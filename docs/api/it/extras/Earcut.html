@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Un'implementazione dell'algoritmo di triangolazione dei poligoni earcut. Il codice è un porting di [link:https://github.com/mapbox/earcut mapbox/earcut].
+		</p>
+
+		<h2>Metodi</h2>
+
+		<h3>[method:Array triangulate]( data, holeIndices, dim )</h3>
+		<p>
+		data -- Un array flat di coordinate dei vertici.<br />
+		holeIndices -- Un array di indici di hole, se presenti.<br />
+		dim -- Il numero di coordinate per vertice nell'array di input.<br /><br />
+
+    Triangola la definizione di forma data restituendo un array di triangoli. 
+    Un triangolo è definito da tre numeri interi consecutivi che rappresentano gli indici dei vertici.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

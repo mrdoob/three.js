@@ -7,6 +7,8 @@ class LineCurve extends Curve {
 
 		super();
 
+		this.isLineCurve = true;
+
 		this.type = 'LineCurve';
 
 		this.v1 = v1;
@@ -40,13 +42,15 @@ class LineCurve extends Curve {
 
 	}
 
-	getTangent( t, optionalTarget ) {
+	getTangent( t, optionalTarget = new Vector2() ) {
 
-		const tangent = optionalTarget || new Vector2();
+		return optionalTarget.subVectors( this.v2, this.v1 ).normalize();
 
-		tangent.copy( this.v2 ).sub( this.v1 ).normalize();
+	}
 
-		return tangent;
+	getTangentAt( u, optionalTarget ) {
+
+		return this.getTangent( u, optionalTarget );
 
 	}
 
@@ -84,7 +88,5 @@ class LineCurve extends Curve {
 	}
 
 }
-
-LineCurve.prototype.isLineCurve = true;
 
 export { LineCurve };

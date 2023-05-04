@@ -4,7 +4,6 @@ var APP = {
 
 		var renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setPixelRatio( window.devicePixelRatio ); // TODO: Use player.setPixelRatio()
-		renderer.outputEncoding = THREE.sRGBEncoding;
 
 		var loader = new THREE.ObjectLoader();
 		var camera, scene;
@@ -30,7 +29,7 @@ var APP = {
 			if ( project.shadowType !== undefined ) renderer.shadowMap.type = project.shadowType;
 			if ( project.toneMapping !== undefined ) renderer.toneMapping = project.toneMapping;
 			if ( project.toneMappingExposure !== undefined ) renderer.toneMappingExposure = project.toneMappingExposure;
-			if ( project.physicallyCorrectLights !== undefined ) renderer.physicallyCorrectLights = project.physicallyCorrectLights;
+			if ( project.useLegacyLights !== undefined ) renderer.useLegacyLights = project.useLegacyLights;
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );

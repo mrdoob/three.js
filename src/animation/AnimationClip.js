@@ -1,4 +1,4 @@
-import { AnimationUtils } from './AnimationUtils.js';
+import * as AnimationUtils from './AnimationUtils.js';
 import { KeyframeTrack } from './KeyframeTrack.js';
 import { BooleanKeyframeTrack } from './tracks/BooleanKeyframeTrack.js';
 import { ColorKeyframeTrack } from './tracks/ColorKeyframeTrack.js';

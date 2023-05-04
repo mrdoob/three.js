@@ -99,20 +99,18 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">threejs</a> - WebGL - Multiple Render Targets<br/>
-			Renders geometry into a G-Buffer.<br/>
-			Visualized here is the color and normal data from the G-Buffer.<br/>
-			Created by <a href="http://twitter.com/mattdesl" target="_blank">@mattdesl</a>.
+			<a href="https://threejs.org" target="_blank">threejs</a> webgl - Multiple RenderTargets
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -121,12 +119,25 @@
 
 			import * as THREE from 'three';
 
-			import WebGL from './jsm/capabilities/WebGL.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
 			let camera, scene, renderer, controls;
 			let renderTarget;
 			let postScene, postCamera;
+
+			const parameters = {
+				samples: 4,
+				wireframe: false
+			};
+
+			const gui = new GUI();
+			gui.add( parameters, 'samples', 0, 4 ).step( 1 );
+			gui.add( parameters, 'wireframe' );
+			gui.onChange( render );
 
 			init();
 
@@ -156,7 +167,6 @@
 
 					renderTarget.texture[ i ].minFilter = THREE.NearestFilter;
 					renderTarget.texture[ i ].magFilter = THREE.NearestFilter;
-					renderTarget.texture[ i ].type = THREE.FloatType;
 
 				}
 
@@ -168,27 +178,19 @@
 				// Scene setup
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 50 );
 				camera.position.z = 4;
 
-				const diffuse = new THREE.TextureLoader().load(
+				const loader = new THREE.TextureLoader();
 
-					'textures/brick_diffuse.jpg',
-
-					function () {
-
-						// ready to render
-						render();
-
-					}
-
-				);
-
-				diffuse.wrapS = diffuse.wrapT = THREE.RepeatWrapping;
+				const diffuse = loader.load( 'textures/hardwood2_diffuse.jpg', render );
+				diffuse.wrapS = THREE.RepeatWrapping;
+				diffuse.wrapT = THREE.RepeatWrapping;
 
 				scene.add( new THREE.Mesh(
-					new THREE.TorusKnotGeometry( 1, 0.3, 128, 64 ),
+					new THREE.TorusKnotGeometry( 1, 0.3, 128, 32 ),
 					new THREE.RawShaderMaterial( {
 						vertexShader: document.querySelector( '#gbuffer-vert' ).textContent.trim(),
 						fragmentShader: document.querySelector( '#gbuffer-frag' ).textContent.trim(),
@@ -222,8 +224,7 @@
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
-				controls.enableZoom = false;
-				controls.screenSpacePanning = true;
+				//controls.enableZoom = false;
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -244,6 +245,18 @@
 			}
 
 			function render() {
+
+				renderTarget.samples = parameters.samples;
+
+				scene.traverse( function ( child ) {
+
+					if ( child.material !== undefined ) {
+
+						child.material.wireframe = parameters.wireframe;
+
+					}
+
+				} );
 
 				// render scene into target
 				renderer.setRenderTarget( renderTarget );

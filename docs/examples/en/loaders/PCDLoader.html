@@ -11,10 +11,27 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">A loader for loading a <em>.pcd</em> resource. <br />
-		Point Cloud Data is a file format for <a href="https://en.wikipedia.org/wiki/Point_Cloud_Library">Point Cloud Library</a>. <br />
-		Loader support ascii and (compressed) binary.
+		<p class="desc">
+			A loader for the PCD (Point Cloud Data) file format. [name] supports ASCII and (compressed) binary files as well as the following PCD fields:
+			<ul>
+				<li>x y z</li>
+				<li>rgb</li>
+				<li>normal_x normal_y normal_z</li>
+				<li>intensity</li>
+				<li>label</li>
+			</ul>
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -28,9 +45,9 @@
 			// resource URL
 			'pointcloud.pcd',
 			// called when the resource is loaded
-			function ( mesh ) {
+			function ( points ) {
 
-				scene.add( mesh );
+				scene.add( points );
 
 			},
 			// called when loading is in progresses
@@ -76,7 +93,7 @@
 
 		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — A string containing the path/URL of the <em>.pcd</em> file.<br />
+		[page:String url] — A string containing the path/URL of the `.pcd` file.<br />
 		[page:Function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives loaded [page:Object3D] as an argument.<br />
 		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br />
@@ -93,7 +110,7 @@
 		[page:String url] — The file name or file url.
 		</p>
 		<p>
-		Parse an <em>pcd</em> binary structure and return an [page:Object3D].<br />
+		Parse an `pcd` binary structure and return an [page:Object3D].<br />
 		The object is converted to [page:Points] with a [page:BufferGeometry] and a [page:PointsMaterial].
 		</p>
 

@@ -22,24 +22,25 @@
   </body>
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
   "imports": {
-    "three": "../../build/three.module.js"
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
   }
 }
 </script>
 
 <script type="module">
 import * as THREE from 'three';
-import * as BufferGeometryUtils from '../../examples/jsm/utils/BufferGeometryUtils.js';
-import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
 function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
   const fov = 60;
   const aspect = 2;  // the canvas default
@@ -149,7 +150,7 @@ function main() {
       });
     });
 
-    const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+    const mergedGeometry = BufferGeometryUtils.mergeGeometries(
         geometries, false);
     const material = new THREE.MeshBasicMaterial({color:'red'});
     const mesh = new THREE.Mesh(mergedGeometry, material);

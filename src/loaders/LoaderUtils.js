@@ -40,7 +40,7 @@ class LoaderUtils {
 
 		if ( index === - 1 ) return './';
 
-		return url.substr( 0, index + 1 );
+		return url.slice( 0, index + 1 );
 
 	}
 

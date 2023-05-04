@@ -50,6 +50,16 @@ class NRRDLoader extends Loader {
 
 	}
 
+	/**
+	 *
+	 * @param {boolean} segmentation is a option for user to choose
+   	 */
+	setSegmentation( segmentation ) {
+
+	    this.segmentation = segmentation;
+
+	}
+
 	parse( data ) {
 
 		// this parser is largely inspired from the XTK NRRD parser : https://github.com/xtk/X
@@ -173,8 +183,7 @@ class NRRDLoader extends Loader {
 
 					headerObject.isNrrd = true;
 
-				} else if ( l.match( /^#/ ) ) {
-				} else if ( m = l.match( /(.*):(.*)/ ) ) {
+				} else if ( ! l.match( /^#/ ) && ( m = l.match( /(.*):(.*)/ ) ) ) {
 
 					field = m[ 1 ].trim();
 					data = m[ 2 ].trim();
@@ -328,7 +337,7 @@ class NRRDLoader extends Loader {
 
 			// we need to decompress the datastream
 			// here we start the unzipping and get a typed Uint8Array back
-			_data = fflate.gunzipSync( new Uint8Array( _data ) );// eslint-disable-line no-undef
+			_data = fflate.gunzipSync( new Uint8Array( _data ) );
 
 		} else if ( headerObject.encoding === 'ascii' || headerObject.encoding === 'text' || headerObject.encoding === 'txt' || headerObject.encoding === 'hex' ) {
 
@@ -354,6 +363,7 @@ class NRRDLoader extends Loader {
 
 		const volume = new Volume();
 		volume.header = headerObject;
+		volume.segmentation = this.segmentation;
 		//
 		// parse the (unzipped) data to a datastream of the correct type
 		//
@@ -380,9 +390,21 @@ class NRRDLoader extends Loader {
 			const zIndex = headerObject.vectors.findIndex( vector => vector[ 2 ] !== 0 );
 
 			const axisOrder = [];
-			axisOrder[ xIndex ] = 'x';
-			axisOrder[ yIndex ] = 'y';
-			axisOrder[ zIndex ] = 'z';
+
+			if ( xIndex !== yIndex && xIndex !== zIndex && yIndex !== zIndex ) {
+
+				axisOrder[ xIndex ] = 'x';
+				axisOrder[ yIndex ] = 'y';
+				axisOrder[ zIndex ] = 'z';
+
+			} else {
+
+				axisOrder[ 0 ] = 'x';
+				axisOrder[ 1 ] = 'y';
+				axisOrder[ 2 ] = 'z';
+
+			}
+
 			volume.axisOrder = axisOrder;
 
 		} else {
@@ -451,7 +473,12 @@ class NRRDLoader extends Loader {
 
 		volume.inverseMatrix = new Matrix4();
 		volume.inverseMatrix.copy( volume.matrix ).invert();
-		volume.RASDimensions = new Vector3( volume.xLength, volume.yLength, volume.zLength ).applyMatrix4( volume.matrix ).round().toArray().map( Math.abs );
+		
+		volume.RASDimensions = [
+			Math.floor( volume.xLength * spacingX ), 
+			Math.floor( volume.yLength * spacingY ), 
+			Math.floor( volume.zLength * spacingZ )
+		];
 
 		// .. and set the default threshold
 		// only if the threshold was not already set

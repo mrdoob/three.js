@@ -16,6 +16,17 @@
 			The last pass is automatically rendered to screen.
 		</p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		</code>
+
 		<h2>Examples</h2>
 
 		<p>
@@ -59,7 +70,7 @@
 			An array representing the (ordered) chain of post-processing passes.
 		</p>
 
-		<h3>[property:WebGLRendererTarget readBuffer]</h3>
+		<h3>[property:WebGLRenderTarget readBuffer]</h3>
 		<p>
 			A reference to the internal read buffer. Passes usually read the previous render result from this buffer.
 		</p>
@@ -74,7 +85,7 @@
 			Whether the final pass is rendered to the screen (default framebuffer) or not.
 		</p>
 
-		<h3>[property:WebGLRendererTarget writeBuffer]</h3>
+		<h3>[property:WebGLRenderTarget writeBuffer]</h3>
 		<p>
 			A reference to the internal write buffer. Passes usually write their result into this buffer.
 		</p>
@@ -87,6 +98,11 @@
 			pass -- The pass to add to the pass chain.<br /><br />
 
 			Adds the given pass to the pass chain.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 		</p>
 
 		<h3>[method:undefined insertPass]( [param:Pass pass], [param:Integer index] )</h3>

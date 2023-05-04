@@ -11,9 +11,20 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">A loader for loading a <em>.pdb</em> resource.<br>
-		The <a href="http://en.wikipedia.org/wiki/Protein_Data_Bank_(file_format)">Protein Data Bank</a> file format is a textual file describing the three-dimensional structures of molecules.
+		<p class="desc">A loader for loading a `.pdb` resource.<br>
+		The [link:http://en.wikipedia.org/wiki/Protein_Data_Bank_(file_format) Protein Data Bank] file format is a textual file describing the three-dimensional structures of molecules.
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { PDBLoader } from 'three/addons/loaders/PDBLoader.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -73,7 +84,7 @@
 
 		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — A string containing the path/URL of the <em>.pdb</em> file.<br />
+		[page:String url] — A string containing the path/URL of the `.pdb` file.<br />
 		[page:Function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives the object having the following properties. [page:BufferGeometry geometryAtoms], [page:BufferGeometry geometryBonds] and the [page:Object JSON] structure.<br />
 		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br />
@@ -84,10 +95,10 @@
 
 		<h3>[method:Object parse]( [param:String text] )</h3>
 		<p>
-		[page:String text] — The textual <em>pdb</em> structure to parse.
+		[page:String text] — The textual `pdb` structure to parse.
 		</p>
 		<p>
-		Parse a <em>pdb</em> text and return a <em>JSON</em> structure.<br />
+		Parse a `pdb` text and return a `JSON` structure.<br />
 		</p>
 
 		<h2>Source</h2>

@@ -11,8 +11,10 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">Create a smooth 3d spline curve from a series of points using the
-			[link:https://en.wikipedia.org/wiki/Centripetal_Catmull-Rom_spline Catmull-Rom] algorithm.</p>
+		<p class="desc">
+			Create a smooth 3d spline curve from a series of points using the
+			[link:https://en.wikipedia.org/wiki/Centripetal_Catmull-Rom_spline Catmull-Rom] algorithm.
+		</p>
 
 		<h2>Code Example</h2>
 
@@ -43,30 +45,33 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:Array points], [param:Boolean closed], [param:String curveType], [param:Float tension] )</h3>
+		<h3>
+			[name]( [param:Array points], [param:Boolean closed], [param:String curveType], [param:Float tension] )
+		</h3>
 		<p>
-			points – An array of [page:Vector3] points<br/>
-			closed – Whether the curve is closed. Default is *false*.<br/>
-			curveType – Type of the curve. Default is *centripetal*.<br/>
-			tension – Tension of the curve. Default is *0.5*.
+			points – An array of [page:Vector3] points<br />
+			closed – Whether the curve is closed. Default is `false`.<br />
+			curveType – Type of the curve. Default is `centripetal`.<br />
+			tension – Tension of the curve. Default is `0.5`.
 		</p>
-
 
 		<h2>Properties</h2>
 		<p>See the base [page:Curve] class for common properties.</p>
 
 		<h3>[property:Array points]</h3>
-		<p>The array of [page:Vector3] points that define the curve. It needs at least two entries.</p>
+		<p>
+			The array of [page:Vector3] points that define the curve. It needs at
+			least two entries.
+		</p>
 
 		<h3>[property:Boolean closed]</h3>
 		<p>The curve will loop back onto itself when this is true.</p>
 
 		<h3>[property:String curveType]</h3>
-		<p>Possible values are *centripetal*, *chordal* and *catmullrom*.</p>
+		<p>Possible values are `centripetal`, `chordal` and `catmullrom`.</p>
 
 		<h3>[property:Float tension]</h3>
-		<p>When [page:.curveType] is *catmullrom*, defines catmullrom's tension.</p>
-
+		<p>When [page:.curveType] is `catmullrom`, defines catmullrom's tension.</p>
 
 		<h2>Methods</h2>
 		<p>See the base [page:Curve] class for common methods.</p>

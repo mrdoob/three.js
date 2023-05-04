@@ -10,8 +10,19 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		Represents a lookup table for colormaps. It is used to determine the color values from a range of data values.
+			Represents a lookup table for colormaps. It is used to determine the color values from a range of data values.
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { Lut } from 'three/addons/math/Lut.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -25,8 +36,8 @@
 
 		<h3>[name]( [param:String colormap], [param:Number count] )</h3>
 		<p>
-		colormap - Sets a colormap from predefined colormaps. Available colormaps are: *rainbow*, *cooltowarm*, *blackbody*, *grayscale*. Default is *rainbow*.<br />
-		count - Sets the number of colors used to represent the data array. Default is *32*.
+		colormap - Sets a colormap from predefined colormaps. Available colormaps are: `rainbow`, `cooltowarm`, `blackbody`, `grayscale`. Default is `rainbow`.<br />
+		count - Sets the number of colors used to represent the data array. Default is `32`.
 		</p>
 
 		<h2>Properties</h2>
@@ -38,7 +49,7 @@
 
 		<h3>[property:Array map]</h3>
 		<p>
-		The currently selected color map. Default is the *rainbow* color map.
+		The currently selected color map. Default is the `rainbow` color map.
 		</p>
 
 		<h3>[property:Number minV]</h3>
@@ -53,7 +64,7 @@
 
 		<h3>[property:Number n]</h3>
 		<p>
-		The number of colors of the current selected color map. Default is *32*.
+		The number of colors of the current selected color map. Default is `32`.
 		</p>
 
 		<h2>Methods</h2>
@@ -91,7 +102,7 @@
 		<h3>[method:this setColorMap]( [param:String colormap], [param:Number count] )</h3>
 		<p>
 		colormap — The name of the color map.<br />
-		count — The number of colors. Default is *32*.
+		count — The number of colors. Default is `32`.
 		</p>
 		<p>
 		Configure the lookup table for the given color map and number of colors.

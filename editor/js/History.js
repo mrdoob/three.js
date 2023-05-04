@@ -1,41 +1,40 @@
-
 import * as Commands from './commands/Commands.js';
 
-function History( editor ) {
+class History {
 
-	this.editor = editor;
-	this.undos = [];
-	this.redos = [];
-	this.lastCmdTime = new Date();
-	this.idCounter = 0;
+	constructor( editor ) {
 
-	this.historyDisabled = false;
-	this.config = editor.config;
+		this.editor = editor;
+		this.undos = [];
+		this.redos = [];
+		this.lastCmdTime = Date.now();
+		this.idCounter = 0;
 
-	// signals
+		this.historyDisabled = false;
+		this.config = editor.config;
 
-	const scope = this;
+		// signals
 
-	this.editor.signals.startPlayer.add( function () {
+		const scope = this;
 
-		scope.historyDisabled = true;
+		this.editor.signals.startPlayer.add( function () {
 
-	} );
+			scope.historyDisabled = true;
 
-	this.editor.signals.stopPlayer.add( function () {
+		} );
 
-		scope.historyDisabled = false;
+		this.editor.signals.stopPlayer.add( function () {
 
-	} );
+			scope.historyDisabled = false;
 
-}
+		} );
 
-History.prototype = {
+	}
 
-	execute: function ( cmd, optionalName ) {
+	execute( cmd, optionalName ) {
 
 		const lastCmd = this.undos[ this.undos.length - 1 ];
-		const timeDifference = new Date().getTime() - this.lastCmdTime.getTime();
+		const timeDifference = Date.now() - this.lastCmdTime;
 
 		const isUpdatableCmd = lastCmd &&
 			lastCmd.updatable &&
@@ -76,16 +75,16 @@ History.prototype = {
 
 		}
 
-		this.lastCmdTime = new Date();
+		this.lastCmdTime = Date.now();
 
 		// clearing all the redo-commands
 
 		this.redos = [];
 		this.editor.signals.historyChanged.dispatch( cmd );
 
-	},
+	}
 
-	undo: function () {
+	undo() {
 
 		if ( this.historyDisabled ) {
 
@@ -118,9 +117,9 @@ History.prototype = {
 
 		return cmd;
 
-	},
+	}
 
-	redo: function () {
+	redo() {
 
 		if ( this.historyDisabled ) {
 
@@ -153,9 +152,9 @@ History.prototype = {
 
 		return cmd;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
 		const history = {};
 		history.undos = [];
@@ -193,9 +192,9 @@ History.prototype = {
 
 		return history;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
 		if ( json === undefined ) return;
 
@@ -226,9 +225,9 @@ History.prototype = {
 		// Select the last executed undo-command
 		this.editor.signals.historyChanged.dispatch( this.undos[ this.undos.length - 1 ] );
 
-	},
+	}
 
-	clear: function () {
+	clear() {
 
 		this.undos = [];
 		this.redos = [];
@@ -236,9 +235,9 @@ History.prototype = {
 
 		this.editor.signals.historyChanged.dispatch();
 
-	},
+	}
 
-	goToState: function ( id ) {
+	goToState( id ) {
 
 		if ( this.historyDisabled ) {
 
@@ -281,9 +280,9 @@ History.prototype = {
 		this.editor.signals.sceneGraphChanged.dispatch();
 		this.editor.signals.historyChanged.dispatch( cmd );
 
-	},
+	}
 
-	enableSerialization: function ( id ) {
+	enableSerialization( id ) {
 
 		/**
 		 * because there might be commands in this.undos and this.redos
@@ -317,6 +316,6 @@ History.prototype = {
 
 	}
 
-};
+}
 
 export { History };

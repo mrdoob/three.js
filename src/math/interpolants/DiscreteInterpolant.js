@@ -2,7 +2,7 @@ import { Interpolant } from '../Interpolant.js';
 
 /**
  *
- * Interpolant that evaluates to the sample value at the position preceeding
+ * Interpolant that evaluates to the sample value at the position preceding
  * the parameter.
  */
 

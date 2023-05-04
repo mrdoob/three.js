@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – 优化对象的同时保持动画效果">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -209,7 +209,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 
   ...
 
--  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+-  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 -      geometries, false);
 -  const material = new THREE.MeshBasicMaterial({
 -    vertexColors: true,
@@ -217,7 +217,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 -  const mesh = new THREE.Mesh(mergedGeometry, material);
 -  scene.add(mesh);
 -  return mesh;
-+  return BufferGeometryUtils.mergeBufferGeometries(
++  return BufferGeometryUtils.mergeGeometries(
 +     geometries, false);
 }
 </pre>
@@ -262,6 +262,12 @@ showFileInfo(fileInfos, fileInfos[0]);
 +  attribute.name = name;
 +  return attribute;
 +});
++baseGeometry.morphAttributes.color = geometries.map((geometry, ndx) =&gt; {
++  const attribute = geometry.getAttribute('color');
++  const name = `target${ndx}`;
++  attribute.name = name;
++  return attribute;
++});
 +const material = new THREE.MeshBasicMaterial({
 +  vertexColors: true,
 +});
@@ -288,10 +294,10 @@ showFileInfo(fileInfos, fileInfos[0]);
 <p>以上我们为每一组数据集创建了几何体, 以第一个作为基准, 获取了<code class="notranslate" translate="no">position</code>属性, 将其他的几何体作为其变形目标</p>
 <p>现在我们需要改变显示和隐藏各种数据集的方式. 我们需要改动变形目标的influence, 而不是简单地显示和隐藏mesh. 对于我们我们想看到的数据集, influence应该是1, 不想看到的是0. 但是我们又不能直接将他们设置成1和0, 这将会显示开与闭的两种情况, 和现在这种没有区别. 我们也可以写一段自定义的动画效果, 听起来不难. 但是我们模仿的WebGL globe用了一个<a href="https://github.com/tweenjs/tween.js/">动画库</a>, 我们也用这一个. </p>
 <p>我们这里首先引入它</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import {BufferGeometryUtils} from '/examples/jsm/utils/BufferGeometryUtils.js';
-import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
-+import {TWEEN} from '/examples/jsm/libs/tween.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {BufferGeometryUtils} from 'three/addons/utils/BufferGeometryUtils.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
++import TWEEN from 'three/addons/libs/tween.module.js';
 </pre>
 <p>然后创建一个<code class="notranslate" translate="no">Tween</code>来使influence变化</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
@@ -348,7 +354,7 @@ function showFileInfo(fileInfos, fileInfo) {
 <p>我们需要以下代码来使用</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  const tweenManager = new TweenManger();
 
   ...
@@ -398,185 +404,6 @@ render();
 </div>
 
 <p></p>
-<p>看起来挺好的, 但是失去了色彩.</p>
-<p>Three.js不支持颜色的变形, 但事实上这是<a href="https://github.com/dataarts/webgl-globe">webgl globe</a>下的一个issue. 基本上它只为第一个数据集生成颜色, 任何其他数据集使用相同的颜色. 即使它们有很大的不同. </p>
-<p>让我们看看是否可以做到让颜色也随之变化. 这个操作方法可能鲁棒性不足. 最好的方式是自己写着色器, 但是我觉得在这里还是讲一下如何修改内置的着色器为好</p>
-<p>我们需要做的第一件事是让代码从每个数据集的几何体中提取颜色. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const baseGeometry = geometries[0];
-baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) =&gt; {
-  const attribute = geometry.getAttribute('position');
-  const name = `target${ndx}`;
-  attribute.name = name;
-  return attribute;
-});
-+const colorAttributes = geometries.map((geometry, ndx) =&gt; {
-+  const attribute = geometry.getAttribute('color');
-+  const name = `morphColor${ndx}`;
-+  attribute.name = `color${ndx}`;  // debug需要
-+  return {name, attribute};
-+});
-const material = new THREE.MeshBasicMaterial({
-  vertexColors: true,
-  morphTargets: true,
-});
-</pre>
-<p>We then need to modify the three.js shader. Three.js materials have an
-<a href="/docs/#api/zh/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a> property we can assign a function. It gives us a
-chance to modify the material's shader before it is passed to WebGL. In fact the
-shader that is provided is actually a special three.js only syntax of shader
-that lists a bunch of shader <em>chunks</em> that three.js will substitute with the
-actual GLSL code for each chunk. Here is what the unmodified vertex shader code
-looks like as passed to <code class="notranslate" translate="no">onBeforeCompile</code>.</p>
-<p>我们需要改动three.js的着色器. Three.js的材质有一个<a href="/docs/#api/zh/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>属性, 我们可以为其赋一个函数. 这给了我们一个在传递给WebGL之前修改材质着色器的机会. 实际上, 提供的着色器就是一个特殊语法的three.js, 然后将会被GLSL替换. 以下是未修改的顶点着色器代码, 看起来将要传给<code class="notranslate" translate="no">onBeforeCompile</code>. (In fact the shader that is provided is actually a special three.js only syntax of shader that lists a bunch of shader <em>chunks</em> that three.js will substitute with the actual GLSL code for each chunk. Here is what the unmodified vertex shader code looks like as passed to <code class="notranslate" translate="no">onBeforeCompile</code>.)</p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">#include &lt;common&gt;
-#include &lt;uv_pars_vertex&gt;
-#include &lt;uv2_pars_vertex&gt;
-#include &lt;envmap_pars_vertex&gt;
-#include &lt;color_pars_vertex&gt;
-#include &lt;fog_pars_vertex&gt;
-#include &lt;morphtarget_pars_vertex&gt;
-#include &lt;skinning_pars_vertex&gt;
-#include &lt;logdepthbuf_pars_vertex&gt;
-#include &lt;clipping_planes_pars_vertex&gt;
-void main() {
-    #include &lt;uv_vertex&gt;
-    #include &lt;uv2_vertex&gt;
-    #include &lt;color_vertex&gt;
-    #include &lt;skinbase_vertex&gt;
-    #ifdef USE_ENVMAP
-    #include &lt;beginnormal_vertex&gt;
-    #include &lt;morphnormal_vertex&gt;
-    #include &lt;skinnormal_vertex&gt;
-    #include &lt;defaultnormal_vertex&gt;
-    #endif
-    #include &lt;begin_vertex&gt;
-    #include &lt;morphtarget_vertex&gt;
-    #include &lt;skinning_vertex&gt;
-    #include &lt;project_vertex&gt;
-    #include &lt;logdepthbuf_vertex&gt;
-    #include &lt;worldpos_vertex&gt;
-    #include &lt;clipping_planes_vertex&gt;
-    #include &lt;envmap_vertex&gt;
-    #include &lt;fog_vertex&gt;
-}
-</pre>
-<p>我们需要替换一下的部分 <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphtarget_pars_vertex.glsl.js"><code class="notranslate" translate="no">morphtarget_pars_vertex</code> chunk</a>, <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphnormal_vertex.glsl.js"><code class="notranslate" translate="no">morphnormal_vertex</code> chunk</a>, <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphtarget_vertex.glsl.js"><code class="notranslate" translate="no">morphtarget_vertex</code> chunk</a>, <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_pars_vertex.glsl.js"><code class="notranslate" translate="no">color_pars_vertex</code> chunk</a>, <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_vertex.glsl.js"><code class="notranslate" translate="no">color_vertex</code> chunk</a></p>
-<p>我们需要把待替换写成一个简单的数组, 在<a href="/docs/#api/zh/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>中应用它们.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshBasicMaterial({
-  vertexColors: true,
-});
-+const vertexShaderReplacements = [
-+  {
-+    from: '#include &lt;morphtarget_pars_vertex&gt;',
-+    to: `
-+      uniform float morphTargetInfluences[8];
-+    `,
-+  },
-+  {
-+    from: '#include &lt;morphnormal_vertex&gt;',
-+    to: `
-+    `,
-+  },
-+  {
-+    from: '#include &lt;morphtarget_vertex&gt;',
-+    to: `
-+      transformed += (morphTarget0 - position) * morphTargetInfluences[0];
-+      transformed += (morphTarget1 - position) * morphTargetInfluences[1];
-+      transformed += (morphTarget2 - position) * morphTargetInfluences[2];
-+      transformed += (morphTarget3 - position) * morphTargetInfluences[3];
-+    `,
-+  },
-+  {
-+    from: '#include &lt;color_pars_vertex&gt;',
-+    to: `
-+      varying vec3 vColor;
-+      attribute vec3 morphColor0;
-+      attribute vec3 morphColor1;
-+      attribute vec3 morphColor2;
-+      attribute vec3 morphColor3;
-+    `,
-+  },
-+  {
-+    from: '#include &lt;color_vertex&gt;',
-+    to: `
-+      vColor.xyz = morphColor0 * morphTargetInfluences[0] +
-+                   morphColor1 * morphTargetInfluences[1] +
-+                   morphColor2 * morphTargetInfluences[2] +
-+                   morphColor3 * morphTargetInfluences[3];
-+    `,
-+  },
-+];
-+material.onBeforeCompile = (shader) =&gt; {
-+  vertexShaderReplacements.forEach((rep) =&gt; {
-+    shader.vertexShader = shader.vertexShader.replace(rep.from, rep.to);
-+  });
-+};
-</pre>
-<p>Three.js会给这些变形对象排序, 然后之后采用最高的influence. 这使得它可以采用更多的变形目标而只有几个可以被在同一时刻使用.不幸的是three.js不提供任何方法来知道将使用多少变形目标, 也不知道变形目标将分配给哪些属性. 所以, 我们必须研究代码并重现它在这里的作用. 如果three.js修改了它的算法, 接下来的代码也得重构. </p>
-<p>首先我们需要移除所有的颜色属性. 如果我们之前没有赋予这个属性那么移除它就一点事没有. 然后我们将会计算那些目标three.js将会用到, 最终把这些目标赋给three.js可能会用到的属性. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mesh = new THREE.Mesh(baseGeometry, material);
-scene.add(mesh);
-
-+function updateMorphTargets() {
-+  // 移除所有的颜色属性
-+  for (const {name} of colorAttributes) {
-+    baseGeometry.deleteAttribute(name);
-+  }
-+
-+  // 没有提供可以查询这个的方法, 我们只能寄希望于它不会改变
-+  const maxInfluences = 8;
-+
-+  // three.js没有提供查询哪个morphtarget会被使用的方法
-+  // 也没有那个属性说明被使用, 所以只能靠猜
-+  // 如果算法改了, 那这些都得重构
-+  mesh.morphTargetInfluences
-+    .map((influence, i) =&gt; [i, influence])            // 将索引映射到influence
-+    .sort((a, b) =&gt; Math.abs(b[1]) - Math.abs(a[1]))  // 降幂排序
-+    .slice(0, maxInfluences)                          // 只要最大的influence
-+    .sort((a, b) =&gt; a[0] - b[0])                      // 按索引排序
-+    .filter(a =&gt; !!a[1])                              // 移除没有influence的
-+    .forEach(([ndx], i) =&gt; {                          // 赋予属性
-+      const name = `morphColor${i}`;
-+      baseGeometry.setAttribute(name, colorAttributes[ndx].attribute);
-+    });
-+}
-</pre>
-<p>我们将会在<code class="notranslate" translate="no">loadAll</code>函数中返回这个函数. 这将不会让我们泄露任何的变量</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">async function loadAll() {
-  ...
-
-+  return updateMorphTargets;
-}
-
-+// 使用无操作的update直到所有数据准备完成
-+let updateMorphTargets = () =&gt; {};
--loadAll();
-+loadAll().then(fn =&gt; {
-+  updateMorphTargets = fn;
-+});
-</pre>
-<p>最终我们需要调用<code class="notranslate" translate="no">updateMorphTargets</code>, 直到我们最终让所有的数值都在渲染前被tween manager更新</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
-
-  ...
-
-  if (tweenManager.update()) {
-    requestRenderIfNotRequested();
-  }
-
-+  updateMorphTargets();
-
-  controls.update();
-  renderer.render(scene, camera);
-}
-</pre>
-<p>然后我们的颜色就可以像尺寸一样动起来了. </p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-morphtargets-w-colors.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lots-of-objects-morphtargets-w-colors.html" target="_blank">点击此处在新标签页中打开</a>
-</div>
-
-<p></p>
 <p>我希望上面讲的这些能有用. 通过threejs提供的方法或者自己写着色器来使用变形对象是一种常见的移动大量对象的手段. 作为一个例子, 我们可以给每一个立方体一个随机目标, 然后从这个位置变换到另一个位置. 这可能是一种超酷的介绍地球的方法. </p>
 <p>接下来你可能感兴趣的是给地球上的一个位置添加标签, 这将在<a href="align-html-elements-to-3d.html">3D中排布HTML元素</a>中涉及. </p>
 <p>Note: We could try to just graph percent of men or percent of women or the raw
@@ -592,8 +419,8 @@ b)</code> "percent" and you'll see what I mean.</p>
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

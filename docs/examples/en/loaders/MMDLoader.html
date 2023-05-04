@@ -11,11 +11,22 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc"> A loader for <a href="https://sites.google.com/view/evpvp/"><em>MMD</em></a> resources. <br /><br />
+		<p class="desc"> A loader for <a href="https://sites.google.com/view/evpvp/">`MMD`</a> resources. <br /><br />
 		[name] creates Three.js Objects from MMD resources as PMD, PMX, VMD, and VPD files.
 		See [page:MMDAnimationHelper] for MMD animation handling as IK, Grant, and Physics.<br /><br />
 
-		If you want raw content of MMD resources, use .loadPMD/PMX/VMD/VPD methods.
+		If you want raw content of MMD resources, use .loadPMD/PMX/VMD/VPD methods.</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -73,7 +84,7 @@
 
 		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — A string containing the path/URL of the <em>.pmd</em> or <em>.pmx</em> file.<br />
+		[page:String url] — A string containing the path/URL of the `.pmd` or `.pmx` file.<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
 		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
@@ -84,7 +95,7 @@
 
 		<h3>[method:undefined loadAnimation]( [param:String url], [param:Object3D object], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — A string or an array of string containing the path/URL of the <em>.vmd</em> file(s).If two or more files are specified, they'll be merged.<br />
+		[page:String url] — A string or an array of string containing the path/URL of the `.vmd` file(s).If two or more files are specified, they'll be merged.<br />
 		[page:Object3D object] — [page:SkinnedMesh] or [page:Camera]. Clip and its tracks will be fitting to this object.<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
 		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
@@ -96,8 +107,8 @@
 
 		<h3>[method:undefined loadWithAnimation]( [param:String modelUrl], [param:String vmdUrl], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String modelUrl] — A string containing the path/URL of the <em>.pmd</em> or <em>.pmx</em> file.<br />
-		[page:String vmdUrl] — A string or an array of string containing the path/URL of the <em>.vmd</em> file(s).<br />
+		[page:String modelUrl] — A string containing the path/URL of the `.pmd` or `.pmx` file.<br />
+		[page:String vmdUrl] — A string or an array of string containing the path/URL of the `.vmd` file(s).<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
 		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />

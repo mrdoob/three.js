@@ -1,5 +1,6 @@
-import { GPUPrimitiveTopology, GPUIndexFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor, GPUColorWriteFlags, GPUStencilOperation, GPUInputStepMode } from './constants.js';
+import { GPUIndexFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor, GPUColorWriteFlags, GPUStencilOperation, GPUInputStepMode } from './constants.js';
 import {
+	Float16BufferAttribute,
 	FrontSide, BackSide, DoubleSide,
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
 	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc,
@@ -9,9 +10,29 @@ import {
 	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor
 } from 'three';
 
+const typedArraysToVertexFormatPrefix = new Map( [
+	[ Int8Array, [ 'sint8', 'snorm8' ]],
+	[ Uint8Array, [ 'uint8', 'unorm8' ]],
+	[ Int16Array, [ 'sint16', 'snorm16' ]],
+	[ Uint16Array, [ 'uint16', 'unorm16' ]],
+	[ Int32Array, [ 'sint32', 'snorm32' ]],
+	[ Uint32Array, [ 'uint32', 'unorm32' ]],
+	[ Float32Array, [ 'float32', ]],
+] );
+
+const typedAttributeToVertexFormatPrefix = new Map( [
+	[ Float16BufferAttribute, [ 'float16', ]],
+] );
+
+const typeArraysToVertexFormatPrefixForItemSize1 = new Map( [
+	[ Int32Array, 'sint32' ],
+	[ Uint32Array, 'uint32' ],
+	[ Float32Array, 'float32' ]
+] );
+
 class WebGPURenderPipeline {
 
-	constructor( device, renderer, sampleCount ) {
+	constructor( device, utils ) {
 
 		this.cacheKey = null;
 		this.shaderAttributes = null;
@@ -20,15 +41,13 @@ class WebGPURenderPipeline {
 		this.usedTimes = 0;
 
 		this._device = device;
-		this._renderer = renderer;
-		this._sampleCount = sampleCount;
+		this._utils = utils;
 
 	}
 
-	init( cacheKey, stageVertex, stageFragment, object, nodeBuilder ) {
+	init( cacheKey, stageVertex, stageFragment, renderObject, nodeBuilder ) {
 
-		const material = object.material;
-		const geometry = object.geometry;
+		const { object, material, geometry } = renderObject;
 
 		// determine shader attributes
 
@@ -46,7 +65,7 @@ class WebGPURenderPipeline {
 
 			vertexBuffers.push( {
 				arrayStride: attribute.arrayStride,
-				attributes: [ { shaderLocation: attribute.slot, offset: 0, format: attribute.format } ],
+				attributes: [ { shaderLocation: attribute.slot, offset: attribute.offset, format: attribute.format } ],
 				stepMode: stepMode
 			} );
 
@@ -86,11 +105,12 @@ class WebGPURenderPipeline {
 
 		//
 
-		const primitiveState = this._getPrimitiveState( object, material );
+		const primitiveState = this._getPrimitiveState( object, geometry, material );
 		const colorWriteMask = this._getColorWriteMask( material );
 		const depthCompare = this._getDepthCompare( material );
-		const colorFormat = this._renderer.getCurrentColorFormat();
-		const depthStencilFormat = this._renderer.getCurrentDepthStencilFormat();
+		const colorFormat = this._utils.getCurrentColorFormat();
+		const depthStencilFormat = this._utils.getCurrentDepthStencilFormat();
+		const sampleCount = this._utils.getSampleCount();
 
 		this.pipeline = this._device.createRenderPipeline( {
 			vertex: Object.assign( {}, stageVertex.stage, { buffers: vertexBuffers } ),
@@ -113,22 +133,10 @@ class WebGPURenderPipeline {
 				stencilWriteMask: material.stencilWriteMask
 			},
 			multisample: {
-				count: this._sampleCount
-			}
+				count: sampleCount
+			},
+			layout: 'auto'
 		} );
-
-	}
-
-	_getArrayStride( type, bytesPerElement ) {
-
-		// @TODO: This code is GLSL specific. We need to update when we switch to WGSL.
-
-		if ( type === 'float' || type === 'int' || type === 'uint' ) return bytesPerElement;
-		if ( type === 'vec2' || type === 'ivec2' || type === 'uvec2' ) return bytesPerElement * 2;
-		if ( type === 'vec3' || type === 'ivec3' || type === 'uvec3' ) return bytesPerElement * 3;
-		if ( type === 'vec4' || type === 'ivec4' || type === 'uvec4' ) return bytesPerElement * 4;
-
-		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
 
 	}
 
@@ -156,7 +164,13 @@ class WebGPURenderPipeline {
 				break;
 
 			case AdditiveBlending:
-				// no alphaBlend settings
+
+				alphaBlend = {
+					srcFactor: GPUBlendFactor.Zero,
+					dstFactor: GPUBlendFactor.One,
+					operation: GPUBlendOperation.Add
+				};
+
 				break;
 
 			case SubtractiveBlending:
@@ -174,6 +188,7 @@ class WebGPURenderPipeline {
 				break;
 
 			case MultiplyBlending:
+
 				if ( premultipliedAlpha === true ) {
 
 					alphaBlend = {
@@ -330,7 +345,6 @@ class WebGPURenderPipeline {
 		switch ( blending ) {
 
 			case NormalBlending:
-
 				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
 				colorBlend.dstFactor = GPUBlendFactor.OneMinusSrcAlpha;
 				colorBlend.operation = GPUBlendOperation.Add;
@@ -338,6 +352,7 @@ class WebGPURenderPipeline {
 
 			case AdditiveBlending:
 				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
+				colorBlend.dstFactor = GPUBlendFactor.One;
 				colorBlend.operation = GPUBlendOperation.Add;
 				break;
 
@@ -431,15 +446,14 @@ class WebGPURenderPipeline {
 
 	}
 
-	_getPrimitiveState( object, material ) {
+	_getPrimitiveState( object, geometry, material ) {
 
 		const descriptor = {};
 
-		descriptor.topology = this._getPrimitiveTopology( object );
+		descriptor.topology = this._utils.getPrimitiveTopology( object, material );
 
 		if ( object.isLine === true && object.isLineSegments !== true ) {
 
-			const geometry = object.geometry;
 			const count = ( geometry.index ) ? geometry.index.count : geometry.attributes.position.count;
 			descriptor.stripIndexFormat = ( count > 65535 ) ? GPUIndexFormat.Uint32 : GPUIndexFormat.Uint16; // define data type for primitive restart value
 
@@ -448,8 +462,8 @@ class WebGPURenderPipeline {
 		switch ( material.side ) {
 
 			case FrontSide:
-				descriptor.frontFace = GPUFrontFace.CCW;
-				descriptor.cullMode = GPUCullMode.Back;
+				descriptor.frontFace = GPUFrontFace.CW;
+				descriptor.cullMode = GPUCullMode.Front;
 				break;
 
 			case BackSide:
@@ -458,7 +472,7 @@ class WebGPURenderPipeline {
 				break;
 
 			case DoubleSide:
-				descriptor.frontFace = GPUFrontFace.CCW;
+				descriptor.frontFace = GPUFrontFace.CW;
 				descriptor.cullMode = GPUCullMode.None;
 				break;
 
@@ -469,15 +483,6 @@ class WebGPURenderPipeline {
 		}
 
 		return descriptor;
-
-	}
-
-	_getPrimitiveTopology( object ) {
-
-		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
-		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
-		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
-		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 
 	}
 
@@ -577,127 +582,48 @@ class WebGPURenderPipeline {
 
 	}
 
-	_getVertexFormat( type, bytesPerElement ) {
+	_getVertexFormat( geometryAttribute ) {
 
-		// float
+		const { itemSize, normalized } = geometryAttribute;
+		const ArrayType = geometryAttribute.array.constructor;
+		const AttributeType = geometryAttribute.constructor;
 
-		if ( type === 'float' ) return GPUVertexFormat.Float32;
+		let format;
 
-		if ( type === 'vec2' ) {
+		if ( itemSize == 1 ) {
 
-			if ( bytesPerElement === 2 ) {
+			format = typeArraysToVertexFormatPrefixForItemSize1.get( ArrayType );
 
-				return GPUVertexFormat.Float16x2;
+		} else {
 
-			} else {
+			const prefixOptions = typedAttributeToVertexFormatPrefix.get( AttributeType ) || typedArraysToVertexFormatPrefix.get( ArrayType );
+			const prefix = prefixOptions[ normalized ? 1 : 0 ];
 
-				return GPUVertexFormat.Float32x2;
+			if ( prefix ) {
 
-			}
+				const bytesPerUnit = ArrayType.BYTES_PER_ELEMENT * itemSize;
+				const paddedBytesPerUnit = Math.floor( ( bytesPerUnit + 3 ) / 4 ) * 4;
+				const paddedItemSize = paddedBytesPerUnit / ArrayType.BYTES_PER_ELEMENT;
 
-		}
+				if ( paddedItemSize % 1 ) {
 
-		if ( type === 'vec3' ) return GPUVertexFormat.Float32x3;
+					throw new Error( 'THREE.WebGPURenderer: Bad vertex format item size.' );
 
-		if ( type === 'vec4' ) {
+				}
 
-			if ( bytesPerElement === 2 ) {
-
-				return GPUVertexFormat.Float16x4;
-
-			} else {
-
-				return GPUVertexFormat.Float32x4;
-
-			}
-
-		}
-
-		// int
-
-		if ( type === 'int' ) return GPUVertexFormat.Sint32;
-
-		if ( type === 'ivec2' ) {
-
-			if ( bytesPerElement === 1 ) {
-
-				return GPUVertexFormat.Sint8x2;
-
-			} else if ( bytesPerElement === 2 ) {
-
-				return GPUVertexFormat.Sint16x2;
-
-			} else {
-
-				return GPUVertexFormat.Sint32x2;
+				format = `${prefix}x${paddedItemSize}`;
 
 			}
 
 		}
 
-		if ( type === 'ivec3' ) return GPUVertexFormat.Sint32x3;
+		if ( ! format ) {
 
-		if ( type === 'ivec4' ) {
-
-			if ( bytesPerElement === 1 ) {
-
-				return GPUVertexFormat.Sint8x4;
-
-			} else if ( bytesPerElement === 2 ) {
-
-				return GPUVertexFormat.Sint16x4;
-
-			} else {
-
-				return GPUVertexFormat.Sint32x4;
-
-			}
+			console.error( 'THREE.WebGPURenderer: Vertex format not supported yet.' );
 
 		}
 
-		// uint
-
-		if ( type === 'uint' ) return GPUVertexFormat.Uint32;
-
-		if ( type === 'uvec2' ) {
-
-			if ( bytesPerElement === 1 ) {
-
-				return GPUVertexFormat.Uint8x2;
-
-			} else if ( bytesPerElement === 2 ) {
-
-				return GPUVertexFormat.Uint16x2;
-
-			} else {
-
-				return GPUVertexFormat.Uint32x2;
-
-			}
-
-		}
-
-		if ( type === 'uvec3' ) return GPUVertexFormat.Uint32x3;
-
-		if ( type === 'uvec4' ) {
-
-			if ( bytesPerElement === 1 ) {
-
-				return GPUVertexFormat.Uint8x4;
-
-			} else if ( bytesPerElement === 2 ) {
-
-				return GPUVertexFormat.Uint16x4;
-
-			} else {
-
-				return GPUVertexFormat.Uint32x4;
-
-			}
-
-		}
-
-		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
+		return format;
 
 	}
 
@@ -709,19 +635,29 @@ class WebGPURenderPipeline {
 		for ( let slot = 0; slot < nodeAttributes.length; slot ++ ) {
 
 			const nodeAttribute = nodeAttributes[ slot ];
-
 			const name = nodeAttribute.name;
-			const type = nodeAttribute.type;
 
 			const geometryAttribute = geometry.getAttribute( name );
-			const bytesPerElement = ( geometryAttribute !== undefined ) ? geometryAttribute.array.BYTES_PER_ELEMENT : 4;
+			const bytesPerElement = geometryAttribute.array.BYTES_PER_ELEMENT;
 
-			const arrayStride = this._getArrayStride( type, bytesPerElement );
-			const format = this._getVertexFormat( type, bytesPerElement );
+			const format = this._getVertexFormat( geometryAttribute );
+
+			let arrayStride = geometryAttribute.itemSize * bytesPerElement;
+			let offset = 0;
+
+			if ( geometryAttribute.isInterleavedBufferAttribute === true ) {
+
+				// @TODO: It can be optimized for "vertexBuffers" on RenderPipeline
+
+				arrayStride = geometryAttribute.data.stride * bytesPerElement;
+				offset = geometryAttribute.offset * bytesPerElement;
+
+			}
 
 			attributes.push( {
 				name,
 				arrayStride,
+				offset,
 				format,
 				slot
 			} );

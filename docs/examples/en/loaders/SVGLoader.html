@@ -11,9 +11,20 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">A loader for loading a <em>.svg</em> resource.<br >
-		<a href="https://en.wikipedia.org/wiki/Scalable_Vector_Graphics">Scalable Vector Graphics</a> is an XML-based vector image format for two-dimensional graphics with support for interactivity and animation.
+		<p class="desc">A loader for loading a `.svg` resource.<br >
+		[link:https://en.wikipedia.org/wiki/Scalable_Vector_Graphics Scalable Vector Graphics] is an XML-based vector image format for two-dimensional graphics with support for interactivity and animation.
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -95,7 +106,7 @@
 
 		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — A string containing the path/URL of the <em>.svg</em> file.<br />
+		[page:String url] — A string containing the path/URL of the `.svg` file.<br />
 		[page:Function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives an array of [page:ShapePath] as an argument.<br />
 		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br />

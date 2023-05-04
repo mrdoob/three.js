@@ -5,13 +5,11 @@ import {
 	DepthTexture,
 	DstAlphaFactor,
 	DstColorFactor,
-	LinearFilter,
 	MeshDepthMaterial,
 	MeshNormalMaterial,
 	NearestFilter,
 	NoBlending,
 	RGBADepthPacking,
-	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	UnsignedShortType,
@@ -64,18 +62,13 @@ class SAOPass extends Pass {
 
 		this.resolution = new Vector2( resolution.x, resolution.y );
 
-		this.saoRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y, {
-			minFilter: LinearFilter,
-			magFilter: LinearFilter,
-			format: RGBAFormat
-		} );
+		this.saoRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y );
 		this.blurIntermediateRenderTarget = this.saoRenderTarget.clone();
 		this.beautyRenderTarget = this.saoRenderTarget.clone();
 
 		this.normalRenderTarget = new WebGLRenderTarget( this.resolution.x, this.resolution.y, {
 			minFilter: NearestFilter,
-			magFilter: NearestFilter,
-			format: RGBAFormat
+			magFilter: NearestFilter
 		} );
 		this.depthRenderTarget = this.normalRenderTarget.clone();
 
@@ -98,12 +91,6 @@ class SAOPass extends Pass {
 		this.normalMaterial = new MeshNormalMaterial();
 		this.normalMaterial.blending = NoBlending;
 
-		if ( SAOShader === undefined ) {
-
-			console.error( 'THREE.SAOPass relies on SAOShader' );
-
-		}
-
 		this.saoMaterial = new ShaderMaterial( {
 			defines: Object.assign( {}, SAOShader.defines ),
 			fragmentShader: SAOShader.fragmentShader,
@@ -120,12 +107,6 @@ class SAOPass extends Pass {
 		this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 		this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
 		this.saoMaterial.blending = NoBlending;
-
-		if ( DepthLimitedBlurShader === undefined ) {
-
-			console.error( 'THREE.SAOPass relies on DepthLimitedBlurShader' );
-
-		}
 
 		this.vBlurMaterial = new ShaderMaterial( {
 			uniforms: UniformsUtils.clone( DepthLimitedBlurShader.uniforms ),
@@ -153,12 +134,6 @@ class SAOPass extends Pass {
 		this.hBlurMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
 		this.hBlurMaterial.blending = NoBlending;
 
-		if ( CopyShader === undefined ) {
-
-			console.error( 'THREE.SAOPass relies on CopyShader' );
-
-		}
-
 		this.materialCopy = new ShaderMaterial( {
 			uniforms: UniformsUtils.clone( CopyShader.uniforms ),
 			vertexShader: CopyShader.vertexShader,
@@ -175,12 +150,6 @@ class SAOPass extends Pass {
 		this.materialCopy.blendSrcAlpha = DstAlphaFactor;
 		this.materialCopy.blendDstAlpha = ZeroFactor;
 		this.materialCopy.blendEquationAlpha = AddEquation;
-
-		if ( UnpackDepthRGBAShader === undefined ) {
-
-			console.error( 'THREE.SAOPass relies on UnpackDepthRGBAShader' );
-
-		}
 
 		this.depthCopy = new ShaderMaterial( {
 			uniforms: UniformsUtils.clone( UnpackDepthRGBAShader.uniforms ),
@@ -404,6 +373,26 @@ class SAOPass extends Pass {
 
 		this.hBlurMaterial.uniforms[ 'size' ].value.set( width, height );
 		this.hBlurMaterial.needsUpdate = true;
+
+	}
+
+	dispose() {
+
+		this.saoRenderTarget.dispose();
+		this.blurIntermediateRenderTarget.dispose();
+		this.beautyRenderTarget.dispose();
+		this.normalRenderTarget.dispose();
+		this.depthRenderTarget.dispose();
+
+		this.depthMaterial.dispose();
+		this.normalMaterial.dispose();
+		this.saoMaterial.dispose();
+		this.vBlurMaterial.dispose();
+		this.hBlurMaterial.dispose();
+		this.materialCopy.dispose();
+		this.depthCopy.dispose();
+
+		this.fsQuad.dispose();
 
 	}
 

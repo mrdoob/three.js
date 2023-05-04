@@ -123,16 +123,21 @@
 			默认值是 *null*。
 		</p>
 
+		<h3>[property:Boolean isBufferGeometry]</h3>
+		<p>
+			用于判断对象是否为[name]的只读标记.
+		</p>
+
 		<h3>[property:Object morphAttributes]</h3>
 		<p>
-			存储 [page:BufferAttribute] 的 Hashmap，存储了几何体 morph targets 的细节信息。
+			存储 [page:BufferAttribute] 的 Hashmap，存储了几何体 morph targets 的细节信息。<br />
+			注意：当这个geometry渲染之后，morph attribute 数据无法更改。你需要调用[page:.dispose]()，并重新创建一个新的[name]实例。
 		</p>
 
 		<h3>[property:Boolean morphTargetsRelative]</h3>
 		<p>
-			Used to control the morph target behavior; when set to true, the morph target data is treated as relative offsets, rather than as absolute positions/normals.
-
-			Default is *false*.
+			用于控制morph target的行为，如果设置为 `true`，morph target数据作为相对的偏移量，而非绝对的位置/法向。
+			默认为*false*。
 		</p>
 
 		<h3>[property:String name]</h3>
@@ -152,7 +157,7 @@
 
 		<h2>方法</h2>
 
-		<h3>[page:EventDispatcher EventDispatcher] 在该类上可用的所有方法。</h3>
+		<p>[page:EventDispatcher EventDispatcher] 在该类上可用的所有方法。</p>
 
 		<h3>[method:this setAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
 		<p>
@@ -196,8 +201,8 @@
 
 		<h3>[method:undefined computeTangents]()</h3>
 		<p>
-		Calculates and adds a tangent attribute to this geometry.<br />
-		The computation is only supported for indexed geometries and if position, normal, and uv attributes are defined.
+		计算并向此geometry中添加tangent attribute。<br />
+		只支持索引化的几何体对象，并且必须拥有position(位置)，normal(法向)和 uv attributes。如果使用了切线空间法向贴图，最好使用[page:BufferGeometryUtils.computeMikkTSpaceTangents]中的MikkTSpace算法。
 		</p>
 
 		<h3>[method:undefined computeVertexNormals]()</h3>
@@ -216,7 +221,7 @@
 		<p>返回缓存相关的 [page:.index]。</p>
 
 		<h3>[method:Boolean hasAttribute]( [param:String name] )</h3>
-		<p>Returns *true* if the attribute with the specified name exists.</p>
+		<p>检查是否存在有指定名称的attribute，如果有返回*true*。</p>
 
 		<h3>[method:this lookAt] ( [param:Vector3 vector] )</h3>
 		<p>
@@ -224,9 +229,6 @@
 
 			旋转几何体朝向控件中的一点。该过程通常在一次处理中完成，不会循环处理。典型的用法是过通过调用 [page:Object3D.lookAt] 实时改变 mesh 朝向。
 		</p>
-
-		<h3>[method:this merge]( [param:BufferGeometry bufferGeometry], [param:Integer offset] )</h3>
-		<p>同参数指定的 BufferGeometry 进行合并。可以通过可选参数指定，从哪个偏移位置开始进行 merge。</p>
 
 		<h3>[method:undefined normalizeNormals]()</h3>
 		<p>

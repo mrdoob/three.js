@@ -18,8 +18,8 @@
 		</p>
 
 		<p>
-			Standalone Draco files have a <em>.drc</em> extension, and contain vertex positions,
-			normals, colors, and other attributes. Draco files <em>do not</em> contain materials,
+			Standalone Draco files have a `.drc` extension, and contain vertex positions,
+			normals, colors, and other attributes. Draco files *do not* contain materials,
 			textures, animation, or node hierarchies – to use these features, embed Draco geometry
 			inside of a glTF file. A normal glTF file can be converted to a Draco-compressed glTF file
 			using [link:https://github.com/AnalyticalGraphicsInc/gltf-pipeline glTF-Pipeline]. When
@@ -31,6 +31,17 @@
 			decoder instances.
 		</p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+		</code>
+
 		<h2>Code Example</h2>
 
 		<code>
@@ -38,7 +49,7 @@
 		const loader = new DRACOLoader();
 
 		// Specify path to a folder containing WASM/JS decoding libraries.
-		loader.setDecoderPath( '/examples/js/libs/draco/' );
+		loader.setDecoderPath( '/examples/jsm/libs/draco/' );
 
 		// Optional: Pre-fetch Draco WASM/JS module.
 		loader.preload();
@@ -78,12 +89,7 @@
 
 		<h2>Browser compatibility</h2>
 
-		<p>DRACOLoader relies on ES6 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise Promises],
-		which are not supported in IE11. To use the loader in IE11, you must
-		[link:https://github.com/stefanpenner/es6-promise include a polyfill]
-		providing a Promise replacement. DRACOLoader will automatically use
-		either the JS or the WASM decoding library, based on browser
-		capabilities.</p>
+		<p>DRACOLoader will automatically use either the JS or the WASM decoding library, based on browser capabilities.</p>
 
 		<br>
 		<hr>
@@ -106,13 +112,13 @@
 
 		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — A string containing the path/URL of the <em>.drc</em> file.<br />
+		[page:String url] — A string containing the path/URL of the `.drc` file.<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
 		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
 		</p>
 		<p>
-		Begin loading from url and call the <em>onLoad</em> function with the decompressed geometry.
+		Begin loading from url and call the `onLoad` function with the decompressed geometry.
 		</p>
 
 		<h3>[method:this setDecoderPath]( [param:String value] )</h3>
@@ -122,7 +128,7 @@
 
 		<h3>[method:this setDecoderConfig]( [param:Object config] )</h3>
 		<p>
-			[page:String config.type] - (Optional) <em>"js"</em> or <em>"wasm"</em>.<br />
+			[page:String config.type] - (Optional) `"js"` or `"wasm"`.<br />
 		</p>
 		<p>
 		Provides configuration for the decoder libraries. Configuration cannot be changed

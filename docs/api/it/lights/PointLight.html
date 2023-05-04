@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Una luce che viene emessa da un unico punto in tutte le direzioni. Un caso d'uso comune per 
+      questo è replicare la luce emessa da una lampadina nuda.<br /><br />
+
+      Questa luce può proiettare le ombre - vedi la pagina [page:PointLightShadow] per i dettagli.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+const light = new THREE.PointLight( 0xff0000, 1, 100 );
+light.position.set( 50, 50, 50 );
+scene.add( light );
+		</code>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_lights_pointlights lights / pointlights ]<br />
+			[example:webgl_effects_anaglyph effects / anaglyph ]<br />
+			[example:webgl_geometry_text geometry / text ]<br />
+			[example:webgl_lensflares lensflares ]
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Number distance], [param:Float decay] )</h3>
+		<p>
+			[page:Integer color] - (opzionale) Il colore esadecimale della luce. Il valore predefinito è 0xffffff (bianco).<br />
+			[page:Float intensity] - (opzionale) Il valore numerico della forza/intensità della luce. Il valore predefinito è 1.<br />
+			[page:Number distance] - Portata massima della luce. Il valore predefinito è 0 (nessun limite).<br />
+			[page:Float decay] - La quantità di attenuazione della luce lungo la distanza della luce. Il valore predefinito è 2.<br /><br />
+
+			Crea una nuova [name].
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>
+      Vedi la classe base [page:Light Light] per le proprietà comuni.
+		</p>
+
+		<h3>[property:Boolean castShadow]</h3>
+		<p>
+			Se impostato a `true` la luce proietterà ombre dinamiche. *Attenzione*: Questo 
+			è costoso e richiede una messa a punto per ottenere le ombre giuste. Vedi 
+			[page:PointLightShadow] per i dettagli. Il valore predefinito è `false`.
+		</p>
+
+		<h3>[property:Float decay]</h3>
+		<p>
+			La quantità di luce che si attenua lungo la distanza della luce. L'impostazione predefinita 
+			è `2`.<br /> 
+			Nel contesto di un rendering fisicamente corretto, il valore predefinito non deve essere modificato.
+		</p>
+
+		<h3>[property:Float distance]</h3>
+		<p>
+			`Modalità predefinita` — Quando la distanza è zero, la luce non si attenua. Quando la distanza è diversa da zero,
+      la luce si attenuerà linearmente dalla massima intensità nella posizione della luce fino a zero a questa distanza 
+      dalla luce.
+		</p>
+		<p>
+			`Modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta]` — Quando la distanza è
+      zero, la luce si attenuerà secondo la legge dell'inverso del quadrato alla distanza infinita.
+      Quando la distanza è diversa da zero, la luce si attenuerà secondo la legge dell'inverso del quadrato 
+      fino in prossimità del limite di distanza, dove si attenuerà quindi rapidamente e senza intoppi fino a 0.
+      Intrinsecamente, i limiti non sono fisicamente corretti.
+		</p>
+		<p>
+			Il valore predefinito è `0.0`.
+		</p>
+
+		<h3>[property:Float intensity]</h3>
+		<p>
+      L'intensità della luce. Il valore predefinito è `1`.<br />
+      Nella modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta], l'intensità 
+      è l'intensità luminosa della luce misurata in candela (cd).<br /><br />
+
+      Modificando l'intensità si modificherà anche la potenza della luce.
+		</p>
+
+		<h3>[property:Float power]</h3>
+		<p>
+      La potenza della luce.<br />
+      Nella modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta], la potenza è la potenza 
+      della luminosità della luce misurata in lumen (lm).<br /><br />
+
+      Modificando la potenza si modificherà anche l'intensità della luce.
+		</p>
+
+		<h3>[property:PointLightShadow shadow]</h3>
+		<p>
+			Una [page:PointLightShadow] utilizzata per calcolare le ombre per questa luce.<br /><br />
+
+      La [page:LightShadow.camera telecamera] di lightShadow è impostata su una [page:PerspectiveCamera]
+      con un [page:PerspectiveCamera.fov fov] di 90, [page:PerspectiveCamera.aspect aspect] di 1,
+      il piano [page:PerspectiveCamera.near near] a 0.5 e il piano [page:PerspectiveCamera.far far] a 500.
+		</p>
+
+		<h2>Metodi</h2>
+		<p>
+      Vedi la classe base [page:Light Light] per i metodi comuni.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+      Sovrascrive il metodo [page:Light.dispose dispose] della classe base.
+      Elimina l'[page:PointLightShadow ombra] di questa luce.
+		</p>
+
+		<h3>[method:this copy]( [param:PointLight source] )</h3>
+		<p>
+      Copia il valore di tutte le proprietà dalla [page:PointLight sorgente] della 
+		  PointLight.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

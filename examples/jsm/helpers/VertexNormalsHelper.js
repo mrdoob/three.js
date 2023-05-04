@@ -50,12 +50,7 @@ class VertexNormalsHelper extends LineSegments {
 
 		const objGeometry = this.object.geometry;
 
-		if ( objGeometry && objGeometry.isGeometry ) {
-
-			console.error( 'THREE.VertexNormalsHelper no longer supports Geometry. Use BufferGeometry instead.' );
-			return;
-
-		} else if ( objGeometry && objGeometry.isBufferGeometry ) {
+		if ( objGeometry ) {
 
 			const objPos = objGeometry.attributes.position;
 
@@ -67,9 +62,9 @@ class VertexNormalsHelper extends LineSegments {
 
 			for ( let j = 0, jl = objPos.count; j < jl; j ++ ) {
 
-				_v1.set( objPos.getX( j ), objPos.getY( j ), objPos.getZ( j ) ).applyMatrix4( matrixWorld );
+				_v1.fromBufferAttribute( objPos, j ).applyMatrix4( matrixWorld );
 
-				_v2.set( objNorm.getX( j ), objNorm.getY( j ), objNorm.getZ( j ) );
+				_v2.fromBufferAttribute( objNorm, j );
 
 				_v2.applyMatrix3( _normalMatrix ).normalize().multiplyScalar( this.size ).add( _v1 );
 
@@ -89,7 +84,13 @@ class VertexNormalsHelper extends LineSegments {
 
 	}
 
-}
+	dispose() {
 
+		this.geometry.dispose();
+		this.material.dispose();
+
+	}
+
+}
 
 export { VertexNormalsHelper };

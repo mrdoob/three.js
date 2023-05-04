@@ -1,14 +1,19 @@
-import { GPULoadOp } from './constants.js';
-import { Color } from 'three';
+import { GPULoadOp, GPUStoreOp } from './constants.js';
+import { Color, Mesh, BoxGeometry, BackSide } from 'three';
+import { context, positionWorldDirection, MeshBasicNodeMaterial } from '../../nodes/Nodes.js';
 
 let _clearAlpha;
 const _clearColor = new Color();
 
 class WebGPUBackground {
 
-	constructor( renderer ) {
+	constructor( renderer, properties ) {
 
 		this.renderer = renderer;
+		this.properties = properties;
+
+		this.boxMesh = null;
+		this.boxMeshNode = null;
 
 		this.forceClear = false;
 
@@ -20,10 +25,11 @@ class WebGPUBackground {
 
 	}
 
-	update( scene ) {
+	update( scene, renderList, renderState ) {
 
 		const renderer = this.renderer;
-		const background = ( scene.isScene === true ) ? scene.background : null;
+		const background = ( scene.isScene === true ) ? scene.backgroundNode || this.properties.get( scene ).backgroundNode || scene.background : null;
+
 		let forceClear = this.forceClear;
 
 		if ( background === null ) {
@@ -41,6 +47,57 @@ class WebGPUBackground {
 			_clearAlpha = 1;
 			forceClear = true;
 
+		} else if ( background.isNode === true ) {
+
+			const sceneProperties = this.properties.get( scene );
+			const backgroundNode = background;
+
+			_clearColor.copy( renderer._clearColor );
+			_clearAlpha = renderer._clearAlpha;
+
+			let boxMesh = this.boxMesh;
+
+			if ( boxMesh === null ) {
+
+				this.boxMeshNode = context( backgroundNode, {
+					// @TODO: Add Texture2D support using node context
+					getUVNode: () => positionWorldDirection
+				} );
+
+				const nodeMaterial = new MeshBasicNodeMaterial();
+				nodeMaterial.colorNode = this.boxMeshNode;
+				nodeMaterial.side = BackSide;
+				nodeMaterial.depthTest = false;
+				nodeMaterial.depthWrite = false;
+				nodeMaterial.fog = false;
+
+				this.boxMesh = boxMesh = new Mesh( new BoxGeometry( 1, 1, 1 ), nodeMaterial );
+				boxMesh.frustumCulled = false;
+
+				boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
+
+					const scale = camera.far;
+
+					this.matrixWorld.makeScale( scale, scale, scale ).copyPosition( camera.matrixWorld );
+
+				};
+
+			}
+
+			const backgroundCacheKey = backgroundNode.getCacheKey();
+
+			if ( sceneProperties.backgroundCacheKey !== backgroundCacheKey ) {
+
+				this.boxMeshNode.node = backgroundNode;
+
+				boxMesh.material.needsUpdate = true;
+
+				sceneProperties.backgroundCacheKey = backgroundCacheKey;
+
+			}
+
+			renderList.unshift( boxMesh, boxMesh.geometry, boxMesh.material, 0, 0, null );
+
 		} else {
 
 			console.error( 'THREE.WebGPURenderer: Unsupported background configuration.', background );
@@ -49,47 +106,78 @@ class WebGPUBackground {
 
 		// configure render pass descriptor
 
-		const renderPassDescriptor = renderer._renderPassDescriptor;
-		const colorAttachment = renderPassDescriptor.colorAttachments[ 0 ];
-		const depthStencilAttachment = renderPassDescriptor.depthStencilAttachment;
+		const colorAttachment = renderState.descriptorGPU.colorAttachments[ 0 ];
+		const depthStencilAttachment = renderState.descriptorGPU.depthStencilAttachment;
 
 		if ( renderer.autoClear === true || forceClear === true ) {
 
 			if ( renderer.autoClearColor === true ) {
 
-				colorAttachment.loadValue = { r: _clearColor.r, g: _clearColor.g, b: _clearColor.b, a: _clearAlpha };
+				_clearColor.multiplyScalar( _clearAlpha );
+
+				colorAttachment.clearValue = { r: _clearColor.r, g: _clearColor.g, b: _clearColor.b, a: _clearAlpha };
+				colorAttachment.loadOp = GPULoadOp.Clear;
+				colorAttachment.storeOp = GPUStoreOp.Store;
 
 			} else {
 
-				colorAttachment.loadValue = GPULoadOp.Load;
+				colorAttachment.loadOp = GPULoadOp.Load;
+				colorAttachment.storeOp = GPUStoreOp.Store;
 
 			}
 
-			if ( renderer.autoClearDepth === true ) {
+			if ( renderState.depth ) {
 
-				depthStencilAttachment.depthLoadValue = renderer._clearDepth;
+				if ( renderer.autoClearDepth === true ) {
 
-			} else {
+					depthStencilAttachment.depthClearValue = renderer._clearDepth;
+					depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
+					depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
-				depthStencilAttachment.depthLoadValue = GPULoadOp.Load;
+				} else {
+
+					depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+					depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+
+				}
 
 			}
 
-			if ( renderer.autoClearStencil === true ) {
+			if ( renderState.stencil ) {
 
-				depthStencilAttachment.stencilLoadValue = renderer._clearStencil;
+				if ( renderer.autoClearStencil === true ) {
 
-			} else {
+					depthStencilAttachment.stencilClearValue = renderer._clearStencil;
+					depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
+					depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
-				depthStencilAttachment.stencilLoadValue = GPULoadOp.Load;
+				} else {
+
+					depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+					depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+
+				}
 
 			}
 
 		} else {
 
-			colorAttachment.loadValue = GPULoadOp.Load;
-			depthStencilAttachment.depthLoadValue = GPULoadOp.Load;
-			depthStencilAttachment.stencilLoadValue = GPULoadOp.Load;
+			colorAttachment.loadOp = GPULoadOp.Load;
+			colorAttachment.storeOp = GPUStoreOp.Store;
+
+			if ( renderState.depth ) {
+
+				depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+
+			}
+
+			if ( renderState.stencil ) {
+
+				depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+
+			}
 
 		}
 

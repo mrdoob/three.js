@@ -15,12 +15,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -29,9 +30,9 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { PLYLoader } from './jsm/loaders/PLYLoader.js';
+			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 
 			let container, stats;
 
@@ -59,7 +60,7 @@
 
 				const plane = new THREE.Mesh(
 					new THREE.PlaneGeometry( 40, 40 ),
-					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
+					new THREE.MeshPhongMaterial( { color: 0xcbcbcb, specular: 0x474747 } )
 				);
 				plane.rotation.x = - Math.PI / 2;
 				plane.position.y = - 0.5;
@@ -75,7 +76,7 @@
 
 					geometry.computeVertexNormals();
 
-					const material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
+					const material = new THREE.MeshStandardMaterial( { color: 0x009cff, flatShading: true } );
 					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.y = - 0.2;
@@ -94,7 +95,7 @@
 
 					geometry.computeVertexNormals();
 
-					const material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
+					const material = new THREE.MeshStandardMaterial( { color: 0x009cff, flatShading: true } );
 					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = - 0.2;
@@ -111,17 +112,16 @@
 
 				// Lights
 
-				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+				scene.add( new THREE.HemisphereLight( 0x8d7c7c, 0x494966 ) );
 
 				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
-				addShadowedLight( 0.5, 1, - 1, 0xffaa00, 1 );
+				addShadowedLight( 0.5, 1, - 1, 0xffd500, 1 );
 
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				renderer.shadowMap.enabled = true;
 

@@ -39,7 +39,7 @@ import {
 	Vector3,
 	Vector4,
 	VectorKeyframeTrack,
-	sRGBEncoding
+	SRGBColorSpace
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 import { NURBSCurve } from '../curves/NURBSCurve.js';
@@ -389,6 +389,15 @@ class FBXTreeParser {
 
 		}
 
+		if ( 'Translation' in textureNode ) {
+
+			const values = textureNode.Translation.value;
+
+			texture.offset.x = values[ 0 ];
+			texture.offset.y = values[ 1 ];
+
+		}
+
 		return texture;
 
 	}
@@ -533,12 +542,12 @@ class FBXTreeParser {
 
 		if ( materialNode.Diffuse ) {
 
-			parameters.color = new Color().fromArray( materialNode.Diffuse.value );
+			parameters.color = new Color().fromArray( materialNode.Diffuse.value ).convertSRGBToLinear();
 
 		} else if ( materialNode.DiffuseColor && ( materialNode.DiffuseColor.type === 'Color' || materialNode.DiffuseColor.type === 'ColorRGB' ) ) {
 
 			// The blender exporter exports diffuse here instead of in materialNode.Diffuse
-			parameters.color = new Color().fromArray( materialNode.DiffuseColor.value );
+			parameters.color = new Color().fromArray( materialNode.DiffuseColor.value ).convertSRGBToLinear();
 
 		}
 
@@ -550,12 +559,12 @@ class FBXTreeParser {
 
 		if ( materialNode.Emissive ) {
 
-			parameters.emissive = new Color().fromArray( materialNode.Emissive.value );
+			parameters.emissive = new Color().fromArray( materialNode.Emissive.value ).convertSRGBToLinear();
 
 		} else if ( materialNode.EmissiveColor && ( materialNode.EmissiveColor.type === 'Color' || materialNode.EmissiveColor.type === 'ColorRGB' ) ) {
 
 			// The blender exporter exports emissive color here instead of in materialNode.Emissive
-			parameters.emissive = new Color().fromArray( materialNode.EmissiveColor.value );
+			parameters.emissive = new Color().fromArray( materialNode.EmissiveColor.value ).convertSRGBToLinear();
 
 		}
 
@@ -591,12 +600,12 @@ class FBXTreeParser {
 
 		if ( materialNode.Specular ) {
 
-			parameters.specular = new Color().fromArray( materialNode.Specular.value );
+			parameters.specular = new Color().fromArray( materialNode.Specular.value ).convertSRGBToLinear();
 
 		} else if ( materialNode.SpecularColor && materialNode.SpecularColor.type === 'Color' ) {
 
 			// The blender exporter exports specular color here instead of in materialNode.Specular
-			parameters.specular = new Color().fromArray( materialNode.SpecularColor.value );
+			parameters.specular = new Color().fromArray( materialNode.SpecularColor.value ).convertSRGBToLinear();
 
 		}
 
@@ -620,7 +629,7 @@ class FBXTreeParser {
 					parameters.map = scope.getTexture( textureMap, child.ID );
 					if ( parameters.map !== undefined ) {
 
-						parameters.map.encoding = sRGBEncoding;
+						parameters.map.colorSpace = SRGBColorSpace;
 
 					}
 
@@ -634,7 +643,7 @@ class FBXTreeParser {
 					parameters.emissiveMap = scope.getTexture( textureMap, child.ID );
 					if ( parameters.emissiveMap !== undefined ) {
 
-						parameters.emissiveMap.encoding = sRGBEncoding;
+						parameters.emissiveMap.colorSpace = SRGBColorSpace;
 
 					}
 
@@ -650,7 +659,7 @@ class FBXTreeParser {
 					if ( parameters.envMap !== undefined ) {
 
 						parameters.envMap.mapping = EquirectangularReflectionMapping;
-						parameters.envMap.encoding = sRGBEncoding;
+						parameters.envMap.colorSpace = SRGBColorSpace;
 
 					}
 
@@ -660,7 +669,7 @@ class FBXTreeParser {
 					parameters.specularMap = scope.getTexture( textureMap, child.ID );
 					if ( parameters.specularMap !== undefined ) {
 
-						parameters.specularMap.encoding = sRGBEncoding;
+						parameters.specularMap.colorSpace = SRGBColorSpace;
 
 					}
 
@@ -1144,7 +1153,7 @@ class FBXTreeParser {
 
 			if ( lightAttribute.Color !== undefined ) {
 
-				color = new Color().fromArray( lightAttribute.Color.value );
+				color = new Color().fromArray( lightAttribute.Color.value ).convertSRGBToLinear();
 
 			}
 
@@ -1460,7 +1469,7 @@ class FBXTreeParser {
 
 			if ( r !== 0 || g !== 0 || b !== 0 ) {
 
-				const color = new Color( r, g, b );
+				const color = new Color( r, g, b ).convertSRGBToLinear();
 				sceneGraph.add( new AmbientLight( color, 1 ) );
 
 			}
@@ -1473,6 +1482,12 @@ class FBXTreeParser {
 
 // parse Geometry data from FBXTree and return map of BufferGeometries
 class GeometryParser {
+
+	constructor() {
+
+		this.negativeMaterialIndices = false;
+
+	}
 
 	// Parse nodes in FBXTree.Objects.Geometry
 	parse( deformers ) {
@@ -1491,6 +1506,14 @@ class GeometryParser {
 				geometryMap.set( parseInt( nodeID ), geo );
 
 			}
+
+		}
+
+		// report warnings
+
+		if ( this.negativeMaterialIndices === true ) {
+
+			console.warn( 'THREE.FBXLoader: The FBX file contains invalid (negative) material indices. The asset might not render as expected.' );
 
 		}
 
@@ -1612,15 +1635,7 @@ class GeometryParser {
 
 		buffers.uvs.forEach( function ( uvBuffer, i ) {
 
-			// subsequent uv buffers are called 'uv1', 'uv2', ...
-			let name = 'uv' + ( i + 1 ).toString();
-
-			// the first uv buffer is just called 'uv'
-			if ( i === 0 ) {
-
-				name = 'uv';
-
-			}
+			const name = i === 0 ? 'uv' : `uv${ i }`;
 
 			geo.setAttribute( name, new Float32BufferAttribute( buffers.uvs[ i ], 2 ) );
 
@@ -1888,6 +1903,13 @@ class GeometryParser {
 
 				materialIndex = getData( polygonVertexIndex, polygonIndex, vertexIndex, geoInfo.material )[ 0 ];
 
+				if ( materialIndex < 0 ) {
+
+					scope.negativeMaterialIndices = true;
+					materialIndex = 0; // fallback
+
+				}
+
 			}
 
 			if ( geoInfo.uv ) {
@@ -1912,6 +1934,8 @@ class GeometryParser {
 			faceLength ++;
 
 			if ( endOfFace ) {
+
+				if ( faceLength > 4 ) console.warn( 'THREE.FBXLoader: Polygons with more than four sides are not supported. Make sure to triangulate the geometry during export.' );
 
 				scope.genFace( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength );
 
@@ -2185,6 +2209,12 @@ class GeometryParser {
 
 		}
 
+		for ( let i = 0, c = new Color(); i < buffer.length; i += 4 ) {
+
+			c.fromArray( buffer, i ).convertSRGBToLinear().toArray( buffer, i );
+
+		}
+
 		return {
 			dataSize: 4,
 			buffer: buffer,
@@ -2238,13 +2268,6 @@ class GeometryParser {
 
 	// Generate a NurbGeometry from a node in FBXTree.Objects.Geometry
 	parseNurbsGeometry( geoNode ) {
-
-		if ( NURBSCurve === undefined ) {
-
-			console.error( 'THREE.FBXLoader: The loader relies on NURBSCurve for any nurbs present in the model. Nurbs will show up as empty geometry.' );
-			return new BufferGeometry();
-
-		}
 
 		const order = parseInt( geoNode.Order );
 
@@ -2416,7 +2439,7 @@ class AnimationParser {
 
 					curveNodesMap.get( animationCurveID ).curves[ 'z' ] = animationCurve;
 
-				} else if ( animationCurveRelationship.match( /d|DeformPercent/ ) && curveNodesMap.has( animationCurveID ) ) {
+				} else if ( animationCurveRelationship.match( /DeformPercent/ ) && curveNodesMap.has( animationCurveID ) ) {
 
 					curveNodesMap.get( animationCurveID ).curves[ 'morph' ] = animationCurve;
 
@@ -3526,13 +3549,7 @@ class BinaryParser {
 
 				}
 
-				if ( typeof fflate === 'undefined' ) {
-
-					console.error( 'THREE.FBXLoader: External library fflate.min.js required.' );
-
-				}
-
-				const data = fflate.unzlibSync( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
+				const data = fflate.unzlibSync( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) );
 				const reader2 = new BinaryReader( data.buffer );
 
 				switch ( type ) {
@@ -3555,6 +3572,8 @@ class BinaryParser {
 
 				}
 
+				break; // cannot happen but is required by the DeepScan
+
 			default:
 				throw new Error( 'THREE.FBXLoader: Unknown property type ' + type );
 
@@ -3571,6 +3590,7 @@ class BinaryReader {
 		this.dv = new DataView( buffer );
 		this.offset = 0;
 		this.littleEndian = ( littleEndian !== undefined ) ? littleEndian : true;
+		this._textDecoder = new TextDecoder();
 
 	}
 
@@ -3789,19 +3809,15 @@ class BinaryReader {
 
 	getString( size ) {
 
-		// note: safari 9 doesn't support Uint8Array.indexOf; create intermediate array instead
-		let a = [];
+		const start = this.offset;
+		let a = new Uint8Array( this.dv.buffer, start, size );
 
-		for ( let i = 0; i < size; i ++ ) {
-
-			a[ i ] = this.getUint8();
-
-		}
+		this.skip( size );
 
 		const nullByte = a.indexOf( 0 );
-		if ( nullByte >= 0 ) a = a.slice( 0, nullByte );
+		if ( nullByte >= 0 ) a = new Uint8Array( this.dv.buffer, start, nullByte );
 
-		return LoaderUtils.decodeText( new Uint8Array( a ) );
+		return this._textDecoder.decode( a );
 
 	}
 
@@ -3947,7 +3963,7 @@ function generateTransform( transformData ) {
 	if ( transformData.preRotation ) {
 
 		const array = transformData.preRotation.map( MathUtils.degToRad );
-		array.push( transformData.eulerOrder );
+		array.push( transformData.eulerOrder || Euler.DEFAULT_ORDER );
 		lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 	}
@@ -3955,7 +3971,7 @@ function generateTransform( transformData ) {
 	if ( transformData.rotation ) {
 
 		const array = transformData.rotation.map( MathUtils.degToRad );
-		array.push( transformData.eulerOrder );
+		array.push( transformData.eulerOrder || Euler.DEFAULT_ORDER );
 		lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 	}
@@ -3963,7 +3979,7 @@ function generateTransform( transformData ) {
 	if ( transformData.postRotation ) {
 
 		const array = transformData.postRotation.map( MathUtils.degToRad );
-		array.push( transformData.eulerOrder );
+		array.push( transformData.eulerOrder || Euler.DEFAULT_ORDER );
 		lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 		lPostRotationM.invert();
 
@@ -4083,7 +4099,7 @@ function convertArrayBufferToString( buffer, from, to ) {
 	if ( from === undefined ) from = 0;
 	if ( to === undefined ) to = buffer.byteLength;
 
-	return LoaderUtils.decodeText( new Uint8Array( buffer, from, to ) );
+	return new TextDecoder().decode( new Uint8Array( buffer, from, to ) );
 
 }
 

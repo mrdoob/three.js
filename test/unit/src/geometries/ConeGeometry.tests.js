@@ -1,31 +1,61 @@
 /* global QUnit */
 
+import { ConeGeometry } from '../../../../src/geometries/ConeGeometry.js';
+
+import { CylinderGeometry } from '../../../../src/geometries/CylinderGeometry.js';
 import { runStdGeometryTests } from '../../utils/qunit-utils.js';
-import { ConeGeometry, ConeBufferGeometry } from '../../../../src/geometries/ConeGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'ConeGeometry', ( hooks ) => {
 
-		var geometries = undefined;
+		let geometries = undefined;
 		hooks.beforeEach( function () {
 
 			geometries = [
 				new ConeGeometry(),
-				new ConeBufferGeometry()
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
+
+			const object = new ConeGeometry();
+			assert.strictEqual(
+				object instanceof CylinderGeometry, true,
+				'ConeGeometry extends from CylinderGeometry'
+			);
+
+		} );
+
+		// INSTANCING
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new ConeGeometry();
+			assert.ok( object, 'Can instantiate a ConeGeometry.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new ConeGeometry();
+			assert.ok(
+				object.type === 'ConeGeometry',
+				'ConeGeometry.type should be ConeGeometry'
+			);
+
+		} );
+
+		QUnit.todo( 'parameters', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		// STATIC
+		QUnit.todo( 'fromJSON', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

@@ -1,13 +1,15 @@
 /* global QUnit */
 
+import { CylinderGeometry } from '../../../../src/geometries/CylinderGeometry.js';
+
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { runStdGeometryTests } from '../../utils/qunit-utils.js';
-import { CylinderGeometry, CylinderBufferGeometry } from '../../../../src/geometries/CylinderGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'CylinderGeometry', ( hooks ) => {
 
-		var geometries = undefined;
+		let geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -31,20 +33,48 @@ export default QUnit.module( 'Geometries', () => {
 				new CylinderGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments, parameters.openEnded ),
 				new CylinderGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments, parameters.openEnded, parameters.thetaStart ),
 				new CylinderGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments, parameters.openEnded, parameters.thetaStart, parameters.thetaLength ),
-				new CylinderBufferGeometry()
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
+
+			const object = new CylinderGeometry();
+			assert.strictEqual(
+				object instanceof BufferGeometry, true,
+				'CylinderGeometry extends from BufferGeometry'
+			);
+
+		} );
+
+		// INSTANCING
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new CylinderGeometry();
+			assert.ok( object, 'Can instantiate a CylinderGeometry.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new CylinderGeometry();
+			assert.ok(
+				object.type === 'CylinderGeometry',
+				'CylinderGeometry.type should be CylinderGeometry'
+			);
+
+		} );
+
+		QUnit.todo( 'parameters', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		// STATIC
+		QUnit.todo( 'fromJSON', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

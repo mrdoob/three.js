@@ -6,12 +6,12 @@ class LineLoop extends Line {
 
 		super( geometry, material );
 
+		this.isLineLoop = true;
+
 		this.type = 'LineLoop';
 
 	}
 
 }
-
-LineLoop.prototype.isLineLoop = true;
 
 export { LineLoop };

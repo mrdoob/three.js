@@ -72,7 +72,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			const curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 			const steps = options.steps !== undefined ? options.steps : 1;
-			let depth = options.depth !== undefined ? options.depth : 1;
+			const depth = options.depth !== undefined ? options.depth : 1;
 
 			let bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
 			let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 0.2;
@@ -83,15 +83,6 @@ class ExtrudeGeometry extends BufferGeometry {
 			const extrudePath = options.extrudePath;
 
 			const uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator;
-
-			// deprecated options
-
-			if ( options.amount !== undefined ) {
-
-				console.warn( 'THREE.ExtrudeBufferGeometry: amount has been renamed to depth.' );
-				depth = options.amount;
-
-			}
 
 			//
 
@@ -179,7 +170,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 				if ( ! vec ) console.error( 'THREE.ExtrudeGeometry: vec does not exist' );
 
-				return vec.clone().multiplyScalar( size ).add( pt );
+				return pt.clone().addScaledVector( vec, size );
 
 			}
 
@@ -686,6 +677,16 @@ class ExtrudeGeometry extends BufferGeometry {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
+
+	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -801,6 +802,8 @@ function toJSON( shapes, options, data ) {
 
 	}
 
+	data.options = Object.assign( {}, options );
+
 	if ( options.extrudePath !== undefined ) data.options.extrudePath = options.extrudePath.toJSON();
 
 	return data;
@@ -808,4 +811,4 @@ function toJSON( shapes, options, data ) {
 }
 
 
-export { ExtrudeGeometry, ExtrudeGeometry as ExtrudeBufferGeometry };
+export { ExtrudeGeometry };

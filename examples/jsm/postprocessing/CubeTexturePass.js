@@ -12,7 +12,7 @@ import { Pass } from './Pass.js';
 
 class CubeTexturePass extends Pass {
 
-	constructor( camera, envMap, opacity = 1 ) {
+	constructor( camera, tCube, opacity = 1 ) {
 
 		super();
 
@@ -37,13 +37,13 @@ class CubeTexturePass extends Pass {
 
 			get: function () {
 
-				return this.uniforms.envMap.value;
+				return this.uniforms.tCube.value;
 
 			}
 
 		} );
 
-		this.envMap = envMap;
+		this.tCube = tCube;
 		this.opacity = opacity;
 
 		this.cubeScene = new Scene();
@@ -60,8 +60,8 @@ class CubeTexturePass extends Pass {
 		this.cubeCamera.projectionMatrix.copy( this.camera.projectionMatrix );
 		this.cubeCamera.quaternion.setFromRotationMatrix( this.camera.matrixWorld );
 
-		this.cubeMesh.material.uniforms.envMap.value = this.envMap;
-		this.cubeMesh.material.uniforms.flipEnvMap.value = ( this.envMap.isCubeTexture && this.envMap.isRenderTargetTexture === false ) ? - 1 : 1;
+		this.cubeMesh.material.uniforms.tCube.value = this.tCube;
+		this.cubeMesh.material.uniforms.tFlip.value = ( this.tCube.isCubeTexture && this.tCube.isRenderTargetTexture === false ) ? - 1 : 1;
 		this.cubeMesh.material.uniforms.opacity.value = this.opacity;
 		this.cubeMesh.material.transparent = ( this.opacity < 1.0 );
 
@@ -70,6 +70,13 @@ class CubeTexturePass extends Pass {
 		renderer.render( this.cubeScene, this.cubeCamera );
 
 		renderer.autoClear = oldAutoClear;
+
+	}
+
+	dispose() {
+
+		this.cubeMesh.geometry.dispose();
+		this.cubeMesh.material.dispose();
 
 	}
 

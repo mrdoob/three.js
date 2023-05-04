@@ -34,4 +34,4 @@ class OctahedronGeometry extends PolyhedronGeometry {
 
 }
 
-export { OctahedronGeometry, OctahedronGeometry as OctahedronBufferGeometry };
+export { OctahedronGeometry };

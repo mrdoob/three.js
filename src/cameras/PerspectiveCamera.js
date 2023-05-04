@@ -7,6 +7,8 @@ class PerspectiveCamera extends Camera {
 
 		super();
 
+		this.isPerspectiveCamera = true;
+
 		this.type = 'PerspectiveCamera';
 
 		this.fov = fov;
@@ -227,7 +229,5 @@ class PerspectiveCamera extends Camera {
 	}
 
 }
-
-PerspectiveCamera.prototype.isPerspectiveCamera = true;
 
 export { PerspectiveCamera };

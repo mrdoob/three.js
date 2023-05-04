@@ -9,8 +9,8 @@ export default QUnit.module( 'Maths', () => {
 		// PUBLIC STUFF
 		QUnit.test( 'generateUUID', ( assert ) => {
 
-			var a = MathUtils.generateUUID();
-			var regex = /[A-Z0-9]{8}-[A-Z0-9]{4}-4[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{12}/i;
+			const a = MathUtils.generateUUID();
+			const regex = /[A-Z0-9]{8}-[A-Z0-9]{4}-4[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{12}/i;
 			// note the fixed '4' here ----------^
 
 			assert.ok( regex.test( a ), 'Generated UUID matches the expected pattern' );
@@ -69,6 +69,14 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'pingpong', ( assert ) => {
+
+			assert.strictEqual( MathUtils.pingpong( 2.5 ), 0.5, 'Value at 2.5 is 0.5' );
+			assert.strictEqual( MathUtils.pingpong( 2.5, 2 ), 1.5, 'Value at 2.5 with length of 2 is 1.5' );
+			assert.strictEqual( MathUtils.pingpong( - 1.5 ), 0.5, 'Value at -1.5 is 0.5' );
+
+		} );
+
 		QUnit.test( 'smoothstep', ( assert ) => {
 
 			assert.strictEqual( MathUtils.smoothstep( - 1, 0, 2 ), 0, 'Value lower than minimum' );
@@ -95,8 +103,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'randInt', ( assert ) => {
 
-			var low = 1, high = 3;
-			var a = MathUtils.randInt( low, high );
+			const low = 1, high = 3;
+			const a = MathUtils.randInt( low, high );
 
 			assert.ok( a >= low, 'Value equal to or higher than lower limit' );
 			assert.ok( a <= high, 'Value equal to or lower than upper limit' );
@@ -105,8 +113,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'randFloat', ( assert ) => {
 
-			var low = 1, high = 3;
-			var a = MathUtils.randFloat( low, high );
+			const low = 1, high = 3;
+			const a = MathUtils.randFloat( low, high );
 
 			assert.ok( a >= low, 'Value equal to or higher than lower limit' );
 			assert.ok( a <= high, 'Value equal to or lower than upper limit' );
@@ -115,10 +123,17 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'randFloatSpread', ( assert ) => {
 
-			var a = MathUtils.randFloatSpread( 3 );
+			const a = MathUtils.randFloatSpread( 3 );
 
 			assert.ok( a > - 3 / 2, 'Value higher than lower limit' );
 			assert.ok( a < 3 / 2, 'Value lower than upper limit' );
+
+		} );
+
+		QUnit.todo( 'seededRandom', ( assert ) => {
+
+			// seededRandom( s ) // interval [ 0, 1 ]
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -166,12 +181,24 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.todo( 'setQuaternionFromProperEuler', ( assert ) => {
 
-		QUnit.test( 'pingpong', ( assert ) => {
+			// setQuaternionFromProperEuler( q, a, b, c, order )
+			assert.ok( false, 'everything\'s gonna be alright' );
 
-			assert.strictEqual( MathUtils.pingpong( 2.5 ), 0.5, 'Value at 2.5 is 0.5' );
-			assert.strictEqual( MathUtils.pingpong( 2.5, 2 ), 1.5, 'Value at 2.5 with length of 2 is 1.5' );
-			assert.strictEqual( MathUtils.pingpong( - 1.5 ), 0.5, 'Value at -1.5 is 0.5' );
+		} );
+
+		QUnit.todo( 'denormalize', ( assert ) => {
+
+			// denormalize( value, array )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'normalize', ( assert ) => {
+
+			// normalize( value, array )
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

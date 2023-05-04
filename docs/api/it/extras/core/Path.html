@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Curve] &rarr; [page:CurvePath] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Una rappresentazione del percorso 2D. La classe mette a dispozione metodi per la 
+      creazione di tracciati e contorni di forme 2D simili all'API Canvas 2D.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const path = new THREE.Path();
+
+		path.lineTo( 0, 0.8 );
+		path.quadraticCurveTo( 0, 1, 0.2, 1 );
+		path.lineTo( 1, 1 );
+
+		const points = path.getPoints();
+
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
+		const material = new THREE.LineBasicMaterial( { color: 0xffffff } );
+
+		const line = new THREE.Line( geometry, material );
+		scene.add( line );
+		</code>
+
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:Array points] )</h3>
+		<p>
+		  points -- (opzionale) array di [page:Vector2 Vector2].<br /><br />
+
+      Crea un Path dai punti. Il primo punto definisce l'offset, quindi i punti successivi sono
+      aggiunti all'array [page:CurvePath.curves curves] come [page:LineCurve LineCurves].<br /><br />
+
+      Se non ci sono punti specificati, viene creato un path vuoto e il [page:.currentPoint] viene impostato 
+      nell'origine.
+		</p>
+
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:CurvePath] per le proprietà comuni.</p>
+
+		<h3>[property:Vector2 currentPoint]</h3>
+		<p>L'offset corrente del path. Qualsiasi nuova [page:Curve] aggiunta inizierà da qui.</p>
+
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:CurvePath] per i metodi comuni.</p>
+
+		<h3>[method:this absarc]( [param:Float x], [param:Float y], [param:Float radius], [param:Float startAngle], [param:Float endAngle], [param:Boolean clockwise] )</h3>
+		<p>
+			x, y -- Il centro assoluto dell'arco.<br />
+			radius -- Il raggio dell'arco.<br />
+			startAngle -- L'angolo iniziale in radianti.<br />
+			endAngle -- L'angolo finale in radianti.<br />
+			clockwise -- Scorre l'arco in senso orario. Il valore predefinito è `false`.<br /><br />
+
+      Aggiunge al path un'[page:EllipseCurve EllipseCurve] posizionata in modo assoluto.
+		</p>
+
+		<h3>[method:this absellipse]( [param:Float x], [param:Float y], [param:Float xRadius], [param:Float yRadius], [param:Float startAngle], [param:Float endAngle], [param:Boolean clockwise], [param:Float rotation] )</h3>
+		<p>
+			x, y -- Il centro assoluto dell'ellisse.<br />
+			xRadius -- Il raggio dell'ellisse nell'asse x.<br />
+			yRadius -- Il raggio dell'ellisse nell'asse y.<br />
+			startAngle -- L'angolo iniziale in radianti.<br />
+			endAngle -- L'angolo finale in radianti.<br />
+			clockwise -- Scorre l'ellisse in senso orario. Il valore predefinito è `false`.<br />
+			rotation -- L'angolo di rotazione dell'ellisse in radianti, in senso antiorario dall'asse X. Opzionale, il valore predefinito è 0.<br /><br />
+
+      Aggiunge al path un'[page:EllipseCurve EllipseCurve] posizionata in modo assoluto.
+		</p>
+
+		<h3>[method:this arc]( [param:Float x], [param:Float y], [param:Float radius], [param:Float startAngle], [param:Float endAngle], [param:Boolean clockwise] )</h3>
+		<p>
+		x, y -- Il centro dell'arco offsettato dall'ultima chiamata.<br />
+		radius -- Il raggio dell'arco.<br />
+		startAngle -- L'angolo iniziale in radianti.<br />
+		endAngle -- L'angolo finale in radianti.<br />
+		clockwise -- Scorre l'arco in senso orario. Il valore predefinito è `false`.<br /><br />
+
+    Aggiunge al path un'[page:EllipseCurve EllipseCurve] posizionata in modo relativo al [page:.currentPoint].
+		</p>
+
+
+		<h3>[method:this bezierCurveTo]( [param:Float cp1X], [param:Float cp1Y], [param:Float cp2X], [param:Float cp2Y], [param:Float x], [param:Float y] )</h3>
+		<p>
+      Crea una curva bezier da [page:.currentPoint] con (cp1X, cp1Y) e (cp2X, cp2Y) come punti di controllo e aggiorna [page:.currentPoint] a x e y.
+    </p>
+
+		<h3>[method:this ellipse]( [param:Float x], [param:Float y], [param:Float xRadius], [param:Float yRadius], [param:Float startAngle], [param:Float endAngle], [param:Boolean clockwise], [param:Float rotation] )</h3>
+		<p>
+			x, y -- Il centro dell'arco offsettato dall'ultima chiamata.<br />
+			xRadius -- Il raggio dell'ellisse nell'asse x.<br />
+			yRadius -- Il raggio dell'ellisse nell'asse y.<br />
+			startAngle -- L'angolo iniziale in radianti.<br />
+			endAngle -- L'angolo finale in radianti.<br />
+			clockwise --  Scorre l'arco in senso orario. Il valore predefinito è `false`.<br /><br />
+			rotation -- L'angolo di rotazione dell'ellisse in radianti, in senso antiorario dall'asse X. Opzionale, il valore predefinito è 0.<br /><br />
+
+      Aggiunge al path un'[page:EllipseCurve EllipseCurve] posizionata in modo relativo al [page:.currentPoint].
+		</p>
+
+		<h3>[method:this lineTo]( [param:Float x], [param:Float y] )</h3>
+		<p>Collega una [page:LineCurve] da il [page:.currentPoint] a x, y sul percorso.</p>
+
+
+		<h3>[method:this moveTo]( [param:Float x], [param:Float y] )</h3>
+		<p>Muove il [page:.currentPoint] a x, y.</p>
+
+
+		<h3>[method:this quadraticCurveTo]( [param:Float cpX], [param:Float cpY], [param:Float x], [param:Float y] )</h3>
+		<p>
+      Crea una curva quadratica da [page:.currentPoint] con cpX e cpY come punto di controllo e aggiorna [page:.currentPoint] a x e y.
+    </p>
+
+		<h3>[method:this setFromPoints]( [param:Array vector2s] )</h3>
+		<p>
+			points --  array di [page:Vector2 Vector2].<br /><br />
+
+      I punti vengono aggiunti all'array [page:CurvePath.curves curves] come [page:LineCurve LineCurves].
+		</p>
+
+		<h3>[method:this splineThru] ( [param:Array points] ) </h3>
+		<p>
+			points - array di [page:Vector2 Vector2].<br /><br />
+
+      Collega un nuovo [page:SplineCurve] al percorso.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

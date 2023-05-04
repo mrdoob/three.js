@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">3D 커브를 따라 돌출되는 튜브를 생성합니다.</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#TubeGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>코드 예제</h2>
+
+		<code>
+		class CustomSinCurve extends THREE.Curve {
+
+			constructor( scale = 1 ) {
+
+				super();
+
+				this.scale = scale;
+
+			}
+
+			getPoint( t, optionalTarget = new THREE.Vector3() ) {
+
+				const tx = t * 3 - 1.5;
+				const ty = Math.sin( 2 * Math.PI * t );
+				const tz = 0;
+
+				return optionalTarget.set( tx, ty, tz ).multiplyScalar( this.scale );
+
+			}
+
+		}
+
+		const path = new CustomSinCurve( 10 );
+		const geometry = new THREE.TubeGeometry( path, 20, 2, 8, false );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
+
+		<h2>생성자</h2>
+
+
+		<h3>[name]([param:Curve path], [param:Integer tubularSegments], [param:Float radius], [param:Integer radialSegments], [param:Boolean closed])</h3>
+		<p>
+		path — [page:Curve] - [page:Curve] 기본 클래스 에서 상속되는 3D 경로입니다. 기본값은 2차 베지어 곡선입니다.<br />
+		tubularSegments — [page:Integer] - 튜브를 구성하는 세그먼트 수입니다. 기본값은 64 입니다.<br />
+		radius — [page:Float] - 튜브의 반지름입니다. 기본값은 1 입니다.<br />
+		radialSegments — [page:Integer] - 횡단면을 구성하는 세그먼트의 수입니다. 기본값은 8 입니다.<br />
+		closed — [page:Boolean] 튜브가 열려 있거나 닫혀 있는지 여부입니다. 기본값은 false 입니다.<br />
+		</p>
+
+
+		<h2>프로퍼티</h2>
+		<p>일반 프로퍼티는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		각 생성자 매개 변수에 대한 속성이 있는 개체입니다. 인스턴스화 후 수정해도 형상은 변경되지 않습니다.
+		</p>
+
+		<h3>[property:Array tangents]</h3>
+		<p>
+		[page:Vector3] 접선의 배열
+		</p>
+
+		<h3>[property:Array normals]</h3>
+		<p>
+		[page:Vector3] 법선의 배열
+		</p>
+
+		<h3>[property:Array binormals]</h3>
+		<p>
+		[page:Vector3] 종법선의 배열
+		</p>
+
+		<h2>메서드</h2>
+		<p>일반 메서드는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -14,6 +14,17 @@
 			Utility class for creating instances of [page:LightProbe].
 		</p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { LightProbeGenerator } from 'three/addons/lights/LightProbeGenerator.js';
+		</code>
+
 		<h2>Examples</h2>
 
 		<p>
@@ -33,7 +44,7 @@
 			Creates a light probe from the given (radiance) environment map. The method expects that the environment map is represented as a cube render target.
 		</p>
 		<p>
-			The [page:Texture.format format] of the cube render target must be set to *RGBA*.
+			The [page:Texture.format format] of the cube render target must be set to `RGBA`.
 		</p>
 
 		<h2>Source</h2>

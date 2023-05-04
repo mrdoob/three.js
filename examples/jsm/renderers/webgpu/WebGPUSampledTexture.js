@@ -1,5 +1,5 @@
 import WebGPUBinding from './WebGPUBinding.js';
-import { GPUBindingType, GPUTextureViewDimension } from './constants.js';
+import { GPUBindingType, GPUTextureViewDimension, GPUTextureAspect } from './constants.js';
 
 class WebGPUSampledTexture extends WebGPUBinding {
 
@@ -7,12 +7,16 @@ class WebGPUSampledTexture extends WebGPUBinding {
 
 		super( name );
 
+		this.isSampledTexture = true;
+
 		this.texture = texture;
 
 		this.dimension = GPUTextureViewDimension.TwoD;
 
 		this.type = GPUBindingType.SampledTexture;
 		this.visibility = GPUShaderStage.FRAGMENT;
+
+		this.aspect = texture.isDepthTexture ? GPUTextureAspect.DepthOnly : GPUTextureAspect.All;
 
 		this.textureGPU = null; // set by the renderer
 
@@ -26,13 +30,13 @@ class WebGPUSampledTexture extends WebGPUBinding {
 
 }
 
-WebGPUSampledTexture.prototype.isSampledTexture = true;
-
 class WebGPUSampledArrayTexture extends WebGPUSampledTexture {
 
-	constructor( name ) {
+	constructor( name, texture ) {
 
-		super( name );
+		super( name, texture );
+
+		this.isSampledArrayTexture = true;
 
 		this.dimension = GPUTextureViewDimension.TwoDArray;
 
@@ -40,13 +44,13 @@ class WebGPUSampledArrayTexture extends WebGPUSampledTexture {
 
 }
 
-WebGPUSampledArrayTexture.prototype.isSampledArrayTexture = true;
-
 class WebGPUSampled3DTexture extends WebGPUSampledTexture {
 
-	constructor( name ) {
+	constructor( name, texture ) {
 
-		super( name );
+		super( name, texture );
+
+		this.isSampled3DTexture = true;
 
 		this.dimension = GPUTextureViewDimension.ThreeD;
 
@@ -54,20 +58,18 @@ class WebGPUSampled3DTexture extends WebGPUSampledTexture {
 
 }
 
-WebGPUSampled3DTexture.prototype.isSampled3DTexture = true;
-
 class WebGPUSampledCubeTexture extends WebGPUSampledTexture {
 
-	constructor( name ) {
+	constructor( name, texture ) {
 
-		super( name );
+		super( name, texture );
+
+		this.isSampledCubeTexture = true;
 
 		this.dimension = GPUTextureViewDimension.Cube;
 
 	}
 
 }
-
-WebGPUSampledCubeTexture.prototype.isSampledCubeTexture = true;
 
 export { WebGPUSampledTexture, WebGPUSampledArrayTexture, WebGPUSampled3DTexture, WebGPUSampledCubeTexture };

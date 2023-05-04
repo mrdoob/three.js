@@ -1,7 +1,6 @@
 import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
-import { BufferAttribute } from '../core/BufferAttribute.js';
-import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferAttribute, Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
 class Box3Helper extends LineSegments {
@@ -41,6 +40,13 @@ class Box3Helper extends LineSegments {
 		this.scale.multiplyScalar( 0.5 );
 
 		super.updateMatrixWorld( force );
+
+	}
+
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
 
 	}
 

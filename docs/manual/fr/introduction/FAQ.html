@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<h2>Quel format de modèle 3D est le mieux supporté?</h2>
+		<div>
+			<p>
+				Le format recommandé pour l'import et l'export de modèles est glTF (GL Transmission Format). Parce que glTF est ciblé sur la rapidité du temps d'exécution, le format est compact et rapide à charger.
+			</p>
+			<p>
+				three.js fournit des loaders pour plusieurs autres formats populaires comme FBX, Collada ou OBJ. Néanmoins, vous devez toujours essayer d'établir un workflow basé sur glTF dans vos projets. Pour plus d'informations, voir [link:#manual/introduction/Loading-3D-models loading 3D models].
+			</p>
+		</div>
+
+		<h2>Pourquoi y a-t-il des tags meta viewport dans les exemples?</h2>
+		<div>
+				<code>&lt;meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;</code>
+
+				<p>Ces tags contrôlent la taille du viewport et l'échelle pour les navigateurs mobiles (où le contenu de la page peut être rendu à des tailles différentes de celle du viewport visible).</p>
+
+				<p>[link:https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html Safari: Using the Viewport]</p>
+
+				<p>[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag MDN: Using the viewport meta tag]</p>
+		</div>
+
+		<h2>Comment conserver l'échelle de la scène au resize?</h2>
+		<p>
+			Nous voulons que tous les objets, peu importe leur distance à la caméra, conservent leur taille, même si la fenêtre est redimensionnée.
+
+			L'équation clé pour résoudre ce problème est la formule suivante, concernant la hauteur visible à une distance donnée:
+
+			<code>
+visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;
+			</code>
+			Si nous augmentons la hauteur de la fenêtre d'un certain pourcentage, alors nous souhaitons que la hauteur visible à toutes distances soit augmentée
+			du même pourcentage.
+
+			Cela ne peut pas être fait en changeant la position de la camera. Il faut plutôt changer le champ de vision de celle-ci.
+			[link:http://jsfiddle.net/Q4Jpu/ Example].
+		</p>
+
+		<h2>Pourquoi une partie de mon objet est invisible?</h2>
+		<p>
+			Cela peut être causé par le face culling. Les faces ont une orientation qui décident quel côté est lequel. Et le culling retire la face arrière dans des circonstances normales. Pour voir si c'est bien votre problème, changez la propriété material side pour THREE.DoubleSide.
+			<code>material.side = THREE.DoubleSide</code>
+		</p>
+
+		<h2>Pourquoi three.js retourne quelques fois des valeurs étranges pour des inputs invalides?</h2>
+		<p>
+			Pour des raisons de performances, three.js ne valide pas les inputs dans la plupart des cas. Il en va de la responsabilité de votre application de vérifier que tous les inputs sont valides.
+		</p>
+	</body>
+</html>

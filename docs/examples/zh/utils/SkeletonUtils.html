@@ -11,36 +11,23 @@
 
 		<p class="desc">用于操控 [page:Skeleton]、 [page:SkinnedMesh]、和 [page:Bone] 的实用方法。</p>
 
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+		</code>
+
 		<h2>方法</h2>
 
 		<h3>[method:Object3D clone]( [param:Object3D object] )</h3>
 		<p>
 		克隆给定对象及其后代，确保任何 [page:SkinnedMesh] 实例都与其骨骼正确关联。同时，骨骼也会被克隆，且必须是传递给此方法的物体的后代。而其他数据，如几何形状和材料，是通过引用来实现重复使用的。
 		</p>
-
-		<h3>[method:Object findBoneTrackData]( [param:String name], [param:Array tracks] )</h3>
-		<p></p>
-
-		<h3>[method:Bone getBoneByName]( [param:String name], [param:Skeleton skeleton] )</h3>
-		<p></p>
-
-		<h3>[method:Array getBones]( [param:Skeleton skeleton] )</h3>
-		<p></p>
-
-		<h3>[method:Array getEqualsBonesNames]( [param:Skeleton skeleton], [param:Skeleton targetSkeleton] )</h3>
-		<p></p>
-
-		<h3>[method:SkeletonHelper getHelperFromSkeleton]( [param:Skeleton skeleton] )</h3>
-		<p></p>
-
-		<h3>[method:Bone getNearestBone]( [param:Bone bone], [param:Array names] )</h3>
-		<p></p>
-
-		<h3>[method:Object getSkeletonOffsets]( [param:SkeletonHelper target], [param:SkeletonHelper source], [param:Object options] )</h3>
-		<p></p>
-
-		<h3>[method:this renameBones]( [param:Skeleton skeleton], [param:Array names] )</h3>
-		<p></p>
 
 		<h3>[method:undefined retarget]( [param:SkeletonHelper target], [param:SkeletonHelper source], [param:Object options] )</h3>
 		<p></p>

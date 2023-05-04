@@ -3,8 +3,8 @@
  *
  * KTX 2.0 is a container format for various GPU texture formats. The loader
  * supports Basis Universal GPU textures, which can be quickly transcoded to
- * a wide variety of GPU texture compression formats. While KTX 2.0 also allows
- * other hardware-specific formats, this loader does not yet parse them.
+ * a wide variety of GPU texture compression formats, as well as some
+ * uncompressed DataTexture and Data3DTexture formats.
  *
  * References:
  * - KTX: http://github.khronos.org/KTX-Specification/
@@ -13,31 +13,59 @@
 
 import {
 	CompressedTexture,
+	CompressedArrayTexture,
+	Data3DTexture,
+	DataTexture,
 	FileLoader,
-	LinearEncoding,
+	FloatType,
+	HalfFloatType,
+	NoColorSpace,
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	Loader,
-	RGBAFormat,
+	RedFormat,
+	RGB_ETC1_Format,
+	RGB_ETC2_Format,
+	RGB_PVRTC_4BPPV1_Format,
+	RGB_S3TC_DXT1_Format,
 	RGBA_ASTC_4x4_Format,
 	RGBA_BPTC_Format,
 	RGBA_ETC2_EAC_Format,
 	RGBA_PVRTC_4BPPV1_Format,
 	RGBA_S3TC_DXT5_Format,
-	RGB_ETC1_Format,
-	RGB_ETC2_Format,
-	RGB_PVRTC_4BPPV1_Format,
-	RGB_S3TC_DXT1_Format,
-	sRGBEncoding,
-	UnsignedByteType
+	RGBAFormat,
+	RGFormat,
+	SRGBColorSpace,
+	UnsignedByteType,
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
+import {
+	read,
+	KHR_DF_FLAG_ALPHA_PREMULTIPLIED,
+	KHR_DF_TRANSFER_SRGB,
+	KHR_SUPERCOMPRESSION_NONE,
+	KHR_SUPERCOMPRESSION_ZSTD,
+	VK_FORMAT_UNDEFINED,
+	VK_FORMAT_R16_SFLOAT,
+	VK_FORMAT_R16G16_SFLOAT,
+	VK_FORMAT_R16G16B16A16_SFLOAT,
+	VK_FORMAT_R32_SFLOAT,
+	VK_FORMAT_R32G32_SFLOAT,
+	VK_FORMAT_R32G32B32A32_SFLOAT,
+	VK_FORMAT_R8_SRGB,
+	VK_FORMAT_R8_UNORM,
+	VK_FORMAT_R8G8_SRGB,
+	VK_FORMAT_R8G8_UNORM,
+	VK_FORMAT_R8G8B8A8_SRGB,
+	VK_FORMAT_R8G8B8A8_UNORM,
+} from '../libs/ktx-parse.module.js';
+import { ZSTDDecoder } from '../libs/zstddec.module.js';
 
-const KTX2TransferSRGB = 2;
-const KTX2_ALPHA_PREMULTIPLIED = 1;
 const _taskCache = new WeakMap();
 
 let _activeLoaders = 0;
+
+let _zstd;
 
 class KTX2Loader extends Loader {
 
@@ -84,21 +112,35 @@ class KTX2Loader extends Loader {
 
 	detectSupport( renderer ) {
 
-		this.workerConfig = {
-			astcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
-			etc1Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
-			etc2Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc' ),
-			dxtSupported: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
-			bptcSupported: renderer.extensions.has( 'EXT_texture_compression_bptc' ),
-			pvrtcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
-				|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
-		};
+		if ( renderer.isWebGPURenderer === true ) {
 
+			this.workerConfig = {
+				astcSupported: renderer.hasFeature( 'texture-compression-astc' ),
+				etc1Supported: false,
+				etc2Supported: renderer.hasFeature( 'texture-compression-etc2' ),
+				dxtSupported: renderer.hasFeature( 'texture-compression-bc' ),
+				bptcSupported: false,
+				pvrtcSupported: false
+			};
 
-		if ( renderer.capabilities.isWebGL2 ) {
+		} else {
 
-			// https://github.com/mrdoob/three.js/pull/22928
-			this.workerConfig.etc1Supported = false;
+			this.workerConfig = {
+				astcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
+				etc1Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
+				etc2Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc' ),
+				dxtSupported: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
+				bptcSupported: renderer.extensions.has( 'EXT_texture_compression_bptc' ),
+				pvrtcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
+					|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
+			};
+
+			if ( renderer.capabilities.isWebGL2 ) {
+
+				// https://github.com/mrdoob/three.js/pull/22928
+				this.workerConfig.etc1Supported = false;
+
+			}
 
 		}
 
@@ -189,8 +231,6 @@ class KTX2Loader extends Loader {
 		loader.setResponseType( 'arraybuffer' );
 		loader.setWithCredentials( this.withCredentials );
 
-		const texture = new CompressedTexture();
-
 		loader.load( url, ( buffer ) => {
 
 			// Check for an existing task using this buffer. A transferred buffer cannot be transferred
@@ -203,57 +243,101 @@ class KTX2Loader extends Loader {
 
 			}
 
-			this._createTexture( [ buffer ] )
-				.then( function ( _texture ) {
-
-					texture.copy( _texture );
-					texture.needsUpdate = true;
-
-					if ( onLoad ) onLoad( texture );
-
-				} )
+			this._createTexture( buffer )
+				.then( ( texture ) => onLoad ? onLoad( texture ) : null )
 				.catch( onError );
 
 		}, onProgress, onError );
 
-		return texture;
-
 	}
 
-	_createTextureFrom( transcodeResult ) {
+	_createTextureFrom( transcodeResult, container ) {
 
-		const { mipmaps, width, height, format, type, error, dfdTransferFn, dfdFlags } = transcodeResult;
+		const { faces, width, height, format, type, error, dfdTransferFn, dfdFlags } = transcodeResult;
 
 		if ( type === 'error' ) return Promise.reject( error );
 
-		const texture = new CompressedTexture( mipmaps, width, height, format, UnsignedByteType );
-		texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
+		let texture;
+
+		if ( container.faceCount === 6 ) {
+
+			texture = new CompressedTexture();
+			texture.image = faces;
+			texture.format = format;
+			texture.type = UnsignedByteType;
+
+		} else {
+
+			const mipmaps = faces[ 0 ].mipmaps;
+
+			texture = container.layerCount > 1
+				? new CompressedArrayTexture( mipmaps, width, height, container.layerCount, format, UnsignedByteType )
+				: new CompressedTexture( mipmaps, width, height, format, UnsignedByteType );
+
+		}
+
+		texture.minFilter = faces[ 0 ].mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
 		texture.magFilter = LinearFilter;
 		texture.generateMipmaps = false;
+
 		texture.needsUpdate = true;
-		texture.encoding = dfdTransferFn === KTX2TransferSRGB ? sRGBEncoding : LinearEncoding;
-		texture.premultiplyAlpha = !! ( dfdFlags & KTX2_ALPHA_PREMULTIPLIED );
+		// TODO: Detect NoColorSpace vs. LinearSRGBColorSpace based on primaries.
+		texture.colorSpace = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? SRGBColorSpace : NoColorSpace;
+		texture.premultiplyAlpha = !! ( dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED );
 
 		return texture;
 
 	}
 
 	/**
-	 * @param {ArrayBuffer[]} buffers
+	 * @param {ArrayBuffer} buffer
 	 * @param {object?} config
-	 * @return {Promise<CompressedTexture>}
+	 * @return {Promise<CompressedTexture|CompressedArrayTexture|DataTexture|Data3DTexture>}
 	 */
-	_createTexture( buffers, config = {} ) {
+	async _createTexture( buffer, config = {} ) {
 
+		const container = read( new Uint8Array( buffer ) );
+
+		if ( container.vkFormat !== VK_FORMAT_UNDEFINED ) {
+
+			const mipmaps = [];
+			const pendings = [];
+
+			for ( let levelIndex = 0; levelIndex < container.levels.length; levelIndex ++ ) {
+
+				pendings.push( createDataTexture( container, levelIndex ).then( function ( dataTexture ) {
+
+					mipmaps[ levelIndex ] = dataTexture;
+
+				} ) );
+
+			}
+
+			await Promise.all( pendings );
+
+			const texture = mipmaps[ 0 ];
+			texture.mipmaps = mipmaps.map( dt => {
+				return {
+					data: dt.source.data,
+					width: dt.source.data.width,
+					height: dt.source.data.height,
+					depth: dt.source.data.depth
+				};
+			} );
+			return texture;
+
+		}
+
+		//
 		const taskConfig = config;
 		const texturePending = this.init().then( () => {
 
-			return this.workerPool.postMessage( { type: 'transcode', buffers, taskConfig: taskConfig }, buffers );
+			return this.workerPool.postMessage( { type: 'transcode', buffer, taskConfig: taskConfig }, [ buffer ] );
 
-		} ).then( ( e ) => this._createTextureFrom( e.data ) );
+		} ).then( ( e ) => this._createTextureFrom( e.data, container ) );
 
 		// Cache the task result.
-		_taskCache.set( buffers[ 0 ], { promise: texturePending } );
+		_taskCache.set( buffer, { promise: texturePending } );
 
 		return texturePending;
 
@@ -342,17 +426,9 @@ KTX2Loader.BasisWorker = function () {
 
 					try {
 
-						const { width, height, hasAlpha, mipmaps, format, dfdTransferFn, dfdFlags } = transcode( message.buffers[ 0 ] );
+						const { faces, buffers, width, height, hasAlpha, format, dfdTransferFn, dfdFlags } = transcode( message.buffer );
 
-						const buffers = [];
-
-						for ( let i = 0; i < mipmaps.length; ++ i ) {
-
-							buffers.push( mipmaps[ i ].data.buffer );
-
-						}
-
-						self.postMessage( { type: 'transcode', id: message.id, width, height, hasAlpha, mipmaps, format, dfdTransferFn, dfdFlags }, buffers );
+						self.postMessage( { type: 'transcode', id: message.id, faces, width, height, hasAlpha, format, dfdTransferFn, dfdFlags }, buffers );
 
 					} catch ( error ) {
 
@@ -411,14 +487,16 @@ KTX2Loader.BasisWorker = function () {
 		const basisFormat = ktx2File.isUASTC() ? BasisFormat.UASTC_4x4 : BasisFormat.ETC1S;
 		const width = ktx2File.getWidth();
 		const height = ktx2File.getHeight();
-		const levels = ktx2File.getLevels();
+		const layerCount = ktx2File.getLayers() || 1;
+		const levelCount = ktx2File.getLevels();
+		const faceCount = ktx2File.getFaces();
 		const hasAlpha = ktx2File.getHasAlpha();
 		const dfdTransferFn = ktx2File.getDFDTransferFunc();
 		const dfdFlags = ktx2File.getDFDFlags();
 
 		const { transcoderFormat, engineFormat } = getTranscoderFormat( basisFormat, width, height, hasAlpha );
 
-		if ( ! width || ! height || ! levels ) {
+		if ( ! width || ! height || ! levelCount ) {
 
 			cleanup();
 			throw new Error( 'THREE.KTX2Loader:	Invalid texture' );
@@ -432,40 +510,52 @@ KTX2Loader.BasisWorker = function () {
 
 		}
 
-		const mipmaps = [];
+		const faces = [];
+		const buffers = [];
 
-		for ( let mip = 0; mip < levels; mip ++ ) {
+		for ( let face = 0; face < faceCount; face ++ ) {
 
-			const levelInfo = ktx2File.getImageLevelInfo( mip, 0, 0 );
-			const mipWidth = levelInfo.origWidth;
-			const mipHeight = levelInfo.origHeight;
-			const dst = new Uint8Array( ktx2File.getImageTranscodedSizeInBytes( mip, 0, 0, transcoderFormat ) );
+			const mipmaps = [];
 
-			const status = ktx2File.transcodeImage(
-				dst,
-				mip,
-				0,
-				0,
-				transcoderFormat,
-				0,
-				- 1,
-				- 1,
-			);
+			for ( let mip = 0; mip < levelCount; mip ++ ) {
 
-			if ( ! status ) {
+				const layerMips = [];
 
-				cleanup();
-				throw new Error( 'THREE.KTX2Loader: .transcodeImage failed.' );
+				let mipWidth, mipHeight;
+
+				for ( let layer = 0; layer < layerCount; layer ++ ) {
+
+					const levelInfo = ktx2File.getImageLevelInfo( mip, layer, face );
+					mipWidth = levelInfo.origWidth < 4 ? levelInfo.origWidth : levelInfo.width;
+					mipHeight = levelInfo.origHeight < 4 ? levelInfo.origHeight : levelInfo.height;
+					const dst = new Uint8Array( ktx2File.getImageTranscodedSizeInBytes( mip, layer, 0, transcoderFormat ) );
+					const status = ktx2File.transcodeImage( dst, mip, layer, face, transcoderFormat, 0, - 1, - 1 );
+
+					if ( ! status ) {
+
+						cleanup();
+						throw new Error( 'THREE.KTX2Loader: .transcodeImage failed.' );
+
+					}
+
+					layerMips.push( dst );
+
+				}
+
+				const mipData = concat( layerMips );
+
+				mipmaps.push( { data: mipData, width: mipWidth, height: mipHeight } );
+				buffers.push( mipData.buffer );
 
 			}
 
-			mipmaps.push( { data: dst, width: mipWidth, height: mipHeight } );
+			faces.push( { mipmaps, width, height, format: engineFormat } );
 
 		}
 
 		cleanup();
 
-		return { width, height, hasAlpha, mipmaps, format: engineFormat, dfdTransferFn, dfdFlags };
+		return { faces, buffers, width, height, hasAlpha, format: engineFormat, dfdTransferFn, dfdFlags };
 
 	}
 
@@ -586,6 +676,173 @@ KTX2Loader.BasisWorker = function () {
 
 	}
 
+	/** Concatenates N byte arrays. */
+	function concat( arrays ) {
+
+		if ( arrays.length === 1 ) return arrays[ 0 ];
+
+		let totalByteLength = 0;
+
+		for ( let i = 0; i < arrays.length; i ++ ) {
+
+			const array = arrays[ i ];
+			totalByteLength += array.byteLength;
+
+		}
+
+		const result = new Uint8Array( totalByteLength );
+
+		let byteOffset = 0;
+
+		for ( let i = 0; i < arrays.length; i ++ ) {
+
+			const array = arrays[ i ];
+			result.set( array, byteOffset );
+
+			byteOffset += array.byteLength;
+
+		}
+
+		return result;
+
+	}
+
 };
+
+//
+// DataTexture and Data3DTexture parsing.
+
+const FORMAT_MAP = {
+
+	[ VK_FORMAT_R32G32B32A32_SFLOAT ]: RGBAFormat,
+	[ VK_FORMAT_R16G16B16A16_SFLOAT ]: RGBAFormat,
+	[ VK_FORMAT_R8G8B8A8_UNORM ]: RGBAFormat,
+	[ VK_FORMAT_R8G8B8A8_SRGB ]: RGBAFormat,
+
+	[ VK_FORMAT_R32G32_SFLOAT ]: RGFormat,
+	[ VK_FORMAT_R16G16_SFLOAT ]: RGFormat,
+	[ VK_FORMAT_R8G8_UNORM ]: RGFormat,
+	[ VK_FORMAT_R8G8_SRGB ]: RGFormat,
+
+	[ VK_FORMAT_R32_SFLOAT ]: RedFormat,
+	[ VK_FORMAT_R16_SFLOAT ]: RedFormat,
+	[ VK_FORMAT_R8_SRGB ]: RedFormat,
+	[ VK_FORMAT_R8_UNORM ]: RedFormat,
+
+};
+
+const TYPE_MAP = {
+
+	[ VK_FORMAT_R32G32B32A32_SFLOAT ]: FloatType,
+	[ VK_FORMAT_R16G16B16A16_SFLOAT ]: HalfFloatType,
+	[ VK_FORMAT_R8G8B8A8_UNORM ]: UnsignedByteType,
+	[ VK_FORMAT_R8G8B8A8_SRGB ]: UnsignedByteType,
+
+	[ VK_FORMAT_R32G32_SFLOAT ]: FloatType,
+	[ VK_FORMAT_R16G16_SFLOAT ]: HalfFloatType,
+	[ VK_FORMAT_R8G8_UNORM ]: UnsignedByteType,
+	[ VK_FORMAT_R8G8_SRGB ]: UnsignedByteType,
+
+	[ VK_FORMAT_R32_SFLOAT ]: FloatType,
+	[ VK_FORMAT_R16_SFLOAT ]: HalfFloatType,
+	[ VK_FORMAT_R8_SRGB ]: UnsignedByteType,
+	[ VK_FORMAT_R8_UNORM ]: UnsignedByteType,
+
+};
+
+const COLOR_SPACE_MAP = {
+
+	[ VK_FORMAT_R8G8B8A8_SRGB ]: SRGBColorSpace,
+	[ VK_FORMAT_R8G8_SRGB ]: SRGBColorSpace,
+	[ VK_FORMAT_R8_SRGB ]: SRGBColorSpace,
+
+};
+
+async function createDataTexture( container, levelIndex = 0 ) {
+
+	const { vkFormat } = container;
+	const pixelWidth = Math.max( 1, container.pixelWidth >> levelIndex );
+	const pixelHeight = Math.max( 1, container.pixelHeight >> levelIndex );
+	const pixelDepth = Math.max( 1, container.pixelDepth >> levelIndex );
+
+	if ( FORMAT_MAP[ vkFormat ] === undefined ) {
+
+		throw new Error( 'THREE.KTX2Loader: Unsupported vkFormat.' );
+
+	}
+
+	const level = container.levels[ levelIndex ];
+
+	let levelData;
+	let view;
+
+	if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_NONE ) {
+
+		levelData = level.levelData;
+
+	} else if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_ZSTD ) {
+
+		if ( ! _zstd ) {
+
+			_zstd = new Promise( async ( resolve ) => {
+
+				const zstd = new ZSTDDecoder();
+				await zstd.init();
+				resolve( zstd );
+
+			} );
+
+		}
+
+		levelData = ( await _zstd ).decode( level.levelData, level.uncompressedByteLength );
+
+	} else {
+
+		throw new Error( 'THREE.KTX2Loader: Unsupported supercompressionScheme.' );
+
+	}
+
+	if ( TYPE_MAP[ vkFormat ] === FloatType ) {
+
+		view = new Float32Array(
+
+			levelData.buffer,
+			levelData.byteOffset,
+			levelData.byteLength / Float32Array.BYTES_PER_ELEMENT
+
+		);
+
+	} else if ( TYPE_MAP[ vkFormat ] === HalfFloatType ) {
+
+		view = new Uint16Array(
+
+			levelData.buffer,
+			levelData.byteOffset,
+			levelData.byteLength / Uint16Array.BYTES_PER_ELEMENT
+
+		);
+
+	} else {
+
+		view = levelData;
+
+	}
+	//
+
+	const texture = pixelDepth === 0
+		? new DataTexture( view, pixelWidth, pixelHeight )
+		: new Data3DTexture( view, pixelWidth, pixelHeight, pixelDepth );
+
+	texture.type = TYPE_MAP[ vkFormat ];
+	texture.format = FORMAT_MAP[ vkFormat ];
+	texture.colorSpace = COLOR_SPACE_MAP[ vkFormat ] || NoColorSpace;
+
+	texture.needsUpdate = true;
+
+	//
+
+	return Promise.resolve( texture );
+
+}
 
 export { KTX2Loader };

@@ -25,7 +25,7 @@
 	<h2>在开始之前</h2>
 
 	<p>
-		如果你是第一次运行一个本地服务器，可以先阅读[link:#manual/introduction/How-to-run-things-locally how to run things locally]。
+		如果你是第一次运行一个本地服务器，可以先阅读[link:#manual/introduction/Installation installation]。
 		正确地托管文件，可以避免很多查看3D模型时的常见错误。
 	</p>
 
@@ -69,12 +69,11 @@
 	<h2>加载</h2>
 
 	<p>
-		Only a few loaders (e.g. [page:ObjectLoader]) are included by default with
-		three.js — others should be added to your app individually.
+		在three.js中只会内置一部分加载器（例如：[page:ObjectLoader]） —— 其它的需要在你的应用中单独引入。
 	</p>
 
 	<code>
-		import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 	</code>
 
 	<p>

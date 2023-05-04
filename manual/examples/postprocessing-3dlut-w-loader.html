@@ -22,7 +22,8 @@
 <script type="importmap">
 {
   "imports": {
-    "three": "../../build/three.module.js"
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
   }
 }
 </script>
@@ -31,17 +32,17 @@
 import * as THREE from 'three';
 import * as lutParser from './resources/lut-reader.js';
 import * as dragAndDrop from './resources/drag-and-drop.js';
-import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from '../../examples/jsm/loaders/GLTFLoader.js';
-import {EffectComposer} from '../../examples/jsm/postprocessing/EffectComposer.js';
-import {RenderPass} from '../../examples/jsm/postprocessing/RenderPass.js';
-import {ShaderPass} from '../../examples/jsm/postprocessing/ShaderPass.js';
-import {GammaCorrectionShader} from '../../examples/jsm/shaders/GammaCorrectionShader.js';
-import {GUI} from '../../examples/jsm/libs/lil-gui.module.min.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
+import {GammaCorrectionShader} from 'three/addons/shaders/GammaCorrectionShader.js';
+import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 
 function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
   const fov = 45;
   const aspect = 2;  // the canvas default
@@ -178,7 +179,7 @@ function main() {
   {
     const loader = new THREE.TextureLoader();
     bgTexture = loader.load('resources/images/beach.jpg');
-    bgTexture.encoding = THREE.sRGBEncoding;
+    bgTexture.colorSpace = THREE.SRGBColorSpace;
     const planeGeo = new THREE.PlaneGeometry(2, 2);
     const planeMat = new THREE.MeshBasicMaterial({
       map: bgTexture,
@@ -378,7 +379,7 @@ function main() {
 
   function ext(s) {
     const period = s.lastIndexOf('.');
-    return s.substr(period + 1);
+    return s.slice(period + 1);
   }
 
   function readLUTFile(file) {

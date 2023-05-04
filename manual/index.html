@@ -8,7 +8,10 @@
 		<link rel="shortcut icon" href="../files/favicon.ico" media="(prefers-color-scheme: light)" />
 		<link rel="stylesheet" type="text/css" href="../files/main.css">
 		<!-- console sandbox -->
-		<script src="../build/three.min.js" async defer></script>
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
+			window.THREE = THREE;
+		</script>
 	</head>
 	<body>
 		<div id="panel">
@@ -28,7 +31,7 @@
 			<div id="contentWrapper">
 				<div id="inputWrapper">
 					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
-					<div id="exitSearchButton"></div>
+					<div id="clearSearchButton"></div>
 					<select id="language">
 						<option value="en">en</option>
 						<option value="fr">fr</option>
@@ -51,7 +54,7 @@
 		const panel = document.querySelector( '#panel' );
 		const content = document.querySelector( '#content' );
 		const expandButton = document.querySelector( '#expandButton' );
-		const exitSearchButton = document.querySelector( '#exitSearchButton' );
+		const clearSearchButton = document.querySelector( '#clearSearchButton' );
 		const panelScrim = document.querySelector( '#panelScrim' );
 		const filterInput = document.querySelector( '#filterInput' );
 		let iframe = document.querySelector( 'iframe' );
@@ -141,11 +144,11 @@
 
 			};
 
-			exitSearchButton.onclick = function () {
+			clearSearchButton.onclick = function () {
 
 				filterInput.value = '';
 				updateFilter();
-				panel.classList.remove( 'searchFocused' );
+				filterInput.focus();
 
 			};
 
@@ -304,13 +307,13 @@
 
 		}
 
-		// Auto change language url. If a reader open a document in English, when he click "zh", the document he read will auto change into Chinese version
+		// Auto change language url. If a reader open a document in English, when they click "zh", the document they read will auto change into Chinese version
 
 		function autoChangeUrlLanguage( language ) {
 
 			const hash = location.hash;
 			if ( hash === '' ) return;
-			const docLink = hash.substr( hash.indexOf( '/' ) );
+			const docLink = hash.slice( hash.indexOf( '/' ) );
 			location.href = '#' + language + docLink;
 
 		}
@@ -323,7 +326,7 @@
 
 			if ( search.indexOf( '?q=' ) !== - 1 ) {
 
-				return decodeURI( search.substr( 3 ) );
+				return decodeURI( search.slice( 3 ) );
 
 			}
 
@@ -428,7 +431,7 @@
 
 			if ( url.origin === window.location.origin ) {
 
-				const hrefNoOrigin = url.href.substr( url.origin.length );
+				const hrefNoOrigin = url.href.slice( url.origin.length );
 				const m = re.exec( hrefNoOrigin );
 				const [ , base, path ] = m;
 				if ( base.includes( 'manual' ) ) {
@@ -492,17 +495,21 @@
 				// We can have 2 hashes. One for the main page, one for the page it's referencing
 				// In other words
 				//	 #en/somePage#someSectionOfPage
-				const subHash = splitHash[0].indexOf('#');
+				const subHash = splitHash[ 0 ].indexOf( '#' );
 				let src;
-				if (subHash >= 0) {
-					const beforeSubHash = splitHash[0].substr(0, subHash);
-					const afterSubHash = splitHash[0].substr(subHash);
+				if ( subHash >= 0 ) {
+
+					const beforeSubHash = splitHash[ 0 ].slice( 0, subHash );
+					const afterSubHash = splitHash[ 0 ].slice( subHash );
 					src = `${beforeSubHash}.html${afterSubHash}${splitHash[ 1 ]}`;
+		
 				} else {
+
 					src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
+		
 				}
 
-				iframe.src = src;  // lgtm[js/client-side-unvalidated-url-redirection]
+				iframe.src = src; // lgtm[js/client-side-unvalidated-url-redirection]
 				iframe.style.display = 'unset';
 
 			} else {

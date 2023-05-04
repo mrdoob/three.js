@@ -15,7 +15,7 @@
 
 import { UniformsUtils, ShaderLib } from 'three';
 
-const lights_mmd_toon_pars_fragment = `
+const lights_mmd_toon_pars_fragment = /* glsl */`
 varying vec3 vViewPosition;
 
 struct BlinnPhongMaterial {
@@ -45,11 +45,9 @@ void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in Geometric
 
 #define RE_Direct				RE_Direct_BlinnPhong
 #define RE_IndirectDiffuse		RE_IndirectDiffuse_BlinnPhong
-
-#define Material_LightProbeLOD( material )	(0)
 `;
 
-const mmd_toon_matcap_fragment = `
+const mmd_toon_matcap_fragment = /* glsl */`
 #ifdef USE_MATCAP
 
 	vec3 viewDir = normalize( vViewPosition );
@@ -85,7 +83,16 @@ const MMDToonShader = {
 		ShaderLib.matcap.uniforms,
 	] ),
 
-	vertexShader: ShaderLib.phong.vertexShader,
+	vertexShader:
+		ShaderLib.phong.vertexShader
+			.replace(
+				'#include <envmap_pars_vertex>',
+				''
+			)
+			.replace(
+				'#include <envmap_vertex>',
+				''
+			),
 
 	fragmentShader:
 		ShaderLib.phong.fragmentShader
@@ -103,8 +110,11 @@ const MMDToonShader = {
 				'#include <envmap_common_pars_fragment>',
 				`
 					#include <gradientmap_pars_fragment>
-					#include <envmap_common_pars_fragment>
 				`
+			)
+			.replace(
+				'#include <envmap_pars_fragment>',
+				''
 			)
 			.replace(
 				'#include <lights_phong_pars_fragment>',
@@ -113,10 +123,9 @@ const MMDToonShader = {
 			.replace(
 				'#include <envmap_fragment>',
 				`
-					#include <envmap_fragment>
 					${mmd_toon_matcap_fragment}
 				`
-			),
+			)
 
 };
 

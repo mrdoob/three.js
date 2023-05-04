@@ -19,9 +19,7 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl hemisphere light example<br/>
-			flamingo by <a href="https://mirada.com/" target="_blank" rel="noopener">mirada</a> from <a href="http://www.ro.me" target="_blank" rel="noopener">ro.me</a><br/><br/>
-			<button id="hemisphereButton">toggle hemisphere light</button>
-			<button id="directionalButton">toggle directional light</button>
+			flamingo by <a href="https://mirada.com/" target="_blank" rel="noopener">mirada</a> from <a href="http://www.ro.me" target="_blank" rel="noopener">ro.me</a>
 		</div>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
@@ -59,12 +57,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -73,10 +72,10 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			let camera, scene, renderer;
 			const mixers = [];
@@ -202,7 +201,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 
 				// STATS
@@ -212,23 +210,30 @@
 
 				//
 
+				const params = {
+					toggleHemisphereLight: function () {
+
+						hemiLight.visible = ! hemiLight.visible;
+						hemiLightHelper.visible = ! hemiLightHelper.visible;
+
+					},
+					toggleDirectionalLight: function () {
+
+						dirLight.visible = ! dirLight.visible;
+						dirLightHelper.visible = ! dirLightHelper.visible;
+
+					}
+				};
+
+				const gui = new GUI();
+
+				gui.add( params, 'toggleHemisphereLight' ).name( 'toggle hemisphere light' );
+				gui.add( params, 'toggleDirectionalLight' ).name( 'toggle directional light' );
+				gui.open();
+
+				//
+
 				window.addEventListener( 'resize', onWindowResize );
-
-				const hemisphereButton = document.getElementById( 'hemisphereButton' );
-				hemisphereButton.addEventListener( 'click', function () {
-
-					hemiLight.visible = ! hemiLight.visible;
-					hemiLightHelper.visible = ! hemiLightHelper.visible;
-
-				} );
-
-				const directionalButton = document.getElementById( 'directionalButton' );
-				directionalButton.addEventListener( 'click', function () {
-
-					dirLight.visible = ! dirLight.visible;
-					dirLightHelper.visible = ! dirLightHelper.visible;
-
-				} );
 
 			}
 

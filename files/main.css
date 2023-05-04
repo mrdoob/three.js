@@ -138,7 +138,7 @@ h1 a {
 	transition: 0s 0s height;
 }
 
-	#panel #exitSearchButton {
+	#panel #clearSearchButton {
 		width: 48px;
 		height: 48px;
 		display: none;
@@ -154,7 +154,7 @@ h1 a {
 		margin-right: 0px;
 	}
 
-	#panel.searchFocused #exitSearchButton {
+	#panel.searchFocused #clearSearchButton {
 		display: block;
 	}
 
@@ -534,6 +534,16 @@ iframe#viewer {
 	padding: 8px 12px 4px;
 	font-size: calc(var(--font-size) - 1px);
 	font-weight: 500;
+	line-height: calc(var(--line-height) - 6px);
+}
+
+.card .tag {
+	background-color: var(--background-color);
+	color: var(--color-blue);
+	margin-left: 6px;
+	padding: 1px 6px 2px;
+	border-radius: 2px;
+	font-size: calc(var(--font-size) - 2px);
 	line-height: calc(var(--line-height) - 6px);
 }
 

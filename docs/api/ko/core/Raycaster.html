@@ -64,7 +64,7 @@
 			[example:webgl_interactive_raycasting_points Raycasting to Points]<br />
 			[example:webgl_geometry_terrain_raycast Terrain raycasting]<br />
 			[example:webgl_interactive_voxelpainter Raycasting to paint voxels]<br />
-			[example:webgl_raycast_texture Raycast to a Texture]
+			[example:webgl_raycaster_texture Raycast to a Texture]
 		</p>
 
 		<h2>생성자</h2>
@@ -158,7 +158,7 @@
 		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
 		[page:Object3D object] — 레이와의 교차 체크를 하는 객체입니다.<br />
-		[page:Boolean recursive] — true라면, 모든 자식들도 함게 체크합니다. false라면 해당 객체와의 교차만 체크합니다. 기본값은 false입니다.<br />
+		[page:Boolean recursive] — true라면, 모든 자식들도 함게 체크합니다. false라면 해당 객체와의 교차만 체크합니다. 기본값은 true입니다.<br />
 		[page:Array optionalTarget] — (생략가능) 결과값을 설정할 타겟입니다. 아니면 [page:Array]가 인스턴스화됩니다. 이 값을 설정하면, 모든 요청 전에 배열을 제거해야합니다 (예를 들어 array.length = 0;).
 		</p>
 		<p>
@@ -174,7 +174,8 @@
 			[page:Integer faceIndex] – 교차 면의 인덱스<br />
 			[page:Object3D object] – 교차된 객체<br />
 			[page:Vector2 uv] - 교차점의 U,V 좌표<br />
-			[page:Vector2 uv2] - 교차점의 U,V 2차 좌표<br />
+			[page:Vector2 uv1] - 교차점의 U,V 2차 좌표<br />
+			[page:Vector3 normal] - 교차점에서 보간된 법선 벡터<br />
 			[page:Integer instanceId] – InstancedMesh에 교차하는 레이의 인스턴스 인덱스 넘버입니다.
 		</p>
 		<p>
@@ -189,7 +190,7 @@
 		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
 		[page:Array objects] — 레이의 교차를 체크하기 위한 객체입니다.<br />
-		[page:Boolean recursive] — true면 객체의 모든 자식들도 체크합니다. 아니면 객체만의 교차를 체크합니다. 기본값은 false입니다.<br />
+		[page:Boolean recursive] — true면 객체의 모든 자식들도 체크합니다. 아니면 객체만의 교차를 체크합니다. 기본값은 true입니다.<br />
 		[page:Array optionalTarget] — (생략가능) 결과값을 설정할 타겟입니다. 아니면 [page:Array]가 인스턴스화됩니다. 이 값을 설정하면, 모든 요청 전에 배열을 제거해야합니다 (예를 들어 array.length = 0;).
 		</p>
 		<p>

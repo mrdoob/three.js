@@ -13,11 +13,8 @@
 
 		<p class="desc"> 一种非光泽表面的材质，没有镜面高光。<br /><br />
 			该材质使用基于非物理的[link:https://en.wikipedia.org/wiki/Lambertian_reflectance Lambertian]模型来计算反射率。
-			这可以很好地模拟一些表面（例如未经处理的木材或石材），但不能模拟具有镜面高光的光泽表面（例如涂漆木材）。<br /><br />
+			这可以很好地模拟一些表面（例如未经处理的木材或石材），但不能模拟具有镜面高光的光泽表面（例如涂漆木材）。 [name] uses per-fragment shading。<br /><br />
 
-
-			使用[link:https://en.wikipedia.org/wiki/Gouraud_shading Gouraud]着色模型计算着色。这将计算每个顶点的着色
-			（即在[link:https://en.wikipedia.org/wiki/Shader#Vertex_shaders vertex shader]中）并在多边形的面上插入结果。<br /><br />
 			由于反射率和光照模型的简单性，[page:MeshPhongMaterial]，[page:MeshStandardMaterial]或者[page:MeshPhysicalMaterial]
 			上使用这种材质时会以一些图形精度为代价，得到更高的性能。
 		</p>
@@ -67,6 +64,13 @@
 		<h3>[property:Float aoMapIntensity]</h3>
 		<p> 环境遮挡效果的强度。默认值为1。零是不遮挡效果。</p>
 
+		<h3>[property:Texture bumpMap]</h3>
+		<p> 用于创建凹凸贴图的纹理。黑色和白色值映射到与光照相关的感知深度。凹凸实际上不会影响对象的几何形状，只影响光照。如果定义了法线贴图，则将忽略该贴图。
+		</p>
+
+		<h3>[property:Float bumpScale]</h3>
+		<p> 凹凸贴图会对材质产生多大影响。典型范围是0-1。默认值为1。</p>
+
 		<h3>[property:Color color]</h3>
 		<p> 材质的颜色([page:Color])，默认值为白色 (0xffffff)。</p>
 
@@ -75,6 +79,20 @@
 
 			选项为[page:Materials THREE.MultiplyOperation]（默认值），[page:Materials THREE.MixOperation]，
 			[page:Materials THREE.AddOperation]。如果选择多个，则使用[page:.reflectivity]在两种颜色之间进行混合。
+		</p>
+
+		<h3>[property:Texture displacementMap]</h3>
+		<p> 位移贴图会影响网格顶点的位置，与仅影响材质的光照和阴影的其他贴图不同，移位的顶点可以投射阴影，阻挡其他对象，
+			以及充当真实的几何体。位移纹理是指：网格的所有顶点被映射为图像中每个像素的值（白色是最高的），并且被重定位。
+		</p>
+
+		<h3>[property:Float displacementScale]</h3>
+		<p> 位移贴图对网格的影响程度（黑色是无位移，白色是最大位移）。如果没有设置位移贴图，则不会应用此值。默认值为1。
+		</p>
+
+		<h3>[property:Float displacementBias]</h3>
+		<p>
+			位移贴图在网格顶点上的偏移量。如果没有设置位移贴图，则不会应用此值。默认值为0。
 		</p>
 
 		<h3>[property:Color emissive]</h3>
@@ -92,6 +110,13 @@
 		<h3>[property:Texture envMap]</h3>
 		<p> 环境贴图。默认值为null。</p>
 
+		<h3>[property:Boolean flatShading]</h3>
+		<p> 定义材质是否使用平面着色进行渲染。默认值为false。
+		</p>
+
+		<h3>[property:Boolean fog]</h3>
+		<p>材质是否受雾影响。默认为*true*。</p>
+
 		<h3>[property:Texture lightMap]</h3>
 		<p>光照贴图。默认值为null。lightMap需要第二组UV。</p>
 
@@ -99,7 +124,25 @@
 		<p>烘焙光的强度。默认值为1。</p>
 
 		<h3>[property:Texture map]</h3>
-		<p>颜色贴图。默认为null。</p>
+		<p>
+			颜色贴图。可以选择包括一个alpha通道，通常与[page:Material.transparent .transparent]
+			或[page:Material.alphaTest .alphaTest]。默认为null。
+		</p>
+
+		<h3>[property:Texture normalMap]</h3>
+		<p> 用于创建法线贴图的纹理。RGB值会影响每个像素片段的曲面法线，并更改颜色照亮的方式。法线贴图不会改变曲面的实际形状，只会改变光照。
+			In case the material has a normal map authored using the left handed convention, the y component of normalScale
+			should be negated to compensate for the different handedness.
+		</p>
+
+		<h3>[property:Integer normalMapType]</h3>
+		<p> 法线贴图的类型。<br /><br />
+			选项为[page:constant THREE.TangentSpaceNormalMap]（默认）和[page:constant THREE.ObjectSpaceNormalMap]。
+		</p>
+
+		<h3>[property:Vector2 normalScale]</h3>
+		<p> 法线贴图对材质的影响程度。典型范围是0-1。默认值是[page:Vector2]设置为（1,1）。
+		</p>
 
 		<h3>[property:Float reflectivity]</h3>
 		<p> 环境贴图对表面的影响程度; 见[page:.combine]。默认值为1，有效范围介于0（无反射）和1（完全反射）之间。</p>

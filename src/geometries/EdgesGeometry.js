@@ -4,16 +4,17 @@ import * as MathUtils from '../math/MathUtils.js';
 import { Triangle } from '../math/Triangle.js';
 import { Vector3 } from '../math/Vector3.js';
 
-const _v0 = new Vector3();
-const _v1 = new Vector3();
-const _normal = new Vector3();
-const _triangle = new Triangle();
+const _v0 = /*@__PURE__*/ new Vector3();
+const _v1 = /*@__PURE__*/ new Vector3();
+const _normal = /*@__PURE__*/ new Vector3();
+const _triangle = /*@__PURE__*/ new Triangle();
 
 class EdgesGeometry extends BufferGeometry {
 
 	constructor( geometry = null, thresholdAngle = 1 ) {
 
 		super();
+
 		this.type = 'EdgesGeometry';
 
 		this.parameters = {
@@ -133,6 +134,16 @@ class EdgesGeometry extends BufferGeometry {
 			this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 		}
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
 
 	}
 

@@ -58,6 +58,8 @@ class LightningStorm extends Object3D {
 
 		super();
 
+		this.isLightningStorm = true;
+
 		// Parameters
 
 		this.stormParams = stormParams;
@@ -205,9 +207,9 @@ class LightningStorm extends Object3D {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.stormParams.size = source.stormParams.size;
 		this.stormParams.minHeight = source.stormParams.minHeight;
@@ -239,7 +241,5 @@ class LightningStorm extends Object3D {
 	}
 
 }
-
-LightningStorm.prototype.isLightningStorm = true;
 
 export { LightningStorm };

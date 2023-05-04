@@ -3,12 +3,14 @@ import { CubeReflectionMapping } from '../constants.js';
 
 class CubeTexture extends Texture {
 
-	constructor( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+	constructor( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace ) {
 
 		images = images !== undefined ? images : [];
 		mapping = mapping !== undefined ? mapping : CubeReflectionMapping;
 
-		super( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+		super( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace );
+
+		this.isCubeTexture = true;
 
 		this.flipY = false;
 
@@ -27,7 +29,5 @@ class CubeTexture extends Texture {
 	}
 
 }
-
-CubeTexture.prototype.isCubeTexture = true;
 
 export { CubeTexture };

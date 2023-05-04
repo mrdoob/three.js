@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Проверка совместимости с WebGL ([name])</h1>
+		<p>
+			Несмотря на то, что это становится все менее и менее серьезной проблемой, но все еще некоторые устройства или браузеры могут не поддерживать WebGL.
+			Следующий метод позволяет вам проверить, поддерживается ли он, и отобразить сообщение пользователю, если это не так.
+			Импортируйте модуль обнаружения поддержки WebGL и выполните следующее, прежде чем пытаться что-либо отобразить.
+		</p>
+
+		<code>
+		import WebGL from 'three/addons/capabilities/WebGL.js';
+
+		if ( WebGL.isWebGLAvailable() ) {
+
+			// Инициализируйте функцию или другие инициализации здесь
+			animate();
+
+		} else {
+
+			const warning = WebGL.getWebGLErrorMessage();
+			document.getElementById( 'container' ).appendChild( warning );
+
+		}
+		</code>
+	</body>
+</html>

@@ -11,8 +11,6 @@ class TexturePass extends Pass {
 
 		super();
 
-		if ( CopyShader === undefined ) console.error( 'THREE.TexturePass relies on CopyShader' );
-
 		const shader = CopyShader;
 
 		this.map = map;
@@ -52,6 +50,14 @@ class TexturePass extends Pass {
 		this.fsQuad.render( renderer );
 
 		renderer.autoClear = oldAutoClear;
+
+	}
+
+	dispose() {
+
+		this.material.dispose();
+
+		this.fsQuad.dispose();
 
 	}
 

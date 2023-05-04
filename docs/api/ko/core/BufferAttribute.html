@@ -16,6 +16,12 @@
 
 		데이터는 모든 길이가 벡터로 저장되며 ([page:BufferAttribute.itemSize itemSize]로 정의된 값),
 		일반적으로 인덱스 값으로 전달될 경우 메서드 내에서 밑줄이 쳐지며 자동으로 벡터 길이에 곱해집니다.
+
+		When working with vector-like data, the <i>.fromBufferAttribute( attribute, index )</i>
+		helper methods on [page:Vector2.fromBufferAttribute Vector2],
+		[page:Vector3.fromBufferAttribute Vector3],
+		[page:Vector4.fromBufferAttribute Vector4], and
+		[page:Color.fromBufferAttribute Color] classes may be helpful.
 		</p>
 
 		<h2>생성자</h2>
@@ -51,6 +57,11 @@
 
 		버퍼가 3개의 컴포넌트를 저장한 벡터(위치, 법선, 색 등)
 		저장된 벡터들의 수를 계산합니다.
+		</p>
+
+		<h3>[property:Boolean isBufferAttribute]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Integer itemSize]</h3>
@@ -127,18 +138,6 @@
 
 		<h3>[method:this copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
 		<p>bufferAttribute[index2]의 벡터를 [page:BufferAttribute.array array][index1]에 복사합니다.</p>
-
-		<h3>[method:this copyColorsArray]( [param:Array colors] ) </h3>
-		<p>RGB 색상 값을 나타내는 배열을 [page:BufferAttribute.array array]에 복사합니다.</p>
-
-		<h3>[method:this copyVector2sArray]( [param:Array vectors] ) </h3>
-		<p>[page:Vector2]값을 나타내는 배열을 [page:BufferAttribute.array array]에 복사합니다.</p>
-
-		<h3>[method:this copyVector3sArray]( [param:Array vectors] ) </h3>
-		<p>[page:Vector3]값을 나타내는 배열을 [page:BufferAttribute.array array]에 복사합니다.</p>
-
-		<h3>[method:this copyVector4sArray]( [param:Array vectors] ) </h3>
-		<p>[page:Vector4]값을 나타내는 배열을 [page:BufferAttribute.array array]에 복사합니다.</p>
 
 		<h3>[method:Number getX]( [param:Integer index] ) </h3>
 		<p>해당 index의 벡터의 x 컴포넌트 값을 리턴합니다.</p>

@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – 大量对象的优化">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -157,7 +157,7 @@ function hsl(h, s, l) {
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.TextureLoader();
   const texture = loader.load('resources/images/world.jpg', render);
-  const geometry = new THREE.SphereBufferGeometry(1, 64, 32);
+  const geometry = new THREE.SphereGeometry(1, 64, 32);
   const material = new THREE.MeshBasicMaterial({map: texture});
   scene.add(new THREE.Mesh(geometry, material));
 }
@@ -173,7 +173,7 @@ function hsl(h, s, l) {
   const boxWidth = 1;
   const boxHeight = 1;
   const boxDepth = 1;
-  const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
+  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
   // 沿着z轴缩放
   geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, 0.5));
 
@@ -274,7 +274,7 @@ function hsl(h, s, l) {
 -  const boxWidth = 1;
 -  const boxHeight = 1;
 -  const boxDepth = 1;
--  const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
+-  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 -  // 沿着Z轴缩放
 -  geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, 0.5));
 
@@ -315,7 +315,7 @@ function hsl(h, s, l) {
 +      const boxWidth = 1;
 +      const boxHeight = 1;
 +      const boxDepth = 1;
-+      const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
++      const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
       // 调整位置辅助器的指向
       lonHelper.rotation.y = THREE.MathUtils.degToRad(lonNdx + file.xllcorner) + lonFudge;
@@ -335,7 +335,7 @@ function hsl(h, s, l) {
     });
   });
 
-+  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
++  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 +      geometries, false);
 +  const material = new THREE.MeshBasicMaterial({color:'red'});
 +  const mesh = new THREE.Mesh(mergedGeometry, material);
@@ -344,9 +344,9 @@ function hsl(h, s, l) {
 }
 </pre>
 <p>我们移除了之前用来改变盒子几何中心的代码, 取而代之的是<code class="notranslate" translate="no">originHelper</code>. 这次我们要为每个长方体创建新的几何体, 因为我们要使用“applyMatrix”来移动每个长方体几何体的顶点, 所以我们最好只移动一次, 而不是两次.</p>
-<p>最后, 我们将所有几何体的数组传入<code class="notranslate" translate="no">BufferGeometryUtils.mergeBufferGeometries</code>, 这个方法将会将其合并到一个mesh中</p>
+<p>最后, 我们将所有几何体的数组传入<code class="notranslate" translate="no">BufferGeometryUtils.mergeGeometries</code>, 这个方法将会将其合并到一个mesh中</p>
 <p>别忘了引入<code class="notranslate" translate="no">BufferGeometryUtils</code></p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as BufferGeometryUtils from '/examples/jsm/utils/BufferGeometryUtils.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 </pre>
 <p>现在, 至少在我的机器上, 可以跑到60帧每秒了</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -372,7 +372,7 @@ data.forEach((row, latNdx) =&gt; {
     const boxWidth = 1;
     const boxHeight = 1;
     const boxDepth = 1;
-    const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
+    const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
     lonHelper.rotation.y = THREE.MathUtils.degToRad(lonNdx + file.xllcorner) + lonFudge;
     latHelper.rotation.x = THREE.MathUtils.degToRad(latNdx + file.yllcorner) + latFudge;
@@ -409,7 +409,7 @@ data.forEach((row, latNdx) =&gt; {
 </pre>
 <p>上面的代码中, 我们查找几何体中的<code class="notranslate" translate="no">position</code>属性来获取所需的数量和顶点. 然后创建一个<code class="notranslate" translate="no">Uint8Array</code>来输入颜色. 接下来通过调用<code class="notranslate" translate="no">geometry.setAttribute</code>来将其设定为一个属性. </p>
 <p>最后告诉three.js使用顶点上色. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeGeometries(
     geometries, false);
 -const material = new THREE.MeshBasicMaterial({color:'red'});
 +const material = new THREE.MeshBasicMaterial({
@@ -434,8 +434,8 @@ scene.add(mesh);
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

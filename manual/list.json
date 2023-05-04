@@ -52,7 +52,7 @@
 			"Start making a Game": "en/game"
 		},
 		"WebXR": {
-			"VR - Basics": "en/webxr",
+			"VR - Basics": "en/webxr-basics",
 			"VR - Look To Select": "en/webxr-look-to-select",
 			"VR - Point To Select": "en/webxr-point-to-select"
 		},
@@ -69,7 +69,7 @@
 		},
 		"Principes de base": {
 			"Primitives": "fr/primitives",
-			"Graphique de scène": "fr/scenegraph",
+			"Graphe de scène": "fr/scenegraph",
 			"Matériaux": "fr/materials",
 			"Textures": "fr/textures",
 			"Lumières": "fr/lights",
@@ -113,7 +113,7 @@
 			"Start making a Game": "fr/game"
 		},
 		"WebXR": {
-			"VR - Basics": "fr/webxr",
+			"VR - Basics": "fr/webxr-basics",
 			"VR - Look To Select": "fr/webxr-look-to-select",
 			"VR - Point To Select": "fr/webxr-point-to-select"
 		},
@@ -174,7 +174,7 @@
 			"Start making a Game": "ja/game"
 		},
 		"WebXR": {
-			"VR - Basics": "ja/webxr",
+			"VR - Basics": "ja/webxr-basics",
 			"VR - Look To Select": "ja/webxr-look-to-select",
 			"VR - Point To Select": "ja/webxr-point-to-select"
 		},
@@ -190,8 +190,8 @@
 			"개발 환경": "ko/setup"
 		},
 		"기본 구조": {
-			"원시 모델": "ko/primitives",
-			"씬 그래프": "ko/scenegraph",
+			"원시 모델(Primitives)": "ko/primitives",
+			"씬 그래프(Scenegraph)": "ko/scenegraph",
 			"재질(Materials)": "ko/materials",
 			"텍스처(Textures)": "ko/textures",
 			"조명(Lights)": "ko/lights",
@@ -235,7 +235,7 @@
 			"게임 만들기": "ko/game"
 		},
 		"웹VR": {
-			"VR - 기본 사항": "ko/webxr",
+			"VR - 기본 사항": "ko/webxr-basics",
 			"VR - Look To Select": "ko/webxr-look-to-select",
 			"VR - Point To Select": "ko/webxr-point-to-select"
 		},
@@ -296,7 +296,7 @@
 			"Start making a Game": "ru/game"
 		},
 		"WebXR": {
-			"VR - Basics": "ru/webxr",
+			"VR - Basics": "ru/webxr-basics",
 			"VR - Look To Select": "ru/webxr-look-to-select",
 			"VR - Point To Select": "ru/webxr-point-to-select"
 		},
@@ -305,6 +305,12 @@
 		}
 	},
 	"zh": {
+		"基本": {
+			"基础": "zh/fundamentals",
+			"响应式设计": "zh/responsive",
+			"先决条件": "zh/prerequisites",
+			"设置": "zh/setup"
+		},
 		"基础": {
 			"图元": "zh/primitives",
 			"场景图": "zh/scenegraph",
@@ -321,11 +327,11 @@
 			"按需渲染": "zh/rendering-on-demand",
 			"调试JavaScript": "zh/debugging-javascript",
 			"调试着色器": "zh/debugging-glsl",
-			"Taking a screenshot": "zh/tips#screenshot",
-			"Prevent the Canvas Being Cleared": "zh/tips#preservedrawingbuffer",
-			"Get Keyboard Input From a Canvas": "zh/tips#tabindex",
-			"Make the Canvas Transparent": "zh/tips#transparent-canvas",
-			"Use three.js as Background in HTML": "zh/tips#html-background"
+			"canvas截图": "zh/tips#screenshot",
+			"防止canvas被清空": "zh/tips#preservedrawingbuffer",
+			"从canvas获取键盘输入": "zh/tips#tabindex",
+			"透明化canvas": "zh/tips#transparent-canvas",
+			"在HTML中使用three.js动画背景": "zh/tips#html-background"
 		},
 		"优化": {
 			"大量对象的优化": "zh/optimize-lots-of-objects",
@@ -334,29 +340,29 @@
 		},
 		"解决方案": {
 			"加载 .OBJ 文件": "zh/load-obj",
-			"Load a .GLTF file": "zh/load-gltf",
-			"Add a Background or Skybox": "zh/backgrounds",
-			"How to Draw Transparent Objects": "zh/transparency",
+			"加载 .GLTF 文件": "zh/load-gltf",
+			"添加背景或天空盒": "zh/backgrounds",
+			"如何绘制透明的物体": "zh/transparency",
 			"多个画布, 多个场景": "zh/multiple-scenes",
 			"鼠标选取对象": "zh/picking",
 			"后期处理": "zh/post-processing",
 			"Applying a LUT File for effects": "zh/post-processing-3dlut",
 			"Using Shadertoy shaders": "zh/shadertoy",
-			"Aligning HTML Elements to 3D": "zh/align-html-elements-to-3d",
-			"Using Indexed Textures for Picking and Color": "zh/indexed-textures",
-			"Using A Canvas for Dynamic Textures": "zh/canvas-textures",
-			"Billboards and Facades": "zh/billboards",
-			"Freeing Resources": "zh/cleanup",
+			"对齐HTML元素到3D对象": "zh/align-html-elements-to-3d",
+			"使用纹理索引来拾取和着色": "zh/indexed-textures",
+			"使用Canvas生成动态纹理": "zh/canvas-textures",
+			"广告牌(Billboards)": "zh/billboards",
+			"释放资源": "zh/cleanup",
 			"Making Voxel Geometry (Minecraft)": "zh/voxel-geometry",
 			"Start making a Game": "zh/game"
 		},
 		"WebXR": {
-			"VR - Basics": "zh/webxr",
+			"VR - Basics": "zh/webxr-basics",
 			"VR - Look To Select": "zh/webxr-look-to-select",
 			"VR - Point To Select": "zh/webxr-point-to-select"
 		},
 		"参考": {
-			"Material Table": "zh/material-table"
+			"材质特性表": "zh/material-table"
 		}
 	}
 }

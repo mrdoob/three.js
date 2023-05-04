@@ -18,13 +18,13 @@ class SVGObject extends Object3D {
 
 		super();
 
+		this.isSVGObject = true;
+
 		this.node = node;
 
 	}
 
 }
-
-SVGObject.prototype.isSVGObject = true;
 
 class SVGRenderer {
 
@@ -227,7 +227,7 @@ class SVGRenderer {
 
 					if ( _clipBox.intersectsBox( _elemBox ) === true ) {
 
-						renderLine( _v1, _v2, element, material );
+						renderLine( _v1, _v2, material );
 
 					}
 
@@ -397,7 +397,7 @@ class SVGRenderer {
 
 		}
 
-		function renderLine( v1, v2, element, material ) {
+		function renderLine( v1, v2, material ) {
 
 			const path = 'M' + convert( v1.positionScreen.x ) + ',' + convert( v1.positionScreen.y ) + 'L' + convert( v2.positionScreen.x ) + ',' + convert( v2.positionScreen.y );
 

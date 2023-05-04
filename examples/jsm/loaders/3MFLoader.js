@@ -9,7 +9,6 @@ import {
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	Loader,
-	LoaderUtils,
 	Matrix4,
 	Mesh,
 	MeshPhongMaterial,
@@ -18,9 +17,11 @@ import {
 	NearestFilter,
 	RepeatWrapping,
 	TextureLoader,
-	sRGBEncoding
+	SRGBColorSpace
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
+
+const COLOR_SPACE_3MF = SRGBColorSpace;
 
 /**
  *
@@ -97,7 +98,6 @@ class ThreeMFLoader extends Loader {
 			let relsName;
 			let modelRelsName;
 			const modelPartNames = [];
-			const printTicketPartNames = [];
 			const texturesPartNames = [];
 
 			let modelRels;
@@ -105,9 +105,11 @@ class ThreeMFLoader extends Loader {
 			const printTicketParts = {};
 			const texturesParts = {};
 
+			const textDecoder = new TextDecoder();
+
 			try {
 
-				zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
+				zip = fflate.unzipSync( new Uint8Array( data ) );
 
 			} catch ( e ) {
 
@@ -134,10 +136,6 @@ class ThreeMFLoader extends Loader {
 
 					modelPartNames.push( file );
 
-				} else if ( file.match( /^3D\/Metadata\/.*\.xml$/ ) ) {
-
-					printTicketPartNames.push( file );
-
 				} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
 
 					texturesPartNames.push( file );
@@ -149,7 +147,7 @@ class ThreeMFLoader extends Loader {
 			//
 
 			const relsView = zip[ relsName ];
-			const relsFileText = LoaderUtils.decodeText( relsView );
+			const relsFileText = textDecoder.decode( relsView );
 			const rels = parseRelsXml( relsFileText );
 
 			//
@@ -157,7 +155,7 @@ class ThreeMFLoader extends Loader {
 			if ( modelRelsName ) {
 
 				const relsView = zip[ modelRelsName ];
-				const relsFileText = LoaderUtils.decodeText( relsView );
+				const relsFileText = textDecoder.decode( relsView );
 				modelRels = parseRelsXml( relsFileText );
 
 			}
@@ -169,7 +167,7 @@ class ThreeMFLoader extends Loader {
 				const modelPart = modelPartNames[ i ];
 				const view = zip[ modelPart ];
 
-				const fileText = LoaderUtils.decodeText( view );
+				const fileText = textDecoder.decode( view );
 				const xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
 
 				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
@@ -363,8 +361,7 @@ class ThreeMFLoader extends Loader {
 				const colorNode = colorNodes[ i ];
 				const color = colorNode.getAttribute( 'color' );
 
-				colorObject.setStyle( color.substring( 0, 7 ) );
-				colorObject.convertSRGBToLinear(); // color is in sRGB
+				colorObject.setStyle( color.substring( 0, 7 ), COLOR_SPACE_3MF );
 
 				colors.push( colorObject.r, colorObject.g, colorObject.b );
 
@@ -793,7 +790,7 @@ class ThreeMFLoader extends Loader {
 
 				} );
 
-				texture.encoding = sRGBEncoding;
+				texture.colorSpace = COLOR_SPACE_3MF;
 
 				// texture parameters
 
@@ -997,7 +994,7 @@ class ThreeMFLoader extends Loader {
 
 		}
 
-		function buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, objectData ) {
+		function buildVertexColorMesh( colorgroup, triangleProperties, meshData, objectData ) {
 
 			// geometry
 
@@ -1110,7 +1107,7 @@ class ThreeMFLoader extends Loader {
 
 					case 'vertexColors':
 						const colorgroup = modelData.resources.colorgroup[ resourceId ];
-						meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, meshData, objects, objectData ) );
+						meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, meshData, objectData ) );
 						break;
 
 					case 'default':
@@ -1119,6 +1116,16 @@ class ThreeMFLoader extends Loader {
 
 					default:
 						console.error( 'THREE.3MFLoader: Unsupported resource type.' );
+
+				}
+
+			}
+
+			if ( objectData.name ) {
+
+				for ( let i = 0; i < meshes.length; i ++ ) {
+
+					meshes[ i ].name = objectData.name;
 
 				}
 
@@ -1154,7 +1161,7 @@ class ThreeMFLoader extends Loader {
 
 		}
 
-		function analyzeObject( modelData, meshData, objectData ) {
+		function analyzeObject( meshData, objectData ) {
 
 			const resourceMap = {};
 
@@ -1183,7 +1190,7 @@ class ThreeMFLoader extends Loader {
 
 			const group = new Group();
 
-			const resourceMap = analyzeObject( modelData, meshData, objectData );
+			const resourceMap = analyzeObject( meshData, objectData );
 			const meshes = buildMeshes( resourceMap, meshData, objects, modelData, textureData, objectData );
 
 			for ( let i = 0, l = meshes.length; i < l; i ++ ) {
@@ -1275,8 +1282,7 @@ class ThreeMFLoader extends Loader {
 			const displaycolor = materialData.displaycolor;
 
 			const color = displaycolor.substring( 0, 7 );
-			material.color.setStyle( color );
-			material.color.convertSRGBToLinear(); // displaycolor is in sRGB
+			material.color.setStyle( color, COLOR_SPACE_3MF );
 
 			// process alpha if set
 
@@ -1346,6 +1352,12 @@ class ThreeMFLoader extends Loader {
 				const compositeData = objectData[ 'components' ];
 
 				objects[ objectData.id ] = getBuild( compositeData, objects, modelData, textureData, objectData, buildComposite );
+
+			}
+
+			if ( objectData.name ) {
+
+				objects[ objectData.id ].name = objectData.name;
 
 			}
 

@@ -9,6 +9,8 @@ class WireframeGeometry2 extends LineSegmentsGeometry {
 
 		super();
 
+		this.isWireframeGeometry2 = true;
+
 		this.type = 'WireframeGeometry2';
 
 		this.fromWireframeGeometry( new WireframeGeometry( geometry ) );
@@ -18,7 +20,5 @@ class WireframeGeometry2 extends LineSegmentsGeometry {
 	}
 
 }
-
-WireframeGeometry2.prototype.isWireframeGeometry2 = true;
 
 export { WireframeGeometry2 };

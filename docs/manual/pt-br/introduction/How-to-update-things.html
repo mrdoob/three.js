@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Como atualizar as coisas</h1>
+		<div>
+			<p>Todos os objetos, por padrão, atualizam automaticamente suas matrizes se
+			forem adicionados à cena (scene) dessa forma</p>
+			<code>
+const object = new THREE.Object3D();
+scene.add( object );
+			</code>
+			ou se eles são filhos de outro objeto que foi adicionado à cena:
+			<code>
+const object1 = new THREE.Object3D();
+const object2 = new THREE.Object3D();
+
+object1.add( object2 );
+scene.add( object1 ); //object1 and object2 will automatically update their matrices
+			</code>
+		</div>
+
+		<p>
+			No entanto, se você sabe que o objeto será estático, pode desativar este recurso e atualizar
+			a matriz de transformação manualmente apenas quando necessário.
+		</p>
+
+		<code>
+object.matrixAutoUpdate = false;
+object.updateMatrix();
+		</code>
+
+		<h2>BufferGeometry</h2>
+		<div>
+			<p>
+				BufferGeometries armazenam informações (tais como posições de vértice, índice de faces, normais, cores,
+				UVs, e quaisquer outros atributos personalizados) em [page:BufferAttribute buffers] - isto é,
+				[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays arrays tipados].
+				Isso os torna geralmente mais rápidos do que os Geometries padrão, ao custo de serem um pouco mais difíceis de
+				trabalhar.
+			</p>
+			<p>
+				Com relação à atualização dos BufferGeometries, o mais importante é entender que
+				você não pode redimensionar buffers (isso é muito custoso, sendo basicamente o equivalente a criar uma nova geometria).
+				No entanto, você pode atualizar o conteúdo dos buffers.
+			</p>
+			<p>
+				Isso significa que se você sabe que um atributo do seu BufferGeometry vai crescer, digamos o número de vértices,
+				você deve pré-alocar um buffer grande o suficiente para conter quaisquer novos vértices que possam ser criados. 
+				É claro, isso também significa que haverá um tamanho máximo para o seu BufferGeometry - 
+				não há como criar um BufferGeometry que possa ser estendido de forma eficiente indefinidamente.
+			</p>
+			<p>
+				Usaremos o exemplo de uma linha que é estendida em tempo de renderização. Vamos alocar espaço
+				no buffer para 500 vértices, mas desenhando apenas dois primeiro, usando [page:BufferGeometry.drawRange].
+			</p>
+			<code>
+const MAX_POINTS = 500;
+
+// geometry
+const geometry = new THREE.BufferGeometry();
+
+// attributes
+const positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
+geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+// draw range
+const drawCount = 2; // draw the first 2 points, only
+geometry.setDrawRange( 0, drawCount );
+
+// material
+const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+
+// line
+const line = new THREE.Line( geometry, material );
+scene.add( line );
+			</code>
+		 	<p>
+				Em seguida, adicionaremos aleatoriamente pontos à linha usando um padrão como:
+			</p>
+			<code>
+const positionAttribute = line.geometry.getAttribute( 'position' );
+
+let x = 0, y = 0, z = 0;
+
+for ( let i = 0; i < positionAttribute.count; i ++ ) {
+
+	positionAttribute.setXYZ( i, x, y, z );
+
+	x += ( Math.random() - 0.5 ) * 30;
+	y += ( Math.random() - 0.5 ) * 30;
+	z += ( Math.random() - 0.5 ) * 30;
+
+}
+			</code>
+			<p>
+				Se você quiser alterar o <em>número de pontos</em> renderizados após a primeira renderização, faça o seguinte:
+			</p>
+			<code>
+line.geometry.setDrawRange( 0, newValue );
+			</code>
+			<p>
+				Se você deseja alterar os valores dos dados de posição após a primeira renderização, você precisa
+				definir a propriedade needsUpdate assim:
+			</p>
+			<code>
+positionAttribute.needsUpdate = true; // required after the first render
+			</code>
+
+			<p>
+				Se você alterar os valores dos dados de posição após a renderização inicial, pode ser necessário recalcular
+				os limites de volume para que outros recursos da engine, como view frustum culling ou helpers,
+				funcionem corretamente
+			</p>
+			<code>
+line.geometry.computeBoundingBox();
+line.geometry.computeBoundingSphere();
+			</code>
+
+			<p>
+				[link:https://jsfiddle.net/t4m85pLr/1/ O fiddle] mostra uma linha animada que você pode adaptar ao seu caso de uso.
+			</p>
+
+			<h3>Exemplos</h3>
+
+			<p>
+				[example:webgl_custom_attributes WebGL / custom / attributes]<br />
+				[example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
+			</p>
+
+		</div>
+
+		<h2>Materiais (Materials)</h2>
+		<div>
+			<p>
+				Todos os valores uniformes podem ser alterados livremente (por exemplo, cores, texturas, opacidade, etc),
+				os valores são enviados para o shader a cada quadro.
+			</p>
+
+			<p>
+				Também os parâmetros relacionados ao GLstate podem mudar a qualquer momento
+				(depthTest, blending, polygonOffset, etc).
+			</p>
+
+			<p>
+				As seguintes propriedades não podem ser alteradas facilmente em tempo de execução
+				(uma vez que o material é renderizado pelo menos uma vez):
+			</p>
+			<ul>
+				<li>números e tipos de uniformes</li>
+				<li>presença ou não de
+					<ul>
+						<li>textura (texture)</li>
+						<li>fog</li>
+						<li>cores dos vértices (vertex colors)</li>
+						<li>morphing</li>
+						<li>shadow map</li>
+						<li>alpha test</li>
+						<li>transparent</li>
+					</ul>
+				</li>
+			</ul>
+
+			<p>
+				Mudanças nestas propriedades requerem a construção de um novo programa de shader. Você precisará definir</p>
+			<code>material.needsUpdate = true</code>
+
+			<p>
+				Tenha em mente que isso pode ser bastante lento e induzir lags na taxa de quadros (especialmente no Windows, pois a compilação do shader é mais lenta no DirectX do que no OpenGL).
+			</p>
+
+			<p>
+				Para uma experiência mais suave, você pode emular alterações nessas propriedades
+				até certo ponto, por ter valores "fictícios" como luzes de intensidade zero, texturas brancas ou fog de densidade zero.
+			</p>
+
+			<p>
+				Você pode alterar livremente o material usado para partes da geometria,
+				no entanto, você não pode alterar como um objeto é dividido em partes (de acordo com os materiais da face).
+			</p>
+
+			<h3>Se você precisar ter diferentes configurações de materiais durante o tempo de execução:</h3>
+			<p>
+				Se o número de materiais / partes for pequeno, você pode pré-dividir o objeto
+				de antemão (por exemplo, cabelo / rosto / corpo / roupa superior / calças para um humano,
+				frente / laterais /topo / vidro / pneu / interior para um carro).
+			</p>
+
+			<p>
+				Se o número for grande (por exemplo, cada rosto pode ser potencialmente diferente),
+				considere uma solução diferente, como usar atributos / texturas para produzir diferenças
+				nos rostos.
+			</p>
+
+			<h3>Exemplos</h3>
+			<p>
+				[example:webgl_materials_car WebGL / materials / car]<br />
+				[example:webgl_postprocessing_dof WebGL / webgl_postprocessing / dof]
+			</p>
+		</div>
+
+
+		<h2>Texturas</h2>
+		<div>
+			<p>
+				Imagem, canvas, vídeo e dados de textura precisam ter a seguinte
+				propriedade definida se eles forem alterados:
+			</p>
+			<code>
+				texture.needsUpdate = true;
+			</code>
+			<p>Os alvos de renderização são atualizados automaticamente.</p>
+
+			<h3>Exemplos</h3>
+			<p>
+				[example:webgl_materials_video WebGL / materials / video]<br />
+				[example:webgl_rtt WebGL / rtt]
+			</p>
+
+		</div>
+
+
+		<h2>Câmeras</h2>
+		<div>
+			<p>
+				A posição e o alvo de uma câmera são atualizados automaticamente. Se você precisa mudar
+			</p>
+			<ul>
+				<li>
+					fov
+				</li>
+				<li>
+					aspect
+				</li>
+				<li>
+					near
+				</li>
+				<li>
+					far
+				</li>
+			</ul>
+			<p>	
+				então você precisará recalcular a matriz de projeção:
+			</p>
+			<code>
+camera.aspect = window.innerWidth / window.innerHeight;
+camera.updateProjectionMatrix();
+			</code>
+		</div>
+	</body>
+</html>

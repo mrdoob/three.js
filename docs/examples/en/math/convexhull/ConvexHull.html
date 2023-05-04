@@ -13,6 +13,17 @@
 			A convex hull class. Implements the Quickhull algorithm by: Dirk Gregorius. March 2014, Game Developers Conference: [link:http://media.steampowered.com/apps/valve/2014/DirkGregorius_ImplementingQuickHull.pdf Implementing QuickHull].
 		</p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { ConvexHull } from 'three/addons/math/ConvexHull.js';
+		</code>
+
 
 		<h2>Constructor</h2>
 
@@ -124,7 +135,7 @@
 		<p>
 			[page:Vector3 point] - A point in 3D space.<br /><br />
 
-			Returns *true* if the given point is inside this convex hull.
+			Returns `true` if the given point is inside this convex hull.
 		</p>
 
 		<h3>[method:this deleteFaceVertices]( [param:Face face], [param:Face absorbingFace]	)</h3>
@@ -145,14 +156,14 @@
 			[page:Ray ray] - The given ray.<br />
 			[page:Vector3 target] - The target vector representing the intersection point.<br /><br />
 
-			Performs a ray intersection test with this convext hull. If no intersection is found, *null* is returned.
+			Performs a ray intersection test with this convext hull. If no intersection is found, `null` is returned.
 		</p>
 
 		<h3>[method:Boolean intersectsRay]( [param:Ray ray] )</h3>
 		<p>
 			[page:Ray ray] - The given ray.<br /><br />
 
-			Returns *true* if the given ray intersects with this convex hull.
+			Returns `true` if the given ray intersects with this convex hull.
 		</p>
 
 		<h3>[method:this makeEmpty]()</h3>

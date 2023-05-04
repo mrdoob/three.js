@@ -1,13 +1,15 @@
 /* global QUnit */
 
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
+
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { runStdGeometryTests } from '../../utils/qunit-utils.js';
-import { BoxGeometry, BoxBufferGeometry } from '../../../../src/geometries/BoxGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'BoxGeometry', ( hooks ) => {
 
-		var geometries = undefined;
+		let geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -23,20 +25,48 @@ export default QUnit.module( 'Geometries', () => {
 				new BoxGeometry(),
 				new BoxGeometry( parameters.width, parameters.height, parameters.depth ),
 				new BoxGeometry( parameters.width, parameters.height, parameters.depth, parameters.widthSegments, parameters.heightSegments, parameters.depthSegments ),
-				new BoxBufferGeometry()
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
+
+			const object = new BoxGeometry();
+			assert.strictEqual(
+				object instanceof BufferGeometry, true,
+				'BoxGeometry extends from BufferGeometry'
+			);
+
+		} );
+
+		// INSTANCING
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new BoxGeometry();
+			assert.ok( object, 'Can instantiate a BoxGeometry.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new BoxGeometry();
+			assert.ok(
+				object.type === 'BoxGeometry',
+				'BoxGeometry.type should be BoxGeometry'
+			);
+
+		} );
+
+		QUnit.todo( 'parameters', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		// STATIC
+		QUnit.todo( 'fromJSON', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

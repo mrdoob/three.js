@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Camera] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Caméra utilisant la [link:https://en.wikipedia.org/wiki/Orthographic_projection projection orthographique].<br /><br />
+
+			Dans ce mode de projection, la taille d'un objet dans l'image rendue reste constante
+			peu importe sa distance à la caméra.<br /><br />
+
+			Cela peut être utile pour effectuer le rendu de scènes 2D et d'éléments UI, entre autres.
+		</p>
+
+		<h2>Exemple de Code</h2>
+
+		<code>
+		const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+		scene.add( camera );
+		</code>
+
+		<h2>Exemples</h2>
+
+		<p>
+			[example:webgl_camera camera ]<br />
+			[example:webgl_interactive_cubes_ortho interactive / cubes / ortho ]<br />
+			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]<br />
+			[example:webgl_postprocessing_advanced postprocessing / advanced ]<br />
+			[example:webgl_postprocessing_dof2 postprocessing / dof2 ]<br />
+			[example:webgl_postprocessing_godrays postprocessing / godrays ]<br />
+			[example:webgl_rtt rtt ]<br />
+			[example:webgl_shaders_tonemapping shaders / tonemapping ]<br />
+			[example:webgl_shadowmap shadowmap ]
+		</p>
+
+		<h2>Constructeur</h2>
+
+
+		<h3>[name]( [param:Number left], [param:Number right], [param:Number top], [param:Number bottom], [param:Number near], [param:Number far] )</h3>
+		<p>
+		left — Plan gauche du frustum de la caméra.<br />
+		right — Plan droit du frustum de la caméra.<br />
+		top — Plan supérieur du frustum de la caméra.<br />
+		bottom — Plan inférieur du frustum de la caméra.<br />
+		near — Plan near du frustum de la caméra.<br />
+		far — Plan far du frustum de la caméra.<br /><br />
+
+		Ensemble ces propriétés définissent le [link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum] de la caméra.
+		</p>
+
+
+		<h2>Properties</h2>
+		<p>
+			Voir la classe [page:Camera] pour connaître les propriétés communes.<br>
+			Notez qu'après avoir changé la grande majorité de ces propriétés vous devrez appeler
+			[page:OrthographicCamera.updateProjectionMatrix .updateProjectionMatrix] afin que les changements prennent effet.
+		</p>
+
+		<h3>[property:Float bottom]</h3>
+		<p>Plan inférieur du frustum de la caméra.</p>
+
+		<h3>[property:Float far]</h3>
+		<p>
+		Plan far du frustum de la caméra. La valeur par défaut est `2000`.<br /><br />
+
+		Doit être supérieur à la valeur actuelle du plan [page:.near near].
+		</p>
+
+		<h3>[property:Boolean isOrthographicCamera]</h3>
+		<p>
+			Flag en lecture seul qui pemet de vérifier si un objet donné est de type [name].
+		</p>
+
+		<h3>[property:Float left]</h3>
+		<p>Plan gauche du frustum de la caméra.</p>
+
+		<h3>[property:Float near]</h3>
+		<p>
+			Plan near du frustum de la caméra. La valeur par défaut est `0.1`.<br /><br />
+
+			L'intervalle valide est comprise entre `0` et la valeur actuelle du plan [page:.far far].
+			Notez que, à l'inverse de la [page:PerspectiveCamera], `0` est une valeur valide pour
+			le plan near de l'OrthographicCamera.
+		</p>
+
+		<h3>[property:Float right]</h3>
+		<p>Plan droit du frustum de la caméra.</p>
+
+		<h3>[property:Float top]</h3>
+		<p>Plan supérieur du frustum de la caméra.</p>
+
+		<h3>[property:Object view]</h3>
+		<p>Renseigné par [page:OrthographicCamera.setViewOffset setViewOffset]. La valeur par défaut est `null`.</p>
+
+		<h3>[property:number zoom]</h3>
+		<p>Récupère ou renseigne le facteur de zoom de la caméra. La valeur par défaut est `1`.</p>
+
+		<h2>Methods</h2>
+		<p>Voir la classe [page:Camera] pour connaître les propriétés communes.</p>
+
+		<h3>[method:undefined setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
+		<p>
+		fullWidth — largeur totale du setup multi-écrans<br />
+		fullHeight — hauteur totale du setup multi-écrans<br />
+		x — décalage horizontal de la sous-caméra<br />
+		y — décalage vertical de la sous-caméra<br />
+		width — largeur de la sous-caméra<br />
+		height — hauteur de la sous-caméra<br /><br />
+
+			Définis un décalage dans un frustum plus grand [link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum].
+			C'est utile pour un setup multi-écrans ou multi-machines.
+			Pour avoir un exemple d'utilisation voir [page:PerspectiveCamera.setViewOffset PerspectiveCamera].
+		</p>
+
+		<h3>[method:undefined clearViewOffset]()</h3>
+		<p>
+		Retire tout décalage mis en place par la méthode .setViewOffset.
+		</p>
+
+		<h3>[method:undefined updateProjectionMatrix]()</h3>
+		<p>
+		Met à jour la matrice de projection de la caméra. Doit être appelé après chaque changement de paramètres.
+		</p>
+
+		<h3>[method:Object toJSON]([param:Object meta])</h3>
+		<p>
+		meta -- objet contenant des metadatas comme des objets ou des textures dans des descendants des objets.<br />
+		Convertis la caméra en [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format] three.js.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

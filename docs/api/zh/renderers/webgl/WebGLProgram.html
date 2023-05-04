@@ -35,7 +35,7 @@
 		uniform vec3 cameraPosition;
 		</code>
 		<code>
-		// default vertex attributes provided by Geometry and BufferGeometry
+		// default vertex attributes provided by BufferGeometry
 		attribute vec3 position;
 		attribute vec3 normal;
 		attribute vec2 uv;
@@ -55,6 +55,9 @@
 		<h3>顶点着色器(有条件的):</h3>
 		<div>
 		<code>
+		#ifdef USE_TANGENT
+			attribute vec4 tangent;
+		#endif
 		#if defined( USE_COLOR_ALPHA )
 			// vertex color attribute with alpha
 			attribute vec4 color;
@@ -113,25 +116,25 @@
 		<h2>属性</h2>
 
 		<h3>[property:String name]</h3>
-		<p>The name of the respective shader program.</p>
+		<p>相应着色器程序的名称。</p>
 
 		<h3>[property:String id]</h3>
-		<p>The identifier of this instance.</p>
+		<p>该实例的 id 标识。</p>
 
 		<h3>[property:String cacheKey]</h3>
-		<p>This key enables the reusability of a single [name] for different materials.</p>
+		<p>启用这个 key 之后，能够实现单个 WebGLProgram 不同材料的可重用性。</p>
 
 		<h3>[property:Integer usedTimes]</h3>
-		<p>How many times this instance is used for rendering render items.</p>
+		<p>此实例用于渲染渲染项的次数。</p>
 
 		<h3>[property:Object program]</h3>
-		<p>The actual shader program.</p>
+		<p>实际的着色器程序。</p>
 
 		<h3>[property:WebGLShader vertexShader]</h3>
-		<p>The vertex shader.</p>
+		<p>顶点着色器。</p>
 
 		<h3>[property:WebGLShader fragmentShader]</h3>
-		<p>The fragment shader.</p>
+		<p>片元着色器。</p>
 
 		<h2>方法</h2>
 
@@ -147,7 +150,7 @@
 
 		<h3>[method:undefined destroy]()</h3>
 		<p>
-		Destroys an instance of [name].
+		销毁 WebGLProgram 的实例。
 		</p>
 
 		<h2>源码</h2>

@@ -6,7 +6,7 @@ import * as MathUtils from '../math/MathUtils.js';
 
 class LatheGeometry extends BufferGeometry {
 
-	constructor( points = [ new Vector2( 0, 0.5 ), new Vector2( 0.5, 0 ), new Vector2( 0, - 0.5 ) ], segments = 12, phiStart = 0, phiLength = Math.PI * 2 ) {
+	constructor( points = [ new Vector2( 0, - 0.5 ), new Vector2( 0.5, 0 ), new Vector2( 0, 0.5 ) ], segments = 12, phiStart = 0, phiLength = Math.PI * 2 ) {
 
 		super();
 
@@ -167,6 +167,16 @@ class LatheGeometry extends BufferGeometry {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
+
+	}
+
 	static fromJSON( data ) {
 
 		return new LatheGeometry( data.points, data.segments, data.phiStart, data.phiLength );
@@ -176,4 +186,4 @@ class LatheGeometry extends BufferGeometry {
 }
 
 
-export { LatheGeometry, LatheGeometry as LatheBufferGeometry };
+export { LatheGeometry };

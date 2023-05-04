@@ -26,6 +26,8 @@ class Water extends Mesh {
 
 		super( geometry );
 
+		this.isWater = true;
+
 		const scope = this;
 
 		const textureWidth = options.textureWidth !== undefined ? options.textureWidth : 512;
@@ -323,7 +325,5 @@ class Water extends Mesh {
 	}
 
 }
-
-Water.prototype.isWater = true;
 
 export { Water };

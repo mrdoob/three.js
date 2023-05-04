@@ -7,6 +7,7 @@ import aomap_pars_fragment from './ShaderChunk/aomap_pars_fragment.glsl.js';
 import begin_vertex from './ShaderChunk/begin_vertex.glsl.js';
 import beginnormal_vertex from './ShaderChunk/beginnormal_vertex.glsl.js';
 import bsdfs from './ShaderChunk/bsdfs.glsl.js';
+import iridescence_fragment from './ShaderChunk/iridescence_fragment.glsl.js';
 import bumpmap_pars_fragment from './ShaderChunk/bumpmap_pars_fragment.glsl.js';
 import clipping_planes_fragment from './ShaderChunk/clipping_planes_fragment.glsl.js';
 import clipping_planes_pars_fragment from './ShaderChunk/clipping_planes_pars_fragment.glsl.js';
@@ -37,7 +38,8 @@ import fog_pars_fragment from './ShaderChunk/fog_pars_fragment.glsl.js';
 import gradientmap_pars_fragment from './ShaderChunk/gradientmap_pars_fragment.glsl.js';
 import lightmap_fragment from './ShaderChunk/lightmap_fragment.glsl.js';
 import lightmap_pars_fragment from './ShaderChunk/lightmap_pars_fragment.glsl.js';
-import lights_lambert_vertex from './ShaderChunk/lights_lambert_vertex.glsl.js';
+import lights_lambert_fragment from './ShaderChunk/lights_lambert_fragment.glsl.js';
+import lights_lambert_pars_fragment from './ShaderChunk/lights_lambert_pars_fragment.glsl.js';
 import lights_pars_begin from './ShaderChunk/lights_pars_begin.glsl.js';
 import envmap_physical_pars_fragment from './ShaderChunk/envmap_physical_pars_fragment.glsl.js';
 import lights_toon_fragment from './ShaderChunk/lights_toon_fragment.glsl.js';
@@ -59,6 +61,7 @@ import map_particle_fragment from './ShaderChunk/map_particle_fragment.glsl.js';
 import map_particle_pars_fragment from './ShaderChunk/map_particle_pars_fragment.glsl.js';
 import metalnessmap_fragment from './ShaderChunk/metalnessmap_fragment.glsl.js';
 import metalnessmap_pars_fragment from './ShaderChunk/metalnessmap_pars_fragment.glsl.js';
+import morphcolor_vertex from './ShaderChunk/morphcolor_vertex.glsl.js';
 import morphnormal_vertex from './ShaderChunk/morphnormal_vertex.glsl.js';
 import morphtarget_pars_vertex from './ShaderChunk/morphtarget_pars_vertex.glsl.js';
 import morphtarget_vertex from './ShaderChunk/morphtarget_vertex.glsl.js';
@@ -71,6 +74,7 @@ import normalmap_pars_fragment from './ShaderChunk/normalmap_pars_fragment.glsl.
 import clearcoat_normal_fragment_begin from './ShaderChunk/clearcoat_normal_fragment_begin.glsl.js';
 import clearcoat_normal_fragment_maps from './ShaderChunk/clearcoat_normal_fragment_maps.glsl.js';
 import clearcoat_pars_fragment from './ShaderChunk/clearcoat_pars_fragment.glsl.js';
+import iridescence_pars_fragment from './ShaderChunk/iridescence_pars_fragment.glsl.js';
 import output_fragment from './ShaderChunk/output_fragment.glsl.js';
 import packing from './ShaderChunk/packing.glsl.js';
 import premultiplied_alpha_fragment from './ShaderChunk/premultiplied_alpha_fragment.glsl.js';
@@ -96,12 +100,10 @@ import transmission_pars_fragment from './ShaderChunk/transmission_pars_fragment
 import uv_pars_fragment from './ShaderChunk/uv_pars_fragment.glsl.js';
 import uv_pars_vertex from './ShaderChunk/uv_pars_vertex.glsl.js';
 import uv_vertex from './ShaderChunk/uv_vertex.glsl.js';
-import uv2_pars_fragment from './ShaderChunk/uv2_pars_fragment.glsl.js';
-import uv2_pars_vertex from './ShaderChunk/uv2_pars_vertex.glsl.js';
-import uv2_vertex from './ShaderChunk/uv2_vertex.glsl.js';
 import worldpos_vertex from './ShaderChunk/worldpos_vertex.glsl.js';
 
 import * as background from './ShaderLib/background.glsl.js';
+import * as backgroundCube from './ShaderLib/backgroundCube.glsl.js';
 import * as cube from './ShaderLib/cube.glsl.js';
 import * as depth from './ShaderLib/depth.glsl.js';
 import * as distanceRGBA from './ShaderLib/distanceRGBA.glsl.js';
@@ -128,6 +130,7 @@ export const ShaderChunk = {
 	begin_vertex: begin_vertex,
 	beginnormal_vertex: beginnormal_vertex,
 	bsdfs: bsdfs,
+	iridescence_fragment: iridescence_fragment,
 	bumpmap_pars_fragment: bumpmap_pars_fragment,
 	clipping_planes_fragment: clipping_planes_fragment,
 	clipping_planes_pars_fragment: clipping_planes_pars_fragment,
@@ -159,7 +162,8 @@ export const ShaderChunk = {
 	gradientmap_pars_fragment: gradientmap_pars_fragment,
 	lightmap_fragment: lightmap_fragment,
 	lightmap_pars_fragment: lightmap_pars_fragment,
-	lights_lambert_vertex: lights_lambert_vertex,
+	lights_lambert_fragment: lights_lambert_fragment,
+	lights_lambert_pars_fragment: lights_lambert_pars_fragment,
 	lights_pars_begin: lights_pars_begin,
 	lights_toon_fragment: lights_toon_fragment,
 	lights_toon_pars_fragment: lights_toon_pars_fragment,
@@ -180,6 +184,7 @@ export const ShaderChunk = {
 	map_particle_pars_fragment: map_particle_pars_fragment,
 	metalnessmap_fragment: metalnessmap_fragment,
 	metalnessmap_pars_fragment: metalnessmap_pars_fragment,
+	morphcolor_vertex: morphcolor_vertex,
 	morphnormal_vertex: morphnormal_vertex,
 	morphtarget_pars_vertex: morphtarget_pars_vertex,
 	morphtarget_vertex: morphtarget_vertex,
@@ -192,6 +197,7 @@ export const ShaderChunk = {
 	clearcoat_normal_fragment_begin: clearcoat_normal_fragment_begin,
 	clearcoat_normal_fragment_maps: clearcoat_normal_fragment_maps,
 	clearcoat_pars_fragment: clearcoat_pars_fragment,
+	iridescence_pars_fragment: iridescence_pars_fragment,
 	output_fragment: output_fragment,
 	packing: packing,
 	premultiplied_alpha_fragment: premultiplied_alpha_fragment,
@@ -217,13 +223,12 @@ export const ShaderChunk = {
 	uv_pars_fragment: uv_pars_fragment,
 	uv_pars_vertex: uv_pars_vertex,
 	uv_vertex: uv_vertex,
-	uv2_pars_fragment: uv2_pars_fragment,
-	uv2_pars_vertex: uv2_pars_vertex,
-	uv2_vertex: uv2_vertex,
 	worldpos_vertex: worldpos_vertex,
 
 	background_vert: background.vertex,
 	background_frag: background.fragment,
+	backgroundCube_vert: backgroundCube.vertex,
+	backgroundCube_frag: backgroundCube.fragment,
 	cube_vert: cube.vertex,
 	cube_frag: cube.fragment,
 	depth_vert: depth.vertex,

@@ -11,7 +11,9 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">This displays a cone shaped helper object for a [page:SpotLight].</p>
+		<p class="desc">
+			This displays a cone shaped helper object for a [page:SpotLight].
+		</p>
 
 		<h2>Code Example</h2>
 		<code>
@@ -24,19 +26,18 @@
 		</code>
 
 		<h2>Examples</h2>
-		<p>
-			[example:webgl_lights_spotlights WebGL/ lights / spotlights ]
-		</p>
+		<p>[example:webgl_lights_spotlights WebGL/ lights / spotlights ]</p>
 
 		<h2>Constructor</h2>
 
 		<h3>[name]( [param:SpotLight light], [param:Hex color] )</h3>
 		<p>
-			[page:SpotLight light] -- The [page:SpotLight] to be visualized. <br /><br/>
+			[page:SpotLight light] -- The [page:SpotLight] to be visualized.
+			<br /><br />
 
-			[page:Hex color] -- (optional) if this is not the set the helper will take the color of the light.
+			[page:Hex color] -- (optional) if this is not the set the helper will take
+			the color of the light.
 		</p>
-
 
 		<h2>Properties</h2>
 		<p>See the base [page:Object3D] class for common properties.</p>
@@ -52,21 +53,25 @@
 
 		<h3>[property:Object matrixAutoUpdate]</h3>
 		<p>
-			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
-			spotLight's [page:Object3D.matrixWorld matrixWorld].
+			See [page:Object3D.matrixAutoUpdate]. Set to `false` here as the helper is
+			using the spotLight's [page:Object3D.matrixWorld matrixWorld].
 		</p>
 
 		<h3>[property:hex color]</h3>
 		<p>
-			 The color parameter passed in the constructor. Default is *undefined*. If this is changed, the helper's color will update
-			the next time [page:.update update] is called.
+			The color parameter passed in the constructor. Default is `undefined`. If
+			this is changed, the helper's color will update the next time
+			[page:.update update] is called.
 		</p>
 
 		<h2>Methods</h2>
 		<p>See the base [page:Object3D] class for common methods.</p>
 
 		<h3>[method:undefined dispose]()</h3>
-		<p>Disposes of the light helper.</p>
+		<p>
+			Frees the GPU-related resources allocated by this instance. Call this
+			method whenever this instance is no longer used in your app.
+		</p>
 
 		<h3>[method:undefined update]()</h3>
 		<p>Updates the light helper.</p>

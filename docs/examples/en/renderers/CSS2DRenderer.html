@@ -10,8 +10,20 @@
 		<h1>[name]</h1>
 
 		<p class="desc">[name] is a simplified version of [page:CSS3DRenderer]. The only transformation that is supported is translation.<br /><br />
-			The renderer is very useful if you want to combine HTML based labels with 3D objects. Here too, the respective DOM elements are wrapped into an instance of *CSS2DObject* and added to the scene graph.<br />
+			The renderer is very useful if you want to combine HTML based labels with 3D objects. Here too, the respective DOM elements are wrapped into an instance of `CSS2DObject` and added to the scene graph.<br /><br />
+			`[name]` only supports 100% browser and display zoom.
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
+		</code>
 
 		<h2>Examples</h2>
 

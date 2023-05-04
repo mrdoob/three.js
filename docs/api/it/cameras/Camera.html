@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Classe base astratta per telecamere. Questa classe dovrebbe essere sempre ereditata quando costruisci una nuova telecamera.
+		</p>
+
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+      Crea una nuova [name]. Si noti che questa classe non intende essere chiamata direttamente;
+      invece, probabilmente vuoi utilizzare una [page:PerspectiveCamera] o una [page:OrthographicCamera].
+		</p>
+
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base  [page:Object3D] per le proprietà comuni.</p>
+
+		<h3>[property:Boolean isCamera]</h3>
+		<p>
+      Flag di sola lettura per verificare se un dato oggetto è di tipo [name].
+		</p>
+
+		<h3>[property:Layers layers]</h3>
+		<p>
+      I [page:Layers layers] di cui la telecamera è parte. Questa è una proprietà ereditata da 
+      [page:Object3D].<br /><br />
+
+      Gli oggetti devono condividere almeno un layer con la telecamera per essere visualizzati
+      quando il viewport della telecamera viene renderizzato.
+		</p>
+
+		<h3>[property:Matrix4 matrixWorldInverse]</h3>
+		<p>
+      Questo è l'inverso di matrixWorld. MatrixWorld contiene la Matrix che contiene
+      la trasformazione del mondo della telecamera.
+		</p>
+
+		<h3>[property:Matrix4 projectionMatrix]</h3>
+		<p>Questa è la matrice che contiene la proiezione (projection).</p>
+
+		<h3>[property:Matrix4 projectionMatrixInverse]</h3>
+		<p>L'inverso di projectionMatrix.</p>
+
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Object3D] per i metodi comuni.</p>
+
+		<h3>[method:Camera clone]( )</h3>
+		<p>
+      Restituisce una nuova telecamera con le stesse proprietà di questa.
+		</p>
+
+		<h3>[method:this copy]( [param:Camera source], [param:Boolean recursive] )</h3>
+		<p>
+      Copia le proprietà della telecamera source in questa.
+		</p>
+
+		<h3>[method:Vector3 getWorldDirection]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — il risultato sarà copiato in questo Vector3. <br /><br />
+
+    Restituisce un [page:Vector3] che rappresenta la direzione dello spazio del world in
+    cui la telecamera sta guardando. (Nota: Una telecamera guarda verso il basso sul suo asse z locale, negativo).<br /><br />
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

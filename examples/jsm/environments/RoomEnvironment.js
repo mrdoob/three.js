@@ -108,6 +108,29 @@ class RoomEnvironment extends Scene {
 
 	}
 
+	dispose() {
+
+		const resources = new Set();
+
+		this.traverse( ( object ) => {
+
+			if ( object.isMesh ) {
+
+				resources.add( object.geometry );
+				resources.add( object.material );
+
+			}
+
+		} );
+
+		for ( const resource of resources ) {
+
+			resource.dispose();
+
+		}
+
+	}
+
 }
 
 function createAreaLightMaterial( intensity ) {

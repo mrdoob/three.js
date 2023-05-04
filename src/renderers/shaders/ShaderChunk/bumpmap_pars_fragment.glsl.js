@@ -11,12 +11,12 @@ export default /* glsl */`
 
 	vec2 dHdxy_fwd() {
 
-		vec2 dSTdx = dFdx( vUv );
-		vec2 dSTdy = dFdy( vUv );
+		vec2 dSTdx = dFdx( vBumpMapUv );
+		vec2 dSTdy = dFdy( vBumpMapUv );
 
-		float Hll = bumpScale * texture2D( bumpMap, vUv ).x;
-		float dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;
-		float dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;
+		float Hll = bumpScale * texture2D( bumpMap, vBumpMapUv ).x;
+		float dBx = bumpScale * texture2D( bumpMap, vBumpMapUv + dSTdx ).x - Hll;
+		float dBy = bumpScale * texture2D( bumpMap, vBumpMapUv + dSTdy ).x - Hll;
 
 		return vec2( dBx, dBy );
 
@@ -24,11 +24,9 @@ export default /* glsl */`
 
 	vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy, float faceDirection ) {
 
-		// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
-
-		vec3 vSigmaX = vec3( dFdx( surf_pos.x ), dFdx( surf_pos.y ), dFdx( surf_pos.z ) );
-		vec3 vSigmaY = vec3( dFdy( surf_pos.x ), dFdy( surf_pos.y ), dFdy( surf_pos.z ) );
-		vec3 vN = surf_norm;		// normalized
+		vec3 vSigmaX = dFdx( surf_pos.xyz );
+		vec3 vSigmaY = dFdy( surf_pos.xyz );
+		vec3 vN = surf_norm; // normalized
 
 		vec3 R1 = cross( vSigmaY, vN );
 		vec3 R2 = cross( vN, vSigmaX );

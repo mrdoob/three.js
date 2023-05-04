@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – Responsive Design">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -246,7 +246,7 @@ There are many cases when using three.js where we need to know the actual
 size of the canvas's drawingBuffer. For example when making a post processing filter,
 or if we are making a shader that accesses <code class="notranslate" translate="no">gl_FragCoord</code>, if we are making
 a screenshot, or reading pixels for GPU picking, for drawing into a 2D canvas,
-etc... There many many cases where if we use <code class="notranslate" translate="no">setPixelRatio</code> then our actual size will be different
+etc... There are many cases where if we use <code class="notranslate" translate="no">setPixelRatio</code> then our actual size will be different
 than the size we requested and we'll have to guess when to use the size
 we asked for and when to use the size three.js is actually using.
 By doing it ourselves we always know the size being used is the size we requested.
@@ -268,8 +268,8 @@ notice the edges are more crisp.</p>
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

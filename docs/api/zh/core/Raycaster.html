@@ -62,7 +62,7 @@
 			[example:webgl_interactive_raycasting_points Raycasting to Points]<br />
 			[example:webgl_geometry_terrain_raycast Terrain raycasting]<br />
 			[example:webgl_interactive_voxelpainter Raycasting to paint voxels]<br />
-			[example:webgl_raycast_texture Raycast to a Texture]
+			[example:webgl_raycaster_texture Raycast to a Texture]
 		</p>
 
 
@@ -162,7 +162,7 @@
 		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
 		[page:Object3D object] —— 检查与射线相交的物体。<br />
-		[page:Boolean recursive] —— 若为true，则同时也会检查所有的后代。否则将只会检查对象本身。默认值为false。<br />
+		[page:Boolean recursive] —— 若为true，则同时也会检查所有的后代。否则将只会检查对象本身。默认值为true。<br />
 		[page:Array optionalTarget] — （可选）设置结果的目标数组。如果不设置这个值，则一个新的[page:Array]会被实例化；如果设置了这个值，则在每次调用之前必须清空这个数组（例如：array.length = 0;）。
 		</p>
 		<p>
@@ -179,7 +179,8 @@
 			[page:Integer faceIndex] —— 相交的面的索引<br />
 			[page:Object3D object] —— 相交的物体<br />
 			[page:Vector2 uv] —— 相交部分的点的UV坐标。<br />
-			[page:Vector2 uv2] —— Second set of U,V coordinates at point of intersection<br />
+			[page:Vector2 uv1] —— Second set of U,V coordinates at point of intersection<br />
+			[page:Vector3 normal] - 交点处的内插法向量<br />
 			[page:Integer instanceId] – The index number of the instance where the ray intersects the InstancedMesh
 		</p>
 		<p>
@@ -195,7 +196,7 @@
 		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
 		[page:Array objects] —— 检测和射线相交的一组物体。<br />
-		[page:Boolean recursive] —— 若为true，则同时也会检测所有物体的后代。否则将只会检测对象本身的相交部分。默认值为false。<br />
+		[page:Boolean recursive] —— 若为true，则同时也会检测所有物体的后代。否则将只会检测对象本身的相交部分。默认值为true。<br />
 		[page:Array optionalTarget] —— （可选）设置结果的目标数组。如果不设置这个值，则一个新的[page:Array]会被实例化；如果设置了这个值，则在每次调用之前必须清空这个数组（例如：array.length = 0;）。
 		</p>
 		<p>

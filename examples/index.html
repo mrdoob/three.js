@@ -29,7 +29,7 @@
 
 				<div id="inputWrapper">
 					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
-					<div id="exitSearchButton"></div>
+					<div id="clearSearchButton"></div>
 				</div>
 
 				<div id="content">
@@ -49,7 +49,7 @@
 		const content = document.getElementById( 'content' );
 		const viewer = document.getElementById( 'viewer' );
 		const filterInput = document.getElementById( 'filterInput' );
-		const exitSearchButton = document.getElementById( 'exitSearchButton' );
+		const clearSearchButton = document.getElementById( 'clearSearchButton' );
 		const expandButton = document.getElementById( 'expandButton' );
 		const viewSrcButton = document.getElementById( 'button' );
 		const panelScrim = document.getElementById( 'panelScrim' );
@@ -77,18 +77,18 @@
 
 			for ( const key in files ) {
 
-				const section = files[ key ];
+				const category = files[ key ];
 
 				const header = document.createElement( 'h2' );
 				header.textContent = key;
 				header.setAttribute( 'data-category', key );
 				container.appendChild( header );
 
-				for ( let i = 0; i < section.length; i ++ ) {
+				for ( let i = 0; i < category.length; i ++ ) {
 
-					const file = section[ i ];
+					const file = category[ i ];
 
-					const link = createLink( file );
+					const link = createLink( file, tags[ file ] );
 					container.appendChild( link );
 
 					links[ file ] = link;
@@ -153,11 +153,11 @@
 
 			};
 
-			exitSearchButton.onclick = function ( ) {
+			clearSearchButton.onclick = function ( ) {
 
 				filterInput.value = '';
 				updateFilter( files, tags );
-				panel.classList.remove( 'searchFocused' );
+				filterInput.focus();
 
 			};
 
@@ -201,15 +201,17 @@
 
 		}
 
-		function createLink( file ) {
+		function createLink( file, tags ) {
+
+			const external = Array.isArray( tags ) && tags.includes( 'external' ) ? ' <span class="tag">external</span>' : '';
 
 			const template = `
 				<div class="card">
-					<a href="${file}.html" target="viewer">
+					<a href="${ file }.html" target="viewer">
 						<div class="cover">
 							<img src="screenshots/${ file }.jpg" loading="lazy" width="400" />
 						</div>
-						<div class="title">${getName( file )}</div>
+						<div class="title">${ getName( file ) }${ external }</div>
 					</a>
 				</div>
 			`;
@@ -249,6 +251,12 @@
 
 		}
 
+		function escapeRegExp( string ) {
+
+			return string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ); // https://stackoverflow.com/a/6969486/5250847
+
+		}
+
 		function updateFilter( files, tags ) {
 
 			let v = filterInput.value.trim();
@@ -264,7 +272,7 @@
 
 			}
 
-			const exp = new RegExp( v, 'gi' );
+			const exp = new RegExp( escapeRegExp( v ), 'gi' );
 
 			for ( const key in files ) {
 
@@ -304,27 +312,16 @@
 		function filterExample( file, exp, tags ) {
 
 			const link = links[ file ];
-			const name = getName( file );
 			if ( file in tags ) file += ' ' + tags[ file ].join( ' ' );
-			const res = file.match( exp );
-			let text;
+			const res = file.replace( /_+/g, ' ' ).match( exp );
 
 			if ( res && res.length > 0 ) {
 
 				link.classList.remove( 'hidden' );
 
-				for ( let i = 0; i < res.length; i ++ ) {
-
-					text = name.replace( res[ i ], '<b>' + res[ i ] + '</b>' );
-
-				}
-
-				link.querySelector( '.title' ).innerHTML = text;
-
 			} else {
 
 				link.classList.add( 'hidden' );
-				link.querySelector( '.title' ).innerHTML = name;
 
 			}
 
@@ -381,7 +378,7 @@
 
 			if ( search.indexOf( '?q=' ) !== - 1 ) {
 
-				return decodeURI( search.substr( 3 ) );
+				return decodeURI( search.slice( 3 ) );
 
 			}
 

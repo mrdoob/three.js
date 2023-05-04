@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:CompressedTexture] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Creates an texture 2D array based on data in compressed form, for example
+			from a [link:https://en.wikipedia.org/wiki/DirectDraw_Surface DDS]
+			file.<br /><br />
+
+			For use with the [page:CompressedTextureLoader CompressedTextureLoader].
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>
+			[name]( [param:Array mipmaps], [param:Number width], [param:Number height], [param:Constant format], [param:Constant type] )
+		</h3>
+		<p>
+			[page:Array mipmaps] -- The mipmaps array should contain objects with
+			data, width and height. The mipmaps should be of the correct format and
+			type.<br />
+
+			[page:Number width] -- The width of the biggest mipmap.<br />
+
+			[page:Number height] -- The height of the biggest mipmap.<br />
+
+			[page:Number depth] -- The number of layers of the 2D array texture.<br />
+
+			[page:Constant format] -- The format used in the mipmaps. See
+			[page:Textures ST3C Compressed Texture Formats], [page:Textures PVRTC Compressed Texture Formats] 
+			and [page:Textures ETC Compressed Texture Format] for other choices.<br />
+
+			[page:Constant type] -- Default is [page:Textures THREE.UnsignedByteType].
+			See [page:Textures type constants] for other choices.<br />
+		</p>
+
+		<h2>Properties</h2>
+
+		See the base [page:CompressedTexture CompressedTexture] class for common
+		properties.
+
+		<h3>[property:number wrapR]</h3>
+		<p>
+			This defines how the texture is wrapped in the depth direction.<br />
+			The default is [page:Textures THREE.ClampToEdgeWrapping], where the edge
+			is clamped to the outer edge texels. The other two choices are
+			[page:Textures THREE.RepeatWrapping] and [page:Textures THREE.MirroredRepeatWrapping]. 
+			See the [page:Textures texture constants]
+			page for details.
+		</p>
+
+		<h3>[property:Object image]</h3>
+		<p>Overridden with a object containing width, height, and depth.</p>
+
+		<h3>[property:Boolean isCompressedArrayTexture]</h3>
+		<p>Read-only flag to check if a given object is of type [name].</p>
+
+		<h2>Methods</h2>
+
+		<p>
+			See the base [page:CompressedTexture CompressedTexture] class for common
+			methods.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

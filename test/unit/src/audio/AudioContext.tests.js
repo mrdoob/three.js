@@ -1,21 +1,66 @@
 /* global QUnit */
 
-// import { AudioContext } from '../../../../src/audio/AudioContext.js';
+import { AudioContext } from '../../../../src/audio/AudioContext.js';
 
 export default QUnit.module( 'Audios', () => {
 
-	QUnit.module( 'AudioContext', () => {
+	QUnit.module( 'AudioContext', ( hooks ) => {
 
-		// PUBLIC STUFF
-		QUnit.todo( 'getContext', ( assert ) => {
+		function mockWindowAudioContext() {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			global.window = {
+				AudioContext: function () {
+
+					return {
+						createGain: () => {
+
+							return {
+								connect: () => {},
+							};
+
+						}
+					};
+
+				},
+			};
+
+		}
+
+		if ( typeof window === 'undefined' ) {
+
+			hooks.before( function () {
+
+				mockWindowAudioContext();
+
+			} );
+
+			hooks.after( function () {
+
+				global.window = undefined;
+
+			} );
+
+		}
+
+		// STATIC
+		QUnit.test( 'getContext', ( assert ) => {
+
+			const context = AudioContext.getContext();
+			assert.strictEqual(
+				context instanceof Object, true,
+				'AudioContext.getContext creates a context.'
+			);
 
 		} );
 
-		QUnit.todo( 'setContext', ( assert ) => {
+		QUnit.test( 'setContext', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			AudioContext.setContext( new window.AudioContext() );
+			const context = AudioContext.getContext();
+			assert.strictEqual(
+				context instanceof Object, true,
+				'AudioContext.setContext updates the context.'
+			);
 
 		} );
 

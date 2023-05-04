@@ -1,6 +1,7 @@
 import {
 	BufferGeometry,
-	DataTexture3D,
+	Color,
+	Data3DTexture,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
@@ -8,7 +9,8 @@ import {
 	Mesh,
 	MeshStandardMaterial,
 	NearestFilter,
-	RedFormat
+	RedFormat,
+	SRGBColorSpace
 } from 'three';
 
 class VOXLoader extends Loader {
@@ -112,7 +114,7 @@ class VOXLoader extends Loader {
 			}
 
 			const chunkSize = data.getUint32( i, true ); i += 4;
-			data.getUint32( i, true ); i += 4; // childChunks
+			i += 4; // childChunks
 
 			if ( id === 'SIZE' ) {
 
@@ -184,6 +186,8 @@ class VOXMesh extends Mesh {
 		const nz = [ 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0 ];
 		const pz = [ 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1 ];
 
+		const _color = new Color();
+
 		function add( tile, x, y, z, r, g, b ) {
 
 			x -= size.x / 2;
@@ -192,8 +196,10 @@ class VOXMesh extends Mesh {
 
 			for ( let i = 0; i < 18; i += 3 ) {
 
+				_color.setRGB( r, g, b, SRGBColorSpace );
+
 				vertices.push( tile[ i + 0 ] + x, tile[ i + 1 ] + y, tile[ i + 2 ] + z );
-				colors.push( r, g, b );
+				colors.push( _color.r, _color.g, _color.b );
 
 			}
 
@@ -266,7 +272,7 @@ class VOXMesh extends Mesh {
 
 }
 
-class VOXDataTexture3D extends DataTexture3D {
+class VOXData3DTexture extends Data3DTexture {
 
 	constructor( chunk ) {
 
@@ -302,4 +308,4 @@ class VOXDataTexture3D extends DataTexture3D {
 
 }
 
-export { VOXLoader, VOXMesh, VOXDataTexture3D };
+export { VOXLoader, VOXMesh, VOXData3DTexture };

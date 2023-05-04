@@ -21,6 +21,8 @@ class Lensflare extends Mesh {
 
 		super( Lensflare.Geometry, new MeshBasicMaterial( { opacity: 0, transparent: true } ) );
 
+		this.isLensflare = true;
+
 		this.type = 'Lensflare';
 		this.frustumCulled = false;
 		this.renderOrder = Infinity;
@@ -264,8 +266,6 @@ class Lensflare extends Mesh {
 	}
 
 }
-
-Lensflare.prototype.isLensflare = true;
 
 //
 

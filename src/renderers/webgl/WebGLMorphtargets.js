@@ -1,6 +1,6 @@
-import { FloatType, RGBAFormat } from '../../constants.js';
-import { DataTexture2DArray } from '../../textures/DataTexture2DArray.js';
-import { Vector3 } from '../../math/Vector3.js';
+import { FloatType } from '../../constants.js';
+import { DataArrayTexture } from '../../textures/DataArrayTexture.js';
+import { Vector4 } from '../../math/Vector4.js';
 import { Vector2 } from '../../math/Vector2.js';
 
 function numericalSort( a, b ) {
@@ -15,26 +15,12 @@ function absNumericalSort( a, b ) {
 
 }
 
-function denormalize( morph, attribute ) {
-
-	let denominator = 1;
-	const array = attribute.isInterleavedBufferAttribute ? attribute.data.array : attribute.array;
-
-	if ( array instanceof Int8Array ) denominator = 127;
-	else if ( array instanceof Int16Array ) denominator = 32767;
-	else if ( array instanceof Int32Array ) denominator = 2147483647;
-	else console.error( 'THREE.WebGLMorphtargets: Unsupported morph attribute data type: ', array );
-
-	morph.divideScalar( denominator );
-
-}
-
 function WebGLMorphtargets( gl, capabilities, textures ) {
 
 	const influencesList = {};
 	const morphInfluences = new Float32Array( 8 );
 	const morphTextures = new WeakMap();
-	const morph = new Vector3();
+	const morph = new Vector4();
 
 	const workInfluences = [];
 
@@ -44,7 +30,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 	}
 
-	function update( object, geometry, material, program ) {
+	function update( object, geometry, program ) {
 
 		const objectInfluences = object.morphTargetInfluences;
 
@@ -53,23 +39,30 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 			// instead of using attributes, the WebGL 2 code path encodes morph targets
 			// into an array of data textures. Each layer represents a single morph target.
 
-			const numberOfMorphTargets = geometry.morphAttributes.position.length;
+			const morphAttribute = geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color;
+			const morphTargetsCount = ( morphAttribute !== undefined ) ? morphAttribute.length : 0;
 
 			let entry = morphTextures.get( geometry );
 
-			if ( entry === undefined || entry.count !== numberOfMorphTargets ) {
+			if ( entry === undefined || entry.count !== morphTargetsCount ) {
 
 				if ( entry !== undefined ) entry.texture.dispose();
 
+				const hasMorphPosition = geometry.morphAttributes.position !== undefined;
 				const hasMorphNormals = geometry.morphAttributes.normal !== undefined;
+				const hasMorphColors = geometry.morphAttributes.color !== undefined;
 
-				const morphTargets = geometry.morphAttributes.position;
+				const morphTargets = geometry.morphAttributes.position || [];
 				const morphNormals = geometry.morphAttributes.normal || [];
+				const morphColors = geometry.morphAttributes.color || [];
 
-				const numberOfVertices = geometry.attributes.position.count;
-				const numberOfVertexData = ( hasMorphNormals === true ) ? 2 : 1; // (v,n) vs. (v)
+				let vertexDataCount = 0;
 
-				let width = numberOfVertices * numberOfVertexData;
+				if ( hasMorphPosition === true ) vertexDataCount = 1;
+				if ( hasMorphNormals === true ) vertexDataCount = 2;
+				if ( hasMorphColors === true ) vertexDataCount = 3;
+
+				let width = geometry.attributes.position.count * vertexDataCount;
 				let height = 1;
 
 				if ( width > capabilities.maxTextureSize ) {
@@ -79,42 +72,42 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 				}
 
-				const buffer = new Float32Array( width * height * 4 * numberOfMorphTargets );
+				const buffer = new Float32Array( width * height * 4 * morphTargetsCount );
 
-				const texture = new DataTexture2DArray( buffer, width, height, numberOfMorphTargets );
-				texture.format = RGBAFormat; // using RGBA since RGB might be emulated (and is thus slower)
+				const texture = new DataArrayTexture( buffer, width, height, morphTargetsCount );
 				texture.type = FloatType;
 				texture.needsUpdate = true;
 
 				// fill buffer
 
-				const vertexDataStride = numberOfVertexData * 4;
+				const vertexDataStride = vertexDataCount * 4;
 
-				for ( let i = 0; i < numberOfMorphTargets; i ++ ) {
+				for ( let i = 0; i < morphTargetsCount; i ++ ) {
 
 					const morphTarget = morphTargets[ i ];
 					const morphNormal = morphNormals[ i ];
+					const morphColor = morphColors[ i ];
 
 					const offset = width * height * 4 * i;
 
 					for ( let j = 0; j < morphTarget.count; j ++ ) {
 
-						morph.fromBufferAttribute( morphTarget, j );
-
-						if ( morphTarget.normalized === true ) denormalize( morph, morphTarget );
-
 						const stride = j * vertexDataStride;
 
-						buffer[ offset + stride + 0 ] = morph.x;
-						buffer[ offset + stride + 1 ] = morph.y;
-						buffer[ offset + stride + 2 ] = morph.z;
-						buffer[ offset + stride + 3 ] = 0;
+						if ( hasMorphPosition === true ) {
+
+							morph.fromBufferAttribute( morphTarget, j );
+
+							buffer[ offset + stride + 0 ] = morph.x;
+							buffer[ offset + stride + 1 ] = morph.y;
+							buffer[ offset + stride + 2 ] = morph.z;
+							buffer[ offset + stride + 3 ] = 0;
+
+						}
 
 						if ( hasMorphNormals === true ) {
 
 							morph.fromBufferAttribute( morphNormal, j );
-
-							if ( morphNormal.normalized === true ) denormalize( morph, morphNormal );
 
 							buffer[ offset + stride + 4 ] = morph.x;
 							buffer[ offset + stride + 5 ] = morph.y;
@@ -123,12 +116,23 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 						}
 
+						if ( hasMorphColors === true ) {
+
+							morph.fromBufferAttribute( morphColor, j );
+
+							buffer[ offset + stride + 8 ] = morph.x;
+							buffer[ offset + stride + 9 ] = morph.y;
+							buffer[ offset + stride + 10 ] = morph.z;
+							buffer[ offset + stride + 11 ] = ( morphColor.itemSize === 4 ) ? morph.w : 1;
+
+						}
+
 					}
 
 				}
 
 				entry = {
-					count: numberOfMorphTargets,
+					count: morphTargetsCount,
 					texture: texture,
 					size: new Vector2( width, height )
 				};

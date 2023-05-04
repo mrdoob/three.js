@@ -2,7 +2,7 @@ import { CylinderGeometry } from './CylinderGeometry.js';
 
 class ConeGeometry extends CylinderGeometry {
 
-	constructor( radius = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
+	constructor( radius = 1, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super( 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
 
@@ -28,4 +28,4 @@ class ConeGeometry extends CylinderGeometry {
 
 }
 
-export { ConeGeometry, ConeGeometry as ConeBufferGeometry };
+export { ConeGeometry };

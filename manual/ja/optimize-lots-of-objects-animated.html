@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – でアニメーションする多くのオブジェクトを最適化">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -224,7 +224,7 @@ depth関数とブレンディングを使い修正できる可能性がありま
 
   ...
 
--  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+-  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 -      geometries, false);
 -  const material = new THREE.MeshBasicMaterial({
 -    vertexColors: true,
@@ -232,7 +232,7 @@ depth関数とブレンディングを使い修正できる可能性がありま
 -  const mesh = new THREE.Mesh(mergedGeometry, material);
 -  scene.add(mesh);
 -  return mesh;
-+  return BufferGeometryUtils.mergeBufferGeometries(
++  return BufferGeometryUtils.mergeGeometries(
 +     geometries, false);
 }
 </pre>
@@ -283,6 +283,12 @@ depth関数とブレンディングを使い修正できる可能性がありま
 +  attribute.name = name;
 +  return attribute;
 +});
++baseGeometry.morphAttributes.color = geometries.map((geometry, ndx) =&gt; {
++  const attribute = geometry.getAttribute('color');
++  const name = `target${ndx}`;
++  attribute.name = name;
++  return attribute;
++});
 +const material = new THREE.MeshBasicMaterial({
 +  vertexColors: true,
 +});
@@ -315,10 +321,10 @@ showFileInfo(fileInfos, fileInfos[0]);
 または簡単にカスタムアニメーションのコードを書く事ができますが、
 オリジナルのwebgl globeでは<a href="https://github.com/tweenjs/tween.js/">アニメーションライブラリ</a>を使っているので合わせましょう。</p>
 <p>アニメーションライブラリをimportする必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import * as BufferGeometryUtils from '/examples/jsm/utils/BufferGeometryUtils.js';
-import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
-+import {TWEEN} from '/examples/jsm/libs/tween.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
++import TWEEN from 'three/addons/libs/tween.module.js';
 </pre>
 <p>そして、影響を与えるアニメーションの <code class="notranslate" translate="no">Tween</code> を作成します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
@@ -378,7 +384,7 @@ TweenManagerは <code class="notranslate" translate="no">update</code> メソッ
 <p>TweenMangerを使用するために次のようなコードにします。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  const tweenManager = new TweenManger();
 
   ...
@@ -428,197 +434,6 @@ render();
 </div>
 
 <p></p>
-<p>これでクロスフェードアニメーションが上手く動くようですが、残念ながら色を失ってしまいました。</p>
-<p>Three.jsはモーフターゲットの色をサポートしておらず、これはオリジナルの<a href="https://github.com/dataarts/webgl-globe">webgl globe</a>側の問題です。
-基本的には最初のデータセットの色を作るだけです。他のデータセットは色が大きく異なっていても同じ色を使用しています。</p>
-<p>色のモーフィングのサポートを追加できるかどうか見てみましょう。これは壊れやすいかもしれませんね。
-最も壊れやすい方法はおそらく100%独自のシェーダを書く事でしょうが、内蔵シェーダーをどのように修正するかを見るのは有用だと思います。</p>
-<p>まず最初に行う必要があるのは各データセットのジオメトリから色を <a href="/docs/#api/ja/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> として抽出するコードを作成する事です。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// use the first geometry as the base
-// and add all the geometries as morphtargets
-const baseGeometry = geometries[0];
-baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) =&gt; {
-  const attribute = geometry.getAttribute('position');
-  const name = `target${ndx}`;
-  attribute.name = name;
-  return attribute;
-});
-+const colorAttributes = geometries.map((geometry, ndx) =&gt; {
-+  const attribute = geometry.getAttribute('color');
-+  const name = `morphColor${ndx}`;
-+  attribute.name = `color${ndx}`;  // just for debugging
-+  return {name, attribute};
-+});
-const material = new THREE.MeshBasicMaterial({
-  vertexColors: true,
-});
-</pre>
-<p>次にthree.jsのシェーダーを修正する必要があります。
-Three.jsのマテリアルには <a href="/docs/#api/ja/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a> プロパティがあり、関数を割り当てる事ができます。
-これはWebGLに渡される前にマテリアルのシェーダーを修正する機会を与えてくれます。
-実際に提供されているシェーダーはthree.js独自の特殊なシェーダー構文になっており、
-シェーダーの<em>チャンク</em>の束をリストアップし、three.jsが各チャンクに対して実際のGLSLコードで置換します。
-以下は変更されていない頂点シェーダーのコードで <code class="notranslate" translate="no">onBeforeCompile</code> に渡されるように見えます。</p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">#include &lt;common&gt;
-#include &lt;uv_pars_vertex&gt;
-#include &lt;uv2_pars_vertex&gt;
-#include &lt;envmap_pars_vertex&gt;
-#include &lt;color_pars_vertex&gt;
-#include &lt;fog_pars_vertex&gt;
-#include &lt;morphtarget_pars_vertex&gt;
-#include &lt;skinning_pars_vertex&gt;
-#include &lt;logdepthbuf_pars_vertex&gt;
-#include &lt;clipping_planes_pars_vertex&gt;
-void main() {
-    #include &lt;uv_vertex&gt;
-    #include &lt;uv2_vertex&gt;
-    #include &lt;color_vertex&gt;
-    #include &lt;skinbase_vertex&gt;
-    #ifdef USE_ENVMAP
-    #include &lt;beginnormal_vertex&gt;
-    #include &lt;morphnormal_vertex&gt;
-    #include &lt;skinnormal_vertex&gt;
-    #include &lt;defaultnormal_vertex&gt;
-    #endif
-    #include &lt;begin_vertex&gt;
-    #include &lt;morphtarget_vertex&gt;
-    #include &lt;skinning_vertex&gt;
-    #include &lt;project_vertex&gt;
-    #include &lt;logdepthbuf_vertex&gt;
-    #include &lt;worldpos_vertex&gt;
-    #include &lt;clipping_planes_vertex&gt;
-    #include &lt;envmap_vertex&gt;
-    #include &lt;fog_vertex&gt;
-}
-</pre>
-<p>上記のシェーダーチャンクから
-<a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphtarget_pars_vertex.glsl.js"><code class="notranslate" translate="no">morphtarget_pars_vertex</code> チャンク</a>、
-<a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphnormal_vertex.glsl.js"><code class="notranslate" translate="no">morphnormal_vertex</code> チャンク</a>、
-<a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphtarget_vertex.glsl.js"><code class="notranslate" translate="no">morphtarget_vertex</code> チャンク</a>、
-<a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_pars_vertex.glsl.js"><code class="notranslate" translate="no">color_pars_vertex</code> チャンク</a>、
-<a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_vertex.glsl.js"><code class="notranslate" translate="no">color_vertex</code> チャンク</a>
-を置き換えたいと思います。</p>
-<p>これを行うには単純な置換の配列を作成して <a href="/docs/#api/ja/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a> で適用します。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshBasicMaterial({
-  vertexColors: true,
-});
-+const vertexShaderReplacements = [
-+  {
-+    from: '#include &lt;morphtarget_pars_vertex&gt;',
-+    to: `
-+      uniform float morphTargetInfluences[8];
-+    `,
-+  },
-+  {
-+    from: '#include &lt;morphnormal_vertex&gt;',
-+    to: `
-+    `,
-+  },
-+  {
-+    from: '#include &lt;morphtarget_vertex&gt;',
-+    to: `
-+      transformed += (morphTarget0 - position) * morphTargetInfluences[0];
-+      transformed += (morphTarget1 - position) * morphTargetInfluences[1];
-+      transformed += (morphTarget2 - position) * morphTargetInfluences[2];
-+      transformed += (morphTarget3 - position) * morphTargetInfluences[3];
-+    `,
-+  },
-+  {
-+    from: '#include &lt;color_pars_vertex&gt;',
-+    to: `
-+      varying vec3 vColor;
-+      attribute vec3 morphColor0;
-+      attribute vec3 morphColor1;
-+      attribute vec3 morphColor2;
-+      attribute vec3 morphColor3;
-+    `,
-+  },
-+  {
-+    from: '#include &lt;color_vertex&gt;',
-+    to: `
-+      vColor.xyz = morphColor0 * morphTargetInfluences[0] +
-+                   morphColor1 * morphTargetInfluences[1] +
-+                   morphColor2 * morphTargetInfluences[2] +
-+                   morphColor3 * morphTargetInfluences[3];
-+    `,
-+  },
-+];
-+material.onBeforeCompile = (shader) =&gt; {
-+  vertexShaderReplacements.forEach((rep) =&gt; {
-+    shader.vertexShader = shader.vertexShader.replace(rep.from, rep.to);
-+  });
-+};
-</pre>
-<p>また、Three.jsはモーフターゲットをソートし、最も影響の高いものだけを適用します。
-これにより1度に数個しか使用されない限り、より多くのモーフターゲットを使用する事ができます。
-残念ながらthree.jsではモーフターゲットが何個使われるのか、どの属性に割り当てられるのかを知る方法は提供されていません。
-そこでコードを調べて、ここで何をしているのかを再現してみましょう。
-もしそのアルゴリズムがthree.jsで変更されたら、このコードをリファクタリングする必要があります。</p>
-<p>まず色の属性を全て削除します。今まで追加していなかった属性は削除しても大丈夫なので問題ありません。
-次にthree.jsが使用すると思われるターゲットを計算し、最後にそのターゲットをthree.jsが割り当てる属性に割り当てます。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mesh = new THREE.Mesh(baseGeometry, material);
-scene.add(mesh);
-
-+function updateMorphTargets() {
-+  // remove all the color attributes
-+  for (const {name} of colorAttributes) {
-+    baseGeometry.deleteAttribute(name);
-+  }
-+
-+  // three.js provides no way to query this so we have to guess and hope it doesn't change.
-+  const maxInfluences = 8;
-+
-+  // three provides no way to query which morph targets it will use
-+  // nor which attributes it will assign them to so we'll guess.
-+  // If the algorithm in three.js changes we'll need to refactor this.
-+  mesh.morphTargetInfluences
-+    .map((influence, i) =&gt; [i, influence])            // map indices to influence
-+    .sort((a, b) =&gt; Math.abs(b[1]) - Math.abs(a[1]))  // sort by highest influence first
-+    .slice(0, maxInfluences)                          // keep only top influences
-+    .sort((a, b) =&gt; a[0] - b[0])                      // sort by index
-+    .filter(a =&gt; !!a[1])                              // remove no influence entries
-+    .forEach(([ndx], i) =&gt; {                          // assign the attributes
-+      const name = `morphColor${i}`;
-+      baseGeometry.setAttribute(name, colorAttributes[ndx].attribute);
-+    });
-+}
-</pre>
-<p>この関数は <code class="notranslate" translate="no">loadAll</code> 関数から返します。この方法では変数をリークする必要はありません。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">async function loadAll() {
-  ...
-
-+  return updateMorphTargets;
-}
-
-+// use a no-op update function until the data is ready
-+let updateMorphTargets = () =&gt; {};
--loadAll();
-+loadAll().then(fn =&gt; {
-+  updateMorphTargets = fn;
-+});
-</pre>
-<p>最後にtweenManagerで値を更新した後、レンダリング前に <code class="notranslate" translate="no">updateMorphTargets</code> を呼び出す必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
-
-  ...
-
-  if (tweenManager.update()) {
-    requestRenderIfNotRequested();
-  }
-
-+  updateMorphTargets();
-
-  controls.update();
-  renderer.render(scene, camera);
-}
-</pre>
-<p>これで色をクロスフェードアニメーションさせる事ができます。</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-morphtargets-w-colors.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lots-of-objects-morphtargets-w-colors.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
-</div>
-
-<p></p>
 <p>これがお役に立てれば幸いです。
 three.jsが提供するサービスを利用するか、カスタムシェーダーを使ってモーフターゲットを使うのは多くのオブジェクトを移動させるための一般的なテクニックです。
 例として全てのキューブに別の目標を設定し、そこから地球上での最初の位置へと変化します。
@@ -632,8 +447,8 @@ three.jsが提供するサービスを利用するか、カスタムシェーダ
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

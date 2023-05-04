@@ -94,14 +94,16 @@ class AnimationClipCreator {
 		const times = [], values = [],
 			timeStep = duration / colors.length;
 
-		for ( let i = 0; i <= colors.length; i ++ ) {
+		for ( let i = 0; i < colors.length; i ++ ) {
 
 			times.push( i * timeStep );
-			values.push( colors[ i % colors.length ] );
+
+			const color = colors[ i ];
+			values.push( color.r, color.g, color.b );
 
 		}
 
-		const trackName = '.material[0].color';
+		const trackName = '.material.color';
 
 		const track = new ColorKeyframeTrack( trackName, times, values );
 

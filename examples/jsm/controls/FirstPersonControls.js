@@ -12,13 +12,6 @@ class FirstPersonControls {
 
 	constructor( object, domElement ) {
 
-		if ( domElement === undefined ) {
-
-			console.warn( 'THREE.FirstPersonControls: The second parameter "domElement" is now mandatory.' );
-			domElement = document;
-
-		}
-
 		this.object = object;
 		this.domElement = domElement;
 
@@ -49,8 +42,8 @@ class FirstPersonControls {
 
 		this.autoSpeedFactor = 0.0;
 
-		this.mouseX = 0;
-		this.mouseY = 0;
+		this.pointerX = 0;
+		this.pointerY = 0;
 
 		this.moveForward = false;
 		this.moveBackward = false;
@@ -83,7 +76,7 @@ class FirstPersonControls {
 
 		};
 
-		this.onMouseDown = function ( event ) {
+		this.onPointerDown = function ( event ) {
 
 			if ( this.domElement !== document ) {
 
@@ -106,7 +99,7 @@ class FirstPersonControls {
 
 		};
 
-		this.onMouseUp = function ( event ) {
+		this.onPointerUp = function ( event ) {
 
 			if ( this.activeLook ) {
 
@@ -123,17 +116,17 @@ class FirstPersonControls {
 
 		};
 
-		this.onMouseMove = function ( event ) {
+		this.onPointerMove = function ( event ) {
 
 			if ( this.domElement === document ) {
 
-				this.mouseX = event.pageX - this.viewHalfX;
-				this.mouseY = event.pageY - this.viewHalfY;
+				this.pointerX = event.pageX - this.viewHalfX;
+				this.pointerY = event.pageY - this.viewHalfY;
 
 			} else {
 
-				this.mouseX = event.pageX - this.domElement.offsetLeft - this.viewHalfX;
-				this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY;
+				this.pointerX = event.pageX - this.domElement.offsetLeft - this.viewHalfX;
+				this.pointerY = event.pageY - this.domElement.offsetTop - this.viewHalfY;
 
 			}
 
@@ -253,8 +246,8 @@ class FirstPersonControls {
 
 				}
 
-				lon -= this.mouseX * actualLookSpeed;
-				if ( this.lookVertical ) lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
+				lon -= this.pointerX * actualLookSpeed;
+				if ( this.lookVertical ) lat -= this.pointerY * actualLookSpeed * verticalLookRatio;
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
 
@@ -280,25 +273,25 @@ class FirstPersonControls {
 		this.dispose = function () {
 
 			this.domElement.removeEventListener( 'contextmenu', contextmenu );
-			this.domElement.removeEventListener( 'mousedown', _onMouseDown );
-			this.domElement.removeEventListener( 'mousemove', _onMouseMove );
-			this.domElement.removeEventListener( 'mouseup', _onMouseUp );
+			this.domElement.removeEventListener( 'pointerdown', _onPointerDown );
+			this.domElement.removeEventListener( 'pointermove', _onPointerMove );
+			this.domElement.removeEventListener( 'pointerup', _onPointerUp );
 
 			window.removeEventListener( 'keydown', _onKeyDown );
 			window.removeEventListener( 'keyup', _onKeyUp );
 
 		};
 
-		const _onMouseMove = this.onMouseMove.bind( this );
-		const _onMouseDown = this.onMouseDown.bind( this );
-		const _onMouseUp = this.onMouseUp.bind( this );
+		const _onPointerMove = this.onPointerMove.bind( this );
+		const _onPointerDown = this.onPointerDown.bind( this );
+		const _onPointerUp = this.onPointerUp.bind( this );
 		const _onKeyDown = this.onKeyDown.bind( this );
 		const _onKeyUp = this.onKeyUp.bind( this );
 
 		this.domElement.addEventListener( 'contextmenu', contextmenu );
-		this.domElement.addEventListener( 'mousemove', _onMouseMove );
-		this.domElement.addEventListener( 'mousedown', _onMouseDown );
-		this.domElement.addEventListener( 'mouseup', _onMouseUp );
+		this.domElement.addEventListener( 'pointerdown', _onPointerDown );
+		this.domElement.addEventListener( 'pointermove', _onPointerMove );
+		this.domElement.addEventListener( 'pointerup', _onPointerUp );
 
 		window.addEventListener( 'keydown', _onKeyDown );
 		window.addEventListener( 'keyup', _onKeyUp );

@@ -30,7 +30,7 @@
 
 	<p>
 		If you're new to running a local server, begin with
-		[link:#manual/introduction/How-to-run-things-locally how to run things locally]
+		[link:#manual/introduction/Installation installation]
 		first. Many common errors viewing 3D models can be avoided by hosting files
 		correctly.
 	</p>
@@ -84,7 +84,7 @@
 	</p>
 
 	<code>
-		import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 	</code>
 
 	<p>
@@ -122,7 +122,7 @@
 	<ol>
 		<li>
 			Check the JavaScript console for errors, and make sure you've used an
-			<em>onError</em> callback when calling <em>.load()</em> to log the result.
+			`onError` callback when calling `.load()` to log the result.
 		</li>
 		<li>
 			View the model in another application. For glTF, drag-and-drop viewers
@@ -144,8 +144,8 @@
 		</li>
 		<li>
 			Look for failed texture requests in the network tab, like
-			<em>C:\\Path\To\Model\texture.jpg</em>. Use paths relative to your
-			model instead, such as <em>images/texture.jpg</em> — this may require
+			`"C:\\Path\To\Model\texture.jpg"`. Use paths relative to your
+			model instead, such as `images/texture.jpg` — this may require
 			editing the model file in a text editor.
 		</li>
 	</ol>

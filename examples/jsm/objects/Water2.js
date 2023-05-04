@@ -27,6 +27,8 @@ class Water extends Mesh {
 
 		super( geometry );
 
+		this.isWater = true;
+
 		this.type = 'Water';
 
 		const scope = this;
@@ -200,8 +202,6 @@ class Water extends Mesh {
 	}
 
 }
-
-Water.prototype.isWater = true;
 
 Water.WaterShader = {
 

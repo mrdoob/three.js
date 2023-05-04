@@ -3,8 +3,9 @@ import {
 	DataUtils,
 	FloatType,
 	HalfFloatType,
-	LinearEncoding,
+	NoColorSpace,
 	LinearFilter,
+	LinearSRGBColorSpace,
 	RedFormat,
 	RGBAFormat
 } from 'three';
@@ -208,7 +209,7 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		function hufUnpackEncTable( uInt8Array, inDataView, inOffset, ni, im, iM, hcode ) {
+		function hufUnpackEncTable( uInt8Array, inOffset, ni, im, iM, hcode ) {
 
 			const p = inOffset;
 			let c = 0;
@@ -371,7 +372,7 @@ class EXRLoader extends DataTextureLoader {
 
 		const getCodeReturn = { c: 0, lc: 0 };
 
-		function getCode( po, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outBufferOffset, outBufferEndOffset ) {
+		function getCode( po, rlc, c, lc, uInt8Array, inOffset, outBuffer, outBufferOffset, outBufferEndOffset ) {
 
 			if ( po == rlc ) {
 
@@ -595,7 +596,7 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		function hufDecode( encodingTable, decodingTable, uInt8Array, inDataView, inOffset, ni, rlc, no, outBuffer, outOffset ) {
+		function hufDecode( encodingTable, decodingTable, uInt8Array, inOffset, ni, rlc, no, outBuffer, outOffset ) {
 
 			let c = 0;
 			let lc = 0;
@@ -618,7 +619,7 @@ class EXRLoader extends DataTextureLoader {
 
 						lc -= pl.len;
 
-						getCode( pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
+						getCode( pl.lit, rlc, c, lc, uInt8Array, inOffset, outBuffer, outOffset, outBufferEndOffset );
 
 						c = getCodeReturn.c;
 						lc = getCodeReturn.lc;
@@ -652,7 +653,7 @@ class EXRLoader extends DataTextureLoader {
 
 									lc -= l;
 
-									getCode( pl.p[ j ], rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
+									getCode( pl.p[ j ], rlc, c, lc, uInt8Array, inOffset, outBuffer, outOffset, outBufferEndOffset );
 
 									c = getCodeReturn.c;
 									lc = getCodeReturn.lc;
@@ -690,7 +691,7 @@ class EXRLoader extends DataTextureLoader {
 
 					lc -= pl.len;
 
-					getCode( pl.lit, rlc, c, lc, uInt8Array, inDataView, inOffset, outBuffer, outOffset, outBufferEndOffset );
+					getCode( pl.lit, rlc, c, lc, uInt8Array, inOffset, outBuffer, outOffset, outBufferEndOffset );
 
 					c = getCodeReturn.c;
 					lc = getCodeReturn.lc;
@@ -734,7 +735,7 @@ class EXRLoader extends DataTextureLoader {
 
 			const ni = nCompressed - ( inOffset.value - initialInOffset );
 
-			hufUnpackEncTable( uInt8Array, inDataView, inOffset, ni, im, iM, freq );
+			hufUnpackEncTable( uInt8Array, inOffset, ni, im, iM, freq );
 
 			if ( nBits > 8 * ( nCompressed - ( inOffset.value - initialInOffset ) ) ) {
 
@@ -744,7 +745,7 @@ class EXRLoader extends DataTextureLoader {
 
 			hufBuildDecTable( freq, im, iM, hdec );
 
-			hufDecode( freq, hdec, uInt8Array, inDataView, inOffset, nBits, iM, nRaw, outBuffer, outOffset );
+			hufDecode( freq, hdec, uInt8Array, inOffset, nBits, iM, nRaw, outBuffer, outOffset );
 
 		}
 
@@ -1252,13 +1253,7 @@ class EXRLoader extends DataTextureLoader {
 
 			const compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
 
-			if ( typeof fflate === 'undefined' ) {
-
-				console.error( 'THREE.EXRLoader: External library fflate.min.js required.' );
-
-			}
-
-			const rawBuffer = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+			const rawBuffer = fflate.unzlibSync( compressed );
 			const tmpBuffer = new Uint8Array( rawBuffer.length );
 
 			predictor( rawBuffer ); // revert predictor
@@ -1375,13 +1370,7 @@ class EXRLoader extends DataTextureLoader {
 
 			const compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
 
-			if ( typeof fflate === 'undefined' ) {
-
-				console.error( 'THREE.EXRLoader: External library fflate.min.js required.' );
-
-			}
-
-			const rawBuffer = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+			const rawBuffer = fflate.unzlibSync( compressed );
 
 			const sz = info.lines * info.channels * info.width;
 			const tmpBuffer = ( info.type == 1 ) ? new Uint16Array( sz ) : new Uint32Array( sz );
@@ -1562,7 +1551,7 @@ class EXRLoader extends DataTextureLoader {
 					case DEFLATE:
 
 						const compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.totalAcUncompressedCount );
-						const data = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+						const data = fflate.unzlibSync( compressed );
 						acBuffer = new Uint16Array( data.buffer );
 						inOffset.value += dwaHeader.totalAcUncompressedCount;
 						break;
@@ -1589,7 +1578,7 @@ class EXRLoader extends DataTextureLoader {
 			if ( dwaHeader.rleRawSize > 0 ) {
 
 				const compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.rleCompressedSize );
-				const data = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+				const data = fflate.unzlibSync( compressed );
 				rleBuffer = decodeRunLength( data.buffer );
 
 				inOffset.value += dwaHeader.rleCompressedSize;
@@ -2056,7 +2045,7 @@ class EXRLoader extends DataTextureLoader {
 
 			}
 
-			if ( spec != 0 ) {
+			if ( ( spec & ~ 0x04 ) != 0 ) { // unsupported tiled, deep-image, multi-part
 
 				console.error( 'EXRHeader:', EXRHeader );
 				throw new Error( 'THREE.EXRLoader: provided file is currently unsupported.' );
@@ -2084,7 +2073,7 @@ class EXRLoader extends DataTextureLoader {
 				uncompress: null,
 				getter: null,
 				format: null,
-				encoding: null,
+				colorSpace: LinearSRGBColorSpace,
 			};
 
 			switch ( EXRHeader.compression ) {
@@ -2216,12 +2205,12 @@ class EXRLoader extends DataTextureLoader {
 			if ( EXRDecoder.outputChannels == 4 ) {
 
 				EXRDecoder.format = RGBAFormat;
-				EXRDecoder.encoding = LinearEncoding;
+				EXRDecoder.colorSpace = LinearSRGBColorSpace;
 
 			} else {
 
 				EXRDecoder.format = RedFormat;
-				EXRDecoder.encoding = LinearEncoding;
+				EXRDecoder.colorSpace = NoColorSpace;
 
 			}
 
@@ -2284,7 +2273,7 @@ class EXRLoader extends DataTextureLoader {
 			height: EXRDecoder.height,
 			data: EXRDecoder.byteArray,
 			format: EXRDecoder.format,
-			encoding: EXRDecoder.encoding,
+			colorSpace: EXRDecoder.colorSpace,
 			type: this.type,
 		};
 
@@ -2301,7 +2290,7 @@ class EXRLoader extends DataTextureLoader {
 
 		function onLoadCallback( texture, texData ) {
 
-			texture.encoding = texData.encoding;
+			texture.colorSpace = texData.colorSpace;
 			texture.minFilter = LinearFilter;
 			texture.magFilter = LinearFilter;
 			texture.generateMipmaps = false;

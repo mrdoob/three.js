@@ -3,14 +3,16 @@ import { PointLightShadow } from './PointLightShadow.js';
 
 class PointLight extends Light {
 
-	constructor( color, intensity, distance = 0, decay = 1 ) {
+	constructor( color, intensity, distance = 0, decay = 2 ) {
 
 		super( color, intensity );
+
+		this.isPointLight = true;
 
 		this.type = 'PointLight';
 
 		this.distance = distance;
-		this.decay = decay; // for physically correct lights, should be 2.
+		this.decay = decay;
 
 		this.shadow = new PointLightShadow();
 
@@ -37,9 +39,9 @@ class PointLight extends Light {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.distance = source.distance;
 		this.decay = source.decay;
@@ -51,7 +53,5 @@ class PointLight extends Light {
 	}
 
 }
-
-PointLight.prototype.isPointLight = true;
 
 export { PointLight };

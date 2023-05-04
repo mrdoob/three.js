@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – 场景图">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -32,7 +32,7 @@
       <div class="lesson">
         <div class="lesson-main">
           <p>本文是关于 three.js 系列文章的一部分。第一篇文章是 <a href="fundamentals.html">three.js 基础</a>。 如果你还没有读过它，建议先从那里开始。</p>
-<p>Three.js 的核心可以说是它的场景图（scene gprah）。场景图在 3D 引擎是一个图中节点的层次结构，其中每个节点代表了一个局部空间（local space）。</p>
+<p>Three.js 的核心可以说是它的场景图（scene graph）。场景图在 3D 引擎是一个图中节点的层次结构，其中每个节点代表了一个局部空间（local space）。</p>
 <p><img src="../resources/images/scenegraph-generic.svg" align="center"></p>
 <p>这有点抽象，所以我们试着举一些例子。</p>
 <p>比如这样一个例子：太阳系、太阳、地球、月亮。</p>
@@ -358,8 +358,8 @@ infoElem.textContent = camera.desc;
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

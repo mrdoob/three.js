@@ -7,7 +7,7 @@ import { SetGeometryValueCommand } from './commands/SetGeometryValueCommand.js';
 import { SidebarGeometryBufferGeometry } from './Sidebar.Geometry.BufferGeometry.js';
 import { SidebarGeometryModifiers } from './Sidebar.Geometry.Modifiers.js';
 
-import { VertexNormalsHelper } from '../../examples/jsm/helpers/VertexNormalsHelper.js';
+import { VertexNormalsHelper } from 'three/addons/helpers/VertexNormalsHelper.js';
 
 function SidebarGeometry( editor ) {
 
@@ -138,14 +138,16 @@ function SidebarGeometry( editor ) {
 
 	// Size
 
-	const geometryBoundingBox = new UIText().setFontSize( '12px' ).setVerticalAlign( 'middle' );
+	const geometryBoundingBox = new UIText().setFontSize( '12px' );
 
-	container.add( new UIText( strings.getKey( 'sidebar/geometry/bounds' ) ).setWidth( '90px' ) );
-	container.add( geometryBoundingBox );
+	const geometryBoundingBoxRow = new UIRow();
+	geometryBoundingBoxRow.add( new UIText( strings.getKey( 'sidebar/geometry/bounds' ) ).setWidth( '90px' ) );
+	geometryBoundingBoxRow.add( geometryBoundingBox );
+	container.add( geometryBoundingBoxRow );
 
 	// Helpers
 
-	const helpersRow = new UIRow().setMarginTop( '16px' ).setPaddingLeft( '90px' );
+	const helpersRow = new UIRow().setPaddingLeft( '90px' );
 	container.add( helpersRow );
 
 	const vertexNormalsButton = new UIButton( strings.getKey( 'sidebar/geometry/show_vertex_normals' ) );
@@ -155,8 +157,7 @@ function SidebarGeometry( editor ) {
 
 		if ( editor.helpers[ object.id ] === undefined ) {
 
-			const helper = new VertexNormalsHelper( object );
-			editor.addHelper( object, helper );
+			editor.addHelper( object, new VertexNormalsHelper( object ) );
 
 		} else {
 
@@ -214,6 +215,8 @@ function SidebarGeometry( editor ) {
 			const z = Math.floor( ( boundingBox.max.z - boundingBox.min.z ) * 1000 ) / 1000;
 
 			geometryBoundingBox.setInnerHTML( `${x}<br/>${y}<br/>${z}` );
+
+			helpersRow.setDisplay( geometry.hasAttribute( 'normal' ) ? '' : 'none' );
 
 		} else {
 

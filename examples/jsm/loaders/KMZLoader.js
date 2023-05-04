@@ -56,7 +56,7 @@ class KMZLoader extends Loader {
 
 			for ( const path in zip ) {
 
-				if ( path.substr( - url.length ) === url ) {
+				if ( path.slice( - url.length ) === url ) {
 
 					return zip[ path ];
 
@@ -86,18 +86,18 @@ class KMZLoader extends Loader {
 
 		//
 
-		const zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
+		const zip = fflate.unzipSync( new Uint8Array( data ) );
 
 		if ( zip[ 'doc.kml' ] ) {
 
-			const xml = new DOMParser().parseFromString( fflate.strFromU8( zip[ 'doc.kml' ] ), 'application/xml' ); // eslint-disable-line no-undef
+			const xml = new DOMParser().parseFromString( fflate.strFromU8( zip[ 'doc.kml' ] ), 'application/xml' );
 
 			const model = xml.querySelector( 'Placemark Model Link href' );
 
 			if ( model ) {
 
 				const loader = new ColladaLoader( manager );
-				return loader.parse( fflate.strFromU8( zip[ model.textContent ] ) ); // eslint-disable-line no-undef
+				return loader.parse( fflate.strFromU8( zip[ model.textContent ] ) );
 
 			}
 
@@ -112,7 +112,7 @@ class KMZLoader extends Loader {
 				if ( extension === 'dae' ) {
 
 					const loader = new ColladaLoader( manager );
-					return loader.parse( fflate.strFromU8( zip[ path ] ) ); // eslint-disable-line no-undef
+					return loader.parse( fflate.strFromU8( zip[ path ] ) );
 
 				}
 

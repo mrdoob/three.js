@@ -12,8 +12,6 @@ class SavePass extends Pass {
 
 		super();
 
-		if ( CopyShader === undefined ) console.error( 'THREE.SavePass relies on CopyShader' );
-
 		const shader = CopyShader;
 
 		this.textureID = 'tDiffuse';
@@ -32,7 +30,7 @@ class SavePass extends Pass {
 
 		if ( this.renderTarget === undefined ) {
 
-			this.renderTarget = new WebGLRenderTarget( window.innerWidth, window.innerHeight );
+			this.renderTarget = new WebGLRenderTarget(); // will be resized later
 			this.renderTarget.texture.name = 'SavePass.rt';
 
 		}
@@ -54,6 +52,22 @@ class SavePass extends Pass {
 		renderer.setRenderTarget( this.renderTarget );
 		if ( this.clear ) renderer.clear();
 		this.fsQuad.render( renderer );
+
+	}
+
+	setSize( width, height ) {
+
+		this.renderTarget.setSize( width, height );
+
+	}
+
+	dispose() {
+
+		this.renderTarget.dispose();
+
+		this.material.dispose();
+
+		this.fsQuad.dispose();
 
 	}
 

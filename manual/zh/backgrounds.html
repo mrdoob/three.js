@@ -1,47 +1,274 @@
-<!DOCTYPE html><html lang="zh"><head>
-    <meta charset="utf-8">
-    <title>Backgrounds and Skyboxes</title>
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Backgrounds and Skyboxes">
-    <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+<!DOCTYPE html>
+<html lang="zh">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<head>
+  <meta charset="utf-8">
+  <title>背景与天空盒</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@threejs">
+  <meta name="twitter:title" content="Three.js – Backgrounds and Skyboxes">
+  <meta property="og:image" content="https://threejs.org/files/share.png">
+  <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+  <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-<script type="importmap">
+  <link rel="stylesheet" href="../resources/lesson.css">
+  <link rel="stylesheet" href="../resources/lang.css">
+  <!-- Import maps polyfill -->
+  <!-- Remove this when import maps will be widely supported -->
+  <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+  <script type="importmap">
 {
   "imports": {
     "three": "../../build/three.module.js"
   }
 }
 </script>
-    <link rel="stylesheet" href="/manual/zh/lang.css">
-  </head>
-  <body>
-    <div class="container">
-      <div class="lesson-title">
-        <h1>Backgrounds and Skyboxes</h1>
-      </div>
-      <div class="lesson">
-        <div class="lesson-main">
-          <p>抱歉，还没有中文翻译哦。 <a href="https://github.com/mrdoob/three.js">欢迎加入翻译</a>! 😄</p>
-<p><a href="/manual/en/backgrounds.html">英文原文链接</a>.</p>
+  <link rel="stylesheet" href="/manual/zh/lang.css">
+</head>
 
+<body>
+  <div class="container">
+    <div class="lesson-title">
+      <h1>背景与天空盒</h1>
+    </div>
+    <div class="lesson">
+      <div class="lesson-main">
+        <p>这里大部分的文章都使用纯色作为背景。</p>
+        <p>添加静态背景就像添加CSS一样简单，参考来自这篇<a href="responsive.html">THREE.js响应式编程</a>中的一个例子，我们只需要改变两个地方。
+        </p>
+        <p>我们需要在Canvas上添加一些CSS，以将其背景设置为图像。</p>
+        <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;style&gt;
+body {
+    margin: 0;
+}
+#c {
+    width: 100%;
+    height: 100%;
+    display: block;
++    background: url(resources/images/daikanyama.jpg) no-repeat center center;
++    background-size: cover;
+}
+&lt;/style&gt;</pre>
+        <p>然后我们需要告诉 <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate"
+              translate="no">WebGLRenderer</code></a> 去使用 <code class="notranslate"
+            translate="no">alpha</code>，这样我们不绘制的地方都是透明的。
+        </p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+-  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++  const renderer = new THREE.WebGLRenderer({
++    antialias: true,
++    canvas,
++    alpha: true,
++  });</pre>
+        <p>然后背景就有了。</p>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/background-css.html"></iframe></div>
+          <a class="threejs_center" href="/manual/examples/background-css.html" target="_blank">点击在新窗口打开</a>
+        </div>
+        <p></p>
+        <p>如果我们想让背景被 <a href="post-processing.html">后处理效果</a>影响，我们需要用THREE.js绘制背景。</p>
+        <p>THREE.js 让这变得非常简单。我们可以将场景的背景设置为一种纹理。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+const bgTexture = loader.load('resources/images/daikanyama.jpg');
+scene.background = bgTexture;</pre>
+        <p>效果如下</p>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/background-scene-background.html"></iframe>
+          </div>
+          <a class="threejs_center" href="/manual/examples/background-scene-background.html"
+            target="_blank">点击在新窗口打开</a>
+        </div>
+        <p></p>
+        <p>这产生了一个背景图，但它被拉伸以适应屏幕。</p>
+        <p>我们可以解决这个问题，通过设置纹理属性 <code class="notranslate" translate="no">repeat</code> 和 <code class="notranslate"
+            translate="no">offset</code> 来显示图像的一部分。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+
+  ...
+
++  // 设置背景贴图的repeat和offset属性
++  // 来保证图片的比例是正确的
++  // 注意图片有可能还没加载完成
++  const canvasAspect = canvas.clientWidth / canvas.clientHeight;
++  const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
++  const aspect = imageAspect / canvasAspect;
++
++  bgTexture.offset.x = aspect &gt; 1 ? (1 - 1 / aspect) / 2 : 0;
++  bgTexture.repeat.x = aspect &gt; 1 ? 1 / aspect : 1;
++
++  bgTexture.offset.y = aspect &gt; 1 ? 0 : (1 - aspect) / 2;
++  bgTexture.repeat.y = aspect &gt; 1 ? 1 : aspect;
+
+  ...
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}</pre>
+        <p>现在由 THREE.js 绘制背景。这个上面CSS的版本没有明显的区别，不过如果我们应用<a href="post-processing.html">后处理效果</a>，背景也会被影响。</p>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/background-scene-background-fixed-aspect.html"></iframe>
+          </div>
+          <a class="threejs_center" href="/manual/examples/background-scene-background-fixed-aspect.html"
+            target="_blank">点击在新窗口打开</a>
+          <p></p>
+          <p>当然，静态背景通常不是我们在 3D 场景中想要的，相对的我们需要某种<em>天空盒</em>效果。就如字面意思，天空盒就是绘制了一片天空在盒子上。我们把相机放在盒子里，看起来里面有天空背景。</p>
+          <p>
+            实现天空盒最常见的方法是制作一个立方体，应用纹理，绘制在它的内部。在立方体的每一面绘制一个纹理（使用纹理坐标），看起来像地平线的一些图像。通常使用带有纹理的天空球体或天空穹顶。你也许自己能想象得出来。只用一个立方体或球体,
+            <a href="textures.html">应用纹理</a>, 标记它是 <code class="notranslate" translate="no">THREE.BackSide</code>
+            ，这样我们渲染内部面而不是外部面，然后也把它直接放到场景里。或者使用两个场景，一个特殊的场景用于绘制天空盒/球体/圆顶，另一个画正常的一切。你可以用你正常的 <a
+              href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate"
+                translate="no">PerspectiveCamera</code></a> 去绘制，不需要<a
+              href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate"
+                translate="no">OrthographicCamera</code></a>。
+          </p>
+          <p>另一个方法是使用<em>立方体贴图(Cubemap)</em>. 立方体贴图是一种特殊的纹理，它有6个立方体面，它不使用标准的纹理坐标，使用从中心指向外部的方向来决定绘制的颜色。</p>
+          <p>这是来自加利福利亚，山景城的计算机历史博物馆的6张立方体图像。</p>
+          <div class="threejs_center">
+            <img src="../examples/resources/images/cubemaps/computer-history-museum/pos-x.jpg" style="width: 200px"
+              class="border">
+            <img src="../examples/resources/images/cubemaps/computer-history-museum/neg-x.jpg" style="width: 200px"
+              class="border">
+            <img src="../examples/resources/images/cubemaps/computer-history-museum/pos-y.jpg" style="width: 200px"
+              class="border">
+          </div>
+          <div class="threejs_center">
+            <img src="../examples/resources/images/cubemaps/computer-history-museum/neg-y.jpg" style="width: 200px"
+              class="border">
+            <img src="../examples/resources/images/cubemaps/computer-history-museum/pos-z.jpg" style="width: 200px"
+              class="border">
+            <img src="../examples/resources/images/cubemaps/computer-history-museum/neg-z.jpg" style="width: 200px"
+              class="border">
+          </div>
+          <p>为了使用它们，我们使用<a href="/docs/#api/en/loaders/CubeTextureLoader"><code class="notranslate"
+                translate="no">CubeTextureLoader</code></a> 加载它们，然后将其用作场景的背景。</p>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const loader = new THREE.CubeTextureLoader();
+  const texture = loader.load([
+    'resources/images/cubemaps/computer-history-museum/pos-x.jpg',
+    'resources/images/cubemaps/computer-history-museum/neg-x.jpg',
+    'resources/images/cubemaps/computer-history-museum/pos-y.jpg',
+    'resources/images/cubemaps/computer-history-museum/neg-y.jpg',
+    'resources/images/cubemaps/computer-history-museum/pos-z.jpg',
+    'resources/images/cubemaps/computer-history-museum/neg-z.jpg',
+  ]);
+  scene.background = texture;
+}</pre>
+          <p>在渲染时，我们不需要像上面那样调整纹理：</p>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+
+  ...
+
+-  // 设置背景贴图的repeat和offset属性
+-  // 来保证图片的比例是正确的
+-  // 注意图片有可能还没加载完成
+-  const canvasAspect = canvas.clientWidth / canvas.clientHeight;
+-  const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
+-  const aspect = imageAspect / canvasAspect;
+-
+-  bgTexture.offset.x = aspect &gt; 1 ? (1 - 1 / aspect) / 2 : 0;
+-  bgTexture.repeat.x = aspect &gt; 1 ? 1 / aspect : 1;
+-
+-  bgTexture.offset.y = aspect &gt; 1 ? 0 : (1 - aspect) / 2;
+-  bgTexture.repeat.y = aspect &gt; 1 ? 1 : aspect;
+
+  ...
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}</pre>
+          <p>让我们添加一些控件，以便我们可以旋转相机。</p>
+          <pre class="prettyprint showlinemods notranslate lang-js"
+            translate="no">import {OrbitControls} from 'three/addons/controls/OrbitControls.js';</pre>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
+const aspect = 2;  // Canvas默认值
+const near = 0.1;
+-const far = 5;
++const far = 100;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+-camera.position.z = 2;
++camera.position.z = 3;
+
++const controls = new OrbitControls(camera, canvas);
++controls.target.set(0, 0, 0);
++controls.update();</pre>
+          <p>来尝试下，拖动以旋转示例里的相机，观察围绕着我们的立方体贴图。</p>
+          <p></p>
+          <div translate="no" class="threejs_example_container notranslate">
+            <div><iframe class="threejs_example notranslate" translate="no" style=" "
+                src="/manual/examples/resources/editor.html?url=/manual/examples/background-cubemap.html"></iframe>
+            </div>
+            <a class="threejs_center" href="/manual/examples/background-cubemap.html" target="_blank">点击在新窗口打开</a>
+          </div>
+          <p></p>
+          <p>另一种选择是使用等距矩形贴图(Equirectangular map)， 这是被
+            <a href="https://google.com/search?q=360+camera">360 全景相机</a> 拍摄的一种特殊类型的图片。
+          </p>
+          <p><a href="https://hdrihaven.com/hdri/?h=tears_of_steel_bridge">这是一张图片</a>，我从
+            <a href="https://hdrihaven.com">这个网站</a>找到的。
+          </p>
+          <div class="threejs_center"><img
+              src="../examples/resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg" style="width: 600px">
+          </div>
+          <p>这并不难，首先，我们将等距矩形图片加载为纹理, 我们可以调用 <a
+              href="/docs/#api/en/renderers/WebGLCubeRenderTarget.fromEquirectangularTexture"><code class="notranslate"
+                translate="no">WebGLCubeRenderTarget.fromEquirectangularTexture</code></a>
+            这将为我们从等距矩形纹理中生成一个立方体贴图，我们传入预期的立方体贴图的大小给 <a href="/docs/#api/en/renderers/WebGLCubeRenderTarget"><code
+                class="notranslate" translate="no">WebGLCubeRenderTarget</code></a>，
+            使用等距矩形图片的高度似乎是一个不错的假设。</p>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+-  const loader = new THREE.CubeTextureLoader();
+-  const texture = loader.load([
+-    'resources/images/cubemaps/computer-history-museum/pos-x.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-x.jpg',
+-    'resources/images/cubemaps/computer-history-museum/pos-y.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-y.jpg',
+-    'resources/images/cubemaps/computer-history-museum/pos-z.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-z.jpg',
+-  ]);
+-  scene.background = texture;
++  const loader = new THREE.TextureLoader();
++  const texture = loader.load(
++    'resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg',
++    () =&gt; {
++      const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
++      rt.fromEquirectangularTexture(renderer, texture);
++      scene.background = rt.texture;
++    });
+}</pre>
+          <p>这就是全部要做的事。</p>
+          <p></p>
+          <div translate="no" class="threejs_example_container notranslate">
+            <div><iframe class="threejs_example notranslate" translate="no" style=" "
+                src="/manual/examples/resources/editor.html?url=/manual/examples/background-equirectangularmap.html"></iframe>
+            </div>
+            <a class="threejs_center" href="/manual/examples/background-equirectangularmap.html"
+              target="_blank">点击在新窗口打开</a>
+          </div>
+          <p></p>
+          <p>除了在加载时执行此操作，你还可以提前转换等距矩形到立方体贴图。<a href="https://matheowis.github.io/HDRI-to-CubeMap/">这是一个可以为你做这件事的网站</a>。
+          </p>
         </div>
       </div>
     </div>
-  
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 
 
-</body></html>
+</body>
+
+</html>

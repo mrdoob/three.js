@@ -33,7 +33,7 @@
 		rectLight.lookAt( 0, 0, 0 );
 		scene.add( rectLight )
 
-		rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
+		rectLightHelper = new RectAreaLightHelper( rectLight );
 		scene.add( rectLightHelper );
 		</code>
 
@@ -59,6 +59,11 @@
 		<h2>属性（Properties）</h2>
 		<p>
 			公共属性请查看基类[page:Light Light]。
+		</p>
+
+		<h3>[property:Boolean isRectAreaLight]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h2>方法（Methods）</h2>

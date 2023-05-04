@@ -1,19 +1,19 @@
 <!DOCTYPE html><html lang="zh"><head>
     <meta charset="utf-8">
-    <title>Canvas Textures</title>
+    <title>Canvas 纹理</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – Canvas Textures">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -27,19 +27,348 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Canvas Textures</h1>
+        <h1>Canvas 纹理</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>抱歉，还没有中文翻译哦。 <a href="https://github.com/mrdoob/three.js">欢迎加入翻译</a>! 😄</p>
-<p><a href="/manual/en/canvas-textures.html">英文原文链接</a>.</p>
+          <p>这篇文章是此篇 <a href="textures.html">关于纹理</a> 文章的延续，如果你还没有读过，你或许应当从那篇开始。</p>
+          <p>在<a href="textures.html">上一篇讲解纹理的文章中</a>，我们主要使用图像文件来生成动态纹理，有时候我们想在运行时生成一个纹理。一种可行的方式是使用 <a href="/docs/#api/en/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>。</p>
+          <p>Canvas纹理 使用一个<code class="notranslate" translate="no">&lt;canvas&gt;</code> 作为它的输入， 如果你还不知道如何使用2D Canvas API来在画布上绘制内容，<a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial">MDN上有一篇很好的文章</a>。</p>
+          <p>我们来写一段简单的Canvas代码，这是一个在随机位置上绘制随机颜色的点的程序。</p>
 
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const ctx = document.createElement('canvas').getContext('2d');
+document.body.appendChild(ctx.canvas);
+ctx.canvas.width = 256;
+ctx.canvas.height = 256;
+ctx.fillStyle = '#FFF';
+ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+function randInt(min, max) {
+  if (max === undefined) {
+    max = min;
+    min = 0;
+  }
+  return Math.random() * (max - min) + min | 0;
+}
+
+function drawRandomDot() {
+  ctx.fillStyle = `#${randInt(0x1000000).toString(16).padStart(6, '0')}`;
+  ctx.beginPath();
+
+  const x = randInt(256);
+  const y = randInt(256);
+  const radius = randInt(10, 64);
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function render() {
+  drawRandomDot();
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);</pre>
+          <p>这实在太简单了。</p>
+          <p></p><div translate="no" class="threejs_example_container notranslate">
+            <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/canvas-random-dots.html"></iframe></div>
+            <a class="threejs_center" href="/manual/examples/canvas-random-dots.html" target="_blank">点击在新窗口打开</a>
+          </div>
+
+          <p></p>
+          <p>现在让我们用它来绘制纹理。我们会用从 <a href="textures.html">上一篇文章</a> 中绘制立方体纹理的例子开始。
+             我们将删除加载图像的代码，取而代之的是使用我们的Canvas，通过创建一个<a href="/docs/#api/en/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>，然后把我们创建好的Canvas对象传入。</p>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cubes = [];  // 我们使用这个数组来旋转这些立方体
+-const loader = new THREE.TextureLoader();
+-
++const ctx = document.createElement('canvas').getContext('2d');
++ctx.canvas.width = 256;
++ctx.canvas.height = 256;
++ctx.fillStyle = '#FFF';
++ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
++const texture = new THREE.CanvasTexture(ctx.canvas);
+
+const material = new THREE.MeshBasicMaterial({
+-  map: loader.load('resources/images/wall.jpg'),
++  map: texture,
+});
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+cubes.push(cube);  // 添加到cube list中方便旋转</pre>
+          <p>然后调用代码，在我们的渲染循环中绘制一个随机点。</p>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
++  drawRandomDot();
++  texture.needsUpdate = true;
+
+  cubes.forEach((cube, ndx) =&gt; {
+    const speed = .2 + ndx * .1;
+    const rot = time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}</pre>
+          <p>我们只需要做额外的一件事，设置了 <a href="/docs/#api/en/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> 的 <code class="notranslate" translate="no">needsUpdate</code>属性来告诉THREE.js来更新纹理画布的最新内容。</p>
+          <p>这样，我们就有了一个用Canvas绘制纹理的立方体。</p>
+          <p></p><div translate="no" class="threejs_example_container notranslate">
+            <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/canvas-textured-cube.html"></iframe></div>
+            <a class="threejs_center" href="/manual/examples/canvas-textured-cube.html" target="_blank">点击在新窗口打开</a>
+          </div>
+          <p></p>
+          <p>请注意，如果你想使用THREE.js绘制到Canvas中，你最好用 <code class="notranslate" translate="no">RenderTarget</code>，在 <a href="rendertargets.html">这篇文章</a> 中有提到。</p>
+          <p>纹理画布的一个常见用法是在场景中绘制文本。例如，你想把一个人的名字放在他们角色上面作为一个徽标(Badge)，你也许需要使用Canvas来绘制徽标纹理。</p>
+          <p>让我们创建一个有3个人的场景，并给每个人绘制一个徽标或者标签(Label)。</p>
+          <p>让我们用上面的例子，移除所有相关的立方体。然后设置背景为白色，然后添加两个<a href="lights.html">灯光</a>。</p>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
++scene.background = new THREE.Color('white');
++
++function addLight(position) {
++  const color = 0xFFFFFF;
++  const intensity = 1;
++  const light = new THREE.DirectionalLight(color, intensity);
++  light.position.set(...position);
++  scene.add(light);
++  scene.add(light.target);
++}
++addLight([-3, 1, 1]);
++addLight([ 2, 1, .5]);</pre>
+          <p>让我们写一些代码以使用2D Canvas绘制标签</p>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function makeLabelCanvas(size, name) {
++  const borderSize = 2;
++  const ctx = document.createElement('canvas').getContext('2d');
++  const font =  `${size}px bold sans-serif`;
++  ctx.font = font;
++  // 测量一下name有多长
++  const doubleBorderSize = borderSize * 2;
++  const width = ctx.measureText(name).width + doubleBorderSize;
++  const height = size + doubleBorderSize;
++  ctx.canvas.width = width;
++  ctx.canvas.height = height;
++
++  // 注意，调整画布后需要重新修改字体
++  ctx.font = font;
++  ctx.textBaseline = 'top';
++
++  ctx.fillStyle = 'blue';
++  ctx.fillRect(0, 0, width, height);
++  ctx.fillStyle = 'white';
++  ctx.fillText(name, borderSize, borderSize);
++
++  return ctx.canvas;
++}</pre>
+          <p>然后我们将用一个圆柱体作为身体，一个球体作为头部，一个平面作为标签来制作一个简单的人。</p>
+          <p>首先我们开始制作共享几何体。</p>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const bodyRadiusTop = .4;
++const bodyRadiusBottom = .2;
++const bodyHeight = 2;
++const bodyRadialSegments = 6;
++const bodyGeometry = new THREE.CylinderGeometry(
++    bodyRadiusTop, bodyRadiusBottom, bodyHeight, bodyRadialSegments);
++
++const headRadius = bodyRadiusTop * 0.8;
++const headLonSegments = 12;
++const headLatSegments = 5;
++const headGeometry = new THREE.SphereGeometry(
++    headRadius, headLonSegments, headLatSegments);
++
++const labelGeometry = new THREE.PlaneGeometry(1, 1);</pre>
+          <p>然后我们写一个函数把这些部分组合成一个人。</p>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function makePerson(x, size, name, color) {
++  const canvas = makeLabelCanvas(size, name);
++  const texture = new THREE.CanvasTexture(canvas);
++  // 因为我们的Canvas长宽都不太可能是2的倍数，所以将filtering设置合理一些
++  texture.minFilter = THREE.LinearFilter;
++  texture.wrapS = THREE.ClampToEdgeWrapping;
++  texture.wrapT = THREE.ClampToEdgeWrapping;
++
++  const labelMaterial = new THREE.MeshBasicMaterial({
++    map: texture,
++    side: THREE.DoubleSide,
++    transparent: true,
++  });
++  const bodyMaterial = new THREE.MeshPhongMaterial({
++    color,
++    flatShading: true,
++  });
++
++  const root = new THREE.Object3D();
++  root.position.x = x;
++
++  const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
++  root.add(body);
++  body.position.y = bodyHeight / 2;
++
++  const head = new THREE.Mesh(headGeometry, bodyMaterial);
++  root.add(head);
++  head.position.y = bodyHeight + headRadius * 1.1;
++
++  const label = new THREE.Mesh(labelGeometry, labelMaterial);
++  root.add(label);
++  label.position.y = bodyHeight * 4 / 5;
++  label.position.z = bodyRadiusTop * 1.01;
++
++  // 如果单位是米， 那这里0.01就是将标签的尺寸转化为厘米
++  const labelBaseScale = 0.01;
++  label.scale.x = canvas.width  * labelBaseScale;
++  label.scale.y = canvas.height * labelBaseScale;
++
++  scene.add(root);
++  return root;
++}</pre>
+          <p>在上面你可以看到，我们把身体、头部、标签放在了一个根<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 上并且调整了他们的位置。这样如果我们想移动人的话直接移动根对象就可以了。身体是2个单位的高度，如果1个单位等于1米，那么上面的代码会尝试用厘米为单位制作标签，它们使用厘米作为宽高，以更好的适合文本。</p>
+          <p>然后我们可以制作带标签的人</p>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+makePerson(-3, 32, 'Purple People Eater', 'purple');
++makePerson(-0, 32, 'Green Machine', 'green');
++makePerson(+3, 32, 'Red Menace', 'red');</pre>
+          <p>剩下的就是添加 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 这样我们就可以移动相机了。</p>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {OrbitControls} from 'three/addons/controls/OrbitControls.js';</pre>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
+const aspect = 2;  // Canvas默认值
+const near = 0.1;
+-const far = 5;
++const far = 50;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+-camera.position.z = 2;
++camera.position.set(0, 2, 5);
+
++const controls = new OrbitControls(camera, canvas);
++controls.target.set(0, 2, 0);
++controls.update();</pre>
+          <p>然后我们得到了一些简单的标签。</p>
+          <p></p><div translate="no" class="threejs_example_container notranslate">
+            <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/canvas-textured-labels.html"></iframe></div>
+            <a class="threejs_center" href="/manual/examples/canvas-textured-labels.html" target="_blank">点击在新窗口打开</a>
+          </div>
+          <p></p>
+          <p>注意事项：</p>
+          <ul>
+            <li>如果你过度放大，标签的分辨率会降低。</li>
+          </ul>
+          <p>没有简单的解决方案，还有更复杂的字体渲染技术，据我所知没有插件可以解决这个问题。另外，还需要用户下载字体数据文件，这会变得很慢。</p>
+          <p>一种方案是增加标签的分辨率，尝试让尺寸变成现在的2倍，然后设置 <code class="notranslate" translate="no">labelBaseScale</code> 是现在的一半。</p>
+
+          <ul>
+            <li>名字越长，标签越长。</li>
+          </ul>
+          <p>如果你想解决这个问题，你需要指定标签的固定大小，然后挤压文本。</p>
+          <p>这很容易做到。传入一个基本宽度并缩放文本以适应。</p>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function makeLabelCanvas(size, name) {
++function makeLabelCanvas(baseWidth, size, name) {
+  const borderSize = 2;
+  const ctx = document.createElement('canvas').getContext('2d');
+  const font =  `${size}px bold sans-serif`;
+  ctx.font = font;
+  // 测量一下name有多长
++  const textWidth = ctx.measureText(name).width;
+
+  const doubleBorderSize = borderSize * 2;
+-  const width = ctx.measureText(name).width + doubleBorderSize;
++  const width = baseWidth + doubleBorderSize;
+  const height = size + doubleBorderSize;
+  ctx.canvas.width = width;
+  ctx.canvas.height = height;
+
+  // 注意，调整画布后需要重新修改字体
+  ctx.font = font;
+-  ctx.textBaseline = 'top';
++  ctx.textBaseline = 'middle';
++  ctx.textAlign = 'center';
+
+  ctx.fillStyle = 'blue';
+  ctx.fillRect(0, 0, width, height);
+
++  // 缩放以适应，但是不要拉伸
++  const scaleFactor = Math.min(1, baseWidth / textWidth);
++  ctx.translate(width / 2, height / 2);
++  ctx.scale(scaleFactor, 1);
+  ctx.fillStyle = 'white';
+  ctx.fillText(name, borderSize, borderSize);
+
+  return ctx.canvas;
+}</pre>
+          <p>然后我们可以传入预期标签的长度</p>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function makePerson(x, size, name, color) {
+-  const canvas = makeLabelCanvas(size, name);
++function makePerson(x, labelWidth, size, name, color) {
++  const canvas = makeLabelCanvas(labelWidth, size, name);
+
+...
+
+}
+
+-makePerson(-3, 32, 'Purple People Eater', 'purple');
+-makePerson(-0, 32, 'Green Machine', 'green');
+-makePerson(+3, 32, 'Red Menace', 'red');
++makePerson(-3, 150, 32, 'Purple People Eater', 'purple');
++makePerson(-0, 150, 32, 'Green Machine', 'green');
++makePerson(+3, 150, 32, 'Red Menace', 'red');</pre>
+          <p>我们将文本居中并缩放以适应标签的尺寸。</p>
+          <p></p><div translate="no" class="threejs_example_container notranslate">
+            <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/canvas-textured-labels-scale-to-fit.html"></iframe></div>
+            <a class="threejs_center" href="/manual/examples/canvas-textured-labels-scale-to-fit.html" target="_blank">点击在新窗口打开</a>
+          </div>
+          <p></p>
+          <p>上面我们为每一个纹理使用了单独的Canvas，是否为每个纹理使用单独的Canvas取决于你。如果你需要经常单独更新它们，每个纹理一个Canvas是一个比较好的选择。如果它们很少或者从不更新，那么你可以用一个Canvas，通过THREE.js来生成多个纹理。让我们更改上面的代码来完成这一点。</p>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const ctx = document.createElement('canvas').getContext('2d');
+function makeLabelCanvas(baseWidth, size, name) {
+  const borderSize = 2;
+-  const ctx = document.createElement('canvas').getContext('2d');
+  const font =  `${size}px bold sans-serif`;
+
+  ...
+
+}
+
++const forceTextureInitialization = function() {
++  const material = new THREE.MeshBasicMaterial();
++  const geometry = new THREE.PlaneGeometry();
++  const scene = new THREE.Scene();
++  scene.add(new THREE.Mesh(geometry, material));
++  const camera = new THREE.Camera();
++
++  return function forceTextureInitialization(texture) {
++    material.map = texture;
++    renderer.render(scene, camera);
++  };
++}();
+
+function makePerson(x, labelWidth, size, name, color) {
+  const canvas = makeLabelCanvas(labelWidth, size, name);
+  const texture = new THREE.CanvasTexture(canvas);
+  // 因为我们的Canvas长宽都不太可能是2的倍数，所以将filtering设置合理一些
+  texture.minFilter = THREE.LinearFilter;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
++  forceTextureInitialization(texture);
+
+  ...</pre>
+          <p></p><div translate="no" class="threejs_example_container notranslate">
+            <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/canvas-textured-labels-one-canvas.html"></iframe></div>
+            <a class="threejs_center" href="/manual/examples/canvas-textured-labels-one-canvas.html" target="_blank">点击在新窗口打开</a>
+          </div>
+          <p></p>
+          <p>另一个问题是标签并不总是面向相机，如果你使用标签作为徽标，这可能是一件好事。
+            如果你使用标签来放置3D游戏中玩家的名字，也许你希望标签总是面对相机。
+            具体内容在 <a href="billboards.html">广告牌(Billboards)文章</a> 有覆盖到。</p>
+          <p>特别是对于标签，<a href="align-html-elements-to-3d.html">另一种解决方案是使用HTML</a>，
+            本文中的标签是 <em>位于3D场景中</em> ，如果你想要他们被其他对象遮挡是很好的，因为 <a href="align-html-elements-to-3d.html">HTML 标签</a> 总是在最上层。
+          </p>  
         </div>
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

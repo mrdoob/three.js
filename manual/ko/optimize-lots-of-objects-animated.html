@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – 다중 애니메이션 요소 최적화하기">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -208,7 +208,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 
   ...
 
--  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+-  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 -      geometries, false);
 -  const material = new THREE.MeshBasicMaterial({
 -    vertexColors: true,
@@ -216,7 +216,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 -  const mesh = new THREE.Mesh(mergedGeometry, material);
 -  scene.add(mesh);
 -  return mesh;
-+  return BufferGeometryUtils.mergeBufferGeometries(
++  return BufferGeometryUtils.mergeGeometries(
 +     geometries, false);
 }
 </pre>
@@ -261,6 +261,12 @@ showFileInfo(fileInfos, fileInfos[0]);
 +  attribute.name = name;
 +  return attribute;
 +});
++baseGeometry.morphAttributes.color = geometries.map((geometry, ndx) =&gt; {
++  const attribute = geometry.getAttribute('color');
++  const name = `target${ndx}`;
++  attribute.name = name;
++  return attribute;
++});
 +const material = new THREE.MeshBasicMaterial({
 +  vertexColors: true,
 ++});
@@ -288,10 +294,10 @@ showFileInfo(fileInfos, fileInfos[0]);
 <p>이제 각 데이터 그룹에 전환 효과를 줘야 합니다. mesh를 사라지고 나타나게 하는 대신 mesh의 <code class="notranslate" translate="no">morphTargetInfluences</code> 속성을 바꿔 애니메이션을 구현할 겁니다. 화면에 렌더링할 데이터 그룹의 influence(영향)은 1, 렌더링하지 않을 그룹의 influence는 0으로 설정하는 것이죠.</p>
 <p>단순히 숫자 0, 1을 바로 지정할 수도 있지만 그러면 애니메이션이 하나도 보이지 않을 겁니다. 아까 썼던 방법과 전혀 차이가 없는 결과가 나오겠죠. 물론 직접 애니메이션 코드를 작성할 수도 있지만 원본 WebGL 지구본이 <a href="https://github.com/tweenjs/tween.js/">애니메이션 라이브러리</a>를 썼으므로 같은 라이브러리를 사용해보겠습니다.</p>
 <p>먼저 라이브러리를 불러옵니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import { BufferGeometryUtils } from '/examples/jsm/utils/BufferGeometryUtils.js';
-import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
-+import { TWEEN } from '/examples/jsm/libs/tween.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import { BufferGeometryUtils } from 'three/addons/utils/BufferGeometryUtils.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
++import TWEEN from 'three/addons/libs/tween.module.js';
 </pre>
 <p>그리고 <code class="notranslate" translate="no">Tween</code>으로 influence 속성에 애니메이션을 줍니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// 선택한 데이터를 보여주고 나머지는 숨깁니다.
@@ -348,7 +354,7 @@ function showFileInfo(fileInfos, fileInfo) {
 <p>만든 클래스의 인스턴스를 생성합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  const tweenManager = new TweenManger();
 
   ...
@@ -398,184 +404,6 @@ render();
 </div>
 
 <p></p>
-<p>애니메이션은 잘 작동하지만 색이 바뀌지 않습니다.</p>
-<p>Three.js의 morphtargets는 색상값을 지원하지 않습니다. 이건 원본 <a href="https://github.com/dataarts/webgl-globe">WebGL 지구본</a>의 문제이기도 하죠. 기본적으로 WebGl 지구본은 그냥 첫 데이터 그룹에 색을 지정하고, 많은 차이가 나는 데이터라도 같은 색을 사용합니다.</p>
-<p>어쨌든 색에 애니메이션을 줄 수 있는 방법을 알아봅시다. 이건 좀 어려울 수 있습니다. 직접 쉐이더를 만드는 게 그나마 덜 어렵긴 하지만, 이 기회에 내장 쉐이더를 어떻게 수정하는지 알아보는 것도 좋을 듯합니다.</p>
-<p>제일 먼저 해야할 건 각 데이터 그룹 geometry의 <a href="/docs/#api/ko/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>에서 색상값을 추출하는 겁니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// 첫 번째 geometry를 기준으로 다른 geometry를 morphtargets로 지정합니다.
-const baseGeometry = geometries[0];
-baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) =&gt; {
-  const attribute = geometry.getAttribute('position');
-  const name = `target${ndx}`;
-  attribute.name = name;
-  return attribute;
-});
-+const colorAttributes = geometries.map((geometry, ndx) =&gt; {
-+  const attribute = geometry.getAttribute('color');
-+  const name = `morphColor${ ndx }`;
-+  attribute.name = `color${ ndx }`;  // 디버깅용
-+  return { name, attribute };
-+});
-const material = new THREE.MeshBasicMaterial({
-  vertexColors: true,
-});
-</pre>
-<p>다음으로 Three.js의 내장 쉐이더를 수정해야 합니다. Three.js의 재질에는 함수를 지정할 수 있는 <a href="/docs/#api/ko/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a> 속성이 있고, 이 속성에 함수를 지정하면 WebGL에 쉐이더를 올리기 전에 재질의 쉐이더를 수정할 수 있습니다. 사실 Three.js에서 넘겨주는 이 쉐이더는 Three.js 전용 문법으로 된 쉐이더 <em>묶음(chunk)</em>으로, Three.js는 이 각 묶음을 실제 GLSL 코드로 바꿔 WebGL에 넘깁니다. 아래는 <code class="notranslate" translate="no">onBeforeCompile</code> 함수에 매개변수로 넘어오는 쉐이더 코드의 한 예입니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">#include &lt;common&gt;
-#include &lt;uv_pars_vertex&gt;
-#include &lt;uv2_pars_vertex&gt;
-#include &lt;envmap_pars_vertex&gt;
-#include &lt;color_pars_vertex&gt;
-#include &lt;fog_pars_vertex&gt;
-#include &lt;morphtarget_pars_vertex&gt;
-#include &lt;skinning_pars_vertex&gt;
-#include &lt;logdepthbuf_pars_vertex&gt;
-#include &lt;clipping_planes_pars_vertex&gt;
-void main() {
-    #include &lt;uv_vertex&gt;
-    #include &lt;uv2_vertex&gt;
-    #include &lt;color_vertex&gt;
-    #include &lt;skinbase_vertex&gt;
-    #ifdef USE_ENVMAP
-    #include &lt;beginnormal_vertex&gt;
-    #include &lt;morphnormal_vertex&gt;
-    #include &lt;skinnormal_vertex&gt;
-    #include &lt;defaultnormal_vertex&gt;
-    #endif
-    #include &lt;begin_vertex&gt;
-    #include &lt;morphtarget_vertex&gt;
-    #include &lt;skinning_vertex&gt;
-    #include &lt;project_vertex&gt;
-    #include &lt;logdepthbuf_vertex&gt;
-    #include &lt;worldpos_vertex&gt;
-    #include &lt;clipping_planes_vertex&gt;
-    #include &lt;envmap_vertex&gt;
-    #include &lt;fog_vertex&gt;
-}
-</pre>
-<p>소스 코드를 뒤져 예제에 적합한 쉐이더 묶음을 몇 개 찾았습니다.</p>
-<ul>
-<li><a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphtarget_pars_vertex.glsl.js"><code class="notranslate" translate="no">morphtarget_pars_vertex</code></a></li>
-<li><a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphnormal_vertex.glsl.js"><code class="notranslate" translate="no">morphnormal_vertex</code></a></li>
-<li><a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphtarget_vertex.glsl.js"><code class="notranslate" translate="no">morphtarget_vertex</code></a></li>
-<li><a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_pars_vertex.glsl.js"><code class="notranslate" translate="no">color_pars_vertex</code></a></li>
-<li><a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_vertex.glsl.js"><code class="notranslate" translate="no">color_vertex</code></a></li>
-</ul>
-<p>이 쉐이더 묶음을 교체하기 위해 간단한 교체용 배열을 만들어 <a href="/docs/#api/ko/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>에 적용합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshBasicMaterial({
-  vertexColors: true,
-});
-+const vertexShaderReplacements = [
-+  {
-+    from: '#include &lt;morphtarget_pars_vertex&gt;',
-+    to: `
-+      uniform float morphTargetInfluences[8];
-+    `,
-+  },
-+  {
-+    from: '#include &lt;morphnormal_vertex&gt;',
-+    to: `
-+    `,
-+  },
-+  {
-+    from: '#include &lt;morphtarget_vertex&gt;',
-+    to: `
-+      transformed += (morphTarget0 - position) * morphTargetInfluences[0];
-+      transformed += (morphTarget1 - position) * morphTargetInfluences[1];
-+      transformed += (morphTarget2 - position) * morphTargetInfluences[2];
-+      transformed += (morphTarget3 - position) * morphTargetInfluences[3];
-+    `,
-+  },
-+  {
-+    from: '#include &lt;color_pars_vertex&gt;',
-+    to: `
-+      varying vec3 vColor;
-+      attribute vec3 morphColor0;
-+      attribute vec3 morphColor1;
-+      attribute vec3 morphColor2;
-+      attribute vec3 morphColor3;
-+    `,
-+  },
-+  {
-+    from: '#include &lt;color_vertex&gt;',
-+    to: `
-+      vColor.xyz = morphColor0 * morphTargetInfluences[0] +
-+                   morphColor1 * morphTargetInfluences[1] +
-+                   morphColor2 * morphTargetInfluences[2] +
-+                   morphColor3 * morphTargetInfluences[3];
-+    `,
-+  },
-+];
-+material.onBeforeCompile = (shader) =&gt; {
-+  vertexShaderReplacements.forEach((rep) =&gt; {
-+    shader.vertexShader = shader.vertexShader.replace(rep.from, rep.to);
-+  });
-+};
-</pre>
-<p>Three.js는 morphtargets을 정렬해 그 중 가장 높은 influence 값을 가진 morphtarget만 적용합니다. 이러면 많은 morphtarget 후보를 지정할 수 있죠. 하지만 Three.js는 어떤 morphtarget을 사용하고 어떤 속성에 morphtarget을 지정할 건지 알려주지 않습니다. Three.js가 하는 일을 따라해보는 수밖에 없는데, 이 방법으로는 Three.js의 알고리즘이 바뀔 때마다 코드를 수정해야 합니다.</p>
-<p>먼저 색 속성을 전부 제거합니다. 속성을 따로 지정하지 않더라도 에러는 뜨지 않으니 그냥 반복문으로 전부 제거하면 됩니다. 그리고 Three.js가 어떤 morphtarget을 쓸 건지 계산한 뒤 Three.js가 사용할 속성에 morphtarget을 지정합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mesh = new THREE.Mesh(baseGeometry, material);
-scene.add(mesh);
-
-+function updateMorphTargets() {
-+  // 색 속성을 전부 제거합니다.
-+  for (const { name } of colorAttributes) {
-+    baseGeometry.deleteAttribute(name);
-+  }
-+
-+  // Three.js는 influence 값을 제공하지 않기에 추측하는 수밖에 없습니다. 물론 소스 코드가 바뀌면 이 값을 수정해야 하겠죠.
-+  const maxInfluences = 8;
-+
-+  // Three.js는 어떤 morphtarget을 사용할 건지, 어떤 속성에 morphtarget을 지정할 건지 알려주지 않습니다.
-+  // Three.js의 알고리즘이 바뀌면 이 코드를 수정해야 할 겁니다.
-+  mesh.morphTargetInfluences
-+    .map((influence, i) =&gt; [i, influence])            // 인덱스값과 influence 값을 매핑합니다.
-+    .sort((a, b) =&gt; Math.abs(b[1]) - Math.abs(a[1]))  // influence 값을 내림차순으로 정렬합니다.
-+    .slice(0, maxInfluences)                          // 상위 값들만 남겨둡니다.
-+    .sort((a, b) =&gt; a[0] - b[0])                      // 인덱스값을 기준으로 정렬합니다.
-+    .filter(a =&gt; !!a[1])                              // influence 값이 없는 요소를 제거합니다.
-+    .forEach(([ndx], i) =&gt; {                          // 속성에 지정합니다.
-+      const name = `morphColor${ i }`;
-+      baseGeometry.setAttribute(name, colorAttributes[ndx].attribute);
-+    });
-+}
-</pre>
-<p>방금 만든 함수를 <code class="notranslate" translate="no">loadAll</code> 함수에서 반환할 겁니다. 이러면 불필요한 변수를 줄일 수 있죠.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">async function loadAll() {
-  ...
-
-+  return updateMorphTargets;
-}
-
-+// 데이터를 불러오기 전까지 빈 함수를 실행합니다.
-+let updateMorphTargets = () =&gt; {};
--loadAll();
-+loadAll().then(fn =&gt; {
-+  updateMorphTargets = fn;
-+});
-</pre>
-<p>마지막으로 tweenManager로 값들을 업데이트한 뒤, 렌더링 메서드 호출 전에 <code class="notranslate" translate="no">updateMorphTarget</code>을 호출해야 합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
-
-  ...
-
-  if (tweenManager.update()) {
-    requestRenderIfNotRequested();
-  }
-
-+  updateMorphTargets();
-
-  controls.update();
-  renderer.render(scene, camera);
-}
-</pre>
-<p>색과 육면체 그래프에 애니메이션을 모두 적용했습니다.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-morphtargets-w-colors.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lots-of-objects-morphtargets-w-colors.html" target="_blank">새 탭에서 보기</a>
-</div>
-
-<p></p>
 <p>여기서 살펴본 내용이 유익했다면 좋겠습니다. Three.js가 제공하는 모듈을 만드는 것과, 직접 쉐이더를 만드는 것 둘 다 morphtargets를 이용해 애니메이션을 구현할 때 자주 사용하는 방법입니다. 예를 들어 각 육면체 그래프를 임의의 요소에 두고 해당 위치에서 지구본 위로 이동하는 애니메이션을 줄 수도 있죠. 그것도 그래프를 표현하는 멋진 방법 중 하나일 겁니다.</p>
 <p>혹시 위 지구본에 각 나라의 이름을 띄워보고 싶진 않나요? 그렇다면 <a href="align-html-elements-to-3d.html">HTML 요소를 3D로 정렬하기</a>를 참고해보세요.</p>
 <blockquote>
@@ -586,8 +414,8 @@ scene.add(mesh);
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

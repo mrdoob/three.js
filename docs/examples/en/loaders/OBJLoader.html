@@ -11,12 +11,23 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">A loader for loading a <em>.obj</em> resource.<br />
-		The <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">OBJ file format</a> is a simple data-format
+		<p class="desc">A loader for loading a `.obj` resource.<br />
+		The [link:https://en.wikipedia.org/wiki/Wavefront_.obj_file OBJ file format] is a simple data-format
 		that represents 3D geometry in a human readable format as the position of each vertex, the UV position of
 		each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list of
 		vertices, and texture vertices.
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -72,7 +83,7 @@
 
 		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — A string containing the path/URL of the <em>.obj</em> file.<br />
+		[page:String url] — A string containing the path/URL of the `.obj` file.<br />
 		[page:Function onLoad] — (optional) A function to be called after the loading is successfully completed. The function receives the loaded [page:Object3D] as an argument.<br />
 		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The function receives a XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
@@ -83,12 +94,12 @@
 
 		<h3>[method:Object3D parse]( [param:String text] )</h3>
 		<p>
-		[page:String text] — The textual <em>obj</em> structure to parse.
+		[page:String text] — The textual `obj` structure to parse.
 		</p>
 		<p>
 		Returns an [page:Object3D]. It contains the parsed meshes as [page:Mesh] and lines as [page:LineSegments].<br />
 		All geometry is created as [page:BufferGeometry]. Default materials are created as [page:MeshPhongMaterial].<br />
-		If an <em>obj</em> object or group uses multiple materials while declaring faces, geometry groups and an array of materials are used.
+		If an `obj` object or group uses multiple materials while declaring faces, geometry groups and an array of materials are used.
 		</p>
 
 		<h3>[method:this setMaterials]( [param:MTLLoader.MaterialCreator materials] )</h3>

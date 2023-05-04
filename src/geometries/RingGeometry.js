@@ -5,7 +5,7 @@ import { Vector3 } from '../math/Vector3.js';
 
 class RingGeometry extends BufferGeometry {
 
-	constructor( innerRadius = 0.5, outerRadius = 1, thetaSegments = 8, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2 ) {
+	constructor( innerRadius = 0.5, outerRadius = 1, thetaSegments = 32, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
@@ -106,6 +106,16 @@ class RingGeometry extends BufferGeometry {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
+
+	}
+
 	static fromJSON( data ) {
 
 		return new RingGeometry( data.innerRadius, data.outerRadius, data.thetaSegments, data.phiSegments, data.thetaStart, data.thetaLength );
@@ -115,4 +125,4 @@ class RingGeometry extends BufferGeometry {
 }
 
 
-export { RingGeometry, RingGeometry as RingBufferGeometry };
+export { RingGeometry };

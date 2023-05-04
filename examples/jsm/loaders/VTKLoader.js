@@ -3,8 +3,7 @@ import {
 	BufferGeometry,
 	FileLoader,
 	Float32BufferAttribute,
-	Loader,
-	LoaderUtils
+	Loader
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
@@ -346,8 +345,6 @@ class VTKLoader extends Loader {
 			let normals = [];
 			let indices = [];
 
-			// Going to make a big array of strings
-			const vtk = [];
 			let index = 0;
 
 			function findString( buffer, start ) {
@@ -386,7 +383,6 @@ class VTKLoader extends Loader {
 
 				} else if ( line.indexOf( 'POINTS' ) === 0 ) {
 
-					vtk.push( line );
 					// Add the points
 					const numberOfPoints = parseInt( line.split( ' ' )[ 1 ], 10 );
 
@@ -721,7 +717,7 @@ class VTKLoader extends Loader {
 
 						txt = new Float32Array( );
 
-					} else if ( ele.attributes.type === 'Int64' ) {
+					} else if ( ele.attributes.type === 'Int32' || ele.attributes.type === 'Int64' ) {
 
 						txt = new Int32Array( );
 
@@ -739,14 +735,18 @@ class VTKLoader extends Loader {
 					// The [DATA] portion stores contiguously every block appended together. The offset from the beginning of the data section to the beginning of a block is
 					// computed by summing the compressed block sizes from preceding blocks according to the header.
 
-					const rawData = ele[ '#text' ];
+					const textNode = ele[ '#text' ];
+					const rawData = Array.isArray( textNode ) ? textNode[ 0 ] : textNode;
 
 					const byteData = Base64toByteArray( rawData );
+
+					// Each data point consists of 8 bits regardless of the header type
+					const dataPointSize = 8;
 
 					let blocks = byteData[ 0 ];
 					for ( let i = 1; i < numBytes - 1; i ++ ) {
 
-						blocks = blocks | ( byteData[ i ] << ( i * numBytes ) );
+						blocks = blocks | ( byteData[ i ] << ( i * dataPointSize ) );
 
 					}
 
@@ -768,8 +768,7 @@ class VTKLoader extends Loader {
 
 						for ( let j = 1; j < numBytes - 1; j ++ ) {
 
-							// Each data point consists of 8 bytes regardless of the header type
-							currentBlockSize = currentBlockSize | ( byteData[ i * numBytes + cSizeStart + j ] << ( j * 8 ) );
+							currentBlockSize = currentBlockSize | ( byteData[ i * numBytes + cSizeStart + j ] << ( j * dataPointSize ) );
 
 						}
 
@@ -780,7 +779,7 @@ class VTKLoader extends Loader {
 
 					for ( let i = 0; i < dataOffsets.length - 1; i ++ ) {
 
-						const data = fflate.unzlibSync( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ) ); // eslint-disable-line no-undef
+						const data = fflate.unzlibSync( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ) );
 						content = data.buffer;
 
 						if ( ele.attributes.type === 'Float32' ) {
@@ -788,7 +787,7 @@ class VTKLoader extends Loader {
 							content = new Float32Array( content );
 							txt = Float32Concat( txt, content );
 
-						} else if ( ele.attributes.type === 'Int64' ) {
+						} else if ( ele.attributes.type === 'Int32' || ele.attributes.type === 'Int64' ) {
 
 							content = new Int32Array( content );
 							txt = Int32Concat( txt, content );
@@ -910,7 +909,7 @@ class VTKLoader extends Loader {
 
 						let arr;
 
-						if ( Object.prototype.toString.call( section.DataArray ) === '[object Array]' ) {
+						if ( Array.isArray( section.DataArray ) ) {
 
 							arr = section.DataArray;
 
@@ -1130,16 +1129,18 @@ class VTKLoader extends Loader {
 
 		}
 
+		const textDecoder = new TextDecoder();
+
 		// get the 5 first lines of the files to check if there is the key word binary
-		const meta = LoaderUtils.decodeText( new Uint8Array( data, 0, 250 ) ).split( '\n' );
+		const meta = textDecoder.decode( new Uint8Array( data, 0, 250 ) ).split( '\n' );
 
 		if ( meta[ 0 ].indexOf( 'xml' ) !== - 1 ) {
 
-			return parseXML( LoaderUtils.decodeText( data ) );
+			return parseXML( textDecoder.decode( data ) );
 
 		} else if ( meta[ 2 ].includes( 'ASCII' ) ) {
 
-			return parseASCII( LoaderUtils.decodeText( data ) );
+			return parseASCII( textDecoder.decode( data ) );
 
 		} else {
 

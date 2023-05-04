@@ -37,7 +37,6 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 
 			ShaderChunk.common,
 			ShaderChunk.uv_pars_vertex,
-			ShaderChunk.uv2_pars_vertex,
 			ShaderChunk.displacementmap_pars_vertex,
 			ShaderChunk.envmap_pars_vertex,
 			ShaderChunk.color_pars_vertex,
@@ -116,14 +115,15 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 
 			ShaderChunk.uv_vertex,
 
-			`#ifdef USE_UV
+			`#ifdef USE_MAP
 					#ifdef USE_PACKED_UV
-						vUv = decodeUV(vUv);
+						vMapUv = decodeUV(vMapUv);
 					#endif
 				#endif`,
 
-			ShaderChunk.uv2_vertex,
 			ShaderChunk.color_vertex,
+			ShaderChunk.morphcolor_vertex,
+
 			ShaderChunk.beginnormal_vertex,
 
 			`#ifdef USE_PACKED_NORMAL
@@ -167,81 +167,7 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 		].join( '\n' );
 
 		// Use the original MeshPhongMaterial's fragmentShader.
-		this.fragmentShader = [
-			'#define PHONG',
-
-			'uniform vec3 diffuse;',
-			'uniform vec3 emissive;',
-			'uniform vec3 specular;',
-			'uniform float shininess;',
-			'uniform float opacity;',
-
-			ShaderChunk.common,
-			ShaderChunk.packing,
-			ShaderChunk.dithering_pars_fragment,
-			ShaderChunk.color_pars_fragment,
-			ShaderChunk.uv_pars_fragment,
-			ShaderChunk.uv2_pars_fragment,
-			ShaderChunk.map_pars_fragment,
-			ShaderChunk.alphamap_pars_fragment,
-			ShaderChunk.aomap_pars_fragment,
-			ShaderChunk.lightmap_pars_fragment,
-			ShaderChunk.emissivemap_pars_fragment,
-			ShaderChunk.envmap_common_pars_fragment,
-			ShaderChunk.envmap_pars_fragment,
-			ShaderChunk.cube_uv_reflection_fragment,
-			ShaderChunk.fog_pars_fragment,
-			ShaderChunk.bsdfs,
-			ShaderChunk.lights_pars_begin,
-			ShaderChunk.normal_pars_fragment,
-			ShaderChunk.lights_phong_pars_fragment,
-			ShaderChunk.shadowmap_pars_fragment,
-			ShaderChunk.bumpmap_pars_fragment,
-			ShaderChunk.normalmap_pars_fragment,
-			ShaderChunk.specularmap_pars_fragment,
-			ShaderChunk.logdepthbuf_pars_fragment,
-			ShaderChunk.clipping_planes_pars_fragment,
-
-			'void main() {',
-
-			ShaderChunk.clipping_planes_fragment,
-
-			'vec4 diffuseColor = vec4( diffuse, opacity );',
-			'ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );',
-			'vec3 totalEmissiveRadiance = emissive;',
-
-			ShaderChunk.logdepthbuf_fragment,
-			ShaderChunk.map_fragment,
-			ShaderChunk.color_fragment,
-			ShaderChunk.alphamap_fragment,
-			ShaderChunk.alphatest_fragment,
-			ShaderChunk.specularmap_fragment,
-			ShaderChunk.normal_fragment_begin,
-			ShaderChunk.normal_fragment_maps,
-			ShaderChunk.emissivemap_fragment,
-
-			// accumulation
-			ShaderChunk.lights_phong_fragment,
-			ShaderChunk.lights_fragment_begin,
-			ShaderChunk.lights_fragment_maps,
-			ShaderChunk.lights_fragment_end,
-
-			// modulation
-			ShaderChunk.aomap_fragment,
-
-			'vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;',
-
-			ShaderChunk.envmap_fragment,
-
-			'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
-
-			ShaderChunk.tonemapping_fragment,
-			ShaderChunk.encodings_fragment,
-			ShaderChunk.fog_fragment,
-			ShaderChunk.premultiplied_alpha_fragment,
-			ShaderChunk.dithering_fragment,
-			'}',
-		].join( '\n' );
+		this.fragmentShader = ShaderLib.phong.fragmentShader;
 
 		this.setValues( parameters );
 

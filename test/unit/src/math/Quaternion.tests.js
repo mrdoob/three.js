@@ -12,14 +12,14 @@ import {
 	z,
 	w,
 	eps
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 const orders = [ 'XYZ', 'YXZ', 'ZXY', 'ZYX', 'YZX', 'XZY' ];
 const eulerAngles = new Euler( 0.1, - 0.3, 0.25 );
 
 function qSub( a, b ) {
 
-	var result = new Quaternion();
+	const result = new Quaternion();
 	result.copy( a );
 
 	result.x -= b.x;
@@ -33,7 +33,7 @@ function qSub( a, b ) {
 
 function doSlerpObject( aArr, bArr, t ) {
 
-	var a = new Quaternion().fromArray( aArr ),
+	const a = new Quaternion().fromArray( aArr ),
 		b = new Quaternion().fromArray( bArr ),
 		c = new Quaternion().fromArray( aArr );
 
@@ -63,7 +63,7 @@ function doSlerpObject( aArr, bArr, t ) {
 
 function doSlerpArray( a, b, t ) {
 
-	var result = [ 0, 0, 0, 0 ];
+	const result = [ 0, 0, 0, 0 ];
 
 	Quaternion.slerpFlat( result, 0, a, 0, b, 0, t );
 
@@ -98,27 +98,27 @@ function doSlerpArray( a, b, t ) {
 
 function slerpTestSkeleton( doSlerp, maxError, assert ) {
 
-	var a, b, result;
+	let result;
 
-	a = [
+	const a = [
 		0.6753410084407496,
 		0.4087830051091744,
 		0.32856700410659473,
 		0.5185120064806223
 	];
 
-	b = [
+	const b = [
 		0.6602792107657797,
 		0.43647413932562285,
 		0.35119011210236006,
 		0.5001871596632682
 	];
 
-	var maxNormError = 0;
+	let maxNormError = 0;
 
 	function isNormal( result ) {
 
-		var normError = Math.abs( 1 - result.length );
+		const normError = Math.abs( 1 - result.length );
 		maxNormError = Math.max( maxNormError, normError );
 		return normError <= maxError;
 
@@ -144,7 +144,7 @@ function slerpTestSkeleton( doSlerp, maxError, assert ) {
 	assert.ok( result.dotA < result.dotB, 'Interpolating at 0.75' );
 	assert.ok( isNormal( result ), 'Approximately normal (at 0.75)' );
 
-	var D = Math.SQRT1_2;
+	const D = Math.SQRT1_2;
 
 	result = doSlerp( [ 1, 0, 0, 0 ], [ 0, 0, 1, 0 ], 0.5 );
 	assert.ok( result.equals( D, 0, D, 0 ), 'X/Z diagonal from axes' );
@@ -169,13 +169,13 @@ export default QUnit.module( 'Maths', () => {
 		// INSTANCING
 		QUnit.test( 'Instancing', ( assert ) => {
 
-			var a = new Quaternion();
+			let a = new Quaternion();
 			assert.ok( a.x == 0, 'Passed!' );
 			assert.ok( a.y == 0, 'Passed!' );
 			assert.ok( a.z == 0, 'Passed!' );
 			assert.ok( a.w == 1, 'Passed!' );
 
-			var a = new Quaternion( x, y, z, w );
+			a = new Quaternion( x, y, z, w );
 			assert.ok( a.x === x, 'Passed!' );
 			assert.ok( a.y === y, 'Passed!' );
 			assert.ok( a.z === z, 'Passed!' );
@@ -201,7 +201,7 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.expect( 8 );
 
-			var a = new Quaternion();
+			const a = new Quaternion();
 			a._onChange( function () {
 
 				assert.ok( true, 'onChange called' );
@@ -222,7 +222,7 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'x', ( assert ) => {
 
-			var a = new Quaternion();
+			let a = new Quaternion();
 			assert.ok( a.x === 0, 'Passed!' );
 
 			a = new Quaternion( 1, 2, 3 );
@@ -236,7 +236,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.x === 10, 'Passed!' );
 
 			a = new Quaternion( 11, 12, 13 );
-			var b = false;
+			let b = false;
 			a._onChange( function () {
 
 				b = true;
@@ -251,7 +251,7 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'y', ( assert ) => {
 
-			var a = new Quaternion();
+			let a = new Quaternion();
 			assert.ok( a.y === 0, 'Passed!' );
 
 			a = new Quaternion( 1, 2, 3 );
@@ -265,7 +265,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.y === 10, 'Passed!' );
 
 			a = new Quaternion( 11, 12, 13 );
-			var b = false;
+			let b = false;
 			a._onChange( function () {
 
 				b = true;
@@ -281,7 +281,7 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( 'z', ( assert ) => {
 
 
-			var a = new Quaternion();
+			let a = new Quaternion();
 			assert.ok( a.z === 0, 'Passed!' );
 
 			a = new Quaternion( 1, 2, 3 );
@@ -295,7 +295,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.z === 10, 'Passed!' );
 
 			a = new Quaternion( 11, 12, 13 );
-			var b = false;
+			let b = false;
 			a._onChange( function () {
 
 				b = true;
@@ -310,7 +310,7 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'w', ( assert ) => {
 
-			var a = new Quaternion();
+			let a = new Quaternion();
 			assert.ok( a.w === 1, 'Passed!' );
 
 			a = new Quaternion( 1, 2, 3 );
@@ -324,7 +324,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.w === 10, 'Passed!' );
 
 			a = new Quaternion( 11, 12, 13 );
-			var b = false;
+			let b = false;
 			a._onChange( function () {
 
 				b = true;
@@ -338,9 +338,16 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
+		QUnit.test( 'isQuaternion', ( assert ) => {
+
+			const object = new Quaternion();
+			assert.ok( object.isQuaternion, 'Quaternion.isQuaternion should be true' );
+
+		} );
+
 		QUnit.test( 'set', ( assert ) => {
 
-			var a = new Quaternion();
+			const a = new Quaternion();
 			assert.ok( a.x == 0, 'Passed!' );
 			assert.ok( a.y == 0, 'Passed!' );
 			assert.ok( a.z == 0, 'Passed!' );
@@ -357,13 +364,13 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( 'clone', ( assert ) => {
 
 
-			var a = new Quaternion().clone();
+			const a = new Quaternion().clone();
 			assert.ok( a.x == 0, 'Passed!' );
 			assert.ok( a.y == 0, 'Passed!' );
 			assert.ok( a.z == 0, 'Passed!' );
 			assert.ok( a.w == 1, 'Passed!' );
 
-			var b = a.set( x, y, z, w ).clone();
+			const b = a.set( x, y, z, w ).clone();
 			assert.ok( b.x == x, 'Passed!' );
 			assert.ok( b.y == y, 'Passed!' );
 			assert.ok( b.z === z, 'Passed!' );
@@ -373,8 +380,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'copy', ( assert ) => {
 
-			var a = new Quaternion( x, y, z, w );
-			var b = new Quaternion().copy( a );
+			const a = new Quaternion( x, y, z, w );
+			const b = new Quaternion().copy( a );
 			assert.ok( b.x == x, 'Passed!' );
 			assert.ok( b.y == y, 'Passed!' );
 			assert.ok( b.z == z, 'Passed!' );
@@ -392,15 +399,15 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setFromEuler/setFromQuaternion', ( assert ) => {
 
-			var angles = [ new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ) ];
+			const angles = [ new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ) ];
 
 			// ensure euler conversion to/from Quaternion matches.
-			for ( var i = 0; i < orders.length; i ++ ) {
+			for ( let i = 0; i < orders.length; i ++ ) {
 
-				for ( var j = 0; j < angles.length; j ++ ) {
+				for ( let j = 0; j < angles.length; j ++ ) {
 
-					var eulers2 = new Euler().setFromQuaternion( new Quaternion().setFromEuler( new Euler( angles[ j ].x, angles[ j ].y, angles[ j ].z, orders[ i ] ) ), orders[ i ] );
-					var newAngle = new Vector3( eulers2.x, eulers2.y, eulers2.z );
+					const eulers2 = new Euler().setFromQuaternion( new Quaternion().setFromEuler( new Euler( angles[ j ].x, angles[ j ].y, angles[ j ].z, orders[ i ] ) ), orders[ i ] );
+					const newAngle = new Vector3( eulers2.x, eulers2.y, eulers2.z );
 					assert.ok( newAngle.distanceTo( angles[ j ] ) < 0.001, 'Passed!' );
 
 				}
@@ -414,18 +421,18 @@ export default QUnit.module( 'Maths', () => {
 			// TODO: find cases to validate.
 			// assert.ok( true, "Passed!" );
 
-			var zero = new Quaternion();
+			const zero = new Quaternion();
 
-			var a = new Quaternion().setFromAxisAngle( new Vector3( 1, 0, 0 ), 0 );
+			let a = new Quaternion().setFromAxisAngle( new Vector3( 1, 0, 0 ), 0 );
 			assert.ok( a.equals( zero ), 'Passed!' );
 			a = new Quaternion().setFromAxisAngle( new Vector3( 0, 1, 0 ), 0 );
 			assert.ok( a.equals( zero ), 'Passed!' );
 			a = new Quaternion().setFromAxisAngle( new Vector3( 0, 0, 1 ), 0 );
 			assert.ok( a.equals( zero ), 'Passed!' );
 
-			var b1 = new Quaternion().setFromAxisAngle( new Vector3( 1, 0, 0 ), Math.PI );
+			const b1 = new Quaternion().setFromAxisAngle( new Vector3( 1, 0, 0 ), Math.PI );
 			assert.ok( ! a.equals( b1 ), 'Passed!' );
-			var b2 = new Quaternion().setFromAxisAngle( new Vector3( 1, 0, 0 ), - Math.PI );
+			const b2 = new Quaternion().setFromAxisAngle( new Vector3( 1, 0, 0 ), - Math.PI );
 			assert.ok( ! a.equals( b2 ), 'Passed!' );
 
 			b1.multiply( b2 );
@@ -436,11 +443,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( 'setFromEuler/setFromRotationMatrix', ( assert ) => {
 
 			// ensure euler conversion for Quaternion matches that of Matrix4
-			for ( var i = 0; i < orders.length; i ++ ) {
+			for ( let i = 0; i < orders.length; i ++ ) {
 
-				var q = new Quaternion().setFromEuler( changeEulerOrder( eulerAngles, orders[ i ] ) );
-				var m = new Matrix4().makeRotationFromEuler( changeEulerOrder( eulerAngles, orders[ i ] ) );
-				var q2 = new Quaternion().setFromRotationMatrix( m );
+				const q = new Quaternion().setFromEuler( changeEulerOrder( eulerAngles, orders[ i ] ) );
+				const m = new Matrix4().makeRotationFromEuler( changeEulerOrder( eulerAngles, orders[ i ] ) );
+				const q2 = new Quaternion().setFromRotationMatrix( m );
 
 				assert.ok( qSub( q, q2 ).length() < 0.001, 'Passed!' );
 
@@ -453,10 +460,10 @@ export default QUnit.module( 'Maths', () => {
 			// contrived examples purely to please the god of code coverage...
 			// match conditions in various 'else [if]' blocks
 
-			var a = new Quaternion();
-			var q = new Quaternion( - 9, - 2, 3, - 4 ).normalize();
-			var m = new Matrix4().makeRotationFromQuaternion( q );
-			var expected = new Vector4( 0.8581163303210332, 0.19069251784911848, - 0.2860387767736777, 0.38138503569823695 );
+			const a = new Quaternion();
+			let q = new Quaternion( - 9, - 2, 3, - 4 ).normalize();
+			const m = new Matrix4().makeRotationFromQuaternion( q );
+			let expected = new Vector4( 0.8581163303210332, 0.19069251784911848, - 0.2860387767736777, 0.38138503569823695 );
 
 			a.setFromRotationMatrix( m );
 			assert.ok( Math.abs( a.x - expected.x ) <= eps, 'm11 > m22 && m11 > m33: check x' );
@@ -464,9 +471,9 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( Math.abs( a.z - expected.z ) <= eps, 'm11 > m22 && m11 > m33: check z' );
 			assert.ok( Math.abs( a.w - expected.w ) <= eps, 'm11 > m22 && m11 > m33: check w' );
 
-			var q = new Quaternion( - 1, - 2, 1, - 1 ).normalize();
+			q = new Quaternion( - 1, - 2, 1, - 1 ).normalize();
 			m.makeRotationFromQuaternion( q );
-			var expected = new Vector4( 0.37796447300922714, 0.7559289460184544, - 0.37796447300922714, 0.37796447300922714 );
+			expected = new Vector4( 0.37796447300922714, 0.7559289460184544, - 0.37796447300922714, 0.37796447300922714 );
 
 			a.setFromRotationMatrix( m );
 			assert.ok( Math.abs( a.x - expected.x ) <= eps, 'm22 > m33: check x' );
@@ -478,10 +485,10 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setFromUnitVectors', ( assert ) => {
 
-			var a = new Quaternion();
-			var b = new Vector3( 1, 0, 0 );
-			var c = new Vector3( 0, 1, 0 );
-			var expected = new Quaternion( 0, 0, Math.sqrt( 2 ) / 2, Math.sqrt( 2 ) / 2 );
+			const a = new Quaternion();
+			const b = new Vector3( 1, 0, 0 );
+			const c = new Vector3( 0, 1, 0 );
+			const expected = new Quaternion( 0, 0, Math.sqrt( 2 ) / 2, Math.sqrt( 2 ) / 2 );
 
 			a.setFromUnitVectors( b, c );
 			assert.ok( Math.abs( a.x - expected.x ) <= eps, 'Check x' );
@@ -493,9 +500,9 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'angleTo', ( assert ) => {
 
-			var a = new Quaternion();
-			var b = new Quaternion().setFromEuler( new Euler( 0, Math.PI, 0 ) );
-			var c = new Quaternion().setFromEuler( new Euler( 0, Math.PI * 2, 0 ) );
+			const a = new Quaternion();
+			const b = new Quaternion().setFromEuler( new Euler( 0, Math.PI, 0 ) );
+			const c = new Quaternion().setFromEuler( new Euler( 0, Math.PI * 2, 0 ) );
 
 			assert.ok( a.angleTo( a ) === 0, 'Passed!' );
 			assert.ok( a.angleTo( b ) === Math.PI, 'Passed!' );
@@ -505,11 +512,11 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'rotateTowards', ( assert ) => {
 
-			var a = new Quaternion();
-			var b = new Quaternion().setFromEuler( new Euler( 0, Math.PI, 0 ) );
-			var c = new Quaternion();
+			const a = new Quaternion();
+			const b = new Quaternion().setFromEuler( new Euler( 0, Math.PI, 0 ) );
+			const c = new Quaternion();
 
-			var halfPI = Math.PI * 0.5;
+			const halfPI = Math.PI * 0.5;
 
 			a.rotateTowards( b, 0 );
 			assert.ok( a.equals( a ) === true, 'Passed!' );
@@ -525,7 +532,7 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'identity', ( assert ) => {
 
-			var a = new Quaternion();
+			const a = new Quaternion();
 
 			a.set( x, y, z, w );
 			a.identity();
@@ -539,11 +546,11 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'invert/conjugate', ( assert ) => {
 
-			var a = new Quaternion( x, y, z, w );
+			const a = new Quaternion( x, y, z, w );
 
 			// TODO: add better validation here.
 
-			var b = a.clone().conjugate();
+			const b = a.clone().conjugate();
 
 			assert.ok( a.x == - b.x, 'Passed!' );
 			assert.ok( a.y == - b.y, 'Passed!' );
@@ -554,8 +561,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'dot', ( assert ) => {
 
-			var a = new Quaternion();
-			var b = new Quaternion();
+			let a = new Quaternion();
+			let b = new Quaternion();
 
 			assert.ok( a.dot( b ) === 1, 'Passed!' );
 			a = new Quaternion( 1, 2, 3, 1 );
@@ -568,7 +575,7 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'normalize/length/lengthSq', ( assert ) => {
 
-			var a = new Quaternion( x, y, z, w );
+			const a = new Quaternion( x, y, z, w );
 
 			assert.ok( a.length() != 1, 'Passed!' );
 			assert.ok( a.lengthSq() != 1, 'Passed!' );
@@ -587,21 +594,21 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'multiplyQuaternions/multiply', ( assert ) => {
 
-			var angles = [ new Euler( 1, 0, 0 ), new Euler( 0, 1, 0 ), new Euler( 0, 0, 1 ) ];
+			const angles = [ new Euler( 1, 0, 0 ), new Euler( 0, 1, 0 ), new Euler( 0, 0, 1 ) ];
 
-			var q1 = new Quaternion().setFromEuler( changeEulerOrder( angles[ 0 ], 'XYZ' ) );
-			var q2 = new Quaternion().setFromEuler( changeEulerOrder( angles[ 1 ], 'XYZ' ) );
-			var q3 = new Quaternion().setFromEuler( changeEulerOrder( angles[ 2 ], 'XYZ' ) );
+			const q1 = new Quaternion().setFromEuler( changeEulerOrder( angles[ 0 ], 'XYZ' ) );
+			const q2 = new Quaternion().setFromEuler( changeEulerOrder( angles[ 1 ], 'XYZ' ) );
+			const q3 = new Quaternion().setFromEuler( changeEulerOrder( angles[ 2 ], 'XYZ' ) );
 
-			var q = new Quaternion().multiplyQuaternions( q1, q2 ).multiply( q3 );
+			const q = new Quaternion().multiplyQuaternions( q1, q2 ).multiply( q3 );
 
-			var m1 = new Matrix4().makeRotationFromEuler( changeEulerOrder( angles[ 0 ], 'XYZ' ) );
-			var m2 = new Matrix4().makeRotationFromEuler( changeEulerOrder( angles[ 1 ], 'XYZ' ) );
-			var m3 = new Matrix4().makeRotationFromEuler( changeEulerOrder( angles[ 2 ], 'XYZ' ) );
+			const m1 = new Matrix4().makeRotationFromEuler( changeEulerOrder( angles[ 0 ], 'XYZ' ) );
+			const m2 = new Matrix4().makeRotationFromEuler( changeEulerOrder( angles[ 1 ], 'XYZ' ) );
+			const m3 = new Matrix4().makeRotationFromEuler( changeEulerOrder( angles[ 2 ], 'XYZ' ) );
 
-			var m = new Matrix4().multiplyMatrices( m1, m2 ).multiply( m3 );
+			const m = new Matrix4().multiplyMatrices( m1, m2 ).multiply( m3 );
 
-			var qFromM = new Quaternion().setFromRotationMatrix( m );
+			const qFromM = new Quaternion().setFromRotationMatrix( m );
 
 			assert.ok( qSub( q, qFromM ).length() < 0.001, 'Passed!' );
 
@@ -609,9 +616,9 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'premultiply', ( assert ) => {
 
-			var a = new Quaternion( x, y, z, w );
-			var b = new Quaternion( 2 * x, - y, - 2 * z, w );
-			var expected = new Quaternion( 42, - 32, - 2, 58 );
+			const a = new Quaternion( x, y, z, w );
+			const b = new Quaternion( 2 * x, - y, - 2 * z, w );
+			const expected = new Quaternion( 42, - 32, - 2, 58 );
 
 			a.premultiply( b );
 			assert.ok( Math.abs( a.x - expected.x ) <= eps, 'Check x' );
@@ -623,30 +630,30 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'slerp', ( assert ) => {
 
-			var a = new Quaternion( x, y, z, w );
-			var b = new Quaternion( - x, - y, - z, - w );
+			const a = new Quaternion( x, y, z, w );
+			const b = new Quaternion( - x, - y, - z, - w );
 
-			var c = a.clone().slerp( b, 0 );
-			var d = a.clone().slerp( b, 1 );
+			const c = a.clone().slerp( b, 0 );
+			const d = a.clone().slerp( b, 1 );
 
 			assert.ok( a.equals( c ), 'Passed' );
 			assert.ok( b.equals( d ), 'Passed' );
 
 
-			var D = Math.SQRT1_2;
+			const D = Math.SQRT1_2;
 
-			var e = new Quaternion( 1, 0, 0, 0 );
-			var f = new Quaternion( 0, 0, 1, 0 );
-			var expected = new Quaternion( D, 0, D, 0 );
-			var result = e.clone().slerp( f, 0.5 );
+			const e = new Quaternion( 1, 0, 0, 0 );
+			const f = new Quaternion( 0, 0, 1, 0 );
+			let expected = new Quaternion( D, 0, D, 0 );
+			let result = e.clone().slerp( f, 0.5 );
 			assert.ok( Math.abs( result.x - expected.x ) <= eps, 'Check x' );
 			assert.ok( Math.abs( result.y - expected.y ) <= eps, 'Check y' );
 			assert.ok( Math.abs( result.z - expected.z ) <= eps, 'Check z' );
 			assert.ok( Math.abs( result.w - expected.w ) <= eps, 'Check w' );
 
 
-			var g = new Quaternion( 0, D, 0, D );
-			var h = new Quaternion( 0, - D, 0, D );
+			const g = new Quaternion( 0, D, 0, D );
+			const h = new Quaternion( 0, - D, 0, D );
 			expected = new Quaternion( 0, 0, 0, 1 );
 			result = g.clone().slerp( h, 0.5 );
 
@@ -659,11 +666,11 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'slerpQuaternions', ( assert ) => {
 
-			var e = new Quaternion( 1, 0, 0, 0 );
-			var f = new Quaternion( 0, 0, 1, 0 );
-			var expected = new Quaternion( Math.SQRT1_2, 0, Math.SQRT1_2, 0 );
+			const e = new Quaternion( 1, 0, 0, 0 );
+			const f = new Quaternion( 0, 0, 1, 0 );
+			const expected = new Quaternion( Math.SQRT1_2, 0, Math.SQRT1_2, 0 );
 
-			var a = new Quaternion();
+			const a = new Quaternion();
 			a.slerpQuaternions( e, f, 0.5 );
 
 			assert.ok( Math.abs( a.x - expected.x ) <= eps, 'Check x' );
@@ -675,11 +682,11 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'random', ( assert ) => {
 
-			var a = new Quaternion();
+			const a = new Quaternion();
 
 			a.random();
 
-			var identity = new Quaternion();
+			const identity = new Quaternion();
 			assert.notDeepEqual(
 				a,
 				identity,
@@ -692,8 +699,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'equals', ( assert ) => {
 
-			var a = new Quaternion( x, y, z, w );
-			var b = new Quaternion( - x, - y, - z, - w );
+			const a = new Quaternion( x, y, z, w );
+			const b = new Quaternion( - x, - y, - z, - w );
 
 			assert.ok( a.x != b.x, 'Passed!' );
 			assert.ok( a.y != b.y, 'Passed!' );
@@ -712,7 +719,7 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'fromArray', ( assert ) => {
 
-			var a = new Quaternion();
+			const a = new Quaternion();
 			a.fromArray( [ x, y, z, w ] );
 			assert.ok( a.x == x, 'Passed!' );
 			assert.ok( a.y == y, 'Passed!' );
@@ -729,22 +736,22 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'toArray', ( assert ) => {
 
-			var a = new Quaternion( x, y, z, w );
+			const a = new Quaternion( x, y, z, w );
 
-			var array = a.toArray();
+			let array = a.toArray();
 			assert.strictEqual( array[ 0 ], x, 'No array, no offset: check x' );
 			assert.strictEqual( array[ 1 ], y, 'No array, no offset: check y' );
 			assert.strictEqual( array[ 2 ], z, 'No array, no offset: check z' );
 			assert.strictEqual( array[ 3 ], w, 'No array, no offset: check w' );
 
-			var array = [];
+			array = [];
 			a.toArray( array );
 			assert.strictEqual( array[ 0 ], x, 'With array, no offset: check x' );
 			assert.strictEqual( array[ 1 ], y, 'With array, no offset: check y' );
 			assert.strictEqual( array[ 2 ], z, 'With array, no offset: check z' );
 			assert.strictEqual( array[ 3 ], w, 'With array, no offset: check w' );
 
-			var array = [];
+			array = [];
 			a.toArray( array, 1 );
 			assert.strictEqual( array[ 0 ], undefined, 'With array and offset: check [0]' );
 			assert.strictEqual( array[ 1 ], x, 'With array and offset: check x' );
@@ -756,9 +763,9 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'fromBufferAttribute', ( assert ) => {
 
-			var a = new Quaternion();
+			const a = new Quaternion();
 
-			var attribute = new BufferAttribute( new Float32Array( [
+			const attribute = new BufferAttribute( new Float32Array( [
 
 				0, 0, 0, 1,
 				.7, 0, 0, .7,
@@ -788,14 +795,14 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( '_onChange', ( assert ) => {
 
-			var b = false;
-			var f = function () {
+			let b = false;
+			const f = function () {
 
 				b = true;
 
 			};
 
-			var a = new Quaternion( 11, 12, 13, 1 );
+			const a = new Quaternion( 11, 12, 13, 1 );
 			a._onChange( f );
 			assert.ok( a._onChangeCallback === f, 'Passed!' );
 
@@ -807,9 +814,9 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( '_onChangeCallback', ( assert ) => {
 
-			var b = false;
-			var a = new Quaternion( 11, 12, 13, 1 );
-			var f = function () {
+			let b = false;
+			const a = new Quaternion( 11, 12, 13, 1 );
+			const f = function () {
 
 				b = true;
 				assert.ok( a === this, 'Passed!' );
@@ -828,25 +835,47 @@ export default QUnit.module( 'Maths', () => {
 		// OTHERS
 		QUnit.test( 'multiplyVector3', ( assert ) => {
 
-			var angles = [ new Euler( 1, 0, 0 ), new Euler( 0, 1, 0 ), new Euler( 0, 0, 1 ) ];
+			const angles = [ new Euler( 1, 0, 0 ), new Euler( 0, 1, 0 ), new Euler( 0, 0, 1 ) ];
 
 			// ensure euler conversion for Quaternion matches that of Matrix4
-			for ( var i = 0; i < orders.length; i ++ ) {
+			for ( let i = 0; i < orders.length; i ++ ) {
 
-				for ( var j = 0; j < angles.length; j ++ ) {
+				for ( let j = 0; j < angles.length; j ++ ) {
 
-					var q = new Quaternion().setFromEuler( changeEulerOrder( angles[ j ], orders[ i ] ) );
-					var m = new Matrix4().makeRotationFromEuler( changeEulerOrder( angles[ j ], orders[ i ] ) );
+					const q = new Quaternion().setFromEuler( changeEulerOrder( angles[ j ], orders[ i ] ) );
+					const m = new Matrix4().makeRotationFromEuler( changeEulerOrder( angles[ j ], orders[ i ] ) );
 
-					var v0 = new Vector3( 1, 0, 0 );
-					var qv = v0.clone().applyQuaternion( q );
-					var mv = v0.clone().applyMatrix4( m );
+					const v0 = new Vector3( 1, 0, 0 );
+					const qv = v0.clone().applyQuaternion( q );
+					const mv = v0.clone().applyMatrix4( m );
 
 					assert.ok( qv.distanceTo( mv ) < 0.001, 'Passed!' );
 
 				}
 
 			}
+
+		} );
+
+		QUnit.test( 'toJSON', ( assert ) => {
+
+			const q = new Quaternion( 0, 0.5, 0.7, 1 );
+			const array = q.toJSON();
+			assert.strictEqual( array[ 0 ], 0, 'Quaternion is serializable.' );
+			assert.strictEqual( array[ 1 ], 0.5, 'Quaternion is serializable.' );
+			assert.strictEqual( array[ 2 ], 0.7, 'Quaternion is serializable.' );
+			assert.strictEqual( array[ 3 ], 1, 'Quaternion is serializable.' );
+
+		} );
+
+		QUnit.test( 'iterable', ( assert ) => {
+
+			const q = new Quaternion( 0, 0.5, 0.7, 1 );
+			const array = [ ...q ];
+			assert.strictEqual( array[ 0 ], 0, 'Quaternion is iterable.' );
+			assert.strictEqual( array[ 1 ], 0.5, 'Quaternion is iterable.' );
+			assert.strictEqual( array[ 2 ], 0.7, 'Quaternion is iterable.' );
+			assert.strictEqual( array[ 3 ], 1, 'Quaternion is iterable.' );
 
 		} );
 

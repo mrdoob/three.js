@@ -15,12 +15,6 @@ class HalftonePass extends Pass {
 
 		super();
 
-	 	if ( HalftoneShader === undefined ) {
-
-	 		console.error( 'THREE.HalftonePass requires HalftoneShader' );
-
-	 	}
-
 	 	this.uniforms = UniformsUtils.clone( HalftoneShader.uniforms );
 	 	this.material = new ShaderMaterial( {
 	 		uniforms: this.uniforms,
@@ -71,6 +65,14 @@ class HalftonePass extends Pass {
  		this.uniforms.height.value = height;
 
  	}
+
+	dispose() {
+
+		this.material.dispose();
+
+		this.fsQuad.dispose();
+
+	}
 
 }
 

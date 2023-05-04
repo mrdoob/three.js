@@ -1,3 +1,9 @@
+if ( window.GPUShaderStage === undefined ) {
+
+	window.GPUShaderStage = { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
+
+}
+
 class WebGPU {
 
 	static isAvailable() {
@@ -8,7 +14,7 @@ class WebGPU {
 
 	static getErrorMessage() {
 
-		const message = 'Your browser does not support <a href="https://gpuweb.github.io/gpuweb/" style="color:blue">WebGPU</a>';
+		const message = 'Your browser does not support <a href="https://gpuweb.github.io/gpuweb/" style="color:blue">WebGPU</a> yet';
 
 		const element = document.createElement( 'div' );
 		element.id = 'webgpumessage';
@@ -19,7 +25,7 @@ class WebGPU {
 		element.style.background = '#fff';
 		element.style.color = '#000';
 		element.style.padding = '1.5em';
-		element.style.width = '400px';
+		element.style.maxWidth = '400px';
 		element.style.margin = '5em auto 0';
 
 		element.innerHTML = message;

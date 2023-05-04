@@ -67,12 +67,6 @@ class SMAAPass extends Pass {
 
 		// materials - pass 1
 
-		if ( SMAAEdgesShader === undefined ) {
-
-			console.error( 'THREE.SMAAPass relies on SMAAShader' );
-
-		}
-
 		this.uniformsEdges = UniformsUtils.clone( SMAAEdgesShader.uniforms );
 
 		this.uniformsEdges[ 'resolution' ].value.set( 1 / width, 1 / height );
@@ -180,6 +174,22 @@ class SMAAPass extends Pass {
 	getSearchTexture() {
 
 		return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEIAAAAhCAAAAABIXyLAAAAAOElEQVRIx2NgGAWjYBSMglEwEICREYRgFBZBqDCSLA2MGPUIVQETE9iNUAqLR5gIeoQKRgwXjwAAGn4AtaFeYLEAAAAASUVORK5CYII=';
+
+	}
+
+	dispose() {
+
+		this.edgesRT.dispose();
+		this.weightsRT.dispose();
+
+		this.areaTexture.dispose();
+		this.searchTexture.dispose();
+
+		this.materialEdges.dispose();
+		this.materialWeights.dispose();
+		this.materialBlend.dispose();
+
+		this.fsQuad.dispose();
 
 	}
 

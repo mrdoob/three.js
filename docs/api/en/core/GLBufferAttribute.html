@@ -12,10 +12,10 @@
 		<p class="desc">
 			This buffer attribute class does not construct a VBO. Instead, it uses
 			whatever VBO is passed in constructor and can later be altered via the
-			*buffer* property.<br /><br />
-			It is required to pass additional params alongside the VBO. Those are:
-			the GL context, the GL data type, the number of components per vertex,
-			the number of bytes per component, and the number of vertices.<br /><br />
+			`buffer` property.<br /><br />
+			It is required to pass additional params alongside the VBO. Those are: the
+			GL context, the GL data type, the number of components per vertex, the
+			number of bytes per component, and the number of vertices.<br /><br />
 			The most common use case for this class is when some kind of GPGPU
 			calculation interferes or even produces the VBOs in question.
 		</p>
@@ -23,15 +23,21 @@
 		<h2>Constructor</h2>
 		<h3>[name]( [param:WebGLBuffer buffer], [param:GLenum type], [param:Integer itemSize], [param:Integer elementSize], [param:Integer count] )</h3>
 		<p>
-		*buffer* — Must be a <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer" target="_blank">WebGLBuffer</a>.
-		<br />
-		*type* — One of <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Data_types" target="_blank">WebGL Data Types</a>.
-		<br />
-		*itemSize* — The number of values of the array that should be associated with
-		a particular vertex. For instance, if this
-		attribute is storing a 3-component vector (such as a position, normal, or color), then itemSize should be 3.
-		<br />
-		*elementSize* — 1, 2 or 4. The corresponding size (in bytes) for the given "type" param.
+			`buffer` — Must be a
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer].
+			<br />
+			`type` — One of
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Data_types WebGL Data Types].
+			<br />
+			`itemSize` — The number of values of the array that should be associated
+			with a particular vertex. For instance, if this attribute is storing a
+			3-component vector (such as a position, normal, or color), then itemSize
+			should be 3.
+			<br />
+			`elementSize` — 1, 2 or 4. The corresponding size (in bytes) for the given
+			"type" param.
+		</p>
+
 		<ul>
 			<li>gl.FLOAT: 4</li>
 			<li>gl.UNSIGNED_SHORT: 2</li>
@@ -41,71 +47,71 @@
 			<li>gl.BYTE: 1</li>
 			<li>gl.UNSIGNED_BYTE: 1</li>
 		</ul>
-		*count* — The expected number of vertices in VBO.
-		</p>
+		`count` — The expected number of vertices in VBO.
 
 		<h2>Properties</h2>
 
 		<h3>[property:WebGLBuffer buffer]</h3>
 		<p>
-			The current <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer" target="_blank">WebGLBuffer</a> instance.
+			The current
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer] instance.
 		</p>
 
 		<h3>[property:Integer count]</h3>
-		<p>
-			The expected number of vertices in VBO.
-		</p>
+		<p>The expected number of vertices in VBO.</p>
+
+		<h3>[property:Boolean isGLBufferAttribute]</h3>
+		<p>Read-only. Always `true`.</p>
 
 		<h3>[property:Integer itemSize]</h3>
-		<p>
-			How many values make up each item (vertex).
-		</p>
+		<p>How many values make up each item (vertex).</p>
 
 		<h3>[property:Integer elementSize]</h3>
 		<p>
-			Stores the corresponding size in bytes for the current *type* property value.
+			Stores the corresponding size in bytes for the current `type` property
+			value.
 		</p>
+		<p>See above (constructor) for a list of known type sizes.</p>
+
+		<h3>[property:String name]</h3>
 		<p>
-			See above (constructor) for a list of known type sizes.
+			Optional name for this attribute instance. Default is an empty string.
 		</p>
 
 		<h3>[property:GLenum type]</h3>
 		<p>
-			A <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Data_types" target="_blank">WebGL Data Type</a>
-			describing the underlying VBO contents.
+			A
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Data_types WebGL Data Type] describing the underlying VBO contents.
 		</p>
 		<p>
-			Set this property together with *elementSize*. The recommended way is
-			using the *setType* method.
-		</p>
-
-		<h3>[property:Boolean isGLBufferAttribute]</h3>
-		<p>
-			Read-only. Always *true*.
+			Set this property together with `elementSize`. The recommended way is
+			using the `setType` method.
 		</p>
 
 		<h2>Methods</h2>
 
-		<h3>[method:this setBuffer]( buffer ) </h3>
-		<p>Sets the *buffer* property.</p>
+		<h3>[method:this setBuffer]( buffer )</h3>
+		<p>Sets the `buffer` property.</p>
 
-		<h3>[method:this setType]( type, elementSize ) </h3>
-		<p>Sets the both *type* and *elementSize* properties.</p>
+		<h3>[method:this setType]( type, elementSize )</h3>
+		<p>Sets the both `type` and `elementSize` properties.</p>
 
-		<h3>[method:this setItemSize]( itemSize ) </h3>
-		<p>Sets the *itemSize* property.</p>
+		<h3>[method:this setItemSize]( itemSize )</h3>
+		<p>Sets the `itemSize` property.</p>
 
-		<h3>[method:this setCount]( count ) </h3>
-		<p>Sets the *count* property.</p>
+		<h3>[method:this setCount]( count )</h3>
+		<p>Sets the `count` property.</p>
 
 		<h3>[property:Integer version]</h3>
 		<p>
-		A version number, incremented every time the needsUpdate property is set to true.
+			A version number, incremented every time the needsUpdate property is set
+			to true.
 		</p>
 
 		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
-		Default is *false*. Setting this to true increments [page:GLBufferAttribute.version version].
+			Default is `false`. Setting this to true increments
+			[page:GLBufferAttribute.version version].
 		</p>
 
 		<h2>Source</h2>

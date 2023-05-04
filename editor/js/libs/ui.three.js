@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-import { RGBELoader } from '../../../examples/jsm/loaders/RGBELoader.js';
-import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
+import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { TGALoader } from 'three/addons/loaders/TGALoader.js';
 
 import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
 import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
@@ -146,7 +146,7 @@ class UITexture extends UISpan {
 
 			const image = texture.image;
 
-			if ( image !== undefined && image.width > 0 ) {
+			if ( image !== undefined && image !== null && image.width > 0 ) {
 
 				canvas.title = texture.sourceFile;
 				const scale = canvas.width / image.width;
@@ -178,13 +178,13 @@ class UITexture extends UISpan {
 
 	}
 
-	setEncoding( encoding ) {
+	setColorSpace( colorSpace ) {
 
 		const texture = this.getValue();
 
 		if ( texture !== null ) {
 
-			texture.encoding = encoding;
+			texture.colorSpace = colorSpace;
 
 		}
 
@@ -275,12 +275,12 @@ class UICubeTexture extends UIElement {
 
 	}
 
-	setEncoding( encoding ) {
+	setColorSpace( colorSpace ) {
 
 		const cubeTexture = this.getValue();
 		if ( cubeTexture !== null ) {
 
-			cubeTexture.encoding = encoding;
+			cubeTexture.colorSpace = colorSpace;
 
 		}
 
@@ -926,7 +926,6 @@ function renderToCanvas( texture ) {
 	if ( renderer === undefined ) {
 
 		renderer = new THREE.WebGLRenderer();
-		renderer.outputEncoding = THREE.sRGBEncoding;
 
 	}
 

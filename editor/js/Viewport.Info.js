@@ -47,19 +47,23 @@ function ViewportInfo( editor ) {
 
 				objects ++;
 
-				if ( object.isMesh ) {
+				if ( object.isMesh || object.isPoints ) {
 
 					const geometry = object.geometry;
 
 					vertices += geometry.attributes.position.count;
 
-					if ( geometry.index !== null ) {
+					if ( object.isMesh ) {
 
-						triangles += geometry.index.count / 3;
+						if ( geometry.index !== null ) {
 
-					} else {
+							triangles += geometry.index.count / 3;
 
-						triangles += geometry.attributes.position.count / 3;
+						} else {
+
+							triangles += geometry.attributes.position.count / 3;
+
+						}
 
 					}
 

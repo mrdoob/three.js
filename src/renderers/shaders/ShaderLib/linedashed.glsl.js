@@ -5,6 +5,7 @@ attribute float lineDistance;
 varying float vLineDistance;
 
 #include <common>
+#include <uv_pars_vertex>
 #include <color_pars_vertex>
 #include <fog_pars_vertex>
 #include <morphtarget_pars_vertex>
@@ -15,7 +16,9 @@ void main() {
 
 	vLineDistance = scale * lineDistance;
 
+	#include <uv_vertex>
 	#include <color_vertex>
+	#include <morphcolor_vertex>
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
 	#include <project_vertex>
@@ -37,6 +40,8 @@ varying float vLineDistance;
 
 #include <common>
 #include <color_pars_fragment>
+#include <uv_pars_fragment>
+#include <map_pars_fragment>
 #include <fog_pars_fragment>
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
@@ -55,6 +60,7 @@ void main() {
 	vec3 outgoingLight = vec3( 0.0 );
 
 	#include <logdepthbuf_fragment>
+	#include <map_fragment>
 	#include <color_fragment>
 
 	outgoingLight = diffuseColor.rgb; // simple shader

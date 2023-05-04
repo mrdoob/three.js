@@ -13,12 +13,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,11 +28,11 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
 
 			const params = {
 				envMap: 'EXR',
@@ -61,13 +62,19 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
 				//
 
 				let geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
 				let material = new THREE.MeshStandardMaterial( {
-					metalness: params.roughness,
-					roughness: params.metalness,
+					metalness: params.metalness,
+					roughness: params.roughness,
 					envMapIntensity: 1.0
 				} );
 
@@ -88,38 +95,27 @@
 
 				};
 
-				new EXRLoader()
-					.load( 'textures/piz_compressed.exr', function ( texture ) {
+				new EXRLoader().load( 'textures/piz_compressed.exr', function ( texture ) {
 
-						exrCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
-						exrBackground = exrCubeRenderTarget.texture;
+					texture.mapping = THREE.EquirectangularReflectionMapping;
 
-						texture.dispose();
+					exrCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
+					exrBackground = texture;
 
-					} );
+				} );
 
 				new THREE.TextureLoader().load( 'textures/equirectangular.png', function ( texture ) {
 
-					texture.encoding = THREE.sRGBEncoding;
+					texture.mapping = THREE.EquirectangularReflectionMapping;
+					texture.colorSpace = THREE.SRGBColorSpace;
 
 					pngCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
-
-					pngBackground = pngCubeRenderTarget.texture;
-
-					texture.dispose();
+					pngBackground = texture;
 
 				} );
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
-
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.appendChild( renderer.domElement );
-
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

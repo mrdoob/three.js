@@ -60,7 +60,7 @@ const LoaderUtils = {
 
 					files.push( file );
 
-					filesMap[ entry.fullPath.substr( 1 ) ] = file;
+					filesMap[ entry.fullPath.slice( 1 ) ] = file;
 					onEntryHandled();
 
 				} );

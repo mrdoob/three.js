@@ -4,8 +4,8 @@ import {
 	FileLoader,
 	FloatType,
 	HalfFloatType,
-	LinearEncoding,
 	LinearFilter,
+	LinearSRGBColorSpace,
 	Loader
 } from 'three';
 import { RGBELoader } from '../loaders/RGBELoader.js';
@@ -23,19 +23,6 @@ class HDRCubeTextureLoader extends Loader {
 
 	load( urls, onLoad, onProgress, onError ) {
 
-		if ( ! Array.isArray( urls ) ) {
-
-			console.warn( 'THREE.HDRCubeTextureLoader signature has changed. Use .setDataType() instead.' );
-
-			this.setDataType( urls );
-
-			urls = onLoad;
-			onLoad = onProgress;
-			onProgress = onError;
-			onError = arguments[ 4 ];
-
-		}
-
 		const texture = new CubeTexture();
 
 		texture.type = this.type;
@@ -44,7 +31,7 @@ class HDRCubeTextureLoader extends Loader {
 
 			case FloatType:
 
-				texture.encoding = LinearEncoding;
+				texture.colorSpace = LinearSRGBColorSpace;
 				texture.minFilter = LinearFilter;
 				texture.magFilter = LinearFilter;
 				texture.generateMipmaps = false;
@@ -52,7 +39,7 @@ class HDRCubeTextureLoader extends Loader {
 
 			case HalfFloatType:
 
-				texture.encoding = LinearEncoding;
+				texture.colorSpace = LinearSRGBColorSpace;
 				texture.minFilter = LinearFilter;
 				texture.magFilter = LinearFilter;
 				texture.generateMipmaps = false;
@@ -83,7 +70,7 @@ class HDRCubeTextureLoader extends Loader {
 						const dataTexture = new DataTexture( texData.data, texData.width, texData.height );
 
 						dataTexture.type = texture.type;
-						dataTexture.encoding = texture.encoding;
+						dataTexture.colorSpace = texture.colorSpace;
 						dataTexture.format = texture.format;
 						dataTexture.minFilter = texture.minFilter;
 						dataTexture.magFilter = texture.magFilter;

@@ -23,12 +23,6 @@ class MeshSurfaceSampler {
 
 		let geometry = mesh.geometry;
 
-		if ( ! geometry.isBufferGeometry || geometry.attributes.position.itemSize !== 3 ) {
-
-			throw new Error( 'THREE.MeshSurfaceSampler: Requires BufferGeometry triangle mesh.' );
-
-		}
-
 		if ( geometry.index ) {
 
 			console.warn( 'THREE.MeshSurfaceSampler: Converting geometry to non-indexed BufferGeometry.' );
@@ -114,11 +108,15 @@ class MeshSurfaceSampler {
 
 	sample( targetPosition, targetNormal, targetColor ) {
 
-		const cumulativeTotal = this.distribution[ this.distribution.length - 1 ];
-
-		const faceIndex = this.binarySearch( this.randomFunction() * cumulativeTotal );
-
+		const faceIndex = this.sampleFaceIndex();
 		return this.sampleFace( faceIndex, targetPosition, targetNormal, targetColor );
+
+	}
+
+	sampleFaceIndex() {
+
+		const cumulativeTotal = this.distribution[ this.distribution.length - 1 ];
+		return this.binarySearch( this.randomFunction() * cumulativeTotal );
 
 	}
 

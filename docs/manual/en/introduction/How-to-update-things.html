@@ -80,16 +80,13 @@ scene.add( line );
 				Next we'll randomly add points to the line using a pattern like:
 			</p>
 			<code>
-const positions = line.geometry.attributes.position.array;
+const positionAttribute = line.geometry.getAttribute( 'position' );
 
-let x, y, z, index;
-x = y = z = index = 0;
+let x = 0, y = 0, z = 0;
 
-for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
+for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-    positions[ index ++ ] = x;
-    positions[ index ++ ] = y;
-    positions[ index ++ ] = z;
+	positionAttribute.setXYZ( i, x, y, z );
 
     x += ( Math.random() - 0.5 ) * 30;
     y += ( Math.random() - 0.5 ) * 30;
@@ -108,7 +105,7 @@ line.geometry.setDrawRange( 0, newValue );
 				set the needsUpdate flag like so:
 			</p>
 			<code>
-line.geometry.attributes.position.needsUpdate = true; // required after the first render
+positionAttribute.needsUpdate = true; // required after the first render
 			</code>
 
 			<p>
@@ -121,7 +118,7 @@ line.geometry.computeBoundingSphere();
 			</code>
 
 			<p>
-				[link:https://jsfiddle.net/xvnctbL0/2/ Here is a fiddle] showing an animated line which you can adapt to your use case.
+				[link:https://jsfiddle.net/t4m85pLr/1/ Here is a fiddle] showing an animated line which you can adapt to your use case.
 			</p>
 
 			<h3>Examples</h3>
@@ -150,6 +147,7 @@ line.geometry.computeBoundingSphere();
 						<li>morphing</li>
 						<li>shadow map</li>
 						<li>alpha test</li>
+						<li>transparent</li>
 					</ul>
 				</li>
 			</ul>

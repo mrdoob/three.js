@@ -54,7 +54,11 @@ class DataTextureLoader extends Loader {
 
 			texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
 
-			if ( texData.encoding !== undefined ) {
+			if ( texData.colorSpace !== undefined ) {
+
+				texture.colorSpace = texData.colorSpace;
+
+			} else if ( texData.encoding !== undefined ) { // @deprecated, r152
 
 				texture.encoding = texData.encoding;
 

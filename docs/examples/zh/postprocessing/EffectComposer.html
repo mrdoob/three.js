@@ -15,6 +15,17 @@
 			后期处理过程根据它们添加/插入的顺序来执行，最后一个过程会被自动渲染到屏幕上。
 		</p>
 
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		</code>
+
 		<h2>例子</h2>
 
 		<p>
@@ -58,7 +69,7 @@
 			一个用于表示后期处理过程链（包含顺序）的数组。
 		</p>
 
-		<h3>[property:WebGLRendererTarget readBuffer]</h3>
+		<h3>[property:WebGLRenderTarget readBuffer]</h3>
 		<p>
 			内部读缓冲区的引用。过程一般从该缓冲区读取先前的渲染结果。
 		</p>
@@ -73,7 +84,7 @@
 			最终过程是否被渲染到屏幕（默认帧缓冲区）。
 		</p>
 
-		<h3>[property:WebGLRendererTarget writeBuffer]</h3>
+		<h3>[property:WebGLRenderTarget writeBuffer]</h3>
 		<p>
 			内部写缓冲区的引用。过程常将它们的渲染结果写入该缓冲区。
 		</p>
@@ -86,6 +97,11 @@
 			pass -- 将被添加到过程链的过程<br /><br />
 
 			将传入的过程添加到过程链。
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 		</p>
 
 		<h3>[method:undefined insertPass]( [param:Pass pass], [param:Integer index] )</h3>

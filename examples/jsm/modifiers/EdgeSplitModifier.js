@@ -153,13 +153,6 @@ class EdgeSplitModifier {
 
 		}
 
-		if ( geometry.isGeometry === true ) {
-
-			console.error( 'THREE.EdgeSplitModifier no longer supports THREE.Geometry. Use BufferGeometry instead.' );
-			return;
-
-		}
-
 		let hadNormals = false;
 		let oldNormals = null;
 

@@ -4,9 +4,10 @@ import { Vector3 } from '../math/Vector3.js';
 
 class TorusGeometry extends BufferGeometry {
 
-	constructor( radius = 1, tube = 0.4, radialSegments = 8, tubularSegments = 6, arc = Math.PI * 2 ) {
+	constructor( radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2 ) {
 
 		super();
+
 		this.type = 'TorusGeometry';
 
 		this.parameters = {
@@ -98,6 +99,16 @@ class TorusGeometry extends BufferGeometry {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
+
+	}
+
 	static fromJSON( data ) {
 
 		return new TorusGeometry( data.radius, data.tube, data.radialSegments, data.tubularSegments, data.arc );
@@ -106,4 +117,4 @@ class TorusGeometry extends BufferGeometry {
 
 }
 
-export { TorusGeometry, TorusGeometry as TorusBufferGeometry };
+export { TorusGeometry };

@@ -23,12 +23,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -37,9 +38,11 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { Refractor } from './jsm/objects/Refractor.js';
-			import { WaterRefractionShader } from './jsm/shaders/WaterRefractionShader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Refractor } from 'three/addons/objects/Refractor.js';
+			import { WaterRefractionShader } from 'three/addons/shaders/WaterRefractionShader.js';
+
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
 
 			let camera, scene, renderer, clock;
 
@@ -55,6 +58,7 @@
 
 				// renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

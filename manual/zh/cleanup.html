@@ -1,45 +1,412 @@
 <!DOCTYPE html><html lang="zh"><head>
-    <meta charset="utf-8">
-    <title>Cleanup</title>
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Cleanup">
-    <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+	<meta charset="utf-8">
+	<title>清除</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:site" content="@threejs">
+	<meta name="twitter:title" content="Three.js – Cleanup">
+	<meta property="og:image" content="https://threejs.org/files/share.png">
+	<link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+	<link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+	<link rel="stylesheet" href="../resources/lesson.css">
+	<link rel="stylesheet" href="../resources/lang.css">
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
-<script type="importmap">
+	<script type="importmap">
 {
   "imports": {
     "three": "../../build/three.module.js"
   }
 }
 </script>
-    <link rel="stylesheet" href="/manual/zh/lang.css">
-  </head>
-  <body>
-    <div class="container">
-      <div class="lesson-title">
-        <h1>Cleanup</h1>
-      </div>
-      <div class="lesson">
-        <div class="lesson-main">
-          <p>抱歉，还没有中文翻译哦。 <a href="https://github.com/mrdoob/three.js">欢迎加入翻译</a>! 😄</p>
-<p><a href="/manual/en/cleanup.html">英文原文链接</a>.</p>
+</head>
+<body>
+<div class="container">
+	<div class="lesson-title">
+		<h1>清除</h1>
+	</div>
+	<div class="lesson">
+		<div class="lesson-main">
+			<p>Three.js应用经常使用大量的内存。一个3D模型的所有节点，可能占用1-20M内存。
+				一个模型可能会使用很多纹理，即使它们被压缩成了图片文件，也必须被展开成为未压缩的形态来使用。每个 1024 x 1024 大小的纹理会占用4-5M内存。</p>
+			<p>大多数的three.js应用在初始化的时候加载资源，并且一直使用这些资源直到页面关闭。但是，如果你想随时间的变动加载和改变资源怎么办呢？</p>
+			<p>不像大多数的JavaScript库，three.js不能自动的清除这些资源。
+				如果你切换页面，浏览器会清除这些资源，其它时候如何管理它们取决于你。这是WebGL设计的问题，three.js没有追索权只能将释放资源的责任托付给你。</p>
+			<p>通过在<a href="textures.html">纹理</a>、
+				<a href="primitives.html">图元</a>和
+				<a href="materials.html">材质</a>对象上调用<code class="notranslate" translate="no">dispose</code>方法来释放资源
+				</p>
+			<p>你可以手动来处理。起初，你可能创建了一些资源。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const boxGeometry = new THREE.BoxGeometry(...);
+const boxTexture = textureLoader.load(...);
+const boxMaterial = new THREE.MeshPhongMaterial({map: texture});
+</pre>
+			<p>然后，当你处理完了它们，可以释放它们</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">boxGeometry.dispose();
+boxTexture.dispose();
+boxMaterial.dispose();
+</pre>
+			<p>随着你使用越来越多的资源，这将会变得越来越乏味。</p>
+			<p>为了减少一些乏味的工作，让我们创建一个类来跟踪这些资源。我们会请求这个类来帮我们做清除的工作。
+			</p>
+			<p>这个类一开始是这个样子。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ResourceTracker {
+  constructor() {
+    this.resources = new Set();
+  }
+  track(resource) {
+    if (resource.dispose) {
+      this.resources.add(resource);
+    }
+    return resource;
+  }
+  untrack(resource) {
+    this.resources.delete(resource);
+  }
+  dispose() {
+    for (const resource of this.resources) {
+      resource.dispose();
+    }
+    this.resources.clear();
+  }
+}
+</pre>
+			<p>让我们在<a href="textures.html">纹理文章</a>中的例子中使用这个类。我们可以创建一个这个类的实例。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const resTracker = new ResourceTracker();
+</pre>
+			<p>然后为了让这个类的使用更加地简单，让我们来为<code class="notranslate" translate="no">track</code>方法创建一个绑定函数。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const resTracker = new ResourceTracker();
++const track = resTracker.track.bind(resTracker);
+</pre>
+			<p>现在，我们只需要在我们创建的每个图元、纹理、材质对象上调用<code class="notranslate" translate="no">track</code>方法就可以使用它。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const boxWidth = 1;
+const boxHeight = 1;
+const boxDepth = 1;
+-const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
++const geometry = track(new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth));
 
-        </div>
-      </div>
-    </div>
-  
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+const cubes = [];  // an array we can use to rotate the cubes
+const loader = new THREE.TextureLoader();
+
+-const material = new THREE.MeshBasicMaterial({
+-  map: loader.load('resources/images/wall.jpg'),
+-});
++const material = track(new THREE.MeshBasicMaterial({
++  map: track(loader.load('resources/images/wall.jpg')),
++}));
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+cubes.push(cube);  // add to our list of cubes to rotate
+</pre>
+			<p>然后，我们从场景中移除这些立方体，再然后调用<code class="notranslate" translate="no">resTracker.dispose</code>来释放它们。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (const cube of cubes) {
+  scene.remove(cube);
+}
+cubes.length = 0;  // clears the cubes array
+resTracker.dispose();
+</pre>
+			<p>这起作用了，但是我发现必须从场景中移除立方体有些乏味。让我们给<code class="notranslate" translate="no">ResourceTracker</code>增加这个功能。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ResourceTracker {
+  constructor() {
+    this.resources = new Set();
+  }
+  track(resource) {
+-    if (resource.dispose) {
++    if (resource.dispose || resource instanceof THREE.Object3D) {
+      this.resources.add(resource);
+    }
+    return resource;
+  }
+  untrack(resource) {
+    this.resources.delete(resource);
+  }
+  dispose() {
+    for (const resource of this.resources) {
+-      resource.dispose();
++      if (resource instanceof THREE.Object3D) {
++        if (resource.parent) {
++          resource.parent.remove(resource);
++        }
++      }
++      if (resource.dispose) {
++        resource.dispose();
++      }
++    }
+    this.resources.clear();
+  }
+}
+</pre>
+			<p>现在我们可以跟踪这些立方体了</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = track(new THREE.MeshBasicMaterial({
+  map: track(loader.load('resources/images/wall.jpg')),
+}));
+const cube = track(new THREE.Mesh(geometry, material));
+scene.add(cube);
+cubes.push(cube);  // add to our list of cubes to rotate
+</pre>
+			<p>我们不再需要编码从场景中移除这些立方体了。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-for (const cube of cubes) {
+-  scene.remove(cube);
+-}
+cubes.length = 0;  // clears the cube array
+resTracker.dispose();
+</pre>
+			<p>让我们来调整一下代码，这样我们可以重新添加立方体、纹理和材质。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+*const cubes = [];  // just an array we can use to rotate the cubes
+
++function addStuffToScene() {
+  const resTracker = new ResourceTracker();
+  const track = resTracker.track.bind(resTracker);
+
+  const boxWidth = 1;
+  const boxHeight = 1;
+  const boxDepth = 1;
+  const geometry = track(new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth));
+
+  const loader = new THREE.TextureLoader();
+
+  const material = track(new THREE.MeshBasicMaterial({
+    map: track(loader.load('resources/images/wall.jpg')),
+  }));
+  const cube = track(new THREE.Mesh(geometry, material));
+  scene.add(cube);
+  cubes.push(cube);  // add to our list of cubes to rotate
++  return resTracker;
++}
+</pre>
+			<p>让我们来编写一些随着时间变动添加和移除物体的代码。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function waitSeconds(seconds = 0) {
+  return new Promise(resolve =&gt; setTimeout(resolve, seconds * 1000));
+}
+
+async function process() {
+  for (;;) {
+    const resTracker = addStuffToScene();
+    await wait(2);
+    cubes.length = 0;  // remove the cubes
+    resTracker.dispose();
+    await wait(1);
+  }
+}
+process();
+</pre>
+			<p>代码将会创建立方体、纹理和材质，等待2秒，然后释放它们，然后等待1秒，重复这个过程。</p>
+			<p></p><div translate="no" class="threejs_example_container notranslate">
+			<div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cleanup-simple.html"></iframe></div>
+			<a class="threejs_center" href="/manual/examples/cleanup-simple.html" target="_blank">点击此处打开独立窗口</a>
+		</div>
+
+			<p></p>
+			<p>这好像能工作了。</p>
+			<p>对于加载文件来说，还需要一点额外的工作。大多数的加载器仅仅返回一个<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>
+				对象，作为它加载的层次对象的根节点，因此我们需要去发现所有的这些资源是哪些。</p>
+			<p>让我们更新<code class="notranslate" translate="no">ResourceTracker</code>来试着去实现它。</p>
+			<p>首先，我们来检测这个物体是否是一个<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>，然后跟踪它的图元、材质和子对象。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ResourceTracker {
+  constructor() {
+    this.resources = new Set();
+  }
+  track(resource) {
+    if (resource.dispose || resource instanceof THREE.Object3D) {
+      this.resources.add(resource);
+    }
++    if (resource instanceof THREE.Object3D) {
++      this.track(resource.geometry);
++      this.track(resource.material);
++      this.track(resource.children);
++    }
+    return resource;
+  }
+  ...
+}
+</pre>
+			<p>现在，因为任意的<code class="notranslate" translate="no">resource.geometry</code>、<code class="notranslate" translate="no">resource.material</code>和<code class="notranslate" translate="no">resource.children</code>有可能为null或undefined，
+				我们将在<code class="notranslate" translate="no">track</code>的入口执行检查。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ResourceTracker {
+  constructor() {
+    this.resources = new Set();
+  }
+  track(resource) {
++    if (!resource) {
++      return resource;
++    }
+
+    if (resource.dispose || resource instanceof THREE.Object3D) {
+      this.resources.add(resource);
+    }
+    if (resource instanceof THREE.Object3D) {
+      this.track(resource.geometry);
+      this.track(resource.material);
+      this.track(resource.children);
+    }
+    return resource;
+  }
+  ...
+}
+</pre>
+			<p>同时，因为<code class="notranslate" translate="no">resource.children</code>是一个数组，
+				同时<code class="notranslate" translate="no">resource.material</code>也可能是数组，让我们对数组做检测。
+				</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ResourceTracker {
+  constructor() {
+    this.resources = new Set();
+  }
+  track(resource) {
+    if (!resource) {
+      return resource;
+    }
+
++    // handle children and when material is an array of materials.
++    if (Array.isArray(resource)) {
++      resource.forEach(resource =&gt; this.track(resource));
++      return resource;
++    }
+
+    if (resource.dispose || resource instanceof THREE.Object3D) {
+      this.resources.add(resource);
+    }
+    if (resource instanceof THREE.Object3D) {
+      this.track(resource.geometry);
+      this.track(resource.material);
+      this.track(resource.children);
+    }
+    return resource;
+  }
+  ...
+}
+</pre>
+			<p>最后我们需要遍历这些材质的属性和uniforms来寻找纹理。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ResourceTracker {
+  constructor() {
+    this.resources = new Set();
+  }
+  track(resource) {
+    if (!resource) {
+      return resource;
+    }
+
+*    // handle children and when material is an array of materials or
+*    // uniform is array of textures
+    if (Array.isArray(resource)) {
+      resource.forEach(resource =&gt; this.track(resource));
+      return resource;
+    }
+
+    if (resource.dispose || resource instanceof THREE.Object3D) {
+      this.resources.add(resource);
+    }
+    if (resource instanceof THREE.Object3D) {
+      this.track(resource.geometry);
+      this.track(resource.material);
+      this.track(resource.children);
+-    }
++    } else if (resource instanceof THREE.Material) {
++      // We have to check if there are any textures on the material
++      for (const value of Object.values(resource)) {
++        if (value instanceof THREE.Texture) {
++          this.track(value);
++        }
++      }
++      // We also have to check if any uniforms reference textures or arrays of textures
++      if (resource.uniforms) {
++        for (const value of Object.values(resource.uniforms)) {
++          if (value) {
++            const uniformValue = value.value;
++            if (uniformValue instanceof THREE.Texture ||
++                Array.isArray(uniformValue)) {
++              this.track(uniformValue);
++            }
++          }
++        }
++      }
++    }
+    return resource;
+  }
+  ...
+}
+</pre>
+			<p>让我们来使用<a href="load-gltf.html">“加载gltf文件文章“</a>中的例子，让它能够加载和释放文件。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gltfLoader = new GLTFLoader();
+function loadGLTF(url) {
+  return new Promise((resolve, reject) =&gt; {
+    gltfLoader.load(url, resolve, undefined, reject);
+  });
+}
+
+function waitSeconds(seconds = 0) {
+  return new Promise(resolve =&gt; setTimeout(resolve, seconds * 1000));
+}
+
+const fileURLs = [
+  'resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf',
+  'resources/models/3dbustchallange_submission/scene.gltf',
+  'resources/models/mountain_landscape/scene.gltf',
+  'resources/models/simple_house_scene/scene.gltf',
+];
+
+async function loadFiles() {
+  for (;;) {
+    for (const url of fileURLs) {
+      const resMgr = new ResourceTracker();
+      const track = resMgr.track.bind(resMgr);
+      const gltf = await loadGLTF(url);
+      const root = track(gltf.scene);
+      scene.add(root);
+
+      // compute the box that contains all the stuff
+      // from root and below
+      const box = new THREE.Box3().setFromObject(root);
+
+      const boxSize = box.getSize(new THREE.Vector3()).length();
+      const boxCenter = box.getCenter(new THREE.Vector3());
+
+      // set the camera to frame the box
+      frameArea(boxSize * 1.1, boxSize, boxCenter, camera);
+
+      await waitSeconds(2);
+      renderer.render(scene, camera);
+
+      resMgr.dispose();
+
+      await waitSeconds(1);
+
+    }
+  }
+}
+loadFiles();
+</pre>
+			<p>然后我们得到了</p>
+			<p></p><div translate="no" class="threejs_example_container notranslate">
+			<div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cleanup-loaded-files.html"></iframe></div>
+			<a class="threejs_center" href="/manual/examples/cleanup-loaded-files.html" target="_blank">点击此处在独立窗口中打开</a>
+		</div>
+
+			<p></p>
+			<p>关于代码的一些注释。</p>
+			<p>如果我们想要加载2个或者更多的文件，并且想要随时地释放它们，我们将要每个文件使用一个<code class="notranslate" translate="no">ResourceTracker</code>。</p>
+			<p>在上面中，我们只是在场景加载之后跟踪了<code class="notranslate" translate="no">gltf.scene</code>。
+				根据<code class="notranslate" translate="no">ResourceTracker</code>的当前实现版本，它会跟踪刚刚加载的所有资源。如果我们向场景中添加了更多的资源，我们需要决定是否要跟踪它们。
+				</p>
+			<p>举例来说，在我们加载了一个角色之后，我们把一个工具放入它的手中，这是通过把工具成为手的子对象来实现的。因此工具将不会被释放。我猜更多的时候，这不是我们想要的。</p>
+			<p>这带来了一个问题。当我起初写上面的<code class="notranslate" translate="no">ResourceTracker</code>的时候，
+				我是在<code class="notranslate" translate="no">dispose</code>方法中遍历所有对象而不是在
+				<code class="notranslate" translate="no">track</code>方法中。稍后，我就想到了上面的成为手的子对象的工具的这个例子，
+				在<code class="notranslate" translate="no">track</code>方法中确切地跟踪哪些对象需要被释放更加地灵活，按理来说也更加地准确，因为我们可以跟踪从文件中加载了什么，而不是稍后从资源图中释放状态。
+				</p>
+			<p>诚实地说，我对ResourceTracker并不是100%满意。在3D引擎中，做这样的事情并不是很常见。我们不应该去猜测什么资源被加载了，我们应该知道。
+				如果three.js能做出改变，所有的文件加载器返回能够引用所有加载资源的标准对象，就太好了。至少在这个时候，three.js在场景加载的时候并没有提供给我们其它的信息。因此，这个方法是有效的。</p>
+			<p>我希望这个例子能给你带来帮助或者至少成为在three.js中如何释放资源的一份好的参考</p>
+
+		</div>
+	</div>
+</div>
+
+<script src="../resources/prettify.js"></script>
+<script src="../resources/lesson.js"></script>
 
 
 

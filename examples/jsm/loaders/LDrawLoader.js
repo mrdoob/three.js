@@ -11,6 +11,7 @@ import {
 	Mesh,
 	MeshStandardMaterial,
 	ShaderMaterial,
+	SRGBColorSpace,
 	UniformsLib,
 	UniformsUtils,
 	Vector3,
@@ -28,16 +29,18 @@ const FINISH_TYPE_METAL = 5;
 
 // State machine to search a subobject path.
 // The LDraw standard establishes these various possible subfolders.
-const FILE_LOCATION_AS_IS = 0;
-const FILE_LOCATION_TRY_PARTS = 1;
-const FILE_LOCATION_TRY_P = 2;
-const FILE_LOCATION_TRY_MODELS = 3;
+const FILE_LOCATION_TRY_PARTS = 0;
+const FILE_LOCATION_TRY_P = 1;
+const FILE_LOCATION_TRY_MODELS = 2;
+const FILE_LOCATION_AS_IS = 3;
 const FILE_LOCATION_TRY_RELATIVE = 4;
 const FILE_LOCATION_TRY_ABSOLUTE = 5;
 const FILE_LOCATION_NOT_FOUND = 6;
 
 const MAIN_COLOUR_CODE = '16';
 const MAIN_EDGE_COLOUR_CODE = '24';
+
+const COLOR_SPACE_LDRAW = SRGBColorSpace;
 
 const _tempVec0 = new Vector3();
 const _tempVec1 = new Vector3();
@@ -688,9 +691,11 @@ class LDrawParsedCache {
 		result.type = original.type;
 		result.category = original.category;
 		result.keywords = original.keywords;
+		result.author = original.author;
 		result.subobjects = original.subobjects;
+		result.fileName = original.fileName;
 		result.totalFaces = original.totalFaces;
-		result.startingConstructionStep = original.startingConstructionStep;
+		result.startingBuildingStep = original.startingBuildingStep;
 		result.materials = original.materials;
 		result.group = null;
 		return result;
@@ -700,7 +705,7 @@ class LDrawParsedCache {
 	async fetchData( fileName ) {
 
 		let triedLowerCase = false;
-		let locationState = FILE_LOCATION_AS_IS;
+		let locationState = FILE_LOCATION_TRY_PARTS;
 		while ( locationState !== FILE_LOCATION_NOT_FOUND ) {
 
 			let subobjectURL = fileName;
@@ -743,7 +748,7 @@ class LDrawParsedCache {
 						fileName = fileName.toLowerCase();
 						subobjectURL = fileName;
 						triedLowerCase = true;
-						locationState = FILE_LOCATION_AS_IS;
+						locationState = FILE_LOCATION_TRY_PARTS;
 
 					}
 
@@ -794,6 +799,7 @@ class LDrawParsedCache {
 		let type = 'Model';
 		let category = null;
 		let keywords = null;
+		let author = null;
 		let totalFaces = 0;
 
 		// split into lines
@@ -816,7 +822,7 @@ class LDrawParsedCache {
 		let bfcInverted = false;
 		let bfcCull = true;
 
-		let startingConstructionStep = false;
+		let startingBuildingStep = false;
 
 		// Parse all line commands
 		for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
@@ -991,7 +997,13 @@ class LDrawParsedCache {
 
 							case 'STEP':
 
-								startingConstructionStep = true;
+								startingBuildingStep = true;
+
+								break;
+
+							case 'Author:':
+
+								author = lp.getToken();
 
 								break;
 
@@ -1059,9 +1071,10 @@ class LDrawParsedCache {
 						matrix: matrix,
 						fileName: fileName,
 						inverted: bfcInverted,
-						startingConstructionStep: startingConstructionStep
+						startingBuildingStep: startingBuildingStep
 					} );
 
+					startingBuildingStep = false;
 					bfcInverted = false;
 
 					break;
@@ -1221,9 +1234,10 @@ class LDrawParsedCache {
 			type,
 			category,
 			keywords,
+			author,
 			subobjects,
 			totalFaces,
-			startingConstructionStep,
+			startingBuildingStep,
 			materials,
 			fileName,
 			group: null
@@ -1356,6 +1370,9 @@ class LDrawPartsGeometryCache {
 			const group = new Group();
 			group.userData.category = info.category;
 			group.userData.keywords = info.keywords;
+			group.userData.author = info.author;
+			group.userData.type = info.type;
+			group.userData.fileName = info.fileName;
 			info.group = group;
 
 			const subobjectInfos = await Promise.all( promises );
@@ -1376,10 +1393,11 @@ class LDrawPartsGeometryCache {
 
 					const subobjectGroup = subobjectInfo;
 					subobject.matrix.decompose( subobjectGroup.position, subobjectGroup.quaternion, subobjectGroup.scale );
-					subobjectGroup.userData.startingConstructionStep = subobject.startingConstructionStep;
+					subobjectGroup.userData.startingBuildingStep = subobject.startingBuildingStep;
 					subobjectGroup.name = subobject.fileName;
 
 					loader.applyMaterialsToMesh( subobjectGroup, subobject.colorCode, info.materials );
+					subobjectGroup.userData.colorCode = subobject.colorCode;
 
 					group.add( subobjectGroup );
 					continue;
@@ -1473,6 +1491,7 @@ class LDrawPartsGeometryCache {
 			if ( subobject ) {
 
 				loader.applyMaterialsToMesh( group, subobject.colorCode, info.materials );
+				group.userData.colorCode = subobject.colorCode;
 
 			}
 
@@ -1883,6 +1902,16 @@ class LDrawLoader extends Loader {
 		// The path to load parts from the LDraw parts library from.
 		this.partsLibraryPath = '';
 
+		// Material assigned to not available colors for meshes and edges
+		this.missingColorMaterial = new MeshStandardMaterial( { color: 0xFF00FF, roughness: 0.3, metalness: 0 } );
+		this.missingColorMaterial.name = 'Missing material';
+		this.missingEdgeColorMaterial = new LineBasicMaterial( { color: 0xFF00FF } );
+		this.missingEdgeColorMaterial.name = 'Missing material - Edge';
+		this.missingConditionalEdgeColorMaterial = new LDrawConditionalLineMaterial( { fog: true, color: 0xFF00FF } );
+		this.missingConditionalEdgeColorMaterial.name = 'Missing material - Conditional Edge';
+		this.missingColorMaterial.userData.edgeMaterial = this.missingEdgeColorMaterial;
+		this.missingEdgeColorMaterial.userData.conditionalEdgeMaterial = this.missingConditionalEdgeColorMaterial;
+
 	}
 
 	setPartsLibraryPath( path ) {
@@ -1933,7 +1962,8 @@ class LDrawLoader extends Loader {
 				.then( group => {
 
 					this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
-					this.computeConstructionSteps( group );
+					this.computeBuildingSteps( group );
+					group.userData.fileName = url;
 					onLoad( group );
 
 				} )
@@ -1949,7 +1979,9 @@ class LDrawLoader extends Loader {
 			.parseModel( text, this.materialLibrary )
 			.then( group => {
 
-				this.computeConstructionSteps( group );
+				this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
+				this.computeBuildingSteps( group );
+				group.userData.fileName = '';
 				onLoad( group );
 
 			} );
@@ -2080,8 +2112,11 @@ class LDrawLoader extends Loader {
 				material = loader.getMaterial( colorCode );
 				if ( material === null ) {
 
-					// otherwise throw an error if this is final opportunity to set the material
-					throw new Error( `LDrawLoader: Material properties for code ${ colorCode } not available.` );
+					// otherwise throw a warning if this is final opportunity to set the material
+					console.warn( `LDrawLoader: Material properties for code ${ colorCode } not available.` );
+
+					// And return the 'missing color' material
+					material = loader.missingColorMaterial;
 
 				}
 
@@ -2118,8 +2153,8 @@ class LDrawLoader extends Loader {
 
 	getMainEdgeMaterial() {
 
-		const mainMat = this.getMainMaterial();
-		return mainMat && mainMat.userData ? mainMat.userData.edgeMaterial : null;
+		const mat = this.getMaterial( MAIN_EDGE_COLOUR_CODE );
+		return mat ? mat.userData.edgeMaterial : null;
 
 	}
 
@@ -2130,8 +2165,8 @@ class LDrawLoader extends Loader {
 		let code = null;
 
 		// Triangle and line colors
-		let color = 0xFF00FF;
-		let edgeColor = 0xFF00FF;
+		let fillColor = '#FF00FF';
+		let edgeColor = '#FF00FF';
 
 		// Transparency
 		let alpha = 1;
@@ -2162,113 +2197,113 @@ class LDrawLoader extends Loader {
 
 			}
 
-			switch ( token.toUpperCase() ) {
+			if ( ! parseLuminance( token ) ) {
 
-				case 'CODE':
+				switch ( token.toUpperCase() ) {
 
-					code = lineParser.getToken();
-					break;
+					case 'CODE':
 
-				case 'VALUE':
+						code = lineParser.getToken();
+						break;
 
-					color = lineParser.getToken();
-					if ( color.startsWith( '0x' ) ) {
+					case 'VALUE':
 
-						color = '#' + color.substring( 2 );
+						fillColor = lineParser.getToken();
+						if ( fillColor.startsWith( '0x' ) ) {
 
-					} else if ( ! color.startsWith( '#' ) ) {
+							fillColor = '#' + fillColor.substring( 2 );
 
-						throw new Error( 'LDrawLoader: Invalid color while parsing material' + lineParser.getLineNumberString() + '.' );
+						} else if ( ! fillColor.startsWith( '#' ) ) {
 
-					}
-
-					break;
-
-				case 'EDGE':
-
-					edgeColor = lineParser.getToken();
-					if ( edgeColor.startsWith( '0x' ) ) {
-
-						edgeColor = '#' + edgeColor.substring( 2 );
-
-					} else if ( ! edgeColor.startsWith( '#' ) ) {
-
-						// Try to see if edge color is a color code
-						edgeMaterial = this.getMaterial( edgeColor );
-						if ( ! edgeMaterial ) {
-
-							throw new Error( 'LDrawLoader: Invalid edge color while parsing material' + lineParser.getLineNumberString() + '.' );
+							throw new Error( 'LDrawLoader: Invalid color while parsing material' + lineParser.getLineNumberString() + '.' );
 
 						}
 
-						// Get the edge material for this triangle material
-						edgeMaterial = edgeMaterial.userData.edgeMaterial;
+						break;
 
-					}
+					case 'EDGE':
 
-					break;
+						edgeColor = lineParser.getToken();
+						if ( edgeColor.startsWith( '0x' ) ) {
 
-				case 'ALPHA':
+							edgeColor = '#' + edgeColor.substring( 2 );
 
-					alpha = parseInt( lineParser.getToken() );
+						} else if ( ! edgeColor.startsWith( '#' ) ) {
 
-					if ( isNaN( alpha ) ) {
+							// Try to see if edge color is a color code
+							edgeMaterial = this.getMaterial( edgeColor );
+							if ( ! edgeMaterial ) {
 
-						throw new Error( 'LDrawLoader: Invalid alpha value in material definition' + lineParser.getLineNumberString() + '.' );
+								throw new Error( 'LDrawLoader: Invalid edge color while parsing material' + lineParser.getLineNumberString() + '.' );
 
-					}
+							}
 
-					alpha = Math.max( 0, Math.min( 1, alpha / 255 ) );
+							// Get the edge material for this triangle material
+							edgeMaterial = edgeMaterial.userData.edgeMaterial;
 
-					if ( alpha < 1 ) {
+						}
 
-						isTransparent = true;
+						break;
 
-					}
+					case 'ALPHA':
 
-					break;
+						alpha = parseInt( lineParser.getToken() );
 
-				case 'LUMINANCE':
+						if ( isNaN( alpha ) ) {
 
-					luminance = parseInt( lineParser.getToken() );
+							throw new Error( 'LDrawLoader: Invalid alpha value in material definition' + lineParser.getLineNumberString() + '.' );
 
-					if ( isNaN( luminance ) ) {
+						}
 
-						throw new Error( 'LDrawLoader: Invalid luminance value in material definition' + LineParser.getLineNumberString() + '.' );
+						alpha = Math.max( 0, Math.min( 1, alpha / 255 ) );
 
-					}
+						if ( alpha < 1 ) {
 
-					luminance = Math.max( 0, Math.min( 1, luminance / 255 ) );
+							isTransparent = true;
 
-					break;
+						}
 
-				case 'CHROME':
-					finishType = FINISH_TYPE_CHROME;
-					break;
+						break;
 
-				case 'PEARLESCENT':
-					finishType = FINISH_TYPE_PEARLESCENT;
-					break;
+					case 'LUMINANCE':
 
-				case 'RUBBER':
-					finishType = FINISH_TYPE_RUBBER;
-					break;
+						if ( ! parseLuminance( lineParser.getToken() ) ) {
 
-				case 'MATTE_METALLIC':
-					finishType = FINISH_TYPE_MATTE_METALLIC;
-					break;
+							throw new Error( 'LDrawLoader: Invalid luminance value in material definition' + LineParser.getLineNumberString() + '.' );
 
-				case 'METAL':
-					finishType = FINISH_TYPE_METAL;
-					break;
+						}
 
-				case 'MATERIAL':
-					// Not implemented
-					lineParser.setToEnd();
-					break;
+						break;
 
-				default:
-					throw new Error( 'LDrawLoader: Unknown token "' + token + '" while parsing material' + lineParser.getLineNumberString() + '.' );
+					case 'CHROME':
+						finishType = FINISH_TYPE_CHROME;
+						break;
+
+					case 'PEARLESCENT':
+						finishType = FINISH_TYPE_PEARLESCENT;
+						break;
+
+					case 'RUBBER':
+						finishType = FINISH_TYPE_RUBBER;
+						break;
+
+					case 'MATTE_METALLIC':
+						finishType = FINISH_TYPE_MATTE_METALLIC;
+						break;
+
+					case 'METAL':
+						finishType = FINISH_TYPE_METAL;
+						break;
+
+					case 'MATERIAL':
+						// Not implemented
+						lineParser.setToEnd();
+						break;
+
+					default:
+						throw new Error( 'LDrawLoader: Unknown token "' + token + '" while parsing material' + lineParser.getLineNumberString() + '.' );
+
+				}
 
 			}
 
@@ -2280,37 +2315,37 @@ class LDrawLoader extends Loader {
 
 			case FINISH_TYPE_DEFAULT:
 
-				material = new MeshStandardMaterial( { color: color, roughness: 0.3, metalness: 0 } );
+				material = new MeshStandardMaterial( { roughness: 0.3, metalness: 0 } );
 				break;
 
 			case FINISH_TYPE_PEARLESCENT:
 
 				// Try to imitate pearlescency by making the surface glossy
-				material = new MeshStandardMaterial( { color: color, roughness: 0.3, metalness: 0.25 } );
+				material = new MeshStandardMaterial( { roughness: 0.3, metalness: 0.25 } );
 				break;
 
 			case FINISH_TYPE_CHROME:
 
 				// Mirror finish surface
-				material = new MeshStandardMaterial( { color: color, roughness: 0, metalness: 1 } );
+				material = new MeshStandardMaterial( { roughness: 0, metalness: 1 } );
 				break;
 
 			case FINISH_TYPE_RUBBER:
 
 				// Rubber finish
-				material = new MeshStandardMaterial( { color: color, roughness: 0.9, metalness: 0 } );
+				material = new MeshStandardMaterial( { roughness: 0.9, metalness: 0 } );
 				break;
 
 			case FINISH_TYPE_MATTE_METALLIC:
 
 				// Brushed metal finish
-				material = new MeshStandardMaterial( { color: color, roughness: 0.8, metalness: 0.4 } );
+				material = new MeshStandardMaterial( { roughness: 0.8, metalness: 0.4 } );
 				break;
 
 			case FINISH_TYPE_METAL:
 
 				// Average metal finish
-				material = new MeshStandardMaterial( { color: color, roughness: 0.2, metalness: 0.85 } );
+				material = new MeshStandardMaterial( { roughness: 0.2, metalness: 0.85 } );
 				break;
 
 			default:
@@ -2319,18 +2354,18 @@ class LDrawLoader extends Loader {
 
 		}
 
+		material.color.setStyle( fillColor, COLOR_SPACE_LDRAW );
 		material.transparent = isTransparent;
 		material.premultipliedAlpha = true;
 		material.opacity = alpha;
 		material.depthWrite = ! isTransparent;
-		material.color.convertSRGBToLinear();
 
 		material.polygonOffset = true;
 		material.polygonOffsetFactor = 1;
 
 		if ( luminance !== 0 ) {
 
-			material.emissive.set( material.color ).multiplyScalar( luminance );
+			material.emissive.setStyle( fillColor, COLOR_SPACE_LDRAW ).multiplyScalar( luminance );
 
 		}
 
@@ -2338,14 +2373,14 @@ class LDrawLoader extends Loader {
 
 			// This is the material used for edges
 			edgeMaterial = new LineBasicMaterial( {
-				color: edgeColor,
+				color: new Color().setStyle( edgeColor, COLOR_SPACE_LDRAW ),
 				transparent: isTransparent,
 				opacity: alpha,
 				depthWrite: ! isTransparent
 			} );
+			edgeMaterial.color;
 			edgeMaterial.userData.code = code;
 			edgeMaterial.name = name + ' - Edge';
-			edgeMaterial.color.convertSRGBToLinear();
 
 			// This is the material used for conditional edges
 			edgeMaterial.userData.conditionalEdgeMaterial = new LDrawConditionalLineMaterial( {
@@ -2353,11 +2388,12 @@ class LDrawLoader extends Loader {
 				fog: true,
 				transparent: isTransparent,
 				depthWrite: ! isTransparent,
-				color: edgeColor,
+				color: new Color().setStyle( edgeColor, COLOR_SPACE_LDRAW ),
 				opacity: alpha,
 
 			} );
-			edgeMaterial.userData.conditionalEdgeMaterial.color.convertSRGBToLinear();
+			edgeMaterial.userData.conditionalEdgeMaterial.userData.code = code;
+			edgeMaterial.userData.conditionalEdgeMaterial.name = name + ' - Conditional Edge';
 
 		}
 
@@ -2370,11 +2406,39 @@ class LDrawLoader extends Loader {
 
 		return material;
 
+		function parseLuminance( token ) {
+
+			// Returns success
+
+			let lum;
+
+			if ( token.startsWith( 'LUMINANCE' ) ) {
+
+				lum = parseInt( token.substring( 9 ) );
+
+			} else {
+
+				lum = parseInt( token );
+
+			}
+
+			if ( isNaN( lum ) ) {
+
+				return false;
+
+			}
+
+			luminance = Math.max( 0, Math.min( 1, lum / 255 ) );
+
+			return true;
+
+		}
+
 	}
 
-	computeConstructionSteps( model ) {
+	computeBuildingSteps( model ) {
 
-		// Sets userdata.constructionStep number in Group objects and userData.numConstructionSteps number in the root Group object.
+		// Sets userdata.buildingStep number in Group objects and userData.numBuildingSteps number in the root Group object.
 
 		let stepNumber = 0;
 
@@ -2382,19 +2446,19 @@ class LDrawLoader extends Loader {
 
 			if ( c.isGroup ) {
 
-				if ( c.userData.startingConstructionStep ) {
+				if ( c.userData.startingBuildingStep ) {
 
 					stepNumber ++;
 
 				}
 
-				c.userData.constructionStep = stepNumber;
+				c.userData.buildingStep = stepNumber;
 
 			}
 
 		} );
 
-		model.userData.numConstructionSteps = stepNumber + 1;
+		model.userData.numBuildingSteps = stepNumber + 1;
 
 	}
 

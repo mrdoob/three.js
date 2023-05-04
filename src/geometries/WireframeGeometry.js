@@ -7,6 +7,7 @@ class WireframeGeometry extends BufferGeometry {
 	constructor( geometry = null ) {
 
 		super();
+
 		this.type = 'WireframeGeometry';
 
 		this.parameters = {
@@ -39,7 +40,7 @@ class WireframeGeometry extends BufferGeometry {
 
 				}
 
-				// create a data structure that contains all eges without duplicates
+				// create a data structure that contains all edges without duplicates
 
 				for ( let o = 0, ol = groups.length; o < ol; ++ o ) {
 
@@ -108,6 +109,16 @@ class WireframeGeometry extends BufferGeometry {
 			this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 		}
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
 
 	}
 

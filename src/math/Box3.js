@@ -4,6 +4,8 @@ class Box3 {
 
 	constructor( min = new Vector3( + Infinity, + Infinity, + Infinity ), max = new Vector3( - Infinity, - Infinity, - Infinity ) ) {
 
+		this.isBox3 = true;
+
 		this.min = min;
 		this.max = max;
 
@@ -20,32 +22,13 @@ class Box3 {
 
 	setFromArray( array ) {
 
-		let minX = + Infinity;
-		let minY = + Infinity;
-		let minZ = + Infinity;
+		this.makeEmpty();
 
-		let maxX = - Infinity;
-		let maxY = - Infinity;
-		let maxZ = - Infinity;
+		for ( let i = 0, il = array.length; i < il; i += 3 ) {
 
-		for ( let i = 0, l = array.length; i < l; i += 3 ) {
-
-			const x = array[ i ];
-			const y = array[ i + 1 ];
-			const z = array[ i + 2 ];
-
-			if ( x < minX ) minX = x;
-			if ( y < minY ) minY = y;
-			if ( z < minZ ) minZ = z;
-
-			if ( x > maxX ) maxX = x;
-			if ( y > maxY ) maxY = y;
-			if ( z > maxZ ) maxZ = z;
+			this.expandByPoint( _vector.fromArray( array, i ) );
 
 		}
-
-		this.min.set( minX, minY, minZ );
-		this.max.set( maxX, maxY, maxZ );
 
 		return this;
 
@@ -53,32 +36,13 @@ class Box3 {
 
 	setFromBufferAttribute( attribute ) {
 
-		let minX = + Infinity;
-		let minY = + Infinity;
-		let minZ = + Infinity;
+		this.makeEmpty();
 
-		let maxX = - Infinity;
-		let maxY = - Infinity;
-		let maxZ = - Infinity;
+		for ( let i = 0, il = attribute.count; i < il; i ++ ) {
 
-		for ( let i = 0, l = attribute.count; i < l; i ++ ) {
-
-			const x = attribute.getX( i );
-			const y = attribute.getY( i );
-			const z = attribute.getZ( i );
-
-			if ( x < minX ) minX = x;
-			if ( y < minY ) minY = y;
-			if ( z < minZ ) minZ = z;
-
-			if ( x > maxX ) maxX = x;
-			if ( y > maxY ) maxY = y;
-			if ( z > maxZ ) maxZ = z;
+			this.expandByPoint( _vector.fromBufferAttribute( attribute, i ) );
 
 		}
-
-		this.min.set( minX, minY, minZ );
-		this.max.set( maxX, maxY, maxZ );
 
 		return this;
 
@@ -195,32 +159,49 @@ class Box3 {
 
 		object.updateWorldMatrix( false, false );
 
-		const geometry = object.geometry;
+		if ( object.boundingBox !== undefined ) {
 
-		if ( geometry !== undefined ) {
+			if ( object.boundingBox === null ) {
 
-			if ( precise && geometry.attributes != undefined && geometry.attributes.position !== undefined ) {
+				object.computeBoundingBox();
 
-				const position = geometry.attributes.position;
-				for ( let i = 0, l = position.count; i < l; i ++ ) {
+			}
 
-					_vector.fromBufferAttribute( position, i ).applyMatrix4( object.matrixWorld );
-					this.expandByPoint( _vector );
+			_box.copy( object.boundingBox );
+			_box.applyMatrix4( object.matrixWorld );
+
+			this.union( _box );
+
+		} else {
+
+			const geometry = object.geometry;
+
+			if ( geometry !== undefined ) {
+
+				if ( precise && geometry.attributes !== undefined && geometry.attributes.position !== undefined ) {
+
+					const position = geometry.attributes.position;
+					for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+						_vector.fromBufferAttribute( position, i ).applyMatrix4( object.matrixWorld );
+						this.expandByPoint( _vector );
+
+					}
+
+				} else {
+
+					if ( geometry.boundingBox === null ) {
+
+						geometry.computeBoundingBox();
+
+					}
+
+					_box.copy( geometry.boundingBox );
+					_box.applyMatrix4( object.matrixWorld );
+
+					this.union( _box );
 
 				}
-
-			} else {
-
-				if ( geometry.boundingBox === null ) {
-
-					geometry.computeBoundingBox();
-
-				}
-
-				_box.copy( geometry.boundingBox );
-				_box.applyMatrix4( object.matrixWorld );
-
-				this.union( _box );
 
 			}
 
@@ -394,17 +375,23 @@ class Box3 {
 
 	distanceToPoint( point ) {
 
-		const clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
-
-		return clampedPoint.sub( point ).length();
+		return this.clampPoint( point, _vector ).distanceTo( point );
 
 	}
 
 	getBoundingSphere( target ) {
 
-		this.getCenter( target.center );
+		if ( this.isEmpty() ) {
 
-		target.radius = this.getSize( _vector ).length() * 0.5;
+			target.makeEmpty();
+
+		} else {
+
+			this.getCenter( target.center );
+
+			target.radius = this.getSize( _vector ).length() * 0.5;
+
+		}
 
 		return target;
 
@@ -469,8 +456,6 @@ class Box3 {
 
 }
 
-Box3.prototype.isBox3 = true;
-
 const _points = [
 	/*@__PURE__*/ new Vector3(),
 	/*@__PURE__*/ new Vector3(),
@@ -508,9 +493,9 @@ function satForAxes( axes, v0, v1, v2, extents ) {
 	for ( let i = 0, j = axes.length - 3; i <= j; i += 3 ) {
 
 		_testAxis.fromArray( axes, i );
-		// project the aabb onto the seperating axis
+		// project the aabb onto the separating axis
 		const r = extents.x * Math.abs( _testAxis.x ) + extents.y * Math.abs( _testAxis.y ) + extents.z * Math.abs( _testAxis.z );
-		// project all 3 vertices of the triangle onto the seperating axis
+		// project all 3 vertices of the triangle onto the separating axis
 		const p0 = v0.dot( _testAxis );
 		const p1 = v1.dot( _testAxis );
 		const p2 = v2.dot( _testAxis );
@@ -518,7 +503,7 @@ function satForAxes( axes, v0, v1, v2, extents ) {
 		if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
 
 			// points of the projected triangle are outside the projected half-length of the aabb
-			// the axis is seperating and we can exit
+			// the axis is separating and we can exit
 			return false;
 
 		}

@@ -36,7 +36,7 @@ function arrayNeedsUint32( array ) {
 
 	for ( let i = array.length - 1; i >= 0; -- i ) {
 
-		if ( array[ i ] > 65535 ) return true;
+		if ( array[ i ] >= 65535 ) return true; // account for PRIMITIVE_RESTART_FIXED_INDEX, #24565
 
 	}
 
@@ -68,4 +68,16 @@ function createElementNS( name ) {
 
 }
 
-export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS };
+const _cache = {};
+
+function warnOnce( message ) {
+
+	if ( message in _cache ) return;
+
+	_cache[ message ] = true;
+
+	console.warn( message );
+
+}
+
+export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, warnOnce };

@@ -13,12 +13,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,11 +28,11 @@
 
 			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { ColladaExporter } from './jsm/exporters/ColladaExporter.js';
-			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { ColladaExporter } from 'three/addons/exporters/ColladaExporter.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
 			////////////////////////////////////////////////////////////////////////////////
 			// Utah/Newell Teapot demo
@@ -85,7 +86,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( canvasWidth, canvasHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
@@ -101,7 +101,7 @@
 				const textureMap = loader.load( 'textures/uv_grid_opengl.jpg' );
 				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
 				textureMap.anisotropy = 16;
-				textureMap.encoding = THREE.sRGBEncoding;
+				textureMap.colorSpace = THREE.SRGBColorSpace;
 
 				// NORMAL MAP
 
@@ -117,7 +117,7 @@
 				];
 
 				textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.encoding = THREE.sRGBEncoding;
+				textureCube.colorSpace = THREE.SRGBColorSpace;
 
 				// MATERIALS
 				const materialColor = new THREE.Color();
@@ -381,6 +381,7 @@
 						colors.push( r * 128, 0, b * 128 );
 
 					}
+
 					teapot.geometry.setAttribute( 'color', new THREE.Uint8BufferAttribute( colors, 3, true ) );
 					teapot.material.vertexColors = true;
 					teapot.material.needsUpdate = true;

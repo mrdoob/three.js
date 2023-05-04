@@ -11,14 +11,12 @@
 		<p>
 			Even though this is becoming less and less of a problem, some devices or browsers may still not support WebGL.
 			The following method allows you to check if it is supported and display a message to the user if it is not.
-		</p>
-
-		<p>
-			Add	[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/capabilities/WebGL.js]
-			to your javascript and run the following before attempting to render anything.
+			Import the WebGL support detection module, and run the following before attempting to render anything.
 		</p>
 
 		<code>
+		import WebGL from 'three/addons/capabilities/WebGL.js';
+
 		if ( WebGL.isWebGLAvailable() ) {
 
 			// Initiate function or other initializations here

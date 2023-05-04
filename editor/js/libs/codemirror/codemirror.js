@@ -393,7 +393,7 @@
     return function(str, direction) {
       var outerType = direction == "ltr" ? "L" : "R";
 
-      if (str.length == 0 || direction == "ltr" && !bidiRE.test(str)) { return false; }
+      if (str.length == 0 || direction == "ltr" && !bidiRE.test(str)) { return false }
       var len = str.length, types = [];
       for (var i = 0; i < len; ++i)
         { types.push(charType(str.charCodeAt(i))); }
@@ -511,7 +511,7 @@
         }
       }
 
-      return direction == "rtl" ? order.reverse() : order;
+      return direction == "rtl" ? order.reverse() : order
     }
   })();
 
@@ -533,7 +533,7 @@
 
   var on = function(emitter, type, f) {
     if (emitter.addEventListener) {
-      emitter.addEventListener(type, f, false);
+      emitter.addEventListener(type, f, { passive: false });
     } else if (emitter.attachEvent) {
       emitter.attachEvent("on" + type, f);
     } else {
@@ -677,7 +677,7 @@
         pos = nl + 1;
       }
     }
-    return result;
+    return result
   } : function (string) { return string.split(/\r\n?|\n/); };
 
   var hasSelection = window.getSelection ? function (te) {
@@ -1087,7 +1087,7 @@
           i += 2;
           at = Math.min(end, i_end);
         }
-        if (!style) { return; }
+        if (!style) { return }
         if (overlay.opaque) {
           st.splice(start, i - start, end, "overlay " + style);
           i = start + 2;
@@ -1121,7 +1121,7 @@
       if (updateFrontier === cm.doc.highlightFrontier)
         { cm.doc.modeFrontier = Math.max(cm.doc.modeFrontier, ++cm.doc.highlightFrontier); }
     }
-    return line.styles;
+    return line.styles
   }
 
   function getContextBefore(cm, n, precise) {
@@ -1786,7 +1786,7 @@
     if (builder.pre.className)
       { builder.textClass = joinClasses(builder.pre.className, builder.textClass || ""); }
 
-    return builder;
+    return builder
   }
 
   function defaultSpecialCharPlaceholder(ch) {
@@ -1799,7 +1799,7 @@
   // Build up the DOM representation for a single token, and add it to
   // the line map. Takes care to render special characters separately.
   function buildToken(builder, text, style, startStyle, endStyle, css, attributes) {
-    if (!text) { return; }
+    if (!text) { return }
     var displayText = builder.splitSpaces ? splitSpaces(text, builder.trailingSpace) : text;
     var special = builder.cm.state.specialChars, mustWrap = false;
     var content;
@@ -1824,7 +1824,7 @@
           builder.col += skipped;
           builder.pos += skipped;
         }
-        if (!m) { break; }
+        if (!m) { break }
         pos += skipped + 1;
         var txt$1 = (void 0);
         if (m[0] == "\t") {
@@ -1858,7 +1858,7 @@
         for (var attr in attributes) { if (attributes.hasOwnProperty(attr) && attr != "style" && attr != "class")
           { token.setAttribute(attr, attributes[attr]); } }
       }
-      return builder.content.appendChild(token);
+      return builder.content.appendChild(token)
     }
     builder.content.appendChild(content);
   }
@@ -2351,12 +2351,14 @@
   function mapFromLineView(lineView, line, lineN) {
     if (lineView.line == line)
       { return {map: lineView.measure.map, cache: lineView.measure.cache} }
-    for (var i = 0; i < lineView.rest.length; i++)
-      { if (lineView.rest[i] == line)
-        { return {map: lineView.measure.maps[i], cache: lineView.measure.caches[i]} } }
-    for (var i$1 = 0; i$1 < lineView.rest.length; i$1++)
-      { if (lineNo(lineView.rest[i$1]) > lineN)
-        { return {map: lineView.measure.maps[i$1], cache: lineView.measure.caches[i$1], before: true} } }
+    if (lineView.rest) {
+      for (var i = 0; i < lineView.rest.length; i++)
+        { if (lineView.rest[i] == line)
+          { return {map: lineView.measure.maps[i], cache: lineView.measure.caches[i]} } }
+      for (var i$1 = 0; i$1 < lineView.rest.length; i$1++)
+        { if (lineNo(lineView.rest[i$1]) > lineN)
+          { return {map: lineView.measure.maps[i$1], cache: lineView.measure.caches[i$1], before: true} } }
+    }
   }
 
   // Render a line into the hidden node display.externalMeasured. Used
@@ -2497,7 +2499,7 @@
           { rect = node.parentNode.getBoundingClientRect(); }
         else
           { rect = getUsefulRect(range(node, start, end).getClientRects(), bias); }
-        if (rect.left || rect.right || start == 0) { break; }
+        if (rect.left || rect.right || start == 0) { break }
         end = start;
         start = start - 1;
         collapse = "right";
@@ -2524,7 +2526,7 @@
     var heights = prepared.view.measure.heights;
     var i = 0;
     for (; i < heights.length - 1; i++)
-      { if (mid < heights[i]) { break; } }
+      { if (mid < heights[i]) { break } }
     var top = i ? heights[i - 1] : 0, bot = heights[i];
     var result = {left: (collapse == "right" ? rect.right : rect.left) - prepared.rect.left,
                   right: (collapse == "left" ? rect.left : rect.right) - prepared.rect.left,
@@ -2532,7 +2534,7 @@
     if (!rect.left && !rect.right) { result.bogus = true; }
     if (!cm.options.singleCursorHeightPerLine) { result.rtop = rtop; result.rbottom = rbot; }
 
-    return result;
+    return result
   }
 
   // Work around problem with bounding client rects on ranges being
@@ -2583,9 +2585,11 @@
   }
 
   function widgetTopHeight(lineObj) {
+    var ref = visualLine(lineObj);
+    var widgets = ref.widgets;
     var height = 0;
-    if (lineObj.widgets) { for (var i = 0; i < lineObj.widgets.length; ++i) { if (lineObj.widgets[i].above)
-      { height += widgetHeight(lineObj.widgets[i]); } } }
+    if (widgets) { for (var i = 0; i < widgets.length; ++i) { if (widgets[i].above)
+      { height += widgetHeight(widgets[i]); } } }
     return height
   }
 
@@ -2812,7 +2816,7 @@
     }
 
     ch = skipExtendingChars(lineObj.text, ch, 1);
-    return PosWithInfo(lineNo, ch, sticky, outside, x - baseX);
+    return PosWithInfo(lineNo, ch, sticky, outside, x - baseX)
   }
 
   function coordsBidiPart(cm, lineObj, lineNo, preparedMeasure, order, x, y) {
@@ -3150,13 +3154,19 @@
     var curFragment = result.cursors = document.createDocumentFragment();
     var selFragment = result.selection = document.createDocumentFragment();
 
+    var customCursor = cm.options.$customCursor;
+    if (customCursor) { primary = true; }
     for (var i = 0; i < doc.sel.ranges.length; i++) {
       if (!primary && i == doc.sel.primIndex) { continue }
       var range = doc.sel.ranges[i];
       if (range.from().line >= cm.display.viewTo || range.to().line < cm.display.viewFrom) { continue }
       var collapsed = range.empty();
-      if (collapsed || cm.options.showCursorWhenSelecting)
-        { drawSelectionCursor(cm, range.head, curFragment); }
+      if (customCursor) {
+        var head = customCursor(cm, range);
+        if (head) { drawSelectionCursor(cm, head, curFragment); }
+      } else if (collapsed || cm.options.showCursorWhenSelecting) {
+        drawSelectionCursor(cm, range.head, curFragment);
+      }
       if (!collapsed)
         { drawSelectionRange(cm, range, selFragment); }
     }
@@ -3174,9 +3184,8 @@
 
     if (/\bcm-fat-cursor\b/.test(cm.getWrapperElement().className)) {
       var charPos = charCoords(cm, head, "div", null, null);
-      if (charPos.right - charPos.left > 0) {
-        cursor.style.width = (charPos.right - charPos.left) + "px";
-      }
+      var width = charPos.right - charPos.left;
+      cursor.style.width = (width > 0 ? width : cm.defaultCharWidth()) + "px";
     }
 
     if (pos.other) {
@@ -3357,7 +3366,7 @@
     for (var i = 0; i < display.view.length; i++) {
       var cur = display.view[i], wrapping = cm.options.lineWrapping;
       var height = (void 0), width = 0;
-      if (cur.hidden) { continue; }
+      if (cur.hidden) { continue }
       oldHeight += cur.line.height;
       if (ie && ie_version < 8) {
         var bot = cur.node.offsetTop + cur.node.offsetHeight;
@@ -3421,7 +3430,7 @@
         to = ensureTo;
       }
     }
-    return {from: from, to: Math.max(to, from + 1)};
+    return {from: from, to: Math.max(to, from + 1)}
   }
 
   // SCROLLING THINGS INTO VIEW
@@ -3515,7 +3524,7 @@
       { result.scrollLeft = Math.max(0, rect.left + gutterSpace - (tooWide ? 0 : 10)); }
     else if (rect.right > screenw + screenleft - 3)
       { result.scrollLeft = rect.right + (tooWide ? 0 : 10) - screenw; }
-    return result;
+    return result
   }
 
   // Store a relative adjustment to the scroll position in the current
@@ -3649,6 +3658,7 @@
       this.vert.firstChild.style.height =
         Math.max(0, measure.scrollHeight - measure.clientHeight + totalHeight) + "px";
     } else {
+      this.vert.scrollTop = 0;
       this.vert.style.display = "";
       this.vert.firstChild.style.height = "0";
     }
@@ -3670,7 +3680,7 @@
       this.checkedZeroWidth = true;
     }
 
-    return {right: needsV ? sWidth : 0, bottom: needsH ? sWidth : 0};
+    return {right: needsV ? sWidth : 0, bottom: needsH ? sWidth : 0}
   };
 
   NativeScrollbars.prototype.setScrollLeft = function (pos) {
@@ -4011,7 +4021,7 @@
       }
       if (+new Date > end) {
         startWorker(cm, cm.options.workDelay);
-        return true;
+        return true
       }
     });
     doc.highlightFrontier = context.line;
@@ -4500,6 +4510,12 @@
 
   function onScrollWheel(cm, e) {
     var delta = wheelEventDelta(e), dx = delta.x, dy = delta.y;
+    var pixelsPerUnit = wheelPixelsPerUnit;
+    if (e.deltaMode === 0) {
+      dx = e.deltaX;
+      dy = e.deltaY;
+      pixelsPerUnit = 1;
+    }
 
     var display = cm.display, scroll = display.scroller;
     // Quit if there's nothing to scroll here
@@ -4528,10 +4544,10 @@
     // estimated pixels/delta value, we just handle horizontal
     // scrolling entirely here. It'll be slightly off from native, but
     // better than glitching out.
-    if (dx && !gecko && !presto && wheelPixelsPerUnit != null) {
+    if (dx && !gecko && !presto && pixelsPerUnit != null) {
       if (dy && canScrollY)
-        { updateScrollTop(cm, Math.max(0, scroll.scrollTop + dy * wheelPixelsPerUnit)); }
-      setScrollLeft(cm, Math.max(0, scroll.scrollLeft + dx * wheelPixelsPerUnit));
+        { updateScrollTop(cm, Math.max(0, scroll.scrollTop + dy * pixelsPerUnit)); }
+      setScrollLeft(cm, Math.max(0, scroll.scrollLeft + dx * pixelsPerUnit));
       // Only prevent default scrolling if vertical scrolling is
       // actually possible. Otherwise, it causes vertical scroll
       // jitter on OSX trackpads when deltaX is small and deltaY
@@ -4544,15 +4560,15 @@
 
     // 'Project' the visible viewport to cover the area that is being
     // scrolled into view (if we know enough to estimate it).
-    if (dy && wheelPixelsPerUnit != null) {
-      var pixels = dy * wheelPixelsPerUnit;
+    if (dy && pixelsPerUnit != null) {
+      var pixels = dy * pixelsPerUnit;
       var top = cm.doc.scrollTop, bot = top + display.wrapper.clientHeight;
       if (pixels < 0) { top = Math.max(0, top + pixels - 50); }
       else { bot = Math.min(cm.doc.height, bot + pixels + 50); }
       updateDisplaySimple(cm, {top: top, bottom: bot});
     }
 
-    if (wheelSamples < 20) {
+    if (wheelSamples < 20 && e.deltaMode !== 0) {
       if (display.wheelStartX == null) {
         display.wheelStartX = scroll.scrollLeft; display.wheelStartY = scroll.scrollTop;
         display.wheelDX = dx; display.wheelDY = dy;
@@ -4644,7 +4660,7 @@
         ranges.splice(--i, 2, new Range(inv ? to : from, inv ? from : to));
       }
     }
-    return new Selection(ranges, primIndex);
+    return new Selection(ranges, primIndex)
   }
 
   function simpleSelection(anchor, head) {
@@ -4705,7 +4721,7 @@
         out[i] = new Range(from, from);
       }
     }
-    return new Selection(out, doc.sel.primIndex);
+    return new Selection(out, doc.sel.primIndex)
   }
 
   // Used to get the editor into a consistent state again when options change.
@@ -4805,7 +4821,7 @@
 
   // Attach a document to an editor.
   function attachDoc(cm, doc) {
-    if (doc.cm) { throw new Error("This document is already in use."); }
+    if (doc.cm) { throw new Error("This document is already in use.") }
     cm.doc = doc;
     doc.cm = cm;
     estimateLineHeights(cm);
@@ -5371,7 +5387,7 @@
       change.origin = type;
       if (filter && !filterChange(doc, change, false)) {
         source.length = 0;
-        return {};
+        return {}
       }
 
       antiChanges.push(historyChangeFromChange(doc, change));
@@ -5666,7 +5682,7 @@
           child.removeInner(at, rm);
           this.height -= oldHeight - child.height;
           if (sz == rm) { this.children.splice(i--, 1); child.parent = null; }
-          if ((n -= rm) == 0) { break; }
+          if ((n -= rm) == 0) { break }
           at = 0;
         } else { at -= sz; }
       }
@@ -5705,7 +5721,7 @@
             child.lines = child.lines.slice(0, remaining);
             this.maybeSpill();
           }
-          break;
+          break
         }
         at -= sz;
       }
@@ -5842,7 +5858,7 @@
 
   // Clear the marker.
   TextMarker.prototype.clear = function () {
-    if (this.explicitlyCleared) { return; }
+    if (this.explicitlyCleared) { return }
     var cm = this.doc.cm, withOp = cm && !cm.curOp;
     if (withOp) { startOperation(cm); }
     if (hasHandler(this, "clear")) {
@@ -6095,7 +6111,7 @@
 
   var nextDocId = 0;
   var Doc = function(text, mode, firstLine, lineSep, direction) {
-    if (!(this instanceof Doc)) { return new Doc(text, mode, firstLine, lineSep, direction); }
+    if (!(this instanceof Doc)) { return new Doc(text, mode, firstLine, lineSep, direction) }
     if (firstLine == null) { firstLine = 0; }
 
     BranchChunk.call(this, [new LeafChunk([new Line("", null)])]);
@@ -6467,7 +6483,7 @@
       ; }(this.linked || (this.linked = [])).push({doc: copy, sharedHist: options.sharedHist});
       copy.linked = [{doc: this, isParent: true, sharedHist: options.sharedHist}];
       copySharedMarkers(copy, findSharedMarkers(this));
-      return copy;
+      return copy
     },
     unlinkDoc: function(other) {
       if (other instanceof CodeMirror) { other = other.doc; }
@@ -7071,7 +7087,7 @@
     transposeChars: function (cm) { return runInOp(cm, function () {
       var ranges = cm.listSelections(), newSel = [];
       for (var i = 0; i < ranges.length; i++) {
-        if (!ranges[i].empty()) { continue; }
+        if (!ranges[i].empty()) { continue }
         var cur = ranges[i].head, line = getLine(cm.doc, cur.line).text;
         if (line) {
           if (cur.ch == line.length) { cur = new Pos(cur.line, cur.ch - 1); }
@@ -7505,7 +7521,7 @@
 
     var lastPos = start;
     function extendTo(pos) {
-      if (cmp(lastPos, pos) == 0) { return; }
+      if (cmp(lastPos, pos) == 0) { return }
       lastPos = pos;
 
       if (behavior.unit == "rectangle") {
@@ -7869,7 +7885,7 @@
   function CodeMirror(place, options) {
     var this$1 = this;
 
-    if (!(this instanceof CodeMirror)) { return new CodeMirror(place, options); }
+    if (!(this instanceof CodeMirror)) { return new CodeMirror(place, options) }
 
     this.options = options = options ? copyObj(options) : {};
     // Determine effective options based on given values and defaults.
@@ -8081,7 +8097,7 @@
     } else if (how == "smart") {
       indentation = doc.mode.indent(state, line.text.slice(curSpaceString.length), line.text);
       if (indentation == Pass || indentation > 150) {
-        if (!aggressive) { return; }
+        if (!aggressive) { return }
         how = "prev";
       }
     }
@@ -8105,7 +8121,7 @@
     if (indentString != curSpaceString) {
       replaceRange(doc, indentString, Pos(n, 0), Pos(n, curSpaceString.length), "+input");
       line.stateAfter = null;
-      return true;
+      return true
     } else {
       // Ensure that, if the cursor was in the whitespace at the start
       // of the line, it is moved to the end of that space.
@@ -8114,7 +8130,7 @@
         if (range.head.line == n && range.head.ch < curSpaceString.length) {
           var pos$1 = Pos(n, curSpaceString.length);
           replaceOneSelection(doc, i$1, new Range(pos$1, pos$1));
-          break;
+          break
         }
       }
     }
@@ -8229,7 +8245,7 @@
   }
 
   function hiddenTextarea() {
-    var te = elt("textarea", null, null, "position: absolute; bottom: -1em; padding: 0; width: 1px; height: 1em; outline: none");
+    var te = elt("textarea", null, null, "position: absolute; bottom: -1em; padding: 0; width: 1px; height: 1em; min-height: 1em; outline: none");
     var div = elt("div", [te], null, "overflow: hidden; position: relative; width: 3px; height: 0px;");
     // The textarea is kept positioned near the cursor to prevent the
     // fact that it'll be scrolled into view on input from scrolling
@@ -8570,7 +8586,7 @@
           while (start > 0 && check(line.charAt(start - 1))) { --start; }
           while (end < line.length && check(line.charAt(end))) { ++end; }
         }
-        return new Range(Pos(pos.line, start), Pos(pos.line, end));
+        return new Range(Pos(pos.line, start), Pos(pos.line, end))
       },
 
       toggleOverwrite: function(value) {
@@ -8657,7 +8673,7 @@
         scrollToCoords(this, doc.scrollLeft, doc.scrollTop);
         this.curOp.forceScroll = true;
         signalLater(this, "swapDoc", this, old);
-        return old;
+        return old
       }),
 
       phrase: function(phraseText) {
@@ -9053,7 +9069,7 @@
       { from = Pos(from.line - 1, getLine(cm.doc, from.line - 1).length); }
     if (to.ch == getLine(cm.doc, to.line).text.length && to.line < cm.lastLine())
       { to = Pos(to.line + 1, 0); }
-    if (from.line < display.viewFrom || to.line > display.viewTo - 1) { return false; }
+    if (from.line < display.viewFrom || to.line > display.viewTo - 1) { return false }
 
     var fromIndex, fromLine, fromNode;
     if (from.line == display.viewFrom || (fromIndex = findViewIndex(cm, from.line)) == 0) {
@@ -9073,13 +9089,13 @@
       toNode = display.view[toIndex + 1].node.previousSibling;
     }
 
-    if (!fromNode) { return false; }
+    if (!fromNode) { return false }
     var newText = cm.doc.splitLines(domTextBetween(cm, fromNode, toNode, fromLine, toLine));
     var oldText = getBetween(cm.doc, Pos(fromLine, 0), Pos(toLine, getLine(cm.doc, toLine).text.length));
     while (newText.length > 1 && oldText.length > 1) {
       if (lst(newText) == lst(oldText)) { newText.pop(); oldText.pop(); toLine--; }
       else if (newText[0] == oldText[0]) { newText.shift(); oldText.shift(); fromLine++; }
-      else { break; }
+      else { break }
     }
 
     var cutFront = 0, cutEnd = 0;
@@ -9108,7 +9124,7 @@
     var chTo = Pos(toLine, oldText.length ? lst(oldText).length - cutEnd : 0);
     if (newText.length > 1 || newText[0] || cmp(chFrom, chTo)) {
       replaceRange(cm.doc, newText, chFrom, chTo, "+input");
-      return true;
+      return true
     }
   };
 
@@ -9595,7 +9611,7 @@
     var input = this, cm = input.cm, display = cm.display, te = input.textarea;
     if (input.contextMenuPending) { input.contextMenuPending(); }
     var pos = posFromMouse(cm, e), scrollPos = display.scroller.scrollTop;
-    if (!pos || presto) { return; } // Opera is difficult.
+    if (!pos || presto) { return } // Opera is difficult.
 
     // Reset the current text selection only if the click is done outside of the selection
     // and 'resetSelectionOnContextMenu' option is true.
@@ -9736,7 +9752,7 @@
     textarea.style.display = "none";
     var cm = CodeMirror(function (node) { return textarea.parentNode.insertBefore(node, textarea.nextSibling); },
       options);
-    return cm;
+    return cm
   }
 
   function addLegacyProps(CodeMirror) {
@@ -9826,7 +9842,7 @@
 
   addLegacyProps(CodeMirror);
 
-  CodeMirror.version = "5.63.0";
+  CodeMirror.version = "5.65.2";
 
   return CodeMirror;
 

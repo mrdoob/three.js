@@ -13,12 +13,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,9 +28,9 @@
 
 			import * as THREE from 'three';
 
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
-			import { GLTFExporter } from './jsm/exporters/GLTFExporter.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			function exportGLTF( input ) {
 
@@ -38,7 +39,6 @@
 				const options = {
 					trs: params.trs,
 					onlyVisible: params.onlyVisible,
-					truncateDrawRange: params.truncateDrawRange,
 					binary: params.binary,
 					maxTextureSize: params.maxTextureSize
 				};
@@ -99,18 +99,17 @@
 			let container;
 
 			let camera, object, object2, material, geometry, scene1, scene2, renderer;
-			let gridHelper, sphere, waltHead;
+			let gridHelper, sphere, model;
 
 			const params = {
 				trs: false,
 				onlyVisible: true,
-				truncateDrawRange: true,
 				binary: false,
 				maxTextureSize: 4096,
 				exportScene1: exportScene1,
 				exportScenes: exportScenes,
 				exportSphere: exportSphere,
-				exportHead: exportHead,
+				exportModel: exportModel,
 				exportObjects: exportObjects,
 				exportSceneObject: exportSceneObject
 			};
@@ -179,7 +178,7 @@
 				// ---------------------------------------------------------------------
 				// Grid
 				// ---------------------------------------------------------------------
-				gridHelper = new THREE.GridHelper( 2000, 20, 0x888888, 0x444444 );
+				gridHelper = new THREE.GridHelper( 2000, 20, 0xc1c1c1, 0x8d8d8d );
 				gridHelper.position.y = - 50;
 				gridHelper.name = 'Grid';
 				scene1.add( gridHelper );
@@ -345,44 +344,6 @@
 				scene1.add( object );
 
 				// ---------------------------------------------------------------------
-				// Buffer geometry truncated (DrawRange)
-				// ---------------------------------------------------------------------
-				geometry = new THREE.BufferGeometry();
-				const numElements = 6;
-				const outOfRange = 3;
-
-				positions = new Float32Array( ( numElements + outOfRange ) * 3 );
-				const colors = new Float32Array( ( numElements + outOfRange ) * 3 );
-
-				positions.set( [
-					0, 0, 0,
-					0, 80, 0,
-					80, 0, 0,
-					80, 0, 0,
-					0, 80, 0,
-					80, 80, 0
-				] );
-
-				colors.set( [
-					1, 0, 0,
-					1, 0, 0,
-					1, 1, 0,
-					1, 1, 0,
-					0, 0, 1,
-					0, 0, 1,
-				] );
-
-				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
-				geometry.setDrawRange( 0, numElements );
-
-				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: true } ) );
-				object.name = 'Custom buffered truncated';
-				object.position.set( 140, - 40, - 200 );
-
-				scene1.add( object );
-
-				// ---------------------------------------------------------------------
 				// THREE.Points
 				// ---------------------------------------------------------------------
 				numPoints = 100;
@@ -454,18 +415,17 @@
 				scene1.add( object );
 
 				// ---------------------------------------------------------------------
-				//
-				//
-				const loader = new OBJLoader();
-				loader.load( 'models/obj/walt/WaltHead.obj', function ( obj ) {
+				// Model requiring KHR_mesh_quantization
+				// ---------------------------------------------------------------------
+				const loader = new GLTFLoader();
+				loader.load( 'models/gltf/ShaderBall.glb', function ( gltf ) {
 
-					waltHead = obj;
-					waltHead.scale.multiplyScalar( 1.5 );
-					waltHead.position.set( 400, 0, 0 );
-					scene1.add( waltHead );
+					model = gltf.scene;
+					model.scale.setScalar( 50 );
+					model.position.set( 200, - 40, - 200 );
+					scene1.add( model );
 
 				} );
-
 
 				// ---------------------------------------------------------------------
 				// 2nd THREE.Scene
@@ -482,6 +442,8 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
 
 				container.appendChild( renderer.domElement );
 
@@ -494,7 +456,6 @@
 				let h = gui.addFolder( 'Settings' );
 				h.add( params, 'trs' ).name( 'Use TRS' );
 				h.add( params, 'onlyVisible' ).name( 'Only Visible Objects' );
-				h.add( params, 'truncateDrawRange' ).name( 'Truncate Draw Range' );
 				h.add( params, 'binary' ).name( 'Binary (GLB)' );
 				h.add( params, 'maxTextureSize', 2, 8192 ).name( 'Max Texture Size' ).step( 1 );
 
@@ -502,7 +463,7 @@
 				h.add( params, 'exportScene1' ).name( 'Export Scene 1' );
 				h.add( params, 'exportScenes' ).name( 'Export Scene 1 and 2' );
 				h.add( params, 'exportSphere' ).name( 'Export Sphere' );
-				h.add( params, 'exportHead' ).name( 'Export Head' );
+				h.add( params, 'exportModel' ).name( 'Export Model' );
 				h.add( params, 'exportObjects' ).name( 'Export Sphere With Grid' );
 				h.add( params, 'exportSceneObject' ).name( 'Export Scene 1 and Object' );
 
@@ -528,9 +489,9 @@
 
 			}
 
-			function exportHead() {
+			function exportModel() {
 
-				exportGLTF( waltHead );
+				exportGLTF( model );
 
 			}
 

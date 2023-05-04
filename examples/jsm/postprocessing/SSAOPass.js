@@ -83,12 +83,6 @@ class SSAOPass extends Pass {
 
 		// ssao material
 
-		if ( SSAOShader === undefined ) {
-
-			console.error( 'THREE.SSAOPass: The pass relies on SSAOShader.' );
-
-		}
-
 		this.ssaoMaterial = new ShaderMaterial( {
 			defines: Object.assign( {}, SSAOShader.defines ),
 			uniforms: UniformsUtils.clone( SSAOShader.uniforms ),
@@ -376,12 +370,6 @@ class SSAOPass extends Pass {
 	generateRandomKernelRotations() {
 
 		const width = 4, height = 4;
-
-		if ( SimplexNoise === undefined ) {
-
-			console.error( 'THREE.SSAOPass: The pass relies on SimplexNoise.' );
-
-		}
 
 		const simplex = new SimplexNoise();
 

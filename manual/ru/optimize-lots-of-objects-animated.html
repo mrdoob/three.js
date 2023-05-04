@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – Оптимизация большого количества анимированных объектов">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -234,7 +234,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 
   ...
 
--  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+-  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 -      geometries, false);
 -  const material = new THREE.MeshBasicMaterial({
 -    vertexColors: true,
@@ -242,7 +242,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 -  const mesh = new THREE.Mesh(mergedGeometry, material);
 -  scene.add(mesh);
 -  return mesh;
-+  return BufferGeometryUtils.mergeBufferGeometries(
++  return BufferGeometryUtils.mergeGeometries(
 +     geometries, false);
 }
 </pre>
@@ -292,6 +292,12 @@ showFileInfo(fileInfos, fileInfos[0]);
 +  attribute.name = name;
 +  return attribute;
 +});
++baseGeometry.morphAttributes.color = geometries.map((geometry, ndx) =&gt; {
++  const attribute = geometry.getAttribute('color');
++  const name = `target${ndx}`;
++  attribute.name = name;
++  return attribute;
++});
 +const material = new THREE.MeshBasicMaterial({
 +  vertexColors: true,
 +});
@@ -326,10 +332,10 @@ showFileInfo(fileInfos, fileInfos[0]);
 но поскольку оригинальный глобус webgl использует
 <a href="https://github.com/tweenjs/tween.js/">библиотеку анимации</a> давайте используем тот же самый здесь.</p>
 <p>Нам нужно включить библиотеку </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import * as BufferGeometryUtils from '/examples/jsm/utils/BufferGeometryUtils.js';
-import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
-+import {TWEEN} from '/examples/jsm/libs/tween.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
++import TWEEN from 'three/addons/libs/tween.module.js';
 </pre>
 <p>А затем создайте <code class="notranslate" translate="no">Tween</code> чтобы оживить влияние.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
@@ -391,7 +397,7 @@ function showFileInfo(fileInfos, fileInfo) {
 <p>Чтобы использовать его, мы создадим один </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  const tweenManager = new TweenManger();
 
   ...
@@ -441,178 +447,6 @@ render();
 </div>
 
 <p></p>
-<p>Кажется, это работает, но, к сожалению, мы потеряли цвета. </p>
-<p>Three.js не поддерживает цвета morphtarget, и на самом деле это проблема оригинального <a href="https://github.com/dataarts/webgl-globe">шара webgl</a>.
-В основном это просто делает цвета для первого набора данных. Любые другие наборы данных используют те же цвета, даже если они сильно различаются. </p>
-<p>Давайте посмотрим, сможем ли мы добавить поддержку для изменения цвета.
-Это может быть хрупким. Наименее хрупким способом, вероятно, было бы на 100% 
-писать наши собственные шейдеры, но я думаю, что было бы полезно посмотреть, 
-как модифицировать встроенные шейдеры. </p>
-<p>Первое, что нам нужно сделать, это сделать цвет выделения кода <a href="/docs/#api/en/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> из геометрии каждого набора данных. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// use the first geometry as the base
-// and add all the geometries as morphtargets
-const baseGeometry = geometries[0];
-baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) =&gt; {
-  const attribute = geometry.getAttribute('position');
-  const name = `target${ndx}`;
-  attribute.name = name;
-  return attribute;
-});
-+const colorAttributes = geometries.map((geometry, ndx) =&gt; {
-+  const attribute = geometry.getAttribute('color');
-+  const name = `morphColor${ndx}`;
-+  attribute.name = `color${ndx}`;  // just for debugging
-+  return {name, attribute};
-+});
-const material = new THREE.MeshBasicMaterial({
-  vertexColors: true,
-  morphTargets: true,
-});
-</pre>
-<p>Затем нам нужно изменить шейдер three.js. Материалы Three.js имеют свойство <a href="/docs/#api/en/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>, 
-которое мы можем назначить функции. Это дает нам возможность изменить шейдер материала до его передачи в WebGL. 
-На самом деле предоставленный шейдер - это на самом деле специальный синтаксис с тремя шейдерами,
-который содержит только три блока шейдеров, которые три.js заменит реальным кодом GLSL для каждого блока. 
-Вот как выглядит код неизмененного вершинного шейдера, передаваемый в <code class="notranslate" translate="no">onBeforeCompile</code>. </p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">#include &lt;common&gt;
-#include &lt;uv_pars_vertex&gt;
-#include &lt;uv2_pars_vertex&gt;
-#include &lt;envmap_pars_vertex&gt;
-#include &lt;color_pars_vertex&gt;
-#include &lt;fog_pars_vertex&gt;
-#include &lt;morphtarget_pars_vertex&gt;
-#include &lt;skinning_pars_vertex&gt;
-#include &lt;logdepthbuf_pars_vertex&gt;
-#include &lt;clipping_planes_pars_vertex&gt;
-void main() {
-    #include &lt;uv_vertex&gt;
-    #include &lt;uv2_vertex&gt;
-    #include &lt;color_vertex&gt;
-    #include &lt;skinbase_vertex&gt;
-    #ifdef USE_ENVMAP
-    #include &lt;beginnormal_vertex&gt;
-    #include &lt;morphnormal_vertex&gt;
-    #include &lt;skinnormal_vertex&gt;
-    #include &lt;defaultnormal_vertex&gt;
-    #endif
-    #include &lt;begin_vertex&gt;
-    #include &lt;morphtarget_vertex&gt;
-    #include &lt;skinning_vertex&gt;
-    #include &lt;project_vertex&gt;
-    #include &lt;logdepthbuf_vertex&gt;
-    #include &lt;worldpos_vertex&gt;
-    #include &lt;clipping_planes_vertex&gt;
-    #include &lt;envmap_vertex&gt;
-    #include &lt;fog_vertex&gt;
-}
-</pre>
-<p>Перебирая различные фрагменты, мы хотим заменить 
-<a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphtarget_pars_vertex.glsl.js"><code class="notranslate" translate="no">morphtarget_pars_vertex</code> блок</a>
-<a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphnormal_vertex.glsl.js"><code class="notranslate" translate="no">morphnormal_vertex</code> блок</a>
-<a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/morphtarget_vertex.glsl.js"><code class="notranslate" translate="no">morphtarget_vertex</code> блок</a>
-<a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_pars_vertex.glsl.js"><code class="notranslate" translate="no">color_pars_vertex</code> блок</a>
-и <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_vertex.glsl.js"><code class="notranslate" translate="no">color_vertex</code> блок</a></p>
-<p>Для этого мы сделаем простой массив замен и применим их в <a href="/docs/#api/en/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshBasicMaterial({
-  vertexColors: true,
-  morphTargets: true,
-});
-+const vertexShaderReplacements = [
-+  {
-+    from: '#include &lt;morphtarget_pars_vertex&gt;',
-+    to: `
-+      uniform float morphTargetInfluences[8];
-+    `,
-+  },
-+  {
-+    from: '#include &lt;morphnormal_vertex&gt;',
-+    to: `
-+    `,
-+  },
-+  {
-+    from: '#include &lt;morphtarget_vertex&gt;',
-+    to: `
-+      transformed += (morphTarget0 - position) * morphTargetInfluences[0];
-+      transformed += (morphTarget1 - position) * morphTargetInfluences[1];
-+      transformed += (morphTarget2 - position) * morphTargetInfluences[2];
-+      transformed += (morphTarget3 - position) * morphTargetInfluences[3];
-+    `,
-+  },
-+  {
-+    from: '#include &lt;color_pars_vertex&gt;',
-+    to: `
-+      varying vec3 vColor;
-+      attribute vec3 morphColor0;
-+      attribute vec3 morphColor1;
-+      attribute vec3 morphColor2;
-+      attribute vec3 morphColor3;
-+    `,
-+  },
-+  {
-+    from: '#include &lt;color_vertex&gt;',
-+    to: `
-+      vColor.xyz = morphColor0 * morphTargetInfluences[0] +
-+                   morphColor1 * morphTargetInfluences[1] +
-+                   morphColor2 * morphTargetInfluences[2] +
-+                   morphColor3 * morphTargetInfluences[3];
-+    `,
-+  },
-+];
-+material.onBeforeCompile = (shader) =&gt; {
-+  vertexShaderReplacements.forEach((rep) =&gt; {
-+    shader.vertexShader = shader.vertexShader.replace(rep.from, rep.to);
-+  });
-+};
-</pre>
-<p>Three.js также сортирует <code class="notranslate" translate="no">morphtargets</code> и применяет только самые высокие влияния. 
-Это позволяет разрешить гораздо больше целей морфинга, если одновременно используется только несколько.
-Нам нужно выяснить, как он сортировал морф-цели, а затем установить соответствие наших цветовых атрибутов.
-Мы можем сделать это, сначала удалив все наши цветовые атрибуты, а затем проверив атрибуты <code class="notranslate" translate="no">morphTarget</code> и увидев,
-какой <a href="/docs/#api/en/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> был назначен. Используя имя <a href="/docs/#api/en/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>, мы можем сказать, какой соответствующий атрибут цвета необходим. </p>
-<p>Сначала мы изменим имена атрибутов морфтаргет <code class="notranslate" translate="no">BufferAttributes</code>, чтобы их было легче разобрать позже. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// use the first geometry as the base
-// and add all the geometries as morphtargets
-const baseGeometry = geometries[0];
-baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) =&gt; {
-  const attribute = geometry.getAttribute('position');
--  const name = `target${ndx}`;
-+  // put the number in front so we can more easily parse it later
-+  const name = `${ndx}target`;
-  attribute.name = name;
-  return attribute;
-});
-</pre>
-<p>Затем мы можем установить соответствующие атрибуты цвета в <a href="/docs/#api/en/core/Object3D.onBeforeRender"><code class="notranslate" translate="no">Object3D.onBeforeRender</code></a>, 
-который является свойством нашей сетки. Three.js вызовет его непосредственно перед рендерингом, 
-что даст нам возможность исправить ситуацию. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mesh = new THREE.Mesh(baseGeometry, material);
-scene.add(mesh);
-+mesh.onBeforeRender = function(renderer, scene, camera, geometry) {
-+  // remove all the color attributes
-+  for (const {name} of colorAttributes) {
-+    geometry.deleteAttribute(name);
-+  }
-+
-+  for (let i = 0; i &lt; colorAttributes.length; ++i) {
-+    const attrib = geometry.getAttribute(`morphTarget${i}`);
-+    if (!attrib) {
-+      break;
-+    }
-+    // The name will be something like "2target" as we named it above
-+    // where 2 is the index of the data set
-+    const ndx = parseInt(attrib.name);
-+    const name = `morphColor${i}`;
-+    geometry.setAttribute(name, colorAttributes[ndx].attribute);
-+  }
-+};
-</pre>
-<p>И с этим у нас должны быть оживляющие цвета так же как коробки. </p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-morphtargets-w-colors.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lots-of-objects-morphtargets-w-colors.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
-</div>
-
-<p></p>
 <p>Я надеюсь, что пройти через это было полезно. Использование morphtargets либо через сервисы,
 которые предоставляет three.js, либо путем написания пользовательских шейдеров - 
 это распространенная техника для перемещения большого количества объектов. 
@@ -633,8 +467,8 @@ scene.add(mesh);
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

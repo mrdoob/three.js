@@ -42,51 +42,42 @@ function UVsDebug( geometry, size = 1024 ) {
 	ctx.fillStyle = 'rgb( 255, 255, 255 )';
 	ctx.fillRect( 0, 0, width, height );
 
-	if ( geometry.isGeometry ) {
+	const index = geometry.index;
+	const uvAttribute = geometry.attributes.uv;
 
-		console.error( 'THREE.UVsDebug no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-		return;
+	if ( index ) {
+
+		// indexed geometry
+
+		for ( let i = 0, il = index.count; i < il; i += 3 ) {
+
+			face[ 0 ] = index.getX( i );
+			face[ 1 ] = index.getX( i + 1 );
+			face[ 2 ] = index.getX( i + 2 );
+
+			uvs[ 0 ].fromBufferAttribute( uvAttribute, face[ 0 ] );
+			uvs[ 1 ].fromBufferAttribute( uvAttribute, face[ 1 ] );
+			uvs[ 2 ].fromBufferAttribute( uvAttribute, face[ 2 ] );
+
+			processFace( face, uvs, i / 3 );
+
+		}
 
 	} else {
 
-		const index = geometry.index;
-		const uvAttribute = geometry.attributes.uv;
+		// non-indexed geometry
 
-		if ( index ) {
+		for ( let i = 0, il = uvAttribute.count; i < il; i += 3 ) {
 
-			// indexed geometry
+			face[ 0 ] = i;
+			face[ 1 ] = i + 1;
+			face[ 2 ] = i + 2;
 
-			for ( let i = 0, il = index.count; i < il; i += 3 ) {
+			uvs[ 0 ].fromBufferAttribute( uvAttribute, face[ 0 ] );
+			uvs[ 1 ].fromBufferAttribute( uvAttribute, face[ 1 ] );
+			uvs[ 2 ].fromBufferAttribute( uvAttribute, face[ 2 ] );
 
-				face[ 0 ] = index.getX( i );
-				face[ 1 ] = index.getX( i + 1 );
-				face[ 2 ] = index.getX( i + 2 );
-
-				uvs[ 0 ].fromBufferAttribute( uvAttribute, face[ 0 ] );
-				uvs[ 1 ].fromBufferAttribute( uvAttribute, face[ 1 ] );
-				uvs[ 2 ].fromBufferAttribute( uvAttribute, face[ 2 ] );
-
-				processFace( face, uvs, i / 3 );
-
-			}
-
-		} else {
-
-			// non-indexed geometry
-
-			for ( let i = 0, il = uvAttribute.count; i < il; i += 3 ) {
-
-				face[ 0 ] = i;
-				face[ 1 ] = i + 1;
-				face[ 2 ] = i + 2;
-
-				uvs[ 0 ].fromBufferAttribute( uvAttribute, face[ 0 ] );
-				uvs[ 1 ].fromBufferAttribute( uvAttribute, face[ 1 ] );
-				uvs[ 2 ].fromBufferAttribute( uvAttribute, face[ 2 ] );
-
-				processFace( face, uvs, i / 3 );
-
-			}
+			processFace( face, uvs, i / 3 );
 
 		}
 

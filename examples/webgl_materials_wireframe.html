@@ -49,12 +49,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -63,9 +64,9 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			const API = {
 				thickness: 1
@@ -88,6 +89,7 @@
 				camera.position.z = 200;
 
 				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.enablePan = false;
 				controls.enableZoom = false;
 
@@ -132,7 +134,7 @@
 
 					//
 
-					animate();
+					render();
 
 				} );
 
@@ -143,6 +145,7 @@
 				gui.add( API, 'thickness', 0, 4 ).onChange( function () {
 
 					mesh2.material.uniforms.thickness.value = API.thickness;
+					render();
 
 				} );
 
@@ -184,9 +187,7 @@
 
 			}
 
-			function animate() {
-
-				requestAnimationFrame( animate );
+			function render() {
 
 				renderer.render( scene, camera );
 

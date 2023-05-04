@@ -30,7 +30,7 @@
 	<h2>属性</h2>
 
 	<h3>[property:AnimationClip animations]</h3>
-	<p>Array with object's animation clips.</p>
+	<p>三维物体所属的动画剪辑数组.</p>
 
 	<h3>[property:Boolean castShadow]</h3>
 	<p>对象是否被渲染到阴影贴图中。默认值为*false*。</p>
@@ -39,27 +39,31 @@
 	<p>含有对象的子级的数组。请参阅[page:Group]来了解将手动对象进行分组的相关信息。</p>
 
 	<h3>[property:Material customDepthMaterial]</h3>
-	<p>Custom depth material to be used when rendering to the depth map. Can only be used in context of meshes.
-	When shadow-casting with a [page:DirectionalLight] or [page:SpotLight], if you are modifying vertex positions in the vertex shader you must specify a customDepthMaterial for proper shadows. Default is *undefined*.
+	<p>在渲染到深度图的时候所用的自定义深度材质。 只能在网格中使用。
+	当使用[page:DirectionalLight]（平行光）或者[page:SpotLight]（聚光灯光）生成影子的时候, 如果你调整过顶点着色器中的顶点位置，就需要定义一个自定义深度材质来生成正确的影子。默认为*undefined*.
 	</p>
 
 	<h3>[property:Material customDistanceMaterial]</h3>
-	<p>与[page:.customDepthMaterial customDepthMaterial]相同，但与[page:PointLight]一起使用。默认值为*undefined*。
+	<p>与[page:.customDepthMaterial customDepthMaterial]相同，但与[page:PointLight](点光源）一起使用。默认值为*undefined*。
 	</p>
 
 	<h3>[property:Boolean frustumCulled]</h3>
 	<p>
-		When this is set, it checks every frame if the object is in the frustum of the camera before rendering the object. If set to `false` the object gets rendered every frame even if it is not in the frustum of the camera. Default is `true`.
+		当这个设置了的时候，每一帧渲染前都会检测这个物体是不是在相机的视椎体范围内。 如果设置为`false` 物体不管是不是在相机的视椎体范围内都会渲染。默认为`true`。
 	</p>
 
 	<h3>[property:Integer id]</h3>
 	<p>只读 —— 表示该对象实例ID的唯一数字。</p>
 
+		<h3>[property:Boolean isObject3D]</h3>
+		<p>
+			查看所给对象是不是[name]类型的只读标记.
+		</p>
+
 	<h3>[property:Layers layers]</h3>
 	<p>
 		物体的层级关系。
-		物体只有和一个正在使用的[page:Camera]至少在同一个层时才可见。This property can also be used to filter out
-		unwanted objects in ray-intersection tests when using [page:Raycaster].
+		物体只有和一个正在使用的[page:Camera]至少在同一个层时才可见。当使用[page:Raycaster]进行射线检测的时候此项属性可以用于过滤不参与检测的物体.
 	</p>
 
 	<h3>[property:Matrix4 matrix]</h3>
@@ -67,12 +71,18 @@
 
 	<h3>[property:Boolean matrixAutoUpdate]</h3>
 	<p>
-		当这个属性设置了之后，它将计算每一帧的位移、旋转（四元变换）和缩放矩阵，并重新计算matrixWorld属性。默认值是[page:Object3D.DefaultMatrixAutoUpdate] (true)。
+		当这个属性设置了之后，它将计算每一帧的位移、旋转（四元变换）和缩放矩阵，并重新计算matrixWorld属性。默认值是[page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE] (true)。
 	</p>
 
 	<h3>[property:Matrix4 matrixWorld]</h3>
 	<p>
 		物体的世界变换。若这个Object3D没有父级，则它将和local transform [page:.matrix]（局部变换矩阵）相同。
+	</p>
+
+	<h3>[property:Boolean matrixWorldAutoUpdate]</h3>
+	<p>
+	默认为 true. 当设置的时候，渲染器在每一帧都会检查物体自身以及它的自带是否需要更新世界变换矩阵。
+	如果不需要的话它自身以及它的子代的所有世界变换矩阵都需要你来维护。
 	</p>
 
 	<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
@@ -102,9 +112,8 @@
 		使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
 	</p>
 	<p>
-	Please notice that this callback is only executed for *renderable* 3D objects. Meaning 3D objects which define their visual
-	appearance with geometries and materials like instances of [page:Mesh], [page:Line], [page:Points] or [page:Sprite].
-	Instances of [page:Object3D], [page:Group] or [page:Bone] are not renderable and thus this callback is not executed for such objects.
+	注意此回调函数只会在*可渲染*的3D物体上执行。可渲染的3D物体指的是那种拥有视觉表现的、定义了几何体与材质的物体，例如像是[page:Mesh]、[page:Line]、[page:Points] 或者[page:Sprite]。
+	[page:Object3D]、 [page:Group] 或者 [page:Bone] 这些是不可渲染的物体，因此此回调函数不会在这样的物体上执行。
 	</p>
 
 	<h3>[property:Function onBeforeRender]</h3>
@@ -113,9 +122,8 @@
 		使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
 	</p>
 	<p>
-	Please notice that this callback is only executed for *renderable* 3D objects. Meaning 3D objects which define their visual
-	appearance with geometries and materials like instances of [page:Mesh], [page:Line], [page:Points] or [page:Sprite].
-	Instances of [page:Object3D], [page:Group] or [page:Bone] are not renderable and thus this callback is not executed for such objects.
+	注意此回调函数只会在*可渲染*的3D物体上执行。可渲染的3D物体指的是那种拥有视觉表现的、定义了几何体与材质的物体，例如像是[page:Mesh]、[page:Line]、[page:Points] 或者[page:Sprite]。
+	[page:Object3D]、 [page:Group] 或者 [page:Bone] 这些是不可渲染的物体，因此此回调函数不会在这样的物体上执行。
 	</p>
 
 	<h3>[property:Object3D parent]</h3>
@@ -151,7 +159,7 @@
 	<h3>[property:Vector3 up]</h3>
 	<p>
 		这个属性由[page:.lookAt lookAt]方法所使用，例如，来决定结果的朝向。
-		默认值是[page:Object3D.DefaultUp]，即( 0, 1, 0 )。
+		默认值是[page:Object3D.DEFAULT_UP]，即( 0, 1, 0 )。
 	</p>
 
 	<h3>[property:Object userData]</h3>
@@ -175,26 +183,30 @@
 	<h2>静态属性</h2>
 	<p>
 		静态属性和方法由每个类所定义，并非由每个类的实例所定义。
-		也就是说，改变[page:Object3D.DefaultUp]或[page:Object3D.DefaultMatrixAutoUpdate]的值，
+		也就是说，改变[page:Object3D.DEFAULT_UP]或[page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE]的值，
 		将改变<b>每个在此之后</b>由Object3D类（或派生类）创建的实例中的[page:.up up]和[page:.matrixAutoUpdate matrixAutoUpdate]的值。（已经创建好的Object3D不会受到影响）。
 	</p>
 
-	<h3>[property:Vector3 DefaultUp]</h3>
+	<h3>[property:Vector3 DEFAULT_UP]</h3>
 	<p>
 		默认的物体的[page:.up up]方向，同时也作为[page:DirectionalLight]、[page:HemisphereLight]和[page:Spotlight]（自顶向下创建的灯光）的默认方向。
 		默认设为( 0, 1, 0 )。
 	</p>
 
-	<h3>[property:Boolean DefaultMatrixAutoUpdate]</h3>
+	<h3>[property:Boolean DEFAULT_MATRIX_AUTO_UPDATE]</h3>
 	<p>
-			[page:.matrixAutoUpdate matrixAutoUpdate]的默认设置，用于新创建的Object3D。<br />
+		[page:.matrixAutoUpdate matrixAutoUpdate]的默认设置，用于新创建的Object3D。<br />
 
 	</p>
 
+	<h3>[property:Boolean DEFAULT_MATRIX_WORLD_AUTO_UPDATE]</h3>
+	<p>
+		[page:.matrixWorldAutoUpdate matrixWorldAutoUpdate]的默认设置，用于新创建的Object3D。<br />
+	</p>
 
 	<h2>方法</h2>
 
-	<h3>[page:EventDispatcher EventDispatcher] 方法在这个类上是可用的。</h3>
+	<p>[page:EventDispatcher EventDispatcher] 在该类上可用的所有方法。</p>
 
 	<h3>[method:this add]( [param:Object3D object], ... )</h3>
 	<p>
@@ -252,6 +264,13 @@
 		从该对象开始，搜索一个对象及其子级，返回第一个给定的属性中包含有匹配的值的子对象。
 	</p>
 
+	<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value] )</h3>
+	<p>
+		name —— 将要用于查找的属性的名称。<br />
+		value —— 给定的属性的值。 <br /><br />
+		从此对象开始，搜索一个对象及其子对象，返回包含给定属性的匹配值的所有子对象。
+	</p>
+
 	<h3>[method:Vector3 getWorldPosition]( [param:Vector3 target] )</h3>
 	<p>
 		[page:Vector3 target] — 结果将被复制到这个Vector3中。<br /><br />
@@ -293,7 +312,7 @@
 		这一方法不支持其父级被旋转过或者被位移过的物体。
 	</p>
 
-	<h3>[method:Array raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+	<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 	<p>抽象（空方法），在一条被投射出的射线与这个物体之间获得交点。
 		在一些子类，例如[page:Mesh], [page:Line], and [page:Points]实现了这个方法，以用于光线投射。
 	</p>
@@ -429,10 +448,10 @@
 
 	<h3>[method:undefined updateWorldMatrix]( [param:Boolean updateParents], [param:Boolean updateChildren] )</h3>
 	<p>
-		updateParents - recursively updates global transform of ancestors.<br />
-		updateChildren - recursively updates global transform of descendants.<br /><br />
+		updateParents - 递归更新物体的所有祖先的全局变换.<br />
+		updateChildren - 递归更新物体的所有后代的全局变换.<br /><br />
 
-		Updates the global transform of the object.
+		更新物体的全局变换。
 	</p>
 
 	<h3>[method:Vector3 worldToLocal]( [param:Vector3 vector] )</h3>

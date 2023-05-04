@@ -23,6 +23,4 @@ void RE_IndirectDiffuse_Toon( const in vec3 irradiance, const in GeometricContex
 
 #define RE_Direct				RE_Direct_Toon
 #define RE_IndirectDiffuse		RE_IndirectDiffuse_Toon
-
-#define Material_LightProbeLOD( material )	(0)
 `;

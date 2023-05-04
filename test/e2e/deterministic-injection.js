@@ -1,4 +1,3 @@
-
 ( function () {
 
 	/* Deterministic random */
@@ -13,7 +12,6 @@
 
 	};
 
-
 	/* Deterministic timer */
 
 	window.performance._now = performance.now;
@@ -24,7 +22,6 @@
 	window.Date.prototype.getTime = now;
 	window.performance.now = now;
 
-
 	/* Deterministic RAF */
 
 	const RAF = window.requestAnimationFrame;
@@ -34,7 +31,7 @@
 	const maxFrameId = 2;
 	window.requestAnimationFrame = function ( cb ) {
 
-		if ( ! _renderStarted ) {
+		if ( ! window._renderStarted ) {
 
 			setTimeout( function () {
 
@@ -52,7 +49,7 @@
 
 				} else {
 
-					_renderFinished = true;
+					window._renderFinished = true;
 
 				}
 
@@ -61,7 +58,6 @@
 		}
 
 	};
-
 
 	/* Semi-determitistic video */
 

@@ -30,13 +30,50 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			// no params
+			const object = new Clock();
+			assert.ok( object, 'Can instantiate a Clock.' );
+
+			// autostart
+			const object_all = new Clock( false );
+			assert.ok( object_all, 'Can instantiate a Clock with autostart.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.todo( 'autoStart', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// PUBLIC STUFF
+		QUnit.todo( 'startTime', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'oldTime', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'elapsedTime', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'running', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
 		QUnit.todo( 'start', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
@@ -73,7 +110,7 @@ export default QUnit.module( 'Core', () => {
 
 			mockPerformance();
 
-			var clock = new Clock( false );
+			const clock = new Clock( false );
 
 			clock.start();
 

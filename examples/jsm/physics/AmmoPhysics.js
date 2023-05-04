@@ -188,56 +188,55 @@ async function AmmoPhysics() {
 
 			const delta = ( time - lastTime ) / 1000;
 
-			// console.time( 'world.step' );
 			world.stepSimulation( delta, 10 );
-			// console.timeEnd( 'world.step' );
 
-		}
+			//
 
-		lastTime = time;
+			for ( let i = 0, l = meshes.length; i < l; i ++ ) {
 
-		//
+				const mesh = meshes[ i ];
 
-		for ( let i = 0, l = meshes.length; i < l; i ++ ) {
+				if ( mesh.isInstancedMesh ) {
 
-			const mesh = meshes[ i ];
+					const array = mesh.instanceMatrix.array;
+					const bodies = meshMap.get( mesh );
 
-			if ( mesh.isInstancedMesh ) {
+					for ( let j = 0; j < bodies.length; j ++ ) {
 
-				const array = mesh.instanceMatrix.array;
-				const bodies = meshMap.get( mesh );
+						const body = bodies[ j ];
 
-				for ( let j = 0; j < bodies.length; j ++ ) {
+						const motionState = body.getMotionState();
+						motionState.getWorldTransform( worldTransform );
 
-					const body = bodies[ j ];
+						const position = worldTransform.getOrigin();
+						const quaternion = worldTransform.getRotation();
+
+						compose( position, quaternion, array, j * 16 );
+
+					}
+
+					mesh.instanceMatrix.needsUpdate = true;
+					mesh.computeBoundingSphere();
+
+				} else if ( mesh.isMesh ) {
+
+					const body = meshMap.get( mesh );
 
 					const motionState = body.getMotionState();
 					motionState.getWorldTransform( worldTransform );
 
 					const position = worldTransform.getOrigin();
 					const quaternion = worldTransform.getRotation();
-
-					compose( position, quaternion, array, j * 16 );
+					mesh.position.set( position.x(), position.y(), position.z() );
+					mesh.quaternion.set( quaternion.x(), quaternion.y(), quaternion.z(), quaternion.w() );
 
 				}
-
-				mesh.instanceMatrix.needsUpdate = true;
-
-			} else if ( mesh.isMesh ) {
-
-				const body = meshMap.get( mesh );
-
-				const motionState = body.getMotionState();
-				motionState.getWorldTransform( worldTransform );
-
-				const position = worldTransform.getOrigin();
-				const quaternion = worldTransform.getRotation();
-				mesh.position.set( position.x(), position.y(), position.z() );
-				mesh.quaternion.set( quaternion.x(), quaternion.y(), quaternion.z(), quaternion.w() );
 
 			}
 
 		}
+
+		lastTime = time;
 
 	}
 

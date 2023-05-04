@@ -25,16 +25,17 @@
 		<a href="http://seiga.nicovideo.jp/seiga/im5162984" target="_blank" rel="noopener">Pose Data</a>
 		</div>
 
-		<script src="js/libs/ammo.wasm.js"></script>
+		<script src="jsm/libs/ammo.wasm.js"></script>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -43,11 +44,11 @@
 
 			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
-			import { MMDLoader } from './jsm/loaders/MMDLoader.js';
-			import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
+			import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
+			import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
+			import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
 
 			let camera, scene, renderer, effect;
 			let mesh, helper;
@@ -76,10 +77,10 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
-				const ambient = new THREE.AmbientLight( 0x666666 );
+				const ambient = new THREE.AmbientLight( 0xaaaaaa, 1 );
 				scene.add( ambient );
 
-				const directionalLight = new THREE.DirectionalLight( 0x887766 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 

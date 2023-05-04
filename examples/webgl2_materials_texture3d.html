@@ -15,12 +15,13 @@
 
 	<!-- Import maps polyfill -->
 	<!-- Remove this when import maps will be widely supported -->
-	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+	<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 	<script type="importmap">
 		{
 			"imports": {
-				"three": "../build/three.module.js"
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
 			}
 		}
 	</script>
@@ -28,11 +29,11 @@
 	<script type="module">
 		import * as THREE from 'three';
 
-		import { GUI } from './jsm/libs/lil-gui.module.min.js';
-		import { OrbitControls } from './jsm/controls/OrbitControls.js';
-		import { NRRDLoader } from './jsm/loaders/NRRDLoader.js';
-		import { VolumeRenderShader1 } from './jsm/shaders/VolumeShader.js';
-		import WebGL from './jsm/capabilities/WebGL.js';
+		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { NRRDLoader } from 'three/addons/loaders/NRRDLoader.js';
+		import { VolumeRenderShader1 } from 'three/addons/shaders/VolumeShader.js';
+		import WebGL from 'three/addons/capabilities/WebGL.js';
 
 		if ( WebGL.isWebGL2Available() === false ) {
 
@@ -97,7 +98,7 @@
 				// THREEJS will select R32F (33326) based on the THREE.RedFormat and THREE.FloatType.
 				// Also see https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_TYPES_FORMATS_FROM_DOM_ELEMENTS_TABLE
 				// TODO: look the dtype up in the volume metadata
-				const texture = new THREE.DataTexture3D( volume.data, volume.xLength, volume.yLength, volume.zLength );
+				const texture = new THREE.Data3DTexture( volume.data, volume.xLength, volume.yLength, volume.zLength );
 				texture.format = THREE.RedFormat;
 				texture.type = THREE.FloatType;
 				texture.minFilter = texture.magFilter = THREE.LinearFilter;

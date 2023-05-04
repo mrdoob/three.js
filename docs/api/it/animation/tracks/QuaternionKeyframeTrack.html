@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		[page:KeyframeTrack] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Una traccia di valori di quaternioni di keyframe.
+		</p>
+
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:String name], [param:Array times], [param:Array values] )</h3>
+		<p>
+			[page:String name] - (obbligatorio) identificativo per il KeyframeTrack.<br />
+			[page:Array times] - (obbligatorio) array di tempi del keyframe.<br />
+			[page:Array values] - valori per i keyframe ai tempi specificati, un array flat di componenti di quaternioni.<br />
+			[page:Constant interpolation] - il tipo di interpolazione da usare. Vedi
+			[page:Animation Animation Constants] per i valori possibili. Il valore di default è
+			[page:Animation InterpolateLinear].
+		</p>
+
+
+		<h2>Proprietà</h2>
+
+
+		<p class="desc">
+			Vedi [page:KeyframeTrack] per le proprietà ereditate.
+		</p>
+
+		<h3>[property:Constant DefaultInterpolation]</h3>
+		<p>
+      Il tipo di interpolazione di default da utilizzare, [page:Animation InterpolateLinear].
+		</p>
+
+		<h3>[property:String ValueTypeName]</h3>
+		<p>
+			String 'quaternion'.
+		</p>
+
+
+		<h2>Metodi</h2>
+
+
+		<p class="desc">
+			Vedi [page:KeyframeTrack] per i metodi ereditati.
+		</p>
+
+		<h3>[method:QuaternionLinearInterpolant InterpolantFactoryMethodLinear]()</h3>
+		<p>
+      Restituisce un nuovo [page:QuaternionLinearInterpolant QuaternionLinearInterpolant] basato sui
+      [page:KeyframeTrack.values values], sui [page:KeyframeTrack.times times] e sul
+			[page:KeyframeTrack.valueSize valueSize] dei keyframe.
+		</p>
+
+
+		<h2>Source</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

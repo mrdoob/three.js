@@ -22,8 +22,8 @@
 		<h3>[name]([param:Number width], [param:Number height], [param:Object options])</h3>
 
 		<p>
-		[page:Float width] -renderTarget的宽度 <br />
-		[page:Float height] - renderTarget的高度 <br />
+		[page:Float width] -renderTarget的宽度. Default is `1`.<br />
+		[page:Float height] - renderTarget的高度. Default is `1`.<br />
 		options - (可选)一个保存着自动生成的目标纹理的纹理参数以及表示是否使用深度缓存/模板缓存的布尔值的对象
 		以下是一些合法选项：<br /><br />
 
@@ -31,18 +31,24 @@
 		[page:Constant wrapT] - 默认是[page:Textures ClampToEdgeWrapping]. <br />
 		[page:Constant magFilter] - 默认是[page:Textures LinearFilter]. <br />
 		[page:Constant minFilter] - 默认是[page:Textures LinearFilter]. <br />
-		[page:Boolean generateMipmaps] - 默认是*false*.<br />
+		[page:Boolean generateMipmaps] - 默认是`false`.<br />
 		[page:Constant format] - 默认是[page:Textures RGBAFormat]. <br />
 		[page:Constant type] - 默认是[page:Textures UnsignedByteType]. <br />
-		[page:Number anisotropy] - 默认是*1*. 参见[page:Texture.anisotropy]<br />
-		[page:Constant encoding] - 默认是[page:Textures LinearEncoding]. <br />
-		[page:Boolean depthBuffer] - 默认是*true*.<br />
-		[page:Boolean stencilBuffer] - 默认是*false*.<br /><br />
+		[page:Number anisotropy] - 默认是`1`. 参见[page:Texture.anisotropy]<br />
+		[page:Constant colorSpace] - 默认是[page:Textures NoColorSpace]. <br />
+		[page:Boolean depthBuffer] - 默认是`true`.<br />
+		[page:Boolean stencilBuffer] - 默认是`false`.<br />
+		[page:Number samples] - 默认是`0`.<br /><br />
 
 		创建一个新[name]
 		</p>
 
 		<h2>属性</h2>
+
+		<h3>[property:Boolean isWebGLRenderTarget]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:number width]</h3>
 		<p>
@@ -89,6 +95,10 @@
 		如果设置，那么场景的深度将会被渲染到此纹理上。默认为null
 		</p>
 
+		<h3>[property:Number samples]</h3>
+		<p>
+		Defines the count of MSAA samples. Can only be used with WebGL 2. Default is *0*.
+		</p>
 
 		<h2>方法</h2>
 

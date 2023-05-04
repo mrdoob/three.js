@@ -55,7 +55,7 @@ UTIF.decode = function ( buff, prm ) {
 	var bin = id == 'II' ? UTIF._binLE : UTIF._binBE;
 	bin.readUshort( data, offset ); offset += 2;
 
-	var ifdo = bin.readUint( data, offset ); offset += 4;
+	var ifdo = bin.readUint( data, offset );
 	var ifds = [];
 	while ( true ) {
 
@@ -339,7 +339,7 @@ UTIF._readIFD = function ( bin, data, offset, ifds, depth, prm ) {
 
 		ifd[ 't' + tag ] = arr;
 
-		if ( tag == 330 && ifd[ 't272' ] && ifd[ 't272' ][ 0 ] == 'DSLR-A100' ) { } else if ( tag == 330 || tag == 34665 || tag == 34853 || ( tag == 50740 && bin.readUshort( data, bin.readUint( arr, 0 ) ) < 300 ) || tag == 61440 ) {
+		if ( tag == 330 || tag == 34665 || tag == 34853 || ( tag == 50740 && bin.readUshort( data, bin.readUint( arr, 0 ) ) < 300 ) || tag == 61440 ) {
 
 			var oarr = tag == 50740 ? [ bin.readUint( arr, 0 ) ] : arr;
 			var subfd = [];

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Un materiale per superfici lucide, senza riflessi speculari.<br /><br />
+
+			Il materiale utilizza un modello [link:https://en.wikipedia.org/wiki/Blinn-Phong_shading_model Blinn-Phong] non fisico
+			per calcolare la riflettanza. A differenza dal modello Lambertiano utilizzato nel [page:MeshLambertMaterial]
+			questo può simulare superfici lucide con riflessi speculari (come il legno verniciato). [name] utilizza 
+			l'ombreggiatura per-fragment.<br /><br />
+
+			Le prestazioni saranno maggiori quando si utilizza questo materiale su	[page:MeshStandardMaterial] o [page:MeshPhysicalMaterial],
+			a scapito di una certa precisione grafica.
+		</p>
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshPhongMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (opzionale) un oggetto con una o più proprietà che definiscono l'aspetto del materiale.
+			Qualsiasi proprietà del materiale (inclusa qualsiasi proprietà ereditata da [page:Material]) può essere passata qui. <br /><br />
+
+			L'eccezione è la proprietà [page:Hexadecimal colore], la quale può essere passata come stringa
+			esadecimale e per impostazione predefinita è `0xffffff` (bianco). [page:Color.set]( color ) viene chiamato internamente.
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Material] per le proprietà comuni.</p>
+
+		<h3>[property:Texture alphaMap]</h3>
+		<p>
+			La mappa alfa è una texture in scala di grigi che controlla l'opacità sulla superficie
+			(nero: completamente trasparente; bianco: completamente opaco). Il valore predefinito è `null`.<br /><br />
+
+			Viene utilizzato solo il colore della texture, ignorando il canale alfa, se esiste.
+			Per le texuture RGB e RGBA, il renderer [page:WebGLRenderer WebGL] utilizzarà il canale del verde 
+			durante il campionamento di questa texture a causa del bit extra di precisione fornito per il verde
+			nei formati RGB 565 compressi e non compressi DXT. Anche le texture solo luminanza e luminanza/alfa continueranno
+			a funzionare come previsto.
+		</p>
+
+		<h3>[property:Texture aoMap]</h3>
+		<p>Il canale rosso di questa texture viene utilizzato come la mappa di occlusione ambientale. Il valore 
+			predefinito è `null`. AoMap richiede un secondo set di UV.</p>
+
+		<h3>[property:Float aoMapIntensity]</h3>
+		<p>L'intensità dell'effetto di occlusione ambientale. Il valore 
+			predefinito è `1`. Zero non è un effetto di occlusione.</p>
+
+		<h3>[property:Texture bumpMap]</h3>
+		<p>
+			La texture per creare una mappa di rilievo. I valori nero e bianco si associano alla profondità percepita in relazione
+			alle luci. Bump in realtà non influisce sulla geometria dell'oggetto, solo sull'illuminazione. Se viene definita una mappa
+			normale questa verrà ignorata.
+		</p>
+
+		<h3>[property:Float bumpScale]</h3>
+		<p>Quanto la mappa di rilievo influisce sul materiale. Gli intervalli tipici sono 0-1. Il valore predefinito è 1.</p>
+
+
+		<h3>[property:Color color]</h3>
+		<p>[page:Color Colore] del materiale, il valore predefinito è impostato a bianco (0xffffff).</p>
+
+		<h3>[property:Integer combine]</h3>
+		<p>
+			Come combinare il risultato del colore della superficie con l'eventuale mappa ambientale.<br /><br />
+
+			Le opzioni sono [page:Materials THREE.MultiplyOperation] (impostazione predefinita), [page:Materials THREE.MixOperation],
+			[page:Materials THREE.AddOperation]. Se viene scelto il mix, la [page:.reflectivity] viene utilizzata per
+			sfumare tra i due colori.
+		</p>
+
+		<h3>[property:Texture displacementMap]</h3>
+		<p>
+			La mappa di spostamento influisce sulla posizione dei vertici della mesh.
+			A differenza di altre mappe che influenzano solo la luce e l'ombra del materiale, i vertici 
+			spostati possono proiettare ombre, bloccare altri oggetti, e altrimenti agire come una vera
+			geometria. La texture di spostamento è un'immagine in cui il valore di ciascun pixel (il bianco è 
+			il più alto) viene mappato e riposizionato rispetto ai vertici della mesh.
+		</p>
+
+		<h3>[property:Float displacementScale]</h3>
+		<p>
+			Quando la mappa di spostamento influenza la mesh (dove il nero non è lo spostamento,
+			e il bianco è lo spostamento massimo). Senza una mappa di spostamento impostata, questo valore
+			non viene applicato.
+			Il valore predefinito è 1.
+		</p>
+
+		<h3>[property:Float displacementBias]</h3>
+		<p>
+			L'offset dei valori della mappa di spostamento sui vertici della mesh.
+			Senza una mappa di spostamento impostata, questo valore
+			non viene applicato. Il valore predefinito è 0.
+		</p>
+
+		<h3>[property:Color emissive]</h3>
+		<p>
+			Colore emissivo (chiaro) per il materiale, essenzialmente un colore solido non influenzato 
+			da altre luci. L'impostazione predefinita è nero.
+		</p>
+
+		<h3>[property:Texture emissiveMap]</h3>
+		<p>
+			Imposta la mappa emissiva (bagliore). Il valore predefinito è `null`. Il colore della mappa emissiva
+			è modulato dal colore emissivo e dall'intensità emissiva. Se si dispone di una mappa emissiva, 
+			assicurarsi di impostare il colore emissivo su qualcosa di diverso dal nero. 
+		</p>
+
+		<h3>[property:Float emissiveIntensity]</h3>
+		<p>Intensità della luce emissiva. Modula il colore emissivo. Il valore predefinito è `1`.</p>
+
+		<h3>[property:Texture envMap]</h3>
+		<p>La mappa ambientale. Il valore predefinito è `null`.</p>
+
+		<h3>[property:Boolean flatShading]</h3>
+		<p>
+			Definisce se il materiale viene renderizzato con un'ombreggiatura piatta. Il valore predefinito è `false`.
+		</p>
+
+		<h3>[property:Boolean fog]</h3>
+		<p>Indica se il materiale è influenzato dalla nebbia. Il valore predefinito è `true`.</p>
+
+		<h3>[property:Texture lightMap]</h3>
+		<p>La mappa della luce. Il valore predefinito è `null`. La lightMap richiede un secondo set di UV.</p>
+
+		<h3>[property:Float lightMapIntensity]</h3>
+		<p>Intensità della luce. Il valore predefinito è `1`.</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>
+			La mappa colore. Può includere facoltativamente un canale alfa, in genere combinato 
+			con [page:Material.transparent .transparent] or[page:Material.alphaTest .alphaTest]. Il valore predefinito è `null`.
+			Il colore della mappa texture è modulato dal [page:.color] diffuso.
+		</p>
+
+		<h3>[property:Texture normalMap]</h3>
+		<p>
+			La texture per creare una mappa normale. I valori RGB influenzano la normale della superficie per ogni frammento di pixel 
+			e cambiano il modo in cui il colore è illuminato. Le mappe normali non modificano la figura effettiva della superficie,
+			ma solo l'illuminazione. Nel caso in cui il materiale abbia una mappa normale creata utilizzando la convezione della mano
+			sinistra, la componente y di normalScale deve essere negata per compensare la diversa mano.
+		</p>
+
+		<h3>[property:Integer normalMapType]</h3>
+		<p>
+			Il tipo di mappa normale.<br /><br />
+
+			Le opzioni sono [page:constant THREE.TangentSpaceNormalMap] (impostazione predefinita), e [page:constant THREE.ObjectSpaceNormalMap].
+		</p>
+
+		<h3>[property:Vector2 normalScale]</h3>
+		<p>
+			Quanto la mappa normale influenza il materiale. Gli intervalli tipici sono 0-1.
+			Il valore predefinito è un [page:Vector2] impostato a (1,1).
+		</p>
+
+		<h3>[property:Float reflectivity]</h3>
+		<p>
+			Quanto la mappa ambientale influisce sulla superficie; vedi anche [page:.combine].
+			Il valore predefinito è 1 e l'intervallo valido è tra 0 (nessun riflesso) e 1 (pieno riflesso).
+		</p>
+
+		<h3>[property:Float refractionRatio]</h3>
+		<p>
+			L'indice di rifrazione (IOR) dell'aria (circa 1) diviso per l'indice di rifrazione del materiale.
+			Viene utilizzato con le modalità di mappatura ambientale [page:Textures THREE.CubeRefractionMapping] e [page:Textures THREE.EquirectangularRefractionMapping].
+			Il rapporto di rifrazione non deve essere superiore a 1. Il valore predefinito è `0.98`.
+		</p>
+
+		<h3>[property:Float shininess]</h3>
+		<p>Quanto è brillante l'evidenziazione [page:.specular speculare]; un valore più alto dà un'evidenziazione più nitida. Il valore predefinito è `30`.</p>
+
+		<h3>[property:Color specular]</h3>
+		<p>
+			Colore speculare del materiale. Il valore predefinito è [page:Color] impostato a `0x111111` (grigio molto scuro).<br /><br />
+
+			Questo definisce la lucentezza del materiale e il colore della sua lucentezza.
+		</p>
+
+		<h3>[property:Texture specularMap]</h3>
+		<p>
+			Il valore della mappa speculare influenza sia quanto contribuisce l'evidenziazione 
+			della superficie speculare sia quanto la mappa ambientale influisce sulla superficie. 
+			Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Boolean wireframe]</h3>
+		<p>Rendering della geometria come wireframe. Il valore predefinito è `false` (cioè renderizzazione come poligoni piatti).</p>
+
+		<h3>[property:String wireframeLinecap]</h3>
+		<p>
+			Definisce l'aspetto delle estremità della linea. I valori possibili sono "butt", "round" e "square". Il valore predefinito è 'round'.<br /><br />
+
+			Questa corrisponde alla proprietà [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
+			e viene ignorata dal renderer [page:WebGLRenderer WebGL].
+		</p>
+
+		<h3>[property:String wireframeLinejoin]</h3>
+		<p>
+			Definisce l'aspetto dei punti di unione della linea. I valori possibili sono "round", "bevel" e "miter". Il valore predefinito è 'round'.<br /><br />
+
+			Questa corrisponde alla proprietà [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]
+			e viene ignorata dal renderer [page:WebGLRenderer WebGL].
+		</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>Controlla lo spessore del wireframe. Il valore predefinito è `1`.<br /><br />
+
+			A causa delle limitazioni del [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf profilo OpenGL Core] 
+			con il renderer [page:WebGLRenderer WebGL] sulla maggior parte delle piattaforme, 
+			la larghezza di riga sarà sempre 1 indipendentemente dal valore impostato.
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Material] per i metodi comuni.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

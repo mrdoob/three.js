@@ -124,21 +124,32 @@ class ColladaExporter {
 
 		function imageToData( image, ext ) {
 
-			canvas = canvas || document.createElement( 'canvas' );
-			ctx = ctx || canvas.getContext( '2d' );
+			if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+				( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+				( typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas ) ||
+				( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
-			canvas.width = image.width;
-			canvas.height = image.height;
+				canvas = canvas || document.createElement( 'canvas' );
+				ctx = ctx || canvas.getContext( '2d' );
 
-			ctx.drawImage( image, 0, 0 );
+				canvas.width = image.width;
+				canvas.height = image.height;
 
-			// Get the base64 encoded data
-			const base64data = canvas
-				.toDataURL( `image/${ ext }`, 1 )
-				.replace( /^data:image\/(png|jpg);base64,/, '' );
+				ctx.drawImage( image, 0, 0 );
 
-			// Convert to a uint8 array
-			return base64ToBuffer( base64data );
+				// Get the base64 encoded data
+				const base64data = canvas
+					.toDataURL( `image/${ ext }`, 1 )
+					.replace( /^data:image\/(png|jpg);base64,/, '' );
+
+				// Convert to a uint8 array
+				return base64ToBuffer( base64data );
+
+			} else {
+
+				throw new Error( 'THREE.ColladaExporter: No valid image data found. Unable to process texture.' );
+
+			}
 
 		}
 
@@ -243,20 +254,11 @@ class ColladaExporter {
 
 		// Process the given piece of geometry into the geometry library
 		// Returns the mesh id
-		function processGeometry( g ) {
+		function processGeometry( bufferGeometry ) {
 
-			let info = geometryInfo.get( g );
+			let info = geometryInfo.get( bufferGeometry );
 
 			if ( ! info ) {
-
-				// convert the geometry to bufferGeometry if it isn't already
-				const bufferGeometry = g;
-
-				if ( bufferGeometry.isBufferGeometry !== true ) {
-
-					throw new Error( 'THREE.ColladaExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-				}
 
 				const meshid = `Mesh${ libraryGeometries.length + 1 }`;
 
@@ -271,7 +273,7 @@ class ColladaExporter {
 						[ { start: 0, count: indexCount, materialIndex: 0 } ];
 
 
-				const gname = g.name ? ` name="${ g.name }"` : '';
+				const gname = bufferGeometry.name ? ` name="${ bufferGeometry.name }"` : '';
 				let gnode = `<geometry id="${ meshid }"${ gname }><mesh>`;
 
 				// define the geometry node and the vertices for the geometry
@@ -305,10 +307,10 @@ class ColladaExporter {
 				}
 
 				// serialize lightmap uvs
-				if ( 'uv2' in bufferGeometry.attributes ) {
+				if ( 'uv1' in bufferGeometry.attributes ) {
 
 					const uvName = `${ meshid }-texcoord2`;
-					gnode += getAttribute( bufferGeometry.attributes.uv2, uvName, [ 'S', 'T' ], 'float' );
+					gnode += getAttribute( bufferGeometry.attributes.uv1, uvName, [ 'S', 'T' ], 'float' );
 					triangleInputs += `<input semantic="TEXCOORD" source="#${ uvName }" offset="0" set="1" />`;
 
 				}
@@ -353,7 +355,7 @@ class ColladaExporter {
 				libraryGeometries.push( gnode );
 
 				info = { meshid: meshid, bufferGeometry: bufferGeometry };
-				geometryInfo.set( g, info );
+				geometryInfo.set( bufferGeometry, info );
 
 			}
 
@@ -366,7 +368,8 @@ class ColladaExporter {
 		function processTexture( tex ) {
 
 			let texid = imageMap.get( tex );
-			if ( texid == null ) {
+
+			if ( texid === undefined ) {
 
 				texid = `image-${ libraryImages.length + 1 }`;
 

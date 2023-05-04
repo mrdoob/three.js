@@ -21,13 +21,6 @@ class TessellateModifier {
 
 	modify( geometry ) {
 
-		if ( geometry.isGeometry === true ) {
-
-			console.error( 'THREE.TessellateModifier no longer supports Geometry. Use BufferGeometry instead.' );
-			return geometry;
-
-		}
-
 		if ( geometry.index !== null ) {
 
 			geometry = geometry.toNonIndexed();
@@ -73,19 +66,19 @@ class TessellateModifier {
 		const hasNormals = attributes.normal !== undefined;
 		const hasColors = attributes.color !== undefined;
 		const hasUVs = attributes.uv !== undefined;
-		const hasUV2s = attributes.uv2 !== undefined;
+		const hasUV1s = attributes.uv1 !== undefined;
 
 		let positions = attributes.position.array;
 		let normals = hasNormals ? attributes.normal.array : null;
 		let colors = hasColors ? attributes.color.array : null;
 		let uvs = hasUVs ? attributes.uv.array : null;
-		let uv2s = hasUV2s ? attributes.uv2.array : null;
+		let uv1s = hasUV1s ? attributes.uv1.array : null;
 
 		let positions2 = positions;
 		let normals2 = normals;
 		let colors2 = colors;
 		let uvs2 = uvs;
-		let uv2s2 = uv2s;
+		let uv1s2 = uv1s;
 
 		let iteration = 0;
 		let tessellating = true;
@@ -136,15 +129,15 @@ class TessellateModifier {
 
 			}
 
-			if ( hasUV2s ) {
+			if ( hasUV1s ) {
 
 				const u21 = u2s[ a ];
 				const u22 = u2s[ b ];
 				const u23 = u2s[ c ];
 
-				uv2s2.push( u21.x, u21.y );
-				uv2s2.push( u22.x, u22.y );
-				uv2s2.push( u23.x, u23.y );
+				uv1s2.push( u21.x, u21.y );
+				uv1s2.push( u22.x, u22.y );
+				uv1s2.push( u23.x, u23.y );
 
 			}
 
@@ -179,10 +172,10 @@ class TessellateModifier {
 
 			}
 
-			if ( hasUV2s ) {
+			if ( hasUV1s ) {
 
-				uv2s = uv2s2;
-				uv2s2 = [];
+				uv1s = uv1s2;
+				uv1s2 = [];
 
 			}
 
@@ -216,11 +209,11 @@ class TessellateModifier {
 
 				}
 
-				if ( hasUV2s ) {
+				if ( hasUV1s ) {
 
-					u2a.fromArray( uv2s, i2 + 0 );
-					u2b.fromArray( uv2s, i2 + 2 );
-					u2c.fromArray( uv2s, i2 + 4 );
+					u2a.fromArray( uv1s, i2 + 0 );
+					u2b.fromArray( uv1s, i2 + 2 );
+					u2c.fromArray( uv1s, i2 + 4 );
 
 				}
 
@@ -238,7 +231,7 @@ class TessellateModifier {
 						if ( hasNormals ) nm.lerpVectors( na, nb, 0.5 );
 						if ( hasColors ) cm.lerpColors( ca, cb, 0.5 );
 						if ( hasUVs ) um.lerpVectors( ua, ub, 0.5 );
-						if ( hasUV2s ) u2m.lerpVectors( u2a, u2b, 0.5 );
+						if ( hasUV1s ) u2m.lerpVectors( u2a, u2b, 0.5 );
 
 						addTriangle( 0, 3, 2 );
 						addTriangle( 3, 1, 2 );
@@ -249,7 +242,7 @@ class TessellateModifier {
 						if ( hasNormals ) nm.lerpVectors( nb, nc, 0.5 );
 						if ( hasColors ) cm.lerpColors( cb, cc, 0.5 );
 						if ( hasUVs ) um.lerpVectors( ub, uc, 0.5 );
-						if ( hasUV2s ) u2m.lerpVectors( u2b, u2c, 0.5 );
+						if ( hasUV1s ) u2m.lerpVectors( u2b, u2c, 0.5 );
 
 						addTriangle( 0, 1, 3 );
 						addTriangle( 3, 2, 0 );
@@ -260,7 +253,7 @@ class TessellateModifier {
 						if ( hasNormals ) nm.lerpVectors( na, nc, 0.5 );
 						if ( hasColors ) cm.lerpColors( ca, cc, 0.5 );
 						if ( hasUVs ) um.lerpVectors( ua, uc, 0.5 );
-						if ( hasUV2s ) u2m.lerpVectors( u2a, u2c, 0.5 );
+						if ( hasUV1s ) u2m.lerpVectors( u2a, u2c, 0.5 );
 
 						addTriangle( 0, 1, 3 );
 						addTriangle( 3, 1, 2 );
@@ -299,9 +292,9 @@ class TessellateModifier {
 
 		}
 
-		if ( hasUV2s ) {
+		if ( hasUV1s ) {
 
-			geometry2.setAttribute( 'uv2', new Float32BufferAttribute( uv2s2, 2 ) );
+			geometry2.setAttribute( 'uv1', new Float32BufferAttribute( uv1s2, 2 ) );
 
 		}
 

@@ -1,13 +1,15 @@
 /* global QUnit */
 
+import { TorusKnotGeometry } from '../../../../src/geometries/TorusKnotGeometry.js';
+
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { runStdGeometryTests } from '../../utils/qunit-utils.js';
-import { TorusKnotGeometry, TorusKnotBufferGeometry } from '../../../../src/geometries/TorusKnotGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'TorusKnotGeometry', ( hooks ) => {
 
-		var geometries = undefined;
+		let geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -26,20 +28,48 @@ export default QUnit.module( 'Geometries', () => {
 				new TorusKnotGeometry( parameters.radius, parameters.tube, parameters.tubularSegments ),
 				new TorusKnotGeometry( parameters.radius, parameters.tube, parameters.tubularSegments, parameters.radialSegments ),
 				new TorusKnotGeometry( parameters.radius, parameters.tube, parameters.tubularSegments, parameters.radialSegments, parameters.p, parameters.q ),
-				new TorusKnotBufferGeometry()
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
+
+			const object = new TorusKnotGeometry();
+			assert.strictEqual(
+				object instanceof BufferGeometry, true,
+				'TorusKnotGeometry extends from BufferGeometry'
+			);
+
+		} );
+
+		// INSTANCING
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new TorusKnotGeometry();
+			assert.ok( object, 'Can instantiate a TorusKnotGeometry.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new TorusKnotGeometry();
+			assert.ok(
+				object.type === 'TorusKnotGeometry',
+				'TorusKnotGeometry.type should be TorusKnotGeometry'
+			);
+
+		} );
+
+		QUnit.todo( 'parameters', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		// STATIC
+		QUnit.todo( 'fromJSON', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

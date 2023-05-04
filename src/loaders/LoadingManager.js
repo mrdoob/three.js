@@ -137,6 +137,6 @@ class LoadingManager {
 
 }
 
-const DefaultLoadingManager = new LoadingManager();
+const DefaultLoadingManager = /*@__PURE__*/ new LoadingManager();
 
 export { DefaultLoadingManager, LoadingManager };

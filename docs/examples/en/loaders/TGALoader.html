@@ -11,9 +11,20 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">A loader for loading a <em>.tga</em> resource. <br />
-		<a href="https://en.wikipedia.org/wiki/Truevision_TGA">TGA</a> is a raster graphics, image file format.
+		<p class="desc">A loader for loading a `.tga` resource. <br />
+		[link:https://en.wikipedia.org/wiki/Truevision_TGA TGA] is a raster graphics, image file format.
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { TGALoader } from 'three/addons/loaders/TGALoader.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -74,7 +85,7 @@
 
 		<h3>[method:DataTexture load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — A string containing the path/URL of the <em>.tga</em> file. <br />
+		[page:String url] — A string containing the path/URL of the `.tga` file. <br />
 		[page:Function onLoad] — (optional) A function to be called after loading is successfully completed. The function receives loaded [page:DataTexture] as an argument.<br />
 		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br />
