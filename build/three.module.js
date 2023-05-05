@@ -200,6 +200,12 @@ const platform = {
 		};
 		this.devicePixelRatio = params.devicePixelRatio;
 
+	},
+
+	setProperties( properties ) {
+
+		this.properties = Object.assign( this.properties || {}, properties );
+
 	}
 
 };
@@ -2584,6 +2590,13 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
 		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
+
+		/**
+		 * ios16.4.1 33189 does not work well in rendertarget
+		 * it only works in depthBuffer true & stencilBuffer false & depthTexture null
+		 * see WebGlTextures.setupRenderBufferStorage
+		 * */
+		platform.properties && ( this.useDEPTH_COMPONENT24 = platform.properties.rendertargetUseDEPTH_COMPONENT24 );
 
 	}
 
@@ -23476,7 +23489,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.depthBuffer && ! renderTarget.stencilBuffer ) {
 
-			let glInternalFormat = 33189;
+			let glInternalFormat = renderTarget.useDEPTH_COMPONENT24 ? 33190 : 33189;
 
 			if ( isMultisample || renderTarget.useRenderToTexture ) {
 
@@ -48826,8 +48839,6 @@ class SkinnedMeshBoxHelper extends LineSegments {
 
 	constructor( mesh, color ) {
 
-		this.mesh = mesh;
-
 		if ( color === undefined ) color = 0xffff00;
 
 		const indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
@@ -48838,6 +48849,8 @@ class SkinnedMeshBoxHelper extends LineSegments {
 		geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
 
 		super( geometry, new LineBasicMaterial( { color: color } ) );
+
+		this.mesh = mesh;
 
 		this.matrixAutoUpdate = false;
 

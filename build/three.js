@@ -207,6 +207,10 @@
 				cancelAnimationFrame: params.cancelAnimationFrame
 			};
 			this.devicePixelRatio = params.devicePixelRatio;
+		},
+
+		setProperties(properties) {
+			this.properties = Object.assign(this.properties || {}, properties);
 		}
 
 	};
@@ -1957,6 +1961,13 @@
 			this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 			this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
 			this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
+			/**
+			 * ios16.4.1 gl.DEPTH_COMPONENT16 does not work well in rendertarget
+			 * it only works in depthBuffer true & stencilBuffer false & depthTexture null
+			 * see WebGlTextures.setupRenderBufferStorage
+			 * */
+
+			platform.properties && (this.useDEPTH_COMPONENT24 = platform.properties.rendertargetUseDEPTH_COMPONENT24);
 		}
 
 		setTexture(texture) {
@@ -17458,7 +17469,7 @@
 			_gl.bindRenderbuffer(_gl.RENDERBUFFER, renderbuffer);
 
 			if (renderTarget.depthBuffer && !renderTarget.stencilBuffer) {
-				let glInternalFormat = _gl.DEPTH_COMPONENT16;
+				let glInternalFormat = renderTarget.useDEPTH_COMPONENT24 ? _gl.DEPTH_COMPONENT24 : _gl.DEPTH_COMPONENT16;
 
 				if (isMultisample || renderTarget.useRenderToTexture) {
 					const depthTexture = renderTarget.depthTexture;
@@ -35326,7 +35337,6 @@
 
 	class SkinnedMeshBoxHelper extends LineSegments {
 		constructor(mesh, color) {
-			this.mesh = mesh;
 			if (color === undefined) color = 0xffff00;
 			const indices = new Uint16Array([0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7]);
 			const positions = new Float32Array(8 * 3);
@@ -35336,6 +35346,7 @@
 			super(geometry, new LineBasicMaterial({
 				color: color
 			}));
+			this.mesh = mesh;
 			this.matrixAutoUpdate = false;
 			this.update();
 		}
