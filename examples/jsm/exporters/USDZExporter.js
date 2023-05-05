@@ -37,7 +37,7 @@ class USDZExporter {
 
 				if ( material.isMeshStandardMaterial ) {
 
-					const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
+					const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usda';
 
 					if ( ! ( geometryFileName in files ) ) {
 
@@ -254,7 +254,7 @@ function buildXform( object, geometry, material ) {
 	}
 
 	return `def Xform "${ name }" (
-    prepend references = @./geometries/Geometry_${ geometry.id }.usd@</Geometry>
+    prepend references = @./geometries/Geometry_${ geometry.id }.usda@</Geometry>
 )
 {
     matrix4d xformOp:transform = ${ transform }
