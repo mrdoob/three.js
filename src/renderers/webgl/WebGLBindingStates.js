@@ -1,4 +1,6 @@
-﻿function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
+﻿import { IntType } from '../../constants.js';
+
+function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 	const maxVertexAttributes = gl.getParameter( gl.MAX_VERTEX_ATTRIBS );
 
@@ -377,7 +379,7 @@
 
 					// check for integer attributes (WebGL 2 only)
 
-					const integer = ( capabilities.isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT || geometryAttribute.integer === true ) );
+					const integer = ( capabilities.isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT || geometryAttribute.gpuType === IntType ) );
 
 					if ( geometryAttribute.isInterleavedBufferAttribute ) {
 

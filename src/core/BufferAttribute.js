@@ -1,7 +1,7 @@
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 import { denormalize, normalize } from '../math/MathUtils.js';
-import { StaticDrawUsage } from '../constants.js';
+import { StaticDrawUsage, FloatType } from '../constants.js';
 import { fromHalfFloat, toHalfFloat } from '../extras/DataUtils.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
@@ -378,7 +378,7 @@ class Int8BufferAttribute extends BufferAttribute {
 
 		super( new Int8Array( array ), itemSize, normalized );
 
-		this.integer = false;
+		this.gpuType = FloatType;
 
 	}
 
@@ -386,7 +386,7 @@ class Int8BufferAttribute extends BufferAttribute {
 
 		super.copy( source );
 
-		this.integer = source.integer;
+		this.gpuType = source.gpuType;
 
 		return this;
 
@@ -400,7 +400,7 @@ class Uint8BufferAttribute extends BufferAttribute {
 
 		super( new Uint8Array( array ), itemSize, normalized );
 
-		this.integer = false;
+		this.gpuType = FloatType;
 
 	}
 
@@ -408,7 +408,7 @@ class Uint8BufferAttribute extends BufferAttribute {
 
 		super.copy( source );
 
-		this.integer = source.integer;
+		this.gpuType = source.gpuType;
 
 		return this;
 
@@ -432,7 +432,7 @@ class Int16BufferAttribute extends BufferAttribute {
 
 		super( new Int16Array( array ), itemSize, normalized );
 
-		this.integer = false;
+		this.gpuType = FloatType;
 
 	}
 
@@ -440,7 +440,7 @@ class Int16BufferAttribute extends BufferAttribute {
 
 		super.copy( source );
 
-		this.integer = source.integer;
+		this.gpuType = source.gpuType;
 
 		return this;
 
@@ -454,7 +454,7 @@ class Uint16BufferAttribute extends BufferAttribute {
 
 		super( new Uint16Array( array ), itemSize, normalized );
 
-		this.integer = false;
+		this.gpuType = FloatType;
 
 	}
 
@@ -462,7 +462,7 @@ class Uint16BufferAttribute extends BufferAttribute {
 
 		super.copy( source );
 
-		this.integer = source.integer;
+		this.gpuType = source.gpuType;
 
 		return this;
 
