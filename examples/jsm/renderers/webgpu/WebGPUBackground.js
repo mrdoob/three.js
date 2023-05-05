@@ -1,17 +1,19 @@
 import { GPULoadOp, GPUStoreOp } from './constants.js';
-import { Color, Mesh, BoxGeometry, BackSide, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
-import { context, vec2, oneMinus, texture, cubeTexture, transformDirection, positionWorld, modelWorldMatrix, viewportBottomLeft, equirectUV, MeshBasicNodeMaterial } from 'three/nodes';
+import { Color, Mesh, BoxGeometry, BackSide } from 'three';
+import { context, positionWorldDirection, MeshBasicNodeMaterial } from '../../nodes/Nodes.js';
 
 let _clearAlpha;
 const _clearColor = new Color();
 
 class WebGPUBackground {
 
-	constructor( renderer ) {
+	constructor( renderer, properties ) {
 
 		this.renderer = renderer;
+		this.properties = properties;
 
 		this.boxMesh = null;
+		this.boxMeshNode = null;
 
 		this.forceClear = false;
 
@@ -23,10 +25,10 @@ class WebGPUBackground {
 
 	}
 
-	update( renderList, scene ) {
+	update( scene, renderList, renderState ) {
 
 		const renderer = this.renderer;
-		const background = ( scene.isScene === true ) ? scene.backgroundNode || scene.background : null;
+		const background = ( scene.isScene === true ) ? scene.backgroundNode || this.properties.get( scene ).backgroundNode || scene.background : null;
 
 		let forceClear = this.forceClear;
 
@@ -45,7 +47,10 @@ class WebGPUBackground {
 			_clearAlpha = 1;
 			forceClear = true;
 
-		} else if ( background.isNode === true || background.isTexture === true ) {
+		} else if ( background.isNode === true ) {
+
+			const sceneProperties = this.properties.get( scene );
+			const backgroundNode = background;
 
 			_clearColor.copy( renderer._clearColor );
 			_clearAlpha = renderer._clearAlpha;
@@ -54,54 +59,40 @@ class WebGPUBackground {
 
 			if ( boxMesh === null ) {
 
-				let node = null;
-
-				if ( background.isCubeTexture === true ) {
-
-					node = cubeTexture( background, transformDirection( positionWorld, modelWorldMatrix ) );
-
-				} else if ( background.isTexture === true ) {
-
-					let nodeUV = null;
-
-					if ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) {
-
-						const dirNode = transformDirection( positionWorld, modelWorldMatrix );
-
-						nodeUV = equirectUV( dirNode );
-						nodeUV = vec2( nodeUV.x, oneMinus( nodeUV.y ) );
-
-					} else {
-
-						nodeUV = viewportBottomLeft;
-
-					}
-
-					node = texture( background, nodeUV );
-
-				} else /*if ( background.isNode === true )*/ {
-
-					node = context( background, {
-						// @TODO: Add Texture2D support using node context
-						getUVNode: () => transformDirection( positionWorld, modelWorldMatrix )
-					} );
-
-				}
+				this.boxMeshNode = context( backgroundNode, {
+					// @TODO: Add Texture2D support using node context
+					getUVNode: () => positionWorldDirection
+				} );
 
 				const nodeMaterial = new MeshBasicNodeMaterial();
-				nodeMaterial.colorNode = node;
+				nodeMaterial.colorNode = this.boxMeshNode;
 				nodeMaterial.side = BackSide;
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
 				nodeMaterial.fog = false;
 
 				this.boxMesh = boxMesh = new Mesh( new BoxGeometry( 1, 1, 1 ), nodeMaterial );
+				boxMesh.frustumCulled = false;
 
 				boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
 
-					this.matrixWorld.copyPosition( camera.matrixWorld );
+					const scale = camera.far;
+
+					this.matrixWorld.makeScale( scale, scale, scale ).copyPosition( camera.matrixWorld );
 
 				};
+
+			}
+
+			const backgroundCacheKey = backgroundNode.getCacheKey();
+
+			if ( sceneProperties.backgroundCacheKey !== backgroundCacheKey ) {
+
+				this.boxMeshNode.node = backgroundNode;
+
+				boxMesh.material.needsUpdate = true;
+
+				sceneProperties.backgroundCacheKey = backgroundCacheKey;
 
 			}
 
@@ -115,9 +106,8 @@ class WebGPUBackground {
 
 		// configure render pass descriptor
 
-		const renderPassDescriptor = renderer._renderPassDescriptor;
-		const colorAttachment = renderPassDescriptor.colorAttachments[ 0 ];
-		const depthStencilAttachment = renderPassDescriptor.depthStencilAttachment;
+		const colorAttachment = renderState.descriptorGPU.colorAttachments[ 0 ];
+		const depthStencilAttachment = renderState.descriptorGPU.depthStencilAttachment;
 
 		if ( renderer.autoClear === true || forceClear === true ) {
 
@@ -136,29 +126,37 @@ class WebGPUBackground {
 
 			}
 
-			if ( renderer.autoClearDepth === true ) {
+			if ( renderState.depth ) {
 
-				depthStencilAttachment.depthClearValue = renderer._clearDepth;
-				depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
-				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+				if ( renderer.autoClearDepth === true ) {
 
-			} else {
+					depthStencilAttachment.depthClearValue = renderer._clearDepth;
+					depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
+					depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
-				depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
-				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+				} else {
+
+					depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+					depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+
+				}
 
 			}
 
-			if ( renderer.autoClearStencil === true ) {
+			if ( renderState.stencil ) {
 
-				depthStencilAttachment.stencilClearValue = renderer._clearStencil;
-				depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
-				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+				if ( renderer.autoClearStencil === true ) {
 
-			} else {
+					depthStencilAttachment.stencilClearValue = renderer._clearStencil;
+					depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
+					depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
-				depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
-				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+				} else {
+
+					depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+					depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+
+				}
 
 			}
 
@@ -167,11 +165,19 @@ class WebGPUBackground {
 			colorAttachment.loadOp = GPULoadOp.Load;
 			colorAttachment.storeOp = GPUStoreOp.Store;
 
-			depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
-			depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+			if ( renderState.depth ) {
 
-			depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
-			depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+				depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+
+			}
+
+			if ( renderState.stencil ) {
+
+				depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+
+			}
 
 		}
 

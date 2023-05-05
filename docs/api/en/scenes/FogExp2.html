@@ -9,32 +9,43 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">This class contains the parameters that define exponential squared fog, which gives a clear view near the camera and a faster than exponentially densening fog farther from the camera.</p>
+		<p class="desc">
+			This class contains the parameters that define exponential squared fog,
+			which gives a clear view near the camera and a faster than exponentially
+			densening fog farther from the camera.
+		</p>
 
 		<h2>Code Example</h2>
 
-		<code>const scene = new THREE.Scene();
-		scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+		<code>
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 		</code>
 
 		<h2>Constructor</h2>
 
-
 		<h3>[name]( [param:Integer color], [param:Float density] )</h3>
 
-		<p>The color parameter is passed to the [page:Color] constructor to set the color property. Color can be a hexadecimal integer or a CSS-style string.</p>
+		<p>
+			The color parameter is passed to the [page:Color] constructor to set the
+			color property. Color can be a hexadecimal integer or a CSS-style string.
+		</p>
 		<h2>Properties</h2>
 
 		<h3>[property:Boolean isFogExp2]</h3>
-		<p>
-			Read-only flag to check if a given object is of type [name].
-		</p>
+		<p>Read-only flag to check if a given object is of type [name].</p>
 
 		<h3>[property:String name]</h3>
-		<p>Optional name of the object (doesn't need to be unique). Default is an empty string.</p>
+		<p>
+			Optional name of the object (doesn't need to be unique). Default is an
+			empty string.
+		</p>
 
 		<h3>[property:Color color]</h3>
-		<p>Fog color. Example: If set to black, far away objects will be rendered black.</p>
+		<p>
+			Fog color. Example: If set to black, far away objects will be rendered
+			black.
+		</p>
 
 		<h3>[property:Float density]</h3>
 		<p>Defines how fast the fog will grow dense.</p>

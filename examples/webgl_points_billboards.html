@@ -54,6 +54,7 @@
 				const vertices = [];
 
 				const sprite = new THREE.TextureLoader().load( 'textures/sprites/disc.png' );
+				sprite.colorSpace = THREE.SRGBColorSpace;
 
 				for ( let i = 0; i < 10000; i ++ ) {
 
@@ -68,7 +69,7 @@
 				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 				material = new THREE.PointsMaterial( { size: 35, sizeAttenuation: true, map: sprite, alphaTest: 0.5, transparent: true } );
-				material.color.setHSL( 1.0, 0.3, 0.7 );
+				material.color.setHSL( 1.0, 0.3, 0.7, THREE.SRGBColorSpace );
 
 				const particles = new THREE.Points( geometry, material );
 				scene.add( particles );

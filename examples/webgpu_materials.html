@@ -29,7 +29,7 @@
 			import * as THREE from 'three';
 			import * as Nodes from 'three/nodes';
 
-			import { attribute, positionLocal, normalLocal, normalWorld, normalView, color, texture, ShaderNode, func, uv, vec3, triplanarTexture, viewportBottomLeft, js, string, global, MeshBasicNodeMaterial, NodeObjectLoader } from 'three/nodes';
+			import { attribute, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, ShaderNode, func, uv, vec2, vec3, vec4, oscSine, triplanarTexture, viewportBottomLeft, js, string, global, loop, MeshBasicNodeMaterial, NodeObjectLoader } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -92,6 +92,11 @@
 				// PositionLocal
 				material = new MeshBasicNodeMaterial();
 				material.colorNode = positionLocal;
+				materials.push( material );
+
+				// PositionWorld
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = positionWorld;
 				materials.push( material );
 
 				// NormalLocal
@@ -204,6 +209,33 @@
 				material = new MeshBasicNodeMaterial();
 				material.colorNode = texture( uvTexture, viewportBottomLeft );
 				materials.push( material );
+
+				// Loop
+				material = new MeshBasicNodeMaterial();
+				materials.push( material );
+
+				const loopCount = 10;
+				material.colorNode = loop( loopCount, ( { i }, stack ) => {
+
+					const output = vec4().temp();
+					const scale = oscSine().mul( .09 ); // just a value to test
+
+					const scaleI = scale.mul( i );
+					const scaleINeg = scaleI.negate();
+
+					const leftUV = uv().add( vec2( scaleI, 0 ) );
+					const rightUV = uv().add( vec2( scaleINeg, 0 ) );
+					const topUV = uv().add( vec2( 0, scaleI ) );
+					const bottomUV = uv().add( vec2( 0, scaleINeg ) );
+
+					stack.assign( output, output.add( texture( uvTexture, leftUV ) ) );
+					stack.assign( output, output.add( texture( uvTexture, rightUV ) ) );
+					stack.assign( output, output.add( texture( uvTexture, topUV ) ) );
+					stack.assign( output, output.add( texture( uvTexture, bottomUV ) ) );
+
+					return output.div( loopCount * 4 );
+
+				} );
 
 				// Scriptable
 

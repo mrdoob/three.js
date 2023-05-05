@@ -108,9 +108,12 @@
 				context.fillStyle = gradient;
 				context.fillRect( 0, 0, 1, 32 );
 
+				const skyMap = new THREE.CanvasTexture( canvas );
+				skyMap.colorSpace = THREE.SRGBColorSpace;
+
 				const sky = new THREE.Mesh(
 					new THREE.SphereGeometry( 10 ),
-					new THREE.MeshBasicMaterial( { map: new THREE.CanvasTexture( canvas ), side: THREE.BackSide } )
+					new THREE.MeshBasicMaterial( { map: skyMap, side: THREE.BackSide } )
 				);
 				scene.add( sky );
 
@@ -211,6 +214,10 @@
 						return sample1( coord + vec3( - step ) ) - sample1( coord + vec3( step ) );
 					}
 
+					vec4 linearToSRGB( in vec4 value ) {
+						return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );
+					}
+
 					void main(){
 						vec3 rayDir = normalize( vDirection );
 						vec2 bounds = hitBox( vOrigin, rayDir );
@@ -255,7 +262,7 @@
 
 						}
 
-						color = ac;
+						color = linearToSRGB( ac );
 
 						if ( color.a == 0.0 ) discard;
 

@@ -10,19 +10,20 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			[link:http://en.wikipedia.org/wiki/Frustum Frustums] are used to determine what is
-			inside the camera's field of view. They help speed up the rendering process - objects which lie
-			outside a camera's frustum can safely be excluded from rendering.<br /><br />
+			[link:http://en.wikipedia.org/wiki/Frustum Frustums] are used to determine
+			what is inside the camera's field of view. They help speed up the
+			rendering process - objects which lie outside a camera's frustum can
+			safely be excluded from rendering.<br /><br />
 
-			This class is mainly intended for use internally by a renderer for calculating
-			a [page:Camera camera] or [page:LightShadow.camera shadowCamera]'s frustum.
+			This class is mainly intended for use internally by a renderer for
+			calculating a [page:Camera camera] or [page:LightShadow.camera shadowCamera]'s frustum.
 		</p>
-
 
 		<h2>Constructor</h2>
 
-
-		<h3>[name]([param:Plane p0], [param:Plane p1], [param:Plane p2], [param:Plane p3], [param:Plane p4], [param:Plane p5])</h3>
+		<h3>
+			[name]([param:Plane p0], [param:Plane p1], [param:Plane p2], [param:Plane p3], [param:Plane p4], [param:Plane p5])
+		</h3>
 		<p>
 			[page:Plane p0] - (optional) defaults to a new [page:Plane].<br />
 			[page:Plane p1] - (optional) defaults to a new [page:Plane].<br />
@@ -34,52 +35,52 @@
 			Creates a new [name].
 		</p>
 
-
 		<h2>Properties</h2>
 
 		<h3>[property:Array planes]</h3>
 		<p>Array of 6 [page:Plane planes].</p>
-
 
 		<h2>Methods</h2>
 
 		<h3>[method:Frustum clone]()</h3>
 		<p>Return a new Frustum with the same parameters as this one.</p>
 
-
 		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
 		<p>
-		[page:Vector3 point] - [page:Vector3] to test.<br /><br />
+			[page:Vector3 point] - [page:Vector3] to test.<br /><br />
 
-		Checks to see if the frustum contains the [page:Vector3 point].
+			Checks to see if the frustum contains the [page:Vector3 point].
 		</p>
 
 		<h3>[method:this copy]( [param:Frustum frustum] )</h3>
 		<p>
-		[page:Frustum frustum] - The frustum to copy<br /><br />
+			[page:Frustum frustum] - The frustum to copy<br /><br />
 
-		Copies the properties of the passed [page:Frustum frustum] into this one.
+			Copies the properties of the passed [page:Frustum frustum] into this one.
 		</p>
 
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
 		<p>
-		[page:Box3 box] - [page:Box3] to check for intersection.<br /><br />
+			[page:Box3 box] - [page:Box3] to check for intersection.<br /><br />
 
-	 	Return true if [page:Box3 box] intersects with this frustum.
+			Return true if [page:Box3 box] intersects with this frustum.
 		</p>
 
 		<h3>[method:Boolean intersectsObject]( [param:Object3D object] )</h3>
 		<p>
-			Checks whether the [page:Object3D object]'s [page:BufferGeometry.boundingSphere bounding sphere] is intersecting the Frustum.<br /><br />
+			Checks whether the [page:Object3D object]'s
+			[page:BufferGeometry.boundingSphere bounding sphere] is intersecting the
+			Frustum.<br /><br />
 
-			Note that the object must have a [page:BufferGeometry geometry] so that the bounding sphere can be calculated.
+			Note that the object must have a [page:BufferGeometry geometry] so that
+			the bounding sphere can be calculated.
 		</p>
 
 		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
 		<p>
-		[page:Sphere sphere] - [page:Sphere] to check for intersection.<br /><br />
+			[page:Sphere sphere] - [page:Sphere] to check for intersection.<br /><br />
 
-	 	Return true if [page:Sphere sphere] intersects with this frustum.
+			Return true if [page:Sphere sphere] intersects with this frustum.
 		</p>
 
 		<h3>[method:Boolean intersectsSprite]( [param:Sprite sprite] )</h3>
@@ -87,18 +88,20 @@
 			Checks whether the [page:Sprite sprite] is intersecting the Frustum.<br /><br />
 		</p>
 
-		<h3>[method:this set]( [param:Plane p0], [param:Plane p1], [param:Plane p2], [param:Plane p3], [param:Plane p4], [param:Plane p5] )</h3>
+		<h3>
+			[method:this set]( [param:Plane p0], [param:Plane p1], [param:Plane p2], [param:Plane p3], [param:Plane p4], [param:Plane p5] )
+		</h3>
 		<p>
-		Sets the frustum from the passed planes. No plane order is implied.<br>
-		Note that this method only copies the values from the given objects.
+			Sets the frustum from the passed planes. No plane order is implied.<br />
+			Note that this method only copies the values from the given objects.
 		</p>
 
 		<h3>[method:this setFromProjectionMatrix]( [param:Matrix4 matrix] )</h3>
 		<p>
-		[page:Matrix4 matrix] - Projection [page:Matrix4] used to set the [page:.planes planes]<br /><br />
-		Sets the frustum planes from the projection matrix.
+			[page:Matrix4 matrix] - Projection [page:Matrix4] used to set the
+			[page:.planes planes]<br /><br />
+			Sets the frustum planes from the projection matrix.
 		</p>
-
 
 		<h2>Source</h2>
 

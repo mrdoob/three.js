@@ -110,6 +110,9 @@ class InstancedMesh extends Mesh {
 
 		this.count = source.count;
 
+		if ( source.boundingBox !== null ) this.boundingBox = source.boundingBox.clone();
+		if ( source.boundingSphere !== null ) this.boundingSphere = source.boundingSphere.clone();
+
 		return this;
 
 	}

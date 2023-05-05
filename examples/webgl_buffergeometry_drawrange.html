@@ -109,7 +109,7 @@
 				scene.add( group );
 
 				const helper = new THREE.BoxHelper( new THREE.Mesh( new THREE.BoxGeometry( r, r, r ) ) );
-				helper.material.color.setHex( 0x101010 );
+				helper.material.color.setHex( 0x474747 );
 				helper.material.blending = THREE.AdditiveBlending;
 				helper.material.transparent = true;
 				group.add( helper );
@@ -178,7 +178,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				container.appendChild( renderer.domElement );
 

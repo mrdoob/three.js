@@ -91,6 +91,7 @@
 
 				const customizedCubeTexture = mipmaps.shift();
 				customizedCubeTexture.mipmaps = mipmaps;
+				customizedCubeTexture.colorSpace = THREE.SRGBColorSpace;
 				customizedCubeTexture.minFilter = THREE.LinearMipMapLinearFilter;
 				customizedCubeTexture.magFilter = THREE.LinearFilter;
 				customizedCubeTexture.generateMipmaps = false;

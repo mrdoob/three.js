@@ -56,6 +56,8 @@
 			import { CopyShader } from 'three/addons/shaders/CopyShader.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let camera, renderer, clock, group, container;
 
 			let composer1, composer2;

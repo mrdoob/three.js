@@ -68,6 +68,9 @@
 				const mapB = textureLoader.load( 'textures/sprite1.png' );
 				mapC = textureLoader.load( 'textures/sprite2.png' );
 
+				mapB.colorSpace = THREE.SRGBColorSpace;
+				mapC.colorSpace = THREE.SRGBColorSpace;
+
 				group = new THREE.Group();
 
 				const materialC = new THREE.SpriteMaterial( { map: mapC, color: 0xffffff, fog: true } );
@@ -122,6 +125,8 @@
 			}
 
 			function createHUDSprites( texture ) {
+
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				const material = new THREE.SpriteMaterial( { map: texture } );
 

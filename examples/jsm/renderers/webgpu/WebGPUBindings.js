@@ -17,20 +17,20 @@ class WebGPUBindings {
 
 	}
 
-	get( object ) {
+	get( renderObject ) {
 
-		let data = this.uniformsData.get( object );
+		let data = this.uniformsData.get( renderObject );
 
 		if ( data === undefined ) {
 
 			// each object defines an array of bindings (ubos, textures, samplers etc.)
 
-			const nodeBuilder = this.nodes.get( object );
+			const nodeBuilder = this.nodes.get( renderObject );
 			const bindings = nodeBuilder.getBindings();
 
 			// setup (static) binding layout and (dynamic) binding group
 
-			const pipeline = object.isNode ? this.computePipelines.get( object ) : this.renderPipelines.get( object ).pipeline;
+			const pipeline = this.renderPipelines.get( renderObject ).pipeline;
 
 			const bindLayout = pipeline.getBindGroupLayout( 0 );
 			const bindGroup = this._createBindGroup( bindings, bindLayout );
@@ -41,7 +41,39 @@ class WebGPUBindings {
 				bindings: bindings
 			};
 
-			this.uniformsData.set( object, data );
+			this.uniformsData.set( renderObject, data );
+
+		}
+
+		return data;
+
+	}
+
+	getForCompute( computeNode ) {
+
+		let data = this.uniformsData.get( computeNode );
+
+		if ( data === undefined ) {
+
+			// each object defines an array of bindings (ubos, textures, samplers etc.)
+
+			const nodeBuilder = this.nodes.getForCompute( computeNode );
+			const bindings = nodeBuilder.getBindings();
+
+			// setup (static) binding layout and (dynamic) binding group
+
+			const pipeline = this.computePipelines.get( computeNode );
+
+			const bindLayout = pipeline.getBindGroupLayout( 0 );
+			const bindGroup = this._createBindGroup( bindings, bindLayout );
+
+			data = {
+				layout: bindLayout,
+				group: bindGroup,
+				bindings: bindings
+			};
+
+			this.uniformsData.set( computeNode, data );
 
 		}
 
@@ -52,35 +84,6 @@ class WebGPUBindings {
 	remove( object ) {
 
 		this.uniformsData.delete( object );
-
-	}
-
-	getForCompute( param ) {
-
-		let data = this.uniformsData.get( param );
-
-		if ( data === undefined ) {
-
-			// bindings are not yet retrieved via node material
-
-			const bindings = param.bindings !== undefined ? param.bindings.slice() : [];
-
-			const computePipeline = this.computePipelines.get( param );
-
-			const bindLayout = computePipeline.getBindGroupLayout( 0 );
-			const bindGroup = this._createBindGroup( bindings, bindLayout );
-
-			data = {
-				layout: bindLayout,
-				group: bindGroup,
-				bindings: bindings
-			};
-
-			this.uniformsData.set( param, data );
-
-		}
-
-		return data;
 
 	}
 
@@ -189,6 +192,7 @@ class WebGPUBindings {
 					const byteLength = binding.getByteLength();
 
 					binding.bufferGPU = this.device.createBuffer( {
+						label: 'bindingBuffer',
 						size: byteLength,
 						usage: binding.usage
 					} );
@@ -230,7 +234,11 @@ class WebGPUBindings {
 
 					} else if ( binding.texture.isVideoTexture ) {
 
-						binding.textureGPU = this.textures.getVideoDefaultTexture();
+						binding.textureGPU = this.textures.getDefaultVideoTexture();
+
+					} else if ( binding.texture.isDepthTexture ) {
+
+						binding.textureGPU = this.textures.getDefaultDepthTexture();
 
 					} else {
 
@@ -240,7 +248,7 @@ class WebGPUBindings {
 
 				}
 
-				const resource = binding.textureGPU instanceof GPUTexture ? binding.textureGPU.createView( { dimension: binding.dimension } ) : binding.textureGPU;
+				const resource = binding.textureGPU instanceof GPUTexture ? binding.textureGPU.createView( { aspect: binding.aspect, dimension: binding.dimension } ) : binding.textureGPU;
 
 				entries.push( { binding: bindingPoint, resource } );
 

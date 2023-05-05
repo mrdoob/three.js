@@ -69,6 +69,8 @@
 				const halfSize = size / 2;
 				const segmentSize = size / segments;
 
+				const _color = new THREE.Color();
+
 				// generate vertices, normals and color data for a simple grid geometry
 
 				for ( let i = 0; i <= segments; i ++ ) {
@@ -85,7 +87,9 @@
 						const r = ( x / size ) + 0.5;
 						const g = ( y / size ) + 0.5;
 
-						colors.push( r, g, 1 );
+						_color.setRGB( r, g, 1, THREE.SRGBColorSpace );
+
+						colors.push( _color.r, _color.g, _color.b );
 
 					}
 

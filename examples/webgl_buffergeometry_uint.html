@@ -54,7 +54,7 @@
 
 				//
 
-				scene.add( new THREE.AmbientLight( 0x444444 ) );
+				scene.add( new THREE.AmbientLight( 0x8d8d8d ) );
 
 				const light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				light1.position.set( 1, 1, 1 );
@@ -158,7 +158,7 @@
 				geometry.computeBoundingSphere();
 
 				const material = new THREE.MeshPhongMaterial( {
-					color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
+					color: 0xd5d5d5, specular: 0xffffff, shininess: 250,
 					side: THREE.DoubleSide, vertexColors: true
 				} );
 
@@ -170,7 +170,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				container.appendChild( renderer.domElement );
 

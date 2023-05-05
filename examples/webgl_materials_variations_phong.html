@@ -60,7 +60,7 @@
 				const reflectionCube = new THREE.CubeTextureLoader()
 					.setPath( 'textures/cube/SwedishRoyalCastle/' )
 					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
-				reflectionCube.encoding = THREE.sRGBEncoding;
+				reflectionCube.colorSpace = THREE.SRGBColorSpace;
 
 				scene = new THREE.Scene();
 				scene.background = reflectionCube;
@@ -69,7 +69,7 @@
 
 				let imgTexture = new THREE.TextureLoader().load( 'textures/planets/moon_1024.jpg' );
 				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
-				imgTexture.encoding = THREE.sRGBEncoding;
+				imgTexture.colorSpace = THREE.SRGBColorSpace;
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
 
@@ -152,7 +152,7 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new THREE.AmbientLight( 0x666666 ) );
 
 				const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( 1, 1, 1 ).normalize();
@@ -167,7 +167,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 

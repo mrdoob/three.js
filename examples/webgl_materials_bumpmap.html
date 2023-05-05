@@ -71,9 +71,9 @@
 
 				// LIGHTS
 
-				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+				scene.add( new THREE.HemisphereLight( 0x8d7c7c, 0x494966 ) );
 
-				spotLight = new THREE.SpotLight( 0xffffbb, 2 );
+				spotLight = new THREE.SpotLight( 0xffffde, 2 );
 				spotLight.position.set( 0.5, 0, 1 );
 				spotLight.position.multiplyScalar( 700 );
 				scene.add( spotLight );
@@ -95,8 +95,8 @@
 				const mapHeight = new THREE.TextureLoader().load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg' );
 
 				const material = new THREE.MeshPhongMaterial( {
-					color: 0x552811,
-					specular: 0x222222,
+					color: 0x9c6e49,
+					specular: 0x666666,
 					shininess: 25,
 					bumpMap: mapHeight,
 					bumpScale: 12
@@ -115,7 +115,6 @@
 				container.appendChild( renderer.domElement );
 
 				renderer.shadowMap.enabled = true;
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 

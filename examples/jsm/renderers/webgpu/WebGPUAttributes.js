@@ -9,7 +9,7 @@ class WebGPUAttributes {
 
 	get( attribute ) {
 
-		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+		attribute = this._getAttribute( attribute );
 
 		return this.buffers.get( attribute );
 
@@ -17,7 +17,7 @@ class WebGPUAttributes {
 
 	remove( attribute ) {
 
-		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+		attribute = this._getAttribute( attribute );
 
 		const data = this.buffers.get( attribute );
 
@@ -33,7 +33,7 @@ class WebGPUAttributes {
 
 	update( attribute, isIndex = false, usage = null ) {
 
-		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+		attribute = this._getAttribute( attribute );
 
 		let data = this.buffers.get( attribute );
 
@@ -81,6 +81,7 @@ class WebGPUAttributes {
 		if ( gpuReadBuffer === null ) {
 
 			gpuReadBuffer = device.createBuffer( {
+				label: attribute.name,
 				size,
 				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 			} );
@@ -114,12 +115,21 @@ class WebGPUAttributes {
 
 	}
 
+	_getAttribute( attribute ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+
+		return attribute;
+
+	}
+
 	_createBuffer( attribute, usage ) {
 
 		const array = attribute.array;
 		const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
 
 		const buffer = this.device.createBuffer( {
+			label: attribute.name,
 			size,
 			usage: usage | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
 			mappedAtCreation: true

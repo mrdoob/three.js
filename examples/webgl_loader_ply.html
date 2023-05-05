@@ -60,7 +60,7 @@
 
 				const plane = new THREE.Mesh(
 					new THREE.PlaneGeometry( 40, 40 ),
-					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
+					new THREE.MeshPhongMaterial( { color: 0xcbcbcb, specular: 0x474747 } )
 				);
 				plane.rotation.x = - Math.PI / 2;
 				plane.position.y = - 0.5;
@@ -76,7 +76,7 @@
 
 					geometry.computeVertexNormals();
 
-					const material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
+					const material = new THREE.MeshStandardMaterial( { color: 0x009cff, flatShading: true } );
 					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.y = - 0.2;
@@ -95,7 +95,7 @@
 
 					geometry.computeVertexNormals();
 
-					const material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
+					const material = new THREE.MeshStandardMaterial( { color: 0x009cff, flatShading: true } );
 					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = - 0.2;
@@ -112,17 +112,16 @@
 
 				// Lights
 
-				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+				scene.add( new THREE.HemisphereLight( 0x8d7c7c, 0x494966 ) );
 
 				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
-				addShadowedLight( 0.5, 1, - 1, 0xffaa00, 1 );
+				addShadowedLight( 0.5, 1, - 1, 0xffd500, 1 );
 
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				renderer.shadowMap.enabled = true;
 

@@ -63,7 +63,9 @@
 				];
 
 				const reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				reflectionCube.colorSpace = THREE.SRGBColorSpace;
 				const refractionCube = new THREE.CubeTextureLoader().load( urls );
+				refractionCube.colorSpace = THREE.SRGBColorSpace;
 				refractionCube.mapping = THREE.CubeRefractionMapping;
 
 				scene = new THREE.Scene();
@@ -77,8 +79,8 @@
 				scene.add( pointLight );
 
 				//materials
-				const cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
-				const cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, envMap: refractionCube, refractionRatio: 0.95 } );
+				const cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xffaa00, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
+				const cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xfff700, envMap: refractionCube, refractionRatio: 0.95 } );
 				const cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } );
 
 				//models

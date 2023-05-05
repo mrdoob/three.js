@@ -33,8 +33,6 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			THREE.ColorManagement.enabled = true;
-
 			let camera, scene, renderer, clock;
 
 			let mesh;
@@ -95,7 +93,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.useLegacyLights = false;
 
 				container.appendChild( renderer.domElement );

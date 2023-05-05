@@ -67,7 +67,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				// Materials
 
@@ -151,7 +150,7 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x888888 ) );
+				scene.add( new THREE.AmbientLight( 0xc1c1c1 ) );
 
 				const pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
 				particleLight.add( pointLight );

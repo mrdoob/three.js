@@ -517,21 +517,26 @@
 	to the [link:https://www.khronos.org/registry/OpenGL/specs/es/3.0/es_spec_3.0.pdf OpenGL ES 3.0 Specification].
 	</p>
 
-	<h2>编码</h2>
+	<h2>Depth Packing</h2>
 	<code>
-		THREE.LinearEncoding
-		THREE.sRGBEncoding
-		THREE.BasicDepthPacking
-		THREE.RGBADepthPacking
-		</code>
+	THREE.BasicDepthPacking
+	THREE.RGBADepthPacking
+	</code>
 	<p>
-		这些常量用于纹理的[page:Texture.encoding encoding]属性。<br /><br />
+		For use with the [page:MeshDepthMaterial.depthPacking depthPacking] property of `MeshDepthMaterial`.
+	</p>
 
-		如果编码类型在纹理已被一个材质使用之后发生了改变，
-		你需要来设置[page:Material.needsUpdate Material.needsUpdate]为*true*来使得材质重新编译。<br /><br />
+	<h2>Color Space</h2>
+	<code>
+	THREE.NoColorSpace = ""
+	THREE.SRGBColorSpace = "srgb"
+	THREE.LinearSRGBColorSpace = "srgb-linear"
+	</code>
+	<p>
+	Used to define the color space of textures (and the output color space of the renderer).<br /><br />
 
-		[page:constant LinearEncoding]是默认值。
-		除此之外的其他值仅在材质的贴图、envMap和emissiveMap中有效。
+	If the color space type is changed after the texture has already been used by a material,
+	you will need to set [page:Material.needsUpdate Material.needsUpdate] to `true` to make the material recompile.<br /><br />
 	</p>
 
 	<h2>源代码</h2>

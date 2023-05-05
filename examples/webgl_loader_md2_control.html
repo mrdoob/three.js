@@ -90,7 +90,7 @@
 
 				// LIGHTS
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new THREE.AmbientLight( 0x666666 ) );
 
 				const light = new THREE.DirectionalLight( 0xffffff, 2.25 );
 				light.position.set( 200, 450, 500 );
@@ -123,7 +123,7 @@
 				ground.material.map.repeat.set( 64, 64 );
 				ground.material.map.wrapS = THREE.RepeatWrapping;
 				ground.material.map.wrapT = THREE.RepeatWrapping;
-				ground.material.map.encoding = THREE.sRGBEncoding;
+				ground.material.map.colorSpace = THREE.SRGBColorSpace;
 				// note that because the ground does not cast a shadow, .castShadow is left false
 				ground.receiveShadow = true;
 
@@ -138,7 +138,6 @@
 
 				//
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 

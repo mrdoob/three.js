@@ -24,8 +24,6 @@ export class CSM {
 
 	constructor( data ) {
 
-		data = data || {};
-
 		this.camera = data.camera;
 		this.parent = data.parent;
 		this.cascades = data.cascades || 3;

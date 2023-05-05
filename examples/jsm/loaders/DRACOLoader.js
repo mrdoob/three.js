@@ -82,7 +82,7 @@ class DRACOLoader extends Loader {
 
 	}
 
-	parse ( buffer, onLoad, onError ) {
+	parse( buffer, onLoad, onError ) {
 
 		this.decodeDracoFile( buffer, onLoad, null, null, SRGBColorSpace ).catch( onError );
 

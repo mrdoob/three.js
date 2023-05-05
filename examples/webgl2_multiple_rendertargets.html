@@ -123,6 +123,8 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let camera, scene, renderer, controls;
 			let renderTarget;
 			let postScene, postCamera;

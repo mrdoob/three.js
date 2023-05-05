@@ -83,7 +83,7 @@
 
 					const material = new THREE.MeshLambertMaterial( {
 
-						color: new THREE.Color().setHSL( Math.random(), 0.5, 0.5 ),
+						color: new THREE.Color().setHSL( Math.random(), 0.5, 0.5, THREE.SRGBColorSpace ),
 						side: THREE.DoubleSide,
 						clippingPlanes: clipPlanes,
 						clipIntersection: params.clipIntersection

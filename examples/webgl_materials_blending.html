@@ -61,6 +61,7 @@
 				ctx.fillRect( 96, 96, 32, 32 );
 
 				mapBg = new THREE.CanvasTexture( canvas );
+				mapBg.colorSpace = THREE.SRGBColorSpace;
 				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
 				mapBg.repeat.set( 64, 32 );
 
@@ -76,11 +77,13 @@
 					{ name: 'Multiply', constant: THREE.MultiplyBlending }
 				];
 
-				const map0 = textureLoader.load( 'textures/uv_grid_opengl.jpg' );
-				const map1 = textureLoader.load( 'textures/sprite0.jpg' );
-				const map2 = textureLoader.load( 'textures/sprite0.png' );
-				const map3 = textureLoader.load( 'textures/lensflare/lensflare0.png' );
-				const map4 = textureLoader.load( 'textures/lensflare/lensflare0_alpha.png' );
+				const assignSRGB = ( texture ) => { texture.colorSpace = THREE.SRGBColorSpace; };
+
+				const map0 = textureLoader.load( 'textures/uv_grid_opengl.jpg', assignSRGB );
+				const map1 = textureLoader.load( 'textures/sprite0.jpg', assignSRGB );
+				const map2 = textureLoader.load( 'textures/sprite0.png', assignSRGB );
+				const map3 = textureLoader.load( 'textures/lensflare/lensflare0.png', assignSRGB );
+				const map4 = textureLoader.load( 'textures/lensflare/lensflare0_alpha.png', assignSRGB );
 
 				const geo1 = new THREE.PlaneGeometry( 100, 100 );
 				const geo2 = new THREE.PlaneGeometry( 100, 25 );
@@ -159,6 +162,7 @@
 				ctx.fillText( text, 10, 22 );
 
 				const map = new THREE.CanvasTexture( canvas );
+				map.colorSpace = THREE.SRGBColorSpace;
 
 				const material = new THREE.MeshBasicMaterial( { map: map, transparent: true } );
 

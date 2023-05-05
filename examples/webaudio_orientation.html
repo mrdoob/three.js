@@ -63,13 +63,15 @@
 				.setPath( 'textures/cube/SwedishRoyalCastle/' )
 				.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
+			reflectionCube.colorSpace = THREE.SRGBColorSpace;
+
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xa0a0a0 );
 			scene.fog = new THREE.Fog( 0xa0a0a0, 2, 20 );
 
 			//
 
-			const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+			const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d );
 			hemiLight.position.set( 0, 20, 0 );
 			scene.add( hemiLight );
 
@@ -88,12 +90,12 @@
 
 			//
 
-			const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 50, 50 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+			const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 50, 50 ), new THREE.MeshPhongMaterial( { color: 0xcbcbcb, depthWrite: false } ) );
 			mesh.rotation.x = - Math.PI / 2;
 			mesh.receiveShadow = true;
 			scene.add( mesh );
 
-			const grid = new THREE.GridHelper( 50, 50, 0x888888, 0x888888 );
+			const grid = new THREE.GridHelper( 50, 50, 0xc1c1c1, 0xc1c1c1 );
 			scene.add( grid );
 
 			//
@@ -154,7 +156,6 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.outputEncoding = THREE.sRGBEncoding;
 			renderer.shadowMap.enabled = true;
 			container.appendChild( renderer.domElement );
 

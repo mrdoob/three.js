@@ -23,10 +23,10 @@ const Skinning = new ShaderNode( ( inputs, {}, builder ) => {
 	const skinVertex = bindMatrix.mul( positionLocal );
 
 	const skinned = add(
-		boneMatX.mul( skinVertex ).mul( weight.x ),
-		boneMatY.mul( skinVertex ).mul( weight.y ),
-		boneMatZ.mul( skinVertex ).mul( weight.z ),
-		boneMatW.mul( skinVertex ).mul( weight.w )
+		boneMatX.mul( weight.x ).mul( skinVertex ),
+		boneMatY.mul( weight.y ).mul( skinVertex ),
+		boneMatZ.mul( weight.z ).mul( skinVertex ),
+		boneMatW.mul( weight.w ).mul( skinVertex )
 	);
 
 	const skinPosition = bindMatrixInverse.mul( skinned ).xyz;

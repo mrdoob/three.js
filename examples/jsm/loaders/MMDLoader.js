@@ -4,6 +4,7 @@ import {
 	Bone,
 	BufferGeometry,
 	Color,
+	ColorManagement,
 	CustomBlending,
 	TangentSpaceNormalMap,
 	DoubleSide,
@@ -225,7 +226,15 @@ class MMDLoader extends Loader {
 			.setWithCredentials( this.withCredentials )
 			.load( url, function ( buffer ) {
 
-				onLoad( parser.parsePmd( buffer, true ) );
+				try {
+
+					onLoad( parser.parsePmd( buffer, true ) );
+
+				} catch ( e ) {
+
+					if ( onError ) onError( e );
+
+				}
 
 			}, onProgress, onError );
 
@@ -251,7 +260,15 @@ class MMDLoader extends Loader {
 			.setWithCredentials( this.withCredentials )
 			.load( url, function ( buffer ) {
 
-				onLoad( parser.parsePmx( buffer, true ) );
+				try {
+
+					onLoad( parser.parsePmx( buffer, true ) );
+
+				} catch ( e ) {
+
+					if ( onError ) onError( e );
+
+				}
 
 			}, onProgress, onError );
 
@@ -286,9 +303,17 @@ class MMDLoader extends Loader {
 
 			this.loader.load( urls[ i ], function ( buffer ) {
 
-				vmds.push( parser.parseVmd( buffer, true ) );
+				try {
 
-				if ( vmds.length === vmdNum ) onLoad( parser.mergeVmds( vmds ) );
+					vmds.push( parser.parseVmd( buffer, true ) );
+
+					if ( vmds.length === vmdNum ) onLoad( parser.mergeVmds( vmds ) );
+
+				} catch ( e ) {
+
+					if ( onError ) onError( e );
+
+				}
 
 			}, onProgress, onError );
 
@@ -317,7 +342,15 @@ class MMDLoader extends Loader {
 			.setWithCredentials( this.withCredentials )
 			.load( url, function ( text ) {
 
-				onLoad( parser.parseVpd( text, true ) );
+				try {
+
+					onLoad( parser.parseVpd( text, true ) );
+
+				} catch ( e ) {
+
+					if ( onError ) onError( e );
+
+				}
 
 			}, onProgress, onError );
 
@@ -1107,6 +1140,14 @@ class MaterialBuilder {
 			params.shininess = material.shininess;
 			params.emissive = new Color().fromArray( material.ambient );
 			params.transparent = params.opacity !== 1.0;
+
+			if ( ColorManagement.enabled === true ) {
+
+				params.diffuse.convertSRGBToLinear();
+				params.specular.convertSRGBToLinear();
+				params.emissive.convertSRGBToLinear();
+
+			}
 
 			//
 

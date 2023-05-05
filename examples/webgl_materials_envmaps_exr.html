@@ -68,7 +68,6 @@
 				container.appendChild( renderer.domElement );
 
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
@@ -108,7 +107,7 @@
 				new THREE.TextureLoader().load( 'textures/equirectangular.png', function ( texture ) {
 
 					texture.mapping = THREE.EquirectangularReflectionMapping;
-					texture.encoding = THREE.sRGBEncoding;
+					texture.colorSpace = THREE.SRGBColorSpace;
 
 					pngCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
 					pngBackground = texture;

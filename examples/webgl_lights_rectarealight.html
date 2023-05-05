@@ -37,7 +37,7 @@
 			import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 
 			let renderer, scene, camera;
-			let stats;
+			let stats, meshKnot;
 
 			init();
 
@@ -47,7 +47,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animation );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -74,14 +73,13 @@
 				scene.add( new RectAreaLightHelper( rectLight3 ) );
 
 				const geoFloor = new THREE.BoxGeometry( 2000, 0.1, 2000 );
-				const matStdFloor = new THREE.MeshStandardMaterial( { color: 0x808080, roughness: 0.1, metalness: 0 } );
+				const matStdFloor = new THREE.MeshStandardMaterial( { color: 0xbcbcbc, roughness: 0.1, metalness: 0 } );
 				const mshStdFloor = new THREE.Mesh( geoFloor, matStdFloor );
 				scene.add( mshStdFloor );
 
 				const geoKnot = new THREE.TorusKnotGeometry( 1.5, 0.5, 200, 16 );
 				const matKnot = new THREE.MeshStandardMaterial( { color: 0xffffff, roughness: 0, metalness: 0 } );
-				const meshKnot = new THREE.Mesh( geoKnot, matKnot );
-				meshKnot.name = 'meshKnot';
+				meshKnot = new THREE.Mesh( geoKnot, matKnot );
 				meshKnot.position.set( 0, 5, 0 );
 				scene.add( meshKnot );
 
@@ -108,8 +106,7 @@
 
 			function animation( time ) {
 
-				const mesh = scene.getObjectByName( 'meshKnot' );
-				mesh.rotation.y = time / 1000;
+				meshKnot.rotation.y = time / 1000;
 
 				renderer.render( scene, camera );
 

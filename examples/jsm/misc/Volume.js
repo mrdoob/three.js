@@ -195,8 +195,16 @@ class Volume {
 
 
 		/**
+		 * @member {boolean} segmentation in segmentation mode, it can load 16-bits nrrds correctly
+		 */
+		this.segmentation = false;
+
+
+		/**
 		 * @member {Array} RASDimensions This array holds the dimensions of the volume in the RAS space
 		 */
+
+
 
 	}
 
@@ -332,13 +340,20 @@ class Volume {
 
 		}
 
-		firstDirection.applyMatrix4( volume.inverseMatrix ).normalize();
+
+		let iLength, jLength;
+
+		if( ! this.segmentation ) {
+
+			firstDirection.applyMatrix4( volume.inverseMatrix ).normalize();
+			secondDirection.applyMatrix4( volume.inverseMatrix ).normalize();
+			axisInIJK.applyMatrix4( volume.inverseMatrix ).normalize();
+
+		}
 		firstDirection.arglet = 'i';
-		secondDirection.applyMatrix4( volume.inverseMatrix ).normalize();
 		secondDirection.arglet = 'j';
-		axisInIJK.applyMatrix4( volume.inverseMatrix ).normalize();
-		const iLength = Math.floor( Math.abs( firstDirection.dot( dimensions ) ) );
-		const jLength = Math.floor( Math.abs( secondDirection.dot( dimensions ) ) );
+		iLength = Math.floor( Math.abs( firstDirection.dot( dimensions ) ) );
+		jLength = Math.floor( Math.abs( secondDirection.dot( dimensions ) ) );
 		const planeWidth = Math.abs( iLength * firstSpacing );
 		const planeHeight = Math.abs( jLength * secondSpacing );
 

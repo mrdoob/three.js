@@ -76,20 +76,17 @@ scene.add( line );
 				然后我们随机增加顶点到line中，以这样的一种方式：
 			</p>
 			<code>
-const positions = line.geometry.attributes.position.array;
+const positionAttribute = line.geometry.getAttribute( 'position' );
 
-let x, y, z, index;
-x = y = z = index = 0;
+let x = 0, y = 0, z = 0;
 
-for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
+for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-    positions[ index ++ ] = x;
-    positions[ index ++ ] = y;
-    positions[ index ++ ] = z;
+	positionAttribute.setXYZ( i, x, y, z );
 
-    x += ( Math.random() - 0.5 ) * 30;
-    y += ( Math.random() - 0.5 ) * 30;
-    z += ( Math.random() - 0.5 ) * 30;
+	x += ( Math.random() - 0.5 ) * 30;
+	y += ( Math.random() - 0.5 ) * 30;
+	z += ( Math.random() - 0.5 ) * 30;
 
 }
 			</code>
@@ -103,7 +100,7 @@ line.geometry.setDrawRange( 0, newValue );
 				如果要在第一次渲染后更改position数值，则需要像这样设置needsUpdate标志：
 			</p>
 			<code>
-line.geometry.attributes.position.needsUpdate = true; // 需要加在第一次渲染之后
+positionAttribute.needsUpdate = true; // 需要加在第一次渲染之后
 			</code>
 
 			<p>

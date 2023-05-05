@@ -14,9 +14,7 @@ class WebGPU {
 
 	static getErrorMessage() {
 
-		let message = 'Your browser does not support <a href="https://gpuweb.github.io/gpuweb/" style="color:blue">WebGPU</a>';
-
-		if ( !! window.chrome ) message += '<br>Try: <b>chrome://flags/#enable-unsafe-webgpu</b>';
+		const message = 'Your browser does not support <a href="https://gpuweb.github.io/gpuweb/" style="color:blue">WebGPU</a> yet';
 
 		const element = document.createElement( 'div' );
 		element.id = 'webgpumessage';
@@ -27,7 +25,7 @@ class WebGPU {
 		element.style.background = '#fff';
 		element.style.color = '#000';
 		element.style.padding = '1.5em';
-		element.style.width = '400px';
+		element.style.maxWidth = '400px';
 		element.style.margin = '5em auto 0';
 
 		element.innerHTML = message;

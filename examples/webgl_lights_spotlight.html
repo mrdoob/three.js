@@ -50,7 +50,6 @@
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
@@ -69,7 +68,7 @@
 				controls.target.set( 0, 18, 0 );
 				controls.update();
 
-				const ambient = new THREE.HemisphereLight( 0xffffff, 0x444444, 0.05 );
+				const ambient = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 0.05 );
 				scene.add( ambient );
 
 				const loader = new THREE.TextureLoader().setPath( 'textures/' );
@@ -84,7 +83,7 @@
 					const texture = loader.load( filename );
 					texture.minFilter = THREE.LinearFilter;
 					texture.magFilter = THREE.LinearFilter;
-					texture.encoding = THREE.sRGBEncoding;
+					texture.colorSpace = THREE.SRGBColorSpace;
 
 					textures[ filename ] = texture;
 
@@ -112,7 +111,7 @@
 				//
 
 				const geometry = new THREE.PlaneGeometry( 1000, 1000 );
-				const material = new THREE.MeshLambertMaterial( { color: 0x808080 } );
+				const material = new THREE.MeshLambertMaterial( { color: 0xbcbcbc } );
 
 				const mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, - 1, 0 );

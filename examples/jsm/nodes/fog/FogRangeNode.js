@@ -19,7 +19,7 @@ class FogRangeNode extends FogNode {
 
 	construct() {
 
-		this.factorNode = smoothstep( this.nearNode, this.farNode, positionView.z.negate() );
+		return smoothstep( this.nearNode, this.farNode, positionView.z.negate() );
 
 	}
 

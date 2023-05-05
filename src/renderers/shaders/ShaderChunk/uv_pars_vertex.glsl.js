@@ -4,11 +4,6 @@ export default /* glsl */`
 	varying vec2 vUv;
 
 #endif
-#ifdef USE_UV2
-
-	attribute vec2 uv2;
-
-#endif
 #ifdef USE_MAP
 
 	uniform mat3 mapTransform;

@@ -534,21 +534,26 @@
 		a especificação [link:https://www.khronos.org/registry/OpenGL/specs/es/3.0/es_spec_3.0.pdf OpenGL ES 3.0].
 		</p>
 
-		<h2>Encoding</h2>
+		<h2>Depth Packing</h2>
 		<code>
-		THREE.LinearEncoding
-		THREE.sRGBEncoding
 		THREE.BasicDepthPacking
 		THREE.RGBADepthPacking
 		</code>
 		<p>
-		Para uso com a propriedade [page:Texture.encoding encoding] de uma textura.<br /><br />
+			For use with the [page:MeshDepthMaterial.depthPacking depthPacking] property of `MeshDepthMaterial`.
+		</p>
 
-		Se o tipo de codificação for alterado após a textura já ter sido usada por um material,
-		você precisará definir [page:Material.needsUpdate Material.needsUpdate] como `true` para fazer o material recompilar.<br /><br />
+		<h2>Color Space</h2>
+		<code>
+		THREE.NoColorSpace = ""
+		THREE.SRGBColorSpace = "srgb"
+		THREE.LinearSRGBColorSpace = "srgb-linear"
+		</code>
+		<p>
+		Used to define the color space of textures (and the output color space of the renderer).<br /><br />
 
-		[page:constant LinearEncoding] é o padrão.
-		Valores diferentes deste são válidos apenas para o mapa de um material, envMap e emissiveMap.
+		If the color space type is changed after the texture has already been used by a material,
+		you will need to set [page:Material.needsUpdate Material.needsUpdate] to `true` to make the material recompile.<br /><br />
 		</p>
 
 		<h2>Source</h2>

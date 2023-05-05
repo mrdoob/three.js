@@ -102,7 +102,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = 3;
 				renderer.domElement.style.background = 'linear-gradient( 180deg, rgba( 0,0,0,1 ) 0%, rgba( 128,128,255,1 ) 100% )';
@@ -128,7 +127,7 @@
 						material.metalness = 1;
 
 						const diffuseMap = textureLoader.load( 'Cerberus_A.jpg', render );
-						diffuseMap.encoding = THREE.sRGBEncoding;
+						diffuseMap.colorSpace = THREE.SRGBColorSpace;
 						material.map = diffuseMap;
 
 						material.metalnessMap = material.roughnessMap = textureLoader.load( 'Cerberus_RM.jpg', render );
