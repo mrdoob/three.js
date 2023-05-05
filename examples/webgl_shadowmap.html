@@ -84,7 +84,7 @@
 
 				// LIGHTS
 
-				const ambient = new THREE.AmbientLight( 0x444444 );
+				const ambient = new THREE.AmbientLight( 0x8d8d8d );
 				scene.add( ambient );
 
 				light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 5, 0.3 );
@@ -183,7 +183,7 @@
 				// GROUND
 
 				const geometry = new THREE.PlaneGeometry( 100, 100 );
-				const planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffb851 } );
+				const planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
 
 				const ground = new THREE.Mesh( geometry, planeMaterial );
 
