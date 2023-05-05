@@ -34,8 +34,6 @@
 			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 			let renderer, scene, camera;
 
 			let spotLight, lightHelper;
@@ -70,7 +68,7 @@
 				controls.target.set( 0, 18, 0 );
 				controls.update();
 
-				const ambient = new THREE.HemisphereLight( 0xffffff, 0x444444, 0.05 );
+				const ambient = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 0.05 );
 				scene.add( ambient );
 
 				const loader = new THREE.TextureLoader().setPath( 'textures/' );
@@ -113,7 +111,7 @@
 				//
 
 				const geometry = new THREE.PlaneGeometry( 1000, 1000 );
-				const material = new THREE.MeshLambertMaterial( { color: 0x808080 } );
+				const material = new THREE.MeshLambertMaterial( { color: 0xbcbcbc } );
 
 				const mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, - 1, 0 );
