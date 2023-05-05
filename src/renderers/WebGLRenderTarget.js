@@ -42,7 +42,7 @@ class WebGLRenderTarget extends EventDispatcher {
 		 * it only works in depthBuffer true & stencilBuffer false & depthTexture null
 		 * see WebGlTextures.setupRenderBufferStorage
 		 * */
-		this.useDEPTH_COMPONENT24 = platform.properties?.rendertargetUseDEPTH_COMPONENT24;
+		platform.properties && ( this.useDEPTH_COMPONENT24 = platform.properties.rendertargetUseDEPTH_COMPONENT24 );
 
 	}
 
