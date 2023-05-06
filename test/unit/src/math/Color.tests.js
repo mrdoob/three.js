@@ -80,7 +80,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.equals( d ), 'Set with style' );
 
 			a.set( 0.5, 0.5, 0.5 );
-			assert.ok( a.equals( e ), 'Set with r,g,b compoennts' );
+			assert.ok( a.equals( e ), 'Set with r,g,b components' );
 
 		} );
 
