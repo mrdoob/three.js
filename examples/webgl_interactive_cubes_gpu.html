@@ -122,10 +122,11 @@
 				function applyId( geometry, id ) {
 
 					const position = geometry.attributes.position;
-					const array = new Int32Array( position.count );
+					const array = new Int16Array( position.count );
 					array.fill( id );
 
-					const bufferAttribute = new THREE.BufferAttribute( array, 1, false );
+					const bufferAttribute = new THREE.Int16BufferAttribute( array, 1, false );
+					bufferAttribute.gpuType = THREE.IntType;
 					geometry.setAttribute( 'id', bufferAttribute );
 
 				}
