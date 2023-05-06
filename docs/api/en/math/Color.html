@@ -51,7 +51,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			[page:Float b] are defined, the red component of the color. If they are
 			not defined, it can be a
 			[link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] (recommended), 
-			a CSS-style string, or another Color instance.<br />
+			a CSS-style string, or another `Color` instance.<br />
 			[page:Float g] - (optional) If it is defined, the green component of the
 			color.<br />
 			[page:Float b] - (optional) If it is defined, the blue component of the
@@ -197,8 +197,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:Object getHSL]( [param:Object target], [param:string colorSpace] =
-			LinearSRGBColorSpace )
+			[method:Object getHSL]( [param:Object target], [param:string colorSpace] = LinearSRGBColorSpace )
 		</h3>
 		<p>
 			[page:Object target] — the result will be copied into this Object. Adds h,
@@ -218,8 +217,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:Color getRGB]( [param:Color target], [param:string colorSpace] =
-			SRGBColorSpace )
+			[method:Color getRGB]( [param:Color target], [param:string colorSpace] = SRGBColorSpace )
 		</h3>
 		<p>
 			[page:Color target] — the result will be copied into this object.<br /><br />
@@ -295,13 +293,15 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			RGB.
 		</p>
 
-		<h3>[method:this set]( [param:Color_Hex_or_String value] )</h3>
+		<h3>[method:this set]( [param:Color_Hex_or_String r], [param:Float g], [param:Float b] )</h3>
 		<p>
-			[page:Color_Hex_or_String value] - Value to set this color to.<br /><br />
+			[page:Color_Hex_or_String r] - (optional) If arguments [page:Float g] and [page:Float b] are defined, the red component of the color. If they are
+			not defined, it can be a [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] (recommended),  a CSS-style string, or another `Color` instance.<br />
+			[page:Float g] - (optional) If it is defined, the green component of the color.<br />
+			[page:Float b] - (optional) If it is defined, the blue component of the color.<br /><br />
 
-			See the Constructor above for full details of what
-			[page:Color_Hex_or_String value] can be. Delegates to [page:.copy],
-			[page:.setStyle], or [page:.setHex] depending on input type.
+			See the Constructor above for full details about possible arguments. Delegates to [page:.copy],
+			[page:.setStyle], [page:.setRGB] or [page:.setHex] depending on input type.
 		</p>
 
 		<h3>[method:this setFromVector3]( [param:Vector3 vector] )</h3>
@@ -311,8 +311,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:this setHex]( [param:Integer hex], [param:string colorSpace] =
-			SRGBColorSpace )
+			[method:this setHex]( [param:Integer hex], [param:string colorSpace] = SRGBColorSpace )
 		</h3>
 		<p>
 			[page:Integer hex] —
@@ -351,8 +350,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:this setStyle]( [param:String style], [param:string colorSpace] =
-			SRGBColorSpace )
+			[method:this setStyle]( [param:String style], [param:string colorSpace] = SRGBColorSpace )
 		</h3>
 		<p>
 			[page:String style] — color as a CSS-style string.<br /><br />
