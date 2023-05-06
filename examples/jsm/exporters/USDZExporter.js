@@ -406,10 +406,10 @@ function buildVector2Array( attribute, count ) {
 function buildPrimvars( attributes, count ) {
 
 	let string = '';
-	const ids = [ '', '1' ];
 
-	for ( const id of ids ) {
+	for ( let i = 0; i < 4; i ++ ) {
 
+		const id = ( i > 0 ? i : '' );
 		const attribute = attributes[ 'uv' + id ];
 
 		if ( attribute !== undefined ) {
