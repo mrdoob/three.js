@@ -304,6 +304,7 @@ function mergeAttributes( attributes ) {
 	let TypedArray;
 	let itemSize;
 	let normalized;
+	let gpuType = - 1;
 	let arrayLength = 0;
 
 	for ( let i = 0; i < attributes.length; ++ i ) {
@@ -341,6 +342,14 @@ function mergeAttributes( attributes ) {
 
 		}
 
+		if ( gpuType === - 1 ) gpuType = attribute.gpuType;
+		if ( gpuType !== attribute.gpuType ) {
+
+			console.error( 'THREE.BufferGeometryUtils: .mergeAttributes() failed. BufferAttribute.gpuType must be consistent across matching attributes.' );
+			return null;
+
+		}
+
 		arrayLength += attribute.array.length;
 
 	}
@@ -356,7 +365,14 @@ function mergeAttributes( attributes ) {
 
 	}
 
-	return new BufferAttribute( array, itemSize, normalized );
+	const result = new BufferAttribute( array, itemSize, normalized );
+	if ( gpuType !== undefined ) {
+
+		result.gpuType = gpuType;
+
+	}
+
+	return result;
 
 }
 

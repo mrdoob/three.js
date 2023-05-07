@@ -87,8 +87,8 @@
 				pickingTexture = new THREE.WebGLRenderTarget( 1, 1, {
 
 					type: THREE.IntType,
-					format: THREE.RedIntegerFormat,
-					internalFormat: 'R32I',
+					format: THREE.RGBAIntegerFormat,
+					internalFormat: 'RGBA32I',
 
 				} );
 				const pickingMaterial = new THREE.ShaderMaterial( {
@@ -122,10 +122,11 @@
 				function applyId( geometry, id ) {
 
 					const position = geometry.attributes.position;
-					const array = new Int32Array( position.count );
+					const array = new Int16Array( position.count );
 					array.fill( id );
 
-					const bufferAttribute = new THREE.BufferAttribute( array, 1, false );
+					const bufferAttribute = new THREE.Int16BufferAttribute( array, 1, false );
+					bufferAttribute.gpuType = THREE.IntType;
 					geometry.setAttribute( 'id', bufferAttribute );
 
 				}
@@ -263,7 +264,7 @@
 				camera.clearViewOffset();
 
 				// create buffer for reading single pixel
-				const pixelBuffer = new Int32Array( 1 );
+				const pixelBuffer = new Int32Array( 4 );
 
 				// read the pixel
 				renderer.readRenderTargetPixels( pickingTexture, 0, 0, 1, 1, pixelBuffer );
