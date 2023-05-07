@@ -115,7 +115,7 @@ const exceptionList = [
 	'webgpu_skinning',
 	'webgpu_skinning_instancing',
 	'webgpu_skinning_points',
-	'webgpu_sprite'
+	'webgpu_sprites'
 
 ];
 
