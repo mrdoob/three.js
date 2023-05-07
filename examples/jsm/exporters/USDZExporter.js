@@ -552,7 +552,7 @@ function parseDocument( context ) {
 		)` );
 
 	writer.appendLine( `token preliminary:anchoring:type = "${context.exporter.sceneAnchoringOptions.ar.anchoring.type}"` );
-	writer.appendLine( `token preliminary:planeAnchoring:alignment = "${context.exporter.sceneAnchoringOptions.ar.planeAnchoring.alignment}"` );
+	writer.appendLine( `token preliminary:planeAnchoring:alignment = "${context.exporter.sceneAnchoringOptions.planeAnchoring.alignment}"` );
 	writer.appendLine();
 
 	for ( const child of context.document.children ) {
@@ -775,7 +775,10 @@ export function buildXform( model, writer, context ) {
 	}
 
 	if ( geometry )
-		writer.beginBlock( `def Xform "${name}" (prepend references = @./geometries/Geometry_${geometry.id}.usd@</Geometry>)` );
+		writer.beginBlock( `def Xform "${name}" (
+    prepend references = @./geometries/Geometry_${geometry.id}.usd@</Geometry>
+    prepend apiSchemas = ["MaterialBindingAPI"]
+)` );
 	else if ( camera )
 		writer.beginBlock( `def Camera "${name}"` );
 	else
@@ -879,11 +882,11 @@ function buildMesh( geometry ) {
         )
         point3f[] points = [${buildVector3Array( attributes.position, count )}]
         ${attributes.uv ?
-		`float2[] primvars:st = [${buildVector2Array( attributes.uv, count )}] (
+		`texCoord2f[] primvars:st = [${buildVector2Array( attributes.uv, count )}] (
             interpolation = "vertex"
         )` : '' }
 		${attributes.uv2 ?
-		`float2[] primvars:st2 = [${buildVector2Array( attributes.uv2, count )}] (
+		`texCoord2f[] primvars:st2 = [${buildVector2Array( attributes.uv2, count )}] (
             interpolation = "vertex"
         )` : '' }
         uniform token subdivisionScheme = "none"
@@ -1040,6 +1043,13 @@ function buildMaterial( material, textures ) {
 		const textureTransformInput = `</Materials/Material_${material.id}/${uvReader}.outputs:result>`;
 		const textureTransformOutput = `</Materials/Material_${material.id}/Transform2d_${mapType}.outputs:result>`;
 
+		const rawTextureExtra = `(
+			colorSpace = "Raw"
+		)`;
+		const needsTextureScale = mapType !== 'normal' && (color && (color.r !== 1 || color.g !== 1 || color.b !== 1 || opacity !== 1)) || false;
+		const needsNormalScaleAndBias = mapType === 'normal';
+		const normalScaleValueString = (material.normalScale ? material.normalScale.x * 2 : 2).toFixed( PRECISION );
+
 		return `
         ${needsTextureTransform ? `def Shader "Transform2d_${mapType}" (
             sdrMetadata = {
@@ -1053,13 +1063,19 @@ function buildMaterial( material, textures ) {
             float2 inputs:translation = ${buildVector2( offset )}
             float2 outputs:result
         }
-		` : '' }
-		def Shader "Texture_${texture.id}_${mapType}"
+        ` : '' }
+        def Shader "Texture_${texture.id}_${mapType}"
         {
             uniform token info:id = "UsdUVTexture"
-            asset inputs:file = @textures/Texture_${id}.${isRGBA ? 'png' : 'jpg'}@
+            asset inputs:file = @textures/Texture_${id}.${isRGBA ? 'png' : 'jpg'}@ ${mapType === 'normal' ? rawTextureExtra : ''}
             float2 inputs:st.connect = ${needsTextureTransform ? textureTransformOutput : textureTransformInput}
-			float4 inputs:scale = (${color ? color.r + ', ' + color.g + ', ' + color.b : '1, 1, 1'}, ${opacity ? opacity : '1'})
+            ${needsTextureScale ? `
+            float4 inputs:scale = (${color ? color.r + ', ' + color.g + ', ' + color.b : '1, 1, 1'}, ${opacity ? opacity : '1'})
+            ` : `` }
+            ${needsNormalScaleAndBias ? `
+            float4 inputs:scale = (${normalScaleValueString}, ${normalScaleValueString}, ${normalScaleValueString}, 1)
+            float4 inputs:bias = (-1, -1, -1, 0)
+            ` : `` }
             token inputs:wrapS = "${wrapS}"
             token inputs:wrapT = "${wrapT}"
             float outputs:r
