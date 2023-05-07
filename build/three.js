@@ -531,6 +531,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				return value;
 
+			case Uint32Array:
+
+				return value / 4294967295.0;
+
 			case Uint16Array:
 
 				return value / 65535.0;
@@ -538,6 +542,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			case Uint8Array:
 
 				return value / 255.0;
+
+			case Int32Array:
+
+				return Math.max( value / 2147483647.0, - 1.0 );
 
 			case Int16Array:
 
@@ -563,6 +571,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				return value;
 
+			case Uint32Array:
+
+				return Math.round( value * 4294967295.0 );
+
 			case Uint16Array:
 
 				return Math.round( value * 65535.0 );
@@ -570,6 +582,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			case Uint8Array:
 
 				return Math.round( value * 255.0 );
+
+			case Int32Array:
+
+				return Math.round( value * 2147483647.0 );
 
 			case Int16Array:
 
@@ -10013,6 +10029,18 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			super( new Int8Array( array ), itemSize, normalized );
 
+			this.gpuType = FloatType;
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.gpuType = source.gpuType;
+
+			return this;
+
 		}
 
 	}
@@ -10022,6 +10050,18 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		constructor( array, itemSize, normalized ) {
 
 			super( new Uint8Array( array ), itemSize, normalized );
+
+			this.gpuType = FloatType;
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.gpuType = source.gpuType;
+
+			return this;
 
 		}
 
@@ -10043,6 +10083,18 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			super( new Int16Array( array ), itemSize, normalized );
 
+			this.gpuType = FloatType;
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.gpuType = source.gpuType;
+
+			return this;
+
 		}
 
 	}
@@ -10052,6 +10104,18 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		constructor( array, itemSize, normalized ) {
 
 			super( new Uint16Array( array ), itemSize, normalized );
+
+			this.gpuType = FloatType;
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.gpuType = source.gpuType;
+
+			return this;
 
 		}
 
@@ -15011,9 +15075,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		function vertexAttribPointer( index, size, type, normalized, stride, offset ) {
+		function vertexAttribPointer( index, size, type, normalized, stride, offset, integer ) {
 
-			if ( capabilities.isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT ) ) {
+			if ( integer === true ) {
 
 				gl.vertexAttribIPointer( index, size, type, stride, offset );
 
@@ -15071,6 +15135,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						const type = attribute.type;
 						const bytesPerElement = attribute.bytesPerElement;
 
+						// check for integer attributes (WebGL 2 only)
+
+						const integer = ( capabilities.isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT || geometryAttribute.gpuType === IntType ) );
+
 						if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
 							const data = geometryAttribute.data;
@@ -15111,7 +15179,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 									type,
 									normalized,
 									stride * bytesPerElement,
-									( offset + ( size / programAttribute.locationSize ) * i ) * bytesPerElement
+									( offset + ( size / programAttribute.locationSize ) * i ) * bytesPerElement,
+									integer
 								);
 
 							}
@@ -15152,7 +15221,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 									type,
 									normalized,
 									size * bytesPerElement,
-									( size / programAttribute.locationSize ) * i * bytesPerElement
+									( size / programAttribute.locationSize ) * i * bytesPerElement,
+									integer
 								);
 
 							}
@@ -17290,7 +17360,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		function reset() {
 
-			render.frame ++;
 			render.calls = 0;
 			render.triangles = 0;
 			render.points = 0;
@@ -17714,6 +17783,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	 * 		like .set for an optional property of the object
 	 *
 	 */
+
 
 	const emptyTexture = /*@__PURE__*/ new Texture();
 	const emptyArrayTexture = /*@__PURE__*/ new DataArrayTexture();
@@ -27928,6 +27998,12 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				}
 
+				if ( _gl instanceof WebGLRenderingContext ) { // @deprecated, r153
+
+					console.warn( 'THREE.WebGLRenderer: WebGL 1 support was deprecated in r153 and will be removed in r163.' );
+
+				}
+
 				// Some experimental-webgl implementations do not have getShaderPrecisionFormat
 
 				if ( _gl.getShaderPrecisionFormat === undefined ) {
@@ -28737,6 +28813,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				//
 
 				if ( this.info.autoReset === true ) this.info.reset();
+
+				this.info.render.frame ++;
 
 				//
 
@@ -36572,6 +36650,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	 *
 	 * }
 	 */
+
 
 	class ExtrudeGeometry extends BufferGeometry {
 
@@ -49009,6 +49088,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	 * The polar angle (phi) is measured from the positive y-axis. The positive y-axis is up.
 	 * The azimuthal angle (theta) is measured from the positive z-axis.
 	 */
+
 
 	class Spherical {
 

@@ -526,6 +526,10 @@ function denormalize( value, array ) {
 
 			return value;
 
+		case Uint32Array:
+
+			return value / 4294967295.0;
+
 		case Uint16Array:
 
 			return value / 65535.0;
@@ -533,6 +537,10 @@ function denormalize( value, array ) {
 		case Uint8Array:
 
 			return value / 255.0;
+
+		case Int32Array:
+
+			return Math.max( value / 2147483647.0, - 1.0 );
 
 		case Int16Array:
 
@@ -558,6 +566,10 @@ function normalize( value, array ) {
 
 			return value;
 
+		case Uint32Array:
+
+			return Math.round( value * 4294967295.0 );
+
 		case Uint16Array:
 
 			return Math.round( value * 65535.0 );
@@ -565,6 +577,10 @@ function normalize( value, array ) {
 		case Uint8Array:
 
 			return Math.round( value * 255.0 );
+
+		case Int32Array:
+
+			return Math.round( value * 2147483647.0 );
 
 		case Int16Array:
 
@@ -10008,6 +10024,18 @@ class Int8BufferAttribute extends BufferAttribute {
 
 		super( new Int8Array( array ), itemSize, normalized );
 
+		this.gpuType = FloatType;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.gpuType = source.gpuType;
+
+		return this;
+
 	}
 
 }
@@ -10017,6 +10045,18 @@ class Uint8BufferAttribute extends BufferAttribute {
 	constructor( array, itemSize, normalized ) {
 
 		super( new Uint8Array( array ), itemSize, normalized );
+
+		this.gpuType = FloatType;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.gpuType = source.gpuType;
+
+		return this;
 
 	}
 
@@ -10038,6 +10078,18 @@ class Int16BufferAttribute extends BufferAttribute {
 
 		super( new Int16Array( array ), itemSize, normalized );
 
+		this.gpuType = FloatType;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.gpuType = source.gpuType;
+
+		return this;
+
 	}
 
 }
@@ -10047,6 +10099,18 @@ class Uint16BufferAttribute extends BufferAttribute {
 	constructor( array, itemSize, normalized ) {
 
 		super( new Uint16Array( array ), itemSize, normalized );
+
+		this.gpuType = FloatType;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.gpuType = source.gpuType;
+
+		return this;
 
 	}
 
@@ -15006,9 +15070,9 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 	}
 
-	function vertexAttribPointer( index, size, type, normalized, stride, offset ) {
+	function vertexAttribPointer( index, size, type, normalized, stride, offset, integer ) {
 
-		if ( capabilities.isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT ) ) {
+		if ( integer === true ) {
 
 			gl.vertexAttribIPointer( index, size, type, stride, offset );
 
@@ -15066,6 +15130,10 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 					const type = attribute.type;
 					const bytesPerElement = attribute.bytesPerElement;
 
+					// check for integer attributes (WebGL 2 only)
+
+					const integer = ( capabilities.isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT || geometryAttribute.gpuType === IntType ) );
+
 					if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
 						const data = geometryAttribute.data;
@@ -15106,7 +15174,8 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 								type,
 								normalized,
 								stride * bytesPerElement,
-								( offset + ( size / programAttribute.locationSize ) * i ) * bytesPerElement
+								( offset + ( size / programAttribute.locationSize ) * i ) * bytesPerElement,
+								integer
 							);
 
 						}
@@ -15147,7 +15216,8 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 								type,
 								normalized,
 								size * bytesPerElement,
-								( size / programAttribute.locationSize ) * i * bytesPerElement
+								( size / programAttribute.locationSize ) * i * bytesPerElement,
+								integer
 							);
 
 						}
@@ -17285,7 +17355,6 @@ function WebGLInfo( gl ) {
 
 	function reset() {
 
-		render.frame ++;
 		render.calls = 0;
 		render.triangles = 0;
 		render.points = 0;
@@ -17709,6 +17778,7 @@ function WebGLObjects( gl, geometries, attributes, info ) {
  * 		like .set for an optional property of the object
  *
  */
+
 
 const emptyTexture = /*@__PURE__*/ new Texture();
 const emptyArrayTexture = /*@__PURE__*/ new DataArrayTexture();
@@ -27923,6 +27993,12 @@ class WebGLRenderer {
 
 			}
 
+			if ( _gl instanceof WebGLRenderingContext ) { // @deprecated, r153
+
+				console.warn( 'THREE.WebGLRenderer: WebGL 1 support was deprecated in r153 and will be removed in r163.' );
+
+			}
+
 			// Some experimental-webgl implementations do not have getShaderPrecisionFormat
 
 			if ( _gl.getShaderPrecisionFormat === undefined ) {
@@ -28732,6 +28808,8 @@ class WebGLRenderer {
 			//
 
 			if ( this.info.autoReset === true ) this.info.reset();
+
+			this.info.render.frame ++;
 
 			//
 
@@ -36567,6 +36645,7 @@ function addContour( vertices, contour ) {
  *
  * }
  */
+
 
 class ExtrudeGeometry extends BufferGeometry {
 
@@ -49004,6 +49083,7 @@ function intersectObject( object, raycaster, intersects, recursive ) {
  * The polar angle (phi) is measured from the positive y-axis. The positive y-axis is up.
  * The azimuthal angle (theta) is measured from the positive z-axis.
  */
+
 
 class Spherical {
 
