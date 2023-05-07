@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js Room Demo</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container">
+			<div id="info">
+				<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
+				<a href="https://google.github.io/filament/Filament.md.html#toc4.7.2" target="_blank" rel="noopener">Room Demo</a> raycaster for animations and click events by <a href="http://steven-ruzicka-portfolio-page.herokuapp.com/" target="_blank" rel="noopener">Steven Ruzicka</a>
+				<br>Click on objects to zoom/play animations
+			</div>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+    <script type="module">
+        import * as THREE from 'three'
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+            
+        // const gui = new GUI.GUI()
+        let clock = new THREE.Clock()
+        const scene = new THREE.Scene()
+        let renderer
+
+        /**
+         * Lights
+         */
+        const ambientLight = new THREE.AmbientLight(0xffffff, 5)
+        scene.add(ambientLight)
+
+        /**
+         * Sizing
+         */
+        const sizes = {
+            width: window.innerWidth,
+            height: window.innerHeight
+        }
+
+        /**
+         * Renderer
+         */
+        renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+        /**
+         * Camera
+         */
+        const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 50)
+        camera.position.set(- 3, 6, 3)
+
+        function logCameraPosition() {
+            console.log(camera.position, camera.rotation)
+        }
+        scene.add(camera)
+
+        const newTableCameraPosition = new THREE.Vector3( 4.455821578526777, 3.0148599588359186, -0.07300141503253793 );
+        const newTableCameraRotation = new THREE.Euler( -1.5894736626573862, -1.0300280434480615, -1.5925813033448406);
+
+        const newDrawerCameraPosition = new THREE.Vector3( -4.679039321772094, 3.9651647259301255, 6.788425620434609 ); 
+        const newDrawerCameraRotation = new THREE.Euler( -2.386476455624608, -0.004641904539556792, -3.1372237424982106);
+
+        const newShelfCameraPosition = new THREE.Vector3( 5.014328628180679, 4.402251395113069, 5.601074182861293 );
+        const newShelfCameraRotation = new THREE.Euler( -2.8057966888937824, -0.8977252150823338, -2.8751820107698096);
+
+        const controls = new OrbitControls(camera, renderer.domElement)
+        controls.enableDamping = true
+
+        // Disable the pan and zoom controls of the OrbitControls
+        controls.enablePan = false;
+        controls.enableZoom = false;
+
+        controls.addEventListener( 'change', logCameraPosition );
+
+        /** Prevent floor clipping **/
+        // Set up a fixed height for the target
+        const fixedTargetHeight = 0.5;
+
+        // Set up an event listener for when the OrbitControls are updated
+        controls.addEventListener( 'change', function () {
+        
+            // Check if the camera is below the fixed target height
+            if ( camera.position.y < fixedTargetHeight ) {
+            
+                // Set the camera y position to the fixed target height
+                camera.position.y = fixedTargetHeight + 0.01;
+            
+                // Update the controls
+                controls.update();
+            
+            }
+          
+        } );
+
+        /**
+         * Loaders
+         */
+        // Texture Loader
+        const textureLoader = new THREE.TextureLoader()
+
+        // GLTF Loader
+        const loader = new GLTFLoader()
+
+        /**
+         * Textures
+         */
+        const tempTexture = textureLoader.load()
+
+        /**
+         * Materials
+         */
+        // const tempMaterial = new THREE.MeshBasicMaterial({ color: '#ffffff' })
+        const tempMaterial = new THREE.MeshNormalMaterial({
+            side: THREE.DoubleSide,
+            flatShading: true
+        })
+        
+        /**
+         * Raycasting
+         */
+        // Set up a variable to hold the raycaster object
+        const raycaster = new THREE.Raycaster();
+        
+        // Set up a variable to hold the mouse coordinates
+        const mouse = new THREE.Vector2();
+        
+        // Set up an event listener for mouse movement
+        window.addEventListener( 'mousemove', onMouseMove, false );
+        
+        // Set up an event listener for mouse clicks
+        window.addEventListener( 'click', onMouseClick, false );
+        
+        // Define the onMouseMove function
+        function onMouseMove( event ) {
+        
+            // Calculate the normalized mouse coordinates
+            mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+            mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+        
+        }
+
+        /**
+         * GLTF Loading
+         */
+        // Declare an array to store animation actions
+        let animationActions = [];
+        let animationLoad = false
+
+        let mixer
+        let key
+        let pliers
+
+        loader.load(
+            'models/gltf/RoomExample (raycaster animations).glb',
+            function (gltf) {
+                scene.add(gltf.scene)
+                const animations = (gltf.animations)
+                mixer = new THREE.AnimationMixer(gltf.scene)
+            
+                // Create a new animation action for each animation clip
+                animationActions = animations.map( ( clip ) => {
+                    const action = mixer.clipAction( clip )
+                    action.setLoop( THREE.LoopOnce, 1 )
+                    action.clampWhenFinished = true
+                    action.timeScale = 1
+                    // action.play()
+                    return action;
+                } );
+                // console.log(animationActions);
+                animationLoad = true
+              
+                gltf.scene.traverse((child) =>
+                {
+                    if (child.isMesh && child.name == 'Circle001')
+                    {
+                        key = child
+                    }
+                    if (child.isMesh && child.name == 'Cylinder')
+                    {
+                        pliers = child
+                    }
+                    child.material = tempMaterial
+                    console.log(child)
+                })
+            },
+            function (xhr) {
+                console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+            },
+            function (error) {
+                console.error(error)
+            }
+        )   
+          
+        let keyGet = false
+        let pliersGet = false
+          
+        // Define the onMouseClick function
+        function onMouseClick() {
+        
+            // Raycast from the camera to the mouse position
+            raycaster.setFromCamera( mouse, camera );
+        
+            // Get an array of all objects intersected by the raycaster
+            const intersects = raycaster.intersectObjects( scene.children, true );
+        
+            // Loop through the intersected objects and do something with them
+            for ( let i = 0; i < intersects.length; i++ ) {
+
+                const intersectedObject = intersects[ i ].object;
+            
+                // Zoom to table
+                if (intersectedObject.name == 'Cube002')
+                {
+                    console.log("Clicked on table");
+                    camera.position.copy( newTableCameraPosition );
+                    camera.rotation.copy( newTableCameraRotation );
+                }
+              
+                // Zoom to drawer
+                if (intersectedObject.name == 'Cube007')
+                {
+                    console.log("Clicked on drawer");
+                    camera.position.copy( newDrawerCameraPosition );
+                    camera.rotation.copy( newDrawerCameraRotation );
+                }
+              
+                // Zoom to shelf
+                if (intersectedObject.name == 'Plane001')
+                {
+                    console.log("Clicked on shelf");
+                    camera.position.copy( newShelfCameraPosition );
+                    camera.rotation.copy( newShelfCameraRotation );
+                }
+              
+                // Open pet door
+                if (intersectedObject.name == 'Door')
+                {
+                    console.log("Clicked on door");
+                    animationActions[0].play()
+                    // doorSelect = true
+                }
+              
+                // Get key
+                if (intersectedObject.name == 'Circle001')
+                {
+                    console.log("Clicked on key");
+                    if (!keyGet) {
+                        key.parent.remove(key)
+                        keyGet = true
+                    }
+                }
+              
+                // Get pliers
+                if (intersectedObject.name == 'Cylinder')
+                {
+                    console.log("Clicked on pliers");
+                    if (!pliersGet) {
+                        pliers.parent.remove(pliers)
+                        pliersGet = true
+                    }
+                }
+              
+                // Open top drawer
+                if (intersectedObject.name == 'Cube003')
+                {
+                    console.log("Clicked on top drawer");
+                    animationActions[1].play()
+                }
+              
+            }
+        }
+
+        // Update the mixer each frame to advance the animations
+        function animate() {
+        
+            requestAnimationFrame( animate );
+        
+            if (animationLoad) {
+            mixer.update( clock.getDelta() );
+            }
+          
+            renderer.render( scene, camera );
+          
+        }
+
+        animate()
+    </script>
+  </body>
+</html>
