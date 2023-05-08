@@ -580,7 +580,7 @@ function addResources( object, context ) {
 
 		if ( material.isMeshStandardMaterial ) {
 
-			const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
+			const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usda';
 
 			if ( ! ( geometryFileName in context.files ) ) {
 
@@ -776,7 +776,7 @@ export function buildXform( model, writer, context ) {
 
 	if ( geometry )
 		writer.beginBlock( `def Xform "${name}" (
-    prepend references = @./geometries/Geometry_${geometry.id}.usd@</Geometry>
+    prepend references = @./geometries/Geometry_${geometry.id}.usda@</Geometry>
     prepend apiSchemas = ["MaterialBindingAPI"]
 )` );
 	else if ( camera )
