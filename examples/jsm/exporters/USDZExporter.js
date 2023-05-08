@@ -471,6 +471,17 @@ function buildMaterial( material, textures ) {
 			1002: 'mirror' // MirroredRepeatWrapping
 		};
 
+		const rotation = texture.rotation * ( 180 / Math.PI );
+
+		const rotationMatrix = new THREE.Matrix3().makeRotation( rotation );
+		const scaleMatrix = new THREE.Matrix3().makeScale( 1.0 / texture.repeat.x, 1.0 / texture.repeat.y );
+
+		const translation = new THREE.Vector2( texture.offset.x, - texture.offset.y );
+		translation.applyMatrix3( scaleMatrix );
+		translation.applyMatrix3( rotationMatrix );
+
+		const scale = new THREE.Vector2( texture.repeat.x, texture.repeat.y );
+
 		return `
 		def Shader "PrimvarReader_${ mapType }"
 		{
@@ -484,9 +495,9 @@ function buildMaterial( material, textures ) {
         {
             uniform token info:id = "UsdTransform2d"
             token inputs:in.connect = </Materials/Material_${ material.id }/PrimvarReader_${ mapType }.outputs:result>
-			float inputs:rotation = ${ texture.rotation * ( 180 / Math.PI ) }
-			float2 inputs:scale = ${ buildVector2( texture.repeat ) }
-            float2 inputs:translation = ${ buildVector2( texture.offset ) }
+            float2 inputs:translation = ${ buildVector2( translation ) }
+			float inputs:rotation = ${ rotation }
+			float2 inputs:scale = ${ buildVector2( scale ) }
             float2 outputs:result
         }
 
