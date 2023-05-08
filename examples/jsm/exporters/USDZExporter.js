@@ -255,6 +255,7 @@ function buildXform( object, geometry, material ) {
 
 	return `def Xform "${ name }" (
     prepend references = @./geometries/Geometry_${ geometry.id }.usda@</Geometry>
+    prepend apiSchemas = ["MaterialBindingAPI"]
 )
 {
     matrix4d xformOp:transform = ${ transform }
@@ -415,7 +416,7 @@ function buildPrimvars( attributes, count ) {
 		if ( attribute !== undefined ) {
 
 			string += `
-		float2[] primvars:st${ id } = [${ buildVector2Array( attribute, count )}] (
+		texCoord2f[] primvars:st${ id } = [${ buildVector2Array( attribute, count )}] (
 			interpolation = "vertex"
 		)`;
 
@@ -467,6 +468,10 @@ function buildMaterial( material, textures ) {
 
 		const uv = texture.channel > 0 ? 'st' + texture.channel : 'st';
 
+		const rawTextureExtra = `(
+			colorSpace = "Raw"
+		)`;
+
 		return `
 		def Shader "PrimvarReader_${ mapType }"
 		{
@@ -488,7 +493,7 @@ function buildMaterial( material, textures ) {
         def Shader "Texture_${ texture.id }_${ mapType }"
         {
             uniform token info:id = "UsdUVTexture"
-            asset inputs:file = @textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }@
+            asset inputs:file = @textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }@ ${mapType === 'normal' ? rawTextureExtra : ''}
 			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
             token inputs:wrapS = "repeat"
             token inputs:wrapT = "repeat"
