@@ -484,6 +484,7 @@ function buildMaterial( material, textures ) {
         {
             uniform token info:id = "UsdTransform2d"
             token inputs:in.connect = </Materials/Material_${ material.id }/PrimvarReader_${ mapType }.outputs:result>
+			float inputs:rotation = ${ texture.rotation * ( 180 / Math.PI ) }
 			float2 inputs:scale = ${ buildVector2( texture.repeat ) }
             float2 inputs:translation = ${ buildVector2( texture.offset ) }
             float2 outputs:result
