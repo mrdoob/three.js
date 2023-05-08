@@ -77,12 +77,11 @@ class USDZExporter {
 
 			const texture = textures[ id ];
 			const color = id.split( '_' )[ 1 ];
-			const isRGBA = texture.format === 1023;
 
 			const canvas = imageToCanvas( texture.image, color, texture.flipY );
-			const blob = await new Promise( resolve => canvas.toBlob( resolve, isRGBA ? 'image/png' : 'image/jpeg', 1 ) );
+			const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/png', 1 ) );
 
-			files[ `textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }` ] = new Uint8Array( await blob.arrayBuffer() );
+			files[ `textures/Texture_${ id }.png` ] = new Uint8Array( await blob.arrayBuffer() );
 
 		}
 
@@ -459,7 +458,6 @@ function buildMaterial( material, textures ) {
 	function buildTexture( texture, mapType, color ) {
 
 		const id = texture.id + ( color ? '_' + color.getHexString() : '' );
-		const isRGBA = texture.format === 1023;
 
 		textures[ id ] = texture;
 
@@ -493,7 +491,7 @@ function buildMaterial( material, textures ) {
         def Shader "Texture_${ texture.id }_${ mapType }"
         {
             uniform token info:id = "UsdUVTexture"
-			asset inputs:file = @textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }@
+			asset inputs:file = @textures/Texture_${ id }.png@
 			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
 			token inputs:sourceColorSpace = "${ texture.colorSpace === THREE.NoColorSpace ? 'raw' : 'sRGB' }"
             token inputs:wrapS = "${ WRAPPINGS[ texture.wrapS ] }"
