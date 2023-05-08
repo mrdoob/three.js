@@ -408,8 +408,40 @@ class PLYLoader extends Loader {
 			}
 
 			if ( buffer.colors.length > 0 ) {
+				if ( buffer.colors.length == buffer.vertices.length  ){
+					geometry.setAttribute( 'color', new Float32BufferAttribute( buffer.colors, 3 ) );
+				}else{
+					const numVertices =  buffer.vertices.length;
+					const vertexColors = new Float32BufferAttribute(new Float32Array(numVertices * 3), 3);
+					vertexColors.needsUpdate = true;
 
-				geometry.setAttribute( 'color', new Float32BufferAttribute( buffer.colors, 3 ) );
+
+
+					// aversing the triangle surface, 
+					// copying each vertex color to the corresponding index position, 
+					// and copying each vertex color to the corresponding index position
+					for (let i = 0, il = geometry.index.count; i < il; i += 3) {
+						const a = geometry.index.array[i];
+						const b = geometry.index.array[i + 1];
+						const c = geometry.index.array[i + 2];
+
+
+						const faceColor = new Color();
+						faceColor.fromArray(buffer.colors, i);
+
+
+
+						vertexColors.setXYZ(a, faceColor.r, faceColor.g, faceColor.b);
+						vertexColors.setXYZ(b, faceColor.r, faceColor.g, faceColor.b);
+						vertexColors.setXYZ(c, faceColor.r, faceColor.g, faceColor.b);
+
+
+					}
+					geometry.setAttribute('color', vertexColors);
+					geometry.setAttribute('FaceColor',  new Float32BufferAttribute( buffer.colors, 3 ) );
+				}
+
+
 
 			}
 
@@ -488,6 +520,18 @@ class PLYLoader extends Loader {
 
 				const vertex_indices = element.vertex_indices || element.vertex_index; // issue #9338
 				const texcoord = element.texcoord;
+				
+				//  save face color attributes
+				if ( cacheEntry.attrR !== null && cacheEntry.attrG !== null && cacheEntry.attrB !== null ) {
+
+					_color.setRGB(
+						element[ cacheEntry.attrR ] / 255.0,
+						element[ cacheEntry.attrG ] / 255.0,
+						element[ cacheEntry.attrB ] / 255.0
+					).convertSRGBToLinear();
+					buffer.colors.push( _color.r, _color.g, _color.b );
+
+				}
 
 				if ( vertex_indices.length === 3 ) {
 
