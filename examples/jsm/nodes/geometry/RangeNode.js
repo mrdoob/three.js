@@ -1,9 +1,9 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { getValueType } from '../core/NodeUtils.js';
-import { attribute } from '../core/AttributeNode.js';
+import { bufferAttribute } from '../accessors/BufferAttributeNode.js';
 import { nodeProxy, float } from '../shadernode/ShaderNode.js';
 
-import { MathUtils, InstancedBufferAttribute } from 'three';
+import { MathUtils } from 'three';
 
 class RangeNode extends Node {
 
@@ -53,55 +53,44 @@ class RangeNode extends Node {
 			else if ( maxLength > minLength && minLength === 1 ) min = new max.constructor().setScalar( min );
 
 			const vectorLength = this.getVectorLength( builder );
-			const attributeName = 'node' + this.id;
 
 			const length = vectorLength * object.count;
 			const array = new Float32Array( length );
 
-			const attributeGeometry = geometry.getAttribute( attributeName );
+			if ( vectorLength === 1 ) {
 
-			if ( attributeGeometry === undefined || attributeGeometry.array.length < length ) {
+				for ( let i = 0; i < length; i ++ ) {
 
-				if ( vectorLength === 1 ) {
-
-					for ( let i = 0; i < length; i ++ ) {
-
-						array[ i ] = MathUtils.lerp( min, max, Math.random() );
-
-					}
-
-				} else if ( min.isColor ) {
-
-					for ( let i = 0; i < length; i += 3 ) {
-
-						array[ i ] = MathUtils.lerp( min.r, max.r, Math.random() );
-						array[ i + 1 ] = MathUtils.lerp( min.g, max.g, Math.random() );
-						array[ i + 2 ] = MathUtils.lerp( min.b, max.b, Math.random() );
-
-					}
-
-				} else {
-
-					for ( let i = 0; i < length; i ++ ) {
-
-						const index = i % vectorLength;
-
-						const minValue = min.getComponent( index );
-						const maxValue = max.getComponent( index );
-
-						array[ i ] = MathUtils.lerp( minValue, maxValue, Math.random() );
-
-					}
+					array[ i ] = MathUtils.lerp( min, max, Math.random() );
 
 				}
 
-				geometry.setAttribute( attributeName, new InstancedBufferAttribute( array, vectorLength ) );
+			} else if ( min.isColor ) {
 
-				geometry.dispose();
+				for ( let i = 0; i < length; i += 3 ) {
+
+					array[ i ] = MathUtils.lerp( min.r, max.r, Math.random() );
+					array[ i + 1 ] = MathUtils.lerp( min.g, max.g, Math.random() );
+					array[ i + 2 ] = MathUtils.lerp( min.b, max.b, Math.random() );
+
+				}
+
+			} else {
+
+				for ( let i = 0; i < length; i ++ ) {
+
+					const index = i % vectorLength;
+
+					const minValue = min.getComponent( index );
+					const maxValue = max.getComponent( index );
+
+					array[ i ] = MathUtils.lerp( minValue, maxValue, Math.random() );
+
+				}
 
 			}
 
-			output = attribute( attributeName, builder.getTypeFromLength( vectorLength ) );
+			output = bufferAttribute( array, builder.getTypeFromLength( vectorLength ) );
 
 		} else {
 
