@@ -552,7 +552,7 @@ function parseDocument( context ) {
 		)` );
 
 	writer.appendLine( `token preliminary:anchoring:type = "${context.exporter.sceneAnchoringOptions.ar.anchoring.type}"` );
-	writer.appendLine( `token preliminary:planeAnchoring:alignment = "${context.exporter.sceneAnchoringOptions.planeAnchoring.alignment}"` );
+	writer.appendLine( `token preliminary:planeAnchoring:alignment = "${context.exporter.sceneAnchoringOptions.ar.planeAnchoring.alignment}"` );
 	writer.appendLine();
 
 	for ( const child of context.document.children ) {
@@ -1416,9 +1416,8 @@ class USDAnimationExtension {
 			}
 
 			model.addTrack( track );
-			const targets = this.rootTargetMap.get( root );
-			if ( ! ( targets === null || targets === void 0 ? void 0 : targets.includes( animationTarget ) ) )
-				targets === null || targets === void 0 ? void 0 : targets.push( animationTarget );
+            const targets = this.rootTargetMap.get(root);
+            if ( ! targets?.includes( animationTarget ) ) targets?.push( animationTarget );
 
 		}
 
@@ -1431,15 +1430,13 @@ class USDAnimationExtension {
 
 	onAfterBuildDocument( ) {
 
-		var _a;
 		for ( const ser of this.serializers ) {
 
-			const parent = ( _a = ser.model ) === null || _a === void 0 ? void 0 : _a.parent;
-			const isEmptyParent = ( parent === null || parent === void 0 ? void 0 : parent.isDynamic ) === true;
-			if ( isEmptyParent ) {
-
-				ser.registerCallback( parent );
-
+			const parent = ser.model?.parent;
+			const isEmptyParent = parent?.isDynamic === true;
+			
+			if (isEmptyParent) {
+				ser.registerCallback(parent);
 			}
 
 		}
@@ -1479,7 +1476,6 @@ class SerializeAnimation {
 	}
 	onSerialize( writer ) {
 
-		var _a, _b, _c, _d, _e, _f, _g, _h;
 		const object = this.object;
 		const arr = this.dict.get( object );
 
@@ -1491,35 +1487,35 @@ class SerializeAnimation {
 		const rotation = new Quaternion();
 		const scale = new Vector3( 1, 1, 1 );
 
-		// TODO doesn't support individual time arrays right now
-		// could use these in case we don't have time values that are identical
-		/*
-        const translationInterpolant = o.pos?.createInterpolant();
-        const rotationInterpolant = o.rot?.createInterpolant();
-        const scaleInterpolant = o.scale?.createInterpolant();
-        */
-
 		writer.appendLine( 'matrix4d xformOp:transform.timeSamples = {' );
 		writer.indent ++;
+
 		for ( const transformData of arr ) {
 
-			let timesArray = ( _a = transformData.pos ) === null || _a === void 0 ? void 0 : _a.times;
-			if ( ! timesArray || transformData.rot && ( ( _b = transformData.rot.times ) === null || _b === void 0 ? void 0 : _b.length ) > ( timesArray === null || timesArray === void 0 ? void 0 : timesArray.length ) )
-				timesArray = ( _c = transformData.rot ) === null || _c === void 0 ? void 0 : _c.times;
-			if ( ! timesArray || transformData.scale && ( ( _d = transformData.scale.times ) === null || _d === void 0 ? void 0 : _d.length ) > ( timesArray === null || timesArray === void 0 ? void 0 : timesArray.length ) )
-				timesArray = ( _e = transformData.scale ) === null || _e === void 0 ? void 0 : _e.times;
-			if ( ! timesArray ) {
+			let posTimesArray = transformData.pos?.times;
+			let rotTimesArray = transformData.rot?.times;
+			let scaleTimesArray = transformData.scale?.times;
 
-				console.error( 'got an animated object but no time values??', object, transformData );
+			// timesArray is the sorted union of all time values
+			let timesArray = [];
+			if (posTimesArray) for (const t of posTimesArray) timesArray.push(t);
+			if (rotTimesArray) for (const t of rotTimesArray) timesArray.push(t);
+			if (scaleTimesArray) for (const t of scaleTimesArray) timesArray.push(t);
+
+			// sort and make unique
+			timesArray.sort((a, b) => a - b);
+			timesArray = [...new Set(timesArray)];
+
+			if (!timesArray || timesArray.length === 0) {
+				console.error("got an animated object but no time values??", object, transformData);
 				continue;
-
 			}
 
 			const startTime = transformData.getStartTime( arr );
 
-			const positionInterpolant = ( _f = transformData.pos ) === null || _f === void 0 ? void 0 : _f.createInterpolant();
-			const rotationInterpolant = ( _g = transformData.rot ) === null || _g === void 0 ? void 0 : _g.createInterpolant();
-			const scaleInterpolant = ( _h = transformData.scale ) === null || _h === void 0 ? void 0 : _h.createInterpolant();
+            const positionInterpolant = transformData.pos?.createInterpolant();
+            const rotationInterpolant = transformData.rot?.createInterpolant();
+            const scaleInterpolant = transformData.scale?.createInterpolant();
 
 			if ( ! positionInterpolant )
 				translation.set( object.position.x, object.position.y, object.position.z );
