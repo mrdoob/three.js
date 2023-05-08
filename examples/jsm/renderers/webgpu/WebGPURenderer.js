@@ -16,6 +16,14 @@ import WebGPUNodes from './nodes/WebGPUNodes.js';
 import WebGPUUtils from './WebGPUUtils.js';
 import { Frustum, Matrix4, Vector3, Color, SRGBColorSpace, NoToneMapping, DepthFormat } from 'three';
 
+let staticAdapter = null;
+
+if ( navigator.gpu !== undefined ) {
+
+	staticAdapter = await navigator.gpu.requestAdapter();
+
+}
+
 console.info( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrtographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
 
 Matrix4.prototype.makePerspective = function ( left, right, top, bottom, near, far ) {
@@ -762,11 +770,7 @@ class WebGPURenderer {
 
 	hasFeature( name ) {
 
-		if ( this._initialized === false ) {
-
-			throw new Error( 'THREE.WebGPURenderer: Renderer must be initialized before testing features.' );
-
-		}
+		const adapter = this._adapter || staticAdapter;
 
 		//
 
@@ -780,7 +784,7 @@ class WebGPURenderer {
 
 		//
 
-		return this._adapter.features.has( name );
+		return adapter.features.has( name );
 
 	}
 
