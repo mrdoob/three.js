@@ -468,7 +468,7 @@ function buildMaterial( material, textures ) {
 		const WRAPPINGS = {
 			1000: 'repeat', // RepeatWrapping
 			1001: 'clamp', // ClampToEdgeWrapping
-			1002: 'repeat' // MirroredRepeatWrapping
+			1002: 'mirror' // MirroredRepeatWrapping
 		};
 
 		return `
