@@ -69,6 +69,7 @@ class NodeBuilder {
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.codes = { vertex: [], fragment: [], compute: [] };
 		this.attributes = [];
+		this.bufferAttributes = [];
 		this.varyings = [];
 		this.vars = { vertex: [], fragment: [], compute: [] };
 		this.flow = { code: '' };
@@ -541,7 +542,29 @@ class NodeBuilder {
 
 	}
 
-	getUniformFromNode( node, shaderStage, type ) {
+	getBufferAttributeFromNode( node, type ) {
+
+		const nodeData = this.getDataFromNode( node );
+
+		let bufferAttribute = nodeData.bufferAttribute;
+
+		if ( bufferAttribute === undefined ) {
+
+			const index = this.uniforms.index ++;
+
+			bufferAttribute = new NodeAttribute( 'nodeAttribute' + index, type, node );
+
+			this.bufferAttributes.push( bufferAttribute );
+
+			nodeData.bufferAttribute = bufferAttribute;
+
+		}
+
+		return bufferAttribute;
+
+	}
+
+	getUniformFromNode( node, type, shaderStage = this.shaderStage ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
@@ -729,6 +752,12 @@ class NodeBuilder {
 		this.setShaderStage( previousShaderStage );
 
 		return flowData;
+
+	}
+
+	getAttributesArray() {
+
+		return this.attributes.concat( this.bufferAttributes );
 
 	}
 
