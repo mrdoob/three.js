@@ -39,8 +39,6 @@ class RangeNode extends Node {
 
 		if ( object.isInstancedMesh === true ) {
 
-			const geometry = builder.geometry;
-
 			let min = this.minNode.value;
 			let max = this.maxNode.value;
 
