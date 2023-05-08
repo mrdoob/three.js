@@ -55,12 +55,19 @@
 			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 			import { CopyShader } from 'three/addons/shaders/CopyShader.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
-			let camera, renderer, clock, group, container;
+			let camera, renderer, group, container;
 
 			let composer1, composer2;
+
+			const params = {
+
+				animate: true,
+
+			}
 
 			init();
 
@@ -75,14 +82,12 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 10, 2000 );
 				camera.position.z = 500;
 
 				const scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xcccccc, 100, 1500 );
-
-				clock = new THREE.Clock();
 
 				//
 
@@ -95,10 +100,16 @@
 				group = new THREE.Group();
 
 				const geometry = new THREE.SphereGeometry( 10, 64, 40 );
-				const material = new THREE.MeshLambertMaterial( { color: 0xee0808 } );
+				const material = new THREE.MeshLambertMaterial( {
+					color: 0xee0808,
+					polygonOffset: true,
+					polygonOffsetFactor: 1, // positive value pushes polygon further away
+					polygonOffsetUnits: 1
+
+				} );
 				const material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 
-				for ( let i = 0; i < 10; i ++ ) {
+				for ( let i = 0; i < 50; i ++ ) {
 
 					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.x = Math.random() * 600 - 300;
@@ -149,6 +160,11 @@
 
 				//
 
+				const gui = new GUI();
+				gui.add( params, 'animate' );
+
+				//
+
 				window.addEventListener( 'resize', onWindowResize );
 
 				animate();
@@ -172,7 +188,11 @@
 
 				const halfWidth = container.offsetWidth / 2;
 
-				group.rotation.y += clock.getDelta() * 0.1;
+				if ( params.animate ) {
+
+					group.rotation.y += 0.002;
+
+				}
 
 				renderer.setScissorTest( true );
 
