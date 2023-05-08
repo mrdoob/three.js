@@ -258,9 +258,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getUniformFromNode( node, shaderStage, type ) {
+	getUniformFromNode( node, type, shaderStage ) {
 
-		const uniformNode = super.getUniformFromNode( node, shaderStage, type );
+		const uniformNode = super.getUniformFromNode( node, type, shaderStage );
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
 		if ( nodeData.uniformGPU === undefined ) {
@@ -446,10 +446,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			const attributes = this.attributes;
-			const length = attributes.length;
+			const attributes = this.getAttributesArray();
 
-			for ( let index = 0; index < length; index ++ ) {
+			for ( let index = 0, length = attributes.length; index < length; index ++ ) {
 
 				const attribute = attributes[ index ];
 				const name = attribute.name;

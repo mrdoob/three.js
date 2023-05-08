@@ -134,6 +134,14 @@
 
 					scene.add( gltf.scene );
 
+
+					setTimeout( () => {
+
+						gltf.scene.children[0].material.dispose();
+						gltf.scene.children[0].geometry.dispose();
+
+					}, 2000 )
+
 				} );
 
 				const sphereGeometry = new THREE.SphereGeometry( .5, 64, 32 );

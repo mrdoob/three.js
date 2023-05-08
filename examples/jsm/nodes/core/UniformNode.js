@@ -36,7 +36,7 @@ class UniformNode extends InputNode {
 
 		const sharedNodeType = sharedNode.getInputType( builder );
 
-		const nodeUniform = builder.getUniformFromNode( sharedNode, builder.shaderStage, sharedNodeType );
+		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage );
 		const propertyName = builder.getPropertyName( nodeUniform );
 
 		return builder.format( propertyName, type, output );

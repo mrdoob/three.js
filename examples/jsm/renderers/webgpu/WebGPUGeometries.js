@@ -105,7 +105,7 @@ class WebGPUGeometries {
 			this.info.memory.geometries --;
 
 			const index = geometry.index;
-			const geometryAttributes = geometry.attributes;
+			const geometryAttributes = renderObject.getAttributes();
 
 			if ( index !== null ) {
 
@@ -113,9 +113,9 @@ class WebGPUGeometries {
 
 			}
 
-			for ( const name in geometryAttributes ) {
+			for ( const geometryAttribute of geometryAttributes ) {
 
-				this.attributes.remove( geometryAttributes[ name ] );
+				this.attributes.remove( geometryAttribute );
 
 			}
 
@@ -154,12 +154,11 @@ class WebGPUGeometries {
 
 	updateAttributes( renderObject ) {
 
-		const geometry = renderObject.geometry;
-		const geometryAttributes = geometry.attributes;
+		const attributes = renderObject.getAttributes();
 
-		for ( const name in geometryAttributes ) {
+		for ( const attribute of attributes ) {
 
-			this.attributes.update( geometryAttributes[ name ] );
+			this.attributes.update( attribute );
 
 		}
 
