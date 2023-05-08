@@ -465,10 +465,6 @@ function buildMaterial( material, textures ) {
 
 		const uv = texture.channel > 0 ? 'st' + texture.channel : 'st';
 
-		const rawTextureExtra = `(
-			colorSpace = "Raw"
-		)`;
-
 		return `
 		def Shader "PrimvarReader_${ mapType }"
 		{
@@ -490,8 +486,9 @@ function buildMaterial( material, textures ) {
         def Shader "Texture_${ texture.id }_${ mapType }"
         {
             uniform token info:id = "UsdUVTexture"
-            asset inputs:file = @textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }@ ${mapType === 'normal' ? rawTextureExtra : ''}
+			asset inputs:file = @textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }@
 			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
+			token inputs:sourceColorSpace = "${ texture.colorSpace === THREE.NoColorSpace ? 'raw' : 'sRGB' }"
             token inputs:wrapS = "repeat"
             token inputs:wrapT = "repeat"
             float outputs:r
