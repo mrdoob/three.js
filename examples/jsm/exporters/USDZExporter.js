@@ -465,6 +465,12 @@ function buildMaterial( material, textures ) {
 
 		const uv = texture.channel > 0 ? 'st' + texture.channel : 'st';
 
+		const WRAPPINGS = {
+			1000: 'repeat', // RepeatWrapping
+			1001: 'clamp', // ClampToEdgeWrapping
+			1002: 'repeat' // MirroredRepeatWrapping
+		};
+
 		return `
 		def Shader "PrimvarReader_${ mapType }"
 		{
@@ -489,8 +495,8 @@ function buildMaterial( material, textures ) {
 			asset inputs:file = @textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }@
 			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
 			token inputs:sourceColorSpace = "${ texture.colorSpace === THREE.NoColorSpace ? 'raw' : 'sRGB' }"
-            token inputs:wrapS = "repeat"
-            token inputs:wrapT = "repeat"
+            token inputs:wrapS = "${ WRAPPINGS[ texture.wrapS ] }"
+            token inputs:wrapT = "${ WRAPPINGS[ texture.wrapT ] }"
             float outputs:r
             float outputs:g
             float outputs:b
