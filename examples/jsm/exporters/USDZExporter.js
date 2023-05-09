@@ -447,6 +447,39 @@ function buildMaterial( material, textures ) {
 			1002: 'mirror' // MirroredRepeatWrapping
 		};
 
+		const repeat = texture.repeat.clone();
+		const offset = texture.offset.clone();
+		const rotation = texture.rotation;
+
+		// rotation is around the wrong point. after rotation we need to shift offset again so that we're rotating around the right spot
+		const xRotationOffset = Math.sin( rotation );
+		const yRotationOffset = Math.cos( rotation );
+
+		// texture coordinates start in the opposite corner, need to correct
+		offset.y = 1 - offset.y - repeat.y;
+
+		// turns out QuickLook is buggy and interprets texture repeat inverted.
+		// Apple Feedback: 	FB10036297 and FB11442287
+		const exportForQuickLook = false;
+		if ( exportForQuickLook ) {
+
+			// This is NOT correct yet in QuickLook, but comes close for a range of models.
+			// It becomes more incorrect the bigger the offset is
+
+			offset.x = offset.x / repeat.x;
+			offset.y = offset.y / repeat.y;
+
+			offset.x += xRotationOffset / repeat.x;
+			offset.y += yRotationOffset - 1;
+
+		} else {
+
+			// results match glTF results exactly. verified correct in usdview.
+			offset.x += xRotationOffset * repeat.x;
+			offset.y += ( 1 - yRotationOffset ) * repeat.y;
+
+		}
+
 		return `
 		def Shader "PrimvarReader_${ mapType }"
 		{
@@ -460,9 +493,9 @@ function buildMaterial( material, textures ) {
         {
             uniform token info:id = "UsdTransform2d"
             token inputs:in.connect = </Materials/Material_${ material.id }/PrimvarReader_${ mapType }.outputs:result>
-            float inputs:rotation = ${ texture.rotation * ( 180 / Math.PI ) }
-            float2 inputs:scale = ${ buildVector2( texture.repeat ) }
-            float2 inputs:translation = ${ buildVector2( texture.offset ) }
+			float inputs:rotation = ${ ( rotation * ( 180 / Math.PI ) ).toFixed( PRECISION ) }
+			float2 inputs:scale = ${ buildVector2( repeat ) }
+            float2 inputs:translation = ${ buildVector2( offset ) }
             float2 outputs:result
         }
 
