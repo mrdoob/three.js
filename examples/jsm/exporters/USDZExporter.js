@@ -76,13 +76,11 @@ class USDZExporter {
 		for ( const id in textures ) {
 
 			const texture = textures[ id ];
-			const color = id.split( '_' )[ 1 ];
-			const isRGBA = texture.format === 1023;
 
-			const canvas = imageToCanvas( texture.image, color, texture.flipY );
-			const blob = await new Promise( resolve => canvas.toBlob( resolve, isRGBA ? 'image/png' : 'image/jpeg', 1 ) );
+			const canvas = imageToCanvas( texture.image, texture.flipY );
+			const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/png', 1 ) );
 
-			files[ `textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }` ] = new Uint8Array( await blob.arrayBuffer() );
+			files[ `textures/Texture_${ id }.png` ] = new Uint8Array( await blob.arrayBuffer() );
 
 		}
 
@@ -119,7 +117,7 @@ class USDZExporter {
 
 }
 
-function imageToCanvas( image, color, flipY ) {
+function imageToCanvas( image, flipY ) {
 
 	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
@@ -134,6 +132,8 @@ function imageToCanvas( image, color, flipY ) {
 
 		const context = canvas.getContext( '2d' );
 
+		// TODO: We should be able to do this in the UsdTransform2d?
+
 		if ( flipY === true ) {
 
 			context.translate( 0, canvas.height );
@@ -142,29 +142,6 @@ function imageToCanvas( image, color, flipY ) {
 		}
 
 		context.drawImage( image, 0, 0, canvas.width, canvas.height );
-
-		if ( color !== undefined ) {
-
-			const hex = parseInt( color, 16 );
-
-			const r = ( hex >> 16 & 255 ) / 255;
-			const g = ( hex >> 8 & 255 ) / 255;
-			const b = ( hex & 255 ) / 255;
-
-			const imagedata = context.getImageData( 0, 0, canvas.width, canvas.height );
-			const data = imagedata.data;
-
-			for ( let i = 0; i < data.length; i += 4 ) {
-
-				data[ i + 0 ] = data[ i + 0 ] * r;
-				data[ i + 1 ] = data[ i + 1 ] * g;
-				data[ i + 2 ] = data[ i + 2 ] * b;
-
-			}
-
-			context.putImageData( imagedata, 0, 0 );
-
-		}
 
 		return canvas;
 
@@ -458,8 +435,7 @@ function buildMaterial( material, textures ) {
 
 	function buildTexture( texture, mapType, color ) {
 
-		const id = texture.id + ( color ? '_' + color.getHexString() : '' );
-		const isRGBA = texture.format === 1023;
+		const id = texture.source.id + '_' + texture.flipY;
 
 		textures[ id ] = texture;
 
@@ -495,18 +471,19 @@ function buildMaterial( material, textures ) {
         {
             uniform token info:id = "UsdTransform2d"
             token inputs:in.connect = </Materials/Material_${ material.id }/PrimvarReader_${ mapType }.outputs:result>
+            float inputs:rotation = ${ rotation }
+            float2 inputs:scale = ${ buildVector2( scale ) }
             float2 inputs:translation = ${ buildVector2( translation ) }
-			float inputs:rotation = ${ rotation }
-			float2 inputs:scale = ${ buildVector2( scale ) }
             float2 outputs:result
         }
 
         def Shader "Texture_${ texture.id }_${ mapType }"
         {
             uniform token info:id = "UsdUVTexture"
-			asset inputs:file = @textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }@
-			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
-			token inputs:sourceColorSpace = "${ texture.colorSpace === THREE.NoColorSpace ? 'raw' : 'sRGB' }"
+            asset inputs:file = @textures/Texture_${ id }.png@
+            float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
+            float4 inputs:scale = (${ color.r }, ${ color.g }, ${ color.b }, 1)
+            token inputs:sourceColorSpace = "${ texture.colorSpace === THREE.NoColorSpace ? 'raw' : 'sRGB' }"
             token inputs:wrapS = "${ WRAPPINGS[ texture.wrapS ] }"
             token inputs:wrapT = "${ WRAPPINGS[ texture.wrapT ] }"
             float outputs:r

@@ -60,7 +60,7 @@ class WebGPURenderPipelines {
 
 			// determine render pipeline
 
-			currentPipeline = this._acquirePipeline( stageVertex, stageFragment, renderObject );
+			currentPipeline = this._acquirePipeline( renderObject, stageVertex, stageFragment );
 			cache.currentPipeline = currentPipeline;
 
 			// keep track of all used times
@@ -92,14 +92,14 @@ class WebGPURenderPipelines {
 
 	}
 
-	_acquirePipeline( stageVertex, stageFragment, renderObject ) {
+	_acquirePipeline( renderObject, stageVertex, stageFragment ) {
 
 		let pipeline;
 		const pipelines = this.pipelines;
 
 		// check for existing pipeline
 
-		const cacheKey = this._computeCacheKey( stageVertex, stageFragment, renderObject );
+		const cacheKey = this._computeCacheKey( renderObject, stageVertex, stageFragment );
 
 		for ( let i = 0, il = pipelines.length; i < il; i ++ ) {
 
@@ -117,7 +117,7 @@ class WebGPURenderPipelines {
 		if ( pipeline === undefined ) {
 
 			pipeline = new WebGPURenderPipeline( this.device, this.utils );
-			pipeline.init( cacheKey, stageVertex, stageFragment, renderObject, this.nodes.get( renderObject ) );
+			pipeline.init( renderObject, cacheKey, stageVertex, stageFragment );
 
 			pipelines.push( pipeline );
 
@@ -127,7 +127,7 @@ class WebGPURenderPipelines {
 
 	}
 
-	_computeCacheKey( stageVertex, stageFragment, renderObject ) {
+	_computeCacheKey( renderObject, stageVertex, stageFragment ) {
 
 		const { object, material } = renderObject;
 		const utils = this.utils;
