@@ -59,7 +59,7 @@
 				// scene
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color().setHSL( 0.51, 0.4, 0.01 );
+				scene.background = new THREE.Color().setHSL( 0.51, 0.4, 0.01, THREE.SRGBColorSpace );
 				scene.fog = new THREE.Fog( scene.background, 3500, 15000 );
 
 				// world
