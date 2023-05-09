@@ -241,7 +241,7 @@ const cacheMaps = { bool: boolsCacheMap, uint: uintsCacheMap, ints: intsCacheMap
 
 const constNodesCacheMap = new Map( [ ...boolsCacheMap, ...floatsCacheMap ] );
 
-const getAutoTypedConstNode = ( value ) => {
+const getConstNode = ( value, type ) => {
 
 	if ( constNodesCacheMap.has( value ) ) {
 
@@ -253,7 +253,7 @@ const getAutoTypedConstNode = ( value ) => {
 
 	} else {
 
-		return new ConstNode( value );
+		return new ConstNode( value, type );
 
 	}
 
@@ -265,33 +265,32 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 		if ( params.length === 0 ) {
 
-			return nodeObject( new ConstNode( getValueFromType( type ), type ) );
-
-		} else {
-
-			if ( type === 'color' && params[ 0 ].isNode !== true ) {
-
-				params = [ getValueFromType( type, ...params ) ];
-
-			}
-
-			if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
-
-				return cacheMap.get( params[ 0 ] );
-
-			}
-
-			const nodes = params.map( getAutoTypedConstNode );
-
-			if ( nodes.length === 1 ) {
-
-				return nodeObject( nodes[ 0 ].nodeType === type || getValueType( nodes[ 0 ].value ) === type ? nodes[ 0 ] : new ConvertNode( nodes[ 0 ], type ) );
-
-			}
-
-			return nodeObject( new JoinNode( nodes, type ) );
+			params = [ getValueFromType( type ) ];
 
 		}
+
+		if ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => ! param.isNode ) ) {
+
+			params = [ getValueFromType( type, ...params ) ];
+
+		}
+
+		if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
+
+			return nodeObject( cacheMap.get( params[ 0 ] ) );
+
+		}
+
+		if ( params.length === 1 ) {
+
+			const node = getConstNode( params[ 0 ], type );
+			if ( node.nodeType === type ) return nodeObject( node );
+			return nodeObject( new ConvertNode( node, type ) );
+
+		}
+
+		const nodes = params.map( param => getConstNode( param ) );
+		return nodeObject( new JoinNode( nodes, type ) );
 
 	};
 
