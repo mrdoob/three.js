@@ -419,9 +419,7 @@ class NRRDLoader extends Loader {
 		const spacingZ = new Vector3().fromArray( headerObject.vectors[ 2 ] ).length();
 		volume.spacing = [ spacingX, spacingY, spacingZ ];
 
-
 		// Create IJKtoRAS matrix
-		volume.matrix = new Matrix4();
 
 		const transitionMatrix = new Matrix4();
 
@@ -445,34 +443,25 @@ class NRRDLoader extends Loader {
 
 		}
 
-
 		if ( ! headerObject.vectors ) {
 
-			volume.matrix.set(
-				1, 0, 0, 0,
-				0, 1, 0, 0,
-				0, 0, 1, 0,
-				0, 0, 0, 1 );
+			volume.matrix = volume.inverseMatrix = new Matrix4();
 
 		} else {
 
 			const v = headerObject.vectors;
 
-			const ijk_to_transition = new Matrix4().set(
+			const ijk_to_transition = new Matrix4(
 				v[ 0 ][ 0 ], v[ 1 ][ 0 ], v[ 2 ][ 0 ], 0,
 				v[ 0 ][ 1 ], v[ 1 ][ 1 ], v[ 2 ][ 1 ], 0,
 				v[ 0 ][ 2 ], v[ 1 ][ 2 ], v[ 2 ][ 2 ], 0,
 				0, 0, 0, 1
 			);
 
-			const transition_to_ras = new Matrix4().multiplyMatrices( ijk_to_transition, transitionMatrix );
-
-			volume.matrix = transition_to_ras;
+			volume.matrix = ijk_to_transition.multiply( transitionMatrix );
+			volume.inverseMatrix = volume.matrix.clone().invert();
 
 		}
-
-		volume.inverseMatrix = new Matrix4();
-		volume.inverseMatrix.copy( volume.matrix ).invert();
 		
 		volume.RASDimensions = [
 			Math.floor( volume.xLength * spacingX ), 
