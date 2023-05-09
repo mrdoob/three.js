@@ -896,7 +896,7 @@ class LDrawParsedCache {
 
 									materials[ material.userData.code ] = material;
 
-								}	else {
+								} else {
 
 									console.warn( 'LDrawLoader: Error parsing material' + lp.getLineNumberString() );
 
@@ -1023,23 +1023,13 @@ class LDrawParsedCache {
 					colorCode = lp.getToken();
 					material = getLocalMaterial( colorCode );
 
-					const posX = parseFloat( lp.getToken() );
-					const posY = parseFloat( lp.getToken() );
-					const posZ = parseFloat( lp.getToken() );
-					const m0 = parseFloat( lp.getToken() );
-					const m1 = parseFloat( lp.getToken() );
-					const m2 = parseFloat( lp.getToken() );
-					const m3 = parseFloat( lp.getToken() );
-					const m4 = parseFloat( lp.getToken() );
-					const m5 = parseFloat( lp.getToken() );
-					const m6 = parseFloat( lp.getToken() );
-					const m7 = parseFloat( lp.getToken() );
-					const m8 = parseFloat( lp.getToken() );
+					const m = [];
+					for ( let i = 0; i < 12; i++ ) m.push( parseFloat( lp.getToken() ) );
 
-					const matrix = new Matrix4().set(
-						m0, m1, m2, posX,
-						m3, m4, m5, posY,
-						m6, m7, m8, posZ,
+					const matrix = new Matrix4(
+						m[ 3 ], m[ 4 ], m[ 5 ], m[ 0 ],
+						m[ 6 ], m[ 7 ], m[ 8 ], m[ 1 ],
+						m[ 9 ], m[ 10 ], m[ 11 ], m[ 2 ],
 						0, 0, 0, 1
 					);
 
