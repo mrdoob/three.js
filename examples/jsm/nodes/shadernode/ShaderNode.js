@@ -97,17 +97,13 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 		return nodeObject;
 
-	} else if ( ( altType === null ) && ( ( type === 'float' ) || ( type === 'boolean' ) ) ) {
+	} else if ( ( altType === null && ( type === 'float' || type === 'boolean' ) ) || ( type && type !== 'shader' && type !== 'string' ) ) {
 
-		return nodeObject( getAutoTypedConstNode( obj ) );
+		return nodeObject( getConstNode( obj, altType ) );
 
 	} else if ( type === 'shader' ) {
 
 		return shader( obj );
-
-	} else if ( type && type !== 'string' ) {
-
-		return nodeObject( new ConstNode( obj, altType ) );
 
 	}
 
