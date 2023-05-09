@@ -16,6 +16,14 @@ import WebGPUNodes from './nodes/WebGPUNodes.js';
 import WebGPUUtils from './WebGPUUtils.js';
 import { Frustum, Matrix4, Vector3, Color, SRGBColorSpace, NoToneMapping, DepthFormat } from 'three';
 
+let staticAdapter = null;
+
+if ( navigator.gpu !== undefined ) {
+
+	staticAdapter = await navigator.gpu.requestAdapter();
+
+}
+
 console.info( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrtographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
 
 Matrix4.prototype.makePerspective = function ( left, right, top, bottom, near, far ) {
@@ -762,11 +770,7 @@ class WebGPURenderer {
 
 	hasFeature( name ) {
 
-		if ( this._initialized === false ) {
-
-			throw new Error( 'THREE.WebGPURenderer: Renderer must be initialized before testing features.' );
-
-		}
+		const adapter = this._adapter || staticAdapter;
 
 		//
 
@@ -780,7 +784,7 @@ class WebGPURenderer {
 
 		//
 
-		return this._adapter.features.has( name );
+		return adapter.features.has( name );
 
 	}
 
@@ -981,13 +985,13 @@ class WebGPURenderer {
 
 		if ( hasIndex === true ) {
 
-			this._setupIndexBuffer( index, passEncoder );
+			this._setupIndexBuffer( renderObject );
 
 		}
 
 		// vertex buffers
 
-		this._setupVertexBuffers( geometry.attributes, passEncoder, renderPipeline );
+		this._setupVertexBuffers( renderObject );
 
 		// draw
 
@@ -1057,32 +1061,27 @@ class WebGPURenderer {
 
 	}
 
-	_setupIndexBuffer( index, encoder ) {
+	_setupIndexBuffer( renderObject ) {
+
+		const index = this._geometries.getIndex( renderObject );
+		const passEncoder = this._currentRenderState.currentPassGPU;
 
 		const buffer = this._attributes.get( index ).buffer;
 		const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
 
-		encoder.setIndexBuffer( buffer, indexFormat );
+		passEncoder.setIndexBuffer( buffer, indexFormat );
 
 	}
 
-	_setupVertexBuffers( geometryAttributes, encoder, renderPipeline ) {
+	_setupVertexBuffers( renderObject ) {
 
-		const shaderAttributes = renderPipeline.shaderAttributes;
+		const passEncoder = this._currentRenderState.currentPassGPU;
+		const attributes = renderObject.getAttributes();
 
-		for ( const shaderAttribute of shaderAttributes ) {
+		for ( let i = 0, l = attributes.length; i < l; i ++ ) {
 
-			const name = shaderAttribute.name;
-			const slot = shaderAttribute.slot;
-
-			const attribute = geometryAttributes[ name ];
-
-			if ( attribute !== undefined ) {
-
-				const buffer = this._attributes.get( attribute ).buffer;
-				encoder.setVertexBuffer( slot, buffer );
-
-			}
+			const buffer = this._attributes.get( attributes[ i ] ).buffer;
+			passEncoder.setVertexBuffer( i, buffer );
 
 		}
 

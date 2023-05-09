@@ -45,13 +45,13 @@ class WebGPURenderPipeline {
 
 	}
 
-	init( cacheKey, stageVertex, stageFragment, renderObject, nodeBuilder ) {
+	init( renderObject, cacheKey, stageVertex, stageFragment ) {
 
 		const { object, material, geometry } = renderObject;
 
 		// determine shader attributes
 
-		const shaderAttributes = this._getShaderAttributes( nodeBuilder, geometry );
+		const shaderAttributes = this._getShaderAttributes( renderObject );
 
 		// vertex buffers
 
@@ -59,8 +59,7 @@ class WebGPURenderPipeline {
 
 		for ( const attribute of shaderAttributes ) {
 
-			const name = attribute.name;
-			const geometryAttribute = geometry.getAttribute( name );
+			const geometryAttribute = attribute.geometryAttribute;
 			const stepMode = ( geometryAttribute !== undefined && geometryAttribute.isInstancedBufferAttribute ) ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
 
 			vertexBuffers.push( {
@@ -627,17 +626,14 @@ class WebGPURenderPipeline {
 
 	}
 
-	_getShaderAttributes( nodeBuilder, geometry ) {
+	_getShaderAttributes( renderObject ) {
 
-		const nodeAttributes = nodeBuilder.attributes;
-		const attributes = [];
+		const attributes = renderObject.getAttributes();
+		const shaderAttributes = [];
 
-		for ( let slot = 0; slot < nodeAttributes.length; slot ++ ) {
+		for ( let slot = 0; slot < attributes.length; slot ++ ) {
 
-			const nodeAttribute = nodeAttributes[ slot ];
-			const name = nodeAttribute.name;
-
-			const geometryAttribute = geometry.getAttribute( name );
+			const geometryAttribute = attributes[ slot ];
 			const bytesPerElement = geometryAttribute.array.BYTES_PER_ELEMENT;
 
 			const format = this._getVertexFormat( geometryAttribute );
@@ -654,8 +650,8 @@ class WebGPURenderPipeline {
 
 			}
 
-			attributes.push( {
-				name,
+			shaderAttributes.push( {
+				geometryAttribute,
 				arrayStride,
 				offset,
 				format,
@@ -664,7 +660,7 @@ class WebGPURenderPipeline {
 
 		}
 
-		return attributes;
+		return shaderAttributes;
 
 	}
 

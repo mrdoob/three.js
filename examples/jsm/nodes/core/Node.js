@@ -374,7 +374,7 @@ class Node {
 				type,
 				meta,
 				metadata: {
-					version: 4.5,
+					version: 4.6,
 					type: 'Node',
 					generator: 'Node.toJSON'
 				}

@@ -51,30 +51,35 @@ class Color {
 		this.g = 1;
 		this.b = 1;
 
-		if ( g === undefined && b === undefined ) {
-
-			// r is THREE.Color, hex or string
-			return this.set( r );
-
-		}
-
-		return this.setRGB( r, g, b );
+		return this.set( r, g, b );
 
 	}
 
-	set( value ) {
+	set( r, g, b ) {
 
-		if ( value && value.isColor ) {
+		if ( g === undefined && b === undefined ) {
 
-			this.copy( value );
+			// r is THREE.Color, hex or string
 
-		} else if ( typeof value === 'number' ) {
+			const value = r;
 
-			this.setHex( value );
+			if ( value && value.isColor ) {
 
-		} else if ( typeof value === 'string' ) {
+				this.copy( value );
 
-			this.setStyle( value );
+			} else if ( typeof value === 'number' ) {
+
+				this.setHex( value );
+
+			} else if ( typeof value === 'string' ) {
+
+				this.setStyle( value );
+
+			}
+
+		} else {
+
+			this.setRGB( r, g, b );
 
 		}
 

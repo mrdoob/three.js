@@ -4,6 +4,7 @@ export default class WebGPURenderObject {
 
 		this.renderer = renderer;
 		this.nodes = nodes;
+
 		this.object = object;
 		this.material = material;
 		this.scene = scene;
@@ -12,8 +13,31 @@ export default class WebGPURenderObject {
 
 		this.geometry = object.geometry;
 
+		this.attributes = null;
+
 		this._materialVersion = - 1;
 		this._materialCacheKey = '';
+
+	}
+
+	getAttributes() {
+
+		if ( this.attributes !== null ) return this.attributes;
+
+		const nodeAttributes = this.nodes.get( this ).getAttributesArray();
+		const geometry = this.geometry;
+
+		const attributes = [];
+
+		for ( const nodeAttribute of nodeAttributes ) {
+
+			attributes.push( nodeAttribute.node && nodeAttribute.node.attribute ? nodeAttribute.node.attribute : geometry.getAttribute( nodeAttribute.name ) );
+
+		}
+
+		this.attributes = attributes;
+
+		return attributes;
 
 	}
 

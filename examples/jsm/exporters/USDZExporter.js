@@ -1,7 +1,4 @@
-import {
-	DoubleSide
-} from 'three';
-
+import * as THREE from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
@@ -37,7 +34,7 @@ class USDZExporter {
 
 				if ( material.isMeshStandardMaterial ) {
 
-					const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
+					const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usda';
 
 					if ( ! ( geometryFileName in files ) ) {
 
@@ -79,13 +76,11 @@ class USDZExporter {
 		for ( const id in textures ) {
 
 			const texture = textures[ id ];
-			const color = id.split( '_' )[ 1 ];
-			const isRGBA = texture.format === 1023;
 
-			const canvas = imageToCanvas( texture.image, color, texture.flipY );
-			const blob = await new Promise( resolve => canvas.toBlob( resolve, isRGBA ? 'image/png' : 'image/jpeg', 1 ) );
+			const canvas = imageToCanvas( texture.image, texture.flipY );
+			const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/png', 1 ) );
 
-			files[ `textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }` ] = new Uint8Array( await blob.arrayBuffer() );
+			files[ `textures/Texture_${ id }.png` ] = new Uint8Array( await blob.arrayBuffer() );
 
 		}
 
@@ -122,7 +117,7 @@ class USDZExporter {
 
 }
 
-function imageToCanvas( image, color, flipY ) {
+function imageToCanvas( image, flipY ) {
 
 	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
@@ -137,6 +132,8 @@ function imageToCanvas( image, color, flipY ) {
 
 		const context = canvas.getContext( '2d' );
 
+		// TODO: We should be able to do this in the UsdTransform2d?
+
 		if ( flipY === true ) {
 
 			context.translate( 0, canvas.height );
@@ -145,29 +142,6 @@ function imageToCanvas( image, color, flipY ) {
 		}
 
 		context.drawImage( image, 0, 0, canvas.width, canvas.height );
-
-		if ( color !== undefined ) {
-
-			const hex = parseInt( color, 16 );
-
-			const r = ( hex >> 16 & 255 ) / 255;
-			const g = ( hex >> 8 & 255 ) / 255;
-			const b = ( hex & 255 ) / 255;
-
-			const imagedata = context.getImageData( 0, 0, canvas.width, canvas.height );
-			const data = imagedata.data;
-
-			for ( let i = 0; i < data.length; i += 4 ) {
-
-				data[ i + 0 ] = data[ i + 0 ] * r;
-				data[ i + 1 ] = data[ i + 1 ] * g;
-				data[ i + 2 ] = data[ i + 2 ] * b;
-
-			}
-
-			context.putImageData( imagedata, 0, 0 );
-
-		}
 
 		return canvas;
 
@@ -254,7 +228,8 @@ function buildXform( object, geometry, material ) {
 	}
 
 	return `def Xform "${ name }" (
-    prepend references = @./geometries/Geometry_${ geometry.id }.usd@</Geometry>
+    prepend references = @./geometries/Geometry_${ geometry.id }.usda@</Geometry>
+    prepend apiSchemas = ["MaterialBindingAPI"]
 )
 {
     matrix4d xformOp:transform = ${ transform }
@@ -310,9 +285,7 @@ function buildMesh( geometry ) {
             interpolation = "vertex"
         )
         point3f[] points = [${ buildVector3Array( attributes.position, count )}]
-        float2[] primvars:st = [${ buildVector2Array( attributes.uv, count )}] (
-            interpolation = "vertex"
-        )
+${ buildPrimvars( attributes, count ) }
         uniform token subdivisionScheme = "none"
     }
 `;
@@ -405,6 +378,30 @@ function buildVector2Array( attribute, count ) {
 
 }
 
+function buildPrimvars( attributes, count ) {
+
+	let string = '';
+
+	for ( let i = 0; i < 4; i ++ ) {
+
+		const id = ( i > 0 ? i : '' );
+		const attribute = attributes[ 'uv' + id ];
+
+		if ( attribute !== undefined ) {
+
+			string += `
+		texCoord2f[] primvars:st${ id } = [${ buildVector2Array( attribute, count )}] (
+			interpolation = "vertex"
+		)`;
+
+		}
+
+	}
+
+	return string;
+
+}
+
 // Materials
 
 function buildMaterials( materials, textures ) {
@@ -438,20 +435,32 @@ function buildMaterial( material, textures ) {
 
 	function buildTexture( texture, mapType, color ) {
 
-		const id = texture.id + ( color ? '_' + color.getHexString() : '' );
-		const isRGBA = texture.format === 1023;
+		const id = texture.source.id + '_' + texture.flipY;
 
 		textures[ id ] = texture;
 
+		const uv = texture.channel > 0 ? 'st' + texture.channel : 'st';
+
+		const WRAPPINGS = {
+			1000: 'repeat', // RepeatWrapping
+			1001: 'clamp', // ClampToEdgeWrapping
+			1002: 'mirror' // MirroredRepeatWrapping
+		};
+
 		return `
-        def Shader "Transform2d_${ mapType }" (
-            sdrMetadata = {
-                string role = "math"
-            }
-        )
+		def Shader "PrimvarReader_${ mapType }"
+		{
+			uniform token info:id = "UsdPrimvarReader_float2"
+            float2 inputs:fallback = (0.0, 0.0)
+			token inputs:varname = "${ uv }"
+			float2 outputs:result
+		}
+
+		def Shader "Transform2d_${ mapType }"
         {
             uniform token info:id = "UsdTransform2d"
-            float2 inputs:in.connect = </Materials/Material_${ material.id }/uvReader_st.outputs:result>
+            token inputs:in.connect = </Materials/Material_${ material.id }/PrimvarReader_${ mapType }.outputs:result>
+            float inputs:rotation = ${ texture.rotation * ( 180 / Math.PI ) }
             float2 inputs:scale = ${ buildVector2( texture.repeat ) }
             float2 inputs:translation = ${ buildVector2( texture.offset ) }
             float2 outputs:result
@@ -460,10 +469,12 @@ function buildMaterial( material, textures ) {
         def Shader "Texture_${ texture.id }_${ mapType }"
         {
             uniform token info:id = "UsdUVTexture"
-            asset inputs:file = @textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }@
+            asset inputs:file = @textures/Texture_${ id }.png@
             float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
-            token inputs:wrapS = "repeat"
-            token inputs:wrapT = "repeat"
+            float4 inputs:scale = (${ color.r }, ${ color.g }, ${ color.b }, 1)
+            token inputs:sourceColorSpace = "${ texture.colorSpace === THREE.NoColorSpace ? 'raw' : 'sRGB' }"
+            token inputs:wrapS = "${ WRAPPINGS[ texture.wrapS ] }"
+            token inputs:wrapT = "${ WRAPPINGS[ texture.wrapT ] }"
             float outputs:r
             float outputs:g
             float outputs:b
@@ -474,7 +485,7 @@ function buildMaterial( material, textures ) {
 	}
 
 
-	if ( material.side === DoubleSide ) {
+	if ( material.side === THREE.DoubleSide ) {
 
 		console.warn( 'THREE.USDZExporter: USDZ does not support double sided materials', material );
 
@@ -588,15 +599,6 @@ ${ inputs.join( '\n' ) }
         }
 
         token outputs:surface.connect = </Materials/Material_${ material.id }/PreviewSurface.outputs:surface>
-        token inputs:frame:stPrimvarName = "st"
-
-        def Shader "uvReader_st"
-        {
-            uniform token info:id = "UsdPrimvarReader_float2"
-            token inputs:varname.connect = </Materials/Material_${ material.id }.inputs:frame:stPrimvarName>
-            float2 inputs:fallback = (0.0, 0.0)
-            float2 outputs:result
-        }
 
 ${ samplers.join( '\n' ) }
 

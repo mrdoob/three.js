@@ -4,11 +4,25 @@ if ( window.GPUShaderStage === undefined ) {
 
 }
 
+let isAvailable = false;
+
+if ( navigator.gpu !== undefined ) {
+
+	const adapter = await navigator.gpu.requestAdapter();
+
+	if ( adapter !== null ) {
+
+		isAvailable = true;
+
+	}
+
+}
+
 class WebGPU {
 
 	static isAvailable() {
 
-		return ( navigator.gpu !== undefined );
+		return isAvailable;
 
 	}
 

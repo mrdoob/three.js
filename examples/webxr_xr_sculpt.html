@@ -133,7 +133,7 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				let reflectionCube = new CubeTextureLoader().load( urls );
+				let reflectionCube = new THREE.CubeTextureLoader().load( urls );
 				*/
 
 				const material = new THREE.MeshStandardMaterial( {
@@ -226,6 +226,8 @@
 					blob.addBall( position.x, position.y, position.z, point.strength, point.subtract );
 
 				}
+
+				blob.update();
 
 			}
 
