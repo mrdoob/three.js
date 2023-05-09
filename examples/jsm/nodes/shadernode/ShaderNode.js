@@ -273,13 +273,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 	return ( ...params ) => {
 
-		if ( params.length === 0 ) {
-
-			params = [ getValueFromType( type ) ];
-
-		}
-
-		if ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => ! param.isNode ) ) {
+		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => typeof param !== 'object' ) ) ) {
 
 			params = [ getValueFromType( type, ...params ) ];
 
