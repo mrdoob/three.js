@@ -123,7 +123,8 @@ material.roughness = min( material.roughness, 1.0 );
 	#ifdef USE_ANISOTROPYMAP
 
 		mat2 anisotropyMat = mat2( anisotropyVector.x, anisotropyVector.y, - anisotropyVector.y, anisotropyVector.x );
-		vec2 anisotropyV = anisotropyMat * ( 2.0 * texture2D( anisotropyMap, vAnisotropyMapUv ).rg - vec2( 1.0 ) );
+		vec3 anisotropyPolar = texture2D( anisotropyMap, vAnisotropyMapUv ).rgb;
+		vec2 anisotropyV = anisotropyMat * normalize( 2.0 * anisotropyPolar.rg - vec2( 1.0 ) ) * anisotropyPolar.b;
 
 	#else
 
