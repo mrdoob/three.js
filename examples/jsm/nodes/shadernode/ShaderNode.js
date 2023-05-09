@@ -284,7 +284,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 		if ( params.length === 1 ) {
 
 			const node = getConstNode( params[ 0 ], type );
-			if ( node.nodeType === type ) return nodeObject( node );
+			if ( node.getNodeType() === type ) return nodeObject( node );
 			return nodeObject( new ConvertNode( node, type ) );
 
 		}
