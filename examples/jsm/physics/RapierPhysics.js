@@ -67,15 +67,7 @@ async function RapierPhysics() {
 
 	function handleMesh( mesh, mass, shape ) {
 
-		const position = mesh.position;
-		const quaternion = mesh.quaternion;
-
-		const desc = mass > 0 ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.fixed();
-		desc.setTranslation( position.x, position.y, position.z );
-		desc.setRotation( quaternion );
-
-		const body = world.createRigidBody( desc );
-		world.createCollider( shape, body );
+		const body = createBody( mesh.position, mesh.quaternion, mass, shape );
 
 		if ( mass > 0 ) {
 
@@ -94,15 +86,8 @@ async function RapierPhysics() {
 
 		for ( let i = 0; i < mesh.count; i ++ ) {
 
-			const index = i * 16;
-
-			const desc = mass > 0 ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.fixed();
-			desc.setTranslation( array[ index + 12 ], array[ index + 13 ], array[ index + 14 ] );
-
-			const body = world.createRigidBody( desc );
-			world.createCollider( shape, body );
-
-			bodies.push( body );
+			const position = new Vector3().fromArray( array, i * 16 + 12 );
+			bodies.push( createBody( position, null, mass, shape ) );
 
 		}
 
@@ -115,12 +100,25 @@ async function RapierPhysics() {
 
 	}
 
-	const ZERO = { x: 0, y: 0, z: 0 };
+	function createBody( position, quaternion, mass, shape ) {
+
+		const desc = mass > 0 ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.fixed();
+		desc.setTranslation( ...position );
+		if ( quaternion !== null ) desc.setRotation( quaternion );
+
+		const body = world.createRigidBody( desc );
+		world.createCollider( shape, body );
+
+		return body;
+
+	}
+
+	const ZERO = new Vector3();
 
 	function setMeshPosition( mesh, position, index = 0 ) {
 
 		let body = meshMap.get( mesh );
-		if ( mesh.isInstanceMesh ) body = body[ index ];
+		if ( mesh.isInstancedMesh ) body = body[ index ];
 
 		body.setAngvel( ZERO );
 		body.setLinvel( ZERO );
@@ -131,7 +129,7 @@ async function RapierPhysics() {
 	function setMeshVelocity( mesh, velocity, index = 0 ) {
 
 		let body = meshMap.get( mesh );
-		if ( mesh.isInstanceMesh ) body = body[ index ];
+		if ( mesh.isInstancedMesh ) body = body[ index ];
 
 		body.setLinvel( velocity );
 
