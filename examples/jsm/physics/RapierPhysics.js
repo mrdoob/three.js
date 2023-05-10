@@ -113,7 +113,7 @@ async function RapierPhysics() {
 
 	}
 
-	const vector = { x: 0, y: 0, z: 0 };
+	const ZERO = { x: 0, y: 0, z: 0 };
 
 	function setMeshPosition( mesh, position, index = 0 ) {
 
@@ -122,17 +122,36 @@ async function RapierPhysics() {
 			const bodies = meshMap.get( mesh );
 			const body = bodies[ index ];
 
-			body.setAngvel( vector );
-			body.setLinvel( vector );
+			body.setAngvel( ZERO );
+			body.setLinvel( ZERO );
 			body.setTranslation( position );
 
 		} else if ( mesh.isMesh ) {
 
 			const body = meshMap.get( mesh );
 
-			body.setAngvel( vector );
-			body.setLinvel( vector );
+			body.setAngvel( ZERO );
+			body.setLinvel( ZERO );
 			body.setTranslation( position );
+
+		}
+
+	}
+
+	function setMeshVelocity( mesh, velocity, index = 0 ) {
+
+		if ( mesh.isInstancedMesh ) {
+
+			const bodies = meshMap.get( mesh );
+			const body = bodies[ index ];
+
+			body.setLinvel( velocity );
+
+		} else if ( mesh.isMesh ) {
+
+			const body = meshMap.get( mesh );
+
+			body.setLinvel( velocity );
 
 		}
 
@@ -201,7 +220,8 @@ async function RapierPhysics() {
 
 	return {
 		addMesh: addMesh,
-		setMeshPosition: setMeshPosition
+		setMeshPosition: setMeshPosition,
+		setMeshVelocity: setMeshVelocity
 	};
 
 }
