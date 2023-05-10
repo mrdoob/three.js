@@ -9,7 +9,8 @@ class USDZExporter {
 			ar: {
 				anchoring: { type: 'plane' },
 				planeAnchoring: { alignment: 'horizontal' }
-			}
+			},
+			quickLookCompatible: false,
 		}, options );
 
 		const files = {};
@@ -68,7 +69,7 @@ class USDZExporter {
 
 		output += buildSceneEnd();
 
-		output += buildMaterials( materials, textures );
+		output += buildMaterials( materials, textures, options.quickLookCompatible );
 
 		files[ modelFileName ] = fflate.strToU8( output );
 		output = null;
@@ -404,7 +405,7 @@ function buildPrimvars( attributes, count ) {
 
 // Materials
 
-function buildMaterials( materials, textures ) {
+function buildMaterials( materials, textures, quickLookCompatible = false ) {
 
 	const array = [];
 
@@ -412,7 +413,7 @@ function buildMaterials( materials, textures ) {
 
 		const material = materials[ uuid ];
 
-		array.push( buildMaterial( material, textures ) );
+		array.push( buildMaterial( material, textures, quickLookCompatible ) );
 
 	}
 
@@ -425,7 +426,7 @@ ${ array.join( '' ) }
 
 }
 
-function buildMaterial( material, textures ) {
+function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	// https://graphics.pixar.com/usd/docs/UsdPreviewSurface-Proposal.html
 
@@ -447,6 +448,38 @@ function buildMaterial( material, textures ) {
 			1002: 'mirror' // MirroredRepeatWrapping
 		};
 
+		const repeat = texture.repeat.clone();
+		const offset = texture.offset.clone();
+		const rotation = texture.rotation;
+
+		// rotation is around the wrong point. after rotation we need to shift offset again so that we're rotating around the right spot
+		const xRotationOffset = Math.sin( rotation );
+		const yRotationOffset = Math.cos( rotation );
+
+		// texture coordinates start in the opposite corner, need to correct
+		offset.y = 1 - offset.y - repeat.y;
+
+		// turns out QuickLook is buggy and interprets texture repeat inverted/applies operations in a different order.
+		// Apple Feedback: 	FB10036297 and FB11442287
+		if ( quickLookCompatible ) {
+
+			// This is NOT correct yet in QuickLook, but comes close for a range of models.
+			// It becomes more incorrect the bigger the offset is
+
+			offset.x = offset.x / repeat.x;
+			offset.y = offset.y / repeat.y;
+
+			offset.x += xRotationOffset / repeat.x;
+			offset.y += yRotationOffset - 1;
+
+		} else {
+
+			// results match glTF results exactly. verified correct in usdview.
+			offset.x += xRotationOffset * repeat.x;
+			offset.y += ( 1 - yRotationOffset ) * repeat.y;
+
+		}
+
 		return `
 		def Shader "PrimvarReader_${ mapType }"
 		{
@@ -460,9 +493,9 @@ function buildMaterial( material, textures ) {
         {
             uniform token info:id = "UsdTransform2d"
             token inputs:in.connect = </Materials/Material_${ material.id }/PrimvarReader_${ mapType }.outputs:result>
-            float inputs:rotation = ${ texture.rotation * ( 180 / Math.PI ) }
-            float2 inputs:scale = ${ buildVector2( texture.repeat ) }
-            float2 inputs:translation = ${ buildVector2( texture.offset ) }
+			float inputs:rotation = ${ ( rotation * ( 180 / Math.PI ) ).toFixed( PRECISION ) }
+			float2 inputs:scale = ${ buildVector2( repeat ) }
+            float2 inputs:translation = ${ buildVector2( offset ) }
             float2 outputs:result
         }
 
