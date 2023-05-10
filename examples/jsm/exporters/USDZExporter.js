@@ -504,7 +504,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
             uniform token info:id = "UsdUVTexture"
             asset inputs:file = @textures/Texture_${ id }.png@
             float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
-            float4 inputs:scale = (${ color.r }, ${ color.g }, ${ color.b }, 1)
+            ${ color !== undefined ? 'float4 inputs:scale = ' + buildColor4( color ) : '' }
             token inputs:sourceColorSpace = "${ texture.colorSpace === THREE.NoColorSpace ? 'raw' : 'sRGB' }"
             token inputs:wrapS = "${ WRAPPINGS[ texture.wrapS ] }"
             token inputs:wrapT = "${ WRAPPINGS[ texture.wrapT ] }"
@@ -643,6 +643,12 @@ ${ samplers.join( '\n' ) }
 function buildColor( color ) {
 
 	return `(${ color.r }, ${ color.g }, ${ color.b })`;
+
+}
+
+function buildColor4( color ) {
+
+	return `(${ color.r }, ${ color.g }, ${ color.b }, 1.0)`;
 
 }
 
