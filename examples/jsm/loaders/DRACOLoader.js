@@ -209,6 +209,8 @@ class DRACOLoader extends Loader {
 
 				this._assignVertexColorSpace( attribute, result.vertexColorSpace );
 
+				attribute.normalized = true;
+
 			}
 
 			geometry.setAttribute( name, attribute );
