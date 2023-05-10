@@ -190,6 +190,8 @@ export default /* glsl */`
 		// Get the specular component.
 		vec3 F = EnvironmentBRDF( n, v, specularColor, specularF90, roughness );
 
+		// As less light is transmitted, the opacity should be increased. This simple approximation does a decent job 
+		// of modulating a CSS background, and has no effect when the buffer is opaque, due to a solid object or clear color.
 		float transmittanceFactor = ( transmittance.r + transmittance.g + transmittance.b ) / 3.0;
 
 		return vec4( ( 1.0 - F ) * attenuatedColor, 1.0 - ( 1.0 - transmittedLight.a ) * transmittanceFactor );
