@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { ShaderNode, nodeObject, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
+import { ShaderNode, nodeObject, float, mat3 } from '../shadernode/ShaderNode.js';
 
 import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping } from 'three';
 
