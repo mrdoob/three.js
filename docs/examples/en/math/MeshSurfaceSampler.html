@@ -32,24 +32,22 @@
 			.setWeightAttribute( 'color' )
 			.build();
 
-		const sampleMesh = new THREE.InstancedMesh( sampleGeometry, sampleMaterial, 100 );
+		const mesh = new THREE.InstancedMesh( sampleGeometry, sampleMaterial, 100 );
 
-		const _position = new THREE.Vector3();
-		const _matrix = new THREE.Matrix4();
+		const position = new THREE.Vector3();
+		const matrix = new THREE.Matrix4();
 
 		// Sample randomly from the surface, creating an instance of the sample
 		// geometry at each sample point.
 		for ( let i = 0; i < 100; i ++ ) {
 
-			sampler.sample( _position );
+			sampler.sample( position );
 
-			_matrix.makeTranslation( _position.x, _position.y, _position.z );
+			matrix.makeTranslation( position.x, position.y, position.z );
 
-			mesh.setMatrixAt( i, _matrix );
+			mesh.setMatrixAt( i, matrix );
 
 		}
-
-		mesh.instanceMatrix.needsUpdate = true;
 
 		scene.add( mesh );
 		</code>

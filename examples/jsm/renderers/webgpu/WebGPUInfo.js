@@ -49,7 +49,6 @@ class WebGPUInfo {
 
 	reset() {
 
-		this.render.frame ++;
 		this.render.drawCalls = 0;
 		this.render.triangles = 0;
 		this.render.points = 0;

@@ -36,8 +36,6 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let container, stats;
 
 			let camera, scene, renderer;
@@ -65,7 +63,9 @@
 				];
 
 				const reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				reflectionCube.colorSpace = THREE.SRGBColorSpace;
 				const refractionCube = new THREE.CubeTextureLoader().load( urls );
+				refractionCube.colorSpace = THREE.SRGBColorSpace;
 				refractionCube.mapping = THREE.CubeRefractionMapping;
 
 				scene = new THREE.Scene();
@@ -79,8 +79,8 @@
 				scene.add( pointLight );
 
 				//materials
-				const cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
-				const cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xffee00, envMap: refractionCube, refractionRatio: 0.95 } );
+				const cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xffaa00, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
+				const cubeMaterial2 = new THREE.MeshLambertMaterial( { color: 0xfff700, envMap: refractionCube, refractionRatio: 0.95 } );
 				const cubeMaterial1 = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } );
 
 				//models
@@ -109,7 +109,6 @@
 
 				//renderer
 				renderer = new THREE.WebGLRenderer();
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

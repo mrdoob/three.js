@@ -228,8 +228,6 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			/* TEXTURE WIDTH FOR SIMULATION */
 			const WIDTH = 64;
 			const BIRDS = WIDTH * WIDTH;
@@ -382,13 +380,13 @@
 				// LIGHTS
 
 				const hemiLight = new THREE.HemisphereLight( colors[ selectModel ], 0xffffff, 1.6 );
-				hemiLight.color.setHSL( 0.6, 1, 0.6 );
-				hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+				hemiLight.color.setHSL( 0.6, 1, 0.6, THREE.SRGBColorSpace );
+				hemiLight.groundColor.setHSL( 0.095, 1, 0.75, THREE.SRGBColorSpace );
 				hemiLight.position.set( 0, 50, 0 );
 				scene.add( hemiLight );
 
 				const dirLight = new THREE.DirectionalLight( 0x00CED1, 0.6 );
-				dirLight.color.setHSL( 0.1, 1, 0.95 );
+				dirLight.color.setHSL( 0.1, 1, 0.95, THREE.SRGBColorSpace );
 				dirLight.position.set( - 1, 1.75, 1 );
 				dirLight.position.multiplyScalar( 30 );
 				scene.add( dirLight );
@@ -396,7 +394,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				container.appendChild( renderer.domElement );
 
 				initComputeRenderer();

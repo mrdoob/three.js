@@ -316,6 +316,18 @@
 			[link:https://www.khronos.org/registry/webgl/extensions/EXT_texture_compression_bptc/ EXT_texture_compression_bptc] extension. <br /><br />
 		</p>
 
+		<h2>Texture Comparison functions</h2>
+		<code>
+		THREE.NeverCompare
+		THREE.LessCompare
+		THREE.EqualCompare
+		THREE.LessEqualCompare
+		THREE.GreaterCompare
+		THREE.NotEqualCompare
+		THREE.GreaterEqualCompare
+		THREE.AlwaysCompare
+		</code>
+
 		<h2>Internal Formats</h2>
 		<code>
 		'ALPHA'
@@ -601,10 +613,9 @@
 
 		<h2>Color Space</h2>
 		<code>
-		THREE.NoColorSpace 
-		THREE.SRGBColorSpace 
-		THREE.LinearSRGBColorSpace
-		THREE.DisplayP3ColorSpace
+		THREE.NoColorSpace = ""
+		THREE.SRGBColorSpace = "srgb"
+		THREE.LinearSRGBColorSpace = "srgb-linear"
 		</code>
 		<p>
 			Used to define the color space of textures (and the output color space of

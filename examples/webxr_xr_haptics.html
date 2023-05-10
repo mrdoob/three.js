@@ -92,7 +92,7 @@
 				controls.update();
 
 				const floorGeometry = new THREE.PlaneGeometry( 4, 4 );
-				const floorMaterial = new THREE.ShadowMaterial( { opacity: 0.25 } );
+				const floorMaterial = new THREE.ShadowMaterial( { opacity: 0.25, blending: THREE.CustomBlending, transparent: false } );
 				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;

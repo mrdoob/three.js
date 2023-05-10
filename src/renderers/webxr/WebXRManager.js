@@ -130,6 +130,7 @@ class WebXRManager extends EventDispatcher {
 
 			if ( controller !== undefined ) {
 
+				controller.update( event.inputSource, event.frame, customReferenceSpace || referenceSpace );
 				controller.dispatchEvent( { type: event.type, data: event.inputSource } );
 
 			}

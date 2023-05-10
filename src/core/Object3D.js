@@ -693,7 +693,7 @@ class Object3D extends EventDispatcher {
 			};
 
 			output.metadata = {
-				version: 4.5,
+				version: 4.6,
 				type: 'Object',
 				generator: 'Object3D.toJSON'
 			};
@@ -944,6 +944,8 @@ class Object3D extends EventDispatcher {
 
 		this.frustumCulled = source.frustumCulled;
 		this.renderOrder = source.renderOrder;
+
+		this.animations = source.animations;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 

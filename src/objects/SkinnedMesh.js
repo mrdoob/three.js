@@ -4,6 +4,7 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { Sphere } from '../math/Sphere.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
+import { Ray } from '../math/Ray.js';
 
 const _basePosition = /*@__PURE__*/ new Vector3();
 
@@ -15,6 +16,8 @@ const _matrix4 = /*@__PURE__*/ new Matrix4();
 const _vertex = /*@__PURE__*/ new Vector3();
 
 const _sphere = /*@__PURE__*/ new Sphere();
+const _inverseMatrix = /*@__PURE__*/ new Matrix4();
+const _ray = /*@__PURE__*/ new Ray();
 
 class SkinnedMesh extends Mesh {
 
@@ -93,20 +96,45 @@ class SkinnedMesh extends Mesh {
 
 		this.skeleton = source.skeleton;
 
+		if ( source.boundingBox !== null ) this.boundingBox = source.boundingBox.clone();
+		if ( source.boundingSphere !== null ) this.boundingSphere = source.boundingSphere.clone();
+
 		return this;
 
 	}
 
 	raycast( raycaster, intersects ) {
 
+		const material = this.material;
+		const matrixWorld = this.matrixWorld;
+
+		if ( material === undefined ) return;
+
+		// test with bounding sphere in world space
+
 		if ( this.boundingSphere === null ) this.computeBoundingSphere();
 
 		_sphere.copy( this.boundingSphere );
-		_sphere.applyMatrix4( this.matrixWorld );
+		_sphere.applyMatrix4( matrixWorld );
 
 		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
 
-		this._computeIntersections( raycaster, intersects );
+		// convert ray to local space of skinned mesh
+
+		_inverseMatrix.copy( matrixWorld ).invert();
+		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
+
+		// test with bounding box in local space
+
+		if ( this.boundingBox !== null ) {
+
+			if ( _ray.intersectsBox( this.boundingBox ) === false ) return;
+
+		}
+
+		// test for intersections with geometry
+
+		this._computeIntersections( raycaster, intersects, _ray );
 
 	}
 

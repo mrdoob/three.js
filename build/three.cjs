@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '152dev';
+const REVISION = '153dev';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -179,6 +179,15 @@ const GreaterStencilFunc = 516;
 const NotEqualStencilFunc = 517;
 const GreaterEqualStencilFunc = 518;
 const AlwaysStencilFunc = 519;
+
+const NeverCompare = 512;
+const LessCompare = 513;
+const EqualCompare = 514;
+const LessEqualCompare = 515;
+const GreaterCompare = 516;
+const NotEqualCompare = 517;
+const GreaterEqualCompare = 518;
+const AlwaysCompare = 519;
 
 const StaticDrawUsage = 35044;
 const DynamicDrawUsage = 35048;
@@ -517,6 +526,10 @@ function denormalize( value, array ) {
 
 			return value;
 
+		case Uint32Array:
+
+			return value / 4294967295.0;
+
 		case Uint16Array:
 
 			return value / 65535.0;
@@ -524,6 +537,10 @@ function denormalize( value, array ) {
 		case Uint8Array:
 
 			return value / 255.0;
+
+		case Int32Array:
+
+			return Math.max( value / 2147483647.0, - 1.0 );
 
 		case Int16Array:
 
@@ -549,6 +566,10 @@ function normalize( value, array ) {
 
 			return value;
 
+		case Uint32Array:
+
+			return Math.round( value * 4294967295.0 );
+
 		case Uint16Array:
 
 			return Math.round( value * 65535.0 );
@@ -556,6 +577,10 @@ function normalize( value, array ) {
 		case Uint8Array:
 
 			return Math.round( value * 255.0 );
+
+		case Int32Array:
+
+			return Math.round( value * 2147483647.0 );
 
 		case Int16Array:
 
@@ -1079,7 +1104,7 @@ class Vector2 {
 
 class Matrix3 {
 
-	constructor() {
+	constructor( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
 		Matrix3.prototype.isMatrix3 = true;
 
@@ -1090,6 +1115,12 @@ class Matrix3 {
 			0, 0, 1
 
 		];
+
+		if ( n11 !== undefined ) {
+
+			this.set( n11, n12, n13, n21, n22, n23, n31, n32, n33 );
+
+		}
 
 	}
 
@@ -1750,11 +1781,15 @@ class ImageUtils {
 
 }
 
+let sourceId = 0;
+
 class Source {
 
 	constructor( data = null ) {
 
 		this.isSource = true;
+
+		Object.defineProperty( this, 'id', { value: sourceId ++ } );
 
 		this.uuid = generateUUID();
 
@@ -2019,7 +2054,7 @@ class Texture extends EventDispatcher {
 		const output = {
 
 			metadata: {
-				version: 4.5,
+				version: 4.6,
 				type: 'Texture',
 				generator: 'Texture.toJSON'
 			},
@@ -5760,7 +5795,7 @@ class Ray {
 
 class Matrix4 {
 
-	constructor() {
+	constructor( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
 		Matrix4.prototype.isMatrix4 = true;
 
@@ -5772,6 +5807,12 @@ class Matrix4 {
 			0, 0, 0, 1
 
 		];
+
+		if ( n11 !== undefined ) {
+
+			this.set( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 );
+
+		}
 
 	}
 
@@ -7669,7 +7710,7 @@ class Object3D extends EventDispatcher {
 			};
 
 			output.metadata = {
-				version: 4.5,
+				version: 4.6,
 				type: 'Object',
 				generator: 'Object3D.toJSON'
 			};
@@ -7920,6 +7961,8 @@ class Object3D extends EventDispatcher {
 
 		this.frustumCulled = source.frustumCulled;
 		this.renderOrder = source.renderOrder;
+
+		this.animations = source.animations;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
@@ -8433,7 +8476,7 @@ class Material extends EventDispatcher {
 
 		const data = {
 			metadata: {
-				version: 4.5,
+				version: 4.6,
 				type: 'Material',
 				generator: 'Material.toJSON'
 			}
@@ -8810,30 +8853,35 @@ class Color {
 		this.g = 1;
 		this.b = 1;
 
-		if ( g === undefined && b === undefined ) {
-
-			// r is THREE.Color, hex or string
-			return this.set( r );
-
-		}
-
-		return this.setRGB( r, g, b );
+		return this.set( r, g, b );
 
 	}
 
-	set( value ) {
+	set( r, g, b ) {
 
-		if ( value && value.isColor ) {
+		if ( g === undefined && b === undefined ) {
 
-			this.copy( value );
+			// r is THREE.Color, hex or string
 
-		} else if ( typeof value === 'number' ) {
+			const value = r;
 
-			this.setHex( value );
+			if ( value && value.isColor ) {
 
-		} else if ( typeof value === 'string' ) {
+				this.copy( value );
 
-			this.setStyle( value );
+			} else if ( typeof value === 'number' ) {
+
+				this.setHex( value );
+
+			} else if ( typeof value === 'string' ) {
+
+				this.setStyle( value );
+
+			}
+
+		} else {
+
+			this.setRGB( r, g, b );
 
 		}
 
@@ -9997,6 +10045,18 @@ class Int8BufferAttribute extends BufferAttribute {
 
 		super( new Int8Array( array ), itemSize, normalized );
 
+		this.gpuType = FloatType;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.gpuType = source.gpuType;
+
+		return this;
+
 	}
 
 }
@@ -10006,6 +10066,18 @@ class Uint8BufferAttribute extends BufferAttribute {
 	constructor( array, itemSize, normalized ) {
 
 		super( new Uint8Array( array ), itemSize, normalized );
+
+		this.gpuType = FloatType;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.gpuType = source.gpuType;
+
+		return this;
 
 	}
 
@@ -10027,6 +10099,18 @@ class Int16BufferAttribute extends BufferAttribute {
 
 		super( new Int16Array( array ), itemSize, normalized );
 
+		this.gpuType = FloatType;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.gpuType = source.gpuType;
+
+		return this;
+
 	}
 
 }
@@ -10036,6 +10120,18 @@ class Uint16BufferAttribute extends BufferAttribute {
 	constructor( array, itemSize, normalized ) {
 
 		super( new Uint16Array( array ), itemSize, normalized );
+
+		this.gpuType = FloatType;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.gpuType = source.gpuType;
+
+		return this;
 
 	}
 
@@ -11079,7 +11175,7 @@ class BufferGeometry extends EventDispatcher {
 
 		const data = {
 			metadata: {
-				version: 4.5,
+				version: 4.6,
 				type: 'BufferGeometry',
 				generator: 'BufferGeometry.toJSON'
 			}
@@ -11307,8 +11403,8 @@ class BufferGeometry extends EventDispatcher {
 
 }
 
-const _inverseMatrix$2 = /*@__PURE__*/ new Matrix4();
-const _ray$2 = /*@__PURE__*/ new Ray();
+const _inverseMatrix$3 = /*@__PURE__*/ new Matrix4();
+const _ray$3 = /*@__PURE__*/ new Ray();
 const _sphere$5 = /*@__PURE__*/ new Sphere();
 const _sphereHitAt = /*@__PURE__*/ new Vector3();
 
@@ -11453,41 +11549,45 @@ class Mesh extends Object3D {
 
 		if ( material === undefined ) return;
 
-		// Checking boundingSphere distance to ray
+		// test with bounding sphere in world space
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
 		_sphere$5.copy( geometry.boundingSphere );
 		_sphere$5.applyMatrix4( matrixWorld );
 
-		_ray$2.copy( raycaster.ray ).recast( raycaster.near );
+		// check distance from ray origin to bounding sphere
 
-		if ( _sphere$5.containsPoint( _ray$2.origin ) === false ) {
+		_ray$3.copy( raycaster.ray ).recast( raycaster.near );
 
-			if ( _ray$2.intersectSphere( _sphere$5, _sphereHitAt ) === null ) return;
+		if ( _sphere$5.containsPoint( _ray$3.origin ) === false ) {
 
-			if ( _ray$2.origin.distanceToSquared( _sphereHitAt ) > ( raycaster.far - raycaster.near ) ** 2 ) return;
+			if ( _ray$3.intersectSphere( _sphere$5, _sphereHitAt ) === null ) return;
+
+			if ( _ray$3.origin.distanceToSquared( _sphereHitAt ) > ( raycaster.far - raycaster.near ) ** 2 ) return;
 
 		}
 
-		//
+		// convert ray to local space of mesh
 
-		_inverseMatrix$2.copy( matrixWorld ).invert();
-		_ray$2.copy( raycaster.ray ).applyMatrix4( _inverseMatrix$2 );
+		_inverseMatrix$3.copy( matrixWorld ).invert();
+		_ray$3.copy( raycaster.ray ).applyMatrix4( _inverseMatrix$3 );
 
-		// Check boundingBox before continuing
+		// test with bounding box in local space
 
 		if ( geometry.boundingBox !== null ) {
 
-			if ( _ray$2.intersectsBox( geometry.boundingBox ) === false ) return;
+			if ( _ray$3.intersectsBox( geometry.boundingBox ) === false ) return;
 
 		}
 
-		this._computeIntersections( raycaster, intersects );
+		// test for intersections with geometry
+
+		this._computeIntersections( raycaster, intersects, _ray$3 );
 
 	}
 
-	_computeIntersections( raycaster, intersects ) {
+	_computeIntersections( raycaster, intersects, rayLocalSpace ) {
 
 		let intersection;
 
@@ -11497,7 +11597,7 @@ class Mesh extends Object3D {
 		const index = geometry.index;
 		const position = geometry.attributes.position;
 		const uv = geometry.attributes.uv;
-		const uv2 = geometry.attributes.uv2;
+		const uv1 = geometry.attributes.uv1;
 		const normal = geometry.attributes.normal;
 		const groups = geometry.groups;
 		const drawRange = geometry.drawRange;
@@ -11522,7 +11622,7 @@ class Mesh extends Object3D {
 						const b = index.getX( j + 1 );
 						const c = index.getX( j + 2 );
 
-						intersection = checkGeometryIntersection( this, groupMaterial, raycaster, _ray$2, uv, uv2, normal, a, b, c );
+						intersection = checkGeometryIntersection( this, groupMaterial, raycaster, rayLocalSpace, uv, uv1, normal, a, b, c );
 
 						if ( intersection ) {
 
@@ -11547,7 +11647,7 @@ class Mesh extends Object3D {
 					const b = index.getX( i + 1 );
 					const c = index.getX( i + 2 );
 
-					intersection = checkGeometryIntersection( this, material, raycaster, _ray$2, uv, uv2, normal, a, b, c );
+					intersection = checkGeometryIntersection( this, material, raycaster, rayLocalSpace, uv, uv1, normal, a, b, c );
 
 					if ( intersection ) {
 
@@ -11580,7 +11680,7 @@ class Mesh extends Object3D {
 						const b = j + 1;
 						const c = j + 2;
 
-						intersection = checkGeometryIntersection( this, groupMaterial, raycaster, _ray$2, uv, uv2, normal, a, b, c );
+						intersection = checkGeometryIntersection( this, groupMaterial, raycaster, rayLocalSpace, uv, uv1, normal, a, b, c );
 
 						if ( intersection ) {
 
@@ -11605,7 +11705,7 @@ class Mesh extends Object3D {
 					const b = i + 1;
 					const c = i + 2;
 
-					intersection = checkGeometryIntersection( this, material, raycaster, _ray$2, uv, uv2, normal, a, b, c );
+					intersection = checkGeometryIntersection( this, material, raycaster, rayLocalSpace, uv, uv1, normal, a, b, c );
 
 					if ( intersection ) {
 
@@ -11655,7 +11755,7 @@ function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point 
 
 }
 
-function checkGeometryIntersection( object, material, raycaster, ray, uv, uv2, normal, a, b, c ) {
+function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, normal, a, b, c ) {
 
 	object.getVertexPosition( a, _vA$1 );
 	object.getVertexPosition( b, _vB$1 );
@@ -11675,13 +11775,14 @@ function checkGeometryIntersection( object, material, raycaster, ray, uv, uv2, n
 
 		}
 
-		if ( uv2 ) {
+		if ( uv1 ) {
 
-			_uvA$1.fromBufferAttribute( uv2, a );
-			_uvB$1.fromBufferAttribute( uv2, b );
-			_uvC$1.fromBufferAttribute( uv2, c );
+			_uvA$1.fromBufferAttribute( uv1, a );
+			_uvB$1.fromBufferAttribute( uv1, b );
+			_uvC$1.fromBufferAttribute( uv1, c );
 
-			intersection.uv2 = Triangle.getInterpolation( _intersectionPoint, _vA$1, _vB$1, _vC$1, _uvA$1, _uvB$1, _uvC$1, new Vector2() );
+			intersection.uv1 = Triangle.getInterpolation( _intersectionPoint, _vA$1, _vB$1, _vC$1, _uvA$1, _uvB$1, _uvC$1, new Vector2() );
+			intersection.uv2 = intersection.uv1; // @deprecated, r152
 
 		}
 
@@ -12039,7 +12140,7 @@ class ShaderMaterial extends Material {
 		this.defaultAttributeValues = {
 			'color': [ 1, 1, 1 ],
 			'uv': [ 0, 0 ],
-			'uv2': [ 0, 0 ]
+			'uv1': [ 0, 0 ]
 		};
 
 		this.index0AttributeName = undefined;
@@ -13653,7 +13754,7 @@ var transmission_pars_fragment = "#ifdef USE_TRANSMISSION\n\tuniform float trans
 
 var uv_pars_fragment = "#ifdef USE_UV\n\tvarying vec2 vUv;\n#endif\n#ifdef USE_MAP\n\tvarying vec2 vMapUv;\n#endif\n#ifdef USE_ALPHAMAP\n\tvarying vec2 vAlphaMapUv;\n#endif\n#ifdef USE_LIGHTMAP\n\tvarying vec2 vLightMapUv;\n#endif\n#ifdef USE_AOMAP\n\tvarying vec2 vAoMapUv;\n#endif\n#ifdef USE_BUMPMAP\n\tvarying vec2 vBumpMapUv;\n#endif\n#ifdef USE_NORMALMAP\n\tvarying vec2 vNormalMapUv;\n#endif\n#ifdef USE_EMISSIVEMAP\n\tvarying vec2 vEmissiveMapUv;\n#endif\n#ifdef USE_METALNESSMAP\n\tvarying vec2 vMetalnessMapUv;\n#endif\n#ifdef USE_ROUGHNESSMAP\n\tvarying vec2 vRoughnessMapUv;\n#endif\n#ifdef USE_CLEARCOATMAP\n\tvarying vec2 vClearcoatMapUv;\n#endif\n#ifdef USE_CLEARCOAT_NORMALMAP\n\tvarying vec2 vClearcoatNormalMapUv;\n#endif\n#ifdef USE_CLEARCOAT_ROUGHNESSMAP\n\tvarying vec2 vClearcoatRoughnessMapUv;\n#endif\n#ifdef USE_IRIDESCENCEMAP\n\tvarying vec2 vIridescenceMapUv;\n#endif\n#ifdef USE_IRIDESCENCE_THICKNESSMAP\n\tvarying vec2 vIridescenceThicknessMapUv;\n#endif\n#ifdef USE_SHEEN_COLORMAP\n\tvarying vec2 vSheenColorMapUv;\n#endif\n#ifdef USE_SHEEN_ROUGHNESSMAP\n\tvarying vec2 vSheenRoughnessMapUv;\n#endif\n#ifdef USE_SPECULARMAP\n\tvarying vec2 vSpecularMapUv;\n#endif\n#ifdef USE_SPECULAR_COLORMAP\n\tvarying vec2 vSpecularColorMapUv;\n#endif\n#ifdef USE_SPECULAR_INTENSITYMAP\n\tvarying vec2 vSpecularIntensityMapUv;\n#endif\n#ifdef USE_TRANSMISSIONMAP\n\tuniform mat3 transmissionMapTransform;\n\tvarying vec2 vTransmissionMapUv;\n#endif\n#ifdef USE_THICKNESSMAP\n\tuniform mat3 thicknessMapTransform;\n\tvarying vec2 vThicknessMapUv;\n#endif";
 
-var uv_pars_vertex = "#ifdef USE_UV\n\tvarying vec2 vUv;\n#endif\n#ifdef USE_UV2\n\tattribute vec2 uv2;\n#endif\n#ifdef USE_MAP\n\tuniform mat3 mapTransform;\n\tvarying vec2 vMapUv;\n#endif\n#ifdef USE_ALPHAMAP\n\tuniform mat3 alphaMapTransform;\n\tvarying vec2 vAlphaMapUv;\n#endif\n#ifdef USE_LIGHTMAP\n\tuniform mat3 lightMapTransform;\n\tvarying vec2 vLightMapUv;\n#endif\n#ifdef USE_AOMAP\n\tuniform mat3 aoMapTransform;\n\tvarying vec2 vAoMapUv;\n#endif\n#ifdef USE_BUMPMAP\n\tuniform mat3 bumpMapTransform;\n\tvarying vec2 vBumpMapUv;\n#endif\n#ifdef USE_NORMALMAP\n\tuniform mat3 normalMapTransform;\n\tvarying vec2 vNormalMapUv;\n#endif\n#ifdef USE_DISPLACEMENTMAP\n\tuniform mat3 displacementMapTransform;\n\tvarying vec2 vDisplacementMapUv;\n#endif\n#ifdef USE_EMISSIVEMAP\n\tuniform mat3 emissiveMapTransform;\n\tvarying vec2 vEmissiveMapUv;\n#endif\n#ifdef USE_METALNESSMAP\n\tuniform mat3 metalnessMapTransform;\n\tvarying vec2 vMetalnessMapUv;\n#endif\n#ifdef USE_ROUGHNESSMAP\n\tuniform mat3 roughnessMapTransform;\n\tvarying vec2 vRoughnessMapUv;\n#endif\n#ifdef USE_CLEARCOATMAP\n\tuniform mat3 clearcoatMapTransform;\n\tvarying vec2 vClearcoatMapUv;\n#endif\n#ifdef USE_CLEARCOAT_NORMALMAP\n\tuniform mat3 clearcoatNormalMapTransform;\n\tvarying vec2 vClearcoatNormalMapUv;\n#endif\n#ifdef USE_CLEARCOAT_ROUGHNESSMAP\n\tuniform mat3 clearcoatRoughnessMapTransform;\n\tvarying vec2 vClearcoatRoughnessMapUv;\n#endif\n#ifdef USE_SHEEN_COLORMAP\n\tuniform mat3 sheenColorMapTransform;\n\tvarying vec2 vSheenColorMapUv;\n#endif\n#ifdef USE_SHEEN_ROUGHNESSMAP\n\tuniform mat3 sheenRoughnessMapTransform;\n\tvarying vec2 vSheenRoughnessMapUv;\n#endif\n#ifdef USE_IRIDESCENCEMAP\n\tuniform mat3 iridescenceMapTransform;\n\tvarying vec2 vIridescenceMapUv;\n#endif\n#ifdef USE_IRIDESCENCE_THICKNESSMAP\n\tuniform mat3 iridescenceThicknessMapTransform;\n\tvarying vec2 vIridescenceThicknessMapUv;\n#endif\n#ifdef USE_SPECULARMAP\n\tuniform mat3 specularMapTransform;\n\tvarying vec2 vSpecularMapUv;\n#endif\n#ifdef USE_SPECULAR_COLORMAP\n\tuniform mat3 specularColorMapTransform;\n\tvarying vec2 vSpecularColorMapUv;\n#endif\n#ifdef USE_SPECULAR_INTENSITYMAP\n\tuniform mat3 specularIntensityMapTransform;\n\tvarying vec2 vSpecularIntensityMapUv;\n#endif\n#ifdef USE_TRANSMISSIONMAP\n\tuniform mat3 transmissionMapTransform;\n\tvarying vec2 vTransmissionMapUv;\n#endif\n#ifdef USE_THICKNESSMAP\n\tuniform mat3 thicknessMapTransform;\n\tvarying vec2 vThicknessMapUv;\n#endif";
+var uv_pars_vertex = "#ifdef USE_UV\n\tvarying vec2 vUv;\n#endif\n#ifdef USE_MAP\n\tuniform mat3 mapTransform;\n\tvarying vec2 vMapUv;\n#endif\n#ifdef USE_ALPHAMAP\n\tuniform mat3 alphaMapTransform;\n\tvarying vec2 vAlphaMapUv;\n#endif\n#ifdef USE_LIGHTMAP\n\tuniform mat3 lightMapTransform;\n\tvarying vec2 vLightMapUv;\n#endif\n#ifdef USE_AOMAP\n\tuniform mat3 aoMapTransform;\n\tvarying vec2 vAoMapUv;\n#endif\n#ifdef USE_BUMPMAP\n\tuniform mat3 bumpMapTransform;\n\tvarying vec2 vBumpMapUv;\n#endif\n#ifdef USE_NORMALMAP\n\tuniform mat3 normalMapTransform;\n\tvarying vec2 vNormalMapUv;\n#endif\n#ifdef USE_DISPLACEMENTMAP\n\tuniform mat3 displacementMapTransform;\n\tvarying vec2 vDisplacementMapUv;\n#endif\n#ifdef USE_EMISSIVEMAP\n\tuniform mat3 emissiveMapTransform;\n\tvarying vec2 vEmissiveMapUv;\n#endif\n#ifdef USE_METALNESSMAP\n\tuniform mat3 metalnessMapTransform;\n\tvarying vec2 vMetalnessMapUv;\n#endif\n#ifdef USE_ROUGHNESSMAP\n\tuniform mat3 roughnessMapTransform;\n\tvarying vec2 vRoughnessMapUv;\n#endif\n#ifdef USE_CLEARCOATMAP\n\tuniform mat3 clearcoatMapTransform;\n\tvarying vec2 vClearcoatMapUv;\n#endif\n#ifdef USE_CLEARCOAT_NORMALMAP\n\tuniform mat3 clearcoatNormalMapTransform;\n\tvarying vec2 vClearcoatNormalMapUv;\n#endif\n#ifdef USE_CLEARCOAT_ROUGHNESSMAP\n\tuniform mat3 clearcoatRoughnessMapTransform;\n\tvarying vec2 vClearcoatRoughnessMapUv;\n#endif\n#ifdef USE_SHEEN_COLORMAP\n\tuniform mat3 sheenColorMapTransform;\n\tvarying vec2 vSheenColorMapUv;\n#endif\n#ifdef USE_SHEEN_ROUGHNESSMAP\n\tuniform mat3 sheenRoughnessMapTransform;\n\tvarying vec2 vSheenRoughnessMapUv;\n#endif\n#ifdef USE_IRIDESCENCEMAP\n\tuniform mat3 iridescenceMapTransform;\n\tvarying vec2 vIridescenceMapUv;\n#endif\n#ifdef USE_IRIDESCENCE_THICKNESSMAP\n\tuniform mat3 iridescenceThicknessMapTransform;\n\tvarying vec2 vIridescenceThicknessMapUv;\n#endif\n#ifdef USE_SPECULARMAP\n\tuniform mat3 specularMapTransform;\n\tvarying vec2 vSpecularMapUv;\n#endif\n#ifdef USE_SPECULAR_COLORMAP\n\tuniform mat3 specularColorMapTransform;\n\tvarying vec2 vSpecularColorMapUv;\n#endif\n#ifdef USE_SPECULAR_INTENSITYMAP\n\tuniform mat3 specularIntensityMapTransform;\n\tvarying vec2 vSpecularIntensityMapUv;\n#endif\n#ifdef USE_TRANSMISSIONMAP\n\tuniform mat3 transmissionMapTransform;\n\tvarying vec2 vTransmissionMapUv;\n#endif\n#ifdef USE_THICKNESSMAP\n\tuniform mat3 thicknessMapTransform;\n\tvarying vec2 vThicknessMapUv;\n#endif";
 
 var uv_vertex = "#ifdef USE_UV\n\tvUv = vec3( uv, 1 ).xy;\n#endif\n#ifdef USE_MAP\n\tvMapUv = ( mapTransform * vec3( MAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_ALPHAMAP\n\tvAlphaMapUv = ( alphaMapTransform * vec3( ALPHAMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_LIGHTMAP\n\tvLightMapUv = ( lightMapTransform * vec3( LIGHTMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_AOMAP\n\tvAoMapUv = ( aoMapTransform * vec3( AOMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_BUMPMAP\n\tvBumpMapUv = ( bumpMapTransform * vec3( BUMPMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_NORMALMAP\n\tvNormalMapUv = ( normalMapTransform * vec3( NORMALMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_DISPLACEMENTMAP\n\tvDisplacementMapUv = ( displacementMapTransform * vec3( DISPLACEMENTMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_EMISSIVEMAP\n\tvEmissiveMapUv = ( emissiveMapTransform * vec3( EMISSIVEMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_METALNESSMAP\n\tvMetalnessMapUv = ( metalnessMapTransform * vec3( METALNESSMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_ROUGHNESSMAP\n\tvRoughnessMapUv = ( roughnessMapTransform * vec3( ROUGHNESSMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_CLEARCOATMAP\n\tvClearcoatMapUv = ( clearcoatMapTransform * vec3( CLEARCOATMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_CLEARCOAT_NORMALMAP\n\tvClearcoatNormalMapUv = ( clearcoatNormalMapTransform * vec3( CLEARCOAT_NORMALMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_CLEARCOAT_ROUGHNESSMAP\n\tvClearcoatRoughnessMapUv = ( clearcoatRoughnessMapTransform * vec3( CLEARCOAT_ROUGHNESSMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_IRIDESCENCEMAP\n\tvIridescenceMapUv = ( iridescenceMapTransform * vec3( IRIDESCENCEMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_IRIDESCENCE_THICKNESSMAP\n\tvIridescenceThicknessMapUv = ( iridescenceThicknessMapTransform * vec3( IRIDESCENCE_THICKNESSMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_SHEEN_COLORMAP\n\tvSheenColorMapUv = ( sheenColorMapTransform * vec3( SHEEN_COLORMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_SHEEN_ROUGHNESSMAP\n\tvSheenRoughnessMapUv = ( sheenRoughnessMapTransform * vec3( SHEEN_ROUGHNESSMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_SPECULARMAP\n\tvSpecularMapUv = ( specularMapTransform * vec3( SPECULARMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_SPECULAR_COLORMAP\n\tvSpecularColorMapUv = ( specularColorMapTransform * vec3( SPECULAR_COLORMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_SPECULAR_INTENSITYMAP\n\tvSpecularIntensityMapUv = ( specularIntensityMapTransform * vec3( SPECULAR_INTENSITYMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_TRANSMISSIONMAP\n\tvTransmissionMapUv = ( transmissionMapTransform * vec3( TRANSMISSIONMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_THICKNESSMAP\n\tvThicknessMapUv = ( thicknessMapTransform * vec3( THICKNESSMAP_UV, 1 ) ).xy;\n#endif";
 
@@ -14990,9 +15091,9 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 	}
 
-	function vertexAttribPointer( index, size, type, normalized, stride, offset ) {
+	function vertexAttribPointer( index, size, type, normalized, stride, offset, integer ) {
 
-		if ( capabilities.isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT ) ) {
+		if ( integer === true ) {
 
 			gl.vertexAttribIPointer( index, size, type, stride, offset );
 
@@ -15050,6 +15151,10 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 					const type = attribute.type;
 					const bytesPerElement = attribute.bytesPerElement;
 
+					// check for integer attributes (WebGL 2 only)
+
+					const integer = ( capabilities.isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT || geometryAttribute.gpuType === IntType ) );
+
 					if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
 						const data = geometryAttribute.data;
@@ -15090,7 +15195,8 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 								type,
 								normalized,
 								stride * bytesPerElement,
-								( offset + ( size / programAttribute.locationSize ) * i ) * bytesPerElement
+								( offset + ( size / programAttribute.locationSize ) * i ) * bytesPerElement,
+								integer
 							);
 
 						}
@@ -15131,7 +15237,8 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 								type,
 								normalized,
 								size * bytesPerElement,
-								( size / programAttribute.locationSize ) * i * bytesPerElement
+								( size / programAttribute.locationSize ) * i * bytesPerElement,
+								integer
 							);
 
 						}
@@ -17269,7 +17376,6 @@ function WebGLInfo( gl ) {
 
 	function reset() {
 
-		render.frame ++;
 		render.calls = 0;
 		render.triangles = 0;
 		render.points = 0;
@@ -19327,7 +19433,9 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
-			parameters.vertexUvs2 ? '#define USE_UV2' : '',
+			parameters.vertexUv1s ? '#define USE_UV1' : '',
+			parameters.vertexUv2s ? '#define USE_UV2' : '',
+			parameters.vertexUv3s ? '#define USE_UV3' : '',
 
 			parameters.pointsUvs ? '#define USE_POINTS_UV' : '',
 
@@ -19375,6 +19483,24 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			'attribute vec3 position;',
 			'attribute vec3 normal;',
 			'attribute vec2 uv;',
+
+			'#ifdef USE_UV1',
+
+			'	attribute vec2 uv1;',
+
+			'#endif',
+
+			'#ifdef USE_UV2',
+
+			'	attribute vec2 uv2;',
+
+			'#endif',
+
+			'#ifdef USE_UV3',
+
+			'	attribute vec2 uv3;',
+
+			'#endif',
 
 			'#ifdef USE_TANGENT',
 
@@ -19488,7 +19614,9 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors || parameters.instancingColor ? '#define USE_COLOR' : '',
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
-			parameters.vertexUvs2 ? '#define USE_UV2' : '',
+			parameters.vertexUv1s ? '#define USE_UV1' : '',
+			parameters.vertexUv2s ? '#define USE_UV2' : '',
+			parameters.vertexUv3s ? '#define USE_UV3' : '',
 
 			parameters.pointsUvs ? '#define USE_POINTS_UV' : '',
 
@@ -19894,9 +20022,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 	function getChannel( value ) {
 
-		if ( value === 1 ) return 'uv2';
+		if ( value === 0 ) return 'uv';
 
-		return 'uv';
+		return `uv${ value }`;
 
 	}
 
@@ -20008,7 +20136,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		const HAS_EXTENSIONS = !! material.extensions;
 
+		const HAS_ATTRIBUTE_UV1 = !! geometry.attributes.uv1;
 		const HAS_ATTRIBUTE_UV2 = !! geometry.attributes.uv2;
+		const HAS_ATTRIBUTE_UV3 = !! geometry.attributes.uv3;
 
 		const parameters = {
 
@@ -20120,7 +20250,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			vertexTangents: HAS_NORMALMAP && !! geometry.attributes.tangent,
 			vertexColors: material.vertexColors,
 			vertexAlphas: material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4,
-			vertexUvs2: HAS_ATTRIBUTE_UV2,
+			vertexUv1s: HAS_ATTRIBUTE_UV1,
+			vertexUv2s: HAS_ATTRIBUTE_UV2,
+			vertexUv3s: HAS_ATTRIBUTE_UV3,
 
 			pointsUvs: object.isPoints === true && !! geometry.attributes.uv && ( HAS_MAP || HAS_ALPHAMAP ),
 
@@ -20312,10 +20444,14 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 11 );
 		if ( parameters.vertexAlphas )
 			_programLayers.enable( 12 );
-		if ( parameters.vertexUvs2 )
+		if ( parameters.vertexUv1s )
 			_programLayers.enable( 13 );
-		if ( parameters.vertexTangents )
+		if ( parameters.vertexUv2s )
 			_programLayers.enable( 14 );
+		if ( parameters.vertexUv3s )
+			_programLayers.enable( 15 );
+		if ( parameters.vertexTangents )
+			_programLayers.enable( 16 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();
@@ -23696,6 +23832,17 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		[ LinearMipmapLinearFilter ]: _gl.LINEAR_MIPMAP_LINEAR
 	};
 
+	const compareToGL = {
+		[ NeverCompare ]: _gl.NEVER,
+		[ AlwaysCompare ]: _gl.ALWAYS,
+		[ LessCompare ]: _gl.LESS,
+		[ LessEqualCompare ]: _gl.LEQUAL,
+		[ EqualCompare ]: _gl.EQUAL,
+		[ GreaterEqualCompare ]: _gl.GEQUAL,
+		[ GreaterCompare ]: _gl.GREATER,
+		[ NotEqualCompare ]: _gl.NOTEQUAL
+	};
+
 	function setTextureParameters( textureType, texture, supportsMips ) {
 
 		if ( supportsMips ) {
@@ -23737,6 +23884,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter should be set to THREE.NearestFilter or THREE.LinearFilter.' );
 
 			}
+
+		}
+
+		if ( texture.compareFunction ) {
+
+			_gl.texParameteri( textureType, _gl.TEXTURE_COMPARE_MODE, _gl.COMPARE_REF_TO_TEXTURE );
+			_gl.texParameteri( textureType, _gl.TEXTURE_COMPARE_FUNC, compareToGL[ texture.compareFunction ] );
 
 		}
 
@@ -25636,6 +25790,7 @@ class WebXRController {
 
 						joint.matrix.fromArray( jointPose.transform.matrix );
 						joint.matrix.decompose( joint.position, joint.rotation, joint.scale );
+						joint.matrixWorldNeedsUpdate = true;
 						joint.jointRadius = jointPose.radius;
 
 					}
@@ -25684,6 +25839,7 @@ class WebXRController {
 
 						grip.matrix.fromArray( gripPose.transform.matrix );
 						grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
+						grip.matrixWorldNeedsUpdate = true;
 
 						if ( gripPose.linearVelocity ) {
 
@@ -25728,6 +25884,7 @@ class WebXRController {
 
 					targetRay.matrix.fromArray( inputPose.transform.matrix );
 					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+					targetRay.matrixWorldNeedsUpdate = true;
 
 					if ( inputPose.linearVelocity ) {
 
@@ -25830,8 +25987,30 @@ class DepthTexture extends Texture {
 		this.flipY = false;
 		this.generateMipmaps = false;
 
+		this.compareFunction = null;
+
 	}
 
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.compareFunction = source.compareFunction;
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		if ( this.compareFunction !== null ) data.compareFunction = this.compareFunction;
+
+		return data;
+
+	}
 
 }
 
@@ -25955,6 +26134,7 @@ class WebXRManager extends EventDispatcher {
 
 			if ( controller !== undefined ) {
 
+				controller.update( event.inputSource, event.frame, customReferenceSpace || referenceSpace );
 				controller.dispatchEvent( { type: event.type, data: event.inputSource } );
 
 			}
@@ -27648,6 +27828,9 @@ class WebGLRenderer {
 
 		}
 
+		const uintClearColor = new Uint32Array( 4 );
+		const intClearColor = new Int32Array( 4 );
+
 		let currentRenderList = null;
 		let currentRenderState = null;
 
@@ -27831,6 +28014,12 @@ class WebGLRenderer {
 					}
 
 				}
+
+			}
+
+			if ( _gl instanceof WebGLRenderingContext ) { // @deprecated, r153
+
+				console.warn( 'THREE.WebGLRenderer: WebGL 1 support was deprecated in r153 and will be removed in r163.' );
 
 			}
 
@@ -28115,7 +28304,65 @@ class WebGLRenderer {
 
 			let bits = 0;
 
-			if ( color ) bits |= _gl.COLOR_BUFFER_BIT;
+			if ( color ) {
+
+				// check if we're trying to clear an integer target
+				let isIntegerFormat = false;
+				if ( _currentRenderTarget !== null ) {
+
+					const targetFormat = _currentRenderTarget.texture.format;
+					isIntegerFormat = targetFormat === RGBAIntegerFormat ||
+						targetFormat === RGIntegerFormat ||
+						targetFormat === RedIntegerFormat;
+
+				}
+
+				// use the appropriate clear functions to clear the target if it's a signed
+				// or unsigned integer target
+				if ( isIntegerFormat ) {
+
+					const targetType = _currentRenderTarget.texture.type;
+					const isUnsignedType = targetType === UnsignedByteType ||
+						targetType === UnsignedIntType ||
+						targetType === UnsignedShortType ||
+						targetType === UnsignedInt248Type ||
+						targetType === UnsignedShort4444Type ||
+						targetType === UnsignedShort5551Type;
+
+					const clearColor = background.getClearColor();
+					const a = background.getClearAlpha();
+					const r = clearColor.r;
+					const g = clearColor.g;
+					const b = clearColor.b;
+
+					const __webglFramebuffer = properties.get( _currentRenderTarget ).__webglFramebuffer;
+
+					if ( isUnsignedType ) {
+
+						uintClearColor[ 0 ] = r;
+						uintClearColor[ 1 ] = g;
+						uintClearColor[ 2 ] = b;
+						uintClearColor[ 3 ] = a;
+						_gl.clearBufferuiv( _gl.COLOR, __webglFramebuffer, uintClearColor );
+
+					} else {
+
+						intClearColor[ 0 ] = r;
+						intClearColor[ 1 ] = g;
+						intClearColor[ 2 ] = b;
+						intClearColor[ 3 ] = a;
+						_gl.clearBufferiv( _gl.COLOR, __webglFramebuffer, intClearColor );
+
+					}
+
+				} else {
+
+					bits |= _gl.COLOR_BUFFER_BIT;
+
+				}
+
+			}
+
 			if ( depth ) bits |= _gl.DEPTH_BUFFER_BIT;
 			if ( stencil ) bits |= _gl.STENCIL_BUFFER_BIT;
 
@@ -28586,6 +28833,8 @@ class WebGLRenderer {
 
 			if ( this.info.autoReset === true ) this.info.reset();
 
+			this.info.render.frame ++;
+
 			//
 
 			background.render( currentRenderList, scene );
@@ -28712,30 +28961,43 @@ class WebGLRenderer {
 
 				} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
-					if ( object.isSkinnedMesh ) {
-
-						// update skeleton only once in a frame
-
-						if ( object.skeleton.frame !== info.render.frame ) {
-
-							object.skeleton.update();
-							object.skeleton.frame = info.render.frame;
-
-						}
-
-					}
-
 					if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
 
-						if ( sortObjects ) {
+						if ( object.isSkinnedMesh ) {
 
-							_vector3.setFromMatrixPosition( object.matrixWorld )
-								.applyMatrix4( _projScreenMatrix );
+							// update skeleton only once in a frame
+
+							if ( object.skeleton.frame !== info.render.frame ) {
+
+								object.skeleton.update();
+								object.skeleton.frame = info.render.frame;
+
+							}
 
 						}
 
 						const geometry = objects.update( object );
 						const material = object.material;
+
+						if ( sortObjects ) {
+
+							if ( object.boundingSphere !== undefined ) {
+
+								if ( object.boundingSphere === null ) object.computeBoundingSphere();
+								_vector3.copy( object.boundingSphere.center );
+
+							} else {
+
+								if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+								_vector3.copy( geometry.boundingSphere.center );
+
+							}
+
+							_vector3
+								.applyMatrix4( object.matrixWorld )
+								.applyMatrix4( _projScreenMatrix );
+
+						}
 
 						if ( Array.isArray( material ) ) {
 
@@ -30945,6 +31207,8 @@ const _matrix4 = /*@__PURE__*/ new Matrix4();
 const _vertex = /*@__PURE__*/ new Vector3();
 
 const _sphere$3 = /*@__PURE__*/ new Sphere();
+const _inverseMatrix$2 = /*@__PURE__*/ new Matrix4();
+const _ray$2 = /*@__PURE__*/ new Ray();
 
 class SkinnedMesh extends Mesh {
 
@@ -31023,20 +31287,45 @@ class SkinnedMesh extends Mesh {
 
 		this.skeleton = source.skeleton;
 
+		if ( source.boundingBox !== null ) this.boundingBox = source.boundingBox.clone();
+		if ( source.boundingSphere !== null ) this.boundingSphere = source.boundingSphere.clone();
+
 		return this;
 
 	}
 
 	raycast( raycaster, intersects ) {
 
+		const material = this.material;
+		const matrixWorld = this.matrixWorld;
+
+		if ( material === undefined ) return;
+
+		// test with bounding sphere in world space
+
 		if ( this.boundingSphere === null ) this.computeBoundingSphere();
 
 		_sphere$3.copy( this.boundingSphere );
-		_sphere$3.applyMatrix4( this.matrixWorld );
+		_sphere$3.applyMatrix4( matrixWorld );
 
 		if ( raycaster.ray.intersectsSphere( _sphere$3 ) === false ) return;
 
-		this._computeIntersections( raycaster, intersects );
+		// convert ray to local space of skinned mesh
+
+		_inverseMatrix$2.copy( matrixWorld ).invert();
+		_ray$2.copy( raycaster.ray ).applyMatrix4( _inverseMatrix$2 );
+
+		// test with bounding box in local space
+
+		if ( this.boundingBox !== null ) {
+
+			if ( _ray$2.intersectsBox( this.boundingBox ) === false ) return;
+
+		}
+
+		// test for intersections with geometry
+
+		this._computeIntersections( raycaster, intersects, _ray$2 );
 
 	}
 
@@ -31439,7 +31728,7 @@ class Skeleton {
 
 		const data = {
 			metadata: {
-				version: 4.5,
+				version: 4.6,
 				type: 'Skeleton',
 				generator: 'Skeleton.toJSON'
 			},
@@ -31609,6 +31898,9 @@ class InstancedMesh extends Mesh {
 		if ( source.instanceColor !== null ) this.instanceColor = source.instanceColor.clone();
 
 		this.count = source.count;
+
+		if ( source.boundingBox !== null ) this.boundingBox = source.boundingBox.clone();
+		if ( source.boundingSphere !== null ) this.boundingSphere = source.boundingSphere.clone();
 
 		return this;
 
@@ -32285,13 +32577,11 @@ class VideoTexture extends Texture {
 
 class FramebufferTexture extends Texture {
 
-	constructor( width, height, format ) {
+	constructor( width, height ) {
 
 		super( { width, height } );
 
 		this.isFramebufferTexture = true;
-
-		this.format = format;
 
 		this.magFilter = NearestFilter;
 		this.minFilter = NearestFilter;
@@ -32743,7 +33033,7 @@ class Curve {
 
 		const data = {
 			metadata: {
-				version: 4.5,
+				version: 4.6,
 				type: 'Curve',
 				generator: 'Curve.toJSON'
 			}
@@ -44126,6 +44416,7 @@ class ObjectLoader extends Loader {
 				if ( data.generateMipmaps !== undefined ) texture.generateMipmaps = data.generateMipmaps;
 				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
 				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
+				if ( data.compareFunction !== undefined ) texture.compareFunction = data.compareFunction;
 
 				if ( data.userData !== undefined ) texture.userData = data.userData;
 
@@ -51011,6 +51302,7 @@ exports.AddOperation = AddOperation;
 exports.AdditiveAnimationBlendMode = AdditiveAnimationBlendMode;
 exports.AdditiveBlending = AdditiveBlending;
 exports.AlphaFormat = AlphaFormat;
+exports.AlwaysCompare = AlwaysCompare;
 exports.AlwaysDepth = AlwaysDepth;
 exports.AlwaysStencilFunc = AlwaysStencilFunc;
 exports.AmbientLight = AmbientLight;
@@ -51110,6 +51402,7 @@ exports.DynamicDrawUsage = DynamicDrawUsage;
 exports.DynamicReadUsage = DynamicReadUsage;
 exports.EdgesGeometry = EdgesGeometry;
 exports.EllipseCurve = EllipseCurve;
+exports.EqualCompare = EqualCompare;
 exports.EqualDepth = EqualDepth;
 exports.EqualStencilFunc = EqualStencilFunc;
 exports.EquirectangularReflectionMapping = EquirectangularReflectionMapping;
@@ -51131,7 +51424,9 @@ exports.Frustum = Frustum;
 exports.GLBufferAttribute = GLBufferAttribute;
 exports.GLSL1 = GLSL1;
 exports.GLSL3 = GLSL3;
+exports.GreaterCompare = GreaterCompare;
 exports.GreaterDepth = GreaterDepth;
+exports.GreaterEqualCompare = GreaterEqualCompare;
 exports.GreaterEqualDepth = GreaterEqualDepth;
 exports.GreaterEqualStencilFunc = GreaterEqualStencilFunc;
 exports.GreaterStencilFunc = GreaterStencilFunc;
@@ -51169,7 +51464,9 @@ exports.LOD = LOD;
 exports.LatheBufferGeometry = LatheBufferGeometry;
 exports.LatheGeometry = LatheGeometry;
 exports.Layers = Layers;
+exports.LessCompare = LessCompare;
 exports.LessDepth = LessDepth;
+exports.LessEqualCompare = LessEqualCompare;
 exports.LessEqualDepth = LessEqualDepth;
 exports.LessEqualStencilFunc = LessEqualStencilFunc;
 exports.LessStencilFunc = LessStencilFunc;
@@ -51228,6 +51525,7 @@ exports.NearestMipMapLinearFilter = NearestMipMapLinearFilter;
 exports.NearestMipMapNearestFilter = NearestMipMapNearestFilter;
 exports.NearestMipmapLinearFilter = NearestMipmapLinearFilter;
 exports.NearestMipmapNearestFilter = NearestMipmapNearestFilter;
+exports.NeverCompare = NeverCompare;
 exports.NeverDepth = NeverDepth;
 exports.NeverStencilFunc = NeverStencilFunc;
 exports.NoBlending = NoBlending;
@@ -51235,6 +51533,7 @@ exports.NoColorSpace = NoColorSpace;
 exports.NoToneMapping = NoToneMapping;
 exports.NormalAnimationBlendMode = NormalAnimationBlendMode;
 exports.NormalBlending = NormalBlending;
+exports.NotEqualCompare = NotEqualCompare;
 exports.NotEqualDepth = NotEqualDepth;
 exports.NotEqualStencilFunc = NotEqualStencilFunc;
 exports.NumberKeyframeTrack = NumberKeyframeTrack;

@@ -44,7 +44,7 @@ class ShaderMaterial extends Material {
 		this.defaultAttributeValues = {
 			'color': [ 1, 1, 1 ],
 			'uv': [ 0, 0 ],
-			'uv2': [ 0, 0 ]
+			'uv1': [ 0, 0 ]
 		};
 
 		this.index0AttributeName = undefined;

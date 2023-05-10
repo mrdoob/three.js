@@ -1,5 +1,6 @@
-import { GPUIndexFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor, GPUColorWriteFlags, GPUStencilOperation, GPUInputStepMode } from './constants.js';
+import { GPUIndexFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor, GPUColorWriteFlags, GPUStencilOperation, GPUInputStepMode } from './constants.js';
 import {
+	Float16BufferAttribute,
 	FrontSide, BackSide, DoubleSide,
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
 	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc,
@@ -8,6 +9,26 @@ import {
 	AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
 	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor
 } from 'three';
+
+const typedArraysToVertexFormatPrefix = new Map( [
+	[ Int8Array, [ 'sint8', 'snorm8' ]],
+	[ Uint8Array, [ 'uint8', 'unorm8' ]],
+	[ Int16Array, [ 'sint16', 'snorm16' ]],
+	[ Uint16Array, [ 'uint16', 'unorm16' ]],
+	[ Int32Array, [ 'sint32', 'snorm32' ]],
+	[ Uint32Array, [ 'uint32', 'unorm32' ]],
+	[ Float32Array, [ 'float32', ]],
+] );
+
+const typedAttributeToVertexFormatPrefix = new Map( [
+	[ Float16BufferAttribute, [ 'float16', ]],
+] );
+
+const typeArraysToVertexFormatPrefixForItemSize1 = new Map( [
+	[ Int32Array, 'sint32' ],
+	[ Uint32Array, 'uint32' ],
+	[ Float32Array, 'float32' ]
+] );
 
 class WebGPURenderPipeline {
 
@@ -24,13 +45,13 @@ class WebGPURenderPipeline {
 
 	}
 
-	init( cacheKey, stageVertex, stageFragment, renderObject, nodeBuilder ) {
+	init( renderObject, cacheKey, stageVertex, stageFragment ) {
 
 		const { object, material, geometry } = renderObject;
 
 		// determine shader attributes
 
-		const shaderAttributes = this._getShaderAttributes( nodeBuilder, geometry );
+		const shaderAttributes = this._getShaderAttributes( renderObject );
 
 		// vertex buffers
 
@@ -38,8 +59,7 @@ class WebGPURenderPipeline {
 
 		for ( const attribute of shaderAttributes ) {
 
-			const name = attribute.name;
-			const geometryAttribute = geometry.getAttribute( name );
+			const geometryAttribute = attribute.geometryAttribute;
 			const stepMode = ( geometryAttribute !== undefined && geometryAttribute.isInstancedBufferAttribute ) ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
 
 			vertexBuffers.push( {
@@ -561,146 +581,62 @@ class WebGPURenderPipeline {
 
 	}
 
-	_getVertexFormat( type, bytesPerElement ) {
+	_getVertexFormat( geometryAttribute ) {
 
-		// float
+		const { itemSize, normalized } = geometryAttribute;
+		const ArrayType = geometryAttribute.array.constructor;
+		const AttributeType = geometryAttribute.constructor;
 
-		if ( type === 'float' ) return GPUVertexFormat.Float32;
+		let format;
 
-		if ( type === 'vec2' ) {
+		if ( itemSize == 1 ) {
 
-			if ( bytesPerElement === 2 ) {
+			format = typeArraysToVertexFormatPrefixForItemSize1.get( ArrayType );
 
-				return GPUVertexFormat.Float16x2;
+		} else {
 
-			} else {
+			const prefixOptions = typedAttributeToVertexFormatPrefix.get( AttributeType ) || typedArraysToVertexFormatPrefix.get( ArrayType );
+			const prefix = prefixOptions[ normalized ? 1 : 0 ];
 
-				return GPUVertexFormat.Float32x2;
+			if ( prefix ) {
 
-			}
+				const bytesPerUnit = ArrayType.BYTES_PER_ELEMENT * itemSize;
+				const paddedBytesPerUnit = Math.floor( ( bytesPerUnit + 3 ) / 4 ) * 4;
+				const paddedItemSize = paddedBytesPerUnit / ArrayType.BYTES_PER_ELEMENT;
 
-		}
+				if ( paddedItemSize % 1 ) {
 
-		if ( type === 'vec3' ) return GPUVertexFormat.Float32x3;
+					throw new Error( 'THREE.WebGPURenderer: Bad vertex format item size.' );
 
-		if ( type === 'vec4' ) {
+				}
 
-			if ( bytesPerElement === 2 ) {
-
-				return GPUVertexFormat.Float16x4;
-
-			} else {
-
-				return GPUVertexFormat.Float32x4;
-
-			}
-
-		}
-
-		// int
-
-		if ( type === 'int' ) return GPUVertexFormat.Sint32;
-
-		if ( type === 'ivec2' ) {
-
-			if ( bytesPerElement === 1 ) {
-
-				return GPUVertexFormat.Sint8x2;
-
-			} else if ( bytesPerElement === 2 ) {
-
-				return GPUVertexFormat.Sint16x2;
-
-			} else {
-
-				return GPUVertexFormat.Sint32x2;
+				format = `${prefix}x${paddedItemSize}`;
 
 			}
 
 		}
 
-		if ( type === 'ivec3' ) return GPUVertexFormat.Sint32x3;
+		if ( ! format ) {
 
-		if ( type === 'ivec4' ) {
-
-			if ( bytesPerElement === 1 ) {
-
-				return GPUVertexFormat.Sint8x4;
-
-			} else if ( bytesPerElement === 2 ) {
-
-				return GPUVertexFormat.Sint16x4;
-
-			} else {
-
-				return GPUVertexFormat.Sint32x4;
-
-			}
+			console.error( 'THREE.WebGPURenderer: Vertex format not supported yet.' );
 
 		}
 
-		// uint
-
-		if ( type === 'uint' ) return GPUVertexFormat.Uint32;
-
-		if ( type === 'uvec2' ) {
-
-			if ( bytesPerElement === 1 ) {
-
-				return GPUVertexFormat.Uint8x2;
-
-			} else if ( bytesPerElement === 2 ) {
-
-				return GPUVertexFormat.Uint16x2;
-
-			} else {
-
-				return GPUVertexFormat.Uint32x2;
-
-			}
-
-		}
-
-		if ( type === 'uvec3' ) return GPUVertexFormat.Uint32x3;
-
-		if ( type === 'uvec4' ) {
-
-			if ( bytesPerElement === 1 ) {
-
-				return GPUVertexFormat.Uint8x4;
-
-			} else if ( bytesPerElement === 2 ) {
-
-				return GPUVertexFormat.Uint16x4;
-
-			} else {
-
-				return GPUVertexFormat.Uint32x4;
-
-			}
-
-		}
-
-		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
+		return format;
 
 	}
 
-	_getShaderAttributes( nodeBuilder, geometry ) {
+	_getShaderAttributes( renderObject ) {
 
-		const nodeAttributes = nodeBuilder.attributes;
-		const attributes = [];
+		const attributes = renderObject.getAttributes();
+		const shaderAttributes = [];
 
-		for ( let slot = 0; slot < nodeAttributes.length; slot ++ ) {
+		for ( let slot = 0; slot < attributes.length; slot ++ ) {
 
-			const nodeAttribute = nodeAttributes[ slot ];
-
-			const name = nodeAttribute.name;
-			const type = nodeAttribute.type;
-
-			const geometryAttribute = geometry.getAttribute( name );
+			const geometryAttribute = attributes[ slot ];
 			const bytesPerElement = geometryAttribute.array.BYTES_PER_ELEMENT;
 
-			const format = this._getVertexFormat( type, bytesPerElement );
+			const format = this._getVertexFormat( geometryAttribute );
 
 			let arrayStride = geometryAttribute.itemSize * bytesPerElement;
 			let offset = 0;
@@ -714,8 +650,8 @@ class WebGPURenderPipeline {
 
 			}
 
-			attributes.push( {
-				name,
+			shaderAttributes.push( {
+				geometryAttribute,
 				arrayStride,
 				offset,
 				format,
@@ -724,7 +660,7 @@ class WebGPURenderPipeline {
 
 		}
 
-		return attributes;
+		return shaderAttributes;
 
 	}
 

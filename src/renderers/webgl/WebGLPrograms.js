@@ -37,9 +37,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 	function getChannel( value ) {
 
-		if ( value === 1 ) return 'uv2';
+		if ( value === 0 ) return 'uv';
 
-		return 'uv';
+		return `uv${ value }`;
 
 	}
 
@@ -151,7 +151,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		const HAS_EXTENSIONS = !! material.extensions;
 
+		const HAS_ATTRIBUTE_UV1 = !! geometry.attributes.uv1;
 		const HAS_ATTRIBUTE_UV2 = !! geometry.attributes.uv2;
+		const HAS_ATTRIBUTE_UV3 = !! geometry.attributes.uv3;
 
 		const parameters = {
 
@@ -263,7 +265,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			vertexTangents: HAS_NORMALMAP && !! geometry.attributes.tangent,
 			vertexColors: material.vertexColors,
 			vertexAlphas: material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4,
-			vertexUvs2: HAS_ATTRIBUTE_UV2,
+			vertexUv1s: HAS_ATTRIBUTE_UV1,
+			vertexUv2s: HAS_ATTRIBUTE_UV2,
+			vertexUv3s: HAS_ATTRIBUTE_UV3,
 
 			pointsUvs: object.isPoints === true && !! geometry.attributes.uv && ( HAS_MAP || HAS_ALPHAMAP ),
 
@@ -455,10 +459,14 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 11 );
 		if ( parameters.vertexAlphas )
 			_programLayers.enable( 12 );
-		if ( parameters.vertexUvs2 )
+		if ( parameters.vertexUv1s )
 			_programLayers.enable( 13 );
-		if ( parameters.vertexTangents )
+		if ( parameters.vertexUv2s )
 			_programLayers.enable( 14 );
+		if ( parameters.vertexUv3s )
+			_programLayers.enable( 15 );
+		if ( parameters.vertexTangents )
+			_programLayers.enable( 16 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();

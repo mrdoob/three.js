@@ -69,6 +69,19 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.ok( ! matrixEquals3( a, b ), 'Passed!' );
 
+			const c = new Matrix3( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
+			assert.ok( c.elements[ 0 ] == 0 );
+			assert.ok( c.elements[ 1 ] == 3 );
+			assert.ok( c.elements[ 2 ] == 6 );
+			assert.ok( c.elements[ 3 ] == 1 );
+			assert.ok( c.elements[ 4 ] == 4 );
+			assert.ok( c.elements[ 5 ] == 7 );
+			assert.ok( c.elements[ 6 ] == 2 );
+			assert.ok( c.elements[ 7 ] == 5 );
+			assert.ok( c.elements[ 8 ] == 8 );
+
+			assert.ok( ! matrixEquals3( a, c ), 'Passed!' );
+
 		} );
 
 		// PUBLIC STUFF

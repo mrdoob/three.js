@@ -35,8 +35,6 @@
 
 			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let container, stats;
 
 			let camera, scene, renderer;
@@ -70,6 +68,7 @@
 				];
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.colorSpace = THREE.SRGBColorSpace;
 				textureCube.mapping = THREE.CubeRefractionMapping;
 
 				scene = new THREE.Scene();
@@ -100,7 +99,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

@@ -16,6 +16,14 @@ import WebGPUNodes from './nodes/WebGPUNodes.js';
 import WebGPUUtils from './WebGPUUtils.js';
 import { Frustum, Matrix4, Vector3, Color, SRGBColorSpace, NoToneMapping, DepthFormat } from 'three';
 
+let staticAdapter = null;
+
+if ( navigator.gpu !== undefined ) {
+
+	staticAdapter = await navigator.gpu.requestAdapter();
+
+}
+
 console.info( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrtographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
 
 Matrix4.prototype.makePerspective = function ( left, right, top, bottom, near, far ) {
@@ -150,6 +158,7 @@ class WebGPURenderer {
 		this._renderTarget = null;
 
 		this._initialized = false;
+		this._initPromise = null;
 
 		// some parameters require default values other than "undefined"
 
@@ -183,75 +192,90 @@ class WebGPURenderer {
 
 		}
 
-		const parameters = this._parameters;
+		if ( this._initPromise !== null ) {
 
-		const adapterOptions = {
-			powerPreference: parameters.powerPreference
-		};
-
-		const adapter = await navigator.gpu.requestAdapter( adapterOptions );
-
-		if ( adapter === null ) {
-
-			throw new Error( 'WebGPURenderer: Unable to create WebGPU adapter.' );
+			return this._initPromise;
 
 		}
 
-		// feature support
+		this._initPromise = new Promise( async ( resolve, reject ) => {
 
-		const features = Object.values( GPUFeatureName );
+			const parameters = this._parameters;
 
-		const supportedFeatures = [];
+			const adapterOptions = {
+				powerPreference: parameters.powerPreference
+			};
 
-		for ( const name of features ) {
+			const adapter = await navigator.gpu.requestAdapter( adapterOptions );
 
-			if ( adapter.features.has( name ) ) {
+			if ( adapter === null ) {
 
-				supportedFeatures.push( name );
+				reject( new Error( 'WebGPURenderer: Unable to create WebGPU adapter.' ) );
+				return;
 
 			}
 
-		}
+			// feature support
 
-		const deviceDescriptor = {
-			requiredFeatures: supportedFeatures,
-			requiredLimits: parameters.requiredLimits
-		};
+			const features = Object.values( GPUFeatureName );
 
-		const device = await adapter.requestDevice( deviceDescriptor );
+			const supportedFeatures = [];
 
-		const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'webgpu' );
+			for ( const name of features ) {
 
-		this._adapter = adapter;
-		this._device = device;
-		this._context = context;
+				if ( adapter.features.has( name ) ) {
 
-		this._configureContext();
+					supportedFeatures.push( name );
 
-		this._info = new WebGPUInfo();
-		this._properties = new WebGPUProperties();
-		this._attributes = new WebGPUAttributes( device );
-		this._geometries = new WebGPUGeometries( this._attributes, this._properties, this._info );
-		this._textures = new WebGPUTextures( device, this._properties, this._info );
-		this._utils = new WebGPUUtils( this );
-		this._nodes = new WebGPUNodes( this, this._properties );
-		this._objects = new WebGPURenderObjects( this, this._nodes, this._geometries, this._info );
-		this._computePipelines = new WebGPUComputePipelines( device, this._nodes );
-		this._renderPipelines = new WebGPURenderPipelines( device, this._nodes, this._utils );
-		this._bindings = this._renderPipelines.bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );
-		this._renderLists = new WebGPURenderLists();
-		this._renderStates = new WebGPURenderStates();
-		this._background = new WebGPUBackground( this, this._properties );
+				}
 
-		//
+			}
 
-		this._setupColorBuffer();
-		this._setupDepthBuffer();
+			const deviceDescriptor = {
+				requiredFeatures: supportedFeatures,
+				requiredLimits: parameters.requiredLimits
+			};
 
-		this._animation.setNodes( this._nodes );
-		this._animation.start();
+			const device = await adapter.requestDevice( deviceDescriptor );
 
-		this._initialized = true;
+			const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'webgpu' );
+
+			this._adapter = adapter;
+			this._device = device;
+			this._context = context;
+
+			this._configureContext();
+
+			this._info = new WebGPUInfo();
+			this._properties = new WebGPUProperties();
+			this._attributes = new WebGPUAttributes( device );
+			this._geometries = new WebGPUGeometries( this._attributes, this._properties, this._info );
+			this._textures = new WebGPUTextures( device, this._properties, this._info );
+			this._utils = new WebGPUUtils( this );
+			this._nodes = new WebGPUNodes( this, this._properties );
+			this._objects = new WebGPURenderObjects( this, this._nodes, this._geometries, this._info );
+			this._computePipelines = new WebGPUComputePipelines( device, this._nodes );
+			this._renderPipelines = new WebGPURenderPipelines( device, this._nodes, this._utils );
+			this._bindings = this._renderPipelines.bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );
+			this._renderLists = new WebGPURenderLists();
+			this._renderStates = new WebGPURenderStates();
+			this._background = new WebGPUBackground( this, this._properties );
+
+			//
+
+			this._setupColorBuffer();
+			this._setupDepthBuffer();
+
+			this._animation.setNodes( this._nodes );
+			this._animation.start();
+
+			this._initialized = true;
+
+			resolve();
+
+		} );
+
+		return this._initPromise;
 
 	}
 
@@ -284,6 +308,8 @@ class WebGPURenderer {
 		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 		if ( this._info.autoReset === true ) this._info.reset();
+
+		this._info.render.frame ++;
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromProjectionMatrix( _projScreenMatrix );
@@ -744,11 +770,7 @@ class WebGPURenderer {
 
 	hasFeature( name ) {
 
-		if ( this._initialized === false ) {
-
-			throw new Error( 'THREE.WebGPURenderer: Renderer must be initialized before testing features.' );
-
-		}
+		const adapter = this._adapter || staticAdapter;
 
 		//
 
@@ -762,7 +784,7 @@ class WebGPURenderer {
 
 		//
 
-		return this._adapter.features.has( name );
+		return adapter.features.has( name );
 
 	}
 
@@ -815,14 +837,19 @@ class WebGPURenderer {
 
 				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
 
-					if ( this.sortObjects === true ) {
-
-						_vector3.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
-
-					}
-
 					const geometry = object.geometry;
 					const material = object.material;
+
+					if ( this.sortObjects === true ) {
+
+						if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+						_vector3
+							.copy( geometry.boundingSphere.center )
+							.applyMatrix4( object.matrixWorld )
+							.applyMatrix4( _projScreenMatrix );
+
+					}
 
 					if ( Array.isArray( material ) ) {
 
@@ -958,13 +985,13 @@ class WebGPURenderer {
 
 		if ( hasIndex === true ) {
 
-			this._setupIndexBuffer( index, passEncoder );
+			this._setupIndexBuffer( renderObject );
 
 		}
 
 		// vertex buffers
 
-		this._setupVertexBuffers( geometry.attributes, passEncoder, renderPipeline );
+		this._setupVertexBuffers( renderObject );
 
 		// draw
 
@@ -1034,32 +1061,27 @@ class WebGPURenderer {
 
 	}
 
-	_setupIndexBuffer( index, encoder ) {
+	_setupIndexBuffer( renderObject ) {
+
+		const index = this._geometries.getIndex( renderObject );
+		const passEncoder = this._currentRenderState.currentPassGPU;
 
 		const buffer = this._attributes.get( index ).buffer;
 		const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
 
-		encoder.setIndexBuffer( buffer, indexFormat );
+		passEncoder.setIndexBuffer( buffer, indexFormat );
 
 	}
 
-	_setupVertexBuffers( geometryAttributes, encoder, renderPipeline ) {
+	_setupVertexBuffers( renderObject ) {
 
-		const shaderAttributes = renderPipeline.shaderAttributes;
+		const passEncoder = this._currentRenderState.currentPassGPU;
+		const attributes = renderObject.getAttributes();
 
-		for ( const shaderAttribute of shaderAttributes ) {
+		for ( let i = 0, l = attributes.length; i < l; i ++ ) {
 
-			const name = shaderAttribute.name;
-			const slot = shaderAttribute.slot;
-
-			const attribute = geometryAttributes[ name ];
-
-			if ( attribute !== undefined ) {
-
-				const buffer = this._attributes.get( attribute ).buffer;
-				encoder.setVertexBuffer( slot, buffer );
-
-			}
+			const buffer = this._attributes.get( attributes[ i ] ).buffer;
+			passEncoder.setVertexBuffer( i, buffer );
 
 		}
 

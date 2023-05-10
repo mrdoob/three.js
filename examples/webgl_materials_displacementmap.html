@@ -37,8 +37,6 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 			let stats;
 			let camera, scene, renderer, controls;
 
@@ -145,7 +143,7 @@
 				pointLight.position.z = 2500;
 				scene.add( pointLight );
 
-				const pointLight2 = new THREE.PointLight( 0xff6666, 1 );
+				const pointLight2 = new THREE.PointLight( 0xffaaaa, 1 );
 				camera.add( pointLight2 );
 
 				const pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
@@ -177,7 +175,7 @@
 
 				material = new THREE.MeshStandardMaterial( {
 
-					color: 0x888888,
+					color: 0xc1c1c1,
 					roughness: settings.roughness,
 					metalness: settings.metalness,
 
@@ -204,7 +202,6 @@
 				loader.load( 'models/obj/ninja/ninjaHead_Low.obj', function ( group ) {
 
 					const geometry = group.children[ 0 ].geometry;
-					geometry.attributes.uv2 = geometry.attributes.uv;
 					geometry.center();
 
 					mesh = new THREE.Mesh( geometry, material );

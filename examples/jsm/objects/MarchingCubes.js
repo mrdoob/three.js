@@ -3,7 +3,9 @@ import {
 	BufferGeometry,
 	Color,
 	DynamicDrawUsage,
-	Mesh
+	Mesh,
+	Sphere,
+	Vector3
 } from 'three';
 
 /**
@@ -93,6 +95,8 @@ class MarchingCubes extends Mesh {
 				geometry.setAttribute( 'color', colorAttribute );
 
 			}
+
+			geometry.boundingSphere = new Sphere( new Vector3(), 1 );
 
 		};
 

@@ -258,9 +258,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getUniformFromNode( node, shaderStage, type ) {
+	getUniformFromNode( node, type, shaderStage ) {
 
-		const uniformNode = super.getUniformFromNode( node, shaderStage, type );
+		const uniformNode = super.getUniformFromNode( node, type, shaderStage );
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
 		if ( nodeData.uniformGPU === undefined ) {
@@ -446,10 +446,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			}
 
-			const attributes = this.attributes;
-			const length = attributes.length;
+			const attributes = this.getAttributesArray();
 
-			for ( let index = 0; index < length; index ++ ) {
+			for ( let index = 0, length = attributes.length; index < length; index ++ ) {
 
 				const attribute = attributes[ index ];
 				const name = attribute.name;
@@ -465,6 +464,12 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
+	getVar( type, name ) {
+
+		return `var ${ name } : ${ this.getType( type ) }`;
+
+	}
+
 	getVars( shaderStage ) {
 
 		const snippets = [];
@@ -472,10 +477,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		for ( const variable of vars ) {
 
-			const name = variable.name;
-			const type = this.getType( variable.type );
-
-			snippets.push( `\tvar ${name} : ${type};` );
+			snippets.push( `\t${ this.getVar( variable.type, variable.name ) };` );
 
 		}
 

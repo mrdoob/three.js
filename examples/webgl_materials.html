@@ -30,8 +30,6 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let stats;
 
 			let camera, scene, renderer;
@@ -61,6 +59,7 @@
 				// Materials
 
 				const texture = new THREE.Texture( generateTexture() );
+				texture.colorSpace = THREE.SRGBColorSpace;
 				texture.needsUpdate = true;
 
 				materials.push( new THREE.MeshLambertMaterial( { map: texture, transparent: true } ) );
@@ -110,7 +109,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				container.appendChild( renderer.domElement );
 
 				//

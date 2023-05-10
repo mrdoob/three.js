@@ -1,4 +1,4 @@
-export const REVISION = '152dev';
+export const REVISION = '153dev';
 
 export const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -172,6 +172,15 @@ export const GreaterStencilFunc = 516;
 export const NotEqualStencilFunc = 517;
 export const GreaterEqualStencilFunc = 518;
 export const AlwaysStencilFunc = 519;
+
+export const NeverCompare = 512;
+export const LessCompare = 513;
+export const EqualCompare = 514;
+export const LessEqualCompare = 515;
+export const GreaterCompare = 516;
+export const NotEqualCompare = 517;
+export const GreaterEqualCompare = 518;
+export const AlwaysCompare = 519;
 
 export const StaticDrawUsage = 35044;
 export const DynamicDrawUsage = 35048;

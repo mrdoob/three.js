@@ -108,11 +108,15 @@ class MeshSurfaceSampler {
 
 	sample( targetPosition, targetNormal, targetColor ) {
 
-		const cumulativeTotal = this.distribution[ this.distribution.length - 1 ];
-
-		const faceIndex = this.binarySearch( this.randomFunction() * cumulativeTotal );
-
+		const faceIndex = this.sampleFaceIndex();
 		return this.sampleFace( faceIndex, targetPosition, targetNormal, targetColor );
+
+	}
+
+	sampleFaceIndex() {
+
+		const cumulativeTotal = this.distribution[ this.distribution.length - 1 ];
+		return this.binarySearch( this.randomFunction() * cumulativeTotal );
 
 	}
 

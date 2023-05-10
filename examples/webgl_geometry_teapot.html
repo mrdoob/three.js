@@ -34,8 +34,6 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 			let camera, scene, renderer;
 			let cameraControls;
 			let effectController;
@@ -69,7 +67,7 @@
 				camera.position.set( - 600, 550, 1300 );
 
 				// LIGHTS
-				ambientLight = new THREE.AmbientLight( 0x333333 );
+				ambientLight = new THREE.AmbientLight( 0x7c7c7c );
 
 				light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
 				light.position.set( 0.32, 0.39, 0.7 );

@@ -68,6 +68,7 @@ export default QUnit.module( 'Maths', () => {
 			const b = new Color( 0.5, 0, 0 );
 			const c = new Color( 0xFF0000 );
 			const d = new Color( 0, 1.0, 0 );
+			const e = new Color( 0.5, 0.5, 0.5 );
 
 			a.set( b );
 			assert.ok( a.equals( b ), 'Set with Color instance' );
@@ -77,6 +78,9 @@ export default QUnit.module( 'Maths', () => {
 
 			a.set( 'rgb(0,255,0)' );
 			assert.ok( a.equals( d ), 'Set with style' );
+
+			a.set( 0.5, 0.5, 0.5 );
+			assert.ok( a.equals( e ), 'Set with r,g,b components' );
 
 		} );
 

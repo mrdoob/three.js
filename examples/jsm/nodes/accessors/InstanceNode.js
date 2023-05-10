@@ -1,10 +1,8 @@
 import Node, { addNodeClass } from '../core/Node.js';
-import { instanceIndex } from '../core/InstanceIndexNode.js';
-import { temp } from '../core/VarNode.js';
-import { buffer } from './BufferNode.js';
+import { bufferAttribute } from './BufferAttributeNode.js';
 import { normalLocal } from './NormalNode.js';
 import { positionLocal } from './PositionNode.js';
-import { nodeProxy, vec3, mat3 } from '../shadernode/ShaderNode.js';
+import { nodeProxy, vec3, mat3, mat4 } from '../shadernode/ShaderNode.js';
 
 class InstanceNode extends Node {
 
@@ -16,13 +14,19 @@ class InstanceNode extends Node {
 
 		//
 
-		const instanceBufferNode = buffer( instanceMesh.instanceMatrix.array, 'mat4', instanceMesh.count );
+		const instanceBuffers = [
+			// F.Signature -> bufferAttribute( array, type, stride, offset )
+			bufferAttribute( instanceMesh.instanceMatrix.array, 'vec4', 16, 0 ),
+			bufferAttribute( instanceMesh.instanceMatrix.array, 'vec4', 16, 4 ),
+			bufferAttribute( instanceMesh.instanceMatrix.array, 'vec4', 16, 8 ),
+			bufferAttribute( instanceMesh.instanceMatrix.array, 'vec4', 16, 12 )
+		];
 
-		this.instanceMatrixNode = temp( instanceBufferNode.element( instanceIndex ) ); // @TODO: a possible caching issue here?
+		this.instanceMatrixNode = mat4( ...instanceBuffers );
 
 	}
 
-	generate( builder ) {
+	construct( builder ) {
 
 		const { instanceMatrixNode } = this;
 
@@ -40,8 +44,10 @@ class InstanceNode extends Node {
 
 		// ASSIGNS
 
-		positionLocal.assign( instancePosition ).build( builder );
-		normalLocal.assign( instanceNormal ).build( builder );
+		builder.stack.assign( positionLocal, instancePosition );
+		builder.stack.assign( normalLocal, instanceNormal );
+
+		return builder.stack;
 
 	}
 

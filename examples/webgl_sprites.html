@@ -29,8 +29,6 @@
 
 			import * as THREE from 'three';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let camera, scene, renderer;
 			let cameraOrtho, sceneOrtho;
 
@@ -69,6 +67,9 @@
 				textureLoader.load( 'textures/sprite0.png', createHUDSprites );
 				const mapB = textureLoader.load( 'textures/sprite1.png' );
 				mapC = textureLoader.load( 'textures/sprite2.png' );
+
+				mapB.colorSpace = THREE.SRGBColorSpace;
+				mapC.colorSpace = THREE.SRGBColorSpace;
 
 				group = new THREE.Group();
 
@@ -113,7 +114,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.autoClear = false; // To allow render overlay on top of sprited sphere
 
 				document.body.appendChild( renderer.domElement );
@@ -125,6 +125,8 @@
 			}
 
 			function createHUDSprites( texture ) {
+
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				const material = new THREE.SpriteMaterial( { map: texture } );
 
