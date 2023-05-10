@@ -47,6 +47,8 @@
 				clock = new THREE.Clock();
 
 				const container = document.createElement( 'div' );
+				container.style.backgroundImage='url(textures/cube/SwedishRoyalCastle/nx.jpg)';
+				// container.style.backgroundColor='#ffffff';
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
@@ -60,7 +62,7 @@
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
 
-						scene.background = texture;
+						// scene.background = texture;
 						scene.environment = texture;
 
 						// model
@@ -78,7 +80,7 @@
 
 					} );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true, } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
