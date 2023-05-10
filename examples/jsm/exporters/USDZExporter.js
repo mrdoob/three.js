@@ -162,11 +162,11 @@ function buildHeader() {
 
 	return `#usda 1.0
 (
-    customLayerData = {
-        string creator = "Three.js USDZExporter"
-    }
-    metersPerUnit = 1
-    upAxis = "Y"
+	customLayerData = {
+		string creator = "Three.js USDZExporter"
+	}
+	metersPerUnit = 1
+	upAxis = "Y"
 )
 
 `;
@@ -177,20 +177,20 @@ function buildSceneStart( options ) {
 
 	return `def Xform "Root"
 {
-    def Scope "Scenes" (
-        kind = "sceneLibrary"
-    )
-    {
-        def Xform "Scene" (
-            customData = {
-                bool preliminary_collidesWithEnvironment = 0
-                string sceneName = "Scene"
-            }
-            sceneName = "Scene"
-        )
-        {
-        token preliminary:anchoring:type = "${options.ar.anchoring.type}"
-        token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"
+	def Scope "Scenes" (
+		kind = "sceneLibrary"
+	)
+	{
+		def Xform "Scene" (
+			customData = {
+				bool preliminary_collidesWithEnvironment = 0
+				string sceneName = "Scene"
+			}
+			sceneName = "Scene"
+		)
+		{
+		token preliminary:anchoring:type = "${options.ar.anchoring.type}"
+		token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"
 
 `;
 
@@ -199,8 +199,8 @@ function buildSceneStart( options ) {
 function buildSceneEnd() {
 
 	return `
-        }
-    }
+		}
+	}
 }
 
 `;
@@ -229,14 +229,14 @@ function buildXform( object, geometry, material ) {
 	}
 
 	return `def Xform "${ name }" (
-    prepend references = @./geometries/Geometry_${ geometry.id }.usda@</Geometry>
-    prepend apiSchemas = ["MaterialBindingAPI"]
+	prepend references = @./geometries/Geometry_${ geometry.id }.usda@</Geometry>
+	prepend apiSchemas = ["MaterialBindingAPI"]
 )
 {
-    matrix4d xformOp:transform = ${ transform }
-    uniform token[] xformOpOrder = ["xformOp:transform"]
+	matrix4d xformOp:transform = ${ transform }
+	uniform token[] xformOpOrder = ["xformOp:transform"]
 
-    rel material:binding = </Materials/Material_${ material.id }>
+	rel material:binding = </Materials/Material_${ material.id }>
 }
 
 `;
@@ -265,7 +265,7 @@ function buildMeshObject( geometry ) {
 	return `
 def "Geometry"
 {
-  ${mesh}
+${mesh}
 }
 `;
 
@@ -278,17 +278,17 @@ function buildMesh( geometry ) {
 	const count = attributes.position.count;
 
 	return `
-    def Mesh "${ name }"
-    {
-        int[] faceVertexCounts = [${ buildMeshVertexCount( geometry ) }]
-        int[] faceVertexIndices = [${ buildMeshVertexIndices( geometry ) }]
-        normal3f[] normals = [${ buildVector3Array( attributes.normal, count )}] (
-            interpolation = "vertex"
-        )
-        point3f[] points = [${ buildVector3Array( attributes.position, count )}]
+	def Mesh "${ name }"
+	{
+		int[] faceVertexCounts = [${ buildMeshVertexCount( geometry ) }]
+		int[] faceVertexIndices = [${ buildMeshVertexIndices( geometry ) }]
+		normal3f[] normals = [${ buildVector3Array( attributes.normal, count )}] (
+			interpolation = "vertex"
+		)
+		point3f[] points = [${ buildVector3Array( attributes.position, count )}]
 ${ buildPrimvars( attributes, count ) }
-        uniform token subdivisionScheme = "none"
-    }
+		uniform token subdivisionScheme = "none"
+	}
 `;
 
 }
@@ -430,7 +430,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	// https://graphics.pixar.com/usd/docs/UsdPreviewSurface-Proposal.html
 
-	const pad = '            ';
+	const pad = '			';
 	const inputs = [];
 	const samplers = [];
 
@@ -484,36 +484,36 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 		def Shader "PrimvarReader_${ mapType }"
 		{
 			uniform token info:id = "UsdPrimvarReader_float2"
-            float2 inputs:fallback = (0.0, 0.0)
+			float2 inputs:fallback = (0.0, 0.0)
 			token inputs:varname = "${ uv }"
 			float2 outputs:result
 		}
 
 		def Shader "Transform2d_${ mapType }"
-        {
-            uniform token info:id = "UsdTransform2d"
-            token inputs:in.connect = </Materials/Material_${ material.id }/PrimvarReader_${ mapType }.outputs:result>
+		{
+			uniform token info:id = "UsdTransform2d"
+			token inputs:in.connect = </Materials/Material_${ material.id }/PrimvarReader_${ mapType }.outputs:result>
 			float inputs:rotation = ${ ( rotation * ( 180 / Math.PI ) ).toFixed( PRECISION ) }
 			float2 inputs:scale = ${ buildVector2( repeat ) }
-            float2 inputs:translation = ${ buildVector2( offset ) }
-            float2 outputs:result
-        }
+			float2 inputs:translation = ${ buildVector2( offset ) }
+			float2 outputs:result
+		}
 
-        def Shader "Texture_${ texture.id }_${ mapType }"
-        {
-            uniform token info:id = "UsdUVTexture"
-            asset inputs:file = @textures/Texture_${ id }.png@
-            float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
-            ${ color !== undefined ? 'float4 inputs:scale = ' + buildColor4( color ) : '' }
-            token inputs:sourceColorSpace = "${ texture.colorSpace === THREE.NoColorSpace ? 'raw' : 'sRGB' }"
-            token inputs:wrapS = "${ WRAPPINGS[ texture.wrapS ] }"
-            token inputs:wrapT = "${ WRAPPINGS[ texture.wrapT ] }"
-            float outputs:r
-            float outputs:g
-            float outputs:b
-            float3 outputs:rgb
-            ${ material.transparent || material.alphaTest > 0.0 ? 'float outputs:a' : '' }
-        }`;
+		def Shader "Texture_${ texture.id }_${ mapType }"
+		{
+			uniform token info:id = "UsdUVTexture"
+			asset inputs:file = @textures/Texture_${ id }.png@
+			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
+			${ color !== undefined ? 'float4 inputs:scale = ' + buildColor4( color ) : '' }
+			token inputs:sourceColorSpace = "${ texture.colorSpace === THREE.NoColorSpace ? 'raw' : 'sRGB' }"
+			token inputs:wrapS = "${ WRAPPINGS[ texture.wrapS ] }"
+			token inputs:wrapT = "${ WRAPPINGS[ texture.wrapT ] }"
+			float outputs:r
+			float outputs:g
+			float outputs:b
+			float3 outputs:rgb
+			${ material.transparent || material.alphaTest > 0.0 ? 'float outputs:a' : '' }
+		}`;
 
 	}
 
@@ -621,21 +621,21 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 	}
 
 	return `
-    def Material "Material_${ material.id }"
-    {
-        def Shader "PreviewSurface"
-        {
-            uniform token info:id = "UsdPreviewSurface"
+	def Material "Material_${ material.id }"
+	{
+		def Shader "PreviewSurface"
+		{
+			uniform token info:id = "UsdPreviewSurface"
 ${ inputs.join( '\n' ) }
-            int inputs:useSpecularWorkflow = 0
-            token outputs:surface
-        }
+			int inputs:useSpecularWorkflow = 0
+			token outputs:surface
+		}
 
-        token outputs:surface.connect = </Materials/Material_${ material.id }/PreviewSurface.outputs:surface>
+		token outputs:surface.connect = </Materials/Material_${ material.id }/PreviewSurface.outputs:surface>
 
 ${ samplers.join( '\n' ) }
 
-    }
+	}
 `;
 
 }
@@ -677,7 +677,7 @@ function buildCamera( camera ) {
 		{
 			matrix4d xformOp:transform = ${ transform }
 			uniform token[] xformOpOrder = ["xformOp:transform"]
-	
+
 			float2 clippingRange = (${ camera.near.toPrecision( PRECISION ) }, ${ camera.far.toPrecision( PRECISION ) })
 			float horizontalAperture = ${ ( ( Math.abs( camera.left ) + Math.abs( camera.right ) ) * 10 ).toPrecision( PRECISION ) }
 			float verticalAperture = ${ ( ( Math.abs( camera.top ) + Math.abs( camera.bottom ) ) * 10 ).toPrecision( PRECISION ) }
@@ -692,7 +692,7 @@ function buildCamera( camera ) {
 		{
 			matrix4d xformOp:transform = ${ transform }
 			uniform token[] xformOpOrder = ["xformOp:transform"]
-	
+
 			float2 clippingRange = (${ camera.near.toPrecision( PRECISION ) }, ${ camera.far.toPrecision( PRECISION ) })
 			float focalLength = ${ camera.getFocalLength().toPrecision( PRECISION ) }
 			float focusDistance = ${ camera.focus.toPrecision( PRECISION ) }
