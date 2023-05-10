@@ -17699,6 +17699,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	 *
 	 */
 
+
 	const emptyTexture = /*@__PURE__*/ new Texture();
 	const emptyArrayTexture = /*@__PURE__*/ new DataArrayTexture();
 	const empty3dTexture = /*@__PURE__*/ new Data3DTexture();
@@ -20168,7 +20169,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				toneMapping: material.toneMapped ? renderer.toneMapping : NoToneMapping,
 				useLegacyLights: renderer.useLegacyLights,
 
-				premultipliedAlpha: material.premultipliedAlpha || HAS_TRANSMISSION,
+				premultipliedAlpha: material.premultipliedAlpha,
 
 				doubleSided: material.side === DoubleSide,
 				flipSided: material.side === BackSide,
@@ -28840,7 +28841,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				_this.getClearColor( _currentClearColor );
 				_currentClearAlpha = _this.getClearAlpha();
-				if ( _currentClearAlpha < 1 ) _this.setClearColor( 0xffffff, 0.8 );
+				if ( _currentClearAlpha < 1 ) _this.setClearColor( 0xffffff, 0.5 );
 
 				_this.clear();
 
@@ -36388,6 +36389,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	 *
 	 * }
 	 */
+
 
 	class ExtrudeGeometry extends BufferGeometry {
 
@@ -48824,6 +48826,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	 * The polar angle (phi) is measured from the positive y-axis. The positive y-axis is up.
 	 * The azimuthal angle (theta) is measured from the positive z-axis.
 	 */
+
 
 	class Spherical {
 

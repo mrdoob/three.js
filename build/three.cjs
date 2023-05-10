@@ -17694,6 +17694,7 @@ function WebGLObjects( gl, geometries, attributes, info ) {
  *
  */
 
+
 const emptyTexture = /*@__PURE__*/ new Texture();
 const emptyArrayTexture = /*@__PURE__*/ new DataArrayTexture();
 const empty3dTexture = /*@__PURE__*/ new Data3DTexture();
@@ -20163,7 +20164,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			toneMapping: material.toneMapped ? renderer.toneMapping : NoToneMapping,
 			useLegacyLights: renderer.useLegacyLights,
 
-			premultipliedAlpha: material.premultipliedAlpha || HAS_TRANSMISSION,
+			premultipliedAlpha: material.premultipliedAlpha,
 
 			doubleSided: material.side === DoubleSide,
 			flipSided: material.side === BackSide,
@@ -28835,7 +28836,7 @@ class WebGLRenderer {
 
 			_this.getClearColor( _currentClearColor );
 			_currentClearAlpha = _this.getClearAlpha();
-			if ( _currentClearAlpha < 1 ) _this.setClearColor( 0xffffff, 0.8 );
+			if ( _currentClearAlpha < 1 ) _this.setClearColor( 0xffffff, 0.5 );
 
 			_this.clear();
 
@@ -36383,6 +36384,7 @@ function addContour( vertices, contour ) {
  *
  * }
  */
+
 
 class ExtrudeGeometry extends BufferGeometry {
 
@@ -48819,6 +48821,7 @@ function intersectObject( object, raycaster, intersects, recursive ) {
  * The polar angle (phi) is measured from the positive y-axis. The positive y-axis is up.
  * The azimuthal angle (theta) is measured from the positive z-axis.
  */
+
 
 class Spherical {
 
