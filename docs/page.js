@@ -1,27 +1,22 @@
 if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
 
-	// If the page is not yet displayed as an iframe of the index page (navigation panel/working links),
-	// redirect to the index page (using the current URL without extension as the new fragment).
-	// If this URL itself has a fragment, append it with a dot (since '#' in a URL fragment is not allowed).
+	// navigates to docs home if direct access, e.g.
+	//   https://mrdoob.github.io/three.js/docs/api/en/audio/Audio.html#filter
+	// ->https://mrdoob.github.io/three.js/docs/#api/en/audio/Audio.filter
 
-	let href = window.location.href;
-	const splitIndex = href.lastIndexOf( '/docs/' ) + 6;
-	const docsBaseURL = href.slice( 0, splitIndex );
+	const url = new URL( window.location.href );
 
-	let hash = window.location.hash;
+	// hash route, e.g. #api/en/audio/Audio.filter
+	url.hash = url.pathname.replace( /\/docs\/(.*?)(?:\.html)?$/, '$1' ) + url.hash.replace( '#', '.' );
 
-	if ( hash !== '' ) {
+	// docs home, e.g. https://mrdoob.github.io/three.js/docs/
+	url.pathname = url.pathname.replace( /(\/docs\/).*$/, '$1' );
 
-		href = href.replace( hash, '' );
-		hash = hash.replace( '#', '.' );
+	window.location.replace( url );
 
-	}
+} else {
 
-	const extension = href.split( '.' ).pop();
-	const end = ( extension === 'html' ) ? - 5 : href.length;
-	const pathSnippet = href.slice( splitIndex, end );
-
-	window.location.replace( docsBaseURL + '#' + pathSnippet + hash );
+	document.addEventListener( 'DOMContentLoaded', onDocumentLoad, { once: true } );
 
 }
 
@@ -172,5 +167,3 @@ function onDocumentLoad() {
 	document.head.appendChild( prettify );
 
 }
-
-document.addEventListener( 'DOMContentLoaded', onDocumentLoad, false );
