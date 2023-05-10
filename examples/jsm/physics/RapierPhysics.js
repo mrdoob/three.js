@@ -151,7 +151,7 @@ async function RapierPhysics() {
 
 			const body = meshMap.get( mesh );
 
-			body.setTranslation( velocity );
+			body.setLinvel( velocity );
 
 		}
 
