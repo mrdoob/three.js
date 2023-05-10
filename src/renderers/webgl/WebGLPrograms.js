@@ -307,7 +307,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			toneMapping: material.toneMapped ? renderer.toneMapping : NoToneMapping,
 			useLegacyLights: renderer.useLegacyLights,
 
-			premultipliedAlpha: material.premultipliedAlpha || HAS_TRANSMISSION,
+			premultipliedAlpha: material.premultipliedAlpha,
 
 			doubleSided: material.side === DoubleSide,
 			flipSided: material.side === BackSide,
