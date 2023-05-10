@@ -209,7 +209,7 @@ class DRACOLoader extends Loader {
 
 				this._assignVertexColorSpace( attribute, result.vertexColorSpace );
 
-				attribute.normalized = true;
+				attribute.normalized = ( array instanceof Float32Array ) === false;
 
 			}
 
