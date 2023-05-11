@@ -45,7 +45,7 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
-		let camera = new PerspectiveCamera();
+		let userCamera = null;
 
 		const cameraL = new PerspectiveCamera();
 		cameraL.layers.enable( 1 );
@@ -72,7 +72,7 @@ class WebXRManager extends EventDispatcher {
 
 		this.setCamera = function ( value ) {
 
-			camera = value;
+			userCamera = value;
 
 		};
 
@@ -512,9 +512,15 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
-		this.updateCamera = function () {
+		this.updateCamera = function ( camera ) {
 
-			if ( session === null ) return;
+			if ( session === null ) return camera;
+
+			if ( userCamera ) {
+
+				camera = userCamera;
+
+			}
 
 			cameraVR.near = cameraR.near = cameraL.near = camera.near;
 			cameraVR.far = cameraR.far = cameraL.far = camera.far;
@@ -560,13 +566,19 @@ class WebXRManager extends EventDispatcher {
 
 			// update user camera and its children
 
-			updateUserCamera( camera, cameraVR, parent );
+			if ( userCamera ) {
+
+				updateUserCamera( cameraVR, parent );
+
+			}
 
 			return cameraVR;
 
 		};
 
-		function updateUserCamera( camera, cameraVR, parent ) {
+		function updateUserCamera( cameraVR, parent ) {
+
+			const camera = userCamera;
 
 			if ( parent === null ) {
 
@@ -601,7 +613,7 @@ class WebXRManager extends EventDispatcher {
 
 			}
 
-		};
+		}
 
 		this.getFoveation = function () {
 
