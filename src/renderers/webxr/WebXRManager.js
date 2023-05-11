@@ -57,9 +57,9 @@ class WebXRManager extends EventDispatcher {
 
 		const cameras = [ cameraL, cameraR ];
 
-		const cameraVR = new ArrayCamera();
-		cameraVR.layers.enable( 1 );
-		cameraVR.layers.enable( 2 );
+		const cameraXR = new ArrayCamera();
+		cameraXR.layers.enable( 1 );
+		cameraXR.layers.enable( 2 );
 
 		let _currentDepthNear = null;
 		let _currentDepthFar = null;
@@ -512,7 +512,7 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
-		this.updateCamera = function ( camera ) {
+		this.updateCameraXR = function ( camera ) {
 
 			if ( session === null ) return camera;
 
@@ -522,27 +522,27 @@ class WebXRManager extends EventDispatcher {
 
 			}
 
-			cameraVR.near = cameraR.near = cameraL.near = camera.near;
-			cameraVR.far = cameraR.far = cameraL.far = camera.far;
+			cameraXR.near = cameraR.near = cameraL.near = camera.near;
+			cameraXR.far = cameraR.far = cameraL.far = camera.far;
 
-			if ( _currentDepthNear !== cameraVR.near || _currentDepthFar !== cameraVR.far ) {
+			if ( _currentDepthNear !== cameraXR.near || _currentDepthFar !== cameraXR.far ) {
 
 				// Note that the new renderState won't apply until the next frame. See #18320
 
 				session.updateRenderState( {
-					depthNear: cameraVR.near,
-					depthFar: cameraVR.far
+					depthNear: cameraXR.near,
+					depthFar: cameraXR.far
 				} );
 
-				_currentDepthNear = cameraVR.near;
-				_currentDepthFar = cameraVR.far;
+				_currentDepthNear = cameraXR.near;
+				_currentDepthFar = cameraXR.far;
 
 			}
 
 			const parent = camera.parent;
-			const cameras = cameraVR.cameras;
+			const cameras = cameraXR.cameras;
 
-			updateCamera( cameraVR, parent );
+			updateCamera( cameraXR, parent );
 
 			for ( let i = 0; i < cameras.length; i ++ ) {
 
@@ -554,13 +554,13 @@ class WebXRManager extends EventDispatcher {
 
 			if ( cameras.length === 2 ) {
 
-				setProjectionFromUnion( cameraVR, cameraL, cameraR );
+				setProjectionFromUnion( cameraXR, cameraL, cameraR );
 
 			} else {
 
 				// assume single camera setup (AR)
 
-				cameraVR.projectionMatrix.copy( cameraL.projectionMatrix );
+				cameraXR.projectionMatrix.copy( cameraL.projectionMatrix );
 
 			}
 
@@ -568,27 +568,27 @@ class WebXRManager extends EventDispatcher {
 
 			if ( userCamera ) {
 
-				updateUserCamera( cameraVR, parent );
+				updateUserCamera( cameraXR, parent );
 
 			}
 
-			return cameraVR;
+			return cameraXR;
 
 		};
 
-		function updateUserCamera( cameraVR, parent ) {
+		function updateUserCamera( cameraXR, parent ) {
 
 			const camera = userCamera;
 
 			if ( parent === null ) {
 
-				camera.matrix.copy( cameraVR.matrixWorld );
+				camera.matrix.copy( cameraXR.matrixWorld );
 
 			} else {
 
 				camera.matrix.copy( parent.matrixWorld );
 				camera.matrix.invert();
-				camera.matrix.multiply( cameraVR.matrixWorld );
+				camera.matrix.multiply( cameraXR.matrixWorld );
 
 			}
 
@@ -603,8 +603,8 @@ class WebXRManager extends EventDispatcher {
 
 			}
 
-			camera.projectionMatrix.copy( cameraVR.projectionMatrix );
-			camera.projectionMatrixInverse.copy( cameraVR.projectionMatrixInverse );
+			camera.projectionMatrix.copy( cameraXR.projectionMatrix );
+			camera.projectionMatrixInverse.copy( cameraXR.projectionMatrixInverse );
 
 			if ( camera.isPerspectiveCamera ) {
 
@@ -674,14 +674,14 @@ class WebXRManager extends EventDispatcher {
 
 				}
 
-				let cameraVRNeedsUpdate = false;
+				let cameraXRNeedsUpdate = false;
 
-				// check if it's necessary to rebuild cameraVR's camera list
+				// check if it's necessary to rebuild cameraXR's camera list
 
-				if ( views.length !== cameraVR.cameras.length ) {
+				if ( views.length !== cameraXR.cameras.length ) {
 
-					cameraVR.cameras.length = 0;
-					cameraVRNeedsUpdate = true;
+					cameraXR.cameras.length = 0;
+					cameraXRNeedsUpdate = true;
 
 				}
 
@@ -733,14 +733,14 @@ class WebXRManager extends EventDispatcher {
 
 					if ( i === 0 ) {
 
-						cameraVR.matrix.copy( camera.matrix );
-						cameraVR.matrix.decompose( cameraVR.position, cameraVR.quaternion, cameraVR.scale );
+						cameraXR.matrix.copy( camera.matrix );
+						cameraXR.matrix.decompose( cameraXR.position, cameraXR.quaternion, cameraXR.scale );
 
 					}
 
-					if ( cameraVRNeedsUpdate === true ) {
+					if ( cameraXRNeedsUpdate === true ) {
 
-						cameraVR.cameras.push( camera );
+						cameraXR.cameras.push( camera );
 
 					}
 
