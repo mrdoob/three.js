@@ -45,6 +45,8 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
+		let camera = new PerspectiveCamera();
+
 		const cameraL = new PerspectiveCamera();
 		cameraL.layers.enable( 1 );
 		cameraL.viewport = new Vector4();
@@ -64,10 +66,15 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
-		this.cameraAutoUpdate = true;
 		this.enabled = false;
 
 		this.isPresenting = false;
+
+		this.setCamera = function ( value ) {
+
+			camera = value;
+
+		};
 
 		this.getController = function ( index ) {
 
@@ -505,7 +512,7 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
-		this.updateCamera = function ( camera ) {
+		this.updateCamera = function () {
 
 			if ( session === null ) return;
 
@@ -555,6 +562,8 @@ class WebXRManager extends EventDispatcher {
 
 			updateUserCamera( camera, cameraVR, parent );
 
+			return cameraVR;
+
 		};
 
 		function updateUserCamera( camera, cameraVR, parent ) {
@@ -591,12 +600,6 @@ class WebXRManager extends EventDispatcher {
 				camera.zoom = 1;
 
 			}
-
-		}
-
-		this.getCamera = function () {
-
-			return cameraVR;
 
 		};
 
