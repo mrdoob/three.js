@@ -20,7 +20,15 @@ export default /* glsl */`
 
 #if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )
 
-	radiance += getIBLRadiance( geometry.viewDir, geometry.normal, material.roughness );
+	#ifdef USE_ANISOTROPY
+
+		radiance += getIBLAnisotropyRadiance( geometry.viewDir, geometry.normal, material.roughness, material.anisotropyB, material.anisotropy );
+
+	#else
+
+		radiance += getIBLRadiance( geometry.viewDir, geometry.normal, material.roughness );
+
+	#endif
 
 	#ifdef USE_CLEARCOAT
 

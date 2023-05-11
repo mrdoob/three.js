@@ -230,6 +230,15 @@ class Material extends EventDispatcher {
 
 		}
 
+		if ( this.anisotropy !== undefined ) data.anisotropy = this.anisotropy;
+		if ( this.anisotropyRotation !== undefined ) data.anisotropyRotation = this.anisotropyRotation;
+
+		if ( this.anisotropyMap && this.anisotropyMap.isTexture ) {
+
+			data.anisotropyMap = this.anisotropyMap.toJSON( meta ).uuid;
+
+		}
+
 		if ( this.map && this.map.isTexture ) data.map = this.map.toJSON( meta ).uuid;
 		if ( this.matcap && this.matcap.isTexture ) data.matcap = this.matcap.toJSON( meta ).uuid;
 		if ( this.alphaMap && this.alphaMap.isTexture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
