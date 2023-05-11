@@ -1,3 +1,5 @@
+import { Vector3, Matrix4 } from 'three';
+
 async function RapierPhysics() {
 
 	const RAPIER = await import( 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.11.2' );
@@ -65,15 +67,7 @@ async function RapierPhysics() {
 
 	function handleMesh( mesh, mass, shape ) {
 
-		const position = mesh.position;
-		const quaternion = mesh.quaternion;
-
-		const desc = mass > 0 ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.fixed();
-		desc.setTranslation( position.x, position.y, position.z );
-		desc.setRotation( quaternion );
-
-		const body = world.createRigidBody( desc );
-		world.createCollider( shape, body );
+		const body = createBody( mesh.position, mesh.quaternion, mass, shape );
 
 		if ( mass > 0 ) {
 
@@ -92,15 +86,8 @@ async function RapierPhysics() {
 
 		for ( let i = 0; i < mesh.count; i ++ ) {
 
-			const index = i * 16;
-
-			const desc = mass > 0 ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.fixed();
-			desc.setTranslation( array[ index + 12 ], array[ index + 13 ], array[ index + 14 ] );
-
-			const body = world.createRigidBody( desc );
-			world.createCollider( shape, body );
-
-			bodies.push( body );
+			const position = new Vector3().fromArray( array, i * 16 + 12 );
+			bodies.push( createBody( position, null, mass, shape ) );
 
 		}
 
@@ -113,47 +100,38 @@ async function RapierPhysics() {
 
 	}
 
-	const ZERO = { x: 0, y: 0, z: 0 };
+	function createBody( position, quaternion, mass, shape ) {
+
+		const desc = mass > 0 ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.fixed();
+		desc.setTranslation( ...position );
+		if ( quaternion !== null ) desc.setRotation( quaternion );
+
+		const body = world.createRigidBody( desc );
+		world.createCollider( shape, body );
+
+		return body;
+
+	}
+
+	const ZERO = new Vector3();
 
 	function setMeshPosition( mesh, position, index = 0 ) {
 
-		if ( mesh.isInstancedMesh ) {
+		let body = meshMap.get( mesh );
+		if ( mesh.isInstancedMesh ) body = body[ index ];
 
-			const bodies = meshMap.get( mesh );
-			const body = bodies[ index ];
-
-			body.setAngvel( ZERO );
-			body.setLinvel( ZERO );
-			body.setTranslation( position );
-
-		} else if ( mesh.isMesh ) {
-
-			const body = meshMap.get( mesh );
-
-			body.setAngvel( ZERO );
-			body.setLinvel( ZERO );
-			body.setTranslation( position );
-
-		}
+		body.setAngvel( ZERO );
+		body.setLinvel( ZERO );
+		body.setTranslation( position );
 
 	}
 
 	function setMeshVelocity( mesh, velocity, index = 0 ) {
 
-		if ( mesh.isInstancedMesh ) {
+		let body = meshMap.get( mesh );
+		if ( mesh.isInstancedMesh ) body = body[ index ];
 
-			const bodies = meshMap.get( mesh );
-			const body = bodies[ index ];
-
-			body.setLinvel( velocity );
-
-		} else if ( mesh.isMesh ) {
-
-			const body = meshMap.get( mesh );
-
-			body.setLinvel( velocity );
-
-		}
+		body.setLinvel( velocity );
 
 	}
 
@@ -190,7 +168,7 @@ async function RapierPhysics() {
 						const position = body.translation();
 						const quaternion = body.rotation();
 
-						compose( position, quaternion, array, j * 16 );
+						new Matrix4().compose( position, quaternion, new Vector3() ).toArray( array, j * 16 );
 
 					}
 
@@ -223,36 +201,6 @@ async function RapierPhysics() {
 		setMeshPosition: setMeshPosition,
 		setMeshVelocity: setMeshVelocity
 	};
-
-}
-
-function compose( position, quaternion, array, index ) {
-
-	const x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
-	const x2 = x + x, y2 = y + y, z2 = z + z;
-	const xx = x * x2, xy = x * y2, xz = x * z2;
-	const yy = y * y2, yz = y * z2, zz = z * z2;
-	const wx = w * x2, wy = w * y2, wz = w * z2;
-
-	array[ index + 0 ] = ( 1 - ( yy + zz ) );
-	array[ index + 1 ] = ( xy + wz );
-	array[ index + 2 ] = ( xz - wy );
-	array[ index + 3 ] = 0;
-
-	array[ index + 4 ] = ( xy - wz );
-	array[ index + 5 ] = ( 1 - ( xx + zz ) );
-	array[ index + 6 ] = ( yz + wx );
-	array[ index + 7 ] = 0;
-
-	array[ index + 8 ] = ( xz + wy );
-	array[ index + 9 ] = ( yz - wx );
-	array[ index + 10 ] = ( 1 - ( xx + yy ) );
-	array[ index + 11 ] = 0;
-
-	array[ index + 12 ] = position.x;
-	array[ index + 13 ] = position.y;
-	array[ index + 14 ] = position.z;
-	array[ index + 15 ] = 1;
 
 }
 
