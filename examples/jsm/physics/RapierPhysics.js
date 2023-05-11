@@ -62,7 +62,9 @@ async function RapierPhysics() {
 		shape.setMass( mass );
 		shape.setRestitution( restitution );
 
-		const body = mesh.isInstancedMesh ? createInstancedBody( mesh, mass, shape ) : createBody( mesh.position, mesh.quaternion, mass, shape );
+		const body = mesh.isInstancedMesh
+							? createInstancedBody( mesh, mass, shape )
+							: createBody( mesh.position, mesh.quaternion, mass, shape );
 
 		if ( mass > 0 ) {
 
@@ -106,7 +108,12 @@ async function RapierPhysics() {
 	function setMeshPosition( mesh, position, index = 0 ) {
 
 		let body = meshMap.get( mesh );
-		if ( mesh.isInstancedMesh ) body = body[ index ];
+
+		if ( mesh.isInstancedMesh ) {
+
+			body = body[ index ];
+
+		}
 
 		body.setAngvel( ZERO );
 		body.setLinvel( ZERO );
@@ -117,7 +124,12 @@ async function RapierPhysics() {
 	function setMeshVelocity( mesh, velocity, index = 0 ) {
 
 		let body = meshMap.get( mesh );
-		if ( mesh.isInstancedMesh ) body = body[ index ];
+
+		if ( mesh.isInstancedMesh ) {
+
+			body = body[ index ];
+
+		}
 
 		body.setLinvel( velocity );
 
