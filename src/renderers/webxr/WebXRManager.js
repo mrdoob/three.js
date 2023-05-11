@@ -66,9 +66,12 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
+		this.cameraAutoUpdate = true; // @deprecated, r153
 		this.enabled = false;
 
 		this.isPresenting = false;
+
+		this.getCamera = function () {}; // @deprecated, r153
 
 		this.setCamera = function ( value ) {
 
