@@ -183,8 +183,8 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.xr.enabled = true;
-			renderer.xr.setCamera( camera );
 			renderer.xr.setReferenceSpaceType( 'local' );
+			renderer.xr.setUserCamera( camera );
 			document.body.appendChild( renderer.domElement );
 
 			document.body.appendChild( VRButton.createButton( renderer ) );

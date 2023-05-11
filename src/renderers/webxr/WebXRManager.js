@@ -73,7 +73,7 @@ class WebXRManager extends EventDispatcher {
 
 		this.getCamera = function () {}; // @deprecated, r153
 
-		this.setCamera = function ( value ) {
+		this.setUserCamera = function ( value ) {
 
 			userCamera = value;
 
