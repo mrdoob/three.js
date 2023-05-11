@@ -139,9 +139,11 @@ async function RapierPhysics() {
 
 	//
 
-	const clock = new Clock();
+	const clock = new Clock( false );
 
 	function step() {
+
+		if ( ! clock.running ) return clock.start();
 
 		world.timestep = clock.getDelta();
 		world.step();
