@@ -11,6 +11,18 @@ export default /* glsl */`
 	mat2x4 boneDualQuatW = getDualQuaternionFromMatrix( boneMatW );
 	vec4 normalizedSkinWeight = normalize( skinWeight );
 
+    if ( dot(boneDualQuatX[0], boneDualQuatY[0]) < 0.0 ) {
+        normalizedSkinWeight.y *= -1.0;
+    }
+
+    if ( dot(boneDualQuatX[0], boneDualQuatZ[0]) < 0.0 ) {
+        normalizedSkinWeight.z *= -1.0;
+    }
+
+    if ( dot(boneDualQuatX[0], boneDualQuatW[0]) < 0.0 ) {
+        normalizedSkinWeight.w *= -1.0;
+    }
+	
 	mat2x4 dq = boneDualQuatX * normalizedSkinWeight.x
 			  + boneDualQuatY * normalizedSkinWeight.y 
 			  + boneDualQuatZ * normalizedSkinWeight.z 
