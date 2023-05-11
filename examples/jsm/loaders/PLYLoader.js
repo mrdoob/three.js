@@ -287,7 +287,7 @@ class PLYLoader extends Loader {
 			  uvs: [],
 			  faceVertexUvs: [],
 			  colors: [],
-			  faceVertexColors: [],// save face color data in a new data structure
+			  faceVertexColors: []
 			};
 
 			for ( const customProperty of Object.keys( scope.customPropertyMapping ) ) {
@@ -416,6 +416,7 @@ class PLYLoader extends Loader {
 				if ( buffer.faceVertexColors.length > 0 ) geometry.setAttribute( 'color', new Float32BufferAttribute( buffer.faceVertexColors, 3 ) );
 
 			}
+
 			// custom buffer data
 
 			for ( const customProperty of Object.keys( scope.customPropertyMapping ) ) {
@@ -484,20 +485,6 @@ class PLYLoader extends Loader {
 
 				const vertex_indices = element.vertex_indices || element.vertex_index; // issue #9338
 				const texcoord = element.texcoord;
-				
-				//  save face color attributes
-				if ( cacheEntry.attrR !== null && cacheEntry.attrG !== null && cacheEntry.attrB !== null ) {
-
-					_color.setRGB(
-						element[ cacheEntry.attrR ] / 255.0,
-						element[ cacheEntry.attrG ] / 255.0,
-						element[ cacheEntry.attrB ] / 255.0
-					).convertSRGBToLinear();
-					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
-					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
-					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
-
-				}
 
 				if ( vertex_indices.length === 3 ) {
 
@@ -515,6 +502,21 @@ class PLYLoader extends Loader {
 
 					buffer.indices.push( vertex_indices[ 0 ], vertex_indices[ 1 ], vertex_indices[ 3 ] );
 					buffer.indices.push( vertex_indices[ 1 ], vertex_indices[ 2 ], vertex_indices[ 3 ] );
+
+				}
+
+				// face colors
+
+				if ( cacheEntry.attrR !== null && cacheEntry.attrG !== null && cacheEntry.attrB !== null ) {
+
+					_color.setRGB(
+						element[ cacheEntry.attrR ] / 255.0,
+						element[ cacheEntry.attrG ] / 255.0,
+						element[ cacheEntry.attrB ] / 255.0
+					).convertSRGBToLinear();
+					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
+					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
+					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
 
 				}
 
