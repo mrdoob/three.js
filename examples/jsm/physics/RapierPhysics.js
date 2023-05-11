@@ -13,7 +13,9 @@ function getCollider( geometry ) {
 
 	const parameters = geometry.parameters;
 
-	if ( geometry.isBoxGeometry === true ) {
+	// TODO change type to is*
+
+	if ( geometry.type === 'BoxGeometry' ) {
 
 		const sx = parameters.width !== undefined ? parameters.width / 2 : 0.5;
 		const sy = parameters.height !== undefined ? parameters.height / 2 : 0.5;
@@ -21,7 +23,7 @@ function getCollider( geometry ) {
 
 		return RAPIER.ColliderDesc.cuboid( sx, sy, sz );
 
-	} else if ( geometry.isSphereGeometry === true || geometry.isIcosahedronGeometry === true ) {
+	} else if ( geometry.type === 'SphereGeometry' || geometry.type === 'IcosahedronGeometry' ) {
 
 		const radius = parameters.radius !== undefined ? parameters.radius : 1;
 		return RAPIER.ColliderDesc.ball( radius );
