@@ -1,4 +1,4 @@
-import { Vector3, Matrix4 } from 'three';
+import { Clock, Vector3, Quaternion, Matrix4 } from 'three';
 
 async function RapierPhysics() {
 
@@ -10,7 +10,7 @@ async function RapierPhysics() {
 
 	// Docs: https://rapier.rs/docs/api/javascript/JavaScript3D/	
 
-	const gravity = { x: 0.0, y: - 9.81, z: 0.0 };
+	const gravity = new Vector3( 0.0, - 9.81, 0.0 );
 	const world = new RAPIER.World( gravity );
 
 	function getCollider( geometry ) {
@@ -46,28 +46,12 @@ async function RapierPhysics() {
 
 		const shape = getCollider( mesh.geometry );
 
-		if ( shape !== null ) {
+		if ( shape === null ) return;
 
-			shape.setMass( mass );
-			shape.setRestitution( restitution );
-	
-			if ( mesh.isInstancedMesh ) {
+		shape.setMass( mass );
+		shape.setRestitution( restitution );
 
-				handleInstancedMesh( mesh, mass, shape );
-
-			} else if ( mesh.isMesh ) {
-
-				handleMesh( mesh, mass, shape );
-
-			}
-
-		}
-
-	}
-
-	function handleMesh( mesh, mass, shape ) {
-
-		const body = createBody( mesh.position, mesh.quaternion, mass, shape );
+		const body = mesh.isInstancedMesh ? createInstancedBody( mesh, mass, shape ) : createBody( mesh.position, mesh.quaternion, mass, shape );
 
 		if ( mass > 0 ) {
 
@@ -78,7 +62,7 @@ async function RapierPhysics() {
 
 	}
 
-	function handleInstancedMesh( mesh, mass, shape ) {
+	function createInstancedBody( mesh, mass, shape ) {
 
 		const array = mesh.instanceMatrix.array;
 
@@ -91,12 +75,7 @@ async function RapierPhysics() {
 
 		}
 
-		if ( mass > 0 ) {
-
-			meshes.push( mesh );
-			meshMap.set( mesh, bodies );
-
-		}
+		return bodies;
 
 	}
 
@@ -137,58 +116,49 @@ async function RapierPhysics() {
 
 	//
 
-	let lastTime = 0;
+	const clock = new Clock();
 
 	function step() {
 
-		const time = performance.now();
+		world.timestep = clock.getDelta();
+		world.step();
 
-		if ( lastTime > 0 ) {
+		//
 
-			const delta = ( time - lastTime ) / 1000;
+		for ( let i = 0, l = meshes.length; i < l; i ++ ) {
 
-			world.timestep = delta;
-			world.step();
+			const mesh = meshes[ i ];
 
-			//
+			if ( mesh.isInstancedMesh ) {
 
-			for ( let i = 0, l = meshes.length; i < l; i ++ ) {
+				const array = mesh.instanceMatrix.array;
+				const bodies = meshMap.get( mesh );
 
-				const mesh = meshes[ i ];
+				for ( let j = 0; j < bodies.length; j ++ ) {
 
-				if ( mesh.isInstancedMesh ) {
+					const body = bodies[ j ];
 
-					const array = mesh.instanceMatrix.array;
-					const bodies = meshMap.get( mesh );
+					const position = body.translation();
+					const quaternion = new Quaternion().copy( body.rotation() );
+					const scale = new Vector3( 1, 1, 1 );
 
-					for ( let j = 0; j < bodies.length; j ++ ) {
-
-						const body = bodies[ j ];
-
-						const position = body.translation();
-						const quaternion = body.rotation();
-
-						new Matrix4().compose( position, quaternion, new Vector3() ).toArray( array, j * 16 );
-
-					}
-
-					mesh.instanceMatrix.needsUpdate = true;
-					mesh.computeBoundingSphere();
-
-				} else if ( mesh.isMesh ) {
-
-					const body = meshMap.get( mesh );
-
-					mesh.position.copy( body.translation() );
-					mesh.quaternion.copy( body.rotation() );
+					new Matrix4().compose( position, quaternion, scale ).toArray( array, j * 16 );
 
 				}
+
+				mesh.instanceMatrix.needsUpdate = true;
+				mesh.computeBoundingSphere();
+
+			} else {
+
+				const body = meshMap.get( mesh );
+
+				mesh.position.copy( body.translation() );
+				mesh.quaternion.copy( body.rotation() );
 
 			}
 
 		}
-
-		lastTime = time;
 
 	}
 
