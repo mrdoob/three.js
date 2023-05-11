@@ -287,6 +287,7 @@ class PLYLoader extends Loader {
 			  uvs: [],
 			  faceVertexUvs: [],
 			  colors: [],
+			  faceVertexColors: [],// save face color data in a new data structure
 			};
 
 			for ( const customProperty of Object.keys( scope.customPropertyMapping ) ) {
@@ -407,51 +408,14 @@ class PLYLoader extends Loader {
 
 			}
 
-			if ( buffer.colors.length > 0 ) {
-				if ( buffer.colors.length == buffer.vertices.length  ){
-					geometry.setAttribute( 'color', new Float32BufferAttribute( buffer.colors, 3 ) );
-				}else{
-					const numVertices =  buffer.vertices.length;
-					const vertexColors = new Float32BufferAttribute(new Float32Array(numVertices * 3), 3);
-					vertexColors.needsUpdate = true;
-
-
-
-					// aversing the triangle surface, 
-					// copying each vertex color to the corresponding index position, 
-					// and copying each vertex color to the corresponding index position
-					for (let i = 0, il = geometry.index.count; i < il; i += 3) {
-						const a = geometry.index.array[i];
-						const b = geometry.index.array[i + 1];
-						const c = geometry.index.array[i + 2];
-
-
-						const faceColor = new Color();
-						faceColor.fromArray(buffer.colors, i);
-
-
-
-						vertexColors.setXYZ(a, faceColor.r, faceColor.g, faceColor.b);
-						vertexColors.setXYZ(b, faceColor.r, faceColor.g, faceColor.b);
-						vertexColors.setXYZ(c, faceColor.r, faceColor.g, faceColor.b);
-
-
-					}
-					geometry.setAttribute('color', vertexColors);
-					geometry.setAttribute('FaceColor',  new Float32BufferAttribute( buffer.colors, 3 ) );
-				}
-
-
-
-			}
-
-			if ( buffer.faceVertexUvs.length > 0 ) {
+			if ( buffer.faceVertexUvs.length > 0 || buffer.faceVertexColors.length > 0 ) {
 
 				geometry = geometry.toNonIndexed();
-				geometry.setAttribute( 'uv', new Float32BufferAttribute( buffer.faceVertexUvs, 2 ) );
+
+				if ( buffer.faceVertexUvs.length > 0 ) geometry.setAttribute( 'uv', new Float32BufferAttribute( buffer.faceVertexUvs, 2 ) );
+				if ( buffer.faceVertexColors.length > 0 ) geometry.setAttribute( 'color', new Float32BufferAttribute( buffer.faceVertexColors, 3 ) );
 
 			}
-
 			// custom buffer data
 
 			for ( const customProperty of Object.keys( scope.customPropertyMapping ) ) {
@@ -529,7 +493,9 @@ class PLYLoader extends Loader {
 						element[ cacheEntry.attrG ] / 255.0,
 						element[ cacheEntry.attrB ] / 255.0
 					).convertSRGBToLinear();
-					buffer.colors.push( _color.r, _color.g, _color.b );
+					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
+					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
+					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
 
 				}
 
