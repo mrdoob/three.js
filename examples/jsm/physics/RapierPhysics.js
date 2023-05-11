@@ -117,43 +117,31 @@ async function RapierPhysics() {
 
 	function setMeshPosition( mesh, position, index = 0 ) {
 
+		let  body = meshMap.get( mesh );
+
 		if ( mesh.isInstancedMesh ) {
 
-			const bodies = meshMap.get( mesh );
-			const body = bodies[ index ];
-
-			body.setAngvel( ZERO );
-			body.setLinvel( ZERO );
-			body.setTranslation( position );
-
-		} else if ( mesh.isMesh ) {
-
-			const body = meshMap.get( mesh );
-
-			body.setAngvel( ZERO );
-			body.setLinvel( ZERO );
-			body.setTranslation( position );
+			body = body[ index ];
 
 		}
+
+		body.setAngvel( ZERO );
+		body.setLinvel( ZERO );
+		body.setTranslation( position );
 
 	}
 
 	function setMeshVelocity( mesh, velocity, index = 0 ) {
 
+		let  body = meshMap.get( mesh );
+
 		if ( mesh.isInstancedMesh ) {
 
-			const bodies = meshMap.get( mesh );
-			const body = bodies[ index ];
-
-			body.setLinvel( velocity );
-
-		} else if ( mesh.isMesh ) {
-
-			const body = meshMap.get( mesh );
-
-			body.setLinvel( velocity );
+			body = body[ index ];
 
 		}
+
+		body.setLinvel( velocity );
 
 	}
 
