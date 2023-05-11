@@ -445,7 +445,8 @@ class NRRDLoader extends Loader {
 
 		if ( ! headerObject.vectors ) {
 
-			volume.matrix = volume.inverseMatrix = new Matrix4();
+			volume.matrix = new Matrix4();
+			volume.inverseMatrix = new Matrix4();
 
 		} else {
 
