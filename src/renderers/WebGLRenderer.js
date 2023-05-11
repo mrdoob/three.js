@@ -1048,9 +1048,7 @@ class WebGLRenderer {
 
 			if ( xr.enabled === true && xr.isPresenting === true ) {
 
-				if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
-
-				camera = xr.getCamera(); // use XR camera for rendering
+				camera = xr.updateCameraXR( camera ); // use XR camera for rendering
 
 			}
 
