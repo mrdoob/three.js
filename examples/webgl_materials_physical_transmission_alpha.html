@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>threejs webgl - materials - transmission 2</title>
+		<title>threejs webgl - materials - transmission - alpha</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 
 		<style>
 			body {
-				background-color: #ffffff;
+				background-color: #888888;
 			}
 
 			#table {
@@ -48,7 +48,7 @@
 		</table>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Transmission 2</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - transmission - alpha</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
@@ -144,11 +144,8 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-
-				// transparent background
-				renderer.setClearColor( 0x000000, 0 );
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -163,17 +160,15 @@
 
 				scene = new THREE.Scene();
 
-				const light = new THREE.DirectionalLight( 0xffffff, 1 );
-				light.position.set( 0, 1, 1 );
-				//scene.add( light );
-
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( -10, 2, 0 );
+				camera.position.set( -5, 0.5, 0 );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 5;
 				controls.maxDistance = 20;
+				controls.target.y = 0.5;
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize );
 

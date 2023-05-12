@@ -158,6 +158,7 @@
 		"webgl_materials_physical_clearcoat",
 		"webgl_materials_physical_reflectivity",
 		"webgl_materials_physical_transmission",
+		"webgl_materials_physical_transmission_alpha",
 		"webgl_materials_standard",
 		"webgl_materials_subsurface_scattering",
 		"webgl_materials_texture_anisotropy",
