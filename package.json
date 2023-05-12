@@ -55,7 +55,7 @@
     "lint-utils": "eslint utils",
     "lint": "npm run lint-core",
     "lint-fix": "npm run lint-core -- --fix && npm run lint-addons -- --fix && npm run lint-examples -- --fix && npm run lint-docs -- --fix && npm run lint-editor -- --fix && npm run lint-playground -- --fix && npm run lint-manual -- --fix && npm run lint-test -- --fix && npm run lint-utils -- --fix",
-    "test-unit": "qunit -r failonlyreporter -f !-webonly test/unit/three.source.unit.js",
+    "test-unit": "c8 qunit -r failonlyreporter -f !-webonly test/unit/three.source.unit.js",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
@@ -86,8 +86,10 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-terser": "^0.4.0",
+    "c8": "*",
     "chalk": "^5.2.0",
     "concurrently": "^8.0.1",
+    "coveralls": "*",
     "eslint": "^8.37.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-compat": "^4.1.2",
@@ -117,5 +119,12 @@
       "build/three.module.js"
     ],
     "directories": {}
+  },
+  "c8": {
+    "src": "./src",
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ]
   }
 }

@@ -32,7 +32,6 @@ jobs:
 
       - name: === Lint testing ===
         run: npm run lint
-
   unit:
     name: Unit testing
     runs-on: ubuntu-latest
@@ -49,7 +48,8 @@ jobs:
 
       - name: === Unit testing ===
         run: npm run test-unit
-
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
   e2e:
     name: E2E testing
     runs-on: ${{ matrix.os }}
