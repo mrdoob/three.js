@@ -15,14 +15,6 @@ class WebGPUBackground {
 		this.boxMesh = null;
 		this.boxMeshNode = null;
 
-		this.forceClear = false;
-
-	}
-
-	clear() {
-
-		this.forceClear = true;
-
 	}
 
 	update( scene, renderList, renderState ) {
@@ -30,7 +22,7 @@ class WebGPUBackground {
 		const renderer = this.renderer;
 		const background = ( scene.isScene === true ) ? scene.backgroundNode || this.properties.get( scene ).backgroundNode || scene.background : null;
 
-		let forceClear = this.forceClear;
+		let forceClear = false;
 
 		if ( background === null ) {
 
