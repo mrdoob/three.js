@@ -62,7 +62,7 @@ Sky.SkyShader = {
 		uniform float mieCoefficient;
 		uniform vec3 up;
 
-		varying vec3 vWorldPosition;
+		varying vec3 vPosition;
 		varying vec3 vSunDirection;
 		varying float vSunfade;
 		varying vec3 vBetaR;
@@ -104,8 +104,7 @@ Sky.SkyShader = {
 
 		void main() {
 
-			vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
-			vWorldPosition = worldPosition.xyz;
+			vPosition = position;
 
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 			gl_Position.z = gl_Position.w; // set z to camera.far
@@ -128,7 +127,7 @@ Sky.SkyShader = {
 		}`,
 
 	fragmentShader: /* glsl */`
-		varying vec3 vWorldPosition;
+		varying vec3 vPosition;
 		varying vec3 vSunDirection;
 		varying float vSunfade;
 		varying vec3 vBetaR;
@@ -137,8 +136,6 @@ Sky.SkyShader = {
 
 		uniform float mieDirectionalG;
 		uniform vec3 up;
-
-		const vec3 cameraPos = vec3( 0.0, 0.0, 0.0 );
 
 		// constants for atmospheric scattering
 		const float pi = 3.141592653589793238462643383279502884197169;
@@ -169,7 +166,7 @@ Sky.SkyShader = {
 
 		void main() {
 
-			vec3 direction = normalize( vWorldPosition - cameraPos );
+			vec3 direction = normalize( vPosition );
 
 			// optical length
 			// cutoff angle at 90 to avoid singularity in next formula.
