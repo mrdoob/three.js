@@ -320,13 +320,12 @@ x, y, 1, 0,
 </code>
 		</p>
 
-		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:this makeTranslation]( [param:Vector3 v] )</h3>
+		<h3>
+			[method:this makeTranslation]( [param:Float x], [param:Float y], [param:Float z] ) // optional API
+		</h3>
 		<p>
-			[page:Float x] - 在X轴上的平移量。<br />
-			[page:Float y] - 在Y轴上的平移量。<br />
-			[page:Float z] - 在Z轴上的平移量。<br /><br />
-
-		设置该矩阵为平移变换：
+		取传入参数[param:Vector3 v]中值设设置该矩阵为平移变换：
 		<code>
 1, 0, 0, x,
 0, 1, 0, y,

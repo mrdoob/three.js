@@ -342,13 +342,12 @@ xz,  yz,   1,  0,
 </code>
 		</p>
 
-		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:this makeTranslation]( [param:Vector3 v] )</h3>
+		<h3>
+			[method:this makeTranslation]( [param:Float x], [param:Float y], [param:Float z] ) // optional API
+		</h3>
 		<p>
-			[page:Float x] - la quantità da translare sull'asse X.<br />
-			[page:Float y] - la quantità da translare sull'asse Y.<br />
-			[page:Float z] - la quantità da translare sull'asse Z.<br /><br />
-
-			Imposta questa matrice come una trasformata di traslazione:
+			Imposta questa matrice come una trasformata di traslazione dal vettore [page:Vector3 v]:
 		<code>
 1, 0, 0, x,
 0, 1, 0, y,
