@@ -588,6 +588,9 @@ export default QUnit.module( 'Maths', () => {
 			a.makeTranslation( b.x, b.y, b.z );
 			assert.ok( matrixEquals4( a, c ), 'Passed!' );
 
+			a.makeTranslation( b );
+			assert.ok( matrixEquals4( a, c ), 'Passed!' );
+
 		} );
 
 		QUnit.test( 'makeRotationX', ( assert ) => {
