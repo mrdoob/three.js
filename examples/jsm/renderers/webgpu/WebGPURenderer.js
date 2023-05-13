@@ -146,6 +146,7 @@ class WebGPURenderer {
 		this._animation = new WebGPUAnimation();
 
 		this._currentRenderState = null;
+		this._lastRenderState = null;
 
 		this._opaqueSort = null;
 		this._transparentSort = null;
@@ -434,6 +435,8 @@ class WebGPURenderer {
 		nodeFrame.renderId = previousRenderId;
 		this._currentRenderState = previousRenderState;
 
+		this._lastRenderState = renderState;
+
 	}
 
 	setAnimationLoop( callback ) {
@@ -688,9 +691,77 @@ class WebGPURenderer {
 
 	}
 
-	clear() {
+	clear( color = true, depth = true, stencil = true ) {
 
-		if ( this._background ) this._background.clear();
+		const renderState = this._currentRenderState || this._lastRenderState;
+		if ( renderState === null ) return;
+
+		depth = depth && renderState.depth;
+		stencil = stencil && renderState.stencil;
+
+		const descriptorGPU = renderState.descriptorGPU;
+		const colorAttachment = descriptorGPU.colorAttachments[ 0 ];
+
+		// @TODO: Include render target in clear operation.
+		if ( this._parameters.antialias === true ) {
+
+			colorAttachment.view = this._colorBuffer.createView();
+			colorAttachment.resolveTarget = this._context.getCurrentTexture().createView();
+
+		} else {
+
+			colorAttachment.view = this._context.getCurrentTexture().createView();
+			colorAttachment.resolveTarget = undefined;
+
+		}
+
+		descriptorGPU.depthStencilAttachment.view = this._depthBuffer.createView();
+
+		if ( color ) {
+
+			colorAttachment.loadOp = GPULoadOp.Clear;
+			colorAttachment.clearValue = { r: this._clearColor.r, g: this._clearColor.g, b: this._clearColor.b, a: this._clearAlpha };
+
+		}
+
+		if ( depth ) {
+
+			descriptorGPU.depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
+			descriptorGPU.depthStencilAttachment.depthClearValue = this._clearDepth;
+
+		}
+
+		if ( stencil ) {
+
+			descriptorGPU.depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
+			descriptorGPU.depthStencilAttachment.stencilClearValue = this._clearStencil;
+
+		}
+
+		renderState.encoderGPU = this._device.createCommandEncoder( {} );
+		renderState.currentPassGPU = renderState.encoderGPU.beginRenderPass( renderState.descriptorGPU );
+
+		renderState.currentPassGPU.end();
+
+		this._device.queue.submit( [ renderState.encoderGPU.finish() ] );
+
+	}
+
+	clearColor() {
+
+		this.clear( true, false, false );
+
+	}
+
+	clearDepth() {
+
+		this.clear( false, true, false );
+
+	}
+
+	clearStencil() {
+
+		this.clear( false, false, true );
 
 	}
 
