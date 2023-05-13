@@ -560,14 +560,29 @@ class Matrix4 {
 
 	makeTranslation( x, y, z ) {
 
-		this.set(
+		if ( x.isVector3 ) {
 
-			1, 0, 0, x,
-			0, 1, 0, y,
-			0, 0, 1, z,
-			0, 0, 0, 1
+			this.set(
 
-		);
+				1, 0, 0, x.x,
+				0, 1, 0, x.y,
+				0, 0, 1, x.z,
+				0, 0, 0, 1
+
+			);
+
+		} else {
+
+			this.set(
+
+				1, 0, 0, x,
+				0, 1, 0, y,
+				0, 0, 1, z,
+				0, 0, 0, 1
+
+			);
+
+		}
 
 		return this;
 
