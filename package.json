@@ -13,7 +13,6 @@
     "./examples/fonts/*": "./examples/fonts/*",
     "./examples/jsm/*": "./examples/jsm/*",
     "./addons/*": "./examples/jsm/*",
-    "./src/*": "./src/*",
     "./nodes": "./examples/jsm/nodes/Nodes.js"
   },
   "repository": {
@@ -27,8 +26,7 @@
     "examples/fonts",
     "LICENSE",
     "package.json",
-    "README.md",
-    "src"
+    "README.md"
   ],
   "directories": {
     "doc": "docs",
