@@ -53,12 +53,13 @@
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.02, 2 );
 				camera.position.set( 0.35, 0.05, 0.35 );
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.target.set( 0, -0.05, 0.1 );
+				controls.maxDistance = 1.5;
 				controls.update();
 
 				const rgbeLoader = new RGBELoader()
