@@ -90,6 +90,10 @@ const exceptionList = [
 	'webgl_test_memory2',
 	'webgl_tiled_forward',
 
+	// TODO: implement determinism for setTimeout and setInterval
+	// could it fix some examples from above?
+	'physics_rapier_instancing',
+
 	// Awaiting for WebGPU support
 	'webgpu_audio_processing',
 	'webgpu_backdrop',
