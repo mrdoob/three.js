@@ -1,0 +1,26 @@
+{
+  "image": "mcr.microsoft.com/vscode/devcontainers/javascript-node:18",
+  "hostRequirements": {
+    "memory": "8gb"
+  },
+  "waitFor": "onCreateCommand",
+  "updateContentCommand": "npm ci",
+  "postCreateCommand": "",
+  "postAttachCommand": "npm start",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [".github/CONTRIBUTING.md"]
+    },
+    "vscode": {
+      "settings": {},
+      "extensions": ["dbaeumer.vscode-eslint"]
+    }
+  },
+  "portsAttributes": {
+    "8080": {
+      "label": "Dev server",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "forwardPorts": [8080]
+}
