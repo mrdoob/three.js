@@ -266,7 +266,7 @@ class Matrix3 {
 	// for 2D Transforms
 
 	makeTranslation( x, y ) {
-		
+
 		if ( x.isVector2 ) {
 
 			this.set(
