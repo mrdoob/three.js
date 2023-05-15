@@ -266,14 +266,27 @@ class Matrix3 {
 	// for 2D Transforms
 
 	makeTranslation( x, y ) {
+		if ( x.isVector2 ) {
 
-		this.set(
+			this.set(
 
-			1, 0, x,
-			0, 1, y,
-			0, 0, 1
+				1, 0, x.x,
+				0, 1, x.y,
+				0, 0, 1
 
-		);
+			);
+
+		} else {
+
+			this.set(
+
+				1, 0, x,
+				0, 1, y,
+				0, 0, 1
+
+			);
+
+		}
 
 		return this;
 
