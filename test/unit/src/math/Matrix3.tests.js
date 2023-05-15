@@ -450,8 +450,15 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.todo( 'makeTranslation', ( assert ) => {
 
-			// makeTranslation( x, y )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const a = new Matrix3();
+			const b = new Vector2( 1, 2 );
+			const c = new Matrix3().set( 1, 0, 1, 0, 1, 2, 0, 0, 1 );
+
+			a.makeTranslation( b.x, b.y );
+			assert.ok( matrixEquals3( a, c ), 'Check translation result' );
+
+			a.makeTranslation( b );
+			assert.ok( matrixEquals3( a, c ), 'Check translation result' );
 
 		} );
 
