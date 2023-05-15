@@ -5,6 +5,7 @@
 [![NPM Downloads][npm-downloads]][npmtrends-url]
 [![DeepScan][deepscan]][deepscan-url]
 [![Discord][discord]][discord-url]
+[![Open in GitHub Codespaces](https://img.shields.io/static/v1?label=GitHub&message=Open%20in%20%20Codespaces&color=24292f)](https://codespaces.new/mrdoob/three.js)
 
 #### JavaScript 3D library
 
