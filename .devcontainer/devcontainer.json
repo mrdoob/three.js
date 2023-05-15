@@ -6,7 +6,7 @@
   "waitFor": "onCreateCommand",
   "updateContentCommand": "npm ci",
   "postCreateCommand": "",
-  "postAttachCommand": "npm start",
+  "postAttachCommand": "npm start -- -- -- --ssl=false",
   "customizations": {
     "codespaces": {
       "openFiles": [".github/CONTRIBUTING.md"]
