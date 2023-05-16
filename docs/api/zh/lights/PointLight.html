@@ -67,21 +67,37 @@
 
 		<h3>[property:Float distance]</h3>
 		<p>
-			如果非零，那么光强度将会从最大值当前灯光位置处按照距离线性衰减到0。
-			缺省值为 *0.0*。
+			`Default mode` — When distance is zero, light does not attenuate. When
+			distance is non-zero, light will attenuate linearly from maximum intensity
+			at the light's position down to zero at this distance from the light.
+		</p>
+		<p>
+			When [page:WebGLRenderer.useLegacyLights legacy lighting mode] is disabled —
+			When distance is zero, light will attenuate according to inverse-square
+			law to infinite distance. When distance is non-zero, light will attenuate
+			according to inverse-square law until near the distance cutoff, where it
+			will then attenuate quickly and smoothly to 0. Inherently, cutoffs are not
+			physically correct.
+		</p>
+		<p>Default is `0.0`.</p>
+		<h3>[property:Float intensity]</h3>
+		<p>
+			The light's intensity. Default is `1`.<br />
+			When [page:WebGLRenderer.useLegacyLights legacy lighting mode] is disabled,
+			intensity is the luminous intensity of the light measured in candela
+			(cd).<br /><br />
+
+			Changing the intensity will also change the light's power.
 		</p>
 
 		<h3>[property:Float power]</h3>
 		<p>
-			光功率<br />
-			在 [page:WebGLRenderer.physicallyCorrectLights physically correct] 模式中,
-			表示以"流明（光通量单位）"为单位的光功率。 缺省值 - *4Math.PI*。 <br /><br />
+			The light's power.<br />
+			When [page:WebGLRenderer.useLegacyLights legacy lighting mode] is disabled,
+			power is the luminous power of the light measured in lumens (lm).
+			<br /><br />
 
-			该值与 [page:.intensity intensity] 直接关联
-			<code>
-				power = intensity * 4&pi;
-			</code>
-			修改该值也会导致光强度的改变。
+			Changing the power will also change the light's intensity.
 		</p>
 
 		<h3>[property:PointLightShadow shadow]</h3>
