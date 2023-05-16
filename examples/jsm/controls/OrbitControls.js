@@ -163,9 +163,6 @@ class OrbitControls extends EventDispatcher {
 			const quat = new Quaternion().setFromUnitVectors( object.up, new Vector3( 0, 1, 0 ) );
 			const quatInverse = quat.clone().invert();
 
-			const lastPosition = new Vector3();
-			const lastQuaternion = new Quaternion();
-
 			const twoPI = 2 * Math.PI;
 
 			return function update() {
@@ -271,26 +268,8 @@ class OrbitControls extends EventDispatcher {
 				}
 
 				scale = 1;
-
-				// update condition is:
-				// min(camera displacement, camera rotation in radians)^2 > EPS
-				// using small-angle approximation cos(x/2) = 1 - x^2 / 8
-
-				if ( zoomChanged ||
-					lastPosition.distanceToSquared( scope.object.position ) > EPS ||
-					8 * ( 1 - lastQuaternion.dot( scope.object.quaternion ) ) > EPS ) {
-
-					scope.dispatchEvent( _changeEvent );
-
-					lastPosition.copy( scope.object.position );
-					lastQuaternion.copy( scope.object.quaternion );
-					zoomChanged = false;
-
-					return true;
-
-				}
-
-				return false;
+				
+				scope.dispatchEvent( _changeEvent );
 
 			};
 
@@ -337,8 +316,6 @@ class OrbitControls extends EventDispatcher {
 		};
 
 		let state = STATE.NONE;
-
-		const EPS = 0.000001;
 
 		// current position in spherical coordinates
 		const spherical = new Spherical();
