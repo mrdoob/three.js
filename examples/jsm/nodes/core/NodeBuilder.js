@@ -282,6 +282,10 @@ class NodeBuilder {
 
 			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) }, ${ getConst( value.z ) }, ${ getConst( value.w ) } )`;
 
+		} else if ( typeLength > 4 && value && ( value.isMatrix3 || value.isMatrix4 ) ) {
+
+			return `${ this.getType( type ) }( ${ value.elements.map( getConst ).join( ', ' ) } )`;
+
 		} else if ( typeLength > 4 ) {
 
 			return `${ this.getType( type ) }()`;
