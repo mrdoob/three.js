@@ -74,6 +74,8 @@
 					geometry.scale( 0.5, 0.5, 0.5 );
 
 					mesh = new THREE.InstancedMesh( geometry, material, count );
+					mesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+
 					scene.add( mesh );
 
 					//

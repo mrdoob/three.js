@@ -1,8 +1,9 @@
 import Node, { addNodeClass } from '../core/Node.js';
-import { bufferAttribute } from './BufferAttributeNode.js';
+import { bufferAttribute, dynamicBufferAttribute } from './BufferAttributeNode.js';
 import { normalLocal } from './NormalNode.js';
 import { positionLocal } from './PositionNode.js';
 import { nodeProxy, vec3, mat3, mat4 } from '../shadernode/ShaderNode.js';
+import { DynamicDrawUsage } from 'three';
 
 class InstanceNode extends Node {
 
@@ -12,23 +13,35 @@ class InstanceNode extends Node {
 
 		this.instanceMesh = instanceMesh;
 
-		//
-
-		const instanceBuffers = [
-			// F.Signature -> bufferAttribute( array, type, stride, offset )
-			bufferAttribute( instanceMesh.instanceMatrix.array, 'vec4', 16, 0 ),
-			bufferAttribute( instanceMesh.instanceMatrix.array, 'vec4', 16, 4 ),
-			bufferAttribute( instanceMesh.instanceMatrix.array, 'vec4', 16, 8 ),
-			bufferAttribute( instanceMesh.instanceMatrix.array, 'vec4', 16, 12 )
-		];
-
-		this.instanceMatrixNode = mat4( ...instanceBuffers );
+		this.instanceMatrixNode = null;
 
 	}
 
 	construct( builder ) {
 
-		const { instanceMatrixNode } = this;
+		let instanceMatrixNode = this.instanceMatrixNode;
+
+		if ( instanceMatrixNode === null ) {
+
+			const instanceMesh = this.instanceMesh;
+			const instaceAttribute = instanceMesh.instanceMatrix;
+			const array = instaceAttribute.array;
+
+			const bufferFn = instaceAttribute.usage === DynamicDrawUsage ? dynamicBufferAttribute : bufferAttribute;
+
+			const instanceBuffers = [
+				// F.Signature -> bufferAttribute( array, type, stride, offset )
+				bufferFn( array, 'vec4', 16, 0 ),
+				bufferFn( array, 'vec4', 16, 4 ),
+				bufferFn( array, 'vec4', 16, 8 ),
+				bufferFn( array, 'vec4', 16, 12 )
+			];
+
+			instanceMatrixNode = mat4( ...instanceBuffers );
+
+			this.instanceMatrixNode = instanceMatrixNode;
+
+		}
 
 		// POSITION
 

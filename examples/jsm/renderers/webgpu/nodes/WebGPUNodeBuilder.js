@@ -506,7 +506,15 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( varying.needsInterpolation ) {
 
-					snippets.push( `@location( ${index} ) ${ varying.name } : ${ this.getType( varying.type ) }` );
+					let attributesSnippet = `@location( ${index} )`;
+
+					if ( varying.type === 'int' || varying.type === 'uint' ) {
+
+						attributesSnippet += ' @interpolate( flat )';
+
+					}
+
+					snippets.push( `${ attributesSnippet } ${ varying.name } : ${ this.getType( varying.type ) }` );
 
 				} else if ( vars.includes( varying ) === false ) {
 
