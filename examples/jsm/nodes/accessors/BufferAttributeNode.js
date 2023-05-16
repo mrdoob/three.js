@@ -43,7 +43,7 @@ class BufferAttributeNode extends InputNode {
 
 		let output = null;
 
-		if ( builder.isShaderStage( 'vertex' ) ) {
+		if ( builder.shaderStage === 'vertex' ) {
 
 			output = propertyName;
 
