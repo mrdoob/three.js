@@ -323,7 +323,6 @@ class OrbitControls extends EventDispatcher {
 
 		let scale = 1;
 		const panOffset = new Vector3();
-		let zoomChanged = false;
 
 		const rotateStart = new Vector2();
 		const rotateEnd = new Vector2();
@@ -455,7 +454,6 @@ class OrbitControls extends EventDispatcher {
 
 				scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom * dollyScale ) );
 				scope.object.updateProjectionMatrix();
-				zoomChanged = true;
 
 			} else {
 
@@ -476,7 +474,6 @@ class OrbitControls extends EventDispatcher {
 
 				scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom / dollyScale ) );
 				scope.object.updateProjectionMatrix();
-				zoomChanged = true;
 
 			} else {
 
