@@ -73,7 +73,13 @@ class WebXRManager extends EventDispatcher {
 		this.isPresenting = false;
 		this.isMultiview = false;
 
-		this.getCamera = function () {}; // @deprecated, r153
+		this.isMultiview = typeof useMultiview === 'undefined' ? false : useMultiview;
+
+		this.getCamera = function () {
+
+			return cameraXR; // TODO (tri): Remove this in 153 release
+
+		}; // @deprecated, r153
 
 		this.setUserCamera = function ( value ) {
 
@@ -317,7 +323,7 @@ class WebXRManager extends EventDispatcher {
 
 					}
 
-					scope.isMultiview = useMultiview && extensions.has( 'OCULUS_multiview' );
+					scope.isMultiview = scope.isMultiview && extensions.has( 'OCULUS_multiview' );
 
 					const projectionlayerInit = {
 						colorFormat: gl.RGBA8,
