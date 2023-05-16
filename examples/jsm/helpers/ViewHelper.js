@@ -163,12 +163,9 @@ class ViewHelper extends Object3D {
 		this.handleClick = function ( event ) {
 
 			if ( this.animating === true ) return false;
-
-			const rect = domElement.getBoundingClientRect();
-			const offsetX = rect.left + ( domElement.offsetWidth - dim );
-			const offsetY = rect.top + ( domElement.offsetHeight - dim );
-			mouse.x = ( ( event.clientX - offsetX ) / ( rect.width - offsetX ) ) * 2 - 1;
-			mouse.y = - ( ( event.clientY - offsetY ) / ( rect.bottom - offsetY ) ) * 2 + 1;
+			
+			mouse.x = (event.offsetX / dim) * 2 - 1;
+      	    mouse.y = (event.offsetY / dim) * 2 - 1;
 
 			raycaster.setFromCamera( mouse, orthoCamera );
 
