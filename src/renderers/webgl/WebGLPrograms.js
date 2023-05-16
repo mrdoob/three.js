@@ -106,6 +106,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		const currentRenderTarget = renderer.getRenderTarget();
 
+		const numMultiviewViews = currentRenderTarget && currentRenderTarget.isWebGLMultiviewRenderTarget ? currentRenderTarget.numViews : 0;
+
 		const IS_INSTANCEDMESH = object.isInstancedMesh === true;
 
 		const HAS_MAP = !! material.map;
@@ -181,6 +183,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			instancingColor: IS_INSTANCEDMESH && object.instanceColor !== null,
 
 			supportsVertexTextures: SUPPORTS_VERTEX_TEXTURES,
+			numMultiviewViews: numMultiviewViews,
+
 			outputColorSpace: ( currentRenderTarget === null ) ? renderer.outputColorSpace : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace ),
 
 			map: HAS_MAP,
@@ -520,6 +524,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 17 );
 		if ( parameters.pointsUvs )
 			_programLayers.enable( 18 );
+		if ( parameters.numMultiviewViews )
+			_programLayers.enable( 19 );
 
 		array.push( _programLayers.mask );
 
