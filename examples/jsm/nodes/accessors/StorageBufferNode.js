@@ -1,6 +1,6 @@
 import BufferNode from './BufferNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { nodeObject, getConstNodeType } from '../shadernode/ShaderNode.js';
+import { nodeObject } from '../shadernode/ShaderNode.js';
 
 class StorageBufferNode extends BufferNode {
 
@@ -22,6 +22,6 @@ class StorageBufferNode extends BufferNode {
 
 export default StorageBufferNode;
 
-export const storage = ( value, nodeOrType, count ) => nodeObject( new StorageBufferNode( value, getConstNodeType( nodeOrType ), count ) );
+export const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );
 
 addNodeClass( StorageBufferNode );
