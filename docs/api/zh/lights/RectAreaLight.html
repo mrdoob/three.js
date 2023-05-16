@@ -61,10 +61,36 @@
 			公共属性请查看基类[page:Light Light]。
 		</p>
 
+		<h3>[property:Float height]</h3>
+		<p>The height of the light.</p>
+
+		<h3>[property:Float intensity]</h3>
+		<p>
+			The light's intensity. Default is `1`.<br />
+			When [page:WebGLRenderer.useLegacyLights legacy lighting mode] is disabled,
+			intensity is the luminance (brightness) of the light measured in nits
+			(cd/m^2).<br /><br />
+
+			Changing the intensity will also change the light's power.
+		</p>
+
 		<h3>[property:Boolean isRectAreaLight]</h3>
 		<p>
 			Read-only flag to check if a given object is of type [name].
 		</p>
+
+		<h3>[property:Float power]</h3>
+		<p>
+			The light's power.<br />
+			When [page:WebGLRenderer.useLegacyLights legacy lighting mode] is disabled,
+			power is the luminous power of the light measured in lumens (lm).
+			<br /><br />
+
+			Changing the power will also change the light's intensity.
+		</p>
+
+		<h3>[property:Float width]</h3>
+		<p>The width of the light.</p>
 
 		<h2>方法（Methods）</h2>
 		<p>
