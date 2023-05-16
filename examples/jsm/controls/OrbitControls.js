@@ -317,8 +317,6 @@ class OrbitControls extends EventDispatcher {
 
 		let state = STATE.NONE;
 
-		const EPS = 0.000001;
-
 		// current position in spherical coordinates
 		const spherical = new Spherical();
 		const sphericalDelta = new Spherical();
