@@ -1,3 +1,5 @@
+import { DynamicDrawUsage } from "three";
+
 class WebGPUAttributes {
 
 	constructor( device ) {
@@ -9,59 +11,59 @@ class WebGPUAttributes {
 
 	get( attribute ) {
 
-		attribute = this._getAttribute( attribute );
+		const bufferAttribute = this._getBufferAttribute( attribute );
 
-		return this.buffers.get( attribute );
+		return this.buffers.get( bufferAttribute );
 
 	}
 
 	remove( attribute ) {
 
-		attribute = this._getAttribute( attribute );
+		const bufferAttribute = this._getBufferAttribute( attribute );
 
-		const data = this.buffers.get( attribute );
+		const data = this.buffers.get( bufferAttribute );
 
 		if ( data ) {
 
 			this._destroyBuffers( data );
 
-			this.buffers.delete( attribute );
+			this.buffers.delete( bufferAttribute );
 
 		}
 
 	}
 
-	update( attribute, isIndex = false, usage = null ) {
+	update( attribute, isIndex = false, gpuUsage = null ) {
 
-		attribute = this._getAttribute( attribute );
+		const bufferAttribute = this._getBufferAttribute( attribute );
 
-		let data = this.buffers.get( attribute );
+		let data = this.buffers.get( bufferAttribute );
 
 		if ( data === undefined ) {
 
-			if ( usage === null ) {
+			if ( gpuUsage === null ) {
 
-				usage = ( isIndex === true ) ? GPUBufferUsage.INDEX : GPUBufferUsage.VERTEX;
+				gpuUsage = ( isIndex === true ) ? GPUBufferUsage.INDEX : GPUBufferUsage.VERTEX;
 
 			}
 
-			data = this._createBuffer( attribute, usage );
+			data = this._createBuffer( bufferAttribute, gpuUsage );
 
-			this.buffers.set( attribute, data );
+			this.buffers.set( bufferAttribute, data );
 
-		} else if ( usage && usage !== data.usage ) {
+		} else if ( gpuUsage && gpuUsage !== data.usage ) {
 
 			this._destroyBuffers( data );
 
-			data = this._createBuffer( attribute, usage );
+			data = this._createBuffer( bufferAttribute, gpuUsage );
 
-			this.buffers.set( attribute, data );
+			this.buffers.set( bufferAttribute, data );
 
-		} else if ( data.version < attribute.version ) {
+		} else if ( data.version < bufferAttribute.version || bufferAttribute.usage === DynamicDrawUsage ) {
 
-			this._writeBuffer( data.buffer, attribute );
+			this._writeBuffer( data.buffer, bufferAttribute );
 
-			data.version = attribute.version;
+			data.version = bufferAttribute.version;
 
 		}
 
@@ -115,7 +117,7 @@ class WebGPUAttributes {
 
 	}
 
-	_getAttribute( attribute ) {
+	_getBufferAttribute( attribute ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
@@ -123,13 +125,13 @@ class WebGPUAttributes {
 
 	}
 
-	_createBuffer( attribute, usage ) {
+	_createBuffer( bufferAttribute, usage ) {
 
-		const array = attribute.array;
+		const array = bufferAttribute.array;
 		const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
 
 		const buffer = this.device.createBuffer( {
-			label: attribute.name,
+			label: bufferAttribute.name,
 			size,
 			usage: usage | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
 			mappedAtCreation: true
@@ -139,10 +141,10 @@ class WebGPUAttributes {
 
 		buffer.unmap();
 
-		attribute.onUploadCallback();
+		bufferAttribute.onUploadCallback();
 
 		return {
-			version: attribute.version,
+			version: bufferAttribute.version,
 			buffer,
 			readBuffer: null,
 			usage

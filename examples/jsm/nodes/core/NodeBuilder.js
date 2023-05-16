@@ -360,12 +360,6 @@ class NodeBuilder {
 
 	}
 
-	isShaderStage( shaderStage ) {
-
-		return this.shaderStage === shaderStage;
-
-	}
-
 	/** @deprecated, r152 */
 	getTextureEncodingFromMap( map ) {
 

@@ -2,7 +2,7 @@ import InputNode from '../core/InputNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { varying } from '../core/VaryingNode.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
-import { InterleavedBufferAttribute, InterleavedBuffer } from 'three';
+import { InterleavedBufferAttribute, InterleavedBuffer, StaticDrawUsage, DynamicDrawUsage } from 'three';
 
 class BufferAttributeNode extends InputNode {
 
@@ -16,6 +16,8 @@ class BufferAttributeNode extends InputNode {
 		this.bufferStride = bufferStride;
 		this.bufferOffset = bufferOffset;
 
+		this.usage = StaticDrawUsage;
+
 	}
 
 	construct( builder ) {
@@ -28,6 +30,8 @@ class BufferAttributeNode extends InputNode {
 
 		const buffer = new InterleavedBuffer( array, stride );
 		const bufferAttribute = new InterleavedBufferAttribute( buffer, itemSize, offset );
+
+		buffer.setUsage( this.usage );
 
 		this.attribute = bufferAttribute;
 		this.attribute.isInstancedBufferAttribute = true; // @TODO: Add a possible: InstancedInterleavedBufferAttribute
@@ -43,7 +47,7 @@ class BufferAttributeNode extends InputNode {
 
 		let output = null;
 
-		if ( builder.isShaderStage( 'vertex' ) ) {
+		if ( builder.shaderStage === 'vertex' ) {
 
 			output = propertyName;
 
@@ -70,5 +74,13 @@ class BufferAttributeNode extends InputNode {
 export default BufferAttributeNode;
 
 export const bufferAttribute = ( array, type, stride, offset ) => nodeObject( new BufferAttributeNode( array, type, stride, offset ) );
+export const dynamicBufferAttribute = ( array, type, stride, offset ) => {
+
+	const node = bufferAttribute( array, type, stride, offset );
+	node.usage = DynamicDrawUsage;
+
+	return node;
+
+};
 
 addNodeClass( BufferAttributeNode );
