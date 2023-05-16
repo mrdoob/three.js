@@ -947,7 +947,7 @@ class Object3D extends EventDispatcher {
 
 		this.animations = source.animations;
 
-		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+		this.userData = structuredClone( source.userData );
 
 		if ( recursive === true ) {
 
