@@ -37,11 +37,7 @@
 
 			let renderer, scene, camera, controls;
 
-			init().catch( function ( err ) {
-
-				console.error( err );
-
-			} );
+			init();
 
 			async function init() {
 
@@ -49,27 +45,26 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1.35;
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.25, 20 );
-				camera.position.set( 0.35, 0.05, 0.35 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.01, 10 );
+				camera.position.set( - 0.35, - 0.2, 0.35 );
 
 				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, - 0.08, 0.11 );
+				controls.minDistance = 0.1;
+				controls.maxDistance = 2;
 				controls.addEventListener( 'change', render );
-				controls.target.set( 0, -0.05, 0.1 );
-				controls.enableZoom = false;
-				controls.enablePan = false;
 				controls.update();
 
-				const rgbeLoader = new RGBELoader()
-					.setPath( 'textures/equirectangular/' );
-
+				const rgbeLoader = new RGBELoader().setPath( 'textures/equirectangular/' );
 				const gltfLoader = new GLTFLoader().setPath( 'models/gltf/' );
 
 				const [ texture, gltf ] = await Promise.all( [
-					rgbeLoader.loadAsync( 'venice_sunset_1k.hdr' ),
+					rgbeLoader.loadAsync( 'royal_esplanade_1k.hdr' ),
 					gltfLoader.loadAsync( 'AnisotropyBarnLamp.glb' ),
 				] );
 
@@ -78,6 +73,7 @@
 				texture.mapping = THREE.EquirectangularReflectionMapping;
 
 				scene.background = texture;
+				scene.backgroundBlurriness = 0.5;
 				scene.environment = texture;
 
 				// model
