@@ -506,6 +506,8 @@ function WebGLMaterials( renderer, properties ) {
 
 				uniforms.anisotropyMap.value = material.anisotropyMap;
 
+				refreshTransformUniform( material.anisotropyMap, uniforms.anisotropyMapTransform );
+
 			}
 
 		}
