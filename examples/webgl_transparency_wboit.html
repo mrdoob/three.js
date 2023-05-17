@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - weighted, blended order-independent transparency</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - weighted, blended order-independent transparency (<a href="http://jcgt.org/published/0002/02/09/">paper</a>, <a href="http://casual-effects.blogspot.com/2015/03/implemented-weighted-blended-order.html">blog</a>)
+			<span id="model" style="display: none;"><br>Model: <a href="https://www.kenney.nl/assets/pirate-kit" target="_blank" rel="noopener">Pirate Ship</a> by <a href="https://www.kenney.nl/">Kenny</a>, CC0 1.0 Universal</span>
+			<br /><span id="color"></span><br />
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { mergeBufferGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			import { MeshWboitMaterial } from 'three/addons/materials/MeshWboitMaterial.js';
+			import { TexturePass } from 'three/addons/postprocessing/TexturePass.js';
+			import { WboitPass } from 'three/addons/postprocessing/WboitPass.js';
+
+			let camera, controls, renderer, texturePass, wboitPass;
+
+			let gl;
+			const mouse = new THREE.Vector2();
+			const pixelBuffer = new Uint8Array( 4 );
+
+			const scenes = [];
+			const sceneTypes = [ 'Boxes', 'Lattice', 'Knot', 'Ship', 'Spheres', 'Wine' ];
+			sceneTypes.forEach( type => scenes[ type ] = new THREE.Scene() );
+
+			const params = {
+				scene: 'Boxes',
+				enabled: true,
+				background: false,
+				doubleSide: true,
+				transparent: true,
+				opacity: 0.75,
+				weight: 1.0
+			};
+
+			init();
+			animate();
+			onWindowResize();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } );
+				renderer.autoClear = false;
+				document.body.appendChild( renderer.domElement );
+
+				gl = renderer.getContext();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.10, 100 );
+				camera.position.z = 10;
+
+				controls = new OrbitControls( camera, renderer.domElement );
+
+				// materials
+
+				const wboitMaterial = new MeshWboitMaterial();
+
+				const coloredWboitMaterial = new MeshWboitMaterial( { vertexColors: true } );
+
+				const opaqueMaterial = new THREE.MeshBasicMaterial( {
+					side: THREE.DoubleSide,
+					color: new THREE.Color( 0.85, 0.85, 0.85 )
+				} );
+
+				const textureLoader = new THREE.TextureLoader();
+
+				// loader
+
+				const loader = new GLTFLoader();
+				const dracoLoader = new DRACOLoader();
+				dracoLoader.setDecoderPath( 'js/libs/draco/' );
+				loader.setDRACOLoader( dracoLoader );
+
+				// scene 'Boxes'
+
+				const z = 3;
+
+				const coloredVertices = new Float32Array( [
+					1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, 1, 0, - 1, - 1, 0, 1, - 1, 0, /* center */
+					0, 0, - z, - 2, 0, - z, - 2, - 2, - z, 0, 0, - z, - 2, - 2, - z, 0, - 2, - z, /* back */
+					2, 2, z, 0, 2, z, 0, 0, z, 2, 2, z, 0, 0, z, 2, 0, z /* front */
+				] );
+
+				const coloredGeometry = new THREE.BufferGeometry();
+				coloredGeometry.setAttribute( 'position', new THREE.BufferAttribute( coloredVertices, 3 ) );
+
+				const squareColors = new Float32Array( 6 /* points */ * 3 /* faces */ * 4 /* stride */, 4 );
+				for ( let i = 0; i < 6; i ++ ) squareColors.set( [ 1.0, 1, 0, 0.5 ], i * 4 );
+				for ( let i = 6; i < 12; i ++ ) squareColors.set( [ 1.0, 0.0, 0, 1.0 ], i * 4 );
+				for ( let i = 12; i < 18; i ++ ) squareColors.set( [ 0, 0, 1.0, 1.0 ], i * 4 );
+				coloredGeometry.setAttribute( 'color', new THREE.BufferAttribute( squareColors, 4 ) );
+
+				const opaqueRectangle1 = new THREE.Mesh( new THREE.PlaneGeometry( 0.7, 1.4 ), opaqueMaterial );
+				opaqueRectangle1.position.y = 0.5;
+				opaqueRectangle1.position.z = z / 2.0;
+
+				const opaqueRectangle2 = new THREE.Mesh( new THREE.PlaneGeometry( 0.7, 1.4 ), opaqueMaterial );
+				opaqueRectangle2.position.x = - 1.0;
+				opaqueRectangle2.rotation.z = Math.PI / 2;
+				opaqueRectangle2.position.z = - z / 2.0;
+
+				scenes[ 'Boxes' ].add( new THREE.Mesh( coloredGeometry, coloredWboitMaterial ) );
+				scenes[ 'Boxes' ].add( opaqueRectangle1 );
+				scenes[ 'Boxes' ].add( opaqueRectangle2 );
+
+				// scene 'Knot'
+
+				const torusKnotGeometry = new THREE.TorusKnotGeometry( 1.5, 0.4, 100, 16 );
+				const torusPoints = torusKnotGeometry.attributes.position.count;
+				const torusColors = new Float32Array( torusPoints * 4, 4 );
+
+				for ( let i = 0; i < torusPoints; i ++ ) {
+
+					const x = torusKnotGeometry.attributes.uv.array[ ( i * 2 ) + 0 ];
+					const y = torusKnotGeometry.attributes.uv.array[ ( i * 2 ) + 1 ];
+					torusColors.set( [ y * ( 1.0 - x ), 1.0 - y, x, 1.00 ], i * 4 );
+
+				}
+
+				torusKnotGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( torusColors, 4 ) );
+
+				scenes[ 'Knot' ].add( new THREE.Mesh( torusKnotGeometry, coloredWboitMaterial ) );
+
+				// scene 'Lattice'
+
+				const numItems = 10;
+				const boxGeometry = new THREE.BoxGeometry( 2, 2, 2, 1, 1, 1 );
+
+				for ( let i = 0; i < numItems; i ++ ) {
+
+					const coloredMaterial = wboitMaterial.clone();
+					coloredMaterial.color = new THREE.Color().setHSL( ( i % 2 == 0 ? numItems - i : i ) / numItems, 0.8, 0.6 );
+
+					const mesh = new THREE.Mesh( boxGeometry, coloredMaterial );
+					mesh.rotation.y = i * Math.PI / 2;
+					mesh.scale.y = 0.3;
+					mesh.position.y = ( i - numItems / 2 ) * 0.4;
+					mesh.scale.x = 3;
+					mesh.scale.z = 0.5;
+
+					scenes[ 'Lattice' ].add( mesh );
+
+				}
+
+				for ( let i = 0; i < 4; i ++ ) {
+
+					const mesh = new THREE.Mesh( boxGeometry, opaqueMaterial );
+					scenes[ 'Lattice' ].add( mesh );
+
+					const angle = i / 2 * Math.PI;
+					mesh.position.set( Math.sin( angle ), 0, Math.cos( angle ) ).multiplyScalar( 2 );
+					mesh.scale.multiplyScalar( 0.275 );
+					mesh.scale.y = 1.25;
+
+				}
+
+				// scene 'Wine'
+
+				const bottleGeometries = [];
+				bottleGeometries.push( new THREE.CylinderGeometry( 1.0, 1.0, 3.0, 32, 1, true ).translate( 0, - 1.5, 0 ) ); /* bottle */
+				bottleGeometries.push( new THREE.SphereGeometry( 1.0, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2 ) ); /* top of bottle */
+				bottleGeometries.push( new THREE.CylinderGeometry( 0.3, 0.3, 1.5, 32, 1, true ).translate( 0, 1.7, 0 ) ); /* neck */
+				bottleGeometries.push( new THREE.CylinderGeometry( 0.375, 0.375, 0.25, 32, 1, false ).translate( 0, 2.5, 0 ) ); /* spout */
+				bottleGeometries.push( new THREE.CircleGeometry( 1, 32 ).rotateX( Math.PI / 2 ).translate( 0, - 3.0, 0 ) ); /* bottom */
+
+				const bottleGeometry = mergeBufferGeometries( bottleGeometries );
+				bottleGeometries.forEach( geometry => geometry.dispose() );
+
+				const bottlePoints = bottleGeometry.attributes.position.count;
+				const bottleColors = new Float32Array( bottlePoints * 4, 4 );
+				for ( let i = 0; i < bottlePoints; i ++ ) bottleColors.set( [ 0, 0.35, 0.02, 1.0 ], i * 4 );
+				bottleGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( bottleColors, 4 ) );
+
+				scenes[ 'Wine' ].add( new THREE.Mesh( bottleGeometry, coloredWboitMaterial ) );
+
+				const liquidGeometry = new THREE.CylinderGeometry( 0.9, 0.9, 2.85, 32, 1, false ).translate( 0, - 1.45, 0 );
+				const liquidMaterial = wboitMaterial.clone();
+				liquidMaterial.color.setRGB( 0.75, 0.0, 0.40 );
+
+				scenes[ 'Wine' ].add( new THREE.Mesh( liquidGeometry, liquidMaterial ) );
+
+				const redBallMaterial = wboitMaterial.clone();
+				redBallMaterial.color = new THREE.Color( 1, 0, 0 );
+
+				const blueBallMaterial = wboitMaterial.clone();
+				blueBallMaterial.color = new THREE.Color( 0, 0, 1 );
+
+				scenes[ 'Wine' ].add( new THREE.Mesh( new THREE.SphereGeometry( 0.5 ), redBallMaterial ).translateX( 0.1 ).translateY( - 2 ) );
+				scenes[ 'Wine' ].add( new THREE.Mesh( new THREE.SphereGeometry( 0.5 ), blueBallMaterial ).translateX( - 0.1 ).translateY( - 2 ) );
+
+				scenes[ 'Wine' ].add( new THREE.Mesh( new THREE.SphereGeometry( 1 ), redBallMaterial ).translateX( 3.2 ) );
+				scenes[ 'Wine' ].add( new THREE.Mesh( new THREE.SphereGeometry( 1 ), blueBallMaterial ).translateX( 2.8 ) );
+
+				// scene 'Ship'
+
+				loader.load( './models/gltf/ship.glb', function ( gltf ) {
+
+					gltf.scene.traverse( ( object ) => {
+
+						if ( object.material ) {
+
+							const coloredMaterial = wboitMaterial.clone();
+							coloredMaterial.color.copy( object.material.color );
+							object.material.dispose();
+							object.material = coloredMaterial;
+
+						}
+
+					} );
+
+					scenes[ 'Ship' ].add( gltf.scene );
+
+					gltf.scene.position.z = - 0.75;
+					gltf.scene.rotation.y = Math.PI / 1.5;
+					gltf.scene.position.y -= 2.00;
+					gltf.scene.scale.multiplyScalar( 0.85 );
+
+					updateSceneParameters();
+
+				}, undefined, error => console.error( error ) );
+
+				// scene 'Spheres'
+
+				scenes[ 'Spheres' ].add( new THREE.Mesh( new THREE.CylinderGeometry( 0.25, 0.25, 6.0 ), opaqueMaterial ) );
+
+				const totalSpheres = 32;
+				const spheresInRow = 8;
+
+				const sphereGeometry = new THREE.SphereGeometry( 1.0 );
+				const sphereTexture = textureLoader.load( './textures/tri_pattern.jpg', () => onWindowResize() );
+
+				for ( let i = 0; i < totalSpheres; i ++ ) {
+
+					const angle = 2 * Math.PI * ( i % spheresInRow ) / spheresInRow;
+
+					const x = Math.sin( angle ) * 1.5;
+					const y = Math.floor( i / spheresInRow ) / ( spheresInRow / 8 ) - 1.5;
+					const z = Math.cos( angle ) * 1.5;
+
+					const coloredMaterial = wboitMaterial.clone();
+					coloredMaterial.color.setHex( Math.random() * 0xffffff );
+					coloredMaterial.map = sphereTexture;
+
+					const sphereMesh = new THREE.Mesh( sphereGeometry, coloredMaterial );
+
+					scenes[ 'Spheres' ].add( sphereMesh );
+
+					sphereMesh.scale.setScalar( 0.8 );
+					sphereMesh.position.set( x, y, z );
+
+				}
+
+				// background
+
+				texturePass = new TexturePass();
+				texturePass.renderToScreen = true;
+				texturePass.map = textureLoader.load( './textures/hardwood2_diffuse.jpg', () => onWindowResize() );
+
+				// wboit pass
+
+				wboitPass = new WboitPass( renderer, scenes[ params.scene ], camera );
+
+				// gui
+
+				const gui = new GUI();
+
+				const folder1 = gui.addFolder( 'Scene Params' );
+
+				folder1.add( params, 'scene', sceneTypes ).onFinishChange( updateScene );
+				folder1.add( params, 'background' ).onFinishChange( updateSceneParameters );
+
+				const folder2 = gui.addFolder( 'Wboit Params' );
+
+				folder2.add( params, 'enabled' ).onFinishChange( updateSceneParameters );
+				folder2.add( params, 'doubleSide' ).onFinishChange( updateSceneParameters );
+				folder2.add( params, 'transparent' ).onFinishChange( updateSceneParameters );
+				folder2.add( params, 'opacity', 0, 1 ).onFinishChange( updateSceneParameters );
+				folder2.add( params, 'weight', 0, 1 ).onFinishChange( updateSceneParameters );
+
+				// events
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				controls.addEventListener( 'change', render );
+				renderer.domElement.addEventListener( 'mousemove', onMouseMove );
+
+				// initialize params
+
+				updateScene();
+				updateSceneParameters();
+
+			}
+
+			function updateScene( ) {
+
+				wboitPass.scene = scenes[ params.scene ];
+
+				document.getElementById( 'model' ).style.display = ( params.scene === 'Ship' ) ? '' : 'none';
+
+				render();
+
+			}
+
+			function updateSceneParameters() {
+
+				sceneTypes.forEach( ( type ) => {
+
+					scenes[ type ].traverse( ( object ) => {
+
+						if ( ! object.material ) return;
+						const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
+
+						for ( let i = 0; i < materials.length; i ++ ) {
+
+							materials[ i ].side = ( params.doubleSide ) ? THREE.DoubleSide : THREE.FrontSide;
+
+							if ( materials[ i ].wboitEnabled !== true ) continue;
+
+							materials[ i ].transparent = params.transparent;
+							materials[ i ].opacity = params.opacity;
+							materials[ i ].weight = params.weight;
+
+						}
+
+					} );
+
+				} );
+
+				render();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				wboitPass.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function onMouseMove( event ) {
+
+				mouse.x = event.clientX;
+				mouse.y = event.clientY;
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+
+				// color under mouse
+
+				gl.readPixels( mouse.x, window.innerHeight - mouse.y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixelBuffer );
+
+				const rgba = Array.apply( [], pixelBuffer );
+				document.getElementById( 'color' ).innerHTML = [
+					( rgba[ 0 ] / 255 ).toPrecision( 2 ),
+					( rgba[ 1 ] / 255 ).toPrecision( 2 ),
+					( rgba[ 2 ] / 255 ).toPrecision( 2 ),
+					( rgba[ 3 ] / 255 ).toPrecision( 2 )
+				].join( ', ' );
+
+			}
+
+			function render() {
+
+				if ( ! scenes[ params.scene ] ) return;
+
+				// clear
+
+				renderer.setClearColor( 0.0, 0.0 );
+				renderer.clear();
+
+				// background
+
+				if ( params.background ) texturePass.render( renderer );
+
+				// scene
+
+				if ( params.enabled ) {
+
+					wboitPass.render( renderer );
+
+				} else {
+
+					renderer.render( scenes[ params.scene ], camera );
+
+				}
+
+			}
+
+		</script>
+
+	</body>
+</html>

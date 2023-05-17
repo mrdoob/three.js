@@ -73,6 +73,7 @@
 	"webgl_shadow_contact": [ "onBeforeCompile", "soft" ],
 	"webgl_shadowmap_viewer": [ "directional", "spot" ],
 	"webgl_tonemapping": [ "gltf" ],
+	"webgl_transparency_wboit": [ "oit", "order-independent", "weighted", "blended", "alpha" ],
 	"webgl_postprocessing_afterimage": [ "trails" ],
 	"webgl_postprocessing_dof": [ "bokeh" ],
 	"webgl_postprocessing_dof2": [ "bokeh" ],
