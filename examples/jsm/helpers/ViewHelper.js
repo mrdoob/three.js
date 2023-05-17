@@ -165,7 +165,7 @@ class ViewHelper extends Object3D {
 			if ( this.animating === true ) return false;
 			
 			mouse.x = (event.offsetX / dim) * 2 - 1;
-      	    mouse.y = (event.offsetY / dim) * 2 - 1;
+      	    mouse.y = -((event.offsetY / dim) * 2 - 1);
 
 			raycaster.setFromCamera( mouse, orthoCamera );
 
