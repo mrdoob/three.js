@@ -1,4 +1,4 @@
-﻿import { IntType } from '../../constants.js';
+﻿import { ByteType, ShortType, IntType, UnsignedByteType, UnsignedShortType, UnsignedIntType } from '../../constants.js';
 
 function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
@@ -379,7 +379,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 					// check for integer attributes (WebGL 2 only)
 
-					const integer = ( capabilities.isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT || geometryAttribute.gpuType === IntType ) );
+					const integer = ( capabilities.isWebGL2 === true && ( type === gl.BYTE || type === gl.SHORT || type === gl.INT || type === gl.UNSIGNED_BYTE || type === gl.UNSIGNED_SHORT || type === gl.UNSIGNED_INT || geometryAttribute.gpuType === ByteType || geometryAttribute.gpuType === ShortType || geometryAttribute.gpuType === IntType || geometryAttribute.gpuType === UnsignedByteType || geometryAttribute.gpuType === UnsignedShortType || geometryAttribute.gpuType === UnsignedIntType ) );
 
 					if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
