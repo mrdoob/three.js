@@ -628,6 +628,7 @@
 
 			"几何体": {
 				"BoxGeometry": "api/zh/geometries/BoxGeometry",
+				"CapsuleGeometry": "api/zh/geometries/CapsuleGeometry",
 				"CircleGeometry": "api/zh/geometries/CircleGeometry",
 				"ConeGeometry": "api/zh/geometries/ConeGeometry",
 				"CylinderGeometry": "api/zh/geometries/CylinderGeometry",
