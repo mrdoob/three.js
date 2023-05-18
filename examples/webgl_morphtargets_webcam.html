@@ -151,7 +151,7 @@
 			document.body.appendChild( renderer.domElement );
 
 			const camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100 );
-			camera.position.z = 4;
+			camera.position.z = 5;
 
 			const scene = new THREE.Scene();
 			scene.scale.x = - 1;
@@ -202,10 +202,10 @@
 			const texture = new THREE.VideoTexture( video );
 			texture.colorSpace = THREE.SRGBColorSpace;
 
-			const geometry = new THREE.PlaneGeometry( 6, 4 );
+			const geometry = new THREE.PlaneGeometry( 1, 1 );
 			const material = new THREE.MeshBasicMaterial( { map: texture, depthWrite: false } );
-			const mesh = new THREE.Mesh( geometry, material );
-			scene.add( mesh );
+			const videomesh = new THREE.Mesh( geometry, material );
+			scene.add( videomesh );
 
 			//
 
@@ -214,7 +214,7 @@
 
 			const transform = new THREE.Object3D();
 
-			renderer.setAnimationLoop( () => {
+			renderer.setAnimationLoop( function () {
 
 				if ( video.readyState >= HTMLMediaElement.HAVE_METADATA ) {
 
@@ -230,7 +230,7 @@
 						const object = scene.getObjectByName( 'grp_transform' );
 
 						object.position.x = transform.position.x;
-						object.position.y = transform.position.z + 35;
+						object.position.y = transform.position.z + 40;
 						object.position.z = - transform.position.y;
 
 						object.rotation.x = transform.rotation.x;
@@ -262,6 +262,9 @@
 
 				}
 
+				videomesh.scale.x = video.videoWidth / 100;
+				videomesh.scale.y = video.videoHeight / 100;
+
 				renderer.render( scene, camera );
 
 				controls.update();
@@ -270,7 +273,7 @@
 
 			} );
 
-			window.addEventListener( 'resize', () => {
+			window.addEventListener( 'resize', function () {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
