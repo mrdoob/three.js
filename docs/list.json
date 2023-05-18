@@ -854,7 +854,8 @@
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
-				"PCDLoader": "examples/zh/loaders/PCDLoader"
+				"PCDLoader": "examples/zh/loaders/PCDLoader",
+				"SVGLoder": "examples/zh/loaders/SVGLoader"
 			},
 
 			"物体": {
