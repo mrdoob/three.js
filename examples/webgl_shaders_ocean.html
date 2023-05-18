@@ -37,8 +37,6 @@
 			import { Water } from 'three/addons/objects/Water.js';
 			import { Sky } from 'three/addons/objects/Sky.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let container, stats;
 			let camera, scene, renderer;
 			let controls, water, sun, mesh;
@@ -55,8 +53,8 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.5;
 				container.appendChild( renderer.domElement );
 
 				//
