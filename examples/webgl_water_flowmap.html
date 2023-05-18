@@ -34,8 +34,6 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Water } from 'three/addons/objects/Water2.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let scene, camera, renderer, water;
 
 			init();
@@ -56,7 +54,7 @@
 				// ground
 
 				const groundGeometry = new THREE.PlaneGeometry( 20, 20, 10, 10 );
-				const groundMaterial = new THREE.MeshBasicMaterial( { color: 0xcccccc } );
+				const groundMaterial = new THREE.MeshBasicMaterial( { color: 0xe7e7e7 } );
 				const ground = new THREE.Mesh( groundGeometry, groundMaterial );
 				ground.rotation.x = Math.PI * - 0.5;
 				scene.add( ground );
@@ -68,6 +66,7 @@
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 16;
 					map.repeat.set( 4, 4 );
+					map.colorSpace = THREE.SRGBColorSpace;
 					groundMaterial.map = map;
 					groundMaterial.needsUpdate = true;
 
@@ -104,7 +103,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				//

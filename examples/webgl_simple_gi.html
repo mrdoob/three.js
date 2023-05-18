@@ -31,8 +31,6 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			class GIMesh extends THREE.Mesh {
 
 				copy( source ) {
@@ -198,7 +196,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				new SimpleGI( renderer, scene );

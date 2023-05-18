@@ -139,8 +139,6 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 			let stats;
 			let camera, scene, renderer;
 
@@ -175,9 +173,9 @@
 
 				// lights
 
-				scene.add( new THREE.AmbientLight( 0x666666 ) );
+				scene.add( new THREE.AmbientLight( 0xaaaaaa ) );
 
-				const light = new THREE.DirectionalLight( 0xdfebff, 1.75 );
+				const light = new THREE.DirectionalLight( 0xf0f6ff, 1.75 );
 				light.position.set( 2, 8, 4 );
 
 				light.castShadow = true;
@@ -215,7 +213,7 @@
 
 				// ground
 
-				const groundMaterial = new THREE.MeshPhongMaterial( { color: 0x404040, specular: 0x111111 } );
+				const groundMaterial = new THREE.MeshPhongMaterial( { color: 0x898989 } );
 
 				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 20000, 20000, 8, 8 ), groundMaterial );
 				ground.rotation.x = - Math.PI / 2;
