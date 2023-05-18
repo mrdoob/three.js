@@ -56,7 +56,7 @@ export default /* glsl */`
 #endif
 #ifdef USE_ANISOTROPYMAP
 
-	vAnisotropyMapUv = ( vec3( ANISOTROPYMAP_UV, 1 ) ).xy;
+	vAnisotropyMapUv = ( anisotropyMapTransform * vec3( ANISOTROPYMAP_UV, 1 ) ).xy;
 
 #endif
 #ifdef USE_CLEARCOATMAP

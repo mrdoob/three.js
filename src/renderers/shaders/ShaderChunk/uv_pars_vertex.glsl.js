@@ -66,6 +66,7 @@ export default /* glsl */`
 #endif
 #ifdef USE_ANISOTROPYMAP
 
+	uniform mat3 anisotropyMapTransform;
 	varying vec2 vAnisotropyMapUv;
 
 #endif
