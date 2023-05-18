@@ -7,10 +7,10 @@ class Backend {
 
 	constructor( parameters = {} ) {
 
-        this.parameters = Object.assign( {}, parameters );
+		this.parameters = Object.assign( {}, parameters );
 		this.properties = new WeakMap();
 		this.renderer = null;
-        this.domElement = null;
+		this.domElement = null;
 
 	}
 
@@ -20,59 +20,59 @@ class Backend {
 
 	}
 
-    // render context
+	// render context
 
 	begin( renderContext ) { }
 
-    finish( renderContext ) { }
+	finish( renderContext ) { }
 
-    // render object
+	// render object
 
 	draw( renderObject, info ) { }
 
-    // program
+	// program
 
-    createProgram( program ) { }
+	createProgram( program ) { }
 
-    destroyProgram( program ) { }
+	destroyProgram( program ) { }
 
-    // bindings
+	// bindings
 
-    createBindings( renderObject ) { }
+	createBindings( renderObject ) { }
 
-    updateBindings( renderObject ) { }
+	updateBindings( renderObject ) { }
 
-    // pipeline
+	// pipeline
 
-    createRenderPipeline( renderObject ) { }
+	createRenderPipeline( renderObject ) { }
 
-    createComputePipeline( computeNode, pipeline ) { }
+	createComputePipeline( computeNode, pipeline ) { }
 
-    destroyPipeline( pipeline ) { }
+	destroyPipeline( pipeline ) { }
 
-    // cache key
+	// cache key
 
-    needsUpdate( renderObject ) { } // return Boolean ( fast test )
+	needsUpdate( renderObject ) { } // return Boolean ( fast test )
 
-    getCacheKey( renderObject ) { } // return String
+	getCacheKey( renderObject ) { } // return String
 
-    // node builder
+	// node builder
 
-    createNodeBuilder( renderObject ) { } // return NodeBuilder (ADD IT)
+	createNodeBuilder( renderObject ) { } // return NodeBuilder (ADD IT)
 
-    // textures
+	// textures
 
-    createSampler( texture ) { }
+	createSampler( texture ) { }
 
-    createDefaultTexture( texture ) { }
+	createDefaultTexture( texture ) { }
 
-    createTexture( texture ) { }
+	createTexture( texture ) { }
 
 	// attributes
 
-	createAttribute( attribute) { }
+	createAttribute( attribute ) { }
 
-    createIndexAttribute( attribute) { }
+	createIndexAttribute( attribute ) { }
 
 	updateAttribute( attribute ) { }
 
@@ -84,15 +84,15 @@ class Backend {
 
 	// utils
 
-    hasFeature( name ) { } // return Boolean
+	hasFeature( name ) { } // return Boolean
 
-    getInstanceCount( renderObject ) {
+	getInstanceCount( renderObject ) {
 
-        const { object, geometry } = renderObject;
+		const { object, geometry } = renderObject;
 
-        return geometry.isInstancedBufferGeometry ? geometry.instanceCount : ( object.isInstancedMesh ? object.count : 1 );
+		return geometry.isInstancedBufferGeometry ? geometry.instanceCount : ( object.isInstancedMesh ? object.count : 1 );
 
-    }
+	}
 
 	getDrawingBufferSize() {
 
@@ -102,37 +102,37 @@ class Backend {
 
 	}
 
-    getScissor() {
+	getScissor() {
 
-        vector4 = vector4 || new Vector4();
+		vector4 = vector4 || new Vector4();
 
-        return this.renderer.getScissor( vector4 );
-
-    }
-
-    getDomElement() {
-
-        let domElement = this.domElement;
-
-        if ( domElement === null ) {
-
-            this.domElement = domElement = ( this.parameters.canvas !== undefined ) ? this.parameters.canvas : this.createCanvasElement();
-
-        }
-
-        return domElement;
+		return this.renderer.getScissor( vector4 );
 
 	}
 
-    createCanvasElement() {
+	getDomElement() {
 
-        const canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
+		let domElement = this.domElement;
+
+		if ( domElement === null ) {
+
+			this.domElement = domElement = ( this.parameters.canvas !== undefined ) ? this.parameters.canvas : this.createCanvasElement();
+
+		}
+
+		return domElement;
+
+	}
+
+	createCanvasElement() {
+
+		const canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 		canvas.style.display = 'block';
 		return canvas;
 
-    }
+	}
 
-    // resource properties 
+	// resource properties
 
 	get( object ) {
 
@@ -149,11 +149,11 @@ class Backend {
 
 	}
 
-    delete( object ) {
+	delete( object ) {
 
-        this.properties.delete( object );
+		this.properties.delete( object );
 
-    }
+	}
 
 }
 

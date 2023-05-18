@@ -10,7 +10,7 @@ import RenderContexts from './RenderContexts.js';
 import Textures from './Textures.js';
 import Background from './Background.js';
 import Nodes from './nodes/Nodes.js';
-import { Frustum, Matrix4, Vector3, Vector4, Color, SRGBColorSpace, NoToneMapping, DepthFormat } from 'three';
+import { Frustum, Matrix4, Vector3, Vector4, Color, SRGBColorSpace, NoToneMapping } from 'three';
 
 const _drawingBufferSize = new Vector4();
 const _frustum = new Frustum();
@@ -27,7 +27,7 @@ class Renderer {
 
 		this.domElement = backend.getDomElement();
 
-        this.backend = backend;
+		this.backend = backend;
 
 		this.autoClear = true;
 		this.autoClearColor = true;
@@ -112,7 +112,7 @@ class Renderer {
 
 				await backend.init( this );
 
-			} catch( error ) {
+			} catch ( error ) {
 
 				reject( error );
 				return;
@@ -212,7 +212,7 @@ class Renderer {
 
 		//
 
-		this._nodes.updateScene( scene );		
+		this._nodes.updateScene( scene );
 
 		//
 
@@ -730,7 +730,7 @@ class Renderer {
 		this._bindings.updateForRender( renderObject );
 
 		//
-		
+
 		this.backend.draw( renderObject, this._info );
 
 	}

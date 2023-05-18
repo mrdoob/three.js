@@ -133,8 +133,8 @@ class Matrix4Uniform extends Uniform {
 
 }
 
-export { 
-	FloatUniform, 
-	Vector2Uniform, Vector3Uniform, Vector4Uniform, ColorUniform, 
-	Matrix3Uniform, Matrix4Uniform 
+export {
+	FloatUniform,
+	Vector2Uniform, Vector3Uniform, Vector4Uniform, ColorUniform,
+	Matrix3Uniform, Matrix4Uniform
 };

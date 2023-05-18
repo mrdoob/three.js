@@ -1,5 +1,5 @@
 export const AttributeType = {
-    VERTEX: 1,
+	VERTEX: 1,
 	INDEX: 2,
 	STORAGE: 4
 };

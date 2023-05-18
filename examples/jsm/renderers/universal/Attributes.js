@@ -47,7 +47,7 @@ class Attributes extends DataMap {
 			data.version = this._getBufferAttribute( attribute ).version;
 
 		} else {
-		
+
 			const bufferAttribute = this._getBufferAttribute( attribute );
 
 			if ( data.version < bufferAttribute.version || bufferAttribute.usage === DynamicDrawUsage ) {

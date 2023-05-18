@@ -71,7 +71,7 @@ class Geometries extends DataMap {
 	constructor( attributes, info ) {
 
 		super();
-		
+
 		this.attributes = attributes;
 		this.info = info;
 

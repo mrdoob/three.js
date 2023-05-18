@@ -1,5 +1,4 @@
 import Buffer from './Buffer.js';
-//import { GPUBindingType } from './constants.js';
 
 class StorageBuffer extends Buffer {
 

@@ -76,7 +76,7 @@ class RenderObjects extends ChainMap {
 				this.nodes.delete( renderObject );
 
 				this.delete( chainKey );
-				
+
 			};
 
 			renderObject.material.addEventListener( 'dispose', onDispose );

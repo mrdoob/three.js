@@ -221,7 +221,7 @@ class RenderPipelines {
 
 		// check material state
 
-		if ( needsUpdate === true || 
+		if ( needsUpdate === true ||
 			cache.material !== material || cache.materialVersion !== material.version ||
 			cache.transparent !== material.transparent || cache.blending !== material.blending || cache.premultipliedAlpha !== material.premultipliedAlpha ||
 			cache.blendSrc !== material.blendSrc || cache.blendDst !== material.blendDst || cache.blendEquation !== material.blendEquation ||

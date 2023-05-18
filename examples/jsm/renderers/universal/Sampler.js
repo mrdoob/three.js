@@ -1,5 +1,4 @@
 import Binding from './Binding.js';
-//import { GPUBindingType } from './constants.js';
 
 class Sampler extends Binding {
 

@@ -6,7 +6,7 @@ class Bindings extends DataMap {
 
 		super();
 
-		this.backend = backend;		
+		this.backend = backend;
 		this.textures = textures;
 		this.pipelines = pipelines;
 		this.attributes = attributes;
@@ -93,7 +93,7 @@ class Bindings extends DataMap {
 
 				this.attributes.update( attribute, AttributeType.STORAGE );
 
-			} 
+			}
 
 		}
 
@@ -144,7 +144,7 @@ class Bindings extends DataMap {
 				//const attribute = binding.attribute;
 
 			} else if ( binding.isSampler ) {
-/*
+				/*
 				const texture = binding.getTexture();
 
 				textures.updateSampler( texture );
@@ -158,7 +158,7 @@ class Bindings extends DataMap {
 
 				}
 */
-			} 
+			}
 
 			updateMap.set( binding, frame );
 
@@ -168,7 +168,7 @@ class Bindings extends DataMap {
 
 			//this.pipelines.getPipeline( object )
 			const pipline = this.pipelines.getForRender( object );
-			
+
 			this.backend.updateBindings( bindings, pipline );
 
 		}

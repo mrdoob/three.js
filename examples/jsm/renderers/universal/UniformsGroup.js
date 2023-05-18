@@ -1,5 +1,5 @@
 import UniformBuffer from './UniformBuffer.js';
-import { GPUChunkBytes } from './constants.js';
+import { GPUChunkBytes } from './Constants.js';
 
 class UniformsGroup extends UniformBuffer {
 

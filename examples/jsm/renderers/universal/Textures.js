@@ -35,7 +35,7 @@ class Textures extends DataMap {
 
 			this.info.memory.textures --;
 
-		}
+		};
 
 		texture.addEventListener( 'dispose', onDispose );
 

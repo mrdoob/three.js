@@ -291,7 +291,7 @@ class Nodes extends DataMap {
 
 
 	}
-	
+
 	updateForRender( renderObject ) {
 
 		const nodeFrame = this.getNodeFrame( renderObject );
