@@ -56,6 +56,7 @@
 	"webgl_portal": [ "frameCorners", "renderTarget" ],
 	"webgl_modifier_subdivision" : [ "external", "community", "smooth" ],
 	"webgl_morphtargets_horse": [ "animation" ],
+	"webgl_morphtargets_webcam": [ "external" ],
 	"webgl_multiple_elements": [ "differential equations", "physics" ],
 	"webgl_multiple_elements_text": [ "font" ],
 	"webgl_panorama_cube": [ "envmap" ],

@@ -189,6 +189,7 @@
 		"webgl_morphtargets_face",
 		"webgl_morphtargets_horse",
 		"webgl_morphtargets_sphere",
+		"webgl_morphtargets_webcam",
 		"webgl_multiple_canvases_circle",
 		"webgl_multiple_canvases_complex",
 		"webgl_multiple_canvases_grid",
