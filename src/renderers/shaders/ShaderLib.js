@@ -346,6 +346,7 @@ ShaderLib.physical = {
 			specularIntensityMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 			anisotropyVector: { value: /*@__PURE__*/ new Vector2() },
 			anisotropyMap: { value: null },
+			anisotropyMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 		}
 	] ),
 
