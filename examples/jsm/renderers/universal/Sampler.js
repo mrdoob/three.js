@@ -1,0 +1,19 @@
+import Binding from './Binding.js';
+//import { GPUBindingType } from './constants.js';
+
+class Sampler extends Binding {
+
+	constructor( name, texture ) {
+
+		super( name );
+
+		this.texture = texture;
+		this.version = 0;
+
+		this.isSampler = true;
+
+	}
+
+}
+
+export default Sampler;

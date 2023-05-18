@@ -141,8 +141,8 @@ export { default as NodeObjectLoader } from './loaders/NodeObjectLoader.js';
 export { default as NodeMaterialLoader } from './loaders/NodeMaterialLoader.js';
 
 // parsers
-export { default as WGSLNodeParser } from './parsers/WGSLNodeParser.js';
-export { default as GLSLNodeParser } from './parsers/GLSLNodeParser.js';
+//export { default as WGSLNodeParser } from './parsers/WGSLNodeParser.js';
+//export { default as GLSLNodeParser } from './parsers/GLSLNodeParser.js';
 
 // materials
 export * from './materials/Materials.js';
