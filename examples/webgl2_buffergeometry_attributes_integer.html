@@ -136,6 +136,7 @@
 				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 				geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 				geometry.setAttribute( 'textureIndex', new THREE.Uint16BufferAttribute( textureIndices, 1 ) );
+				geometry.attributes.textureIndex.gpuType = THREE.UnsignedShortType;
 
 				geometry.computeBoundingSphere();
 
