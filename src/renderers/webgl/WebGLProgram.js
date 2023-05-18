@@ -555,6 +555,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
 
+			parameters.useLegacyLights ? '#define LEGACY_LIGHTS' : '',
+
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 			( parameters.logarithmicDepthBuffer && parameters.rendererExtensionFragDepth ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
