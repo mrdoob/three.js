@@ -33,8 +33,6 @@
 			import { XRButton } from 'three/addons/webxr/XRButton.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 			const clock = new THREE.Clock();
 
 			let container;
@@ -63,11 +61,11 @@
 
 				room = new THREE.LineSegments(
 					new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ).translate( 0, 3, 0 ),
-					new THREE.LineBasicMaterial( { color: 0x808080 } )
+					new THREE.LineBasicMaterial( { color: 0xbcbcbc } )
 				);
 				scene.add( room );
 
-				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
+				scene.add( new THREE.HemisphereLight( 0xa5a5a5, 0x898989 ) );
 
 				const light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 ).normalize();
