@@ -33,8 +33,6 @@
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 			let camera, scene, raycaster, renderer;
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
@@ -57,11 +55,11 @@
 
 				room = new THREE.LineSegments(
 					new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ).translate( 0, 3, 0 ),
-					new THREE.LineBasicMaterial( { color: 0x808080 } )
+					new THREE.LineBasicMaterial( { color: 0xbcbcbc } )
 				);
 				scene.add( room );
 
-				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
+				scene.add( new THREE.HemisphereLight( 0xa5a5a5, 0x898989 ) );
 
 				const light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 ).normalize();
@@ -69,13 +67,13 @@
 
 				marker = new THREE.Mesh(
 					new THREE.CircleGeometry( 0.25, 32 ).rotateX( - Math.PI / 2 ),
-					new THREE.MeshBasicMaterial( { color: 0x808080 } )
+					new THREE.MeshBasicMaterial( { color: 0xbcbcbc } )
 				);
 				scene.add( marker );
 
 				floor = new THREE.Mesh(
 					new THREE.PlaneGeometry( 4.8, 4.8, 2, 2 ).rotateX( - Math.PI / 2 ),
-					new THREE.MeshBasicMaterial( { color: 0x808080, transparent: true, opacity: 0.25 } )
+					new THREE.MeshBasicMaterial( { color: 0xbcbcbc, transparent: true, opacity: 0.25 } )
 				);
 				scene.add( floor );
 
