@@ -47,6 +47,10 @@
 
 			precision highp float;
 
+			vec4 LinearTosRGB( in vec4 value ) {
+				return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );
+			}	
+
 			uniform LightingData {
 				vec3 position;
 				vec3 ambientColor;
@@ -81,6 +85,8 @@
 					Light.specularColor * specularLightWeighting;
 
 				fragColor = vec4( color.rgb * lightWeighting.rgb, 1.0 );
+
+				fragColor = LinearTosRGB( fragColor );
 
 			}
 
@@ -121,6 +127,10 @@
 
 			precision highp float;
 
+			vec4 LinearTosRGB( in vec4 value ) {
+				return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );
+			}			
+
 			uniform sampler2D diffuseMap;
 
 			in vec2 vUv;
@@ -157,6 +167,8 @@
 
 				fragColor = vec4( texture( diffuseMap, vUv ).rgb * lightWeighting.rgb, 1.0 );
 
+				fragColor = LinearTosRGB( fragColor );
+
 			}
 
 		</script>
@@ -181,8 +193,6 @@
 			import * as THREE from 'three';
 
 			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
 			let camera, scene, renderer, clock;
 
@@ -216,6 +226,7 @@
 				// texture
 
 				const texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				// uniforms groups
 
@@ -230,9 +241,9 @@
 				const lightingUniformsGroup = new THREE.UniformsGroup();
 				lightingUniformsGroup.setName( 'LightingData' );
 				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Vector3( 0, 0, 10 ) ) ); // light position
-				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Color( 0x333333 ) ) ); // ambient color
-				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Color( 0xaaaaaa ) ) ); // diffuse color
-				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Color( 0xcccccc ) ) ); // specular color
+				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Color( 0x7c7c7c ) ) ); // ambient color
+				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Color( 0xd5d5d5 ) ) ); // diffuse color
+				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Color( 0xe7e7e7 ) ) ); // specular color
 				lightingUniformsGroup.add( new THREE.Uniform( 64 ) ); // shininess
 
 				// materials

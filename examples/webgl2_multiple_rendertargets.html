@@ -78,6 +78,10 @@
 			precision highp float;
 			precision highp int;
 
+			vec4 LinearTosRGB( in vec4 value ) {
+				return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );
+			}	
+
 			layout(location = 0) out vec4 pc_FragColor;
 
 			in vec2 vUv;
@@ -87,11 +91,13 @@
 
 			void main() {
 
-				vec3 diffuse = texture( tDiffuse, vUv ).rgb;
-				vec3 normal = texture( tNormal, vUv ).rgb;
+				vec4 diffuse = texture( tDiffuse, vUv );
+				vec4 normal = texture( tNormal, vUv );
 
-				pc_FragColor.rgb = mix( diffuse, normal, step( 0.5, vUv.x ) );
+				pc_FragColor = mix( diffuse, normal, step( 0.5, vUv.x ) );
 				pc_FragColor.a = 1.0;
+
+				pc_FragColor = LinearTosRGB( pc_FragColor );
 
 			}
 		</script>
@@ -122,8 +128,6 @@
 			import WebGL from 'three/addons/capabilities/WebGL.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
 			let camera, scene, renderer, controls;
 			let renderTarget;
@@ -188,6 +192,7 @@
 				const diffuse = loader.load( 'textures/hardwood2_diffuse.jpg', render );
 				diffuse.wrapS = THREE.RepeatWrapping;
 				diffuse.wrapT = THREE.RepeatWrapping;
+				diffuse.colorSpace = THREE.SRGBColorSpace;
 
 				scene.add( new THREE.Mesh(
 					new THREE.TorusKnotGeometry( 1, 0.3, 128, 32 ),
