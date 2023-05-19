@@ -19,6 +19,7 @@
 			void main() {
 
 				gl_FragColor = texture2D( tDiffuse, vUv );
+				#include <encodings_fragment>
 
 			}
 
@@ -74,8 +75,6 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let container, stats;
 
 			let cameraRTT, camera, sceneRTT, sceneScreen, scene, renderer, zmesh1, zmesh2;
@@ -112,7 +111,7 @@
 				light.position.set( 0, 0, 1 ).normalize();
 				sceneRTT.add( light );
 
-				light = new THREE.DirectionalLight( 0xffaaaa, 1.5 );
+				light = new THREE.DirectionalLight( 0xffd5d5, 1.5 );
 				light.position.set( 0, 0, - 1 ).normalize();
 				sceneRTT.add( light );
 
@@ -144,8 +143,8 @@
 
 				const torusGeometry = new THREE.TorusGeometry( 100, 25, 15, 30 );
 
-				const mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } );
-				const mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
+				const mat1 = new THREE.MeshPhongMaterial( { color: 0x9c9c9c, specular: 0xffaa00, shininess: 5 } );
+				const mat2 = new THREE.MeshPhongMaterial( { color: 0x9c0000, specular: 0xff2200, shininess: 5 } );
 
 				zmesh1 = new THREE.Mesh( torusGeometry, mat1 );
 				zmesh1.position.set( 0, 0, 100 );
@@ -184,7 +183,6 @@
 				}
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
