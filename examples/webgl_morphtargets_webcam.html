@@ -35,8 +35,6 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
@@ -108,40 +106,6 @@
 				// '': 'tongueOut'
 			};
 
-			const video = document.createElement( 'video' );
-
-			const filesetResolver = await FilesetResolver.forVisionTasks(
-				'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm'
-			);
-
-			const faceLandmarker = await FaceLandmarker.createFromOptions( filesetResolver, {
-				baseOptions: {
-					modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
-					delegate: 'GPU'
-				},
-				outputFaceBlendshapes: true,
-				outputFacialTransformationMatrixes: true,
-				runningMode: 'VIDEO',
-				numFaces: 1
-			} );
-
-			if ( navigator.mediaDevices && navigator.mediaDevices.getUserMedia ) {
-
-				navigator.mediaDevices.getUserMedia( { video: { facingMode: 'user' } } )
-					.then( function ( stream ) {
-
-						video.srcObject = stream;
-						video.play();
-
-					} )
-					.catch( function ( error ) {
-
-						console.error( 'Unable to access the camera/webcam.', error );
-
-					} );
-
-			}
-
 			//
 
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -178,13 +142,14 @@
 					const mesh = gltf.scene.children[ 0 ];
 					scene.add( mesh );
 
+					const head = mesh.getObjectByName( 'mesh_2' );
+					head.material = new THREE.MeshNormalMaterial();
+
 					// GUI
 
 					const gui = new GUI();
 					gui.close();
 
-					const head = mesh.getObjectByName( 'mesh_2' );
-					head.material = new THREE.MeshNormalMaterial();
 					const influences = head.morphTargetInfluences;
 
 					for ( const [ key, value ] of Object.entries( head.morphTargetDictionary ) ) {
@@ -194,10 +159,14 @@
 							.listen( influences );
 
 					}
+					
+					renderer.setAnimationLoop( animation );
 
 				} );
 
 			// Video Texture
+
+			const video = document.createElement( 'video' );
 
 			const texture = new THREE.VideoTexture( video );
 			texture.colorSpace = THREE.SRGBColorSpace;
@@ -207,14 +176,43 @@
 			const videomesh = new THREE.Mesh( geometry, material );
 			scene.add( videomesh );
 
-			//
+			// MediaPipe
 
-			const stats = new Stats();
-			document.body.appendChild( stats.dom );
+			const filesetResolver = await FilesetResolver.forVisionTasks(
+				'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm'
+			);
+
+			const faceLandmarker = await FaceLandmarker.createFromOptions( filesetResolver, {
+				baseOptions: {
+					modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
+					delegate: 'GPU'
+				},
+				outputFaceBlendshapes: true,
+				outputFacialTransformationMatrixes: true,
+				runningMode: 'VIDEO',
+				numFaces: 1
+			} );
+
+			if ( navigator.mediaDevices && navigator.mediaDevices.getUserMedia ) {
+
+				navigator.mediaDevices.getUserMedia( { video: { facingMode: 'user' } } )
+					.then( function ( stream ) {
+
+						video.srcObject = stream;
+						video.play();
+
+					} )
+					.catch( function ( error ) {
+
+						console.error( 'Unable to access the camera/webcam.', error );
+
+					} );
+
+			}
 
 			const transform = new THREE.Object3D();
 
-			renderer.setAnimationLoop( function () {
+			function animation() {
 
 				if ( video.readyState >= HTMLMediaElement.HAVE_METADATA ) {
 
@@ -241,18 +239,20 @@
 
 					if ( results.faceBlendshapes.length > 0  ) {
 
-						const faceBlendshapes = results.faceBlendshapes[ 0 ].categories;;
+						const face = scene.getObjectByName( 'mesh_2' );
 
-						const object = scene.getObjectByName( 'mesh_2' );
+						const faceBlendshapes = results.faceBlendshapes[ 0 ].categories;
 
 						for ( const blendshape of faceBlendshapes ) {
 
-							const name = blendshapesMap[ blendshape.categoryName ];
-							const index = object.morphTargetDictionary[ name ];
+							const categoryName = blendshape.categoryName;
+							const score = blendshape.score;
+
+							const index = face.morphTargetDictionary[ blendshapesMap[  categoryName ] ];
 
 							if ( index !== undefined ) {
 
-								object.morphTargetInfluences[ index ] = blendshape.score;
+								face.morphTargetInfluences[ index ] = score;
 
 							}
 
@@ -269,9 +269,7 @@
 
 				controls.update();
 
-				stats.update();
-
-			} );
+			}
 
 			window.addEventListener( 'resize', function () {
 
