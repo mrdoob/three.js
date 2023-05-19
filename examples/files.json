@@ -309,7 +309,6 @@
 		"webgl_shadowmap_pcss",
 		"webgl_shadowmap_progressive",
 		"webgl_simple_gi",
-		"webgl_tiled_forward",
 		"webgl_worker_offscreencanvas"
 	],
 	"webgl2": [
