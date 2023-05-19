@@ -24,6 +24,8 @@ const assets = [
 	'../examples/jsm/libs/draco/gltf/draco_decoder.wasm',
 	'../examples/jsm/libs/draco/gltf/draco_wasm_wrapper.js',
 
+	'../examples/jsm/libs/meshopt_decoder.module.js',
+
 	'../examples/jsm/libs/motion-controllers.module.js',
 
 	'../examples/jsm/libs/rhino3dm/rhino3dm.wasm',
@@ -37,6 +39,7 @@ const assets = [
 	'../examples/jsm/loaders/FBXLoader.js',
 	'../examples/jsm/loaders/GLTFLoader.js',
 	'../examples/jsm/loaders/KMZLoader.js',
+	'../examples/jsm/loaders/KTX2Loader.js',
 	'../examples/jsm/loaders/IFCLoader.js',
 	'../examples/jsm/loaders/ifc/web-ifc-api.js',
 	'../examples/jsm/loaders/ifc/web-ifc.wasm',
