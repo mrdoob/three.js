@@ -1,5 +1,6 @@
 import {
 	Clock,
+	HalfFloatType,
 	Vector2,
 	WebGLRenderTarget
 } from 'three';
@@ -22,7 +23,7 @@ class EffectComposer {
 			this._width = size.width;
 			this._height = size.height;
 
-			renderTarget = new WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio );
+			renderTarget = new WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType } );
 			renderTarget.texture.name = 'EffectComposer.rt1';
 
 		} else {

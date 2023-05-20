@@ -4,6 +4,7 @@ import {
 	AddEquation,
 	SrcAlphaFactor,
 	Color,
+	HalfFloatType,
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
@@ -87,7 +88,7 @@ class SSAARenderPass extends Pass {
 
 		if ( ! this.sampleRenderTarget ) {
 
-			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height );
+			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { type: HalfFloatType } );
 			this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
 
 		}

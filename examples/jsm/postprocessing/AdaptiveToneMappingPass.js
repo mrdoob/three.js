@@ -1,4 +1,5 @@
 import {
+	HalfFloatType,
 	LinearMipmapLinearFilter,
 	MeshBasicMaterial,
 	NoBlending,
@@ -206,17 +207,17 @@ class AdaptiveToneMappingPass extends Pass {
 		}
 
 
-		this.luminanceRT = new WebGLRenderTarget( this.resolution, this.resolution );
+		this.luminanceRT = new WebGLRenderTarget( this.resolution, this.resolution, { type: HalfFloatType } );
 		this.luminanceRT.texture.name = 'AdaptiveToneMappingPass.l';
 		this.luminanceRT.texture.generateMipmaps = false;
 
-		this.previousLuminanceRT = new WebGLRenderTarget( this.resolution, this.resolution );
+		this.previousLuminanceRT = new WebGLRenderTarget( this.resolution, this.resolution, { type: HalfFloatType } );
 		this.previousLuminanceRT.texture.name = 'AdaptiveToneMappingPass.pl';
 		this.previousLuminanceRT.texture.generateMipmaps = false;
 
 		// We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
 
-		const pars = { minFilter: LinearMipmapLinearFilter, generateMipmaps: true };
+		const pars = { minFilter: LinearMipmapLinearFilter, generateMipmaps: true, type: HalfFloatType };
 
 		this.currentLuminanceRT = new WebGLRenderTarget( this.resolution, this.resolution, pars );
 		this.currentLuminanceRT.texture.name = 'AdaptiveToneMappingPass.cl';

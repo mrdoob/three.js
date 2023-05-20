@@ -2,6 +2,7 @@ import {
 	AdditiveBlending,
 	Color,
 	DoubleSide,
+	HalfFloatType,
 	Matrix4,
 	MeshDepthMaterial,
 	NoBlending,
@@ -54,26 +55,26 @@ class OutlinePass extends Pass {
 		this.prepareMaskMaterial.side = DoubleSide;
 		this.prepareMaskMaterial.fragmentShader = replaceDepthToViewZ( this.prepareMaskMaterial.fragmentShader, this.renderCamera );
 
-		this.renderTargetDepthBuffer = new WebGLRenderTarget( this.resolution.x, this.resolution.y );
+		this.renderTargetDepthBuffer = new WebGLRenderTarget( this.resolution.x, this.resolution.y, { type: HalfFloatType } );
 		this.renderTargetDepthBuffer.texture.name = 'OutlinePass.depth';
 		this.renderTargetDepthBuffer.texture.generateMipmaps = false;
 
-		this.renderTargetMaskDownSampleBuffer = new WebGLRenderTarget( resx, resy );
+		this.renderTargetMaskDownSampleBuffer = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
 		this.renderTargetMaskDownSampleBuffer.texture.name = 'OutlinePass.depthDownSample';
 		this.renderTargetMaskDownSampleBuffer.texture.generateMipmaps = false;
 
-		this.renderTargetBlurBuffer1 = new WebGLRenderTarget( resx, resy );
+		this.renderTargetBlurBuffer1 = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
 		this.renderTargetBlurBuffer1.texture.name = 'OutlinePass.blur1';
 		this.renderTargetBlurBuffer1.texture.generateMipmaps = false;
-		this.renderTargetBlurBuffer2 = new WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ) );
+		this.renderTargetBlurBuffer2 = new WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ), { type: HalfFloatType } );
 		this.renderTargetBlurBuffer2.texture.name = 'OutlinePass.blur2';
 		this.renderTargetBlurBuffer2.texture.generateMipmaps = false;
 
 		this.edgeDetectionMaterial = this.getEdgeDetectionMaterial();
-		this.renderTargetEdgeBuffer1 = new WebGLRenderTarget( resx, resy );
+		this.renderTargetEdgeBuffer1 = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
 		this.renderTargetEdgeBuffer1.texture.name = 'OutlinePass.edge1';
 		this.renderTargetEdgeBuffer1.texture.generateMipmaps = false;
-		this.renderTargetEdgeBuffer2 = new WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ) );
+		this.renderTargetEdgeBuffer2 = new WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ), { type: HalfFloatType } );
 		this.renderTargetEdgeBuffer2.texture.name = 'OutlinePass.edge2';
 		this.renderTargetEdgeBuffer2.texture.generateMipmaps = false;
 
