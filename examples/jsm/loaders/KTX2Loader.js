@@ -526,8 +526,27 @@ KTX2Loader.BasisWorker = function () {
 				for ( let layer = 0; layer < layerCount; layer ++ ) {
 
 					const levelInfo = ktx2File.getImageLevelInfo( mip, layer, face );
-					mipWidth = levelInfo.origWidth < 4 ? levelInfo.origWidth : levelInfo.width;
-					mipHeight = levelInfo.origHeight < 4 ? levelInfo.origHeight : levelInfo.height;
+
+					if ( face === 0 && mip === 0 && layer === 0 && ( levelInfo.origWidth % 4 !== 0 || levelInfo.origHeight % 4 !== 0 ) ) {
+
+						console.warn( 'THREE.KTX2Loader: ETC1S and UASTC textures should use multiple-of-four dimensions.' );
+
+					}
+
+					if ( levelCount > 1 ) {
+
+						mipWidth = levelInfo.origWidth;
+						mipHeight = levelInfo.origHeight;
+
+					} else {
+
+						// Handles non-multiple-of-four dimensions in textures without mipmaps. Textures with
+						// mipmaps must use multiple-of-four dimensions. See mrdoob/three.js#25908.
+						mipWidth = levelInfo.width;
+						mipHeight = levelInfo.height;
+
+					}
+
 					const dst = new Uint8Array( ktx2File.getImageTranscodedSizeInBytes( mip, layer, 0, transcoderFormat ) );
 					const status = ktx2File.transcodeImage( dst, mip, layer, face, transcoderFormat, 0, - 1, - 1 );
 
