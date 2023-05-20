@@ -495,7 +495,10 @@
 			"Cameras": {
 				"ArrayCamera": "api/ar/cameras/ArrayCamera",
 				"Camera": "api/ar/cameras/Camera",
-				"CubeCamera": "api/ar/cameras/CubeCamera"
+				"CubeCamera": "api/ar/cameras/CubeCamera",
+				"OrthographicCamera": "api/ar/cameras/OrthographicCamera",
+				"PerspectiveCamera": "api/ar/cameras/PerspectiveCamera",
+				"StereoCamera": "api/ar/cameras/StereoCamera"
 			}
 
 		}
