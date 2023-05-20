@@ -65,8 +65,7 @@
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
 			const ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
 
@@ -87,7 +86,6 @@
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 			renderer.toneMapping = THREE.ReinhardToneMapping;
 			document.body.appendChild( renderer.domElement );
 
@@ -103,7 +101,7 @@
 			controls.maxDistance = 100;
 			controls.addEventListener( 'change', render );
 
-			scene.add( new THREE.AmbientLight( 0x404040 ) );
+			scene.add( new THREE.AmbientLight( 0x898989 ) );
 
 			const renderScene = new RenderPass( scene, camera );
 
@@ -117,7 +115,7 @@
 			bloomComposer.addPass( renderScene );
 			bloomComposer.addPass( bloomPass );
 
-			const finalPass = new ShaderPass(
+			const mixPass = new ShaderPass(
 				new THREE.ShaderMaterial( {
 					uniforms: {
 						baseTexture: { value: null },
@@ -128,11 +126,14 @@
 					defines: {}
 				} ), 'baseTexture'
 			);
-			finalPass.needsSwap = true;
+			mixPass.needsSwap = true;
+
+			const outputPass = new ShaderPass( GammaCorrectionShader );
 
 			const finalComposer = new EffectComposer( renderer );
 			finalComposer.addPass( renderScene );
-			finalComposer.addPass( finalPass );
+			finalComposer.addPass( mixPass );
+			finalComposer.addPass( outputPass );
 
 			const raycaster = new THREE.Raycaster();
 
