@@ -12,9 +12,9 @@
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGL 2 - buffergeometry - integer attributes</div>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
-			in int textureIndex;
+			in uint textureIndex;
 
-			flat out int vIndex; // "flat" indicates that the value will not be interpolated (required for integer attributes)
+			flat out uint vIndex; // "flat" indicates that the value will not be interpolated (required for integer attributes)
 			out vec2 vUv;
 
 			void main()	{
@@ -28,7 +28,7 @@
 		</script>
 
 		<script id="fragmentShader" type="x-shader/x-fragment">
-			flat in int vIndex;
+			flat in uint vIndex;
 			in vec2 vUv;
 
 			uniform sampler2D uTextures[ 3 ];
@@ -37,9 +37,9 @@
 
 			void main()	{
 
-				if ( vIndex == 0 ) outColor = texture( uTextures[ 0 ], vUv );
-				else if ( vIndex == 1 ) outColor = texture( uTextures[ 1 ], vUv );
-				else if ( vIndex == 2 ) outColor = texture( uTextures[ 2 ], vUv );
+				if ( vIndex == 0u ) outColor = texture( uTextures[ 0 ], vUv );
+				else if ( vIndex == 1u ) outColor = texture( uTextures[ 1 ], vUv );
+				else if ( vIndex == 2u ) outColor = texture( uTextures[ 2 ], vUv );
 
 			}
 		</script>
