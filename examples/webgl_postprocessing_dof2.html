@@ -97,6 +97,7 @@
 							 r + 'posz.jpg', r + 'negz.jpg' ];
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.colorSpace = THREE.SRGBColorSpace;
 
 				scene.background = textureCube;
 
@@ -190,7 +191,7 @@
 
 				// lights
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new THREE.AmbientLight( 0x666666 ) );
 
 				const directionalLight1 = new THREE.DirectionalLight( 0xffffff, 2 );
 				directionalLight1.position.set( 2, 1.2, 10 ).normalize();

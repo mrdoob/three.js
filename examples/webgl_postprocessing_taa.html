@@ -40,9 +40,9 @@
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 			import { TAARenderPass } from 'three/addons/postprocessing/TAARenderPass.js';
-			import { CopyShader } from 'three/addons/shaders/CopyShader.js';
+			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
-			let camera, scene, renderer, composer, copyPass, taaRenderPass, renderPass;
+			let camera, scene, renderer, composer, taaRenderPass, renderPass;
 			let gui, stats;
 			let index = 0;
 
@@ -125,6 +125,7 @@
 				texture.magFilter = THREE.NearestFilter;
 				texture.anisotropy = 1;
 				texture.generateMipmaps = false;
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				const material2 = new THREE.MeshBasicMaterial( { map: texture } );
 
@@ -144,8 +145,8 @@
 				renderPass.enabled = false;
 				composer.addPass( renderPass );
 
-				copyPass = new ShaderPass( CopyShader );
-				composer.addPass( copyPass );
+				const outputPass = new ShaderPass( GammaCorrectionShader );
+				composer.addPass( outputPass );
 
 				window.addEventListener( 'resize', onWindowResize );
 

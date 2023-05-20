@@ -53,8 +53,6 @@
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 			let container, stats;
 
 			let composerScene, composer1, composer2, composer3, composer4;
@@ -301,7 +299,7 @@
 
 				const mat2 = new THREE.MeshPhongMaterial( {
 
-					color: 0x999999,
+					color: 0xcbcbcb,
 					specular: 0x080808,
 					shininess: 20,
 					map: diffuseMap,

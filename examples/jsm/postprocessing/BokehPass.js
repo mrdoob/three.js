@@ -66,7 +66,6 @@ class BokehPass extends Pass {
 		} );
 
 		this.uniforms = bokehUniforms;
-		this.needsSwap = false;
 
 		this.fsQuad = new FullScreenQuad( this.materialBokeh );
 
