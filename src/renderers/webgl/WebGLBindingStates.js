@@ -321,11 +321,6 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 		if ( integer === true ) {
 
-			// Bind unsigned integers as signed
-			if ( type === gl.UNSIGNED_BYTE ) type = gl.BYTE;
-			else if ( type === gl.UNSIGNED_SHORT ) type = gl.SHORT;
-			else if ( type === gl.UNSIGNED_INT ) type = gl.INT;
-
 			gl.vertexAttribIPointer( index, size, type, stride, offset );
 
 		} else {
