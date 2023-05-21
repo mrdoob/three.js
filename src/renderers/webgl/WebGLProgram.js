@@ -418,6 +418,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 		prefixVertex = [
 
+			'#define SHADER_NAME ' + parameters.shaderName,
+
 			customDefines
 
 		].filter( filterEmptyLine ).join( '\n' );
@@ -431,6 +433,9 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 		prefixFragment = [
 
 			customExtensions,
+
+			'#define SHADER_NAME ' + parameters.shaderName,
+
 			customDefines
 
 		].filter( filterEmptyLine ).join( '\n' );

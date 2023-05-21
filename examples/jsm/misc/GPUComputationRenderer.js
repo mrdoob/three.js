@@ -332,6 +332,7 @@ class GPUComputationRenderer {
 			uniforms = uniforms || {};
 
 			const material = new ShaderMaterial( {
+				name: 'GPUComputationShader',
 				uniforms: uniforms,
 				vertexShader: getPassThroughVertexShader(),
 				fragmentShader: computeFragmentShader
