@@ -67,7 +67,7 @@
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-			const ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
+			const BLOOM_SCENE = 1;
 
 			const bloomLayer = new THREE.Layers();
 			bloomLayer.set( BLOOM_SCENE );
@@ -142,50 +142,28 @@
 
 			const gui = new GUI();
 
-			gui.add( params, 'scene', [ 'Scene with Glow', 'Glow only', 'Scene only' ] ).onChange( function ( value ) {
-
-				switch ( value ) 	{
-
-					case 'Scene with Glow':
-						bloomComposer.renderToScreen = false;
-						break;
-					case 'Glow only':
-						bloomComposer.renderToScreen = true;
-						break;
-					case 'Scene only':
-						// nothing to do
-						break;
-
-				}
-
-				render();
-
-			} );
-
-			const folder = gui.addFolder( 'Bloom Parameters' );
-
-			folder.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
+			gui.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
 
 				outputPass.toneMappingExposure = Math.pow( value, 4.0 );
 				render();
 
 			} );
 
-			folder.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function ( value ) {
+			gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function ( value ) {
 
 				bloomPass.threshold = Number( value );
 				render();
 
 			} );
 
-			folder.add( params, 'bloomStrength', 0.0, 10.0 ).onChange( function ( value ) {
+			gui.add( params, 'bloomStrength', 0.0, 10.0 ).onChange( function ( value ) {
 
 				bloomPass.strength = Number( value );
 				render();
 
 			} );
 
-			folder.add( params, 'bloomRadius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
+			gui.add( params, 'bloomRadius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
 
 				bloomPass.radius = Number( value );
 				render();
@@ -269,42 +247,12 @@
 
 			function render() {
 
-				switch ( params.scene ) {
+				scene.traverse( darkenNonBloomed );
+				bloomComposer.render();
+				scene.traverse( restoreMaterial );
 
-					case 'Scene only':
-						renderer.render( scene, camera );
-						break;
-					case 'Glow only':
-						renderBloom( false );
-						break;
-					case 'Scene with Glow':
-					default:
-						// render scene with bloom
-						renderBloom( true );
-
-						// render the entire scene, then render bloom scene on top
-						finalComposer.render();
-						break;
-
-				}
-
-			}
-
-			function renderBloom( mask ) {
-
-				if ( mask === true ) {
-
-					scene.traverse( darkenNonBloomed );
-					bloomComposer.render();
-					scene.traverse( restoreMaterial );
-
-				} else {
-
-					camera.layers.set( BLOOM_SCENE );
-					bloomComposer.render();
-					camera.layers.set( ENTIRE_SCENE );
-
-				}
+				// render the entire scene, then render bloom scene on top
+				finalComposer.render();
 
 			}
 
