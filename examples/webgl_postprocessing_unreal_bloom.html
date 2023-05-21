@@ -49,8 +49,7 @@
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let camera, stats;
 			let composer, renderer, mixer, clock;
@@ -76,7 +75,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMapping = THREE.ReinhardToneMapping;
 				container.appendChild( renderer.domElement );
 
 				const scene = new THREE.Scene();
@@ -102,7 +100,7 @@
 				bloomPass.strength = params.bloomStrength;
 				bloomPass.radius = params.bloomRadius;
 
-				const outputPass = new ShaderPass( GammaCorrectionShader );
+				const outputPass = new OutputPass( THREE.ReinhardToneMapping );
 
 				composer = new EffectComposer( renderer );
 				composer.addPass( renderScene );
@@ -127,7 +125,7 @@
 
 				gui.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
 
-					renderer.toneMappingExposure = Math.pow( value, 4.0 );
+					outputPass.toneMappingExposure = Math.pow( value, 4.0 );
 
 				} );
 

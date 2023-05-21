@@ -65,7 +65,7 @@
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			const ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
 
@@ -74,9 +74,9 @@
 
 			const params = {
 				exposure: 1,
-				bloomStrength: 5,
+				bloomStrength: 3,
 				bloomThreshold: 0,
-				bloomRadius: 0,
+				bloomRadius: 0.5,
 				scene: 'Scene with Glow'
 			};
 
@@ -86,7 +86,6 @@
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.toneMapping = THREE.ReinhardToneMapping;
 			document.body.appendChild( renderer.domElement );
 
 			const scene = new THREE.Scene();
@@ -128,7 +127,7 @@
 			);
 			mixPass.needsSwap = true;
 
-			const outputPass = new ShaderPass( GammaCorrectionShader );
+			const outputPass = new OutputPass( THREE.ReinhardToneMapping );
 
 			const finalComposer = new EffectComposer( renderer );
 			finalComposer.addPass( renderScene );
@@ -167,7 +166,7 @@
 
 			folder.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
 
-				renderer.toneMappingExposure = Math.pow( value, 4.0 );
+				outputPass.toneMappingExposure = Math.pow( value, 4.0 );
 				render();
 
 			} );
