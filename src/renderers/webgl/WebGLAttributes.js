@@ -1,3 +1,5 @@
+import { FloatType } from '../../constants.js';
+
 function WebGLAttributes( gl, capabilities ) {
 
 	const isWebGL2 = capabilities.isWebGL2;
@@ -24,7 +26,7 @@ function WebGLAttributes( gl, capabilities ) {
 
 		} else if ( array instanceof Uint16Array ) {
 
-			if ( attribute.isFloat16BufferAttribute ) {
+			if ( attribute.isFloat16BufferAttribute || attribute.gpuType === FloatType ) {
 
 				if ( isWebGL2 ) {
 
