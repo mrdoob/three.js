@@ -73,11 +73,10 @@
 			bloomLayer.set( BLOOM_SCENE );
 
 			const params = {
-				exposure: 1,
-				bloomStrength: 3,
-				bloomThreshold: 0,
-				bloomRadius: 0.5,
-				scene: 'Scene with Glow'
+				threshold: 0,
+				strength: 3,
+				radius: 0.5,
+				exposure: 1
 			};
 
 			const darkMaterial = new THREE.MeshBasicMaterial( { color: 'black' } );
@@ -105,9 +104,9 @@
 			const renderScene = new RenderPass( scene, camera );
 
 			const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-			bloomPass.threshold = params.bloomThreshold;
-			bloomPass.strength = params.bloomStrength;
-			bloomPass.radius = params.bloomRadius;
+			bloomPass.threshold = params.threshold;
+			bloomPass.strength = params.strength;
+			bloomPass.radius = params.radius;
 
 			const bloomComposer = new EffectComposer( renderer );
 			bloomComposer.renderToScreen = false;
@@ -142,30 +141,34 @@
 
 			const gui = new GUI();
 
-			gui.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
+			const bloomFolder = gui.addFolder( 'bloom' );
 
-				outputPass.toneMappingExposure = Math.pow( value, 4.0 );
-				render();
-
-			} );
-
-			gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function ( value ) {
+			bloomFolder.add( params, 'threshold', 0.0, 1.0 ).onChange( function ( value ) {
 
 				bloomPass.threshold = Number( value );
 				render();
 
 			} );
 
-			gui.add( params, 'bloomStrength', 0.0, 10.0 ).onChange( function ( value ) {
+			bloomFolder.add( params, 'strength', 0.0, 10.0 ).onChange( function ( value ) {
 
 				bloomPass.strength = Number( value );
 				render();
 
 			} );
 
-			gui.add( params, 'bloomRadius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
+			bloomFolder.add( params, 'radius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
 
 				bloomPass.radius = Number( value );
+				render();
+
+			} );
+
+			const toneMappingFolder = gui.addFolder( 'tone mapping' );
+
+			toneMappingFolder.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
+
+				outputPass.toneMappingExposure = Math.pow( value, 4.0 );
 				render();
 
 			} );

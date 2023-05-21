@@ -55,10 +55,10 @@
 			let composer, renderer, mixer, clock;
 
 			const params = {
-				exposure: 1,
-				bloomStrength: 1.5,
-				bloomThreshold: 0,
-				bloomRadius: 0
+				threshold: 0,
+				strength: 1.5,
+				radius: 0,
+				exposure: 1
 			};
 
 			init();
@@ -96,9 +96,9 @@
 				const renderScene = new RenderPass( scene, camera );
 
 				const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-				bloomPass.threshold = params.bloomThreshold;
-				bloomPass.strength = params.bloomStrength;
-				bloomPass.radius = params.bloomRadius;
+				bloomPass.threshold = params.threshold;
+				bloomPass.strength = params.strength;
+				bloomPass.radius = params.radius;
 
 				const outputPass = new OutputPass( THREE.ReinhardToneMapping );
 
@@ -123,27 +123,31 @@
 
 				const gui = new GUI();
 
-				gui.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
+				const bloomFolder = gui.addFolder( 'bloom' );
 
-					outputPass.toneMappingExposure = Math.pow( value, 4.0 );
-
-				} );
-
-				gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function ( value ) {
+				bloomFolder.add( params, 'threshold', 0.0, 1.0 ).onChange( function ( value ) {
 
 					bloomPass.threshold = Number( value );
 
 				} );
 
-				gui.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function ( value ) {
+				bloomFolder.add( params, 'strength', 0.0, 3.0 ).onChange( function ( value ) {
 
 					bloomPass.strength = Number( value );
 
 				} );
 
-				gui.add( params, 'bloomRadius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
+				gui.add( params, 'radius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
 
 					bloomPass.radius = Number( value );
+
+				} );
+
+				const toneMappingFolder = gui.addFolder( 'tone mapping' );
+
+				toneMappingFolder.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
+
+					outputPass.toneMappingExposure = Math.pow( value, 4.0 );
 
 				} );
 
