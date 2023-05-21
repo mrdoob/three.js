@@ -1,4 +1,5 @@
 import {
+	HalfFloatType,
 	WebGLRenderTarget
 } from 'three';
 import { SSAARenderPass } from './SSAARenderPass.js';
@@ -41,14 +42,14 @@ class TAARenderPass extends SSAARenderPass {
 
 		if ( this.sampleRenderTarget === undefined ) {
 
-			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
+			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { type: HalfFloatType } );
 			this.sampleRenderTarget.texture.name = 'TAARenderPass.sample';
 
 		}
 
 		if ( this.holdRenderTarget === undefined ) {
 
-			this.holdRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, this.params );
+			this.holdRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { type: HalfFloatType } );
 			this.holdRenderTarget.texture.name = 'TAARenderPass.hold';
 
 		}
