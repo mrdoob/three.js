@@ -173,6 +173,7 @@
 					for ( const path of data.paths ) {
 
 						const fillColor = path.userData.style.fill;
+
 						if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none' ) {
 
 							const material = new THREE.MeshBasicMaterial( {
@@ -184,7 +185,9 @@
 								wireframe: guiData.fillShapesWireframe
 							} );
 
-							for ( const shape of SVGLoader.createShapes( path )) {
+							const shapes = SVGLoader.createShapes( path );
+
+							for ( const shape of shapes ) {
 
 								const geometry = new THREE.ShapeGeometry( shape );
 								const mesh = new THREE.Mesh( geometry, material );
