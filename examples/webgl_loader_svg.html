@@ -154,17 +154,15 @@
 
 				loader.load( url, function ( data ) {
 
-					const paths = data.paths;
-
 					const group = new THREE.Group();
 					group.scale.multiplyScalar( 0.25 );
 					group.position.x = - 70;
 					group.position.y = 70;
 					group.scale.y *= - 1;
 
-					for ( let i = 0; i < paths.length; i ++ ) {
+					let renderOrder = 0;
 
-						const path = paths[ i ];
+					for ( const path of data.paths ) {
 
 						const fillColor = path.userData.style.fill;
 						if ( guiData.drawFillShapes && fillColor !== undefined && fillColor !== 'none' ) {
@@ -178,14 +176,11 @@
 								wireframe: guiData.fillShapesWireframe
 							} );
 
-							const shapes = SVGLoader.createShapes( path );
-
-							for ( let j = 0; j < shapes.length; j ++ ) {
-
-								const shape = shapes[ j ];
+							for ( const shape of SVGLoader.createShapes( path ) ) {
 
 								const geometry = new THREE.ShapeGeometry( shape );
 								const mesh = new THREE.Mesh( geometry, material );
+								mesh.renderOrder = renderOrder ++;
 
 								group.add( mesh );
 
@@ -206,15 +201,14 @@
 								wireframe: guiData.strokesWireframe
 							} );
 
-							for ( let j = 0, jl = path.subPaths.length; j < jl; j ++ ) {
-
-								const subPath = path.subPaths[ j ];
+							for ( const subPath of path.subPaths ) {
 
 								const geometry = SVGLoader.pointsToStroke( subPath.getPoints(), path.userData.style );
 
 								if ( geometry ) {
 
 									const mesh = new THREE.Mesh( geometry, material );
+									mesh.renderOrder = renderOrder ++;
 
 									group.add( mesh );
 
@@ -240,6 +234,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				render();
 
 			}
 
