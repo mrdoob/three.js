@@ -106,7 +106,11 @@ function onDocumentLoad() {
 
 	// handle code snippets formatting
 
-	for ( const el of document.getElementsByTagName( 'code' ) ) {
+	const elements = document.getElementsByTagName( 'code' );
+
+	for ( let i = 0; i < elements.length; i ++ ) {
+
+		const el = elements[ i ];
 
 		// ignores singleline text
 		const lines = el.textContent.split( '\n' );
