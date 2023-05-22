@@ -26115,9 +26115,6 @@ class WebXRManager extends EventDispatcher {
 		const controllers = [];
 		const controllerInputSources = [];
 
-		const planes = new Set();
-		const planesLastChangedTimes = new Map();
-
 		//
 
 		let userCamera = null;
@@ -26726,12 +26723,6 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
-		this.getPlanes = function () {
-
-			return planes;
-
-		};
-
 		// Animation Loop
 
 		let onAnimationFrameCallback = null;
@@ -26845,60 +26836,7 @@ class WebXRManager extends EventDispatcher {
 
 			if ( frame.detectedPlanes ) {
 
-				scope.dispatchEvent( { type: 'planesdetected', data: frame.detectedPlanes } );
-
-				let planesToRemove = null;
-
-				for ( const plane of planes ) {
-
-					if ( ! frame.detectedPlanes.has( plane ) ) {
-
-						if ( planesToRemove === null ) {
-
-							planesToRemove = [];
-
-						}
-
-						planesToRemove.push( plane );
-
-					}
-
-				}
-
-				if ( planesToRemove !== null ) {
-
-					for ( const plane of planesToRemove ) {
-
-						planes.delete( plane );
-						planesLastChangedTimes.delete( plane );
-						scope.dispatchEvent( { type: 'planeremoved', data: plane } );
-
-					}
-
-				}
-
-				for ( const plane of frame.detectedPlanes ) {
-
-					if ( ! planes.has( plane ) ) {
-
-						planes.add( plane );
-						planesLastChangedTimes.set( plane, frame.lastChangedTime );
-						scope.dispatchEvent( { type: 'planeadded', data: plane } );
-
-					} else {
-
-						const lastKnownTime = planesLastChangedTimes.get( plane );
-
-						if ( plane.lastChangedTime > lastKnownTime ) {
-
-							planesLastChangedTimes.set( plane, plane.lastChangedTime );
-							scope.dispatchEvent( { type: 'planechanged', data: plane } );
-
-						}
-
-					}
-
-				}
+				scope.dispatchEvent( { type: 'planesdetected', data: frame } );
 
 			}
 
