@@ -164,6 +164,7 @@ class ViewHelper extends Object3D {
 
 			if ( this.animating === true ) return false;
 			
+			const rect = domElement.getBoundingClientRect();
 			const offsetX = rect.left + ( domElement.offsetWidth - dim );
 			const offsetY = rect.top + ( domElement.offsetHeight - dim );
 			mouse.x = ( ( event.clientX - offsetX ) / ( rect.right - offsetX ) ) * 2 - 1;
