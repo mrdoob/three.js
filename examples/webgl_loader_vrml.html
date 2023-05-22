@@ -35,8 +35,6 @@
 			import { VRMLLoader } from 'three/addons/loaders/VRMLLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let camera, scene, renderer, stats, controls, loader;
 
 			const params = {
@@ -74,10 +72,10 @@
 
 				// light
 
-				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
-				scene.add( hemiLight );
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.4 );
+				scene.add( ambientLight );
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.6 );
 				dirLight.position.set( 200, 200, 200 );
 				scene.add( dirLight );
 
@@ -87,7 +85,6 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

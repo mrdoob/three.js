@@ -28,6 +28,7 @@ import {
 	Scene,
 	ShapeUtils,
 	SphereGeometry,
+	SRGBColorSpace,
 	TextureLoader,
 	Vector2,
 	Vector3
@@ -1370,6 +1371,7 @@ class VRMLLoader extends Loader {
 						}
 
 						texture = new DataTexture( data, width, height );
+						texture.colorSpace = SRGBColorSpace;
 						texture.needsUpdate = true;
 						texture.__type = textureType; // needed for material modifications
 						break;
@@ -1442,6 +1444,7 @@ class VRMLLoader extends Loader {
 
 				texture.wrapS = wrapS;
 				texture.wrapT = wrapT;
+				texture.colorSpace = SRGBColorSpace;
 
 			}
 
@@ -1700,6 +1703,8 @@ class VRMLLoader extends Loader {
 
 				}
 
+				convertColorsToLinearSRGB( colorAttribute );
+
 			}
 
 			if ( normal ) {
@@ -1901,6 +1906,8 @@ class VRMLLoader extends Loader {
 
 				}
 
+				convertColorsToLinearSRGB( colorAttribute );
+
 			}
 
 			//
@@ -1966,7 +1973,15 @@ class VRMLLoader extends Loader {
 			const geometry = new BufferGeometry();
 
 			geometry.setAttribute( 'position', new Float32BufferAttribute( coord, 3 ) );
-			if ( color ) geometry.setAttribute( 'color', new Float32BufferAttribute( color, 3 ) );
+
+			if ( color ) {
+
+				const colorAttribute = new Float32BufferAttribute( color, 3 );
+				convertColorsToLinearSRGB( colorAttribute );
+
+				geometry.setAttribute( 'color', colorAttribute );
+
+			}
 
 			geometry._type = 'points';
 
@@ -2379,6 +2394,8 @@ class VRMLLoader extends Loader {
 					colorAttribute = toNonIndexedAttribute( indices, new Float32BufferAttribute( colors, 3 ) );
 
 				}
+
+				convertColorsToLinearSRGB( colorAttribute );
 
 			}
 
@@ -3067,6 +3084,21 @@ class VRMLLoader extends Loader {
 
 		}
 
+		function convertColorsToLinearSRGB( attribute ) {
+
+			const color = new Color();
+
+			for ( let i = 0; i < attribute.count; i ++ ) {
+
+				color.fromBufferAttribute( attribute, i );
+				color.convertSRGBToLinear();
+
+				attribute.setXYZ( i, color.r, color.g, color.b );
+
+			}
+
+		}
+
 		/**
 		 * Vertically paints the faces interpolating between the
 		 * specified colors at the specified angels. This is used for the Background
@@ -3164,7 +3196,7 @@ class VRMLLoader extends Loader {
 				const colorA = colors[ thresholdIndexA ];
 				const colorB = colors[ thresholdIndexB ];
 
-				color.copy( colorA ).lerp( colorB, t );
+				color.copy( colorA ).lerp( colorB, t ).convertSRGBToLinear();
 
 				colorAttribute.setXYZ( index, color.r, color.g, color.b );
 
