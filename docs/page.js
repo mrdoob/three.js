@@ -106,16 +106,22 @@ function onDocumentLoad() {
 
 	// handle code snippets formatting
 
-	const elements = document.getElementsByTagName( 'code' );
+	for ( const el of document.getElementsByTagName( 'code' ) ) {
 
-	for ( let i = 0; i < elements.length; i ++ ) {
+		// ignores singleline text
+		const lines = el.textContent.split( '\n' );
+		if ( lines.length <= 1 ) continue;
 
-		const element = elements[ i ];
+		// ignores blank text
+		const nonBlankLine = lines.filter( l => l.trim() )[ 0 ];
+		if ( nonBlankLine === undefined ) continue;
 
-		text = element.textContent.trim();
-		text = text.replace( /^\t\t/gm, '' );
+		// strips indents if any
+		const m = nonBlankLine.match( /^([\t ]+)/ );
+		if ( m ) el.textContent = lines.map( l => l.startsWith( m[ 1 ] ) ? l.substring( m[ 1 ].length ) : l ).join( '\n' );
 
-		element.textContent = text;
+		// strips leading and trailing whitespaces finally
+		el.textContent = el.textContent.trim();
 
 	}
 
