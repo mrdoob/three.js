@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>ثوابت معادلات الدمج المخصصة (Custom Blending Equation Constants)</h1>
+
+		<p>
+			تعمل هذه الثوابت مع جميع أنواع المواد. يتم تعيين وضع الدمج للمادة أولاً إلى THREE.CustomBlending، ثم تعيين معادلة الدمج المطلوبة وعامل المصدر وعامل الوجهة.
+		</p>
+
+		<h2>مثال للكود</h2>
+
+		<code>
+		const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+		material.blending = THREE.CustomBlending; 
+		material.blendEquation = THREE.AddEquation; //default 
+		material.blendSrc = THREE.SrcAlphaFactor;  //default 
+		material.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+		</code>
+
+		<h2>أمثلة (Examples)</h2>
+		<p>
+			[example:webgl_materials_blending_custom materials / blending / custom ]
+
+		</p>
+
+		<h2>معادلات الدمج (Blending Equations)</h2>
+		<code>
+		THREE.AddEquation 
+		THREE.SubtractEquation 
+		THREE.ReverseSubtractEquation
+		THREE.MinEquation 
+		THREE.MaxEquation
+		</code>
+
+		<h2>عوامل المصدر (Source Factors)</h2>
+		<code>
+		THREE.ZeroFactor 
+		THREE.OneFactor 
+		THREE.SrcColorFactor
+		THREE.OneMinusSrcColorFactor 
+		THREE.SrcAlphaFactor
+		THREE.OneMinusSrcAlphaFactor 
+		THREE.DstAlphaFactor
+		THREE.OneMinusDstAlphaFactor 
+		THREE.DstColorFactor
+		THREE.OneMinusDstColorFactor 
+		THREE.SrcAlphaSaturateFactor
+		</code>
+
+		<h2>عوامل الوجهة (Destination Factors)</h2>
+		<p>
+			جميع عوامل المصدر صالحة كعوامل وجهة، باستثناء
+			<code>THREE.SrcAlphaSaturateFactor</code>
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>
