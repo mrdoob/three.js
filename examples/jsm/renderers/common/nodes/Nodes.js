@@ -242,7 +242,7 @@ class Nodes extends DataMap {
 
 				} else {
 
-					console.error( 'WebGPUNodes: Unsupported environment configuration.', environment );
+					console.error( 'Nodes: Unsupported environment configuration.', environment );
 
 				}
 
