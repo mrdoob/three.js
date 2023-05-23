@@ -63,7 +63,6 @@ const exceptionList = [
 	'webgl_effects_ascii',
 	'webgl_loader_pdb',
 	'webgl_multiple_elements_text',
-	'webgl_shaders_tonemapping',
 
 	// Unknown
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime

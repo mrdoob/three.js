@@ -202,7 +202,6 @@
 		"webgl_shader_lava",
 		"webgl_shaders_ocean",
 		"webgl_shaders_sky",
-		"webgl_shaders_tonemapping",
 		"webgl_shadow_contact",
 		"webgl_shadowmap",
 		"webgl_shadowmap_performance",

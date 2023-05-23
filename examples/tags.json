@@ -69,7 +69,6 @@
 	"webgl_rtt": [ "renderTarget", "texture" ],
 	"webgl_shaders_ocean": [ "water" ],
 	"webgl_shaders_sky": [ "sun" ],
-	"webgl_shaders_tonemapping": [ "hrd" ],
 	"webgl_shadow_contact": [ "onBeforeCompile", "soft" ],
 	"webgl_shadowmap_viewer": [ "directional", "spot" ],
 	"webgl_tonemapping": [ "gltf" ],
