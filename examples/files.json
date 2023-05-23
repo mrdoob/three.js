@@ -207,7 +207,6 @@
 		"webgl_rtt",
 		"webgl_shader",
 		"webgl_shader_lava",
-		"webgl_shader2",
 		"webgl_shaders_ocean",
 		"webgl_shaders_sky",
 		"webgl_shaders_tonemapping",
