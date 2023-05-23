@@ -20,7 +20,6 @@ import {
 	RepeatWrapping,
 	Scene,
 	Source,
-	sRGBEncoding,
 	CompressedTexture,
 	Vector3
 } from 'three';
