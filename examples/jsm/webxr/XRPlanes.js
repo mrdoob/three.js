@@ -12,7 +12,6 @@ class XRPlanes extends Object3D {
 
 		super();
 
-		const geometry = new BoxGeometry();
 		const matrix = new Matrix4();
 
 		const currentPlanes = new Map();
@@ -26,14 +25,19 @@ class XRPlanes extends Object3D {
 
 			const referenceSpace = xr.getReferenceSpace();
 
+			let planeschanged = false;
+
 			for ( const [ plane, mesh ] of currentPlanes ) {
 
 				if ( planes.has( plane ) === false ) {
 
+					mesh.geometry.dispose();
 					mesh.material.dispose();
 					this.remove( mesh );
 
 					currentPlanes.delete( plane );
+
+					planeschanged = true;
 
 				}
 
@@ -65,17 +69,25 @@ class XRPlanes extends Object3D {
 					const width = maxX - minX;
 					const height = maxZ - minZ;
 
+					const geometry = new BoxGeometry( width, 0.01, height );
 					const material = new MeshBasicMaterial( { color: 0xffffff * Math.random() } );
 
 					const mesh = new Mesh( geometry, material );
 					mesh.position.setFromMatrixPosition( matrix );
 					mesh.quaternion.setFromRotationMatrix( matrix );
-					mesh.scale.set( width, 0.01, height );
 					this.add( mesh );
 
 					currentPlanes.set( plane, mesh );
 
+					planeschanged = true;
+
 				}
+
+			}
+
+			if ( planeschanged ) {
+
+				this.dispatchEvent( { type: 'planeschanged' } );
 
 			}
 
