@@ -24,35 +24,31 @@ The aim of the project is to create an easy to use, lightweight, cross-browser, 
 This code creates a scene, a camera, and a geometric cube, and it adds the cube to the scene. It then creates a `WebGL` renderer for the scene and camera, and it adds that viewport to the `document.body` element. Finally, it animates the cube within the scene for the camera.
 
 ```javascript
-import * as THREE from 'three';
+import * as THREE from 'three'; // Importing three.js
 
-// init
-
-const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+// Initialization
+const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 ); //Setting up camera
 camera.position.z = 1;
 
 const scene = new THREE.Scene();
 
-const geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
-const material = new THREE.MeshNormalMaterial();
-
+const box_geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+const box_material = new THREE.MeshNormalMaterial();
 const mesh = new THREE.Mesh( geometry, material );
+
 scene.add( mesh );
 
-const renderer = new THREE.WebGLRenderer( { antialias: true } );
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize( window.innerWidth, window.innerHeight );
-renderer.setAnimationLoop( animation );
+renderer.setAnimationLoop( animation ); // Sets the animation loop for the renderer
 document.body.appendChild( renderer.domElement );
 
-// animation
-
+// Animation
 function animation( time ) {
+    mesh.rotation.x = time / 2000;
+    mesh.rotation.y = time / 1000;
 
-	mesh.rotation.x = time / 2000;
-	mesh.rotation.y = time / 1000;
-
-	renderer.render( scene, camera );
-
+    renderer.render( scene, camera );
 }
 ```
 
@@ -60,7 +56,7 @@ If everything went well, you should see [this](https://jsfiddle.net/7u84j6kp/).
 
 ### Cloning this repository
 
-Cloning the repo with all its history results in a ~2 GB download. If you don't need the whole history you can use the `depth` parameter to significantly reduce download size.
+Cloning the repo with all its history results in a `~2 GB` download. If you don't need the whole history you can use the `depth` parameter to significantly reduce download size:
 
 ```sh
 git clone --depth=1 https://github.com/mrdoob/three.js.git
@@ -81,4 +77,3 @@ git clone --depth=1 https://github.com/mrdoob/three.js.git
 [deepscan-url]: https://deepscan.io/dashboard#view=project&tid=16600&pid=19901&bid=525701
 [discord]: https://img.shields.io/discord/685241246557667386
 [discord-url]: https://discord.gg/56GBJwAnUS
-
