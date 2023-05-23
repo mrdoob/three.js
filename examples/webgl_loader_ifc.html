@@ -29,7 +29,7 @@
 					"three/examples/jsm/utils/BufferGeometryUtils": "./jsm/utils/BufferGeometryUtils.js",
 					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.5.23/build/index.module.js",
 					"web-ifc": "https://unpkg.com/web-ifc@0.0.36/web-ifc-api.js",
-					"web-ifc-three": "https://unpkg.com/web-ifc-three@0.0.122/IFCLoader.js"
+					"web-ifc-three": "https://unpkg.com/web-ifc-three@0.0.125/IFCLoader.js"
 				}
 			}
 		</script>
@@ -41,8 +41,6 @@
 
 			import { IFCLoader } from 'web-ifc-three';
 			import { IFCSPACE } from 'web-ifc';
-
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
 
 			let scene, camera, renderer;
 
@@ -99,7 +97,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				//Controls
