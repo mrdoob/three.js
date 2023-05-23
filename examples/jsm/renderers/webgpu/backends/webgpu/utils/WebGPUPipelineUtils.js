@@ -508,7 +508,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPURenderer: Unknown Material.side value.', material.side );
+				console.error( 'THREE.WebGPUPipelineUtils: Unknown material.side value.', material.side );
 				break;
 
 		}
