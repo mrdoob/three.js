@@ -230,7 +230,7 @@ class WebGPUAttributeUtils {
 
 		if ( ! format ) {
 
-			console.error( 'THREE.WebGPURenderer: Vertex format not supported yet.' );
+			console.error( 'THREE.WebGPUAttributeUtils: Vertex format not supported yet.' );
 
 		}
 
