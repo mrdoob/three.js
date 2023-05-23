@@ -143,8 +143,8 @@ class Pipelines extends DataMap {
 
 		super.dispose();
 
-		this.caches.clear();
-		this.shaderModules = {
+		this.caches = new Map();
+		this.programs = {
 			vertex: new Map(),
 			fragment: new Map(),
 			compute: new Map()
