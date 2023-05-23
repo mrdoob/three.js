@@ -401,7 +401,7 @@ class Renderer {
 
 		if ( x.isVector4 ) {
 
-			scissor.set( x.x, x.y, x.z, x.w );
+			scissor.copy( x );
 
 		} else {
 
