@@ -570,7 +570,7 @@ class WebGPUPipelineUtils {
 					break;
 
 				default:
-					console.error( 'THREE.WebGPURenderer: Invalid depth function.', depthFunc );
+					console.error( 'THREE.WebGPUPipelineUtils: Invalid depth function.', depthFunc );
 
 			}
 
