@@ -72,7 +72,6 @@ const exceptionList = [
 	'webgl_buffergeometry_glbufferattribute',
 	'webgl_clipping_advanced',
 	'webgl_lensflares',
-	'webgl_lines_sphere',
 	'webgl_lights_spotlights',
 	'webgl_loader_imagebitmap',
 	'webgl_loader_texture_lottie',
