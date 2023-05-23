@@ -96,7 +96,7 @@ class Renderer {
 
 		if ( this._initialized ) {
 
-			throw new Error( 'WebGPURenderer: Device has already been initialized.' );
+			throw new Error( 'Renderer: Backend has already been initialized.' );
 
 		}
 
