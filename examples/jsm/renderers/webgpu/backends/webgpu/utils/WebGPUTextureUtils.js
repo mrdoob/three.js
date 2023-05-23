@@ -213,7 +213,7 @@ class WebGPUTextureUtils {
 
 		} else {
 
-			console.warn( 'WebGPUTexture: Unable to update texture.' );
+			console.warn( 'WebGPUTextureUtils: Unable to update texture.' );
 
 		}
 
