@@ -218,7 +218,7 @@ class WebGPUAttributeUtils {
 
 				if ( paddedItemSize % 1 ) {
 
-					throw new Error( 'THREE.WebGPURenderer: Bad vertex format item size.' );
+					throw new Error( 'THREE.WebGPUAttributeUtils: Bad vertex format item size.' );
 
 				}
 
