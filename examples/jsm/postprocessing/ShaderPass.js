@@ -24,7 +24,7 @@ class ShaderPass extends Pass {
 
 			this.material = new ShaderMaterial( {
 
-				name: ( shader.name !== undefined ) ? shader.name : shader.type,
+				name: shader.name,
 				defines: Object.assign( {}, shader.defines ),
 				uniforms: this.uniforms,
 				vertexShader: shader.vertexShader,

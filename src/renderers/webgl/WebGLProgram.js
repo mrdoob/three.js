@@ -418,6 +418,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 		prefixVertex = [
 
+			'#define SHADER_TYPE ' + parameters.shaderType,
 			'#define SHADER_NAME ' + parameters.shaderName,
 
 			customDefines
@@ -434,6 +435,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			customExtensions,
 
+			'#define SHADER_TYPE ' + parameters.shaderType,
 			'#define SHADER_NAME ' + parameters.shaderName,
 
 			customDefines
@@ -452,6 +454,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			generatePrecision( parameters ),
 
+			'#define SHADER_TYPE ' + parameters.shaderType,
 			'#define SHADER_NAME ' + parameters.shaderName,
 
 			customDefines,
@@ -665,6 +668,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			generatePrecision( parameters ),
 
+			'#define SHADER_TYPE ' + parameters.shaderType,
 			'#define SHADER_NAME ' + parameters.shaderName,
 
 			customDefines,
@@ -963,6 +967,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 	//
 
+	this.type = parameters.shaderType;
 	this.name = parameters.shaderName;
 	this.id = programIdCount ++;
 	this.cacheKey = cacheKey;
