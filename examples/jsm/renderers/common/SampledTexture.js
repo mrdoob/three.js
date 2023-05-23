@@ -21,7 +21,7 @@ class SampledTexture extends Binding {
 
 		const { texture, version } = this;
 
-		return texture.isVideoTexture ? true : version !== texture.version; // version === 0 && texture.version > 0
+		return texture.isVideoTexture ? true : version !== texture.version; // @TODO: version === 0 && texture.version > 0 ( need add it just to External Textures like PNG,JPG )
 
 	}
 
