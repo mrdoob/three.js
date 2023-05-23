@@ -2,18 +2,18 @@ class DataMap {
 
 	constructor() {
 
-		this.datas = new WeakMap();
+		this.data = new WeakMap();
 
 	}
 
 	get( object ) {
 
-		let map = this.datas.get( object );
+		let map = this.data.get( object );
 
 		if ( map === undefined ) {
 
 			map = {};
-			this.datas.set( object, map );
+			this.data.set( object, map );
 
 		}
 
@@ -25,11 +25,11 @@ class DataMap {
 
 		let map;
 
-		if ( this.datas.has( object ) ) {
+		if ( this.data.has( object ) ) {
 
-			map = this.datas.get( object );
+			map = this.data.get( object );
 
-			this.datas.delete( object );
+			this.data.delete( object );
 
 		}
 
@@ -39,13 +39,13 @@ class DataMap {
 
 	has( object ) {
 
-		return this.datas.has( object );
+		return this.data.has( object );
 
 	}
 
 	dispose() {
 
-		this.datas.clear();
+		this.data.clear();
 
 	}
 
