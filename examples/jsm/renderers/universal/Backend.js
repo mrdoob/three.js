@@ -8,7 +8,7 @@ class Backend {
 	constructor( parameters = {} ) {
 
 		this.parameters = Object.assign( {}, parameters );
-		this.properties = new WeakMap();
+		this.datas = new WeakMap();
 		this.renderer = null;
 		this.domElement = null;
 
@@ -136,12 +136,12 @@ class Backend {
 
 	get( object ) {
 
-		let map = this.properties.get( object );
+		let map = this.datas.get( object );
 
 		if ( map === undefined ) {
 
 			map = {};
-			this.properties.set( object, map );
+			this.datas.set( object, map );
 
 		}
 
@@ -151,7 +151,7 @@ class Backend {
 
 	delete( object ) {
 
-		this.properties.delete( object );
+		this.datas.delete( object );
 
 	}
 

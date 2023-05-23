@@ -22,25 +22,25 @@ const typeArraysToVertexFormatPrefixForItemSize1 = new Map( [
 
 class WebGPUAttributeUtils {
 
-    constructor( backend ) {
+	constructor( backend ) {
 
-        this.backend = backend;
+		this.backend = backend;
 
-    }
+	}
 
-    createAttribute( attribute, usage ) {
+	createAttribute( attribute, usage ) {
 
-        const bufferAttribute = this.getBufferAttribute( attribute );
+		const bufferAttribute = this._getBufferAttribute( attribute );
 
-        const backend = this.backend;
-        const device = backend.device;
+		const backend = this.backend;
+		const device = backend.device;
 
 		const array = bufferAttribute.array;
 		const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
 
 		const buffer = device.createBuffer( {
 			label: bufferAttribute.name,
-			size : size,
+			size: size,
 			usage: usage,
 			mappedAtCreation: true
 		} );
@@ -53,22 +53,14 @@ class WebGPUAttributeUtils {
 
 	}
 
-    getBufferAttribute( attribute ) {
+	updateAttribute( attribute ) {
 
-		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+		const bufferAttribute = this._getBufferAttribute( attribute );
 
-		return attribute;
+		const backend = this.backend;
+		const device = backend.device;
 
-	}
-
-    updateAttribute( attribute ) { 
-
-        const bufferAttribute = this.getBufferAttribute( attribute );
-
-        const backend = this.backend;
-        const device = backend.device;
-
-        const buffer = backend.get( bufferAttribute ).buffer;
+		const buffer = backend.get( attribute ).buffer;
 
 		const array = bufferAttribute.array;
 		const updateRange = bufferAttribute.updateRange;
@@ -98,9 +90,9 @@ class WebGPUAttributeUtils {
 
 		}
 
-    }
+	}
 
-    createShaderAttributes( renderObject ) {
+	createShaderAttributes( renderObject ) {
 
 		const attributes = renderObject.getAttributes();
 		const shaderAttributes = [];
@@ -110,7 +102,7 @@ class WebGPUAttributeUtils {
 			const geometryAttribute = attributes[ slot ];
 			const bytesPerElement = geometryAttribute.array.BYTES_PER_ELEMENT;
 
-			const format = this.getVertexFormat( geometryAttribute );
+			const format = this._getVertexFormat( geometryAttribute );
 
 			let arrayStride = geometryAttribute.itemSize * bytesPerElement;
 			let offset = 0;
@@ -138,7 +130,70 @@ class WebGPUAttributeUtils {
 
 	}
 
-    getVertexFormat( geometryAttribute ) {
+	destroyAttribute( attribute ) {
+
+		const backend = this.backend;
+		const data = backend.get( attribute );
+
+		data.buffer.destroy();
+
+		backend.delete( attribute );
+
+	}
+
+	async getArrayBuffer( attribute ) {
+
+		const backend = this.backend;
+		const device = backend.device;
+
+		const data = backend.get( attribute );
+
+		//const bufferAttribute = this._getBufferAttribute( attribute );
+
+		const bufferGPU = data.buffer;
+		const size = bufferGPU.size;
+
+		let readBufferGPU = data.readBuffer;
+		let needsUnmap = true;
+
+		if ( readBufferGPU === undefined ) {
+
+			readBufferGPU = device.createBuffer( {
+				label: attribute.name,
+				size,
+				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+			} );
+
+			needsUnmap = false;
+
+			data.readBuffer = readBufferGPU;
+
+		}
+
+		const cmdEncoder = device.createCommandEncoder( {} );
+
+		cmdEncoder.copyBufferToBuffer(
+			bufferGPU,
+			0,
+			readBufferGPU,
+			0,
+			size
+		);
+
+		if ( needsUnmap ) readBufferGPU.unmap();
+
+		const gpuCommands = cmdEncoder.finish();
+		device.queue.submit( [ gpuCommands ] );
+
+		await readBufferGPU.mapAsync( GPUMapMode.READ );
+
+		const arrayBuffer = readBufferGPU.getMappedRange();
+
+		return arrayBuffer;
+
+	}
+
+	_getVertexFormat( geometryAttribute ) {
 
 		const { itemSize, normalized } = geometryAttribute;
 		const ArrayType = geometryAttribute.array.constructor;
@@ -180,6 +235,14 @@ class WebGPUAttributeUtils {
 		}
 
 		return format;
+
+	}
+
+	_getBufferAttribute( attribute ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+
+		return attribute;
 
 	}
 

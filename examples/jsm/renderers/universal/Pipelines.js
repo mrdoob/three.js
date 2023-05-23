@@ -14,7 +14,7 @@ class Pipelines extends DataMap {
 
 		this.bindings = null; // set by the bindings
 
-		this.pipelines = new Map();
+		this.caches = new Map();
 		this.programs = {
 			vertex: new Map(),
 			fragment: new Map(),
@@ -23,17 +23,11 @@ class Pipelines extends DataMap {
 
 	}
 
-	has( object ) {
-
-		return this.pipelines.get( object ) !== undefined;
-
-	}
-
 	getForCompute( computeNode ) {
 
 		const { backend } = this;
 
-		let data = this.get( computeNode );
+		const data = this.get( computeNode );
 
 		if ( data.pipeline === undefined ) {
 
@@ -60,7 +54,7 @@ class Pipelines extends DataMap {
 
 			// determine compute pipeline
 
-			const pipeline = this._getComputePipeline( computeNode, stageCompute );
+			const pipeline = this._getComputePipeline( stageCompute );
 
 			// keep track of all used times
 
@@ -81,7 +75,7 @@ class Pipelines extends DataMap {
 
 		const { backend } = this;
 
-		let data = this.get( renderObject );
+		const data = this.get( renderObject );
 
 		if ( this._needsUpdate( renderObject ) ) {
 
@@ -137,9 +131,11 @@ class Pipelines extends DataMap {
 
 	}
 
-	remove( object ) {
+	delete( object ) {
 
 		this._releasePipeline( object );
+
+		super.delete( object );
 
 	}
 
@@ -147,7 +143,7 @@ class Pipelines extends DataMap {
 
 		super.dispose();
 
-		this.pipelines = new Map();
+		this.caches.clear();
 		this.shaderModules = {
 			vertex: new Map(),
 			fragment: new Map(),
@@ -156,19 +152,19 @@ class Pipelines extends DataMap {
 
 	}
 
-	_getComputePipeline( computeNode, stageCompute ) {
+	_getComputePipeline( stageCompute ) {
 
 		// check for existing pipeline
 
 		const cacheKey = 'compute:' + stageCompute.id;
 
-		let pipeline = this.pipelines.get( cacheKey );
+		let pipeline = this.caches.get( cacheKey );
 
 		if ( pipeline === undefined ) {
 
 			pipeline = new ComputePipeline( cacheKey, stageCompute );
-			this.pipelines.set( cacheKey, computeNode );
-			this.pipelines.set( computeNode, pipeline );
+
+			this.caches.set( cacheKey, pipeline );
 
 			this.backend.createComputePipeline( pipeline );
 
@@ -184,13 +180,13 @@ class Pipelines extends DataMap {
 
 		const cacheKey = this._getRenderCacheKey( renderObject, stageVertex, stageFragment );
 
-		let pipeline = this.pipelines.get( cacheKey );
+		let pipeline = this.caches.get( cacheKey );
 
 		if ( pipeline === undefined ) {
 
 			pipeline = new RenderPipeline( cacheKey, stageVertex, stageFragment );
-			this.pipelines.set( cacheKey, pipeline );
-			this.pipelines.set( pipeline, cacheKey );
+
+			this.caches.set( cacheKey, pipeline );
 
 			renderObject.pipeline = pipeline;
 
@@ -232,19 +228,13 @@ class Pipelines extends DataMap {
 
 	_releasePipeline( object ) {
 
-		const data = this.get( object );
+		const pipeline = this.get( object ).pipeline;
 
-		const pipeline = data.pipeline;
-		delete data.pipeline;
-
-		this.bindings.delete( object );
+		//this.bindings.delete( object );
 
 		if ( pipeline && -- pipeline.usedTimes === 0 ) {
 
-			const cacheKey = this.pipelines.get( pipeline );
-
-			this.pipelines.delete( cacheKey );
-			this.pipelines.delete( pipeline );
+			this.caches.delete( pipeline.cacheKey );
 
 			if ( pipeline.isComputePipeline ) {
 

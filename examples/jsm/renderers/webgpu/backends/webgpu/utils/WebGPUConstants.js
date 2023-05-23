@@ -214,6 +214,12 @@ export const GPUAddressMode = {
 	MirrorRepeat: 'mirror-repeat'
 };
 
+export const GPUSamplerBindingType = {
+	Filtering: 'filtering',
+	NonFiltering: 'non-filtering',
+	Comparison: 'comparison'
+};
+
 export const GPUFilterMode = {
 	Linear: 'linear',
 	Nearest: 'nearest'

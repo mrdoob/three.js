@@ -20,9 +20,9 @@ class RenderObjects extends ChainMap {
 
 	get( object, material, scene, camera, lightsNode ) {
 
-		const chainKey = [ object, material, scene, camera, lightsNode ];
+		const chainArray = [ object, material, scene, camera, lightsNode ];
 
-		let renderObject = super.get( chainKey );
+		let renderObject = super.get( chainArray );
 
 		if ( renderObject === undefined ) {
 
@@ -30,7 +30,7 @@ class RenderObjects extends ChainMap {
 
 			this._initRenderObject( renderObject );
 
-			this.set( chainKey, renderObject );
+			this.set( chainArray, renderObject );
 
 		} else {
 
@@ -67,6 +67,7 @@ class RenderObjects extends ChainMap {
 		if ( data.initialized !== true ) {
 
 			data.initialized = true;
+			data.cacheKey = renderObject.getCacheKey();
 
 			const onDispose = () => {
 
@@ -75,7 +76,7 @@ class RenderObjects extends ChainMap {
 				this.pipelines.delete( renderObject );
 				this.nodes.delete( renderObject );
 
-				this.delete( chainKey );
+				this.delete( renderObject.getChainArray() );
 
 			};
 

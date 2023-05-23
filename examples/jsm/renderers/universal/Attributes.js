@@ -1,6 +1,6 @@
 import DataMap from './DataMap.js';
 import { AttributeType } from './Constants.js';
-import { DynamicDrawUsage } from "three";
+import { DynamicDrawUsage } from 'three';
 
 class Attributes extends DataMap {
 
@@ -14,9 +14,9 @@ class Attributes extends DataMap {
 
 	delete( attribute ) {
 
-		const data = this.delete( attribute );
+		const attributeData = super.delete( attribute );
 
-		if ( data !== undefined ) {
+		if ( attributeData !== undefined ) {
 
 			this.backend.destroyAttribute( attribute );
 
@@ -26,7 +26,7 @@ class Attributes extends DataMap {
 
 	update( attribute, type ) {
 
-		let data = this.get( attribute );
+		const data = this.get( attribute );
 
 		if ( data.version === undefined ) {
 

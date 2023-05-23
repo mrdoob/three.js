@@ -1,24 +1,6 @@
-import { WebGPUSampledTexture, WebGPUSampledCubeTexture } from '../SampledTexture.js';
+import { SampledTexture, SampledCubeTexture } from '../SampledTexture.js';
 
-class WebGPUNodeSampledTexture extends WebGPUSampledTexture {
-
-	constructor( name, textureNode ) {
-
-		super( name, textureNode.value );
-
-		this.textureNode = textureNode;
-
-	}
-
-	getTexture() {
-
-		return this.textureNode.value;
-
-	}
-
-}
-
-class WebGPUNodeSampledCubeTexture extends WebGPUSampledCubeTexture {
+class NodeSampledTexture extends SampledTexture {
 
 	constructor( name, textureNode ) {
 
@@ -36,4 +18,22 @@ class WebGPUNodeSampledCubeTexture extends WebGPUSampledCubeTexture {
 
 }
 
-export { WebGPUNodeSampledTexture, WebGPUNodeSampledCubeTexture };
+class NodeSampledCubeTexture extends SampledCubeTexture {
+
+	constructor( name, textureNode ) {
+
+		super( name, textureNode.value );
+
+		this.textureNode = textureNode;
+
+	}
+
+	getTexture() {
+
+		return this.textureNode.value;
+
+	}
+
+}
+
+export { NodeSampledTexture, NodeSampledCubeTexture };

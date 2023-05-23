@@ -3,8 +3,8 @@ import {
 	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from '../../../../universal/nodes/NodeUniform.js';
-import WebGPUNodeSampler from '../../../../universal/nodes/NodeSampler.js';
-import { WebGPUNodeSampledTexture, WebGPUNodeSampledCubeTexture } from '../../../../universal/nodes/NodeSampledTexture.js';
+import NodeSampler from '../../../../universal/nodes/NodeSampler.js';
+import { NodeSampledTexture, NodeSampledCubeTexture } from '../../../../universal/nodes/NodeSampledTexture.js';
 
 import UniformBuffer from '../../../../universal/UniformBuffer.js';
 import StorageBuffer from '../../../../universal/StorageBuffer.js';
@@ -16,11 +16,13 @@ import { NodeBuilder, CodeNode, NodeMaterial } from '../../../../../nodes/Nodes.
 
 import WGSLNodeParser from './WGSLNodeParser.js';
 
+/*
 const gpuShaderStageLib = {
 	'vertex': GPUShaderStage.VERTEX,
 	'fragment': GPUShaderStage.FRAGMENT,
 	'compute': GPUShaderStage.COMPUTE
 };
+*/
 
 const supports = {
 	instance: true
@@ -262,17 +264,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			if ( type === 'texture' || type === 'cubeTexture' ) {
 
-				const sampler = new WebGPUNodeSampler( `${uniformNode.name}_sampler`, uniformNode.node );
+				const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node );
 
 				let texture = null;
 
 				if ( type === 'texture' ) {
 
-					texture = new WebGPUNodeSampledTexture( uniformNode.name, uniformNode.node );
+					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node );
 
 				} else if ( type === 'cubeTexture' ) {
 
-					texture = new WebGPUNodeSampledCubeTexture( uniformNode.name, uniformNode.node );
+					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node );
 
 				}
 

@@ -10,9 +10,10 @@ import RenderContexts from './RenderContexts.js';
 import Textures from './Textures.js';
 import Background from './Background.js';
 import Nodes from './nodes/Nodes.js';
-import { Frustum, Matrix4, Vector3, Vector4, Color, SRGBColorSpace, NoToneMapping } from 'three';
+import { Frustum, Matrix4, Vector2, Vector3, Vector4, Color, SRGBColorSpace, NoToneMapping } from 'three';
 
-const _drawingBufferSize = new Vector4();
+const _drawingBufferSize = new Vector2();
+const _screen = new Vector4();
 const _frustum = new Frustum();
 const _projScreenMatrix = new Matrix4();
 const _vector3 = new Vector3();
@@ -84,8 +85,9 @@ class Renderer {
 
 		// backwards compatibility
 
-		this.shadow = {
-			shadowMap: {}
+		this.shadowMap = {
+			enabled: false,
+			type: null
 		};
 
 	}
@@ -146,6 +148,12 @@ class Renderer {
 
 	}
 
+	async compile( scene, camera ) {
+
+		console.warn( 'THREE.Renderer: .compile() is not implemented yet.' );
+
+	}
+
 	async render( scene, camera ) {
 
 		if ( this._initialized === false ) await this.init();
@@ -180,13 +188,30 @@ class Renderer {
 
 		//
 
+		let viewport = this._viewport;
+		let scissor = this._scissor;
+
+		if ( renderTarget !== null ) {
+
+			viewport = renderTarget.viewport;
+			scissor = renderTarget.scissor;
+
+		}
+
 		this.getDrawingBufferSize( _drawingBufferSize );
 
-		renderContext.viewportValue.copy( this._viewport ).multiplyScalar( this._pixelRatio ).floor();
-		renderContext.viewport = renderContext.viewportValue.equals( _drawingBufferSize ) === false;
+		_screen.set( 0, 0, _drawingBufferSize.width, _drawingBufferSize.height );
 
-		renderContext.scissorValue.copy( this._scissor ).multiplyScalar( this._pixelRatio ).floor();
-		renderContext.scissor = renderContext.scissorValue.equals( _drawingBufferSize ) === false;
+		const minDepth = ( viewport.minDepth === undefined ) ? 0 : viewport.minDepth;
+		const maxDepth = ( viewport.maxDepth === undefined ) ? 1 : viewport.maxDepth;
+
+		renderContext.viewportValue.copy( viewport ).multiplyScalar( this._pixelRatio ).floor();
+		renderContext.viewportValue.minDepth = minDepth;
+		renderContext.viewportValue.maxDepth = maxDepth;
+		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
+
+		renderContext.scissorValue.copy( scissor ).multiplyScalar( this._pixelRatio ).floor();
+		renderContext.scissor = this._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 
 		//
 
@@ -208,7 +233,21 @@ class Renderer {
 
 		//
 
-		renderContext.renderTarget = renderTarget;
+		if ( renderTarget !== null ) {
+
+			this._textures.updateRenderTarget( renderTarget );
+
+			const renderTargetData = this._textures.get( renderTarget );
+
+			renderContext.texture = renderTargetData.texture;
+			renderContext.depthTexture = renderTargetData.depthTexture;
+
+		} else {
+
+			renderContext.texture = null;
+			renderContext.depthTexture = null;
+
+		}
 
 		//
 
@@ -258,7 +297,7 @@ class Renderer {
 
 	async getArrayBuffer( attribute ) {
 
-		return await this._attributes.getArrayBuffer( attribute );
+		return await this.backend.getArrayBuffer( attribute );
 
 	}
 
@@ -384,19 +423,13 @@ class Renderer {
 
 	}
 
-	copyFramebufferToRenderTarget( renderTarget ) {
-
-		this.backend.copyFramebufferToRenderTarget( renderTarget );
-
-	}
-
 	getViewport( target ) {
 
 		return target.copy( this._viewport );
 
 	}
 
-	setViewport( x, y, width, height /*minDepth = 0, maxDepth = 1*/ ) {
+	setViewport( x, y, width, height, minDepth = 0, maxDepth = 1 ) {
 
 		const viewport = this._viewport;
 
@@ -409,6 +442,9 @@ class Renderer {
 			viewport.set( x, y, width, height );
 
 		}
+
+		viewport.minDepth = minDepth;
+		viewport.maxDepth = maxDepth;
 
 	}
 
@@ -463,25 +499,27 @@ class Renderer {
 
 	clear( color = true, depth = true, stencil = true ) {
 
-		this.backend.clear( color, depth, stencil );
+		const renderContext = this._currentRenderContext || this._lastRenderContext;
+
+		if ( renderContext ) this.backend.clear( renderContext, color, depth, stencil );
 
 	}
 
 	clearColor() {
 
-		this.backend.clear( true, false, false );
+		this.clear( true, false, false );
 
 	}
 
 	clearDepth() {
 
-		this.backend.clear( false, true, false );
+		this.clear( false, true, false );
 
 	}
 
 	clearStencil() {
 
-		this.backend.clear( false, false, true );
+		this.clear( false, false, true );
 
 	}
 
@@ -513,7 +551,7 @@ class Renderer {
 		if ( this._initialized === false ) await this.init();
 
 		const backend = this.backend;
-		const piplines = this._pipelines;
+		const pipelines = this._pipelines;
 		const computeGroup = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
 
 		backend.beginCompute( computeGroup );
@@ -522,7 +560,7 @@ class Renderer {
 
 			// onInit
 
-			if ( piplines.has( computeNode ) === false ) {
+			if ( pipelines.has( computeNode ) === false ) {
 
 				computeNode.onInit( { renderer: this } );
 
@@ -531,7 +569,7 @@ class Renderer {
 			this._nodes.updateForCompute( computeNode );
 			this._bindings.updateForCompute( computeNode );
 
-			const computePipeline = piplines.getForCompute( computeNode );
+			const computePipeline = pipelines.getForCompute( computeNode );
 			const computeBindings = this._bindings.getForCompute( computeNode );
 
 			backend.compute( computeGroup, computeNode, computeBindings, computePipeline );
@@ -551,6 +589,16 @@ class Renderer {
 	hasFeature( name ) {
 
 		return this.backend.hasFeature( name );
+
+	}
+
+	copyFramebufferToTexture( framebufferTexture ) {
+
+		const renderContext = this._currentRenderContext || this._lastRenderContext;
+
+		this._textures.updateTexture( framebufferTexture );
+
+		this.backend.copyFramebufferToTexture( framebufferTexture, renderContext );
 
 	}
 
@@ -683,7 +731,12 @@ class Renderer {
 						const minDepth = ( vp.minDepth === undefined ) ? 0 : vp.minDepth;
 						const maxDepth = ( vp.maxDepth === undefined ) ? 1 : vp.maxDepth;
 
-						this._currentRenderContext.currentPassGPU.setViewport( vp.x, vp.y, vp.width, vp.height, minDepth, maxDepth );
+						const viewportValue = this._currentRenderContext.viewportValue;
+						viewportValue.copy( vp ).multiplyScalar( this._pixelRatio ).floor();
+						viewportValue.minDepth = minDepth;
+						viewportValue.maxDepth = maxDepth;
+
+						this.backend.updateViewport( this._currentRenderContext );
 
 						this._renderObject( object, scene, camera2, geometry, material, group, lightsNode );
 

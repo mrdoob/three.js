@@ -10,7 +10,7 @@ class TextureRenderer {
 
 	}
 
-	getTexture() {
+	get texture() {
 
 		return this.renderTarget.texture;
 

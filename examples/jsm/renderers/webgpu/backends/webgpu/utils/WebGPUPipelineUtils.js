@@ -1,31 +1,38 @@
-import { 
-    GPUInputStepMode, GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat
+import { BlendColorFactor, OneMinusBlendColorFactor, } from '../../../../universal/Constants.js';
+
+import {
+	GPUInputStepMode, GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation
 } from './WebGPUConstants.js';
 
 import {
 	FrontSide, BackSide, DoubleSide,
-    NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
-    NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending,
+	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
+	NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending,
+	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstColorFactor,
+	OneMinusDstColorFactor, DstAlphaFactor, OneMinusDstAlphaFactor, SrcAlphaSaturateFactor,
+	AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
+	KeepStencilOp, ZeroStencilOp, ReplaceStencilOp, InvertStencilOp, IncrementStencilOp, DecrementStencilOp, IncrementWrapStencilOp, DecrementWrapStencilOp,
+	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc
 } from 'three';
 
 class WebGPUPipelineUtils {
 
-    constructor( backend ) {
+	constructor( backend ) {
 
-        this.backend = backend;
+		this.backend = backend;
 
-    }
+	}
 
-    createRenderPipeline( renderObject ) {
+	createRenderPipeline( renderObject ) {
 
-        const { object, material, geometry, pipeline } = renderObject;
-        const { vertexProgram, fragmentProgram } = pipeline;
+		const { object, material, geometry, pipeline } = renderObject;
+		const { vertexProgram, fragmentProgram } = pipeline;
 
-        const backend = this.backend;
-        const device = backend.device;
+		const backend = this.backend;
+		const device = backend.device;
 		const utils = backend.utils;
 
-        const pipelineGPU = backend.get( pipeline );
+		const pipelineData = backend.get( pipeline );
 
 		// determine shader attributes
 
@@ -55,8 +62,8 @@ class WebGPUPipelineUtils {
 
 		if ( material.transparent === true && material.blending !== NoBlending ) {
 
-			alphaBlend = this.getAlphaBlend( material );
-			colorBlend = this.getColorBlend( material );
+			alphaBlend = this._getAlphaBlend( material );
+			colorBlend = this._getColorBlend( material );
 
 		}
 
@@ -67,27 +74,27 @@ class WebGPUPipelineUtils {
 		if ( material.stencilWrite === true ) {
 
 			stencilFront = {
-				compare: this.getStencilCompare( material ),
-				failOp: this.getStencilOperation( material.stencilFail ),
-				depthFailOp: this.getStencilOperation( material.stencilZFail ),
-				passOp: this.getStencilOperation( material.stencilZPass )
+				compare: this._getStencilCompare( material ),
+				failOp: this._getStencilOperation( material.stencilFail ),
+				depthFailOp: this._getStencilOperation( material.stencilZFail ),
+				passOp: this._getStencilOperation( material.stencilZPass )
 			};
 
 		}
 
 		//
 
-        const vertexModule = backend.get( vertexProgram ).module;
-        const fragmentModule = backend.get( fragmentProgram ).module;
+		const vertexModule = backend.get( vertexProgram ).module;
+		const fragmentModule = backend.get( fragmentProgram ).module;
 
-		const primitiveState = this.getPrimitiveState( object, geometry, material );
-		const colorWriteMask = this.getColorWriteMask( material );
-		const depthCompare = this.getDepthCompare( material );
-		const colorFormat = utils.getCurrentColorFormat();
-		const depthStencilFormat = utils.getCurrentDepthStencilFormat();
+		const primitiveState = this._getPrimitiveState( object, geometry, material );
+		const colorWriteMask = this._getColorWriteMask( material );
+		const depthCompare = this._getDepthCompare( material );
+		const colorFormat = utils.getCurrentColorFormat( renderObject.context );
+		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
 		const sampleCount = utils.getSampleCount();
 
-		pipelineGPU.pipeline = device.createRenderPipeline( {
+		pipelineData.pipeline = device.createRenderPipeline( {
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
 			fragment: Object.assign( {}, fragmentModule, { targets: [ {
 				format: colorFormat,
@@ -113,25 +120,25 @@ class WebGPUPipelineUtils {
 			layout: 'auto'
 		} );
 
-    }
+	}
 
-    createComputePipeline( pipeline ) {
+	createComputePipeline( pipeline ) {
 
-        const backend = this.backend;
-        const device = backend.device;
+		const backend = this.backend;
+		const device = backend.device;
 
-        const computeProgram = backend.get( pipeline.computeProgram ).module;
+		const computeProgram = backend.get( pipeline.computeProgram ).module;
 
-        const pipelineGPU = backend.get( pipeline );
-        
-        pipelineGPU.pipeline = device.createComputePipeline( {
-            compute: computeProgram,
-            layout: 'auto'
-        } );
+		const pipelineGPU = backend.get( pipeline );
 
-    }
+		pipelineGPU.pipeline = device.createComputePipeline( {
+			compute: computeProgram,
+			layout: 'auto'
+		} );
 
-    getAlphaBlend( material ) {
+	}
+
+	_getAlphaBlend( material ) {
 
 		const blending = material.blending;
 		const premultipliedAlpha = material.premultipliedAlpha;
@@ -201,9 +208,9 @@ class WebGPUPipelineUtils {
 				if ( blendSrcAlpha !== null && blendDstAlpha !== null && blendEquationAlpha !== null ) {
 
 					alphaBlend = {
-						srcFactor: this.getBlendFactor( blendSrcAlpha ),
-						dstFactor: this.getBlendFactor( blendDstAlpha ),
-						operation: this.getBlendOperation( blendEquationAlpha )
+						srcFactor: this._getBlendFactor( blendSrcAlpha ),
+						dstFactor: this._getBlendFactor( blendDstAlpha ),
+						operation: this._getBlendOperation( blendEquationAlpha )
 					};
 
 				}
@@ -219,7 +226,7 @@ class WebGPUPipelineUtils {
 
 	}
 
-    getBlendFactor( blend ) {
+	_getBlendFactor( blend ) {
 
 		let blendFactor;
 
@@ -277,7 +284,6 @@ class WebGPUPipelineUtils {
 				blendFactor = GPUBlendFactor.OneMinusBlendColor;
 				break;
 
-
 			default:
 				console.error( 'THREE.WebGPURenderer: Blend factor not supported.', blend );
 
@@ -287,7 +293,7 @@ class WebGPUPipelineUtils {
 
 	}
 
-    getColorBlend( material ) {
+	_getColorBlend( material ) {
 
 		const blending = material.blending;
 		const premultipliedAlpha = material.premultipliedAlpha;
@@ -325,9 +331,9 @@ class WebGPUPipelineUtils {
 				break;
 
 			case CustomBlending:
-				colorBlend.srcFactor = this.getBlendFactor( material.blendSrc );
-				colorBlend.dstFactor = this.getBlendFactor( material.blendDst );
-				colorBlend.operation = this.getBlendOperation( material.blendEquation );
+				colorBlend.srcFactor = this._getBlendFactor( material.blendSrc );
+				colorBlend.dstFactor = this._getBlendFactor( material.blendDst );
+				colorBlend.operation = this._getBlendOperation( material.blendEquation );
 				break;
 
 			default:
@@ -339,7 +345,7 @@ class WebGPUPipelineUtils {
 
 	}
 
-    getStencilCompare( material ) {
+	_getStencilCompare( material ) {
 
 		let stencilCompare;
 
@@ -388,7 +394,7 @@ class WebGPUPipelineUtils {
 
 	}
 
-    getStencilOperation( op ) {
+	_getStencilOperation( op ) {
 
 		let stencilOperation;
 
@@ -435,7 +441,7 @@ class WebGPUPipelineUtils {
 
 	}
 
-    getBlendOperation( blendEquation ) {
+	_getBlendOperation( blendEquation ) {
 
 		let blendOperation;
 
@@ -470,10 +476,10 @@ class WebGPUPipelineUtils {
 
 	}
 
-    getPrimitiveState( object, geometry, material ) {
+	_getPrimitiveState( object, geometry, material ) {
 
 		const descriptor = {};
-        const utils = this.backend.utils;
+		const utils = this.backend.utils;
 
 		descriptor.topology = utils.getPrimitiveTopology( object, material );
 
@@ -511,13 +517,13 @@ class WebGPUPipelineUtils {
 
 	}
 
-    getColorWriteMask( material ) {
+	_getColorWriteMask( material ) {
 
 		return ( material.colorWrite === true ) ? GPUColorWriteFlags.All : GPUColorWriteFlags.None;
 
 	}
 
-    getDepthCompare( material ) {
+	_getDepthCompare( material ) {
 
 		let depthCompare;
 

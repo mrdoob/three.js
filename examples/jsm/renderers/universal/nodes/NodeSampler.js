@@ -1,6 +1,6 @@
 import Sampler from '../Sampler.js';
 
-class WebGPUNodeSampler extends Sampler {
+class NodeSampler extends Sampler {
 
 	constructor( name, textureNode ) {
 
@@ -18,4 +18,4 @@ class WebGPUNodeSampler extends Sampler {
 
 }
 
-export default WebGPUNodeSampler;
+export default NodeSampler;

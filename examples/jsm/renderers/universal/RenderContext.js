@@ -1,8 +1,12 @@
-import { Vector4 } from "three";
+import { Vector4 } from 'three';
+
+let id = 0;
 
 class RenderContext {
 
 	constructor() {
+
+		this.id = id ++;
 
 		this.color = true;
 		this.clearColor = true;
@@ -21,7 +25,9 @@ class RenderContext {
 
 		this.scissor = false;
 		this.scissorValue = new Vector4();
-		this.scissorTest = false;
+
+		this.texture = null;
+		this.depthTexture = null;
 
 	}
 

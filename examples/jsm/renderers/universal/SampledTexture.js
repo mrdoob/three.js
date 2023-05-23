@@ -17,6 +17,14 @@ class SampledTexture extends Binding {
 
 	}
 
+	get needsBindingsUpdate() {
+
+		const { texture, version } = this;
+
+		return texture.isVideoTexture ? true : version === 0 && texture.version > 0;
+
+	}
+
 	update() {
 
 		if ( this.version !== this.texture.version ) {
@@ -33,7 +41,7 @@ class SampledTexture extends Binding {
 
 }
 
-class WebGPUSampledArrayTexture extends SampledTexture {
+class SampledArrayTexture extends SampledTexture {
 
 	constructor( name, texture ) {
 
@@ -45,7 +53,7 @@ class WebGPUSampledArrayTexture extends SampledTexture {
 
 }
 
-class WebGPUSampled3DTexture extends SampledTexture {
+class Sampled3DTexture extends SampledTexture {
 
 	constructor( name, texture ) {
 
@@ -57,7 +65,7 @@ class WebGPUSampled3DTexture extends SampledTexture {
 
 }
 
-class WebGPUSampledCubeTexture extends SampledTexture {
+class SampledCubeTexture extends SampledTexture {
 
 	constructor( name, texture ) {
 
@@ -69,4 +77,4 @@ class WebGPUSampledCubeTexture extends SampledTexture {
 
 }
 
-export { SampledTexture as WebGPUSampledTexture, WebGPUSampledArrayTexture, WebGPUSampled3DTexture, WebGPUSampledCubeTexture };
+export { SampledTexture, SampledArrayTexture, Sampled3DTexture, SampledCubeTexture };

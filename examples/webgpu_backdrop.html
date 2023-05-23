@@ -83,6 +83,8 @@
 
 				// portals
 
+				const geometry = new THREE.SphereGeometry( .3, 32, 16 );
+
 				portals = new THREE.Group();
 				scene.add( portals );
 
@@ -91,8 +93,6 @@
 					const distance = 1;
 					const id = portals.children.length;
 					const rotation = THREE.MathUtils.degToRad( id * 45 );
-
-					const geometry = new THREE.SphereGeometry( .3, 32, 16 );
 
 					const material = new MeshStandardNodeMaterial( { color: 0x0066ff } );
 					material.roughnessNode = float( .2 );

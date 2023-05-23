@@ -37,17 +37,17 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
-	getBuffer() {
+	get buffer() {
 
-		let buffer = this.buffer;
+		let buffer = this._buffer;
 
 		if ( buffer === null ) {
 
-			const byteLength = this.getByteLength();
+			const byteLength = this.byteLength;
 
 			buffer = new Float32Array( new ArrayBuffer( byteLength ) );
 
-			this.buffer = buffer;
+			this._buffer = buffer;
 
 		}
 
@@ -55,7 +55,7 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
-	getByteLength() {
+	get byteLength() {
 
 		let offset = 0; // global buffer offset in bytes
 
@@ -130,7 +130,7 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
-		const a = this.getBuffer();
+		const a = this.buffer;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
 
@@ -149,7 +149,7 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
-		const a = this.getBuffer();
+		const a = this.buffer;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
 
@@ -170,7 +170,7 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
-		const a = this.getBuffer();
+		const a = this.buffer;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
 
@@ -192,7 +192,7 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
-		const a = this.getBuffer();
+		const a = this.buffer;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
 
@@ -215,7 +215,7 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
-		const a = this.getBuffer();
+		const a = this.buffer;
 		const c = uniform.getValue();
 		const offset = uniform.offset;
 
@@ -237,7 +237,7 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
-		const a = this.getBuffer();
+		const a = this.buffer;
 		const e = uniform.getValue().elements;
 		const offset = uniform.offset;
 
@@ -267,7 +267,7 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
-		const a = this.getBuffer();
+		const a = this.buffer;
 		const e = uniform.getValue().elements;
 		const offset = uniform.offset;
 

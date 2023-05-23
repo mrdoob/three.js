@@ -1,9 +1,13 @@
+let id = 0;
+
 export default class RenderObject {
 
 	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode ) {
 
 		this._nodes = nodes;
 		this._geometries = geometries;
+
+		this.id = id ++;
 
 		this.renderer = renderer;
 		this.object = object;
@@ -38,6 +42,12 @@ export default class RenderObject {
 	getIndex() {
 
 		return this._geometries.getIndex( this );
+
+	}
+
+	getChainArray() {
+
+		return [ this.object, this.material, this.scene, this.camera, this.lightsNode ];
 
 	}
 

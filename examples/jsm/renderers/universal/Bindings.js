@@ -1,4 +1,5 @@
 import DataMap from './DataMap.js';
+import { AttributeType } from './Constants.js';
 
 class Bindings extends DataMap {
 
@@ -23,7 +24,7 @@ class Bindings extends DataMap {
 
 		const bindings = renderObject.getBindings();
 
-		let data = this.get( renderObject );
+		const data = this.get( renderObject );
 
 		if ( data.bindings !== bindings ) {
 
@@ -33,9 +34,9 @@ class Bindings extends DataMap {
 
 			this._init( bindings );
 
-			const pipline = this.pipelines.getForRender( renderObject );
+			const pipeline = this.pipelines.getForRender( renderObject );
 
-			this.backend.createBindings( bindings, pipline );
+			this.backend.createBindings( bindings, pipeline );
 
 		}
 
@@ -45,21 +46,21 @@ class Bindings extends DataMap {
 
 	getForCompute( computeNode ) {
 
-		let data = this.get( computeNode );
+		const data = this.get( computeNode );
 
 		if ( data.bindings === undefined ) {
 
 			const nodeBuilder = this.nodes.getForCompute( computeNode );
 
-			data.bindings = nodeBuilder.getBindings();
+			const bindings = nodeBuilder.getBindings();
 
-			this._init( data );
+			data.bindings = bindings;
+
+			this._init( bindings );
 
 			const pipeline = this.pipelines.getForCompute( computeNode );
 
-			this.backend.createBindings( data, pipeline );
-
-			this.uniformBindings.set( computeNode, data );
+			this.backend.createBindings( bindings, pipeline );
 
 		}
 
@@ -85,7 +86,7 @@ class Bindings extends DataMap {
 
 			if ( binding.isSampler || binding.isSampledTexture ) {
 
-				this.textures.initTexture( binding.texture );
+				this.textures.updateTexture( binding.texture );
 
 			} else if ( binding.isStorageBuffer ) {
 
@@ -119,9 +120,9 @@ class Bindings extends DataMap {
 
 			if ( binding.isUniformBuffer ) {
 
-				const needsBufferWrite = binding.update();
+				const needsUpdate = binding.update();
 
-				if ( needsBufferWrite ) {
+				if ( needsUpdate ) {
 
 					backend.updateBinding( binding );
 
@@ -129,35 +130,16 @@ class Bindings extends DataMap {
 
 			} else if ( binding.isSampledTexture ) {
 
-				const needsTextureUpdate = binding.update();
+				if ( binding.needsBindingsUpdate ) needsBindingsUpdate = true;
 
-				if ( needsTextureUpdate ) {
+				const needsUpdate = binding.update();
+
+				if ( needsUpdate ) {
 
 					this.textures.updateTexture( binding.texture );
 
-					needsBindingsUpdate = true;
-
 				}
 
-			} else if ( binding.isStorageBuffer ) {
-
-				//const attribute = binding.attribute;
-
-			} else if ( binding.isSampler ) {
-				/*
-				const texture = binding.getTexture();
-
-				textures.updateSampler( texture );
-
-				const samplerGPU = textures.getSampler( texture );
-
-				if ( binding.samplerGPU !== samplerGPU ) {
-
-					binding.samplerGPU = samplerGPU;
-					needsBindGroupRefresh = true;
-
-				}
-*/
 			}
 
 			updateMap.set( binding, frame );
@@ -166,10 +148,9 @@ class Bindings extends DataMap {
 
 		if ( needsBindingsUpdate === true ) {
 
-			//this.pipelines.getPipeline( object )
-			const pipline = this.pipelines.getForRender( object );
+			const pipeline = this.pipelines.getForRender( object );
 
-			this.backend.updateBindings( bindings, pipline );
+			this.backend.updateBindings( bindings, pipeline );
 
 		}
 

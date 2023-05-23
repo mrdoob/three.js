@@ -2,22 +2,19 @@ import { GPUPrimitiveTopology, GPUTextureFormat } from './WebGPUConstants.js';
 
 class WebGPUUtils {
 
-    constructor( backend ) {
+	constructor( backend ) {
 
-        this.backend = backend;
+		this.backend = backend;
 
-    }
+	}
 
-    getCurrentDepthStencilFormat() {
+	getCurrentDepthStencilFormat( renderContext ) {
 
-        const renderer = this.backend.renderer;
-		const renderTarget = renderer.getRenderTarget();
+		let format;
 
-        let format;
+		if ( renderContext.depthTexture !== null ) {
 
-		if ( renderTarget !== null ) {
-
-			format = this.get( renderTarget ).depthTextureFormat;
+			format = this.getTextureFormatGPU( renderContext.depthTexture );
 
 		} else {
 
@@ -27,18 +24,21 @@ class WebGPUUtils {
 
 		return format;
 
-    }
+	}
 
-    getCurrentColorFormat() {
+	getTextureFormatGPU( texture ) {
 
-        const renderer = this.backend.renderer;
-		const renderTarget = renderer.getRenderTarget();
+		return this.backend.get( texture ).texture.format;
 
-        let format;
+	}
 
-		if ( renderTarget !== null ) {
+	getCurrentColorFormat( renderContext ) {
 
-			format = this.get( renderTarget ).colorTextureFormat;
+		let format;
+
+		if ( renderContext.texture !== null ) {
+
+			format = this.getTextureFormatGPU( renderContext.texture );
 
 		} else {
 
@@ -50,22 +50,19 @@ class WebGPUUtils {
 
 	}
 
-    getCurrentColorSpace() {
+	getCurrentColorSpace( renderContext ) {
 
-		const renderer = this.backend.renderer;
-		const renderTarget = renderer.getRenderTarget();
+		if ( renderContext.texture !== null ) {
 
-		if ( renderTarget !== null ) {
-
-			return renderTarget.texture.colorSpace;
+			return renderContext.texture.colorSpace;
 
 		}
 
-		return renderer.outputColorSpace;
+		return this.backend.renderer.outputColorSpace;
 
 	}
 
-    getPrimitiveTopology( object, material ) {
+	getPrimitiveTopology( object, material ) {
 
 		if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
 		else if ( object.isLineSegments || ( object.isMesh && material.wireframe === true ) ) return GPUPrimitiveTopology.LineList;
@@ -74,7 +71,7 @@ class WebGPUUtils {
 
 	}
 
-    getSampleCount() {
+	getSampleCount() {
 
 		return this.backend.parameters.sampleCount;
 

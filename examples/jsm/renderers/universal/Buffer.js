@@ -11,19 +11,19 @@ class Buffer extends Binding {
 
 		this.bytesPerElement = Float32Array.BYTES_PER_ELEMENT;
 
-		this.buffer = buffer;
+		this._buffer = buffer;
 
 	}
 
-	getByteLength() {
+	get byteLength() {
 
-		return getFloatLength( this.buffer.byteLength );
+		return getFloatLength( this._buffer.byteLength );
 
 	}
 
-	getBuffer() {
+	get buffer() {
 
-		return this.buffer;
+		return this._buffer;
 
 	}
 

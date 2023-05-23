@@ -76,7 +76,7 @@ class Geometries extends DataMap {
 		this.info = info;
 
 		this.wireframes = new WeakMap();
-		this.geometryFrame = new WeakMap();
+		this.attributeFrame = new WeakMap();
 
 	}
 
@@ -92,16 +92,16 @@ class Geometries extends DataMap {
 
 		if ( this.has( renderObject ) === false ) this.initGeometry( renderObject );
 
-		this.updateFrameAttributes( renderObject );
+		this.updateAttributes( renderObject );
 
 	}
 
 	initGeometry( renderObject ) {
 
 		const geometry = renderObject.geometry;
-		const geometryProperties = this.get( geometry );
+		const geometryData = this.get( geometry );
 
-		geometryProperties.initialized = true;
+		geometryData.initialized = true;
 
 		this.info.memory.geometries ++;
 
@@ -140,28 +140,13 @@ class Geometries extends DataMap {
 
 	}
 
-	updateFrameAttributes( renderObject ) {
-
-		const frame = this.info.render.frame;
-		const geometry = renderObject.geometry;
-
-		if ( this.geometryFrame.get( geometry ) !== frame ) {
-
-			this.updateAttributes( renderObject );
-
-			this.geometryFrame.set( geometry, frame );
-
-		}
-
-	}
-
 	updateAttributes( renderObject ) {
 
 		const attributes = renderObject.getAttributes();
 
 		for ( const attribute of attributes ) {
 
-			this.attributes.update( attribute, AttributeType.VERTEX );
+			this.updateAttribute( attribute, AttributeType.VERTEX );
 
 		}
 
@@ -169,7 +154,21 @@ class Geometries extends DataMap {
 
 		if ( index !== null ) {
 
-			this.attributes.update( index, AttributeType.INDEX );
+			this.updateAttribute( index, AttributeType.INDEX );
+
+		}
+
+	}
+
+	updateAttribute( attribute, type ) {
+
+		const frame = this.info.render.frame;
+
+		if ( this.attributeFrame.get( attribute ) !== frame ) {
+
+			this.attributes.update( attribute, type );
+
+			this.attributeFrame.set( attribute, frame );
 
 		}
 
