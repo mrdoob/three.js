@@ -1,18 +1,18 @@
-import UniformsGroup from '../../../../common/UniformsGroup.js';
+import UniformsGroup from '../../common/UniformsGroup.js';
 import {
 	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
-} from '../../../../common/nodes/NodeUniform.js';
-import NodeSampler from '../../../../common/nodes/NodeSampler.js';
-import { NodeSampledTexture, NodeSampledCubeTexture } from '../../../../common/nodes/NodeSampledTexture.js';
+} from '../../common/nodes/NodeUniform.js';
+import NodeSampler from '../../common/nodes/NodeSampler.js';
+import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
-import UniformBuffer from '../../../../common/UniformBuffer.js';
-import StorageBuffer from '../../../../common/StorageBuffer.js';
-import { getVectorLength, getStrideLength } from '../../../../common/BufferUtils.js';
+import UniformBuffer from '../../common/UniformBuffer.js';
+import StorageBuffer from '../../common/StorageBuffer.js';
+import { getVectorLength, getStrideLength } from '../../common/BufferUtils.js';
 
-import RenderTarget from '../../../../common/RenderTarget.js';
+import RenderTarget from '../../common/RenderTarget.js';
 
-import { NodeBuilder, CodeNode, NodeMaterial } from '../../../../../nodes/Nodes.js';
+import { NodeBuilder, CodeNode, NodeMaterial } from '../../../nodes/Nodes.js';
 
 import WGSLNodeParser from './WGSLNodeParser.js';
 

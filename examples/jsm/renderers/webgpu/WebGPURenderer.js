@@ -1,5 +1,5 @@
 import Renderer from '../common/Renderer.js';
-import WebGPUBackend from './backends/webgpu/WebGPUBackend.js';
+import WebGPUBackend from './WebGPUBackend.js';
 /*
 const debugHandler = {
 
