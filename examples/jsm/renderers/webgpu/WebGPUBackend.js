@@ -1,6 +1,6 @@
 import { GPUFeatureName, GPUTextureFormat, GPULoadOp, GPUStoreOp, GPUIndexFormat } from './utils/WebGPUConstants.js';
 
-import WebGPUNodeBuilder from './builder/WGSLNodeBuilder.js';
+import WebGPUNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
 
 import { Matrix4, Frustum, DepthFormat } from 'three';
