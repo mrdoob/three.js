@@ -1,10 +1,10 @@
-import { GPUChunkBytes } from './Constants.js';
+import { GPU_CHUNK_BYTES } from './Constants.js';
 
 function getFloatLength( floatLength ) {
 
 	// ensure chunk size alignment (STD140 layout)
 
-	return floatLength + ( ( GPUChunkBytes - ( floatLength % GPUChunkBytes ) ) % GPUChunkBytes );
+	return floatLength + ( ( GPU_CHUNK_BYTES - ( floatLength % GPU_CHUNK_BYTES ) ) % GPU_CHUNK_BYTES );
 
 }
 

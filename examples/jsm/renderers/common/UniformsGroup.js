@@ -1,5 +1,5 @@
 import UniformBuffer from './UniformBuffer.js';
-import { GPUChunkBytes } from './Constants.js';
+import { GPU_CHUNK_BYTES } from './Constants.js';
 
 class UniformsGroup extends UniformBuffer {
 
@@ -65,8 +65,8 @@ class UniformsGroup extends UniformBuffer {
 
 			// offset within a single chunk in bytes
 
-			const chunkOffset = offset % GPUChunkBytes;
-			const remainingSizeInChunk = GPUChunkBytes - chunkOffset;
+			const chunkOffset = offset % GPU_CHUNK_BYTES;
+			const remainingSizeInChunk = GPU_CHUNK_BYTES - chunkOffset;
 
 			// conformance tests
 
@@ -74,7 +74,7 @@ class UniformsGroup extends UniformBuffer {
 
 				// check for chunk overflow
 
-				offset += ( GPUChunkBytes - chunkOffset );
+				offset += ( GPU_CHUNK_BYTES - chunkOffset );
 
 			} else if ( chunkOffset % uniform.boundary !== 0 ) {
 
@@ -90,7 +90,7 @@ class UniformsGroup extends UniformBuffer {
 
 		}
 
-		return Math.ceil( offset / GPUChunkBytes ) * GPUChunkBytes;
+		return Math.ceil( offset / GPU_CHUNK_BYTES ) * GPU_CHUNK_BYTES;
 
 	}
 

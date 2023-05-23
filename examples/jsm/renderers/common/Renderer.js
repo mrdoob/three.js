@@ -190,11 +190,13 @@ class Renderer {
 
 		let viewport = this._viewport;
 		let scissor = this._scissor;
+		let pixelRatio = this._pixelRatio;
 
 		if ( renderTarget !== null ) {
 
 			viewport = renderTarget.viewport;
 			scissor = renderTarget.scissor;
+			pixelRatio = 1;
 
 		}
 
@@ -205,12 +207,12 @@ class Renderer {
 		const minDepth = ( viewport.minDepth === undefined ) ? 0 : viewport.minDepth;
 		const maxDepth = ( viewport.maxDepth === undefined ) ? 1 : viewport.maxDepth;
 
-		renderContext.viewportValue.copy( viewport ).multiplyScalar( this._pixelRatio ).floor();
+		renderContext.viewportValue.copy( viewport ).multiplyScalar( pixelRatio ).floor();
 		renderContext.viewportValue.minDepth = minDepth;
 		renderContext.viewportValue.maxDepth = maxDepth;
 		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
 
-		renderContext.scissorValue.copy( scissor ).multiplyScalar( this._pixelRatio ).floor();
+		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
 		renderContext.scissor = this._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 
 		//

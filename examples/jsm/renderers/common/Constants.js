@@ -6,7 +6,7 @@ export const AttributeType = {
 
 // size of a chunk in bytes (STD140 layout)
 
-export const GPUChunkBytes = 16;
+export const GPU_CHUNK_BYTES = 16;
 
 // @TODO: Move to src/constants.js
 
