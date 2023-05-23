@@ -62,7 +62,6 @@ const exceptionList = [
 	'webgl_camera_logarithmicdepthbuffer',
 	'webgl_effects_ascii',
 	'webgl_loader_pdb',
-	'webgl_multiple_canvases_circle',
 	'webgl_multiple_elements_text',
 	'webgl_shaders_tonemapping',
 
