@@ -24,7 +24,7 @@ class RenderPipelines {
 
 	get( renderObject ) {
 
-		const { backend, device } = this;
+		const { backend } = this;
 		const cache = this._getCache( renderObject );
 
 		let currentPipeline = cache.currentPipeline;
@@ -195,12 +195,12 @@ class RenderPipelines {
 
 	}
 
-	_releaseProgram( stage ) {
+	_releaseProgram( program ) {
 
-		if ( -- stage.usedTimes === 0 ) {
+		if ( -- program.usedTimes === 0 ) {
 
-			const code = stage.code;
-			const stage = stage.stage;
+			const code = program.code;
+			const stage = program.stage;
 
 			this.programs[ stage ].delete( code );
 
