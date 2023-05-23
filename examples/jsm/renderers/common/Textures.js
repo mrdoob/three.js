@@ -81,7 +81,7 @@ class Textures extends DataMap {
 
 		if ( isRenderTexture && textureData.initialized === true ) {
 
-			// it's a update
+			// it's an update
 
 			backend.destroySampler( texture );
 			backend.destroyTexture( texture );
