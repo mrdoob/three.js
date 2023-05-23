@@ -62,9 +62,7 @@ const exceptionList = [
 	'webgl_camera_logarithmicdepthbuffer',
 	'webgl_effects_ascii',
 	'webgl_loader_pdb',
-	'webgl_multiple_canvases_circle',
 	'webgl_multiple_elements_text',
-	'webgl_shaders_tonemapping',
 
 	// Unknown
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
@@ -72,7 +70,6 @@ const exceptionList = [
 	'webgl_buffergeometry_glbufferattribute',
 	'webgl_clipping_advanced',
 	'webgl_lensflares',
-	'webgl_lines_sphere',
 	'webgl_lights_spotlights',
 	'webgl_loader_imagebitmap',
 	'webgl_loader_texture_lottie',
