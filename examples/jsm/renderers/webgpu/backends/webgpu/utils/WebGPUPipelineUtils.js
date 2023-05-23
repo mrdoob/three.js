@@ -468,7 +468,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			default:
-				console.error( 'THREE.WebGPURenderer: Blend equation not supported.', blendEquation );
+				console.error( 'THREE.WebGPUPipelineUtils: Blend equation not supported.', blendEquation );
 
 		}
 
