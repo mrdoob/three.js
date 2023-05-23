@@ -91,7 +91,7 @@ class WebGPUTextureUtils {
 
 		if ( textureData.initialized ) {
 
-			throw new Error( 'WebGPUTexture: Texture already initialized.' );
+			throw new Error( 'WebGPUTextureUtils: Texture already initialized.' );
 
 		}
 
