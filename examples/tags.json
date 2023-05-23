@@ -44,7 +44,6 @@
 	"webgl_materials_lightmap": [ "shadow" ],
 	"webgl_materials_physical_clearcoat": [ "anisotropy" ],
 	"webgl_materials_physical_transmission": [ "alpha" ],
-	"webgl_materials_standard": [ "pbr" ],
 	"webgl_materials_texture_canvas": [ "paint" ],
 	"webgl_materials_texture_filters": [ "mipmap", "min", "mag" ],
 	"webgl_materials_texture_manualmipmap": [ "mipmap", "min", "mag" ],
