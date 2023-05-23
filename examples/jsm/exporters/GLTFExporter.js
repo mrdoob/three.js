@@ -841,8 +841,8 @@ class GLTFWriter {
 
 		}
 
-		const metalness = metalnessMap?.image;
-		const roughness = roughnessMap?.image;
+		const metalness = metalnessMap ? metalnessMap.image : null;
+		const roughness = roughnessMap ? roughnessMap.image : null;
 
 		const width = Math.max( metalness ? metalness.width : 0, roughness ? roughness.width : 0 );
 		const height = Math.max( metalness ? metalness.height : 0, roughness ? roughness.height : 0 );
@@ -1160,7 +1160,7 @@ class GLTFWriter {
 
 		} else {
 
-			throw new Error( 'THREE.GLTFExporter: Unsupported bufferAttribute component type: ' + attribute.array.constructor );
+			throw new Error( 'THREE.GLTFExporter: Unsupported bufferAttribute component type: ' + attribute.array.constructor.name );
 
 		}
 
@@ -1250,7 +1250,7 @@ class GLTFWriter {
 
 				if ( format !== RGBAFormat ) {
 
-					console.error( 'GLTFExporter: Only RGBAFormat is supported.', image );
+					console.error( 'GLTFExporter: Only RGBAFormat is supported.', format );
 
 				}
 
@@ -1371,8 +1371,6 @@ class GLTFWriter {
 		if ( map instanceof CompressedTexture ) {
 
 			map = decompress( map, options.maxTextureSize );
-			// remove from cache, as the underlaying canvas is always the same between decompressed textures
-			cache.images.delete( map.image );
 
 		}
 

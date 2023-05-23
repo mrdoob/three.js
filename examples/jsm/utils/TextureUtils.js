@@ -7,10 +7,10 @@ import {
 	Scene,
 	WebGLRenderer,
 	Texture,
-	sRGBEncoding
+	SRGBColorSpace
 } from 'three';
 
-let temporaryRenderer;
+let _renderer;
 let fullscreenQuadGeometry;
 let fullscreenQuadMaterial;
 let fullscreenQuad;
@@ -47,7 +47,7 @@ export function decompress( texture, maxTextureSize, renderer = null ) {
 	} );
 
 	fullscreenQuadMaterial.uniforms.blitTexture.value = texture;
-	fullscreenQuadMaterial.defines.IS_SRGB = texture.encoding == sRGBEncoding;
+	fullscreenQuadMaterial.defines.IS_SRGB = texture.colorSpace == SRGBColorSpace;
 	fullscreenQuadMaterial.needsUpdate = true;
 
 	if ( ! fullscreenQuad ) {
@@ -57,22 +57,19 @@ export function decompress( texture, maxTextureSize, renderer = null ) {
 
 	}
 
-	const temporaryCam = new PerspectiveCamera();
-	const temporaryScene = new Scene();
-	temporaryScene.add( fullscreenQuad );
+	const _camera = new PerspectiveCamera();
+	const _scene = new Scene();
+	_scene.add( fullscreenQuad );
 
 	if ( ! renderer ) {
 
-		if ( ! temporaryRenderer )
-			temporaryRenderer = new WebGLRenderer( { antialias: false } );
-
-		renderer = temporaryRenderer;
+		renderer = _renderer = new WebGLRenderer( { antialias: false } );
 
 	}
 
 	renderer.setSize( Math.min( texture.image.width, maxTextureSize ), Math.min( texture.image.height, maxTextureSize ) );
 	renderer.clear();
-	renderer.render( temporaryScene, temporaryCam );
+	renderer.render( _scene, _camera );
 
 	const readableTexture = new Texture( renderer.domElement );
 
@@ -82,11 +79,10 @@ export function decompress( texture, maxTextureSize, renderer = null ) {
 	readableTexture.wrapT = texture.wrapT;
 	readableTexture.name = texture.name;
 
-	readableTexture.userData.mimeType = 'image/png';
+	if ( _renderer ) {
 
-	if ( temporaryRenderer ) {
-
-		temporaryRenderer.dispose();
+		_renderer.dispose();
+		_renderer = null;
 
 	}
 
