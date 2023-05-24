@@ -31,7 +31,7 @@
 			import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
-			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			function exportGLTF( input ) {
@@ -455,24 +455,16 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 				// ---------------------------------------------------------------------
-				// Exporting compressed textures and meshes (KTX2 / Draco) (TODO: Meshopt)
+				// Exporting compressed textures and meshes (KTX2 / Draco / Meshopt)
 				// ---------------------------------------------------------------------
 				const ktx2Loader = new KTX2Loader()
 					.setTranscoderPath( 'jsm/libs/basis/' )
 					.detectSupport( renderer );
 
-				const dracoLoader = new DRACOLoader()
-					.setDecoderPath( 'jsm/libs/draco/' );
-
 				const gltfLoader = new GLTFLoader().setPath( 'models/gltf/' );
 				gltfLoader.setKTX2Loader( ktx2Loader );
-				gltfLoader.setDRACOLoader( dracoLoader );
-				gltfLoader.load( 'coffeemat.etc1s+draco.glb', function ( gltf ) {
-
-					// coffeemat.etc1s+draco.glb was produced from the source scene using gltf-transform:
-					// gltf-transform etc1s coffeemat/scene.gltf coffeemat.etc1s.glb
-					// gltf-transform draco coffeemat.etc1s.glb coffeemat.etc1s+draco.glb
-					// The resulting model uses KHR_texture_basisu (for texture compression using ETC1S) and DRACO mesh compression.
+				gltfLoader.setMeshoptDecoder( MeshoptDecoder );
+				gltfLoader.load( 'coffeemat.glb', function ( gltf ) {
 
 					gltf.scene.position.x = 400;
 					gltf.scene.position.z = - 200;
