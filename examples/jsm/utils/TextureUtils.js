@@ -30,16 +30,11 @@ export function decompress( texture, maxTextureSize, renderer = null ) {
             uniform sampler2D blitTexture; 
             varying vec2 vUv;
 
-            // took from threejs 05fc79cd52b79e8c3e8dec1e7dca72c5c39983a4
-            vec4 conv_LinearTosRGB( in vec4 value ) {
-                return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );
-            }
-
             void main(){ 
                 gl_FragColor = vec4(vUv.xy, 0, 1);
                 
                 #ifdef IS_SRGB
-                gl_FragColor = conv_LinearTosRGB( texture2D( blitTexture, vUv) );
+                gl_FragColor = LinearTosRGB( texture2D( blitTexture, vUv) );
                 #else
                 gl_FragColor = texture2D( blitTexture, vUv);
                 #endif
