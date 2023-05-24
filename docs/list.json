@@ -508,6 +508,27 @@
 				"Materials": "api/ar/constants/Materials",
 				"Renderer": "api/ar/constants/Renderer",
 				"Textures": "api/ar/constants/Textures"
+			},
+
+			"Core": {
+				"BufferAttribute": "api/ar/core/BufferAttribute",
+				"BufferGeometry": "api/ar/core/BufferGeometry",
+				"Clock": "api/ar/core/Clock",
+				"EventDispatcher": "api/ar/core/EventDispatcher",
+				"GLBufferAttribute": "api/ar/core/GLBufferAttribute",
+				"InstancedBufferAttribute": "api/ar/core/InstancedBufferAttribute",
+				"InstancedBufferGeometry": "api/ar/core/InstancedBufferGeometry",
+				"InstancedInterleavedBuffer": "api/ar/core/InstancedInterleavedBuffer",
+				"InterleavedBuffer": "api/ar/core/InterleavedBuffer",
+				"InterleavedBufferAttribute": "api/ar/core/InterleavedBufferAttribute",
+				"Layers": "api/ar/core/Layers",
+				"Object3D": "api/ar/core/Object3D",
+				"Raycaster": "api/ar/core/Raycaster",
+				"Uniform": "api/ar/core/Uniform"
+			},
+
+			"Core / BufferAttributes": {
+				"BufferAttribute Types": "api/ar/core/bufferAttributeTypes/BufferAttributeTypes"
 			}
 
 		}
