@@ -15,7 +15,7 @@ let fullscreenQuadGeometry;
 let fullscreenQuadMaterial;
 let fullscreenQuad;
 
-export function decompress( texture, maxTextureSize, renderer = null ) {
+export function decompress( texture, maxTextureSize = Infinity, renderer = null ) {
 
 	if ( ! fullscreenQuadGeometry ) fullscreenQuadGeometry = new PlaneGeometry( 2, 2, 1, 1 );
 	if ( ! fullscreenQuadMaterial ) fullscreenQuadMaterial = new ShaderMaterial( {
