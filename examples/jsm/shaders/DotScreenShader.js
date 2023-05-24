@@ -10,6 +10,8 @@ import {
 
 const DotScreenShader = {
 
+	name: 'DotScreenShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null },

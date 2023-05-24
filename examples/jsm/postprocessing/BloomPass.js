@@ -30,6 +30,7 @@ class BloomPass extends Pass {
 
 		this.materialCombine = new ShaderMaterial( {
 
+			name: CombineShader.name,
 			uniforms: this.combineUniforms,
 			vertexShader: CombineShader.vertexShader,
 			fragmentShader: CombineShader.fragmentShader,
@@ -49,6 +50,7 @@ class BloomPass extends Pass {
 
 		this.materialConvolution = new ShaderMaterial( {
 
+			name: convolutionShader.name,
 			uniforms: this.convolutionUniforms,
 			vertexShader: convolutionShader.vertexShader,
 			fragmentShader: convolutionShader.fragmentShader,
@@ -126,6 +128,8 @@ class BloomPass extends Pass {
 }
 
 const CombineShader = {
+
+	name: 'CombineShader',
 
 	uniforms: {
 

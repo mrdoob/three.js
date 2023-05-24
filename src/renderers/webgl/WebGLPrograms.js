@@ -163,7 +163,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			isWebGL2: IS_WEBGL2,
 
 			shaderID: shaderID,
-			shaderName: material.type,
+			shaderType: material.type,
+			shaderName: material.name,
 
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader,

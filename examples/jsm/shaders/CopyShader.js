@@ -4,6 +4,8 @@
 
 const CopyShader = {
 
+	name: 'CopyShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null },

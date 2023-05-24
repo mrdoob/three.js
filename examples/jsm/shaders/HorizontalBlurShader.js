@@ -9,6 +9,8 @@
 
 const HorizontalBlurShader = {
 
+	name: 'HorizontalBlurShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null },
