@@ -49,7 +49,7 @@
 			import { VerticalBlurShader } from 'three/addons/shaders/VerticalBlurShader.js';
 			import { SepiaShader } from 'three/addons/shaders/SepiaShader.js';
 			import { VignetteShader } from 'three/addons/shaders/VignetteShader.js';
-			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -151,7 +151,7 @@
 				const effectBleach = new ShaderPass( shaderBleach );
 				const effectSepia = new ShaderPass( shaderSepia );
 				const effectVignette = new ShaderPass( shaderVignette );
-				const gammaCorrection = new ShaderPass( GammaCorrectionShader );
+				const outputPass = new OutputPass();
 
 				effectBleach.uniforms[ 'opacity' ].value = 0.95;
 
@@ -215,7 +215,7 @@
 				composer1 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer1.addPass( renderScene );
-				composer1.addPass( gammaCorrection );
+				composer1.addPass( outputPass );
 				composer1.addPass( effectFilmBW );
 				composer1.addPass( effectVignette );
 
@@ -224,7 +224,7 @@
 				composer2 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer2.addPass( renderScene );
-				composer2.addPass( gammaCorrection );
+				composer2.addPass( outputPass );
 				composer2.addPass( effectDotScreen );
 				composer2.addPass( renderMask );
 				composer2.addPass( effectColorify1 );

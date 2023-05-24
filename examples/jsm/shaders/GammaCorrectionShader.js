@@ -3,9 +3,6 @@
  * http://en.wikipedia.org/wiki/gamma_correction
  */
 
-// @deprecated, r153
-console.warn( 'THREE.GammaCorrectionShader: GammaCorrectionShader is deprecated, use OutputPass in r153+.' );
-
 const GammaCorrectionShader = {
 
 	name: 'GammaCorrectionShader',
