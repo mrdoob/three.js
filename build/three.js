@@ -14215,6 +14215,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			scale: { value: 1.0 },
 			map: { value: null },
 			alphaMap: { value: null },
+			alphaMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 			alphaTest: { value: 0 },
 			uvTransform: { value: /*@__PURE__*/ new Matrix3() }
 
@@ -14229,6 +14230,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			map: { value: null },
 			mapTransform: { value: /*@__PURE__*/ new Matrix3() },
 			alphaMap: { value: null },
+			alphaMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 			alphaTest: { value: 0 }
 
 		}
@@ -27155,6 +27157,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				uniforms.alphaMap.value = material.alphaMap;
 
+				refreshTransformUniform( material.alphaMap, uniforms.alphaMapTransform );
+
 			}
 
 			if ( material.alphaTest > 0 ) {
@@ -27182,6 +27186,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			if ( material.alphaMap ) {
 
 				uniforms.alphaMap.value = material.alphaMap;
+
+				refreshTransformUniform( material.alphaMap, uniforms.alphaMapTransform );
 
 			}
 
