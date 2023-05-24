@@ -20,6 +20,7 @@ import {
 	RepeatWrapping,
 	Scene,
 	Source,
+	SRGBColorSpace,
 	CompressedTexture,
 	Vector3
 } from 'three';
