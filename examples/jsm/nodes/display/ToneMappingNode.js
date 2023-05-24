@@ -7,7 +7,7 @@ import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMappin
 // exposure only
 const LinearToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
 
-	return color.mul( exposure );
+	return color.mul( exposure ).clamp();
 
 } );
 
