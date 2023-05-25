@@ -189,15 +189,7 @@
 
 					color.copy( lut.getColor( colorValue ) ).convertSRGBToLinear();
 
-					if ( color === undefined ) {
-
-						console.log( 'Unable to determine color for value:', colorValue );
-
-					} else {
-
-						colors.setXYZ( i, color.r, color.g, color.b );
-
-					}
+					colors.setXYZ( i, color.r, color.g, color.b );
 
 				}
 
