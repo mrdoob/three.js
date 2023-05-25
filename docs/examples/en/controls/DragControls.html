@@ -106,6 +106,16 @@
 			If set to `true`, [name] does not transform individual objects but the entire group. Default is `false`.
 		</p>
 
+		<h3>[property:Boolean transformDescendants]</h3>
+		<p>
+			This option can be set to prevent DragControls from operating on descendant objects that are not specified
+			in the array of draggable 3D objects.
+			When this option is set, such descendant objects can be dragged individually.
+			When this option is not set, rather than descendant objects being dragged individually, the object that is dragged will be
+			the closest of its ancestors that appears in the array of draggable 3D objects.
+			Default is `true`.
+		</p>
+
 		<h2>Methods</h2>
 
 		<p>See the base [page:EventDispatcher] class for common methods.</p>
