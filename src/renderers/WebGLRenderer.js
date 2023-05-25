@@ -1338,7 +1338,7 @@ class WebGLRenderer {
 
 				const isWebGL2 = capabilities.isWebGL2;
 
-				_transmissionRenderTarget = new WebGLRenderTarget( 1024, 1024, {
+				_transmissionRenderTarget = new WebGLRenderTarget( 1024 * _pixelRatio, 1024 * _pixelRatio, {
 					generateMipmaps: true,
 					type: extensions.has( 'EXT_color_buffer_half_float' ) ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
