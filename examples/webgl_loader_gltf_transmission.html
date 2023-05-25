@@ -40,7 +40,6 @@
 			let camera, scene, renderer, controls, clock, mixer;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -61,6 +60,8 @@
 						texture.mapping = THREE.EquirectangularReflectionMapping;
 
 						scene.background = texture;
+						scene.backgroundBlurriness = 0.35;
+
 						scene.environment = texture;
 
 						// model
@@ -79,6 +80,7 @@
 					} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setAnimationLoop( render );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -86,6 +88,8 @@
 				container.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = - 0.75;
 				controls.enableDamping = true;
 				controls.minDistance = 0.5;
 				controls.maxDistance = 1;
@@ -107,19 +111,11 @@
 
 			//
 
-			function animate() {
-
-				requestAnimationFrame( animate );
+			function render() {
 
 				if ( mixer ) mixer.update( clock.getDelta() );
 
-				controls.update(); // required if damping enabled
-
-				render();
-
-			}
-
-			function render() {
+				controls.update();
 
 				renderer.render( scene, camera );
 
