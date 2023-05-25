@@ -919,6 +919,7 @@ class VRMLLoader extends Loader {
 				} else {
 
 					skyMaterial.color.setRGB( skyColor[ 0 ], skyColor[ 1 ], skyColor[ 2 ] );
+					skyMaterial.convertSRGBToLinear();
 
 				}
 
@@ -1224,10 +1225,12 @@ class VRMLLoader extends Loader {
 
 					case 'diffuseColor':
 						materialData.diffuseColor = new Color( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
+						materialData.diffuseColor.convertSRGBToLinear();
 						break;
 
 					case 'emissiveColor':
 						materialData.emissiveColor = new Color( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
+						materialData.emissiveColor.convertSRGBToLinear();
 						break;
 
 					case 'shininess':
@@ -1235,7 +1238,8 @@ class VRMLLoader extends Loader {
 						break;
 
 					case 'specularColor':
-						materialData.emissiveColor = new Color( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
+						materialData.specularColor = new Color( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
+						materialData.specularColor.convertSRGBToLinear();
 						break;
 
 					case 'transparency':

@@ -46,8 +46,6 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Lut } from 'three/addons/math/Lut.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let container;
 
 			let perpCamera, orthoCamera, renderer, lut;
@@ -83,6 +81,7 @@
 				sprite = new THREE.Sprite( new THREE.SpriteMaterial( {
 					map: new THREE.CanvasTexture( lut.createCanvas() )
 				} ) );
+				sprite.material.map.colorSpace = THREE.SRGBColorSpace;
 				sprite.scale.x = 0.125;
 				uiScene.add( sprite );
 
@@ -102,7 +101,6 @@
 				perpCamera.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
@@ -183,22 +181,15 @@
 				const geometry = mesh.geometry;
 				const pressures = geometry.attributes.pressure;
 				const colors = geometry.attributes.color;
+				const color = new THREE.Color();
 
 				for ( let i = 0; i < pressures.array.length; i ++ ) {
 
 					const colorValue = pressures.array[ i ];
 
-					const color = lut.getColor( colorValue );
+					color.copy( lut.getColor( colorValue ) ).convertSRGBToLinear();
 
-					if ( color === undefined ) {
-
-						console.log( 'Unable to determine color for value:', colorValue );
-
-					} else {
-
-						colors.setXYZ( i, color.r, color.g, color.b );
-
-					}
+					colors.setXYZ( i, color.r, color.g, color.b );
 
 				}
 
