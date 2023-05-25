@@ -4,7 +4,6 @@ import {
 	Bone,
 	BufferGeometry,
 	Color,
-	ColorManagement,
 	CustomBlending,
 	TangentSpaceNormalMap,
 	DoubleSide,
