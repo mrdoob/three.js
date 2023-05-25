@@ -9,7 +9,7 @@ uniform float toneMappingExposure;
 // exposure only
 vec3 LinearToneMapping( vec3 color ) {
 
-	return toneMappingExposure * color;
+	return saturate( toneMappingExposure * color );
 
 }
 
