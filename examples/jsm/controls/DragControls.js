@@ -142,28 +142,28 @@ class DragControls extends EventDispatcher {
 
 		}
 
-    function objectFromIntersection(intersection) {
+		function objectFromIntersection(intersection) {
 
-      if ( scope.transformGroup === true ) return _objects[0]
-  
-      if ( scope.transformDescendants === true ) return intersection.object
-  
-      function findAncestorInObjectsList(object) {
-  
-        if (_objects.includes(object)) {
-          return object
-        }
-        else if (object.parent) {
-          return findAncestorInObjectsList(object.parent)
-        }
-        else {
-          return null
-        }
-      }
-  
-      return findAncestorInObjectsList(intersection.object)
-  
-    }
+			if (scope.transformGroup === true) return _objects[0]
+
+			if (scope.transformDescendants === true) return intersection.object
+
+			function findAncestorInObjectsList(object) {
+
+				if (_objects.includes(object)) {
+					return object
+				}
+				else if (object.parent) {
+					return findAncestorInObjectsList(object.parent)
+				}
+				else {
+					return null
+				}
+			}
+
+			return findAncestorInObjectsList(intersection.object)
+
+		}
 
 		function onPointerDown( event ) {
 
