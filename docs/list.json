@@ -529,6 +529,14 @@
 
 			"Core / BufferAttributes": {
 				"BufferAttribute Types": "api/ar/core/bufferAttributeTypes/BufferAttributeTypes"
+			},
+
+			"Extras": {
+				"DataUtils": "api/ar/extras/DataUtils",
+				"Earcut": "api/ar/extras/Earcut",
+				"ImageUtils": "api/ar/extras/ImageUtils",
+				"PMREMGenerator": "api/ar/extras/PMREMGenerator",
+				"ShapeUtils": "api/ar/extras/ShapeUtils"
 			}
 
 		}
