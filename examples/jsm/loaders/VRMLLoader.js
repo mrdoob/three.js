@@ -1235,7 +1235,7 @@ class VRMLLoader extends Loader {
 						break;
 
 					case 'specularColor':
-						materialData.emissiveColor = new Color( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
+						materialData.specularColor = new Color( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
 						break;
 
 					case 'transparency':
