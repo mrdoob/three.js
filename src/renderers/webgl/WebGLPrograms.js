@@ -4,6 +4,7 @@ import { WebGLProgram } from './WebGLProgram.js';
 import { WebGLShaderCache } from './WebGLShaderCache.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { UniformsUtils } from '../shaders/UniformsUtils.js';
+import { BoneIndexWeightsTextureAllow, BoneIndexWeightsTextureAlways } from '../../constants.js';
 
 function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping ) {
 
@@ -290,6 +291,14 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
 
 			skinning: object.isSkinnedMesh === true,
+			skinWeightsTexture: object.isSkinnedMesh === true
+				&& (
+					object.useBoneIndexWeightsTexture === BoneIndexWeightsTextureAlways
+					|| (
+						object.useBoneIndexWeightsTexture === BoneIndexWeightsTextureAllow
+						&& object.boneIndexWeightsTexture !== null
+					)
+				),
 
 			morphTargets: geometry.morphAttributes.position !== undefined,
 			morphNormals: geometry.morphAttributes.normal !== undefined,
@@ -436,6 +445,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.numClippingPlanes );
 		array.push( parameters.numClipIntersection );
 		array.push( parameters.depthPacking );
+		array.push( parameters.skinWeightsTexture );
 
 	}
 

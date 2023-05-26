@@ -5,6 +5,9 @@ import { Sphere } from '../math/Sphere.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Ray } from '../math/Ray.js';
+import { BoneIndexWeightsTextureAllow, BoneIndexWeightsTextureNever, FloatType, IntType, RGFormat } from '../constants.js';
+import { DataTexture } from '../textures/DataTexture.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
 
 const _basePosition = /*@__PURE__*/ new Vector3();
 
@@ -35,6 +38,91 @@ class SkinnedMesh extends Mesh {
 
 		this.boundingBox = null;
 		this.boundingSphere = null;
+
+		this.useBoneIndexWeightsTexture = BoneIndexWeightsTextureAllow;
+		this.boneIndexWeightsTexture = null;
+
+	}
+
+	createBoneIndexWeightsTexture() {
+
+		const indexBuffers = this.geometry.getSkinIndexBuffers();
+		const weightBuffers = this.geometry.getSkinWeightBuffers();
+
+		if ( ! this.geometry
+				|| this.useBoneIndexWeightsTexture === BoneIndexWeightsTextureNever
+				|| ( this.useBoneIndexWeightsTexture === BoneIndexWeightsTextureAllow
+						&& indexBuffers.length <= 1 ) ) {
+
+			return;
+
+		}
+
+		const vertexCount = indexBuffers[ 0 ].count;
+		const boneStartIndex = new Int32Array( vertexCount );
+
+		const influences = [];
+
+		for ( let vi = 0; vi < vertexCount; ++ vi ) {
+
+			boneStartIndex[ vi ] = influences.length / 2;
+
+			for ( let attrIndex = 0; attrIndex < 4 * indexBuffers.length; ++ attrIndex ) {
+
+				const bufferIndex = Math.trunc( attrIndex / 4 );
+				const component = attrIndex % 4;
+
+				const weight = weightBuffers[ bufferIndex ].getComponent( vi, component );
+
+				if ( weight == 0 ) {
+
+					// weights are sorted so once 0 is seen, there are no more weights
+					break;
+
+				}
+
+				const boneIndex = indexBuffers[ bufferIndex ].getComponent( vi, component );
+				influences.push( boneIndex, weight );
+
+			}
+
+			influences.push( - 1, - 1 );
+
+		}
+
+		// make the texture width a power of 2
+		const influenceCount = influences.length / 2;
+		const textureWidth = Math.pow( 2, Math.ceil( Math.log2( Math.sqrt( influenceCount ) ) ) );
+		const textureHeight = Math.ceil( influenceCount / textureWidth );
+		const influenceArray = new Float32Array( 2 * textureWidth * textureHeight );
+
+		for ( let ii = 0; ii < influences.length; ++ ii ) {
+
+			influenceArray[ ii ] = influences[ ii ];
+
+		}
+
+		for ( let ii = influences.length; ii < influenceArray.length; ++ ii ) {
+
+			influenceArray[ ii ] = - 1;
+
+		}
+
+		if ( this.boneIndexWeightsTexture ) {
+
+			this.boneIndexWeightsTexture.dispose();
+
+		}
+
+		this.boneIndexWeightsTexture = new DataTexture(
+			influenceArray, textureWidth, textureHeight, RGFormat, FloatType );
+
+		this.boneIndexWeightsTexture.needsUpdate = true;
+
+		const attrib = new BufferAttribute( boneStartIndex, 1 );
+		attrib.gpuType = IntType;
+
+		this.geometry.setAttribute( 'bonePairTexStartIndex', attrib );
 
 	}
 
@@ -95,7 +183,9 @@ class SkinnedMesh extends Mesh {
 		this.bindMatrixInverse.copy( source.bindMatrixInverse );
 
 		this.skeleton = source.skeleton;
+		this.useBoneIndexWeightsTexture = source.useBoneIndexWeightsTexture;
 
+		if ( source.boneIndexWeightsTexture !== null ) this.boneIndexWeightsTexture = source.boneIndexWeightsTexture.clone();
 		if ( source.boundingBox !== null ) this.boundingBox = source.boundingBox.clone();
 		if ( source.boundingSphere !== null ) this.boundingSphere = source.boundingSphere.clone();
 
@@ -175,27 +265,83 @@ class SkinnedMesh extends Mesh {
 
 	normalizeSkinWeights() {
 
-		const vector = new Vector4();
+		const weightBuffers = this.geometry.getSkinWeightBuffers();
+		const indexBuffers = this.geometry.getSkinIndexBuffers();
+		const vertexCount = weightBuffers[ 0 ].count;
+		const maxInfluences =
+			this.useBoneIndexWeightsTexture == BoneIndexWeightsTextureNever ? 4 : 4 * indexBuffers.length;
 
-		const skinWeight = this.geometry.attributes.skinWeight;
+		const tempBoneIndexes = [ ...Array( maxInfluences ) ];
+		const tempBoneWeights = [ ...Array( maxInfluences ) ];
 
-		for ( let i = 0, l = skinWeight.count; i < l; i ++ ) {
+		for ( let vi = 0; vi < vertexCount; vi ++ ) {
 
-			vector.fromBufferAttribute( skinWeight, i );
+			const sortedSkinPairIndexes = [];
 
-			const scale = 1.0 / vector.manhattanLength();
+			for ( let jj = 0; jj < 4 * weightBuffers.length; ++ jj ) {
 
-			if ( scale !== Infinity ) {
-
-				vector.multiplyScalar( scale );
-
-			} else {
-
-				vector.set( 1, 0, 0, 0 ); // do something reasonable
+				sortedSkinPairIndexes.push( jj );
 
 			}
 
-			skinWeight.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
+			// Sort by descending weight so when weights are limited we only take the
+			// highest ones
+			sortedSkinPairIndexes.sort( ( a, b ) => {
+
+				const bufIndexA = Math.trunc( a / 4 );
+				const bufIndexB = Math.trunc( b / 4 );
+
+				return weightBuffers[ bufIndexB ].getComponent( vi, b % 4 )
+				     - weightBuffers[ bufIndexA ].getComponent( vi, a % 4 );
+
+			} );
+
+			let vertexWeight = 0;
+
+			for ( let destAttrIndex = 0; destAttrIndex < maxInfluences; ++ destAttrIndex ) {
+
+				const srcAttrIndex = sortedSkinPairIndexes[ destAttrIndex ];
+				const bufIndex = Math.trunc( srcAttrIndex / 4 );
+				const component = srcAttrIndex % 4;
+				const weight = weightBuffers[ bufIndex ].getComponent( vi, component );
+				vertexWeight += weight;
+
+				tempBoneIndexes[ destAttrIndex ] = indexBuffers[ bufIndex ].getComponent( vi, component );
+				tempBoneWeights[ destAttrIndex ] = weight;
+
+			}
+
+			if ( vertexWeight === 0 ) {
+
+				// do something reasonable
+				weightBuffers[ 0 ].setXYZW( 1, 0, 0, 0 );
+				for ( let bufIndex = 1; bufIndex < weightBuffers.length; ++ bufIndex ) {
+
+					weightBuffers[ bufIndex ].setXYZW( 0, 0, 0, 0 );
+
+				}
+
+			} else {
+
+				for ( let attrIndex = 0; attrIndex < maxInfluences; ++ attrIndex ) {
+
+					const bufIndex = Math.trunc( attrIndex / 4 );
+					const component = attrIndex % 4;
+					const normalizedWeight = tempBoneWeights[ attrIndex ] / vertexWeight;
+
+					indexBuffers[ bufIndex ].setComponent( vi, component, tempBoneIndexes[ attrIndex ] );
+					weightBuffers[ bufIndex ].setComponent( vi, component, normalizedWeight );
+
+				}
+
+			}
+
+		}
+
+		for ( let bufIndex = 0; bufIndex < maxInfluences / 4; ++ bufIndex ) {
+
+			weightBuffers[ bufIndex ].needsUpdate = true;
+			indexBuffers[ bufIndex ].needsUpdate = true;
 
 		}
 

@@ -86,83 +86,71 @@ class InterleavedBufferAttribute {
 
 	}
 
-	setX( index, x ) {
+	setComponent( index, component, value ) {
 
-		if ( this.normalized ) x = normalize( x, this.array );
+		if ( this.normalized ) value = normalize( value, this.array );
 
-		this.data.array[ index * this.data.stride + this.offset ] = x;
+		this.data.array[ index * this.data.stride + this.offset + component ] = value;
 
 		return this;
+
+	}
+
+	setX( index, x ) {
+
+		return this.setComponent( index, 0, x );
 
 	}
 
 	setY( index, y ) {
 
-		if ( this.normalized ) y = normalize( y, this.array );
-
-		this.data.array[ index * this.data.stride + this.offset + 1 ] = y;
-
-		return this;
+		return this.setComponent( index, 1, y );
 
 	}
 
 	setZ( index, z ) {
 
-		if ( this.normalized ) z = normalize( z, this.array );
-
-		this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
-
-		return this;
+		return this.setComponent( index, 2, z );
 
 	}
 
 	setW( index, w ) {
 
-		if ( this.normalized ) w = normalize( w, this.array );
+		return this.setComponent( index, 3, w );
 
-		this.data.array[ index * this.data.stride + this.offset + 3 ] = w;
+	}
 
-		return this;
+	getComponent( index, component ) {
+
+		let item = this.data.array[ index * this.data.stride + this.offset + component ];
+
+		if ( this.normalized ) item = denormalize( item, this.array );
+
+		return item;
 
 	}
 
 	getX( index ) {
 
-		let x = this.data.array[ index * this.data.stride + this.offset ];
-
-		if ( this.normalized ) x = denormalize( x, this.array );
-
-		return x;
+		return this.getComponent( index, 0 );
 
 	}
 
 	getY( index ) {
 
-		let y = this.data.array[ index * this.data.stride + this.offset + 1 ];
-
-		if ( this.normalized ) y = denormalize( y, this.array );
-
-		return y;
+		return this.getComponent( index, 1 );
 
 	}
 
 	getZ( index ) {
 
-		let z = this.data.array[ index * this.data.stride + this.offset + 2 ];
-
-		if ( this.normalized ) z = denormalize( z, this.array );
-
-		return z;
+		return this.getComponent( index, 2 );
 
 	}
 
 	getW( index ) {
 
-		let w = this.data.array[ index * this.data.stride + this.offset + 3 ];
-
-		if ( this.normalized ) w = denormalize( w, this.array );
-
-		return w;
+		return this.getComponent( index, 3 );
 
 	}
 
