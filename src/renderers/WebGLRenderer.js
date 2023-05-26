@@ -1363,15 +1363,14 @@ class WebGLRenderer {
 			_this.getDrawingBufferSize( _vector2 );
 
 			if ( isWebGL2 ) {
-	
+
 				_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
-	
+
 			} else {
-	
+
 				_transmissionRenderTarget.setSize( floorPowerOfTwo( _vector2.x ), floorPowerOfTwo( _vector2.y ) );
-	
+
 			}
-	
 
 			//
 
