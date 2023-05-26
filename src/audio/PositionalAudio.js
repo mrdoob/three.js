@@ -19,7 +19,6 @@ class PositionalAudio extends Audio {
 
 	}
 	
-	
 	connect() {
 
 		super.connect();
