@@ -28,6 +28,7 @@ class BufferAttribute {
 
 		this.usage = StaticDrawUsage;
 		this.updateRange = { offset: 0, count: - 1 };
+		this.gpuType = FloatType;
 
 		this.version = 0;
 
@@ -58,6 +59,7 @@ class BufferAttribute {
 		this.normalized = source.normalized;
 
 		this.usage = source.usage;
+		this.gpuType = source.gpuType;
 
 		return this;
 
@@ -378,18 +380,6 @@ class Int8BufferAttribute extends BufferAttribute {
 
 		super( new Int8Array( array ), itemSize, normalized );
 
-		this.gpuType = FloatType;
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.gpuType = source.gpuType;
-
-		return this;
-
 	}
 
 }
@@ -399,18 +389,6 @@ class Uint8BufferAttribute extends BufferAttribute {
 	constructor( array, itemSize, normalized ) {
 
 		super( new Uint8Array( array ), itemSize, normalized );
-
-		this.gpuType = FloatType;
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.gpuType = source.gpuType;
-
-		return this;
 
 	}
 
@@ -432,18 +410,6 @@ class Int16BufferAttribute extends BufferAttribute {
 
 		super( new Int16Array( array ), itemSize, normalized );
 
-		this.gpuType = FloatType;
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.gpuType = source.gpuType;
-
-		return this;
-
 	}
 
 }
@@ -453,18 +419,6 @@ class Uint16BufferAttribute extends BufferAttribute {
 	constructor( array, itemSize, normalized ) {
 
 		super( new Uint16Array( array ), itemSize, normalized );
-
-		this.gpuType = FloatType;
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.gpuType = source.gpuType;
-
-		return this;
 
 	}
 
