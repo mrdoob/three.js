@@ -3,7 +3,7 @@ import { GPUFeatureName, GPUTextureFormat, GPULoadOp, GPUStoreOp, GPUIndexFormat
 import WebGPUNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
 
-import { Matrix4, Frustum, DepthFormat, WebGPUCoordinateSystem } from 'three';
+import { DepthFormat, WebGPUCoordinateSystem } from 'three';
 
 import WebGPUUtils from './utils/WebGPUUtils.js';
 import WebGPUAttributeUtils from './utils/WebGPUAttributeUtils.js';
