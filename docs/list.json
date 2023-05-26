@@ -537,6 +537,15 @@
 				"ImageUtils": "api/ar/extras/ImageUtils",
 				"PMREMGenerator": "api/ar/extras/PMREMGenerator",
 				"ShapeUtils": "api/ar/extras/ShapeUtils"
+			},
+
+			"Extras / Core": {
+				"Curve": "api/ar/extras/core/Curve",
+				"CurvePath": "api/ar/extras/core/CurvePath",
+				"Interpolations": "api/ar/extras/core/Interpolations",
+				"Path": "api/ar/extras/core/Path",
+				"Shape": "api/ar/extras/core/Shape",
+				"ShapePath": "api/ar/extras/core/ShapePath"
 			}
 
 		}
