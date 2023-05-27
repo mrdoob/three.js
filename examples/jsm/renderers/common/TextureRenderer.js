@@ -8,6 +8,8 @@ class TextureRenderer {
 
 		this.renderTarget = new RenderTarget( 1, 1, options );
 
+		this.isTextureRenderer = true;
+
 	}
 
 	get texture() {

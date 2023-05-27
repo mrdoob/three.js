@@ -1,4 +1,4 @@
-import { GPUFeatureName, GPUTextureFormat, GPULoadOp, GPUStoreOp, GPUIndexFormat } from './utils/WebGPUConstants.js';
+import { GPUFeatureName, GPUTextureFormat, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension } from './utils/WebGPUConstants.js';
 
 import WebGPUNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
@@ -151,7 +151,13 @@ class WebGPUBackend extends Backend {
 
 			// @TODO: Support RenderTarget with antialiasing.
 
-			colorAttachment.view = textureData.texture.createView();
+			colorAttachment.view = textureData.texture.createView( {
+				baseMipLevel: 0,
+				mipLevelCount: 1,
+				baseArrayLayer: renderContext.activeCubeFace,
+				dimension: GPUTextureViewDimension.TwoD
+			} );
+
 			depthStencilAttachment.view = depthTextureData.texture.createView();
 
 			if ( renderContext.stencil && renderContext.depthTexture.format === DepthFormat ) {
@@ -263,6 +269,14 @@ class WebGPUBackend extends Backend {
 		renderContextData.currentPass.end();
 
 		this.device.queue.submit( [ renderContextData.encoder.finish() ] );
+
+		//
+
+		if ( renderContext.texture !== null && renderContext.texture.generateMipmaps === true ) {
+
+			this.textureUtils.generateMipmaps( renderContext.texture );
+
+		}
 
 	}
 

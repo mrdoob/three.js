@@ -173,6 +173,26 @@ class WebGPUTextureUtils {
 
 	}
 
+	generateMipmaps( texture ) {
+
+		const textureData = this.backend.get( texture );
+
+		if ( texture.isCubeTexture ) {
+
+			for ( let i = 0; i < 6; i ++ ) {
+
+				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i );
+
+			}
+
+		} else {
+
+			this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU );
+
+		}
+
+	}
+
 	updateTexture( texture ) {
 
 		const textureData = this.backend.get( texture );
@@ -331,7 +351,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer ) {
+	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0 ) {
 
 		if ( this.mipmapUtils === null ) {
 
@@ -529,7 +549,7 @@ class WebGPUTextureUtils {
 
 	_needsMipmaps( texture ) {
 
-		return ( texture.isCompressedTexture !== true ) && ( texture.generateMipmaps === true ) && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
+		return ( texture.isCompressedTexture !== true ) /*&& ( texture.generateMipmaps === true )*/ && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
 
 	}
 

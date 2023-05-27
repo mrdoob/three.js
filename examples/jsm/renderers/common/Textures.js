@@ -1,5 +1,7 @@
 import DataMap from './DataMap.js';
-import { DepthTexture, DepthStencilFormat, UnsignedInt248Type } from 'three';
+import { Vector2, DepthTexture, DepthStencilFormat, UnsignedInt248Type } from 'three';
+
+const _size = new Vector2();
 
 class Textures extends DataMap {
 
@@ -17,6 +19,7 @@ class Textures extends DataMap {
 		const renderTargetData = this.get( renderTarget );
 
 		const texture = renderTarget.texture;
+		const size = this.getSize( texture );
 
 		let depthTexture = renderTarget.depthTexture || renderTargetData.depthTexture;
 
@@ -25,23 +28,23 @@ class Textures extends DataMap {
 			depthTexture = new DepthTexture();
 			depthTexture.format = DepthStencilFormat;
 			depthTexture.type = UnsignedInt248Type;
-			depthTexture.image.width = texture.image.width;
-			depthTexture.image.height = texture.image.height;
+			depthTexture.image.width = size.width;
+			depthTexture.image.height = size.height;
 
 		}
 
-		if ( renderTargetData.width !== texture.image.width || texture.image.height !== renderTargetData.height ) {
+		if ( renderTargetData.width !== size.width || size.height !== renderTargetData.height ) {
 
 			texture.needsUpdate = true;
 			depthTexture.needsUpdate = true;
 
-			depthTexture.image.width = texture.image.width;
-			depthTexture.image.height = texture.image.height;
+			depthTexture.image.width = size.width;
+			depthTexture.image.height = size.height;
 
 		}
 
-		renderTargetData.width = texture.image.width;
-		renderTargetData.height = texture.image.height;
+		renderTargetData.width = size.width;
+		renderTargetData.height = size.height;
 		renderTargetData.texture = texture;
 		renderTargetData.depthTexture = depthTexture;
 
@@ -168,6 +171,24 @@ class Textures extends DataMap {
 		//
 
 		textureData.version = texture.version;
+
+	}
+
+	getSize( texture, target = _size ) {
+
+		if ( texture.isCubeTexture ) {
+
+			target.width = texture.image[ 0 ].width;
+			target.height = texture.image[ 0 ].height;
+
+		} else {
+
+			target.width = texture.image.width;
+			target.height = texture.image.height;
+
+		}
+
+		return target;
 
 	}
 
