@@ -46,7 +46,11 @@ class CubeCamera extends Object3D {
 
 		const coordinateSystem = this.coordinateSystem;
 
-		const [ cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ ] = this.children;
+		const cameras = this.children.concat();
+
+		const [ cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ ] = cameras;
+
+		for ( const camera of cameras ) this.remove( camera );
 
 		if ( coordinateSystem === WebGLCoordinateSystem ) {
 
@@ -93,6 +97,8 @@ class CubeCamera extends Object3D {
 			throw new Error( 'THREE.CubeCamera.updateCoordinateSystem(): Invalid coordinate system: ' + coordinateSystem );
 
 		}
+
+		for ( const camera of cameras ) this.add( camera );
 
 	}
 
