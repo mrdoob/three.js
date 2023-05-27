@@ -16,9 +16,9 @@ class Nodes extends DataMap {
 
 	getForRender( renderObject ) {
 
-		const renderObjectProperties = this.get( renderObject );
+		const renderObjectData = this.get( renderObject );
 
-		let nodeBuilder = renderObjectProperties.nodeBuilder;
+		let nodeBuilder = renderObjectData.nodeBuilder;
 
 		if ( nodeBuilder === undefined ) {
 
@@ -30,7 +30,7 @@ class Nodes extends DataMap {
 			nodeBuilder.toneMappingNode = this.getToneMappingNode();
 			nodeBuilder.build();
 
-			renderObjectProperties.nodeBuilder = nodeBuilder;
+			renderObjectData.nodeBuilder = nodeBuilder;
 
 		}
 
@@ -40,16 +40,16 @@ class Nodes extends DataMap {
 
 	getForCompute( computeNode ) {
 
-		const computeProperties = this.get( computeNode );
+		const computeData = this.get( computeNode );
 
-		let nodeBuilder = computeProperties.nodeBuilder;
+		let nodeBuilder = computeData.nodeBuilder;
 
 		if ( nodeBuilder === undefined ) {
 
 			nodeBuilder = this.backend.createNodeBuilder( computeNode, this.renderer );
 			nodeBuilder.build();
 
-			computeProperties.nodeBuilder = nodeBuilder;
+			computeData.nodeBuilder = nodeBuilder;
 
 		}
 
@@ -138,12 +138,12 @@ class Nodes extends DataMap {
 
 	updateBackground( scene ) {
 
-		const sceneProperties = this.get( scene );
+		const sceneData = this.get( scene );
 		const background = scene.background;
 
 		if ( background ) {
 
-			if ( sceneProperties.background !== background ) {
+			if ( sceneData.background !== background ) {
 
 				let backgroundNode = null;
 
@@ -173,15 +173,15 @@ class Nodes extends DataMap {
 
 				}
 
-				sceneProperties.backgroundNode = backgroundNode;
-				sceneProperties.background = background;
+				sceneData.backgroundNode = backgroundNode;
+				sceneData.background = background;
 
 			}
 
-		} else if ( sceneProperties.backgroundNode ) {
+		} else if ( sceneData.backgroundNode ) {
 
-			delete sceneProperties.backgroundNode;
-			delete sceneProperties.background;
+			delete sceneData.backgroundNode;
+			delete sceneData.background;
 
 		}
 
@@ -189,12 +189,12 @@ class Nodes extends DataMap {
 
 	updateFog( scene ) {
 
-		const sceneProperties = this.get( scene );
+		const sceneData = this.get( scene );
 		const fog = scene.fog;
 
 		if ( fog ) {
 
-			if ( sceneProperties.fog !== fog ) {
+			if ( sceneData.fog !== fog ) {
 
 				let fogNode = null;
 
@@ -212,15 +212,15 @@ class Nodes extends DataMap {
 
 				}
 
-				sceneProperties.fogNode = fogNode;
-				sceneProperties.fog = fog;
+				sceneData.fogNode = fogNode;
+				sceneData.fog = fog;
 
 			}
 
 		} else {
 
-			delete sceneProperties.fogNode;
-			delete sceneProperties.fog;
+			delete sceneData.fogNode;
+			delete sceneData.fog;
 
 		}
 
@@ -228,12 +228,12 @@ class Nodes extends DataMap {
 
 	updateEnvironment( scene ) {
 
-		const sceneProperties = this.get( scene );
+		const sceneData = this.get( scene );
 		const environment = scene.environment;
 
 		if ( environment ) {
 
-			if ( sceneProperties.environment !== environment ) {
+			if ( sceneData.environment !== environment ) {
 
 				let environmentNode = null;
 
@@ -251,15 +251,15 @@ class Nodes extends DataMap {
 
 				}
 
-				sceneProperties.environmentNode = environmentNode;
-				sceneProperties.environment = environment;
+				sceneData.environmentNode = environmentNode;
+				sceneData.environment = environment;
 
 			}
 
-		} else if ( sceneProperties.environmentNode ) {
+		} else if ( sceneData.environmentNode ) {
 
-			delete sceneProperties.environmentNode;
-			delete sceneProperties.environment;
+			delete sceneData.environmentNode;
+			delete sceneData.environment;
 
 		}
 
@@ -291,11 +291,7 @@ class Nodes extends DataMap {
 
 	}
 
-	updateForCompute( computeNode ) {
-
-
-
-	}
+	updateForCompute( /*computeNode*/ ) { }
 
 	updateForRender( renderObject ) {
 
