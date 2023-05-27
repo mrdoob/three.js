@@ -546,6 +546,19 @@
 				"Path": "api/ar/extras/core/Path",
 				"Shape": "api/ar/extras/core/Shape",
 				"ShapePath": "api/ar/extras/core/ShapePath"
+			},
+
+			"Extras / Curves": {
+				"ArcCurve": "api/ar/extras/curves/ArcCurve",
+				"CatmullRomCurve3": "api/ar/extras/curves/CatmullRomCurve3",
+				"CubicBezierCurve": "api/ar/extras/curves/CubicBezierCurve",
+				"CubicBezierCurve3": "api/ar/extras/curves/CubicBezierCurve3",
+				"EllipseCurve": "api/ar/extras/curves/EllipseCurve",
+				"LineCurve": "api/ar/extras/curves/LineCurve",
+				"LineCurve3": "api/ar/extras/curves/LineCurve3",
+				"QuadraticBezierCurve": "api/ar/extras/curves/QuadraticBezierCurve",
+				"QuadraticBezierCurve3": "api/ar/extras/curves/QuadraticBezierCurve3",
+				"SplineCurve": "api/ar/extras/curves/SplineCurve"
 			}
 
 		}
