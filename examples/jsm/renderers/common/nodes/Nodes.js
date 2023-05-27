@@ -110,22 +110,27 @@ class Nodes extends DataMap {
 	updateToneMapping() {
 
 		const renderer = this.renderer;
-		const rendererProperties = this.get( renderer );
+		const rendererData = this.get( renderer );
 		const rendererToneMapping = renderer.toneMapping;
 
 		if ( rendererToneMapping !== NoToneMapping ) {
 
-			if ( rendererProperties.toneMapping !== rendererToneMapping ) {
+			if ( rendererData.toneMapping !== rendererToneMapping ) {
 
-				rendererProperties.toneMappingNode = toneMapping( rendererToneMapping, reference( 'toneMappingExposure', 'float', renderer ) );
-				rendererProperties.toneMapping = rendererToneMapping;
+				const rendererToneMappingNode = rendererData.rendererToneMappingNode || toneMapping( rendererToneMapping, reference( 'toneMappingExposure', 'float', renderer ) );
+				rendererToneMappingNode.toneMapping = rendererToneMapping;
+
+				rendererData.rendererToneMappingNode = rendererToneMappingNode;
+				rendererData.toneMappingNode = rendererToneMappingNode;
+				rendererData.toneMapping = rendererToneMapping;
 
 			}
 
 		} else {
 
-			delete rendererProperties.toneMappingNode;
-			delete rendererProperties.toneMapping;
+			// Don't delete rendererData.rendererToneMappingNode
+			delete rendererData.toneMappingNode;
+			delete rendererData.toneMapping;
 
 		}
 
