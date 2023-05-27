@@ -919,7 +919,7 @@ class VRMLLoader extends Loader {
 				} else {
 
 					skyMaterial.color.setRGB( skyColor[ 0 ], skyColor[ 1 ], skyColor[ 2 ] );
-					skyMaterial.convertSRGBToLinear();
+					skyMaterial.color.convertSRGBToLinear();
 
 				}
 

@@ -19,6 +19,14 @@ class PositionalAudio extends Audio {
 
 	}
 
+	connect() {
+
+		super.connect();
+
+		this.panner.connect( this.gain );
+
+	}
+
 	disconnect() {
 
 		super.disconnect();
