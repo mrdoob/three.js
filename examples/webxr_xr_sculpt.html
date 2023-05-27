@@ -134,6 +134,7 @@
 				];
 
 				let reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				reflectionCube.colorSpace = THREE.SRGBColorSpace;
 				*/
 
 				const material = new THREE.MeshStandardMaterial( {
