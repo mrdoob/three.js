@@ -14,7 +14,7 @@ class CubeCamera extends Object3D {
 		this.type = 'CubeCamera';
 
 		this.renderTarget = renderTarget;
-		this.coordinateSystem = null;
+		this.coordinateSystem = WebGLCoordinateSystem;
 
 		const cameraPX = new PerspectiveCamera( fov, aspect, near, far );
 		cameraPX.layers = this.layers;
@@ -39,6 +39,8 @@ class CubeCamera extends Object3D {
 		const cameraNZ = new PerspectiveCamera( fov, aspect, near, far );
 		cameraNZ.layers = this.layers;
 		this.add( cameraNZ );
+
+		this.updateCoordinateSystem();
 
 	}
 
