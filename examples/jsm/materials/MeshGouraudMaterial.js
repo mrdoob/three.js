@@ -38,7 +38,6 @@ const GouraudShader = {
 		#include <common>
 		#include <uv_pars_vertex>
 		#include <envmap_pars_vertex>
-		#include <bsdfs>
 		#include <lights_pars_begin>
 		#include <color_pars_vertex>
 		#include <fog_pars_vertex>
@@ -227,7 +226,6 @@ const GouraudShader = {
 		#include <emissivemap_pars_fragment>
 		#include <envmap_common_pars_fragment>
 		#include <envmap_pars_fragment>
-		#include <bsdfs>
 		#include <lights_pars_begin>
 		#include <fog_pars_fragment>
 		#include <shadowmap_pars_fragment>

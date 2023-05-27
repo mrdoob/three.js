@@ -6,7 +6,6 @@ import aomap_fragment from './ShaderChunk/aomap_fragment.glsl.js';
 import aomap_pars_fragment from './ShaderChunk/aomap_pars_fragment.glsl.js';
 import begin_vertex from './ShaderChunk/begin_vertex.glsl.js';
 import beginnormal_vertex from './ShaderChunk/beginnormal_vertex.glsl.js';
-import bsdfs from './ShaderChunk/bsdfs.glsl.js';
 import iridescence_fragment from './ShaderChunk/iridescence_fragment.glsl.js';
 import bumpmap_pars_fragment from './ShaderChunk/bumpmap_pars_fragment.glsl.js';
 import clipping_planes_fragment from './ShaderChunk/clipping_planes_fragment.glsl.js';
@@ -129,7 +128,6 @@ export const ShaderChunk = {
 	aomap_pars_fragment: aomap_pars_fragment,
 	begin_vertex: begin_vertex,
 	beginnormal_vertex: beginnormal_vertex,
-	bsdfs: bsdfs,
 	iridescence_fragment: iridescence_fragment,
 	bumpmap_pars_fragment: bumpmap_pars_fragment,
 	clipping_planes_fragment: clipping_planes_fragment,

@@ -147,7 +147,6 @@ class Water extends Mesh {
 
 				#include <common>
 				#include <packing>
-				#include <bsdfs>
 				#include <fog_pars_fragment>
 				#include <logdepthbuf_pars_fragment>
 				#include <lights_pars_begin>

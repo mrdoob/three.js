@@ -65,7 +65,6 @@ uniform float opacity;
 #include <emissivemap_pars_fragment>
 #include <gradientmap_pars_fragment>
 #include <fog_pars_fragment>
-#include <bsdfs>
 #include <lights_pars_begin>
 #include <normal_pars_fragment>
 #include <lights_toon_pars_fragment>
