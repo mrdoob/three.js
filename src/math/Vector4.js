@@ -552,6 +552,18 @@ class Vector4 {
 
 	}
 
+	addLength( length ) {
+
+		return this.multiplyScalar( 1 + length / this.length() );
+
+	}
+
+	subLength( length ) {
+
+		return this.multiplyScalar( 1 - length / this.length() );
+
+	}
+
 	setLength( length ) {
 
 		return this.normalize().multiplyScalar( length );

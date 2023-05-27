@@ -481,6 +481,38 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'addLength', ( assert ) => {
+
+			let a = new Vector3( x, y, z );
+			const l = a.length();
+
+			a.addLength( - l );
+			assert.ok( a.length() == 0, 'Passed!' );
+
+			a = new Vector3( x, y, z );
+			const s = Math.random();
+			const length = s * l;
+			a.addLength( length );
+			assert.ok( a.length() - l - length < 0.0000001, 'Passed!' );
+
+		} );
+
+		QUnit.test( 'subLength', ( assert ) => {
+
+			let a = new Vector3( x, y, z );
+			const l = a.length();
+
+			a.subLength( l );
+			assert.ok( a.length() == 0, 'Passed!' );
+
+			a = new Vector3( x, y, z );
+			const s = Math.random();
+			const length = s * l;
+			a.subLength( length );
+			assert.ok( a.length() + length - l < 0.0000001, 'Passed!' );
+
+		} );
+
 		QUnit.test( 'setLength', ( assert ) => {
 
 			let a = new Vector3( x, 0, 0 );
