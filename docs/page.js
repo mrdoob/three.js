@@ -76,6 +76,8 @@ function onDocumentLoad() {
 
 	document.body.innerHTML = text;
 
+	order( document.body );
+
 	if ( window.parent.getPageURL ) {
 
 		const links = document.querySelectorAll( '.links' );
@@ -166,4 +168,44 @@ function onDocumentLoad() {
 
 	document.head.appendChild( prettify );
 
+}
+
+function order(body) {
+    let sections = [],
+        currentSection = [],
+        currentSubSection = [];
+    while(body.childNodes.length) {
+        const child = body.firstChild;
+        child.remove();
+        if(child.nodeName === 'H3') {
+            if(currentSubSection.length) currentSection.push(currentSubSection);
+            currentSubSection = [];
+        }
+        if(child.nodeName === 'H2') {
+            if(currentSubSection.length) currentSection.push(currentSubSection);
+            currentSubSection = [];
+            if(currentSection.length) sections.push(currentSection);
+            currentSection = [];
+        }
+        currentSubSection.push(child);
+    }
+    currentSection.push(currentSubSection);
+    sections.push(currentSection);
+
+    sections.forEach(function(section) {
+        section.sort(function(a, b) {
+            a = a[0]; b = b[0];
+            if(a.nodeName !== 'H3') return -1;
+            a = a.textContent; b = b.textContent;
+            if(a > b) return 1;
+            if(a < b) return -1;
+            return 0;
+        });
+
+        section.forEach(function(subSection) {
+            subSection.forEach(function(element) {
+                body.appendChild(element);
+            });
+        });
+    });
 }
