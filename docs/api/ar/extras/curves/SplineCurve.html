@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Curve] &rarr;
+	 
+		<h1>[name]</h1>
+	 
+		<p class="desc">
+		قم بإنشاء منحنى سبلاين ثنائي الأبعاد ناعم من سلسلة من النقاط. يستخدم هذا داخليًا
+		[page:Interpolations.CatmullRom] لإنشاء المنحنى.
+		</p>
+	 
+		<h2>مثال الكود</h2>
+	 
+		<code>
+		// إنشاء موجة شبيهة بالجيب
+		const curve = new THREE.SplineCurve( [
+		new THREE.Vector2( -10, 0 ),
+		new THREE.Vector2( -5, 5 ),
+		new THREE.Vector2( 0, 0 ),
+		new THREE.Vector2( 5, -5 ),
+		new THREE.Vector2( 10, 0 )
+		] );
+	 
+		const points = curve.getPoints( 50 );
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
+	 
+		const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+	 
+		// إنشاء الكائن النهائي لإضافته إلى المشهد
+		const splineObject = new THREE.Line( geometry, material );
+		</code>
+	 
+		<h2>المنشئ (Constructor)</h2>
+	 
+		<h3>[name]( [param:Array points] )</h3>
+		<p>points – مصفوفة من نقاط [page:Vector2] التي تحدد المنحنى.</p>
+	 
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى قاعدة [page:Curve] للخصائص المشتركة.</p>
+	 
+		<h3>[property:Array points]</h3>
+		<p>مصفوفة من نقاط [page:Vector2] التي تحدد المنحنى.</p>
+	 
+		<h2>الوظائف (Methods)</h2>
+		<p>انظر إلى قاعدة [page:Curve] للأساليب المشتركة.</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
