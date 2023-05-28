@@ -1,6 +1,7 @@
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
+import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RAD2DEG } from '../../math/MathUtils.js';
@@ -39,6 +40,9 @@ class WebXRManager extends EventDispatcher {
 
 		const controllers = [];
 		const controllerInputSources = [];
+
+		const currentSize = new Vector2();
+		let currentPixelRatio = null;
 
 		//
 
@@ -182,6 +186,8 @@ class WebXRManager extends EventDispatcher {
 
 			//
 
+			renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
+
 			animation.stop();
 
 			scope.isPresenting = false;
@@ -292,6 +298,7 @@ class WebXRManager extends EventDispatcher {
 					glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
 
 					session.updateRenderState( { baseLayer: glBaseLayer } );
+					renderer.setDrawingBufferSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, 1 );
 
 					newRenderTarget = new WebGLRenderTarget(
 						glBaseLayer.framebufferWidth,
@@ -329,6 +336,7 @@ class WebXRManager extends EventDispatcher {
 					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
 
 					session.updateRenderState( { layers: [ glProjLayer ] } );
+					renderer.setDrawingBufferSize( glProjLayer.textureWidth, glProjLayer.textureHeight, 1 );
 
 					newRenderTarget = new WebGLRenderTarget(
 						glProjLayer.textureWidth,
@@ -353,6 +361,9 @@ class WebXRManager extends EventDispatcher {
 
 				customReferenceSpace = null;
 				referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
+
+				currentPixelRatio = renderer.getPixelRatio();
+				renderer.getDrawingBufferSize( currentSize );
 
 				animation.setContext( session );
 				animation.start();
