@@ -546,6 +546,30 @@
 				"Path": "api/ar/extras/core/Path",
 				"Shape": "api/ar/extras/core/Shape",
 				"ShapePath": "api/ar/extras/core/ShapePath"
+			},
+
+			"Geometries": {
+				"BoxGeometry": "api/ar/geometries/BoxGeometry",
+				"CapsuleGeometry": "api/ar/geometries/CapsuleGeometry",
+				"CircleGeometry": "api/ar/geometries/CircleGeometry",
+				"ConeGeometry": "api/ar/geometries/ConeGeometry",
+				"CylinderGeometry": "api/ar/geometries/CylinderGeometry",
+				"DodecahedronGeometry": "api/ar/geometries/DodecahedronGeometry",
+				"EdgesGeometry": "api/ar/geometries/EdgesGeometry",
+				"ExtrudeGeometry": "api/ar/geometries/ExtrudeGeometry",
+				"IcosahedronGeometry": "api/ar/geometries/IcosahedronGeometry",
+				"LatheGeometry": "api/ar/geometries/LatheGeometry",
+				"OctahedronGeometry": "api/ar/geometries/OctahedronGeometry",
+				"PlaneGeometry": "api/ar/geometries/PlaneGeometry",
+				"PolyhedronGeometry": "api/ar/geometries/PolyhedronGeometry",
+				"RingGeometry": "api/ar/geometries/RingGeometry",
+				"ShapeGeometry": "api/ar/geometries/ShapeGeometry",
+				"SphereGeometry": "api/ar/geometries/SphereGeometry",
+				"TetrahedronGeometry": "api/ar/geometries/TetrahedronGeometry",
+				"TorusGeometry": "api/ar/geometries/TorusGeometry",
+				"TorusKnotGeometry": "api/ar/geometries/TorusKnotGeometry",
+				"TubeGeometry": "api/ar/geometries/TubeGeometry",
+				"WireframeGeometry": "api/ar/geometries/WireframeGeometry"
 			}
 
 		}
