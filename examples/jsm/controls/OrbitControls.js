@@ -583,8 +583,14 @@ class OrbitControls extends EventDispatcher {
 
 		function updateMouseParameters( event ) {
 
-			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+			const x = event.clientX - scope.domElement.clientLeft;
+			const y = event.clientY - scope.domElement.clientTop;
+			const w = scope.domElement.clientWidth;
+			const h = scope.domElement.clientHeight;
+
+			mouse.x = ( x / w ) * 2 - 1;
+			mouse.y = - ( y / h ) * 2 + 1;
+
 			dollyDirection.set( mouse.x, mouse.y, 1 ).unproject( object ).sub( object.position ).normalize();
 
 		}
