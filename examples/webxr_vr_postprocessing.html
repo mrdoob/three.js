@@ -51,10 +51,7 @@
 			renderer.xr.enabled = true;
 			document.body.appendChild( VRButton.createButton( renderer ) );
 
-			const camera = new THREE.PerspectiveCamera(
-				75,
-				window.innerHeight / window.innerHeight
-			);
+			const camera = new THREE.PerspectiveCamera( 75 );
 
 			const controls = new OrbitControls( camera, renderer.domElement );
 
