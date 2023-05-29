@@ -558,6 +558,14 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
+		function updateMouseParameters( event ) {
+
+			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+			dollyDirection.set( mouse.x, mouse.y, 1 ).unproject( object ).sub( object.position ).normalize();
+
+		}
+
 		//
 		// event callbacks - update the object state
 		//
@@ -570,6 +578,7 @@ class OrbitControls extends EventDispatcher {
 
 		function handleMouseDownDolly( event ) {
 
+			updateMouseParameters( event );
 			dollyStart.set( event.clientX, event.clientY );
 
 		}
@@ -636,9 +645,7 @@ class OrbitControls extends EventDispatcher {
 
 		function handleMouseWheel( event ) {
 
-			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-			dollyDirection.set( mouse.x, mouse.y, 1 ).unproject( object ).sub( object.position ).normalize();
+			updateMouseParameters( event );
 
 			if ( event.deltaY < 0 ) {
 
