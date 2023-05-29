@@ -5,6 +5,7 @@ import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
+import { createNodeMaterialFromType } from '../materials/NodeMaterial.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import { REVISION, NoColorSpace, LinearEncoding, sRGBEncoding, SRGBColorSpace, Color, Vector2, Vector3, Vector4, Float16BufferAttribute } from 'three';
@@ -918,6 +919,12 @@ class NodeBuilder {
 		this.buildCode();
 
 		return this;
+
+	}
+
+	createNodeMaterial( type ) {
+
+		return createNodeMaterialFromType( type );
 
 	}
 
