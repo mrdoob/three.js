@@ -50,6 +50,7 @@
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
 			let camera, stats;
 			let composer, renderer, mixer, clock;
@@ -76,6 +77,9 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				renderer.xr.enabled = true;
+				container.appendChild( VRButton.createButton( renderer ) );
 
 				const scene = new THREE.Scene();
 
@@ -117,7 +121,7 @@
 					const clip = gltf.animations[ 0 ];
 					mixer.clipAction( clip.optimize() ).play();
 
-					animate();
+					renderer.setAnimationLoop( animate );
 
 				} );
 
@@ -169,8 +173,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				const delta = clock.getDelta();
 
