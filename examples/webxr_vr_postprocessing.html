@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js vr - postprocessing</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			#info > * {
+				max-width: 650px;
+				margin-left: auto;
+				margin-right: auto;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - postprocessing<br/>
+			(Oculus Browser 15.1+)
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+			const renderer = new THREE.WebGLRenderer();
+			document.body.appendChild( renderer.domElement );
+
+			renderer.xr.enabled = true;
+			document.body.appendChild( VRButton.createButton( renderer ) );
+
+			const camera = new THREE.PerspectiveCamera(
+				75,
+				window.innerHeight / window.innerHeight
+			);
+
+			const controls = new OrbitControls( camera, renderer.domElement );
+
+			const scene = new THREE.Scene();
+			scene.position.z = - 8; // XR camera starts at 0,0
+
+			const triangle = new THREE.BufferGeometry();
+			triangle.setAttribute(
+				'position',
+				new THREE.Float32BufferAttribute( [ - 1, - 1, 1, 1, - 1, 1, 0, 1, 1 ], 3 )
+			);
+
+			const orange = new THREE.Mesh(
+				triangle,
+				new THREE.MeshBasicMaterial( { color: 'orange', side: THREE.DoubleSide } )
+			);
+			orange.position.x = - 3;
+			scene.add( orange );
+
+			const red = new THREE.Mesh(
+				triangle,
+				new THREE.MeshBasicMaterial( { color: 0xff2060, side: THREE.DoubleSide } )
+			);
+			scene.add( red );
+
+			const blue = new THREE.Mesh(
+				triangle,
+				new THREE.MeshBasicMaterial( { color: 'cyan', side: THREE.DoubleSide } )
+			);
+			blue.position.x = 3;
+			scene.add( blue );
+
+			const size = new THREE.Vector2();
+
+			const composer = new EffectComposer( renderer );
+			composer.addPass( new RenderPass( scene, camera ) );
+			composer.addPass( new UnrealBloomPass( size, 0.5, 1, 0 ) );
+			composer.addPass( new OutputPass( THREE.ACESFilmicToneMapping ) );
+
+			function handleResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.getSize( size );
+				composer.setSize( size.width, size.height );
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+			}
+
+			handleResize();
+			window.addEventListener( 'resize', handleResize );
+
+			renderer.setAnimationLoop( () => {
+
+				controls.update();
+				composer.render();
+
+			} );
+
+
+		</script>
+
+	</body>
+
+</html>
