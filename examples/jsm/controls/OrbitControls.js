@@ -5,7 +5,9 @@ import {
 	Spherical,
 	TOUCH,
 	Vector2,
-	Vector3
+	Vector3,
+	Plane,
+	Ray
 } from 'three';
 
 // OrbitControls performs orbiting, dollying (zooming), and panning.
@@ -72,7 +74,7 @@ class OrbitControls extends EventDispatcher {
 		this.panSpeed = 1.0;
 		this.screenSpacePanning = true; // if false, pan orthogonal to world-space direction camera.up
 		this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
-		this.zoomToCursor = true;
+		this.zoomToCursor = false;
 
 		// Set to true to automatically rotate around the target
 		// If auto-rotate is enabled, you must call controls.update() in your animation loop
@@ -306,7 +308,28 @@ class OrbitControls extends EventDispatcher {
 					}
 
 					scope.object.updateMatrixWorld();
-					scope.target.set( 0, 0, - 1 ).transformDirection( scope.object.matrixWorld ).multiplyScalar( newRadius ).add( scope.object.position );
+
+					if ( this.screenSpacePanning ) {
+
+						// position the orbit target in front of the new camera position
+						scope.target.set( 0, 0, - 1 )
+							.transformDirection( scope.object.matrix )
+							.multiplyScalar( newRadius )
+							.add( scope.object.position );
+
+					} else {
+
+						// get the ray and translation plane to compute target
+						const ray = new Ray();
+						ray.origin.copy( scope.object.position );
+						ray.direction.set( 0, 0, - 1 ).transformDirection( scope.object.matrix );
+
+						const plane = new Plane();
+						plane.setFromNormalAndCoplanarPoint( scope.object.up, scope.target );
+
+						ray.intersectPlane( plane, scope.target );
+
+					}
 
 				} else {
 
