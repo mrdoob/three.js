@@ -546,8 +546,8 @@
 				"Path": "api/ar/extras/core/Path",
 				"Shape": "api/ar/extras/core/Shape",
 				"ShapePath": "api/ar/extras/core/ShapePath"
-			},			
-			
+			},
+
 			"Extras / Curves": {
 				"ArcCurve": "api/ar/extras/curves/ArcCurve",
 				"CatmullRomCurve3": "api/ar/extras/curves/CatmullRomCurve3",
