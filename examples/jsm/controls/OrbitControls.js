@@ -303,6 +303,9 @@ class OrbitControls extends EventDispatcher {
 
 					} else {
 
+						console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - zoom to cursor disabled.' );
+						scope.zoomToCursor = false;
+
 						newRadius = offset.length();
 
 					}
