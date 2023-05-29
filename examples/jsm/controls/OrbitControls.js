@@ -333,10 +333,20 @@ class OrbitControls extends EventDispatcher {
 
 				} else {
 
-					let radius = offset.length() * scale;
-					radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, radius ) );
+					if ( scope.object.isOrthographicCamera ) {
 
-					position.copy( scope.target ).addScaledVector( offset, radius / offset.length() );
+						scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom / scale ) );
+						scope.object.updateProjectionMatrix();
+						zoomChanged = true;
+
+					} else {
+
+						let radius = offset.length() * scale;
+						radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, radius ) );
+
+						position.copy( scope.target ).addScaledVector( offset, radius / offset.length() );
+
+					}
 
 				}
 
