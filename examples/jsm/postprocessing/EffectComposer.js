@@ -9,6 +9,8 @@ import { ShaderPass } from './ShaderPass.js';
 import { MaskPass } from './MaskPass.js';
 import { ClearMaskPass } from './MaskPass.js';
 
+const size = /* @__PURE__ */ new Vector2();
+
 class EffectComposer {
 
 	constructor( renderer, renderTarget ) {
@@ -19,7 +21,7 @@ class EffectComposer {
 
 		if ( renderTarget === undefined ) {
 
-			const size = renderer.getSize( new Vector2() );
+			renderer.getSize( size );
 			this._width = size.width;
 			this._height = size.height;
 
@@ -47,6 +49,22 @@ class EffectComposer {
 		this.copyPass = new ShaderPass( CopyShader );
 
 		this.clock = new Clock();
+
+		this.onSessionStateChange = this.onSessionStateChange.bind( this );
+		this.renderer.xr.addEventListener( 'sessionstart', this.onSessionStateChange );
+		this.renderer.xr.addEventListener( 'sessionend', this.onSessionStateChange );
+
+	}
+
+	onSessionStateChange() {
+
+		this.renderer.getSize( size );
+		this._width = size.width;
+		this._height = size.height;
+
+		this._pixelRatio = this.renderer.xr.isPresenting ? 1 : this.renderer.getPixelRatio();
+
+		this.setSize( this._width, this._height );
 
 	}
 
@@ -168,7 +186,7 @@ class EffectComposer {
 
 		if ( renderTarget === undefined ) {
 
-			const size = this.renderer.getSize( new Vector2() );
+			this.renderer.getSize( size );
 			this._pixelRatio = this.renderer.getPixelRatio();
 			this._width = size.width;
 			this._height = size.height;
@@ -221,6 +239,9 @@ class EffectComposer {
 		this.renderTarget2.dispose();
 
 		this.copyPass.dispose();
+
+		this.renderer.xr.removeEventListener( 'sessionstart', this.onSessionStateChange );
+		this.renderer.xr.removeEventListener( 'sessionend', this.onSessionStateChange );
 
 	}
 
