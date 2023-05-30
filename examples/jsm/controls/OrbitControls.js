@@ -160,7 +160,7 @@ class OrbitControls extends EventDispatcher {
 			const offset = new Vector3();
 
 			// so camera.up is the orbit axis
-			const quat = new Quaternion().setFromUnitVectors( object.up, new Vector3( 0, 1, 0 ) );
+			const quat = new Quaternion().setFromUnitVectors( scope.object.up, new Vector3( 0, 1, 0 ) );
 			const quatInverse = quat.clone().invert();
 
 			const lastPosition = new Vector3();
