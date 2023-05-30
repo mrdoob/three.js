@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name] هو شكل بسيط من الهندسة الإقليدية. يتم بناؤه من عدد من الشرائح المثلثية التي تتجه حول نقطة مركزية وتمتد إلى أبعد ما يمكن من نصف قطر معين. يتم بناؤه عكس اتجاه عقارب الساعة من زاوية بدء وزاوية مركزية معينة. يمكن أيضًا استخدامه لإنشاء مضلعات منتظمة، حيث يحدد عدد الشرائح عدد الجوانب.
+		</p>
+
+		<iframe
+			id="scene"
+			src="scenes/geometry-browser.html#CircleGeometry"
+		></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+    
+		<h2>مثال الكود</h2>
+
+		<code>
+const geometry = new THREE.CircleGeometry( 5, 32 ); 
+const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } ); 
+const circle = new THREE.Mesh( geometry, material ); scene.add( circle );
+		</code>
+	 
+		<h2>المنشئ (Constructor)</h2>
+	 
+		<h3>
+		[name]([param:Float radius], [param:Integer segments], [param:Float thetaStart], [param:Float thetaLength])
+		</h3>
+		<p>
+		radius — نصف قطر الدائرة، الافتراضي = 1.<br />
+		segments — عدد الشرائح (المثلثات)، الحد الأدنى = 3، الافتراضي = 32.<br />
+		thetaStart — زاوية البدء للشريحة الأولى، الافتراضي = 0 (موقع الساعة
+		الثالثة).<br />
+		thetaLength — الزاوية المركزية، وغالبًا ما تسمى ثيتا، للقطاع الدائري. الافتراضي هو 2 * Pi، مما يجعله دائرة كاملة.
+		</p>
+	 
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر فئة [page:BufferGeometry] الأساسية للخصائص المشتركة.</p>
+	 
+		<h3>[property:Object parameters]</h3>
+		<p>
+		كائن يحتوي على خاصية لكل من معلمات المنشئ. أي تعديل بعد التجسيد لا يغير
+		الهندسة.
+		</p>
+	 
+		<h2>الطرق (Methods)</h2>
+		<p>انظر فئة [page:BufferGeometry] الأساسية للطرق المشتركة.</p>
+	 
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
