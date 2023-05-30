@@ -251,11 +251,11 @@ class OrbitControls extends EventDispatcher {
 				// we adjust zoom later in these cases
 				if ( scope.zoomToCursor || scope.object.isOrthographicCamera ) {
 
-					spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
+					spherical.radius = clampDistance( spherical.radius );
 
 				} else {
 
-					spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius * scale ) );
+					spherical.radius = clampDistance( spherical.radius * scale );
 
 				}
 
@@ -294,8 +294,7 @@ class OrbitControls extends EventDispatcher {
 						// move the camera down the pointer ray
 						// this method avoids floating point error
 						const prevRadius = offset.length();
-						newRadius = prevRadius * scale;
-						newRadius = Math.max( scope.minDistance, Math.min( scope.maxDistance, newRadius ) );
+						newRadius = clampDistance( prevRadius * scale );
 
 						const radiusDelta = prevRadius - newRadius;
 						scope.object.position.addScaledVector( dollyDirection, radiusDelta );
@@ -603,6 +602,12 @@ class OrbitControls extends EventDispatcher {
 			mouse.y = - ( y / h ) * 2 + 1;
 
 			dollyDirection.set( mouse.x, mouse.y, 1 ).unproject( object ).sub( object.position ).normalize();
+
+		}
+
+		function clampDistance( dist ) {
+
+			return Math.max( scope.minDistance, Math.min( scope.maxDistance, dist ) );
 
 		}
 
