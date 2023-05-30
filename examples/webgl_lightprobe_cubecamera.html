@@ -84,8 +84,6 @@
 
 				new THREE.CubeTextureLoader().load( urls, function ( cubeTexture ) {
 
-					cubeTexture.colorSpace = THREE.SRGBColorSpace;
-
 					scene.background = cubeTexture;
 
 					cubeCamera.update( renderer, scene );

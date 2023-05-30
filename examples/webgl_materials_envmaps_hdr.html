@@ -116,8 +116,6 @@
 					.setPath( './textures/cube/pisa/' )
 					.load( ldrUrls, function () {
 
-						ldrCubeMap.colorSpace = THREE.SRGBColorSpace;
-
 						ldrCubeRenderTarget = pmremGenerator.fromCubemap( ldrCubeMap );
 
 					} );

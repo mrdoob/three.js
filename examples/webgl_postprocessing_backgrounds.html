@@ -178,7 +178,6 @@
 				const ldrUrls = genCubeUrls( 'textures/cube/pisa/', '.png' );
 				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
 
-					ldrCubeMap.colorSpace = THREE.SRGBColorSpace;
 					cubeTexturePassP = new CubeTexturePass( cameraP, ldrCubeMap );
 					composer.insertPass( cubeTexturePassP, 2 );
 

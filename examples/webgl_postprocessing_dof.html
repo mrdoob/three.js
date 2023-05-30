@@ -82,7 +82,6 @@
 				];
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.colorSpace = THREE.SRGBColorSpace;
 
 				parameters = { color: 0xff4900, envMap: textureCube };
 				cubeMaterial = new THREE.MeshBasicMaterial( parameters );

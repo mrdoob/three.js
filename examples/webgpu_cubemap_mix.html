@@ -79,7 +79,6 @@
 
 				cube2Texture.generateMipmaps = true;
 				cube2Texture.minFilter = THREE.LinearMipmapLinearFilter;
-				cube2Texture.colorSpace = THREE.SRGBColorSpace;
 
 				scene.environmentNode = mix( cubeTexture( cube2Texture ), cubeTexture( cube1Texture ), oscSine( timerLocal( .1 ) ) );
 
