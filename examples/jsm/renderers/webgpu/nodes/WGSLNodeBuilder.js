@@ -11,6 +11,7 @@ import StorageBuffer from '../../common/StorageBuffer.js';
 import { getVectorLength, getStrideLength } from '../../common/BufferUtils.js';
 
 import RenderTarget from '../../common/RenderTarget.js';
+import CubeRenderTarget from '../../common/CubeRenderTarget.js';
 
 import { NodeBuilder, CodeNode, NodeMaterial } from '../../../nodes/Nodes.js';
 
@@ -694,6 +695,12 @@ class WebGPUNodeBuilder extends NodeBuilder {
 	getRenderTarget( width, height, options ) {
 
 		return new RenderTarget( width, height, options );
+
+	}
+
+	getCubeRenderTarget( size, options ) {
+
+		return new CubeRenderTarget( size, options );
 
 	}
 

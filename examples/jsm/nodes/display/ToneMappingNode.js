@@ -95,6 +95,15 @@ class ToneMappingNode extends TempNode {
 
 	}
 
+	getCacheKey() {
+
+		let cacheKey = super.getCacheKey();
+		cacheKey = '{toneMapping:' + this.toneMapping + ',nodes:' + cacheKey + '}';
+
+		return cacheKey;
+
+	}
+
 	construct( builder ) {
 
 		const colorNode = this.colorNode || builder.context.color;
