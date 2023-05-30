@@ -563,7 +563,7 @@ class OrbitControls extends EventDispatcher {
 
 		function dollyOut( dollyScale ) {
 
-			if ( scope.object.isPerspectiveCamera || scope.object.isPerspectiveCamera ) {
+			if ( scope.object.isPerspectiveCamera || scope.object.isOrthographicCamera ) {
 
 				scale /= dollyScale;
 
