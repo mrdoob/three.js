@@ -20,6 +20,8 @@ import {
 const _changeEvent = { type: 'change' };
 const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
+const _ray = new Ray();
+const _plane = new Plane();
 
 class OrbitControls extends EventDispatcher {
 
@@ -325,14 +327,12 @@ class OrbitControls extends EventDispatcher {
 						} else {
 
 							// get the ray and translation plane to compute target
-							const ray = new Ray();
-							ray.origin.copy( scope.object.position );
-							ray.direction.set( 0, 0, - 1 ).transformDirection( scope.object.matrix );
+							_ray.origin.copy( scope.object.position );
+							_ray.direction.set( 0, 0, - 1 ).transformDirection( scope.object.matrix );
 
-							const plane = new Plane();
-							plane.setFromNormalAndCoplanarPoint( scope.object.up, scope.target );
+							_plane.setFromNormalAndCoplanarPoint( scope.object.up, scope.target );
 
-							ray.intersectPlane( plane, scope.target );
+							_ray.intersectPlane( _plane, scope.target );
 
 						}
 
