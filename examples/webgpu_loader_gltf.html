@@ -68,6 +68,9 @@
 					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
+						texture.minFilter = THREE.LinearMipmapLinearFilter;
+						texture.magFilter = THREE.LinearFilter;
+						texture.generateMipmaps = true;
 
 						scene.background = texture;
 						scene.environment = texture;
