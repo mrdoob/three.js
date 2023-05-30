@@ -96,7 +96,6 @@
 				const urls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
 
 				textureCube = new THREE.CubeTextureLoader().setPath( path ).load( urls );
-				textureCube.colorSpace = THREE.SRGBColorSpace;
 
 				materials[ 'wireframe' ] = new THREE.MeshBasicMaterial( { wireframe: true } );
 				materials[ 'flat' ] = new THREE.MeshPhongMaterial( { specular: 0x000000, flatShading: true, side: THREE.DoubleSide } );
