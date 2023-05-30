@@ -13,6 +13,7 @@ class MeshBasicMaterial extends Material {
 		this.type = 'MeshBasicMaterial';
 
 		this.color = new Color( 0xffffff ); // emissive
+		this.flatColors = false;
 
 		this.map = null;
 
@@ -47,6 +48,7 @@ class MeshBasicMaterial extends Material {
 		super.copy( source );
 
 		this.color.copy( source.color );
+		this.flatColors = source.flatColors;
 
 		this.map = source.map;
 

@@ -284,6 +284,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			useFog: material.fog === true,
 			fogExp2: ( fog && fog.isFogExp2 ),
 
+			flatColors: material.flatColors === true,
 			flatShading: material.flatShading === true,
 
 			sizeAttenuation: material.sizeAttenuation === true,

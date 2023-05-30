@@ -545,6 +545,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.pointsUvs ? '#define USE_POINTS_UV' : '',
 
+			parameters.flatColors ? '#define FLAT_COLORS' : '',
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
 			parameters.skinning ? '#define USE_SKINNING' : '',
@@ -735,6 +736,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
+			parameters.flatColors ? '#define FLAT_COLORS' : '',
 
 			parameters.doubleSided ? '#define DOUBLE_SIDED' : '',
 			parameters.flipSided ? '#define FLIP_SIDED' : '',
