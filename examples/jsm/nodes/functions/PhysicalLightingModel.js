@@ -43,7 +43,7 @@ const RE_IndirectSpecular_Physical = new ShaderNode( ( inputs ) => {
 
 	const totalScattering = singleScattering.add( multiScattering );
 
-	const diffuse = diffuseColor.mul( max( totalScattering.r, max( totalScattering.g, totalScattering.b ) ).oneMinus() );
+	const diffuse = diffuseColor.mul( totalScattering.r.max( totalScattering.g ).max( totalScattering.b ).oneMinus() );
 
 	reflectedLight.indirectSpecular.addAssign( radiance.mul( singleScattering ) );
 	reflectedLight.indirectSpecular.addAssign( multiScattering.mul( cosineWeightedIrradiance ) );
