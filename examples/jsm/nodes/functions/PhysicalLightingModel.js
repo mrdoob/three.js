@@ -7,6 +7,7 @@ import { diffuseColor, specularColor, roughness } from '../core/PropertyNode.js'
 import { transformedNormalView } from '../accessors/NormalNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
 import { ShaderNode, float, vec3 } from '../shadernode/ShaderNode.js';
+import { max } from '../math/MathNode.js';
 
 // Fdez-Agüera's "Multiple-Scattering Microfacet Model for Real-Time Image Based Lighting"
 // Approximates multiscattering in order to preserve energy.
@@ -40,7 +41,9 @@ const RE_IndirectSpecular_Physical = new ShaderNode( ( inputs ) => {
 
 	computeMultiscattering( singleScattering, multiScattering );
 
-	const diffuse = diffuseColor.mul( singleScattering.add( multiScattering ).oneMinus() );
+	const totalScattering = singleScattering.add( multiScattering );
+
+	const diffuse = diffuseColor.mul( max( totalScattering.r, max( totalScattering.g, totalScattering.b ) ).oneMinus() );
 
 	reflectedLight.indirectSpecular.addAssign( radiance.mul( singleScattering ) );
 	reflectedLight.indirectSpecular.addAssign( multiScattering.mul( cosineWeightedIrradiance ) );
