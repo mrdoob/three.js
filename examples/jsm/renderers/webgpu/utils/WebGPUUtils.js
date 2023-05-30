@@ -71,7 +71,13 @@ class WebGPUUtils {
 
 	}
 
-	getSampleCount() {
+	getSampleCount( renderContext ) {
+
+		if ( renderContext.texture !== null ) {
+
+			return 1;
+
+		}
 
 		return this.backend.parameters.sampleCount;
 

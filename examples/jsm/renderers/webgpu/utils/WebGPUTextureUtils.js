@@ -101,7 +101,7 @@ class WebGPUTextureUtils {
 		const dimension = this._getDimension( texture );
 		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
 		const format = texture.internalFormat || this._getFormat( texture );
-		//const sampleCount = texture.isRenderTargetTexture || texture.isDepthTexture ? backend.utils.getSampleCount() : 1;
+		//const sampleCount = texture.isRenderTargetTexture || texture.isDepthTexture ? backend.utils.getSampleCount( renderContext ) : 1;
 		const sampleCount = 1;
 
 		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
@@ -615,7 +615,7 @@ class WebGPUTextureUtils {
 
 		let formatGPU;
 
-		if ( texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true ) {
+		if ( /*texture.isRenderTargetTexture === true ||*/ texture.isFramebufferTexture === true ) {
 
 			formatGPU = GPUTextureFormat.BGRA8Unorm;
 
