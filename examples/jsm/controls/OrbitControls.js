@@ -247,6 +247,19 @@ class OrbitControls extends EventDispatcher {
 
 				}
 
+				// adjust the camera position based on zoom only if we're not zooming to the cursor or if it's an ortho camera
+				// we adjust zoom later in these cases
+				if ( scope.zoomToCursor || scope.object.isOrthographicCamera ) {
+
+					spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) );
+
+				} else {
+
+					spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius * scale ) );
+
+				}
+
+
 				offset.setFromSpherical( spherical );
 
 				// rotate offset back to "camera-up-vector-is-up" space
@@ -338,22 +351,11 @@ class OrbitControls extends EventDispatcher {
 
 					}
 
-				} else {
+				} else if ( scope.object.isOrthographicCamera ) {
 
-					if ( scope.object.isOrthographicCamera ) {
-
-						scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom / scale ) );
-						scope.object.updateProjectionMatrix();
-						zoomChanged = true;
-
-					} else {
-
-						let radius = offset.length() * scale;
-						radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, radius ) );
-
-						position.copy( scope.target ).addScaledVector( offset, radius / offset.length() );
-
-					}
+					scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom / scale ) );
+					scope.object.updateProjectionMatrix();
+					zoomChanged = true;
 
 				}
 
