@@ -7,7 +7,6 @@ import { diffuseColor, specularColor, roughness } from '../core/PropertyNode.js'
 import { transformedNormalView } from '../accessors/NormalNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
 import { ShaderNode, float, vec3 } from '../shadernode/ShaderNode.js';
-import { max } from '../math/MathNode.js';
 
 // Fdez-Agüera's "Multiple-Scattering Microfacet Model for Real-Time Image Based Lighting"
 // Approximates multiscattering in order to preserve energy.
