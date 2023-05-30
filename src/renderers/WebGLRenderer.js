@@ -20,7 +20,8 @@ import {
 	UnsignedShortType,
 	UnsignedInt248Type,
 	UnsignedShort4444Type,
-	UnsignedShort5551Type
+	UnsignedShort5551Type,
+	WebGLCoordinateSystem
 } from '../constants.js';
 import { Color } from '../math/Color.js';
 import { Frustum } from '../math/Frustum.js';
@@ -2407,6 +2408,12 @@ class WebGLRenderer {
 			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
 
 		}
+
+	}
+
+	get coordinateSystem() {
+
+		return WebGLCoordinateSystem;
 
 	}
 

@@ -148,6 +148,12 @@ class Renderer {
 
 	}
 
+	get coordinateSystem() {
+
+		return this.backend.coordinateSystem;
+
+	}
+
 	async compile( scene, camera ) {
 
 		console.warn( 'THREE.Renderer: .compile() is not implemented yet.' );
@@ -173,6 +179,18 @@ class Renderer {
 		this._currentRenderContext = renderContext;
 
 		nodeFrame.renderId ++;
+
+		//
+
+		const coordinateSystem = this.coordinateSystem;
+
+		if ( camera.coordinateSystem !== coordinateSystem ) {
+
+			camera.coordinateSystem = coordinateSystem;
+
+			camera.updateProjectionMatrix();
+
+		}
 
 		//
 
@@ -218,7 +236,7 @@ class Renderer {
 		//
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-		_frustum.setFromProjectionMatrix( _projScreenMatrix );
+		_frustum.setFromProjectionMatrix( _projScreenMatrix, coordinateSystem );
 
 		const renderList = this._renderLists.get( scene, camera );
 		renderList.init();
