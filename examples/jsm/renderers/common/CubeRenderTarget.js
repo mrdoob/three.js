@@ -1,10 +1,8 @@
 import MeshBasicNodeMaterial from '../../nodes/materials/MeshBasicNodeMaterial.js';
-import { WebGLCubeRenderTarget, Scene, CubeCamera, BoxGeometry, Mesh, BackSide, NoBlending, LinearFilter, LinearMipmapLinearFilter, RGBAFormat, NoColorSpace, FloatType, HalfFloatType } from 'three';
+import { WebGLCubeRenderTarget, Scene, CubeCamera, BoxGeometry, Mesh, BackSide, NoBlending, LinearFilter, LinearMipmapLinearFilter } from 'three';
 import { equirectUV } from '../../nodes/utils/EquirectUVNode.js';
 import { texture as TSL_Texture } from '../../nodes/accessors/TextureNode.js';
 import { positionWorldDirection } from '../../nodes/accessors/PositionNode.js';
-import { vec2, vec3 } from '../../nodes/shadernode/ShaderNode.js';
-import { transformedNormalWorld } from '../../nodes/accessors/NormalNode.js';
 
 // @TODO: Consider rename WebGLCubeRenderTarget to just CubeRenderTarget
 
@@ -20,10 +18,6 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 	fromEquirectangularTexture( renderer, texture ) {
 
-		this.texture.type = HalfFloatType;
-		this.texture.format = NoColorSpace;
-
-		this.texture.format = RGBAFormat;
 		this.texture.type = texture.type;
 		this.texture.colorSpace = texture.colorSpace;
 
@@ -33,11 +27,10 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 		const geometry = new BoxGeometry( 5, 5, 5 );
 
-		let uvNode = equirectUV( positionWorldDirection );
-		//uvNode = vec2( uvNode.x, uvNode.y.oneMinus() );
+		const uvNode = equirectUV( positionWorldDirection );
 
 		const material = new MeshBasicNodeMaterial();
-		material.colorNode = TSL_Texture( texture, uvNode, 0 ); //material.uniforms.tEquirect.value = texture;
+		material.colorNode = TSL_Texture( texture, uvNode, 0 );
 		material.side = BackSide;
 		material.blending = NoBlending;
 
