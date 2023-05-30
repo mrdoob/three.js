@@ -9,7 +9,6 @@ import { transformedNormalView, transformedNormalWorld } from '../accessors/Norm
 import { positionViewDirection } from '../accessors/PositionNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { float, vec2 } from '../shadernode/ShaderNode.js';
-import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { reference } from '../accessors/ReferenceNode.js';
 
@@ -33,7 +32,8 @@ class EnvironmentNode extends LightingNode {
 			const texture = envNode.value;
 			const renderer = builder.renderer;
 
-			const cubeRTT = new CubeRenderTarget( 512 ).fromEquirectangularTexture( renderer, texture );
+			// @TODO: Add dispose logic here
+			const cubeRTT = builder.getCubeRenderTarget( 512 ).fromEquirectangularTexture( renderer, texture );
 
 			envNode = cubeTexture( cubeRTT.texture );
 

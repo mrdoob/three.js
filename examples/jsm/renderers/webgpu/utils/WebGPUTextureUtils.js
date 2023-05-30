@@ -13,6 +13,8 @@ import {
 	NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare
 } from 'three';
 
+import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
+
 import WebGPUTextureMipmapUtils from './WebGPUTextureMipmapUtils.js';
 
 const _compareToWebGPU = {
@@ -240,6 +242,14 @@ class WebGPUTextureUtils {
 		//
 
 		textureData.version = texture.version;
+
+	}
+
+	_isEnvironmentTexture( texture ) {
+
+		const mapping = texture.mapping;
+
+		return ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping ) || ( mapping === CubeReflectionMapping || mapping === CubeRefractionMapping );
 
 	}
 
@@ -548,6 +558,8 @@ class WebGPUTextureUtils {
 	}
 
 	_needsMipmaps( texture ) {
+
+		if ( this._isEnvironmentTexture( texture ) ) return true;
 
 		return ( texture.isCompressedTexture !== true ) /*&& ( texture.generateMipmaps === true )*/ && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
 

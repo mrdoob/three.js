@@ -1,8 +1,8 @@
-import MeshBasicNodeMaterial from '../../nodes/materials/MeshBasicNodeMaterial.js';
 import { WebGLCubeRenderTarget, Scene, CubeCamera, BoxGeometry, Mesh, BackSide, NoBlending, LinearFilter, LinearMipmapLinearFilter } from 'three';
 import { equirectUV } from '../../nodes/utils/EquirectUVNode.js';
 import { texture as TSL_Texture } from '../../nodes/accessors/TextureNode.js';
 import { positionWorldDirection } from '../../nodes/accessors/PositionNode.js';
+import { createNodeMaterialFromType } from '../../nodes/materials/NodeMaterial.js';
 
 // @TODO: Consider rename WebGLCubeRenderTarget to just CubeRenderTarget
 
@@ -18,6 +18,11 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 	fromEquirectangularTexture( renderer, texture ) {
 
+		const currentMinFilter = texture.minFilter;
+		const currentGenerateMipmaps = texture.generateMipmaps;
+
+		texture.generateMipmaps = true;
+
 		this.texture.type = texture.type;
 		this.texture.colorSpace = texture.colorSpace;
 
@@ -29,18 +34,15 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 		const uvNode = equirectUV( positionWorldDirection );
 
-		const material = new MeshBasicNodeMaterial();
+		const material = createNodeMaterialFromType( 'MeshBasicNodeMaterial' );
 		material.colorNode = TSL_Texture( texture, uvNode, 0 );
 		material.side = BackSide;
 		material.blending = NoBlending;
 
 		const mesh = new Mesh( geometry, material );
-		mesh.name = 'fromEquirectangularTexture';
 
 		const scene = new Scene();
 		scene.add( mesh );
-
-		const currentMinFilter = texture.minFilter;
 
 		// Avoid blurred poles
 		if ( texture.minFilter === LinearMipmapLinearFilter ) texture.minFilter = LinearFilter;
@@ -49,6 +51,7 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 		camera.update( renderer, scene );
 
 		texture.minFilter = currentMinFilter;
+		texture.currentGenerateMipmaps = currentGenerateMipmaps;
 
 		mesh.geometry.dispose();
 		mesh.material.dispose();
