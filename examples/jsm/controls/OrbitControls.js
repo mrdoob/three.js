@@ -273,7 +273,7 @@ class OrbitControls extends EventDispatcher {
 				let zoomChanged = false;
 				if ( scope.zoomToCursor ) {
 
-					let newRadius;
+					let newRadius = null;
 					if ( scope.object.isPerspectiveCamera ) {
 
 						// move the camera down the pointer ray
@@ -284,6 +284,7 @@ class OrbitControls extends EventDispatcher {
 
 						const radiusDelta = prevRadius - newRadius;
 						scope.object.position.addScaledVector( dollyDirection, radiusDelta );
+						scope.object.updateMatrixWorld();
 
 					} else if ( scope.object.isOrthographicCamera ) {
 
@@ -299,6 +300,8 @@ class OrbitControls extends EventDispatcher {
 						mouseAfter.unproject( scope.object );
 
 						scope.object.position.sub( mouseAfter ).add( mouseBefore );
+						scope.object.updateMatrixWorld();
+
 						newRadius = offset.length();
 
 					} else {
@@ -306,31 +309,32 @@ class OrbitControls extends EventDispatcher {
 						console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - zoom to cursor disabled.' );
 						scope.zoomToCursor = false;
 
-						newRadius = offset.length();
-
 					}
 
-					scope.object.updateMatrixWorld();
+					// handle the placement of the target
+					if ( newRadius !== null ) {
 
-					if ( this.screenSpacePanning ) {
+						if ( this.screenSpacePanning ) {
 
-						// position the orbit target in front of the new camera position
-						scope.target.set( 0, 0, - 1 )
-							.transformDirection( scope.object.matrix )
-							.multiplyScalar( newRadius )
-							.add( scope.object.position );
+							// position the orbit target in front of the new camera position
+							scope.target.set( 0, 0, - 1 )
+								.transformDirection( scope.object.matrix )
+								.multiplyScalar( newRadius )
+								.add( scope.object.position );
 
-					} else {
+						} else {
 
-						// get the ray and translation plane to compute target
-						const ray = new Ray();
-						ray.origin.copy( scope.object.position );
-						ray.direction.set( 0, 0, - 1 ).transformDirection( scope.object.matrix );
+							// get the ray and translation plane to compute target
+							const ray = new Ray();
+							ray.origin.copy( scope.object.position );
+							ray.direction.set( 0, 0, - 1 ).transformDirection( scope.object.matrix );
 
-						const plane = new Plane();
-						plane.setFromNormalAndCoplanarPoint( scope.object.up, scope.target );
+							const plane = new Plane();
+							plane.setFromNormalAndCoplanarPoint( scope.object.up, scope.target );
 
-						ray.intersectPlane( plane, scope.target );
+							ray.intersectPlane( plane, scope.target );
+
+						}
 
 					}
 
@@ -558,11 +562,7 @@ class OrbitControls extends EventDispatcher {
 
 		function dollyOut( dollyScale ) {
 
-			if ( scope.object.isPerspectiveCamera ) {
-
-				scale /= dollyScale;
-
-			} else if ( scope.object.isOrthographicCamera ) {
+			if ( scope.object.isPerspectiveCamera || scope.object.isPerspectiveCamera ) {
 
 				scale /= dollyScale;
 
@@ -577,11 +577,7 @@ class OrbitControls extends EventDispatcher {
 
 		function dollyIn( dollyScale ) {
 
-			if ( scope.object.isPerspectiveCamera ) {
-
-				scale *= dollyScale;
-
-			} else if ( scope.object.isOrthographicCamera ) {
+			if ( scope.object.isPerspectiveCamera || scope.object.isOrthographicCamera ) {
 
 				scale *= dollyScale;
 
