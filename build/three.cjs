@@ -204,6 +204,9 @@ const GLSL3 = '300 es';
 
 const _SRGBAFormat = 1035; // fallback for WebGL 1
 
+const WebGLCoordinateSystem = 2000;
+const WebGPUCoordinateSystem = 2001;
+
 /**
  * https://github.com/mrdoob/eventdispatcher.js/
  */
@@ -6580,7 +6583,7 @@ class Matrix4 {
 
 	}
 
-	makePerspective( left, right, top, bottom, near, far ) {
+	makePerspective( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem ) {
 
 		const te = this.elements;
 		const x = 2 * near / ( right - left );
@@ -6588,19 +6591,35 @@ class Matrix4 {
 
 		const a = ( right + left ) / ( right - left );
 		const b = ( top + bottom ) / ( top - bottom );
-		const c = - ( far + near ) / ( far - near );
-		const d = - 2 * far * near / ( far - near );
 
-		te[ 0 ] = x;	te[ 4 ] = 0;	te[ 8 ] = a;	te[ 12 ] = 0;
-		te[ 1 ] = 0;	te[ 5 ] = y;	te[ 9 ] = b;	te[ 13 ] = 0;
-		te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = c;	te[ 14 ] = d;
+		let c, d;
+
+		if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+			c = - ( far + near ) / ( far - near );
+			d = ( - 2 * far * near ) / ( far - near );
+
+		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+			c = - far / ( far - near );
+			d = ( - far * near ) / ( far - near );
+
+		} else {
+
+			throw new Error( 'THREE.Matrix4.makePerspective(): Invalid coordinate system: ' + coordinateSystem );
+
+		}
+
+		te[ 0 ] = x;	te[ 4 ] = 0;	te[ 8 ] = a; 	te[ 12 ] = 0;
+		te[ 1 ] = 0;	te[ 5 ] = y;	te[ 9 ] = b; 	te[ 13 ] = 0;
+		te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = c; 	te[ 14 ] = d;
 		te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = - 1;	te[ 15 ] = 0;
 
 		return this;
 
 	}
 
-	makeOrthographic( left, right, top, bottom, near, far ) {
+	makeOrthographic( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem ) {
 
 		const te = this.elements;
 		const w = 1.0 / ( right - left );
@@ -6609,12 +6628,29 @@ class Matrix4 {
 
 		const x = ( right + left ) * w;
 		const y = ( top + bottom ) * h;
-		const z = ( far + near ) * p;
 
-		te[ 0 ] = 2 * w;	te[ 4 ] = 0;	te[ 8 ] = 0;	te[ 12 ] = - x;
-		te[ 1 ] = 0;	te[ 5 ] = 2 * h;	te[ 9 ] = 0;	te[ 13 ] = - y;
-		te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = - 2 * p;	te[ 14 ] = - z;
-		te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = 0;	te[ 15 ] = 1;
+		let z, zInv;
+
+		if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+			z = ( far + near ) * p;
+			zInv = - 2 * p;
+
+		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+			z = near * p;
+			zInv = - 1 * p;
+
+		} else {
+
+			throw new Error( 'THREE.Matrix4.makeOrthographic(): Invalid coordinate system: ' + coordinateSystem );
+
+		}
+
+		te[ 0 ] = 2 * w;	te[ 4 ] = 0;		te[ 8 ] = 0; 		te[ 12 ] = - x;
+		te[ 1 ] = 0; 		te[ 5 ] = 2 * h;	te[ 9 ] = 0; 		te[ 13 ] = - y;
+		te[ 2 ] = 0; 		te[ 6 ] = 0;		te[ 10 ] = zInv;	te[ 14 ] = - z;
+		te[ 3 ] = 0; 		te[ 7 ] = 0;		te[ 11 ] = 0;		te[ 15 ] = 1;
 
 		return this;
 
@@ -9733,6 +9769,7 @@ class BufferAttribute {
 
 		this.usage = StaticDrawUsage;
 		this.updateRange = { offset: 0, count: - 1 };
+		this.gpuType = FloatType;
 
 		this.version = 0;
 
@@ -9763,6 +9800,7 @@ class BufferAttribute {
 		this.normalized = source.normalized;
 
 		this.usage = source.usage;
+		this.gpuType = source.gpuType;
 
 		return this;
 
@@ -10083,18 +10121,6 @@ class Int8BufferAttribute extends BufferAttribute {
 
 		super( new Int8Array( array ), itemSize, normalized );
 
-		this.gpuType = FloatType;
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.gpuType = source.gpuType;
-
-		return this;
-
 	}
 
 }
@@ -10104,18 +10130,6 @@ class Uint8BufferAttribute extends BufferAttribute {
 	constructor( array, itemSize, normalized ) {
 
 		super( new Uint8Array( array ), itemSize, normalized );
-
-		this.gpuType = FloatType;
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.gpuType = source.gpuType;
-
-		return this;
 
 	}
 
@@ -10137,18 +10151,6 @@ class Int16BufferAttribute extends BufferAttribute {
 
 		super( new Int16Array( array ), itemSize, normalized );
 
-		this.gpuType = FloatType;
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.gpuType = source.gpuType;
-
-		return this;
-
 	}
 
 }
@@ -10158,18 +10160,6 @@ class Uint16BufferAttribute extends BufferAttribute {
 	constructor( array, itemSize, normalized ) {
 
 		super( new Uint16Array( array ), itemSize, normalized );
-
-		this.gpuType = FloatType;
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.gpuType = source.gpuType;
-
-		return this;
 
 	}
 
@@ -12333,6 +12323,8 @@ class Camera extends Object3D {
 		this.projectionMatrix = new Matrix4();
 		this.projectionMatrixInverse = new Matrix4();
 
+		this.coordinateSystem = WebGLCoordinateSystem;
+
 	}
 
 	copy( source, recursive ) {
@@ -12343,6 +12335,8 @@ class Camera extends Object3D {
 
 		this.projectionMatrix.copy( source.projectionMatrix );
 		this.projectionMatrixInverse.copy( source.projectionMatrixInverse );
+
+		this.coordinateSystem = source.coordinateSystem;
 
 		return this;
 
@@ -12581,7 +12575,7 @@ class PerspectiveCamera extends Camera {
 		const skew = this.filmOffset;
 		if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
 
-		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far );
+		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far, this.coordinateSystem );
 
 		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
 
@@ -12623,42 +12617,97 @@ class CubeCamera extends Object3D {
 		this.type = 'CubeCamera';
 
 		this.renderTarget = renderTarget;
+		this.coordinateSystem = null;
 
 		const cameraPX = new PerspectiveCamera( fov, aspect, near, far );
 		cameraPX.layers = this.layers;
-		cameraPX.up.set( 0, 1, 0 );
-		cameraPX.lookAt( 1, 0, 0 );
 		this.add( cameraPX );
 
 		const cameraNX = new PerspectiveCamera( fov, aspect, near, far );
 		cameraNX.layers = this.layers;
-		cameraNX.up.set( 0, 1, 0 );
-		cameraNX.lookAt( - 1, 0, 0 );
 		this.add( cameraNX );
 
 		const cameraPY = new PerspectiveCamera( fov, aspect, near, far );
 		cameraPY.layers = this.layers;
-		cameraPY.up.set( 0, 0, - 1 );
-		cameraPY.lookAt( 0, 1, 0 );
 		this.add( cameraPY );
 
 		const cameraNY = new PerspectiveCamera( fov, aspect, near, far );
 		cameraNY.layers = this.layers;
-		cameraNY.up.set( 0, 0, 1 );
-		cameraNY.lookAt( 0, - 1, 0 );
 		this.add( cameraNY );
 
 		const cameraPZ = new PerspectiveCamera( fov, aspect, near, far );
 		cameraPZ.layers = this.layers;
-		cameraPZ.up.set( 0, 1, 0 );
-		cameraPZ.lookAt( 0, 0, 1 );
 		this.add( cameraPZ );
 
 		const cameraNZ = new PerspectiveCamera( fov, aspect, near, far );
 		cameraNZ.layers = this.layers;
-		cameraNZ.up.set( 0, 1, 0 );
-		cameraNZ.lookAt( 0, 0, - 1 );
 		this.add( cameraNZ );
+
+	}
+
+	updateCoordinateSystem() {
+
+		const coordinateSystem = this.coordinateSystem;
+
+		const cameras = this.children.concat();
+
+		const [ cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ ] = cameras;
+
+		for ( const camera of cameras ) this.remove( camera );
+
+		if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+			cameraPX.up.set( 0, 1, 0 );
+			cameraPX.lookAt( 1, 0, 0 );
+
+			cameraNX.up.set( 0, 1, 0 );
+			cameraNX.lookAt( - 1, 0, 0 );
+
+			cameraPY.up.set( 0, 0, - 1 );
+			cameraPY.lookAt( 0, 1, 0 );
+
+			cameraNY.up.set( 0, 0, 1 );
+			cameraNY.lookAt( 0, - 1, 0 );
+
+			cameraPZ.up.set( 0, 1, 0 );
+			cameraPZ.lookAt( 0, 0, 1 );
+
+			cameraNZ.up.set( 0, 1, 0 );
+			cameraNZ.lookAt( 0, 0, - 1 );
+
+		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+			cameraPX.up.set( 0, - 1, 0 );
+			cameraPX.lookAt( - 1, 0, 0 );
+
+			cameraNX.up.set( 0, - 1, 0 );
+			cameraNX.lookAt( 1, 0, 0 );
+
+			cameraPY.up.set( 0, 0, 1 );
+			cameraPY.lookAt( 0, 1, 0 );
+
+			cameraNY.up.set( 0, 0, - 1 );
+			cameraNY.lookAt( 0, - 1, 0 );
+
+			cameraPZ.up.set( 0, - 1, 0 );
+			cameraPZ.lookAt( 0, 0, 1 );
+
+			cameraNZ.up.set( 0, - 1, 0 );
+			cameraNZ.lookAt( 0, 0, - 1 );
+
+		} else {
+
+			throw new Error( 'THREE.CubeCamera.updateCoordinateSystem(): Invalid coordinate system: ' + coordinateSystem );
+
+		}
+
+		for ( const camera of cameras ) {
+
+			this.add( camera );
+
+			camera.updateMatrixWorld();
+
+		}
 
 	}
 
@@ -12667,6 +12716,14 @@ class CubeCamera extends Object3D {
 		if ( this.parent === null ) this.updateMatrixWorld();
 
 		const renderTarget = this.renderTarget;
+
+		if ( this.coordinateSystem !== renderer.coordinateSystem ) {
+
+			this.coordinateSystem = renderer.coordinateSystem;
+
+			this.updateCoordinateSystem();
+
+		}
 
 		const [ cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ ] = this.children;
 
@@ -13127,7 +13184,7 @@ class Frustum {
 
 	}
 
-	setFromProjectionMatrix( m ) {
+	setFromProjectionMatrix( m, coordinateSystem = WebGLCoordinateSystem ) {
 
 		const planes = this.planes;
 		const me = m.elements;
@@ -13141,7 +13198,20 @@ class Frustum {
 		planes[ 2 ].setComponents( me3 + me1, me7 + me5, me11 + me9, me15 + me13 ).normalize();
 		planes[ 3 ].setComponents( me3 - me1, me7 - me5, me11 - me9, me15 - me13 ).normalize();
 		planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize();
-		planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize();
+
+		if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+			planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize();
+
+		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+			planes[ 5 ].setComponents( me2, me6, me10, me14 ).normalize();
+
+		} else {
+
+			throw new Error( 'THREE.Frustum.setFromProjectionMatrix(): Invalid coordinate system: ' + coordinateSystem );
+
+		}
 
 		return this;
 
@@ -15989,7 +16059,7 @@ class OrthographicCamera extends Camera {
 
 		}
 
-		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far );
+		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem );
 
 		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
 
@@ -30200,6 +30270,12 @@ class WebGLRenderer {
 
 	}
 
+	get coordinateSystem() {
+
+		return WebGLCoordinateSystem;
+
+	}
+
 	get physicallyCorrectLights() { // @deprecated, r150
 
 		console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
@@ -42195,6 +42271,7 @@ class CubeTextureLoader extends Loader {
 	load( urls, onLoad, onProgress, onError ) {
 
 		const texture = new CubeTexture();
+		texture.colorSpace = SRGBColorSpace;
 
 		const loader = new ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
@@ -45865,6 +45942,14 @@ class PositionalAudio extends Audio {
 
 		this.panner = this.context.createPanner();
 		this.panner.panningModel = 'HRTF';
+		this.panner.connect( this.gain );
+
+	}
+
+	connect() {
+
+		super.connect();
+
 		this.panner.connect( this.gain );
 
 	}
@@ -51801,11 +51886,13 @@ exports.VideoTexture = VideoTexture;
 exports.WebGL1Renderer = WebGL1Renderer;
 exports.WebGL3DRenderTarget = WebGL3DRenderTarget;
 exports.WebGLArrayRenderTarget = WebGLArrayRenderTarget;
+exports.WebGLCoordinateSystem = WebGLCoordinateSystem;
 exports.WebGLCubeRenderTarget = WebGLCubeRenderTarget;
 exports.WebGLMultipleRenderTargets = WebGLMultipleRenderTargets;
 exports.WebGLRenderTarget = WebGLRenderTarget;
 exports.WebGLRenderer = WebGLRenderer;
 exports.WebGLUtils = WebGLUtils;
+exports.WebGPUCoordinateSystem = WebGPUCoordinateSystem;
 exports.WireframeGeometry = WireframeGeometry;
 exports.WrapAroundEnding = WrapAroundEnding;
 exports.ZeroCurvatureEnding = ZeroCurvatureEnding;
