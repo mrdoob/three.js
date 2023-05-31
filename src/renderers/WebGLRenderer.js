@@ -2071,7 +2071,7 @@ class WebGLRenderer {
 			// Render to base layer instead of canvas in WebXR
 			if ( renderTarget === null && this.xr.isPresenting ) {
 
-				renderTarget = this.xr.getRenderTarget();
+				renderTarget = this.xr._getRenderTarget();
 
 			}
 
