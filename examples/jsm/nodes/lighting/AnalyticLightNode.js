@@ -6,8 +6,8 @@ import { vec3 } from '../shadernode/ShaderNode.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { positionWorld } from '../accessors/PositionNode.js';
+//import { step } from '../math/MathNode.js';
 import { cond } from '../math/CondNode.js';
-import MeshBasicNodeMaterial from '../materials/MeshBasicNodeMaterial.js';
 
 import { Color, DepthTexture, NearestFilter } from 'three';
 
@@ -43,7 +43,7 @@ class AnalyticLightNode extends LightingNode {
 
 		if ( shadowNode === null ) {
 
-			if ( depthMaterial === null ) depthMaterial = new MeshBasicNodeMaterial();
+			if ( depthMaterial === null ) depthMaterial = builder.createNodeMaterial( 'MeshBasicNodeMaterial' );
 
 			const shadow = this.light.shadow;
 			const rtt = builder.getRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
@@ -51,6 +51,9 @@ class AnalyticLightNode extends LightingNode {
 			const depthTexture = new DepthTexture();
 			depthTexture.minFilter = NearestFilter;
 			depthTexture.magFilter = NearestFilter;
+			depthTexture.image.width = shadow.mapSize.width;
+			depthTexture.image.height = shadow.mapSize.height;
+			//depthTexture.compareFunction = THREE.LessCompare;
 
 			rtt.depthTexture = depthTexture;
 
@@ -128,7 +131,7 @@ class AnalyticLightNode extends LightingNode {
 
 	}
 
-	update( frame ) {
+	update( /*frame*/ ) {
 
 		const { light } = this;
 

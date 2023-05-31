@@ -3,7 +3,7 @@ import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 import { viewportTopLeft } from './ViewportNode.js';
 
-let rtt = null;
+let sharedFramebuffer = null;
 
 class ViewportSharedTextureNode extends ViewportTextureNode {
 
@@ -13,9 +13,9 @@ class ViewportSharedTextureNode extends ViewportTextureNode {
 
 	}
 
-	constructRTT( builder ) {
+	constructFramebuffer( builder ) {
 
-		return rtt || ( rtt = builder.getRenderTarget() );
+		return sharedFramebuffer || ( sharedFramebuffer = super.constructFramebuffer( builder ) );
 
 	}
 

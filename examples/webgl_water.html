@@ -34,8 +34,6 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Water } from 'three/addons/objects/Water2.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let scene, camera, clock, renderer, water;
 
 			let torusKnot;
@@ -91,6 +89,7 @@
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 16;
 					map.repeat.set( 4, 4 );
+					map.colorSpace = THREE.SRGBColorSpace;
 					groundMaterial.map = map;
 					groundMaterial.needsUpdate = true;
 
@@ -127,7 +126,7 @@
 
 				// light
 
-				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				const ambientLight = new THREE.AmbientLight( 0xe7e7e7, 0.4 );
 				scene.add( ambientLight );
 
 				const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.6 );
@@ -139,7 +138,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				// gui

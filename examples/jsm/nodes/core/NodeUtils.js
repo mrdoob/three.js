@@ -95,6 +95,10 @@ export function getValueType( value ) {
 
 		return 'string';
 
+	} else if ( typeOf === 'function' ) {
+
+		return 'shader';
+
 	} else if ( value.isVector2 === true ) {
 
 		return 'vec2';
@@ -132,6 +136,12 @@ export function getValueType( value ) {
 export function getValueFromType( type, ...params ) {
 
 	const last4 = type ? type.slice( - 4 ) : undefined;
+
+	if ( ( last4 === 'vec2' || last4 === 'vec3' || last4 === 'vec4' ) && params.length === 1 ) { // ensure same behaviour as in NodeBuilder.format()
+
+		params = last4 === 'vec2' ? [ params[ 0 ], params[ 0 ] ] : [ params[ 0 ], params[ 0 ], params[ 0 ] ];
+
+	}
 
 	if ( type === 'color' ) {
 

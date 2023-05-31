@@ -1,6 +1,7 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
+	Color,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader
@@ -107,6 +108,8 @@ class VTKLoader extends Loader {
 			let inColorSection = false;
 			let inNormalsSection = false;
 
+			const color = new Color();
+
 			const lines = data.split( '\n' );
 
 			for ( const i in lines ) {
@@ -207,7 +210,10 @@ class VTKLoader extends Loader {
 							const r = parseFloat( result[ 1 ] );
 							const g = parseFloat( result[ 2 ] );
 							const b = parseFloat( result[ 3 ] );
-							colors.push( r, g, b );
+
+							color.set( r, g, b ).convertSRGBToLinear();
+
+							colors.push( color.r, color.g, color.b );
 
 						}
 
@@ -319,9 +325,11 @@ class VTKLoader extends Loader {
 						const g = colors[ 3 * i + 1 ];
 						const b = colors[ 3 * i + 2 ];
 
-						newColors.push( r, g, b );
-						newColors.push( r, g, b );
-						newColors.push( r, g, b );
+						color.set( r, g, b ).convertSRGBToLinear();
+
+						newColors.push( color.r, color.g, color.b );
+						newColors.push( color.r, color.g, color.b );
+						newColors.push( color.r, color.g, color.b );
 
 					}
 

@@ -31,8 +31,7 @@
 
 			import { RGBShiftShader } from 'three/addons/shaders/RGBShiftShader.js';
 			import { DotScreenShader } from 'three/addons/shaders/DotScreenShader.js';
-
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
 			let camera, renderer, composer;
 			let object;
@@ -72,7 +71,7 @@
 
 				}
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new THREE.AmbientLight( 0x666666 ) );
 
 				const light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 );
@@ -90,6 +89,9 @@
 				const effect2 = new ShaderPass( RGBShiftShader );
 				effect2.uniforms[ 'amount' ].value = 0.0015;
 				composer.addPass( effect2 );
+
+				const effect3 = new ShaderPass( GammaCorrectionShader );
+				composer.addPass( effect3 );
 
 				//
 

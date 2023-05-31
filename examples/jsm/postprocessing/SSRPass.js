@@ -162,6 +162,7 @@ class SSRPass extends Pass {
 		this.beautyRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
+			type: HalfFloatType,
 			depthTexture: depthTexture,
 			depthBuffer: true
 		} );
@@ -184,7 +185,8 @@ class SSRPass extends Pass {
 
 		this.metalnessRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
-			magFilter: NearestFilter
+			magFilter: NearestFilter,
+			type: HalfFloatType,
 		} );
 
 

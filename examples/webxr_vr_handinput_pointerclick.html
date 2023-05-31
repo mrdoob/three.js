@@ -39,8 +39,6 @@
 
 		import { World, System, Component, TagComponent, Types } from 'three/addons/libs/ecsy.module.js';
 
-		THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 		class Object3D extends Component { }
 
 		Object3D.schema = {
@@ -256,10 +254,9 @@
 
 						const offset = entity.getComponent( OffsetFromCamera );
 						const object = entity.getComponent( Object3D ).object;
-						const xrCamera = this.renderer.xr.getCamera();
-						object.position.x = xrCamera.position.x + offset.x;
-						object.position.y = xrCamera.position.y + offset.y;
-						object.position.z = xrCamera.position.z + offset.z;
+						object.position.x = camera.position.x + offset.x;
+						object.position.y = camera.position.y + offset.y;
+						object.position.z = camera.position.z + offset.z;
 						entity.removeComponent( NeedCalibration );
 
 					}
@@ -305,7 +302,7 @@
 			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 			camera.position.set( 0, 1.2, 0.3 );
 
-			scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
+			scene.add( new THREE.HemisphereLight( 0xcccccc, 0x999999 ) );
 
 			const light = new THREE.DirectionalLight( 0xffffff );
 			light.position.set( 0, 6, 0 );
@@ -322,8 +319,7 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
 			renderer.xr.enabled = true;
-			renderer.xr.cameraAutoUpdate = false;
-
+			renderer.xr.setUserCamera( camera );
 			container.appendChild( renderer.domElement );
 
 			document.body.appendChild( VRButton.createButton( renderer ) );
@@ -518,7 +514,6 @@
 
 			const delta = clock.getDelta();
 			const elapsedTime = clock.elapsedTime;
-			renderer.xr.updateCamera( camera );
 			world.execute( delta, elapsedTime );
 			renderer.render( scene, camera );
 

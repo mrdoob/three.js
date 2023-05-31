@@ -186,7 +186,7 @@
 				const mesh = generateInstancedMesh( geometry, material, 500 );
 				scene.add( mesh );
 
-				this.fbo = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+				this.fbo = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { type: THREE.HalfFloatType } );
 
 				this.render = function ( delta, rtt ) {
 
@@ -298,6 +298,9 @@
 						'		gl_FragColor = mix( texel2, texel1, mixRatio );',
 
 						'	}',
+
+						'	#include <tonemapping_fragment>',
+						'	#include <encodings_fragment>',
 
 						'}'
 

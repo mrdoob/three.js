@@ -11,7 +11,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_iridescence" target="_blank" rel="noopener">KHR_materials_iridescence</a><br />
 			Iridescence Lamp from <a href="https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/IridescenceLamp" target="_blank" rel="noopener">glTF-Sample-Models</a><br />
-			<a href="https://hdrihaven.com/hdri/?h=venice_sunset" target="_blank" rel="noopener">Venice Sunset</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			<a href="https://hdrihaven.com/hdri/?h=venice_sunset" target="_blank" rel="noopener">Venice Sunset</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -46,6 +46,7 @@
 			async function init() {
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setAnimationLoop( render );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -53,11 +54,12 @@
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.05, 20 );
 				camera.position.set( 0.35, 0.05, 0.35 );
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render );
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = - 0.5;
 				controls.target.set( 0, 0.2, 0 );
 				controls.update();
 
@@ -102,6 +104,7 @@
 
 			function render() {
 
+				controls.update();
 				renderer.render( scene, camera );
 
 			}

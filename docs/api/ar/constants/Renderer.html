@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>ثوابت WebGLRenderer</h1>
+
+		<h2>أنماط قطع الوجه (Cull Face Modes)</h2>
+		<code>
+		THREE.CullFaceNone 
+		THREE.CullFaceBack 
+		THREE.CullFaceFront
+		THREE.CullFaceFrontBack
+		</code>
+		<p>
+			[page:constant CullFaceNone] تعطيل قطع الوجه.<br />
+			[page:constant CullFaceBack] قطع الوجوه الخلفية (الافتراضي).<br />
+			[page:constant CullFaceFront] قطع الوجوه الأمامية.<br />
+			[page:constant CullFaceFrontBack] قطع كلا الوجوه الأمامية والخلفية.
+		</p>
+
+		<h2>أنواع الظلال (Shadow Types)</h2>
+		<code>
+		THREE.BasicShadowMap 
+		THREE.PCFShadowMap 
+		THREE.PCFSoftShadowMap
+		THREE.VSMShadowMap
+		</code>
+		<p>
+			هذه الخيارات تحدد خاصية  [page:WebGLRenderer.shadowMap.type shadowMap.type] في WebGLRenderer.<br /><br />
+			[page:constant BasicShadowMap] يعطي خرائط ظل غير مصفاة - الأسرع ، ولكن الأقل جودة.<br />
+			[page:constant PCFShadowMap] يصفي خرائط الظل باستخدام خوارزمية
+			Percentage-Closer Filtering (PCF) (افتراضي).<br />
+			[page:constant PCFSoftShadowMap] يصفي خرائط الظل باستخدام خوارزمية
+			Percentage-Closer Filtering (PCF) مع أفضل الظلال الناعمة
+			خاصةً عند استخدام خرائط ظل بدقة منخفضة.<br />
+			[page:constant VSMShadowMap] يصفي خرائط الظل باستخدام خوارزمية Variance Shadow
+			Map (VSM). عند استخدام VSMShadowMap ، سيقوم جميع مستقبلات الظل بإلقاء الظلال أيضًا.
+		</p>
+
+		
+		<h2>Tone Mapping</h2>
+		<code>
+		THREE.NoToneMapping 
+		THREE.LinearToneMapping 
+		THREE.ReinhardToneMapping
+		THREE.CineonToneMapping 
+		THREE.ACESFilmicToneMapping
+		THREE.CustomToneMapping
+		</code>
+		<p>
+			هذه الخيارات تحدد خاصية [page:WebGLRenderer.toneMapping toneMapping] في WebGLRenderer. يتم استخدام هذا لتقريب مظهر نطاق الإضاءة العالي (HDR) على الوسط الذي يحتوي على نطاق إضاءة منخفض على شاشة الكمبيوتر القياسية أو شاشة الجوال.
+		</p>
+		<p>
+			THREE.LinearToneMapping، THREE.ReinhardToneMapping، THREE.CineonToneMapping و THREE.ACESFilmicToneMapping هي تنفيذات مدمجة لتقريب مظهر نطاق الإضاءة العالي (HDR). يتوقع THREE.CustomToneMapping تنفيذًا مخصصًا عن طريق تعديل شفرة GLSL لبرنامج تظليل مقطع المواد. راجع [example:webgl_tonemapping WebGL / tonemapping] مثالًا. 
+		</p>
+
+		<h2>المصدر (Source)</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

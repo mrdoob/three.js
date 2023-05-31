@@ -1,9 +1,14 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { getValueType } from '../core/NodeUtils.js';
-import { attribute } from '../core/AttributeNode.js';
+import { buffer } from '../accessors/BufferNode.js';
+//import { bufferAttribute } from '../accessors/BufferAttributeNode.js';
+import { instanceIndex } from '../core/InstanceIndexNode.js';
 import { nodeProxy, float } from '../shadernode/ShaderNode.js';
 
-import { MathUtils, InstancedBufferAttribute } from 'three';
+import { Vector4, MathUtils } from 'three';
+
+let min = null;
+let max = null;
 
 class RangeNode extends Node {
 
@@ -39,69 +44,46 @@ class RangeNode extends Node {
 
 		if ( object.isInstancedMesh === true ) {
 
-			const geometry = builder.geometry;
+			let minValue = this.minNode.value;
+			let maxValue = this.maxNode.value;
 
-			let min = this.minNode.value;
-			let max = this.maxNode.value;
+			const minLength = builder.getTypeLength( getValueType( minValue ) );
+			const maxLength = builder.getTypeLength( getValueType( maxValue ) );
 
-			const minLength = builder.getTypeLength( getValueType( min ) );
-			const maxLength = builder.getTypeLength( getValueType( max ) );
+			min = min || new Vector4();
+			max = max || new Vector4();
 
-				 if ( minLength > maxLength && maxLength > 1 ) max = new min.constructor().fromArray( min.toArray() );
-			else if ( minLength > maxLength && maxLength === 1 ) max = new min.constructor().setScalar( max );
-			else if ( maxLength > minLength && minLength > 1 ) min = new max.constructor().fromArray( min.toArray() );
-			else if ( maxLength > minLength && minLength === 1 ) min = new max.constructor().setScalar( min );
+			min.setScalar( 0 );
+			max.setScalar( 0 );
 
-			const vectorLength = this.getVectorLength( builder );
-			const attributeName = 'node' + this.id;
+			if ( minLength === 1 ) min.setScalar( minValue );
+			else if ( minValue.isColor ) min.set( minValue.r, minValue.g, minValue.b );
+			else min.set( minValue.x, minValue.y, minValue.z || 0, minValue.w || 0 );
 
-			const length = vectorLength * object.count;
+			if ( maxLength === 1 ) max.setScalar( maxValue );
+			else if ( maxValue.isColor ) max.set( maxValue.r, maxValue.g, maxValue.b );
+			else max.set( maxValue.x, maxValue.y, maxValue.z || 0, maxValue.w || 0 );
+
+			const stride = 4;
+
+			const length = stride * object.count;
 			const array = new Float32Array( length );
 
-			const attributeGeometry = geometry.getAttribute( attributeName );
+			for ( let i = 0; i < length; i ++ ) {
 
-			if ( attributeGeometry === undefined || attributeGeometry.array.length < length ) {
+				const index = i % stride;
 
-				if ( vectorLength === 1 ) {
+				const minElementValue = min.getComponent( index );
+				const maxElementValue = max.getComponent( index );
 
-					for ( let i = 0; i < length; i ++ ) {
-
-						array[ i ] = MathUtils.lerp( min, max, Math.random() );
-
-					}
-
-				} else if ( min.isColor ) {
-
-					for ( let i = 0; i < length; i += 3 ) {
-
-						array[ i ] = MathUtils.lerp( min.r, max.r, Math.random() );
-						array[ i + 1 ] = MathUtils.lerp( min.g, max.g, Math.random() );
-						array[ i + 2 ] = MathUtils.lerp( min.b, max.b, Math.random() );
-
-					}
-
-				} else {
-
-					for ( let i = 0; i < length; i ++ ) {
-
-						const index = i % vectorLength;
-
-						const minValue = min.getComponent( index );
-						const maxValue = max.getComponent( index );
-
-						array[ i ] = MathUtils.lerp( minValue, maxValue, Math.random() );
-
-					}
-
-				}
-
-				geometry.setAttribute( attributeName, new InstancedBufferAttribute( array, vectorLength ) );
-
-				geometry.dispose();
+				array[ i ] = MathUtils.lerp( minElementValue, maxElementValue, Math.random() );
 
 			}
 
-			output = attribute( attributeName, builder.getTypeFromLength( vectorLength ) );
+			const nodeType = this.getNodeType( builder );
+
+			output = buffer( array, 'vec4', object.count ).element( instanceIndex ).convert( nodeType );
+			//output = bufferAttribute( array, 'vec4', 4, 0 ).convert( nodeType );
 
 		} else {
 

@@ -79,7 +79,7 @@ const shaderNodeHandler = {
 
 const nodeObjectsCacheMap = new WeakMap();
 
-const ShaderNodeObject = function ( obj ) {
+const ShaderNodeObject = function ( obj, altType = null ) {
 
 	const type = getValueType( obj );
 
@@ -97,13 +97,13 @@ const ShaderNodeObject = function ( obj ) {
 
 		return nodeObject;
 
-	} else if ( ( type === 'float' ) || ( type === 'boolean' ) ) {
+	} else if ( ( altType === null && ( type === 'float' || type === 'boolean' ) ) || ( type && type !== 'shader' && type !== 'string' ) ) {
 
-		return nodeObject( getAutoTypedConstNode( obj ) );
+		return nodeObject( getConstNode( obj, altType ) );
 
-	} else if ( type && type !== 'string' ) {
+	} else if ( type === 'shader' ) {
 
-		return nodeObject( new ConstNode( obj ) );
+		return shader( obj );
 
 	}
 
@@ -111,11 +111,11 @@ const ShaderNodeObject = function ( obj ) {
 
 };
 
-const ShaderNodeObjects = function ( objects ) {
+const ShaderNodeObjects = function ( objects, altType = null ) {
 
 	for ( const name in objects ) {
 
-		objects[ name ] = nodeObject( objects[ name ] );
+		objects[ name ] = nodeObject( objects[ name ], altType );
 
 	}
 
@@ -123,13 +123,13 @@ const ShaderNodeObjects = function ( objects ) {
 
 };
 
-const ShaderNodeArray = function ( array ) {
+const ShaderNodeArray = function ( array, altType = null ) {
 
 	const len = array.length;
 
 	for ( let i = 0; i < len; i ++ ) {
 
-		array[ i ] = nodeObject( array[ i ] );
+		array[ i ] = nodeObject( array[ i ], altType );
 
 	}
 
@@ -237,7 +237,7 @@ const cacheMaps = { bool: boolsCacheMap, uint: uintsCacheMap, ints: intsCacheMap
 
 const constNodesCacheMap = new Map( [ ...boolsCacheMap, ...floatsCacheMap ] );
 
-const getAutoTypedConstNode = ( value ) => {
+const getConstNode = ( value, type ) => {
 
 	if ( constNodesCacheMap.has( value ) ) {
 
@@ -249,7 +249,21 @@ const getAutoTypedConstNode = ( value ) => {
 
 	} else {
 
-		return new ConstNode( value );
+		return new ConstNode( value, type );
+
+	}
+
+};
+
+const safeGetNodeType = ( node ) => {
+
+	try {
+
+		return node.getNodeType();
+
+	} catch {
+
+		return undefined;
 
 	}
 
@@ -259,35 +273,28 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 	return ( ...params ) => {
 
-		if ( params.length === 0 ) {
+		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => typeof param !== 'object' ) ) ) {
 
-			return nodeObject( new ConstNode( getValueFromType( type ), type ) );
-
-		} else {
-
-			if ( type === 'color' && params[ 0 ].isNode !== true ) {
-
-				params = [ getValueFromType( type, ...params ) ];
-
-			}
-
-			if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
-
-				return cacheMap.get( params[ 0 ] );
-
-			}
-
-			const nodes = params.map( getAutoTypedConstNode );
-
-			if ( nodes.length === 1 ) {
-
-				return nodeObject( nodes[ 0 ].nodeType === type || getValueType( nodes[ 0 ].value ) === type ? nodes[ 0 ] : new ConvertNode( nodes[ 0 ], type ) );
-
-			}
-
-			return nodeObject( new JoinNode( nodes, type ) );
+			params = [ getValueFromType( type, ...params ) ];
 
 		}
+
+		if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
+
+			return nodeObject( cacheMap.get( params[ 0 ] ) );
+
+		}
+
+		if ( params.length === 1 ) {
+
+			const node = getConstNode( params[ 0 ], type );
+			if ( safeGetNodeType( node ) === type ) return nodeObject( node );
+			return nodeObject( new ConvertNode( node, type ) );
+
+		}
+
+		const nodes = params.map( param => getConstNode( param ) );
+		return nodeObject( new JoinNode( nodes, type ) );
 
 	};
 
@@ -307,9 +314,9 @@ export function ShaderNode( jsFunc ) {
 
 }
 
-export const nodeObject = ( val ) => /* new */ ShaderNodeObject( val );
-export const nodeObjects = ( val ) => new ShaderNodeObjects( val );
-export const nodeArray = ( val ) => new ShaderNodeArray( val );
+export const nodeObject = ( val, altType = null ) => /* new */ ShaderNodeObject( val, altType );
+export const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val, altType );
+export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
 export const nodeProxy = ( ...val ) => new ShaderNodeProxy( ...val );
 export const nodeImmutable = ( ...val ) => new ShaderNodeImmutable( ...val );
 

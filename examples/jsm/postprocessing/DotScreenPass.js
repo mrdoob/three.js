@@ -21,6 +21,7 @@ class DotScreenPass extends Pass {
 
 		this.material = new ShaderMaterial( {
 
+			name: shader.name,
 			uniforms: this.uniforms,
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader

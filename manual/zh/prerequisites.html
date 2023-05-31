@@ -104,7 +104,7 @@ console.log(g());  // prints 456
 变量会改变的情况下使用<code class="notranslate" translate="no">let</code>。这将会帮助避免大量bug。</p>
 <h3 id="-for-elem-of-collection-for-elem-in-collection-">使用<code class="notranslate" translate="no">for(elem of collection)</code>而不是<code class="notranslate" translate="no">for(elem in collection)</code></h3>
 <p><code class="notranslate" translate="no">for of</code>是新的，<code class="notranslate" translate="no">for in</code>是旧的。 <code class="notranslate" translate="no">for of</code>解决了<code class="notranslate" translate="no">for in</code>的问题。</p>
-<p>举个例子，你可以像这样迭代一个对象的所以键/值对</p>
+<p>举个例子，你可以像这样迭代一个对象的所有键/值对</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (const [key, value] of Object.entries(someObject)) {
   console.log(key, value);
 }

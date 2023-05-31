@@ -1,4 +1,4 @@
-import { Material, ShaderMaterial } from 'three';
+import { Material, ShaderMaterial, NoColorSpace } from 'three';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { diffuseColor } from '../core/PropertyNode.js';
@@ -10,6 +10,7 @@ import { instance } from '../accessors/InstanceNode.js';
 import { positionLocal } from '../accessors/PositionNode.js';
 import { skinning } from '../accessors/SkinningNode.js';
 import { texture } from '../accessors/TextureNode.js';
+import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { lightsWithoutWrap } from '../lighting/LightsNode.js';
 import { mix } from '../math/MathNode.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
@@ -165,9 +166,33 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
+	getEnvNode( builder ) {
+
+		let node = null;
+
+		if ( this.envNode ) {
+
+			node = this.envNode;
+
+		} else if ( this.envMap ) {
+
+			node = this.envMap.isCubeTexture ? cubeTexture( this.envMap ) : texture( this.envMap );
+
+		} else if ( builder.environmentNode ) {
+
+			node = builder.environmentNode;
+
+		}
+
+		return node;
+
+	}
+
 	constructLights( builder ) {
 
-		const envNode = this.envNode || builder.environmentNode;
+		const envNode = this.getEnvNode( builder );
+
+		//
 
 		const materialLightsNode = [];
 
@@ -257,7 +282,21 @@ class NodeMaterial extends ShaderMaterial {
 
 		// ENCODING
 
-		outputNode = outputNode.colorSpace( renderer.outputColorSpace );
+		const renderTarget = renderer.getRenderTarget();
+
+		let outputColorSpace;
+
+		if ( renderTarget !== null ) {
+
+			outputColorSpace = renderTarget.texture.colorSpace;
+
+		} else {
+
+			outputColorSpace = renderer.outputColorSpace;
+
+		}
+
+		if ( outputColorSpace !== NoColorSpace ) outputNode = outputNode.colorSpace( outputColorSpace );
 
 		// FOG
 

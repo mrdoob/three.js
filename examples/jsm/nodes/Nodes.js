@@ -45,6 +45,7 @@ export { default as ConvertNode } from './utils/ConvertNode.js';
 export { default as DiscardNode, discard } from './utils/DiscardNode.js';
 export { default as EquirectUVNode, equirectUV } from './utils/EquirectUVNode.js';
 export { default as JoinNode } from './utils/JoinNode.js';
+export { default as LoopNode, loop } from './utils/LoopNode.js';
 export { default as MatcapUVNode, matcapUV } from './utils/MatcapUVNode.js';
 export { default as MaxMipLevelNode, maxMipLevel } from './utils/MaxMipLevelNode.js';
 export { default as OscNode, oscSine, oscSquare, oscTriangle, oscSawtooth } from './utils/OscNode.js';
@@ -62,6 +63,7 @@ export * from './shadernode/ShaderNode.js';
 
 // accessors
 export { default as BitangentNode, bitangentGeometry, bitangentLocal, bitangentView, bitangentWorld, transformedBitangentView, transformedBitangentWorld } from './accessors/BitangentNode.js';
+export { default as BufferAttributeNode, bufferAttribute, dynamicBufferAttribute } from './accessors/BufferAttributeNode.js';
 export { default as BufferNode, buffer } from './accessors/BufferNode.js';
 export { default as CameraNode, cameraProjectionMatrix, cameraViewMatrix, cameraNormalMatrix, cameraWorldMatrix, cameraPosition } from './accessors/CameraNode.js';
 export { default as CubeTextureNode, cubeTexture } from './accessors/CubeTextureNode.js';
@@ -139,8 +141,7 @@ export { default as NodeObjectLoader } from './loaders/NodeObjectLoader.js';
 export { default as NodeMaterialLoader } from './loaders/NodeMaterialLoader.js';
 
 // parsers
-export { default as WGSLNodeParser } from './parsers/WGSLNodeParser.js';
-export { default as GLSLNodeParser } from './parsers/GLSLNodeParser.js';
+export { default as GLSLNodeParser } from './parsers/GLSLNodeParser.js'; // @TODO: Move to jsm/renderers/webgl.
 
 // materials
 export * from './materials/Materials.js';

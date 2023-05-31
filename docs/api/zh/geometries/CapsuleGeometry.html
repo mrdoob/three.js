@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr; [page:LatheGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name]是一个胶囊图形类，通过半径和高度来进行构造。使用lathe来进行构造。
+		</p>
+
+		<iframe
+			id="scene"
+			src="scenes/geometry-browser.html#CapsuleGeometry"
+		></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>代码示例</h2>
+
+		<code>
+const geometry = new THREE.CapsuleGeometry( 1, 1, 4, 8 ); 
+const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} ); 
+const capsule = new THREE.Mesh( geometry, material ); scene.add( capsule );
+		</code>
+
+		<h2>构造函数</h2>
+
+		<h3>
+			[name]([param:Float radius], [param:Float length], [param:Integer capSubdivisions], [param:Integer radialSegments])
+		</h3>
+		<p>
+			radius — 胶囊半径。可选的; 默认值为1。<br />
+			length — 中间区域的长度。可选的; 默认值为1。<br />
+			capSegments — 构造盖子的曲线部分的个数。可选的; 默认值为4。<br />
+			radialSegments — 覆盖胶囊圆周的分离的面的个数。可选的; 默认值为8。<br />
+		</p>
+
+		<h2>属性</h2>
+		<p>查看公共属性请参考基类[page:BufferGeometry]。</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+			有属性的构造函数参数对象。任何实例化之后的修改都不会改变图形。
+		</p>
+
+		<h2>方法</h2>
+		<p>查看公共属性请参考基类[page:BufferGeometry]。</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

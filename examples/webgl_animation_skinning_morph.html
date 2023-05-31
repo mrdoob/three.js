@@ -56,8 +56,6 @@
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 			let container, stats, clock, gui, mixer, actions, activeAction, previousAction;
 			let camera, scene, renderer, model, face;
 
@@ -83,7 +81,7 @@
 
 				// lights
 
-				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d );
 				hemiLight.position.set( 0, 20, 0 );
 				scene.add( hemiLight );
 
@@ -93,7 +91,7 @@
 
 				// ground
 
-				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0xcbcbcb, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 

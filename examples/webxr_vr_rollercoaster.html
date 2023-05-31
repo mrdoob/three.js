@@ -35,15 +35,6 @@
 
 			let mesh, material, geometry;
 
-			const renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.xr.enabled = true;
-			renderer.xr.setReferenceSpaceType( 'local' );
-			document.body.appendChild( renderer.domElement );
-
-			document.body.appendChild( VRButton.createButton( renderer ) );
-
 			//
 
 			const scene = new THREE.Scene();
@@ -187,6 +178,16 @@
 			funfairs.push( mesh );
 
 			//
+
+			const renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.xr.enabled = true;
+			renderer.xr.setReferenceSpaceType( 'local' );
+			renderer.xr.setUserCamera( camera );
+			document.body.appendChild( renderer.domElement );
+
+			document.body.appendChild( VRButton.createButton( renderer ) );
 
 			window.addEventListener( 'resize', onWindowResize );
 

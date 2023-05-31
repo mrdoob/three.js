@@ -373,7 +373,6 @@
 				"OBJLoader": "examples/en/loaders/OBJLoader",
 				"PCDLoader": "examples/en/loaders/PCDLoader",
 				"PDBLoader": "examples/en/loaders/PDBLoader",
-				"PRWMLoader": "examples/en/loaders/PRWMLoader",
 				"SVGLoader": "examples/en/loaders/SVGLoader",
 				"TGALoader": "examples/en/loaders/TGALoader"
 			},
@@ -495,7 +494,111 @@
 			"Cameras": {
 				"ArrayCamera": "api/ar/cameras/ArrayCamera",
 				"Camera": "api/ar/cameras/Camera",
-				"CubeCamera": "api/ar/cameras/CubeCamera"
+				"CubeCamera": "api/ar/cameras/CubeCamera",
+				"OrthographicCamera": "api/ar/cameras/OrthographicCamera",
+				"PerspectiveCamera": "api/ar/cameras/PerspectiveCamera",
+				"StereoCamera": "api/ar/cameras/StereoCamera"
+			},
+
+			"Constants": {
+				"Animation": "api/ar/constants/Animation",
+				"Core": "api/ar/constants/Core",
+				"CustomBlendingEquation": "api/ar/constants/CustomBlendingEquations",
+				"BufferAttributeUsage": "api/ar/constants/BufferAttributeUsage",
+				"Materials": "api/ar/constants/Materials",
+				"Renderer": "api/ar/constants/Renderer",
+				"Textures": "api/ar/constants/Textures"
+			},
+
+			"Core": {
+				"BufferAttribute": "api/ar/core/BufferAttribute",
+				"BufferGeometry": "api/ar/core/BufferGeometry",
+				"Clock": "api/ar/core/Clock",
+				"EventDispatcher": "api/ar/core/EventDispatcher",
+				"GLBufferAttribute": "api/ar/core/GLBufferAttribute",
+				"InstancedBufferAttribute": "api/ar/core/InstancedBufferAttribute",
+				"InstancedBufferGeometry": "api/ar/core/InstancedBufferGeometry",
+				"InstancedInterleavedBuffer": "api/ar/core/InstancedInterleavedBuffer",
+				"InterleavedBuffer": "api/ar/core/InterleavedBuffer",
+				"InterleavedBufferAttribute": "api/ar/core/InterleavedBufferAttribute",
+				"Layers": "api/ar/core/Layers",
+				"Object3D": "api/ar/core/Object3D",
+				"Raycaster": "api/ar/core/Raycaster",
+				"Uniform": "api/ar/core/Uniform"
+			},
+
+			"Core / BufferAttributes": {
+				"BufferAttribute Types": "api/ar/core/bufferAttributeTypes/BufferAttributeTypes"
+			},
+
+			"Extras": {
+				"DataUtils": "api/ar/extras/DataUtils",
+				"Earcut": "api/ar/extras/Earcut",
+				"ImageUtils": "api/ar/extras/ImageUtils",
+				"PMREMGenerator": "api/ar/extras/PMREMGenerator",
+				"ShapeUtils": "api/ar/extras/ShapeUtils"
+			},
+
+			"Extras / Core": {
+				"Curve": "api/ar/extras/core/Curve",
+				"CurvePath": "api/ar/extras/core/CurvePath",
+				"Interpolations": "api/ar/extras/core/Interpolations",
+				"Path": "api/ar/extras/core/Path",
+				"Shape": "api/ar/extras/core/Shape",
+				"ShapePath": "api/ar/extras/core/ShapePath"
+			},
+
+			"Extras / Curves": {
+				"ArcCurve": "api/ar/extras/curves/ArcCurve",
+				"CatmullRomCurve3": "api/ar/extras/curves/CatmullRomCurve3",
+				"CubicBezierCurve": "api/ar/extras/curves/CubicBezierCurve",
+				"CubicBezierCurve3": "api/ar/extras/curves/CubicBezierCurve3",
+				"EllipseCurve": "api/ar/extras/curves/EllipseCurve",
+				"LineCurve": "api/ar/extras/curves/LineCurve",
+				"LineCurve3": "api/ar/extras/curves/LineCurve3",
+				"QuadraticBezierCurve": "api/ar/extras/curves/QuadraticBezierCurve",
+				"QuadraticBezierCurve3": "api/ar/extras/curves/QuadraticBezierCurve3",
+				"SplineCurve": "api/ar/extras/curves/SplineCurve"
+			},
+
+			"Geometries": {
+				"BoxGeometry": "api/ar/geometries/BoxGeometry",
+				"CapsuleGeometry": "api/ar/geometries/CapsuleGeometry",
+				"CircleGeometry": "api/ar/geometries/CircleGeometry",
+				"ConeGeometry": "api/ar/geometries/ConeGeometry",
+				"CylinderGeometry": "api/ar/geometries/CylinderGeometry",
+				"DodecahedronGeometry": "api/ar/geometries/DodecahedronGeometry",
+				"EdgesGeometry": "api/ar/geometries/EdgesGeometry",
+				"ExtrudeGeometry": "api/ar/geometries/ExtrudeGeometry",
+				"IcosahedronGeometry": "api/ar/geometries/IcosahedronGeometry",
+				"LatheGeometry": "api/ar/geometries/LatheGeometry",
+				"OctahedronGeometry": "api/ar/geometries/OctahedronGeometry",
+				"PlaneGeometry": "api/ar/geometries/PlaneGeometry",
+				"PolyhedronGeometry": "api/ar/geometries/PolyhedronGeometry",
+				"RingGeometry": "api/ar/geometries/RingGeometry",
+				"ShapeGeometry": "api/ar/geometries/ShapeGeometry",
+				"SphereGeometry": "api/ar/geometries/SphereGeometry",
+				"TetrahedronGeometry": "api/ar/geometries/TetrahedronGeometry",
+				"TorusGeometry": "api/ar/geometries/TorusGeometry",
+				"TorusKnotGeometry": "api/ar/geometries/TorusKnotGeometry",
+				"TubeGeometry": "api/ar/geometries/TubeGeometry",
+				"WireframeGeometry": "api/ar/geometries/WireframeGeometry"
+			},
+
+			"Helpers": {
+				"ArrowHelper": "api/ar/helpers/ArrowHelper",
+				"AxesHelper": "api/ar/helpers/AxesHelper",
+				"BoxHelper": "api/ar/helpers/BoxHelper",
+				"Box3Helper": "api/ar/helpers/Box3Helper",
+				"CameraHelper": "api/ar/helpers/CameraHelper",
+				"DirectionalLightHelper": "api/ar/helpers/DirectionalLightHelper",
+				"GridHelper": "api/ar/helpers/GridHelper",
+				"PolarGridHelper": "api/ar/helpers/PolarGridHelper",
+				"HemisphereLightHelper": "api/ar/helpers/HemisphereLightHelper",
+				"PlaneHelper": "api/ar/helpers/PlaneHelper",
+				"PointLightHelper": "api/ar/helpers/PointLightHelper",
+				"SkeletonHelper": "api/ar/helpers/SkeletonHelper",
+				"SpotLightHelper": "api/ar/helpers/SpotLightHelper"
 			}
 
 		}
@@ -598,6 +701,7 @@
 			},
 
 			"附件": {
+				"DataUtils": "api/zh/extras/DataUtils",
 				"Earcut": "api/zh/extras/Earcut",
 				"ImageUtils": "api/zh/extras/ImageUtils",
 				"PMREMGenerator": "api/zh/extras/PMREMGenerator",
@@ -628,6 +732,7 @@
 
 			"几何体": {
 				"BoxGeometry": "api/zh/geometries/BoxGeometry",
+				"CapsuleGeometry": "api/zh/geometries/CapsuleGeometry",
 				"CircleGeometry": "api/zh/geometries/CircleGeometry",
 				"ConeGeometry": "api/zh/geometries/ConeGeometry",
 				"CylinderGeometry": "api/zh/geometries/CylinderGeometry",
@@ -776,6 +881,8 @@
 			},
 
 			"渲染器": {
+				"WebGL3DRenderTarget": "api/zh/renderers/WebGL3DRenderTarget",
+				"WebGLArrayRenderTarget": "api/zh/renderers/WebGLArrayRenderTarget",
 				"WebGLMultipleRenderTargets": "api/zh/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
 				"WebGL1Renderer": "api/zh/renderers/WebGL1Renderer",
@@ -849,11 +956,14 @@
 
 			"加载器": {
 				"FontLoader": "examples/zh/loaders/FontLoader",
+				"DracoLoader": "examples/zh/loaders/DracoLoader",
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
-				"PCDLoader": "examples/zh/loaders/PCDLoader"
+				"PCDLoader": "examples/zh/loaders/PCDLoader",
+				"SVGLoader": "examples/zh/loaders/SVGLoader",
+				"TGALoader": "examples/zh/loaders/TGALoader"
 			},
 
 			"物体": {
@@ -1987,7 +2097,6 @@
 				"OBJLoader": "examples/en/loaders/OBJLoader",
 				"PCDLoader": "examples/en/loaders/PCDLoader",
 				"PDBLoader": "examples/en/loaders/PDBLoader",
-				"PRWMLoader": "examples/en/loaders/PRWMLoader",
 				"SVGLoader": "examples/en/loaders/SVGLoader",
 				"TGALoader": "examples/en/loaders/TGALoader"
 			},
