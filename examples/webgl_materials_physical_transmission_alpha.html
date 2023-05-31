@@ -110,7 +110,7 @@
 									mesh = child;
 									material = mesh.material;
 
-									let color = new THREE.Color();
+									const color = new THREE.Color();
 
 									params.color = color.copy( mesh.material.color ).getHex();
 									params.roughness = mesh.material.roughness;
@@ -135,7 +135,7 @@
 
 							scene.environment = hdrEquirect;
 							//scene.background = hdrEquirect;
-	
+
 							render();
 
 						} );
@@ -161,7 +161,7 @@
 				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( -5, 0.5, 0 );
+				camera.position.set( - 5, 0.5, 0 );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
@@ -197,10 +197,14 @@
 
 						material.opacity = params.opacity;
 						const transparent = params.opacity < 1;
-						if(transparent !== material.transparent) {
+
+						if ( transparent !== material.transparent ) {
+
 							material.transparent = transparent;
 							material.needsUpdate = true;
+
 						}
+
 						render();
 
 					} );
