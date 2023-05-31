@@ -79,6 +79,7 @@ class Renderer {
 		this._clearStencil = 0;
 
 		this._renderTarget = null;
+		this._currentActiveCubeFace = 0;
 
 		this._initialized = false;
 		this._initPromise = null;
@@ -88,6 +89,10 @@ class Renderer {
 		this.shadowMap = {
 			enabled: false,
 			type: null
+		};
+
+		this.xr = {
+			enabled: false
 		};
 
 	}
@@ -148,7 +153,13 @@ class Renderer {
 
 	}
 
-	async compile( scene, camera ) {
+	get coordinateSystem() {
+
+		return this.backend.coordinateSystem;
+
+	}
+
+	async compile( /*scene, camera*/ ) {
 
 		console.warn( 'THREE.Renderer: .compile() is not implemented yet.' );
 
@@ -169,10 +180,23 @@ class Renderer {
 
 		const renderContext = this._renderContexts.get( scene, camera );
 		const renderTarget = this._renderTarget;
+		const activeCubeFace = this._activeCubeFace;
 
 		this._currentRenderContext = renderContext;
 
 		nodeFrame.renderId ++;
+
+		//
+
+		const coordinateSystem = this.coordinateSystem;
+
+		if ( camera.coordinateSystem !== coordinateSystem ) {
+
+			camera.coordinateSystem = coordinateSystem;
+
+			camera.updateProjectionMatrix();
+
+		}
 
 		//
 
@@ -218,7 +242,7 @@ class Renderer {
 		//
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-		_frustum.setFromProjectionMatrix( _projScreenMatrix );
+		_frustum.setFromProjectionMatrix( _projScreenMatrix, coordinateSystem );
 
 		const renderList = this._renderLists.get( scene, camera );
 		renderList.init();
@@ -250,6 +274,8 @@ class Renderer {
 			renderContext.depthTexture = null;
 
 		}
+
+		renderContext.activeCubeFace = activeCubeFace;
 
 		//
 
@@ -542,9 +568,10 @@ class Renderer {
 
 	}
 
-	setRenderTarget( renderTarget ) {
+	setRenderTarget( renderTarget, activeCubeFace = 0 ) {
 
 		this._renderTarget = renderTarget;
+		this._activeCubeFace = activeCubeFace;
 
 	}
 

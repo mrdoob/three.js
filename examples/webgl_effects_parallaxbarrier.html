@@ -65,7 +65,6 @@
 				];
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.colorSpace = THREE.SRGBColorSpace;
 
 				scene = new THREE.Scene();
 				scene.background = textureCube;

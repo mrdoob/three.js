@@ -9,6 +9,8 @@ import { transformedNormalView, transformedNormalWorld } from '../accessors/Norm
 import { positionViewDirection } from '../accessors/PositionNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { float, vec2 } from '../shadernode/ShaderNode.js';
+import { cubeTexture } from '../accessors/CubeTextureNode.js';
+import { reference } from '../accessors/ReferenceNode.js';
 
 class EnvironmentNode extends LightingNode {
 
@@ -22,8 +24,20 @@ class EnvironmentNode extends LightingNode {
 
 	construct( builder ) {
 
-		const envNode = this.envNode;
+		let envNode = this.envNode;
 		const properties = builder.getNodeProperties( this );
+
+		if ( envNode.isTextureNode && envNode.value.isCubeTexture !== true ) {
+
+			const texture = envNode.value;
+			const renderer = builder.renderer;
+
+			// @TODO: Add dispose logic here
+			const cubeRTT = builder.getCubeRenderTarget( 512 ).fromEquirectangularTexture( renderer, texture );
+
+			envNode = cubeTexture( cubeRTT.texture );
+
+		}
 
 		let reflectVec;
 		let radianceTextureUVNode;
@@ -120,9 +134,11 @@ class EnvironmentNode extends LightingNode {
 
 		//
 
-		builder.context.radiance.addAssign( isolateRadianceFlowContext );
+		const intensity = reference( 'envMapIntensity', 'float', builder.material );
 
-		builder.context.iblIrradiance.addAssign( irradianceContext.mul( Math.PI ) );
+		builder.context.radiance.addAssign( isolateRadianceFlowContext.mul( intensity ) );
+
+		builder.context.iblIrradiance.addAssign( irradianceContext.mul( Math.PI ).mul( intensity ) );
 
 		properties.radianceContext = isolateRadianceFlowContext;
 		properties.irradianceContext = irradianceContext;

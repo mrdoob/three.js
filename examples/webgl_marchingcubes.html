@@ -160,9 +160,6 @@
 			const refractionCube = cubeTextureLoader.load( urls );
 			refractionCube.mapping = THREE.CubeRefractionMapping;
 
-			reflectionCube.colorSpace = THREE.SRGBColorSpace;
-			refractionCube.colorSpace = THREE.SRGBColorSpace;
-
 			// toons
 
 			const toonMaterial1 = createShaderMaterial( ToonShader1, light, ambientLight );

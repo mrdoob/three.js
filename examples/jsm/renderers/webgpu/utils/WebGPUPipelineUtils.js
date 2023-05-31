@@ -92,7 +92,7 @@ class WebGPUPipelineUtils {
 		const depthCompare = this._getDepthCompare( material );
 		const colorFormat = utils.getCurrentColorFormat( renderObject.context );
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
-		const sampleCount = utils.getSampleCount();
+		const sampleCount = utils.getSampleCount( renderObject.context );
 
 		pipelineData.pipeline = device.createRenderPipeline( {
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),

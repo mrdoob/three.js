@@ -13,6 +13,8 @@ import {
 	NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare
 } from 'three';
 
+import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
+
 import WebGPUTextureMipmapUtils from './WebGPUTextureMipmapUtils.js';
 
 const _compareToWebGPU = {
@@ -101,7 +103,7 @@ class WebGPUTextureUtils {
 		const dimension = this._getDimension( texture );
 		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
 		const format = texture.internalFormat || this._getFormat( texture );
-		//const sampleCount = texture.isRenderTargetTexture || texture.isDepthTexture ? backend.utils.getSampleCount() : 1;
+		//const sampleCount = texture.isRenderTargetTexture || texture.isDepthTexture ? backend.utils.getSampleCount( renderContext ) : 1;
 		const sampleCount = 1;
 
 		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
@@ -173,6 +175,26 @@ class WebGPUTextureUtils {
 
 	}
 
+	generateMipmaps( texture ) {
+
+		const textureData = this.backend.get( texture );
+
+		if ( texture.isCubeTexture ) {
+
+			for ( let i = 0; i < 6; i ++ ) {
+
+				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i );
+
+			}
+
+		} else {
+
+			this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU );
+
+		}
+
+	}
+
 	updateTexture( texture ) {
 
 		const textureData = this.backend.get( texture );
@@ -220,6 +242,14 @@ class WebGPUTextureUtils {
 		//
 
 		textureData.version = texture.version;
+
+	}
+
+	_isEnvironmentTexture( texture ) {
+
+		const mapping = texture.mapping;
+
+		return ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping ) || ( mapping === CubeReflectionMapping || mapping === CubeRefractionMapping );
 
 	}
 
@@ -331,7 +361,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer ) {
+	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0 ) {
 
 		if ( this.mipmapUtils === null ) {
 
@@ -529,7 +559,9 @@ class WebGPUTextureUtils {
 
 	_needsMipmaps( texture ) {
 
-		return ( texture.isCompressedTexture !== true ) && ( texture.generateMipmaps === true ) && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
+		if ( this._isEnvironmentTexture( texture ) ) return true;
+
+		return ( texture.isCompressedTexture !== true ) /*&& ( texture.generateMipmaps === true )*/ && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
 
 	}
 
@@ -595,7 +627,7 @@ class WebGPUTextureUtils {
 
 		let formatGPU;
 
-		if ( texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true ) {
+		if ( /*texture.isRenderTargetTexture === true ||*/ texture.isFramebufferTexture === true ) {
 
 			formatGPU = GPUTextureFormat.BGRA8Unorm;
 

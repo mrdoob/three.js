@@ -8,7 +8,6 @@ import { texture } from '../accessors/TextureNode.js';
 import { positionWorld } from '../accessors/PositionNode.js';
 //import { step } from '../math/MathNode.js';
 import { cond } from '../math/CondNode.js';
-import MeshBasicNodeMaterial from '../materials/MeshBasicNodeMaterial.js';
 
 import { Color, DepthTexture, NearestFilter } from 'three';
 
@@ -44,7 +43,7 @@ class AnalyticLightNode extends LightingNode {
 
 		if ( shadowNode === null ) {
 
-			if ( depthMaterial === null ) depthMaterial = new MeshBasicNodeMaterial();
+			if ( depthMaterial === null ) depthMaterial = builder.createNodeMaterial( 'MeshBasicNodeMaterial' );
 
 			const shadow = this.light.shadow;
 			const rtt = builder.getRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
