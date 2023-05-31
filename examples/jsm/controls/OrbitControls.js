@@ -249,7 +249,7 @@ class OrbitControls extends EventDispatcher {
 
 				// adjust the camera position based on zoom only if we're not zooming to the cursor or if it's an ortho camera
 				// we adjust zoom later in these cases
-				if ( scope.zoomToCursor || scope.object.isOrthographicCamera ) {
+				if ( scope.zoomToCursor && performCursorZoom || scope.object.isOrthographicCamera ) {
 
 					spherical.radius = clampDistance( spherical.radius );
 
@@ -286,7 +286,7 @@ class OrbitControls extends EventDispatcher {
 
 				// adjust camera position
 				let zoomChanged = false;
-				if ( scope.zoomToCursor ) {
+				if ( scope.zoomToCursor && performCursorZoom ) {
 
 					let newRadius = null;
 					if ( scope.object.isPerspectiveCamera ) {
@@ -359,6 +359,7 @@ class OrbitControls extends EventDispatcher {
 				}
 
 				scale = 1;
+				performCursorZoom = false;
 
 				// update condition is:
 				// min(camera displacement, camera rotation in radians)^2 > EPS
@@ -452,6 +453,7 @@ class OrbitControls extends EventDispatcher {
 
 		const dollyDirection = new Vector3();
 		const mouse = new Vector2();
+		let performCursorZoom = false;
 
 		const pointers = [];
 		const pointerPositions = {};
@@ -592,6 +594,14 @@ class OrbitControls extends EventDispatcher {
 		}
 
 		function updateMouseParameters( event ) {
+
+			if ( ! scope.zoomToCursor ) {
+
+				return;
+
+			}
+
+			performCursorZoom = true;
 
 			const x = event.clientX - scope.domElement.clientLeft;
 			const y = event.clientY - scope.domElement.clientTop;
