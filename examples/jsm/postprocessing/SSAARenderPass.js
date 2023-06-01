@@ -32,7 +32,6 @@ class SSAARenderPass extends Pass {
 		this.camera = camera;
 
 		this.sampleLevel = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
-		this.unbiased = true;
 
 		// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
 		this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
@@ -101,8 +100,6 @@ class SSAARenderPass extends Pass {
 		renderer.getClearColor( this._oldClearColor );
 		const oldClearAlpha = renderer.getClearAlpha();
 
-		const baseSampleWeight = 1.0 / jitterOffsets.length;
-		const roundingRange = 1 / 32;
 		this.copyUniforms[ 'tDiffuse' ].value = this.sampleRenderTarget.texture;
 
 		const viewOffset = {
@@ -139,20 +136,7 @@ class SSAARenderPass extends Pass {
 
 			}
 
-			let sampleWeight = baseSampleWeight;
-
-			if ( this.unbiased ) {
-
-				// the theory is that equal weights for each sample lead to an accumulation of rounding errors.
-				// The following equation varies the sampleWeight per sample so that it is uniformly distributed
-				// across a range of values whose rounding errors cancel each other out.
-
-				const uniformCenteredDistribution = ( - 0.5 + ( i + 0.5 ) / jitterOffsets.length );
-				sampleWeight += roundingRange * uniformCenteredDistribution;
-
-			}
-
-			this.copyUniforms[ 'opacity' ].value = sampleWeight;
+			this.copyUniforms[ 'opacity' ].value = 1.0 / jitterOffsets.length;
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
 			renderer.setRenderTarget( this.sampleRenderTarget );
 			renderer.clear();
