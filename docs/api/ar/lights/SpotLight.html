@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			يتم إصدار هذا الضوء من نقطة واحدة في اتجاه واحد ، على طول مخروط
+			يزداد حجمه كلما ابتعد عن الضوء. <br /><br />
+			يمكن لهذا الضوء إلقاء الظلال - انظر صفحة [page:SpotLightShadow] للحصول على
+			تفاصيل.
+		</p>
+			
+		<h2>مثال للكود</h2>
+		<code>
+		// مصباح كاشف أبيض يشرق من الجانب ، يتم تعديله بواسطة ملمس ، يلقي ظلاً
+			
+		const spotLight = new THREE.SpotLight( 0xffffff );
+		spotLight.position.set( 100, 1000, 100 );
+		spotLight.map = new THREE.TextureLoader().load( url );
+			
+		spotLight.castShadow = true;
+			
+		spotLight.shadow.mapSize.width = 1024;
+		spotLight.shadow.mapSize.height = 1024;
+			
+		spotLight.shadow.camera.near = 500;
+		spotLight.shadow.camera.far = 4000;
+		spotLight.shadow.camera.fov = 30;
+			
+		scene.add( spotLight );
+		</code>
+			
+		<h2>أمثلة (Examples)</h2>
+		<p>
+		[example:webgl_lights_spotlight lights / spotlight ]<br />
+		[example:webgl_lights_spotlights lights / spotlights ]
+		</p>
+			
+		<h2>المنشئ (Constructor)</h2>
+		<h3>
+		[name]( [param:Integer color], [param:Float intensity], [param:Float distance], [param:Radians angle], [param:Float penumbra], [param:Float decay] )
+		</h3>
+		<p>
+		[page:Integer color] - (اختياري) لون سداسي عشري للضوء. الافتراضي
+		هو 0xffffff (أبيض).<br />
+		[page:Float intensity] - (اختياري) قيمة رقمية لقوة / شدة الضوء.
+		الافتراضي هو 1.<br />
+		[page:Float distance] - المدى الأقصى للضوء. الافتراضي هو 0 (لا
+		حدود).<br />
+		[page:Radians angle] - أقصى زاوية لانتشار الضوء من
+		اتجاهه الذي يعتبر حدًا أعلى Math.PI/2.<br />
+		[page:Float penumbra] - نسبة مخروط الضوء الذي يتلاشى
+		بسبب الظلال الجانبية. يأخذ قيم بين الصفر و 1. الافتراضي هو صفر.<br />
+		[page:Float decay] - مقدار تضاؤل الضوء على طول مسافة ال
+		ضوء.<br /><br />
+		إنشاء جديد [name].
+		</p>
+			
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى قائمة [page:Light Light] للخصائص المشتركة.</p>
+		
+		<h3>[property:Float angle]</h3>
+		<p>
+		أقصى مدى للضوء الكاشف ، بالراديان ، من اتجاهه. يجب أن يكون
+		لا يزيد عن `Math.PI/2`. القيمة الافتراضية هي `Math.PI/3`.
+		</p>
+		
+		<h3>[property:Boolean castShadow]</h3>
+		<p>
+		إذا تم تعيينه على `true` ، فسيقوم الضوء بإلقاء ظلال ديناميكية. <b>تحذير</b>: هذا
+		مكلف ويتطلب التعديل لجعل الظلال تبدو صحيحة. انظر
+		[page:SpotLightShadow] للحصول على التفاصيل. الافتراضي هو `false`.
+		</p>
+		
+		<h3>[property:Float decay]</h3>
+		<p>
+		مقدار تضاؤل الضوء على طول مسافة الضوء. القيمة الافتراضية هي
+		`2`.<br />
+		في سياق التصيير الفعلي الصحيح ، يجب عدم تغيير القيمة الافتراضية.
+		</p>
+		
+		<h3>[property:Float distance]</h3>
+		<p>
+		`الوضع الافتراضي` - عندما تكون المسافة صفرًا ، لا يتلاشى الضوء. عندما
+		تكون المسافة غير صفرية ، سيتلاشى الضوء بشكل خطي من أقصى شدة
+		عند موقع الضوء إلى الصفر على هذه المسافة من الضوء.
+		</p>
+		<p>
+		عندما يتم تعطيل [page:WebGLRenderer.useLegacyLights legacy lighting mode] -
+		عندما تكون المسافة صفرًا ، سيتلاشى الضوء وفقًا لقانون المربع المعكوس
+		إلى مسافة لانهائية. عندما تكون المسافة غير صفرية ، سيتلاشى الضوء
+		وفقًا لقانون المربع المعكوس حتى قرب نقطة قطع المسافة ، حيث
+		سيتلاشى بسرعة وبسلاسة إلى `0`. بطبعه، ليست نقطة القطع فيزيائية صحيحة.
+		</p>
+		<p>القيمة الافتراضية هى `0.0`.</p>
+		
+		<h3>[property:Float intensity]</h3>
+		<p>
+		شدة الضوء. القيمة الافتراضية هي `1`.<br />
+		عندما يتم تعطيل [page:WebGLRenderer.useLegacyLights legacy lighting mode]،
+		الشدة هى شدة إضاءة الضوء المقاسة بالشمعات
+		(cd).<br /><br />
+		تغيير الشدة سيغير أيضًا قوة الضوء.
+		</p>
+		
+		<h3>[property:Boolean isSpotLight]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان كائنًا معينًا من نوع [name].</p>
+
+		<h3>[property:Float penumbra]</h3>
+		<p>
+		نسبة مخروط الضوء الذي يتلاشى بسبب الظلال الجانبية. يأخذ
+		قيم بين الصفر و 1. القيمة الافتراضية هي `0.0`.
+		</p>
+		
+		<h3>[property:Vector3 position]</h3>
+		<p>
+		يتم تعيين هذا مساويًا لـ [page:Object3D.DEFAULT_UP] (0، 1، 0) ، بحيث
+		الضوء يشرق من الأعلى إلى الأسفل.
+		</p>
+		
+		<h3>[property:Float power]</h3>
+		<p>
+		قوة الضوء.<br />
+		عندما يتم تعطيل [page:WebGLRenderer.useLegacyLights legacy lighting mode]،
+		الطاقة هي قوة إضاءة الضوء المقاسة باللومن (lm).
+		<br /><br />
+		تغيير الطاقة سيغير أيضًا شدة الضوء.
+		</p>
+		
+		<h3>[property:SpotLightShadow shadow]</h3>
+		<p>[page:SpotLightShadow] يستخدم لحساب ظلال هذا الضوء.</p>
+		
+		<h3>[property:Object3D target]</h3>
+		<p>
+		يشير Spotlight من [page:.position position] إلى
+		target.position. موقع الهدف الافتراضي هو `(0، 0، 0)`.<br />
+		<b>ملاحظة</b>: لتغيير موقع الهدف إلى أي شيء آخر غير
+		الافتراضي ، يجب إضافته إلى [page:Scene scene] باستخدام
+		<code> scene.add( light.target ); </code>
+		هذا حتى يتم تحديث [page:Object3D.matrixWorld matrixWorld] للهدف
+		تلقائيًا في كل إطار.<br /><br />
+		من الممكن أيضًا تعيين الهدف لكونه كائنًا آخر في المشهد
+		(أي شيء لديه خاصية [page:Object3D.position position]) ، مثل:
+		<code>
+		const targetObject = new THREE.Object3D(); 
+		scene.add(targetObject);
+		
+		light.target = targetObject;
+		</code>
+		سوف يتبع المصباح الكاشف الآن كائن الهدف.
+		</p>
+		
+		<h3>[property:Texture map]</h3>
+		<p>
+		[page:Texture] يستخدم لتعديل لون الضوء. يتم خلط لون المصباح
+		مع قيمة RGB لهذه الملمس ، بنسبة
+		تتوافق مع قيمة ألفا. يتم تكرار التأثير المشابه للكعكة باستخدام قِيَم بكسل (0، 0، 0، 1-قِيَم_الكعكة). <b>تحذير</b>:
+		[param:SpotLight map] مُعَطَّلَ إذا كان [param:SpotLight castShadow]
+		<b>خطأ</b>.
+		</p>
+		
+		<h2>الطرق (Methods)</h2>
+		
+		<p>انظر إلى قائمة [page:Light Light] للطرق المشتركة.</p>
+		
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		تحرير المصادر المتعلقة بالجهاز GPU التي تم تخصيصها من قبل هذه المثيل. اتصل بهذه
+		الطريقة كلما لم يُستخدَم هذه المثيل في تطبيقك.
+		</p>
+		
+		<h3>[method:this copy]( [param:SpotLight source] )</h3>
+		<p>
+		نسخ قِيَم جميع خصائص [page:SpotLight source] إلى
+		هذه SpotLight.
+		</p>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

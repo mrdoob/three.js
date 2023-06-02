@@ -599,6 +599,19 @@
 				"PointLightHelper": "api/ar/helpers/PointLightHelper",
 				"SkeletonHelper": "api/ar/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/ar/helpers/SpotLightHelper"
+			},
+
+			"Lights": {
+				"AmbientLight": "api/ar/lights/AmbientLight",
+				"AmbientLightProbe": "api/ar/lights/AmbientLightProbe",
+				"DirectionalLight": "api/ar/lights/DirectionalLight",
+				"HemisphereLight": "api/ar/lights/HemisphereLight",
+				"HemisphereLightProbe": "api/ar/lights/HemisphereLightProbe",
+				"Light": "api/ar/lights/Light",
+				"LightProbe": "api/ar/lights/LightProbe",
+				"PointLight": "api/ar/lights/PointLight",
+				"RectAreaLight": "api/ar/lights/RectAreaLight",
+				"SpotLight": "api/ar/lights/SpotLight"
 			}
 
 		}
