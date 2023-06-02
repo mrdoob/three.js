@@ -612,6 +612,13 @@
 				"PointLight": "api/ar/lights/PointLight",
 				"RectAreaLight": "api/ar/lights/RectAreaLight",
 				"SpotLight": "api/ar/lights/SpotLight"
+			},
+
+			"Lights / Shadows": {
+				"LightShadow": "api/ar/lights/shadows/LightShadow",
+				"PointLightShadow": "api/ar/lights/shadows/PointLightShadow",
+				"DirectionalLightShadow": "api/ar/lights/shadows/DirectionalLightShadow",
+				"SpotLightShadow": "api/ar/lights/shadows/SpotLightShadow"
 			}
 
 		}
