@@ -73,15 +73,15 @@ export default class RenderObject {
 
 	}
 
-	getAttributeHash( index ) {
+	getAttributeUUID( index ) {
 
-		return this._attributes.getHash( this.getAttributes()[ index ] );
+		return this._attributes.getUUID( this.getAttributes()[ index ] );
 
 	}
 
-	getIndexHash() {
+	getIndexUUID() {
 
-		return this._attributes.getHash( this.getIndex() );
+		return this._attributes.getUUID( this.getIndex() );
 
 	}
 
