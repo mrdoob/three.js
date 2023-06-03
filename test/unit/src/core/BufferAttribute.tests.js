@@ -287,6 +287,7 @@ export default QUnit.module( 'Core', () => {
 
 			const attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 );
 			assert.deepEqual( attr.toJSON(), {
+				uuid: attr.uuid,
 				itemSize: 3,
 				type: 'Float32Array',
 				array: [ 1, 2, 3, 4, 5, 6 ],
@@ -299,6 +300,7 @@ export default QUnit.module( 'Core', () => {
 			attr2.updateRange.offset = 1;
 			attr2.updateRange.count = 2;
 			assert.deepEqual( attr2.toJSON(), {
+				uuid: attr2.uuid,
 				itemSize: 3,
 				type: 'Float32Array',
 				array: [ 1, 2, 3, 4, 5, 6 ],

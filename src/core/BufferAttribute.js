@@ -55,6 +55,7 @@ class BufferAttribute {
 
 	copy( source ) {
 
+		this.uuid = source.uuid;
 		this.name = source.name;
 		this.array = new source.array.constructor( source.array );
 		this.itemSize = source.itemSize;
@@ -335,6 +336,7 @@ class BufferAttribute {
 	toJSON() {
 
 		const data = {
+			uuid: this.uuid,
 			itemSize: this.itemSize,
 			type: this.array.constructor.name,
 			array: Array.from( this.array ),

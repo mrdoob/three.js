@@ -98,7 +98,11 @@ class BufferGeometryLoader extends Loader {
 		if ( index !== undefined ) {
 
 			const typedArray = getTypedArray( index.type, index.array );
-			geometry.setIndex( new BufferAttribute( typedArray, 1 ) );
+
+			const bufferAttribute = new BufferAttribute( typedArray, 1 );
+			bufferAttribute.uuid = index.uuid;
+
+			geometry.setIndex( bufferAttribute );
 
 		}
 
@@ -122,6 +126,7 @@ class BufferGeometryLoader extends Loader {
 
 			}
 
+			if ( attribute.uuid !== undefined ) bufferAttribute.uuid = attribute.uuid;
 			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
 			if ( attribute.usage !== undefined ) bufferAttribute.setUsage( attribute.usage );
 

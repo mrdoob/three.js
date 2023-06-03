@@ -656,11 +656,12 @@ export default QUnit.module( 'Core', () => {
 				'data': {
 					'attributes': {
 						'attribute1': {
+							'uuid': attribute1.uuid,
+							'name': 'attribute1',
 							'itemSize': 1,
 							'type': 'Uint16Array',
 							'array': [ 1, 3, 5, 7 ],
-							'normalized': false,
-							'name': 'attribute1'
+							'normalized': false
 						}
 					},
 					'index': {
@@ -689,11 +690,12 @@ export default QUnit.module( 'Core', () => {
 			j = a.toJSON();
 			gold.data.morphAttributes = {
 				'attribute1': [ {
+					'uuid': attribute1.uuid,
+					'name': 'attribute1',
 					'itemSize': 1,
 					'type': 'Uint16Array',
 					'array': [ 1, 3, 5, 7 ],
-					'normalized': false,
-					'name': 'attribute1'
+					'normalized': false
 				} ]
 			};
 			gold.data.morphTargetsRelative = false;
