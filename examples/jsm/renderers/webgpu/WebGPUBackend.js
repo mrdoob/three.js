@@ -1,4 +1,4 @@
-/*// debugger utils
+/*// debugger tools
 import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-check-redundant-state-setting.js';
 //*/
 
