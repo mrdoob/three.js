@@ -130,6 +130,7 @@ class UnrealBloomPass extends Pass {
 			vertexShader: copyShader.vertexShader,
 			fragmentShader: copyShader.fragmentShader,
 			blending: AdditiveBlending,
+			premultipliedAlpha: true,
 			depthTest: false,
 			depthWrite: false,
 			transparent: true
