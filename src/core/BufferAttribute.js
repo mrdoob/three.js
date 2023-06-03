@@ -1,3 +1,4 @@
+import * as MathUtils from '../math/MathUtils.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 import { denormalize, normalize } from '../math/MathUtils.js';
@@ -31,6 +32,8 @@ class BufferAttribute {
 		this.gpuType = FloatType;
 
 		this.version = 0;
+
+		this.uuid = MathUtils.generateUUID();
 
 	}
 
