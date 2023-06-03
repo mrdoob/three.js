@@ -100,7 +100,7 @@ class BufferGeometryLoader extends Loader {
 			const typedArray = getTypedArray( index.type, index.array );
 
 			const bufferAttribute = new BufferAttribute( typedArray, 1 );
-			bufferAttribute.uuid = index.uuid;
+			if ( index.uuid !== undefined ) bufferAttribute.uuid = index.uuid;
 
 			geometry.setIndex( bufferAttribute );
 
