@@ -422,16 +422,14 @@ class WebGPUBackend extends Backend {
 
 		if ( hasIndex === true ) {
 
-			const indexUUID = renderObject.getIndexUUID();
-
-			if ( attributesSet.index !== indexUUID ) {
+			if ( attributesSet.index !== index ) {
 			
 				const buffer = this.get( index ).buffer;
 				const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
 
 				passEncoderGPU.setIndexBuffer( buffer, indexFormat );
 
-				attributesSet.index = indexUUID;
+				attributesSet.index = index;
 
 			}
 
@@ -444,14 +442,13 @@ class WebGPUBackend extends Backend {
 		for ( let i = 0, l = attributes.length; i < l; i ++ ) {
 
 			const attribute = attributes[ i ];
-			const attributeUUID = renderObject.getAttributeUUID( i );
 
-			if ( attributesSet[ i ] !== attributeUUID ) {
+			if ( attributesSet[ i ] !== attribute ) {
 
 				const buffer = this.get( attribute ).buffer;
 				passEncoderGPU.setVertexBuffer( i, buffer );
 
-				attributesSet[ i ] = attributeUUID;
+				attributesSet[ i ] = attribute;
 
 			}
 
