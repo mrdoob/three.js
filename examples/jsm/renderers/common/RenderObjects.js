@@ -4,13 +4,12 @@ import RenderObject from './RenderObject.js';
 
 class RenderObjects extends ChainMap {
 
-	constructor( renderer, nodes, attributes, geometries, pipelines, info ) {
+	constructor( renderer, nodes, geometries, pipelines, info ) {
 
 		super();
 
 		this.renderer = renderer;
 		this.nodes = nodes;
-		this.attributes = attributes;
 		this.geometries = geometries;
 		this.pipelines = pipelines;
 		this.info = info;
@@ -27,7 +26,7 @@ class RenderObjects extends ChainMap {
 
 		if ( renderObject === undefined ) {
 
-			renderObject = new RenderObject( this.nodes, this.attributes, this.geometries, this.renderer, object, material, scene, camera, lightsNode );
+			renderObject = new RenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode );
 
 			this._initRenderObject( renderObject );
 

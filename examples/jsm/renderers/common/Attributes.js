@@ -62,12 +62,6 @@ class Attributes extends DataMap {
 
 	}
 
-	getUUID( attribute ) {
-
-		return this._getBufferAttribute( attribute ).uuid;
-
-	}
-
 	_getBufferAttribute( attribute ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;

@@ -2,10 +2,9 @@ let id = 0;
 
 export default class RenderObject {
 
-	constructor( nodes, attributes, geometries, renderer, object, material, scene, camera, lightsNode ) {
+	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode ) {
 
 		this._nodes = nodes;
-		this._attributes = attributes;
 		this._geometries = geometries;
 
 		this.id = id ++;
@@ -70,18 +69,6 @@ export default class RenderObject {
 		this.attributes = attributes;
 
 		return attributes;
-
-	}
-
-	getAttributeUUID( index ) {
-
-		return this._attributes.getUUID( this.getAttributes()[ index ] );
-
-	}
-
-	getIndexUUID() {
-
-		return this._attributes.getUUID( this.getIndex() );
 
 	}
 

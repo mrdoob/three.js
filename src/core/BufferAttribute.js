@@ -1,4 +1,3 @@
-import * as MathUtils from '../math/MathUtils.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 import { denormalize, normalize } from '../math/MathUtils.js';
@@ -33,8 +32,6 @@ class BufferAttribute {
 
 		this.version = 0;
 
-		this.uuid = MathUtils.generateUUID();
-
 	}
 
 	onUploadCallback() {}
@@ -55,7 +52,6 @@ class BufferAttribute {
 
 	copy( source ) {
 
-		this.uuid = source.uuid;
 		this.name = source.name;
 		this.array = new source.array.constructor( source.array );
 		this.itemSize = source.itemSize;
@@ -336,7 +332,6 @@ class BufferAttribute {
 	toJSON() {
 
 		const data = {
-			uuid: this.uuid,
 			itemSize: this.itemSize,
 			type: this.array.constructor.name,
 			array: Array.from( this.array ),
