@@ -1,3 +1,7 @@
+/*// debugger utils
+import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-check-redundant-state-setting.js';
+//*/
+
 import { GPUFeatureName, GPUTextureFormat, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension } from './utils/WebGPUConstants.js';
 
 import WebGPUNodeBuilder from './nodes/WGSLNodeBuilder.js';
@@ -243,6 +247,7 @@ class WebGPUBackend extends Backend {
 		renderContextData.descriptor = descriptor;
 		renderContextData.encoder = encoder;
 		renderContextData.currentPass = currentPass;
+		renderContextData.currentAttributesSet = {};
 
 		//
 
@@ -395,6 +400,7 @@ class WebGPUBackend extends Backend {
 		const bindingsData = this.get( renderObject.getBindings() );
 		const contextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
+		const attributesSet = contextData.currentAttributesSet;
 
 		// pipeline
 
@@ -406,18 +412,28 @@ class WebGPUBackend extends Backend {
 		const bindGroupGPU = bindingsData.group;
 		passEncoderGPU.setBindGroup( 0, bindGroupGPU );
 
-		// index
+		// attributes
 
 		const index = renderObject.getIndex();
 
 		const hasIndex = ( index !== null );
 
+		// index
+
 		if ( hasIndex === true ) {
 
-			const buffer = this.get( index ).buffer;
-			const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
+			const indexHash = renderObject.getIndexHash();
 
-			passEncoderGPU.setIndexBuffer( buffer, indexFormat );
+			if ( attributesSet.index !== indexHash ) {
+			
+				const buffer = this.get( index ).buffer;
+				const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
+
+				passEncoderGPU.setIndexBuffer( buffer, indexFormat );
+
+				attributesSet.index = indexHash;
+
+			}
 
 		}
 
@@ -427,8 +443,17 @@ class WebGPUBackend extends Backend {
 
 		for ( let i = 0, l = attributes.length; i < l; i ++ ) {
 
-			const buffer = this.get( attributes[ i ] ).buffer;
-			passEncoderGPU.setVertexBuffer( i, buffer );
+			const attribute = attributes[ i ];
+			const attributeHash = renderObject.getAttributeHash( i );
+
+			if ( attributesSet[ i ] !== attributeHash ) {
+
+				const buffer = this.get( attribute ).buffer;
+				passEncoderGPU.setVertexBuffer( i, buffer );
+
+				attributesSet[ i ] = attributeHash;
+
+			}
 
 		}
 
@@ -703,6 +728,7 @@ class WebGPUBackend extends Backend {
 		if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
 		renderContextData.currentPass = encoder.beginRenderPass( descriptor );
+		renderContextData.currentAttributesSet = {};
 
 	}
 

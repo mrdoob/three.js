@@ -134,7 +134,7 @@ class Renderer {
 			this._textures = new Textures( backend, this._info );
 			this._pipelines = new Pipelines( backend, this._nodes );
 			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this._info );
-			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._info );
+			this._objects = new RenderObjects( this, this._nodes, this._attributes, this._geometries, this._pipelines, this._info );
 			this._renderLists = new RenderLists();
 			this._renderContexts = new RenderContexts();
 
