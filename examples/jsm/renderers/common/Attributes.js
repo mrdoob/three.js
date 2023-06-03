@@ -62,7 +62,7 @@ class Attributes extends DataMap {
 
 	}
 
-	getUUID( attribute ) {
+	getHash( attribute ) {
 
 		return this._getBufferAttribute( attribute ).uuid;
 
