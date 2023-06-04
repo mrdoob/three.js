@@ -1903,11 +1903,11 @@ class LDrawLoader extends Loader {
 		this.partsLibraryPath = '';
 
 		// Material assigned to not available colors for meshes and edges
-		this.missingColorMaterial = new MeshStandardMaterial( { color: 0xFF00FF, roughness: 0.3, metalness: 0 } );
+		this.missingColorMaterial = new MeshStandardMaterial( { name: Loader.DEFAULT_MATERIAL_NAME, color: 0xFF00FF, roughness: 0.3, metalness: 0 } );
 		this.missingColorMaterial.name = 'Missing material';
-		this.missingEdgeColorMaterial = new LineBasicMaterial( { color: 0xFF00FF } );
+		this.missingEdgeColorMaterial = new LineBasicMaterial( { name: Loader.DEFAULT_MATERIAL_NAME, color: 0xFF00FF } );
 		this.missingEdgeColorMaterial.name = 'Missing material - Edge';
-		this.missingConditionalEdgeColorMaterial = new LDrawConditionalLineMaterial( { fog: true, color: 0xFF00FF } );
+		this.missingConditionalEdgeColorMaterial = new LDrawConditionalLineMaterial( { name: Loader.DEFAULT_MATERIAL_NAME, fog: true, color: 0xFF00FF } );
 		this.missingConditionalEdgeColorMaterial.name = 'Missing material - Conditional Edge';
 		this.missingColorMaterial.userData.edgeMaterial = this.missingEdgeColorMaterial;
 		this.missingEdgeColorMaterial.userData.conditionalEdgeMaterial = this.missingConditionalEdgeColorMaterial;
