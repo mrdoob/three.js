@@ -536,7 +536,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			//
 
-			parameters.vertexTangents ? '#define USE_TANGENT' : '',
+			parameters.vertexTangents && parameters.flatShading === false ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
 			parameters.vertexUv1s ? '#define USE_UV1' : '',
@@ -723,7 +723,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.transmissionMap ? '#define USE_TRANSMISSIONMAP' : '',
 			parameters.thicknessMap ? '#define USE_THICKNESSMAP' : '',
 
-			parameters.vertexTangents ? '#define USE_TANGENT' : '',
+			parameters.vertexTangents && parameters.flatShading === false ? '#define USE_TANGENT' : '',
 			parameters.vertexColors || parameters.instancingColor ? '#define USE_COLOR' : '',
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
 			parameters.vertexUv1s ? '#define USE_UV1' : '',
