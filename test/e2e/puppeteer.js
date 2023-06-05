@@ -94,6 +94,7 @@ const exceptionList = [
 	// Awaiting for WebGPU support
 	'webgpu_audio_processing',
 	'webgpu_backdrop',
+	'webgpu_backdrop_area',
 	'webgpu_compute',
 	'webgpu_cubemap_adjustments',
 	'webgpu_cubemap_dynamic',
