@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			فئة لتحميل [page:CubeTexture CubeTexture]. يستخدم هذا
+			[page:ImageLoader] داخليًا لتحميل الملفات.
+		</p>
+		 
+		<h2>مثال للكود</h2>
+		 
+		<code>
+const scene = new THREE.Scene();
+scene.background = new THREE.CubeTextureLoader()
+	.setPath( 'textures/cubeMaps/' )
+	.load( [
+				'px.png',
+				'nx.png',
+				'py.png',
+				'ny.png',
+				'pz.png',
+				'nz.png'
+			] );
+		</code>
+		 
+		<h2>أمثلة (Examples)</h2>
+		 
+		<p>
+		[example:webgl_materials_cubemap materials / cubemap]<br />
+		[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic]<br />
+		[example:webgl_materials_cubemap_refraction materials / cubemap / refraction]
+		</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — [page:LoadingManager loadingManager]
+		للمحمل الذي سيتم استخدامه. الافتراضي هو [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+		 
+		ينشئ جديدًا [name].
+		</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر الفئة الأساسية [page:Loader] للخصائص المشتركة.</p>
+		 
+		<h2>الطرق (Methods)</h2>
+		<p>انظر الفئة الأساسية [page:Loader] للطرق المشتركة.</p>
+		 
+		<h3>
+		[method:CubeTexture load]( [param:String urls], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )
+		</h3>
+		<p>
+		[page:String urls] — مصفوفة من 6 عناوين URL للصور، واحدة لكل جانب من
+		CubeTexture. يجب تحديد عناوين URL بالترتيب التالي: pos-x،
+		neg-x، pos-y، neg-y، pos-z، neg-z. يمكن أن يكونوا أيضًا
+		[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URIs].<br />
+		يجب ملاحظة أنه بالاتفاقية، تتم تحديد خرائط المكعب في نظام إحداثيات
+		فيه x الموجب إلى اليمين عند النظر إلى محور z الموجب - بعبارة أخرى، باستخدام نظام إحداثيات ذو يد يسرى. نظرًا لأن three.js يستخدم
+		نظام إحداثيات ذو يد يمنى، ستكون خرائط البيئة المستخدمة في three.js
+		pos-x و neg-x مبادلتان.<br />
+		[page:Function onLoad] (اختياري) — سيتم استدعاؤه عند اكتمال التحميل.
+		الحجة ستكون القوام المحمَّلة [page:CubeTexture texture].<br />
+		[page:Function onProgress] (اختياري) — هذه الدالة التابعة للرد
+		غير معتمد حاليًا.<br />
+		[page:Function onError] (اختياري) — سيتم استدعاؤه إذا حدث خطأ في التحميل.<br />
+		</p>
+		<p>
+		ابدأ التحميل من url وأرسل القوام المحمَّلة [page:CubeTexture texture] إلى
+		onLoad. تعود الطريقة أيضًا كائن قوام جديد يمكن استخدامه مباشرةً لإنشاء مادة
+		.
+		</p>
+		 
+
+		<h2>المصدر (Source)</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -619,6 +619,24 @@
 				"PointLightShadow": "api/ar/lights/shadows/PointLightShadow",
 				"DirectionalLightShadow": "api/ar/lights/shadows/DirectionalLightShadow",
 				"SpotLightShadow": "api/ar/lights/shadows/SpotLightShadow"
+			},
+
+			"Loaders": {
+				"AnimationLoader": "api/ar/loaders/AnimationLoader",
+				"AudioLoader": "api/ar/loaders/AudioLoader",
+				"BufferGeometryLoader": "api/ar/loaders/BufferGeometryLoader",
+				"Cache": "api/ar/loaders/Cache",
+				"CompressedTextureLoader": "api/ar/loaders/CompressedTextureLoader",
+				"CubeTextureLoader": "api/ar/loaders/CubeTextureLoader",
+				"DataTextureLoader": "api/ar/loaders/DataTextureLoader",
+				"FileLoader": "api/ar/loaders/FileLoader",
+				"ImageBitmapLoader": "api/ar/loaders/ImageBitmapLoader",
+				"ImageLoader": "api/ar/loaders/ImageLoader",
+				"Loader": "api/ar/loaders/Loader",
+				"LoaderUtils": "api/ar/loaders/LoaderUtils",
+				"MaterialLoader": "api/ar/loaders/MaterialLoader",
+				"ObjectLoader": "api/ar/loaders/ObjectLoader",
+				"TextureLoader": "api/ar/loaders/TextureLoader"
 			}
 
 		}
