@@ -18,6 +18,10 @@ class CameraNode extends Object3DNode {
 
 			return 'mat4';
 
+		} else if ( scope === CameraNode.NEAR || scope === CameraNode.FAR ) {
+
+			return 'float';
+
 		}
 
 		return super.getNodeType( builder );
@@ -34,9 +38,13 @@ class CameraNode extends Object3DNode {
 
 			uniformNode.value = camera.projectionMatrix;
 
-		} else if ( scope === CameraNode.VIEW_MATRIX ) {
+		} else if ( scope === CameraNode.NEAR ) {
 
-			uniformNode.value = camera.matrixWorldInverse;
+			uniformNode.value = camera.near;
+
+		} else if ( scope === CameraNode.FAR ) {
+
+			uniformNode.value = camera.far;
 
 		} else {
 
@@ -56,6 +64,10 @@ class CameraNode extends Object3DNode {
 
 			this._uniformNode.nodeType = 'mat4';
 
+		} else if ( scope === CameraNode.NEAR || scope === CameraNode.FAR ) {
+
+			this._uniformNode.nodeType = 'float';
+
 		}
 
 		return super.generate( builder );
@@ -65,10 +77,14 @@ class CameraNode extends Object3DNode {
 }
 
 CameraNode.PROJECTION_MATRIX = 'projectionMatrix';
+CameraNode.NEAR = 'near';
+CameraNode.FAR = 'far';
 
 export default CameraNode;
 
 export const cameraProjectionMatrix = nodeImmutable( CameraNode, CameraNode.PROJECTION_MATRIX );
+export const cameraNear = nodeImmutable( CameraNode, CameraNode.NEAR );
+export const cameraFar = nodeImmutable( CameraNode, CameraNode.FAR );
 export const cameraViewMatrix = nodeImmutable( CameraNode, CameraNode.VIEW_MATRIX );
 export const cameraNormalMatrix = nodeImmutable( CameraNode, CameraNode.NORMAL_MATRIX );
 export const cameraWorldMatrix = nodeImmutable( CameraNode, CameraNode.WORLD_MATRIX );
