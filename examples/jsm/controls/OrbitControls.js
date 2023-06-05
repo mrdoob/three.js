@@ -344,7 +344,7 @@ class OrbitControls extends EventDispatcher {
 							_ray.origin.copy( scope.object.position );
 							_ray.direction.set( 0, 0, - 1 ).transformDirection( scope.object.matrix );
 
-							// if the camera is ~20 degrees above the horizon then don't adjust the focus target to avoid
+							// if the camera is 20 degrees above the horizon then don't adjust the focus target to avoid
 							// extremely large values
 							if ( Math.abs( scope.object.up.dot( _ray.direction ) ) < TILT_LIMIT ) {
 
