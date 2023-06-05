@@ -342,9 +342,18 @@ class OrbitControls extends EventDispatcher {
 							_ray.origin.copy( scope.object.position );
 							_ray.direction.set( 0, 0, - 1 ).transformDirection( scope.object.matrix );
 
-							_plane.setFromNormalAndCoplanarPoint( scope.object.up, scope.target );
+							// if the camera is ~30 degrees above the horizon then don't adjust the focus target to avoid
+							// extremely large values
+							if ( Math.abs( scope.object.up.dot( _ray.direction ) ) < 0.3 ) {
 
-							_ray.intersectPlane( _plane, scope.target );
+								object.lookAt( scope.target );
+
+							} else {
+
+								_plane.setFromNormalAndCoplanarPoint( scope.object.up, scope.target );
+								_ray.intersectPlane( _plane, scope.target );
+
+							}
 
 						}
 
