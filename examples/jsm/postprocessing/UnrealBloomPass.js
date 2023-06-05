@@ -80,11 +80,11 @@ class UnrealBloomPass extends Pass {
 		this.materialHighPassFilter = new ShaderMaterial( {
 			uniforms: this.highPassUniforms,
 			vertexShader: highPassShader.vertexShader,
-			fragmentShader: highPassShader.fragmentShader,
-			defines: {}
+			fragmentShader: highPassShader.fragmentShader
 		} );
 
-		// Gaussian Blur Materials
+		// gaussian blur materials
+
 		this.separableBlurMaterials = [];
 		const kernelSizeArray = [ 3, 5, 7, 9, 11 ];
 		resx = Math.round( this.resolution.x / 2 );
@@ -102,7 +102,8 @@ class UnrealBloomPass extends Pass {
 
 		}
 
-		// Composite material
+		// composite material
+
 		this.compositeMaterial = this.getCompositeMaterial( this.nMips );
 		this.compositeMaterial.uniforms[ 'blurTexture1' ].value = this.renderTargetsVertical[ 0 ].texture;
 		this.compositeMaterial.uniforms[ 'blurTexture2' ].value = this.renderTargetsVertical[ 1 ].texture;
@@ -111,21 +112,19 @@ class UnrealBloomPass extends Pass {
 		this.compositeMaterial.uniforms[ 'blurTexture5' ].value = this.renderTargetsVertical[ 4 ].texture;
 		this.compositeMaterial.uniforms[ 'bloomStrength' ].value = strength;
 		this.compositeMaterial.uniforms[ 'bloomRadius' ].value = 0.1;
-		this.compositeMaterial.needsUpdate = true;
 
 		const bloomFactors = [ 1.0, 0.8, 0.6, 0.4, 0.2 ];
 		this.compositeMaterial.uniforms[ 'bloomFactors' ].value = bloomFactors;
 		this.bloomTintColors = [ new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ) ];
 		this.compositeMaterial.uniforms[ 'bloomTintColors' ].value = this.bloomTintColors;
 
-		// copy material
+		// blend material
 
 		const copyShader = CopyShader;
 
 		this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
-		this.copyUniforms[ 'opacity' ].value = 1.0;
 
-		this.materialCopy = new ShaderMaterial( {
+		this.blendMaterial = new ShaderMaterial( {
 			uniforms: this.copyUniforms,
 			vertexShader: copyShader.vertexShader,
 			fragmentShader: copyShader.fragmentShader,
@@ -172,7 +171,7 @@ class UnrealBloomPass extends Pass {
 		}
 
 		this.compositeMaterial.dispose();
-		this.materialCopy.dispose();
+		this.blendMaterial.dispose();
 		this.basic.dispose();
 
 		//
@@ -273,7 +272,7 @@ class UnrealBloomPass extends Pass {
 
 		// Blend it additively over the input texture
 
-		this.fsQuad.material = this.materialCopy;
+		this.fsQuad.material = this.blendMaterial;
 		this.copyUniforms[ 'tDiffuse' ].value = this.renderTargetsHorizontal[ 0 ].texture;
 
 		if ( maskActive ) renderer.state.buffers.stencil.setTest( true );
