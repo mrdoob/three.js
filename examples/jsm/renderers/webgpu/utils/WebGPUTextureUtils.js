@@ -86,7 +86,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	createTexture( texture ) {
+	createTexture( texture, options = {} ) {
 
 		const backend = this.backend;
 		const textureData = backend.get( texture );
@@ -104,9 +104,9 @@ class WebGPUTextureUtils {
 		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
 		const format = texture.internalFormat || this._getFormat( texture );
 		//const sampleCount = texture.isRenderTargetTexture || texture.isDepthTexture ? backend.utils.getSampleCount( renderContext ) : 1;
-		const sampleCount = 1;
+		const sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
 
-		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
+		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC;
 
 		if ( texture.isCompressedTexture !== true ) {
 

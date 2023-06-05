@@ -42,6 +42,9 @@ class Renderer {
 
 		this.sortObjects = true;
 
+		this.depth = true;
+		this.stencil = true;
+
 		// internals
 
 		this._pixelRatio = 1;
@@ -238,6 +241,9 @@ class Renderer {
 
 		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
 		renderContext.scissor = this._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
+
+		renderContext.depth = this.depth;
+		renderContext.stencil = this.stencil;
 
 		//
 
