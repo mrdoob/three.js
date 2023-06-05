@@ -7,7 +7,8 @@ import {
 	Vector2,
 	Vector3,
 	Plane,
-	Ray
+	Ray,
+	MathUtils
 } from 'three';
 
 // OrbitControls performs orbiting, dollying (zooming), and panning.
@@ -22,6 +23,7 @@ const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
 const _ray = new Ray();
 const _plane = new Plane();
+const TILT_LIMIT = Math.cos( 70 * MathUtils.DEG2RAD );
 
 class OrbitControls extends EventDispatcher {
 
@@ -342,9 +344,9 @@ class OrbitControls extends EventDispatcher {
 							_ray.origin.copy( scope.object.position );
 							_ray.direction.set( 0, 0, - 1 ).transformDirection( scope.object.matrix );
 
-							// if the camera is ~30 degrees above the horizon then don't adjust the focus target to avoid
+							// if the camera is ~20 degrees above the horizon then don't adjust the focus target to avoid
 							// extremely large values
-							if ( Math.abs( scope.object.up.dot( _ray.direction ) ) < 0.3 ) {
+							if ( Math.abs( scope.object.up.dot( _ray.direction ) ) < TILT_LIMIT ) {
 
 								object.lookAt( scope.target );
 
