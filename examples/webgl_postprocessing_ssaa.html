@@ -8,7 +8,9 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Manual Supersamling Anti-Aliasing (SSAA) pass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Unbiased Manual Supersamling Anti-Aliasing (SSAA) pass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
+			This example shows how to unbias the rounding errors accumulated using high number of SSAA samples on a 8-bit per channel buffer.<br/><br/>
+			Turn off the "unbiased" feature to see the banding that results from accumulated rounding errors.
 		</div>
 
 		<div id="container"></div>
@@ -45,6 +47,7 @@
 
 			const params = {
 				sampleLevel: 4,
+				unbiased: true,
 				camera: 'perspective',
 				clearColor: 'black',
 				clearAlpha: 1.0,
@@ -64,6 +67,7 @@
 
 				gui = new GUI();
 
+				gui.add( params, 'unbiased' );
 				gui.add( params, 'sampleLevel', {
 					'Level 0: 1 Sample': 0,
 					'Level 1: 2 Samples': 1,
@@ -231,6 +235,7 @@
 				ssaaRenderPassP.clearAlpha = ssaaRenderPassO.clearAlpha = params.clearAlpha;
 
 				ssaaRenderPassP.sampleLevel = ssaaRenderPassO.sampleLevel = params.sampleLevel;
+				ssaaRenderPassP.unbiased = ssaaRenderPassO.unbiased = params.unbiased;
 
 				ssaaRenderPassP.enabled = ( params.camera === 'perspective' );
 				ssaaRenderPassO.enabled = ( params.camera === 'orthographic' );
