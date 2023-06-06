@@ -637,6 +637,11 @@
 				"MaterialLoader": "api/ar/loaders/MaterialLoader",
 				"ObjectLoader": "api/ar/loaders/ObjectLoader",
 				"TextureLoader": "api/ar/loaders/TextureLoader"
+			},
+
+			"Loaders / Managers": {
+				"DefaultLoadingManager": "api/ar/loaders/managers/DefaultLoadingManager",
+				"LoadingManager": "api/ar/loaders/managers/LoadingManager"
 			}
 
 		}
