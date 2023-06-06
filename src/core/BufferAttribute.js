@@ -346,30 +346,6 @@ class BufferAttribute {
 
 	}
 
-	copyColorsArray() { // @deprecated, r144
-
-		console.error( 'THREE.BufferAttribute: copyColorsArray() was removed in r144.' );
-
-	}
-
-	copyVector2sArray() { // @deprecated, r144
-
-		console.error( 'THREE.BufferAttribute: copyVector2sArray() was removed in r144.' );
-
-	}
-
-	copyVector3sArray() { // @deprecated, r144
-
-		console.error( 'THREE.BufferAttribute: copyVector3sArray() was removed in r144.' );
-
-	}
-
-	copyVector4sArray() { // @deprecated, r144
-
-		console.error( 'THREE.BufferAttribute: copyVector4sArray() was removed in r144.' );
-
-	}
-
 }
 
 //
