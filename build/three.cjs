@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '153';
+const REVISION = '154dev';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -10087,30 +10087,6 @@ class BufferAttribute {
 
 	}
 
-	copyColorsArray() { // @deprecated, r144
-
-		console.error( 'THREE.BufferAttribute: copyColorsArray() was removed in r144.' );
-
-	}
-
-	copyVector2sArray() { // @deprecated, r144
-
-		console.error( 'THREE.BufferAttribute: copyVector2sArray() was removed in r144.' );
-
-	}
-
-	copyVector3sArray() { // @deprecated, r144
-
-		console.error( 'THREE.BufferAttribute: copyVector3sArray() was removed in r144.' );
-
-	}
-
-	copyVector4sArray() { // @deprecated, r144
-
-		console.error( 'THREE.BufferAttribute: copyVector4sArray() was removed in r144.' );
-
-	}
-
 }
 
 //
@@ -11071,13 +11047,6 @@ class BufferGeometry extends EventDispatcher {
 			normalAttribute.needsUpdate = true;
 
 		}
-
-	}
-
-	merge() { // @deprecated, r144
-
-		console.error( 'THREE.BufferGeometry.merge() has been removed. Use THREE.BufferGeometryUtils.mergeGeometries() instead.' );
-		return this;
 
 	}
 
@@ -30433,20 +30402,6 @@ class Scene extends Object3D {
 
 	}
 
-	get autoUpdate() { // @deprecated, r144
-
-		console.warn( 'THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.' );
-		return this.matrixWorldAutoUpdate;
-
-	}
-
-	set autoUpdate( value ) { // @deprecated, r144
-
-		console.warn( 'THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.' );
-		this.matrixWorldAutoUpdate = value;
-
-	}
-
 }
 
 class InterleavedBuffer {
@@ -41709,6 +41664,8 @@ class Loader {
 
 }
 
+Loader.DEFAULT_MATERIAL_NAME = '__DEFAULT';
+
 const loading = {};
 
 class HttpError extends Error {
@@ -51250,216 +51207,6 @@ class ShapePath {
 
 }
 
-class BoxBufferGeometry extends BoxGeometry { // @deprecated, r144
-
-	constructor( width, height, depth, widthSegments, heightSegments, depthSegments ) {
-
-		console.warn( 'THREE.BoxBufferGeometry has been renamed to THREE.BoxGeometry.' );
-		super( width, height, depth, widthSegments, heightSegments, depthSegments );
-
-
-	}
-
-}
-
-class CapsuleBufferGeometry extends CapsuleGeometry { // @deprecated, r144
-
-	constructor( radius, length, capSegments, radialSegments ) {
-
-		console.warn( 'THREE.CapsuleBufferGeometry has been renamed to THREE.CapsuleGeometry.' );
-		super( radius, length, capSegments, radialSegments );
-
-	}
-
-}
-
-class CircleBufferGeometry extends CircleGeometry { // @deprecated, r144
-
-	constructor( radius, segments, thetaStart, thetaLength ) {
-
-		console.warn( 'THREE.CircleBufferGeometry has been renamed to THREE.CircleGeometry.' );
-		super( radius, segments, thetaStart, thetaLength );
-
-	}
-
-}
-
-class ConeBufferGeometry extends ConeGeometry { // @deprecated, r144
-
-	constructor( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
-
-		console.warn( 'THREE.ConeBufferGeometry has been renamed to THREE.ConeGeometry.' );
-		super( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
-
-	}
-
-}
-
-class CylinderBufferGeometry extends CylinderGeometry { // @deprecated, r144
-
-	constructor( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
-
-		console.warn( 'THREE.CylinderBufferGeometry has been renamed to THREE.CylinderGeometry.' );
-		super( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
-
-	}
-
-}
-
-class DodecahedronBufferGeometry extends DodecahedronGeometry { // @deprecated, r144
-
-	constructor( radius, detail ) {
-
-		console.warn( 'THREE.DodecahedronBufferGeometry has been renamed to THREE.DodecahedronGeometry.' );
-		super( radius, detail );
-
-	}
-
-}
-
-class ExtrudeBufferGeometry extends ExtrudeGeometry { // @deprecated, r144
-
-	constructor( shapes, options ) {
-
-		console.warn( 'THREE.ExtrudeBufferGeometry has been renamed to THREE.ExtrudeGeometry.' );
-		super( shapes, options );
-
-	}
-
-}
-
-class IcosahedronBufferGeometry extends IcosahedronGeometry { // @deprecated, r144
-
-	constructor( radius, detail ) {
-
-		console.warn( 'THREE.IcosahedronBufferGeometry has been renamed to THREE.IcosahedronGeometry.' );
-		super( radius, detail );
-
-	}
-
-}
-
-class LatheBufferGeometry extends LatheGeometry { // @deprecated, r144
-
-	constructor( points, segments, phiStart, phiLength ) {
-
-		console.warn( 'THREE.LatheBufferGeometry has been renamed to THREE.LatheGeometry.' );
-		super( points, segments, phiStart, phiLength );
-
-	}
-
-}
-
-class OctahedronBufferGeometry extends OctahedronGeometry { // @deprecated, r144
-
-	constructor( radius, detail ) {
-
-		console.warn( 'THREE.OctahedronBufferGeometry has been renamed to THREE.OctahedronGeometry.' );
-		super( radius, detail );
-
-	}
-
-}
-
-class PlaneBufferGeometry extends PlaneGeometry { // @deprecated, r144
-
-	constructor( width, height, widthSegments, heightSegments ) {
-
-		console.warn( 'THREE.PlaneBufferGeometry has been renamed to THREE.PlaneGeometry.' );
-		super( width, height, widthSegments, heightSegments );
-
-	}
-
-}
-
-class PolyhedronBufferGeometry extends PolyhedronGeometry { // @deprecated, r144
-
-	constructor( vertices, indices, radius, detail ) {
-
-		console.warn( 'THREE.PolyhedronBufferGeometry has been renamed to THREE.PolyhedronGeometry.' );
-		super( vertices, indices, radius, detail );
-
-	}
-
-}
-
-class RingBufferGeometry extends RingGeometry { // @deprecated, r144
-
-	constructor( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
-
-		console.warn( 'THREE.RingBufferGeometry has been renamed to THREE.RingGeometry.' );
-		super( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength );
-
-	}
-
-}
-
-class ShapeBufferGeometry extends ShapeGeometry { // @deprecated, r144
-
-	constructor( shapes, curveSegments ) {
-
-		console.warn( 'THREE.ShapeBufferGeometry has been renamed to THREE.ShapeGeometry.' );
-		super( shapes, curveSegments );
-
-	}
-
-}
-
-class SphereBufferGeometry extends SphereGeometry { // @deprecated, r144
-
-	constructor( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
-
-		console.warn( 'THREE.SphereBufferGeometry has been renamed to THREE.SphereGeometry.' );
-		super( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
-
-	}
-
-}
-
-class TetrahedronBufferGeometry extends TetrahedronGeometry { // @deprecated, r144
-
-	constructor( radius, detail ) {
-
-		console.warn( 'THREE.TetrahedronBufferGeometry has been renamed to THREE.TetrahedronGeometry.' );
-		super( radius, detail );
-
-	}
-
-}
-
-class TorusBufferGeometry extends TorusGeometry { // @deprecated, r144
-
-	constructor( radius, tube, radialSegments, tubularSegments, arc ) {
-
-		console.warn( 'THREE.TorusBufferGeometry has been renamed to THREE.TorusGeometry.' );
-		super( radius, tube, radialSegments, tubularSegments, arc );
-
-	}
-
-}
-
-class TorusKnotBufferGeometry extends TorusKnotGeometry { // @deprecated, r144
-
-	constructor( radius, tube, tubularSegments, radialSegments, p, q ) {
-
-		console.warn( 'THREE.TorusKnotBufferGeometry has been renamed to THREE.TorusKnotGeometry.' );
-		super( radius, tube, tubularSegments, radialSegments, p, q );
-
-	}
-
-}
-
-class TubeBufferGeometry extends TubeGeometry { // @deprecated, r144
-
-	constructor( path, tubularSegments, radius, radialSegments, closed ) {
-
-		console.warn( 'THREE.TubeBufferGeometry has been renamed to THREE.TubeGeometry.' );
-		super( path, tubularSegments, radius, radialSegments, closed );
-
-	}
-
-}
-
 if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 	__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'register', { detail: {
@@ -51516,7 +51263,6 @@ exports.BooleanKeyframeTrack = BooleanKeyframeTrack;
 exports.Box2 = Box2;
 exports.Box3 = Box3;
 exports.Box3Helper = Box3Helper;
-exports.BoxBufferGeometry = BoxBufferGeometry;
 exports.BoxGeometry = BoxGeometry;
 exports.BoxHelper = BoxHelper;
 exports.BufferAttribute = BufferAttribute;
@@ -51527,11 +51273,9 @@ exports.Cache = Cache;
 exports.Camera = Camera;
 exports.CameraHelper = CameraHelper;
 exports.CanvasTexture = CanvasTexture;
-exports.CapsuleBufferGeometry = CapsuleBufferGeometry;
 exports.CapsuleGeometry = CapsuleGeometry;
 exports.CatmullRomCurve3 = CatmullRomCurve3;
 exports.CineonToneMapping = CineonToneMapping;
-exports.CircleBufferGeometry = CircleBufferGeometry;
 exports.CircleGeometry = CircleGeometry;
 exports.ClampToEdgeWrapping = ClampToEdgeWrapping;
 exports.Clock = Clock;
@@ -51541,7 +51285,6 @@ exports.ColorManagement = ColorManagement;
 exports.CompressedArrayTexture = CompressedArrayTexture;
 exports.CompressedTexture = CompressedTexture;
 exports.CompressedTextureLoader = CompressedTextureLoader;
-exports.ConeBufferGeometry = ConeBufferGeometry;
 exports.ConeGeometry = ConeGeometry;
 exports.CubeCamera = CubeCamera;
 exports.CubeReflectionMapping = CubeReflectionMapping;
@@ -51560,7 +51303,6 @@ exports.Curve = Curve;
 exports.CurvePath = CurvePath;
 exports.CustomBlending = CustomBlending;
 exports.CustomToneMapping = CustomToneMapping;
-exports.CylinderBufferGeometry = CylinderBufferGeometry;
 exports.CylinderGeometry = CylinderGeometry;
 exports.Cylindrical = Cylindrical;
 exports.Data3DTexture = Data3DTexture;
@@ -51578,7 +51320,6 @@ exports.DirectionalLight = DirectionalLight;
 exports.DirectionalLightHelper = DirectionalLightHelper;
 exports.DiscreteInterpolant = DiscreteInterpolant;
 exports.DisplayP3ColorSpace = DisplayP3ColorSpace;
-exports.DodecahedronBufferGeometry = DodecahedronBufferGeometry;
 exports.DodecahedronGeometry = DodecahedronGeometry;
 exports.DoubleSide = DoubleSide;
 exports.DstAlphaFactor = DstAlphaFactor;
@@ -51595,7 +51336,6 @@ exports.EquirectangularReflectionMapping = EquirectangularReflectionMapping;
 exports.EquirectangularRefractionMapping = EquirectangularRefractionMapping;
 exports.Euler = Euler;
 exports.EventDispatcher = EventDispatcher;
-exports.ExtrudeBufferGeometry = ExtrudeBufferGeometry;
 exports.ExtrudeGeometry = ExtrudeGeometry;
 exports.FileLoader = FileLoader;
 exports.Float16BufferAttribute = Float16BufferAttribute;
@@ -51622,7 +51362,6 @@ exports.HalfFloatType = HalfFloatType;
 exports.HemisphereLight = HemisphereLight;
 exports.HemisphereLightHelper = HemisphereLightHelper;
 exports.HemisphereLightProbe = HemisphereLightProbe;
-exports.IcosahedronBufferGeometry = IcosahedronBufferGeometry;
 exports.IcosahedronGeometry = IcosahedronGeometry;
 exports.ImageBitmapLoader = ImageBitmapLoader;
 exports.ImageLoader = ImageLoader;
@@ -51647,7 +51386,6 @@ exports.InvertStencilOp = InvertStencilOp;
 exports.KeepStencilOp = KeepStencilOp;
 exports.KeyframeTrack = KeyframeTrack;
 exports.LOD = LOD;
-exports.LatheBufferGeometry = LatheBufferGeometry;
 exports.LatheGeometry = LatheGeometry;
 exports.Layers = Layers;
 exports.LessCompare = LessCompare;
@@ -51726,7 +51464,6 @@ exports.NumberKeyframeTrack = NumberKeyframeTrack;
 exports.Object3D = Object3D;
 exports.ObjectLoader = ObjectLoader;
 exports.ObjectSpaceNormalMap = ObjectSpaceNormalMap;
-exports.OctahedronBufferGeometry = OctahedronBufferGeometry;
 exports.OctahedronGeometry = OctahedronGeometry;
 exports.OneFactor = OneFactor;
 exports.OneMinusDstAlphaFactor = OneMinusDstAlphaFactor;
@@ -51740,7 +51477,6 @@ exports.PMREMGenerator = PMREMGenerator;
 exports.Path = Path;
 exports.PerspectiveCamera = PerspectiveCamera;
 exports.Plane = Plane;
-exports.PlaneBufferGeometry = PlaneBufferGeometry;
 exports.PlaneGeometry = PlaneGeometry;
 exports.PlaneHelper = PlaneHelper;
 exports.PointLight = PointLight;
@@ -51748,7 +51484,6 @@ exports.PointLightHelper = PointLightHelper;
 exports.Points = Points;
 exports.PointsMaterial = PointsMaterial;
 exports.PolarGridHelper = PolarGridHelper;
-exports.PolyhedronBufferGeometry = PolyhedronBufferGeometry;
 exports.PolyhedronGeometry = PolyhedronGeometry;
 exports.PositionalAudio = PositionalAudio;
 exports.PropertyBinding = PropertyBinding;
@@ -51802,7 +51537,6 @@ exports.ReinhardToneMapping = ReinhardToneMapping;
 exports.RepeatWrapping = RepeatWrapping;
 exports.ReplaceStencilOp = ReplaceStencilOp;
 exports.ReverseSubtractEquation = ReverseSubtractEquation;
-exports.RingBufferGeometry = RingBufferGeometry;
 exports.RingGeometry = RingGeometry;
 exports.SIGNED_RED_GREEN_RGTC2_Format = SIGNED_RED_GREEN_RGTC2_Format;
 exports.SIGNED_RED_RGTC1_Format = SIGNED_RED_RGTC1_Format;
@@ -51813,7 +51547,6 @@ exports.ShaderLib = ShaderLib;
 exports.ShaderMaterial = ShaderMaterial;
 exports.ShadowMaterial = ShadowMaterial;
 exports.Shape = Shape;
-exports.ShapeBufferGeometry = ShapeBufferGeometry;
 exports.ShapeGeometry = ShapeGeometry;
 exports.ShapePath = ShapePath;
 exports.ShapeUtils = ShapeUtils;
@@ -51823,7 +51556,6 @@ exports.SkeletonHelper = SkeletonHelper;
 exports.SkinnedMesh = SkinnedMesh;
 exports.Source = Source;
 exports.Sphere = Sphere;
-exports.SphereBufferGeometry = SphereBufferGeometry;
 exports.SphereGeometry = SphereGeometry;
 exports.Spherical = Spherical;
 exports.SphericalHarmonics3 = SphericalHarmonics3;
@@ -51847,19 +51579,15 @@ exports.SubtractEquation = SubtractEquation;
 exports.SubtractiveBlending = SubtractiveBlending;
 exports.TOUCH = TOUCH;
 exports.TangentSpaceNormalMap = TangentSpaceNormalMap;
-exports.TetrahedronBufferGeometry = TetrahedronBufferGeometry;
 exports.TetrahedronGeometry = TetrahedronGeometry;
 exports.Texture = Texture;
 exports.TextureLoader = TextureLoader;
-exports.TorusBufferGeometry = TorusBufferGeometry;
 exports.TorusGeometry = TorusGeometry;
-exports.TorusKnotBufferGeometry = TorusKnotBufferGeometry;
 exports.TorusKnotGeometry = TorusKnotGeometry;
 exports.Triangle = Triangle;
 exports.TriangleFanDrawMode = TriangleFanDrawMode;
 exports.TriangleStripDrawMode = TriangleStripDrawMode;
 exports.TrianglesDrawMode = TrianglesDrawMode;
-exports.TubeBufferGeometry = TubeBufferGeometry;
 exports.TubeGeometry = TubeGeometry;
 exports.TwoPassDoubleSide = TwoPassDoubleSide;
 exports.UVMapping = UVMapping;
