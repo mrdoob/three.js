@@ -20,7 +20,7 @@ class ExtendedMaterialNode extends MaterialNode {
 		const scope = this.scope;
 		let type = null;
 
-		if ( scope === ExtendedMaterialNode.NORMAL ) {
+		if ( scope === ExtendedMaterialNode.NORMAL || scope === ExtendedMaterialNode.CLEARCOAT_NORMAL ) {
 
 			type = 'vec3';
 
@@ -41,6 +41,10 @@ class ExtendedMaterialNode extends MaterialNode {
 
 			node = material.normalMap ? normalMap( this.getTexture( 'normalMap' ), materialReference( 'normalScale', 'vec2' ) ) : normalView;
 
+		} else if ( scope === ExtendedMaterialNode.CLEARCOAT_NORMAL ) {
+
+			node = material.clearcoatNormalMap ? normalMap( this.getTexture( 'clearcoatNormalMap' ), materialReference( 'clearcoatNormalScale', 'vec2' ) ) : normalView;
+
 		}
 
 		return node || super.construct( builder );
@@ -50,9 +54,11 @@ class ExtendedMaterialNode extends MaterialNode {
 }
 
 ExtendedMaterialNode.NORMAL = 'normal';
+ExtendedMaterialNode.CLEARCOAT_NORMAL = 'clearcoatNormal';
 
 export default ExtendedMaterialNode;
 
 export const materialNormal = nodeImmutable( ExtendedMaterialNode, ExtendedMaterialNode.NORMAL );
+export const materialClearcoatNormal = nodeImmutable( ExtendedMaterialNode, ExtendedMaterialNode.CLEARCOAT_NORMAL );
 
 addNodeClass( ExtendedMaterialNode );
