@@ -614,10 +614,11 @@ class OrbitControls extends EventDispatcher {
 
 			performCursorZoom = true;
 
-			const x = event.clientX - scope.domElement.clientLeft;
-			const y = event.clientY - scope.domElement.clientTop;
-			const w = scope.domElement.clientWidth;
-			const h = scope.domElement.clientHeight;
+			const rect = scope.domElement.getBoundingClientRect();
+			const x = event.clientX - rect.left;
+			const y = event.clientY - rect.top;
+			const w = rect.width;
+			const h = rect.height;
 
 			mouse.x = ( x / w ) * 2 - 1;
 			mouse.y = - ( y / h ) * 2 + 1;
