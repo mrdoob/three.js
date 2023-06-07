@@ -1,5 +1,4 @@
-import { BackSide } from '../../constants.js';
-import { getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
+import { BackSide, LinearSRGBColorSpace } from '../../constants.js';
 
 function WebGLMaterials( renderer, properties ) {
 
@@ -17,7 +16,7 @@ function WebGLMaterials( renderer, properties ) {
 
 	function refreshFogUniforms( uniforms, fog ) {
 
-		fog.color.getRGB( uniforms.fogColor.value, getUnlitUniformColorSpace( renderer ) );
+		fog.color.getRGB( uniforms.fogColor.value, LinearSRGBColorSpace );
 
 		if ( fog.isFog ) {
 

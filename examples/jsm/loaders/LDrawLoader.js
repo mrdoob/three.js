@@ -133,8 +133,8 @@ class LDrawConditionalLineMaterial extends ShaderMaterial {
 				outgoingLight = diffuseColor.rgb; // simple shader
 				gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 				#include <tonemapping_fragment>
-				#include <colorspace_fragment>
 				#include <fog_fragment>
+				#include <colorspace_fragment>
 				#include <premultiplied_alpha_fragment>
 			}
 			`,

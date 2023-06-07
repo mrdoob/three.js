@@ -165,8 +165,8 @@ class OutlineEffect {
 			'	gl_FragColor = vec4( outlineColor, outlineAlpha );',
 
 			'	#include <tonemapping_fragment>',
-			'	#include <colorspace_fragment>',
 			'	#include <fog_fragment>',
+			'	#include <colorspace_fragment>',
 			'	#include <premultiplied_alpha_fragment>',
 
 			'}'

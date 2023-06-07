@@ -348,8 +348,8 @@ Water.WaterShader = {
 			gl_FragColor = vec4( color, 1.0 ) * mix( refractColor, reflectColor, reflectance );
 
 			#include <tonemapping_fragment>
-			#include <colorspace_fragment>
 			#include <fog_fragment>
+			#include <colorspace_fragment>
 
 		}`
 
