@@ -1,5 +1,7 @@
 import UniformNode from '../core/UniformNode.js';
 import { uv } from './UVNode.js';
+import { textureSize } from './TextureSizeNode.js';
+import { context } from '../core/ContextNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
@@ -140,6 +142,32 @@ class TextureNode extends UniformNode {
 
 	}
 
+	uv( uvNode ) {
+
+		const textureNode = this.clone();
+		textureNode.uvNode = uvNode;
+
+		return textureNode;
+
+	}
+
+	level( levelNode ) {
+
+		const textureNode = this.clone();
+		textureNode.levelNode = levelNode;
+
+		return context( textureNode, {
+			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => levelNode
+		} );
+
+	}
+
+	size( levelNode ) {
+
+		return textureSize( this, levelNode );
+
+	}
+
 	serialize( data ) {
 
 		super.serialize( data );
@@ -156,13 +184,22 @@ class TextureNode extends UniformNode {
 
 	}
 
+	clone() {
+
+		return new this.constructor( this.value, this.uvNode, this.levelNode );
+
+	}
+
 }
 
 export default TextureNode;
 
 export const texture = nodeProxy( TextureNode );
+//export const textureLevel = ( value, uv, level ) => texture( value, uv ).level( level );
+
 export const sampler = ( aTexture ) => ( aTexture.isNode === true ? aTexture : texture( aTexture ) ).convert( 'sampler' );
 
 addNodeElement( 'texture', texture );
+//addNodeElement( 'textureLevel', textureLevel );
 
 addNodeClass( TextureNode );
