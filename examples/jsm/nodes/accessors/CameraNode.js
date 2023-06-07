@@ -34,7 +34,11 @@ class CameraNode extends Object3DNode {
 		const uniformNode = this._uniformNode;
 		const scope = this.scope;
 
-		if ( scope === CameraNode.PROJECTION_MATRIX ) {
+		if ( scope === CameraNode.VIEW_MATRIX ) {
+
+			uniformNode.value = camera.matrixWorldInverse;
+
+		} else if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
 			uniformNode.value = camera.projectionMatrix;
 
