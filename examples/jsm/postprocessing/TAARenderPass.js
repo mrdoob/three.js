@@ -69,7 +69,6 @@ class TAARenderPass extends SSAARenderPass {
 		const oldClearAlpha = renderer.getClearAlpha();
 
 		const sampleWeight = 1.0 / ( jitterOffsets.length );
-		const accumulationWeight = this.accumulateIndex * sampleWeight;
 
 		if ( this.accumulateIndex >= 0 && this.accumulateIndex < jitterOffsets.length ) {
 
@@ -117,6 +116,7 @@ class TAARenderPass extends SSAARenderPass {
 		}
 
 		renderer.setClearColor( this.clearColor, this.clearAlpha );
+		const accumulationWeight = this.accumulateIndex * sampleWeight;
 
 		if ( accumulationWeight > 0 ) {
 
@@ -133,7 +133,6 @@ class TAARenderPass extends SSAARenderPass {
 			this.copyUniforms[ 'opacity' ].value = 1.0 - accumulationWeight;
 			this.copyUniforms[ 'tDiffuse' ].value = this.holdRenderTarget.texture;
 			renderer.setRenderTarget( writeBuffer );
-			if ( accumulationWeight === 0 ) renderer.clear();
 			this.fsQuad.render( renderer );
 
 		}
