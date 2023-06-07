@@ -1,7 +1,8 @@
 class LightingModel {
 
-	constructor( direct = null, indirectDiffuse = null, indirectSpecular = null, ambientOcclusion = null ) {
+	constructor( init = null, direct = null, indirectDiffuse = null, indirectSpecular = null, ambientOcclusion = null ) {
 
+		this.init = init;
 		this.direct = direct;
 		this.indirectDiffuse = indirectDiffuse;
 		this.indirectSpecular = indirectSpecular;
