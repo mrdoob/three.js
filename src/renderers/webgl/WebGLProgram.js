@@ -211,13 +211,29 @@ function resolveIncludes( string ) {
 
 }
 
+const shaderChunkMap = new Map( [
+	[ 'encodings_fragment', 'color_space_fragment' ], // @deprecated, r154
+	[ 'encodings_pars_fragment', 'color_space_pars_fragment' ] // @deprecated, r154
+] );
+
 function includeReplacer( match, include ) {
 
-	const string = ShaderChunk[ include ];
+	let string = ShaderChunk[ include ];
 
 	if ( string === undefined ) {
 
-		throw new Error( 'Can not resolve #include <' + include + '>' );
+		const newInclude = shaderChunkMap.get( include );
+
+		if ( newInclude !== undefined ) {
+
+			string = ShaderChunk[ newInclude ];
+			console.warn( 'THREE.WebGLRenderer: Shader chunk "%s" has been deprecated. Use "%s" instead.', include, newInclude );
+
+		} else {
+
+			throw new Error( 'Can not resolve #include <' + include + '>' );
+
+		}
 
 	}
 
