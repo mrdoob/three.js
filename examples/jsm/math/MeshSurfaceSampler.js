@@ -187,7 +187,7 @@ class MeshSurfaceSampler {
 				_face.a.fromBufferAttribute( this.normalAttribute, faceIndex * 3 );
 				_face.b.fromBufferAttribute( this.normalAttribute, faceIndex * 3 + 1 );
 				_face.c.fromBufferAttribute( this.normalAttribute, faceIndex * 3 + 2 );
-				targetNormal.set( 0, 0, 0 ).addScaledVector( _face.a, u ).addScaledVector( _face.b, v ).addScaledVector( _face.c, 1 - ( u + v ) );
+				targetNormal.set( 0, 0, 0 ).addScaledVector( _face.a, u ).addScaledVector( _face.b, v ).addScaledVector( _face.c, 1 - ( u + v ) ).normalize();
 
 			} else {
 
