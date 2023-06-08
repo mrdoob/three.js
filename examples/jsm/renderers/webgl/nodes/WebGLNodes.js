@@ -6,15 +6,24 @@ import { Material } from 'three';
 const builders = new WeakMap();
 export const nodeFrame = new NodeFrame();
 
+Material.prototype.hasBuilt = false;
+
 Material.prototype.onBuild = function ( object, parameters, renderer ) {
 
-	if ( object.material.isNodeMaterial === true ) {
+	if ( object.material.isNodeMaterial === true && ! this.hasBuilt ) {
 
 		builders.set( this, new WebGLNodeBuilder( object, renderer, parameters ).build() );
+		this.hasBuilt = true;
 
 	}
 
 };
+
+Material.prototype.onBeforeCompile = function () {
+
+	this.hasBuilt = false;
+
+}
 
 Material.prototype.onBeforeRender = function ( renderer, scene, camera, geometry, object ) {
 
