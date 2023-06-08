@@ -501,7 +501,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 			for ( const attribute of attributes ) {
 
 				// ignore common attributes to prevent redefinitions
-				if ( attribute.name === 'uv' || attribute.name === 'position' || attribute.name === 'normal' )
+				if ( /^(position|normal|uv\d?)$/.test( attribute.name ) )
 					continue;
 
 				snippet += `attribute ${attribute.type} ${attribute.name}; `;
