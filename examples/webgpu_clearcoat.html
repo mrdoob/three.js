@@ -61,7 +61,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 0.25, 50 );
 				camera.position.z = 10;
 
 				scene = new THREE.Scene();
@@ -205,7 +205,9 @@
 
 				// EVENTS
 
-				new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 3;
+				controls.maxDistance = 30;
 
 				window.addEventListener( 'resize', onWindowResize );
 
