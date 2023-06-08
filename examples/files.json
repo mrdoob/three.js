@@ -132,7 +132,6 @@
 		"webgl_loader_xyz",
 		"webgl_lod",
 		"webgl_marchingcubes",
-		"webgl_materials_alphahash",
 		"webgl_materials_blending",
 		"webgl_materials_blending_custom",
 		"webgl_materials_bumpmap",
