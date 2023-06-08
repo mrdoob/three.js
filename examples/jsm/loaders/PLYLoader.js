@@ -408,6 +408,12 @@ class PLYLoader extends Loader {
 
 			}
 
+			if ( buffer.colors.length > 0 ) {
+
+				geometry.setAttribute( 'color', new Float32BufferAttribute( buffer.colors, 3 ) );
+
+			}
+
 			if ( buffer.faceVertexUvs.length > 0 || buffer.faceVertexColors.length > 0 ) {
 
 				geometry = geometry.toNonIndexed();
