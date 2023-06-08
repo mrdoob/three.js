@@ -1,4 +1,4 @@
-import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder } from 'three/nodes';
+import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder, normalView } from 'three/nodes';
 import SlotNode from './SlotNode.js';
 import { PerspectiveCamera, ShaderChunk, ShaderLib, UniformsUtils, UniformsLib } from 'three';
 
@@ -96,6 +96,14 @@ class WebGLNodeBuilder extends NodeBuilder {
 	_parseObject() {
 
 		const { material, renderer } = this;
+
+		this.addSlot( 'fragment', new SlotNode( {
+			node: normalView,
+			nodeType: 'vec3',
+			source: getIncludeSnippet( 'clipping_planes_fragment' ),
+			target: 'vec3 TransformedNormalView = %RESULT%;',
+			inclusionType: 'append'
+		} ) );
 
 		if ( renderer.toneMappingNode && renderer.toneMappingNode.isNode === true ) {
 
@@ -336,17 +344,6 @@ class WebGLNodeBuilder extends NodeBuilder {
 						source: 'material.transmission = transmission;',
 						target: 'material.transmission = %RESULT%;'
 					} ) );
-
-					if ( material.thicknessNode && material.thicknessNode.isNode ) {
-
-						this.addSlot( 'fragment', new SlotNode( {
-							node: material.thicknessNode,
-							nodeType: 'float',
-							source: 'material.thickness = thickness;',
-							target: 'material.thickness = %RESULT%;'
-						} ) );
-
-					}
 
 					if ( material.thicknessNode && material.thicknessNode.isNode ) {
 
