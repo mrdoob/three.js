@@ -4,10 +4,4 @@ export default /* glsl */`
 	if ( diffuseColor.a < alphaTest ) discard;
 
 #endif
-
-#ifdef USE_ALPHAHASH
-
-	if ( diffuseColor.a < getAlphaHashThreshold( vObjectPosition, alphaHashScale ) ) discard;
-
-#endif
 `;

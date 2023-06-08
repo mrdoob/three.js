@@ -56,6 +56,7 @@ uniform float opacity;
 #include <color_pars_fragment>
 #include <map_particle_pars_fragment>
 #include <alphatest_pars_fragment>
+#include <alphahash_pars_fragment>
 #include <fog_pars_fragment>
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
@@ -71,6 +72,7 @@ void main() {
 	#include <map_particle_fragment>
 	#include <color_fragment>
 	#include <alphatest_fragment>
+	#include <alphahash_fragment>
 
 	outgoingLight = diffuseColor.rgb;
 

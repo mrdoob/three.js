@@ -9,12 +9,6 @@ varying vec3 vViewPosition;
 
 #endif
 
-#ifdef USE_ALPHAHASH
-
-	varying vec3 vObjectPosition;
-
-#endif
-
 #include <common>
 #include <uv_pars_vertex>
 #include <displacementmap_pars_vertex>
@@ -57,12 +51,6 @@ void main() {
 #ifdef USE_TRANSMISSION
 
 	vWorldPosition = worldPosition.xyz;
-
-#endif
-
-#ifdef USE_ALPHAHASH
-
-	vObjectPosition = transformed.xyz;
 
 #endif
 }
@@ -142,6 +130,7 @@ varying vec3 vViewPosition;
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <alphatest_pars_fragment>
+#include <alphahash_pars_fragment>
 #include <aomap_pars_fragment>
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
@@ -177,6 +166,7 @@ void main() {
 	#include <color_fragment>
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
+	#include <alphahash_fragment>
 	#include <roughnessmap_fragment>
 	#include <metalnessmap_fragment>
 	#include <normal_fragment_begin>
