@@ -122,7 +122,6 @@ class MaterialLoader extends Loader {
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
 		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
 		if ( json.alphaHash !== undefined ) material.alphaHash = json.alphaHash;
-		if ( json.alphaHashScale !== undefined ) material.alphaHashScale = json.alphaHashScale;
 		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
 		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;

@@ -5,7 +5,7 @@ export default /* glsl */`
 	 * See: https://casual-effects.com/research/Wyman2017Hashed/index.html
 	 */
 
-	uniform float alphaHashScale;
+	const float ALPHA_HASH_SCALE = 0.05; // Derived from trials only, and may be changed.
 
 	float hash2D( vec2 value ) {
 
@@ -19,14 +19,14 @@ export default /* glsl */`
 
 	}
 
-	float getAlphaHashThreshold( vec3 position, float hashScale ) {
+	float getAlphaHashThreshold( vec3 position ) {
 
 		// Find the discretized derivatives of our coordinates
 		float maxDeriv = max(
 			length( dFdx( position.xyz ) ),
 			length( dFdy( position.xyz ) )
 		);
-		float pixScale = 1.0 / ( hashScale * maxDeriv );
+		float pixScale = 1.0 / ( ALPHA_HASH_SCALE * maxDeriv );
 
 		// Find two nearest log-discretized noise scales
 		vec2 pixScales = vec2(

@@ -26,7 +26,6 @@ class Material extends EventDispatcher {
 		this.opacity = 1;
 		this.transparent = false;
 		this.alphaHash = false;
-		this.alphaHashScale = 1;
 
 		this.blendSrc = SrcAlphaFactor;
 		this.blendDst = OneMinusSrcAlphaFactor;
@@ -356,7 +355,6 @@ class Material extends EventDispatcher {
 
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.alphaHash === true ) data.alphaHash = this.alphaHash;
-		if ( this.alphaHashScale !== 0 ) data.alphaHashScale = this.alphaHashScale;
 		if ( this.alphaToCoverage === true ) data.alphaToCoverage = this.alphaToCoverage;
 		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
 		if ( this.forceSinglePass === true ) data.forceSinglePass = this.forceSinglePass;
@@ -479,7 +477,6 @@ class Material extends EventDispatcher {
 
 		this.alphaTest = source.alphaTest;
 		this.alphaHash = source.alphaHash;
-		this.alphaHashScale = source.alphaHashScale;
 		this.alphaToCoverage = source.alphaToCoverage;
 		this.premultipliedAlpha = source.premultipliedAlpha;
 		this.forceSinglePass = source.forceSinglePass;

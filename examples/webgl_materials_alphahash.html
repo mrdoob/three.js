@@ -64,7 +64,6 @@
 			const params = {
 				alpha: 0.4,
 				alphaHash: true,
-				alphaHashScale: 0.1,
 				taa: true,
 				sampleLevel: 2,
 			};
@@ -139,8 +138,8 @@
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', () => ( needsUpdate = true ) );
-				controls.minDistance = 5;
-				controls.maxDistance = 15;
+				controls.minDistance = 0.5;
+				controls.maxDistance = 100;
 				controls.update();
 
 				//
@@ -149,7 +148,6 @@
 
 				gui.add( params, 'alpha', 0, 1 ).onChange( onMaterialUpdate );
 				gui.add( params, 'alphaHash' ).onChange( onMaterialUpdate );
-				gui.add( params, 'alphaHashScale', 0.0, 2.0 ).onChange( onMaterialUpdate );
 
 				const taaFolder = gui.addFolder('Temporal Anti-Aliasing');
 
@@ -194,7 +192,6 @@
 
 						object.material.opacity = params.alpha;
 						object.material.alphaHash = params.alphaHash;
-						object.material.alphaHashScale = params.alphaHashScale;
 						object.material.transparent = !params.alphaHash;
 						object.material.depthWrite = params.alphaHash;
 
@@ -211,6 +208,8 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+
+				// group.rotation.y += 0.01;
 
 				if ( needsUpdate ) {
 
