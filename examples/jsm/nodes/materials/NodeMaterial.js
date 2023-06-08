@@ -44,6 +44,9 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.positionNode = null;
 
+		this.vertexShader = null;
+		this.fragmentShader = null;
+
 	}
 
 	customProgramCacheKey() {
