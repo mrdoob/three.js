@@ -101,7 +101,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 			node: normalView,
 			nodeType: 'vec3',
 			source: getIncludeSnippet( 'clipping_planes_fragment' ),
-			target: 'TransformedNormalView = %RESULT%;',
+			target: 'vec3 TransformedNormalView = %RESULT%;',
 			inclusionType: 'append'
 		} ) );
 
