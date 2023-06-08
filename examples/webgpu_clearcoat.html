@@ -181,12 +181,12 @@
 				// LIGHTS
 
 				particleLight = new THREE.Mesh(
-					new THREE.SphereGeometry( .1, 8, 8 ),
+					new THREE.SphereGeometry( .05, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff } )
 				);
 				scene.add( particleLight );
 
-				particleLight.add( new THREE.PointLight( 0xffffff, 50 ) );
+				particleLight.add( new THREE.PointLight( 0xffffff, 30 ) );
 
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
