@@ -85,6 +85,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		let vertexShader, fragmentShader;
 		let customVertexShaderID, customFragmentShaderID;
 
+		const hasShaders = ( material.vertexShader !== null && material.fragmentShader !== null );
+
 		if ( shaderID ) {
 
 			const shader = ShaderLib[ shaderID ];
@@ -92,7 +94,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			vertexShader = shader.vertexShader;
 			fragmentShader = shader.fragmentShader;
 
-		} else {
+		} else if ( hasShaders ) {
 
 			vertexShader = material.vertexShader;
 			fragmentShader = material.fragmentShader;
@@ -342,6 +344,21 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			customProgramCacheKey: material.customProgramCacheKey()
 
 		};
+
+		if ( ! hasShaders ) {
+
+			material.onBuild( object, parameters, renderer );
+
+			material.vertexShader = parameters.vertexShader;
+			material.fragmentShader = parameters.fragmentShader;
+			material.uniforms = parameters.uniforms;
+
+			_customShaders.update( material );
+
+			parameters.customVertexShaderID = _customShaders.getVertexShaderID( material );
+			parameters.customFragmentShaderID = _customShaders.getFragmentShaderID( material );
+
+		}
 
 		return parameters;
 
