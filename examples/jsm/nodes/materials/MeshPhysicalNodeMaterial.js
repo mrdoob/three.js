@@ -51,10 +51,10 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		// CLEARCOAT
 
-		const claercoatNode = this.clearcoatNode ? float( this.clearcoatNode ) : materialClearcoat;
+		const clearcoatNode = this.clearcoatNode ? float( this.clearcoatNode ) : materialClearcoat;
 		const clearcoatRoughnessNode = this.clearcoatRoughnessNode ? float( this.clearcoatRoughnessNode ) : materialClearcoatRoughness;
 
-		stack.assign( clearcoat, claercoatNode );
+		stack.assign( clearcoat, clearcoatNode );
 		stack.assign( clearcoatRoughness, clearcoatRoughnessNode );
 
 	}
