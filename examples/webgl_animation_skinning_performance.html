@@ -579,9 +579,9 @@
 
 				requestAnimationFrame( animate );
 
-				// idleWeight = idleAction.getEffectiveWeight();
-				// walkWeight = walkAction.getEffectiveWeight();
-				// runWeight = runAction.getEffectiveWeight();
+				idleWeight = idleActions[ 0 ].getEffectiveWeight();
+				walkWeight = walkActions[ 0 ].getEffectiveWeight();
+				runWeight = runActions[ 0 ].getEffectiveWeight();
 
 				// Update the panel values if weights are modified from "outside" (by crossfadings)
 
