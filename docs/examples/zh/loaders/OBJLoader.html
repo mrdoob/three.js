@@ -12,10 +12,21 @@
 		<h1>OBJ加载器（[name]）</h1>
 
 		<p class="desc">用于加载 <em>.obj</em> 资源的加载器。<br />
-		<a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">OBJ 文件格式</a>是一种简单的数据格式，
+		[link:https://en.wikipedia.org/wiki/Wavefront_.obj_file OBJ 文件格式]是一种简单的数据格式，
 		这种格式以人类可读的形式来表示3D几何体，即每个顶点的位置、每个纹理坐标顶点的UV位置、顶点法线、
 		将使每个多边形定义为顶点列表的面以及纹理顶点。
 		</p>
+
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+		</code>
 
 		<h2>代码示例</h2>
 

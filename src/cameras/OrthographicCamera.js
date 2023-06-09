@@ -6,6 +6,8 @@ class OrthographicCamera extends Camera {
 
 		super();
 
+		this.isOrthographicCamera = true;
+
 		this.type = 'OrthographicCamera';
 
 		this.zoom = 1;
@@ -105,7 +107,7 @@ class OrthographicCamera extends Camera {
 
 		}
 
-		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far );
+		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem );
 
 		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
 
@@ -130,7 +132,5 @@ class OrthographicCamera extends Camera {
 	}
 
 }
-
-OrthographicCamera.prototype.isOrthographicCamera = true;
 
 export { OrthographicCamera };

@@ -14,10 +14,23 @@
 			Created by <a href="https://orfleisher.com" target="_blank" rel="noopener">@juniorxsound</a>. Panorama from <a href="https://krpano.com/examples/?depthmap" target="_blank" rel="noopener">krpano</a>.
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
-			import { VRButton } from './jsm/webxr/VRButton.js';
+			import * as THREE from 'three';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
 			let camera, scene, renderer, sphere, clock;
 
@@ -57,6 +70,7 @@
 
 				loader.load( './textures/kandao3.jpg', function ( texture ) {
 
+					texture.colorSpace = THREE.SRGBColorSpace;
 					texture.minFilter = THREE.NearestFilter;
 					texture.generateMipmaps = false;
 					sphere.material.map = texture;

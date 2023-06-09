@@ -26,7 +26,7 @@
 
 		<h2>例子</h2>
 		<p>
-			[example:webgl_raycast_sprite WebGL / raycast / sprite]<br />
+			[example:webgl_raycaster_sprite WebGL / raycast / sprite]<br />
 			[example:webgl_sprites WebGL / sprites]<br />
 			[example:svg_sandbox SVG / sandbox]
 		</p>
@@ -60,14 +60,28 @@
 		<h3>[property:Color color]</h3>
 		<p>材质的颜色([page:Color])，默认值为白色 (0xffffff)。 [page:.map]会和 color 相乘。</p>
 
+		<h3>[property:Boolean fog]</h3>
+		<p>材质是否受雾影响。默认为*true*。</p>
+
+		<h3>[property:Boolean isSpriteMaterial]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Texture map]</h3>
-		<p>颜色贴图。默认为null。</p>
+		<p>
+			颜色贴图。可以选择包括一个alpha通道，通常与[page:Material.transparent .transparent]
+			或[page:Material.alphaTest .alphaTest]。默认为null。
+		</p>
 
 		<h3>[property:Radians rotation]</h3>
 		<p> sprite的转动，以弧度为单位。默认值为0。</p>
 
 		<h3>[property:Boolean sizeAttenuation]</h3>
 		<p> 精灵的大小是否会被相机深度衰减。（仅限透视摄像头。）默认为*true*。</p>
+
+		<h3>[property:Boolean transparent]</h3>
+		<p>定义此材质是否透明。默认值为 *true*。</p>
 
 		<h2>方法(Methods)</h2>
 		<p>共有方法请参见其基类[page:Material]。</p>

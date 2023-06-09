@@ -11,10 +11,7 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">
-			Helper object to visualize a [page:Plane].
-		</p>
-
+		<p class="desc">Helper object to visualize a [page:Plane].</p>
 
 		<h2>Code Example</h2>
 
@@ -24,21 +21,23 @@
 		scene.add( helper );
 		</code>
 
-
 		<h2>Constructor</h2>
 
-
-		<h3>[name]( [param:Plane plane], [param:Float size], [param:Color hex] )</h3>
+		<h3>
+			[name]( [param:Plane plane], [param:Float size], [param:Color hex] )
+		</h3>
 		<p>
-		[page:Plane plane] --  the plane to visualize.<br />
-		[page:Float size] -- (optional) side length of plane helper. Default is 1.<br />
-		[page:Color color] --  (optional) the color of the helper. Default is 0xffff00.<br /><br />
+			[page:Plane plane] -- the plane to visualize.<br />
+			[page:Float size] -- (optional) side length of plane helper. Default is
+			1.<br />
+			[page:Color color] -- (optional) the color of the helper. Default is
+			0xffff00.<br /><br />
 
-		Creates a new wireframe representation of the passed plane.
+			Creates a new wireframe representation of the passed plane.
 		</p>
 
 		<h2>Properties</h2>
-		<p>See the base [page:LineSegments] class for common properties.</p>
+		<p>See the base [page:Line] class for common properties.</p>
 
 		<h3>[property:Plane plane]</h3>
 		<p>The [page:Plane plane] being visualized.</p>
@@ -46,15 +45,19 @@
 		<h3>[property:Float size]</h3>
 		<p>The side lengths of plane helper.</p>
 
-
 		<h2>Methods</h2>
 		<p>See the base [page:LineSegments] class for common methods.</p>
 
 		<h3>[method:undefined updateMatrixWorld]( [param:Boolean force] )</h3>
 		<p>
-			This overrides the method in the base [page:Object3D] class so that it also
-			updates the helper object according to the [page:PlaneHelper.plane .plane] and
-			[page:PlaneHelper.size .size] properties.
+			This overrides the method in the base [page:Object3D] class so that it
+			also updates the helper object according to the [page:PlaneHelper.plane .plane] and [page:PlaneHelper.size .size] properties.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Frees the GPU-related resources allocated by this instance. Call this
+			method whenever this instance is no longer used in your app.
 		</p>
 
 		<h2>Source</h2>

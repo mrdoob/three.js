@@ -13,6 +13,9 @@
 		表示一个颜色。
 		</p>
 
+		<p>
+			对 [name] 实例进行遍历将按相应的顺序生成它的分量 (r, g, b)。
+		</p>
 
 		<h2>代码示例</h2>
 		颜色可以用以下任意一种方式初始化。
@@ -46,7 +49,7 @@
 		<h3>[name]( [param:Color_Hex_or_String r], [param:Float g], [param:Float b] )</h3>
 		<p>
 		[page:Color_Hex_or_String r] - (可选参数)  如果参数g和b被定义，则r表示颜色中的红色分量。
-		如果未被定义，r可以是一个十六进制 [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] 颜色值或CSS样式的字符串或一个Color实例。<br />
+		如果未被定义，r可以是一个十六进制 [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] 颜色值或CSS样式的字符串或一个`Color`实例。<br />
 		[page:Float g] - (可选参数) 如果被定义，表示颜色中的绿色分量。<br />
 		[page:Float b] - (可选参数) 如果被定义，表示颜色中的蓝色分量。<br /><br />
 
@@ -73,6 +76,11 @@
 		</p>
 
 		<h2>属性（Properties）</h2>
+
+		<h3>[property:Boolean isColor]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:Float r]</h3>
 		<p>
@@ -113,18 +121,6 @@
 			从 [page:Color color] 中拷贝 [page:.r r], [page:.g g] 和 [page:.b b] 值到当前的颜色。
 		</p>
 
-		<h3>[method:this convertGammaToLinear]( [param:Float gammaFactor] ) </h3>
-		<p>
-		[page:Float gammaFactor] - (可选参数). 默认值 *2.0*.<br /><br />
-		通过取颜色 [page:.r r], [page:.g g] and [page:.b b] 的 [page:Float gammaFactor] 次方将颜色从伽马空间转换成线性空间。
-		</p>
-
-		<h3>[method:this convertLinearToGamma]( [param:Float gammaFactor] ) </h3>
-		<p>
-		[page:Float gammaFactor] - (可选参数). 默认值 *2.0*.<br /><br />
-		通过取颜色 [page:.r r], [page:.g g] and [page:.b b] 的 1/[page:Float gammaFactor] 次方将颜色从线性空间转换成伽马空间。
-		</p>
-
 		<h3>[method:this convertLinearToSRGB]() </h3>
 		<p>
 			将此颜色从线性空间转换成sRGB空间。
@@ -133,22 +129,6 @@
 		<h3>[method:this convertSRGBToLinear]() </h3>
 		<p>
 			将此颜色从sRGB空间转换成线性空间。
-		</p>
-
-		<h3>[method:this copyGammaToLinear]( [param:Color color], [param:Float gammaFactor] ) </h3>
-		<p>
-		[page:Color color] — 需要拷贝的颜色。<br />
-		[page:Float gammaFactor] - (可选参数). 默认值为 *2.0*.<br /><br />
-
-		将传入的 [param:Color color] 从伽马空间转换到线性空间然后复制给当前颜色。
-		</p>
-
-		<h3>[method:this copyLinearToGamma]( [param:Color color], [param:Float gammaFactor] ) </h3>
-		<p>
-		[page:Color color] — 需要拷贝的颜色。<br />
-		[page:Float gammaFactor] - (可选参数). 默认值为 *2.0*.<br /><br />
-
-		将传入的 [param:Color color] 从线性空间转换到伽马空间然后复制给当前颜色。
 		</p>
 
 		<h3>[method:this copyLinearToSRGB]( [param:Color color]] ) </h3>
@@ -184,13 +164,13 @@
 		根据参数 [page:BufferAttribute attribute] 设置该颜色。
 		</p>
 
-		<h3>[method:Integer getHex]()</h3>
+		<h3>[method:Integer getHex]( [param:string colorSpace] = SRGBColorSpace )</h3>
 		<p>返回此颜色的十六进制值。</p>
 
-		<h3>[method:String getHexString]()</h3>
+		<h3>[method:String getHexString]( [param:string colorSpace] = SRGBColorSpace )</h3>
 		<p>将此颜色的十六进制值作为字符串返回 (例如, 'FFFFFF')。</p>
 
-		<h3>[method:Object getHSL]( [param:Object target] )</h3>
+		<h3>[method:Object getHSL]( [param:Object target], [param:string colorSpace] = LinearSRGBColorSpace )</h3>
 		<p>
 			[page:Object target] — 结果将复制到这个对象中。向对象添加h、s和l键(如果不存在)。<br /><br />
 
@@ -202,7 +182,14 @@
 
 		</p>
 
-		<h3>[method:String getStyle]()</h3>
+		<h3>[method:Color getRGB]( [param:Color target], [param:string colorSpace] = LinearSRGBColorSpace )</h3>
+		<p>
+			[page:Color target] - 结果将复制到这个对象中.<br /><br />
+
+			Returns the RGB values of this color as an instance of [page:Color].
+		</p>
+
+		<h3>[method:String getStyle]( [param:string colorSpace] = SRGBColorSpace )</h3>
 		<p>以CSS样式字符串的形式返回该颜色的值。例如:“rgb(255,0,0)”。</p>
 
 		<h3>[method:this lerp]( [param:Color color], [param:Float alpha] ) </h3>
@@ -246,15 +233,18 @@
 			相加，最后再将结果转成RGB值。
 		</p>
 
-		<h3>[method:this set]( [param:Color_Hex_or_String value] ) </h3>
+		<h3>[method:this set]( [param:Color_Hex_or_String r], [param:Float g], [param:Float b] )</h3>
 		<p>
-		[page:Color_Hex_or_String value] - 用于设置该颜色的值。<br /><br />
+			[page:Color_Hex_or_String r] - (optional) If arguments [page:Float g] and [page:Float b] are defined, the red component of the color. If they are
+			not defined, it can be a [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] (recommended),  a CSS-style string, or another `Color` instance.<br />
+			[page:Float g] - (optional) If it is defined, the green component of the color.<br />
+			[page:Float b] - (optional) If it is defined, the blue component of the color.<br /><br />
 
-		有关 [page:Color_Hex_or_String value] 的详细信息，请参阅上面的构造函数。
-		根据输入类型，将会委托给 [page:.copy], [page:.setStyle], 或者 [page:.setHex] 函数处理。
+			See the Constructor above for full details about possible arguments. Delegates to [page:.copy],
+			[page:.setStyle], [page:.setRGB] or [page:.setHex] depending on input type.
 		</p>
 
-		<h3>[method:this setHex]( [param:Integer hex] ) </h3>
+		<h3>[method:this setHex]( [param:Integer hex], [param:string colorSpace] = SRGBColorSpace ) </h3>
 		<p>
 		[page:Integer hex] — [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] 格式。<br /><br />
 
@@ -262,7 +252,7 @@
 
 		</p>
 
-		<h3>[method:this setHSL]( [param:Float h], [param:Float s], [param:Float l] ) </h3>
+		<h3>[method:this setHSL]( [param:Float h], [param:Float s], [param:Float l], [param:string colorSpace] = LinearSRGBColorSpace ) </h3>
 		<p>
 		[page:Float h] — 色相值处于0到1之间。hue value between 0.0 and 1.0 <br />
 		[page:Float s] — 饱和度值处于0到1之间。<br />
@@ -271,7 +261,7 @@
 		采用HLS值设置此颜色。
 		</p>
 
-		<h3>[method:this setRGB]( [param:Float r], [param:Float g], [param:Float b] ) </h3>
+		<h3>[method:this setRGB]( [param:Float r], [param:Float g], [param:Float b], [param:string colorSpace] = LinearSRGBColorSpace ) </h3>
 		<p>
 		[page:Float r] — 红色通道的值在0到1之间。<br />
 		[page:Float g] — 绿色通道的值在0到1之间。<br />
@@ -287,7 +277,7 @@
 		将颜色的RGB值都设为该 [page:Float scalar] 的值。
 		</p>
 
-		<h3>[method:this setStyle]( [param:String style] ) </h3>
+		<h3>[method:this setStyle]( [param:String style], [param:string colorSpace] = SRGBColorSpace ) </h3>
 		<p>
 		[page:String style] — 颜色css样式的字符串<br /><br />
 
@@ -306,7 +296,7 @@
 		注意，对于X11颜色名称，多个单词(如暗橙色)变成字符串“darkorange”。
 		</p>
 
-		<h3>[method:this setColorName]( [param:String style] ) </h3>
+		<h3>[method:this setColorName]( [param:String style], [param:string colorSpace] = SRGBColorSpace ) </h3>
 		<p>
 		[page:String style] — 颜色名字的英文单词 ( 具体请查阅 [link:https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart X11 color names] )<br /><br />
 
@@ -326,6 +316,11 @@
 		[page:Integer offset] - 数组的可选偏移量<br /><br />
 
 		返回一个格式为[ r, g, b ] 数组。
+		</p>
+
+		<h3>[method:Number toJSON]()</h3>
+		<p>
+		This methods defines the serialization result of [name]. Returns the color as a hexadecimal value.
 		</p>
 
 		<h2>源码（Source）</h2>

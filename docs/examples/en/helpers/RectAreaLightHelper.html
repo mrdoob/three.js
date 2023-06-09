@@ -7,13 +7,24 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Object3D] &rarr;
+		[page:Object3D] &rarr; [page:Line] &rarr;
 
 		<h1>[name]</h1>
 
 		<p class="desc">
 			Creates a visual aid for a [page:RectAreaLight].
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -42,16 +53,18 @@
 
 		<h3>[property:hex color]</h3>
 		<p>
-						 The color parameter passed in the constructor. Default is *undefined*. If this is changed, the helper's color will update
+						 The color parameter passed in the constructor. Default is `undefined`. If this is changed, the helper's color will update
 						the next time [page:.update update] is called.
 		</p>
 
 
 		<h2>Methods</h2>
-		<p>See the base [page:Object3D] class for common methods.</p>
+		<p>See the base [page:Line] class for common methods.</p>
 
 		<h3>[method:undefined dispose]()</h3>
-		<p>Dispose of the rectAreaLightHelper.</p>
+		<p>
+		Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+		</p>
 
 		<h2>Source</h2>
 

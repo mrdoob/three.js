@@ -207,13 +207,26 @@
 
 		</script>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
+			import * as THREE from 'three';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';
 
 			/* TEXTURE WIDTH FOR SIMULATION */
 			const WIDTH = 64;
@@ -221,7 +234,7 @@
 
 			/* BAKE ANIMATION INTO TEXTURE and CREATE GEOMETRY FROM BASE MODEL */
 			const BirdGeometry = new THREE.BufferGeometry();
-			let textureAnimation, durationAnimation, birdMesh, materialShader, vertexPerBird;
+			let textureAnimation, durationAnimation, birdMesh, materialShader, indicesPerBird;
 
 			function nextPowerOf2( n ) {
 
@@ -248,14 +261,14 @@
 				const morphAttributes = birdGeo.morphAttributes.position;
 				const tHeight = nextPowerOf2( durationAnimation );
 				const tWidth = nextPowerOf2( birdGeo.getAttribute( 'position' ).count );
-				vertexPerBird = birdGeo.getAttribute( 'position' ).count;
-				const tData = new Float32Array( 3 * tWidth * tHeight );
+				indicesPerBird = birdGeo.index.count;
+				const tData = new Float32Array( 4 * tWidth * tHeight );
 
 				for ( let i = 0; i < tWidth; i ++ ) {
 
 					for ( let j = 0; j < tHeight; j ++ ) {
 
-						const offset = j * tWidth * 3;
+						const offset = j * tWidth * 4;
 
 						const curMorph = Math.floor( j / durationAnimation * morphAttributes.length );
 						const nextMorph = ( Math.floor( j / durationAnimation * morphAttributes.length ) + 1 ) % morphAttributes.length;
@@ -268,17 +281,19 @@
 							d0 = morphAttributes[ curMorph ].array[ i * 3 ];
 							d1 = morphAttributes[ nextMorph ].array[ i * 3 ];
 
-							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 3 ] = Math.lerp( d0, d1, lerpAmount );
+							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 4 ] = Math.lerp( d0, d1, lerpAmount );
 
 							d0 = morphAttributes[ curMorph ].array[ i * 3 + 1 ];
 							d1 = morphAttributes[ nextMorph ].array[ i * 3 + 1 ];
 
-							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 3 + 1 ] = Math.lerp( d0, d1, lerpAmount );
+							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 4 + 1 ] = Math.lerp( d0, d1, lerpAmount );
 
 							d0 = morphAttributes[ curMorph ].array[ i * 3 + 2 ];
 							d1 = morphAttributes[ nextMorph ].array[ i * 3 + 2 ];
 
-							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 3 + 2 ] = Math.lerp( d0, d1, lerpAmount );
+							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 4 + 2 ] = Math.lerp( d0, d1, lerpAmount );
+
+							tData[ offset + i * 4 + 3 ] = 1;
 
 						}
 
@@ -286,7 +301,7 @@
 
 				}
 
-				textureAnimation = new THREE.DataTexture( tData, tWidth, tHeight, THREE.RGBFormat, THREE.FloatType );
+				textureAnimation = new THREE.DataTexture( tData, tWidth, tHeight, THREE.RGBAFormat, THREE.FloatType );
 				textureAnimation.needsUpdate = true;
 
 				const vertices = [], color = [], reference = [], seeds = [], indices = [];
@@ -365,13 +380,13 @@
 				// LIGHTS
 
 				const hemiLight = new THREE.HemisphereLight( colors[ selectModel ], 0xffffff, 1.6 );
-				hemiLight.color.setHSL( 0.6, 1, 0.6 );
-				hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+				hemiLight.color.setHSL( 0.6, 1, 0.6, THREE.SRGBColorSpace );
+				hemiLight.groundColor.setHSL( 0.095, 1, 0.75, THREE.SRGBColorSpace );
 				hemiLight.position.set( 0, 50, 0 );
 				scene.add( hemiLight );
 
 				const dirLight = new THREE.DirectionalLight( 0x00CED1, 0.6 );
-				dirLight.color.setHSL( 0.1, 1, 0.95 );
+				dirLight.color.setHSL( 0.1, 1, 0.95, THREE.SRGBColorSpace );
 				dirLight.position.set( - 1, 1.75, 1 );
 				dirLight.position.multiplyScalar( 30 );
 				scene.add( dirLight );
@@ -400,28 +415,28 @@
 					cohesion: 20.0,
 					freedom: 0.75,
 					size: sizes[ selectModel ],
-					count: BIRDS
+					count: Math.floor( BIRDS / 4 )
 
 				};
 
 				const valuesChanger = function () {
 
-					velocityUniforms[ "separationDistance" ].value = effectController.separation;
-					velocityUniforms[ "alignmentDistance" ].value = effectController.alignment;
-					velocityUniforms[ "cohesionDistance" ].value = effectController.cohesion;
-					velocityUniforms[ "freedomFactor" ].value = effectController.freedom;
-					if ( materialShader ) materialShader.uniforms[ "size" ].value = effectController.size;
-					BirdGeometry.setDrawRange( 0, vertexPerBird * effectController.count );
+					velocityUniforms[ 'separationDistance' ].value = effectController.separation;
+					velocityUniforms[ 'alignmentDistance' ].value = effectController.alignment;
+					velocityUniforms[ 'cohesionDistance' ].value = effectController.cohesion;
+					velocityUniforms[ 'freedomFactor' ].value = effectController.freedom;
+					if ( materialShader ) materialShader.uniforms[ 'size' ].value = effectController.size;
+					BirdGeometry.setDrawRange( 0, indicesPerBird * effectController.count );
 
 				};
 
 				valuesChanger();
 
-				gui.add( effectController, "separation", 0.0, 100.0, 1.0 ).onChange( valuesChanger );
-				gui.add( effectController, "alignment", 0.0, 100, 0.001 ).onChange( valuesChanger );
-				gui.add( effectController, "cohesion", 0.0, 100, 0.025 ).onChange( valuesChanger );
-				gui.add( effectController, "size", 0, 1, 0.01 ).onChange( valuesChanger );
-				gui.add( effectController, "count", 0, BIRDS, 1 ).onChange( valuesChanger );
+				gui.add( effectController, 'separation', 0.0, 100.0, 1.0 ).onChange( valuesChanger );
+				gui.add( effectController, 'alignment', 0.0, 100, 0.001 ).onChange( valuesChanger );
+				gui.add( effectController, 'cohesion', 0.0, 100, 0.025 ).onChange( valuesChanger );
+				gui.add( effectController, 'size', 0, 1, 0.01 ).onChange( valuesChanger );
+				gui.add( effectController, 'count', 0, BIRDS, 1 ).onChange( valuesChanger );
 				gui.close();
 
 				initBirds( effectController );
@@ -432,7 +447,7 @@
 
 				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
-				if ( isSafari() ) {
+				if ( renderer.capabilities.isWebGL2 === false ) {
 
 					gpuCompute.setDataType( THREE.HalfFloatType );
 
@@ -443,8 +458,8 @@
 				fillPositionTexture( dtPosition );
 				fillVelocityTexture( dtVelocity );
 
-				velocityVariable = gpuCompute.addVariable( "textureVelocity", document.getElementById( 'fragmentShaderVelocity' ).textContent, dtVelocity );
-				positionVariable = gpuCompute.addVariable( "texturePosition", document.getElementById( 'fragmentShaderPosition' ).textContent, dtPosition );
+				velocityVariable = gpuCompute.addVariable( 'textureVelocity', document.getElementById( 'fragmentShaderVelocity' ).textContent, dtVelocity );
+				positionVariable = gpuCompute.addVariable( 'texturePosition', document.getElementById( 'fragmentShaderPosition' ).textContent, dtPosition );
 
 				gpuCompute.setVariableDependencies( velocityVariable, [ positionVariable, velocityVariable ] );
 				gpuCompute.setVariableDependencies( positionVariable, [ positionVariable, velocityVariable ] );
@@ -452,16 +467,16 @@
 				positionUniforms = positionVariable.material.uniforms;
 				velocityUniforms = velocityVariable.material.uniforms;
 
-				positionUniforms[ "time" ] = { value: 0.0 };
-				positionUniforms[ "delta" ] = { value: 0.0 };
-				velocityUniforms[ "time" ] = { value: 1.0 };
-				velocityUniforms[ "delta" ] = { value: 0.0 };
-				velocityUniforms[ "testing" ] = { value: 1.0 };
-				velocityUniforms[ "separationDistance" ] = { value: 1.0 };
-				velocityUniforms[ "alignmentDistance" ] = { value: 1.0 };
-				velocityUniforms[ "cohesionDistance" ] = { value: 1.0 };
-				velocityUniforms[ "freedomFactor" ] = { value: 1.0 };
-				velocityUniforms[ "predator" ] = { value: new THREE.Vector3() };
+				positionUniforms[ 'time' ] = { value: 0.0 };
+				positionUniforms[ 'delta' ] = { value: 0.0 };
+				velocityUniforms[ 'time' ] = { value: 1.0 };
+				velocityUniforms[ 'delta' ] = { value: 0.0 };
+				velocityUniforms[ 'testing' ] = { value: 1.0 };
+				velocityUniforms[ 'separationDistance' ] = { value: 1.0 };
+				velocityUniforms[ 'alignmentDistance' ] = { value: 1.0 };
+				velocityUniforms[ 'cohesionDistance' ] = { value: 1.0 };
+				velocityUniforms[ 'freedomFactor' ] = { value: 1.0 };
+				velocityUniforms[ 'predator' ] = { value: new THREE.Vector3() };
 				velocityVariable.material.defines.BOUNDS = BOUNDS.toFixed( 2 );
 
 				velocityVariable.wrapS = THREE.RepeatWrapping;
@@ -476,12 +491,6 @@
 					console.error( error );
 
 				}
-
-			}
-
-			function isSafari() {
-
-				return !! navigator.userAgent.match( /Safari/i ) && ! navigator.userAgent.match( /Chrome/i );
 
 			}
 
@@ -647,22 +656,22 @@
 				if ( delta > 1 ) delta = 1; // safety cap on large deltas
 				last = now;
 
-				positionUniforms[ "time" ].value = now;
-				positionUniforms[ "delta" ].value = delta;
-				velocityUniforms[ "time" ].value = now;
-				velocityUniforms[ "delta" ].value = delta;
-				if ( materialShader ) materialShader.uniforms[ "time" ].value = now / 1000;
-				if ( materialShader ) materialShader.uniforms[ "delta" ].value = delta;
+				positionUniforms[ 'time' ].value = now;
+				positionUniforms[ 'delta' ].value = delta;
+				velocityUniforms[ 'time' ].value = now;
+				velocityUniforms[ 'delta' ].value = delta;
+				if ( materialShader ) materialShader.uniforms[ 'time' ].value = now / 1000;
+				if ( materialShader ) materialShader.uniforms[ 'delta' ].value = delta;
 
-				velocityUniforms[ "predator" ].value.set( 0.5 * mouseX / windowHalfX, - 0.5 * mouseY / windowHalfY, 0 );
+				velocityUniforms[ 'predator' ].value.set( 0.5 * mouseX / windowHalfX, - 0.5 * mouseY / windowHalfY, 0 );
 
 				mouseX = 10000;
 				mouseY = 10000;
 
 				gpuCompute.compute();
 
-				if ( materialShader ) materialShader.uniforms[ "texturePosition" ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
-				if ( materialShader ) materialShader.uniforms[ "textureVelocity" ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
+				if ( materialShader ) materialShader.uniforms[ 'texturePosition' ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
+				if ( materialShader ) materialShader.uniforms[ 'textureVelocity' ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
 
 				renderer.render( scene, camera );
 

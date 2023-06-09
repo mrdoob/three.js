@@ -9,6 +9,7 @@ class ShapeGeometry extends BufferGeometry {
 	constructor( shapes = new Shape( [ new Vector2( 0, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), curveSegments = 12 ) {
 
 		super();
+
 		this.type = 'ShapeGeometry';
 
 		this.parameters = {
@@ -110,7 +111,7 @@ class ShapeGeometry extends BufferGeometry {
 
 			}
 
-			// incides
+			// indices
 
 			for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
@@ -126,6 +127,16 @@ class ShapeGeometry extends BufferGeometry {
 			}
 
 		}
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
 
 	}
 
@@ -181,4 +192,4 @@ function toJSON( shapes, data ) {
 
 }
 
-export { ShapeGeometry, ShapeGeometry as ShapeBufferGeometry };
+export { ShapeGeometry };

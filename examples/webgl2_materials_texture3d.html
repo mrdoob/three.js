@@ -13,18 +13,31 @@
 	</div>
 	<div id="inset"></div>
 
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
+			}
+		}
+	</script>
+
 	<script type="module">
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 
-		import { GUI } from './jsm/libs/lil-gui.module.min.js';
-		import { OrbitControls } from './jsm/controls/OrbitControls.js';
-		import { NRRDLoader } from './jsm/loaders/NRRDLoader.js';
-		import { VolumeRenderShader1 } from './jsm/shaders/VolumeShader.js';
-		import { WEBGL } from './jsm/WebGL.js';
+		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { NRRDLoader } from 'three/addons/loaders/NRRDLoader.js';
+		import { VolumeRenderShader1 } from 'three/addons/shaders/VolumeShader.js';
+		import WebGL from 'three/addons/capabilities/WebGL.js';
 
-		if ( WEBGL.isWebGL2Available() === false ) {
+		if ( WebGL.isWebGL2Available() === false ) {
 
-			document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+			document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
 
 		}
 
@@ -79,17 +92,18 @@
 			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
 
 			// Load the data ...
-			new NRRDLoader().load( "models/nrrd/stent.nrrd", function ( volume ) {
+			new NRRDLoader().load( 'models/nrrd/stent.nrrd', function ( volume ) {
 
 				// Texture to hold the volume. We have scalars, so we put our data in the red channel.
 				// THREEJS will select R32F (33326) based on the THREE.RedFormat and THREE.FloatType.
 				// Also see https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_TYPES_FORMATS_FROM_DOM_ELEMENTS_TABLE
 				// TODO: look the dtype up in the volume metadata
-				const texture = new THREE.DataTexture3D( volume.data, volume.xLength, volume.yLength, volume.zLength );
+				const texture = new THREE.Data3DTexture( volume.data, volume.xLength, volume.yLength, volume.zLength );
 				texture.format = THREE.RedFormat;
 				texture.type = THREE.FloatType;
 				texture.minFilter = texture.magFilter = THREE.LinearFilter;
 				texture.unpackAlignment = 1;
+				texture.needsUpdate = true;
 
 				// Colormap textures
 				cmtextures = {
@@ -102,12 +116,12 @@
 
 				const uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniforms[ "u_data" ].value = texture;
-				uniforms[ "u_size" ].value.set( volume.xLength, volume.yLength, volume.zLength );
-				uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
-				uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
-				uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
-				uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
+				uniforms[ 'u_data' ].value = texture;
+				uniforms[ 'u_size' ].value.set( volume.xLength, volume.yLength, volume.zLength );
+				uniforms[ 'u_clim' ].value.set( volconfig.clim1, volconfig.clim2 );
+				uniforms[ 'u_renderstyle' ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
+				uniforms[ 'u_renderthreshold' ].value = volconfig.isothreshold; // For ISO renderstyle
+				uniforms[ 'u_cmdata' ].value = cmtextures[ volconfig.colormap ];
 
 				material = new THREE.ShaderMaterial( {
 					uniforms: uniforms,
@@ -133,10 +147,10 @@
 
 		function updateUniforms() {
 
-			material.uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
-			material.uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
-			material.uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
-			material.uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
+			material.uniforms[ 'u_clim' ].value.set( volconfig.clim1, volconfig.clim2 );
+			material.uniforms[ 'u_renderstyle' ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
+			material.uniforms[ 'u_renderthreshold' ].value = volconfig.isothreshold; // For ISO renderstyle
+			material.uniforms[ 'u_cmdata' ].value = cmtextures[ volconfig.colormap ];
 
 			render();
 

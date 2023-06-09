@@ -1,21 +1,13 @@
 import { Material } from './Material.js';
 import { Color } from '../math/Color.js';
 
-/**
- * parameters = {
- *  color: <hex>,
- *  map: new THREE.Texture( <Image> ),
- *  alphaMap: new THREE.Texture( <Image> ),
- *  rotation: <float>,
- *  sizeAttenuation: <bool>
- * }
- */
-
 class SpriteMaterial extends Material {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.isSpriteMaterial = true;
 
 		this.type = 'SpriteMaterial';
 
@@ -30,6 +22,8 @@ class SpriteMaterial extends Material {
 		this.sizeAttenuation = true;
 
 		this.transparent = true;
+
+		this.fog = true;
 
 		this.setValues( parameters );
 
@@ -49,12 +43,12 @@ class SpriteMaterial extends Material {
 
 		this.sizeAttenuation = source.sizeAttenuation;
 
+		this.fog = source.fog;
+
 		return this;
 
 	}
 
 }
-
-SpriteMaterial.prototype.isSpriteMaterial = true;
 
 export { SpriteMaterial };

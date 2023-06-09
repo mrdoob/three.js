@@ -1,7 +1,7 @@
 import {
 	ShaderMaterial,
 	UniformsUtils
-} from '../../../build/three.module.js';
+} from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { FilmShader } from '../shaders/FilmShader.js';
 
@@ -11,14 +11,13 @@ class FilmPass extends Pass {
 
 		super();
 
-		if ( FilmShader === undefined ) console.error( 'THREE.FilmPass relies on FilmShader' );
-
 		const shader = FilmShader;
 
 		this.uniforms = UniformsUtils.clone( shader.uniforms );
 
 		this.material = new ShaderMaterial( {
 
+			name: shader.name,
 			uniforms: this.uniforms,
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader
@@ -51,6 +50,14 @@ class FilmPass extends Pass {
 			this.fsQuad.render( renderer );
 
 		}
+
+	}
+
+	dispose() {
+
+		this.material.dispose();
+
+		this.fsQuad.dispose();
 
 	}
 

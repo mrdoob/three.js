@@ -1,10 +1,11 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { Config } from './Config.js';
 import { Loader } from './Loader.js';
 import { History as _History } from './History.js';
 import { Strings } from './Strings.js';
 import { Storage as _Storage } from './Storage.js';
+import { Selector } from './Viewport.Selector.js';
 
 var _DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
 _DEFAULT_CAMERA.name = 'Camera';
@@ -13,7 +14,7 @@ _DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
 
 function Editor() {
 
-	var Signal = signals.Signal;
+	const Signal = signals.Signal; // eslint-disable-line no-undef
 
 	this.signals = {
 
@@ -85,8 +86,9 @@ function Editor() {
 		historyChanged: new Signal(),
 
 		viewportCameraChanged: new Signal(),
+		viewportShadingChanged: new Signal(),
 
-		animationStopped: new Signal()
+		intersectionsDetected: new Signal(),
 
 	};
 
@@ -94,6 +96,7 @@ function Editor() {
 	this.history = new _History( this );
 	this.storage = new _Storage();
 	this.strings = new Strings( this.config );
+	this.selector = new Selector( this );
 
 	this.loader = new Loader( this );
 
@@ -118,7 +121,9 @@ function Editor() {
 	this.helpers = {};
 
 	this.cameras = {};
+
 	this.viewportCamera = this.camera;
+	this.viewportShading = 'default';
 
 	this.addCamera( this.camera );
 
@@ -134,6 +139,8 @@ Editor.prototype = {
 		this.scene.background = scene.background;
 		this.scene.environment = scene.environment;
 		this.scene.fog = scene.fog;
+		this.scene.backgroundBlurriness = scene.backgroundBlurriness;
+		this.scene.backgroundIntensity = scene.backgroundIntensity;
 
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
@@ -424,6 +431,10 @@ Editor.prototype = {
 
 					helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
 
+				} else if ( object.isBone === true && object.parent?.isBone !== true ) {
+
+					helper = new THREE.SkeletonHelper( object );
+
 				} else {
 
 					// no helper for this object type
@@ -431,7 +442,7 @@ Editor.prototype = {
 
 				}
 
-				var picker = new THREE.Mesh( geometry, material );
+				const picker = new THREE.Mesh( geometry, material );
 				picker.name = 'picker';
 				picker.userData.object = object;
 				helper.add( picker );
@@ -529,24 +540,18 @@ Editor.prototype = {
 
 	},
 
+	setViewportShading: function( value ) {
+
+		this.viewportShading = value;
+		this.signals.viewportShadingChanged.dispatch();
+
+	},
+
 	//
 
 	select: function ( object ) {
 
-		if ( this.selected === object ) return;
-
-		var uuid = null;
-
-		if ( object !== null ) {
-
-			uuid = object.uuid;
-
-		}
-
-		this.selected = object;
-
-		this.config.setKey( 'selected', uuid );
-		this.signals.objectSelected.dispatch( object );
+		this.selector.select( object );
 
 	},
 
@@ -581,7 +586,7 @@ Editor.prototype = {
 
 	deselect: function () {
 
-		this.select( null );
+		this.selector.deselect();
 
 	},
 
@@ -684,11 +689,11 @@ Editor.prototype = {
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				shadowType: this.config.getKey( 'project/renderer/shadowType' ),
 				vr: this.config.getKey( 'project/vr' ),
-				physicallyCorrectLights: this.config.getKey( 'project/renderer/physicallyCorrectLights' ),
+				useLegacyLights: this.config.getKey( 'project/renderer/useLegacyLights' ),
 				toneMapping: this.config.getKey( 'project/renderer/toneMapping' ),
 				toneMappingExposure: this.config.getKey( 'project/renderer/toneMappingExposure' )
 			},
-			camera: this.camera.toJSON(),
+			camera: this.viewportCamera.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
 			history: this.history.toJSON()

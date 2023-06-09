@@ -7,6 +7,8 @@ class ImageBitmapLoader extends Loader {
 
 		super( manager );
 
+		this.isImageBitmapLoader = true;
+
 		if ( typeof createImageBitmap === 'undefined' ) {
 
 			console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
@@ -93,7 +95,5 @@ class ImageBitmapLoader extends Loader {
 	}
 
 }
-
-ImageBitmapLoader.prototype.isImageBitmapLoader = true;
 
 export { ImageBitmapLoader };

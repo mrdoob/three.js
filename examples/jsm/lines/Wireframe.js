@@ -3,7 +3,7 @@ import {
 	InterleavedBufferAttribute,
 	Mesh,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
 import { LineMaterial } from '../lines/LineMaterial.js';
 
@@ -16,11 +16,13 @@ class Wireframe extends Mesh {
 
 		super( geometry, material );
 
+		this.isWireframe = true;
+
 		this.type = 'Wireframe';
 
 	}
 
-	// for backwards-compatability, but could be a method of LineSegmentsGeometry...
+	// for backwards-compatibility, but could be a method of LineSegmentsGeometry...
 
 	computeLineDistances() {
 
@@ -50,7 +52,5 @@ class Wireframe extends Mesh {
 	}
 
 }
-
-Wireframe.prototype.isWireframe = true;
 
 export { Wireframe };

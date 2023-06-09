@@ -1,0 +1,164 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>のレンダーターゲット</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – のレンダーターゲット">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>のレンダーターゲット</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>レンダーターゲットとはレンダリングする先のテクスチャです。一度レンダリングすればテクスチャのように使うことができます。</p>
+<p>簡単な例を作ってみましょう。<a href="responsive.html">レスポンシブデザインの記事</a>にある例を試してみましょう。</p>
+<p>レンダーターゲットへのレンダリングは通常のレンダリングとほぼ同じです。まず<a href="/docs/#api/ja/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>を作ります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtWidth = 512;
+const rtHeight = 512;
+const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
+</pre>
+<p><a href="/docs/#api/ja/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a>と<a href="/docs/#api/ja/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>を作ります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtFov = 75;
+const rtAspect = rtWidth / rtHeight;
+const rtNear = 0.1;
+const rtFar = 5;
+const rtCamera = new THREE.PerspectiveCamera(rtFov, rtAspect, rtNear, rtFar);
+rtCamera.position.z = 2;
+
+const rtScene = new THREE.Scene();
+rtScene.background = new THREE.Color('red');
+</pre>
+<p>アスペクトをキャンバスのアスペクトではなくレンダーターゲットのアスペクトに設定したことに注意してください。レンダリング先のアスペクトに合わせるのが正解です。この例では立方体の側面につかうテクスチャにレンダリング先にします。立方体の側面ば正方形なのでアスペクトは1.0です。</p>
+<p>いろいろ入れてみましょう。この例ではライトと３つの立方体を<a href="responsive.html">この前の記事</a>から使います。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const color = 0xFFFFFF;
+  const intensity = 1;
+  const light = new THREE.DirectionalLight(color, intensity);
+  light.position.set(-1, 2, 4);
+*  rtScene.add(light);
+}
+
+const boxWidth = 1;
+const boxHeight = 1;
+const boxDepth = 1;
+const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+
+function makeInstance(geometry, color, x) {
+  const material = new THREE.MeshPhongMaterial({color});
+
+  const cube = new THREE.Mesh(geometry, material);
+*  rtScene.add(cube);
+
+  cube.position.x = x;
+
+  return cube;
+}
+
+*const rtCubes = [
+  makeInstance(geometry, 0x44aa88,  0),
+  makeInstance(geometry, 0x8844aa, -2),
+  makeInstance(geometry, 0xaa8844,  2),
+];
+</pre>
+<p>前の記事の<a href="/docs/#api/ja/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>と<a href="/docs/#api/ja/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a>はそのままにしてあります。これらをキャンバスにレンダリングするために使います。空の空間をレンダリングしても意味がないのでとりあえず入れてあります。</p>
+<p>レンダーターゲットとなるテクスチャを貼る立方体をシーンに追加します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
+  map: renderTarget.texture,
+});
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+</pre>
+<p>このシーンをレンダーターゲットにレンダリングします。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  ...
+
+  // rotate all the cubes in the render target scene
+  rtCubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+    const rot = time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  // draw render target scene to render target
+  renderer.setRenderTarget(renderTarget);
+  renderer.render(rtScene, rtCamera);
+  renderer.setRenderTarget(null);
+</pre>
+<p>次にレンダーターゲットのテクスチャが貼られている立方体を追加したシーンをキャンバスにレンダリングします。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  // rotate the cube in the scene
+  cube.rotation.x = time;
+  cube.rotation.y = time * 1.1;
+
+  // render the scene to the canvas
+  renderer.render(scene, camera);
+</pre>
+<p>見てください！</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-target.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/render-target.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>立方体が赤いのはレンダーターゲットのテクスチャとしてレンダリングした<code class="notranslate" translate="no">rtScene</code>の<code class="notranslate" translate="no">background</code>を赤でクリアーしたからです。</p>
+<p>レンダーターゲットは色々な使い方ができます。<a href="shadows.html">シャドウ</a>もレンダーターゲットを使います。<a href="picking.html">ピッキング</a>もレンダーターゲットを使います。<a href="post-processing.html">ポストプロセッシング効果</a>もレンダーターゲットを使います。車のミラーを再現するために車の背後をレンダリングしたテクスチャを利用できますし、３Dゲームに出てくる監視モニターにも使うことができます。</p>
+<p><a href="/docs/#api/ja/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>を使う時にはいくつか注意点があります。</p>
+<ul>
+<li><p>デフォルトで<a href="/docs/#api/ja/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>は２つのテクスチャを作ります。</p>
+<p>  color textureとdepth (stencil) textureです。もし後者のテクスチャが必要なければオプションでオフにできます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const rt = new THREE.WebGLRenderTarget(width, height, {
+    depthBuffer: false,
+    stencilBuffer: false,
+  });
+</pre>
+</li>
+<li><p>レンダーテクスチャのサイズを変更する必要があるかもしれません</p>
+<p>上の例では512 x 512のサイズのレンダーテクスチャを作りました。通常はポストプロセッシングにおいてキャンバスと同じサイズのレンダーターゲットが必要になります。つまりキャンバスのサイズを変えたら同時にレンダーターゲットとレンダーターゲットに使うカメラのサイズも一緒に変える必要があります。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+
++    renderTarget.setSize(canvas.width, canvas.height);
++    rtCamera.aspect = camera.aspect;
++    rtCamera.updateProjectionMatrix();
+}
+</pre></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

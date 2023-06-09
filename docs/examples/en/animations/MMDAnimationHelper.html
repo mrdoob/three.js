@@ -9,10 +9,21 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc"> A animation helper for <a href="https://sites.google.com/view/evpvp/"><em>MMD</em></a> resources. <br /><br />
+		<p class="desc"> A animation helper for <a href="https://sites.google.com/view/evpvp/">`MMD`</a> resources. <br /><br />
 		[name] handles animation of MMD assets loaded by [page:MMDLoader] with MMD special features as IK, Grant, and Physics.
 		It uses [page:CCDIKSolver] and [page:MMDPhysics] inside.
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -73,6 +84,7 @@
 		<h3>[name]( [param:Object params] )</h3>
 		<p>
 		[page:Object params] — (optional)<br />
+		</p>
 		<ul>
 			<li> [page:Boolean sync] - Whether animation durations of added objects are synched. Default is true.</li>
 			<li> [page:Number afterglow] - Default is 0.0.</li>
@@ -80,7 +92,6 @@
 			<li> [page:Boolean pmxAnimation] - If it is set to true, the helper follows the complex and costly PMX animation system.
 			Try this option only if your PMX model animation doesn't work well. Default is false.</li>
 		</ul>
-		</p>
 		<p>
 		Creates a new [name].
 		</p>
@@ -108,6 +119,7 @@
 		<p>
 		[page:Object3D object] — [page:SkinnedMesh], [page:Camera], or [page:Audio]<br />
 		[page:Object params] — (optional)<br />
+		</p>
 		<ul>
 			<li>[page:AnimationClip animation] - an [page:AnimationClip] or an array of [page:AnimationClip] set to object. Only for [page:SkinnedMesh] and [page:Camera]. Default is undefined.</li>
 			<li>[page:Boolean physics] - Only for [page:SkinnedMesh]. A flag whether turn on physics. Default is true.</li>
@@ -117,7 +129,6 @@
 			<li>[page:Vector3 gravity] - Only for [page:SkinnedMesh] and physics is true. Physics parameter. Default is ( 0, - 9.8 * 10, 0 ).</li>
 			<li>[page:Number delayTime] - Only for [page:Audio]. Default is 0.0.</li>
 		</ul>
-		</p>
 		<p>
 		Add an [page:SkinnedMesh], [page:Camera], or [page:Audio] to helper and setup animation. The anmation durations of added objects are synched.
 		If camera/audio has already been added, it'll be replaced with a new one.
@@ -137,12 +148,12 @@
 		[page:SkinnedMesh mesh] — [page:SkinnedMesh] which changes the posing. It doesn't need to be added to helper.<br />
 		[page:Object vpd] — VPD content obtained by [page:MMDLoader].loadVPD<br />
 		[page:Object params] — (optional)<br />
+		</p>
 		<ul>
 			<li>[page:Boolean resetPose] - Default is true.</li>
 			<li>[page:Boolean ik] - Default is true.</li>
 			<li>[page:Boolean grant] - Default is true.</li>
 		</ul>
-		</p>
 		<p>
 		Changes the posing of [page:SkinnedMesh] as VPD content specifies.
 		</p>

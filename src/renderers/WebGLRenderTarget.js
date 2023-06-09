@@ -1,7 +1,9 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
 import { Texture } from '../textures/Texture.js';
-import { LinearFilter } from '../constants.js';
+import { LinearFilter, NoColorSpace, SRGBColorSpace, sRGBEncoding } from '../constants.js';
 import { Vector4 } from '../math/Vector4.js';
+import { Source } from '../textures/Source.js';
+import { warnOnce } from '../utils.js';
 
 /*
  In options, we can specify:
@@ -10,9 +12,11 @@ import { Vector4 } from '../math/Vector4.js';
 */
 class WebGLRenderTarget extends EventDispatcher {
 
-	constructor( width, height, options = {} ) {
+	constructor( width = 1, height = 1, options = {} ) {
 
 		super();
+
+		this.isWebGLRenderTarget = true;
 
 		this.width = width;
 		this.height = height;
@@ -23,30 +27,30 @@ class WebGLRenderTarget extends EventDispatcher {
 
 		this.viewport = new Vector4( 0, 0, width, height );
 
-		this.texture = new Texture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+		const image = { width: width, height: height, depth: 1 };
+
+		if ( options.encoding !== undefined ) {
+
+			// @deprecated, r152
+			warnOnce( 'THREE.WebGLRenderTarget: option.encoding has been replaced by option.colorSpace.' );
+			options.colorSpace = options.encoding === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
+
+		}
+
+		this.texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
 		this.texture.isRenderTargetTexture = true;
 
-		this.texture.image = { width: width, height: height, depth: 1 };
-
+		this.texture.flipY = false;
 		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
 		this.texture.internalFormat = options.internalFormat !== undefined ? options.internalFormat : null;
 		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
 
 		this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
+
 		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
-	}
-
-	setTexture( texture ) {
-
-		texture.image = {
-			width: this.width,
-			height: this.height,
-			depth: this.depth
-		};
-
-		this.texture = texture;
+		this.samples = options.samples !== undefined ? options.samples : 0;
 
 	}
 
@@ -83,14 +87,25 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.height = source.height;
 		this.depth = source.depth;
 
+		this.scissor.copy( source.scissor );
+		this.scissorTest = source.scissorTest;
+
 		this.viewport.copy( source.viewport );
 
 		this.texture = source.texture.clone();
-		this.texture.image = { ...this.texture.image }; // See #20328.
+		this.texture.isRenderTargetTexture = true;
+
+		// ensure image object is not shared, see #20328
+
+		const image = Object.assign( {}, source.texture.image );
+		this.texture.source = new Source( image );
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
-		this.depthTexture = source.depthTexture;
+
+		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
+
+		this.samples = source.samples;
 
 		return this;
 
@@ -103,7 +118,5 @@ class WebGLRenderTarget extends EventDispatcher {
 	}
 
 }
-
-WebGLRenderTarget.prototype.isWebGLRenderTarget = true;
 
 export { WebGLRenderTarget };

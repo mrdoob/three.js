@@ -31,8 +31,18 @@
 
 		To use this, as with all files in the /examples directory, you will have to
 		include the file separately in your HTML.
-
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -123,7 +133,7 @@
 
 		<h3>[property:Boolean enabled]</h3>
 		<p>
-			When set to *false*, the controls will not respond to user input. Default is *true*.
+			When set to `false`, the controls will not respond to user input. Default is `true`.
 		</p>
 
 		<h3>[property:Boolean enableAnimations]</h3>
@@ -252,11 +262,6 @@
 			Keyboard modifiers can be specified as 'CTRL', 'SHIFT' or null if not needed.
 		</p>
 
-		<h3>[method:undefined setTarget] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
-		<p>
-			Set the trackball center point.
-		</p>
-
 		<h3>[method:Boolean unsetMouseAction] ( mouse, key )</h3>
 		<p>
 			Removes a mouse action by specifying its mouse/key combination.<br><br>
@@ -280,7 +285,7 @@
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js examples/jsm/controls/ArcballControls.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/ArcballControls.js examples/jsm/controls/ArcballControls.js]
 		</p>
 	</body>
 </html>

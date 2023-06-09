@@ -68,11 +68,24 @@
 
 		</script>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let scene, camera, renderer;
 			let geometry, mesh, material;
@@ -123,14 +136,14 @@
 
 					uniforms: {
 
-						"map": { value: texture },
-						"width": { value: width },
-						"height": { value: height },
-						"nearClipping": { value: nearClipping },
-						"farClipping": { value: farClipping },
+						'map': { value: texture },
+						'width': { value: width },
+						'height': { value: height },
+						'nearClipping': { value: nearClipping },
+						'farClipping': { value: farClipping },
 
-						"pointSize": { value: 2 },
-						"zOffset": { value: 1000 }
+						'pointSize': { value: 2 },
+						'zOffset': { value: 1000 }
 
 					},
 					vertexShader: document.getElementById( 'vs' ).textContent,

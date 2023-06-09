@@ -1,7 +1,8 @@
 import {
 	Triangle,
+	Vector2,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * Utility class for sampling weighted random points on the surface of a mesh.
@@ -16,18 +17,13 @@ import {
 
 const _face = new Triangle();
 const _color = new Vector3();
+const _uva = new Vector2(), _uvb = new Vector2(), _uvc = new Vector2();
 
 class MeshSurfaceSampler {
 
 	constructor( mesh ) {
 
 		let geometry = mesh.geometry;
-
-		if ( ! geometry.isBufferGeometry || geometry.attributes.position.itemSize !== 3 ) {
-
-			throw new Error( 'THREE.MeshSurfaceSampler: Requires BufferGeometry triangle mesh.' );
-
-		}
 
 		if ( geometry.index ) {
 
@@ -42,6 +38,7 @@ class MeshSurfaceSampler {
 
 		this.positionAttribute = this.geometry.getAttribute( 'position' );
 		this.colorAttribute = this.geometry.getAttribute( 'color' );
+		this.uvAttribute = this.geometry.getAttribute( 'uv' );
 		this.weightAttribute = null;
 
 		this.distribution = null;
@@ -112,13 +109,17 @@ class MeshSurfaceSampler {
 
 	}
 
-	sample( targetPosition, targetNormal, targetColor ) {
+	sample( targetPosition, targetNormal, targetColor, targetUV ) {
+
+		const faceIndex = this.sampleFaceIndex();
+		return this.sampleFace( faceIndex, targetPosition, targetNormal, targetColor, targetUV );
+
+	}
+
+	sampleFaceIndex() {
 
 		const cumulativeTotal = this.distribution[ this.distribution.length - 1 ];
-
-		const faceIndex = this.binarySearch( this.randomFunction() * cumulativeTotal );
-
-		return this.sampleFace( faceIndex, targetPosition, targetNormal, targetColor );
+		return this.binarySearch( this.randomFunction() * cumulativeTotal );
 
 	}
 
@@ -156,7 +157,7 @@ class MeshSurfaceSampler {
 
 	}
 
-	sampleFace( faceIndex, targetPosition, targetNormal, targetColor ) {
+	sampleFace( faceIndex, targetPosition, targetNormal, targetColor, targetUV ) {
 
 		let u = this.randomFunction();
 		let v = this.randomFunction();
@@ -199,6 +200,15 @@ class MeshSurfaceSampler {
 			targetColor.r = _color.x;
 			targetColor.g = _color.y;
 			targetColor.b = _color.z;
+
+		}
+
+		if ( targetUV !== undefined && this.uvAttribute !== undefined ) {
+
+			_uva.fromBufferAttribute( this.uvAttribute, faceIndex * 3 );
+			_uvb.fromBufferAttribute( this.uvAttribute, faceIndex * 3 + 1 );
+			_uvc.fromBufferAttribute( this.uvAttribute, faceIndex * 3 + 2 );
+			targetUV.set( 0, 0 ).addScaledVector( _uva, u ).addScaledVector( _uvb, v ).addScaledVector( _uvc, 1 - ( u + v ) );
 
 		}
 

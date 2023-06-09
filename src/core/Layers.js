@@ -8,7 +8,7 @@ class Layers {
 
 	set( channel ) {
 
-		this.mask = 1 << channel | 0;
+		this.mask = ( 1 << channel | 0 ) >>> 0;
 
 	}
 

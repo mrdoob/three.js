@@ -6,6 +6,8 @@ class Box2 {
 
 	constructor( min = new Vector2( + Infinity, + Infinity ), max = new Vector2( - Infinity, - Infinity ) ) {
 
+		this.isBox2 = true;
+
 		this.min = min;
 		this.max = max;
 
@@ -158,8 +160,7 @@ class Box2 {
 
 	distanceToPoint( point ) {
 
-		const clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
-		return clampedPoint.sub( point ).length();
+		return this.clampPoint( point, _vector ).distanceTo( point );
 
 	}
 
@@ -167,6 +168,8 @@ class Box2 {
 
 		this.min.max( box.min );
 		this.max.min( box.max );
+
+		if ( this.isEmpty() ) this.makeEmpty();
 
 		return this;
 
@@ -197,7 +200,5 @@ class Box2 {
 	}
 
 }
-
-Box2.prototype.isBox2 = true;
 
 export { Box2 };

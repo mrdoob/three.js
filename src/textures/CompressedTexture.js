@@ -2,9 +2,11 @@ import { Texture } from './Texture.js';
 
 class CompressedTexture extends Texture {
 
-	constructor( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+	constructor( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, colorSpace ) {
 
-		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace );
+
+		this.isCompressedTexture = true;
 
 		this.image = { width: width, height: height };
 		this.mipmaps = mipmaps;
@@ -22,7 +24,5 @@ class CompressedTexture extends Texture {
 	}
 
 }
-
-CompressedTexture.prototype.isCompressedTexture = true;
 
 export { CompressedTexture };

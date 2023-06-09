@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Um KeyframeTrack é uma sequência cronometrada de [link:https://en.wikipedia.org/wiki/Key_frame keyframes],
+			que são compostos de listas de tempos e valores relacionados, e que são usados ​​para animar uma
+			propriedade específica de um objeto.
+		</p>
+
+		<p>
+			Para obter uma visão geral dos diferentes elementos do sistema de animação three.js, consulte o
+			artigo "Sistema de animação" na seção "Próximos Passos" do manual.
+		</p>
+
+		<p>
+			Em contraste com a hierarquia de animação do
+			[link:https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3 JSON model format] uma
+			`KeyframeTrack` não armazena seus keyframes únicos como objetos em um array de "chaves" (mantendo os
+			tempos e os valores de cada frame juntos em um só lugar).
+		</p>
+
+		<p>
+			Em vez disso, há sempre dois arrays em um `KeyframeTrack`: o array [page:.times times]
+			armazena os valores de tempo para todos os keyframes desta track em ordem sequencial, e o 
+			array [page:.values values] contém os valores alterados correspondentes da propriedade animada.
+		</p>
+
+		<p>
+			Um único valor, pertencente a um determinado ponto do tempo, pode não ser apenas um simples número, mas (por
+			exemplo) um vetor (se uma posição for animada) ou um quaternion (se uma rotação for animada). Por
+			isso o array de valores (que também é um array plano) pode ser três ou quatro vezes maior que 
+			o array de tempo.
+		</p>
+
+		<p>
+			Correspondendo aos diferentes tipos possíveis de valores animados existem várias subclasses de
+			`KeyframeTrack`, herdando a maioria das propriedades e métodos:
+		</p>
+
+		<ul>
+			<li>[page:BooleanKeyframeTrack]</li>
+			<li>[page:ColorKeyframeTrack]</li>
+			<li>[page:NumberKeyframeTrack]</li>
+			<li>[page:QuaternionKeyframeTrack]</li>
+			<li>[page:StringKeyframeTrack]</li>
+			<li>[page:VectorKeyframeTrack]</li>
+		</ul>
+
+		<p>
+			Alguns exemplos de como criar manualmente [page:AnimationClip AnimationClips] com diferentes tipos de 
+			KeyframeTracks pode ser encontrado no arquivo [link:https://threejs.org/examples/jsm/animation/AnimationClipCreator.js AnimationClipCreator].
+		</p>
+
+		<p>
+			Como os valores explícitos são especificados apenas para os pontos discretos de tempo armazenados no array de tempo,
+			todos os valores intermediários devem ser interpolados.
+		</p>
+
+		<p>
+			O nome da track é importante para a conexão desta track com uma propriedade específica do
+			nó animado (feito por [page:PropertyBinding]).
+		</p>
+
+
+		<h2>Construtor</h2>
+
+
+		<h3>[name]( [param:String name], [param:Array times], [param:Array values], [param:Constant interpolation] )</h3>
+		<p>
+			[page:String name] - o identificador do `KeyframeTrack`.<br />
+			[page:Array times] - um array de keyframes, convertidos internamente para um
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array].<br />
+			[page:Array values] - um array com os valores relacionados ao array times, convertidos internamente para um
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array].<br />
+			[page:Constant interpolation] - o tipo de interpolação a ser usado. Ver
+			[page:Animation Animation Constants] para valores possíveis. O padrão é [page:Animation InterpolateLinear].
+		</p>
+
+
+		<h2>Propriedades</h2>
+
+
+		<h3>[property:String name]</h3>
+		<p>
+			O nome da track pode se referir a morph targets ou [page:SkinnedMesh bones] ou possivelmente outros valores dentro de um objeto animado. Ver 
+			[page:PropertyBinding.parseTrackName] para as formas de strings que podem ser analisadas para propriedades
+			vinculativas:
+		</p>
+
+		<p>
+			O nome pode especificar o nó usando seu nome ou seu uuid (embora precise estar na
+			subárvore do nó do grafo de cena passado para o mixer). Ou, se o nome da track começar com um ponto,
+			a track se aplica ao nó raiz que foi passado para o mixer.
+		</p>
+
+		<p>
+			Normalmente, após o nó, uma propriedade será especificada diretamente. Mas você também pode especificar um
+			subpropriedade, como .rotation[x], se você quiser apenas direcionar o componente X da rotação
+			através de uma track flutuante.
+		</p>
+
+		<p>
+			Você também pode especificar bones ou multimateriais usando um nome de objeto, por exemplo:
+			.bones[R_hand].scale; o canal vermelho da cor difusa do quarto material em um
+			array de materiais - como um exemplo - pode ser acessado com .materials[3].diffuse[r].
+		</p>
+
+		<p>
+			PropertyBinding também resolverá nomes de morph targets, por exemplo: .morphTargetInfluences[run].
+		</p>
+
+		<p>
+			Nota: o nome da track não precisa necessariamente ser único. Várias tracks podem conduzir a mesma
+			propriedade. O resultado deve ser baseado em uma mistura ponderada entre as várias tracks de acordo com
+			os pesos de suas respectivas ações.
+		</p>
+
+		<h3>[property:Float32Array times]</h3>
+		<p>
+			Um [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
+			convertido do array de tempos que é passado no construtor.
+		</p>
+
+		<h3>[property:Float32Array values]</h3>
+		<p>
+			Um [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
+			convertido do array de valores que é passada no construtor.
+		</p>
+
+		<h3>[property:Constant DefaultInterpolation]</h3>
+		<p>
+			O tipo de interpolação padrão: [page:Animation InterpolateLinear].
+		</p>
+
+		<h3>[property:Constant TimeBufferType ]</h3>
+		<p>
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
+			o tipo de buffer usado internamente para os tempos.
+		</p>
+
+		<h3>[property:Constant ValueBufferType ]</h3>
+		<p>
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
+			o tipo de buffer usado internamente para os valores.
+		</p>
+
+
+		<h2>Métodos</h2>
+
+
+		<h3>[method:KeyframeTrack clone]()</h3>
+		<p>
+			Retorna uma cópia desta track.
+		</p>
+
+		<h3>[method:Interpolant createInterpolant]()</h3>
+		<p>
+			Cria um [page:LinearInterpolant LinearInterpolant], [page:CubicInterpolant CubicInterpolant]
+			ou [page:DiscreteInterpolant DiscreteInterpolant], dependendo do valor do parâmetro interpolação
+ 			passado no construtor.
+		</p>
+
+		<h3>[method:Interpolant getInterpolation]()</h3>
+		<p>
+			Retorna o tipo da interpolação.
+		</p>
+
+		<h3>[method:Number getValueSize]()</h3>
+		<p>
+			Retorna o tamanho de cada valor (que é o comprimento do array [page:.values values] dividido
+			pelo comprimento do array [page:.times times]).
+		</p>
+
+		<h3>[method:DiscreteInterpolant InterpolantFactoryMethodDiscrete]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<p>
+			Cria uma nova [page:DiscreteInterpolant DiscreteInterpolant] a partir do
+			[page:KeyframeTrack.times times] e [page:KeyframeTrack.times values]. Um Float32Array pode ser
+			passado e receberá os resultados. Caso contrário, um novo array com o tamanho apropriado será
+			criado automaticamente.
+		</p>
+
+		<h3>[method:LinearInterpolant InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<p>
+			Cria uma nova [page:LinearInterpolant LinearInterpolant] a partir do
+			[page:KeyframeTrack.times times] e [page:KeyframeTrack.times values]. Um Float32Array pode ser
+			passado e receberá os resultados. Caso contrário, um novo array com o tamanho apropriado será
+			criado automaticamente.
+		</p>
+
+		<h3>[method:CubicInterpolant InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<p>
+			Cria uma nova [page:CubicInterpolant CubicInterpolant] a partir do
+			[page:KeyframeTrack.times times] e [page:KeyframeTrack.times values]. Um Float32Array pode ser
+			passado e receberá os resultados. Caso contrário, um novo array com o tamanho apropriado será
+			criado automaticamente.
+		</p>
+
+		<h3>[method:this optimize]()</h3>
+		<p>
+			Remove chaves sequenciais equivalentes, que são comuns em morph targets.
+		</p>
+
+		<h3>[method:this scale]()</h3>
+		<p>
+			Dimensiona todos os tempos de keyframe por um fator.<br /><br />
+
+			Nota: Isso é útil, por exemplo, para conversões para uma determinada taxa de quadros por segundo (como
+			é feito internamente por
+			[page:AnimationClip.CreateFromMorphTargetSequence animationClip.CreateFromMorphTargetSequence]).
+		</p>
+
+		<h3>[method:this setInterpolation]( [param:Constant interpolationType] )</h3>
+		<p>
+			Define o tipo de interpolação. Veja [page:Animation Animation Constants] para opções.
+		</p>
+
+		<h3>[method:this shift]( [param:Number timeOffsetInSeconds] )</h3>
+		<p>
+			Move todos os keyframes para frente ou para trás no tempo.
+		</p>
+
+		<h3>[method:this trim]( [param:Number startTimeInSeconds], [param:Number endTimeInSeconds] )</h3>
+		<p>
+			Remove keyframes antes de `startTime` e depois de `endTime`,
+			sem alterar nenhum valor dentro do intervalo [`startTime`, `endTime`].
+		</p>
+
+		<h3>[method:Boolean validate]()</h3>
+		<p>
+			Executa validação mínima nas tracks. Retorna verdadeiro se válido.
+		</p>
+
+		<p>
+			Este método registra erros no console se uma track estiver vazia, se o [page:.valueSize value size] não for
+			válido, se um item no array [page:.times times] ou [page:.values values]
+			não for um número válido ou se os itens no array `times` estiverem fora de ordem.
+		</p>
+
+		<h2>Métodos Estáticos</h2>
+
+		<h3>[method:JSON toJSON]( [param:KeyframeTrack track] )</h3>
+		<p>
+			Converte a track para JSON.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

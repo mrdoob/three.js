@@ -14,14 +14,27 @@
 			by <a href="https://twitter.com/fernandojsg">fernandojsg</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let group;
 			let container, stats;
@@ -54,20 +67,20 @@
 
 				const gui = new GUI();
 
-				gui.add( effectController, "showDots" ).onChange( function ( value ) {
+				gui.add( effectController, 'showDots' ).onChange( function ( value ) {
 
 					pointCloud.visible = value;
 
 				} );
-				gui.add( effectController, "showLines" ).onChange( function ( value ) {
+				gui.add( effectController, 'showLines' ).onChange( function ( value ) {
 
 					linesMesh.visible = value;
 
 				} );
-				gui.add( effectController, "minDistance", 10, 300 );
-				gui.add( effectController, "limitConnections" );
-				gui.add( effectController, "maxConnections", 0, 30, 1 );
-				gui.add( effectController, "particleCount", 0, maxParticleCount, 1 ).onChange( function ( value ) {
+				gui.add( effectController, 'minDistance', 10, 300 );
+				gui.add( effectController, 'limitConnections' );
+				gui.add( effectController, 'maxConnections', 0, 30, 1 );
+				gui.add( effectController, 'particleCount', 0, maxParticleCount, 1 ).onChange( function ( value ) {
 
 					particleCount = parseInt( value );
 					particles.setDrawRange( 0, particleCount );
@@ -96,7 +109,7 @@
 				scene.add( group );
 
 				const helper = new THREE.BoxHelper( new THREE.Mesh( new THREE.BoxGeometry( r, r, r ) ) );
-				helper.material.color.setHex( 0x101010 );
+				helper.material.color.setHex( 0x474747 );
 				helper.material.blending = THREE.AdditiveBlending;
 				helper.material.transparent = true;
 				group.add( helper );
@@ -165,7 +178,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				container.appendChild( renderer.domElement );
 

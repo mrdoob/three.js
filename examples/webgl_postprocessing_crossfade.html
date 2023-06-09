@@ -15,13 +15,26 @@
 
 		<div id="container"></div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { TWEEN } from './jsm/libs/tween.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import TWEEN from 'three/addons/libs/tween.module.js';
 
 			let container, stats;
 			let renderer;
@@ -173,8 +186,7 @@
 				const mesh = generateInstancedMesh( geometry, material, 500 );
 				scene.add( mesh );
 
-				const renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
-				this.fbo = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters );
+				this.fbo = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { type: THREE.HalfFloatType } );
 
 				this.render = function ( delta, rtt ) {
 
@@ -286,6 +298,9 @@
 						'		gl_FragColor = mix( texel2, texel1, mixRatio );',
 
 						'	}',
+
+						'	#include <tonemapping_fragment>',
+						'	#include <encodings_fragment>',
 
 						'}'
 

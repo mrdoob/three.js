@@ -12,9 +12,22 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - sprites
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			let camera, scene, renderer;
 			let cameraOrtho, sceneOrtho;
@@ -51,9 +64,12 @@
 
 				const textureLoader = new THREE.TextureLoader();
 
-				textureLoader.load( "textures/sprite0.png", createHUDSprites );
-				const mapB = textureLoader.load( "textures/sprite1.png" );
-				mapC = textureLoader.load( "textures/sprite2.png" );
+				textureLoader.load( 'textures/sprite0.png', createHUDSprites );
+				const mapB = textureLoader.load( 'textures/sprite1.png' );
+				mapC = textureLoader.load( 'textures/sprite2.png' );
+
+				mapB.colorSpace = THREE.SRGBColorSpace;
+				mapC.colorSpace = THREE.SRGBColorSpace;
 
 				group = new THREE.Group();
 
@@ -109,6 +125,8 @@
 			}
 
 			function createHUDSprites( texture ) {
+
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				const material = new THREE.SpriteMaterial( { map: texture } );
 

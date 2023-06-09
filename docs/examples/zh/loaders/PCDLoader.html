@@ -11,10 +11,27 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">用于加载 <em>.pcd</em> 资源的加载器。<br />
-		点云数据是 <a href="https://en.wikipedia.org/wiki/Point_Cloud_Library">点云库</a> 的文件格式。 <br />
-		加载器支持 ascii 和 (压缩) 二进制编码。
+		<p class="desc">
+			A loader for the PCD (Point Cloud Data) file format. [name] supports ASCII and (compressed) binary files as well as the following PCD fields:
+			<ul>
+				<li>x y z</li>
+				<li>rgb</li>
+				<li>normal_x normal_y normal_z</li>
+				<li>intensity</li>
+				<li>label</li>
+			</ul>
 		</p>
+
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
+		</code>
 
 		<h2>代码示例</h2>
 
@@ -28,9 +45,9 @@
 			// resource URL
 			'pointcloud.pcd',
 			// called when the resource is loaded
-			function ( mesh ) {
+			function ( points ) {
 
-				scene.add( mesh );
+				scene.add( points );
 
 			},
 			// called when loading is in progresses

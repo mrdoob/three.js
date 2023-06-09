@@ -10,23 +10,36 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl normalmap demo.<br/>
-			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
+			<a href="https://casual-effects.com/data/" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { BleachBypassShader } from './jsm/shaders/BleachBypassShader.js';
-			import { ColorCorrectionShader } from './jsm/shaders/ColorCorrectionShader.js';
-			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
-			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { BleachBypassShader } from 'three/addons/shaders/BleachBypassShader.js';
+			import { ColorCorrectionShader } from 'three/addons/shaders/ColorCorrectionShader.js';
+			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
 			let container, stats, loader;
 
@@ -59,14 +72,14 @@
 				camera.position.z = 1200;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x111111 );
+				scene.background = new THREE.Color( 0x494949 );
 
 				// LIGHTS
 
-				ambientLight = new THREE.AmbientLight( 0x444444 );
+				ambientLight = new THREE.AmbientLight( 0x8d8d8d );
 				scene.add( ambientLight );
 
-				pointLight = new THREE.PointLight( 0xffffff, 1.25, 1000 );
+				pointLight = new THREE.PointLight( 0xffffff, 2, 1000 );
 				pointLight.position.set( 0, 0, 600 );
 
 				scene.add( pointLight );
@@ -77,16 +90,16 @@
 
 				const textureLoader = new THREE.TextureLoader();
 
-				const diffuseMap = textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
-				diffuseMap.encoding = THREE.sRGBEncoding;
+				const diffuseMap = textureLoader.load( 'models/gltf/LeePerrySmith/Map-COL.jpg' );
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 
-				const specularMap = textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" );
-				specularMap.encoding = THREE.sRGBEncoding;
+				const specularMap = textureLoader.load( 'models/gltf/LeePerrySmith/Map-SPEC.jpg' );
+				specularMap.colorSpace = THREE.SRGBColorSpace;
 
-				const normalMap = textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				const normalMap = textureLoader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' );
 
 				const material = new THREE.MeshPhongMaterial( {
-					color: 0xdddddd,
+					color: 0xefefef,
 					specular: 0x222222,
 					shininess: 35,
 					map: diffuseMap,
@@ -96,7 +109,7 @@
 				} );
 
 				loader = new GLTFLoader();
-				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
+				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
 					createScene( gltf.scene.children[ 0 ].geometry, 100, material );
 
@@ -120,8 +133,8 @@
 
 				const effectBleach = new ShaderPass( BleachBypassShader );
 				const effectColor = new ShaderPass( ColorCorrectionShader );
-				effectFXAA = new ShaderPass( FXAAShader );
 				const gammaCorrection = new ShaderPass( GammaCorrectionShader );
+				effectFXAA = new ShaderPass( FXAAShader );
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
@@ -130,13 +143,15 @@
 				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
 				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
 
-				composer = new EffectComposer( renderer );
+				const renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { type: THREE.HalfFloatType, depthTexture: new THREE.DepthTexture() } );
+
+				composer = new EffectComposer( renderer, renderTarget );
 
 				composer.addPass( renderModel );
-				composer.addPass( effectFXAA );
 				composer.addPass( effectBleach );
 				composer.addPass( effectColor );
 				composer.addPass( gammaCorrection );
+				composer.addPass( effectFXAA );
 
 				// EVENTS
 

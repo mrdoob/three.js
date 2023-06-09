@@ -1,7 +1,6 @@
 export const vertex = /* glsl */`
 #include <common>
 #include <uv_pars_vertex>
-#include <uv2_pars_vertex>
 #include <envmap_pars_vertex>
 #include <color_pars_vertex>
 #include <fog_pars_vertex>
@@ -13,8 +12,8 @@ export const vertex = /* glsl */`
 void main() {
 
 	#include <uv_vertex>
-	#include <uv2_vertex>
 	#include <color_vertex>
+	#include <morphcolor_vertex>
 
 	#if defined ( USE_ENVMAP ) || defined ( USE_SKINNING )
 
@@ -54,7 +53,6 @@ uniform float opacity;
 #include <dithering_pars_fragment>
 #include <color_pars_fragment>
 #include <uv_pars_fragment>
-#include <uv2_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <alphatest_pars_fragment>
@@ -62,7 +60,6 @@ uniform float opacity;
 #include <lightmap_pars_fragment>
 #include <envmap_common_pars_fragment>
 #include <envmap_pars_fragment>
-#include <cube_uv_reflection_fragment>
 #include <fog_pars_fragment>
 #include <specularmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
@@ -86,8 +83,8 @@ void main() {
 	// accumulation (baked indirect lighting only)
 	#ifdef USE_LIGHTMAP
 
-		vec4 lightMapTexel= texture2D( lightMap, vUv2 );
-		reflectedLight.indirectDiffuse += lightMapTexelToLinear( lightMapTexel ).rgb * lightMapIntensity;
+		vec4 lightMapTexel = texture2D( lightMap, vLightMapUv );
+		reflectedLight.indirectDiffuse += lightMapTexel.rgb * lightMapIntensity * RECIPROCAL_PI;
 
 	#else
 

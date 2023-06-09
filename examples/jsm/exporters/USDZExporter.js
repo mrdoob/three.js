@@ -1,8 +1,17 @@
+import * as THREE from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
 
-	async parse( scene ) {
+	async parse( scene, options = {} ) {
+
+		options = Object.assign( {
+			ar: {
+				anchoring: { type: 'plane' },
+				planeAnchoring: { alignment: 'horizontal' }
+			},
+			quickLookCompatible: false,
+		}, options );
 
 		const files = {};
 		const modelFileName = 'model.usda';
@@ -12,6 +21,8 @@ class USDZExporter {
 
 		let output = buildHeader();
 
+		output += buildSceneStart( options );
+
 		const materials = {};
 		const textures = {};
 
@@ -19,12 +30,12 @@ class USDZExporter {
 
 			if ( object.isMesh ) {
 
-				if ( object.material.isMeshStandardMaterial ) {
+				const geometry = object.geometry;
+				const material = object.material;
 
-					const geometry = object.geometry;
-					const material = object.material;
+				if ( material.isMeshStandardMaterial ) {
 
-					const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
+					const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usda';
 
 					if ( ! ( geometryFileName in files ) ) {
 
@@ -47,11 +58,18 @@ class USDZExporter {
 
 				}
 
+			} else if ( object.isCamera ) {
+
+				output += buildCamera( object );
+
 			}
 
 		} );
 
-		output += buildMaterials( materials, textures );
+
+		output += buildSceneEnd();
+
+		output += buildMaterials( materials, textures, options.quickLookCompatible );
 
 		files[ modelFileName ] = fflate.strToU8( output );
 		output = null;
@@ -59,13 +77,11 @@ class USDZExporter {
 		for ( const id in textures ) {
 
 			const texture = textures[ id ];
-			const color = id.split( '_' )[ 1 ];
-			const isRGBA = texture.format === 1023;
 
-			const canvas = imageToCanvas( texture.image, color );
-			const blob = await new Promise( resolve => canvas.toBlob( resolve, isRGBA ? 'image/png' : 'image/jpeg', 1 ) );
+			const canvas = imageToCanvas( texture.image, texture.flipY );
+			const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/png', 1 ) );
 
-			files[ `textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }` ] = new Uint8Array( await blob.arrayBuffer() );
+			files[ `textures/Texture_${ id }.png` ] = new Uint8Array( await blob.arrayBuffer() );
 
 		}
 
@@ -102,7 +118,7 @@ class USDZExporter {
 
 }
 
-function imageToCanvas( image, color ) {
+function imageToCanvas( image, flipY ) {
 
 	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
@@ -116,32 +132,23 @@ function imageToCanvas( image, color ) {
 		canvas.height = image.height * Math.min( 1, scale );
 
 		const context = canvas.getContext( '2d' );
-		context.drawImage( image, 0, 0, canvas.width, canvas.height );
 
-		if ( color !== undefined ) {
+		// TODO: We should be able to do this in the UsdTransform2d?
 
-			const hex = parseInt( color, 16 );
+		if ( flipY === true ) {
 
-			const r = ( hex >> 16 & 255 ) / 255;
-			const g = ( hex >> 8 & 255 ) / 255;
-			const b = ( hex & 255 ) / 255;
-
-			const imagedata = context.getImageData( 0, 0, canvas.width, canvas.height );
-			const data = imagedata.data;
-
-			for ( let i = 0; i < data.length; i += 4 ) {
-
-				data[ i + 0 ] = data[ i + 0 ] * r;
-				data[ i + 1 ] = data[ i + 1 ] * g;
-				data[ i + 2 ] = data[ i + 2 ] * b;
-
-			}
-
-			context.putImageData( imagedata, 0, 0 );
+			context.translate( 0, canvas.height );
+			context.scale( 1, - 1 );
 
 		}
 
+		context.drawImage( image, 0, 0, canvas.width, canvas.height );
+
 		return canvas;
+
+	} else {
+
+		throw new Error( 'THREE.USDZExporter: No valid image data found. Unable to process texture.' );
 
 	}
 
@@ -155,12 +162,46 @@ function buildHeader() {
 
 	return `#usda 1.0
 (
-    customLayerData = {
-        string creator = "Three.js USDZExporter"
-    }
-    metersPerUnit = 1
-    upAxis = "Y"
+	customLayerData = {
+		string creator = "Three.js USDZExporter"
+	}
+	metersPerUnit = 1
+	upAxis = "Y"
 )
+
+`;
+
+}
+
+function buildSceneStart( options ) {
+
+	return `def Xform "Root"
+{
+	def Scope "Scenes" (
+		kind = "sceneLibrary"
+	)
+	{
+		def Xform "Scene" (
+			customData = {
+				bool preliminary_collidesWithEnvironment = 0
+				string sceneName = "Scene"
+			}
+			sceneName = "Scene"
+		)
+		{
+		token preliminary:anchoring:type = "${options.ar.anchoring.type}"
+		token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"
+
+`;
+
+}
+
+function buildSceneEnd() {
+
+	return `
+		}
+	}
+}
 
 `;
 
@@ -188,13 +229,14 @@ function buildXform( object, geometry, material ) {
 	}
 
 	return `def Xform "${ name }" (
-    prepend references = @./geometries/Geometry_${ geometry.id }.usd@</Geometry>
+	prepend references = @./geometries/Geometry_${ geometry.id }.usda@</Geometry>
+	prepend apiSchemas = ["MaterialBindingAPI"]
 )
 {
-    matrix4d xformOp:transform = ${ transform }
-    uniform token[] xformOpOrder = ["xformOp:transform"]
+	matrix4d xformOp:transform = ${ transform }
+	uniform token[] xformOpOrder = ["xformOp:transform"]
 
-    rel material:binding = </Materials/Material_${ material.id }>
+	rel material:binding = </Materials/Material_${ material.id }>
 }
 
 `;
@@ -223,7 +265,7 @@ function buildMeshObject( geometry ) {
 	return `
 def "Geometry"
 {
-  ${mesh}
+${mesh}
 }
 `;
 
@@ -236,19 +278,17 @@ function buildMesh( geometry ) {
 	const count = attributes.position.count;
 
 	return `
-    def Mesh "${ name }"
-    {
-        int[] faceVertexCounts = [${ buildMeshVertexCount( geometry ) }]
-        int[] faceVertexIndices = [${ buildMeshVertexIndices( geometry ) }]
-        normal3f[] normals = [${ buildVector3Array( attributes.normal, count )}] (
-            interpolation = "vertex"
-        )
-        point3f[] points = [${ buildVector3Array( attributes.position, count )}]
-        float2[] primvars:st = [${ buildVector2Array( attributes.uv, count )}] (
-            interpolation = "vertex"
-        )
-        uniform token subdivisionScheme = "none"
-    }
+	def Mesh "${ name }"
+	{
+		int[] faceVertexCounts = [${ buildMeshVertexCount( geometry ) }]
+		int[] faceVertexIndices = [${ buildMeshVertexIndices( geometry ) }]
+		normal3f[] normals = [${ buildVector3Array( attributes.normal, count )}] (
+			interpolation = "vertex"
+		)
+		point3f[] points = [${ buildVector3Array( attributes.position, count )}]
+${ buildPrimvars( attributes, count ) }
+		uniform token subdivisionScheme = "none"
+	}
 `;
 
 }
@@ -339,9 +379,33 @@ function buildVector2Array( attribute, count ) {
 
 }
 
+function buildPrimvars( attributes, count ) {
+
+	let string = '';
+
+	for ( let i = 0; i < 4; i ++ ) {
+
+		const id = ( i > 0 ? i : '' );
+		const attribute = attributes[ 'uv' + id ];
+
+		if ( attribute !== undefined ) {
+
+			string += `
+		texCoord2f[] primvars:st${ id } = [${ buildVector2Array( attribute, count )}] (
+			interpolation = "vertex"
+		)`;
+
+		}
+
+	}
+
+	return string;
+
+}
+
 // Materials
 
-function buildMaterials( materials, textures ) {
+function buildMaterials( materials, textures, quickLookCompatible = false ) {
 
 	const array = [];
 
@@ -349,7 +413,7 @@ function buildMaterials( materials, textures ) {
 
 		const material = materials[ uuid ];
 
-		array.push( buildMaterial( material, textures ) );
+		array.push( buildMaterial( material, textures, quickLookCompatible ) );
 
 	}
 
@@ -362,53 +426,118 @@ ${ array.join( '' ) }
 
 }
 
-function buildMaterial( material, textures ) {
+function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	// https://graphics.pixar.com/usd/docs/UsdPreviewSurface-Proposal.html
 
-	const pad = '            ';
+	const pad = '			';
 	const inputs = [];
 	const samplers = [];
 
 	function buildTexture( texture, mapType, color ) {
 
-		const id = texture.id + ( color ? '_' + color.getHexString() : '' );
-		const isRGBA = texture.format === 1023;
+		const id = texture.source.id + '_' + texture.flipY;
 
 		textures[ id ] = texture;
 
-		return `
-        def Shader "Transform2d_${ mapType }" (
-            sdrMetadata = {
-                string role = "math"
-            }
-        )
-        {
-            uniform token info:id = "UsdTransform2d"
-            float2 inputs:in.connect = </Materials/Material_${ material.id }/uvReader_st.outputs:result>
-            float2 inputs:scale = ${ buildVector2( texture.repeat ) }
-            float2 inputs:translation = ${ buildVector2( texture.offset ) }
-            float2 outputs:result
-        }
+		const uv = texture.channel > 0 ? 'st' + texture.channel : 'st';
 
-        def Shader "Texture_${ texture.id }_${ mapType }"
-        {
-            uniform token info:id = "UsdUVTexture"
-            asset inputs:file = @textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }@
-            float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
-            token inputs:wrapS = "repeat"
-            token inputs:wrapT = "repeat"
-            float outputs:r
-            float outputs:g
-            float outputs:b
-            float3 outputs:rgb
-        }`;
+		const WRAPPINGS = {
+			1000: 'repeat', // RepeatWrapping
+			1001: 'clamp', // ClampToEdgeWrapping
+			1002: 'mirror' // MirroredRepeatWrapping
+		};
+
+		const repeat = texture.repeat.clone();
+		const offset = texture.offset.clone();
+		const rotation = texture.rotation;
+
+		// rotation is around the wrong point. after rotation we need to shift offset again so that we're rotating around the right spot
+		const xRotationOffset = Math.sin( rotation );
+		const yRotationOffset = Math.cos( rotation );
+
+		// texture coordinates start in the opposite corner, need to correct
+		offset.y = 1 - offset.y - repeat.y;
+
+		// turns out QuickLook is buggy and interprets texture repeat inverted/applies operations in a different order.
+		// Apple Feedback: 	FB10036297 and FB11442287
+		if ( quickLookCompatible ) {
+
+			// This is NOT correct yet in QuickLook, but comes close for a range of models.
+			// It becomes more incorrect the bigger the offset is
+
+			offset.x = offset.x / repeat.x;
+			offset.y = offset.y / repeat.y;
+
+			offset.x += xRotationOffset / repeat.x;
+			offset.y += yRotationOffset - 1;
+
+		} else {
+
+			// results match glTF results exactly. verified correct in usdview.
+			offset.x += xRotationOffset * repeat.x;
+			offset.y += ( 1 - yRotationOffset ) * repeat.y;
+
+		}
+
+		return `
+		def Shader "PrimvarReader_${ mapType }"
+		{
+			uniform token info:id = "UsdPrimvarReader_float2"
+			float2 inputs:fallback = (0.0, 0.0)
+			token inputs:varname = "${ uv }"
+			float2 outputs:result
+		}
+
+		def Shader "Transform2d_${ mapType }"
+		{
+			uniform token info:id = "UsdTransform2d"
+			token inputs:in.connect = </Materials/Material_${ material.id }/PrimvarReader_${ mapType }.outputs:result>
+			float inputs:rotation = ${ ( rotation * ( 180 / Math.PI ) ).toFixed( PRECISION ) }
+			float2 inputs:scale = ${ buildVector2( repeat ) }
+			float2 inputs:translation = ${ buildVector2( offset ) }
+			float2 outputs:result
+		}
+
+		def Shader "Texture_${ texture.id }_${ mapType }"
+		{
+			uniform token info:id = "UsdUVTexture"
+			asset inputs:file = @textures/Texture_${ id }.png@
+			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
+			${ color !== undefined ? 'float4 inputs:scale = ' + buildColor4( color ) : '' }
+			token inputs:sourceColorSpace = "${ texture.colorSpace === THREE.NoColorSpace ? 'raw' : 'sRGB' }"
+			token inputs:wrapS = "${ WRAPPINGS[ texture.wrapS ] }"
+			token inputs:wrapT = "${ WRAPPINGS[ texture.wrapT ] }"
+			float outputs:r
+			float outputs:g
+			float outputs:b
+			float3 outputs:rgb
+			${ material.transparent || material.alphaTest > 0.0 ? 'float outputs:a' : '' }
+		}`;
+
+	}
+
+
+	if ( material.side === THREE.DoubleSide ) {
+
+		console.warn( 'THREE.USDZExporter: USDZ does not support double sided materials', material );
 
 	}
 
 	if ( material.map !== null ) {
 
 		inputs.push( `${ pad }color3f inputs:diffuseColor.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:rgb>` );
+
+		if ( material.transparent ) {
+
+			inputs.push( `${ pad }float inputs:opacity.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:a>` );
+
+		} else if ( material.alphaTest > 0.0 ) {
+
+			inputs.push( `${ pad }float inputs:opacity.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:a>` );
+			inputs.push( `${ pad }float inputs:opacityThreshold = ${material.alphaTest}` );
+
+		}
 
 		samplers.push( buildTexture( material.map, 'diffuse', material.color ) );
 
@@ -492,30 +621,21 @@ function buildMaterial( material, textures ) {
 	}
 
 	return `
-    def Material "Material_${ material.id }"
-    {
-        def Shader "PreviewSurface"
-        {
-            uniform token info:id = "UsdPreviewSurface"
+	def Material "Material_${ material.id }"
+	{
+		def Shader "PreviewSurface"
+		{
+			uniform token info:id = "UsdPreviewSurface"
 ${ inputs.join( '\n' ) }
-            int inputs:useSpecularWorkflow = 0
-            token outputs:surface
-        }
+			int inputs:useSpecularWorkflow = 0
+			token outputs:surface
+		}
 
-        token outputs:surface.connect = </Materials/Material_${ material.id }/PreviewSurface.outputs:surface>
-        token inputs:frame:stPrimvarName = "st"
-
-        def Shader "uvReader_st"
-        {
-            uniform token info:id = "UsdPrimvarReader_float2"
-            token inputs:varname.connect = </Materials/Material_${ material.id }.inputs:frame:stPrimvarName>
-            float2 inputs:fallback = (0.0, 0.0)
-            float2 outputs:result
-        }
+		token outputs:surface.connect = </Materials/Material_${ material.id }/PreviewSurface.outputs:surface>
 
 ${ samplers.join( '\n' ) }
 
-    }
+	}
 `;
 
 }
@@ -526,9 +646,64 @@ function buildColor( color ) {
 
 }
 
+function buildColor4( color ) {
+
+	return `(${ color.r }, ${ color.g }, ${ color.b }, 1.0)`;
+
+}
+
 function buildVector2( vector ) {
 
 	return `(${ vector.x }, ${ vector.y })`;
+
+}
+
+
+function buildCamera( camera ) {
+
+	const name = camera.name ? camera.name : 'Camera_' + camera.id;
+
+	const transform = buildMatrix( camera.matrixWorld );
+
+	if ( camera.matrixWorld.determinant() < 0 ) {
+
+		console.warn( 'THREE.USDZExporter: USDZ does not support negative scales', camera );
+
+	}
+
+	if ( camera.isOrthographicCamera ) {
+
+		return `def Camera "${name}"
+		{
+			matrix4d xformOp:transform = ${ transform }
+			uniform token[] xformOpOrder = ["xformOp:transform"]
+
+			float2 clippingRange = (${ camera.near.toPrecision( PRECISION ) }, ${ camera.far.toPrecision( PRECISION ) })
+			float horizontalAperture = ${ ( ( Math.abs( camera.left ) + Math.abs( camera.right ) ) * 10 ).toPrecision( PRECISION ) }
+			float verticalAperture = ${ ( ( Math.abs( camera.top ) + Math.abs( camera.bottom ) ) * 10 ).toPrecision( PRECISION ) }
+			token projection = "orthographic"
+		}
+	
+	`;
+
+	} else {
+
+		return `def Camera "${name}"
+		{
+			matrix4d xformOp:transform = ${ transform }
+			uniform token[] xformOpOrder = ["xformOp:transform"]
+
+			float2 clippingRange = (${ camera.near.toPrecision( PRECISION ) }, ${ camera.far.toPrecision( PRECISION ) })
+			float focalLength = ${ camera.getFocalLength().toPrecision( PRECISION ) }
+			float focusDistance = ${ camera.focus.toPrecision( PRECISION ) }
+			float horizontalAperture = ${ camera.getFilmWidth().toPrecision( PRECISION ) }
+			token projection = "perspective"
+			float verticalAperture = ${ camera.getFilmHeight().toPrecision( PRECISION ) }
+		}
+	
+	`;
+
+	}
 
 }
 

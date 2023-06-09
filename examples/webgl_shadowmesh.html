@@ -14,11 +14,24 @@
 
 		<div id="container"></div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { ShadowMesh } from './jsm/objects/ShadowMesh.js';
+			import { ShadowMesh } from 'three/addons/objects/ShadowMesh.js';
 
 			let SCREEN_WIDTH = window.innerWidth;
 			let SCREEN_HEIGHT = window.innerHeight;
@@ -60,7 +73,7 @@
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				document.getElementById( "container" ).appendChild( renderer.domElement );
+				document.getElementById( 'container' ).appendChild( renderer.domElement );
 				window.addEventListener( 'resize', onWindowResize );
 
 				camera.position.set( 0, 2.5, 10 );
@@ -246,7 +259,7 @@
 					lightSphere.visible = false;
 					lightHolder.visible = false;
 
-					document.getElementById( 'lightButton' ).value = "Switch to PointLight";
+					document.getElementById( 'lightButton' ).value = 'Switch to PointLight';
 
 				} else {
 
@@ -272,7 +285,7 @@
 					lightSphere.visible = true;
 					lightHolder.visible = true;
 
-					document.getElementById( 'lightButton' ).value = "Switch to THREE.DirectionalLight";
+					document.getElementById( 'lightButton' ).value = 'Switch to THREE.DirectionalLight';
 
 				}
 

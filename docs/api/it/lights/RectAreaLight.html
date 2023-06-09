@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      RectAreaLight emette luce uniformemente sulla faccia di un piano rettangolare. Questo tipo di luce 
+      può essere utilizzato per simulare le sorgenti di luce come finestre luminose o strisce luminose.<br /><br />
+
+			Note importanti:
+			<ul>
+				<li>Non c'è il supporto per le ombre.</li>
+				<li>Solo [page:MeshStandardMaterial MeshStandardMaterial] e [page:MeshPhysicalMaterial MeshPhysicalMaterial] sono supportati.</li>
+				<li>Devi includere [link:https://threejs.org/examples/jsm/lights/RectAreaLightUniformsLib.js RectAreaLightUniformsLib] nella tua scena e chiamare `init()`.</li>
+			</ul>
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+const width = 10;
+const height = 10;
+const intensity = 1;
+const rectLight = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+rectLight.position.set( 5, 5, 0 );
+rectLight.lookAt( 0, 0, 0 );
+scene.add( rectLight )
+
+const rectLightHelper = new RectAreaLightHelper( rectLight );
+rectLight.add( rectLightHelper );
+		</code>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_lights_rectarealight WebGL / rectarealight ]
+		</p>
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Float width], [param:Float height] )</h3>
+		<p>
+			[page:Integer color] - (opzionale) colore esadecimale della luce. Il valore predefinito è 0xffffff (bianco).<br />
+			[page:Float intensity] - (opzionale) l'intensità della luce, o luminosità. Il valore predefinito è 1.<br />
+			[page:Float width] - (opzionale) larghezza della luce. Il valore predefinito è 10.<br />
+			[page:Float height] - (opzionale) altezza della luce. Il valore predefinito è 10.<br /><br />
+
+      Crea una nuova [name].
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>
+      Vedi la classe base [page:Light Light] per le proprietà comuni.
+		</p>
+
+		<h3>[property:Float height]</h3>
+		<p>
+      L'altezza della luce.
+		</p>
+
+		<h3>[property:Float intensity]</h3>
+		<p>
+      L'intensità della luce. Il valore predefinito è `1`.<br />
+      Quando [page:WebGLRenderer.useLegacyLights legacy lighting mode] è disabilitata, l'intesità è la luminanza
+      (luminosità) della luce misurata in nits (cd/m^2).<br /><br />
+
+      Modificando l'intensità si modificherà anche la potenza della luce.
+		</p>
+
+		<h3>[property:Boolean isRectAreaLight]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è del tipo [name].
+		</p>
+
+		<h3>[property:Float power]</h3>
+		<p>
+      La potenza della luce.<br />
+	  Quando [page:WebGLRenderer.useLegacyLights legacy lighting mode] è disabilitata, la potenza è la potenza 
+      della luminosità della luce misurata in lumen (lm).<br /><br />
+
+      Modificando la potenza si modificherà anche l'intensità della luce.
+		</p>
+
+		<h3>[property:Float width]</h3>
+		<p>
+      La larghezza della luce.
+		</p>
+
+		<h2>Metodi</h2>
+		<p>
+      Vedi la classe base [page:Light Light] per i metodi comuni.
+		</p>
+
+
+		<h3>[method:this copy]( [param:RectAreaLight source] )</h3>
+		<p>
+      Copia il valore di tutte le proprietà dalla [page:RectAreaLight sorgente] a questa 
+		  RectAreaLight.
+		</p>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

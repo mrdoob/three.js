@@ -10,17 +10,30 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl materials matcap<br />
-			Drag-and-drop JPG, PNG, or EXR MatCap image files<br/>
+			Drag-and-drop JPG, PNG, WebP, AVIF, or EXR MatCap image files<br/>
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
 
 			let mesh, renderer, scene, camera;
 
@@ -43,7 +56,6 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 			 	renderer.toneMappingExposure = API.exposure;
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				// scene
 				scene = new THREE.Scene();
@@ -62,9 +74,7 @@
 				const manager = new THREE.LoadingManager( render );
 
 				// matcap
-				const loaderEXR = new EXRLoader( manager )
-					.setDataType( THREE.UnsignedByteType ); // default: FloatType
-
+				const loaderEXR = new EXRLoader( manager );
 				const matcap = loaderEXR.load( 'textures/matcaps/040full.exr' );
 
 				// normalmap
@@ -152,19 +162,19 @@
 
 				texture.needsUpdate = true;
 
-				mesh.material.needsUpdate = true; // because the encoding can change
+				mesh.material.needsUpdate = true; // because the color space can change
 
 				render();
 
 			}
 
-			function handleJPG( event ) { // PNG, too
+			function handleJPG( event ) { // PNG, WebP, AVIF, too
 
 				function imgCallback( event ) {
 
 					const texture = new THREE.Texture( event.target );
 
-					texture.encoding = THREE.sRGBEncoding;
+					texture.colorSpace = THREE.SRGBColorSpace;
 
 					updateMatcap( texture );
 
@@ -184,7 +194,7 @@
 
 				const loader = new EXRLoader();
 
-				loader.setDataType( THREE.UnsignedByteType ); // default: FloatType
+				loader.setDataType( THREE.HalfFloatType );
 
 				const texData = loader.parse( contents );
 
@@ -196,29 +206,11 @@
 
 				texture.format = texData.format;
 				texture.type = texData.type;
-
-				switch ( texture.type ) {
-
-					case THREE.UnsignedByteType:
-
-						texture.encoding = THREE.RGBEEncoding;
-						texture.minFilter = THREE.NearestFilter;
-						texture.magFilter = THREE.NearestFilter;
-						texture.generateMipmaps = false;
-						texture.flipY = false;
-						break;
-
-					case THREE.FloatType:
-					case THREE.HalfFloatType:
-
-						texture.encoding = THREE.LinearEncoding;
-						texture.minFilter = THREE.LinearFilter;
-						texture.magFilter = THREE.LinearFilter;
-						texture.generateMipmaps = false;
-						texture.flipY = false;
-						break;
-
-				}
+				texture.colorSpace = THREE.LinearSRGBColorSpace;
+				texture.minFilter = THREE.LinearFilter;
+				texture.magFilter = THREE.LinearFilter;
+				texture.generateMipmaps = false;
+				texture.flipY = false;
 
 				updateMatcap( texture );
 

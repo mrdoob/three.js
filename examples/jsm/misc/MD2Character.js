@@ -6,8 +6,8 @@ import {
 	Object3D,
 	TextureLoader,
 	UVMapping,
-	sRGBEncoding
-} from '../../../build/three.module.js';
+	SRGBColorSpace
+} from 'three';
 import { MD2Loader } from '../loaders/MD2Loader.js';
 
 class MD2Character {
@@ -73,7 +73,7 @@ class MD2Character {
 				textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
 				textures[ i ].mapping = UVMapping;
 				textures[ i ].name = textureUrls[ i ];
-				textures[ i ].encoding = sRGBEncoding;
+				textures[ i ].colorSpace = SRGBColorSpace;
 
 			}
 

@@ -2,7 +2,9 @@
  * Full-screen textured quad shader
  */
 
-var CopyShader = {
+const CopyShader = {
+
+	name: 'CopyShader',
 
 	uniforms: {
 
@@ -34,6 +36,7 @@ var CopyShader = {
 
 			vec4 texel = texture2D( tDiffuse, vUv );
 			gl_FragColor = opacity * texel;
+
 
 		}`
 

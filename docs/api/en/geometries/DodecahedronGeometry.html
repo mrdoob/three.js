@@ -7,13 +7,16 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:BufferGeometry] &rarr; [page:PolyhedronGeometry] &rarr;
+		[page:BufferGeometry] &rarr; [page:PolyhedronGeometry] 
 
 		<h1>[name]</h1>
 
 		<p class="desc">A class for generating a dodecahedron geometries.</p>
 
-		<iframe id="scene" src="scenes/geometry-browser.html#DodecahedronGeometry"></iframe>
+		<iframe
+			id="scene"
+			src="scenes/geometry-browser.html#DodecahedronGeometry"
+		></iframe>
 
 		<script>
 
@@ -35,8 +38,9 @@
 
 		<h3>[name]([param:Float radius], [param:Integer detail])</h3>
 		<p>
-		radius — Radius of the dodecahedron. Default is 1.<br />
-		detail — Default is 0. Setting this to a value greater than 0 adds vertices making it no longer a dodecahedron.
+			radius — Radius of the dodecahedron. Default is `1`.<br />
+			detail — Default is `0`. Setting this to a value greater than `0` adds
+			vertices making it no longer a dodecahedron.
 		</p>
 
 		<h2>Properties</h2>
@@ -44,7 +48,8 @@
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+			An object with a property for each of the constructor parameters. Any
+			modification after instantiation does not change the geometry.
 		</p>
 
 		<h2>Methods</h2>

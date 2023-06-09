@@ -30,6 +30,20 @@ function arrayMax( array ) {
 
 }
 
+function arrayNeedsUint32( array ) {
+
+	// assumes larger values usually on last
+
+	for ( let i = array.length - 1; i >= 0; -- i ) {
+
+		if ( array[ i ] >= 65535 ) return true; // account for PRIMITIVE_RESTART_FIXED_INDEX, #24565
+
+	}
+
+	return false;
+
+}
+
 const TYPED_ARRAYS = {
 	Int8Array: Int8Array,
 	Uint8Array: Uint8Array,
@@ -54,40 +68,16 @@ function createElementNS( name ) {
 
 }
 
-/**
-  * cyrb53 hash for string from: https://stackoverflow.com/a/52171480
-  *
-  * Public Domain, @bryc - https://stackoverflow.com/users/815680/bryc
-  *
-  * It is roughly similar to the well-known MurmurHash/xxHash algorithms. It uses a combination
-  * of multiplication and Xorshift to generate the hash, but not as thorough. As a result it's
-  * faster than either would be in JavaScript and significantly simpler to implement. Keep in
-  * mind this is not a secure algorithm, if privacy/security is a concern, this is not for you.
-  *
-  * @param {string} str
-  * @param {number} seed, default 0
-  * @returns number
-  */
-function hashString( str, seed = 0 ) {
+const _cache = {};
 
-	let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+function warnOnce( message ) {
 
-	for ( let i = 0, ch; i < str.length; i ++ ) {
+	if ( message in _cache ) return;
 
-		ch = str.charCodeAt( i );
+	_cache[ message ] = true;
 
-		h1 = Math.imul( h1 ^ ch, 2654435761 );
-
-		h2 = Math.imul( h2 ^ ch, 1597334677 );
-
-	}
-
-	h1 = Math.imul( h1 ^ ( h1 >>> 16 ), 2246822507 ) ^ Math.imul( h2 ^ ( h2 >>> 13 ), 3266489909 );
-
-	h2 = Math.imul( h2 ^ ( h2 >>> 16 ), 2246822507 ) ^ Math.imul( h1 ^ ( h1 >>> 13 ), 3266489909 );
-
-	return 4294967296 * ( 2097151 & h2 ) + ( h1 >>> 0 );
+	console.warn( message );
 
 }
 
-export { arrayMin, arrayMax, getTypedArray, createElementNS, hashString };
+export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, warnOnce };

@@ -1,0 +1,386 @@
+<!DOCTYPE html><html lang="ru"><head>
+    <meta charset="utf-8">
+    <title>Граф сцены </title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Граф сцены ">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Граф сцены </h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Эта статья является частью серии статей о three.js. 
+Первая статья - <a href="fundamentals.html">основы Three.js</a>.
+Если вы её еще не читали, советую вам сделать это.</p>
+<p>Ядром Three.js, возможно, является граф сцены. Граф сцены в трехмерном 
+движке - это иерархия узлов в графе, где каждый узел представляет 
+локальное пространство.</p>
+<p><img src="../resources/images/scenegraph-generic.svg" align="center"></p>
+<p>Это своего рода абстракция, поэтому давайте попробуем привести несколько примеров.</p>
+<p>Одним из примеров может быть солнечная система, солнце, земля, луна.</p>
+<p><img src="../resources/images/scenegraph-solarsystem.svg" align="center"></p>
+<p>Земля вращается вокруг Солнца. Луна вращается вокруг Земли. Луна движется по 
+кругу вокруг Земли. С точки зрения Луны она вращается в «локальном пространстве» 
+Земли. Хотя его движение относительно Солнца с точки зрения Луны представляет 
+собой какой-то сумасшедший спирографический изгиб, ему просто нужно заниматься 
+вращением вокруг локального пространства Земли.</p>
+<p></p><div class="threejs_diagram_container">
+  <iframe class="threejs_diagram " style="width: 400px; height: 300px;" src="/manual/foo/../resources/moon-orbit.html"></iframe>
+</div>
+
+<p></p>
+<p>Чтобы думать об этом иначе, вы, живущие на Земле, не должны думать о вращении 
+Земли вокруг своей оси или о вращении вокруг Солнца. Вы просто идете или едете, 
+или плаваете, или бежите, как будто Земля вообще не движется и не вращается. 
+Вы идете, ездите, плаваете, бегаете и живете в «локальном пространстве» Земли, 
+хотя относительно Солнца вы вращаетесь вокруг Земли со скоростью около 
+1000 миль в час, а вокруг Солнца - около 67 000 миль в час. Ваше положение 
+в Солнечной системе похоже на положение Луны наверху, но вам не нужно 
+беспокоиться о себе. Вы просто переживаете за свое положение относительно 
+земли, ее "локального пространства".</p>
+<p>Давайте сделаем это один шаг за один раз. Представьте, что мы хотим сделать 
+диаграмму солнца, земли и луны. Мы начнем с солнца, просто сделав сферу 
+и поместив ее в начало координат. Примечание: мы используем солнце, 
+землю, луну в качестве демонстрации того, как использовать граф сцены. 
+Конечно, настоящее Солнце, Земля и Луна используют физику, но для наших 
+целей мы подделаем это с помощью графа сцены.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// массив объектов, направление которых обновляется
+const objects = [];
+
+// использовать только одну сферу для всего
+const radius = 1;
+const widthSegments = 6;
+const heightSegments = 6;
+const sphereGeometry = new THREE.SphereGeometry(
+    radius, widthSegments, heightSegments);
+
+const sunMaterial = new THREE.MeshPhongMaterial({emissive: 0xFFFF00});
+const sunMesh = new THREE.Mesh(sphereGeometry, sunMaterial);
+sunMesh.scale.set(5, 5, 5);  // сделать солнце большим
+scene.add(sunMesh);
+objects.push(sunMesh);
+</pre>
+<p>Мы используем действительно низкополигональную сферу. 
+Всего 6 разделений вокруг его экватора. Это так легко увидеть вращение.</p>
+<p>Мы собираемся повторно использовать одну и ту же сферу для всего, 
+поэтому мы установим масштаб для солнечной полигональной сетки (mesh) в 5x.</p>
+<p>Мы также устанавливаем свойство материала "Затенение по Фонгу" <code class="notranslate" translate="no">emissive</code> желтым. 
+Излучающее (emissive) свойство материала Phong - это цвет, который будет рисоваться 
+без попадания света на поверхность. Свет добавляется к этому цвету.</p>
+<p>Давайте также поместим один точечный источник света в центр сцены. Мы рассмотрим 
+более подробно о точечных источниках света позже, но пока простая версия 
+представляет собой точечный источник света.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const color = 0xFFFFFF;
+  const intensity = 3;
+  const light = new THREE.PointLight(color, intensity);
+  scene.add(light);
+}
+</pre>
+<p>Чтобы было легче увидеть, мы поместим камеру прямо над источником, смотря вниз. 
+Самый простой способ сделать это - использовать <code class="notranslate" translate="no">lookAt</code>. <code class="notranslate" translate="no">lookAt</code>
+Функция будет ориентировать камеру из своего положения в "смотриНа 
+точку переданную <code class="notranslate" translate="no">lookAt</code>. Перед тем, как сделать это, мы должны сказать 
+камере, в какую сторону направлена верхняя часть камеры или, скорее, 
+в какой стороне "верх" для камеры. Для большинства ситуаций положительный 
+Y - это достаточно хорошо, но, так как мы смотрим прямо вниз, 
+мы должны сказать камере, что положительный Z - вверхy.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+camera.position.set(0, 50, 0);
+camera.up.set(0, 0, 1);
+camera.lookAt(0, 0, 0);
+</pre>
+<p>В цикле отрисовки, переделанном из предыдущих примеров, 
+мы вращаем все объекты в нашем массиве <code class="notranslate" translate="no">objects</code> с помощью этого кода.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">objects.forEach((obj) =&gt; {
+  obj.rotation.y = time;
+});
+</pre>
+<p>Так как мы добавили <code class="notranslate" translate="no">sunMesh</code> в массив <code class="notranslate" translate="no">objects</code> он будет вращаться.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-sun.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Теперь давайте добавим землю.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const earthMaterial = new THREE.MeshPhongMaterial({color: 0x2233FF, emissive: 0x112244});
+const earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial);
+earthMesh.position.x = 10;
+scene.add(earthMesh);
+objects.push(earthMesh);
+</pre>
+<p>Мы создаем материал синего цвета, но мы дали ему небольшое количество <em>излучающего</em> 
+синего цвета, чтобы он отображался на черном фоне.</p>
+<p>Мы используем ту же <code class="notranslate" translate="no">sphereGeometry</code> с нашим новым синим <code class="notranslate" translate="no">earthMaterial</code> чтобы сделать 
+<code class="notranslate" translate="no">earthMesh</code>. Мы размещаем эти 10 единиц слева от солнца и добавляем их в сцену. 
+Поскольку мы добавили его в наш массив <code class="notranslate" translate="no">objects</code>, он тоже будет вращаться.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Вы можете видеть, что Солнце и Земля вращаются, но Земля не вращается вокруг Солнца. 
+Давайте сделаем землю дитя солнца</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-scene.add(earthMesh);
++sunMesh.add(earthMesh);
+</pre>
+<p>а также...</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-orbit.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-orbit.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Что случилось? Почему Земля такого же размера, как Солнце, и почему она так далеко? 
+На самом деле мне пришлось передвинуть камеру с 50 единиц сверху до 150 единиц 
+сверху, чтобы увидеть Землю.</p>
+<p>Мы сделали <code class="notranslate" translate="no">earthMesh</code> ребенком <code class="notranslate" translate="no">sunMesh</code>. <code class="notranslate" translate="no">sunMesh</code> масштабирован на 5x 
+из-за <code class="notranslate" translate="no">sunMesh.scale.set(5, 5, 5)</code>. Это означает, что локальное пространство
+<code class="notranslate" translate="no">sunMesh</code> в 5 раз больше.  Все, что помещено в это пространство, будет умножено на 5. 
+Это означает, что Земля теперь в 5 раз больше и расстояние от Солнца 
+(<code class="notranslate" translate="no">earthMesh.position.x = 10</code>) также в 5 раз.</p>
+<p>Наш граф сцены в настоящее время выглядит следующим образом</p>
+<p><img src="../resources/images/scenegraph-sun-earth.svg" align="center"></p>
+<p>Чтобы это исправить, давайте добавим пустой узел графа сцены. 
+Мы будем связывать солнце и землю с этим узлом.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const solarSystem = new THREE.Object3D();
++scene.add(solarSystem);
++objects.push(solarSystem);
+
+const sunMaterial = new THREE.MeshPhongMaterial({emissive: 0xFFFF00});
+const sunMesh = new THREE.Mesh(sphereGeometry, sunMaterial);
+sunMesh.scale.set(5, 5, 5);
+-scene.add(sunMesh);
++solarSystem.add(sunMesh);
+objects.push(sunMesh);
+
+const earthMaterial = new THREE.MeshPhongMaterial({color: 0x2233FF, emissive: 0x112244});
+const earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial);
+earthMesh.position.x = 10;
+-sunMesh.add(earthMesh);
++solarSystem.add(earthMesh);
+objects.push(earthMesh);
+</pre>
+<p>Здесь мы сделали <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. Как и <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> он также является узлом в графе сцены, 
+но в отличие от <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> он не имеет материала или геометрии. Это просто 
+представляет локальное пространство.</p>
+<p>Наш новый граф сцены выглядит следующим образом</p>
+<p><img src="../resources/images/scenegraph-sun-earth-fixed.svg" align="center"></p>
+<p>И <code class="notranslate" translate="no">sunMesh</code> и <code class="notranslate" translate="no">earthMesh</code> дети <code class="notranslate" translate="no">solarSystem</code>. Все 3 вращаются, и теперь, 
+поскольку они не являются потомками <code class="notranslate" translate="no">earthMesh</code>, <code class="notranslate" translate="no">sunMesh</code> больше не 
+масштабируются в 5 раз.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-orbit-fixed.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-orbit-fixed.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Намного лучше. Земля меньше Солнца, и она вращается вокруг Солнца и вращается сама.</p>
+<p>Продолжая ту же самую модель, давайте добавим луну.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const earthOrbit = new THREE.Object3D();
++earthOrbit.position.x = 10;
++solarSystem.add(earthOrbit);
++objects.push(earthOrbit);
+
+const earthMaterial = new THREE.MeshPhongMaterial({color: 0x2233FF, emissive: 0x112244});
+const earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial);
+-solarSystem.add(earthMesh);
++earthOrbit.add(earthMesh);
+objects.push(earthMesh);
+
++const moonOrbit = new THREE.Object3D();
++moonOrbit.position.x = 2;
++earthOrbit.add(moonOrbit);
+
++const moonMaterial = new THREE.MeshPhongMaterial({color: 0x888888, emissive: 0x222222});
++const moonMesh = new THREE.Mesh(sphereGeometry, moonMaterial);
++moonMesh.scale.set(.5, .5, .5);
++moonOrbit.add(moonMesh);
++objects.push(moonMesh);
+</pre>
+<p>Снова мы добавили еще один невидимый узел графа сцены <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> под названием <code class="notranslate" translate="no">earthOrbit</code>
+и добавили <code class="notranslate" translate="no">earthMesh</code> и <code class="notranslate" translate="no">moonMesh</code> к нему. Новый граф сцены выглядит следующим образом.</p>
+<p><img src="../resources/images/scenegraph-sun-earth-moon.svg" align="center"></p>
+<p>и вот что</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-moon.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Вы можете видеть, что луна следует шаблону спирографа, показанному в верхней части этой 
+статьи, но нам не пришлось вычислять ее вручную. Мы просто настраиваем наш 
+граф сцены, чтобы он сделал это за нас.</p>
+<p>Часто полезно рисовать что-то для визуализации узлов в графе сцены. 
+Three.js имеет несколько полезных ... ммм, помощников ... помогающих с этим.</p>
+<p>Один называется <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>. Он рисует 3 линии, представляющие локальные оси
+<span style="color:red">X</span>,
+<span style="color:green">Y</span>, и
+<span style="color:blue">Z</span> Давайте добавим по одному к каждому узлу, 
+который мы создали.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// добавляем AxesHelper к каждому узлу
+objects.forEach((node) =&gt; {
+  const axes = new THREE.AxesHelper();
+  axes.material.depthTest = false;
+  axes.renderOrder = 1;
+  node.add(axes);
+});
+</pre>
+<p>В нашем случае мы хотим, чтобы оси появлялись, даже если они находятся внутри сфер. 
+Чтобы сделать это, мы устанавливаем для их материала <code class="notranslate" translate="no">depthTest</code> значение false, 
+что означает, что они не будут проверять, что они рисуются за чем-то другим. 
+Мы также устанавливаем их <code class="notranslate" translate="no">renderOrder</code> в 1 (по умолчанию 0), чтобы они 
+рисовались после всех сфер. В противном случае сфера может накрыть их и закрыть их.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-moon-axes.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Мы можем видеть оси
+<span style="color:red">x (красная)</span> и
+<span style="color:blue">z (синяя)</span> Поскольку мы смотрим прямо вниз, и каждый 
+из наших объектов вращается только вокруг своей оси y, мы не видим большую часть 
+осей <span style="color:green">y (зеленая)</span>.</p>
+<p>Может быть трудно увидеть некоторые из них, так как есть две пары перекрывающихся осей. 
+И <code class="notranslate" translate="no">sunMesh</code> и  <code class="notranslate" translate="no">solarSystem</code> находятся в одинаковом положении. Точно так же <code class="notranslate" translate="no">earthMesh</code> и
+<code class="notranslate" translate="no">earthOrbit</code>находятся в той же позиции. Давайте добавим несколько простых элементов управления, 
+чтобы мы могли включать и выключать их для каждого узла. Пока мы делаем это, 
+давайте также добавим еще одного помощника под названием <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a>. 
+Создающего двумерную сетку на плоскости X, Z. По умолчанию сетка составляет 
+10х10 единиц.</p>
+<p>Мы также собираемся использовать <a href="https://github.com/georgealways/lil-gui">lil-gui</a> 
+библиотеку пользовательского интерфейса, которая очень популярна в проектах Three.js. 
+lil-gui принимает объект и имя свойства для этого объекта и в зависимости от типа 
+свойства автоматически создает пользовательский интерфейс для управления этим свойством.</p>
+<p>Мы хотим сделать <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> и <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> для каждого узла. Нам нужна метка для каждого 
+узла, поэтому мы избавимся от старого цикла и переключимся на вызов некоторой 
+функции, чтобы добавить помощники для каждого узла</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-// добавляем AxesHelper к каждому узлу
+-objects.forEach((node) =&gt; {
+-  const axes = new THREE.AxesHelper();
+-  axes.material.depthTest = false;
+-  axes.renderOrder = 1;
+-  node.add(axes);
+-});
+
++function makeAxisGrid(node, label, units) {
++  const helper = new AxisGridHelper(node, units);
++  gui.add(helper, 'visible').name(label);
++}
++
++makeAxisGrid(solarSystem, 'solarSystem', 25);
++makeAxisGrid(sunMesh, 'sunMesh');
++makeAxisGrid(earthOrbit, 'earthOrbit');
++makeAxisGrid(earthMesh, 'earthMesh');
++makeAxisGrid(moonMesh, 'moonMesh');
+</pre>
+<p><code class="notranslate" translate="no">makeAxisGrid</code> делает <code class="notranslate" translate="no">AxisGridHelper</code> класс, который мы создадим, 
+чтобы сделать lil-gui счастливым. Как сказано выше, lil-gui автоматически 
+создаст пользовательский интерфейс, который манипулирует именованным свойством 
+некоторого объекта. Это создаст другой пользовательский интерфейс в зависимости 
+от типа свойства. Мы хотим, чтобы он создал флажок, поэтому нам нужно указать 
+<code class="notranslate" translate="no">bool</code> свойство. Но мы хотим, чтобы и оси, и сетка появлялись / исчезали на основе 
+одного свойства, поэтому мы создадим класс, который имеет метод получения и 
+установки для свойства. Таким образом, мы можем позволить lil-gui думать, 
+что он манипулирует одним свойством, но внутри мы можем установить видимое 
+свойство <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a> и <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> для узла.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// Для включения и выключения видимых осей и сетки
+// lil-gui требуется свойство, которое возвращает bool
+// это checkbox мы сделали сеттер и геттер
+// чтобы получить значение для `visible` от lil-gui
+class AxisGridHelper {
+  constructor(node, units = 10) {
+    const axes = new THREE.AxesHelper();
+    axes.material.depthTest = false;
+    axes.renderOrder = 2;  // после сетки
+    node.add(axes);
+
+    const grid = new THREE.GridHelper(units, units);
+    grid.material.depthTest = false;
+    grid.renderOrder = 1;
+    node.add(grid);
+
+    this.grid = grid;
+    this.axes = axes;
+    this.visible = false;
+  }
+  get visible() {
+    return this._visible;
+  }
+  set visible(v) {
+    this._visible = v;
+    this.grid.visible = v;
+    this.axes.visible = v;
+  }
+}
+</pre>
+<p>Мы устанавливаем <code class="notranslate" translate="no">renderOrder</code> в <a href="/docs/#api/en/helpers/AxesHelper"><code class="notranslate" translate="no">AxesHelper</code></a>
+равным 2, а для <a href="/docs/#api/en/helpers/GridHelper"><code class="notranslate" translate="no">GridHelper</code></a> равным 1 так, что оси втянуться после появления сетки. 
+В противном случае сетка может перезаписать оси.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/scenegraph-sun-earth-moon-axes-grids.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/scenegraph-sun-earth-moon-axes-grids.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Включите <code class="notranslate" translate="no">solarSystem</code> и вы увидите, что Земля находится точно в 10 единицах от центра, 
+как мы установили выше. Вы можете увидеть , как земля находится в 
+<em>локальном пространстве</em> <code class="notranslate" translate="no">solarSystem</code>. Включите <code class="notranslate" translate="no">earthOrbit</code> и вы увидите, 
+как луна ровно на 2 единицы от центра <em>локального пространства</em> <code class="notranslate" translate="no">earthOrbit</code>.</p>
+<p>Еще несколько примеров графов сцены. Автомобиль в простом игровом мире 
+может иметь такой граф сцены</p>
+<p><img src="../resources/images/scenegraph-car.svg" align="center"></p>
+<p>Если вы двигаете кузов автомобиля, все колеса будут двигаться вместе с ним. 
+Если вы хотите, чтобы кузов отскакивал отдельно от колес, вы можете привязать 
+тело и колеса к "рамному" узлу, который представляет раму автомобиля.</p>
+<p>Другой пример - человек в игровом мире.</p>
+<p><img src="../resources/images/scenegraph-human.svg" align="center"></p>
+<p>Вы можете видеть, что график сцены становится довольно сложным для человека. 
+На самом деле этот граф сцены упрощен. Например, вы можете расширить его, 
+чтобы охватить каждый палец (по крайней мере, еще 28 узлов) и каждый палец 
+(еще 28 узлов), плюс для челюсти, глаз и, возможно, больше.</p>
+<p>Я надеюсь, что это дает некоторое представление о том, как работает граф сцены 
+и как вы можете его использовать. Создание <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> узлов и родительских 
+объектов для них - важный шаг к хорошему использованию трехмерного движка, 
+такого как three.js. Часто может показаться, что какая-то сложная математика 
+необходима, чтобы заставить что-то двигаться и вращаться так, как вы хотите. 
+Например, без графа сцены, вычисляющего движение луны или куда поставить 
+колеса автомобиля относительно его тела, было бы очень сложно, но с 
+помощью графа сцены это становится намного проще.</p>
+<p><a href="materials.html">Далее мы пройдемся по материалам</a>.</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

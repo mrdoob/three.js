@@ -1,33 +1,33 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
-import { UIRow, UIText, UIInteger, UISelect, UICheckbox, UINumber } from './libs/ui.js';
+import { UIDiv, UIRow, UIText, UIInteger, UISelect, UICheckbox, UINumber } from './libs/ui.js';
 import { UIPoints3 } from './libs/ui.three.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
 function GeometryParametersPanel( editor, object ) {
 
-	var strings = editor.strings;
+	const strings = editor.strings;
 
-	var container = new UIRow();
+	const container = new UIDiv();
 
-	var geometry = object.geometry;
-	var parameters = geometry.parameters;
+	const geometry = object.geometry;
+	const parameters = geometry.parameters;
 
 	// points
 
-	var pointsRow = new UIRow();
+	const pointsRow = new UIRow();
 	pointsRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/path' ) ).setWidth( '90px' ) );
 
-	var points = new UIPoints3().setValue( parameters.path.points ).onChange( update );
+	const points = new UIPoints3().setValue( parameters.path.points ).onChange( update );
 	pointsRow.add( points );
 
 	container.add( pointsRow );
 
 	// radius
 
-	var radiusRow = new UIRow();
-	var radius = new UINumber( parameters.radius ).onChange( update );
+	const radiusRow = new UIRow();
+	const radius = new UINumber( parameters.radius ).onChange( update );
 
 	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/radius' ) ).setWidth( '90px' ) );
 	radiusRow.add( radius );
@@ -36,8 +36,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// tubularSegments
 
-	var tubularSegmentsRow = new UIRow();
-	var tubularSegments = new UIInteger( parameters.tubularSegments ).onChange( update );
+	const tubularSegmentsRow = new UIRow();
+	const tubularSegments = new UIInteger( parameters.tubularSegments ).onChange( update );
 
 	tubularSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/tubularsegments' ) ).setWidth( '90px' ) );
 	tubularSegmentsRow.add( tubularSegments );
@@ -46,8 +46,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// radialSegments
 
-	var radialSegmentsRow = new UIRow();
-	var radialSegments = new UIInteger( parameters.radialSegments ).onChange( update );
+	const radialSegmentsRow = new UIRow();
+	const radialSegments = new UIInteger( parameters.radialSegments ).onChange( update );
 
 	radialSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/radialsegments' ) ).setWidth( '90px' ) );
 	radialSegmentsRow.add( radialSegments );
@@ -56,8 +56,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// closed
 
-	var closedRow = new UIRow();
-	var closed = new UICheckbox( parameters.closed ).onChange( update );
+	const closedRow = new UIRow();
+	const closed = new UICheckbox( parameters.closed ).onChange( update );
 
 	closedRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/closed' ) ).setWidth( '90px' ) );
 	closedRow.add( closed );
@@ -66,8 +66,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// curveType
 
-	var curveTypeRow = new UIRow();
-	var curveType = new UISelect().setOptions( { centripetal: 'centripetal', chordal: 'chordal', catmullrom: 'catmullrom' } ).setValue( parameters.path.curveType ).onChange( update );
+	const curveTypeRow = new UIRow();
+	const curveType = new UISelect().setOptions( { centripetal: 'centripetal', chordal: 'chordal', catmullrom: 'catmullrom' } ).setValue( parameters.path.curveType ).onChange( update );
 
 	curveTypeRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/curvetype' ) ).setWidth( '90px' ), curveType );
 
@@ -75,8 +75,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// tension
 
-	var tensionRow = new UIRow().setDisplay( curveType.getValue() == 'catmullrom' ? '' : 'none' );
-	var tension = new UINumber( parameters.path.tension ).setStep( 0.01 ).onChange( update );
+	const tensionRow = new UIRow().setDisplay( curveType.getValue() == 'catmullrom' ? '' : 'none' );
+	const tension = new UINumber( parameters.path.tension ).setStep( 0.01 ).onChange( update );
 
 	tensionRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/tension' ) ).setWidth( '90px' ), tension );
 

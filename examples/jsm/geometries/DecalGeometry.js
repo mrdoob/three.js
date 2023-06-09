@@ -3,7 +3,7 @@ import {
 	Float32BufferAttribute,
 	Matrix4,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * You can use this geometry to create a decal mesh, that serves different kinds of purposes.
@@ -63,13 +63,6 @@ class DecalGeometry extends BufferGeometry {
 			const normal = new Vector3();
 
 			// handle different geometry types
-
-			if ( mesh.geometry.isGeometry === true ) {
-
-				console.error( 'THREE.DecalGeometry no longer supports THREE.Geometry. Use BufferGeometry instead.' );
-				return;
-
-			}
 
 			const geometry = mesh.geometry;
 

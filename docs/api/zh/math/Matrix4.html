@@ -95,11 +95,15 @@ m.elements = [ 11, 21, 31, 41,
 		<h2>构造器（Constructor）</h2>
 
 
-		<h3>[name]()</h3>
+		<h3>[name]( [param:Number n11], [param:Number n12], [param:Number n13], [param:Number n14],
+			[param:Number n21], [param:Number n22], [param:Number n23], [param:Number n24],
+			[param:Number n31], [param:Number n32], [param:Number n33], [param:Number n34],
+			[param:Number n41], [param:Number n42], [param:Number n43], [param:Number n44] )</h3>
 
 		<p>
-			创建并初始化一个4X4的单位矩阵[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
-	</p>
+			Creates a 4x4 matrix with the given arguments in row-major order. If no arguments are provided, the constructor initializes 
+			the [name] to the 4x4 [link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
+		</p>
 
 		<h2>属性（Properties）</h2>
 
@@ -187,9 +191,9 @@ zAxis = (c, g, k)
 		<h3>[method:this identity]()</h3>
 		<p>将当前矩阵重置为单位矩阵[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix]。</p>
 
-		<h3>[method:this lookAt]( [param:Vector3 eye], [param:Vector3 center], [param:Vector3 up], )</h3>
+		<h3>[method:this lookAt]( [param:Vector3 eye], [param:Vector3 target], [param:Vector3 up] )</h3>
 		<p>
-			构造一个旋转矩阵，从[page:Vector3 eye] 指向 [page:Vector3 center]，由向量 [page:Vector3 up] 定向。
+			构造一个旋转矩阵，从[page:Vector3 eye] 指向 [page:Vector3 target]，由向量 [page:Vector3 up] 定向。
 		</p>
 
 		<h3>[method:this makeRotationAxis]( [param:Vector3 axis], [param:Float theta] )</h3>
@@ -199,7 +203,7 @@ zAxis = (c, g, k)
 
 		设置当前矩阵为围绕轴 [page:Vector3 axis] 旋转量为 [page:Float theta]弧度。<br />
 
-		这是一种有点争议但在数学上可以替代通过四元数[page:Quaternions]旋转的办法。 请参阅此处[link:https://www.gamedev.net/articles/programming/math-and-physics/do-we-really-need-quaternions-r1199 here]的讨论。
+		这是一种有点争议但在数学上可以替代通过四元数[page:Quaternion Quaternions]旋转的办法。 请参阅此处[link:https://www.gamedev.net/articles/programming/math-and-physics/do-we-really-need-quaternions-r1199 here]的讨论。
 		</p>
 
 		<h3>[method:this makeBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
@@ -316,13 +320,12 @@ x, y, 1, 0,
 </code>
 		</p>
 
-		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:this makeTranslation]( [param:Vector3 v] )</h3>
+		<h3>
+			[method:this makeTranslation]( [param:Float x], [param:Float y], [param:Float z] ) // optional API
+		</h3>
 		<p>
-			[page:Float x] - 在X轴上的平移量。<br />
-			[page:Float y] - 在Y轴上的平移量。<br />
-			[page:Float z] - 在Z轴上的平移量。<br /><br />
-
-		设置该矩阵为平移变换：
+		取传入参数[param:Vector3 v]中值设设置该矩阵为平移变换：
 		<code>
 1, 0, 0, x,
 0, 1, 0, y,

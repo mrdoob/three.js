@@ -1,216 +1,189 @@
-import { TempNode } from '../core/TempNode.js';
+import TempNode from '../core/TempNode.js';
+import { sub, mul, div } from './OperatorNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { addNodeElement, nodeObject, nodeProxy, float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
 class MathNode extends TempNode {
 
-	constructor( a, bOrMethod, cOrMethod, method ) {
+	constructor( method, aNode, bNode = null, cNode = null ) {
 
 		super();
 
-		this.a = a;
-		typeof bOrMethod !== 'string' ? this.b = bOrMethod : method = bOrMethod;
-		typeof cOrMethod !== 'string' ? this.c = cOrMethod : method = cOrMethod;
-
 		this.method = method;
 
-	}
-
-	getNumInputs( /*builder*/ ) {
-
-		switch ( this.method ) {
-
-			case MathNode.MIX:
-			case MathNode.CLAMP:
-			case MathNode.REFRACT:
-			case MathNode.SMOOTHSTEP:
-			case MathNode.FACEFORWARD:
-
-				return 3;
-
-			case MathNode.MIN:
-			case MathNode.MAX:
-			case MathNode.MOD:
-			case MathNode.STEP:
-			case MathNode.REFLECT:
-			case MathNode.DISTANCE:
-			case MathNode.DOT:
-			case MathNode.CROSS:
-			case MathNode.POW:
-
-				return 2;
-
-			default:
-
-				return 1;
-
-		}
+		this.aNode = aNode;
+		this.bNode = bNode;
+		this.cNode = cNode;
 
 	}
 
 	getInputType( builder ) {
 
-		const a = builder.getTypeLength( this.a.getType( builder ) );
-		const b = this.b ? builder.getTypeLength( this.b.getType( builder ) ) : 0;
-		const c = this.c ? builder.getTypeLength( this.c.getType( builder ) ) : 0;
+		const aType = this.aNode.getNodeType( builder );
+		const bType = this.bNode ? this.bNode.getNodeType( builder ) : null;
+		const cType = this.cNode ? this.cNode.getNodeType( builder ) : null;
 
-		if ( a > b && a > c ) {
+		const aLen = builder.isMatrix( aType ) ? 0 : builder.getTypeLength( aType );
+		const bLen = builder.isMatrix( bType ) ? 0 : builder.getTypeLength( bType );
+		const cLen = builder.isMatrix( cType ) ? 0 : builder.getTypeLength( cType );
 
-			return this.a.getType( builder );
+		if ( aLen > bLen && aLen > cLen ) {
 
-		} else if ( b > c ) {
+			return aType;
 
-			return this.b.getType( builder );
+		} else if ( bLen > cLen ) {
+
+			return bType;
+
+		} else if ( cLen > aLen ) {
+
+			return cType;
 
 		}
 
-		return this.c.getType( builder );
+		return aType;
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
-		switch ( this.method ) {
+		const method = this.method;
 
-			case MathNode.LENGTH:
-			case MathNode.DISTANCE:
-			case MathNode.DOT:
+		if ( method === MathNode.LENGTH || method === MathNode.DISTANCE || method === MathNode.DOT ) {
 
-				return 'f';
+			return 'float';
 
-			case MathNode.CROSS:
+		} else if ( method === MathNode.CROSS ) {
 
-				return 'v3';
+			return 'vec3';
+
+		} else {
+
+			return this.getInputType( builder );
 
 		}
-
-		return this.getInputType( builder );
 
 	}
 
 	generate( builder, output ) {
 
-		let a, b, c;
-		const al = this.a ? builder.getTypeLength( this.a.getType( builder ) ) : 0,
-			bl = this.b ? builder.getTypeLength( this.b.getType( builder ) ) : 0,
-			cl = this.c ? builder.getTypeLength( this.c.getType( builder ) ) : 0,
-			inputType = this.getInputType( builder ),
-			nodeType = this.getType( builder );
+		const method = this.method;
 
-		switch ( this.method ) {
+		const type = this.getNodeType( builder );
+		const inputType = this.getInputType( builder );
 
-			// 1 input
+		const a = this.aNode;
+		const b = this.bNode;
+		const c = this.cNode;
 
-			case MathNode.NEGATE:
+		const isWebGL = builder.renderer.isWebGLRenderer === true;
 
-				return builder.format( '( -' + this.a.build( builder, inputType ) + ' )', inputType, output );
+		if ( method === MathNode.TRANSFORM_DIRECTION ) {
 
-			case MathNode.INVERT:
+			// dir can be either a direction vector or a normal vector
+			// upper-left 3x3 of matrix is assumed to be orthogonal
 
-				return builder.format( '( 1.0 - ' + this.a.build( builder, inputType ) + ' )', inputType, output );
+			let tA = a;
+			let tB = b;
 
-				// 2 inputs
+			if ( builder.isMatrix( tA.getNodeType( builder ) ) ) {
 
-			case MathNode.CROSS:
+				tB = vec4( vec3( tB ), 0.0 );
 
-				a = this.a.build( builder, 'v3' );
-				b = this.b.build( builder, 'v3' );
+			} else {
 
-				break;
+				tA = vec4( vec3( tA ), 0.0 );
 
-			case MathNode.STEP:
+			}
 
-				a = this.a.build( builder, al === 1 ? 'f' : inputType );
-				b = this.b.build( builder, inputType );
+			const mulNode = mul( tA, tB ).xyz;
 
-				break;
+			return normalize( mulNode ).build( builder, output );
 
-			case MathNode.MIN:
-			case MathNode.MAX:
-			case MathNode.MOD:
+		} else if ( method === MathNode.NEGATE ) {
 
-				a = this.a.build( builder, inputType );
-				b = this.b.build( builder, bl === 1 ? 'f' : inputType );
+			return builder.format( '-' + a.build( builder, inputType ), type, output );
 
-				break;
+		} else if ( method === MathNode.ONE_MINUS ) {
 
-				// 3 inputs
+			return sub( 1.0, a ).build( builder, output );
 
-			case MathNode.REFRACT:
+		} else if ( method === MathNode.RECIPROCAL ) {
 
-				a = this.a.build( builder, inputType );
-				b = this.b.build( builder, inputType );
-				c = this.c.build( builder, 'f' );
+			return div( 1.0, a ).build( builder, output );
 
-				break;
+		} else if ( method === MathNode.DIFFERENCE ) {
 
-			case MathNode.MIX:
+			return abs( sub( a, b ) ).build( builder, output );
 
-				a = this.a.build( builder, inputType );
-				b = this.b.build( builder, inputType );
-				c = this.c.build( builder, cl === 1 ? 'f' : inputType );
+		} else {
 
-				break;
+			const params = [];
 
-				// default
+			if ( method === MathNode.CROSS ) {
 
-			default:
+				params.push(
+					a.build( builder, type ),
+					b.build( builder, type )
+				);
 
-				a = this.a.build( builder, inputType );
-				if ( this.b ) b = this.b.build( builder, inputType );
-				if ( this.c ) c = this.c.build( builder, inputType );
+			} else if ( method === MathNode.STEP ) {
 
-				break;
+				params.push(
+					a.build( builder, builder.getTypeLength( a.getNodeType( builder ) ) === 1 ? 'float' : inputType ),
+					b.build( builder, inputType )
+				);
+
+			} else if ( ( isWebGL && ( method === MathNode.MIN || method === MathNode.MAX ) ) || method === MathNode.MOD ) {
+
+				params.push(
+					a.build( builder, inputType ),
+					b.build( builder, builder.getTypeLength( b.getNodeType( builder ) ) === 1 ? 'float' : inputType )
+				);
+
+			} else if ( method === MathNode.REFRACT ) {
+
+				params.push(
+					a.build( builder, inputType ),
+					b.build( builder, inputType ),
+					c.build( builder, 'float' )
+				);
+
+			} else if ( method === MathNode.MIX ) {
+
+				params.push(
+					a.build( builder, inputType ),
+					b.build( builder, inputType ),
+					c.build( builder, builder.getTypeLength( c.getNodeType( builder ) ) === 1 ? 'float' : inputType )
+				);
+
+			} else {
+
+				params.push( a.build( builder, inputType ) );
+				if ( b !== null ) params.push( b.build( builder, inputType ) );
+				if ( c !== null ) params.push( c.build( builder, inputType ) );
+
+			}
+
+			return builder.format( `${ builder.getMethod( method ) }( ${params.join( ', ' )} )`, type, output );
 
 		}
-
-		// build function call
-
-		const params = [];
-		params.push( a );
-		if ( b ) params.push( b );
-		if ( c ) params.push( c );
-
-		const numInputs = this.getNumInputs( builder );
-
-		if ( params.length !== numInputs ) {
-
-			throw Error( `Arguments not match used in "${this.method}". Require ${numInputs}, currently ${params.length}.` );
-
-		}
-
-		return builder.format( this.method + '( ' + params.join( ', ' ) + ' )', nodeType, output );
 
 	}
 
-	copy( source ) {
+	serialize( data ) {
 
-		super.copy( source );
+		super.serialize( data );
 
-		this.a = source.a;
-		this.b = source.b;
-		this.c = source.c;
-		this.method = source.method;
-
-		return this;
+		data.method = this.method;
 
 	}
 
-	toJSON( meta ) {
+	deserialize( data ) {
 
-		let data = this.getJSONNode( meta );
+		super.deserialize( data );
 
-		if ( ! data ) {
-
-			data = this.createJSONNode( meta );
-
-			data.a = this.a.toJSON( meta ).uuid;
-			if ( this.b ) data.b = this.b.toJSON( meta ).uuid;
-			if ( this.c ) data.c = this.c.toJSON( meta ).uuid;
-
-			data.method = this.method;
-
-		}
-
-		return data;
+		this.method = data.method;
 
 	}
 
@@ -218,42 +191,48 @@ class MathNode extends TempNode {
 
 // 1 input
 
-MathNode.RAD = 'radians';
-MathNode.DEG = 'degrees';
+MathNode.RADIANS = 'radians';
+MathNode.DEGREES = 'degrees';
 MathNode.EXP = 'exp';
 MathNode.EXP2 = 'exp2';
 MathNode.LOG = 'log';
 MathNode.LOG2 = 'log2';
 MathNode.SQRT = 'sqrt';
-MathNode.INV_SQRT = 'inversesqrt';
+MathNode.INVERSE_SQRT = 'inversesqrt';
 MathNode.FLOOR = 'floor';
 MathNode.CEIL = 'ceil';
 MathNode.NORMALIZE = 'normalize';
 MathNode.FRACT = 'fract';
-MathNode.SATURATE = 'saturate';
 MathNode.SIN = 'sin';
 MathNode.COS = 'cos';
 MathNode.TAN = 'tan';
 MathNode.ASIN = 'asin';
 MathNode.ACOS = 'acos';
-MathNode.ARCTAN = 'atan';
+MathNode.ATAN = 'atan';
 MathNode.ABS = 'abs';
 MathNode.SIGN = 'sign';
 MathNode.LENGTH = 'length';
 MathNode.NEGATE = 'negate';
-MathNode.INVERT = 'invert';
+MathNode.ONE_MINUS = 'oneMinus';
+MathNode.DFDX = 'dFdx';
+MathNode.DFDY = 'dFdy';
+MathNode.ROUND = 'round';
+MathNode.RECIPROCAL = 'reciprocal';
 
 // 2 inputs
 
+MathNode.ATAN2 = 'atan2';
 MathNode.MIN = 'min';
 MathNode.MAX = 'max';
 MathNode.MOD = 'mod';
 MathNode.STEP = 'step';
 MathNode.REFLECT = 'reflect';
 MathNode.DISTANCE = 'distance';
+MathNode.DIFFERENCE = 'difference';
 MathNode.DOT = 'dot';
 MathNode.CROSS = 'cross';
 MathNode.POW = 'pow';
+MathNode.TRANSFORM_DIRECTION = 'transformDirection';
 
 // 3 inputs
 
@@ -263,7 +242,112 @@ MathNode.REFRACT = 'refract';
 MathNode.SMOOTHSTEP = 'smoothstep';
 MathNode.FACEFORWARD = 'faceforward';
 
-MathNode.prototype.nodeType = 'Math';
-MathNode.prototype.hashProperties = [ 'method' ];
+export default MathNode;
 
-export { MathNode };
+export const EPSILON = float( 1e-6 );
+export const INFINITY = float( 1e6 );
+
+export const radians = nodeProxy( MathNode, MathNode.RADIANS );
+export const degrees = nodeProxy( MathNode, MathNode.DEGREES );
+export const exp = nodeProxy( MathNode, MathNode.EXP );
+export const exp2 = nodeProxy( MathNode, MathNode.EXP2 );
+export const log = nodeProxy( MathNode, MathNode.LOG );
+export const log2 = nodeProxy( MathNode, MathNode.LOG2 );
+export const sqrt = nodeProxy( MathNode, MathNode.SQRT );
+export const inverseSqrt = nodeProxy( MathNode, MathNode.INVERSE_SQRT );
+export const floor = nodeProxy( MathNode, MathNode.FLOOR );
+export const ceil = nodeProxy( MathNode, MathNode.CEIL );
+export const normalize = nodeProxy( MathNode, MathNode.NORMALIZE );
+export const fract = nodeProxy( MathNode, MathNode.FRACT );
+export const sin = nodeProxy( MathNode, MathNode.SIN );
+export const cos = nodeProxy( MathNode, MathNode.COS );
+export const tan = nodeProxy( MathNode, MathNode.TAN );
+export const asin = nodeProxy( MathNode, MathNode.ASIN );
+export const acos = nodeProxy( MathNode, MathNode.ACOS );
+export const atan = nodeProxy( MathNode, MathNode.ATAN );
+export const abs = nodeProxy( MathNode, MathNode.ABS );
+export const sign = nodeProxy( MathNode, MathNode.SIGN );
+export const length = nodeProxy( MathNode, MathNode.LENGTH );
+export const negate = nodeProxy( MathNode, MathNode.NEGATE );
+export const oneMinus = nodeProxy( MathNode, MathNode.ONE_MINUS );
+export const dFdx = nodeProxy( MathNode, MathNode.DFDX );
+export const dFdy = nodeProxy( MathNode, MathNode.DFDY );
+export const round = nodeProxy( MathNode, MathNode.ROUND );
+export const reciprocal = nodeProxy( MathNode, MathNode.RECIPROCAL );
+
+export const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
+export const min = nodeProxy( MathNode, MathNode.MIN );
+export const max = nodeProxy( MathNode, MathNode.MAX );
+export const mod = nodeProxy( MathNode, MathNode.MOD );
+export const step = nodeProxy( MathNode, MathNode.STEP );
+export const reflect = nodeProxy( MathNode, MathNode.REFLECT );
+export const distance = nodeProxy( MathNode, MathNode.DISTANCE );
+export const difference = nodeProxy( MathNode, MathNode.DIFFERENCE );
+export const dot = nodeProxy( MathNode, MathNode.DOT );
+export const cross = nodeProxy( MathNode, MathNode.CROSS );
+export const pow = nodeProxy( MathNode, MathNode.POW );
+export const pow2 = nodeProxy( MathNode, MathNode.POW, 2 );
+export const pow3 = nodeProxy( MathNode, MathNode.POW, 3 );
+export const pow4 = nodeProxy( MathNode, MathNode.POW, 4 );
+export const transformDirection = nodeProxy( MathNode, MathNode.TRANSFORM_DIRECTION );
+
+export const mix = nodeProxy( MathNode, MathNode.MIX );
+export const clamp = ( value, low = 0, high = 1 ) => nodeObject( new MathNode( MathNode.CLAMP, nodeObject( value ), nodeObject( low ), nodeObject( high ) ) );
+export const saturate = ( value ) => clamp( value );
+export const refract = nodeProxy( MathNode, MathNode.REFRACT );
+export const smoothstep = nodeProxy( MathNode, MathNode.SMOOTHSTEP );
+export const faceForward = nodeProxy( MathNode, MathNode.FACEFORWARD );
+
+export const mixElement = ( t, e1, e2 ) => mix( e1, e2, t );
+export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
+
+addNodeElement( 'radians', radians );
+addNodeElement( 'degrees', degrees );
+addNodeElement( 'exp', exp );
+addNodeElement( 'exp2', exp2 );
+addNodeElement( 'log', log );
+addNodeElement( 'log2', log2 );
+addNodeElement( 'sqrt', sqrt );
+addNodeElement( 'inverseSqrt', inverseSqrt );
+addNodeElement( 'floor', floor );
+addNodeElement( 'ceil', ceil );
+addNodeElement( 'normalize', normalize );
+addNodeElement( 'fract', fract );
+addNodeElement( 'sin', sin );
+addNodeElement( 'cos', cos );
+addNodeElement( 'tan', tan );
+addNodeElement( 'asin', asin );
+addNodeElement( 'acos', acos );
+addNodeElement( 'atan', atan );
+addNodeElement( 'abs', abs );
+addNodeElement( 'sign', sign );
+addNodeElement( 'length', length );
+addNodeElement( 'negate', negate );
+addNodeElement( 'oneMinus', oneMinus );
+addNodeElement( 'dFdx', dFdx );
+addNodeElement( 'dFdy', dFdy );
+addNodeElement( 'round', round );
+addNodeElement( 'reciprocal', reciprocal );
+addNodeElement( 'atan2', atan2 );
+addNodeElement( 'min', min );
+addNodeElement( 'max', max );
+addNodeElement( 'mod', mod );
+addNodeElement( 'step', step );
+addNodeElement( 'reflect', reflect );
+addNodeElement( 'distance', distance );
+addNodeElement( 'dot', dot );
+addNodeElement( 'cross', cross );
+addNodeElement( 'pow', pow );
+addNodeElement( 'pow2', pow2 );
+addNodeElement( 'pow3', pow3 );
+addNodeElement( 'pow4', pow4 );
+addNodeElement( 'transformDirection', transformDirection );
+addNodeElement( 'mix', mixElement );
+addNodeElement( 'clamp', clamp );
+addNodeElement( 'refract', refract );
+addNodeElement( 'smoothstep', smoothstepElement );
+addNodeElement( 'faceForward', faceForward );
+addNodeElement( 'difference', difference );
+addNodeElement( 'saturate', saturate );
+
+addNodeClass( MathNode );

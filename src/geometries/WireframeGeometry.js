@@ -7,6 +7,7 @@ class WireframeGeometry extends BufferGeometry {
 	constructor( geometry = null ) {
 
 		super();
+
 		this.type = 'WireframeGeometry';
 
 		this.parameters = {
@@ -39,7 +40,7 @@ class WireframeGeometry extends BufferGeometry {
 
 				}
 
-				// create a data structure that contains all eges without duplicates
+				// create a data structure that contains all edges without duplicates
 
 				for ( let o = 0, ol = groups.length; o < ol; ++ o ) {
 
@@ -111,6 +112,16 @@ class WireframeGeometry extends BufferGeometry {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
+
+	}
+
 }
 
 function isUniqueEdge( start, end, edges ) {
@@ -124,7 +135,8 @@ function isUniqueEdge( start, end, edges ) {
 
 	} else {
 
-		edges.add( hash1, hash2 );
+		edges.add( hash1 );
+		edges.add( hash2 );
 		return true;
 
 	}

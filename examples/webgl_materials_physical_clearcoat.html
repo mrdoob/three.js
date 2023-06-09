@@ -11,16 +11,29 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - materials - clearcoat
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
 
-			import { FlakesTexture } from './jsm/textures/FlakesTexture.js';
+			import { FlakesTexture } from 'three/addons/textures/FlakesTexture.js';
 
 			let container, stats;
 
@@ -37,8 +50,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 1000;
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 0.25, 50 );
+				camera.position.z = 10;
 
 				scene = new THREE.Scene();
 
@@ -50,12 +63,12 @@
 					.load( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ],
 						function ( texture ) {
 
-							const geometry = new THREE.SphereGeometry( 80, 64, 32 );
+							const geometry = new THREE.SphereGeometry( .8, 64, 32 );
 
 							const textureLoader = new THREE.TextureLoader();
 
 							const diffuse = textureLoader.load( 'textures/carbon/Carbon.png' );
-							diffuse.encoding = THREE.sRGBEncoding;
+							diffuse.colorSpace = THREE.SRGBColorSpace;
 							diffuse.wrapS = THREE.RepeatWrapping;
 							diffuse.wrapT = THREE.RepeatWrapping;
 							diffuse.repeat.x = 10;
@@ -64,6 +77,8 @@
 							const normalMap = textureLoader.load( 'textures/carbon/Carbon_Normal.png' );
 							normalMap.wrapS = THREE.RepeatWrapping;
 							normalMap.wrapT = THREE.RepeatWrapping;
+							normalMap.repeat.x = 10;
+							normalMap.repeat.y = 10;
 
 							const normalMap2 = textureLoader.load( 'textures/water/Water_1_M_Normal.jpg' );
 
@@ -76,7 +91,7 @@
 
 							const normalMap4 = textureLoader.load( 'textures/golfball.jpg' );
 
-							const clearcoatNormaMap = textureLoader.load( 'textures/pbr/Scratched_gold/Scratched_gold_01_1K_Normal.png' );
+							const clearcoatNormalMap = textureLoader.load( 'textures/pbr/Scratched_gold/Scratched_gold_01_1K_Normal.png' );
 
 							// car paint
 
@@ -91,8 +106,8 @@
 							} );
 
 							let mesh = new THREE.Mesh( geometry, material );
-							mesh.position.x = - 100;
-							mesh.position.y = 100;
+							mesh.position.x = - 1;
+							mesh.position.y = 1;
 							group.add( mesh );
 
 							// fibers
@@ -105,8 +120,8 @@
 								normalMap: normalMap
 							} );
 							mesh = new THREE.Mesh( geometry, material );
-							mesh.position.x = 100;
-							mesh.position.y = 100;
+							mesh.position.x = 1;
+							mesh.position.y = 1;
 							group.add( mesh );
 
 							// golf
@@ -116,14 +131,14 @@
 								roughness: 0.1,
 								clearcoat: 1.0,
 								normalMap: normalMap4,
-								clearcoatNormalMap: clearcoatNormaMap,
+								clearcoatNormalMap: clearcoatNormalMap,
 
 								// y scale is negated to compensate for normal map handedness.
 								clearcoatNormalScale: new THREE.Vector2( 2.0, - 2.0 )
 							} );
 							mesh = new THREE.Mesh( geometry, material );
-							mesh.position.x = - 100;
-							mesh.position.y = - 100;
+							mesh.position.x = - 1;
+							mesh.position.y = - 1;
 							group.add( mesh );
 
 							// clearcoat + normalmap
@@ -134,14 +149,14 @@
 								color: 0xff0000,
 								normalMap: normalMap2,
 								normalScale: new THREE.Vector2( 0.15, 0.15 ),
-								clearcoatNormalMap: clearcoatNormaMap,
+								clearcoatNormalMap: clearcoatNormalMap,
 
 								// y scale is negated to compensate for normal map handedness.
 								clearcoatNormalScale: new THREE.Vector2( 2.0, - 2.0 )
 							} );
 							mesh = new THREE.Mesh( geometry, material );
-							mesh.position.x = 100;
-							mesh.position.y = - 100;
+							mesh.position.x = 1;
+							mesh.position.y = - 1;
 							group.add( mesh );
 
 							//
@@ -156,14 +171,15 @@
 				// LIGHTS
 
 				particleLight = new THREE.Mesh(
-					new THREE.SphereGeometry( 4, 8, 8 ),
+					new THREE.SphereGeometry( .05, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff } )
 				);
 				scene.add( particleLight );
 
-				particleLight.add( new THREE.PointLight( 0xffffff, 1 ) );
+				particleLight.add( new THREE.PointLight( 0xffffff, 30 ) );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.useLegacyLights = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -175,7 +191,6 @@
 
 				//
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
@@ -184,7 +199,9 @@
 
 				// EVENTS
 
-				new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 3;
+				controls.maxDistance = 30;
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -220,9 +237,9 @@
 
 				const timer = Date.now() * 0.00025;
 
-				particleLight.position.x = Math.sin( timer * 7 ) * 300;
-				particleLight.position.y = Math.cos( timer * 5 ) * 400;
-				particleLight.position.z = Math.cos( timer * 3 ) * 300;
+				particleLight.position.x = Math.sin( timer * 7 ) * 3;
+				particleLight.position.y = Math.cos( timer * 5 ) * 4;
+				particleLight.position.z = Math.cos( timer * 3 ) * 3;
 
 				for ( let i = 0; i < group.children.length; i ++ ) {
 

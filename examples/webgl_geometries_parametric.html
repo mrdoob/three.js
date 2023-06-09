@@ -11,15 +11,28 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - parametric geometries</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { Curves } from './jsm/curves/CurveExtras.js';
-			import { ParametricGeometry } from './jsm/geometries/ParametricGeometry.js';
-			import { ParametricGeometries } from './jsm/geometries/ParametricGeometries.js';
+			import * as Curves from 'three/addons/curves/CurveExtras.js';
+			import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';
+			import { ParametricGeometries } from 'three/addons/geometries/ParametricGeometries.js';
 
 			let camera, scene, renderer, stats;
 
@@ -49,6 +62,7 @@
 				const map = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
+				map.colorSpace = THREE.SRGBColorSpace;
 
 				const material = new THREE.MeshPhongMaterial( { map: map, side: THREE.DoubleSide } );
 

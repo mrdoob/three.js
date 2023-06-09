@@ -1,18 +1,15 @@
 import {
-	LinearFilter,
 	Mesh,
 	OrthographicCamera,
 	PerspectiveCamera,
 	PlaneGeometry,
-	RGBFormat,
 	Scene,
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
+} from 'three';
 
-import { BokehShader } from '../shaders/BokehShader2.js';
-import { BokehDepthShader } from '../shaders/BokehShader2.js';
+import { BokehShader, BokehDepthShader } from '../shaders/BokehShader2.js';
 
 class CinematicCamera extends PerspectiveCamera {
 
@@ -125,9 +122,8 @@ class CinematicCamera extends PerspectiveCamera {
 
 			this.postprocessing.scene.add( this.postprocessing.camera );
 
-			const pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBFormat };
-			this.postprocessing.rtTextureDepth = new WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
-			this.postprocessing.rtTextureColor = new WebGLRenderTarget( window.innerWidth, window.innerHeight, pars );
+			this.postprocessing.rtTextureDepth = new WebGLRenderTarget( window.innerWidth, window.innerHeight );
+			this.postprocessing.rtTextureColor = new WebGLRenderTarget( window.innerWidth, window.innerHeight );
 
 			const bokeh_shader = BokehShader;
 

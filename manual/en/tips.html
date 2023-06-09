@@ -1,0 +1,374 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>Tips</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Tips">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Tips</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>This article is a collection of small issues you might run into
+using three.js that seemed too small to have their own article.</p>
+<hr>
+<p><a id="screenshot" data-toc="Taking a screenshot"></a></p>
+<h1 id="taking-a-screenshot-of-the-canvas">Taking A Screenshot of the Canvas</h1>
+<p>In the browser there are effectively 2 functions that will take a screenshot.
+The old one 
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL"><code class="notranslate" translate="no">canvas.toDataURL</code></a>
+and the new better one 
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob"><code class="notranslate" translate="no">canvas.toBlob</code></a></p>
+<p>So you'd think it would be easy to take a screenshot by just adding some code like</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
++&lt;button id="screenshot" type="button"&gt;Save...&lt;/button&gt;
+</pre>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const elem = document.querySelector('#screenshot');
+elem.addEventListener('click', () =&gt; {
+  canvas.toBlob((blob) =&gt; {
+    saveBlob(blob, `screencapture-${canvas.width}x${canvas.height}.png`);
+  });
+});
+
+const saveBlob = (function() {
+  const a = document.createElement('a');
+  document.body.appendChild(a);
+  a.style.display = 'none';
+  return function saveData(blob, fileName) {
+     const url = window.URL.createObjectURL(blob);
+     a.href = url;
+     a.download = fileName;
+     a.click();
+  };
+}());
+</pre>
+<p>Here's the example from <a href="responsive.html">the article on responsiveness</a>
+with the code above added and some CSS to place the button</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-screenshot-bad.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-screenshot-bad.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>When I tried it I got this screenshot</p>
+<div class="threejs_center"><img src="../resources/images/screencapture-413x313.png"></div>
+
+<p>Yes, it's just a black image.</p>
+<p>It's possible it worked for you depending on your browser/OS but in general
+it's not likely to work.</p>
+<p>The issue is that for performance and compatibility reasons, by default the browser
+will clear a WebGL canvas's drawing buffer after you've drawn to it.</p>
+<p>The solution is to call your rendering code just before capturing.</p>
+<p>In our code we need to adjust a few things. First let's separate
+out the rendering code.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const state = {
++  time: 0,
++};
+
+-function render(time) {
+-  time *= 0.001;
++function render() {
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  cubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+-    const rot = time * speed;
++    const rot = state.time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  renderer.render(scene, camera);
+
+-  requestAnimationFrame(render);
+}
+
++function animate(time) {
++  state.time = time * 0.001;
++
++  render();
++
++  requestAnimationFrame(animate);
++}
++requestAnimationFrame(animate);
+</pre>
+<p>Now that <code class="notranslate" translate="no">render</code> is only concerned with actually rendering
+we can call it just before capturing the canvas.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const elem = document.querySelector('#screenshot');
+elem.addEventListener('click', () =&gt; {
++  render();
+  canvas.toBlob((blob) =&gt; {
+    saveBlob(blob, `screencapture-${canvas.width}x${canvas.height}.png`);
+  });
+});
+</pre>
+<p>And now it should work.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-screenshot-good.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-screenshot-good.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>For a different solution see the next item.</p>
+<hr>
+<p><a id="preservedrawingbuffer" data-toc="Prevent the Canvas Being Cleared"></a></p>
+<h1 id="preventing-the-canvas-being-cleared">Preventing the canvas being cleared</h1>
+<p>Let's say you wanted to let the user paint with an animated
+object. You need to pass in <code class="notranslate" translate="no">preserveDrawingBuffer: true</code> when
+you create the <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. This prevents the browser from
+clearing the canvas. You also need to tell three.js not to clear
+the canvas as well.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++const renderer = new THREE.WebGLRenderer({
++  canvas,
++  preserveDrawingBuffer: true,
++  alpha: true,
++});
++renderer.autoClearColor = false;
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-preservedrawingbuffer.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-preservedrawingbuffer.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>Note that if you were serious about making a drawing program this would not be a
+solution as the browser will still clear the canvas anytime we change its
+resolution. We're changing is resolution based on its display size. Its display
+size changes when the window changes size. That includes when the user downloads
+a file, even in another tab, and the browser adds a status bar. It also includes when
+the user turns their phone and the browser switches from portrait to landscape.</p>
+<p>If you really wanted to make a drawing program you'd
+<a href="rendertargets.html">render to a texture using a render target</a>.</p>
+<hr>
+<p><a id="tabindex" data-toc="Get Keyboard Input From a Canvas"></a></p>
+<h1 id="getting-keyboard-input">Getting Keyboard Input</h1>
+<p>Throughout these tutorials we've often attached event listeners to the <code class="notranslate" translate="no">canvas</code>.
+While many events work, one that does not work by default is keyboard
+events.</p>
+<p>To get keyboard events, set the <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex"><code class="notranslate" translate="no">tabindex</code></a>
+of the canvas to 0 or more. Eg.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas tabindex="0"&gt;&lt;/canvas&gt;
+</pre>
+<p>This ends up causing a new issue though. Anything that has a <code class="notranslate" translate="no">tabindex</code> set
+will get highlighted when it has the focus. To fix that set its focus CSS outline
+to none</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">canvas:focus {
+  outline:none;
+}
+</pre>
+<p>To demonstrate here are 3 canvases </p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c1"&gt;&lt;/canvas&gt;
+&lt;canvas id="c2" tabindex="0"&gt;&lt;/canvas&gt;
+&lt;canvas id="c3" tabindex="1"&gt;&lt;/canvas&gt;
+</pre>
+<p>and some css just for the last canvas </p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c3:focus {
+    outline: none;
+}
+</pre>
+<p>Let's attach the same event listeners to all of them</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">document.querySelectorAll('canvas').forEach((canvas) =&gt; {
+  const ctx = canvas.getContext('2d');
+
+  function draw(str) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(str, canvas.width / 2, canvas.height / 2);
+  }
+  draw(canvas.id);
+
+  canvas.addEventListener('focus', () =&gt; {
+    draw('has focus press a key');
+  });
+
+  canvas.addEventListener('blur', () =&gt; {
+    draw('lost focus');
+  });
+
+  canvas.addEventListener('keydown', (e) =&gt; {
+    draw(`keyCode: ${e.keyCode}`);
+  });
+});
+</pre>
+<p>Notice you can't get the first canvas to accept keyboard input.
+The second canvas you can but it gets highlighted. The 3rd
+canvas has both solutions applied.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-tabindex.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-tabindex.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<hr>
+<p><a id="transparent-canvas" data-toc="Make the Canvas Transparent"></a></p>
+<h1 id="making-the-canvas-transparent">Making the Canvas Transparent</h1>
+<p>By default THREE.js makes the canvas opaque. If you want the
+canvas to be transparent pass in <a href="/docs/#api/en/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha:true</code></a> when you create
+the <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++const renderer = new THREE.WebGLRenderer({
++  canvas,
++  alpha: true,
++});
+</pre>
+<p>You probably also want to tell it that your results are <strong>not</strong> using premultiplied alpha</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  alpha: true,
++  premultipliedAlpha: false,
+});
+</pre>
+<p>Three.js defaults to the canvas using
+<a href="/docs/#api/en/renderers/WebGLRenderer#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: true</code></a> but defaults
+to materials outputting <a href="/docs/#api/en/materials/Material#premultipliedAlpha"><code class="notranslate" translate="no">premultipliedAlpha: false</code></a>.</p>
+<p>If you'd like a better understanding of when and when not to use premultiplied alpha
+here's <a href="https://developer.nvidia.com/content/alpha-blending-pre-or-not-pre">a good article on it</a>.</p>
+<p>In any case let's setup a simple example with a transparent canvas.</p>
+<p>We applied the settings above to the example from <a href="responsive.html">the article on responsiveness</a>.
+Let's also make the materials more transparent.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x) {
+-  const material = new THREE.MeshPhongMaterial({color});
++  const material = new THREE.MeshPhongMaterial({
++    color,
++    opacity: 0.5,
++  });
+
+...
+</pre>
+<p>And let's add some HTML content</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="content"&gt;
++    &lt;div&gt;
++      &lt;h1&gt;Cubes-R-Us!&lt;/h1&gt;
++      &lt;p&gt;We make the best cubes!&lt;/p&gt;
++    &lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>as well as some CSS to put the canvas in front</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">body {
+    margin: 0;
+}
+#c {
+    width: 100%;
+    height: 100%;
+    display: block;
++    position: fixed;
++    left: 0;
++    top: 0;
++    z-index: 2;
++    pointer-events: none;
+}
++#content {
++  font-size: 7vw;
++  font-family: sans-serif;
++  text-align: center;
++  width: 100%;
++  height: 100%;
++  display: flex;
++  justify-content: center;
++  align-items: center;
++}
+</pre>
+<p>note that <code class="notranslate" translate="no">pointer-events: none</code> makes the canvas invisible to the mouse
+and touch events so you can select the text beneath.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-transparent-canvas.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-transparent-canvas.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<hr>
+<p><a id="html-background" data-toc="Use three.js as Background in HTML"></a></p>
+<h1 id="making-your-background-a-three-js-animation">Making your background a three.js animation</h1>
+<p>A common question is how to make a three.js animation be the background of
+a webpage.</p>
+<p>There are 2 obvious ways.</p>
+<ul>
+<li>Set the canvas CSS <code class="notranslate" translate="no">position</code> to <code class="notranslate" translate="no">fixed</code> as in</li>
+</ul>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c {
+ position: fixed;
+ left: 0;
+ top: 0;
+ ...
+}
+</pre>
+<p>You can basically see this exact solution on the previous example. Just set <code class="notranslate" translate="no">z-index</code> to -1
+and the cubes will appear behind the text.</p>
+<p>A small disadvantage to this solution is your JavaScript must integrate with the page
+and if you have a complex page then you need to make sure none of the JavaScript in your
+three.js visualization conflict with the JavaScript doing other things in the page.</p>
+<ul>
+<li>Use an <code class="notranslate" translate="no">iframe</code></li>
+</ul>
+<p>This is the solution used on <a href="/">the front page of this site</a>.</p>
+<p>In your webpage just insert an iframe, for example</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;iframe id="background" src="responsive.html"&gt;
+&lt;div&gt;
+  Your content goes here.
+&lt;/div&gt;
+</pre>
+<p>Then style the iframe to fill the window and be in the background
+which is basically the same code as we used above for the canvas
+except we also need to set <code class="notranslate" translate="no">border</code> to <code class="notranslate" translate="no">none</code> since iframes have
+a border by default.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">#background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    border: none;
+    pointer-events: none;
+}
+</pre><p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/tips-html-background.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/tips-html-background.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

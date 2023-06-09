@@ -14,13 +14,15 @@ class DirectionalLightHelper extends Object3D {
 	constructor( light, size, color ) {
 
 		super();
+
 		this.light = light;
-		this.light.updateMatrixWorld();
 
 		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
 
 		this.color = color;
+
+		this.type = 'DirectionalLightHelper';
 
 		if ( size === undefined ) size = 1;
 
@@ -58,6 +60,9 @@ class DirectionalLightHelper extends Object3D {
 	}
 
 	update() {
+
+		this.light.updateWorldMatrix( true, false );
+		this.light.target.updateWorldMatrix( true, false );
 
 		_v1.setFromMatrixPosition( this.light.matrixWorld );
 		_v2.setFromMatrixPosition( this.light.target.matrixWorld );

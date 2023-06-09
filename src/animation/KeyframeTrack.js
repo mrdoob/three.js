@@ -6,7 +6,7 @@ import {
 import { CubicInterpolant } from '../math/interpolants/CubicInterpolant.js';
 import { LinearInterpolant } from '../math/interpolants/LinearInterpolant.js';
 import { DiscreteInterpolant } from '../math/interpolants/DiscreteInterpolant.js';
-import { AnimationUtils } from './AnimationUtils.js';
+import * as AnimationUtils from './AnimationUtils.js';
 
 class KeyframeTrack {
 

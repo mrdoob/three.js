@@ -14,16 +14,29 @@
 		move camera with WASD / RF + mouse
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { FontLoader } from './jsm/loaders/FontLoader.js';
-			import { TextGeometry } from './jsm/geometries/TextGeometry.js';
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 			const SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
 
@@ -66,7 +79,7 @@
 
 				// LIGHTS
 
-				const ambient = new THREE.AmbientLight( 0x444444 );
+				const ambient = new THREE.AmbientLight( 0x8d8d8d );
 				scene.add( ambient );
 
 				const light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 5, 0.3 );
@@ -92,7 +105,6 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.autoClear = false;
 
 				//
@@ -141,7 +153,7 @@
 				// GROUND
 
 				const geometry = new THREE.PlaneGeometry( 100, 100 );
-				const planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffb851 } );
+				const planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
 
 				const ground = new THREE.Mesh( geometry, planeMaterial );
 
@@ -159,7 +171,7 @@
 				const loader = new FontLoader();
 				loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
-					const textGeo = new TextGeometry( "THREE.JS", {
+					const textGeo = new TextGeometry( 'THREE.JS', {
 
 						font: font,
 
@@ -276,7 +288,7 @@
 				}
 
 				const gltfLoader = new GLTFLoader();
-				gltfLoader.load( "models/gltf/Horse.glb", function ( gltf ) {
+				gltfLoader.load( 'models/gltf/Horse.glb', function ( gltf ) {
 
 					const mesh = gltf.scene.children[ 0 ];
 					const clip = gltf.animations[ 0 ];

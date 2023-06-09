@@ -11,7 +11,7 @@ import {
 	Quaternion,
 	SphereGeometry,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 const _q = new Quaternion();
 const _targetPos = new Vector3();
@@ -149,7 +149,6 @@ class CCDIKSolver {
 				angle = math.acos( angle );
 
 				// skip if changing angle is too small to prevent vibration of bone
-				// Refer to http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mmd.three.js
 				if ( angle < 1e-5 ) continue;
 
 				if ( ik.minAngle !== undefined && angle < ik.minAngle ) {
@@ -187,19 +186,13 @@ class CCDIKSolver {
 
 				if ( rotationMin !== undefined ) {
 
-					link.rotation.setFromVector3(
-						link.rotation
-							.toVector3( _vector )
-							.max( rotationMin ) );
+					link.rotation.setFromVector3( _vector.setFromEuler( link.rotation ).max( rotationMin ) );
 
 				}
 
 				if ( rotationMax !== undefined ) {
 
-					link.rotation.setFromVector3(
-						link.rotation
-							.toVector3( _vector )
-							.min( rotationMax ) );
+					link.rotation.setFromVector3( _vector.setFromEuler( link.rotation ).min( rotationMax ) );
 
 				}
 
@@ -224,7 +217,7 @@ class CCDIKSolver {
 	 */
 	createHelper() {
 
-		return new CCDIKHelper( this.mesh, this.mesh.geometry.userData.MMD.iks );
+		return new CCDIKHelper( this.mesh, this.iks );
 
 	}
 
@@ -290,7 +283,7 @@ function setPositionOfBoneToAttributeArray( array, index, bone, matrixWorldInv )
  */
 class CCDIKHelper extends Object3D {
 
-	constructor( mesh, iks = [] ) {
+	constructor( mesh, iks = [], sphereSize = 0.25 ) {
 
 		super();
 
@@ -300,7 +293,7 @@ class CCDIKHelper extends Object3D {
 		this.matrix.copy( mesh.matrixWorld );
 		this.matrixAutoUpdate = false;
 
-		this.sphereGeometry = new SphereGeometry( 0.25, 16, 8 );
+		this.sphereGeometry = new SphereGeometry( sphereSize, 16, 8 );
 
 		this.targetSphereMaterial = new MeshBasicMaterial( {
 			color: new Color( 0xff8888 ),
@@ -400,6 +393,30 @@ class CCDIKHelper extends Object3D {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+	 */
+	dispose() {
+
+		this.sphereGeometry.dispose();
+
+		this.targetSphereMaterial.dispose();
+		this.effectorSphereMaterial.dispose();
+		this.linkSphereMaterial.dispose();
+		this.lineMaterial.dispose();
+
+		const children = this.children;
+
+		for ( let i = 0; i < children.length; i ++ ) {
+
+			const child = children[ i ];
+
+			if ( child.isLine ) child.geometry.dispose();
+
+		}
+
+	}
+
 	// private method
 
 	_init() {
@@ -462,4 +479,4 @@ class CCDIKHelper extends Object3D {
 
 }
 
-export { CCDIKSolver };
+export { CCDIKSolver, CCDIKHelper };

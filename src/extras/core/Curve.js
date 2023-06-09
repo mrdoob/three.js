@@ -389,7 +389,7 @@ class Curve {
 
 		const data = {
 			metadata: {
-				version: 4.5,
+				version: 4.6,
 				type: 'Curve',
 				generator: 'Curve.toJSON'
 			}

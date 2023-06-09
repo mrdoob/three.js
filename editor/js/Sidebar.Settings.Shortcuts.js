@@ -4,9 +4,9 @@ import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
 
 function SidebarSettingsShortcuts( editor ) {
 
-	var strings = editor.strings;
+	const strings = editor.strings;
 
-	var IS_MAC = navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
+	const IS_MAC = navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
 
 	function isValidKeyBinding( key ) {
 
@@ -14,28 +14,28 @@ function SidebarSettingsShortcuts( editor ) {
 
 	}
 
-	var config = editor.config;
-	var signals = editor.signals;
+	const config = editor.config;
+	const signals = editor.signals;
 
-	var container = new UIPanel();
+	const container = new UIPanel();
 
-	var headerRow = new UIRow();
+	const headerRow = new UIRow();
 	headerRow.add( new UIText( strings.getKey( 'sidebar/settings/shortcuts' ).toUpperCase() ) );
 	container.add( headerRow );
 
-	var shortcuts = [ 'translate', 'rotate', 'scale', 'undo', 'focus' ];
+	const shortcuts = [ 'translate', 'rotate', 'scale', 'undo', 'focus' ];
 
 	function createShortcutInput( name ) {
 
-		var configName = 'settings/shortcuts/' + name;
-		var shortcutRow = new UIRow();
+		const configName = 'settings/shortcuts/' + name;
+		const shortcutRow = new UIRow();
 
-		var shortcutInput = new UIInput().setWidth( '15px' ).setFontSize( '12px' );
+		const shortcutInput = new UIInput().setWidth( '15px' ).setFontSize( '12px' );
 		shortcutInput.setTextAlign( 'center' );
 		shortcutInput.setTextTransform( 'lowercase' );
 		shortcutInput.onChange( function () {
 
-			var value = shortcutInput.getValue().toLowerCase();
+			const value = shortcutInput.getValue().toLowerCase();
 
 			if ( isValidKeyBinding( value ) ) {
 
@@ -89,7 +89,7 @@ function SidebarSettingsShortcuts( editor ) {
 
 	}
 
-	for ( var i = 0; i < shortcuts.length; i ++ ) {
+	for ( let i = 0; i < shortcuts.length; i ++ ) {
 
 		createShortcutInput( shortcuts[ i ] );
 
@@ -107,11 +107,11 @@ function SidebarSettingsShortcuts( editor ) {
 
 			case 'delete':
 
-				var object = editor.selected;
+				const object = editor.selected;
 
 				if ( object === null ) return;
 
-				var parent = object.parent;
+				const parent = object.parent;
 				if ( parent !== null ) editor.execute( new RemoveObjectCommand( editor, object ) );
 
 				break;
@@ -166,7 +166,7 @@ function SidebarSettingsShortcuts( editor ) {
 
 		}
 
-	}, false );
+	} );
 
 	return container;
 

@@ -12,8 +12,8 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		用于模拟相机视锥体的辅助对象.<br />
-		它使用 [page:LineSegments] 来模拟相机视锥体.
+		用于模拟相机视锥体的辅助对象.它使用 [page:LineSegments] 来模拟相机视锥体.<br /><br />
+		[name] must be a child of the scene.
 		</p>
 
 		<h2>代码示例</h2>
@@ -63,12 +63,18 @@
 		</p>
 
 
-
-
-
 		<h2>方法</h2>
 		<p>请到基类 [page:LineSegments] 页面查看公共方法.</p>
 
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			用于辅助对象销毁内部创建的 [page:Line.material material] 和 [page:Line.geometry geometry] 。
+		</p>
+
+		<h3>[method:this setColors]( [param:Color frustum], [param:Color cone], [param:Color up], [param:Color target], [param:Color cross] )</h3>
+		<p>
+			定义辅助对象的颜色。
+		</p>
 
 		<h3>[method:undefined update]()</h3>
 		<p>基于相机的投影矩阵更新辅助对象.</p>

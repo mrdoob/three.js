@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Camera] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Caméra qui utilise [link:https://en.wikipedia.org/wiki/Perspective_(graphical) perspective projection].<br /><br />
+
+			Ce mode de projection est fait afin d'imiter la vision humaine. C'est le mode de
+			projection le plus communément utilisé afin d'effectuer le rendu d'une scène 3D.
+		</p>
+
+		<h2>Exemple de Code</h2>
+
+		<code>
+		const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+		scene.add( camera );
+		</code>
+
+		<h2>Exemples</h2>
+
+		<p>
+			[example:webgl_animation_skinning_blending animation / skinning / blending ]<br />
+			[example:webgl_animation_skinning_morph animation / skinning / morph ]<br />
+			[example:webgl_effects_stereo effects / stereo ]<br />
+			[example:webgl_interactive_cubes interactive / cubes ]<br />
+			[example:webgl_loader_collada_skinning loader / collada / skinning ]
+		</p>
+
+		<h2>Constructeur</h2>
+
+		<h3>[name]( [param:Number fov], [param:Number aspect], [param:Number near], [param:Number far] )</h3>
+		<p>
+		fov — Champ de vision vertical du frustum de la caméra.<br />
+		aspect — Ratio d'aspect du frustum de la caméra.<br />
+		near — Plan near du frustum de la caméra.<br />
+		far — Plan far du frustum de la caméra.<br /><br />
+
+		Ensemble, ces valeurs définissent le [link:https://en.wikipedia.org/wiki/Viewing_frustum viewing frustum] de la caméra.
+		</p>
+
+
+		<h2>Propriétés</h2>
+		<p>
+			Voir la classe [page:Camera] pour connaître les propriétés communes.<br>
+			Notez qu'après avoir changé la grande majorité de ces propriétés vous devrez appeller
+			[page:PerspectiveCamera.updateProjectionMatrix .updateProjectionMatrix] afin que les changements prennent effet.
+		</p>
+
+		<h3>[property:Float aspect]</h3>
+		<p>Ratio d'aspect du frustum de la caméra, en général la largeur du canvas / sa hauteur. La valeur par défaut est `1` (canvas carré).</p>
+
+		<h3>[property:Float far]</h3>
+		<p>
+			Plan far du frustum de la caméra. La valeur par défaut est `2000`.<br /><br />
+
+			Doit être supérieur à la valeur actuelle du plan [page:.near near].
+		</p>
+
+		<h3>[property:Float filmGauge]</h3>
+		<p>Taille de la pellicule utilisée pour l'axe le plus grand. La valeur par défaut est 35 (millimètres). Ce paramètre n'influe pas sur la matrice de projection sauf si .filmOffset est à une valeur non-nulle </p>
+		
+		<h3>[property:Float filmOffset]</h3>
+		<p>Décalage horizontal dans la même unité que `.filmGauge`. La valeur par défaut est `0`.</p>
+
+		<h3>[property:Float focus]</h3>
+		<p>Distance de l'objet utilisé pour les effets de stéréoscopie et de profondeur de champ.
+			Ce paramètre n'influe pas sur la matrice de projection sauf si une [page:StereoCamera] est utilisée.
+			La valeur par défaut est `10`.
+		</p>
+
+		<h3>[property:Float fov]</h3>
+		<p>Champ de vision vertical du frustum de la caméra, du bas vers le haut de l'écran, en degrés. La valeur par défaut est `50`.</p>
+
+		<h3>[property:Boolean isPerspectiveCamera]</h3>
+		<p>
+			Flag en lecture seul qui pemet de vérifier si un objet donné est de type [name].
+		</p>
+
+
+		<h3>[property:Float near]</h3>
+		<p>
+			Plan near du frustum de la caméra. La valeur par défaut est `0.1`.<br /><br />
+
+			L'intervalle valide est supérieure à `0` et inférieure à la valeur actuelle du plan [page:.far far].
+			Notez que, à l'inverse de l'[page:OrthographicCamera], `0` n'est <em>pas</em> une valeur valide
+			pour le plan near d'une PerspectiveCamera.
+		</p>
+
+		<h3>[property:Object view]</h3>
+		<p>
+			Spécification du frustum ou nul.
+			La valeur est fixée par la méthode [page:PerspectiveCamera.setViewOffset .setViewOffset] 
+			et supprimée par la méthode [page:PerspectiveCamera.clearViewOffset .clearViewOffset].
+		</p>
+
+		<h3>[property:number zoom]</h3>
+		<p>Récupère ou renseigne le facteur de zoom de la caméra. La valeur par défaut est `1`.</p>
+
+
+		<h2>Methods</h2>
+		<p>Voir la classe [page:Camera] pour connaître les propriétés communes.</p>
+
+		<h3>[method:undefined clearViewOffset]()</h3>
+		<p>Retire tout décalage mis en place par la méthode [page:PerspectiveCamera.setViewOffset .setViewOffset].</p>
+
+		<h3>[method:Float getEffectiveFOV]()</h3>
+		<p>Retourne l'angle du champ de vision verticalen degrés en prenant en compte le .zoom.</p>
+
+		<h3>[method:Float getFilmHeight]()</h3>
+		<p>
+		Retourne la hauteur de l'image dans la pellicule. Si .aspect est plus petit ou égal à un
+		(format portrait), le résultat est égal à .filmGauge.
+		</p>
+
+		<h3>[method:Float getFilmWidth]()</h3>
+		<p>
+		Retourne la largeur de l'image dans la pellicule. Si .aspect est plus grand ou égal à un
+		(format paysage), le résultat est égal à .filmGauge.
+		</p>
+
+		<h3>[method:Float getFocalLength]()</h3>
+		<p>Retourne la distance focale du .fov actuel par rapport au .filmGauge.</p>
+
+		<h3>[method:undefined setFocalLength]( [param:Float focalLength] )</h3>
+		<p>
+		Définis une valeur pour le champ de vision en fonction de la distance focale par rapport à la [page:PerspectiveCamera.filmGauge .filmGauge] actuelle.<br /><br />
+
+		Par défaut, la distance focale est spécifiée pour une caméra de 35mm (plein cadre).
+		</p>
+
+		<h3>[method:undefined setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
+		<p>
+		fullWidth — largeur totale du setup multi-écrans<br />
+		fullHeight — hauteur totale du setup multi-écrans<br />
+		x — décalage horizontal de la sous-caméra<br />
+		y — décalage vertical de la sous-caméra<br />
+		width — largeur de la sous-caméra<br />
+		height — hauteur de la sous-caméra
+		</p>
+
+		<p>
+		Définis un décalage dans un frustum plus grand. C'est utile pour un setup multi-écrans ou multi-machines.
+		</p>
+
+		<p>
+		Par exemple, si vous avez 3x2 écrans, que chaque écran est un 1920x1080 et les écrans sont dans une grille comme suit:<br />
+
+		<pre>
++---+---+---+
+| A | B | C |
++---+---+---+
+| D | E | F |
++---+---+---+
+		</pre>
+
+		puis pour chaque écran vous l'appelleriez ainsi:<br />
+
+		<code>const w = 1920;
+const h = 1080;
+const fullWidth = w * 3;
+const fullHeight = h * 2;
+
+// A
+camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
+// B
+camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
+// C
+camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
+// D
+camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
+// E
+camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
+// F
+camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
+</code>
+
+		Notez qu'il n'y a aucune raison que les écrans aient la même taille ou qu'ils soient dans une grille.
+		</p>
+
+		<h3>[method:undefined updateProjectionMatrix]()</h3>
+		<p>
+		Met à jour la matrice de projection de la caméra. Doit être appelé après chaque changement de paramètres.
+		</p>
+
+		<h3>[method:Object toJSON]([param:Object meta])</h3>
+		<p>
+		meta -- objet contenant des metadatas comme des objets ou des textures dans des descendants des objets.<br />
+		Convertis la caméra en [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format] three.js.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

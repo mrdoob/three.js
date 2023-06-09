@@ -7,8 +7,9 @@ class LineCurve3 extends Curve {
 
 		super();
 
-		this.type = 'LineCurve3';
 		this.isLineCurve3 = true;
+
+		this.type = 'LineCurve3';
 
 		this.v1 = v1;
 		this.v2 = v2;
@@ -38,6 +39,19 @@ class LineCurve3 extends Curve {
 		return this.getPoint( u, optionalTarget );
 
 	}
+
+	getTangent( t, optionalTarget = new Vector3() ) {
+
+		return optionalTarget.subVectors( this.v2, this.v1 ).normalize();
+
+	}
+
+	getTangentAt( u, optionalTarget ) {
+
+		return this.getTangent( u, optionalTarget );
+
+	}
+
 	copy( source ) {
 
 		super.copy( source );

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Un materiale per disegnare geometrie in stile wireframe.</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const material = new THREE.LineBasicMaterial( {
+			color: 0xffffff,
+			linewidth: 1,
+			linecap: 'round', // ignorato da WebGLRenderer
+			linejoin:  'round' // ignorato da WebGLRenderer
+		} );
+		</code>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_buffergeometry_drawrange WebGL / buffergeometry / drawrange]<br />
+			[example:webgl_buffergeometry_lines WebGL / buffergeometry / lines]<br />
+			[example:webgl_buffergeometry_lines_indexed WebGL / buffergeometry / lines / indexed]<br />
+			[example:webgl_decals WebGL / decals]<br />
+			[example:webgl_geometry_nurbs WebGL / geometry / nurbs]<br />
+			[example:webgl_geometry_shapes WebGL / geometry / shapes]<br />
+			[example:webgl_geometry_spline_editor WebGL / geometry / spline / editor]<br />
+			[example:webgl_interactive_buffergeometry WebGL / interactive / buffergeometry]<br />
+			[example:webgl_interactive_voxelpainter WebGL / interactive / voxelpainter]<br />
+			[example:webgl_lines_colors WebGL / lines / colors]<br />
+			[example:webgl_lines_dashed WebGL / lines / dashed]<br />
+			[example:webgl_materials WebGL / materials]<br />
+			[example:physics_ammo_rope physics / ammo / rope]
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+
+		<p>
+		[page:Object parameters] - (opzionale) un oggetto con una o più proprietà che definiscono l'aspetto del materiale.
+		Qualsiasi proprietà del materiale (inclusa qualsiasi proprietà ereditata dal [page:Material Materiale]) può essere passata qui.<br /><br />
+
+		L'eccezione è la proprietà [page:Hexadecimal color], che può essere passata come una stringa esadecimale ed il suo valore predefinito è `0xffffff` (bianco).
+		Il metodo [page:Color.set]( color ) è chiamato internamente.
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Material] per le proprietà comuni.</p>
+
+		<h3>[property:Color color]</h3>
+		<p>[page:Color Colore] del materiale, da impostazione predefinita impostato a bianco (0xffffff).</p>
+
+		<h3>[property:Boolean fog]</h3>
+		<p>Indica se il materiale è influenzato dalla nebbia. Il valore predefinito è `true`.</p>
+
+		<h3>[property:Float linewidth]</h3>
+		<p>
+			Controlla lo spessore della linea. Il valore predefinito è `1`.<br /><br />
+
+			A causa delle limitazioni del [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf profilo OpenGL Core]
+			con il renderer [page:WebGLRenderer WebGL] sulla maggior parte delle piattaforme, la larghezza della linea sarà sempre 1
+			indipendentemente dal valore impostato.
+		</p>
+
+		<h3>[property:String linecap]</h3>
+		<p>
+			Definisce l'aspetto della fine della linea. I valori possibili sono 'butt', 'round' e 'square'.
+			Il valore predefinito è 'round'.<br /><br />
+
+			Questa corrisponde alla proprietà [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
+			e viene ignorata dal renderer [page:WebGLRenderer WebGL].
+		</p>
+
+		<h3>[property:String linejoin]</h3>
+		<p>
+			Definisce l'aspetto dei punti di unione della linea. I valori possibili sono 'round', 'bevel' e 'miter'. Il valore predefinito è 'round'. <br /><br />
+
+			Questa corrisponde alla proprietà [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
+			e viene ignorata dal renderer [page:WebGLRenderer WebGL].
+		</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>
+			Sets the color of the lines using data from a [page:Texture].
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Material] per i metodi comuni.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

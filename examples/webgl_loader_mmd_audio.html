@@ -8,6 +8,7 @@
 		<style>
 			body {
 				color: #444;
+				background: #fff;
 			}
 			a {
 				color: #08f;
@@ -29,15 +30,28 @@
 		Camera is customized from <a href="http://www.nicovideo.jp/watch/sm19168559" target="_blank" rel="noopener">this Data</a>
 		</div>
 
-		<script src="js/libs/ammo.wasm.js"></script>
+		<script src="jsm/libs/ammo.wasm.js"></script>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
-			import { MMDLoader } from './jsm/loaders/MMDLoader.js';
-			import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
+			import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
+			import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
+			import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
 
 			let mesh, camera, scene, renderer, effect;
 			let helper;
@@ -73,16 +87,16 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
-				scene.add( new THREE.PolarGridHelper( 30, 10 ) );
+				scene.add( new THREE.PolarGridHelper( 30, 0 ) );
 
 				const listener = new THREE.AudioListener();
 				camera.add( listener );
 				scene.add( camera );
 
-				const ambient = new THREE.AmbientLight( 0x666666 );
+				const ambient = new THREE.AmbientLight( 0xaaaaaa, 1 );
 				scene.add( ambient );
 
-				const directionalLight = new THREE.DirectionalLight( 0x887766 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 

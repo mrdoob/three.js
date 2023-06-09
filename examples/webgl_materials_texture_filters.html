@@ -43,9 +43,22 @@
 		min: <span class="c">Nearest</span>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			const SCREEN_WIDTH = window.innerWidth;
 			const SCREEN_HEIGHT = window.innerHeight;
@@ -81,19 +94,20 @@
 
 				// GROUND
 
-				const imageCanvas = document.createElement( "canvas" );
-				const context = imageCanvas.getContext( "2d" );
+				const imageCanvas = document.createElement( 'canvas' );
+				const context = imageCanvas.getContext( '2d' );
 
 				imageCanvas.width = imageCanvas.height = 128;
 
-				context.fillStyle = "#444";
+				context.fillStyle = '#444';
 				context.fillRect( 0, 0, 128, 128 );
 
-				context.fillStyle = "#fff";
+				context.fillStyle = '#fff';
 				context.fillRect( 0, 0, 64, 64 );
 				context.fillRect( 64, 64, 64, 64 );
 
 				const textureCanvas = new THREE.CanvasTexture( imageCanvas );
+				textureCanvas.colorSpace = THREE.SRGBColorSpace;
 				textureCanvas.repeat.set( 1000, 1000 );
 				textureCanvas.wrapS = THREE.RepeatWrapping;
 				textureCanvas.wrapT = THREE.RepeatWrapping;
@@ -102,7 +116,7 @@
 				textureCanvas2.magFilter = THREE.NearestFilter;
 				textureCanvas2.minFilter = THREE.NearestFilter;
 
-				const	materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
+				const materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
 				const materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
 				const geometry = new THREE.PlaneGeometry( 100, 100 );
@@ -164,11 +178,14 @@
 
 				};
 
-				const texturePainting = new THREE.TextureLoader().load( "textures/758px-Canestra_di_frutta_(Caravaggio).jpg", callbackPainting );
+				const texturePainting = new THREE.TextureLoader().load( 'textures/758px-Canestra_di_frutta_(Caravaggio).jpg', callbackPainting );
 				const texturePainting2 = new THREE.Texture();
+
 				const materialPainting = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting } );
 				const materialPainting2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: texturePainting2 } );
 
+				texturePainting.colorSpace = THREE.SRGBColorSpace;
+				texturePainting2.colorSpace = THREE.SRGBColorSpace;
 				texturePainting2.minFilter = texturePainting2.magFilter = THREE.NearestFilter;
 				texturePainting.minFilter = texturePainting.magFilter = THREE.LinearFilter;
 				texturePainting.mapping = THREE.UVMapping;
@@ -179,7 +196,7 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;
 
-				renderer.domElement.style.position = "relative";
+				renderer.domElement.style.position = 'relative';
 				container.appendChild( renderer.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove );

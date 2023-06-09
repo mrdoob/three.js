@@ -13,6 +13,17 @@
 			Represents an oriented bounding box (OBB) in 3D space.
 		</p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { OBB } from 'three/addons/math/OBB.js';
+		</code>
+
 		<h2>Examples</h2>
 		<p>
 			[example:webgl_math_obb]
@@ -131,7 +142,7 @@
 		<h3>[method:Boolean intersectsOBB]( [param:OBB obb], [param:Number epsilon] )</h3>
 		<p>
 			[page:OBB obb] — The OBB to test.<br />
-			[page:Number epsilon] — An optional numeric value to counteract arithmetic errors. Default is *Number.EPSILON*.
+			[page:Number epsilon] — An optional numeric value to counteract arithmetic errors. Default is `Number.EPSILON`.
 		</p>
 		<p>
 			Whether the given [name] intersects this [name] or not.
@@ -152,7 +163,7 @@
 		</p>
 		<p>
 			Performs a Ray/OBB intersection test and stores the intersection point to the given 3D vector.
-			If no intersection is detected, *null* is returned.
+			If no intersection is detected, `null` is returned.
 		</p>
 
 		<h3>[method:this set]( [param:Vector3 center], [param:Vector3 halfSize], [param:Matrix3 rotation] )</h3>

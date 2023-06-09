@@ -5,7 +5,6 @@ import {
 	EquirectangularReflectionMapping,
 	EquirectangularRefractionMapping,
 	CubeUVReflectionMapping,
-	CubeUVRefractionMapping,
 
 	RepeatWrapping,
 	ClampToEdgeWrapping,
@@ -48,6 +47,7 @@ import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { Scene } from '../scenes/Scene.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
 import { Texture } from '../textures/Texture.js';
+import { Source } from '../textures/Source.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { ImageLoader } from './ImageLoader.js';
 import { LoadingManager } from './LoadingManager.js';
@@ -100,6 +100,8 @@ class ObjectLoader extends Loader {
 			const metadata = json.metadata;
 
 			if ( metadata === undefined || metadata.type === undefined || metadata.type.toLowerCase() === 'geometry' ) {
+
+				if ( onError !== undefined ) onError( new Error( 'THREE.ObjectLoader: Can\'t load ' + url ) );
 
 				console.error( 'THREE.ObjectLoader: Can\'t load ' + url );
 				return;
@@ -168,7 +170,7 @@ class ObjectLoader extends Loader {
 
 			for ( const uuid in images ) {
 
-				if ( images[ uuid ] instanceof HTMLImageElement ) {
+				if ( images[ uuid ].data instanceof HTMLImageElement ) {
 
 					hasImages = true;
 					break;
@@ -275,13 +277,6 @@ class ObjectLoader extends Loader {
 					case 'InstancedBufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data );
-
-						break;
-
-					case 'Geometry':
-
-						console.error( 'THREE.ObjectLoader: The legacy Geometry type is no longer supported.' );
-
 						break;
 
 					default:
@@ -301,7 +296,7 @@ class ObjectLoader extends Loader {
 				geometry.uuid = data.uuid;
 
 				if ( data.name !== undefined ) geometry.name = data.name;
-				if ( geometry.isBufferGeometry === true && data.userData !== undefined ) geometry.userData = data.userData;
+				if ( data.userData !== undefined ) geometry.userData = data.userData;
 
 				geometries[ data.uuid ] = geometry;
 
@@ -327,39 +322,13 @@ class ObjectLoader extends Loader {
 
 				const data = json[ i ];
 
-				if ( data.type === 'MultiMaterial' ) {
+				if ( cache[ data.uuid ] === undefined ) {
 
-					// Deprecated
-
-					const array = [];
-
-					for ( let j = 0; j < data.materials.length; j ++ ) {
-
-						const material = data.materials[ j ];
-
-						if ( cache[ material.uuid ] === undefined ) {
-
-							cache[ material.uuid ] = loader.parse( material );
-
-						}
-
-						array.push( cache[ material.uuid ] );
-
-					}
-
-					materials[ data.uuid ] = array;
-
-				} else {
-
-					if ( cache[ data.uuid ] === undefined ) {
-
-						cache[ data.uuid ] = loader.parse( data );
-
-					}
-
-					materials[ data.uuid ] = cache[ data.uuid ];
+					cache[ data.uuid ] = loader.parse( data );
 
 				}
+
+				materials[ data.uuid ] = cache[ data.uuid ];
 
 			}
 
@@ -461,7 +430,7 @@ class ObjectLoader extends Loader {
 
 					// load array of images e.g CubeTexture
 
-					images[ image.uuid ] = [];
+					const imageArray = [];
 
 					for ( let j = 0, jl = url.length; j < jl; j ++ ) {
 
@@ -473,13 +442,13 @@ class ObjectLoader extends Loader {
 
 							if ( deserializedImage instanceof HTMLImageElement ) {
 
-								images[ image.uuid ].push( deserializedImage );
+								imageArray.push( deserializedImage );
 
 							} else {
 
 								// special case: handle array of data textures for cube textures
 
-								images[ image.uuid ].push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
+								imageArray.push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
 
 							}
 
@@ -487,17 +456,15 @@ class ObjectLoader extends Loader {
 
 					}
 
+					images[ image.uuid ] = new Source( imageArray );
+
 				} else {
 
 					// load single image
 
 					const deserializedImage = deserializeImage( image.url );
+					images[ image.uuid ] = new Source( deserializedImage );
 
-					if ( deserializedImage !== null ) {
-
-						images[ image.uuid ] = deserializedImage;
-
-					}
 
 				}
 
@@ -560,7 +527,7 @@ class ObjectLoader extends Loader {
 
 					// load array of images e.g CubeTexture
 
-					images[ image.uuid ] = [];
+					const imageArray = [];
 
 					for ( let j = 0, jl = url.length; j < jl; j ++ ) {
 
@@ -572,13 +539,13 @@ class ObjectLoader extends Loader {
 
 							if ( deserializedImage instanceof HTMLImageElement ) {
 
-								images[ image.uuid ].push( deserializedImage );
+								imageArray.push( deserializedImage );
 
 							} else {
 
 								// special case: handle array of data textures for cube textures
 
-								images[ image.uuid ].push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
+								imageArray.push( new DataTexture( deserializedImage.data, deserializedImage.width, deserializedImage.height ) );
 
 							}
 
@@ -586,17 +553,14 @@ class ObjectLoader extends Loader {
 
 					}
 
+					images[ image.uuid ] = new Source( imageArray );
+
 				} else {
 
 					// load single image
 
 					const deserializedImage = await deserializeImage( image.url );
-
-					if ( deserializedImage !== null ) {
-
-						images[ image.uuid ] = deserializedImage;
-
-					}
+					images[ image.uuid ] = new Source( deserializedImage );
 
 				}
 
@@ -640,12 +604,14 @@ class ObjectLoader extends Loader {
 
 				}
 
+				const source = images[ data.image ];
+				const image = source.data;
+
 				let texture;
-				const image = images[ data.image ];
 
 				if ( Array.isArray( image ) ) {
 
-					texture = new CubeTexture( image );
+					texture = new CubeTexture();
 
 					if ( image.length === 6 ) texture.needsUpdate = true;
 
@@ -653,11 +619,11 @@ class ObjectLoader extends Loader {
 
 					if ( image && image.data ) {
 
-						texture = new DataTexture( image.data, image.width, image.height );
+						texture = new DataTexture();
 
 					} else {
 
-						texture = new Texture( image );
+						texture = new Texture();
 
 					}
 
@@ -665,11 +631,14 @@ class ObjectLoader extends Loader {
 
 				}
 
+				texture.source = source;
+
 				texture.uuid = data.uuid;
 
 				if ( data.name !== undefined ) texture.name = data.name;
 
 				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping, TEXTURE_MAPPING );
+				if ( data.channel !== undefined ) texture.channel = data.channel;
 
 				if ( data.offset !== undefined ) texture.offset.fromArray( data.offset );
 				if ( data.repeat !== undefined ) texture.repeat.fromArray( data.repeat );
@@ -684,8 +653,10 @@ class ObjectLoader extends Loader {
 				}
 
 				if ( data.format !== undefined ) texture.format = data.format;
+				if ( data.internalFormat !== undefined ) texture.internalFormat = data.internalFormat;
 				if ( data.type !== undefined ) texture.type = data.type;
-				if ( data.encoding !== undefined ) texture.encoding = data.encoding;
+				if ( data.colorSpace !== undefined ) texture.colorSpace = data.colorSpace;
+				if ( data.encoding !== undefined ) texture.encoding = data.encoding; // @deprecated, r152
 
 				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TEXTURE_FILTER );
 				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TEXTURE_FILTER );
@@ -693,8 +664,10 @@ class ObjectLoader extends Loader {
 
 				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
 
+				if ( data.generateMipmaps !== undefined ) texture.generateMipmaps = data.generateMipmaps;
 				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
 				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
+				if ( data.compareFunction !== undefined ) texture.compareFunction = data.compareFunction;
 
 				if ( data.userData !== undefined ) texture.userData = data.userData;
 
@@ -813,6 +786,9 @@ class ObjectLoader extends Loader {
 					}
 
 				}
+
+				if ( data.backgroundBlurriness !== undefined ) object.backgroundBlurriness = data.backgroundBlurriness;
+				if ( data.backgroundIntensity !== undefined ) object.backgroundIntensity = data.backgroundIntensity;
 
 				break;
 
@@ -990,6 +966,8 @@ class ObjectLoader extends Loader {
 
 		}
 
+		if ( data.up !== undefined ) object.up.fromArray( data.up );
+
 		if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
 		if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
 
@@ -1048,7 +1026,7 @@ class ObjectLoader extends Loader {
 
 				if ( child !== undefined ) {
 
-					object.addLevel( child, level.distance );
+					object.addLevel( child, level.distance, level.hysteresis );
 
 				}
 
@@ -1086,15 +1064,6 @@ class ObjectLoader extends Loader {
 
 	}
 
-	/* DEPRECATED */
-
-	setTexturePath( value ) {
-
-		console.warn( 'THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().' );
-		return this.setResourcePath( value );
-
-	}
-
 }
 
 const TEXTURE_MAPPING = {
@@ -1103,8 +1072,7 @@ const TEXTURE_MAPPING = {
 	CubeRefractionMapping: CubeRefractionMapping,
 	EquirectangularReflectionMapping: EquirectangularReflectionMapping,
 	EquirectangularRefractionMapping: EquirectangularRefractionMapping,
-	CubeUVReflectionMapping: CubeUVReflectionMapping,
-	CubeUVRefractionMapping: CubeUVRefractionMapping
+	CubeUVReflectionMapping: CubeUVReflectionMapping
 };
 
 const TEXTURE_WRAPPING = {

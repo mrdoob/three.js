@@ -13,16 +13,31 @@
 			shader by <a href="http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html">Martins Upitis</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { BokehPass } from './jsm/postprocessing/BokehPass.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
 			let camera, scene, renderer, stats,
 				singleMaterial, zmaterial,
@@ -68,7 +83,7 @@
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
 
-				parameters = { color: 0xff1100, envMap: textureCube };
+				parameters = { color: 0xff4900, envMap: textureCube };
 				cubeMaterial = new THREE.MeshBasicMaterial( parameters );
 
 				singleMaterial = false;
@@ -146,16 +161,16 @@
 
 				const matChanger = function ( ) {
 
-					postprocessing.bokeh.uniforms[ "focus" ].value = effectController.focus;
-					postprocessing.bokeh.uniforms[ "aperture" ].value = effectController.aperture * 0.00001;
-					postprocessing.bokeh.uniforms[ "maxblur" ].value = effectController.maxblur;
+					postprocessing.bokeh.uniforms[ 'focus' ].value = effectController.focus;
+					postprocessing.bokeh.uniforms[ 'aperture' ].value = effectController.aperture * 0.00001;
+					postprocessing.bokeh.uniforms[ 'maxblur' ].value = effectController.maxblur;
 
 				};
 
 				const gui = new GUI();
-				gui.add( effectController, "focus", 10.0, 3000.0, 10 ).onChange( matChanger );
-				gui.add( effectController, "aperture", 0, 10, 0.1 ).onChange( matChanger );
-				gui.add( effectController, "maxblur", 0.0, 0.01, 0.001 ).onChange( matChanger );
+				gui.add( effectController, 'focus', 10.0, 3000.0, 10 ).onChange( matChanger );
+				gui.add( effectController, 'aperture', 0, 10, 0.1 ).onChange( matChanger );
+				gui.add( effectController, 'maxblur', 0.0, 0.01, 0.001 ).onChange( matChanger );
 				gui.close();
 
 				matChanger();
@@ -194,16 +209,16 @@
 				const bokehPass = new BokehPass( scene, camera, {
 					focus: 1.0,
 					aperture: 0.025,
-					maxblur: 0.01,
-
-					width: width,
-					height: height
+					maxblur: 0.01
 				} );
+
+				const outputPass = new ShaderPass( GammaCorrectionShader );
 
 				const composer = new EffectComposer( renderer );
 
 				composer.addPass( renderPass );
 				composer.addPass( bokehPass );
+				composer.addPass( outputPass );
 
 				postprocessing.composer = composer;
 				postprocessing.bokeh = bokehPass;

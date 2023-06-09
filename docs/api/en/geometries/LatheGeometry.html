@@ -11,9 +11,15 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">Creates meshes with axial symmetry like vases. The lathe rotates around the Y axis.</p>
+		<p class="desc">
+			Creates meshes with axial symmetry like vases. The lathe rotates around
+			the Y axis.
+		</p>
 
-		<iframe id="scene" src="scenes/geometry-browser.html#LatheGeometry"></iframe>
+		<iframe
+			id="scene"
+			src="scenes/geometry-browser.html#LatheGeometry"
+		></iframe>
 
 		<script>
 
@@ -30,7 +36,6 @@
 		}
 
 		</script>
-
 		<h2>Code Example</h2>
 
 		<code>
@@ -46,23 +51,29 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]([param:Array points], [param:Integer segments], [param:Float phiStart], [param:Float phiLength])</h3>
+		<h3>
+			[name]([param:Array points], [param:Integer segments], [param:Float
+			phiStart], [param:Float phiLength])
+		</h3>
 		<p>
-		points — Array of Vector2s. The x-coordinate of each point must be greater than zero. Default is an array with (0,0.5), (0.5,0) and (0,-0.5) which creates a simple diamond shape.<br />
-		segments — the number of circumference segments to generate. Default is 12.<br />
-		phiStart — the starting angle in radians. Default is 0.<br />
-		phiLength — the radian (0 to 2PI) range of the lathed section 2PI is a closed lathe, less than 2PI is a portion. Default is 2PI.
+			points — Array of Vector2s. The x-coordinate of each point must be greater
+			than zero. Default is an array with (0,-0.5), (0.5,0) and (0,0.5) which
+			creates a simple diamond shape.<br />
+			segments — the number of circumference segments to generate. Default is
+			12.<br />
+			phiStart — the starting angle in radians. Default is `0`.<br />
+			phiLength — the radian (0 to 2PI) range of the lathed section 2PI is a
+			closed lathe, less than 2PI is a portion. Default is 2PI.
 		</p>
-		<p>
-		This creates a [name] based on the parameters.
-		</p>
+		<p>This creates a [name] based on the parameters.</p>
 
 		<h2>Properties</h2>
 		<p>See the base [page:BufferGeometry] class for common properties.</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+			An object with a property for each of the constructor parameters. Any
+			modification after instantiation does not change the geometry.
 		</p>
 
 		<h2>Methods</h2>

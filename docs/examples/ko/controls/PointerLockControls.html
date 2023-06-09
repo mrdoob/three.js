@@ -15,6 +15,17 @@
 		해당 클래스의 구현은 [link:https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API Pointer Lock API] 를 기반으로 합니다. [name] 은 1 인칭 3D 게임을 위한 완벽한 선택입니다.
 		</p>
 
+		<h2>수입</h2>
+
+		<p>
+			[name] 는 애드온이며 명시적으로 가져와야 합니다.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+		</code>
+
 		<h2>Code Example</h2>
 
 		<code>
@@ -75,7 +86,7 @@
 
 		<h3>[property:HTMLDOMElement domElement]</h3>
 		<p>
-			마우스 / 터치 이벤트를 수신하는 데 사용되는 HTMLDOMElement입니다. 이것은 생성자에 의해 설정되어야 합니다; 
+			마우스 / 터치 이벤트를 수신하는 데 사용되는 HTMLDOMElement입니다. 이것은 생성자에 의해 설정되어야 합니다;
 			생성자를 통해 설정되지 않을 경우 새 이벤트 리스너에 설정되지 않습니다.
 		</p>
 
@@ -97,11 +108,11 @@
 
 		<h2>메소드</h2>
 		<p>일반적인 메소드는 [page:EventDispatcher] 클래스를 참조하세요.</p>
-		
+
 
 		<h3>[method:undefined connect] ()</h3>
 		<p>
-			컨트롤의 이벤트 리스너를 추가합니다.			
+			컨트롤의 이벤트 리스너를 추가합니다.
 		</p>
 
 		<h3>[method:undefined disconnect] ()</h3>

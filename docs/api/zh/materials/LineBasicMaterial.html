@@ -38,7 +38,6 @@
 			[example:webgl_interactive_voxelpainter WebGL / interactive / voxelpainter]<br />
 			[example:webgl_lines_colors WebGL / lines / colors]<br />
 			[example:webgl_lines_dashed WebGL / lines / dashed]<br />
-			[example:webgl_lines_sphere WebGL / lines / sphere]<br />
 			[example:webgl_materials WebGL / materials]<br />
 			[example:physics_ammo_rope physics / ammo / rope]
 		</p>
@@ -58,6 +57,9 @@
 		<h3>[property:Color color]</h3>
 		<p>材质的颜色([page:Color])，默认值为白色 (0xffffff)。</p>
 
+		<h3>[property:Boolean fog]</h3>
+		<p>材质是否受雾影响。默认为*true*。</p>
+
 		<h3>[property:Float linewidth]</h3>
 		<p> 控制线宽。默认值为 *1*。<br /><br />
 			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与
@@ -74,6 +76,11 @@
 		<p> 定义线连接节点的样式。可选值为 'round', 'bevel' 和 'miter'。默认值为 'round'。<br /><br />
 			该属性对应[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]属性，
 			并且会被[page:WebGLRenderer WebGL]渲染器忽略。
+		</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>
+			Sets the color of the lines using data from a [page:Texture].
 		</p>
 
 		<h2>方法(Methods)</h2>

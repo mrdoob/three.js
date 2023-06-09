@@ -6,21 +6,21 @@ import { SidebarProjectVideo } from './Sidebar.Project.Video.js';
 
 function SidebarProject( editor ) {
 
-	var config = editor.config;
-	var signals = editor.signals;
-	var strings = editor.strings;
+	const config = editor.config;
+	const signals = editor.signals;
+	const strings = editor.strings;
 
-	var container = new UISpan();
+	const container = new UISpan();
 
-	var settings = new UIPanel();
+	const settings = new UIPanel();
 	settings.setBorderTop( '0' );
 	settings.setPaddingTop( '20px' );
 	container.add( settings );
 
 	// Title
 
-	var titleRow = new UIRow();
-	var title = new UIInput( config.getKey( 'project/title' ) ).setLeft( '100px' ).setWidth( '150px' ).onChange( function () {
+	const titleRow = new UIRow();
+	const title = new UIInput( config.getKey( 'project/title' ) ).setLeft( '100px' ).setWidth( '150px' ).onChange( function () {
 
 		config.setKey( 'project/title', this.getValue() );
 
@@ -33,8 +33,8 @@ function SidebarProject( editor ) {
 
 	// Editable
 
-	var editableRow = new UIRow();
-	var editable = new UICheckbox( config.getKey( 'project/editable' ) ).setLeft( '100px' ).onChange( function () {
+	const editableRow = new UIRow();
+	const editable = new UICheckbox( config.getKey( 'project/editable' ) ).setLeft( '100px' ).onChange( function () {
 
 		config.setKey( 'project/editable', this.getValue() );
 
@@ -47,8 +47,8 @@ function SidebarProject( editor ) {
 
 	// WebVR
 
-	var vrRow = new UIRow();
-	var vr = new UICheckbox( config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
+	const vrRow = new UIRow();
+	const vr = new UICheckbox( config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
 
 		config.setKey( 'project/vr', this.getValue() );
 

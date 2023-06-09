@@ -5,9 +5,10 @@ import { Vector2 } from '../math/Vector2.js';
 
 class CylinderGeometry extends BufferGeometry {
 
-	constructor( radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
+	constructor( radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
+
 		this.type = 'CylinderGeometry';
 
 		this.parameters = {
@@ -263,6 +264,16 @@ class CylinderGeometry extends BufferGeometry {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
+
+	}
+
 	static fromJSON( data ) {
 
 		return new CylinderGeometry( data.radiusTop, data.radiusBottom, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength );
@@ -272,4 +283,4 @@ class CylinderGeometry extends BufferGeometry {
 }
 
 
-export { CylinderGeometry, CylinderGeometry as CylinderBufferGeometry };
+export { CylinderGeometry };

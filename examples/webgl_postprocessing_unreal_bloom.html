@@ -24,27 +24,41 @@
 			<a href="http://mjmurdock.com/" target="_blank" rel="noopener">Mike Murdock</a>, CC Attribution.
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { UnrealBloomPass } from './jsm/postprocessing/UnrealBloomPass.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let camera, stats;
 			let composer, renderer, mixer, clock;
 
 			const params = {
-				exposure: 1,
-				bloomStrength: 1.5,
-				bloomThreshold: 0,
-				bloomRadius: 0
+				threshold: 0,
+				strength: 1.5,
+				radius: 0,
+				exposure: 1
 			};
 
 			init();
@@ -61,7 +75,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMapping = THREE.ReinhardToneMapping;
 				container.appendChild( renderer.domElement );
 
 				const scene = new THREE.Scene();
@@ -75,7 +88,7 @@
 				controls.minDistance = 1;
 				controls.maxDistance = 10;
 
-				scene.add( new THREE.AmbientLight( 0x404040 ) );
+				scene.add( new THREE.AmbientLight( 0x898989 ) );
 
 				const pointLight = new THREE.PointLight( 0xffffff, 1 );
 				camera.add( pointLight );
@@ -83,13 +96,16 @@
 				const renderScene = new RenderPass( scene, camera );
 
 				const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-				bloomPass.threshold = params.bloomThreshold;
-				bloomPass.strength = params.bloomStrength;
-				bloomPass.radius = params.bloomRadius;
+				bloomPass.threshold = params.threshold;
+				bloomPass.strength = params.strength;
+				bloomPass.radius = params.radius;
+
+				const outputPass = new OutputPass( THREE.ReinhardToneMapping );
 
 				composer = new EffectComposer( renderer );
 				composer.addPass( renderScene );
 				composer.addPass( bloomPass );
+				composer.addPass( outputPass );
 
 				new GLTFLoader().load( 'models/gltf/PrimaryIonDrive.glb', function ( gltf ) {
 
@@ -107,27 +123,31 @@
 
 				const gui = new GUI();
 
-				gui.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
+				const bloomFolder = gui.addFolder( 'bloom' );
 
-					renderer.toneMappingExposure = Math.pow( value, 4.0 );
-
-				} );
-
-				gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function ( value ) {
+				bloomFolder.add( params, 'threshold', 0.0, 1.0 ).onChange( function ( value ) {
 
 					bloomPass.threshold = Number( value );
 
 				} );
 
-				gui.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function ( value ) {
+				bloomFolder.add( params, 'strength', 0.0, 3.0 ).onChange( function ( value ) {
 
 					bloomPass.strength = Number( value );
 
 				} );
 
-				gui.add( params, 'bloomRadius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
+				gui.add( params, 'radius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
 
 					bloomPass.radius = Number( value );
+
+				} );
+
+				const toneMappingFolder = gui.addFolder( 'tone mapping' );
+
+				toneMappingFolder.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
+
+					outputPass.toneMappingExposure = Math.pow( value, 4.0 );
 
 				} );
 

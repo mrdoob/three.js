@@ -1,0 +1,271 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>の前提条件</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – の前提条件">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>の前提条件</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>これらの記事は、three.jsの使用方法を学習するためものです。
+JavaScriptのプログラミング方法を把握してる事を前提とします。
+DOMとは何か、HTMLの記述方法、JavaScriptでDOMの作成方法を把握してる事を前提とします。
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import">es6 modules</a> のimportや <code class="notranslate" translate="no">&lt;script type="module"&gt;</code> タグを把握してる事を前提とします。
+CSSや <a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors">CSSセレクター</a> が何か把握してる事を前提とします。
+ES5、ES6、およびES7を把握してる事を前提とします。
+イベントとコールバックでJavaScripが実行されるのを把握してる事を前提とします。
+クロージャとは何かを知っている事を前提とします。</p>
+<p>また、以下に簡単な復習と注意事項があります。</p>
+<h2 id="es6-">es6モジュール</h2>
+<p>es6モジュールはスクリプトの中で <code class="notranslate" translate="no">import</code> キーワード、または <code class="notranslate" translate="no">&lt;script type="module"&gt;</code> タグを使用してインラインでロードできます。
+以下に両方の使用​​例があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
+import * as THREE from 'three';
+
+...
+
+&lt;/script&gt;
+</pre>
+<p>パスは絶対パス、または相対パスでなければなりません。相対パスは常に <code class="notranslate" translate="no">./</code> または <code class="notranslate" translate="no">../</code> で始まり <code class="notranslate" translate="no">&lt;img&gt;</code> や <code class="notranslate" translate="no">&lt;a&gt;</code> などの他のタグやcss参照とは異なります。</p>
+<p>詳細は<a href="fundamentals.html">この記事</a>の最後に記載しています。</p>
+<h2 id="-document-queryselector-document-queryselectorall-"><code class="notranslate" translate="no">document.querySelector</code> と <code class="notranslate" translate="no">document.querySelectorAll</code></h2>
+<p><code class="notranslate" translate="no">document.querySelector</code> を使用し、CSSセレクターに一致する最初の要素を選択できます。
+<code class="notranslate" translate="no">document.querySelectorAll</code> は、CSSセレクターに一致するすべての要素を返します。</p>
+<h2 id="-onbody-"><code class="notranslate" translate="no">onbody</code> は必要ありません</h2>
+<p>20年前の古いWebページでは、以下のようなHTMLが多く使われてました。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">&lt;body onload="somefunction()"&gt;
+</pre><p>このスタイルは非推奨です。スクリプトをページの下部に配置します。</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;html&gt;
+  &lt;head&gt;
+    ...
+  &lt;/head&gt;
+  &lt;body&gt;
+     ...
+  &lt;/body&gt;
+  &lt;script&gt;
+    // inline javascript
+  &lt;/script&gt;
+&lt;/html&gt;
+</pre>
+<p>または、<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script">deferプロパティを使用します</a>。</p>
+<h2 id="-">クロージャーの仕組みを知る</h2>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function a(v) {
+  const foo = v;
+  return function() {
+     return foo;
+  };
+}
+
+const f = a(123);
+const g = a(456);
+console.log(f());  // prints 123
+console.log(g());  // prints 456
+</pre>
+<p>上記のコードでは、新しい関数が作成される度に関数 <code class="notranslate" translate="no">a</code> を呼び出します。
+その関数は変数 <code class="notranslate" translate="no">foo</code> を <em>閉じ込めます</em> 。
+ここに<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures">詳細な情報</a> があります。</p>
+<h2 id="-this-"><code class="notranslate" translate="no">this</code> がどのように機能するか知る</h2>
+<p><code class="notranslate" translate="no">this</code> は魔法ではありません。
+引数が関数に渡されるのと同じように、関数に自動的に渡される実質的な変数です。
+簡単に説明すると、次のような関数を直接呼び出す場合です。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">somefunction(a, b, c);
+</pre><p><code class="notranslate" translate="no">this</code> は <code class="notranslate" translate="no">null</code>（strictモードまたはモジュールの場合）になりますが、ドット演算子を使用して関数を呼び出す場合と同様です。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">someobject.somefunction(a, b, c);
+</pre><p><code class="notranslate" translate="no">this</code> は <code class="notranslate" translate="no">someobject</code> がセットされます。</p>
+<p>この部分はみなさんが混乱するコールバックです。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> const callback = someobject.somefunction;
+ loader.load(callback);
+</pre><p>これは経験の浅い人が期待するように動作しません。
+なぜなら <code class="notranslate" translate="no">loader.load</code> がコールバックを呼び出す時、<code class="notranslate" translate="no">.</code> 演算子で <code class="notranslate" translate="no">this</code> を呼び出していないため、デフォルトではnullになります（ローダーが明示的に何かを設定しない限り）
+コールバックが発生した時に <code class="notranslate" translate="no">this</code> を <code class="notranslate" translate="no">someobject</code> したい場合は、関数をバインドする必要があります。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> const callback = someobject.somefunction.bind(someobject);
+ loader.load(callback);
+</pre><p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this">この記事は <code class="notranslate" translate="no">this</code> を理解するのに役立つかもしれません</a>.</p>
+<h2 id="es5-es6-es7-stuff">ES5/ES6/ES7 stuff</h2>
+<h3 id="-var-const-let-"><code class="notranslate" translate="no">var</code> は非推奨です。 <code class="notranslate" translate="no">const</code> か <code class="notranslate" translate="no">let</code> を使って下さい</h3>
+<p><code class="notranslate" translate="no">var</code> は使用する理由がありません。varを使用するのは悪い習慣と見なされます。ほとんどの場合、変数の値を変えない場合は <code class="notranslate" translate="no">const</code> を使用します。
+値が変更される場合は <code class="notranslate" translate="no">let</code> を使用します。これにより大量のバグを回避できます。</p>
+<h3 id="-for-of-for-in-"><code class="notranslate" translate="no">for of</code> を使用し <code class="notranslate" translate="no">for in</code> は使用しない</h3>
+<p><code class="notranslate" translate="no">for of</code> は新しい書き方で、 <code class="notranslate" translate="no">for in</code> は古い書き方です。 <code class="notranslate" translate="no">for in</code> で解決できない問題を <code class="notranslate" translate="no">for of</code> が解決しています。
+解決した一例として、オブジェクトのすべてのkey/valueのペアを反復処理ができます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (const [key, value] of Object.entries(someObject)) {
+  console.log(key, value);
+}
+</pre>
+<h3 id="-foreach-map-filter-"><code class="notranslate" translate="no">forEach</code> 、<code class="notranslate" translate="no">map</code> 、 <code class="notranslate" translate="no">filter</code> は役に立ちます</h3>
+<p>配列の関数である <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach"><code class="notranslate" translate="no">forEach</code></a> や
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"><code class="notranslate" translate="no">map</code></a> 、
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"><code class="notranslate" translate="no">filter</code></a>
+ はモダンなJavaScriptで広く使われています。</p>
+<h3 id="-">分割代入を使う</h3>
+<p><code class="notranslate" translate="no">const dims = {width: 300, height: 150}</code> のObjectがあるとします。</p>
+<p>古いコードの場合</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> const width = dims.width;
+ const height = dims.height;
+</pre><p>新しいコードの場合</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> const {width, height} = dims;
+</pre><h3 id="-">オブジェクト宣言のショートカットを使う</h3>
+<p>古いコードの場合</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no"> const width = 300;
+ const height = 150;
+ const obj = {
+   width: width,
+   height: height,
+   area: function() {
+     return this.width * this.height
+   },
+ };
+</pre>
+<p>新しいコードの場合</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no"> const width = 300;
+ const height = 150;
+ const obj = {
+   width,
+   height,
+   area() {
+     return this.width * this.height;
+   },
+ };
+</pre>
+<h3 id="-">スプレット演算子 <code class="notranslate" translate="no">...</code> を使う</h3>
+<p>スプレット演算子にはたくさんの使い方があります。例えば</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no"> function log(className, ...args) {
+   const elem = document.createElement('div');
+   elem.className = className;
+   elem.textContent = [...args].join(' ');
+   document.body.appendChild(elem);
+ }
+</pre>
+<p>もう1つの例</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const position = [1, 2, 3];
+somemesh.position.set(...position);
+</pre>
+<h3 id="-class-"><code class="notranslate" translate="no">class</code> を使う</h3>
+<p>ES5より以前のオブジェクトのようなクラス構文は、ほとんどのプログラマーにはなじみがありませんでした。
+ES5以降では、C ++やC＃、Javaのスタイルに近い<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes"><code class="notranslate" translate="no">class</code> キーワードを使用</a>
+できるようになりました。</p>
+<h3 id="getters-setters-">gettersとsettersを理解する</h3>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get">Getters</a> と
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set">setters</a> は
+ほとんどのモダンなプログラミン言語でよく使われます。
+ES5のクラス構文により、ES5以前よりもはるかに簡単に使えます。</p>
+<h3 id="-">必要に応じてアロー関数を使います</h3>
+<p>アロー関数はcallbackとPromiseで特に役立ちます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">loader.load((texture) =&gt; {
+  // use texture
+});
+</pre>
+<p>アロー関数は <code class="notranslate" translate="no">this</code> をバインドします。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const foo = (args) =&gt; {/* code */};
+</pre>
+<p>ショートカットで書くなら</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const foo = (function(args) {/* code */}).bind(this));
+</pre>
+<h3 id="promise-async-await-">Promiseはasync/awaitと同様です</h3>
+<p>Promisesは非同期な処理を助ます。Async/awaitはpromiseを助けます。</p>
+<p>ここで扱うには大きな話題になるため、<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises">promiseのドキュメントを読んで下さい</a>。
+また、<a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await">async/awaitもドキュメントを読んで下さい</a>。</p>
+<h3 id="-">テンプレートリテラルを使用する</h3>
+<p>テンプレートリテラルは、引用符（"", ''）の代わりにバックティック文字（<code class="notranslate" translate="no"> </code>）を使います。</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const foo = `this is a template literal`;
+</pre><p>テンプレートリテラルには基本的に2つの機能があります。1つは複数行にかけます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const foo = `this
+is
+a
+template
+literal`;
+const bar = "this\nis\na\ntemplate\nliteral";
+</pre>
+<p>上記の <code class="notranslate" translate="no">foo</code> と <code class="notranslate" translate="no">bar</code> は同様の意味になります.</p>
+<p>もう1つは、文字モードの中に <code class="notranslate" translate="no">${javascript-expression}</code> のようにJavaScriptのスニペッドを挿入できます。
+これはテンプレートの一部です。例えば</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const r = 192;
+const g = 255;
+const b = 64;
+const rgbCSSColor = `rgb(${r},${g},${b})`;
+</pre>
+<p>または</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = [192, 255, 64];
+const rgbCSSColor = `rgb(${color.join(',')})`;
+</pre>
+<p>または</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const aWidth = 10;
+const bWidth = 20;
+someElement.style.width = `${aWidth + bWidth}px`;
+</pre>
+<h1 id="javascript-">JavaScriptのコーディング規則を学びましょう</h1>
+<p>自由にコードフォーマットする事ができますが、少なくとも1つの規則に注意する必要があります。
+JavaScriptの変数名や関数名、メソッド名はすべてローワーキャメルケースです。
+コンストラクターやクラスの名前はアッパーキャメルケースです。
+このルールに従うなら、他のほとんどのJavaScriptコードと一致します。</p>
+<p>多くの <a href="https://eslint.org">リンター]</a> やコード内の明らかなエラーをチェックするプログラムは、間違ったケースを使用するとエラーを指摘します。
+上記の規則に従うことで、エラーが間違っている事がわかるからです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const v = new vector(); // clearly an error if all classes start with a capital letter
+const v = Vector();     // clearly an error if all functions start with a lowercase latter.
+</pre>
+<h1 id="visual-studio-code-">Visual Studio Codeの使用を検討する</h1>
+<p>もちろんあなたが望むエディタが良いですが、もし望むエディタがなければ <a href="https://code.visualstudio.com/">Visual Studio Code</a> を使う事を検討してみて下さい。
+インストールし <a href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">eslintをセットアップ</a> します。
+セットアップには数分かかる場合がありますが、バグを見つけるのに非常に役に立ちます。</p>
+<p>いくつかの例</p>
+<p><a href="https://eslint.org/docs/rules/no-undef"><code class="notranslate" translate="no">no-undef</code> ルール</a> を有効にすると、VSCodeのEsLintで多くの未定義の変数について警告します。</p>
+<div class="threejs_center"><img style="width: 615px;" src="../resources/images/vscode-eslint-not-defined.png"></div>
+
+<p>上記は <code class="notranslate" translate="no">doTheThing</code> のスペルを  <code class="notranslate" translate="no">doThing</code> と間違えている事がわかります。
+<code class="notranslate" translate="no">doThing</code> の下に赤い波線があり、その上をホバリングすると定義されていない事がわかります。
+1つのエラーが回避されました。
+<code class="notranslate" translate="no">THREE</code> を使用して警告が表示された場合、eslintに <code class="notranslate" translate="no">THREE</code> が存在する事を伝えるため、JavaScriptファイルの先頭に <code class="notranslate" translate="no">/* global THREE */</code> を追加します。</p>
+<div class="threejs_center"><img style="width: 615px;" src="../resources/images/vscode-eslint-not-a-constructor.png"></div>
+
+<p>上記では、eslintは <code class="notranslate" translate="no">アッパーキャメルケース</code> がコンストラクターであるというルールを知っているため、 <code class="notranslate" translate="no">new</code> を使用する必要があります。
+他のエラーをキャッチして避けます。これは<a href="https://eslint.org/docs/rules/new-cap"><code class="notranslate" translate="no">new-cap</code> ルール</a> です。</p>
+<p><a href="https://eslint.org/docs/rules/">数百のEslintルールをオン・オフにカスタム</a> できます。
+上記の例では <code class="notranslate" translate="no">var</code> でなく <code class="notranslate" translate="no">const</code> と <code class="notranslate" translate="no">let</code> を使用するルールを適用しました。
+コードでは <code class="notranslate" translate="no">var</code> を使用しましたが、<code class="notranslate" translate="no">let</code> または <code class="notranslate" translate="no">const</code> を使用する必要があると警告されました。</p>
+<div class="threejs_center"><img style="width: 615px;" src="../resources/images/vscode-eslint-var.png"></div>
+
+<p>ここでは <code class="notranslate" translate="no">let</code> を使用しましたが、値を変更しない事がわかったため、 <code class="notranslate" translate="no">const</code> を使用することが提案されました。</p>
+<div class="threejs_center"><img style="width: 615px;" src="../resources/images/vscode-eslint-let.png"></div>
+
+<p>もちろん、 <code class="notranslate" translate="no">var</code> を使い続けたい場合は、そのルールをオフにすることができます。
+上記で記述したように <code class="notranslate" translate="no">var</code> よりも <code class="notranslate" translate="no">const</code> と <code class="notranslate" translate="no">let</code> を使用することを好みます。
+それらはうまく機能し、バグを防ぎます。</p>
+<p>ルールをオーバーライドする必要がある場合、1行のコードまたはコードセクションに<a href="https://eslint.org/docs/user-guide/configuring#disabling-rules-with-inline-comments">無効にするコメントを追加できます</a>。</p>
+<h1 id="-">レガシーブラウザをサポートする必要がある場合は、トランスパイラーを使用して下さい</h1>
+<p>ほとんどのモダンなブラウザは自動更新されるため、これらすべての機能を使用すると便利です。生産性を高め、バグを回避できます。
+あなたのプロジェクトで古いブラウザをサポートする必要があれば、<a href="https://babeljs.io">ES5/ES6/ES7コードをES5のJavascriptにトランスパイラーするツール</a> を使用して下さい。</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

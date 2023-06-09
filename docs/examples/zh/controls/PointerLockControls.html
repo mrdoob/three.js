@@ -16,6 +16,17 @@
 		对于第一人称3D游戏来说， [name] 是一个非常完美的选择。
 		</p>
 
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			请参阅 [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+		</code>
+
 		<h2>代码示例</h2>
 
 		<code>
@@ -40,7 +51,7 @@
 
 		<p>[example:misc_controls_pointerlock misc / controls / pointerlock ]</p>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
 		<p>
@@ -87,12 +98,12 @@
 
 		<h3>[property:Float maxPolarAngle]</h3>
 		<p>
-			Camera pitch, upper limit. Range is 0 to Math.PI radians. Default is Math.PI.
+			摄像机的俯仰角上限限制。范围为0到Math.PI弧度之间。默认值为Math.PI。
 		</p>
 
 		<h3>[property:Float minPolarAngle]</h3>
 		<p>
-			Camera pitch, lower limit. Range is 0 to Math.PI radians. Default is 0.
+			摄像机的俯仰角下限限制。范围为0到Math.PI弧度之间。默认值为0。
 		</p>
 
 		<h2>Methods</h2>

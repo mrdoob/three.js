@@ -1,3 +1,5 @@
+import { LinearSRGBColorSpace } from '../../constants.js';
+
 /**
  * Uniform Utilities
  */
@@ -19,7 +21,16 @@ export function cloneUniforms( src ) {
 				property.isVector2 || property.isVector3 || property.isVector4 ||
 				property.isTexture || property.isQuaternion ) ) {
 
-				dst[ u ][ p ] = property.clone();
+				if ( property.isRenderTargetTexture ) {
+
+					console.warn( 'UniformsUtils: Textures of render targets cannot be cloned via cloneUniforms() or mergeUniforms().' );
+					dst[ u ][ p ] = null;
+
+				} else {
+
+					dst[ u ][ p ] = property.clone();
+
+				}
 
 			} else if ( Array.isArray( property ) ) {
 
@@ -56,6 +67,33 @@ export function mergeUniforms( uniforms ) {
 	}
 
 	return merged;
+
+}
+
+export function cloneUniformsGroups( src ) {
+
+	const dst = [];
+
+	for ( let u = 0; u < src.length; u ++ ) {
+
+		dst.push( src[ u ].clone() );
+
+	}
+
+	return dst;
+
+}
+
+export function getUnlitUniformColorSpace( renderer ) {
+
+	if ( renderer.getRenderTarget() === null ) {
+
+		// https://github.com/mrdoob/three.js/pull/23937#issuecomment-1111067398
+		return renderer.outputColorSpace;
+
+	}
+
+	return LinearSRGBColorSpace;
 
 }
 

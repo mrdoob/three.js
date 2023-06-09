@@ -13,11 +13,6 @@
 		This class is used to convert 이 클래스는 연속된 shape들을 [page:Path] 배열로 바꾸는데에 사용되며, 일례로 SVG shape를 path로 바꾸는 것이 있습니다.(아래 예제를 확인하세요).
 		</p>
 
-		<h2>예제</h2>
-		<p>
-			[example:webgl_geometry_extrude_shapes2 geometry / extrude / shapes2]
-		</p>
-
 		<h2>생성자</h2>
 
 
@@ -64,15 +59,13 @@
 		<p>[page:ShapePath.currentPath currentPath] 위에 새 [page:SplineCurve]를 연결합니다.</p>
 
 
-		<h3>[method:Array toShapes]( [param:Boolean isCCW], [param:Boolean noHoles] )</h3>
+		<h3>[method:Array toShapes]( [param:Boolean isCCW] )</h3>
 		<p>
-		isCCW -- solids와 holes가 생성되는 방식을 변경합니다<br/>
-		noHoles -- holes를 생성할지 안 할지를 설정합니다.
+		isCCW -- solids와 holes가 생성되는 방식을 변경합니다
 		</p>
 		<p>
 		[page:ShapePath.subPaths subPaths] 배열을 Shapes 배열로 변환합니다. 기본값으로 solid shapes는 시계방향(CW)이고 holes는 반시계방향(CCW)입니다.
 		isCCW가 true면, 이 값들이 반대가 됩니다.
-		noHoles 파라미터가 true면 모든 path들은 solid shapes로 설정되고 isCCW는 무시됩니다.
 		<br/>
 
 		</p>

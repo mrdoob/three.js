@@ -1,15 +1,9 @@
 export default /* glsl */`
-#if defined( USE_ENVMAP )
-
-	#ifdef ENVMAP_MODE_REFRACTION
-
-		uniform float refractionRatio;
-
-	#endif
+#ifdef USE_ENVMAP
 
 	vec3 getIBLIrradiance( const in vec3 normal ) {
 
-		#if defined( ENVMAP_TYPE_CUBE_UV )
+		#ifdef ENVMAP_TYPE_CUBE_UV
 
 			vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );
 
@@ -27,22 +21,12 @@ export default /* glsl */`
 
 	vec3 getIBLRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness ) {
 
-		#if defined( ENVMAP_TYPE_CUBE_UV )
+		#ifdef ENVMAP_TYPE_CUBE_UV
 
-			vec3 reflectVec;
+			vec3 reflectVec = reflect( - viewDir, normal );
 
-			#ifdef ENVMAP_MODE_REFLECTION
-
-				reflectVec = reflect( - viewDir, normal );
-
-				// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
-				reflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );
-
-			#else
-
-				reflectVec = refract( - viewDir, normal, refractionRatio );
-
-			#endif
+			// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
+			reflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );
 
 			reflectVec = inverseTransformDirection( reflectVec, viewMatrix );
 
@@ -57,6 +41,29 @@ export default /* glsl */`
 		#endif
 
 	}
+
+	#ifdef USE_ANISOTROPY
+
+		vec3 getIBLAnisotropyRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness, const in vec3 bitangent, const in float anisotropy ) {
+
+			#ifdef ENVMAP_TYPE_CUBE_UV
+
+			  // https://google.github.io/filament/Filament.md.html#lighting/imagebasedlights/anisotropy
+				vec3 bentNormal = cross( bitangent, viewDir );
+				bentNormal = normalize( cross( bentNormal, bitangent ) );
+				bentNormal = normalize( mix( bentNormal, normal, pow2( pow2( 1.0 - anisotropy * ( 1.0 - roughness ) ) ) ) );
+
+				return getIBLRadiance( viewDir, bentNormal, roughness );
+
+			#else
+
+				return vec3( 0.0 );
+
+			#endif
+
+		}
+
+	#endif
 
 #endif
 `;

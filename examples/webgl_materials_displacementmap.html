@@ -14,18 +14,32 @@
 			ninja head from <a href="https://gpuopen.com/archive/gamescgi/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
 			let stats;
-
 			let camera, scene, renderer, controls;
+
 			const settings = {
 				metalness: 1.0,
 				roughness: 0.4,
@@ -53,43 +67,43 @@
 
 				const gui = new GUI();
 				//let gui = gui.addFolder( "Material" );
-				gui.add( settings, "metalness" ).min( 0 ).max( 1 ).onChange( function ( value ) {
+				gui.add( settings, 'metalness' ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					material.metalness = value;
 
 				} );
 
-				gui.add( settings, "roughness" ).min( 0 ).max( 1 ).onChange( function ( value ) {
+				gui.add( settings, 'roughness' ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					material.roughness = value;
 
 				} );
 
-				gui.add( settings, "aoMapIntensity" ).min( 0 ).max( 1 ).onChange( function ( value ) {
+				gui.add( settings, 'aoMapIntensity' ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					material.aoMapIntensity = value;
 
 				} );
 
-				gui.add( settings, "ambientIntensity" ).min( 0 ).max( 1 ).onChange( function ( value ) {
+				gui.add( settings, 'ambientIntensity' ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					ambientLight.intensity = value;
 
 				} );
 
-				gui.add( settings, "envMapIntensity" ).min( 0 ).max( 3 ).onChange( function ( value ) {
+				gui.add( settings, 'envMapIntensity' ).min( 0 ).max( 3 ).onChange( function ( value ) {
 
 					material.envMapIntensity = value;
 
 				} );
 
-				gui.add( settings, "displacementScale" ).min( 0 ).max( 3.0 ).onChange( function ( value ) {
+				gui.add( settings, 'displacementScale' ).min( 0 ).max( 3.0 ).onChange( function ( value ) {
 
 					material.displacementScale = value;
 
 				} );
 
-				gui.add( settings, "normalScale" ).min( - 1 ).max( 1 ).onChange( function ( value ) {
+				gui.add( settings, 'normalScale' ).min( - 1 ).max( 1 ).onChange( function ( value ) {
 
 					material.normalScale.set( 1, - 1 ).multiplyScalar( value );
 
@@ -106,7 +120,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
@@ -130,7 +143,7 @@
 				pointLight.position.z = 2500;
 				scene.add( pointLight );
 
-				const pointLight2 = new THREE.PointLight( 0xff6666, 1 );
+				const pointLight2 = new THREE.PointLight( 0xffaaaa, 1 );
 				camera.add( pointLight2 );
 
 				const pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
@@ -140,7 +153,7 @@
 
 				// env map
 
-				const path = "textures/cube/SwedishRoyalCastle/";
+				const path = 'textures/cube/SwedishRoyalCastle/';
 				const format = '.jpg';
 				const urls = [
 					path + 'px' + format, path + 'nx' + format,
@@ -149,20 +162,19 @@
 				];
 
 				const reflectionCube = new THREE.CubeTextureLoader().load( urls );
-				reflectionCube.encoding = THREE.sRGBEncoding;
 
 				// textures
 
 				const textureLoader = new THREE.TextureLoader();
-				const normalMap = textureLoader.load( "models/obj/ninja/normal.png" );
-				const aoMap = textureLoader.load( "models/obj/ninja/ao.jpg" );
-				const displacementMap = textureLoader.load( "models/obj/ninja/displacement.jpg" );
+				const normalMap = textureLoader.load( 'models/obj/ninja/normal.png' );
+				const aoMap = textureLoader.load( 'models/obj/ninja/ao.jpg' );
+				const displacementMap = textureLoader.load( 'models/obj/ninja/displacement.jpg' );
 
 				// material
 
 				material = new THREE.MeshStandardMaterial( {
 
-					color: 0x888888,
+					color: 0xc1c1c1,
 					roughness: settings.roughness,
 					metalness: settings.metalness,
 
@@ -186,10 +198,9 @@
 				//
 
 				const loader = new OBJLoader();
-				loader.load( "models/obj/ninja/ninjaHead_Low.obj", function ( group ) {
+				loader.load( 'models/obj/ninja/ninjaHead_Low.obj', function ( group ) {
 
 					const geometry = group.children[ 0 ].geometry;
-					geometry.attributes.uv2 = geometry.attributes.uv;
 					geometry.center();
 
 					mesh = new THREE.Mesh( geometry, material );

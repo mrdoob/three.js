@@ -7,6 +7,8 @@ class PerspectiveCamera extends Camera {
 
 		super();
 
+		this.isPerspectiveCamera = true;
+
 		this.type = 'PerspectiveCamera';
 
 		this.fov = fov;
@@ -198,7 +200,7 @@ class PerspectiveCamera extends Camera {
 		const skew = this.filmOffset;
 		if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
 
-		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far );
+		this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far, this.coordinateSystem );
 
 		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
 
@@ -227,7 +229,5 @@ class PerspectiveCamera extends Camera {
 	}
 
 }
-
-PerspectiveCamera.prototype.isPerspectiveCamera = true;
 
 export { PerspectiveCamera };

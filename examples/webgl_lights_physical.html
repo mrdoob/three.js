@@ -15,14 +15,27 @@
 			Reinhard inline tonemapping with real-world light falloff (decay = 2).
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, scene, renderer, bulbLight, bulbMat, hemiLight, stats;
 			let ballMat, cubeMat, floorMat;
@@ -32,29 +45,29 @@
 
 			// ref for lumens: http://www.power-sure.com/lumens.htm
 			const bulbLuminousPowers = {
-				"110000 lm (1000W)": 110000,
-				"3500 lm (300W)": 3500,
-				"1700 lm (100W)": 1700,
-				"800 lm (60W)": 800,
-				"400 lm (40W)": 400,
-				"180 lm (25W)": 180,
-				"20 lm (4W)": 20,
-				"Off": 0
+				'110000 lm (1000W)': 110000,
+				'3500 lm (300W)': 3500,
+				'1700 lm (100W)': 1700,
+				'800 lm (60W)': 800,
+				'400 lm (40W)': 400,
+				'180 lm (25W)': 180,
+				'20 lm (4W)': 20,
+				'Off': 0
 			};
 
 			// ref for solar irradiances: https://en.wikipedia.org/wiki/Lux
 			const hemiLuminousIrradiances = {
-				"0.0001 lx (Moonless Night)": 0.0001,
-				"0.002 lx (Night Airglow)": 0.002,
-				"0.5 lx (Full Moon)": 0.5,
-				"3.4 lx (City Twilight)": 3.4,
-				"50 lx (Living Room)": 50,
-				"100 lx (Very Overcast)": 100,
-				"350 lx (Office Room)": 350,
-				"400 lx (Sunrise/Sunset)": 400,
-				"1000 lx (Overcast)": 1000,
-				"18000 lx (Daylight)": 18000,
-				"50000 lx (Direct Sun)": 50000
+				'0.0001 lx (Moonless Night)': 0.0001,
+				'0.002 lx (Night Airglow)': 0.002,
+				'0.5 lx (Full Moon)': 0.5,
+				'3.4 lx (City Twilight)': 3.4,
+				'50 lx (Living Room)': 50,
+				'100 lx (Very Overcast)': 100,
+				'350 lx (Office Room)': 350,
+				'400 lx (Sunrise/Sunset)': 400,
+				'1000 lx (Overcast)': 1000,
+				'18000 lx (Daylight)': 18000,
+				'50000 lx (Direct Sun)': 50000
 			};
 
 			const params = {
@@ -105,18 +118,18 @@
 					bumpScale: 0.0005
 				} );
 				const textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "textures/hardwood2_diffuse.jpg", function ( map ) {
+				textureLoader.load( 'textures/hardwood2_diffuse.jpg', function ( map ) {
 
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 10, 24 );
-					map.encoding = THREE.sRGBEncoding;
+					map.colorSpace = THREE.SRGBColorSpace;
 					floorMat.map = map;
 					floorMat.needsUpdate = true;
 
 				} );
-				textureLoader.load( "textures/hardwood2_bump.jpg", function ( map ) {
+				textureLoader.load( 'textures/hardwood2_bump.jpg', function ( map ) {
 
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
@@ -126,7 +139,7 @@
 					floorMat.needsUpdate = true;
 
 				} );
-				textureLoader.load( "textures/hardwood2_roughness.jpg", function ( map ) {
+				textureLoader.load( 'textures/hardwood2_roughness.jpg', function ( map ) {
 
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
@@ -143,18 +156,18 @@
 					bumpScale: 0.002,
 					metalness: 0.2
 				} );
-				textureLoader.load( "textures/brick_diffuse.jpg", function ( map ) {
+				textureLoader.load( 'textures/brick_diffuse.jpg', function ( map ) {
 
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 1, 1 );
-					map.encoding = THREE.sRGBEncoding;
+					map.colorSpace = THREE.SRGBColorSpace;
 					cubeMat.map = map;
 					cubeMat.needsUpdate = true;
 
 				} );
-				textureLoader.load( "textures/brick_bump.jpg", function ( map ) {
+				textureLoader.load( 'textures/brick_bump.jpg', function ( map ) {
 
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
@@ -170,18 +183,18 @@
 					roughness: 0.5,
 					metalness: 1.0
 				} );
-				textureLoader.load( "textures/planets/earth_atmos_2048.jpg", function ( map ) {
+				textureLoader.load( 'textures/planets/earth_atmos_2048.jpg', function ( map ) {
 
 					map.anisotropy = 4;
-					map.encoding = THREE.sRGBEncoding;
+					map.colorSpace = THREE.SRGBColorSpace;
 					ballMat.map = map;
 					ballMat.needsUpdate = true;
 
 				} );
-				textureLoader.load( "textures/planets/earth_specular_2048.jpg", function ( map ) {
+				textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function ( map ) {
 
 					map.anisotropy = 4;
-					map.encoding = THREE.sRGBEncoding;
+					map.colorSpace = THREE.SRGBColorSpace;
 					ballMat.metalnessMap = map;
 					ballMat.needsUpdate = true;
 
@@ -218,8 +231,7 @@
 
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.physicallyCorrectLights = true;
-				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.useLegacyLights = false;
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );

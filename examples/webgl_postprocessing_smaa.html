@@ -13,15 +13,31 @@
 
 		<div id="container"></div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { SMAAPass } from './jsm/postprocessing/SMAAPass.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+
 
 			let camera, scene, renderer, composer, stats;
 
@@ -30,7 +46,7 @@
 
 			function init() {
 
-				const container = document.getElementById( "container" );
+				const container = document.getElementById( 'container' );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -54,8 +70,9 @@
 				mesh1.position.x = - 100;
 				scene.add( mesh1 );
 
-				const texture = new THREE.TextureLoader().load( "textures/brick_diffuse.jpg" );
+				const texture = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
 				texture.anisotropy = 4;
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				const material2 = new THREE.MeshBasicMaterial( { map: texture } );
 
@@ -70,6 +87,9 @@
 
 				const pass = new SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
 				composer.addPass( pass );
+
+				const outputPass = new ShaderPass( GammaCorrectionShader );
+				composer.addPass( outputPass );
 
 				window.addEventListener( 'resize', onWindowResize );
 

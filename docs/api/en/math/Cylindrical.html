@@ -10,21 +10,22 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			A point's [link:https://en.wikipedia.org/wiki/Cylindrical_coordinate_system cylindrical coordinates].
+			A point's
+			[link:https://en.wikipedia.org/wiki/Cylindrical_coordinate_system cylindrical coordinates].
 		</p>
-
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:Float radius], [param:Float theta], [param:Float y] )</h3>
+		<h3>
+			[name]( [param:Float radius], [param:Float theta], [param:Float y] )
+		</h3>
 		<p>
-		[page:Float radius] - distance from the origin to a point in the x-z plane.
-		Default is *1.0*.<br />
-		[page:Float theta] - counterclockwise angle in the x-z plane measured in radians
-		from the positive z-axis. Default is *0*.<br />
-		[page:Float y] - height above the x-z plane. Default is *0*.
+			[page:Float radius] - distance from the origin to a point in the x-z
+			plane. Default is `1.0`.<br />
+			[page:Float theta] - counterclockwise angle in the x-z plane measured in
+			radians from the positive z-axis. Default is `0`.<br />
+			[page:Float y] - height above the x-z plane. Default is `0`.
 		</p>
-
 
 		<h2>Properties</h2>
 
@@ -34,35 +35,39 @@
 
 		<h3>[property:Float y]</h3>
 
-
 		<h2>Methods</h2>
 
 		<h3>[method:Cylindrical clone]()</h3>
 		<p>
-		Returns a new cylindrical with the same [page:.radius radius], [page:.theta theta]
-		and [page:.y y] properties as this one.
+			Returns a new cylindrical with the same [page:.radius radius],
+			[page:.theta theta] and [page:.y y] properties as this one.
 		</p>
 
 		<h3>[method:this copy]( [param:Cylindrical other] )</h3>
 		<p>
-			Copies the values of the passed Cylindrical's [page:.radius radius], [page:.theta theta]
-			and [page:.y y] properties to this cylindrical.
+			Copies the values of the passed Cylindrical's [page:.radius radius],
+			[page:.theta theta] and [page:.y y] properties to this cylindrical.
 		</p>
 
-		<h3>[method:this set]( [param:Float radius], [param:Float theta], [param:Float y] )</h3>
-		<p>Sets values of this cylindrical's [page:.radius radius], [page:.theta theta]
-		and [page:.y y] properties.</p>
+		<h3>
+			[method:this set]( [param:Float radius], [param:Float theta], [param:Float y] )
+		</h3>
+		<p>
+			Sets values of this cylindrical's [page:.radius radius], [page:.theta theta] and [page:.y y] properties.
+		</p>
 
 		<h3>[method:this setFromVector3]( [param:Vector3 vec3] )</h3>
 		<p>
-			Sets values of this cylindrical's [page:.radius radius], [page:.theta theta]
+			Sets values of this cylindrical's [page:.radius radius], [page:.theta theta] 
 			and [page:.y y] properties from the [page:Vector3 Vector3].
 		</p>
 
-		<h3>[method:this setFromCartesianCoords]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>
+			[method:this setFromCartesianCoords]( [param:Float x], [param:Float y], [param:Float z] )
+		</h3>
 		<p>
-			Sets values of this cylindrical's [page:.radius radius], [page:.theta theta]
-			and [page:.y y] properties from Cartesian coordinates.
+			Sets values of this cylindrical's [page:.radius radius], [page:.theta theta] and 
+			[page:.y y] properties from Cartesian coordinates.
 		</p>
 
 		<h2>Source</h2>

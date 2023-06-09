@@ -1,0 +1,204 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Multiple Scenes - Controls</title>
+    <style>
+    #c {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: -1;
+    }
+    *[data-diagram] {
+      display: inline-block;
+      width: 5em;
+      height: 3em;
+    }
+    .left {
+      float: left;
+      margin-right: .25em;
+    }
+    .right {
+      float: right;
+      margin-left: .25em;
+    }
+    p {
+      margin: 1em auto;
+      max-width: 500px;
+      font-size: xx-large;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <p>
+      <span data-diagram="box" class="left"></span>
+      I love boxes. Presents come in boxes.
+      When I find a new box I'm always excited to find out what's inside.
+    </p>
+    <p>
+      <span data-diagram="pyramid" class="right"></span>
+      When I was a kid I dreamed of going on an expedition inside a pyramid
+      and finding a undiscovered tomb full of mummies and treasure.
+    </p>
+  </body>
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import {TrackballControls} from 'three/addons/controls/TrackballControls.js';
+
+function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas, alpha: true});
+
+  const sceneElements = [];
+  function addScene(elem, fn) {
+    sceneElements.push({elem, fn});
+  }
+
+  function makeScene(elem) {
+    const scene = new THREE.Scene();
+
+    const fov = 45;
+    const aspect = 2;  // the canvas default
+    const near = 0.1;
+    const far = 5;
+    const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+    camera.position.set(0, 1, 2);
+    camera.lookAt(0, 0, 0);
+    scene.add(camera);
+
+    const controls = new TrackballControls(camera, elem);
+    controls.noZoom = true;
+    controls.noPan = true;
+
+    {
+      const color = 0xFFFFFF;
+      const intensity = 1;
+      const light = new THREE.DirectionalLight(color, intensity);
+      light.position.set(-1, 2, 4);
+      camera.add(light);
+    }
+
+    return {scene, camera, controls};
+  }
+
+  const sceneInitFunctionsByName = {
+    'box': (elem) => {
+      const {scene, camera, controls} = makeScene(elem);
+      const geometry = new THREE.BoxGeometry(1, 1, 1);
+      const material = new THREE.MeshPhongMaterial({color: 'red'});
+      const mesh = new THREE.Mesh(geometry, material);
+      scene.add(mesh);
+      return (time, rect) => {
+        mesh.rotation.y = time * .1;
+        camera.aspect = rect.width / rect.height;
+        camera.updateProjectionMatrix();
+        controls.handleResize();
+        controls.update();
+        renderer.render(scene, camera);
+      };
+    },
+    'pyramid': (elem) => {
+      const {scene, camera, controls} = makeScene(elem);
+      const radius = .8;
+      const widthSegments = 4;
+      const heightSegments = 2;
+      const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+      const material = new THREE.MeshPhongMaterial({
+        color: 'blue',
+        flatShading: true,
+      });
+      const mesh = new THREE.Mesh(geometry, material);
+      scene.add(mesh);
+      return (time, rect) => {
+        mesh.rotation.y = time * .1;
+        camera.aspect = rect.width / rect.height;
+        camera.updateProjectionMatrix();
+        controls.handleResize();
+        controls.update();
+        renderer.render(scene, camera);
+      };
+    },
+  };
+
+  document.querySelectorAll('[data-diagram]').forEach((elem) => {
+    const sceneName = elem.dataset.diagram;
+    const sceneInitFunction = sceneInitFunctionsByName[sceneName];
+    const sceneRenderFunction = sceneInitFunction(elem);
+    addScene(elem, sceneRenderFunction);
+  });
+
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
+
+  const clearColor = new THREE.Color('#000');
+  function render(time) {
+    time *= 0.001;
+
+    resizeRendererToDisplaySize(renderer);
+
+    renderer.setScissorTest(false);
+    renderer.setClearColor(clearColor, 0);
+    renderer.clear(true, true);
+    renderer.setScissorTest(true);
+
+    const transform = `translateY(${window.scrollY}px)`;
+    renderer.domElement.style.transform = transform;
+
+    for (const {elem, fn} of sceneElements) {
+      // get the viewport relative position of this element
+      const rect = elem.getBoundingClientRect();
+      const {left, right, top, bottom, width, height} = rect;
+
+      const isOffscreen =
+          bottom < 0 ||
+          top > renderer.domElement.clientHeight ||
+          right < 0 ||
+          left > renderer.domElement.clientWidth;
+
+      if (!isOffscreen) {
+        const positiveYUpBottom = renderer.domElement.clientHeight - bottom;
+        renderer.setScissor(left, positiveYUpBottom, width, height);
+        renderer.setViewport(left, positiveYUpBottom, width, height);
+
+        fn(time, rect);
+      }
+    }
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+}
+
+main();
+</script>
+</html>
+

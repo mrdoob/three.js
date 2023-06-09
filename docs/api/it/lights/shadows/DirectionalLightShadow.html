@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:LightShadow] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Questa classe viene utilizzata internamente da [page:DirectionalLight DirectionalLights] per calcolare le ombre.<br /><br />
+
+      A differenza delle altre classi Ombra, questa utilizza una [page:OrthographicCamera] per calcolare le ombre,
+      piuttosto che una [page:PerspectiveCamera]. Questo è perché i raggi della luce da una [page:DirectionalLight] sono 
+      paralleli.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		// Crea un WebGLRenderer e attiva le ombre nel renderer
+		const renderer = new THREE.WebGLRenderer();
+		renderer.shadowMap.enabled = true;
+		renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
+		// Crea una DirectionalLight e attiva le ombre per la luce
+		const light = new THREE.DirectionalLight( 0xffffff, 1 );
+		light.position.set( 0, 1, 0 ); //default; light shining from top
+		light.castShadow = true; // default false
+		scene.add( light );
+
+		// Imposta le proprietà dell'ombra per la luce
+		light.shadow.mapSize.width = 512; // default
+		light.shadow.mapSize.height = 512; // default
+		light.shadow.camera.near = 0.5; // default
+		light.shadow.camera.far = 500; // default
+
+		// Crea una sfera che proietta le ombre (ma non le riceve)
+		const sphereGeometry = new THREE.SphereGeometry( 5, 32, 32 );
+		const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+		const sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+		sphere.castShadow = true; //default is false
+		sphere.receiveShadow = false; //default
+		scene.add( sphere );
+
+		// Crea un piano che riceve le ombre (ma non le proietta)
+		const planeGeometry = new THREE.PlaneGeometry( 20, 20, 32, 32 );
+		const planeMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } )
+		const plane = new THREE.Mesh( planeGeometry, planeMaterial );
+		plane.receiveShadow = true;
+		scene.add( plane );
+
+		// Crea un helper per la telecamera ombra (opzionale)
+		const helper = new THREE.CameraHelper( light.shadow.camera );
+		scene.add( helper );
+		</code>
+
+		<h2>Costruttore</h2>
+		<h3>[name]( )</h3>
+		<p>
+			Crea una nuova [name]. Questa classe non deve essere chiamata direttamente - viene 
+      chiamata internamente da [page:DirectionalLight].
+		</p>
+
+    <h2>Proprietà</h2>
+		<p>
+      Vedi la classe base [page:LightShadow LightShadow] per le proprietà comuni.
+		</p>
+
+		<h3>[property:Camera camera]</h3>
+		<p>
+      La visione del mondo della luce. Questo viene utilizzato per generare una mappa di profondità della scena;
+      gli oggetti dietro altri oggetti dalla prospettiva della luce saranno in ombra.<br /><br />
+
+      L'impostazione predefinita è una [page:OrthographicCamera] con [page:OrthographicCamera.left left] e 
+      [page:OrthographicCamera.bottom bottom] impostati a -5, [page:OrthographicCamera.right right]
+			e [page:OrthographicCamera.top top] impostati a 5, il piano [page:OrthographicCamera.near near]
+      imopstato a 0.5 e il piano [page:OrthographicCamera.far far] impostato a 500.
+		</p>
+
+		<h3>[property:Boolean isDirectionalLightShadow]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è del tipo [name].
+		</p>
+
+    <h2>Metodi</h2>
+		<p>
+      Vedi la classe base [page:LightShadow LightShadow] per i metodi comuni.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/lights/[name].js src/lights/[name].js]
+		</p>
+	</body>
+</html>

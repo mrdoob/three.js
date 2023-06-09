@@ -6,6 +6,8 @@ class InstancedBufferGeometry extends BufferGeometry {
 
 		super();
 
+		this.isInstancedBufferGeometry = true;
+
 		this.type = 'InstancedBufferGeometry';
 		this.instanceCount = Infinity;
 
@@ -21,15 +23,9 @@ class InstancedBufferGeometry extends BufferGeometry {
 
 	}
 
-	clone() {
-
-		return new this.constructor().copy( this );
-
-	}
-
 	toJSON() {
 
-		const data = super.toJSON( this );
+		const data = super.toJSON();
 
 		data.instanceCount = this.instanceCount;
 
@@ -40,7 +36,5 @@ class InstancedBufferGeometry extends BufferGeometry {
 	}
 
 }
-
-InstancedBufferGeometry.prototype.isInstancedBufferGeometry = true;
 
 export { InstancedBufferGeometry };

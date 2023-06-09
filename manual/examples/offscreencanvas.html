@@ -1,0 +1,62 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - OffscreenCanvas</title>
+    <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    #noOffscreenCanvas {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        background: red;
+        color: white;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <div id="noOffscreenCanvas" style="display:none;">
+      <div>no OffscreenCanvas support</div>
+    </div>
+  </body>
+<script type="module">
+function main() {  /* eslint consistent-return: 0 */
+  const canvas = document.querySelector('#c');
+  if (!canvas.transferControlToOffscreen) {
+    canvas.style.display = 'none';
+    document.querySelector('#noOffscreenCanvas').style.display = '';
+    return;
+  }
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-cubes.js', {type: 'module'});
+  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+
+  function sendSize() {
+    worker.postMessage({
+      type: 'size',
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    });
+  }
+
+  window.addEventListener('resize', sendSize);
+  sendSize();
+}
+main();
+
+</script>
+</html>
+

@@ -158,8 +158,8 @@
 		<div>
 			<p>
 				自定义attributes和uniforms必须在GLSL着色器代码中声明（在 *vertexShader* 和/或 *fragmentShader* 中)。
-				自定义uniforms必须定义为 *ShaderMaterial* 的  *uniforms* 属性，
-				而任何自定义attribtes必须通过[page:BufferAttribute]实例来定义。
+				自定义uniforms必须定义为 *ShaderMaterial* 的 *uniforms* 属性，
+				而任何自定义attributes必须通过[page:BufferAttribute]实例来定义。
 				注意 *varying*s 只需要在shader代码中声明（而不必在材质中）。
 			</p>
 			<p> 要声明一个自定义属性，更多细节请参考[page:BufferGeometry]页面，
@@ -254,7 +254,7 @@
 this.defaultAttributeValues = {
 	'color': [ 1, 1, 1 ],
 	'uv': [ 0, 0 ],
-	'uv2': [ 0, 0 ]
+	'uv1': [ 0, 0 ]
 };
 			</code>
 
@@ -313,6 +313,11 @@ this.extensions = {
 
 		</p>
 
+		<h3>[property:Boolean isShaderMaterial]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Boolean lights]</h3>
 		<p> 材质是否受到光照的影响。默认值为 *false*。如果传递与光照相关的uniform数据到这个材质，则为true。默认是false。
 		</p>
@@ -369,7 +374,7 @@ this.extensions = {
 		<h2>方法(Methods)</h2>
 		<p>共有方法请参见其基类[page:Material]。</p>
 
-		<h3>[method:ShaderMaterial clone]() [param:ShaderMaterial this]</h3>
+		<h3>[method:ShaderMaterial clone]()</h3>
 		<p> 创建该材质的一个浅拷贝。需要注意的是，vertexShader和fragmentShader使用<em>引用拷贝</em>；
 			*attributes*的定义也是如此;
 			这意味着，克隆的材质将共享相同的编译[page:WebGLProgram]；

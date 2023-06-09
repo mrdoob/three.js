@@ -3,14 +3,8 @@ export default /* glsl */`
 
 	#ifdef USE_LIGHTMAP
 
-		vec4 lightMapTexel = texture2D( lightMap, vUv2 );
-		vec3 lightMapIrradiance = lightMapTexelToLinear( lightMapTexel ).rgb * lightMapIntensity;
-
-		#ifndef PHYSICALLY_CORRECT_LIGHTS
-
-			lightMapIrradiance *= PI;
-
-		#endif
+		vec4 lightMapTexel = texture2D( lightMap, vLightMapUv );
+		vec3 lightMapIrradiance = lightMapTexel.rgb * lightMapIntensity;
 
 		irradiance += lightMapIrradiance;
 
@@ -26,7 +20,15 @@ export default /* glsl */`
 
 #if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )
 
-	radiance += getIBLRadiance( geometry.viewDir, geometry.normal, material.roughness );
+	#ifdef USE_ANISOTROPY
+
+		radiance += getIBLAnisotropyRadiance( geometry.viewDir, geometry.normal, material.roughness, material.anisotropyB, material.anisotropy );
+
+	#else
+
+		radiance += getIBLRadiance( geometry.viewDir, geometry.normal, material.roughness );
+
+	#endif
 
 	#ifdef USE_CLEARCOAT
 

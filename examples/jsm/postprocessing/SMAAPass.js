@@ -1,13 +1,12 @@
 import {
+	HalfFloatType,
 	LinearFilter,
 	NearestFilter,
-	RGBAFormat,
-	RGBFormat,
 	ShaderMaterial,
 	Texture,
 	UniformsUtils,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
+} from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { SMAAEdgesShader } from '../shaders/SMAAShader.js';
 import { SMAAWeightsShader } from '../shaders/SMAAShader.js';
@@ -23,17 +22,13 @@ class SMAAPass extends Pass {
 
 		this.edgesRT = new WebGLRenderTarget( width, height, {
 			depthBuffer: false,
-			generateMipmaps: false,
-			minFilter: LinearFilter,
-			format: RGBFormat
+			type: HalfFloatType
 		} );
 		this.edgesRT.texture.name = 'SMAAPass.edges';
 
 		this.weightsRT = new WebGLRenderTarget( width, height, {
 			depthBuffer: false,
-			generateMipmaps: false,
-			minFilter: LinearFilter,
-			format: RGBAFormat
+			type: HalfFloatType
 		} );
 		this.weightsRT.texture.name = 'SMAAPass.weights';
 
@@ -52,7 +47,6 @@ class SMAAPass extends Pass {
 		this.areaTexture = new Texture();
 		this.areaTexture.name = 'SMAAPass.area';
 		this.areaTexture.image = areaTextureImage;
-		this.areaTexture.format = RGBFormat;
 		this.areaTexture.minFilter = LinearFilter;
 		this.areaTexture.generateMipmaps = false;
 		this.areaTexture.flipY = false;
@@ -75,12 +69,6 @@ class SMAAPass extends Pass {
 		this.searchTexture.flipY = false;
 
 		// materials - pass 1
-
-		if ( SMAAEdgesShader === undefined ) {
-
-			console.error( 'THREE.SMAAPass relies on SMAAShader' );
-
-		}
 
 		this.uniformsEdges = UniformsUtils.clone( SMAAEdgesShader.uniforms );
 
@@ -189,6 +177,22 @@ class SMAAPass extends Pass {
 	getSearchTexture() {
 
 		return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEIAAAAhCAAAAABIXyLAAAAAOElEQVRIx2NgGAWjYBSMglEwEICREYRgFBZBqDCSLA2MGPUIVQETE9iNUAqLR5gIeoQKRgwXjwAAGn4AtaFeYLEAAAAASUVORK5CYII=';
+
+	}
+
+	dispose() {
+
+		this.edgesRT.dispose();
+		this.weightsRT.dispose();
+
+		this.areaTexture.dispose();
+		this.searchTexture.dispose();
+
+		this.materialEdges.dispose();
+		this.materialWeights.dispose();
+		this.materialBlend.dispose();
+
+		this.fsQuad.dispose();
 
 	}
 

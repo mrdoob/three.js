@@ -16,7 +16,7 @@ function SidebarMaterialColorProperty( editor, property, name ) {
 
 	if ( property === 'emissive' ) {
 
-		intensity = new UINumber().setWidth( '30px' ).onChange( onChange );
+		intensity = new UINumber( 1 ).setWidth( '30px' ).setRange( 0, Infinity ).onChange( onChange );
 		container.add( intensity );
 
 	}

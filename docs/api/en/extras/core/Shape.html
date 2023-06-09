@@ -12,8 +12,9 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		Defines an arbitrary 2d shape plane using paths with optional holes. It can be used with [page:ExtrudeGeometry],
-		[page:ShapeGeometry], to get points, or to get triangulated faces.
+			Defines an arbitrary 2d shape plane using paths with optional holes. It
+			can be used with [page:ExtrudeGeometry], [page:ShapeGeometry], to get
+			points, or to get triangulated faces.
 		</p>
 
 		<h2>Code Example</h2>
@@ -29,7 +30,14 @@
 		heartShape.bezierCurveTo( 80, 35, 80, 0, 50, 0 );
 		heartShape.bezierCurveTo( 35, 0, 25, 25, 25, 25 );
 
-		const extrudeSettings = { depth: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
+		const extrudeSettings = { 
+			depth: 8, 
+			bevelEnabled: true, 
+			bevelSegments: 2, 
+			steps: 2, 
+			bevelSize: 1, 
+			bevelThickness: 1 
+		};
 
 		const geometry = new THREE.ExtrudeGeometry( heartShape, extrudeSettings );
 
@@ -39,33 +47,32 @@
 		<h2>Examples</h2>
 
 		<p>
-		[example:webgl_geometry_shapes geometry / shapes ]<br/>
-		[example:webgl_geometry_extrude_shapes geometry / extrude / shapes ]<br/>
-		[example:webgl_geometry_extrude_shapes2 geometry / extrude / shapes2 ]<br/>
+			[example:webgl_geometry_shapes geometry / shapes ]<br />
+			[example:webgl_geometry_extrude_shapes geometry / extrude / shapes ]
 		</p>
-
 
 		<h2>Constructor</h2>
 
-
 		<h3>[name]( [param:Array points] )</h3>
 		<p>
-		points -- (optional) array of [page:Vector2 Vector2s].<br /><br />
+			points -- (optional) array of [page:Vector2 Vector2s].<br /><br />
 
-		Creates a Shape from the points. The first point defines the offset, then successive points
-		are added to the [page:CurvePath.curves curves] array as [page:LineCurve LineCurves].<br /><br />
+			Creates a Shape from the points. The first point defines the offset, then
+			successive points are added to the [page:CurvePath.curves curves] array as
+			[page:LineCurve LineCurves].<br /><br />
 
-		If no points are specified, an empty shape is created and the [page:.currentPoint] is set to
-		the origin.
+			If no points are specified, an empty shape is created and the
+			[page:.currentPoint] is set to the origin.
 		</p>
-
 
 		<h2>Properties</h2>
 		<p>See the base [page:Path] class for common properties.</p>
 
 		<h3>[property:String uuid]</h3>
 		<p>
-		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this instance. This gets automatically assigned, so this shouldn't be edited.
+			[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of
+			this instance. This gets automatically assigned, so this shouldn't be
+			edited.
 		</p>
 
 		<h3>[property:Array holes]</h3>
@@ -76,23 +83,20 @@
 
 		<h3>[method:Array extractPoints]( [param:Integer divisions] )</h3>
 		<p>
-		divisions -- The fineness of the result.<br /><br />
+			divisions -- The fineness of the result.<br /><br />
 
-		Call [page:Curve.getPoints getPoints] on the shape and the [page:.holes] array, and return an object of the form:
-		<code>
-{
-	shape
-	holes
-}
-		</code>
-		where shape and holes are arrays of [page:Vector2 Vector2s].
+			Call [page:Curve.getPoints getPoints] on the shape and the [page:.holes]
+			array, and return an object of the form:
+			<code> { shape holes } </code>
+			where shape and holes are arrays of [page:Vector2 Vector2s].
 		</p>
 
 		<h3>[method:Array getPointsHoles]( [param:Integer divisions] )</h3>
 		<p>
-		divisions -- The fineness of the result.<br /><br />
+			divisions -- The fineness of the result.<br /><br />
 
-		Get an array of [page:Vector2 Vector2s] that represent the holes in the shape.
+			Get an array of [page:Vector2 Vector2s] that represent the holes in the
+			shape.
 		</p>
 
 		<h2>Source</h2>

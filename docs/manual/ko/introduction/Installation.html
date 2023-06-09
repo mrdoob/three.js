@@ -32,7 +32,7 @@
     </p>
 
     <code>
-		npm install --save three
+		npm install three
 		</code>
 
     <p>
@@ -77,24 +77,26 @@
     </p>
 
     <code>
-		&lt;script type="module">
+&lt;script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js">&lt;/script>
 
-		  // Find the latest version by visiting https://cdn.skypack.dev/three.
+&lt;script type="importmap">
+    {
+    "imports": {
+        "three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js"
+    }
+    }
+&lt;/script>
 
-		  import * as THREE from 'https://cdn.skypack.dev/three@&lt;version&gt;';
+&lt;script type="module">
 
-		  const scene = new THREE.Scene();
+    import * as THREE from 'three';
 
-		&lt;/script>
-		</code>
+    const scene = new THREE.Scene();
 
-    <p>
-        모든 속성들이 <em>build/three.module.js</em> 모듈을 통해 접근하는 것은 아닙니다.  다른 자주 쓰이는 라이브러리들, controls, loaders, post-processing effects 같은 것들은
-        [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] 의 하위폴더에서 불러와야 합니다. 더 자세한 내용을 알아보려면, 아래 <em>예제</em>를 참고하세요.
-    </p>
+&lt;/script>
+</code>
 
-
-    <h2>예제</h2>
+    <h2>Addons</h2>
 
     <p>
         three.js는 3D 엔진의 주요 컴포넌트들에 초점을 두고 있습니다. 다른 여러 유용한 컴포넌트들 —
@@ -110,9 +112,9 @@
 
 
     <code>
-		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-		const controls = new OrbitControls();
+		const controls = new OrbitControls( camera, renderer.domElement );
 		</code>
 
     <p>
@@ -120,16 +122,26 @@
     </p>
 
     <code>
-		&lt;script type="module">
+&lt;script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js">&lt;/script>
 
-		  // Find the latest version by visiting https://cdn.skypack.dev/three.
+&lt;script type="importmap">
+    {
+    "imports": {
+        "three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@&lt;version&gt;/examples/jsm/"
+    }
+    }
+&lt;/script>
 
-		  import { OrbitControls } from 'https://cdn.skypack.dev/three@&lt;version&gt;/examples/jsm/controls/OrbitControls.js';
+&lt;script type="module">
 
-		  const controls = new OrbitControls();
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-		&lt;/script>
-		</code>
+    const controls = new OrbitControls( camera, renderer.domElement );
+
+&lt;/script>
+</code>
 
     <p>
         모든 파일들의 버전을 동일하게 맞추는것이 무엇보다 중요합니다. 서로 다른 버전에서 import를 하거나, three.js 라이브러리 자체가 아닌 다른 버전의 예제를 사용하지 마세요.
@@ -164,19 +176,11 @@
     <h3>Node.js</h3>
 
     <p>
-        three.js 를 [link:https://eloquentjavascript.net/20_node.html Node.js]에서 사용하는기에는 어려움이 있는데, 두 가지 이유가 있습니다.
+        Because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be resolved by using shims like [link:https://github.com/stackgl/headless-gl headless-gl], or by replacing components like [page:TextureLoader] with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
     </p>
 
     <p>
-        첫 번째로, three.js는 웹을 목적으로 만들어졌기때문에, Node.js에서 항상 활용 가능하다고 보증할 수 없는 브라우저와 DOM API에 의존하고 있는 까닭입니다.
-        이러한 문제들은 shims를 통해 [link:https://github.com/stackgl/headless-gl headless-gl]처럼 해결하거나, [page:TextureLoader] 같은 컴포넌트를 커스터마이징 해서 해결 가능합니다. 다른 DOM API는 관련된 코드가 더 복잡하게 연관되어 있어, 수정하기 더 까다롭습니다.
-        Node.js 지원을 향상시키기 위한 더 간단하고, 유지보수 가능한 pull 요청은 언제든지 환영이지만, 본인의 작업을 위한 issue 생성을 더 권장합니다.
-    </p>
-
-    <p>
-        둘째로, Node.js의 ES 모듈 지원은 ... 다소 복잡합니다. Node.js v12에서, 코어 라이브러리는 CommonJS 모듈로, <em>require('three')</em>와 같이 사용 가능합니다.
-        하지만, 대부분의 <em>examples/jsm</em> 안의 예제 컴포넌트들은 불가능합니다. Node.js 향후 버전에서는 이게 해결될 수도 있겠지만, 그 전까지는
-        [link:https://github.com/standard-things/esm esm]처럼 사용해 Node.js 앱이 ES 모듈을 인식할 수 있도록 해줘야 합니다.
+        Make sure to add `{ "type": "module" }` to your `package.json` to enable ES6 modules in your node project.
     </p>
 
 </body>

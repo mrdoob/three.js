@@ -6,25 +6,23 @@ export default /* glsl */`
 
 #endif
 
-#ifdef OBJECTSPACE_NORMALMAP
+#ifdef USE_NORMALMAP_OBJECTSPACE
 
 	uniform mat3 normalMatrix;
 
 #endif
 
-#if ! defined ( USE_TANGENT ) && ( defined ( TANGENTSPACE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP ) )
+#if ! defined ( USE_TANGENT ) && ( defined ( USE_NORMALMAP_TANGENTSPACE ) || defined ( USE_CLEARCOAT_NORMALMAP ) || defined( USE_ANISOTROPY ) )
 
 	// Normal Mapping Without Precomputed Tangents
 	// http://www.thetenthplanet.de/archives/1180
 
-	vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 mapN, float faceDirection ) {
+	mat3 getTangentFrame( vec3 eye_pos, vec3 surf_norm, vec2 uv ) {
 
-		// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
-
-		vec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );
-		vec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );
-		vec2 st0 = dFdx( vUv.st );
-		vec2 st1 = dFdy( vUv.st );
+		vec3 q0 = dFdx( eye_pos.xyz );
+		vec3 q1 = dFdy( eye_pos.xyz );
+		vec2 st0 = dFdx( uv.st );
+		vec2 st1 = dFdy( uv.st );
 
 		vec3 N = surf_norm; // normalized
 
@@ -35,9 +33,9 @@ export default /* glsl */`
 		vec3 B = q1perp * st0.y + q0perp * st1.y;
 
 		float det = max( dot( T, T ), dot( B, B ) );
-		float scale = ( det == 0.0 ) ? 0.0 : faceDirection * inversesqrt( det );
+		float scale = ( det == 0.0 ) ? 0.0 : inversesqrt( det );
 
-		return normalize( T * ( mapN.x * scale ) + B * ( mapN.y * scale ) + N * mapN.z );
+		return mat3( T * scale, B * scale, N );
 
 	}
 

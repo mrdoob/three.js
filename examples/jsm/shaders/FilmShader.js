@@ -2,7 +2,7 @@
  * Film grain & scanlines shader
  *
  * - ported from HLSL to WebGL / GLSL
- * http://www.truevision3d.com/forums/showcase/staticnoise_colorblackwhite_scanline_shaders-t18698.0.html
+ * https://web.archive.org/web/20210226214859/http://www.truevision3d.com/forums/showcase/staticnoise_colorblackwhite_scanline_shaders-t18698.0.html
  *
  * Screen Space Static Postprocessor
  *
@@ -19,6 +19,8 @@
  */
 
 const FilmShader = {
+
+	name: 'FilmShader',
 
 	uniforms: {
 

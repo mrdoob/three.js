@@ -31,4 +31,4 @@ class TetrahedronGeometry extends PolyhedronGeometry {
 
 }
 
-export { TetrahedronGeometry, TetrahedronGeometry as TetrahedronBufferGeometry };
+export { TetrahedronGeometry };

@@ -16,8 +16,19 @@
 			다른 컨트롤과 달리, 해당 기능은 카메라의 장면 변환을 의미하지 않습니다.<br /><br />
 
 			[name] 는 연결된 3D 객체가 씬(scene) 그래프의 일부 입니다.
-		
+
 		</p>
+
+		<h2>수입</h2>
+
+		<p>
+			[name] 는 애드온이며 명시적으로 가져와야 합니다.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { TransformControls } from 'three/addons/controls/TransformControls.js';
+		</code>
 
 		<h2>예시</h2>
 
@@ -41,7 +52,7 @@
 
 		<h3>change</h3>
 		<p>
-			어떤 유형 (객체 또는 속성 변경) 의 변경이 수행할 경우 호출됩니다. 속성 변경은 이벤트 리스너를 추가 할 수 있는 별도의 이벤트입니다. 
+			어떤 유형 (객체 또는 속성 변경) 의 변경이 수행할 경우 호출됩니다. 속성 변경은 이벤트 리스너를 추가 할 수 있는 별도의 이벤트입니다.
 			이벤트의 타입은 "propertyname-changed" 입니다.
 		</p>
 
@@ -62,7 +73,7 @@
 
 		<h2>속성</h2>
 
-		<p>공통 속성은 [page: Object3D] 클래스를 참조하세요.</p>
+		<p>공통 속성은 [page:Object3D] 클래스를 참조하세요.</p>
 
 		<h3>[property:String axis]</h3>
 		<p>
@@ -76,7 +87,7 @@
 
 		<h3>[property:HTMLDOMElement domElement]</h3>
 		<p>
-			HTMLDOMElement는 마우스 / 터치 이벤트를 사용하는데 이용됩니다. 이것은 생성자에 의해 설정되어야 합니다; 
+			HTMLDOMElement는 마우스 / 터치 이벤트를 사용하는데 이용됩니다. 이것은 생성자에 의해 설정되어야 합니다;
 			생성자를 통해 설정되지 않을 경우 새 이벤트 리스너에 설정되지 않습니다.
 		</p>
 

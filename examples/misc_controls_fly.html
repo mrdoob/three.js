@@ -27,16 +27,31 @@
 		<b>WASD</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll, <b>up|down</b> pitch, <b>left|right</b> yaw
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { FlyControls } from './jsm/controls/FlyControls.js';
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
+			import { FlyControls } from 'three/addons/controls/FlyControls.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
 			const radius = 6371;
 			const tilt = 0.41;
@@ -79,16 +94,17 @@
 
 				const materialNormalMap = new THREE.MeshPhongMaterial( {
 
-					specular: 0x333333,
+					specular: 0x7c7c7c,
 					shininess: 15,
-					map: textureLoader.load( "textures/planets/earth_atmos_2048.jpg" ),
-					specularMap: textureLoader.load( "textures/planets/earth_specular_2048.jpg" ),
-					normalMap: textureLoader.load( "textures/planets/earth_normal_2048.jpg" ),
+					map: textureLoader.load( 'textures/planets/earth_atmos_2048.jpg' ),
+					specularMap: textureLoader.load( 'textures/planets/earth_specular_2048.jpg' ),
+					normalMap: textureLoader.load( 'textures/planets/earth_normal_2048.jpg' ),
 
 					// y scale is negated to compensate for normal map handedness.
 					normalScale: new THREE.Vector2( 0.85, - 0.85 )
 
 				} );
+				materialNormalMap.map.colorSpace = THREE.SRGBColorSpace;
 
 				// planet
 
@@ -103,10 +119,11 @@
 
 				const materialClouds = new THREE.MeshLambertMaterial( {
 
-					map: textureLoader.load( "textures/planets/earth_clouds_1024.png" ),
+					map: textureLoader.load( 'textures/planets/earth_clouds_1024.png' ),
 					transparent: true
 
 				} );
+				materialClouds.map.colorSpace = THREE.SRGBColorSpace;
 
 				meshClouds = new THREE.Mesh( geometry, materialClouds );
 				meshClouds.scale.set( cloudsScale, cloudsScale, cloudsScale );
@@ -117,9 +134,10 @@
 
 				const materialMoon = new THREE.MeshPhongMaterial( {
 
-					map: textureLoader.load( "textures/planets/moon_1024.jpg" )
+					map: textureLoader.load( 'textures/planets/moon_1024.jpg' )
 
 				} );
+				materialMoon.map.colorSpace = THREE.SRGBColorSpace;
 
 				meshMoon = new THREE.Mesh( geometry, materialMoon );
 				meshMoon.position.set( radius * 5, 0, 0 );
@@ -161,12 +179,12 @@
 				starsGeometry[ 1 ].setAttribute( 'position', new THREE.Float32BufferAttribute( vertices2, 3 ) );
 
 				const starsMaterials = [
-					new THREE.PointsMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
+					new THREE.PointsMaterial( { color: 0x9c9c9c, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x9c9c9c, size: 1, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x7c7c7c, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x838383, size: 1, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x5a5a5a, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x5a5a5a, size: 1, sizeAttenuation: false } )
 				];
 
 				for ( let i = 10; i < 30; i ++ ) {
@@ -211,11 +229,13 @@
 
 				const renderModel = new RenderPass( scene, camera );
 				const effectFilm = new FilmPass( 0.35, 0.75, 2048, false );
+				const gammaCorrection = new ShaderPass( GammaCorrectionShader );
 
 				composer = new EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectFilm );
+				composer.addPass( gammaCorrection );
 
 			}
 

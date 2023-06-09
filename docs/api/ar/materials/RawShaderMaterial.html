@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Material] &rarr; [page:ShaderMaterial] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		هذه الفئة تعمل تمامًا مثل [page:ShaderMaterial]، باستثناء أن التعريفات
+		من الموحدات والسمات المدمجة لا يتم إلحاقها تلقائيًا بـ
+		كود GLSL shader.
+		</p>
+		 
+		<h2>مثال الكود</h2>
+		<code>
+		const material = new THREE.RawShaderMaterial( {
+		 
+			uniforms: {
+			time: { value: 1.0 }
+			},
+			vertexShader: document.getElementById( 'vertexShader' ).textContent,
+			fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+		 
+		} );
+		</code>
+		 
+		<h2>أمثلة (Examples)</h2>
+		<p>
+		[example:webgl_buffergeometry_rawshader WebGL / buffergeometry / rawshader]<br />
+		[example:webgl_buffergeometry_instancing_billboards WebGL / buffergeometry / instancing / billboards]<br />
+		[example:webgl_buffergeometry_instancing WebGL / buffergeometry / instancing]<br />
+		[example:webgl_raymarching_reflect WebGL / raymarching / reflect]<br />
+		[example:webgl2_volume_cloud WebGL 2 / volume / cloud]<br />
+		[example:webgl2_volume_instancing WebGL 2 / volume / instancing]<br />
+		[example:webgl2_volume_perlin WebGL 2 / volume / perlin]
+		</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+		[page:Object parameters] - (اختياري) كائن يحتوي على واحد أو أكثر
+		خصائص تحدد مظهر المادة. يمكن تمرير أي خاصية من
+		المادة (بما في ذلك أي خاصية موروثة من [page:Material] و
+		[page:ShaderMaterial]) هنا.<br /><br />
+		</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		<p>
+		انظر إلى الفئات الأساسية [page:Material] و [page:ShaderMaterial] للخصائص المشتركة.
+		</p>
+		 
+		<h2>الطرق (Methods)</h2>
+		<p>
+		انظر إلى الفئات الأساسية [page:Material] و [page:ShaderMaterial] للطرق المشتركة.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -11,11 +11,24 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - uint</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			let container, stats;
 
@@ -41,7 +54,7 @@
 
 				//
 
-				scene.add( new THREE.AmbientLight( 0x444444 ) );
+				scene.add( new THREE.AmbientLight( 0x8d8d8d ) );
 
 				const light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				light1.position.set( 1, 1, 1 );
@@ -145,7 +158,7 @@
 				geometry.computeBoundingSphere();
 
 				const material = new THREE.MeshPhongMaterial( {
-					color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
+					color: 0xd5d5d5, specular: 0xffffff, shininess: 250,
 					side: THREE.DoubleSide, vertexColors: true
 				} );
 
@@ -157,7 +170,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				container.appendChild( renderer.domElement );
 

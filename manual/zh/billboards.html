@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="utf-8">
+  <title>广告牌(Billboards)</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@threejs">
+  <meta name="twitter:title" content="Three.js – Billboards">
+  <meta property="og:image" content="https://threejs.org/files/share.png">
+  <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+  <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+  <link rel="stylesheet" href="../resources/lesson.css">
+  <link rel="stylesheet" href="../resources/lang.css">
+  <!-- Import maps polyfill -->
+  <!-- Remove this when import maps will be widely supported -->
+  <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+  <script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  <link rel="stylesheet" href="/manual/zh/lang.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="lesson-title">
+      <h1>广告牌(Billboards)</h1>
+    </div>
+    <div class="lesson">
+      <div class="lesson-main">
+        <p>在 <a href="canvas-textures.html">上一篇文章</a> 我们使用了一个 <a href="/docs/#api/en/textures/CanvasTexture"><code
+              class="notranslate" translate="no">CanvasTexture</code></a>
+          在人物上创作标签(Labels)和徽标(Badges)。有时我们想制作一些总是面对相机的东西。Three.js提供了 <a href="/docs/#api/en/objects/Sprite"><code
+              class="notranslate" translate="no">Sprite</code></a> 和
+          <a href="/docs/#api/en/materials/SpriteMaterial"><code class="notranslate"
+              translate="no">SpriteMaterial</code></a> 来实现这个功能。
+        </p>
+
+
+        <p>我们修改这个徽标的例子 <a href="canvas-textures.html">使用Canvas作为纹理</a>，
+          应用 <a href="/docs/#api/en/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a> and
+          <a href="/docs/#api/en/materials/SpriteMaterial"><code class="notranslate"
+              translate="no">SpriteMaterial</code></a>
+        </p>
+
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makePerson(x, labelWidth, size, name, color) {
+  const canvas = makeLabelCanvas(labelWidth, size, name);
+  const texture = new THREE.CanvasTexture(canvas);
+  // 因为我们的Canvas的尺寸可能不是2的N次方
+  // 在两个维度上适当地设置filter属性
+  texture.minFilter = THREE.LinearFilter;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+
+-  const labelMaterial = new THREE.MeshBasicMaterial({
++  const labelMaterial = new THREE.SpriteMaterial({
+    map: texture,
+-    side: THREE.DoubleSide,
+    transparent: true,
+  });
+
+  const root = new THREE.Object3D();
+  root.position.x = x;
+
+  const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+  root.add(body);
+  body.position.y = bodyHeight / 2;
+
+  const head = new THREE.Mesh(headGeometry, bodyMaterial);
+  root.add(head);
+  head.position.y = bodyHeight + headRadius * 1.1;
+
+-  const label = new THREE.Mesh(labelGeometry, labelMaterial);
++  const label = new THREE.Sprite(labelMaterial);
+  root.add(label);
+  label.position.y = bodyHeight * 4 / 5;
+  label.position.z = bodyRadiusTop * 1.01;</pre>
+        <p>现在标签始终是面向相机了。</p>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/billboard-labels-w-sprites.html"></iframe>
+          </div>
+          <a class="threejs_center" href="/manual/examples/billboard-labels-w-sprites.html" target="_blank">点击在新窗口打开</a>
+        </div>
+        <p></p>
+        <p>一个问题是，从某些角度来看的话，标签与人物重合了。 </p>
+        <div class="threejs_center"><img src="../resources/images/billboard-label-z-issue.png" style="width: 455px;">
+        </div>
+        <p>我们可以通过移动标签的位置来解决此问题。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
++// 如果单位是米，这里就用0.01
++// 也就是以厘米作为标签的单位
++const labelBaseScale = 0.01;
+const label = new THREE.Sprite(labelMaterial);
+root.add(label);
+-label.position.y = bodyHeight * 4 / 5;
+-label.position.z = bodyRadiusTop * 1.01;
++label.position.y = head.position.y + headRadius + size * labelBaseScale;
+
+-// 如果单位是米，这里就用0.01
+-// 也就是以厘米作为标签的单位
+-const labelBaseScale = 0.01;
+label.scale.x = canvas.width  * labelBaseScale;
+label.scale.y = canvas.height * labelBaseScale;</pre>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/billboard-labels-w-sprites-adjust-height.html"></iframe>
+          </div>
+          <a class="threejs_center" href="/manual/examples/billboard-labels-w-sprites-adjust-height.html"
+            target="_blank">点击在新窗口打开</a>
+        </div>
+        <p></p>
+        <p>我们可以用Billboard做的另一件事是绘制立面(Facades)。</p>
+        <p>我们不绘制 3D 对象，而是使用图片绘制 2D 平面化的 3D 对象，这通常比绘制 3D 对象要快。</p>
+        <p>例如，我们用树木网络制作一个场景，我们让每一棵树的底部是圆柱体，顶部是圆锥体。</p>
+        <p>第一步，我们创建圆锥体和圆柱体的Geometry和Material，所有的树都会复用这些。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+const trunkRadius = .2;
+const trunkHeight = 1;
+const trunkRadialSegments = 12;
+const trunkGeometry = new THREE.CylinderGeometry(
+    trunkRadius, trunkRadius, trunkHeight, trunkRadialSegments);
+
+const topRadius = trunkRadius * 4;
+const topHeight = trunkHeight * 2;
+const topSegments = 12;
+const topGeometry = new THREE.ConeGeometry(
+    topRadius, topHeight, topSegments);
+
+const trunkMaterial = new THREE.MeshPhongMaterial({color: 'brown'});
+const topMaterial = new THREE.MeshPhongMaterial({color: 'green'});</pre>
+        <p>然后我们创建一个函数，对每一棵树的树干和树顶创建一个 <a href="/docs/#api/en/objects/Mesh"><code class="notranslate"
+              translate="no">Mesh</code></a>
+          ，并把它们都加入到一个 <a href="/docs/#api/en/core/Object3D"><code class="notranslate"
+              translate="no">Object3D</code></a>对象下。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+function makeTree(x, z) {
+  const root = new THREE.Object3D();
+  const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+  trunk.position.y = trunkHeight / 2;
+  root.add(trunk);
+
+  const top = new THREE.Mesh(topGeometry, topMaterial);
+  top.position.y = trunkHeight + topHeight / 2;
+  root.add(top);
+
+  root.position.set(x, 0, z);
+  scene.add(root);
+
+  return root;
+}</pre>
+        <p>然后我们会创建一个循环，生成树网络。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+for (let z = -50; z &lt;= 50; z += 10) {
+  for (let x = -50; x &lt;= 50; x += 10) {
+    makeTree(x, z);
+  }
+}</pre>
+        <p>让我们再增加一个地平面。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+// 添加地面
+{
+  const size = 400;
+  const geometry = new THREE.PlaneGeometry(size, size);
+  const material = new THREE.MeshPhongMaterial({color: 'gray'});
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.rotation.x = Math.PI * -0.5;
+  scene.add(mesh);
+}</pre>
+        <p>然后把背景调整为浅蓝(lightblue)</p>
+
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+const scene = new THREE.Scene();
+-scene.background = new THREE.Color('white');
++scene.background = new THREE.Color('lightblue');</pre>
+        <p>我们得到了一个树木网络</p>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/billboard-trees-no-billboards.html"></iframe>
+          </div>
+          <a class="threejs_center" href="/manual/examples/billboard-trees-no-billboards.html"
+            target="_blank">点击在新窗口打开</a>
+        </div>
+        <p></p>
+        <p>这里有11x11或者121棵树，每棵树由12个多边形组成的锥体 +
+          48个多边形组成的树干组成，所以每棵树包含60个多边形。121*60的结果是7260，这并不是很多，当然更精细的3D树可能有1000-3000个多边形构成。如果3000个多边形构成的树，那么121棵树将包含363000个多边形。
+        </p>
+        <p>使用Facades，可以降低这个数字。</p>
+        <p>我们可以在一些绘图应用中手动创建一个Facade，现在让我们编写一些代码来手动生成一个。</p>
+        <p>现在写一些代码把对象绘制到纹理中，使用一个 <code class="notranslate" translate="no">RenderTarget</code>，我们提到过使用
+          <code class="notranslate" translate="no">RenderTarget</code>
+          来渲染，具体在这篇 <a href="rendertargets.html">渲染目标</a> 文章里。
+        </p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+function frameArea(sizeToFitOnScreen, boxSize, boxCenter, camera) {
+  const halfSizeToFitOnScreen = sizeToFitOnScreen * 0.5;
+  const halfFovY = THREE.MathUtils.degToRad(camera.fov * .5);
+  const distance = halfSizeToFitOnScreen / Math.tan(halfFovY);
+
+  camera.position.copy(boxCenter);
+  camera.position.z += distance;
+
+  // 为视锥体选择合适的near和far值
+  // 可以把盒模型包裹进来
+  camera.near = boxSize / 100;
+  camera.far = boxSize * 100;
+
+  camera.updateProjectionMatrix();
+}
+
+function makeSpriteTexture(textureSize, obj) {
+  const rt = new THREE.WebGLRenderTarget(textureSize, textureSize);
+
+  const aspect = 1;  // 因为Render Target是正方形
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+
+  scene.add(obj);
+
+  // 计算对象的盒模型
+  const box = new THREE.Box3().setFromObject(obj);
+
+  const boxSize = box.getSize(new THREE.Vector3());
+  const boxCenter = box.getCenter(new THREE.Vector3());
+
+  // 设置相机去构建盒模型
+  const fudge = 1.1;
+  const size = Math.max(...boxSize.toArray()) * fudge;
+  frameArea(size, size, boxCenter, camera);
+
+  renderer.autoClear = false;
+  renderer.setRenderTarget(rt);
+  renderer.render(scene, camera);
+  renderer.setRenderTarget(null);
+  renderer.autoClear = true;
+
+  scene.remove(obj);
+
+  return {
+    position: boxCenter.multiplyScalar(fudge),
+    scale: size,
+    texture: rt.texture,
+  };
+}</pre>
+        <p>关于上面代码的一些注意事项：</p>
+        <p>我们使用之前代码定义好的视图的 (<code class="notranslate" translate="no">fov</code>) 属性，
+        </p>
+        <p>我们计算一个包含树的盒模型，这和 <a href="load-obj.html">加载.obj的文件</a> 中提到的方式一致，有一点微小的改变。</p>
+        <p>我们再次调用 <code class="notranslate" translate="no">frameArea</code>，稍微改写了一下<a
+            href="load-obj.html">加载.obj的文件</a>。
+          在这种情况下，我们计算相机需要离物体多远，从而让它的视野以包含对象。然后我们将相机的-z值设置为从对象盒模型的中心到此的距离。</p>
+        <p>我们将想要适应的大小乘以1.1倍(<code class="notranslate" translate="no">fudge</code>)
+          来确保树完全在渲染目标中。这是因为我们用来计算对象是否适合相机的视口的尺寸，没有考虑到对象的边缘可能会超出我们的可视区域之外。我们可以计算出如何让盒子100%合适，但这会浪费很多空间，所以我们就是蒙混
+          <em>(fudge)</em> 一下。
+        </p>
+        <p>然后我们渲染到RenderTarget中，然后从场景中移除此对象。 </p>
+        <p>重点是需要场景中的灯光，但我们需要确保场景中没有其他东西。</p>
+        <p>我们也不能给场景设置背景色。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+const scene = new THREE.Scene();
+-scene.background = new THREE.Color('lightblue');</pre>
+        <p>最后我们返回了纹理，位置和缩放比例，我们需要创建Facade，让它看起来在同一个地方。</p>
+        <p>然后我们制作一棵树，调用此代码：</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+// 创建Billboard纹理
+const tree = makeTree(0, 0);
+const facadeSize = 64;
+const treeSpriteInfo = makeSpriteTexture(facadeSize, tree);</pre>
+        <p>然后我们可以制作一个Facade网络，而不是树网络。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
++function makeSprite(spriteInfo, x, z) {
++  const {texture, offset, scale} = spriteInfo;
++  const mat = new THREE.SpriteMaterial({
++    map: texture,
++    transparent: true,
++  });
++  const sprite = new THREE.Sprite(mat);
++  scene.add(sprite);
++  sprite.position.set(
++      offset.x + x,
++      offset.y,
++      offset.z + z);
++  sprite.scale.set(scale, scale, scale);
++}
+
+for (let z = -50; z &lt;= 50; z += 10) {
+  for (let x = -50; x &lt;= 50; x += 10) {
+-    makeTree(x, z);
++    makeSprite(treeSpriteInfo, x, z);
+  }
+}</pre>
+        <p>在上面的代码中，我们应用了定位Facade所需的偏移量和缩放比例，因此他会出现在和原树同一个地方。</p>
+        <p>现在我们已经完成了Facade纹理的制作，我们可以再次设置背景。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js"
+          translate="no">scene.background = new THREE.Color('lightblue');</pre>
+        <p>现在我们得到了一个全是树Facades的场景。</p>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/billboard-trees-static-billboards.html"></iframe>
+          </div>
+          <a class="threejs_center" href="/manual/examples/billboard-trees-static-billboards.html"
+            target="_blank">点击在新窗口打开</a>
+        </div>
+        <p></p>
+        <p>
+          与上面的树模型相比，它们看起来非常相似。我们使用了低分辨率纹理，只有64x64像素，所以Facade是块状的，你当然可以提高分辨率。通常Facade只会用在非常远处的物体，因为当它们非常小的时候，低分辨率纹理就足够了。它节省了绘制远处只有几个像素的精致树模型时间。
+        </p>
+        <p>另一个问题是我们只能从一侧查看树。这往往是通过渲染更多的Facade来解决，比如绘制对象周围的8个方向，然后根据实际相机的方向来设置要展示的Facade。</p>
+        <p>是否使用Facade由你决定，如果你决定去使用它们，希望这篇文章给了你一些想法和解决方案。</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body>
+
+</html>

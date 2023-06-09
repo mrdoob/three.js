@@ -1,0 +1,259 @@
+<!DOCTYPE html><html lang="ko"><head>
+    <meta charset="utf-8">
+    <title>배경과 하늘 상자</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – 배경과 하늘 상자">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+    <link rel="stylesheet" href="/manual/ko/lang.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>배경과 하늘 상자</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>이 시리즈의 예제 대부분은 단색 배경을 사용했습니다.</p>
+<p>Three.js에서 단순한 배경을 넣는 건 CSS만큼이나 쉽습니다. <a href="responsive.html">반응형 디자인에 관한
+글</a>의 예제에서 2가지만 바꿔주면 되죠.</p>
+<p>먼저 CSS로 canvas에 배경을 추가합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;style&gt;
+body {
+    margin: 0;
+}
+#c {
+    width: 100%;
+    height: 100%;
+    display: block;
++    background: url(resources/images/daikanyama.jpg) no-repeat center center;
++    background-size: cover;
+}
+&lt;/style&gt;
+</pre>
+<p>그리고 <a href="/docs/#api/ko/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>에 <code class="notranslate" translate="no">alpha</code> 옵션을 켜 아무것도 없는 공간은 투명하게
+보이도록 설정합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+-  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++  const renderer = new THREE.WebGLRenderer({
++    antialias: true,
++    canvas,
++    alpha: true,
++  });
+</pre>
+<p>간단하지 않나요?</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-css.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-css.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>배경이 <a href="post-processing.html">후처리 효과</a>의 영향을 받게 하려면
+Three.js로 배경을 렌더링해야 합니다.</p>
+<p>간단히 장면의 배경에 텍스처를 입혀주기만 하면 되죠.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+const bgTexture = loader.load('resources/images/daikanyama.jpg');
+scene.background = bgTexture;
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-scene-background.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-scene-background.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>배경이 지정되긴 했지만, 화면에 맞춰 늘어났네요.</p>
+<p>이미지의 일부만 보이도록 <code class="notranslate" translate="no">repeat</code>과 <code class="notranslate" translate="no">offset</code> 속성을 조정해 문제를 해결해봅시다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+
+   ...
++  /**
++   * 배경 텍스처의 repeat과 offset 속성을 조정해 이미지의 비율이 깨지지
++   * 않도록 합니다.
++   * 이미지를 불러오는 데 시간이 걸릴 수 있으니 감안해야 합니다.
++   **/
++  const canvasAspect = canvas.clientWidth / canvas.clientHeight;
++  const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
++  const aspect = imageAspect / canvasAspect;
++
++  bgTexture.offset.x = aspect &gt; 1 ? (1 - 1 / aspect) / 2 : 0;
++  bgTexture.repeat.x = aspect &gt; 1 ? 1 / aspect : 1;
++
++  bgTexture.offset.y = aspect &gt; 1 ? 0 : (1 - aspect) / 2;
++  bgTexture.repeat.y = aspect &gt; 1 ? 1 : aspect;
+
+  ...
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p>이제 Three.js가 배경을 렌더링합니다. 그냥 보기에 CSS와 큰 차이는 없지만,
+<a href="post-processing.html">후처리 효과</a>의 영향을 받는다는 점이 다릅니다.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-scene-background-fixed-aspect.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-scene-background-fixed-aspect.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>물론 3D 장면을 만들 때 단순한 배경을 자주 사용하진 않습니다. 대신 주로 일종의
+<em>하늘 상자(skybox)</em>를 사용하죠. 하늘 상자란 말 그대로 하늘을 그려놓은 상자로써,
+상자 안에 카메라를 놓으면 마치 배경에 하늘이 있는 것처럼 보이는 효과를 줍니다.</p>
+<p>일반적으로 육면체에 텍스처를 입히고 안쪽을 렌더링하도록 설정해 하늘 상자를
+구현합니다. 각 면에 수평선처럼 보이는 이미지를 텍스처로 배치하는 거죠(텍스처
+좌표를 이용해). 하늘 구체(sky sphere)나 하늘 돔(sky dom)도 자주 사용하는
+방식입니다. 다시 말해 육면체나 구체를 만들고, <a href="textures.html">텍스처를 입힌</a>
+뒤, 바깥 면이 아닌 안쪽 면을 렌더링하도록 <code class="notranslate" translate="no">THREE.BackSide</code> 값을 넣어주면
+됩니다. 그리고 바로 장면(scene)에 추가하거나, 하늘 상자/구체/돔을 담당할
+장면 하나, 다른 요소를 담당할 장면 하나 이렇게 총 2개를 만들 수도 있죠.
+<a href="/docs/#api/ko/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>를 쓸 필요는 없으니 <a href="/docs/#api/ko/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>를 그대로
+사용하면 됩니다.</p>
+<p>다른 방법 중 하나는 <em>큐브맵(Cubemap)</em>입니다. 큐브맵은 정육면체의 한 면 당
+하나, 총 6개의 면을 가진 텍스처로, 텍스처 좌표 대신 중앙에서 바깥쪽을 가리키는
+방향으로 색상값을 결정합니다.</p>
+<p>아래 6개의 이미지는 캘리포니아 마운틴 뷰에 있는 컴퓨터 역사 박물관에서 찍은
+사진입니다.</p>
+<div class="threejs_center">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/pos-x.jpg" style="width: 200px" class="border">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/neg-x.jpg" style="width: 200px" class="border">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/pos-y.jpg" style="width: 200px" class="border">
+</div>
+<div class="threejs_center">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/neg-y.jpg" style="width: 200px" class="border">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/pos-z.jpg" style="width: 200px" class="border">
+  <img src="../examples/resources/images/cubemaps/computer-history-museum/neg-z.jpg" style="width: 200px" class="border">
+</div>
+
+<p>이들을 <a href="/docs/#api/ko/loaders/CubeTextureLoader"><code class="notranslate" translate="no">CubeTextureLoader</code></a>로 불러와 장면의 배경으로 설정합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const loader = new THREE.CubeTextureLoader();
+  const texture = loader.load([
+    'resources/images/cubemaps/computer-history-museum/pos-x.jpg',
+    'resources/images/cubemaps/computer-history-museum/neg-x.jpg',
+    'resources/images/cubemaps/computer-history-museum/pos-y.jpg',
+    'resources/images/cubemaps/computer-history-museum/neg-y.jpg',
+    'resources/images/cubemaps/computer-history-museum/pos-z.jpg',
+    'resources/images/cubemaps/computer-history-museum/neg-z.jpg',
+  ]);
+  scene.background = texture;
+}
+</pre>
+<p>이 텍스처는 별도 조정이 필요 없으니 위에서 작성했던 코드를 삭제합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+
+   ...
+
+-  /**
+-   * 배경 텍스처의 repeat과 offset 속성을 조정해 이미지의 비율이 깨지지
+-   * 않도록 합니다.
+-   * 이미지를 불러오는 데 시간이 걸릴 수 있으니 감안해야 합니다.
+-   **/
+-  const canvasAspect = canvas.clientWidth / canvas.clientHeight;
+-  const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
+-  const aspect = imageAspect / canvasAspect;
+-
+-  bgTexture.offset.x = aspect &gt; 1 ? (1 - 1 / aspect) / 2 : 0;
+-  bgTexture.repeat.x = aspect &gt; 1 ? 1 / aspect : 1;
+-
+-  bgTexture.offset.y = aspect &gt; 1 ? 0 : (1 - aspect) / 2;
+-  bgTexture.repeat.y = aspect &gt; 1 ? 1 : aspect;
+
+  ...
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p>카메라도 조작이 가능하도록 만듭니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+</pre>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
+const aspect = 2;  // canvas 기본값
+const near = 0.1;
+-const far = 5;
++const far = 100;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+-camera.position.z = 2;
++camera.position.z = 3;
+
++const controls = new OrbitControls(camera, canvas);
++controls.target.set(0, 0, 0);
++controls.update();
+</pre>
+<p>예제를 드래그하면 큐브맵이 주위를 둘러싼 게 보일 겁니다.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-cubemap.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-cubemap.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>다른 방법은 등장방형도법(Equirectangular map)을 이용하는 겁니다. 이런 사진은
+주로 <a href="https://google.com/search?q=360+camera">360도 카메라</a>로 촬영합니다.</p>
+<p><a href="https://hdrihaven.com/hdri/?h=tears_of_steel_bridge">다음 사진</a>은 <a href="https://hdrihaven.com">이 사이트</a>에서
+가져온 사진입니다.</p>
+<div class="threejs_center"><img src="../examples/resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg" style="width: 600px"></div>
+
+<p>등장방형도법의 사용법은 별로 다르지 않습니다. 먼저 등장방형도법 이미지를 텍스처로 불러온 뒤, 콜백에서 불러온 이미지 텍스처를 <a href="/docs/#api/ko/renderers/WebGLCubeRenderTarget.fromEquirectangularTexture"><code class="notranslate" translate="no">WebGLCubeRenderTarget.fromEquirectangularTexture</code></a>를 호출할 때 넘겨주면 큐브맵(정육면체를 펼친 모양의 텍스처)를 만들 수 있습니다. <a href="/docs/#api/ko/renderers/WebGLCubeRenderTarget"><code class="notranslate" translate="no">WebGLCubeRenderTarget</code></a>을 생성할 때 큐브맵의 크기를 지정해주기만 하면 되죠. 예제의 경우 등장방형도법 이미지의 높이를 넘겨주면 될 겁니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+-  const loader = new THREE.CubeTextureLoader();
+-  const texture = loader.load([
+-    'resources/images/cubemaps/computer-history-museum/pos-x.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-x.jpg',
+-    'resources/images/cubemaps/computer-history-museum/pos-y.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-y.jpg',
+-    'resources/images/cubemaps/computer-history-museum/pos-z.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-z.jpg',
+-  ]);
+-  scene.background = texture;
++  const loader = new THREE.TextureLoader();
++  const texture = loader.load(
++    'resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg',
++    () =&gt; {
++      const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
++      rt.fromEquirectangularTexture(renderer, texture);
++      scene.background = rt.texture;
++    });
+}
+</pre>
+<p>어렵지 않게 등장방형도법 텍스처를 구현했습니다.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/background-equirectangularmap.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/background-equirectangularmap.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>등장방형도법은 복잡한 쉐이더를 사용하기에 큐브맵보다 성능이 떨어집니다.
+다행히 등장방형도법 이미지를 큐브맵으로 바꾸는 건 그다지 어려운 일이 아니죠.
+<a href="https://matheowis.github.io/HDRI-to-CubeMap/">이 사이트를 이용</a>하면 쉽게
+이미지를 변경할 수 있을 겁니다.</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

@@ -5,6 +5,8 @@
 
 const GammaCorrectionShader = {
 
+	name: 'GammaCorrectionShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null }
@@ -32,7 +34,7 @@ const GammaCorrectionShader = {
 
 			vec4 tex = texture2D( tDiffuse, vUv );
 
-			gl_FragColor = LinearTosRGB( tex ); // optional: LinearToGamma( tex, float( GAMMA_FACTOR ) );
+			gl_FragColor = LinearTosRGB( tex );
 
 		}`
 

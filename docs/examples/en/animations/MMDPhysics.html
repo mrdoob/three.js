@@ -9,9 +9,20 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc"> A Physics handler for <a href="https://sites.google.com/view/evpvp/"><em>MMD</em></a> resources. <br /><br />
-		[name] calculates Physics for model loaded by [page:MMDLoader] with <a href="https://github.com/kripken/ammo.js/">ammo.js</a> (Bullet-based JavaScript Physics engine).
+		<p class="desc"> A Physics handler for <a href="https://sites.google.com/view/evpvp/">`MMD`</a> resources. <br /><br />
+		[name] calculates Physics for model loaded by [page:MMDLoader] with [link:https://github.com/kripken/ammo.js/ ammo.js] (Bullet-based JavaScript Physics engine).
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { MMDPhysics } from 'three/addons/animation/MMDPhysics.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -54,12 +65,12 @@
 		[page:Array rigidBodyParams] — An array of [page:Object] specifying Rigid Body parameters.<br />
 		[page:Array constraintParams] — (optional) An array of [page:Object] specifying Constraint parameters.<br />
 		[page:Object params] — (optional)<br />
+		</p>
 		<ul>
 			<li>[page:Number unitStep] - Default is 1 / 65.</li>
 			<li>[page:Integer maxStepNum] - Default is 3.</li>
 			<li>[page:Vector3 gravity] - Default is ( 0, - 9.8 * 10, 0 )</li>
 		</ul>
-		</p>
 		<p>
 		Creates a new [name].
 		</p>

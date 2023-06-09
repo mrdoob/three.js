@@ -5,7 +5,7 @@ import {
 	Raycaster,
 	Vector2,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 const _plane = new Plane();
 const _raycaster = new Raycaster();

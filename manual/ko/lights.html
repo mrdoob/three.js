@@ -1,0 +1,498 @@
+<!DOCTYPE html><html lang="ko"><head>
+    <meta charset="utf-8">
+    <title>조명(Lights)</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – 조명(Lights)">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+    <link rel="stylesheet" href="/manual/ko/lang.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>조명(Lights)</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>※ 이 글은 Three.js의 튜토리얼 시리즈로서,
+먼저 <a href="fundamentals.html">Three.js의 기본 구조에 관한 글</a>과
+<a href="setup.html">개발 환경 설정하는 법</a>을 읽고 오길 권장합니다.</p>
+<p>이전 글은 <a href="textures.html">텍스처에 관한 글</a>이었죠. 이번에는
+Three.js의 다양한 조명을 어떻게 쓰는지 알아보겠습니다.</p>
+<p>먼저 이전 예제에서 카메라를 수정하겠습니다. 시야각(fov, field of view)은
+45도, <code class="notranslate" translate="no">far</code>면은 100칸, 카메라의 위치는 중점에서 위로 10칸, 뒤로 20칸 옮깁니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">*const fov = 45;
+const aspect = 2;  // canvas 요소의 기본 비율
+const near = 0.1;
+*const far = 100;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
++camera.position.set(0, 10, 20);
+</pre>
+<p>다음으로 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를 추가합니다. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 특정 좌표를
+중심으로 카메라를 자전 또는 <em>공전(orbit)</em>하도록 해줍니다. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는
+별도 모듈이므로, 먼저 페이지에 로드해야 합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+</pre>
+<p>이제 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에 카메라와, DOM 이벤트를 감지할 수 있도록
+canvas 요소를 넘겨줍니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controls = new OrbitControls(camera, canvas);
+controls.target.set(0, 5, 0);
+controls.update();
+</pre>
+<p>또한 시점을 중점에서 위로 5칸 올린 후 <code class="notranslate" translate="no">controls.update</code> 메서드를
+호출해 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>가 새로운 시점을 바라보게 합니다.</p>
+<p>다음으로 빛을 받을 무언가를 만들어보겠습니다. 먼저 땅의 역할을 할
+평면을 만들고, 평면에 2x2 픽셀의 체크판 텍스처를 씌우겠습니다.</p>
+<div class="threejs_center">
+  <img src="../examples/resources/images/checker.png" class="border" style="
+    image-rendering: pixelated;
+    width: 128px;
+  ">
+</div>
+
+<p>일단 텍스처를 불러온 뒤, 반복하도록 래핑(wrapping)을 설정해줍니다. 필터는
+<code class="notranslate" translate="no">NearestFilter</code>, 텍스처가 2x2 픽셀의 체크판이니 <code class="notranslate" translate="no">repeat</code> 속성을 평면의
+반으로 설정하면 체크판의 각 칸은 정확히 (장면의) 1칸이 될 겁니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const planeSize = 40;
+
+const loader = new THREE.TextureLoader();
+const texture = loader.load('resources/images/checker.png');
+texture.wrapS = THREE.RepeatWrapping;
+texture.wrapT = THREE.RepeatWrapping;
+texture.magFilter = THREE.NearestFilter;
+const repeats = planeSize / 2;
+texture.repeat.set(repeats, repeats);
+</pre>
+<p>그리고 평면 <code class="notranslate" translate="no">geometry</code>, 평면에 쓸 재질(material), 장면(scene)에 추가할
+<code class="notranslate" translate="no">mesh</code>를 만듭니다. 평면은 기본적으로 XY축을 기준으로 하니, XZ축을 기준으로
+하려면 평면을 회전시켜야 합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const planeGeo = new THREE.PlaneGeometry(planeSize, planeSize);
+const planeMat = new THREE.MeshPhongMaterial({
+  map: texture,
+  side: THREE.DoubleSide,
+});
+const mesh = new THREE.Mesh(planeGeo, planeMat);
+mesh.rotation.x = Math.PI * -.5;
+scene.add(mesh);
+</pre>
+<p>정육면체와 구체도 추가해서 평면까지 총 3개의 물체를 추가하도록 하죠.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const cubeSize = 4;
+  const cubeGeo = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+  const cubeMat = new THREE.MeshPhongMaterial({color: '#8AC'});
+  const mesh = new THREE.Mesh(cubeGeo, cubeMat);
+  mesh.position.set(cubeSize + 1, cubeSize / 2, 0);
+  scene.add(mesh);
+}
+{
+  const sphereRadius = 3;
+  const sphereWidthDivisions = 32;
+  const sphereHeightDivisions = 16;
+  const sphereGeo = new THREE.SphereGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions);
+  const sphereMat = new THREE.MeshPhongMaterial({color: '#CA8'});
+  const mesh = new THREE.Mesh(sphereGeo, sphereMat);
+  mesh.position.set(-sphereRadius - 1, sphereRadius + 2, 0);
+  scene.add(mesh);
+}
+</pre>
+<p>빛을 받을 물체를 만들었으니 이제 조명을 가지고 놀아봅시다!</p>
+<h2 id="-ambientlight-"><a href="/docs/#api/ko/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a></h2>
+<p>먼저 <a href="/docs/#api/ko/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a>(자연광)를 써보겠습니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
+const intensity = 1;
+const light = new THREE.AmbientLight(color, intensity);
+scene.add(light);
+</pre>
+<p>이 조명도 <a href="https://github.com/georgealways/lil-gui">lil-gui</a>를 사용해
+속성을 조정할 수 있도록 만들겠습니다. lil-gui로 색상을 조정하려면 간단한
+헬퍼 클래스가 필요합니다. 이 클래스는 색상을 CSS hex(예: <code class="notranslate" translate="no">#FF8844</code>) 값으로
+변경해 lil-gui에 넘겨주는 역할을 할 거예요. 그리고 lil-gui가 클래스의
+속성을 지정할 때, 이를 조명에 직접 지정하도록 합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ColorGUIHelper {
+  constructor(object, prop) {
+    this.object = object;
+    this.prop = prop;
+  }
+  get value() {
+    return `#${this.object[this.prop].getHexString()}`;
+  }
+  set value(hexString) {
+    this.object[this.prop].set(hexString);
+  }
+}
+</pre>
+<p>아래는 lil-gui를 만드는 코드입니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
+gui.add(light, 'intensity', 0, 2, 0.01);
+</pre>
+<p>결과물은 다음과 같죠.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-ambient.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/lights-ambient.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>카메라를 <em>공전시키기(orbit)</em> 위해 화면을 드래그해보세요.</p>
+<p>물체들이 평평하고, 윤곽이 뚜렷하지 않습니다. <a href="/docs/#api/ko/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a>는 물체와
+조명의 색, 그리고 조명의 밝기를 곱한 것과 같죠.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">color = materialColor * light.color * light.intensity;
+</pre><p>이게 전부입니다. <a href="/docs/#api/ko/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a>에는 방향이라는 개념이 없죠. 주변광은
+완전히 고르게 적용되고 공간 안 물체의 색을 바꾸는 역할만 하기 때문에
+실용적이지 않은데다 그다지 <em>조명</em>처럼 느껴지지도 않습니다. 어두운 장면을
+덜 어둡게 만드는 정도에만 도움이 되죠.</p>
+<h2 id="-hemispherelight-"><a href="/docs/#api/ko/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a></h2>
+<p>조명을 <a href="/docs/#api/ko/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>(반구광)으로 바꾸겠습니다. <a href="/docs/#api/ko/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>는
+천장과 바닥의 색을 인자로 받아, 물체의 천장을 바라보는 면은 천장 색, 바닥을
+바라보는 면은 바닥 색으로 혼합합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const color = 0xFFFFFF;
++const skyColor = 0xB1E1FF;  // 하늘색
++const groundColor = 0xB97A20;  // 오렌지 브라운
+const intensity = 1;
+-const light = new THREE.AmbientLight(color, intensity);
++const light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
+scene.add(light);
+</pre>
+<p>마찬가지로 lil-gui를 수정해 두 색상을 조정할 수 있도록 합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+-gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
++gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('skyColor');
++gui.addColor(new ColorGUIHelper(light, 'groundColor'), 'value').name('groundColor');
+gui.add(light, 'intensity', 0, 2, 0.01);
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-hemisphere.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/lights-hemisphere.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>이 또한 그다지 입체적이지 않습니다. 아까보다는 낮지만 전체적으로 2D처럼
+보이네요. <a href="/docs/#api/ko/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>는 주로 풍경을 표현하거나 할 때 다른 조명과
+함께 사용합니다. 다른 조명과 조합할 때 유용하고, 간단히는 <a href="/docs/#api/ko/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a>
+대신 사용할 수 있죠.</p>
+<h2 id="-directionallight-"><a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a></h2>
+<p>이번에는 조명을 <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>(직사광)로 바꿔보죠. <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>는
+주로 태양을 표현할 때 사용합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
+const intensity = 1;
+const light = new THREE.DirectionalLight(color, intensity);
+light.position.set(0, 10, 0);
+light.target.position.set(-5, 0, 0);
+scene.add(light);
+scene.add(light.target);
+</pre>
+<p>먼저 <code class="notranslate" translate="no">light</code>와 <code class="notranslate" translate="no">light.target</code>(목표)을 모두 장면에 추가해야 합니다.
+그래야 Three.js의 <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>가 목표가 있는 방향으로 빛을
+쬘 테니까요.</p>
+<p>이 역시 GUI를 사용해 목표의 위치를 조정할 수 있도록 만들겠습니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
+gui.add(light, 'intensity', 0, 2, 0.01);
+gui.add(light.target.position, 'x', -10, 10);
+gui.add(light.target.position, 'z', -10, 10);
+gui.add(light.target.position, 'y', 0, 10);
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-directional.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/lights-directional.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>조명의 위치가 보이지 않으니 정확한 동작을 확인하기가 좀 어렵네요.
+다행히 Three.js에는 눈에 보이지 않는 요소의 시각화를 도와주는
+다양한 헬퍼 객체가 있습니다. 이 경우 <a href="/docs/#api/ko/helpers/DirectionalLightHelper"><code class="notranslate" translate="no">DirectionalLightHelper</code></a>를
+사용해 조명을 면으로, 조명의 방향을 선으로 나타낼 수 있습니다.
+사용법도 간단해서 조명을 인자로 넘겨주고 생성한 인스턴스를 장면에
+추가하면 됩니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const helper = new THREE.DirectionalLightHelper(light);
+scene.add(helper);
+</pre>
+<p>하는 김에 조명과 목표 둘 다 위치를 조정할 수 있도록 하겠습니다.
+<a href="/docs/#api/ko/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a> 객체를 인자로 받아, <code class="notranslate" translate="no">lil-gui</code>로 이 객체의 <code class="notranslate" translate="no">x</code>, <code class="notranslate" translate="no">y</code>,
+<code class="notranslate" translate="no">z</code> 속성을 조정하는 함수를 하나 만듭니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeXYZGUI(gui, vector3, name, onChangeFn) {
+  const folder = gui.addFolder(name);
+  folder.add(vector3, 'x', -10, 10).onChange(onChangeFn);
+  folder.add(vector3, 'y', 0, 10).onChange(onChangeFn);
+  folder.add(vector3, 'z', -10, 10).onChange(onChangeFn);
+  folder.open();
+}
+</pre>
+<p>헬퍼 객체를 사용할 때는 헬퍼 객체의 <code class="notranslate" translate="no">update</code> 메서드를 수동으로
+호출해줘야 합니다. 한 예로 lil-gui가 객체 속성을 변경할 때마다
+인자로 넘겨준 <code class="notranslate" translate="no">onChangeFn</code>에서 헬퍼 객체의 <code class="notranslate" translate="no">update</code> 메서드를
+호출할 수 있죠.</p>
+<p>그리고 조명의 위치, 목표의 위치 객체에 방금 만든 함수를 각각 적용합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function updateLight() {
++  light.target.updateMatrixWorld();
++  helper.update();
++}
++updateLight();
+
+const gui = new GUI();
+gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
+gui.add(light, 'intensity', 0, 2, 0.01);
+
++makeXYZGUI(gui, light.position, 'position', updateLight);
++makeXYZGUI(gui, light.target.position, 'target', updateLight);
+</pre>
+<p>이제 조명, 목표의 위치를 각각 조정할 수 있습니다.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-directional-w-helper.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/lights-directional-w-helper.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>카메라를 돌려보면 아까보다 훨씬 동작이 명확하게 보일 겁니다.
+평면은 <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>를 나타내는데, 이는 직사광이 어느
+<em>한 점</em>에서 뻗어나오는 조명이 아니기 때문입니다. 무한한 광원이
+목표를 향해 평행하게 빛을 내리쬐는 것이죠.</p>
+<h2 id="-pointlight-"><a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a></h2>
+<p><a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>는 한 점에서 무한히 뻗어나가는 광원입니다. 코드를
+다시 한 번 수정해보죠.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
+const intensity = 1;
+-const light = new THREE.DirectionalLight(color, intensity);
++const light = new THREE.PointLight(color, intensity);
+light.position.set(0, 10, 0);
+-light.target.position.set(-5, 0, 0);
+scene.add(light);
+-scene.add(light.target);
+</pre>
+<p>헬퍼 객체도 <a href="/docs/#api/ko/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a>로 바꾸겠습니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const helper = new THREE.DirectionalLightHelper(light);
++const helper = new THREE.PointLightHelper(light);
+scene.add(helper);
+</pre>
+<p><a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>에는 목표가 없으므로 <code class="notranslate" translate="no">onChange</code> 함수도 훨씬 간단하게
+짤 수 있습니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateLight() {
+-  light.target.updateMatrixWorld();
+  helper.update();
+}
+-updateLight();
+</pre>
+<p><a href="/docs/#api/ko/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a>는 점의 표상을 그립니다. 점의 표상이란 점으로는 확인이 어려우니,
+기본값으로 다이아몬드 형태의 와이어프레임(wireframe)을 대신 그려놓은 것이죠. 점의
+형태는 조명에 <code class="notranslate" translate="no">mesh</code> 객체를 하나 넘겨 얼마든지 바꿀 수 있습니다.</p>
+<p><a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>에는 추가로 <a href="/docs/#api/ko/lights/PointLight#distance"><code class="notranslate" translate="no">distance</code></a> 속성이 있습니다.
+<code class="notranslate" translate="no">distance</code>가이 0이면 <a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>의 밝기가 무한대임을 의미하고,  0보다 크면
+<code class="notranslate" translate="no">distance</code>에 지정된 거리만큼만 영향을 미칩니다.</p>
+<p>거리도 조정할 수 있도록 GUI에 추가하겠습니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
+gui.add(light, 'intensity', 0, 2, 0.01);
++gui.add(light, 'distance', 0, 40).onChange(updateLight);
+
+makeXYZGUI(gui, light.position, 'position', updateLight);
+-makeXYZGUI(gui, light.target.position, 'target', updateLight);
+</pre>
+<p>이제 한 번 테스트해보죠.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-point.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/lights-point.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p><code class="notranslate" translate="no">distance</code>가 0보다 클 때 조명의 밝기를 잘 관찰해보세요.</p>
+<h2 id="-spotlight-"><a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a></h2>
+<p>스포트라이트는 비유하자면 원뿔 안의 <a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>입니다.
+차이점은 원뿔 안에서만 빛난다는 점이죠. <a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>의
+원뿔은 종류는 외부 원뿔과 내부 원뿔 두 가지입니다.
+빛의 밝기는 내부 원뿔에서 가장 세고, 외부 원뿔에 가까워질수록
+0까지 낮아집니다.</p>
+<p><a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>와 마찬가지로 <a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>도 목표의 위치를
+정해줘야 합니다. 원뿔의 밑면이 해당 목표물을 바라보게 되죠.</p>
+<p>위 예제의 <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>와 헬퍼 객체를 수정하겠습니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
+const intensity = 1;
+-const light = new THREE.DirectionalLight(color, intensity);
++const light = new THREE.SpotLight(color, intensity);
+scene.add(light);
+scene.add(light.target);
+
+-const helper = new THREE.DirectionalLightHelper(light);
++const helper = new THREE.SpotLightHelper(light);
+scene.add(helper);
+</pre>
+<p>원뿔의 내각은 <a href="/docs/#api/ko/lights/SpotLight#angle"><code class="notranslate" translate="no">angle</code></a>에 호도(radians)값을 지정해
+설정합니다. <a href="textures.html">텍스처 예제</a>에서 사용했던 <code class="notranslate" translate="no">DegRadHelper</code>
+객체를 사용해 UI에는 도(degrees)로 표시하도록 하겠습니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">gui.add(new DegRadHelper(light, 'angle'), 'value', 0, 90).name('angle').onChange(updateLight);
+</pre>
+<p>내부 원뿔의 크기는 <a href="/docs/#api/ko/lights/SpotLight#penumbra"><code class="notranslate" translate="no">penumbra(반음영)</code></a> 속성을 외부
+원뿔에 대한 비율(퍼센트)로 지정해 사용합니다. 다시 말해 <code class="notranslate" translate="no">penumbra</code> 속성이
+0이면 외부 원뿔과 크기가 동일하다는 것이고, 1이면 빛이 중앙에서부터 외부
+원뿔까지 점점 희미해짐을 의미하죠. <code class="notranslate" translate="no">penumbra</code> 속성이 0.5이라면? 중앙과 외부
+원뿔의 사이 50% 지점부터 빛이 희미해짐을 의미합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">gui.add(light, 'penumbra', 0, 1, 0.01);
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-spot-w-helper.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/lights-spot-w-helper.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p><code class="notranslate" translate="no">penumbra</code> 속성이 0일 때는 빛의 경계가 굉장히 분명한 것이 보일 겁니다.
+<code class="notranslate" translate="no">penumbra</code> 속성을 1에 가깝게 조정하면 경계가 점점 흐릿해지죠.</p>
+<p><a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>가 <em>원뿔 모양</em>처럼 보이지 않을지도 모릅니다. 이는 바닥이 원뿔의
+거리보다 가까이 있기 때문으로, <code class="notranslate" translate="no">distance</code>를 약 5 정도로 조정하면 원뿔의 밑면을
+확인할 수 있을 겁니다.</p>
+<h2 id="-rectarealight-"><a href="/docs/#api/ko/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a></h2>
+<p>마지막으로 살펴볼 조명은 <a href="/docs/#api/ko/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>입니다. 이름 그대로 사각 형태의
+조명으로, 형광등이나 천장의 유리를 통과하는 태양빛을 표현하기에 적합합니다.</p>
+<p><a href="/docs/#api/ko/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>는 <a href="/docs/#api/ko/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>과 <a href="/docs/#api/ko/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a>만
+지원합니다. 예전 코드에서 재질(material)을 <a href="/docs/#api/ko/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a>로 바꾸겠습니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  ...
+
+  const planeGeo = new THREE.PlaneGeometry(planeSize, planeSize);
+-  const planeMat = new THREE.MeshPhongMaterial({
++  const planeMat = new THREE.MeshStandardMaterial({
+    map: texture,
+    side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(planeGeo, planeMat);
+  mesh.rotation.x = Math.PI * -.5;
+  scene.add(mesh);
+}
+{
+  const cubeSize = 4;
+  const cubeGeo = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+- const cubeMat = new THREE.MeshPhongMaterial({color: '#8AC'});
++ const cubeMat = new THREE.MeshStandardMaterial({color: '#8AC'});
+  const mesh = new THREE.Mesh(cubeGeo, cubeMat);
+  mesh.position.set(cubeSize + 1, cubeSize / 2, 0);
+  scene.add(mesh);
+}
+{
+  const sphereRadius = 3;
+  const sphereWidthDivisions = 32;
+  const sphereHeightDivisions = 16;
+  const sphereGeo = new THREE.SphereGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions);
+-  const sphereMat = new THREE.MeshPhongMaterial({color: '#CA8'});
++ const sphereMat = new THREE.MeshStandardMaterial({color: '#CA8'});
+  const mesh = new THREE.Mesh(sphereGeo, sphereMat);
+  mesh.position.set(-sphereRadius - 1, sphereRadius + 2, 0);
+  scene.add(mesh);
+}
+</pre>
+<p><a href="/docs/#api/ko/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>를 사용하려면 별도의 데이터를 불러와야 합니다. 또한
+<a href="/docs/#api/ko/helpers/RectAreaLightHelper"><code class="notranslate" translate="no">RectAreaLightHelper</code></a>도 같이 불러와 조명을 시각화하겠습니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
++import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
+</pre>
+<p>모듈을 불러온 후 <code class="notranslate" translate="no">RectAreaLightUniformsLib.init</code> 메서드를 호출합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++  RectAreaLightUniformsLib.init();
+</pre>
+<p>데이터를 불러오지 않아도 에러는 발생하지 않지만, 이상하게 보일 것이므로
+데이터를 불러와야 한다는 것을 꼭 기억하기 바랍니다.</p>
+<p>이제 조명을 추가합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
+*const intensity = 5;
++const width = 12;
++const height = 4;
+*const light = new THREE.RectAreaLight(color, intensity, width, height);
+light.position.set(0, 10, 0);
++light.rotation.x = THREE.MathUtils.degToRad(-90);
+scene.add(light);
+
+*const helper = new RectAreaLightHelper(light);
+*light.add(helper);
+</pre>
+<p><a href="/docs/#api/ko/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>는 <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>, <a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>와 달리 목표를 사용하지 않습니다.
+빛의 방향은 <code class="notranslate" translate="no">rotation</code>으로 설정할 수 있죠. 또 <a href="/docs/#api/ko/helpers/RectAreaLightHelper"><code class="notranslate" translate="no">RectAreaLightHelper</code></a>는 직접 조명을
+자식으로 두는 다른 헬퍼 객체와 달리, 해당 조명의 자식이어야 합니다.</p>
+<p>조명의 <code class="notranslate" translate="no">rotation</code>, <code class="notranslate" translate="no">width</code>, <code class="notranslate" translate="no">height</code> 속성을 조정할 수 있도록 GUI도 수정해줍니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
+gui.add(light, 'intensity', 0, 10, 0.01);
+gui.add(light, 'width', 0, 20);
+gui.add(light, 'height', 0, 20);
+gui.add(new DegRadHelper(light.rotation, 'x'), 'value', -180, 180).name('x rotation');
+gui.add(new DegRadHelper(light.rotation, 'y'), 'value', -180, 180).name('y rotation');
+gui.add(new DegRadHelper(light.rotation, 'z'), 'value', -180, 180).name('z rotation');
+
+makeXYZGUI(gui, light.position, 'position');
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-rectarea.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/lights-rectarea.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>하나 설명하지 않은 것이 있습니다. 위 예제에는 <a href="/docs/#api/ko/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>의 <code class="notranslate" translate="no">physicallyCorrectLights(물리 기반 조명)</code>
+설정이 있습니다. 이는 거리에 따라 빛이 어떻게 떨어질지 결정하는 속성으로,
+<a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>와 <a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>가 이 설정의 영향을 받습니다. <a href="/docs/#api/ko/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>는
+마찬가지로 설정의 영향도 받고, 기본적으로 이 설정을 사용하죠.</p>
+<p>이 설정을 사용하면 기본적으로 조명의 <code class="notranslate" translate="no">distance</code>나 <code class="notranslate" translate="no">intensity</code> 대신
+<a href="/docs/#api/ko/lights/PointLight#power"><code class="notranslate" translate="no">power</code></a> 속성을 루멘(lumens) 단위로 설정해야 합니다.
+그러면 Three.js는 물리적 계산을 통해 실제 광원을 흉내내죠. 예제의
+거리 단위는 미터(meters)이니, 60w짜리 전구는 약 800루멘 정도일 겁니다.
+그리고 조명의 부서짐(decay) 정도를 설정하는 <a href="/docs/#api/ko/lights/PointLight#decay"><code class="notranslate" translate="no">decay</code></a>
+속성도 있습니다. 현실적인 조명을 위해서는 <code class="notranslate" translate="no">2</code> 정도가 적당하죠.</p>
+<p>한 번 예제를 만들어 테스트해봅시다.</p>
+<p>먼저 <code class="notranslate" translate="no">renderer</code>의 <code class="notranslate" translate="no">physicallyCorrectLights</code> 속성을 켭니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++renderer.physicallyCorrectLights = true;
+</pre>
+<p>그리고 <code class="notranslate" translate="no">power</code>를 800루멘으로, <code class="notranslate" translate="no">decay</code> 속성을 2로, <code class="notranslate" translate="no">distance</code>
+속성을 <code class="notranslate" translate="no">Infinity</code>로 설정합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
+const intensity = 1;
+const light = new THREE.PointLight(color, intensity);
+light.power = 800;
+light.decay = 2;
+light.distance = Infinity;
+</pre>
+<p>마지막으로 GUI를 추가해 <code class="notranslate" translate="no">power</code>와 <code class="notranslate" translate="no">decay</code> 속성을 조정할 수 있도록
+해줍니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
+gui.add(light, 'decay', 0, 4, 0.01);
+gui.add(light, 'power', 0, 2000);
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-point-physically-correct.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/lights-point-physically-correct.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>조명은 <code class="notranslate" translate="no">renderer</code>가 장면을 렌더링하는 속도에 영향을 미칩니다. 그러니
+가능한 적은 조명을 쓰는 게 좋죠.</p>
+<p>다음 장에서는 <a href="cameras.html">카메라 조작법</a>에 대해 알아보겠습니다.</p>
+<p><canvas id="c"></canvas></p>
+<script type="module" src="../resources/threejs-lights.js"></script>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

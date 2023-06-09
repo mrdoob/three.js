@@ -51,8 +51,7 @@
 			[example:webgl_multiple_elements_text WebGL / multiple / elements / text]<br />
 			[example:webgl_points_billboards WebGL / points / billboards]<br />
 			[example:webgl_points_dynamic WebGL / points / dynamic]<br />
-			[example:webgl_points_sprites WebGL / points / sprites]<br />
-			[example:webgl_trails WebGL / trails]
+			[example:webgl_points_sprites WebGL / points / sprites]
 		</p>
 
 		<h2>[name]( [param:Object parameters] )</h2>
@@ -78,9 +77,14 @@
 		<h3>[property:Color color]</h3>
 		<p>材质的颜色([page:Color])，默认值为白色 (0xffffff)。</p>
 
-		<h3>[property:Texture map]</h3>
+		<h3>[property:Boolean fog]</h3>
+		<p>材质是否受雾影响。默认为*true*。</p>
 
-		<p>使用[page:Texture]中的数据设置点的颜色。</p>
+		<h3>[property:Texture map]</h3>
+		<p>
+			使用来自[page:Texture]的数据设置点的颜色。可以选择包括一个alpha通道，通常与
+			[page:Material.transparent .transparent]或[page:Material.alphaTest .alphaTest]。
+		</p>
 
 		<h3>[property:Number size]</h3>
 		<p>设置点的大小。默认值为1.0。<br/>

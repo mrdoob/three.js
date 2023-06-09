@@ -1,0 +1,177 @@
+<!DOCTYPE html><html lang="ko"><head>
+    <meta charset="utf-8">
+    <title>렌더 타겟(Render Targets)</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – 렌더 타겟(Render Targets)">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+    <link rel="stylesheet" href="/manual/ko/lang.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>렌더 타겟(Render Targets)</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Three.js의 렌더 타겟이란, 직접 렌더링할 수 있는 텍스처(texture)를 말합니다.
+한 번 텍스처로 렌더링한 뒤에는 다른 텍스처처럼 사용할 수 있죠.</p>
+<p>간단한 예제를 만들어보겠습니다. <a href="responsive.html">반응형 디자인에 관한 글</a>에서
+썼던 예제를 가져오도록 하죠.</p>
+<p>렌더 타겟을 만드는 방법은 기존 렌더링 방법과 유사합니다. 먼저 <a href="/docs/#api/ko/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> 인스턴스를
+생성합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtWidth = 512;
+const rtHeight = 512;
+const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
+</pre>
+<p>그리고 <a href="/docs/#api/ko/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a>와 <a href="/docs/#api/ko/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>(장면)을 추가합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtFov = 75;
+const rtAspect = rtWidth / rtHeight;
+const rtNear = 0.1;
+const rtFar = 5;
+const rtCamera = new THREE.PerspectiveCamera(rtFov, rtAspect, rtNear, rtFar);
+rtCamera.position.z = 2;
+
+const rtScene = new THREE.Scene();
+rtScene.background = new THREE.Color('red');
+</pre>
+<p>위 예제에서는 렌더 타겟의 가로세로비(aspect, 종횡비)를 canvas가 아닌 렌더 타겟
+자체의 사이즈로 구했습니다. 렌더 타켓의 가로세로비는 텍스처를 사용할 물체에 맞춰
+정해야 하기 때문이죠. 예제의 경우 렌더 타겟을 정육면체의 텍스처로 사용할 것이고,
+정육면체의 모든 면은 정사각형이므로 가로세로비는 1.0입니다.</p>
+<p>그리고 <a href="responsive.html">이전 글</a>에서 썼던 조명과 정육면체 3개를 추가하겠습니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const color = 0xFFFFFF;
+  const intensity = 1;
+  const light = new THREE.DirectionalLight(color, intensity);
+  light.position.set(-1, 2, 4);
+*  rtScene.add(light);
+}
+
+const boxWidth = 1;
+const boxHeight = 1;
+const boxDepth = 1;
+const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+
+function makeInstance(geometry, color, x) {
+  const material = new THREE.MeshPhongMaterial({color});
+
+  const cube = new THREE.Mesh(geometry, material);
+*  rtScene.add(cube);
+
+  cube.position.x = x;
+
+  return cube;
+}
+
+*const rtCubes = [
+  makeInstance(geometry, 0x44aa88,  0),
+  makeInstance(geometry, 0x8844aa, -2),
+  makeInstance(geometry, 0xaa8844,  2),
+];
+</pre>
+<p>이전 글의 <a href="/docs/#api/ko/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>과 <a href="/docs/#api/ko/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a>는 그대로 둡니다. 이 둘은 canvas를 렌더링하는
+데 사용할 거예요.</p>
+<p>먼저 렌더 타겟의 텍스처를 사용하는 정육면체를 추가합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
+  map: renderTarget.texture,
+});
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+</pre>
+<p>그리고 <code class="notranslate" translate="no">render</code> 함수 안에서 렌더 타겟의 장면을 먼저 렌더링한 뒤,</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  ...
+
+  // 렌더 타겟의 장면 안에서 정육면체를 각각 회전시킵니다
+  rtCubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+    const rot = time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  // 렌더 타겟의 장면을 렌더 타겟에 렌더링합니다
+  renderer.setRenderTarget(renderTarget);
+  renderer.render(rtScene, rtCamera);
+  renderer.setRenderTarget(null);
+</pre>
+<p>canvas에 렌더 타겟의 텍스처를 사용하는 정육면체를 렌더링합니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  // 장면 중앙의 정육면체를 회전시킵니다
+  cube.rotation.x = time;
+  cube.rotation.y = time * 1.1;
+
+  // 장면은 canvas에 렌더링합니다
+  renderer.render(scene, camera);
+</pre>
+<p>붐!</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-target.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/render-target.html" target="_blank">새 탭에서 보기</a>
+</div>
+
+<p></p>
+<p>정육면체가 빨간 건 정육면체를 잘 보이도록 하기 위해 <code class="notranslate" translate="no">rtScene</code>의 <code class="notranslate" translate="no">background</code>
+속성을 빨강으로 설정했기 때문입니다.</p>
+<p>렌더 타겟의 용도는 무궁무진합니다. <a href="shadows.html">그림자</a>가 렌더 타겟을
+사용하고, <a href="picking.html">피킹(picking)도 렌더 타겟을 사용할 수 있죠</a>.
+많은 <a href="post-processing.html">후처리 효과</a>를 사용할 때 렌더 타겟이 필수
+요소인 경우도 있고, 차의 후사경(rear view mirror, 백미러)이나 모니터 화면 등에도
+렌더 타겟을 활용할 수 있습니다.</p>
+<p>이번 글은 여기까지입니다. 마지막으로 <a href="/docs/#api/ko/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>을 사용할 때의 주의해야
+할 점 몇 가지만 살펴보고 끝내도록 하죠.</p>
+<ul>
+<li><p>기본적으로 <a href="/docs/#api/ko/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>은 2개의 텍스처를 생성합니다. 하나는 색상 텍스처이고, 다른 하나는 깊이/스텐실(depth/stencil) 텍스처이죠. 깊이 텍스처나 스텐실 텍스처를 사용하지 않을 거라면 인스턴스 생성 시 옵션을 지정해 텍스처를 아예 생성하지 않도록 할 수 있습니다.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const rt = new THREE.WebGLRenderTarget(width, height, {
+    depthBuffer: false,
+    stencilBuffer: false,
+  });
+</pre>
+</li>
+<li><p>렌더 타겟의 크기를 바꿔야 한다면</p>
+<p>앞선 예제에서는 렌더 타겟을 생성할 때 고정 사이즈, 512x512를 사용했습니다. 하지만 후처리 등에서 렌더 타겟을 사용할 경우, canvas 크기와 렌더 타겟의 크기를 똑같이 설정하는 것이 일반적입니다. 예제를 바탕으로 이를 구현하려면 canvas의 사이즈가 변경되었을 때 카메라와 렌더 타겟의 사이즈를 변경해주어야 하죠.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+
++    renderTarget.setSize(canvas.width, canvas.height);
++    rtCamera.aspect = camera.aspect;
++    rtCamera.updateProjectionMatrix();
+}
+</pre></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

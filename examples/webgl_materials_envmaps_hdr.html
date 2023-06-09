@@ -14,17 +14,30 @@
 			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
-			import { RGBMLoader } from './jsm/loaders/RGBMLoader.js';
-			import { DebugEnvironment } from './jsm/environments/DebugEnvironment.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
+			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
+			import { DebugEnvironment } from 'three/addons/environments/DebugEnvironment.js';
 
 			const params = {
 				envMap: 'HDR',
@@ -55,7 +68,7 @@
 				scene.background = new THREE.Color( 0x000000 );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.physicallyCorrectLights = true;
+				renderer.useLegacyLights = false;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
 				//
@@ -89,7 +102,6 @@
 				const hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
 				hdrCubeMap = new HDRCubeTextureLoader()
 					.setPath( './textures/cube/pisaHDR/' )
-					.setDataType( THREE.UnsignedByteType )
 					.load( hdrUrls, function () {
 
 						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
@@ -104,19 +116,15 @@
 					.setPath( './textures/cube/pisa/' )
 					.load( ldrUrls, function () {
 
-						ldrCubeMap.encoding = THREE.sRGBEncoding;
-
 						ldrCubeRenderTarget = pmremGenerator.fromCubemap( ldrCubeMap );
 
 					} );
 
 
 				const rgbmUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
-				rgbmCubeMap = new RGBMLoader()
+				rgbmCubeMap = new RGBMLoader().setMaxRange( 16 )
 					.setPath( './textures/cube/pisaRGBM16/' )
 					.loadCubemap( rgbmUrls, function () {
-
-						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
 
 						rgbmCubeRenderTarget = pmremGenerator.fromCubemap( rgbmCubeMap );
 
@@ -133,7 +141,6 @@
 				container.appendChild( renderer.domElement );
 
 				//renderer.toneMapping = ReinhardToneMapping;
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

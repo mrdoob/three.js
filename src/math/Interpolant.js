@@ -67,7 +67,7 @@ class Interpolant {
 
 								i1 = pp.length;
 								this._cachedIndex = i1;
-								return this.afterEnd_( i1 - 1, t, t0 );
+								return this.copySampleValue_( i1 - 1 );
 
 							}
 
@@ -115,7 +115,7 @@ class Interpolant {
 								// before start
 
 								this._cachedIndex = 0;
-								return this.beforeStart_( 0, t, t1 );
+								return this.copySampleValue_( 0 );
 
 							}
 
@@ -172,7 +172,7 @@ class Interpolant {
 				if ( t0 === undefined ) {
 
 					this._cachedIndex = 0;
-					return this.beforeStart_( 0, t, t1 );
+					return this.copySampleValue_( 0 );
 
 				}
 
@@ -180,7 +180,7 @@ class Interpolant {
 
 					i1 = pp.length;
 					this._cachedIndex = i1;
-					return this.afterEnd_( i1 - 1, t0, t );
+					return this.copySampleValue_( i1 - 1 );
 
 				}
 
@@ -237,10 +237,5 @@ class Interpolant {
 	}
 
 }
-
-// ALIAS DEFINITIONS
-
-Interpolant.prototype.beforeStart_ = Interpolant.prototype.copySampleValue_;
-Interpolant.prototype.afterEnd_ = Interpolant.prototype.copySampleValue_;
 
 export { Interpolant };

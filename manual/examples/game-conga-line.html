@@ -1,0 +1,819 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Game</title>
+    <style>
+    html {
+      box-sizing: border-box;
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+    html, body {
+        margin: 0;
+        height: 100%;
+        user-select: none;
+    }
+    img, canvas {
+        /* prevent the save-image on long press on mobile */
+        pointer-events: none;
+    }
+    #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    #ui {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-items: center;
+      align-content: stretch;
+    }
+    #ui>div {
+      display: flex;
+      align-items: flex-end;
+      flex: 1 1 auto;
+    }
+    .bright {
+      filter: brightness(2);
+    }
+    #left {
+      justify-content: flex-end;
+    }
+    #right {
+      justify-content: flex-start;
+    }
+    #ui img {
+      padding: 10px;
+      width: 80px;
+      height: 80px;
+      display: block;
+    }
+    #loading {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: xx-large;
+      font-family: sans-serif;
+        }
+    #loading>div>div {
+      padding: 2px;
+    }
+    .progress {
+      width: 50vw;
+      border: 1px solid black;
+    }
+    #progressbar {
+      width: 0%;
+      transition: width ease-out .5s;
+      height: 1em;
+      background-color: #888;
+      background-image: linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, .5) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, .5) 50%,
+        rgba(255, 255, 255, .5) 75%,
+        transparent 75%,
+        transparent
+      );
+      background-size: 50px 50px;
+      animation: progressanim 2s linear infinite;
+    }
+
+    @keyframes progressanim {
+      0% {
+        background-position: 50px 50px;
+      }
+      100% {
+        background-position: 0 0;
+      }
+    }
+
+    #labels {
+      position: absolute;  /* let us position ourself inside the container */
+      left: 0;             /* make our position the top left of the container */
+      top: 0;
+      color: white;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    #labels>div {
+      position: absolute;  /* let us position them inside the container */
+      left: 0;             /* make their default position the top left of the container */
+      top: 0;
+      font-size: large;
+      font-family: monospace;
+      user-select: none;   /* don't let the text get selected */
+      text-shadow:         /* create a black outline */
+        -1px -1px 0 #000,
+         0   -1px 0 #000,
+         1px -1px 0 #000,
+         1px  0   0 #000,
+         1px  1px 0 #000,
+         0    1px 0 #000,
+        -1px  1px 0 #000,
+        -1px  0   0 #000;
+    }
+  </style>
+  </head>
+  <body>
+    <canvas id="c" tabindex="1"></canvas>
+    <div id="ui">
+      <div id="left"><img src="resources/images/left.svg"></div>
+      <div style="flex: 0 0 40px;"></div>
+      <div id="right"><img src="resources/images/right.svg"></div>
+    </div>
+    <div id="loading">
+      <div>
+        <div>...loading...</div>
+        <div class="progress"><div id="progressbar"></div></div>
+      </div>
+    </div>
+    <div id="labels"></div>
+  </body>
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
+
+function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  const fov = 45;
+  const aspect = 2;  // the canvas default
+  const near = 0.1;
+  const far = 1000;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.set(0, 40, 80);
+
+  const controls = new OrbitControls(camera, canvas);
+  controls.target.set(0, 5, 0);
+  controls.update();
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color('white');
+
+  function addLight(...pos) {
+    const color = 0xFFFFFF;
+    const intensity = 0.8;
+    const light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(...pos);
+    scene.add(light);
+    scene.add(light.target);
+  }
+  addLight(5, 5, 2);
+  addLight(-5, 5, 5);
+
+  const manager = new THREE.LoadingManager();
+  manager.onLoad = init;
+
+  const progressbarElem = document.querySelector('#progressbar');
+  manager.onProgress = (url, itemsLoaded, itemsTotal) => {
+    progressbarElem.style.width = `${itemsLoaded / itemsTotal * 100 | 0}%`;
+  };
+
+  const models = {
+    pig:    { url: 'resources/models/animals/Pig.gltf' },
+    cow:    { url: 'resources/models/animals/Cow.gltf' },
+    llama:  { url: 'resources/models/animals/Llama.gltf' },
+    pug:    { url: 'resources/models/animals/Pug.gltf' },
+    sheep:  { url: 'resources/models/animals/Sheep.gltf' },
+    zebra:  { url: 'resources/models/animals/Zebra.gltf' },
+    horse:  { url: 'resources/models/animals/Horse.gltf' },
+    knight: { url: 'resources/models/knight/KnightCharacter.gltf' },
+  };
+  {
+    const gltfLoader = new GLTFLoader(manager);
+    for (const model of Object.values(models)) {
+      gltfLoader.load(model.url, (gltf) => {
+        model.gltf = gltf;
+      });
+    }
+  }
+
+  function prepModelsAndAnimations() {
+    const box = new THREE.Box3();
+    const size = new THREE.Vector3();
+    Object.values(models).forEach(model => {
+      box.setFromObject(model.gltf.scene);
+      box.getSize(size);
+      model.size = size.length();
+      const animsByName = {};
+      model.gltf.animations.forEach((clip) => {
+        animsByName[clip.name] = clip;
+        // Should really fix this in .blend file
+        if (clip.name === 'Walk') {
+          clip.duration /= 2;
+        }
+      });
+      model.animations = animsByName;
+    });
+  }
+
+  // Keeps the state of keys/buttons
+  //
+  // You can check
+  //
+  //   inputManager.keys.left.down
+  //
+  // to see if the left key is currently held down
+  // and you can check
+  //
+  //   inputManager.keys.left.justPressed
+  //
+  // To see if the left key was pressed this frame
+  //
+  // Keys are 'left', 'right', 'a', 'b', 'up', 'down'
+  class InputManager {
+    constructor() {
+      this.keys = {};
+      const keyMap = new Map();
+
+      const setKey = (keyName, pressed) => {
+        const keyState = this.keys[keyName];
+        keyState.justPressed = pressed && !keyState.down;
+        keyState.down = pressed;
+      };
+
+      const addKey = (keyCode, name) => {
+        this.keys[name] = { down: false, justPressed: false };
+        keyMap.set(keyCode, name);
+      };
+
+      const setKeyFromKeyCode = (keyCode, pressed) => {
+        const keyName = keyMap.get(keyCode);
+        if (!keyName) {
+          return;
+        }
+        setKey(keyName, pressed);
+      };
+
+      addKey(37, 'left');
+      addKey(39, 'right');
+      addKey(38, 'up');
+      addKey(40, 'down');
+      addKey(90, 'a');
+      addKey(88, 'b');
+
+      window.addEventListener('keydown', (e) => {
+        setKeyFromKeyCode(e.keyCode, true);
+      });
+      window.addEventListener('keyup', (e) => {
+        setKeyFromKeyCode(e.keyCode, false);
+      });
+
+      const sides = [
+        { elem: document.querySelector('#left'),  key: 'left'  },
+        { elem: document.querySelector('#right'), key: 'right' },
+      ];
+
+      // note: not a good design?
+      // The last direction the user presses should take
+      // precedence. Example: User presses L, without letting go of
+      // L user presses R. Input should now be R. User lets off R
+      // Input should now be L.
+      // With this code if user pressed both L and R result is nothing
+
+      const clearKeys = () => {
+        for (const {key} of sides) {
+            setKey(key, false);
+        }
+      };
+
+      const handleMouseMove = (e) => {
+        e.preventDefault();
+        // this is needed because we call preventDefault();
+        // we also gave the canvas a tabindex so it can
+        // become the focus
+        canvas.focus();
+        window.addEventListener('pointermove', handleMouseMove);
+        window.addEventListener('pointerup', handleMouseUp);
+
+        for (const {elem, key} of sides) {
+          let pressed = false;
+          const rect = elem.getBoundingClientRect();
+          const x = e.clientX;
+          const y = e.clientY;
+          const inRect = x >= rect.left && x < rect.right &&
+                         y >= rect.top && y < rect.bottom;
+          if (inRect) {
+            pressed = true;
+          }
+          setKey(key, pressed);
+        }
+      };
+
+      function handleMouseUp() {
+        clearKeys();
+        window.removeEventListener('pointermove', handleMouseMove, {passive: false});
+        window.removeEventListener('pointerup', handleMouseUp);
+      }
+
+      const uiElem = document.querySelector('#ui');
+      uiElem.addEventListener('pointerdown', handleMouseMove, {passive: false});
+
+      uiElem.addEventListener('touchstart', (e) => {
+        // prevent scrolling
+        e.preventDefault();
+      }, {passive: false});
+    }
+    update() {
+      for (const keyState of Object.values(this.keys)) {
+        if (keyState.justPressed) {
+          keyState.justPressed = false;
+        }
+      }
+    }
+  }
+
+  function removeArrayElement(array, element) {
+    const ndx = array.indexOf(element);
+    if (ndx >= 0) {
+      array.splice(ndx, 1);
+    }
+  }
+
+  class SafeArray {
+    constructor() {
+      this.array = [];
+      this.addQueue = [];
+      this.removeQueue = new Set();
+    }
+    get isEmpty() {
+      return this.addQueue.length + this.array.length > 0;
+    }
+    add(element) {
+      this.addQueue.push(element);
+    }
+    remove(element) {
+      this.removeQueue.add(element);
+    }
+    forEach(fn) {
+      this._addQueued();
+      this._removeQueued();
+      for (const element of this.array) {
+        if (this.removeQueue.has(element)) {
+          continue;
+        }
+        fn(element);
+      }
+      this._removeQueued();
+    }
+    _addQueued() {
+      if (this.addQueue.length) {
+        this.array.splice(this.array.length, 0, ...this.addQueue);
+        this.addQueue = [];
+      }
+    }
+    _removeQueued() {
+      if (this.removeQueue.size) {
+        this.array = this.array.filter(element => !this.removeQueue.has(element));
+        this.removeQueue.clear();
+      }
+    }
+  }
+
+  class GameObjectManager {
+    constructor() {
+      this.gameObjects = new SafeArray();
+    }
+    createGameObject(parent, name) {
+      const gameObject = new GameObject(parent, name);
+      this.gameObjects.add(gameObject);
+      return gameObject;
+    }
+    removeGameObject(gameObject) {
+      this.gameObjects.remove(gameObject);
+    }
+    update() {
+      this.gameObjects.forEach(gameObject => gameObject.update());
+    }
+  }
+
+  const kForward = new THREE.Vector3(0, 0, 1);
+  const globals = {
+    camera,
+    canvas,
+    debug: true,
+    time: 0,
+    moveSpeed: 16,
+    deltaTime: 0,
+    player: null,
+    congaLine: [],
+  };
+  const gameObjectManager = new GameObjectManager();
+  const inputManager = new InputManager();
+
+  class GameObject {
+    constructor(parent, name) {
+      this.name = name;
+      this.components = [];
+      this.transform = new THREE.Object3D();
+      parent.add(this.transform);
+    }
+    addComponent(ComponentType, ...args) {
+      const component = new ComponentType(this, ...args);
+      this.components.push(component);
+      return component;
+    }
+    removeComponent(component) {
+      removeArrayElement(this.components, component);
+    }
+    getComponent(ComponentType) {
+      return this.components.find(c => c instanceof ComponentType);
+    }
+    update() {
+      for (const component of this.components) {
+        component.update();
+      }
+    }
+  }
+
+  // Base for all components
+  class Component {
+    constructor(gameObject) {
+      this.gameObject = gameObject;
+    }
+    update() {
+    }
+  }
+
+  class CameraInfo extends Component {
+    constructor(gameObject) {
+      super(gameObject);
+      this.projScreenMatrix = new THREE.Matrix4();
+      this.frustum = new THREE.Frustum();
+    }
+    update() {
+      const {camera} = globals;
+      this.projScreenMatrix.multiplyMatrices(
+          camera.projectionMatrix,
+          camera.matrixWorldInverse);
+      this.frustum.setFromProjectionMatrix(this.projScreenMatrix);
+    }
+  }
+
+  class SkinInstance extends Component {
+    constructor(gameObject, model) {
+      super(gameObject);
+      this.model = model;
+      this.animRoot = SkeletonUtils.clone(this.model.gltf.scene);
+      this.mixer = new THREE.AnimationMixer(this.animRoot);
+      gameObject.transform.add(this.animRoot);
+      this.actions = {};
+    }
+    setAnimation(animName) {
+      const clip = this.model.animations[animName];
+      // turn off all current actions
+      for (const action of Object.values(this.actions)) {
+        action.enabled = false;
+      }
+      // get or create existing action for clip
+      const action = this.mixer.clipAction(clip);
+      action.enabled = true;
+      action.reset();
+      action.play();
+      this.actions[animName] = action;
+    }
+    update() {
+      this.mixer.update(globals.deltaTime);
+    }
+  }
+
+  class FiniteStateMachine {
+    constructor(states, initialState) {
+      this.states = states;
+      this.transition(initialState);
+    }
+    get state() {
+      return this.currentState;
+    }
+    transition(state) {
+      const oldState = this.states[this.currentState];
+      if (oldState && oldState.exit) {
+        oldState.exit.call(this);
+      }
+      this.currentState = state;
+      const newState = this.states[state];
+      if (newState.enter) {
+        newState.enter.call(this);
+      }
+    }
+    update() {
+      const state = this.states[this.currentState];
+      if (state.update) {
+        state.update.call(this);
+      }
+    }
+  }
+
+  const gui = new GUI();
+  gui.add(globals, 'debug').onChange(showHideDebugInfo);
+
+  const labelContainerElem = document.querySelector('#labels');
+  function showHideDebugInfo() {
+    labelContainerElem.style.display = globals.debug ? '' : 'none';
+  }
+  class StateDisplayHelper extends Component {
+    constructor(gameObject, size) {
+      super(gameObject);
+      this.elem = document.createElement('div');
+      labelContainerElem.appendChild(this.elem);
+      this.pos = new THREE.Vector3();
+
+      this.helper = new THREE.PolarGridHelper(size / 2, 1, 1, 16);
+      gameObject.transform.add(this.helper);
+    }
+    setState(s) {
+      this.elem.textContent = s;
+    }
+    setColor(cssColor) {
+      this.elem.style.color = cssColor;
+      this.helper.material.color.set(cssColor);
+    }
+    update() {
+      this.helper.visible = globals.debug;
+      if (!globals.debug) {
+        return;
+      }
+      const {pos} = this;
+      const {transform} = this.gameObject;
+      const {canvas} = globals;
+      pos.copy(transform.position);
+
+      // get the normalized screen coordinate of that position
+      // x and y will be in the -1 to +1 range with x = -1 being
+      // on the left and y = -1 being on the bottom
+      pos.project(globals.camera);
+
+      // convert the normalized position to CSS coordinates
+      const x = (pos.x *  .5 + .5) * canvas.clientWidth;
+      const y = (pos.y * -.5 + .5) * canvas.clientHeight;
+
+      // move the elem to that position
+      this.elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+    }
+  }
+
+  class Player extends Component {
+    constructor(gameObject) {
+      super(gameObject);
+      const model = models.knight;
+      globals.playerRadius = model.size / 2;
+      this.text = gameObject.addComponent(StateDisplayHelper, model.size);
+      this.skinInstance = gameObject.addComponent(SkinInstance, model);
+      this.skinInstance.setAnimation('Run');
+      this.turnSpeed = globals.moveSpeed / 4;
+      this.offscreenTimer = 0;
+      this.maxTimeOffScreen = 3;
+
+    }
+    update() {
+      const {deltaTime, moveSpeed, cameraInfo} = globals;
+      const {transform} = this.gameObject;
+      const delta = (inputManager.keys.left.down  ?  1 : 0) +
+                    (inputManager.keys.right.down ? -1 : 0);
+      transform.rotation.y += this.turnSpeed * delta * deltaTime;
+      transform.translateOnAxis(kForward, moveSpeed * deltaTime);
+
+      const {frustum} = cameraInfo;
+      if (frustum.containsPoint(transform.position)) {
+        this.offscreenTimer = 0;
+      } else {
+        this.offscreenTimer += deltaTime;
+        if (this.offscreenTimer >= this.maxTimeOffScreen) {
+          transform.position.set(0, 0, 0);
+        }
+      }
+    }
+  }
+
+  // Returns true of obj1 and obj2 are close
+  function isClose(obj1, obj1Radius, obj2, obj2Radius) {
+    const minDist = obj1Radius + obj2Radius;
+    const dist = obj1.position.distanceTo(obj2.position);
+    return dist < minDist;
+  }
+
+  // keeps v between -min and +min
+  function minMagnitude(v, min) {
+    return Math.abs(v) > min
+        ? min * Math.sign(v)
+        : v;
+  }
+
+  const aimTowardAndGetDistance = function() {
+    const delta = new THREE.Vector3();
+
+    return function aimTowardAndGetDistance(source, targetPos, maxTurn) {
+      delta.subVectors(targetPos, source.position);
+      // compute the direction we want to be facing
+      const targetRot = Math.atan2(delta.x, delta.z) + Math.PI * 1.5;
+      // rotate in the shortest direction
+      const deltaRot = (targetRot - source.rotation.y + Math.PI * 1.5) % (Math.PI * 2) - Math.PI;
+      // make sure we don't turn faster than maxTurn
+      const deltaRotation = minMagnitude(deltaRot, maxTurn);
+      // keep rotation between 0 and Math.PI * 2
+      source.rotation.y = THREE.MathUtils.euclideanModulo(
+          source.rotation.y + deltaRotation, Math.PI * 2);
+      // return the distance to the target
+      return delta.length();
+    };
+  }();
+
+  class Animal extends Component {
+    constructor(gameObject, model) {
+      super(gameObject);
+      this.helper = gameObject.addComponent(StateDisplayHelper, model.size);
+      const hitRadius = model.size / 2;
+      const skinInstance = gameObject.addComponent(SkinInstance, model);
+      skinInstance.mixer.timeScale = globals.moveSpeed / 4;
+      const transform = gameObject.transform;
+      const playerTransform = globals.player.gameObject.transform;
+      const maxTurnSpeed = Math.PI * (globals.moveSpeed / 4);
+      const targetHistory = [];
+      let targetNdx = 0;
+
+      function addHistory() {
+        const targetGO = globals.congaLine[targetNdx];
+        const newTargetPos = new THREE.Vector3();
+        newTargetPos.copy(targetGO.transform.position);
+        targetHistory.push(newTargetPos);
+      }
+
+      this.fsm = new FiniteStateMachine({
+        idle: {
+          enter: () => {
+            skinInstance.setAnimation('Idle');
+          },
+          update: () => {
+            // check if player is near
+            if (isClose(transform, hitRadius, playerTransform, globals.playerRadius)) {
+              this.fsm.transition('waitForEnd');
+            }
+          },
+        },
+        waitForEnd: {
+          enter: () => {
+            skinInstance.setAnimation('Jump');
+          },
+          update: () => {
+            // get the gameObject at the end of the conga line
+            const lastGO = globals.congaLine[globals.congaLine.length - 1];
+            const deltaTurnSpeed = maxTurnSpeed * globals.deltaTime;
+            const targetPos = lastGO.transform.position;
+            aimTowardAndGetDistance(transform, targetPos, deltaTurnSpeed);
+            // check if last thing in conga line is near
+            if (isClose(transform, hitRadius, lastGO.transform, globals.playerRadius)) {
+              this.fsm.transition('goToLast');
+            }
+          },
+        },
+        goToLast: {
+          enter: () => {
+            // remember who we're following
+            targetNdx = globals.congaLine.length - 1;
+            // add ourselves to the conga line
+            globals.congaLine.push(gameObject);
+            skinInstance.setAnimation('Walk');
+          },
+          update: () => {
+            addHistory();
+            // walk to the oldest point in the history
+            const targetPos = targetHistory[0];
+            const maxVelocity = globals.moveSpeed * globals.deltaTime;
+            const deltaTurnSpeed = maxTurnSpeed * globals.deltaTime;
+            const distance = aimTowardAndGetDistance(transform, targetPos, deltaTurnSpeed);
+            const velocity = distance;
+            transform.translateOnAxis(kForward, Math.min(velocity, maxVelocity));
+            if (distance <= maxVelocity) {
+              this.fsm.transition('follow');
+            }
+          },
+        },
+        follow: {
+          update: () => {
+            addHistory();
+            // remove the oldest history and just put ourselves there.
+            const targetPos = targetHistory.shift();
+            transform.position.copy(targetPos);
+            const deltaTurnSpeed = maxTurnSpeed * globals.deltaTime;
+            aimTowardAndGetDistance(transform, targetHistory[0], deltaTurnSpeed);
+          },
+        },
+      }, 'idle');
+    }
+    update() {
+      this.fsm.update();
+      const dir = THREE.MathUtils.radToDeg(this.gameObject.transform.rotation.y);
+      this.helper.setState(`${this.fsm.state}:${dir.toFixed(0)}`);
+    }
+  }
+
+  function init() {
+    // hide the loading bar
+    const loadingElem = document.querySelector('#loading');
+    loadingElem.style.display = 'none';
+
+    prepModelsAndAnimations();
+
+    {
+      const gameObject = gameObjectManager.createGameObject(camera, 'camera');
+      globals.cameraInfo = gameObject.addComponent(CameraInfo);
+    }
+
+    {
+      const gameObject = gameObjectManager.createGameObject(scene, 'player');
+      globals.player = gameObject.addComponent(Player);
+      globals.congaLine = [gameObject];
+    }
+
+    const animalModelNames = [
+      'pig',
+      'cow',
+      'llama',
+      'pug',
+      'sheep',
+      'zebra',
+      'horse',
+    ];
+    animalModelNames.forEach((name, ndx) => {
+      const gameObject = gameObjectManager.createGameObject(scene, name);
+      gameObject.addComponent(Animal, models[name]);
+      gameObject.transform.position.x = (ndx + 1) * 5;
+    });
+  }
+
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
+
+  let then = 0;
+  function render(now) {
+    // convert to seconds
+    globals.time = now * 0.001;
+    // make sure delta time isn't too big.
+    globals.deltaTime = Math.min(globals.time - then, 1 / 20);
+    then = globals.time;
+
+    if (resizeRendererToDisplaySize(renderer)) {
+      const canvas = renderer.domElement;
+      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.updateProjectionMatrix();
+    }
+
+    gameObjectManager.update();
+    inputManager.update();
+
+    renderer.render(scene, camera);
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+}
+
+main();
+</script>
+</html>

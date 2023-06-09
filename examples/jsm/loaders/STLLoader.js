@@ -1,12 +1,12 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
+	Color,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
-	LoaderUtils,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * Description: A THREE loader for STL ASCII files, as created by Solidworks and other CAD programs.
@@ -151,7 +151,7 @@ class STLLoader extends Loader {
 
 			for ( let i = 0, il = query.length; i < il; i ++ ) {
 
-				if ( query[ i ] !== reader.getUint8( offset + i, false ) ) return false;
+				if ( query[ i ] !== reader.getUint8( offset + i ) ) return false;
 
 			}
 
@@ -195,6 +195,8 @@ class STLLoader extends Loader {
 
 			const vertices = new Float32Array( faces * 3 * 3 );
 			const normals = new Float32Array( faces * 3 * 3 );
+
+			const color = new Color();
 
 			for ( let face = 0; face < faces; face ++ ) {
 
@@ -240,9 +242,11 @@ class STLLoader extends Loader {
 
 					if ( hasColors ) {
 
-						colors[ componentIdx ] = r;
-						colors[ componentIdx + 1 ] = g;
-						colors[ componentIdx + 2 ] = b;
+						color.set( r, g, b ).convertSRGBToLinear();
+
+						colors[ componentIdx ] = color.r;
+						colors[ componentIdx + 1 ] = color.g;
+						colors[ componentIdx + 2 ] = color.b;
 
 					}
 
@@ -357,7 +361,7 @@ class STLLoader extends Loader {
 
 			if ( typeof buffer !== 'string' ) {
 
-				return LoaderUtils.decodeText( new Uint8Array( buffer ) );
+				return new TextDecoder().decode( buffer );
 
 			}
 

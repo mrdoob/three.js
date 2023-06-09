@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Buffer Attribute Usage Constants</h1>
+
+		<p>
+			사용 상수를 사용하여 성능을 최적화하기 위해 지오메트리 버퍼 속성을 사용하는 방법에 대한 힌트를 API에 제공할 수 있습니다.
+		</p>
+
+		<h2>코드 예제</h2>
+
+		<code>
+		const geometry = new THREE.BufferGeometry();
+		const positionAttribute = new THREE.BufferAttribute( array, 3 , false );
+		positionAttribute.setUsage( THREE.DynamicDrawUsage );
+		geometry.setAttribute( 'position', positionAttribute );
+		</code>
+
+		<h2>예제</h2>
+		<p>[example:webgl_buffergeometry_drawrange materials / buffergeometry / drawrange ]</p>
+
+		<h2>Geometry Usage</h2>
+		<code>
+		THREE.StaticDrawUsage
+		THREE.DynamicDrawUsage
+		THREE.StreamDrawUsage
+
+		THREE.StaticReadUsage
+		THREE.DynamicReadUsage
+		THREE.StreamReadUsage
+
+		THREE.StaticCopyUsage
+		THREE.DynamicCopyUsage
+		THREE.StreamCopyUsage
+		</code>
+
+		이러한 각 상수에 대한 자세한 내용은 [link:https://www.khronos.org/opengl/wiki/Buffer_Object#Buffer_Object_Usage this OpenGL documentation]를 참조하세요. 
+
+		<h2>소스코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

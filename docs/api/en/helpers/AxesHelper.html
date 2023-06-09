@@ -10,32 +10,29 @@
 		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
 
 		<h1>[name]</h1>
-
-		<p class="desc">An axis object to visualize the 3 axes in a simple way. <br />
+		<p class="desc">
+			An axis object to visualize the 3 axes in a simple way. <br />
 			The X axis is red. The Y axis is green. The Z axis is blue.
 		</p>
 
 		<h2>Code Example</h2>
-
 		<code>
 const axesHelper = new THREE.AxesHelper( 5 );
 scene.add( axesHelper );
 		</code>
 
 		<h2>Examples</h2>
-
 		<p>
-			[example:webgl_buffergeometry_compression WebGL / buffergeometry / compression]<br/>
-			[example:webgl_geometry_convex WebGL / geometry / convex]<br/>
+			[example:webgl_buffergeometry_compression WebGL / buffergeometry / compression]<br />
+			[example:webgl_geometry_convex WebGL / geometry / convex]<br />
 			[example:webgl_loader_nrrd WebGL / loader / nrrd]
 		</p>
 
 		<h2>Constructor</h2>
-
-
 		<h3>[name]( [param:Number size] )</h3>
 		<p>
-		[page:Number size] -- (optional) size of the lines representing the axes. Default is *1*.
+			[page:Number size] -- (optional) size of the lines representing the axes.
+			Default is `1`.
 		</p>
 
 		<h2>Properties</h2>
@@ -44,18 +41,21 @@ scene.add( axesHelper );
 		<h2>Methods</h2>
 		<p>See the base [page:LineSegments] class for common methods.</p>
 
-		<h3>[method:this setColors]( [param:Color xAxisColor], [param:Color yAxisColor], [param:Color zAxisColor] )</h3>
+		<h3>
+			[method:this setColors]( [param:Color xAxisColor], [param:Color yAxisColor], [param:Color zAxisColor] )
+		</h3>
 		<p>
-		Sets the axes colors to [page:Color xAxisColor], [page:Color yAxisColor], [page:Color zAxisColor].
+			Sets the axes colors to [page:Color xAxisColor], [page:Color yAxisColor],
+			[page:Color zAxisColor].
 		</p>
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-		Disposes of the internally-created [page:Line.material material] and [page:Line.geometry geometry] used by this helper.
+			Frees the GPU-related resources allocated by this instance. Call this
+			method whenever this instance is no longer used in your app.
 		</p>
 
 		<h2>Source</h2>
-
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 		</p>

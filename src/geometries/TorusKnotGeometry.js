@@ -7,6 +7,7 @@ class TorusKnotGeometry extends BufferGeometry {
 	constructor( radius = 1, tube = 0.4, tubularSegments = 64, radialSegments = 8, p = 2, q = 3 ) {
 
 		super();
+
 		this.type = 'TorusKnotGeometry';
 
 		this.parameters = {
@@ -44,7 +45,7 @@ class TorusKnotGeometry extends BufferGeometry {
 
 		for ( let i = 0; i <= tubularSegments; ++ i ) {
 
-			// the radian "u" is used to calculate the position on the torus curve of the current tubular segement
+			// the radian "u" is used to calculate the position on the torus curve of the current tubular segment
 
 			const u = i / tubularSegments * p * Math.PI * 2;
 
@@ -76,7 +77,7 @@ class TorusKnotGeometry extends BufferGeometry {
 				const cy = tube * Math.sin( v );
 
 				// now calculate the final vertex position.
-				// first we orient the extrusion with our basis vectos, then we add it to the current position on the curve
+				// first we orient the extrusion with our basis vectors, then we add it to the current position on the curve
 
 				vertex.x = P1.x + ( cx * N.x + cy * B.x );
 				vertex.y = P1.y + ( cx * N.y + cy * B.y );
@@ -145,6 +146,16 @@ class TorusKnotGeometry extends BufferGeometry {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
+
+	}
+
 	static fromJSON( data ) {
 
 		return new TorusKnotGeometry( data.radius, data.tube, data.tubularSegments, data.radialSegments, data.p, data.q );
@@ -153,4 +164,4 @@ class TorusKnotGeometry extends BufferGeometry {
 
 }
 
-export { TorusKnotGeometry, TorusKnotGeometry as TorusKnotBufferGeometry };
+export { TorusKnotGeometry };

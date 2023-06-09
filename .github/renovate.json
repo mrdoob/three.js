@@ -1,0 +1,16 @@
+{
+  "extends": [
+    "config:base",
+    ":disableDependencyDashboard"
+  ],
+  "timezone": "Asia/Tokyo",
+  "schedule": ["after 1am and before 7am every monday"],
+  "packageRules": [
+    {
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch", "minor", "pin", "digest"],
+      "groupName": "devDependencies (non-major)",
+      "automerge": true
+    }
+  ]
+}

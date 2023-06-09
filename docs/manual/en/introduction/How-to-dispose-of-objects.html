@@ -44,6 +44,11 @@
 		Similar to buffers, this object can only be deleted by calling [page:Texture.dispose]().
 	</p>
 
+	<p>
+		If you use an `ImageBitmap` as the texture's data source, you have to call [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap/close ImageBitmap.close]() at the application level to dispose of all CPU-side resources.
+		An automated call of `ImageBitmap.close()` in [page:Texture.dispose]() is not possible, since the image bitmap becomes unusable, and the engine has no way of knowing if the image bitmap is used elsewhere.
+	</p>
+
 	<h2>Render Targets</h2>
 
 	<p>
@@ -55,8 +60,8 @@
 	<h2>Miscellaneous</h2>
 
 	<p>
-		There are other classes from the examples directory like controls or post processing passes which provide *dispose()* methods in order to remove internal event listeners
-		or render targets. In general, it's recommended to check the API or documentation of a class and watch for *dispose()*. If present, you should use it when cleaning things up.
+		There are other classes from the examples directory like controls or post processing passes which provide `dispose()` methods in order to remove internal event listeners
+		or render targets. In general, it's recommended to check the API or documentation of a class and watch for `dispose()`. If present, you should use it when cleaning things up.
 	</p>
 
 	<h2>FAQ</h2>
@@ -67,7 +72,7 @@
 		This question was asked many times by the community so it's important to clarify this matter. Fact is that *three.js* does not know the lifetime or scope
 		of user-created entities like geometries or materials. This is the responsibility of the application. For example even if a material is currently not used for rendering,
 		it might be necessary for the next frame. So if the application decides that a certain object can be deleted, it has to	notify the engine via calling the respective
-		*dispose()* method.
+		`dispose()` method.
 	</p>
 
 	<h3>Does removing a mesh from the scene also dispose its geometry and material?</h3>
@@ -84,14 +89,14 @@
 		in your application, it's a good idea to debug this property in order to easily identify a memory leak.
 	</p>
 
-	<h3>What happens when you call *dispose()* on a texture but the image is not loaded yet?</h3>
+	<h3>What happens when you call `dispose()` on a texture but the image is not loaded yet?</h3>
 
 	<p>
 		Internal resources for a texture are only allocated if the image has fully loaded. If you dispose a texture before the image was loaded,
 		nothing happens. No resources were allocated so there is also no need for clean up.
 	</p>
 
-	<h3>What happens when I call *dispose()* and then use the respective object at a later point?</h3>
+	<h3>What happens when I call `dispose()` and then use the respective object at a later point?</h3>
 
 	<p>
 		The deleted internal resources will be created again by the engine. So no runtime error will occur but you might notice a negative performance impact for the current frame,
@@ -101,7 +106,7 @@
 	<h3>How should I manage *three.js* objects in my app? When do I know how to dispose things?</h3>
 
 	<p>
-		In general, there is no definite recommendation for this. It highly depends on the specific use case when calling *dispose()* is appropriate. It's important to highlight that
+		In general, there is no definite recommendation for this. It highly depends on the specific use case when calling `dispose()` is appropriate. It's important to highlight that
 		it's not always necessary to dispose objects all the time. A good example for this is a game which consists of multiple levels. A good place for object disposal is when
 		switching the level. The app could traverse through the old scene and dispose all obsolete materials, geometries and textures. As mentioned in the previous section, it does not
 		produce a runtime error if you dispose an object that is actually still in use. The worst thing that can happen is performance drop for a single frame.

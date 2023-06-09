@@ -1,6 +1,5 @@
 /**
- * Ascii generation is based on http://www.nihilogic.dk/labs/jsascii/
- * Maybe more about this later with a blog post at http://lab4games.net/zz85/blog
+ * Ascii generation is based on https://github.com/hassadee/jsascii/blob/master/jsascii.js
  *
  * 16 April 2012 - @blurspline
  */
@@ -15,14 +14,13 @@ class AsciiEffect {
 
 		// Some ASCII settings
 
-		const bResolution = ! options[ 'resolution' ] ? 0.15 : options[ 'resolution' ]; // Higher for more details
-		const iScale = ! options[ 'scale' ] ? 1 : options[ 'scale' ];
-		const bColor = ! options[ 'color' ] ? false : options[ 'color' ]; // nice but slows down rendering!
-		const bAlpha = ! options[ 'alpha' ] ? false : options[ 'alpha' ]; // Transparency
-		const bBlock = ! options[ 'block' ] ? false : options[ 'block' ]; // blocked characters. like good O dos
-		const bInvert = ! options[ 'invert' ] ? false : options[ 'invert' ]; // black is white, white is black
-
-		const strResolution = 'low';
+		const fResolution = options[ 'resolution' ] || 0.15; // Higher for more details
+		const iScale = options[ 'scale' ] || 1;
+		const bColor = options[ 'color' ] || false; // nice but slows down rendering!
+		const bAlpha = options[ 'alpha' ] || false; // Transparency
+		const bBlock = options[ 'block' ] || false; // blocked characters. like good O dos
+		const bInvert = options[ 'invert' ] || false; // black is white, white is black
+		const strResolution = options[ 'strResolution' ] || 'low';
 
 		let width, height;
 
@@ -50,25 +48,19 @@ class AsciiEffect {
 		this.render = function ( scene, camera ) {
 
 			renderer.render( scene, camera );
-			asciifyImage( renderer, oAscii );
+			asciifyImage( oAscii );
 
 		};
 
 		this.domElement = domElement;
 
 
-		// Throw in ascii library from http://www.nihilogic.dk/labs/jsascii/jsascii.js
-
-		/*
-		* jsAscii 0.1
-		* Copyright (c) 2008 Jacob Seidelin, jseidelin@nihilogic.dk, http://blog.nihilogic.dk/
-		* MIT License [http://www.nihilogic.dk/licenses/mit-license.txt]
-		*/
+		// Throw in ascii library from https://github.com/hassadee/jsascii/blob/master/jsascii.js (MIT License)
 
 		function initAsciiSize() {
 
-			iWidth = Math.round( width * fResolution );
-			iHeight = Math.round( height * fResolution );
+			iWidth = Math.floor( width * fResolution );
+			iHeight = Math.floor( height * fResolution );
 
 			oCanvas.width = iWidth;
 			oCanvas.height = iHeight;
@@ -89,9 +81,6 @@ class AsciiEffect {
 			oAscii.cellPadding = 0;
 
 			const oStyle = oAscii.style;
-			oStyle.display = 'inline';
-			oStyle.width = Math.round( iWidth / fResolution * iScale ) + 'px';
-			oStyle.height = Math.round( iHeight / fResolution * iScale ) + 'px';
 			oStyle.whiteSpace = 'pre';
 			oStyle.margin = '0px';
 			oStyle.padding = '0px';
@@ -128,18 +117,6 @@ class AsciiEffect {
 		let aCharList = ( bColor ? aDefaultColorCharList : aDefaultCharList );
 
 		if ( charSet ) aCharList = charSet;
-
-		let fResolution = 0.5;
-
-		switch ( strResolution ) {
-
-			case 'low' : 	fResolution = 0.25; break;
-			case 'medium' : fResolution = 0.5; break;
-			case 'high' : 	fResolution = 1; break;
-
-		}
-
-		if ( bResolution ) fResolution = bResolution;
 
 		// Setup dom
 
@@ -198,7 +175,7 @@ class AsciiEffect {
 
 		// convert img element to ascii
 
-		function asciifyImage( canvasRenderer, oAscii ) {
+		function asciifyImage( oAscii ) {
 
 			oCtx.clearRect( 0, 0, iWidth, iHeight );
 			oCtx.drawImage( oCanvasImg, 0, 0, iWidth, iHeight );
@@ -271,7 +248,7 @@ class AsciiEffect {
 
 			}
 
-			oAscii.innerHTML = '<tr><td>' + strChars + '</td></tr>';
+			oAscii.innerHTML = `<tr><td style="display:block;width:${width}px;height:${height}px;overflow:hidden">${strChars}</td></tr>`;
 
 			// console.timeEnd('rendering');
 

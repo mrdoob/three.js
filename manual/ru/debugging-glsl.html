@@ -1,0 +1,104 @@
+<!DOCTYPE html><html lang="ru"><head>
+    <meta charset="utf-8">
+    <title>Отладка - GLSL</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Отладка - GLSL">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Отладка - GLSL</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Этот сайт пока не учит GLSL так же, как не учит JavaScript. Это действительно большие темы. Если вы хотите изучать GLSL, рассмотрите
+<a href="https://webglfundamentals.org">эти статьи</a> в качестве отправной точки.</p>
+<p>Если вы уже знаете GLSL, вот несколько советов по отладке.</p>
+<p>Когда я делаю новый шейдер GLSL, и вообще ничего не появляется, первое, что я делаю,
+это изменяю фрагментный шейдер, чтобы он возвращал сплошной цвет. Например, в самом низу шейдера я мог бы поставить </p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">void main() {
+
+  ...
+
+  gl_FragColor = vec4(1, 0, 0, 1);  // red
+}
+</pre>
+<p>Если я вижу объект, который пытался нарисовать, то я знаю, что проблема связана с моим фрагментным шейдером. 
+Это может быть что-то вроде плохих текстур, неинициализированной униформы,
+униформы с неправильными значениями, но, по крайней мере, у меня есть направление, чтобы посмотреть. </p>
+<p>Чтобы проверить некоторые из них, я мог бы начать пытаться сделать некоторые из входных данных. 
+Например, если я использую нормали в фрагментном шейдере, я мог бы добавить </p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">gl_FragColor = vec4(vNormal * 0.5 + 0.5, 1);
+</pre>
+<p>Нормали переходят от -1 к +1, поэтому, умножив на 0,5 и добавив 0,5, 
+мы получим значения, которые идут от 0,0 до 1,0, что делает их полезными для цветов. </p>
+<p>Попробуйте это с некоторыми вещами, которые, как вы знаете, работают, и вы начнете понимать, как обычно выглядят нормали.
+Если ваши нормали не выглядят нормально, то у вас есть ключ к пониманию, где искать.
+Если вы манипулируете нормалями в шейдере фрагментов, вы можете использовать ту же технику, чтобы нарисовать результат этой манипуляции. </p>
+<div class="threejs_center"><img src="../resources/images/standard-primitive-normals.jpg" style="width: 650px;"></div>
+
+<p>Точно так же, если мы используем текстуры, будут координаты текстуры, и мы можем нарисовать их чем-то вроде </p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">gl_FragColor = vec4(fract(vUv), 0, 1);
+</pre>
+<p><code class="notranslate" translate="no">fract</code> есть в случае, если мы используем текстурные координаты, которые выходят за пределы диапазона от 0 до 1.
+Это часто встречается, если для <code class="notranslate" translate="no">texture.repeat</code> установлено значение больше 1. </p>
+<div class="threejs_center"><img src="../resources/images/standard-primitive-uvs.jpg" style="width: 650px;"></div>
+
+<p>Вы можете делать подобные вещи для всех значений в вашем фрагментном шейдере.
+Выясните, каким может быть их диапазон, добавьте код для установки <code class="notranslate" translate="no">gl_FragColor</code> с диапазоном от 0,0 до 1,0. </p>
+<p>Чтобы проверить текстуры, попробуйте <a href="/docs/#api/en/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> или <a href="/docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>, которые, как вы знаете, работают. </p>
+<p>И наоборот, если после установки <code class="notranslate" translate="no">gl_FragColor</code> на красный я все еще ничего не вижу, 
+у меня есть подсказка, моя проблема может быть в направлении вещей, связанных с вершинным шейдером. 
+Некоторые матрицы могут быть неправильными, или мои атрибуты могут содержать неверные данные или неправильно настроены. </p>
+<p>Я бы сначала посмотрел на матрицы. Я мог бы поставить точку останова сразу после моего вызова <code class="notranslate" translate="no">renderer.render(scene, camera)</code>,
+а затем начать расширять объекты в инспекторе. Матрица мира и проекционная матрица камеры, по крайней мере, не полны <code class="notranslate" translate="no">NaN</code>? 
+Расширяя сцену и глядя на ее <code class="notranslate" translate="no">children</code>, я бы проверил, что мировые матрицы выглядят разумно (без <code class="notranslate" translate="no">NaN</code>) и последние 4 значения каждой матрицы выглядят разумно для моей сцены. 
+Если я ожидаю, что моя сцена будет иметь размеры 50x50x50 единиц, а некоторые матрицы показывают 552352623.123, то явно что-то не так. </p>
+<div class="threejs_center"><img src="../resources/images/inspect-matrices.gif"></div>
+
+<p>Как и в случае с фрагментным шейдером, мы также можем рисовать значения из вершинного шейдера, передавая их фрагментному шейдеру. 
+Объявите переменные в обоих и передайте значение, которое вы не уверены, правильно. Фактически, если мой шейдер использует нормали, 
+я изменю фрагментный шейдер так, чтобы он отображался так, как указано выше, а затем просто установите для <code class="notranslate" translate="no">vNormal</code> значение, которое я хочу отобразить,
+но масштабировать, чтобы значения изменялись от 0,0 до 1,0. Затем я смотрю на результаты и проверяю, соответствуют ли они моим ожиданиям. </p>
+<p>Еще одна полезная вещь - использовать более простой шейдер. 
+Можете ли вы нарисовать свои данные с помощью <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>? 
+Если вы можете тогда попробуйте и убедитесь, что он показывает, как ожидалось. </p>
+<p>Если нет, то какой самый простой вершинный шейдер, который позволит вам визуализировать вашу геометрию? Обычно это так же просто, как </p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">gl_Position = projection * modelView * vec4(position.xyz, 1);
+</pre>
+<p>Если это работает, начните добавлять изменения постепенно.</p>
+<p>Еще одна вещь, которую вы можете сделать, это использовать расширение
+<a href="https://chrome.google.com/webstore/detail/shader-editor/ggeaidddejpbakgafapihjbgdlbbbpob?hl=en">Shader Editor для Chrome</a>
+или аналогичное для других браузеров. Это отличный способ посмотреть, как работают другие шейдеры. Это также хорошо,
+поскольку вы можете внести некоторые из предложенных выше изменений во время работы кода. </p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

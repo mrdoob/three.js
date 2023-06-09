@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Cela peut être utilisé comme objet d'assistance pour afficher une [page:BufferGeometry geometry] sous forme filaire.</p>
+
+		<h2>Exemple de code :</h2>
+
+		<code>
+		const geometry = new THREE.SphereGeometry( 100, 100, 100 );
+
+		const wireframe = new THREE.WireframeGeometry( geometry );
+
+		const line = new THREE.LineSegments( wireframe );
+		line.material.depthTest = false;
+		line.material.opacity = 0.25;
+		line.material.transparent = true;
+
+		scene.add( line );
+		</code>
+
+		<h2>Exemples</h2>
+
+		<p>
+			[example:webgl_helpers helpers]
+		</p>
+
+		<h2>Constructeur</h2>
+
+		<h3>[name]( [param:BufferGeometry geometry] )</h3>
+		<p>
+		geometry — Tout objet de géométrie.
+		</p>
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les propriétés communes.</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les méthodes communes.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
