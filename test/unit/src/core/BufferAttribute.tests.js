@@ -258,6 +258,33 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'getComponent', ( assert ) => {
+
+			const f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8 ] );
+			const a = new BufferAttribute( f32a, 4, false );
+
+			assert.equal( a.getComponent( 0, 0 ), 1, 'v0.x was not retrieved' );
+			assert.equal( a.getComponent( 0, 1 ), 2, 'v0.y was not retrieved' );
+			assert.equal( a.getComponent( 1, 2 ), 7, 'v1.z was not retrieved' );
+			assert.equal( a.getComponent( 1, 3 ), 8, 'v1.w was not retrieved' );
+
+		} );
+
+		QUnit.test( 'setComponent', ( assert ) => {
+
+			const f32a = new Float32Array( [ 0, 0, 0, 0, 0, 0, 0, 0 ] );
+			const a = new BufferAttribute( f32a, 4, false );
+			const expected = new Float32Array( [ 1, 2, 0, 0, 0, 0, 3, 4 ] );
+
+			a.setComponent( 0, 0, 1 );
+			a.setComponent( 0, 1, 2 );
+			a.setComponent( 1, 2, 3 );
+			a.setComponent( 1, 3, 4 );
+
+			assert.deepEqual( a.array, expected, 'Check for the correct values' );
+
+		} );
+
 		QUnit.test( 'onUpload', ( assert ) => {
 
 			const a = new BufferAttribute();
@@ -507,7 +534,7 @@ export default QUnit.module( 'Core', () => {
 		const toHalfFloatArray = ( f32Array ) => {
 
 			const f16Array = new Uint16Array( f32Array.length );
-			for ( let i = 0, n = f32Array.length; i < n; ++i ) {
+			for ( let i = 0, n = f32Array.length; i < n; ++ i ) {
 
 				f16Array[ i ] = toHalfFloat( f32Array[ i ] );
 
@@ -520,7 +547,7 @@ export default QUnit.module( 'Core', () => {
 		const fromHalfFloatArray = ( f16Array ) => {
 
 			const f32Array = new Float32Array( f16Array.length );
-			for ( let i = 0, n = f16Array.length; i < n; ++i ) {
+			for ( let i = 0, n = f16Array.length; i < n; ++ i ) {
 
 				f32Array[ i ] = fromHalfFloat( f16Array[ i ] );
 
