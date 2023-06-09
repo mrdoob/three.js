@@ -17,7 +17,8 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Skeletal Animations with >4 Bone Influences Per Vertex<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			 - Skeletal Animations with <= 4 (left) and > 4 (right) Bone Influences Per Vertex<br/>
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -169,8 +170,17 @@
 			
 					mixer = new THREE.AnimationMixer( scene );
 					const animations = gltf.animations;
-					mixer.clipAction( animations[ 0 ], limitedBonesModel ).play();
-					mixer.clipAction( animations[ 0 ], unlimitedBonesModel ).play();
+					const actions = [ limitedBonesModel, unlimitedBonesModel ]
+						.map( model => mixer.clipAction( animations[ 0 ], model ) );
+
+					// start the animations at the point where the artifacts show so that
+					// the automated screenshots pick it up
+					for ( const action of actions ) {
+
+						action.time = 0.35 * animations[ 0 ].duration;
+						action.play();
+			
+					}
 
 					animate();
 

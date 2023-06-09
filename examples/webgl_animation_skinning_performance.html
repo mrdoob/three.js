@@ -61,6 +61,9 @@
 			let singleStepMode = false;
 			let sizeOfNextStep = 0;
 
+			let soldiersLoaded = false;
+			let headLoaded = false;
+
 			init();
 
 			function init() {
@@ -138,11 +141,8 @@
 
 					}
 
-					createPanel();
-
-					activateAllActions();
-
-					animate();
+					soldiersLoaded = true;
+					finishInitialization();
 
 				} );
 
@@ -165,6 +165,9 @@
 					actions.push( action );
 					mixers.push( mixer );
 
+					headLoaded = true;
+					finishInitialization();
+
 				} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -180,6 +183,20 @@
 				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function finishInitialization() {
+
+				if ( ! soldiersLoaded || ! headLoaded ) return;
+
+				// The scene must be complete before modifying or starting rendering.
+				// Otherwise, there's access to incomplete state and automated
+				// screenshots are non-deterministic.
+
+				createPanel();
+				activateAllActions();
+				animate();
 
 			}
 
