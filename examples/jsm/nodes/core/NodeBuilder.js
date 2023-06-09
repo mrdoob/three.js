@@ -97,6 +97,12 @@ class NodeBuilder {
 
 	}
 
+	includes( node ) {
+
+		return this.nodes.includes( node );
+
+	}
+
 	getBindings() {
 
 		let bindingsArray = this.bindingsArray;

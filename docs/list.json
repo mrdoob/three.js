@@ -642,6 +642,27 @@
 			"Loaders / Managers": {
 				"DefaultLoadingManager": "api/ar/loaders/managers/DefaultLoadingManager",
 				"LoadingManager": "api/ar/loaders/managers/LoadingManager"
+			},
+
+			"Materials": {
+				"LineBasicMaterial": "api/ar/materials/LineBasicMaterial",
+				"LineDashedMaterial": "api/ar/materials/LineDashedMaterial",
+				"Material": "api/ar/materials/Material",
+				"MeshBasicMaterial": "api/ar/materials/MeshBasicMaterial",
+				"MeshDepthMaterial": "api/ar/materials/MeshDepthMaterial",
+				"MeshDistanceMaterial": "api/ar/materials/MeshDistanceMaterial",
+				"MeshLambertMaterial": "api/ar/materials/MeshLambertMaterial",
+				"MeshMatcapMaterial": "api/ar/materials/MeshMatcapMaterial",
+				"MeshNormalMaterial": "api/ar/materials/MeshNormalMaterial",
+				"MeshPhongMaterial": "api/ar/materials/MeshPhongMaterial",
+				"MeshPhysicalMaterial": "api/ar/materials/MeshPhysicalMaterial",
+				"MeshStandardMaterial": "api/ar/materials/MeshStandardMaterial",
+				"MeshToonMaterial": "api/ar/materials/MeshToonMaterial",
+				"PointsMaterial": "api/ar/materials/PointsMaterial",
+				"RawShaderMaterial": "api/ar/materials/RawShaderMaterial",
+				"ShaderMaterial": "api/ar/materials/ShaderMaterial",
+				"ShadowMaterial": "api/ar/materials/ShadowMaterial",
+				"SpriteMaterial": "api/ar/materials/SpriteMaterial"
 			}
 
 		}
