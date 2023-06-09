@@ -38,7 +38,7 @@ class PromiseQueue {
 /* CONFIG VARIABLES START */
 
 const idleTime = 9; // 9 seconds - for how long there should be no network requests
-const parseTime = 6; // 6 seconds per megabyte
+const parseTime = 7; // 7 seconds per megabyte
 
 const exceptionList = [
 
@@ -131,7 +131,7 @@ const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.3; // at most 0.3% different pixels
 
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
-const renderTimeout = 5; // 5 seconds, set to 0 to disable
+const renderTimeout = 7; // 7 seconds, set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
 
@@ -582,7 +582,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		}
 
-	} catch ( e ) { 
+	} catch ( e ) {
 
 		if ( attemptID === numAttempts - 1 ) {
 
