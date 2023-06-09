@@ -358,6 +358,11 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			parameters.customVertexShaderID = _customShaders.getVertexShaderID( material );
 			parameters.customFragmentShaderID = _customShaders.getFragmentShaderID( material );
 
+			// ensure rebuild if getParameters needed to check validity of program
+
+			material.vertexShader = null;
+			material.fragmentShader = null;
+
 		}
 
 		return parameters;
