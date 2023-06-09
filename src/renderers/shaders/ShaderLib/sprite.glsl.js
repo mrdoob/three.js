@@ -72,7 +72,7 @@ void main() {
 
 	#include <output_fragment>
 	#include <tonemapping_fragment>
-	#include <color_space_fragment>
+	#include <colorspace_fragment>
 	#include <fog_fragment>
 
 }

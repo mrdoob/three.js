@@ -56,7 +56,7 @@ void main() {
 	gl_FragColor = texColor;
 
 	#include <tonemapping_fragment>
-	#include <color_space_fragment>
+	#include <colorspace_fragment>
 
 }
 `;

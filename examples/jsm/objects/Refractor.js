@@ -323,7 +323,7 @@ Refractor.RefractorShader = {
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 
 			#include <tonemapping_fragment>
-			#include <color_space_fragment>
+			#include <colorspace_fragment>
 
 		}`
 

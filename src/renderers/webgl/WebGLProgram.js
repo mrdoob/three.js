@@ -212,8 +212,8 @@ function resolveIncludes( string ) {
 }
 
 const shaderChunkMap = new Map( [
-	[ 'encodings_fragment', 'color_space_fragment' ], // @deprecated, r154
-	[ 'encodings_pars_fragment', 'color_space_pars_fragment' ] // @deprecated, r154
+	[ 'encodings_fragment', 'colorspace_fragment' ], // @deprecated, r154
+	[ 'encodings_pars_fragment', 'colorspace_pars_fragment' ] // @deprecated, r154
 ] );
 
 function includeReplacer( match, include ) {
@@ -776,7 +776,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.dithering ? '#define DITHERING' : '',
 			parameters.opaque ? '#define OPAQUE' : '',
 
-			ShaderChunk[ 'color_space_pars_fragment' ], // this code is required here because it is used by the various encoding/decoding function defined below
+			ShaderChunk[ 'colorspace_pars_fragment' ], // this code is required here because it is used by the various encoding/decoding function defined below
 			getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputColorSpace ),
 
 			parameters.useDepthPacking ? '#define DEPTH_PACKING ' + parameters.depthPacking : '',

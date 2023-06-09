@@ -120,7 +120,7 @@ class GroundProjectedSkybox extends Mesh {
 					gl_FragColor = vec4( outcolor, 1.0 );
 
 					#include <tonemapping_fragment>
-					#include <color_space_fragment>
+					#include <colorspace_fragment>
 
 				}
 				`;
