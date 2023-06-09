@@ -48,7 +48,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	customProgramCacheKey() {
 
-		return getCacheKey( this );
+		return this.type + getCacheKey( this );
 
 	}
 
