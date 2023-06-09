@@ -10,7 +10,8 @@ const nodeShaderLib = {
 	MeshBasicNodeMaterial: ShaderLib.basic,
 	PointsNodeMaterial: ShaderLib.points,
 	MeshStandardNodeMaterial: ShaderLib.standard,
-	MeshPhysicalNodeMaterial: ShaderLib.physical
+	MeshPhysicalNodeMaterial: ShaderLib.physical,
+	MeshPhongNodeMaterial: ShaderLib.phong
 };
 
 const glslMethods = {
@@ -74,6 +75,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		if ( material.isMeshPhysicalNodeMaterial ) type = 'MeshPhysicalNodeMaterial';
 		else if ( material.isMeshStandardNodeMaterial ) type = 'MeshStandardNodeMaterial';
+		else if ( material.isMeshPhongNodeMaterial ) type = 'MeshPhongNodeMaterial';
 		else if ( material.isMeshBasicNodeMaterial ) type = 'MeshBasicNodeMaterial';
 		else if ( material.isPointsNodeMaterial ) type = 'PointsNodeMaterial';
 		else if ( material.isLineBasicNodeMaterial ) type = 'LineBasicNodeMaterial';
