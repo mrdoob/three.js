@@ -46,17 +46,17 @@ class SkinnedMesh extends Mesh {
 
 	createBoneIndexWeightsTexture() {
 
-		const indexBuffers = this.geometry.getSkinIndexBuffers();
-		const weightBuffers = this.geometry.getSkinWeightBuffers();
-
 		if ( ! this.geometry
-				|| this.useBoneIndexWeightsTexture === BoneIndexWeightsTextureNever
-				|| ( this.useBoneIndexWeightsTexture === BoneIndexWeightsTextureAllow
-						&& indexBuffers.length <= 1 ) ) {
+			|| this.useBoneIndexWeightsTexture === BoneIndexWeightsTextureNever
+			|| ( this.useBoneIndexWeightsTexture === BoneIndexWeightsTextureAllow
+				&& this.geometry.getSkinIndexBuffers().length <= 1 ) ) {
 
 			return;
 
 		}
+
+		const indexBuffers = this.geometry.getSkinIndexBuffers();
+		const weightBuffers = this.geometry.getSkinWeightBuffers();
 
 		const vertexCount = indexBuffers[ 0 ].count;
 		const boneStartIndex = new Int32Array( vertexCount );
