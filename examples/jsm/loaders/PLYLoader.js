@@ -678,10 +678,8 @@ class PLYLoader extends Loader {
 			let line = '';
 			const lines = [];
 
-			const startBytes = new TextDecoder().decode( bytes.subarray( 0, 5 ) );
-			const startLine = startBytes.match( /^ply[\n\r]+/ )[ 0 ]
-
-			const hasCRNL = startLine.length === 5;
+			const startLine = new TextDecoder().decode( bytes.subarray( 0, 5 ) );
+			const hasCRNL = /^ply\r\n/.test( startLine );
 
 			do {
 
