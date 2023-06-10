@@ -663,6 +663,30 @@
 				"ShaderMaterial": "api/ar/materials/ShaderMaterial",
 				"ShadowMaterial": "api/ar/materials/ShadowMaterial",
 				"SpriteMaterial": "api/ar/materials/SpriteMaterial"
+			},
+
+			"Math": {
+				"Box2": "api/ar/math/Box2",
+				"Box3": "api/ar/math/Box3",
+				"Color": "api/ar/math/Color",
+				"Cylindrical": "api/ar/math/Cylindrical",
+				"Euler": "api/ar/math/Euler",
+				"Frustum": "api/ar/math/Frustum",
+				"Interpolant": "api/ar/math/Interpolant",
+				"Line3": "api/ar/math/Line3",
+				"MathUtils": "api/ar/math/MathUtils",
+				"Matrix3": "api/ar/math/Matrix3",
+				"Matrix4": "api/ar/math/Matrix4",
+				"Plane": "api/ar/math/Plane",
+				"Quaternion": "api/ar/math/Quaternion",
+				"Ray": "api/ar/math/Ray",
+				"Sphere": "api/ar/math/Sphere",
+				"Spherical": "api/ar/math/Spherical",
+				"SphericalHarmonics3": "api/ar/math/SphericalHarmonics3",
+				"Triangle": "api/ar/math/Triangle",
+				"Vector2": "api/ar/math/Vector2",
+				"Vector3": "api/ar/math/Vector3",
+				"Vector4": "api/ar/math/Vector4"
 			}
 
 		}
