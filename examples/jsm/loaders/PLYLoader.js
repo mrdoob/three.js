@@ -104,19 +104,15 @@ class PLYLoader extends Loader {
 
 	parse( data ) {
 
-		function parseHeader( data ) {
+		function parseHeader( data, headerLength = 0 ) {
 
 			const patternHeader = /^ply([\s\S]*)end_header(\r\n|\r|\n)/;
 			let headerText = '';
-			let headerLength = 0;
 			const result = patternHeader.exec( data );
 
 			if ( result !== null ) {
 
-				const newlineCount = result[ 0 ].match( /\r/g ).length;
-
 				headerText = result[ 1 ];
-				headerLength = new Blob( [ result[ 0 ] ] ).size + newlineCount;
 
 			}
 
@@ -682,6 +678,11 @@ class PLYLoader extends Loader {
 			let line = '';
 			const lines = [];
 
+			const startBytes = new TextDecoder().decode( bytes.subarray( 0, 5 ) );
+			const startLine = startBytes.match( /^ply[\n\r]+/ )[ 0 ]
+
+			const hasCRNL = startLine.length === 5;
+
 			do {
 
 				const c = String.fromCharCode( bytes[ i ++ ] );
@@ -704,7 +705,10 @@ class PLYLoader extends Loader {
 
 			} while ( cont && i < bytes.length );
 
-			return lines.join( '\r' ) + '\r';
+			// ascii section using \r\n as line endings
+			if ( hasCRNL ) i++;
+
+			return { headerText: lines.join( '\r' ) + '\r',  headerLength: i };
 
 		}
 
@@ -716,8 +720,8 @@ class PLYLoader extends Loader {
 		if ( data instanceof ArrayBuffer ) {
 
 			const bytes = new Uint8Array( data );
-			const headerText = extractHeaderText( bytes );
-			const header = parseHeader( headerText );
+			const { headerText, headerLength } = extractHeaderText( bytes );
+			const header = parseHeader( headerText, headerLength );
 
 			if ( header.format === 'ascii' ) {
 
