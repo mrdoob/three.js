@@ -113,8 +113,10 @@ class PLYLoader extends Loader {
 
 			if ( result !== null ) {
 
+				const newlineCount = result[ 0 ].match( /\r/g ).length;
+
 				headerText = result[ 1 ];
-				headerLength = new Blob( [ result[ 0 ] ] ).size;
+				headerLength = new Blob( [ result[ 0 ] ] ).size + newlineCount;
 
 			}
 
