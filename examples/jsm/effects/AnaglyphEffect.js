@@ -91,7 +91,7 @@ class AnaglyphEffect {
 				'			max( colorL.a, colorR.a ) );',
 
 				'	#include <tonemapping_fragment>',
-				'	#include <encodings_fragment>',
+				'	#include <colorspace_fragment>',
 
 				'}'
 

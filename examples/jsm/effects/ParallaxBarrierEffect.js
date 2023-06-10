@@ -69,7 +69,7 @@ class ParallaxBarrierEffect {
 				'	}',
 
 				'	#include <tonemapping_fragment>',
-				'	#include <encodings_fragment>',
+				'	#include <colorspace_fragment>',
 
 				'}'
 

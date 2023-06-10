@@ -211,13 +211,29 @@ function resolveIncludes( string ) {
 
 }
 
+const shaderChunkMap = new Map( [
+	[ 'encodings_fragment', 'colorspace_fragment' ], // @deprecated, r154
+	[ 'encodings_pars_fragment', 'colorspace_pars_fragment' ] // @deprecated, r154
+] );
+
 function includeReplacer( match, include ) {
 
-	const string = ShaderChunk[ include ];
+	let string = ShaderChunk[ include ];
 
 	if ( string === undefined ) {
 
-		throw new Error( 'Can not resolve #include <' + include + '>' );
+		const newInclude = shaderChunkMap.get( include );
+
+		if ( newInclude !== undefined ) {
+
+			string = ShaderChunk[ newInclude ];
+			console.warn( 'THREE.WebGLRenderer: Shader chunk "%s" has been deprecated. Use "%s" instead.', include, newInclude );
+
+		} else {
+
+			throw new Error( 'Can not resolve #include <' + include + '>' );
+
+		}
 
 	}
 
@@ -760,7 +776,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.dithering ? '#define DITHERING' : '',
 			parameters.opaque ? '#define OPAQUE' : '',
 
-			ShaderChunk[ 'encodings_pars_fragment' ], // this code is required here because it is used by the various encoding/decoding function defined below
+			ShaderChunk[ 'colorspace_pars_fragment' ], // this code is required here because it is used by the various encoding/decoding function defined below
 			getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputColorSpace ),
 
 			parameters.useDepthPacking ? '#define DEPTH_PACKING ' + parameters.depthPacking : '',
