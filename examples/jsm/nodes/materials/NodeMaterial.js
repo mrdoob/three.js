@@ -29,6 +29,8 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.type = this.constructor.name;
 
+		this.forceSinglePass = false;
+
 		this.lights = true;
 		this.normals = true;
 

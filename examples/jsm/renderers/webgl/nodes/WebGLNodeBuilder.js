@@ -141,10 +141,6 @@ class WebGLNodeBuilder extends NodeBuilder {
 				inclusionType: 'append'
 			} ) );
 
-		} else {
-
-			this.addCode( 'fragment', getIncludeSnippet( 'alphatest_fragment' ), 'diffuseColor.a = opacity;', this.shader );
-
 		}
 
 		if ( material.normalNode && material.normalNode.isNode ) {
