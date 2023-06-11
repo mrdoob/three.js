@@ -52,9 +52,9 @@ const exceptionList = [
 
 	// WebXR also isn't determinstic enough?
 	'webxr_ar_lighting',
-	'webxr_vr_ballshooter',
 	'webxr_vr_sandbox',
 	'webxr_vr_video',
+	'webxr_xr_ballshooter',
 
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 
