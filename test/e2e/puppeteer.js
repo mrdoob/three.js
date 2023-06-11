@@ -42,16 +42,19 @@ const parseTime = 6; // 6 seconds per megabyte
 
 const exceptionList = [
 
-	// video tag isn't deterministic enough
+	// video tag isn't deterministic enough?
 	'css3d_youtube',
 	'webgl_materials_video',
 	'webgl_video_kinect',
 	'webgl_video_panorama_equirectangular',
-	'webxr_vr_video',
 
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
 
-	'webxr_ar_lighting', // webxr
+	// WebXR also isn't determinstic enough?
+	'webxr_ar_lighting',
+	'webxr_vr_ballshooter',
+	'webxr_vr_sandbox',
+	'webxr_vr_video',
 
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 
