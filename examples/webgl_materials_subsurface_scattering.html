@@ -37,8 +37,6 @@
 		import { SubsurfaceScatteringShader } from 'three/addons/shaders/SubsurfaceScatteringShader.js';
 		import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
-		THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 		let container, stats;
 		let camera, scene, renderer;
 		let model;
@@ -58,21 +56,21 @@
 
 			// Lights
 
-			scene.add( new THREE.AmbientLight( 0x888888 ) );
+			scene.add( new THREE.AmbientLight( 0xc1c1c1 ) );
 
 			const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.03 );
 			directionalLight.position.set( 0.0, 0.5, 0.5 ).normalize();
 			scene.add( directionalLight );
 
-			const pointLight1 = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888888 } ) );
-			pointLight1.add( new THREE.PointLight( 0x888888, 7.0, 300 ) );
+			const pointLight1 = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xc1c1c1 } ) );
+			pointLight1.add( new THREE.PointLight( 0xc1c1c1, 7.0, 300 ) );
 			scene.add( pointLight1 );
 			pointLight1.position.x = 0;
 			pointLight1.position.y = - 50;
 			pointLight1.position.z = 350;
 
-			const pointLight2 = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888800 } ) );
-			pointLight2.add( new THREE.PointLight( 0x888800, 1.0, 500 ) );
+			const pointLight2 = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xc1c100 } ) );
+			pointLight2.add( new THREE.PointLight( 0xc1c100, 1.0, 500 ) );
 			scene.add( pointLight2 );
 			pointLight2.position.x = - 100;
 			pointLight2.position.y = 20;
@@ -102,6 +100,8 @@
 
 			const loader = new THREE.TextureLoader();
 			const imgTexture = loader.load( 'models/fbx/white.jpg' );
+			imgTexture.colorSpace = THREE.SRGBColorSpace;
+
 			const thicknessTexture = loader.load( 'models/fbx/bunny_thickness.jpg' );
 			imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 

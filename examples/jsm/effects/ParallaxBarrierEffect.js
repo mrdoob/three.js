@@ -68,6 +68,9 @@ class ParallaxBarrierEffect {
 
 				'	}',
 
+				'	#include <tonemapping_fragment>',
+				'	#include <colorspace_fragment>',
+
 				'}'
 
 			].join( '\n' )

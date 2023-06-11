@@ -20,12 +20,16 @@ import {
 	UnsignedShortType,
 	UnsignedInt248Type,
 	UnsignedShort4444Type,
-	UnsignedShort5551Type
+	UnsignedShort5551Type,
+	WebGLCoordinateSystem
 } from '../constants.js';
+import { Color } from '../math/Color.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
+import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
+import { floorPowerOfTwo } from '../math/MathUtils.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
 import { WebGLAttributes } from './webgl/WebGLAttributes.js';
 import { WebGLBackground } from './webgl/WebGLBackground.js';
@@ -174,6 +178,9 @@ class WebGLRenderer {
 		const _currentScissor = new Vector4();
 		let _currentScissorTest = null;
 
+		const _currentClearColor = new Color( 0x000000 );
+		let _currentClearAlpha = 0;
+
 		//
 
 		let _width = canvas.width;
@@ -204,6 +211,7 @@ class WebGLRenderer {
 
 		const _projScreenMatrix = new Matrix4();
 
+		const _vector2 = new Vector2();
 		const _vector3 = new Vector3();
 
 		const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, isScene: true };
@@ -278,6 +286,12 @@ class WebGLRenderer {
 					}
 
 				}
+
+			}
+
+			if ( _gl instanceof WebGLRenderingContext ) { // @deprecated, r153
+
+				console.warn( 'THREE.WebGLRenderer: WebGL 1 support was deprecated in r153 and will be removed in r163.' );
 
 			}
 
@@ -1042,9 +1056,7 @@ class WebGLRenderer {
 
 			if ( xr.enabled === true && xr.isPresenting === true ) {
 
-				if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
-
-				camera = xr.getCamera(); // use XR camera for rendering
+				camera = xr.updateCameraXR( camera ); // use XR camera for rendering
 
 			}
 
@@ -1090,6 +1102,8 @@ class WebGLRenderer {
 			//
 
 			if ( this.info.autoReset === true ) this.info.reset();
+
+			this.info.render.frame ++;
 
 			//
 
@@ -1324,11 +1338,11 @@ class WebGLRenderer {
 
 		function renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera ) {
 
+			const isWebGL2 = capabilities.isWebGL2;
+
 			if ( _transmissionRenderTarget === null ) {
 
-				const isWebGL2 = capabilities.isWebGL2;
-
-				_transmissionRenderTarget = new WebGLRenderTarget( 1024, 1024, {
+				_transmissionRenderTarget = new WebGLRenderTarget( 1, 1, {
 					generateMipmaps: true,
 					type: extensions.has( 'EXT_color_buffer_half_float' ) ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
@@ -1347,10 +1361,27 @@ class WebGLRenderer {
 
 			}
 
+			_this.getDrawingBufferSize( _vector2 );
+
+			if ( isWebGL2 ) {
+
+				_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
+
+			} else {
+
+				_transmissionRenderTarget.setSize( floorPowerOfTwo( _vector2.x ), floorPowerOfTwo( _vector2.y ) );
+
+			}
+
 			//
 
 			const currentRenderTarget = _this.getRenderTarget();
 			_this.setRenderTarget( _transmissionRenderTarget );
+
+			_this.getClearColor( _currentClearColor );
+			_currentClearAlpha = _this.getClearAlpha();
+			if ( _currentClearAlpha < 1 ) _this.setClearColor( 0xffffff, 0.5 );
+
 			_this.clear();
 
 			// Turn off the features which can affect the frag color for opaque objects pass.
@@ -1400,6 +1431,8 @@ class WebGLRenderer {
 			}
 
 			_this.setRenderTarget( currentRenderTarget );
+
+			_this.setClearColor( _currentClearColor, _currentClearAlpha );
 
 			_this.toneMapping = currentToneMapping;
 
@@ -1604,7 +1637,7 @@ class WebGLRenderer {
 			const colorSpace = ( _currentRenderTarget === null ) ? _this.outputColorSpace : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace );
 			const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
 			const vertexAlphas = material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4;
-			const vertexTangents = !! material.normalMap && !! geometry.attributes.tangent;
+			const vertexTangents = !! geometry.attributes.tangent && ( !! material.normalMap || material.anisotropy > 0 );
 			const morphTargets = !! geometry.morphAttributes.position;
 			const morphNormals = !! geometry.morphAttributes.normal;
 			const morphColors = !! geometry.morphAttributes.color;
@@ -2375,6 +2408,12 @@ class WebGLRenderer {
 			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
 
 		}
+
+	}
+
+	get coordinateSystem() {
+
+		return WebGLCoordinateSystem;
 
 	}
 

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">كائن سهم ثلاثي الأبعاد لتصور الاتجاهات.</p>
+
+		<h2>مثال الكود</h2>
+
+		<code>
+		const dir = new THREE.Vector3( 1, 2, 0 );
+
+		//normalize the direction vector (convert to vector of length 1)
+		dir.normalize();
+
+		const origin = new THREE.Vector3( 0, 0, 0 );
+		const length = 1;
+		const hex = 0xffff00;
+
+		const arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+		scene.add( arrowHelper );
+		</code>
+
+		<h2>أمثلة (Examples)</h2>
+
+		<p>[example:webgl_shadowmesh WebGL / shadowmesh]</p>
+
+		<h2>المنشئ (Constructor)</h2>
+
+		<h3>
+		[name]([param:Vector3 dir], [param:Vector3 origin], [param:Number length],
+		[param:Number hex], [param:Number headLength], [param:Number headWidth])
+		</h3>
+		<p>
+		[page:Vector3 dir] - الاتجاه من المنشأ. يجب أن يكون متجه وحدة. <br />
+		[page:Vector3 origin] - النقطة التي يبدأ فيها السهم.<br />
+		[page:Number length] - طول السهم. الافتراضي هو `1`.<br />
+		[page:Number hex] - قيمة ست عشرية لتحديد اللون. الافتراضي هو
+		0xffff00.<br />
+		[page:Number headLength] - طول رأس السهم. الافتراضي
+		هو 0.2 * الطول.<br />
+		[page:Number headWidth] - عرض رأس السهم. الافتراضي هو
+		0.2 * headLength.<br />
+		</p>
+
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى قاعدة [page:Object3D] class للخصائص المشتركة.</p>
+
+		<h3>[property:Line line]</h3>
+		<p>يحتوي على جزء الخط من المساعد السهم.</p>
+
+		<h3>[property:Mesh cone]</h3>
+		<p>يحتوي على جزء المخروط من المساعد السهم.</p>
+
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى قاعدة [page:Object3D] class للطرق المشتركة.</p>
+
+		<h3>[method:undefined setColor]([param:Color color])</h3>
+		<p>
+		اللون - اللون المطلوب.<br /><br />
+
+		يضبط لون المساعد السهم.
+		</p>
+
+		<h3>
+		[method:undefined setLength]([param:Number length], [param:Number headLength], [param:Number headWidth])
+		</h3>
+		<p>
+		الطول - الطول المطلوب.<br />
+		headLength - طول رأس السهم.<br />
+		headWidth - عرض رأس السهم.<br /><br />
+
+		يضبط طول المساعد السهم.
+		</p>
+
+		<h3>[method:undefined setDirection]([param:Vector3 dir])</h3>
+		<p>
+		dir - الاتجاه المطلوب. يجب أن يكون متجه وحدة.<br /><br />
+
+		يضبط اتجاه المساعد السهم.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		يحرر الموارد المتعلقة بالـ GPU التي تم تخصيصها من قبل هذا المثيل. اتصل بهذه
+		الطريقة كلما لم يعد هذا المثيل مستخدمًا في تطبيقك.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

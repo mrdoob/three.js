@@ -22,6 +22,18 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 		}
 
+		for ( const name in geometry.morphAttributes ) {
+
+			const array = geometry.morphAttributes[ name ];
+
+			for ( let i = 0, l = array.length; i < l; i ++ ) {
+
+				attributes.remove( array[ i ] );
+
+			}
+
+		}
+
 		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
 		delete geometries[ geometry.id ];

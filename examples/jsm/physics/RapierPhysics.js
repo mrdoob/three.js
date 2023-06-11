@@ -1,79 +1,72 @@
-async function RapierPhysics() {
+import { Clock, Vector3, Quaternion, Matrix4 } from 'three';
 
-	const RAPIER = await import( 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.11.2' );
-	
-	await RAPIER.init();
+const RAPIER_PATH = 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.11.2';
 
-	const frameRate = 60;
+const frameRate = 60;
 
-	// Docs: https://rapier.rs/docs/api/javascript/JavaScript3D/	
+const _scale = new Vector3( 1, 1, 1 );
+const ZERO = new Vector3();
 
-	const gravity = { x: 0.0, y: - 9.81, z: 0.0 };
-	const world = new RAPIER.World( gravity );
+let RAPIER = null;
 
-	function getCollider( geometry ) {
+function getCollider( geometry ) {
 
-		const parameters = geometry.parameters;
+	const parameters = geometry.parameters;
 
-		// TODO change type to is*
+	// TODO change type to is*
 
-		if ( geometry.type === 'BoxGeometry' ) {
+	if ( geometry.type === 'BoxGeometry' ) {
 
-			const sx = parameters.width !== undefined ? parameters.width / 2 : 0.5;
-			const sy = parameters.height !== undefined ? parameters.height / 2 : 0.5;
-			const sz = parameters.depth !== undefined ? parameters.depth / 2 : 0.5;
+		const sx = parameters.width !== undefined ? parameters.width / 2 : 0.5;
+		const sy = parameters.height !== undefined ? parameters.height / 2 : 0.5;
+		const sz = parameters.depth !== undefined ? parameters.depth / 2 : 0.5;
 
-			return RAPIER.ColliderDesc.cuboid( sx, sy, sz );
+		return RAPIER.ColliderDesc.cuboid( sx, sy, sz );
 
-		} else if ( geometry.type === 'SphereGeometry' || geometry.type === 'IcosahedronGeometry' ) {
+	} else if ( geometry.type === 'SphereGeometry' || geometry.type === 'IcosahedronGeometry' ) {
 
-			const radius = parameters.radius !== undefined ? parameters.radius : 1;
-
-			return RAPIER.ColliderDesc.ball( radius );
-
-		}
-
-		return null;
+		const radius = parameters.radius !== undefined ? parameters.radius : 1;
+		return RAPIER.ColliderDesc.ball( radius );
 
 	}
 
+	return null;
+
+}
+
+async function RapierPhysics() {
+
+	if ( RAPIER === null ) {
+
+		RAPIER = await import( RAPIER_PATH );
+		await RAPIER.init();
+
+	}
+
+	// Docs: https://rapier.rs/docs/api/javascript/JavaScript3D/	
+
+	const gravity = new Vector3( 0.0, - 9.81, 0.0 );
+	const world = new RAPIER.World( gravity );
+
 	const meshes = [];
 	const meshMap = new WeakMap();
+
+	const _vector = new Vector3();
+	const _quaternion = new Quaternion();
+	const _matrix = new Matrix4();
 
 	function addMesh( mesh, mass = 0, restitution = 0 ) {
 
 		const shape = getCollider( mesh.geometry );
 
-		if ( shape !== null ) {
+		if ( shape === null ) return;
 
-			shape.setMass( mass );
-			shape.setRestitution( restitution );
-	
-			if ( mesh.isInstancedMesh ) {
+		shape.setMass( mass );
+		shape.setRestitution( restitution );
 
-				handleInstancedMesh( mesh, mass, shape );
-
-			} else if ( mesh.isMesh ) {
-
-				handleMesh( mesh, mass, shape );
-
-			}
-
-		}
-
-	}
-
-	function handleMesh( mesh, mass, shape ) {
-
-		const position = mesh.position;
-		const quaternion = mesh.quaternion;
-
-		const desc = mass > 0 ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.fixed();
-		desc.setTranslation( position.x, position.y, position.z );
-		desc.setRotation( quaternion );
-
-		const body = world.createRigidBody( desc );
-		world.createCollider( shape, body );
+		const body = mesh.isInstancedMesh
+							? createInstancedBody( mesh, mass, shape )
+							: createBody( mesh.position, mesh.quaternion, mass, shape );
 
 		if ( mass > 0 ) {
 
@@ -84,7 +77,7 @@ async function RapierPhysics() {
 
 	}
 
-	function handleInstancedMesh( mesh, mass, shape ) {
+	function createInstancedBody( mesh, mass, shape ) {
 
 		const array = mesh.instanceMatrix.array;
 
@@ -92,106 +85,102 @@ async function RapierPhysics() {
 
 		for ( let i = 0; i < mesh.count; i ++ ) {
 
-			const index = i * 16;
-
-			const desc = mass > 0 ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.fixed();
-			desc.setTranslation( array[ index + 12 ], array[ index + 13 ], array[ index + 14 ] );
-
-			const body = world.createRigidBody( desc );
-			world.createCollider( shape, body );
-
-			bodies.push( body );
+			const position = _vector.fromArray( array, i * 16 + 12 );
+			bodies.push( createBody( position, null, mass, shape ) );
 
 		}
 
-		if ( mass > 0 ) {
-
-			meshes.push( mesh );
-			meshMap.set( mesh, bodies );
-
-		}
+		return bodies;
 
 	}
 
-	const vector = { x: 0, y: 0, z: 0 };
+	function createBody( position, quaternion, mass, shape ) {
+
+		const desc = mass > 0 ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.fixed();
+		desc.setTranslation( ...position );
+		if ( quaternion !== null ) desc.setRotation( quaternion );
+
+		const body = world.createRigidBody( desc );
+		world.createCollider( shape, body );
+
+		return body;
+
+	}
 
 	function setMeshPosition( mesh, position, index = 0 ) {
 
+		let body = meshMap.get( mesh );
+
 		if ( mesh.isInstancedMesh ) {
 
-			const bodies = meshMap.get( mesh );
-			const body = bodies[ index ];
-
-			body.setAngvel( vector );
-			body.setLinvel( vector );
-			body.setTranslation( position );
-
-		} else if ( mesh.isMesh ) {
-
-			const body = meshMap.get( mesh );
-
-			body.setAngvel( vector );
-			body.setLinvel( vector );
-			body.setTranslation( position );
+			body = body[ index ];
 
 		}
+
+		body.setAngvel( ZERO );
+		body.setLinvel( ZERO );
+		body.setTranslation( position );
+
+	}
+
+	function setMeshVelocity( mesh, velocity, index = 0 ) {
+
+		let body = meshMap.get( mesh );
+
+		if ( mesh.isInstancedMesh ) {
+
+			body = body[ index ];
+
+		}
+
+		body.setLinvel( velocity );
 
 	}
 
 	//
 
-	let lastTime = 0;
+	const clock = new Clock();
 
 	function step() {
 
-		const time = performance.now();
+		world.timestep = clock.getDelta();
+		world.step();
 
-		if ( lastTime > 0 ) {
+		//
 
-			const delta = ( time - lastTime ) / 1000;
+		for ( let i = 0, l = meshes.length; i < l; i ++ ) {
 
-			world.timestep = delta;
-			world.step();
+			const mesh = meshes[ i ];
 
-			//
+			if ( mesh.isInstancedMesh ) {
 
-			for ( let i = 0, l = meshes.length; i < l; i ++ ) {
+				const array = mesh.instanceMatrix.array;
+				const bodies = meshMap.get( mesh );
 
-				const mesh = meshes[ i ];
+				for ( let j = 0; j < bodies.length; j ++ ) {
 
-				if ( mesh.isInstancedMesh ) {
+					const body = bodies[ j ];
 
-					const array = mesh.instanceMatrix.array;
-					const bodies = meshMap.get( mesh );
+					const position = body.translation();
+					_quaternion.copy( body.rotation() );
 
-					for ( let j = 0; j < bodies.length; j ++ ) {
-
-						const body = bodies[ j ];
-
-						const position = body.translation();
-						const quaternion = body.rotation();
-
-						compose( position, quaternion, array, j * 16 );
-
-					}
-
-					mesh.instanceMatrix.needsUpdate = true;
-					mesh.computeBoundingSphere();
-
-				} else if ( mesh.isMesh ) {
-
-					const body = meshMap.get( mesh );
-
-					mesh.position.copy( body.translation() );
-					mesh.quaternion.copy( body.rotation() );
+					_matrix.compose( position, _quaternion, _scale ).toArray( array, j * 16 );
 
 				}
+
+				mesh.instanceMatrix.needsUpdate = true;
+				mesh.computeBoundingSphere();
+
+			} else {
+
+				const body = meshMap.get( mesh );
+
+				mesh.position.copy( body.translation() );
+				mesh.quaternion.copy( body.rotation() );
 
 			}
 
 		}
-
-		lastTime = time;
 
 	}
 
@@ -201,38 +190,9 @@ async function RapierPhysics() {
 
 	return {
 		addMesh: addMesh,
-		setMeshPosition: setMeshPosition
+		setMeshPosition: setMeshPosition,
+		setMeshVelocity: setMeshVelocity
 	};
-
-}
-
-function compose( position, quaternion, array, index ) {
-
-	const x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
-	const x2 = x + x, y2 = y + y, z2 = z + z;
-	const xx = x * x2, xy = x * y2, xz = x * z2;
-	const yy = y * y2, yz = y * z2, zz = z * z2;
-	const wx = w * x2, wy = w * y2, wz = w * z2;
-
-	array[ index + 0 ] = ( 1 - ( yy + zz ) );
-	array[ index + 1 ] = ( xy + wz );
-	array[ index + 2 ] = ( xz - wy );
-	array[ index + 3 ] = 0;
-
-	array[ index + 4 ] = ( xy - wz );
-	array[ index + 5 ] = ( 1 - ( xx + zz ) );
-	array[ index + 6 ] = ( yz + wx );
-	array[ index + 7 ] = 0;
-
-	array[ index + 8 ] = ( xz + wy );
-	array[ index + 9 ] = ( yz - wx );
-	array[ index + 10 ] = ( 1 - ( xx + yy ) );
-	array[ index + 11 ] = 0;
-
-	array[ index + 12 ] = position.x;
-	array[ index + 13 ] = position.y;
-	array[ index + 14 ] = position.z;
-	array[ index + 15 ] = 1;
 
 }
 

@@ -41,8 +41,6 @@
 			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 			let container, stats, loader;
 
 			let camera, scene, renderer;
@@ -74,11 +72,11 @@
 				camera.position.z = 1200;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x111111 );
+				scene.background = new THREE.Color( 0x494949 );
 
 				// LIGHTS
 
-				ambientLight = new THREE.AmbientLight( 0x444444 );
+				ambientLight = new THREE.AmbientLight( 0x8d8d8d );
 				scene.add( ambientLight );
 
 				pointLight = new THREE.PointLight( 0xffffff, 2, 1000 );
@@ -101,7 +99,7 @@
 				const normalMap = textureLoader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' );
 
 				const material = new THREE.MeshPhongMaterial( {
-					color: 0xdddddd,
+					color: 0xefefef,
 					specular: 0x222222,
 					shininess: 35,
 					map: diffuseMap,

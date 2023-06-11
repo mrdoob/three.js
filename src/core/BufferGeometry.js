@@ -726,13 +726,6 @@ class BufferGeometry extends EventDispatcher {
 
 	}
 
-	merge() { // @deprecated, r144
-
-		console.error( 'THREE.BufferGeometry.merge() has been removed. Use THREE.BufferGeometryUtils.mergeGeometries() instead.' );
-		return this;
-
-	}
-
 	normalizeNormals() {
 
 		const normals = this.attributes.normal;
@@ -855,7 +848,7 @@ class BufferGeometry extends EventDispatcher {
 
 		const data = {
 			metadata: {
-				version: 4.5,
+				version: 4.6,
 				type: 'BufferGeometry',
 				generator: 'BufferGeometry.toJSON'
 			}

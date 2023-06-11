@@ -39,8 +39,6 @@
 		import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
 		import { ToonShader1, ToonShader2, ToonShaderHatching, ToonShaderDotted } from 'three/addons/shaders/ToonShader.js';
 
-		THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 		let container, stats;
 
 		let camera, scene, renderer;
@@ -80,11 +78,11 @@
 			light.position.set( 0.5, 0.5, 1 );
 			scene.add( light );
 
-			pointLight = new THREE.PointLight( 0xff3300 );
+			pointLight = new THREE.PointLight( 0xff7c00 );
 			pointLight.position.set( 0, 0, 100 );
 			scene.add( pointLight );
 
-			ambientLight = new THREE.AmbientLight( 0x080808 );
+			ambientLight = new THREE.AmbientLight( 0x323232 );
 			scene.add( ambientLight );
 
 			// MATERIALS
@@ -172,17 +170,18 @@
 			const texture = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 			texture.wrapS = THREE.RepeatWrapping;
 			texture.wrapT = THREE.RepeatWrapping;
+			texture.colorSpace = THREE.SRGBColorSpace;
 
 			const materials = {
-				'shiny': new THREE.MeshStandardMaterial( { color: 0x550000, envMap: reflectionCube, roughness: 0.1, metalness: 1.0 } ),
+				'shiny': new THREE.MeshStandardMaterial( { color: 0x9c0000, envMap: reflectionCube, roughness: 0.1, metalness: 1.0 } ),
 				'chrome': new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } ),
 				'liquid': new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: refractionCube, refractionRatio: 0.85 } ),
-				'matte': new THREE.MeshPhongMaterial( { specular: 0x111111, shininess: 1 } ),
+				'matte': new THREE.MeshPhongMaterial( { specular: 0x494949, shininess: 1 } ),
 				'flat': new THREE.MeshLambertMaterial( { /*TODO flatShading: true */ } ),
 				'textured': new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture } ),
 				'colors': new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: true } ),
 				'multiColors': new THREE.MeshPhongMaterial( { shininess: 2, vertexColors: true } ),
-				'plastic': new THREE.MeshPhongMaterial( { specular: 0x888888, shininess: 250 } ),
+				'plastic': new THREE.MeshPhongMaterial( { specular: 0xc1c1c1, shininess: 250 } ),
 				'toon1': toonMaterial1,
 				'toon2': toonMaterial2,
 				'hatching': hatchingMaterial,
@@ -286,12 +285,12 @@
 
 			const rainbow = [
 				new THREE.Color( 0xff0000 ),
-				new THREE.Color( 0xff7f00 ),
+				new THREE.Color( 0xffbb00 ),
 				new THREE.Color( 0xffff00 ),
 				new THREE.Color( 0x00ff00 ),
 				new THREE.Color( 0x0000ff ),
-				new THREE.Color( 0x4b0082 ),
-				new THREE.Color( 0x9400d3 )
+				new THREE.Color( 0x9400bd ),
+				new THREE.Color( 0xc800eb )
 			];
 			const subtract = 12;
 			const strength = 1.2 / ( ( Math.sqrt( numblobs ) - 1 ) / 4 + 1 );

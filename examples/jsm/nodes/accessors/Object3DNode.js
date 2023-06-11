@@ -32,7 +32,7 @@ class Object3DNode extends Node {
 
 			return 'mat3';
 
-		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION ) {
+		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION || scope === Object3DNode.SCALE ) {
 
 			return 'vec3';
 
@@ -63,6 +63,12 @@ class Object3DNode extends Node {
 			uniformNode.value = uniformNode.value || new Vector3();
 
 			uniformNode.value.setFromMatrixPosition( object.matrixWorld );
+
+		} else if ( scope === Object3DNode.SCALE ) {
+
+			uniformNode.value = uniformNode.value || new Vector3();
+
+			uniformNode.value.setFromMatrixScale( object.matrixWorld );
 
 		} else if ( scope === Object3DNode.DIRECTION ) {
 
@@ -95,7 +101,7 @@ class Object3DNode extends Node {
 
 			this._uniformNode.nodeType = 'mat3';
 
-		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION ) {
+		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION || scope === Object3DNode.SCALE ) {
 
 			this._uniformNode.nodeType = 'vec3';
 
@@ -127,6 +133,7 @@ Object3DNode.VIEW_MATRIX = 'viewMatrix';
 Object3DNode.NORMAL_MATRIX = 'normalMatrix';
 Object3DNode.WORLD_MATRIX = 'worldMatrix';
 Object3DNode.POSITION = 'position';
+Object3DNode.SCALE = 'scale';
 Object3DNode.VIEW_POSITION = 'viewPosition';
 Object3DNode.DIRECTION = 'direction';
 
@@ -137,6 +144,7 @@ export const objectViewMatrix = nodeProxy( Object3DNode, Object3DNode.VIEW_MATRI
 export const objectNormalMatrix = nodeProxy( Object3DNode, Object3DNode.NORMAL_MATRIX );
 export const objectWorldMatrix = nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
 export const objectPosition = nodeProxy( Object3DNode, Object3DNode.POSITION );
+export const objectScale = nodeProxy( Object3DNode, Object3DNode.SCALE );
 export const objectViewPosition = nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
 
 addNodeClass( Object3DNode );

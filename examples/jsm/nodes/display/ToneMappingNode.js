@@ -1,13 +1,13 @@
 import TempNode from '../core/TempNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { ShaderNode, nodeObject, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
+import { ShaderNode, nodeObject, float, mat3 } from '../shadernode/ShaderNode.js';
 
 import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping } from 'three';
 
 // exposure only
 const LinearToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
 
-	return color.mul( exposure );
+	return color.mul( exposure ).clamp();
 
 } );
 
@@ -49,16 +49,16 @@ const ACESFilmicToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
 
 	// sRGB => XYZ => D65_2_D60 => AP1 => RRT_SAT
 	const ACESInputMat = mat3(
-		vec3( 0.59719, 0.07600, 0.02840 ), // transposed from source
-		vec3( 0.35458, 0.90834, 0.13383 ),
-		vec3( 0.04823, 0.01566, 0.83777 )
+		0.59719, 0.35458, 0.04823,
+		0.07600, 0.90834, 0.01566,
+		0.02840, 0.13383, 0.83777
 	);
 
 	// ODT_SAT => XYZ => D60_2_D65 => sRGB
 	const ACESOutputMat = mat3(
-		vec3( 1.60475, - 0.10208, - 0.00327 ), // transposed from source
-		vec3( - 0.53108, 1.10813, - 0.07276 ),
-		vec3( - 0.07367, - 0.00605, 1.07602 )
+		1.60475, - 0.53108, - 0.07367,
+		- 0.10208, 1.10813, - 0.00605,
+		- 0.00327, - 0.07276, 1.07602
 	);
 
 	color = color.mul( exposure ).div( 0.6 );
@@ -92,6 +92,15 @@ class ToneMappingNode extends TempNode {
 
 		this.exposureNode = exposureNode;
 		this.colorNode = colorNode;
+
+	}
+
+	getCacheKey() {
+
+		let cacheKey = super.getCacheKey();
+		cacheKey = '{toneMapping:' + this.toneMapping + ',nodes:' + cacheKey + '}';
+
+		return cacheKey;
 
 	}
 

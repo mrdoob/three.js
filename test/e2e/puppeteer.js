@@ -70,7 +70,6 @@ const exceptionList = [
 	'webgl_modifier_simplifier',
 	'webgl_multiple_canvases_circle',
 	'webgl_multiple_elements_text',
-	'webgl_shaders_tonemapping',
 
 	// Unknown
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
@@ -78,7 +77,6 @@ const exceptionList = [
 	'webgl_buffergeometry_glbufferattribute',
 	'webgl_clipping_advanced',
 	'webgl_lensflares',
-	'webgl_lines_sphere',
 	'webgl_lights_spotlights',
 	'webgl_loader_imagebitmap',
 	'webgl_loader_texture_lottie',
@@ -94,7 +92,41 @@ const exceptionList = [
 	'webgl_shadowmap',
 	'webgl_shadowmap_progressive',
 	'webgl_test_memory2',
-	'webgl_tiled_forward'
+	'webgl_tiled_forward',
+
+	// TODO: implement determinism for setTimeout and setInterval
+	// could it fix some examples from above?
+	'physics_rapier_instancing',
+
+	// Awaiting for WebGPU support
+	'webgpu_audio_processing',
+	'webgpu_backdrop',
+	'webgpu_backdrop_area',
+	'webgpu_clearcoat',
+	'webgpu_compute',
+	'webgpu_cubemap_adjustments',
+	'webgpu_cubemap_dynamic',
+	'webgpu_cubemap_mix',
+	'webgpu_depth_texture',
+	'webgpu_equirectangular',
+	'webgpu_instance_mesh',
+	'webgpu_instance_uniform',
+	'webgpu_lights_custom',
+	'webgpu_lights_ies_spotlight',
+	'webgpu_lights_phong',
+	'webgpu_lights_selective',
+	'webgpu_loader_gltf',
+	'webgpu_loader_gltf_compressed',
+	'webgpu_materials',
+	'webgpu_materials_video',
+	'webgpu_particles',
+	'webgpu_rtt',
+	'webgpu_sandbox',
+	'webgpu_shadowmap',
+	'webgpu_skinning',
+	'webgpu_skinning_instancing',
+	'webgpu_skinning_points',
+	'webgpu_sprites'
 
 ];
 

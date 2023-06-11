@@ -24,6 +24,8 @@ const assets = [
 	'../examples/jsm/libs/draco/gltf/draco_decoder.wasm',
 	'../examples/jsm/libs/draco/gltf/draco_wasm_wrapper.js',
 
+	'../examples/jsm/libs/meshopt_decoder.module.js',
+
 	'../examples/jsm/libs/motion-controllers.module.js',
 
 	'../examples/jsm/libs/rhino3dm/rhino3dm.wasm',
@@ -37,6 +39,7 @@ const assets = [
 	'../examples/jsm/loaders/FBXLoader.js',
 	'../examples/jsm/loaders/GLTFLoader.js',
 	'../examples/jsm/loaders/KMZLoader.js',
+	'../examples/jsm/loaders/KTX2Loader.js',
 	'../examples/jsm/loaders/IFCLoader.js',
 	'../examples/jsm/loaders/ifc/web-ifc-api.js',
 	'../examples/jsm/loaders/ifc/web-ifc.wasm',
@@ -73,8 +76,6 @@ const assets = [
 	'../examples/jsm/exporters/USDZExporter.js',
 
 	'../examples/jsm/helpers/VertexNormalsHelper.js',
-
-	'../examples/jsm/geometries/TeapotGeometry.js',
 
 	'../examples/jsm/webxr/VRButton.js',
 	'../examples/jsm/webxr/XRControllerModelFactory.js',
@@ -176,7 +177,6 @@ const assets = [
 	'./js/Sidebar.Geometry.TorusGeometry.js',
 	'./js/Sidebar.Geometry.TorusKnotGeometry.js',
 	'./js/Sidebar.Geometry.TubeGeometry.js',
-	'./js/Sidebar.Geometry.TeapotGeometry.js',
 	'./js/Sidebar.Material.js',
 	'./js/Sidebar.Material.BooleanProperty.js',
 	'./js/Sidebar.Material.ColorProperty.js',

@@ -121,7 +121,7 @@ function getDifferingProp( geometryA, geometryB ) {
 // Compare json file with its source geometry.
 function checkGeometryJsonWriting( geom, json ) {
 
-	QUnit.assert.equal( json.metadata.version, '4.5', 'check metadata version' );
+	QUnit.assert.equal( json.metadata.version, '4.6', 'check metadata version' );
 	QUnit.assert.equalKey( geom, json, 'type' );
 	QUnit.assert.equalKey( geom, json, 'uuid' );
 	QUnit.assert.equal( json.id, undefined, 'should not persist id' );
@@ -270,7 +270,7 @@ function checkLightCopyClone( assert, light ) {
 // Compare json file with its source Light.
 function checkLightJsonWriting( assert, light, json ) {
 
-	assert.equal( json.metadata.version, '4.5', 'check metadata version' );
+	assert.equal( json.metadata.version, '4.6', 'check metadata version' );
 
 	const object = json.object;
 	assert.equalKey( light, object, 'type' );

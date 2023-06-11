@@ -64,6 +64,12 @@ export default /* glsl */`
 	varying vec2 vRoughnessMapUv;
 
 #endif
+#ifdef USE_ANISOTROPYMAP
+
+	uniform mat3 anisotropyMapTransform;
+	varying vec2 vAnisotropyMapUv;
+
+#endif
 #ifdef USE_CLEARCOATMAP
 
 	uniform mat3 clearcoatMapTransform;

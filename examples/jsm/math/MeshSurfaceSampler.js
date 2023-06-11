@@ -1,5 +1,6 @@
 import {
 	Triangle,
+	Vector2,
 	Vector3
 } from 'three';
 
@@ -16,6 +17,7 @@ import {
 
 const _face = new Triangle();
 const _color = new Vector3();
+const _uva = new Vector2(), _uvb = new Vector2(), _uvc = new Vector2();
 
 class MeshSurfaceSampler {
 
@@ -35,7 +37,9 @@ class MeshSurfaceSampler {
 		this.randomFunction = Math.random;
 
 		this.positionAttribute = this.geometry.getAttribute( 'position' );
+		this.normalAttribute = this.geometry.getAttribute( 'normal' );
 		this.colorAttribute = this.geometry.getAttribute( 'color' );
+		this.uvAttribute = this.geometry.getAttribute( 'uv' );
 		this.weightAttribute = null;
 
 		this.distribution = null;
@@ -106,10 +110,10 @@ class MeshSurfaceSampler {
 
 	}
 
-	sample( targetPosition, targetNormal, targetColor ) {
+	sample( targetPosition, targetNormal, targetColor, targetUV ) {
 
 		const faceIndex = this.sampleFaceIndex();
-		return this.sampleFace( faceIndex, targetPosition, targetNormal, targetColor );
+		return this.sampleFace( faceIndex, targetPosition, targetNormal, targetColor, targetUV );
 
 	}
 
@@ -154,7 +158,7 @@ class MeshSurfaceSampler {
 
 	}
 
-	sampleFace( faceIndex, targetPosition, targetNormal, targetColor ) {
+	sampleFace( faceIndex, targetPosition, targetNormal, targetColor, targetUV ) {
 
 		let u = this.randomFunction();
 		let v = this.randomFunction();
@@ -178,7 +182,18 @@ class MeshSurfaceSampler {
 
 		if ( targetNormal !== undefined ) {
 
-			_face.getNormal( targetNormal );
+			if ( this.normalAttribute !== undefined ) {
+
+				_face.a.fromBufferAttribute( this.normalAttribute, faceIndex * 3 );
+				_face.b.fromBufferAttribute( this.normalAttribute, faceIndex * 3 + 1 );
+				_face.c.fromBufferAttribute( this.normalAttribute, faceIndex * 3 + 2 );
+				targetNormal.set( 0, 0, 0 ).addScaledVector( _face.a, u ).addScaledVector( _face.b, v ).addScaledVector( _face.c, 1 - ( u + v ) ).normalize();
+
+			} else {
+
+				_face.getNormal( targetNormal );
+				
+			}
 
 		}
 
@@ -197,6 +212,15 @@ class MeshSurfaceSampler {
 			targetColor.r = _color.x;
 			targetColor.g = _color.y;
 			targetColor.b = _color.z;
+
+		}
+
+		if ( targetUV !== undefined && this.uvAttribute !== undefined ) {
+
+			_uva.fromBufferAttribute( this.uvAttribute, faceIndex * 3 );
+			_uvb.fromBufferAttribute( this.uvAttribute, faceIndex * 3 + 1 );
+			_uvc.fromBufferAttribute( this.uvAttribute, faceIndex * 3 + 2 );
+			targetUV.set( 0, 0 ).addScaledVector( _uva, u ).addScaledVector( _uvb, v ).addScaledVector( _uvc, 1 - ( u + v ) );
 
 		}
 

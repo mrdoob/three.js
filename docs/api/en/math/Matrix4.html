@@ -62,7 +62,7 @@
 
 		<h2>A Note on Row-Major and Column-Major Ordering</h2>
 		<p>
-			The [page:set]() method takes arguments in
+			The constructor and [page:set]() method take arguments in
 			[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major] 
 			order, while internally they are stored in the [page:.elements elements] array in column-major order.<br /><br />
 
@@ -117,11 +117,14 @@ m.elements = [ 11, 21, 31, 41,
 
 		<h2>Constructor</h2>
 
-		<h3>[name]()</h3>
+		<h3>[name]( [param:Number n11], [param:Number n12], [param:Number n13], [param:Number n14],
+			[param:Number n21], [param:Number n22], [param:Number n23], [param:Number n24],
+			[param:Number n31], [param:Number n32], [param:Number n33], [param:Number n34],
+			[param:Number n41], [param:Number n42], [param:Number n43], [param:Number n44] )</h3>
 
 		<p>
-			Creates and initializes the [name] to the 4x4
-			[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
+			Creates a 4x4 matrix with the given arguments in row-major order. If no arguments are provided, the constructor initializes 
+			the [name] to the 4x4 [link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
 		</p>
 
 		<h2>Properties</h2>
@@ -393,15 +396,12 @@ xz, yz, 1, 0,
 0, 0, 0, 1 </code>
 		</p>
 
+		<h3>[method:this makeTranslation]( [param:Vector3 v] )</h3>
 		<h3>
-			[method:this makeTranslation]( [param:Float x], [param:Float y], [param:Float z] )
+			[method:this makeTranslation]( [param:Float x], [param:Float y], [param:Float z] ) // optional API
 		</h3>
 		<p>
-			[page:Float x] - the amount to translate in the X axis.<br />
-			[page:Float y] - the amount to translate in the Y axis.<br />
-			[page:Float z] - the amount to translate in the Z axis.<br /><br />
-
-			Sets this matrix as a translation transform:
+			Sets this matrix as a translation transform from vector [page:Vector3 v], or numbers [page:Float x], [page:Float y] and [page:Float z]:
 			<code> 
 1, 0, 0, x, 
 0, 1, 0, y, 

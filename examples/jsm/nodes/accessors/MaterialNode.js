@@ -173,6 +173,34 @@ class MaterialNode extends Node {
 
 			}
 
+		} else if ( scope === MaterialNode.CLEARCOAT ) {
+
+			const clearcoatNode = this.getFloat( 'clearcoat' );
+
+			if ( material.clearcoatMap && material.clearcoatMap.isTexture === true ) {
+
+				node = clearcoatNode.mul( this.getTexture( 'clearcoatMap' ).r );
+
+			} else {
+
+				node = clearcoatNode;
+
+			}
+
+		} else if ( scope === MaterialNode.CLEARCOAT_ROUGHNESS ) {
+
+			const clearcoatRoughnessNode = this.getFloat( 'clearcoatRoughness' );
+
+			if ( material.clearcoatRoughnessMap && material.clearcoatRoughnessMap.isTexture === true ) {
+
+				node = clearcoatRoughnessNode.mul( this.getTexture( 'clearcoatRoughnessMap' ).r );
+
+			} else {
+
+				node = clearcoatRoughnessNode;
+
+			}
+
 		} else if ( scope === MaterialNode.ROTATION ) {
 
 			node = this.getFloat( 'rotation' );
@@ -248,6 +276,8 @@ MaterialNode.SPECULAR_COLOR = 'specularColor';
 MaterialNode.REFLECTIVITY = 'reflectivity';
 MaterialNode.ROUGHNESS = 'roughness';
 MaterialNode.METALNESS = 'metalness';
+MaterialNode.CLEARCOAT = 'clearcoat';
+MaterialNode.CLEARCOAT_ROUGHNESS = 'clearcoatRoughness';
 MaterialNode.EMISSIVE = 'emissive';
 MaterialNode.ROTATION = 'rotation';
 MaterialNode.UV = 'uv';
@@ -264,6 +294,8 @@ export const materialSpecularColor = nodeImmutable( MaterialNode, MaterialNode.S
 export const materialReflectivity = nodeImmutable( MaterialNode, MaterialNode.REFLECTIVITY );
 export const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
 export const materialMetalness = nodeImmutable( MaterialNode, MaterialNode.METALNESS );
+export const materialClearcoat = nodeImmutable( MaterialNode, MaterialNode.CLEARCOAT );
+export const materialClearcoatRoughness = nodeImmutable( MaterialNode, MaterialNode.CLEARCOAT_ROUGHNESS );
 export const materialRotation = nodeImmutable( MaterialNode, MaterialNode.ROTATION );
 
 addNodeClass( MaterialNode );

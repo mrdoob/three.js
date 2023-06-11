@@ -40,8 +40,8 @@
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
-
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
 			let camera, scene, renderer, composer;
 			let object, light;
@@ -99,7 +99,7 @@
 
 				}
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new THREE.AmbientLight( 0x666666 ) );
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 );
@@ -112,6 +112,9 @@
 
 				glitchPass = new GlitchPass();
 				composer.addPass( glitchPass );
+
+				const outputPass = new ShaderPass( GammaCorrectionShader );
+				composer.addPass( outputPass );
 
 
 				//

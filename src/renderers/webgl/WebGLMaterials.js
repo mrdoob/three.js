@@ -289,6 +289,8 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.alphaMap.value = material.alphaMap;
 
+			refreshTransformUniform( material.alphaMap, uniforms.alphaMapTransform );
+
 		}
 
 		if ( material.alphaTest > 0 ) {
@@ -316,6 +318,8 @@ function WebGLMaterials( renderer, properties ) {
 		if ( material.alphaMap ) {
 
 			uniforms.alphaMap.value = material.alphaMap;
+
+			refreshTransformUniform( material.alphaMap, uniforms.alphaMapTransform );
 
 		}
 
@@ -495,6 +499,20 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.attenuationDistance.value = material.attenuationDistance;
 			uniforms.attenuationColor.value.copy( material.attenuationColor );
+
+		}
+
+		if ( material.anisotropy > 0 ) {
+
+			uniforms.anisotropyVector.value.set( material.anisotropy * Math.cos( material.anisotropyRotation ), material.anisotropy * Math.sin( material.anisotropyRotation ) );
+
+			if ( material.anisotropyMap ) {
+
+				uniforms.anisotropyMap.value = material.anisotropyMap;
+
+				refreshTransformUniform( material.anisotropyMap, uniforms.anisotropyMapTransform );
+
+			}
 
 		}
 

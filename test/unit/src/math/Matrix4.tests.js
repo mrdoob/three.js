@@ -72,6 +72,26 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.ok( ! matrixEquals4( a, b ), 'Passed!' );
 
+			const c = new Matrix4( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+			assert.ok( c.elements[ 0 ] == 0 );
+			assert.ok( c.elements[ 1 ] == 4 );
+			assert.ok( c.elements[ 2 ] == 8 );
+			assert.ok( c.elements[ 3 ] == 12 );
+			assert.ok( c.elements[ 4 ] == 1 );
+			assert.ok( c.elements[ 5 ] == 5 );
+			assert.ok( c.elements[ 6 ] == 9 );
+			assert.ok( c.elements[ 7 ] == 13 );
+			assert.ok( c.elements[ 8 ] == 2 );
+			assert.ok( c.elements[ 9 ] == 6 );
+			assert.ok( c.elements[ 10 ] == 10 );
+			assert.ok( c.elements[ 11 ] == 14 );
+			assert.ok( c.elements[ 12 ] == 3 );
+			assert.ok( c.elements[ 13 ] == 7 );
+			assert.ok( c.elements[ 14 ] == 11 );
+			assert.ok( c.elements[ 15 ] == 15 );
+
+			assert.ok( ! matrixEquals4( a, c ), 'Passed!' );
+
 		} );
 
 		// PUBLIC STUFF
@@ -566,6 +586,9 @@ export default QUnit.module( 'Maths', () => {
 			const c = new Matrix4().set( 1, 0, 0, 2, 0, 1, 0, 3, 0, 0, 1, 4, 0, 0, 0, 1 );
 
 			a.makeTranslation( b.x, b.y, b.z );
+			assert.ok( matrixEquals4( a, c ), 'Passed!' );
+
+			a.makeTranslation( b );
 			assert.ok( matrixEquals4( a, c ), 'Passed!' );
 
 		} );

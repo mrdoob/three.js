@@ -112,6 +112,14 @@ uniform float opacity;
 	#endif
 #endif
 
+#ifdef USE_ANISOTROPY
+	uniform vec2 anisotropyVector;
+
+	#ifdef USE_ANISOTROPYMAP
+		uniform sampler2D anisotropyMap;
+	#endif
+#endif
+
 varying vec3 vViewPosition;
 
 #include <common>
@@ -203,7 +211,7 @@ void main() {
 
 	#include <output_fragment>
 	#include <tonemapping_fragment>
-	#include <encodings_fragment>
+	#include <colorspace_fragment>
 	#include <fog_fragment>
 	#include <premultiplied_alpha_fragment>
 	#include <dithering_fragment>

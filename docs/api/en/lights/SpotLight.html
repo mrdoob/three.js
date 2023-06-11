@@ -52,13 +52,13 @@
 			[page:Integer color] - (optional) hexadecimal color of the light. Default
 			is 0xffffff (white).<br />
 			[page:Float intensity] - (optional) numeric value of the light's
-			strength/intensity. Default is 1.<br />
-			[page:Float distance] - Maximum range of the light. Default is 0 (no
+			strength/intensity. Default is `1`.<br />
+			[page:Float distance] - Maximum range of the light. Default is `0` (no
 			limit).<br />
 			[page:Radians angle] - Maximum angle of light dispersion from its
 			direction whose upper bound is Math.PI/2.<br />
 			[page:Float penumbra] - Percent of the spotlight cone that is attenuated
-			due to penumbra. Takes values between zero and 1. Default is zero.<br />
+			due to penumbra. Takes values between zero and `1`. Default is zero.<br />
 			[page:Float decay] - The amount the light dims along the distance of the
 			light.<br /><br />
 			Creates a new [name].
@@ -95,7 +95,7 @@
 			at the light's position down to zero at this distance from the light.
 		</p>
 		<p>
-			`[page:WebGLRenderer.physicallyCorrectLights Physically correct] mode` —
+			When [page:WebGLRenderer.useLegacyLights legacy lighting mode] is disabled —
 			When distance is zero, light will attenuate according to inverse-square
 			law to infinite distance. When distance is non-zero, light will attenuate
 			according to inverse-square law until near the distance cutoff, where it
@@ -107,7 +107,7 @@
 		<h3>[property:Float intensity]</h3>
 		<p>
 			The light's intensity. Default is `1`.<br />
-			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode,
+			When [page:WebGLRenderer.useLegacyLights legacy lighting mode] is disabled,
 			intensity is the luminous intensity of the light measured in candela
 			(cd).<br /><br />
 			Changing the intensity will also change the light's power.
@@ -119,7 +119,7 @@
 		<h3>[property:Float penumbra]</h3>
 		<p>
 			Percent of the spotlight cone that is attenuated due to penumbra. Takes
-			values between zero and 1. The default is `0.0`.
+			values between zero and `1`. The default is `0.0`.
 		</p>
 
 		<h3>[property:Vector3 position]</h3>
@@ -131,7 +131,7 @@
 		<h3>[property:Float power]</h3>
 		<p>
 			The light's power.<br />
-			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode,
+			When [page:WebGLRenderer.useLegacyLights legacy lighting mode] is disabled,
 			power is the luminous power of the light measured in lumens (lm).
 			<br /><br />
 			Changing the power will also change the light's intensity.
@@ -143,7 +143,7 @@
 		<h3>[property:Object3D target]</h3>
 		<p>
 			The Spotlight points from its [page:.position position] to
-			target.position. The default position of the target is *(0, 0, 0)*.<br />
+			target.position. The default position of the target is `(0, 0, 0)`.<br />
 			*Note*: For the target's position to be changed to anything other than the
 			default, it must be added to the [page:Scene scene] using
 			<code> scene.add( light.target ); </code>

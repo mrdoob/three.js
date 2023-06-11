@@ -345,6 +345,9 @@ const BokehShader = {
 
 			gl_FragColor.rgb = col;
 			gl_FragColor.a = 1.0;
+
+			#include <tonemapping_fragment>
+			#include <colorspace_fragment>
 		}`
 
 };

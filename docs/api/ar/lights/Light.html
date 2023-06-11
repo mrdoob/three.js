@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			الفئة الأساسية المجردة للأضواء - ترث جميع أنواع الأضواء الأخرى
+			الخصائص والطرق الموصوفة هنا.
+		</p>
+			
+		<h2>المنشئ (Constructor)</h2>
+			
+		<h3>[name]( [param:Integer color], [param:Float intensity] )</h3>
+		<p>
+		[page:Integer color] - (اختياري) لون سداسي عشري للضوء. الافتراضي
+		هو 0xffffff (أبيض).<br />
+		[page:Float intensity] - (اختياري) قيمة رقمية لـ
+		قوة / شدة الضوء. الافتراضي هو 1.<br /><br />
+		يخلق جديد [name]. يرجى ملاحظة أنه لا يُقصد منه أن يتم استدعاؤه مباشرةً
+		(استخدم واحدًا من الفئات المشتقة بدلاً من ذلك).
+		</p>
+			
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر قائمة [page:Object3D Object3D] الأساسية للخصائص المشتركة.</p>
+			
+		<h3>[property:Color color]</h3>
+		<p>
+		لون الضوء. يعود إلى جديد [page:Color] محدد على الأبيض ، إذا لم
+		تمرير في المُنشئ.<br />
+		</p>
+			
+		<h3>[property:Float intensity]</h3>
+		<p>
+		شدة الضوء ، أو قوته.<br />
+		عندما يتم تعطيل [page:WebGLRenderer.useLegacyLights legacy lighting mode] ،
+		وحدات الشدة تعتمد على نوع الضوء.<br />
+		الافتراضي - `1.0`.
+		</p>
+			
+		<h3>[property:Boolean isLight]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان كائنًا معينًا من نوع [name].</p>
+			
+		<h2>الطرق (Methods)</h2>
+		<p>انظر قائمة [page:Object3D Object3D] الأساسية للطرق المشتركة.</p>
+			
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		طريقة التخلص المجردة للفئات التي تمتد هذه الفئة ؛ تنفذه
+		الفئات الفرعية التي لديها موارد قابلة للتصرف متعلقة بالجهاز.
+		</p>
+			
+		<h3>[method:this copy]( [param:Light source] )</h3>
+		<p>
+		ينسخ قيمة [page:.color color] و[page:.intensity intensity]
+		من ضوء المصدر [page:Light source] إلى
+		هذا واحد.
+		</p>
+			
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
+		<p>
+		meta - كائن يحتوي على بيانات تعريفية مثل المواد والقوام لـ
+		objects.<br />
+		حول الضوء إلى three.js
+		[link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
+		</p>
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

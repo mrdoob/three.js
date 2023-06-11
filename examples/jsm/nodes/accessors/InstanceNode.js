@@ -1,10 +1,9 @@
 import Node, { addNodeClass } from '../core/Node.js';
-import { instanceIndex } from '../core/InstanceIndexNode.js';
-import { temp } from '../core/VarNode.js';
-import { buffer } from './BufferNode.js';
+import { bufferAttribute, dynamicBufferAttribute } from './BufferAttributeNode.js';
 import { normalLocal } from './NormalNode.js';
 import { positionLocal } from './PositionNode.js';
-import { nodeProxy, vec3, mat3 } from '../shadernode/ShaderNode.js';
+import { nodeProxy, vec3, mat3, mat4 } from '../shadernode/ShaderNode.js';
+import { DynamicDrawUsage } from 'three';
 
 class InstanceNode extends Node {
 
@@ -14,17 +13,35 @@ class InstanceNode extends Node {
 
 		this.instanceMesh = instanceMesh;
 
-		//
-
-		const instanceBufferNode = buffer( instanceMesh.instanceMatrix.array, 'mat4', instanceMesh.count );
-
-		this.instanceMatrixNode = temp( instanceBufferNode.element( instanceIndex ) ); // @TODO: a possible caching issue here?
+		this.instanceMatrixNode = null;
 
 	}
 
-	generate( builder ) {
+	construct( builder ) {
 
-		const { instanceMatrixNode } = this;
+		let instanceMatrixNode = this.instanceMatrixNode;
+
+		if ( instanceMatrixNode === null ) {
+
+			const instanceMesh = this.instanceMesh;
+			const instaceAttribute = instanceMesh.instanceMatrix;
+			const array = instaceAttribute.array;
+
+			const bufferFn = instaceAttribute.usage === DynamicDrawUsage ? dynamicBufferAttribute : bufferAttribute;
+
+			const instanceBuffers = [
+				// F.Signature -> bufferAttribute( array, type, stride, offset )
+				bufferFn( array, 'vec4', 16, 0 ),
+				bufferFn( array, 'vec4', 16, 4 ),
+				bufferFn( array, 'vec4', 16, 8 ),
+				bufferFn( array, 'vec4', 16, 12 )
+			];
+
+			instanceMatrixNode = mat4( ...instanceBuffers );
+
+			this.instanceMatrixNode = instanceMatrixNode;
+
+		}
 
 		// POSITION
 
@@ -40,8 +57,10 @@ class InstanceNode extends Node {
 
 		// ASSIGNS
 
-		positionLocal.assign( instancePosition ).build( builder );
-		normalLocal.assign( instanceNormal ).build( builder );
+		builder.stack.assign( positionLocal, instancePosition );
+		builder.stack.assign( normalLocal, instanceNormal );
+
+		return builder.stack;
 
 	}
 

@@ -71,7 +71,7 @@ class AttributeNode extends Node {
 
 			const nodeAttribute = builder.getAttribute( attributeName, attributeType );
 
-			if ( builder.isShaderStage( 'vertex' ) ) {
+			if ( builder.shaderStage === 'vertex' ) {
 
 				return builder.format( nodeAttribute.name, attributeType, nodeType );
 

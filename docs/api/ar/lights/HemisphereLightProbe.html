@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Light] &rarr; [page:LightProbe]
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			مسابير الضوء هي طريقة بديلة لإضافة الضوء إلى مشهد ثلاثي الأبعاد.
+			HemisphereLightProbe هي بيانات تقدير الضوء لضوء نصف كرة واحد
+			في المشهد. لمزيد من المعلومات حول مسابير الضوء ، انتقل إلى
+			[page:LightProbe].
+		</p>
+			
+		<h2>المنشئ (Constructor)</h2>
+			
+		<h3>
+		[name]( [param:Color skyColor], [param:Color groundColor], [param:Float intensity] )
+		</h3>
+		<p>
+		[page:Color skyColor] - (اختياري) مثيل من Color ، سلسلة
+		يمثل لونًا أو رقمًا يمثل لونًا.<br />
+		[page:Color groundColor] - (اختياري) مثيل من Color ، سلسلة
+		يمثل لونًا أو رقمًا يمثل لونًا.<br />
+		[page:Float intensity] - (اختياري) قيمة رقمية لـ
+		شدة مسبار الضوء. الافتراضي هو 1.<br /><br />
+			
+		يخلق جديد [name].
+		</p>
+			
+		<h2>الخصائص (Properties)</h2>
+		<p>
+		انظر قائمة [page:LightProbe LightProbe] الأساسية للخصائص المشتركة.
+		</p>
+			
+		<h3>[property:Boolean isHemisphereLightProbe]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان كائنًا معينًا من نوع [name].</p>
+			
+		<h2>الطرق (Methods)</h2>
+		<p>انظر قائمة [page:LightProbe LightProbe] الأساسية للطرق المشتركة.</p>
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

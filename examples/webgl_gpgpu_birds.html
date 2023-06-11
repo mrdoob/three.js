@@ -319,8 +319,6 @@
 
 			import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 			/* TEXTURE WIDTH FOR SIMULATION */
 			const WIDTH = 32;
 
@@ -398,7 +396,7 @@
 						const y = ~ ~ ( birdIndex / WIDTH ) / WIDTH;
 
 						const c = new THREE.Color(
-							0x444444 +
+							0x666666 +
 							~ ~ ( v / 9 ) / BIRDS * 0x666666
 						);
 
