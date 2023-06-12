@@ -16,7 +16,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/"
+					"three/addons/": "./jsm/",
+					"postprocessing": "https://esm.sh/postprocessing"
 				}
 			}
 		</script>
@@ -25,9 +26,8 @@
 
 			import * as THREE from 'three';
 
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import * as PP from 'postprocessing';
+
 
 			import { RGBShiftShader } from 'three/addons/shaders/RGBShiftShader.js';
 			import { DotScreenShader } from 'three/addons/shaders/DotScreenShader.js';
@@ -79,18 +79,21 @@
 
 				// postprocessing
 
-				composer = new EffectComposer( renderer );
-				composer.addPass( new RenderPass( scene, camera ) );
+				composer = new PP.EffectComposer( renderer );
+				composer.addPass( new PP.RenderPass( scene, camera ) );
 
-				const effect1 = new ShaderPass( DotScreenShader );
-				effect1.uniforms[ 'scale' ].value = 4;
+				const dotScreenMaterialShader = new THREE.ShaderMaterial( DotScreenShader );
+				const effect1 = new PP.ShaderPass( dotScreenMaterialShader, 'tDiffuse' );
+				dotScreenMaterialShader.uniforms[ 'scale' ].value = 4;
 				composer.addPass( effect1 );
 
-				const effect2 = new ShaderPass( RGBShiftShader );
-				effect2.uniforms[ 'amount' ].value = 0.0015;
+				const rgbShiftMaterialShader = new THREE.ShaderMaterial( RGBShiftShader );
+				const effect2 = new PP.ShaderPass( rgbShiftMaterialShader, 'tDiffuse' );
+				rgbShiftMaterialShader.uniforms[ 'amount' ].value = 0.0015;
 				composer.addPass( effect2 );
 
-				const effect3 = new ShaderPass( GammaCorrectionShader );
+				const gammaCorrectionMaterialShader = new THREE.ShaderMaterial( GammaCorrectionShader );
+				const effect3 = new PP.ShaderPass( gammaCorrectionMaterialShader, 'tDiffuse' );
 				composer.addPass( effect3 );
 
 				//
