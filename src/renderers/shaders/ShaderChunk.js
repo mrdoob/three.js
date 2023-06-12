@@ -1,3 +1,5 @@
+import alphahash_fragment from './ShaderChunk/alphahash_fragment.glsl.js';
+import alphahash_pars_fragment from './ShaderChunk/alphahash_pars_fragment.glsl.js';
 import alphamap_fragment from './ShaderChunk/alphamap_fragment.glsl.js';
 import alphamap_pars_fragment from './ShaderChunk/alphamap_pars_fragment.glsl.js';
 import alphatest_fragment from './ShaderChunk/alphatest_fragment.glsl.js';
@@ -121,6 +123,8 @@ import * as shadow from './ShaderLib/shadow.glsl.js';
 import * as sprite from './ShaderLib/sprite.glsl.js';
 
 export const ShaderChunk = {
+	alphahash_fragment: alphahash_fragment,
+	alphahash_pars_fragment: alphahash_pars_fragment,
 	alphamap_fragment: alphamap_fragment,
 	alphamap_pars_fragment: alphamap_pars_fragment,
 	alphatest_fragment: alphatest_fragment,

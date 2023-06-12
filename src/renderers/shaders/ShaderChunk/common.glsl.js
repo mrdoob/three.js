@@ -61,6 +61,12 @@ struct GeometricContext {
 #endif
 };
 
+#ifdef USE_ALPHAHASH
+
+	varying vec3 vPosition;
+
+#endif
+
 vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
 
 	return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );
