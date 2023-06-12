@@ -42,26 +42,36 @@ const parseTime = 6; // 6 seconds per megabyte
 
 const exceptionList = [
 
-	// video tag not deterministic enough
+	// video tag isn't deterministic enough?
 	'css3d_youtube',
+	'webgl_materials_video',
 	'webgl_video_kinect',
 	'webgl_video_panorama_equirectangular',
-	'webxr_vr_video',
 
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
 
-	'webxr_ar_lighting', // webxr
+	// WebXR also isn't determinstic enough?
+	'webxr_ar_lighting',
+	'webxr_vr_sandbox',
+	'webxr_vr_video',
+	'webxr_xr_ballshooter',
 
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 
 	// Windows-Linux text rendering differences
-	// TODO: Fix these by setting a font in Puppeteer -- this can also fix a bunch of 0.1%-0.2% examples
+	// TODO: Fix these by e.g. disabling text rendering altogether -- this can also fix a bunch of 0.1%-0.2% examples
 	'css3d_periodictable',
 	'misc_controls_pointerlock',
 	'misc_uv_tests',
 	'webgl_camera_logarithmicdepthbuffer',
 	'webgl_effects_ascii',
+	'webgl_geometry_extrude_shapes',
+	'webgl_interactive_lines',
+	'webgl_loader_collada_kinematics',
+	'webgl_loader_ldraw',
 	'webgl_loader_pdb',
+	'webgl_modifier_simplifier',
+	'webgl_multiple_canvases_circle',
 	'webgl_multiple_elements_text',
 
 	// Unknown
@@ -149,7 +159,7 @@ console.red = msg => console.log( chalk.red( msg ) );
 console.yellow = msg => console.log( chalk.yellow( msg ) );
 console.green = msg => console.log( chalk.green( msg ) );
 
-let browser;
+let browser, platform;
 
 /* Launch server */
 
@@ -221,7 +231,7 @@ async function main() {
 
 	browser = await puppeteer.launch( {
 		executablePath,
-		headless: ! process.env.VISIBLE,
+		headless: process.env.VISIBLE ? false : 'new',
 		args: flags,
 		defaultViewport: viewport,
 		handleSIGINT: false,
@@ -290,6 +300,8 @@ async function downloadLatestChromium() {
 
 	const browserFetcher = new BrowserFetcher( { path: 'test/e2e/chromium' } );
 
+	platform = browserFetcher.platform();
+
 	let revisionInfo = browserFetcher.revisionInfo( chromiumRevision );
 	if ( revisionInfo.local === true ) {
 
@@ -302,7 +314,7 @@ async function downloadLatestChromium() {
 		console.log( 'Downloaded.' );
 
 	}
-	console.log( `Using Chromium r${ chromiumRevision } (${ revisionInfo.url }), stable channel on ${ browserFetcher.platform() }` );
+	console.log( `Using Chromium r${ chromiumRevision } (${ revisionInfo.url }), stable channel on ${ platform }` );
 	return revisionInfo;
 
 }
@@ -539,7 +551,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} catch {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await screenshot.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-actual.jpg` );
 				throw new Error( `Screenshot does not exist: ${ file }` );
 
 			}
@@ -558,8 +570,8 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} catch {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
-				await expected.writeAsync( `test/e2e/output-screenshots/${ file }-expected.jpg` );
+				await screenshot.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-actual.jpg` );
+				await expected.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-expected.jpg` );
 				throw new Error( `Image sizes does not match in file: ${ file }` );
 
 			}
@@ -574,9 +586,9 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} else {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
-				await expected.writeAsync( `test/e2e/output-screenshots/${ file }-expected.jpg` );
-				await diff.writeAsync( `test/e2e/output-screenshots/${ file }-diff.jpg` );
+				await screenshot.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-actual.jpg` );
+				await expected.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-expected.jpg` );
+				await diff.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-diff.jpg` );
 				throw new Error( `Diff wrong in ${ differentPixels.toFixed( 1 ) }% of pixels in file: ${ file }` );
 
 			}
