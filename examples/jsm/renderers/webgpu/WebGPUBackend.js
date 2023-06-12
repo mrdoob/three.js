@@ -19,12 +19,6 @@ import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
 let _staticAdapter = null;
 
-if ( navigator.gpu !== undefined ) {
-
-	_staticAdapter = await navigator.gpu.requestAdapter();
-
-}
-
 //
 
 class WebGPUBackend extends Backend {
@@ -67,6 +61,13 @@ class WebGPUBackend extends Backend {
 	async init( renderer ) {
 
 		await super.init( renderer );
+
+		//request static adapter in init async
+		if ( navigator.gpu !== undefined && !_staticAdapter ) {
+
+			_staticAdapter = await navigator.gpu.requestAdapter();
+		
+		}
 
 		//
 
