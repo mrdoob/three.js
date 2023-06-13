@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js Room Demo</title>
+		<title>three.js Escape Room Demo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -11,7 +11,7 @@
 		<div id="container">
 			<div id="info">
 				<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
-				<a href="https://google.github.io/filament/Filament.md.html#toc4.7.2" target="_blank" rel="noopener">Room Demo</a> raycaster for animations and click events by <a href="http://steven-ruzicka-portfolio-page.herokuapp.com/" target="_blank" rel="noopener">Steven Ruzicka</a>
+				<a href="https://google.github.io/filament/Filament.md.html#toc4.7.2" target="_blank" rel="noopener">Escape Room Demo</a> raycaster for animations and click events by <a href="http://steven-ruzicka-portfolio-page.herokuapp.com/" target="_blank" rel="noopener">Steven Ruzicka</a>
 				<br>Click on objects to zoom/play animations
 			</div>
 		</div>
@@ -64,28 +64,32 @@
         const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 50)
         camera.position.set(- 3, 6, 3)
 
-        function logCameraPosition() {
-            console.log(camera.position, camera.rotation)
-        }
+        // function logCameraPosition() {
+        //     console.log(camera.position, camera.rotation)
+        // }
+        
         scene.add(camera)
 
         const newTableCameraPosition = new THREE.Vector3( 4.455821578526777, 3.0148599588359186, -0.07300141503253793 );
-        const newTableCameraRotation = new THREE.Euler( -1.5894736626573862, -1.0300280434480615, -1.5925813033448406);
+        const newTableCameraRotation = new THREE.Euler( -1.5894736626573862, -1.0300280434480615, -1.5925813033448406 );
 
         const newDrawerCameraPosition = new THREE.Vector3( -4.679039321772094, 3.9651647259301255, 6.788425620434609 ); 
-        const newDrawerCameraRotation = new THREE.Euler( -2.386476455624608, -0.004641904539556792, -3.1372237424982106);
+        const newDrawerCameraRotation = new THREE.Euler( -2.386476455624608, -0.004641904539556792, -3.1372237424982106 );
 
-        const newShelfCameraPosition = new THREE.Vector3( 5.014328628180679, 4.402251395113069, 5.601074182861293 );
-        const newShelfCameraRotation = new THREE.Euler( -2.8057966888937824, -0.8977252150823338, -2.8751820107698096);
+        const newCrateCameraPosition = new THREE.Vector3( 1.4722780172494747, 1.5526588031541937, -6.897397275732495 );
+        const newCrateCameraRotation = new THREE.Euler( -0.18344142811042216, 0.05891582543072242, 0.010923728618444895 );
+
+        const newVentCameraPosition = new THREE.Vector3( 5.572692042346023, 2.1813105225135674, -4.414494325318659 );
+        const newVentCameraRotation = new THREE.Euler( -1.5421419262907532, -1.2536886897782091, -1.5406391739397662 );
 
         const controls = new OrbitControls(camera, renderer.domElement)
         controls.enableDamping = true
 
         // Disable the pan and zoom controls of the OrbitControls
-        controls.enablePan = false;
+        controls.enablePan = true;
         controls.enableZoom = false;
 
-        controls.addEventListener( 'change', logCameraPosition );
+        // controls.addEventListener( 'change', logCameraPosition );
 
         /** Prevent floor clipping **/
         // Set up a fixed height for the target
@@ -163,10 +167,16 @@
 
         let mixer
         let key
-        let pliers
+        let handSawBlade
+        let handSawHandle
+        let looseBoard
+        let wrench
+        let lockKey
+        let doorKey
+        let lock
 
         loader.load(
-            'models/gltf/RoomExample (raycaster animations).glb',
+            'models/gltf/EscapeRoomDemo.glb',
             function (gltf) {
                 scene.add(gltf.scene)
                 const animations = (gltf.animations)
@@ -178,24 +188,45 @@
                     action.setLoop( THREE.LoopOnce, 1 )
                     action.clampWhenFinished = true
                     action.timeScale = 1
-                    // action.play()
                     return action;
                 } );
-                // console.log(animationActions);
                 animationLoad = true
               
+                // Assign meshes to objects
                 gltf.scene.traverse((child) =>
                 {
-                    if (child.isMesh && child.name == 'Circle001')
+                    if (child.name == 'BoxKey')
                     {
-                        key = child
+                        doorKey = child
                     }
-                    if (child.isMesh && child.name == 'Cylinder')
+                    if (child.name == 'Hand_saw_blade')
                     {
-                        pliers = child
+                        handSawBlade = child
                     }
-                    child.material = tempMaterial
-                    console.log(child)
+                    if (child.name == 'Hand_saw_handle')
+                    {
+                        handSawHandle = child
+                    }
+                    if (child.name == 'Loose_Board')
+                    {
+                        looseBoard = child
+                    }
+                    if (child.name == 'WrenchBody')
+                    {
+                        wrench = child
+                    }
+                    if (child.name == 'LockKey')
+                    {
+                        lockKey = child
+                    }
+                    if (child.name == 'Lock')
+                    {
+                        lock = child
+                    }
+
+                    if (child.name != 'Exit_Screen') {
+                        child.material = tempMaterial
+                    }
                 })
             },
             function (xhr) {
@@ -207,9 +238,16 @@
         )   
           
         let keyGet = false
-        let pliersGet = false
+        let handSawGet = false
+        let looseBoardRemove = false
+        let wrenchGet = false
+        let ventOpen = false
+        let lockKeyGet = false
+        let lockRemove = false
+        let petDoorOpen = false
+        let doorKeyGet = false
+        let exitDoorOpen = false
           
-        // Define the onMouseClick function
         function onMouseClick() {
         
             // Raycast from the camera to the mouse position
@@ -217,71 +255,133 @@
         
             // Get an array of all objects intersected by the raycaster
             const intersects = raycaster.intersectObjects( scene.children, true );
-        
+
+            // Escape
+            if (exitDoorOpen) {
+                console.log("You escaped!");
+            }
+
             // Loop through the intersected objects and do something with them
             for ( let i = 0; i < intersects.length; i++ ) {
 
                 const intersectedObject = intersects[ i ].object;
-            
+
                 // Zoom to table
-                if (intersectedObject.name == 'Cube002')
+                if (intersectedObject.name == 'wooden_table')
                 {
-                    console.log("Clicked on table");
                     camera.position.copy( newTableCameraPosition );
                     camera.rotation.copy( newTableCameraRotation );
                 }
               
                 // Zoom to drawer
-                if (intersectedObject.name == 'Cube007')
+                if (intersectedObject.name == 'Drawer')
                 {
-                    console.log("Clicked on drawer");
                     camera.position.copy( newDrawerCameraPosition );
                     camera.rotation.copy( newDrawerCameraRotation );
                 }
               
-                // Zoom to shelf
-                if (intersectedObject.name == 'Plane001')
+                // Zoom to wooden crate
+                if (intersectedObject.name == 'Wooden_Crate')
                 {
-                    console.log("Clicked on shelf");
-                    camera.position.copy( newShelfCameraPosition );
-                    camera.rotation.copy( newShelfCameraRotation );
+                    camera.position.copy( newCrateCameraPosition );
+                    camera.rotation.copy( newCrateCameraRotation );
+                }
+
+                // Zoom to vent
+                if (intersectedObject.name == 'small_vent')
+                {
+                    camera.position.copy( newVentCameraPosition );
+                    camera.rotation.copy( newVentCameraRotation );
                 }
               
-                // Open pet door
-                if (intersectedObject.name == 'Door')
+                // Get hand saw
+                if (intersectedObject.name == 'Hand_saw_blade')
                 {
-                    console.log("Clicked on door");
-                    animationActions[0].play()
-                    // doorSelect = true
-                }
-              
-                // Get key
-                if (intersectedObject.name == 'Circle001')
-                {
-                    console.log("Clicked on key");
-                    if (!keyGet) {
-                        key.parent.remove(key)
-                        keyGet = true
+                    if (!handSawGet) {
+                        handSawBlade.parent.remove(handSawBlade)
+                        handSawHandle.parent.remove(handSawHandle)
+                        handSawGet = true
                     }
                 }
-              
-                // Get pliers
-                if (intersectedObject.name == 'Cylinder')
+
+                // Remove loose board
+                if (intersectedObject.name == 'Loose_Board')
                 {
-                    console.log("Clicked on pliers");
-                    if (!pliersGet) {
-                        pliers.parent.remove(pliers)
-                        pliersGet = true
+                    if (!looseBoardRemove && handSawGet) {
+                        looseBoard.parent.remove(looseBoard)
+                        looseBoardRemove = true
+                    }
+                }
+
+                // Remove lock
+                if (intersectedObject.name == 'Lock')
+                {
+                    if (lockKeyGet) {
+                        lock.parent.remove(lock)
+                        lockRemove = true
+                    }
+                }
+
+                // Get wrench
+                if (intersectedObject.name == 'WrenchBody')
+                {
+                    if (looseBoardRemove) {
+                        wrench.parent.remove(wrench)
+                        wrenchGet = true
+                    }
+                }
+
+                // Get lock key
+                if (intersectedObject.name == 'LockKey')
+                {
+                    if (ventOpen) {
+                        lockKey.parent.remove(lockKey)
+                        lockKeyGet = true
+                    }
+                }
+
+                // Get door key
+                if (intersectedObject.name == 'BoxKey')
+                {
+                    if (!doorKeyGet) {
+                        doorKey.parent.remove(doorKey)
+                        doorKeyGet = true
                     }
                 }
               
                 // Open top drawer
-                if (intersectedObject.name == 'Cube003')
+                if (intersectedObject.name == 'TopDrawer')
                 {
-                    console.log("Clicked on top drawer");
                     animationActions[1].play()
+                    animationActions[3].play()
                 }
-              
+
+                // Open vent
+                if (intersectedObject.name == 'small_vent')
+                {
+                    if (wrenchGet) {
+                        animationActions[2].play()
+                        ventOpen = true
+                    }
+                }
+
+                // Open pet door
+                if (intersectedObject.name == 'Door')
+                {
+                    if (lockRemove) {
+                        animationActions[0].play()
+                        petDoorOpen = true
+                    }
+                }
+
+                // Open exit door
+                if (intersectedObject.name == 'ExitDoor')
+                {
+                    if (doorKeyGet) {
+                        animationActions[4].play()
+                        exitDoorOpen = true
+                    }
+                }
             }
         }
 
@@ -291,7 +391,7 @@
             requestAnimationFrame( animate );
         
             if (animationLoad) {
-            mixer.update( clock.getDelta() );
+                mixer.update( clock.getDelta() );
             }
           
             renderer.render( scene, camera );
