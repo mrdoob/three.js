@@ -110,15 +110,16 @@ class KTX2Loader extends Loader {
 
 	}
 
-	detectSupport( renderer ) {
+	async detectSupport( renderer ) {
 
 		if ( renderer.isWebGPURenderer === true ) {
-
+			// wait for WebGPU adapter to get features 
+			//https://github.com/mrdoob/three.js/pull/26242
 			this.workerConfig = {
-				astcSupported: renderer.hasFeature( 'texture-compression-astc' ),
+				astcSupported: await renderer.hasFeature( 'texture-compression-astc' ),
 				etc1Supported: false,
-				etc2Supported: renderer.hasFeature( 'texture-compression-etc2' ),
-				dxtSupported: renderer.hasFeature( 'texture-compression-bc' ),
+				etc2Supported: await renderer.hasFeature( 'texture-compression-etc2' ),
+				dxtSupported: await renderer.hasFeature( 'texture-compression-bc' ),
 				bptcSupported: false,
 				pvrtcSupported: false
 			};
