@@ -19,6 +19,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
 			 - Skeletal Animations with <= 4 (left) and > 4 (right) Bone Influences Per Vertex<br/>
+			 (Mask model made by Iker J. de los Mozos)
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -112,7 +113,6 @@
 				const controls2 = new OrbitControls( views[ 1 ].camera, renderer.domElement );
 				controls2.target.set( 0, 1, 0 ).add( views[ 1 ].offset );
 				controls2.update();
-
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
