@@ -687,6 +687,13 @@
 				"Vector2": "api/ar/math/Vector2",
 				"Vector3": "api/ar/math/Vector3",
 				"Vector4": "api/ar/math/Vector4"
+			},
+
+			"Math / Interpolants": {
+				"CubicInterpolant": "api/ar/math/interpolants/CubicInterpolant",
+				"DiscreteInterpolant": "api/ar/math/interpolants/DiscreteInterpolant",
+				"LinearInterpolant": "api/ar/math/interpolants/LinearInterpolant",
+				"QuaternionLinearInterpolant": "api/ar/math/interpolants/QuaternionLinearInterpolant"
 			}
 
 		}
