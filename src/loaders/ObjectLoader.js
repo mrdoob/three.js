@@ -62,9 +62,10 @@ import { getTypedArray } from '../utils.js';
 
 class ObjectLoader extends Loader {
 
-	constructor( manager ) {
+	constructor( manager, options = {} ) {
 
 		super( manager );
+		this.options = options;
 
 	}
 
@@ -860,7 +861,9 @@ class ObjectLoader extends Loader {
 				geometry = getGeometry( data.geometry );
 			 	material = getMaterial( data.material );
 
-				object = new SkinnedMesh( geometry, material );
+				object = new SkinnedMesh( geometry, material, {
+					useBoneIndexWeightsTexture: this.options.useBoneIndexWeightsTexture
+				} );
 
 				if ( data.bindMode !== undefined ) object.bindMode = data.bindMode;
 				if ( data.bindMatrix !== undefined ) object.bindMatrix.fromArray( data.bindMatrix );

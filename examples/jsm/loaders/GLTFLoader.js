@@ -3673,22 +3673,10 @@ class GLTFParser {
 
 					// .isSkinnedMesh isn't in glTF spec. See ._markDefs()
 					mesh = meshDef.isSkinnedMesh === true
-						? new SkinnedMesh( geometry, material )
+						? new SkinnedMesh( geometry, material, {
+								useBoneIndexWeightsTexture: parser.options.useBoneIndexWeightsTexture
+						} )
 						: new Mesh( geometry, material );
-
-					if ( mesh.isSkinnedMesh === true ) {
-
-						// normalize skin weights to fix malformed assets (see #15319)
-						// normalization behavior changes if skin weights texture is used
-						mesh.useBoneIndexWeightsTexture = parser.options.useBoneIndexWeightsTexture;
-						mesh.normalizeSkinWeights();
-
-						// TODO: the loaders wouldn't have to call this method if the
-						// skinning buffers were normalized on/before SkinnedMesh
-						// construction.
-						mesh.createBoneIndexWeightsTexture();
-
-					}
 
 					if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
 

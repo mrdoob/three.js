@@ -24,7 +24,7 @@ const _ray = /*@__PURE__*/ new Ray();
 
 class SkinnedMesh extends Mesh {
 
-	constructor( geometry, material ) {
+	constructor( geometry, material, options = {} ) {
 
 		super( geometry, material );
 
@@ -39,8 +39,21 @@ class SkinnedMesh extends Mesh {
 		this.boundingBox = null;
 		this.boundingSphere = null;
 
-		this.useBoneIndexWeightsTexture = BoneIndexWeightsTextureAllow;
+		this.useBoneIndexWeightsTexture =
+			options.useBoneIndexWeightsTexture !== undefined ?
+				options.useBoneIndexWeightsTexture : BoneIndexWeightsTextureAllow;
+
 		this.boneIndexWeightsTexture = null;
+
+		// Don't process geometry data if this constructor is being called as part
+		// of a .clone() operation. The object's members will already be set but the
+		// constructor parameters will be undefined.
+		if ( geometry ) {
+
+			this.normalizeSkinWeights();
+			this.createBoneIndexWeightsTexture();
+
+		}
 
 	}
 
