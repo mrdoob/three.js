@@ -206,6 +206,7 @@
 		"webgl_points_waves",
 		"webgl_portal",
 		"webgl_raycaster_bvh",
+		"webgl_raycaster_animations",
 		"webgl_raycaster_sprite",
 		"webgl_raycaster_texture",
 		"webgl_read_float_buffer",
