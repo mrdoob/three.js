@@ -50,6 +50,8 @@
 			const skeletons = [];
 			const mixers = [];
 			const models = [];
+			let head;
+			let envMap;
 
 			let idleWeight, walkWeight, runWeight;
 			const idleActions = [];
@@ -63,6 +65,7 @@
 
 			let soldiersLoaded = false;
 			let headLoaded = false;
+			let envMapLoaded = false;
 
 			init();
 
@@ -150,16 +153,17 @@
 				// so that we're confident it's really on
 				loader.load( 'models/gltf/HeadWithMax16Joints.glb', function ( gltf ) {
 
-					const model = gltf.scene;
-					scene.add( model );
-					models.push( model );
+					head = gltf.scene;
 
-					model.position.set( 0, 1, - 1 );
-					model.rotation.y = - Math.PI;
+					scene.add( head );
+					models.push( head );
 
-					revertVertexSkinningBuffers( model );
+					head.position.set( 0, 1, - 1 );
+					head.rotation.y = - Math.PI;
 
-					const mixer = new THREE.AnimationMixer( model );
+					revertVertexSkinningBuffers( head );
+
+					const mixer = new THREE.AnimationMixer( head );
 					const action = mixer.clipAction( gltf.animations[ 0 ] );
 					action.play();
 					actions.push( action );
@@ -170,9 +174,23 @@
 
 				} );
 
+				new THREE.TextureLoader().load(
+					'textures/2294472375_24a3b8ef46_o.jpg',
+					texture => {
+
+						envMap = texture;
+						envMap.mapping = THREE.EquirectangularReflectionMapping;
+						envMap.colorSpace = THREE.SRGBColorSpace;
+
+						envMapLoaded = true;
+						finishInitialization();
+
+					} );
+
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
@@ -188,7 +206,18 @@
 
 			function finishInitialization() {
 
-				if ( ! soldiersLoaded || ! headLoaded ) return;
+				if ( ! soldiersLoaded || ! headLoaded || ! envMapLoaded ) return;
+
+				head.traverse( object => {
+
+					if ( object.material && object.material.isMeshPhysicalMaterial ) {
+
+						// MeshPhysicalMaterial looks better with an environment map
+						object.material.envMap = envMap;
+
+					}
+
+				} );
 
 				// The scene must be complete before modifying or starting rendering.
 				// Otherwise, there's access to incomplete state and automated

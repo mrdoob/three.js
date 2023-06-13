@@ -77,6 +77,8 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -86,17 +88,6 @@
 				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d );
 				hemiLight.position.set( 0, 20, 0 );
 				scene.add( hemiLight );
-
-				const dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( 30, 10, 10 );
-				dirLight.castShadow = true;
-				dirLight.shadow.camera.top = 2;
-				dirLight.shadow.camera.bottom = - 2;
-				dirLight.shadow.camera.left = - 2;
-				dirLight.shadow.camera.right = 2;
-				dirLight.shadow.camera.near = 0.1;
-				dirLight.shadow.camera.far = 40;
-				scene.add( dirLight );
 
 				// ground
 
@@ -131,6 +122,12 @@
 
 				// Box
 			
+				const textureLoader = new THREE.TextureLoader();
+
+				const envMap = textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg' );
+				envMap.mapping = THREE.EquirectangularReflectionMapping;
+				envMap.colorSpace = THREE.SRGBColorSpace;
+
 				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/HeadWithMax16Joints.glb', function ( gltf ) {
 
@@ -138,7 +135,12 @@
 
 					unlimitedBonesModel.traverse( ( object ) => {
 
-						if ( object.isMesh ) object.castShadow = true;
+						if ( object.material && object.material.isMeshPhysicalMaterial ) {
+
+							// MeshPhysicalMaterial looks better with an environment map
+							object.material.envMap = envMap;
+
+						}
 
 					} );
 
