@@ -178,26 +178,6 @@ function MenubarFile( editor ) {
 
 	options.add( new UIHorizontalRule() );
 
-	// Export DAE
-
-	option = new UIRow();
-	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/file/export/dae' ) );
-	option.onClick( async function () {
-
-		const { ColladaExporter } = await import( 'three/addons/exporters/ColladaExporter.js' );
-
-		const exporter = new ColladaExporter();
-
-		exporter.parse( editor.scene, function ( result ) {
-
-			saveString( result.data, 'scene.dae' );
-
-		} );
-
-	} );
-	options.add( option );
-
 	// Export DRC
 
 	option = new UIRow();
