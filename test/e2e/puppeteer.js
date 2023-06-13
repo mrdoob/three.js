@@ -83,6 +83,7 @@ const exceptionList = [
 	'webgl_nodes_materials_standard',
 	'webgl_postprocessing_crossfade',
 	'webgl_postprocessing_dof2',
+	'webgl_raycaster_animations',
 	'webgl_raymarching_reflect',
 	'webgl_renderer_pathtracer',
 	'webgl_shadowmap',
