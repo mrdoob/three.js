@@ -27,7 +27,6 @@
     <script type="module">
         import * as THREE from 'three'
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
             
         // const gui = new GUI.GUI()
@@ -162,7 +161,6 @@
         let animationLoad = false
 
         let mixer
-        let key
         let handSawBlade
         let handSawHandle
         let looseBoard
@@ -233,7 +231,6 @@
             }
         )   
           
-        let keyGet = false
         let handSawGet = false
         let looseBoardRemove = false
         let wrenchGet = false
