@@ -90,6 +90,10 @@
 				hemiLight.position.set( 0, 20, 0 );
 				scene.add( hemiLight );
 
+				const dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( 1, 1, 1 );
+				scene.add( dirLight );
+
 				// ground
 
 				const mesh = new THREE.Mesh(
