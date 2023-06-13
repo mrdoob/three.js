@@ -170,4 +170,4 @@ class LUTPass extends ShaderPass {
 
 }
 
-export { LUTPass };
+export { LUTPass, LUTShader };

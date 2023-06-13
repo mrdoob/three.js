@@ -1,207 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>three.js webgl - 3d luts</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
-	</head>
+<head>
+	<title>three.js webgl - 3d luts</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+</head>
 
-	<body>
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - 3D LUTs<br />
-			Battle Damaged Sci-fi Helmet by
-			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
-			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a><br />
-			LUTs from <a href="https://www.rocketstock.com/free-after-effects-templates/35-free-luts-for-color-grading-videos/">RocketStock</a>, <a href="https://www.freepresets.com/product/free-luts-cinematic/">FreePresets.com</a>
-		</div>
+<body>
+<div id="info">
+	<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - 3D LUTs<br/>
+	Battle Damaged Sci-fi Helmet by
+	<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br/>
+	<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> from <a
+	href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a><br/>
+	LUTs from <a href="https://www.rocketstock.com/free-after-effects-templates/35-free-luts-for-color-grading-videos/">RocketStock</a>,
+	<a href="https://www.freepresets.com/product/free-luts-cinematic/">FreePresets.com</a>
+</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
-		<script type="importmap">
+<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/"
+					"three/addons/": "./jsm/",
+					"postprocessing": "https://esm.sh/postprocessing"
 				}
 			}
-		</script>
 
-		<script type="module">
-			import * as THREE from 'three';
 
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { LUTPass } from 'three/addons/postprocessing/LUTPass.js';
-			import { LUTCubeLoader } from 'three/addons/loaders/LUTCubeLoader.js';
-			import { LUT3dlLoader } from 'three/addons/loaders/LUT3dlLoader.js';
-			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+</script>
 
-			const params = {
-				enabled: true,
-				lut: 'Bourbon 64.CUBE',
-				intensity: 1,
-				use2DLut: false,
-			};
+<script type="module">
+		import * as THREE from 'three';
+		import * as PP from 'postprocessing';
 
-			const lutMap = {
-				'Bourbon 64.CUBE': null,
-				'Chemical 168.CUBE': null,
-				'Clayton 33.CUBE': null,
-				'Cubicle 99.CUBE': null,
-				'Remy 24.CUBE': null,
-				'Presetpro-Cinematic.3dl': null
-			};
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+		import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+		import { LUTShader } from 'three/addons/postprocessing/LUTPass.js';
+		import { LUTCubeLoader } from 'three/addons/loaders/LUTCubeLoader.js';
+		import { LUT3dlLoader } from 'three/addons/loaders/LUT3dlLoader.js';
+		import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let gui;
-			let camera, scene, renderer;
-			let composer, lutPass;
+		const params = {
+			enabled: true,
+			lut: 'Bourbon 64.CUBE',
+			intensity: 1,
+			use2DLut: false,
+		};
 
-			init();
-			render();
+		const lutMap = {
+			'Bourbon 64.CUBE': null,
+			'Chemical 168.CUBE': null,
+			'Clayton 33.CUBE': null,
+			'Cubicle 99.CUBE': null,
+			'Remy 24.CUBE': null,
+			'Presetpro-Cinematic.3dl': null
+		};
 
-			function init() {
+		let gui;
+		let camera, scene, renderer;
+		let composer, lutShaderMaterial, lutPass, currentLut;
 
-				const container = document.createElement( 'div' );
-				document.body.appendChild( container );
+		init();
+		render();
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-				camera.position.set( - 1.8, 0.6, 2.7 );
+		function init() {
 
-				scene = new THREE.Scene();
+			const container = document.createElement( 'div' );
+			document.body.appendChild( container );
 
-				new RGBELoader()
-					.setPath( 'textures/equirectangular/' )
-					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
+			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+			camera.position.set( - 1.8, 0.6, 2.7 );
 
-						texture.mapping = THREE.EquirectangularReflectionMapping;
+			scene = new THREE.Scene();
 
-						scene.background = texture;
-						scene.environment = texture;
+			new RGBELoader()
+				.setPath( 'textures/equirectangular/' )
+				.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
-						// model
+					texture.mapping = THREE.EquirectangularReflectionMapping;
 
-						const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
-						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+					scene.background = texture;
+					scene.environment = texture;
 
-							scene.add( gltf.scene );
+					// model
 
-						} );
+					const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+					loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+
+						scene.add( gltf.scene );
 
 					} );
 
-				Object.keys( lutMap ).forEach( name => {
-
-					if ( /\.CUBE$/i.test( name ) ) {
-
-						new LUTCubeLoader()
-							.load( 'luts/' + name, function ( result ) {
-
-								lutMap[ name ] = result;
-
-							} );
-
-					} else {
-
-						new LUT3dlLoader()
-							.load( 'luts/' + name, function ( result ) {
-
-								lutMap[ name ] = result;
-
-							} );
-
-					}
-
 				} );
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 1;
-				container.appendChild( renderer.domElement );
+			Object.keys( lutMap ).forEach( name => {
 
-				const target = new THREE.WebGLRenderTarget( {
-					minFilter: THREE.LinearFilter,
-					magFilter: THREE.LinearFilter,
-					format: THREE.RGBAFormat,
-					colorSpace: THREE.SRGBColorSpace
-				} );
+				if ( /\.CUBE$/i.test( name ) ) {
 
-				composer = new EffectComposer( renderer, target );
-				composer.setPixelRatio( window.devicePixelRatio );
-				composer.setSize( window.innerWidth, window.innerHeight );
-				composer.addPass( new RenderPass( scene, camera ) );
-				composer.addPass( new ShaderPass( GammaCorrectionShader ) );
+					new LUTCubeLoader()
+						.load( 'luts/' + name, function ( result ) {
 
-				lutPass = new LUTPass();
-				composer.addPass( lutPass );
+							lutMap[ name ] = result;
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 2;
-				controls.maxDistance = 10;
-				controls.target.set( 0, 0, - 0.2 );
-				controls.update();
-
-				gui = new GUI();
-				gui.width = 350;
-				gui.add( params, 'enabled' );
-				gui.add( params, 'lut', Object.keys( lutMap ) );
-				gui.add( params, 'intensity' ).min( 0 ).max( 1 );
-
-				if ( renderer.capabilities.isWebGL2 ) {
-
-					gui.add( params, 'use2DLut' );
+						} );
 
 				} else {
 
-					params.use2DLut = true;
+					new LUT3dlLoader()
+						.load( 'luts/' + name, function ( result ) {
+
+							lutMap[ name ] = result;
+
+						} );
 
 				}
 
-				window.addEventListener( 'resize', onWindowResize );
+			} );
+
+			renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			renderer.toneMappingExposure = 1;
+			container.appendChild( renderer.domElement );
+
+			composer = new PP.EffectComposer( renderer );
+			composer.setSize( window.innerWidth, window.innerHeight );
+			composer.addPass( new PP.RenderPass( scene, camera ) );
+
+			const gammaShaderMaterial = new THREE.ShaderMaterial( GammaCorrectionShader );
+			composer.addPass( new PP.ShaderPass( gammaShaderMaterial, 'tDiffuse' ) );
+
+			lutShaderMaterial = new THREE.ShaderMaterial( LUTShader );
+
+			lutPass = new PP.ShaderPass( lutShaderMaterial, 'tDiffuse' );
+			composer.addPass( lutPass );
+
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.minDistance = 2;
+			controls.maxDistance = 10;
+			controls.target.set( 0, 0, - 0.2 );
+			controls.update();
+
+			gui = new GUI();
+			gui.width = 350;
+			gui.add( params, 'enabled' );
+			gui.add( params, 'lut', Object.keys( lutMap ) );
+			gui.add( params, 'intensity' ).min( 0 ).max( 1 );
+
+			if ( renderer.capabilities.isWebGL2 ) {
+
+				gui.add( params, 'use2DLut' );
+
+			} else {
+
+				params.use2DLut = true;
 
 			}
 
-			function onWindowResize() {
+			if ( lutMap[ params.lut ] ) {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.setSize( window.innerWidth, window.innerHeight );
-
-				render();
+				params.use2DLut ? lutMap[ params.lut ].texture : lutMap[ params.lut ].texture3D;
 
 			}
 
-			//
 
-			function render() {
+			window.addEventListener( 'resize', onWindowResize );
 
-				requestAnimationFrame( render );
+		}
 
-				lutPass.enabled = params.enabled && Boolean( lutMap[ params.lut ] );
-				lutPass.intensity = params.intensity;
-				if ( lutMap[ params.lut ] ) {
+		function onWindowResize() {
 
-					const lut = lutMap[ params.lut ];
-					lutPass.lut = params.use2DLut ? lut.texture : lut.texture3D;
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			composer.setSize( window.innerWidth, window.innerHeight );
+
+			render();
+
+		}
+
+
+		function checkLut( v ) {
+
+			if ( currentLut !== v ) {
+
+				lutShaderMaterial.uniforms.lut3d.value = null;
+				lutShaderMaterial.uniforms.lut.value = null;
+				currentLut = v;
+
+				if ( v ) {
+
+					const is3dTextureDefine = v.isData3DTexture ? 1 : 0;
+					if ( is3dTextureDefine !== lutShaderMaterial.defines.USE_3DTEXTURE ) {
+
+						lutShaderMaterial.defines.USE_3DTEXTURE = is3dTextureDefine;
+						lutShaderMaterial.needsUpdate = true;
+
+					}
+
+
+					lutShaderMaterial.uniforms.lutSize.value = v.image.width;
+					if ( v.isData3DTexture ) {
+
+						lutShaderMaterial.uniforms.lut3d.value = v;
+
+					} else {
+
+						lutShaderMaterial.uniforms.lut.value = v;
+
+					}
 
 				}
 
-				composer.render();
-
 			}
 
-		</script>
+		}
 
-	</body>
+
+		function render() {
+
+			requestAnimationFrame( render );
+
+			lutPass.enabled = params.enabled && Boolean( lutMap[ params.lut ] );
+			lutShaderMaterial.uniforms.intensity.value = params.intensity;
+
+			if ( lutMap[ params.lut ] ) checkLut( params.use2DLut ? lutMap[ params.lut ].texture : lutMap[ params.lut ].texture3D );
+
+			composer.render();
+
+		}
+
+</script>
+
+</body>
 </html>
