@@ -94,6 +94,11 @@ function Loader( editor ) {
 					loader.parse( contents, function ( object ) {
 
 						editor.execute( new AddObjectCommand( editor, object ) );
+						console.log( object )
+
+					}, function ( error ) {
+
+						console.error( error )
 
 					} );
 

@@ -25,6 +25,8 @@ import {
 	DoubleSide
 } from 'three';
 
+import { EXRLoader } from '../loaders/EXRLoader.js';
+
 const _taskCache = new WeakMap();
 
 class Rhino3dmLoader extends Loader {
@@ -217,7 +219,7 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
-	_createMaterial( material ) {
+	_createMaterial( material, renderEnvironment ) {
 
 		if ( material === undefined ) {
 
@@ -242,7 +244,7 @@ class Rhino3dmLoader extends Loader {
 
 		}
 
-		// console.log( material );
+		console.log( material );
 
 		const mat = new MeshStandardMaterial( {
 			color: diffusecolor,
@@ -251,6 +253,13 @@ class Rhino3dmLoader extends Loader {
 			transparent: material.transparency > 0 ? true : false,
 			opacity: 1.0 - material.transparency
 		} );
+
+		if ( material.supported ) {
+
+			mat.roughness = material.roughness
+			mat.metalness = material.metallic
+
+		}
 
 		const textureLoader = new TextureLoader();
 
@@ -293,10 +302,29 @@ class Rhino3dmLoader extends Loader {
 
 				map.wrapS = texture.wrapU === 0 ? RepeatWrapping : ClampToEdgeWrapping;
 				map.wrapT = texture.wrapV === 0 ? RepeatWrapping : ClampToEdgeWrapping;
-				map.repeat.set( texture.repeat[ 0 ], texture.repeat[ 1 ] );
+
+				if ( texture.repeat ) {
+
+					map.repeat.set( texture.repeat[ 0 ], texture.repeat[ 1 ] );
+
+				}
 
 			}
 
+		}
+
+
+		if (renderEnvironment) {
+
+			new EXRLoader().load( renderEnvironment.image, function ( texture ) {
+
+				
+				texture.mapping = THREE.EquirectangularReflectionMapping;
+				console.log(texture)
+				mat.envMap = texture;
+
+			} )
+			
 		}
 
 		return mat;
@@ -305,7 +333,7 @@ class Rhino3dmLoader extends Loader {
 
 	_createGeometry( data ) {
 
-		// console.log(data);
+		console.log(data);
 
 		const object = new Object3D();
 		const instanceDefinitionObjects = [];
@@ -317,6 +345,7 @@ class Rhino3dmLoader extends Loader {
 		object.userData[ 'settings' ] = data.settings;
 		object.userData[ 'objectType' ] = 'File3dm';
 		object.userData[ 'materials' ] = null;
+		
 		object.name = this.url;
 
 		let objects = data.objects;
@@ -348,7 +377,7 @@ class Rhino3dmLoader extends Loader {
 					if ( attributes.materialIndex >= 0 ) {
 
 						const rMaterial = materials[ attributes.materialIndex ];
-						let material = this._createMaterial( rMaterial );
+						let material = this._createMaterial( rMaterial, data.renderEnvironment );
 						material = this._compareMaterials( material );
 						_object = this._createObject( obj, material );
 
@@ -962,35 +991,8 @@ function Rhino3dmWorker() {
 
 					let textureType = textureTypes[ j ].constructor.name;
 					textureType = textureType.substring( 12, textureType.length );
-					const texture = { type: textureType };
-
-					const image = doc.getEmbeddedFileAsBase64( _texture.fileName );
-
-					texture.wrapU = _texture.wrapU;
-					texture.wrapV = _texture.wrapV;
-					texture.wrapW = _texture.wrapW;
-					const uvw = _texture.uvwTransform.toFloatArray( true );
-					texture.repeat = [ uvw[ 0 ], uvw[ 5 ] ];
-
-					if ( image ) {
-
-						texture.image = 'data:image/png;base64,' + image;
-
-					} else {
-
-						self.postMessage( { type: 'warning', id: taskID, data: {
-							message: `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.`,
-							type: 'missing resource'
-						}
-
-						} );
-
-						texture.image = null;
-
-					}
-
+					const texture = extractTextureData(_texture, textureType, doc);
 					textures.push( texture );
-
 					_texture.delete();
 
 				}
@@ -1006,12 +1008,10 @@ function Rhino3dmWorker() {
 					const _texture = _material.getTexture( pbrTextureTypes[ j ] );
 					if ( _texture ) {
 
-						const image = doc.getEmbeddedFileAsBase64( _texture.fileName );
 						let textureType = pbrTextureTypes[ j ].constructor.name;
 						textureType = textureType.substring( 12, textureType.length );
-						const texture = { type: textureType, image: 'data:image/png;base64,' + image };
+						const texture = extractTextureData(_texture, textureType, doc);
 						textures.push( texture );
-
 						_texture.delete();
 
 					}
@@ -1087,6 +1087,42 @@ function Rhino3dmWorker() {
 
 		const settings = extractProperties( doc.settings() );
 
+		console.log( `backgroundId: ${doc.settings().renderSettings().renderEnvironments.backgroundId}` )
+		console.log( `skylightingId: ${doc.settings().renderSettings().renderEnvironments.skylightingId}` )
+		console.log( `skylightingOverride: ${doc.settings().renderSettings().renderEnvironments.skylightingOverride}` )
+		console.log( `reflectionId: ${doc.settings().renderSettings().renderEnvironments.reflectionId}` )
+		console.log( `reflectionOverride: ${doc.settings().renderSettings().renderEnvironments.reflectionOverride}` )
+
+		const backgroundId = doc.settings().renderSettings().renderEnvironments.backgroundId
+		const skylightingId = doc.settings().renderSettings().renderEnvironments.skylightingId
+		const reflectionId = doc.settings().renderSettings().renderEnvironments.reflectionId
+		
+		//const background = doc.embeddedFiles().findId(backgroundId)
+		//const skylight = doc.embeddedFiles().findId(skylightingId)
+		//const reflection = doc.embeddedFiles().findId(reflectionId)
+
+		//console.log(`${background}, ${skylight}, ${reflection}`)
+
+		const efCount = doc.embeddedFiles().count()
+		console.log(`efCount: ${efCount}`)
+
+		const backgroundGet = doc.embeddedFiles().get(0).filename
+		const backgroundLength = doc.embeddedFiles().get(0).length
+		const background = doc.getEmbeddedFileAsBase64(backgroundGet)
+		const backgroundImage = 'data:image/png;base64,' + background;
+
+		const renderEnvironment = { type: 'renderEnvironment', image: backgroundImage, name: backgroundGet };
+
+		console.log(`${backgroundGet}, ${backgroundLength}`)
+		console.log(background)
+
+		const paths = doc.embeddedFilePaths();
+		console.log(paths)
+
+		console.log(`nº of embedded files: ${doc.embeddedFiles().count()}`)
+
+
+
 		//TODO: Handle other document stuff like dimstyles, instance definitions, bitmaps etc.
 
 		// Handle dimstyles
@@ -1110,7 +1146,40 @@ function Rhino3dmWorker() {
 
 		doc.delete();
 
-		return { objects, materials, layers, views, namedViews, groups, strings, settings };
+		return { objects, materials, layers, views, namedViews, groups, strings, settings, renderEnvironment };
+
+	}
+
+	function extractTextureData( t, tType, d ) {
+
+		const texture = { type: tType };
+
+		const image = d.getEmbeddedFileAsBase64( t.fileName );
+
+		texture.wrapU = t.wrapU;
+		texture.wrapV = t.wrapV;
+		texture.wrapW = t.wrapW;
+		const uvw = t.uvwTransform.toFloatArray( true );
+		texture.repeat = [ uvw[ 0 ], uvw[ 5 ] ];
+
+		if ( image ) {
+
+			texture.image = 'data:image/png;base64,' + image;
+
+		} else {
+
+			self.postMessage( { type: 'warning', id: taskID, data: {
+				message: `THREE.3DMLoader: Image for ${tType} texture not embedded in file.`,
+				type: 'missing resource'
+			}
+
+			} );
+
+			texture.image = null;
+
+		}
+
+		return texture;
 
 	}
 
