@@ -16,6 +16,7 @@ import { mix } from '../math/MathNode.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import AONode from '../lighting/AONode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
+import { discard } from '../utils/DiscardNode.js';
 
 const NodeMaterials = new Map();
 
@@ -144,7 +145,7 @@ class NodeMaterial extends ShaderMaterial {
 
 			const alphaTestNode = this.alphaTestNode ? float( this.alphaTestNode ) : materialAlphaTest;
 
-			stack.add( diffuseColor.a.lessThanEqual( alphaTestNode ).discard() );
+			stack.add( discard( diffuseColor.a.lessThanEqual( alphaTestNode ) ) );
 
 		}
 
