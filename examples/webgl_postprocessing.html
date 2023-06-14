@@ -31,7 +31,6 @@
 
 			import { RGBShiftShader } from 'three/addons/shaders/RGBShiftShader.js';
 			import { DotScreenShader } from 'three/addons/shaders/DotScreenShader.js';
-			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
 			let camera, renderer, composer;
 			let object;
@@ -91,10 +90,6 @@
 				const effect2 = new PP.ShaderPass( rgbShiftMaterialShader, 'tDiffuse' );
 				rgbShiftMaterialShader.uniforms[ 'amount' ].value = 0.0015;
 				composer.addPass( effect2 );
-
-				const gammaCorrectionMaterialShader = new THREE.ShaderMaterial( GammaCorrectionShader );
-				const effect3 = new PP.ShaderPass( gammaCorrectionMaterialShader, 'tDiffuse' );
-				composer.addPass( effect3 );
 
 				//
 
