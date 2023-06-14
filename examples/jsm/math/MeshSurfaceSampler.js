@@ -37,6 +37,7 @@ class MeshSurfaceSampler {
 		this.randomFunction = Math.random;
 
 		this.positionAttribute = this.geometry.getAttribute( 'position' );
+		this.normalAttribute = this.geometry.getAttribute( 'normal' );
 		this.colorAttribute = this.geometry.getAttribute( 'color' );
 		this.uvAttribute = this.geometry.getAttribute( 'uv' );
 		this.weightAttribute = null;
@@ -181,7 +182,18 @@ class MeshSurfaceSampler {
 
 		if ( targetNormal !== undefined ) {
 
-			_face.getNormal( targetNormal );
+			if ( this.normalAttribute !== undefined ) {
+
+				_face.a.fromBufferAttribute( this.normalAttribute, faceIndex * 3 );
+				_face.b.fromBufferAttribute( this.normalAttribute, faceIndex * 3 + 1 );
+				_face.c.fromBufferAttribute( this.normalAttribute, faceIndex * 3 + 2 );
+				targetNormal.set( 0, 0, 0 ).addScaledVector( _face.a, u ).addScaledVector( _face.b, v ).addScaledVector( _face.c, 1 - ( u + v ) ).normalize();
+
+			} else {
+
+				_face.getNormal( targetNormal );
+				
+			}
 
 		}
 

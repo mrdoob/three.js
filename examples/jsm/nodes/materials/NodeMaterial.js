@@ -29,6 +29,8 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.type = this.constructor.name;
 
+		this.forceSinglePass = false;
+
 		this.lights = true;
 		this.normals = true;
 
@@ -48,7 +50,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	customProgramCacheKey() {
 
-		return getCacheKey( this );
+		return this.type + getCacheKey( this );
 
 	}
 
