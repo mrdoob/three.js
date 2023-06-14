@@ -60,9 +60,9 @@
 			const matLine = new LineMaterial( {
 
 				color: 0xffffff,
-				linewidth: 1, // in world units with size attenuation, pixels otherwise
 				worldUnits: true,
 				vertexColors: true,
+				vertexWidths: true,
 
 				//resolution:  // to be set by renderer, eventually
 				alphaToCoverage: true,
@@ -72,9 +72,9 @@
 			const matThresholdLine = new LineMaterial( {
 
 				color: 0xffffff,
-				linewidth: matLine.linewidth, // in world units with size attenuation, pixels otherwise
 				worldUnits: true,
 				// vertexColors: true,
+				vertexWidths: true,
 				transparent: true,
 				opacity: 0.2,
 				depthTest: false,
@@ -88,7 +88,8 @@
 				'line type': 0,
 				'world units': matLine.worldUnits,
 				'visualize threshold': matThresholdLine.visible,
-				'width': matLine.linewidth,
+				'startWidth': matLine.linewidth,
+				'endWidth': matLine.linewidth,
 				'alphaToCoverage': matLine.alphaToCoverage,
 				'threshold': raycaster.params.Line2.threshold,
 				'translation': raycaster.params.Line2.threshold,
@@ -160,10 +161,6 @@
 
 				}
 
-				const lineGeometry = new LineGeometry();
-				lineGeometry.setPositions( positions );
-				lineGeometry.setColors( colors );
-
 				const segmentsGeometry = new LineSegmentsGeometry();
 				segmentsGeometry.setPositions( positions );
 				segmentsGeometry.setColors( colors );
@@ -174,27 +171,35 @@
 				scene.add( segments );
 				segments.visible = false;
 
-				thresholdSegments = new LineSegments2( segmentsGeometry, matThresholdLine );
+				const thresholdSegmentsGeometry = new LineSegmentsGeometry();
+				thresholdSegmentsGeometry.setPositions( positions );
+				thresholdSegmentsGeometry.setColors( colors );
+
+				thresholdSegments = new LineSegments2( thresholdSegmentsGeometry, matThresholdLine );
 				thresholdSegments.computeLineDistances();
 				thresholdSegments.scale.set( 1, 1, 1 );
 				scene.add( thresholdSegments );
 				thresholdSegments.visible = false;
+
+				const lineGeometry = new LineGeometry();
+				lineGeometry.setPositions( positions );
+				lineGeometry.setColors( colors );
 
 				line = new Line2( lineGeometry, matLine );
 				line.computeLineDistances();
 				line.scale.set( 1, 1, 1 );
 				scene.add( line );
 
-				thresholdLine = new Line2( lineGeometry, matThresholdLine );
+				const thresholdLineGeometry = new LineGeometry();
+				thresholdLineGeometry.setPositions( positions );
+				thresholdLineGeometry.setColors( colors );
+
+				thresholdLine = new Line2( thresholdLineGeometry, matThresholdLine );
 				thresholdLine.computeLineDistances();
 				thresholdLine.scale.set( 1, 1, 1 );
 				scene.add( thresholdLine );
 
-				const geo = new THREE.BufferGeometry();
-				geo.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-				geo.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-
-				//
+				updateWidths();
 
 				document.addEventListener( 'pointermove', onPointerMove );
 				window.addEventListener( 'resize', onWindowResize );
@@ -316,6 +321,27 @@
 
 			}
 
+			function updateWidths() {
+
+				const widths = [];
+				const thresholdWidths = [];
+				const points = segments.geometry.getAttribute( 'instanceStart' ).array;
+				const numPoints = points.length / 3;
+				for ( let i = 0; i < numPoints; i ++ ) {
+
+					const width = i / ( numPoints - 1 ) * ( params.endWidth - params.startWidth ) + params.startWidth;
+					widths.push( width );
+					thresholdWidths.push( width + raycaster.params.Line2.threshold );
+
+				}
+
+				segments.geometry.setWidths( widths );
+				thresholdSegments.geometry.setWidths( thresholdWidths );
+				line.geometry.setWidths( widths );
+				thresholdLine.geometry.setWidths( thresholdWidths );
+
+			}
+
 			function initGui() {
 
 				gui = new GUI();
@@ -342,10 +368,15 @@
 
 				} );
 
-				gui.add( params, 'width', 1, 10 ).onChange( function ( val ) {
+				gui.add( params, 'startWidth', 1, 50 ).onChange( function () {
 
-					matLine.linewidth = val;
-					matThresholdLine.linewidth = matLine.linewidth + raycaster.params.Line2.threshold;
+					updateWidths();
+
+				} );
+
+				gui.add( params, 'endWidth', 1, 50 ).onChange( function () {
+
+					updateWidths();
 
 				} );
 
@@ -355,10 +386,10 @@
 
 				} );
 
-				gui.add( params, 'threshold', 0, 10 ).onChange( function ( val ) {
+				gui.add( params, 'threshold', 0, 50 ).onChange( function ( val ) {
 
 					raycaster.params.Line2.threshold = val;
-					matThresholdLine.linewidth = matLine.linewidth + raycaster.params.Line2.threshold;
+					updateWidths();
 
 				} );
 

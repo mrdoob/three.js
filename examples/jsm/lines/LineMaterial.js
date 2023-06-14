@@ -57,6 +57,10 @@ ShaderLib[ 'line' ] = {
 		attribute vec3 instanceColorStart;
 		attribute vec3 instanceColorEnd;
 
+		attribute float instanceWidthStart;
+		attribute float instanceWidthEnd;
+		varying float vWidth;
+
 		#ifdef WORLD_UNITS
 
 			varying vec4 worldPos;
@@ -167,6 +171,21 @@ ShaderLib[ 'line' ] = {
 			dir.x *= aspect;
 			dir = normalize( dir );
 
+			// width
+			#ifdef USE_WIDTH
+
+				float widthStart = instanceWidthStart;
+				float widthEnd = instanceWidthEnd;
+
+			#else
+
+				float widthStart = linewidth;
+				float widthEnd = linewidth;
+
+			#endif
+
+			vWidth = ( position.y < 0.5 ) ? widthStart : widthEnd;
+
 			#ifdef WORLD_UNITS
 
 				// get the offset direction as perpendicular to the view vector
@@ -192,8 +211,8 @@ ShaderLib[ 'line' ] = {
 				#ifndef USE_DASH
 
 					// extend the line bounds to encompass  endcaps
-					start.xyz += - worldDir * linewidth * 0.5;
-					end.xyz += worldDir * linewidth * 0.5;
+					start.xyz += - worldDir * widthStart * 0.5;
+					end.xyz += worldDir * widthEnd * 0.5;
 
 					// shift the position of the quad so it hugs the forward edge of the line
 					offset.xy -= dir * forwardOffset;
@@ -208,8 +227,8 @@ ShaderLib[ 'line' ] = {
 
 				}
 
-				// adjust for linewidth
-				offset *= linewidth * 0.5;
+				// adjust for line width
+				offset *= vWidth * 0.5;
 
 				// set the world position
 				worldPos = ( position.y < 0.5 ) ? start : end;
@@ -244,8 +263,8 @@ ShaderLib[ 'line' ] = {
 
 				}
 
-				// adjust for linewidth
-				offset *= linewidth;
+				// adjust for line width
+				offset *= vWidth;
 
 				// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
 				offset /= resolution.y;
@@ -275,7 +294,8 @@ ShaderLib[ 'line' ] = {
 	/* glsl */`
 		uniform vec3 diffuse;
 		uniform float opacity;
-		uniform float linewidth;
+
+		varying float vWidth;
 
 		#ifdef USE_DASH
 
@@ -365,7 +385,7 @@ ShaderLib[ 'line' ] = {
 				vec3 p2 = rayEnd * params.y;
 				vec3 delta = p1 - p2;
 				float len = length( delta );
-				float norm = len / linewidth;
+				float norm = len / vWidth;
 
 				#ifndef USE_DASH
 
@@ -512,6 +532,32 @@ class LineMaterial extends ShaderMaterial {
 				set: function ( value ) {
 
 					this.uniforms.linewidth.value = value;
+
+				}
+
+			},
+
+			vertexWidths: {
+
+				enumerable: true,
+
+				get: function () {
+
+					return 'USE_WIDTH' in this.defines;
+
+				},
+
+				set: function ( value ) {
+
+					if ( value === true ) {
+
+						this.defines.USE_WIDTH = '';
+
+					} else {
+
+						delete this.defines.USE_WIDTH;
+
+					}
 
 				}
 
