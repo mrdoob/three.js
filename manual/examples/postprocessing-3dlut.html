@@ -39,7 +39,7 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
-import {GammaCorrectionShader} from 'three/addons/shaders/GammaCorrectionShader.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 
 function main() {
@@ -315,7 +315,7 @@ function main() {
   const renderModel = new RenderPass(scene, camera);
   renderModel.clear = false;  // so we don't clear out the background
   const renderBG = new RenderPass(sceneBG, cameraBG);
-  const gammaPass = new ShaderPass(GammaCorrectionShader);
+  const outputPass = new OutputPass();
 
   const composer = new EffectComposer(renderer);
 
@@ -323,7 +323,7 @@ function main() {
   composer.addPass(renderModel);
   composer.addPass(effectLUT);
   composer.addPass(effectLUTNearest);
-  composer.addPass(gammaPass);
+  composer.addPass(outputPass);
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
