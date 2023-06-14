@@ -299,7 +299,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		if ( outputColorSpace !== NoColorSpace ) outputNode = outputNode.colorSpace( outputColorSpace );
+		if ( outputColorSpace !== NoColorSpace ) outputNode = outputNode.linearToColorSpace( outputColorSpace );
 
 		// FOG
 

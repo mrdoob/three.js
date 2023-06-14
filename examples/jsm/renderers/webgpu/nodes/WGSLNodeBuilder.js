@@ -131,6 +131,12 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
+	needsColorSpace( texture ) {
+
+		return texture.isVideoTexture === true;
+
+	}
+
 	getSampler( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
