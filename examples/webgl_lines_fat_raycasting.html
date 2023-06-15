@@ -88,8 +88,8 @@
 				'line type': 0,
 				'world units': matLine.worldUnits,
 				'visualize threshold': matThresholdLine.visible,
-				'startWidth': matLine.linewidth,
-				'endWidth': matLine.linewidth,
+				'width': matLine.linewidth,
+				'variable widths': false,
 				'alphaToCoverage': matLine.alphaToCoverage,
 				'threshold': raycaster.params.Line2.threshold,
 				'translation': raycaster.params.Line2.threshold,
@@ -329,7 +329,14 @@
 				const numPoints = points.length / 3;
 				for ( let i = 0; i < numPoints; i ++ ) {
 
-					const width = i / ( numPoints - 1 ) * ( params.endWidth - params.startWidth ) + params.startWidth;
+					let width = params.width;
+					if ( params[ 'variable widths' ] ) {
+
+						const segment = i;
+						width += params.width * ( Math.sin( segment / 4 ) + 1 );
+
+					}
+
 					widths.push( width );
 					thresholdWidths.push( width + raycaster.params.Line2.threshold );
 
@@ -368,14 +375,15 @@
 
 				} );
 
-				gui.add( params, 'startWidth', 1, 50 ).onChange( function () {
+				gui.add( params, 'width', 1, 10 ).onChange( function () {
 
 					updateWidths();
 
 				} );
 
-				gui.add( params, 'endWidth', 1, 50 ).onChange( function () {
+				gui.add( params, 'variable widths' ).onChange( function ( val ) {
 
+					params[ 'variable widths' ] = val;
 					updateWidths();
 
 				} );
@@ -386,7 +394,7 @@
 
 				} );
 
-				gui.add( params, 'threshold', 0, 50 ).onChange( function ( val ) {
+				gui.add( params, 'threshold', 0, 10 ).onChange( function ( val ) {
 
 					raycaster.params.Line2.threshold = val;
 					updateWidths();

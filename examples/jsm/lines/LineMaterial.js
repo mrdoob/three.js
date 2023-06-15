@@ -172,7 +172,7 @@ ShaderLib[ 'line' ] = {
 			dir = normalize( dir );
 
 			// width
-			#ifdef USE_WIDTH
+			#ifdef USE_VERTEX_WIDTH
 
 				float widthStart = instanceWidthStart;
 				float widthEnd = instanceWidthEnd;
@@ -543,7 +543,7 @@ class LineMaterial extends ShaderMaterial {
 
 				get: function () {
 
-					return 'USE_WIDTH' in this.defines;
+					return 'USE_VERTEX_WIDTH' in this.defines;
 
 				},
 
@@ -551,11 +551,11 @@ class LineMaterial extends ShaderMaterial {
 
 					if ( value === true ) {
 
-						this.defines.USE_WIDTH = '';
+						this.defines.USE_VERTEX_WIDTH = '';
 
 					} else {
 
-						delete this.defines.USE_WIDTH;
+						delete this.defines.USE_VERTEX_WIDTH;
 
 					}
 
