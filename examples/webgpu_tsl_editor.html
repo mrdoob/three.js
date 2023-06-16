@@ -119,14 +119,14 @@
 
 					const tslCode = `// Example: Desaturate texture
 
-const { texture, uniform, color, vec4 } = TSL;
+const { texture, uniform, vec4 } = TSL;
 
 //const samplerTexture = new THREE.Texture();
 const samplerTexture = new THREE.TextureLoader().load( './textures/uv_grid_opengl.jpg' );
 
 // label is optional
 const myMap = texture( samplerTexture ).rgb.label( 'myTexture' );
-const myColor = uniform( color( 0x0066ff ) ).label( 'myColor' );
+const myColor = uniform( new THREE.Color( 0x0066ff ) ).label( 'myColor' );
 const opacity = .7;
 
 const desaturatedMap = myMap.rgb.saturation( 0 ); // try add .temp( 'myVar' ) after saturation()
