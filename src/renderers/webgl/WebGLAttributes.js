@@ -26,7 +26,7 @@ function WebGLAttributes( gl, capabilities ) {
 
 		} else if ( array instanceof Uint16Array ) {
 
-			if ( attribute.isFloat16BufferAttribute || attribute.gpuType === FloatType ) {
+			if ( attribute.isFloat16BufferAttribute || ( bufferType !== gl.ELEMENT_ARRAY_BUFFER && attribute.gpuType === FloatType ) ) {
 
 				if ( isWebGL2 ) {
 
