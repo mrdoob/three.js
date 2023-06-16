@@ -96,7 +96,7 @@ fn threejs_repeatWrapping( uv : vec2<f32>, dimension : vec2<u32> ) -> vec2<u32> 
 ` )
 };
 
-class WebGPUNodeBuilder extends NodeBuilder {
+class WGSLNodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer ) {
 
@@ -516,7 +516,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 					snippets.push( `${ attributesSnippet } ${ varying.name } : ${ this.getType( varying.type ) }` );
 
-				} else if ( vars.includes( varying ) === false ) {
+				} else if ( shaderStage === 'vertex' && vars.includes( varying ) === false ) {
 
 					vars.push( varying );
 
@@ -861,4 +861,4 @@ var<${access}> ${name} : ${structName};`;
 
 }
 
-export default WebGPUNodeBuilder;
+export default WGSLNodeBuilder;

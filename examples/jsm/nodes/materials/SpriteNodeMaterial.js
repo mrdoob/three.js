@@ -88,13 +88,6 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 	copy( source ) {
 
-		this.colorNode = source.colorNode;
-		this.opacityNode = source.opacityNode;
-
-		this.alphaTestNode = source.alphaTestNode;
-
-		this.lightNode = source.lightNode;
-
 		this.positionNode = source.positionNode;
 		this.rotationNode = source.rotationNode;
 		this.scaleNode = source.scaleNode;

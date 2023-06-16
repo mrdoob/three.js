@@ -4,7 +4,7 @@ import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-c
 
 import { GPUFeatureName, GPUTextureFormat, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension } from './utils/WebGPUConstants.js';
 
-import WebGPUNodeBuilder from './nodes/WGSLNodeBuilder.js';
+import WGSLNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
 
 import { DepthTexture, DepthFormat, DepthStencilFormat, UnsignedInt248Type, UnsignedIntType, WebGPUCoordinateSystem } from 'three';
@@ -576,7 +576,7 @@ class WebGPUBackend extends Backend {
 
 	createNodeBuilder( object, renderer ) {
 
-		return new WebGPUNodeBuilder( object, renderer );
+		return new WGSLNodeBuilder( object, renderer );
 
 	}
 

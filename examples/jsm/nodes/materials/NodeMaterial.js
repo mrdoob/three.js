@@ -74,14 +74,22 @@ class NodeMaterial extends ShaderMaterial {
 
 		builder.addStack();
 
-		if ( this.normals === true ) this.constructNormal( builder );
+		if ( this.isUnlit === false ) {
 
-		this.constructDiffuseColor( builder );
-		this.constructVariants( builder );
+			if ( this.normals === true ) this.constructNormal( builder );
 
-		const outgoingLightNode = this.constructLighting( builder );
+			this.constructDiffuseColor( builder );
+			this.constructVariants( builder );
 
-		builder.stack.outputNode = this.constructOutput( builder, outgoingLightNode, diffuseColor.a );
+			const outgoingLightNode = this.constructLighting( builder );
+
+			builder.stack.outputNode = this.constructOutput( builder, outgoingLightNode, diffuseColor.a );
+
+		} else {
+
+			builder.stack.outputNode = this.constructOutput( builder, this.colorNode );
+
+		}
 
 		builder.addFlow( 'fragment', builder.removeStack() );
 
@@ -265,7 +273,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	constructOutput( builder, outgoingLight, opacity ) {
+	constructOutput( builder, outgoingLight, opacity = null ) {
 
 		const renderer = builder.renderer;
 
@@ -281,7 +289,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		// @TODO: Optimize outputNode to vec3.
 
-		let outputNode = vec4( outgoingLight, opacity );
+		let outputNode = opacity !== null ? vec4( outgoingLight, opacity ) : outgoingLight;
 
 		// ENCODING
 
@@ -403,6 +411,30 @@ class NodeMaterial extends ShaderMaterial {
 		}
 
 		return data;
+
+	}
+
+	get isUnlit() {
+
+		return this.construct === NodeMaterial.prototype.construct;
+
+	}
+
+	copy( source ) {
+
+		this.lightsNode = source.lightsNode;
+		this.envNode = source.lightsNode;
+
+		this.colorNode = source.lightsNode;
+		this.normalNode = source.lightsNode;
+		this.opacityNode = source.lightsNode;
+		this.backdropNode = source.lightsNode;
+		this.backdropAlphaNode = source.lightsNode;
+		this.alphaTestNode = source.lightsNode;
+
+		this.positionNode = source.lightsNode;
+
+		return super.copy( source );
 
 	}
 

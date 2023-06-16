@@ -46,8 +46,8 @@ class NodeBuilder {
 	constructor( object, renderer, parser ) {
 
 		this.object = object;
-		this.material = object && ( object.material || null );
-		this.geometry = object && ( object.geometry || null );
+		this.material = ( object && object.material ) || null;
+		this.geometry = ( object && object.geometry ) || null;
 		this.renderer = renderer;
 		this.parser = parser;
 
