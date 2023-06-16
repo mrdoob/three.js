@@ -76,7 +76,7 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000000, 0.0025 );
 
-				light = new THREE.DirectionalLight( 0xffffff );
+				light = new THREE.DirectionalLight( 0xffffff, 3 );
 				light.position.set( 0, 0.5, 1 ).normalize();
 				scene.add( light );
 
@@ -218,6 +218,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				document.body.appendChild( renderer.domElement );
 
 				//
