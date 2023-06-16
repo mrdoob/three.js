@@ -133,7 +133,7 @@ const desaturatedMap = myMap.rgb.saturation( 0 ); // try add .temp( 'myVar' ) af
 
 const finalColor = desaturatedMap.add( myColor );
 
-return vec4( finalColor, opacity );
+output = vec4( finalColor, opacity );
 `;
 
 					const editor = window.monaco.editor.create( editorDOM, {
@@ -155,10 +155,10 @@ return vec4( finalColor, opacity );
 
 						try {
 
-							const tslCode = editor.getValue();
-							const outputNode = new Function( 'THREE', 'TSL', tslCode )( THREE, NODES, tslCode );
+							const tslCode = `let output = null;\n${ editor.getValue() }\nreturn { output };`;
+							const nodes = new Function( 'THREE', 'TSL', tslCode )( THREE, NODES, tslCode );
 
-							mesh.material.colorNode = outputNode;
+							mesh.material.colorNode = nodes.output;
 							mesh.material.dispose();
 
 							const outputColorSpace = renderer.outputColorSpace;
