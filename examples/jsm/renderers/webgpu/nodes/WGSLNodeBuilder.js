@@ -258,9 +258,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getUniformFromNode( node, type, shaderStage ) {
+	getUniformFromNode( node, type, shaderStage, name = null ) {
 
-		const uniformNode = super.getUniformFromNode( node, type, shaderStage );
+		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
 		if ( nodeData.uniformGPU === undefined ) {
