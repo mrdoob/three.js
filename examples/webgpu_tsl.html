@@ -131,7 +131,7 @@ const myMap = texture( samplerTexture ).rgb.label( 'myTexture' );
 const myColor = uniform( color( 0x0066ff ) ).label( 'myColor' );
 const opacity = .7;
 
-const desaturatedMap = myMap.rgb.saturation( 0 ); // try add .temp( 'MyVar' ) after saturation()
+const desaturatedMap = myMap.rgb.saturation( 0 ); // try add .temp( 'myVar' ) after saturation()
 
 const finalColor = desaturatedMap.add( myColor );
 
