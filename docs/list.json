@@ -709,6 +709,16 @@
 				"Skeleton": "api/ar/objects/Skeleton",
 				"SkinnedMesh": "api/ar/objects/SkinnedMesh",
 				"Sprite": "api/ar/objects/Sprite"
+			},
+
+			"Renderers": {
+				"WebGLMultipleRenderTargets": "api/ar/renderers/WebGLMultipleRenderTargets",
+				"WebGLRenderer": "api/ar/renderers/WebGLRenderer",
+				"WebGL1Renderer": "api/ar/renderers/WebGL1Renderer",
+				"WebGLRenderTarget": "api/ar/renderers/WebGLRenderTarget",
+				"WebGL3DRenderTarget": "api/ar/renderers/WebGL3DRenderTarget",
+				"WebGLArrayRenderTarget": "api/ar/renderers/WebGLArrayRenderTarget",
+				"WebGLCubeRenderTarget": "api/ar/renderers/WebGLCubeRenderTarget"
 			}
 
 		}
