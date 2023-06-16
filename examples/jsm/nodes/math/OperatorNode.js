@@ -120,7 +120,7 @@ class OperatorNode extends TempNode {
 
 				typeB = typeA;
 
-			} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' ) {
+			} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' ) {
 
 				if ( builder.isVector( typeA ) ) {
 
