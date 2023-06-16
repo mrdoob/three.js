@@ -93,8 +93,6 @@
 				renderer.setSize( 200, 200 );
 				rendererDOM.appendChild( renderer.domElement );
 
-				renderer.outputColorSpace = THREE.NoColorSpace; // Don't apply "sRGB/Display-P3" encoding.
-
 				const material = new NODES.NodeMaterial();
 				material.colorNode = NODES.vec4( 0, 0, 0, 1 );
 
