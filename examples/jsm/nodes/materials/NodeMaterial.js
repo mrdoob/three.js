@@ -416,7 +416,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	get isUnlit() {
 
-		return this.construct === NodeMaterial.prototype.construct;
+		return this.constructor === NodeMaterial.prototype.constructor;
 
 	}
 
