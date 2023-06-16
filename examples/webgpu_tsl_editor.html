@@ -89,7 +89,7 @@
 				const rendererDOM = document.getElementById( 'renderer' );
 
 				const renderer = new WebGPURenderer();
-				renderer.outputColorSpace = THREE.NoColorSpace;
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( 200, 200 );
 				rendererDOM.appendChild( renderer.domElement );
@@ -112,7 +112,7 @@
 
 				require( [ 'vs/editor/editor.main' ], () => {
 
-					const options = { shader: 'fragment', outputColorSpace: THREE.NoColorSpace };
+					const options = { shader: 'fragment', outputColorSpace: THREE.LinearSRGBColorSpace };
 
 					let timeout = null;
 					let nodeBuilder = null;
@@ -209,7 +209,7 @@ output = vec4( finalColor, opacity );
 
 					gui.add( options, 'shader', [ 'vertex', 'fragment' ] ).onChange( showCode );
 
-					gui.add( options, 'outputColorSpace', [ THREE.NoColorSpace, THREE.SRGBColorSpace ] ).onChange( ( value ) => {
+					gui.add( options, 'outputColorSpace', [ THREE.LinearSRGBColorSpace, THREE.SRGBColorSpace ] ).onChange( ( value ) => {
 
 						renderer.outputColorSpace = value;
 
