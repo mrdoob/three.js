@@ -140,7 +140,7 @@ class TextureNode extends UniformNode {
 
 			let snippet = propertyName;
 
-			if ( builder.needsColorSpace( this.value ) ) {
+			if ( builder.needsColorSpaceToLinear( this.value ) ) {
 
 				snippet = colorSpaceToLinear( expression( snippet, nodeType ), this.value.colorSpace ).construct( builder ).build( builder, nodeType );
 

@@ -131,7 +131,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	needsColorSpace( texture ) {
+	needsColorSpaceToLinear( texture ) {
 
 		return texture.isVideoTexture === true;
 
