@@ -89,6 +89,7 @@
 				const rendererDOM = document.getElementById( 'renderer' );
 
 				const renderer = new WebGPURenderer();
+				renderer.outputColorSpace = THREE.NoColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( 200, 200 );
 				rendererDOM.appendChild( renderer.domElement );
@@ -104,15 +105,17 @@
 					renderer.render( scene, camera );
 
 				} );
+
 				// editor
 
 				window.require.config( { paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@latest/min/vs' } } );
 
 				require( [ 'vs/editor/editor.main' ], () => {
 
-					const options = { shader: 'fragment' };
+					const options = { shader: 'fragment', outputColorSpace: THREE.NoColorSpace };
 
 					let timeout = null;
+					let nodeBuilder = null;
 
 					const editorDOM = document.getElementById( 'source' );
 					const resultDOM = document.getElementById( 'result' );
@@ -151,26 +154,27 @@ output = vec4( finalColor, opacity );
 						readOnly: true
 					} );
 
+					const showCode = () => {
+
+						result.setValue( nodeBuilder[ options.shader + 'Shader' ] );
+						result.revealLine( 1 );
+
+					};
+
 					const build = () => {
 
 						try {
 
 							const tslCode = `let output = null;\n${ editor.getValue() }\nreturn { output };`;
-							const nodes = new Function( 'THREE', 'TSL', tslCode )( THREE, NODES, tslCode );
+							const nodes = new Function( 'THREE', 'TSL', tslCode )( THREE, NODES );
 
 							mesh.material.colorNode = nodes.output;
 							mesh.material.dispose();
 
-							const outputColorSpace = renderer.outputColorSpace;
-							renderer.outputColorSpace = THREE.NoColorSpace; // Don't apply "sRGB/Display-P3" encoding to clean up the output.
-
-							const nodeBuilder = new WGSLNodeBuilder( mesh, renderer );
+							nodeBuilder = new WGSLNodeBuilder( mesh, renderer );
 							nodeBuilder.build();
 
-							result.setValue( nodeBuilder[ options.shader + 'Shader' ] );
-							result.revealLine( 1 );
-
-							renderer.outputColorSpace = outputColorSpace; // restore
+							showCode();
 
 							// extra debug info
 
@@ -203,7 +207,11 @@ output = vec4( finalColor, opacity );
 
 					const gui = new GUI();
 
-					gui.add( options, 'shader', [ 'vertex', 'fragment' ] ).onChange( () => {
+					gui.add( options, 'shader', [ 'vertex', 'fragment' ] ).onChange( showCode );
+
+					gui.add( options, 'outputColorSpace', [ THREE.NoColorSpace, THREE.SRGBColorSpace ] ).onChange( ( value ) => {
+
+						renderer.outputColorSpace = value;
 
 						build();
 
