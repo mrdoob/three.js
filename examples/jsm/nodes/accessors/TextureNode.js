@@ -1,7 +1,9 @@
 import UniformNode from '../core/UniformNode.js';
 import { uv } from './UVNode.js';
 import { textureSize } from './TextureSizeNode.js';
+import { colorSpaceToLinear } from '../display/ColorSpaceNode.js';
 import { context } from '../core/ContextNode.js';
+import { expression } from '../code/ExpressionNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
@@ -136,7 +138,15 @@ class TextureNode extends UniformNode {
 
 			}
 
-			return builder.format( propertyName, nodeType, output );
+			let snippet = propertyName;
+
+			if ( builder.needsColorSpaceToLinear( this.value ) ) {
+
+				snippet = colorSpaceToLinear( expression( snippet, nodeType ), this.value.colorSpace ).construct( builder ).build( builder, nodeType );
+
+			}
+
+			return builder.format( snippet, nodeType, output );
 
 		}
 

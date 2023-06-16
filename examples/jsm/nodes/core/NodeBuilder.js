@@ -390,6 +390,12 @@ class NodeBuilder {
 
 	}
 
+	needsColorSpaceToLinear( /*texture*/ ) {
+
+		return false;
+
+	}
+
 	/** @deprecated, r152 */
 	getTextureEncodingFromMap( map ) {
 
