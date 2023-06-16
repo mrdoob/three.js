@@ -10,7 +10,7 @@ export { default as AttributeNode, attribute } from './core/AttributeNode.js';
 export { default as BypassNode, bypass } from './core/BypassNode.js';
 export { default as CacheNode, cache } from './core/CacheNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
-export { default as ContextNode, context } from './core/ContextNode.js';
+export { default as ContextNode, context, label } from './core/ContextNode.js';
 export { default as InstanceIndexNode, instanceIndex } from './core/InstanceIndexNode.js';
 export { default as LightingModel, lightingModel } from './core/LightingModel.js';
 export { default as Node, addNodeClass, createNodeFromType } from './core/Node.js';
@@ -28,7 +28,7 @@ export { default as PropertyNode, property, diffuseColor, roughness, metalness, 
 export { default as StackNode, stack } from './core/StackNode.js';
 export { default as TempNode } from './core/TempNode.js';
 export { default as UniformNode, uniform } from './core/UniformNode.js';
-export { default as VarNode, label, temp } from './core/VarNode.js';
+export { default as VarNode, temp } from './core/VarNode.js';
 export { default as VaryingNode, varying } from './core/VaryingNode.js';
 
 import * as NodeUtils from './core/NodeUtils.js';
