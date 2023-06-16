@@ -123,7 +123,8 @@
 
 const { texture, uniform, color, vec4 } = TSL;
 
-const samplerTexture = new THREE.Texture();
+//const samplerTexture = new THREE.Texture();
+const samplerTexture = new THREE.TextureLoader().load( './textures/uv_grid_opengl.jpg' );
 
 // label is optional
 const myMap = texture( samplerTexture ).rgb.label( 'myTexture' );
