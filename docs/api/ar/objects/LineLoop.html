@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Line] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		خط مستمر يتصل بالعودة إلى البداية.<br /><br />
+		 
+		هذا مطابق تقريبًا لـ [page:Line] ؛ الفرق الوحيد هو أنه
+		يتم تقديمه باستخدام
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_LOOP] بدلاً من
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_STRIP]،
+		الذي يرسم خطًا مستقيمًا إلى الرأس التالي ، و
+		يربط الرأس الأخير مرة أخرى إلى الأول.
+		</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>
+		[name]( [param:BufferGeometry geometry], [param:Material material] )
+		</h3>
+		 
+		<p>
+		[page:BufferGeometry geometry] - قائمة من الرؤوس التي تمثل نقاط على
+		حلقة الخط.<br />
+		[page:Material material] - مادة للخط. الافتراضية هي
+		[page:LineBasicMaterial LineBasicMaterial].
+		</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		<p>راجع الفئة الأساسية [page:Line] للحصول على الخصائص المشتركة.</p>
+		 
+		<h3>[property:Boolean isLineLoop]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان كائنًا معطىً من نوع [name].</p>
+		 
+		<h2>الطرق (Methods)</h2>
+		<p>راجع الفئة الأساسية [page:Line] للحصول على الطرق المشتركة.</p>
+		 
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
