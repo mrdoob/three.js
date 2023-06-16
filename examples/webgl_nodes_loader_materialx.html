@@ -86,6 +86,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				renderer.toneMapping = THREE.LinearToneMapping;
 				renderer.toneMappingExposure = .5;
 				renderer.setAnimationLoop( render );
