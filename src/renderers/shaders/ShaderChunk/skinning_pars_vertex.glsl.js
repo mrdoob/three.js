@@ -37,5 +37,5 @@ export default /* glsl */`
 
 	}
 
-#endif // USE_SKINNING
+#endif
 `;
