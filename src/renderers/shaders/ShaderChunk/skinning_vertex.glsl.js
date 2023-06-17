@@ -19,8 +19,9 @@ export default /* glsl */`
 
 				vec2 boneIndexWeight =
 					texelFetch( boneIndexWeightsTexture,
-											ivec2( bonePairTexIndex % boneTexWidth,
-											bonePairTexIndex / boneTexWidth), 0 ).xy;
+					            ivec2( bonePairTexIndex % boneTexWidth,
+					                   bonePairTexIndex / boneTexWidth),
+					            0 ).xy;
 
 				int boneIndex = int(boneIndexWeight.x);
 

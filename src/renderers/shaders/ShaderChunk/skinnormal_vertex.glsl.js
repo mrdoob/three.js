@@ -17,8 +17,9 @@ export default /* glsl */`
 
 				vec2 boneIndexWeight =
 					texelFetch( boneIndexWeightsTexture,
-											ivec2( bonePairTexIndex % boneTexWidth,
-											bonePairTexIndex / boneTexWidth ), 0 ).xy;
+					            ivec2( bonePairTexIndex % boneTexWidth,
+					                   bonePairTexIndex / boneTexWidth ),
+					            0 ).xy;
 
 				int boneIndex = int( boneIndexWeight.x );
 
@@ -31,8 +32,8 @@ export default /* glsl */`
 				mat4 boneMatrix = getBoneMatrix( float( boneIndex ) );
 				skinnedNormal +=
 					normalize( mat3( bindMatrixInverse )
-									* mat3( boneMatrix )
-									* mat3( bindMatrix ) * objectNormal )
+					         * mat3( boneMatrix )
+					         * mat3( bindMatrix ) * objectNormal )
 					* boneIndexWeight.y;
 
 			}
