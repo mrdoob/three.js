@@ -27,8 +27,12 @@
 
 	/* Deterministic RAF */
 
-	const ST = window.setTimeout;
 	const RAF = window.requestAnimationFrame;
+
+	window._setTimeout = window.setTimeout;
+	window._setInterval = window.setInterval;
+	window._clearTimeout = window.clearTimeout;
+	window._clearInterval = window.clearInterval;
 
 	window._renderStarted = false;
 	window._renderFinished = false;
@@ -37,7 +41,7 @@
 
 		if ( ! window._renderStarted ) {
 
-			ST( () => requestAnimationFrame( cb ), 50 );
+			window._setTimeout( () => requestAnimationFrame( cb ), 10 );
 
 		} else {
 
@@ -66,7 +70,7 @@
 
 	};
 
-	/*const handles = [];
+	const handles = [];
 	window.setTimeout = function ( func, ms, ...args ) {
 
 		const i = handles.length;
@@ -103,7 +107,7 @@
 
 	};
 
-	window.clearTimeout = window.clearInterval = ( i ) => { handles[ i ] = false; };*/
+	window.clearTimeout = window.clearInterval = ( i ) => { handles[ i ] = false; };
 
 	/* Semi-deterministic video */
 	// TODO: Fix this
