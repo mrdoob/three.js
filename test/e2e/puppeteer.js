@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import puppeteer from 'puppeteer-core';
-import { install, computeExecutablePath, resolveBuildId, detectBrowserPlatform } from '@puppeteer/browsers';
+import { install, computeExecutablePath/*, resolveBuildId*/, detectBrowserPlatform } from '@puppeteer/browsers';
 import express from 'express';
 import path from 'path';
 import pixelmatch from 'pixelmatch';
