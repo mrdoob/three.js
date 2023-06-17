@@ -54,7 +54,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as NODES from 'three/nodes';
+			import * as Nodes from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -94,8 +94,8 @@
 				renderer.setSize( 200, 200 );
 				rendererDOM.appendChild( renderer.domElement );
 
-				const material = new NODES.NodeMaterial();
-				material.colorNode = NODES.vec4( 0, 0, 0, 1 );
+				const material = new Nodes.NodeMaterial();
+				material.colorNode = Nodes.vec4( 0, 0, 0, 1 );
 
 				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( mesh );
@@ -166,7 +166,7 @@ output = vec4( finalColor, opacity );
 						try {
 
 							const tslCode = `let output = null;\n${ editor.getValue() }\nreturn { output };`;
-							const nodes = new Function( 'THREE', 'TSL', tslCode )( THREE, NODES );
+							const nodes = new Function( 'THREE', 'TSL', tslCode )( THREE, Nodes );
 
 							mesh.material.colorNode = nodes.output;
 							mesh.material.dispose();
