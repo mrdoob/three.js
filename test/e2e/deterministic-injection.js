@@ -41,7 +41,7 @@
 
 		if ( ! window._renderStarted ) {
 
-			window._setTimeout( () => requestAnimationFrame( cb ), 10 );
+			_setTimeout( () => requestAnimationFrame( cb ), 10 );
 
 		} else {
 
