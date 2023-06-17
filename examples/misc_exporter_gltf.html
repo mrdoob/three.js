@@ -164,14 +164,14 @@
 				// ---------------------------------------------------------------------
 				// Ambient light
 				// ---------------------------------------------------------------------
-				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.2 );
+				const ambientLight = new THREE.AmbientLight( 0xcccccc );
 				ambientLight.name = 'AmbientLight';
 				scene1.add( ambientLight );
 
 				// ---------------------------------------------------------------------
 				// DirectLight
 				// ---------------------------------------------------------------------
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
 				dirLight.target.position.set( 0, 0, - 1 );
 				dirLight.add( dirLight.target );
 				dirLight.lookAt( - 1, - 1, 0 );
@@ -199,6 +199,7 @@
 				// Icosahedron
 				const mapGrid = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 				mapGrid.wrapS = mapGrid.wrapT = THREE.RepeatWrapping;
+				mapGrid.colorSpace = THREE.SRGBColorSpace;
 				material = new THREE.MeshBasicMaterial( {
 					color: 0xffffff,
 					map: mapGrid
@@ -445,6 +446,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
 
