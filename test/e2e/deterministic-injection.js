@@ -17,7 +17,7 @@
 	window.performance._now = performance.now;
 
 	let frameId = 0;
-	//let lastFrameRealTime = 0;
+	let lastFrameRealTime = 0;
 	const maxFrameId = 2;
 
 	const now = () => frameId * 1000 / 60;
@@ -37,7 +37,7 @@
 
 		if ( ! window._renderStarted ) {
 
-			ST( () => requestAnimationFrame( cb ), 10 );
+			ST( () => requestAnimationFrame( cb ), 50 );
 
 		} else {
 
@@ -53,12 +53,12 @@
 
 				}
 
-				frameId ++;/*if ( performance._now() > lastFrameRealTime + 1000 / 120 ) {
+				if ( performance._now() > lastFrameRealTime + 1000 / 120 ) {
 
 					lastFrameRealTime = performance._now();
 					frameId ++;
 
-				}*/
+				}
 
 			} );
 
@@ -66,7 +66,7 @@
 
 	};
 
-	const handles = [];
+	/*const handles = [];
 	window.setTimeout = function ( func, ms, ...args ) {
 
 		const i = handles.length;
@@ -103,7 +103,7 @@
 
 	};
 
-	window.clearTimeout = window.clearInterval = ( i ) => { handles[ i ] = false; };
+	window.clearTimeout = window.clearInterval = ( i ) => { handles[ i ] = false; };*/
 
 	/* Semi-deterministic video */
 	// TODO: Fix this
