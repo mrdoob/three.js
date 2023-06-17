@@ -117,5 +117,8 @@
       "build/three.module.js"
     ],
     "directories": {}
+  },
+  "dependencies": {
+    "@puppeteer/browsers": "^1.4.1"
   }
 }
