@@ -140,7 +140,7 @@ const exceptionList = [
 const chromiumChannel = 'stable'; // stable -- beta -- dev -- canary -- latest
 const installedBrowsersDir = 'test/e2e/chromium';
 
-const port = 8234;
+const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.3; // at most 0.3% different pixels
 
@@ -174,7 +174,7 @@ process.on( 'SIGINT', () => close() );
 
 async function main() {
 
-	/* Create output directories */
+	/* Create output directory */
 
 	try { await fs.rm( 'test/e2e/output-screenshots', { recursive: true, force: true } ); } catch {}
 	try { await fs.mkdir( 'test/e2e/output-screenshots' ); } catch {}
