@@ -16,11 +16,11 @@
 
 	window.performance._now = performance.now;
 
-	let frameId = 0;
+	let frameID = 0;
 	let lastFrameRealTime = 0;
-	const maxFrameId = 2;
+	const maxFrameID = 2;
 
-	const now = () => frameId * 1000 / 60;
+	const now = () => frameID * 1000 / 60;
 	window.Date.now = now;
 	window.Date.prototype.getTime = now;
 	window.performance.now = now;
@@ -47,20 +47,20 @@
 
 			RAF( () => {
 
-				if ( frameId < maxFrameId ) {
+				if ( frameID < maxFrameID ) {
+
+					if ( performance._now() > lastFrameRealTime + 1000 / 120 ) {
+
+						lastFrameRealTime = performance._now();
+						frameID ++;
+
+					}
 
 					cb( now() );
 
 				} else {
 
 					window._renderFinished = true;
-
-				}
-
-				if ( performance._now() > lastFrameRealTime + 1000 / 120 ) {
-
-					lastFrameRealTime = performance._now();
-					frameId ++;
 
 				}
 
