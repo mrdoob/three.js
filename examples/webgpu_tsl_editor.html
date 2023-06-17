@@ -169,7 +169,7 @@ output = vec4( finalColor, opacity );
 							const nodes = new Function( 'THREE', 'TSL', tslCode )( THREE, Nodes );
 
 							mesh.material.colorNode = nodes.output;
-							mesh.material.dispose();
+							mesh.material.needsUpdate = true;
 
 							nodeBuilder = new WGSLNodeBuilder( mesh, renderer );
 							nodeBuilder.build();
