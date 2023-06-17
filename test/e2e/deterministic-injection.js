@@ -17,8 +17,8 @@
 	window.performance._now = performance.now;
 
 	let frameId = 0;
+	let lastFrameRealTime = 0;
 	const maxFrameId = 2;
-	const lastFrameRealTime = 0;
 
 	const now = () => frameId * 1000 / 60;
 	window.Date.now = now;
