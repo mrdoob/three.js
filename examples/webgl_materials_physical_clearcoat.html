@@ -178,10 +178,10 @@
 
 				particleLight.add( new THREE.PointLight( 0xffffff, 30 ) );
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.useLegacyLights = false;
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
 				//
