@@ -45,6 +45,7 @@ class NodeMaterial extends ShaderMaterial {
 		this.alphaTestNode = null;
 
 		this.positionNode = null;
+		this.outputNode = null;
 
 	}
 
@@ -83,11 +84,11 @@ class NodeMaterial extends ShaderMaterial {
 
 			const outgoingLightNode = this.constructLighting( builder );
 
-			builder.stack.outputNode = this.constructOutput( builder, outgoingLightNode, diffuseColor.a );
+			builder.stack.outputNode = this.constructOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
 
 		} else {
 
-			builder.stack.outputNode = this.constructOutput( builder, this.colorNode );
+			builder.stack.outputNode = this.constructOutput( builder, this.outputNode || vec4( 0, 0, 0, 1 ) );
 
 		}
 
@@ -273,7 +274,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	constructOutput( builder, outgoingLight, opacity = null ) {
+	constructOutput( builder, outputNode ) {
 
 		const renderer = builder.renderer;
 
@@ -283,13 +284,9 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( toneMappingNode ) {
 
-			outgoingLight = toneMappingNode.context( { color: outgoingLight } );
+			outputNode = vec4( toneMappingNode.context( { color: outputNode.rgb } ), outputNode.a );
 
 		}
-
-		// @TODO: Optimize outputNode to vec3.
-
-		let outputNode = opacity !== null ? vec4( outgoingLight, opacity ) : outgoingLight;
 
 		// ENCODING
 
@@ -423,16 +420,17 @@ class NodeMaterial extends ShaderMaterial {
 	copy( source ) {
 
 		this.lightsNode = source.lightsNode;
-		this.envNode = source.lightsNode;
+		this.envNode = source.envNode;
 
-		this.colorNode = source.lightsNode;
-		this.normalNode = source.lightsNode;
-		this.opacityNode = source.lightsNode;
-		this.backdropNode = source.lightsNode;
-		this.backdropAlphaNode = source.lightsNode;
-		this.alphaTestNode = source.lightsNode;
+		this.colorNode = source.colorNode;
+		this.normalNode = source.normalNode;
+		this.opacityNode = source.opacityNode;
+		this.backdropNode = source.backdropNode;
+		this.backdropAlphaNode = source.backdropAlphaNode;
+		this.alphaTestNode = source.alphaTestNode;
 
-		this.positionNode = source.lightsNode;
+		this.positionNode = source.positionNode;
+		this.outputNode = source.outputNode;
 
 		return super.copy( source );
 
