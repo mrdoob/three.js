@@ -17,33 +17,33 @@
 	window.performance._now = performance.now;
 
 	let frameId = 0;
-	const now = () => frameId * 16;
+	const maxFrameId = 2;
+	const lastFrameRealTime = 0;
+
+	const now = () => frameId * 1000 / 60;
 	window.Date.now = now;
 	window.Date.prototype.getTime = now;
 	window.performance.now = now;
 
 	/* Deterministic RAF */
 
+	const ST = window.setTimeout;
 	const RAF = window.requestAnimationFrame;
+
 	window._renderStarted = false;
 	window._renderFinished = false;
 
-	const maxFrameId = 2;
 	window.requestAnimationFrame = function ( cb ) {
 
 		if ( ! window._renderStarted ) {
 
-			setTimeout( function () {
-
-				requestAnimationFrame( cb );
-
-			}, 50 );
+			ST( () => requestAnimationFrame( cb ), 10 );
 
 		} else {
 
-			RAF( function () {
+			RAF( () => {
 
-				if ( frameId ++ < maxFrameId ) {
+				if ( frameId < maxFrameId ) {
 
 					cb( now() );
 
@@ -53,13 +53,60 @@
 
 				}
 
+				if ( performance._now() > lastFrameRealTime + 1000 / 120 ) {
+
+					lastFrameRealTime = performance._now();
+					frameId ++;
+
+				}
+
 			} );
 
 		}
 
 	};
 
-	/* Semi-determitistic video */
+	const handles = [];
+	window.setTimeout = function ( func, ms, ...args ) {
+
+		const i = handles.length;
+		handles[ i ] = true;
+
+		if ( ms < 1000 / 120 ) {
+
+			func( ...args );
+
+		} else {
+
+			const then = now();
+			requestAnimationFrame( now => handles[ i ] ? setTimeout( func, ms - now + then, ...args ) : null );
+
+		}
+
+		return i;
+
+	};
+
+	window.setInterval = function ( func, ms, ...args ) {
+
+		const i = handles.length;
+		handles[ i ] = true;
+
+		const wrap = () => {
+			if ( ! handles[ i ] ) return;
+			func( ...args );
+			setTimeout( wrap, ms );
+		};
+		setTimeout( wrap, ms );
+
+		return i;
+
+	};
+
+	window.clearTimeout = window.clearInterval = ( i ) => { handles[ i ] = false; };
+
+	/* Semi-deterministic video */
+	// TODO: Fix this
 
 	const play = HTMLVideoElement.prototype.play;
 
@@ -81,6 +128,7 @@
 	};
 
 	/* Additional variable for ~5 examples */
+	// TODO: Remove this
 
 	window.TESTING = true;
 
