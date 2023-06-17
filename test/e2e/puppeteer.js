@@ -483,7 +483,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			await page.evaluate( async ( renderTimeout, parseTime ) => {
 
-				await new Promise( resolve => setTimeout( resolve, parseTime ) );
+				await new Promise( resolve => _setTimeout( resolve, parseTime ) );
 
 				/* Resolve render promise */
 
@@ -493,18 +493,18 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 					const renderStart = performance._now();
 
-					const waitingLoop = setInterval( function () {
+					const waitingLoop = _setInterval( function () {
 
 						const renderTimeoutExceeded = ( renderTimeout > 0 ) && ( performance._now() - renderStart > 1000 * renderTimeout );
 
 						if ( renderTimeoutExceeded ) {
 
-							clearInterval( waitingLoop );
+							_clearInterval( waitingLoop );
 							reject( 'Render timeout exceeded' );
 
 						} else if ( window._renderFinished ) {
 
-							clearInterval( waitingLoop );
+							_clearInterval( waitingLoop );
 							resolve();
 
 						}
