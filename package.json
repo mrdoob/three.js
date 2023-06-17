@@ -84,6 +84,7 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
+    "@puppeteer/browsers": "^1.4.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-terser": "^0.4.0",
     "chalk": "^5.2.0",
@@ -117,8 +118,5 @@
       "build/three.module.js"
     ],
     "directories": {}
-  },
-  "dependencies": {
-    "@puppeteer/browsers": "^1.4.1"
   }
 }
