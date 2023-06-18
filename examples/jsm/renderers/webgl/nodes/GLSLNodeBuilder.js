@@ -46,6 +46,22 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getVars( shaderStage ) {
+
+		const snippets = [];
+
+		const vars = this.vars[ shaderStage ];
+
+		for ( const variable of vars ) {
+
+			snippets.push( `${ this.getVar( variable.type, variable.name ) };` );
+
+		}
+
+		return snippets.join( '\n\t' );
+
+	}
+
 	getUniforms( shaderStage ) {
 
 		const uniforms = this.uniforms[ shaderStage ];
