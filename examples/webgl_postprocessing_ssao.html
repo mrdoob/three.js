@@ -55,6 +55,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 );
@@ -63,8 +64,8 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xaaaaaa );
 
-				scene.add( new THREE.DirectionalLight() );
-				scene.add( new THREE.HemisphereLight() );
+				scene.add( new THREE.DirectionalLight( 0xffffff, 4 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff ) );
 
 				group = new THREE.Group();
 				scene.add( group );

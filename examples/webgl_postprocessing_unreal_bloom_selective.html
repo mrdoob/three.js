@@ -74,7 +74,7 @@
 
 			const params = {
 				threshold: 0,
-				strength: 1.5,
+				strength: 1,
 				radius: 0.5,
 				exposure: 1
 			};
@@ -85,6 +85,7 @@
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.useLegacyLights = false;
 			document.body.appendChild( renderer.domElement );
 
 			const scene = new THREE.Scene();
@@ -98,8 +99,6 @@
 			controls.minDistance = 1;
 			controls.maxDistance = 100;
 			controls.addEventListener( 'change', render );
-
-			scene.add( new THREE.AmbientLight( 0x898989 ) );
 
 			const renderScene = new RenderPass( scene, camera );
 

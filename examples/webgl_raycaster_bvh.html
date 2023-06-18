@@ -90,13 +90,14 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xeeeeee );
 
-				const ambient = new THREE.HemisphereLight( 0xffffff, 0x999999 );
+				const ambient = new THREE.HemisphereLight( 0xffffff, 0x999999, 3 );
 				scene.add( ambient );
 
 				// renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();

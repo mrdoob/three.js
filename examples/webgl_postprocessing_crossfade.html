@@ -131,20 +131,20 @@
 
 				for ( let i = 0; i < count; i ++ ) {
 
-					dummy.position.x = Math.random() * 10000 - 5000;
-					dummy.position.y = Math.random() * 6000 - 3000;
-					dummy.position.z = Math.random() * 8000 - 4000;
+					dummy.position.x = Math.random() * 100 - 50;
+					dummy.position.y = Math.random() * 60 - 30;
+					dummy.position.z = Math.random() * 80 - 40;
 
 					dummy.rotation.x = Math.random() * 2 * Math.PI;
 					dummy.rotation.y = Math.random() * 2 * Math.PI;
 					dummy.rotation.z = Math.random() * 2 * Math.PI;
 
-					dummy.scale.x = Math.random() * 200 + 100;
+					dummy.scale.x = Math.random() * 2 + 1;
 
 					if ( geometry.type === 'BoxGeometry' ) {
 
-						dummy.scale.y = Math.random() * 200 + 100;
-						dummy.scale.z = Math.random() * 200 + 100;
+						dummy.scale.y = Math.random() * 2 + 1;
+						dummy.scale.z = Math.random() * 2 + 1;
 
 					} else {
 
@@ -168,15 +168,15 @@
 
 				this.clearColor = clearColor;
 
-				const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 2000;
+				const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 20;
 
 				// Setup scene
 				const scene = new THREE.Scene();
-				scene.add( new THREE.AmbientLight( 0x555555 ) );
+				scene.add( new THREE.AmbientLight( 0xaaaaaa ) );
 
 				const light = new THREE.SpotLight( 0xffffff, 1.5 );
-				light.position.set( 0, 500, 2000 );
+				light.position.set( 0, 5, 20 );
 				scene.add( light );
 
 				this.rotationSpeed = rotationSpeed;
