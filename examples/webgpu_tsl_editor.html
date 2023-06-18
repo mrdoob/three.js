@@ -59,6 +59,7 @@
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 			import WGSLNodeBuilder from 'three/addons/renderers/webgpu/nodes/WGSLNodeBuilder.js';
+			import GLSLNodeBuilder from 'three/addons/renderers/webgl/nodes/GLSLNodeBuilder.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -112,7 +113,11 @@
 
 				require( [ 'vs/editor/editor.main' ], () => {
 
-					const options = { shader: 'fragment', outputColorSpace: THREE.LinearSRGBColorSpace };
+					const options = {
+						shader: 'fragment',
+						outputColorSpace: THREE.LinearSRGBColorSpace,
+						output: 'WGSL'
+					};
 
 					let timeout = null;
 					let nodeBuilder = null;
@@ -171,7 +176,9 @@ output = vec4( finalColor, opacity );
 							mesh.material.outputNode = nodes.output;
 							mesh.material.needsUpdate = true;
 
-							nodeBuilder = new WGSLNodeBuilder( mesh, renderer );
+							const NodeBuilder = options.output === 'WGSL' ? WGSLNodeBuilder : GLSLNodeBuilder;
+
+							nodeBuilder = new NodeBuilder( mesh, renderer );
 							nodeBuilder.build();
 
 							showCode();
@@ -207,6 +214,7 @@ output = vec4( finalColor, opacity );
 
 					const gui = new GUI();
 
+					gui.add( options, 'output', [ 'GLSL', 'WGSL' ] ).onChange( build );
 					gui.add( options, 'shader', [ 'vertex', 'fragment' ] ).onChange( showCode );
 
 					gui.add( options, 'outputColorSpace', [ THREE.LinearSRGBColorSpace, THREE.SRGBColorSpace ] ).onChange( ( value ) => {
