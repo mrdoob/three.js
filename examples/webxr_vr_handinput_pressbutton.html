@@ -362,9 +362,9 @@
 			listener = new THREE.AudioListener();
 			camera.add( listener );
 
-			scene.add( new THREE.HemisphereLight( 0xcccccc, 0x999999 ) );
+			scene.add( new THREE.HemisphereLight( 0xcccccc, 0x999999, 3 ) );
 
-			const light = new THREE.DirectionalLight( 0xffffff );
+			const light = new THREE.DirectionalLight( 0xffffff, 3 );
 			light.position.set( 0, 6, 0 );
 			light.castShadow = true;
 			light.shadow.camera.top = 2;
@@ -377,6 +377,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.useLegacyLights = false;
 			renderer.shadowMap.enabled = true;
 			renderer.xr.enabled = true;
 			renderer.xr.setUserCamera( camera );
