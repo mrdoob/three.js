@@ -447,6 +447,9 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		for ( const uniform of uniforms ) {
 
+			if ( /^(modelViewMatrix|projectionMatrix)$/.test( uniform.name ) )
+				continue;
+
 			let snippet = null;
 
 			if ( uniform.type === 'texture' ) {
