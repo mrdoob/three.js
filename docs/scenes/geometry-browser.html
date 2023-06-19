@@ -48,6 +48,7 @@
 				ConeGeometry,
 				Curve,
 				CylinderGeometry,
+				DirectionalLight,
 				DodecahedronGeometry,
 				DoubleSide,
 				ExtrudeGeometry,
@@ -62,7 +63,6 @@
 				OctahedronGeometry,
 				PerspectiveCamera,
 				PlaneGeometry,
-				PointLight,
 				RingGeometry,
 				Scene,
 				Shape,
@@ -749,16 +749,17 @@
 			const renderer = new WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.useLegacyLights = false;
 			document.body.appendChild( renderer.domElement );
 
 			const orbit = new OrbitControls( camera, renderer.domElement );
 			orbit.enableZoom = false;
 
 			const lights = [];
-			lights[ 0 ] = new PointLight( 0xffffff, 1, 0 );
-			lights[ 1 ] = new PointLight( 0xffffff, 1, 0 );
-			lights[ 2 ] = new PointLight( 0xffffff, 1, 0 );
-
+			lights[ 0 ] = new DirectionalLight( 0xffffff, 3 );
+			lights[ 1 ] = new DirectionalLight( 0xffffff, 3 );
+			lights[ 2 ] = new DirectionalLight( 0xffffff, 3 );
+			
 			lights[ 0 ].position.set( 0, 200, 0 );
 			lights[ 1 ].position.set( 100, 200, 100 );
 			lights[ 2 ].position.set( - 100, - 200, - 100 );
