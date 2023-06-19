@@ -78,15 +78,15 @@
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
-				camera.position.set( 0, 200, 1200 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 400 );
+				camera.position.set( 0, 20, 120 );
 
 				scene = new THREE.Scene();
 
 				// Grid
 
-				const helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
-				helper.position.y = - 75;
+				const helper = new THREE.GridHelper( 100, 40, 0x303030, 0x303030 );
+				helper.position.y = - 7.5;
 				scene.add( helper );
 
 				// CubeMap
@@ -112,7 +112,7 @@
 
 				// Spheres geometry
 
-				const geometry = new THREE.SphereGeometry( 70, 32, 16 );
+				const geometry = new THREE.SphereGeometry( 7, 32, 16 );
 
 				for ( let i = 0, l = 12; i < l; i ++ ) {
 
@@ -122,9 +122,9 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x111111 ) );
+				scene.add( new THREE.AmbientLight( 0x444444 ) );
 
-				const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.4 );
 
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
@@ -133,23 +133,24 @@
 
 				scene.add( directionalLight );
 
-				pointLight = new THREE.PointLight( 0xffffff, 1 );
+				pointLight = new THREE.PointLight( 0xffffff, 1000 );
 				scene.add( pointLight );
 
-				pointLight.add( new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
+				pointLight.add( new THREE.Mesh( new THREE.SphereGeometry( 0.4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) ) );
 
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
 				//
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 400;
-				controls.maxDistance = 2000;
+				controls.minDistance = 40;
+				controls.maxDistance = 200;
 
 				//
 
@@ -168,8 +169,8 @@
 
 				mesh.color = new THREE.Color( Math.random() * 0xffffff );
 
-				mesh.position.x = ( objects.length % 4 ) * 200 - 300;
-				mesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;
+				mesh.position.x = ( objects.length % 4 ) * 20 - 30;
+				mesh.position.z = Math.floor( objects.length / 4 ) * 20 - 20;
 
 				mesh.rotation.x = Math.random() * 200 - 100;
 				mesh.rotation.y = Math.random() * 200 - 100;
@@ -216,9 +217,9 @@
 
 				}
 
-				pointLight.position.x = Math.sin( timer * 7 ) * 300;
-				pointLight.position.y = Math.cos( timer * 5 ) * 400;
-				pointLight.position.z = Math.cos( timer * 3 ) * 300;
+				pointLight.position.x = Math.sin( timer * 7 ) * 30;
+				pointLight.position.y = Math.cos( timer * 5 ) * 40;
+				pointLight.position.z = Math.cos( timer * 3 ) * 30;
 
 				renderer.render( scene, camera );
 
