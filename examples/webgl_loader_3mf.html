@@ -60,12 +60,11 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x333333 );
-
-				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
 
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
 
@@ -82,8 +81,11 @@
 				controls.enablePan = false;
 				controls.update();
 
-				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
-				camera.add( pointLight );
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.6 ) );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 2 );
+				light.position.set( - 1, - 2.5, 1 );
+				scene.add( light );
 
 				const manager = new THREE.LoadingManager();
 
