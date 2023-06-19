@@ -64,7 +64,7 @@ class WebGPUPipelineUtils {
 			blending = {
 				alpha: this._getAlphaBlend( material ),
 				color: this._getColorBlend( material )
-			}
+			};
 
 		}
 
