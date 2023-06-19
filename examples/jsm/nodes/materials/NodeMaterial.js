@@ -45,6 +45,7 @@ class NodeMaterial extends ShaderMaterial {
 		this.alphaTestNode = null;
 
 		this.positionNode = null;
+		this.outputNode = null;
 
 	}
 
@@ -74,14 +75,22 @@ class NodeMaterial extends ShaderMaterial {
 
 		builder.addStack();
 
-		if ( this.normals === true ) this.constructNormal( builder );
+		if ( this.isUnlit === false ) {
 
-		this.constructDiffuseColor( builder );
-		this.constructVariants( builder );
+			if ( this.normals === true ) this.constructNormal( builder );
 
-		const outgoingLightNode = this.constructLighting( builder );
+			this.constructDiffuseColor( builder );
+			this.constructVariants( builder );
 
-		builder.stack.outputNode = this.constructOutput( builder, outgoingLightNode, diffuseColor.a );
+			const outgoingLightNode = this.constructLighting( builder );
+
+			builder.stack.outputNode = this.constructOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
+
+		} else {
+
+			builder.stack.outputNode = this.constructOutput( builder, this.outputNode || vec4( 0, 0, 0, 1 ) );
+
+		}
 
 		builder.addFlow( 'fragment', builder.removeStack() );
 
@@ -265,7 +274,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	constructOutput( builder, outgoingLight, opacity ) {
+	constructOutput( builder, outputNode ) {
 
 		const renderer = builder.renderer;
 
@@ -275,13 +284,9 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( toneMappingNode ) {
 
-			outgoingLight = toneMappingNode.context( { color: outgoingLight } );
+			outputNode = vec4( toneMappingNode.context( { color: outputNode.rgb } ), outputNode.a );
 
 		}
-
-		// @TODO: Optimize outputNode to vec3.
-
-		let outputNode = vec4( outgoingLight, opacity );
 
 		// ENCODING
 
@@ -403,6 +408,31 @@ class NodeMaterial extends ShaderMaterial {
 		}
 
 		return data;
+
+	}
+
+	get isUnlit() {
+
+		return this.constructor === NodeMaterial.prototype.constructor;
+
+	}
+
+	copy( source ) {
+
+		this.lightsNode = source.lightsNode;
+		this.envNode = source.envNode;
+
+		this.colorNode = source.colorNode;
+		this.normalNode = source.normalNode;
+		this.opacityNode = source.opacityNode;
+		this.backdropNode = source.backdropNode;
+		this.backdropAlphaNode = source.backdropAlphaNode;
+		this.alphaTestNode = source.alphaTestNode;
+
+		this.positionNode = source.positionNode;
+		this.outputNode = source.outputNode;
+
+		return super.copy( source );
 
 	}
 

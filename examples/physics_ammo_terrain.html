@@ -94,9 +94,10 @@
 
 				container = document.getElementById( 'container' );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
@@ -150,7 +151,10 @@
 
 				} );
 
-				const light = new THREE.DirectionalLight( 0xffffff, 1 );
+				const ambientLight = new THREE.AmbientLight( 0xbbbbbb );
+				scene.add( ambientLight );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
 				light.position.set( 100, 100, 50 );
 				light.castShadow = true;
 				const dLight = 200;

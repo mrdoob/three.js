@@ -70,6 +70,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -98,9 +99,9 @@
 
 				}
 
-				scene.add( new THREE.AmbientLight( 0x666666 ) );
+				scene.add( new THREE.AmbientLight( 0xcccccc ) );
 
-				light = new THREE.DirectionalLight( 0xffffff );
+				light = new THREE.DirectionalLight( 0xffffff, 3 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 

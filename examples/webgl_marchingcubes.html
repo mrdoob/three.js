@@ -74,15 +74,15 @@
 
 			// LIGHTS
 
-			light = new THREE.DirectionalLight( 0xffffff );
+			light = new THREE.DirectionalLight( 0xffffff, 3 );
 			light.position.set( 0.5, 0.5, 1 );
 			scene.add( light );
 
-			pointLight = new THREE.PointLight( 0xff7c00 );
+			pointLight = new THREE.PointLight( 0xff7c00, 3, 0, 0 );
 			pointLight.position.set( 0, 0, 100 );
 			scene.add( pointLight );
 
-			ambientLight = new THREE.AmbientLight( 0x323232 );
+			ambientLight = new THREE.AmbientLight( 0x323232, 3 );
 			scene.add( ambientLight );
 
 			// MATERIALS
@@ -108,6 +108,7 @@
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.useLegacyLights = false;
 			container.appendChild( renderer.domElement );
 
 			// CONTROLS

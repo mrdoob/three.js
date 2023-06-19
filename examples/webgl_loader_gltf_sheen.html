@@ -78,9 +78,10 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
+				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
-				const environment = new RoomEnvironment();
+				const environment = new RoomEnvironment( renderer );
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 				scene.background = new THREE.Color( 0xbbbbbb );

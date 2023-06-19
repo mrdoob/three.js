@@ -39,10 +39,9 @@ class RenderObjects extends ChainMap {
 
 			if ( data.cacheKey !== cacheKey ) {
 
-				data.cacheKey = cacheKey;
+				renderObject.dispose();
 
-				this.pipelines.delete( renderObject );
-				this.nodes.delete( renderObject );
+				renderObject = this.get( object, material, scene, camera, lightsNode );
 
 			}
 
@@ -71,7 +70,7 @@ class RenderObjects extends ChainMap {
 
 			const onDispose = () => {
 
-				renderObject.material.removeEventListener( 'dispose', onDispose );
+				renderObject.removeEventListener( 'dispose', onDispose );
 
 				this.pipelines.delete( renderObject );
 				this.nodes.delete( renderObject );
@@ -80,7 +79,7 @@ class RenderObjects extends ChainMap {
 
 			};
 
-			renderObject.material.addEventListener( 'dispose', onDispose );
+			renderObject.addEventListener( 'dispose', onDispose );
 
 		}
 

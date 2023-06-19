@@ -72,7 +72,7 @@ void main() {
 
 	outgoingLight = diffuseColor.rgb;
 
-	#include <output_fragment>
+	#include <opaque_fragment>
 	#include <tonemapping_fragment>
 	#include <colorspace_fragment>
 	#include <fog_fragment>

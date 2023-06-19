@@ -111,6 +111,7 @@
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.useLegacyLights = false;
 			renderer.toneMapping = THREE.ACESFilmicToneMapping;
 			document.body.appendChild( renderer.domElement );
 
@@ -120,7 +121,7 @@
 			const scene = new THREE.Scene();
 			scene.scale.x = - 1;
 
-			const environment = new RoomEnvironment();
+			const environment = new RoomEnvironment( renderer );
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 			scene.background = new THREE.Color( 0x666666 );

@@ -91,10 +91,11 @@
 			scene.add( plane );
 
 			// Lights
-			const hemiLight = new THREE.HemisphereLight( 0x8d7c7c, 0x494966 );
+			const hemiLight = new THREE.HemisphereLight( 0x8d7c7c, 0x494966, 3 );
 			scene.add( hemiLight );
 
 			const spotLight = new THREE.SpotLight();
+			spotLight.intensity = 8;
 			spotLight.angle = Math.PI / 16;
 			spotLight.penumbra = 0.5;
 			// spotLight.castShadow = true;
@@ -158,6 +159,7 @@
 			// renderer
 			renderer = new THREE.WebGLRenderer( { antialias: false } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.useLegacyLights = false;
 			container.appendChild( renderer.domElement );
 
 			//

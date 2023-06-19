@@ -120,6 +120,7 @@
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.useLegacyLights = false;
 
 				views = document.querySelectorAll( '.view' );
 

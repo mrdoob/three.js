@@ -161,16 +161,17 @@
 				const mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, side: THREE.DoubleSide } ) );
 				scene.add( mesh );
 
-				const ambientLight = new THREE.AmbientLight( 0xeeeeee );
+				const ambientLight = new THREE.AmbientLight( 0xeeeeee, 3 );
 				scene.add( ambientLight );
 
-				const directionalLight = new THREE.DirectionalLight( 0xffffff, 4 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 12 );
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
 				controls = new FirstPersonControls( camera, renderer.domElement );

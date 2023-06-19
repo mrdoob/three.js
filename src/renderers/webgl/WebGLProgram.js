@@ -213,7 +213,8 @@ function resolveIncludes( string ) {
 
 const shaderChunkMap = new Map( [
 	[ 'encodings_fragment', 'colorspace_fragment' ], // @deprecated, r154
-	[ 'encodings_pars_fragment', 'colorspace_pars_fragment' ] // @deprecated, r154
+	[ 'encodings_pars_fragment', 'colorspace_pars_fragment' ], // @deprecated, r154
+	[ 'output_fragment', 'opaque_fragment' ], // @deprecated, r154
 ] );
 
 function includeReplacer( match, include ) {
