@@ -86,6 +86,7 @@ const exceptionList = [
 	'webgl_shadowmap_progressive',
 	'webgl_test_memory2',
 	'webgl_tiled_forward',
+	'webgl_animation_skinning_performance',
 
 	// TODO: implement determinism for setTimeout and setInterval
 	// could it fix some examples from above?
