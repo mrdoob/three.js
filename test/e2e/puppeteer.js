@@ -1,5 +1,6 @@
 import chalk from 'chalk';
-import puppeteer, { BrowserFetcher } from 'puppeteer-core';
+import puppeteer from 'puppeteer-core';
+import { install, computeExecutablePath/*, resolveBuildId*/, detectBrowserPlatform } from '@puppeteer/browsers';
 import express from 'express';
 import path from 'path';
 import pixelmatch from 'pixelmatch';
@@ -137,7 +138,8 @@ const exceptionList = [
 
 /* CONFIG VARIABLES END */
 
-const chromiumRevision = '1108766'; // Chromium 112.0.5614.0, Puppeteer 19.8.0, https://github.com/puppeteer/puppeteer/releases/tag/puppeteer-core-v19.8.0
+const chromiumChannel = 'stable'; // stable -- beta -- dev -- canary -- latest
+const installedBrowsersDir = 'test/e2e/chromium';
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
@@ -173,7 +175,7 @@ process.on( 'SIGINT', () => close() );
 
 async function main() {
 
-	/* Create output directories */
+	/* Create output directory */
 
 	try { await fs.rm( 'test/e2e/output-screenshots', { recursive: true, force: true } ); } catch {}
 	try { await fs.mkdir( 'test/e2e/output-screenshots' ); } catch {}
@@ -221,7 +223,7 @@ async function main() {
 
 	/* Download browser */
 
-	const { executablePath } = await downloadLatestChromium();
+	const executablePath = await downloadLatestChromium();
 
 	/* Launch browser */
 
@@ -300,24 +302,20 @@ async function main() {
 
 async function downloadLatestChromium() {
 
-	const browserFetcher = new BrowserFetcher( { path: 'test/e2e/chromium' } );
+	platform = detectBrowserPlatform();
 
-	platform = browserFetcher.platform();
+	const revision = '1108766'; //await resolveBuildId( 'chromium', platform, chromiumChannel );
+	                            // the Chromium snapshots server doesn't work properly currently so fix the revision
+	const options = { browser: 'chromium', buildId: revision, cacheDir: path.resolve( installedBrowsersDir ) };
 
-	let revisionInfo = browserFetcher.revisionInfo( chromiumRevision );
-	if ( revisionInfo.local === true ) {
+	console.log( `Using Chromium r${ revision }, ${ chromiumChannel } channel on ${ platform }` );
+	console.log( 'Downloading...' );
 
-		console.log( 'Latest Chromium has been already downloaded.' );
+	await install( options );
 
-	} else {
+	console.log( 'Downloaded.' );
 
-		console.log( 'Downloading latest Chromium...' );
-		revisionInfo = await browserFetcher.download( chromiumRevision );
-		console.log( 'Downloaded.' );
-
-	}
-	console.log( `Using Chromium r${ chromiumRevision } (${ revisionInfo.url }), stable channel on ${ platform }` );
-	return revisionInfo;
+	return computeExecutablePath( options );
 
 }
 
