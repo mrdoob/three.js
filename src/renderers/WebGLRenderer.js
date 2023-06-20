@@ -1093,6 +1093,9 @@ class WebGLRenderer {
 
 			const shadowsArray = currentRenderState.state.shadowsArray;
 
+			// muse be done before shadowMap.render, so that the number is the the same for shadows and real objects
+			this.info.render.frame ++;
+
 			shadowMap.render( shadowsArray, scene, camera );
 
 			if ( _clippingEnabled === true ) clipping.endShadows();
@@ -1101,7 +1104,6 @@ class WebGLRenderer {
 
 			if ( this.info.autoReset === true ) this.info.reset();
 
-			this.info.render.frame ++;
 
 			//
 
@@ -1230,19 +1232,6 @@ class WebGLRenderer {
 				} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
 					if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
-
-						if ( object.isSkinnedMesh ) {
-
-							// update skeleton only once in a frame
-
-							if ( object.skeleton.frame !== info.render.frame ) {
-
-								object.skeleton.update();
-								object.skeleton.frame = info.render.frame;
-
-							}
-
-						}
 
 						const geometry = objects.update( object );
 						const material = object.material;
