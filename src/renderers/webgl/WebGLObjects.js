@@ -27,11 +27,17 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 			}
 
-			attributes.update( object.instanceMatrix, gl.ARRAY_BUFFER );
+			if ( updateMap.get( object ) !== frame ) {
 
-			if ( object.instanceColor !== null ) {
+				attributes.update( object.instanceMatrix, gl.ARRAY_BUFFER );
 
-				attributes.update( object.instanceColor, gl.ARRAY_BUFFER );
+				if ( object.instanceColor !== null ) {
+
+					attributes.update( object.instanceColor, gl.ARRAY_BUFFER );
+
+				}
+
+				updateMap.set( object, frame );
 
 			}
 
@@ -39,10 +45,13 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 		if ( object.isSkinnedMesh ) {
 
-			if ( object.skeleton.frame !== info.render.frame ) {
+			const skeleton = object.skeleton;
 
-				object.skeleton.update();
-				object.skeleton.frame = info.render.frame;
+			if ( updateMap.get( skeleton ) !== frame ) {
+
+				skeleton.update();
+
+				updateMap.set( skeleton, frame );
 
 			}
 
