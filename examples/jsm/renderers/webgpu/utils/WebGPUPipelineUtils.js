@@ -57,13 +57,14 @@ class WebGPUPipelineUtils {
 
 		// blending
 
-		let alphaBlend = {};
-		let colorBlend = {};
+		let blending;
 
 		if ( material.transparent === true && material.blending !== NoBlending ) {
 
-			alphaBlend = this._getAlphaBlend( material );
-			colorBlend = this._getColorBlend( material );
+			blending = {
+				alpha: this._getAlphaBlend( material ),
+				color: this._getColorBlend( material )
+			};
 
 		}
 
@@ -98,10 +99,7 @@ class WebGPUPipelineUtils {
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
 			fragment: Object.assign( {}, fragmentModule, { targets: [ {
 				format: colorFormat,
-				blend: {
-					alpha: alphaBlend,
-					color: colorBlend
-				},
+				blend: blending,
 				writeMask: colorWriteMask
 			} ] } ),
 			primitive: primitiveState,

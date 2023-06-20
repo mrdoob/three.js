@@ -719,6 +719,13 @@
 				"WebGL3DRenderTarget": "api/ar/renderers/WebGL3DRenderTarget",
 				"WebGLArrayRenderTarget": "api/ar/renderers/WebGLArrayRenderTarget",
 				"WebGLCubeRenderTarget": "api/ar/renderers/WebGLCubeRenderTarget"
+			},
+
+			"Renderers / Shaders": {
+				"ShaderChunk": "api/ar/renderers/shaders/ShaderChunk",
+				"ShaderLib": "api/ar/renderers/shaders/ShaderLib",
+				"UniformsLib": "api/ar/renderers/shaders/UniformsLib",
+				"UniformsUtils": "api/ar/renderers/shaders/UniformsUtils"
 			}
 
 		}
