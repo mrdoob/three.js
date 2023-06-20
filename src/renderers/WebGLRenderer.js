@@ -1089,12 +1089,11 @@ class WebGLRenderer {
 
 			//
 
+			this.info.render.frame ++;
+
 			if ( _clippingEnabled === true ) clipping.beginShadows();
 
 			const shadowsArray = currentRenderState.state.shadowsArray;
-
-			// muse be done before shadowMap.render, so that the number is the the same for shadows and real objects
-			this.info.render.frame ++;
 
 			shadowMap.render( shadowsArray, scene, camera );
 
