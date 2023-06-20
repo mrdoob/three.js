@@ -39,8 +39,6 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 		if ( object.isSkinnedMesh ) {
 
-			// update skeleton only once in a frame
-
 			if ( object.skeleton.frame !== info.render.frame ) {
 
 				object.skeleton.update();
@@ -49,7 +47,6 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 			}
 
 		}
-
 
 		return buffergeometry;
 
