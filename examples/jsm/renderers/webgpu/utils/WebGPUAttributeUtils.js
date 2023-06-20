@@ -1,4 +1,5 @@
 import { Float16BufferAttribute } from 'three';
+import { GPUInputStepMode } from './WebGPUConstants.js';
 
 const typedArraysToVertexFormatPrefix = new Map( [
 	[ Int8Array, [ 'sint8', 'snorm8' ]],
@@ -106,6 +107,7 @@ class WebGPUAttributeUtils {
 
 			let arrayStride = geometryAttribute.itemSize * bytesPerElement;
 			let offset = 0;
+			let stepMode = geometryAttribute.isInstancedBufferAttribute ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
 
 			if ( geometryAttribute.isInterleavedBufferAttribute === true ) {
 
@@ -113,12 +115,14 @@ class WebGPUAttributeUtils {
 
 				arrayStride = geometryAttribute.data.stride * bytesPerElement;
 				offset = geometryAttribute.offset * bytesPerElement;
+				if ( geometryAttribute.data.isInstancedInterleavedBuffer ) stepMode = GPUInputStepMode.Instance;
 
 			}
 
 			shaderAttributes.push( {
 				geometryAttribute,
 				arrayStride,
+				stepMode,
 				offset,
 				format,
 				slot
