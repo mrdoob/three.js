@@ -1,7 +1,7 @@
 import { BlendColorFactor, OneMinusBlendColorFactor, } from '../../common/Constants.js';
 
 import {
-	GPUInputStepMode, GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation
+	GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation
 } from './WebGPUConstants.js';
 
 import {
@@ -44,13 +44,10 @@ class WebGPUPipelineUtils {
 
 		for ( const attribute of shaderAttributes ) {
 
-			const geometryAttribute = attribute.geometryAttribute;
-			const stepMode = ( geometryAttribute !== undefined && geometryAttribute.isInstancedBufferAttribute ) ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
-
 			vertexBuffers.push( {
 				arrayStride: attribute.arrayStride,
 				attributes: [ { shaderLocation: attribute.slot, offset: attribute.offset, format: attribute.format } ],
-				stepMode: stepMode
+				stepMode: attribute.stepMode
 			} );
 
 		}
