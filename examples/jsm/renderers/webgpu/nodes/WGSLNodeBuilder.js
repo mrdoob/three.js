@@ -1,3 +1,5 @@
+import { NoColorSpace } from 'three';
+
 import UniformsGroup from '../../common/UniformsGroup.js';
 import {
 	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
@@ -133,7 +135,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	needsColorSpaceToLinear( texture ) {
 
-		return texture.isVideoTexture === true;
+		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
 
 	}
 
