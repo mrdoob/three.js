@@ -91,13 +91,13 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		<p>Read-only flag to check if a given object is of type [name].</p>
 
 		<h3>[property:Float r]</h3>
-		<p>Red channel value between 0 and 1. Default is 1.</p>
+		<p>Red channel value between `0` and `1`. Default is `1`.</p>
 
 		<h3>[property:Float g]</h3>
-		<p>Green channel value between 0 and 1. Default is 1.</p>
+		<p>Green channel value between `0` and `1`. Default is `1`.</p>
 
 		<h3>[property:Float b]</h3>
-		<p>Blue channel value between 0 and 1. Default is 1.</p>
+		<p>Blue channel value between `0` and `1`. Default is `1`.</p>
 
 		<h2>Methods</h2>
 
@@ -217,7 +217,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:Color getRGB]( [param:Color target], [param:string colorSpace] = SRGBColorSpace )
+			[method:Color getRGB]( [param:Color target], [param:string colorSpace] = LinearSRGBColorSpace )
 		</h3>
 		<p>
 			[page:Color target] — the result will be copied into this object.<br /><br />
@@ -324,9 +324,9 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			[method:this setHSL]( [param:Float h], [param:Float s], [param:Float l], [param:string colorSpace] = LinearSRGBColorSpace )
 		</h3>
 		<p>
-			[page:Float h] — hue value between 0.0 and 1.0 <br />
-			[page:Float s] — saturation value between 0.0 and 1.0 <br />
-			[page:Float l] — lightness value between 0.0 and 1.0<br /><br />
+			[page:Float h] — hue value between `0.0` and `1.0` <br />
+			[page:Float s] — saturation value between `0.0` and `1.0` <br />
+			[page:Float l] — lightness value between `0.0` and `1.0`<br /><br />
 
 			Sets color from HSL values.
 		</p>
@@ -335,16 +335,16 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			[method:this setRGB]( [param:Float r], [param:Float g], [param:Float b], [param:string colorSpace] = LinearSRGBColorSpace )
 		</h3>
 		<p>
-			[page:Float r] — Red channel value between 0.0 and 1.0.<br />
-			[page:Float g] — Green channel value between 0.0 and 1.0.<br />
-			[page:Float b] — Blue channel value between 0.0 and 1.0.<br /><br />
+			[page:Float r] — Red channel value between `0.0` and `1.0`.<br />
+			[page:Float g] — Green channel value between `0.0` and `1.0`.<br />
+			[page:Float b] — Blue channel value between `0.0` and `1.0`.<br /><br />
 
 			Sets this color from RGB values.
 		</p>
 
 		<h3>[method:this setScalar]( [param:Float scalar] )</h3>
 		<p>
-			[page:Float scalar] — a value between 0.0 and 1.0.<br /><br />
+			[page:Float scalar] — a value between `0.0` and `1.0`.<br /><br />
 
 			Sets all three color components to the value [page:Float scalar].
 		</p>

@@ -56,6 +56,13 @@
 			若缓存存储三元组（例如顶点位置、法向量、颜色值），则该值应等于队列中三元组的个数。
 		</p>
 
+		<h3>[property:Number gpuType]</h3>
+		<p>
+			Configures the bound GPU type for use in shaders. Either [page:BufferAttribute THREE.FloatType] or [page:BufferAttribute THREE.IntType], default is [page:BufferAttribute THREE.FloatType].
+
+			Note: this only has an effect for integer arrays and is not configurable for float arrays. For lower precision float types, see [page:BufferAttributeTypes THREE.Float16BufferAttribute].
+		</p>
+
 		<h3>[property:Boolean isBufferAttribute]</h3>
 		<p>
 			用于判断对象是否为[name]类型的只读标记.

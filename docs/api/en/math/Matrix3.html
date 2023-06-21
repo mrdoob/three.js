@@ -107,7 +107,7 @@ zAxis = (c, f, i)
 		<p>
 			[page:Array array] - the array to read the elements from.<br />
 			[page:Integer offset] - (optional) index of first element in the array.
-			Default is 0.<br /><br />
+			Default is `0`.<br /><br />
 
 			Sets the elements of this matrix based on an array in
 			[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
@@ -169,8 +169,11 @@ x, 0, 0,
 0, 0, 1 	</code>
 		</p>
 
+		<h3>[method:this makeTranslation]( [param:Vector2 v] )</h3>
 		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y] )</h3>
 		<p>
+			[page:Vector2 v] a translation transform from vector.<br />
+			or<br />
 			[page:Float x] - the amount to translate in the X axis.<br />
 			[page:Float y] - the amount to translate in the Y axis.<br />
 

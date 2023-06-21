@@ -66,7 +66,7 @@ function onDocumentLoad() {
 
 	text = text.replace( /\[link:([\w\:\/\.\-\_\(\)\?\#\=\!\~]+)\]/gi, '<a href="$1" target="_blank">$1</a>' ); // [link:url]
 	text = text.replace( /\[link:([\w:/.\-_()?#=!~]+) ([\w\p{L}:/.\-_'\s]+)\]/giu, '<a href="$1" target="_blank">$2</a>' ); // [link:url title]
-	text = text.replace( /\*([\w\d\"\-\(][\w\d\ \/\+\-\(\)\=\,\."]*[\w\d\"\)]|\w)\*/gi, '<strong>$1</strong>' ); // *text*
+	text = text.replace( /\*([\u4e00-\u9fa5\w\d\-\(\"\（\“][\u4e00-\u9fa5\w\d\ \/\+\-\(\)\=\,\.\（\）\，\。"]*[\u4e00-\u9fa5\w\d\"\)\”\）]|\w)\*/gi, '<strong>$1</strong>' ); // *text*
 	text = text.replace( /\`(.*?)\`/gi, '<code class="inline">$1</code>' ); // `code`
 
 	text = text.replace( /\[example:([\w\_]+)\]/gi, '[example:$1 $1]' ); // [example:name] to [example:name title]
@@ -106,16 +106,32 @@ function onDocumentLoad() {
 
 	// handle code snippets formatting
 
+	function dedent( text ) {
+
+		// ignores singleline text
+		const lines = text.split( '\n' );
+		if ( lines.length <= 1 ) return text;
+
+		// ignores blank text
+		const nonBlankLine = lines.filter( l => l.trim() )[ 0 ];
+		if ( nonBlankLine === undefined ) return text;
+
+		// strips indents if any
+		const m = nonBlankLine.match( /^([\t ]+)/ );
+		if ( m ) text = lines.map( l => l.startsWith( m[ 1 ] ) ? l.substring( m[ 1 ].length ) : l ).join( '\n' );
+
+		// strips leading and trailing whitespaces finally
+		return text.trim();
+
+	}
+
 	const elements = document.getElementsByTagName( 'code' );
 
 	for ( let i = 0; i < elements.length; i ++ ) {
 
 		const element = elements[ i ];
 
-		text = element.textContent.trim();
-		text = text.replace( /^\t\t/gm, '' );
-
-		element.textContent = text;
+		element.textContent = dedent( element.textContent );
 
 	}
 

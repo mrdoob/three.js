@@ -45,6 +45,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				document.body.appendChild( renderer.domElement );
 
 				// scene
@@ -83,8 +84,6 @@
 				const urls = genCubeUrls( 'textures/cube/pisa/', '.png' );
 
 				new THREE.CubeTextureLoader().load( urls, function ( cubeTexture ) {
-
-					cubeTexture.colorSpace = THREE.SRGBColorSpace;
 
 					scene.background = cubeTexture;
 

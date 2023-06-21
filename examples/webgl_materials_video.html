@@ -42,9 +42,8 @@
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 			import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
-			import { CopyShader } from 'three/addons/shaders/CopyShader.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let container;
 
@@ -89,13 +88,14 @@
 
 				scene = new THREE.Scene();
 
-				const light = new THREE.DirectionalLight( 0xffffff );
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
 				light.position.set( 0.5, 1, 1 ).normalize();
 				scene.add( light );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
 				video = document.getElementById( 'video' );
@@ -107,6 +107,7 @@
 				} );
 
 				texture = new THREE.VideoTexture( video );
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				//
 
@@ -169,15 +170,15 @@
 
 				// postprocessing
 
-				const renderModel = new RenderPass( scene, camera );
-				const effectBloom = new BloomPass( 1.3 );
-				const effectCopy = new ShaderPass( CopyShader );
+				const renderPass = new RenderPass( scene, camera );
+				const bloomPass = new BloomPass( 1.3 );
+				const outputPass = new OutputPass();
 
 				composer = new EffectComposer( renderer );
 
-				composer.addPass( renderModel );
-				composer.addPass( effectBloom );
-				composer.addPass( effectCopy );
+				composer.addPass( renderPass );
+				composer.addPass( bloomPass );
+				composer.addPass( outputPass );
 
 				//
 

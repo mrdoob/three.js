@@ -21,8 +21,10 @@ import {
 	Scene,
 	Source,
 	SRGBColorSpace,
+	CompressedTexture,
 	Vector3
 } from 'three';
+import { decompress } from './../utils/TextureUtils.js';
 
 
 /**
@@ -827,6 +829,18 @@ class GLTFWriter {
 
 		console.warn( 'THREE.GLTFExporter: Merged metalnessMap and roughnessMap textures.' );
 
+		if ( metalnessMap instanceof CompressedTexture ) {
+
+			metalnessMap = decompress( metalnessMap );
+
+		}
+
+		if ( roughnessMap instanceof CompressedTexture ) {
+
+			roughnessMap = decompress( roughnessMap );
+
+		}
+
 		const metalness = metalnessMap ? metalnessMap.image : null;
 		const roughness = roughnessMap ? roughnessMap.image : null;
 
@@ -1146,7 +1160,7 @@ class GLTFWriter {
 
 		} else {
 
-			throw new Error( 'THREE.GLTFExporter: Unsupported bufferAttribute component type.' );
+			throw new Error( 'THREE.GLTFExporter: Unsupported bufferAttribute component type: ' + attribute.array.constructor.name );
 
 		}
 
@@ -1236,7 +1250,7 @@ class GLTFWriter {
 
 				if ( format !== RGBAFormat ) {
 
-					console.error( 'GLTFExporter: Only RGBAFormat is supported.' );
+					console.error( 'GLTFExporter: Only RGBAFormat is supported.', format );
 
 				}
 
@@ -1344,12 +1358,21 @@ class GLTFWriter {
 	 */
 	processTexture( map ) {
 
+		const writer = this;
+		const options = writer.options;
 		const cache = this.cache;
 		const json = this.json;
 
 		if ( cache.textures.has( map ) ) return cache.textures.get( map );
 
 		if ( ! json.textures ) json.textures = [];
+
+		// make non-readable textures (e.g. CompressedTexture) readable by blitting them into a new texture
+		if ( map instanceof CompressedTexture ) {
+
+			map = decompress( map, options.maxTextureSize );
+
+		}
 
 		let mimeType = map.userData.mimeType;
 

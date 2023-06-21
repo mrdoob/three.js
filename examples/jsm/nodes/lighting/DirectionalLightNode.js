@@ -28,7 +28,7 @@ class DirectionalLightNode extends AnalyticLightNode {
 				lightDirection,
 				lightColor,
 				reflectedLight
-			}, builder );
+			} );
 
 		}
 

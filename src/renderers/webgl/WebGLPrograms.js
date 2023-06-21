@@ -152,6 +152,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		const HAS_ALPHATEST = material.alphaTest > 0;
 
+		const HAS_ALPHAHASH = !! material.alphaHash;
+
 		const HAS_EXTENSIONS = !! material.extensions;
 
 		const HAS_ATTRIBUTE_UV1 = !! geometry.attributes.uv1;
@@ -163,7 +165,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			isWebGL2: IS_WEBGL2,
 
 			shaderID: shaderID,
-			shaderName: material.type,
+			shaderType: material.type,
+			shaderName: material.name,
 
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader,
@@ -231,6 +234,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			alphaMap: HAS_ALPHAMAP,
 			alphaTest: HAS_ALPHATEST,
+			alphaHash: HAS_ALPHAHASH,
 
 			combine: material.combine,
 

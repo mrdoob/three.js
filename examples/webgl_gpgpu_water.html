@@ -311,17 +311,18 @@
 
 				scene = new THREE.Scene();
 
-				const sun = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+				const sun = new THREE.DirectionalLight( 0xFFFFFF, 3.0 );
 				sun.position.set( 300, 400, 175 );
 				scene.add( sun );
 
-				const sun2 = new THREE.DirectionalLight( 0x40A040, 0.6 );
+				const sun2 = new THREE.DirectionalLight( 0x40A040, 2.0 );
 				sun2.position.set( - 100, 350, - 200 );
 				scene.add( sun2 );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

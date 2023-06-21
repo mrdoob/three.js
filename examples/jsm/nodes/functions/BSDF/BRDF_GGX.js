@@ -10,13 +10,15 @@ const BRDF_GGX = new ShaderNode( ( inputs ) => {
 
 	const { lightDirection, f0, f90, roughness } = inputs;
 
+	const normalView = inputs.normalView || transformedNormalView;
+
 	const alpha = roughness.pow2(); // UE4's roughness
 
 	const halfDir = lightDirection.add( positionViewDirection ).normalize();
 
-	const dotNL = transformedNormalView.dot( lightDirection ).clamp();
-	const dotNV = transformedNormalView.dot( positionViewDirection ).clamp();
-	const dotNH = transformedNormalView.dot( halfDir ).clamp();
+	const dotNL = normalView.dot( lightDirection ).clamp();
+	const dotNV = normalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
+	const dotNH = normalView.dot( halfDir ).clamp();
 	const dotVH = positionViewDirection.dot( halfDir ).clamp();
 
 	const F = F_Schlick.call( { f0, f90, dotVH } );

@@ -23,6 +23,6 @@ const RE_IndirectDiffuse_BlinnPhong = new ShaderNode( ( { irradiance, reflectedL
 
 } );
 
-const phongLightingModel = lightingModel( RE_Direct_BlinnPhong, RE_IndirectDiffuse_BlinnPhong );
+const phongLightingModel = lightingModel( null, RE_Direct_BlinnPhong, RE_IndirectDiffuse_BlinnPhong );
 
 export default phongLightingModel;

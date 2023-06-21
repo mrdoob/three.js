@@ -30,12 +30,12 @@
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import WebGPUTextureRenderer from 'three/addons/renderers/webgpu/WebGPUTextureRenderer.js';
+			import RenderTarget from 'three/addons/renderers/common/RenderTarget.js';
 
 			let camera, scene, renderer;
 			const mouse = new THREE.Vector2();
 
-			let cameraFX, sceneFX, textureRenderer;
+			let cameraFX, sceneFX, renderTarget;
 
 			let box;
 
@@ -81,8 +81,7 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
-				textureRenderer = new WebGPUTextureRenderer( renderer );
-				textureRenderer.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
+				renderTarget = new RenderTarget( window.innerWidth * dpr, window.innerHeight * dpr );
 
 				window.addEventListener( 'mousemove', onWindowMouseMove );
 				window.addEventListener( 'resize', onWindowResize );
@@ -99,7 +98,7 @@
 				const screenFXNode = uniform( mouse ).add( vec2( 0.5, 0.5 ) );
 
 				const materialFX = new MeshBasicNodeMaterial();
-				materialFX.colorNode = texture( textureRenderer.getTexture() ).mul( screenFXNode );
+				materialFX.colorNode = texture( renderTarget.texture ).mul( screenFXNode );
 
 				const quad = new THREE.Mesh( geometryFX, materialFX );
 				sceneFX.add( quad );
@@ -119,7 +118,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				textureRenderer.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
+				renderTarget.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
 
 			}
 
@@ -128,7 +127,10 @@
 				box.rotation.x += 0.01;
 				box.rotation.y += 0.02;
 
-				textureRenderer.render( scene, camera );
+				renderer.setRenderTarget( renderTarget );
+				renderer.render( scene, camera );
+
+				renderer.setRenderTarget( null );
 				renderer.render( sceneFX, cameraFX );
 
 			}

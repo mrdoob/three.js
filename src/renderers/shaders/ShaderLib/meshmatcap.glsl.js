@@ -58,6 +58,7 @@ varying vec3 vViewPosition;
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <alphatest_pars_fragment>
+#include <alphahash_pars_fragment>
 #include <fog_pars_fragment>
 #include <normal_pars_fragment>
 #include <bumpmap_pars_fragment>
@@ -76,6 +77,7 @@ void main() {
 	#include <color_fragment>
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
+	#include <alphahash_fragment>
 	#include <normal_fragment_begin>
 	#include <normal_fragment_maps>
 
@@ -96,9 +98,9 @@ void main() {
 
 	vec3 outgoingLight = diffuseColor.rgb * matcapColor.rgb;
 
-	#include <output_fragment>
+	#include <opaque_fragment>
 	#include <tonemapping_fragment>
-	#include <encodings_fragment>
+	#include <colorspace_fragment>
 	#include <fog_fragment>
 	#include <premultiplied_alpha_fragment>
 	#include <dithering_fragment>

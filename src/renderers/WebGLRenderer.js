@@ -20,13 +20,16 @@ import {
 	UnsignedShortType,
 	UnsignedInt248Type,
 	UnsignedShort4444Type,
-	UnsignedShort5551Type
+	UnsignedShort5551Type,
+	WebGLCoordinateSystem
 } from '../constants.js';
 import { Color } from '../math/Color.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
+import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
+import { floorPowerOfTwo } from '../math/MathUtils.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
 import { WebGLAttributes } from './webgl/WebGLAttributes.js';
 import { WebGLBackground } from './webgl/WebGLBackground.js';
@@ -208,6 +211,7 @@ class WebGLRenderer {
 
 		const _projScreenMatrix = new Matrix4();
 
+		const _vector2 = new Vector2();
 		const _vector3 = new Vector3();
 
 		const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, isScene: true };
@@ -285,7 +289,7 @@ class WebGLRenderer {
 
 			}
 
-			if ( _gl instanceof WebGLRenderingContext ) { // @deprecated, r153
+			if ( typeof WebGLRenderingContext !== 'undefined' && _gl instanceof WebGLRenderingContext ) { // @deprecated, r153
 
 				console.warn( 'THREE.WebGLRenderer: WebGL 1 support was deprecated in r153 and will be removed in r163.' );
 
@@ -603,15 +607,13 @@ class WebGLRenderer {
 					const g = clearColor.g;
 					const b = clearColor.b;
 
-					const __webglFramebuffer = properties.get( _currentRenderTarget ).__webglFramebuffer;
-
 					if ( isUnsignedType ) {
 
 						uintClearColor[ 0 ] = r;
 						uintClearColor[ 1 ] = g;
 						uintClearColor[ 2 ] = b;
 						uintClearColor[ 3 ] = a;
-						_gl.clearBufferuiv( _gl.COLOR, __webglFramebuffer, uintClearColor );
+						_gl.clearBufferuiv( _gl.COLOR, 0, uintClearColor );
 
 					} else {
 
@@ -619,7 +621,7 @@ class WebGLRenderer {
 						intClearColor[ 1 ] = g;
 						intClearColor[ 2 ] = b;
 						intClearColor[ 3 ] = a;
-						_gl.clearBufferiv( _gl.COLOR, __webglFramebuffer, intClearColor );
+						_gl.clearBufferiv( _gl.COLOR, 0, intClearColor );
 
 					}
 
@@ -1087,6 +1089,8 @@ class WebGLRenderer {
 
 			//
 
+			this.info.render.frame ++;
+
 			if ( _clippingEnabled === true ) clipping.beginShadows();
 
 			const shadowsArray = currentRenderState.state.shadowsArray;
@@ -1099,7 +1103,6 @@ class WebGLRenderer {
 
 			if ( this.info.autoReset === true ) this.info.reset();
 
-			this.info.render.frame ++;
 
 			//
 
@@ -1229,19 +1232,6 @@ class WebGLRenderer {
 
 					if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
 
-						if ( object.isSkinnedMesh ) {
-
-							// update skeleton only once in a frame
-
-							if ( object.skeleton.frame !== info.render.frame ) {
-
-								object.skeleton.update();
-								object.skeleton.frame = info.render.frame;
-
-							}
-
-						}
-
 						const geometry = objects.update( object );
 						const material = object.material;
 
@@ -1334,11 +1324,11 @@ class WebGLRenderer {
 
 		function renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera ) {
 
+			const isWebGL2 = capabilities.isWebGL2;
+
 			if ( _transmissionRenderTarget === null ) {
 
-				const isWebGL2 = capabilities.isWebGL2;
-
-				_transmissionRenderTarget = new WebGLRenderTarget( 1024, 1024, {
+				_transmissionRenderTarget = new WebGLRenderTarget( 1, 1, {
 					generateMipmaps: true,
 					type: extensions.has( 'EXT_color_buffer_half_float' ) ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
@@ -1354,6 +1344,18 @@ class WebGLRenderer {
 				const mesh = new Mesh( geometry, material );
 				scene.add( mesh );
 				*/
+
+			}
+
+			_this.getDrawingBufferSize( _vector2 );
+
+			if ( isWebGL2 ) {
+
+				_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
+
+			} else {
+
+				_transmissionRenderTarget.setSize( floorPowerOfTwo( _vector2.x ), floorPowerOfTwo( _vector2.y ) );
 
 			}
 
@@ -2392,6 +2394,12 @@ class WebGLRenderer {
 			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
 
 		}
+
+	}
+
+	get coordinateSystem() {
+
+		return WebGLCoordinateSystem;
 
 	}
 

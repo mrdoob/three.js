@@ -40,8 +40,6 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Reflector } from 'three/addons/objects/Reflector.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let camera, scene, renderer;
 
 			let cameraControls;
@@ -59,9 +57,9 @@
 
 				// renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
 				// scene
@@ -141,7 +139,7 @@
 				planeBottom.rotateX( - Math.PI / 2 );
 				scene.add( planeBottom );
 
-				const planeFront = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xbbbbfe } ) );
+				const planeFront = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x7f7fff } ) );
 				planeFront.position.z = 50;
 				planeFront.position.y = 50;
 				planeFront.rotateY( Math.PI );
@@ -160,19 +158,19 @@
 				scene.add( planeLeft );
 
 				// lights
-				const mainLight = new THREE.PointLight( 0xe7e7e7, 1.5, 250 );
+				const mainLight = new THREE.PointLight( 0xe7e7e7, 2.5, 250, 0 );
 				mainLight.position.y = 60;
 				scene.add( mainLight );
 
-				const greenLight = new THREE.PointLight( 0x00ff00, 0.25, 1000 );
+				const greenLight = new THREE.PointLight( 0x00ff00, 0.5, 1000, 0 );
 				greenLight.position.set( 550, 50, 0 );
 				scene.add( greenLight );
 
-				const redLight = new THREE.PointLight( 0xff0000, 0.25, 1000 );
+				const redLight = new THREE.PointLight( 0xff0000, 0.5, 1000, 0 );
 				redLight.position.set( - 550, 50, 0 );
 				scene.add( redLight );
 
-				const blueLight = new THREE.PointLight( 0xbbbbfe, 0.25, 1000 );
+				const blueLight = new THREE.PointLight( 0xbbbbfe, 0.5, 1000, 0 );
 				blueLight.position.set( 0, 50, 550 );
 				scene.add( blueLight );
 

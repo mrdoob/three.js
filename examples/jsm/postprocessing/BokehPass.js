@@ -1,5 +1,6 @@
 import {
 	Color,
+	HalfFloatType,
 	MeshDepthMaterial,
 	NearestFilter,
 	NoBlending,
@@ -33,7 +34,8 @@ class BokehPass extends Pass {
 
 		this.renderTargetDepth = new WebGLRenderTarget( 1, 1, { // will be resized later
 			minFilter: NearestFilter,
-			magFilter: NearestFilter
+			magFilter: NearestFilter,
+			type: HalfFloatType
 		} );
 
 		this.renderTargetDepth.texture.name = 'BokehPass.depth';
@@ -66,7 +68,6 @@ class BokehPass extends Pass {
 		} );
 
 		this.uniforms = bokehUniforms;
-		this.needsSwap = false;
 
 		this.fsQuad = new FullScreenQuad( this.materialBokeh );
 

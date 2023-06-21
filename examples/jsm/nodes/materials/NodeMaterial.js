@@ -1,4 +1,4 @@
-import { Material, ShaderMaterial } from 'three';
+import { Material, ShaderMaterial, NoColorSpace } from 'three';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { diffuseColor } from '../core/PropertyNode.js';
@@ -10,6 +10,7 @@ import { instance } from '../accessors/InstanceNode.js';
 import { positionLocal } from '../accessors/PositionNode.js';
 import { skinning } from '../accessors/SkinningNode.js';
 import { texture } from '../accessors/TextureNode.js';
+import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { lightsWithoutWrap } from '../lighting/LightsNode.js';
 import { mix } from '../math/MathNode.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
@@ -28,6 +29,8 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.type = this.constructor.name;
 
+		this.forceSinglePass = false;
+
 		this.lights = true;
 		this.normals = true;
 
@@ -42,12 +45,13 @@ class NodeMaterial extends ShaderMaterial {
 		this.alphaTestNode = null;
 
 		this.positionNode = null;
+		this.outputNode = null;
 
 	}
 
 	customProgramCacheKey() {
 
-		return getCacheKey( this );
+		return this.type + getCacheKey( this );
 
 	}
 
@@ -71,14 +75,22 @@ class NodeMaterial extends ShaderMaterial {
 
 		builder.addStack();
 
-		if ( this.normals === true ) this.constructNormal( builder );
+		if ( this.isUnlit === false ) {
 
-		this.constructDiffuseColor( builder );
-		this.constructVariants( builder );
+			if ( this.normals === true ) this.constructNormal( builder );
 
-		const outgoingLightNode = this.constructLighting( builder );
+			this.constructDiffuseColor( builder );
+			this.constructVariants( builder );
 
-		builder.stack.outputNode = this.constructOutput( builder, outgoingLightNode, diffuseColor.a );
+			const outgoingLightNode = this.constructLighting( builder );
+
+			builder.stack.outputNode = this.constructOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
+
+		} else {
+
+			builder.stack.outputNode = this.constructOutput( builder, this.outputNode || vec4( 0, 0, 0, 1 ) );
+
+		}
 
 		builder.addFlow( 'fragment', builder.removeStack() );
 
@@ -165,9 +177,33 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
+	getEnvNode( builder ) {
+
+		let node = null;
+
+		if ( this.envNode ) {
+
+			node = this.envNode;
+
+		} else if ( this.envMap ) {
+
+			node = this.envMap.isCubeTexture ? cubeTexture( this.envMap ) : texture( this.envMap );
+
+		} else if ( builder.environmentNode ) {
+
+			node = builder.environmentNode;
+
+		}
+
+		return node;
+
+	}
+
 	constructLights( builder ) {
 
-		const envNode = this.envNode || builder.environmentNode;
+		const envNode = this.getEnvNode( builder );
+
+		//
 
 		const materialLightsNode = [];
 
@@ -211,11 +247,12 @@ class NodeMaterial extends ShaderMaterial {
 		const lights = this.lights === true || this.lightsNode !== null;
 
 		const lightsNode = lights ? this.constructLights( builder ) : null;
-		const lightingModelNode = lightsNode ? this.constructLightingModel( builder ) : null;
 
 		let outgoingLightNode = diffuseColor.rgb;
 
 		if ( lightsNode && lightsNode.hasLight !== false ) {
+
+			const lightingModelNode = this.constructLightingModel( builder );
 
 			outgoingLightNode = lightsNode.lightingContext( lightingModelNode, backdropNode, backdropAlphaNode );
 
@@ -237,7 +274,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	constructOutput( builder, outgoingLight, opacity ) {
+	constructOutput( builder, outputNode ) {
 
 		const renderer = builder.renderer;
 
@@ -247,17 +284,27 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( toneMappingNode ) {
 
-			outgoingLight = toneMappingNode.context( { color: outgoingLight } );
+			outputNode = vec4( toneMappingNode.context( { color: outputNode.rgb } ), outputNode.a );
 
 		}
 
-		// @TODO: Optimize outputNode to vec3.
-
-		let outputNode = vec4( outgoingLight, opacity );
-
 		// ENCODING
 
-		outputNode = outputNode.colorSpace( renderer.outputColorSpace );
+		const renderTarget = renderer.getRenderTarget();
+
+		let outputColorSpace;
+
+		if ( renderTarget !== null ) {
+
+			outputColorSpace = renderTarget.texture.colorSpace;
+
+		} else {
+
+			outputColorSpace = renderer.outputColorSpace;
+
+		}
+
+		if ( outputColorSpace !== NoColorSpace ) outputNode = outputNode.linearToColorSpace( outputColorSpace );
 
 		// FOG
 
@@ -361,6 +408,31 @@ class NodeMaterial extends ShaderMaterial {
 		}
 
 		return data;
+
+	}
+
+	get isUnlit() {
+
+		return this.constructor === NodeMaterial.prototype.constructor;
+
+	}
+
+	copy( source ) {
+
+		this.lightsNode = source.lightsNode;
+		this.envNode = source.envNode;
+
+		this.colorNode = source.colorNode;
+		this.normalNode = source.normalNode;
+		this.opacityNode = source.opacityNode;
+		this.backdropNode = source.backdropNode;
+		this.backdropAlphaNode = source.backdropAlphaNode;
+		this.alphaTestNode = source.alphaTestNode;
+
+		this.positionNode = source.positionNode;
+		this.outputNode = source.outputNode;
+
+		return super.copy( source );
 
 	}
 

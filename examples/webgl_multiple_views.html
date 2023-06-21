@@ -111,7 +111,7 @@
 
 				scene = new THREE.Scene();
 
-				const light = new THREE.DirectionalLight( 0xffffff );
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
@@ -214,6 +214,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

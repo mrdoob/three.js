@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+		<h1>[name]</h1>
+
+		<p class="desc">
+			一个用于加载经过Draco压缩的图形库。 <br /><br />
+			[link:https://google.github.io/draco/ Draco]是一个开源的库，主要用于压缩和解压缩三维模型及点云。
+			以客户端上解压缩为代价，显著减少压缩的图形。
+		</p>
+
+		<p>
+			独立的Draco文件后缀为`.drc`，其中包含顶点坐标，法线，颜色和其他的属性，
+			Draco文件*不*包含材质，纹理，动画和节点结构-为了能使用这些特征，需要将Draco图形
+			嵌入到GLTF文件中。使用[link:https://github.com/AnalyticalGraphicsInc/gltf-pipeline glTF-Pipeline]可以将一个普通的GLTF文件转化为经过Draco压缩的GLTF文件。
+			当使用Draco压缩的GLTF模型时，[page:GLTFLoader]内部会调用DRACOLoader。
+		</p>
+
+		<p>
+			推荐创建一个DRACOLoader实例并重用，可以有效避免重复创建加载多个解压器实例。
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name]是一个插件，必须显示引用。
+			请参考 [link:#manual/introduction/Installation Installation / Addons]。
+		</p>
+
+		<code>
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+		</code>
+
+		<h2>代码示例</h2>
+
+		<code>
+		// Instantiate a loader
+		const loader = new DRACOLoader();
+
+		// Specify path to a folder containing WASM/JS decoding libraries.
+		loader.setDecoderPath( '/examples/jsm/libs/draco/' );
+
+		// Optional: Pre-fetch Draco WASM/JS module.
+		loader.preload();
+
+		// Load a Draco geometry
+		loader.load(
+			// resource URL
+			'model.drc',
+			// called when the resource is loaded
+			function ( geometry ) {
+
+				const material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
+				const mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+			},
+			// called as loading progresses
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+		);
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_loader_draco]
+		</p>
+
+		<h2>浏览器兼容性</h2>
+
+		<p>DRACOLoader会根据浏览器的特性，自动使用JS或者WASM解码库。</p>
+
+		<br>
+		<hr>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — 加载器使用的[page:LoadingManager loadingManager]. 默认值为[page:LoadingManager THREE.DefaultLoadingManager].
+		</p>
+		<p>
+		创建一个新的[name].
+		</p>
+
+		<h2>属性</h2>
+		<p>查看公共属性请参考基类[page:Loader]</p>
+
+		<h2>方法</h2>
+		<p>查看公共方法请查看基类[page:Loader]</p>
+
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — 一个`.drc`文件的路径或者网络地址。<br />
+		[page:Function onLoad] — 加载成功之后调用的函数。<br />
+		[page:Function onProgress] — (可选的) 正在加载时调用的函数。参数为XMLHttpRequest实例，包含.[page:Integer total]和.[page:Integer loaded]<br />
+		[page:Function onError] — (可选的)加载出现错误时调用的函数。该函将错误信息作为参数。<br />
+		</p>
+		<p>
+		开始加载解压缩的图形并调用`onLoad`函数。
+		</p>
+
+		<h3>[method:this setDecoderPath]( [param:String value] )</h3>
+		<p>
+		[page:String value] — 包含JS和WASM解压缩库的文件夹路径。
+		</p>
+
+		<h3>[method:this setDecoderConfig]( [param:Object config] )</h3>
+		<p>
+			[page:String config.type] - (可选的) `"js"`或`"wasm"`。<br />
+		</p>
+		<p>
+		为解压缩库提供配置，在解压开始后不能修改。
+		</p>
+
+		<h3>[method:this setWorkerLimit]( [param:Number workerLimit] )</h3>
+		<p>
+			[page:Number workerLimit] - 可以分配的最大线程数。默认值为4。<br />
+		</p>
+		<p>
+		设置用于解码的[link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers Web Workers]的最大值。如果线程也用于其他的任务，给定更小的限制会更合理。
+		
+		</p>
+
+		<h3>[method:this preload]()</h3>
+		<p>
+		如果还没加载完成，则请求解压库。
+		</p>
+
+		<h3>[method:this dispose]()</h3>
+		<p>
+		处理解压资源和释放的内存。在处理后，解码器
+		[link:https://github.com/google/draco/issues/349 不能重新加载].
+		</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/DRACOLoader.js examples/jsm/loaders/DRACOLoader.js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			فئة لتحميل [page:Texture texture]. يستخدم هذا
+			[page:ImageLoader] داخليًا لتحميل الملفات.
+		</p>
+		 
+		<h2>مثال الكود</h2>
+		 
+		<code>
+		const texture = new THREE.TextureLoader().load('textures/land_ocean_ice_cloud_2048.jpg' ); 
+		// immediately use the texture for material creation 
+			
+		const material = new THREE.MeshBasicMaterial( { map:texture } );
+		</code>
+		 
+		<h2>مثال الكود مع الردود  (Code Example with Callbacks)</h2>
+		 
+		<code>
+		// instantiate a loader
+		const loader = new THREE.TextureLoader();
+	
+		// load a resource
+		loader.load(
+			// resource URL
+			'textures/land_ocean_ice_cloud_2048.jpg',
+	
+			// onLoad callback
+			function ( texture ) {
+				// in this example we create the material when the texture is loaded
+				const material = new THREE.MeshBasicMaterial( {
+					map: texture
+					} );
+			},
+	
+			// onProgress callback currently not supported
+			undefined,
+	
+			// onError callback
+			function ( err ) {
+				console.error( 'An error happened.' );
+			}
+		);
+		</code>
+		 
+		<p>
+		يرجى ملاحظة أن three.js r84 قام بإسقاط دعم حدث التقدم لـ TextureLoader
+		. لـ TextureLoader يدعم أحداث التقدم، انظر
+		[link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145 هذا الموضوع].
+		</p>
+
+		<h2>أمثلة (Examples)</h2>
+		<p>[example:webgl_geometry_cube geometry / cube]</p>
+	 
+		<h2>المنشئ (Constructor)</h2>
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — [page:LoadingManager loadingManager]
+		للمحمل الذي سيتم استخدامه. الافتراضي هو [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+	 
+		ينشئ [name] جديد.
+		</p>
+	 
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر الفئة الأساسية [page:Loader] للخصائص المشتركة.</p>
+	 
+		<h2>الطرق (Methods)</h2>
+		<p>انظر الفئة الأساسية [page:Loader] للطرق المشتركة.</p>
+	 
+		<h3>
+		[method:Texture load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )
+		</h3>
+		<p>
+		[page:String url] — المسار أو عنوان URL للملف. يمكن أن يكون هذا أيضًا
+		[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] (اختياري) — سيتم استدعاؤه عند اكتمال التحميل.
+		الحجة ستكون ال [page:Texture texture] المحمّل.<br />
+		[page:Function onProgress] (اختياري) — هذه الدالة الرجعية
+		غير مدعومة حاليًا.<br />
+		[page:Function onError] (اختياري) — سيتم استدعاؤه عند حدوث خطأ في التحميل.<br /><br />
+	 
+		ابدأ التحميل من عنوان URL المعطى وأرسل الـ[page:Texture texture] المحمّل بالكامل
+		إلى onLoad. تعيد الطريقة أيضًا كائن نسيج جديد يمكن
+		استخدامه مباشرة لإنشاء المادة. إذا قمت بذلك بهذه الطريقة، فقد يظهر النسيج
+		في مشهدك بمجرد انتهاء عملية التحميل المعنية.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

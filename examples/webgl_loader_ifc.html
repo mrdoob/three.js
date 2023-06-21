@@ -29,7 +29,7 @@
 					"three/examples/jsm/utils/BufferGeometryUtils": "./jsm/utils/BufferGeometryUtils.js",
 					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.5.23/build/index.module.js",
 					"web-ifc": "https://unpkg.com/web-ifc@0.0.36/web-ifc-api.js",
-					"web-ifc-three": "https://unpkg.com/web-ifc-three@0.0.122/IFCLoader.js"
+					"web-ifc-three": "https://unpkg.com/web-ifc-three@0.0.125/IFCLoader.js"
 				}
 			}
 		</script>
@@ -41,8 +41,6 @@
 
 			import { IFCLoader } from 'web-ifc-three';
 			import { IFCSPACE } from 'web-ifc';
-
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
 
 			let scene, camera, renderer;
 
@@ -65,15 +63,15 @@
 				scene.add( cube );
 
 				//Lights
-				const directionalLight1 = new THREE.DirectionalLight( 0xffeeff, 0.8 );
+				const directionalLight1 = new THREE.DirectionalLight( 0xffeeff, 2.5 );
 				directionalLight1.position.set( 1, 1, 1 );
 				scene.add( directionalLight1 );
 
-				const directionalLight2 = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				const directionalLight2 = new THREE.DirectionalLight( 0xffffff, 2.5 );
 				directionalLight2.position.set( - 1, 0.5, - 1 );
 				scene.add( directionalLight2 );
 
-				const ambientLight = new THREE.AmbientLight( 0xffffee, 0.25 );
+				const ambientLight = new THREE.AmbientLight( 0xffffee, 0.75 );
 				scene.add( ambientLight );
 
 				//Setup IFC Loader
@@ -99,7 +97,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+				renderer.useLegacyLights = false;
 				document.body.appendChild( renderer.domElement );
 
 				//Controls

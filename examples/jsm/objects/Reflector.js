@@ -54,6 +54,7 @@ class Reflector extends Mesh {
 		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample, type: HalfFloatType } );
 
 		const material = new ShaderMaterial( {
+			name: ( shader.name !== undefined ) ? shader.name : 'unspecified',
 			uniforms: UniformsUtils.clone( shader.uniforms ),
 			fragmentShader: shader.fragmentShader,
 			vertexShader: shader.vertexShader
@@ -201,6 +202,8 @@ class Reflector extends Mesh {
 
 Reflector.ReflectorShader = {
 
+	name: 'ReflectorShader',
+
 	uniforms: {
 
 		'color': {
@@ -261,7 +264,7 @@ Reflector.ReflectorShader = {
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 
 			#include <tonemapping_fragment>
-			#include <encodings_fragment>
+			#include <colorspace_fragment>
 
 		}`
 };

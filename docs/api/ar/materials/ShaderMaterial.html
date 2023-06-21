@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		مادة يتم عرضها بشيدرات مخصصة. الشيدر هو برنامج صغير
+		مكتوب في
+		[link:https://www.khronos.org/files/opengles_shading_language.pdf GLSL]
+		يعمل على GPU. قد ترغب في استخدام شيدر مخصص إذا كنت بحاجة إلى:
+		</p>
+		 
+		<ul>
+			<li>
+			تنفيذ تأثير غير مضمن في أي من المواد المدمجة [page:Material materials]
+			</li>
+			<li>
+			دمج العديد من الكائنات في [page:BufferGeometry] واحد لكي
+			تحسين الأداء
+			</li>
+		</ul>
+			هناك الملاحظات التالية التي يجب مراعاتها عند استخدام `ShaderMaterial`:
+		<ul>
+			<li>
+			سيتم عرض `ShaderMaterial` بشكل صحيح فقط من قِبَل
+			[page:WebGLRenderer]، نظرًا لأن كود GLSL في
+			[link:https://en.wikipedia.org/wiki/Shader#Vertex_shaders vertexShader]
+			و [link:https://en.wikipedia.org/wiki/Shader#Pixel_shaders fragmentShader] 
+			يجب تجميعه وتشغيله على GPU باستخدام WebGL.
+			</li>
+			<li>
+			اعتبارًا من THREE r72، لم يعد يتم دعم تعيين السمات مباشرة في ShaderMaterial. يجب استخدام نسخة [page:BufferGeometry] بدلاً من ذلك،
+			باستخدام [page:BufferAttribute] instances لتعريف السمات المخصصة.
+			</li>
+			<li>
+			اعتبارًا من THREE r77، لم يعد من المفترض استخدام نسخ [page:WebGLRenderTarget] أو
+			[page:WebGLCubeRenderTarget] كموحدات. يجب استخدام خاصية [page:Texture texture] بدلاً من ذلك.
+			</li>
+			<li>
+			يتم تمرير السمات والموحدات المضمنة إلى الشيدرات جنبًا إلى جنب
+			مع كودك. إذا كنت لا ترغب في أن يضيف [page:WebGLProgram] أي شيء إلى
+			كود شيدرك، يمكنك استخدام [page:RawShaderMaterial] بدلاً من هذه
+			الفئة.
+			</li>
+			<li>
+				يمكنك استخدام التوجيه #pragma unroll_loop_start و #pragma
+				unroll_loop_end لفك حلقة `for` في GLSL بواسطة معالج شيدر
+				قبل التشغيل. يجب وضع التوجيه فوق الحلقة مباشرة. يجب أن يتطابق تنسيق الحلقة مع معيار محدد.
+				<ul>
+					<li>
+					يجب أن تكون الحلقة
+					[link:https://en.wikipedia.org/wiki/Normalized_loop normalized].
+					</li>
+					<li>يجب أن يكون متغير الحلقة *i*.</li>
+					<li>
+					ستستبدل قِبَال `UNROLLED_LOOP_INDEX` بالقِبَال المُعَبرَة لـ *i* للتكرار المُعَبرَ ويمكن استخدامها في بيانات قِبَال التشغيل.
+					</li>
+				</ul>
+				<code>
+				#pragma unroll_loop_start 
+				for ( int i = 0; i < 10; i ++ ) {
+					// ... 
+				}
+				#pragma unroll_loop_end
+				</code>
+			</li>
+		</ul>
+		 
+		<h2>مثال الكود</h2>
+
+		<code>
+		const material = new THREE.ShaderMaterial( {
+	 
+			uniforms: {
+				time: { value: 1.0 },
+				resolution: { value: new THREE.Vector2() }
+			},
+	 
+			vertexShader: document.getElementById( 'vertexShader' ).textContent,
+			fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+	 
+		} );
+		</code>
+	 
+		<h2>أمثلة (Examples)</h2>
+	 
+		<p>
+		[example:webgl_buffergeometry_custom_attributes_particles webgl / buffergeometry / custom / attributes / particles]<br />
+		[example:webgl_buffergeometry_selective_draw webgl / buffergeometry / selective / draw]<br />
+		[example:webgl_custom_attributes webgl / custom / attributes]<br />
+		[example:webgl_custom_attributes_lines webgl / custom / attributes / lines]<br />
+		[example:webgl_custom_attributes_points webgl / custom / attributes / points]<br />
+		[example:webgl_custom_attributes_points2 webgl / custom / attributes / points2]<br />
+		[example:webgl_custom_attributes_points3 webgl / custom / attributes / points3]<br />
+		[example:webgl_depth_texture webgl / depth / texture]<br />
+		[example:webgl_gpgpu_birds webgl / gpgpu / birds]<br />
+		[example:webgl_gpgpu_protoplanet webgl / gpgpu / protoplanet]<br />
+		[example:webgl_gpgpu_water webgl / gpgpu / water]<br />
+		[example:webgl_interactive_points webgl / interactive / points]<br />
+		[example:webgl_video_kinect webgl / video / kinect]<br />
+		[example:webgl_lights_hemisphere webgl / lights / hemisphere]<br />
+		[example:webgl_marchingcubes webgl / marchingcubes]<br />
+		[example:webgl_materials_envmaps webgl / materials / envmaps]<br />
+		[example:webgl_materials_lightmap webgl / materials / lightmap]<br />
+		[example:webgl_materials_wireframe webgl / materials / wireframe]<br />
+		[example:webgl_modifier_tessellation webgl / modifier / tessellation]<br />
+		[example:webgl_postprocessing_dof2 webgl / postprocessing / dof2]<br />
+		[example:webgl_postprocessing_godrays webgl / postprocessing /
+		godrays]
+		</p>
+
+		<h2>شيدرات الرأس وشيدرات الجزء (Vertex shaders and fragment shaders)</h2>
+
+		<div>
+		<p>يمكنك تحديد نوعين مختلفين من الشيدرات لكل مادة:</p>
+		<ul>
+			<li>
+			يعمل شيدر الرأس أولاً؛ يتلقى `attributes`، يحسب /
+			يعدل موضع كل رأس فردي، ويمرر
+			بيانات إضافية (`varying`s) إلى شيدر الجزء.
+			</li>
+			<li>
+			يعمل شيدر الجزء (أو البكسل) ثانيًا؛ يضبط لون
+			كل "جزء" فردي (بكسل) يتم عرضه على الشاشة.
+			</li>
+		</ul>
+		<p>
+		هناك ثلاثة أنواع من المتغيرات في الشيدرات: الموحدات، والسمات، و
+		varyings:
+		</p>
+		<ul>
+			<li>
+			`Uniforms` هي متغيرات لها نفس القيمة لجميع الرؤوس -
+			الإضاءة، والضباب، وخرائط الظل هي أمثلة على البيانات التي ستكون
+			مخزنة في الموحدات. يمكن الوصول إلى الموحدات من قبل كل من شيدر الرأس
+			وشيدر الجزء.
+			</li>
+			<li>
+			`Attributes` هي متغيرات مرتبطة بكل رأس - على سبيل المثال،
+			موضع الرأس، والوجه الطبيعي، ولون الرأس هي جميعها أمثلة على
+			البيانات التي ستكون مخزنة في السمات. يمكن `فقط` الوصول إلى السمات
+			داخل شيدر الرأس.
+			</li>
+			<li>
+			`Varyings` هي متغيرات تُمَرَّر من شيدر الرأس إلى
+			شيدر الجزء. لكل جزء، ستتم تقديم قيمة كل varying بشكل سلس من قِبَال رؤوس مجاورة.
+			</li>
+		</ul>
+		<p>
+		يجب ملاحظة أن `within` الشيدر نفسه، تعمل الموحدات والسمات مثل
+		المستمرات؛ يمكنك فقط تعديل قِبَالها بتمرير قِبَال مختلفة
+		إلى المخازن من كود JavaScript الخاص بك.
+		</p>
+		</div>
+	 
+		<h2>السمات والموحدات المدمجة (Built-in attributes and uniforms)</h2>
+
+		<div>
+		<p>
+		يوفر [page:WebGLRenderer] العديد من السمات والموحدات إلى
+		الشيدرات افتراضيًا؛ يتم إلحاق تعريفات هذه المتغيرات بكود
+		`fragmentShader` و `vertexShader` الخاص بك من قبل [page:WebGLProgram] عندما
+		يتم تجميع الشيدر؛ ليس عليك إعلانها بنفسك. انظر
+		[page:WebGLProgram] للحصول على تفاصيل هذه المتغيرات.
+		</p>
+		<p>
+		بعض هذه الموحدات أو السمات (على سبيل المثال تلك المتعلقة بالإضاءة،
+		الضباب، إلخ) تتطلب تعيين خصائص على المادة لكي
+		[page:WebGLRenderer] لنسخ القيم المناسبة إلى GPU - تأكد من تعيين هذه العلامات إذا كنت ترغب في استخدام هذه الميزات في شيدرك الخاص.
+		</p>
+		<p>
+		إذا كنت لا ترغب في أن يضيف [page:WebGLProgram] أي شيء إلى كود شيدرك
+		، يمكنك استخدام [page:RawShaderMaterial] بدلاً من هذه الفئة.
+		</p>
+		</div>
+	 
+		<h2>السمات والموحدات المخصصة (Custom attributes and uniforms)</h2>
+	 
+		<div>
+			<p>
+			يجب إعلان كل من السمات والموحدات المخصصة في كود GLSL shader
+			(داخل `vertexShader` و / أو `fragmentShader`). يجب تعريف الموحدات المخصصة
+			في `both` خاصية `uniforms` لـ
+			`ShaderMaterial`، في حين يجب تعريف أي سمات مخصصة عبر
+			[page:BufferAttribute] instances. يجب ملاحظة أن `varying`s يجب فقط أن
+			يتم إعلانها داخل كود الشيدر (وليس داخل المادة).
+			</p>
+			<p>
+			لإعلان سمة مخصصة، يرجى الإشارة إلى
+			[page:BufferGeometry] للحصول على نظرة عامة، و
+			[page:BufferAttribute] للحصول على نظرة مفصلة على API `BufferAttribute`.
+			</p>
+			<p>
+			عند إنشاء سماتك، يجب أن يكون كل مجموعة مُطَبَّقَة التي تقوم بإنشائها لحفظ بيانات سمتك مضروبًا في حجم نوع بياناتك. على سبيل المثال، إذا كانت سمتك من نوع [page:Vector3 THREE.Vector3] ، وكان لديك 3000 رأس في [page:BufferGeometry] ، فيجب إنشاء قيمة مجموعتك المُطَبَّقَة بطول 3000 * 3 ، أو 9000 (قيمة واحدة
+			لكل مُكَوِّن). يظهر جدول حجم كل نوع من أنواع البيانات أدناه للإشارة:
+			</p>
+	 
+			<table>
+				<caption>
+					<a id="attribute-sizes">Attribute sizes</a>
+				</caption>
+				<thead>
+					<tr>
+						<th>GLSL type</th>
+						<th>JavaScript type</th>
+						<th>Size</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>float</td>
+						<td>[page:Number]</td>
+						<td>1</td>
+					</tr>
+					<tr>
+						<td>vec2</td>
+						<td>[page:Vector2 THREE.Vector2]</td>
+						<td>2</td>
+					</tr>
+					<tr>
+						<td>vec3</td>
+						<td>[page:Vector3 THREE.Vector3]</td>
+						<td>3</td>
+					</tr>
+					<tr>
+						<td>vec3</td>
+						<td>[page:Color THREE.Color]</td>
+						<td>3</td>
+					</tr>
+					<tr>
+						<td>vec4</td>
+						<td>[page:Vector4 THREE.Vector4]</td>
+						<td>4</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<p>
+				يجب ملاحظة أن مخازن السمات `ليست` تتحدث تلقائيًا عندما تتغير قيمها. لتحديث السمات المخصصة، قم بتعيين علامة `needsUpdate`
+				إلى true على [page:BufferAttribute] للهندسة (انظر
+				[page:BufferGeometry] لمزيد من التفاصيل).
+				</p>
+			 
+				<p>
+				لإعلان [page:Uniform] مخصص، استخدم خاصية `uniforms`:
+					<code>
+uniforms: { 
+	time: { value: 1.0 },
+	resolution: { value: new THREE.Vector2() } 
+}
+					</code>
+			</p>
+			 
+			<p>
+			يوصى بتحديث قيم [page:Uniform] المخصصة اعتمادًا على
+			[page:Object3D object] و [page:Camera camera] في
+			[page:Object3D.onBeforeRender] لأن [page:Material] يمكن أن يتم مشاركته
+			بين [page:Mesh meshes]، يتم تحديث [page:Matrix4 matrixWorld] لـ [page:Scene] و
+			[page:Camera] في [page:WebGLRenderer.render]، وبعض
+			المؤثرات تعرض [page:Scene scene] باستخدام خاصة بهم [page:Camera cameras].
+			</p>
+		</div>
+			 
+		<h2>المنشئ (Constructor)</h2>
+			 
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+		[page:Object parameters] - (اختياري) كائن يحتوي على واحد أو أكثر
+		خصائص تحدد مظهر المادة. يمكن تمرير أي خاصية من
+		المادة (بما في ذلك أي خاصية موروثة من [page:Material]) هنا.
+		</p>
+			 
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى الفئة الأساسية [page:Material] للخصائص المشتركة.</p>
+			 
+		<h3>[property:Boolean clipping]</h3>
+		<p>
+		يحدد ما إذا كانت هذه المادة تدعم القطع؛ صحيح للسماح للعارض
+		بتمرير الزي الرسمي clippingPlanes. الافتراضي هو false.
+		</p>
+			 
+		<h3>[property:Object defaultAttributeValues]</h3>
+		<p>
+		عندما لا تتضمن الهندسة المعروضة هذه السمات ولكن المادة تفعل ذلك، سيتم تمرير هذه القيم الافتراضية إلى الشيدرات. هذا يتجنب الأخطاء عندما تكون بيانات المخزن المؤقت مفقودة.
+	 
+		<code>
+this.defaultAttributeValues = { 
+	'color': [ 1, 1, 1 ], 
+	'uv': [ 0, 0 ],
+	'uv1': [ 0, 0 ] 
+};
+		</code>
+		</p>
+	 
+		<h3>[property:Object defines]</h3>
+		<p>
+		يحدد ثوابت مخصصة باستخدام توجيهات `#define` داخل كود GLSL
+		لكل من شيدر الرأس وشيدر الجزء؛ كل زوج من المفتاح / القيمة
+		يولد توجيهًا آخر:
+			<code> 
+				defines: { 
+					FOO: 15, 
+					BAR: true 
+				} 
+			</code>
+			يولد الأسطر
+			<code> 
+			#define FOO 15 
+			#define BAR true 
+			</code>
+			في كود GLSL.
+			</p>
+	 
+			<h3>[property:Object extensions]</h3>
+			<p>
+			كائن يحتوي على الخصائص التالية:
+			<code>
+this.extensions = { 
+	derivatives: false, // set to use derivatives
+	fragDepth: false, // set to use fragment depth values 
+	drawBuffers: false, // set to use draw buffers 
+	shaderTextureLOD: false // set to use
+	shader texture LOD 
+};
+			</code>
+		</p>
+	 
+		<h3>[property:Boolean fog]</h3>
+		<p>
+		تحدد ما إذا كان يتم التأثير على لون المادة بإعدادات الضباب العالمية؛ صحيح
+		لتمرير موحدات الضباب إلى الشيدر. الافتراضي هو false.
+		</p>
+	 
+		<h3>[property:String fragmentShader]</h3>
+		<p>
+		كود GLSL لشيدر الجزء. هذا هو الكود الفعلي للشيدر. في
+		المثال أعلاه، يتم استخراج كود `vertexShader` و `fragmentShader` من
+		DOM؛ يمكن تمريره كسلسلة مباشرة أو تحميله عبر AJAX
+		بدلاً من ذلك.
+		</p>
+	 
+		<h3>[property:String glslVersion]</h3>
+		<p>
+		يحدد إصدار GLSL لكود الشيدر المخصص. ذو صلة فقط لـ WebGL 2
+		لتحديد ما إذا كان يجب تحديد GLSL 3.0 أم لا. القيم المتاحة هي
+		`THREE.GLSL1` أو `THREE.GLSL3`. الافتراضي هو `null`.
+		</p>
+	 
+		<h3>[property:String index0AttributeName]</h3>
+		<p>
+		إذا تم تعيينه، يستدعي هذا
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation gl.bindAttribLocation] 
+		لربط فهرس رأس عام بمتغير سمة. الافتراضي هو غير معرف.
+		</p>
+	 
+		<h3>[property:Boolean isShaderMaterial]</h3>
+		<p>علامة قراءة فقط للتحقق مما إذا كان كائنًا معينًا من نوع [name].</p>
+	 
+		<h3>[property:Boolean lights]</h3>
+		<p>
+		يحدد ما إذا كانت هذه المادة تستخدم الإضاءة؛ صحيح لتمرير بيانات الموحدات
+		المتعلقة بالإضاءة إلى هذا الشيدر. الافتراضي هو false.
+		</p>
+	 
+		<h3>[property:Float linewidth]</h3>
+		<p>
+		يتحكم في سُمك الإطار السلكي. الافتراضي هو 1.<br /><br />
+	 
+		نظرًا للقيود
+		[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile] 
+		مع [page:WebGLRenderer WebGL] renderer على معظم
+		المنصات ستكون linewidth دائمًا 1 بغض النظر عن القيمة المُعَدَّة.
+		</p>
+	 
+		<h3>[property:Boolean flatShading]</h3>
+		<p>
+		حدد ما إذا كان يتم عرض المادة بظلال مسطحة. 
+		الافتراضي هو false.
+		</p>
+
+		<h3>[property:Object uniforms]</h3>
+		<p>
+		كائن من الشكل:
+		<code> 
+			{ 
+				"uniform1": { value: 1.0 }, 
+				"uniform2": { value: 2 } 
+			}
+		</code>
+		يحدد الموحدات التي يتم تمريرها إلى كود الشيدر؛ المفاتيح هي أسماء الموحدات
+		، والقيم هي تعريفات من الشكل
+		<code> 
+			{
+				value: 1.0 
+			}
+		</code>
+		حيث `value` هو قيمة الموحد. يجب أن تتطابق الأسماء مع اسم
+		الموحد، كما هو محدد في كود GLSL. يجب ملاحظة أن الموحدات يتم تحديثها
+		في كل إطار، لذلك تحديث قيمة الموحد سيؤدي فورًا إلى
+		تحديث القيمة المتاحة لكود GLSL.
+		</p>
+	 
+		<h3>[property:Boolean uniformsNeedUpdate]</h3>
+		<p>
+		يمكن استخدامه لإجبار تحديث الموحدات أثناء تغيير الموحدات في
+		[page:Object3D.onBeforeRender](). الافتراضي هو `false`.
+		</p>
+	 
+		<h3>[property:Boolean vertexColors]</h3>
+		<p>يعرف ما إذا كان يتم استخدام تلوين الرأس. الافتراضي هو `false`.</p>
+	 
+		<h3>[property:String vertexShader]</h3>
+		<p>
+		كود GLSL لشيدر الرأس. هذا هو الكود الفعلي للشيدر. في
+		المثال أعلاه، يتم استخراج كود `vertexShader` و `fragmentShader` من
+		DOM؛ يمكن تمريره كسلسلة مباشرة أو تحميله عبر AJAX
+		بدلاً من ذلك.
+		</p>
+	 
+		<h3>[property:Boolean wireframe]</h3>
+		<p>
+		عرض الهندسة كإطار سلكي (باستخدام GL_LINES بدلاً من GL_TRIANGLES).
+		الافتراضي هو false (أي عرض كأشكال مسطحة).
+		</p>
+	 
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>
+		يتحكم في سُمك الإطار السلكي. الافتراضي هو 1.<br /><br />
+	 
+		نظرًا للقيود
+		[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile] 
+		مع [page:WebGLRenderer WebGL] renderer على معظم
+		المنصات ستكون linewidth دائمًا 1 بغض النظر عن القيمة المُعَدَّة.
+		</p>
+	 
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى الفئة الأساسية [page:Material] للطرق المشتركة.</p>
+	 
+		<h3>[method:ShaderMaterial clone]()</h3>
+		<p>
+		يولِّد نسخة طبقية من هذه المادة. يجب ملاحظة أن vertexShader و
+		fragmentShader يتم نسخهم `by reference`، كذلك تعاريف
+		`attributes`؛ هذا يعني أن نسخ المادة ستشارك نفس
+		[page:WebGLProgram] المُجَمَّع. ومع ذلك، فإن `uniforms` يتم نسخها `by
+		value`، مما يتيح لك امتلاك مجموعات مختلفة من الموحدات لنسخ مختلفة من
+		المادة.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

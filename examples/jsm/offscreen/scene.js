@@ -45,6 +45,7 @@ function init( canvas, width, height, pixelRatio, path ) {
 		renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas } );
 		renderer.setPixelRatio( pixelRatio );
 		renderer.setSize( width, height, false );
+		renderer.useLegacyLights = false;
 
 		animate();
 

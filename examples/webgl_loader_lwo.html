@@ -12,7 +12,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - LWOLoader
 			<P>Lightwave Object loader by <a href="https://discoverthreejs.com/" target="_blank" rel="noopener">Discover three.js</a></P>
-			Models by <a href="https://onthez.com/" target="_blank" rel="noopener">on the z</a> - Environment images by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			Models by <a href="https://onthez.com/" target="_blank" rel="noopener">on the z</a> - Environment images from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -50,10 +50,10 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
 
-				const ambientLight = new THREE.AmbientLight( 0x666666 );
+				const ambientLight = new THREE.AmbientLight( 0xbbbbbb );
 				scene.add( ambientLight );
 
-				const light1 = new THREE.DirectionalLight( 0xc1c1c1 );
+				const light1 = new THREE.DirectionalLight( 0xc1c1c1, 3 );
 				light1.position.set( 0, 200, 100 );
 				scene.add( light1 );
 
@@ -82,6 +82,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animation );
+				renderer.useLegacyLights = false;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 

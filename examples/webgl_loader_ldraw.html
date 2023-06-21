@@ -89,6 +89,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
@@ -98,7 +99,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xdeebed );
-				scene.environment = pmremGenerator.fromScene( new RoomEnvironment() ).texture;
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment( renderer ) ).texture;
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;

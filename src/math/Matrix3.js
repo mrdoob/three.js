@@ -267,13 +267,27 @@ class Matrix3 {
 
 	makeTranslation( x, y ) {
 
-		this.set(
+		if ( x.isVector2 ) {
 
-			1, 0, x,
-			0, 1, y,
-			0, 0, 1
+			this.set(
 
-		);
+				1, 0, x.x,
+				0, 1, x.y,
+				0, 0, 1
+
+			);
+
+		} else {
+
+			this.set(
+
+				1, 0, x,
+				0, 1, y,
+				0, 0, 1
+
+			);
+
+		}
 
 		return this;
 

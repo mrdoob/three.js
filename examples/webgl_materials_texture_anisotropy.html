@@ -108,14 +108,14 @@
 				scene2.background = new THREE.Color( 0xf2f7ff );
 				scene2.fog = new THREE.Fog( 0xf2f7ff, 1, 25000 );
 
-				scene1.add( new THREE.AmbientLight( 0xeef0ff ) );
-				scene2.add( new THREE.AmbientLight( 0xeef0ff ) );
+				scene1.add( new THREE.AmbientLight( 0xeef0ff, 3 ) );
+				scene2.add( new THREE.AmbientLight( 0xeef0ff, 3 ) );
 
-				const light1 = new THREE.DirectionalLight( 0xffffff, 2 );
+				const light1 = new THREE.DirectionalLight( 0xffffff, 6 );
 				light1.position.set( 1, 1, 1 );
 				scene1.add( light1 );
 
-				const light2 = new THREE.DirectionalLight( 0xffffff, 2 );
+				const light2 = new THREE.DirectionalLight( 0xffffff, 6 );
 				light2.position.set( 1, 1, 1 );
 				scene2.add( light2 );
 
@@ -172,6 +172,7 @@
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.useLegacyLights = false;
 				renderer.autoClear = false;
 
 				renderer.domElement.style.position = 'relative';
