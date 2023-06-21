@@ -66,7 +66,6 @@ class ColorSpaceNode extends TempNode {
 		super( 'vec4' );
 
 		this.method = method;
-
 		this.node = node;
 
 	}
