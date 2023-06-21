@@ -652,8 +652,6 @@ class Matrix4 {
 
 	compose( position, quaternion, scale ) {
 
-		const te = this.elements;
-
 		const x = quaternion._x, y = quaternion._y, z = quaternion._z, w = quaternion._w;
 		const x2 = x + x,	y2 = y + y, z2 = z + z;
 		const xx = x * x2, xy = x * y2, xz = x * z2;
@@ -662,25 +660,14 @@ class Matrix4 {
 
 		const sx = scale.x, sy = scale.y, sz = scale.z;
 
-		te[ 0 ] = ( 1 - ( yy + zz ) ) * sx;
-		te[ 1 ] = ( xy + wz ) * sx;
-		te[ 2 ] = ( xz - wy ) * sx;
-		te[ 3 ] = 0;
+		this.set(
 
-		te[ 4 ] = ( xy - wz ) * sy;
-		te[ 5 ] = ( 1 - ( xx + zz ) ) * sy;
-		te[ 6 ] = ( yz + wx ) * sy;
-		te[ 7 ] = 0;
+			( 1 - ( yy + zz ) ) * sx, ( xy - wz ) * sy, ( xz + wy ) * sz, position.x,
+			( xy + wz ) * sx, ( 1 - ( xx + zz ) ) * sy, ( yz - wx ) * sz, position.y,
+			( xz - wy ) * sx, ( yz + wx ) * sy, ( 1 - ( xx + yy ) ) * sz, position.z,
+			0, 0, 0, 1
 
-		te[ 8 ] = ( xz + wy ) * sz;
-		te[ 9 ] = ( yz - wx ) * sz;
-		te[ 10 ] = ( 1 - ( xx + yy ) ) * sz;
-		te[ 11 ] = 0;
-
-		te[ 12 ] = position.x;
-		te[ 13 ] = position.y;
-		te[ 14 ] = position.z;
-		te[ 15 ] = 1;
+		);
 
 		return this;
 
@@ -688,19 +675,12 @@ class Matrix4 {
 
 	decompose( position, quaternion, scale ) {
 
-		const te = this.elements;
+		let sx = _v1.setFromMatrixColumn( this, 0 ).length();
+		const sy = _v1.setFromMatrixColumn( this, 1 ).length();
+		const sz = _v1.setFromMatrixColumn( this, 2 ).length();
 
-		let sx = _v1.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
-		const sy = _v1.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
-		const sz = _v1.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
-
-		// if determine is negative, we need to invert one scale
-		const det = this.determinant();
-		if ( det < 0 ) sx = - sx;
-
-		position.x = te[ 12 ];
-		position.y = te[ 13 ];
-		position.z = te[ 14 ];
+		// if determinant is negative, we need to invert one scale
+		if ( this.determinant() < 0 ) sx = - sx;
 
 		// scale the rotation part
 		_m1.copy( this );
@@ -721,11 +701,9 @@ class Matrix4 {
 		_m1.elements[ 9 ] *= invSZ;
 		_m1.elements[ 10 ] *= invSZ;
 
+		position.setFromMatrixColumn( this, 3 );
 		quaternion.setFromRotationMatrix( _m1 );
-
-		scale.x = sx;
-		scale.y = sy;
-		scale.z = sz;
+		scale.set( sx, sy, sz );
 
 		return this;
 
@@ -733,7 +711,6 @@ class Matrix4 {
 
 	makePerspective( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem ) {
 
-		const te = this.elements;
 		const x = 2 * near / ( right - left );
 		const y = 2 * near / ( top - bottom );
 
@@ -758,10 +735,14 @@ class Matrix4 {
 
 		}
 
-		te[ 0 ] = x;	te[ 4 ] = 0;	te[ 8 ] = a; 	te[ 12 ] = 0;
-		te[ 1 ] = 0;	te[ 5 ] = y;	te[ 9 ] = b; 	te[ 13 ] = 0;
-		te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = c; 	te[ 14 ] = d;
-		te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = - 1;	te[ 15 ] = 0;
+		this.set(
+
+			x, 0, a, 0,
+			0, y, b, 0,
+			0, 0, c, d,
+			0, 0, - 1, 0
+
+		);
 
 		return this;
 
@@ -769,7 +750,6 @@ class Matrix4 {
 
 	makeOrthographic( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem ) {
 
-		const te = this.elements;
 		const w = 1 / ( right - left );
 		const h = 1 / ( top - bottom );
 		const p = 1 / ( far - near );
@@ -795,10 +775,14 @@ class Matrix4 {
 
 		}
 
-		te[ 0 ] = 2 * w;	te[ 4 ] = 0;		te[ 8 ] = 0; 		te[ 12 ] = - x;
-		te[ 1 ] = 0; 		te[ 5 ] = 2 * h;	te[ 9 ] = 0; 		te[ 13 ] = - y;
-		te[ 2 ] = 0; 		te[ 6 ] = 0;		te[ 10 ] = zInv;	te[ 14 ] = - z;
-		te[ 3 ] = 0; 		te[ 7 ] = 0;		te[ 11 ] = 0;		te[ 15 ] = 1;
+		this.set(
+
+			2 * w, 0, 0, - x,
+			0, 2 * h, 0, - y,
+			0, 0, zInv, - z,
+			0, 0, 0, 1
+
+		);
 
 		return this;
 
@@ -833,27 +817,11 @@ class Matrix4 {
 
 	toArray( array = [], offset = 0 ) {
 
-		const te = this.elements;
+		for ( let i = 0; i < 16; i ++ ) {
 
-		array[ offset ] = te[ 0 ];
-		array[ offset + 1 ] = te[ 1 ];
-		array[ offset + 2 ] = te[ 2 ];
-		array[ offset + 3 ] = te[ 3 ];
+			array[ i + offset ] = this.elements[ i ];
 
-		array[ offset + 4 ] = te[ 4 ];
-		array[ offset + 5 ] = te[ 5 ];
-		array[ offset + 6 ] = te[ 6 ];
-		array[ offset + 7 ] = te[ 7 ];
-
-		array[ offset + 8 ] = te[ 8 ];
-		array[ offset + 9 ] = te[ 9 ];
-		array[ offset + 10 ] = te[ 10 ];
-		array[ offset + 11 ] = te[ 11 ];
-
-		array[ offset + 12 ] = te[ 12 ];
-		array[ offset + 13 ] = te[ 13 ];
-		array[ offset + 14 ] = te[ 14 ];
-		array[ offset + 15 ] = te[ 15 ];
+		}
 
 		return array;
 
@@ -863,7 +831,7 @@ class Matrix4 {
 
 const _v1 = /*@__PURE__*/ new Vector3();
 const _m1 = /*@__PURE__*/ new Matrix4();
-const _zero = /*@__PURE__*/ new Vector3( 0, 0, 0 );
+const _zero = /*@__PURE__*/ new Vector3();
 const _one = /*@__PURE__*/ new Vector3( 1, 1, 1 );
 const _x = /*@__PURE__*/ new Vector3();
 const _y = /*@__PURE__*/ new Vector3();
