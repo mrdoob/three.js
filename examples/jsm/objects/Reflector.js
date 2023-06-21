@@ -33,6 +33,7 @@ class Reflector extends Mesh {
 		const clipBias = options.clipBias || 0;
 		const shader = options.shader || Reflector.ReflectorShader;
 		const multisample = ( options.multisample !== undefined ) ? options.multisample : 4;
+		const blur = options.blur || 0.0
 
 		//
 
@@ -63,6 +64,7 @@ class Reflector extends Mesh {
 		material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
 		material.uniforms[ 'color' ].value = color;
 		material.uniforms[ 'textureMatrix' ].value = textureMatrix;
+		material.uniforms['blurSize'].value = blur;
 
 		this.material = material;
 
@@ -216,6 +218,10 @@ Reflector.ReflectorShader = {
 
 		'textureMatrix': {
 			value: null
+		},
+		
+		'blurSize': {
+			value: null
 		}
 
 	},
@@ -240,6 +246,7 @@ Reflector.ReflectorShader = {
 	fragmentShader: /* glsl */`
 		uniform vec3 color;
 		uniform sampler2D tDiffuse;
+		uniform float blurSize;
 		varying vec4 vUv;
 
 		#include <logdepthbuf_pars_fragment>
@@ -256,11 +263,31 @@ Reflector.ReflectorShader = {
 
 		}
 
+		vec4 blur( sampler2D diffuse, float blurSize, vec4 uv ) {
+			vec4 sum = vec4(0.0);
+			sum += texture2DProj(diffuse, vec4(uv.x - 4.0 * blurSize, uv.y, uv.z, uv.w)) * 0.05;
+			sum += texture2DProj(diffuse, vec4(uv.x - 3.0 * blurSize, uv.y, uv.z, uv.w)) * 0.09;
+			sum += texture2DProj(diffuse, vec4(uv.x - 2.0 * blurSize, uv.y, uv.z, uv.w)) * 0.12;
+			sum += texture2DProj(diffuse, vec4(uv.x - blurSize, uv.y, uv.z, uv.w)) * 0.15;
+			sum += texture2DProj(diffuse, vec4(uv.x, uv.y, uv.z, uv.w)) * 0.16;
+			sum += texture2DProj(diffuse, vec4(uv.x + blurSize, uv.y, uv.z, uv.w)) * 0.15;
+			sum += texture2DProj(diffuse, vec4(uv.x + 2.0 * blurSize, uv.y, uv.z, uv.w)) * 0.12;
+			sum += texture2DProj(diffuse, vec4(uv.x + 3.0 * blurSize, uv.y, uv.z, uv.w)) * 0.09;
+			sum += texture2DProj(diffuse, vec4(uv.x + 4.0 * blurSize, uv.y, uv.z, uv.w)) * 0.05;
+
+			return sum;
+		}
+
 		void main() {
 
 			#include <logdepthbuf_fragment>
 
-			vec4 base = texture2DProj( tDiffuse, vUv );
+			vec4 base = vec4(0.0);
+			if(blurSize != 0.0) {
+				base = blur(tDiffuse, blurSize, vUv);
+			} else {
+				base = texture2DProj(tDiffuse, vUv);
+			}
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 
 			#include <tonemapping_fragment>
