@@ -138,10 +138,10 @@ class Matrix4 {
 
 		this.set(
 
-			me[ 0 ] * scaleX, me[ 4 ] * scaleY, me[ 8 ] * scaleZ,  0,
-			me[ 1 ] * scaleX, me[ 5 ] * scaleY, me[ 9 ] * scaleZ,  0,
+			me[ 0 ] * scaleX, me[ 4 ] * scaleY, me[ 8 ] * scaleZ, 0,
+			me[ 1 ] * scaleX, me[ 5 ] * scaleY, me[ 9 ] * scaleZ, 0,
 			me[ 2 ] * scaleX, me[ 6 ] * scaleY, me[ 10 ] * scaleZ, 0,
-			0,                0,                0,                 1
+			0, 0, 0, 1
 
 		);
 
@@ -162,10 +162,10 @@ class Matrix4 {
 
 			this.set(
 
-				c * e,       - c * f,     d,       0,
+				c * e, - c * f, d, 0,
 				af + be * d, ae - bf * d, - b * c, 0,
-				bf - ae * d, be + af * d, a * c,   0,
-				0,           0,           0,       1
+				bf - ae * d, be + af * d, a * c, 0,
+				0, 0, 0, 1
 
 			);
 
@@ -176,9 +176,9 @@ class Matrix4 {
 			this.set(
 
 				ce + df * b, de * b - cf, a * d, 0,
-				a * f,       a * e,       - b,   0,
+				a * f, a * e, - b, 0,
 				cf * b - de, df + ce * b, a * c, 0,
-				0,           0,           0,     1
+				0, 0, 0, 1
 
 			);
 
@@ -189,9 +189,9 @@ class Matrix4 {
 			this.set(
 
 				ce - df * b, - a * f, de + cf * b, 0,
-				cf + de * b, a * e,   df - ce * b, 0,
-				- a * d,     b,       a * c,       0,
-				0,           0,       0,           1
+				cf + de * b, a * e, df - ce * b, 0,
+				- a * d, b, a * c, 0,
+				0, 0, 0, 1
 
 			);
 
@@ -201,10 +201,10 @@ class Matrix4 {
 
 			this.set(
 
-				c * e, be * d - af,  ae * d + bf, 0,
-				c * f, bf * d + ae,  af * d - be, 0,
-				- d,   b * c,        a * c,       0,
-				0,     0,            0,           1
+				c * e, be * d - af, ae * d + bf, 0,
+				c * f, bf * d + ae, af * d - be, 0,
+				- d, b * c, a * c, 0,
+				0, 0, 0, 1
 
 			);
 
@@ -214,10 +214,10 @@ class Matrix4 {
 
 			this.set(
 
-				c * e,   bd - ac * f,  bc * f + ad, 0,
-				f,       a * e,        - b * e,     0,
-				- d * e, ad * f + bc,  ac - bd * f, 0,
-				0,       0,            0,           1
+				c * e, bd - ac * f, bc * f + ad, 0,
+				f, a * e, - b * e, 0,
+				- d * e, ad * f + bc, ac - bd * f, 0,
+				0, 0, 0, 1
 
 			);
 
@@ -227,10 +227,10 @@ class Matrix4 {
 
 			this.set(
 
-				c * e,       - f,   d * e,       0,
+				c * e, - f, d * e, 0,
 				ac * f + bd, a * e, ad * f - bc, 0,
 				bc * f - ad, b * e, bd * f + ac, 0,
-				0,           0,     0,           1
+				0, 0, 0, 1
 
 			);
 
@@ -507,8 +507,6 @@ class Matrix4 {
 	}
 
 	getMaxScaleOnAxis() {
-
-		const te = this.elements;
 
 		const scaleXSq = _v1.setFromMatrixColumn( this, 0 ).lengthSq();
 		const scaleYSq = _v1.setFromMatrixColumn( this, 1 ).lengthSq();
