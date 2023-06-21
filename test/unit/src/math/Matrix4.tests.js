@@ -570,6 +570,23 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'getScale', ( assert ) => {
+
+			const m = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
+			const expected = new Vector3(
+				Math.sqrt( 1 * 1 + 5 * 5 + 9 * 9 ),
+				Math.sqrt( 2 * 2 + 6 * 6 + 10 * 10 ),
+				Math.sqrt( 3 * 3 + 7 * 7 + 11 * 11 ) );
+
+			const scale = new Vector3();
+			m.getScale( scale );
+
+			assert.ok( Math.abs( scale.x - expected.x ) <= eps, 'Passed!' );
+			assert.ok( Math.abs( scale.y - expected.y ) <= eps, 'Passed!' );
+			assert.ok( Math.abs( scale.z - expected.z ) <= eps, 'Passed!' );
+
+		} );
+
 		QUnit.test( 'getMaxScaleOnAxis', ( assert ) => {
 
 			const a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
