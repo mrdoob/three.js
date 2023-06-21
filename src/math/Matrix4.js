@@ -549,11 +549,9 @@ class Matrix4 {
 
 	getScale( v ) {
 
-		const te = this.elements;
-
-		v.x = _v1.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
-		v.y = _v1.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
-		v.z = _v1.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
+		v.x = _v1.setFromMatrixColumn( this, 0 ).length();
+		v.y = _v1.setFromMatrixColumn( this, 1 ).length();
+		v.z = _v1.setFromMatrixColumn( this, 2 ).length();
 
 		return this;
 
