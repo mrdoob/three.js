@@ -1,5 +1,5 @@
 import { code } from '../../code/CodeNode.js';
-import { fn } from '../../code/FunctionNode.js';
+import { nativeFn } from '../../code/FunctionNode.js';
 
 // Original shader code from:
 // https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_transform_color.glsl
@@ -16,4 +16,4 @@ vec3 mx_srgb_texture_to_lin_rec709(vec3 color)
 
 const includes = [ mx_transform_color ];
 
-export const mx_srgb_texture_to_lin_rec709 = fn( 'vec3 mx_srgb_texture_to_lin_rec709( vec3 color )', includes );
+export const mx_srgb_texture_to_lin_rec709 = nativeFn( 'vec3 mx_srgb_texture_to_lin_rec709( vec3 color )', includes );

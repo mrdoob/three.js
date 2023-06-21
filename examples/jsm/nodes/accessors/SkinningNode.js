@@ -1,6 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { ShaderNode, nodeProxy } from '../shadernode/ShaderNode.js';
+import { fn, nodeProxy } from '../shadernode/ShaderNode.js';
 import { attribute } from '../core/AttributeNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { add } from '../math/OperatorNode.js';
@@ -9,7 +9,7 @@ import { normalLocal } from './NormalNode.js';
 import { positionLocal } from './PositionNode.js';
 import { tangentLocal } from './TangentNode.js';
 
-const Skinning = new ShaderNode( ( inputs, {}, builder ) => {
+const Skinning = fn( ( inputs, {}, builder ) => {
 
 	const { index, weight, bindMatrix, bindMatrixInverse, boneMatrices } = inputs;
 
@@ -80,14 +80,14 @@ class SkinningNode extends Node {
 
 	generate( builder ) {
 
-		/*return new ShaderNode( ( {}, stack, builder ) => Skinning.call( {
+		/*return fn( ( {}, stack, builder ) => Skinning( {
 			index: this.skinIndexNode,
 			weight: this.skinWeightNode,
 			bindMatrix: this.bindMatrixNode,
 			bindMatrixInverse: this.bindMatrixInverseNode,
 			boneMatrices: this.boneMatricesNode
 		}, stack, builder ) ).build( builder );*/
-		Skinning.call( {
+		Skinning( {
 			index: this.skinIndexNode,
 			weight: this.skinWeightNode,
 			bindMatrix: this.bindMatrixNode,
