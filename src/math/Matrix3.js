@@ -357,19 +357,11 @@ class Matrix3 {
 
 	toArray( array = [], offset = 0 ) {
 
-		const te = this.elements;
+		for ( let i = 0; i < 9; i ++ ) {
 
-		array[ offset ] = te[ 0 ];
-		array[ offset + 1 ] = te[ 1 ];
-		array[ offset + 2 ] = te[ 2 ];
+			array[ i + offset ] = this.elements[ i ];
 
-		array[ offset + 3 ] = te[ 3 ];
-		array[ offset + 4 ] = te[ 4 ];
-		array[ offset + 5 ] = te[ 5 ];
-
-		array[ offset + 6 ] = te[ 6 ];
-		array[ offset + 7 ] = te[ 7 ];
-		array[ offset + 8 ] = te[ 8 ];
+		}
 
 		return array;
 
