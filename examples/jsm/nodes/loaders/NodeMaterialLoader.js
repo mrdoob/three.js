@@ -13,7 +13,7 @@ MaterialLoader.createMaterialFromType = function ( type ) {
 
 	}
 
-	return superFromTypeFunction( this, type );
+	return superFromTypeFunction.call( this, type );
 
 };
 
