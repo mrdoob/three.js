@@ -114,10 +114,12 @@ class Matrix4 {
 	makeBasis( xAxis, yAxis, zAxis ) {
 
 		this.set(
+
 			xAxis.x, yAxis.x, zAxis.x, 0,
 			xAxis.y, yAxis.y, zAxis.y, 0,
 			xAxis.z, yAxis.z, zAxis.z, 0,
 			0, 0, 0, 1
+
 		);
 
 		return this;
@@ -128,40 +130,26 @@ class Matrix4 {
 
 		// this method does not support reflection matrices
 
-		const te = this.elements;
 		const me = m.elements;
 
 		const scaleX = 1 / _v1.setFromMatrixColumn( m, 0 ).length();
 		const scaleY = 1 / _v1.setFromMatrixColumn( m, 1 ).length();
 		const scaleZ = 1 / _v1.setFromMatrixColumn( m, 2 ).length();
 
-		te[ 0 ] = me[ 0 ] * scaleX;
-		te[ 1 ] = me[ 1 ] * scaleX;
-		te[ 2 ] = me[ 2 ] * scaleX;
-		te[ 3 ] = 0;
+		this.set(
 
-		te[ 4 ] = me[ 4 ] * scaleY;
-		te[ 5 ] = me[ 5 ] * scaleY;
-		te[ 6 ] = me[ 6 ] * scaleY;
-		te[ 7 ] = 0;
+			me[ 0 ] * scaleX, me[ 4 ] * scaleY, me[ 8 ] * scaleZ,  0,
+			me[ 1 ] * scaleX, me[ 5 ] * scaleY, me[ 9 ] * scaleZ,  0,
+			me[ 2 ] * scaleX, me[ 6 ] * scaleY, me[ 10 ] * scaleZ, 0,
+			0,                0,                0,                 1
 
-		te[ 8 ] = me[ 8 ] * scaleZ;
-		te[ 9 ] = me[ 9 ] * scaleZ;
-		te[ 10 ] = me[ 10 ] * scaleZ;
-		te[ 11 ] = 0;
-
-		te[ 12 ] = 0;
-		te[ 13 ] = 0;
-		te[ 14 ] = 0;
-		te[ 15 ] = 1;
+		);
 
 		return this;
 
 	}
 
 	makeRotationFromEuler( euler ) {
-
-		const te = this.elements;
 
 		const x = euler.x, y = euler.y, z = euler.z;
 		const a = Math.cos( x ), b = Math.sin( x );
@@ -172,110 +160,81 @@ class Matrix4 {
 
 			const ae = a * e, af = a * f, be = b * e, bf = b * f;
 
-			te[ 0 ] = c * e;
-			te[ 4 ] = - c * f;
-			te[ 8 ] = d;
+			this.set(
 
-			te[ 1 ] = af + be * d;
-			te[ 5 ] = ae - bf * d;
-			te[ 9 ] = - b * c;
+				c * e,       - c * f,     d,       0,
+				af + be * d, ae - bf * d, - b * c, 0,
+				bf - ae * d, be + af * d, a * c,   0,
+				0,           0,           0,       1
 
-			te[ 2 ] = bf - ae * d;
-			te[ 6 ] = be + af * d;
-			te[ 10 ] = a * c;
+			);
 
 		} else if ( euler.order === 'YXZ' ) {
 
 			const ce = c * e, cf = c * f, de = d * e, df = d * f;
 
-			te[ 0 ] = ce + df * b;
-			te[ 4 ] = de * b - cf;
-			te[ 8 ] = a * d;
+			this.set(
 
-			te[ 1 ] = a * f;
-			te[ 5 ] = a * e;
-			te[ 9 ] = - b;
+				ce + df * b, de * b - cf, a * d, 0,
+				a * f,       a * e,       - b,   0,
+				cf * b - de, df + ce * b, a * c, 0,
+				0,           0,           0,     1
 
-			te[ 2 ] = cf * b - de;
-			te[ 6 ] = df + ce * b;
-			te[ 10 ] = a * c;
+			);
 
 		} else if ( euler.order === 'ZXY' ) {
 
 			const ce = c * e, cf = c * f, de = d * e, df = d * f;
 
-			te[ 0 ] = ce - df * b;
-			te[ 4 ] = - a * f;
-			te[ 8 ] = de + cf * b;
+			this.set(
 
-			te[ 1 ] = cf + de * b;
-			te[ 5 ] = a * e;
-			te[ 9 ] = df - ce * b;
+				ce - df * b, - a * f, de + cf * b, 0,
+				cf + de * b, a * e,   df - ce * b, 0,
+				- a * d,     b,       a * c,       0,
+				0,           0,       0,           1
 
-			te[ 2 ] = - a * d;
-			te[ 6 ] = b;
-			te[ 10 ] = a * c;
+			);
 
 		} else if ( euler.order === 'ZYX' ) {
 
 			const ae = a * e, af = a * f, be = b * e, bf = b * f;
 
-			te[ 0 ] = c * e;
-			te[ 4 ] = be * d - af;
-			te[ 8 ] = ae * d + bf;
+			this.set(
 
-			te[ 1 ] = c * f;
-			te[ 5 ] = bf * d + ae;
-			te[ 9 ] = af * d - be;
+				c * e, be * d - af,  ae * d + bf, 0,
+				c * f, bf * d + ae,  af * d - be, 0,
+				- d,   b * c,        a * c,       0,
+				0,     0,            0,           1
 
-			te[ 2 ] = - d;
-			te[ 6 ] = b * c;
-			te[ 10 ] = a * c;
+			);
 
 		} else if ( euler.order === 'YZX' ) {
 
 			const ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
-			te[ 0 ] = c * e;
-			te[ 4 ] = bd - ac * f;
-			te[ 8 ] = bc * f + ad;
+			this.set(
 
-			te[ 1 ] = f;
-			te[ 5 ] = a * e;
-			te[ 9 ] = - b * e;
+				c * e,   bd - ac * f,  bc * f + ad, 0,
+				f,       a * e,        - b * e,     0,
+				- d * e, ad * f + bc,  ac - bd * f, 0,
+				0,       0,            0,           1
 
-			te[ 2 ] = - d * e;
-			te[ 6 ] = ad * f + bc;
-			te[ 10 ] = ac - bd * f;
+			);
 
 		} else if ( euler.order === 'XZY' ) {
 
 			const ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
-			te[ 0 ] = c * e;
-			te[ 4 ] = - f;
-			te[ 8 ] = d * e;
+			this.set(
 
-			te[ 1 ] = ac * f + bd;
-			te[ 5 ] = a * e;
-			te[ 9 ] = ad * f - bc;
+				c * e,       - f,   d * e,       0,
+				ac * f + bd, a * e, ad * f - bc, 0,
+				bc * f - ad, b * e, bd * f + ac, 0,
+				0,           0,     0,           1
 
-			te[ 2 ] = bc * f - ad;
-			te[ 6 ] = b * e;
-			te[ 10 ] = bd * f + ac;
+			);
 
 		}
-
-		// bottom row
-		te[ 3 ] = 0;
-		te[ 7 ] = 0;
-		te[ 11 ] = 0;
-
-		// last column
-		te[ 12 ] = 0;
-		te[ 13 ] = 0;
-		te[ 14 ] = 0;
-		te[ 15 ] = 1;
 
 		return this;
 
@@ -551,9 +510,9 @@ class Matrix4 {
 
 		const te = this.elements;
 
-		const scaleXSq = te[ 0 ] * te[ 0 ] + te[ 1 ] * te[ 1 ] + te[ 2 ] * te[ 2 ];
-		const scaleYSq = te[ 4 ] * te[ 4 ] + te[ 5 ] * te[ 5 ] + te[ 6 ] * te[ 6 ];
-		const scaleZSq = te[ 8 ] * te[ 8 ] + te[ 9 ] * te[ 9 ] + te[ 10 ] * te[ 10 ];
+		const scaleXSq = _v1.setFromMatrixColumn( this, 0 ).lengthSq();
+		const scaleYSq = _v1.setFromMatrixColumn( this, 1 ).lengthSq();
+		const scaleZSq = _v1.setFromMatrixColumn( this, 2 ).lengthSq();
 
 		return Math.sqrt( Math.max( scaleXSq, scaleYSq, scaleZSq ) );
 
@@ -813,9 +772,9 @@ class Matrix4 {
 	makeOrthographic( left, right, top, bottom, near, far, coordinateSystem = WebGLCoordinateSystem ) {
 
 		const te = this.elements;
-		const w = 1.0 / ( right - left );
-		const h = 1.0 / ( top - bottom );
-		const p = 1.0 / ( far - near );
+		const w = 1 / ( right - left );
+		const h = 1 / ( top - bottom );
+		const p = 1 / ( far - near );
 
 		const x = ( right + left ) * w;
 		const y = ( top + bottom ) * h;
@@ -830,7 +789,7 @@ class Matrix4 {
 		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
 
 			z = near * p;
-			zInv = - 1 * p;
+			zInv = - p;
 
 		} else {
 
