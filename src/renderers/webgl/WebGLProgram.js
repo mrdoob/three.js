@@ -400,8 +400,6 @@ function generateCubeUVSize( parameters ) {
 
 function constructShaderPrefixes( parameters ) {
 
-	let prefixVertex, prefixFragment;
-
 	const defines = { ...parameters.defines };
 
 	defines.SHADER_TYPE = parameters.shaderType;
