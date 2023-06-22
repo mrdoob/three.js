@@ -100,17 +100,19 @@ class NodeMaterial extends ShaderMaterial {
 
 		const object = builder.object;
 
+		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
+
+			builder.stack.assign( positionLocal, instance( object ) );
+
+		}
+
+		//
+
 		let vertex = positionLocal;
 
 		if ( this.positionNode !== null ) {
 
 			vertex = vertex.bypass( positionLocal.assign( this.positionNode ) );
-
-		}
-
-		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
-
-			vertex = vertex.bypass( instance( object ) );
 
 		}
 
