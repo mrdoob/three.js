@@ -141,14 +141,18 @@ class Pipelines extends DataMap {
 
 		const pipeline = this._releasePipeline( object );
 
-		if ( pipeline.isComputePipeline ) {
+		if ( pipeline && pipeline.usedTimes === 0 ) {
 
-			this._releaseProgram( pipeline.computeProgram );
+			if ( pipeline.isComputePipeline ) {
 
-		} else {
+				this._releaseProgram( pipeline.computeProgram );
 
-			this._releaseProgram( pipeline.vertexProgram );
-			this._releaseProgram( pipeline.fragmentProgram );
+			} else {
+
+				this._releaseProgram( pipeline.vertexProgram );
+				this._releaseProgram( pipeline.fragmentProgram );
+
+			}
 
 		}
 

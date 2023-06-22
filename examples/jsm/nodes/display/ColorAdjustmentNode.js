@@ -2,15 +2,15 @@ import TempNode from '../core/TempNode.js';
 import { dot, mix } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, ShaderNode, nodeProxy, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, tslFn, nodeProxy, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
 
-const saturationNode = new ShaderNode( ( { color, adjustment } ) => {
+const saturationNode = tslFn( ( { color, adjustment } ) => {
 
 	return adjustment.mix( luminance( color ), color );
 
 } );
 
-const vibranceNode = new ShaderNode( ( { color, adjustment } ) => {
+const vibranceNode = tslFn( ( { color, adjustment } ) => {
 
 	const average = add( color.r, color.g, color.b ).div( 3.0 );
 
@@ -21,7 +21,7 @@ const vibranceNode = new ShaderNode( ( { color, adjustment } ) => {
 
 } );
 
-const hueNode = new ShaderNode( ( { color, adjustment } ) => {
+const hueNode = tslFn( ( { color, adjustment } ) => {
 
 	const RGBtoYIQ = mat3( 0.299, 0.587, 0.114, 0.595716, - 0.274453, - 0.321263, 0.211456, - 0.522591, 0.311135 );
 	const YIQtoRGB = mat3( 1.0, 0.9563, 0.6210, 1.0, - 0.2721, - 0.6474, 1.0, - 1.107, 1.7046 );
@@ -58,15 +58,15 @@ class ColorAdjustmentNode extends TempNode {
 
 		if ( method === ColorAdjustmentNode.SATURATION ) {
 
-			outputNode = saturationNode.call( callParams );
+			outputNode = saturationNode( callParams );
 
 		} else if ( method === ColorAdjustmentNode.VIBRANCE ) {
 
-			outputNode = vibranceNode.call( callParams );
+			outputNode = vibranceNode( callParams );
 
 		} else if ( method === ColorAdjustmentNode.HUE ) {
 
-			outputNode = hueNode.call( callParams );
+			outputNode = hueNode( callParams );
 
 		} else {
 

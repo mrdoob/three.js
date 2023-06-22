@@ -7,7 +7,7 @@ import { lightingModel } from '../core/LightingModel.js';
 import { diffuseColor, specularColor, roughness, clearcoat, clearcoatRoughness } from '../core/PropertyNode.js';
 import { transformedNormalView, transformedClearcoatNormalView } from '../accessors/NormalNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
-import { ShaderNode, float, vec3 } from '../shadernode/ShaderNode.js';
+import { tslFn, float, vec3 } from '../shadernode/ShaderNode.js';
 
 const clearcoatF0 = vec3( 0.04 );
 const clearcoatF90 = vec3( 1 );
@@ -17,7 +17,7 @@ const clearcoatF90 = vec3( 1 );
 // http://www.jcgt.org/published/0008/01/03/
 const computeMultiscattering = ( singleScatter, multiScatter, specularF90 = float( 1 ) ) => {
 
-	const fab = DFGApprox.call( { roughness } );
+	const fab = DFGApprox( { roughness } );
 
 	const FssEss = specularColor.mul( fab.x ).add( specularF90.mul( fab.y ) );
 
@@ -32,7 +32,7 @@ const computeMultiscattering = ( singleScatter, multiScatter, specularF90 = floa
 
 };
 
-const LM_Init = new ShaderNode( ( context, stack, builder ) => {
+const LM_Init = tslFn( ( context, stack, builder ) => {
 
 	if ( builder.includes( clearcoat ) ) {
 
@@ -41,7 +41,7 @@ const LM_Init = new ShaderNode( ( context, stack, builder ) => {
 
 		const dotNVcc = transformedClearcoatNormalView.dot( positionViewDirection ).clamp();
 
-		const Fcc = F_Schlick.call( {
+		const Fcc = F_Schlick( {
 			dotVH: dotNVcc,
 			f0: clearcoatF0,
 			f90: clearcoatF90
@@ -56,7 +56,7 @@ const LM_Init = new ShaderNode( ( context, stack, builder ) => {
 
 } );
 
-const RE_IndirectSpecular_Physical = new ShaderNode( ( context ) => {
+const RE_IndirectSpecular_Physical = tslFn( ( context ) => {
 
 	const { radiance, iblIrradiance, reflectedLight } = context;
 
@@ -64,7 +64,7 @@ const RE_IndirectSpecular_Physical = new ShaderNode( ( context ) => {
 
 		const dotNVcc = transformedClearcoatNormalView.dot( positionViewDirection ).clamp();
 
-		const clearcoatEnv = EnvironmentBRDF.call( {
+		const clearcoatEnv = EnvironmentBRDF( {
 			dotNV: dotNVcc,
 			specularColor: clearcoatF0,
 			specularF90: clearcoatF90,
@@ -94,15 +94,15 @@ const RE_IndirectSpecular_Physical = new ShaderNode( ( context ) => {
 
 } );
 
-const RE_IndirectDiffuse_Physical = new ShaderNode( ( context ) => {
+const RE_IndirectDiffuse_Physical = tslFn( ( context ) => {
 
 	const { irradiance, reflectedLight } = context;
 
-	reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert.call( { diffuseColor } ) ) );
+	reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
 
 } );
 
-const RE_Direct_Physical = new ShaderNode( ( inputs ) => {
+const RE_Direct_Physical = tslFn( ( inputs ) => {
 
 	const { lightDirection, lightColor, reflectedLight } = inputs;
 
@@ -114,17 +114,17 @@ const RE_Direct_Physical = new ShaderNode( ( inputs ) => {
 		const dotNLcc = transformedClearcoatNormalView.dot( lightDirection ).clamp();
 		const ccIrradiance = dotNLcc.mul( lightColor );
 
-		reflectedLight.clearcoatSpecular.addAssign( ccIrradiance.mul( BRDF_GGX.call( { lightDirection, f0: clearcoatF0, f90: clearcoatF90, roughness: clearcoatRoughness, normalView: transformedClearcoatNormalView } ) ) );
+		reflectedLight.clearcoatSpecular.addAssign( ccIrradiance.mul( BRDF_GGX( { lightDirection, f0: clearcoatF0, f90: clearcoatF90, roughness: clearcoatRoughness, normalView: transformedClearcoatNormalView } ) ) );
 
 	}
 
-	reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert.call( { diffuseColor: diffuseColor.rgb } ) ) );
+	reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
 
-	reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX.call( { lightDirection, f0: specularColor, f90: 1, roughness } ) ) );
+	reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX( { lightDirection, f0: specularColor, f90: 1, roughness } ) ) );
 
 } );
 
-const RE_AmbientOcclusion_Physical = new ShaderNode( ( context ) => {
+const RE_AmbientOcclusion_Physical = tslFn( ( context ) => {
 
 	const { ambientOcclusion, reflectedLight } = context;
 

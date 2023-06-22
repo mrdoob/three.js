@@ -100,27 +100,27 @@ class NodeMaterial extends ShaderMaterial {
 
 		const object = builder.object;
 
-		let vertex = positionLocal;
+		builder.addStack();
 
-		if ( this.positionNode !== null ) {
+		if ( object.isSkinnedMesh === true ) {
 
-			vertex = vertex.bypass( positionLocal.assign( this.positionNode ) );
+			builder.stack.add( skinning( object ) );
 
 		}
 
 		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
 
-			vertex = vertex.bypass( instance( object ) );
+			builder.stack.add( instance( object ) );
 
 		}
 
-		if ( object.isSkinnedMesh === true ) {
+		if ( this.positionNode !== null ) {
 
-			vertex = vertex.bypass( skinning( object ) );
+			builder.stack.assign( positionLocal, this.positionNode );
 
 		}
 
-		builder.context.vertex = vertex;
+		builder.context.vertex = builder.removeStack();
 
 		return modelViewProjection();
 
@@ -149,9 +149,9 @@ class NodeMaterial extends ShaderMaterial {
 
 		// ALPHA TEST
 
-		if ( this.alphaTestNode || this.alphaTest > 0 ) {
+		if ( this.alphaTestNode !== null || this.alphaTest > 0 ) {
 
-			const alphaTestNode = this.alphaTestNode ? float( this.alphaTestNode ) : materialAlphaTest;
+			const alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
 
 			stack.add( diffuseColor.a.lessThanEqual( alphaTestNode ).discard() );
 

@@ -46,7 +46,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 		// ROUGHNESS
 
 		let roughnessNode = this.roughnessNode ? float( this.roughnessNode ) : materialRoughness;
-		roughnessNode = getRoughness.call( { roughness: roughnessNode } );
+		roughnessNode = getRoughness( { roughness: roughnessNode } );
 
 		stack.assign( roughness, roughnessNode );
 

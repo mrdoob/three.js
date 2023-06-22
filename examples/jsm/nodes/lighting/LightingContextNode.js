@@ -67,11 +67,11 @@ class LightingContextNode extends ContextNode {
 		Object.assign( context, lighting );
 
 		// @TODO: Call needed return a new node ( or rename the ShaderNodeInternal.call() function ), it's not moment to run
-		if ( lightingModelNode && lightingModelNode.init ) lightingModelNode.init.call( context, builder.stack, builder );
+		if ( lightingModelNode && lightingModelNode.init ) lightingModelNode.init( context, builder.stack, builder );
 
-		if ( lightingModelNode && lightingModelNode.indirectDiffuse ) lightingModelNode.indirectDiffuse.call( context, builder.stack, builder );
-		if ( lightingModelNode && lightingModelNode.indirectSpecular ) lightingModelNode.indirectSpecular.call( context, builder.stack, builder );
-		if ( lightingModelNode && lightingModelNode.ambientOcclusion ) lightingModelNode.ambientOcclusion.call( context, builder.stack, builder );
+		if ( lightingModelNode && lightingModelNode.indirectDiffuse ) lightingModelNode.indirectDiffuse( context, builder.stack, builder );
+		if ( lightingModelNode && lightingModelNode.indirectSpecular ) lightingModelNode.indirectSpecular( context, builder.stack, builder );
+		if ( lightingModelNode && lightingModelNode.ambientOcclusion ) lightingModelNode.ambientOcclusion( context, builder.stack, builder );
 
 		return super.construct( builder );
 
