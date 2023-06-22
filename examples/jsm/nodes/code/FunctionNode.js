@@ -118,7 +118,7 @@ export const wgslFn = ( code, includes ) => nativeFn( code, includes, 'wgsl' );
 
 export const func = ( code, includes ) => {
 
-	console.warn( 'FunctionNode: func() is deprecated. Use nativeFn(), wgslFn() or glslFn() instead.' );
+	console.warn( 'TSL: func() is deprecated. Use nativeFn(), wgslFn() or glslFn() instead.' );
 
 	return nodeObject( new FunctionNode( code, includes ) );
 
