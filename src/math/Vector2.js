@@ -2,7 +2,7 @@ import * as MathUtils from './MathUtils.js';
 
 class Vector2 {
 
-	constructor( x = 0, y = 0 ) {
+	constructor( x = 0, y = x ) {
 
 		Vector2.prototype.isVector2 = true;
 

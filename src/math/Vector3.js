@@ -3,9 +3,16 @@ import { Quaternion } from './Quaternion.js';
 
 class Vector3 {
 
-	constructor( x = 0, y = 0, z = 0 ) {
+	constructor( x = 0, y, z ) {
 
 		Vector3.prototype.isVector3 = true;
+
+		if ( z === undefined ) {
+
+			if ( y === undefined ) z = y = x;
+			else z = 0;
+
+		}
 
 		this.x = x;
 		this.y = y;

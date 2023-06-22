@@ -24,6 +24,24 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.z == 0, 'Passed!' );
 			assert.ok( a.w == 1, 'Passed!' );
 
+			a = new Vector4( x );
+			assert.ok( a.x === x, 'Passed!' );
+			assert.ok( a.y === x, 'Passed!' );
+			assert.ok( a.z === x, 'Passed!' );
+			assert.ok( a.w === 1, 'Passed!' );
+
+			a = new Vector4( x, y );
+			assert.ok( a.x === x, 'Passed!' );
+			assert.ok( a.y === y, 'Passed!' );
+			assert.ok( a.z === 0, 'Passed!' );
+			assert.ok( a.w === 1, 'Passed!' );
+
+			a = new Vector4( x, y, z );
+			assert.ok( a.x === x, 'Passed!' );
+			assert.ok( a.y === y, 'Passed!' );
+			assert.ok( a.z === z, 'Passed!' );
+			assert.ok( a.w === 1, 'Passed!' );
+
 			a = new Vector4( x, y, z, w );
 			assert.ok( a.x === x, 'Passed!' );
 			assert.ok( a.y === y, 'Passed!' );

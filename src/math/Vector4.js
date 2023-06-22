@@ -1,8 +1,15 @@
 class Vector4 {
 
-	constructor( x = 0, y = 0, z = 0, w = 1 ) {
+	constructor( x = 0, y, z, w = 1 ) {
 
 		Vector4.prototype.isVector4 = true;
+
+		if ( z === undefined ) {
+
+			if ( y === undefined ) z = y = x;
+			else z = 0;
+
+		}
 
 		this.x = x;
 		this.y = y;

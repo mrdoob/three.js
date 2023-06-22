@@ -30,6 +30,16 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.y == 0, 'Passed!' );
 			assert.ok( a.z == 0, 'Passed!' );
 
+			a = new Vector3( x );
+			assert.ok( a.x == x, 'Passed!' );
+			assert.ok( a.y == x, 'Passed!' );
+			assert.ok( a.z == x, 'Passed!' );
+
+			a = new Vector3( x, y );
+			assert.ok( a.x == x, 'Passed!' );
+			assert.ok( a.y == y, 'Passed!' );
+			assert.ok( a.z == 0, 'Passed!' );
+
 			a = new Vector3( x, y, z );
 			assert.ok( a.x === x, 'Passed!' );
 			assert.ok( a.y === y, 'Passed!' );
