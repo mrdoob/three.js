@@ -386,7 +386,7 @@ function generateCubeUVSize( parameters ) {
 
 	const imageHeight = parameters.envMapCubeUVHeight;
 
-	if ( imageHeight === null ) return false;
+	if ( imageHeight === null ) return null;
 
 	const maxMip = Math.log2( imageHeight ) - 2;
 
@@ -449,7 +449,7 @@ function constructShaderPrefixes( parameters ) {
 		//
 
 		defines.USE_FOG = parameters.useFog && parameters.fog;
-		defines.FOG_EXP2 = parameters.useFog && parameters.fogExp2;
+		defines.FOG_EXP2 = parameters.useFog && Boolean( parameters.fogExp2 );
 
 		defines.USE_TRANSMISSION = parameters.transmission;
 
@@ -543,9 +543,9 @@ function constructShaderPrefixes( parameters ) {
 		}
 
 		const envMapCubeUVSize = generateCubeUVSize( parameters );
-		fragmentDefines.CUBEUV_TEXEL_WIDTH = envMapCubeUVSize && envMapCubeUVSize.texelWidth;
-		fragmentDefines.CUBEUV_TEXEL_HEIGHT = envMapCubeUVSize && envMapCubeUVSize.texelHeight;
-		fragmentDefines.CUBEUV_MAX_MIP = envMapCubeUVSize && envMapCubeUVSize.maxMip + '.0';
+		fragmentDefines.CUBEUV_TEXEL_WIDTH = Boolean( envMapCubeUVSize ) && envMapCubeUVSize.texelWidth;
+		fragmentDefines.CUBEUV_TEXEL_HEIGHT = Boolean( envMapCubeUVSize ) && envMapCubeUVSize.texelHeight;
+		fragmentDefines.CUBEUV_MAX_MIP = Boolean( envMapCubeUVSize ) && envMapCubeUVSize.maxMip + '.0';
 
 		fragmentDefines.USE_ANISOTROPY = parameters.anisotropy;
 		fragmentDefines.USE_CLEARCOAT = parameters.clearcoat;
