@@ -386,7 +386,7 @@ function generateCubeUVSize( parameters ) {
 
 	const imageHeight = parameters.envMapCubeUVHeight;
 
-	if ( imageHeight === null ) return null;
+	if ( imageHeight === null ) return false;
 
 	const maxMip = Math.log2( imageHeight ) - 2;
 
