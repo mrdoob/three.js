@@ -400,7 +400,7 @@ function generateCubeUVSize( parameters ) {
 
 function constructShaderPrefixes( parameters ) {
 
-	const defines = { ...parameters.defines };
+	const defines = {};
 
 	defines.SHADER_TYPE = parameters.shaderType;
 	defines.SHADER_NAME = parameters.shaderName;
@@ -567,6 +567,9 @@ function constructShaderPrefixes( parameters ) {
 		fragmentDefines.DEPTH_PACKING = parameters.useDepthPacking && parameters.depthPacking;
 
 	}
+
+	Object.assign( vertexDefines, parameters.defines );
+	Object.assign( fragmentDefines, parameters.defines );
 
 	const precisionString = parameters.isRawShaderMaterial ? '' : generatePrecision( parameters ) + '\n';
 	const extensionsString = parameters.isWebGL2 ? '' : generateExtensions( parameters ) + '\n';
