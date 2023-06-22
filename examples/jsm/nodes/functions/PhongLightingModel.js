@@ -4,9 +4,9 @@ import { lightingModel } from '../core/LightingModel.js';
 import { diffuseColor } from '../core/PropertyNode.js';
 import { materialReflectivity } from '../accessors/MaterialNode.js';
 import { transformedNormalView } from '../accessors/NormalNode.js';
-import { fn } from '../shadernode/ShaderNode.js';
+import { tslFn } from '../shadernode/ShaderNode.js';
 
-const RE_Direct_BlinnPhong = fn( ( { lightDirection, lightColor, reflectedLight } ) => {
+const RE_Direct_BlinnPhong = tslFn( ( { lightDirection, lightColor, reflectedLight } ) => {
 
 	const dotNL = transformedNormalView.dot( lightDirection ).clamp();
 	const irradiance = dotNL.mul( lightColor );
@@ -17,7 +17,7 @@ const RE_Direct_BlinnPhong = fn( ( { lightDirection, lightColor, reflectedLight 
 
 } );
 
-const RE_IndirectDiffuse_BlinnPhong = fn( ( { irradiance, reflectedLight } ) => {
+const RE_IndirectDiffuse_BlinnPhong = tslFn( ( { irradiance, reflectedLight } ) => {
 
 	reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
 

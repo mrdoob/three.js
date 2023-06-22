@@ -209,9 +209,9 @@ class Node {
 				const stackNodesBeforeConstruct = builder.stack.nodes.length;
 
 				properties.initialized = true;
-				properties.outputNode = this.construct( builder ) || null;
+				properties.outputNode = this.construct( builder );
 
-				if ( properties.outputNode === null && builder.stack.nodes.length !== stackNodesBeforeConstruct ) {
+				if ( properties.outputNode !== null && builder.stack.nodes.length !== stackNodesBeforeConstruct ) {
 
 					properties.outputNode = builder.stack;
 

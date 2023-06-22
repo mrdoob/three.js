@@ -8,14 +8,14 @@ import { tangentView } from '../accessors/TangentNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { faceDirection } from './FrontFacingNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { fn, nodeProxy, vec3, mat3 } from '../shadernode/ShaderNode.js';
+import { tslFn, nodeProxy, vec3, mat3 } from '../shadernode/ShaderNode.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 
 // Normal Mapping Without Precomputed Tangents
 // http://www.thetenthplanet.de/archives/1180
 
-const perturbNormal2ArbNode = fn( ( inputs ) => {
+const perturbNormal2ArbNode = tslFn( ( inputs ) => {
 
 	const { eye_pos, surf_norm, mapN, uv } = inputs;
 

@@ -7,7 +7,7 @@ import { lightingModel } from '../core/LightingModel.js';
 import { diffuseColor, specularColor, roughness, clearcoat, clearcoatRoughness } from '../core/PropertyNode.js';
 import { transformedNormalView, transformedClearcoatNormalView } from '../accessors/NormalNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
-import { fn, float, vec3 } from '../shadernode/ShaderNode.js';
+import { tslFn, float, vec3 } from '../shadernode/ShaderNode.js';
 
 const clearcoatF0 = vec3( 0.04 );
 const clearcoatF90 = vec3( 1 );
@@ -32,7 +32,7 @@ const computeMultiscattering = ( singleScatter, multiScatter, specularF90 = floa
 
 };
 
-const LM_Init = fn( ( context, stack, builder ) => {
+const LM_Init = tslFn( ( context, stack, builder ) => {
 
 	if ( builder.includes( clearcoat ) ) {
 
@@ -56,7 +56,7 @@ const LM_Init = fn( ( context, stack, builder ) => {
 
 } );
 
-const RE_IndirectSpecular_Physical = fn( ( context ) => {
+const RE_IndirectSpecular_Physical = tslFn( ( context ) => {
 
 	const { radiance, iblIrradiance, reflectedLight } = context;
 
@@ -94,7 +94,7 @@ const RE_IndirectSpecular_Physical = fn( ( context ) => {
 
 } );
 
-const RE_IndirectDiffuse_Physical = fn( ( context ) => {
+const RE_IndirectDiffuse_Physical = tslFn( ( context ) => {
 
 	const { irradiance, reflectedLight } = context;
 
@@ -102,7 +102,7 @@ const RE_IndirectDiffuse_Physical = fn( ( context ) => {
 
 } );
 
-const RE_Direct_Physical = fn( ( inputs ) => {
+const RE_Direct_Physical = tslFn( ( inputs ) => {
 
 	const { lightDirection, lightColor, reflectedLight } = inputs;
 
@@ -124,7 +124,7 @@ const RE_Direct_Physical = fn( ( inputs ) => {
 
 } );
 
-const RE_AmbientOcclusion_Physical = fn( ( context ) => {
+const RE_AmbientOcclusion_Physical = tslFn( ( context ) => {
 
 	const { ambientOcclusion, reflectedLight } = context;
 

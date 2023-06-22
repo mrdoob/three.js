@@ -103,7 +103,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 	} else if ( type === 'shader' ) {
 
-		return fn( obj );
+		return tslFn( obj );
 
 	}
 
@@ -320,7 +320,7 @@ export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, al
 export const nodeProxy = ( ...params ) => new ShaderNodeProxy( ...params );
 export const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params );
 
-export const shader = ( jsFunc ) => {
+export const shader = ( jsFunc ) => { // @deprecated, r154
 
 	console.warn( 'TSL: shader() is deprecated. Use fn() instead.' );
 
@@ -328,7 +328,7 @@ export const shader = ( jsFunc ) => {
 
 };
 
-export const fn = ( jsFunc ) => {
+export const tslFn = ( jsFunc ) => {
 
 	let shaderNode = null;
 

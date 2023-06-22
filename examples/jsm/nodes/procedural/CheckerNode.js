@@ -1,9 +1,9 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, fn, nodeProxy } from '../shadernode/ShaderNode.js';
+import { addNodeElement, tslFn, nodeProxy } from '../shadernode/ShaderNode.js';
 
-const checkerShaderNode = fn( ( inputs ) => {
+const checkerShaderNode = tslFn( ( inputs ) => {
 
 	const uv = inputs.uv.mul( 2.0 );
 

@@ -99,7 +99,7 @@ class FunctionNode extends CodeNode {
 
 export default FunctionNode;
 
-export const nativeFn = ( code, includes, language = '' ) => {
+const nativeFn = ( code, includes, language = '' ) => {
 
 	let functionNode = null;
 
@@ -116,7 +116,7 @@ export const nativeFn = ( code, includes, language = '' ) => {
 export const glslFn = ( code, includes ) => nativeFn( code, includes, 'glsl' );
 export const wgslFn = ( code, includes ) => nativeFn( code, includes, 'wgsl' );
 
-export const func = ( code, includes ) => {
+export const func = ( code, includes ) => { // @deprecated, r154
 
 	console.warn( 'TSL: func() is deprecated. Use nativeFn(), wgslFn() or glslFn() instead.' );
 

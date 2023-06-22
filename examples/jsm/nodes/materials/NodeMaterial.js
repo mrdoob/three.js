@@ -100,29 +100,27 @@ class NodeMaterial extends ShaderMaterial {
 
 		const object = builder.object;
 
-		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
-
-			builder.stack.assign( positionLocal, instance( object ) );
-
-		}
-
-		//
-
-		let vertex = positionLocal;
-
-		if ( this.positionNode !== null ) {
-
-			vertex = vertex.bypass( positionLocal.assign( this.positionNode ) );
-
-		}
+		builder.addStack();
 
 		if ( object.isSkinnedMesh === true ) {
 
-			vertex = vertex.bypass( skinning( object ) );
+			builder.stack.add( skinning( object ) );
 
 		}
 
-		builder.context.vertex = vertex;
+		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
+
+			builder.stack.add( instance( object ) );
+
+		}
+
+		if ( this.positionNode !== null ) {
+
+			builder.stack.assign( positionLocal, this.positionNode );
+
+		}
+
+		builder.context.vertex = builder.removeStack();
 
 		return modelViewProjection();
 

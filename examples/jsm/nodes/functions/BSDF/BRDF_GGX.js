@@ -3,10 +3,10 @@ import V_GGX_SmithCorrelated from './V_GGX_SmithCorrelated.js';
 import D_GGX from './D_GGX.js';
 import { transformedNormalView } from '../../accessors/NormalNode.js';
 import { positionViewDirection } from '../../accessors/PositionNode.js';
-import { fn } from '../../shadernode/ShaderNode.js';
+import { tslFn } from '../../shadernode/ShaderNode.js';
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-const BRDF_GGX = fn( ( inputs ) => {
+const BRDF_GGX = tslFn( ( inputs ) => {
 
 	const { lightDirection, f0, f90, roughness } = inputs;
 

@@ -2,17 +2,17 @@ import F_Schlick from './F_Schlick.js';
 import { shininess, specularColor } from '../../core/PropertyNode.js';
 import { transformedNormalView } from '../../accessors/NormalNode.js';
 import { positionViewDirection } from '../../accessors/PositionNode.js';
-import { fn, float } from '../../shadernode/ShaderNode.js';
+import { tslFn, float } from '../../shadernode/ShaderNode.js';
 
 const G_BlinnPhong_Implicit = () => float( 0.25 );
 
-const D_BlinnPhong = fn( ( { dotNH } ) => {
+const D_BlinnPhong = tslFn( ( { dotNH } ) => {
 
 	return shininess.mul( 0.5 / Math.PI ).add( 1.0 ).mul( dotNH.pow( shininess ) );
 
 } );
 
-const BRDF_BlinnPhong = fn( ( { lightDirection } ) => {
+const BRDF_BlinnPhong = tslFn( ( { lightDirection } ) => {
 
 	const halfDir = lightDirection.add( positionViewDirection ).normalize();
 

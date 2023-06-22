@@ -1,9 +1,9 @@
-import { fn } from '../../shadernode/ShaderNode.js';
+import { tslFn } from '../../shadernode/ShaderNode.js';
 
 // Microfacet Models for Refraction through Rough Surfaces - equation (33)
 // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
 // alpha is "roughness squared" in Disney’s reparameterization
-const D_GGX = fn( ( inputs ) => {
+const D_GGX = tslFn( ( inputs ) => {
 
 	const { alpha, dotNH } = inputs;
 
