@@ -41,23 +41,12 @@ class Node {
 
 		for ( const { property, index, childNode } of getNodeChildren( this ) ) {
 
-			if ( index !== undefined ) {
+			yield { childNode, replaceNode( node ) {
 
-				yield { childNode, replaceNode( node ) {
+				if ( index === undefined ) self[ property ] = node;
+				else self[ property ][ index ] = node;
 
-					self[ property ][ index ] = node;
-
-				} };
-
-			} else {
-
-				yield { childNode, replaceNode( node ) {
-
-					self[ property ] = node;
-
-				} };
-
-			}
+			} };
 
 		}
 
