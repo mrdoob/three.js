@@ -33,7 +33,7 @@ class Reflector extends Mesh {
 		const clipBias = options.clipBias || 0;
 		const shader = options.shader || Reflector.ReflectorShader;
 		const multisample = ( options.multisample !== undefined ) ? options.multisample : 4;
-		const blur = options.blur || 0.0
+		const blur = options.blur || 0.0;
 
 		//
 
@@ -64,7 +64,7 @@ class Reflector extends Mesh {
 		material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
 		material.uniforms[ 'color' ].value = color;
 		material.uniforms[ 'textureMatrix' ].value = textureMatrix;
-		material.uniforms['blurSize'].value = blur;
+		material.uniforms[ 'blurSize' ].value = blur;
 
 		this.material = material;
 
