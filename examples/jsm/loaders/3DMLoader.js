@@ -289,7 +289,7 @@ class Rhino3dmLoader extends Loader {
 
 				const map = textureLoader.load( texture.image );
 
-				console.log(texture.type )
+				//console.log(texture.type )
 
 				switch ( texture.type ) {
 
@@ -444,7 +444,7 @@ class Rhino3dmLoader extends Loader {
 
 		}
 
-		console.log(mat)
+		//console.log(mat)
 
 		return mat;
 
@@ -1123,10 +1123,10 @@ function Rhino3dmWorker() {
 
 			material.textures = textures;
 
-			console.log(_pbrMaterial.supported)
+			//console.log(_pbrMaterial.supported)
 
 			material._supported = _pbrMaterial.supported
-			console.log(material)
+			//console.log(material)
 
 			if ( _pbrMaterial.supported ) {
 
@@ -1149,7 +1149,7 @@ function Rhino3dmWorker() {
 				//const pbMaterialProperties = extractProperties( _pbrMaterial );
 
 				material.pbr = extractProperties( _pbrMaterial )
-				console.log(material.pbr)
+				//console.log(material.pbr)
 
 				//material = Object.assign( pbMaterialProperties, material );
 
@@ -1220,6 +1220,10 @@ function Rhino3dmWorker() {
 
 		const settings = extractProperties( doc.settings() );
 
+		// Handle Render Environments
+		//console.log(doc.settings().renderSettings().renderEnvironments)
+
+
 		/*
 		console.log( `backgroundId: ${doc.settings().renderSettings().renderEnvironments.backgroundId}` )
 		console.log( `skylightingId: ${doc.settings().renderSettings().renderEnvironments.skylightingId}` )
@@ -1238,24 +1242,25 @@ function Rhino3dmWorker() {
 		//console.log(`${background}, ${skylight}, ${reflection}`)
 
 		const efCount = doc.embeddedFiles().count()
-		//console.log(`efCount: ${efCount}`)
+		let renderEnvironment = null
+		console.log(`efCount: ${efCount}`)
+		if ( efCount > 0 ) {
+			// TODO: FIX THIS AFTER https://mcneel.myjetbrains.com/youtrack/issue/RH3DM-155 is fixed
+			const backgroundGet = doc.embeddedFiles().get(0).filename
+			const backgroundLength = doc.embeddedFiles().get(0).length
+			const background = doc.getEmbeddedFileAsBase64(backgroundGet)
+			const backgroundImage = 'data:image/png;base64,' + background;
 
-		const backgroundGet = doc.embeddedFiles().get(0).filename
-		const backgroundLength = doc.embeddedFiles().get(0).length
-		const background = doc.getEmbeddedFileAsBase64(backgroundGet)
-		const backgroundImage = 'data:image/png;base64,' + background;
+			//renderEnvironment = { type: 'renderEnvironment', image: backgroundImage, name: backgroundGet };
 
-		const renderEnvironment = { type: 'renderEnvironment', image: backgroundImage, name: backgroundGet };
-
+		}
 		//console.log(`${backgroundGet}, ${backgroundLength}`)
 		//console.log(background)
 
-		const paths = doc.embeddedFilePaths();
+		//const paths = doc.embeddedFilePaths();
 		//console.log(paths)
 
 		//console.log(`nº of embedded files: ${doc.embeddedFiles().count()}`)
-
-
 
 		//TODO: Handle other document stuff like dimstyles, instance definitions, bitmaps etc.
 
@@ -1277,6 +1282,48 @@ function Rhino3dmWorker() {
 			strings.push( doc.strings().get( i ) );
 
 		}
+
+		/*
+
+		  	//RenderSource
+			BND_File3dmGroundPlane& GetGroundPlane() const { return *m_ground_plane; }
+			BND_File3dmSafeFrame& GetSafeFrame() const { return *m_safe_frame; }
+			BND_File3dmDithering& GetDithering() const { return *m_dithering; }
+			BND_File3dmSkylight& GetSkylight() const { return *m_skylight; }
+			BND_File3dmLinearWorkflow& GetLinearWorkflow() const { return *m_linear_workflow; }
+			BND_File3dmRenderChannels& GetRenderChannels() const { return *m_render_channels; }
+			BND_File3dmRenderEnvironments& GetRenderEnvironments() const { return *m_render_environments; }
+			BND_File3dmSun& GetSun() const { return *m_sun; }
+			BND_File3dmPostEffectTable& GetPostEffects() const { return *m_post_effects; }
+		*/
+
+		// Handle Render Settings
+
+		const renderSettings = {
+			ambientLight: doc.settings().renderSettings().ambientLight,
+			backgroundColorTop: doc.settings().renderSettings().backgroundColorTop,
+			backgroundColorBottom: doc.settings().renderSettings().backgroundColorBottom,
+			useHiddenLights: doc.settings().renderSettings().useHiddenLights,
+			depthCue: doc.settings().renderSettings().depthCue,
+			flatShade: doc.settings().renderSettings().flatShade,
+			renderBackFaces: doc.settings().renderSettings().renderBackFaces,
+			//groundPlane: extractProperties( doc.settings().renderSettings().groundPlane ),
+			safeFrame: extractProperties( doc.settings().renderSettings().safeFrame ),
+			dithering: extractProperties( doc.settings().renderSettings().dithering ),
+			skylight: extractProperties( doc.settings().renderSettings().skylight ),
+			linearWorkflow: extractProperties( doc.settings().renderSettings().linearWorkflow ),
+			renderChannels: extractProperties( doc.settings().renderSettings().renderChannels ),
+			sun: extractProperties( doc.settings().renderSettings().sun ),
+			renderEnvironments: extractProperties( doc.settings().renderSettings().renderEnvironments ),
+			postEffects: extractProperties( doc.settings().renderSettings().renderEnvironments ),
+
+		}
+
+		//renderSettings.sun.light = extractProperties(doc.settings().renderSettings().sun.light)
+
+		console.log(renderSettings)
+
+
 
 		doc.delete();
 
@@ -1560,6 +1607,10 @@ function Rhino3dmWorker() {
 				if ( typeof value === 'object' && value !== null && value.hasOwnProperty( 'constructor' ) ) {
 
 					result[ property ] = { name: value.constructor.name, value: value.value };
+
+				} else if ( typeof value === 'object' && value !== null ) {
+
+					result[ property ] = extractProperties( value );
 
 				} else {
 
