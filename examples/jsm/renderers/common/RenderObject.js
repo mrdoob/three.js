@@ -1,12 +1,8 @@
-import { EventDispatcher } from 'three';
-
 let id = 0;
 
-export default class RenderObject extends EventDispatcher {
+export default class RenderObject {
 
 	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode ) {
-
-		super();
 
 		this._nodes = nodes;
 		this._geometries = geometries;
@@ -29,15 +25,15 @@ export default class RenderObject extends EventDispatcher {
 		this._materialVersion = - 1;
 		this._materialCacheKey = '';
 
-		const onDispose = () => {
+		this.onDispose = null;
 
-			this.material.removeEventListener( 'dispose', onDispose );
+		this.onMaterialDispose = () => {
 
 			this.dispose();
 
 		};
 
-		this.material.addEventListener( 'dispose', onDispose );
+		this.material.addEventListener( 'dispose', this.onMaterialDispose );
 
 	}
 
@@ -108,7 +104,9 @@ export default class RenderObject extends EventDispatcher {
 
 	dispose() {
 
-		this.dispatchEvent( { type: 'dispose' } );
+		this.material.removeEventListener( 'dispose', this.onMaterialDispose );
+
+		this.onDispose();
 
 	}
 

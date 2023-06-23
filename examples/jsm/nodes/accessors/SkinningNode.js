@@ -1,6 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { ShaderNode, nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeProxy } from '../shadernode/ShaderNode.js';
 import { attribute } from '../core/AttributeNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { add } from '../math/OperatorNode.js';
@@ -8,54 +8,6 @@ import { buffer } from './BufferNode.js';
 import { normalLocal } from './NormalNode.js';
 import { positionLocal } from './PositionNode.js';
 import { tangentLocal } from './TangentNode.js';
-
-const Skinning = new ShaderNode( ( inputs, {}, builder ) => {
-
-	const { index, weight, bindMatrix, bindMatrixInverse, boneMatrices } = inputs;
-
-	const boneMatX = boneMatrices.element( index.x );
-	const boneMatY = boneMatrices.element( index.y );
-	const boneMatZ = boneMatrices.element( index.z );
-	const boneMatW = boneMatrices.element( index.w );
-
-	// POSITION
-
-	const skinVertex = bindMatrix.mul( positionLocal );
-
-	const skinned = add(
-		boneMatX.mul( weight.x ).mul( skinVertex ),
-		boneMatY.mul( weight.y ).mul( skinVertex ),
-		boneMatZ.mul( weight.z ).mul( skinVertex ),
-		boneMatW.mul( weight.w ).mul( skinVertex )
-	);
-
-	const skinPosition = bindMatrixInverse.mul( skinned ).xyz;
-
-	// NORMAL
-
-	let skinMatrix = add(
-		weight.x.mul( boneMatX ),
-		weight.y.mul( boneMatY ),
-		weight.z.mul( boneMatZ ),
-		weight.w.mul( boneMatW )
-	);
-
-	skinMatrix = bindMatrixInverse.mul( skinMatrix ).mul( bindMatrix );
-
-	const skinNormal = skinMatrix.transformDirection( normalLocal ).xyz;
-
-	// ASSIGNS
-
-	positionLocal.assign( skinPosition ).build( builder ); // @TODO: For some reason this doesn't work as stack.assign( positionLocal, skinPosition )?
-	normalLocal.assign( skinNormal ).build( builder );
-
-	if ( builder.hasGeometryAttribute( 'tangent' ) ) {
-
-		tangentLocal.assign( skinNormal ).build( builder );
-
-	}
-
-} );
 
 class SkinningNode extends Node {
 
@@ -78,22 +30,51 @@ class SkinningNode extends Node {
 
 	}
 
-	generate( builder ) {
+	construct( builder ) {
 
-		/*return new ShaderNode( ( {}, stack, builder ) => Skinning.call( {
-			index: this.skinIndexNode,
-			weight: this.skinWeightNode,
-			bindMatrix: this.bindMatrixNode,
-			bindMatrixInverse: this.bindMatrixInverseNode,
-			boneMatrices: this.boneMatricesNode
-		}, stack, builder ) ).build( builder );*/
-		Skinning.call( {
-			index: this.skinIndexNode,
-			weight: this.skinWeightNode,
-			bindMatrix: this.bindMatrixNode,
-			bindMatrixInverse: this.bindMatrixInverseNode,
-			boneMatrices: this.boneMatricesNode
-		}, {}, builder );
+		const { skinIndexNode, skinWeightNode, bindMatrixNode, bindMatrixInverseNode, boneMatricesNode } = this;
+
+		const boneMatX = boneMatricesNode.element( skinIndexNode.x );
+		const boneMatY = boneMatricesNode.element( skinIndexNode.y );
+		const boneMatZ = boneMatricesNode.element( skinIndexNode.z );
+		const boneMatW = boneMatricesNode.element( skinIndexNode.w );
+
+		// POSITION
+
+		const skinVertex = bindMatrixNode.mul( positionLocal );
+
+		const skinned = add(
+			boneMatX.mul( skinWeightNode.x ).mul( skinVertex ),
+			boneMatY.mul( skinWeightNode.y ).mul( skinVertex ),
+			boneMatZ.mul( skinWeightNode.z ).mul( skinVertex ),
+			boneMatW.mul( skinWeightNode.w ).mul( skinVertex )
+		);
+
+		const skinPosition = bindMatrixInverseNode.mul( skinned ).xyz;
+
+		// NORMAL
+
+		let skinMatrix = add(
+			skinWeightNode.x.mul( boneMatX ),
+			skinWeightNode.y.mul( boneMatY ),
+			skinWeightNode.z.mul( boneMatZ ),
+			skinWeightNode.w.mul( boneMatW )
+		);
+
+		skinMatrix = bindMatrixInverseNode.mul( skinMatrix ).mul( bindMatrixNode );
+
+		const skinNormal = skinMatrix.transformDirection( normalLocal ).xyz;
+
+		// ASSIGNS
+
+		builder.stack.assign( positionLocal, skinPosition );
+		builder.stack.assign( normalLocal, skinNormal );
+
+		if ( builder.hasGeometryAttribute( 'tangent' ) ) {
+
+			builder.stack.assign( tangentLocal, skinNormal );
+
+		}
 
 	}
 
