@@ -41,23 +41,12 @@ class Node {
 
 		for ( const { property, index, childNode } of getNodeChildren( this ) ) {
 
-			if ( index !== undefined ) {
+			yield { childNode, replaceNode( node ) {
 
-				yield { childNode, replaceNode( node ) {
+				if ( index === undefined ) self[ property ] = node;
+				else self[ property ][ index ] = node;
 
-					self[ property ][ index ] = node;
-
-				} };
-
-			} else {
-
-				yield { childNode, replaceNode( node ) {
-
-					self[ property ] = node;
-
-				} };
-
-			}
+			} };
 
 		}
 
@@ -206,8 +195,16 @@ class Node {
 
 			if ( properties.initialized !== true || builder.context.tempRead === false ) {
 
+				const stackNodesBeforeConstruct = builder.stack.nodes.length;
+
 				properties.initialized = true;
 				properties.outputNode = this.construct( builder );
+
+				if ( properties.outputNode !== null && builder.stack.nodes.length !== stackNodesBeforeConstruct ) {
+
+					properties.outputNode = builder.stack;
+
+				}
 
 				for ( const childNode of Object.values( properties ) ) {
 
