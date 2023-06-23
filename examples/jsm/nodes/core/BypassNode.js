@@ -20,7 +20,7 @@ class BypassNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const snippet = this.callNode.build( builder, 'void' );
 
@@ -30,7 +30,7 @@ class BypassNode extends Node {
 
 		}
 
-		return this.outputNode.build( builder, output );
+		return this.outputNode.build( builder );
 
 	}
 
