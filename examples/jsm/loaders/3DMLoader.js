@@ -235,13 +235,9 @@ class Rhino3dmLoader extends Loader {
 
 		//console.log(material)
 
-		const _diffuseColor = material.diffuseColor;
+		let mat = new MeshPhysicalMaterial( {
 
-		const diffusecolor = new Color( _diffuseColor.r / 255.0, _diffuseColor.g / 255.0, _diffuseColor.b / 255.0 );
-
-		const mat = new MeshPhysicalMaterial( {
-
-			color: diffusecolor,
+			color: new Color( material.diffuseColor.r / 255.0, material.diffuseColor.g / 255.0, material.diffuseColor.b / 255.0 ),
 			emissive: new Color( material.emissionColor.r, material.emissionColor.g, material.emissionColor.b ),
 			flatShading: material.disableLighting,
 			ior: material.indexOfRefraction,
@@ -271,6 +267,15 @@ class Rhino3dmLoader extends Loader {
 			mat.sheen = pbr.sheen;
 			mat.specularIntensity = pbr.specular;
 			mat.thickness = pbr.subsurface;
+
+		}
+
+		if ( material._supported && material.pbr.opacity === 0 && material.transparency === 1 ) {
+
+			//some compromises
+
+			mat.opacity = 0.2;
+			mat.transmission = 1.00;
 
 		}
 
@@ -428,7 +433,6 @@ class Rhino3dmLoader extends Loader {
 
 		}
 
-
 		if ( renderEnvironment ) {
 
 			new EXRLoader().load( renderEnvironment.image, function ( texture ) {
@@ -437,7 +441,7 @@ class Rhino3dmLoader extends Loader {
 				mat.envMap = texture;
 
 			} );
-			
+
 		}
 
 		console.log(mat)
@@ -466,9 +470,6 @@ class Rhino3dmLoader extends Loader {
 		let objects = data.objects;
 		const materials = data.materials;
 
-		console.log(data.materials)
-		console.log(data.layers)
-
 		for ( let i = 0; i < objects.length; i ++ ) {
 
 			const obj = objects[ i ];
@@ -492,9 +493,6 @@ class Rhino3dmLoader extends Loader {
 
 					let _object;
 
-					console.log( attributes.materialIndex )
-					console.log( attributes.materialSource.value )
-					console.log( data.layers[ attributes.layerIndex ].renderMaterialIndex )
 					let matId = attributes.materialIndex >= 0 ? attributes.materialIndex : data.layers[ attributes.layerIndex ].renderMaterialIndex;
 
 					if ( matId >= 0 ) {
