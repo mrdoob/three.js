@@ -123,6 +123,7 @@ const exceptionList = [
 	'webgpu_loader_gltf_compressed',
 	'webgpu_materials',
 	'webgpu_materials_video',
+	'webgpu_morphtargets',
 	'webgpu_particles',
 	'webgpu_rtt',
 	'webgpu_sandbox',
