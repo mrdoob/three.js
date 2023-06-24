@@ -100,8 +100,15 @@ class NodeMaterial extends ShaderMaterial {
 	constructPosition( builder ) {
 
 		const object = builder.object;
+		const geometry = object.geometry;
 
 		builder.addStack();
+
+		if ( geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color ) {
+
+			builder.stack.add( morph( object ) );
+
+		}
 
 		if ( object.isSkinnedMesh === true ) {
 
