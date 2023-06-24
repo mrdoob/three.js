@@ -400,6 +400,18 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getVertexIndex() {
+
+		if ( this.shaderStage === 'vertex' ) {
+
+			return this.getBuiltin( 'vertex_index', 'vertexIndex', 'u32', 'attribute' );
+
+		}
+
+		return 'vertexIndex';
+
+	}
+
 	getInstanceIndex() {
 
 		if ( this.shaderStage === 'vertex' ) {

@@ -573,6 +573,12 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getVertexIndex() {
+
+		return 'gl_VertexID';
+
+	}
+
 	getFrontFacing() {
 
 		return 'gl_FrontFacing';

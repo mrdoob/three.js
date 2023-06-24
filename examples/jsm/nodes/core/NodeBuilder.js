@@ -234,6 +234,12 @@ class NodeBuilder {
 
 	}
 
+	getVertexIndex() {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
 	getInstanceIndex() {
 
 		console.warn( 'Abstract function.' );
