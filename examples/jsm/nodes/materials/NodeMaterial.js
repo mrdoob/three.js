@@ -7,12 +7,13 @@ import { materialAlphaTest, materialColor, materialOpacity, materialEmissive } f
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
-import { positionLocal } from '../accessors/PositionNode.js';
+import { positionLocal, positionView } from '../accessors/PositionNode.js';
 import { skinning } from '../accessors/SkinningNode.js';
+import { morph } from '../accessors/MorphNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { lightsWithoutWrap } from '../lighting/LightsNode.js';
-import { mix } from '../math/MathNode.js';
+import { mix, dFdx, dFdy } from '../math/MathNode.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import AONode from '../lighting/AONode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
@@ -169,11 +170,21 @@ class NodeMaterial extends ShaderMaterial {
 
 		// NORMAL VIEW
 
-		const normalNode = this.normalNode ? vec3( this.normalNode ) : materialNormal;
+		if ( this.flatShading === true ) {
 
-		stack.assign( transformedNormalView, normalNode );
+			const fdx = dFdx( positionView );
+			const fdy = dFdy( positionView.negate() ); // use -positionView ?
+			const normalNode = fdx.cross( fdy ).normalize();
 
-		return normalNode;
+			stack.assign( transformedNormalView, normalNode );
+
+		} else {
+
+			const normalNode = this.normalNode ? vec3( this.normalNode ) : materialNormal;
+
+			stack.assign( transformedNormalView, normalNode );
+
+		}
 
 	}
 
