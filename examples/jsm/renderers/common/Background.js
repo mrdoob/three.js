@@ -30,14 +30,14 @@ class Background extends DataMap {
 
 			// no background settings, use clear color configuration from the renderer
 
-			_clearColor.copy( renderer._clearColor );
+			_clearColor.copyLinearToSRGB( renderer._clearColor );
 			_clearAlpha = renderer._clearAlpha;
 
 		} else if ( background.isColor === true ) {
 
 			// background is an opaque color
 
-			_clearColor.copy( background );
+			_clearColor.copyLinearToSRGB( background );
 			_clearAlpha = 1;
 			forceClear = true;
 

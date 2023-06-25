@@ -726,6 +726,10 @@
 				"ShaderLib": "api/ar/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/ar/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/ar/renderers/shaders/UniformsUtils"
+			},
+
+			"Renderers / WebXR": {
+				"WebXRManager": "api/ar/renderers/webxr/WebXRManager"
 			}
 
 		}
