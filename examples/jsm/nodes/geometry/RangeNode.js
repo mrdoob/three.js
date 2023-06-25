@@ -2,7 +2,7 @@ import Node, { addNodeClass } from '../core/Node.js';
 import { getValueType } from '../core/NodeUtils.js';
 import { buffer } from '../accessors/BufferNode.js';
 //import { bufferAttribute } from '../accessors/BufferAttributeNode.js';
-import { instanceIndex } from '../core/InstanceIndexNode.js';
+import { instanceIndex } from '../core/IndexNode.js';
 import { nodeProxy, float } from '../shadernode/ShaderNode.js';
 
 import { Vector4, MathUtils } from 'three';

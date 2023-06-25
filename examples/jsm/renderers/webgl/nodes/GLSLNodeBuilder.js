@@ -160,6 +160,12 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getVertexIndex() {
+
+		return 'gl_VertexID';
+
+	}
+
 	getFrontFacing() {
 
 		return 'gl_FrontFacing';
