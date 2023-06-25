@@ -80,6 +80,12 @@ class Backend {
 
 	destroyAttribute( attribute ) { }
 
+	// snapshot
+
+	createSnapshot() {}
+
+	destroySnapshot() {}
+
 	// canvas
 
 	updateSize() { }

@@ -26,6 +26,7 @@
 			import * as THREE from 'three';
 			import { texture, uv, userData, rangeFog, color, SpriteNodeMaterial } from 'three/nodes';
 
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
 
@@ -38,6 +39,8 @@
 			let group;
 
 			let imageWidth = 1, imageHeight = 1;
+
+			let amount = 8000;
 
 			init();
 
@@ -60,9 +63,11 @@
 				scene = new THREE.Scene();
 				scene.fogNode = rangeFog( color( 0x0000ff ), 1500, 2100 );
 
+				// enable static mode
+				scene.false = true;
+
 				// create sprites
 
-				const amount = 200;
 				const radius = 500;
 
 				const textureLoader = new THREE.TextureLoader();
@@ -115,6 +120,8 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
+				initGui();
+
 			}
 
 			function onWindowResize() {
@@ -138,16 +145,38 @@
 					const sprite = group.children[ i ];
 					const scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
 
-					sprite.userData.rotation += 0.1 * ( i / l );
+					sprite.userData.rotation += 0.01 * ( i / l );
 					sprite.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
 
 				}
 
-				group.rotation.x = time * 0.5;
-				group.rotation.y = time * 0.75;
-				group.rotation.z = time * 1.0;
+				group.rotation.x = time * 0.05;
+				group.rotation.y = time * 0.075;
+				group.rotation.z = time * 0.1;
 
 				renderer.render( scene, camera );
+
+			}
+
+			function initGui() {
+
+				const gui = new GUI();
+
+				const param = {
+					'static': false,
+				};
+
+
+				const staticConfig = {
+					skipGeometry: true,
+					skipNodes: true
+				};
+
+				gui.add( param, 'static' ).onChange( function ( val ) {
+
+					scene.static = val ? staticConfig : false;
+
+				} );
 
 			}
 

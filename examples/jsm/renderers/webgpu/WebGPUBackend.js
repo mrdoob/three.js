@@ -137,6 +137,25 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
+		if ( renderContext.static ) {
+
+			if ( ! renderContext.staticEnabled ) {
+
+				return this._beginCreateRenderBundles( renderContext );
+
+			}
+
+		} else {
+
+			if ( renderContextData.renderBundles !== null ) {
+
+				renderContextData.renderBundles = null;
+				renderContextData.bundleDescriptor = null;
+
+			}
+
+		}
+
 		const device = this.device;
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
@@ -366,6 +385,23 @@ class WebGPUBackend extends Backend {
 		if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
 
 			renderContextData.currentPass.endOcclusionQuery();
+
+		}
+
+		if ( renderContext.static && ! renderContextData.renderBundles ) {
+
+			renderContextData.renderBundles = [ renderContextData.currentPass.finish() ];
+
+			// start real pass
+
+			this.beginRender( renderContext );
+
+
+		}
+
+		if ( renderContextData.renderBundles ) {
+
+			renderContextData.currentPass.executeBundles( renderContextData.renderBundles );
 
 		}
 
@@ -607,9 +643,11 @@ class WebGPUBackend extends Backend {
 	draw( renderObject, info ) {
 
 		const { object, geometry, context, pipeline } = renderObject;
+		const contextData = this.get( context );
+
+		if ( contextData.renderBundles ) return;
 
 		const bindingsData = this.get( renderObject.getBindings() );
-		const contextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
 		const currentSets = contextData.currentSets;
 
@@ -1077,6 +1115,25 @@ class WebGPUBackend extends Backend {
 			format: GPUTextureFormat.BGRA8Unorm,
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
 		} );
+
+	}
+
+	_beginCreateRenderBundles( renderContext ) {
+
+		const renderContextData = this.get( renderContext );
+console.log( 'x');
+		const descriptor = {
+			colorFormats: [ GPUTextureFormat.BGRA8Unorm ],
+			depthStencilFormat: this._getDepthBufferGPU( renderContext ).format,
+			sampleCount: this.parameters.sampleCount,
+//			depthReadOnly: false,
+//			stencilReadOnly: false
+		};
+
+		renderContextData.currentPass = this.device.createRenderBundleEncoder( descriptor );
+		renderContextData.bundleDescriptor = descriptor;
+
+		renderContextData.currentSets = { attributes: {} };
 
 	}
 

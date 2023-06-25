@@ -259,6 +259,14 @@ class Renderer {
 		renderContext.depth = this.depth;
 		renderContext.stencil = this.stencil;
 
+		renderContext.static = scene.static;
+
+		if ( ! scene.static && renderContext.staticEnabled ) {
+
+			renderContext.staticEnabled = false;
+
+		}
+
 		//
 
 		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
@@ -275,7 +283,7 @@ class Renderer {
 
 		renderList.finish();
 
-		if ( this.sortObjects === true ) {
+		if ( this.sortObjects === true && ! renderContext.staticEnabled ) {
 
 			renderList.sort( this._opaqueSort, this._transparentSort );
 
@@ -319,6 +327,7 @@ class Renderer {
 
 		//
 
+		const startTime  = performance.now();
 		this.backend.beginRender( renderContext );
 
 		// process render lists
@@ -331,6 +340,12 @@ class Renderer {
 		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
 
 		// finish render pass
+
+		if ( renderContext.static ) {
+
+			renderContext.staticEnabled = true;
+
+		}
 
 		this.backend.finishRender( renderContext );
 
@@ -346,6 +361,9 @@ class Renderer {
 		//
 
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
+
+		console.log( this.info.render.drawCalls, 'elapsed:', performance.now() - startTime );
+
 
 	}
 
@@ -921,6 +939,7 @@ class Renderer {
 
 	_renderObjectDirect( object, material, scene, camera, lightsNode, passId ) {
 
+		const renderContext = this._currentRenderContext;
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
 
 		//
@@ -929,13 +948,15 @@ class Renderer {
 
 		//
 
+		const updateGeometery = renderContext.staticEnabled ? renderContext.static.skipGeometry !== true : true;
+
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 		//
 
 		this._nodes.updateForRender( renderObject );
-		this._geometries.updateForRender( renderObject );
+		if ( updateGeometery ) this._geometries.updateForRender( renderObject );
 		this._bindings.updateForRender( renderObject );
 		this._pipelines.updateForRender( renderObject );
 
