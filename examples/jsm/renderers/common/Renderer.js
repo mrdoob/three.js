@@ -637,6 +637,12 @@ class Renderer {
 
 	}
 
+	readRenderTargetPixelsAsync ( renderTarget, x, y, width, height ) {
+
+		return this.backend.copyTextureToBuffer( renderTarget.texture, x, y, width, height );
+
+	}
+
 	_projectObject( object, camera, groupOrder, renderList ) {
 
 		if ( object.visible === false ) return;
