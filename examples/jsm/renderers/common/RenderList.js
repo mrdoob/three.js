@@ -61,6 +61,8 @@ class RenderList {
 		this.lightsNode = lights( [] );
 		this.lightsArray = [];
 
+		this.occlusionQueryCount = 0;
+
 	}
 
 	init() {
@@ -70,6 +72,8 @@ class RenderList {
 		this.opaque.length = 0;
 		this.transparent.length = 0;
 		this.lightsArray.length = 0;
+
+		this.occlusionQueryCount = 0;
 
 		return this;
 
@@ -116,6 +120,8 @@ class RenderList {
 	push( object, geometry, material, groupOrder, z, group ) {
 
 		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group );
+
+		if ( object.occlusionTest === true ) this.occlusionQueryCount++;
 
 		( material.transparent === true ? this.transparent : this.opaque ).push( renderItem );
 

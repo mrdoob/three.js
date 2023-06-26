@@ -134,6 +134,22 @@ class WebGPUBackend extends Backend {
 		const renderContextData = this.get( renderContext );
 
 		const device = this.device;
+		const occlusionQueryCount = renderContext.occlusionQueryCount;
+
+		let occlusionQuerySet;
+
+		if ( occlusionQueryCount > 0 ) {
+
+			console.log( 'occlusion query count', renderContext.occlusionQueryCount );
+
+			occlusionQuerySet = device.createQuerySet( { type: 'occlusion', count: occlusionQueryCount } );
+
+			//renderContextData.occlusionQuerySet = occlusionQuerySet; // FIXME do we need to destroy this
+			renderContextData.occlusionQueryIndex = 0;
+			renderContextData.occlusionQueryObjects = new Array( occlusionQueryCount );
+			renderContextData.lastOcclusionObject = null;
+
+		}
 
 		const descriptor = {
 			colorAttachments: [ {
@@ -141,7 +157,8 @@ class WebGPUBackend extends Backend {
 			} ],
 			depthStencilAttachment: {
 				view: null
-			}
+			},
+			occlusionQuerySet
 		};
 
 		const colorAttachment = descriptor.colorAttachments[ 0 ];
@@ -268,13 +285,65 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	finishRender( renderContext ) {
+	async finishRender( renderContext ) {
 
 		const renderContextData = this.get( renderContext );
+		const occlusionQueryCount = renderContext.occlusionQueryCount;
+
+		let readBuffer;
+
+		if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
+
+			console.log( 'end q: (end)', renderContextData.lastOcclusionObject.uuid );
+			renderContextData.currentPass.endOcclusionQuery();
+
+		}
 
 		renderContextData.currentPass.end();
 
+		if ( occlusionQueryCount > 0 ) {
+
+			const bufferSize = occlusionQueryCount * 8;
+
+			const queryResolveBuffer = this.device.createBuffer(
+				{
+					size: bufferSize,
+					usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC
+				}
+			);
+
+			readBuffer = this.device.createBuffer(
+				{
+					size: bufferSize,
+					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+				}
+			);
+
+			// two buffers required here - WebGPU doesn't allow usage of QUERY_RESOLVE & MAP_READ
+			renderContextData.encoder.resolveQuerySet( renderContextData.occlusionQuerySet, 0, occlusionQueryCount, queryResolveBuffer, 0 );
+			renderContextData.encoder.copyBufferToBuffer(queryResolveBuffer, 0, readBuffer, 0, bufferSize );
+
+		}
+
 		this.device.queue.submit( [ renderContextData.encoder.finish() ] );
+
+		// handle occlusion query results
+
+		if ( readBuffer != undefined  ) {
+
+			await readBuffer.mapAsync( GPUMapMode.READ );
+
+			const buffer = readBuffer.getMappedRange();
+			const results = new BigUint64Array( buffer );
+			const objects = renderContextData.occlusionQueryObjects;
+
+			for ( let i = 0; i < objects.length; i++ ) {
+
+				objects[ i ].isOccluded = ( results[ i ] == 1 );
+
+			}
+
+		}
 
 		//
 
@@ -452,6 +521,33 @@ class WebGPUBackend extends Backend {
 				attributesSet[ i ] = attribute;
 
 			}
+
+		}
+
+		// occlusion queries
+
+		const lastObject = contextData.lastOcclusionObject;
+
+		if ( lastObject !== object ) {
+
+			if ( lastObject !== null && lastObject.occlusionTest ) {
+
+				console.log( 'end q', lastObject.uuid );
+
+				passEncoderGPU.endOcclusionQuery();
+				contextData.occlusionQueryIndex++;
+
+			}
+
+			if ( object.occlusionTest ) {
+
+				console.log( 'start q', contextData.occlusionQueryIndex, object.uuid );
+				passEncoderGPU.beginOcclusionQuery( contextData.occlusionQueryIndex );
+				contextData.occlusionQueryObjects[ contextData.occlusionQueryIndex ] = object;
+
+			}
+
+			contextData.lastOcclusionObject = object;
 
 		}
 
