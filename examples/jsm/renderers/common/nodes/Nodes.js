@@ -22,7 +22,7 @@ class Nodes extends DataMap {
 
 		if ( nodeBuilder === undefined ) {
 
-			nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
+			nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer, renderObject.scene );
 			nodeBuilder.material = renderObject.material;
 			nodeBuilder.lightsNode = renderObject.lightsNode;
 			nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );

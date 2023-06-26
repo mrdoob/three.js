@@ -69,7 +69,7 @@ export { default as CameraNode, cameraProjectionMatrix, cameraViewMatrix, camera
 export { default as CubeTextureNode, cubeTexture } from './accessors/CubeTextureNode.js';
 export { default as ExtendedMaterialNode, materialNormal } from './accessors/ExtendedMaterialNode.js';
 export { default as InstanceNode, instance } from './accessors/InstanceNode.js';
-export { default as MaterialNode, materialUV, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecularColor, materialReflectivity, materialRoughness, materialMetalness, materialRotation } from './accessors/MaterialNode.js';
+export { default as MaterialNode, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecularColor, materialReflectivity, materialRoughness, materialMetalness, materialRotation, materialSheen, materialSheenRoughness } from './accessors/MaterialNode.js';
 export { default as MaterialReferenceNode, materialReference } from './accessors/MaterialReferenceNode.js';
 export { default as MorphNode, morph } from './accessors/MorphNode.js';
 export { default as TextureBicubicNode, textureBicubic } from './accessors/TextureBicubicNode.js';
@@ -82,6 +82,7 @@ export { default as PositionNode, positionGeometry, positionLocal, positionWorld
 export { default as ReferenceNode, reference } from './accessors/ReferenceNode.js';
 export { default as ReflectVectorNode, reflectVector } from './accessors/ReflectVectorNode.js';
 export { default as SkinningNode, skinning } from './accessors/SkinningNode.js';
+export { default as SceneNode, backgroundBlurriness } from './accessors/SceneNode.js';
 export { default as StorageBufferNode, storage } from './accessors/StorageBufferNode.js';
 export { default as TangentNode, tangentGeometry, tangentLocal, tangentView, tangentWorld, transformedTangentView, transformedTangentWorld } from './accessors/TangentNode.js';
 export { default as TextureNode, texture, /*textureLevel,*/ sampler } from './accessors/TextureNode.js';
