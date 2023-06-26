@@ -69,7 +69,7 @@ export { default as CameraNode, cameraProjectionMatrix, cameraViewMatrix, camera
 export { default as CubeTextureNode, cubeTexture } from './accessors/CubeTextureNode.js';
 export { default as ExtendedMaterialNode, materialNormal } from './accessors/ExtendedMaterialNode.js';
 export { default as InstanceNode, instance } from './accessors/InstanceNode.js';
-export { default as MaterialNode, materialUV, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecularColor, materialReflectivity, materialRoughness, materialMetalness, materialRotation } from './accessors/MaterialNode.js';
+export { default as MaterialNode, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecularColor, materialReflectivity, materialRoughness, materialMetalness, materialRotation, materialSheen, materialSheenRoughness } from './accessors/MaterialNode.js';
 export { default as MaterialReferenceNode, materialReference } from './accessors/MaterialReferenceNode.js';
 export { default as MorphNode, morph } from './accessors/MorphNode.js';
 export { default as TextureBicubicNode, textureBicubic } from './accessors/TextureBicubicNode.js';
