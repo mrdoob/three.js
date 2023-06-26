@@ -323,6 +323,7 @@
 		"webgpu_lights_selective",
 		"webgpu_loader_gltf",
 		"webgpu_loader_gltf_compressed",
+		"webgpu_loader_gltf_sheen",
 		"webgpu_materials",
 		"webgpu_materials_video",
 		"webgpu_morphtargets",
