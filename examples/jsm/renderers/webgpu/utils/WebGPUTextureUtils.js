@@ -266,7 +266,7 @@ class WebGPUTextureUtils {
 		encoder.copyTextureToBuffer(
 			{
 				texture: textureGPU,
-				origin: { x: x, y: y },
+				origin: { x, y },
 			},
 			{
 				buffer: readBuffer,
