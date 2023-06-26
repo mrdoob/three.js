@@ -572,11 +572,17 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	copyTextureToBuffer( texture, x, y, width, height ) {
+
+		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height );
+
+	}
+
 	// node builder
 
-	createNodeBuilder( object, renderer ) {
+	createNodeBuilder( object, renderer, scene = null ) {
 
-		return new WGSLNodeBuilder( object, renderer );
+		return new WGSLNodeBuilder( object, renderer, scene );
 
 	}
 

@@ -49,6 +49,8 @@ export const roughness = nodeImmutable( PropertyNode, 'float', 'Roughness' );
 export const metalness = nodeImmutable( PropertyNode, 'float', 'Metalness' );
 export const clearcoat = nodeImmutable( PropertyNode, 'float', 'Clearcoat' );
 export const clearcoatRoughness = nodeImmutable( PropertyNode, 'float', 'ClearcoatRoughness' );
+export const sheen = nodeImmutable( PropertyNode, 'vec3', 'Sheen' );
+export const sheenRoughness = nodeImmutable( PropertyNode, 'float', 'SheenRoughness' );
 export const specularColor = nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
 export const shininess = nodeImmutable( PropertyNode, 'float', 'Shininess' );
 
