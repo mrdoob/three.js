@@ -574,9 +574,9 @@ class WebGPUBackend extends Backend {
 
 	// node builder
 
-	createNodeBuilder( object, renderer ) {
+	createNodeBuilder( object, renderer, scene = null ) {
 
-		return new WGSLNodeBuilder( object, renderer );
+		return new WGSLNodeBuilder( object, renderer, scene );
 
 	}
 

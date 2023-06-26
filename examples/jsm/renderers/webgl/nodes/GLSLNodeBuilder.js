@@ -12,9 +12,9 @@ const precisionLib = {
 
 class GLSLNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer ) {
+	constructor( object, renderer, scene = null ) {
 
-		super( object, renderer, new GLSLNodeParser() );
+		super( object, renderer, new GLSLNodeParser(), scene );
 
 	}
 

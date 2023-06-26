@@ -100,9 +100,9 @@ fn threejs_repeatWrapping( uv : vec2<f32>, dimension : vec2<u32> ) -> vec2<u32> 
 
 class WGSLNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer ) {
+	constructor( object, renderer, scene = null ) {
 
-		super( object, renderer, new WGSLNodeParser() );
+		super( object, renderer, new WGSLNodeParser(), scene );
 
 		this.uniformsGroup = {};
 
