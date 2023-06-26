@@ -1,13 +1,12 @@
-import UniformNode from '../core/UniformNode.js';
+import UniformNode, { uniform } from '../core/UniformNode.js';
 import { uv } from './UVNode.js';
 import { textureSize } from './TextureSizeNode.js';
 import { colorSpaceToLinear } from '../display/ColorSpaceNode.js';
 import { context } from '../core/ContextNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
-
-let defaultUV;
+import { addNodeElement, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
+import { NodeUpdateType } from '../core/constants.js';
 
 class TextureNode extends UniformNode {
 
@@ -19,6 +18,8 @@ class TextureNode extends UniformNode {
 
 		this.uvNode = uvNode;
 		this.levelNode = levelNode;
+
+		this.updateType = NodeUpdateType.FRAME;
 
 	}
 
@@ -44,7 +45,9 @@ class TextureNode extends UniformNode {
 
 	getDefaultUV() {
 
-		return defaultUV || ( defaultUV = uv() );
+		const texture = this.value;
+
+		return uniform( texture.matrix ).mul( vec3( uv( texture.channel ), 1 ) );
 
 	}
 
@@ -191,6 +194,18 @@ class TextureNode extends UniformNode {
 		super.deserialize( data );
 
 		this.value = data.meta.textures[ data.value ];
+
+	}
+
+	update() {
+
+		const texture = this.value;
+
+		if ( texture.matrixAutoUpdate === true ) {
+
+			texture.updateMatrix();
+
+		}
 
 	}
 
