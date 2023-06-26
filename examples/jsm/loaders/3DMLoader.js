@@ -1052,7 +1052,7 @@ function Rhino3dmWorker() {
 		// Handle instance definitions
 		// console.log( `Instance Definitions Count: ${doc.instanceDefinitions().count()}` );
 
-		for ( let i = 0; i < doc.instanceDefinitions().count(); i ++ ) {
+		for ( let i = 0; i < doc.instanceDefinitions().count; i ++ ) {
 
 			const idef = doc.instanceDefinitions().get( i );
 			const idefAttributes = extractProperties( idef );
@@ -1096,7 +1096,7 @@ function Rhino3dmWorker() {
 			rhino.TextureType.PBR_Displacement
 		];
 
-		for ( let i = 0; i < doc.materials().count(); i ++ ) {
+		for ( let i = 0; i < doc.materials().count; i ++ ) {
 
 			const _material = doc.materials().get( i );
 			const _pbrMaterial = _material.physicallyBased();
@@ -1166,7 +1166,7 @@ function Rhino3dmWorker() {
 
 		// Handle layers
 
-		for ( let i = 0; i < doc.layers().count(); i ++ ) {
+		for ( let i = 0; i < doc.layers().count; i ++ ) {
 
 			const _layer = doc.layers().get( i );
 			const layer = extractProperties( _layer );
@@ -1179,7 +1179,7 @@ function Rhino3dmWorker() {
 
 		// Handle views
 
-		for ( let i = 0; i < doc.views().count(); i ++ ) {
+		for ( let i = 0; i < doc.views().count; i ++ ) {
 
 			const _view = doc.views().get( i );
 			const view = extractProperties( _view );
@@ -1192,7 +1192,7 @@ function Rhino3dmWorker() {
 
 		// Handle named views
 
-		for ( let i = 0; i < doc.namedViews().count(); i ++ ) {
+		for ( let i = 0; i < doc.namedViews().count; i ++ ) {
 
 			const _namedView = doc.namedViews().get( i );
 			const namedView = extractProperties( _namedView );
@@ -1205,7 +1205,7 @@ function Rhino3dmWorker() {
 
 		// Handle groups
 
-		for ( let i = 0; i < doc.groups().count(); i ++ ) {
+		for ( let i = 0; i < doc.groups().count; i ++ ) {
 
 			const _group = doc.groups().get( i );
 			const group = extractProperties( _group );
@@ -1241,7 +1241,7 @@ function Rhino3dmWorker() {
 
 		//console.log(`${background}, ${skylight}, ${reflection}`)
 
-		const efCount = doc.embeddedFiles().count()
+		const efCount = doc.embeddedFiles().count
 		let renderEnvironment = null
 		console.log(`efCount: ${efCount}`)
 		if ( efCount > 0 ) {
@@ -1275,7 +1275,7 @@ function Rhino3dmWorker() {
 		// Note: doc.strings().documentUserTextCount() counts any doc.strings defined in a section
 		//console.log( `Document User Text Count: ${doc.strings().documentUserTextCount()}` );
 
-		const strings_count = doc.strings().count();
+		const strings_count = doc.strings().count;
 
 		for ( let i = 0; i < strings_count; i ++ ) {
 
@@ -1307,7 +1307,20 @@ function Rhino3dmWorker() {
 			depthCue: doc.settings().renderSettings().depthCue,
 			flatShade: doc.settings().renderSettings().flatShade,
 			renderBackFaces: doc.settings().renderSettings().renderBackFaces,
-			//groundPlane: extractProperties( doc.settings().renderSettings().groundPlane ),
+			renderPoints: doc.settings().renderSettings().renderPoints,
+			renderCurves: doc.settings().renderSettings().renderCurves,
+			renderIsoParams: doc.settings().renderSettings().renderIsoParams,
+			renderMeshEdges: doc.settings().renderSettings().renderMeshEdges,
+			renderAnnotations: doc.settings().renderSettings().renderAnnotations,
+			useViewportSize: doc.settings().renderSettings().useViewportSize,
+			scaleBackgroundToFit: doc.settings().renderSettings().scaleBackgroundToFit,
+			transparentBackground: doc.settings().renderSettings().transparentBackground,
+			imageDpi: doc.settings().renderSettings().imageDpi,
+			shadowMapLevel: doc.settings().renderSettings().shadowMapLevel,
+			namedView: doc.settings().renderSettings().namedView,
+			snapShot: doc.settings().renderSettings().snapShot,
+			specificViewport: doc.settings().renderSettings().specificViewport,
+			groundPlane: extractProperties( doc.settings().renderSettings().groundPlane ),
 			safeFrame: extractProperties( doc.settings().renderSettings().safeFrame ),
 			dithering: extractProperties( doc.settings().renderSettings().dithering ),
 			skylight: extractProperties( doc.settings().renderSettings().skylight ),
@@ -1315,11 +1328,19 @@ function Rhino3dmWorker() {
 			renderChannels: extractProperties( doc.settings().renderSettings().renderChannels ),
 			sun: extractProperties( doc.settings().renderSettings().sun ),
 			renderEnvironments: extractProperties( doc.settings().renderSettings().renderEnvironments ),
-			postEffects: extractProperties( doc.settings().renderSettings().renderEnvironments ),
+			postEffects: extractProperties( doc.settings().renderSettings().postEffects ),
 
 		}
 
-		//renderSettings.sun.light = extractProperties(doc.settings().renderSettings().sun.light)
+		//remove this eventually to some sample
+		const peCount = renderSettings.postEffects.count
+		for(let c = 0; c < peCount; c++) {
+
+			const pe = extractProperties(doc.settings().renderSettings().postEffects.get(c))
+
+			console.log(pe)
+
+		}
 
 		console.log(renderSettings)
 
@@ -1572,6 +1593,8 @@ function Rhino3dmWorker() {
 				attributes.geometry.userStrings = _geometry.getUserStrings();
 
 			}
+
+			console.log( _attributes.decals().count )
 
 			attributes.drawColor = _attributes.drawColor( doc );
 
