@@ -68,6 +68,8 @@ class Backend {
 
 	createTexture( texture ) { }
 
+	copyTextureToBuffer( texture, x, y, width, height ) {}
+
 	// attributes
 
 	createAttribute( attribute ) { }

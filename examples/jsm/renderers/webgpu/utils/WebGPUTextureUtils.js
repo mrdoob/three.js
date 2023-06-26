@@ -245,6 +245,52 @@ class WebGPUTextureUtils {
 
 	}
 
+	async copyTextureToBuffer( texture, x, y, width, height ) {
+
+		const device = this.backend.device;
+
+		const textureData = this.backend.get( texture );
+		const textureGPU = textureData.texture;
+		const format = textureData.textureDescriptorGPU.format;
+		const bytesPerTexel = this._getBytesPerTexel( format );
+
+		const readBuffer = device.createBuffer(
+			{
+				size: width * height * bytesPerTexel,
+				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+			}
+		);
+
+		const encoder = device.createCommandEncoder();
+
+		encoder.copyTextureToBuffer(
+			{
+				texture: textureGPU,
+				origin: { x, y },
+			},
+			{
+				buffer: readBuffer,
+				bytesPerRow: width * bytesPerTexel
+			},
+			{
+				width: width,
+				height: height
+			}
+
+		);
+
+		const typedArrayType = this._getTypedArrayType( format );
+
+		device.queue.submit( [ encoder.finish() ] );
+
+		await readBuffer.mapAsync( GPUMapMode.READ );
+
+		const buffer = readBuffer.getMappedRange();
+
+		return new typedArrayType( buffer );
+
+	}
+
 	_isEnvironmentTexture( texture ) {
 
 		const mapping = texture.mapping;
@@ -576,6 +622,42 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.RG32Float ) return 8;
 		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
 		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
+
+	}
+
+	_getTypedArrayType( format ) {
+
+		if ( format === GPUTextureFormat.R8Uint ) return Uint8Array;
+		if ( format === GPUTextureFormat.R8Sint ) return Int8Array;
+		if ( format === GPUTextureFormat.R8Unorm ) return Uint8Array;
+		if ( format === GPUTextureFormat.R8Snorm ) return Int8Array;
+		if ( format === GPUTextureFormat.RG8Uint ) return Uint8Array;
+		if ( format === GPUTextureFormat.RG8Sint ) return Int8Array;
+		if ( format === GPUTextureFormat.RG8Unorm ) return Uint8Array;
+		if ( format === GPUTextureFormat.RG8Snorm ) return Int8Array;
+		if ( format === GPUTextureFormat.RGBA8Uint ) return Uint8Array;
+		if ( format === GPUTextureFormat.RGBA8Sint ) return Int8Array;
+		if ( format === GPUTextureFormat.RGBA8Unorm ) return Uint8Array;
+		if ( format === GPUTextureFormat.RGBA8Snorm ) return Int8Array;
+
+
+		if ( format === GPUTextureFormat.R16Uint ) return Uint16Array;
+		if ( format === GPUTextureFormat.R16Sint ) return Int16Array;
+		if ( format === GPUTextureFormat.RG16Uint ) return Uint16Array;
+		if ( format === GPUTextureFormat.RG16Sint ) return Int16Array;
+		if ( format === GPUTextureFormat.RGBA16Uint ) return Uint16Array;
+		if ( format === GPUTextureFormat.RGBA16Sint ) return Int16Array;
+
+
+		if ( format === GPUTextureFormat.R32Uint ) return Uint32Array;
+		if ( format === GPUTextureFormat.R32Sint ) return Int32Array;
+		if ( format === GPUTextureFormat.R32Float ) return Float32Array;
+		if ( format === GPUTextureFormat.RG32Uint ) return Uint32Array;
+		if ( format === GPUTextureFormat.RG32Sint ) return Int32Array;
+		if ( format === GPUTextureFormat.RG32Float ) return Float32Array;
+		if ( format === GPUTextureFormat.RGBA32Uint ) return Uint32Array;
+		if ( format === GPUTextureFormat.RGBA32Sint ) return Int32Array;
+		if ( format === GPUTextureFormat.RGBA32Float ) return Float32Array;
 
 	}
 
