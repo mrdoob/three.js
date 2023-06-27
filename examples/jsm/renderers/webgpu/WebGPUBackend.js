@@ -142,7 +142,7 @@ class WebGPUBackend extends Backend {
 
 			occlusionQuerySet = device.createQuerySet( { type: 'occlusion', count: occlusionQueryCount } );
 
-			renderContextData.occlusionQuerySet = occlusionQuerySet; // FIXME do we need to destroy this
+			renderContextData.occlusionQuerySet = occlusionQuerySet;
 			renderContextData.occlusionQueryIndex = 0;
 			renderContextData.occlusionQueryObjects = new Array( occlusionQueryCount );
 			renderContextData.lastOcclusionObject = null;
@@ -300,7 +300,7 @@ class WebGPUBackend extends Backend {
 
 		if ( occlusionQueryCount > 0 ) {
 
-			const bufferSize = occlusionQueryCount * 8;
+			const bufferSize = occlusionQueryCount * 8; // 8 byte entries for query results
 
 			const queryResolveBuffer = this.device.createBuffer(
 				{
@@ -316,7 +316,7 @@ class WebGPUBackend extends Backend {
 				}
 			);
 
-			// two buffers required here - WebGPU doesn't allow usage of QUERY_RESOLVE & MAP_READ
+			// two buffers required here - WebGPU doesn't allow usage of QUERY_RESOLVE & MAP_READ to be combined
 			renderContextData.encoder.resolveQuerySet( renderContextData.occlusionQuerySet, 0, occlusionQueryCount, queryResolveBuffer, 0 );
 			renderContextData.encoder.copyBufferToBuffer(queryResolveBuffer, 0, readBuffer, 0, bufferSize );
 
@@ -324,9 +324,17 @@ class WebGPUBackend extends Backend {
 
 		this.device.queue.submit( [ renderContextData.encoder.finish() ] );
 
+		//
+
+		if ( renderContext.texture !== null && renderContext.texture.generateMipmaps === true ) {
+
+			this.textureUtils.generateMipmaps( renderContext.texture );
+
+		}
+
 		// handle occlusion query results
 
-		if ( readBuffer != undefined  ) {
+		if ( readBuffer !== undefined  ) {
 
 			await readBuffer.mapAsync( GPUMapMode.READ );
 
@@ -340,13 +348,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-		}
-
-		//
-
-		if ( renderContext.texture !== null && renderContext.texture.generateMipmaps === true ) {
-
-			this.textureUtils.generateMipmaps( renderContext.texture );
+			renderContextData.occlusionQuerySet.destroy();
 
 		}
 
@@ -521,7 +523,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		// occlusion queries
+		// occlusion queries - handle multiple consecutive draw calls for an object
 
 		const lastObject = contextData.lastOcclusionObject;
 
