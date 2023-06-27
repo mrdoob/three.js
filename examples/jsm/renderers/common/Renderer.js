@@ -836,11 +836,11 @@ class Renderer {
 
 	}
 
-	_renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode, namespace ) {
+	_renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode, passId ) {
 
 		//
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, namespace );
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, passId );
 		renderObject.context = this._currentRenderContext;
 
 		//
