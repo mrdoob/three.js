@@ -85,7 +85,7 @@ class FlyControls extends EventDispatcher {
 
 		this.keyup = function ( event ) {
 
-			if ( scope.enabled === false ) return;
+			if ( this.enabled === false ) return;
 
 			switch ( event.code ) {
 
@@ -119,7 +119,7 @@ class FlyControls extends EventDispatcher {
 
 		this.pointerdown = function ( event ) {
 
-			if ( scope.enabled === false ) return;
+			if ( this.enabled === false ) return;
 
 			if ( this.dragToLook ) {
 
@@ -142,7 +142,7 @@ class FlyControls extends EventDispatcher {
 
 		this.pointermove = function ( event ) {
 
-			if ( scope.enabled === false ) return;
+			if ( this.enabled === false ) return;
 
 			if ( ! this.dragToLook || this.status > 0 ) {
 
@@ -161,7 +161,7 @@ class FlyControls extends EventDispatcher {
 
 		this.pointerup = function ( event ) {
 
-			if ( scope.enabled === false ) return;
+			if ( this.enabled === false ) return;
 
 			if ( this.dragToLook ) {
 
@@ -188,7 +188,7 @@ class FlyControls extends EventDispatcher {
 
 		this.contextMenu = function ( event ) {
 
-			if ( scope.enabled === false ) return;
+			if ( this.enabled === false ) return;
 
 			event.preventDefault();
 
@@ -196,7 +196,7 @@ class FlyControls extends EventDispatcher {
 
 		this.update = function ( delta ) {
 
-			if ( scope.enabled === false ) return;
+			if ( this.enabled === false ) return;
 
 			const moveMult = delta * scope.movementSpeed;
 			const rotMult = delta * scope.rollSpeed;
