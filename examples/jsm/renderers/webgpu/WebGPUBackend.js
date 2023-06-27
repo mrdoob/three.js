@@ -525,25 +525,29 @@ class WebGPUBackend extends Backend {
 
 		// occlusion queries - handle multiple consecutive draw calls for an object
 
-		const lastObject = contextData.lastOcclusionObject;
+		if ( contextData.occlusionQuerySet !== undefined  ) {
 
-		if ( contextData.occlusionQueryObjects !== undefined && lastObject !== object ) {
+			const lastObject = contextData.lastOcclusionObject;
 
-			if ( lastObject !== null && lastObject.occlusionTest === true ) {
+			if ( lastObject !== object ) {
 
-				passEncoderGPU.endOcclusionQuery();
-				contextData.occlusionQueryIndex++;
+				if ( lastObject !== null && lastObject.occlusionTest === true ) {
+
+					passEncoderGPU.endOcclusionQuery();
+					contextData.occlusionQueryIndex++;
+	
+				}
+
+				if ( object.occlusionTest === true ) {
+	
+					passEncoderGPU.beginOcclusionQuery( contextData.occlusionQueryIndex );
+					contextData.occlusionQueryObjects[ contextData.occlusionQueryIndex ] = object;
+	
+					contextData.lastOcclusionObject = object;
+	
+				}
 
 			}
-
-			if ( object.occlusionTest === true ) {
-
-				passEncoderGPU.beginOcclusionQuery( contextData.occlusionQueryIndex );
-				contextData.occlusionQueryObjects[ contextData.occlusionQueryIndex ] = object;
-
-			}
-
-			contextData.lastOcclusionObject = object;
 
 		}
 
