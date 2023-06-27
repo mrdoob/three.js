@@ -282,6 +282,7 @@ class Renderer {
 		}
 
 		renderContext.activeCubeFace = activeCubeFace;
+		renderContext.occlusionQueryCount = renderList.occlusionQueryCount;
 
 		//
 
