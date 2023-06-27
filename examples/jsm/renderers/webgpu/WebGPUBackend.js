@@ -348,6 +348,8 @@ class WebGPUBackend extends Backend {
 
 			}
 
+			renderContextData.occlusionQueryObjects = null;
+			renderContextData.lastOcclusionObject = null;
 			renderContextData.occlusionQuerySet.destroy();
 
 		}
