@@ -817,10 +817,10 @@ class Renderer {
 		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 			material.side = BackSide;
-			this._renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode, 'backSide' );
+			this._renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode, 'backSide' ); // create backSide pass id
 
 			material.side = FrontSide;
-			this._renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode );
+			this._renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode ); // use default pass id
 
 			material.side = DoubleSide;
 

@@ -13,26 +13,26 @@ class RenderObjects {
 		this.info = info;
 
 		this.chainMaps = {};
-		this.dataMaps = {};
+		this.dataMap = new DataMap();
 
 	}
 
-	get( object, material, scene, camera, lightsNode, namespace ) {
+	get( object, material, scene, camera, lightsNode, passId ) {
 
-		const chainMap = this.getChainMap( namespace );
+		const chainMap = this.getChainMap( passId );
 		const chainArray = [ object, material, scene, camera, lightsNode ];
 
 		let renderObject = chainMap.get( chainArray );
 
 		if ( renderObject === undefined ) {
 
-			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, namespace );
+			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, passId );
 
 			chainMap.set( chainArray, renderObject );
 
 		} else {
 
-			const data = this.getDataMap( namespace ).get( renderObject );
+			const data = this.dataMap.get( renderObject );
 			const cacheKey = renderObject.getCacheKey();
 
 			if ( data.cacheKey !== cacheKey ) {
@@ -49,29 +49,23 @@ class RenderObjects {
 
 	}
 
-	getChainMap( namespace = 'default' ) {
+	getChainMap( passId = 'default' ) {
 
-		return this.chainMaps[ namespace ] || ( this.chainMaps[ namespace ] = new ChainMap() );
-
-	}
-
-	getDataMap( namespace = 'default' ) {
-
-		return this.dataMaps[ namespace ] || ( this.dataMaps[ namespace ] = new DataMap() );
+		return this.chainMaps[ passId ] || ( this.chainMaps[ passId ] = new ChainMap() );
 
 	}
 
 	dispose() {
 
 		this.chainMaps = {};
-		this.dataMaps = {};
+		this.dataMap = new DataMap();
 
 	}
 
-	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, namespace ) {
+	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, passId ) {
 
-		const chainMap = this.getChainMap( namespace );
-		const dataMap = this.getDataMap( namespace );
+		const chainMap = this.getChainMap( passId );
+		const dataMap = this.dataMap;
 		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode );
 
 		const data = dataMap.get( renderObject );
