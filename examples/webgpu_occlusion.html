@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { nodeObject, normalMap, uniform, Node, NodeUpdateType, MeshPhongNodeMaterial } from 'three/nodes';
+			import { nodeObject, uniform, Node, NodeUpdateType, MeshPhongNodeMaterial } from 'three/nodes';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -38,7 +38,6 @@
 			let camera, scene, renderer, controls;
 
 			class OcclusionNode extends Node {
-
 
 				constructor( testObject, normalColor, occludedColor ) {
 
