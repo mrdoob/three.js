@@ -140,11 +140,9 @@ class WebGPUBackend extends Backend {
 
 		if ( occlusionQueryCount > 0 ) {
 
-			console.log( 'occlusion query count', renderContext.occlusionQueryCount );
-
 			occlusionQuerySet = device.createQuerySet( { type: 'occlusion', count: occlusionQueryCount } );
 
-			//renderContextData.occlusionQuerySet = occlusionQuerySet; // FIXME do we need to destroy this
+			renderContextData.occlusionQuerySet = occlusionQuerySet; // FIXME do we need to destroy this
 			renderContextData.occlusionQueryIndex = 0;
 			renderContextData.occlusionQueryObjects = new Array( occlusionQueryCount );
 			renderContextData.lastOcclusionObject = null;
@@ -294,7 +292,6 @@ class WebGPUBackend extends Backend {
 
 		if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
 
-			console.log( 'end q: (end)', renderContextData.lastOcclusionObject.uuid );
 			renderContextData.currentPass.endOcclusionQuery();
 
 		}
@@ -528,20 +525,17 @@ class WebGPUBackend extends Backend {
 
 		const lastObject = contextData.lastOcclusionObject;
 
-		if ( lastObject !== object ) {
+		if ( contextData.occlusionQueryObjects !== undefined && lastObject !== object ) {
 
-			if ( lastObject !== null && lastObject.occlusionTest ) {
-
-				console.log( 'end q', lastObject.uuid );
+			if ( lastObject !== null && lastObject.occlusionTest === true ) {
 
 				passEncoderGPU.endOcclusionQuery();
 				contextData.occlusionQueryIndex++;
 
 			}
 
-			if ( object.occlusionTest ) {
+			if ( object.occlusionTest === true ) {
 
-				console.log( 'start q', contextData.occlusionQueryIndex, object.uuid );
 				passEncoderGPU.beginOcclusionQuery( contextData.occlusionQueryIndex );
 				contextData.occlusionQueryObjects[ contextData.occlusionQueryIndex ] = object;
 
