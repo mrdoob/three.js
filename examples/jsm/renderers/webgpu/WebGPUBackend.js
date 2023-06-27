@@ -288,7 +288,7 @@ class WebGPUBackend extends Backend {
 		const renderContextData = this.get( renderContext );
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
-		let readBuffer;
+		let readBuffer, occlusionQueryObjects;
 
 		if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
 
@@ -320,6 +320,10 @@ class WebGPUBackend extends Backend {
 			renderContextData.encoder.resolveQuerySet( renderContextData.occlusionQuerySet, 0, occlusionQueryCount, queryResolveBuffer, 0 );
 			renderContextData.encoder.copyBufferToBuffer(queryResolveBuffer, 0, readBuffer, 0, bufferSize );
 
+			// Get a refernce to the array of objects with queries. The renderContextData property
+			// can be changed by another render pass before the buffer.mapAsyc() completes.
+			occlusionQueryObjects = renderContextData.occlusionQueryObjects;
+
 		}
 
 		this.device.queue.submit( [ renderContextData.encoder.finish() ] );
@@ -340,11 +344,10 @@ class WebGPUBackend extends Backend {
 
 			const buffer = readBuffer.getMappedRange();
 			const results = new BigUint64Array( buffer );
-			const objects = renderContextData.occlusionQueryObjects;
 
-			for ( let i = 0; i < objects.length; i++ ) {
+			for ( let i = 0; i < occlusionQueryObjects.length; i++ ) {
 
-				objects[ i ].isOccluded = ( results[ i ] == 1 );
+				occlusionQueryObjects[ i ].isOccluded = ( results[ i ] !== 0n );
 
 			}
 
@@ -545,9 +548,9 @@ class WebGPUBackend extends Backend {
 					passEncoderGPU.beginOcclusionQuery( contextData.occlusionQueryIndex );
 					contextData.occlusionQueryObjects[ contextData.occlusionQueryIndex ] = object;
 	
-					contextData.lastOcclusionObject = object;
-	
 				}
+
+				contextData.lastOcclusionObject = object;
 
 			}
 
