@@ -86,16 +86,19 @@
 				volumeMaterial.backdropNode = viewportSharedTexture();
 				volumeMaterial.backdropAlphaNode = depthAlphaNode;
 				volumeMaterial.transparent = true;
+				volumeMaterial.side = THREE.DoubleSide;
 
 				const depthMaterial = new MeshBasicNodeMaterial();
 				depthMaterial.backdropNode = depthAlphaNode;
 				depthMaterial.transparent = true;
+				depthMaterial.side = THREE.DoubleSide;
 
 				const bicubicMaterial = new MeshBasicNodeMaterial();
 				bicubicMaterial.backdropNode = viewportMipTexture().bicubic( 5 ); // @TODO: Move to alpha value [ 0, 1 ]
 				bicubicMaterial.backdropAlphaNode = checker( uv().mul( 3 ).mul( modelScale.xy ) );
 				bicubicMaterial.opacityNode = bicubicMaterial.backdropAlphaNode;
 				bicubicMaterial.transparent = true;
+				bicubicMaterial.side = THREE.DoubleSide;
 
 				const pixelMaterial = new MeshBasicNodeMaterial();
 				pixelMaterial.backdropNode = viewportSharedTexture( viewportTopLeft.mul( 100 ).floor().div( 100 ) );
@@ -105,14 +108,7 @@
 
 				const box = new THREE.Mesh( new THREE.BoxGeometry( 2, 2, 2 ), volumeMaterial );
 				box.position.set( 0, 1, 0 );
-				//box.material.side = THREE.DoubleSide; // @TODO: Needed add support to material.forceSinglePass = false;
 				scene.add( box );
-
-				const boxBack = new THREE.Mesh( new THREE.BoxGeometry( 2, 2, 2 ).scale( - 1, - 1, - 1 ), volumeMaterial );
-				boxBack.position.set( 0, 1, 0 );
-				boxBack.renderOrder = - 1;
-				boxBack.visible = false;
-				scene.add( boxBack );
 
 				const floor = new THREE.Mesh( new THREE.BoxGeometry( 1.99, .01, 1.99 ), new MeshBasicNodeMaterial( { color: 0x333333 } ) );
 				floor.position.set( 0, 0, 0 );
@@ -146,12 +142,11 @@
 				const gui = new GUI();
 				const options = { material: 'volume' };
 
-				gui.add( box.scale, 'x', 0.1, 2, 0.01 ).onChange( () => boxBack.scale.copy( box.scale ) );
-				gui.add( box.scale, 'z', 0.1, 2, 0.01 ).onChange( () => boxBack.scale.copy( box.scale ) );
+				gui.add( box.scale, 'x', 0.1, 2, 0.01 );
+				gui.add( box.scale, 'z', 0.1, 2, 0.01 );
 				gui.add( options, 'material', Object.keys( materials ) ).onChange( name => {
 
-					box.material = boxBack.material = materials[ name ];
-					boxBack.visible = ( name === 'bicubic' );
+					box.material = materials[ name ];
 
 				} );
 
