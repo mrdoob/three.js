@@ -8,7 +8,7 @@ import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebXRController } from './WebXRController.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedIntType, UnsignedInt248Type } from '../../constants.js';
+import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedIntType, UnsignedInt248Type, XRRightEyeLayer, XRLeftEyeLayer } from '../../constants.js';
 
 class WebXRManager extends EventDispatcher {
 
@@ -45,21 +45,22 @@ class WebXRManager extends EventDispatcher {
 		let userCamera = null;
 
 		const cameraL = new PerspectiveCamera();
-		cameraL.layers.enable( 1 );
+		cameraL.layers.enable( XRRightEyeLayer );
 		cameraL.viewport = new Vector4();
 
 		const cameraR = new PerspectiveCamera();
-		cameraR.layers.enable( 2 );
+		cameraR.layers.enable( XRLeftEyeLayer );
 		cameraR.viewport = new Vector4();
 
 		const cameras = [ cameraL, cameraR ];
 
 		const cameraXR = new ArrayCamera();
-		cameraXR.layers.enable( 1 );
-		cameraXR.layers.enable( 2 );
+		cameraXR.layers.enable( XRRightEyeLayer );
+		cameraXR.layers.enable( XRLeftEyeLayer );
 
 		let _currentDepthNear = null;
 		let _currentDepthFar = null;
+		let _currentCameraLayers = null;
 
 		//
 
@@ -169,6 +170,7 @@ class WebXRManager extends EventDispatcher {
 
 			_currentDepthNear = null;
 			_currentDepthFar = null;
+			_currentCameraLayers = null;
 
 			// restore framebuffer/rendering state
 
@@ -538,6 +540,17 @@ class WebXRManager extends EventDispatcher {
 				_currentDepthFar = cameraXR.far;
 
 			}
+
+			if ( _currentCameraLayers !== camera.layers.mask ) {
+
+				cameraL.layers.mask = camera.layers.mask | 1 << XRLeftEyeLayer;
+				cameraR.layers.mask = camera.layers.mask | 1 << XRRightEyeLayer;
+				cameraXR.layers.mask = camera.layers.mask | 1 << XRRightEyeLayer | 1 << XRLeftEyeLayer;
+
+				_currentCameraLayers = camera.layers.mask;
+
+			}
+
 
 			const parent = camera.parent;
 			const cameras = cameraXR.cameras;

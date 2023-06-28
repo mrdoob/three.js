@@ -53,6 +53,8 @@ export const ReinhardToneMapping = 2;
 export const CineonToneMapping = 3;
 export const ACESFilmicToneMapping = 4;
 export const CustomToneMapping = 5;
+export const XRRightEyeLayer = 1;
+export const XRLeftEyeLayer = 2;
 
 export const UVMapping = 300;
 export const CubeReflectionMapping = 301;
