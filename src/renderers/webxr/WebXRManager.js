@@ -45,18 +45,18 @@ class WebXRManager extends EventDispatcher {
 		let userCamera = null;
 
 		const cameraL = new PerspectiveCamera();
-		cameraL.layers.enable( XRRightEyeLayer );
+		cameraL.layers.enable( XRLeftEyeLayer );
 		cameraL.viewport = new Vector4();
 
 		const cameraR = new PerspectiveCamera();
-		cameraR.layers.enable( XRLeftEyeLayer );
+		cameraR.layers.enable( XRRightEyeLayer );
 		cameraR.viewport = new Vector4();
 
 		const cameras = [ cameraL, cameraR ];
 
 		const cameraXR = new ArrayCamera();
-		cameraXR.layers.enable( XRRightEyeLayer );
 		cameraXR.layers.enable( XRLeftEyeLayer );
+		cameraXR.layers.enable( XRRightEyeLayer );
 
 		let _currentDepthNear = null;
 		let _currentDepthFar = null;
