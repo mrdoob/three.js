@@ -79,7 +79,14 @@
 
 				// volume
 
-				const depthAlphaNode = depthTexture().distance( depth ).oneMinus().smoothstep( .90, 2 ).mul( 20 ).saturate();
+				const depthDistance = depthTexture().distance( depth );
+				const depthAlphaNode = depthDistance.oneMinus().smoothstep( .90, 2 ).mul( 20 ).saturate();
+				const depthBlurred = viewportMipTexture().bicubic( depthDistance.smoothstep( 0, .6 ).mul( 40 * 5 ).clamp( 0, 5 ) );
+
+				const blurredBlur = new MeshBasicNodeMaterial();
+				blurredBlur.backdropNode = depthBlurred.add( depthAlphaNode.mix( color( 0x0066ff ), 0 ) );
+				blurredBlur.transparent = true;
+				blurredBlur.side = THREE.DoubleSide;
 
 				const volumeMaterial = new MeshBasicNodeMaterial();
 				volumeMaterial.colorNode = color( 0x0066ff );
@@ -133,6 +140,7 @@
 				// gui
 
 				const materials = {
+					'blurred': blurredBlur,
 					'volume': volumeMaterial,
 					'depth': depthMaterial,
 					'bicubic': bicubicMaterial,
@@ -140,7 +148,9 @@
 				};
 
 				const gui = new GUI();
-				const options = { material: 'volume' };
+				const options = { material: 'blurred' };
+
+				box.material = materials[ options.material ];
 
 				gui.add( box.scale, 'x', 0.1, 2, 0.01 );
 				gui.add( box.scale, 'z', 0.1, 2, 0.01 );
