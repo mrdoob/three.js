@@ -422,6 +422,12 @@
 					"icon": "chart-treemap",
 					"children": [
 						{
+							"name": "UV",
+							"icon": "chart-treemap",
+							"nodeType": "vec2",
+							"editorClass": "UVEditor"
+						},
+						{
 							"name": "Matcap UV",
 							"icon": "chart-treemap",
 							"nodeType": "vec1",
@@ -432,12 +438,6 @@
 							"icon": "chart-treemap",
 							"nodeType": "vec1",
 							"shaderNode": "pointUV"
-						},
-						{
-							"name": "UV",
-							"icon": "chart-treemap",
-							"nodeType": "vec2",
-							"editorClass": "UVEditor"
 						}
 					]
 				},
