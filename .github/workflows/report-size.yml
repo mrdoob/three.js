@@ -29,7 +29,7 @@ jobs:
       # Using actions/download-artifact doesn't work here
       # https://github.com/actions/download-artifact/issues/60
       - name: Download artifact
-        uses: actions/github-script@v6
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6
         id: download-artifact
         with:
           result-encoding: string
@@ -56,9 +56,9 @@ jobs:
 
       # This runs on the base branch of the PR, meaning "dev"
       - name: Git checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
       - name: Install Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3
         with:
           node-version: 18
           cache: 'npm'
@@ -126,14 +126,14 @@ jobs:
           echo "TREESHAKEN_DIFF=$TREESHAKEN_DIFF" >> $GITHUB_OUTPUT
 
       - name: Find existing comment
-        uses: peter-evans/find-comment@v2
+        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2
         id: find-comment
         with:
           issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}
           comment-author: 'github-actions[bot]'
           body-includes: Bundle size
       - name: Comment on PR
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@c6c9a1a66007646a28c153e2a8580a5bad27bcfa # v3
         with:
           issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
