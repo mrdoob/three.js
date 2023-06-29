@@ -26227,8 +26227,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			//
 
-			let userCamera = null;
-
 			const cameraL = new PerspectiveCamera();
 			cameraL.layers.enable( 1 );
 			cameraL.viewport = new Vector4();
@@ -26248,18 +26246,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			//
 
-			this.cameraAutoUpdate = true; // @deprecated, r153
+			this.cameraAutoUpdate = true;
 			this.enabled = false;
 
 			this.isPresenting = false;
-
-			this.getCamera = function () {}; // @deprecated, r153
-
-			this.setUserCamera = function ( value ) {
-
-				userCamera = value;
-
-			};
 
 			this.getController = function ( index ) {
 
@@ -26697,15 +26687,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			this.updateCameraXR = function ( camera ) {
+			this.updateCamera = function ( camera ) {
 
-				if ( session === null ) return camera;
-
-				if ( userCamera ) {
-
-					camera = userCamera;
-
-				}
+				if ( session === null ) return;
 
 				cameraXR.near = cameraR.near = cameraL.near = camera.near;
 				cameraXR.far = cameraR.far = cameraL.far = camera.far;
@@ -26751,19 +26735,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				// update user camera and its children
 
-				if ( userCamera ) {
-
-					updateUserCamera( cameraXR, parent );
-
-				}
-
-				return cameraXR;
+				updateUserCamera( camera, cameraXR, parent );
 
 			};
 
-			function updateUserCamera( cameraXR, parent ) {
-
-				const camera = userCamera;
+			function updateUserCamera( camera, cameraXR, parent ) {
 
 				if ( parent === null ) {
 
@@ -26799,6 +26775,12 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				}
 
 			}
+
+			this.getCamera = function () {
+
+				return cameraXR;
+
+			};
 
 			this.getFoveation = function () {
 
@@ -28938,7 +28920,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				if ( xr.enabled === true && xr.isPresenting === true ) {
 
-					camera = xr.updateCameraXR( camera ); // use XR camera for rendering
+					if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
+
+					camera = xr.getCamera(); // use XR camera for rendering
 
 				}
 
