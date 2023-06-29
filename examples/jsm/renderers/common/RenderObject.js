@@ -21,6 +21,7 @@ export default class RenderObject {
 		this.attributes = null;
 		this.context = null;
 		this.pipeline = null;
+		this.vertexBuffers = null;
 
 		this._materialVersion = - 1;
 		this._materialCacheKey = '';
@@ -91,9 +92,7 @@ export default class RenderObject {
 
 	getVertexBuffers() {
 
-		if ( this.vertexBuffers !== null ) return this.vertexBuffers;
-
-		this.getAttributes();
+		if ( this.vertexBuffers === null ) this.getAttributes();
 
 		return this.vertexBuffers;
 
