@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '154dev';
+const REVISION = '154';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -26222,8 +26222,6 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
-		let userCamera = null;
-
 		const cameraL = new PerspectiveCamera();
 		cameraL.layers.enable( 1 );
 		cameraL.viewport = new Vector4();
@@ -26243,18 +26241,10 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
-		this.cameraAutoUpdate = true; // @deprecated, r153
+		this.cameraAutoUpdate = true;
 		this.enabled = false;
 
 		this.isPresenting = false;
-
-		this.getCamera = function () {}; // @deprecated, r153
-
-		this.setUserCamera = function ( value ) {
-
-			userCamera = value;
-
-		};
 
 		this.getController = function ( index ) {
 
@@ -26692,15 +26682,9 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
-		this.updateCameraXR = function ( camera ) {
+		this.updateCamera = function ( camera ) {
 
-			if ( session === null ) return camera;
-
-			if ( userCamera ) {
-
-				camera = userCamera;
-
-			}
+			if ( session === null ) return;
 
 			cameraXR.near = cameraR.near = cameraL.near = camera.near;
 			cameraXR.far = cameraR.far = cameraL.far = camera.far;
@@ -26746,19 +26730,11 @@ class WebXRManager extends EventDispatcher {
 
 			// update user camera and its children
 
-			if ( userCamera ) {
-
-				updateUserCamera( cameraXR, parent );
-
-			}
-
-			return cameraXR;
+			updateUserCamera( camera, cameraXR, parent );
 
 		};
 
-		function updateUserCamera( cameraXR, parent ) {
-
-			const camera = userCamera;
+		function updateUserCamera( camera, cameraXR, parent ) {
 
 			if ( parent === null ) {
 
@@ -26794,6 +26770,12 @@ class WebXRManager extends EventDispatcher {
 			}
 
 		}
+
+		this.getCamera = function () {
+
+			return cameraXR;
+
+		};
 
 		this.getFoveation = function () {
 
@@ -28933,7 +28915,9 @@ class WebGLRenderer {
 
 			if ( xr.enabled === true && xr.isPresenting === true ) {
 
-				camera = xr.updateCameraXR( camera ); // use XR camera for rendering
+				if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
+
+				camera = xr.getCamera(); // use XR camera for rendering
 
 			}
 
