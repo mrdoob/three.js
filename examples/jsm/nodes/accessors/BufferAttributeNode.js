@@ -29,7 +29,7 @@ class BufferAttributeNode extends InputNode {
 		const stride = this.bufferStride || itemSize;
 		const offset = this.bufferOffset;
 
-		const buffer = ( array.isInterleavedBuffer === undefined ) ? new InterleavedBuffer( array, stride ) : array;
+		const buffer = array.isInterleavedBuffer === true ? array : new InterleavedBuffer( array, stride );
 		const bufferAttribute = new InterleavedBufferAttribute( buffer, itemSize, offset );
 
 		buffer.setUsage( this.usage );
