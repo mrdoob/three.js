@@ -1,3 +1,5 @@
+import { NoColorSpace } from 'three';
+
 import UniformsGroup from '../../common/UniformsGroup.js';
 import {
 	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
@@ -96,11 +98,11 @@ fn threejs_repeatWrapping( uv : vec2<f32>, dimension : vec2<u32> ) -> vec2<u32> 
 ` )
 };
 
-class WebGPUNodeBuilder extends NodeBuilder {
+class WGSLNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer ) {
+	constructor( object, renderer, scene = null ) {
 
-		super( object, renderer, new WGSLNodeParser() );
+		super( object, renderer, new WGSLNodeParser(), scene );
 
 		this.uniformsGroup = {};
 
@@ -128,6 +130,12 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		}
 
 		return super.build();
+
+	}
+
+	needsColorSpaceToLinear( texture ) {
+
+		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
 
 	}
 
@@ -252,9 +260,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getUniformFromNode( node, type, shaderStage ) {
+	getUniformFromNode( node, type, shaderStage, name = null ) {
 
-		const uniformNode = super.getUniformFromNode( node, type, shaderStage );
+		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
 		if ( nodeData.uniformGPU === undefined ) {
@@ -392,6 +400,18 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
+	getVertexIndex() {
+
+		if ( this.shaderStage === 'vertex' ) {
+
+			return this.getBuiltin( 'vertex_index', 'vertexIndex', 'u32', 'attribute' );
+
+		}
+
+		return 'vertexIndex';
+
+	}
+
 	getInstanceIndex() {
 
 		if ( this.shaderStage === 'vertex' ) {
@@ -510,7 +530,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 					snippets.push( `${ attributesSnippet } ${ varying.name } : ${ this.getType( varying.type ) }` );
 
-				} else if ( vars.includes( varying ) === false ) {
+				} else if ( shaderStage === 'vertex' && vars.includes( varying ) === false ) {
 
 					vars.push( varying );
 
@@ -548,7 +568,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( shaderStage === 'fragment' ) {
 
-					bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name}_sampler : sampler;` );
+					bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler;` );
 
 				}
 
@@ -574,7 +594,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
-				bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : ${textureType};` );
+				bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name} : ${textureType};` );
 
 			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' ) {
 
@@ -855,4 +875,4 @@ var<${access}> ${name} : ${structName};`;
 
 }
 
-export default WebGPUNodeBuilder;
+export default WGSLNodeBuilder;

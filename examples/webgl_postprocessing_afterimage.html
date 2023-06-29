@@ -30,8 +30,7 @@
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { AfterimagePass } from 'three/addons/postprocessing/AfterimagePass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let camera, scene, renderer, composer;
 			let mesh;
@@ -53,6 +52,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -74,7 +74,7 @@
 				afterimagePass = new AfterimagePass();
 				composer.addPass( afterimagePass );
 
-				const outputPass = new ShaderPass( GammaCorrectionShader );
+				const outputPass = new OutputPass();
 				composer.addPass( outputPass );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -116,15 +116,10 @@
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
 
-				if ( params.enable ) {
+				afterimagePass.enabled = params.enable;
 
-					composer.render();
+				composer.render();
 
-				} else {
-
-					renderer.render( scene, camera );
-
-				}
 
 			}
 

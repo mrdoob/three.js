@@ -80,10 +80,8 @@ class VarNode extends Node {
 
 export default VarNode;
 
-export const label = nodeProxy( VarNode );
-export const temp = label;
+export const temp = nodeProxy( VarNode );
 
-addNodeElement( 'label', label );
 addNodeElement( 'temp', temp );
 
 addNodeClass( VarNode );

@@ -25,6 +25,16 @@ export default class RenderObject {
 		this._materialVersion = - 1;
 		this._materialCacheKey = '';
 
+		this.onDispose = null;
+
+		this.onMaterialDispose = () => {
+
+			this.dispose();
+
+		};
+
+		this.material.addEventListener( 'dispose', this.onMaterialDispose );
+
 	}
 
 	getNodeBuilder() {
@@ -89,6 +99,14 @@ export default class RenderObject {
 		cacheKey.push( 'nodes:' + this._nodes.getCacheKey( scene, lightsNode ) );
 
 		return '{' + cacheKey.join( ',' ) + '}';
+
+	}
+
+	dispose() {
+
+		this.material.removeEventListener( 'dispose', this.onMaterialDispose );
+
+		this.onDispose();
 
 	}
 

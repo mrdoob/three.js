@@ -66,6 +66,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
 				// Materials
@@ -150,9 +151,9 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0xc1c1c1 ) );
+				scene.add( new THREE.AmbientLight( 0xc1c1c1, 3 ) );
 
-				const pointLight = new THREE.PointLight( 0xffffff, 2, 800 );
+				const pointLight = new THREE.PointLight( 0xffffff, 2, 800, 0 );
 				particleLight.add( pointLight );
 
 				//

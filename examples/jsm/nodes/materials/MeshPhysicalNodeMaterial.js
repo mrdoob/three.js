@@ -1,4 +1,9 @@
 import { addNodeMaterial } from './NodeMaterial.js';
+import { transformedClearcoatNormalView } from '../accessors/NormalNode.js';
+import { clearcoat, clearcoatRoughness, sheen, sheenRoughness } from '../core/PropertyNode.js';
+import { materialClearcoatNormal } from '../accessors/ExtendedMaterialNode.js';
+import { materialClearcoat, materialClearcoatRoughness, materialSheen, materialSheenRoughness } from '../accessors/MaterialNode.js';
+import { float, vec3 } from '../shadernode/ShaderNode.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
 
 import { MeshPhysicalMaterial } from 'three';
@@ -35,6 +40,42 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.setDefaultValues( defaultValues );
 
 		this.setValues( parameters );
+
+	}
+
+	constructVariants( builder ) {
+
+		super.constructVariants( builder );
+
+		const { stack } = builder;
+
+		// CLEARCOAT
+
+		const clearcoatNode = this.clearcoatNode ? float( this.clearcoatNode ) : materialClearcoat;
+		const clearcoatRoughnessNode = this.clearcoatRoughnessNode ? float( this.clearcoatRoughnessNode ) : materialClearcoatRoughness;
+
+		stack.assign( clearcoat, clearcoatNode );
+		stack.assign( clearcoatRoughness, clearcoatRoughnessNode );
+
+		// SHEEN
+
+		const sheenNode = this.sheenNode ? vec3( this.sheenNode ) : materialSheen;
+		const sheenRoughnessNode = this.sheenRoughnessNode ? float( this.sheenRoughnessNode ) : materialSheenRoughness;
+
+		stack.assign( sheen, sheenNode );
+		stack.assign( sheenRoughness, sheenRoughnessNode );
+
+	}
+
+	constructNormal( builder ) {
+
+		super.constructNormal( builder );
+
+		// CLEARCOAT NORMAL
+
+		const clearcoatNormalNode = this.clearcoatNormalNode ? vec3( this.clearcoatNormalNode ) : materialClearcoatNormal;
+
+		builder.stack.assign( transformedClearcoatNormalView, clearcoatNormalNode );
 
 	}
 

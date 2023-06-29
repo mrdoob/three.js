@@ -91,6 +91,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
 				const width = window.innerWidth || 2;

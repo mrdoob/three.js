@@ -86,7 +86,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	createTexture( texture ) {
+	createTexture( texture, options = {} ) {
 
 		const backend = this.backend;
 		const textureData = backend.get( texture );
@@ -104,9 +104,9 @@ class WebGPUTextureUtils {
 		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
 		const format = texture.internalFormat || this._getFormat( texture );
 		//const sampleCount = texture.isRenderTargetTexture || texture.isDepthTexture ? backend.utils.getSampleCount( renderContext ) : 1;
-		const sampleCount = 1;
+		const sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
 
-		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
+		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC;
 
 		if ( texture.isCompressedTexture !== true ) {
 
@@ -242,6 +242,52 @@ class WebGPUTextureUtils {
 		//
 
 		textureData.version = texture.version;
+
+	}
+
+	async copyTextureToBuffer( texture, x, y, width, height ) {
+
+		const device = this.backend.device;
+
+		const textureData = this.backend.get( texture );
+		const textureGPU = textureData.texture;
+		const format = textureData.textureDescriptorGPU.format;
+		const bytesPerTexel = this._getBytesPerTexel( format );
+
+		const readBuffer = device.createBuffer(
+			{
+				size: width * height * bytesPerTexel,
+				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+			}
+		);
+
+		const encoder = device.createCommandEncoder();
+
+		encoder.copyTextureToBuffer(
+			{
+				texture: textureGPU,
+				origin: { x, y },
+			},
+			{
+				buffer: readBuffer,
+				bytesPerRow: width * bytesPerTexel
+			},
+			{
+				width: width,
+				height: height
+			}
+
+		);
+
+		const typedArrayType = this._getTypedArrayType( format );
+
+		device.queue.submit( [ encoder.finish() ] );
+
+		await readBuffer.mapAsync( GPUMapMode.READ );
+
+		const buffer = readBuffer.getMappedRange();
+
+		return new typedArrayType( buffer );
 
 	}
 
@@ -576,6 +622,42 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.RG32Float ) return 8;
 		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
 		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
+
+	}
+
+	_getTypedArrayType( format ) {
+
+		if ( format === GPUTextureFormat.R8Uint ) return Uint8Array;
+		if ( format === GPUTextureFormat.R8Sint ) return Int8Array;
+		if ( format === GPUTextureFormat.R8Unorm ) return Uint8Array;
+		if ( format === GPUTextureFormat.R8Snorm ) return Int8Array;
+		if ( format === GPUTextureFormat.RG8Uint ) return Uint8Array;
+		if ( format === GPUTextureFormat.RG8Sint ) return Int8Array;
+		if ( format === GPUTextureFormat.RG8Unorm ) return Uint8Array;
+		if ( format === GPUTextureFormat.RG8Snorm ) return Int8Array;
+		if ( format === GPUTextureFormat.RGBA8Uint ) return Uint8Array;
+		if ( format === GPUTextureFormat.RGBA8Sint ) return Int8Array;
+		if ( format === GPUTextureFormat.RGBA8Unorm ) return Uint8Array;
+		if ( format === GPUTextureFormat.RGBA8Snorm ) return Int8Array;
+
+
+		if ( format === GPUTextureFormat.R16Uint ) return Uint16Array;
+		if ( format === GPUTextureFormat.R16Sint ) return Int16Array;
+		if ( format === GPUTextureFormat.RG16Uint ) return Uint16Array;
+		if ( format === GPUTextureFormat.RG16Sint ) return Int16Array;
+		if ( format === GPUTextureFormat.RGBA16Uint ) return Uint16Array;
+		if ( format === GPUTextureFormat.RGBA16Sint ) return Int16Array;
+
+
+		if ( format === GPUTextureFormat.R32Uint ) return Uint32Array;
+		if ( format === GPUTextureFormat.R32Sint ) return Int32Array;
+		if ( format === GPUTextureFormat.R32Float ) return Float32Array;
+		if ( format === GPUTextureFormat.RG32Uint ) return Uint32Array;
+		if ( format === GPUTextureFormat.RG32Sint ) return Int32Array;
+		if ( format === GPUTextureFormat.RG32Float ) return Float32Array;
+		if ( format === GPUTextureFormat.RGBA32Uint ) return Uint32Array;
+		if ( format === GPUTextureFormat.RGBA32Sint ) return Int32Array;
+		if ( format === GPUTextureFormat.RGBA32Float ) return Float32Array;
 
 	}
 

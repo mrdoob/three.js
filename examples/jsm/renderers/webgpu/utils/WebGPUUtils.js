@@ -16,9 +16,13 @@ class WebGPUUtils {
 
 			format = this.getTextureFormatGPU( renderContext.depthTexture );
 
-		} else {
+		} else if ( renderContext.depth && renderContext.stencil ) {
 
 			format = GPUTextureFormat.Depth24PlusStencil8;
+
+		} else if ( renderContext.depth ) {
+
+			format = GPUTextureFormat.Depth24Plus;
 
 		}
 

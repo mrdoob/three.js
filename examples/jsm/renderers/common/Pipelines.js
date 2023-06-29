@@ -33,7 +33,7 @@ class Pipelines extends DataMap {
 
 			// release previous cache
 
-			this._releasePipeline( computeNode );
+			const previousPipeline = this._releasePipeline( computeNode );
 
 			// get shader
 
@@ -44,6 +44,8 @@ class Pipelines extends DataMap {
 			let stageCompute = this.programs.compute.get( nodeBuilder.computeShader );
 
 			if ( stageCompute === undefined ) {
+
+				if ( previousPipeline ) this._releaseProgram( previousPipeline.computeShader );
 
 				stageCompute = new ProgrammableStage( nodeBuilder.computeShader, 'compute' );
 				this.programs.compute.set( nodeBuilder.computeShader, stageCompute );
@@ -81,7 +83,7 @@ class Pipelines extends DataMap {
 
 			// release previous cache
 
-			this._releasePipeline( renderObject );
+			const previousPipeline = this._releasePipeline( renderObject );
 
 			// get shader
 
@@ -93,6 +95,8 @@ class Pipelines extends DataMap {
 
 			if ( stageVertex === undefined ) {
 
+				if ( previousPipeline ) this._releaseProgram( previousPipeline.vertexProgram );
+
 				stageVertex = new ProgrammableStage( nodeBuilder.vertexShader, 'vertex' );
 				this.programs.vertex.set( nodeBuilder.vertexShader, stageVertex );
 
@@ -103,6 +107,8 @@ class Pipelines extends DataMap {
 			let stageFragment = this.programs.fragment.get( nodeBuilder.fragmentShader );
 
 			if ( stageFragment === undefined ) {
+
+				if ( previousPipeline ) this._releaseProgram( previousPipeline.fragmentShader );
 
 				stageFragment = new ProgrammableStage( nodeBuilder.fragmentShader, 'fragment' );
 				this.programs.fragment.set( nodeBuilder.fragmentShader, stageFragment );
@@ -133,7 +139,22 @@ class Pipelines extends DataMap {
 
 	delete( object ) {
 
-		this._releasePipeline( object );
+		const pipeline = this._releasePipeline( object );
+
+		if ( pipeline && pipeline.usedTimes === 0 ) {
+
+			if ( pipeline.isComputePipeline ) {
+
+				this._releaseProgram( pipeline.computeProgram );
+
+			} else {
+
+				this._releaseProgram( pipeline.vertexProgram );
+				this._releaseProgram( pipeline.fragmentProgram );
+
+			}
+
+		}
 
 		super.delete( object );
 
@@ -236,18 +257,9 @@ class Pipelines extends DataMap {
 
 			this.caches.delete( pipeline.cacheKey );
 
-			if ( pipeline.isComputePipeline ) {
-
-				this._releaseProgram( pipeline.computeProgram );
-
-			} else {
-
-				this._releaseProgram( pipeline.vertexProgram );
-				this._releaseProgram( pipeline.fragmentProgram );
-
-			}
-
 		}
+
+		return pipeline;
 
 	}
 

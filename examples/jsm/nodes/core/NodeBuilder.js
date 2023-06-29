@@ -43,13 +43,14 @@ const toFloat = ( value ) => {
 
 class NodeBuilder {
 
-	constructor( object, renderer, parser ) {
+	constructor( object, renderer, parser, scene = null ) {
 
 		this.object = object;
-		this.material = object && ( object.material || null );
-		this.geometry = object && ( object.geometry || null );
+		this.material = ( object && object.material ) || null;
+		this.geometry = ( object && object.geometry ) || null;
 		this.renderer = renderer;
 		this.parser = parser;
+		this.scene = scene;
 
 		this.nodes = [];
 		this.updateNodes = [];
@@ -94,6 +95,12 @@ class NodeBuilder {
 
 		this.shaderStage = null;
 		this.buildStage = null;
+
+	}
+
+	includes( node ) {
+
+		return this.nodes.includes( node );
 
 	}
 
@@ -225,6 +232,12 @@ class NodeBuilder {
 	isAvailable( /*name*/ ) {
 
 		return false;
+
+	}
+
+	getVertexIndex() {
+
+		console.warn( 'Abstract function.' );
 
 	}
 
@@ -381,6 +394,12 @@ class NodeBuilder {
 	isReference( type ) {
 
 		return type === 'void' || type === 'property' || type === 'sampler' || type === 'texture' || type === 'cubeTexture';
+
+	}
+
+	needsColorSpaceToLinear( /*texture*/ ) {
+
+		return false;
 
 	}
 
@@ -582,7 +601,7 @@ class NodeBuilder {
 
 	}
 
-	getUniformFromNode( node, type, shaderStage = this.shaderStage ) {
+	getUniformFromNode( node, type, shaderStage = this.shaderStage, name = null ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
@@ -592,7 +611,7 @@ class NodeBuilder {
 
 			const index = this.uniforms.index ++;
 
-			nodeUniform = new NodeUniform( 'nodeUniform' + index, type, node );
+			nodeUniform = new NodeUniform( name || ( 'nodeUniform' + index ), type, node );
 
 			this.uniforms[ shaderStage ].push( nodeUniform );
 

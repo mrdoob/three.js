@@ -97,11 +97,12 @@
 				};
 				loadModel( );
 
-				const pointLight = new THREE.PointLight( 0xffffff, 1 );
+				const pointLight = new THREE.PointLight( 0xffffff, 3, 0, 0 );
 				perpCamera.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.autoClear = false;
+				renderer.useLegacyLights = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );

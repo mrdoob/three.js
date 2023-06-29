@@ -3710,7 +3710,10 @@ class ColladaLoader extends Loader {
 
 		}
 
-		const fallbackMaterial = new MeshBasicMaterial( { color: 0xff00ff } );
+		const fallbackMaterial = new MeshBasicMaterial( {
+			name: Loader.DEFAULT_MATERIAL_NAME,
+			color: 0xff00ff
+		} );
 
 		function resolveMaterialBinding( keys, instanceMaterials ) {
 

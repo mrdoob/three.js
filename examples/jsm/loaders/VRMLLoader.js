@@ -960,7 +960,10 @@ class VRMLLoader extends Loader {
 
 			// if the appearance field is NULL or unspecified, lighting is off and the unlit object color is (0, 0, 0)
 
-			let material = new MeshBasicMaterial( { color: 0x000000 } );
+			let material = new MeshBasicMaterial( { 
+				name: Loader.DEFAULT_MATERIAL_NAME,
+				color: 0x000000
+			} );
 			let geometry;
 
 			for ( let i = 0, l = fields.length; i < l; i ++ ) {
@@ -1007,7 +1010,10 @@ class VRMLLoader extends Loader {
 
 				if ( type === 'points' ) { // points
 
-					const pointsMaterial = new PointsMaterial( { color: 0xffffff } );
+					const pointsMaterial = new PointsMaterial( {
+						name: Loader.DEFAULT_MATERIAL_NAME,
+						color: 0xffffff
+					} );
 
 					if ( geometry.attributes.color !== undefined ) {
 
@@ -1029,7 +1035,10 @@ class VRMLLoader extends Loader {
 
 				} else if ( type === 'line' ) { // lines
 
-					const lineMaterial = new LineBasicMaterial( { color: 0xffffff } );
+					const lineMaterial = new LineBasicMaterial( {
+						name: Loader.DEFAULT_MATERIAL_NAME,
+						color: 0xffffff
+					} );
 
 					if ( geometry.attributes.color !== undefined ) {
 
@@ -1116,7 +1125,10 @@ class VRMLLoader extends Loader {
 
 							// if the material field is NULL or unspecified, lighting is off and the unlit object color is (0, 0, 0)
 
-							material = new MeshBasicMaterial( { color: 0x000000 } );
+							material = new MeshBasicMaterial( {
+								name: Loader.DEFAULT_MATERIAL_NAME,
+								color: 0x000000
+							} );
 
 						}
 

@@ -1,10 +1,10 @@
-import { code } from '../../code/CodeNode.js';
-import { fn } from '../../code/FunctionNode.js';
+import { glsl } from '../../code/CodeNode.js';
+import { glslFn } from '../../code/FunctionNode.js';
 
 // Original shader code from:
 // https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_transform_color.glsl
 
-export const mx_transform_color = code( `#define M_AP1_TO_REC709 mat3(1.705079555511475, -0.1297005265951157, -0.02416634373366833, -0.6242334842681885, 1.138468623161316, -0.1246141716837883, -0.0808461606502533, -0.008768022060394287, 1.148780584335327)
+export const mx_transform_color = glsl( `#define M_AP1_TO_REC709 mat3(1.705079555511475, -0.1297005265951157, -0.02416634373366833, -0.6242334842681885, 1.138468623161316, -0.1246141716837883, -0.0808461606502533, -0.008768022060394287, 1.148780584335327)
 
 vec3 mx_srgb_texture_to_lin_rec709(vec3 color)
 {
@@ -16,4 +16,4 @@ vec3 mx_srgb_texture_to_lin_rec709(vec3 color)
 
 const includes = [ mx_transform_color ];
 
-export const mx_srgb_texture_to_lin_rec709 = fn( 'vec3 mx_srgb_texture_to_lin_rec709( vec3 color )', includes );
+export const mx_srgb_texture_to_lin_rec709 = glslFn( 'vec3 mx_srgb_texture_to_lin_rec709( vec3 color )', includes );

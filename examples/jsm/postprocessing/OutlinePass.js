@@ -96,7 +96,6 @@ class OutlinePass extends Pass {
 		const copyShader = CopyShader;
 
 		this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
-		this.copyUniforms[ 'opacity' ].value = 1.0;
 
 		this.materialCopy = new ShaderMaterial( {
 			uniforms: this.copyUniforms,
@@ -104,8 +103,7 @@ class OutlinePass extends Pass {
 			fragmentShader: copyShader.fragmentShader,
 			blending: NoBlending,
 			depthTest: false,
-			depthWrite: false,
-			transparent: true
+			depthWrite: false
 		} );
 
 		this.enabled = true;

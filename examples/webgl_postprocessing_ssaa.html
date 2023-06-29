@@ -36,9 +36,8 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 			import { SSAARenderPass } from 'three/addons/postprocessing/SSAARenderPass.js';
-			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let scene, renderer, composer;
 			let cameraP, ssaaRenderPassP;
@@ -98,6 +97,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( devicePixelRatio );
 				renderer.setSize( width, height );
+				renderer.useLegacyLights = false;
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -121,25 +121,25 @@
 				const group = new THREE.Group();
 				scene.add( group );
 
-				const light = new THREE.PointLight( 0xefffef, 0.8 );
-				light.position.z = 70;
-				light.position.y = - 70;
-				light.position.x = - 70;
+				const light = new THREE.PointLight( 0xefffef, 500 );
+				light.position.z = 10;
+				light.position.y = - 10;
+				light.position.x = - 10;
 				scene.add( light );
 
-				const light2 = new THREE.PointLight( 0xffefef, 0.8 );
-				light2.position.z = 70;
-				light2.position.x = - 70;
-				light2.position.y = 70;
+				const light2 = new THREE.PointLight( 0xffefef, 500 );
+				light2.position.z = 10;
+				light2.position.x = - 10;
+				light2.position.y = 10;
 				scene.add( light2 );
 
-				const light3 = new THREE.PointLight( 0xefefff, 0.8 );
-				light3.position.z = 70;
-				light3.position.x = 70;
-				light3.position.y = - 70;
+				const light3 = new THREE.PointLight( 0xefefff, 500 );
+				light3.position.z = 10;
+				light3.position.x = 10;
+				light3.position.y = - 10;
 				scene.add( light3 );
 
-				const light4 = new THREE.AmbientLight( 0xffffff, 0.05 );
+				const light4 = new THREE.AmbientLight( 0xffffff, 0.2 );
 				scene.add( light4 );
 
 				const geometry = new THREE.SphereGeometry( 3, 48, 24 );
@@ -172,7 +172,7 @@
 				composer.addPass( ssaaRenderPassP );
 				ssaaRenderPassO = new SSAARenderPass( scene, cameraO );
 				composer.addPass( ssaaRenderPassO );
-				const outputPass = new ShaderPass( GammaCorrectionShader );
+				const outputPass = new OutputPass();
 				composer.addPass( outputPass );
 
 				window.addEventListener( 'resize', onWindowResize );

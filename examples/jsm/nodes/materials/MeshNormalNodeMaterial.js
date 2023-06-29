@@ -31,16 +31,6 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 	}
 
-	copy( source ) {
-
-		this.opacityNode = source.opacityNode;
-
-		this.positionNode = source.positionNode;
-
-		return super.copy( source );
-
-	}
-
 }
 
 export default MeshNormalNodeMaterial;

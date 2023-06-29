@@ -17,6 +17,7 @@ class BufferAttributeNode extends InputNode {
 		this.bufferOffset = bufferOffset;
 
 		this.usage = StaticDrawUsage;
+		this.instanced = false;
 
 	}
 
@@ -34,7 +35,7 @@ class BufferAttributeNode extends InputNode {
 		buffer.setUsage( this.usage );
 
 		this.attribute = bufferAttribute;
-		this.attribute.isInstancedBufferAttribute = true; // @TODO: Add a possible: InstancedInterleavedBufferAttribute
+		this.attribute.isInstancedBufferAttribute = this.instanced; // @TODO: Add a possible: InstancedInterleavedBufferAttribute
 
 	}
 
@@ -69,18 +70,30 @@ class BufferAttributeNode extends InputNode {
 
 	}
 
+	setUsage( value ) {
+
+		this.usage = value;
+
+		return this;
+
+	}
+
+	setInstanced( value ) {
+
+		this.instanced = value;
+
+		return this;
+
+	}
+
 }
 
 export default BufferAttributeNode;
 
 export const bufferAttribute = ( array, type, stride, offset ) => nodeObject( new BufferAttributeNode( array, type, stride, offset ) );
-export const dynamicBufferAttribute = ( array, type, stride, offset ) => {
+export const dynamicBufferAttribute = ( array, type, stride, offset ) => bufferAttribute( array, type, stride, offset ).setUsage( DynamicDrawUsage );
 
-	const node = bufferAttribute( array, type, stride, offset );
-	node.usage = DynamicDrawUsage;
-
-	return node;
-
-};
+export const instancedBufferAttribute = ( array, type, stride, offset ) => bufferAttribute( array, type, stride, offset ).setInstanced( true );
+export const instancedDynamicBufferAttribute = ( array, type, stride, offset ) => dynamicBufferAttribute( array, type, stride, offset ).setInstanced( true );
 
 addNodeClass( BufferAttributeNode );

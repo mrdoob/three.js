@@ -1,5 +1,5 @@
 import Node, { addNodeClass } from '../core/Node.js';
-import { bufferAttribute, dynamicBufferAttribute } from './BufferAttributeNode.js';
+import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './BufferAttributeNode.js';
 import { normalLocal } from './NormalNode.js';
 import { positionLocal } from './PositionNode.js';
 import { nodeProxy, vec3, mat3, mat4 } from '../shadernode/ShaderNode.js';
@@ -27,7 +27,7 @@ class InstanceNode extends Node {
 			const instaceAttribute = instanceMesh.instanceMatrix;
 			const array = instaceAttribute.array;
 
-			const bufferFn = instaceAttribute.usage === DynamicDrawUsage ? dynamicBufferAttribute : bufferAttribute;
+			const bufferFn = instaceAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
 
 			const instanceBuffers = [
 				// F.Signature -> bufferAttribute( array, type, stride, offset )
@@ -59,8 +59,6 @@ class InstanceNode extends Node {
 
 		builder.stack.assign( positionLocal, instancePosition );
 		builder.stack.assign( normalLocal, instanceNormal );
-
-		return builder.stack;
 
 	}
 

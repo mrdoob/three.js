@@ -82,7 +82,7 @@ class StackNode extends Node {
 
 		for ( const node of this.nodes ) {
 
-			node.build( builder );
+			node.build( builder, 'void' );
 
 		}
 

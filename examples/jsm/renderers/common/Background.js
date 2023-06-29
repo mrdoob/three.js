@@ -1,6 +1,6 @@
 import DataMap from './DataMap.js';
-import { Color, Mesh, BoxGeometry, BackSide } from 'three';
-import { context, positionWorldDirection, MeshBasicNodeMaterial } from '../../nodes/Nodes.js';
+import { Color, Mesh, SphereGeometry, BackSide } from 'three';
+import { context, positionWorldDirection, backgroundBlurriness, MeshBasicNodeMaterial } from '../../nodes/Nodes.js';
 
 let _clearAlpha;
 const _clearColor = new Color();
@@ -30,14 +30,14 @@ class Background extends DataMap {
 
 			// no background settings, use clear color configuration from the renderer
 
-			_clearColor.copy( renderer._clearColor );
+			_clearColor.copyLinearToSRGB( renderer._clearColor );
 			_clearAlpha = renderer._clearAlpha;
 
 		} else if ( background.isColor === true ) {
 
 			// background is an opaque color
 
-			_clearColor.copy( background );
+			_clearColor.copyLinearToSRGB( background );
 			_clearAlpha = 1;
 			forceClear = true;
 
@@ -55,7 +55,8 @@ class Background extends DataMap {
 
 				this.boxMeshNode = context( backgroundNode, {
 					// @TODO: Add Texture2D support using node context
-					getUVNode: () => positionWorldDirection
+					getUVNode: () => positionWorldDirection,
+					getSamplerLevelNode: () => backgroundBlurriness
 				} );
 
 				const nodeMaterial = new MeshBasicNodeMaterial();
@@ -65,7 +66,7 @@ class Background extends DataMap {
 				nodeMaterial.depthWrite = false;
 				nodeMaterial.fog = false;
 
-				this.boxMesh = boxMesh = new Mesh( new BoxGeometry( 1, 1, 1 ), nodeMaterial );
+				this.boxMesh = boxMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );
 				boxMesh.frustumCulled = false;
 
 				boxMesh.onBeforeRender = function ( renderer, scene, camera ) {

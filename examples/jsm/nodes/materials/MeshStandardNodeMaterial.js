@@ -46,7 +46,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 		// ROUGHNESS
 
 		let roughnessNode = this.roughnessNode ? float( this.roughnessNode ) : materialRoughness;
-		roughnessNode = getRoughness.call( { roughness: roughnessNode } );
+		roughnessNode = getRoughness( { roughness: roughnessNode } );
 
 		stack.assign( roughness, roughnessNode );
 
@@ -64,23 +64,10 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	copy( source ) {
 
-		this.colorNode = source.colorNode;
-		this.opacityNode = source.opacityNode;
-
-		this.alphaTestNode = source.alphaTestNode;
-
-		this.normalNode = source.normalNode;
-
 		this.emissiveNode = source.emissiveNode;
 
 		this.metalnessNode = source.metalnessNode;
 		this.roughnessNode = source.roughnessNode;
-
-		this.envNode = source.envNode;
-
-		this.lightsNode = source.lightsNode;
-
-		this.positionNode = source.positionNode;
 
 		return super.copy( source );
 

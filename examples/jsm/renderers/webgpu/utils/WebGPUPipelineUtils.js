@@ -1,7 +1,7 @@
 import { BlendColorFactor, OneMinusBlendColorFactor, } from '../../common/Constants.js';
 
 import {
-	GPUInputStepMode, GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation
+	GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation
 } from './WebGPUConstants.js';
 
 import {
@@ -44,26 +44,24 @@ class WebGPUPipelineUtils {
 
 		for ( const attribute of shaderAttributes ) {
 
-			const geometryAttribute = attribute.geometryAttribute;
-			const stepMode = ( geometryAttribute !== undefined && geometryAttribute.isInstancedBufferAttribute ) ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
-
 			vertexBuffers.push( {
 				arrayStride: attribute.arrayStride,
 				attributes: [ { shaderLocation: attribute.slot, offset: attribute.offset, format: attribute.format } ],
-				stepMode: stepMode
+				stepMode: attribute.stepMode
 			} );
 
 		}
 
 		// blending
 
-		let alphaBlend = {};
-		let colorBlend = {};
+		let blending;
 
 		if ( material.transparent === true && material.blending !== NoBlending ) {
 
-			alphaBlend = this._getAlphaBlend( material );
-			colorBlend = this._getColorBlend( material );
+			blending = {
+				alpha: this._getAlphaBlend( material ),
+				color: this._getColorBlend( material )
+			};
 
 		}
 
@@ -98,10 +96,7 @@ class WebGPUPipelineUtils {
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
 			fragment: Object.assign( {}, fragmentModule, { targets: [ {
 				format: colorFormat,
-				blend: {
-					alpha: alphaBlend,
-					color: colorBlend
-				},
+				blend: blending,
 				writeMask: colorWriteMask
 			} ] } ),
 			primitive: primitiveState,

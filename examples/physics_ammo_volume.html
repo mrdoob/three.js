@@ -94,9 +94,10 @@
 
 				camera.position.set( - 7, 5, 8 );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
@@ -106,10 +107,10 @@
 
 				textureLoader = new THREE.TextureLoader();
 
-				const ambientLight = new THREE.AmbientLight( 0x404040 );
+				const ambientLight = new THREE.AmbientLight( 0xbbbbbb );
 				scene.add( ambientLight );
 
-				const light = new THREE.DirectionalLight( 0xffffff, 1 );
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
 				light.position.set( - 10, 10, 5 );
 				light.castShadow = true;
 				const d = 20;

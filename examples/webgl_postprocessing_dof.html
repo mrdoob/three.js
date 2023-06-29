@@ -36,8 +36,7 @@
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let camera, scene, renderer, stats,
 				singleMaterial, zmaterial,
@@ -71,6 +70,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
+				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
 				const path = 'textures/cube/SwedishRoyalCastle/';
@@ -212,7 +212,7 @@
 					maxblur: 0.01
 				} );
 
-				const outputPass = new ShaderPass( GammaCorrectionShader );
+				const outputPass = new OutputPass();
 
 				const composer = new EffectComposer( renderer );
 

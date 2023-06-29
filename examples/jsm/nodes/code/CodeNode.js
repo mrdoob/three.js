@@ -70,6 +70,9 @@ class CodeNode extends Node {
 export default CodeNode;
 
 export const code = nodeProxy( CodeNode );
+
 export const js = ( src, includes ) => code( src, includes, 'js' );
+export const wgsl = ( src, includes ) => code( src, includes, 'wgsl' );
+export const glsl = ( src, includes ) => code( src, includes, 'glsl' );
 
 addNodeClass( CodeNode );

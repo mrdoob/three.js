@@ -49,7 +49,7 @@
 					"three/addons/": "./jsm/",
 					"three/examples/": "./",
 					"three-gpu-pathtracer": "https://unpkg.com/three-gpu-pathtracer@0.0.14/build/index.module.js",
-					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@^0.5.21/build/index.module.js"
+					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.6.0/build/index.module.js"
 				}
 			}
 		</script>
@@ -104,6 +104,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true, preserveDrawingBuffer: true, premultipliedAlpha: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.useLegacyLights = false;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.setClearColor( 0xdddddd );
 				document.body.appendChild( renderer.domElement );
