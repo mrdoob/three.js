@@ -85,6 +85,7 @@ const exceptionList = [
 	'webgl_loader_imagebitmap',
 	'webgl_loader_texture_lottie',
 	'webgl_loader_texture_pvrtc',
+	'webgl_materials_alphahash',
 	'webgl_materials_blending',
 	'webgl_mirror',
 	'webgl_morphtargets_face',
