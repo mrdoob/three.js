@@ -73,7 +73,7 @@ export default class RenderObject {
 
 		for ( const nodeAttribute of nodeAttributes ) {
 
-			let attribute = nodeAttribute.node && nodeAttribute.node.attribute ? nodeAttribute.node.attribute : geometry.getAttribute( nodeAttribute.name );
+			const attribute = nodeAttribute.node && nodeAttribute.node.attribute ? nodeAttribute.node.attribute : geometry.getAttribute( nodeAttribute.name );
 
 			attributes.push( attribute );
 
