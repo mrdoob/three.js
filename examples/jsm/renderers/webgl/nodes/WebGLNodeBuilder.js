@@ -126,7 +126,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 				node: material.colorNode,
 				nodeType: 'vec4',
 				source: 'vec4 diffuseColor = vec4( diffuse, opacity );',
-				target: 'vec4 diffuseColor = %RESULT%;'
+				target: 'vec4 diffuseColor = %RESULT%; diffuseColor.a *= opacity;',
 			} ) );
 
 		}
