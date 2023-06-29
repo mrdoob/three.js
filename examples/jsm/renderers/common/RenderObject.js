@@ -69,16 +69,33 @@ export default class RenderObject {
 		const geometry = this.geometry;
 
 		const attributes = [];
+		const vertexBuffers = new Set();
 
 		for ( const nodeAttribute of nodeAttributes ) {
 
-			attributes.push( nodeAttribute.node && nodeAttribute.node.attribute ? nodeAttribute.node.attribute : geometry.getAttribute( nodeAttribute.name ) );
+			let attribute = nodeAttribute.node && nodeAttribute.node.attribute ? nodeAttribute.node.attribute : geometry.getAttribute( nodeAttribute.name );
+
+			attributes.push( attribute );
+
+			const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
+			vertexBuffers.add( bufferAttribute );
 
 		}
 
 		this.attributes = attributes;
+		this.vertexBuffers = Array.from( vertexBuffers.values() );
 
 		return attributes;
+
+	}
+
+	getVertexBuffers() {
+
+		if ( this.vertexBuffers !== null ) return this.vertexBuffers;
+
+		this.getAttributes();
+
+		return this.vertexBuffers;
 
 	}
 
