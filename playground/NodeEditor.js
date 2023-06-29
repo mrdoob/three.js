@@ -682,7 +682,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 				const visible = buttonLabel.indexOf( value ) !== - 1;
 
-				if ( visible && button.parent !== null ) {
+				if ( visible && button.parent !== null && button.children.length === 0 ) {
 
 					nodeButtonsVisible.push( button );
 
