@@ -120,8 +120,7 @@ class WebGPUAttributeUtils {
 				if ( geometryAttribute.isInterleavedBufferAttribute === true ) {
 
 					arrayStride = geometryAttribute.data.stride * bytesPerElement;
-//					stepMode = geometryAttribute.data.isInstancedInterleavedBuffer ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
-					stepMode = GPUInputStepMode.Instance;
+					stepMode = geometryAttribute.data.isInstancedInterleavedBuffer ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
 
 				} else {
 
@@ -136,12 +135,8 @@ class WebGPUAttributeUtils {
 					stepMode
 				};
 
-				console.log( 'non cache', geometryAttribute );
-
 				vertexBuffers.set( bufferAttribute, vertexBufferLayout );
 
-			} else {
-				console.log( 'cache', geometryAttribute );
 			}
 
 			const format = this._getVertexFormat( geometryAttribute );
