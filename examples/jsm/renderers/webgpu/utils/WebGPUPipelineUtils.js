@@ -37,7 +37,7 @@ class WebGPUPipelineUtils {
 		// vertex buffers
 
 		const vertexBuffers = backend.attributeUtils.createShaderVertexBuffers( renderObject );
-console.log( vertexBuffers );
+
 		// blending
 
 		let blending;
