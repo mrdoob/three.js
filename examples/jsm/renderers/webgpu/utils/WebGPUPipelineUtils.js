@@ -34,23 +34,9 @@ class WebGPUPipelineUtils {
 
 		const pipelineData = backend.get( pipeline );
 
-		// determine shader attributes
-
-		const shaderAttributes = backend.attributeUtils.createShaderAttributes( renderObject );
-
 		// vertex buffers
 
-		const vertexBuffers = [];
-
-		for ( const attribute of shaderAttributes ) {
-
-			vertexBuffers.push( {
-				arrayStride: attribute.arrayStride,
-				attributes: [ { shaderLocation: attribute.slot, offset: attribute.offset, format: attribute.format } ],
-				stepMode: attribute.stepMode
-			} );
-
-		}
+		const vertexBuffers = backend.attributeUtils.createShaderVertexBuffers( renderObject );
 
 		// blending
 
