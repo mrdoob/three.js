@@ -75,6 +75,7 @@ body {
         <p>THREE.js 让这变得非常简单。我们可以将场景的背景设置为一种纹理。</p>
         <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 const bgTexture = loader.load('resources/images/daikanyama.jpg');
+bgTexture.colorSpace = THREE.SRGBColorSpace;
 scene.background = bgTexture;</pre>
         <p>效果如下</p>
         <p></p>
@@ -241,9 +242,9 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +  const texture = loader.load(
 +    'resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg',
 +    () =&gt; {
-+      const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
-+      rt.fromEquirectangularTexture(renderer, texture);
-+      scene.background = rt.texture;
++      texture.mapping = THREE.EquirectangularReflectionMapping;
++      texture.colorSpace = THREE.SRGBColorSpace;
++      scene.background = texture;
 +    });
 }</pre>
           <p>这就是全部要做的事。</p>
