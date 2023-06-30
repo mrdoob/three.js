@@ -34,23 +34,30 @@ class WebGPUAttributeUtils {
 		const bufferAttribute = this._getBufferAttribute( attribute );
 
 		const backend = this.backend;
-		const device = backend.device;
+		const bufferData = backend.get( bufferAttribute );
 
-		const array = bufferAttribute.array;
-		const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
+		let buffer = bufferData.buffer;
 
-		const buffer = device.createBuffer( {
-			label: bufferAttribute.name,
-			size: size,
-			usage: usage,
-			mappedAtCreation: true
-		} );
+		if ( buffer === undefined ) {
 
-		new array.constructor( buffer.getMappedRange() ).set( array );
+			const device = backend.device;
 
-		buffer.unmap();
+			const array = bufferAttribute.array;
+			const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
 
-		backend.get( attribute ).buffer = buffer;
+			buffer = device.createBuffer( {
+				label: bufferAttribute.name,
+				size: size,
+				usage: usage,
+				mappedAtCreation: true
+			} );
+
+			new array.constructor( buffer.getMappedRange() ).set( array );
+
+			buffer.unmap();
+
+			bufferData.buffer = buffer;
+		}
 
 	}
 
@@ -61,7 +68,7 @@ class WebGPUAttributeUtils {
 		const backend = this.backend;
 		const device = backend.device;
 
-		const buffer = backend.get( attribute ).buffer;
+		const buffer = backend.get( bufferAttribute ).buffer;
 
 		const array = bufferAttribute.array;
 		const updateRange = bufferAttribute.updateRange;
@@ -93,51 +100,64 @@ class WebGPUAttributeUtils {
 
 	}
 
-	createShaderAttributes( renderObject ) {
+	createShaderVertexBuffers( renderObject ) {
 
 		const attributes = renderObject.getAttributes();
-		const shaderAttributes = [];
+		const vertexBuffers = new Map();
 
 		for ( let slot = 0; slot < attributes.length; slot ++ ) {
 
 			const geometryAttribute = attributes[ slot ];
 			const bytesPerElement = geometryAttribute.array.BYTES_PER_ELEMENT;
+			const bufferAttribute = this._getBufferAttribute( geometryAttribute );
 
-			const format = this._getVertexFormat( geometryAttribute );
+			let vertexBufferLayout = vertexBuffers.get( bufferAttribute );
 
-			let arrayStride = geometryAttribute.itemSize * bytesPerElement;
-			let offset = 0;
-			let stepMode = geometryAttribute.isInstancedBufferAttribute ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
+			if ( vertexBufferLayout === undefined ) {
 
-			if ( geometryAttribute.isInterleavedBufferAttribute === true ) {
+				let arrayStride, stepMode;
 
-				// @TODO: It can be optimized for "vertexBuffers" on RenderPipeline
+				if ( geometryAttribute.isInterleavedBufferAttribute === true ) {
 
-				arrayStride = geometryAttribute.data.stride * bytesPerElement;
-				offset = geometryAttribute.offset * bytesPerElement;
-				if ( geometryAttribute.data.isInstancedInterleavedBuffer ) stepMode = GPUInputStepMode.Instance;
+					arrayStride = geometryAttribute.data.stride * bytesPerElement;
+					stepMode = geometryAttribute.data.isInstancedInterleavedBuffer ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
+
+				} else {
+
+					arrayStride = geometryAttribute.itemSize * bytesPerElement;
+					stepMode = geometryAttribute.isInstancedBufferAttribute ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
+
+				}
+
+				vertexBufferLayout = {
+					arrayStride,
+					attributes: [],
+					stepMode
+				};
+
+				vertexBuffers.set( bufferAttribute, vertexBufferLayout );
 
 			}
 
-			shaderAttributes.push( {
-				geometryAttribute,
-				arrayStride,
-				stepMode,
+			const format = this._getVertexFormat( geometryAttribute );
+			const offset = ( geometryAttribute.isInterleavedBufferAttribute === true ) ? geometryAttribute.offset * bytesPerElement : 0;
+
+			vertexBufferLayout.attributes.push( {
+				shaderLocation: slot,
 				offset,
-				format,
-				slot
+				format
 			} );
 
 		}
 
-		return shaderAttributes;
+		return Array.from( vertexBuffers.values() );
 
 	}
 
 	destroyAttribute( attribute ) {
 
 		const backend = this.backend;
-		const data = backend.get( attribute );
+		const data = backend.get( this._getBufferAttribute( attribute ) );
 
 		data.buffer.destroy();
 
@@ -150,9 +170,7 @@ class WebGPUAttributeUtils {
 		const backend = this.backend;
 		const device = backend.device;
 
-		const data = backend.get( attribute );
-
-		//const bufferAttribute = this._getBufferAttribute( attribute );
+		const data = backend.get( this._getBufferAttribute( attribute ) );
 
 		const bufferGPU = data.buffer;
 		const size = bufferGPU.size;

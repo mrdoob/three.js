@@ -511,18 +511,18 @@ class WebGPUBackend extends Backend {
 
 		// vertex buffers
 
-		const attributes = renderObject.getAttributes();
+		const vertexBuffers = renderObject.getVertexBuffers();
 
-		for ( let i = 0, l = attributes.length; i < l; i ++ ) {
+		for ( let i = 0, l = vertexBuffers.length; i < l; i ++ ) {
 
-			const attribute = attributes[ i ];
+			const vertexBuffer = vertexBuffers[ i ];
 
-			if ( attributesSet[ i ] !== attribute ) {
+			if ( attributesSet[ i ] !== vertexBuffer ) {
 
-				const buffer = this.get( attribute ).buffer;
+				const buffer = this.get( vertexBuffer ).buffer;
 				passEncoderGPU.setVertexBuffer( i, buffer );
 
-				attributesSet[ i ] = attribute;
+				attributesSet[ i ] = vertexBuffer;
 
 			}
 
