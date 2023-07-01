@@ -21,47 +21,62 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import {init, state} from './shared-cubes.js';
+import { init, state } from './shared-cubes.js';
 
-function startWorker(canvas) {
-  const offscreen = canvas.transferControlToOffscreen();
-  const worker = new Worker('offscreencanvas-worker-cubes.js', {type: 'module'});
-  worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
+function startWorker( canvas ) {
 
-  function sendSize() {
-    worker.postMessage({
-      type: 'size',
-      width: canvas.clientWidth,
-      height: canvas.clientHeight,
-    });
-  }
+	const offscreen = canvas.transferControlToOffscreen();
+	const worker = new Worker( 'offscreencanvas-worker-cubes.js', { type: 'module' } );
+	worker.postMessage( { type: 'init', canvas: offscreen }, [ offscreen ] );
 
-  window.addEventListener('resize', sendSize);
-  sendSize();
+	function sendSize() {
 
-  console.log('using OffscreenCanvas');  /* eslint-disable-line no-console */
+		worker.postMessage( {
+			type: 'size',
+			width: canvas.clientWidth,
+			height: canvas.clientHeight,
+		} );
+
+	}
+
+	window.addEventListener( 'resize', sendSize );
+	sendSize();
+
+	console.log( 'using OffscreenCanvas' ); /* eslint-disable-line no-console */
+
 }
 
-function startMainPage(canvas) {
-  init({canvas});
+function startMainPage( canvas ) {
 
-  function sendSize() {
-    state.width = canvas.clientWidth;
-    state.height = canvas.clientHeight;
-  }
-  window.addEventListener('resize', sendSize);
-  sendSize();
+	init( { canvas } );
 
-  console.log('using regular canvas');  /* eslint-disable-line no-console */
+	function sendSize() {
+
+		state.width = canvas.clientWidth;
+		state.height = canvas.clientHeight;
+
+	}
+
+	window.addEventListener( 'resize', sendSize );
+	sendSize();
+
+	console.log( 'using regular canvas' ); /* eslint-disable-line no-console */
+
 }
 
-function main() {  /* eslint consistent-return: 0 */
-  const canvas = document.querySelector('#c');
-  if (canvas.transferControlToOffscreen) {
-    startWorker(canvas);
-  } else {
-    startMainPage(canvas);
-  }
+function main() { /* eslint consistent-return: 0 */
+
+	const canvas = document.querySelector( '#c' );
+	if ( canvas.transferControlToOffscreen ) {
+
+		startWorker( canvas );
+
+	} else {
+
+		startMainPage( canvas );
+
+	}
+
 }
 
 main();

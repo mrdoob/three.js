@@ -69,6 +69,7 @@ const texture = loader.load('resources/images/checker.png');
 texture.wrapS = THREE.RepeatWrapping;
 texture.wrapT = THREE.RepeatWrapping;
 texture.magFilter = THREE.NearestFilter;
+texture.colorSpace = THREE.SRGBColorSpace;
 const repeats = planeSize / 2;
 texture.repeat.set(repeats, repeats);
 </pre>
@@ -389,34 +390,7 @@ makeXYZGUI(gui, light.position, 'position');
 </div>
 
 <p></p>
-<p>Une chose que nous n'avons pas vu, c'est qu'il existe un paramètre sur le <a href="https://threejs.org/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> appelé <code class="notranslate" translate="no">physicalCorrectLights</code>. Il affecte la façon dont la lumière tombe en tant que distance de la lumière. Cela n'affecte que <a href="https://threejs.org/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> et <a href="https://threejs.org/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>. <a href="https://threejs.org/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> le fait automatiquement.</p>
-<p>Pour les lumières, l'idée de base est de ne pas définir de distance pour qu'elles s'éteignent, et vous ne définissez pas <code class="notranslate" translate="no">intensity</code>. Au lieu de cela, vous définissez la <a href="/docs/#api/en/lights/PointLight#power"><code class="notranslate" translate="no">power</code></a> de la lumière en lumens, puis three.js utilisera des calculs physiques comme de vraies lumières. Les unités de three.js dans ce cas sont des mètres et une ampoule de 60w aurait environ 800 lumens. Il y a aussi une propriété <a href="/docs/#api/en/lights/PointLight#decay"><code class="notranslate" translate="no">decay</code></a>. Elle doit être réglé sur 2 pour une apparence réaliste.</p>
-<p>Testons ça.</p>
-<p>D'abord, définissons <code class="notranslate" translate="no">physicallyCorrectLights</code> sur true</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
-+renderer.physicallyCorrectLights = true;
-</pre>
-<p>Ensuite, réglons la <code class="notranslate" translate="no">power</code> à 800 lumens, la <code class="notranslate" translate="no">decay</code> à 2, et
-la <code class="notranslate" translate="no">distance</code> sur <code class="notranslate" translate="no">Infinity</code>.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
-const light = new THREE.PointLight(color, intensity);
-light.power = 800;
-light.decay = 2;
-light.distance = Infinity;
-</pre>
-<p>et mettons à jour lil-gui pour pouvoir changer <code class="notranslate" translate="no">power</code> et <code class="notranslate" translate="no">decay</code></p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
-gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'decay', 0, 4, 0.01);
-gui.add(light, 'power', 0, 2000);
-</pre>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-point-physically-correct.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lights-point-physically-correct.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
-</div>
 
-<p></p>
 <p>Il est important de noter que chaque lumière que vous ajoutez à la scène ralentit la vitesse à laquelle Three.js rend la scène, vous devez donc toujours essayer d'en utiliser le moins possible pour atteindre vos objectifs.</p>
 <p>Passons maintenant à <a href="cameras.html">la gestion des caméras</a>.</p>
 <p><canvas id="c"></canvas></p>
