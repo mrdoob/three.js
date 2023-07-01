@@ -99,6 +99,7 @@ composer.addPass(filmPass);
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {BloomPass} from 'three/addons/postprocessing/BloomPass.js';
 import {FilmPass} from 'three/addons/postprocessing/FilmPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 </pre>
 <p>ほとんどのポストプロセスには <code class="notranslate" translate="no">EffectComposer.js</code> と <code class="notranslate" translate="no">RenderPass.js</code> が必須です。</p>
 <p>最後に <a href="/docs/#api/ja/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> の代わりに <code class="notranslate" translate="no">EffectComposer.render</code> を使用し、<code class="notranslate" translate="no">EffectComposer</code> にキャンバスのサイズを合わせます。</p>

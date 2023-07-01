@@ -84,6 +84,7 @@ const texture = loader.load('../resources/images/checker.png');
 texture.wrapS = THREE.RepeatWrapping;
 texture.wrapT = THREE.RepeatWrapping;
 texture.magFilter = THREE.NearestFilter;
+texture.colorSpace = THREE.SRGBColorSpace;
 const repeats = planeSize / 2;
 texture.repeat.set(repeats, repeats);
 </pre>
@@ -460,41 +461,7 @@ makeXYZGUI(gui, light.position, 'position');
 </div>
 
 <p></p>
-<p>Одна вещь, которую мы не охватили, это то, что есть настройка для <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>
-вызываемого в <code class="notranslate" translate="no">physicallyCorrectLights</code>. Это влияет на то, как свет падает в зависимости 
-от расстояния до предмета. Это влияет только на <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> и <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>. 
-<a href="/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> делает это автоматически.</p>
-<p>Для источников света, хотя основная идея заключается в том, что вы не устанавливаете 
-расстояние для их затухания и не устанавливаете <code class="notranslate" translate="no">intensity</code>. Вместо этого вы устанавливаете силу
-<a href="/docs/#api/en/lights/PointLight#power"><code class="notranslate" translate="no">power</code></a> света в люменах, а затем three.js будет использовать физические 
-вычисления, как у настоящих источников света. Единицами three.js в этом случае являются метры, 
-а лампочка мощностью 60 Вт будет иметь около 800 люмен. 
-Там также есть распад <a href="/docs/#api/en/lights/PointLight#decay"><code class="notranslate" translate="no">decay</code></a>, он должен быть установлен в <code class="notranslate" translate="no">2</code> для реализма.</p>
-<p>Давайте проверим это.</p>
-<p>Сначала мы включим физически правильное освещение</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
-+renderer.physicallyCorrectLights = true;
-</pre>
-<p>Затем мы установим <code class="notranslate" translate="no">power</code> = 800 lumens,  <code class="notranslate" translate="no">decay</code> = 2 и <code class="notranslate" translate="no">distance</code> до <code class="notranslate" translate="no">Infinity</code>.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
-const light = new THREE.PointLight(color, intensity);
-light.power = 800;
-light.decay = 2;
-light.distance = Infinity;
-</pre>
-<p>и мы добавим графический интерфейс, чтобы мы могли изменить <code class="notranslate" translate="no">power</code> и <code class="notranslate" translate="no">decay</code></p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
-gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'decay', 0, 4, 0.01);
-gui.add(light, 'power', 0, 2000);
-</pre>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-point-physically-correct.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lights-point-physically-correct.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
-</div>
 
-<p></p>
 <p>Важно отметить, что каждый источник света, который вы добавляете в сцену, 
 замедляет скорость рендеринга сцены в three.js, поэтому вы всегда должны 
 стараться использовать как можно меньше для достижения своих целей.</p>
