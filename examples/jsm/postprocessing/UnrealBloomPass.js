@@ -94,7 +94,7 @@ class UnrealBloomPass extends Pass {
 
 			this.separableBlurMaterials.push( this.getSeperableBlurMaterial( kernelSizeArray[ i ] ) );
 
-			this.separableBlurMaterials[ i ].uniforms[ 'texSize' ].value = new Vector2( resx, resy );
+			this.separableBlurMaterials[ i ].uniforms[ 'invSize' ].value = new Vector2( 1 / resx, 1 / resy );
 
 			resx = Math.round( resx / 2 );
 
@@ -192,7 +192,7 @@ class UnrealBloomPass extends Pass {
 			this.renderTargetsHorizontal[ i ].setSize( resx, resy );
 			this.renderTargetsVertical[ i ].setSize( resx, resy );
 
-			this.separableBlurMaterials[ i ].uniforms[ 'texSize' ].value = new Vector2( resx, resy );
+			this.separableBlurMaterials[ i ].uniforms[ 'invSize' ].value = new Vector2( 1 / resx, 1 / resy );
 
 			resx = Math.round( resx / 2 );
 			resy = Math.round( resy / 2 );
@@ -298,6 +298,16 @@ class UnrealBloomPass extends Pass {
 
 	getSeperableBlurMaterial( kernelRadius ) {
 
+		const coefficients = [];
+
+		const sigma = kernelRadius;
+
+		for ( let i = 0; i < kernelRadius; i ++ ) {
+
+			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( sigma * sigma ) ) / sigma );
+
+		}
+
 		return new ShaderMaterial( {
 
 			defines: {
@@ -307,8 +317,9 @@ class UnrealBloomPass extends Pass {
 
 			uniforms: {
 				'colorTexture': { value: null },
-				'texSize': { value: new Vector2( 0.5, 0.5 ) },
-				'direction': { value: new Vector2( 0.5, 0.5 ) }
+				'invSize': { value: new Vector2( 0.5, 0.5 ) }, // inverse texture size
+				'direction': { value: new Vector2( 0.5, 0.5 ) },
+				'gaussianCoefficients': { value: coefficients } // precomputed Gaussian coefficients
 			},
 
 			vertexShader:
@@ -322,23 +333,19 @@ class UnrealBloomPass extends Pass {
 				`#include <common>
 				varying vec2 vUv;
 				uniform sampler2D colorTexture;
-				uniform vec2 texSize;
+				uniform vec2 invSize;
 				uniform vec2 direction;
+				uniform float gaussianCoefficients[KERNEL_RADIUS];
 
-				float gaussianPdf(in float x, in float sigma) {
-					return 0.39894 * exp( -0.5 * x * x/( sigma * sigma))/sigma;
-				}
 				void main() {
-					vec2 invSize = 1.0 / texSize;
-					float fSigma = float(SIGMA);
-					float weightSum = gaussianPdf(0.0, fSigma);
-					vec3 diffuseSum = texture2D( colorTexture, vUv).rgb * weightSum;
+					float weightSum = gaussianCoefficients[0];
+					vec3 diffuseSum = texture2D( colorTexture, vUv ).rgb * weightSum;
 					for( int i = 1; i < KERNEL_RADIUS; i ++ ) {
 						float x = float(i);
-						float w = gaussianPdf(x, fSigma);
+						float w = gaussianCoefficients[i];
 						vec2 uvOffset = direction * invSize * x;
-						vec3 sample1 = texture2D( colorTexture, vUv + uvOffset).rgb;
-						vec3 sample2 = texture2D( colorTexture, vUv - uvOffset).rgb;
+						vec3 sample1 = texture2D( colorTexture, vUv + uvOffset ).rgb;
+						vec3 sample2 = texture2D( colorTexture, vUv - uvOffset ).rgb;
 						diffuseSum += (sample1 + sample2) * w;
 						weightSum += 2.0 * w;
 					}
