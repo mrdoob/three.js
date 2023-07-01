@@ -4,6 +4,7 @@ function main() {
 
 	const canvas = document.querySelector( '#c' );
 	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
+	renderer.useLegacyLights = false;
 
 	const fov = 75;
 	const aspect = 2; // the canvas default
@@ -17,7 +18,7 @@ function main() {
 	{
 
 		const color = 0xFFFFFF;
-		const intensity = 1;
+		const intensity = 3;
 		const light = new THREE.DirectionalLight( color, intensity );
 		light.position.set( - 1, 2, 4 );
 		scene.add( light );
