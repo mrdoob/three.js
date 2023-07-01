@@ -27,6 +27,15 @@ const shaderNodeHandler = {
 
 	},
 
+	ownKeys(node) {
+		const nodeElements = [...NodeElements.keys()];
+		return Object.getOwnPropertyNames(node)
+			.concat(nodeElements)
+			.concat(nodeElements.map(element => element + "Assign"))
+			.concat(["w", "z", "y", "x"].reduce((acc, el) => (acc.forEach(v => acc.push(el + v)), acc.push(el), acc), []))
+			.concat(["width", "height"]);
+	},
+
 	get: function ( node, prop, nodeObj ) {
 
 		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
