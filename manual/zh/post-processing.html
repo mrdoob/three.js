@@ -81,6 +81,7 @@ composer.addPass(filmPass);
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {BloomPass} from 'three/addons/postprocessing/BloomPass.js';
 import {FilmPass} from 'three/addons/postprocessing/FilmPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 </pre>
 <p>对于几乎所有的后期处理EffectComposer.js，RenderPass.js 都是必需的。</p>
 <p>们需要做的最后一件事是使用EffectComposer.render 替代 WebGLRenderer.render 并告诉EffectComposer来匹配画布的大小</p>

@@ -78,6 +78,7 @@ const texture = loader.load('resources/images/checker.png');
 texture.wrapS = THREE.RepeatWrapping;
 texture.wrapT = THREE.RepeatWrapping;
 texture.magFilter = THREE.NearestFilter;
+texture.colorSpace = THREE.SRGBColorSpace;
 const repeats = planeSize / 2;
 texture.repeat.set(repeats, repeats);
 </pre>
@@ -442,43 +443,7 @@ makeXYZGUI(gui, light.position, 'position');
 </div>
 
 <p></p>
-<p>하나 설명하지 않은 것이 있습니다. 위 예제에는 <a href="/docs/#api/ko/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>의 <code class="notranslate" translate="no">physicallyCorrectLights(물리 기반 조명)</code>
-설정이 있습니다. 이는 거리에 따라 빛이 어떻게 떨어질지 결정하는 속성으로,
-<a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>와 <a href="/docs/#api/ko/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>가 이 설정의 영향을 받습니다. <a href="/docs/#api/ko/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>는
-마찬가지로 설정의 영향도 받고, 기본적으로 이 설정을 사용하죠.</p>
-<p>이 설정을 사용하면 기본적으로 조명의 <code class="notranslate" translate="no">distance</code>나 <code class="notranslate" translate="no">intensity</code> 대신
-<a href="/docs/#api/ko/lights/PointLight#power"><code class="notranslate" translate="no">power</code></a> 속성을 루멘(lumens) 단위로 설정해야 합니다.
-그러면 Three.js는 물리적 계산을 통해 실제 광원을 흉내내죠. 예제의
-거리 단위는 미터(meters)이니, 60w짜리 전구는 약 800루멘 정도일 겁니다.
-그리고 조명의 부서짐(decay) 정도를 설정하는 <a href="/docs/#api/ko/lights/PointLight#decay"><code class="notranslate" translate="no">decay</code></a>
-속성도 있습니다. 현실적인 조명을 위해서는 <code class="notranslate" translate="no">2</code> 정도가 적당하죠.</p>
-<p>한 번 예제를 만들어 테스트해봅시다.</p>
-<p>먼저 <code class="notranslate" translate="no">renderer</code>의 <code class="notranslate" translate="no">physicallyCorrectLights</code> 속성을 켭니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
-+renderer.physicallyCorrectLights = true;
-</pre>
-<p>그리고 <code class="notranslate" translate="no">power</code>를 800루멘으로, <code class="notranslate" translate="no">decay</code> 속성을 2로, <code class="notranslate" translate="no">distance</code>
-속성을 <code class="notranslate" translate="no">Infinity</code>로 설정합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
-const light = new THREE.PointLight(color, intensity);
-light.power = 800;
-light.decay = 2;
-light.distance = Infinity;
-</pre>
-<p>마지막으로 GUI를 추가해 <code class="notranslate" translate="no">power</code>와 <code class="notranslate" translate="no">decay</code> 속성을 조정할 수 있도록
-해줍니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
-gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'decay', 0, 4, 0.01);
-gui.add(light, 'power', 0, 2000);
-</pre>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-point-physically-correct.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lights-point-physically-correct.html" target="_blank">새 탭에서 보기</a>
-</div>
 
-<p></p>
 <p>조명은 <code class="notranslate" translate="no">renderer</code>가 장면을 렌더링하는 속도에 영향을 미칩니다. 그러니
 가능한 적은 조명을 쓰는 게 좋죠.</p>
 <p>다음 장에서는 <a href="cameras.html">카메라 조작법</a>에 대해 알아보겠습니다.</p>

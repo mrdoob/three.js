@@ -644,6 +644,7 @@ scene.add(mesh);
 const texture = loader.load('resources/images/minecraft/flourish-cc-by-nc-sa.png', render);
 texture.magFilter = THREE.NearestFilter;
 texture.minFilter = THREE.NearestFilter;
+texture.colorSpace = THREE.SRGBColorSpace;
 </pre>
 <p>그리고 <code class="notranslate" translate="no">VoxelWorld</code>에 설정값을 넘겨줍니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const tileSize = 16;
