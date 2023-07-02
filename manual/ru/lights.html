@@ -289,7 +289,8 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 <p><a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> - это свет, который сидит в какой-то точке и излучает свет 
 во всех направлениях от этой точки. Давайте изменим код.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.PointLight(color, intensity);
 light.position.set(0, 10, 0);
@@ -342,7 +343,8 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 Конус света открываем по направлению к цели.</p>
 <p>Модификация нашего <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> с помощником сверху</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);
 scene.add(light);
