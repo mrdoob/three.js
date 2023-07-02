@@ -300,19 +300,16 @@ class UnrealBloomPass extends Pass {
 
 		const coefficients = [];
 
-		const sigma = kernelRadius;
-
 		for ( let i = 0; i < kernelRadius; i ++ ) {
 
-			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( sigma * sigma ) ) / sigma );
+			coefficients.push( 0.39894 * Math.exp( - 0.5 * i * i / ( kernelRadius * kernelRadius ) ) / kernelRadius );
 
 		}
 
 		return new ShaderMaterial( {
 
 			defines: {
-				'KERNEL_RADIUS': kernelRadius,
-				'SIGMA': kernelRadius
+				'KERNEL_RADIUS': kernelRadius
 			},
 
 			uniforms: {
