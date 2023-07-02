@@ -89,11 +89,8 @@ composer.addPass(bloomPass);
     648,    // scanline count
     false,  // grayscale
 );
-filmPass.renderToScreen = true;
 composer.addPass(filmPass);
 </pre>
-<p><code class="notranslate" translate="no">filmPass</code> は最後のPassなので、<code class="notranslate" translate="no">renderToScreen</code> プロパティをtrueに設定し、キャンバスにレンダリングするようにします。
-この設定がないと次のレンダーターゲットにレンダリングされます。</p>
 <p>これらのクラスを使用するには、以下をインポートする必要があります。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';

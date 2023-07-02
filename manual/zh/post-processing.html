@@ -72,10 +72,8 @@ composer.addPass(bloomPass);
     648,    // scanline count
     false,  // grayscale
 );
-filmPass.renderToScreen = true;
 composer.addPass(filmPass);
 </pre>
-<p>由于filmPass是最后一次传递，我们将其renderToScreen属性设置为true来告诉它渲染到画布。如果不设置它，它将渲染到下一个渲染目标。</p>
 <p>为了使用这些类,我们需要导入一些js模块</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';

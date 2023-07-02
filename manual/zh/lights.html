@@ -233,7 +233,8 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 <h2 id="-pointlight-">点光源（<a href="/docs/#api/zh/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>）</h2>
 <p>点光源（<a href="/docs/#api/zh/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>）表示的是从一个点朝各个方向发射出光线的一种光照效果。我们修改一下代码：</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.PointLight(color, intensity);
 light.position.set(0, 10, 0);
@@ -278,7 +279,8 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 <p>聚光灯（<a href="/docs/#api/zh/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>）类似方向光（<a href="/docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>）一样需要一个目标点，光源的位置是圆锥的顶点，目标点处于圆锥的中轴线上。</p>
 <p>修改上面 <a href="/docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> 的代码如下：</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);
 scene.add(light);
