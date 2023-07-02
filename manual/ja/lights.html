@@ -261,7 +261,8 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 <p><a href="/docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> はある点から全方向に光を放つライトです。
 コード変更しましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.PointLight(color, intensity);
 light.position.set(0, 10, 0);
@@ -312,7 +313,8 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 ライトの円錐体がターゲットに向かって照らされます。</p>
 <p>上記のヘルパーを使って <a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> を修正します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);
 scene.add(light);

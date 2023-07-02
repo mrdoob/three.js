@@ -270,7 +270,8 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 <p><a href="/docs/#api/ko/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>는 한 점에서 무한히 뻗어나가는 광원입니다. 코드를
 다시 한 번 수정해보죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.PointLight(color, intensity);
 light.position.set(0, 10, 0);
@@ -324,7 +325,8 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 정해줘야 합니다. 원뿔의 밑면이 해당 목표물을 바라보게 되죠.</p>
 <p>위 예제의 <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>와 헬퍼 객체를 수정하겠습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);
 scene.add(light);
