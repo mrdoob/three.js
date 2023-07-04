@@ -842,8 +842,9 @@ class Renderer {
 
 		//
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, passId );
-		renderObject.context = this._currentRenderContext;
+		const renderContext = this._currentRenderContext;
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, passId, renderContext );
+		renderObject.context = renderContext;
 
 		//
 

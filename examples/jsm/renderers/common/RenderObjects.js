@@ -17,10 +17,10 @@ class RenderObjects {
 
 	}
 
-	get( object, material, scene, camera, lightsNode, passId ) {
+	get( object, material, scene, camera, lightsNode, passId, renderContext ) {
 
 		const chainMap = this.getChainMap( passId );
-		const chainArray = [ object, material, scene, camera, lightsNode ];
+		const chainArray = [ object, material, renderContext, lightsNode ];
 
 		let renderObject = chainMap.get( chainArray );
 
