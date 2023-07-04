@@ -1,7 +1,6 @@
 import {
 	EventDispatcher,
 	MathUtils,
-	MOUSE,
 	Quaternion,
 	Vector2,
 	Vector3
