@@ -16,9 +16,20 @@ class ComputeNode extends Node {
 		this.workgroupSize = workgroupSize;
 		this.dispatchCount = 0;
 
+		this.version = 1;
 		this.updateType = NodeUpdateType.OBJECT;
 
 		this.updateDispatchCount();
+
+	}
+
+	set needsUpdate( value ) {
+
+		if ( value === true ) {
+
+			this.version ++;
+
+		}
 
 	}
 

@@ -29,7 +29,7 @@ class Pipelines extends DataMap {
 
 		const data = this.get( computeNode );
 
-		if ( data.pipeline === undefined ) {
+		if ( this._needsComputeUpdate( computeNode ) ) {
 
 			const previousPipeline = data.pipeline;
 
@@ -80,6 +80,7 @@ class Pipelines extends DataMap {
 
 			//
 
+			data.version = computeNode.version;
 			data.pipeline = pipeline;
 
 		}
@@ -94,7 +95,7 @@ class Pipelines extends DataMap {
 
 		const data = this.get( renderObject );
 
-		if ( this._needsUpdate( renderObject ) ) {
+		if ( this._needsRenderUpdate( renderObject ) ) {
 
 			const previousPipeline = data.pipeline;
 
@@ -310,7 +311,15 @@ class Pipelines extends DataMap {
 
 	}
 
-	_needsUpdate( renderObject ) {
+	_needsComputeUpdate( computeNode ) {
+
+		const data = this.get( computeNode );
+
+		return data.pipeline === undefined || data.version !== computeNode.version;
+
+	}
+
+	_needsRenderUpdate( renderObject ) {
 
 		const data = this.get( renderObject );
 		const material = renderObject.material;
