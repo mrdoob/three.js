@@ -838,7 +838,8 @@ class OrbitControls extends EventDispatcher {
 		}
 
 		
-		function onDragStart(){
+		function onDragStart(ev){
+			ev.preventDefault();
 			return false;
 		}
 		//
