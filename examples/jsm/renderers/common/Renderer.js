@@ -87,6 +87,8 @@ class Renderer {
 		this._initialized = false;
 		this._initPromise = null;
 
+		this._nullTarget = {};
+
 		// backwards compatibility
 
 		this.shadowMap = {
@@ -181,8 +183,8 @@ class Renderer {
 
 		//
 
-		const renderContext = this._renderContexts.get( scene, camera );
 		const renderTarget = this._renderTarget;
+		const renderContext = this._renderContexts.get( scene, camera, renderTarget || this._nullTarget );
 		const activeCubeFace = this._activeCubeFace;
 
 		this._currentRenderContext = renderContext;

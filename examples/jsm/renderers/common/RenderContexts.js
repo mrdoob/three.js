@@ -9,9 +9,9 @@ class RenderContexts {
 
 	}
 
-	get( scene, camera ) {
+	get( scene, camera, renderTarget ) {
 
-		const chainKey = [ scene, camera ];
+		const chainKey = [ scene, camera, renderTarget ];
 
 		let renderState = this.renderStates.get( chainKey );
 
