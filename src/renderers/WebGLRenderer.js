@@ -1634,7 +1634,7 @@ class WebGLRenderer {
 
 			if ( material.toneMapped ) {
 
-				if ( _currentRenderTarget === null || ( _currentRenderTarget !== null && _currentRenderTarget.isXRRenderTarget === true ) ) {
+				if ( _currentRenderTarget === null || _currentRenderTarget.isXRRenderTarget === true ) {
 
 					toneMapping = _this.toneMapping;
 

@@ -164,7 +164,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		if ( material.toneMapped ) {
 
-			if ( currentRenderTarget === null || ( currentRenderTarget !== null && currentRenderTarget.isXRRenderTarget === true ) ) {
+			if ( currentRenderTarget === null || currentRenderTarget.isXRRenderTarget === true ) {
 
 				toneMapping = renderer.toneMapping;
 
