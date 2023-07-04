@@ -18,7 +18,6 @@ export function addNodeElement( name, nodeElement ) {
 }
 
 const shaderNodeHandler = {
-
 	construct( NodeClosure, params ) {
 
 		const inputs = params.shift();
@@ -31,12 +30,11 @@ const shaderNodeHandler = {
 
 		const nodeElements = [ ...NodeElements.keys() ];
 
-		return Object.getOwnPropertyNames( node )
+		return [...new Set(Object.getOwnPropertyNames( node )
 			.concat( nodeElements )
 			.concat( nodeElements.map( element => element + 'Assign' ) )
 			.concat( [ 'w', 'z', 'y', 'x' ].reduce( ( acc, el ) => ( acc.forEach( v => acc.push( el + v ) ), acc.push( el ), acc ), [] ) )
-			.concat( [ 'width', 'height' ] );
-
+			.concat( [ 'width', 'height' ] ))];
 	},
 
 	get: function ( node, prop, nodeObj ) {
