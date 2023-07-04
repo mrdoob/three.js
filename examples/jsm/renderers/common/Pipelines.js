@@ -355,7 +355,7 @@ class Pipelines extends DataMap {
 
 		}
 
-		return needsUpdate || data.pipeline !== undefined;
+		return needsUpdate || data.pipeline === undefined;
 
 	}
 
