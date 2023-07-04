@@ -310,6 +310,7 @@ class OrbitControls extends EventDispatcher {
 
 			scope.domElement.removeEventListener( 'pointermove', onPointerMove );
 			scope.domElement.removeEventListener( 'pointerup', onPointerUp );
+			scope.domElement.removeEventListener( 'dragstart', onDragStart );
 
 
 			if ( scope._domElementKeyEvents !== null ) {
@@ -836,6 +837,10 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
+		
+		function onDragStart(){
+			return false;
+		}
 		//
 		// event handlers - FSM: listen for events and reset state
 		//
@@ -1254,6 +1259,7 @@ class OrbitControls extends EventDispatcher {
 		scope.domElement.addEventListener( 'pointerdown', onPointerDown );
 		scope.domElement.addEventListener( 'pointercancel', onPointerUp );
 		scope.domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
+		scope.domElement.addEventListener( 'dragstart', onDragStart );
 
 		// force an update at start
 
