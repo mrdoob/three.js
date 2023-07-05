@@ -65,7 +65,11 @@ const OutputShader = {
 
 			// color space
 
-			gl_FragColor = LinearTosRGB( gl_FragColor );
+			#ifdef SRGB_COLOR_SPACE
+
+				gl_FragColor = LinearTosRGB( gl_FragColor );
+
+			#endif
 
 		}`
 
