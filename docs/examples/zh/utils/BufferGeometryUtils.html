@@ -125,7 +125,17 @@
 			creaseAngle -- The crease angle.
 		</p>
 		<p>
-		Creates a new, non-indexed geometry with smooth normals everywhere except faces that meet at an angle greater than the crease angle.
+			Modifies the supplied geometry if it is non-indexed, otherwise creates a new,
+			non-indexed geometry.<br /><br />
+
+			Returns the geometry with smooth normals everywhere except faces
+			that meet at an angle greater than the crease angle.<br /><br />
+
+			Backwards compatible with code that uses this method to operate on the original geometry.<br /><br />
+
+			[page:BufferGeometry.toNonIndexed]() warns if the geometry is non-indexed and
+			returns <code>this</code>, i.e. the same geometry on which it was called:<br /><br />
+			<code>BufferGeometry is already non-indexed.</code>
 		</p>
 
 		<h3>[method:BufferGeometry toTrianglesDrawMode]( [param:BufferGeometry geometry], [param:TrianglesDrawMode drawMode] )</h3>
