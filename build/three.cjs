@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '154';
+const REVISION = '155dev';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -20306,6 +20306,18 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const HAS_ATTRIBUTE_UV2 = !! geometry.attributes.uv2;
 		const HAS_ATTRIBUTE_UV3 = !! geometry.attributes.uv3;
 
+		let toneMapping = NoToneMapping;
+
+		if ( material.toneMapped ) {
+
+			if ( currentRenderTarget === null || currentRenderTarget.isXRRenderTarget === true ) {
+
+				toneMapping = renderer.toneMapping;
+
+			}
+
+		}
+
 		const parameters = {
 
 			isWebGL2: IS_WEBGL2,
@@ -20466,7 +20478,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			shadowMapEnabled: renderer.shadowMap.enabled && shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
 
-			toneMapping: material.toneMapped ? renderer.toneMapping : NoToneMapping,
+			toneMapping: toneMapping,
 			useLegacyLights: renderer.useLegacyLights,
 
 			premultipliedAlpha: material.premultipliedAlpha,
@@ -29490,7 +29502,18 @@ class WebGLRenderer {
 			const morphTargets = !! geometry.morphAttributes.position;
 			const morphNormals = !! geometry.morphAttributes.normal;
 			const morphColors = !! geometry.morphAttributes.color;
-			const toneMapping = material.toneMapped ? _this.toneMapping : NoToneMapping;
+
+			let toneMapping = NoToneMapping;
+
+			if ( material.toneMapped ) {
+
+				if ( _currentRenderTarget === null || _currentRenderTarget.isXRRenderTarget === true ) {
+
+					toneMapping = _this.toneMapping;
+
+				}
+
+			}
 
 			const morphAttribute = geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color;
 			const morphTargetsCount = ( morphAttribute !== undefined ) ? morphAttribute.length : 0;
@@ -32749,6 +32772,21 @@ class CompressedArrayTexture extends CompressedTexture {
 		this.isCompressedArrayTexture = true;
 		this.image.depth = depth;
 		this.wrapR = ClampToEdgeWrapping;
+
+	}
+
+}
+
+class CompressedCubeTexture extends CompressedTexture {
+
+	constructor( images, format, type ) {
+
+		super( undefined, images[ 0 ].width, images[ 0 ].height, format, type, CubeReflectionMapping );
+
+		this.isCompressedCubeTexture = true;
+		this.isCubeTexture = true;
+
+		this.image = images;
 
 	}
 
@@ -51303,6 +51341,7 @@ exports.Color = Color;
 exports.ColorKeyframeTrack = ColorKeyframeTrack;
 exports.ColorManagement = ColorManagement;
 exports.CompressedArrayTexture = CompressedArrayTexture;
+exports.CompressedCubeTexture = CompressedCubeTexture;
 exports.CompressedTexture = CompressedTexture;
 exports.CompressedTextureLoader = CompressedTextureLoader;
 exports.ConeGeometry = ConeGeometry;
