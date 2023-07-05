@@ -1,5 +1,5 @@
 import {
-	ShaderMaterial,
+	RawShaderMaterial,
 	UniformsUtils,
 	NoToneMapping,
 	LinearToneMapping,
@@ -25,7 +25,7 @@ class OutputPass extends Pass {
 
 		this.uniforms = UniformsUtils.clone( shader.uniforms );
 
-		this.material = new ShaderMaterial( {
+		this.material = new RawShaderMaterial( {
 			uniforms: this.uniforms,
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader
