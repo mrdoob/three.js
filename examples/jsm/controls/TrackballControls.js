@@ -1,6 +1,7 @@
 import {
 	EventDispatcher,
 	MathUtils,
+	MOUSE,
 	Quaternion,
 	Vector2,
 	Vector3
@@ -48,7 +49,11 @@ class TrackballControls extends EventDispatcher {
 
 		this.keys = [ 'KeyA' /*A*/, 'KeyS' /*S*/, 'KeyD' /*D*/ ];
 
-		this.mouseButtons = { LEFT: STATE.ROTATE, MIDDLE: STATE.DOLLY, RIGHT: STATE.PAN };
+		this.mouseButtons = {
+			[ MOUSE.LEFT ]: STATE.ROTATE,
+			[ MOUSE.MIDDLE ]: STATE.DOLLY,
+			[ MOUSE.RIGHT ]: STATE.PAN
+		};
 
 		// internals
 
