@@ -1229,8 +1229,22 @@ function mergeGroups( geometry ) {
 }
 
 
-// Creates a new, non-indexed geometry with smooth normals everywhere except faces that meet at
-// an angle greater than the crease angle.
+/**
+ * Modifies the supplied geometry if it is non-indexed, otherwise creates a new,
+ * non-indexed geometry. Returns the geometry with smooth normals everywhere except
+ * faces that meet at an angle greater than the crease angle.
+ *
+ * Backwards compatible with code such as @react-three/drei's `<RoundedBox>`
+ * which uses this method to operate on the original geometry.
+ *
+ * As of this writing, BufferGeometry.toNonIndexed() warns if the geometry is
+ * non-indexed and returns `this`, i.e. the same geometry on which it was called:
+ * `BufferGeometry is already non-indexed.`
+ *
+ * @param {BufferGeometry} geometry
+ * @param {number} [creaseAngle]
+ * @return {BufferGeometry}
+ */
 function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ ) {
 
 	const creaseDot = Math.cos( creaseAngle );
@@ -1253,7 +1267,7 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 
 	}
 
-	const resultGeometry = geometry.toNonIndexed();
+	const resultGeometry = geometry.index ? geometry.toNonIndexed() : geometry;
 	const posAttr = resultGeometry.attributes.position;
 	const vertexMap = {};
 
