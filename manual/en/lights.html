@@ -291,7 +291,8 @@ shooting out parallel rays of light.</p>
 <p>A <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> is a light that sits at a point and shoots light
 in all directions from that point. Let's change the code.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.PointLight(color, intensity);
 light.position.set(0, 10, 0);
@@ -347,7 +348,8 @@ the directional light. The light's cone will
 open toward the target.</p>
 <p>Modifying our <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> with helper from above</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);
 scene.add(light);

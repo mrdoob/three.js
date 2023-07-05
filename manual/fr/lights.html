@@ -238,7 +238,8 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 <h2 id="-pointlight-"><a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a></h2>
 <p>Un <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> est une lumière qui se trouve en un point et projette de la lumière dans toutes les directions à partir de ce point. Changeons le code.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.PointLight(color, intensity);
 light.position.set(0, 10, 0);
@@ -283,7 +284,8 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 <p>Pour utiliser une <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>, nous avons besoin d'une cible tout comme la lumière directionnelle. Le cône de lumière s'ouvrira vers la cible.</p>
 <p>Modifions notre <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> avec le 'helper' vu plus haut</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);
 scene.add(light);
