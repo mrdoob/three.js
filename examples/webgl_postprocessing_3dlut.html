@@ -124,13 +124,14 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.useLegacyLights = false;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
 				composer = new EffectComposer( renderer );
 				composer.setPixelRatio( window.devicePixelRatio );
 				composer.setSize( window.innerWidth, window.innerHeight );
 				composer.addPass( new RenderPass( scene, camera ) );
-				composer.addPass( new OutputPass( THREE.ACESFilmicToneMapping ) );
+				composer.addPass( new OutputPass() );
 
 				lutPass = new LUTPass();
 				composer.addPass( lutPass );
