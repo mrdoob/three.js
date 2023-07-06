@@ -17,7 +17,7 @@ class RenderObjects {
 
 	}
 
-	get( object, material, scene, camera, lightsNode, passId, renderContext ) {
+	get( object, material, scene, camera, lightsNode, renderContext, passId ) {
 
 		const chainMap = this.getChainMap( passId );
 		const chainArray = [ object, material, renderContext, lightsNode ];
@@ -26,7 +26,7 @@ class RenderObjects {
 
 		if ( renderObject === undefined ) {
 
-			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, passId );
+			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, passId );
 
 			chainMap.set( chainArray, renderObject );
 
@@ -39,7 +39,7 @@ class RenderObjects {
 
 				renderObject.dispose();
 
-				renderObject = this.get( object, material, scene, camera, lightsNode );
+				renderObject = this.get( object, material, scene, camera, lightsNode, renderContext );
 
 			}
 
@@ -62,11 +62,11 @@ class RenderObjects {
 
 	}
 
-	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, passId ) {
+	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, passId ) {
 
 		const chainMap = this.getChainMap( passId );
 		const dataMap = this.dataMap;
-		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode );
+		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext );
 
 		const data = dataMap.get( renderObject );
 		data.cacheKey = renderObject.getCacheKey();
