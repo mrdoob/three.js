@@ -12,7 +12,7 @@ class RenderContexts {
 	get( scene, camera, renderTarget = null ) {
 
 		const chainKey = [ scene, camera ];
-		const attachmentState = renderTarget === null ? 'default' : `${renderTarget.texture.format}:${renderTarget.samples}:${renderTarget.depthBuffer}:${renderTarget.stencilBuffer}:`;
+		const attachmentState = renderTarget === null ? 'default' : `${renderTarget.texture.format}:${renderTarget.samples}:${renderTarget.depthBuffer}:${renderTarget.stencilBuffer}`;
 
 		const chainMap = this.getChainMap( attachmentState );
 
