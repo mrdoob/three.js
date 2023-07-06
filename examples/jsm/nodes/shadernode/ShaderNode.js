@@ -261,7 +261,7 @@ const safeGetNodeType = ( node ) => {
 
 		return node.getNodeType();
 
-	} catch {
+	} catch ( _ ) {
 
 		return undefined;
 

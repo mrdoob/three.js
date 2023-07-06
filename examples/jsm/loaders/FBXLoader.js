@@ -1270,7 +1270,7 @@ class FBXTreeParser {
 
 		} else {
 
-			material = new MeshPhongMaterial( { 
+			material = new MeshPhongMaterial( {
 				name: Loader.DEFAULT_MATERIAL_NAME,
 				color: 0xcccccc
 			} );

@@ -960,7 +960,7 @@ class VRMLLoader extends Loader {
 
 			// if the appearance field is NULL or unspecified, lighting is off and the unlit object color is (0, 0, 0)
 
-			let material = new MeshBasicMaterial( { 
+			let material = new MeshBasicMaterial( {
 				name: Loader.DEFAULT_MATERIAL_NAME,
 				color: 0x000000
 			} );
