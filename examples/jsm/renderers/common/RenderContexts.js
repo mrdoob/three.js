@@ -5,25 +5,34 @@ class RenderContexts {
 
 	constructor() {
 
-		this.renderStates = new ChainMap();
+		this.chainMaps = {};
 
 	}
 
-	get( scene, camera ) {
+	get( scene, camera, renderTarget = null ) {
 
 		const chainKey = [ scene, camera ];
+		const attachmentState = renderTarget === null ? 'default' : `${renderTarget.texture.format}:${renderTarget.samples}:${renderTarget.depthBuffer}:${renderTarget.stencilBuffer}`;
 
-		let renderState = this.renderStates.get( chainKey );
+		const chainMap = this.getChainMap( attachmentState );
+
+		let renderState = chainMap.get( chainKey );
 
 		if ( renderState === undefined ) {
 
 			renderState = new RenderContext();
 
-			this.renderStates.set( chainKey, renderState );
+			chainMap.set( chainKey, renderState );
 
 		}
 
 		return renderState;
+
+	}
+
+	getChainMap( attachmentState ) {
+
+		return this.chainMaps[ attachmentState ] || ( this.chainMaps[ attachmentState ] = new ChainMap() );
 
 	}
 
