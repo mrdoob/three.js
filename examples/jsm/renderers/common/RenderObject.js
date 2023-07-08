@@ -15,11 +15,11 @@ export default class RenderObject {
 		this.scene = scene;
 		this.camera = camera;
 		this.lightsNode = lightsNode;
+		this.context = renderContext;
 
 		this.geometry = object.geometry;
 
 		this.attributes = null;
-		this.context = renderContext;
 		this.pipeline = null;
 		this.vertexBuffers = null;
 

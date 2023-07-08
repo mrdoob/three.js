@@ -88,7 +88,7 @@ class Geometries extends DataMap {
 
 	}
 
-	update( renderObject ) {
+	updateForRender( renderObject ) {
 
 		if ( this.has( renderObject ) === false ) this.initGeometry( renderObject );
 

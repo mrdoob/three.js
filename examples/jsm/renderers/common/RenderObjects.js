@@ -39,7 +39,7 @@ class RenderObjects {
 
 				renderObject.dispose();
 
-				renderObject = this.get( object, material, scene, camera, lightsNode, renderContext );
+				renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, passId );
 
 			}
 
@@ -66,6 +66,7 @@ class RenderObjects {
 
 		const chainMap = this.getChainMap( passId );
 		const dataMap = this.dataMap;
+
 		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext );
 
 		const data = dataMap.get( renderObject );

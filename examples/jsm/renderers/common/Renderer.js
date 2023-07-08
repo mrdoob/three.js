@@ -805,6 +805,12 @@ class Renderer {
 
 		//
 
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext );
+
+		this._nodes.updateBefore( renderObject );
+
+		//
+
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
@@ -844,12 +850,8 @@ class Renderer {
 
 		//
 
-		this._nodes.updateBefore( renderObject );
-
-		//
-
 		this._nodes.updateForRender( renderObject );
-		this._geometries.update( renderObject );
+		this._geometries.updateForRender( renderObject );
 		this._bindings.updateForRender( renderObject );
 
 		//
