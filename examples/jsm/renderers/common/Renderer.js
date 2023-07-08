@@ -181,8 +181,8 @@ class Renderer {
 
 		//
 
-		const renderContext = this._renderContexts.get( scene, camera );
 		const renderTarget = this._renderTarget;
+		const renderContext = this._renderContexts.get( scene, camera, renderTarget );
 		const activeCubeFace = this._activeCubeFace;
 
 		this._currentRenderContext = renderContext;
@@ -840,8 +840,7 @@ class Renderer {
 
 		//
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, passId );
-		renderObject.context = this._currentRenderContext;
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
 
 		//
 

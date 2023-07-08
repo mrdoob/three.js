@@ -2,7 +2,7 @@ let id = 0;
 
 export default class RenderObject {
 
-	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode ) {
+	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext ) {
 
 		this._nodes = nodes;
 		this._geometries = geometries;
@@ -19,7 +19,7 @@ export default class RenderObject {
 		this.geometry = object.geometry;
 
 		this.attributes = null;
-		this.context = null;
+		this.context = renderContext;
 		this.pipeline = null;
 		this.vertexBuffers = null;
 
@@ -58,7 +58,7 @@ export default class RenderObject {
 
 	getChainArray() {
 
-		return [ this.object, this.material, this.scene, this.camera, this.lightsNode ];
+		return [ this.object, this.material, this.context, this.lightsNode ];
 
 	}
 
