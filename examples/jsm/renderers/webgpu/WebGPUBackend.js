@@ -123,9 +123,9 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	async getArrayBuffer( attribute ) {
+	async getArrayBufferAsync( attribute ) {
 
-		return await this.attributeUtils.getArrayBuffer( attribute );
+		return await this.attributeUtils.getArrayBufferAsync( attribute );
 
 	}
 

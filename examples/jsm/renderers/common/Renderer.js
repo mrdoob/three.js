@@ -329,9 +329,17 @@ class Renderer {
 
 	}
 
-	async getArrayBuffer( attribute ) {
+	getArrayBuffer( attribute ) { // @deprecated, r155
 
-		return await this.backend.getArrayBuffer( attribute );
+		console.warn( 'THREE.Renderer: getArrayBuffer() is deprecated. Use getArrayBufferAsync() instead.' );
+
+		return this.getArrayBufferAsync( attribute );
+
+	}
+
+	async getArrayBufferAsync( attribute ) {
+
+		return await this.backend.getArrayBufferAsync( attribute );
 
 	}
 
