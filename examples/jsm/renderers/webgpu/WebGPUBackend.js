@@ -54,7 +54,8 @@ class WebGPUBackend extends Backend {
 		this.context = null;
 		this.colorBuffer = null;
 
-		this.depthBuffers = new WeakMap();
+		this.depthBufferTexture = new DepthTexture();
+		this.depthBufferTexture.name = 'depthBuffer';
 
 		this.utils = new WebGPUUtils( this );
 		this.attributeUtils = new WebGPUAttributeUtils( this );
@@ -751,62 +752,45 @@ class WebGPUBackend extends Backend {
 
 	// utils
 
-	_getDepthBufferGPU( renderContext ) {
+	_getDepthBufferGPU( renderContext, depthTexture = this.depthBufferTexture ) {
 
-		const { depthBuffers } = this;
 		const { width, height } = this.getDrawingBufferSize();
 
-		let depthTexture = depthBuffers.get( renderContext );
+		const depthTextureGPU = this.get( depthTexture ).texture;
 
-		if ( depthTexture !== undefined && depthTexture.image.width === width && depthTexture.image.height === height ) {
+		if ( depthTextureGPU !== undefined ) {
 
-			return this.get( depthTexture ).texture;
+			if ( depthTexture.image.width === width && depthTexture.image.height === height ) {
+
+				return depthTextureGPU;
+
+			}
+
+			this.textureUtils.destroyTexture( depthTexture );
+
+			this.delete( depthTexture );
 
 		}
 
-		this._destroyDepthBufferGPU( renderContext );
+		if ( renderContext.stencil ) {
 
-		depthTexture = new DepthTexture();
-		depthTexture.name = 'depthBuffer';
-
-		if ( renderContext.stencil  ) {
-
-			depthTexture = new DepthTexture();
 			depthTexture.format = DepthStencilFormat;
 			depthTexture.type = UnsignedInt248Type;
 
 		} else if ( renderContext.depth ) {
 
-			depthTexture = new DepthTexture();
 			depthTexture.format = DepthFormat;
 			depthTexture.type = UnsignedIntType;
 
 		}
 
+		depthTexture.name = 'depthBuffer';
 		depthTexture.image.width = width;
 		depthTexture.image.height = height;
 
 		this.textureUtils.createTexture( depthTexture, { sampleCount: this.parameters.sampleCount } );
 
-		depthBuffers.set( renderContext, depthTexture );
-
 		return this.get( depthTexture ).texture;
-
-	}
-
-	_destroyDepthBufferGPU( renderContext ) {
-
-		const { depthBuffers } = this;
-
-		const depthTexture = depthBuffers.get( renderContext );
-
-		if ( depthTexture !== undefined ) {
-
-			this.textureUtils.destroyTexture( depthTexture );
-
-			depthBuffers.delete( renderContext );
-
-		}
 
 	}
 
