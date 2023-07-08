@@ -75,12 +75,6 @@ scene.add( light );
 
 		<h3>[property:Float distance]</h3>
 		<p>
-			`Default mode` — When distance is zero, light does not attenuate. When
-			distance is non-zero, light will attenuate linearly from maximum intensity
-			at the light's position down to zero at this distance from the light.
-		</p>
-		<p>
-			When [page:WebGLRenderer.useLegacyLights legacy lighting mode] is disabled —
 			When distance is zero, light will attenuate according to inverse-square
 			law to infinite distance. When distance is non-zero, light will attenuate
 			according to inverse-square law until near the distance cutoff, where it
@@ -91,19 +85,15 @@ scene.add( light );
 
 		<h3>[property:Float intensity]</h3>
 		<p>
-			The light's intensity. Default is `1`.<br />
-			When [page:WebGLRenderer.useLegacyLights legacy lighting mode] is disabled,
-			intensity is the luminous intensity of the light measured in candela
-			(cd).<br /><br />
-
+			The light's luminous intensity measured in candela (cd). Default is `1`.
+			<br /><br />
 			Changing the intensity will also change the light's power.
 		</p>
 
 		<h3>[property:Float power]</h3>
 		<p>
 			The light's power.<br />
-			When [page:WebGLRenderer.useLegacyLights legacy lighting mode] is disabled,
-			power is the luminous power of the light measured in lumens (lm).
+			Power is the luminous power of the light measured in lumens (lm).
 			<br /><br />
 
 			Changing the power will also change the light's intensity.

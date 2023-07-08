@@ -41,7 +41,6 @@ function main() {
 
 	const canvas = document.querySelector( '#c' );
 	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
-	renderer.useLegacyLights = false;
 	renderer.xr.enabled = true;
 	document.body.appendChild( VRButton.createButton( renderer ) );
 
