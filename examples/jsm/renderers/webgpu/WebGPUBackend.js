@@ -54,8 +54,8 @@ class WebGPUBackend extends Backend {
 		this.context = null;
 		this.colorBuffer = null;
 
-		this.depthBufferTexture = new DepthTexture();
-		this.depthBufferTexture.name = 'depthBuffer';
+		this.defaultDepthTexture = new DepthTexture();
+		this.defaultDepthTexture.name = 'depthBuffer';
 
 		this.utils = new WebGPUUtils( this );
 		this.attributeUtils = new WebGPUAttributeUtils( this );
@@ -752,15 +752,30 @@ class WebGPUBackend extends Backend {
 
 	// utils
 
-	_getDepthBufferGPU( renderContext, depthTexture = this.depthBufferTexture ) {
+	_getDepthBufferGPU( renderContext ) {
 
 		const { width, height } = this.getDrawingBufferSize();
 
+		const depthTexture = this.defaultDepthTexture;
 		const depthTextureGPU = this.get( depthTexture ).texture;
+
+		let format, type;
+
+		if ( renderContext.stencil ) {
+
+			format = DepthStencilFormat;
+			type = UnsignedInt248Type;
+
+		} else if ( renderContext.depth ) {
+
+			format = DepthFormat;
+			type = UnsignedIntType;
+
+		}
 
 		if ( depthTextureGPU !== undefined ) {
 
-			if ( depthTexture.image.width === width && depthTexture.image.height === height ) {
+			if ( depthTexture.image.width === width && depthTexture.image.height === height && depthTexture.format === format && depthTexture.type === type ) {
 
 				return depthTextureGPU;
 
@@ -768,23 +783,11 @@ class WebGPUBackend extends Backend {
 
 			this.textureUtils.destroyTexture( depthTexture );
 
-			this.delete( depthTexture );
-
-		}
-
-		if ( renderContext.stencil ) {
-
-			depthTexture.format = DepthStencilFormat;
-			depthTexture.type = UnsignedInt248Type;
-
-		} else if ( renderContext.depth ) {
-
-			depthTexture.format = DepthFormat;
-			depthTexture.type = UnsignedIntType;
-
 		}
 
 		depthTexture.name = 'depthBuffer';
+		depthTexture.format = format;
+		depthTexture.type = type;
 		depthTexture.image.width = width;
 		depthTexture.image.height = height;
 
