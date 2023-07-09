@@ -32,8 +32,8 @@ export default QUnit.module( 'Renderers', () => {
 
 			function setMaterialProgramId(properties, mat, id) {
 
-				properties.get( mat )
-				properties.update( mat, 'currentProgram', {id : id} )
+				properties.get( mat );
+				properties.update( mat, 'currentProgram', {id : id} );
 				
 			}
 
@@ -65,17 +65,17 @@ export default QUnit.module( 'Renderers', () => {
 				const objA = { id: 'A', renderOrder: 0 };
 				const matA = { transparent: true };
 				const geoA = {};
-				setMaterialProgramId( properties, matA, 1)
+				setMaterialProgramId( properties, matA, 1);
 
 				const objB = { id: 'B', renderOrder: 0 };
 				const matB = { transparent: true };
 				const geoB = {};
-				setMaterialProgramId( properties, matB, 2)
+				setMaterialProgramId( properties, matB, 2);
 
 				const objC = { id: 'C', renderOrder: 0 };
 				const matC = { transparent: false };
 				const geoC = {};
-				setMaterialProgramId( properties, matC, 3)
+				setMaterialProgramId( properties, matC, 3);
 
 				const objD = { id: 'D', renderOrder: 0 };
 				const matD = { transparent: false };
@@ -167,17 +167,17 @@ export default QUnit.module( 'Renderers', () => {
 				const objA = { id: 'A', renderOrder: 0 };
 				const matA = { transparent: true };
 				const geoA = {};
-				setMaterialProgramId( properties, matA, 1)
+				setMaterialProgramId( properties, matA, 1);
 
 				const objB = { id: 'B', renderOrder: 0 };
 				const matB = { transparent: true };
 				const geoB = {};
-				setMaterialProgramId( properties, matB, 2)
+				setMaterialProgramId( properties, matB, 2);
 
 				const objC = { id: 'C', renderOrder: 0 };
 				const matC = { transparent: false };
 				const geoC = {};
-				setMaterialProgramId( properties, matC, 3)
+				setMaterialProgramId( properties, matC, 3);
 
 				const objD = { id: 'D', renderOrder: 0 };
 				const matD = { transparent: false };
