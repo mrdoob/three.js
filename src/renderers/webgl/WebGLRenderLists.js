@@ -12,6 +12,10 @@ function painterSortStable( a, b ) {
 
 		return a.material.id - b.material.id;
 
+	} else if ( a.programId !== b.programId ) {
+
+		return a.programId - b.programId;
+
 	} else if ( a.z !== b.z ) {
 
 		return a.z - b.z;
@@ -47,7 +51,7 @@ function reversePainterSortStable( a, b ) {
 }
 
 
-function WebGLRenderList() {
+function WebGLRenderList( properties ) {
 
 	const renderItems = [];
 	let renderItemsIndex = 0;
@@ -69,6 +73,7 @@ function WebGLRenderList() {
 	function getNextRenderItem( object, geometry, material, groupOrder, z, group ) {
 
 		let renderItem = renderItems[ renderItemsIndex ];
+		const program = properties.get( material ).currentProgram;
 
 		if ( renderItem === undefined ) {
 
@@ -80,7 +85,8 @@ function WebGLRenderList() {
 				groupOrder: groupOrder,
 				renderOrder: object.renderOrder,
 				z: z,
-				group: group
+				group: group,
+				programId: program ? program.id : 0
 			};
 
 			renderItems[ renderItemsIndex ] = renderItem;
@@ -95,6 +101,7 @@ function WebGLRenderList() {
 			renderItem.renderOrder = object.renderOrder;
 			renderItem.z = z;
 			renderItem.group = group;
+			renderItem.programId = program ? program.id : 0;
 
 		}
 
@@ -188,7 +195,7 @@ function WebGLRenderList() {
 
 }
 
-function WebGLRenderLists() {
+function WebGLRenderLists( properties ) {
 
 	let lists = new WeakMap();
 
@@ -199,14 +206,14 @@ function WebGLRenderLists() {
 
 		if ( listArray === undefined ) {
 
-			list = new WebGLRenderList();
+			list = new WebGLRenderList( properties );
 			lists.set( scene, [ list ] );
 
 		} else {
 
 			if ( renderCallDepth >= listArray.length ) {
 
-				list = new WebGLRenderList();
+				list = new WebGLRenderList( properties );
 				listArray.push( list );
 
 			} else {

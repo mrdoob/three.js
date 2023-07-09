@@ -1,5 +1,6 @@
 /* global QUnit */
 
+import { WebGLProperties } from '../../../../../src/renderers/webgl/WebGLProperties.js';
 import { WebGLRenderLists, WebGLRenderList } from '../../../../../src/renderers/webgl/WebGLRenderLists.js';
 import { Scene } from '../../../../../src/scenes/Scene.js';
 
@@ -29,9 +30,17 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module( 'WebGLRenderList', () => {
 
+      function setMaterialProgramId(properties, mat, id) {
+
+        properties.get( mat )
+        properties.update( mat, 'currentProgram', {id : id} )
+        
+      }
+
 			QUnit.test( 'init', ( assert ) => {
 
-				const list = new WebGLRenderList();
+        const properties = new WebGLProperties();
+				const list = new WebGLRenderList( properties );
 
 				assert.ok( list.transparent.length === 0, 'Transparent list defaults to length 0.' );
 				assert.ok( list.opaque.length === 0, 'Opaque list defaults to length 0.' );
@@ -51,22 +60,27 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'push', ( assert ) => {
 
-				const list = new WebGLRenderList();
+        const properties = new WebGLProperties();
+				const list = new WebGLRenderList( properties );
 				const objA = { id: 'A', renderOrder: 0 };
 				const matA = { transparent: true };
 				const geoA = {};
+        setMaterialProgramId( properties, matA, 1)
 
 				const objB = { id: 'B', renderOrder: 0 };
 				const matB = { transparent: true };
 				const geoB = {};
+        setMaterialProgramId( properties, matB, 2)
 
 				const objC = { id: 'C', renderOrder: 0 };
 				const matC = { transparent: false };
 				const geoC = {};
+        setMaterialProgramId( properties, matC, 3)
 
 				const objD = { id: 'D', renderOrder: 0 };
 				const matD = { transparent: false };
 				const geoD = {};
+        setMaterialProgramId( properties, matD, 4)
 
 				list.push( objA, geoA, matA, 0, 0.5, {} );
 				assert.ok( list.transparent.length === 1, 'Transparent list is length 1 after adding transparent item.' );
@@ -81,7 +95,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 0,
 						renderOrder: 0,
 						z: 0.5,
-						group: {}
+						group: {},
+            programId: 1
 					},
 					'The first transparent render list item is structured correctly.'
 				);
@@ -99,7 +114,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 1,
 						renderOrder: 0,
 						z: 1.5,
-						group: {}
+						group: {},
+            programId: 2
 					},
 					'The second transparent render list item is structured correctly.'
 				);
@@ -117,7 +133,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 2,
 						renderOrder: 0,
 						z: 2.5,
-						group: {}
+						group: {},
+            programId: 3
 					},
 					'The first opaque render list item is structured correctly.'
 				);
@@ -135,7 +152,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 3,
 						renderOrder: 0,
 						z: 3.5,
-						group: {}
+						group: {},
+            programId: 4
 					},
 					'The second opaque render list item is structured correctly.'
 				);
@@ -144,22 +162,27 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'unshift', ( assert ) => {
 
-				const list = new WebGLRenderList();
+        const properties = new WebGLProperties();
+				const list = new WebGLRenderList( properties );
 				const objA = { id: 'A', renderOrder: 0 };
 				const matA = { transparent: true };
 				const geoA = {};
+        setMaterialProgramId( properties, matA, 1)
 
 				const objB = { id: 'B', renderOrder: 0 };
 				const matB = { transparent: true };
 				const geoB = {};
+        setMaterialProgramId( properties, matB, 2)
 
 				const objC = { id: 'C', renderOrder: 0 };
 				const matC = { transparent: false };
 				const geoC = {};
+        setMaterialProgramId( properties, matC, 3)
 
 				const objD = { id: 'D', renderOrder: 0 };
 				const matD = { transparent: false };
 				const geoD = {};
+        setMaterialProgramId( properties, matD, 4)
 
 
 				list.unshift( objA, geoA, matA, 0, 0.5, {} );
@@ -175,7 +198,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 0,
 						renderOrder: 0,
 						z: 0.5,
-						group: {}
+						group: {},
+            programId: 1
 					},
 					'The first transparent render list item is structured correctly.'
 				);
@@ -193,7 +217,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 1,
 						renderOrder: 0,
 						z: 1.5,
-						group: {}
+						group: {},
+            programId: 2
 					},
 					'The second transparent render list item is structured correctly.'
 				);
@@ -211,7 +236,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 2,
 						renderOrder: 0,
 						z: 2.5,
-						group: {}
+						group: {},
+            programId: 3
 					},
 					'The first opaque render list item is structured correctly.'
 				);
@@ -229,7 +255,8 @@ export default QUnit.module( 'Renderers', () => {
 						groupOrder: 3,
 						renderOrder: 0,
 						z: 3.5,
-						group: {}
+						group: {},
+            programId: 4
 					},
 					'The second opaque render list item is structured correctly.'
 				);
@@ -238,7 +265,8 @@ export default QUnit.module( 'Renderers', () => {
 
 			QUnit.test( 'sort', ( assert ) => {
 
-				const list = new WebGLRenderList();
+        const properties = new WebGLProperties();
+				const list = new WebGLRenderList( properties );
 				const items = [ { id: 4 }, { id: 5 }, { id: 2 }, { id: 3 } ];
 
 				items.forEach( item => {
