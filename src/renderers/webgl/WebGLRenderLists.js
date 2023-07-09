@@ -8,13 +8,13 @@ function painterSortStable( a, b ) {
 
 		return a.renderOrder - b.renderOrder;
 
-	} else if ( a.material.id !== b.material.id ) {
-
-		return a.material.id - b.material.id;
-
 	} else if ( a.programId !== b.programId ) {
 
 		return a.programId - b.programId;
+
+	} else if ( a.material.id !== b.material.id ) {
+
+		return a.material.id - b.material.id;
 
 	} else if ( a.z !== b.z ) {
 
