@@ -23,13 +23,15 @@ class ComputeNode extends Node {
 
 	}
 
+	dispose() {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
+	}
+
 	set needsUpdate( value ) {
 
-		if ( value === true ) {
-
-			this.version ++;
-
-		}
+		if ( value === true ) this.version ++;
 
 	}
 

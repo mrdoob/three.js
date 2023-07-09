@@ -4,7 +4,7 @@ import RenderObject from './RenderObject.js';
 
 class RenderObjects extends ChainMap {
 
-	constructor( renderer, nodes, geometries, pipelines, info ) {
+	constructor( renderer, nodes, geometries, pipelines, bindings, info ) {
 
 		super();
 
@@ -12,6 +12,7 @@ class RenderObjects extends ChainMap {
 		this.nodes = nodes;
 		this.geometries = geometries;
 		this.pipelines = pipelines;
+		this.bindings = bindings;
 		this.info = info;
 
 		this.dataMap = new DataMap();
@@ -69,6 +70,7 @@ class RenderObjects extends ChainMap {
 			this.dataMap.delete( renderObject );
 
 			this.pipelines.delete( renderObject );
+			this.bindings.delete( renderObject );
 			this.nodes.delete( renderObject );
 
 			this.delete( renderObject.getChainArray() );
