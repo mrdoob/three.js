@@ -347,7 +347,7 @@ class WebGLRenderer {
 			clipping = new WebGLClipping( properties );
 			programCache = new WebGLPrograms( _this, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping );
 			materials = new WebGLMaterials( _this, properties );
-			renderLists = new WebGLRenderLists();
+			renderLists = new WebGLRenderLists( properties );
 			renderStates = new WebGLRenderStates( extensions, capabilities );
 			background = new WebGLBackground( _this, cubemaps, cubeuvmaps, state, objects, _alpha, premultipliedAlpha );
 			shadowMap = new WebGLShadowMap( _this, objects, capabilities );
