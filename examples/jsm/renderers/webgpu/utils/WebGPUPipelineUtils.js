@@ -66,25 +66,49 @@ class WebGPUPipelineUtils {
 
 		}
 
-		//
+		const colorWriteMask = this._getColorWriteMask( material );
+
+		const targets = [];
+
+		if ( Array.isArray( renderObject.context.texture ) ) {
+
+			const textures = renderObject.context.texture;
+
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				const colorFormat = utils.getTextureFormatGPU( textures[ i ] );
+
+				targets.push( {
+					format: colorFormat,
+					blend: blending,
+					writeMask: colorWriteMask
+				} );
+
+			}
+
+		} else {
+
+			const colorFormat = utils.getCurrentColorFormat( renderObject.context );
+
+			targets.push( {
+				format: colorFormat,
+				blend: blending,
+				writeMask: colorWriteMask
+			} );
+
+		}
 
 		const vertexModule = backend.get( vertexProgram ).module;
 		const fragmentModule = backend.get( fragmentProgram ).module;
 
 		const primitiveState = this._getPrimitiveState( object, geometry, material );
-		const colorWriteMask = this._getColorWriteMask( material );
 		const depthCompare = this._getDepthCompare( material );
-		const colorFormat = utils.getCurrentColorFormat( renderObject.context );
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
 		const sampleCount = utils.getSampleCount( renderObject.context );
 
 		pipelineData.pipeline = device.createRenderPipeline( {
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
-			fragment: Object.assign( {}, fragmentModule, { targets: [ {
-				format: colorFormat,
-				blend: blending,
-				writeMask: colorWriteMask
-			} ] } ),
+			fragment: Object.assign( {}, fragmentModule, { targets } ),
 			primitive: primitiveState,
 			depthStencil: {
 				format: depthStencilFormat,

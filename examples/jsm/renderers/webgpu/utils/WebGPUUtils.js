@@ -40,9 +40,19 @@ class WebGPUUtils {
 
 		let format;
 
+		const texture = renderContext.texture
+
 		if ( renderContext.texture !== null ) {
 
-			format = this.getTextureFormatGPU( renderContext.texture );
+			if ( Array.isArray( texture) ) {
+
+				format = 'dummy';
+
+			} else {
+
+				format = this.getTextureFormatGPU( renderContext.texture );
+
+			}
 
 		} else {
 

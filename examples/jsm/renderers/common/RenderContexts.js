@@ -12,6 +12,8 @@ class RenderContexts {
 	get( scene, camera, renderTarget = null ) {
 
 		const chainKey = [ scene, camera ];
+
+		// FIXME - handle multiple renderTarget textures
 		const attachmentState = renderTarget === null ? 'default' : `${renderTarget.texture.format}:${renderTarget.samples}:${renderTarget.depthBuffer}:${renderTarget.stencilBuffer}`;
 
 		const chainMap = this.getChainMap( attachmentState );

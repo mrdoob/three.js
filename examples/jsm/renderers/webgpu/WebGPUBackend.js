@@ -152,17 +152,48 @@ class WebGPUBackend extends Backend {
 
 		if ( renderContext.texture !== null ) {
 
-			const textureData = this.get( renderContext.texture );
-			const depthTextureData = this.get( renderContext.depthTexture );
-
 			// @TODO: Support RenderTarget with antialiasing.
 
-			colorAttachment.view = textureData.texture.createView( {
-				baseMipLevel: 0,
-				mipLevelCount: 1,
-				baseArrayLayer: renderContext.activeCubeFace,
-				dimension: GPUTextureViewDimension.TwoD
-			} );
+			if ( Array.isArray( renderContext.texture ) ) {
+
+				const textures = renderContext.texture;
+
+				descriptor.colorAttachments = [];
+
+				const colorAttachments = descriptor.colorAttachments;
+
+				for ( let i = 0; i < textures.length; i ++ ) {
+
+					const textureData = this.get( textures[ i ] );
+
+					const view = textureData.texture.createView( {
+						baseMipLevel: 0,
+						mipLevelCount: 1,
+						baseArrayLayer: renderContext.activeCubeFace,
+						dimension: GPUTextureViewDimension.TwoD
+					} );
+
+					colorAttachments.push( {
+						view,
+						loadOp: GPULoadOp.Load,
+						storeOp: GPUStoreOp.Store
+
+					} )
+
+				}
+
+			} else {
+
+				colorAttachment.view = textureData.texture.createView( {
+					baseMipLevel: 0,
+					mipLevelCount: 1,
+					baseArrayLayer: renderContext.activeCubeFace,
+					dimension: GPUTextureViewDimension.TwoD
+				} );
+
+			}
+
+			const depthTextureData = this.get( renderContext.depthTexture );
 
 			depthStencilAttachment.view = depthTextureData.texture.createView();
 
@@ -190,16 +221,45 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( renderContext.clearColor ) {
 
-			colorAttachment.clearValue = renderContext.clearColorValue;
-			colorAttachment.loadOp = GPULoadOp.Clear;
-			colorAttachment.storeOp = GPUStoreOp.Store;
+		if ( renderContext.texture !== null && Array.isArray( renderContext.texture ) ) {
+
+			const colorAttachments = descriptor.colorAttachments;
+
+			for ( let i = 0; i < this.colorBuffer.length; i ++ ) {
+
+				const colorAttachment = colorAttachments[ i ];
+
+				if ( renderContext.clearColor ) {
+
+					colorAttachment.clearValue = renderContext.clearColorValue;
+					colorAttachment.loadOp = GPULoadOp.Clear;
+					colorAttachment.storeOp = GPUStoreOp.Store;
+
+				} else {
+
+					colorAttachment.loadOp = GPULoadOp.Load;
+					colorAttachment.storeOp = GPUStoreOp.Store;
+
+				}
+
+			}
+
 
 		} else {
 
-			colorAttachment.loadOp = GPULoadOp.Load;
-			colorAttachment.storeOp = GPUStoreOp.Store;
+			if ( renderContext.clearColor ) {
+
+				colorAttachment.clearValue = renderContext.clearColorValue;
+				colorAttachment.loadOp = GPULoadOp.Clear;
+				colorAttachment.storeOp = GPUStoreOp.Store;
+
+			} else {
+
+				colorAttachment.loadOp = GPULoadOp.Load;
+				colorAttachment.storeOp = GPUStoreOp.Store;
+
+			}
 
 		}
 
