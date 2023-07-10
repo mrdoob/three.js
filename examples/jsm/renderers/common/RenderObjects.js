@@ -4,12 +4,13 @@ import RenderObject from './RenderObject.js';
 
 class RenderObjects {
 
-	constructor( renderer, nodes, geometries, pipelines, info ) {
+	constructor( renderer, nodes, geometries, pipelines, bindings, info ) {
 
 		this.renderer = renderer;
 		this.nodes = nodes;
 		this.geometries = geometries;
 		this.pipelines = pipelines;
+		this.bindings = bindings;
 		this.info = info;
 
 		this.chainMaps = {};
@@ -77,6 +78,7 @@ class RenderObjects {
 			dataMap.delete( renderObject );
 
 			this.pipelines.delete( renderObject );
+			this.bindings.delete( renderObject );
 			this.nodes.delete( renderObject );
 
 			chainMap.delete( renderObject.getChainArray() );

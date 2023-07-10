@@ -57,6 +57,7 @@ class WebGPUAttributeUtils {
 			buffer.unmap();
 
 			bufferData.buffer = buffer;
+
 		}
 
 	}

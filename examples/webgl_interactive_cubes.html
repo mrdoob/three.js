@@ -67,7 +67,20 @@
 
 				for ( let i = 0; i < 2000; i ++ ) {
 
-					const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					let material ;
+					const materialData = { color: Math.random() * 0xffffff };
+
+					const random = Math.random();
+					if ( random < 0.33 ) {
+						material = new THREE.MeshLambertMaterial( materialData );
+					}
+					else if ( random < 0.67 ) {
+						material = new THREE.MeshPhongMaterial( materialData );
+					}
+					else {
+						material = new THREE.MeshStandardMaterial( materialData );
+					}
+					const object = new THREE.Mesh( geometry, material );
 
 					object.position.x = Math.random() * 40 - 20;
 					object.position.y = Math.random() * 40 - 20;

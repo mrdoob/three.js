@@ -706,7 +706,7 @@ class PLYLoader extends Loader {
 			// ascii section using \r\n as line endings
 			if ( hasCRNL === true ) i ++;
 
-			return { headerText: lines.join( '\r' ) + '\r',  headerLength: i };
+			return { headerText: lines.join( '\r' ) + '\r', headerLength: i };
 
 		}
 
