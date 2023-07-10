@@ -1179,6 +1179,8 @@ class OrbitControls extends EventDispatcher {
 
 		function onTouchStart( event ) {
 
+			if ( scope.enabled === false ) return;
+
 			trackPointer( event );
 
 			switch ( pointers.length ) {
