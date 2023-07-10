@@ -75,6 +75,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
@@ -101,7 +102,7 @@
 				bloomPass.strength = params.strength;
 				bloomPass.radius = params.radius;
 
-				const outputPass = new OutputPass( THREE.ReinhardToneMapping );
+				const outputPass = new OutputPass();
 
 				composer = new EffectComposer( renderer );
 				composer.addPass( renderScene );
@@ -148,7 +149,7 @@
 
 				toneMappingFolder.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
 
-					outputPass.toneMappingExposure = Math.pow( value, 4.0 );
+					renderer.toneMappingExposure = Math.pow( value, 4.0 );
 
 				} );
 

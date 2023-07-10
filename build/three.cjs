@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '154dev';
+const REVISION = '155dev';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -20306,6 +20306,18 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const HAS_ATTRIBUTE_UV2 = !! geometry.attributes.uv2;
 		const HAS_ATTRIBUTE_UV3 = !! geometry.attributes.uv3;
 
+		let toneMapping = NoToneMapping;
+
+		if ( material.toneMapped ) {
+
+			if ( currentRenderTarget === null || currentRenderTarget.isXRRenderTarget === true ) {
+
+				toneMapping = renderer.toneMapping;
+
+			}
+
+		}
+
 		const parameters = {
 
 			isWebGL2: IS_WEBGL2,
@@ -20466,7 +20478,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			shadowMapEnabled: renderer.shadowMap.enabled && shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
 
-			toneMapping: material.toneMapped ? renderer.toneMapping : NoToneMapping,
+			toneMapping: toneMapping,
 			useLegacyLights: renderer.useLegacyLights,
 
 			premultipliedAlpha: material.premultipliedAlpha,
@@ -26222,8 +26234,6 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
-		let userCamera = null;
-
 		const cameraL = new PerspectiveCamera();
 		cameraL.layers.enable( 1 );
 		cameraL.viewport = new Vector4();
@@ -26243,18 +26253,10 @@ class WebXRManager extends EventDispatcher {
 
 		//
 
-		this.cameraAutoUpdate = true; // @deprecated, r153
+		this.cameraAutoUpdate = true;
 		this.enabled = false;
 
 		this.isPresenting = false;
-
-		this.getCamera = function () {}; // @deprecated, r153
-
-		this.setUserCamera = function ( value ) {
-
-			userCamera = value;
-
-		};
 
 		this.getController = function ( index ) {
 
@@ -26692,15 +26694,9 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
-		this.updateCameraXR = function ( camera ) {
+		this.updateCamera = function ( camera ) {
 
-			if ( session === null ) return camera;
-
-			if ( userCamera ) {
-
-				camera = userCamera;
-
-			}
+			if ( session === null ) return;
 
 			cameraXR.near = cameraR.near = cameraL.near = camera.near;
 			cameraXR.far = cameraR.far = cameraL.far = camera.far;
@@ -26746,19 +26742,11 @@ class WebXRManager extends EventDispatcher {
 
 			// update user camera and its children
 
-			if ( userCamera ) {
-
-				updateUserCamera( cameraXR, parent );
-
-			}
-
-			return cameraXR;
+			updateUserCamera( camera, cameraXR, parent );
 
 		};
 
-		function updateUserCamera( cameraXR, parent ) {
-
-			const camera = userCamera;
+		function updateUserCamera( camera, cameraXR, parent ) {
 
 			if ( parent === null ) {
 
@@ -26794,6 +26782,12 @@ class WebXRManager extends EventDispatcher {
 			}
 
 		}
+
+		this.getCamera = function () {
+
+			return cameraXR;
+
+		};
 
 		this.getFoveation = function () {
 
@@ -28933,7 +28927,9 @@ class WebGLRenderer {
 
 			if ( xr.enabled === true && xr.isPresenting === true ) {
 
-				camera = xr.updateCameraXR( camera ); // use XR camera for rendering
+				if ( xr.cameraAutoUpdate === true ) xr.updateCamera( camera );
+
+				camera = xr.getCamera(); // use XR camera for rendering
 
 			}
 
@@ -29506,7 +29502,18 @@ class WebGLRenderer {
 			const morphTargets = !! geometry.morphAttributes.position;
 			const morphNormals = !! geometry.morphAttributes.normal;
 			const morphColors = !! geometry.morphAttributes.color;
-			const toneMapping = material.toneMapped ? _this.toneMapping : NoToneMapping;
+
+			let toneMapping = NoToneMapping;
+
+			if ( material.toneMapped ) {
+
+				if ( _currentRenderTarget === null || _currentRenderTarget.isXRRenderTarget === true ) {
+
+					toneMapping = _this.toneMapping;
+
+				}
+
+			}
 
 			const morphAttribute = geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color;
 			const morphTargetsCount = ( morphAttribute !== undefined ) ? morphAttribute.length : 0;
@@ -32765,6 +32772,21 @@ class CompressedArrayTexture extends CompressedTexture {
 		this.isCompressedArrayTexture = true;
 		this.image.depth = depth;
 		this.wrapR = ClampToEdgeWrapping;
+
+	}
+
+}
+
+class CompressedCubeTexture extends CompressedTexture {
+
+	constructor( images, format, type ) {
+
+		super( undefined, images[ 0 ].width, images[ 0 ].height, format, type, CubeReflectionMapping );
+
+		this.isCompressedCubeTexture = true;
+		this.isCubeTexture = true;
+
+		this.image = images;
 
 	}
 
@@ -51319,6 +51341,7 @@ exports.Color = Color;
 exports.ColorKeyframeTrack = ColorKeyframeTrack;
 exports.ColorManagement = ColorManagement;
 exports.CompressedArrayTexture = CompressedArrayTexture;
+exports.CompressedCubeTexture = CompressedCubeTexture;
 exports.CompressedTexture = CompressedTexture;
 exports.CompressedTextureLoader = CompressedTextureLoader;
 exports.ConeGeometry = ConeGeometry;

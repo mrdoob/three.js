@@ -3,7 +3,7 @@ import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './Buf
 import { normalLocal } from './NormalNode.js';
 import { positionLocal } from './PositionNode.js';
 import { nodeProxy, vec3, mat3, mat4 } from '../shadernode/ShaderNode.js';
-import { DynamicDrawUsage } from 'three';
+import { DynamicDrawUsage, InstancedInterleavedBuffer } from 'three';
 
 class InstanceNode extends Node {
 
@@ -24,17 +24,17 @@ class InstanceNode extends Node {
 		if ( instanceMatrixNode === null ) {
 
 			const instanceMesh = this.instanceMesh;
-			const instaceAttribute = instanceMesh.instanceMatrix;
-			const array = instaceAttribute.array;
+			const instanceAttribute = instanceMesh.instanceMatrix;
+			const buffer = new InstancedInterleavedBuffer( instanceAttribute.array, 16, 1 );
 
-			const bufferFn = instaceAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
+			const bufferFn = instanceAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
 
 			const instanceBuffers = [
 				// F.Signature -> bufferAttribute( array, type, stride, offset )
-				bufferFn( array, 'vec4', 16, 0 ),
-				bufferFn( array, 'vec4', 16, 4 ),
-				bufferFn( array, 'vec4', 16, 8 ),
-				bufferFn( array, 'vec4', 16, 12 )
+				bufferFn( buffer, 'vec4', 16, 0 ),
+				bufferFn( buffer, 'vec4', 16, 4 ),
+				bufferFn( buffer, 'vec4', 16, 8 ),
+				bufferFn( buffer, 'vec4', 16, 12 )
 			];
 
 			instanceMatrixNode = mat4( ...instanceBuffers );

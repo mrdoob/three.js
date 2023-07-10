@@ -181,7 +181,7 @@ requestAnimationFrame(render);
 <p>效果好了一些但还是很难看出是三维的。我们来添加些光照效果，应该会有点帮助。three.js中有很多种类型的灯光，我们将在<a href="lights.html">后期文章</a>中详细讨论。现在我们先创建一盏平行光。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const color = 0xFFFFFF;
-  const intensity = 1;
+  const intensity = 3;
   const light = new THREE.DirectionalLight(color, intensity);
   light.position.set(-1, 2, 4);
   scene.add(light);

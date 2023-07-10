@@ -691,6 +691,7 @@ of the texture.</p>
 const texture = loader.load('resources/images/minecraft/flourish-cc-by-nc-sa.png', render);
 texture.magFilter = THREE.NearestFilter;
 texture.minFilter = THREE.NearestFilter;
+texture.colorSpace = THREE.SRGBColorSpace;
 </pre>
 <p>and pass the settings to the <code class="notranslate" translate="no">VoxelWorld</code> class</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const tileSize = 16;

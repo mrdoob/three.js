@@ -10,7 +10,7 @@ import RenderContexts from './RenderContexts.js';
 import Textures from './Textures.js';
 import Background from './Background.js';
 import Nodes from './nodes/Nodes.js';
-import { Frustum, Matrix4, Vector2, Vector3, Vector4, Color, SRGBColorSpace, NoToneMapping } from 'three';
+import { Frustum, Matrix4, Vector2, Vector3, Vector4, Color, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping } from 'three';
 
 const _drawingBufferSize = new Vector2();
 const _screen = new Vector4();
@@ -181,8 +181,8 @@ class Renderer {
 
 		//
 
-		const renderContext = this._renderContexts.get( scene, camera );
 		const renderTarget = this._renderTarget;
+		const renderContext = this._renderContexts.get( scene, camera, renderTarget );
 		const activeCubeFace = this._activeCubeFace;
 
 		this._currentRenderContext = renderContext;
@@ -329,9 +329,17 @@ class Renderer {
 
 	}
 
-	async getArrayBuffer( attribute ) {
+	getArrayBuffer( attribute ) { // @deprecated, r155
 
-		return await this.backend.getArrayBuffer( attribute );
+		console.warn( 'THREE.Renderer: getArrayBuffer() is deprecated. Use getArrayBufferAsync() instead.' );
+
+		return this.getArrayBufferAsync( attribute );
+
+	}
+
+	async getArrayBufferAsync( attribute ) {
+
+		return await this.backend.getArrayBufferAsync( attribute );
 
 	}
 
@@ -821,10 +829,7 @@ class Renderer {
 
 		//
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode );
-		renderObject.context = this._currentRenderContext;
-
-		//
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext );
 
 		this._nodes.updateBefore( renderObject );
 
@@ -835,8 +840,42 @@ class Renderer {
 
 		//
 
+		material.onBeforeRender( this, scene, camera, geometry, material, group );
+
+		//
+
+		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
+
+			material.side = BackSide;
+			this._renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode, 'backSide' ); // create backSide pass id
+
+			material.side = FrontSide;
+			this._renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode ); // use default pass id
+
+			material.side = DoubleSide;
+
+		} else {
+
+			this._renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode );
+
+		}
+
+		//
+
+		object.onAfterRender( this, scene, camera, geometry, material, group );
+
+	}
+
+	_renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode, passId ) {
+
+		//
+
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
+
+		//
+
 		this._nodes.updateForRender( renderObject );
-		this._geometries.update( renderObject );
+		this._geometries.updateForRender( renderObject );
 		this._bindings.updateForRender( renderObject );
 
 		//

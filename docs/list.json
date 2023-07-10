@@ -730,6 +730,12 @@
 
 			"Renderers / WebXR": {
 				"WebXRManager": "api/ar/renderers/webxr/WebXRManager"
+			},
+
+			"Scenes": {
+				"Fog": "api/ar/scenes/Fog",
+				"FogExp2": "api/ar/scenes/FogExp2",
+				"Scene": "api/ar/scenes/Scene"
 			}
 
 		}
