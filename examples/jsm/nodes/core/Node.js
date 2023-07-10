@@ -1,3 +1,4 @@
+import { EventDispatcher } from 'three';
 import { NodeUpdateType } from './constants.js';
 import { getNodeChildren, getCacheKey } from './NodeUtils.js';
 import { MathUtils } from 'three';
@@ -6,11 +7,11 @@ const NodeClasses = new Map();
 
 let _nodeId = 0;
 
-class Node {
+class Node extends EventDispatcher {
 
 	constructor( nodeType = null ) {
 
-		this.isNode = true;
+		super();
 
 		this.nodeType = nodeType;
 
@@ -18,6 +19,8 @@ class Node {
 		this.updateBeforeType = NodeUpdateType.NONE;
 
 		this.uuid = MathUtils.generateUUID();
+
+		this.isNode = true;
 
 		Object.defineProperty( this, 'id', { value: _nodeId ++ } );
 
@@ -49,6 +52,12 @@ class Node {
 			} };
 
 		}
+
+	}
+
+	dispose() {
+
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
