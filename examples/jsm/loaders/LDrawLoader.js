@@ -767,7 +767,7 @@ class LDrawParsedCache {
 				const text = await fileLoader.loadAsync( subobjectURL );
 				return text;
 
-			} catch {
+			} catch ( _ ) {
 
 				continue;
 

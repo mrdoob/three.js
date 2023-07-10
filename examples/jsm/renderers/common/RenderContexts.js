@@ -38,7 +38,7 @@ class RenderContexts {
 
 	dispose() {
 
-		this.renderStates = new ChainMap();
+		this.chainMaps = {};
 
 	}
 

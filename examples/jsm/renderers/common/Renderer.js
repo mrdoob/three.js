@@ -137,7 +137,7 @@ class Renderer {
 			this._textures = new Textures( backend, this._info );
 			this._pipelines = new Pipelines( backend, this._nodes );
 			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this._info );
-			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._info );
+			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this._info );
 			this._renderLists = new RenderLists();
 			this._renderContexts = new RenderContexts();
 
@@ -329,9 +329,17 @@ class Renderer {
 
 	}
 
-	async getArrayBuffer( attribute ) {
+	getArrayBuffer( attribute ) { // @deprecated, r155
 
-		return await this.backend.getArrayBuffer( attribute );
+		console.warn( 'THREE.Renderer: getArrayBuffer() is deprecated. Use getArrayBufferAsync() instead.' );
+
+		return this.getArrayBufferAsync( attribute );
+
+	}
+
+	async getArrayBufferAsync( attribute ) {
+
+		return await this.backend.getArrayBufferAsync( attribute );
 
 	}
 
@@ -587,31 +595,47 @@ class Renderer {
 
 		const backend = this.backend;
 		const pipelines = this._pipelines;
-		const computeGroup = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
+		const bindings = this._bindings;
+		const nodes = this._nodes;
+		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
 
-		backend.beginCompute( computeGroup );
+		backend.beginCompute( computeNodes );
 
-		for ( const computeNode of computeGroup ) {
+		for ( const computeNode of computeList ) {
 
 			// onInit
 
 			if ( pipelines.has( computeNode ) === false ) {
 
+				const dispose = () => {
+
+					computeNode.removeEventListener( 'dispose', dispose );
+
+					pipelines.delete( computeNode );
+					bindings.delete( computeNode );
+					nodes.delete( computeNode );
+
+				};
+
+				computeNode.addEventListener( 'dispose', dispose );
+
+				//
+
 				computeNode.onInit( { renderer: this } );
 
 			}
 
-			this._nodes.updateForCompute( computeNode );
-			this._bindings.updateForCompute( computeNode );
+			nodes.updateForCompute( computeNode );
+			bindings.updateForCompute( computeNode );
 
 			const computePipeline = pipelines.getForCompute( computeNode );
-			const computeBindings = this._bindings.getForCompute( computeNode );
+			const computeBindings = bindings.getForCompute( computeNode );
 
-			backend.compute( computeGroup, computeNode, computeBindings, computePipeline );
+			backend.compute( computeNodes, computeNode, computeBindings, computePipeline );
 
 		}
 
-		backend.finishCompute( computeGroup );
+		backend.finishCompute( computeNodes );
 
 	}
 
