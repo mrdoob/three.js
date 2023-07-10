@@ -69,6 +69,7 @@ class NodeBuilder {
 		this.flowNodes = { vertex: [], fragment: [], compute: [] };
 		this.flowCode = { vertex: '', fragment: '', compute: [] };
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
+		this.structs = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.codes = { vertex: [], fragment: [], compute: [] };
 		this.bindings = { vertex: [], fragment: [], compute: [] };
 		this.bindingsOffset = { vertex: 0, fragment: 0, compute: 0 };
@@ -598,6 +599,27 @@ class NodeBuilder {
 		}
 
 		return bufferAttribute;
+
+	}
+
+	getStructTypeFromNode( node, shaderStage = this.shaderStage, name = null ) {
+
+		const nodeData = this.getDataFromNode( node, shaderStage );
+
+		let nodeStruct = nodeData.structType;
+
+		if ( nodeStruct === undefined ) {
+
+			const index = this.structs.index ++;
+
+			node.name = `StructType${index}`;
+			this.structs[ shaderStage ].push( node );
+
+			nodeData.structType = nodeStruct;
+
+		}
+
+		return node;
 
 	}
 

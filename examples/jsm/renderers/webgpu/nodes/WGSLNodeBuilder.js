@@ -492,6 +492,44 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getStructMembers( struct ) {
+
+		const snippets = [];
+		const members = struct.getMemberTypes();
+
+		for ( let i = 0; i < members.length; i ++ ) {
+
+			const member = members[ i ];
+			snippets.push( `\t@location( ${i} ) m${i} : ${ member }<f32>` );
+
+		}
+
+		return snippets.join( ',\n' );
+
+	}
+
+	getStructs( shaderStage ) {
+
+		const snippets = [];
+		const structs = this.structs[ shaderStage ];
+
+		for ( let index = 0, length = structs.length; index < length; index ++ ) {
+
+			const struct = structs[ index ];
+			const name = struct.name;
+
+			let snippet = `\struct ${ name } {\n`;
+			snippet += this.getStructMembers( struct );
+			snippet += '\n}';
+
+			snippets.push( snippet );
+
+		}
+
+		return snippets.join( '\n\n' );
+
+	}
+
 	getVar( type, name ) {
 
 		return `var ${ name } : ${ this.getType( type ) }`;
@@ -539,6 +577,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 					if ( varying.type === 'int' || varying.type === 'uint' ) {
 
 						attributesSnippet += ' @interpolate( flat )';
+
 
 					}
 
@@ -712,13 +751,16 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			}
 
+			const outputNode = mainNode.outputNode;
 			const stageData = shadersData[ shaderStage ];
 
 			stageData.uniforms = this.getUniforms( shaderStage );
 			stageData.attributes = this.getAttributes( shaderStage );
 			stageData.varyings = this.getVaryings( shaderStage );
+			stageData.structs = this.getStructs( shaderStage );
 			stageData.vars = this.getVars( shaderStage );
 			stageData.codes = this.getCodes( shaderStage );
+			stageData.returnType = ( outputNode !== undefined && outputNode.isOutputStructNode === true ) ? outputNode.nodeType : '@location( 0 ) vec4<f32>';
 			stageData.flow = flow;
 
 		}
@@ -831,11 +873,14 @@ fn main( ${shaderData.attributes} ) -> NodeVaryingsStruct {
 // uniforms
 ${shaderData.uniforms}
 
+// structs
+${shaderData.structs}
+
 // codes
 ${shaderData.codes}
 
 @fragment
-fn main( ${shaderData.varyings} ) -> @location( 0 ) vec4<f32> {
+fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 
 	// vars
 	${shaderData.vars}

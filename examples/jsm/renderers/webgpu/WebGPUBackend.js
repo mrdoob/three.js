@@ -152,27 +152,76 @@ class WebGPUBackend extends Backend {
 
 		if ( renderContext.texture !== null ) {
 
-			const textureData = this.get( renderContext.texture );
-			const depthTextureData = this.get( renderContext.depthTexture );
+			if ( Array.isArray( renderContext.texture ) ) {
 
-			const view = textureData.texture.createView( {
-				baseMipLevel: 0,
-				mipLevelCount: 1,
-				baseArrayLayer: renderContext.activeCubeFace,
-				dimension: GPUTextureViewDimension.TwoD
-			} );
+				const textures = renderContext.texture;
 
-			if ( textureData.msaaTexture !== undefined ) {
+				descriptor.colorAttachments = [];
 
-				colorAttachment.view = textureData.msaaTexture.createView();
-				colorAttachment.resolveTarget = view;
+				const colorAttachments = descriptor.colorAttachments;
+
+				for ( let i = 0; i < textures.length; i ++ ) {
+
+					const textureData = this.get( textures[ i ] );
+
+					const textureView = textureData.texture.createView( {
+						baseMipLevel: 0,
+						mipLevelCount: 1,
+						baseArrayLayer: renderContext.activeCubeFace,
+						dimension: GPUTextureViewDimension.TwoD
+					} );
+
+					let view, resolveTarget;
+
+					if ( textureData.msaaTexture !== undefined ) {
+
+						view = textureData.msaaTexture.createView();
+						resolveTarget = textureView;
+
+					} else {
+
+						view = textureView;
+						resolveTarget = undefined;
+
+					}
+
+					colorAttachments.push( {
+						view,
+						resolveTarget,
+						loadOp: GPULoadOp.Load,
+						storeOp: GPUStoreOp.Store
+
+					} );
+
+				}
 
 			} else {
 
-				colorAttachment.view = view;
-				colorAttachment.resolveTarget = undefined;
+				const textureData = this.get( renderContext.texture );
+
+				const view = textureData.texture.createView( {
+					baseMipLevel: 0,
+					mipLevelCount: 1,
+					baseArrayLayer: renderContext.activeCubeFace,
+					dimension: GPUTextureViewDimension.TwoD
+				} );
+
+				if ( textureData.msaaTexture !== undefined ) {
+
+					colorAttachment.view = textureData.msaaTexture.createView();
+					colorAttachment.resolveTarget = view;
+
+				} else {
+
+					colorAttachment.view = view;
+					colorAttachment.resolveTarget = undefined;
+
+				}
 
 			}
+
+
+			const depthTextureData = this.get( renderContext.depthTexture );
 
 			depthStencilAttachment.view = depthTextureData.texture.createView();
 
@@ -200,16 +249,45 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( renderContext.clearColor ) {
 
-			colorAttachment.clearValue = renderContext.clearColorValue;
-			colorAttachment.loadOp = GPULoadOp.Clear;
-			colorAttachment.storeOp = GPUStoreOp.Store;
+		if ( renderContext.texture !== null && Array.isArray( renderContext.texture ) ) {
+
+			const colorAttachments = descriptor.colorAttachments;
+
+			for ( let i = 0; i < colorAttachments.length; i ++ ) {
+
+				const colorAttachment = colorAttachments[ i ];
+
+				if ( renderContext.clearColor ) {
+
+					colorAttachment.clearValue = renderContext.clearColorValue;
+					colorAttachment.loadOp = GPULoadOp.Clear;
+					colorAttachment.storeOp = GPUStoreOp.Store;
+
+				} else {
+
+					colorAttachment.loadOp = GPULoadOp.Load;
+					colorAttachment.storeOp = GPUStoreOp.Store;
+
+				}
+
+			}
+
 
 		} else {
 
-			colorAttachment.loadOp = GPULoadOp.Load;
-			colorAttachment.storeOp = GPUStoreOp.Store;
+			if ( renderContext.clearColor ) {
+
+				colorAttachment.clearValue = renderContext.clearColorValue;
+				colorAttachment.loadOp = GPULoadOp.Clear;
+				colorAttachment.storeOp = GPUStoreOp.Store;
+
+			} else {
+
+				colorAttachment.loadOp = GPULoadOp.Load;
+				colorAttachment.storeOp = GPUStoreOp.Store;
+
+			}
 
 		}
 
@@ -291,7 +369,31 @@ class WebGPUBackend extends Backend {
 
 		if ( renderContext.texture !== null && renderContext.texture.generateMipmaps === true ) {
 
-			this.textureUtils.generateMipmaps( renderContext.texture );
+			if ( Array.isArray( renderContext.texture ) ) {
+
+				const textures = renderContext.texture;
+
+				for ( let i = 0; i < textures.length; i ++ ) {
+
+					const texture = textures[ i ];
+
+					if ( texture.generateMipmaps === true ) {
+
+						this.textureUtils.generateMipmaps( texture );
+
+					}
+
+				}
+
+			} else {
+
+				if ( renderContext.texture.generateMipmaps === true ) {
+
+					this.textureUtils.generateMipmaps( renderContext.texture );
+
+				}
+
+			}
 
 		}
 

@@ -344,7 +344,15 @@ class NodeMaterial extends ShaderMaterial {
 
 			if ( renderTarget !== null ) {
 
-				outputColorSpace = renderTarget.texture.colorSpace;
+				if ( Array.isArray( renderTarget.texture ) ) {
+
+					outputColorSpace = renderTarget.texture[ 0 ].colorSpace;
+
+				} else {
+
+					outputColorSpace = renderTarget.texture.colorSpace;
+
+				}
 
 			} else {
 
