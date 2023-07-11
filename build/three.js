@@ -20484,7 +20484,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				shadowMapType: renderer.shadowMap.type,
 
 				toneMapping: toneMapping,
-				useLegacyLights: renderer.useLegacyLights,
+				useLegacyLights: renderer._useLegacyLights,
 
 				premultipliedAlpha: material.premultipliedAlpha,
 
@@ -27191,7 +27191,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				uniforms.lightMap.value = material.lightMap;
 
 				// artist-friendly light intensity scaling factor
-				const scaleFactor = ( renderer.useLegacyLights === true ) ? Math.PI : 1;
+				const scaleFactor = ( renderer._useLegacyLights === true ) ? Math.PI : 1;
 
 				uniforms.lightMapIntensity.value = material.lightMapIntensity * scaleFactor;
 
@@ -28030,7 +28030,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			// physical lights
 
-			this.useLegacyLights = true;
+			this._useLegacyLights = false;
 
 			// tone mapping
 
@@ -28837,7 +28837,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				} );
 
-				currentRenderState.setupLights( _this.useLegacyLights );
+				currentRenderState.setupLights( _this._useLegacyLights );
 
 				scene.traverse( function ( object ) {
 
@@ -28990,7 +28990,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				// render scene
 
-				currentRenderState.setupLights( _this.useLegacyLights );
+				currentRenderState.setupLights( _this._useLegacyLights );
 
 				if ( camera.isArrayCamera ) {
 
@@ -30296,14 +30296,14 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		get physicallyCorrectLights() { // @deprecated, r150
 
-			console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
+			console.warn( 'THREE.WebGLRenderer: The property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
 			return ! this.useLegacyLights;
 
 		}
 
 		set physicallyCorrectLights( value ) { // @deprecated, r150
 
-			console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
+			console.warn( 'THREE.WebGLRenderer: The property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
 			this.useLegacyLights = ! value;
 
 		}
@@ -30319,6 +30319,20 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			console.warn( 'THREE.WebGLRenderer: Property .outputEncoding has been removed. Use .outputColorSpace instead.' );
 			this.outputColorSpace = encoding === sRGBEncoding ? SRGBColorSpace : LinearSRGBColorSpace;
+
+		}
+
+		get useLegacyLights() { // @deprecated, r155
+
+			console.warn( 'THREE.WebGLRenderer: The property .useLegacyLights has been deprecated. Migrate your lighting according to the following guide: TODO.' );
+			return this._useLegacyLights;
+
+		}
+
+		set useLegacyLights( value ) { // @deprecated, r155
+
+			console.warn( 'THREE.WebGLRenderer: The property .useLegacyLights has been deprecated. Migrate your lighting according to the following guide: TODO.' );
+			this._useLegacyLights = value;
 
 		}
 
@@ -34907,7 +34921,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.parameters = {
 				radius: radius,
-				height: length,
+				length: length,
 				capSegments: capSegments,
 				radialSegments: radialSegments,
 			};
@@ -46881,7 +46895,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			// ensure there is a value node
 			if ( ! targetObject ) {
 
-				console.error( 'THREE.PropertyBinding: Trying to update node for track: ' + this.path + ' but it wasn\'t found.' );
+				console.warn( 'THREE.PropertyBinding: No target node found for track: ' + this.path + '.' );
 				return;
 
 			}
