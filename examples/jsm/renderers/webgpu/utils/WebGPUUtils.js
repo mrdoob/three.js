@@ -46,7 +46,7 @@ class WebGPUUtils {
 
 			if ( Array.isArray( texture) ) {
 
-				format = 'dummy';
+				format = 'dummy'; // FIXME
 
 			} else {
 
@@ -67,6 +67,12 @@ class WebGPUUtils {
 	getCurrentColorSpace( renderContext ) {
 
 		if ( renderContext.texture !== null ) {
+
+			if ( Array.isArray( renderContext.texture ) ) {
+
+				return renderContext.texture[ 0 ].colorSpace;
+
+			}
 
 			return renderContext.texture.colorSpace;
 
