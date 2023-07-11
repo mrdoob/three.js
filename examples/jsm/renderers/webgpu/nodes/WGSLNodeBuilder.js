@@ -736,7 +736,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			stageData.structs = this.getStructs( shaderStage );
 			stageData.vars = this.getVars( shaderStage );
 			stageData.codes = this.getCodes( shaderStage );
-			stageData.returnType = outputNode.isOutputStructNode === true ? outputNode.nodeType : '@location( 0 ) vec4<f32>';
+			stageData.returnType = ( outputNode !== undefined && outputNode.isOutputStructNode === true  ) ? outputNode.nodeType : '@location( 0 ) vec4<f32>';
 			stageData.flow = flow;
 
 		}
@@ -746,7 +746,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 			this.vertexShader = this._getWGSLVertexCode( shadersData.vertex );
 			this.fragmentShader = this._getWGSLFragmentCode( shadersData.fragment );
 
-			if ( this.material.isStruct ) console.log( this.fragmentShader );
 		} else {
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
