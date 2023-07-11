@@ -43,7 +43,8 @@
 			const params = {
 				exposure: 1.0,
 				toneMapping: 'ACESFilmic',
-				blurriness: 0.3
+				blurriness: 0.3,
+				intensity: 1.0,
 			};
 
 			const toneMappingOptions = {
@@ -142,6 +143,15 @@
 					.onChange( function ( value ) {
 
 						scene.backgroundBlurriness = value;
+						render();
+
+					} );
+
+				gui.add( params, 'intensity', 0, 1 )
+
+					.onChange( function ( value ) {
+
+						scene.backgroundIntensity = value;
 						render();
 
 					} );
