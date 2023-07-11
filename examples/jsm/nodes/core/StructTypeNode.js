@@ -1,4 +1,4 @@
-import Node, { addNodeClass } from 'three/examples/jsm/nodes/core/Node.js';
+import Node, { addNodeClass } from './Node.js';
 
 class StructTypeNode extends Node {
 
@@ -8,12 +8,6 @@ class StructTypeNode extends Node {
 
         this.types = types;
 		this.isStructTypeNode = true;
-
-	}
-
-	getHash( builder ) {
-
-		return this.name || super.getHash( builder );
 
 	}
 

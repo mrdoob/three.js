@@ -1,6 +1,6 @@
-import Node, { addNodeClass } from 'three/examples/jsm/nodes/core/Node.js';
-import StructTypeNode from 'three/examples/jsm/nodes/core/StructTypeNode.js';
-import { nodeProxy } from 'three/examples/jsm/nodes/shadernode/ShaderNode.js';
+import Node, { addNodeClass } from './Node.js';
+import StructTypeNode from './StructTypeNode.js';
+import { nodeProxy } from '../shadernode/ShaderNode.js';
 
 class OutputStructNode extends Node {
 
@@ -13,13 +13,9 @@ class OutputStructNode extends Node {
 
 	}
 
-	getHash( builder ) {
-
-		return this.name || super.getHash( builder );
-
-	}
-
 	construct( builder ) {
+
+		super.construct( builder );
 
 		const members = this.members;
 		const types = [];
@@ -34,18 +30,16 @@ class OutputStructNode extends Node {
 
 	}
 
-	generate( builder ) {
+	generate( builder, output ) {
 
 		const nodeVar = builder.getVarFromNode( this, this.nodeType );
 		const propertyName = builder.getPropertyName( nodeVar );
-
-		this.name = propertyName;
 
 		const members = this.members;
 
 		for ( let i = 0; i < members.length; i++ ) {
 
-			const snippet = members[ i ].build( builder );
+			const snippet = members[ i ].build( builder, output );
 
 			builder.addLineFlowCode( `${propertyName}.m${i} = ${snippet}` );
 

@@ -184,6 +184,8 @@ class WebGPUBackend extends Backend {
 
 			} else {
 
+				const textureData = this.get( renderContext.texture );
+
 				colorAttachment.view = textureData.texture.createView( {
 					baseMipLevel: 0,
 					mipLevelCount: 1,
@@ -226,7 +228,7 @@ class WebGPUBackend extends Backend {
 
 			const colorAttachments = descriptor.colorAttachments;
 
-			for ( let i = 0; i < this.colorBuffer.length; i ++ ) {
+			for ( let i = 0; i < colorAttachments.length; i ++ ) {
 
 				const colorAttachment = colorAttachments[ i ];
 
