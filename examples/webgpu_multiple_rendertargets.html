@@ -30,9 +30,9 @@
 			import * as THREE from 'three';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			// import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { NodeMaterial, attribute, uv, normalGeometry, normalize, mix, modelNormalMatrix,  step, texture, outputStruct, uniform, varying, vec2, vec4 } from 'three/nodes';
+			import { NodeMaterial, attribute, mix, modelNormalMatrix, normalGeometry, normalize, outputStruct, step, texture, uniform, uv, varying, vec2, vec4 } from 'three/nodes';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
@@ -144,13 +144,14 @@
 				renderer.useLegacyLights = false;
 				document.body.appendChild( renderer.domElement );
 
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				// Create a multi render target with Float buffers
 
 				renderTarget = new THREE.WebGLMultipleRenderTargets(
 					window.innerWidth * window.devicePixelRatio,
 					window.innerHeight * window.devicePixelRatio,
 					2,
-					{ minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter }
+					{ minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, colorSpace: THREE.LinearSRGBColorSpace }
 				);
 
 				// Name our G-Buffer attachments for debugging
@@ -171,7 +172,6 @@
 				const diffuse = loader.load( 'textures/hardwood2_diffuse.jpg', render );
 				diffuse.wrapS = THREE.RepeatWrapping;
 				diffuse.wrapT = THREE.RepeatWrapping;
-				diffuse.colorSpace = THREE.SRGBColorSpace;
 
 				scene.add( new THREE.Mesh(
 					new THREE.TorusKnotGeometry( 1, 0.3, 128, 32 ),
@@ -213,6 +213,10 @@
 
 			function render() {
 
+				/*
+
+				// Features not yet working
+
 				renderTarget.samples = parameters.samples;
 
 				scene.traverse( function ( child ) {
@@ -224,6 +228,8 @@
 					}
 
 				} );
+
+				*/
 
 				// render scene into target
 				renderer.setRenderTarget( renderTarget );
