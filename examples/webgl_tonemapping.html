@@ -43,7 +43,8 @@
 			const params = {
 				exposure: 1.0,
 				toneMapping: 'ACESFilmic',
-				blurriness: 0.3
+				blurriness: 0.3,
+				intensity: 1.0,
 			};
 
 			const toneMappingOptions = {
@@ -125,19 +126,21 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 				gui = new GUI();
-
-				gui.add( params, 'toneMapping', Object.keys( toneMappingOptions ) )
+				const toneMappingFolder = gui.addFolder( 'tone mapping' );
+			
+				toneMappingFolder.add( params, 'toneMapping', Object.keys( toneMappingOptions ) )
 
 					.onChange( function () {
 
-						updateGUI();
+						updateGUI( toneMappingFolder );
 
 						renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
 						render();
 
 					} );
+				const backgroundFolder = gui.addFolder( 'background' );
 
-				gui.add( params, 'blurriness', 0, 1 )
+				backgroundFolder.add( params, 'blurriness', 0, 1 )
 
 					.onChange( function ( value ) {
 
@@ -146,13 +149,22 @@
 
 					} );
 
-				updateGUI();
+				backgroundFolder.add( params, 'intensity', 0, 1 )
+
+					.onChange( function ( value ) {
+
+						scene.backgroundIntensity = value;
+						render();
+
+					} );
+
+				updateGUI( toneMappingFolder );
 
 				gui.open();
 
 			}
 
-			function updateGUI() {
+			function updateGUI( folder ) {
 
 				if ( guiExposure !== null ) {
 
@@ -163,7 +175,7 @@
 
 				if ( params.toneMapping !== 'None' ) {
 
-					guiExposure = gui.add( params, 'exposure', 0, 2 )
+					guiExposure = folder.add( params, 'exposure', 0, 2 )
 
 						.onChange( function () {
 
