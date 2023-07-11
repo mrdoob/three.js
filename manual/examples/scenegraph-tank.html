@@ -49,7 +49,6 @@ function main() {
 
 	const canvas = document.querySelector( '#c' );
 	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas } );
-	renderer.useLegacyLights = false;
 	renderer.setClearColor( 0xAAAAAA );
 	renderer.shadowMap.enabled = true;
 

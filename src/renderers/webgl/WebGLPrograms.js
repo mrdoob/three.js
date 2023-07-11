@@ -333,7 +333,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			shadowMapType: renderer.shadowMap.type,
 
 			toneMapping: toneMapping,
-			useLegacyLights: renderer.useLegacyLights,
+			useLegacyLights: renderer._useLegacyLights,
 
 			premultipliedAlpha: material.premultipliedAlpha,
 

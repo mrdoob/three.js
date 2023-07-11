@@ -26,7 +26,7 @@ class RoomEnvironment extends Scene {
 
 		let intensity = 5;
 
-		if ( renderer !== null && renderer.useLegacyLights === false ) intensity = 900;
+		if ( renderer !== null && renderer._useLegacyLights === false ) intensity = 900;
 
 		const mainLight = new PointLight( 0xffffff, intensity, 28, 2 );
 		mainLight.position.set( 0.418, 16.199, 0.300 );
