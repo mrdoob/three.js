@@ -822,6 +822,12 @@ class Renderer {
 
 	}
 
+	_getRenderObject( object, material, scene, camera, lightsNode, passId ) {
+
+		return this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
+
+	}
+
 	_renderObject( object, scene, camera, geometry, material, group, lightsNode ) {
 
 		material = scene.overrideMaterial !== null ? scene.overrideMaterial : material;
@@ -832,7 +838,7 @@ class Renderer {
 
 		//
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext );
+		const renderObject = this._getRenderObject( object, material, scene, camera, lightsNode );
 
 		this._nodes.updateBefore( renderObject );
 
@@ -850,16 +856,16 @@ class Renderer {
 		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 			material.side = BackSide;
-			this._renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode, 'backSide' ); // create backSide pass id
+			this._renderObjectDirect( this._getRenderObject( object, material, scene, camera, lightsNode, 'backSide' ) ); // create backSide pass id
 
 			material.side = FrontSide;
-			this._renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode ); // use default pass id
+			this._renderObjectDirect( renderObject ); // use default pass id
 
 			material.side = DoubleSide;
 
 		} else {
 
-			this._renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode );
+			this._renderObjectDirect( renderObject );
 
 		}
 
@@ -869,13 +875,7 @@ class Renderer {
 
 	}
 
-	_renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode, passId ) {
-
-		//
-
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
-
-		//
+	_renderObjectDirect( renderObject ) {
 
 		this._nodes.updateForRender( renderObject );
 		this._geometries.updateForRender( renderObject );
