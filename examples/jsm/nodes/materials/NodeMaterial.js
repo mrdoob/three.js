@@ -1,7 +1,7 @@
 import { Material, ShaderMaterial, NoColorSpace } from 'three';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
-import { diffuseColor } from '../core/PropertyNode.js';
+import { output, diffuseColor } from '../core/PropertyNode.js';
 import { materialNormal } from '../accessors/ExtendedMaterialNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
@@ -85,11 +85,27 @@ class NodeMaterial extends ShaderMaterial {
 
 			const outgoingLightNode = this.constructLighting( builder );
 
-			builder.stack.outputNode = this.constructOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
+			const outputNode = this.constructOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
+
+			builder.stack.assign( output, outputNode );
+
+			if ( this.outputNode !== null ) {
+
+				builder.stack.outputNode = vec4( this.outputNode );
+
+			} else {
+
+				builder.stack.outputNode = output;
+
+			}
 
 		} else {
 
-			builder.stack.outputNode = this.constructOutput( builder, this.outputNode || vec4( 0, 0, 0, 1 ) );
+			const outputNode = this.constructOutput( builder, this.outputNode || vec4( 0, 0, 0, 1 ) );
+
+			builder.stack.assign( output, outputNode );
+
+			builder.stack.outputNode = output;
 
 		}
 
