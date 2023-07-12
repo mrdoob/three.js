@@ -76,6 +76,8 @@ class NodeMaterial extends ShaderMaterial {
 
 		builder.addStack();
 
+		let outputNode;
+
 		if ( this.isUnlit === false ) {
 
 			if ( this.normals === true ) this.constructNormal( builder );
@@ -85,29 +87,17 @@ class NodeMaterial extends ShaderMaterial {
 
 			const outgoingLightNode = this.constructLighting( builder );
 
-			const outputNode = this.constructOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
+			outputNode = this.constructOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
 
-			builder.stack.assign( output, outputNode );
-
-			if ( this.outputNode !== null ) {
-
-				builder.stack.outputNode = vec4( this.outputNode );
-
-			} else {
-
-				builder.stack.outputNode = output;
-
-			}
+			if ( this.outputNode !== null ) outputNode = this.outputNode;
 
 		} else {
 
-			const outputNode = this.constructOutput( builder, this.outputNode || vec4( 0, 0, 0, 1 ) );
-
-			builder.stack.assign( output, outputNode );
-
-			builder.stack.outputNode = output;
+			outputNode = this.constructOutput( builder, this.outputNode || vec4( 0, 0, 0, 1 ) );
 
 		}
+
+		builder.stack.outputNode = outputNode;
 
 		builder.addFlow( 'fragment', builder.removeStack() );
 
@@ -345,6 +335,10 @@ class NodeMaterial extends ShaderMaterial {
 		const fogNode = builder.fogNode;
 
 		if ( fogNode ) outputNode = vec4( fogNode.mixAssign( outputNode.rgb ), outputNode.a );
+
+		// OUTPUT NODE
+
+		builder.stack.assign( output, outputNode );
 
 		return outputNode;
 

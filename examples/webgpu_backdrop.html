@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { float, vec3, color, toneMapping, viewportSharedTexture, viewportTopLeft, checker, uv, oscSine, output, MeshStandardNodeMaterial } from 'three/nodes';
+			import { float, vec3, color, toneMapping, viewportSharedTexture, viewportTopLeft, checker, uv, timerLocal, oscSine, output, MeshStandardNodeMaterial } from 'three/nodes';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -75,8 +75,11 @@
 					mixer = new THREE.AnimationMixer( object );
 
 					const material = object.children[ 0 ].children[ 0 ].material;
+
 					// output material effect ( better using hsv )
-					material.outputNode = oscSine().mix( output, output.posterize( 4 ).rgb.saturation( 0 ).add( .3 ) );
+					// ignore output.sRGBToLinear().linearTosRGB() for now
+
+					material.outputNode = oscSine( timerLocal( .1 ) ).mix( output, output.add( .1 ).posterize( 4 ).mul( 2 ) );
 
 					const action = mixer.clipAction( gltf.animations[ 0 ] );
 					action.play();
