@@ -22,7 +22,7 @@ class Background extends DataMap {
 	update( scene, renderList, renderContext ) {
 
 		const renderer = this.renderer;
-		const background = ( scene.isScene === true ) ? this.nodes.getBackgroundNode( scene ) || scene.background : null;
+		const background = this.nodes.getBackgroundNode( scene ) || scene.background;
 
 		let forceClear = false;
 
