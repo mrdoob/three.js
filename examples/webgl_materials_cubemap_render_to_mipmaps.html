@@ -246,14 +246,14 @@
 					let material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: cubeTexture } );
 
 					let mesh = new THREE.Mesh( sphere, material );
-					mesh.position.set( 100, 0, 0 );
+					mesh.position.set( - 100, 0, 0 );
 					scene.add( mesh );
 
 					material = material.clone();
 					material.envMap = cubeMapRenderTarget.texture;
 
 					mesh = new THREE.Mesh( sphere, material );
-					mesh.position.set( - 100, 0, 0 );
+					mesh.position.set( 100, 0, 0 );
 					scene.add( mesh );
 
 				} );
