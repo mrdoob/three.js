@@ -222,6 +222,12 @@ class Pipelines extends DataMap {
 
 	}
 
+	updateForRender( renderObject ) {
+
+		this.getForRender( renderObject );
+
+	}
+
 	_getComputePipeline( computeNode, stageCompute, cacheKey ) {
 
 		// check for existing pipeline

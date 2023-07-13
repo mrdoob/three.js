@@ -139,6 +139,20 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getSamplerCompare( textureProperty, uvSnippet, compareSnippet, shaderStage = this.shaderStage ) {
+
+		if ( shaderStage === 'fragment' ) {
+
+			return `textureSampleCompare( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${compareSnippet} )`;
+
+		} else {
+
+			console.error( `WebGPURenderer: THREE.DepthTexture.compareFunction() does not support ${ shaderStage } shader.` );
+
+		}
+
+	}
+
 	getSampler( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
@@ -204,6 +218,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 		}
 
 		return snippet;
+
+	}
+
+	getTextureCompare( texture, textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+
+		return this.getSamplerCompare( textureProperty, uvSnippet, shaderStage );
 
 	}
 
@@ -568,7 +588,17 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( shaderStage === 'fragment' ) {
 
-					bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler;` );
+					const texture = uniform.node.value;
+
+					if ( texture.isDepthTexture === true && texture.compareFunction !== null ) {
+
+						bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler_comparison;` );
+
+					} else {
+
+						bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler;` );
+
+					}
 
 				}
 

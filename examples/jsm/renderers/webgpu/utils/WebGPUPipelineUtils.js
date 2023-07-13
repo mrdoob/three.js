@@ -33,6 +33,7 @@ class WebGPUPipelineUtils {
 		const utils = backend.utils;
 
 		const pipelineData = backend.get( pipeline );
+		const bindingsData = backend.get( renderObject.getBindings() );
 
 		// vertex buffers
 
@@ -98,7 +99,9 @@ class WebGPUPipelineUtils {
 			multisample: {
 				count: sampleCount
 			},
-			layout: 'auto'
+			layout: device.createPipelineLayout( {
+				bindGroupLayouts: [ bindingsData.layout ]
+			} )
 		} );
 
 	}

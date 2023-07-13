@@ -10,16 +10,74 @@ class WebGPUBindingUtils {
 
 	}
 
-	createBindings( bindings, pipeline ) {
+	createBindingsLayout( bindings ) {
+
+		const backend = this.backend;
+		const device = backend.device;
+
+		const entries = [];
+
+		let index = 0;
+
+		for ( const binding of bindings ) {
+
+			const bindingGPU = {
+				binding: index ++,
+				visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
+			};
+
+			if ( binding.isUniformBuffer ) {
+
+				const buffer = {}; // GPUBufferBindingLayout
+
+				bindingGPU.buffer = buffer;
+
+			} else if ( binding.isSampler ) {
+
+				const sampler = {}; // GPUSamplerBindingLayout
+
+				if ( binding.texture.isDepthTexture ) {
+
+					if ( binding.texture.compareFunction !== null ) {
+
+						sampler.type = 'comparison';
+
+					}
+
+				}
+
+				bindingGPU.sampler = sampler;
+
+			} else if ( binding.isSampledTexture ) {
+
+				const texture = {}; // GPUTextureBindingLayout
+
+				if ( binding.texture.isDepthTexture ) {
+
+					texture.sampleType = 'depth';
+
+				}
+
+				bindingGPU.texture = texture;
+
+			}
+
+			entries.push( bindingGPU );
+
+		}
+
+		return device.createBindGroupLayout( { entries } );
+
+	}
+
+	createBindings( bindings ) {
 
 		const backend = this.backend;
 		const bindingsData = backend.get( bindings );
 
 		// setup (static) binding layout and (dynamic) binding group
 
-		const pipelineGPU = backend.get( pipeline ).pipeline;
-
-		const bindLayoutGPU = pipelineGPU.getBindGroupLayout( 0 );
+		const bindLayoutGPU = this.createBindingsLayout( bindings );
 		const bindGroupGPU = this.createBindGroup( bindings, bindLayoutGPU );
 
 		bindingsData.layout = bindLayoutGPU;

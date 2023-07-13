@@ -34,9 +34,7 @@ class Bindings extends DataMap {
 
 			this._init( bindings );
 
-			const pipeline = this.pipelines.getForRender( renderObject );
-
-			this.backend.createBindings( bindings, pipeline );
+			this.backend.createBindings( bindings );
 
 		}
 

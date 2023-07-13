@@ -19,13 +19,13 @@ import WebGPUTextureMipmapUtils from './WebGPUTextureMipmapUtils.js';
 
 const _compareToWebGPU = {
 	[ NeverCompare ]: 'never',
-	[ AlwaysCompare ]: 'less',
-	[ LessCompare ]: 'equal',
+	[ LessCompare ]: 'less',
+	[ EqualCompare ]: 'equal',
 	[ LessEqualCompare ]: 'less-equal',
-	[ EqualCompare ]: 'greater',
-	[ GreaterEqualCompare ]: 'not-equal',
-	[ GreaterCompare ]: 'greater-equal',
-	[ NotEqualCompare ]: 'always'
+	[ GreaterCompare ]: 'greater',
+	[ GreaterEqualCompare ]: 'greater-equal',
+	[ AlwaysCompare ]: 'always',
+	[ NotEqualCompare ]: 'not-equal'
 };
 
 class WebGPUTextureUtils {
