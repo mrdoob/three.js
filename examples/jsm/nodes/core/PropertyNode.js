@@ -53,5 +53,6 @@ export const sheen = nodeImmutable( PropertyNode, 'vec3', 'Sheen' );
 export const sheenRoughness = nodeImmutable( PropertyNode, 'float', 'SheenRoughness' );
 export const specularColor = nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
 export const shininess = nodeImmutable( PropertyNode, 'float', 'Shininess' );
+export const output = nodeImmutable( PropertyNode, 'vec4', 'Output' );
 
 addNodeClass( PropertyNode );
