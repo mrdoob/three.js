@@ -1,7 +1,7 @@
 import { Material, ShaderMaterial, NoColorSpace } from 'three';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
-import { diffuseColor } from '../core/PropertyNode.js';
+import { output, diffuseColor } from '../core/PropertyNode.js';
 import { materialNormal } from '../accessors/ExtendedMaterialNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
@@ -76,6 +76,8 @@ class NodeMaterial extends ShaderMaterial {
 
 		builder.addStack();
 
+		let outputNode;
+
 		if ( this.isUnlit === false ) {
 
 			if ( this.normals === true ) this.constructNormal( builder );
@@ -85,13 +87,17 @@ class NodeMaterial extends ShaderMaterial {
 
 			const outgoingLightNode = this.constructLighting( builder );
 
-			builder.stack.outputNode = this.constructOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
+			outputNode = this.constructOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
+
+			if ( this.outputNode !== null ) outputNode = this.outputNode;
 
 		} else {
 
-			builder.stack.outputNode = this.constructOutput( builder, this.outputNode || vec4( 0, 0, 0, 1 ) );
+			outputNode = this.constructOutput( builder, this.outputNode || vec4( 0, 0, 0, 1 ) );
 
 		}
+
+		builder.stack.outputNode = outputNode;
 
 		builder.addFlow( 'fragment', builder.removeStack() );
 
@@ -306,12 +312,6 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		// FOG
-
-		const fogNode = builder.fogNode;
-
-		if ( fogNode ) outputNode = vec4( fogNode.mixAssign( outputNode.rgb ), outputNode.a );
-
 		// ENCODING
 
 		const renderTarget = renderer.getRenderTarget();
@@ -329,6 +329,16 @@ class NodeMaterial extends ShaderMaterial {
 		}
 
 		if ( outputColorSpace !== NoColorSpace ) outputNode = outputNode.linearToColorSpace( outputColorSpace );
+
+		// FOG
+
+		const fogNode = builder.fogNode;
+
+		if ( fogNode ) outputNode = vec4( fogNode.mixAssign( outputNode.rgb ), outputNode.a );
+
+		// OUTPUT NODE
+
+		builder.stack.assign( output, outputNode );
 
 		return outputNode;
 
