@@ -66,10 +66,6 @@ class WebGPUBindingUtils {
 
 					texture.sampleType = 'depth';
 
-				} else if ( binding.texture.isVideoTexture ) {
-
-					texture.sampleType = 'float';
-
 				}
 
 				if ( binding.isSampledCubeTexture ) {
