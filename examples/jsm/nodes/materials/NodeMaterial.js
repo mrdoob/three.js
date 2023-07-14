@@ -1,4 +1,4 @@
-import { Material, ShaderMaterial, NoColorSpace } from 'three';
+import { Material, ShaderMaterial, NoColorSpace, LinearSRGBColorSpace } from 'three';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor } from '../core/PropertyNode.js';
@@ -34,6 +34,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.lights = true;
 		this.normals = true;
+		this.unlit = false;
 
 		this.lightsNode = null;
 		this.envNode = null;
@@ -88,6 +89,12 @@ class NodeMaterial extends ShaderMaterial {
 			const outgoingLightNode = this.constructLighting( builder );
 
 			outputNode = this.constructOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
+
+			// OUTPUT NODE
+
+			builder.stack.assign( output, outputNode );
+
+			//
 
 			if ( this.outputNode !== null ) outputNode = this.outputNode;
 
@@ -328,17 +335,17 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		if ( outputColorSpace !== NoColorSpace ) outputNode = outputNode.linearToColorSpace( outputColorSpace );
+		if ( outputColorSpace !== LinearSRGBColorSpace && outputColorSpace !== NoColorSpace ) {
+
+			outputNode = outputNode.linearToColorSpace( outputColorSpace );
+
+		}
 
 		// FOG
 
 		const fogNode = builder.fogNode;
 
 		if ( fogNode ) outputNode = vec4( fogNode.mixAssign( outputNode.rgb ), outputNode.a );
-
-		// OUTPUT NODE
-
-		builder.stack.assign( output, outputNode );
 
 		return outputNode;
 
@@ -441,7 +448,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	get isUnlit() {
 
-		return this.constructor === NodeMaterial.prototype.constructor;
+		return this.unlit === true || this.constructor === NodeMaterial.prototype.constructor;
 
 	}
 
