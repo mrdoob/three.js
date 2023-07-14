@@ -39,7 +39,7 @@
 		[page:Boolean depthBuffer] - 默认是`true`.<br />
 		[page:Boolean stencilBuffer] - 默认是`false`.<br />
 		[page:Number samples] - 默认是`0`.<br />
-		[page:Number count] - The number of render targets. Default is `1`.<br /><br />
+		[page:Number count] - default is `1`.<br /><br />
 
 		创建一个新[name]
 		</p>
@@ -83,9 +83,8 @@
 
 		<h3>[property:Texture textures]</h3>
 		<p>
-			The texture property is overwritten in [name] and replaced with an array.
-			This array holds the [page:WebGLRenderTarget.texture texture] references
-			of the respective render targets.
+			An array holding the [page:WebGLRenderTarget.texture texture] references
+			of multiple render targets configured with the [page:Number count] option.
 		</p>
 
 		<h3>[property:Boolean depthBuffer]</h3>
