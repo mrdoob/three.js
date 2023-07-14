@@ -56,9 +56,7 @@ class Bindings extends DataMap {
 
 			this._init( bindings );
 
-			const pipeline = this.pipelines.getForCompute( computeNode );
-
-			this.backend.createBindings( bindings, pipeline );
+			this.backend.createBindings( bindings );
 
 		}
 

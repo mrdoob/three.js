@@ -106,7 +106,7 @@ class WebGPUPipelineUtils {
 
 	}
 
-	createComputePipeline( pipeline ) {
+	createComputePipeline( pipeline, bindings ) {
 
 		const backend = this.backend;
 		const device = backend.device;
@@ -114,10 +114,13 @@ class WebGPUPipelineUtils {
 		const computeProgram = backend.get( pipeline.computeProgram ).module;
 
 		const pipelineGPU = backend.get( pipeline );
+		const bindingsData = backend.get( bindings );
 
 		pipelineGPU.pipeline = device.createComputePipeline( {
 			compute: computeProgram,
-			layout: 'auto'
+			layout: device.createPipelineLayout( {
+				bindGroupLayouts: [ bindingsData.layout ]
+			} )
 		} );
 
 	}

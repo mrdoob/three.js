@@ -1,5 +1,5 @@
 import {
-	GPUTextureAspect, GPUTextureViewDimension
+	GPUTextureAspect, GPUTextureViewDimension, GPUBufferBindingType
 } from './WebGPUConstants.js';
 
 class WebGPUBindingUtils {
@@ -23,12 +23,18 @@ class WebGPUBindingUtils {
 
 			const bindingGPU = {
 				binding: index ++,
-				visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
+				visibility: binding.visibility
 			};
 
-			if ( binding.isUniformBuffer ) {
+			if ( binding.isUniformBuffer || binding.isStorageBuffer ) {
 
 				const buffer = {}; // GPUBufferBindingLayout
+
+				if ( binding.isStorageBuffer ) {
+
+					buffer.type = GPUBufferBindingType.Storage;
+
+				}
 
 				bindingGPU.buffer = buffer;
 
@@ -48,6 +54,10 @@ class WebGPUBindingUtils {
 
 				bindingGPU.sampler = sampler;
 
+			} else if ( binding.isSampledTexture && binding.texture.isVideoTexture ) {
+
+				bindingGPU.externalTexture = {}; // GPUExternalTextureBindingLayout
+
 			} else if ( binding.isSampledTexture ) {
 
 				const texture = {}; // GPUTextureBindingLayout
@@ -56,9 +66,23 @@ class WebGPUBindingUtils {
 
 					texture.sampleType = 'depth';
 
+				} else if ( binding.texture.isVideoTexture ) {
+
+					texture.sampleType = 'float';
+
+				}
+
+				if ( binding.isSampledCubeTexture ) {
+
+					texture.viewDimension = GPUTextureViewDimension.Cube;
+
 				}
 
 				bindingGPU.texture = texture;
+
+			} else {
+
+				console.error( 'WebGPUBindingUtils: Unsupported binding "${ binding }".' );
 
 			}
 
