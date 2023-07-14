@@ -347,12 +347,6 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		// FOG
-
-		const fogNode = builder.fogNode;
-
-		if ( fogNode ) outputNode = vec4( fogNode.mixAssign( outputNode.rgb ), outputNode.a );
-
 		return outputNode;
 
 	}
