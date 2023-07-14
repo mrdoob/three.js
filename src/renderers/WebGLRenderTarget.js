@@ -37,13 +37,22 @@ class WebGLRenderTarget extends EventDispatcher {
 
 		}
 
-		this.texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
-		this.texture.isRenderTargetTexture = true;
+		const texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
 
-		this.texture.flipY = false;
-		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
-		this.texture.internalFormat = options.internalFormat !== undefined ? options.internalFormat : null;
-		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
+		texture.flipY = false;
+		texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
+		texture.internalFormat = options.internalFormat !== undefined ? options.internalFormat : null;
+		texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
+
+		this.textures = [];
+
+		const count = options.count !== undefined ? options.count : 1;
+		for ( let i = 0; i < count; i ++ ) {
+
+			this.textures[ i ] = texture.clone();
+			this.textures[ i ].isRenderTargetTexture = true;
+
+		}
 
 		this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
@@ -51,6 +60,18 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
 		this.samples = options.samples !== undefined ? options.samples : 0;
+
+	}
+
+	get texture() {
+
+		return this.textures[ 0 ];
+
+	}
+
+	set texture( value ) {
+
+		this.textures[ 0 ] = value;
 
 	}
 
@@ -92,8 +113,14 @@ class WebGLRenderTarget extends EventDispatcher {
 
 		this.viewport.copy( source.viewport );
 
-		this.texture = source.texture.clone();
-		this.texture.isRenderTargetTexture = true;
+		this.textures.length = 0;
+
+		for ( let i = 0, il = source.textures.length; i < il; i ++ ) {
+
+			this.textures[ i ] = source.textures[ i ].clone();
+			this.textures[ i ].isRenderTargetTexture = true;
+
+		}
 
 		// ensure image object is not shared, see #20328
 

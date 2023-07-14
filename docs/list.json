@@ -279,7 +279,6 @@
 			},
 
 			"Renderers": {
-				"WebGLMultipleRenderTargets": "api/en/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
 				"WebGL1Renderer": "api/en/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
@@ -712,7 +711,6 @@
 			},
 
 			"Renderers": {
-				"WebGLMultipleRenderTargets": "api/ar/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/ar/renderers/WebGLRenderer",
 				"WebGL1Renderer": "api/ar/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/ar/renderers/WebGLRenderTarget",
@@ -1020,7 +1018,6 @@
 			"渲染器": {
 				"WebGL3DRenderTarget": "api/zh/renderers/WebGL3DRenderTarget",
 				"WebGLArrayRenderTarget": "api/zh/renderers/WebGLArrayRenderTarget",
-				"WebGLMultipleRenderTargets": "api/zh/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
 				"WebGL1Renderer": "api/zh/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/zh/renderers/WebGLRenderTarget",
@@ -1611,7 +1608,6 @@
 			},
 
 			"Renderers": {
-				"WebGLMultipleRenderTargets": "api/it/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/it/renderers/WebGLRenderer",
 				"WebGL1Renderer": "api/it/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/it/renderers/WebGLRenderTarget",
@@ -2141,7 +2137,6 @@
 			},
 
 			"Renderers": {
-				"WebGLMultipleRenderTargets": "api/en/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
 				"WebGL1Renderer": "api/en/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",

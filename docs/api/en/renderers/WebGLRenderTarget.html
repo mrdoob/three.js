@@ -49,7 +49,8 @@
 			<br />
 			[page:Boolean depthBuffer] - default is `true`. <br />
 			[page:Boolean stencilBuffer] - default is `false`.<br />
-			[page:Number samples] - default is `0`.<br /><br />
+			[page:Number samples] - default is `0`.<br />
+			[page:Number count] - The number of render targets. Default is `1`.<br /><br />
 
 			Creates a new [name]
 		</p>
@@ -81,6 +82,13 @@
 		<p>
 			This texture instance holds the rendered pixels. Use it as input for
 			further processing.
+		</p>
+
+		<h3>[property:Texture textures]</h3>
+		<p>
+			The texture property is overwritten in [name] and replaced with an array.
+			This array holds the [page:WebGLRenderTarget.texture texture] references
+			of the respective render targets.
 		</p>
 
 		<h3>[property:Boolean depthBuffer]</h3>
