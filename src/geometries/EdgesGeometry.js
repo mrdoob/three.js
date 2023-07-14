@@ -147,6 +147,12 @@ class EdgesGeometry extends BufferGeometry {
 
 	}
 
+	static fromJSON( data ) {
+
+		return new EdgesGeometry( data.geometry, data.thresholdAngle);
+
+	}
+
 }
 
 export { EdgesGeometry };
