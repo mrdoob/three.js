@@ -250,6 +250,10 @@ class Renderer {
 
 		//
 
+		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
+
+		//
+
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromProjectionMatrix( _projScreenMatrix, coordinateSystem );
 
@@ -317,6 +321,10 @@ class Renderer {
 		this._currentRenderContext = previousRenderState;
 
 		this._lastRenderContext = renderContext;
+
+		//
+
+		sceneRef.onAfterRender( this, scene, camera, renderTarget );
 
 	}
 
