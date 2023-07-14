@@ -837,16 +837,16 @@ class Renderer {
 		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 			material.side = BackSide;
-			this._renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode, 'backSide' ); // create backSide pass id
+			this._renderObjectDirect( object, material, scene, camera, lightsNode, 'backSide' ); // create backSide pass id
 
 			material.side = FrontSide;
-			this._renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode ); // use default pass id
+			this._renderObjectDirect( object, material, scene, camera, lightsNode ); // use default pass id
 
 			material.side = DoubleSide;
 
 		} else {
 
-			this._renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode );
+			this._renderObjectDirect( object, material, scene, camera, lightsNode );
 
 		}
 
@@ -856,7 +856,7 @@ class Renderer {
 
 	}
 
-	_renderObjectDirect( object, scene, camera, geometry, material, group, lightsNode, passId ) {
+	_renderObjectDirect( object, material, scene, camera, lightsNode, passId ) {
 
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
 
