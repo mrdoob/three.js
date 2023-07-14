@@ -490,8 +490,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 			}
 
-			// @deprecated, r155
-			const textures = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture : renderTarget.textures;
+			const textures = renderTarget.textures;
 
 			if ( drawBuffers.length !== textures.length || drawBuffers[ 0 ] !== gl.COLOR_ATTACHMENT0 ) {
 

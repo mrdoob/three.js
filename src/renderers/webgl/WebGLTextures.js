@@ -347,8 +347,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		// @deprecated, r155
-		const textures = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture : renderTarget.textures;
+		const textures = renderTarget.textures;
 
 		for ( let i = 0, il = textures.length; i < il; i ++ ) {
 
@@ -1410,8 +1409,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else {
 
-			// @deprecated, r155
-			const textures = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture : renderTarget.textures;
+			const textures = renderTarget.textures;
 
 			for ( let i = 0; i < textures.length; i ++ ) {
 
@@ -1575,8 +1573,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
 
-		// @deprecated, r155
-		const textures = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture : renderTarget.textures;
+		const textures = renderTarget.textures;
 
 		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 		const isMultipleRenderTargets = ( textures.length > 1 );
@@ -1764,8 +1761,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		const supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
-		// @deprecated, r155
-		const textures = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture : renderTarget.textures;
+		const textures = renderTarget.textures;
 
 		for ( let i = 0, il = textures.length; i < il; i ++ ) {
 
@@ -1790,8 +1786,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( ( isWebGL2 && renderTarget.samples > 0 ) && useMultisampledRTT( renderTarget ) === false ) {
 
-			// @deprecated, r155
-			const textures = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture : renderTarget.textures;
+			const textures = renderTarget.textures;
 			const width = renderTarget.width;
 			const height = renderTarget.height;
 			let mask = _gl.COLOR_BUFFER_BIT;
