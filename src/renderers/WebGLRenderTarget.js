@@ -83,9 +83,13 @@ class WebGLRenderTarget extends EventDispatcher {
 			this.height = height;
 			this.depth = depth;
 
-			this.texture.image.width = width;
-			this.texture.image.height = height;
-			this.texture.image.depth = depth;
+			for ( let i = 0, il = this.textures.length; i < il; i ++ ) {
+
+				this.textures[ i ].image.width = width;
+				this.textures[ i ].image.height = height;
+				this.textures[ i ].image.depth = depth;
+
+			}
 
 			this.dispose();
 
