@@ -312,6 +312,12 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
+		// FOG
+
+		const fogNode = builder.fogNode;
+
+		if ( fogNode ) outputNode = vec4( fogNode.mixAssign( outputNode.rgb ), outputNode.a );
+
 		// ENCODING
 
 		const renderTarget = renderer.getRenderTarget();
@@ -329,12 +335,6 @@ class NodeMaterial extends ShaderMaterial {
 		}
 
 		if ( outputColorSpace !== NoColorSpace ) outputNode = outputNode.linearToColorSpace( outputColorSpace );
-
-		// FOG
-
-		const fogNode = builder.fogNode;
-
-		if ( fogNode ) outputNode = vec4( fogNode.mixAssign( outputNode.rgb ), outputNode.a );
 
 		// OUTPUT NODE
 
