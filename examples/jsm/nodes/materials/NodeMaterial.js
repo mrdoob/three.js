@@ -34,7 +34,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.lights = true;
 		this.normals = true;
-		this.unlit = false;
+		this.unlit = this.constructor === NodeMaterial.prototype.constructor; // Extended materials are not unlit by default
 
 		this.lightsNode = null;
 		this.envNode = null;
@@ -79,7 +79,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		let outputNode;
 
-		if ( this.isUnlit === false ) {
+		if ( this.unlit === false ) {
 
 			if ( this.normals === true ) this.constructNormal( builder );
 
@@ -443,12 +443,6 @@ class NodeMaterial extends ShaderMaterial {
 		}
 
 		return data;
-
-	}
-
-	get isUnlit() {
-
-		return this.unlit === true || this.constructor === NodeMaterial.prototype.constructor;
 
 	}
 
