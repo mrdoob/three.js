@@ -1486,8 +1486,6 @@ class WebGLRenderer {
 
 			const materialProperties = properties.get( material );
 
-			materialProperties.instancingColor = object.isInstancedMesh === true && object.instanceColor !== null;
-
 			const lights = currentRenderState.state.lights;
 			const shadowsArray = currentRenderState.state.shadowsArray;
 
