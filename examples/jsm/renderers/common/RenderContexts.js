@@ -26,6 +26,8 @@ class RenderContexts {
 
 		}
 
+		if ( renderTarget !== null ) renderState.sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
+
 		return renderState;
 
 	}
