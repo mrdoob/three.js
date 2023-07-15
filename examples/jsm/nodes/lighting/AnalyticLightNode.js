@@ -6,6 +6,7 @@ import { vec3 } from '../shadernode/ShaderNode.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { positionWorld } from '../accessors/PositionNode.js';
+import { normalWorld } from '../accessors/NormalNode.js';
 
 import { Color, DepthTexture, NearestFilter, LessCompare } from 'three';
 
@@ -59,11 +60,12 @@ class AnalyticLightNode extends LightingNode {
 
 			//
 
-			const bias = reference( 'bias', 'float', shadow );
+			const bias = reference( 'bias', 'float', shadow ); // -.001
+			const normalBias = reference( 'normalBias', 'float', shadow );
 
 			//
 
-			let shadowCoord = uniform( shadow.matrix ).mul( positionWorld );
+			let shadowCoord = uniform( shadow.matrix ).mul( positionWorld.add( normalWorld.mul( normalBias ) ) );
 			shadowCoord = shadowCoord.xyz.div( shadowCoord.w );
 
 			const frustumTest = shadowCoord.x.greaterThanEqual( 0 )
