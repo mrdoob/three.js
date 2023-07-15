@@ -80,7 +80,6 @@
 				const loader = new OBJLoader();
 				loader.load( 'models/obj/tree.obj', function ( object ) {
 
-					object.material = materialScene;
 					object.position.set( 0, - 150, - 150 );
 					object.scale.multiplyScalar( 400 );
 					scene.add( object );
