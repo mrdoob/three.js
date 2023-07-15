@@ -73,8 +73,6 @@
 
 				materialDepth = new THREE.MeshDepthMaterial();
 
-				const materialScene = new THREE.MeshBasicMaterial( { color: 0x000000 } );
-
 				// tree
 
 				const loader = new OBJLoader();
@@ -89,7 +87,7 @@
 				// sphere
 
 				const geo = new THREE.SphereGeometry( 1, 20, 10 );
-				sphereMesh = new THREE.Mesh( geo, materialScene );
+				sphereMesh = new THREE.Mesh( geo, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
 				sphereMesh.scale.multiplyScalar( 20 );
 				scene.add( sphereMesh );
 
