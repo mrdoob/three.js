@@ -167,9 +167,7 @@
 				const mesh = new THREE.Mesh( geometry, material );
 
 				const currentRenderTarget = renderer.getRenderTarget();
-				const currentToneMapping = renderer.toneMapping;
 				const currentXrEnabled = renderer.xr.enabled;
-				renderer.toneMapping = THREE.NoToneMapping;
 				renderer.xr.enabled = false;
 
 				for ( let faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
@@ -193,7 +191,6 @@
 				}
 
 				renderer.setRenderTarget( currentRenderTarget );
-				renderer.toneMapping = currentToneMapping;
 				renderer.xr.enabled = currentXrEnabled;
 
 				mesh.geometry.dispose();
@@ -210,7 +207,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
