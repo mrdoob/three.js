@@ -130,13 +130,7 @@
 
 			function onWindowResize() {
 
-				const width = window.innerWidth;
-				const height = window.innerHeight;
-
-				postCamera.aspect = width / height;
-				postCamera.updateProjectionMatrix();
-
-				renderer.setSize( width, height );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
