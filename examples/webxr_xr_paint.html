@@ -60,9 +60,9 @@
 				const grid = new THREE.GridHelper( 4, 1, 0x111111, 0x111111 );
 				scene.add( grid );
 
-				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
+				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788, 3 ) );
 
-				const light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				const light = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light.position.set( 0, 4, 0 );
 				scene.add( light );
 

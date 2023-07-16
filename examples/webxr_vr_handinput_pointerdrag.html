@@ -39,8 +39,6 @@
 
 		import { World, System, Component, TagComponent, Types } from 'three/addons/libs/ecsy.module.js';
 
-		THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 		class Object3D extends Component { }
 
 		Object3D.schema = {
@@ -408,9 +406,9 @@
 			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 			camera.position.set( 0, 1.2, 0.3 );
 
-			scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
+			scene.add( new THREE.HemisphereLight( 0xcccccc, 0x999999, 3 ) );
 
-			const light = new THREE.DirectionalLight( 0xffffff );
+			const light = new THREE.DirectionalLight( 0xffffff, 3 );
 			light.position.set( 0, 6, 0 );
 			light.castShadow = true;
 			light.shadow.camera.top = 2;

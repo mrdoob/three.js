@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { float, vec3, color, toneMapping, viewportSharedTexture, viewportTopLeft, checker, uv, oscSine, MeshStandardNodeMaterial } from 'three/nodes';
+			import { float, vec3, color, toneMapping, viewportSharedTexture, viewportTopLeft, checker, uv, timerLocal, oscSine, output, MeshStandardNodeMaterial } from 'three/nodes';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -74,6 +74,13 @@
 					const object = gltf.scene;
 					mixer = new THREE.AnimationMixer( object );
 
+					const material = object.children[ 0 ].children[ 0 ].material;
+
+					// output material effect ( better using hsv )
+					// ignore output.sRGBToLinear().linearTosRGB() for now
+
+					material.outputNode = oscSine( timerLocal( .1 ) ).mix( output, output.add( .1 ).posterize( 4 ).mul( 2 ) );
+
 					const action = mixer.clipAction( gltf.animations[ 0 ] );
 					action.play();
 
@@ -83,6 +90,8 @@
 
 				// portals
 
+				const geometry = new THREE.SphereGeometry( .3, 32, 16 );
+
 				portals = new THREE.Group();
 				scene.add( portals );
 
@@ -91,8 +100,6 @@
 					const distance = 1;
 					const id = portals.children.length;
 					const rotation = THREE.MathUtils.degToRad( id * 45 );
-
-					const geometry = new THREE.SphereGeometry( .3, 32, 16 );
 
 					const material = new MeshStandardNodeMaterial( { color: 0x0066ff } );
 					material.roughnessNode = float( .2 );

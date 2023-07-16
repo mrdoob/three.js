@@ -39,7 +39,7 @@ class PointLightNode extends AnalyticLightNode {
 		const lightDirection = lVector.normalize();
 		const lightDistance = lVector.length();
 
-		const lightAttenuation = getDistanceAttenuation.call( {
+		const lightAttenuation = getDistanceAttenuation( {
 			lightDistance,
 			cutoffDistance: cutoffDistanceNode,
 			decayExponent: decayExponentNode
@@ -52,11 +52,11 @@ class PointLightNode extends AnalyticLightNode {
 
 		if ( lightingModelFunctionNode && lightingModelFunctionNode.direct ) {
 
-			lightingModelFunctionNode.direct.call( {
+			lightingModelFunctionNode.direct( {
 				lightDirection,
 				lightColor,
 				reflectedLight
-			}, builder );
+			} );
 
 		}
 

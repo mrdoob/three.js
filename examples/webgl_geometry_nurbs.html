@@ -70,9 +70,9 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				scene.add( new THREE.AmbientLight( 0x808080 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff ) );
 
-				const light = new THREE.DirectionalLight( 0xffffff, 1 );
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 

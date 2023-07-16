@@ -49,14 +49,6 @@
 
 				scene = new THREE.Scene();
 
-				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				hemiLight.position.set( 0, 1, 0 );
-				scene.add( hemiLight );
-
-				const dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( 0, 1, 0 );
-				scene.add( dirLight );
-
 				// grid
 				const gridHelper = new THREE.GridHelper( 28, 28, 0x303030, 0x303030 );
 				scene.add( gridHelper );

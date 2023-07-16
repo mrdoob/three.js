@@ -146,9 +146,9 @@
 
 					scene.add( new THREE.Mesh( geometry, material ) );
 
-					scene.add( new THREE.HemisphereLight( 0xaaaaaa, 0x444444 ) );
+					scene.add( new THREE.HemisphereLight( 0xaaaaaa, 0x444444, 3 ) );
 
-					const light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+					const light = new THREE.DirectionalLight( 0xffffff, 1.5 );
 					light.position.set( 1, 1, 1 );
 					scene.add( light );
 

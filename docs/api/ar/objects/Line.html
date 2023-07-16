@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		خط مستمر.<br /><br />
+		 
+		هذا مطابق تقريبًا لـ [page:LineSegments] ؛ الفرق الوحيد هو
+		أنه يتم تقديمه باستخدام
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_STRIP] بدلاً من
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINES]
+		</p>
+		 
+		<h2>مثال للكود</h2>
+		 
+		<code>
+		const material = new THREE.LineBasicMaterial({
+			color: 0x0000ff
+		});
+		 
+		const points = [];
+		points.push( new THREE.Vector3( - 10, 0, 0 ) );
+		points.push( new THREE.Vector3( 0, 10, 0 ) );
+		points.push( new THREE.Vector3( 10, 0, 0 ) );
+		 
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
+		 
+		const line = new THREE.Line( geometry, material );
+		scene.add( line );
+		</code>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>
+		[name]( [param:BufferGeometry geometry], [param:Material material] )
+		</h3>
+		 
+		<p>
+		[page:BufferGeometry geometry] - الرؤوس التي تمثل الخط
+		القطعة (القطع). الافتراضية هي جديدة [page:BufferGeometry].<br />
+		[page:Material material] - مادة للخط. الافتراضية هي جديدة
+		[page:LineBasicMaterial].<br />
+		</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		<p>راجع الفئة الأساسية [page:Object3D] للحصول على الخصائص المشتركة.</p>
+		 
+		<h3>[property:BufferGeometry geometry]</h3>
+		<p>الرؤوس التي تمثل الخط القطعة (القطع).</p>
+		 
+		<h3>[property:Boolean isLine]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان كائنًا معطىً من نوع [name].</p>
+		 
+		<h3>[property:Material material]</h3>
+		<p>مادة للخط.</p>
+		 
+		<h3>[property:Array morphTargetInfluences]</h3>
+		<p>
+		مجموعة من الأوزان عادةً من 0-1 التي تحدد مدى تطبيق التغير
+		يتم تطبيقه. غير محدد بشكل افتراضي ، ولكن يتم إعادة تعيينه إلى مجموعة فارغة بواسطة
+		[page:.updateMorphTargets]().
+		</p>
+		 
+		<h3>[property:Object morphTargetDictionary]</h3>
+		<p>
+		قاموس من morphTargets بناءً على خاصية morphTarget.name.
+		غير محدد بشكل افتراضي ، ولكن يتم إعادة بنائه [page:.updateMorphTargets]().
+		</p>
+		 
+		<h2>الطرق (Methods)</h2>
+		<p>راجع الفئة الأساسية [page:Object3D] للحصول على الطرق المشتركة.</p>
+		 
+		<h3>[method:this computeLineDistances]()</h3>
+		<p>
+		يحسب مجموعة من قيم المسافات التي هي ضرورية لـ
+		[page:LineDashedMaterial]. بالنسبة لكل رأس في الهندسة ، يحسب الأسلوب
+		الطول التراكمي من النقطة الحالية إلى
+		بداية جدا من الخط.
+		</p>
+		 
+		<h3>
+		[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )
+		</h3>
+		<p>
+		احصل على تقاطعات بين [page:Ray] المصبوب وهذا الخط.
+		ستستدعي [page:Raycaster.intersectObject] هذه الطريقة.
+		</p>
+		 
+		<h3>[method:Line clone]()</h3>
+		<p>يعود بنسخة من هذا كائن Line وأحفاده.</p>
+		 
+		<h3>[method:undefined updateMorphTargets]()</h3>
+		<p>
+		يحدث morphTargets ليكون لها تأثير على الكائن. يعيد تعيين
+		[page:.morphTargetInfluences] و [page:.morphTargetDictionary]
+		خصائص.
+		</p>
+	 
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

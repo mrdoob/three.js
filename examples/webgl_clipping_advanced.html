@@ -174,9 +174,9 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0xffffff, 0.3 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff ) );
 
-				const spotLight = new THREE.SpotLight( 0xffffff, 0.5 );
+				const spotLight = new THREE.SpotLight( 0xffffff, 60 );
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.2;
 				spotLight.position.set( 2, 3, 3 );
@@ -187,7 +187,7 @@
 				spotLight.shadow.mapSize.height = 1024;
 				scene.add( spotLight );
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				dirLight.position.set( 0, 2, 0 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 1;

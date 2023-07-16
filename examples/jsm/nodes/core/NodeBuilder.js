@@ -5,6 +5,7 @@ import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
+import { createNodeMaterialFromType } from '../materials/NodeMaterial.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import { REVISION, NoColorSpace, LinearEncoding, sRGBEncoding, SRGBColorSpace, Color, Vector2, Vector3, Vector4, Float16BufferAttribute } from 'three';
@@ -42,13 +43,14 @@ const toFloat = ( value ) => {
 
 class NodeBuilder {
 
-	constructor( object, renderer, parser ) {
+	constructor( object, renderer, parser, scene = null ) {
 
 		this.object = object;
-		this.material = object && ( object.material || null );
-		this.geometry = object && ( object.geometry || null );
+		this.material = ( object && object.material ) || null;
+		this.geometry = ( object && object.geometry ) || null;
 		this.renderer = renderer;
 		this.parser = parser;
+		this.scene = scene;
 
 		this.nodes = [];
 		this.updateNodes = [];
@@ -68,7 +70,11 @@ class NodeBuilder {
 		this.flowCode = { vertex: '', fragment: '', compute: [] };
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.codes = { vertex: [], fragment: [], compute: [] };
+		this.bindings = { vertex: [], fragment: [], compute: [] };
+		this.bindingsOffset = { vertex: 0, fragment: 0, compute: 0 };
+		this.bindingsArray = null;
 		this.attributes = [];
+		this.bufferAttributes = [];
 		this.varyings = [];
 		this.vars = { vertex: [], fragment: [], compute: [] };
 		this.flow = { code: '' };
@@ -89,6 +95,28 @@ class NodeBuilder {
 
 		this.shaderStage = null;
 		this.buildStage = null;
+
+	}
+
+	includes( node ) {
+
+		return this.nodes.includes( node );
+
+	}
+
+	getBindings() {
+
+		let bindingsArray = this.bindingsArray;
+
+		if ( bindingsArray === null ) {
+
+			const bindings = this.bindings;
+
+			this.bindingsArray = bindingsArray = ( this.material !== null ) ? [ ...bindings.vertex, ...bindings.fragment ] : bindings.compute;
+
+		}
+
+		return bindingsArray;
 
 	}
 
@@ -207,6 +235,12 @@ class NodeBuilder {
 
 	}
 
+	getVertexIndex() {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
 	getInstanceIndex() {
 
 		console.warn( 'Abstract function.' );
@@ -280,6 +314,10 @@ class NodeBuilder {
 		} else if ( typeLength === 4 ) {
 
 			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) }, ${ getConst( value.z ) }, ${ getConst( value.w ) } )`;
+
+		} else if ( typeLength > 4 && value && ( value.isMatrix3 || value.isMatrix4 ) ) {
+
+			return `${ this.getType( type ) }( ${ value.elements.map( getConst ).join( ', ' ) } )`;
 
 		} else if ( typeLength > 4 ) {
 
@@ -359,9 +397,9 @@ class NodeBuilder {
 
 	}
 
-	isShaderStage( shaderStage ) {
+	needsColorSpaceToLinear( /*texture*/ ) {
 
-		return this.shaderStage === shaderStage;
+		return false;
 
 	}
 
@@ -541,7 +579,29 @@ class NodeBuilder {
 
 	}
 
-	getUniformFromNode( node, shaderStage, type ) {
+	getBufferAttributeFromNode( node, type ) {
+
+		const nodeData = this.getDataFromNode( node );
+
+		let bufferAttribute = nodeData.bufferAttribute;
+
+		if ( bufferAttribute === undefined ) {
+
+			const index = this.uniforms.index ++;
+
+			bufferAttribute = new NodeAttribute( 'nodeAttribute' + index, type, node );
+
+			this.bufferAttributes.push( bufferAttribute );
+
+			nodeData.bufferAttribute = bufferAttribute;
+
+		}
+
+		return bufferAttribute;
+
+	}
+
+	getUniformFromNode( node, type, shaderStage = this.shaderStage, name = null ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
@@ -551,7 +611,7 @@ class NodeBuilder {
 
 			const index = this.uniforms.index ++;
 
-			nodeUniform = new NodeUniform( 'nodeUniform' + index, type, node );
+			nodeUniform = new NodeUniform( name || ( 'nodeUniform' + index ), type, node );
 
 			this.uniforms[ shaderStage ].push( nodeUniform );
 
@@ -732,6 +792,12 @@ class NodeBuilder {
 
 	}
 
+	getAttributesArray() {
+
+		return this.attributes.concat( this.bufferAttributes );
+
+	}
+
 	getAttributes( /*shaderStage*/ ) {
 
 		console.warn( 'Abstract function.' );
@@ -872,6 +938,12 @@ class NodeBuilder {
 		this.buildCode();
 
 		return this;
+
+	}
+
+	createNodeMaterial( type ) {
+
+		return createNodeMaterialFromType( type );
 
 	}
 

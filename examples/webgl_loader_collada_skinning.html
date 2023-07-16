@@ -75,12 +75,12 @@
 
 				//
 
-				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.2 );
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.6 );
 				scene.add( ambientLight );
 
-				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
-				scene.add( camera );
-				camera.add( pointLight );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				directionalLight.position.set( 1.5, 1, - 1.5 );
+				scene.add( directionalLight );
 
 				//
 

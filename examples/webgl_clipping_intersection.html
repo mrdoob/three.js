@@ -67,12 +67,9 @@
 				controls.maxDistance = 10;
 				controls.enablePan = false;
 
-				const light = new THREE.HemisphereLight( 0xffffff, 0x080808, 1.5 );
+				const light = new THREE.HemisphereLight( 0xffffff, 0x080808, 4.5 );
 				light.position.set( - 1.25, 1, 1.25 );
 				scene.add( light );
-
-				// const helper = new THREE.CameraHelper( light.shadow.camera );
-				// scene.add( helper );
 
 				//
 

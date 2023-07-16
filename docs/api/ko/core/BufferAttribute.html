@@ -53,10 +53,17 @@
 
 		<h3>[property:Integer count]</h3>
 		<p>
-		[page:BufferAttribute.itemSize itemSize]로 나눈 [page:BufferAttribute.array array]의 길이를 저장.<br /><br />
+		[page:BufferAttribute.itemSize itemSize]로 나눈 [page:BufferAttribute.array array]의 길이를 저장. Read-only property.<br /><br />
 
 		버퍼가 3개의 컴포넌트를 저장한 벡터(위치, 법선, 색 등)
 		저장된 벡터들의 수를 계산합니다.
+		</p>
+
+		<h3>[property:Number gpuType]</h3>
+		<p>
+			Configures the bound GPU type for use in shaders. Either [page:BufferAttribute THREE.FloatType] or [page:BufferAttribute THREE.IntType], default is [page:BufferAttribute THREE.FloatType].
+
+			Note: this only has an effect for integer arrays and is not configurable for float arrays. For lower precision float types, see [page:BufferAttributeTypes THREE.Float16BufferAttribute].
 		</p>
 
 		<h3>[property:Boolean isBufferAttribute]</h3>

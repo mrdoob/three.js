@@ -44,8 +44,8 @@
 
 				// CAMERAS
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.position.set( 0, 0, 1000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 0, 2.5 );
 
 				// SCENE
 
@@ -57,7 +57,6 @@
 				loader.setPath( 'textures/cube/Bridge2/' );
 
 				textureCube = loader.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
-				textureCube.colorSpace = THREE.SRGBColorSpace;
 
 				const textureLoader = new THREE.TextureLoader();
 
@@ -69,7 +68,7 @@
 
 				//
 
-				const geometry = new THREE.IcosahedronGeometry( 400, 15 );
+				const geometry = new THREE.IcosahedronGeometry( 1, 15 );
 				sphereMaterial = new THREE.MeshBasicMaterial( { envMap: textureCube } );
 				sphereMesh = new THREE.Mesh( geometry, sphereMaterial );
 				scene.add( sphereMesh );
@@ -84,8 +83,8 @@
 				//
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 500;
-				controls.maxDistance = 2500;
+				controls.minDistance = 1.5;
+				controls.maxDistance = 6;
 
 				//
 

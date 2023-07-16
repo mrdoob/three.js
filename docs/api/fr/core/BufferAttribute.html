@@ -49,10 +49,17 @@
 
 		<h3>[property:Integer count]</h3>
 		<p>
-		Stocke la longueur du tableau [page:BufferAttribute.array array] divisée par [page:BufferAttribute.itemSize itemSize].<br /><br />
+		Stocke la longueur du tableau [page:BufferAttribute.array array] divisée par [page:BufferAttribute.itemSize itemSize]. Read-only property.<br /><br />
 
 		Si le tampon stocke un vecteur à 3 composants (tel qu'une position, une normale ou une couleur),
 		cela comptera alors le nombre de ces vecteurs stockés.
+		</p>
+
+		<h3>[property:Number gpuType]</h3>
+		<p>
+			Configures the bound GPU type for use in shaders. Either [page:BufferAttribute THREE.FloatType] or [page:BufferAttribute THREE.IntType], default is [page:BufferAttribute THREE.FloatType].
+
+			Note: this only has an effect for integer arrays and is not configurable for float arrays. For lower precision float types, see [page:BufferAttributeTypes THREE.Float16BufferAttribute].
 		</p>
 
 		<h3>[property:Boolean isBufferAttribute]</h3>

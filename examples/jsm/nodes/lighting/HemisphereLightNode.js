@@ -14,8 +14,8 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 		super( light );
 
-		this.lightPositionNode = objectPosition;
-		this.lightDirectionNode = objectPosition.normalize();
+		this.lightPositionNode = objectPosition( light );
+		this.lightDirectionNode = this.lightPositionNode.normalize();
 
 		this.groundColorNode = uniform( new Color() );
 

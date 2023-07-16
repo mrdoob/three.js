@@ -14,6 +14,7 @@
 import {
 	CompressedTexture,
 	CompressedArrayTexture,
+	CompressedCubeTexture,
 	Data3DTexture,
 	DataTexture,
 	FileLoader,
@@ -261,10 +262,7 @@ class KTX2Loader extends Loader {
 
 		if ( container.faceCount === 6 ) {
 
-			texture = new CompressedTexture();
-			texture.image = faces;
-			texture.format = format;
-			texture.type = UnsignedByteType;
+			texture = new CompressedCubeTexture( faces, format, UnsignedByteType );
 
 		} else {
 
@@ -317,12 +315,14 @@ class KTX2Loader extends Loader {
 
 			const texture = mipmaps[ 0 ];
 			texture.mipmaps = mipmaps.map( dt => {
+
 				return {
 					data: dt.source.data,
 					width: dt.source.data.width,
 					height: dt.source.data.height,
 					depth: dt.source.data.depth
 				};
+
 			} );
 			return texture;
 
@@ -526,8 +526,28 @@ KTX2Loader.BasisWorker = function () {
 				for ( let layer = 0; layer < layerCount; layer ++ ) {
 
 					const levelInfo = ktx2File.getImageLevelInfo( mip, layer, face );
-					mipWidth = levelInfo.origWidth < 4 ? levelInfo.origWidth : levelInfo.width;
-					mipHeight = levelInfo.origHeight < 4 ? levelInfo.origHeight : levelInfo.height;
+
+					if ( face === 0 && mip === 0 && layer === 0 && ( levelInfo.origWidth % 4 !== 0 || levelInfo.origHeight % 4 !== 0 ) ) {
+
+						console.warn( 'THREE.KTX2Loader: ETC1S and UASTC textures should use multiple-of-four dimensions.' );
+
+					}
+
+					if ( levelCount > 1 ) {
+
+						mipWidth = levelInfo.origWidth;
+						mipHeight = levelInfo.origHeight;
+
+					} else {
+
+						// Handles non-multiple-of-four dimensions in textures without mipmaps. Textures with
+						// mipmaps must use multiple-of-four dimensions, for some texture formats and APIs.
+						// See mrdoob/three.js#25908.
+						mipWidth = levelInfo.width;
+						mipHeight = levelInfo.height;
+
+					}
+
 					const dst = new Uint8Array( ktx2File.getImageTranscodedSizeInBytes( mip, layer, 0, transcoderFormat ) );
 					const status = ktx2File.transcodeImage( dst, mip, layer, face, transcoderFormat, 0, - 1, - 1 );
 

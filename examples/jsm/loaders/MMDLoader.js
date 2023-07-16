@@ -4,7 +4,6 @@ import {
 	Bone,
 	BufferGeometry,
 	Color,
-	ColorManagement,
 	CustomBlending,
 	TangentSpaceNormalMap,
 	DoubleSide,
@@ -1141,13 +1140,9 @@ class MaterialBuilder {
 			params.emissive = new Color().fromArray( material.ambient );
 			params.transparent = params.opacity !== 1.0;
 
-			if ( ColorManagement.enabled === true ) {
-
-				params.diffuse.convertSRGBToLinear();
-				params.specular.convertSRGBToLinear();
-				params.emissive.convertSRGBToLinear();
-
-			}
+			params.diffuse.convertSRGBToLinear();
+			params.specular.convertSRGBToLinear();
+			params.emissive.convertSRGBToLinear();
 
 			//
 

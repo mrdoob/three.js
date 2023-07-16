@@ -67,6 +67,7 @@ const texture = loader.load('resources/images/checker.png');
 texture.wrapS = THREE.RepeatWrapping;
 texture.wrapT = THREE.RepeatWrapping;
 texture.magFilter = THREE.NearestFilter;
+texture.colorSpace = THREE.SRGBColorSpace;
 const repeats = planeSize / 2;
 texture.repeat.set(repeats, repeats);
 </pre>
@@ -232,7 +233,8 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 <h2 id="-pointlight-">点光源（<a href="/docs/#api/zh/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>）</h2>
 <p>点光源（<a href="/docs/#api/zh/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>）表示的是从一个点朝各个方向发射出光线的一种光照效果。我们修改一下代码：</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.PointLight(color, intensity);
 light.position.set(0, 10, 0);
@@ -277,7 +279,8 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 <p>聚光灯（<a href="/docs/#api/zh/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>）类似方向光（<a href="/docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>）一样需要一个目标点，光源的位置是圆锥的顶点，目标点处于圆锥的中轴线上。</p>
 <p>修改上面 <a href="/docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> 的代码如下：</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);
 scene.add(light);
@@ -382,33 +385,7 @@ makeXYZGUI(gui, light.position, 'position');
 </div>
 
 <p></p>
-<p>关于光照，我们尚未提及的是 <a href="/docs/#api/zh/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> 中有一个设置项 <code class="notranslate" translate="no">physicallyCorrectLights</code>。这个设置会影响（随着离光源的距离增加）光照如何减弱。这个设置会影响点光源（<a href="/docs/#api/zh/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>）和聚光灯（<a href="/docs/#api/zh/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>），矩形区域光（<a href="/docs/#api/zh/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>）会自动应用这个特性。</p>
-<p>在设置光照时，基本思路是不要设置 <code class="notranslate" translate="no">distance</code> 来表现光照的衰减，也不要设置 <code class="notranslate" translate="no">intensity</code>。而是设置光照的 <a href="/docs/#api/zh/lights/PointLight#power"><code class="notranslate" translate="no">power</code></a> 属性，以流明为单位，three.js 会进行物理计算，从而表现出接近真实的光照效果。在这种情况下 three.js 参与计算的长度单位是米，一个 60瓦 的灯泡大概是 800 流明强度。并且光源有一个 <a href="/docs/#api/zh/lights/PointLight#decay"><code class="notranslate" translate="no">decay</code></a> 属性，为了模拟真实效果，应该被设置为 <code class="notranslate" translate="no">2</code>。</p>
-<p>下面让我们测试看看。</p>
-<p>首先开启 <code class="notranslate" translate="no">physicallyCorrectLights</code> 模式</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
-+renderer.physicallyCorrectLights = true;
-</pre>
-<p>然后我们设置光照的参数，<code class="notranslate" translate="no">power</code> 设置为 800 流明，<code class="notranslate" translate="no">decay</code> 设置为 2，<code class="notranslate" translate="no">distance</code> 设置为 <code class="notranslate" translate="no">Infinity</code>。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
-const light = new THREE.PointLight(color, intensity);
-light.power = 800;
-light.decay = 2;
-light.distance = Infinity;
-</pre>
-<p>并且添加 gui 控制 <code class="notranslate" translate="no">power</code> 和 <code class="notranslate" translate="no">decay</code></p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
-gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'decay', 0, 4, 0.01);
-gui.add(light, 'power', 0, 2000);
-</pre>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-point-physically-correct.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lights-point-physically-correct.html" target="_blank">点击此处在新标签页中打开</a>
-</div>
 
-<p></p>
 <p>需要注意，每添加一个光源到场景中，都会降低 three.js 渲染场景的速度，所以应该尽量使用最少的资源来实现想要的效果。</p>
 <p>接下来我们学习 three.js 中的 <a href="cameras.html">相机</a>。</p>
 <p><canvas id="c"></canvas></p>

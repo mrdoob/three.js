@@ -68,7 +68,6 @@
 				scene.background = new THREE.Color( 0x000000 );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.useLegacyLights = false;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
 				//
@@ -115,8 +114,6 @@
 				ldrCubeMap = new THREE.CubeTextureLoader()
 					.setPath( './textures/cube/pisa/' )
 					.load( ldrUrls, function () {
-
-						ldrCubeMap.colorSpace = THREE.SRGBColorSpace;
 
 						ldrCubeRenderTarget = pmremGenerator.fromCubemap( ldrCubeMap );
 

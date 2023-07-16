@@ -51,7 +51,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			[page:Float b] are defined, the red component of the color. If they are
 			not defined, it can be a
 			[link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] (recommended), 
-			a CSS-style string, or another Color instance.<br />
+			a CSS-style string, or another `Color` instance.<br />
 			[page:Float g] - (optional) If it is defined, the green component of the
 			color.<br />
 			[page:Float b] - (optional) If it is defined, the blue component of the
@@ -91,13 +91,13 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		<p>Read-only flag to check if a given object is of type [name].</p>
 
 		<h3>[property:Float r]</h3>
-		<p>Red channel value between 0 and 1. Default is 1.</p>
+		<p>Red channel value between `0` and `1`. Default is `1`.</p>
 
 		<h3>[property:Float g]</h3>
-		<p>Green channel value between 0 and 1. Default is 1.</p>
+		<p>Green channel value between `0` and `1`. Default is `1`.</p>
 
 		<h3>[property:Float b]</h3>
-		<p>Blue channel value between 0 and 1. Default is 1.</p>
+		<p>Blue channel value between `0` and `1`. Default is `1`.</p>
 
 		<h2>Methods</h2>
 
@@ -197,8 +197,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:Object getHSL]( [param:Object target], [param:string colorSpace] =
-			LinearSRGBColorSpace )
+			[method:Object getHSL]( [param:Object target], [param:string colorSpace] = LinearSRGBColorSpace )
 		</h3>
 		<p>
 			[page:Object target] — the result will be copied into this Object. Adds h,
@@ -218,8 +217,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:Color getRGB]( [param:Color target], [param:string colorSpace] =
-			SRGBColorSpace )
+			[method:Color getRGB]( [param:Color target], [param:string colorSpace] = LinearSRGBColorSpace )
 		</h3>
 		<p>
 			[page:Color target] — the result will be copied into this object.<br /><br />
@@ -295,13 +293,15 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			RGB.
 		</p>
 
-		<h3>[method:this set]( [param:Color_Hex_or_String value] )</h3>
+		<h3>[method:this set]( [param:Color_Hex_or_String r], [param:Float g], [param:Float b] )</h3>
 		<p>
-			[page:Color_Hex_or_String value] - Value to set this color to.<br /><br />
+			[page:Color_Hex_or_String r] - (optional) If arguments [page:Float g] and [page:Float b] are defined, the red component of the color. If they are
+			not defined, it can be a [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] (recommended),  a CSS-style string, or another `Color` instance.<br />
+			[page:Float g] - (optional) If it is defined, the green component of the color.<br />
+			[page:Float b] - (optional) If it is defined, the blue component of the color.<br /><br />
 
-			See the Constructor above for full details of what
-			[page:Color_Hex_or_String value] can be. Delegates to [page:.copy],
-			[page:.setStyle], or [page:.setHex] depending on input type.
+			See the Constructor above for full details about possible arguments. Delegates to [page:.copy],
+			[page:.setStyle], [page:.setRGB] or [page:.setHex] depending on input type.
 		</p>
 
 		<h3>[method:this setFromVector3]( [param:Vector3 vector] )</h3>
@@ -311,8 +311,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:this setHex]( [param:Integer hex], [param:string colorSpace] =
-			SRGBColorSpace )
+			[method:this setHex]( [param:Integer hex], [param:string colorSpace] = SRGBColorSpace )
 		</h3>
 		<p>
 			[page:Integer hex] —
@@ -325,9 +324,9 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			[method:this setHSL]( [param:Float h], [param:Float s], [param:Float l], [param:string colorSpace] = LinearSRGBColorSpace )
 		</h3>
 		<p>
-			[page:Float h] — hue value between 0.0 and 1.0 <br />
-			[page:Float s] — saturation value between 0.0 and 1.0 <br />
-			[page:Float l] — lightness value between 0.0 and 1.0<br /><br />
+			[page:Float h] — hue value between `0.0` and `1.0` <br />
+			[page:Float s] — saturation value between `0.0` and `1.0` <br />
+			[page:Float l] — lightness value between `0.0` and `1.0`<br /><br />
 
 			Sets color from HSL values.
 		</p>
@@ -336,23 +335,22 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			[method:this setRGB]( [param:Float r], [param:Float g], [param:Float b], [param:string colorSpace] = LinearSRGBColorSpace )
 		</h3>
 		<p>
-			[page:Float r] — Red channel value between 0.0 and 1.0.<br />
-			[page:Float g] — Green channel value between 0.0 and 1.0.<br />
-			[page:Float b] — Blue channel value between 0.0 and 1.0.<br /><br />
+			[page:Float r] — Red channel value between `0.0` and `1.0`.<br />
+			[page:Float g] — Green channel value between `0.0` and `1.0`.<br />
+			[page:Float b] — Blue channel value between `0.0` and `1.0`.<br /><br />
 
 			Sets this color from RGB values.
 		</p>
 
 		<h3>[method:this setScalar]( [param:Float scalar] )</h3>
 		<p>
-			[page:Float scalar] — a value between 0.0 and 1.0.<br /><br />
+			[page:Float scalar] — a value between `0.0` and `1.0`.<br /><br />
 
 			Sets all three color components to the value [page:Float scalar].
 		</p>
 
 		<h3>
-			[method:this setStyle]( [param:String style], [param:string colorSpace] =
-			SRGBColorSpace )
+			[method:this setStyle]( [param:String style], [param:string colorSpace] = SRGBColorSpace )
 		</h3>
 		<p>
 			[page:String style] — color as a CSS-style string.<br /><br />

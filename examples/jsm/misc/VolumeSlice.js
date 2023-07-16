@@ -5,7 +5,8 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	PlaneGeometry,
-	Texture
+	Texture,
+	SRGBColorSpace
 } from 'three';
 
 /**
@@ -68,6 +69,7 @@ class VolumeSlice {
 		const canvasMap = new Texture( this.canvas );
 		canvasMap.minFilter = LinearFilter;
 		canvasMap.wrapS = canvasMap.wrapT = ClampToEdgeWrapping;
+		canvasMap.colorSpace = SRGBColorSpace;
 		const material = new MeshBasicMaterial( { map: canvasMap, side: DoubleSide, transparent: true } );
 		/**
 		 * @member {Mesh} mesh The mesh ready to get used in the scene

@@ -55,11 +55,11 @@
 
 				scene.add( new THREE.GridHelper( 2, 4, 0xc1c1c1, 0x8d8d8d ) );
 
-				const light = new THREE.DirectionalLight( 0xffffff );
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
-				const light2 = new THREE.HemisphereLight( 0xffffff, 0xc1c1c1 );
+				const light2 = new THREE.HemisphereLight( 0xffffff, 0xc1c1c1, 3 );
 				scene.add( light2 );
 
 				// renderer

@@ -1,27 +1,22 @@
 if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
 
-	// If the page is not yet displayed as an iframe of the index page (navigation panel/working links),
-	// redirect to the index page (using the current URL without extension as the new fragment).
-	// If this URL itself has a fragment, append it with a dot (since '#' in a URL fragment is not allowed).
+	// navigates to docs home if direct access, e.g.
+	//   https://mrdoob.github.io/three.js/docs/api/en/audio/Audio.html#filter
+	// ->https://mrdoob.github.io/three.js/docs/#api/en/audio/Audio.filter
 
-	let href = window.location.href;
-	const splitIndex = href.lastIndexOf( '/docs/' ) + 6;
-	const docsBaseURL = href.slice( 0, splitIndex );
+	const url = new URL( window.location.href );
 
-	let hash = window.location.hash;
+	// hash route, e.g. #api/en/audio/Audio.filter
+	url.hash = url.pathname.replace( /\/docs\/(.*?)(?:\.html)?$/, '$1' ) + url.hash.replace( '#', '.' );
 
-	if ( hash !== '' ) {
+	// docs home, e.g. https://mrdoob.github.io/three.js/docs/
+	url.pathname = url.pathname.replace( /(\/docs\/).*$/, '$1' );
 
-		href = href.replace( hash, '' );
-		hash = hash.replace( '#', '.' );
+	window.location.replace( url );
 
-	}
+} else {
 
-	const extension = href.split( '.' ).pop();
-	const end = ( extension === 'html' ) ? - 5 : href.length;
-	const pathSnippet = href.slice( splitIndex, end );
-
-	window.location.replace( docsBaseURL + '#' + pathSnippet + hash );
+	document.addEventListener( 'DOMContentLoaded', onDocumentLoad, { once: true } );
 
 }
 
@@ -66,12 +61,12 @@ function onDocumentLoad() {
 	// text = text.replace( /\[member:.([\w]+) ([\w\.\s]+)\]/gi, "<a onclick=\"window.parent.setUrlFragment('" + name + ".$1')\" title=\"$1\">$2</a>" );
 
 	text = text.replace( /\[(member|property|method|param):([\w]+)\]/gi, '[$1:$2 $2]' ); // [member:name] to [member:name title]
-	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gi, `<a class='permalink links' data-fragment='${name}.$2' target='_parent' title='${name}.$2'>#</a> .<a class='links' data-fragment='${name}.$2' id='$2'>$2</a> $3 : <a class='param links' data-fragment='$1'>$1</a>` );
+	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\([\s\S]*?\))?/gi, `<a class='permalink links' data-fragment='${name}.$2' target='_parent' title='${name}.$2'>#</a> .<a class='links' data-fragment='${name}.$2' id='$2'>$2</a> $3 : <a class='param links' data-fragment='$1'>$1</a>` );
 	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, '$2 : <a class=\'param links\' data-fragment=\'$1\'>$1</a>' ); // [param:name title]
 
 	text = text.replace( /\[link:([\w\:\/\.\-\_\(\)\?\#\=\!\~]+)\]/gi, '<a href="$1" target="_blank">$1</a>' ); // [link:url]
 	text = text.replace( /\[link:([\w:/.\-_()?#=!~]+) ([\w\p{L}:/.\-_'\s]+)\]/giu, '<a href="$1" target="_blank">$2</a>' ); // [link:url title]
-	text = text.replace( /\*([\w\d\"\-\(][\w\d\ \/\+\-\(\)\=\,\."]*[\w\d\"\)]|\w)\*/gi, '<strong>$1</strong>' ); // *text*
+	text = text.replace( /\*([\u4e00-\u9fa5\w\d\-\(\"\（\“][\u4e00-\u9fa5\w\d\ \/\+\-\(\)\=\,\.\（\）\，\。"]*[\u4e00-\u9fa5\w\d\"\)\”\）]|\w)\*/gi, '<strong>$1</strong>' ); // *text*
 	text = text.replace( /\`(.*?)\`/gi, '<code class="inline">$1</code>' ); // `code`
 
 	text = text.replace( /\[example:([\w\_]+)\]/gi, '[example:$1 $1]' ); // [example:name] to [example:name title]
@@ -111,16 +106,32 @@ function onDocumentLoad() {
 
 	// handle code snippets formatting
 
+	function dedent( text ) {
+
+		// ignores singleline text
+		const lines = text.split( '\n' );
+		if ( lines.length <= 1 ) return text;
+
+		// ignores blank text
+		const nonBlankLine = lines.filter( l => l.trim() )[ 0 ];
+		if ( nonBlankLine === undefined ) return text;
+
+		// strips indents if any
+		const m = nonBlankLine.match( /^([\t ]+)/ );
+		if ( m ) text = lines.map( l => l.startsWith( m[ 1 ] ) ? l.substring( m[ 1 ].length ) : l ).join( '\n' );
+
+		// strips leading and trailing whitespaces finally
+		return text.trim();
+
+	}
+
 	const elements = document.getElementsByTagName( 'code' );
 
 	for ( let i = 0; i < elements.length; i ++ ) {
 
 		const element = elements[ i ];
 
-		text = element.textContent.trim();
-		text = text.replace( /^\t\t/gm, '' );
-
-		element.textContent = text;
+		element.textContent = dedent( element.textContent );
 
 	}
 
@@ -172,5 +183,3 @@ function onDocumentLoad() {
 	document.head.appendChild( prettify );
 
 }
-
-document.addEventListener( 'DOMContentLoaded', onDocumentLoad, false );

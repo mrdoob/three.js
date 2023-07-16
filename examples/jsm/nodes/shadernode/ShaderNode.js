@@ -97,17 +97,13 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 		return nodeObject;
 
-	} else if ( ( altType === null ) && ( ( type === 'float' ) || ( type === 'boolean' ) ) ) {
+	} else if ( ( altType === null && ( type === 'float' || type === 'boolean' ) ) || ( type && type !== 'shader' && type !== 'string' ) ) {
 
-		return nodeObject( getAutoTypedConstNode( obj ) );
+		return nodeObject( getConstNode( obj, altType ) );
 
 	} else if ( type === 'shader' ) {
 
-		return shader( obj );
-
-	} else if ( type && type !== 'string' ) {
-
-		return nodeObject( new ConstNode( obj, altType ) );
+		return tslFn( obj );
 
 	}
 
@@ -241,7 +237,7 @@ const cacheMaps = { bool: boolsCacheMap, uint: uintsCacheMap, ints: intsCacheMap
 
 const constNodesCacheMap = new Map( [ ...boolsCacheMap, ...floatsCacheMap ] );
 
-const getAutoTypedConstNode = ( value ) => {
+const getConstNode = ( value, type ) => {
 
 	if ( constNodesCacheMap.has( value ) ) {
 
@@ -253,7 +249,21 @@ const getAutoTypedConstNode = ( value ) => {
 
 	} else {
 
-		return new ConstNode( value );
+		return new ConstNode( value, type );
+
+	}
+
+};
+
+const safeGetNodeType = ( node ) => {
+
+	try {
+
+		return node.getNodeType();
+
+	} catch ( _ ) {
+
+		return undefined;
 
 	}
 
@@ -263,35 +273,28 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 	return ( ...params ) => {
 
-		if ( params.length === 0 ) {
+		if ( params.length === 0 || ( ! [ 'bool', 'float', 'int', 'uint' ].includes( type ) && params.every( param => typeof param !== 'object' ) ) ) {
 
-			return nodeObject( new ConstNode( getValueFromType( type ), type ) );
-
-		} else {
-
-			if ( type === 'color' && params[ 0 ].isNode !== true ) {
-
-				params = [ getValueFromType( type, ...params ) ];
-
-			}
-
-			if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
-
-				return cacheMap.get( params[ 0 ] );
-
-			}
-
-			const nodes = params.map( getAutoTypedConstNode );
-
-			if ( nodes.length === 1 ) {
-
-				return nodeObject( nodes[ 0 ].nodeType === type || getValueType( nodes[ 0 ].value ) === type ? nodes[ 0 ] : new ConvertNode( nodes[ 0 ], type ) );
-
-			}
-
-			return nodeObject( new JoinNode( nodes, type ) );
+			params = [ getValueFromType( type, ...params ) ];
 
 		}
+
+		if ( params.length === 1 && cacheMap !== null && cacheMap.has( params[ 0 ] ) ) {
+
+			return nodeObject( cacheMap.get( params[ 0 ] ) );
+
+		}
+
+		if ( params.length === 1 ) {
+
+			const node = getConstNode( params[ 0 ], type );
+			if ( safeGetNodeType( node ) === type ) return nodeObject( node );
+			return nodeObject( new ConvertNode( node, type ) );
+
+		}
+
+		const nodes = params.map( param => getConstNode( param ) );
+		return nodeObject( new JoinNode( nodes, type ) );
 
 	};
 
@@ -314,10 +317,30 @@ export function ShaderNode( jsFunc ) {
 export const nodeObject = ( val, altType = null ) => /* new */ ShaderNodeObject( val, altType );
 export const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val, altType );
 export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
-export const nodeProxy = ( ...val ) => new ShaderNodeProxy( ...val );
-export const nodeImmutable = ( ...val ) => new ShaderNodeImmutable( ...val );
+export const nodeProxy = ( ...params ) => new ShaderNodeProxy( ...params );
+export const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params );
 
-export const shader = ( ...val ) => new ShaderNode( ...val );
+export const shader = ( jsFunc ) => { // @deprecated, r154
+
+	console.warn( 'TSL: shader() is deprecated. Use tslFn() instead.' );
+
+	return new ShaderNode( jsFunc );
+
+};
+
+export const tslFn = ( jsFunc ) => {
+
+	let shaderNode = null;
+
+	return ( ...params ) => {
+
+		if ( shaderNode === null ) shaderNode = new ShaderNode( jsFunc );
+
+		return shaderNode.call( ...params );
+
+	};
+
+};
 
 addNodeClass( ShaderNode );
 

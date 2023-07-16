@@ -20,6 +20,8 @@
 
 const FilmShader = {
 
+	name: 'FilmShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null },

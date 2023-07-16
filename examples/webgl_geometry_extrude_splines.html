@@ -184,7 +184,9 @@
 
 				// light
 
-				const light = new THREE.DirectionalLight( 0xffffff );
+				scene.add( new THREE.AmbientLight( 0xffffff ) );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 

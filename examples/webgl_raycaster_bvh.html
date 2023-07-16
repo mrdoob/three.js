@@ -33,7 +33,7 @@
 				"imports": {
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
-					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@^0.5.21/build/index.module.js"
+					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.6.0/build/index.module.js"
 				}
 			}
 		</script>
@@ -90,7 +90,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xeeeeee );
 
-				const ambient = new THREE.HemisphereLight( 0xffffff, 0x999999 );
+				const ambient = new THREE.HemisphereLight( 0xffffff, 0x999999, 3 );
 				scene.add( ambient );
 
 				// renderer

@@ -47,10 +47,17 @@
 
 		<h3>[property:Integer count]</h3>
 		<p>
-      Memorizza la lunghezza dell'[page:BufferAttribute.array array] divisa per [page:BufferAttribute.itemSize itemSize].<br /><br />
+      Memorizza la lunghezza dell'[page:BufferAttribute.array array] divisa per [page:BufferAttribute.itemSize itemSize]. Read-only property.<br /><br />
 
       Se il buffer memorizza un vettore a 3 componenti (come una posizione, una normale o un colore),
       questo conterà il numero dei vettori memorizzati.
+		</p>
+
+		<h3>[property:Number gpuType]</h3>
+		<p>
+			Configures the bound GPU type for use in shaders. Either [page:BufferAttribute THREE.FloatType] or [page:BufferAttribute THREE.IntType], default is [page:BufferAttribute THREE.FloatType].
+
+			Note: this only has an effect for integer arrays and is not configurable for float arrays. For lower precision float types, see [page:BufferAttributeTypes THREE.Float16BufferAttribute].
 		</p>
 
 		<h3>[property:Boolean isBufferAttribute]</h3>

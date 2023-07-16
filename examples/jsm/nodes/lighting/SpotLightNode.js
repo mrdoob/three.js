@@ -60,7 +60,7 @@ class SpotLightNode extends AnalyticLightNode {
 
 		const lightDistance = lVector.length();
 
-		const lightAttenuation = getDistanceAttenuation.call( {
+		const lightAttenuation = getDistanceAttenuation( {
 			lightDistance,
 			cutoffDistance: cutoffDistanceNode,
 			decayExponent: decayExponentNode
@@ -73,11 +73,11 @@ class SpotLightNode extends AnalyticLightNode {
 
 		if ( lightingModelFunctionNode && lightingModelFunctionNode.direct ) {
 
-			lightingModelFunctionNode.direct.call( {
+			lightingModelFunctionNode.direct( {
 				lightDirection,
 				lightColor,
 				reflectedLight
-			}, builder );
+			} );
 
 		}
 

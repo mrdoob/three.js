@@ -73,14 +73,11 @@
 
 				materialDepth = new THREE.MeshDepthMaterial();
 
-				const materialScene = new THREE.MeshBasicMaterial( { color: 0x000000 } );
-
 				// tree
 
 				const loader = new OBJLoader();
 				loader.load( 'models/obj/tree.obj', function ( object ) {
 
-					object.material = materialScene;
 					object.position.set( 0, - 150, - 150 );
 					object.scale.multiplyScalar( 400 );
 					scene.add( object );
@@ -90,7 +87,7 @@
 				// sphere
 
 				const geo = new THREE.SphereGeometry( 1, 20, 10 );
-				sphereMesh = new THREE.Mesh( geo, materialScene );
+				sphereMesh = new THREE.Mesh( geo, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
 				sphereMesh.scale.multiplyScalar( 20 );
 				scene.add( sphereMesh );
 
@@ -154,7 +151,7 @@
 
 				postprocessing.scene.add( postprocessing.camera );
 
-				postprocessing.rtTextureColors = new THREE.WebGLRenderTarget( renderTargetWidth, renderTargetHeight );
+				postprocessing.rtTextureColors = new THREE.WebGLRenderTarget( renderTargetWidth, renderTargetHeight, { type: THREE.HalfFloatType } );
 
 				// Switching the depth formats to luminance from rgb doesn't seem to work. I didn't
 				// investigate further for now.
@@ -163,15 +160,15 @@
 				// I would have this quarter size and use it as one of the ping-pong render
 				// targets but the aliasing causes some temporal flickering
 
-				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( renderTargetWidth, renderTargetHeight );
-				postprocessing.rtTextureDepthMask = new THREE.WebGLRenderTarget( renderTargetWidth, renderTargetHeight );
+				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( renderTargetWidth, renderTargetHeight, { type: THREE.HalfFloatType } );
+				postprocessing.rtTextureDepthMask = new THREE.WebGLRenderTarget( renderTargetWidth, renderTargetHeight, { type: THREE.HalfFloatType } );
 
 				// The ping-pong render targets can use an adjusted resolution to minimize cost
 
 				const adjustedWidth = renderTargetWidth * godrayRenderTargetResolutionMultiplier;
 				const adjustedHeight = renderTargetHeight * godrayRenderTargetResolutionMultiplier;
-				postprocessing.rtTextureGodRays1 = new THREE.WebGLRenderTarget( adjustedWidth, adjustedHeight );
-				postprocessing.rtTextureGodRays2 = new THREE.WebGLRenderTarget( adjustedWidth, adjustedHeight );
+				postprocessing.rtTextureGodRays1 = new THREE.WebGLRenderTarget( adjustedWidth, adjustedHeight, { type: THREE.HalfFloatType } );
+				postprocessing.rtTextureGodRays2 = new THREE.WebGLRenderTarget( adjustedWidth, adjustedHeight, { type: THREE.HalfFloatType } );
 
 				// god-ray shaders
 
@@ -231,7 +228,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate, renderer.domElement );
+				requestAnimationFrame( animate );
 
 				stats.begin();
 				render();

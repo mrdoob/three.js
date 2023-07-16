@@ -56,10 +56,9 @@
 				scene.background = new THREE.Color( 0x666666 );
 
 				const hemiLight = new THREE.HemisphereLight();
-				hemiLight.intensity = 0.3;
 				scene.add( hemiLight );
 
-				const dirLight = new THREE.DirectionalLight();
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
 				dirLight.position.set( 5, 5, 5 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.zoom = 2;

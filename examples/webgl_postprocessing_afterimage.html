@@ -30,8 +30,7 @@
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { AfterimagePass } from 'three/addons/postprocessing/AfterimagePass.js';
-
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let camera, scene, renderer, composer;
 			let mesh;
@@ -53,7 +52,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -75,6 +73,9 @@
 				afterimagePass = new AfterimagePass();
 				composer.addPass( afterimagePass );
 
+				const outputPass = new OutputPass();
+				composer.addPass( outputPass );
+
 				window.addEventListener( 'resize', onWindowResize );
 
 				if ( typeof TESTING !== 'undefined' ) {
@@ -93,7 +94,7 @@
 
 			function createGUI() {
 
-				const gui = new GUI( { name: 'Damp setting' } );
+				const gui = new GUI( { title: 'Damp setting' } );
 				gui.add( afterimagePass.uniforms[ 'damp' ], 'value', 0, 1 ).step( 0.001 );
 				gui.add( params, 'enable' );
 
@@ -114,15 +115,10 @@
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
 
-				if ( params.enable ) {
+				afterimagePass.enabled = params.enable;
 
-					composer.render();
+				composer.render();
 
-				} else {
-
-					renderer.render( scene, camera );
-
-				}
 
 			}
 

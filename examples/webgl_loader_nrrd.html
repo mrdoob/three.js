@@ -38,10 +38,7 @@
 			import { NRRDLoader } from 'three/addons/loaders/NRRDLoader.js';
 			import { VTKLoader } from 'three/addons/loaders/VTKLoader.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
-			let container,
-				stats,
+			let stats,
 				camera,
 				controls,
 				scene,
@@ -61,10 +58,10 @@
 
 				// light
 
-				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 3 );
 				scene.add( hemiLight );
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				dirLight.position.set( 200, 200, 200 );
 				scene.add( dirLight );
 
@@ -154,14 +151,10 @@
 				} );
 				// renderer
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				controls = new TrackballControls( camera, renderer.domElement );
 				controls.minDistance = 100;
@@ -171,7 +164,7 @@
 				controls.panSpeed = 2;
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 				const gui = new GUI();
 

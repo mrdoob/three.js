@@ -56,11 +56,15 @@
 
 		<h3>[property:Integer count]</h3>
 		<p>
-			Stores the [page:BufferAttribute.array array]'s length divided by the
-			[page:BufferAttribute.itemSize itemSize].<br /><br />
+			Represents the number of items this buffer attribute stores. It is internally computed by dividing the [page:BufferAttribute.array array]'s length by the
+			[page:BufferAttribute.itemSize itemSize]. Read-only property.
+		</p>
 
-			If the buffer is storing a 3-component vector (such as a position, normal,
-			or color), then this will count the number of such vectors stored.
+		<h3>[property:Number gpuType]</h3>
+		<p>
+			Configures the bound GPU type for use in shaders. Either [page:BufferAttribute THREE.FloatType] or [page:BufferAttribute THREE.IntType], default is [page:BufferAttribute THREE.FloatType].
+
+			Note: this only has an effect for integer arrays and is not configurable for float arrays. For lower precision float types, see [page:BufferAttributeTypes THREE.Float16BufferAttribute].
 		</p>
 
 		<h3>[property:Boolean isBufferAttribute]</h3>

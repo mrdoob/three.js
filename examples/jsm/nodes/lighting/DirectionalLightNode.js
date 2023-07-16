@@ -24,11 +24,11 @@ class DirectionalLightNode extends AnalyticLightNode {
 
 		if ( lightingModelFunctionNode && lightingModelFunctionNode.direct ) {
 
-			lightingModelFunctionNode.direct.call( {
+			lightingModelFunctionNode.direct( {
 				lightDirection,
 				lightColor,
 				reflectedLight
-			}, builder );
+			} );
 
 		}
 

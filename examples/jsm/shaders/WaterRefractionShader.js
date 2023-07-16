@@ -76,12 +76,15 @@ const WaterRefractionShader = {
 
 			// new uv coords
 
-		 vec4 uv = vec4( vUvRefraction );
-		 uv.xy += distortion;
+			vec4 uv = vec4( vUvRefraction );
+			uv.xy += distortion;
 
 			vec4 base = texture2DProj( tDiffuse, uv );
 
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+
+			#include <tonemapping_fragment>
+			#include <colorspace_fragment>
 
 		}`
 

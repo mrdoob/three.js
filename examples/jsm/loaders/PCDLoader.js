@@ -1,5 +1,6 @@
 import {
 	BufferGeometry,
+	Color,
 	FileLoader,
 	Float32BufferAttribute,
 	Int32BufferAttribute,
@@ -232,6 +233,8 @@ class PCDLoader extends Loader {
 		const intensity = [];
 		const label = [];
 
+		const c = new Color();
+
 		// ascii
 
 		if ( PCDheader.data === 'ascii' ) {
@@ -272,10 +275,13 @@ class PCDLoader extends Loader {
 
 					}
 
-					const r = ( rgb >> 16 ) & 0x0000ff;
-					const g = ( rgb >> 8 ) & 0x0000ff;
-					const b = ( rgb >> 0 ) & 0x0000ff;
-					color.push( r / 255, g / 255, b / 255 );
+					const r = ( ( rgb >> 16 ) & 0x0000ff ) / 255;
+					const g = ( ( rgb >> 8 ) & 0x0000ff ) / 255;
+					const b = ( ( rgb >> 0 ) & 0x0000ff ) / 255;
+
+					c.set( r, g, b ).convertSRGBToLinear();
+
+					color.push( c.r, c.g, c.b );
 
 				}
 
@@ -335,9 +341,14 @@ class PCDLoader extends Loader {
 				if ( offset.rgb !== undefined ) {
 
 					const rgbIndex = PCDheader.fields.indexOf( 'rgb' );
-					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 2 ) / 255.0 );
-					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 1 ) / 255.0 );
-					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 0 ) / 255.0 );
+
+					const r = dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 2 ) / 255.0;
+					const g = dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 1 ) / 255.0;
+					const b = dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 0 ) / 255.0;
+
+					c.set( r, g, b ).convertSRGBToLinear();
+
+					color.push( c.r, c.g, c.b );
 
 				}
 
@@ -389,9 +400,13 @@ class PCDLoader extends Loader {
 
 				if ( offset.rgb !== undefined ) {
 
-					color.push( dataview.getUint8( row + offset.rgb + 2 ) / 255.0 );
-					color.push( dataview.getUint8( row + offset.rgb + 1 ) / 255.0 );
-					color.push( dataview.getUint8( row + offset.rgb + 0 ) / 255.0 );
+					const r = dataview.getUint8( row + offset.rgb + 2 ) / 255.0;
+					const g = dataview.getUint8( row + offset.rgb + 1 ) / 255.0;
+					const b = dataview.getUint8( row + offset.rgb + 0 ) / 255.0;
+
+					c.set( r, g, b ).convertSRGBToLinear();
+
+					color.push( c.r, c.g, c.b );
 
 				}
 

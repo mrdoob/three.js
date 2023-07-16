@@ -1,18 +1,18 @@
 import TempNode from '../core/TempNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { ShaderNode, nodeObject, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
+import { tslFn, nodeObject, float, mat3 } from '../shadernode/ShaderNode.js';
 
 import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping } from 'three';
 
 // exposure only
-const LinearToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
+const LinearToneMappingNode = tslFn( ( { color, exposure } ) => {
 
-	return color.mul( exposure );
+	return color.mul( exposure ).clamp();
 
 } );
 
 // source: https://www.cs.utah.edu/docs/techreports/2002/pdf/UUCS-02-001.pdf
-const ReinhardToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
+const ReinhardToneMappingNode = tslFn( ( { color, exposure } ) => {
 
 	color = color.mul( exposure );
 
@@ -21,7 +21,7 @@ const ReinhardToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
 } );
 
 // source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
-const OptimizedCineonToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
+const OptimizedCineonToneMappingNode = tslFn( ( { color, exposure } ) => {
 
 	// optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
 	color = color.mul( exposure );
@@ -35,7 +35,7 @@ const OptimizedCineonToneMappingNode = new ShaderNode( ( { color, exposure } ) =
 } );
 
 // source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
-const RRTAndODTFit = new ShaderNode( ( { color } ) => {
+const RRTAndODTFit = tslFn( ( { color } ) => {
 
 	const a = color.mul( color.add( 0.0245786 ) ).sub( 0.000090537 );
 	const b = color.mul( color.add( 0.4329510 ).mul( 0.983729 ) ).add( 0.238081 );
@@ -45,20 +45,20 @@ const RRTAndODTFit = new ShaderNode( ( { color } ) => {
 } );
 
 // source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
-const ACESFilmicToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
+const ACESFilmicToneMappingNode = tslFn( ( { color, exposure } ) => {
 
 	// sRGB => XYZ => D65_2_D60 => AP1 => RRT_SAT
 	const ACESInputMat = mat3(
-		vec3( 0.59719, 0.07600, 0.02840 ), // transposed from source
-		vec3( 0.35458, 0.90834, 0.13383 ),
-		vec3( 0.04823, 0.01566, 0.83777 )
+		0.59719, 0.35458, 0.04823,
+		0.07600, 0.90834, 0.01566,
+		0.02840, 0.13383, 0.83777
 	);
 
 	// ODT_SAT => XYZ => D60_2_D65 => sRGB
 	const ACESOutputMat = mat3(
-		vec3( 1.60475, - 0.10208, - 0.00327 ), // transposed from source
-		vec3( - 0.53108, 1.10813, - 0.07276 ),
-		vec3( - 0.07367, - 0.00605, 1.07602 )
+		1.60475, - 0.53108, - 0.07367,
+		- 0.10208, 1.10813, - 0.00605,
+		- 0.00327, - 0.07276, 1.07602
 	);
 
 	color = color.mul( exposure ).div( 0.6 );
@@ -66,7 +66,7 @@ const ACESFilmicToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
 	color = ACESInputMat.mul( color );
 
 	// Apply RRT and ODT
-	color = RRTAndODTFit.call( { color } );
+	color = RRTAndODTFit( { color } );
 
 	color = ACESOutputMat.mul( color );
 
@@ -95,6 +95,15 @@ class ToneMappingNode extends TempNode {
 
 	}
 
+	getCacheKey() {
+
+		let cacheKey = super.getCacheKey();
+		cacheKey = '{toneMapping:' + this.toneMapping + ',nodes:' + cacheKey + '}';
+
+		return cacheKey;
+
+	}
+
 	construct( builder ) {
 
 		const colorNode = this.colorNode || builder.context.color;
@@ -109,7 +118,7 @@ class ToneMappingNode extends TempNode {
 
 		if ( toneMappingNode ) {
 
-			outputNode = toneMappingNode.call( toneMappingParams );
+			outputNode = toneMappingNode( toneMappingParams );
 
 		} else {
 

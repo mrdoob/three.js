@@ -11,7 +11,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_transmission" target="_blank" rel="noopener">KHR_materials_transmission</a><br />
 			Iridescent Dish With Olives by <a href="https://github.com/echadwick-wayfair" target="_blank" rel="noopener">Eric Chadwick</a><br />
-			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -40,7 +40,6 @@
 			let camera, scene, renderer, controls, clock, mixer;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -61,6 +60,8 @@
 						texture.mapping = THREE.EquirectangularReflectionMapping;
 
 						scene.background = texture;
+						scene.backgroundBlurriness = 0.35;
+
 						scene.environment = texture;
 
 						// model
@@ -79,6 +80,7 @@
 					} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setAnimationLoop( render );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -86,6 +88,8 @@
 				container.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = - 0.75;
 				controls.enableDamping = true;
 				controls.minDistance = 0.5;
 				controls.maxDistance = 1;
@@ -107,19 +111,11 @@
 
 			//
 
-			function animate() {
-
-				requestAnimationFrame( animate );
+			function render() {
 
 				if ( mixer ) mixer.update( clock.getDelta() );
 
-				controls.update(); // required if damping enabled
-
-				render();
-
-			}
-
-			function render() {
+				controls.update();
 
 				renderer.render( scene, camera );
 

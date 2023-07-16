@@ -64,9 +64,9 @@
 
 				scene = new THREE.Scene();
 
-				scene.add( new THREE.AmbientLight( 0x222244 ) );
+				scene.add( new THREE.AmbientLight( 0x999999 ) );
 
-				const light = new THREE.DirectionalLight();
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
 				light.position.set( 0.5, 0.5, 1 );
 				light.castShadow = true;
 				light.shadow.camera.zoom = 4; // tighter shadow map
