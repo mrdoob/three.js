@@ -1,6 +1,6 @@
 import DataMap from './DataMap.js';
 import { Color, Mesh, SphereGeometry, BackSide } from 'three';
-import { context, positionWorldDirection, backgroundBlurriness, MeshBasicNodeMaterial } from '../../nodes/Nodes.js';
+import { context, positionWorldDirection, backgroundBlurriness, backgroundIntensity, MeshBasicNodeMaterial } from '../../nodes/Nodes.js';
 
 let _clearAlpha;
 const _clearColor = new Color();
@@ -57,7 +57,7 @@ class Background extends DataMap {
 					// @TODO: Add Texture2D support using node context
 					getUVNode: () => positionWorldDirection,
 					getSamplerLevelNode: () => backgroundBlurriness
-				} );
+				} ).mul( backgroundIntensity );
 
 				const nodeMaterial = new MeshBasicNodeMaterial();
 				nodeMaterial.colorNode = this.boxMeshNode;
