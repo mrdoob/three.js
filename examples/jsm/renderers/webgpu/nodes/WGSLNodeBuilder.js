@@ -19,13 +19,11 @@ import { NodeBuilder, CodeNode, NodeMaterial } from '../../../nodes/Nodes.js';
 
 import WGSLNodeParser from './WGSLNodeParser.js';
 
-/*
 const gpuShaderStageLib = {
 	'vertex': GPUShaderStage.VERTEX,
 	'fragment': GPUShaderStage.FRAGMENT,
 	'compute': GPUShaderStage.COMPUTE
 };
-*/
 
 const supports = {
 	instance: true
@@ -207,6 +205,20 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, shaderStage = this.shaderStage ) {
+
+		if ( shaderStage === 'fragment' ) {
+
+			return `textureSampleCompare( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${compareSnippet} )`;
+
+		} else {
+
+			console.error( `WebGPURenderer: THREE.DepthTexture.compareFunction() does not support ${ shaderStage } shader.` );
+
+		}
+
+	}
+
 	getTextureLevel( texture, textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
 		let snippet = null;
@@ -273,8 +285,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			if ( type === 'texture' || type === 'cubeTexture' ) {
 
-				const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node );
-
 				let texture = null;
 
 				if ( type === 'texture' ) {
@@ -287,11 +297,16 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
+				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
+
 				// add first textures in sequence and group for last
 				const lastBinding = bindings[ bindings.length - 1 ];
 				const index = lastBinding && lastBinding.isUniformsGroup ? bindings.length - 1 : bindings.length;
 
 				if ( shaderStage === 'fragment' ) {
+
+					const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node );
+					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 					bindings.splice( index, 0, sampler, texture );
 
@@ -309,7 +324,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				const bufferClass = type === 'storageBuffer' ? StorageBuffer : UniformBuffer;
 				const buffer = new bufferClass( 'NodeBuffer_' + node.id, node.value );
-				//buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
+				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				// add first textures in sequence and group for last
 				const lastBinding = bindings[ bindings.length - 1 ];
@@ -326,7 +341,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 				if ( uniformsGroup === undefined ) {
 
 					uniformsGroup = new UniformsGroup( 'nodeUniforms' );
-					//uniformsGroup.setVisibility( gpuShaderStageLib[ shaderStage ] );
+					uniformsGroup.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 					this.uniformsGroup[ shaderStage ] = uniformsGroup;
 
@@ -568,7 +583,17 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( shaderStage === 'fragment' ) {
 
-					bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler;` );
+					const texture = uniform.node.value;
+
+					if ( texture.isDepthTexture === true && texture.compareFunction !== null ) {
+
+						bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler_comparison;` );
+
+					} else {
+
+						bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler;` );
+
+					}
 
 				}
 
