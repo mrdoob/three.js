@@ -25,6 +25,10 @@ class SceneNode extends Node {
 
 			output = reference( 'backgroundBlurriness', 'float', scene );
 
+		} else if ( scope === SceneNode.BACKGROUND_INTENSITY ) {
+
+			output = reference( 'backgroundIntensity', 'float', scene );
+
 		} else {
 
 			console.error( 'THREE.SceneNode: Unknown scope:', scope );
@@ -38,9 +42,11 @@ class SceneNode extends Node {
 }
 
 SceneNode.BACKGROUND_BLURRINESS = 'backgroundBlurriness';
+SceneNode.BACKGROUND_INTENSITY = 'backgroundIntensity';
 
 export default SceneNode;
 
 export const backgroundBlurriness = nodeImmutable( SceneNode, SceneNode.BACKGROUND_BLURRINESS );
+export const backgroundIntensity = nodeImmutable( SceneNode, SceneNode.BACKGROUND_INTENSITY );
 
 addNodeClass( SceneNode );
