@@ -61,7 +61,7 @@ class BumpMapNode extends TempNode {
 		const dHdxy = dHdxy_fwd( { bumpTexture: this.texture, bumpScale } );
 
 		return perturbNormalArb( {
-			surf_pos: positionView,
+			surf_pos: positionView.negate(),
 			surf_norm: normalView,
 			dHdxy
 		} );
