@@ -174,9 +174,6 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			colorAttachment.view = view;
-			colorAttachment.resolveTarget = resolveTarget;
-
 			depthStencilAttachment.view = depthTextureData.texture.createView();
 
 			if ( renderContext.stencil && renderContext.depthTexture.format === DepthFormat ) {
