@@ -79,10 +79,10 @@ class Textures extends DataMap {
 		const textureData = this.get( texture );
 		if ( textureData.initialized === true && textureData.version === texture.version ) return;
 
-		const isRenderTexture = texture.isRenderTargetTexture || texture.isDepthTexture || texture.isFramebufferTexture;
+		const isRenderTarget = texture.isRenderTargetTexture || texture.isDepthTexture || texture.isFramebufferTexture;
 		const backend = this.backend;
 
-		if ( isRenderTexture && textureData.initialized === true ) {
+		if ( isRenderTarget && textureData.initialized === true ) {
 
 			// it's an update
 
@@ -93,7 +93,7 @@ class Textures extends DataMap {
 
 		//
 
-		if ( isRenderTexture ) {
+		if ( isRenderTarget ) {
 
 			backend.createSampler( texture );
 			backend.createTexture( texture );

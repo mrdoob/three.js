@@ -32,9 +32,12 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.forceSinglePass = false;
 
+		this.unlit = this.constructor === NodeMaterial.prototype.constructor; // Extended materials are not unlit by default
+
+		this.fog = true;
 		this.lights = true;
 		this.normals = true;
-		this.unlit = this.constructor === NodeMaterial.prototype.constructor; // Extended materials are not unlit by default
+		this.colorSpace = true;
 
 		this.lightsNode = null;
 		this.envNode = null;
@@ -321,29 +324,37 @@ class NodeMaterial extends ShaderMaterial {
 
 		// FOG
 
-		const fogNode = builder.fogNode;
+		if ( this.fog === true ) {
 
-		if ( fogNode ) outputNode = vec4( fogNode.mixAssign( outputNode.rgb ), outputNode.a );
+			const fogNode = builder.fogNode;
 
-		// ENCODING
-
-		const renderTarget = renderer.getRenderTarget();
-
-		let outputColorSpace;
-
-		if ( renderTarget !== null ) {
-
-			outputColorSpace = renderTarget.texture.colorSpace;
-
-		} else {
-
-			outputColorSpace = renderer.outputColorSpace;
+			if ( fogNode ) outputNode = vec4( fogNode.mixAssign( outputNode.rgb ), outputNode.a );
 
 		}
 
-		if ( outputColorSpace !== LinearSRGBColorSpace && outputColorSpace !== NoColorSpace ) {
+		// ENCODING
 
-			outputNode = outputNode.linearToColorSpace( outputColorSpace );
+		if ( this.colorSpace === true ) {
+
+			const renderTarget = renderer.getRenderTarget();
+
+			let outputColorSpace;
+
+			if ( renderTarget !== null ) {
+
+				outputColorSpace = renderTarget.texture.colorSpace;
+
+			} else {
+
+				outputColorSpace = renderer.outputColorSpace;
+
+			}
+
+			if ( outputColorSpace !== LinearSRGBColorSpace && outputColorSpace !== NoColorSpace ) {
+
+				outputNode = outputNode.linearToColorSpace( outputColorSpace );
+
+			}
 
 		}
 

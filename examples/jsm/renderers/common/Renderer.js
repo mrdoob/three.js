@@ -639,8 +639,8 @@ class Renderer {
 			nodes.updateForCompute( computeNode );
 			bindings.updateForCompute( computeNode );
 
-			const computePipeline = pipelines.getForCompute( computeNode );
 			const computeBindings = bindings.getForCompute( computeNode );
+			const computePipeline = pipelines.getForCompute( computeNode, computeBindings );
 
 			backend.compute( computeNodes, computeNode, computeBindings, computePipeline );
 
@@ -882,6 +882,7 @@ class Renderer {
 		this._nodes.updateForRender( renderObject );
 		this._geometries.updateForRender( renderObject );
 		this._bindings.updateForRender( renderObject );
+		this._pipelines.updateForRender( renderObject );
 
 		//
 

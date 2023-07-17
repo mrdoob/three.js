@@ -214,12 +214,6 @@ export const GPUAddressMode = {
 	MirrorRepeat: 'mirror-repeat'
 };
 
-export const GPUSamplerBindingType = {
-	Filtering: 'filtering',
-	NonFiltering: 'non-filtering',
-	Comparison: 'comparison'
-};
-
 export const GPUFilterMode = {
 	Linear: 'linear',
 	Nearest: 'nearest'
@@ -269,16 +263,24 @@ export const GPUStencilOperation = {
 	DecrementWrap: 'decrement-wrap'
 };
 
-export const GPUBindingType = {
-	UniformBuffer: 'uniform-buffer',
-	StorageBuffer: 'storage-buffer',
-	ReadonlyStorageBuffer: 'readonly-storage-buffer',
-	Sampler: 'sampler',
-	ComparisonSampler: 'comparison-sampler',
-	SampledTexture: 'sampled-texture',
-	MultisampledTexture: 'multisampled-texture',
-	ReadonlyStorageTexture: 'readonly-storage-texture',
-	WriteonlyStorageTexture: 'writeonly-storage-texture'
+export const GPUBufferBindingType = {
+	Uniform: 'uniform',
+	Storage: 'storage',
+	ReadOnlyStorage: 'read-only-storage'
+};
+
+export const GPUSamplerBindingType = {
+	Filtering: 'filtering',
+	NonFiltering: 'non-filtering',
+	Comparison: 'comparison'
+};
+
+export const GPUTextureSampleType = {
+	Float: 'float',
+	UnfilterableFloat: 'unfilterable-float',
+	Depth: 'depth',
+	SInt: 'sint',
+	UInt: 'uint'
 };
 
 export const GPUTextureDimension = {
