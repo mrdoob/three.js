@@ -166,7 +166,7 @@ class WebGPUBackend extends Backend {
 
 				colorAttachment.view = textureData.msaaTexture.createView();
 				colorAttachment.resolveTarget = view;
-``
+
 			} else {
 
 				colorAttachment.view = view;
