@@ -1,6 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { materialReference } from './MaterialReferenceNode.js';
-import { nodeImmutable } from '../shadernode/ShaderNode.js';
+import { nodeImmutable, float } from '../shadernode/ShaderNode.js';
 
 class MaterialNode extends Node {
 
@@ -112,15 +112,13 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.SPECULAR_STRENGTH ) {
 
-			const specularNode = this.getColor( 'specular' );
-
 			if ( material.specularMap && material.specularMap.isTexture === true ) {
 
-				node = specularNode.mul( this.getTexture( 'specularMap' ).r );
+				node = this.getTexture( 'specularMap' ).r;
 
 			} else {
 
-				node = specularNode;
+				node = float( 1 );
 
 			}
 
