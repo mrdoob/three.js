@@ -439,7 +439,7 @@ class WebGPUTextureUtils {
 
 		const options = {};
 
-		options.imageOrientation = ( texture.flipY === true ) ? 'flipY' : 'none';
+		options.imageOrientation = ( texture.flipY === true ) ? 'flipY' : 'default';
 		options.premultiplyAlpha = ( texture.premultiplyAlpha === true ) ? 'premultiply' : 'default';
 
 		return createImageBitmap( image, 0, 0, width, height, options );
