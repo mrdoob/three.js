@@ -3133,8 +3133,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.viewport.set( 0, 0, width, height );
 			this.scissor.set( 0, 0, width, height );
 
-			return this;
-
 		}
 
 		copy( source ) {
@@ -8032,7 +8030,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.frustumCulled = source.frustumCulled;
 			this.renderOrder = source.renderOrder;
 
-			this.animations = source.animations;
+			this.animations = source.animations.slice();
 
 			this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
@@ -12706,10 +12704,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			const currentRenderTarget = renderer.getRenderTarget();
 
-			const currentToneMapping = renderer.toneMapping;
 			const currentXrEnabled = renderer.xr.enabled;
 
-			renderer.toneMapping = NoToneMapping;
 			renderer.xr.enabled = false;
 
 			const generateMipmaps = renderTarget.texture.generateMipmaps;
@@ -12738,7 +12734,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			renderer.setRenderTarget( currentRenderTarget );
 
-			renderer.toneMapping = currentToneMapping;
 			renderer.xr.enabled = currentXrEnabled;
 
 			renderTarget.texture.needsPMREMUpdate = true;
@@ -29479,6 +29474,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				materialProperties.outputColorSpace = parameters.outputColorSpace;
 				materialProperties.instancing = parameters.instancing;
+				materialProperties.instancingColor = parameters.instancingColor;
 				materialProperties.skinning = parameters.skinning;
 				materialProperties.morphTargets = parameters.morphTargets;
 				materialProperties.morphNormals = parameters.morphNormals;
@@ -29570,6 +29566,14 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						needsProgramChange = true;
 
 					} else if ( ! object.isSkinnedMesh && materialProperties.skinning === true ) {
+
+						needsProgramChange = true;
+
+					} else if ( object.isInstancedMesh && materialProperties.instancingColor === true && object.instanceColor === null ) {
+
+						needsProgramChange = true;
+
+					} else if ( object.isInstancedMesh && materialProperties.instancingColor === false && object.instanceColor !== null ) {
 
 						needsProgramChange = true;
 
@@ -30324,14 +30328,14 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		get useLegacyLights() { // @deprecated, r155
 
-			console.warn( 'THREE.WebGLRenderer: The property .useLegacyLights has been deprecated. Migrate your lighting according to the following guide: TODO.' );
+			console.warn( 'THREE.WebGLRenderer: The property .useLegacyLights has been deprecated. Migrate your lighting according to the following guide: https://discourse.threejs.org/t/updates-to-lighting-in-three-js-r155/53733.' );
 			return this._useLegacyLights;
 
 		}
 
 		set useLegacyLights( value ) { // @deprecated, r155
 
-			console.warn( 'THREE.WebGLRenderer: The property .useLegacyLights has been deprecated. Migrate your lighting according to the following guide: TODO.' );
+			console.warn( 'THREE.WebGLRenderer: The property .useLegacyLights has been deprecated. Migrate your lighting according to the following guide: https://discourse.threejs.org/t/updates-to-lighting-in-three-js-r155/53733.' );
 			this._useLegacyLights = value;
 
 		}
