@@ -1601,6 +1601,7 @@ class WebGLRenderer {
 
 			materialProperties.outputColorSpace = parameters.outputColorSpace;
 			materialProperties.instancing = parameters.instancing;
+			materialProperties.instancingColor = parameters.instancingColor;
 			materialProperties.skinning = parameters.skinning;
 			materialProperties.morphTargets = parameters.morphTargets;
 			materialProperties.morphNormals = parameters.morphNormals;
@@ -1692,6 +1693,14 @@ class WebGLRenderer {
 					needsProgramChange = true;
 
 				} else if ( ! object.isSkinnedMesh && materialProperties.skinning === true ) {
+
+					needsProgramChange = true;
+
+				} else if ( object.isInstancedMesh && materialProperties.instancingColor === true && object.instanceColor === null ) {
+
+					needsProgramChange = true;
+
+				} else if ( object.isInstancedMesh && materialProperties.instancingColor === false && object.instanceColor !== null ) {
 
 					needsProgramChange = true;
 
