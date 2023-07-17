@@ -222,17 +222,17 @@ export const GPUFilterMode = {
 export const GPUBlendFactor = {
 	Zero: 'zero',
 	One: 'one',
-	SrcColor: 'src-color',
-	OneMinusSrcColor: 'one-minus-src-color',
+	Src: 'src',
+	OneMinusSrc: 'one-minus-src',
 	SrcAlpha: 'src-alpha',
 	OneMinusSrcAlpha: 'one-minus-src-alpha',
-	DstColor: 'dst-color',
-	OneMinusDstColor: 'one-minus-dst-color',
+	Dst: 'dst',
+	OneMinusDstColor: 'one-minus-dst',
 	DstAlpha: 'dst-alpha',
 	OneMinusDstAlpha: 'one-minus-dst-alpha',
 	SrcAlphaSaturated: 'src-alpha-saturated',
-	BlendColor: 'blend-color',
-	OneMinusBlendColor: 'one-minus-blend-color'
+	Constant: 'constant',
+	OneMinusConstant: 'one-minus-constant'
 };
 
 export const GPUBlendOperation = {
