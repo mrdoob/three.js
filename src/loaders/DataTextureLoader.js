@@ -32,7 +32,7 @@ class DataTextureLoader extends Loader {
 
 			const texData = scope.parse( buffer );
 
-			if ( ! texData ) return;
+			if ( ! texData ) return onError();
 
 			if ( texData.image !== undefined ) {
 
