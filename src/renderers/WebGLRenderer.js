@@ -2115,8 +2115,15 @@ class WebGLRenderer {
 
 				} else {
 
-					if ( Array.isArray( __webglFramebuffer ) ) framebuffer = __webglFramebuffer[ activeMipmapLevel ];
-					else framebuffer = __webglFramebuffer;
+					if ( Array.isArray( __webglFramebuffer ) ) {
+						
+						framebuffer = __webglFramebuffer[ activeMipmapLevel ];
+
+					} else {
+						
+						framebuffer = __webglFramebuffer;
+
+					}
 
 				}
 
