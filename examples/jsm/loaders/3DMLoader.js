@@ -429,6 +429,8 @@ class Rhino3dmLoader extends Loader {
 
 				}
 
+				//console.log( map )
+
 			}
 
 		}
@@ -491,23 +493,23 @@ class Rhino3dmLoader extends Loader {
 
 				default:
 
-					let _object;
-
 					let matId = attributes.materialIndex >= 0 ? attributes.materialIndex : data.layers[ attributes.layerIndex ].renderMaterialIndex;
+					let material;
 
 					if ( matId >= 0 ) {
 
 						const rMaterial = materials[ matId ];
-						let material = this._createMaterial( rMaterial, data.renderEnvironment );
-						material = this._compareMaterials( material );
-						_object = this._createObject( obj, material );
+						material = this._createMaterial( rMaterial, data.renderEnvironment );
+
 
 					} else {
 
-						const material = this._createMaterial();
-						_object = this._createObject( obj, material );
+						material = this._createMaterial();
 
 					}
+
+					material = this._compareMaterials( material );
+					const _object = this._createObject( obj, material );
 
 					if ( _object === undefined ) {
 
@@ -590,6 +592,7 @@ class Rhino3dmLoader extends Loader {
 		}
 
 		object.userData[ 'materials' ] = this.materials;
+		object.name = ''
 		return object;
 
 	}
@@ -1220,48 +1223,6 @@ function Rhino3dmWorker() {
 
 		const settings = extractProperties( doc.settings() );
 
-		// Handle Render Environments
-		//console.log(doc.settings().renderSettings().renderEnvironments)
-
-
-		/*
-		console.log( `backgroundId: ${doc.settings().renderSettings().renderEnvironments.backgroundId}` )
-		console.log( `skylightingId: ${doc.settings().renderSettings().renderEnvironments.skylightingId}` )
-		console.log( `skylightingOverride: ${doc.settings().renderSettings().renderEnvironments.skylightingOverride}` )
-		console.log( `reflectionId: ${doc.settings().renderSettings().renderEnvironments.reflectionId}` )
-		console.log( `reflectionOverride: ${doc.settings().renderSettings().renderEnvironments.reflectionOverride}` )
-*/
-		const backgroundId = doc.settings().renderSettings().renderEnvironments.backgroundId
-		const skylightingId = doc.settings().renderSettings().renderEnvironments.skylightingId
-		const reflectionId = doc.settings().renderSettings().renderEnvironments.reflectionId
-		
-		//const background = doc.embeddedFiles().findId(backgroundId)
-		//const skylight = doc.embeddedFiles().findId(skylightingId)
-		//const reflection = doc.embeddedFiles().findId(reflectionId)
-
-		//console.log(`${background}, ${skylight}, ${reflection}`)
-
-		const efCount = doc.embeddedFiles().count
-		let renderEnvironment = null
-		console.log(`efCount: ${efCount}`)
-		if ( efCount > 0 ) {
-			// TODO: FIX THIS AFTER https://mcneel.myjetbrains.com/youtrack/issue/RH3DM-155 is fixed
-			const backgroundGet = doc.embeddedFiles().get(0).filename
-			const backgroundLength = doc.embeddedFiles().get(0).length
-			const background = doc.getEmbeddedFileAsBase64(backgroundGet)
-			const backgroundImage = 'data:image/png;base64,' + background;
-
-			//renderEnvironment = { type: 'renderEnvironment', image: backgroundImage, name: backgroundGet };
-
-		}
-		//console.log(`${backgroundGet}, ${backgroundLength}`)
-		//console.log(background)
-
-		//const paths = doc.embeddedFilePaths();
-		//console.log(paths)
-
-		//console.log(`nº of embedded files: ${doc.embeddedFiles().count()}`)
-
 		//TODO: Handle other document stuff like dimstyles, instance definitions, bitmaps etc.
 
 		// Handle dimstyles
@@ -1296,6 +1257,51 @@ function Rhino3dmWorker() {
 			BND_File3dmSun& GetSun() const { return *m_sun; }
 			BND_File3dmPostEffectTable& GetPostEffects() const { return *m_post_effects; }
 		*/
+
+		// Handle Render Environments
+
+		// get the id of the active render environment skylight, which we'll use for environment texture
+		const skylightingId = doc.settings().renderSettings().renderEnvironments.skylightingId
+
+		const rc = doc.renderContent()
+
+		let renderEnvironment = null
+
+		for( let i = 0; i < rc.count; i++ ) {
+
+			const content = rc.get(i)
+
+			switch( content.kind ) {
+
+				case 'environment':
+
+					const id = content.id
+
+					// there could be multiple render environments in a 3dm file
+					if ( id !== skylightingId ) break;
+
+					const renderTexture = content.findChild( 'texture' )
+					const fileName = renderTexture.fileName
+
+					for ( let j = 0; j < doc.embeddedFiles().count; j ++ ) {
+
+						const _fileName = doc.embeddedFiles().get( j ).fileName
+
+						if ( fileName === _fileName ) {
+
+							const background = doc.getEmbeddedFileAsBase64( fileName )
+							const backgroundImage = 'data:image/png;base64,' + background
+							renderEnvironment = { type: 'renderEnvironment', image: backgroundImage, name: fileName };
+
+						}
+
+					}
+					
+					break;
+
+			}
+
+		}
 
 		// Handle Render Settings
 
@@ -1338,13 +1344,11 @@ function Rhino3dmWorker() {
 
 			const pe = extractProperties(doc.settings().renderSettings().postEffects.get(c))
 
-			console.log(pe)
+			//console.log(pe)
 
 		}
 
 		console.log(renderSettings)
-
-
 
 		doc.delete();
 
@@ -1362,6 +1366,9 @@ function Rhino3dmWorker() {
 		texture.wrapV = t.wrapV;
 		texture.wrapW = t.wrapW;
 		const uvw = t.uvwTransform.toFloatArray( true );
+		console.log( t.id )
+		console.log( t.textureType.value)
+		console.log( t.enabled )
 		texture.repeat = [ uvw[ 0 ], uvw[ 5 ] ];
 
 		if ( image ) {
@@ -1594,7 +1601,24 @@ function Rhino3dmWorker() {
 
 			}
 
-			console.log( _attributes.decals().count )
+			if ( _attributes.decals().count > 0 ) {
+
+				self.postMessage( { type: 'warning', id: taskID, data: {
+					message: `THREE.3DMLoader: No conversion exists for the decals associated with this object.`,
+					type: 'no conversion',
+					guid: _attributes.id
+				}
+	
+				} );
+				
+			}
+
+			//console.log(_attributes.meshModifiers().displacement().texture.fileName)
+			console.log( 'meshMods' );
+			console.log(extractProperties(_attributes.meshModifiers().thickening()));
+			console.log(extractProperties(_attributes.meshModifiers().edgeSoftening()));
+			console.log(extractProperties(_attributes.meshModifiers().shutLining()));
+			console.log(extractProperties(_attributes.meshModifiers().displacement()));
 
 			attributes.drawColor = _attributes.drawColor( doc );
 
