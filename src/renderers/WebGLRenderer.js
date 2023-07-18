@@ -2097,8 +2097,15 @@ class WebGLRenderer {
 
 				if ( renderTarget.isWebGLCubeRenderTarget ) {
 
-					if ( Array.isArray( __webglFramebuffer[ activeCubeFace ] ) ) framebuffer = __webglFramebuffer[ activeCubeFace ][ activeMipmapLevel ];
-					else framebuffer = __webglFramebuffer[ activeCubeFace ];
+					if ( Array.isArray( __webglFramebuffer[ activeCubeFace ] ) ) {
+						
+						framebuffer = __webglFramebuffer[ activeCubeFace ][ activeMipmapLevel ];
+
+					} else { 
+						
+						framebuffer = __webglFramebuffer[ activeCubeFace ];
+
+					}
 
 					isCube = true;
 
