@@ -46,9 +46,11 @@ class TextureNode extends UniformNode {
 
 	}
 
-	getDefaultUV( uvNode ) {
+	getDefaultUV( uvNode = null ) {
 
 		const texture = this.value;
+
+		if ( uvNode === null ) uvNode = uv( texture.channel );
 
 		return uniform( texture.matrix ).mul( vec3( uvNode, 1 ) );
 
@@ -80,7 +82,7 @@ class TextureNode extends UniformNode {
 
 		if ( this.updateMatrix ) {
 
-			uvNode = this.getDefaultUV( uvNode || uv( texture.channel ) );
+			uvNode = this.getDefaultUV( uvNode );
 
 		} else if ( ! uvNode ) {
 
