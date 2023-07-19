@@ -11,10 +11,10 @@ import {
 const _taskCache = new WeakMap();
 
 const _dependencies = {
-	"draco_decoder.js": new URL("../libs/draco/draco_decoder.js", import.meta.url).toString(),
-	"draco_decoder.wasm": new URL("../libs/draco/draco_decoder.wasm", import.meta.url).toString(),
-	"draco_encoder.js": new URL("../libs/draco/draco_encoder.js", import.meta.url).toString(),
-	"draco_wasm_wrapper.js": new URL("../libs/draco/draco_wasm_wrapper.js", import.meta.url).toString(),
+	'draco_decoder.js': new URL( '../libs/draco/draco_decoder.js', import.meta.url ).toString(),
+	'draco_decoder.wasm': new URL( '../libs/draco/draco_decoder.wasm', import.meta.url ).toString(),
+	'draco_encoder.js': new URL( '../libs/draco/draco_encoder.js', import.meta.url ).toString(),
+	'draco_wasm_wrapper.js': new URL( '../libs/draco/draco_wasm_wrapper.js', import.meta.url ).toString(),
 };
 
 class DRACOLoader extends Loader {
@@ -250,8 +250,10 @@ class DRACOLoader extends Loader {
 
 	_loadLibrary( url, responseType ) {
 
-		if (!this.decoderPath && _dependencies[url]) {
-			url = _dependencies[url];	
+		if ( ! this.decoderPath && _dependencies[ url ] ) {
+
+			url = _dependencies[ url ];
+
 		}
 
 		const loader = new FileLoader( this.manager );
