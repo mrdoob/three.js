@@ -165,7 +165,7 @@ class Nodes extends DataMap {
 
 					}
 
-					backgroundNode = texture( background, nodeUV );
+					backgroundNode = texture( background, nodeUV ).setUpdateMatrix( true );
 
 				} else if ( background.isColor !== true ) {
 
