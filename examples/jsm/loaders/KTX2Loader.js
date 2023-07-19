@@ -68,6 +68,11 @@ let _activeLoaders = 0;
 
 let _zstd;
 
+const _dependencies = {
+	"basis_transcoder.js": new URL("../libs/basis/basis_transcoder.js", import.meta.url).toString(),
+	"basis_transcoder.wasm": new URL("../libs/basis/basis_transcoder.wasm", import.meta.url).toString(),
+};
+
 class KTX2Loader extends Loader {
 
 	constructor( manager ) {
@@ -157,14 +162,14 @@ class KTX2Loader extends Loader {
 			const jsLoader = new FileLoader( this.manager );
 			jsLoader.setPath( this.transcoderPath );
 			jsLoader.setWithCredentials( this.withCredentials );
-			const jsContent = jsLoader.loadAsync( 'basis_transcoder.js' );
+			const jsContent = jsLoader.loadAsync( this.transcoderPath ? 'basis_transcoder.js' : _dependencies['basis_transcoder.js'] );
 
 			// Load transcoder WASM binary.
 			const binaryLoader = new FileLoader( this.manager );
 			binaryLoader.setPath( this.transcoderPath );
 			binaryLoader.setResponseType( 'arraybuffer' );
 			binaryLoader.setWithCredentials( this.withCredentials );
-			const binaryContent = binaryLoader.loadAsync( 'basis_transcoder.wasm' );
+			const binaryContent = binaryLoader.loadAsync( this.transcoderPath ? 'basis_transcoder.wasm' : _dependencies['basis_transcoder.wasm']);
 
 			this.transcoderPending = Promise.all( [ jsContent, binaryContent ] )
 				.then( ( [ jsContent, binaryContent ] ) => {
