@@ -77,6 +77,8 @@ class Nodes extends DataMap {
 
 	getToneMappingNode() {
 
+		if ( this.isToneMappingState === false ) return null;
+
 		return this.renderer.toneMappingNode || this.get( this.renderer ).toneMappingNode || null;
 
 	}
@@ -107,13 +109,22 @@ class Nodes extends DataMap {
 
 	}
 
+	get isToneMappingState() {
+
+		const renderer = this.renderer;
+		const renderTarget = renderer.getRenderTarget();
+
+		return renderTarget && renderTarget.isCubeRenderTarget ? false : true;
+
+	}
+
 	updateToneMapping() {
 
 		const renderer = this.renderer;
 		const rendererData = this.get( renderer );
 		const rendererToneMapping = renderer.toneMapping;
 
-		if ( rendererToneMapping !== NoToneMapping ) {
+		if ( this.isToneMappingState && rendererToneMapping !== NoToneMapping ) {
 
 			if ( rendererData.toneMapping !== rendererToneMapping ) {
 
