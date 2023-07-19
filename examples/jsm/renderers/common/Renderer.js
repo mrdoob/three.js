@@ -656,12 +656,6 @@ class Renderer {
 
 	}
 
-	getRenderTarget() {
-
-		return this._renderTarget;
-
-	}
-
 	hasFeature( name ) {
 
 		return this.backend.hasFeature( name );
