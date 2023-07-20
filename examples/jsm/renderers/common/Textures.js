@@ -17,6 +17,7 @@ class Textures extends DataMap {
 	updateRenderTarget( renderTarget ) {
 
 		const renderTargetData = this.get( renderTarget );
+		const sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
 
 		const texture = renderTarget.texture;
 		const size = this.getSize( texture );
@@ -48,8 +49,19 @@ class Textures extends DataMap {
 		renderTargetData.texture = texture;
 		renderTargetData.depthTexture = depthTexture;
 
-		this.updateTexture( texture );
-		this.updateTexture( depthTexture );
+		if ( renderTargetData.sampleCount !== sampleCount ) {
+
+			texture.needsUpdate = true;
+			depthTexture.needsUpdate = true;
+
+			renderTargetData.sampleCount = sampleCount;
+
+		}
+
+		const options = { sampleCount };
+
+		this.updateTexture( texture, options );
+		this.updateTexture( depthTexture, options );
 
 		// dispose handler
 
@@ -74,7 +86,7 @@ class Textures extends DataMap {
 
 	}
 
-	updateTexture( texture ) {
+	updateTexture( texture, options = {} ) {
 
 		const textureData = this.get( texture );
 		if ( textureData.initialized === true && textureData.version === texture.version ) return;
@@ -96,7 +108,7 @@ class Textures extends DataMap {
 		if ( isRenderTarget ) {
 
 			backend.createSampler( texture );
-			backend.createTexture( texture );
+			backend.createTexture( texture, options );
 
 		} else {
 
@@ -120,7 +132,7 @@ class Textures extends DataMap {
 
 					if ( textureData.isDefaultTexture === undefined || textureData.isDefaultTexture === true ) {
 
-						backend.createTexture( texture );
+						backend.createTexture( texture, options );
 
 						textureData.isDefaultTexture = false;
 

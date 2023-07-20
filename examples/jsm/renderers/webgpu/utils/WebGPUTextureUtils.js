@@ -103,8 +103,9 @@ class WebGPUTextureUtils {
 		const dimension = this._getDimension( texture );
 		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
 		const format = texture.internalFormat || this._getFormat( texture );
-		//const sampleCount = texture.isRenderTargetTexture || texture.isDepthTexture ? backend.utils.getSampleCount( renderContext ) : 1;
+
 		const sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
+		const primarySampleCount = texture.isRenderTargetTexture ? 1 : sampleCount;
 
 		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC;
 
@@ -122,7 +123,7 @@ class WebGPUTextureUtils {
 				depthOrArrayLayers: depth,
 			},
 			mipLevelCount: mipLevelCount,
-			sampleCount: sampleCount,
+			sampleCount: primarySampleCount,
 			dimension: dimension,
 			format: format,
 			usage: usage
@@ -156,6 +157,17 @@ class WebGPUTextureUtils {
 
 		}
 
+		if ( texture.isRenderTargetTexture && sampleCount > 1 ) {
+
+			const msaaTextureDescriptorGPU = Object.assign( {}, textureDescriptorGPU );
+
+			msaaTextureDescriptorGPU.label = msaaTextureDescriptorGPU.label + '-msaa';
+			msaaTextureDescriptorGPU.sampleCount = sampleCount;
+
+			textureData.msaaTexture = backend.device.createTexture( msaaTextureDescriptorGPU );
+
+		}
+
 		textureData.initialized = true;
 
 		textureData.needsMipmaps = needsMipmaps;
@@ -169,6 +181,8 @@ class WebGPUTextureUtils {
 		const textureData = backend.get( texture );
 
 		textureData.texture.destroy();
+
+		if ( textureData.msaaTexture !== undefined ) textureData.msaaTexture.destroy();
 
 		backend.delete( texture );
 
