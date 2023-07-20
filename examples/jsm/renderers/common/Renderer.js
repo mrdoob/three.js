@@ -600,6 +600,12 @@ class Renderer {
 
 	}
 
+	getRenderTarget() {
+
+		return this._renderTarget;
+
+	}
+
 	async compute( computeNodes ) {
 
 		if ( this._initialized === false ) await this.init();
@@ -647,12 +653,6 @@ class Renderer {
 		}
 
 		backend.finishCompute( computeNodes );
-
-	}
-
-	getRenderTarget() {
-
-		return this._renderTarget;
 
 	}
 
