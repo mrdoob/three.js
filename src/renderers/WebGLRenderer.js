@@ -1823,7 +1823,7 @@ class WebGLRenderer {
 					refreshLights = true;		// remains set until update done
 
 				}
-				
+
 			}
 
 			// skinning and morph target uniforms must be set even if material didn't change
