@@ -1790,7 +1790,19 @@ class WebGLRenderer {
 
 			if ( refreshProgram || _currentCamera !== camera ) {
 
+				// common camera uniforms
+
 				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
+				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
+				p_uniforms.setValue( _gl, 'isOrthographic', camera.isOrthographicCamera === true );
+
+				const uCamPos = p_uniforms.map.cameraPosition;
+
+				if ( uCamPos !== undefined ) {
+
+					uCamPos.setValue( _gl, _vector3.setFromMatrixPosition( camera.matrixWorld ) );
+
+				}
 
 				if ( capabilities.logarithmicDepthBuffer ) {
 
@@ -1811,20 +1823,7 @@ class WebGLRenderer {
 					refreshLights = true;		// remains set until update done
 
 				}
-
-				// load material common uniforms
-
-				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
-				p_uniforms.setValue( _gl, 'isOrthographic', camera.isOrthographicCamera === true );
-
-				const uCamPos = p_uniforms.map.cameraPosition;
-
-				if ( uCamPos !== undefined ) {
-
-					uCamPos.setValue( _gl, _vector3.setFromMatrixPosition( camera.matrixWorld ) );
-
-				}
-
+				
 			}
 
 			// skinning and morph target uniforms must be set even if material didn't change
