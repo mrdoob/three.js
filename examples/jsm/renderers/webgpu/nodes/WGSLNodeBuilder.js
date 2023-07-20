@@ -1,4 +1,4 @@
-import { NoColorSpace } from 'three';
+import { RenderTarget, NoColorSpace } from 'three';
 
 import UniformsGroup from '../../common/UniformsGroup.js';
 import {
@@ -12,7 +12,6 @@ import UniformBuffer from '../../common/UniformBuffer.js';
 import StorageBuffer from '../../common/StorageBuffer.js';
 import { getVectorLength, getStrideLength } from '../../common/BufferUtils.js';
 
-import RenderTarget from '../../common/RenderTarget.js';
 import CubeRenderTarget from '../../common/CubeRenderTarget.js';
 
 import { NodeBuilder, CodeNode, NodeMaterial } from '../../../nodes/Nodes.js';
