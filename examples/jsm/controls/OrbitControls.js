@@ -8,7 +8,8 @@ import {
 	Vector3,
 	Plane,
 	Ray,
-	MathUtils
+	MathUtils,
+	Clock,
 } from 'three';
 
 // OrbitControls performs orbiting, dollying (zooming), and panning.
@@ -23,6 +24,7 @@ const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
 const _ray = new Ray();
 const _plane = new Plane();
+const _clock = new Clock();
 const TILT_LIMIT = Math.cos( 70 * MathUtils.DEG2RAD );
 
 class OrbitControls extends EventDispatcher {
@@ -470,9 +472,13 @@ class OrbitControls extends EventDispatcher {
 		const pointerPositions = {};
 
 		function getAutoRotationAngle() {
-
+			// New
+			return (2 * Math.PI / 60 * scope.autoRotateSpeed) * _clock.getDelta();
+			//     (2 * Math.PI / 60 * 2)                     * 0.0166               = 0.0034906555555555556
+			
+			// Original
 			return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
-
+			//     2 * 3.14159 / 60 / 60 * 2                      == 0.0034906555555555556
 		}
 
 		function getZoomScale() {
