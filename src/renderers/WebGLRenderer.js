@@ -1794,7 +1794,6 @@ class WebGLRenderer {
 
 				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
 				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
-				p_uniforms.setValue( _gl, 'isOrthographic', camera.isOrthographicCamera === true );
 
 				const uCamPos = p_uniforms.map.cameraPosition;
 
@@ -1808,6 +1807,20 @@ class WebGLRenderer {
 
 					p_uniforms.setValue( _gl, 'logDepthBufFC',
 						2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
+
+				}
+
+				// isOrthographic is defined in the scaffold for all shaders, but may not be used in all.
+				// https://github.com/mrdoob/three.js/pull/26467#issuecomment-1645185067
+
+				if ( material.isMeshPhongMaterial ||
+					material.isMeshToonMaterial ||
+					material.isMeshLambertMaterial ||
+					material.isMeshBasicMaterial ||
+					material.isMeshStandardMaterial ||
+					material.isShaderMaterial ) {
+
+					p_uniforms.setValue( _gl, 'isOrthographic', camera.isOrthographicCamera === true );
 
 				}
 
