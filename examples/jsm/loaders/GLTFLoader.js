@@ -4320,6 +4320,7 @@ class GLTFParser {
 						break;
 
 				}
+
 				break;
 
 		}
@@ -4394,6 +4395,7 @@ class GLTFParser {
 		track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline = true;
 
 	}
+
 }
 
 /**
