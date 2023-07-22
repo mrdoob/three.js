@@ -4264,6 +4264,28 @@ class GLTFParser {
 	_createAnimationTracks( node, inputAccessor, outputAccessor, sampler, target ) {
 
 		const tracks = [];
+
+		const targetName = node.name ? node.name : node.uuid;
+		const targetNames = [];
+
+		if ( PATH_PROPERTIES[ target.path ] === PATH_PROPERTIES.weights ) {
+
+			node.traverse( function ( object ) {
+
+				if ( object.morphTargetInfluences ) {
+
+					targetNames.push( object.name ? object.name : object.uuid );
+
+				}
+
+			} );
+
+		} else {
+
+			targetNames.push( targetName );
+
+		}
+
 		let TypedKeyframeTrack;
 
 		switch ( PATH_PROPERTIES[ target.path ] ) {
@@ -4287,29 +4309,8 @@ class GLTFParser {
 
 		}
 
-		const targetName = node.name ? node.name : node.uuid;
-
 		const interpolation = sampler.interpolation !== undefined ? INTERPOLATION[ sampler.interpolation ] : InterpolateLinear;
 
-		const targetNames = [];
-
-		if ( PATH_PROPERTIES[ target.path ] === PATH_PROPERTIES.weights ) {
-
-			node.traverse( function ( object ) {
-
-				if ( object.morphTargetInfluences ) {
-
-					targetNames.push( object.name ? object.name : object.uuid );
-
-				}
-
-			} );
-
-		} else {
-
-			targetNames.push( targetName );
-
-		}
 
 		const outputArray = this._getArrayFromAccessor( outputAccessor );
 
