@@ -4302,9 +4302,24 @@ class GLTFParser {
 
 			case PATH_PROPERTIES.position:
 			case PATH_PROPERTIES.scale:
-			default:
 
 				TypedKeyframeTrack = VectorKeyframeTrack;
+				break;
+
+			default:
+
+				switch ( outputAccessor.itemSize ) {
+
+					case 1:
+						TypedKeyframeTrack = NumberKeyframeTrack;
+						break;
+					case 2:
+					case 3:
+					default:
+						TypedKeyframeTrack = VectorKeyframeTrack;
+						break;
+
+				}
 				break;
 
 		}
