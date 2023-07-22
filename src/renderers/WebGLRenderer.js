@@ -1810,8 +1810,7 @@ class WebGLRenderer {
 
 				}
 
-				// isOrthographic is defined in the scaffold for all shaders, but may not be used in all.
-				// https://github.com/mrdoob/three.js/pull/26467#issuecomment-1645185067
+				// consider moving isOrthographic to UniformLib and WebGLMaterials, see https://github.com/mrdoob/three.js/pull/26467#issuecomment-1645185067
 
 				if ( material.isMeshPhongMaterial ||
 					material.isMeshToonMaterial ||
