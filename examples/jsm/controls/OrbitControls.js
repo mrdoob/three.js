@@ -1024,6 +1024,10 @@ class OrbitControls extends EventDispatcher {
 
 			state = STATE.NONE;
 
+			// It is possible user held down pointer for a long time, meaning the clock delta can be massive, 
+			// call getDelta() to reset the delta so that getAutoRotationAngle() gets a normal value.
+			_clock.getDelta();
+
 		}
 
 		function onMouseDown( event ) {
@@ -1174,6 +1178,16 @@ class OrbitControls extends EventDispatcher {
 			if ( scope.enabled === false || scope.enablePan === false ) return;
 
 			handleKeyDown( event );
+
+		}
+
+		function onVisibilityChanged( event ) {
+
+			// If tab has just become un-hidden the clock delta can be very large, call getDelta() to 
+			// reset the delta so that getAutoRotationAngle() gets a normal value.
+			if (!event.target.hidden) {
+				_clock.getDelta();
+			}
 
 		}
 
@@ -1370,12 +1384,13 @@ class OrbitControls extends EventDispatcher {
 		}
 
 		//
-
 		scope.domElement.addEventListener( 'contextmenu', onContextMenu );
 
 		scope.domElement.addEventListener( 'pointerdown', onPointerDown );
 		scope.domElement.addEventListener( 'pointercancel', onPointerUp );
 		scope.domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
+
+		scope.domElement.ownerDocument.addEventListener( 'visibilitychange', onVisibilityChanged );
 
 		// force an update at start
 
