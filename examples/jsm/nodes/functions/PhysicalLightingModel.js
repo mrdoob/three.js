@@ -8,7 +8,7 @@ import LightingModel from '../core/LightingModel.js';
 import { diffuseColor, specularColor, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness } from '../core/PropertyNode.js';
 import { transformedNormalView, transformedClearcoatNormalView } from '../accessors/NormalNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
-import { tslFn, float, vec3 } from '../shadernode/ShaderNode.js';
+import { float, vec3 } from '../shadernode/ShaderNode.js';
 import { cond } from '../math/CondNode.js';
 
 const clearcoatF0 = vec3( 0.04 );
