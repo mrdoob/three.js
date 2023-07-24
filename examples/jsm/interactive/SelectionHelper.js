@@ -19,7 +19,7 @@ class SelectionHelper {
 
 		this.onPointerDown = function ( event ) {
 
-			if (this.enabled === false) return;
+			if ( this.enabled === false ) return;
 
 			this.isDown = true;
 			this.onSelectStart( event );
@@ -28,7 +28,7 @@ class SelectionHelper {
 
 		this.onPointerMove = function ( event ) {
 
-			if (this.enabled === false) return;
+			if ( this.enabled === false ) return;
 
 			if ( this.isDown ) {
 
@@ -40,7 +40,7 @@ class SelectionHelper {
 
 		this.onPointerUp = function ( ) {
 
-			if (this.enabled === false) return;
+			if ( this.enabled === false ) return;
 
 			this.isDown = false;
 			this.onSelectOver();
