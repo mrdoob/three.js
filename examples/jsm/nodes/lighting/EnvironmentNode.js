@@ -56,22 +56,20 @@ class EnvironmentNode extends LightingNode {
 
 		//
 
-		let isolateClearcoatRadiance = null;
+		const clearcoatRadiance = builder.context.lightingModel.clearcoatRadiance;
 
-		if ( builder.context.clearcoatRadiance  ) {
+		if ( clearcoatRadiance ) {
 
-			const clearcoatRadiance = context( envNode, createRadianceContext( clearcoatRoughness, transformedClearcoatNormalView ) ).mul( intensity );
+			const clearcoatRadianceContext = context( envNode, createRadianceContext( clearcoatRoughness, transformedClearcoatNormalView ) ).mul( intensity );
+			const isolateClearcoatRadiance = cache( clearcoatRadianceContext );
 
-			isolateClearcoatRadiance = cache( clearcoatRadiance );
-
-			builder.context.clearcoatRadiance.addAssign( isolateClearcoatRadiance );
+			clearcoatRadiance.addAssign( isolateClearcoatRadiance );
 
 		}
 
 		//
 
 		properties.radiance = isolateRadiance;
-		properties.clearcoatRadiance = isolateClearcoatRadiance;
 		properties.irradiance = irradiance;
 
 	}

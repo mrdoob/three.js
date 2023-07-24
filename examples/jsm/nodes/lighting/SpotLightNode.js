@@ -50,6 +50,8 @@ class SpotLightNode extends AnalyticLightNode {
 
 		super.construct( builder );
 
+		const lightingModel = builder.context.lightingModel;
+
 		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
 
 		const lVector = objectViewPosition( light ).sub( positionView ); // @TODO: Add it into LightNode
@@ -68,18 +70,13 @@ class SpotLightNode extends AnalyticLightNode {
 
 		const lightColor = colorNode.mul( spotAttenuation ).mul( lightAttenuation );
 
-		const lightingModelFunctionNode = builder.context.lightingModelNode;
 		const reflectedLight = builder.context.reflectedLight;
 
-		if ( lightingModelFunctionNode && lightingModelFunctionNode.direct ) {
-
-			lightingModelFunctionNode.direct( {
-				lightDirection,
-				lightColor,
-				reflectedLight
-			} );
-
-		}
+		lightingModel.direct( {
+			lightDirection,
+			lightColor,
+			reflectedLight
+		} );
 
 	}
 

@@ -4,6 +4,7 @@ import { clearcoat, clearcoatRoughness, sheen, sheenRoughness } from '../core/Pr
 import { materialClearcoatNormal } from '../accessors/ExtendedMaterialNode.js';
 import { materialClearcoat, materialClearcoatRoughness, materialSheen, materialSheenRoughness } from '../accessors/MaterialNode.js';
 import { float, vec3 } from '../shadernode/ShaderNode.js';
+import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
 
 import { MeshPhysicalMaterial } from 'three';
@@ -40,6 +41,12 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.setDefaultValues( defaultValues );
 
 		this.setValues( parameters );
+
+	}
+
+	constructLightingModel( /*builder*/ ) {
+
+		return new PhysicalLightingModel();
 
 	}
 

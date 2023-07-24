@@ -4,7 +4,7 @@ import DFGApprox from './BSDF/DFGApprox.js';
 import EnvironmentBRDF from './BSDF/EnvironmentBRDF.js';
 import F_Schlick from './BSDF/F_Schlick.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
-import { lightingModel } from '../core/LightingModel.js';
+import LightingModel from '../core/LightingModel.js';
 import { diffuseColor, specularColor, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness } from '../core/PropertyNode.js';
 import { transformedNormalView, transformedClearcoatNormalView } from '../accessors/NormalNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
@@ -61,144 +61,152 @@ const computeMultiscattering = ( singleScatter, multiScatter, specularF90 = floa
 
 };
 
-const LM_Init = tslFn( ( context, stack, builder ) => {
+//
 
-	if ( builder.includes( clearcoat ) ) {
+class PhysicalLightingModel extends LightingModel {
 
-		context.clearcoatRadiance = vec3().temp();
-		context.reflectedLight.clearcoatSpecular = vec3().temp();
+	constructor( clearcoat = true, sheen = true ) {
 
-		const dotNVcc = transformedClearcoatNormalView.dot( positionViewDirection ).clamp();
+		super();
 
-		const Fcc = F_Schlick( {
-			dotVH: dotNVcc,
-			f0: clearcoatF0,
-			f90: clearcoatF90
-		} );
+		this.clearcoat = clearcoat;
+		this.sheen = sheen;
 
-		const outgoingLight = context.reflectedLight.total;
-		const clearcoatLight = outgoingLight.mul( clearcoat.mul( Fcc ).oneMinus() ).add( context.reflectedLight.clearcoatSpecular.mul( clearcoat ) );
-
-		outgoingLight.assign( clearcoatLight );
+		this.clearcoatRadiance = null;
+		this.clearcoatSpecular = null;
+		this.sheenSpecular = null;
 
 	}
 
-	if ( builder.includes( sheen ) ) {
+	init( { reflectedLight } ) {
 
-		context.reflectedLight.sheenSpecular = vec3().temp();
+		if ( this.clearcoat === true ) {
 
-		const outgoingLight = context.reflectedLight.total;
+			this.clearcoatRadiance = vec3().temp();
+			this.clearcoatSpecular = vec3().temp();
 
-		const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( 0.157 ).oneMinus();
-		const sheenLight = outgoingLight.mul( sheenEnergyComp ).add( context.reflectedLight.sheenSpecular );
+			const dotNVcc = transformedClearcoatNormalView.dot( positionViewDirection ).clamp();
 
-		outgoingLight.assign( sheenLight );
+			const Fcc = F_Schlick( {
+				dotVH: dotNVcc,
+				f0: clearcoatF0,
+				f90: clearcoatF90
+			} );
 
-	}
+			const outgoingLight = reflectedLight.total;
+			const clearcoatLight = outgoingLight.mul( clearcoat.mul( Fcc ).oneMinus() ).add( this.clearcoatSpecular.mul( clearcoat ) );
 
-} );
+			outgoingLight.assign( clearcoatLight );
 
-const RE_IndirectSpecular_Physical = tslFn( ( context ) => {
+		}
 
-	const { radiance, iblIrradiance, reflectedLight } = context;
+		if ( this.sheen === true ) {
 
-	if ( reflectedLight.sheenSpecular ) {
+			this.sheenSpecular = vec3().temp();
 
-		reflectedLight.sheenSpecular.addAssign( iblIrradiance.mul(
-			sheen,
-			IBLSheenBRDF( transformedNormalView, positionViewDirection, sheenRoughness )
-		) );
+			const outgoingLight = reflectedLight.total;
 
-	}
+			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( 0.157 ).oneMinus();
+			const sheenLight = outgoingLight.mul( sheenEnergyComp ).add( this.sheenSpecular );
 
-	if ( reflectedLight.clearcoatSpecular ) {
+			outgoingLight.assign( sheenLight );
 
-		const dotNVcc = transformedClearcoatNormalView.dot( positionViewDirection ).clamp();
-
-		const clearcoatEnv = EnvironmentBRDF( {
-			dotNV: dotNVcc,
-			specularColor: clearcoatF0,
-			specularF90: clearcoatF90,
-			roughness: clearcoatRoughness
-		} );
-
-		reflectedLight.clearcoatSpecular.addAssign( context.clearcoatRadiance.mul( clearcoatEnv ) );
+		}
 
 	}
 
-	// Both indirect specular and indirect diffuse light accumulate here
+	direct( { lightDirection, lightColor, reflectedLight } ) {
 
-	const singleScattering = vec3().temp();
-	const multiScattering = vec3().temp();
-	const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
+		const dotNL = transformedNormalView.dot( lightDirection ).clamp();
+		const irradiance = dotNL.mul( lightColor );
 
-	computeMultiscattering( singleScattering, multiScattering );
+		if ( this.sheen === true ) {
 
-	const totalScattering = singleScattering.add( multiScattering );
+			this.sheenSpecular.addAssign( irradiance.mul( BRDF_Sheen( { lightDirection } ) ) );
 
-	const diffuse = diffuseColor.mul( totalScattering.r.max( totalScattering.g ).max( totalScattering.b ).oneMinus() );
+		}
 
-	reflectedLight.indirectSpecular.addAssign( radiance.mul( singleScattering ) );
-	reflectedLight.indirectSpecular.addAssign( multiScattering.mul( cosineWeightedIrradiance ) );
+		if ( this.clearcoat === true ) {
 
-	reflectedLight.indirectDiffuse.addAssign( diffuse.mul( cosineWeightedIrradiance ) );
+			const dotNLcc = transformedClearcoatNormalView.dot( lightDirection ).clamp();
+			const ccIrradiance = dotNLcc.mul( lightColor );
 
-} );
+			this.clearcoatSpecular.addAssign( ccIrradiance.mul( BRDF_GGX( { lightDirection, f0: clearcoatF0, f90: clearcoatF90, roughness: clearcoatRoughness, normalView: transformedClearcoatNormalView } ) ) );
 
-const RE_IndirectDiffuse_Physical = tslFn( ( context ) => {
+		}
 
-	const { irradiance, reflectedLight } = context;
+		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
 
-	reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
-
-} );
-
-const RE_Direct_Physical = tslFn( ( inputs ) => {
-
-	const { lightDirection, lightColor, reflectedLight } = inputs;
-
-	const dotNL = transformedNormalView.dot( lightDirection ).clamp();
-	const irradiance = dotNL.mul( lightColor );
-
-	if ( reflectedLight.sheenSpecular ) {
-
-		reflectedLight.sheenSpecular.addAssign( irradiance.mul( BRDF_Sheen( { lightDirection } ) ) );
+		reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX( { lightDirection, f0: specularColor, f90: 1, roughness } ) ) );
 
 	}
 
-	if ( reflectedLight.clearcoatSpecular ) {
+	indirectDiffuse( { irradiance, reflectedLight } ) {
 
-		const dotNLcc = transformedClearcoatNormalView.dot( lightDirection ).clamp();
-		const ccIrradiance = dotNLcc.mul( lightColor );
-
-		reflectedLight.clearcoatSpecular.addAssign( ccIrradiance.mul( BRDF_GGX( { lightDirection, f0: clearcoatF0, f90: clearcoatF90, roughness: clearcoatRoughness, normalView: transformedClearcoatNormalView } ) ) );
+		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
 
 	}
 
-	reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
+	indirectSpecular( { radiance, iblIrradiance, reflectedLight, } ) {
 
-	reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX( { lightDirection, f0: specularColor, f90: 1, roughness } ) ) );
+		if ( this.sheen === true ) {
 
-} );
+			this.sheenSpecular.addAssign( iblIrradiance.mul(
+				sheen,
+				IBLSheenBRDF( transformedNormalView, positionViewDirection, sheenRoughness )
+			) );
 
-const RE_AmbientOcclusion_Physical = tslFn( ( context ) => {
+		}
 
-	const { ambientOcclusion, reflectedLight } = context;
+		if ( this.clearcoat === true ) {
 
-	const dotNV = transformedNormalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
+			const dotNVcc = transformedClearcoatNormalView.dot( positionViewDirection ).clamp();
 
-	const aoNV = dotNV.add( ambientOcclusion );
-	const aoExp = roughness.mul( - 16.0 ).oneMinus().negate().exp2();
+			const clearcoatEnv = EnvironmentBRDF( {
+				dotNV: dotNVcc,
+				specularColor: clearcoatF0,
+				specularF90: clearcoatF90,
+				roughness: clearcoatRoughness
+			} );
 
-	const aoNode = ambientOcclusion.sub( aoNV.pow( aoExp ).oneMinus() ).clamp();
+			this.clearcoatSpecular.addAssign( this.clearcoatRadiance.mul( clearcoatEnv ) );
 
-	reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
+		}
 
-	reflectedLight.indirectSpecular.mulAssign( aoNode );
+		// Both indirect specular and indirect diffuse light accumulate here
 
+		const singleScattering = vec3().temp();
+		const multiScattering = vec3().temp();
+		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
 
-} );
+		computeMultiscattering( singleScattering, multiScattering );
 
-const physicalLightingModel = lightingModel( LM_Init, RE_Direct_Physical, RE_IndirectDiffuse_Physical, RE_IndirectSpecular_Physical, RE_AmbientOcclusion_Physical );
+		const totalScattering = singleScattering.add( multiScattering );
 
-export default physicalLightingModel;
+		const diffuse = diffuseColor.mul( totalScattering.r.max( totalScattering.g ).max( totalScattering.b ).oneMinus() );
+
+		reflectedLight.indirectSpecular.addAssign( radiance.mul( singleScattering ) );
+		reflectedLight.indirectSpecular.addAssign( multiScattering.mul( cosineWeightedIrradiance ) );
+
+		reflectedLight.indirectDiffuse.addAssign( diffuse.mul( cosineWeightedIrradiance ) );
+
+	}
+
+	ambientOcclusion( { ambientOcclusion, reflectedLight } ) {
+
+		const dotNV = transformedNormalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
+
+		const aoNV = dotNV.add( ambientOcclusion );
+		const aoExp = roughness.mul( - 16.0 ).oneMinus().negate().exp2();
+
+		const aoNode = ambientOcclusion.sub( aoNV.pow( aoExp ).oneMinus() ).clamp();
+
+		reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
+
+		reflectedLight.indirectSpecular.mulAssign( aoNode );
+
+	}
+
+}
+
+export default PhysicalLightingModel;
