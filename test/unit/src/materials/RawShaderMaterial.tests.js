@@ -1,29 +1,51 @@
 /* global QUnit */
 
-// import { RawShaderMaterial } from '../../../../src/materials/RawShaderMaterial.js';
+import { RawShaderMaterial } from '../../../../src/materials/RawShaderMaterial.js';
+
+import { ShaderMaterial } from '../../../../src/materials/ShaderMaterial.js';
 
 export default QUnit.module( 'Materials', () => {
 
 	QUnit.module( 'RawShaderMaterial', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new RawShaderMaterial();
+			assert.strictEqual(
+				object instanceof ShaderMaterial, true,
+				'RawShaderMaterial extends from ShaderMaterial'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new RawShaderMaterial();
+			assert.ok( object, 'Can instantiate a RawShaderMaterial.' );
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isRawShaderMaterial', ( assert ) => {
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new RawShaderMaterial();
+			assert.ok(
+				object.type === 'RawShaderMaterial',
+				'RawShaderMaterial.type should be RawShaderMaterial'
+			);
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isRawShaderMaterial', ( assert ) => {
+
+			const object = new RawShaderMaterial();
+			assert.ok(
+				object.isRawShaderMaterial,
+				'RawShaderMaterial.isRawShaderMaterial should be true'
+			);
 
 		} );
 

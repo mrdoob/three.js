@@ -25,17 +25,16 @@
 
 		<h2>属性</h2>
 
-		<h3>[property:Boolean autoUpdate]</h3>
-		<p>
-			默认值为true，若设置了这个值，则渲染器会检查每一帧是否需要更新场景及其中物体的矩阵。
-			当设为false时，你必须亲自手动维护场景中的矩阵。
-		</p>
-
 		<h3>[property:Object background]</h3>
 		<p>
 		若不为空，在渲染场景的时候将设置背景，且背景总是首先被渲染的。
 		可以设置一个用于的“clear”的[page:Color]（颜色）、一个覆盖canvas的[page:Texture]（纹理），
 		或是 a cubemap as a [page:CubeTexture] or an equirectangular as a [page:Texture]。默认值为null。
+		</p>
+
+		<h3>[property:Float backgroundBlurriness]</h3>
+		<p>
+			Sets the blurriness of the background. Only influences environment maps assigned to [page:Scene.background]. Valid input is a float between *0* and *1*. Default is *0*.
 		</p>
 
 		<h3>[property:Texture environment]</h3>

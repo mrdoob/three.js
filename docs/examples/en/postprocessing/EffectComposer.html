@@ -16,6 +16,17 @@
 			The last pass is automatically rendered to screen.
 		</p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		</code>
+
 		<h2>Examples</h2>
 
 		<p>
@@ -87,6 +98,11 @@
 			pass -- The pass to add to the pass chain.<br /><br />
 
 			Adds the given pass to the pass chain.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 		</p>
 
 		<h3>[method:undefined insertPass]( [param:Pass pass], [param:Integer index] )</h3>

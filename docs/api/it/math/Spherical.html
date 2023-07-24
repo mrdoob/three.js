@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">Le [link:https://en.wikipedia.org/wiki/Spherical_coordinate_system coordinate sferiche] di un punto.</p>
+
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:Float radius], [param:Float phi], [param:Float theta] )</h3>
+		<p>
+		[page:Float radius] - il raggio, o la [link:https://en.wikipedia.org/wiki/Euclidean_distance distanza Euclidea]
+		(distanza in linea retta) dal punto all'origine. Il valore predefinito è `1.0`.<br />
+		[page:Float phi] - angolo polare in radianti dall'asse y (su). Il valore predefinito è `0`.<br />
+		[page:Float theta] - angolo dell'equatore in radianti attorno l'asse y (su). Il valore predefinito è `0`.<br /><br />
+
+		I poli (phi) sono sull'asse positivo e negativo. L'equatore (theta) inizia con z positivo.
+		</p>
+
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Float radius]</h3>
+
+		<h3>[property:Float phi]</h3>
+
+		<h3>[property:Float theta]</h3>
+
+
+		<h2>Metodi</h2>
+
+		<h3>[method:Spherical clone]()</h3>
+		<p>
+			Restituisce una nuova [name] con le stesse proprietà [page:.radius radius], [page:.phi phi]
+			e [page:.theta theta] di questo.
+		</p>
+
+		<h3>[method:this copy]( [param:Spherical s] )</h3>
+		<p>
+			Copia i valori delle proprietà [page:.radius radius], [page:.phi phi]
+			e [page:.theta theta] della sferica a questa sferica.
+		</p>
+
+		<h3>[method:this makeSafe]()</h3>
+		<p>
+			Limita l'angolo polare [page:.phi phi] per essere tra 0.000001 e pi - 0.000001.
+		</p>
+
+		<h3>[method:this set]( [param:Float radius], [param:Float phi], [param:Float theta] )</h3>
+		<p>Imposta i valori delle proprietà [page:.radius radius], [page:.phi phi]
+		e [page:.theta theta] di questa sferica.</p>
+
+		<h3>[method:this setFromVector3]( [param:Vector3 vec3] )</h3>
+		<p>
+			Imposta i valori delle proprietà [page:.radius radius], [page:.phi phi]
+			e [page:.theta theta] di questa sferica dal [page:Vector3 Vector3].
+		</p>
+
+		<h3>[method:this setFromCartesianCoords]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+			Imposta i valori delle proprietà [page:.radius radius], [page:.phi phi]
+			e [page:.theta theta] di questa sferica dalle coordinate cartesiane.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

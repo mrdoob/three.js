@@ -16,12 +16,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -30,14 +31,15 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
 			let stats;
-
 			let camera, scene, renderer, controls;
+
 			const settings = {
 				metalness: 1.0,
 				roughness: 0.4,
@@ -118,7 +120,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
@@ -138,14 +139,14 @@
 				ambientLight = new THREE.AmbientLight( 0xffffff, settings.ambientIntensity );
 				scene.add( ambientLight );
 
-				pointLight = new THREE.PointLight( 0xff0000, 0.5 );
+				pointLight = new THREE.PointLight( 0xff0000, 1.5, 0, 0 );
 				pointLight.position.z = 2500;
 				scene.add( pointLight );
 
-				const pointLight2 = new THREE.PointLight( 0xff6666, 1 );
+				const pointLight2 = new THREE.PointLight( 0xff6666, 3, 0, 0 );
 				camera.add( pointLight2 );
 
-				const pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
+				const pointLight3 = new THREE.PointLight( 0x0000ff, 1.5, 0, 0 );
 				pointLight3.position.x = - 1000;
 				pointLight3.position.z = 1000;
 				scene.add( pointLight3 );
@@ -161,7 +162,6 @@
 				];
 
 				const reflectionCube = new THREE.CubeTextureLoader().load( urls );
-				reflectionCube.encoding = THREE.sRGBEncoding;
 
 				// textures
 
@@ -174,7 +174,7 @@
 
 				material = new THREE.MeshStandardMaterial( {
 
-					color: 0x888888,
+					color: 0xc1c1c1,
 					roughness: settings.roughness,
 					metalness: settings.metalness,
 
@@ -201,7 +201,6 @@
 				loader.load( 'models/obj/ninja/ninjaHead_Low.obj', function ( group ) {
 
 					const geometry = group.children[ 0 ].geometry;
-					geometry.attributes.uv2 = geometry.attributes.uv;
 					geometry.center();
 
 					mesh = new THREE.Mesh( geometry, material );

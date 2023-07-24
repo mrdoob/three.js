@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+	 
+		<p class="desc">
+			كائن [page:Layers] يعين [page:Object3D] إلى 1 أو أكثر من 32
+			طبقة مرقمة من `0` إلى `31` - يتم تخزين الطبقات داخليًا كـ
+			[link:https://en.wikipedia.org/wiki/Mask_(computing) قناع بت]، وافتراضيًا
+			كل Object3Ds عضو في الطبقة 0.<br /><br />
+	 
+			يمكن استخدام هذا للتحكم في الرؤية - يجب أن يشترك كائن في طبقة مع
+			[page:Camera camera] ليكون مرئيًا عندما يتم عرض هذه الكاميرا
+			المعروضة.<br /><br />
+	 
+			جميع الفئات التي ترث من [page:Object3D] لديها
+			[page:Object3D.layers] خاصية وهي نسخة من هذه الفئة.
+		</p>
+	 
+		<h2>أمثلة (Examples)</h2>
+	 
+		<p>[example:webgl_layers WebGL / layers]</p>
+	 
+		<h2>المنشئ (Constructor)</h2>
+	 
+		<h3>[name]()</h3>
+		<p>إنشاء كائن طبقات جديد، مع تعيين العضوية في البداية إلى الطبقة 0.</p>
+	 
+		<h2>الخصائص (Properties)</h2>
+	 
+		<h3>[property:Integer mask]</h3>
+		<p>
+			قناع بت يخزن أي من الطبقات الـ 32 التي يكون هذا الكائن طبقات حاليًا
+			عضوًا فيه.
+		</p>
+	 
+		<h2>الوظائف (Methods)</h2>
+	 
+		<h3>[method:undefined disable]( [param:Integer layer] )</h3>
+		<p>
+			layer - عدد صحيح من 0 إلى 31.<br /><br />
+	 
+			إزالة عضوية هذه `layer`.
+		</p>
+	 
+		<h3>[method:undefined enable]( [param:Integer layer] )</h3>
+		<p>
+			layer - عدد صحيح من 0 إلى 31.<br /><br />
+	 
+			إضافة عضوية هذه `layer`.
+		</p>
+	 
+		<h3>[method:undefined set]( [param:Integer layer] )</h3>
+		<p>
+			layer - عدد صحيح من 0 إلى 31.<br /><br />
+		 
+			تعيين العضوية إلى `layer`، وإزالة العضوية من جميع الطبقات الأخرى.
+		</p>
+		 
+		<h3>[method:Boolean test]( [param:Layers layers] )</h3>
+		<p>
+			layers - كائن طبقات<br /><br />
+		 
+			يعود بـ true إذا كان هذا وكائن `layers` الممرر لديهما على الأقل واحدة
+			طبقة مشتركة.
+		</p>
+		 
+		<h3>[method:Boolean isEnabled]( [param:Integer layer] )</h3>
+		<p>
+			layer - عدد صحيح من 0 إلى 31.<br /><br />
+		 
+			يعود بـ true إذا تم تمكين الطبقة المعطاة.
+		</p>
+		 
+		<h3>[method:undefined toggle]( [param:Integer layer] )</h3>
+		<p>
+			layer - عدد صحيح من 0 إلى 31.<br /><br />
+		 
+			تبديل عضوية `layer`.
+		</p>
+		 
+		<h3>[method:undefined enableAll]()</h3>
+		<p>إضافة عضوية لجميع الطبقات.</p>
+		 
+		<h3>[method:undefined disableAll]()</h3>
+		<p>إزالة العضوية من جميع الطبقات.</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

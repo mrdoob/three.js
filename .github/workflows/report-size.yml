@@ -1,0 +1,156 @@
+name: Report size
+
+on:
+  workflow_run:
+    workflows: ["Read size"]
+    types:
+      - completed
+
+# This workflow needs to be run with "pull-requests: write" permissions to
+# be able to comment on the pull request. We can't checkout the PR code
+# in this workflow.
+# Reference:
+# https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+permissions:
+  pull-requests: write
+
+jobs:
+  report-size:
+    name: Comment on PR
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Log GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      # Using actions/download-artifact doesn't work here
+      # https://github.com/actions/download-artifact/issues/60
+      - name: Download artifact
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6
+        id: download-artifact
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs/promises');
+
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: context.payload.workflow_run.id,
+            });
+            const matchArtifact = artifacts.data.artifacts.find((artifact) => artifact.name === 'sizes');
+            const download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip',
+            });
+
+            await fs.writeFile('sizes.zip', Buffer.from(download.data));
+            await exec.exec('unzip sizes.zip');
+            const json = await fs.readFile('sizes.json', 'utf8');
+            return json;
+
+      # This runs on the base branch of the PR, meaning "dev"
+      - name: Git checkout
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
+      - name: Install Node
+        uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: === Test tree-shaking ===
+        run: npm run test-treeshake
+      - name: Read sizes
+        id: read-size
+        run: |
+          FILESIZE_BASE=$(stat --format=%s build/three.module.min.js)
+          gzip -k build/three.module.min.js
+          FILESIZE_BASE_GZIP=$(stat --format=%s build/three.module.min.js.gz)
+          TREESHAKEN_BASE=$(stat --format=%s test/treeshake/index.bundle.min.js)
+          gzip -k test/treeshake/index.bundle.min.js
+          TREESHAKEN_BASE_GZIP=$(stat --format=%s test/treeshake/index.bundle.min.js.gz)
+
+          # log to console
+          echo "FILESIZE_BASE=$FILESIZE_BASE"
+          echo "FILESIZE_BASE_GZIP=$FILESIZE_BASE_GZIP"
+          echo "TREESHAKEN_BASE=$TREESHAKEN_BASE"
+          echo "TREESHAKEN_BASE_GZIP=$TREESHAKEN_BASE_GZIP"
+
+          echo "FILESIZE_BASE=$FILESIZE_BASE" >> $GITHUB_OUTPUT
+          echo "FILESIZE_BASE_GZIP=$FILESIZE_BASE_GZIP" >> $GITHUB_OUTPUT
+          echo "TREESHAKEN_BASE=$TREESHAKEN_BASE" >> $GITHUB_OUTPUT
+          echo "TREESHAKEN_BASE_GZIP=$TREESHAKEN_BASE_GZIP" >> $GITHUB_OUTPUT
+
+      - name: Format sizes
+        id: format
+        # It's important these are passed as env variables.
+        # https://securitylab.github.com/research/github-actions-untrusted-input/
+        env:
+          FILESIZE: ${{ fromJSON(steps.download-artifact.outputs.result).filesize }}
+          FILESIZE_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).gzip }}
+          FILESIZE_BASE: ${{ steps.read-size.outputs.FILESIZE_BASE }}
+          FILESIZE_BASE_GZIP: ${{ steps.read-size.outputs.FILESIZE_BASE_GZIP }}
+          TREESHAKEN: ${{ fromJSON(steps.download-artifact.outputs.result).treeshaken }}
+          TREESHAKEN_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).treeshakenGzip }}
+          TREESHAKEN_BASE: ${{ steps.read-size.outputs.TREESHAKEN_BASE }}
+          TREESHAKEN_BASE_GZIP: ${{ steps.read-size.outputs.TREESHAKEN_BASE_GZIP }}
+        run: |
+          FILESIZE_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE")
+          FILESIZE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE_GZIP")
+          FILESIZE_BASE_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE_BASE")
+          FILESIZE_BASE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE_BASE_GZIP")
+          FILESIZE_DIFF=$(node ./test/treeshake/utils/format-diff.js "$FILESIZE" "$FILESIZE_BASE")
+          TREESHAKEN_FORM=$(node ./test/treeshake/utils/format-size.js "$TREESHAKEN")
+          TREESHAKEN_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$TREESHAKEN_GZIP")
+          TREESHAKEN_BASE_FORM=$(node ./test/treeshake/utils/format-size.js "$TREESHAKEN_BASE")
+          TREESHAKEN_BASE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$TREESHAKEN_BASE_GZIP")
+          TREESHAKEN_DIFF=$(node ./test/treeshake/utils/format-diff.js "$TREESHAKEN" "$TREESHAKEN_BASE")
+
+          echo "FILESIZE=$FILESIZE_FORM" >> $GITHUB_OUTPUT
+          echo "FILESIZE_GZIP=$FILESIZE_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "FILESIZE_BASE=$FILESIZE_BASE_FORM" >> $GITHUB_OUTPUT
+          echo "FILESIZE_BASE_GZIP=$FILESIZE_BASE_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "FILESIZE_DIFF=$FILESIZE_DIFF" >> $GITHUB_OUTPUT
+          echo "TREESHAKEN=$TREESHAKEN_FORM" >> $GITHUB_OUTPUT
+          echo "TREESHAKEN_GZIP=$TREESHAKEN_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "TREESHAKEN_BASE=$TREESHAKEN_BASE_FORM" >> $GITHUB_OUTPUT
+          echo "TREESHAKEN_BASE_GZIP=$TREESHAKEN_BASE_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "TREESHAKEN_DIFF=$TREESHAKEN_DIFF" >> $GITHUB_OUTPUT
+
+      - name: Find existing comment
+        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2
+        id: find-comment
+        with:
+          issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Bundle size
+      - name: Comment on PR
+        uses: peter-evans/create-or-update-comment@c6c9a1a66007646a28c153e2a8580a5bad27bcfa # v3
+        with:
+          issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            ### 📦 Bundle size
+
+            _Full ESM build, minified and gzipped._
+
+            | Filesize `${{ github.ref_name }}` | Filesize PR | Diff |
+            |----------|---------|------|
+            | ${{ steps.format.outputs.FILESIZE_BASE }} (${{ steps.format.outputs.FILESIZE_BASE_GZIP }}) | ${{ steps.format.outputs.FILESIZE }} (${{ steps.format.outputs.FILESIZE_GZIP }}) | ${{ steps.format.outputs.FILESIZE_DIFF }} |
+
+            ### 🌳 Bundle size after tree-shaking
+
+            _Minimal build including a renderer, camera, empty scene, and dependencies._
+
+            | Filesize `${{ github.ref_name }}` | Filesize PR | Diff |
+            |----------|---------|------|
+            | ${{ steps.format.outputs.TREESHAKEN_BASE }} (${{ steps.format.outputs.TREESHAKEN_BASE_GZIP }}) | ${{ steps.format.outputs.TREESHAKEN }} (${{ steps.format.outputs.TREESHAKEN_GZIP }}) | ${{ steps.format.outputs.TREESHAKEN_DIFF }} |

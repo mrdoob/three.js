@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – 배경과 하늘 상자">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -52,8 +52,9 @@ body {
 보이도록 설정합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
--  const renderer = new THREE.WebGLRenderer({canvas});
+-  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  const renderer = new THREE.WebGLRenderer({
++    antialias: true,
 +    canvas,
 +    alpha: true,
 +  });
@@ -70,6 +71,7 @@ Three.js로 배경을 렌더링해야 합니다.</p>
 <p>간단히 장면의 배경에 텍스처를 입혀주기만 하면 되죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 const bgTexture = loader.load('resources/images/daikanyama.jpg');
+bgTexture.colorSpace = THREE.SRGBColorSpace;
 scene.background = bgTexture;
 </pre>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -183,7 +185,7 @@ scene.background = bgTexture;
 }
 </pre>
 <p>카메라도 조작이 가능하도록 만듭니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 </pre>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
 const aspect = 2;  // canvas 기본값
@@ -227,9 +229,9 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +  const texture = loader.load(
 +    'resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg',
 +    () =&gt; {
-+      const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
-+      rt.fromEquirectangularTexture(renderer, texture);
-+      scene.background = rt.texture;
++      texture.mapping = THREE.EquirectangularReflectionMapping;
++      texture.colorSpace = THREE.SRGBColorSpace;
++      scene.background = texture;
 +    });
 }
 </pre>
@@ -249,8 +251,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

@@ -2,11 +2,14 @@
 
 import { WireframeGeometry } from '../../../../src/geometries/WireframeGeometry.js';
 
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
+// import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+
 export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'WireframeGeometry', ( hooks ) => {
 
-		var geometries = undefined;
+		let geometries = undefined; // eslint-disable-line no-unused-vars
 		hooks.beforeEach( function () {
 
 			geometries = [
@@ -16,14 +19,36 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new WireframeGeometry();
+			assert.strictEqual(
+				object instanceof BufferGeometry, true,
+				'WireframeGeometry extends from BufferGeometry'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new WireframeGeometry();
+			assert.ok( object, 'Can instantiate a WireframeGeometry.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new WireframeGeometry();
+			assert.ok(
+				object.type === 'WireframeGeometry',
+				'WireframeGeometry.type should be WireframeGeometry'
+			);
+
+		} );
+
+		QUnit.todo( 'parameters', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

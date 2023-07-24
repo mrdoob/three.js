@@ -187,7 +187,6 @@
 
 			#include <common>
 			#include <uv_pars_vertex>
-			#include <uv2_pars_vertex>
 			#include <displacementmap_pars_vertex>
 			#include <envmap_pars_vertex>
 			#include <color_pars_vertex>
@@ -202,7 +201,6 @@
 				vec2 cellSize = vec2( 1.0 / WIDTH, 1.0 / WIDTH );
 
 				#include <uv_vertex>
-				#include <uv2_vertex>
 				#include <color_vertex>
 
 				// # include <beginnormal_vertex>
@@ -248,12 +246,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -262,11 +261,11 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
-			import { SimplexNoise } from './jsm/math/SimplexNoise.js';
+			import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';
+			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 
 			// Texture width for simulation
 			const WIDTH = 128;
@@ -312,11 +311,11 @@
 
 				scene = new THREE.Scene();
 
-				const sun = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+				const sun = new THREE.DirectionalLight( 0xFFFFFF, 3.0 );
 				sun.position.set( 300, 400, 175 );
 				scene.add( sun );
 
-				const sun2 = new THREE.DirectionalLight( 0x40A040, 0.6 );
+				const sun2 = new THREE.DirectionalLight( 0x40A040, 2.0 );
 				sun2.position.set( - 100, 350, - 200 );
 				scene.add( sun2 );
 
@@ -415,14 +414,10 @@
 				material.lights = true;
 
 				// Material attributes from THREE.MeshPhongMaterial
-				material.color = new THREE.Color( materialColor );
-				material.specular = new THREE.Color( 0x111111 );
-				material.shininess = 50;
-
 				// Sets the uniforms with the material values
-				material.uniforms[ 'diffuse' ].value = material.color;
-				material.uniforms[ 'specular' ].value = material.specular;
-				material.uniforms[ 'shininess' ].value = Math.max( material.shininess, 1e-4 );
+				material.uniforms[ 'diffuse' ].value = new THREE.Color( materialColor );
+				material.uniforms[ 'specular' ].value = new THREE.Color( 0x111111 );
+				material.uniforms[ 'shininess' ].value = Math.max( 50, 1e-4 );
 				material.uniforms[ 'opacity' ].value = material.opacity;
 
 				// Defines

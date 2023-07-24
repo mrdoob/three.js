@@ -17,12 +17,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -31,26 +32,26 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
-			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
-			import { DotScreenPass } from './jsm/postprocessing/DotScreenPass.js';
-			import { MaskPass, ClearMaskPass } from './jsm/postprocessing/MaskPass.js';
-			import { TexturePass } from './jsm/postprocessing/TexturePass.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
+			import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
+			import { DotScreenPass } from 'three/addons/postprocessing/DotScreenPass.js';
+			import { MaskPass, ClearMaskPass } from 'three/addons/postprocessing/MaskPass.js';
+			import { TexturePass } from 'three/addons/postprocessing/TexturePass.js';
 
-			import { BleachBypassShader } from './jsm/shaders/BleachBypassShader.js';
-			import { ColorifyShader } from './jsm/shaders/ColorifyShader.js';
-			import { HorizontalBlurShader } from './jsm/shaders/HorizontalBlurShader.js';
-			import { VerticalBlurShader } from './jsm/shaders/VerticalBlurShader.js';
-			import { SepiaShader } from './jsm/shaders/SepiaShader.js';
-			import { VignetteShader } from './jsm/shaders/VignetteShader.js';
-			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
+			import { BleachBypassShader } from 'three/addons/shaders/BleachBypassShader.js';
+			import { ColorifyShader } from 'three/addons/shaders/ColorifyShader.js';
+			import { HorizontalBlurShader } from 'three/addons/shaders/HorizontalBlurShader.js';
+			import { VerticalBlurShader } from 'three/addons/shaders/VerticalBlurShader.js';
+			import { SepiaShader } from 'three/addons/shaders/SepiaShader.js';
+			import { VignetteShader } from 'three/addons/shaders/VignetteShader.js';
+			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			let container, stats;
 
@@ -90,7 +91,7 @@
 
 				//
 
-				directionalLight = new THREE.DirectionalLight( 0xffffff );
+				directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
 				directionalLight.position.set( 0, - 0.1, 1 ).normalize();
 				sceneModel.add( directionalLight );
 
@@ -104,7 +105,7 @@
 				//
 
 				const diffuseMap = new THREE.TextureLoader().load( 'textures/cube/SwedishRoyalCastle/pz.jpg' );
-				diffuseMap.encoding = THREE.sRGBEncoding;
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 
 				const materialColor = new THREE.MeshBasicMaterial( {
 					map: diffuseMap,
@@ -294,11 +295,11 @@
 			function createMesh( geometry, scene, scale ) {
 
 				const diffuseMap = new THREE.TextureLoader().load( 'models/gltf/LeePerrySmith/Map-COL.jpg' );
-				diffuseMap.encoding = THREE.sRGBEncoding;
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 
 				const mat2 = new THREE.MeshPhongMaterial( {
 
-					color: 0x999999,
+					color: 0xcbcbcb,
 					specular: 0x080808,
 					shininess: 20,
 					map: diffuseMap,

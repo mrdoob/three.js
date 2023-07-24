@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – 후처리">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -73,15 +73,14 @@ composer.addPass(bloomPass);
     648,    // 스캔라인 개수
     false,  // 흑백
 );
-filmPass.renderToScreen = true;
 composer.addPass(filmPass);
 </pre>
-<p><code class="notranslate" translate="no">filmPass</code>가 마지막 pass이기에 캔버스에 결과를 바로 렌더링하도록 <code class="notranslate" translate="no">renderToScreen</code> 옵션을 true로 설정했습니다. 이 옵션을 설정하지 않으면 캔버스가 아닌 다음 렌더 타겟에 장면을 렌더링할 거예요.</p>
 <p>또 이 클래스들을 사용하기 위해 여러 스크립트를 불러와야 합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { EffectComposer } from '/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from '/examples/jsm/postprocessing/RenderPass.js';
-import { BloomPass } from '/examples/jsm/postprocessing/BloomPass.js';
-import { FilmPass } from '/examples/jsm/postprocessing/FilmPass.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
+import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 </pre>
 <p>대부분의 후처리에는 <code class="notranslate" translate="no">EffectComposer.js</code>와 <code class="notranslate" translate="no">RenderPass.js</code>가 필수입니다.</p>
 <p>이제 <a href="/docs/#api/ko/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> 대신 <code class="notranslate" translate="no">EffectComposer.render</code>를 사용<em>하고</em> <code class="notranslate" translate="no">EffectComposer</code>가 결과물을 캔버스의 크기에 맞추도록 해야 합니다.</p>
@@ -122,14 +121,14 @@ import { FilmPass } from '/examples/jsm/postprocessing/FilmPass.js';
 
 <p></p>
 <p>런타임에 효과의 속성을 변경할 때는 보통 uniform의 value 값을 바꿉니다. GUI를 추가해 이 속성을 조정할 수 있게 만들어보죠. 어떤 속성을 어떻게 조작할 수 있는지는 해당 효과의 소스 코드를 열어봐야 알 수 있습니다.</p>
-<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/js/postprocessing/BloomPass.js"><code class="notranslate" translate="no">BloomPass.js</code></a>에서
+<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/BloomPass.js"><code class="notranslate" translate="no">BloomPass.js</code></a>에서
 아래 코드를 찾았습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.copyUniforms[ "opacity" ].value = strength;
 </pre>
 <p>아래처럼 하면 강도를 런타임에 바꿀 수 있겠네요.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">bloomPass.copyUniforms.opacity.value = someValue;
 </pre>
-<p>마찬가지로 <a href="https://github.com/mrdoob/three.js/blob/master/examples/js/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>에서
+<p>마찬가지로 <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>에서
 아래 코드를 찾았습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">if ( grayscale !== undefined )    this.uniforms.grayscale.value = grayscale;
 if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
@@ -137,7 +136,7 @@ if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlin
 if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 </pre>
 <p>이제 어떻게 값을 지정해야 하는지 알았으니 이 값을 조작하는 GUI를 만들어봅시다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { GUI } from '/examples/jsm/libs/lil-gui.module.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <p>일단 모듈을 로드합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
@@ -215,15 +214,15 @@ gui.add(colorPass.uniforms.color.value, 'b', 0, 4).name('blue');
 </div>
 
 <p></p>
-<p>언급했듯 이 글에서 GLSL의 작성법과 사용자 지정 쉐이더를 만드는 법을 모두 다루기는 무리입니다. WebGL이 어떻게 동작하는지 알고 싶다면 <a href="https://webglfundamentals.org">이 시리즈</a>를 참고하세요. <a href="https://github.com/mrdoob/three.js/tree/master/examples/js/shaders">Three.js의 후처리 쉐이더 소스 코드</a>를 분석하는 것도 좋은 방법입니다. 상대적으로 복잡한 쉐이더도 있지만 작은 것부터 차근차근 살펴본다면 언젠가 전체를 이해할 수 있을 거예요.</p>
-<p>아쉽게도 Three.js의 후처리 효과 대부분은 공식 문서가 없어 <a href="https://github.com/mrdoob/three.js/tree/master/examples">예제를 참고하거나</a> <a href="https://github.com/mrdoob/three.js/tree/master/examples/js/postprocessing">후처리 효과의 소스 코드</a>를 직접 분석해야 합니다. 부디 이 글과 이 시리즈의 <a href="rendertargets.html">렌더 타겟에 관한 글</a>이 좋은 출발점을 마련해주었으면 좋겠네요.</p>
+<p>언급했듯 이 글에서 GLSL의 작성법과 사용자 지정 쉐이더를 만드는 법을 모두 다루기는 무리입니다. WebGL이 어떻게 동작하는지 알고 싶다면 <a href="https://webglfundamentals.org">이 시리즈</a>를 참고하세요. <a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/shaders">Three.js의 후처리 쉐이더 소스 코드</a>를 분석하는 것도 좋은 방법입니다. 상대적으로 복잡한 쉐이더도 있지만 작은 것부터 차근차근 살펴본다면 언젠가 전체를 이해할 수 있을 거예요.</p>
+<p>아쉽게도 Three.js의 후처리 효과 대부분은 공식 문서가 없어 <a href="https://github.com/mrdoob/three.js/tree/master/examples">예제를 참고하거나</a> <a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/postprocessing">후처리 효과의 소스 코드</a>를 직접 분석해야 합니다. 부디 이 글과 이 시리즈의 <a href="rendertargets.html">렌더 타겟에 관한 글</a>이 좋은 출발점을 마련해주었으면 좋겠네요.</p>
 
         </div>
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

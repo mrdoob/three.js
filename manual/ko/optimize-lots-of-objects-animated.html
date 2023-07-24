@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – 다중 애니메이션 요소 최적화하기">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -208,7 +208,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 
   ...
 
--  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+-  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 -      geometries, false);
 -  const material = new THREE.MeshBasicMaterial({
 -    vertexColors: true,
@@ -216,7 +216,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 -  const mesh = new THREE.Mesh(mergedGeometry, material);
 -  scene.add(mesh);
 -  return mesh;
-+  return BufferGeometryUtils.mergeBufferGeometries(
++  return BufferGeometryUtils.mergeGeometries(
 +     geometries, false);
 }
 </pre>
@@ -294,10 +294,10 @@ showFileInfo(fileInfos, fileInfos[0]);
 <p>이제 각 데이터 그룹에 전환 효과를 줘야 합니다. mesh를 사라지고 나타나게 하는 대신 mesh의 <code class="notranslate" translate="no">morphTargetInfluences</code> 속성을 바꿔 애니메이션을 구현할 겁니다. 화면에 렌더링할 데이터 그룹의 influence(영향)은 1, 렌더링하지 않을 그룹의 influence는 0으로 설정하는 것이죠.</p>
 <p>단순히 숫자 0, 1을 바로 지정할 수도 있지만 그러면 애니메이션이 하나도 보이지 않을 겁니다. 아까 썼던 방법과 전혀 차이가 없는 결과가 나오겠죠. 물론 직접 애니메이션 코드를 작성할 수도 있지만 원본 WebGL 지구본이 <a href="https://github.com/tweenjs/tween.js/">애니메이션 라이브러리</a>를 썼으므로 같은 라이브러리를 사용해보겠습니다.</p>
 <p>먼저 라이브러리를 불러옵니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import { BufferGeometryUtils } from '/examples/jsm/utils/BufferGeometryUtils.js';
-import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
-+import { TWEEN } from '/examples/jsm/libs/tween.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import { BufferGeometryUtils } from 'three/addons/utils/BufferGeometryUtils.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
++import TWEEN from 'three/addons/libs/tween.module.js';
 </pre>
 <p>그리고 <code class="notranslate" translate="no">Tween</code>으로 influence 속성에 애니메이션을 줍니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// 선택한 데이터를 보여주고 나머지는 숨깁니다.
@@ -354,7 +354,7 @@ function showFileInfo(fileInfos, fileInfo) {
 <p>만든 클래스의 인스턴스를 생성합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  const tweenManager = new TweenManger();
 
   ...
@@ -414,8 +414,8 @@ render();
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

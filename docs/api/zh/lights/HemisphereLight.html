@@ -37,45 +37,39 @@
 
 		<h2>构造器（Constructor）</h2>
 		<h3>[name]( [param:Integer skyColor], [param:Integer groundColor], [param:Float intensity] )</h3>
-	<p>
-		[page:Integer skyColor] - (可选参数) 天空中发出光线的颜色。 缺省值 0xffffff。<br />
-		[page:Integer groundColor] - (可选参数) 地面发出光线的颜色。 缺省值 0xffffff。<br />
-		[page:Float intensity] - (可选参数) 光照强度。 缺省值 1。<br /><br />
+		<p>
+			[page:Color skyColor] -（可选）一个表示颜色的 Color 的实例、字符串或数字，默认为一个白色（0xffffff）的 [page:Color Color] 对象。<br />
+			[page:Color groundColor] -（可选）一个表示颜色的 Color 的实例、字符串或数字，默认为一个白色（0xffffff）的 [page:Color Color] 对象。<br />
+			[page:Float intensity] -（可选）光照强度。默认值为 1。<br /><br />
 
-		创建一个半球光。
+			创建一个半球光。
 		</p>
 
 		<h2>属性（Properties）</h2>
 		<p>
-			公共属性请查看基类[page:Light Light]。
+			公共属性请查看基类 [page:Light Light]。
 		</p>
 
-		<h3>[property:Boolean castShadow]</h3>
-		<p>
-			该参数在构造时被设置为 *undefined* 因为半球光不能投射阴影。
-		</p>
-
-
-		<h3>[property:Float color]</h3>
+		<h3>[property:Color color]</h3>
 		<p>
 			在构造时传递的天空发出光线的颜色。
-			默认会创建 [page:Color] 并设置为白色（0xffffff）。
+			默认值为白色（0xffffff）的 [page:Color] 对象。
 		</p>
 
-		<h3>[property:Float groundColor]</h3>
+		<h3>[property:Color groundColor]</h3>
 		<p>
 			在构造时传递的地面发出光线的颜色。
-			默认会创建 [page:Color] 并设置为白色（0xffffff）。
+			默认值为白色（0xffffff）的 [page:Color] 对象。
 		</p>
 
 		<h3>[property:Boolean isHemisphereLight]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			只读，用于检查对象的类型是否为 [name]。
 		</p>
 
 		<h3>[property:Vector3 position]</h3>
 		<p>
-			假如这个值设置等于 [page:Object3D.DefaultUp] (0, 1, 0),那么光线将会从上往下照射。
+			假如这个值设置为 [page:Object3D.DEFAULT_UP] (0, 1, 0)，光线将会从上往下照射。
 		</p>
 
 
@@ -86,7 +80,7 @@
 
 		<h3>[method:this copy]( [param:HemisphereLight source] )</h3>
 		<p>
-			从[page:Light source]复制 [page:.color color], [page:.intensity intensity] 和
+			从 [page:Light source] 复制 [page:.color color]、[page:.intensity intensity] 和
 			[page:.groundColor groundColor] 的值到当前半球光对象中。
 		</p>
 

@@ -7,7 +7,6 @@ import {
 	Color,
 	DirectionalLight,
 	DoubleSide,
-	Euler,
 	FileLoader,
 	Float32BufferAttribute,
 	FrontSide,
@@ -37,7 +36,7 @@ import {
 	Vector2,
 	Vector3,
 	VectorKeyframeTrack,
-	sRGBEncoding
+	SRGBColorSpace
 } from 'three';
 import { TGALoader } from '../loaders/TGALoader.js';
 
@@ -963,7 +962,7 @@ class ColladaLoader extends Loader {
 
 			let i, j, l;
 
-			// procces skin data for each vertex
+			// process skin data for each vertex
 
 			for ( i = 0, l = vcount.length; i < l; i ++ ) {
 
@@ -1580,7 +1579,7 @@ class ColladaLoader extends Loader {
 
 			material.name = data.name || '';
 
-			function getTexture( textureObject, encoding = null ) {
+			function getTexture( textureObject, colorSpace = null ) {
 
 				const sampler = effect.profile.samplers[ textureObject.id ];
 				let image = null;
@@ -1628,9 +1627,9 @@ class ColladaLoader extends Loader {
 
 						}
 
-						if ( encoding !== null ) {
+						if ( colorSpace !== null ) {
 
-							texture.encoding = encoding;
+							texture.colorSpace = colorSpace;
 
 						}
 
@@ -1664,7 +1663,7 @@ class ColladaLoader extends Loader {
 
 					case 'diffuse':
 						if ( parameter.color ) material.color.fromArray( parameter.color );
-						if ( parameter.texture ) material.map = getTexture( parameter.texture, sRGBEncoding );
+						if ( parameter.texture ) material.map = getTexture( parameter.texture, SRGBColorSpace );
 						break;
 					case 'specular':
 						if ( parameter.color && material.specular ) material.specular.fromArray( parameter.color );
@@ -1674,14 +1673,14 @@ class ColladaLoader extends Loader {
 						if ( parameter.texture ) material.normalMap = getTexture( parameter.texture );
 						break;
 					case 'ambient':
-						if ( parameter.texture ) material.lightMap = getTexture( parameter.texture, sRGBEncoding );
+						if ( parameter.texture ) material.lightMap = getTexture( parameter.texture, SRGBColorSpace );
 						break;
 					case 'shininess':
 						if ( parameter.float && material.shininess ) material.shininess = parameter.float;
 						break;
 					case 'emission':
 						if ( parameter.color && material.emissive ) material.emissive.fromArray( parameter.color );
-						if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture, sRGBEncoding );
+						if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture, SRGBColorSpace );
 						break;
 
 				}
@@ -2338,7 +2337,7 @@ class ColladaLoader extends Loader {
 			const position = { array: [], stride: 0 };
 			const normal = { array: [], stride: 0 };
 			const uv = { array: [], stride: 0 };
-			const uv2 = { array: [], stride: 0 };
+			const uv1 = { array: [], stride: 0 };
 			const color = { array: [], stride: 0 };
 
 			const skinIndex = { array: [], stride: 4 };
@@ -2473,7 +2472,7 @@ class ColladaLoader extends Loader {
 										break;
 
 									case 'TEXCOORD1':
-										buildGeometryData( primitive, sources[ id ], input.offset, uv2.array );
+										buildGeometryData( primitive, sources[ id ], input.offset, uv1.array );
 										uv.stride = sources[ id ].stride;
 										break;
 
@@ -2502,8 +2501,8 @@ class ColladaLoader extends Loader {
 							break;
 
 						case 'TEXCOORD1':
-							buildGeometryData( primitive, sources[ input.id ], input.offset, uv2.array );
-							uv2.stride = sources[ input.id ].stride;
+							buildGeometryData( primitive, sources[ input.id ], input.offset, uv1.array );
+							uv1.stride = sources[ input.id ].stride;
 							break;
 
 					}
@@ -2518,7 +2517,7 @@ class ColladaLoader extends Loader {
 			if ( normal.array.length > 0 ) geometry.setAttribute( 'normal', new Float32BufferAttribute( normal.array, normal.stride ) );
 			if ( color.array.length > 0 ) geometry.setAttribute( 'color', new Float32BufferAttribute( color.array, color.stride ) );
 			if ( uv.array.length > 0 ) geometry.setAttribute( 'uv', new Float32BufferAttribute( uv.array, uv.stride ) );
-			if ( uv2.array.length > 0 ) geometry.setAttribute( 'uv2', new Float32BufferAttribute( uv2.array, uv2.stride ) );
+			if ( uv1.array.length > 0 ) geometry.setAttribute( 'uv1', new Float32BufferAttribute( uv1.array, uv1.stride ) );
 
 			if ( skinIndex.array.length > 0 ) geometry.setAttribute( 'skinIndex', new Float32BufferAttribute( skinIndex.array, skinIndex.stride ) );
 			if ( skinWeight.array.length > 0 ) geometry.setAttribute( 'skinWeight', new Float32BufferAttribute( skinWeight.array, skinWeight.stride ) );
@@ -3711,7 +3710,10 @@ class ColladaLoader extends Loader {
 
 		}
 
-		const fallbackMaterial = new MeshBasicMaterial( { color: 0xff00ff } );
+		const fallbackMaterial = new MeshBasicMaterial( {
+			name: Loader.DEFAULT_MATERIAL_NAME,
+			color: 0xff00ff
+		} );
 
 		function resolveMaterialBinding( keys, instanceMaterials ) {
 
@@ -3759,6 +3761,34 @@ class ColladaLoader extends Loader {
 					} else {
 
 						materials.push( new MeshPhongMaterial() );
+
+					}
+
+				}
+
+				// Collada allows to use phong and lambert materials with lines. Replacing these cases with LineBasicMaterial.
+
+				if ( type === 'lines' || type === 'linestrips' ) {
+
+					for ( let i = 0, l = materials.length; i < l; i ++ ) {
+
+						const material = materials[ i ];
+
+						if ( material.isMeshPhongMaterial === true || material.isMeshLambertMaterial === true ) {
+
+							const lineMaterial = new LineBasicMaterial();
+
+							// copy compatible properties
+
+							lineMaterial.color.copy( material.color );
+							lineMaterial.opacity = material.opacity;
+							lineMaterial.transparent = material.transparent;
+
+							// replace material
+
+							materials[ i ] = lineMaterial;
+
+						}
 
 					}
 
@@ -3991,7 +4021,7 @@ class ColladaLoader extends Loader {
 		// metadata
 
 		const version = collada.getAttribute( 'version' );
-		console.log( 'THREE.ColladaLoader: File version', version );
+		console.debug( 'THREE.ColladaLoader: File version', version );
 
 		const asset = parseAsset( getElementsByTagName( collada, 'asset' )[ 0 ] );
 		const textureLoader = new TextureLoader( this.manager );
@@ -4067,7 +4097,7 @@ class ColladaLoader extends Loader {
 		if ( asset.upAxis === 'Z_UP' ) {
 
 			console.warn( 'THREE.ColladaLoader: You are loading an asset with a Z-UP coordinate system. The loader just rotates the asset to transform it into Y-UP. The vertex data are not converted, see #24289.' );
-			scene.quaternion.setFromEuler( new Euler( - Math.PI / 2, 0, 0 ) );
+			scene.rotation.set( - Math.PI / 2, 0, 0 );
 
 		}
 

@@ -1,10 +1,11 @@
 import {
 	Color,
 	LightProbe,
-	LinearEncoding,
+	LinearSRGBColorSpace,
 	SphericalHarmonics3,
 	Vector3,
-	sRGBEncoding
+	SRGBColorSpace,
+	NoColorSpace
 } from 'three';
 
 class LightProbeGenerator {
@@ -55,7 +56,7 @@ class LightProbeGenerator {
 				color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
 
 				// convert to linear color space
-				convertColorToLinear( color, cubeTexture.encoding );
+				convertColorToLinear( color, cubeTexture.colorSpace );
 
 				// pixel coordinate on unit cube
 
@@ -153,7 +154,7 @@ class LightProbeGenerator {
 				color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
 
 				// convert to linear color space
-				convertColorToLinear( color, cubeRenderTarget.texture.encoding );
+				convertColorToLinear( color, cubeRenderTarget.texture.colorSpace );
 
 				// pixel coordinate on unit cube
 
@@ -223,22 +224,23 @@ class LightProbeGenerator {
 
 }
 
-function convertColorToLinear( color, encoding ) {
+function convertColorToLinear( color, colorSpace ) {
 
-	switch ( encoding ) {
+	switch ( colorSpace ) {
 
-		case sRGBEncoding:
+		case SRGBColorSpace:
 
 			color.convertSRGBToLinear();
 			break;
 
-		case LinearEncoding:
+		case LinearSRGBColorSpace:
+		case NoColorSpace:
 
 			break;
 
 		default:
 
-			console.warn( 'WARNING: LightProbeGenerator convertColorToLinear() encountered an unsupported encoding.' );
+			console.warn( 'WARNING: LightProbeGenerator convertColorToLinear() encountered an unsupported color space.' );
 			break;
 
 	}

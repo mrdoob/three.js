@@ -16,12 +16,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -29,12 +30,12 @@
 		<script type="module">
 			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { ArcballControls } from './jsm/controls/ArcballControls.js';
+			import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
 
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
-			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 			const cameras = [ 'Orthographic', 'Perspective' ];
 			const cameraType = { type: 'Perspective' };
@@ -100,8 +101,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = 3;
 				renderer.domElement.style.background = 'linear-gradient( 180deg, rgba( 0,0,0,1 ) 0%, rgba( 128,128,255,1 ) 100% )';
@@ -110,7 +109,6 @@
 				//
 
 				scene = new THREE.Scene();
-				scene.add( new THREE.HemisphereLight( 0x443333, 0x222233, 4 ) );
 
 				camera = makePerspectiveCamera();
 				camera.position.set( 0, 0, perspectiveDistance );
@@ -127,7 +125,7 @@
 						material.metalness = 1;
 
 						const diffuseMap = textureLoader.load( 'Cerberus_A.jpg', render );
-						diffuseMap.encoding = THREE.sRGBEncoding;
+						diffuseMap.colorSpace = THREE.SRGBColorSpace;
 						material.map = diffuseMap;
 
 						material.metalnessMap = material.roughnessMap = textureLoader.load( 'Cerberus_RM.jpg', render );

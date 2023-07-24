@@ -207,7 +207,7 @@ class TransformControls extends Object3D {
 
 		if ( this.camera.isOrthographicCamera ) {
 
-			this.camera.getWorldDirection( this.eye );
+			this.camera.getWorldDirection( this.eye ).negate();
 
 		} else {
 
@@ -1197,7 +1197,6 @@ class TransformControlsGizmo extends Object3D {
 
 				if ( handle.name === 'AXIS' ) {
 
-					handle.position.copy( this.worldPositionStart );
 					handle.visible = !! this.axis;
 
 					if ( this.axis === 'X' ) {

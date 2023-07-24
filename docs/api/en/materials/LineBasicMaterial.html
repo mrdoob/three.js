@@ -14,7 +14,6 @@
 		<p class="desc">A material for drawing wireframe-style geometries.</p>
 
 		<h2>Code Example</h2>
-
 		<code>
 		const material = new THREE.LineBasicMaterial( {
 			color: 0xffffff,
@@ -25,7 +24,6 @@
 		</code>
 
 		<h2>Examples</h2>
-
 		<p>
 			[example:webgl_buffergeometry_drawrange WebGL / buffergeometry / drawrange]<br />
 			[example:webgl_buffergeometry_lines WebGL / buffergeometry / lines]<br />
@@ -38,21 +36,21 @@
 			[example:webgl_interactive_voxelpainter WebGL / interactive / voxelpainter]<br />
 			[example:webgl_lines_colors WebGL / lines / colors]<br />
 			[example:webgl_lines_dashed WebGL / lines / dashed]<br />
-			[example:webgl_lines_sphere WebGL / lines / sphere]<br />
-			[example:webgl_materials WebGL / materials]<br />
 			[example:physics_ammo_rope physics / ammo / rope]
 		</p>
 
 		<h2>Constructor</h2>
-
 		<h3>[name]( [param:Object parameters] )</h3>
 
 		<p>
-		[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
-		Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
+			[page:Object parameters] - (optional) an object with one or more
+			properties defining the material's appearance. Any property of the
+			material (including any property inherited from [page:Material]) can be
+			passed in here.<br /><br />
 
-		The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal
-		string and is `0xffffff` (white) by default. [page:Color.set]( color ) is called internally.
+			The exception is the property [page:Hexadecimal color], which can be
+			passed in as a hexadecimal string and is `0xffffff` (white) by default.
+			[page:Color.set]( color ) is called internally.
 		</p>
 
 		<h2>Properties</h2>
@@ -68,27 +66,34 @@
 		<p>
 			Controls line thickness. Default is `1`.<br /><br />
 
-			Due to limitations of the [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
-			with the [page:WebGLRenderer WebGL] renderer on most platforms linewidth will
-			always be 1 regardless of the set value.
+			Due to limitations of the
+			[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile] 
+			with the [page:WebGLRenderer WebGL] renderer on most
+			platforms linewidth will always be `1` regardless of the set value.
 		</p>
 
 		<h3>[property:String linecap]</h3>
 		<p>
-			Define appearance of line ends. Possible values are 'butt', 'round' and 'square'.
-			Default is 'round'.<br /><br />
+			Define appearance of line ends. Possible values are 'butt', 'round' and
+			'square'. Default is 'round'.<br /><br />
 
-			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
+			This corresponds to the
+			[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap] 
 			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
 		</p>
 
 		<h3>[property:String linejoin]</h3>
 		<p>
-			Define appearance of line joints. Possible values are 'round', 'bevel' and 'miter'. Default is 'round'. <br /><br />
+			Define appearance of line joints. Possible values are 'round', 'bevel' and
+			'miter'. Default is 'round'. <br /><br />
 
-			This corresponds to the [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]
+			This corresponds to the
+			[link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin] 
 			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
 		</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>Sets the color of the lines using data from a [page:Texture].</p>
 
 		<h2>Methods</h2>
 		<p>See the base [page:Material] class for common methods.</p>

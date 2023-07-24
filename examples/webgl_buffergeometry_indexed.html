@@ -13,12 +13,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,8 +28,8 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer, stats;
 
@@ -50,6 +51,7 @@
 				//
 
 				const light = new THREE.HemisphereLight();
+				light.intensity = 3;
 				scene.add( light );
 
 				//
@@ -68,6 +70,8 @@
 				const halfSize = size / 2;
 				const segmentSize = size / segments;
 
+				const _color = new THREE.Color();
+
 				// generate vertices, normals and color data for a simple grid geometry
 
 				for ( let i = 0; i <= segments; i ++ ) {
@@ -84,7 +88,9 @@
 						const r = ( x / size ) + 0.5;
 						const g = ( y / size ) + 0.5;
 
-						colors.push( r, g, 1 );
+						_color.setRGB( r, g, 1, THREE.SRGBColorSpace );
+
+						colors.push( _color.r, _color.g, _color.b );
 
 					}
 

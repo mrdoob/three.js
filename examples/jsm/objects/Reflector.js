@@ -9,9 +9,7 @@ import {
 	Vector3,
 	Vector4,
 	WebGLRenderTarget,
-	HalfFloatType,
-	NoToneMapping,
-	LinearEncoding
+	HalfFloatType
 } from 'three';
 
 class Reflector extends Mesh {
@@ -54,6 +52,7 @@ class Reflector extends Mesh {
 		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample, type: HalfFloatType } );
 
 		const material = new ShaderMaterial( {
+			name: ( shader.name !== undefined ) ? shader.name : 'unspecified',
 			uniforms: UniformsUtils.clone( shader.uniforms ),
 			fragmentShader: shader.fragmentShader,
 			vertexShader: shader.vertexShader
@@ -146,13 +145,9 @@ class Reflector extends Mesh {
 
 			const currentXrEnabled = renderer.xr.enabled;
 			const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
-			const currentOutputEncoding = renderer.outputEncoding;
-			const currentToneMapping = renderer.toneMapping;
 
 			renderer.xr.enabled = false; // Avoid camera modification
 			renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
-			renderer.outputEncoding = LinearEncoding;
-			renderer.toneMapping = NoToneMapping;
 
 			renderer.setRenderTarget( renderTarget );
 
@@ -163,8 +158,6 @@ class Reflector extends Mesh {
 
 			renderer.xr.enabled = currentXrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
-			renderer.outputEncoding = currentOutputEncoding;
-			renderer.toneMapping = currentToneMapping;
 
 			renderer.setRenderTarget( currentRenderTarget );
 
@@ -200,6 +193,8 @@ class Reflector extends Mesh {
 }
 
 Reflector.ReflectorShader = {
+
+	name: 'ReflectorShader',
 
 	uniforms: {
 
@@ -261,7 +256,7 @@ Reflector.ReflectorShader = {
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 
 			#include <tonemapping_fragment>
-			#include <encodings_fragment>
+			#include <colorspace_fragment>
 
 		}`
 };

@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – Making a Game">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -234,10 +234,10 @@ we instead want to clone the scene and in particular we want to clone
 it for skinned animated characters. Fortunately there's a utility function,
 <code class="notranslate" translate="no">SkeletonUtils.clone</code> we can use to do this. So, first we need to include
 the utils.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from '/examples/jsm/loaders/GLTFLoader.js';
-+import * as SkeletonUtils from '/examples/jsm/utils/SkeletonUtils.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
++import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 </pre>
 <p>Then we can clone the models we just loaded</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
@@ -1513,11 +1513,11 @@ class StateDisplayHelper extends Component {
 </pre>
 <p>While we're at it lets make it so we can turn them on/off using lil-gui like
 we've used else where</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from '/examples/jsm/loaders/GLTFLoader.js';
-import * as SkeletonUtils from '/examples/jsm/utils/SkeletonUtils.js';
-+import {GUI} from '/examples/jsm/libs/lil-gui.module.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
++import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const gui = new GUI();
 +gui.add(globals, 'debug').onChange(showHideDebugInfo);
@@ -1927,8 +1927,8 @@ If you make a cool game post a link in the comments below.</p>
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

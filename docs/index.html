@@ -8,7 +8,10 @@
 		<link rel="shortcut icon" href="../files/favicon.ico" media="(prefers-color-scheme: light)" />
 		<link rel="stylesheet" type="text/css" href="../files/main.css">
 		<!-- console sandbox -->
-		<script src="../build/three.min.js" async defer></script>
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
+			window.THREE = THREE;
+		</script>
 	</head>
 	<body>
 		<div id="panel">
@@ -29,7 +32,7 @@
 			<div id="contentWrapper">
 				<div id="inputWrapper">
 					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
-					<div id="exitSearchButton"></div>
+					<div id="clearSearchButton"></div>
 					<select id="language">
 						<option value="en">en</option>
 						<option value="ar">ar</option>
@@ -38,6 +41,8 @@
 						<option value="ja">日本語</option>
 						<option value="it">it</option>
 						<option value="pt-br">pt-br</option>
+						<option value="fr">fr</option>
+						<option value="ru">ru</option>
 					</select>
 				</div>
 				<div id="content"></div>
@@ -52,7 +57,7 @@
 		const panel = document.getElementById( 'panel' );
 		const content = document.getElementById( 'content' );
 		const expandButton = document.getElementById( 'expandButton' );
-		const exitSearchButton = document.getElementById( 'exitSearchButton' );
+		const clearSearchButton = document.getElementById( 'clearSearchButton' );
 		const panelScrim = document.getElementById( 'panelScrim' );
 		const filterInput = document.getElementById( 'filterInput' );
 		let iframe = document.querySelector( 'iframe' );
@@ -88,7 +93,7 @@
 
 			if ( /^(api|manual|examples)/.test( hash ) ) {
 
-				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh|ja|it|pt-br)\//.exec( hash );
+				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh|ja|it|pt-br|fr|ru)\//.exec( hash );
 
 				if ( hashLanguage === null ) {
 
@@ -163,11 +168,11 @@
 
 			};
 
-			exitSearchButton.onclick = function () {
+			clearSearchButton.onclick = function () {
 
 				filterInput.value = '';
 				updateFilter();
-				panel.classList.remove( 'searchFocused' );
+				filterInput.focus();
 
 			};
 
@@ -472,16 +477,32 @@
 			// First separate the member (if existing) from the page name,
 			// then identify the subpage's URL and set it as URL fragment (re-adding the member)
 
+			const pageURL = getPageURL( pageName );
+
+			if ( pageURL ) {
+
+				window.location.hash = pageURL;
+
+				createNewIframe();
+
+			}
+
+		}
+
+		function getPageURL( pageName ) {
+
 			const splitPageName = decomposePageName( pageName, '.', '.' );
 
 			const currentProperties = pageProperties[ splitPageName[ 0 ] ];
 
 			if ( currentProperties ) {
 
-				window.location.hash = currentProperties.pageURL + splitPageName[ 1 ];
+				return currentProperties.pageURL + splitPageName[ 1 ];
+		
+			} else {
 
-				createNewIframe();
-
+				return null;
+		
 			}
 
 		}

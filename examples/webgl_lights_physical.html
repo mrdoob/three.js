@@ -17,12 +17,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -31,10 +32,10 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, scene, renderer, bulbLight, bulbMat, hemiLight, stats;
 			let ballMat, cubeMat, floorMat;
@@ -123,7 +124,7 @@
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 10, 24 );
-					map.encoding = THREE.sRGBEncoding;
+					map.colorSpace = THREE.SRGBColorSpace;
 					floorMat.map = map;
 					floorMat.needsUpdate = true;
 
@@ -161,7 +162,7 @@
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 1, 1 );
-					map.encoding = THREE.sRGBEncoding;
+					map.colorSpace = THREE.SRGBColorSpace;
 					cubeMat.map = map;
 					cubeMat.needsUpdate = true;
 
@@ -185,7 +186,7 @@
 				textureLoader.load( 'textures/planets/earth_atmos_2048.jpg', function ( map ) {
 
 					map.anisotropy = 4;
-					map.encoding = THREE.sRGBEncoding;
+					map.colorSpace = THREE.SRGBColorSpace;
 					ballMat.map = map;
 					ballMat.needsUpdate = true;
 
@@ -193,7 +194,7 @@
 				textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function ( map ) {
 
 					map.anisotropy = 4;
-					map.encoding = THREE.sRGBEncoding;
+					map.colorSpace = THREE.SRGBColorSpace;
 					ballMat.metalnessMap = map;
 					ballMat.needsUpdate = true;
 
@@ -230,8 +231,6 @@
 
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.physicallyCorrectLights = true;
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );

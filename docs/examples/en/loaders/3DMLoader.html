@@ -14,8 +14,19 @@
 			A loader for Rhinoceros 3d files and objects. <br /><br />
 			Rhinoceros is a 3D modeler used to create, edit, analyze, document, render, animate, and translate NURBS curves, surfaces, breps, extrusions, point clouds, as well as polygon meshes and SubD objects.
 			[link:https://github.com/mcneel/rhino3dm rhino3dm.js] is compiled to WebAssembly from the open source geometry library [link:https://github.com/mcneel/opennurbs openNURBS].
-			The loader currently uses <a href="https://www.npmjs.com/package/rhino3dm/v/0.15.0-beta">rhino3dm.js 0.15.0-beta.</a>
+			The loader currently uses [link:https://www.npmjs.com/package/rhino3dm/v/0.15.0-beta rhino3dm.js 0.15.0-beta.]
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { Rhino3dmLoader } from 'three/addons/loaders/3DMLoader.js';
+		</code>
 
 		<h2>Supported Conversions</h2>
 
@@ -110,7 +121,7 @@
 
 		// Specify path to a folder containing WASM/JS libraries or a CDN.
 		//loader.setLibraryPath( '/path_to_library/rhino3dm/' );
-		loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/' );
+		loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.15.0/' );
 
 		// Load a 3DM file
 		loader.load(
@@ -180,17 +191,17 @@
 		</p>
 		<p>
 		Parse a File3dm ArrayBuffer and call the `onLoad` function with the resulting Object3d.
-		See <a href="https://github.com/mcneel/rhino-developer-samples/tree/7/rhino3dm/js/SampleParse3dmObjects">this example</a> for further reference.
+		See [link:https://github.com/mcneel/rhino-developer-samples/tree/7/rhino3dm/js/SampleParse3dmObjects this example] for further reference.
 		</p>
 
 		<code>
-		import rhino3dm from 'https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/rhino3dm.module.js'
+		import rhino3dm from 'https://cdn.jsdelivr.net/npm/rhino3dm@7.15.0/rhino3dm.module.js'
 
 		// Instantiate a loader
 		const loader = new Rhino3dmLoader();
 
 		// Specify path to a folder containing WASM/JS libraries or a CDN.
-		loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/' );
+		loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.15.0/' );
 
 		rhino3dm().then(async m => {
 
@@ -227,7 +238,7 @@
 		// Specify path to a folder containing the WASM/JS library:
 		loader.setLibraryPath( '/path_to_library/rhino3dm/' );
 		// or from a CDN:
-		loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/' );
+		loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.15.0/' );
 		</code>
 
 		<h3>[method:this setWorkerLimit]( [param:Number workerLimit] )</h3>

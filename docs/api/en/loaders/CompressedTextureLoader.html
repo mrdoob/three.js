@@ -12,15 +12,16 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		Abstract base class for block based textures loader (dds, pvr, ...).
-		This uses the [page:FileLoader] internally for loading files.
+			Abstract base class for block based textures loader (dds, pvr, ...). This
+			uses the [page:FileLoader] internally for loading files.
 		</p>
 
 		<h2>Examples</h2>
 
 		<p>
-			See the [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/DDSLoader.js DDSLoader]
-			and [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/PVRLoader.js PVRLoader]
+			See the
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/DDSLoader.js DDSLoader] 
+			and [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/PVRLoader.js PVRLoader] 
 			for examples of derived classes.
 		</p>
 
@@ -28,10 +29,10 @@
 
 		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<p>
-		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use.
-		Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+			[page:LoadingManager manager] — The [page:LoadingManager loadingManager]
+			for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
 
-		Creates a new [name].
+			Creates a new [name].
 		</p>
 
 		<h2>Properties</h2>
@@ -40,16 +41,25 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
 
-		<h3>[method:CompressedTexture load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>
+			[method:CompressedTexture load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )
+		</h3>
 		<p>
-		[page:String url] — the path or URL to the file. This can also be a
+			[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
-		[page:Function onLoad] (optional) — Will be called when load completes. The argument will be the loaded texture.<br />
-		[page:Function onProgress] (optional) — Will be called while load progresses. The argument will be the ProgressEvent instance, which contains .[page:Boolean lengthComputable], .[page:Integer total] and .[page:Integer loaded]. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
-		[page:Function onError] (optional) — Will be called when load errors.<br />
+			[page:Function onLoad] (optional) — Will be called when load completes.
+			The argument will be the loaded texture.<br />
+			[page:Function onProgress] (optional) — Will be called while load
+			progresses. The argument will be the ProgressEvent instance, which
+			contains .[page:Boolean lengthComputable], .[page:Integer total] and
+			.[page:Integer loaded]. If the server does not set the Content-Length
+			header; .[page:Integer total] will be 0.<br />
+			[page:Function onError] (optional) — Will be called when load errors.<br />
 		</p>
 		<p>
-		Begin loading from url and pass the loaded texture to onLoad. The method also returns a new texture object which can directly be used for material creation.
+			Begin loading from url and pass the loaded texture to onLoad. The method
+			also returns a new texture object which can directly be used for material
+			creation.
 		</p>
 
 		<h2>Source</h2>

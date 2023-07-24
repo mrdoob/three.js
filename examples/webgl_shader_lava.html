@@ -76,12 +76,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -90,10 +91,11 @@
 
 			import * as THREE from 'three';
 
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
-			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
+			import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let camera, renderer, composer, clock;
 
@@ -115,19 +117,24 @@
 
 				const textureLoader = new THREE.TextureLoader();
 
+				const cloudTexture = textureLoader.load( 'textures/lava/cloud.png' );
+				const lavaTexture = textureLoader.load( 'textures/lava/lavatile.jpg' );
+
+				lavaTexture.colorSpace = THREE.SRGBColorSpace;
+
+				cloudTexture.wrapS = cloudTexture.wrapT = THREE.RepeatWrapping;
+				lavaTexture.wrapS = lavaTexture.wrapT = THREE.RepeatWrapping;
+
 				uniforms = {
 
 					'fogDensity': { value: 0.45 },
 					'fogColor': { value: new THREE.Vector3( 0, 0, 0 ) },
 					'time': { value: 1.0 },
 					'uvScale': { value: new THREE.Vector2( 3.0, 1.0 ) },
-					'texture1': { value: textureLoader.load( 'textures/lava/cloud.png' ) },
-					'texture2': { value: textureLoader.load( 'textures/lava/lavatile.jpg' ) }
+					'texture1': { value: cloudTexture },
+					'texture2': { value: lavaTexture }
 
 				};
-
-				uniforms[ 'texture1' ].value.wrapS = uniforms[ 'texture1' ].value.wrapT = THREE.RepeatWrapping;
-				uniforms[ 'texture2' ].value.wrapS = uniforms[ 'texture2' ].value.wrapT = THREE.RepeatWrapping;
 
 				const size = 0.65;
 
@@ -147,21 +154,22 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				container.appendChild( renderer.domElement );
 				renderer.autoClear = false;
-
+				container.appendChild( renderer.domElement );
 
 				//
 
 				const renderModel = new RenderPass( scene, camera );
 				const effectBloom = new BloomPass( 1.25 );
 				const effectFilm = new FilmPass( 0.35, 0.95, 2048, false );
+				const outputPass = new OutputPass();
 
 				composer = new EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectBloom );
 				composer.addPass( effectFilm );
+				composer.addPass( outputPass );
 
 				//
 

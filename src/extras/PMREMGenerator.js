@@ -2,12 +2,13 @@ import {
 	CubeReflectionMapping,
 	CubeRefractionMapping,
 	CubeUVReflectionMapping,
-	LinearEncoding,
 	LinearFilter,
 	NoToneMapping,
 	NoBlending,
 	RGBAFormat,
-	HalfFloatType
+	HalfFloatType,
+	BackSide,
+	LinearSRGBColorSpace
 } from '../constants.js';
 
 import { BufferAttribute } from '../core/BufferAttribute.js';
@@ -21,7 +22,6 @@ import { Color } from '../math/Color.js';
 import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { BoxGeometry } from '../geometries/BoxGeometry.js';
-import { BackSide } from '../constants.js';
 
 const LOD_MIN = 4;
 
@@ -255,13 +255,13 @@ class PMREMGenerator {
 			generateMipmaps: false,
 			type: HalfFloatType,
 			format: RGBAFormat,
-			encoding: LinearEncoding,
+			colorSpace: LinearSRGBColorSpace,
 			depthBuffer: false
 		};
 
 		const cubeUVRenderTarget = _createRenderTarget( width, height, params );
 
-		if ( this._pingPongRenderTarget === null || this._pingPongRenderTarget.width !== width ) {
+		if ( this._pingPongRenderTarget === null || this._pingPongRenderTarget.width !== width || this._pingPongRenderTarget.height !== height ) {
 
 			if ( this._pingPongRenderTarget !== null ) {
 

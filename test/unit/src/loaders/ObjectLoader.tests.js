@@ -1,39 +1,69 @@
 /* global QUnit */
 
-// import { ObjectLoader } from '../../../../src/loaders/ObjectLoader.js';
+import { ObjectLoader } from '../../../../src/loaders/ObjectLoader.js';
+
+import { Loader } from '../../../../src/loaders/Loader.js';
 
 export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module( 'ObjectLoader', () => {
 
-		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		// INHERITANCE
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new ObjectLoader();
+			assert.strictEqual(
+				object instanceof Loader, true,
+				'ObjectLoader extends from Loader'
+			);
 
 		} );
 
-		// PUBLIC STUFF
+		// INSTANCING
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new ObjectLoader();
+			assert.ok( object, 'Can instantiate an ObjectLoader.' );
+
+		} );
+
+		// PUBLIC
 		QUnit.todo( 'load', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'setTexturePath', ( assert ) => {
+		QUnit.todo( 'loadAsync', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setCrossOrigin', ( assert ) => {
-
+			// async loadAsync( url, onProgress )
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		QUnit.todo( 'parse', ( assert ) => {
 
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'parseAsync', ( assert ) => {
+
+			// async parseAsync( json )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'parseShapes', ( assert ) => {
+
+			// parseShapes( json )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'parseSkeletons', ( assert ) => {
+
+			// parseSkeletons( json, object )
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
@@ -62,6 +92,13 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
+		QUnit.todo( 'parseImagesAsync', ( assert ) => {
+
+			// async parseImagesAsync( json )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		QUnit.todo( 'parseTextures', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
@@ -70,6 +107,13 @@ export default QUnit.module( 'Loaders', () => {
 
 		QUnit.todo( 'parseObject', ( assert ) => {
 
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'bindSkeletons', ( assert ) => {
+
+			// bindSkeletons( object, skeletons )
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );

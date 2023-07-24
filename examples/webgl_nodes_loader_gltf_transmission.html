@@ -11,18 +11,19 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_transmission" target="_blank" rel="noopener">KHR_materials_transmission</a> + Nodes<br />
 			Iridescent Dish With Olives by <a href="https://github.com/echadwick-wayfair" target="_blank" rel="noopener">Eric Chadwick</a><br />
-			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -30,16 +31,15 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import { NodeMaterial, float, texture } from 'three/nodes';
 
-			import { NodeMaterial, float, texture, mul } from 'three-nodes/Nodes.js';
+			import { nodeFrame } from 'three/addons/renderers/webgl/nodes/WebGLNodes.js';
 
-			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-
-			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 			let camera, scene, renderer, controls, clock, mixer;
 
@@ -71,7 +71,7 @@
 
 						new GLTFLoader()
 							.setPath( 'models/gltf/' )
-							.setDRACOLoader( new DRACOLoader().setDecoderPath( 'js/libs/draco/gltf/' ) )
+							.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) )
 							.load( 'IridescentDishWithOlives.glb', function ( gltf ) {
 
 								// nodes
@@ -82,10 +82,10 @@
 
 								if ( material && material.transmission > 0 ) {
 
-									const nodeMaterial = NodeMaterial.fromMaterial( material );
+									const nodeMaterial = NodeMaterial.fromMaterial( material ); // @TODO: NodeMaterial.fromMaterial can be removed if WebGLNodes will apply it by default (as in WebGPURenderer)
 									nodeMaterial.transmissionNode = float( 1 );
 									nodeMaterial.iorNode = float( 1.5 );
-									nodeMaterial.thicknessNode = mul( texture( material.thicknessMap ).g, 0.1 );
+									nodeMaterial.thicknessNode = texture( material.thicknessMap ).g.mul( 0.1 );
 									//nodeMaterial.attenuationDistanceNode;
 									//nodeMaterial.attenuationColorNode;
 
@@ -110,7 +110,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );

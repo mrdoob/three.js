@@ -1,17 +1,17 @@
-import { ShaderNode, add, sub, mul, div, pow2 } from '../../shadernode/ShaderNodeBaseElements.js';
+import { tslFn } from '../../shadernode/ShaderNode.js';
 
 // Microfacet Models for Refraction through Rough Surfaces - equation (33)
 // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
 // alpha is "roughness squared" in Disney’s reparameterization
-const D_GGX = new ShaderNode( ( inputs ) => {
+const D_GGX = tslFn( ( inputs ) => {
 
 	const { alpha, dotNH } = inputs;
 
-	const a2 = pow2( alpha );
+	const a2 = alpha.pow2();
 
-	const denom = add( mul( pow2( dotNH ), sub( a2, 1.0 ) ), 1.0 ); // avoid alpha = 0 with dotNH = 1
+	const denom = dotNH.pow2().mul( a2.oneMinus() ).oneMinus(); // avoid alpha = 0 with dotNH = 1
 
-	return mul( 1 / Math.PI, div( a2, pow2( denom ) ) );
+	return a2.div( denom.pow2() ).mul( 1 / Math.PI );
 
 } ); // validated
 

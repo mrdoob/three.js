@@ -24,6 +24,18 @@
 			and they require special handling during the disposal process. More information in the [link:https://threejs.org/docs/#manual/en/introduction/How-to-dispose-of-objects How to dispose of objects] guide.
 		</p>
 
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+		</code>
+
+
 		<h2>扩展</h2>
 
 		<p>
@@ -34,7 +46,6 @@
 			<li>KHR_draco_mesh_compression</li>
 			<li>KHR_materials_clearcoat</li>
 			<li>KHR_materials_ior</li>
-			<li>KHR_materials_pbrSpecularGlossiness</li>
 			<li>KHR_materials_specular</li>
 			<li>KHR_materials_transmission</li>
 			<li>KHR_materials_iridescence</li>
@@ -46,6 +57,7 @@
 			<li>KHR_texture_transform<sup>2</sup></li>
 			<li>EXT_texture_webp</li>
 			<li>EXT_meshopt_compression</li>
+			<li>EXT_mesh_gpu_instancing</li>
 		</ul>
 
 		<p>
@@ -57,9 +69,6 @@
 			<li>[link:https://github.com/takahirox/three-gltf-extensions MSFT_texture_dds]</li>
 		</ul>
 
-		<p><i>
-			<sup>1</sup>需要[link:https://threejs.org/docs/#api/en/renderers/WebGLRenderer.physicallyCorrectLights physicallyCorrectLights]被启用。
-		</i></p>
 		<p><i>
 			<sup>2</sup>支持UV变换，但存在一些重要的限制。
 			Transforms applied to
@@ -82,7 +91,7 @@
 
 		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
 		const dracoLoader = new DRACOLoader();
-		dracoLoader.setDecoderPath( '/examples/js/libs/draco/' );
+		dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
 		loader.setDRACOLoader( dracoLoader );
 
 		// Load a glTF resource
@@ -122,12 +131,6 @@
 			[example:webgl_loader_gltf]
 		</p>
 
-		<h2>浏览器兼容性</h2>
-
-		<p>GLTFLoader 依赖 ES6 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise Promises]，
-		这一特性不支持IE11。若要在IE11中使用该加载器，你必须引入polyfill（[link:https://github.com/stefanpenner/es6-promise include a polyfill]）
-		来提供一个Promise的替代方案。</p>
-
 		<h2>纹理</h2>
 
 		<p>纹理中包含的颜色信息（.map, .emissiveMap, 和 .specularMap）在glTF中总是使用sRGB颜色空间，而顶点颜色和材质属性（.color, .emissive, .specular）
@@ -135,7 +138,7 @@
 		颜色空间并显示在屏幕上。除非你需要使用线性颜色空间进行后期处理，否则请在使用glTF的时候将[page:WebGLRenderer]进行如下配置：</p>
 
 		<code>
-		renderer.outputEncoding = THREE.sRGBEncoding;
+		renderer.outputColorSpace = THREE.SRGBColorSpace;
 		</code>
 
 		<p>假设渲染器的配置如上所示，则GLTFLoader将可以正确地自动配置从.gltf或.glb文件中引用的纹理。
@@ -143,7 +146,7 @@
 
 		<code>
 		// If texture is used for color information, set colorspace.
-		texture.encoding = THREE.sRGBEncoding;
+		texture.colorSpace = THREE.SRGBColorSpace;
 
 		// UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
 		texture.flipY = false;
@@ -206,7 +209,7 @@
 		[page:DRACOLoader dracoLoader] — THREE.DRACOLoader的实例，用于解码使用KHR_draco_mesh_compression扩展压缩过的文件。
 		</p>
 		<p>
-		请参阅[link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme]来了解Draco及其解码器的详细信息。
+		请参阅[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/libs/draco#readme readme]来了解Draco及其解码器的详细信息。
 		</p>
 
 		<h3>[method:undefined parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>

@@ -14,7 +14,7 @@ import {
 
 class RoomEnvironment extends Scene {
 
-	constructor() {
+	constructor( renderer = null ) {
 
 		super();
 
@@ -24,7 +24,11 @@ class RoomEnvironment extends Scene {
 		const roomMaterial = new MeshStandardMaterial( { side: BackSide } );
 		const boxMaterial = new MeshStandardMaterial();
 
-		const mainLight = new PointLight( 0xffffff, 5.0, 28, 2 );
+		let intensity = 5;
+
+		if ( renderer !== null && renderer._useLegacyLights === false ) intensity = 900;
+
+		const mainLight = new PointLight( 0xffffff, intensity, 28, 2 );
 		mainLight.position.set( 0.418, 16.199, 0.300 );
 		this.add( mainLight );
 
@@ -105,6 +109,29 @@ class RoomEnvironment extends Scene {
 		light6.position.set( 0.0, 20.0, 0.0 );
 		light6.scale.set( 1.0, 0.1, 1.0 );
 		this.add( light6 );
+
+	}
+
+	dispose() {
+
+		const resources = new Set();
+
+		this.traverse( ( object ) => {
+
+			if ( object.isMesh ) {
+
+				resources.add( object.geometry );
+				resources.add( object.material );
+
+			}
+
+		} );
+
+		for ( const resource of resources ) {
+
+			resource.dispose();
+
+		}
 
 	}
 

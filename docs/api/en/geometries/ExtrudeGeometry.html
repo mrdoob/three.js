@@ -13,7 +13,10 @@
 
 		<p class="desc">Creates extruded geometry from a path shape.</p>
 
-		<iframe id="scene" src="scenes/geometry-browser.html#ExtrudeGeometry"></iframe>
+		<iframe
+			id="scene"
+			src="scenes/geometry-browser.html#ExtrudeGeometry"
+		></iframe>
 
 		<script>
 
@@ -32,7 +35,6 @@
 		</script>
 
 		<h2>Code Example</h2>
-
 
 		<code>
 		const length = 12, width = 8;
@@ -60,37 +62,53 @@
 		scene.add( mesh );
 		</code>
 
-
 		<h2>Constructor</h2>
-
 
 		<h3>[name]([param:Array shapes], [param:Object options])</h3>
 		<p>
-		shapes — Shape or an array of shapes. <br />
-		options — Object that can contain the following parameters.
-
-			<ul>
-				<li>curveSegments — int. Number of points on the curves. Default is 12.</li>
-				<li>steps — int. Number of points used for subdividing segments along the depth of the extruded spline. Default is 1.</li>
-				<li>depth — float. Depth to extrude the shape. Default is 1.</li>
-				<li>bevelEnabled — bool. Apply beveling to the shape. Default is true.</li>
-				<li>bevelThickness — float. How deep into the original shape the bevel goes. Default is 0.2.</li>
-				<li>bevelSize — float. Distance from the shape outline that the bevel extends. Default is bevelThickness - 0.1.</li>
-				<li>bevelOffset — float. Distance from the shape outline that the bevel starts. Default is 0.</li>
-				<li>bevelSegments — int. Number of bevel layers. Default is 3.</li>
-				<li>extrudePath — THREE.Curve. A 3D spline path along which the shape should be extruded. Bevels not supported for path extrusion.</li>
-				<li>UVGenerator —  Object. object that provides UV generator functions</li>
-			</ul>
-
-		</p>
-		<p>
-			This object extrudes a 2D shape to a 3D geometry.
+			shapes — Shape or an array of shapes. <br />
+			options — Object that can contain the following parameters.
 		</p>
 
+		<ul>
+			<li>
+				curveSegments — int. Number of points on the curves. Default is `12`.
+			</li>
+			<li>
+				steps — int. Number of points used for subdividing segments along the
+				depth of the extruded spline. Default is `1`.
+			</li>
+			<li>depth — float. Depth to extrude the shape. Default is `1`.</li>
+			<li>
+				bevelEnabled — bool. Apply beveling to the shape. Default is true.
+			</li>
+			<li>
+				bevelThickness — float. How deep into the original shape the bevel goes.
+				Default is `0.2`.
+			</li>
+			<li>
+				bevelSize — float. Distance from the shape outline that the bevel
+				extends. Default is bevelThickness - 0.1.
+			</li>
+			<li>
+				bevelOffset — float. Distance from the shape outline that the bevel
+				starts. Default is `0`.
+			</li>
+			<li>bevelSegments — int. Number of bevel layers. Default is `3`.</li>
+			<li>
+				extrudePath — THREE.Curve. A 3D spline path along which the shape should
+				be extruded. Bevels not supported for path extrusion.
+			</li>
+			<li>UVGenerator — Object. object that provides UV generator functions</li>
+		</ul>
+
+		<p>This object extrudes a 2D shape to a 3D geometry.</p>
+
 		<p>
-			When creating a Mesh with this geometry, if you'd like to have a separate material used for its face
-			and its extruded sides, you can use an array of materials. The first material will be
-			applied to the face; the second material will be applied to the sides.
+			When creating a Mesh with this geometry, if you'd like to have a separate
+			material used for its face and its extruded sides, you can use an array of
+			materials. The first material will be applied to the face; the second
+			material will be applied to the sides.
 		</p>
 
 		<h2>Properties</h2>
@@ -98,7 +116,8 @@
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+			An object with a property for each of the constructor parameters. Any
+			modification after instantiation does not change the geometry.
 		</p>
 
 		<h2>Methods</h2>

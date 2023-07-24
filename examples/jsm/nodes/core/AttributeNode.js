@@ -1,5 +1,6 @@
-import Node from './Node.js';
-import VaryingNode from './VaryingNode.js';
+import Node, { addNodeClass } from './Node.js';
+import { varying } from './VaryingNode.js';
+import { nodeObject } from '../shadernode/ShaderNode.js';
 
 class AttributeNode extends Node {
 
@@ -19,14 +20,23 @@ class AttributeNode extends Node {
 
 	getNodeType( builder ) {
 
+		const attributeName = this.getAttributeName( builder );
+
 		let nodeType = super.getNodeType( builder );
 
 		if ( nodeType === null ) {
 
-			const attributeName = this.getAttributeName( builder );
-			const attribute = builder.geometry.getAttribute( attributeName );
+			if ( builder.hasGeometryAttribute( attributeName ) ) {
 
-			nodeType = builder.getTypeFromLength( attribute.itemSize );
+				const attribute = builder.geometry.getAttribute( attributeName );
+
+				nodeType = builder.getTypeFromAttribute( attribute );
+
+			} else {
+
+				nodeType = 'float';
+
+			}
 
 		}
 
@@ -50,17 +60,34 @@ class AttributeNode extends Node {
 
 	generate( builder ) {
 
-		const attribute = builder.getAttribute( this.getAttributeName( builder ), this.getNodeType( builder ) );
+		const attributeName = this.getAttributeName( builder );
+		const nodeType = this.getNodeType( builder );
+		const geometryAttribute = builder.hasGeometryAttribute( attributeName );
 
-		if ( builder.isShaderStage( 'vertex' ) ) {
+		if ( geometryAttribute === true ) {
 
-			return attribute.name;
+			const attribute = builder.geometry.getAttribute( attributeName );
+			const attributeType = builder.getTypeFromAttribute( attribute );
+
+			const nodeAttribute = builder.getAttribute( attributeName, attributeType );
+
+			if ( builder.shaderStage === 'vertex' ) {
+
+				return builder.format( nodeAttribute.name, attributeType, nodeType );
+
+			} else {
+
+				const nodeVarying = varying( this );
+
+				return nodeVarying.build( builder, nodeType );
+
+			}
 
 		} else {
 
-			const nodeVarying = new VaryingNode( this );
+			console.warn( `AttributeNode: Attribute "${ attributeName }" not found.` );
 
-			return nodeVarying.build( builder, attribute.type );
+			return builder.getConst( nodeType );
 
 		}
 
@@ -69,3 +96,7 @@ class AttributeNode extends Node {
 }
 
 export default AttributeNode;
+
+export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
+
+addNodeClass( AttributeNode );

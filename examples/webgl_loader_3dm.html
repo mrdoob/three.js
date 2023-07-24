@@ -34,12 +34,13 @@
 		<div id="loader"></div>
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -48,10 +49,10 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { Rhino3dmLoader } from './jsm/loaders/3DMLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Rhino3dmLoader } from 'three/addons/loaders/3DMLoader.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer;
 			let controls, gui;
@@ -61,12 +62,11 @@
 
 			function init() {
 
-				THREE.Object3D.DefaultUp = new THREE.Vector3( 0, 0, 1 );
+				THREE.Object3D.DEFAULT_UP.set( 0, 0, 1 );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -74,12 +74,12 @@
 
 				scene = new THREE.Scene();
 
-				const directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 6 );
 				directionalLight.position.set( 0, 0, 2 );
 				scene.add( directionalLight );
 
 				const loader = new Rhino3dmLoader();
-				loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.11.1/' );
+				loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.15.0/' );
 				loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
 
 					scene.add( object );

@@ -52,7 +52,7 @@
 			"Start making a Game": "en/game"
 		},
 		"WebXR": {
-			"VR - Basics": "en/webxr",
+			"VR - Basics": "en/webxr-basics",
 			"VR - Look To Select": "en/webxr-look-to-select",
 			"VR - Point To Select": "en/webxr-point-to-select"
 		},
@@ -69,7 +69,7 @@
 		},
 		"Principes de base": {
 			"Primitives": "fr/primitives",
-			"Graphique de scène": "fr/scenegraph",
+			"Graphe de scène": "fr/scenegraph",
 			"Matériaux": "fr/materials",
 			"Textures": "fr/textures",
 			"Lumières": "fr/lights",
@@ -113,7 +113,7 @@
 			"Start making a Game": "fr/game"
 		},
 		"WebXR": {
-			"VR - Basics": "fr/webxr",
+			"VR - Basics": "fr/webxr-basics",
 			"VR - Look To Select": "fr/webxr-look-to-select",
 			"VR - Point To Select": "fr/webxr-point-to-select"
 		},
@@ -174,7 +174,7 @@
 			"Start making a Game": "ja/game"
 		},
 		"WebXR": {
-			"VR - Basics": "ja/webxr",
+			"VR - Basics": "ja/webxr-basics",
 			"VR - Look To Select": "ja/webxr-look-to-select",
 			"VR - Point To Select": "ja/webxr-point-to-select"
 		},
@@ -235,7 +235,7 @@
 			"게임 만들기": "ko/game"
 		},
 		"웹VR": {
-			"VR - 기본 사항": "ko/webxr",
+			"VR - 기본 사항": "ko/webxr-basics",
 			"VR - Look To Select": "ko/webxr-look-to-select",
 			"VR - Point To Select": "ko/webxr-point-to-select"
 		},
@@ -296,7 +296,7 @@
 			"Start making a Game": "ru/game"
 		},
 		"WebXR": {
-			"VR - Basics": "ru/webxr",
+			"VR - Basics": "ru/webxr-basics",
 			"VR - Look To Select": "ru/webxr-look-to-select",
 			"VR - Point To Select": "ru/webxr-point-to-select"
 		},
@@ -305,6 +305,12 @@
 		}
 	},
 	"zh": {
+		"基本": {
+			"基础": "zh/fundamentals",
+			"响应式设计": "zh/responsive",
+			"先决条件": "zh/prerequisites",
+			"设置": "zh/setup"
+		},
 		"基础": {
 			"图元": "zh/primitives",
 			"场景图": "zh/scenegraph",
@@ -351,7 +357,7 @@
 			"Start making a Game": "zh/game"
 		},
 		"WebXR": {
-			"VR - Basics": "zh/webxr",
+			"VR - Basics": "zh/webxr-basics",
 			"VR - Look To Select": "zh/webxr-look-to-select",
 			"VR - Point To Select": "zh/webxr-point-to-select"
 		},

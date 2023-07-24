@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+	 
+		<p class="desc">فئة تحتوي على دوال مساعدة للصور.</p>
+	 
+		<h2>الوظائف (Methods)</h2>
+	 
+		<h3>
+			[method:String getDataURL]( [param:HTMLCanvasElement image] |
+			[param:HTMLImageElement image] | [param:ImageBitmap image] )
+		</h3>
+		<p>
+			image -- كائن الصورة.<br /><br />
+	 
+			يعود بـ URI بيانات يحتوي على تمثيل للصورة المعطاة.
+		</p>
+	 
+		<h3>
+			[method:Object sRGBToLinear]( [param:HTMLCanvasElement image] |
+			[param:HTMLImageElement image] | [param:ImageBitmap image] )
+		</h3>
+		<p>
+			image -- كائن الصورة.<br /><br />
+	 
+			يحول بيانات الصورة sRGB المعطاة إلى مساحة اللون الخطية.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

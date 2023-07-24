@@ -13,34 +13,19 @@
 
 		<h2>Before we start</h2>
 
-		<p>Before you can use three.js, you need somewhere to display it. Save the following HTML to a file on your computer, along with a copy of [link:https://threejs.org/build/three.js three.js] in the js/ directory, and open it in your browser.</p>
-
-		<code>
-		&lt;!DOCTYPE html&gt;
-		&lt;html&gt;
-			&lt;head&gt;
-				&lt;meta charset="utf-8"&gt;
-				&lt;title&gt;My first three.js app&lt;/title&gt;
-				&lt;style&gt;
-					body { margin: 0; }
-				&lt;/style&gt;
-			&lt;/head&gt;
-			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
-					// Our Javascript will go here.
-				&lt;/script&gt;
-			&lt;/body&gt;
-		&lt;/html&gt;
-		</code>
-
-		<p>That's all. All the code below goes into the empty &lt;script&gt; tag.</p>
+		<p>
+			If you haven't yet, go through the [link:#manual/introduction/Installation Installation] guide. We'll assume you've already set up the same project structure (including <i>index.html</i> and <i>main.js</i>), have installed three.js, and are either running a build tool, or using a local server with a CDN and import maps.
+		</p>
 
 		<h2>Creating the scene</h2>
 
 		<p>To actually be able to display anything with three.js, we need three things: scene, camera and renderer, so that we can render the scene with camera.</p>
 
+		<p><i>main.js —</i></p>
+
 		<code>
+		import * as THREE from 'three';
+
 		const scene = new THREE.Scene();
 		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -59,9 +44,7 @@
 
 		<p>The next two attributes are the `near` and `far` clipping plane. What that means, is that objects further away from the camera than the value of `far` or closer than `near` won't be rendered. You don't have to worry about this now, but you may want to use other values in your apps to get better performance.</p>
 
-		<p>Next up is the renderer. This is where the magic happens. In addition to the WebGLRenderer we use here, three.js comes with a few others, often used as fallbacks for users with older browsers or for those who don't have WebGL support for some reason.</p>
-
-		<p>In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our app - in this case, the width and height of the browser window. For performance intensive apps, you can also give `setSize` smaller values, like `window.innerWidth/2` and `window.innerHeight/2`, which will make the app render at quarter size.</p>
+		<p>Next up is the renderer. In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our app - in this case, the width and height of the browser window. For performance intensive apps, you can also give `setSize` smaller values, like `window.innerWidth/2` and `window.innerHeight/2`, which will make the app render at quarter size.</p>
 
 		<p>If you wish to keep the size of your app but render it at a lower resolution, you can do so by calling `setSize` with false as `updateStyle` (the third argument). For example, `setSize(window.innerWidth/2, window.innerHeight/2, false)` will render your app at half resolution, given that your &lt;canvas&gt; has 100% width and height.</p>
 
@@ -116,12 +99,14 @@
 		<h2>The result</h2>
 		<p>Congratulations! You have now completed your first three.js application. It's simple, but you have to start somewhere.</p>
 
-		<p>The full code is available below and as an editable [link:https://jsfiddle.net/fxurzeb4/ live example]. Play around with it to get a better understanding of how it works.</p>
+		<p>The full code is available below and as an editable [link:https://jsfiddle.net/0c1oqf38/ live example]. Play around with it to get a better understanding of how it works.</p>
+
+		<p><i>index.html —</i></p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
 		&lt;html&gt;
-			&lt;head&gt;
+			&lt;head lang="en"&gt;
 				&lt;meta charset="utf-8"&gt;
 				&lt;title&gt;My first three.js app&lt;/title&gt;
 				&lt;style&gt;
@@ -129,35 +114,40 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
-					const scene = new THREE.Scene();
-					const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
-					const renderer = new THREE.WebGLRenderer();
-					renderer.setSize( window.innerWidth, window.innerHeight );
-					document.body.appendChild( renderer.domElement );
-
-					const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-					const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-					const cube = new THREE.Mesh( geometry, material );
-					scene.add( cube );
-
-					camera.position.z = 5;
-
-					function animate() {
-						requestAnimationFrame( animate );
-
-						cube.rotation.x += 0.01;
-						cube.rotation.y += 0.01;
-
-						renderer.render( scene, camera );
-					};
-
-					animate();
-				&lt;/script&gt;
+				&lt;script type="module" src="/main.js"&gt;&lt;/script&gt;
 			&lt;/body&gt;
 		&lt;/html&gt;
+		</code>
+
+		<p><i>main.js —</i></p>
+
+		<code>
+		import * as THREE from 'three';
+
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
+
+		camera.position.z = 5;
+
+		function animate() {
+			requestAnimationFrame( animate );
+
+			cube.rotation.x += 0.01;
+			cube.rotation.y += 0.01;
+
+			renderer.render( scene, camera );
+		}
+
+		animate();
 		</code>
 	</body>
 </html>

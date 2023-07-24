@@ -76,6 +76,7 @@ body.rtl table {
 }
 body.rtl code {
 	direction: ltr !important;
+	text-align: initial;
 }
 
 a {
@@ -114,7 +115,8 @@ p,
 div,
 table,
 ol,
-ul {
+ul,
+summary {
 	margin-top: 16px;
 	margin-bottom: 16px;
 }

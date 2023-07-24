@@ -87,7 +87,7 @@ function buildInfo( renderTarget, options = {} ) {
 		HEIGHT = renderTarget.height,
 		TYPE = renderTarget.texture.type,
 		FORMAT = renderTarget.texture.format,
-		ENCODING = renderTarget.texture.encoding,
+		COLOR_SPACE = renderTarget.texture.colorSpace,
 		COMPRESSION = ( options.compression !== undefined ) ? options.compression : ZIP_COMPRESSION,
 		EXPORTER_TYPE = ( options.type !== undefined ) ? options.type : HalfFloatType,
 		OUT_TYPE = ( EXPORTER_TYPE === FloatType ) ? 2 : 1,
@@ -99,7 +99,7 @@ function buildInfo( renderTarget, options = {} ) {
 		height: HEIGHT,
 		type: TYPE,
 		format: FORMAT,
-		encoding: ENCODING,
+		colorSpace: COLOR_SPACE,
 		compression: COMPRESSION,
 		blockLines: COMPRESSION_SIZE,
 		dataType: OUT_TYPE,
@@ -266,13 +266,7 @@ function compressZIP( data, tmpBuffer ) {
 
 	}
 
-	if ( typeof fflate === 'undefined' ) {
-
-		console.error( 'THREE.EXRLoader: External \`fflate.module.js\` required' );
-
-	}
-
-	const deflate = fflate.zlibSync( tmpBuffer ); // eslint-disable-line no-undef
+	const deflate = fflate.zlibSync( tmpBuffer );
 
 	return deflate;
 

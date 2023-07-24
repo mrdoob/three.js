@@ -1292,6 +1292,31 @@ class MMDPhysicsHelper extends Object3D {
 
 	}
 
+
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+	 */
+	dispose() {
+
+		const materials = this.materials;
+		const children = this.children;
+
+		for ( let i = 0; i < materials.length; i ++ ) {
+
+			materials[ i ].dispose();
+
+		}
+
+		for ( let i = 0; i < children.length; i ++ ) {
+
+			const child = children[ i ];
+
+			if ( child.isMesh ) child.geometry.dispose();
+
+		}
+
+	}
+
 	/**
 	 * Updates Rigid Bodies visualization.
 	 */

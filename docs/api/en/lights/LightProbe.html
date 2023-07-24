@@ -12,21 +12,26 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Light probes are an alternative way of adding light to a 3D scene. Unlike classical light sources (e.g. directional,
-			point or spot lights), light probes do not emit light. Instead they store information about light passing through
-			3D space. During rendering, the light that hits a 3D object is approximated by using the data from the light probe.
+			Light probes are an alternative way of adding light to a 3D scene. Unlike
+			classical light sources (e.g. directional, point or spot lights), light
+			probes do not emit light. Instead they store information about light
+			passing through 3D space. During rendering, the light that hits a 3D
+			object is approximated by using the data from the light probe.
 		</p>
 
 		<p class="desc">
-			Light probes are usually created from (radiance) environment maps. The class [page:LightProbeGenerator] can
-			be used to create light probes from instances of [page:CubeTexture] or [page:WebGLCubeRenderTarget].
-			However, light estimation data could also be provided in other forms e.g. by WebXR. This enables the rendering
-			of augmented reality content that reacts to real world lighting.
+			Light probes are usually created from (radiance) environment maps. The
+			class [page:LightProbeGenerator] can be used to create light probes from
+			instances of [page:CubeTexture] or [page:WebGLCubeRenderTarget]. However,
+			light estimation data could also be provided in other forms e.g. by WebXR.
+			This enables the rendering of augmented reality content that reacts to
+			real world lighting.
 		</p>
 
 		<p class="desc">
-			The current probe implementation in three.js supports so-called diffuse light probes. This type of light probe
-			is functionally equivalent to an irradiance environment map.
+			The current probe implementation in three.js supports so-called diffuse
+			light probes. This type of light probe is functionally equivalent to an
+			irradiance environment map.
 		</p>
 
 		<h2>Examples</h2>
@@ -39,22 +44,23 @@
 
 		<h3>[name]( [param:SphericalHarmonics3 sh], [param:Float intensity] )</h3>
 		<p>
-		[page:SphericalHarmonics3 sh] - (optional) An instance of [page:SphericalHarmonics3].<br />
-		[page:Float intensity] - (optional) Numeric value of the light probe's intensity. Default is 1.<br /><br />
+			[page:SphericalHarmonics3 sh] - (optional) An instance of
+			[page:SphericalHarmonics3].<br />
+			[page:Float intensity] - (optional) Numeric value of the light probe's
+			intensity. Default is `1`.<br /><br />
 
-		Creates a new [name].
+			Creates a new [name].
 		</p>
 
 		<h2>Properties</h2>
 		<p>
-				See the base [page:Light Light] class for common properties. The [page:Light.color color] property is currently
-				not evaluated and thus has no effect.
+			See the base [page:Light Light] class for common properties. The
+			[page:Light.color color] property is currently not evaluated and thus has
+			no effect.
 		</p>
 
 		<h3>[property:Boolean isLightProbe]</h3>
-		<p>
-			Read-only flag to check if a given object is of type [name].
-		</p>
+		<p>Read-only flag to check if a given object is of type [name].</p>
 
 		<h3>[property:SphericalHarmonics3 sh]</h3>
 		<p>
@@ -62,9 +68,7 @@
 		</p>
 
 		<h2>Methods</h2>
-		<p>
-				See the base [page:Light Light] class for common methods.
-		</p>
+		<p>See the base [page:Light Light] class for common methods.</p>
 		<h2>Source</h2>
 
 		<p>

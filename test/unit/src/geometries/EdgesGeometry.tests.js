@@ -1,6 +1,7 @@
 /* global QUnit */
 
 import { EdgesGeometry } from '../../../../src/geometries/EdgesGeometry.js';
+
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
@@ -19,16 +20,16 @@ import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera.js'
 
 function testEdges( vertList, idxList, numAfter, assert ) {
 
-	var geoms = createGeometries( vertList, idxList );
+	const geoms = createGeometries( vertList, idxList );
 
-	for ( var i = 0; i < geoms.length; i ++ ) {
+	for ( let i = 0; i < geoms.length; i ++ ) {
 
-		var geom = geoms[ i ];
+		const geom = geoms[ i ];
 
-		var numBefore = idxList.length;
+		const numBefore = idxList.length;
 		assert.equal( countEdges( geom ), numBefore, 'Edges before!' );
 
-		var egeom = new EdgesGeometry( geom );
+		const egeom = new EdgesGeometry( geom );
 
 		assert.equal( countEdges( egeom ), numAfter, 'Edges after!' );
 		output( geom, egeom );
@@ -39,31 +40,31 @@ function testEdges( vertList, idxList, numAfter, assert ) {
 
 function createGeometries( vertList, idxList ) {
 
-	var geomIB = createIndexedBufferGeometry( vertList, idxList );
-	var geomDC = addDrawCalls( geomIB.clone() );
+	const geomIB = createIndexedBufferGeometry( vertList, idxList );
+	const geomDC = addDrawCalls( geomIB.clone() );
 	return [ geomIB, geomDC ];
 
 }
 
 function createIndexedBufferGeometry( vertList, idxList ) {
 
-	var geom = new BufferGeometry();
+	const geom = new BufferGeometry();
 
-	var indexTable = [];
-	var numTris = idxList.length / 3;
-	var numVerts = 0;
+	const indexTable = [];
+	const numTris = idxList.length / 3;
+	let numVerts = 0;
 
-	var indices = new Uint32Array( numTris * 3 );
-	var vertices = new Float32Array( vertList.length * 3 );
+	const indices = new Uint32Array( numTris * 3 );
+	let vertices = new Float32Array( vertList.length * 3 );
 
-	for ( var i = 0; i < numTris; i ++ ) {
+	for ( let i = 0; i < numTris; i ++ ) {
 
-		for ( var j = 0; j < 3; j ++ ) {
+		for ( let j = 0; j < 3; j ++ ) {
 
-			var idx = idxList[ 3 * i + j ];
+			const idx = idxList[ 3 * i + j ];
 			if ( indexTable[ idx ] === undefined ) {
 
-				var v = vertList[ idx ];
+				const v = vertList[ idx ];
 				vertices[ 3 * numVerts ] = v.x;
 				vertices[ 3 * numVerts + 1 ] = v.y;
 				vertices[ 3 * numVerts + 2 ] = v.z;
@@ -91,12 +92,12 @@ function createIndexedBufferGeometry( vertList, idxList ) {
 
 function addDrawCalls( geometry ) {
 
-	var numTris = geometry.index.count / 3;
+	const numTris = geometry.index.count / 3;
 
-	for ( var i = 0; i < numTris; i ++ ) {
+	for ( let i = 0; i < numTris; i ++ ) {
 
-		var start = i * 3;
-		var count = 3;
+		const start = i * 3;
+		const count = 3;
 
 		geometry.addGroup( start, count );
 
@@ -120,7 +121,7 @@ function countEdges( geom ) {
 
 	}
 
-	var indices = geom.index;
+	const indices = geom.index;
 	if ( indices ) {
 
 		return indices.count;
@@ -134,11 +135,11 @@ function countEdges( geom ) {
 //
 // DEBUGGING
 //
-var DEBUG = false;
-var renderer;
-var camera;
-var scene = new Scene();
-var xoffset = 0;
+const DEBUG = false;
+let renderer;
+let camera;
+const scene = new Scene();
+let xoffset = 0;
 
 function output( geom, egeom ) {
 
@@ -146,8 +147,8 @@ function output( geom, egeom ) {
 
 	if ( ! renderer ) initDebug();
 
-	var mesh = new Mesh( geom, undefined );
-	var edges = new LineSegments( egeom, new LineBasicMaterial( { color: 'black' } ) );
+	const mesh = new Mesh( geom, undefined );
+	const edges = new LineSegments( egeom, new LineBasicMaterial( { color: 'black' } ) );
 
 	mesh.position.setX( xoffset );
 	edges.position.setX( xoffset ++ );
@@ -170,8 +171,8 @@ function initDebug() {
 
 	} );
 
-	var width = 600;
-	var height = 480;
+	const width = 600;
+	const height = 480;
 
 	renderer.setSize( width, height );
 	renderer.setClearColor( 0xCCCCCC );
@@ -183,7 +184,7 @@ function initDebug() {
 
 	document.body.appendChild( renderer.domElement );
 
-	var controls = new THREE.OrbitControls( camera, renderer.domElement ); // TODO: please do somethings for that -_-'
+	const controls = new THREE.OrbitControls( camera, renderer.domElement ); // TODO: please do somethings for that -_-'
 	controls.target = new Vector3( 30, 0, 0 );
 
 	animate();
@@ -204,7 +205,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'EdgesGeometry', () => {
 
-		var vertList = [
+		const vertList = [
 			new Vector3( 0, 0, 0 ),
 			new Vector3( 1, 0, 0 ),
 			new Vector3( 1, 1, 0 ),
@@ -213,14 +214,36 @@ export default QUnit.module( 'Geometries', () => {
 		];
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new EdgesGeometry();
+			assert.strictEqual(
+				object instanceof BufferGeometry, true,
+				'EdgesGeometry extends from BufferGeometry'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new EdgesGeometry();
+			assert.ok( object, 'Can instantiate an EdgesGeometry.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new EdgesGeometry();
+			assert.ok(
+				object.type === 'EdgesGeometry',
+				'EdgesGeometry.type should be EdgesGeometry'
+			);
+
+		} );
+
+		QUnit.todo( 'parameters', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
@@ -247,7 +270,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'two isolated triangles', ( assert ) => {
 
-			var vertList = [
+			const vertList = [
 				new Vector3( 0, 0, 0 ),
 				new Vector3( 1, 0, 0 ),
 				new Vector3( 1, 1, 0 ),

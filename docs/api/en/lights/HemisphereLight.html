@@ -7,19 +7,17 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-        [page:Object3D] &rarr; [page:Light] &rarr;
+		[page:Object3D] &rarr; [page:Light] &rarr;
 
 		<h1>[name]</h1>
 
 		<p class="desc">
-			A light source positioned directly above the scene, with color fading from the
-			sky color to the ground color. <br /><br />
-
+			A light source positioned directly above the scene, with color fading from
+			the sky color to the ground color. <br /><br />
 			This light cannot be used to cast shadows.
 		</p>
 
 		<h2>Code Example</h2>
-
 		<code>
 		const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
 		scene.add( light );
@@ -36,43 +34,44 @@
 		</p>
 
 		<h2>Constructor</h2>
-		<h3>[name]( [param:Integer skyColor], [param:Integer groundColor], [param:Float intensity] )</h3>
-    <p>
-		[page:Integer skyColor] - (optional) hexadecimal color of the sky. Default is 0xffffff.<br />
-		[page:Integer groundColor] - (optional) hexadecimal color of the ground. Default is 0xffffff.<br />
-		[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br /><br />
+		<h3>
+			[name]( [param:Integer skyColor], [param:Integer groundColor],
+			[param:Float intensity] )
+		</h3>
+		<p>
+			[page:Integer skyColor] - (optional) hexadecimal color of the sky. Default
+			is 0xffffff.<br />
+			[page:Integer groundColor] - (optional) hexadecimal color of the ground.
+			Default is 0xffffff.<br />
+			[page:Float intensity] - (optional) numeric value of the light's
+			strength/intensity. Default is `1`.<br /><br />
 
-		Creates a new [name].
+			Creates a new [name].
 		</p>
 
 		<h2>Properties</h2>
-		<p>
-			See the base [page:Light Light] class for common properties.
-		</p>
+		<p>See the base [page:Light Light] class for common properties.</p>
 
 		<h3>[property:Float color]</h3>
 		<p>
-			The light's sky color, as passed in the constructor.
-			Default is a new [page:Color] set to white (0xffffff).
+			The light's sky color, as passed in the constructor. Default is a new
+			[page:Color] set to white (0xffffff).
 		</p>
 
 		<h3>[property:Float groundColor]</h3>
 		<p>
-			The light's ground color, as passed in the constructor.
-			Default is a new [page:Color] set to white (0xffffff).
+			The light's ground color, as passed in the constructor. Default is a new
+			[page:Color] set to white (0xffffff).
 		</p>
 
 		<h3>[property:Boolean isHemisphereLight]</h3>
-		<p>
-			Read-only flag to check if a given object is of type [name].
-		</p>
+		<p>Read-only flag to check if a given object is of type [name].</p>
 
 		<h3>[property:Vector3 position]</h3>
 		<p>
-			This is set equal to [page:Object3D.DefaultUp] (0, 1, 0), so that the light shines from the top down.
+			This is set equal to [page:Object3D.DEFAULT_UP] (0, 1, 0), so that the
+			light shines from the top down.
 		</p>
-
-
 
 		<h2>Methods</h2>
 
@@ -81,7 +80,8 @@
 		<h3>[method:this copy]( [param:HemisphereLight source] )</h3>
 		<p>
 			Copies the value of [page:.color color], [page:.intensity intensity] and
-			[page:.groundColor groundColor] from the [page:Light source] light into this one.
+			[page:.groundColor groundColor] from the [page:Light source] light into
+			this one.
 		</p>
 
 		<h2>Source</h2>

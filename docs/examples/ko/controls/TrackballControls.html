@@ -18,6 +18,17 @@
 			</p>
 		</p>
 
+		<h2>수입</h2>
+
+		<p>
+			[name] 는 애드온이며 명시적으로 가져와야 합니다.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+		</code>
+
 		<h2>예시</h2>
 
 		<p>[example:misc_controls_trackball misc / controls / trackball ]</p>
@@ -84,12 +95,22 @@
 
 		<h3>[property:Number maxDistance]</h3>
 		<p>
-			축소할 수 있는 범위를 설정합니다. 기본값은 *무한대* 입니다.
+			축소할 수 있는 범위를 설정합니다. ([page:PerspectiveCamera] only). 기본값은 *무한대* 입니다.
 		</p>
 
 		<h3>[property:Number minDistance]</h3>
 		<p>
-			확대할 수 있는 범위를 설정합니다. 기본값은 *0* 입니다.
+			확대할 수 있는 범위를 설정합니다. ([page:PerspectiveCamera] only). 기본값은 *0* 입니다.
+		</p>
+
+		<h3>[property:Float maxZoom]</h3>
+		<p>
+			축소 할 수 있는 범위를 설정합니다. ( [page:OrthographicCamera] only ). 기본값은 *무한대* 입니다.
+		</p>
+
+		<h3>[property:Float minZoom]</h3>
+		<p>
+			확대 할 수 있는 범위를 설정합니다. ( [page:OrthographicCamera] only ). 기본값은 *0* 입니다.
 		</p>
 
 		<h3>

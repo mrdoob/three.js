@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">Una sfera definita da un centro e un raggio.</p>
+
+		<h2>Costruttore</h2>
+		<h3>[name]( [param:Vector3 center], [param:Float radius] )</h3>
+		<p>
+		[page:Vector3 center] - centro della sfera. Il valore predefinito è un [page:Vector3] a `(0, 0, 0)`. <br />
+		[page:Float radius] - raggio della sfera. Il valore predefinito è -1.<br /><br />
+
+		Crea una nuova [name].
+
+		</p>
+
+
+		<h2>Proprietà</h2>
+
+
+		<h3>[property:Vector3 center]</h3>
+		<p>Un [page:Vector3] che definisce il centro della sfera. Il valore predefinito è `(0, 0, 0)`.</p>
+
+		<h3>[property:Float radius]</h3>
+		<p>Il raggio della sfera. Il valore predefinito è -1.</p>
+
+		<h2>Metodi</h2>
+
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<p>
+			[page:Matrix4 matrix] - [Page:Matrix4] da applicare. <br /><br />
+
+			Trasforma questa sfera con la [page:Matrix4] fornita.
+		</p>
+
+		<h3>[method:Vector3 clampPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] Il punto da bloccare.<br />
+		[page:Vector3 target] — Il risultato verrà copiato in questo Vector3.<br /><br />
+
+		Blocca un punto all'interno della sfera. Se il punto è fuori dalla sfera, lo bloccherà al punto 
+		più vicino sul bordo della sfera. I punti già all'interno della sfera non saranno influenzati.
+		</p>
+
+		<h3>[method:Sphere clone]()</h3>
+		<p>Restituisce un nuova sfera con lo stesso [page:.center centro] e [page:.radius raggio] di questa.</p>
+
+		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - il [page:Vector3] da controllare.<br /><br />
+
+		Controlla se la sfera contiene il [page:Vector3 punto] fornito comprensivo della superficie della sfera.
+		</p>
+
+		<h3>[method:this copy]( [param:Sphere sphere] )</h3>
+		<p>
+			Copia i valori delle proprietà [page:.center centro] e [page:.radius raggio] della sfera passata 
+			in questa sfera.
+		</p>
+
+		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
+		<p>
+			Restituisce la distanza più vicina dal confine della sfera al [page:Vector3 punto]. Se la sfera contiene il punto, 
+			la distanza sarà negativa.
+		</p>
+
+		<h3>[method:this expandByPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] che da includere nella sfera.<br /><br />
+
+		Espande i confini della sfera per includere il [page:Vector3 punto].
+		</p>
+
+		<h3>[method:Boolean isEmpty]()</h3>
+		<p>
+			Controlla se la sfera è vuota (il raggio impostato ad un numero negativo).</br>
+			Le sfere con un raggio di 0 contengono solo il loro punto centrale e non sono considerate vuote.
+		</p>
+
+		<h3>[method:this makeEmpty]()</h3>
+		<p>Rende la sfera vuota impostando il [page:.center centro] a (0, 0, 0) e il [page:.radius raggio] a -1.</p>
+
+		<h3>[method:Boolean equals]( [param:Sphere sphere] )</h3>
+		<p>
+			Controlla se i due centri e i due raggi sono uguali.
+		</p>
+
+		<h3>[method:Box3 getBoundingBox]( [param:Box3 target] )</h3>
+		<p>
+		[page:Box3 target] — Il risultato verrà copiato in questo Box3.<br /><br />
+
+		Restituisce un [link:https://en.wikipedia.org/wiki/Minimum_bounding_box Minimum Bounding Box] per la sfera.
+		</p>
+
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - [page:Box3] per verificare la presenza di intersezioni.<br /><br />
+		
+		Determina se questa sfera interseca il [page:Box3 box] dato oppure no.
+		</p>
+
+		<h3>[method:Boolean intersectsPlane]( [param:Plane plane] )</h3>
+		<p>
+		[page:Plane plane] - Plane per verificare la presenza di intersezioni.<br /><br />
+
+		Determina se questa sfera interseca il [page:Plane plane] dato oppure no.
+		</p>
+
+		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
+		<p>
+		[page:Sphere sphere] - Sphere per verificare la presenza di intersezioni.<br /><br />
+
+		Verifica se le due sfere si intersecano.
+		</p>
+
+		<h3>[method:this set]( [param:Vector3 center], [param:Float radius] )</h3>
+		<p>
+			[page:Vector3 center] - centro della sfera.<br />
+			[page:Float radius] - raggio della sfera.<br /><br />
+
+			Imposta le proprietà [page:.center centro] e [page:.radius raggio] di questa sfera.<br>
+			Si noti che questo metodo copia solo i valori per il centro dato.
+		</p>
+
+		<h3>[method:this setFromPoints]( [param:Array points], [param:Vector3 optionalCenter] )</h3>
+		<p>
+		[page:Array points] - un [page:Array] di posizioni [page:Vector3].<br />
+		[page:Vector3 optionalCenter] - Posizione [page:Vector3] opzionale per il centro della sfera.<br /><br />
+
+		Calcola la sfera di delimitazione minima per un array di [page:Array punti]. Se viene fornito l'[page:Vector3 optionalCenter],
+		viene utilizzato con il centro della sfera. Altrimenti, viene calcolato il centro del rettangolo di selezione allineato
+		agli assi che comprende i [page:Array punti].
+		</p>
+
+		<h3>[method:this translate]( [param:Vector3 offset] )</h3>
+		<p>
+			Trasla il centro della sfera dell'offset [page:Vector3] fornito.
+		</p>
+
+		<h3>[method:this union]( [param:Sphere sphere] )</h3>
+		<p>
+		[page:Sphere sphere] - Sfera di delimitazione che sarà unita a questa sfera.<br /><br />
+
+		Espande questa sfera per racchiudere sia la sfera originale che quella data.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

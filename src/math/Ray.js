@@ -38,7 +38,7 @@ class Ray {
 
 	at( t, target ) {
 
-		return target.copy( this.direction ).multiplyScalar( t ).add( this.origin );
+		return target.copy( this.origin ).addScaledVector( this.direction, t );
 
 	}
 
@@ -70,7 +70,7 @@ class Ray {
 
 		}
 
-		return target.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+		return target.copy( this.origin ).addScaledVector( this.direction, directionDistance );
 
 	}
 
@@ -92,7 +92,7 @@ class Ray {
 
 		}
 
-		_vector.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+		_vector.copy( this.origin ).addScaledVector( this.direction, directionDistance );
 
 		return _vector.distanceToSquared( point );
 
@@ -203,13 +203,13 @@ class Ray {
 
 		if ( optionalPointOnRay ) {
 
-			optionalPointOnRay.copy( this.direction ).multiplyScalar( s0 ).add( this.origin );
+			optionalPointOnRay.copy( this.origin ).addScaledVector( this.direction, s0 );
 
 		}
 
 		if ( optionalPointOnSegment ) {
 
-			optionalPointOnSegment.copy( _segDir ).multiplyScalar( s1 ).add( _segCenter );
+			optionalPointOnSegment.copy( _segCenter ).addScaledVector( _segDir, s1 );
 
 		}
 
@@ -234,8 +234,8 @@ class Ray {
 		// t1 = second intersect point - exit point on back of sphere
 		const t1 = tca + thc;
 
-		// test to see if both t0 and t1 are behind the ray - if so, return null
-		if ( t0 < 0 && t1 < 0 ) return null;
+		// test to see if t1 is behind the ray - if so, return null
+		if ( t1 < 0 ) return null;
 
 		// test to see if t0 is behind the ray:
 		// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
@@ -356,12 +356,9 @@ class Ray {
 
 		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return null;
 
-		// These lines also handle the case where tmin or tmax is NaN
-		// (result of 0 * Infinity). x !== x returns true if x is NaN
+		if ( tymin > tmin || isNaN( tmin ) ) tmin = tymin;
 
-		if ( tymin > tmin || tmin !== tmin ) tmin = tymin;
-
-		if ( tymax < tmax || tmax !== tmax ) tmax = tymax;
+		if ( tymax < tmax || isNaN( tmax ) ) tmax = tymax;
 
 		if ( invdirz >= 0 ) {
 

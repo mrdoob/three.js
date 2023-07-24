@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Questa luce illumina globalmente tutti gli oggetti nella scena allo stesso modo.<br /><br />
+
+      Questa luce non può essere utilizzata per proiettare ombre in quanto non ha una direzione.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const light = new THREE.AmbientLight( 0x404040 ); // soft white light
+		scene.add( light );
+		</code>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Integer color], [param:Float intensity] )</h3>
+		<p>
+		[page:Integer color] - (opzionale) Valore numerico della componente RGB del colore. Il valore predefinito è 0xffffff.<br />
+		[page:Float intensity] - (opzionale) Valore numerico della forza/intensità della luce. Il valore predefinito è 1.<br /><br />
+
+    Crea una nuova [name].
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>
+      Vedi la classe base [page:Light Light] per le proprietà comuni.
+		</p>
+
+		<h3>[property:Boolean isAmbientLight]</h3>
+		<p>
+      Flag di sola lettura per verificare se l'oggetto dato è del tipo [name].
+		</p>
+
+
+		<h2>Metodi</h2>
+		<p>
+      Vedi la classe base [page:Light Light] per i metodi comuni.
+		</p>
+    
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

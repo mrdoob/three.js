@@ -12,10 +12,21 @@
 		<p class="desc">
 		An exporter for `Collada`.
 		<br /><br />
-		<a href="https://www.khronos.org/collada/" target="_blank">Collada</a> is a
+		[link:https://www.khronos.org/collada/ Collada] is a
 		file format for robust representation of scenes, materials, animations, and other 3D content in an xml format.
 		This exporter only supports exporting geometry, materials, textures, and scene hierarchy.
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { ColladaExporter } from 'three/addons/exporters/ColladaExporter.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -23,7 +34,7 @@
 		// Instantiate an exporter
 		const exporter = new ColladaExporter();
 
-		// Parse the input and generate the ply output
+		// Parse the input and generate the collada ( .dae ) output
 		const data = exporter.parse( scene, null, options );
 		downloadFile( data );
 		</code>
@@ -44,6 +55,7 @@
 		[page:Object input] — Object3D to be exported<br />
 		[page:Function onCompleted] — Will be called when the export completes. Optional. The same data is immediately returned from the function.<br />
 		[page:Options options] — Export options<br />
+		</p>
 		<ul>
 			<li>version - string. Which version of Collada to export. The options are "1.4.1" or "1.5.0". Defaults to "1.4.1".</li>
 			<li>author - string. The name to include in the author field. Author field is excluded by default.</li>
@@ -52,7 +64,6 @@
 			<li>unitName - string. Name of the unit. Can be any string, but could be for example "meter", "inch", or "parsec".</li>
 			<li>unitMeter - number. Length of the unit in meters.</li>
 		</ul>
-		</p>
 		<p>
 		Generates an object with Collada file and texture data. This object is returned from the function and passed into the "onCompleted" callback.
 		<code>

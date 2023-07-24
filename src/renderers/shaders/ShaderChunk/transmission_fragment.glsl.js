@@ -9,13 +9,13 @@ export default /* glsl */`
 
 	#ifdef USE_TRANSMISSIONMAP
 
-		material.transmission *= texture2D( transmissionMap, vUv ).r;
+		material.transmission *= texture2D( transmissionMap, vTransmissionMapUv ).r;
 
 	#endif
 
 	#ifdef USE_THICKNESSMAP
 
-		material.thickness *= texture2D( thicknessMap, vUv ).g;
+		material.thickness *= texture2D( thicknessMap, vThicknessMapUv ).g;
 
 	#endif
 
@@ -23,14 +23,14 @@ export default /* glsl */`
 	vec3 v = normalize( cameraPosition - pos );
 	vec3 n = inverseTransformDirection( normal, viewMatrix );
 
-	vec4 transmission = getIBLVolumeRefraction(
+	vec4 transmitted = getIBLVolumeRefraction(
 		n, v, material.roughness, material.diffuseColor, material.specularColor, material.specularF90,
 		pos, modelMatrix, viewMatrix, projectionMatrix, material.ior, material.thickness,
 		material.attenuationColor, material.attenuationDistance );
 
-	material.transmissionAlpha = mix( material.transmissionAlpha, transmission.a, material.transmission );
+	material.transmissionAlpha = mix( material.transmissionAlpha, transmitted.a, material.transmission );
 
-	totalDiffuse = mix( totalDiffuse, transmission.rgb, material.transmission );
+	totalDiffuse = mix( totalDiffuse, transmitted.rgb, material.transmission );
 
 #endif
 `;

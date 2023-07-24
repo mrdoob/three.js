@@ -14,34 +14,29 @@
 		<h2>Functions</h2>
 
 		<h3>[method:String decodeText]( [param:TypedArray array] )</h3>
+		<p>[page:TypedArray array] — A stream of bytes as a typed array.</p>
 		<p>
-		[page:TypedArray array] —  A stream of bytes as a typed array.
-		</p>
-		<p>
-		The function takes a stream of bytes as input and returns a string representation.
+			The function takes a stream of bytes as input and returns a string
+			representation.
 		</p>
 
 		<h3>[method:String extractUrlBase]( [param:String url] )</h3>
-		<p>
-		[page:String url] —  The url to extract the base url from.
-		</p>
-		<p>
-		Extract the base from the URL.
-		</p>
+		<p>[page:String url] — The url to extract the base url from.</p>
+		<p>Extract the base from the URL.</p>
 
-
-		<h3>[method:String resolveURL]( [param:String url], [param:String path]  )</h3>
+		<h3>
+			[method:String resolveURL]( [param:String url], [param:String path] )
+		</h3>
 		<p>
-		[page:String url] —  The absolute or relative url resolve.
-		[page:String path] —  The base path for relative urls to be resolved against.
+			[page:String url] — The absolute or relative url resolve. [page:String path] — The base path for relative urls to be resolved against.
 		</p>
 		<p>
-		Resolves relative urls against the given path. Absolute paths, data urls, and blob urls will be returned as is. Invalid urls will return an empty string.
+			Resolves relative urls against the given path. Absolute paths, data urls,
+			and blob urls will be returned as is. Invalid urls will return an empty
+			string.
 		</p>
-
 
 		<h2>Source</h2>
-
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 		</p>

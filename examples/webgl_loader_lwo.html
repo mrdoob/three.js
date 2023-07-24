@@ -12,17 +12,18 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - LWOLoader
 			<P>Lightwave Object loader by <a href="https://discoverthreejs.com/" target="_blank" rel="noopener">Discover three.js</a></P>
-			Models by <a href="https://onthez.com/" target="_blank" rel="noopener">on the z</a> - Environment images by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			Models by <a href="https://onthez.com/" target="_blank" rel="noopener">on the z</a> - Environment images from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -31,8 +32,8 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { LWOLoader } from './jsm/loaders/LWOLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { LWOLoader } from 'three/addons/loaders/LWOLoader.js';
 
 			let camera, scene, renderer;
 
@@ -49,10 +50,10 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
 
-				const ambientLight = new THREE.AmbientLight( 0x222222 );
+				const ambientLight = new THREE.AmbientLight( 0xbbbbbb );
 				scene.add( ambientLight );
 
-				const light1 = new THREE.DirectionalLight( 0x888888 );
+				const light1 = new THREE.DirectionalLight( 0xc1c1c1, 3 );
 				light1.position.set( 0, 200, 100 );
 				scene.add( light1 );
 
@@ -81,7 +82,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animation );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 

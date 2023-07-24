@@ -15,6 +15,17 @@
 			Renders a sphere to visualize a light probe in the scene.
 		<p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { LightProbeHelper } from 'three/addons/helpers/LightProbeHelper.js';
+		</code>
+
 		<h2>Code Example</h2>
 
 		<code>
@@ -48,7 +59,9 @@
 		<p>See the base [page:Mesh] class for common methods.</p>
 
 		<h3>[method:undefined dispose]()</h3>
-		<p>Frees internal resources.</p>
+		<p>
+		Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+		</p>
 
 
 		<h2>Source</h2>

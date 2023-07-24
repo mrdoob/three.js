@@ -36,62 +36,72 @@
 
 		<h2>构造器（Constructor）</h2>
 
-		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Number distance], [param:Float decay] )</h3>
+		<h3>[name]( [param:Color color], [param:Float intensity], [param:Number distance], [param:Float decay] )</h3>
 		<p>
-			[page:Integer color] - (可选参数)) 十六进制光照颜色。 缺省值 0xffffff (白色)。<br />
-			[page:Float intensity] - (可选参数) 光照强度。 缺省值 1。 <br /><br />
-			[page:Number distance] - 这个距离表示从光源到光照强度为0的位置。
-			当设置为0时，光永远不会消失(距离无穷大)。缺省值 0.<br />
-			[page:Float decay] - 沿着光照距离的衰退量。缺省值 1。
-
-			在 [page:WebGLRenderer.physicallyCorrectLights physically correct] 模式中，decay = 2。<br /><br />
+			[page:Color color] -（可选）一个表示颜色的 Color 的实例、字符串或数字，默认为一个白色（0xffffff）的 [page:Color Color] 对象。<br />
+			[page:Float intensity] -（可选）光照强度。默认值为 1。<br />
+			[page:Number distance] - 光源照射的最大距离。默认值为 0（无限远）。<br />
+			[page:Float decay] - 沿着光照距离的衰退量。默认值为 2。<br /><br />
 
 			创建一个新的点光源（PointLight）。
 		</p>
 
 		<h2>属性（Properties）</h2>
 		<p>
-			公共属性请查看基类[page:Light Light]。
+			公共属性请查看基类 [page:Light Light]。
+		</p>
+
+		<h3>[property:Boolean castShadow]</h3>
+		<p>
+			此属性设置为 `true` 灯光将投射阴影。*注意*：这样做的代价比较高，需要通过调整让阴影看起来正确。
+			查看 [page:PointLightShadow] 了解详细信息。
+			默认值为 `false`。
 		</p>
 
 		<h3>[property:Float decay]</h3>
 		<p>
-			沿着光照距离的衰减量<br />
-			在 [page:WebGLRenderer.physicallyCorrectLights physically correct] 模式下，decay 设置为等于2将实现现实世界的光衰减。<br/>
-			缺省值为 *1*。
+			光线随着距离增加变暗的衰减量。默认值为 `2`。<br />
+			在物理正确渲染的上下文中，不应更改默认值。
 		</p>
 
 		<h3>[property:Float distance]</h3>
 		<p>
-			如果非零，那么光强度将会从最大值当前灯光位置处按照距离线性衰减到0。
-			缺省值为 *0.0*。
+			当值为零时，光线将根据平方反比定律衰减到无限远。
+			当值不为零时，光线会先按照平方反比定律衰减，直到距离截止点附近，然后线性衰减到 0。
+		</p>
+		<p>默认值为 `0.0`。</p>
+
+		<h3>[property:Float intensity]</h3>
+		<p>
+			光源的强度。默认值为 `1`。<br />
+			单位是坎德拉（cd）。<br /><br />
+			改变该值会影响到 `power` 的值。
 		</p>
 
 		<h3>[property:Float power]</h3>
 		<p>
-			光功率<br />
-			在 [page:WebGLRenderer.physicallyCorrectLights physically correct] 模式中,
-			表示以"流明（光通量单位）"为单位的光功率。 缺省值 - *4Math.PI*。 <br /><br />
-
-			该值与 [page:.intensity intensity] 直接关联
-			<code>
-				power = intensity * 4&pi;
-			</code>
-			修改该值也会导致光强度的改变。
+			光源的功率。<br />
+			单位为流明（lm）。<br /><br />
+			改变该值会影响到 `intensity` 的值。
 		</p>
 
 		<h3>[property:PointLightShadow shadow]</h3>
 		<p>
-			[page:PointLightShadow]用与计算此光照的阴影。<br /><br />
+			[page:PointLightShadow] 对象，用与计算此光照的阴影。<br /><br />
 
-			此对象的摄像机被设置为 [page:PerspectiveCamera.fov fov] 为90度，[page:PerspectiveCamera.aspect aspect]为1，
-			近裁剪面 [page:PerspectiveCamera.near near] 为0，远裁剪面[page:PerspectiveCamera.far far]
-			为500的透视摄像机 [page:PerspectiveCamera]。
+			此对象的摄像机为：一个 [page:PerspectiveCamera.fov fov] 值为90度、[page:PerspectiveCamera.aspect aspect] 值为 1、
+			[page:PerspectiveCamera.near near] 值为 0、[page:PerspectiveCamera.far far]
+			值为 500 的透视摄像机（[page:PerspectiveCamera]）。
 		</p>
 
 		<h2>方法（Methods）</h2>
 		<p>
 			公共方法请查看基类 [page:Light Light]。
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			释放由该实例分配的 GPU 相关资源。 当这个实例不再在你的应用中使用时，调用这个方法。
 		</p>
 
 		<h3>[method:this copy]( [param:PointLight source] )</h3>

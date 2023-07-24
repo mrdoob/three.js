@@ -299,7 +299,7 @@ class GPUComputationRenderer {
 
 				const variable = variables[ i ];
 
-				variable.initialValueTexture?.dispose();
+				if ( variable.initialValueTexture ) variable.initialValueTexture.dispose();
 
 				const renderTargets = variable.renderTargets;
 
@@ -330,6 +330,7 @@ class GPUComputationRenderer {
 			uniforms = uniforms || {};
 
 			const material = new ShaderMaterial( {
+				name: 'GPUComputationShader',
 				uniforms: uniforms,
 				vertexShader: getPassThroughVertexShader(),
 				fragmentShader: computeFragmentShader
@@ -395,10 +396,18 @@ class GPUComputationRenderer {
 
 			const currentRenderTarget = renderer.getRenderTarget();
 
+			const currentXrEnabled = renderer.xr.enabled;
+			const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+
+			renderer.xr.enabled = false; // Avoid camera modification
+			renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 			mesh.material = material;
 			renderer.setRenderTarget( output );
 			renderer.render( scene, camera );
 			mesh.material = passThruShader;
+
+			renderer.xr.enabled = currentXrEnabled;
+			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 
 			renderer.setRenderTarget( currentRenderTarget );
 

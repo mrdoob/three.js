@@ -7,8 +7,9 @@ import {
 	RGIntegerFormat,
 	RedFormat,
 	RedIntegerFormat,
-	LinearEncoding,
-	sRGBEncoding,
+	NoColorSpace,
+	LinearSRGBColorSpace,
+	SRGBColorSpace,
 	DataTexture,
 	REVISION,
 } from 'three';
@@ -22,6 +23,7 @@ import {
 	KHR_DF_CHANNEL_RGBSDA_RED,
 	KHR_DF_MODEL_RGBSDA,
 	KHR_DF_PRIMARIES_BT709,
+	KHR_DF_PRIMARIES_UNSPECIFIED,
 	KHR_DF_SAMPLE_DATATYPE_FLOAT,
 	KHR_DF_SAMPLE_DATATYPE_LINEAR,
 	KHR_DF_SAMPLE_DATATYPE_SIGNED,
@@ -45,40 +47,49 @@ const VK_FORMAT_MAP = {
 
 	[ RGBAFormat ]: {
 		[ FloatType ]: {
-			[ LinearEncoding ]: VK_FORMAT_R32G32B32A32_SFLOAT,
+			[ NoColorSpace ]: VK_FORMAT_R32G32B32A32_SFLOAT,
+			[ LinearSRGBColorSpace ]: VK_FORMAT_R32G32B32A32_SFLOAT,
 		},
 		[ HalfFloatType ]: {
-			[ LinearEncoding ]: VK_FORMAT_R16G16B16A16_SFLOAT,
+			[ NoColorSpace ]: VK_FORMAT_R16G16B16A16_SFLOAT,
+			[ LinearSRGBColorSpace ]: VK_FORMAT_R16G16B16A16_SFLOAT,
 		},
 		[ UnsignedByteType ]: {
-			[ LinearEncoding ]: VK_FORMAT_R8G8B8A8_UNORM,
-			[ sRGBEncoding ]: VK_FORMAT_R8G8B8A8_SRGB,
+			[ NoColorSpace ]: VK_FORMAT_R8G8B8A8_UNORM,
+			[ LinearSRGBColorSpace ]: VK_FORMAT_R8G8B8A8_UNORM,
+			[ SRGBColorSpace ]: VK_FORMAT_R8G8B8A8_SRGB,
 		},
 	},
 
 	[ RGFormat ]: {
 		[ FloatType ]: {
-			[ LinearEncoding ]: VK_FORMAT_R32G32_SFLOAT,
+			[ NoColorSpace ]: VK_FORMAT_R32G32_SFLOAT,
+			[ LinearSRGBColorSpace ]: VK_FORMAT_R32G32_SFLOAT,
 		},
 		[ HalfFloatType ]: {
-			[ LinearEncoding ]: VK_FORMAT_R16G16_SFLOAT,
+			[ NoColorSpace ]: VK_FORMAT_R16G16_SFLOAT,
+			[ LinearSRGBColorSpace ]: VK_FORMAT_R16G16_SFLOAT,
 		},
 		[ UnsignedByteType ]: {
-			[ LinearEncoding ]: VK_FORMAT_R8G8_UNORM,
-			[ sRGBEncoding ]: VK_FORMAT_R8G8_SRGB,
+			[ NoColorSpace ]: VK_FORMAT_R8G8_UNORM,
+			[ LinearSRGBColorSpace ]: VK_FORMAT_R8G8_UNORM,
+			[ SRGBColorSpace ]: VK_FORMAT_R8G8_SRGB,
 		},
 	},
 
 	[ RedFormat ]: {
 		[ FloatType ]: {
-			[ LinearEncoding ]: VK_FORMAT_R32_SFLOAT,
+			[ NoColorSpace ]: VK_FORMAT_R32_SFLOAT,
+			[ LinearSRGBColorSpace ]: VK_FORMAT_R32_SFLOAT,
 		},
 		[ HalfFloatType ]: {
-			[ LinearEncoding ]: VK_FORMAT_R16_SFLOAT,
+			[ NoColorSpace ]: VK_FORMAT_R16_SFLOAT,
+			[ LinearSRGBColorSpace ]: VK_FORMAT_R16_SFLOAT,
 		},
 		[ UnsignedByteType ]: {
-			[ LinearEncoding ]: VK_FORMAT_R8_SRGB,
-			[ sRGBEncoding ]: VK_FORMAT_R8_UNORM,
+			[ NoColorSpace ]: VK_FORMAT_R8_UNORM,
+			[ LinearSRGBColorSpace ]: VK_FORMAT_R8_UNORM,
+			[ SRGBColorSpace ]: VK_FORMAT_R8_SRGB,
 		},
 	},
 
@@ -96,7 +107,7 @@ const KHR_DF_CHANNEL_MAP = {
 const ERROR_INPUT = 'THREE.KTX2Exporter: Supported inputs are DataTexture, Data3DTexture, or WebGLRenderer and WebGLRenderTarget.';
 const ERROR_FORMAT = 'THREE.KTX2Exporter: Supported formats are RGBAFormat, RGFormat, or RedFormat.';
 const ERROR_TYPE = 'THREE.KTX2Exporter: Supported types are FloatType, HalfFloatType, or UnsignedByteType."';
-const ERROR_ENCODING = 'THREE.KTX2Exporter: Supported encodings are sRGB (UnsignedByteType only) or Linear.';
+const ERROR_COLOR_SPACE = 'THREE.KTX2Exporter: Supported color spaces are SRGBColorSpace (UnsignedByteType only), LinearSRGBColorSpace, or NoColorSpace.';
 
 export class KTX2Exporter {
 
@@ -130,9 +141,9 @@ export class KTX2Exporter {
 
 		}
 
-		if ( VK_FORMAT_MAP[ texture.format ][ texture.type ][ texture.encoding ] === undefined ) {
+		if ( VK_FORMAT_MAP[ texture.format ][ texture.type ][ texture.colorSpace ] === undefined ) {
 
-			throw new Error( ERROR_ENCODING );
+			throw new Error( ERROR_COLOR_SPACE );
 
 		}
 
@@ -142,7 +153,7 @@ export class KTX2Exporter {
 		const channelCount = getChannelCount( texture );
 		const container = new KTX2Container();
 
-		container.vkFormat = VK_FORMAT_MAP[ texture.format ][ texture.type ][ texture.encoding ];
+		container.vkFormat = VK_FORMAT_MAP[ texture.format ][ texture.type ][ texture.colorSpace ];
 		container.typeSize = array.BYTES_PER_ELEMENT;
 		container.pixelWidth = texture.image.width;
 		container.pixelHeight = texture.image.height;
@@ -157,11 +168,11 @@ export class KTX2Exporter {
 
 		const basicDesc = container.dataFormatDescriptor[ 0 ];
 
-		// TODO: After `texture.encoding` is replaced, distinguish between
-		// non-color data (unspecified model and primaries) and sRGB or Linear-sRGB colors.
 		basicDesc.colorModel = KHR_DF_MODEL_RGBSDA;
-		basicDesc.colorPrimaries = KHR_DF_PRIMARIES_BT709;
-		basicDesc.transferFunction = texture.encoding === sRGBEncoding
+		basicDesc.colorPrimaries = texture.colorSpace === NoColorSpace
+			? KHR_DF_PRIMARIES_UNSPECIFIED
+			: KHR_DF_PRIMARIES_BT709;
+		basicDesc.transferFunction = texture.colorSpace === SRGBColorSpace
 			? KHR_DF_TRANSFER_SRGB
 			: KHR_DF_TRANSFER_LINEAR;
 
@@ -177,7 +188,7 @@ export class KTX2Exporter {
 
 			let channelType = KHR_DF_CHANNEL_MAP[ i ];
 
-			if ( texture.encoding === LinearEncoding ) {
+			if ( texture.colorSpace === LinearSRGBColorSpace || texture.colorSpace === NoColorSpace ) {
 
 				channelType |= KHR_DF_SAMPLE_DATATYPE_LINEAR;
 

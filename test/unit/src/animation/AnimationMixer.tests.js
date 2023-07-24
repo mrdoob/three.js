@@ -1,10 +1,12 @@
 /* global QUnit */
 
 import { AnimationMixer } from '../../../../src/animation/AnimationMixer.js';
+
+import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
 import { AnimationClip } from '../../../../src/animation/AnimationClip.js';
 import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyframeTrack.js';
 import { Object3D } from '../../../../src/core/Object3D.js';
-import { zero3, one3, two3 } from '../math/Constants.tests.js';
+import { zero3, one3, two3 } from '../../utils/math-constants.js';
 
 function getClips( pos1, pos2, scale1, scale2, dur ) {
 
@@ -25,20 +27,38 @@ export default QUnit.module( 'Animation', () => {
 	QUnit.module( 'AnimationMixer', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new AnimationMixer();
+			assert.strictEqual(
+				object instanceof EventDispatcher, true,
+				'AnimationMixer extends from EventDispatcher'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new AnimationMixer();
+			assert.ok( object, 'Can instantiate a AnimationMixer.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.todo( 'time', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// PUBLIC STUFF
+		QUnit.todo( 'timeScale', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
 		QUnit.todo( 'clipAction', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
@@ -84,6 +104,12 @@ export default QUnit.module( 'Animation', () => {
 		} );
 
 		QUnit.todo( 'update', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setTime', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

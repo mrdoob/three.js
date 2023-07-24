@@ -13,12 +13,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -39,6 +40,7 @@
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( imageBitmap ) {
 
 						const texture = new THREE.CanvasTexture( imageBitmap );
+						texture.colorSpace = THREE.SRGBColorSpace;
 						const material = new THREE.MeshBasicMaterial( { map: texture } );
 
 						/* ImageBitmap should be disposed when done with it
@@ -67,6 +69,7 @@
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( image ) {
 
 						const texture = new THREE.CanvasTexture( image );
+						texture.colorSpace = THREE.SRGBColorSpace;
 						const material = new THREE.MeshBasicMaterial( { color: 0xff8888, map: texture } );
 						addCube( material );
 
@@ -74,7 +77,7 @@
 
 			}
 
-			const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+			const geometry = new THREE.BoxGeometry();
 
 			function addCube( material ) {
 

@@ -35,12 +35,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -49,11 +50,11 @@
 
 			import * as THREE from 'three';
 
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { CopyShader } from './jsm/shaders/CopyShader.js';
-			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { ColorCorrectionShader } from 'three/addons/shaders/ColorCorrectionShader.js';
+			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 
 			let camera, scene, renderer, clock, group, container;
 
@@ -70,16 +71,16 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
-			
+
 				clock = new THREE.Clock();
 
 				//
 
-				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 3 );
 				hemiLight.position.set( 0, 1000, 0 );
 				scene.add( hemiLight );
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 2.5 );
 				dirLight.position.set( - 3000, 1000, - 1000 );
 				scene.add( dirLight );
 
@@ -88,7 +89,7 @@
 				group = new THREE.Group();
 
 				const geometry = new THREE.TetrahedronGeometry( 10 );
-				const material = new THREE.MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
+				const material = new THREE.MeshStandardMaterial( { color: 0xf73232, flatShading: true } );
 
 				for ( let i = 0; i < 100; i ++ ) {
 
@@ -113,9 +114,9 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
+				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
 				//
@@ -128,11 +129,11 @@
 
 				fxaaPass = new ShaderPass( FXAAShader );
 
-				const copyPass = new ShaderPass( CopyShader );
+				const colorCorrectionPass = new ShaderPass( ColorCorrectionShader );
 
 				composer1 = new EffectComposer( renderer );
 				composer1.addPass( renderPass );
-				composer1.addPass( copyPass );
+				composer1.addPass( colorCorrectionPass );
 
 				//
 
@@ -143,6 +144,10 @@
 
 				composer2 = new EffectComposer( renderer );
 				composer2.addPass( renderPass );
+				composer2.addPass( colorCorrectionPass );
+
+				// FXAA is engineered to be applied towards the end of engine post processing after conversion to low dynamic range and conversion to the sRGB color space for display.´
+
 				composer2.addPass( fxaaPass );
 
 				//

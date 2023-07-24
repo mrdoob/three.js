@@ -15,12 +15,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -29,12 +30,13 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { BokehPass } from './jsm/postprocessing/BokehPass.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let camera, scene, renderer, stats,
 				singleMaterial, zmaterial,
@@ -80,7 +82,7 @@
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
 
-				parameters = { color: 0xff1100, envMap: textureCube };
+				parameters = { color: 0xff4900, envMap: textureCube };
 				cubeMaterial = new THREE.MeshBasicMaterial( parameters );
 
 				singleMaterial = false;
@@ -206,16 +208,16 @@
 				const bokehPass = new BokehPass( scene, camera, {
 					focus: 1.0,
 					aperture: 0.025,
-					maxblur: 0.01,
-
-					width: width,
-					height: height
+					maxblur: 0.01
 				} );
+
+				const outputPass = new OutputPass();
 
 				const composer = new EffectComposer( renderer );
 
 				composer.addPass( renderPass );
 				composer.addPass( bokehPass );
+				composer.addPass( outputPass );
 
 				postprocessing.composer = composer;
 				postprocessing.bokeh = bokehPass;

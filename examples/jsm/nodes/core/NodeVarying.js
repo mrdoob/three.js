@@ -1,11 +1,14 @@
-class NodeVarying {
+import NodeVar from './NodeVar.js';
+
+class NodeVarying extends NodeVar {
 
 	constructor( name, type ) {
 
-		this.isNodeVarying = true;
+		super( name, type );
 
-		this.name = name;
-		this.type = type;
+		this.needsInterpolation = false;
+
+		this.isNodeVarying = true;
 
 	}
 

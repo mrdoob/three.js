@@ -11,8 +11,7 @@ import {
 	RawShaderMaterial,
 	Vector2,
 	Vector3,
-	Vector4,
-	RGBAFormat
+	Vector4
 } from 'three';
 
 class Lensflare extends Mesh {
@@ -34,8 +33,8 @@ class Lensflare extends Mesh {
 
 		// textures
 
-		const tempMap = new FramebufferTexture( 16, 16, RGBAFormat );
-		const occlusionMap = new FramebufferTexture( 16, 16, RGBAFormat );
+		const tempMap = new FramebufferTexture( 16, 16 );
+		const occlusionMap = new FramebufferTexture( 16, 16 );
 
 		// material
 

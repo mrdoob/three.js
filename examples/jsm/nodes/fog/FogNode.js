@@ -1,5 +1,5 @@
-import Node from '../core/Node.js';
-import MathNode from '../math/MathNode.js';
+import Node, { addNodeClass } from '../core/Node.js';
+import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class FogNode extends Node {
 
@@ -14,18 +14,24 @@ class FogNode extends Node {
 
 	}
 
-	mix( outputNode ) {
+	mixAssign( outputNode ) {
 
-		return new MathNode( MathNode.MIX, outputNode, this.colorNode, this );
+		return this.mix( outputNode, this.colorNode );
 
 	}
 
-	generate( builder ) {
+	construct() {
 
-		return this.factorNode.build( builder, 'float' );
+		return this.factorNode;
 
 	}
 
 }
 
 export default FogNode;
+
+export const fog = nodeProxy( FogNode );
+
+addNodeElement( 'fog', fog );
+
+addNodeClass( FogNode );

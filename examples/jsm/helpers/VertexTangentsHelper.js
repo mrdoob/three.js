@@ -76,6 +76,13 @@ class VertexTangentsHelper extends LineSegments {
 
 	}
 
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+	}
+
 }
 
 export { VertexTangentsHelper };

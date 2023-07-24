@@ -1,9 +1,10 @@
 const handlers = {
-  onDropFile: () => {},
+	onDropFile: () => {},
 };
 
-export function setup(options) {
-  const html = `
+export function setup( options ) {
+
+	const html = `
   <style>
     .dragInfo {
         position: fixed;
@@ -35,55 +36,75 @@ export function setup(options) {
   </div>
   `;
 
-  const elem = document.createElement('div');
-  elem.innerHTML = html;
-  document.body.appendChild(elem);
+	const elem = document.createElement( 'div' );
+	elem.innerHTML = html;
+	document.body.appendChild( elem );
 
-  const dragInfo = document.querySelector('.dragInfo');
-  function showDragInfo(show) {
-    dragInfo.style.display = show ? '' : 'none';
-  }
+	const dragInfo = document.querySelector( '.dragInfo' );
+	function showDragInfo( show ) {
 
-  document.body.addEventListener('dragenter', () => {
-    showDragInfo(true);
-  });
+		dragInfo.style.display = show ? '' : 'none';
 
-  const dragElem = dragInfo;
+	}
 
-  dragElem.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    return false;
-  });
+	document.body.addEventListener( 'dragenter', () => {
 
-  dragElem.addEventListener('dragleave', () => {
-    showDragInfo(false);
-    return false;
-  });
+		showDragInfo( true );
 
-  dragElem.addEventListener('dragend', () => {
-    showDragInfo(false);
-    return false;
-  });
+	} );
 
-  dragElem.addEventListener('drop', (e) => {
-    e.preventDefault();
-    showDragInfo(false);
-    if (e.dataTransfer.items) {
-      let fileNdx = 0;
-      for (let i = 0; i < e.dataTransfer.items.length; ++i) {
-        const item = e.dataTransfer.items[i];
-        if (item.kind === 'file') {
-          handlers.onDropFile(item.getAsFile(), fileNdx++);
-        }
-      }
-    }
+	const dragElem = dragInfo;
 
-    return false;
-  });
+	dragElem.addEventListener( 'dragover', ( e ) => {
+
+		e.preventDefault();
+		return false;
+
+	} );
+
+	dragElem.addEventListener( 'dragleave', () => {
+
+		showDragInfo( false );
+		return false;
+
+	} );
+
+	dragElem.addEventListener( 'dragend', () => {
+
+		showDragInfo( false );
+		return false;
+
+	} );
+
+	dragElem.addEventListener( 'drop', ( e ) => {
+
+		e.preventDefault();
+		showDragInfo( false );
+		if ( e.dataTransfer.items ) {
+
+			let fileNdx = 0;
+			for ( let i = 0; i < e.dataTransfer.items.length; ++ i ) {
+
+				const item = e.dataTransfer.items[ i ];
+				if ( item.kind === 'file' ) {
+
+					handlers.onDropFile( item.getAsFile(), fileNdx ++ );
+
+				}
+
+			}
+
+		}
+
+		return false;
+
+	} );
 
 }
 
-export function onDropFile(fn) {
-  handlers.onDropFile = fn;
+export function onDropFile( fn ) {
+
+	handlers.onDropFile = fn;
+
 }
 

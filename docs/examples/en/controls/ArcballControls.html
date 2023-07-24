@@ -31,8 +31,18 @@
 
 		To use this, as with all files in the /examples directory, you will have to
 		include the file separately in your HTML.
-
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -176,6 +186,16 @@
 			How far you can zoom in ( [page:OrthographicCamera] only ). Default is 0.
 		</p>
 
+		<h3>[property:Float radiusFactor]</h3>
+		<p>
+			The size of the gizmo relative to the screen width and height. Default is 0.67.
+		</p>
+
+		<h3>[property:Float rotateSpeed]</h3>
+		<p>
+			Speed of rotation. Default is 1.
+		</p>
+
 		<h3>[property:Float scaleFactor]</h3>
 		<p>
 			The scaling factor used when performing zoom operation.
@@ -189,11 +209,6 @@
 		<h3>[property:Float wMax]</h3>
 		<p>
 			Maximum angular velocity allowed on rotation animation start.
-		</p>
-
-		<h3>[property:Float radiusFactor]</h3>
-		<p>
-			The size of the gizmo relative to the screen width and height. Default is 0.67.
 		</p>
 
 

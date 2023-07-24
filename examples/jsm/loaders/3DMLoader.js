@@ -15,14 +15,14 @@ import {
 	PointLight,
 	SpotLight,
 	RectAreaLight,
-	Vector3,
 	Sprite,
 	SpriteMaterial,
 	CanvasTexture,
 	LinearFilter,
 	ClampToEdgeWrapping,
 	RepeatWrapping,
-	TextureLoader
+	TextureLoader,
+	DoubleSide
 } from 'three';
 
 const _taskCache = new WeakMap();
@@ -190,6 +190,8 @@ class Rhino3dmLoader extends Loader {
 		mat.color.b = material.color.b;
 		mat.type = material.type;
 
+		const json = JSON.stringify( mat );
+
 		for ( let i = 0; i < this.materials.length; i ++ ) {
 
 			const m = this.materials[ i ];
@@ -201,7 +203,7 @@ class Rhino3dmLoader extends Loader {
 			_mat.color.b = m.color.b;
 			_mat.type = m.type;
 
-			if ( JSON.stringify( mat ) === JSON.stringify( _mat ) ) {
+			if ( JSON.stringify( _mat ) === json ) {
 
 				return m;
 
@@ -222,8 +224,8 @@ class Rhino3dmLoader extends Loader {
 			return new MeshStandardMaterial( {
 				color: new Color( 1, 1, 1 ),
 				metalness: 0.8,
-				name: 'default',
-				side: 2
+				name: Loader.DEFAULT_MATERIAL_NAME,
+				side: DoubleSide
 			} );
 
 		}
@@ -245,7 +247,7 @@ class Rhino3dmLoader extends Loader {
 		const mat = new MeshStandardMaterial( {
 			color: diffusecolor,
 			name: material.name,
-			side: 2,
+			side: DoubleSide,
 			transparent: material.transparency > 0 ? true : false,
 			opacity: 1.0 - material.transparency
 		} );
@@ -419,7 +421,7 @@ class Rhino3dmLoader extends Loader {
 					const xf = iRef.geometry.xform.array;
 
 					const matrix = new Matrix4();
-          			matrix.set( xf[ 0 ], xf[ 1 ], xf[ 2 ], xf[ 3 ], xf[ 4 ], xf[ 5 ], xf[ 6 ], xf[ 7 ], xf[ 8 ], xf[ 9 ], xf[ 10 ], xf[ 11 ], xf[ 12 ], xf[ 13 ], xf[ 14 ], xf[ 15 ] );
+					matrix.set( ...xf );
 
 					iRefObject.applyMatrix4( matrix );
 
@@ -625,7 +627,7 @@ class Rhino3dmLoader extends Loader {
 						light.position.set( geometry.location[ 0 ] - ( height / 2 ), geometry.location[ 1 ], geometry.location[ 2 ] - ( width / 2 ) );
 						light.height = height;
 						light.width = width;
-						light.lookAt( new Vector3( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] ) );
+						light.lookAt( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
 
 						break;
 

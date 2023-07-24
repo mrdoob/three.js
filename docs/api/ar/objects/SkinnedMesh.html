@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Mesh] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		شبكة لديها [page:Skeleton] مع [page:Bone bones] يمكن استخدامها بعد ذلك
+		لتحريك رؤوس الهندسة.<br /> <br />
+			
+		يمكن استخدام [name] فقط مع WebGL 2. مع WebGL 1 `OES_texture_float` و
+		مطلوب دعم نسيج الرأس.
+		</p>
+			
+		<iframe id="scene" src="scenes/bones-browser.html"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>مثال للكود</h2>
+
+		<code>
+		const geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
+
+		// create the skin indices and skin weights manually
+		// (typically a loader would read this data from a 3D model for you)
+
+		const position = geometry.attributes.position;
+
+		const vertex = new THREE.Vector3();
+
+		const skinIndices = [];
+		const skinWeights = [];
+
+		for ( let i = 0; i < position.count; i ++ ) {
+
+			vertex.fromBufferAttribute( position, i );
+
+			// compute skinIndex and skinWeight based on some configuration data
+			const y = ( vertex.y + sizing.halfHeight );
+			const skinIndex = Math.floor( y / sizing.segmentHeight );
+			const skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
+			skinIndices.push( skinIndex, skinIndex + 1, 0, 0 );
+			skinWeights.push( 1 - skinWeight, skinWeight, 0, 0 );
+		}
+
+		geometry.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+		geometry.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+
+		// create skinned mesh and skeleton
+
+		const mesh = new THREE.SkinnedMesh( geometry, material );
+		const skeleton = new THREE.Skeleton( bones );
+
+		// see example from THREE.Skeleton
+		const rootBone = skeleton.bones[ 0 ];
+		mesh.add( rootBone );
+
+		// bind the skeleton to the mesh
+		mesh.bind( skeleton );
+
+		// move the bones and manipulate the model
+		skeleton.bones[ 0 ].rotation.x = -0.1;
+		skeleton.bones[ 1 ].rotation.x = 0.2;
+		</code>
+
+		<h2>المنشئ (Constructor)</h2>
+		<h3>
+		[name]( [param:BufferGeometry geometry], [param:Material material] )
+		</h3>
+		<p>
+		[page:BufferGeometry geometry] - نسخة من [page:BufferGeometry].<br />
+		[page:Material material] - (اختياري) نسخة من [page:Material].
+		الافتراضي هو [page:MeshBasicMaterial] جديد.
+		</p>
+		
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى الفئة الأساسية [page:Mesh] للحصول على الخصائص المشتركة.</p>
+		
+		<h3>[property:String bindMode]</h3>
+		<p>
+		إما "مرفق" أو "منفصل". "مرفق" يستخدم
+		خاصية [page:SkinnedMesh.matrixWorld] لمصفوفة التحويل الأساسية لـ
+		العظام. "منفصل" يستخدم [page:SkinnedMesh.bindMatrix]. الافتراضي هو
+		"مرفق".
+		</p>
+		
+		<h3>[property:Matrix4 bindMatrix]</h3>
+		<p>المصفوفة الأساسية المستخدمة لتحويلات العظام المربوطة.</p>
+		
+		<h3>[property:Matrix4 bindMatrixInverse]</h3>
+		<p>المصفوفة الأساسية المستخدمة لإعادة تعيين تحويلات العظام المربوطة.</p>
+		
+		<h3>[property:Box3 boundingBox]</h3>
+		<p>
+		مربع التحديد لـ [name]. يمكن حسابه بـ
+		[page:.computeBoundingBox](). الافتراضي هو `null`.
+		</p>
+		
+		<h3>[property:Sphere boundingSphere]</h3>
+		<p>
+		الكرة المحيطة لـ [name]. يمكن حسابها بـ
+		[page:.computeBoundingSphere](). الافتراضي هو `null`.
+		</p>
+		
+		<h3>[property:Boolean isSkinnedMesh]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان كائن معين هو من نوع [name].</p>
+		
+		<h3>[property:Skeleton skeleton]</h3>
+		<p>[page:Skeleton] يمثل هيكل العظام للشبكة المشدودة.</p>
+		
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى الفئة الأساسية [page:Mesh] للحصول على الطرق المشتركة.</p>
+		
+		<h3>
+		[method:undefined bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )
+		</h3>
+		<p>
+		[page:Skeleton skeleton] - [page:Skeleton] تم إنشاؤه من شجرة [page:Bone Bones].<br />
+		[page:Matrix4 bindMatrix] - [page:Matrix4] يمثل التحويل الأساسي
+		للهيكل العظمي.<br /> <br />
+		
+		ربط هيكل عظمي بالشبكة المشدودة. يتم حفظ bindMatrix في
+		خاصية .bindMatrix ويتم حساب .bindMatrixInverse.
+		</p>
+		
+		<h3>[method:SkinnedMesh clone]()</h3>
+		<p>
+		لا تقوم هذه الطريقة حاليًا بنسخ نسخة من [name] بشكل صحيح.
+		يرجى استخدام [page:SkeletonUtils.clone]() في هذه الأثناء.
+		</p>
+		
+		<h3>[method:undefined computeBoundingBox]()</h3>
+		<p>
+		حساب مربع التحديد، وتحديث خاصية [page:.boundingBox].<br />
+		لا يتم حساب مربعات التحديد افتراضيًا. يجب حسابها بشكل صريح
+		، وإلا كانت `null`. إذا كانت نسخة من [name] متحركة،
+		يجب استدعاء هذه الطريقة في كل إطار لحساب مربع تحديد صحيح.
+		</p>
+		
+		<h3>[method:undefined computeBoundingSphere]()</h3>
+		<p>
+		حساب الكرة المحيطة، وتحديث خاصية [page:.boundingSphere]
+		.<br />
+		لا يتم حساب الكرات المحيطة افتراضيًا. يجب حسابها بشكل صريح
+		، وإلا كانت `null`. إذا كانت نسخة من [name] متحركة،
+		يجب استدعاء هذه الطريقة في كل إطار لحساب كرة محيطة صحيحة.
+		</p>
+		
+		<h3>[method:undefined normalizeSkinWeights]()</h3>
+		<p>تطبيع أوزان الجلد.</p>
+		
+		<h3>[method:undefined pose]()</h3>
+		<p>هذه الطريقة تضع الشبكة المشدودة في وضعية الأساس (إعادة تعيين الوضعية).</p>
+		
+		<h3>
+		[method:Vector3 applyBoneTransform]( [param:Integer index], [param:Vector3 vector] )
+		</h3>
+		<p>
+		تطبق تحويل العظام المرتبط بالفهرس المعطى على موضع المتجه المعطى. يُعاد المتجه المُحدَّث.
+		</p>
+		
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

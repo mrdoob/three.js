@@ -1,8 +1,8 @@
 export default /* glsl */`
 
-#ifdef OBJECTSPACE_NORMALMAP
+#ifdef USE_NORMALMAP_OBJECTSPACE
 
-	normal = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0; // overrides both flatShading and attribute normals
+	normal = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0; // overrides both flatShading and attribute normals
 
 	#ifdef FLIP_SIDED
 
@@ -18,20 +18,12 @@ export default /* glsl */`
 
 	normal = normalize( normalMatrix * normal );
 
-#elif defined( TANGENTSPACE_NORMALMAP )
+#elif defined( USE_NORMALMAP_TANGENTSPACE )
 
-	vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+	vec3 mapN = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;
 	mapN.xy *= normalScale;
 
-	#ifdef USE_TANGENT
-
-		normal = normalize( vTBN * mapN );
-
-	#else
-
-		normal = perturbNormal2Arb( - vViewPosition, normal, mapN, faceDirection );
-
-	#endif
+	normal = normalize( tbn * mapN );
 
 #elif defined( USE_BUMPMAP )
 

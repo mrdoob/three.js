@@ -25,12 +25,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -39,7 +40,7 @@
 
 			import * as THREE from 'three';
 
-			import { DragControls } from './jsm/controls/DragControls.js';
+			import { DragControls } from 'three/addons/controls/DragControls.js';
 
 			let container;
 			let camera, scene, renderer;
@@ -57,21 +58,21 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
-				camera.position.z = 1000;
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 500 );
+				camera.position.z = 25;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
-				scene.add( new THREE.AmbientLight( 0x505050 ) );
+				scene.add( new THREE.AmbientLight( 0xaaaaaa ) );
 
-				const light = new THREE.SpotLight( 0xffffff, 1.5 );
-				light.position.set( 0, 500, 2000 );
+				const light = new THREE.SpotLight( 0xffffff, 10000 );
+				light.position.set( 0, 25, 50 );
 				light.angle = Math.PI / 9;
 
 				light.castShadow = true;
-				light.shadow.camera.near = 1000;
-				light.shadow.camera.far = 4000;
+				light.shadow.camera.near = 10;
+				light.shadow.camera.far = 100;
 				light.shadow.mapSize.width = 1024;
 				light.shadow.mapSize.height = 1024;
 
@@ -80,15 +81,15 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				const geometry = new THREE.BoxGeometry( 40, 40, 40 );
+				const geometry = new THREE.BoxGeometry();
 
 				for ( let i = 0; i < 200; i ++ ) {
 
 					const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
-					object.position.x = Math.random() * 1000 - 500;
-					object.position.y = Math.random() * 600 - 300;
-					object.position.z = Math.random() * 800 - 400;
+					object.position.x = Math.random() * 30 - 15;
+					object.position.y = Math.random() * 15 - 7.5;
+					object.position.z = Math.random() * 20 - 10;
 
 					object.rotation.x = Math.random() * 2 * Math.PI;
 					object.rotation.y = Math.random() * 2 * Math.PI;
@@ -110,7 +111,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFShadowMap;
 

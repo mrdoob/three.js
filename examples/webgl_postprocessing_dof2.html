@@ -14,12 +14,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,10 +29,10 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { BokehShader, BokehDepthShader } from './jsm/shaders/BokehShader2.js';
+			import { BokehShader, BokehDepthShader } from 'three/addons/shaders/BokehShader2.js';
 
 			let container, stats;
 			let camera, scene, renderer, materialDepth;
@@ -108,7 +109,8 @@
 					shininess: 0.5,
 					specular: 0xffffff,
 					envMap: textureCube,
-					side: THREE.DoubleSide
+					side: THREE.DoubleSide,
+					forceSinglePass: true
 				} );
 
 				const rand = Math.random;
@@ -188,13 +190,13 @@
 
 				// lights
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new THREE.AmbientLight( 0xcccccc ) );
 
-				const directionalLight1 = new THREE.DirectionalLight( 0xffffff, 2 );
+				const directionalLight1 = new THREE.DirectionalLight( 0xffffff, 6 );
 				directionalLight1.position.set( 2, 1.2, 10 ).normalize();
 				scene.add( directionalLight1 );
 
-				const directionalLight2 = new THREE.DirectionalLight( 0xffffff, 1 );
+				const directionalLight2 = new THREE.DirectionalLight( 0xffffff, 3 );
 				directionalLight2.position.set( - 2, 1.2, - 10 ).normalize();
 				scene.add( directionalLight2 );
 
@@ -329,8 +331,8 @@
 
 				postprocessing.scene.add( postprocessing.camera );
 
-				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
-				postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { type: THREE.HalfFloatType } );
+				postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { type: THREE.HalfFloatType } );
 
 				const bokeh_shader = BokehShader;
 

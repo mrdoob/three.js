@@ -18,12 +18,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -32,8 +33,8 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { TransformControls } from './jsm/controls/TransformControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TransformControls } from 'three/addons/controls/TransformControls.js';
 
 			let cameraPersp, cameraOrtho, currentCamera;
 			let scene, renderer, control, orbit;
@@ -43,7 +44,7 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -54,21 +55,24 @@
 				cameraOrtho = new THREE.OrthographicCamera( - 600 * aspect, 600 * aspect, 600, - 600, 0.01, 30000 );
 				currentCamera = cameraPersp;
 
-				currentCamera.position.set( 1000, 500, 1000 );
-				currentCamera.lookAt( 0, 200, 0 );
+				currentCamera.position.set( 5, 2.5, 5 );
 
 				scene = new THREE.Scene();
-				scene.add( new THREE.GridHelper( 1000, 10, 0x888888, 0x444444 ) );
+				scene.add( new THREE.GridHelper( 5, 10, 0x888888, 0x444444 ) );
 
-				const light = new THREE.DirectionalLight( 0xffffff, 2 );
+				const ambientLight = new THREE.AmbientLight( 0xffffff );
+				scene.add( ambientLight );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 4 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
 				const texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
+				texture.colorSpace = THREE.SRGBColorSpace;
 				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
-				const material = new THREE.MeshLambertMaterial( { map: texture, transparent: true } );
+				const geometry = new THREE.BoxGeometry();
+				const material = new THREE.MeshLambertMaterial( { map: texture } );
 
 				orbit = new OrbitControls( currentCamera, renderer.domElement );
 				orbit.update();

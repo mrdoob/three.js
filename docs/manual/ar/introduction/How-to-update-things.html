@@ -72,20 +72,17 @@ scene.add( line );
 				بعد ذلك سنضيف نقاطًا بشكل عشوائي إلى الخط باستخدام نمط مثل:
 			</p>
 			<code>
-const positions = line.geometry.attributes.position.array;
+const positionAttribute = line.geometry.getAttribute( 'position' );
 
-let x, y, z, index;
-x = y = z = index = 0;
+let x = 0, y = 0, z = 0;
 
-for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
+for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-    positions[ index ++ ] = x;
-    positions[ index ++ ] = y;
-    positions[ index ++ ] = z;
+	positionAttribute.setXYZ( i, x, y, z );
 
-    x += ( Math.random() - 0.5 ) * 30;
-    y += ( Math.random() - 0.5 ) * 30;
-    z += ( Math.random() - 0.5 ) * 30;
+	x += ( Math.random() - 0.5 ) * 30;
+	y += ( Math.random() - 0.5 ) * 30;
+	z += ( Math.random() - 0.5 ) * 30;
 
 }
 			</code>
@@ -99,7 +96,7 @@ line.geometry.setDrawRange( 0, newValue );
 				إذا كنت تريد تغيير قيم بيانات الموضع بعد العرض الأول ، فأنت بحاجة إلى تعيين علامة needsUpdate على النحو التالي:
 			</p>
 			<code>
-line.geometry.attributes.position.needsUpdate = true; // required after the first render
+positionAttribute.needsUpdate = true; // required after the first render
 			</code>
 
 			<p>

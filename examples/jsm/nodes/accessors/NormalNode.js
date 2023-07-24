@@ -1,23 +1,25 @@
-import Node from '../core/Node.js';
-import AttributeNode from '../core/AttributeNode.js';
-import VaryingNode from '../core/VaryingNode.js';
-import ModelNode from '../accessors/ModelNode.js';
-import CameraNode from '../accessors/CameraNode.js';
-import OperatorNode from '../math/OperatorNode.js';
-import MathNode from '../math/MathNode.js';
+import Node, { addNodeClass } from '../core/Node.js';
+import { attribute } from '../core/AttributeNode.js';
+import { varying } from '../core/VaryingNode.js';
+import { property } from '../core/PropertyNode.js';
+import { normalize } from '../math/MathNode.js';
+import { cameraViewMatrix } from './CameraNode.js';
+import { modelNormalMatrix } from './ModelNode.js';
+import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
 class NormalNode extends Node {
-
-	static GEOMETRY = 'geometry';
-	static LOCAL = 'local';
-	static WORLD = 'world';
-	static VIEW = 'view';
 
 	constructor( scope = NormalNode.LOCAL ) {
 
 		super( 'vec3' );
 
 		this.scope = scope;
+
+	}
+
+	isGlobal() {
+
+		return true;
 
 	}
 
@@ -35,26 +37,26 @@ class NormalNode extends Node {
 
 		if ( scope === NormalNode.GEOMETRY ) {
 
-			outputNode = new AttributeNode( 'normal', 'vec3' );
+			outputNode = attribute( 'normal', 'vec3' );
 
 		} else if ( scope === NormalNode.LOCAL ) {
 
-			outputNode = new VaryingNode( new NormalNode( NormalNode.GEOMETRY ) );
+			outputNode = varying( normalGeometry );
 
 		} else if ( scope === NormalNode.VIEW ) {
 
-			const vertexNormalNode = new OperatorNode( '*', new ModelNode( ModelNode.NORMAL_MATRIX ), new NormalNode( NormalNode.LOCAL ) );
-			outputNode = new MathNode( MathNode.NORMALIZE, new VaryingNode( vertexNormalNode ) );
+			const vertexNode = modelNormalMatrix.mul( normalLocal );
+			outputNode = normalize( varying( vertexNode ) );
 
 		} else if ( scope === NormalNode.WORLD ) {
 
-			// To use INVERSE_TRANSFORM_DIRECTION only inverse the param order like this: MathNode( ..., Vector, Matrix );
-			const vertexNormalNode = new MathNode( MathNode.TRANSFORM_DIRECTION, new NormalNode( NormalNode.VIEW ), new CameraNode( CameraNode.VIEW_MATRIX ) );
-			outputNode = new MathNode( MathNode.NORMALIZE, new VaryingNode( vertexNormalNode ) );
+			// To use inverseTransformDirection only inverse the param order like this: cameraViewMatrix.transformDirection( normalView )
+			const vertexNode = normalView.transformDirection( cameraViewMatrix );
+			outputNode = normalize( varying( vertexNode ) );
 
 		}
 
-		return outputNode.build( builder );
+		return outputNode.build( builder, this.getNodeType( builder ) );
 
 	}
 
@@ -76,4 +78,19 @@ class NormalNode extends Node {
 
 }
 
+NormalNode.GEOMETRY = 'geometry';
+NormalNode.LOCAL = 'local';
+NormalNode.VIEW = 'view';
+NormalNode.WORLD = 'world';
+
 export default NormalNode;
+
+export const normalGeometry = nodeImmutable( NormalNode, NormalNode.GEOMETRY );
+export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL );
+export const normalView = nodeImmutable( NormalNode, NormalNode.VIEW );
+export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );
+export const transformedNormalView = property( 'vec3', 'TransformedNormalView' );
+export const transformedNormalWorld = transformedNormalView.transformDirection( cameraViewMatrix ).normalize();
+export const transformedClearcoatNormalView = property( 'vec3', 'TransformedClearcoatNormalView' );
+
+addNodeClass( NormalNode );

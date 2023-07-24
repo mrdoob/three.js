@@ -1,5 +1,6 @@
 import {
 	EventDispatcher,
+	MathUtils,
 	MOUSE,
 	Quaternion,
 	Vector2,
@@ -42,6 +43,9 @@ class TrackballControls extends EventDispatcher {
 
 		this.minDistance = 0;
 		this.maxDistance = Infinity;
+
+		this.minZoom = 0;
+		this.maxZoom = Infinity;
 
 		this.keys = [ 'KeyA' /*A*/, 'KeyS' /*S*/, 'KeyD' /*D*/ ];
 
@@ -205,8 +209,13 @@ class TrackballControls extends EventDispatcher {
 
 				} else if ( scope.object.isOrthographicCamera ) {
 
-					scope.object.zoom /= factor;
-					scope.object.updateProjectionMatrix();
+					scope.object.zoom = MathUtils.clamp( scope.object.zoom / factor, scope.minZoom, scope.maxZoom );
+
+					if ( lastZoom !== scope.object.zoom ) {
+
+						scope.object.updateProjectionMatrix();
+
+					}
 
 				} else {
 
@@ -226,8 +235,13 @@ class TrackballControls extends EventDispatcher {
 
 					} else if ( scope.object.isOrthographicCamera ) {
 
-						scope.object.zoom /= factor;
-						scope.object.updateProjectionMatrix();
+						scope.object.zoom = MathUtils.clamp( scope.object.zoom / factor, scope.minZoom, scope.maxZoom );
+
+						if ( lastZoom !== scope.object.zoom ) {
+
+							scope.object.updateProjectionMatrix();
+
+						}
 
 					} else {
 
@@ -700,8 +714,20 @@ class TrackballControls extends EventDispatcher {
 
 				case 2:
 					_state = STATE.TOUCH_ZOOM_PAN;
-					_moveCurr.copy( getMouseOnCircle( event.pageX - _movePrev.x, event.pageY - _movePrev.y ) );
-					_movePrev.copy( _moveCurr );
+
+					for ( let i = 0; i < _pointers.length; i ++ ) {
+
+						if ( _pointers[ i ].pointerId !== event.pointerId ) {
+
+							const position = _pointerPositions[ _pointers[ i ].pointerId ];
+							_moveCurr.copy( getMouseOnCircle( position.x, position.y ) );
+							_movePrev.copy( _moveCurr );
+							break;
+
+						}
+
+					}
+
 					break;
 
 			}

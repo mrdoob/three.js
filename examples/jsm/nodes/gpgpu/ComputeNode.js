@@ -1,5 +1,6 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
+import { addNodeElement, nodeObject } from '../shadernode/ShaderNode.js';
 
 class ComputeNode extends Node {
 
@@ -15,9 +16,22 @@ class ComputeNode extends Node {
 		this.workgroupSize = workgroupSize;
 		this.dispatchCount = 0;
 
-		this.updateType = NodeUpdateType.Object;
+		this.version = 1;
+		this.updateType = NodeUpdateType.OBJECT;
 
 		this.updateDispatchCount();
+
+	}
+
+	dispose() {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
+	}
+
+	set needsUpdate( value ) {
+
+		if ( value === true ) this.version ++;
 
 	}
 
@@ -52,7 +66,7 @@ class ComputeNode extends Node {
 
 			if ( snippet !== '' ) {
 
-				builder.addFlowCode( snippet );
+				builder.addLineFlowCode( snippet );
 
 			}
 
@@ -63,3 +77,9 @@ class ComputeNode extends Node {
 }
 
 export default ComputeNode;
+
+export const compute = ( node, count, workgroupSize ) => nodeObject( new ComputeNode( nodeObject( node ), count, workgroupSize ) );
+
+addNodeElement( 'compute', compute );
+
+addNodeClass( ComputeNode );

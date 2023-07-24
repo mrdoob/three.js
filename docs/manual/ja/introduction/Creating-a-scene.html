@@ -13,7 +13,7 @@
 
 		<h2>始める前に</h2>
 
-		<p>three.jsを使う前に、表示するための場所が必要です。以下のHTMLをPCのファイルに保存して、そのHTMLを保存したディレクトリにjs/ディレクトリを作成し[link:https://threejs.org/build/three.js three.js]のコピーを保存しておいてください。その後、保存したHTMLをブラウザで開いてください。</p>
+		<p>three.jsを使う前に、表示するための場所が必要です。Save the following HTML to a file on your computer and open it in your browser.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -26,8 +26,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					// Our Javascript will go here.
 				&lt;/script&gt;
 			&lt;/body&gt;
@@ -116,7 +117,7 @@
 		<h2>成果</h2>
 		<p>おめでとうございます。これで初めてのthree.jsアプリが完成しました。簡単なことですが、誰でもはじめは初心者です。</p>
 
-		<p>今回使用したコードは[link:https://jsfiddle.net/mkba0ecu/ live example]にあり編集可能です。紹介したコードがどうやって動作するかをより理解するために、それを使って遊んでみてください。</p>
+		<p>今回使用したコードは[link:https://jsfiddle.net/0c1oqf38/ live example]にあり編集可能です。紹介したコードがどうやって動作するかをより理解するために、それを使って遊んでみてください。</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -128,8 +129,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					const scene = new THREE.Scene();
 					const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -151,7 +153,7 @@
 						cube.rotation.y += 0.01;
 
 						renderer.render( scene, camera );
-					};
+					}
 
 					animate();
 				&lt;/script&gt;

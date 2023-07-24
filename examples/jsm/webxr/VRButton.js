@@ -174,8 +174,6 @@ class VRButton {
 
 	}
 
-	static xrSessionIsGranted = false;
-
 	static registerSessionGrantedListener() {
 
 		if ( 'xr' in navigator ) {
@@ -196,6 +194,7 @@ class VRButton {
 
 }
 
+VRButton.xrSessionIsGranted = false;
 VRButton.registerSessionGrantedListener();
 
 export { VRButton };

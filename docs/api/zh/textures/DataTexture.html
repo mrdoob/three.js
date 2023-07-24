@@ -16,7 +16,7 @@
 
 		<h2>构造函数</h2>
 
-		<h3>[name]( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy )</h3>
+		<h3>[name]( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, colorSpace )</h3>
 		<p>
 			data 参数必须是一个 [link:https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView ArrayBufferView] 。
 			其他参数对应于继承自 [page:Texture] 的属性，其中 magFilter 与 minFilter 默认为 THREE.NearestFilter。
@@ -80,7 +80,7 @@
 		Whether to generate mipmaps (if possible) for a texture. False by default.
 		</p>
 
-		<h3>[property:Image image]</h3>
+		<h3>[property:Object image]</h3>
 		<p>
 		Overridden with a record type holding data, width and height.
 		</p>

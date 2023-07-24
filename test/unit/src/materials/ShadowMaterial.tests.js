@@ -1,27 +1,73 @@
 /* global QUnit */
 
-// import { ShadowMaterial } from '../../../../src/materials/ShadowMaterial.js';
+import { ShadowMaterial } from '../../../../src/materials/ShadowMaterial.js';
+
+import { Material } from '../../../../src/materials/Material.js';
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module( 'LineBasicMaterial', () => {
+	QUnit.module( 'ShadowMaterial', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new ShadowMaterial();
+			assert.strictEqual(
+				object instanceof Material, true,
+				'ShadowMaterial extends from Material'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new ShadowMaterial();
+			assert.ok( object, 'Can instantiate a ShadowMaterial.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new ShadowMaterial();
+			assert.ok(
+				object.type === 'ShadowMaterial',
+				'ShadowMaterial.type should be ShadowMaterial'
+			);
+
+		} );
+
+		QUnit.todo( 'color', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isShadowMaterial', ( assert ) => {
+		QUnit.todo( 'transparent', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'fog', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isShadowMaterial', ( assert ) => {
+
+			const object = new ShadowMaterial();
+			assert.ok(
+				object.isShadowMaterial,
+				'ShadowMaterial.isShadowMaterial should be true'
+			);
+
+		} );
+
+		QUnit.todo( 'copy', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

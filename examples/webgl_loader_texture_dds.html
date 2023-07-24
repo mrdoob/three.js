@@ -15,12 +15,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -29,7 +30,7 @@
 
 			import * as THREE from 'three';
 
-			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
+			import { DDSLoader } from 'three/addons/loaders/DDSLoader.js';
 
 			let camera, scene, renderer;
 			const meshes = [];
@@ -39,12 +40,12 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 1000;
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 10;
 
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
+				const geometry = new THREE.BoxGeometry( 2, 2, 2 );
 
 				/*
 				This is how compressed textures are supposed to be used:
@@ -59,28 +60,35 @@
 				const map1 = loader.load( 'textures/compressed/disturb_dxt1_nomip.dds' );
 				map1.minFilter = map1.magFilter = THREE.LinearFilter;
 				map1.anisotropy = 4;
+				map1.colorSpace = THREE.SRGBColorSpace;
 
 				const map2 = loader.load( 'textures/compressed/disturb_dxt1_mip.dds' );
 				map2.anisotropy = 4;
+				map2.colorSpace = THREE.SRGBColorSpace;
 
 				const map3 = loader.load( 'textures/compressed/hepatica_dxt3_mip.dds' );
 				map3.anisotropy = 4;
+				map3.colorSpace = THREE.SRGBColorSpace;
 
 				const map4 = loader.load( 'textures/compressed/explosion_dxt5_mip.dds' );
 				map4.anisotropy = 4;
+				map4.colorSpace = THREE.SRGBColorSpace;
 
 				const map5 = loader.load( 'textures/compressed/disturb_argb_nomip.dds' );
 				map5.minFilter = map5.magFilter = THREE.LinearFilter;
 				map5.anisotropy = 4;
+				map5.colorSpace = THREE.SRGBColorSpace;
 
 				const map6 = loader.load( 'textures/compressed/disturb_argb_mip.dds' );
 				map6.anisotropy = 4;
+				map6.colorSpace = THREE.SRGBColorSpace;
 
 				const cubemap1 = loader.load( 'textures/compressed/Mountains.dds', function ( texture ) {
 
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
+					texture.colorSpace = THREE.SRGBColorSpace;
 					material1.needsUpdate = true;
 
 				} );
@@ -90,6 +98,7 @@
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
+					texture.colorSpace = THREE.SRGBColorSpace;
 					material5.needsUpdate = true;
 
 				} );
@@ -99,6 +108,7 @@
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
+					texture.colorSpace = THREE.SRGBColorSpace;
 					material6.needsUpdate = true;
 
 				} );
@@ -112,51 +122,51 @@
 				const material7 = new THREE.MeshBasicMaterial( { map: map5 } );
 				const material8 = new THREE.MeshBasicMaterial( { map: map6 } );
 
-				let mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 50, 32, 16 ), material1 );
-				mesh.position.x = - 600;
-				mesh.position.y = - 200;
+				let mesh = new THREE.Mesh( new THREE.TorusGeometry(), material1 );
+				mesh.position.x = - 6;
+				mesh.position.y = - 2;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material2 );
-				mesh.position.x = - 200;
-				mesh.position.y = - 200;
+				mesh.position.x = - 2;
+				mesh.position.y = - 2;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material3 );
-				mesh.position.x = - 200;
-				mesh.position.y = 200;
+				mesh.position.x = - 2;
+				mesh.position.y = 2;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material4 );
-				mesh.position.x = - 600;
-				mesh.position.y = 200;
+				mesh.position.x = - 6;
+				mesh.position.y = 2;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material5 );
-				mesh.position.x = 200;
-				mesh.position.y = 200;
+				mesh.position.x = 2;
+				mesh.position.y = 2;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material6 );
-				mesh.position.x = 200;
-				mesh.position.y = - 200;
+				mesh.position.x = 2;
+				mesh.position.y = - 2;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material7 );
-				mesh.position.x = 600;
-				mesh.position.y = - 200;
+				mesh.position.x = 6;
+				mesh.position.y = - 2;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material8 );
-				mesh.position.x = 600;
-				mesh.position.y = 200;
+				mesh.position.x = 6;
+				mesh.position.y = 2;
 				scene.add( mesh );
 				meshes.push( mesh );
 

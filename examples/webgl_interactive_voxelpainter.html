@@ -24,12 +24,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -68,8 +69,10 @@
 
 				// cubes
 
+				const map = new THREE.TextureLoader().load( 'textures/square-outline-textured.png' );
+				map.colorSpace = THREE.SRGBColorSpace;
 				cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
-				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: new THREE.TextureLoader().load( 'textures/square-outline-textured.png' ) } );
+				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: map } );
 
 				// grid
 
@@ -91,10 +94,10 @@
 
 				// lights
 
-				const ambientLight = new THREE.AmbientLight( 0x606060 );
+				const ambientLight = new THREE.AmbientLight( 0x606060, 3 );
 				scene.add( ambientLight );
 
-				const directionalLight = new THREE.DirectionalLight( 0xffffff );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
 				directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
 				scene.add( directionalLight );
 

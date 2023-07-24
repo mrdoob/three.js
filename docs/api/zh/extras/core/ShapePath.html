@@ -10,12 +10,7 @@
 		<h1>形状路径（[name]）</h1>
 
 		<p class="desc">
-		该类用于转换一系列的形状为一个[page:Path]数组，例如转换SVG中的Path为three.js中的Path（请参阅下方的example）。
-		</p>
-
-		<h2>例子</h2>
-		<p>
-			[example:webgl_geometry_extrude_shapes2 geometry / extrude / shapes2]
+		该类用于转换一系列的形状为一个[page:Path]数组，例如转换SVG中的Path为three.js中的Path。
 		</p>
 
 		<h2>构造函数</h2>
@@ -67,14 +62,13 @@
 			连接一个新的[page:SplineCurve]（样条曲线）到[page:ShapePath.currentPath currentPath]（当前路径）。</p>
 
 
-		<h3>[method:Array toShapes]( [param:Boolean isCCW], [param:Boolean noHoles] )</h3>
+		<h3>[method:Array toShapes]( [param:Boolean isCCW] )</h3>
 		<p>
-		isCCW -- 更改实体形状和孔洞的生成方式。<br/>
-		noHoles -- 是否创建孔洞。
+		isCCW -- 更改实体形状和孔洞的生成方式。
 		</p>
 		<p>
 		将[page:ShapePath.subPaths subPaths]数组转换为到Shapes数组。默认情况下，实体形状按照顺时针（CW）来定义，孔洞按照逆时针（CCW）来定义。
-		如果isCCW被设置为true，则孔洞和实体形状的定义将被反转。如果noHoles参数设置为true，则所有路径将被设置为实体形状，isCCW将被忽略。
+		如果isCCW被设置为true，则孔洞和实体形状的定义将被反转。
 		<br/>
 
 		</p>

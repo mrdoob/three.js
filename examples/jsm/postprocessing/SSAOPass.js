@@ -7,6 +7,7 @@ import {
 	DstAlphaFactor,
 	DstColorFactor,
 	FloatType,
+	HalfFloatType,
 	MathUtils,
 	MeshNormalMaterial,
 	NearestFilter,
@@ -65,29 +66,24 @@ class SSAOPass extends Pass {
 		depthTexture.format = DepthStencilFormat;
 		depthTexture.type = UnsignedInt248Type;
 
-		this.beautyRenderTarget = new WebGLRenderTarget( this.width, this.height );
+		this.beautyRenderTarget = new WebGLRenderTarget( this.width, this.height, { type: HalfFloatType } );
 
 		// normal render target with depth buffer
 
 		this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
+			type: HalfFloatType,
 			depthTexture: depthTexture
 		} );
 
 		// ssao render target
 
-		this.ssaoRenderTarget = new WebGLRenderTarget( this.width, this.height );
+		this.ssaoRenderTarget = new WebGLRenderTarget( this.width, this.height, { type: HalfFloatType } );
 
 		this.blurRenderTarget = this.ssaoRenderTarget.clone();
 
 		// ssao material
-
-		if ( SSAOShader === undefined ) {
-
-			console.error( 'THREE.SSAOPass: The pass relies on SSAOShader.' );
-
-		}
 
 		this.ssaoMaterial = new ShaderMaterial( {
 			defines: Object.assign( {}, SSAOShader.defines ),
@@ -376,12 +372,6 @@ class SSAOPass extends Pass {
 	generateRandomKernelRotations() {
 
 		const width = 4, height = 4;
-
-		if ( SimplexNoise === undefined ) {
-
-			console.error( 'THREE.SSAOPass: The pass relies on SimplexNoise.' );
-
-		}
 
 		const simplex = new SimplexNoise();
 

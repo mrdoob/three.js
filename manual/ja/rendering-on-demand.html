@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – で要求されたレンダリング">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -44,8 +44,8 @@ requestAnimationFrame(render);
 変更にはテクスチャやモデルの読込完了、外部ソースからのデータ受取、ユーザーによる設定やカメラ調整などその他の関連する入力などが含まれます。</p>
 <p><a href="responsive.html">レスポンシブデザインの記事</a>を例に要求に応じてレンダリングするように修正してみましょう。</p>
 <p>最初に <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を追加します。これで何かの変更を反映してレンダリングする事ができます。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-+import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 </pre>
 <p>次に以下のように設定します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
@@ -162,9 +162,9 @@ render();
 
 <p></p>
 <p>シンプルなlil-guiを追加し、GUIで値の変更時にレンダリングを要求してみましょう。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
-+import {GUI} from '/examples/jsm/libs/lil-gui.module.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
++import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <p>各キューブの色と×スケールを設定できるようにしましょう。
 色を設定するには<a href="lights.html">照明の記事</a>で作成した <code class="notranslate" translate="no">ColorGUIHelper</code> を使います。</p>
@@ -208,8 +208,8 @@ three.jsを要求に応じてレンダリングするアプリ/ページはあ�
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

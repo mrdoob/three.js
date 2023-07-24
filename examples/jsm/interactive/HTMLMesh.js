@@ -4,7 +4,7 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	PlaneGeometry,
-	sRGBEncoding,
+	SRGBColorSpace,
 	Color
 } from 'three';
 
@@ -37,6 +37,8 @@ class HTMLMesh extends Mesh {
 
 			material.map.dispose();
 
+			canvases.delete( dom );
+
 			this.removeEventListener( 'mousedown', onEvent );
 			this.removeEventListener( 'mousemove', onEvent );
 			this.removeEventListener( 'mouseup', onEvent );
@@ -57,7 +59,7 @@ class HTMLTexture extends CanvasTexture {
 		this.dom = dom;
 
 		this.anisotropy = 16;
-		this.encoding = sRGBEncoding;
+		this.colorSpace = SRGBColorSpace;
 		this.minFilter = LinearFilter;
 		this.magFilter = LinearFilter;
 
@@ -271,6 +273,19 @@ function html2canvas( element ) {
 			context.drawImage( element, 0, 0 );
 			context.restore();
 
+		} else if ( element instanceof HTMLImageElement ) {
+
+			if ( element.style.display === 'none' ) return;
+
+			const rect = element.getBoundingClientRect();
+
+			x = rect.left - offset.left - 0.5;
+			y = rect.top - offset.top - 0.5;
+			width = rect.width;
+			height = rect.height;
+
+			context.drawImage( element, x, y, width, height );
+
 		} else {
 
 			if ( element.style.display === 'none' ) return;
@@ -469,17 +484,14 @@ function html2canvas( element ) {
 
 	const offset = element.getBoundingClientRect();
 
-	let canvas;
+	let canvas = canvases.get( element );
 
-	if ( canvases.has( element ) ) {
-
-		canvas = canvases.get( element );
-
-	} else {
+	if ( canvas === undefined ) {
 
 		canvas = document.createElement( 'canvas' );
 		canvas.width = offset.width;
 		canvas.height = offset.height;
+		canvases.set( element, canvas );
 
 	}
 

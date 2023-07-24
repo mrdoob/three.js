@@ -1,8 +1,11 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
+	Color,
 	FileLoader,
-	Loader
+	Loader,
+	LinearSRGBColorSpace,
+	SRGBColorSpace
 } from 'three';
 
 const _taskCache = new WeakMap();
@@ -73,18 +76,25 @@ class DRACOLoader extends Loader {
 
 		loader.load( url, ( buffer ) => {
 
-			this.decodeDracoFile( buffer, onLoad ).catch( onError );
+			this.parse( buffer, onLoad, onError );
 
 		}, onProgress, onError );
 
 	}
 
-	decodeDracoFile( buffer, callback, attributeIDs, attributeTypes ) {
+	parse( buffer, onLoad, onError ) {
+
+		this.decodeDracoFile( buffer, onLoad, null, null, SRGBColorSpace ).catch( onError );
+
+	}
+
+	decodeDracoFile( buffer, callback, attributeIDs, attributeTypes, vertexColorSpace = LinearSRGBColorSpace ) {
 
 		const taskConfig = {
 			attributeIDs: attributeIDs || this.defaultAttributeIDs,
 			attributeTypes: attributeTypes || this.defaultAttributeTypes,
-			useUniqueIDs: !! attributeIDs
+			useUniqueIDs: !! attributeIDs,
+			vertexColorSpace: vertexColorSpace,
 		};
 
 		return this.decodeGeometry( buffer, taskConfig ).then( callback );
@@ -188,16 +198,46 @@ class DRACOLoader extends Loader {
 
 		for ( let i = 0; i < geometryData.attributes.length; i ++ ) {
 
-			const attribute = geometryData.attributes[ i ];
-			const name = attribute.name;
-			const array = attribute.array;
-			const itemSize = attribute.itemSize;
+			const result = geometryData.attributes[ i ];
+			const name = result.name;
+			const array = result.array;
+			const itemSize = result.itemSize;
 
-			geometry.setAttribute( name, new BufferAttribute( array, itemSize ) );
+			const attribute = new BufferAttribute( array, itemSize );
+
+			if ( name === 'color' ) {
+
+				this._assignVertexColorSpace( attribute, result.vertexColorSpace );
+
+				attribute.normalized = ( array instanceof Float32Array ) === false;
+
+			}
+
+			geometry.setAttribute( name, attribute );
 
 		}
 
 		return geometry;
+
+	}
+
+	_assignVertexColorSpace( attribute, inputColorSpace ) {
+
+		// While .drc files do not specify colorspace, the only 'official' tooling
+		// is PLY and OBJ converters, which use sRGB. We'll assume sRGB when a .drc
+		// file is passed into .load() or .parse(). GLTFLoader uses internal APIs
+		// to decode geometry, and vertex colors are already Linear-sRGB in there.
+
+		if ( inputColorSpace !== SRGBColorSpace ) return;
+
+		const _color = new Color();
+
+		for ( let i = 0, il = attribute.count; i < il; i ++ ) {
+
+			_color.fromBufferAttribute( attribute, i ).convertSRGBToLinear();
+			attribute.setXYZ( i, _color.r, _color.g, _color.b );
+
+		}
 
 	}
 
@@ -351,6 +391,12 @@ class DRACOLoader extends Loader {
 
 		this.workerPool.length = 0;
 
+		if ( this.workerSourceURL !== '' ) {
+
+			URL.revokeObjectURL( this.workerSourceURL );
+
+		}
+
 		return this;
 
 	}
@@ -393,12 +439,10 @@ function DRACOWorker() {
 
 					const draco = module.draco;
 					const decoder = new draco.Decoder();
-					const decoderBuffer = new draco.DecoderBuffer();
-					decoderBuffer.Init( new Int8Array( buffer ), buffer.byteLength );
 
 					try {
 
-						const geometry = decodeGeometry( draco, decoder, decoderBuffer, taskConfig );
+						const geometry = decodeGeometry( draco, decoder, new Int8Array( buffer ), taskConfig );
 
 						const buffers = geometry.attributes.map( ( attr ) => attr.array.buffer );
 
@@ -414,7 +458,6 @@ function DRACOWorker() {
 
 					} finally {
 
-						draco.destroy( decoderBuffer );
 						draco.destroy( decoder );
 
 					}
@@ -426,7 +469,7 @@ function DRACOWorker() {
 
 	};
 
-	function decodeGeometry( draco, decoder, decoderBuffer, taskConfig ) {
+	function decodeGeometry( draco, decoder, array, taskConfig ) {
 
 		const attributeIDs = taskConfig.attributeIDs;
 		const attributeTypes = taskConfig.attributeTypes;
@@ -434,17 +477,17 @@ function DRACOWorker() {
 		let dracoGeometry;
 		let decodingStatus;
 
-		const geometryType = decoder.GetEncodedGeometryType( decoderBuffer );
+		const geometryType = decoder.GetEncodedGeometryType( array );
 
 		if ( geometryType === draco.TRIANGULAR_MESH ) {
 
 			dracoGeometry = new draco.Mesh();
-			decodingStatus = decoder.DecodeBufferToMesh( decoderBuffer, dracoGeometry );
+			decodingStatus = decoder.DecodeArrayToMesh( array, array.byteLength, dracoGeometry );
 
 		} else if ( geometryType === draco.POINT_CLOUD ) {
 
 			dracoGeometry = new draco.PointCloud();
-			decodingStatus = decoder.DecodeBufferToPointCloud( decoderBuffer, dracoGeometry );
+			decodingStatus = decoder.DecodeArrayToPointCloud( array, array.byteLength, dracoGeometry );
 
 		} else {
 
@@ -487,7 +530,15 @@ function DRACOWorker() {
 
 			}
 
-			geometry.attributes.push( decodeAttribute( draco, decoder, dracoGeometry, attributeName, attributeType, attribute ) );
+			const attributeResult = decodeAttribute( draco, decoder, dracoGeometry, attributeName, attributeType, attribute );
+
+			if ( attributeName === 'color' ) {
+
+				attributeResult.vertexColorSpace = taskConfig.vertexColorSpace;
+
+			}
+
+			geometry.attributes.push( attributeResult );
 
 		}
 

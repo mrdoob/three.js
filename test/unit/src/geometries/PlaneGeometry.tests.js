@@ -1,13 +1,15 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils.js';
 import { PlaneGeometry } from '../../../../src/geometries/PlaneGeometry.js';
+
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
 
 export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'PlaneGeometry', ( hooks ) => {
 
-		var geometries = undefined;
+		let geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -28,14 +30,43 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
+
+			const object = new PlaneGeometry();
+			assert.strictEqual(
+				object instanceof BufferGeometry, true,
+				'PlaneGeometry extends from BufferGeometry'
+			);
+
+		} );
+
+		// INSTANCING
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new PlaneGeometry();
+			assert.ok( object, 'Can instantiate a PlaneGeometry.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new PlaneGeometry();
+			assert.ok(
+				object.type === 'PlaneGeometry',
+				'PlaneGeometry.type should be PlaneGeometry'
+			);
+
+		} );
+
+		QUnit.todo( 'parameters', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		// STATIC
+		QUnit.todo( 'fromJSON', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

@@ -12,8 +12,13 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Class for loading a [page:CubeTexture CubeTexture].
-			This uses the [page:ImageLoader] internally for loading files.
+			[name] can be used to load cube maps. The loader returns an instance of [page:CubeTexture] and expects the cube map to
+			be defined as six separate images representing the sides of a cube. Other cube map definitions like vertical and horizontal cross, 
+			column and row layouts are not supported.
+		</p>
+		<p>
+			The loaded [page:CubeTexture] is in sRGB color space. Meaning the [page:Texture.colorSpace colorSpace] 
+			property is set to `THREE.SRGBColorSpace` by default.
 		</p>
 
 		<h2>Code Example</h2>
@@ -44,9 +49,10 @@ scene.background = new THREE.CubeTextureLoader()
 
 		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<p>
-		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+			[page:LoadingManager manager] — The [page:LoadingManager loadingManager]
+			for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
 
-		Creates a new [name].
+			Creates a new [name].
 		</p>
 
 		<h2>Properties</h2>
@@ -55,24 +61,32 @@ scene.background = new THREE.CubeTextureLoader()
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
 
-		<h3>[method:CubeTexture load]( [param:String urls], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>
+			[method:CubeTexture load]( [param:String urls], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )
+		</h3>
 		<p>
-		[page:String urls] — array of 6 urls to images, one for each side of the CubeTexture.
-		The urls should be specified in the following order: pos-x, neg-x, pos-y, neg-y, pos-z, neg-z.
-		They can also be [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URIs].<br />
-		Note that, by convention, cube maps are specified in a coordinate system in which positive-x is to the right
-		when looking up the positive-z axis -- in other words, using a left-handed coordinate system.
-		Since three.js uses a right-handed coordinate system, environment maps used in three.js will have pos-x and neg-x swapped.<br />
-		[page:Function onLoad] (optional) — Will be called when load completes. The argument will be the loaded [page:CubeTexture texture].<br />
-		[page:Function onProgress] (optional) — This callback function is currently not supported.<br />
-		[page:Function onError] (optional) — Will be called when load errors.<br />
+			[page:String urls] — array of 6 urls to images, one for each side of the
+			CubeTexture. The urls should be specified in the following order: pos-x,
+			neg-x, pos-y, neg-y, pos-z, neg-z. They can also be
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URIs].<br />
+			Note that, by convention, cube maps are specified in a coordinate system
+			in which positive-x is to the right when looking up the positive-z axis --
+			in other words, using a left-handed coordinate system. Since three.js uses
+			a right-handed coordinate system, environment maps used in three.js will
+			have pos-x and neg-x swapped.<br />
+			[page:Function onLoad] (optional) — Will be called when load completes.
+			The argument will be the loaded [page:CubeTexture texture].<br />
+			[page:Function onProgress] (optional) — This callback function is
+			currently not supported.<br />
+			[page:Function onError] (optional) — Will be called when load errors.<br />
 		</p>
 		<p>
-		Begin loading from url and pass the loaded [page:CubeTexture texture] to onLoad. The method also returns a new texture object which can directly be used for material creation.
+			Begin loading from url and pass the loaded [page:CubeTexture texture] to
+			onLoad. The method also returns a new texture object which can directly be
+			used for material creation.
 		</p>
 
 		<h2>Source</h2>
-
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 		</p>

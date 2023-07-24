@@ -101,7 +101,7 @@ class Plane {
 
 	projectPoint( point, target ) {
 
-		return target.copy( this.normal ).multiplyScalar( - this.distanceToPoint( point ) ).add( point );
+		return target.copy( point ).addScaledVector( this.normal, - this.distanceToPoint( point ) );
 
 	}
 
@@ -133,7 +133,7 @@ class Plane {
 
 		}
 
-		return target.copy( direction ).multiplyScalar( t ).add( line.start );
+		return target.copy( line.start ).addScaledVector( direction, t );
 
 	}
 

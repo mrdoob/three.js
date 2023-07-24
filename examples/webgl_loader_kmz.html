@@ -14,12 +14,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,8 +29,8 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { KMZLoader } from './jsm/loaders/KMZLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { KMZLoader } from 'three/addons/loaders/KMZLoader.js';
 
 			let camera, scene, renderer;
 
@@ -40,7 +41,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x999999 );
 
-				const light = new THREE.DirectionalLight( 0xffffff );
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
 				light.position.set( 0.5, 1.0, 0.5 ).normalize();
 
 				scene.add( light );
@@ -52,11 +53,10 @@
 
 				scene.add( camera );
 
-				const grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x333333 );
+				const grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x7b7b7b );
 				scene.add( grid );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

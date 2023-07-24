@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:WebGLRenderTarget] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Utilizzato da [page:CubeCamera] come suo [page:WebGLRenderTarget].
+		</p>
+
+		<h2>Esempi</h2>
+
+		<p>Vedi [page:CubeCamera] per gli esempi.</p>
+
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]([param:Number size], [param:Object options])</h3>
+		<p>
+		[page:Float size] - la dimensione, in pixel. Il valore predefinito è `1`.<br />
+		options - (opzionale) oggetto che contiene i parametri della texture per un target texture auto generato 
+		e i booleani depthBuffer/stencilBuffer.
+
+		Per una spiegazione dei parametri della texture vedi [page:Texture Texture]. Le seguenti
+		sono opzioni valide:<br /><br />
+
+		[page:Constant wrapS] - Il valore predefinito è [page:Textures ClampToEdgeWrapping]. <br />
+		[page:Constant wrapT] - Il valore predefinito è [page:Textures ClampToEdgeWrapping]. <br />
+		[page:Constant magFilter] - Il valore predefinito è [page:Textures .LinearFilter]. <br />
+		[page:Constant minFilter] - Il valore predefinito è [page:Textures LinearFilter]. <br />
+		[page:Boolean generateMipmaps] - Il valore predefinito è `false`.<br />
+		[page:Constant format] - Il valore predefinito è [page:Textures RGBAFormat]. <br />
+		[page:Constant type] - Il valore predefinito è [page:Textures UnsignedByteType]. <br />
+		[page:Number anisotropy] - Il valore predefinito è `1`. Vedi [page:Texture.anisotropy]<br />
+		[page:Constant colorSpace] - Il valore predefinito è [page:Textures NoColorSpace]. <br />
+		[page:Boolean depthBuffer] - Il valore predefinito è `true`.<br />
+		[page:Boolean stencilBuffer] - Il valore predefinito è `false`.<br /><br />
+
+		Crea un nuovo [name]
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>Vedi [page:WebGLRenderTarget] per le proprietà ereditate</h3>
+
+		<h2>Metodi</h2>
+
+		<h3>Vedi [page:WebGLRenderTarget] per i metodi ereditati</h3>
+
+		<h3>[method:this fromEquirectangularTexture]( [param:WebGLRenderer renderer], [param:Texture texture] )</h3>
+		<p>
+			[page:WebGLRenderer renderer] — il renderer.<br/>
+			[page:Texture texture] — la texture equirettangolare.
+		</p>
+		<p>
+			Utilizza questo metodo se vuoi convertire un panorama equirettangolare nel formato cubemap.
+		</p>
+
+		<h3>[method:undefined clear]( [param:WebGLRenderer renderer], [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
+		<p>
+			Chiama questo metodo per cancellare il colore, la profondità e/o i buffer stencil del render target.
+			Il buffer del colore è impostato al colore corrente del renderer. L'impostazione predefinita degli argomenti è `true`.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

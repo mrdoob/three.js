@@ -13,6 +13,17 @@
 
 		<p>Weighted sampling is useful for effects like heavier foliage growth in certain areas of terrain, or concentrated particle emissions from specific parts of a mesh. Vertex weights may be written programmatically, or painted by hand as vertex colors in 3D tools like Blender.</p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { MeshSurfaceSampler } from 'three/addons/math/MeshSurfaceSampler.js';
+		</code>
+
 		<h2>Code Example</h2>
 
 		<code>
@@ -21,24 +32,22 @@
 			.setWeightAttribute( 'color' )
 			.build();
 
-		const sampleMesh = new THREE.InstancedMesh( sampleGeometry, sampleMaterial, 100 );
+		const mesh = new THREE.InstancedMesh( sampleGeometry, sampleMaterial, 100 );
 
-		const _position = new THREE.Vector3();
-		const _matrix = new THREE.Matrix4();
+		const position = new THREE.Vector3();
+		const matrix = new THREE.Matrix4();
 
 		// Sample randomly from the surface, creating an instance of the sample
 		// geometry at each sample point.
 		for ( let i = 0; i < 100; i ++ ) {
 
-			sampler.sample( _position );
+			sampler.sample( position );
 
-			_matrix.makeTranslation( _position.x, _position.y, _position.z );
+			matrix.makeTranslation( position.x, position.y, position.z );
 
-			mesh.setMatrixAt( i, _matrix );
+			mesh.setMatrixAt( i, matrix );
 
 		}
-
-		mesh.instanceMatrix.needsUpdate = true;
 
 		scene.add( mesh );
 		</code>
@@ -71,9 +80,9 @@
 		Processes the input geometry and prepares to return samples. Any configuration of the geometry or sampler must occur before this method is called. Time complexity is <i>O(n)</i> for a surface with <i>n</i> faces.
 		</p>
 
-		<h3>[method:this sample]( [param:Vector3 targetPosition], [param:Vector3 targetNormal], [param:Color targetColor] )</h3>
+		<h3>[method:this sample]( [param:Vector3 targetPosition], [param:Vector3 targetNormal], [param:Color targetColor], [param:Vector2 targetUV] )</h3>
 		<p>
-		Selects a random point on the surface of the input geometry, returning the position and optionally the normal vector and color at that point. Time complexity is <i>O(log n)</i> for a surface with <i>n</i> faces.</i></p>
+		Selects a random point on the surface of the input geometry, returning the position and optionally the normal vector, color and UV Coordinate at that point. Time complexity is <i>O(log n)</i> for a surface with <i>n</i> faces.</i></p>
 
 		<h2>Source</h2>
 

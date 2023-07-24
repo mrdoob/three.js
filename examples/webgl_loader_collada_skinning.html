@@ -16,12 +16,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -30,10 +31,10 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let container, stats, clock, controls;
 			let camera, scene, renderer, mixer;
@@ -60,16 +61,6 @@
 					const avatar = collada.scene;
 					const animations = avatar.animations;
 
-					avatar.traverse( function ( node ) {
-
-						if ( node.isSkinnedMesh ) {
-
-							node.frustumCulled = false;
-
-						}
-
-					} );
-
 					mixer = new THREE.AnimationMixer( avatar );
 					mixer.clipAction( animations[ 0 ] ).play();
 
@@ -79,22 +70,21 @@
 
 				//
 
-				const gridHelper = new THREE.GridHelper( 10, 20, 0x888888, 0x444444 );
+				const gridHelper = new THREE.GridHelper( 10, 20, 0xc1c1c1, 0x8d8d8d );
 				scene.add( gridHelper );
 
 				//
 
-				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.2 );
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.6 );
 				scene.add( ambientLight );
 
-				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
-				scene.add( camera );
-				camera.add( pointLight );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				directionalLight.position.set( 1.5, 1, - 1.5 );
+				scene.add( directionalLight );
 
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

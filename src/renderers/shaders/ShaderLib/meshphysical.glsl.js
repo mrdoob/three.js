@@ -11,7 +11,6 @@ varying vec3 vViewPosition;
 
 #include <common>
 #include <uv_pars_vertex>
-#include <uv2_pars_vertex>
 #include <displacementmap_pars_vertex>
 #include <color_pars_vertex>
 #include <fog_pars_vertex>
@@ -25,7 +24,6 @@ varying vec3 vViewPosition;
 void main() {
 
 	#include <uv_vertex>
-	#include <uv2_vertex>
 	#include <color_vertex>
 	#include <morphcolor_vertex>
 
@@ -63,7 +61,7 @@ export const fragment = /* glsl */`
 
 #ifdef PHYSICAL
 	#define IOR
-	#define SPECULAR
+	#define USE_SPECULAR
 #endif
 
 uniform vec3 diffuse;
@@ -76,16 +74,16 @@ uniform float opacity;
 	uniform float ior;
 #endif
 
-#ifdef SPECULAR
+#ifdef USE_SPECULAR
 	uniform float specularIntensity;
 	uniform vec3 specularColor;
 
-	#ifdef USE_SPECULARINTENSITYMAP
-		uniform sampler2D specularIntensityMap;
+	#ifdef USE_SPECULAR_COLORMAP
+		uniform sampler2D specularColorMap;
 	#endif
 
-	#ifdef USE_SPECULARCOLORMAP
-		uniform sampler2D specularColorMap;
+	#ifdef USE_SPECULAR_INTENSITYMAP
+		uniform sampler2D specularIntensityMap;
 	#endif
 #endif
 
@@ -105,12 +103,20 @@ uniform float opacity;
 	uniform vec3 sheenColor;
 	uniform float sheenRoughness;
 
-	#ifdef USE_SHEENCOLORMAP
+	#ifdef USE_SHEEN_COLORMAP
 		uniform sampler2D sheenColorMap;
 	#endif
 
-	#ifdef USE_SHEENROUGHNESSMAP
+	#ifdef USE_SHEEN_ROUGHNESSMAP
 		uniform sampler2D sheenRoughnessMap;
+	#endif
+#endif
+
+#ifdef USE_ANISOTROPY
+	uniform vec2 anisotropyVector;
+
+	#ifdef USE_ANISOTROPYMAP
+		uniform sampler2D anisotropyMap;
 	#endif
 #endif
 
@@ -121,14 +127,13 @@ varying vec3 vViewPosition;
 #include <dithering_pars_fragment>
 #include <color_pars_fragment>
 #include <uv_pars_fragment>
-#include <uv2_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <alphatest_pars_fragment>
+#include <alphahash_pars_fragment>
 #include <aomap_pars_fragment>
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
-#include <bsdfs>
 #include <iridescence_fragment>
 #include <cube_uv_reflection_fragment>
 #include <envmap_common_pars_fragment>
@@ -161,6 +166,7 @@ void main() {
 	#include <color_fragment>
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
+	#include <alphahash_fragment>
 	#include <roughnessmap_fragment>
 	#include <metalnessmap_fragment>
 	#include <normal_fragment_begin>
@@ -205,9 +211,9 @@ void main() {
 
 	#endif
 
-	#include <output_fragment>
+	#include <opaque_fragment>
 	#include <tonemapping_fragment>
-	#include <encodings_fragment>
+	#include <colorspace_fragment>
 	#include <fog_fragment>
 	#include <premultiplied_alpha_fragment>
 	#include <dithering_fragment>

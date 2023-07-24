@@ -14,12 +14,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,9 +29,9 @@
 
 			import * as THREE from 'three';
 
-			import { TTFLoader } from './jsm/loaders/TTFLoader.js';
-			import { Font } from './jsm/loaders/FontLoader.js';
-			import { TextGeometry } from './jsm/geometries/TextGeometry.js';
+			import { TTFLoader } from 'three/addons/loaders/TTFLoader.js';
+			import { Font } from 'three/addons/loaders/FontLoader.js';
+			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 			let container;
 			let camera, cameraTarget, scene, renderer;
@@ -79,14 +80,14 @@
 
 				// LIGHTS
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
-				dirLight.position.set( 0, 0, 1 ).normalize();
-				scene.add( dirLight );
+				const dirLight1 = new THREE.DirectionalLight( 0xffffff, 0.4 );
+				dirLight1.position.set( 0, 0, 1 ).normalize();
+				scene.add( dirLight1 );
 
-				const pointLight = new THREE.PointLight( 0xffffff, 1.5 );
-				pointLight.position.set( 0, 100, 90 );
-				pointLight.color.setHSL( Math.random(), 1, 0.5 );
-				scene.add( pointLight );
+				const dirLight2 = new THREE.DirectionalLight( 0xffffff, 2 );
+				dirLight2.position.set( 0, hover, 10 ).normalize();
+				dirLight2.color.setHSL( Math.random(), 1, 0.5, THREE.SRGBColorSpace );
+				scene.add( dirLight2 );
 
 				material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 

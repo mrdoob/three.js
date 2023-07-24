@@ -1,10 +1,11 @@
-import Node from '../core/Node.js';
-import PropertyNode from '../core/PropertyNode.js';
-import ContextNode from '../core/ContextNode.js';
+import Node, { addNodeClass } from '../core/Node.js';
+import { property } from '../core/PropertyNode.js';
+import { context as contextNode } from '../core/ContextNode.js';
+import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class CondNode extends Node {
 
-	constructor( condNode, ifNode, elseNode ) {
+	constructor( condNode, ifNode, elseNode = null ) {
 
 		super();
 
@@ -18,11 +19,16 @@ class CondNode extends Node {
 	getNodeType( builder ) {
 
 		const ifType = this.ifNode.getNodeType( builder );
-		const elseType = this.elseNode.getNodeType( builder );
 
-		if ( builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ) {
+		if ( this.elseNode !== null ) {
 
-			return elseType;
+			const elseType = this.elseNode.getNodeType( builder );
+
+			if ( builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ) {
+
+				return elseType;
+
+			}
 
 		}
 
@@ -33,23 +39,37 @@ class CondNode extends Node {
 	generate( builder ) {
 
 		const type = this.getNodeType( builder );
-
 		const context = { tempWrite: false };
-		const nodeProperty = new PropertyNode( null, type ).build( builder );
 
-		const nodeSnippet = new ContextNode( this.condNode/*, context*/ ).build( builder, 'bool' ),
-			ifSnippet = new ContextNode( this.ifNode, context ).build( builder, type ),
-			elseSnippet = new ContextNode( this.elseNode, context ).build( builder, type );
+		const { ifNode, elseNode } = this;
 
-		builder.addFlowCode( `if ( ${nodeSnippet} ) {
+		const needsProperty = ifNode.getNodeType( builder ) !== 'void' || ( elseNode && elseNode.getNodeType( builder ) !== 'void' );
+		const nodeProperty = needsProperty ? property( type ).build( builder ) : '';
 
-\t\t${nodeProperty} = ${ifSnippet};
+		const nodeSnippet = contextNode( this.condNode/*, context*/ ).build( builder, 'bool' );
 
-\t} else {
+		builder.addFlowCode( `\n${ builder.tab }if ( ${ nodeSnippet } ) {\n\n` ).addFlowTab();
 
-\t\t${nodeProperty} = ${elseSnippet};
+		let ifSnippet = contextNode( this.ifNode, context ).build( builder, type );
 
-\t}` );
+		ifSnippet = needsProperty ? nodeProperty + ' = ' + ifSnippet + ';' : ifSnippet;
+
+		builder.removeFlowTab().addFlowCode( builder.tab + '\t' + ifSnippet + '\n\n' + builder.tab + '}' );
+
+		if ( elseNode !== null ) {
+
+			builder.addFlowCode( ' else {\n\n' ).addFlowTab();
+
+			let elseSnippet = contextNode( elseNode, context ).build( builder, type );
+			elseSnippet = nodeProperty ? nodeProperty + ' = ' + elseSnippet + ';' : elseSnippet;
+
+			builder.removeFlowTab().addFlowCode( builder.tab + '\t' + elseSnippet + '\n\n' + builder.tab + '}\n\n' );
+
+		} else {
+
+			builder.addFlowCode( '\n\n' );
+
+		}
 
 		return nodeProperty;
 
@@ -58,3 +78,9 @@ class CondNode extends Node {
 }
 
 export default CondNode;
+
+export const cond = nodeProxy( CondNode );
+
+addNodeElement( 'cond', cond );
+
+addNodeClass( CondNode );

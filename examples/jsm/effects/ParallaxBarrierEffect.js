@@ -68,6 +68,9 @@ class ParallaxBarrierEffect {
 
 				'	}',
 
+				'	#include <tonemapping_fragment>',
+				'	#include <colorspace_fragment>',
+
 				'}'
 
 			].join( '\n' )
@@ -90,9 +93,9 @@ class ParallaxBarrierEffect {
 
 		this.render = function ( scene, camera ) {
 
-			scene.updateMatrixWorld();
+			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-			if ( camera.parent === null ) camera.updateMatrixWorld();
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 			_stereo.update( camera );
 

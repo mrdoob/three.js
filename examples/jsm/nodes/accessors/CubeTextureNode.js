@@ -1,8 +1,8 @@
 import TextureNode from './TextureNode.js';
 import UniformNode from '../core/UniformNode.js';
-import ReflectVectorNode from './ReflectVectorNode.js';
-
-import { negate, vec3, nodeObject } from '../shadernode/ShaderNodeBaseElements.js';
+import { reflectVector } from './ReflectVectorNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { addNodeElement, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
 
 class CubeTextureNode extends TextureNode {
 
@@ -20,31 +20,13 @@ class CubeTextureNode extends TextureNode {
 
 	}
 
-	getConstructHash( builder ) {
+	getDefaultUV() {
 
-		return `${ this.uuid } / ${ builder.context.environmentContext?.uuid || '' }`;
-
-	}
-
-	construct( builder ) {
-
-		const properties = builder.getNodeProperties( this );
-
-		const uvNode = this.uvNode || builder.context.uvNode || new ReflectVectorNode();
-		let levelNode = this.levelNode || builder.context.levelNode;
-
-		if ( levelNode?.isNode === true ) {
-
-			const texture = this.value;
-
-			levelNode = builder.context.levelShaderNode ? builder.context.levelShaderNode.call( { texture, levelNode }, builder ) : levelNode;
-
-		}
-
-		properties.uvNode = uvNode;
-		properties.levelNode = levelNode;
+		return reflectVector;
 
 	}
+
+	setUpdateMatrix( /*updateMatrix*/ ) { } // Ignore .updateMatrix for CubeTextureNode
 
 	generate( builder, output ) {
 
@@ -72,31 +54,39 @@ class CubeTextureNode extends TextureNode {
 
 			const nodeData = builder.getDataFromNode( this );
 
-			let snippet = nodeData.snippet;
+			let propertyName = nodeData.propertyName;
 
-			if ( snippet === undefined || builder.context.tempRead === false ) {
+			if ( propertyName === undefined ) {
 
-				const uvNodeObject = nodeObject( uvNode );
-				const cubeUV = vec3( negate( uvNodeObject.x ), uvNodeObject.yz );
+				const cubeUV = vec3( uvNode.x.negate(), uvNode.yz );
 				const uvSnippet = cubeUV.build( builder, 'vec3' );
 
-				if ( levelNode ) {
+				const nodeVar = builder.getVarFromNode( this, 'vec4' );
+
+				propertyName = builder.getPropertyName( nodeVar );
+
+				let snippet = null;
+
+				if ( levelNode && levelNode.isNode === true ) {
 
 					const levelSnippet = levelNode.build( builder, 'float' );
 
-					snippet = builder.getCubeTextureLevel( textureProperty, uvSnippet, levelSnippet );
+					snippet = builder.getTextureLevel( this, textureProperty, uvSnippet, levelSnippet );
 
 				} else {
 
-					snippet = builder.getCubeTexture( textureProperty, uvSnippet );
+					snippet = builder.getTexture( this, textureProperty, uvSnippet );
 
 				}
 
+				builder.addLineFlowCode( `${propertyName} = ${snippet}` );
+
 				nodeData.snippet = snippet;
+				nodeData.propertyName = propertyName;
 
 			}
 
-			return builder.format( snippet, 'vec4', output );
+			return builder.format( propertyName, 'vec4', output );
 
 		}
 
@@ -105,3 +95,9 @@ class CubeTextureNode extends TextureNode {
 }
 
 export default CubeTextureNode;
+
+export const cubeTexture = nodeProxy( CubeTextureNode );
+
+addNodeElement( 'cubeTexture', cubeTexture );
+
+addNodeClass( CubeTextureNode );

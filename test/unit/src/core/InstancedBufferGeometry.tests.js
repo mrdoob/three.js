@@ -1,6 +1,8 @@
 /* global QUnit */
 
 import { InstancedBufferGeometry } from '../../../../src/core/InstancedBufferGeometry.js';
+
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 
 export default QUnit.module( 'Core', () => {
@@ -22,29 +24,61 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new InstancedBufferGeometry();
+			assert.strictEqual(
+				object instanceof BufferGeometry, true,
+				'InstancedBufferGeometry extends from BufferGeometry'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new InstancedBufferGeometry();
+			assert.ok( object, 'Can instantiate an InstancedBufferGeometry.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new InstancedBufferGeometry();
+			assert.ok(
+				object.type === 'InstancedBufferGeometry',
+				'InstancedBufferGeometry.type should be InstancedBufferGeometry'
+			);
+
+		} );
+
+		QUnit.todo( 'instanceCount', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// PUBLIC STUFF
+		// PUBLIC
+		QUnit.test( 'isInstancedBufferGeometry', ( assert ) => {
+
+			const object = new InstancedBufferGeometry();
+			assert.ok(
+				object.isInstancedBufferGeometry,
+				'InstancedBufferGeometry.isInstancedBufferGeometry should be true'
+			);
+
+		} );
+
 		QUnit.test( 'copy', ( assert ) => {
 
-			var instanceMock1 = {};
-			var instanceMock2 = {};
-			var indexMock = createClonableMock();
-			var defaultAttribute1 = new BufferAttribute( new Float32Array( [ 1 ] ) );
-			var defaultAttribute2 = new BufferAttribute( new Float32Array( [ 2 ] ) );
+			const instanceMock1 = {};
+			const instanceMock2 = {};
+			const indexMock = createClonableMock();
+			const defaultAttribute1 = new BufferAttribute( new Float32Array( [ 1 ] ) );
+			const defaultAttribute2 = new BufferAttribute( new Float32Array( [ 2 ] ) );
 
-			var instance = new InstancedBufferGeometry();
+			const instance = new InstancedBufferGeometry();
 
 			instance.addGroup( 0, 10, instanceMock1 );
 			instance.addGroup( 10, 5, instanceMock2 );
@@ -52,7 +86,7 @@ export default QUnit.module( 'Core', () => {
 			instance.setAttribute( 'defaultAttribute1', defaultAttribute1 );
 			instance.setAttribute( 'defaultAttribute2', defaultAttribute2 );
 
-			var copiedInstance = new InstancedBufferGeometry().copy( instance );
+			const copiedInstance = new InstancedBufferGeometry().copy( instance );
 
 			assert.ok( copiedInstance instanceof InstancedBufferGeometry, 'the clone has the correct type' );
 
@@ -73,7 +107,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( 'clone', ( assert ) => {
+		QUnit.todo( 'toJSON', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

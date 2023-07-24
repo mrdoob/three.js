@@ -1,4 +1,4 @@
-import { BackSide, DoubleSide, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, LinearEncoding, sRGBEncoding, NormalBlending } from '../../constants.js';
+import { BackSide, DoubleSide, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, NormalBlending, LinearSRGBColorSpace } from '../../constants.js';
 import { Layers } from '../../core/Layers.js';
 import { WebGLProgram } from './WebGLProgram.js';
 import { WebGLShaderCache } from './WebGLShaderCache.js';
@@ -11,9 +11,10 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	const _customShaders = new WebGLShaderCache();
 	const programs = [];
 
-	const isWebGL2 = capabilities.isWebGL2;
+	const IS_WEBGL2 = capabilities.isWebGL2;
 	const logarithmicDepthBuffer = capabilities.logarithmicDepthBuffer;
-	const vertexTextures = capabilities.vertexTextures;
+	const SUPPORTS_VERTEX_TEXTURES = capabilities.vertexTextures;
+
 	let precision = capabilities.precision;
 
 	const shaderIDs = {
@@ -33,6 +34,14 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		ShadowMaterial: 'shadow',
 		SpriteMaterial: 'sprite'
 	};
+
+	function getChannel( value ) {
+
+		if ( value === 0 ) return 'uv';
+
+		return `uv${ value }`;
+
+	}
 
 	function getParameters( material, lights, shadows, scene, object ) {
 
@@ -97,16 +106,79 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		const currentRenderTarget = renderer.getRenderTarget();
 
-		const useAlphaTest = material.alphaTest > 0;
-		const useClearcoat = material.clearcoat > 0;
-		const useIridescence = material.iridescence > 0;
+		const IS_INSTANCEDMESH = object.isInstancedMesh === true;
+
+		const HAS_MAP = !! material.map;
+		const HAS_MATCAP = !! material.matcap;
+		const HAS_ENVMAP = !! envMap;
+		const HAS_AOMAP = !! material.aoMap;
+		const HAS_LIGHTMAP = !! material.lightMap;
+		const HAS_BUMPMAP = !! material.bumpMap;
+		const HAS_NORMALMAP = !! material.normalMap;
+		const HAS_DISPLACEMENTMAP = !! material.displacementMap;
+		const HAS_EMISSIVEMAP = !! material.emissiveMap;
+
+		const HAS_METALNESSMAP = !! material.metalnessMap;
+		const HAS_ROUGHNESSMAP = !! material.roughnessMap;
+
+		const HAS_ANISOTROPY = material.anisotropy > 0;
+		const HAS_CLEARCOAT = material.clearcoat > 0;
+		const HAS_IRIDESCENCE = material.iridescence > 0;
+		const HAS_SHEEN = material.sheen > 0;
+		const HAS_TRANSMISSION = material.transmission > 0;
+
+		const HAS_ANISOTROPYMAP = HAS_ANISOTROPY && !! material.anisotropyMap;
+
+		const HAS_CLEARCOATMAP = HAS_CLEARCOAT && !! material.clearcoatMap;
+		const HAS_CLEARCOAT_NORMALMAP = HAS_CLEARCOAT && !! material.clearcoatNormalMap;
+		const HAS_CLEARCOAT_ROUGHNESSMAP = HAS_CLEARCOAT && !! material.clearcoatRoughnessMap;
+
+		const HAS_IRIDESCENCEMAP = HAS_IRIDESCENCE && !! material.iridescenceMap;
+		const HAS_IRIDESCENCE_THICKNESSMAP = HAS_IRIDESCENCE && !! material.iridescenceThicknessMap;
+
+		const HAS_SHEEN_COLORMAP = HAS_SHEEN && !! material.sheenColorMap;
+		const HAS_SHEEN_ROUGHNESSMAP = HAS_SHEEN && !! material.sheenRoughnessMap;
+
+		const HAS_SPECULARMAP = !! material.specularMap;
+		const HAS_SPECULAR_COLORMAP = !! material.specularColorMap;
+		const HAS_SPECULAR_INTENSITYMAP = !! material.specularIntensityMap;
+
+		const HAS_TRANSMISSIONMAP = HAS_TRANSMISSION && !! material.transmissionMap;
+		const HAS_THICKNESSMAP = HAS_TRANSMISSION && !! material.thicknessMap;
+
+		const HAS_GRADIENTMAP = !! material.gradientMap;
+
+		const HAS_ALPHAMAP = !! material.alphaMap;
+
+		const HAS_ALPHATEST = material.alphaTest > 0;
+
+		const HAS_ALPHAHASH = !! material.alphaHash;
+
+		const HAS_EXTENSIONS = !! material.extensions;
+
+		const HAS_ATTRIBUTE_UV1 = !! geometry.attributes.uv1;
+		const HAS_ATTRIBUTE_UV2 = !! geometry.attributes.uv2;
+		const HAS_ATTRIBUTE_UV3 = !! geometry.attributes.uv3;
+
+		let toneMapping = NoToneMapping;
+
+		if ( material.toneMapped ) {
+
+			if ( currentRenderTarget === null || currentRenderTarget.isXRRenderTarget === true ) {
+
+				toneMapping = renderer.toneMapping;
+
+			}
+
+		}
 
 		const parameters = {
 
-			isWebGL2: isWebGL2,
+			isWebGL2: IS_WEBGL2,
 
 			shaderID: shaderID,
-			shaderName: material.type,
+			shaderType: material.type,
+			shaderName: material.name,
 
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader,
@@ -120,72 +192,116 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			precision: precision,
 
-			instancing: object.isInstancedMesh === true,
-			instancingColor: object.isInstancedMesh === true && object.instanceColor !== null,
+			instancing: IS_INSTANCEDMESH,
+			instancingColor: IS_INSTANCEDMESH && object.instanceColor !== null,
 
-			supportsVertexTextures: vertexTextures,
-			outputEncoding: ( currentRenderTarget === null ) ? renderer.outputEncoding : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.encoding : LinearEncoding ),
-			map: !! material.map,
-			matcap: !! material.matcap,
-			envMap: !! envMap,
-			envMapMode: envMap && envMap.mapping,
+			supportsVertexTextures: SUPPORTS_VERTEX_TEXTURES,
+			outputColorSpace: ( currentRenderTarget === null ) ? renderer.outputColorSpace : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace ),
+
+			map: HAS_MAP,
+			matcap: HAS_MATCAP,
+			envMap: HAS_ENVMAP,
+			envMapMode: HAS_ENVMAP && envMap.mapping,
 			envMapCubeUVHeight: envMapCubeUVHeight,
-			lightMap: !! material.lightMap,
-			aoMap: !! material.aoMap,
-			emissiveMap: !! material.emissiveMap,
-			bumpMap: !! material.bumpMap,
-			normalMap: !! material.normalMap,
-			objectSpaceNormalMap: material.normalMapType === ObjectSpaceNormalMap,
-			tangentSpaceNormalMap: material.normalMapType === TangentSpaceNormalMap,
+			aoMap: HAS_AOMAP,
+			lightMap: HAS_LIGHTMAP,
+			bumpMap: HAS_BUMPMAP,
+			normalMap: HAS_NORMALMAP,
+			displacementMap: SUPPORTS_VERTEX_TEXTURES && HAS_DISPLACEMENTMAP,
+			emissiveMap: HAS_EMISSIVEMAP,
 
-			decodeVideoTexture: !! material.map && ( material.map.isVideoTexture === true ) && ( material.map.encoding === sRGBEncoding ),
+			normalMapObjectSpace: HAS_NORMALMAP && material.normalMapType === ObjectSpaceNormalMap,
+			normalMapTangentSpace: HAS_NORMALMAP && material.normalMapType === TangentSpaceNormalMap,
 
-			clearcoat: useClearcoat,
-			clearcoatMap: useClearcoat && !! material.clearcoatMap,
-			clearcoatRoughnessMap: useClearcoat && !! material.clearcoatRoughnessMap,
-			clearcoatNormalMap: useClearcoat && !! material.clearcoatNormalMap,
+			metalnessMap: HAS_METALNESSMAP,
+			roughnessMap: HAS_ROUGHNESSMAP,
 
-			iridescence: useIridescence,
-			iridescenceMap: useIridescence && !! material.iridescenceMap,
-			iridescenceThicknessMap: useIridescence && !! material.iridescenceThicknessMap,
+			anisotropy: HAS_ANISOTROPY,
+			anisotropyMap: HAS_ANISOTROPYMAP,
 
-			displacementMap: !! material.displacementMap,
-			roughnessMap: !! material.roughnessMap,
-			metalnessMap: !! material.metalnessMap,
-			specularMap: !! material.specularMap,
-			specularIntensityMap: !! material.specularIntensityMap,
-			specularColorMap: !! material.specularColorMap,
+			clearcoat: HAS_CLEARCOAT,
+			clearcoatMap: HAS_CLEARCOATMAP,
+			clearcoatNormalMap: HAS_CLEARCOAT_NORMALMAP,
+			clearcoatRoughnessMap: HAS_CLEARCOAT_ROUGHNESSMAP,
+
+			iridescence: HAS_IRIDESCENCE,
+			iridescenceMap: HAS_IRIDESCENCEMAP,
+			iridescenceThicknessMap: HAS_IRIDESCENCE_THICKNESSMAP,
+
+			sheen: HAS_SHEEN,
+			sheenColorMap: HAS_SHEEN_COLORMAP,
+			sheenRoughnessMap: HAS_SHEEN_ROUGHNESSMAP,
+
+			specularMap: HAS_SPECULARMAP,
+			specularColorMap: HAS_SPECULAR_COLORMAP,
+			specularIntensityMap: HAS_SPECULAR_INTENSITYMAP,
+
+			transmission: HAS_TRANSMISSION,
+			transmissionMap: HAS_TRANSMISSIONMAP,
+			thicknessMap: HAS_THICKNESSMAP,
+
+			gradientMap: HAS_GRADIENTMAP,
 
 			opaque: material.transparent === false && material.blending === NormalBlending,
 
-			alphaMap: !! material.alphaMap,
-			alphaTest: useAlphaTest,
-
-			gradientMap: !! material.gradientMap,
-
-			sheen: material.sheen > 0,
-			sheenColorMap: !! material.sheenColorMap,
-			sheenRoughnessMap: !! material.sheenRoughnessMap,
-
-			transmission: material.transmission > 0,
-			transmissionMap: !! material.transmissionMap,
-			thicknessMap: !! material.thicknessMap,
+			alphaMap: HAS_ALPHAMAP,
+			alphaTest: HAS_ALPHATEST,
+			alphaHash: HAS_ALPHAHASH,
 
 			combine: material.combine,
 
-			vertexTangents: ( !! material.normalMap && !! geometry.attributes.tangent ),
+			//
+
+			mapUv: HAS_MAP && getChannel( material.map.channel ),
+			aoMapUv: HAS_AOMAP && getChannel( material.aoMap.channel ),
+			lightMapUv: HAS_LIGHTMAP && getChannel( material.lightMap.channel ),
+			bumpMapUv: HAS_BUMPMAP && getChannel( material.bumpMap.channel ),
+			normalMapUv: HAS_NORMALMAP && getChannel( material.normalMap.channel ),
+			displacementMapUv: HAS_DISPLACEMENTMAP && getChannel( material.displacementMap.channel ),
+			emissiveMapUv: HAS_EMISSIVEMAP && getChannel( material.emissiveMap.channel ),
+
+			metalnessMapUv: HAS_METALNESSMAP && getChannel( material.metalnessMap.channel ),
+			roughnessMapUv: HAS_ROUGHNESSMAP && getChannel( material.roughnessMap.channel ),
+
+			anisotropyMapUv: HAS_ANISOTROPYMAP && getChannel( material.anisotropyMap.channel ),
+
+			clearcoatMapUv: HAS_CLEARCOATMAP && getChannel( material.clearcoatMap.channel ),
+			clearcoatNormalMapUv: HAS_CLEARCOAT_NORMALMAP && getChannel( material.clearcoatNormalMap.channel ),
+			clearcoatRoughnessMapUv: HAS_CLEARCOAT_ROUGHNESSMAP && getChannel( material.clearcoatRoughnessMap.channel ),
+
+			iridescenceMapUv: HAS_IRIDESCENCEMAP && getChannel( material.iridescenceMap.channel ),
+			iridescenceThicknessMapUv: HAS_IRIDESCENCE_THICKNESSMAP && getChannel( material.iridescenceThicknessMap.channel ),
+
+			sheenColorMapUv: HAS_SHEEN_COLORMAP && getChannel( material.sheenColorMap.channel ),
+			sheenRoughnessMapUv: HAS_SHEEN_ROUGHNESSMAP && getChannel( material.sheenRoughnessMap.channel ),
+
+			specularMapUv: HAS_SPECULARMAP && getChannel( material.specularMap.channel ),
+			specularColorMapUv: HAS_SPECULAR_COLORMAP && getChannel( material.specularColorMap.channel ),
+			specularIntensityMapUv: HAS_SPECULAR_INTENSITYMAP && getChannel( material.specularIntensityMap.channel ),
+
+			transmissionMapUv: HAS_TRANSMISSIONMAP && getChannel( material.transmissionMap.channel ),
+			thicknessMapUv: HAS_THICKNESSMAP && getChannel( material.thicknessMap.channel ),
+
+			alphaMapUv: HAS_ALPHAMAP && getChannel( material.alphaMap.channel ),
+
+			//
+
+			vertexTangents: !! geometry.attributes.tangent && ( HAS_NORMALMAP || HAS_ANISOTROPY ),
 			vertexColors: material.vertexColors,
 			vertexAlphas: material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4,
-			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatMap || !! material.clearcoatRoughnessMap || !! material.clearcoatNormalMap || !! material.iridescenceMap || !! material.iridescenceThicknessMap || !! material.displacementMap || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || !! material.sheenColorMap || !! material.sheenRoughnessMap,
-			uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap || !! material.iridescenceMap || !! material.iridescenceThicknessMap || material.transmission > 0 || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || material.sheen > 0 || !! material.sheenColorMap || !! material.sheenRoughnessMap ) && !! material.displacementMap,
+			vertexUv1s: HAS_ATTRIBUTE_UV1,
+			vertexUv2s: HAS_ATTRIBUTE_UV2,
+			vertexUv3s: HAS_ATTRIBUTE_UV3,
+
+			pointsUvs: object.isPoints === true && !! geometry.attributes.uv && ( HAS_MAP || HAS_ALPHAMAP ),
 
 			fog: !! fog,
 			useFog: material.fog === true,
 			fogExp2: ( fog && fog.isFogExp2 ),
 
-			flatShading: !! material.flatShading,
+			flatShading: material.flatShading === true,
 
-			sizeAttenuation: material.sizeAttenuation,
+			sizeAttenuation: material.sizeAttenuation === true,
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
 
 			skinning: object.isSkinnedMesh === true,
@@ -199,12 +315,14 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			numDirLights: lights.directional.length,
 			numPointLights: lights.point.length,
 			numSpotLights: lights.spot.length,
+			numSpotLightMaps: lights.spotLightMap.length,
 			numRectAreaLights: lights.rectArea.length,
 			numHemiLights: lights.hemi.length,
 
 			numDirLightShadows: lights.directionalShadowMap.length,
 			numPointLightShadows: lights.pointShadowMap.length,
 			numSpotLightShadows: lights.spotShadowMap.length,
+			numSpotLightShadowsWithMaps: lights.numSpotLightShadowsWithMaps,
 
 			numClippingPlanes: clipping.numPlanes,
 			numClipIntersection: clipping.numIntersection,
@@ -214,27 +332,27 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			shadowMapEnabled: renderer.shadowMap.enabled && shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
 
-			toneMapping: material.toneMapped ? renderer.toneMapping : NoToneMapping,
-			physicallyCorrectLights: renderer.physicallyCorrectLights,
+			toneMapping: toneMapping,
+			useLegacyLights: renderer._useLegacyLights,
 
 			premultipliedAlpha: material.premultipliedAlpha,
 
 			doubleSided: material.side === DoubleSide,
 			flipSided: material.side === BackSide,
 
-			useDepthPacking: !! material.depthPacking,
+			useDepthPacking: material.depthPacking >= 0,
 			depthPacking: material.depthPacking || 0,
 
 			index0AttributeName: material.index0AttributeName,
 
-			extensionDerivatives: material.extensions && material.extensions.derivatives,
-			extensionFragDepth: material.extensions && material.extensions.fragDepth,
-			extensionDrawBuffers: material.extensions && material.extensions.drawBuffers,
-			extensionShaderTextureLOD: material.extensions && material.extensions.shaderTextureLOD,
+			extensionDerivatives: HAS_EXTENSIONS && material.extensions.derivatives === true,
+			extensionFragDepth: HAS_EXTENSIONS && material.extensions.fragDepth === true,
+			extensionDrawBuffers: HAS_EXTENSIONS && material.extensions.drawBuffers === true,
+			extensionShaderTextureLOD: HAS_EXTENSIONS && material.extensions.shaderTextureLOD === true,
 
-			rendererExtensionFragDepth: isWebGL2 || extensions.has( 'EXT_frag_depth' ),
-			rendererExtensionDrawBuffers: isWebGL2 || extensions.has( 'WEBGL_draw_buffers' ),
-			rendererExtensionShaderTextureLod: isWebGL2 || extensions.has( 'EXT_shader_texture_lod' ),
+			rendererExtensionFragDepth: IS_WEBGL2 || extensions.has( 'EXT_frag_depth' ),
+			rendererExtensionDrawBuffers: IS_WEBGL2 || extensions.has( 'WEBGL_draw_buffers' ),
+			rendererExtensionShaderTextureLod: IS_WEBGL2 || extensions.has( 'EXT_shader_texture_lod' ),
 
 			customProgramCacheKey: material.customProgramCacheKey()
 
@@ -274,7 +392,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			getProgramCacheKeyParameters( array, parameters );
 			getProgramCacheKeyBooleans( array, parameters );
-			array.push( renderer.outputEncoding );
+			array.push( renderer.outputColorSpace );
 
 		}
 
@@ -287,11 +405,33 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	function getProgramCacheKeyParameters( array, parameters ) {
 
 		array.push( parameters.precision );
-		array.push( parameters.outputEncoding );
+		array.push( parameters.outputColorSpace );
 		array.push( parameters.envMapMode );
 		array.push( parameters.envMapCubeUVHeight );
+		array.push( parameters.mapUv );
+		array.push( parameters.alphaMapUv );
+		array.push( parameters.lightMapUv );
+		array.push( parameters.aoMapUv );
+		array.push( parameters.bumpMapUv );
+		array.push( parameters.normalMapUv );
+		array.push( parameters.displacementMapUv );
+		array.push( parameters.emissiveMapUv );
+		array.push( parameters.metalnessMapUv );
+		array.push( parameters.roughnessMapUv );
+		array.push( parameters.anisotropyMapUv );
+		array.push( parameters.clearcoatMapUv );
+		array.push( parameters.clearcoatNormalMapUv );
+		array.push( parameters.clearcoatRoughnessMapUv );
+		array.push( parameters.iridescenceMapUv );
+		array.push( parameters.iridescenceThicknessMapUv );
+		array.push( parameters.sheenColorMapUv );
+		array.push( parameters.sheenRoughnessMapUv );
+		array.push( parameters.specularMapUv );
+		array.push( parameters.specularColorMapUv );
+		array.push( parameters.specularIntensityMapUv );
+		array.push( parameters.transmissionMapUv );
+		array.push( parameters.thicknessMapUv );
 		array.push( parameters.combine );
-		array.push( parameters.vertexUvs );
 		array.push( parameters.fogExp2 );
 		array.push( parameters.sizeAttenuation );
 		array.push( parameters.morphTargetsCount );
@@ -299,11 +439,13 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.numDirLights );
 		array.push( parameters.numPointLights );
 		array.push( parameters.numSpotLights );
+		array.push( parameters.numSpotLightMaps );
 		array.push( parameters.numHemiLights );
 		array.push( parameters.numRectAreaLights );
 		array.push( parameters.numDirLightShadows );
 		array.push( parameters.numPointLightShadows );
 		array.push( parameters.numSpotLightShadows );
+		array.push( parameters.numSpotLightShadowsWithMaps );
 		array.push( parameters.shadowMapType );
 		array.push( parameters.toneMapping );
 		array.push( parameters.numClippingPlanes );
@@ -324,64 +466,34 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 2 );
 		if ( parameters.instancingColor )
 			_programLayers.enable( 3 );
-		if ( parameters.map )
-			_programLayers.enable( 4 );
 		if ( parameters.matcap )
-			_programLayers.enable( 5 );
+			_programLayers.enable( 4 );
 		if ( parameters.envMap )
+			_programLayers.enable( 5 );
+		if ( parameters.normalMapObjectSpace )
 			_programLayers.enable( 6 );
-		if ( parameters.lightMap )
+		if ( parameters.normalMapTangentSpace )
 			_programLayers.enable( 7 );
-		if ( parameters.aoMap )
-			_programLayers.enable( 8 );
-		if ( parameters.emissiveMap )
-			_programLayers.enable( 9 );
-		if ( parameters.bumpMap )
-			_programLayers.enable( 10 );
-		if ( parameters.normalMap )
-			_programLayers.enable( 11 );
-		if ( parameters.objectSpaceNormalMap )
-			_programLayers.enable( 12 );
-		if ( parameters.tangentSpaceNormalMap )
-			_programLayers.enable( 13 );
 		if ( parameters.clearcoat )
-			_programLayers.enable( 14 );
-		if ( parameters.clearcoatMap )
-			_programLayers.enable( 15 );
-		if ( parameters.clearcoatRoughnessMap )
-			_programLayers.enable( 16 );
-		if ( parameters.clearcoatNormalMap )
-			_programLayers.enable( 17 );
+			_programLayers.enable( 8 );
 		if ( parameters.iridescence )
-			_programLayers.enable( 18 );
-		if ( parameters.iridescenceMap )
-			_programLayers.enable( 19 );
-		if ( parameters.iridescenceThicknessMap )
-			_programLayers.enable( 20 );
-		if ( parameters.displacementMap )
-			_programLayers.enable( 21 );
-		if ( parameters.specularMap )
-			_programLayers.enable( 22 );
-		if ( parameters.roughnessMap )
-			_programLayers.enable( 23 );
-		if ( parameters.metalnessMap )
-			_programLayers.enable( 24 );
-		if ( parameters.gradientMap )
-			_programLayers.enable( 25 );
-		if ( parameters.alphaMap )
-			_programLayers.enable( 26 );
+			_programLayers.enable( 9 );
 		if ( parameters.alphaTest )
-			_programLayers.enable( 27 );
+			_programLayers.enable( 10 );
 		if ( parameters.vertexColors )
-			_programLayers.enable( 28 );
+			_programLayers.enable( 11 );
 		if ( parameters.vertexAlphas )
-			_programLayers.enable( 29 );
-		if ( parameters.vertexUvs )
-			_programLayers.enable( 30 );
+			_programLayers.enable( 12 );
+		if ( parameters.vertexUv1s )
+			_programLayers.enable( 13 );
+		if ( parameters.vertexUv2s )
+			_programLayers.enable( 14 );
+		if ( parameters.vertexUv3s )
+			_programLayers.enable( 15 );
 		if ( parameters.vertexTangents )
-			_programLayers.enable( 31 );
-		if ( parameters.uvsVertexOnly )
-			_programLayers.enable( 32 );
+			_programLayers.enable( 16 );
+		if ( parameters.anisotropy )
+			_programLayers.enable( 17 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();
@@ -406,7 +518,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 8 );
 		if ( parameters.shadowMapEnabled )
 			_programLayers.enable( 9 );
-		if ( parameters.physicallyCorrectLights )
+		if ( parameters.useLegacyLights )
 			_programLayers.enable( 10 );
 		if ( parameters.doubleSided )
 			_programLayers.enable( 11 );
@@ -416,26 +528,14 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 13 );
 		if ( parameters.dithering )
 			_programLayers.enable( 14 );
-		if ( parameters.specularIntensityMap )
-			_programLayers.enable( 15 );
-		if ( parameters.specularColorMap )
-			_programLayers.enable( 16 );
 		if ( parameters.transmission )
-			_programLayers.enable( 17 );
-		if ( parameters.transmissionMap )
-			_programLayers.enable( 18 );
-		if ( parameters.thicknessMap )
-			_programLayers.enable( 19 );
+			_programLayers.enable( 15 );
 		if ( parameters.sheen )
-			_programLayers.enable( 20 );
-		if ( parameters.sheenColorMap )
-			_programLayers.enable( 21 );
-		if ( parameters.sheenRoughnessMap )
-			_programLayers.enable( 22 );
-		if ( parameters.decodeVideoTexture )
-			_programLayers.enable( 23 );
+			_programLayers.enable( 16 );
 		if ( parameters.opaque )
-			_programLayers.enable( 24 );
+			_programLayers.enable( 17 );
+		if ( parameters.pointsUvs )
+			_programLayers.enable( 18 );
 
 		array.push( _programLayers.mask );
 
@@ -533,6 +633,5 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	};
 
 }
-
 
 export { WebGLPrograms };

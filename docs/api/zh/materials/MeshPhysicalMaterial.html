@@ -25,6 +25,9 @@
 			<li>
 				<b>高级光线反射:</b> 为非金属材质提供了更多更灵活的光线反射。
 			</li>
+			<li>
+				<b>Sheen:</b> Can be used for representing cloth and fabric materials.
+			</li>
 		</ul>
 
 		<p>
@@ -52,9 +55,8 @@
 		<h2>例子</h2>
 
 		<p>
-			[example:webgl_materials_variations_physical materials / variations / physical]<br />
 			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
-			[example:webgl_materials_physical_reflectivity materials / physical / reflectivity]<br />
+			[example:webgl_loader_gltf_sheen loader / gltf / sheen]<br />
 			[example:webgl_materials_physical_transmission materials / physical / transmission]
 		</p>
 
@@ -77,7 +79,7 @@
 
 		<h3>[property:Float attenuationDistance]</h3>
 		<p>
-		Density of the medium given as the average distance that light travels in the medium before interacting with a particle. The value is given in world space. Default is *0*.
+		Density of the medium given as the average distance that light travels in the medium before interacting with a particle. The value is given in world space units, and must be greater than zero. Default is `Infinity`.
 		</p>
 
 		<h3>[property:Float clearcoat]</h3>

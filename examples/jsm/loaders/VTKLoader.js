@@ -1,10 +1,10 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
+	Color,
 	FileLoader,
 	Float32BufferAttribute,
-	Loader,
-	LoaderUtils
+	Loader
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
@@ -108,6 +108,8 @@ class VTKLoader extends Loader {
 			let inColorSection = false;
 			let inNormalsSection = false;
 
+			const color = new Color();
+
 			const lines = data.split( '\n' );
 
 			for ( const i in lines ) {
@@ -208,7 +210,10 @@ class VTKLoader extends Loader {
 							const r = parseFloat( result[ 1 ] );
 							const g = parseFloat( result[ 2 ] );
 							const b = parseFloat( result[ 3 ] );
-							colors.push( r, g, b );
+
+							color.set( r, g, b ).convertSRGBToLinear();
+
+							colors.push( color.r, color.g, color.b );
 
 						}
 
@@ -320,9 +325,11 @@ class VTKLoader extends Loader {
 						const g = colors[ 3 * i + 1 ];
 						const b = colors[ 3 * i + 2 ];
 
-						newColors.push( r, g, b );
-						newColors.push( r, g, b );
-						newColors.push( r, g, b );
+						color.set( r, g, b ).convertSRGBToLinear();
+
+						newColors.push( color.r, color.g, color.b );
+						newColors.push( color.r, color.g, color.b );
+						newColors.push( color.r, color.g, color.b );
 
 					}
 
@@ -780,7 +787,7 @@ class VTKLoader extends Loader {
 
 					for ( let i = 0; i < dataOffsets.length - 1; i ++ ) {
 
-						const data = fflate.unzlibSync( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ) ); // eslint-disable-line no-undef
+						const data = fflate.unzlibSync( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ) );
 						content = data.buffer;
 
 						if ( ele.attributes.type === 'Float32' ) {
@@ -1130,16 +1137,18 @@ class VTKLoader extends Loader {
 
 		}
 
+		const textDecoder = new TextDecoder();
+
 		// get the 5 first lines of the files to check if there is the key word binary
-		const meta = LoaderUtils.decodeText( new Uint8Array( data, 0, 250 ) ).split( '\n' );
+		const meta = textDecoder.decode( new Uint8Array( data, 0, 250 ) ).split( '\n' );
 
 		if ( meta[ 0 ].indexOf( 'xml' ) !== - 1 ) {
 
-			return parseXML( LoaderUtils.decodeText( data ) );
+			return parseXML( textDecoder.decode( data ) );
 
 		} else if ( meta[ 2 ].includes( 'ASCII' ) ) {
 
-			return parseASCII( LoaderUtils.decodeText( data ) );
+			return parseASCII( textDecoder.decode( data ) );
 
 		} else {
 

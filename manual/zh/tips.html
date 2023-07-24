@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – Tips">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -135,7 +135,7 @@ elem.addEventListener('click', () =&gt; {
 <h1 id="preventing-the-canvas-being-cleared">防止canvas被清空</h1>
 <p>如果你想要让用户使用动画对象进行绘图。你需要在创建 <a href="/docs/#api/zh/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> 的时候传入 <code class="notranslate" translate="no">preserveDrawingBuffer: true</code>。这将阻止浏览器清理canvas。类似的，你也需要告诉three.js不要自动清理canvas。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
--const renderer = new THREE.WebGLRenderer({canvas});
+-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +const renderer = new THREE.WebGLRenderer({
 +  canvas,
 +  preserveDrawingBuffer: true,
@@ -213,7 +213,7 @@ elem.addEventListener('click', () =&gt; {
 <h1 id="making-the-canvas-transparent">透明化canvas</h1>
 <p>默认情况下THREE.js让canvas显示为不透明。如果你需要让canvas变得透明可以在创建 <a href="/docs/#api/zh/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> 的时候传入 <a href="/docs/#api/zh/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha:true</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
--const renderer = new THREE.WebGLRenderer({canvas});
+-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +const renderer = new THREE.WebGLRenderer({
 +  canvas,
 +  alpha: true,
@@ -334,8 +334,8 @@ const renderer = new THREE.WebGLRenderer({
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

@@ -3,8 +3,9 @@ import {
 	DataUtils,
 	FloatType,
 	HalfFloatType,
-	LinearEncoding,
+	NoColorSpace,
 	LinearFilter,
+	LinearSRGBColorSpace,
 	RedFormat,
 	RGBAFormat
 } from 'three';
@@ -1252,13 +1253,7 @@ class EXRLoader extends DataTextureLoader {
 
 			const compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
 
-			if ( typeof fflate === 'undefined' ) {
-
-				console.error( 'THREE.EXRLoader: External library fflate.min.js required.' );
-
-			}
-
-			const rawBuffer = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+			const rawBuffer = fflate.unzlibSync( compressed );
 			const tmpBuffer = new Uint8Array( rawBuffer.length );
 
 			predictor( rawBuffer ); // revert predictor
@@ -1375,13 +1370,7 @@ class EXRLoader extends DataTextureLoader {
 
 			const compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
 
-			if ( typeof fflate === 'undefined' ) {
-
-				console.error( 'THREE.EXRLoader: External library fflate.min.js required.' );
-
-			}
-
-			const rawBuffer = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+			const rawBuffer = fflate.unzlibSync( compressed );
 
 			const sz = info.lines * info.channels * info.width;
 			const tmpBuffer = ( info.type == 1 ) ? new Uint16Array( sz ) : new Uint32Array( sz );
@@ -1562,7 +1551,7 @@ class EXRLoader extends DataTextureLoader {
 					case DEFLATE:
 
 						const compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.totalAcUncompressedCount );
-						const data = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+						const data = fflate.unzlibSync( compressed );
 						acBuffer = new Uint16Array( data.buffer );
 						inOffset.value += dwaHeader.totalAcUncompressedCount;
 						break;
@@ -1589,7 +1578,7 @@ class EXRLoader extends DataTextureLoader {
 			if ( dwaHeader.rleRawSize > 0 ) {
 
 				const compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.rleCompressedSize );
-				const data = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+				const data = fflate.unzlibSync( compressed );
 				rleBuffer = decodeRunLength( data.buffer );
 
 				inOffset.value += dwaHeader.rleCompressedSize;
@@ -1761,11 +1750,21 @@ class EXRLoader extends DataTextureLoader {
 
 		const parseInt64 = function ( dataView, offset ) {
 
-			const Int64 = Number( dataView.getBigInt64( offset.value, true ) );
+			let int;
+
+			if ( 'getBigInt64' in DataView.prototype ) {
+
+				int = Number( dataView.getBigInt64( offset.value, true ) );
+
+			} else {
+
+				int = dataView.getUint32( offset.value + 4, true ) + Number( dataView.getUint32( offset.value, true ) << 32 );
+
+			}
 
 			offset.value += ULONG_SIZE;
 
-			return Int64;
+			return int;
 
 		};
 
@@ -2074,7 +2073,7 @@ class EXRLoader extends DataTextureLoader {
 				uncompress: null,
 				getter: null,
 				format: null,
-				encoding: null,
+				colorSpace: LinearSRGBColorSpace,
 			};
 
 			switch ( EXRHeader.compression ) {
@@ -2206,12 +2205,12 @@ class EXRLoader extends DataTextureLoader {
 			if ( EXRDecoder.outputChannels == 4 ) {
 
 				EXRDecoder.format = RGBAFormat;
-				EXRDecoder.encoding = LinearEncoding;
+				EXRDecoder.colorSpace = LinearSRGBColorSpace;
 
 			} else {
 
 				EXRDecoder.format = RedFormat;
-				EXRDecoder.encoding = LinearEncoding;
+				EXRDecoder.colorSpace = NoColorSpace;
 
 			}
 
@@ -2274,7 +2273,7 @@ class EXRLoader extends DataTextureLoader {
 			height: EXRDecoder.height,
 			data: EXRDecoder.byteArray,
 			format: EXRDecoder.format,
-			encoding: EXRDecoder.encoding,
+			colorSpace: EXRDecoder.colorSpace,
 			type: this.type,
 		};
 
@@ -2291,7 +2290,7 @@ class EXRLoader extends DataTextureLoader {
 
 		function onLoadCallback( texture, texData ) {
 
-			texture.encoding = texData.encoding;
+			texture.colorSpace = texData.colorSpace;
 			texture.minFilter = LinearFilter;
 			texture.magFilter = LinearFilter;
 			texture.generateMipmaps = false;

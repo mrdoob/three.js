@@ -218,6 +218,7 @@ const ShaderLib = {
 		uniforms: {
 			uvTransform: { value: /*@__PURE__*/ new Matrix3() },
 			t2D: { value: null },
+			backgroundIntensity: { value: 1 }
 		},
 
 		vertexShader: ShaderChunk.background_vert,
@@ -225,14 +226,27 @@ const ShaderLib = {
 
 	},
 
+	backgroundCube: {
+
+		uniforms: {
+			envMap: { value: null },
+			flipEnvMap: { value: - 1 },
+			backgroundBlurriness: { value: 0 },
+			backgroundIntensity: { value: 1 }
+		},
+
+		vertexShader: ShaderChunk.backgroundCube_vert,
+		fragmentShader: ShaderChunk.backgroundCube_frag
+
+	},
+
 	cube: {
 
-		uniforms: /*@__PURE__*/ mergeUniforms( [
-			UniformsLib.envmap,
-			{
-				opacity: { value: 1.0 }
-			}
-		] ),
+		uniforms: {
+			tCube: { value: null },
+			tFlip: { value: - 1 },
+			opacity: { value: 1.0 }
+		},
 
 		vertexShader: ShaderChunk.cube_vert,
 		fragmentShader: ShaderChunk.cube_frag
@@ -292,33 +306,47 @@ ShaderLib.physical = {
 		{
 			clearcoat: { value: 0 },
 			clearcoatMap: { value: null },
+			clearcoatMapTransform: { value: /*@__PURE__*/ new Matrix3() },
+			clearcoatNormalMap: { value: null },
+			clearcoatNormalMapTransform: { value: /*@__PURE__*/ new Matrix3() },
+			clearcoatNormalScale: { value: /*@__PURE__*/ new Vector2( 1, 1 ) },
 			clearcoatRoughness: { value: 0 },
 			clearcoatRoughnessMap: { value: null },
-			clearcoatNormalScale: { value: /*@__PURE__*/ new Vector2( 1, 1 ) },
-			clearcoatNormalMap: { value: null },
+			clearcoatRoughnessMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 			iridescence: { value: 0 },
 			iridescenceMap: { value: null },
+			iridescenceMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 			iridescenceIOR: { value: 1.3 },
 			iridescenceThicknessMinimum: { value: 100 },
 			iridescenceThicknessMaximum: { value: 400 },
 			iridescenceThicknessMap: { value: null },
+			iridescenceThicknessMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 			sheen: { value: 0 },
 			sheenColor: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 			sheenColorMap: { value: null },
+			sheenColorMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 			sheenRoughness: { value: 1 },
 			sheenRoughnessMap: { value: null },
+			sheenRoughnessMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 			transmission: { value: 0 },
 			transmissionMap: { value: null },
+			transmissionMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 			transmissionSamplerSize: { value: /*@__PURE__*/ new Vector2() },
 			transmissionSamplerMap: { value: null },
 			thickness: { value: 0 },
 			thicknessMap: { value: null },
+			thicknessMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 			attenuationDistance: { value: 0 },
 			attenuationColor: { value: /*@__PURE__*/ new Color( 0x000000 ) },
-			specularIntensity: { value: 1 },
-			specularIntensityMap: { value: null },
 			specularColor: { value: /*@__PURE__*/ new Color( 1, 1, 1 ) },
 			specularColorMap: { value: null },
+			specularColorMapTransform: { value: /*@__PURE__*/ new Matrix3() },
+			specularIntensity: { value: 1 },
+			specularIntensityMap: { value: null },
+			specularIntensityMapTransform: { value: /*@__PURE__*/ new Matrix3() },
+			anisotropyVector: { value: /*@__PURE__*/ new Vector2() },
+			anisotropyMap: { value: null },
+			anisotropyMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 		}
 	] ),
 

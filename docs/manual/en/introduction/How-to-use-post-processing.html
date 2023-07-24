@@ -28,9 +28,10 @@
 		</p>
 
 		<code>
-		import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-		import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-		import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
+		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+		import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
+		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 		</code>
 
 		<p>
@@ -59,8 +60,8 @@
 		<p>
 			Our composer is now ready so it's possible to configure the chain of post-processing passes. These passes are responsible for creating
 			the final visual output of the application. They are processed in order of their addition/insertion. In our example, the instance of `RenderPass`
-			is executed first and then the instance of `GlitchPass`. The last enabled pass in the chain is automatically rendered to the screen. The setup
-			of the passes looks like so:
+			is executed first, then the instance of `GlitchPass` and finally `OutputPass`. The last enabled pass in the chain is automatically rendered to the screen. 
+			The setup of the passes looks like so:
 		</p>
 
 		<code>
@@ -69,12 +70,15 @@
 
 		const glitchPass = new GlitchPass();
 		composer.addPass( glitchPass );
+
+		const outputPass = new OutputPass();
+		composer.addPass( outputPass );
 		</code>
 
 		<p>
 			`RenderPass` is normally placed at the beginning of the chain in order to provide the rendered scene as an input for the next post-processing step. In our case,
-			`GlitchPass` is going to use these image data to apply a wild glitch effect. Check out this [link:https://threejs.org/examples/webgl_postprocessing_glitch live example]
-			to see it in action.
+			`GlitchPass` is going to use these image data to apply a wild glitch effect. `OutputPass` is usually the last pass in the chain which performs sRGB color space conversion and optional tone mapping.
+			Check out this [link:https://threejs.org/examples/webgl_postprocessing_glitch live example] to see it in action.
 		</p>
 
 		<h2>Built-in Passes</h2>
@@ -92,8 +96,8 @@
 		</p>
 
 		<code>
-		import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-		import { LuminosityShader } from 'three/examples/jsm/shaders/LuminosityShader.js';
+		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
 
 		// later in your init routine
 

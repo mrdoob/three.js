@@ -1,10 +1,23 @@
 import { BackSide } from '../../constants.js';
+import { getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
 
 function WebGLMaterials( renderer, properties ) {
 
+	function refreshTransformUniform( map, uniform ) {
+
+		if ( map.matrixAutoUpdate === true ) {
+
+			map.updateMatrix();
+
+		}
+
+		uniform.value.copy( map.matrix );
+
+	}
+
 	function refreshFogUniforms( uniforms, fog ) {
 
-		uniforms.fogColor.value.copy( fog.color );
+		fog.color.getRGB( uniforms.fogColor.value, getUnlitUniformColorSpace( renderer ) );
 
 		if ( fog.isFog ) {
 
@@ -119,25 +132,56 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.map.value = material.map;
 
+			refreshTransformUniform( material.map, uniforms.mapTransform );
+
 		}
 
 		if ( material.alphaMap ) {
 
 			uniforms.alphaMap.value = material.alphaMap;
 
+			refreshTransformUniform( material.alphaMap, uniforms.alphaMapTransform );
+
 		}
 
 		if ( material.bumpMap ) {
 
 			uniforms.bumpMap.value = material.bumpMap;
+
+			refreshTransformUniform( material.bumpMap, uniforms.bumpMapTransform );
+
 			uniforms.bumpScale.value = material.bumpScale;
-			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
+
+			if ( material.side === BackSide ) {
+
+				uniforms.bumpScale.value *= - 1;
+
+			}
+
+		}
+
+		if ( material.normalMap ) {
+
+			uniforms.normalMap.value = material.normalMap;
+
+			refreshTransformUniform( material.normalMap, uniforms.normalMapTransform );
+
+			uniforms.normalScale.value.copy( material.normalScale );
+
+			if ( material.side === BackSide ) {
+
+				uniforms.normalScale.value.negate();
+
+			}
 
 		}
 
 		if ( material.displacementMap ) {
 
 			uniforms.displacementMap.value = material.displacementMap;
+
+			refreshTransformUniform( material.displacementMap, uniforms.displacementMapTransform );
+
 			uniforms.displacementScale.value = material.displacementScale;
 			uniforms.displacementBias.value = material.displacementBias;
 
@@ -147,19 +191,15 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.emissiveMap.value = material.emissiveMap;
 
-		}
-
-		if ( material.normalMap ) {
-
-			uniforms.normalMap.value = material.normalMap;
-			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
+			refreshTransformUniform( material.emissiveMap, uniforms.emissiveMapTransform );
 
 		}
 
 		if ( material.specularMap ) {
 
 			uniforms.specularMap.value = material.specularMap;
+
+			refreshTransformUniform( material.specularMap, uniforms.specularMapTransform );
 
 		}
 
@@ -188,9 +228,11 @@ function WebGLMaterials( renderer, properties ) {
 			uniforms.lightMap.value = material.lightMap;
 
 			// artist-friendly light intensity scaling factor
-			const scaleFactor = ( renderer.physicallyCorrectLights !== true ) ? Math.PI : 1;
+			const scaleFactor = ( renderer._useLegacyLights === true ) ? Math.PI : 1;
 
 			uniforms.lightMapIntensity.value = material.lightMapIntensity * scaleFactor;
+
+			refreshTransformUniform( material.lightMap, uniforms.lightMapTransform );
 
 		}
 
@@ -199,163 +241,7 @@ function WebGLMaterials( renderer, properties ) {
 			uniforms.aoMap.value = material.aoMap;
 			uniforms.aoMapIntensity.value = material.aoMapIntensity;
 
-		}
-
-		// uv repeat and offset setting priorities
-		// 1. color map
-		// 2. specular map
-		// 3. displacementMap map
-		// 4. normal map
-		// 5. bump map
-		// 6. roughnessMap map
-		// 7. metalnessMap map
-		// 8. alphaMap map
-		// 9. emissiveMap map
-		// 10. clearcoat map
-		// 11. clearcoat normal map
-		// 12. clearcoat roughnessMap map
-		// 13. iridescence map
-		// 14. iridescence thickness map
-		// 15. specular intensity map
-		// 16. specular tint map
-		// 17. transmission map
-		// 18. thickness map
-
-		let uvScaleMap;
-
-		if ( material.map ) {
-
-			uvScaleMap = material.map;
-
-		} else if ( material.specularMap ) {
-
-			uvScaleMap = material.specularMap;
-
-		} else if ( material.displacementMap ) {
-
-			uvScaleMap = material.displacementMap;
-
-		} else if ( material.normalMap ) {
-
-			uvScaleMap = material.normalMap;
-
-		} else if ( material.bumpMap ) {
-
-			uvScaleMap = material.bumpMap;
-
-		} else if ( material.roughnessMap ) {
-
-			uvScaleMap = material.roughnessMap;
-
-		} else if ( material.metalnessMap ) {
-
-			uvScaleMap = material.metalnessMap;
-
-		} else if ( material.alphaMap ) {
-
-			uvScaleMap = material.alphaMap;
-
-		} else if ( material.emissiveMap ) {
-
-			uvScaleMap = material.emissiveMap;
-
-		} else if ( material.clearcoatMap ) {
-
-			uvScaleMap = material.clearcoatMap;
-
-		} else if ( material.clearcoatNormalMap ) {
-
-			uvScaleMap = material.clearcoatNormalMap;
-
-		} else if ( material.clearcoatRoughnessMap ) {
-
-			uvScaleMap = material.clearcoatRoughnessMap;
-
-		} else if ( material.iridescenceMap ) {
-
-			uvScaleMap = material.iridescenceMap;
-
-		} else if ( material.iridescenceThicknessMap ) {
-
-			uvScaleMap = material.iridescenceThicknessMap;
-
-		} else if ( material.specularIntensityMap ) {
-
-			uvScaleMap = material.specularIntensityMap;
-
-		} else if ( material.specularColorMap ) {
-
-			uvScaleMap = material.specularColorMap;
-
-		} else if ( material.transmissionMap ) {
-
-			uvScaleMap = material.transmissionMap;
-
-		} else if ( material.thicknessMap ) {
-
-			uvScaleMap = material.thicknessMap;
-
-		} else if ( material.sheenColorMap ) {
-
-			uvScaleMap = material.sheenColorMap;
-
-		} else if ( material.sheenRoughnessMap ) {
-
-			uvScaleMap = material.sheenRoughnessMap;
-
-		}
-
-		if ( uvScaleMap !== undefined ) {
-
-			// backwards compatibility
-			if ( uvScaleMap.isWebGLRenderTarget ) {
-
-				uvScaleMap = uvScaleMap.texture;
-
-			}
-
-			if ( uvScaleMap.matrixAutoUpdate === true ) {
-
-				uvScaleMap.updateMatrix();
-
-			}
-
-			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
-
-		}
-
-		// uv repeat and offset setting priorities for uv2
-		// 1. ao map
-		// 2. light map
-
-		let uv2ScaleMap;
-
-		if ( material.aoMap ) {
-
-			uv2ScaleMap = material.aoMap;
-
-		} else if ( material.lightMap ) {
-
-			uv2ScaleMap = material.lightMap;
-
-		}
-
-		if ( uv2ScaleMap !== undefined ) {
-
-			// backwards compatibility
-			if ( uv2ScaleMap.isWebGLRenderTarget ) {
-
-				uv2ScaleMap = uv2ScaleMap.texture;
-
-			}
-
-			if ( uv2ScaleMap.matrixAutoUpdate === true ) {
-
-				uv2ScaleMap.updateMatrix();
-
-			}
-
-			uniforms.uv2Transform.value.copy( uv2ScaleMap.matrix );
+			refreshTransformUniform( material.aoMap, uniforms.aoMapTransform );
 
 		}
 
@@ -365,6 +251,14 @@ function WebGLMaterials( renderer, properties ) {
 
 		uniforms.diffuse.value.copy( material.color );
 		uniforms.opacity.value = material.opacity;
+
+		if ( material.map ) {
+
+			uniforms.map.value = material.map;
+
+			refreshTransformUniform( material.map, uniforms.mapTransform );
+
+		}
 
 	}
 
@@ -387,45 +281,21 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.map.value = material.map;
 
+			refreshTransformUniform( material.map, uniforms.uvTransform );
+
 		}
 
 		if ( material.alphaMap ) {
 
 			uniforms.alphaMap.value = material.alphaMap;
 
+			refreshTransformUniform( material.alphaMap, uniforms.alphaMapTransform );
+
 		}
 
 		if ( material.alphaTest > 0 ) {
 
 			uniforms.alphaTest.value = material.alphaTest;
-
-		}
-
-		// uv repeat and offset setting priorities
-		// 1. color map
-		// 2. alpha map
-
-		let uvScaleMap;
-
-		if ( material.map ) {
-
-			uvScaleMap = material.map;
-
-		} else if ( material.alphaMap ) {
-
-			uvScaleMap = material.alphaMap;
-
-		}
-
-		if ( uvScaleMap !== undefined ) {
-
-			if ( uvScaleMap.matrixAutoUpdate === true ) {
-
-				uvScaleMap.updateMatrix();
-
-			}
-
-			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 		}
 
@@ -441,45 +311,21 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.map.value = material.map;
 
+			refreshTransformUniform( material.map, uniforms.mapTransform );
+
 		}
 
 		if ( material.alphaMap ) {
 
 			uniforms.alphaMap.value = material.alphaMap;
 
+			refreshTransformUniform( material.alphaMap, uniforms.alphaMapTransform );
+
 		}
 
 		if ( material.alphaTest > 0 ) {
 
 			uniforms.alphaTest.value = material.alphaTest;
-
-		}
-
-		// uv repeat and offset setting priorities
-		// 1. color map
-		// 2. alpha map
-
-		let uvScaleMap;
-
-		if ( material.map ) {
-
-			uvScaleMap = material.map;
-
-		} else if ( material.alphaMap ) {
-
-			uvScaleMap = material.alphaMap;
-
-		}
-
-		if ( uvScaleMap !== undefined ) {
-
-			if ( uvScaleMap.matrixAutoUpdate === true ) {
-
-				uvScaleMap.updateMatrix();
-
-			}
-
-			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 		}
 
@@ -504,18 +350,23 @@ function WebGLMaterials( renderer, properties ) {
 
 	function refreshUniformsStandard( uniforms, material ) {
 
-		uniforms.roughness.value = material.roughness;
 		uniforms.metalness.value = material.metalness;
+
+		if ( material.metalnessMap ) {
+
+			uniforms.metalnessMap.value = material.metalnessMap;
+
+			refreshTransformUniform( material.metalnessMap, uniforms.metalnessMapTransform );
+
+		}
+
+		uniforms.roughness.value = material.roughness;
 
 		if ( material.roughnessMap ) {
 
 			uniforms.roughnessMap.value = material.roughnessMap;
 
-		}
-
-		if ( material.metalnessMap ) {
-
-			uniforms.metalnessMap.value = material.metalnessMap;
+			refreshTransformUniform( material.roughnessMap, uniforms.roughnessMapTransform );
 
 		}
 
@@ -544,11 +395,15 @@ function WebGLMaterials( renderer, properties ) {
 
 				uniforms.sheenColorMap.value = material.sheenColorMap;
 
+				refreshTransformUniform( material.sheenColorMap, uniforms.sheenColorMapTransform );
+
 			}
 
 			if ( material.sheenRoughnessMap ) {
 
 				uniforms.sheenRoughnessMap.value = material.sheenRoughnessMap;
+
+				refreshTransformUniform( material.sheenRoughnessMap, uniforms.sheenRoughnessMapTransform );
 
 			}
 
@@ -563,18 +418,25 @@ function WebGLMaterials( renderer, properties ) {
 
 				uniforms.clearcoatMap.value = material.clearcoatMap;
 
+				refreshTransformUniform( material.clearcoatMap, uniforms.clearcoatMapTransform );
+
 			}
 
 			if ( material.clearcoatRoughnessMap ) {
 
 				uniforms.clearcoatRoughnessMap.value = material.clearcoatRoughnessMap;
 
+				refreshTransformUniform( material.clearcoatRoughnessMap, uniforms.clearcoatRoughnessMapTransform );
+
 			}
 
 			if ( material.clearcoatNormalMap ) {
 
-				uniforms.clearcoatNormalScale.value.copy( material.clearcoatNormalScale );
 				uniforms.clearcoatNormalMap.value = material.clearcoatNormalMap;
+
+				refreshTransformUniform( material.clearcoatNormalMap, uniforms.clearcoatNormalMapTransform );
+
+				uniforms.clearcoatNormalScale.value.copy( material.clearcoatNormalScale );
 
 				if ( material.side === BackSide ) {
 
@@ -597,11 +459,15 @@ function WebGLMaterials( renderer, properties ) {
 
 				uniforms.iridescenceMap.value = material.iridescenceMap;
 
+				refreshTransformUniform( material.iridescenceMap, uniforms.iridescenceMapTransform );
+
 			}
 
 			if ( material.iridescenceThicknessMap ) {
 
 				uniforms.iridescenceThicknessMap.value = material.iridescenceThicknessMap;
+
+				refreshTransformUniform( material.iridescenceThicknessMap, uniforms.iridescenceThicknessMapTransform );
 
 			}
 
@@ -617,6 +483,8 @@ function WebGLMaterials( renderer, properties ) {
 
 				uniforms.transmissionMap.value = material.transmissionMap;
 
+				refreshTransformUniform( material.transmissionMap, uniforms.transmissionMapTransform );
+
 			}
 
 			uniforms.thickness.value = material.thickness;
@@ -625,6 +493,8 @@ function WebGLMaterials( renderer, properties ) {
 
 				uniforms.thicknessMap.value = material.thicknessMap;
 
+				refreshTransformUniform( material.thicknessMap, uniforms.thicknessMapTransform );
+
 			}
 
 			uniforms.attenuationDistance.value = material.attenuationDistance;
@@ -632,18 +502,36 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
+		if ( material.anisotropy > 0 ) {
+
+			uniforms.anisotropyVector.value.set( material.anisotropy * Math.cos( material.anisotropyRotation ), material.anisotropy * Math.sin( material.anisotropyRotation ) );
+
+			if ( material.anisotropyMap ) {
+
+				uniforms.anisotropyMap.value = material.anisotropyMap;
+
+				refreshTransformUniform( material.anisotropyMap, uniforms.anisotropyMapTransform );
+
+			}
+
+		}
+
 		uniforms.specularIntensity.value = material.specularIntensity;
 		uniforms.specularColor.value.copy( material.specularColor );
+
+		if ( material.specularColorMap ) {
+
+			uniforms.specularColorMap.value = material.specularColorMap;
+
+			refreshTransformUniform( material.specularColorMap, uniforms.specularColorMapTransform );
+
+		}
 
 		if ( material.specularIntensityMap ) {
 
 			uniforms.specularIntensityMap.value = material.specularIntensityMap;
 
-		}
-
-		if ( material.specularColorMap ) {
-
-			uniforms.specularColorMap.value = material.specularColorMap;
+			refreshTransformUniform( material.specularIntensityMap, uniforms.specularIntensityMapTransform );
 
 		}
 
@@ -661,9 +549,11 @@ function WebGLMaterials( renderer, properties ) {
 
 	function refreshUniformsDistance( uniforms, material ) {
 
-		uniforms.referencePosition.value.copy( material.referencePosition );
-		uniforms.nearDistance.value = material.nearDistance;
-		uniforms.farDistance.value = material.farDistance;
+		const light = properties.get( material ).light;
+
+		uniforms.referencePosition.value.setFromMatrixPosition( light.matrixWorld );
+		uniforms.nearDistance.value = light.shadow.camera.near;
+		uniforms.farDistance.value = light.shadow.camera.far;
 
 	}
 

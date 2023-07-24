@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – Backgrounds and Skyboxes">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -52,8 +52,9 @@ body {
 drawing anything are transparent.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
--  const renderer = new THREE.WebGLRenderer({canvas});
+-  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  const renderer = new THREE.WebGLRenderer({
++    antialias: true,
 +    canvas,
 +    alpha: true,
 +  });
@@ -72,6 +73,7 @@ THREE.js.</p>
 a texture.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 const bgTexture = loader.load('resources/images/daikanyama.jpg');
+bgTexture.colorSpace = THREE.SRGBColorSpace;
 scene.background = bgTexture;
 </pre>
 <p>which gives us</p>
@@ -189,7 +191,7 @@ scene's background.</p>
 }
 </pre>
 <p>Let's add some controls in so we can rotate the camera.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 </pre>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
 const aspect = 2;  // the canvas default
@@ -218,11 +220,6 @@ surrounds us.</p>
 <a href="https://hdrihaven.com">this site</a>.</p>
 <div class="threejs_center"><img src="../examples/resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg" style="width: 600px"></div>
 
-<p>It's not much different. First we load the equirectangular image as a texture
-and then, in the callback after it has loaded, we can call <a href="/docs/#api/en/renderers/WebGLCubeRenderTarget.fromEquirectangularTexture"><code class="notranslate" translate="no">WebGLCubeRenderTarget.fromEquirectangularTexture</code></a>
-which will generate a cubemap from the equirectangular texture for us.
-We pass in the size we want the cubemap to be to <a href="/docs/#api/en/renderers/WebGLCubeRenderTarget"><code class="notranslate" translate="no">WebGLCubeRenderTarget</code></a>.
-Passing in the height of the equirectangular image seems like a good bet.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
 -  const loader = new THREE.CubeTextureLoader();
 -  const texture = loader.load([
@@ -238,9 +235,9 @@ Passing in the height of the equirectangular image seems like a good bet.</p>
 +  const texture = loader.load(
 +    'resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg',
 +    () =&gt; {
-+      const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
-+      rt.fromEquirectangularTexture(renderer, texture);
-+      scene.background = rt.texture;
++      texture.mapping = THREE.EquirectangularReflectionMapping;
++      texture.colorSpace = THREE.SRGBColorSpace;
++      scene.background = texture;
 +    });
 }
 </pre>
@@ -258,8 +255,8 @@ to a cubemap beforehand. <a href="https://matheowis.github.io/HDRI-to-CubeMap/">
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

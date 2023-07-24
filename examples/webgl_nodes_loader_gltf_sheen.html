@@ -20,13 +20,14 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -34,14 +35,13 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import { NodeMaterial, uv, mix, color, checker } from 'three/nodes';
 
-			import { NodeMaterial, color, uv, mix, mul, checker } from 'three-nodes/Nodes.js';
+			import { nodeFrame } from 'three/addons/renderers/webgl/nodes/WebGLNodes.js';
 
-			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
-
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 			let camera, scene, renderer, controls;
 
@@ -69,9 +69,9 @@
 						const object = gltf.scene.getObjectByName( 'SheenChair_fabric' );
 
 						// Convert to NodeMaterial
-						const material = NodeMaterial.fromMaterial( object.material );
+						const material = NodeMaterial.fromMaterial( object.material ); // @TODO: NodeMaterial.fromMaterial can be removed if WebGLNodes will apply it by default (as in WebGPURenderer)
 
-						const checkerNode = checker( mul( uv(), 5 ) );
+						const checkerNode = checker( uv().mul( 5 ) );
 
 						material.sheenNode = mix( color( 0x00ffff ), color( 0xffff00 ), checkerNode );
 						material.sheenRoughnessNode = checkerNode;
@@ -85,10 +85,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
-				const environment = new RoomEnvironment();
+				const environment = new RoomEnvironment( renderer );
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 				scene.background = new THREE.Color( 0xbbbbbb );

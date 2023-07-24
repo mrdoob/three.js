@@ -9,7 +9,6 @@ import {
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	Loader,
-	LoaderUtils,
 	Matrix4,
 	Mesh,
 	MeshPhongMaterial,
@@ -18,9 +17,11 @@ import {
 	NearestFilter,
 	RepeatWrapping,
 	TextureLoader,
-	sRGBEncoding
+	SRGBColorSpace
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
+
+const COLOR_SPACE_3MF = SRGBColorSpace;
 
 /**
  *
@@ -104,9 +105,11 @@ class ThreeMFLoader extends Loader {
 			const printTicketParts = {};
 			const texturesParts = {};
 
+			const textDecoder = new TextDecoder();
+
 			try {
 
-				zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
+				zip = fflate.unzipSync( new Uint8Array( data ) );
 
 			} catch ( e ) {
 
@@ -144,7 +147,7 @@ class ThreeMFLoader extends Loader {
 			//
 
 			const relsView = zip[ relsName ];
-			const relsFileText = LoaderUtils.decodeText( relsView );
+			const relsFileText = textDecoder.decode( relsView );
 			const rels = parseRelsXml( relsFileText );
 
 			//
@@ -152,7 +155,7 @@ class ThreeMFLoader extends Loader {
 			if ( modelRelsName ) {
 
 				const relsView = zip[ modelRelsName ];
-				const relsFileText = LoaderUtils.decodeText( relsView );
+				const relsFileText = textDecoder.decode( relsView );
 				modelRels = parseRelsXml( relsFileText );
 
 			}
@@ -164,7 +167,7 @@ class ThreeMFLoader extends Loader {
 				const modelPart = modelPartNames[ i ];
 				const view = zip[ modelPart ];
 
-				const fileText = LoaderUtils.decodeText( view );
+				const fileText = textDecoder.decode( view );
 				const xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
 
 				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
@@ -358,8 +361,7 @@ class ThreeMFLoader extends Loader {
 				const colorNode = colorNodes[ i ];
 				const color = colorNode.getAttribute( 'color' );
 
-				colorObject.setStyle( color.substring( 0, 7 ) );
-				colorObject.convertSRGBToLinear(); // color is in sRGB
+				colorObject.setStyle( color.substring( 0, 7 ), COLOR_SPACE_3MF );
 
 				colors.push( colorObject.r, colorObject.g, colorObject.b );
 
@@ -788,7 +790,7 @@ class ThreeMFLoader extends Loader {
 
 				} );
 
-				texture.encoding = sRGBEncoding;
+				texture.colorSpace = COLOR_SPACE_3MF;
 
 				// texture parameters
 
@@ -1065,7 +1067,11 @@ class ThreeMFLoader extends Loader {
 			geometry.setIndex( new BufferAttribute( meshData[ 'triangles' ], 1 ) );
 			geometry.setAttribute( 'position', new BufferAttribute( meshData[ 'vertices' ], 3 ) );
 
-			const material = new MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
+			const material = new MeshPhongMaterial( {
+				name: Loader.DEFAULT_MATERIAL_NAME,
+				color: 0xffffff,
+				flatShading: true
+			} );
 
 			const mesh = new Mesh( geometry, material );
 
@@ -1280,8 +1286,7 @@ class ThreeMFLoader extends Loader {
 			const displaycolor = materialData.displaycolor;
 
 			const color = displaycolor.substring( 0, 7 );
-			material.color.setStyle( color );
-			material.color.convertSRGBToLinear(); // displaycolor is in sRGB
+			material.color.setStyle( color, COLOR_SPACE_3MF );
 
 			// process alpha if set
 

@@ -14,6 +14,17 @@
 			该类是 [page:FlyControls] 的另一个实现。
 		</p>
 
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			请参考[link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+		</code>
+
 		<h2>例子</h2>
 
 		<p>[example:webgl_geometry_terrain webgl / geometry / terrain ]</p>
@@ -62,17 +73,17 @@
 
 		<h3>[property:Number heightCoef]</h3>
 		<p>
-			Determines how much faster the camera moves when it's y-component is near [page:.heightMax]. Default is *1*.
+			当Y坐标接近[page:.heightMax]时摄像机的移动速度。默认值为*1*。
 		</p>
 
 		<h3>[property:Number heightMax]</h3>
 		<p>
-			Upper camera height limit used for movement speed adjusment. Default is *1*.
+			用于调节移动速度的摄像机最大高度限制。默认值为*1*。
 		</p>
 
 		<h3>[property:Number heightMin]</h3>
 		<p>
-			Lower camera height limit used for movement speed adjusment. Default is *0*.
+			用于调节移动速度的摄像机最低高度限制。默认值为*0*。
 		</p>
 
 		<h3>[property:Boolean heightSpeed]</h3>
@@ -147,7 +158,7 @@
 		<h3>[method:undefined update] ( [param:Number delta] )</h3>
 		<p>
 			<p>
-				[page:Number delta]: Time delta value.
+				[page:Number delta]：时间增量值。
 			</p>
 			<p>
 				更新控制器，常被用在动画循环中。

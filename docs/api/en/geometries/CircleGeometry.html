@@ -12,13 +12,18 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			[name] is a simple shape of Euclidean geometry.
-			It is constructed from a number of triangular segments that are oriented around a central point and extend as far out as a given radius.
-			It is built counter-clockwise from a start angle and a given central angle.
-			It can also be used to create regular polygons, where the number of segments determines the number of sides.
+			[name] is a simple shape of Euclidean geometry. It is constructed from a
+			number of triangular segments that are oriented around a central point and
+			extend as far out as a given radius. It is built counter-clockwise from a
+			start angle and a given central angle. It can also be used to create
+			regular polygons, where the number of segments determines the number of
+			sides.
 		</p>
 
-		<iframe id="scene" src="scenes/geometry-browser.html#CircleGeometry"></iframe>
+		<iframe
+			id="scene"
+			src="scenes/geometry-browser.html#CircleGeometry"
+		></iframe>
 
 		<script>
 
@@ -35,24 +40,27 @@
 		}
 
 		</script>
-
+    
 		<h2>Code Example</h2>
 
 		<code>
-		const geometry = new THREE.CircleGeometry( 5, 32 );
-		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-		const circle = new THREE.Mesh( geometry, material );
-		scene.add( circle );
+const geometry = new THREE.CircleGeometry( 5, 32 ); 
+const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } ); 
+const circle = new THREE.Mesh( geometry, material ); scene.add( circle );
 		</code>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]([param:Float radius], [param:Integer segments], [param:Float thetaStart], [param:Float thetaLength])</h3>
+		<h3>
+			[name]([param:Float radius], [param:Integer segments], [param:Float thetaStart], [param:Float thetaLength])
+		</h3>
 		<p>
-		radius — Radius of the circle, default = 1.<br />
-		segments — Number of segments (triangles), minimum = 3, default = 8.<br />
-		thetaStart — Start angle for first segment, default = 0 (three o'clock position).<br />
-		thetaLength — The central angle, often called theta, of the circular sector. The default is 2*Pi, which makes for a complete circle.
+			radius — Radius of the circle, default = 1.<br />
+			segments — Number of segments (triangles), minimum = `3`, default = `32`.<br />
+			thetaStart — Start angle for first segment, default = `0` (three o'clock
+			position).<br />
+			thetaLength — The central angle, often called theta, of the circular
+			sector. The default is `2`*Pi, which makes for a complete circle.
 		</p>
 
 		<h2>Properties</h2>
@@ -60,7 +68,8 @@
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+			An object with a property for each of the constructor parameters. Any
+			modification after instantiation does not change the geometry.
 		</p>
 
 		<h2>Methods</h2>

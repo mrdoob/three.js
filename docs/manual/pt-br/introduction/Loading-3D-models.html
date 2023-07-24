@@ -15,7 +15,7 @@
 		Os modelos 3D estão disponíveis em centenas de formatos de arquivo, cada um com diferentes
 		propósitos, recursos variados e complexidade variável. Embora o
 		<a href="https://github.com/mrdoob/three.js/tree/dev/examples/jsm/loaders" target="_blank" rel="noopener">
-		three.js forneça muitos loaders</a>, escolher o formato e o fluxo de trabalho certos economizará tempo e frustração mais tarde. 
+		three.js forneça muitos loaders</a>, escolher o formato e o fluxo de trabalho certos economizará tempo e frustração mais tarde.
 		Alguns formatos são difíceis de trabalhar, ineficientes para experiências em tempo real
 		ou simplesmente não são totalmente suportados por enquanto.
 	</p>
@@ -29,7 +29,7 @@
 
 	<p>
 		Se você é iniciante na execução de um servidor local, comece com
-		[link:#manual/introduction/How-to-run-things-locally Como executar localmente]
+		[link:#manual/introduction/Installation installation]
 		primeiro. Muitos erros comuns de visualização de modelos 3D podem ser evitados hospedando arquivos
 		corretamente.
 	</p>
@@ -37,9 +37,9 @@
 	<h2>Fluxo de trabalho recomendado</h2>
 
 	<p>
-		Sempre que possível, recomendamos o uso do glTF (GL Transmission Format). Ambas versões do formato, 
-		<small>.GLB</small> e <small>.GLTF</small>, são bem suportadas. 
-		Como o glTF está focado na entrega de recursos em tempo de execução, 
+		Sempre que possível, recomendamos o uso do glTF (GL Transmission Format). Ambas versões do formato,
+		<small>.GLB</small> e <small>.GLTF</small>, são bem suportadas.
+		Como o glTF está focado na entrega de recursos em tempo de execução,
 		ele é compacto para transmitir e rápido para carregar. Seus recursos incluem meshs, materiais,
 		texturas, skins, skeletons, morph targets, animações, luzes e câmeras.
 	</p>
@@ -76,12 +76,12 @@
 	<h2>Carregando</h2>
 
 	<p>
-		Apenas alguns poucos loaders (por exemplo [page:ObjectLoader]) são incluídos por padrão com o 
+		Apenas alguns poucos loaders (por exemplo [page:ObjectLoader]) são incluídos por padrão com o
 		three.js — outros devem ser adicionados ao seu aplicativo individualmente.
 	</p>
 
 	<code>
-		import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 	</code>
 
 	<p>
@@ -125,7 +125,7 @@
 			Visualize o modelo em outro aplicativo. Para glTF, visualizadores drag-and-drop
 			estão disponíveis para
 			<a href="https://gltf-viewer.donmccurdy.com/" target="_blank" rel="noopener">three.js</a> e
-			<a href="https://sandbox.babylonjs.com/" target="_blank" rel="noopener">babylon.js</a>. 
+			<a href="https://sandbox.babylonjs.com/" target="_blank" rel="noopener">babylon.js</a>.
 			Se o modelo aparece corretamente em um ou mais aplicativos,
 			<a href="https://github.com/mrdoob/three.js/issues/new" target="_blank" rel="noopener">registre um bug do three.js</a>.
 			Se o modelo não puder ser mostrado em nenhum aplicativo, recomendamos
@@ -136,13 +136,13 @@
 			dimensionados de forma diferente, e modelos grandes podem não aparecer se a câmera estiver
 			dentro do modelo.
 		</li>
-		<li>	
+		<li>
 			Tente adicionar e posicionar uma fonte de luz. O modelo pode estar escondido no escuro.
 		</li>
 		<li>
 			Procure requisições de textura com falha na aba network, como
 			`"C:\\Path\To\Model\texture.jpg"`. Use caminhos relativos ao seu
-			modelo em vez disso, tal como `images/texture.jpg` — 
+			modelo em vez disso, tal como `images/texture.jpg` —
 			isso pode exigir edição do arquivo de modelo em um editor de texto.
 		</li>
 	</ol>
@@ -153,7 +153,7 @@
 		Se você passou pelo processo de solução de problemas acima e seu modelo
 		ainda não está funcionando, uma abordagem correta para pedir ajuda fará com que você
 		tenha uma solução mais rápida. Poste uma pergunta no
-		<a href="https://discourse.threejs.org/" target="_blank" rel="noopener">fórum three.js</a> 
+		<a href="https://discourse.threejs.org/" target="_blank" rel="noopener">fórum three.js</a>
 		e, sempre que possível,
 		inclua seu modelo (ou um modelo mais simples com o mesmo problema) em qualquer formato que
 		você tiver disponível. Inclua informações suficientes para outra pessoa reproduzir

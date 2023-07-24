@@ -235,6 +235,10 @@ function denormalize( value, array ) {
 
 			return value;
 
+		case Uint32Array:
+
+			return value / 4294967295.0;
+
 		case Uint16Array:
 
 			return value / 65535.0;
@@ -242,6 +246,10 @@ function denormalize( value, array ) {
 		case Uint8Array:
 
 			return value / 255.0;
+
+		case Int32Array:
+
+			return Math.max( value / 2147483647.0, - 1.0 );
 
 		case Int16Array:
 
@@ -267,6 +275,10 @@ function normalize( value, array ) {
 
 			return value;
 
+		case Uint32Array:
+
+			return Math.round( value * 4294967295.0 );
+
 		case Uint16Array:
 
 			return Math.round( value * 65535.0 );
@@ -274,6 +286,10 @@ function normalize( value, array ) {
 		case Uint8Array:
 
 			return Math.round( value * 255.0 );
+
+		case Int32Array:
+
+			return Math.round( value * 2147483647.0 );
 
 		case Int16Array:
 
@@ -291,7 +307,32 @@ function normalize( value, array ) {
 
 }
 
-
+const MathUtils = {
+	DEG2RAD: DEG2RAD,
+	RAD2DEG: RAD2DEG,
+	generateUUID: generateUUID,
+	clamp: clamp,
+	euclideanModulo: euclideanModulo,
+	mapLinear: mapLinear,
+	inverseLerp: inverseLerp,
+	lerp: lerp,
+	damp: damp,
+	pingpong: pingpong,
+	smoothstep: smoothstep,
+	smootherstep: smootherstep,
+	randInt: randInt,
+	randFloat: randFloat,
+	randFloatSpread: randFloatSpread,
+	seededRandom: seededRandom,
+	degToRad: degToRad,
+	radToDeg: radToDeg,
+	isPowerOfTwo: isPowerOfTwo,
+	ceilPowerOfTwo: ceilPowerOfTwo,
+	floorPowerOfTwo: floorPowerOfTwo,
+	setQuaternionFromProperEuler: setQuaternionFromProperEuler,
+	normalize: normalize,
+	denormalize: denormalize
+};
 
 export {
 	DEG2RAD,
@@ -318,4 +359,5 @@ export {
 	setQuaternionFromProperEuler,
 	normalize,
 	denormalize,
+	MathUtils
 };

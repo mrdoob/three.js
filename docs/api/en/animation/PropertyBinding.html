@@ -10,94 +10,56 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			This holds a reference to a real property in the scene graph; used internally.
+			This holds a reference to a real property in the scene graph; used
+			internally.
 		</p>
-
 
 		<h2>Constructor</h2>
 
-
 		<h3>[name]( [param:Object3D rootNode], path, parsedPath )</h3>
-		<p>
-			-- [page:Object3D rootNode]:
-			-- path
-			-- parsedPath (optional)
-
-		</p>
+		<p>-- [page:Object3D rootNode]: -- path -- parsedPath (optional)</p>
 
 		<h2>Properties</h2>
 
 		<h3>[property:Number path]</h3>
-		<p>
-
-		</p>
 
 		<h3>[property:Number parsedPath]</h3>
-		<p>
-
-		</p>
 
 		<h3>[property:Number node]</h3>
-		<p>
-
-		</p>
 
 		<h3>[property:Number rootNode]</h3>
-		<p>
-
-		</p>
 
 		<h3>[property:Object BindingType]</h3>
-		<p>
-
-		</p>
 
 		<h3>[property:Object Versioning]</h3>
-		<p>
-
-		</p>
 
 		<h3>[property:Array GetterByBindingType]</h3>
-		<p>
-
-		</p>
 
 		<h3>[property:Array SetterByBindingTypeAndVersioning]</h3>
-		<p>
-
-		</p>
-
-
 
 		<h2>Methods</h2>
 
 		<h3>[method:undefined getValue]( [param:Array targetArray], [param:Number offset] )</h3>
-		<p>
-		</p>
 
 		<h3>[method:undefined setValue]( [param:Array sourceArray], [param:Number offset] )</h3>
-		<p>
-		</p>
 
 		<h3>[method:undefined bind]( )</h3>
 		<p>
-			Create getter / setter pair for a property in the scene graph. Used internally by
-			[page:PropertyBinding.getValue getValue] and [page:PropertyBinding.setValue setValue].
+			Create getter / setter pair for a property in the scene graph. Used
+			internally by [page:PropertyBinding.getValue getValue] and
+			[page:PropertyBinding.setValue setValue].
 		</p>
 
 		<h3>[method:undefined unbind]( )</h3>
-		<p>
-			Unbind getter / setter pair for a property in the scene graph.
-		</p>
+		<p>Unbind getter / setter pair for a property in the scene graph.</p>
 
 		<h3>[method:Constructor Composite]( targetGroup, path, optionalParsedPath )</h3>
-		<p>
-			Create a new Composite PropertyBinding.
-		</p>
+		<p>Create a new Composite PropertyBinding.</p>
 
 		<h3>[method:Constructor create]( root, path, parsedPath )</h3>
 		<p>
-			Create a new Composite PropertyBinding (if root is an [page:AnimationObjectGroup]) or PropertyBinding.
+			Create a new Composite PropertyBinding (if root is an
+			[page:AnimationObjectGroup]) or PropertyBinding.
 		</p>
 
 		<h3>[method:Constructor parseTrackName]( trackName )</h3>
@@ -115,15 +77,9 @@
 		</p>
 
 		<h3>[method:Constructor findNode]( root, nodeName )</h3>
-		<p>
-			Find a node in a node tree or [page:Skeleton Skeleton].
-		</p>
-
-
-
+		<p>Find a node in a node tree or [page:Skeleton Skeleton].</p>
 
 		<h2>Source</h2>
-
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

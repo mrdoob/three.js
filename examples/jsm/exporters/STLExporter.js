@@ -13,7 +13,11 @@ class STLExporter {
 
 	parse( scene, options = {} ) {
 
-		const binary = options.binary !== undefined ? options.binary : false;
+		options = Object.assign( {
+			binary: false
+		}, options );
+
+		const binary = options.binary;
 
 		//
 
@@ -120,9 +124,9 @@ class STLExporter {
 
 			if ( object.isSkinnedMesh === true ) {
 
-				object.boneTransform( a, vA );
-				object.boneTransform( b, vB );
-				object.boneTransform( c, vC );
+				object.applyBoneTransform( a, vA );
+				object.applyBoneTransform( b, vB );
+				object.applyBoneTransform( c, vC );
 
 			}
 

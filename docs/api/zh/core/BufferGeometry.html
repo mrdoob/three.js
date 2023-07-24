@@ -125,20 +125,19 @@
 
 		<h3>[property:Boolean isBufferGeometry]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			用于判断对象是否为[name]的只读标记.
 		</p>
 
 		<h3>[property:Object morphAttributes]</h3>
 		<p>
 			存储 [page:BufferAttribute] 的 Hashmap，存储了几何体 morph targets 的细节信息。<br />
-			Note: Once the geometry has been rendered, the morph attribute data cannot be changed. You will have to call [page:.dispose](), and create a new instance of [name].
+			注意：当这个geometry渲染之后，morph attribute 数据无法更改。你需要调用[page:.dispose]()，并重新创建一个新的[name]实例。
 		</p>
 
 		<h3>[property:Boolean morphTargetsRelative]</h3>
 		<p>
-			Used to control the morph target behavior; when set to true, the morph target data is treated as relative offsets, rather than as absolute positions/normals.
-
-			Default is *false*.
+			用于控制morph target的行为，如果设置为 `true`，morph target数据作为相对的偏移量，而非绝对的位置/法向。
+			默认为*false*。
 		</p>
 
 		<h3>[property:String name]</h3>
@@ -202,9 +201,8 @@
 
 		<h3>[method:undefined computeTangents]()</h3>
 		<p>
-		Calculates and adds a tangent attribute to this geometry.<br />
-		The computation is only supported for indexed geometries and if position, normal, and uv attributes are defined. When using a tangent space normal map, prefer the MikkTSpace algorithm provided by
-		[page:BufferGeometryUtils.computeMikkTSpaceTangents] instead.
+		计算并向此geometry中添加tangent attribute。<br />
+		只支持索引化的几何体对象，并且必须拥有position(位置)，normal(法向)和 uv attributes。如果使用了切线空间法向贴图，最好使用[page:BufferGeometryUtils.computeMikkTSpaceTangents]中的MikkTSpace算法。
 		</p>
 
 		<h3>[method:undefined computeVertexNormals]()</h3>
@@ -223,7 +221,7 @@
 		<p>返回缓存相关的 [page:.index]。</p>
 
 		<h3>[method:Boolean hasAttribute]( [param:String name] )</h3>
-		<p>Returns *true* if the attribute with the specified name exists.</p>
+		<p>检查是否存在有指定名称的attribute，如果有返回*true*。</p>
 
 		<h3>[method:this lookAt] ( [param:Vector3 vector] )</h3>
 		<p>

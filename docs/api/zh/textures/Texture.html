@@ -14,7 +14,7 @@
 
 		<h2>构造函数</h2>
 
-		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding )</h3>
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace )</h3>
 
 		<h2>代码示例</h2>
 
@@ -71,6 +71,11 @@
 		请参阅[page:Textures texture constants]（映射模式常量）来了解其他映射类型。
 		</p>
 
+		<h3>[property:Integer channel]</h3>
+		<p>
+		Lets you select the uv attribute to map the texture to. `0` for `uv`, `1` for `uv1`, `2` for `uv2` and `3` for `uv3`.
+		</p>
+
 		<h3>[property:number wrapS]</h3>
 		<p>
 		这个值定义了纹理贴图在水平方向上将如何包裹，在UV映射中对应于*U*。<br />
@@ -122,13 +127,10 @@
 
 		<h3>[property:String internalFormat]</h3>
 		<p>
-		The default value is obtained using a combination of [page:Texture.format .format] and
-		[page:Texture.type .type].<br />
+		此项的默认值由[page:Texture.format .format]和[page:Texture.type .type]混合并决定。<br />
 
-		The GPU format allows the developer to specify how the data is going to be
-		stored on the GPU.<br /><br />
-
-		See the [page:Textures texture constants] page for details regarding all supported internal formats.
+		这项GPU格式设置允许开发者决定在GPU中的数据存储方式。<br /><br />
+		查看[page:Textures texture constants]页面来了解所有可用的Internal Formats以及其细节。
 		</p>
 
 		<h3>[property:number type]</h3>
@@ -141,42 +143,15 @@
 
 		<h3>[property:Vector2 offset]</h3>
 		<p>
-		How much a single repetition of the texture is offset from the beginning, in each direction U and V.
-		Typical range is *0.0* to *1.0*.
-		</p>
-		<p>
-			The below texture types share the *first* uv channel in the engine. The offset (and repeat) setting is evaluated according to
-			the following priorities and then shared by those textures:
-			<ol>
-				<li>color map</li>
-				<li>specular map</li>
-				<li>displacement map</li>
-				<li>normal map</li>
-				<li>bump map</li>
-				<li>roughness map</li>
-				<li>metalness map</li>
-				<li>alpha map</li>
-				<li>emissive map</li>
-				<li>clearcoat map</li>
-				<li>clearcoat normal map</li>
-				<li>clearcoat roughnessMap map</li>
-			</ol>
-		</p>
-		<p>
-			The below texture types share the *second* uv channel in the engine. The offset (and repeat) setting is evaluated according to
-			the following priorities and then shared by those textures:
-			<ol>
-				<li>ao map</li>
-				<li>light map</li>
-			</ol>
+		贴图单次重复中的起始偏移量，分别表示U和V。
+		一般范围是由`0.0`到`1.0`。
 		</p>
 
 		<h3>[property:Vector2 repeat]</h3>
 		<p>
-		How many times the texture is repeated across the surface, in each direction U and V.  If repeat is set
-		greater than 1 in either direction, the corresponding Wrap parameter should also be set to
-		[page:Textures THREE.RepeatWrapping] or [page:Textures THREE.MirroredRepeatWrapping] to achieve the desired
-		tiling effect. Setting different repeat values for textures is restricted in the same way like [page:.offset].
+		决定纹理在表面的重复次数，两个方向分别表示U和V，如果重复次数在任何方向上设置了超过1的数值，
+		对应的Wrap需要设置为[page:Textures THREE.RepeatWrapping]或者[page:Textures THREE.MirroredRepeatWrapping]来
+		达到想要的平铺效果。
 		</p>
 
 		<h3>[property:number rotation]</h3>
@@ -213,18 +188,18 @@
 
 		<h3>[property:Boolean premultiplyAlpha]</h3>
 		<p>
-		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Default is *false*.<br /><br />
+		如果设置为*true*并且alpha通道存在的话，上传到GPU时alpha的数值将会与颜色通道的数值相乘。默认为*false*。<br /><br />
 
-		Note that this property has no effect for [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
-		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
+		注意此项属性不会影响到[link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap]。
+		如果你想要则需要在bitmap创建的时候进行配置，如何配置请查看[page:ImageBitmapLoader]。
 		</p>
 
 		<h3>[property:Boolean flipY]</h3>
 		<p>
-		If set to *true*, the texture is flipped along the vertical axis when uploaded to the GPU. Default is *true*.<br /><br />
+		如果设置为*true*，纹理在上传到GPU的时候会进行纵向的翻转。默认值为*true*。<br /><br />
 
-		Note that this property has no effect for [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
-		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
+		注意此项属性不会影响到[link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap]。
+		如果你想要则需要在bitmap创建的时候进行配置，如何配置请查看[page:ImageBitmapLoader]。
 		</p>
 
 		<h3>[property:number unpackAlignment]</h3>
@@ -234,13 +209,10 @@
 			请参阅[link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei]来了解详细信息。
 		</p>
 
-		<h3>[property:number encoding]</h3>
+		<h3>[property:string colorSpace]</h3>
 		<p>
-		默认值为[page:Textures THREE.LinearEncoding]。
-		请参阅[page:Textures texture constants]来了解其他格式的详细信息。<br /><br />
-
-		请注意，如果在材质被使用之后，纹理贴图中这个值发生了改变，
-		需要触发Material.needsUpdate，来使得这个值在着色器中实现。
+		默认值为[page:Textures THREE.NoColorSpace]。
+		请参阅[page:Textures texture constants]来了解其他格式的详细信息。
 		</p>
 
 		<h3>[property:Integer version]</h3>
@@ -262,14 +234,12 @@
 
 		<h3>[property:Object userData]</h3>
 		<p>
-		An object that can be used to store custom data about the texture. It should not hold
-		references to functions as these will not be cloned.
+		保存关于纹理的自定义信息的对象。不应该放函数引用，因为函数不会拷贝。
 		</p>
 
 		<h3>[property:Source source]</h3>
 		<p>
-		The data definition of a texture. A reference to the data source can be shared across textures.
-		This is often useful in context of spritesheets where multiple textures render the same data but with different texture transformations.
+		纹理的数据源信息。可以在不同的纹理之间引用相同的数据源，这在使用精灵表的情况下很好用，因为在这种情况下不同的纹理只是使用了不同的偏移，但是其数据源是相同的。
 		</p>
 
 		<h2>方法</h2>
@@ -285,7 +255,7 @@
 		<h3>[method:Texture clone]()</h3>
 		<p>
 			拷贝纹理。请注意。这不是“深拷贝”，图像是共用的。
-			Besides, cloning a texture does not automatically mark it for a texture upload. You have to set [page:Texture.needsUpdate] to true as soon as its image property (the data source) is fully loaded or ready.
+			除此之外，拷贝一个纹理并不会将此纹理自动标记并上传。你需要在图片的属性变更或者源数据完全加载完的时候并准备好的时候将[page:Texture.needsUpdate]设置为true。
 		</p>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>

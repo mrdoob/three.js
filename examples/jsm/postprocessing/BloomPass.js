@@ -1,5 +1,6 @@
 import {
 	AdditiveBlending,
+	HalfFloatType,
 	ShaderMaterial,
 	UniformsUtils,
 	Vector2,
@@ -10,15 +11,15 @@ import { ConvolutionShader } from '../shaders/ConvolutionShader.js';
 
 class BloomPass extends Pass {
 
-	constructor( strength = 1, kernelSize = 25, sigma = 4, resolution = 256 ) {
+	constructor( strength = 1, kernelSize = 25, sigma = 4 ) {
 
 		super();
 
 		// render targets
 
-		this.renderTargetX = new WebGLRenderTarget( resolution, resolution );
+		this.renderTargetX = new WebGLRenderTarget( 1, 1, { type: HalfFloatType } ); // will be resized later
 		this.renderTargetX.texture.name = 'BloomPass.x';
-		this.renderTargetY = new WebGLRenderTarget( resolution, resolution );
+		this.renderTargetY = new WebGLRenderTarget( 1, 1, { type: HalfFloatType } ); // will be resized later
 		this.renderTargetY.texture.name = 'BloomPass.y';
 
 		// combine material
@@ -29,6 +30,7 @@ class BloomPass extends Pass {
 
 		this.materialCombine = new ShaderMaterial( {
 
+			name: CombineShader.name,
 			uniforms: this.combineUniforms,
 			vertexShader: CombineShader.vertexShader,
 			fragmentShader: CombineShader.fragmentShader,
@@ -39,8 +41,6 @@ class BloomPass extends Pass {
 
 		// convolution material
 
-		if ( ConvolutionShader === undefined ) console.error( 'THREE.BloomPass relies on ConvolutionShader' );
-
 		const convolutionShader = ConvolutionShader;
 
 		this.convolutionUniforms = UniformsUtils.clone( convolutionShader.uniforms );
@@ -50,6 +50,7 @@ class BloomPass extends Pass {
 
 		this.materialConvolution = new ShaderMaterial( {
 
+			name: convolutionShader.name,
 			uniforms: this.convolutionUniforms,
 			vertexShader: convolutionShader.vertexShader,
 			fragmentShader: convolutionShader.fragmentShader,
@@ -105,9 +106,30 @@ class BloomPass extends Pass {
 
 	}
 
+	setSize( width, height ) {
+
+		this.renderTargetX.setSize( width, height );
+		this.renderTargetY.setSize( width, height );
+
+	}
+
+	dispose() {
+
+		this.renderTargetX.dispose();
+		this.renderTargetY.dispose();
+
+		this.materialCombine.dispose();
+		this.materialConvolution.dispose();
+
+		this.fsQuad.dispose();
+
+	}
+
 }
 
 const CombineShader = {
+
+	name: 'CombineShader',
 
 	uniforms: {
 

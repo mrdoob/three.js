@@ -14,12 +14,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -66,6 +67,9 @@
 				textureLoader.load( 'textures/sprite0.png', createHUDSprites );
 				const mapB = textureLoader.load( 'textures/sprite1.png' );
 				mapC = textureLoader.load( 'textures/sprite2.png' );
+
+				mapB.colorSpace = THREE.SRGBColorSpace;
+				mapC.colorSpace = THREE.SRGBColorSpace;
 
 				group = new THREE.Group();
 
@@ -121,6 +125,8 @@
 			}
 
 			function createHUDSprites( texture ) {
+
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				const material = new THREE.SpriteMaterial( { map: texture } );
 

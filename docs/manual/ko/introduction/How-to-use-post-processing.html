@@ -28,9 +28,10 @@
 		</p>
 
 		<code>
-		import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-		import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-		import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
+		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+		import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
+		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 		</code>
 
 		<p>
@@ -59,7 +60,7 @@
 		<p>
             composer는 이제 준비가 다 되었으니, 후처리 과정 연결을 설정할 수 있습니다.
             이러한 과정은 앱을 만드는 최종 화면 출력을 담당하며, 첨부/삽입한 순서대로 처리합니다.
-            이 예제에서 먼저 실행한 것은 *RenderPass* 인스턴스이고 그 다음이 *GlitchPass* 입니다.
+            In our example, the instance of `RenderPass` is executed first, then the instance of `GlitchPass` and finally `OutputPass`.
             마지막 과정이 끝나면 자동으로 화면에 렌더링됩니다. 패스 설정은 아래와 같습니다.
 		</p>
 
@@ -69,12 +70,16 @@
 
 		const glitchPass = new GlitchPass();
 		composer.addPass( glitchPass );
+
+		const outputPass = new OutputPass();
+		composer.addPass( outputPass );
 		</code>
 
 		<p>
-			*RenderPass*는 일반적으로 맨 위에 위치해서 렌더링된 장면을 후처리의 기본 입력 장면으로 활용합니다. 예제의 경우,
-            *GlitchPass*는 이 이미지 데이터에 거친 글리치 효과를 넣어줍니다. [link:https://threejs.org/examples/webgl_postprocessing_glitch live example]에서 작동을
-            확인해보세요.
+            *RenderPass*는 일반적으로 맨 위에 위치해서 렌더링된 장면을 후처리의 기본 입력 장면으로 활용합니다. 예제의 경우,
+            *GlitchPass*는 이 이미지 데이터에 거친 글리치 효과를 넣어줍니다. 
+             `OutputPass` is usually the last pass in the chain which performs sRGB color space conversion and optional tone mapping.
+            [link:https://threejs.org/examples/webgl_postprocessing_glitch live example]에서 작동을 확인해보세요.
 		</p>
 
 		<h2>기본 내장 후처리방식</h2>
@@ -92,8 +97,8 @@
 		</p>
 
 		<code>
-		import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-		import { LuminosityShader } from 'three/examples/jsm/shaders/LuminosityShader.js';
+		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
 
 		// later in your init routine
 

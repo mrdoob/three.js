@@ -194,23 +194,24 @@ function WebGLRenderLists() {
 
 	function get( scene, renderCallDepth ) {
 
+		const listArray = lists.get( scene );
 		let list;
 
-		if ( lists.has( scene ) === false ) {
+		if ( listArray === undefined ) {
 
 			list = new WebGLRenderList();
 			lists.set( scene, [ list ] );
 
 		} else {
 
-			if ( renderCallDepth >= lists.get( scene ).length ) {
+			if ( renderCallDepth >= listArray.length ) {
 
 				list = new WebGLRenderList();
-				lists.get( scene ).push( list );
+				listArray.push( list );
 
 			} else {
 
-				list = lists.get( scene )[ renderCallDepth ];
+				list = listArray[ renderCallDepth ];
 
 			}
 

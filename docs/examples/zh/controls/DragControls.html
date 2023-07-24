@@ -15,6 +15,17 @@
 		该类被用于提供一个拖放交互。
 		</p>
 
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { DragControls } from 'three/addons/controls/DragControls.js';
+		</code>
+
 		<h2>代码示例</h2>
 
 		<code>
@@ -39,7 +50,7 @@
 
 		<p>[example:misc_controls_drag misc / controls / drag ]</p>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]( [param:Array objects], [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
 		<p>
@@ -93,11 +104,10 @@
 
 		<h3>[property:Boolean transformGroup]</h3>
 		<p>
-			This option only works if the [page:DragControls.objects] array contains a single draggable group object.
-			If set to *true*, [name] does not transform individual objects but the entire group. Default is *false*.
+			当[page:DragControls.objects]数组包含一个单个可拖拽的组对象时该选项生效。如果设置为`true`，[name]会转换整个组对象，而不对单个对象做转换。默认值为`false`。
 		</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<p>共有方法请参见其基类[page:EventDispatcher]。</p>
 
@@ -118,12 +128,12 @@
 
 		<h3>[method:Array getObjects] ()</h3>
 		<p>
-			Returns the array of draggable objects.
+			返回可拖拽的对象数组。
 		</p>
 
 		<h3>[method:Raycaster getRaycaster] ()</h3>
 		<p>
-			Returns the internal [page:Raycaster] instance that is used for intersection tests.
+			返回用于相交测试的内部[page:Raycaster]实例。
 		</p>
 
 		<h2>Source</h2>

@@ -11,13 +11,14 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - RTT
 		</div>
 
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -25,24 +26,24 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import { texture, uniform, vec2, MeshBasicNodeMaterial } from 'three/nodes';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
-			import WebGPUTextureRenderer from './jsm/renderers/webgpu/WebGPUTextureRenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import RenderTarget from 'three/addons/renderers/common/RenderTarget.js';
 
 			let camera, scene, renderer;
 			const mouse = new THREE.Vector2();
 
-			let cameraFX, sceneFX, textureRenderer;
+			let cameraFX, sceneFX, renderTarget;
 
 			let box;
 
 			const dpr = window.devicePixelRatio;
 
-			init().then( animate ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -61,11 +62,11 @@
 				// textured mesh
 
 				const loader = new THREE.TextureLoader();
-				const texture = loader.load( './textures/uv_grid_opengl.jpg' );
+				const uvTexture = loader.load( './textures/uv_grid_opengl.jpg' );
 
 				const geometryBox = new THREE.BoxGeometry();
-				const materialBox = new Nodes.MeshBasicNodeMaterial();
-				materialBox.colorNode = new Nodes.TextureNode( texture );
+				const materialBox = new MeshBasicNodeMaterial();
+				materialBox.colorNode = texture( uvTexture );
 
 				//
 
@@ -77,10 +78,10 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( dpr );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
-				textureRenderer = new WebGPUTextureRenderer( renderer );
-				textureRenderer.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
+				renderTarget = new RenderTarget( window.innerWidth * dpr, window.innerHeight * dpr );
 
 				window.addEventListener( 'mousemove', onWindowMouseMove );
 				window.addEventListener( 'resize', onWindowResize );
@@ -94,17 +95,13 @@
 
 				// modulate the final color based on the mouse position
 
-				const screenFXNode = new Nodes.OperatorNode( '+', new Nodes.UniformNode( mouse ), new Nodes.ConstNode( new THREE.Vector2( 0.5, 0.5 ) ) );
+				const screenFXNode = uniform( mouse ).add( vec2( 0.5, 0.5 ) );
 
-				const materialFX = new Nodes.MeshBasicNodeMaterial();
-				materialFX.colorNode = new Nodes.OperatorNode( '*', new Nodes.TextureNode( textureRenderer.getTexture() ), screenFXNode );
+				const materialFX = new MeshBasicNodeMaterial();
+				materialFX.colorNode = texture( renderTarget.texture ).mul( screenFXNode );
 
 				const quad = new THREE.Mesh( geometryFX, materialFX );
 				sceneFX.add( quad );
-
-				//
-
-				return renderer.init();
 
 			}
 
@@ -121,25 +118,20 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				textureRenderer.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
+				renderTarget.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
 
 			}
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				box.rotation.x += 0.01;
 				box.rotation.y += 0.02;
 
-				textureRenderer.render( scene, camera );
+				renderer.setRenderTarget( renderTarget );
+				renderer.render( scene, camera );
+
+				renderer.setRenderTarget( null );
 				renderer.render( sceneFX, cameraFX );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

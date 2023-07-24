@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 
 class ConvertNode extends Node {
 
@@ -11,31 +11,48 @@ class ConvertNode extends Node {
 
 	}
 
-	getNodeType( /*builder*/ ) {
+	getNodeType( builder ) {
 
-		return this.convertTo;
+		const requestType = this.node.getNodeType( builder );
+
+		let convertTo = null;
+
+		for ( const overloadingType of this.convertTo.split( '|' ) ) {
+
+			if ( convertTo === null || builder.getTypeLength( requestType ) === builder.getTypeLength( overloadingType ) ) {
+
+				convertTo = overloadingType;
+
+			}
+
+		}
+
+		return convertTo;
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.convertTo = this.convertTo;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.convertTo = data.convertTo;
 
 	}
 
 	generate( builder, output ) {
 
-		const convertTo = this.convertTo;
 		const node = this.node;
 		const type = this.getNodeType( builder );
 
-		let snippet = null;
-
-		if ( builder.isReference( convertTo ) === false ) {
-
-			const nodeSnippet = node.build( builder, convertTo );
-
-			snippet = builder.format( nodeSnippet, type, convertTo );
-
-		} else {
-
-			snippet = node.build( builder, convertTo );
-
-		}
+		const snippet = node.build( builder, type );
 
 		return builder.format( snippet, type, output );
 
@@ -44,3 +61,5 @@ class ConvertNode extends Node {
 }
 
 export default ConvertNode;
+
+addNodeClass( ConvertNode );

@@ -86,6 +86,7 @@ function Editor() {
 		historyChanged: new Signal(),
 
 		viewportCameraChanged: new Signal(),
+		viewportShadingChanged: new Signal(),
 
 		intersectionsDetected: new Signal(),
 
@@ -120,7 +121,9 @@ function Editor() {
 	this.helpers = {};
 
 	this.cameras = {};
+
 	this.viewportCamera = this.camera;
+	this.viewportShading = 'default';
 
 	this.addCamera( this.camera );
 
@@ -136,6 +139,8 @@ Editor.prototype = {
 		this.scene.background = scene.background;
 		this.scene.environment = scene.environment;
 		this.scene.fog = scene.fog;
+		this.scene.backgroundBlurriness = scene.backgroundBlurriness;
+		this.scene.backgroundIntensity = scene.backgroundIntensity;
 
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
@@ -535,6 +540,13 @@ Editor.prototype = {
 
 	},
 
+	setViewportShading: function( value ) {
+
+		this.viewportShading = value;
+		this.signals.viewportShadingChanged.dispatch();
+
+	},
+
 	//
 
 	select: function ( object ) {
@@ -677,11 +689,10 @@ Editor.prototype = {
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				shadowType: this.config.getKey( 'project/renderer/shadowType' ),
 				vr: this.config.getKey( 'project/vr' ),
-				physicallyCorrectLights: this.config.getKey( 'project/renderer/physicallyCorrectLights' ),
 				toneMapping: this.config.getKey( 'project/renderer/toneMapping' ),
 				toneMappingExposure: this.config.getKey( 'project/renderer/toneMappingExposure' )
 			},
-			camera: this.camera.toJSON(),
+			camera: this.viewportCamera.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
 			history: this.history.toJSON()

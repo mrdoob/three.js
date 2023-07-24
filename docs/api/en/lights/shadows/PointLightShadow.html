@@ -7,13 +7,14 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
+		[page:LightShadow] &rarr;
 
 		<h1>[name]</h1>
 
 		<p class="desc">
-			This is used internally by [page:PointLight PointLights] for calculating shadows.
+			This is used internally by [page:PointLight PointLights] for calculating
+			shadows.
 		</p>
-
 
 		<h2>Code Example</h2>
 		<code>
@@ -57,8 +58,8 @@
 		<h2>Constructor</h2>
 		<h3>[name]( )</h3>
 		<p>
-			Creates a new [name]. This is not intended to be called directly - it is called
-			internally by [page:PointLight].
+			Creates a new [name]. This is not intended to be called directly - it is
+			called internally by [page:PointLight].
 		</p>
 
 		<h2>Properties</h2>
@@ -67,22 +68,21 @@
 		</p>
 
 		<h3>[property:Boolean isPointLightShadow]</h3>
-		<p>
-			Read-only flag to check if a given object is of type [name].
-		</p>
+		<p>Read-only flag to check if a given object is of type [name].</p>
 
 		<h2>Methods</h2>
 
-		<p>
-			See the base [page:LightShadow LightShadow] class for common methods.
-		</p>
+		<p>See the base [page:LightShadow LightShadow] class for common methods.</p>
 
-		<h3>[method:undefined updateMatrices]( [param:Light light], [param:number viewportIndex])</h3>
+		<h3>
+			[method:undefined updateMatrices]( [param:Light light], [param:number viewportIndex])
+		</h3>
 		<p>
-		Update the matrices for the camera and shadow, used internally by the renderer.<br /><br />
+			Update the matrices for the camera and shadow, used internally by the
+			renderer.<br /><br />
 
-		light -- the light for which the shadow is being rendered.<br />
-		viewportIndex -- calculates the matrix for this viewport
+			light -- the light for which the shadow is being rendered.<br />
+			viewportIndex -- calculates the matrix for this viewport
 		</p>
 
 		<h2>Source</h2>

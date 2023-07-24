@@ -9,8 +9,20 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">Utility functions for [page:Skeleton], [page:SkinnedMesh], and [page:Bone] manipulation.</p>
+		<p class="desc">
+			Utility functions for [page:Skeleton], [page:SkinnedMesh], and [page:Bone] manipulation.
+		</p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+		</code>
 
 		<h2>Methods</h2>
 
@@ -21,30 +33,6 @@
 			the object passed to this method. Other data, like geometries and materials, are reused by
 			reference.
 		</p>
-
-		<h3>[method:Object findBoneTrackData]( [param:String name], [param:Array tracks] )</h3>
-		<p></p>
-
-		<h3>[method:Bone getBoneByName]( [param:String name], [param:Skeleton skeleton] )</h3>
-		<p></p>
-
-		<h3>[method:Array getBones]( [param:Skeleton skeleton] )</h3>
-		<p></p>
-
-		<h3>[method:Array getEqualsBonesNames]( [param:Skeleton skeleton], [param:Skeleton targetSkeleton] )</h3>
-		<p></p>
-
-		<h3>[method:SkeletonHelper getHelperFromSkeleton]( [param:Skeleton skeleton] )</h3>
-		<p></p>
-
-		<h3>[method:Bone getNearestBone]( [param:Bone bone], [param:Array names] )</h3>
-		<p></p>
-
-		<h3>[method:Object getSkeletonOffsets]( [param:SkeletonHelper target], [param:SkeletonHelper source], [param:Object options] )</h3>
-		<p></p>
-
-		<h3>[method:this renameBones]( [param:Skeleton skeleton], [param:Array names] )</h3>
-		<p></p>
 
 		<h3>[method:undefined retarget]( [param:SkeletonHelper target], [param:SkeletonHelper source], [param:Object options] )</h3>
 		<p></p>

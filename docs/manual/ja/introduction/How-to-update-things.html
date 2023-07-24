@@ -76,16 +76,13 @@ scene.add( line );
             次に以下のようにして、線上にランダムに点を追加してみましょう。
         </p>
         <code>
-const positions = line.geometry.attributes.position.array;
+const positionAttribute = line.geometry.getAttribute( 'position' );
 
-let x, y, z, index;
-x = y = z = index = 0;
+let x = 0, y = 0, z = 0;
 
-for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
+for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-    positions[ index ++ ] = x;
-    positions[ index ++ ] = y;
-    positions[ index ++ ] = z;
+    positionAttribute.setXYZ( i, x, y, z );
 
     x += ( Math.random() - 0.5 ) * 30;
     y += ( Math.random() - 0.5 ) * 30;
@@ -103,7 +100,7 @@ line.geometry.setDrawRange( 0, newValue );
             最初の描画以降に位置データの値を変更したい場合は、needsUpdateをtrueにセットする必要があります。
         </p>
         <code>
-line.geometry.attributes.position.needsUpdate = true; // required after the first render
+positionAttribute.needsUpdate = true; // required after the first render
 			</code>
 
         <p>

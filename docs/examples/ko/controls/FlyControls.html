@@ -15,6 +15,17 @@
 	
 		</p>
 
+		<h2>수입</h2>
+
+		<p>
+			[name] 는 애드온이며 명시적으로 가져와야 합니다.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { FlyControls } from 'three/addons/controls/FlyControls.js';
+		</code>
+
 		<h2>예시</h2>
 
 		<p>[example:misc_controls_fly misc / controls / fly ]</p>
@@ -57,6 +68,11 @@
 		<h3>[property:Boolean dragToLook]</h3>
 		<p>
 			*true* 으로 설정되어 있을 경우, 드래그 상호 작용을 수행해야만 주변을 둘러볼 수 있습니다. 기본값은 *false* 입니다.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			*false*로 설정할 경우, 컨트롤은 사용자 입력에 응답하지 못합니다. 기본값은 *true* 입니다.
 		</p>
 
 		<h3>[property:Number movementSpeed]</h3>

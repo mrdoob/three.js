@@ -7,11 +7,22 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Object3D] &rarr;
+		[page:Object3D] &rarr; [page:Line] &rarr;
 
 		<h1>[name]</h1>
 
 		<p class="desc">This helper displays the directional cone of a [page:PositionalAudio].</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { PositionalAudioHelper } from 'three/addons/helpers/PositionalAudioHelper.js';
+		</code>
 
 		<h2>Code Example</h2>
 		<code>
@@ -56,13 +67,15 @@
 		<p>The amount of divisions of the outer part of the directional cone.</p>
 
 		<h2>Methods</h2>
-		<p>See the base [page:Object3D] class for common methods.</p>
-
-		<h3>[method:undefined dispose]()</h3>
-		<p>Disposes of the helper.</p>
+		<p>See the base [page:Line] class for common methods.</p>
 
 		<h3>[method:undefined update]()</h3>
 		<p>Updates the helper.</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+		</p>
 
 		<h2>Source</h2>
 

@@ -22,32 +22,13 @@ class Box3 {
 
 	setFromArray( array ) {
 
-		let minX = + Infinity;
-		let minY = + Infinity;
-		let minZ = + Infinity;
+		this.makeEmpty();
 
-		let maxX = - Infinity;
-		let maxY = - Infinity;
-		let maxZ = - Infinity;
+		for ( let i = 0, il = array.length; i < il; i += 3 ) {
 
-		for ( let i = 0, l = array.length; i < l; i += 3 ) {
-
-			const x = array[ i ];
-			const y = array[ i + 1 ];
-			const z = array[ i + 2 ];
-
-			if ( x < minX ) minX = x;
-			if ( y < minY ) minY = y;
-			if ( z < minZ ) minZ = z;
-
-			if ( x > maxX ) maxX = x;
-			if ( y > maxY ) maxY = y;
-			if ( z > maxZ ) maxZ = z;
+			this.expandByPoint( _vector.fromArray( array, i ) );
 
 		}
-
-		this.min.set( minX, minY, minZ );
-		this.max.set( maxX, maxY, maxZ );
 
 		return this;
 
@@ -55,32 +36,13 @@ class Box3 {
 
 	setFromBufferAttribute( attribute ) {
 
-		let minX = + Infinity;
-		let minY = + Infinity;
-		let minZ = + Infinity;
+		this.makeEmpty();
 
-		let maxX = - Infinity;
-		let maxY = - Infinity;
-		let maxZ = - Infinity;
+		for ( let i = 0, il = attribute.count; i < il; i ++ ) {
 
-		for ( let i = 0, l = attribute.count; i < l; i ++ ) {
-
-			const x = attribute.getX( i );
-			const y = attribute.getY( i );
-			const z = attribute.getZ( i );
-
-			if ( x < minX ) minX = x;
-			if ( y < minY ) minY = y;
-			if ( z < minZ ) minZ = z;
-
-			if ( x > maxX ) maxX = x;
-			if ( y > maxY ) maxY = y;
-			if ( z > maxZ ) maxZ = z;
+			this.expandByPoint( _vector.fromBufferAttribute( attribute, i ) );
 
 		}
-
-		this.min.set( minX, minY, minZ );
-		this.max.set( maxX, maxY, maxZ );
 
 		return this;
 
@@ -197,32 +159,49 @@ class Box3 {
 
 		object.updateWorldMatrix( false, false );
 
-		const geometry = object.geometry;
+		if ( object.boundingBox !== undefined ) {
 
-		if ( geometry !== undefined ) {
+			if ( object.boundingBox === null ) {
 
-			if ( precise && geometry.attributes != undefined && geometry.attributes.position !== undefined ) {
+				object.computeBoundingBox();
 
-				const position = geometry.attributes.position;
-				for ( let i = 0, l = position.count; i < l; i ++ ) {
+			}
 
-					_vector.fromBufferAttribute( position, i ).applyMatrix4( object.matrixWorld );
-					this.expandByPoint( _vector );
+			_box.copy( object.boundingBox );
+			_box.applyMatrix4( object.matrixWorld );
+
+			this.union( _box );
+
+		} else {
+
+			const geometry = object.geometry;
+
+			if ( geometry !== undefined ) {
+
+				if ( precise && geometry.attributes !== undefined && geometry.attributes.position !== undefined ) {
+
+					const position = geometry.attributes.position;
+					for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+						_vector.fromBufferAttribute( position, i ).applyMatrix4( object.matrixWorld );
+						this.expandByPoint( _vector );
+
+					}
+
+				} else {
+
+					if ( geometry.boundingBox === null ) {
+
+						geometry.computeBoundingBox();
+
+					}
+
+					_box.copy( geometry.boundingBox );
+					_box.applyMatrix4( object.matrixWorld );
+
+					this.union( _box );
 
 				}
-
-			} else {
-
-				if ( geometry.boundingBox === null ) {
-
-					geometry.computeBoundingBox();
-
-				}
-
-				_box.copy( geometry.boundingBox );
-				_box.applyMatrix4( object.matrixWorld );
-
-				this.union( _box );
 
 			}
 
@@ -396,17 +375,23 @@ class Box3 {
 
 	distanceToPoint( point ) {
 
-		const clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
-
-		return clampedPoint.sub( point ).length();
+		return this.clampPoint( point, _vector ).distanceTo( point );
 
 	}
 
 	getBoundingSphere( target ) {
 
-		this.getCenter( target.center );
+		if ( this.isEmpty() ) {
 
-		target.radius = this.getSize( _vector ).length() * 0.5;
+			target.makeEmpty();
+
+		} else {
+
+			this.getCenter( target.center );
+
+			target.radius = this.getSize( _vector ).length() * 0.5;
+
+		}
 
 		return target;
 

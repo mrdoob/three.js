@@ -5,6 +5,7 @@ import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
 import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
 import { SetPositionCommand } from './commands/SetPositionCommand.js';
+import { clone } from '../../examples/jsm/utils/SkeletonUtils.js';
 
 function MenubarEdit( editor ) {
 
@@ -123,7 +124,7 @@ function MenubarEdit( editor ) {
 
 		if ( object === null || object.parent === null ) return; // avoid cloning the camera or scene
 
-		object = object.clone();
+		object = clone( object );
 
 		editor.execute( new AddObjectCommand( editor, object ) );
 
@@ -202,7 +203,7 @@ function MenubarEdit( editor ) {
 
 			if ( map ) {
 
-				map.encoding = THREE.sRGBEncoding;
+				map.colorSpace = THREE.SRGBColorSpace;
 				needsUpdate = true;
 
 			}

@@ -14,7 +14,6 @@
 import {
 	AddOperation,
 	BackSide,
-	BufferAttribute,
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
@@ -35,6 +34,7 @@ import {
 	Points,
 	PointsMaterial,
 	RepeatWrapping,
+	SRGBColorSpace,
 	TextureLoader,
 	Vector2
 } from 'three';
@@ -170,8 +170,6 @@ class LWOTreeParser {
 
 		const materials = this.getMaterials( geometry.userData.matNames, layer.geometry.type );
 
-		this.duplicateUVs( geometry, materials );
-
 		if ( layer.geometry.type === 'points' ) mesh = new Points( geometry, materials );
 		else if ( layer.geometry.type === 'lines' ) mesh = new LineSegments( geometry, materials );
 		else mesh = new Mesh( geometry, materials );
@@ -266,31 +264,6 @@ class LWOTreeParser {
 			return m.name === name;
 
 		} )[ 0 ];
-
-	}
-
-	// If the material has an aoMap, duplicate UVs
-	duplicateUVs( geometry, materials ) {
-
-		let duplicateUVs = false;
-
-		if ( ! Array.isArray( materials ) ) {
-
-			if ( materials.aoMap ) duplicateUVs = true;
-
-		} else {
-
-			materials.forEach( function ( material ) {
-
-				if ( material.aoMap ) duplicateUVs = true;
-
-			} );
-
-		}
-
-		if ( ! duplicateUVs ) return;
-
-		geometry.setAttribute( 'uv2', new BufferAttribute( geometry.attributes.uv.array, 2 ) );
 
 	}
 
@@ -464,6 +437,7 @@ class MaterialParser {
 
 				case 'Color':
 					maps.map = texture;
+					maps.map.colorSpace = SRGBColorSpace;
 					break;
 				case 'Roughness':
 					maps.roughnessMap = texture;
@@ -471,10 +445,12 @@ class MaterialParser {
 					break;
 				case 'Specular':
 					maps.specularMap = texture;
+					maps.specularMap.colorSpace = SRGBColorSpace;
 					maps.specular = 0xffffff;
 					break;
 				case 'Luminous':
 					maps.emissiveMap = texture;
+					maps.emissiveMap.colorSpace = SRGBColorSpace;
 					maps.emissive = 0x808080;
 					break;
 				case 'Luminous Color':
@@ -532,6 +508,7 @@ class MaterialParser {
 
 					case 'Color':
 						maps.map = texture;
+						maps.map.colorSpace = SRGBColorSpace;
 						break;
 					case 'Diffuse':
 						maps.aoMap = texture;
@@ -542,10 +519,12 @@ class MaterialParser {
 						break;
 					case 'Specular':
 						maps.specularMap = texture;
+						maps.specularMap.colorSpace = SRGBColorSpace;
 						maps.specular = 0xffffff;
 						break;
 					case 'Luminosity':
 						maps.emissiveMap = texture;
+						maps.emissiveMap.colorSpace = SRGBColorSpace;
 						maps.emissive = 0x808080;
 						break;
 					case 'Metallic':
@@ -581,7 +560,11 @@ class MaterialParser {
 
 			params.color = new Color().fromArray( attributes.Color.value );
 
-		} else params.color = new Color();
+		} else {
+
+			params.color = new Color();
+
+		}
 
 
 		if ( attributes.Transparency && attributes.Transparency.value !== 0 ) {

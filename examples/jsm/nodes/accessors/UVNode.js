@@ -1,4 +1,6 @@
+import { addNodeClass } from '../core/Node.js';
 import AttributeNode from '../core/AttributeNode.js';
+import { nodeObject } from '../shadernode/ShaderNode.js';
 
 class UVNode extends AttributeNode {
 
@@ -16,7 +18,7 @@ class UVNode extends AttributeNode {
 
 		const index = this.index;
 
-		return 'uv' + ( index > 0 ? index + 1 : '' );
+		return 'uv' + ( index > 0 ? index : '' );
 
 	}
 
@@ -39,3 +41,7 @@ class UVNode extends AttributeNode {
 }
 
 export default UVNode;
+
+export const uv = ( ...params ) => nodeObject( new UVNode( ...params ) );
+
+addNodeClass( UVNode );

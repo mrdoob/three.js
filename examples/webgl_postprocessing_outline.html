@@ -13,12 +13,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,16 +28,17 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { OutlinePass } from './jsm/postprocessing/OutlinePass.js';
-			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 
 			let container, stats;
 			let camera, scene, renderer, controls;
@@ -147,9 +149,9 @@
 
 				//
 
-				scene.add( new THREE.AmbientLight( 0xaaaaaa, 0.2 ) );
+				scene.add( new THREE.AmbientLight( 0xaaaaaa, 0.6 ) );
 
-				const light = new THREE.DirectionalLight( 0xddffdd, 0.6 );
+				const light = new THREE.DirectionalLight( 0xddffdd, 2 );
 				light.position.set( 1, 1, 1 );
 				light.castShadow = true;
 				light.shadow.mapSize.width = 1024;
@@ -259,6 +261,9 @@
 					texture.wrapT = THREE.RepeatWrapping;
 
 				} );
+
+				const outputPass = new OutputPass();
+				composer.addPass( outputPass );
 
 				effectFXAA = new ShaderPass( FXAAShader );
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );

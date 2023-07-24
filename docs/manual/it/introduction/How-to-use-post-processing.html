@@ -13,7 +13,7 @@
       Molte applicazioni 3D visualizzano i loro oggetti 3D direttamente sullo schermo. A volte, tuttavia, si vuole applicare uno o più effetti grafici
       come Depth-Of-Field, Bloom, Film Grain o vari tipi di Anti-aliasing. Il Post-processing è una soluzione ampiamente utilizzata per implementare questi effetti.
       Prima di tutto, la scena viene renderizzata su un target di rendering che rappresenta un buffer nella memoria della scheda video.
-      Nella fase successiva, uno o più passaggi di post-processing applicano filtri ed effetti al buffer dell'immagine prima che questa venga infine renderizzata 
+      Nella fase successiva, uno o più passaggi di post-processing applicano filtri ed effetti al buffer dell'immagine prima che questa venga infine renderizzata
       sullo schermo.
 		</p>
 		<p>
@@ -23,15 +23,16 @@
 		<h2>Workflow</h2>
 
 		<p>
-      Il primo step, nel processo, è quello di importare tutti i file necessari dalla cartella degli esempi. La guida presuppone che si utilizzi 
-      il [link:https://www.npmjs.com/package/three pacchetto npm] ufficiale di three.js. Per la nostra demo di base in questa guida abbiamo 
+      Il primo step, nel processo, è quello di importare tutti i file necessari dalla cartella degli esempi. La guida presuppone che si utilizzi
+      il [link:https://www.npmjs.com/package/three pacchetto npm] ufficiale di three.js. Per la nostra demo di base in questa guida abbiamo
       bisogno dei seguenti file:
 		</p>
 
 		<code>
-		import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-		import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-		import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
+		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+		import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
+		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 		</code>
 
 		<p>
@@ -59,8 +60,8 @@
 
 		<p>
       Il composer è pronto, ed è possibile configurare la catena di passaggi di post-processing. Questi passaggi sono i responsabili per la creazione
-      dell'output visivo finale dell'applicazione. Vengono elaborati nello stesso ordine in cui sono stati aggiunti/inseriti. Nel nostro esempio, l'istanza
-      di `RenderPass` viene eseguita per prima, poi l'istanza di `GlitchPass`. L'ultimo passaggio abilitato della catena viene automaticamente renderizzato sullo schermo.
+      dell'output visivo finale dell'applicazione. Vengono elaborati nello stesso ordine in cui sono stati aggiunti/inseriti. In our example, the instance of `RenderPass`
+      is executed first, then the instance of `GlitchPass` and finally `OutputPass`. L'ultimo passaggio abilitato della catena viene automaticamente renderizzato sullo schermo.
       La configurazione dei passaggi è la seguente:
 		</p>
 
@@ -70,18 +71,21 @@
 
 		const glitchPass = new GlitchPass();
 		composer.addPass( glitchPass );
+
+		const outputPass = new OutputPass();
+		composer.addPass( outputPass );
 		</code>
 
 		<p>
-      `RenderPass` viene normalmente posizionata all'inizio della catena per fornire la scena renderizzata come input per il passaggio successivo di post-processing. 
-      Nel nostro caso `GlitchPass` utilizzarà questi dati di immagine per applicare un effetto glitch selvaggio. Guarda questo [link:https://threejs.org/examples/webgl_postprocessing_glitch esempio live]
-      per vederli in azione.
+      `RenderPass` viene normalmente posizionata all'inizio della catena per fornire la scena renderizzata come input per il passaggio successivo di post-processing.
+      Nel nostro caso `GlitchPass` utilizzarà questi dati di immagine per applicare un effetto glitch selvaggio.  `OutputPass` is usually the last pass in the chain which performs sRGB color space conversion and optional tone mapping.
+      Guarda questo [link:https://threejs.org/examples/webgl_postprocessing_glitch esempio live] per vederli in azione.
 		</p>
 
 		<h2>Passi Built-in</h2>
 
 		<p>
-      È possibile utilizzare un'ampia gamma di passaggi di post-processing predefiniti forniti dall'engine. Si possono trovare nella 
+      È possibile utilizzare un'ampia gamma di passaggi di post-processing predefiniti forniti dall'engine. Si possono trovare nella
       cartella di [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/postprocessing postprocessing].
 		</p>
 
@@ -89,13 +93,13 @@
 
 		<p>
       A volte si desidera scrivere uno shader di post-processing personalizzato e includerlo nella catena dei passi di post-processing.
-      Per questo scenario puoi utilizzare `ShaderPass`. Dopo aver importato il file e lo shader personalizzato, si può usare il seguente codice per 
+      Per questo scenario puoi utilizzare `ShaderPass`. Dopo aver importato il file e lo shader personalizzato, si può usare il seguente codice per
       impostare i passaggi:
 		</p>
 
 		<code>
-		import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-		import { LuminosityShader } from 'three/examples/jsm/shaders/LuminosityShader.js';
+		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
 
 		// later in your init routine
 

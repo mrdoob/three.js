@@ -14,12 +14,13 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,10 +29,10 @@
 
 			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
 			let camera, scene, renderer;
 			let cameraControls;
@@ -66,16 +67,15 @@
 				camera.position.set( - 600, 550, 1300 );
 
 				// LIGHTS
-				ambientLight = new THREE.AmbientLight( 0x333333 );
+				ambientLight = new THREE.AmbientLight( 0x7c7c7c, 3.0 );
 
-				light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+				light = new THREE.DirectionalLight( 0xFFFFFF, 3.0 );
 				light.position.set( 0.32, 0.39, 0.7 );
 
 				// RENDERER
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( canvasWidth, canvasHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
@@ -89,14 +89,13 @@
 				const textureMap = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
 				textureMap.anisotropy = 16;
-				textureMap.encoding = THREE.sRGBEncoding;
+				textureMap.colorSpace = THREE.SRGBColorSpace;
 
 				// REFLECTION MAP
 				const path = 'textures/cube/pisa/';
 				const urls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
 
 				textureCube = new THREE.CubeTextureLoader().setPath( path ).load( urls );
-				textureCube.encoding = THREE.sRGBEncoding;
 
 				materials[ 'wireframe' ] = new THREE.MeshBasicMaterial( { wireframe: true } );
 				materials[ 'flat' ] = new THREE.MeshPhongMaterial( { specular: 0x000000, flatShading: true, side: THREE.DoubleSide } );

@@ -1,37 +1,54 @@
 /* global QUnit */
 
+import { DirectionalLightShadow } from '../../../../src/lights/DirectionalLightShadow.js';
+
+import { LightShadow } from '../../../../src/lights/LightShadow.js';
 import { ObjectLoader } from '../../../../src/loaders/ObjectLoader.js';
 import { DirectionalLight } from '../../../../src/lights/DirectionalLight.js';
-import { DirectionalLightShadow } from '../../../../src/lights/DirectionalLightShadow.js';
 
 export default QUnit.module( 'Lights', () => {
 
 	QUnit.module( 'DirectionalLightShadow', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new DirectionalLightShadow();
+			assert.strictEqual(
+				object instanceof LightShadow, true,
+				'DirectionalLightShadow extends from LightShadow'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new DirectionalLightShadow();
+			assert.ok( object, 'Can instantiate a DirectionalLightShadow.' );
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isDirectionalLightShadow', ( assert ) => {
+
+			const object = new DirectionalLightShadow();
+			assert.ok(
+				object.isDirectionalLightShadow,
+				'DirectionalLightShadow.isDirectionalLightShadow should be true'
+			);
 
 		} );
 
 		// OTHERS
 		QUnit.test( 'clone/copy', ( assert ) => {
 
-			var a = new DirectionalLightShadow();
-			var b = new DirectionalLightShadow();
-			var c;
+			const a = new DirectionalLightShadow();
+			const b = new DirectionalLightShadow();
 
 			assert.notDeepEqual( a, b, 'Newly instanced shadows are not equal' );
 
-			c = a.clone();
+			const c = a.clone();
 			assert.smartEqual( a, c, 'Shadows are identical after clone()' );
 
 			c.mapSize.set( 1024, 1024 );
@@ -47,18 +64,21 @@ export default QUnit.module( 'Lights', () => {
 
 		QUnit.test( 'toJSON', ( assert ) => {
 
-			var light = new DirectionalLight();
-			var shadow = new DirectionalLightShadow();
+			const light = new DirectionalLight();
+			const shadow = new DirectionalLightShadow();
 
 			shadow.bias = 10;
 			shadow.radius = 5;
 			shadow.mapSize.set( 1024, 1024 );
 			light.shadow = shadow;
 
-			var json = light.toJSON();
-			var newLight = new ObjectLoader().parse( json );
+			const json = light.toJSON();
+			const newLight = new ObjectLoader().parse( json );
 
-			assert.smartEqual( newLight.shadow, light.shadow, 'Reloaded shadow is identical to the original one' );
+			assert.smartEqual(
+				newLight.shadow, light.shadow,
+				'Reloaded shadow is identical to the original one'
+			);
 
 		} );
 

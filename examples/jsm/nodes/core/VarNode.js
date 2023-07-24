@@ -1,5 +1,5 @@
-import Node from './Node.js';
-import OperatorNode from '../math/OperatorNode.js';
+import Node, { addNodeClass } from './Node.js';
+import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class VarNode extends Node {
 
@@ -12,41 +12,25 @@ class VarNode extends Node {
 
 	}
 
-	op( op, ...params ) {
+	assign( node ) {
 
-		this.node = new OperatorNode( op, this.node, ...params );
+		node.traverse( ( childNode, replaceNode ) => {
 
+			if ( replaceNode && childNode.uuid === this.uuid ) {
+
+				replaceNode( this.node );
+
+			}
+
+		} );
+		this.node = node;
 		return this;
 
 	}
 
-	assign( ...params ) {
+	isGlobal() {
 
-		return this.op( '=', ...params );
-
-	}
-
-	add( ...params ) {
-
-		return this.op( '+', ...params );
-
-	}
-
-	sub( ...params ) {
-
-		return this.op( '-', ...params );
-
-	}
-
-	mul( ...params ) {
-
-		return this.op( '*', ...params );
-
-	}
-
-	div( ...params ) {
-
-		return this.op( '/', ...params );
+		return true;
 
 	}
 
@@ -86,7 +70,7 @@ class VarNode extends Node {
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
-		builder.addFlowCode( `${propertyName} = ${snippet}` );
+		builder.addLineFlowCode( `${propertyName} = ${snippet}` );
 
 		return propertyName;
 
@@ -95,3 +79,9 @@ class VarNode extends Node {
 }
 
 export default VarNode;
+
+export const temp = nodeProxy( VarNode );
+
+addNodeElement( 'temp', temp );
+
+addNodeClass( VarNode );

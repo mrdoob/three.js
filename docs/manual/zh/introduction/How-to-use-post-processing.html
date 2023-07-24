@@ -28,9 +28,10 @@
 		</p>
 
 		<code>
-		import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-		import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-		import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
+		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+		import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
+		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 		</code>
 
 		<p>
@@ -59,7 +60,7 @@
 		<p>
 			我们的合成器已经准备好了，现在我们就可以来配置后期处理过程链了。
 			这些过程负责创建应用程序的最终视觉输出，它们按照添加/插入的顺序来进行处理。
-			在我们的示例中，首先执行的是*RenderPass*实例，然后是*GlitchPass*。在链中的最后一个过程将自动被渲染到屏幕上。
+			In our example, the instance of `RenderPass` is executed first, then the instance of `GlitchPass` and finally `OutputPass`。
 			这些过程的设置类似这样：
 		</p>
 
@@ -69,12 +70,16 @@
 
 		const glitchPass = new GlitchPass();
 		composer.addPass( glitchPass );
+
+		const outputPass = new OutputPass();
+		composer.addPass( outputPass );
 		</code>
 
 		<p>
 			*RenderPass*通常位于过程链的开始，以便将渲染好的场景作为输入来提供给下一个后期处理步骤。
-			在我们的示例中，*GlitchPass*将会使用这些图像数据，来应用一个疯狂的故障效果。参见这个示例：
-			[link:https://threejs.org/examples/webgl_postprocessing_glitch live example]来看一看它的实际效果。
+			在我们的示例中，*GlitchPass*将会使用这些图像数据，来应用一个疯狂的故障效果。
+			 `OutputPass` is usually the last pass in the chain which performs sRGB color space conversion and optional tone mapping.
+			参见这个示例：[link:https://threejs.org/examples/webgl_postprocessing_glitch live example]来看一看它的实际效果。
 		</p>
 
 		<h2>内置过程</h2>
@@ -92,8 +97,8 @@
 		</p>
 
 		<code>
-		import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-		import { LuminosityShader } from 'three/examples/jsm/shaders/LuminosityShader.js';
+		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
 
 		// later in your init routine
 

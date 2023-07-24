@@ -14,7 +14,7 @@
   <p>
 		I modelli 3D sono disponibili in centinai di formati, ognuno con uno scopo differente, diverse funzioni
     e complessità varie. Sebbene <a href="https://github.com/mrdoob/three.js/tree/dev/examples/jsm/loaders" target="_blank" rel="noopener">
-    three.js metta a disposizione molti loader</a>, la scelta del formato e del flusso di lavoro giusti farà risparmiare tempo e frustrazione in seguito. 
+    three.js metta a disposizione molti loader</a>, la scelta del formato e del flusso di lavoro giusti farà risparmiare tempo e frustrazione in seguito.
     Con alcuni formati è difficile lavorare, possono essere inefficienti per le esperienze in tempo reale, o semplicemente non supportati al momento.
 	</p>
 
@@ -26,8 +26,8 @@
 	<h2>Prima di iniziare</h2>
 
 	<p>
-		Se siete alle prime armi con la gestione di un server locale, 
-    iniziate prima di tutto a capire [link:#manual/introduction/How-to-run-things-locally come gestire le cose a livello locale].
+		Se siete alle prime armi con la gestione di un server locale,
+    iniziate prima di tutto a capire [link:#manual/introduction/Installation installation].
     Molti errori comuni nella visualizzazione dei modelli 3D possono essere evitati gestendo correttamente l'hosting dei file.
 	</p>
 
@@ -59,8 +59,8 @@
 	</ul>
 
 	<p>
-    Se i tuoi strumenti preferiti di sviluppo dei modelli, non supportano il formato glTF, 
-    considera di richiedere l'esportazione glTF agli autori, 
+    Se i tuoi strumenti preferiti di sviluppo dei modelli, non supportano il formato glTF,
+    considera di richiedere l'esportazione glTF agli autori,
     o di fare un post <a href="https://github.com/KhronosGroup/glTF/issues/1051" target="_blank" rel="noopener">sul thread della roadmap di glTF</a>.
 	</p>
 
@@ -76,12 +76,12 @@
 	</p>
 
 	<code>
-		import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 	</code>
 
 	<p>
-    Una volta importato un loader, sei pronto per aggiungere e caricare un modello alla scena. La sintassi 
-    varia a seconda del loader utilizzato - quando vengono utilizzati altri formati, contralla gli esempi e la 
+    Una volta importato un loader, sei pronto per aggiungere e caricare un modello alla scena. La sintassi
+    varia a seconda del loader utilizzato - quando vengono utilizzati altri formati, contralla gli esempi e la
     documentazione del loader. Per il formato glTF, l'utilizzo con gli script globali sarebbe:
 	</p>
 
@@ -120,10 +120,10 @@
 		<li>
       Visualizza il modello in un'altra applicazione. Per il formato glTF, sono disponibili visualizzatori drag-and-drop per
 			<a href="https://gltf-viewer.donmccurdy.com/" target="_blank" rel="noopener">three.js</a> e
-			<a href="https://sandbox.babylonjs.com/" target="_blank" rel="noopener">babylon.js</a>. 
+			<a href="https://sandbox.babylonjs.com/" target="_blank" rel="noopener">babylon.js</a>.
       Se il modello viene visualizzato correttamente in una o più applicazioni,
       <a href="https://github.com/mrdoob/three.js/issues/new" target="_blank" rel="noopener">segnala il bug a three.js</a>.
-      Se il modello non è visualizzabile in nessuna applicazione, incoraggiamo vivamente di segnalare un bug 
+      Se il modello non è visualizzabile in nessuna applicazione, incoraggiamo vivamente di segnalare un bug
       all'applicazione utilizzata per creare il modello.
 		</li>
 		<li>
@@ -134,8 +134,8 @@
       Prova ad aggiungere e posizionare una luce nella scena. Il modello potrebbe essere nascosto nell'oscurità.
 		</li>
 		<li>
-      Cerca le richieste delle texture fallite nel tab network degli strumenti per sviluppatori del browser, 
-      come `"C:\\Path\To\Model\texture.jpg"`. Utilizza path relativi al tuo modello come `images/texture.jpg` - 
+      Cerca le richieste delle texture fallite nel tab network degli strumenti per sviluppatori del browser,
+      come `"C:\\Path\To\Model\texture.jpg"`. Utilizza path relativi al tuo modello come `images/texture.jpg` -
       ciò potrebbe richiedere una modifica del file del modello in un editor di testo.
 		</li>
 	</ol>
@@ -144,8 +144,8 @@
 
 	<p>
 		Se hai eseguito la procedura di risoluzione dei problemi qui sopra e il tuo modello ancora non funziona,
-    il giusto approccio è chiedere aiuto per una soluzione più veloce. Scrivi una domanda sul 
-    <a href="https://discourse.threejs.org/" target="_blank" rel="noopener">forum three.js</a> e, quando possibile, 
+    il giusto approccio è chiedere aiuto per una soluzione più veloce. Scrivi una domanda sul
+    <a href="https://discourse.threejs.org/" target="_blank" rel="noopener">forum three.js</a> e, quando possibile,
     includi il tuo modello (o un modello più semplice con lo stesso problema) in qualsiasi formato disponibile.
     Includi informazioni sufficienti per consentire a qualcun altro di riprodurre rapidamente il problema - idealmente, una demo dal vivo.
 	</p>

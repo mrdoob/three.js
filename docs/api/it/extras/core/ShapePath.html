@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Questa classe viene utilizzata per convertire una serie di forme in un array di [page:Path], ad esempio una 
+      forma SVG in un path.
+		</p>
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name](  )</h3>
+		<p>
+      Crea un nuovo ShapePath. Diversamente da un [page:Path], non vengono passati punti poiché lo ShapePath
+      è progettato per essere generato dopo la creazione.
+		</p>
+
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Array subPaths]</h3>
+		<p>
+		  Un array di [page:Path].
+		</p>
+
+		<h3>[property:Array currentPath]</h3>
+		<p>
+		  Il [page:Path] corrente che viene generato.
+		</p>
+
+		<h3>[property:Color color]</h3>
+		<p>Il [page:Color Colore] della shape, da impostazione predefinita impostato su bianco (0xffffff).</p>
+
+		<h2>Metodi</h2>
+
+		<h3>[method:this moveTo]( [param:Float x], [param:Float y] )</h3>
+		<p>
+      Inizia un nuovo [page:Path] e chiama [page:Path.moveTo]( x, y ) su questo [page:Path].
+      Punta anche [page:ShapePath.currentPath currentPath] a quel [page:Path].
+		</p>
+
+		<h3>[method:this lineTo]( [param:Float x], [param:Float y] )</h3>
+		<p>
+      Crea una linea dall'offset del [page:ShapePath.currentPath currentPath]
+      a X e Y e aggiorna l'offset di X e Y.
+    </p>
+
+		<h3>[method:this quadraticCurveTo]( [param:Float cpX], [param:Float cpY], [param:Float x], [param:Float y] )</h3>
+		<p>
+      Crea una curva quadratica dall'offset del [page:ShapePath.currentPath currentPath] a x e y con cpX e cpY
+      come punto di controllo e aggiorna l'offset del [page:ShapePath.currentPath currentPath] di x e y.
+    </p>
+
+		<h3>[method:this bezierCurveTo]( [param:Float cp1X], [param:Float cp1Y], [param:Float cp2X], [param:Float cp2Y], [param:Float x], [param:Float y] )</h3>
+		<p>
+      Crea una curva bazier dall'offset del [page:ShapePath.currentPath currentPath] a x e y con
+      cp1X, cp1Y e cp2X, cp2Y come punti di controllo e aggiorna l'offset del [page:ShapePath.currentPath currentPath] a x e y.
+    </p>
+
+		<h3>[method:this splineThru] ( [param:Array points] ) </h3>
+		<p>points - Un array di [page:Vector2]</p>
+		<p>Collega una nuova [page:SplineCurve] al [page:ShapePath.currentPath currentPath].</p>
+
+
+		<h3>[method:Array toShapes]( [param:Boolean isCCW] )</h3>
+		<p>
+		isCCW -- Modifica la modalità di generazione degli hole e dei solidi<br/>
+		</p>
+		<p>
+      Converte l'array [page:ShapePath.subPaths subPaths] in un array di Shape. Per impostazione predefinita
+      le forme solide sono definite in senso orario (CW) e i fori sono definiti in senso antiorario (CCW).
+      Se isCCW è impostato su `true`, le forme sono capovolte.
+		</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/extras/core/ShapePath.js src/extras/core/ShapePath.js]
+		</p>
+	</body>
+</html>

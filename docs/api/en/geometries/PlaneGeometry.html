@@ -13,7 +13,10 @@
 
 		<p class="desc">A class for generating plane geometries.</p>
 
-		<iframe id="scene" src="scenes/geometry-browser.html#PlaneGeometry"></iframe>
+		<iframe
+			id="scene"
+			src="scenes/geometry-browser.html#PlaneGeometry"
+		></iframe>
 
 		<script>
 
@@ -30,23 +33,25 @@
 		}
 
 		</script>
-
 		<h2>Code Example</h2>
 
-		<code>const geometry = new THREE.PlaneGeometry( 1, 1 );
-		const material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
-		const plane = new THREE.Mesh( geometry, material );
-		scene.add( plane );
+		<code>
+const geometry = new THREE.PlaneGeometry( 1, 1 );
+const material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+const plane = new THREE.Mesh( geometry, material );
+scene.add( plane );
 		</code>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]([param:Float width], [param:Float height], [param:Integer widthSegments], [param:Integer heightSegments])</h3>
+		<h3>
+			[name]([param:Float width], [param:Float height], [param:Integer widthSegments], [param:Integer heightSegments])
+		</h3>
 		<p>
-		width — Width along the X axis. Default is 1.<br />
-		height — Height along the Y axis. Default is 1.<br />
-		widthSegments — Optional. Default is 1. <br />
-		heightSegments — Optional. Default is 1.
+			width — Width along the X axis. Default is `1`.<br />
+			height — Height along the Y axis. Default is `1`.<br />
+			widthSegments — Optional. Default is `1`. <br />
+			heightSegments — Optional. Default is `1`.
 		</p>
 
 		<h2>Properties</h2>
@@ -54,7 +59,8 @@
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+			An object with a property for each of the constructor parameters. Any
+			modification after instantiation does not change the geometry.
 		</p>
 
 		<h2>Methods</h2>

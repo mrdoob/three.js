@@ -1,4 +1,5 @@
 import {
+	HalfFloatType,
 	LinearFilter,
 	NearestFilter,
 	ShaderMaterial,
@@ -20,12 +21,14 @@ class SMAAPass extends Pass {
 		// render targets
 
 		this.edgesRT = new WebGLRenderTarget( width, height, {
-			depthBuffer: false
+			depthBuffer: false,
+			type: HalfFloatType
 		} );
 		this.edgesRT.texture.name = 'SMAAPass.edges';
 
 		this.weightsRT = new WebGLRenderTarget( width, height, {
-			depthBuffer: false
+			depthBuffer: false,
+			type: HalfFloatType
 		} );
 		this.weightsRT.texture.name = 'SMAAPass.weights';
 
@@ -66,12 +69,6 @@ class SMAAPass extends Pass {
 		this.searchTexture.flipY = false;
 
 		// materials - pass 1
-
-		if ( SMAAEdgesShader === undefined ) {
-
-			console.error( 'THREE.SMAAPass relies on SMAAShader' );
-
-		}
 
 		this.uniformsEdges = UniformsUtils.clone( SMAAEdgesShader.uniforms );
 
@@ -180,6 +177,22 @@ class SMAAPass extends Pass {
 	getSearchTexture() {
 
 		return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEIAAAAhCAAAAABIXyLAAAAAOElEQVRIx2NgGAWjYBSMglEwEICREYRgFBZBqDCSLA2MGPUIVQETE9iNUAqLR5gIeoQKRgwXjwAAGn4AtaFeYLEAAAAASUVORK5CYII=';
+
+	}
+
+	dispose() {
+
+		this.edgesRT.dispose();
+		this.weightsRT.dispose();
+
+		this.areaTexture.dispose();
+		this.searchTexture.dispose();
+
+		this.materialEdges.dispose();
+		this.materialWeights.dispose();
+		this.materialBlend.dispose();
+
+		this.fsQuad.dispose();
 
 	}
 

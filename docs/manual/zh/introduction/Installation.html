@@ -67,18 +67,26 @@
 		</p>
 
 		<code>
+		&lt;script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js">&lt;/script>
+
+		&lt;script type="importmap">
+			{
+			"imports": {
+				"three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js"
+			}
+			}
+		&lt;/script>
+
 		&lt;script type="module">
 
-		  // 通过访问 https://cdn.skypack.dev/three 来查找最新版本。
+			import * as THREE from 'three';
 
-		  import * as THREE from 'https://cdn.skypack.dev/three@&lt;version&gt;';
-
-		  const scene = new THREE.Scene();
+			const scene = new THREE.Scene();
 
 		&lt;/script>
 		</code>
 
-		<h2>示例</h2>
+		<h2>Addons</h2>
 
 		<p>
 			three.js的核心专注于3D引擎最重要的组件。其它很多有用的组件 —— 如控制器（control）、加载器（loader）以及后期处理效果（post-processing effect） —— 是 [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] 目录的一部分。它们被称为“示例”，虽然你可以直接将它们拿来使用，但它们也需要重新混合以及定制。这些组件和 three.js 的核心保持同步，而 npm 上类似的第三方包则由不同的作者进行维护，可能不是最新的。
@@ -90,7 +98,7 @@
 
 
 		<code>
-		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 		const controls = new OrbitControls( camera, renderer.domElement );
 		</code>
@@ -100,13 +108,23 @@
 		</p>
 
 		<code>
+		&lt;script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js">&lt;/script>
+
+		&lt;script type="importmap">
+			{
+			"imports": {
+				"three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js",
+				"three/addons/": "https://unpkg.com/three@&lt;version&gt;/examples/jsm/"
+			}
+			}
+		&lt;/script>
+
 		&lt;script type="module">
 
-		  // 通过访问 https://cdn.skypack.dev/three 来查找最新版本。
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-		  import { OrbitControls } from 'https://cdn.skypack.dev/three@&lt;version&gt;/examples/jsm/controls/OrbitControls.js';
-
-		  const controls = new OrbitControls( camera, renderer.domElement );
+			const controls = new OrbitControls( camera, renderer.domElement );
 
 		&lt;/script>
 		</code>
@@ -136,11 +154,11 @@
 		<h3>Node.js</h3>
 
 		<p>
-			Because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be resolved by using shims like [link:https://github.com/stackgl/headless-gl headless-gl], or by replacing components like [page:TextureLoader] with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
+			由于 three.js 是为 Web 构建的, 因此它依赖于浏览器和 DOM 的 API ，但这些 API 在 Node.js 里不一定存在。这些问题中有的可以使用 [link:https://github.com/stackgl/headless-gl headless-gl] 等 shims 来解决，或者用自定义的替代方案来替换像 [page:TextureLoader] 这样的组件。其他 DOM API 可能与使用它们的代码强相关，因此将更难以解决。我们欢迎简单且易于维护的 pull request 来改进对 Node.js 的支持，但建议先打开问题来讨论您的改进。
 		</p>
 
 		<p>
-			Make sure to add `{ "type": "module" }` to your `package.json` to enable ES6 modules in your node project.
+			确保在您的 package.json 文件中添加 { "type": "module" }，以在您的 Node.js 项目中启用 ES6 模块。
 		</p>
 
 	</body>
