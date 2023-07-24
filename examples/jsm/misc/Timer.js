@@ -4,6 +4,7 @@ class Timer {
 
 		this._previousTime = 0;
 		this._currentTime = 0;
+		this._startTime = now();
 
 		this._delta = 0;
 		this._elapsed = 0;
@@ -81,7 +82,7 @@ class Timer {
 
 	reset() {
 
-		this._currentTime = this._now();
+		this._currentTime = now() - this._startTime;
 
 		return this;
 
@@ -112,7 +113,7 @@ class Timer {
 		} else {
 
 			this._previousTime = this._currentTime;
-			this._currentTime = ( timestamp !== null ) ? timestamp : this._now();
+			this._currentTime = ( timestamp !== null ) ? timestamp : ( now() - this._startTime );
 
 			this._delta = this._currentTime - this._previousTime;
 
@@ -126,13 +127,11 @@ class Timer {
 
 	}
 
-	// private
+}
 
-	_now() {
+function now() {
 
-		return ( typeof performance === 'undefined' ? Date : performance ).now();
-
-	}
+	return ( typeof performance === 'undefined' ? Date : performance ).now();
 
 }
 
