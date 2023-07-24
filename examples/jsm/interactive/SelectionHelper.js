@@ -40,9 +40,7 @@ class SelectionHelper {
 
 		}.bind( this );
 
-		this.renderer.domElement.addEventListener( 'pointerdown', this.onPointerDown );
-		this.renderer.domElement.addEventListener( 'pointermove', this.onPointerMove );
-		this.renderer.domElement.addEventListener( 'pointerup', this.onPointerUp );
+		this.reactive();
 
 	}
 
@@ -51,6 +49,14 @@ class SelectionHelper {
 		this.renderer.domElement.removeEventListener( 'pointerdown', this.onPointerDown );
 		this.renderer.domElement.removeEventListener( 'pointermove', this.onPointerMove );
 		this.renderer.domElement.removeEventListener( 'pointerup', this.onPointerUp );
+
+	}
+
+	reactive() {
+
+		this.renderer.domElement.addEventListener( 'pointerdown', this.onPointerDown );
+		this.renderer.domElement.addEventListener( 'pointermove', this.onPointerMove );
+		this.renderer.domElement.addEventListener( 'pointerup', this.onPointerUp );
 
 	}
 
