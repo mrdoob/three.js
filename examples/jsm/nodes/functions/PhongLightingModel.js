@@ -33,11 +33,11 @@ const BRDF_BlinnPhong = tslFn( ( { lightDirection } ) => {
 
 class PhongLightingModel extends LightingModel {
 
-	constructor() {
+	constructor( specular = true ) {
 
 		super();
 
-		this.specular = true;
+		this.specular = specular;
 
 	}
 
