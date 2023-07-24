@@ -15,8 +15,11 @@ class SelectionHelper {
 		this.pointBottomRight = new Vector2();
 
 		this.isDown = false;
+		this.enabled = true;
 
 		this.onPointerDown = function ( event ) {
+
+			if (this.enabled === false) return;
 
 			this.isDown = true;
 			this.onSelectStart( event );
@@ -24,6 +27,8 @@ class SelectionHelper {
 		}.bind( this );
 
 		this.onPointerMove = function ( event ) {
+
+			if (this.enabled === false) return;
 
 			if ( this.isDown ) {
 
@@ -35,12 +40,16 @@ class SelectionHelper {
 
 		this.onPointerUp = function ( ) {
 
+			if (this.enabled === false) return;
+
 			this.isDown = false;
 			this.onSelectOver();
 
 		}.bind( this );
 
-		this.reactive();
+		this.renderer.domElement.addEventListener( 'pointerdown', this.onPointerDown );
+		this.renderer.domElement.addEventListener( 'pointermove', this.onPointerMove );
+		this.renderer.domElement.addEventListener( 'pointerup', this.onPointerUp );
 
 	}
 
@@ -49,14 +58,6 @@ class SelectionHelper {
 		this.renderer.domElement.removeEventListener( 'pointerdown', this.onPointerDown );
 		this.renderer.domElement.removeEventListener( 'pointermove', this.onPointerMove );
 		this.renderer.domElement.removeEventListener( 'pointerup', this.onPointerUp );
-
-	}
-
-	reactive() {
-
-		this.renderer.domElement.addEventListener( 'pointerdown', this.onPointerDown );
-		this.renderer.domElement.addEventListener( 'pointermove', this.onPointerMove );
-		this.renderer.domElement.addEventListener( 'pointerup', this.onPointerUp );
 
 	}
 
