@@ -208,11 +208,15 @@ class EdgeSplitModifier {
 
 		}
 
+		const oldNbIndices = positions.length /
+			geometry.getAttribute( 'position' ).itemSize;
+		const newNbIndices = oldNbIndices + splitIndexes.length;
+
 		const newAttributes = {};
 		for ( const name of Object.keys( geometry.attributes ) ) {
 
 			const oldAttribute = geometry.attributes[ name ];
-			const newArray = new oldAttribute.array.constructor( ( indexes.length + splitIndexes.length ) * oldAttribute.itemSize );
+			const newArray = new oldAttribute.array.constructor( newNbIndices * oldAttribute.itemSize );
 			newArray.set( oldAttribute.array );
 			newAttributes[ name ] = new BufferAttribute( newArray, oldAttribute.itemSize, oldAttribute.normalized );
 
@@ -220,7 +224,6 @@ class EdgeSplitModifier {
 
 		const newIndexes = new Uint32Array( indexes.length );
 		newIndexes.set( indexes );
-
 		for ( let i = 0; i < splitIndexes.length; i ++ ) {
 
 			const split = splitIndexes[ i ];
@@ -230,7 +233,7 @@ class EdgeSplitModifier {
 
 				for ( let j = 0; j < attribute.itemSize; j ++ ) {
 
-					attribute.array[ ( indexes.length + i ) * attribute.itemSize + j ] =
+					attribute.array[ ( oldNbIndices + i ) * attribute.itemSize + j ] =
 						attribute.array[ index * attribute.itemSize + j ];
 
 				}
@@ -239,7 +242,7 @@ class EdgeSplitModifier {
 
 			for ( const j of split.indexes ) {
 
-				newIndexes[ j ] = indexes.length + i;
+				newIndexes[ j ] = oldNbIndices + i;
 
 			}
 
