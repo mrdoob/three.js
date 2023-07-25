@@ -12,7 +12,7 @@ export { default as CacheNode, cache } from './core/CacheNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
 export { default as ContextNode, context, label } from './core/ContextNode.js';
 export { default as IndexNode, vertexIndex, instanceIndex } from './core/IndexNode.js';
-export { default as LightingModel, lightingModel } from './core/LightingModel.js';
+export { default as LightingModel } from './core/LightingModel.js';
 export { default as Node, addNodeClass, createNodeFromType } from './core/Node.js';
 export { default as NodeAttribute } from './core/NodeAttribute.js';
 export { default as NodeBuilder } from './core/NodeBuilder.js';
@@ -155,7 +155,6 @@ export * from './materials/Materials.js';
 export * from './materialx/MaterialXNodes.js';
 
 // functions
-export { default as BRDF_BlinnPhong } from './functions/BSDF/BRDF_BlinnPhong.js';
 export { default as BRDF_GGX } from './functions/BSDF/BRDF_GGX.js';
 export { default as BRDF_Lambert } from './functions/BSDF/BRDF_Lambert.js';
 export { default as D_GGX } from './functions/BSDF/D_GGX.js';
@@ -168,5 +167,5 @@ export { getDistanceAttenuation } from './lighting/LightUtils.js';
 export { default as getGeometryRoughness } from './functions/material/getGeometryRoughness.js';
 export { default as getRoughness } from './functions/material/getRoughness.js';
 
-export { default as phongLightingModel } from './functions/PhongLightingModel.js';
-export { default as physicalLightingModel } from './functions/PhysicalLightingModel.js';
+export { default as PhongLightingModel } from './functions/PhongLightingModel.js';
+export { default as PhysicalLightingModel } from './functions/PhysicalLightingModel.js';

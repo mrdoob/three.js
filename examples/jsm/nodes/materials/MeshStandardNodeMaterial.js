@@ -3,7 +3,7 @@ import { diffuseColor, metalness, roughness, specularColor } from '../core/Prope
 import { mix } from '../math/MathNode.js';
 import { materialRoughness, materialMetalness } from '../accessors/MaterialNode.js';
 import getRoughness from '../functions/material/getRoughness.js';
-import physicalLightingModel from '../functions/PhysicalLightingModel.js';
+import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
 import { MeshStandardMaterial } from 'three';
@@ -31,7 +31,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	constructLightingModel( /*builder*/ ) {
 
-		return physicalLightingModel;
+		return new PhysicalLightingModel( false, false ); // ( clearcoat, sheen ) -> standard
 
 	}
 
