@@ -1,6 +1,6 @@
 import DataMap from './DataMap.js';
 import { Color, Mesh, SphereGeometry, BackSide } from 'three';
-import { context, positionWorldDirection, backgroundBlurriness, backgroundIntensity, MeshBasicNodeMaterial } from '../../nodes/Nodes.js';
+import { vec4, context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection } from '../../nodes/Nodes.js';
 
 let _clearAlpha;
 const _clearColor = new Color();
@@ -14,8 +14,8 @@ class Background extends DataMap {
 		this.renderer = renderer;
 		this.nodes = nodes;
 
-		this.boxMesh = null;
-		this.boxMeshNode = null;
+		this.backgroundMesh = null;
+		this.backgroundMeshNode = null;
 
 	}
 
@@ -49,31 +49,33 @@ class Background extends DataMap {
 			_clearColor.copy( renderer._clearColor );
 			_clearAlpha = renderer._clearAlpha;
 
-			let boxMesh = this.boxMesh;
+			let backgroundMesh = this.backgroundMesh;
 
-			if ( boxMesh === null ) {
+			if ( backgroundMesh === null ) {
 
-				this.boxMeshNode = context( backgroundNode, {
+				this.backgroundMeshNode = context( backgroundNode, {
 					// @TODO: Add Texture2D support using node context
-					getUVNode: () => positionWorldDirection,
+					getUVNode: () => normalWorld,
 					getSamplerLevelNode: () => backgroundBlurriness
 				} ).mul( backgroundIntensity );
 
-				const nodeMaterial = new MeshBasicNodeMaterial();
-				nodeMaterial.colorNode = this.boxMeshNode;
+				let viewProj = modelViewProjection();
+				viewProj = vec4( viewProj.x, viewProj.y, viewProj.w, viewProj.w );
+
+				const nodeMaterial = new NodeMaterial();
+				nodeMaterial.outputNode = this.backgroundMeshNode;
 				nodeMaterial.side = BackSide;
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
 				nodeMaterial.fog = false;
+				nodeMaterial.vertexNode = viewProj;
 
-				this.boxMesh = boxMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );
-				boxMesh.frustumCulled = false;
+				this.backgroundMesh = backgroundMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );
+				backgroundMesh.frustumCulled = false;
 
-				boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
+				backgroundMesh.onBeforeRender = function ( renderer, scene, camera ) {
 
-					const scale = camera.far;
-
-					this.matrixWorld.makeScale( scale, scale, scale ).copyPosition( camera.matrixWorld );
+					this.matrixWorld.copyPosition( camera.matrixWorld );
 
 				};
 
@@ -83,15 +85,15 @@ class Background extends DataMap {
 
 			if ( sceneData.backgroundCacheKey !== backgroundCacheKey ) {
 
-				this.boxMeshNode.node = backgroundNode;
+				this.backgroundMeshNode.node = backgroundNode;
 
-				boxMesh.material.needsUpdate = true;
+				backgroundMesh.material.needsUpdate = true;
 
 				sceneData.backgroundCacheKey = backgroundCacheKey;
 
 			}
 
-			renderList.unshift( boxMesh, boxMesh.geometry, boxMesh.material, 0, 0, null );
+			renderList.unshift( backgroundMesh, backgroundMesh.geometry, backgroundMesh.material, 0, 0, null );
 
 		} else {
 
