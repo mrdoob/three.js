@@ -1238,6 +1238,10 @@ class WebGLRenderer {
 						const geometry = objects.update( object );
 						const material = object.material;
 
+						// We'll do distance culling here in order to improve performance.
+						// Caller can calculate a surfaceArea for each mesh, and assign it to userData.
+						// So, here we'll calculate a maxDrawDistance for this object. And if the distance
+						// between object center and camera exceeds this value, we won't draw it.
 						if (object.isMesh && object?.userData?.surfaceArea && distanceCullingFactor) {
 
 							const surfaceArea = object.userData.surfaceArea;
