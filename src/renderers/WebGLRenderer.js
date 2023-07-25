@@ -591,7 +591,7 @@ class WebGLRenderer {
 		this.getEnableDistanceCulling = function () {
 
 			return enableDistanceCulling;
-			
+
 		}
 
 		this.setEnableDistanceCulling = function (value) {
@@ -1107,7 +1107,7 @@ class WebGLRenderer {
 
 			renderListStack.push( currentRenderList );
 
-			projectObject( scene, camera, 0, _this.sortObjects, _this.distanceToLengthOfSideRatio );
+			projectObject( scene, camera, 0, _this.sortObjects );
 
 			currentRenderList.finish();
 
