@@ -1210,7 +1210,7 @@ class WebGLRenderer {
 
 		};
 
-		function projectObject( object, camera, groupOrder, sortObjects) {
+		function projectObject( object, camera, groupOrder, sortObjects ) {
 
 			if ( object.visible === false ) return;
 
