@@ -1,8 +1,8 @@
 import { addNodeMaterial } from './NodeMaterial.js';
 import { transformedClearcoatNormalView } from '../accessors/NormalNode.js';
-import { clearcoat, clearcoatRoughness, sheen, sheenRoughness } from '../core/PropertyNode.js';
+import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness } from '../core/PropertyNode.js';
 import { materialClearcoatNormal } from '../accessors/ExtendedMaterialNode.js';
-import { materialClearcoat, materialClearcoatRoughness, materialSheen, materialSheenRoughness } from '../accessors/MaterialNode.js';
+import { materialClearcoat, materialClearcoatRoughness, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness } from '../accessors/MaterialNode.js';
 import { float, vec3 } from '../shadernode/ShaderNode.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
@@ -46,7 +46,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	constructLightingModel( /*builder*/ ) {
 
-		return new PhysicalLightingModel();
+		return new PhysicalLightingModel(); // @TODO: Optimize shader using parameters.
 
 	}
 
@@ -71,6 +71,16 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		stack.assign( sheen, sheenNode );
 		stack.assign( sheenRoughness, sheenRoughnessNode );
+
+		// IRIDESCENCE
+
+		const iridescenceNode = this.iridescenceNode ? float( this.iridescenceNode ) : materialIridescence;
+		const iridescenceIORNode = this.iridescenceIORNode ? float( this.iridescenceIORNode ) : materialIridescenceIOR;
+		const iridescenceThicknessNode = this.iridescenceThicknessNode ? float( this.iridescenceThicknessNode ) : materialIridescenceThickness;
+
+		stack.assign( iridescence, iridescenceNode );
+		stack.assign( iridescenceIOR, iridescenceIORNode );
+		stack.assign( iridescenceThickness, iridescenceThicknessNode );
 
 	}
 
