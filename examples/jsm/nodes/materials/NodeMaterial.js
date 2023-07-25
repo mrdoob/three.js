@@ -50,7 +50,9 @@ class NodeMaterial extends ShaderMaterial {
 		this.alphaTestNode = null;
 
 		this.positionNode = null;
-		this.outputNode = null;
+
+		this.outputNode = null; // @TODO: Rename to fragmentNode
+		this.vertexNode = null;
 
 	}
 
@@ -146,7 +148,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		builder.context.vertex = builder.removeStack();
 
-		return modelViewProjection();
+		return this.vertexNode || modelViewProjection();
 
 	}
 
@@ -470,7 +472,9 @@ class NodeMaterial extends ShaderMaterial {
 		this.alphaTestNode = source.alphaTestNode;
 
 		this.positionNode = source.positionNode;
+
 		this.outputNode = source.outputNode;
+		this.vertexNode = source.vertexNode;
 
 		return super.copy( source );
 
