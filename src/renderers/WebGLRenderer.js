@@ -1265,7 +1265,7 @@ class WebGLRenderer {
 						const geometry = objects.update( object );
 						const material = object.material;
 
-						if (object.isMesh && object?.userData?.area) {
+						if (object.isMesh && object?.userData?.area && enableDistanceCulling) {
 
 							const area = object.userData.area;
 							const scale = _vector3.setFromMatrixScale(object.matrixWorld);
