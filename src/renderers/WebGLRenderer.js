@@ -83,6 +83,7 @@ class WebGLRenderer {
 			preserveDrawingBuffer = false,
 			powerPreference = 'default',
 			failIfMajorPerformanceCaveat = false,
+			distanceCullingFactor = undefined,
 		} = parameters;
 
 		this.isWebGLRenderer = true;
@@ -1236,6 +1237,31 @@ class WebGLRenderer {
 
 						const geometry = objects.update( object );
 						const material = object.material;
+
+						if (object.isMesh && object?.userData?.surfaceArea && distanceCullingFactor) {
+
+							const surfaceArea = object.userData.surfaceArea;
+							const scale = _vector3.setFromMatrixScale(object.matrixWorld);
+							let maxDrawDistance = surfaceArea * ((Math.pow(scale.x, 2) + Math.pow(scale.y, 2) + Math.pow(scale.z, 2)) / 3);
+							maxDrawDistance = Math.sqrt(maxDrawDistance) * distanceCullingFactor;
+							if ( object.boundingSphere !== undefined ) {
+
+								if ( object.boundingSphere === null ) object.computeBoundingSphere();
+								_vector3.copy( object.boundingSphere.center );
+
+							} else {
+
+								if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+								_vector3.copy( geometry.boundingSphere.center );
+
+							}
+							_vector3.applyMatrix4(object.matrixWorld);
+							const distance = _vector3.distanceTo(camera.position) / camera.zoom;
+							if (distance > maxDrawDistance) {
+								return;
+							}
+
+						}
 
 						if ( sortObjects ) {
 
