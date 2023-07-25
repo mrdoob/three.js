@@ -23,7 +23,7 @@ class Pipelines extends DataMap {
 
 	}
 
-	getForCompute( computeNode ) {
+	getForCompute( computeNode, bindings ) {
 
 		const { backend } = this;
 
@@ -69,7 +69,7 @@ class Pipelines extends DataMap {
 
 				if ( previousPipeline && previousPipeline.usedTimes === 0 ) this._releasePipeline( computeNode );
 
-				pipeline = this._getComputePipeline( computeNode, stageCompute, cacheKey );
+				pipeline = this._getComputePipeline( computeNode, stageCompute, cacheKey, bindings );
 
 			}
 
@@ -222,7 +222,13 @@ class Pipelines extends DataMap {
 
 	}
 
-	_getComputePipeline( computeNode, stageCompute, cacheKey ) {
+	updateForRender( renderObject ) {
+
+		this.getForRender( renderObject );
+
+	}
+
+	_getComputePipeline( computeNode, stageCompute, cacheKey, bindings ) {
 
 		// check for existing pipeline
 
@@ -236,7 +242,7 @@ class Pipelines extends DataMap {
 
 			this.caches.set( cacheKey, pipeline );
 
-			this.backend.createComputePipeline( pipeline );
+			this.backend.createComputePipeline( pipeline, bindings );
 
 		}
 

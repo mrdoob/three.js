@@ -103,7 +103,7 @@
     "rollup": "^3.20.2",
     "rollup-plugin-filesize": "^10.0.0",
     "rollup-plugin-visualizer": "^5.9.0",
-    "servez": "^1.14.2"
+    "servez": "^2.0.0"
   },
   "overrides": {
     "jpeg-js": "^0.4.4"

@@ -600,6 +600,12 @@ class Renderer {
 
 	}
 
+	getRenderTarget() {
+
+		return this._renderTarget;
+
+	}
+
 	async compute( computeNodes ) {
 
 		if ( this._initialized === false ) await this.init();
@@ -639,20 +645,14 @@ class Renderer {
 			nodes.updateForCompute( computeNode );
 			bindings.updateForCompute( computeNode );
 
-			const computePipeline = pipelines.getForCompute( computeNode );
 			const computeBindings = bindings.getForCompute( computeNode );
+			const computePipeline = pipelines.getForCompute( computeNode, computeBindings );
 
 			backend.compute( computeNodes, computeNode, computeBindings, computePipeline );
 
 		}
 
 		backend.finishCompute( computeNodes );
-
-	}
-
-	getRenderTarget() {
-
-		return this._renderTarget;
 
 	}
 
@@ -882,6 +882,7 @@ class Renderer {
 		this._nodes.updateForRender( renderObject );
 		this._geometries.updateForRender( renderObject );
 		this._bindings.updateForRender( renderObject );
+		this._pipelines.updateForRender( renderObject );
 
 		//
 

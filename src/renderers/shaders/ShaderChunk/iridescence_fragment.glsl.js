@@ -64,7 +64,7 @@ export default /* glsl */`
 		float cosTheta2Sq = 1.0 - sinTheta2Sq;
 		if ( cosTheta2Sq < 0.0 ) {
 
-			 return vec3( 1.0 );
+			return vec3( 1.0 );
 
 		}
 
@@ -73,7 +73,6 @@ export default /* glsl */`
 		// First interface
 		float R0 = IorToFresnel0( iridescenceIOR, outsideIOR );
 		float R12 = F_Schlick( R0, 1.0, cosTheta1 );
-		float R21 = R12;
 		float T121 = 1.0 - R12;
 		float phi12 = 0.0;
 		if ( iridescenceIOR < outsideIOR ) phi12 = PI;

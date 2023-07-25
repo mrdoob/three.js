@@ -30,9 +30,9 @@ class DataTextureLoader extends Loader {
 		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( buffer ) {
 
-			const texData = scope.parse( buffer );
+			const texData = scope.parse( buffer ); // TODO: Use try/catch here and throw errors in derived loaders, see #26412
 
-			if ( ! texData ) return;
+			if ( ! texData ) return onError();
 
 			if ( texData.image !== undefined ) {
 

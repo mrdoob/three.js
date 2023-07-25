@@ -12,6 +12,8 @@ import { float, vec2 } from '../shadernode/ShaderNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { reference } from '../accessors/ReferenceNode.js';
 
+const envNodeCache = new WeakMap();
+
 class EnvironmentNode extends LightingNode {
 
 	constructor( envNode = null ) {
@@ -29,13 +31,23 @@ class EnvironmentNode extends LightingNode {
 
 		if ( envNode.isTextureNode && envNode.value.isCubeTexture !== true ) {
 
-			const texture = envNode.value;
-			const renderer = builder.renderer;
+			let cacheEnvNode = envNodeCache.get( envNode.value );
 
-			// @TODO: Add dispose logic here
-			const cubeRTT = builder.getCubeRenderTarget( 512 ).fromEquirectangularTexture( renderer, texture );
+			if ( cacheEnvNode === undefined ) {
 
-			envNode = cubeTexture( cubeRTT.texture );
+				const texture = envNode.value;
+				const renderer = builder.renderer;
+
+				// @TODO: Add dispose logic here
+				const cubeRTT = builder.getCubeRenderTarget( 512 ).fromEquirectangularTexture( renderer, texture );
+
+				cacheEnvNode = cubeTexture( cubeRTT.texture );
+
+				envNodeCache.set( envNode.value, cacheEnvNode );
+
+			}
+
+			envNode	= cacheEnvNode;
 
 		}
 
@@ -56,22 +68,20 @@ class EnvironmentNode extends LightingNode {
 
 		//
 
-		let isolateClearcoatRadiance = null;
+		const clearcoatRadiance = builder.context.lightingModel.clearcoatRadiance;
 
-		if ( builder.context.clearcoatRadiance  ) {
+		if ( clearcoatRadiance ) {
 
-			const clearcoatRadiance = context( envNode, createRadianceContext( clearcoatRoughness, transformedClearcoatNormalView ) ).mul( intensity );
+			const clearcoatRadianceContext = context( envNode, createRadianceContext( clearcoatRoughness, transformedClearcoatNormalView ) ).mul( intensity );
+			const isolateClearcoatRadiance = cache( clearcoatRadianceContext );
 
-			isolateClearcoatRadiance = cache( clearcoatRadiance );
-
-			builder.context.clearcoatRadiance.addAssign( isolateClearcoatRadiance );
+			clearcoatRadiance.addAssign( isolateClearcoatRadiance );
 
 		}
 
 		//
 
 		properties.radiance = isolateRadiance;
-		properties.clearcoatRadiance = isolateClearcoatRadiance;
 		properties.irradiance = irradiance;
 
 	}
