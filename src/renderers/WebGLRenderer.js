@@ -83,6 +83,7 @@ class WebGLRenderer {
 			preserveDrawingBuffer = false,
 			powerPreference = 'default',
 			failIfMajorPerformanceCaveat = false,
+			enableDistanceCulling = false,
 		} = parameters;
 
 		this.isWebGLRenderer = true;
@@ -202,6 +203,9 @@ class WebGLRenderer {
 
 		let _clippingEnabled = false;
 		let _localClippingEnabled = false;
+
+		// distance culling
+		let distanceCullingFactor = 100;
 
 		// transmission
 
@@ -571,6 +575,30 @@ class WebGLRenderer {
 			background.setClearAlpha.apply( background, arguments );
 
 		};
+
+		this.getDistanceCullingFactor = function () {
+			
+			return distanceCullingFactor;
+
+		}
+
+		this.setDistanceCullingFactor = function ( value ) {
+			
+			distanceCullingFactor = value;
+
+		}
+
+		this.getEnableDistanceCulling = function () {
+
+			return enableDistanceCulling;
+			
+		}
+
+		this.setEnableDistanceCulling = function (value) {
+			
+			enableDistanceCulling = value;
+
+		}
 
 		this.clear = function ( color = true, depth = true, stencil = true ) {
 
@@ -1032,8 +1060,6 @@ class WebGLRenderer {
 		xr.addEventListener( 'sessionend', onXRSessionEnd );
 
 		// Rendering
-		// Distance culling ratio
-		this.distanceToLengthOfSideRatio = 100;
 
 		this.render = function ( scene, camera ) {
 
@@ -1184,7 +1210,7 @@ class WebGLRenderer {
 
 		};
 
-		function projectObject( object, camera, groupOrder, sortObjects, distanceToLengthOfSideRatio ) {
+		function projectObject( object, camera, groupOrder, sortObjects) {
 
 			if ( object.visible === false ) return;
 
@@ -1243,15 +1269,15 @@ class WebGLRenderer {
 
 							const area = object.userData.area;
 							const scale = _vector3.setFromMatrixScale(object.matrixWorld);
-							let maxDrawDistance = area * ((Math.pow(scale.x, 2) + Math.pow(scale.y, 2) + Math.pow(scale.z,2)) / 3);
-							maxDrawDistance = Math.sqrt(maxDrawDistance) * distanceToLengthOfSideRatio;
+							let maxDrawDistance = area * ((Math.pow(scale.x, 2) + Math.pow(scale.y, 2) + Math.pow(scale.z, 2)) / 3);
+							maxDrawDistance = Math.sqrt(maxDrawDistance) * distanceCullingFactor;
 							if ( object.boundingSphere !== undefined ) {
 
 								if ( object.boundingSphere === null ) object.computeBoundingSphere();
 								_vector3.copy( object.boundingSphere.center );
 
 							} else {
-								
+
 								if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 								_vector3.copy( geometry.boundingSphere.center );
 
@@ -1317,7 +1343,7 @@ class WebGLRenderer {
 
 			for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-				projectObject( children[ i ], camera, groupOrder, sortObjects, distanceToLengthOfSideRatio );
+				projectObject( children[ i ], camera, groupOrder, sortObjects );
 
 			}
 
