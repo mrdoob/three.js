@@ -147,6 +147,9 @@ class WebGLRenderer {
 		this.clippingPlanes = [];
 		this.localClippingEnabled = false;
 
+		// distance culling
+		this.distanceCullingFactor = undefined;
+
 		// physically based shading
 
 		this.outputColorSpace = SRGBColorSpace;
@@ -203,9 +206,6 @@ class WebGLRenderer {
 
 		let _clippingEnabled = false;
 		let _localClippingEnabled = false;
-
-		// distance culling
-		let distanceCullingFactor;
 
 		// transmission
 
@@ -575,12 +575,6 @@ class WebGLRenderer {
 			background.setClearAlpha.apply( background, arguments );
 
 		};
-
-		this.setDistanceCullingFactor = function ( value ) {
-			
-			distanceCullingFactor = value;
-
-		}
 
 		this.clear = function ( color = true, depth = true, stencil = true ) {
 
@@ -1247,12 +1241,12 @@ class WebGLRenderer {
 						const geometry = objects.update( object );
 						const material = object.material;
 
-						if (object.isMesh && object?.userData?.area && distanceCullingFactor) {
+						if (object.isMesh && object?.userData?.area && _this.distanceCullingFactor) {
 
 							const area = object.userData.area;
 							const scale = _vector3.setFromMatrixScale(object.matrixWorld);
 							let maxDrawDistance = area * ((Math.pow(scale.x, 2) + Math.pow(scale.y, 2) + Math.pow(scale.z, 2)) / 3);
-							maxDrawDistance = Math.sqrt(maxDrawDistance) * distanceCullingFactor;
+							maxDrawDistance = Math.sqrt(maxDrawDistance) * _this.distanceCullingFactor;
 							if ( object.boundingSphere !== undefined ) {
 
 								if ( object.boundingSphere === null ) object.computeBoundingSphere();
