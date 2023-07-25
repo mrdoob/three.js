@@ -83,7 +83,6 @@ class WebGLRenderer {
 			preserveDrawingBuffer = false,
 			powerPreference = 'default',
 			failIfMajorPerformanceCaveat = false,
-			enableDistanceCulling = false,
 		} = parameters;
 
 		this.isWebGLRenderer = true;
