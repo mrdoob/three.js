@@ -122,6 +122,7 @@ const exceptionList = [
 	'webgpu_lights_selective',
 	'webgpu_loader_gltf',
 	'webgpu_loader_gltf_compressed',
+	'webgpu_loader_gltf_iridescence',
 	'webgpu_loader_gltf_sheen',
 	'webgpu_materials',
 	'webgpu_materials_video',
@@ -598,7 +599,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		}
 
-	} catch ( e ) { 
+	} catch ( e ) {
 
 		if ( attemptID === numAttempts - 1 ) {
 
