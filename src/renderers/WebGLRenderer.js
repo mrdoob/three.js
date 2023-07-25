@@ -205,7 +205,7 @@ class WebGLRenderer {
 		let _localClippingEnabled = false;
 
 		// distance culling
-		let distanceCullingFactor = 100;
+		let distanceCullingFactor;
 
 		// transmission
 
@@ -576,27 +576,9 @@ class WebGLRenderer {
 
 		};
 
-		this.getDistanceCullingFactor = function () {
-			
-			return distanceCullingFactor;
-
-		}
-
 		this.setDistanceCullingFactor = function ( value ) {
 			
 			distanceCullingFactor = value;
-
-		}
-
-		this.getEnableDistanceCulling = function () {
-
-			return enableDistanceCulling;
-
-		}
-
-		this.setEnableDistanceCulling = function (value) {
-			
-			enableDistanceCulling = value;
 
 		}
 
@@ -1265,7 +1247,7 @@ class WebGLRenderer {
 						const geometry = objects.update( object );
 						const material = object.material;
 
-						if (object.isMesh && object?.userData?.area && enableDistanceCulling) {
+						if (object.isMesh && object?.userData?.area && distanceCullingFactor) {
 
 							const area = object.userData.area;
 							const scale = _vector3.setFromMatrixScale(object.matrixWorld);
