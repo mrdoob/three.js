@@ -1032,6 +1032,8 @@ class WebGLRenderer {
 		xr.addEventListener( 'sessionend', onXRSessionEnd );
 
 		// Rendering
+		// Distance culling ratio
+		this.distanceToLengthOfSideRatio = 100;
 
 		this.render = function ( scene, camera ) {
 
@@ -1079,7 +1081,7 @@ class WebGLRenderer {
 
 			renderListStack.push( currentRenderList );
 
-			projectObject( scene, camera, 0, _this.sortObjects );
+			projectObject( scene, camera, 0, _this.sortObjects, this.distanceToLengthOfSideRatio );
 
 			currentRenderList.finish();
 
@@ -1182,7 +1184,7 @@ class WebGLRenderer {
 
 		};
 
-		function projectObject( object, camera, groupOrder, sortObjects ) {
+		function projectObject( object, camera, groupOrder, sortObjects, distanceToLengthOfSideRatio ) {
 
 			if ( object.visible === false ) return;
 
@@ -1237,6 +1239,21 @@ class WebGLRenderer {
 						const geometry = objects.update( object );
 						const material = object.material;
 
+						if (object.isMesh && object?.userData?.area) {
+
+							const area = object.userData.area;
+							const scale = _vector3.setFromMatrixScale(object.matrixWorld);
+							let maxDrawDistance = area * ((Math.pow(scale.x, 2) + Math.pow(scale.y, 2) + Math.pow(scale.z, 2)) / 3);
+							maxDrawDistance = Math.sqrt(maxDrawDistance) * distanceToLengthOfSideRatio;
+							geometry.computeBoundingSphere();
+							_vector3.copy(geometry.boundingSphere.center).applyMatrix4(object.matrixWorld);
+							const distance = _vector3.distanceTo(camera.position) / camera.zoom;
+							if (distance > maxDrawDistance) {
+								return;
+							}
+
+						}
+
 						if ( sortObjects ) {
 
 							if ( object.boundingSphere !== undefined ) {
@@ -1290,7 +1307,7 @@ class WebGLRenderer {
 
 			for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-				projectObject( children[ i ], camera, groupOrder, sortObjects );
+				projectObject( children[ i ], camera, groupOrder, sortObjects, distanceToLengthOfSideRatio );
 
 			}
 
