@@ -48,7 +48,7 @@ class TGALoader extends DataTextureLoader {
 					// What the need of a file without data ?
 
 				case TGA_TYPE_NO_DATA:
-					throw new Error.error( 'THREE.TGALoader: No data.' );
+					throw new Error( 'THREE.TGALoader: No data.' );
 
 					// Invalid type ?
 
