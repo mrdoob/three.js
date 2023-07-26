@@ -367,7 +367,7 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		if ( renderContext.texture !== null && renderContext.texture.generateMipmaps === true ) {
+		if ( renderContext.texture !== null ) {
 
 			if ( Array.isArray( renderContext.texture ) ) {
 
