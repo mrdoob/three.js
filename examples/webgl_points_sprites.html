@@ -58,7 +58,11 @@
 
 				const textureLoader = new THREE.TextureLoader();
 
-				const assignSRGB = ( texture ) => { texture.colorSpace = THREE.SRGBColorSpace; };
+				const assignSRGB = ( texture ) => {
+
+					texture.colorSpace = THREE.SRGBColorSpace;
+
+				};
 
 				const sprite1 = textureLoader.load( 'textures/sprites/snowflake1.png', assignSRGB );
 				const sprite2 = textureLoader.load( 'textures/sprites/snowflake2.png', assignSRGB );

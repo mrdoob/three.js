@@ -44,8 +44,6 @@ class WebGLMultipleRenderTargets extends WebGLRenderTarget {
 		this.viewport.set( 0, 0, width, height );
 		this.scissor.set( 0, 0, width, height );
 
-		return this;
-
 	}
 
 	copy( source ) {

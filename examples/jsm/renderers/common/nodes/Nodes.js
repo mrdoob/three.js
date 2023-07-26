@@ -1,6 +1,6 @@
 import DataMap from '../DataMap.js';
 import { NoToneMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
-import { NodeFrame, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, positionWorld, modelWorldMatrix, transformDirection, equirectUV, viewportBottomLeft } from '../../../nodes/Nodes.js';
+import { NodeFrame, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, equirectUV, viewportBottomLeft, normalWorld } from '../../../nodes/Nodes.js';
 
 class Nodes extends DataMap {
 
@@ -22,7 +22,7 @@ class Nodes extends DataMap {
 
 		if ( nodeBuilder === undefined ) {
 
-			nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
+			nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer, renderObject.scene );
 			nodeBuilder.material = renderObject.material;
 			nodeBuilder.lightsNode = renderObject.lightsNode;
 			nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
@@ -77,6 +77,8 @@ class Nodes extends DataMap {
 
 	getToneMappingNode() {
 
+		if ( this.isToneMappingState === false ) return null;
+
 		return this.renderer.toneMappingNode || this.get( this.renderer ).toneMappingNode || null;
 
 	}
@@ -107,13 +109,22 @@ class Nodes extends DataMap {
 
 	}
 
+	get isToneMappingState() {
+
+		const renderer = this.renderer;
+		const renderTarget = renderer.getRenderTarget();
+
+		return renderTarget && renderTarget.isCubeRenderTarget ? false : true;
+
+	}
+
 	updateToneMapping() {
 
 		const renderer = this.renderer;
 		const rendererData = this.get( renderer );
 		const rendererToneMapping = renderer.toneMapping;
 
-		if ( rendererToneMapping !== NoToneMapping ) {
+		if ( this.isToneMappingState && rendererToneMapping !== NoToneMapping ) {
 
 			if ( rendererData.toneMapping !== rendererToneMapping ) {
 
@@ -149,7 +160,7 @@ class Nodes extends DataMap {
 
 				if ( background.isCubeTexture === true ) {
 
-					backgroundNode = cubeTexture( background, transformDirection( positionWorld, modelWorldMatrix ) );
+					backgroundNode = cubeTexture( background, normalWorld );
 
 				} else if ( background.isTexture === true ) {
 
@@ -165,7 +176,7 @@ class Nodes extends DataMap {
 
 					}
 
-					backgroundNode = texture( background, nodeUV );
+					backgroundNode = texture( background, nodeUV ).setUpdateMatrix( true );
 
 				} else if ( background.isColor !== true ) {
 

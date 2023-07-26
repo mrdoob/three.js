@@ -112,13 +112,11 @@
 
 				//
 
-				const light = new THREE.DirectionalLight( 0xffaa33 );
+				const light = new THREE.DirectionalLight( 0xffaa33, 3 );
 				light.position.set( - 10, 10, 10 );
-				light.intensity = 1.0;
 				scene.add( light );
 
-				const light2 = new THREE.AmbientLight( 0x003973 );
-				light2.intensity = 1.0;
+				const light2 = new THREE.AmbientLight( 0x003973, 3 );
 				scene.add( light2 );
 
 				//

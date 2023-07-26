@@ -153,11 +153,25 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		const HAS_ALPHATEST = material.alphaTest > 0;
 
+		const HAS_ALPHAHASH = !! material.alphaHash;
+
 		const HAS_EXTENSIONS = !! material.extensions;
 
 		const HAS_ATTRIBUTE_UV1 = !! geometry.attributes.uv1;
 		const HAS_ATTRIBUTE_UV2 = !! geometry.attributes.uv2;
 		const HAS_ATTRIBUTE_UV3 = !! geometry.attributes.uv3;
+
+		let toneMapping = NoToneMapping;
+
+		if ( material.toneMapped ) {
+
+			if ( currentRenderTarget === null || currentRenderTarget.isXRRenderTarget === true ) {
+
+				toneMapping = renderer.toneMapping;
+
+			}
+
+		}
 
 		const parameters = {
 
@@ -233,6 +247,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			alphaMap: HAS_ALPHAMAP,
 			alphaTest: HAS_ALPHATEST,
+			alphaHash: HAS_ALPHAHASH,
 
 			combine: material.combine,
 
@@ -326,8 +341,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			shadowMapEnabled: renderer.shadowMap.enabled && shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
 
-			toneMapping: material.toneMapped ? renderer.toneMapping : NoToneMapping,
-			useLegacyLights: renderer.useLegacyLights,
+			toneMapping: toneMapping,
+			useLegacyLights: renderer._useLegacyLights,
 
 			premultipliedAlpha: material.premultipliedAlpha,
 

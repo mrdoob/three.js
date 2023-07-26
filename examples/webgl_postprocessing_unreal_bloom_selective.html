@@ -74,7 +74,7 @@
 
 			const params = {
 				threshold: 0,
-				strength: 3,
+				strength: 1,
 				radius: 0.5,
 				exposure: 1
 			};
@@ -85,6 +85,7 @@
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.toneMapping = THREE.ReinhardToneMapping;
 			document.body.appendChild( renderer.domElement );
 
 			const scene = new THREE.Scene();
@@ -98,8 +99,6 @@
 			controls.minDistance = 1;
 			controls.maxDistance = 100;
 			controls.addEventListener( 'change', render );
-
-			scene.add( new THREE.AmbientLight( 0x898989 ) );
 
 			const renderScene = new RenderPass( scene, camera );
 
@@ -126,7 +125,7 @@
 			);
 			mixPass.needsSwap = true;
 
-			const outputPass = new OutputPass( THREE.ReinhardToneMapping );
+			const outputPass = new OutputPass();
 
 			const finalComposer = new EffectComposer( renderer );
 			finalComposer.addPass( renderScene );
@@ -150,7 +149,7 @@
 
 			} );
 
-			bloomFolder.add( params, 'strength', 0.0, 10.0 ).onChange( function ( value ) {
+			bloomFolder.add( params, 'strength', 0.0, 3 ).onChange( function ( value ) {
 
 				bloomPass.strength = Number( value );
 				render();
@@ -168,7 +167,7 @@
 
 			toneMappingFolder.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
 
-				outputPass.toneMappingExposure = Math.pow( value, 4.0 );
+				renderer.toneMappingExposure = Math.pow( value, 4.0 );
 				render();
 
 			} );

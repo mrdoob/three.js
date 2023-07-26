@@ -1,7 +1,7 @@
 import { BlendColorFactor, OneMinusBlendColorFactor, } from '../../common/Constants.js';
 
 import {
-	GPUInputStepMode, GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation
+	GPUFrontFace, GPUCullMode, GPUColorWriteFlags, GPUCompareFunction, GPUBlendFactor, GPUBlendOperation, GPUIndexFormat, GPUStencilOperation
 } from './WebGPUConstants.js';
 
 import {
@@ -33,37 +33,19 @@ class WebGPUPipelineUtils {
 		const utils = backend.utils;
 
 		const pipelineData = backend.get( pipeline );
-
-		// determine shader attributes
-
-		const shaderAttributes = backend.attributeUtils.createShaderAttributes( renderObject );
+		const bindingsData = backend.get( renderObject.getBindings() );
 
 		// vertex buffers
 
-		const vertexBuffers = [];
-
-		for ( const attribute of shaderAttributes ) {
-
-			const geometryAttribute = attribute.geometryAttribute;
-			const stepMode = ( geometryAttribute !== undefined && geometryAttribute.isInstancedBufferAttribute ) ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
-
-			vertexBuffers.push( {
-				arrayStride: attribute.arrayStride,
-				attributes: [ { shaderLocation: attribute.slot, offset: attribute.offset, format: attribute.format } ],
-				stepMode: stepMode
-			} );
-
-		}
+		const vertexBuffers = backend.attributeUtils.createShaderVertexBuffers( renderObject );
 
 		// blending
 
-		let alphaBlend = {};
-		let colorBlend = {};
+		let blending;
 
 		if ( material.transparent === true && material.blending !== NoBlending ) {
 
-			alphaBlend = this._getAlphaBlend( material );
-			colorBlend = this._getColorBlend( material );
+			blending = this._getBlending( material );
 
 		}
 
@@ -98,10 +80,7 @@ class WebGPUPipelineUtils {
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
 			fragment: Object.assign( {}, fragmentModule, { targets: [ {
 				format: colorFormat,
-				blend: {
-					alpha: alphaBlend,
-					color: colorBlend
-				},
+				blend: blending,
 				writeMask: colorWriteMask
 			} ] } ),
 			primitive: primitiveState,
@@ -117,12 +96,14 @@ class WebGPUPipelineUtils {
 			multisample: {
 				count: sampleCount
 			},
-			layout: 'auto'
+			layout: device.createPipelineLayout( {
+				bindGroupLayouts: [ bindingsData.layout ]
+			} )
 		} );
 
 	}
 
-	createComputePipeline( pipeline ) {
+	createComputePipeline( pipeline, bindings ) {
 
 		const backend = this.backend;
 		const device = backend.device;
@@ -130,99 +111,118 @@ class WebGPUPipelineUtils {
 		const computeProgram = backend.get( pipeline.computeProgram ).module;
 
 		const pipelineGPU = backend.get( pipeline );
+		const bindingsData = backend.get( bindings );
 
 		pipelineGPU.pipeline = device.createComputePipeline( {
 			compute: computeProgram,
-			layout: 'auto'
+			layout: device.createPipelineLayout( {
+				bindGroupLayouts: [ bindingsData.layout ]
+			} )
 		} );
 
 	}
 
-	_getAlphaBlend( material ) {
+	_getBlending( material ) {
+
+		let color, alpha;
 
 		const blending = material.blending;
-		const premultipliedAlpha = material.premultipliedAlpha;
 
-		let alphaBlend = undefined;
+		if ( blending === CustomBlending ) {
 
-		switch ( blending ) {
+			const blendSrcAlpha = material.blendSrcAlpha !== null ? material.blendSrcAlpha : GPUBlendFactor.One;
+			const blendDstAlpha = material.blendDstAlpha !== null ? material.blendDstAlpha : GPUBlendFactor.Zero;
+			const blendEquationAlpha = material.blendEquationAlpha !== null ? material.blendEquationAlpha : GPUBlendFactor.Add;
 
-			case NormalBlending:
+			color = {
+				srcFactor: this._getBlendFactor( material.blendSrc ),
+				dstFactor: this._getBlendFactor( material.blendDst ),
+				operation: this._getBlendOperation( material.blendEquation )
+			};
 
-				if ( premultipliedAlpha === false ) {
+			alpha = {
+				srcFactor: this._getBlendFactor( blendSrcAlpha ),
+				dstFactor: this._getBlendFactor( blendDstAlpha ),
+				operation: this._getBlendOperation( blendEquationAlpha )
+			};
 
-					alphaBlend = {
-						srcFactor: GPUBlendFactor.One,
-						dstFactor: GPUBlendFactor.OneMinusSrcAlpha,
-						operation: GPUBlendOperation.Add
-					};
+		} else {
 
-				}
+			const premultipliedAlpha = material.premultipliedAlpha;
 
-				break;
+			const setBlend = ( srcRGB, dstRGB, srcAlpha, dstAlpha ) => {
 
-			case AdditiveBlending:
-
-				alphaBlend = {
-					srcFactor: GPUBlendFactor.Zero,
-					dstFactor: GPUBlendFactor.One,
+				color = {
+					srcFactor: srcRGB,
+					dstFactor: dstRGB,
 					operation: GPUBlendOperation.Add
 				};
 
-				break;
+				alpha = {
+					srcFactor: srcAlpha,
+					dstFactor: dstAlpha,
+					operation: GPUBlendOperation.Add
+				};
 
-			case SubtractiveBlending:
+			};
 
-				if ( premultipliedAlpha === true ) {
+			if ( premultipliedAlpha ) {
 
-					alphaBlend = {
-						srcFactor: GPUBlendFactor.OneMinusSrcColor,
-						dstFactor: GPUBlendFactor.OneMinusSrcAlpha,
-						operation: GPUBlendOperation.Add
-					};
+				switch ( blending ) {
 
-				}
+					case NormalBlending:
+						setBlend( GPUBlendFactor.SrcAlpha, GPUBlendFactor.OneMinusSrcAlpha, GPUBlendFactor.One, GPUBlendFactor.OneMinusSrcAlpha );
+						break;
 
-				break;
+					case AdditiveBlending:
+						setBlend( GPUBlendFactor.SrcAlpha, GPUBlendFactor.One, GPUBlendFactor.One, GPUBlendFactor.One );
+						break;
 
-			case MultiplyBlending:
+					case SubtractiveBlending:
+						setBlend( GPUBlendFactor.Zero, GPUBlendFactor.OneMinusSrc, GPUBlendFactor.Zero, GPUBlendFactor.One );
+						break;
 
-				if ( premultipliedAlpha === true ) {
-
-					alphaBlend = {
-						srcFactor: GPUBlendFactor.Zero,
-						dstFactor: GPUBlendFactor.SrcAlpha,
-						operation: GPUBlendOperation.Add
-					};
-
-				}
-
-				break;
-
-			case CustomBlending:
-
-				const blendSrcAlpha = material.blendSrcAlpha;
-				const blendDstAlpha = material.blendDstAlpha;
-				const blendEquationAlpha = material.blendEquationAlpha;
-
-				if ( blendSrcAlpha !== null && blendDstAlpha !== null && blendEquationAlpha !== null ) {
-
-					alphaBlend = {
-						srcFactor: this._getBlendFactor( blendSrcAlpha ),
-						dstFactor: this._getBlendFactor( blendDstAlpha ),
-						operation: this._getBlendOperation( blendEquationAlpha )
-					};
+					case MultiplyBlending:
+						setBlend( GPUBlendFactor.Zero, GPUBlendFactor.Src, GPUBlendFactor.Zero, GPUBlendFactor.SrcAlpha );
+						break;
 
 				}
 
-				break;
+			} else {
 
-			default:
-				console.error( 'THREE.WebGPURenderer: Blending not supported.', blending );
+				switch ( blending ) {
+
+					case NormalBlending:
+						setBlend( GPUBlendFactor.SrcAlpha, GPUBlendFactor.OneMinusSrcAlpha, GPUBlendFactor.One, GPUBlendFactor.OneMinusSrcAlpha );
+						break;
+
+					case AdditiveBlending:
+						setBlend( GPUBlendFactor.SrcAlpha, GPUBlendFactor.One, GPUBlendFactor.SrcAlpha, GPUBlendFactor.One );
+						break;
+
+					case SubtractiveBlending:
+						setBlend( GPUBlendFactor.Zero, GPUBlendFactor.OneMinusSrc, GPUBlendFactor.Zero, GPUBlendFactor.One );
+						break;
+
+					case MultiplyBlending:
+						setBlend( GPUBlendFactor.Zero, GPUBlendFactor.Src, GPUBlendFactor.Zero, GPUBlendFactor.Src );
+						break;
+
+				}
+
+			}
 
 		}
 
-		return alphaBlend;
+		if ( color !== undefined && alpha !== undefined ) {
+
+			return { color, alpha };
+
+		} else {
+
+			console.error( 'THREE.WebGPURenderer: Invalid blending: ', blending );
+
+		}
 
 	}
 
@@ -241,11 +241,11 @@ class WebGPUPipelineUtils {
 				break;
 
 			case SrcColorFactor:
-				blendFactor = GPUBlendFactor.SrcColor;
+				blendFactor = GPUBlendFactor.Src;
 				break;
 
 			case OneMinusSrcColorFactor:
-				blendFactor = GPUBlendFactor.OneMinusSrcColor;
+				blendFactor = GPUBlendFactor.OneMinusSrc;
 				break;
 
 			case SrcAlphaFactor:
@@ -257,7 +257,7 @@ class WebGPUPipelineUtils {
 				break;
 
 			case DstColorFactor:
-				blendFactor = GPUBlendFactor.DstColor;
+				blendFactor = GPUBlendFactor.Dst;
 				break;
 
 			case OneMinusDstColorFactor:
@@ -277,11 +277,11 @@ class WebGPUPipelineUtils {
 				break;
 
 			case BlendColorFactor:
-				blendFactor = GPUBlendFactor.BlendColor;
+				blendFactor = GPUBlendFactor.Constant;
 				break;
 
 			case OneMinusBlendColorFactor:
-				blendFactor = GPUBlendFactor.OneMinusBlendColor;
+				blendFactor = GPUBlendFactor.OneMinusConstant;
 				break;
 
 			default:
@@ -290,58 +290,6 @@ class WebGPUPipelineUtils {
 		}
 
 		return blendFactor;
-
-	}
-
-	_getColorBlend( material ) {
-
-		const blending = material.blending;
-		const premultipliedAlpha = material.premultipliedAlpha;
-
-		const colorBlend = {
-			srcFactor: null,
-			dstFactor: null,
-			operation: null
-		};
-
-		switch ( blending ) {
-
-			case NormalBlending:
-				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
-				colorBlend.dstFactor = GPUBlendFactor.OneMinusSrcAlpha;
-				colorBlend.operation = GPUBlendOperation.Add;
-				break;
-
-			case AdditiveBlending:
-				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
-				colorBlend.dstFactor = GPUBlendFactor.One;
-				colorBlend.operation = GPUBlendOperation.Add;
-				break;
-
-			case SubtractiveBlending:
-				colorBlend.srcFactor = GPUBlendFactor.Zero;
-				colorBlend.dstFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.Zero : GPUBlendFactor.OneMinusSrcColor;
-				colorBlend.operation = GPUBlendOperation.Add;
-				break;
-
-			case MultiplyBlending:
-				colorBlend.srcFactor = GPUBlendFactor.Zero;
-				colorBlend.dstFactor = GPUBlendFactor.SrcColor;
-				colorBlend.operation = GPUBlendOperation.Add;
-				break;
-
-			case CustomBlending:
-				colorBlend.srcFactor = this._getBlendFactor( material.blendSrc );
-				colorBlend.dstFactor = this._getBlendFactor( material.blendDst );
-				colorBlend.operation = this._getBlendOperation( material.blendEquation );
-				break;
-
-			default:
-				console.error( 'THREE.WebGPURenderer: Blending not supported.', blending );
-
-		}
-
-		return colorBlend;
 
 	}
 

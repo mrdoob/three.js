@@ -1229,14 +1229,21 @@ function mergeGroups( geometry ) {
 }
 
 
-// Creates a new, non-indexed geometry with smooth normals everywhere except faces that meet at
-// an angle greater than the crease angle.
+/**
+ * Modifies the supplied geometry if it is non-indexed, otherwise creates a new,
+ * non-indexed geometry. Returns the geometry with smooth normals everywhere except
+ * faces that meet at an angle greater than the crease angle.
+ *
+ * @param {BufferGeometry} geometry
+ * @param {number} [creaseAngle]
+ * @return {BufferGeometry}
+ */
 function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ ) {
 
 	const creaseDot = Math.cos( creaseAngle );
 	const hashMultiplier = ( 1 + 1e-10 ) * 1e2;
 
-	// reusable vertors
+	// reusable vectors
 	const verts = [ new Vector3(), new Vector3(), new Vector3() ];
 	const tempVec1 = new Vector3();
 	const tempVec2 = new Vector3();
@@ -1253,7 +1260,9 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 
 	}
 
-	const resultGeometry = geometry.toNonIndexed();
+	// BufferGeometry.toNonIndexed() warns if the geometry is non-indexed
+	// and returns the original geometry
+	const resultGeometry = geometry.index ? geometry.toNonIndexed() : geometry;
 	const posAttr = resultGeometry.attributes.position;
 	const vertexMap = {};
 

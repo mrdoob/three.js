@@ -177,11 +177,11 @@ class BufferAttribute {
 
 	getComponent( index, component ) {
 
-		let data = this.array[ index * this.itemSize + component ];
+		let value = this.array[ index * this.itemSize + component ];
 
-		if ( this.normalized ) data = denormalize( data, this.array );
+		if ( this.normalized ) value = denormalize( value, this.array );
 
-		return data;
+		return value;
 
 	}
 

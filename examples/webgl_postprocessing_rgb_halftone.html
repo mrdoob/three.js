@@ -75,7 +75,7 @@
 				group = new THREE.Group();
 				const floor = new THREE.Mesh( new THREE.BoxGeometry( 100, 1, 100 ), new THREE.MeshPhongMaterial( {} ) );
 				floor.position.y = - 10;
-				const light = new THREE.PointLight( 0xffffff, 1.0, 50, 2 );
+				const light = new THREE.PointLight( 0xffffff, 250 );
 				light.position.y = 2;
 				group.add( floor, light );
 				scene.add( group );

@@ -4,7 +4,7 @@ import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-c
 
 import { GPUFeatureName, GPUTextureFormat, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension } from './utils/WebGPUConstants.js';
 
-import WebGPUNodeBuilder from './nodes/WGSLNodeBuilder.js';
+import WGSLNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
 
 import { DepthTexture, DepthFormat, DepthStencilFormat, UnsignedInt248Type, UnsignedIntType, WebGPUCoordinateSystem } from 'three';
@@ -54,7 +54,8 @@ class WebGPUBackend extends Backend {
 		this.context = null;
 		this.colorBuffer = null;
 
-		this.depthBuffers = new WeakMap();
+		this.defaultDepthTexture = new DepthTexture();
+		this.defaultDepthTexture.name = 'depthBuffer';
 
 		this.utils = new WebGPUUtils( this );
 		this.attributeUtils = new WebGPUAttributeUtils( this );
@@ -123,9 +124,9 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	async getArrayBuffer( attribute ) {
+	async getArrayBufferAsync( attribute ) {
 
-		return await this.attributeUtils.getArrayBuffer( attribute );
+		return await this.attributeUtils.getArrayBufferAsync( attribute );
 
 	}
 
@@ -154,14 +155,24 @@ class WebGPUBackend extends Backend {
 			const textureData = this.get( renderContext.texture );
 			const depthTextureData = this.get( renderContext.depthTexture );
 
-			// @TODO: Support RenderTarget with antialiasing.
-
-			colorAttachment.view = textureData.texture.createView( {
+			const view = textureData.texture.createView( {
 				baseMipLevel: 0,
 				mipLevelCount: 1,
 				baseArrayLayer: renderContext.activeCubeFace,
 				dimension: GPUTextureViewDimension.TwoD
 			} );
+
+			if ( textureData.msaaTexture !== undefined ) {
+
+				colorAttachment.view = textureData.msaaTexture.createView();
+				colorAttachment.resolveTarget = view;
+
+			} else {
+
+				colorAttachment.view = view;
+				colorAttachment.resolveTarget = undefined;
+
+			}
 
 			depthStencilAttachment.view = depthTextureData.texture.createView();
 
@@ -438,18 +449,18 @@ class WebGPUBackend extends Backend {
 
 		// vertex buffers
 
-		const attributes = renderObject.getAttributes();
+		const vertexBuffers = renderObject.getVertexBuffers();
 
-		for ( let i = 0, l = attributes.length; i < l; i ++ ) {
+		for ( let i = 0, l = vertexBuffers.length; i < l; i ++ ) {
 
-			const attribute = attributes[ i ];
+			const vertexBuffer = vertexBuffers[ i ];
 
-			if ( attributesSet[ i ] !== attribute ) {
+			if ( attributesSet[ i ] !== vertexBuffer ) {
 
-				const buffer = this.get( attribute ).buffer;
+				const buffer = this.get( vertexBuffer ).buffer;
 				passEncoderGPU.setVertexBuffer( i, buffer );
 
-				attributesSet[ i ] = attribute;
+				attributesSet[ i ] = vertexBuffer;
 
 			}
 
@@ -554,9 +565,9 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	createTexture( texture ) {
+	createTexture( texture, options ) {
 
-		this.textureUtils.createTexture( texture );
+		this.textureUtils.createTexture( texture, options );
 
 	}
 
@@ -572,11 +583,17 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	copyTextureToBuffer( texture, x, y, width, height ) {
+
+		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height );
+
+	}
+
 	// node builder
 
-	createNodeBuilder( object, renderer ) {
+	createNodeBuilder( object, renderer, scene = null ) {
 
-		return new WebGPUNodeBuilder( object, renderer );
+		return new WGSLNodeBuilder( object, renderer, scene );
 
 	}
 
@@ -607,23 +624,23 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	createComputePipeline( computePipeline ) {
+	createComputePipeline( computePipeline, bindings ) {
 
-		this.pipelineUtils.createComputePipeline( computePipeline );
+		this.pipelineUtils.createComputePipeline( computePipeline, bindings );
 
 	}
 
 	// bindings
 
-	createBindings( bindings, pipeline ) {
+	createBindings( bindings ) {
 
-		this.bindingUtils.createBindings( bindings, pipeline );
+		this.bindingUtils.createBindings( bindings );
 
 	}
 
-	updateBindings( bindings, pipeline ) {
+	updateBindings( bindings ) {
 
-		this.bindingUtils.createBindings( bindings, pipeline );
+		this.bindingUtils.createBindings( bindings );
 
 	}
 
@@ -747,60 +764,46 @@ class WebGPUBackend extends Backend {
 
 	_getDepthBufferGPU( renderContext ) {
 
-		const { depthBuffers } = this;
 		const { width, height } = this.getDrawingBufferSize();
 
-		let depthTexture = depthBuffers.get( renderContext );
+		const depthTexture = this.defaultDepthTexture;
+		const depthTextureGPU = this.get( depthTexture ).texture;
 
-		if ( depthTexture !== undefined && depthTexture.image.width === width && depthTexture.image.height === height ) {
+		let format, type;
 
-			return this.get( depthTexture ).texture;
+		if ( renderContext.stencil ) {
 
-		}
-
-		this._destroyDepthBufferGPU( renderContext );
-
-		depthTexture = new DepthTexture();
-		depthTexture.name = 'depthBuffer';
-
-		if ( renderContext.stencil  ) {
-
-			depthTexture = new DepthTexture();
-			depthTexture.format = DepthStencilFormat;
-			depthTexture.type = UnsignedInt248Type;
+			format = DepthStencilFormat;
+			type = UnsignedInt248Type;
 
 		} else if ( renderContext.depth ) {
 
-			depthTexture = new DepthTexture();
-			depthTexture.format = DepthFormat;
-			depthTexture.type = UnsignedIntType;
+			format = DepthFormat;
+			type = UnsignedIntType;
 
 		}
 
+		if ( depthTextureGPU !== undefined ) {
+
+			if ( depthTexture.image.width === width && depthTexture.image.height === height && depthTexture.format === format && depthTexture.type === type ) {
+
+				return depthTextureGPU;
+
+			}
+
+			this.textureUtils.destroyTexture( depthTexture );
+
+		}
+
+		depthTexture.name = 'depthBuffer';
+		depthTexture.format = format;
+		depthTexture.type = type;
 		depthTexture.image.width = width;
 		depthTexture.image.height = height;
 
 		this.textureUtils.createTexture( depthTexture, { sampleCount: this.parameters.sampleCount } );
 
-		depthBuffers.set( renderContext, depthTexture );
-
 		return this.get( depthTexture ).texture;
-
-	}
-
-	_destroyDepthBufferGPU( renderContext ) {
-
-		const { depthBuffers } = this;
-
-		const depthTexture = depthBuffers.get( renderContext );
-
-		if ( depthTexture !== undefined ) {
-
-			this.textureUtils.destroyTexture( depthTexture );
-
-			depthBuffers.delete( renderContext );
-
-		}
 
 	}
 

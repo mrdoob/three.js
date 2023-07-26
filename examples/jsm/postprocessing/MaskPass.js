@@ -63,10 +63,13 @@ class MaskPass extends Pass {
 		if ( this.clear ) renderer.clear();
 		renderer.render( this.scene, this.camera );
 
-		// unlock color and depth buffer for subsequent rendering
+		// unlock color and depth buffer and make them writable for subsequent rendering/clearing
 
 		state.buffers.color.setLocked( false );
 		state.buffers.depth.setLocked( false );
+
+		state.buffers.color.setMask( true );
+		state.buffers.depth.setMask( true );
 
 		// only render where stencil is set to 1
 

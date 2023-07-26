@@ -23,8 +23,6 @@ class Skeleton {
 		this.boneTexture = null;
 		this.boneTextureSize = 0;
 
-		this.frame = - 1;
-
 		this.init();
 
 	}

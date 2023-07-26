@@ -101,7 +101,7 @@
 
 				scene.add( new THREE.AmbientLight( 0x444444 ) );
 
-				spotLight = new THREE.SpotLight( 0xff8888 );
+				spotLight = new THREE.SpotLight( 0xff8888, 400 );
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.3;
 				spotLight.position.set( 8, 10, 5 );
@@ -115,7 +115,7 @@
 				scene.add( spotLight );
 
 
-				dirLight = new THREE.DirectionalLight( 0x8888ff );
+				dirLight = new THREE.DirectionalLight( 0x8888ff, 3 );
 				dirLight.position.set( 3, 12, 17 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 0.1;

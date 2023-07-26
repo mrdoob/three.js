@@ -44,6 +44,7 @@
 				const height = window.innerHeight;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				document.body.appendChild( renderer.domElement );
 

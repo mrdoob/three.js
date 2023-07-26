@@ -120,7 +120,7 @@
 			const scene = new THREE.Scene();
 			scene.scale.x = - 1;
 
-			const environment = new RoomEnvironment();
+			const environment = new RoomEnvironment( renderer );
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 			scene.background = new THREE.Color( 0x666666 );

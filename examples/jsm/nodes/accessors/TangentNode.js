@@ -1,6 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { attribute } from '../core/AttributeNode.js';
-import { label } from '../core/VarNode.js';
+import { temp } from '../core/VarNode.js';
 import { varying } from '../core/VaryingNode.js';
 import { normalize } from '../math/MathNode.js';
 import { cameraViewMatrix } from './CameraNode.js';
@@ -97,7 +97,7 @@ export const tangentGeometry = nodeImmutable( TangentNode, TangentNode.GEOMETRY 
 export const tangentLocal = nodeImmutable( TangentNode, TangentNode.LOCAL );
 export const tangentView = nodeImmutable( TangentNode, TangentNode.VIEW );
 export const tangentWorld = nodeImmutable( TangentNode, TangentNode.WORLD );
-export const transformedTangentView = label( tangentView, 'TransformedTangentView' );
+export const transformedTangentView = temp( tangentView, 'TransformedTangentView' );
 export const transformedTangentWorld = normalize( transformedTangentView.transformDirection( cameraViewMatrix ) );
 
 addNodeClass( TangentNode );

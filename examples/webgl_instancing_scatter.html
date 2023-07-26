@@ -132,11 +132,11 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( api.backgroundColor );
 
-				const pointLight = new THREE.PointLight( 0xAA8899, 0.75 );
+				const pointLight = new THREE.PointLight( 0xAA8899, 2.5, 0, 0 );
 				pointLight.position.set( 50, - 25, 75 );
 				scene.add( pointLight );
 
-				scene.add( new THREE.HemisphereLight() );
+				scene.add( new THREE.AmbientLight( 0xffffff, 3 ) );
 
 				//
 

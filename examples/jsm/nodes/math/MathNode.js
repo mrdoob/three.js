@@ -218,6 +218,8 @@ MathNode.DFDX = 'dFdx';
 MathNode.DFDY = 'dFdy';
 MathNode.ROUND = 'round';
 MathNode.RECIPROCAL = 'reciprocal';
+MathNode.TRUNC = 'trunc';
+MathNode.FWIDTH = 'fwidth';
 
 // 2 inputs
 
@@ -274,6 +276,8 @@ export const dFdx = nodeProxy( MathNode, MathNode.DFDX );
 export const dFdy = nodeProxy( MathNode, MathNode.DFDY );
 export const round = nodeProxy( MathNode, MathNode.ROUND );
 export const reciprocal = nodeProxy( MathNode, MathNode.RECIPROCAL );
+export const trunc = nodeProxy( MathNode, MathNode.TRUNC );
+export const fwidth = nodeProxy( MathNode, MathNode.FWIDTH );
 
 export const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
 export const min = nodeProxy( MathNode, MathNode.MIN );
@@ -328,6 +332,8 @@ addNodeElement( 'dFdx', dFdx );
 addNodeElement( 'dFdy', dFdy );
 addNodeElement( 'round', round );
 addNodeElement( 'reciprocal', reciprocal );
+addNodeElement( 'trunc', trunc );
+addNodeElement( 'fwidth', fwidth );
 addNodeElement( 'atan2', atan2 );
 addNodeElement( 'min', min );
 addNodeElement( 'max', max );

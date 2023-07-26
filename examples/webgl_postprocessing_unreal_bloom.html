@@ -56,7 +56,7 @@
 
 			const params = {
 				threshold: 0,
-				strength: 1.5,
+				strength: 1,
 				radius: 0,
 				exposure: 1
 			};
@@ -75,6 +75,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ReinhardToneMapping;
 				container.appendChild( renderer.domElement );
 
 				const scene = new THREE.Scene();
@@ -85,12 +86,12 @@
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.maxPolarAngle = Math.PI * 0.5;
-				controls.minDistance = 1;
-				controls.maxDistance = 10;
+				controls.minDistance = 3;
+				controls.maxDistance = 8;
 
-				scene.add( new THREE.AmbientLight( 0x898989 ) );
+				scene.add( new THREE.AmbientLight( 0xcccccc ) );
 
-				const pointLight = new THREE.PointLight( 0xffffff, 1 );
+				const pointLight = new THREE.PointLight( 0xffffff, 100 );
 				camera.add( pointLight );
 
 				const renderScene = new RenderPass( scene, camera );
@@ -100,7 +101,7 @@
 				bloomPass.strength = params.strength;
 				bloomPass.radius = params.radius;
 
-				const outputPass = new OutputPass( THREE.ReinhardToneMapping );
+				const outputPass = new OutputPass();
 
 				composer = new EffectComposer( renderer );
 				composer.addPass( renderScene );
@@ -147,7 +148,7 @@
 
 				toneMappingFolder.add( params, 'exposure', 0.1, 2 ).onChange( function ( value ) {
 
-					outputPass.toneMappingExposure = Math.pow( value, 4.0 );
+					renderer.toneMappingExposure = Math.pow( value, 4.0 );
 
 				} );
 

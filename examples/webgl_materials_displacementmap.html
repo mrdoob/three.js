@@ -139,14 +139,14 @@
 				ambientLight = new THREE.AmbientLight( 0xffffff, settings.ambientIntensity );
 				scene.add( ambientLight );
 
-				pointLight = new THREE.PointLight( 0xff0000, 0.5 );
+				pointLight = new THREE.PointLight( 0xff0000, 1.5, 0, 0 );
 				pointLight.position.z = 2500;
 				scene.add( pointLight );
 
-				const pointLight2 = new THREE.PointLight( 0xffaaaa, 1 );
+				const pointLight2 = new THREE.PointLight( 0xff6666, 3, 0, 0 );
 				camera.add( pointLight2 );
 
-				const pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
+				const pointLight3 = new THREE.PointLight( 0x0000ff, 1.5, 0, 0 );
 				pointLight3.position.x = - 1000;
 				pointLight3.position.z = 1000;
 				scene.add( pointLight3 );

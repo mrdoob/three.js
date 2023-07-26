@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			يمكن لهذه المادة تلقي الظلال، ولكنها في الوقت نفسه شفافة تمامًا.
+		</p>
+		 
+		<h2>مثال الكود</h2>
+		 
+		<code>
+		const geometry = new THREE.PlaneGeometry( 2000, 2000 );
+		geometry.rotateX( - Math.PI / 2 );
+		 
+		const material = new THREE.ShadowMaterial();
+		material.opacity = 0.2;
+		 
+		const plane = new THREE.Mesh( geometry, material );
+		plane.position.y = -200;
+		plane.receiveShadow = true;
+		scene.add( plane );
+		</code>
+		 
+		<h2>أمثلة (Examples)</h2>
+		 
+		<p>[example:webgl_geometry_spline_editor geometry / spline / editor]</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+		[page:Object parameters] - (اختياري) كائن يحتوي على واحد أو أكثر
+		خصائص تحدد مظهر المادة. يمكن تمرير أي خاصية من
+		المادة (بما في ذلك أي خاصية موروثة من [page:Material]) هنا.<br /><br />
+		</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى الفئات الأساسية [page:Material] للخصائص المشتركة.</p>
+		 
+		<h3>[property:Color color]</h3>
+		<p>[page:Color] المادة، بشكل افتراضي مضبوط على الأسود (0x000000).</p>
+		 
+		<h3>[property:Boolean fog]</h3>
+		<p>ما إذا كانت المادة متأثرة بالضباب. الافتراضي هو `true`.</p>
+		 
+		<h3>[property:Boolean transparent]</h3>
+		<p>يحدد ما إذا كانت هذه المادة شفافة. الافتراضي هو `true`.</p>
+		 
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى الفئات الأساسية [page:Material] للطرق المشتركة.</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

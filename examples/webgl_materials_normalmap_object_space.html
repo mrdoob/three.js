@@ -42,7 +42,7 @@
 			function init() {
 
 				// renderer
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -63,10 +63,10 @@
 				controls.enablePan = false;
 
 				// ambient
-				scene.add( new THREE.AmbientLight( 0xffffff, .2 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.6 ) );
 
 				// light
-				const light = new THREE.PointLight( 0xffffff, 1.5 );
+				const light = new THREE.PointLight( 0xffffff, 4.5, 0, 0 );
 				camera.add( light );
 
 				// model

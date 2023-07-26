@@ -79,7 +79,7 @@ class WebGPUUtils {
 
 		if ( renderContext.texture !== null ) {
 
-			return 1;
+			return renderContext.sampleCount;
 
 		}
 

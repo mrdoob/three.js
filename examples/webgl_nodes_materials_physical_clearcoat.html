@@ -54,8 +54,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 1000;
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 0.25, 50 );
+				camera.position.z = 10;
 
 				scene = new THREE.Scene();
 
@@ -67,7 +67,7 @@
 					.load( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ],
 						  function ( hdrTexture ) {
 
-							const geometry = new THREE.SphereGeometry( 80, 64, 32 );
+							const geometry = new THREE.SphereGeometry( .8, 64, 32 );
 
 							const textureLoader = new THREE.TextureLoader();
 
@@ -105,8 +105,8 @@
 							material.normalNode = normalMap( texture( normalMap3, carPaintUV ), carPaintNormalScale );
 
 							let mesh = new THREE.Mesh( geometry, material );
-							mesh.position.x = - 100;
-							mesh.position.y = 100;
+							mesh.position.x = - 1;
+							mesh.position.y = 1;
 							group.add( mesh );
 
 							// fibers
@@ -121,8 +121,8 @@
 							material.normalNode = normalMap( texture( normalMap1, fibersUV ) );
 
 							mesh = new THREE.Mesh( geometry, material );
-							mesh.position.x = 100;
-							mesh.position.y = 100;
+							mesh.position.x = 1;
+							mesh.position.y = 1;
 							group.add( mesh );
 
 							// golf
@@ -137,8 +137,8 @@
 							material.clearcoatNormalNode = normalMap( texture( clearcoatNormalMap ), vec2( 2.0, - 2.0 ) );
 
 							mesh = new THREE.Mesh( geometry, material );
-							mesh.position.x = - 100;
-							mesh.position.y = - 100;
+							mesh.position.x = - 1;
+							mesh.position.y = - 1;
 							group.add( mesh );
 
 							// clearcoat + normalmap
@@ -153,8 +153,8 @@
 							material.clearcoatNormalNode = normalMap( texture( clearcoatNormalMap ), vec2( 2.0, - 2.0 ) );
 
 							mesh = new THREE.Mesh( geometry, material );
-							mesh.position.x = 100;
-							mesh.position.y = - 100;
+							mesh.position.x = 1;
+							mesh.position.y = - 1;
 							group.add( mesh );
 
 							//
@@ -169,12 +169,12 @@
 				// LIGHTS
 
 				particleLight = new THREE.Mesh(
-					new THREE.SphereGeometry( 4, 8, 8 ),
+					new THREE.SphereGeometry( .05, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff } )
 				);
 				scene.add( particleLight );
 
-				particleLight.add( new THREE.PointLight( 0xffffff, 1 ) );
+				particleLight.add( new THREE.PointLight( 0xffffff, 30 ) );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -234,9 +234,9 @@
 
 				const timer = Date.now() * 0.00025;
 
-				particleLight.position.x = Math.sin( timer * 7 ) * 300;
-				particleLight.position.y = Math.cos( timer * 5 ) * 400;
-				particleLight.position.z = Math.cos( timer * 3 ) * 300;
+				particleLight.position.x = Math.sin( timer * 7 ) * 3;
+				particleLight.position.y = Math.cos( timer * 5 ) * 4;
+				particleLight.position.z = Math.cos( timer * 3 ) * 3;
 
 				for ( let i = 0; i < group.children.length; i ++ ) {
 

@@ -214,12 +214,6 @@ export const GPUAddressMode = {
 	MirrorRepeat: 'mirror-repeat'
 };
 
-export const GPUSamplerBindingType = {
-	Filtering: 'filtering',
-	NonFiltering: 'non-filtering',
-	Comparison: 'comparison'
-};
-
 export const GPUFilterMode = {
 	Linear: 'linear',
 	Nearest: 'nearest'
@@ -228,17 +222,17 @@ export const GPUFilterMode = {
 export const GPUBlendFactor = {
 	Zero: 'zero',
 	One: 'one',
-	SrcColor: 'src-color',
-	OneMinusSrcColor: 'one-minus-src-color',
+	Src: 'src',
+	OneMinusSrc: 'one-minus-src',
 	SrcAlpha: 'src-alpha',
 	OneMinusSrcAlpha: 'one-minus-src-alpha',
-	DstColor: 'dst-color',
-	OneMinusDstColor: 'one-minus-dst-color',
+	Dst: 'dst',
+	OneMinusDstColor: 'one-minus-dst',
 	DstAlpha: 'dst-alpha',
 	OneMinusDstAlpha: 'one-minus-dst-alpha',
 	SrcAlphaSaturated: 'src-alpha-saturated',
-	BlendColor: 'blend-color',
-	OneMinusBlendColor: 'one-minus-blend-color'
+	Constant: 'constant',
+	OneMinusConstant: 'one-minus-constant'
 };
 
 export const GPUBlendOperation = {
@@ -269,16 +263,24 @@ export const GPUStencilOperation = {
 	DecrementWrap: 'decrement-wrap'
 };
 
-export const GPUBindingType = {
-	UniformBuffer: 'uniform-buffer',
-	StorageBuffer: 'storage-buffer',
-	ReadonlyStorageBuffer: 'readonly-storage-buffer',
-	Sampler: 'sampler',
-	ComparisonSampler: 'comparison-sampler',
-	SampledTexture: 'sampled-texture',
-	MultisampledTexture: 'multisampled-texture',
-	ReadonlyStorageTexture: 'readonly-storage-texture',
-	WriteonlyStorageTexture: 'writeonly-storage-texture'
+export const GPUBufferBindingType = {
+	Uniform: 'uniform',
+	Storage: 'storage',
+	ReadOnlyStorage: 'read-only-storage'
+};
+
+export const GPUSamplerBindingType = {
+	Filtering: 'filtering',
+	NonFiltering: 'non-filtering',
+	Comparison: 'comparison'
+};
+
+export const GPUTextureSampleType = {
+	Float: 'float',
+	UnfilterableFloat: 'unfilterable-float',
+	Depth: 'depth',
+	SInt: 'sint',
+	UInt: 'uint'
 };
 
 export const GPUTextureDimension = {

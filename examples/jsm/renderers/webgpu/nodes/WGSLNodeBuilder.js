@@ -1,3 +1,5 @@
+import { RenderTarget, NoColorSpace } from 'three';
+
 import UniformsGroup from '../../common/UniformsGroup.js';
 import {
 	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
@@ -10,20 +12,17 @@ import UniformBuffer from '../../common/UniformBuffer.js';
 import StorageBuffer from '../../common/StorageBuffer.js';
 import { getVectorLength, getStrideLength } from '../../common/BufferUtils.js';
 
-import RenderTarget from '../../common/RenderTarget.js';
 import CubeRenderTarget from '../../common/CubeRenderTarget.js';
 
 import { NodeBuilder, CodeNode, NodeMaterial } from '../../../nodes/Nodes.js';
 
 import WGSLNodeParser from './WGSLNodeParser.js';
 
-/*
 const gpuShaderStageLib = {
 	'vertex': GPUShaderStage.VERTEX,
 	'fragment': GPUShaderStage.FRAGMENT,
 	'compute': GPUShaderStage.COMPUTE
 };
-*/
 
 const supports = {
 	instance: true
@@ -96,11 +95,11 @@ fn threejs_repeatWrapping( uv : vec2<f32>, dimension : vec2<u32> ) -> vec2<u32> 
 ` )
 };
 
-class WebGPUNodeBuilder extends NodeBuilder {
+class WGSLNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer ) {
+	constructor( object, renderer, scene = null ) {
 
-		super( object, renderer, new WGSLNodeParser() );
+		super( object, renderer, new WGSLNodeParser(), scene );
 
 		this.uniformsGroup = {};
 
@@ -128,6 +127,12 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		}
 
 		return super.build();
+
+	}
+
+	needsColorSpaceToLinear( texture ) {
+
+		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
 
 	}
 
@@ -199,6 +204,20 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
+	getTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, shaderStage = this.shaderStage ) {
+
+		if ( shaderStage === 'fragment' ) {
+
+			return `textureSampleCompare( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${compareSnippet} )`;
+
+		} else {
+
+			console.error( `WebGPURenderer: THREE.DepthTexture.compareFunction() does not support ${ shaderStage } shader.` );
+
+		}
+
+	}
+
 	getTextureLevel( texture, textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
 		let snippet = null;
@@ -252,9 +271,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getUniformFromNode( node, type, shaderStage ) {
+	getUniformFromNode( node, type, shaderStage, name = null ) {
 
-		const uniformNode = super.getUniformFromNode( node, type, shaderStage );
+		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
 		if ( nodeData.uniformGPU === undefined ) {
@@ -264,8 +283,6 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			const bindings = this.bindings[ shaderStage ];
 
 			if ( type === 'texture' || type === 'cubeTexture' ) {
-
-				const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node );
 
 				let texture = null;
 
@@ -279,11 +296,16 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
+				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
+
 				// add first textures in sequence and group for last
 				const lastBinding = bindings[ bindings.length - 1 ];
 				const index = lastBinding && lastBinding.isUniformsGroup ? bindings.length - 1 : bindings.length;
 
 				if ( shaderStage === 'fragment' ) {
+
+					const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node );
+					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 					bindings.splice( index, 0, sampler, texture );
 
@@ -301,7 +323,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				const bufferClass = type === 'storageBuffer' ? StorageBuffer : UniformBuffer;
 				const buffer = new bufferClass( 'NodeBuffer_' + node.id, node.value );
-				//buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
+				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				// add first textures in sequence and group for last
 				const lastBinding = bindings[ bindings.length - 1 ];
@@ -318,7 +340,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				if ( uniformsGroup === undefined ) {
 
 					uniformsGroup = new UniformsGroup( 'nodeUniforms' );
-					//uniformsGroup.setVisibility( gpuShaderStageLib[ shaderStage ] );
+					uniformsGroup.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 					this.uniformsGroup[ shaderStage ] = uniformsGroup;
 
@@ -389,6 +411,18 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		}
 
 		return property;
+
+	}
+
+	getVertexIndex() {
+
+		if ( this.shaderStage === 'vertex' ) {
+
+			return this.getBuiltin( 'vertex_index', 'vertexIndex', 'u32', 'attribute' );
+
+		}
+
+		return 'vertexIndex';
 
 	}
 
@@ -510,7 +544,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 					snippets.push( `${ attributesSnippet } ${ varying.name } : ${ this.getType( varying.type ) }` );
 
-				} else if ( vars.includes( varying ) === false ) {
+				} else if ( shaderStage === 'vertex' && vars.includes( varying ) === false ) {
 
 					vars.push( varying );
 
@@ -548,7 +582,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( shaderStage === 'fragment' ) {
 
-					bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name}_sampler : sampler;` );
+					const texture = uniform.node.value;
+
+					if ( texture.isDepthTexture === true && texture.compareFunction !== null ) {
+
+						bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler_comparison;` );
+
+					} else {
+
+						bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler;` );
+
+					}
 
 				}
 
@@ -574,7 +618,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
-				bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : ${textureType};` );
+				bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name} : ${textureType};` );
 
 			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' ) {
 
@@ -855,4 +899,4 @@ var<${access}> ${name} : ${structName};`;
 
 }
 
-export default WebGPUNodeBuilder;
+export default WGSLNodeBuilder;

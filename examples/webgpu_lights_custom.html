@@ -26,12 +26,22 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { ShaderNode, color, lights, toneMapping, MeshStandardNodeMaterial, PointsNodeMaterial } from 'three/nodes';
+			import { color, lights, toneMapping, MeshStandardNodeMaterial, PointsNodeMaterial, LightingModel } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			class CustomLightingModel extends LightingModel {
+
+				direct( { lightColor, reflectedLight } ) {
+
+					reflectedLight.directDiffuse.addAssign( lightColor );
+
+				}
+
+			}
 
 			let camera, scene, renderer;
 
@@ -100,15 +110,8 @@
 
 				// custom lighting model
 
-				const customLightingModel = new ShaderNode( ( inputs ) => {
-
-					const { lightColor, reflectedLight } = inputs;
-
-					reflectedLight.directDiffuse.addAssign( lightColor );
-
-				} );
-
-				const lightingModelContext = allLightsNode.context( { lightingModelNode: { direct: customLightingModel } } );
+				const lightingModel = new CustomLightingModel();
+				const lightingModelContext = allLightsNode.context( { lightingModel } );
 
 				materialPoints.lightsNode = lightingModelContext;
 

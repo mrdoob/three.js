@@ -54,13 +54,13 @@
 
 				//
 
-				scene.add( new THREE.AmbientLight( 0x8d8d8d ) );
+				scene.add( new THREE.AmbientLight( 0xcccccc ) );
 
-				const light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				const light1 = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light1.position.set( 1, 1, 1 );
 				scene.add( light1 );
 
-				const light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				const light2 = new THREE.DirectionalLight( 0xffffff, 4.5 );
 				light2.position.set( 0, - 1, 0 );
 				scene.add( light2 );
 
@@ -167,10 +167,9 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				container.appendChild( renderer.domElement );
 
 				//

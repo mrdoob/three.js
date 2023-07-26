@@ -74,10 +74,10 @@
 				scene.background = new THREE.Color( 0xfce4ec );
 
 				// lights
-				const ambient = new THREE.HemisphereLight( 0xffffff, 0xbfd4d2, 0.9 );
+				const ambient = new THREE.HemisphereLight( 0xffffff, 0xbfd4d2, 3 );
 				scene.add( ambient );
 
-				const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.1 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.3 );
 				directionalLight.position.set( 1, 4, 3 ).multiplyScalar( 3 );
 				directionalLight.castShadow = true;
 				directionalLight.shadow.mapSize.setScalar( 2048 );

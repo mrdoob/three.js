@@ -24,6 +24,7 @@ class TAARenderPass extends SSAARenderPass {
 
 		this.sampleLevel = 0;
 		this.accumulate = false;
+		this.accumulateIndex = - 1;
 
 	}
 

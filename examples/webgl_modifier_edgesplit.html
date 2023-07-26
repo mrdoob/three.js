@@ -73,7 +73,7 @@
 				controls.minZoom = 1;
 				camera.position.set( 0, 0, 4 );
 
-				scene.add( new THREE.HemisphereLight( 0xffffff, 0x444444 ) );
+				scene.add( new THREE.HemisphereLight( 0xffffff, 0x444444, 3 ) );
 
 				new OBJLoader().load(
 					'./models/obj/cerberus/Cerberus.obj',

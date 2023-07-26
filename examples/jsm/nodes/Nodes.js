@@ -10,9 +10,9 @@ export { default as AttributeNode, attribute } from './core/AttributeNode.js';
 export { default as BypassNode, bypass } from './core/BypassNode.js';
 export { default as CacheNode, cache } from './core/CacheNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
-export { default as ContextNode, context } from './core/ContextNode.js';
-export { default as InstanceIndexNode, instanceIndex } from './core/InstanceIndexNode.js';
-export { default as LightingModel, lightingModel } from './core/LightingModel.js';
+export { default as ContextNode, context, label } from './core/ContextNode.js';
+export { default as IndexNode, vertexIndex, instanceIndex } from './core/IndexNode.js';
+export { default as LightingModel } from './core/LightingModel.js';
 export { default as Node, addNodeClass, createNodeFromType } from './core/Node.js';
 export { default as NodeAttribute } from './core/NodeAttribute.js';
 export { default as NodeBuilder } from './core/NodeBuilder.js';
@@ -24,18 +24,18 @@ export { default as NodeKeywords } from './core/NodeKeywords.js';
 export { default as NodeUniform } from './core/NodeUniform.js';
 export { default as NodeVar } from './core/NodeVar.js';
 export { default as NodeVarying } from './core/NodeVarying.js';
-export { default as PropertyNode, property, diffuseColor, roughness, metalness, specularColor, shininess } from './core/PropertyNode.js';
+export { default as PropertyNode, property, output, diffuseColor, roughness, metalness, specularColor, shininess } from './core/PropertyNode.js';
 export { default as StackNode, stack } from './core/StackNode.js';
 export { default as TempNode } from './core/TempNode.js';
 export { default as UniformNode, uniform } from './core/UniformNode.js';
-export { default as VarNode, label, temp } from './core/VarNode.js';
+export { default as VarNode, temp } from './core/VarNode.js';
 export { default as VaryingNode, varying } from './core/VaryingNode.js';
 
 import * as NodeUtils from './core/NodeUtils.js';
 export { NodeUtils };
 
 // math
-export { default as MathNode, EPSILON, INFINITY, radians, degrees, exp, exp2, log, log2, sqrt, inverseSqrt, floor, ceil, normalize, fract, sin, cos, tan, asin, acos, atan, abs, sign, length, negate, oneMinus, dFdx, dFdy, round, reciprocal, atan2, min, max, mod, step, reflect, distance, difference, dot, cross, pow, pow2, pow3, pow4, transformDirection, mix, clamp, saturate, refract, smoothstep, faceForward } from './math/MathNode.js';
+export { default as MathNode, EPSILON, INFINITY, radians, degrees, exp, exp2, log, log2, sqrt, inverseSqrt, floor, ceil, normalize, fract, sin, cos, tan, asin, acos, atan, abs, sign, length, negate, oneMinus, dFdx, dFdy, round, reciprocal, trunc, fwidth, atan2, min, max, mod, step, reflect, distance, difference, dot, cross, pow, pow2, pow3, pow4, transformDirection, mix, clamp, saturate, refract, smoothstep, faceForward } from './math/MathNode.js';
 export { default as OperatorNode, add, sub, mul, div, remainder, equal, assign, lessThan, greaterThan, lessThanEqual, greaterThanEqual, and, or, xor, bitAnd, bitOr, bitXor, shiftLeft, shiftRight } from './math/OperatorNode.js';
 export { default as CondNode, cond } from './math/CondNode.js';
 
@@ -63,24 +63,26 @@ export * from './shadernode/ShaderNode.js';
 
 // accessors
 export { default as BitangentNode, bitangentGeometry, bitangentLocal, bitangentView, bitangentWorld, transformedBitangentView, transformedBitangentWorld } from './accessors/BitangentNode.js';
-export { default as BufferAttributeNode, bufferAttribute, dynamicBufferAttribute } from './accessors/BufferAttributeNode.js';
+export { default as BufferAttributeNode, bufferAttribute, dynamicBufferAttribute, instancedBufferAttribute, instancedDynamicBufferAttribute } from './accessors/BufferAttributeNode.js';
 export { default as BufferNode, buffer } from './accessors/BufferNode.js';
 export { default as CameraNode, cameraProjectionMatrix, cameraViewMatrix, cameraNormalMatrix, cameraWorldMatrix, cameraPosition, cameraNear, cameraFar } from './accessors/CameraNode.js';
 export { default as CubeTextureNode, cubeTexture } from './accessors/CubeTextureNode.js';
 export { default as ExtendedMaterialNode, materialNormal } from './accessors/ExtendedMaterialNode.js';
 export { default as InstanceNode, instance } from './accessors/InstanceNode.js';
-export { default as MaterialNode, materialUV, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecularColor, materialReflectivity, materialRoughness, materialMetalness, materialRotation } from './accessors/MaterialNode.js';
+export { default as MaterialNode, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecularColor, materialReflectivity, materialRoughness, materialMetalness, materialRotation, materialSheen, materialSheenRoughness } from './accessors/MaterialNode.js';
 export { default as MaterialReferenceNode, materialReference } from './accessors/MaterialReferenceNode.js';
+export { default as MorphNode, morph } from './accessors/MorphNode.js';
 export { default as TextureBicubicNode, textureBicubic } from './accessors/TextureBicubicNode.js';
 export { default as ModelNode, modelDirection, modelViewMatrix, modelNormalMatrix, modelWorldMatrix, modelPosition, modelViewPosition, modelScale } from './accessors/ModelNode.js';
 export { default as ModelViewProjectionNode, modelViewProjection } from './accessors/ModelViewProjectionNode.js';
-export { default as NormalNode, normalGeometry, normalLocal, normalView, normalWorld, transformedNormalView, transformedNormalWorld } from './accessors/NormalNode.js';
+export { default as NormalNode, normalGeometry, normalLocal, normalView, normalWorld, transformedNormalView, transformedNormalWorld, transformedClearcoatNormalView } from './accessors/NormalNode.js';
 export { default as Object3DNode, objectDirection, objectViewMatrix, objectNormalMatrix, objectWorldMatrix, objectPosition, objectScale, objectViewPosition } from './accessors/Object3DNode.js';
 export { default as PointUVNode, pointUV } from './accessors/PointUVNode.js';
 export { default as PositionNode, positionGeometry, positionLocal, positionWorld, positionWorldDirection, positionView, positionViewDirection } from './accessors/PositionNode.js';
 export { default as ReferenceNode, reference } from './accessors/ReferenceNode.js';
 export { default as ReflectVectorNode, reflectVector } from './accessors/ReflectVectorNode.js';
 export { default as SkinningNode, skinning } from './accessors/SkinningNode.js';
+export { default as SceneNode, backgroundBlurriness, backgroundIntensity } from './accessors/SceneNode.js';
 export { default as StorageBufferNode, storage } from './accessors/StorageBufferNode.js';
 export { default as TangentNode, tangentGeometry, tangentLocal, tangentView, tangentWorld, transformedTangentView, transformedTangentWorld } from './accessors/TangentNode.js';
 export { default as TextureNode, texture, /*textureLevel,*/ sampler } from './accessors/TextureNode.js';
@@ -90,7 +92,7 @@ export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
 // display
 export { default as BlendModeNode, burn, dodge, overlay, screen } from './display/BlendModeNode.js';
 export { default as ColorAdjustmentNode, saturation, vibrance, hue, lumaCoeffs, luminance } from './display/ColorAdjustmentNode.js';
-export { default as ColorSpaceNode, colorSpace } from './display/ColorSpaceNode.js';
+export { default as ColorSpaceNode, linearToColorSpace, colorSpaceToLinear, linearTosRGB, sRGBToLinear } from './display/ColorSpaceNode.js';
 export { default as FrontFacingNode, frontFacing, faceDirection } from './display/FrontFacingNode.js';
 export { default as NormalMapNode, normalMap, TBNViewMatrix } from './display/NormalMapNode.js';
 export { default as PosterizeNode, posterize } from './display/PosterizeNode.js';
@@ -103,9 +105,9 @@ export { default as ViewportDepthNode, viewZToOrthographicDepth, orthographicDep
 
 // code
 export { default as ExpressionNode, expression } from './code/ExpressionNode.js';
-export { default as CodeNode, code, js } from './code/CodeNode.js';
+export { default as CodeNode, code, js, wgsl, glsl } from './code/CodeNode.js';
 export { default as FunctionCallNode, call } from './code/FunctionCallNode.js';
-export { default as FunctionNode, func, fn } from './code/FunctionNode.js';
+export { default as FunctionNode, wgslFn, glslFn } from './code/FunctionNode.js';
 export { default as ScriptableNode, scriptable, global } from './code/ScriptableNode.js';
 export { default as ScriptableValueNode, scriptableValue } from './code/ScriptableValueNode.js';
 
@@ -153,7 +155,6 @@ export * from './materials/Materials.js';
 export * from './materialx/MaterialXNodes.js';
 
 // functions
-export { default as BRDF_BlinnPhong } from './functions/BSDF/BRDF_BlinnPhong.js';
 export { default as BRDF_GGX } from './functions/BSDF/BRDF_GGX.js';
 export { default as BRDF_Lambert } from './functions/BSDF/BRDF_Lambert.js';
 export { default as D_GGX } from './functions/BSDF/D_GGX.js';
@@ -166,5 +167,5 @@ export { getDistanceAttenuation } from './lighting/LightUtils.js';
 export { default as getGeometryRoughness } from './functions/material/getGeometryRoughness.js';
 export { default as getRoughness } from './functions/material/getRoughness.js';
 
-export { default as phongLightingModel } from './functions/PhongLightingModel.js';
-export { default as physicalLightingModel } from './functions/PhysicalLightingModel.js';
+export { default as PhongLightingModel } from './functions/PhongLightingModel.js';
+export { default as PhysicalLightingModel } from './functions/PhysicalLightingModel.js';

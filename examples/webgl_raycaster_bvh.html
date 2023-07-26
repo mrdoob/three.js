@@ -90,7 +90,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xeeeeee );
 
-				const ambient = new THREE.HemisphereLight( 0xffffff, 0x999999 );
+				const ambient = new THREE.HemisphereLight( 0xffffff, 0x999999, 3 );
 				scene.add( ambient );
 
 				// renderer
