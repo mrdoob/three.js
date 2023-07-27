@@ -10,7 +10,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '154';
+	const REVISION = '155';
 
 	const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -2890,13 +2890,13 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	 * Texture parameters for an auto-generated target texture
 	 * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
 	*/
-	class WebGLRenderTarget extends EventDispatcher {
+	class RenderTarget extends EventDispatcher {
 
 		constructor( width = 1, height = 1, options = {} ) {
 
 			super();
 
-			this.isWebGLRenderTarget = true;
+			this.isRenderTarget = true;
 
 			this.width = width;
 			this.height = height;
@@ -2994,6 +2994,18 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		dispose() {
 
 			this.dispatchEvent( { type: 'dispose' } );
+
+		}
+
+	}
+
+	class WebGLRenderTarget extends RenderTarget {
+
+		constructor( width = 1, height = 1, options = {} ) {
+
+			super( width, height, options );
+
+			this.isWebGLRenderTarget = true;
 
 		}
 
@@ -3132,8 +3144,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.viewport.set( 0, 0, width, height );
 			this.scissor.set( 0, 0, width, height );
-
-			return this;
 
 		}
 
@@ -8032,7 +8042,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.frustumCulled = source.frustumCulled;
 			this.renderOrder = source.renderOrder;
 
-			this.animations = source.animations;
+			this.animations = source.animations.slice();
 
 			this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
@@ -9919,6 +9929,26 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			// Matching BufferAttribute constructor, do not normalize the array.
 			this.array.set( value, offset );
+
+			return this;
+
+		}
+
+		getComponent( index, component ) {
+
+			let value = this.array[ index * this.itemSize + component ];
+
+			if ( this.normalized ) value = denormalize( value, this.array );
+
+			return value;
+
+		}
+
+		setComponent( index, component, value ) {
+
+			if ( this.normalized ) value = normalize( value, this.array );
+
+			this.array[ index * this.itemSize + component ] = value;
 
 			return this;
 
@@ -12706,10 +12736,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			const currentRenderTarget = renderer.getRenderTarget();
 
-			const currentToneMapping = renderer.toneMapping;
 			const currentXrEnabled = renderer.xr.enabled;
 
-			renderer.toneMapping = NoToneMapping;
 			renderer.xr.enabled = false;
 
 			const generateMipmaps = renderTarget.texture.generateMipmaps;
@@ -12738,7 +12766,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			renderer.setRenderTarget( currentRenderTarget );
 
-			renderer.toneMapping = currentToneMapping;
 			renderer.xr.enabled = currentXrEnabled;
 
 			renderTarget.texture.needsPMREMUpdate = true;
@@ -13661,7 +13688,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	var bsdfs = "float G_BlinnPhong_Implicit( ) {\n\treturn 0.25;\n}\nfloat D_BlinnPhong( const in float shininess, const in float dotNH ) {\n\treturn RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\n}\nvec3 BRDF_BlinnPhong( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in vec3 specularColor, const in float shininess ) {\n\tvec3 halfDir = normalize( lightDir + viewDir );\n\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\tfloat dotVH = saturate( dot( viewDir, halfDir ) );\n\tvec3 F = F_Schlick( specularColor, 1.0, dotVH );\n\tfloat G = G_BlinnPhong_Implicit( );\n\tfloat D = D_BlinnPhong( shininess, dotNH );\n\treturn F * ( G * D );\n} // validated";
 
-	var iridescence_fragment = "#ifdef USE_IRIDESCENCE\n\tconst mat3 XYZ_TO_REC709 = mat3(\n\t\t 3.2404542, -0.9692660,  0.0556434,\n\t\t-1.5371385,  1.8760108, -0.2040259,\n\t\t-0.4985314,  0.0415560,  1.0572252\n\t);\n\tvec3 Fresnel0ToIor( vec3 fresnel0 ) {\n\t\tvec3 sqrtF0 = sqrt( fresnel0 );\n\t\treturn ( vec3( 1.0 ) + sqrtF0 ) / ( vec3( 1.0 ) - sqrtF0 );\n\t}\n\tvec3 IorToFresnel0( vec3 transmittedIor, float incidentIor ) {\n\t\treturn pow2( ( transmittedIor - vec3( incidentIor ) ) / ( transmittedIor + vec3( incidentIor ) ) );\n\t}\n\tfloat IorToFresnel0( float transmittedIor, float incidentIor ) {\n\t\treturn pow2( ( transmittedIor - incidentIor ) / ( transmittedIor + incidentIor ));\n\t}\n\tvec3 evalSensitivity( float OPD, vec3 shift ) {\n\t\tfloat phase = 2.0 * PI * OPD * 1.0e-9;\n\t\tvec3 val = vec3( 5.4856e-13, 4.4201e-13, 5.2481e-13 );\n\t\tvec3 pos = vec3( 1.6810e+06, 1.7953e+06, 2.2084e+06 );\n\t\tvec3 var = vec3( 4.3278e+09, 9.3046e+09, 6.6121e+09 );\n\t\tvec3 xyz = val * sqrt( 2.0 * PI * var ) * cos( pos * phase + shift ) * exp( - pow2( phase ) * var );\n\t\txyz.x += 9.7470e-14 * sqrt( 2.0 * PI * 4.5282e+09 ) * cos( 2.2399e+06 * phase + shift[ 0 ] ) * exp( - 4.5282e+09 * pow2( phase ) );\n\t\txyz /= 1.0685e-7;\n\t\tvec3 rgb = XYZ_TO_REC709 * xyz;\n\t\treturn rgb;\n\t}\n\tvec3 evalIridescence( float outsideIOR, float eta2, float cosTheta1, float thinFilmThickness, vec3 baseF0 ) {\n\t\tvec3 I;\n\t\tfloat iridescenceIOR = mix( outsideIOR, eta2, smoothstep( 0.0, 0.03, thinFilmThickness ) );\n\t\tfloat sinTheta2Sq = pow2( outsideIOR / iridescenceIOR ) * ( 1.0 - pow2( cosTheta1 ) );\n\t\tfloat cosTheta2Sq = 1.0 - sinTheta2Sq;\n\t\tif ( cosTheta2Sq < 0.0 ) {\n\t\t\t return vec3( 1.0 );\n\t\t}\n\t\tfloat cosTheta2 = sqrt( cosTheta2Sq );\n\t\tfloat R0 = IorToFresnel0( iridescenceIOR, outsideIOR );\n\t\tfloat R12 = F_Schlick( R0, 1.0, cosTheta1 );\n\t\tfloat R21 = R12;\n\t\tfloat T121 = 1.0 - R12;\n\t\tfloat phi12 = 0.0;\n\t\tif ( iridescenceIOR < outsideIOR ) phi12 = PI;\n\t\tfloat phi21 = PI - phi12;\n\t\tvec3 baseIOR = Fresnel0ToIor( clamp( baseF0, 0.0, 0.9999 ) );\t\tvec3 R1 = IorToFresnel0( baseIOR, iridescenceIOR );\n\t\tvec3 R23 = F_Schlick( R1, 1.0, cosTheta2 );\n\t\tvec3 phi23 = vec3( 0.0 );\n\t\tif ( baseIOR[ 0 ] < iridescenceIOR ) phi23[ 0 ] = PI;\n\t\tif ( baseIOR[ 1 ] < iridescenceIOR ) phi23[ 1 ] = PI;\n\t\tif ( baseIOR[ 2 ] < iridescenceIOR ) phi23[ 2 ] = PI;\n\t\tfloat OPD = 2.0 * iridescenceIOR * thinFilmThickness * cosTheta2;\n\t\tvec3 phi = vec3( phi21 ) + phi23;\n\t\tvec3 R123 = clamp( R12 * R23, 1e-5, 0.9999 );\n\t\tvec3 r123 = sqrt( R123 );\n\t\tvec3 Rs = pow2( T121 ) * R23 / ( vec3( 1.0 ) - R123 );\n\t\tvec3 C0 = R12 + Rs;\n\t\tI = C0;\n\t\tvec3 Cm = Rs - T121;\n\t\tfor ( int m = 1; m <= 2; ++ m ) {\n\t\t\tCm *= r123;\n\t\t\tvec3 Sm = 2.0 * evalSensitivity( float( m ) * OPD, float( m ) * phi );\n\t\t\tI += Cm * Sm;\n\t\t}\n\t\treturn max( I, vec3( 0.0 ) );\n\t}\n#endif";
+	var iridescence_fragment = "#ifdef USE_IRIDESCENCE\n\tconst mat3 XYZ_TO_REC709 = mat3(\n\t\t 3.2404542, -0.9692660,  0.0556434,\n\t\t-1.5371385,  1.8760108, -0.2040259,\n\t\t-0.4985314,  0.0415560,  1.0572252\n\t);\n\tvec3 Fresnel0ToIor( vec3 fresnel0 ) {\n\t\tvec3 sqrtF0 = sqrt( fresnel0 );\n\t\treturn ( vec3( 1.0 ) + sqrtF0 ) / ( vec3( 1.0 ) - sqrtF0 );\n\t}\n\tvec3 IorToFresnel0( vec3 transmittedIor, float incidentIor ) {\n\t\treturn pow2( ( transmittedIor - vec3( incidentIor ) ) / ( transmittedIor + vec3( incidentIor ) ) );\n\t}\n\tfloat IorToFresnel0( float transmittedIor, float incidentIor ) {\n\t\treturn pow2( ( transmittedIor - incidentIor ) / ( transmittedIor + incidentIor ));\n\t}\n\tvec3 evalSensitivity( float OPD, vec3 shift ) {\n\t\tfloat phase = 2.0 * PI * OPD * 1.0e-9;\n\t\tvec3 val = vec3( 5.4856e-13, 4.4201e-13, 5.2481e-13 );\n\t\tvec3 pos = vec3( 1.6810e+06, 1.7953e+06, 2.2084e+06 );\n\t\tvec3 var = vec3( 4.3278e+09, 9.3046e+09, 6.6121e+09 );\n\t\tvec3 xyz = val * sqrt( 2.0 * PI * var ) * cos( pos * phase + shift ) * exp( - pow2( phase ) * var );\n\t\txyz.x += 9.7470e-14 * sqrt( 2.0 * PI * 4.5282e+09 ) * cos( 2.2399e+06 * phase + shift[ 0 ] ) * exp( - 4.5282e+09 * pow2( phase ) );\n\t\txyz /= 1.0685e-7;\n\t\tvec3 rgb = XYZ_TO_REC709 * xyz;\n\t\treturn rgb;\n\t}\n\tvec3 evalIridescence( float outsideIOR, float eta2, float cosTheta1, float thinFilmThickness, vec3 baseF0 ) {\n\t\tvec3 I;\n\t\tfloat iridescenceIOR = mix( outsideIOR, eta2, smoothstep( 0.0, 0.03, thinFilmThickness ) );\n\t\tfloat sinTheta2Sq = pow2( outsideIOR / iridescenceIOR ) * ( 1.0 - pow2( cosTheta1 ) );\n\t\tfloat cosTheta2Sq = 1.0 - sinTheta2Sq;\n\t\tif ( cosTheta2Sq < 0.0 ) {\n\t\t\treturn vec3( 1.0 );\n\t\t}\n\t\tfloat cosTheta2 = sqrt( cosTheta2Sq );\n\t\tfloat R0 = IorToFresnel0( iridescenceIOR, outsideIOR );\n\t\tfloat R12 = F_Schlick( R0, 1.0, cosTheta1 );\n\t\tfloat T121 = 1.0 - R12;\n\t\tfloat phi12 = 0.0;\n\t\tif ( iridescenceIOR < outsideIOR ) phi12 = PI;\n\t\tfloat phi21 = PI - phi12;\n\t\tvec3 baseIOR = Fresnel0ToIor( clamp( baseF0, 0.0, 0.9999 ) );\t\tvec3 R1 = IorToFresnel0( baseIOR, iridescenceIOR );\n\t\tvec3 R23 = F_Schlick( R1, 1.0, cosTheta2 );\n\t\tvec3 phi23 = vec3( 0.0 );\n\t\tif ( baseIOR[ 0 ] < iridescenceIOR ) phi23[ 0 ] = PI;\n\t\tif ( baseIOR[ 1 ] < iridescenceIOR ) phi23[ 1 ] = PI;\n\t\tif ( baseIOR[ 2 ] < iridescenceIOR ) phi23[ 2 ] = PI;\n\t\tfloat OPD = 2.0 * iridescenceIOR * thinFilmThickness * cosTheta2;\n\t\tvec3 phi = vec3( phi21 ) + phi23;\n\t\tvec3 R123 = clamp( R12 * R23, 1e-5, 0.9999 );\n\t\tvec3 r123 = sqrt( R123 );\n\t\tvec3 Rs = pow2( T121 ) * R23 / ( vec3( 1.0 ) - R123 );\n\t\tvec3 C0 = R12 + Rs;\n\t\tI = C0;\n\t\tvec3 Cm = Rs - T121;\n\t\tfor ( int m = 1; m <= 2; ++ m ) {\n\t\t\tCm *= r123;\n\t\t\tvec3 Sm = 2.0 * evalSensitivity( float( m ) * OPD, float( m ) * phi );\n\t\t\tI += Cm * Sm;\n\t\t}\n\t\treturn max( I, vec3( 0.0 ) );\n\t}\n#endif";
 
 	var bumpmap_pars_fragment = "#ifdef USE_BUMPMAP\n\tuniform sampler2D bumpMap;\n\tuniform float bumpScale;\n\tvec2 dHdxy_fwd() {\n\t\tvec2 dSTdx = dFdx( vBumpMapUv );\n\t\tvec2 dSTdy = dFdy( vBumpMapUv );\n\t\tfloat Hll = bumpScale * texture2D( bumpMap, vBumpMapUv ).x;\n\t\tfloat dBx = bumpScale * texture2D( bumpMap, vBumpMapUv + dSTdx ).x - Hll;\n\t\tfloat dBy = bumpScale * texture2D( bumpMap, vBumpMapUv + dSTdy ).x - Hll;\n\t\treturn vec2( dBx, dBy );\n\t}\n\tvec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy, float faceDirection ) {\n\t\tvec3 vSigmaX = dFdx( surf_pos.xyz );\n\t\tvec3 vSigmaY = dFdy( surf_pos.xyz );\n\t\tvec3 vN = surf_norm;\n\t\tvec3 R1 = cross( vSigmaY, vN );\n\t\tvec3 R2 = cross( vN, vSigmaX );\n\t\tfloat fDet = dot( vSigmaX, R1 ) * faceDirection;\n\t\tvec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );\n\t\treturn normalize( abs( fDet ) * surf_norm - vGrad );\n\t}\n#endif";
 
@@ -17289,7 +17316,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				}
 
-			} else {
+			} else if ( geometryPosition !== undefined ) {
 
 				const array = geometryPosition.array;
 				version = geometryPosition.version;
@@ -17303,6 +17330,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 					indices.push( a, b, b, c, c, a );
 
 				}
+
+			} else {
+
+				return;
 
 			}
 
@@ -20311,6 +20342,18 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			const HAS_ATTRIBUTE_UV2 = !! geometry.attributes.uv2;
 			const HAS_ATTRIBUTE_UV3 = !! geometry.attributes.uv3;
 
+			let toneMapping = NoToneMapping;
+
+			if ( material.toneMapped ) {
+
+				if ( currentRenderTarget === null || currentRenderTarget.isXRRenderTarget === true ) {
+
+					toneMapping = renderer.toneMapping;
+
+				}
+
+			}
+
 			const parameters = {
 
 				isWebGL2: IS_WEBGL2,
@@ -20471,8 +20514,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				shadowMapEnabled: renderer.shadowMap.enabled && shadows.length > 0,
 				shadowMapType: renderer.shadowMap.type,
 
-				toneMapping: material.toneMapped ? renderer.toneMapping : NoToneMapping,
-				useLegacyLights: renderer.useLegacyLights,
+				toneMapping: toneMapping,
+				useLegacyLights: renderer._useLegacyLights,
 
 				premultipliedAlpha: material.premultipliedAlpha,
 
@@ -23644,6 +23687,17 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
+			if ( glFormat === _gl.RED_INTEGER ) {
+
+				if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = _gl.R8UI;
+				if ( glType === _gl.UNSIGNED_SHORT ) internalFormat = _gl.R16UI;
+				if ( glType === _gl.UNSIGNED_INT ) internalFormat = _gl.R32UI;
+				if ( glType === _gl.BYTE ) internalFormat = _gl.R8I;
+				if ( glType === _gl.SHORT ) internalFormat = _gl.R16I;
+				if ( glType === _gl.INT ) internalFormat = _gl.R32I;
+
+			}
+
 			if ( glFormat === _gl.RG ) {
 
 				if ( glType === _gl.FLOAT ) internalFormat = _gl.RG32F;
@@ -23820,14 +23874,32 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				for ( let i = 0; i < 6; i ++ ) {
 
-					_gl.deleteFramebuffer( renderTargetProperties.__webglFramebuffer[ i ] );
+					if ( Array.isArray( renderTargetProperties.__webglFramebuffer[ i ] ) ) {
+
+						for ( let level = 0; level < renderTargetProperties.__webglFramebuffer[ i ].length; level ++ ) _gl.deleteFramebuffer( renderTargetProperties.__webglFramebuffer[ i ][ level ] );
+
+					} else {
+
+						_gl.deleteFramebuffer( renderTargetProperties.__webglFramebuffer[ i ] );
+
+					}
+
 					if ( renderTargetProperties.__webglDepthbuffer ) _gl.deleteRenderbuffer( renderTargetProperties.__webglDepthbuffer[ i ] );
 
 				}
 
 			} else {
 
-				_gl.deleteFramebuffer( renderTargetProperties.__webglFramebuffer );
+				if ( Array.isArray( renderTargetProperties.__webglFramebuffer ) ) {
+
+					for ( let level = 0; level < renderTargetProperties.__webglFramebuffer.length; level ++ ) _gl.deleteFramebuffer( renderTargetProperties.__webglFramebuffer[ level ] );
+
+				} else {
+
+					_gl.deleteFramebuffer( renderTargetProperties.__webglFramebuffer );
+
+				}
+
 				if ( renderTargetProperties.__webglDepthbuffer ) _gl.deleteRenderbuffer( renderTargetProperties.__webglDepthbuffer );
 				if ( renderTargetProperties.__webglMultisampledFramebuffer ) _gl.deleteFramebuffer( renderTargetProperties.__webglMultisampledFramebuffer );
 
@@ -24802,7 +24874,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		// Render targets
 
 		// Setup storage for target texture and bind it to correct framebuffer
-		function setupFrameBufferTexture( framebuffer, renderTarget, texture, attachment, textureTarget ) {
+		function setupFrameBufferTexture( framebuffer, renderTarget, texture, attachment, textureTarget, level ) {
 
 			const glFormat = utils.convert( texture.format, texture.colorSpace );
 			const glType = utils.convert( texture.type );
@@ -24811,13 +24883,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( ! renderTargetProperties.__hasExternalTextures ) {
 
+				const width = Math.max( 1, renderTarget.width >> level );
+				const height = Math.max( 1, renderTarget.height >> level );
+
 				if ( textureTarget === _gl.TEXTURE_3D || textureTarget === _gl.TEXTURE_2D_ARRAY ) {
 
-					state.texImage3D( textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, renderTarget.depth, 0, glFormat, glType, null );
+					state.texImage3D( textureTarget, level, glInternalFormat, width, height, renderTarget.depth, 0, glFormat, glType, null );
 
 				} else {
 
-					state.texImage2D( textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
+					state.texImage2D( textureTarget, level, glInternalFormat, width, height, 0, glFormat, glType, null );
 
 				}
 
@@ -24831,7 +24906,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			} else if ( textureTarget === _gl.TEXTURE_2D || ( textureTarget >= _gl.TEXTURE_CUBE_MAP_POSITIVE_X && textureTarget <= _gl.TEXTURE_CUBE_MAP_NEGATIVE_Z ) ) { // see #24753
 
-				_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( texture ).__webglTexture, 0 );
+				_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( texture ).__webglTexture, level );
 
 			}
 
@@ -25052,7 +25127,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( colorTexture !== undefined ) {
 
-				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, renderTarget.texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D );
+				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, renderTarget.texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, 0 );
 
 			}
 
@@ -25099,13 +25174,41 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				for ( let i = 0; i < 6; i ++ ) {
 
-					renderTargetProperties.__webglFramebuffer[ i ] = _gl.createFramebuffer();
+					if ( isWebGL2 && texture.mipmaps && texture.mipmaps.length > 0 ) {
+
+						renderTargetProperties.__webglFramebuffer[ i ] = [];
+
+						for ( let level = 0; level < texture.mipmaps.length; level ++ ) {
+
+							renderTargetProperties.__webglFramebuffer[ i ][ level ] = _gl.createFramebuffer();
+
+						}
+
+					} else {
+
+						renderTargetProperties.__webglFramebuffer[ i ] = _gl.createFramebuffer();
+
+					}
 
 				}
 
 			} else {
 
-				renderTargetProperties.__webglFramebuffer = _gl.createFramebuffer();
+				if ( isWebGL2 && texture.mipmaps && texture.mipmaps.length > 0 ) {
+
+					renderTargetProperties.__webglFramebuffer = [];
+
+					for ( let level = 0; level < texture.mipmaps.length; level ++ ) {
+
+						renderTargetProperties.__webglFramebuffer[ level ] = _gl.createFramebuffer();
+
+					}
+
+				} else {
+
+					renderTargetProperties.__webglFramebuffer = _gl.createFramebuffer();
+
+				}
 
 				if ( isMultipleRenderTargets ) {
 
@@ -25185,7 +25288,19 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				for ( let i = 0; i < 6; i ++ ) {
 
-					setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer[ i ], renderTarget, texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i );
+					if ( isWebGL2 && texture.mipmaps && texture.mipmaps.length > 0 ) {
+
+						for ( let level = 0; level < texture.mipmaps.length; level ++ ) {
+
+							setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer[ i ][ level ], renderTarget, texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, level );
+
+						}
+
+					} else {
+
+						setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer[ i ], renderTarget, texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0 );
+
+					}
 
 				}
 
@@ -25208,7 +25323,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 					state.bindTexture( _gl.TEXTURE_2D, attachmentProperties.__webglTexture );
 					setTextureParameters( _gl.TEXTURE_2D, attachment, supportsMips );
-					setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, attachment, _gl.COLOR_ATTACHMENT0 + i, _gl.TEXTURE_2D );
+					setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, attachment, _gl.COLOR_ATTACHMENT0 + i, _gl.TEXTURE_2D, 0 );
 
 					if ( textureNeedsGenerateMipmaps( attachment, supportsMips ) ) {
 
@@ -25240,7 +25355,20 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				state.bindTexture( glTextureType, textureProperties.__webglTexture );
 				setTextureParameters( glTextureType, texture, supportsMips );
-				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, texture, _gl.COLOR_ATTACHMENT0, glTextureType );
+
+				if ( isWebGL2 && texture.mipmaps && texture.mipmaps.length > 0 ) {
+
+					for ( let level = 0; level < texture.mipmaps.length; level ++ ) {
+
+						setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer[ level ], renderTarget, texture, _gl.COLOR_ATTACHMENT0, glTextureType, level );
+
+					}
+
+				} else {
+
+					setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, texture, _gl.COLOR_ATTACHMENT0, glTextureType, 0 );
+
+				}
 
 				if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
@@ -27179,7 +27307,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				uniforms.lightMap.value = material.lightMap;
 
 				// artist-friendly light intensity scaling factor
-				const scaleFactor = ( renderer.useLegacyLights === true ) ? Math.PI : 1;
+				const scaleFactor = ( renderer._useLegacyLights === true ) ? Math.PI : 1;
 
 				uniforms.lightMapIntensity.value = material.lightMapIntensity * scaleFactor;
 
@@ -28018,7 +28146,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			// physical lights
 
-			this.useLegacyLights = true;
+			this._useLegacyLights = false;
 
 			// tone mapping
 
@@ -28661,6 +28789,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				if ( material.wireframe === true ) {
 
 					index = geometries.getWireframeAttribute( geometry );
+
+					if ( index === undefined ) return;
+
 					rangeFactor = 2;
 
 				}
@@ -28825,7 +28956,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				} );
 
-				currentRenderState.setupLights( _this.useLegacyLights );
+				currentRenderState.setupLights( _this._useLegacyLights );
 
 				scene.traverse( function ( object ) {
 
@@ -28978,7 +29109,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				// render scene
 
-				currentRenderState.setupLights( _this.useLegacyLights );
+				currentRenderState.setupLights( _this._useLegacyLights );
 
 				if ( camera.isArrayCamera ) {
 
@@ -29467,6 +29598,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				materialProperties.outputColorSpace = parameters.outputColorSpace;
 				materialProperties.instancing = parameters.instancing;
+				materialProperties.instancingColor = parameters.instancingColor;
 				materialProperties.skinning = parameters.skinning;
 				materialProperties.morphTargets = parameters.morphTargets;
 				materialProperties.morphNormals = parameters.morphNormals;
@@ -29495,7 +29627,18 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				const morphTargets = !! geometry.morphAttributes.position;
 				const morphNormals = !! geometry.morphAttributes.normal;
 				const morphColors = !! geometry.morphAttributes.color;
-				const toneMapping = material.toneMapped ? _this.toneMapping : NoToneMapping;
+
+				let toneMapping = NoToneMapping;
+
+				if ( material.toneMapped ) {
+
+					if ( _currentRenderTarget === null || _currentRenderTarget.isXRRenderTarget === true ) {
+
+						toneMapping = _this.toneMapping;
+
+					}
+
+				}
 
 				const morphAttribute = geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color;
 				const morphTargetsCount = ( morphAttribute !== undefined ) ? morphAttribute.length : 0;
@@ -29547,6 +29690,14 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						needsProgramChange = true;
 
 					} else if ( ! object.isSkinnedMesh && materialProperties.skinning === true ) {
+
+						needsProgramChange = true;
+
+					} else if ( object.isInstancedMesh && materialProperties.instancingColor === true && object.instanceColor === null ) {
+
+						needsProgramChange = true;
+
+					} else if ( object.isInstancedMesh && materialProperties.instancingColor === false && object.instanceColor !== null ) {
 
 						needsProgramChange = true;
 
@@ -29965,7 +30116,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 					if ( renderTarget.isWebGLCubeRenderTarget ) {
 
-						framebuffer = __webglFramebuffer[ activeCubeFace ];
+						if ( Array.isArray( __webglFramebuffer[ activeCubeFace ] ) ) {
+
+							framebuffer = __webglFramebuffer[ activeCubeFace ][ activeMipmapLevel ];
+
+						} else {
+
+							framebuffer = __webglFramebuffer[ activeCubeFace ];
+
+						}
+
 						isCube = true;
 
 					} else if ( ( capabilities.isWebGL2 && renderTarget.samples > 0 ) && textures.useMultisampledRTT( renderTarget ) === false ) {
@@ -29974,7 +30134,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 					} else {
 
-						framebuffer = __webglFramebuffer;
+						if ( Array.isArray( __webglFramebuffer ) ) {
+
+							framebuffer = __webglFramebuffer[ activeMipmapLevel ];
+
+						} else {
+
+							framebuffer = __webglFramebuffer;
+
+						}
 
 					}
 
@@ -30273,14 +30441,14 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		get physicallyCorrectLights() { // @deprecated, r150
 
-			console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
+			console.warn( 'THREE.WebGLRenderer: The property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
 			return ! this.useLegacyLights;
 
 		}
 
 		set physicallyCorrectLights( value ) { // @deprecated, r150
 
-			console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
+			console.warn( 'THREE.WebGLRenderer: The property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
 			this.useLegacyLights = ! value;
 
 		}
@@ -30296,6 +30464,20 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			console.warn( 'THREE.WebGLRenderer: Property .outputEncoding has been removed. Use .outputColorSpace instead.' );
 			this.outputColorSpace = encoding === sRGBEncoding ? SRGBColorSpace : LinearSRGBColorSpace;
+
+		}
+
+		get useLegacyLights() { // @deprecated, r155
+
+			console.warn( 'THREE.WebGLRenderer: The property .useLegacyLights has been deprecated. Migrate your lighting according to the following guide: https://discourse.threejs.org/t/updates-to-lighting-in-three-js-r155/53733.' );
+			return this._useLegacyLights;
+
+		}
+
+		set useLegacyLights( value ) { // @deprecated, r155
+
+			console.warn( 'THREE.WebGLRenderer: The property .useLegacyLights has been deprecated. Migrate your lighting according to the following guide: https://discourse.threejs.org/t/updates-to-lighting-in-three-js-r155/53733.' );
+			this._useLegacyLights = value;
 
 		}
 
@@ -32759,6 +32941,21 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
+	class CompressedCubeTexture extends CompressedTexture {
+
+		constructor( images, format, type ) {
+
+			super( undefined, images[ 0 ].width, images[ 0 ].height, format, type, CubeReflectionMapping );
+
+			this.isCompressedCubeTexture = true;
+			this.isCubeTexture = true;
+
+			this.image = images;
+
+		}
+
+	}
+
 	class CanvasTexture extends Texture {
 
 		constructor( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
@@ -34869,7 +35066,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.parameters = {
 				radius: radius,
-				height: length,
+				length: length,
 				capSegments: capSegments,
 				radialSegments: radialSegments,
 			};
@@ -42319,9 +42516,28 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			loader.setWithCredentials( scope.withCredentials );
 			loader.load( url, function ( buffer ) {
 
-				const texData = scope.parse( buffer );
+				let texData;
 
-				if ( ! texData ) return;
+				try {
+
+					texData = scope.parse( buffer );
+
+				} catch ( error ) {
+
+					if ( onError !== undefined ) {
+
+						onError( error );
+
+					} else {
+
+						console.error( error );
+						return;
+
+					}
+
+				}
+
+				if ( ! texData ) return onError(); // TODO: Remove this when all loaders properly throw errors
 
 				if ( texData.image !== undefined ) {
 
@@ -46843,7 +47059,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			// ensure there is a value node
 			if ( ! targetObject ) {
 
-				console.error( 'THREE.PropertyBinding: Trying to update node for track: ' + this.path + ' but it wasn\'t found.' );
+				console.warn( 'THREE.PropertyBinding: No target node found for track: ' + this.path + '.' );
 				return;
 
 			}
@@ -51308,6 +51524,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	exports.ColorKeyframeTrack = ColorKeyframeTrack;
 	exports.ColorManagement = ColorManagement;
 	exports.CompressedArrayTexture = CompressedArrayTexture;
+	exports.CompressedCubeTexture = CompressedCubeTexture;
 	exports.CompressedTexture = CompressedTexture;
 	exports.CompressedTextureLoader = CompressedTextureLoader;
 	exports.ConeGeometry = ConeGeometry;
@@ -51559,6 +51776,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	exports.RedFormat = RedFormat;
 	exports.RedIntegerFormat = RedIntegerFormat;
 	exports.ReinhardToneMapping = ReinhardToneMapping;
+	exports.RenderTarget = RenderTarget;
 	exports.RepeatWrapping = RepeatWrapping;
 	exports.ReplaceStencilOp = ReplaceStencilOp;
 	exports.ReverseSubtractEquation = ReverseSubtractEquation;

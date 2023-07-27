@@ -71,6 +71,7 @@ Three.js로 배경을 렌더링해야 합니다.</p>
 <p>간단히 장면의 배경에 텍스처를 입혀주기만 하면 되죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
 const bgTexture = loader.load('resources/images/daikanyama.jpg');
+bgTexture.colorSpace = THREE.SRGBColorSpace;
 scene.background = bgTexture;
 </pre>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -228,9 +229,9 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +  const texture = loader.load(
 +    'resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg',
 +    () =&gt; {
-+      const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
-+      rt.fromEquirectangularTexture(renderer, texture);
-+      scene.background = rt.texture;
++      texture.mapping = THREE.EquirectangularReflectionMapping;
++      texture.colorSpace = THREE.SRGBColorSpace;
++      scene.background = texture;
 +    });
 }
 </pre>

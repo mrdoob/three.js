@@ -4,12 +4,13 @@ import RenderObject from './RenderObject.js';
 
 class RenderObjects {
 
-	constructor( renderer, nodes, geometries, pipelines, info ) {
+	constructor( renderer, nodes, geometries, pipelines, bindings, info ) {
 
 		this.renderer = renderer;
 		this.nodes = nodes;
 		this.geometries = geometries;
 		this.pipelines = pipelines;
+		this.bindings = bindings;
 		this.info = info;
 
 		this.chainMaps = {};
@@ -17,16 +18,16 @@ class RenderObjects {
 
 	}
 
-	get( object, material, scene, camera, lightsNode, passId ) {
+	get( object, material, scene, camera, lightsNode, renderContext, passId ) {
 
 		const chainMap = this.getChainMap( passId );
-		const chainArray = [ object, material, scene, camera, lightsNode ];
+		const chainArray = [ object, material, renderContext, lightsNode ];
 
 		let renderObject = chainMap.get( chainArray );
 
 		if ( renderObject === undefined ) {
 
-			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, passId );
+			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, passId );
 
 			chainMap.set( chainArray, renderObject );
 
@@ -39,7 +40,7 @@ class RenderObjects {
 
 				renderObject.dispose();
 
-				renderObject = this.get( object, material, scene, camera, lightsNode );
+				renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, passId );
 
 			}
 
@@ -62,11 +63,12 @@ class RenderObjects {
 
 	}
 
-	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, passId ) {
+	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, passId ) {
 
 		const chainMap = this.getChainMap( passId );
 		const dataMap = this.dataMap;
-		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode );
+
+		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext );
 
 		const data = dataMap.get( renderObject );
 		data.cacheKey = renderObject.getCacheKey();
@@ -76,6 +78,7 @@ class RenderObjects {
 			dataMap.delete( renderObject );
 
 			this.pipelines.delete( renderObject );
+			this.bindings.delete( renderObject );
 			this.nodes.delete( renderObject );
 
 			chainMap.delete( renderObject.getChainArray() );

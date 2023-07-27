@@ -26,6 +26,8 @@ class CubeTextureNode extends TextureNode {
 
 	}
 
+	setUpdateMatrix( /*updateMatrix*/ ) { } // Ignore .updateMatrix for CubeTextureNode
+
 	generate( builder, output ) {
 
 		const { uvNode, levelNode } = builder.getNodeProperties( this );

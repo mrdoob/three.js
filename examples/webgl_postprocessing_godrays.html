@@ -73,14 +73,11 @@
 
 				materialDepth = new THREE.MeshDepthMaterial();
 
-				const materialScene = new THREE.MeshBasicMaterial( { color: 0x000000 } );
-
 				// tree
 
 				const loader = new OBJLoader();
 				loader.load( 'models/obj/tree.obj', function ( object ) {
 
-					object.material = materialScene;
 					object.position.set( 0, - 150, - 150 );
 					object.scale.multiplyScalar( 400 );
 					scene.add( object );
@@ -90,7 +87,7 @@
 				// sphere
 
 				const geo = new THREE.SphereGeometry( 1, 20, 10 );
-				sphereMesh = new THREE.Mesh( geo, materialScene );
+				sphereMesh = new THREE.Mesh( geo, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
 				sphereMesh.scale.multiplyScalar( 20 );
 				scene.add( sphereMesh );
 
@@ -100,7 +97,6 @@
 				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
 				renderer.autoClear = false;
@@ -232,7 +228,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate, renderer.domElement );
+				requestAnimationFrame( animate );
 
 				stats.begin();
 				render();

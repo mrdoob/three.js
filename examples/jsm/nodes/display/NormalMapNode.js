@@ -15,7 +15,7 @@ import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 // Normal Mapping Without Precomputed Tangents
 // http://www.thetenthplanet.de/archives/1180
 
-const perturbNormal2ArbNode = tslFn( ( inputs ) => {
+const perturbNormal2Arb = tslFn( ( inputs ) => {
 
 	const { eye_pos, surf_norm, mapN, uv } = inputs;
 
@@ -80,7 +80,7 @@ class NormalMapNode extends TempNode {
 
 			} else {
 
-				outputNode = perturbNormal2ArbNode( {
+				outputNode = perturbNormal2Arb( {
 					eye_pos: positionView,
 					surf_norm: normalView,
 					mapN: normalMap,

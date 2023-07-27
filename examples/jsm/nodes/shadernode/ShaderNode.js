@@ -261,7 +261,7 @@ const safeGetNodeType = ( node ) => {
 
 		return node.getNodeType();
 
-	} catch {
+	} catch ( _ ) {
 
 		return undefined;
 
@@ -322,7 +322,7 @@ export const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params
 
 export const shader = ( jsFunc ) => { // @deprecated, r154
 
-	console.warn( 'TSL: shader() is deprecated. Use fn() instead.' );
+	console.warn( 'TSL: shader() is deprecated. Use tslFn() instead.' );
 
 	return new ShaderNode( jsFunc );
 

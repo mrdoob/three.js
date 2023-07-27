@@ -51,7 +51,11 @@ export const clearcoat = nodeImmutable( PropertyNode, 'float', 'Clearcoat' );
 export const clearcoatRoughness = nodeImmutable( PropertyNode, 'float', 'ClearcoatRoughness' );
 export const sheen = nodeImmutable( PropertyNode, 'vec3', 'Sheen' );
 export const sheenRoughness = nodeImmutable( PropertyNode, 'float', 'SheenRoughness' );
+export const iridescence = nodeImmutable( PropertyNode, 'float', 'Iridescence' );
+export const iridescenceIOR = nodeImmutable( PropertyNode, 'float', 'IridescenceIOR' );
+export const iridescenceThickness = nodeImmutable( PropertyNode, 'float', 'IridescenceThickness' );
 export const specularColor = nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
 export const shininess = nodeImmutable( PropertyNode, 'float', 'Shininess' );
+export const output = nodeImmutable( PropertyNode, 'vec4', 'Output' );
 
 addNodeClass( PropertyNode );
