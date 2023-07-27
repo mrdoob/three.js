@@ -42516,9 +42516,28 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			loader.setWithCredentials( scope.withCredentials );
 			loader.load( url, function ( buffer ) {
 
-				const texData = scope.parse( buffer ); // TODO: Use try/catch here and throw errors in derived loaders, see #26412
+				let texData;
 
-				if ( ! texData ) return onError();
+				try {
+
+					texData = scope.parse( buffer );
+
+				} catch ( error ) {
+
+					if ( onError !== undefined ) {
+
+						onError( error );
+
+					} else {
+
+						console.error( error );
+						return;
+
+					}
+
+				}
+
+				if ( ! texData ) return onError(); // TODO: Remove this when all loaders properly throw errors
 
 				if ( texData.image !== undefined ) {
 
