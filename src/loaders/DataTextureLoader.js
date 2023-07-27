@@ -51,8 +51,6 @@ class DataTextureLoader extends Loader {
 
 			}
 
-			if ( ! texData ) return onError(); // TODO: Remove this when all loaders properly throw errors
-
 			if ( texData.image !== undefined ) {
 
 				texture.image = texData.image;
