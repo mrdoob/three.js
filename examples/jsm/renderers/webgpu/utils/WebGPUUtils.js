@@ -40,19 +40,10 @@ class WebGPUUtils {
 
 		let format;
 
-		const texture = renderContext.texture
+		if ( renderContext.textures !== null ) {
 
-		if ( renderContext.texture !== null ) {
+			format = this.getTextureFormatGPU( renderContext.textures[ 0 ] );
 
-			if ( Array.isArray( texture) ) {
-
-				format = 'dummy'; // FIXME
-
-			} else {
-
-				format = this.getTextureFormatGPU( renderContext.texture );
-
-			}
 
 		} else {
 
@@ -66,15 +57,9 @@ class WebGPUUtils {
 
 	getCurrentColorSpace( renderContext ) {
 
-		if ( renderContext.texture !== null ) {
+		if ( renderContext.textures !== null ) {
 
-			if ( Array.isArray( renderContext.texture ) ) {
-
-				return renderContext.texture[ 0 ].colorSpace;
-
-			}
-
-			return renderContext.texture.colorSpace;
+			return renderContext.textures[ 0 ].colorSpace;
 
 		}
 
@@ -93,7 +78,7 @@ class WebGPUUtils {
 
 	getSampleCount( renderContext ) {
 
-		if ( renderContext.texture !== null ) {
+		if ( renderContext.textures !== null ) {
 
 			return renderContext.sampleCount;
 

@@ -68,9 +68,9 @@ class WebGPUPipelineUtils {
 
 		const targets = [];
 
-		if ( Array.isArray( renderObject.context.texture ) ) {
+		if ( renderObject.context.textures !== null ) {
 
-			const textures = renderObject.context.texture;
+			const textures = renderObject.context.textures;
 
 			for ( let i = 0; i < textures.length; i ++ ) {
 

@@ -150,76 +150,48 @@ class WebGPUBackend extends Backend {
 
 		const antialias = this.parameters.antialias;
 
-		if ( renderContext.texture !== null ) {
+		if ( renderContext.textures !== null ) {
 
-			if ( Array.isArray( renderContext.texture ) ) {
+			const textures = renderContext.textures;
 
-				const textures = renderContext.texture;
+			descriptor.colorAttachments = [];
 
-				descriptor.colorAttachments = [];
+			const colorAttachments = descriptor.colorAttachments;
 
-				const colorAttachments = descriptor.colorAttachments;
+			for ( let i = 0; i < textures.length; i ++ ) {
 
-				for ( let i = 0; i < textures.length; i ++ ) {
+				const textureData = this.get( textures[ i ] );
 
-					const textureData = this.get( textures[ i ] );
-
-					const textureView = textureData.texture.createView( {
-						baseMipLevel: 0,
-						mipLevelCount: 1,
-						baseArrayLayer: renderContext.activeCubeFace,
-						dimension: GPUTextureViewDimension.TwoD
-					} );
-
-					let view, resolveTarget;
-
-					if ( textureData.msaaTexture !== undefined ) {
-
-						view = textureData.msaaTexture.createView();
-						resolveTarget = textureView;
-
-					} else {
-
-						view = textureView;
-						resolveTarget = undefined;
-
-					}
-
-					colorAttachments.push( {
-						view,
-						resolveTarget,
-						loadOp: GPULoadOp.Load,
-						storeOp: GPUStoreOp.Store
-
-					} );
-
-				}
-
-			} else {
-
-				const textureData = this.get( renderContext.texture );
-
-				const view = textureData.texture.createView( {
+				const textureView = textureData.texture.createView( {
 					baseMipLevel: 0,
 					mipLevelCount: 1,
 					baseArrayLayer: renderContext.activeCubeFace,
 					dimension: GPUTextureViewDimension.TwoD
 				} );
 
+				let view, resolveTarget;
+
 				if ( textureData.msaaTexture !== undefined ) {
 
-					colorAttachment.view = textureData.msaaTexture.createView();
-					colorAttachment.resolveTarget = view;
+					view = textureData.msaaTexture.createView();
+					resolveTarget = textureView;
 
 				} else {
 
-					colorAttachment.view = view;
-					colorAttachment.resolveTarget = undefined;
+					view = textureView;
+					resolveTarget = undefined;
 
 				}
 
-			}
+				colorAttachments.push( {
+					view,
+					resolveTarget,
+					loadOp: GPULoadOp.Load,
+					storeOp: GPUStoreOp.Store
 
+				} );
+
+			}
 
 			const depthTextureData = this.get( renderContext.depthTexture );
 
@@ -249,8 +221,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-
-		if ( renderContext.texture !== null && Array.isArray( renderContext.texture ) ) {
+		if ( renderContext.textures !== null ) {
 
 			const colorAttachments = descriptor.colorAttachments;
 
@@ -367,29 +338,17 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		if ( renderContext.texture !== null ) {
+		if ( renderContext.textures !== null ) {
 
-			if ( Array.isArray( renderContext.texture ) ) {
+			const textures = renderContext.textures;
 
-				const textures = renderContext.texture;
+			for ( let i = 0; i < textures.length; i ++ ) {
 
-				for ( let i = 0; i < textures.length; i ++ ) {
+				const texture = textures[ i ];
 
-					const texture = textures[ i ];
+				if ( texture.generateMipmaps === true ) {
 
-					if ( texture.generateMipmaps === true ) {
-
-						this.textureUtils.generateMipmaps( texture );
-
-					}
-
-				}
-
-			} else {
-
-				if ( renderContext.texture.generateMipmaps === true ) {
-
-					this.textureUtils.generateMipmaps( renderContext.texture );
+					this.textureUtils.generateMipmaps( texture );
 
 				}
 

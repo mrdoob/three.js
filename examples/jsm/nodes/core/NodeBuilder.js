@@ -615,7 +615,7 @@ class NodeBuilder {
 			node.name = `StructType${index}`;
 			this.structs[ shaderStage ].push( node );
 
-			nodeData.structType = nodeStruct;
+			nodeData.structType = node;
 
 		}
 

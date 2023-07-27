@@ -23,11 +23,12 @@ class Textures extends DataMap {
 
 		if ( renderTarget.isWebGLMultipleRenderTargets ) {
 
-			texture = renderTarget.texture[ 0 ];
 			textures = renderTarget.texture;
+			texture = renderTarget.texture[ 0 ];
 
 		} else {
 
+			textures = [ renderTarget.texture ];
 			texture = renderTarget.texture;
 
 		}
@@ -59,7 +60,7 @@ class Textures extends DataMap {
 
 		renderTargetData.width = size.width;
 		renderTargetData.height = size.height;
-		renderTargetData.texture = renderTarget.texture;
+		renderTargetData.textures = textures;
 		renderTargetData.depthTexture = depthTexture;
 
 		if ( renderTargetData.sampleCount !== sampleCount ) {
@@ -73,20 +74,10 @@ class Textures extends DataMap {
 
 		const options = { sampleCount };
 
-		if ( renderTarget.isWebGLMultipleRenderTargets ) {
 
-			for ( let i = 0; i < textures.length; i ++ ) {
+		for ( let i = 0; i < textures.length; i ++ ) {
 
-				const texture = textures[ i ];
-
-				if ( textureNeedsUpdate ) texture.needsUpdate = true;
-
-				this.updateTexture( texture, options );
-
-			}
-
-
-		} else {
+			const texture = textures[ i ];
 
 			if ( textureNeedsUpdate ) texture.needsUpdate = true;
 
