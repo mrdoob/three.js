@@ -83,7 +83,6 @@ class WebGLRenderer {
 			preserveDrawingBuffer = false,
 			powerPreference = 'default',
 			failIfMajorPerformanceCaveat = false,
-			distanceCullingFactor = undefined,
 		} = parameters;
 
 		this.isWebGLRenderer = true;
@@ -150,6 +149,13 @@ class WebGLRenderer {
 		// physically based shading
 
 		this.outputColorSpace = SRGBColorSpace;
+
+		// distance culling
+
+		// distance culling is used in order to improve performance.
+		// 0 means distance culling is disabled.
+		// 100 means a 1x1 squre mesh is visible within 100.
+		this.distanceCullingFactor = 0;
 
 		// physical lights
 
@@ -1242,12 +1248,12 @@ class WebGLRenderer {
 						// Caller can calculate a surfaceArea for each mesh, and assign it to userData.
 						// So, here we'll calculate a maxDrawDistance for this object. And if the distance
 						// between object center and camera exceeds this value, we won't draw it.
-						if (object.isMesh && object?.userData?.surfaceArea && distanceCullingFactor) {
+						if (_this.distanceCullingFactor && object.isMesh && object?.userData?.surfaceArea) {
 
 							const surfaceArea = object.userData.surfaceArea;
 							const scale = _vector3.setFromMatrixScale(object.matrixWorld);
 							let maxDrawDistance = surfaceArea * ((Math.pow(scale.x, 2) + Math.pow(scale.y, 2) + Math.pow(scale.z, 2)) / 3);
-							maxDrawDistance = Math.sqrt(maxDrawDistance) * distanceCullingFactor;
+							maxDrawDistance = Math.sqrt(maxDrawDistance) * _this.distanceCullingFactor;
 							if ( object.boundingSphere !== undefined ) {
 
 								if ( object.boundingSphere === null ) object.computeBoundingSphere();
