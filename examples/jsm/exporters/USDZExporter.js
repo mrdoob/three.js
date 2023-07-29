@@ -10,8 +10,8 @@ class USDZExporter {
 
 		options = Object.assign( {
 			ar: {
-				anchoring: { type: 'plane' },
-				planeAnchoring: { alignment: 'horizontal' }
+				anchoring: { type: 'face' },
+				planeAnchoring: { alignment: 'any' }
 			}
 		}, options );
 
@@ -263,13 +263,18 @@ function buildMatrix( matrix ) {
 
 	const array = matrix.elements;
 
-	return `( ${ buildMatrixRow( array, 0 ) }, ${ buildMatrixRow( array, 4 ) }, ${ buildMatrixRow( array, 8 ) }, ${ buildMatrixRow( array, 12 ) } )`;
+	return `( ${ buildMatrixRow( array, 0 ) }, ${ buildMatrixRow( array, 4 ) }, ${ buildMatrixRow( array, 8 ) }, ${ buildMatrixRow2( array, 12 ) } )`;
 
 }
 
 function buildMatrixRow( array, offset ) {
 
 	return `(${ array[ offset + 0 ] }, ${ array[ offset + 1 ] }, ${ array[ offset + 2 ] }, ${ array[ offset + 3 ] })`;
+}
+
+function buildMatrixRow2( array, offset ) {
+
+	return `(${ array[ offset + 0 ]}, ${ array[ offset + 1 ] + 0.023 }, ${ array[ offset + 2 ] - 0.01 }, ${ array[ offset + 3 ] })`;
 
 }
 
@@ -628,13 +633,13 @@ function buildCamera( camera ) {
 		{
 			matrix4d xformOp:transform = ${ transform }
 			uniform token[] xformOpOrder = ["xformOp:transform"]
-	
+
 			float2 clippingRange = (${ camera.near.toPrecision( PRECISION ) }, ${ camera.far.toPrecision( PRECISION ) })
 			float horizontalAperture = ${ ( ( Math.abs( camera.left ) + Math.abs( camera.right ) ) * 10 ).toPrecision( PRECISION ) }
 			float verticalAperture = ${ ( ( Math.abs( camera.top ) + Math.abs( camera.bottom ) ) * 10 ).toPrecision( PRECISION ) }
 			token projection = "orthographic"
 		}
-	
+
 	`;
 
 	} else {
@@ -643,7 +648,7 @@ function buildCamera( camera ) {
 		{
 			matrix4d xformOp:transform = ${ transform }
 			uniform token[] xformOpOrder = ["xformOp:transform"]
-	
+
 			float2 clippingRange = (${ camera.near.toPrecision( PRECISION ) }, ${ camera.far.toPrecision( PRECISION ) })
 			float focalLength = ${ camera.getFocalLength().toPrecision( PRECISION ) }
 			float focusDistance = ${ camera.focus.toPrecision( PRECISION ) }
@@ -651,7 +656,7 @@ function buildCamera( camera ) {
 			token projection = "perspective"
 			float verticalAperture = ${ camera.getFilmHeight().toPrecision( PRECISION ) }
 		}
-	
+
 	`;
 
 	}
