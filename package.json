@@ -98,7 +98,7 @@
     "jimp": "^0.22.7",
     "magic-string": "^0.30.0",
     "pixelmatch": "^5.3.0",
-    "puppeteer-core": "^19.8.1",
+    "puppeteer-core": "^20.0.0",
     "qunit": "^2.19.4",
     "rollup": "^3.20.2",
     "rollup-plugin-filesize": "^10.0.0",
