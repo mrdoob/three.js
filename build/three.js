@@ -10,7 +10,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '155';
+	const REVISION = '156dev';
 
 	const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -14698,24 +14698,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			const xr = renderer.xr;
-			const environmentBlendMode = xr.getEnvironmentBlendMode();
+			const environmentBlendMode = renderer.xr.getEnvironmentBlendMode();
 
-			switch ( environmentBlendMode ) {
+			if ( environmentBlendMode === 'additive' ) {
 
-				case 'opaque':
-					forceClear = true;
-					break;
+				state.buffers.color.setClear( 0, 0, 0, 1, premultipliedAlpha );
 
-				case 'additive':
-					state.buffers.color.setClear( 0, 0, 0, 1, premultipliedAlpha );
-					forceClear = true;
-					break;
+			} else if ( environmentBlendMode === 'alpha-blend' ) {
 
-				case 'alpha-blend':
-					state.buffers.color.setClear( 0, 0, 0, 0, premultipliedAlpha );
-					forceClear = true;
-					break;
+				state.buffers.color.setClear( 0, 0, 0, 0, premultipliedAlpha );
 
 			}
 
@@ -42536,8 +42527,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 					}
 
 				}
-
-				if ( ! texData ) return onError(); // TODO: Remove this when all loaders properly throw errors
 
 				if ( texData.image !== undefined ) {
 
