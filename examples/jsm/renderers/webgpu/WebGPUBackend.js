@@ -317,6 +317,7 @@ class WebGPUBackend extends Backend {
 		stencil = stencil && renderContext.stencil;
 
 		const colorAttachment = descriptor.colorAttachments[ 0 ];
+		const depthStencilAttachment = descriptor.depthStencilAttachment;
 
 		const antialias = this.parameters.antialias;
 
@@ -340,19 +341,31 @@ class WebGPUBackend extends Backend {
 			colorAttachment.loadOp = GPULoadOp.Clear;
 			colorAttachment.clearValue = renderContext.clearColorValue;
 
+		} else {
+
+			colorAttachment.loadOp = GPULoadOp.Load;
+
 		}
 
 		if ( depth ) {
 
-			descriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
-			descriptor.depthStencilAttachment.depthClearValue = renderContext.clearDepthValue;
+			depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
+			depthStencilAttachment.depthClearValue = renderContext.clearDepthValue;
+
+		} else {
+
+			depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
 
 		}
 
 		if ( stencil ) {
 
-			descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
-			descriptor.depthStencilAttachment.stencilClearValue = renderContext.clearStencilValue;
+			depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
+			depthStencilAttachment.stencilClearValue = renderContext.clearStencilValue;
+
+		} else {
+
+			depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
 		}
 
