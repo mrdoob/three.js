@@ -176,7 +176,7 @@ class OrbitControls extends EventDispatcher {
 
 			const twoPI = 2 * Math.PI;
 
-			return function update(deltaSeconds = undefined) {
+			return function update( deltaTime = null ) {
 
 				const position = scope.object.position;
 
@@ -190,7 +190,7 @@ class OrbitControls extends EventDispatcher {
 
 				if ( scope.autoRotate && state === STATE.NONE ) {
 
-					rotateLeft( getAutoRotationAngle(deltaSeconds) );
+					rotateLeft( getAutoRotationAngle( deltaTime ) );
 
 				}
 
@@ -469,12 +469,18 @@ class OrbitControls extends EventDispatcher {
 		const pointers = [];
 		const pointerPositions = {};
 
-		function getAutoRotationAngle(deltaSeconds = undefined) {
+		function getAutoRotationAngle( deltaTime ) {
 
-			if (deltaSeconds)
-				return (2 * Math.PI / 60 * scope.autoRotateSpeed) * deltaSeconds;
-			else
+			if ( deltaSeconds !== null ) {
+
+				return ( 2 * Math.PI / 60 * scope.autoRotateSpeed ) * deltaTime;
+
+			} else {
+
 				return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
+
+			}
+
 		}
 
 		function getZoomScale() {
