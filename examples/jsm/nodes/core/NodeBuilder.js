@@ -576,7 +576,6 @@ class NodeBuilder {
 	}
 
 	getNodeProperties( node, shaderStage = 'any' ) {
-ode, shaderStage = 'any' ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
