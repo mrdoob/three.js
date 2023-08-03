@@ -471,7 +471,7 @@ class OrbitControls extends EventDispatcher {
 
 		function getAutoRotationAngle( deltaTime ) {
 
-			if ( deltaSeconds !== null ) {
+			if ( deltaTime !== null ) {
 
 				return ( 2 * Math.PI / 60 * scope.autoRotateSpeed ) * deltaTime;
 
