@@ -1,6 +1,6 @@
 import DataMap from '../DataMap.js';
 import { NoToneMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
-import { NodeFrame, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, positionWorld, modelWorldMatrix, transformDirection, equirectUV, viewportBottomLeft } from '../../../nodes/Nodes.js';
+import { NodeFrame, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, equirectUV, viewportBottomLeft, normalWorld } from '../../../nodes/Nodes.js';
 
 class Nodes extends DataMap {
 
@@ -160,7 +160,7 @@ class Nodes extends DataMap {
 
 				if ( background.isCubeTexture === true ) {
 
-					backgroundNode = cubeTexture( background, transformDirection( positionWorld, modelWorldMatrix ) );
+					backgroundNode = cubeTexture( background, normalWorld );
 
 				} else if ( background.isTexture === true ) {
 

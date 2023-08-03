@@ -30,7 +30,6 @@
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import RenderTarget from 'three/addons/renderers/common/RenderTarget.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -94,7 +93,7 @@
 				const depthTexture = new THREE.DepthTexture();
 				depthTexture.type = THREE.FloatType;
 
-				renderTarget = new RenderTarget( window.innerWidth * dpr, window.innerHeight * dpr );
+				renderTarget = new THREE.RenderTarget( window.innerWidth * dpr, window.innerHeight * dpr );
 				renderTarget.depthTexture = depthTexture;
 
 				window.addEventListener( 'resize', onWindowResize );

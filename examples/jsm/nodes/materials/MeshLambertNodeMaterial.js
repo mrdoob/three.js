@@ -1,5 +1,5 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import lambertLightingModel from '../functions/LambertLightingModel.js';
+import PhongLightingModel from '../functions/PhongLightingModel.js';
 
 import { MeshLambertMaterial } from 'three';
 
@@ -23,7 +23,7 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 
 	constructLightingModel( /*builder*/ ) {
 
-		return lambertLightingModel;
+		return new PhongLightingModel( false ); // ( specular ) -> force lambert
 
 	}
 

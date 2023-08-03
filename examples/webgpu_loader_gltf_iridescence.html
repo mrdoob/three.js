@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - GLTFloader + Iridescence + Nodes</title>
+		<title>three.js webgpu - GLTFloader + Iridescence</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_iridescence" target="_blank" rel="noopener">KHR_materials_iridescence</a> + Nodes<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_iridescence" target="_blank" rel="noopener">KHR_materials_iridescence</a><br />
 			Iridescence Lamp from <a href="https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/IridescenceLamp" target="_blank" rel="noopener">glTF-Sample-Models</a><br />
 			<a href="https://hdrihaven.com/hdri/?h=venice_sunset" target="_blank" rel="noopener">Venice Sunset</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
@@ -22,8 +22,7 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -31,9 +30,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { NodeMaterial, uv, vec2, checker, float, timerLocal } from 'three/nodes';
 
-			import { nodeFrame } from 'three/addons/renderers/webgl/nodes/WebGLNodes.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -49,19 +48,29 @@
 
 			async function init() {
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				renderer = new WebGPURenderer( { antialias: true } );
+				renderer.setAnimationLoop( render );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.setAnimationLoop( render );
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.05, 20 );
 				camera.position.set( 0.35, 0.05, 0.35 );
 
 				controls = new OrbitControls( camera, renderer.domElement );
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = - 0.5;
 				controls.target.set( 0, 0.2, 0 );
 				controls.update();
 
@@ -75,27 +84,6 @@
 					gltfLoader.loadAsync( 'IridescenceLamp.glb' ),
 				] );
 
-				// nodes
-
-				gltf.scene.traverse( mesh => {
-
-					const material = mesh.material;
-
-					if ( material && material.iridescence > 0 ) {
-
-						const iridescenceFactorNode = checker( uv().add( vec2( timerLocal( - .05 ), 0 ) ).mul( 20 ) );
-
-						const nodeMaterial = NodeMaterial.fromMaterial( material ); // @TODO: NodeMaterial.fromMaterial can be removed if WebGLNodes will apply it by default (as in WebGPURenderer)
-						nodeMaterial.iridescenceNode = iridescenceFactorNode;
-						nodeMaterial.iridescenceIORNode = float( 1.3 );
-						nodeMaterial.iridescenceThicknessNode = float( 400 );
-
-						mesh.material = nodeMaterial;
-
-					}
-
-				} );
-
 				// environment
 
 				texture.mapping = THREE.EquirectangularReflectionMapping;
@@ -106,6 +94,8 @@
 				// model
 
 				scene.add( gltf.scene );
+
+				render();
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -119,12 +109,13 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				render();
+
 			}
 
 			function render() {
 
-				nodeFrame.update();
-
+				controls.update();
 				renderer.render( scene, camera );
 
 			}

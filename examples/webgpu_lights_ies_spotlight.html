@@ -134,7 +134,6 @@
 				camera.position.set( 16, 4, 1 );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render );
 				controls.minDistance = 2;
 				controls.maxDistance = 50;
 				controls.enablePan = false;
