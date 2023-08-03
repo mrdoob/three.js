@@ -8,8 +8,7 @@ import {
 	Vector3,
 	Plane,
 	Ray,
-	MathUtils,
-	Clock,
+	MathUtils
 } from 'three';
 
 // OrbitControls performs orbiting, dollying (zooming), and panning.
@@ -24,7 +23,6 @@ const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
 const _ray = new Ray();
 const _plane = new Plane();
-const _clock = new Clock();
 const TILT_LIMIT = Math.cos( 70 * MathUtils.DEG2RAD );
 
 class OrbitControls extends EventDispatcher {
@@ -178,7 +176,7 @@ class OrbitControls extends EventDispatcher {
 
 			const twoPI = 2 * Math.PI;
 
-			return function update() {
+			return function update(deltaSeconds = undefined) {
 
 				const position = scope.object.position;
 
@@ -192,7 +190,7 @@ class OrbitControls extends EventDispatcher {
 
 				if ( scope.autoRotate && state === STATE.NONE ) {
 
-					rotateLeft( getAutoRotationAngle() );
+					rotateLeft( getAutoRotationAngle(deltaSeconds) );
 
 				}
 
@@ -471,8 +469,12 @@ class OrbitControls extends EventDispatcher {
 		const pointers = [];
 		const pointerPositions = {};
 
-		function getAutoRotationAngle() {
-			return (2 * Math.PI / 60 * scope.autoRotateSpeed) * _clock.getDelta();
+		function getAutoRotationAngle(deltaSeconds = undefined) {
+
+			if (deltaSeconds)
+				return (2 * Math.PI / 60 * scope.autoRotateSpeed) * deltaSeconds;
+			else
+				return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
 		}
 
 		function getZoomScale() {
@@ -1024,10 +1026,6 @@ class OrbitControls extends EventDispatcher {
 
 			state = STATE.NONE;
 
-			// It is possible user held down pointer for a long time, meaning the clock delta can be massive, 
-			// call getDelta() to reset the delta so that getAutoRotationAngle() gets a normal value.
-			_clock.getDelta();
-
 		}
 
 		function onMouseDown( event ) {
@@ -1178,16 +1176,6 @@ class OrbitControls extends EventDispatcher {
 			if ( scope.enabled === false || scope.enablePan === false ) return;
 
 			handleKeyDown( event );
-
-		}
-
-		function onVisibilityChanged( event ) {
-
-			// If tab has just become un-hidden the clock delta can be very large, call getDelta() to 
-			// reset the delta so that getAutoRotationAngle() gets a normal value.
-			if (!event.target.hidden) {
-				_clock.getDelta();
-			}
 
 		}
 
@@ -1384,13 +1372,12 @@ class OrbitControls extends EventDispatcher {
 		}
 
 		//
+
 		scope.domElement.addEventListener( 'contextmenu', onContextMenu );
 
 		scope.domElement.addEventListener( 'pointerdown', onPointerDown );
 		scope.domElement.addEventListener( 'pointercancel', onPointerUp );
 		scope.domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
-
-		scope.domElement.ownerDocument.addEventListener( 'visibilitychange', onVisibilityChanged );
 
 		// force an update at start
 

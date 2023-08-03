@@ -40,6 +40,7 @@
 
 			let renderer, scene, camera;
 			let controls;
+			let clock;
 
 			init();
 			animate();
@@ -60,6 +61,8 @@
 				controls.autoRotate = true;
 				controls.autoRotateSpeed = - 1.0;
 				controls.enableDamping = true;
+
+				clock = new THREE.Clock();
 
 				// Material
 
@@ -234,8 +237,9 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				controls.update();
+			
+				let delta = clock.getDelta();
+				controls.update(delta);
 
 				renderer.render( scene, camera );
 
