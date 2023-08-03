@@ -571,7 +571,7 @@ class NodeBuilder {
 
 		if ( nodeData[ shaderStage ] === undefined ) nodeData[ shaderStage ] = {};
 
-		return shaderStage !== null ? nodeData[ shaderStage ] : nodeData;
+		return nodeData[ shaderStage ];
 
 	}
 
@@ -652,7 +652,7 @@ class NodeBuilder {
 
 	getVaryingFromNode( node, type ) {
 
-		const nodeData = this.getDataFromNode( node, null );
+		const nodeData = this.getDataFromNode( node, 'any' );
 
 		let nodeVarying = nodeData.varying;
 
