@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - scale and fov-invariant sprites</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - scale and fov-invariant sprites
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			let camera, scene, renderer;
+			
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			let group;
+
+			init();
+			animate();
+
+			function init() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera = new THREE.PerspectiveCamera( 60, width / height, 1, 2100 );
+				camera.position.z = 15;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x000000, 1500, 2100 );
+
+				// create sprites
+
+				const textureLoader = new THREE.TextureLoader();
+
+				const mapA = textureLoader.load( 'textures/sprite1.png' );
+				mapA.colorSpace = THREE.SRGBColorSpace;
+
+				group = new THREE.Group();
+
+				const materialA = new THREE.SpriteMaterial( { map: mapA, color: 0xffffff, sizeAttenuation: false } );
+				const materialB = new THREE.SpriteMaterial( { map: mapA, color: 0xffffff } );
+
+				const spriteA = new THREE.Sprite( materialA );
+				spriteA.position.set( 1, 0, 0 );
+				// Scale the Sprite A down a bit so that when the example is first launched, it looks
+				// as large as Sprite B.
+				spriteA.scale.setScalar( 0.12 );
+				group.add( spriteA );
+				const spriteB = new THREE.Sprite( materialB );
+				spriteB.position.set( - 1, 0, 0 );
+				group.add( spriteB );
+
+				scene.add( group );
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				document.body.appendChild( renderer.domElement );
+
+				const gui = new GUI();
+
+				const params = {
+					texture: true,
+					fov: camera.fov,
+					camera_z: camera.position.z
+				};
+				spriteA.fov = camera.fov;
+
+				gui.add( params, 'fov', 0.02, 85 ).onChange( ( value ) => {
+
+					camera.fov = value;
+					camera.updateProjectionMatrix();
+
+				} );
+
+				gui.add( params, 'camera_z', 1, 80 ).onChange( ( value ) => {
+
+					camera.position.z = value;
+
+				} );
+
+				gui.open();
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
+
+				renderer.clear();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
