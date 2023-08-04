@@ -547,7 +547,7 @@ class GLTFLightsExtension {
 
 		const color = new Color( 0xffffff );
 
-		if ( lightDef.color !== undefined ) color.setRGB( ...lightDef.color, LinearSRGBColorSpace )
+		if ( lightDef.color !== undefined ) color.setRGB( ...lightDef.color, LinearSRGBColorSpace );
 
 		const range = lightDef.range !== undefined ? lightDef.range : 0;
 
