@@ -2,7 +2,8 @@ import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import { attribute } from '../core/AttributeNode.js';
 import { varying } from '../core/VaryingNode.js';
 import { materialLineDashSize, materialLineGapSize, materialLineScale } from '../accessors/LineMaterialNode.js';
-import { dashScale, dashSize, gapSize } from '../core/PropertyNode.js';
+import { dashSize, gapSize } from '../core/PropertyNode.js';
+import { float } from '../shadernode/ShaderNode.js';
 import { LineDashedMaterial } from 'three';
 
 const defaultValues = new LineDashedMaterial();
@@ -34,11 +35,10 @@ class LineDashedNodeMaterial extends NodeMaterial {
 		const dashSizeNode = this.dashSizeNode ? float( this.dashSizeNode ) : materialLineDashSize;
 		const gapSizeNode = this.dashSizeNode ? float( this.dashGapNode ) : materialLineGapSize;
 
-		stack.assign( dashScale, dashScaleNode );
 		stack.assign( dashSize, dashSizeNode );
 		stack.assign( gapSize, gapSizeNode );
 
-		const vLineDistance = varying( attribute( 'lineDistance' ).mul( dashScale ) );
+		const vLineDistance = varying( attribute( 'lineDistance' ).mul( dashScaleNode ) );
 
 		stack.add( vLineDistance.mod( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard() );
 
