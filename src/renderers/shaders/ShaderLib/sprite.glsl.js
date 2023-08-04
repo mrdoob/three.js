@@ -22,9 +22,9 @@ void main() {
 
 		bool isPerspective = isPerspectiveMatrix( projectionMatrix );
 
-		// Also dividing by the tangent of the half angle allows the sprite to stay the
-		// same size irrespectively from the FOV too, rather than only irrespective
-		// to the distance to camera.
+		// Also, multiplying by the tangent of the half angle allows the sprite to maintain its
+		// size irrespective of the field of view (FOV), not just irrespective of the distance
+		// to the camera.
 		if ( isPerspective ) scale *= - ( mvPosition.z / projectionMatrix[ 1 ][ 1 ] );
 
 	#endif
