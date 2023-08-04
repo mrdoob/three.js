@@ -79,7 +79,11 @@ class Sprite extends Object3D {
 
 		if ( raycaster.camera.isPerspectiveCamera && this.material.sizeAttenuation === false ) {
 
-			_worldScale.multiplyScalar( - _mvPosition.z );
+			// Multiplying by the tangent of the half angle allows the sprite to maintain its
+			// size irrespective of the field of view (FOV), not just irrespective of the distance
+			// to the camera. The element at [1][1] of the projectionMatrix is the tangent of
+			// half the FOV.
+			_worldScale.multiplyScalar( - _mvPosition.z / raycaster.camera.projectionMatrix.elements[ 5 ] );
 
 		}
 
