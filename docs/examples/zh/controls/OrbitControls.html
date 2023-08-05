@@ -93,6 +93,7 @@
 		<p>
 			将其设为true，以自动围绕目标旋转。<br>
 			请注意，如果它被启用，你必须在你的动画循环里调用[page:.update]()。
+			If you want the animation to be frame rate independent, apply a time delta value to [page:.update]().
 		</p>
 
 		<h3>[property:Float autoRotateSpeed]</h3>
@@ -319,10 +320,11 @@ controls.touches = {
 			Removes the key event listener previously defined with [page:.listenToKeyEvents]().
 		</p>
 
-		<h3>[method:Boolean update] ()</h3>
+		<h3>[method:Boolean update] ( [param:Number deltaTime] )</h3>
 		<p>
 			更新控制器。必须在摄像机的变换发生任何手动改变后调用，
 			或如果[page:.autoRotate]或[page:.enableDamping]被设置时，在update循环里调用。
+			`deltaTime` is optional and only required if you want [page:.autoRotate] to be frame rate independent.
 		</p>
 
 		<h2>源代码</h2>

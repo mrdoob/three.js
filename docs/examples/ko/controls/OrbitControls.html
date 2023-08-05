@@ -91,7 +91,7 @@
 		<h3>[property:Boolean autoRotate]</h3>
 		<p>
 			대상 주위를 자동으로 회전하려면 true로 설정합니다.<br> autoRotate를 활성할 경우, 애니메이션 루프에서 [page:.update()]를 호출해야 합니다.
-
+			If you want the animation to be frame rate independent, apply a time delta value to [page:.update]().
 		</p>
 
 		<h3>[property:Float autoRotateSpeed]</h3>
@@ -317,9 +317,10 @@ controls.touches = {
 			Removes the key event listener previously defined with [page:.listenToKeyEvents]().
 		</p>
 
-		<h3>[method:Boolean update] ()</h3>
+		<h3>[method:Boolean update] (  [param:Number deltaTime]  )</h3>
 		<p>
 			컨트롤을 업데이트합니다. 카메라를 수동으로 변환하거나, [page:.autoRotate] 또는 [page:.enableDamping]을 설정할 경우 업데이트 루프에서 호출해야 합니다.
+			`deltaTime` is optional and only required if you want [page:.autoRotate] to be frame rate independent.
 		</p>
 
 		<h2>Source</h2>
