@@ -6,9 +6,7 @@ class LineMaterialNode extends MaterialNode {
 
 	constructor( scope ) {
 
-		super();
-
-		this.scope = scope;
+		super( scope );
 
 	}
 
