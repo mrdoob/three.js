@@ -5,7 +5,7 @@ import { nodeImmutable, vec2 } from '../shadernode/ShaderNode.js';
 
 import { Vector2, Vector4 } from 'three';
 
-let resolution, viewport;
+let resolution, viewportResult;
 
 class ViewportNode extends Node {
 
@@ -45,7 +45,7 @@ class ViewportNode extends Node {
 
 		if ( this.scope === ViewportNode.VIEWPORT ) {
 
-			renderer.getViewport( viewport );
+			renderer.getViewport( viewportResult );
 
 		} else {
 
@@ -69,7 +69,7 @@ class ViewportNode extends Node {
 
 		} else if ( scope === ViewportNode.VIEWPORT ) {
 
-			output = uniform( viewport || ( viewport = new Vector4() ) );
+			output = uniform( viewportResult || ( viewportResult = new Vector4() ) );
 
 		} else {
 
@@ -120,7 +120,7 @@ export default ViewportNode;
 
 export const viewportCoordinate = nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
 export const viewportResolution = nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
-export const viewportViewport = nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
+export const viewport = nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
 export const viewportTopLeft = nodeImmutable( ViewportNode, ViewportNode.TOP_LEFT );
 export const viewportBottomLeft = nodeImmutable( ViewportNode, ViewportNode.BOTTOM_LEFT );
 export const viewportTopRight = nodeImmutable( ViewportNode, ViewportNode.TOP_RIGHT );
