@@ -21,6 +21,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 
 		this.setDefaultValues( defaultValues );
 
+		this.offsetNode = null;
 		this.dashScaleNode = null;
 		this.dashSizeNode = null;
 		this.gapSizeNode = null;
@@ -31,6 +32,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 
 	constructVariants( { stack } ) {
 
+		const offsetNode = this.offsetNode;
 		const dashScaleNode = this.dashScaleNode ? float( this.dashScaleNode ) : materialLineScale;
 		const dashSizeNode = this.dashSizeNode ? float( this.dashSizeNode ) : materialLineDashSize;
 		const gapSizeNode = this.dashSizeNode ? float( this.dashGapNode ) : materialLineGapSize;
@@ -39,8 +41,9 @@ class LineDashedNodeMaterial extends NodeMaterial {
 		stack.assign( gapSize, gapSizeNode );
 
 		const vLineDistance = varying( attribute( 'lineDistance' ).mul( dashScaleNode ) );
+		const vLineDistanceOffset = offsetNode ? vLineDistance.add( offsetNode ) : vLineDistance;
 
-		stack.add( vLineDistance.mod( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard() );
+		stack.add( vLineDistanceOffset.mod( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard() );
 
 	}
 
