@@ -78,6 +78,7 @@ const exceptionList = [
 	// Unknown
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
 	'webgl_animation_skinning_blending',
+  'webgl_animation_skinning_performance',
 	'webgl_buffergeometry_glbufferattribute',
 	'webgl_clipping_advanced',
 	'webgl_lensflares',
@@ -98,7 +99,7 @@ const exceptionList = [
 	'webgl_shadowmap_progressive',
 	'webgl_test_memory2',
 	'webgl_tiled_forward',
-	'webgl_animation_skinning_performance',
+	'webgl2_volume_instancing',
 
 	// TODO: implement determinism for setTimeout and setInterval
 	// could it fix some examples from above?

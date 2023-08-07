@@ -82,7 +82,7 @@
 				gui.add( effectController, 'maxConnections', 0, 30, 1 );
 				gui.add( effectController, 'particleCount', 0, maxParticleCount, 1 ).onChange( function ( value ) {
 
-					particleCount = parseInt( value );
+					particleCount = value;
 					particles.setDrawRange( 0, particleCount );
 
 				} );

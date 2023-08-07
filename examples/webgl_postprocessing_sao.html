@@ -132,7 +132,7 @@
 					'Normal': SAOPass.OUTPUT.Normal
 				} ).onChange( function ( value ) {
 
-					saoPass.params.output = parseInt( value );
+					saoPass.params.output = value;
 
 				} );
 				gui.add( saoPass.params, 'saoBias', - 1, 1 );
