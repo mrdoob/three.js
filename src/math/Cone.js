@@ -1,4 +1,5 @@
 import { Vector3 } from "./Vector3";
+import { Box3 } from "./Box3";
 
 /**
  *  @param {Vector3} v The cone origin
@@ -9,10 +10,15 @@ import { Vector3 } from "./Vector3";
  */
 export function Cone( v, axis, theta, inf, sup ) {
 
+    /** @type {Vector3} */
     this.v = v || new Vector3();
-    this.axis = axis || new Vector3( 1, 0, 0 );
+    /** @type {Vector3} */
+    this.axis = axis || new Vector3(1, 0, 0);
+    /** @type {number} */
     this.theta = theta || 0;
+    /** @type {number} */
     this.inf = inf || 0;
+    /** @type {number} */
     this.sup = sup || + Infinity;
 
     this.cosTheta = Math.cos( theta );
@@ -21,6 +27,15 @@ export function Cone( v, axis, theta, inf, sup ) {
 
 Object.assign( Cone.prototype, {
 
+    /**
+     * @this Cone
+     * @param {Vector3} v
+     * @param {Vector3} axis
+     * @param {number} theta
+     * @param {number?} inf
+     * @param {number?} sup
+     * @returns
+     */
     set: function ( v, axis, theta, inf, sup ) {
 
         this.v.copy( v );
@@ -35,12 +50,21 @@ Object.assign( Cone.prototype, {
 
     },
 
+    /**
+     * @this Cone
+     * @returns {Cone}
+     */
     clone: function () {
 
         return new this.constructor().copy( this );
 
     },
 
+    /**
+     * @this Cone
+     * @param {Cone} cone
+     * @returns
+     */
     copy: function ( cone ) {
 
         this.v.copy( cone.v );
@@ -55,12 +79,21 @@ Object.assign( Cone.prototype, {
 
     },
 
+    /**
+     * @this Cone
+     * @returns {boolean}
+     */
     empty: function () {
 
         return ( this.theta <= 0 || this.inf >= this.sup );
 
     },
 
+    /**
+     * @this Cone
+     * @param {Vector3} point
+     * @returns {boolean}
+     */
     containsPoint: function () {
         let tmp = new Vector3();
         return function (point) {
@@ -78,6 +111,11 @@ Object.assign( Cone.prototype, {
         };
     }(),
 
+    /**
+     * @this Cone
+     * @param {Box3} target
+     * @returns {Box3}
+     */
     getBoundingBox: function ( target ) {
 
         throw "not implemented yet, todo";
@@ -86,6 +124,11 @@ Object.assign( Cone.prototype, {
 
     },
 
+    /**
+     * @this Cone
+     * @param {Cone} cone
+     * @returns
+     */
     equals: function ( cone ) {
 
         return cone.v.equals( this.v ) && cone.axis.equals( this.axis ) && cone.theta === this.theta && cone.inf === this.inf && cone.sup === this.sup;
