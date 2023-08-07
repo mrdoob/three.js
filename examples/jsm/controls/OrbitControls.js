@@ -614,17 +614,17 @@ class OrbitControls extends EventDispatcher {
 
 		function updateMouseParameters( event ) {
 
-			if (!scope.zoomToCursor) {
+			if ( !scope.zoomToCursor ) {
 
 				return;
 
 			}
 
-			if (!scope.object.isPerspectiveCamera && !scope.object.isOrthographicCamera) {
+			if ( !scope.object.isPerspectiveCamera && !scope.object.isOrthographicCamera ) {
 
-				console.warn('WARNING: OrbitControls.js encountered an unknown camera type - zoomToCursor disabled.');
+				console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - zoomToCursor disabled.' );
 				scope.zoomToCursor = false;
-				dollyDirection.copy(scope.target).sub(scope.object.position).normalize();
+				dollyDirection.copy( scope.target ).sub( scope.object.position ).normalize();
 				return;
 				
 			}
@@ -637,10 +637,10 @@ class OrbitControls extends EventDispatcher {
 			const w = rect.width;
 			const h = rect.height;
 
-			mouse.x = (x / w) * 2 - 1;
-			mouse.y = - (y / h) * 2 + 1;
+			mouse.x = ( x / w ) * 2 - 1;
+			mouse.y = - ( y / h ) * 2 + 1;
 
-			dollyDirection.set(mouse.x, mouse.y, 1).unproject(scope.object).sub(scope.object.position).normalize();
+			dollyDirection.set( mouse.x, mouse.y, 1 ).unproject( scope.object ).sub( scope.object.position ).normalize();
 
 		}
 
