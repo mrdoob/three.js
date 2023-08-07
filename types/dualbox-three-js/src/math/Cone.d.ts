@@ -4,9 +4,9 @@ import { Plane } from './Plane';
 import { Matrix4 } from './Matrix4';
 
 export class Cone {
-    constructor(v: Vector3?, axis: Vector3?, theta: number?, inf: number?, sup: number?);
+    constructor(v?: Vector3, axis?: Vector3, theta?: number, inf?: number, sup?: number);
 
-    set(v: Vector3, axis: Vector3, theta: number, inf: number?, sup: number?): Cone;
+    set(v: Vector3, axis: Vector3, theta: number, inf?: number, sup?: number): Cone;
     clone(): Cone;
     copy(cone: Cone): Cone;
     empty(): boolean;
