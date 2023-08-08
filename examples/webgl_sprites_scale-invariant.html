@@ -58,18 +58,18 @@
 
 				group = new THREE.Group();
 
-				const materialA = new THREE.SpriteMaterial( { map: mapA, color: 0xffffff, sizeAttenuation: false } );
-				const materialB = new THREE.SpriteMaterial( { map: mapA, color: 0xffffff } );
+				const materialA = new THREE.SpriteMaterial( { map: mapA, color: 0xffffff, sizeAttenuation: false, fovAttenuation: false } );
+				const materialB = new THREE.SpriteMaterial( { map: mapA, color: 0xffffff, sizeAttenuation: false } );
 
 				const spriteA = new THREE.Sprite( materialA );
 				spriteA.position.set( 2, 0, 0 );
 				// Scale the Sprite A down a bit so that when the example is first launched, it looks
 				// as large as Sprite B.
-				spriteA.scale.setScalar( 0.24 );
+				spriteA.scale.setScalar( 0.2 );
 				group.add( spriteA );
 				const spriteB = new THREE.Sprite( materialB );
 				spriteB.position.set( - 2, 0, 0 );
-				spriteB.scale.setScalar( 2 );
+				spriteB.scale.setScalar( 0.12 );
 				group.add( spriteB );
 
 				scene.add( group );

@@ -249,6 +249,10 @@ class MaterialLoader extends Loader {
 		if ( json.size !== undefined ) material.size = json.size;
 		if ( json.sizeAttenuation !== undefined ) material.sizeAttenuation = json.sizeAttenuation;
 
+		// for SpriteMaterial
+
+		if ( json.fovAttenuation !== undefined ) material.fovAttenuation = json.fovAttenuation;
+
 		// maps
 
 		if ( json.map !== undefined ) material.map = getTexture( json.map );

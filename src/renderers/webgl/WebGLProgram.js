@@ -580,6 +580,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.shadowMapEnabled ? '#define ' + shadowMapTypeDefine : '',
 
 			parameters.sizeAttenuation ? '#define USE_SIZEATTENUATION' : '',
+			parameters.fovAttenuation ? '#define USE_FOVATTENUATION' : '',
 
 			parameters.useLegacyLights ? '#define LEGACY_LIGHTS' : '',
 

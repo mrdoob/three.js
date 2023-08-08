@@ -302,6 +302,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			flatShading: material.flatShading === true,
 
 			sizeAttenuation: material.sizeAttenuation === true,
+			fovAttenuation: material.fovAttenuation === true,
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
 
 			skinning: object.isSkinnedMesh === true,
@@ -436,6 +437,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.combine );
 		array.push( parameters.fogExp2 );
 		array.push( parameters.sizeAttenuation );
+		array.push( parameters.fovAttenuation );
 		array.push( parameters.morphTargetsCount );
 		array.push( parameters.morphAttributeCount );
 		array.push( parameters.numDirLights );

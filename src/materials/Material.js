@@ -317,6 +317,7 @@ class Material extends EventDispatcher {
 		if ( this.size !== undefined ) data.size = this.size;
 		if ( this.shadowSide !== null ) data.shadowSide = this.shadowSide;
 		if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
+		if ( this.fovAttenuation !== undefined ) data.fovAttenuation = this.fovAttenuation;
 
 		if ( this.blending !== NormalBlending ) data.blending = this.blending;
 		if ( this.side !== FrontSide ) data.side = this.side;

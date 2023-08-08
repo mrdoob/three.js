@@ -21,6 +21,8 @@ class SpriteMaterial extends Material {
 
 		this.sizeAttenuation = true;
 
+		this.fovAttenuation = true;
+
 		this.transparent = true;
 
 		this.fog = true;
@@ -42,6 +44,8 @@ class SpriteMaterial extends Material {
 		this.rotation = source.rotation;
 
 		this.sizeAttenuation = source.sizeAttenuation;
+
+		this.fovAttenuation	= source.fovAttenuation;
 
 		this.fog = source.fog;
 

@@ -18,14 +18,25 @@ void main() {
 	scale.x = length( vec3( modelMatrix[ 0 ].x, modelMatrix[ 0 ].y, modelMatrix[ 0 ].z ) );
 	scale.y = length( vec3( modelMatrix[ 1 ].x, modelMatrix[ 1 ].y, modelMatrix[ 1 ].z ) );
 
-	#ifndef USE_SIZEATTENUATION
+	#if !defined(USE_SIZEATTENUATION) || !defined(USE_FOVATTENUATION)
 
 		bool isPerspective = isPerspectiveMatrix( projectionMatrix );
 
-		// Also, multiplying by the tangent of the half angle allows the sprite to maintain its
+		#ifndef USE_SIZEATTENUATION
+		
+		if ( isPerspective ) scale *= - mvPosition.z;
+
+		#endif
+
+		#ifndef USE_FOVATTENUATION
+
+		// Multiplying by the tangent of the half angle allows the sprite to maintain its
 		// size irrespective of the field of view (FOV), not just irrespective of the distance
 		// to the camera.
-		if ( isPerspective ) scale *= - ( mvPosition.z / projectionMatrix[ 1 ][ 1 ] );
+		// The element at [1][1] of the projectionMatrix is the 1 over the tangent of half the FOV.
+		if ( isPerspective ) scale /= projectionMatrix[ 1 ][ 1 ];
+
+		#endif
 
 	#endif
 

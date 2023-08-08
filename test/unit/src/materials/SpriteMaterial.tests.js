@@ -68,6 +68,12 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
+		QUnit.todo( 'fovAttenuation', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		QUnit.todo( 'transparent', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
