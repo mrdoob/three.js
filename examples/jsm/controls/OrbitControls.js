@@ -614,19 +614,10 @@ class OrbitControls extends EventDispatcher {
 
 		function updateMouseParameters( event ) {
 
-			if ( !scope.zoomToCursor ) {
+			if ( ! scope.zoomToCursor ) {
 
 				return;
 
-			}
-
-			if ( !scope.object.isPerspectiveCamera && !scope.object.isOrthographicCamera ) {
-
-				console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - zoomToCursor disabled.' );
-				scope.zoomToCursor = false;
-				dollyDirection.copy( scope.target ).sub( scope.object.position ).normalize();
-				return;
-				
 			}
 
 			performCursorZoom = true;
