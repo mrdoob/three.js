@@ -1,5 +1,3 @@
-// @TODO: Is this needed? Can it be moved in MaterialNode?
-
 import MaterialNode from './MaterialNode.js';
 import { materialReference } from './MaterialReferenceNode.js';
 import { normalView } from './NormalNode.js';
@@ -42,7 +40,7 @@ class ExtendedMaterialNode extends MaterialNode {
 
 			if ( material.normalMap ) {
 
-				node = normalMap( this.getTexture( 'normalMap' ), materialReference( 'normalScale', 'vec2' ) );
+				node = normalMap( this.getTexture( builder, 'normalMap' ), materialReference( 'normalScale', 'vec2' ) );
 
 			} else if ( material.bumpMap ) {
 
@@ -56,7 +54,7 @@ class ExtendedMaterialNode extends MaterialNode {
 
 		} else if ( scope === ExtendedMaterialNode.CLEARCOAT_NORMAL ) {
 
-			node = material.clearcoatNormalMap ? normalMap( this.getTexture( 'clearcoatNormalMap' ), materialReference( 'clearcoatNormalScale', 'vec2' ) ) : normalView;
+			node = material.clearcoatNormalMap ? normalMap( this.getTexture( builder, 'clearcoatNormalMap' ), materialReference( 'clearcoatNormalScale', 'vec2' ) ) : normalView;
 
 		}
 

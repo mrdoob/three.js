@@ -23,10 +23,14 @@ export default class RenderObject {
 		this.pipeline = null;
 		this.vertexBuffers = null;
 
+		this._nodeBuilder = null;
+		this._bindings = null;
 		this._materialVersion = - 1;
 		this._materialCacheKey = '';
 
 		this.onDispose = null;
+
+		this.isRenderObject = true;
 
 		this.onMaterialDispose = () => {
 
@@ -40,13 +44,13 @@ export default class RenderObject {
 
 	getNodeBuilder() {
 
-		return this._nodes.getForRender( this );
+		return this._nodeBuilder || ( this._nodeBuilder = this._nodes.getForRender( this ) );
 
 	}
 
 	getBindings() {
 
-		return this.getNodeBuilder().getBindings();
+		return this._bindings || ( this._bindings = this.getNodeBuilder().createBindings() );
 
 	}
 

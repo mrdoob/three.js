@@ -109,10 +109,9 @@ class Bindings extends DataMap {
 
 		for ( const binding of bindings ) {
 
-			const isShared = binding.isShared;
 			const isUpdated = updateMap.get( binding ) === frame;
 
-			if ( isShared && isUpdated ) continue;
+			if ( isUpdated ) continue;
 
 			if ( binding.isUniformBuffer ) {
 

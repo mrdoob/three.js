@@ -10,9 +10,9 @@ class LineMaterialNode extends MaterialNode {
 
 	}
 
-	construct( /* builder */ ) {
+	construct( builder ) {
 
-		return this.getFloat( this.scope );
+		return this.getFloat( builder, this.scope );
 
 	}
 

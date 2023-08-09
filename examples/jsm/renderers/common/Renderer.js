@@ -258,7 +258,7 @@ class Renderer {
 		_frustum.setFromProjectionMatrix( _projScreenMatrix, coordinateSystem );
 
 		const renderList = this._renderLists.get( scene, camera );
-		renderList.init();
+		renderList.begin();
 
 		this._projectObject( scene, camera, 0, renderList );
 

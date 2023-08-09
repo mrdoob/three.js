@@ -104,6 +104,20 @@ class NodeBuilder {
 
 	}
 
+	createBindings() {
+
+		const bindingsArray = [];
+
+		for ( const binding of this.getBindings() ) {
+
+			bindingsArray.push( binding.clone() );
+
+		}
+
+		return bindingsArray;
+
+	}
+
 	getBindings() {
 
 		let bindingsArray = this.bindingsArray;
@@ -128,14 +142,26 @@ class NodeBuilder {
 
 	addNode( node ) {
 
-		if ( this.nodes.indexOf( node ) === - 1 ) {
+		if ( this.nodes.includes( node ) === false ) {
+
+			this.nodes.push( node );
+
+			this.setHashNode( node, node.getHash( this ) );
+
+		}
+
+	}
+
+	buildUpdateNodes() {
+
+		for ( const node of this.nodes ) {
 
 			const updateType = node.getUpdateType();
 			const updateBeforeType = node.getUpdateBeforeType();
 
 			if ( updateType !== NodeUpdateType.NONE ) {
 
-				this.updateNodes.push( node );
+				this.updateNodes.push( node.getSelf() );
 
 			}
 
@@ -144,10 +170,6 @@ class NodeBuilder {
 				this.updateBeforeNodes.push( node );
 
 			}
-
-			this.nodes.push( node );
-
-			this.setHashNode( node, node.getHash( this ) );
 
 		}
 
@@ -940,6 +962,7 @@ class NodeBuilder {
 		// stage 4: build code for a specific output
 
 		this.buildCode();
+		this.buildUpdateNodes();
 
 		return this;
 

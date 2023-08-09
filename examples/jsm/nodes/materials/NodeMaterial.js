@@ -16,6 +16,7 @@ import { lightsWithoutWrap } from '../lighting/LightsNode.js';
 import { mix, dFdx, dFdy } from '../math/MathNode.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import AONode from '../lighting/AONode.js';
+import { lightingContext } from '../lighting/LightingContextNode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
 
 const NodeMaterials = new Map();
@@ -290,7 +291,7 @@ class NodeMaterial extends ShaderMaterial {
 
 			const lightingModelNode = this.constructLightingModel( builder );
 
-			outgoingLightNode = lightsNode.lightingContext( lightingModelNode, backdropNode, backdropAlphaNode );
+			outgoingLightNode = lightingContext( lightsNode, lightingModelNode, backdropNode, backdropAlphaNode );
 
 		} else if ( backdropNode !== null ) {
 

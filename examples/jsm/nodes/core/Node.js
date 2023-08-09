@@ -32,6 +32,14 @@ class Node extends EventDispatcher {
 
 	}
 
+	getSelf() {
+
+		// Returns non-node object.
+
+		return this.self || this;
+
+	}
+
 	isGlobal( /*builder*/ ) {
 
 		return false;
