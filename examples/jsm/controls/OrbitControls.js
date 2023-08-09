@@ -41,7 +41,7 @@ class OrbitControls extends EventDispatcher {
 		// "target" sets the location of focus, where the object orbits around
 		this.target = new Vector3();
 
-		// Sets the 3D cursor (similar to Blender), from which the maxPanRadius takes effect
+		// Sets the 3D cursor (similar to Blender), from which the maxTargetRadius takes effect
 		this.cursor = new Vector3();
 
 		// How far you can dolly in and out ( PerspectiveCamera only )
@@ -52,9 +52,9 @@ class OrbitControls extends EventDispatcher {
 		this.minZoom = 0;
 		this.maxZoom = Infinity;
 
-		// Limit camera pan within a sphere
-		this.minPanRadius = 0;
-	    this.maxPanRadius = Infinity;
+		// Limit camera target within a spherical area around the cursor
+		this.minTargetRadius = 0;
+	    this.maxTargetRadius = Infinity;
 
 		// How far you can orbit vertically, upper and lower limits.
 		// Range is 0 to Math.PI radians.
@@ -270,7 +270,7 @@ class OrbitControls extends EventDispatcher {
 
 				// Limit the target distance from the cursor to create a sphere around the center of interest
 				scope.target.sub( scope.cursor );
-        		scope.target.clampLength( scope.minPanRadius, scope.maxPanRadius );
+        		scope.target.clampLength( scope.minTargetRadius, scope.maxTargetRadius );
         		scope.target.add( scope.cursor );
 				offset.setFromSpherical( spherical );
 
