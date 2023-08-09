@@ -259,7 +259,7 @@ class WebGPUBackend extends Backend {
 		renderContextData.descriptor = descriptor;
 		renderContextData.encoder = encoder;
 		renderContextData.currentPass = currentPass;
-		renderContextData.currentAttributesSet = {};
+		renderContextData.currentSets = { attributes: {} };
 
 		//
 
@@ -425,12 +425,19 @@ class WebGPUBackend extends Backend {
 		const bindingsData = this.get( renderObject.getBindings() );
 		const contextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
-		const attributesSet = contextData.currentAttributesSet;
+		const currentSets = contextData.currentSets;
 
 		// pipeline
 
 		const passEncoderGPU = contextData.currentPass;
-		passEncoderGPU.setPipeline( pipelineGPU );
+
+		if ( currentSets.pipeline !== pipelineGPU ) {
+
+			passEncoderGPU.setPipeline( pipelineGPU );
+
+			currentSets.pipeline = pipelineGPU;
+
+		}
 
 		// bind group
 
@@ -447,14 +454,14 @@ class WebGPUBackend extends Backend {
 
 		if ( hasIndex === true ) {
 
-			if ( attributesSet.index !== index ) {
-			
+			if ( currentSets.index !== index ) {
+
 				const buffer = this.get( index ).buffer;
 				const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
 
 				passEncoderGPU.setIndexBuffer( buffer, indexFormat );
 
-				attributesSet.index = index;
+				currentSets.index = index;
 
 			}
 
@@ -468,12 +475,12 @@ class WebGPUBackend extends Backend {
 
 			const vertexBuffer = vertexBuffers[ i ];
 
-			if ( attributesSet[ i ] !== vertexBuffer ) {
+			if ( currentSets.attributes[ i ] !== vertexBuffer ) {
 
 				const buffer = this.get( vertexBuffer ).buffer;
 				passEncoderGPU.setVertexBuffer( i, buffer );
 
-				attributesSet[ i ] = vertexBuffer;
+				currentSets.attributes[ i ] = vertexBuffer;
 
 			}
 
@@ -769,7 +776,7 @@ class WebGPUBackend extends Backend {
 		if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
 		renderContextData.currentPass = encoder.beginRenderPass( descriptor );
-		renderContextData.currentAttributesSet = {};
+		renderContextData.currentSets = { attributes: {} };
 
 	}
 
