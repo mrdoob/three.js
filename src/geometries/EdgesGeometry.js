@@ -4,6 +4,20 @@ import * as MathUtils from '../math/MathUtils.js';
 import { Triangle } from '../math/Triangle.js';
 import { Vector3 } from '../math/Vector3.js';
 
+//Retrieve data at the current position.
+const getDataByIndex = ( array, size, index ) => {
+
+	const newArray = [];
+	for ( let s = 0; s < size; s ++ ) {
+
+		newArray.push( array[ index * size + s ] );
+
+	}
+
+	return newArray;
+
+};
+
 const _v0 = /*@__PURE__*/ new Vector3();
 const _v1 = /*@__PURE__*/ new Vector3();
 const _normal = /*@__PURE__*/ new Vector3();
@@ -38,6 +52,7 @@ class EdgesGeometry extends BufferGeometry {
 
 			const edgeData = {};
 			const vertices = [];
+			const dotSequential = [];
 			for ( let i = 0; i < indexCount; i += 3 ) {
 
 				if ( indexAttr ) {
@@ -94,6 +109,35 @@ class EdgesGeometry extends BufferGeometry {
 							vertices.push( v0.x, v0.y, v0.z );
 							vertices.push( v1.x, v1.y, v1.z );
 
+							//Record the coordinates of the ‘position’
+							if ( vertKeys[ j ] === 'a' ) {
+
+								dotSequential.push( indexArr[ 0 ] );
+
+							} else if ( vertKeys[ j ] === 'b' ) {
+
+								dotSequential.push( indexArr[ 1 ] );
+
+							} else if ( vertKeys[ j ] === 'c' ) {
+
+								dotSequential.push( indexArr[ 2 ] );
+
+							}
+
+							if ( vertKeys[ jNext ] === 'a' ) {
+
+								dotSequential.push( indexArr[ 0 ] );
+
+							} else if ( vertKeys[ jNext ] === 'b' ) {
+
+								dotSequential.push( indexArr[ 1 ] );
+
+							} else if ( vertKeys[ jNext ] === 'c' ) {
+
+								dotSequential.push( indexArr[ 2 ] );
+
+							}
+
 						}
 
 						edgeData[ reverseHash ] = null;
@@ -127,11 +171,48 @@ class EdgesGeometry extends BufferGeometry {
 					vertices.push( _v0.x, _v0.y, _v0.z );
 					vertices.push( _v1.x, _v1.y, _v1.z );
 
+					//Record the coordinates of the ‘position’
+					dotSequential.push( index0 );
+					dotSequential.push( index1 );
+
 				}
 
 			}
 
 			this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+
+			//Based on the recorded position, locate data from other attributes and reorganize.
+			for ( const key in geometry.attributes ) {
+
+				if ( key !== 'normal' && key !== 'uv' && key !== 'position' ) {
+
+					const attributeArray = [];
+					for ( let s = 0, t = dotSequential.length; s < t; s ++ ) {
+
+						const newDataArray = getDataByIndex(
+							geometry.attributes[ key ].array,
+							geometry.attributes[ key ].itemSize,
+							dotSequential[ s ]
+						);
+						for ( let a = 0, b = newDataArray.length; a < b; a ++ ) {
+
+							attributeArray.push( newDataArray[ a ] );
+
+						}
+
+					}
+
+					this.setAttribute(
+						key,
+						new Float32BufferAttribute(
+							attributeArray,
+							geometry.attributes[ key ].itemSize
+						)
+					);
+
+				}
+
+			}
 
 		}
 
