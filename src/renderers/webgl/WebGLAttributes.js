@@ -1,9 +1,23 @@
+import {BufferAttribute} from 'three' ;
+
+/**
+ *
+ * @param {WebGL2RenderingContext} gl
+ * @param {*} capabilities
+ * @returns
+ */
 function WebGLAttributes( gl, capabilities ) {
 
 	const isWebGL2 = capabilities.isWebGL2;
 
 	const buffers = new WeakMap();
 
+	/**
+	 *
+	 * @param {BufferAttribute} attribute
+	 * @param {number} bufferType gl.ARRAY_BUFFER | gl.ELEMENT_ARRAY_BUFFER
+	 * @returns
+	 */
 	function createBuffer( attribute, bufferType ) {
 
 		const array = attribute.array;
@@ -81,6 +95,12 @@ function WebGLAttributes( gl, capabilities ) {
 
 	}
 
+	/**
+	 *
+	 * @param {WebGLBuffer} buffer
+	 * @param {BufferAttribute} attribute
+	 * @param {number} bufferType  gl.ARRAY_BUFFER | gl.ELEMENT_ARRAY_BUFFER
+	 */
 	function updateBuffer( buffer, attribute, bufferType ) {
 
 		const array = attribute.array;
@@ -118,6 +138,11 @@ function WebGLAttributes( gl, capabilities ) {
 
 	//
 
+	/**
+	 *
+	 * @param {BufferAttribute} attribute
+	 * @returns
+	 */
 	function get( attribute ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
@@ -126,6 +151,10 @@ function WebGLAttributes( gl, capabilities ) {
 
 	}
 
+	/**
+	 *
+	 * @param {BufferAttribute} attribute
+	 */
 	function remove( attribute ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;

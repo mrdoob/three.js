@@ -9,6 +9,12 @@ const _vector2 = /*@__PURE__*/ new Vector2();
 
 class BufferAttribute {
 
+	/**
+	 *
+	 * @param {TypedArray} array
+	 * @param {*} itemSize
+	 * @param {*} normalized
+	 */
 	constructor( array, itemSize, normalized = false ) {
 
 		if ( Array.isArray( array ) ) {
