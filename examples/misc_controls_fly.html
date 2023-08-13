@@ -205,7 +205,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.useLegacyLights = false;
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -228,7 +227,7 @@
 				// postprocessing
 
 				const renderModel = new RenderPass( scene, camera );
-				const effectFilm = new FilmPass( 0.35, 0.75, 2048, false );
+				const effectFilm = new FilmPass( 0.35 );
 				const outputPass = new OutputPass();
 
 				composer = new EffectComposer( renderer );

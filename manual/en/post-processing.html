@@ -67,8 +67,7 @@ This continues through all the passes. </p>
 <p>Whether or not to clear before rendering this pass</p>
 <h2 id="-rendertoscreen-"><code class="notranslate" translate="no">renderToScreen</code></h2>
 <p>Whether or not to render to the canvas instead the current destination render
-target. Usually you need to set this to true on the last pass you add to your
-<code class="notranslate" translate="no">EffectComposer</code>.</p>
+target. In most use cases you do not set this flag explicitly since the last pass in the pass chain is automatically rendered to screen.</p>
 <p>Let's put together a basic example. We'll start with the example from <a href="responsive.html">the
 article on responsiveness</a>.</p>
 <p>To that first we create an <code class="notranslate" translate="no">EffectComposer</code>.</p>
@@ -89,26 +88,29 @@ top of the original input. This makes the scene <em>bloom</em></p>
 );
 composer.addPass(bloomPass);
 </pre>
-<p>Finally we had a <code class="notranslate" translate="no">FilmPass</code> that draws noise and scanlines on top of its input.</p>
+<p>Next we had a <code class="notranslate" translate="no">FilmPass</code> that draws noise and scanlines on top of its input.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const filmPass = new FilmPass(
     0.35,   // noise intensity
     0.025,  // scanline intensity
     648,    // scanline count
     false,  // grayscale
 );
-filmPass.renderToScreen = true;
 composer.addPass(filmPass);
 </pre>
-<p>Since the <code class="notranslate" translate="no">filmPass</code> is the last pass we set its <code class="notranslate" translate="no">renderToScreen</code> property to
-true to tell it to render to the canvas. Without setting this it would instead
-render to the next render target.</p>
+<p>Finally we had a <code class="notranslate" translate="no">OutputPass</code> which performs color space conversion to sRGB and optional tone mapping.
+This pass is usually the last pass of the pass chain.
+</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const outputPass = new OutputPass();
+composer.addPass(outputPass);
+</pre>
 <p>To use these classes we need to import a bunch of scripts.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {BloomPass} from 'three/addons/postprocessing/BloomPass.js';
 import {FilmPass} from 'three/addons/postprocessing/FilmPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 </pre>
-<p>For pretty much any post processing <code class="notranslate" translate="no">EffectComposer.js</code>, and <code class="notranslate" translate="no">RenderPass.js</code>
+<p>For pretty much any post processing <code class="notranslate" translate="no">EffectComposer.js</code>, <code class="notranslate" translate="no">RenderPass.js</code> and <code class="notranslate" translate="no">OutputPass.js</code>
 are required.</p>
 <p>The last things we need to do are to use <code class="notranslate" translate="no">EffectComposer.render</code> instead of
 <a href="/docs/#api/en/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> <em>and</em> to tell the <code class="notranslate" translate="no">EffectComposer</code> to match the size of

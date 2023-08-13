@@ -1,4 +1,5 @@
 import ReferenceNode from './ReferenceNode.js';
+import { NodeUpdateType } from '../core/constants.js';
 import { addNodeClass } from '../core/Node.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 
@@ -9,6 +10,8 @@ class MaterialReferenceNode extends ReferenceNode {
 		super( property, inputType, material );
 
 		this.material = material;
+
+		this.updateType = NodeUpdateType.RENDER;
 
 	}
 

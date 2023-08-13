@@ -104,7 +104,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.useLegacyLights = false;
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -133,10 +132,8 @@
 				//
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.enableDamping = true;
 				controls.enableZoom = false;
 				controls.enablePan = false;
-				controls.dampingFactor = 0.2;
 
 				controls.addEventListener( 'change', () => ( needsUpdate = true ) );
 
@@ -198,8 +195,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				controls.update();
 
 				render();
 

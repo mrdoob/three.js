@@ -38,8 +38,7 @@
 
 			}
 
-			let renderer, scene, camera;
-			let controls;
+			let renderer, scene, camera, controls, clock;
 
 			init();
 			animate();
@@ -49,7 +48,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.useLegacyLights = false;
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -61,6 +59,8 @@
 				controls.autoRotate = true;
 				controls.autoRotateSpeed = - 1.0;
 				controls.enableDamping = true;
+
+				clock = new THREE.Clock();
 
 				// Material
 
@@ -235,8 +235,9 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				controls.update();
+			
+				const delta = clock.getDelta();
+				controls.update( delta );
 
 				renderer.render( scene, camera );
 

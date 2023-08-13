@@ -281,8 +281,7 @@
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( config.resolution, config.resolution );
-				renderer.useLegacyLights = false;
+				renderer.setSize( parseInt( config.resolution ), parseInt( config.resolution ) );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -334,7 +333,7 @@
 
 				} else {
 
-					renderer.setSize( config.resolution, config.resolution );
+					renderer.setSize( parseInt( config.resolution ), parseInt( config.resolution ) );
 
 				}
 

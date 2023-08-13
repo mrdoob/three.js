@@ -159,7 +159,6 @@
 			// renderer
 			renderer = new THREE.WebGLRenderer( { antialias: false } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.useLegacyLights = false;
 			container.appendChild( renderer.domElement );
 
 			//
@@ -263,7 +262,7 @@
 				'Metalness': SSRPass.OUTPUT.Metalness,
 			} ).onChange( function ( value ) {
 
-				ssrPass.output = parseInt( value );
+				ssrPass.output = value;
 
 			} );
 			ssrPass.opacity = 1;

@@ -14,6 +14,7 @@
 import {
 	CompressedTexture,
 	CompressedArrayTexture,
+	CompressedCubeTexture,
 	Data3DTexture,
 	DataTexture,
 	FileLoader,
@@ -261,10 +262,7 @@ class KTX2Loader extends Loader {
 
 		if ( container.faceCount === 6 ) {
 
-			texture = new CompressedTexture();
-			texture.image = faces;
-			texture.format = format;
-			texture.type = UnsignedByteType;
+			texture = new CompressedCubeTexture( faces, format, UnsignedByteType );
 
 		} else {
 
@@ -317,12 +315,14 @@ class KTX2Loader extends Loader {
 
 			const texture = mipmaps[ 0 ];
 			texture.mipmaps = mipmaps.map( dt => {
+
 				return {
 					data: dt.source.data,
 					width: dt.source.data.width,
 					height: dt.source.data.height,
 					depth: dt.source.data.depth
 				};
+
 			} );
 			return texture;
 

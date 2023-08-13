@@ -57,6 +57,7 @@ class WebGPUAttributeUtils {
 			buffer.unmap();
 
 			bufferData.buffer = buffer;
+
 		}
 
 	}
@@ -165,7 +166,7 @@ class WebGPUAttributeUtils {
 
 	}
 
-	async getArrayBuffer( attribute ) {
+	async getArrayBufferAsync( attribute ) {
 
 		const backend = this.backend;
 		const device = backend.device;

@@ -98,6 +98,8 @@ const exceptionList = [
 	'webgl_shadowmap_progressive',
 	'webgl_test_memory2',
 	'webgl_tiled_forward',
+	'webgl2_volume_instancing',
+	'webgl_points_dynamic',
 
 	// TODO: implement determinism for setTimeout and setInterval
 	// could it fix some examples from above?
@@ -122,6 +124,7 @@ const exceptionList = [
 	'webgpu_lights_selective',
 	'webgpu_loader_gltf',
 	'webgpu_loader_gltf_compressed',
+	'webgpu_loader_gltf_iridescence',
 	'webgpu_loader_gltf_sheen',
 	'webgpu_materials',
 	'webgpu_materials_video',
@@ -599,7 +602,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		}
 
-	} catch ( e ) { 
+	} catch ( e ) {
 
 		if ( attemptID === numAttempts - 1 ) {
 

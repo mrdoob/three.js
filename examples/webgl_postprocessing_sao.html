@@ -58,7 +58,6 @@
 				renderer.setClearColor( 0x000000 );
 				renderer.setPixelRatio( devicePixelRatio );
 				renderer.setSize( width, height );
-				renderer.useLegacyLights = false;
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 65, width / height, 3, 10 );
@@ -133,7 +132,7 @@
 					'Normal': SAOPass.OUTPUT.Normal
 				} ).onChange( function ( value ) {
 
-					saoPass.params.output = parseInt( value );
+					saoPass.params.output = value;
 
 				} );
 				gui.add( saoPass.params, 'saoBias', - 1, 1 );

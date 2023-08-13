@@ -128,7 +128,7 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 			}
 
-		} else {
+		} else if ( geometryPosition !== undefined ) {
 
 			const array = geometryPosition.array;
 			version = geometryPosition.version;
@@ -142,6 +142,10 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 				indices.push( a, b, b, c, c, a );
 
 			}
+
+		} else {
+
+			return;
 
 		}
 

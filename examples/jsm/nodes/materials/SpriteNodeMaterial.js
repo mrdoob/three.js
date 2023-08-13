@@ -4,7 +4,7 @@ import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
 import { materialRotation } from '../accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../accessors/ModelNode.js';
 import { positionLocal } from '../accessors/PositionNode.js';
-import { vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { float, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
 import { SpriteMaterial } from 'three';
 
@@ -66,7 +66,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		alignedPosition = alignedPosition.mul( scale );
 
-		const rotation = rotationNode || materialRotation;
+		const rotation = float( rotationNode || materialRotation );
 
 		const cosAngle = rotation.cos();
 		const sinAngle = rotation.sin();
