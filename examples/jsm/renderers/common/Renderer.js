@@ -551,6 +551,14 @@ class Renderer {
 
 	}
 
+	isOccluded( object ) {
+
+		const renderContext = this._currentRenderContext || this._lastRenderContext;
+
+		return renderContext ? this.backend.isOccluded( renderContext, object ) : false;
+
+	}
+
 	clear( color = true, depth = true, stencil = true ) {
 
 		const renderContext = this._currentRenderContext || this._lastRenderContext;

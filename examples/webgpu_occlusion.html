@@ -53,9 +53,11 @@
 
 				}
 
-				update( /* frame */ ) {
+				async update( frame ) {
 
-					this.uniformNode.value.copy( this.testObject.isOccluded ? this.occludedColor : this.normalColor );
+					const isOccluded = frame.renderer.isOccluded( this.testObject );
+
+					this.uniformNode.value.copy( isOccluded ? this.occludedColor : this.normalColor );
 
 				}
 
