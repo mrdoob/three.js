@@ -289,6 +289,7 @@ class Renderer {
 		}
 
 		renderContext.activeCubeFace = activeCubeFace;
+		renderContext.occlusionQueryCount = renderList.occlusionQueryCount;
 
 		//
 
@@ -547,6 +548,14 @@ class Renderer {
 	setClearStencil( stencil ) {
 
 		this._clearStencil = stencil;
+
+	}
+
+	isOccluded( object ) {
+
+		const renderContext = this._currentRenderContext || this._lastRenderContext;
+
+		return renderContext ? this.backend.isOccluded( renderContext, object ) : false;
 
 	}
 
