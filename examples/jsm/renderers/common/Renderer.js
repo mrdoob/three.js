@@ -555,7 +555,7 @@ class Renderer {
 
 		const renderContext = this._currentRenderContext || this._lastRenderContext;
 
-		return renderContext ? this.backend.isOccluded( renderContext, object ) : false;
+		return renderContext && this.backend.isOccluded( renderContext, object );
 
 	}
 
