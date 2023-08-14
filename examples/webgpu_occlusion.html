@@ -120,6 +120,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
 				document.body.appendChild( renderer.domElement );
 
 				// controls
@@ -127,7 +128,6 @@
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 3;
 				controls.maxDistance = 25;
-				controls.addEventListener( 'change', render );
 
 				window.addEventListener( 'resize', onWindowResize );
 
