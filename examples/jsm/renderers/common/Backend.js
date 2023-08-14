@@ -141,6 +141,12 @@ class Backend {
 
 	// resource properties
 
+	set( object, value ) {
+
+		this.data.set( object, value );
+
+	}
+
 	get( object ) {
 
 		let map = this.data.get( object );

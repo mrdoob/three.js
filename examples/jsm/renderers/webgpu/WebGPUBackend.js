@@ -801,8 +801,6 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	// bindings
-
 	createBindings( bindings ) {
 
 		this.bindingUtils.createBindings( bindings );
@@ -820,8 +818,6 @@ class WebGPUBackend extends Backend {
 		this.bindingUtils.updateBinding( binding );
 
 	}
-
-	// attributes
 
 	createIndexAttribute( attribute ) {
 

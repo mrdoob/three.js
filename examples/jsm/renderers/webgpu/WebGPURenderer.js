@@ -1,4 +1,5 @@
 import Renderer from '../common/Renderer.js';
+import WebGLBackend from '../webgl/WebGLBackend.js';
 import WebGPUBackend from './WebGPUBackend.js';
 /*
 const debugHandler = {
@@ -18,7 +19,8 @@ class WebGPURenderer extends Renderer {
 
 	constructor( parameters = {} ) {
 
-		const backend = new WebGPUBackend( parameters );
+		//const backend = new WebGPUBackend( parameters );
+		const backend = new WebGLBackend( parameters );
 		//const backend = new Proxy( new WebGPUBackend( parameters ), debugHandler );
 
 		super( backend );

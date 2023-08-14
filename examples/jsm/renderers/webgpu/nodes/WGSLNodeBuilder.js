@@ -1,10 +1,7 @@
 import { RenderTarget, NoColorSpace } from 'three';
 
 import UniformsGroup from '../../common/UniformsGroup.js';
-import {
-	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
-	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
-} from '../../common/nodes/NodeUniform.js';
+
 import NodeSampler from '../../common/nodes/NodeSampler.js';
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
@@ -354,7 +351,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 					for ( const uniformNode of node.nodes ) {
 
-						const uniformNodeGPU = this._getNodeUniform( uniformNode, type );
+						const uniformNodeGPU = this.getNodeUniform( uniformNode, type );
 
 						// fit bounds to buffer
 						uniformNodeGPU.boundary = getVectorLength( uniformNodeGPU.itemSize );
@@ -368,7 +365,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				} else {
 
-					uniformGPU = this._getNodeUniform( uniformNode, type );
+					uniformGPU = this.getNodeUniform( uniformNode, type );
 
 					uniformsGroup.addUniform( uniformGPU );
 
@@ -775,20 +772,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 	_include( name ) {
 
 		wgslPolyfill[ name ].build( this );
-
-	}
-
-	_getNodeUniform( uniformNode, type ) {
-
-		if ( type === 'float' ) return new FloatNodeUniform( uniformNode );
-		if ( type === 'vec2' ) return new Vector2NodeUniform( uniformNode );
-		if ( type === 'vec3' ) return new Vector3NodeUniform( uniformNode );
-		if ( type === 'vec4' ) return new Vector4NodeUniform( uniformNode );
-		if ( type === 'color' ) return new ColorNodeUniform( uniformNode );
-		if ( type === 'mat3' ) return new Matrix3NodeUniform( uniformNode );
-		if ( type === 'mat4' ) return new Matrix4NodeUniform( uniformNode );
-
-		throw new Error( `Uniform "${type}" not declared.` );
 
 	}
 
