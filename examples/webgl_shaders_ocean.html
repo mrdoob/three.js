@@ -127,7 +127,7 @@
 
 					if ( renderTarget !== undefined ) renderTarget.dispose();
 
-					renderTarget = pmremGenerator.fromScene( sky );
+					renderTarget = pmremGenerator.fromScene( scene );
 
 					scene.environment = renderTarget.texture;
 
