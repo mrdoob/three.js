@@ -32,7 +32,16 @@ class Points extends Object3D {
 
 		super.copy( source, recursive );
 
-		this.material = source.material;
+		if ( Array.isArray( source.material ) ) {
+
+			this.material = source.material.slice();
+
+		} else {
+
+			this.material = source.material;
+
+		}
+
 		this.geometry = source.geometry;
 
 		return this;
