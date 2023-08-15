@@ -30,6 +30,7 @@ import {
 	RGB_PVRTC_4BPPV1_Format,
 	RGB_S3TC_DXT1_Format,
 	RGBA_ASTC_4x4_Format,
+	RGBA_ASTC_6x6_Format,
 	RGBA_BPTC_Format,
 	RGBA_ETC2_EAC_Format,
 	RGBA_PVRTC_4BPPV1_Format,
@@ -59,6 +60,8 @@ import {
 	VK_FORMAT_R8G8_UNORM,
 	VK_FORMAT_R8G8B8A8_SRGB,
 	VK_FORMAT_R8G8B8A8_UNORM,
+	VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
+	VK_FORMAT_ASTC_6x6_UNORM_BLOCK
 } from '../libs/ktx-parse.module.js';
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
 
@@ -298,33 +301,7 @@ class KTX2Loader extends Loader {
 
 		if ( container.vkFormat !== VK_FORMAT_UNDEFINED ) {
 
-			const mipmaps = [];
-			const pendings = [];
-
-			for ( let levelIndex = 0; levelIndex < container.levels.length; levelIndex ++ ) {
-
-				pendings.push( createDataTexture( container, levelIndex ).then( function ( dataTexture ) {
-
-					mipmaps[ levelIndex ] = dataTexture;
-
-				} ) );
-
-			}
-
-			await Promise.all( pendings );
-
-			const texture = mipmaps[ 0 ];
-			texture.mipmaps = mipmaps.map( dt => {
-
-				return {
-					data: dt.source.data,
-					width: dt.source.data.width,
-					height: dt.source.data.height,
-					depth: dt.source.data.depth
-				};
-
-			} );
-			return texture;
+			return createRawTexture( container );
 
 		}
 
@@ -730,7 +707,10 @@ KTX2Loader.BasisWorker = function () {
 };
 
 //
-// DataTexture and Data3DTexture parsing.
+// Parsing for non-Basis textures. These textures are may have supercompression
+// like Zstd, but they do not require transcoding.
+
+const UNCOMPRESSED_FORMATS = new Set( [ RGBAFormat, RGFormat, RedFormat ] );
 
 const FORMAT_MAP = {
 
@@ -748,6 +728,9 @@ const FORMAT_MAP = {
 	[ VK_FORMAT_R16_SFLOAT ]: RedFormat,
 	[ VK_FORMAT_R8_SRGB ]: RedFormat,
 	[ VK_FORMAT_R8_UNORM ]: RedFormat,
+
+	[ VK_FORMAT_ASTC_6x6_SRGB_BLOCK ]: RGBA_ASTC_6x6_Format,
+	[ VK_FORMAT_ASTC_6x6_UNORM_BLOCK ]: RGBA_ASTC_6x6_Format,
 
 };
 
@@ -768,6 +751,9 @@ const TYPE_MAP = {
 	[ VK_FORMAT_R8_SRGB ]: UnsignedByteType,
 	[ VK_FORMAT_R8_UNORM ]: UnsignedByteType,
 
+	[ VK_FORMAT_ASTC_6x6_SRGB_BLOCK ]: UnsignedByteType,
+	[ VK_FORMAT_ASTC_6x6_UNORM_BLOCK ]: UnsignedByteType,
+
 };
 
 const COLOR_SPACE_MAP = {
@@ -776,14 +762,13 @@ const COLOR_SPACE_MAP = {
 	[ VK_FORMAT_R8G8_SRGB ]: SRGBColorSpace,
 	[ VK_FORMAT_R8_SRGB ]: SRGBColorSpace,
 
+	[ VK_FORMAT_ASTC_6x6_SRGB_BLOCK ]: SRGBColorSpace,
+
 };
 
-async function createDataTexture( container, levelIndex = 0 ) {
+async function createRawTexture( container ) {
 
 	const { vkFormat } = container;
-	const pixelWidth = Math.max( 1, container.pixelWidth >> levelIndex );
-	const pixelHeight = Math.max( 1, container.pixelHeight >> levelIndex );
-	const pixelDepth = Math.max( 1, container.pixelDepth >> levelIndex );
 
 	if ( FORMAT_MAP[ vkFormat ] === undefined ) {
 
@@ -791,16 +776,11 @@ async function createDataTexture( container, levelIndex = 0 ) {
 
 	}
 
-	const level = container.levels[ levelIndex ];
+	//
 
-	let levelData;
-	let view;
+	let zstd;
 
-	if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_NONE ) {
-
-		levelData = level.levelData;
-
-	} else if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_ZSTD ) {
+	if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_ZSTD ) {
 
 		if ( ! _zstd ) {
 
@@ -814,44 +794,97 @@ async function createDataTexture( container, levelIndex = 0 ) {
 
 		}
 
-		levelData = ( await _zstd ).decode( level.levelData, level.uncompressedByteLength );
-
-	} else {
-
-		throw new Error( 'THREE.KTX2Loader: Unsupported supercompressionScheme.' );
+		zstd = await _zstd;
 
 	}
 
-	if ( TYPE_MAP[ vkFormat ] === FloatType ) {
-
-		view = new Float32Array(
-
-			levelData.buffer,
-			levelData.byteOffset,
-			levelData.byteLength / Float32Array.BYTES_PER_ELEMENT
-
-		);
-
-	} else if ( TYPE_MAP[ vkFormat ] === HalfFloatType ) {
-
-		view = new Uint16Array(
-
-			levelData.buffer,
-			levelData.byteOffset,
-			levelData.byteLength / Uint16Array.BYTES_PER_ELEMENT
-
-		);
-
-	} else {
-
-		view = levelData;
-
-	}
 	//
 
-	const texture = pixelDepth === 0
-		? new DataTexture( view, pixelWidth, pixelHeight )
-		: new Data3DTexture( view, pixelWidth, pixelHeight, pixelDepth );
+	const mipmaps = [];
+
+
+	for ( let levelIndex = 0; levelIndex < container.levels.length; levelIndex ++ ) {
+
+		const levelWidth = Math.max( 1, container.pixelWidth >> levelIndex );
+		const levelHeight = Math.max( 1, container.pixelHeight >> levelIndex );
+		const levelDepth = container.pixelDepth ? Math.max( 1, container.pixelDepth >> levelIndex ) : 0;
+
+		const level = container.levels[ levelIndex ];
+
+		let levelData;
+
+		if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_NONE ) {
+
+			levelData = level.levelData;
+
+		} else if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_ZSTD ) {
+
+			levelData = zstd.decode( level.levelData, level.uncompressedByteLength );
+
+		} else {
+
+			throw new Error( 'THREE.KTX2Loader: Unsupported supercompressionScheme.' );
+
+		}
+
+		let data;
+
+		if ( TYPE_MAP[ vkFormat ] === FloatType ) {
+
+			data = new Float32Array(
+
+				levelData.buffer,
+				levelData.byteOffset,
+				levelData.byteLength / Float32Array.BYTES_PER_ELEMENT
+
+			);
+
+		} else if ( TYPE_MAP[ vkFormat ] === HalfFloatType ) {
+
+			data = new Uint16Array(
+
+				levelData.buffer,
+				levelData.byteOffset,
+				levelData.byteLength / Uint16Array.BYTES_PER_ELEMENT
+
+			);
+
+		} else {
+
+			data = levelData;
+
+		}
+
+		mipmaps.push( {
+
+			data: data,
+			width: levelWidth,
+			height: levelHeight,
+			depth: levelDepth,
+
+		} );
+
+	}
+
+	let texture;
+
+	if ( UNCOMPRESSED_FORMATS.has( FORMAT_MAP[ vkFormat ] ) ) {
+
+		texture = container.pixelDepth === 0
+		? new DataTexture( mipmaps, container.pixelWidth, container.pixelHeight )
+		: new Data3DTexture( mipmaps, container.pixelWidth, container.pixelHeight, container.pixelDepth );
+
+	} else {
+
+		if ( container.pixelDepth > 0 ) throw new Error( 'THREE.KTX2Loader: Unsupported pixelDepth.' );
+
+		texture = new CompressedTexture( mipmaps, container.pixelWidth, container.pixelHeight );
+
+
+
+	}
+
+	texture.mipmaps = mipmaps;
 
 	texture.type = TYPE_MAP[ vkFormat ];
 	texture.format = FORMAT_MAP[ vkFormat ];
