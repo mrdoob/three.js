@@ -127,7 +127,7 @@
 
 					if ( renderTarget !== undefined ) renderTarget.dispose();
 
-					const s = new Scene();
+					const s = new THREE.Scene();
 					s.add( sky.clone() );
 
 					renderTarget = pmremGenerator.fromScene( s );
