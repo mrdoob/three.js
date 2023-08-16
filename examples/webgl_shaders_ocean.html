@@ -113,6 +113,8 @@
 				};
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const sceneEnv = new THREE.Scene();
+
 				let renderTarget;
 
 				function updateSun() {
@@ -127,10 +129,9 @@
 
 					if ( renderTarget !== undefined ) renderTarget.dispose();
 
-					const s = new THREE.Scene();
-					s.add( sky.clone() );
-
-					renderTarget = pmremGenerator.fromScene( s );
+					sceneEnv.add( sky );
+					renderTarget = pmremGenerator.fromScene( sceneEnv );
+					scene.add( sky );
 
 					scene.environment = renderTarget.texture;
 
