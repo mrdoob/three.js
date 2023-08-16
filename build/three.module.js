@@ -11487,7 +11487,7 @@ class Mesh extends Object3D {
 
 		}
 
-		this.material = source.material;
+		this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 		this.geometry = source.geometry;
 
 		return this;
@@ -32350,7 +32350,7 @@ class Line extends Object3D {
 
 		super.copy( source, recursive );
 
-		this.material = source.material;
+		this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 		this.geometry = source.geometry;
 
 		return this;
@@ -32671,7 +32671,7 @@ class Points extends Object3D {
 
 		super.copy( source, recursive );
 
-		this.material = source.material;
+		this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 		this.geometry = source.geometry;
 
 		return this;

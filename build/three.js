@@ -11494,7 +11494,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			this.material = source.material;
+			this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 			this.geometry = source.geometry;
 
 			return this;
@@ -32357,7 +32357,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			super.copy( source, recursive );
 
-			this.material = source.material;
+			this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 			this.geometry = source.geometry;
 
 			return this;
@@ -32678,7 +32678,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			super.copy( source, recursive );
 
-			this.material = source.material;
+			this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 			this.geometry = source.geometry;
 
 			return this;
