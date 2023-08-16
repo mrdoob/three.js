@@ -258,7 +258,7 @@ class Renderer {
 		_frustum.setFromProjectionMatrix( _projScreenMatrix, coordinateSystem );
 
 		const renderList = this._renderLists.get( scene, camera );
-		renderList.init();
+		renderList.begin();
 
 		this._projectObject( scene, camera, 0, renderList );
 
@@ -289,6 +289,7 @@ class Renderer {
 		}
 
 		renderContext.activeCubeFace = activeCubeFace;
+		renderContext.occlusionQueryCount = renderList.occlusionQueryCount;
 
 		//
 
@@ -547,6 +548,14 @@ class Renderer {
 	setClearStencil( stencil ) {
 
 		this._clearStencil = stencil;
+
+	}
+
+	isOccluded( object ) {
+
+		const renderContext = this._currentRenderContext || this._lastRenderContext;
+
+		return renderContext && this.backend.isOccluded( renderContext, object );
 
 	}
 

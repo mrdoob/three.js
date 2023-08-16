@@ -3,7 +3,7 @@
  * Copyright 2010-2023 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '155';
+const REVISION = '156dev';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -13777,7 +13777,7 @@ var logdepthbuf_pars_vertex = "#ifdef USE_LOGDEPTHBUF\n\t#ifdef USE_LOGDEPTHBUF_
 
 var logdepthbuf_vertex = "#ifdef USE_LOGDEPTHBUF\n\t#ifdef USE_LOGDEPTHBUF_EXT\n\t\tvFragDepth = 1.0 + gl_Position.w;\n\t\tvIsPerspective = float( isPerspectiveMatrix( projectionMatrix ) );\n\t#else\n\t\tif ( isPerspectiveMatrix( projectionMatrix ) ) {\n\t\t\tgl_Position.z = log2( max( EPSILON, gl_Position.w + 1.0 ) ) * logDepthBufFC - 1.0;\n\t\t\tgl_Position.z *= gl_Position.w;\n\t\t}\n\t#endif\n#endif";
 
-var map_fragment = "#ifdef USE_MAP\n\tdiffuseColor *= texture2D( map, vMapUv );\n#endif";
+var map_fragment = "#ifdef USE_MAP\n\tvec4 sampledDiffuseColor = texture2D( map, vMapUv );\n\t#ifdef DECODE_VIDEO_TEXTURE\n\t\tsampledDiffuseColor = vec4( mix( pow( sampledDiffuseColor.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), sampledDiffuseColor.rgb * 0.0773993808, vec3( lessThanEqual( sampledDiffuseColor.rgb, vec3( 0.04045 ) ) ) ), sampledDiffuseColor.w );\n\t\n\t#endif\n\tdiffuseColor *= sampledDiffuseColor;\n#endif";
 
 var map_pars_fragment = "#ifdef USE_MAP\n\tuniform sampler2D map;\n#endif";
 
@@ -13871,7 +13871,7 @@ var worldpos_vertex = "#if defined( USE_ENVMAP ) || defined( DISTANCE ) || defin
 
 const vertex$h = "varying vec2 vUv;\nuniform mat3 uvTransform;\nvoid main() {\n\tvUv = ( uvTransform * vec3( uv, 1 ) ).xy;\n\tgl_Position = vec4( position.xy, 1.0, 1.0 );\n}";
 
-const fragment$h = "uniform sampler2D t2D;\nuniform float backgroundIntensity;\nvarying vec2 vUv;\nvoid main() {\n\tvec4 texColor = texture2D( t2D, vUv );\n\ttexColor.rgb *= backgroundIntensity;\n\tgl_FragColor = texColor;\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n}";
+const fragment$h = "uniform sampler2D t2D;\nuniform float backgroundIntensity;\nvarying vec2 vUv;\nvoid main() {\n\tvec4 texColor = texture2D( t2D, vUv );\n\t#ifdef DECODE_VIDEO_TEXTURE\n\t\ttexColor = vec4( mix( pow( texColor.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), texColor.rgb * 0.0773993808, vec3( lessThanEqual( texColor.rgb, vec3( 0.04045 ) ) ) ), texColor.w );\n\t#endif\n\ttexColor.rgb *= backgroundIntensity;\n\tgl_FragColor = texColor;\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n}";
 
 const vertex$g = "varying vec3 vWorldDirection;\n#include <common>\nvoid main() {\n\tvWorldDirection = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\tgl_Position.z = gl_Position.w;\n}";
 
@@ -14691,24 +14691,15 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 		}
 
-		const xr = renderer.xr;
-		const environmentBlendMode = xr.getEnvironmentBlendMode();
+		const environmentBlendMode = renderer.xr.getEnvironmentBlendMode();
 
-		switch ( environmentBlendMode ) {
+		if ( environmentBlendMode === 'additive' ) {
 
-			case 'opaque':
-				forceClear = true;
-				break;
+			state.buffers.color.setClear( 0, 0, 0, 1, premultipliedAlpha );
 
-			case 'additive':
-				state.buffers.color.setClear( 0, 0, 0, 1, premultipliedAlpha );
-				forceClear = true;
-				break;
+		} else if ( environmentBlendMode === 'alpha-blend' ) {
 
-			case 'alpha-blend':
-				state.buffers.color.setClear( 0, 0, 0, 0, premultipliedAlpha );
-				forceClear = true;
-				break;
+			state.buffers.color.setClear( 0, 0, 0, 0, premultipliedAlpha );
 
 		}
 
@@ -19823,6 +19814,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.useLegacyLights ? '#define LEGACY_LIGHTS' : '',
 
+			parameters.decodeVideoTexture ? '#define DECODE_VIDEO_TEXTURE' : '',
+
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 			( parameters.logarithmicDepthBuffer && parameters.rendererExtensionFragDepth ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
@@ -20510,6 +20503,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			toneMapping: toneMapping,
 			useLegacyLights: renderer._useLegacyLights,
 
+			decodeVideoTexture: HAS_MAP && ( material.map.isVideoTexture === true ) && ( material.map.colorSpace === SRGBColorSpace ),
+
 			premultipliedAlpha: material.premultipliedAlpha,
 
 			doubleSided: material.side === DoubleSide,
@@ -20711,6 +20706,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 17 );
 		if ( parameters.pointsUvs )
 			_programLayers.enable( 18 );
+		if ( parameters.decodeVideoTexture )
+			_programLayers.enable( 19 );
 
 		array.push( _programLayers.mask );
 
@@ -24271,7 +24268,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				glFormat = utils.convert( texture.format, texture.colorSpace );
 
 			let glType = utils.convert( texture.type ),
-				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace );
+				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace, texture.isVideoTexture );
 
 			setTextureParameters( textureType, texture, supportsMips );
 
@@ -25550,7 +25547,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const format = texture.format;
 		const type = texture.type;
 
-		if ( texture.isCompressedTexture === true || texture.format === _SRGBAFormat ) return image;
+		if ( texture.isCompressedTexture === true || texture.isVideoTexture === true || texture.format === _SRGBAFormat ) return image;
 
 		if ( colorSpace !== LinearSRGBColorSpace && colorSpace !== NoColorSpace ) {
 
@@ -29780,12 +29777,36 @@ class WebGLRenderer {
 
 			if ( refreshProgram || _currentCamera !== camera ) {
 
+				// common camera uniforms
+
 				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
+				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
+
+				const uCamPos = p_uniforms.map.cameraPosition;
+
+				if ( uCamPos !== undefined ) {
+
+					uCamPos.setValue( _gl, _vector3.setFromMatrixPosition( camera.matrixWorld ) );
+
+				}
 
 				if ( capabilities.logarithmicDepthBuffer ) {
 
 					p_uniforms.setValue( _gl, 'logDepthBufFC',
 						2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
+
+				}
+
+				// consider moving isOrthographic to UniformLib and WebGLMaterials, see https://github.com/mrdoob/three.js/pull/26467#issuecomment-1645185067
+
+				if ( material.isMeshPhongMaterial ||
+					material.isMeshToonMaterial ||
+					material.isMeshLambertMaterial ||
+					material.isMeshBasicMaterial ||
+					material.isMeshStandardMaterial ||
+					material.isShaderMaterial ) {
+
+					p_uniforms.setValue( _gl, 'isOrthographic', camera.isOrthographicCamera === true );
 
 				}
 
@@ -29799,50 +29820,6 @@ class WebGLRenderer {
 
 					refreshMaterial = true;		// set to true on material change
 					refreshLights = true;		// remains set until update done
-
-				}
-
-				// load material specific uniforms
-				// (shader material also gets them for the sake of genericity)
-
-				if ( material.isShaderMaterial ||
-					material.isMeshPhongMaterial ||
-					material.isMeshToonMaterial ||
-					material.isMeshStandardMaterial ||
-					material.envMap ) {
-
-					const uCamPos = p_uniforms.map.cameraPosition;
-
-					if ( uCamPos !== undefined ) {
-
-						uCamPos.setValue( _gl,
-							_vector3.setFromMatrixPosition( camera.matrixWorld ) );
-
-					}
-
-				}
-
-				if ( material.isMeshPhongMaterial ||
-					material.isMeshToonMaterial ||
-					material.isMeshLambertMaterial ||
-					material.isMeshBasicMaterial ||
-					material.isMeshStandardMaterial ||
-					material.isShaderMaterial ) {
-
-					p_uniforms.setValue( _gl, 'isOrthographic', camera.isOrthographicCamera === true );
-
-				}
-
-				if ( material.isMeshPhongMaterial ||
-					material.isMeshToonMaterial ||
-					material.isMeshLambertMaterial ||
-					material.isMeshBasicMaterial ||
-					material.isMeshStandardMaterial ||
-					material.isShaderMaterial ||
-					material.isShadowMaterial ||
-					object.isSkinnedMesh ) {
-
-					p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
 				}
 
@@ -42529,8 +42506,6 @@ class DataTextureLoader extends Loader {
 				}
 
 			}
-
-			if ( ! texData ) return onError(); // TODO: Remove this when all loaders properly throw errors
 
 			if ( texData.image !== undefined ) {
 

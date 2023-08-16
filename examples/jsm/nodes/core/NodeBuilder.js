@@ -104,6 +104,20 @@ class NodeBuilder {
 
 	}
 
+	createBindings() {
+
+		const bindingsArray = [];
+
+		for ( const binding of this.getBindings() ) {
+
+			bindingsArray.push( binding.clone() );
+
+		}
+
+		return bindingsArray;
+
+	}
+
 	getBindings() {
 
 		let bindingsArray = this.bindingsArray;
@@ -128,14 +142,26 @@ class NodeBuilder {
 
 	addNode( node ) {
 
-		if ( this.nodes.indexOf( node ) === - 1 ) {
+		if ( this.nodes.includes( node ) === false ) {
+
+			this.nodes.push( node );
+
+			this.setHashNode( node, node.getHash( this ) );
+
+		}
+
+	}
+
+	buildUpdateNodes() {
+
+		for ( const node of this.nodes ) {
 
 			const updateType = node.getUpdateType();
 			const updateBeforeType = node.getUpdateBeforeType();
 
 			if ( updateType !== NodeUpdateType.NONE ) {
 
-				this.updateNodes.push( node );
+				this.updateNodes.push( node.getSelf() );
 
 			}
 
@@ -144,10 +170,6 @@ class NodeBuilder {
 				this.updateBeforeNodes.push( node );
 
 			}
-
-			this.nodes.push( node );
-
-			this.setHashNode( node, node.getHash( this ) );
 
 		}
 
@@ -330,6 +352,8 @@ class NodeBuilder {
 	}
 
 	getType( type ) {
+
+		if ( type === 'color' ) return 'vec3';
 
 		return type;
 
@@ -561,17 +585,19 @@ class NodeBuilder {
 
 		if ( nodeData === undefined ) {
 
-			nodeData = { vertex: {}, fragment: {}, compute: {} };
+			nodeData = {};
 
 			cache.setNodeData( node, nodeData );
 
 		}
 
-		return shaderStage !== null ? nodeData[ shaderStage ] : nodeData;
+		if ( nodeData[ shaderStage ] === undefined ) nodeData[ shaderStage ] = {};
+
+		return nodeData[ shaderStage ];
 
 	}
 
-	getNodeProperties( node, shaderStage = this.shaderStage ) {
+	getNodeProperties( node, shaderStage = 'any' ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
@@ -648,7 +674,7 @@ class NodeBuilder {
 
 	getVaryingFromNode( node, type ) {
 
-		const nodeData = this.getDataFromNode( node, null );
+		const nodeData = this.getDataFromNode( node, 'any' );
 
 		let nodeVarying = nodeData.varying;
 
@@ -812,7 +838,7 @@ class NodeBuilder {
 
 	getVar( type, name ) {
 
-		return `${type} ${name}`;
+		return `${ this.getType( type ) } ${ name }`;
 
 	}
 
@@ -936,6 +962,7 @@ class NodeBuilder {
 		// stage 4: build code for a specific output
 
 		this.buildCode();
+		this.buildUpdateNodes();
 
 		return this;
 

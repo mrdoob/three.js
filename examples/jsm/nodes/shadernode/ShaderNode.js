@@ -37,6 +37,10 @@ const shaderNodeHandler = {
 
 				return ( ...params ) => nodeElement( nodeObj, ...params );
 
+			} else if ( prop === 'self' ) {
+
+				return node;
+
 			} else if ( prop.endsWith( 'Assign' ) && NodeElements.has( prop.slice( 0, prop.length - 'Assign'.length ) ) ) {
 
 				const nodeElement = NodeElements.get( prop.slice( 0, prop.length - 'Assign'.length ) );

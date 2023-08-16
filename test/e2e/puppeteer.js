@@ -98,6 +98,8 @@ const exceptionList = [
 	'webgl_shadowmap_progressive',
 	'webgl_test_memory2',
 	'webgl_tiled_forward',
+	'webgl2_volume_instancing',
+	'webgl_points_dynamic',
 
 	// TODO: implement determinism for setTimeout and setInterval
 	// could it fix some examples from above?
@@ -127,6 +129,7 @@ const exceptionList = [
 	'webgpu_materials',
 	'webgpu_materials_video',
 	'webgpu_morphtargets',
+	'webgpu_occlusion',
 	'webgpu_particles',
 	'webgpu_rtt',
 	'webgpu_sandbox',
