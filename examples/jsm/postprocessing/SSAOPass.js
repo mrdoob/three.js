@@ -93,7 +93,6 @@ class SSAOPass extends Pass {
 			blending: NoBlending
 		} );
 
-		this.ssaoMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 		this.ssaoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
 		this.ssaoMaterial.uniforms[ 'tDepth' ].value = this.normalRenderTarget.depthTexture;
 		this.ssaoMaterial.uniforms[ 'tNoise' ].value = this.noiseTexture;
