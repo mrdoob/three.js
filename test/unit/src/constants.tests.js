@@ -135,6 +135,9 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.RGBA_ASTC_12x10_Format, 37820, 'Constants.RGBA_ASTC_12x10_Format is equal to 37820' );
 		assert.equal( Constants.RGBA_ASTC_12x12_Format, 37821, 'Constants.RGBA_ASTC_12x12_Format is equal to 37821' );
 		assert.equal( Constants.RGBA_BPTC_Format, 36492, 'Constants.RGBA_BPTC_Format is equal to 36492' );
+		assert.equal( Constants.SRGB_ALPHA_BPTC_Format, 36493, 'Constants.SRGB_ALPHA_BPTC_Format is equal to 36493' );
+		assert.equal( Constants.RGB_BPTC_SIGNED_Format, 36494, 'Constants.RGB_BPTC_SIGNED_Format is equal to 36494' );
+		assert.equal( Constants.RGB_BPTC_UNSIGNED_Format, 36495, 'Constants.RGB_BPTC_UNSIGNED_Format is equal to 36495' );
 		assert.equal( Constants.RED_RGTC1_Format, 36283, 'Constants.RED_RGTC1_Format is equal to 36283' );
 		assert.equal( Constants.SIGNED_RED_RGTC1_Format, 36284, 'Constants.SIGNED_RED_RGTC1_Format is equal to 36284' );
 		assert.equal( Constants.RED_GREEN_RGTC2_Format, 36285, 'Constants.RED_GREEN_RGTC2_Format is equal to 36285' );
