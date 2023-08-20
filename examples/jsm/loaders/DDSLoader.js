@@ -193,9 +193,9 @@ class DDSLoader extends CompressedTextureLoader {
 			case FOURCC_DX10:
 
 				dataOffset += extendedHeaderLengthInt * 4;
-				const extendedHeader = new Int32Array(buffer, (headerLengthInt + 1) * 4, extendedHeaderLengthInt);
+				const extendedHeader = new Int32Array( buffer, ( headerLengthInt + 1 ) * 4, extendedHeaderLengthInt );
 				const dxgiFormat = extendedHeader[ off_dxgiFormat ];
-				switch (dxgiFormat) {
+				switch ( dxgiFormat ) {
 
 					case DXGI_FORMAT_BC6H_SF16: {
 
@@ -215,7 +215,7 @@ class DDSLoader extends CompressedTextureLoader {
 
 					default: {
 
-						console.error('Unsupported DXGI_FORMAT code ', dxgiFormat);
+						console.error( 'THREE.DDSLoader.parse: Unsupported DXGI_FORMAT code ', dxgiFormat );
 						return dds;
 
 					}
@@ -290,6 +290,7 @@ class DDSLoader extends CompressedTextureLoader {
 					dataLength = byteArray.length;
 
 				} else {
+
 					dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
 					byteArray = new Uint8Array( buffer, dataOffset, dataLength );
 
