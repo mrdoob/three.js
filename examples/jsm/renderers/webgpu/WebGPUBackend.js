@@ -742,9 +742,15 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	updateTexture( texture ) {
+	updateTexture( texture, options ) {
 
-		this.textureUtils.updateTexture( texture );
+		this.textureUtils.updateTexture( texture, options );
+
+	}
+
+	generateMipmaps( texture ) {
+
+		this.textureUtils.generateMipmaps( texture );
 
 	}
 
@@ -972,7 +978,7 @@ class WebGPUBackend extends Backend {
 		depthTexture.image.width = width;
 		depthTexture.image.height = height;
 
-		this.textureUtils.createTexture( depthTexture, { sampleCount: this.parameters.sampleCount } );
+		this.textureUtils.createTexture( depthTexture, { sampleCount: this.parameters.sampleCount, width, height } );
 
 		return this.get( depthTexture ).texture;
 

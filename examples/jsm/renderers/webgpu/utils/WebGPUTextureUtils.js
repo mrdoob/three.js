@@ -97,11 +97,13 @@ class WebGPUTextureUtils {
 
 		}
 
-		const { width, height, depth } = this._getSize( texture );
+		if ( options.needsMipmaps === undefined ) options.needsMipmaps = false;
+		if ( options.levels === undefined ) options.levels = 1;
+		if ( options.depth === undefined ) options.depth = 1;
 
-		const needsMipmaps = this._needsMipmaps( texture );
+		const { width, height, depth, needsMipmaps, levels } = options;
+
 		const dimension = this._getDimension( texture );
-		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
 		const format = texture.internalFormat || this._getFormat( texture );
 
 		const sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
@@ -122,7 +124,7 @@ class WebGPUTextureUtils {
 				height: height,
 				depthOrArrayLayers: depth,
 			},
-			mipLevelCount: mipLevelCount,
+			mipLevelCount: levels,
 			sampleCount: primarySampleCount,
 			dimension: dimension,
 			format: format,
@@ -170,7 +172,6 @@ class WebGPUTextureUtils {
 
 		textureData.initialized = true;
 
-		textureData.needsMipmaps = needsMipmaps;
 		textureData.textureDescriptorGPU = textureDescriptorGPU;
 
 	}
@@ -217,20 +218,20 @@ class WebGPUTextureUtils {
 
 	}
 
-	updateTexture( texture ) {
+	updateTexture( texture, options ) {
 
 		const textureData = this.backend.get( texture );
 
-		const { needsMipmaps, textureDescriptorGPU } = textureData;
+		const { textureDescriptorGPU } = textureData;
 
-		if ( textureDescriptorGPU === undefined ) // unsupported texture format
+		if ( texture.isRenderTargetTexture || ( textureDescriptorGPU === undefined /* unsupported texture format */ ) )
 			return;
 
 		// transfer texture data
 
 		if ( texture.isDataTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
 
-			this._copyBufferToTexture( texture.image, textureData.texture, textureDescriptorGPU, needsMipmaps );
+			this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU );
 
 		} else if ( texture.isCompressedTexture ) {
 
@@ -238,15 +239,7 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isCubeTexture ) {
 
-			if ( texture.image.length === 6 ) {
-
-				this._copyCubeMapToTexture( texture.image, texture, textureData.texture, textureDescriptorGPU, needsMipmaps );
-
-			}
-
-		} else if ( texture.isRenderTargetTexture ) {
-
-			if ( needsMipmaps === true ) this._generateMipmaps( textureData.texture, textureDescriptorGPU );
+			this._copyCubeMapToTexture( options.images, texture, textureData.texture, textureDescriptorGPU );
 
 		} else if ( texture.isVideoTexture ) {
 
@@ -254,13 +247,9 @@ class WebGPUTextureUtils {
 
 			textureData.externalTexture = video;
 
-		} else if ( texture.image !== null ) {
-
-			this._copyImageToTexture( texture.image, texture, textureData.texture, textureDescriptorGPU, needsMipmaps );
-
 		} else {
 
-			console.warn( 'WebGPUTextureUtils: Unable to update texture.' );
+			this._copyImageToTexture( options.image, textureData.texture );
 
 		}
 
@@ -336,7 +325,7 @@ class WebGPUTextureUtils {
 			texture.minFilter = NearestFilter;
 			texture.magFilter = NearestFilter;
 
-			this.createTexture( texture );
+			this.createTexture( texture, { width: 1, height: 1 } );
 
 			this.defaultTexture = defaultTexture = texture;
 
@@ -356,7 +345,7 @@ class WebGPUTextureUtils {
 			texture.minFilter = NearestFilter;
 			texture.magFilter = NearestFilter;
 
-			this.createTexture( texture );
+			this.createTexture( texture, { width: 1, height: 1, depth: 6 } );
 
 			this.defaultCubeTexture = defaultCubeTexture = texture;
 
@@ -366,33 +355,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	_copyImageToTexture( image, texture, textureGPU, textureDescriptorGPU, needsMipmaps, originDepth ) {
-
-		if ( this._isHTMLImage( image ) ) {
-
-			this._getImageBitmapFromHTML( image, texture ).then( imageBitmap => {
-
-				this._copyExternalImageToTexture( imageBitmap, textureGPU, textureDescriptorGPU, needsMipmaps, originDepth );
-
-			} );
-
-		} else {
-
-			// assume ImageBitmap
-
-			this._copyExternalImageToTexture( image, textureGPU, textureDescriptorGPU, needsMipmaps, originDepth );
-
-		}
-
-	}
-
-	_isHTMLImage( image ) {
-
-		return ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) || ( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement );
-
-	}
-
-	_copyCubeMapToTexture( images, texture, textureGPU, textureDescriptorGPU, needsMipmaps ) {
+	_copyCubeMapToTexture( images, texture, textureGPU, textureDescriptorGPU ) {
 
 		for ( let i = 0; i < 6; i ++ ) {
 
@@ -400,11 +363,11 @@ class WebGPUTextureUtils {
 
 			if ( image.isDataTexture ) {
 
-				this._copyBufferToTexture( image.image, textureGPU, textureDescriptorGPU, needsMipmaps, i );
+				this._copyBufferToTexture( image.image, textureGPU, textureDescriptorGPU, i );
 
 			} else {
 
-				this._copyImageToTexture( image, texture, textureGPU, textureDescriptorGPU, needsMipmaps, i );
+				this._copyImageToTexture( image, textureGPU, i );
 
 			}
 
@@ -412,7 +375,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	_copyExternalImageToTexture( image, textureGPU, textureDescriptorGPU, needsMipmaps, originDepth = 0 ) {
+	_copyImageToTexture( image, textureGPU, originDepth = 0 ) {
 
 		const device = this.backend.device;
 
@@ -430,8 +393,6 @@ class WebGPUTextureUtils {
 			}
 		);
 
-		if ( needsMipmaps ) this._generateMipmaps( textureGPU, textureDescriptorGPU, originDepth );
-
 	}
 
 	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0 ) {
@@ -446,21 +407,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	_getImageBitmapFromHTML( image, texture ) {
-
-		const width = image.width;
-		const height = image.height;
-
-		const options = {};
-
-		options.imageOrientation = ( texture.flipY === true ) ? 'flipY' : 'none';
-		options.premultiplyAlpha = ( texture.premultiplyAlpha === true ) ? 'premultiply' : 'default';
-
-		return createImageBitmap( image, 0, 0, width, height, options );
-
-	}
-
-	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, needsMipmaps, originDepth = 0 ) {
+	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, originDepth = 0 ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 		// @TODO: Consider to support valid buffer layouts with other formats like RGB
@@ -488,8 +435,6 @@ class WebGPUTextureUtils {
 				height: image.height,
 				depthOrArrayLayers: ( image.depth !== undefined ) ? image.depth : 1
 			} );
-
-		if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureDescriptorGPU, originDepth );
 
 	}
 
@@ -600,44 +545,6 @@ class WebGPUTextureUtils {
 
 	}
 
-	_getSize( texture ) {
-
-		const image = texture.image;
-
-		let width, height, depth;
-
-		if ( texture.isCubeTexture ) {
-
-			const faceImage = image.length > 0 ? image[ 0 ].image || image[ 0 ] : null;
-
-			width = faceImage ? faceImage.width : 1;
-			height = faceImage ? faceImage.height : 1;
-			depth = 6; // one image for each side of the cube map
-
-		} else if ( image !== null ) {
-
-			width = image.width;
-			height = image.height;
-			depth = ( image.depth !== undefined ) ? image.depth : 1;
-
-		} else {
-
-			width = height = depth = 1;
-
-		}
-
-		return { width, height, depth };
-
-	}
-
-	_needsMipmaps( texture ) {
-
-		if ( this._isEnvironmentTexture( texture ) ) return true;
-
-		return ( texture.isCompressedTexture !== true ) /*&& ( texture.generateMipmaps === true )*/ && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
-
-	}
-
 	_getBytesPerTexel( format ) {
 
 		if ( format === GPUTextureFormat.R8Unorm ) return 1;
@@ -703,28 +610,6 @@ class WebGPUTextureUtils {
 		}
 
 		return dimension;
-
-	}
-
-	_getMipLevelCount( texture, width, height, needsMipmaps ) {
-
-		let mipLevelCount;
-
-		if ( texture.isCompressedTexture ) {
-
-			mipLevelCount = texture.mipmaps.length;
-
-		} else if ( needsMipmaps ) {
-
-			mipLevelCount = Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
-
-		} else {
-
-			mipLevelCount = 1; // a texture without mipmaps has a base mip (mipLevel 0)
-
-		}
-
-		return mipLevelCount;
 
 	}
 
