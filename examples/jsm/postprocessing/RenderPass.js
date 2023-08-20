@@ -14,7 +14,7 @@ class RenderPass extends Pass {
 
 		this.overrideMaterial = overrideMaterial;
 
-		this.clearColor = clearColor;
+		this.clearColor = ( clearColor !== undefined ) ? clearColor : new THREE.Color(0x000000);
 		this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
 
 		this.clear = true;
