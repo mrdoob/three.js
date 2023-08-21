@@ -17,12 +17,15 @@ import {
 	CompressedCubeTexture,
 	Data3DTexture,
 	DataTexture,
+	DisplayP3ColorSpace,
 	FileLoader,
 	FloatType,
 	HalfFloatType,
 	NoColorSpace,
 	LinearFilter,
 	LinearMipmapLinearFilter,
+	LinearDisplayP3ColorSpace,
+	LinearSRGBColorSpace,
 	Loader,
 	RedFormat,
 	RGB_ETC1_Format,
@@ -61,7 +64,10 @@ import {
 	VK_FORMAT_R8G8B8A8_SRGB,
 	VK_FORMAT_R8G8B8A8_UNORM,
 	VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
-	VK_FORMAT_ASTC_6x6_UNORM_BLOCK
+	VK_FORMAT_ASTC_6x6_UNORM_BLOCK,
+	KHR_DF_PRIMARIES_UNSPECIFIED,
+	KHR_DF_PRIMARIES_BT709,
+	KHR_DF_PRIMARIES_DISPLAYP3
 } from '../libs/ktx-parse.module.js';
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
 
@@ -282,8 +288,7 @@ class KTX2Loader extends Loader {
 		texture.generateMipmaps = false;
 
 		texture.needsUpdate = true;
-		// TODO: Detect NoColorSpace vs. LinearSRGBColorSpace based on primaries.
-		texture.colorSpace = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? SRGBColorSpace : NoColorSpace;
+		texture.colorSpace = parseColorSpace( container );
 		texture.premultiplyAlpha = !! ( dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED );
 
 		return texture;
@@ -756,16 +761,6 @@ const TYPE_MAP = {
 
 };
 
-const COLOR_SPACE_MAP = {
-
-	[ VK_FORMAT_R8G8B8A8_SRGB ]: SRGBColorSpace,
-	[ VK_FORMAT_R8G8_SRGB ]: SRGBColorSpace,
-	[ VK_FORMAT_R8_SRGB ]: SRGBColorSpace,
-
-	[ VK_FORMAT_ASTC_6x6_SRGB_BLOCK ]: SRGBColorSpace,
-
-};
-
 async function createRawTexture( container ) {
 
 	const { vkFormat } = container;
@@ -888,13 +883,37 @@ async function createRawTexture( container ) {
 
 	texture.type = TYPE_MAP[ vkFormat ];
 	texture.format = FORMAT_MAP[ vkFormat ];
-	texture.colorSpace = COLOR_SPACE_MAP[ vkFormat ] || NoColorSpace;
-
+	texture.colorSpace = parseColorSpace( container );
 	texture.needsUpdate = true;
 
 	//
 
 	return Promise.resolve( texture );
+
+}
+
+function parseColorSpace( container ) {
+
+	const dfd = container.dataFormatDescriptor[ 0 ];
+
+	if ( dfd.colorPrimaries === KHR_DF_PRIMARIES_BT709 ) {
+
+		return dfd.transferFunction === KHR_DF_TRANSFER_SRGB ? SRGBColorSpace : LinearSRGBColorSpace;
+
+	} else if ( dfd.colorPrimaries === KHR_DF_PRIMARIES_DISPLAYP3 ) {
+
+		return dfd.transferFunction === KHR_DF_TRANSFER_SRGB ? DisplayP3ColorSpace : LinearDisplayP3ColorSpace;
+
+	} else if ( dfd.colorPrimaries === KHR_DF_PRIMARIES_UNSPECIFIED ) {
+
+		return NoColorSpace;
+
+	} else {
+
+		console.warn( `THREE.KTX2Loader: Unsupported color primaries, "${ dfd.colorPrimaries }"` );
+		return NoColorSpace;
+
+	}
 
 }
 
