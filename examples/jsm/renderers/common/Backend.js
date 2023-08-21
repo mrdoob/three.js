@@ -1,7 +1,7 @@
 let vector2 = null;
 let vector4 = null;
 
-import { Vector2, Vector4, REVISION } from 'three';
+import { Vector2, Vector4, REVISION, createCanvasElement } from 'three';
 
 class Backend {
 
@@ -118,7 +118,7 @@ class Backend {
 
 		if ( domElement === null ) {
 
-			domElement = ( this.parameters.canvas !== undefined ) ? this.parameters.canvas : this.createCanvasElement();
+			domElement = ( this.parameters.canvas !== undefined ) ? this.parameters.canvas : createCanvasElement();
 
 			// OffscreenCanvas does not have setAttribute, see #22811
 			if ( 'setAttribute' in domElement ) domElement.setAttribute( 'data-engine', `three.js r${REVISION}` );
@@ -128,14 +128,6 @@ class Backend {
 		}
 
 		return domElement;
-
-	}
-
-	createCanvasElement() {
-
-		const canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-		canvas.style.display = 'block';
-		return canvas;
 
 	}
 

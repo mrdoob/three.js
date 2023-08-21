@@ -134,6 +134,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	const RGBA_ASTC_12x10_Format = 37820;
 	const RGBA_ASTC_12x12_Format = 37821;
 	const RGBA_BPTC_Format = 36492;
+	const SRGB_ALPHA_BPTC_Format = 36493;
+	const RGB_BPTC_SIGNED_Format = 36494;
+	const RGB_BPTC_UNSIGNED_Format = 36495;
 	const RED_RGTC1_Format = 36283;
 	const SIGNED_RED_RGTC1_Format = 36284;
 	const RED_GREEN_RGTC2_Format = 36285;
@@ -1535,6 +1538,14 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
+	function createCanvasElement() {
+
+		const canvas = createElementNS( 'canvas' );
+		canvas.style.display = 'block';
+		return canvas;
+
+	}
+
 	const _cache = {};
 
 	function warnOnce( message ) {
@@ -1926,7 +1937,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	let textureId = 0;
+	let _textureId = 0;
 
 	class Texture extends EventDispatcher {
 
@@ -1936,7 +1947,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.isTexture = true;
 
-			Object.defineProperty( this, 'id', { value: textureId ++ } );
+			Object.defineProperty( this, 'id', { value: _textureId ++ } );
 
 			this.uuid = generateUUID();
 
@@ -8393,7 +8404,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	let materialId = 0;
+	let _materialId = 0;
 
 	class Material extends EventDispatcher {
 
@@ -8403,7 +8414,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.isMaterial = true;
 
-			Object.defineProperty( this, 'id', { value: materialId ++ } );
+			Object.defineProperty( this, 'id', { value: _materialId ++ } );
 
 			this.uuid = generateUUID();
 
@@ -10372,7 +10383,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	let _id$1 = 0;
+	let _id$2 = 0;
 
 	const _m1 = /*@__PURE__*/ new Matrix4();
 	const _obj = /*@__PURE__*/ new Object3D();
@@ -10389,7 +10400,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.isBufferGeometry = true;
 
-			Object.defineProperty( this, 'id', { value: _id$1 ++ } );
+			Object.defineProperty( this, 'id', { value: _id$2 ++ } );
 
 			this.uuid = generateUUID();
 
@@ -11494,7 +11505,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			this.material = source.material;
+			this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 			this.geometry = source.geometry;
 
 			return this;
@@ -20057,7 +20068,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	let _id = 0;
+	let _id$1 = 0;
 
 	class WebGLShaderCache {
 
@@ -20171,7 +20182,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		constructor( code ) {
 
-			this.id = _id ++;
+			this.id = _id$1 ++;
 
 			this.code = code;
 			this.usedTimes = 0;
@@ -25833,13 +25844,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			// BPTC
 
-			if ( p === RGBA_BPTC_Format ) {
+			if ( p === RGBA_BPTC_Format || p === SRGB_ALPHA_BPTC_Format || p === RGB_BPTC_SIGNED_Format || p === RGB_BPTC_UNSIGNED_Format ) {
 
 				extension = extensions.get( 'EXT_texture_compression_bptc' );
 
 				if ( extension !== null ) {
 
-					if ( p === RGBA_BPTC_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT : extension.COMPRESSED_RGBA_BPTC_UNORM_EXT;
+					if ( p === RGBA_BPTC_Format || p === SRGB_ALPHA_BPTC_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT : extension.COMPRESSED_RGBA_BPTC_UNORM_EXT;
+					if ( p === RGB_BPTC_SIGNED_Format ) return extension.COMPRESSED_RGB_BPTC_SIGNED_FLOAT_EXT;
+					if ( p === RGB_BPTC_UNSIGNED_Format ) return extension.COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_EXT;
 
 				} else {
 
@@ -28048,14 +28061,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			dispose: dispose
 
 		};
-
-	}
-
-	function createCanvasElement() {
-
-		const canvas = createElementNS( 'canvas' );
-		canvas.style.display = 'block';
-		return canvas;
 
 	}
 
@@ -32357,7 +32362,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			super.copy( source, recursive );
 
-			this.material = source.material;
+			this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 			this.geometry = source.geometry;
 
 			return this;
@@ -32678,7 +32683,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			super.copy( source, recursive );
 
-			this.material = source.material;
+			this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 			this.geometry = source.geometry;
 
 			return this;
@@ -45919,6 +45924,12 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		disconnect() {
 
+			if ( this._connected === false ) {
+
+				return;
+
+			}
+
 			if ( this.filters.length > 0 ) {
 
 				this.source.disconnect( this.filters[ 0 ] );
@@ -49167,7 +49178,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	let id = 0;
+	let _id = 0;
 
 	class UniformsGroup extends EventDispatcher {
 
@@ -49177,7 +49188,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.isUniformsGroup = true;
 
-			Object.defineProperty( this, 'id', { value: id ++ } );
+			Object.defineProperty( this, 'id', { value: _id ++ } );
 
 			this.name = '';
 
@@ -51737,6 +51748,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	exports.RGBA_S3TC_DXT1_Format = RGBA_S3TC_DXT1_Format;
 	exports.RGBA_S3TC_DXT3_Format = RGBA_S3TC_DXT3_Format;
 	exports.RGBA_S3TC_DXT5_Format = RGBA_S3TC_DXT5_Format;
+	exports.RGB_BPTC_SIGNED_Format = RGB_BPTC_SIGNED_Format;
+	exports.RGB_BPTC_UNSIGNED_Format = RGB_BPTC_UNSIGNED_Format;
 	exports.RGB_ETC1_Format = RGB_ETC1_Format;
 	exports.RGB_ETC2_Format = RGB_ETC2_Format;
 	exports.RGB_PVRTC_2BPPV1_Format = RGB_PVRTC_2BPPV1_Format;
@@ -51759,6 +51772,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	exports.SIGNED_RED_GREEN_RGTC2_Format = SIGNED_RED_GREEN_RGTC2_Format;
 	exports.SIGNED_RED_RGTC1_Format = SIGNED_RED_RGTC1_Format;
 	exports.SRGBColorSpace = SRGBColorSpace;
+	exports.SRGB_ALPHA_BPTC_Format = SRGB_ALPHA_BPTC_Format;
 	exports.Scene = Scene;
 	exports.ShaderChunk = ShaderChunk;
 	exports.ShaderLib = ShaderLib;
@@ -51846,6 +51860,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	exports.ZeroSlopeEnding = ZeroSlopeEnding;
 	exports.ZeroStencilOp = ZeroStencilOp;
 	exports._SRGBAFormat = _SRGBAFormat;
+	exports.createCanvasElement = createCanvasElement;
 	exports.sRGBEncoding = sRGBEncoding;
 
 }));

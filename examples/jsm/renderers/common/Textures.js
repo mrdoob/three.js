@@ -1,7 +1,8 @@
 import DataMap from './DataMap.js';
-import { Vector2, DepthTexture, DepthStencilFormat, UnsignedInt248Type } from 'three';
 
-const _size = new Vector2();
+import { Vector3, DepthTexture, DepthStencilFormat, UnsignedInt248Type, LinearFilter, NearestFilter, EquirectangularReflectionMapping, EquirectangularRefractionMapping, CubeReflectionMapping, CubeRefractionMapping } from 'three';
+
+const _size = new Vector3();
 
 class Textures extends DataMap {
 
@@ -105,6 +106,16 @@ class Textures extends DataMap {
 
 		//
 
+		const { width, height, depth } = this.getSize( texture );
+
+		options.width = width;
+		options.height = height;
+		options.depth = depth;
+		options.needsMipmaps = this.needsMipmaps( texture );
+		options.levels = this.getMipLevels( texture, width, height, options.needsMipmaps );
+
+		//
+
 		if ( isRenderTarget ) {
 
 			backend.createSampler( texture );
@@ -130,6 +141,24 @@ class Textures extends DataMap {
 
 				} else {
 
+					if ( texture.images ) {
+
+						const images = [];
+
+						for ( const image of texture.images ) {
+
+							images.push( this._getUploadImage( image ) );
+
+						}
+
+						options.images = images;
+
+					} else {
+
+						options.image = this._getUploadImage( image );
+
+					}
+
 					if ( textureData.isDefaultTexture === undefined || textureData.isDefaultTexture === true ) {
 
 						backend.createTexture( texture, options );
@@ -138,7 +167,9 @@ class Textures extends DataMap {
 
 					}
 
-					backend.updateTexture( texture );
+					backend.updateTexture( texture, options );
+
+					if ( options.needsMipmaps ) backend.generateMipmaps( texture );
 
 				}
 
@@ -188,19 +219,93 @@ class Textures extends DataMap {
 
 	getSize( texture, target = _size ) {
 
-		if ( texture.isCubeTexture ) {
+		let image = texture.images ? texture.images[ 0 ] : texture.image;
 
-			target.width = texture.image[ 0 ].width;
-			target.height = texture.image[ 0 ].height;
+		if ( image ) {
+
+			if ( image.image !== undefined ) image = image.image;
+
+			target.width = image.width;
+			target.height = image.height;
+			target.depth = texture.isCubeTexture ? 6 : ( image.depth || 1 );
 
 		} else {
 
-			target.width = texture.image.width;
-			target.height = texture.image.height;
+			target.width = target.height = target.depth = 1;
 
 		}
 
 		return target;
+
+	}
+
+	getMipLevels( texture, width, height, needsMipmaps ) {
+
+		let mipLevelCount;
+
+		if ( texture.isCompressedTexture ) {
+
+			mipLevelCount = texture.mipmaps.length;
+
+		} else if ( needsMipmaps ) {
+
+			mipLevelCount = Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
+
+		} else {
+
+			mipLevelCount = 1; // a texture without mipmaps has a base mip (mipLevel 0)
+
+		}
+
+		return mipLevelCount;
+
+	}
+
+	needsMipmaps( texture ) {
+
+		if ( this.isEnvironmentTexture( texture ) ) return true;
+
+		return ( texture.isCompressedTexture !== true ) /*&& ( texture.generateMipmaps === true )*/ && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
+
+	}
+
+	isEnvironmentTexture( texture ) {
+
+		const mapping = texture.mapping;
+
+		return ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping ) || ( mapping === CubeReflectionMapping || mapping === CubeRefractionMapping );
+
+	}
+
+	_getUploadImage( image ) {
+
+		if ( this._isHTMLImage( image ) ) {
+
+			return this._imageToCanvas( image );
+
+		}
+
+		return image;
+
+	}
+
+	_imageToCanvas( image ) {
+
+		const { width, height } = image;
+
+		// eslint-disable-next-line compat/compat
+		const canvas = new OffscreenCanvas( width, height );
+
+		const context = canvas.getContext( '2d' );
+		context.drawImage( image, 0, 0, width, height );
+
+		return canvas;
+
+	}
+
+	_isHTMLImage( image ) {
+
+		return ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) || ( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement );
 
 	}
 

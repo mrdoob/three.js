@@ -1,4 +1,4 @@
-import { RenderTarget, NoColorSpace } from 'three';
+import { RenderTarget, NoColorSpace, FloatType } from 'three';
 
 import UniformsGroup from '../../common/UniformsGroup.js';
 
@@ -133,7 +133,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getSampler( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+	_getSampler( texture, textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
@@ -141,17 +141,13 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			this._include( 'repeatWrapping' );
-
-			const dimension = `textureDimensions( ${textureProperty}, 0 )`;
-
-			return `textureLoad( ${textureProperty}, threejs_repeatWrapping( ${uvSnippet}, ${dimension} ), 0 )`;
+			return this.getTextureLoad( texture, textureProperty, uvSnippet );
 
 		}
 
 	}
 
-	getVideoSampler( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+	_getVideoSampler( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
@@ -165,21 +161,33 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	_getSamplerLevel( texture, textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
-		if ( shaderStage === 'fragment' ) {
+		if ( shaderStage === 'fragment' && this.isUnfilterable( texture ) === false ) {
 
 			return `textureSampleLevel( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${biasSnippet} )`;
 
 		} else {
 
-			this._include( 'repeatWrapping' );
-
-			const dimension = `textureDimensions( ${textureProperty}, 0 )`;
-
-			return `textureLoad( ${textureProperty}, threejs_repeatWrapping( ${uvSnippet}, ${dimension} ), i32( ${biasSnippet} ) )`;
+			return this.getTextureLoad( texture, textureProperty, uvSnippet, biasSnippet );
 
 		}
+
+	}
+
+	getTextureLoad( texture, textureProperty, uvSnippet, biasSnippet = '0' ) {
+
+		this._include( 'repeatWrapping' );
+
+		const dimension = `textureDimensions( ${textureProperty}, 0 )`;
+
+		return `textureLoad( ${textureProperty}, threejs_repeatWrapping( ${uvSnippet}, ${dimension} ), i32( ${biasSnippet} ) )`;
+
+	}
+
+	isUnfilterable( texture ) {
+
+		return texture.isDataTexture === true && texture.type === FloatType;
 
 	}
 
@@ -189,11 +197,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( texture.isVideoTexture === true ) {
 
-			snippet = this.getVideoSampler( textureProperty, uvSnippet, shaderStage );
+			snippet = this._getVideoSampler( textureProperty, uvSnippet, shaderStage );
+
+		} else if ( this.isUnfilterable( texture ) ) {
+
+			snippet = this.getTextureLoad( texture, textureProperty, uvSnippet );
 
 		} else {
 
-			snippet = this.getSampler( textureProperty, uvSnippet, shaderStage );
+			snippet = this._getSampler( texture, textureProperty, uvSnippet, shaderStage );
 
 		}
 
@@ -221,11 +233,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( texture.isVideoTexture === true ) {
 
-			snippet = this.getVideoSampler( textureProperty, uvSnippet, shaderStage );
+			snippet = this._getVideoSampler( textureProperty, uvSnippet, shaderStage );
 
 		} else {
 
-			snippet = this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
+			snippet = this._getSamplerLevel( texture, textureProperty, uvSnippet, biasSnippet, shaderStage );
 
 		}
 
@@ -299,7 +311,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 				const lastBinding = bindings[ bindings.length - 1 ];
 				const index = lastBinding && lastBinding.isUniformsGroup ? bindings.length - 1 : bindings.length;
 
-				if ( shaderStage === 'fragment' ) {
+				if ( shaderStage === 'fragment' && this.isUnfilterable( node.value ) === false ) {
 
 					const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node );
 					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
@@ -577,9 +589,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' ) {
 
-				if ( shaderStage === 'fragment' ) {
+				const texture = uniform.node.value;
 
-					const texture = uniform.node.value;
+				if ( shaderStage === 'fragment' && this.isUnfilterable( texture ) === false ) {
 
 					if ( texture.isDepthTexture === true && texture.compareFunction !== null ) {
 
@@ -592,8 +604,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 					}
 
 				}
-
-				const texture = uniform.node.value;
 
 				let textureType;
 

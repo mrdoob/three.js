@@ -1,6 +1,7 @@
 import {
-	GPUTextureAspect, GPUTextureViewDimension, GPUBufferBindingType
+	GPUTextureAspect, GPUTextureViewDimension, GPUBufferBindingType, GPUTextureSampleType
 } from './WebGPUConstants.js';
+import { FloatType } from 'three';
 
 class WebGPUBindingUtils {
 
@@ -64,7 +65,13 @@ class WebGPUBindingUtils {
 
 				if ( binding.texture.isDepthTexture ) {
 
-					texture.sampleType = 'depth';
+					texture.sampleType = GPUTextureSampleType.Depth;
+
+				} else if ( binding.texture.isDataTexture && binding.texture.type === FloatType ) {
+
+					// @TODO: Add support for this soon: backend.hasFeature( 'float32-filterable' )
+
+					texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
 
 				}
 
