@@ -101,7 +101,7 @@ class WebGPUTextureUtils {
 		if ( options.levels === undefined ) options.levels = 1;
 		if ( options.depth === undefined ) options.depth = 1;
 
-		const { width, height, depth, needsMipmaps, levels } = options;
+		const { width, height, depth, levels } = options;
 
 		const dimension = this._getDimension( texture );
 		const format = texture.internalFormat || this._getFormat( texture );
