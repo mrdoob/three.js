@@ -1538,6 +1538,14 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
+	function createCanvasElement() {
+
+		const canvas = createElementNS( 'canvas' );
+		canvas.style.display = 'block';
+		return canvas;
+
+	}
+
 	const _cache = {};
 
 	function warnOnce( message ) {
@@ -28056,14 +28064,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	function createCanvasElement() {
-
-		const canvas = createElementNS( 'canvas' );
-		canvas.style.display = 'block';
-		return canvas;
-
-	}
-
 	class WebGLRenderer {
 
 		constructor( parameters = {} ) {
@@ -51860,6 +51860,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	exports.ZeroSlopeEnding = ZeroSlopeEnding;
 	exports.ZeroStencilOp = ZeroStencilOp;
 	exports._SRGBAFormat = _SRGBAFormat;
+	exports.createCanvasElement = createCanvasElement;
 	exports.sRGBEncoding = sRGBEncoding;
 
 }));

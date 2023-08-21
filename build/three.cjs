@@ -1533,6 +1533,14 @@ function createElementNS( name ) {
 
 }
 
+function createCanvasElement() {
+
+	const canvas = createElementNS( 'canvas' );
+	canvas.style.display = 'block';
+	return canvas;
+
+}
+
 const _cache = {};
 
 function warnOnce( message ) {
@@ -28051,14 +28059,6 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 }
 
-function createCanvasElement() {
-
-	const canvas = createElementNS( 'canvas' );
-	canvas.style.display = 'block';
-	return canvas;
-
-}
-
 class WebGLRenderer {
 
 	constructor( parameters = {} ) {
@@ -51855,4 +51855,5 @@ exports.ZeroFactor = ZeroFactor;
 exports.ZeroSlopeEnding = ZeroSlopeEnding;
 exports.ZeroStencilOp = ZeroStencilOp;
 exports._SRGBAFormat = _SRGBAFormat;
+exports.createCanvasElement = createCanvasElement;
 exports.sRGBEncoding = sRGBEncoding;
