@@ -263,7 +263,7 @@ class KTX2Loader extends Loader {
 
 	_createTextureFrom( transcodeResult, container ) {
 
-		const { faces, width, height, format, type, error, dfdTransferFn, dfdFlags } = transcodeResult;
+		const { faces, width, height, format, type, error, dfdFlags } = transcodeResult;
 
 		if ( type === 'error' ) return Promise.reject( error );
 
@@ -408,9 +408,9 @@ KTX2Loader.BasisWorker = function () {
 
 					try {
 
-						const { faces, buffers, width, height, hasAlpha, format, dfdTransferFn, dfdFlags } = transcode( message.buffer );
+						const { faces, buffers, width, height, hasAlpha, format, dfdFlags } = transcode( message.buffer );
 
-						self.postMessage( { type: 'transcode', id: message.id, faces, width, height, hasAlpha, format, dfdTransferFn, dfdFlags }, buffers );
+						self.postMessage( { type: 'transcode', id: message.id, faces, width, height, hasAlpha, format, dfdFlags }, buffers );
 
 					} catch ( error ) {
 
@@ -473,7 +473,6 @@ KTX2Loader.BasisWorker = function () {
 		const levelCount = ktx2File.getLevels();
 		const faceCount = ktx2File.getFaces();
 		const hasAlpha = ktx2File.getHasAlpha();
-		const dfdTransferFn = ktx2File.getDFDTransferFunc();
 		const dfdFlags = ktx2File.getDFDFlags();
 
 		const { transcoderFormat, engineFormat } = getTranscoderFormat( basisFormat, width, height, hasAlpha );
@@ -557,7 +556,7 @@ KTX2Loader.BasisWorker = function () {
 
 		cleanup();
 
-		return { faces, buffers, width, height, hasAlpha, format: engineFormat, dfdTransferFn, dfdFlags };
+		return { faces, buffers, width, height, hasAlpha, format: engineFormat, dfdFlags };
 
 	}
 
