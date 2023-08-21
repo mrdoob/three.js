@@ -129,9 +129,6 @@ const RGBA_ASTC_10x10_Format = 37819;
 const RGBA_ASTC_12x10_Format = 37820;
 const RGBA_ASTC_12x12_Format = 37821;
 const RGBA_BPTC_Format = 36492;
-const SRGB_ALPHA_BPTC_Format = 36493;
-const RGB_BPTC_SIGNED_Format = 36494;
-const RGB_BPTC_UNSIGNED_Format = 36495;
 const RED_RGTC1_Format = 36283;
 const SIGNED_RED_RGTC1_Format = 36284;
 const RED_GREEN_RGTC2_Format = 36285;
@@ -1924,7 +1921,7 @@ function serializeImage( image ) {
 
 }
 
-let _textureId = 0;
+let textureId = 0;
 
 class Texture extends EventDispatcher {
 
@@ -1934,7 +1931,7 @@ class Texture extends EventDispatcher {
 
 		this.isTexture = true;
 
-		Object.defineProperty( this, 'id', { value: _textureId ++ } );
+		Object.defineProperty( this, 'id', { value: textureId ++ } );
 
 		this.uuid = generateUUID();
 
@@ -8391,7 +8388,7 @@ class Triangle {
 
 }
 
-let _materialId = 0;
+let materialId = 0;
 
 class Material extends EventDispatcher {
 
@@ -8401,7 +8398,7 @@ class Material extends EventDispatcher {
 
 		this.isMaterial = true;
 
-		Object.defineProperty( this, 'id', { value: _materialId ++ } );
+		Object.defineProperty( this, 'id', { value: materialId ++ } );
 
 		this.uuid = generateUUID();
 
@@ -10370,7 +10367,7 @@ class Float64BufferAttribute extends BufferAttribute {
 
 }
 
-let _id$2 = 0;
+let _id$1 = 0;
 
 const _m1 = /*@__PURE__*/ new Matrix4();
 const _obj = /*@__PURE__*/ new Object3D();
@@ -10387,7 +10384,7 @@ class BufferGeometry extends EventDispatcher {
 
 		this.isBufferGeometry = true;
 
-		Object.defineProperty( this, 'id', { value: _id$2 ++ } );
+		Object.defineProperty( this, 'id', { value: _id$1 ++ } );
 
 		this.uuid = generateUUID();
 
@@ -20055,7 +20052,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 }
 
-let _id$1 = 0;
+let _id = 0;
 
 class WebGLShaderCache {
 
@@ -20169,7 +20166,7 @@ class WebGLShaderStage {
 
 	constructor( code ) {
 
-		this.id = _id$1 ++;
+		this.id = _id ++;
 
 		this.code = code;
 		this.usedTimes = 0;
@@ -25831,15 +25828,13 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		// BPTC
 
-		if ( p === RGBA_BPTC_Format || p === SRGB_ALPHA_BPTC_Format || p === RGB_BPTC_SIGNED_Format || p === RGB_BPTC_UNSIGNED_Format ) {
+		if ( p === RGBA_BPTC_Format ) {
 
 			extension = extensions.get( 'EXT_texture_compression_bptc' );
 
 			if ( extension !== null ) {
 
-				if ( p === RGBA_BPTC_Format || p === SRGB_ALPHA_BPTC_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT : extension.COMPRESSED_RGBA_BPTC_UNORM_EXT;
-				if ( p === RGB_BPTC_SIGNED_Format ) return extension.COMPRESSED_RGB_BPTC_SIGNED_FLOAT_EXT;
-				if ( p === RGB_BPTC_UNSIGNED_Format ) return extension.COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_EXT;
+				if ( p === RGBA_BPTC_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT : extension.COMPRESSED_RGBA_BPTC_UNORM_EXT;
 
 			} else {
 
@@ -49167,7 +49162,7 @@ class Uniform {
 
 }
 
-let _id = 0;
+let id = 0;
 
 class UniformsGroup extends EventDispatcher {
 
@@ -49177,7 +49172,7 @@ class UniformsGroup extends EventDispatcher {
 
 		this.isUniformsGroup = true;
 
-		Object.defineProperty( this, 'id', { value: _id ++ } );
+		Object.defineProperty( this, 'id', { value: id ++ } );
 
 		this.name = '';
 
@@ -51737,8 +51732,6 @@ exports.RGBA_PVRTC_4BPPV1_Format = RGBA_PVRTC_4BPPV1_Format;
 exports.RGBA_S3TC_DXT1_Format = RGBA_S3TC_DXT1_Format;
 exports.RGBA_S3TC_DXT3_Format = RGBA_S3TC_DXT3_Format;
 exports.RGBA_S3TC_DXT5_Format = RGBA_S3TC_DXT5_Format;
-exports.RGB_BPTC_SIGNED_Format = RGB_BPTC_SIGNED_Format;
-exports.RGB_BPTC_UNSIGNED_Format = RGB_BPTC_UNSIGNED_Format;
 exports.RGB_ETC1_Format = RGB_ETC1_Format;
 exports.RGB_ETC2_Format = RGB_ETC2_Format;
 exports.RGB_PVRTC_2BPPV1_Format = RGB_PVRTC_2BPPV1_Format;
@@ -51761,7 +51754,6 @@ exports.RingGeometry = RingGeometry;
 exports.SIGNED_RED_GREEN_RGTC2_Format = SIGNED_RED_GREEN_RGTC2_Format;
 exports.SIGNED_RED_RGTC1_Format = SIGNED_RED_RGTC1_Format;
 exports.SRGBColorSpace = SRGBColorSpace;
-exports.SRGB_ALPHA_BPTC_Format = SRGB_ALPHA_BPTC_Format;
 exports.Scene = Scene;
 exports.ShaderChunk = ShaderChunk;
 exports.ShaderLib = ShaderLib;
