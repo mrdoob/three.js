@@ -186,7 +186,8 @@ class WebXRManager extends EventDispatcher {
 
 			//
 
-			renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
+			renderer.setPixelRatio( currentPixelRatio );
+			renderer.setSize( currentSize.width, currentSize.height, false );
 
 			animation.stop();
 
@@ -298,7 +299,9 @@ class WebXRManager extends EventDispatcher {
 					glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
 
 					session.updateRenderState( { baseLayer: glBaseLayer } );
-					renderer.setDrawingBufferSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, 1 );
+
+					renderer.setPixelRatio( 1 );
+					renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
 
 					newRenderTarget = new WebGLRenderTarget(
 						glBaseLayer.framebufferWidth,
@@ -336,7 +339,9 @@ class WebXRManager extends EventDispatcher {
 					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
 
 					session.updateRenderState( { layers: [ glProjLayer ] } );
-					renderer.setDrawingBufferSize( glProjLayer.textureWidth, glProjLayer.textureHeight, 1 );
+
+					renderer.setPixelRatio( 1 );
+					renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
 
 					newRenderTarget = new WebGLRenderTarget(
 						glProjLayer.textureWidth,
@@ -363,7 +368,7 @@ class WebXRManager extends EventDispatcher {
 				referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
 
 				currentPixelRatio = renderer.getPixelRatio();
-				renderer.getDrawingBufferSize( currentSize );
+				renderer.getSize( currentSize );
 
 				animation.setContext( session );
 				animation.start();
