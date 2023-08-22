@@ -326,12 +326,7 @@ class Object3D extends EventDispatcher {
 
 		if ( object && object.isObject3D ) {
 
-			if ( object.parent !== null ) {
-
-				object.parent.remove( object );
-
-			}
-
+			object.removeFromParent();
 			object.parent = this;
 			this.children.push( object );
 
@@ -411,27 +406,58 @@ class Object3D extends EventDispatcher {
 
 	attach( object ) {
 
-		// adds object as a child of this, while maintaining the object's world transform
+		if ( arguments.length > 1 ) {
 
-		// Note: This method does not support scene graphs having non-uniformly-scaled nodes(s)
+			for ( let i = 0; i < arguments.length; i ++ ) {
 
-		this.updateWorldMatrix( true, false );
+				this.attach( arguments[ i ] );
 
-		_m1.copy( this.matrixWorld ).invert();
+			}
 
-		if ( object.parent !== null ) {
-
-			object.parent.updateWorldMatrix( true, false );
-
-			_m1.multiply( object.parent.matrixWorld );
+			return this;
 
 		}
 
-		object.applyMatrix4( _m1 );
+		if ( object === this ) {
 
-		this.add( object );
+			console.error( 'THREE.Object3D.attach: object can\'t be attached as a child of itself.', object );
+			return this;
 
-		object.updateWorldMatrix( false, true );
+		}
+
+		if ( object && object.isObject3D ) {
+
+			// adds object as a child of this, while maintaining the object's world transform
+
+			// Note: This method does not support scene graphs having non-uniformly-scaled node(s)
+
+			this.updateWorldMatrix( true, false );
+
+			_m1.copy( this.matrixWorld ).invert();
+
+			if ( object.parent !== null ) {
+
+				object.parent.updateWorldMatrix( true, false );
+
+				_m1.multiply( object.parent.matrixWorld );
+
+			}
+
+			object.applyMatrix4( _m1 );
+
+			object.removeFromParent();
+			object.parent = this;
+			this.children.push( object );
+
+			object.updateWorldMatrix( false, true );
+
+			object.dispatchEvent( _addedEvent );
+
+		} else {
+
+			console.error( 'THREE.Object3D.attach: object not an instance of THREE.Object3D.', object );
+
+		}
 
 		return this;
 
