@@ -1,7 +1,7 @@
 import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial } from 'three/nodes';
 
 import UniformsGroup from '../../common/UniformsGroup.js';
-import { NodeSampledTexture } from '../../common/nodes/NodeSampledTexture.js';
+import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan'
@@ -43,9 +43,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTextureBias( texture, textureProperty, uvSnippet, biasSnippet ) {
-
-		if ( this.material.extensions !== undefined ) this.material.extensions.shaderTextureLOD = true;
+	getTextureLevel( texture, textureProperty, uvSnippet, biasSnippet ) {
 
 		return `textureLod( ${textureProperty}, ${uvSnippet}, ${biasSnippet} )`;
 
@@ -256,6 +254,7 @@ void main() {
 	// flow
 	${shaderData.flow}
 
+	gl_PointSize = 4.0;
 }
 `;
 
@@ -358,8 +357,8 @@ void main() {
 			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
 			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
 
-			console.log( this.vertexShader );
-			console.log( this.fragmentShader );
+			//console.log( this.vertexShader );
+			//console.log( this.fragmentShader );
 
 		} else {
 
@@ -379,9 +378,15 @@ void main() {
 
 		if ( uniformGPU === undefined ) {
 
-			if ( type === 'texture' || type === 'cubeTexture' ) {
+			if ( type === 'texture' ) {
 
 				uniformGPU = new NodeSampledTexture( uniformNode.name, uniformNode.node );
+
+				this.bindings[ shaderStage ].push( uniformGPU );
+
+			} else if ( type === 'cubeTexture' ) {
+
+				uniformGPU = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node );
 
 				this.bindings[ shaderStage ].push( uniformGPU );
 

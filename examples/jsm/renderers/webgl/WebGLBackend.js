@@ -4,6 +4,10 @@ import GLSLNodeBuilder from './nodes/GLSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
 
 import WebGLAttributeUtils from './utils/WebGLAttributeUtils.js';
+import WebGLState from './utils/WebGLState.js';
+import WebGLUtils from './utils/WebGLUtils.js';
+import WebGLTextureUtils from './utils/WebGLTextureUtils.js';
+import WebGLExtensions from './utils/WebGLExtensions.js';
 
 //
 
@@ -23,11 +27,18 @@ class WebGLBackend extends Backend {
 
 		const parameters = this.parameters;
 
-		const context = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgl2' );
+		const glContext = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgl2' );
 
-		this.context = context;
+		this.gl = glContext;
 
+		this.extensions = new WebGLExtensions( this );
 		this.attributeUtils = new WebGLAttributeUtils( this );
+		this.textureUtils = new WebGLTextureUtils( this );
+		this.state = new WebGLState( this );
+		this.utils = new WebGLUtils( this );
+		this.defaultTextures = {};
+
+		this.extensions.get( 'EXT_color_buffer_float' );
 
 	}
 
@@ -39,7 +50,7 @@ class WebGLBackend extends Backend {
 
 	beginRender( renderContext ) {
 
-		const gl = this.context;
+		const { gl } = this;
 
 		//
 
@@ -76,7 +87,7 @@ class WebGLBackend extends Backend {
 
 	updateViewport( renderContext ) {
 
-		const gl = this.context;
+		const gl = this.gl;
 		const { x, y, width, height } = renderContext.viewportValue;
 
 		gl.viewport( x, y, width, height );
@@ -109,10 +120,10 @@ class WebGLBackend extends Backend {
 
 	draw( renderObject, info ) {
 
-		const { pipeline } = renderObject;
+		const { pipeline, material } = renderObject;
 		const { programGPU, vaoGPU } = this.get( pipeline );
 
-		const gl = this.context;
+		const { gl, state } = this;
 
 		//
 
@@ -130,17 +141,13 @@ class WebGLBackend extends Backend {
 			} else if ( binding.isSampledTexture ) {
 
 				gl.activeTexture( gl.TEXTURE0 + index );
-				gl.bindTexture( gl.TEXTURE_2D, bindingData.textureGPU );
+				gl.bindTexture( bindingData.glTextureType, bindingData.textureGPU );
 
 			}
 
 		}
 
-		// temp
-		gl.frontFace( gl.CCW );
-		gl.cullFace( gl.FRONT );
-		gl.enable( gl.DEPTH_TEST );
-		// --
+		state.setMaterial( material );
 
 		gl.useProgram( programGPU );
 		gl.bindVertexArray( vaoGPU );
@@ -154,13 +161,25 @@ class WebGLBackend extends Backend {
 		const drawRange = geometry.drawRange;
 		const firstVertex = drawRange.start;
 
+		//
+
+		let mode;
+		if ( object.isPoints ) mode = gl.POINTS;
+		else if ( object.isLine ) mode = gl.LINES;
+		else if ( object.isLineLoop ) mode = gl.LINE_LOOP;
+		else if ( object.isLineSegments ) mode = gl.LINES;
+		else mode = gl.TRIANGLES;
+
+		//
+
+
 		if ( index !== null ) {
 
 			const indexData = this.get( index );
 
 			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
 
-			gl.drawElements( gl.TRIANGLES, index.count, indexData.type, firstVertex );
+			gl.drawElements( mode, index.count, indexData.type, firstVertex );
 
 			info.update( object, indexCount, 1 );
 
@@ -169,7 +188,10 @@ class WebGLBackend extends Backend {
 			const positionAttribute = geometry.attributes.position;
 			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : positionAttribute.count;
 
-			gl.drawArrays( gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, firstVertex );
+			const indexData = this.get( positionAttribute );
+
+			gl.drawArrays( mode, 0, vertexCount );
+			//gl.drawArrays( mode, vertexCount, gl.UNSIGNED_SHORT, firstVertex );
 
 			info.update( object, vertexCount, 1 );
 
@@ -211,47 +233,117 @@ class WebGLBackend extends Backend {
 
 	createDefaultTexture( texture ) {
 
-		const gl = this.context;
+		const { gl, textureUtils, defaultTextures } = this;
 
-		const textureGPU = gl.createTexture();
+		const glTextureType = textureUtils.getGLTextureType( texture );
 
-		gl.bindTexture( gl.TEXTURE_2D, textureGPU );
-		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
-		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+		let textureGPU = defaultTextures[ glTextureType ];
+
+		if ( textureGPU === undefined ) {
+
+			textureGPU = gl.createTexture();
+
+			gl.bindTexture( glTextureType, textureGPU );
+			gl.texParameteri( glTextureType, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
+			gl.texParameteri( glTextureType, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+
+			//gl.texImage2D( target + i, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data );
+
+			defaultTextures[ glTextureType ] = textureGPU;
+
+		}
 
 		this.set( texture, {
-			textureGPU: textureGPU
+			textureGPU,
+			glTextureType,
+			isDefault: true
 		} );
 
 	}
 
-	createTexture( texture/*, options*/ ) {
+	createTexture( texture, options ) {
 
-		const gl = this.context;
-		const image = texture.image;
-		const levels = Math.log2( Math.max( image.width, image.height ) ) + 1;
+		const { gl, utils, textureUtils } = this;
+		const { levels, width, height } = options;
+
+		const glFormat = utils.convert( texture.format, texture.colorSpace );
+		const glType = utils.convert( texture.type );
+		const glInternalFormat = textureUtils.getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace, texture.isVideoTexture );
 
 		const textureGPU = gl.createTexture();
+		const glTextureType = textureUtils.getGLTextureType( texture );
 
-		gl.bindTexture( gl.TEXTURE_2D, textureGPU );
-		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR );
-		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR );
-		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT );
-		gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT );
+		gl.bindTexture( glTextureType, textureGPU );
 
-		gl.texStorage2D( gl.TEXTURE_2D, levels, gl.RGBA8, image.width, image.height );
-		gl.texSubImage2D( gl.TEXTURE_2D, 0, 0, 0, image.width, image.height, gl.RGBA, gl.UNSIGNED_BYTE, image );
-		gl.generateMipmap( gl.TEXTURE_2D );
+		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
+		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+		gl.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE );
+
+		textureUtils.setTextureParameters( glTextureType, texture );
+
+		gl.bindTexture( glTextureType, textureGPU );
+		gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
 
 		this.set( texture, {
-			textureGPU: textureGPU
+			textureGPU,
+			glTextureType,
+			glFormat,
+			glType,
+			glInternalFormat
 		} );
 
 	}
 
-	updateTexture( /*texture*/ ) {
+	updateTexture( texture, options ) {
 
-		console.warn( 'Abstract class.' );
+		const { gl } = this;
+		const { width, height } = options;
+		const { textureGPU, glTextureType, glFormat, glType } = this.get( texture );
+
+		const getImage = ( source ) => {
+
+			if ( source.isDataTexture ) {
+
+				return source.image.data;
+
+			}
+
+			return source;
+
+		};
+
+		gl.bindTexture( glTextureType, textureGPU );
+
+		if ( texture.isCubeTexture ) {
+
+			const images = options.images;
+
+			for ( let i = 0; i < 6; i ++ ) {
+
+				const image = getImage( images[ i ] );
+
+				gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, image );
+
+			}
+
+		} else {
+
+			const image = getImage( options.image );
+
+			gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, image );
+
+		}
+
+	}
+
+	generateMipmaps( texture ) {
+
+		const { gl } = this;
+		const { textureGPU, glTextureType } = this.get( texture );
+
+		gl.bindTexture( glTextureType, textureGPU );
+		gl.generateMipmap( glTextureType );
 
 	}
 
@@ -279,7 +371,7 @@ class WebGLBackend extends Backend {
 
 	createProgram( program ) {
 
-		const gl = this.context;
+		const gl = this.gl;
 		const { stage, code } = program;
 
 		const shader = stage === 'vertex' ? gl.createShader( gl.VERTEX_SHADER ) : gl.createShader( gl.FRAGMENT_SHADER );
@@ -307,7 +399,7 @@ class WebGLBackend extends Backend {
 
 	createRenderPipeline( renderObject ) {
 
-		const gl = this.context;
+		const gl = this.gl;
 		const pipeline = renderObject.pipeline;
 
 		// Program
@@ -324,6 +416,8 @@ class WebGLBackend extends Backend {
 			console.error( 'THREE.WebGLBackend:', gl.getProgramInfoLog( programGPU ) );
 
 		}
+
+		gl.useProgram( programGPU );
 
 		// Bindings
 
@@ -342,7 +436,6 @@ class WebGLBackend extends Backend {
 			} else if ( binding.isSampledTexture ) {
 
 				const location = gl.getUniformLocation( programGPU, binding.name );
-				gl.useProgram( programGPU );
 				gl.uniform1i( location, index );
 
 			}
@@ -396,7 +489,13 @@ class WebGLBackend extends Backend {
 
 	createBindings( bindings ) {
 
-		const gl = this.context;
+		this.updateBindings( bindings );
+
+	}
+
+	updateBindings( bindings ) {
+
+		const { gl } = this;
 
 		let groupIndex = 0;
 		let textureIndex = 0;
@@ -419,11 +518,12 @@ class WebGLBackend extends Backend {
 
 			} else if ( binding.isSampledTexture ) {
 
-				const textureGPU = this.get( binding.texture ).textureGPU;
+				const { textureGPU, glTextureType } = this.get( binding.texture );
 
 				this.set( binding, {
 					index: textureIndex ++,
-					textureGPU: textureGPU
+					textureGPU,
+					glTextureType
 				} );
 
 			}
@@ -432,15 +532,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	updateBindings( bindings ) {
-
-		//console.log( 'updateBindings:', bindings );
-
-	}
-
 	updateBinding( binding ) {
 
-		const gl = this.context;
+		const gl = this.gl;
 
 		if ( binding.isUniformsGroup ) {
 
@@ -459,7 +553,7 @@ class WebGLBackend extends Backend {
 
 	createIndexAttribute( attribute ) {
 
-		const gl = this.context;
+		const gl = this.gl;
 
 		this.attributeUtils.createAttribute( attribute, gl.ELEMENT_ARRAY_BUFFER );
 
@@ -467,7 +561,7 @@ class WebGLBackend extends Backend {
 
 	createAttribute( attribute ) {
 
-		const gl = this.context;
+		const gl = this.gl;
 
 		this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
 

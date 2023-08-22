@@ -743,18 +743,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getRenderTarget( width, height, options ) {
-
-		return new RenderTarget( width, height, options );
-
-	}
-
-	getCubeRenderTarget( size, options ) {
-
-		return new CubeRenderTarget( size, options );
-
-	}
-
 	getMethod( method ) {
 
 		if ( wgslPolyfill[ method ] !== undefined ) {

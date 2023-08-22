@@ -9,7 +9,7 @@ class WebGLAttributeUtils {
 	createAttribute( attribute, bufferType ) {
 
 		const backend = this.backend;
-		const gl = backend.context;
+		const { gl } = backend;
 
 		const array = attribute.array;
 		const usage = attribute.usage || gl.STATIC_DRAW;
