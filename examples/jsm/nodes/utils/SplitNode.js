@@ -59,7 +59,7 @@ class SplitNode extends Node {
 
 			if ( this.components.length === nodeTypeLength && this.components === stringVectorComponents.slice( 0, this.components.length ) ) {
 
-				// unecessary swizzle
+				// unnecessary swizzle
 
 				snippet = builder.format( nodeSnippet, type, output );
 
