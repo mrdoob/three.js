@@ -213,6 +213,7 @@
 		"webgl_sprites",
 		"webgl_test_memory",
 		"webgl_test_memory2",
+		"webgl_test_wide_gamut",
 		"webgl_tonemapping",
 		"webgl_video_kinect",
 		"webgl_video_panorama_equirectangular",

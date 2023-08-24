@@ -1,4 +1,4 @@
-import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, } from '../constants.js';
+import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, LinearDisplayP3ColorSpace, } from '../constants.js';
 import { Matrix3 } from './Matrix3.js';
 
 export function SRGBToLinear( c ) {
@@ -51,23 +51,39 @@ function LinearSRGBToDisplayP3( color ) {
 
 }
 
+function LinearDisplayP3ToLinearSRGB( color ) {
+
+	return color.applyMatrix3( LINEAR_DISPLAY_P3_TO_LINEAR_SRGB );
+
+}
+
+function LinearSRGBToLinearDisplayP3( color ) {
+
+	return color.applyMatrix3( LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 );
+
+}
+
 // Conversions from <source> to Linear-sRGB reference space.
-const TO_LINEAR = {
+const TO_REFERENCE = {
 	[ LinearSRGBColorSpace ]: ( color ) => color,
 	[ SRGBColorSpace ]: ( color ) => color.convertSRGBToLinear(),
 	[ DisplayP3ColorSpace ]: DisplayP3ToLinearSRGB,
+	[ LinearDisplayP3ColorSpace ]: LinearDisplayP3ToLinearSRGB,
 };
 
 // Conversions to <target> from Linear-sRGB reference space.
-const FROM_LINEAR = {
+const FROM_REFERENCE = {
 	[ LinearSRGBColorSpace ]: ( color ) => color,
 	[ SRGBColorSpace ]: ( color ) => color.convertLinearToSRGB(),
 	[ DisplayP3ColorSpace ]: LinearSRGBToDisplayP3,
+	[ LinearDisplayP3ColorSpace ]: LinearSRGBToLinearDisplayP3,
 };
 
 export const ColorManagement = {
 
 	enabled: true,
+
+	_workingColorSpace: LinearSRGBColorSpace,
 
 	get legacyMode() {
 
@@ -87,13 +103,13 @@ export const ColorManagement = {
 
 	get workingColorSpace() {
 
-		return LinearSRGBColorSpace;
+		return this._workingColorSpace;
 
 	},
 
 	set workingColorSpace( colorSpace ) {
 
-		console.warn( 'THREE.ColorManagement: .workingColorSpace is readonly.' );
+		this._workingColorSpace = colorSpace;
 
 	},
 
@@ -105,8 +121,8 @@ export const ColorManagement = {
 
 		}
 
-		const sourceToLinear = TO_LINEAR[ sourceColorSpace ];
-		const targetFromLinear = FROM_LINEAR[ targetColorSpace ];
+		const sourceToLinear = TO_REFERENCE[ sourceColorSpace ];
+		const targetFromLinear = FROM_REFERENCE[ targetColorSpace ];
 
 		if ( sourceToLinear === undefined || targetFromLinear === undefined ) {
 
