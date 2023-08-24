@@ -961,6 +961,7 @@ class FBXTreeParser {
 				}
 
 				model.name = node.attrName ? PropertyBinding.sanitizeNodeName( node.attrName ) : '';
+				model.userData.originalName = node.attrName;
 
 				model.ID = id;
 
@@ -997,6 +998,7 @@ class FBXTreeParser {
 						// set name and id here - otherwise in cases where "subBone" is created it will not have a name / id
 
 						bone.name = name ? PropertyBinding.sanitizeNodeName( name ) : '';
+						bone.userData.originalName = name;
 						bone.ID = id;
 
 						skeleton.bones[ i ] = bone;
