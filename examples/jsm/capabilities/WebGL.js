@@ -32,8 +32,6 @@ class WebGL {
 
 	static isColorSpaceAvailable( colorSpace ) {
 
-		if ( ! window.matchMedia( '( color-gamut: p3 )' ).matches ) return false;
-
 		try {
 
 			const canvas = document.createElement( 'canvas' );

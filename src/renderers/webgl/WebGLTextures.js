@@ -741,8 +741,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
 			const texturePrimaries = ColorManagement.getPrimaries( texture.colorSpace );
 
-			_gl.unpackColorSpace = ColorManagement.getUnpackColorSpace();
-
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
@@ -1159,8 +1157,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
 			const texturePrimaries = ColorManagement.getPrimaries( texture.colorSpace );
-
-			_gl.unpackColorSpace = ColorManagement.getUnpackColorSpace();
 
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
@@ -2042,15 +2038,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( texture.isCompressedTexture === true || texture.isVideoTexture === true || texture.format === _SRGBAFormat ) return image;
 
-		const transferFunction = ColorManagement.getTransferFunction( colorSpace );
-
-		console.log({ transferFunction });
-
 		if ( colorSpace !== LinearSRGBColorSpace && colorSpace !== NoColorSpace ) {
 
 			// sRGB
 
-			if ( transferFunction === SRGBTransferFunction ) {
+			if ( ColorManagement.getTransferFunction( colorSpace ) === SRGBTransferFunction ) {
 
 				if ( isWebGL2 === false ) {
 
