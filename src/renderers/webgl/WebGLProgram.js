@@ -1,7 +1,8 @@
 import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
-import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GLSL3, LinearSRGBColorSpace, SRGBColorSpace } from '../../constants.js';
+import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GLSL3, LinearSRGBColorSpace, SRGBColorSpace, LinearDisplayP3ColorSpace, DisplayP3ColorSpace, P3Primaries, Rec709Primaries, NoColorSpace } from '../../constants.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
 
 let programIdCount = 0;
 
@@ -26,15 +27,39 @@ function handleSource( string, errorLine ) {
 
 function getEncodingComponents( colorSpace ) {
 
+	let gamutMapping = '';
+
+	if ( colorSpace !== NoColorSpace ) {
+
+		const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
+		const encodingPrimaries = colorSpace === NoColorSpace ? '' : ColorManagement.getPrimaries( colorSpace );
+
+		if ( workingPrimaries === P3Primaries && encodingPrimaries === Rec709Primaries ) {
+
+			gamutMapping = 'P3ToRec709';
+
+		} else if ( workingPrimaries === Rec709Primaries && encodingPrimaries === P3Primaries ) {
+
+			gamutMapping = 'Rec709ToP3';
+
+		}
+
+	}
+
 	switch ( colorSpace ) {
 
+		case NoColorSpace:
 		case LinearSRGBColorSpace:
-			return [ 'Linear', '( value )' ];
+		case LinearDisplayP3ColorSpace:
+			return [ gamutMapping, 'LinearTransferOETF' ];
+
 		case SRGBColorSpace:
-			return [ 'sRGB', '( value )' ];
+		case DisplayP3ColorSpace:
+			return [ gamutMapping, 'sRGBTransferOETF' ];
+
 		default:
 			console.warn( 'THREE.WebGLProgram: Unsupported color space:', colorSpace );
-			return [ 'Linear', '( value )' ];
+			return [ gamutMapping, 'LinearTransferOETF' ];
 
 	}
 
@@ -67,7 +92,9 @@ function getShaderErrors( gl, shader, type ) {
 function getTexelEncodingFunction( functionName, colorSpace ) {
 
 	const components = getEncodingComponents( colorSpace );
-	return 'vec4 ' + functionName + '( vec4 value ) { return LinearTo' + components[ 0 ] + components[ 1 ] + '; }';
+	const result = `vec4 ${functionName}( vec4 value ) { return ${components[ 0 ]}( ${components[ 1 ]}( value ) ); }`;
+	console.log(result);
+	return result;
 
 }
 

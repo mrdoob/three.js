@@ -158,6 +158,12 @@ export const LinearSRGBColorSpace = 'srgb-linear';
 export const DisplayP3ColorSpace = 'display-p3';
 export const LinearDisplayP3ColorSpace = 'display-p3-linear';
 
+export const LinearTransferFunction = 'linear';
+export const SRGBTransferFunction = 'srgb';
+
+export const Rec709Primaries = 'rec709';
+export const P3Primaries = 'p3';
+
 export const ZeroStencilOp = 0;
 export const KeepStencilOp = 7680;
 export const ReplaceStencilOp = 7681;

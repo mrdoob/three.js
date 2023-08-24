@@ -1,4 +1,4 @@
-import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, LinearDisplayP3ColorSpace, } from '../constants.js';
+import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, LinearDisplayP3ColorSpace, Rec709Primaries, P3Primaries, SRGBTransferFunction, LinearTransferFunction, NoColorSpace, } from '../constants.js';
 import { Matrix3 } from './Matrix3.js';
 
 export function SRGBToLinear( c ) {
@@ -79,6 +79,8 @@ const FROM_REFERENCE = {
 	[ LinearDisplayP3ColorSpace ]: LinearSRGBToLinearDisplayP3,
 };
 
+const SUPPORTED_WORKING_COLOR_SPACES = new Set( [ LinearSRGBColorSpace, LinearDisplayP3ColorSpace ] );
+
 export const ColorManagement = {
 
 	enabled: true,
@@ -109,6 +111,12 @@ export const ColorManagement = {
 
 	set workingColorSpace( colorSpace ) {
 
+		if ( ! SUPPORTED_WORKING_COLOR_SPACES.has( colorSpace ) ) {
+
+			throw new Error( `Unsupported working color space, "${ colorSpace }".` );
+
+		}
+
 		this._workingColorSpace = colorSpace;
 
 	},
@@ -136,14 +144,67 @@ export const ColorManagement = {
 
 	fromWorkingColorSpace: function ( color, targetColorSpace ) {
 
-		return this.convert( color, this.workingColorSpace, targetColorSpace );
+		return this.convert( color, this._workingColorSpace, targetColorSpace );
 
 	},
 
 	toWorkingColorSpace: function ( color, sourceColorSpace ) {
 
-		return this.convert( color, sourceColorSpace, this.workingColorSpace );
+		return this.convert( color, sourceColorSpace, this._workingColorSpace );
 
 	},
+
+	getPrimaries: function ( colorSpace ) {
+
+		switch ( colorSpace ) {
+
+			case SRGBColorSpace:
+			case LinearSRGBColorSpace:
+				return Rec709Primaries;
+
+			case DisplayP3ColorSpace:
+			case LinearDisplayP3ColorSpace:
+				return P3Primaries;
+
+			default:
+				throw new Error( `Unsupported color space, "${ colorSpace }."` );
+
+		}
+
+	},
+
+	getTransferFunction: function ( colorSpace ) {
+
+		switch ( colorSpace ) {
+
+			case SRGBColorSpace:
+			case DisplayP3ColorSpace:
+				return SRGBTransferFunction;
+
+			case LinearSRGBColorSpace:
+			case LinearDisplayP3ColorSpace:
+			case NoColorSpace:
+				return LinearTransferFunction;
+
+			default:
+				throw new Error( `Unsupported color space, "${ colorSpace }."` );
+
+		}
+
+	},
+
+	getUnpackColorSpace: function () {
+
+		switch ( this._workingColorSpace ) {
+
+			case LinearSRGBColorSpace:
+				return SRGBColorSpace;
+
+			case LinearDisplayP3ColorSpace:
+				return DisplayP3ColorSpace;
+
+		}
+
+	}
 
 };

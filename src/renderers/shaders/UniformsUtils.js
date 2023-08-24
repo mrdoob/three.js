@@ -1,4 +1,5 @@
 import { LinearSRGBColorSpace } from '../../constants.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
 
 /**
  * Uniform Utilities
@@ -93,7 +94,7 @@ export function getUnlitUniformColorSpace( renderer ) {
 
 	}
 
-	return LinearSRGBColorSpace;
+	return ColorManagement.workingColorSpace;
 
 }
 

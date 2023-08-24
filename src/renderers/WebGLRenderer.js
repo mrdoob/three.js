@@ -21,7 +21,8 @@ import {
 	UnsignedInt248Type,
 	UnsignedShort4444Type,
 	UnsignedShort5551Type,
-	WebGLCoordinateSystem
+	WebGLCoordinateSystem,
+    DisplayP3ColorSpace
 } from '../constants.js';
 import { Color } from '../math/Color.js';
 import { Frustum } from '../math/Frustum.js';
@@ -59,6 +60,7 @@ import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
 import { createCanvasElement } from '../utils.js';
+import { ColorManagement } from '../math/ColorManagement.js';
 
 class WebGLRenderer {
 
@@ -140,7 +142,7 @@ class WebGLRenderer {
 
 		// physically based shading
 
-		this.outputColorSpace = SRGBColorSpace;
+		this._outputColorSpace = SRGBColorSpace;
 
 		// physical lights
 
@@ -2392,6 +2394,16 @@ class WebGLRenderer {
 
 		};
 
+		this.resetColorManagement = function () {
+
+			_gl.drawingBufferColorSpace = this._outputColorSpace === DisplayP3ColorSpace ? DisplayP3ColorSpace : 'srgb';
+			_gl.unpackColorSpace = ColorManagement.getUnpackColorSpace();
+
+			const { drawingBufferColorSpace, unpackColorSpace } = _gl;
+			console.log({ drawingBufferColorSpace, unpackColorSpace });
+
+		};
+
 		this.resetState = function () {
 
 			_currentActiveCubeFace = 0;
@@ -2414,6 +2426,20 @@ class WebGLRenderer {
 	get coordinateSystem() {
 
 		return WebGLCoordinateSystem;
+
+	}
+
+	get outputColorSpace() {
+
+		return this._outputColorSpace;
+
+	}
+
+	set outputColorSpace( colorSpace ) {
+
+		this._outputColorSpace = colorSpace;
+
+		this.resetColorManagement();
 
 	}
 

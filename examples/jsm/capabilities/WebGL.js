@@ -30,6 +30,25 @@ class WebGL {
 
 	}
 
+	static isColorSpaceAvailable( colorSpace ) {
+
+		if ( ! window.matchMedia( '( color-gamut: p3 )' ).matches ) return false;
+
+		try {
+
+			const canvas = document.createElement( 'canvas' );
+			const ctx = window.WebGL2RenderingContext && canvas.getContext( 'webgl2' );
+			ctx.drawingBufferColorSpace = colorSpace;
+			return ctx.drawingBufferColorSpace === colorSpace;
+
+		} catch ( e ) {
+
+			return false;
+
+		}
+
+	}
+
 	static getWebGLErrorMessage() {
 
 		return this.getErrorMessage( 1 );
