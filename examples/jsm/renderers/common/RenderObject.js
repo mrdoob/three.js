@@ -16,6 +16,7 @@ export default class RenderObject {
 		this.camera = camera;
 		this.lightsNode = lightsNode;
 		this.context = renderContext;
+		this.instances = null;
 
 		this.geometry = object.geometry;
 
