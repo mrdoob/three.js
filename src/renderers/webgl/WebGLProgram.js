@@ -27,28 +27,27 @@ function handleSource( string, errorLine ) {
 
 function getEncodingComponents( colorSpace ) {
 
-	let gamutMapping = '';
+	const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
+	const encodingPrimaries = ColorManagement.getPrimaries( colorSpace );
 
-	if ( colorSpace !== NoColorSpace ) {
+	let gamutMapping;
 
-		const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
-		const encodingPrimaries = colorSpace === NoColorSpace ? '' : ColorManagement.getPrimaries( colorSpace );
+	if ( workingPrimaries === encodingPrimaries ) {
 
-		if ( workingPrimaries === P3Primaries && encodingPrimaries === Rec709Primaries ) {
+		gamutMapping = '';
 
-			gamutMapping = 'P3ToRec709';
+	} else if ( workingPrimaries === P3Primaries && encodingPrimaries === Rec709Primaries ) {
 
-		} else if ( workingPrimaries === Rec709Primaries && encodingPrimaries === P3Primaries ) {
+		gamutMapping = 'P3ToRec709';
 
-			gamutMapping = 'Rec709ToP3';
+	} else if ( workingPrimaries === Rec709Primaries && encodingPrimaries === P3Primaries ) {
 
-		}
+		gamutMapping = 'Rec709ToP3';
 
 	}
 
 	switch ( colorSpace ) {
 
-		case NoColorSpace:
 		case LinearSRGBColorSpace:
 		case LinearDisplayP3ColorSpace:
 			return [ gamutMapping, 'LinearTransferOETF' ];
