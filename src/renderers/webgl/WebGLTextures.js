@@ -739,12 +739,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			state.activeTexture( _gl.TEXTURE0 + slot );
 
 			const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
-			const texturePrimaries = ColorManagement.getPrimaries( texture.colorSpace );
+			const texturePrimaries = texture.colorSpace === NoColorSpace ? null : ColorManagement.getPrimaries( texture.colorSpace );
+			const unpackConversion = texture.colorSpace === NoColorSpace ? _gl.NONE : _gl.BROWSER_DEFAULT_WEBGL;
 
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
-			_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, workingPrimaries === texturePrimaries ? _gl.NONE : _gl.BROWSER_DEFAULT_WEBGL );
+			_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, unpackConversion );
 
 			const needsPowerOfTwo = textureNeedsPowerOfTwo( texture ) && isPowerOfTwo( texture.image ) === false;
 			let image = resizeImage( texture.image, needsPowerOfTwo, false, maxTextureSize );
@@ -1156,12 +1157,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			state.activeTexture( _gl.TEXTURE0 + slot );
 
 			const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
-			const texturePrimaries = ColorManagement.getPrimaries( texture.colorSpace );
+			const texturePrimaries = texture.colorSpace === NoColorSpace ? null : ColorManagement.getPrimaries( texture.colorSpace );
+			const unpackConversion = texture.colorSpace === NoColorSpace ? _gl.NONE : _gl.BROWSER_DEFAULT_WEBGL;
 
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
-			_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, workingPrimaries === texturePrimaries ? _gl.NONE : _gl.BROWSER_DEFAULT_WEBGL );
+			_gl.pixelStorei( _gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, unpackConversion );
 
 			const isCompressed = ( texture.isCompressedTexture || texture.image[ 0 ].isCompressedTexture );
 			const isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );

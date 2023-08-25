@@ -1,4 +1,3 @@
-import { LinearSRGBColorSpace } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 
 /**
