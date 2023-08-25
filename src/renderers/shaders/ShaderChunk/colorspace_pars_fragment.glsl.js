@@ -29,4 +29,9 @@ vec4 LinearTransferOETF( in vec4 value ) {
 vec4 sRGBTransferOETF( in vec4 value ) {
 	return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );
 }
+
+// @deprecated, r156
+vec4 LinearTosRGB( in vec4 value ) {
+	return sRGBTransferOETF( value );
+}
 `;
