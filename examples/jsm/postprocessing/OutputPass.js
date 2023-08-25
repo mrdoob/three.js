@@ -1,11 +1,12 @@
 import {
+	ColorManagement,
 	RawShaderMaterial,
 	UniformsUtils,
 	LinearToneMapping,
 	ReinhardToneMapping,
 	CineonToneMapping,
 	ACESFilmicToneMapping,
-	SRGBColorSpace
+	SRGBTransfer
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { OutputShader } from '../shaders/OutputShader.js';
@@ -51,7 +52,7 @@ class OutputPass extends Pass {
 
 			this.material.defines = {};
 
-			if ( this._outputColorSpace == SRGBColorSpace ) this.material.defines.SRGB_COLOR_SPACE = '';
+			if ( ColorManagement.getTransfer( this._outputColorSpace ) === SRGBTransfer ) this.material.defines.SRGB_TRANSFER = '';
 
 			if ( this._toneMapping === LinearToneMapping ) this.material.defines.LINEAR_TONE_MAPPING = '';
 			else if ( this._toneMapping === ReinhardToneMapping ) this.material.defines.REINHARD_TONE_MAPPING = '';
