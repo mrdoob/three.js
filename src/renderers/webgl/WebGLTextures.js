@@ -740,7 +740,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
 			const texturePrimaries = texture.colorSpace === NoColorSpace ? null : ColorManagement.getPrimaries( texture.colorSpace );
-			const unpackConversion = texture.colorSpace === NoColorSpace ? _gl.NONE : _gl.BROWSER_DEFAULT_WEBGL;
+			const unpackConversion = texture.colorSpace === NoColorSpace || workingPrimaries === texturePrimaries ? _gl.NONE : _gl.BROWSER_DEFAULT_WEBGL;
 
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
@@ -1158,7 +1158,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
 			const texturePrimaries = texture.colorSpace === NoColorSpace ? null : ColorManagement.getPrimaries( texture.colorSpace );
-			const unpackConversion = texture.colorSpace === NoColorSpace ? _gl.NONE : _gl.BROWSER_DEFAULT_WEBGL;
+			const unpackConversion = texture.colorSpace === NoColorSpace || workingPrimaries === texturePrimaries ? _gl.NONE : _gl.BROWSER_DEFAULT_WEBGL;
 
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
