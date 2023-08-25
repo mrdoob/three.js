@@ -88,10 +88,9 @@
 
 			};
 
-			const isP3Display = window.matchMedia( '( color-gamut: p3 )' ).matches;
 			const isP3Context = THREE.ColorManagement.isDrawingBufferColorSpaceSupported( THREE.DisplayP3ColorSpace );
 
-			if ( isP3Display && isP3Context ) {
+			if ( isP3Context ) {
 
 				THREE.ColorManagement.workingColorSpace = THREE.LinearDisplayP3ColorSpace;
 
@@ -121,7 +120,7 @@
 				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
-				if ( isP3Display && isP3Context ) {
+				if ( isP3Context && window.matchMedia( '( color-gamut: p3 )' ).matches ) {
 
 					renderer.outputColorSpace = THREE.DisplayP3ColorSpace;
 
@@ -132,6 +131,7 @@
 				gui.add( params, 'image', IMAGE_OPTIONS ).onChange( initTextures );
 
 				window.addEventListener( 'resize', onWindowResize );
+				window.matchMedia( '( color-gamut: p3 )' ).addEventListener( 'change', onGamutChange );
 
 			}
 
@@ -192,6 +192,15 @@
 
 				containTexture( window.innerWidth / window.innerHeight, sceneL.background );
 				containTexture( window.innerWidth / window.innerHeight, sceneR.background );
+
+			}
+
+			function onGamutChange( { matches } ) {
+
+				renderer.outputColorSpace = isP3Context && matches ? THREE.DisplayP3ColorSpace : THREE.SRGBColorSpace;
+
+				textureL.needsUpdate = true;
+				textureR.needsUpdate = true;
 
 			}
 
