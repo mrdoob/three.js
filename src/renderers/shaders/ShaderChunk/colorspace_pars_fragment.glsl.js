@@ -31,6 +31,11 @@ vec4 sRGBTransferOETF( in vec4 value ) {
 }
 
 // @deprecated, r156
+vec4 LinearToLinear( in vec4 value ) {
+	return value;
+}
+
+// @deprecated, r156
 vec4 LinearTosRGB( in vec4 value ) {
 	return sRGBTransferOETF( value );
 }
