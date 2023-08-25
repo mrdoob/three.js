@@ -158,8 +158,8 @@ export const LinearSRGBColorSpace = 'srgb-linear';
 export const DisplayP3ColorSpace = 'display-p3';
 export const LinearDisplayP3ColorSpace = 'display-p3-linear';
 
-export const LinearTransferFunction = 'linear';
-export const SRGBTransferFunction = 'srgb';
+export const LinearTransfer = 'linear';
+export const SRGBTransfer = 'srgb';
 
 export const Rec709Primaries = 'rec709';
 export const P3Primaries = 'p3';

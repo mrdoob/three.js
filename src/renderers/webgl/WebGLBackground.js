@@ -1,4 +1,4 @@
-import { BackSide, FrontSide, CubeUVReflectionMapping, SRGBColorSpace, SRGBTransferFunction } from '../../constants.js';
+import { BackSide, FrontSide, CubeUVReflectionMapping, SRGBColorSpace, SRGBTransfer } from '../../constants.js';
 import { BoxGeometry } from '../../geometries/BoxGeometry.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
@@ -109,7 +109,7 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 			boxMesh.material.uniforms.flipEnvMap.value = ( background.isCubeTexture && background.isRenderTargetTexture === false ) ? - 1 : 1;
 			boxMesh.material.uniforms.backgroundBlurriness.value = scene.backgroundBlurriness;
 			boxMesh.material.uniforms.backgroundIntensity.value = scene.backgroundIntensity;
-			boxMesh.material.toneMapped = ( ColorManagement.getTransferFunction( background.colorSpace ) === SRGBTransferFunction ) ? false : true;
+			boxMesh.material.toneMapped = ( ColorManagement.getTransfer( background.colorSpace ) === SRGBTransfer ) ? false : true;
 
 			if ( currentBackground !== background ||
 				currentBackgroundVersion !== background.version ||
@@ -165,7 +165,7 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 			planeMesh.material.uniforms.t2D.value = background;
 			planeMesh.material.uniforms.backgroundIntensity.value = scene.backgroundIntensity;
-			planeMesh.material.toneMapped = ( ColorManagement.getTransferFunction( background.colorSpace ) === SRGBTransferFunction ) ? false : true;
+			planeMesh.material.toneMapped = ( ColorManagement.getTransfer( background.colorSpace ) === SRGBTransfer ) ? false : true;
 
 			if ( background.matrixAutoUpdate === true ) {
 

@@ -1,4 +1,4 @@
-import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, LinearDisplayP3ColorSpace, Rec709Primaries, P3Primaries, SRGBTransferFunction, LinearTransferFunction, NoColorSpace, } from '../constants.js';
+import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, LinearDisplayP3ColorSpace, Rec709Primaries, P3Primaries, SRGBTransfer, LinearTransfer, NoColorSpace, } from '../constants.js';
 import { Matrix3 } from './Matrix3.js';
 
 export function SRGBToLinear( c ) {
@@ -173,18 +173,18 @@ export const ColorManagement = {
 
 	},
 
-	getTransferFunction: function ( colorSpace ) {
+	getTransfer: function ( colorSpace ) {
 
 		switch ( colorSpace ) {
 
 			case SRGBColorSpace:
 			case DisplayP3ColorSpace:
-				return SRGBTransferFunction;
+				return SRGBTransfer;
 
 			case LinearSRGBColorSpace:
 			case LinearDisplayP3ColorSpace:
 			case NoColorSpace:
-				return LinearTransferFunction;
+				return LinearTransfer;
 
 			default:
 				throw new Error( `Unsupported color space, "${ colorSpace }."` );
