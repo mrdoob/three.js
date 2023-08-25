@@ -139,6 +139,23 @@ export const ColorManagement = {
 
 	},
 
+	isDrawingBufferColorSpaceSupported: function ( colorSpace ) {
+
+		try {
+
+			const canvas = document.createElement( 'canvas' );
+			const ctx = window.WebGL2RenderingContext && canvas.getContext( 'webgl2' );
+			ctx.drawingBufferColorSpace = colorSpace;
+			return ctx.drawingBufferColorSpace === colorSpace;
+
+		} catch ( e ) {
+
+			return false;
+
+		}
+
+	}
+
 };
 
 

@@ -88,10 +88,10 @@
 
 			};
 
-			const hasP3Display = window.matchMedia( '( color-gamut: p3 )' ).matches;
-			const hasP3Context = WebGL.isColorSpaceAvailable( THREE.DisplayP3ColorSpace );
+			const isP3Display = window.matchMedia( '( color-gamut: p3 )' ).matches;
+			const isP3Context = THREE.ColorManagement.isDrawingBufferColorSpaceSupported( THREE.DisplayP3ColorSpace );
 
-			if ( hasP3Display && hasP3Context ) {
+			if ( isP3Display && isP3Context ) {
 
 				THREE.ColorManagement.workingColorSpace = THREE.LinearDisplayP3ColorSpace;
 
@@ -121,7 +121,7 @@
 				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
-				if ( hasP3Display && hasP3Context ) {
+				if ( isP3Display && isP3Context ) {
 
 					renderer.outputColorSpace = THREE.DisplayP3ColorSpace;
 
