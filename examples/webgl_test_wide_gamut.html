@@ -111,11 +111,6 @@
 
 				loader = new THREE.TextureLoader().setPath( 'textures/wide_gamut/' );
 
-				const light = new THREE.HemisphereLight( 0xffffff, 0x444444, 3 );
-				light.position.set( - 2, 2, 2 );
-				sceneL.add( light.clone() );
-				sceneR.add( light.clone() );
-
 				initTextures();
 				initSlider();
 
@@ -141,11 +136,6 @@
 			}
 
 			async function initTextures() {
-
-				// TODO: With workingColorSpace="p3-linear", outputColorSpace="srgb", images display quite differently. Expected?
-				// TODO: Where should .unpackColorSpace be set? Per texture or globally on the renderer?
-				// TODO: What happens given a Linear-sRGB texture when working color space is Linear-P3? Can we support that?
-				// TODO: How to detect support for drawingBufferColorSpace="display-p3"?
 
 				textureL = await loader.loadAsync( params.image.replace( '{colorSpace}', 'srgb' ) );
 				textureR = await loader.loadAsync( params.image.replace( '{colorSpace}', 'p3' ) );
@@ -209,6 +199,7 @@
 
 				// Sets the matrix uv transform so the texture image is contained in a region having the specified aspect ratio,
 				// and does so without distortion. Akin to CSS object-fit: contain.
+				// Source: https://github.com/mrdoob/three.js/pull/17199
 
 				var imageAspect = ( target.image && target.image.width ) ? target.image.width / target.image.height : 1;
 

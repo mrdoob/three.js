@@ -75,8 +75,16 @@ const TO_REFERENCE = {
 const FROM_REFERENCE = {
 	[ LinearSRGBColorSpace ]: ( color ) => color,
 	[ SRGBColorSpace ]: ( color ) => color.convertLinearToSRGB(),
-	[ DisplayP3ColorSpace ]: LinearSRGBToDisplayP3,
 	[ LinearDisplayP3ColorSpace ]: LinearSRGBToLinearDisplayP3,
+	[ DisplayP3ColorSpace ]: LinearSRGBToDisplayP3,
+};
+
+const COLOR_SPACE_COMPONENTS = {
+	[ NoColorSpace ]: { transfer: LinearTransfer, primaries: undefined },
+	[ LinearSRGBColorSpace ]: { transfer: LinearTransfer, primaries: Rec709Primaries },
+	[ SRGBColorSpace ]: { transfer: SRGBTransfer, primaries: Rec709Primaries },
+	[ LinearDisplayP3ColorSpace ]: { transfer: LinearTransfer, primaries: P3Primaries },
+	[ DisplayP3ColorSpace ]: { transfer: SRGBTransfer, primaries: P3Primaries },
 };
 
 const SUPPORTED_WORKING_COLOR_SPACES = new Set( [ LinearSRGBColorSpace, LinearDisplayP3ColorSpace ] );
@@ -156,55 +164,14 @@ export const ColorManagement = {
 
 	getPrimaries: function ( colorSpace ) {
 
-		switch ( colorSpace ) {
-
-			case SRGBColorSpace:
-			case LinearSRGBColorSpace:
-				return Rec709Primaries;
-
-			case DisplayP3ColorSpace:
-			case LinearDisplayP3ColorSpace:
-				return P3Primaries;
-
-			default:
-				throw new Error( `Unsupported color space, "${ colorSpace }."` );
-
-		}
+		return COLOR_SPACE_COMPONENTS[ colorSpace ].primaries;
 
 	},
 
 	getTransfer: function ( colorSpace ) {
 
-		switch ( colorSpace ) {
-
-			case SRGBColorSpace:
-			case DisplayP3ColorSpace:
-				return SRGBTransfer;
-
-			case LinearSRGBColorSpace:
-			case LinearDisplayP3ColorSpace:
-			case NoColorSpace:
-				return LinearTransfer;
-
-			default:
-				throw new Error( `Unsupported color space, "${ colorSpace }."` );
-
-		}
+		return COLOR_SPACE_COMPONENTS[ colorSpace ].transfer;
 
 	},
-
-	getUnpackColorSpace: function () {
-
-		switch ( this._workingColorSpace ) {
-
-			case LinearSRGBColorSpace:
-				return SRGBColorSpace;
-
-			case LinearDisplayP3ColorSpace:
-				return DisplayP3ColorSpace;
-
-		}
-
-	}
 
 };
