@@ -1,5 +1,5 @@
 import { addNodeClass } from '../core/Node.js';
-import TextureNode, { texture } from './TextureNode.js';
+import TextureNode from './TextureNode.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
 
 class TextureStoreNode extends TextureNode {
