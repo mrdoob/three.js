@@ -112,7 +112,7 @@ class Textures extends DataMap {
 		options.height = height;
 		options.depth = depth;
 		options.needsMipmaps = this.needsMipmaps( texture );
-		options.levels = options.needsMipmaps ? this.getMipLevels( texture, width, height, options.needsMipmaps ) : 1;
+		options.levels = options.needsMipmaps ? this.getMipLevels( texture, width, height ) : 1;
 
 		//
 
@@ -241,7 +241,7 @@ class Textures extends DataMap {
 
 	}
 
-	getMipLevels( texture, width, height, needsMipmaps ) {
+	getMipLevels( texture, width, height ) {
 
 		let mipLevelCount;
 
@@ -249,13 +249,9 @@ class Textures extends DataMap {
 
 			mipLevelCount = texture.mipmaps.length;
 
-		} else if ( needsMipmaps ) {
-
-			mipLevelCount = Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
-
 		} else {
 
-			mipLevelCount = 1; // a texture without mipmaps has a base mip (mipLevel 0)
+			mipLevelCount = Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
 
 		}
 
