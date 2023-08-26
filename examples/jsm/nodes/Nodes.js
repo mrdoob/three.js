@@ -86,6 +86,7 @@ export { default as SceneNode, backgroundBlurriness, backgroundIntensity } from 
 export { default as StorageBufferNode, storage } from './accessors/StorageBufferNode.js';
 export { default as TangentNode, tangentGeometry, tangentLocal, tangentView, tangentWorld, transformedTangentView, transformedTangentWorld } from './accessors/TangentNode.js';
 export { default as TextureNode, texture, /*textureLevel,*/ sampler } from './accessors/TextureNode.js';
+export { default as TextureStoreNode, textureStore } from './accessors/TextureStoreNode.js';
 export { default as UVNode, uv } from './accessors/UVNode.js';
 export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
 
