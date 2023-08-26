@@ -112,11 +112,13 @@ class Textures extends DataMap {
 		options.height = height;
 		options.depth = depth;
 		options.needsMipmaps = this.needsMipmaps( texture );
-		options.levels = this.getMipLevels( texture, width, height, options.needsMipmaps );
+		options.levels = options.needsMipmaps ? this.getMipLevels( texture, width, height, options.needsMipmaps ) : 1;
 
 		//
 
-		if ( isRenderTarget ) {
+		if ( isRenderTarget || options.store === true ) {
+
+			//if ( options.store === true ) options.levels = 1; /* no mipmaps? */
 
 			backend.createSampler( texture );
 			backend.createTexture( texture, options );
