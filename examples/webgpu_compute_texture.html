@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { ShaderNode, texture, textureStore, wgslFn, instanceIndex, MeshPhongNodeMaterial } from 'three/nodes';
+			import { ShaderNode, texture, textureStore, wgslFn, instanceIndex, MeshBasicNodeMaterial } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -95,7 +95,7 @@
 
 				const computeNode = computeShaderNode.compute( width * height );
 
-				const material = new MeshPhongNodeMaterial( { color: 0x00ff00 } );
+				const material = new MeshBasicNodeMaterial( { color: 0x00ff00 } );
 				material.colorNode = texture( storageTexture );
 
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
