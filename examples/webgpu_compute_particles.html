@@ -78,6 +78,7 @@
 
 				const positionBuffer = createBuffer();
 				const velocityBuffer = createBuffer();
+				const colorBuffer = createBuffer();
 
 				// compute
 
@@ -95,6 +96,7 @@
 
 					const position = positionBuffer.element( instanceIndex );
 					const velocity = velocityBuffer.element( instanceIndex );
+					const color = colorBuffer.element( instanceIndex );
 
 					const randX = hash( { num: instanceIndex } );
 					const randY = hash( { num: instanceIndex.add( 2 ) } );
@@ -103,7 +105,10 @@
 					stack.assign( position.x, randX.mul( 60 ).add( - 30 ) );
 					stack.assign( position.y, randY.mul( 10 ) );
 					stack.assign( position.z, randZ.mul( 60 ).add( - 30 ) );
+
 					stack.assign( velocity.y, instanceIndex.float().cos().mul( - .06 ) );
+
+					stack.assign( color, vec3( randX, randY, randZ ) );
 
 				} ).compute( particleCount );
 
@@ -144,7 +149,7 @@
 				// create particles
 
 				const particleMaterial = new SpriteNodeMaterial();
-				particleMaterial.colorNode = textureNode.mul( vec3( hash( { num: instanceIndex } ), hash( { num: instanceIndex.add( 1 ) } ), hash( { num: instanceIndex.add( 2 ) } ) ) );
+				particleMaterial.colorNode = textureNode.mul( colorBuffer.element( instanceIndex ) );
 				particleMaterial.positionNode = positionBuffer.toAttribute();
 				particleMaterial.scaleNode = size;
 				particleMaterial.depthWrite = false;
