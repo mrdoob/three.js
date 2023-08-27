@@ -362,7 +362,7 @@ class GLTFLoader extends Loader {
 
 			const plugin = this.pluginCallbacks[ i ]( parser );
 
-			if ( ! plugin.name ) console.error( 'THREE.GLTFLoader: Invalid plugin found: missing name', plugin );
+			if ( ! plugin.name ) console.error( 'THREE.GLTFLoader: Invalid plugin found: missing name' );
 
 			plugins[ plugin.name ] = plugin;
 
