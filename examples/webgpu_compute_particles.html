@@ -36,9 +36,12 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			const particleCount = 100000;
+
 			const gravity = uniform( - .0098 );
 			const bounce = uniform( .8 );
 			const friction = uniform( .99 );
+			const size = uniform( .12 );
+
 			const clickPosition = uniform( new THREE.Vector3() );
 
 			let camera, scene, renderer;
@@ -143,7 +146,7 @@
 				const particleMaterial = new SpriteNodeMaterial();
 				particleMaterial.colorNode = textureNode.mul( vec3( hash( { num: instanceIndex } ), hash( { num: instanceIndex.add( 1 ) } ), hash( { num: instanceIndex.add( 2 ) } ) ) );
 				particleMaterial.positionNode = positionBuffer.toAttribute();
-				particleMaterial.scaleNode = float( .12 );
+				particleMaterial.scaleNode = size;
 				particleMaterial.depthWrite = false;
 				particleMaterial.depthTest = true;
 				particleMaterial.transparent = true;
@@ -247,6 +250,7 @@
 				gui.add( gravity, 'value', - .0098, 0, 0.0001 ).name( 'gravity' );
 				gui.add( bounce, 'value', .1, 1, 0.01 ).name( 'bounce' );
 				gui.add( friction, 'value', .96, .99, 0.01 ).name( 'friction' );
+				gui.add( size, 'value', .12, .5, 0.01 ).name( 'size' );
 
 			}
 
