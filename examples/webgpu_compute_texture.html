@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { ShaderNode, texture, textureStore, wgslFn, instanceIndex, MeshBasicNodeMaterial } from 'three/nodes';
+			import { texture, textureStore, wgslFn, instanceIndex, MeshBasicNodeMaterial } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -64,38 +64,31 @@
 
 				// create function
 
-				const computeShaderNode = new ShaderNode( ( stack ) => {
+				const computeWGSL = wgslFn( `
+					fn computeWGSL( storageTex: texture_storage_2d<rgba8unorm, write>, index: u32 ) -> void {
 
-					// the first function will be the main one
+						let posX = index % ${ width };
+						let posY = index / ${ width };
+						let indexUV = vec2<u32>( posX, posY );
+						let uv = getUV( posX, posY );
 
-					const computeWGSL = wgslFn( `
-						fn computeWGSL( storageTex: texture_storage_2d<rgba8unorm, write>, index:u32 ) -> void {
+						textureStore( storageTex, indexUV, vec4f( uv, 0, 1 ) );
 
-							let posX = index % ${ width };
-							let posY = index / ${ width };
-							let indexUV = vec2<u32>( posX, posY );
-							let uv = getUV( posX, posY );
+					}
 
-							textureStore( storageTex, indexUV, vec4f( uv, 0, 1 ) );
+					fn getUV( posX: u32, posY: u32 ) -> vec2<f32> {
 
-						}
+						let uv = vec2<f32>( f32( posX ) / ${ width }.0, f32( posY ) / ${ height }.0 );
 
-						fn getUV( posX:u32, posY:u32 ) -> vec2<f32> {
+						return uv;
 
-							let uv = vec2<f32>( f32( posX ) / ${ width }.0, f32( posY ) / ${ height }.0 );
-
-							return uv;
-
-						}
-					` );
-
-					stack.add( computeWGSL( { storageTex: textureStore( storageTexture ), index: instanceIndex } ) );
-
-				} );
+					}
+				` );
 
 				// compute
 
-				const computeNode = computeShaderNode.compute( width * height );
+				const computeWGSLCall = computeWGSL( { storageTex: textureStore( storageTexture ), index: instanceIndex } );
+				const computeNode = computeWGSLCall.compute( width * height );
 
 				const material = new MeshBasicNodeMaterial( { color: 0x00ff00 } );
 				material.colorNode = texture( storageTexture );
