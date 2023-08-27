@@ -111,6 +111,7 @@ const exceptionList = [
 	'webgpu_backdrop_area',
 	'webgpu_clearcoat',
 	'webgpu_compute',
+	'webgpu_compute_particles',
 	'webgpu_compute_texture',
 	'webgpu_cubemap_adjustments',
 	'webgpu_cubemap_dynamic',
