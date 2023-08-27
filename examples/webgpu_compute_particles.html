@@ -123,6 +123,11 @@
 						stack.assign( position.y, 0 );
 						stack.assign( velocity.y, velocity.y.negate().mul( bounce ) );
 
+						// floor friction
+
+						stack.assign( velocity.x, velocity.x.mul( .9 ) );
+						stack.assign( velocity.z, velocity.z.mul( .9 ) );
+
 					} );
 
 				} );
