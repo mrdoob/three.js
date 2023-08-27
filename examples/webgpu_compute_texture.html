@@ -69,16 +69,16 @@
 
 						let posX = index % ${ width };
 						let posY = index / ${ width };
-						let indexUV = vec2<u32>( posX, posY );
+						let indexUV = vec2u( posX, posY );
 						let uv = getUV( posX, posY );
 
 						textureStore( storageTex, indexUV, vec4f( uv, 0, 1 ) );
 
 					}
 
-					fn getUV( posX: u32, posY: u32 ) -> vec2<f32> {
+					fn getUV( posX: u32, posY: u32 ) -> vec2f {
 
-						let uv = vec2<f32>( f32( posX ) / ${ width }.0, f32( posY ) / ${ height }.0 );
+						let uv = vec2f( f32( posX ) / ${ width }.0, f32( posY ) / ${ height }.0 );
 
 						return uv;
 
