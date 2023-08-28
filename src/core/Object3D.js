@@ -12,6 +12,7 @@ let _object3DId = 0;
 const _v1 = /*@__PURE__*/ new Vector3();
 const _q1 = /*@__PURE__*/ new Quaternion();
 const _m1 = /*@__PURE__*/ new Matrix4();
+const _m2 = /*@__PURE__*/ new Matrix4();
 const _target = /*@__PURE__*/ new Vector3();
 
 const _position = /*@__PURE__*/ new Vector3();
@@ -24,6 +25,30 @@ const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 
 const _addedEvent = { type: 'added' };
 const _removedEvent = { type: 'removed' };
+
+function _canAppend( parent, object, caller ) {
+
+	if ( ! object || ! object.isObject3D ) {
+
+		console.error( `THREE.Object3D.${caller}: object is not a THREE.Object3D instance`, object );
+		return false;
+
+	}
+
+	for ( let i = parent; i !== null; i = i.parent ) {
+
+		if ( i === object ) {
+
+			console.error( `THREE.Object3D.${caller}: object cannot be an ancestor of itself`, object );
+			return false;
+
+		}
+
+	}
+
+	return true;
+
+}
 
 class Object3D extends EventDispatcher {
 
@@ -303,38 +328,18 @@ class Object3D extends EventDispatcher {
 
 	}
 
-	add( object ) {
+	add( /* varargs */ ) {
 
-		if ( arguments.length > 1 ) {
+		for ( let i = 0, l = arguments.length; i < l; i ++ ) {
 
-			for ( let i = 0; i < arguments.length; i ++ ) {
+			const object = arguments[ i ];
 
-				this.add( arguments[ i ] );
+			if ( _canAppend( this, object, 'add' ) === false ) continue;
 
-			}
-
-			return this;
-
-		}
-
-		if ( object === this ) {
-
-			console.error( 'THREE.Object3D.add: object can\'t be added as a child of itself.', object );
-			return this;
-
-		}
-
-		if ( object && object.isObject3D ) {
-
-			object.removeFromParent();
-			object.parent = this;
+			object.removeFromParent().parent = this;
 			this.children.push( object );
 
 			object.dispatchEvent( _addedEvent );
-
-		} else {
-
-			console.error( 'THREE.Object3D.add: object not an instance of THREE.Object3D.', object );
 
 		}
 
@@ -404,58 +409,42 @@ class Object3D extends EventDispatcher {
 
 	}
 
-	attach( object ) {
+	attach( /* varargs */ ) {
 
-		if ( arguments.length > 1 ) {
+		// adds object as a child of this, while maintaining the object's world transform
 
-			for ( let i = 0; i < arguments.length; i ++ ) {
+		// Note: This method does not support scene graphs having non-uniformly-scaled node(s)
 
-				this.attach( arguments[ i ] );
+		this.updateWorldMatrix( true, false );
 
-			}
+		_m1.copy( this.matrixWorld ).invert();
 
-			return this;
+		for ( let i = 0, l = arguments.length; i < l; i ++ ) {
 
-		}
+			const object = arguments[ i ];
 
-		if ( object === this ) {
-
-			console.error( 'THREE.Object3D.attach: object can\'t be attached as a child of itself.', object );
-			return this;
-
-		}
-
-		if ( object && object.isObject3D ) {
-
-			// adds object as a child of this, while maintaining the object's world transform
-
-			// Note: This method does not support scene graphs having non-uniformly-scaled node(s)
-
-			this.updateWorldMatrix( true, false );
-
-			_m1.copy( this.matrixWorld ).invert();
+			if ( _canAppend( this, object, 'attach' ) === false ) continue;
 
 			if ( object.parent !== null ) {
 
 				object.parent.updateWorldMatrix( true, false );
 
-				_m1.multiply( object.parent.matrixWorld );
+				_m2.multiplyMatrices( _m1, object.parent.matrixWorld );
+
+				object.applyMatrix4( _m2 );
+
+			} else {
+
+				object.applyMatrix4( _m1 );
 
 			}
 
-			object.applyMatrix4( _m1 );
-
-			object.removeFromParent();
-			object.parent = this;
+			object.removeFromParent().parent = this;
 			this.children.push( object );
 
 			object.updateWorldMatrix( false, true );
 
 			object.dispatchEvent( _addedEvent );
-
-		} else {
-
-			console.error( 'THREE.Object3D.attach: object not an instance of THREE.Object3D.', object );
 
 		}
 
