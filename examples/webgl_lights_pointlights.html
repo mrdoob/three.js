@@ -47,6 +47,10 @@
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 100;
+				setInterval(()=>{
+					const scale = Math.random() * 10 + .5;
+					camera.scale.set(scale, scale, scale)
+				}, 500)
 
 				scene = new THREE.Scene();
 

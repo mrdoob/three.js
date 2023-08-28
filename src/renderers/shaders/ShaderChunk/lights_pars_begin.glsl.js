@@ -2,6 +2,7 @@ export default /* glsl */`
 uniform bool receiveShadow;
 uniform vec3 ambientLightColor;
 uniform vec3 lightProbe[ 9 ];
+uniform float cameraScale;
 
 // get the irradiance (radiance convolved with cosine lobe) at the point 'normal' on the unit sphere
 // source: https://graphics.stanford.edu/papers/envmap/envmap.pdf
@@ -123,7 +124,7 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 		light.direction = normalize( lVector );
 
-		float lightDistance = length( lVector );
+		float lightDistance = length( lVector ) * cameraScale;
 
 		light.color = pointLight.color;
 		light.color *= getDistanceAttenuation( lightDistance, pointLight.distance, pointLight.decay );
@@ -161,7 +162,7 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 		if ( spotAttenuation > 0.0 ) {
 
-			float lightDistance = length( lVector );
+			float lightDistance = length( lVector ) * cameraScale;
 
 			light.color = spotLight.color * spotAttenuation;
 			light.color *= getDistanceAttenuation( lightDistance, spotLight.distance, spotLight.decay );

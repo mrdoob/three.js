@@ -123,6 +123,8 @@ const UniformsLib = {
 
 		lightProbe: { value: [] },
 
+		cameraScale: { value: 1 },
+
 		directionalLights: { value: [], properties: {
 			direction: {},
 			color: {}

@@ -235,6 +235,7 @@ function WebGLLights( extensions, capabilities ) {
 			const distance = light.distance;
 
 			const shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.texture : null;
+			state.cameraScale = 0.0;
 
 			if ( light.isAmbientLight ) {
 
@@ -472,6 +473,9 @@ function WebGLLights( extensions, capabilities ) {
 
 		}
 
+		// TODO how can we properly set the version here?
+		state.version = nextVersion ++;
+
 	}
 
 	function setupView( lights, camera ) {
@@ -481,6 +485,9 @@ function WebGLLights( extensions, capabilities ) {
 		let spotLength = 0;
 		let rectAreaLength = 0;
 		let hemiLength = 0;
+
+		camera.getWorldScale(vector3);
+		state.cameraScale = vector3.x;
 
 		const viewMatrix = camera.matrixWorldInverse;
 
