@@ -303,7 +303,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( ( emissiveNode && emissiveNode.isNode === true ) || ( material.emissive && material.emissive.isColor === true ) ) {
 
-			outgoingLightNode = outgoingLightNode.add( emissiveNode ? vec3( emissiveNode ) : materialEmissive );
+			outgoingLightNode = outgoingLightNode.add( vec3( emissiveNode ? emissiveNode : materialEmissive ) );
 
 		}
 

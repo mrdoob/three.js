@@ -12,6 +12,7 @@ class SampledTexture extends Binding {
 
 		this.texture = texture;
 		this.version = texture ? texture.version : 0;
+		this.store = false;
 
 		this.isSampledTexture = true;
 

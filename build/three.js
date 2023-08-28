@@ -134,6 +134,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	const RGBA_ASTC_12x10_Format = 37820;
 	const RGBA_ASTC_12x12_Format = 37821;
 	const RGBA_BPTC_Format = 36492;
+	const RGB_BPTC_SIGNED_Format = 36494;
+	const RGB_BPTC_UNSIGNED_Format = 36495;
 	const RED_RGTC1_Format = 36283;
 	const SIGNED_RED_RGTC1_Format = 36284;
 	const RED_GREEN_RGTC2_Format = 36285;
@@ -166,6 +168,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	const SRGBColorSpace = 'srgb';
 	const LinearSRGBColorSpace = 'srgb-linear';
 	const DisplayP3ColorSpace = 'display-p3';
+	const LinearDisplayP3ColorSpace = 'display-p3-linear';
 
 	const ZeroStencilOp = 0;
 	const KeepStencilOp = 7680;
@@ -1535,6 +1538,14 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
+	function createCanvasElement() {
+
+		const canvas = createElementNS( 'canvas' );
+		canvas.style.display = 'block';
+		return canvas;
+
+	}
+
 	const _cache = {};
 
 	function warnOnce( message ) {
@@ -1926,7 +1937,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	let textureId = 0;
+	let _textureId = 0;
 
 	class Texture extends EventDispatcher {
 
@@ -1936,7 +1947,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.isTexture = true;
 
-			Object.defineProperty( this, 'id', { value: textureId ++ } );
+			Object.defineProperty( this, 'id', { value: _textureId ++ } );
 
 			this.uuid = generateUUID();
 
@@ -8393,7 +8404,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	let materialId = 0;
+	let _materialId = 0;
 
 	class Material extends EventDispatcher {
 
@@ -8403,7 +8414,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.isMaterial = true;
 
-			Object.defineProperty( this, 'id', { value: materialId ++ } );
+			Object.defineProperty( this, 'id', { value: _materialId ++ } );
 
 			this.uuid = generateUUID();
 
@@ -10372,7 +10383,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	let _id$1 = 0;
+	let _id$2 = 0;
 
 	const _m1 = /*@__PURE__*/ new Matrix4();
 	const _obj = /*@__PURE__*/ new Object3D();
@@ -10389,7 +10400,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.isBufferGeometry = true;
 
-			Object.defineProperty( this, 'id', { value: _id$1 ++ } );
+			Object.defineProperty( this, 'id', { value: _id$2 ++ } );
 
 			this.uuid = generateUUID();
 
@@ -11494,7 +11505,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			this.material = source.material;
+			this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 			this.geometry = source.geometry;
 
 			return this;
@@ -20057,7 +20068,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	let _id = 0;
+	let _id$1 = 0;
 
 	class WebGLShaderCache {
 
@@ -20171,7 +20182,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		constructor( code ) {
 
-			this.id = _id ++;
+			this.id = _id$1 ++;
 
 			this.code = code;
 			this.usedTimes = 0;
@@ -25560,7 +25571,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				// sRGB
 
-				if ( colorSpace === SRGBColorSpace ) {
+				if ( colorSpace === SRGBColorSpace || colorSpace === DisplayP3ColorSpace ) {
 
 					if ( isWebGL2 === false ) {
 
@@ -25626,6 +25637,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
+	const LinearTransferFunction = 0;
+	const SRGBTransferFunction = 1;
+
 	function WebGLUtils( gl, extensions, capabilities ) {
 
 		const isWebGL2 = capabilities.isWebGL2;
@@ -25633,6 +25647,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		function convert( p, colorSpace = NoColorSpace ) {
 
 			let extension;
+
+			const transferFunction = ( colorSpace === SRGBColorSpace || colorSpace === DisplayP3ColorSpace ) ? SRGBTransferFunction : LinearTransferFunction;
 
 			if ( p === UnsignedByteType ) return gl.UNSIGNED_BYTE;
 			if ( p === UnsignedShort4444Type ) return gl.UNSIGNED_SHORT_4_4_4_4;
@@ -25700,7 +25716,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( p === RGB_S3TC_DXT1_Format || p === RGBA_S3TC_DXT1_Format || p === RGBA_S3TC_DXT3_Format || p === RGBA_S3TC_DXT5_Format ) {
 
-				if ( colorSpace === SRGBColorSpace ) {
+				if ( transferFunction === SRGBTransferFunction ) {
 
 					extension = extensions.get( 'WEBGL_compressed_texture_s3tc_srgb' );
 
@@ -25785,8 +25801,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				if ( extension !== null ) {
 
-					if ( p === RGB_ETC2_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ETC2 : extension.COMPRESSED_RGB8_ETC2;
-					if ( p === RGBA_ETC2_EAC_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ETC2_EAC : extension.COMPRESSED_RGBA8_ETC2_EAC;
+					if ( p === RGB_ETC2_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ETC2 : extension.COMPRESSED_RGB8_ETC2;
+					if ( p === RGBA_ETC2_EAC_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ETC2_EAC : extension.COMPRESSED_RGBA8_ETC2_EAC;
 
 				} else {
 
@@ -25808,20 +25824,20 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				if ( extension !== null ) {
 
-					if ( p === RGBA_ASTC_4x4_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR : extension.COMPRESSED_RGBA_ASTC_4x4_KHR;
-					if ( p === RGBA_ASTC_5x4_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR : extension.COMPRESSED_RGBA_ASTC_5x4_KHR;
-					if ( p === RGBA_ASTC_5x5_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR : extension.COMPRESSED_RGBA_ASTC_5x5_KHR;
-					if ( p === RGBA_ASTC_6x5_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR : extension.COMPRESSED_RGBA_ASTC_6x5_KHR;
-					if ( p === RGBA_ASTC_6x6_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR : extension.COMPRESSED_RGBA_ASTC_6x6_KHR;
-					if ( p === RGBA_ASTC_8x5_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR : extension.COMPRESSED_RGBA_ASTC_8x5_KHR;
-					if ( p === RGBA_ASTC_8x6_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR : extension.COMPRESSED_RGBA_ASTC_8x6_KHR;
-					if ( p === RGBA_ASTC_8x8_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR : extension.COMPRESSED_RGBA_ASTC_8x8_KHR;
-					if ( p === RGBA_ASTC_10x5_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR : extension.COMPRESSED_RGBA_ASTC_10x5_KHR;
-					if ( p === RGBA_ASTC_10x6_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR : extension.COMPRESSED_RGBA_ASTC_10x6_KHR;
-					if ( p === RGBA_ASTC_10x8_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR : extension.COMPRESSED_RGBA_ASTC_10x8_KHR;
-					if ( p === RGBA_ASTC_10x10_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR : extension.COMPRESSED_RGBA_ASTC_10x10_KHR;
-					if ( p === RGBA_ASTC_12x10_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR : extension.COMPRESSED_RGBA_ASTC_12x10_KHR;
-					if ( p === RGBA_ASTC_12x12_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR : extension.COMPRESSED_RGBA_ASTC_12x12_KHR;
+					if ( p === RGBA_ASTC_4x4_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR : extension.COMPRESSED_RGBA_ASTC_4x4_KHR;
+					if ( p === RGBA_ASTC_5x4_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR : extension.COMPRESSED_RGBA_ASTC_5x4_KHR;
+					if ( p === RGBA_ASTC_5x5_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR : extension.COMPRESSED_RGBA_ASTC_5x5_KHR;
+					if ( p === RGBA_ASTC_6x5_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR : extension.COMPRESSED_RGBA_ASTC_6x5_KHR;
+					if ( p === RGBA_ASTC_6x6_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR : extension.COMPRESSED_RGBA_ASTC_6x6_KHR;
+					if ( p === RGBA_ASTC_8x5_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR : extension.COMPRESSED_RGBA_ASTC_8x5_KHR;
+					if ( p === RGBA_ASTC_8x6_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR : extension.COMPRESSED_RGBA_ASTC_8x6_KHR;
+					if ( p === RGBA_ASTC_8x8_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR : extension.COMPRESSED_RGBA_ASTC_8x8_KHR;
+					if ( p === RGBA_ASTC_10x5_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR : extension.COMPRESSED_RGBA_ASTC_10x5_KHR;
+					if ( p === RGBA_ASTC_10x6_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR : extension.COMPRESSED_RGBA_ASTC_10x6_KHR;
+					if ( p === RGBA_ASTC_10x8_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR : extension.COMPRESSED_RGBA_ASTC_10x8_KHR;
+					if ( p === RGBA_ASTC_10x10_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR : extension.COMPRESSED_RGBA_ASTC_10x10_KHR;
+					if ( p === RGBA_ASTC_12x10_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR : extension.COMPRESSED_RGBA_ASTC_12x10_KHR;
+					if ( p === RGBA_ASTC_12x12_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR : extension.COMPRESSED_RGBA_ASTC_12x12_KHR;
 
 				} else {
 
@@ -25833,13 +25849,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			// BPTC
 
-			if ( p === RGBA_BPTC_Format ) {
+			if ( p === RGBA_BPTC_Format || p === RGB_BPTC_SIGNED_Format || p === RGB_BPTC_UNSIGNED_Format ) {
 
 				extension = extensions.get( 'EXT_texture_compression_bptc' );
 
 				if ( extension !== null ) {
 
-					if ( p === RGBA_BPTC_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT : extension.COMPRESSED_RGBA_BPTC_UNORM_EXT;
+					if ( p === RGBA_BPTC_Format ) return ( transferFunction === SRGBTransferFunction ) ? extension.COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT : extension.COMPRESSED_RGBA_BPTC_UNORM_EXT;
+					if ( p === RGB_BPTC_SIGNED_Format ) return extension.COMPRESSED_RGB_BPTC_SIGNED_FLOAT_EXT;
+					if ( p === RGB_BPTC_UNSIGNED_Format ) return extension.COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_EXT;
 
 				} else {
 
@@ -28048,14 +28066,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			dispose: dispose
 
 		};
-
-	}
-
-	function createCanvasElement() {
-
-		const canvas = createElementNS( 'canvas' );
-		canvas.style.display = 'block';
-		return canvas;
 
 	}
 
@@ -32357,7 +32367,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			super.copy( source, recursive );
 
-			this.material = source.material;
+			this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 			this.geometry = source.geometry;
 
 			return this;
@@ -32678,7 +32688,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			super.copy( source, recursive );
 
-			this.material = source.material;
+			this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 			this.geometry = source.geometry;
 
 			return this;
@@ -45919,6 +45929,12 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		disconnect() {
 
+			if ( this._connected === false ) {
+
+				return;
+
+			}
+
 			if ( this.filters.length > 0 ) {
 
 				this.source.disconnect( this.filters[ 0 ] );
@@ -49167,7 +49183,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	let id = 0;
+	let _id = 0;
 
 	class UniformsGroup extends EventDispatcher {
 
@@ -49177,7 +49193,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.isUniformsGroup = true;
 
-			Object.defineProperty( this, 'id', { value: id ++ } );
+			Object.defineProperty( this, 'id', { value: _id ++ } );
 
 			this.name = '';
 
@@ -51621,6 +51637,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	exports.LineDashedMaterial = LineDashedMaterial;
 	exports.LineLoop = LineLoop;
 	exports.LineSegments = LineSegments;
+	exports.LinearDisplayP3ColorSpace = LinearDisplayP3ColorSpace;
 	exports.LinearEncoding = LinearEncoding;
 	exports.LinearFilter = LinearFilter;
 	exports.LinearInterpolant = LinearInterpolant;
@@ -51737,6 +51754,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	exports.RGBA_S3TC_DXT1_Format = RGBA_S3TC_DXT1_Format;
 	exports.RGBA_S3TC_DXT3_Format = RGBA_S3TC_DXT3_Format;
 	exports.RGBA_S3TC_DXT5_Format = RGBA_S3TC_DXT5_Format;
+	exports.RGB_BPTC_SIGNED_Format = RGB_BPTC_SIGNED_Format;
+	exports.RGB_BPTC_UNSIGNED_Format = RGB_BPTC_UNSIGNED_Format;
 	exports.RGB_ETC1_Format = RGB_ETC1_Format;
 	exports.RGB_ETC2_Format = RGB_ETC2_Format;
 	exports.RGB_PVRTC_2BPPV1_Format = RGB_PVRTC_2BPPV1_Format;
@@ -51846,6 +51865,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	exports.ZeroSlopeEnding = ZeroSlopeEnding;
 	exports.ZeroStencilOp = ZeroStencilOp;
 	exports._SRGBAFormat = _SRGBAFormat;
+	exports.createCanvasElement = createCanvasElement;
 	exports.sRGBEncoding = sRGBEncoding;
 
 }));
