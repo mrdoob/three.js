@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { ShaderNode, tslFn, uniform, bitXor, shiftRight, texture, instanceIndex, add, mul, uint, float, vec3, storage, SpriteNodeMaterial } from 'three/nodes';
+			import { ShaderNode, uniform, texture, instanceIndex, float, vec3, storage, SpriteNodeMaterial } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -82,31 +82,18 @@
 
 				// compute
 
-				const hash = tslFn( ( { num } ) => { // Taken from https://www.shadertoy.com/view/XlGcRh, originally from pcg-random.org
-
-					const state = add( mul( uint( num ), 747796405 ), 2891336453 );
-					const word = mul( bitXor( shiftRight( state, add( shiftRight( state, 28 ), 4 ) ), state ), 277803737 );
-					const uintResult = bitXor( shiftRight( word, 22 ), word );
-
-					return mul( 1 / 2 ** 32, uintResult ); // Convert to range [0, 1)
-
-				} );
-
 				const computeInit = new ShaderNode( ( stack ) => {
 
 					const position = positionBuffer.element( instanceIndex );
-					const velocity = velocityBuffer.element( instanceIndex );
 					const color = colorBuffer.element( instanceIndex );
 
-					const randX = hash( { num: instanceIndex } );
-					const randY = hash( { num: instanceIndex.add( 2 ) } );
-					const randZ = hash( { num: instanceIndex.add( 3 ) } );
+					const randX = instanceIndex.hash();
+					const randY = instanceIndex.add( 2 ).hash();
+					const randZ = instanceIndex.add( 3 ).hash();
 
 					stack.assign( position.x, randX.mul( 60 ).add( - 30 ) );
 					stack.assign( position.y, randY.mul( 10 ) );
 					stack.assign( position.z, randZ.mul( 60 ).add( - 30 ) );
-
-					stack.assign( velocity.y, instanceIndex.float().cos().mul( - .06 ) );
 
 					stack.assign( color, vec3( randX, randY, randZ ) );
 
@@ -199,7 +186,7 @@
 					const distArea = float( 7 ).sub( dist ).max( 0 );
 
 					const power = distArea.mul( .1 );
-					const relativePower = power.mul( hash( { num: instanceIndex } ).mul( .5 ).add( .5 ) );
+					const relativePower = power.mul( instanceIndex.hash().mul( .5 ).add( .5 ) );
 
 					stack.assign( velocity, velocity.add( direction.mul( relativePower ) ) );
 
