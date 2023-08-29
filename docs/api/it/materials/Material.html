@@ -29,6 +29,14 @@
 
 		<h2>Proprietà</h2>
 
+		<h3>[property:Boolean alphaHash]</h3>
+		<p>
+			Enables alpha hashed transparency, an alternative to [page:.transparent] or [page:.alphaTest].
+			The material will not be rendered if opacity is lower than a random threshold.
+			Randomization introduces some grain or noise, but approximates alpha blending without
+			the associated problems of sorting. Using TAARenderPass can reduce the resulting noise.
+		</p>
+
 		<h3>[property:Float alphaTest]</h3>
 		<p>
 			Imposta il valore alfa per essere usato quando vengono eseguiti i test alfa.
