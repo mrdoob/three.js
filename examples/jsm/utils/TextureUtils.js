@@ -77,6 +77,7 @@ export function decompress( texture, maxTextureSize = Infinity, renderer = null 
 	if ( _renderer ) {
 
 		_renderer.dispose();
+		_renderer.forceContextLoss();
 		_renderer = null;
 
 	}
