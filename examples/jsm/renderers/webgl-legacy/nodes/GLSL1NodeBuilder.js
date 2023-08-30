@@ -1,4 +1,4 @@
-import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial } from 'three/nodes';
+import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial } from '../../../nodes/Nodes.js';
 
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan'
@@ -10,7 +10,7 @@ const precisionLib = {
 	high: 'highp'
 };
 
-class GLSLNodeBuilder extends NodeBuilder {
+class GLSL1NodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer, scene = null ) {
 
@@ -337,4 +337,4 @@ void main() {
 
 }
 
-export default GLSLNodeBuilder;
+export default GLSL1NodeBuilder;
