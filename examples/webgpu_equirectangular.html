@@ -49,6 +49,8 @@
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
+					throw new Error( 'No WebGPU or WebGL2 support' );
+
 				}
 
 				const container = document.createElement( 'div' );

@@ -52,6 +52,8 @@
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
+					throw new Error( 'No WebGPU or WebGL2 support' );
+
 				}
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
