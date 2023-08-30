@@ -7,12 +7,13 @@ class WebGLUtils {
 		this.backend = backend;
 
 		this.gl = this.backend.gl;
+		this.extensions = backend.extensions;
 
 	}
 
 	convert( p, colorSpace = NoColorSpace ) {
 
-		const { gl } = this;
+		const { gl, extensions } = this;
 
 		let extension;
 
@@ -54,7 +55,7 @@ class WebGLUtils {
 
 			if ( colorSpace === SRGBColorSpace ) {
 
-				//extension = extensions.get( 'WEBGL_compressed_texture_s3tc_srgb' );
+				extension = extensions.get( 'WEBGL_compressed_texture_s3tc_srgb' );
 
 				if ( extension !== null ) {
 
@@ -71,7 +72,7 @@ class WebGLUtils {
 
 			} else {
 
-				//extension = extensions.get( 'WEBGL_compressed_texture_s3tc' );
+				extension = extensions.get( 'WEBGL_compressed_texture_s3tc' );
 
 				if ( extension !== null ) {
 
@@ -94,7 +95,7 @@ class WebGLUtils {
 
 		if ( p === RGB_PVRTC_4BPPV1_Format || p === RGB_PVRTC_2BPPV1_Format || p === RGBA_PVRTC_4BPPV1_Format || p === RGBA_PVRTC_2BPPV1_Format ) {
 
-			//extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
+			extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
 
 			if ( extension !== null ) {
 
@@ -115,7 +116,7 @@ class WebGLUtils {
 
 		if ( p === RGB_ETC1_Format ) {
 
-			//extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
+			extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
 
 			if ( extension !== null ) {
 
@@ -133,7 +134,7 @@ class WebGLUtils {
 
 		if ( p === RGB_ETC2_Format || p === RGBA_ETC2_EAC_Format ) {
 
-			//extension = extensions.get( 'WEBGL_compressed_texture_etc' );
+			extension = extensions.get( 'WEBGL_compressed_texture_etc' );
 
 			if ( extension !== null ) {
 
@@ -156,7 +157,7 @@ class WebGLUtils {
 			p === RGBA_ASTC_10x6_Format || p === RGBA_ASTC_10x8_Format || p === RGBA_ASTC_10x10_Format ||
 			p === RGBA_ASTC_12x10_Format || p === RGBA_ASTC_12x12_Format ) {
 
-			//extension = extensions.get( 'WEBGL_compressed_texture_astc' );
+			extension = extensions.get( 'WEBGL_compressed_texture_astc' );
 
 			if ( extension !== null ) {
 
@@ -187,7 +188,7 @@ class WebGLUtils {
 
 		if ( p === RGBA_BPTC_Format ) {
 
-			//extension = extensions.get( 'EXT_texture_compression_bptc' );
+			extension = extensions.get( 'EXT_texture_compression_bptc' );
 
 			if ( extension !== null ) {
 
@@ -205,7 +206,7 @@ class WebGLUtils {
 
 		if ( p === RED_RGTC1_Format || p === SIGNED_RED_RGTC1_Format || p === RED_GREEN_RGTC2_Format || p === SIGNED_RED_GREEN_RGTC2_Format ) {
 
-			//extension = extensions.get( 'EXT_texture_compression_rgtc' );
+			extension = extensions.get( 'EXT_texture_compression_rgtc' );
 
 			if ( extension !== null ) {
 

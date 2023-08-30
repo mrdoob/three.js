@@ -1,4 +1,4 @@
-import { RenderTarget, NoColorSpace, FloatType } from 'three';
+import { NoColorSpace, FloatType } from 'three';
 
 import UniformsGroup from '../../common/UniformsGroup.js';
 
@@ -8,8 +8,6 @@ import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/N
 import UniformBuffer from '../../common/UniformBuffer.js';
 import StorageBuffer from '../../common/StorageBuffer.js';
 import { getVectorLength, getStrideLength } from '../../common/BufferUtils.js';
-
-import CubeRenderTarget from '../../common/CubeRenderTarget.js';
 
 import { NodeBuilder, CodeNode, NodeMaterial } from '../../../nodes/Nodes.js';
 

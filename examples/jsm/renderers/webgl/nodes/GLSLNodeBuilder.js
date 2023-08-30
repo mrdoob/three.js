@@ -1,4 +1,4 @@
-import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial } from 'three/nodes';
+import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial } from '../../../nodes/Nodes.js';
 
 import UniformsGroup from '../../common/UniformsGroup.js';
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
@@ -254,7 +254,8 @@ void main() {
 	// flow
 	${shaderData.flow}
 
-	gl_PointSize = 4.0;
+	gl_PointSize = 1.0;
+
 }
 `;
 

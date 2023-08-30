@@ -587,7 +587,7 @@ class WebGLBackend extends Backend {
 
 	updateSize() {
 
-		console.warn( 'Abstract class.' );
+		//console.warn( 'Abstract class.' );
 
 	}
 
