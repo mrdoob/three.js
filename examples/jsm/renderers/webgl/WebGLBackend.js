@@ -188,7 +188,6 @@ class WebGLBackend extends Backend {
 			const positionAttribute = geometry.attributes.position;
 			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : positionAttribute.count;
 
-			const indexData = this.get( positionAttribute );
 
 			gl.drawArrays( mode, 0, vertexCount );
 			//gl.drawArrays( mode, vertexCount, gl.UNSIGNED_SHORT, firstVertex );

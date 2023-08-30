@@ -101,10 +101,6 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 				snippet = precisionLib[ precision ] + ' ' + snippet;
 
-			} else {
-
-				snippet = snippet;
-
 			}
 
 			if ( group ) {

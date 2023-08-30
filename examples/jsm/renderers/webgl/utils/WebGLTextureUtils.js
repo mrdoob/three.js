@@ -177,7 +177,7 @@ class WebGLTextureUtils {
 
 		if ( extensions.has( 'EXT_texture_filter_anisotropic' ) === true ) {
 
-			const extension = extensions.get( 'EXT_texture_filter_anisotropic' );
+			extension = extensions.get( 'EXT_texture_filter_anisotropic' );
 
 			if ( texture.magFilter === NearestFilter ) return;
 			if ( texture.minFilter !== NearestMipmapLinearFilter && texture.minFilter !== LinearMipmapLinearFilter ) return;
