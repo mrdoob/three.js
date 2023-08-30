@@ -32,6 +32,7 @@
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -45,7 +46,7 @@
 			const clickPosition = uniform( new THREE.Vector3() );
 
 			let camera, scene, renderer;
-			let controls;
+			let controls, stats;
 			let computeParticles;
 
 			init();
@@ -167,8 +168,10 @@
 				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( render );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				//
 
@@ -257,8 +260,9 @@
 
 			}
 
-			function render() {
+			function animate() {
 
+				stats.update();
 				renderer.compute( computeParticles );
 				renderer.render( scene, camera );
 
