@@ -1,8 +1,5 @@
 import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial } from '../../../nodes/Nodes.js';
 
-import UniformsGroup from '../../common/UniformsGroup.js';
-import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
-
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan'
 };
@@ -13,13 +10,11 @@ const precisionLib = {
 	high: 'highp'
 };
 
-class GLSLNodeBuilder extends NodeBuilder {
+class GLSL1NodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer, scene = null ) {
 
 		super( object, renderer, new GLSLNodeParser(), scene );
-
-		this.uniformsGroup = {};
 
 	}
 
@@ -37,13 +32,15 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			return `texture( ${textureProperty}, ${uvSnippet} )`;
+			return `texture2D( ${textureProperty}, ${uvSnippet} )`;
 
 		}
 
 	}
 
-	getTextureLevel( texture, textureProperty, uvSnippet, biasSnippet ) {
+	getTextureBias( texture, textureProperty, uvSnippet, biasSnippet ) {
+
+		if ( this.material.extensions !== undefined ) this.material.extensions.shaderTextureLOD = true;
 
 		return `textureLod( ${textureProperty}, ${uvSnippet}, ${biasSnippet} )`;
 
@@ -69,29 +66,25 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 		const uniforms = this.uniforms[ shaderStage ];
 
-		const bindingSnippets = [];
-		const groupSnippets = [];
+		let output = '';
 
 		for ( const uniform of uniforms ) {
 
 			let snippet = null;
-			let group = false;
 
 			if ( uniform.type === 'texture' ) {
 
-				snippet = `sampler2D ${uniform.name};`;
+				snippet = `sampler2D ${uniform.name};\n`;
 
 			} else if ( uniform.type === 'cubeTexture' ) {
 
-				snippet = `samplerCube ${uniform.name};`;
+				snippet = `samplerCube ${uniform.name};\n`;
 
 			} else {
 
 				const vectorType = this.getVectorType( uniform.type );
 
-				snippet = `${vectorType} ${uniform.name};`;
-
-				group = true;
+				snippet = `${vectorType} ${uniform.name};\n`;
 
 			}
 
@@ -99,35 +92,17 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 			if ( precision !== null ) {
 
-				snippet = precisionLib[ precision ] + ' ' + snippet;
-
-			}
-
-			if ( group ) {
-
-				snippet = '\t' + snippet;
-
-				groupSnippets.push( snippet );
+				snippet = 'uniform ' + precisionLib[ precision ] + ' ' + snippet;
 
 			} else {
 
 				snippet = 'uniform ' + snippet;
 
-				bindingSnippets.push( snippet );
-
 			}
 
-		}
-
-		let output = '';
-
-		if ( groupSnippets.length > 0 ) {
-
-			output += this._getGLSLUniformStruct( shaderStage + 'NodeUniforms', groupSnippets.join( '\n' ) ) + '\n';
+			output += snippet;
 
 		}
-
-		output += bindingSnippets.join( '\n' );
 
 		return output;
 
@@ -141,11 +116,9 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 			const attributes = this.attributes;
 
-			let location = 0;
-
 			for ( const attribute of attributes ) {
 
-				snippet += `layout( location = ${ location ++ } ) in ${ attribute.type } ${ attribute.name };\n`;
+				snippet += `attribute ${attribute.type} ${attribute.name};\n`;
 
 			}
 
@@ -165,7 +138,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 			for ( const varying of varyings ) {
 
-				snippet += `${varying.needsInterpolation ? 'out' : '/*out*/'} ${varying.type} ${varying.name};\n`;
+				snippet += `${varying.needsInterpolation ? 'varying' : '/*varying*/'} ${varying.type} ${varying.name};\n`;
 
 			}
 
@@ -175,7 +148,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 				if ( varying.needsInterpolation ) {
 
-					snippet += `in ${varying.type} ${varying.name};\n`;
+					snippet += `varying ${varying.type} ${varying.name};\n`;
 
 				}
 
@@ -211,24 +184,9 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	_getGLSLUniformStruct( name, vars ) {
-
-		return `
-layout( std140 ) uniform ${name} {
-${vars}
-};`;
-
-	}
-
 	_getGLSLVertexCode( shaderData ) {
 
-		return `#version 300 es
-
-${ this.getSignature() }
-
-// precision
-precision highp float;
-precision highp int;
+		return `${ this.getSignature() }
 
 // uniforms
 ${shaderData.uniforms}
@@ -250,8 +208,6 @@ void main() {
 	// flow
 	${shaderData.flow}
 
-	gl_PointSize = 1.0;
-
 }
 `;
 
@@ -259,9 +215,7 @@ void main() {
 
 	_getGLSLFragmentCode( shaderData ) {
 
-		return `#version 300 es
-
-${ this.getSignature() }
+		return `${ this.getSignature() }
 
 // precision
 precision highp float;
@@ -275,8 +229,6 @@ ${shaderData.varyings}
 
 // codes
 ${shaderData.codes}
-
-layout( location = 0 ) out vec4 fragColor;
 
 void main() {
 
@@ -328,7 +280,7 @@ void main() {
 
 					} else if ( shaderStage === 'fragment' ) {
 
-						flow += 'fragColor = ';
+						flow += 'gl_FragColor = ';
 
 					}
 
@@ -354,65 +306,12 @@ void main() {
 			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
 			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
 
-			//console.log( this.vertexShader );
-			//console.log( this.fragmentShader );
-
 		} else {
 
 			console.warn( 'GLSLNodeBuilder: compute shaders are not supported.' );
 			//this.computeShader = this._getGLSLComputeCode( shadersData.compute );
 
 		}
-
-	}
-
-	getUniformFromNode( node, type, shaderStage, name = null ) {
-
-		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
-		const nodeData = this.getDataFromNode( node, shaderStage );
-
-		let uniformGPU = nodeData.uniformGPU;
-
-		if ( uniformGPU === undefined ) {
-
-			if ( type === 'texture' ) {
-
-				uniformGPU = new NodeSampledTexture( uniformNode.name, uniformNode.node );
-
-				this.bindings[ shaderStage ].push( uniformGPU );
-
-			} else if ( type === 'cubeTexture' ) {
-
-				uniformGPU = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node );
-
-				this.bindings[ shaderStage ].push( uniformGPU );
-
-			} else {
-
-				let uniformsGroup = this.uniformsGroup[ shaderStage ];
-
-				if ( uniformsGroup === undefined ) {
-
-					uniformsGroup = new UniformsGroup( shaderStage + 'NodeUniforms' );
-					//uniformsGroup.setVisibility( gpuShaderStageLib[ shaderStage ] );
-
-					this.uniformsGroup[ shaderStage ] = uniformsGroup;
-
-					this.bindings[ shaderStage ].push( uniformsGroup );
-
-				}
-
-				uniformGPU = this.getNodeUniform( uniformNode, type );
-
-				uniformsGroup.addUniform( uniformGPU );
-
-			}
-
-			nodeData.uniformGPU = uniformGPU;
-
-		}
-
-		return uniformNode;
 
 	}
 
@@ -438,4 +337,4 @@ void main() {
 
 }
 
-export default GLSLNodeBuilder;
+export default GLSL1NodeBuilder;
