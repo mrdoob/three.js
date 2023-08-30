@@ -30,15 +30,17 @@
 			import * as THREE from 'three';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			//import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { NodeMaterial, MeshBasicNodeMaterial, mix, modelNormalMatrix, normalGeometry, normalize, outputStruct, step, texture, uniform, uv, varying, vec2, vec4 } from 'three/nodes';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer, torus;
 			let renderTarget;
 			let postScene, postCamera;
+
+			/*
 
 			const parameters = {
 				samples: 4,
@@ -47,9 +49,10 @@
 
 			const gui = new GUI();
 			gui.add( parameters, 'samples', 0, 4 ).step( 1 );
-			// gui.add( parameters, 'wireframe' );
+			gui.add( parameters, 'wireframe' );
 			gui.onChange( render );
 
+			*/
 
 			class WriteGBufferMaterial extends MeshBasicNodeMaterial {
 
@@ -109,10 +112,10 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.useLegacyLights = false;
+				renderer.setAnimationLoop( render );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				// Create a multi render target with Float buffers
 
 				renderTarget = new THREE.WebGLMultipleRenderTargets(
@@ -141,10 +144,12 @@
 				diffuse.wrapS = THREE.RepeatWrapping;
 				diffuse.wrapT = THREE.RepeatWrapping;
 
-				scene.add( new THREE.Mesh(
+				torus = new THREE.Mesh(
 					new THREE.TorusKnotGeometry( 1, 0.3, 128, 32 ),
 					new WriteGBufferMaterial( diffuse )
-				) );
+				);
+
+				scene.add( torus );
 
 				// PostProcessing setup
 
@@ -158,8 +163,7 @@
 
 				// Controls
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render );
+				new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -179,13 +183,13 @@
 
 			}
 
-			function render() {
-
-				renderTarget.samples = parameters.samples;
+			function render( time ) {
 
 				/*
 
 				// Feature not yet working
+
+				renderTarget.samples = parameters.samples;
 
 				scene.traverse( function ( child ) {
 
@@ -198,6 +202,8 @@
 				} );
 
 				*/
+
+				torus.rotation.y = ( time / 1000 ) * .4;
 
 				// render scene into target
 				renderer.setRenderTarget( renderTarget );
