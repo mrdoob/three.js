@@ -178,29 +178,50 @@ class WebGPUBackend extends Backend {
 
 		const antialias = this.parameters.antialias;
 
-		if ( renderContext.texture !== null ) {
+		if ( renderContext.textures !== null ) {
 
-			const textureData = this.get( renderContext.texture );
-			const depthTextureData = this.get( renderContext.depthTexture );
+			const textures = renderContext.textures;
 
-			const view = textureData.texture.createView( {
-				baseMipLevel: 0,
-				mipLevelCount: 1,
-				baseArrayLayer: renderContext.activeCubeFace,
-				dimension: GPUTextureViewDimension.TwoD
-			} );
+			descriptor.colorAttachments = [];
 
-			if ( textureData.msaaTexture !== undefined ) {
+			const colorAttachments = descriptor.colorAttachments;
 
-				colorAttachment.view = textureData.msaaTexture.createView();
-				colorAttachment.resolveTarget = view;
+			for ( let i = 0; i < textures.length; i ++ ) {
 
-			} else {
+				const textureData = this.get( textures[ i ] );
 
-				colorAttachment.view = view;
-				colorAttachment.resolveTarget = undefined;
+				const textureView = textureData.texture.createView( {
+					baseMipLevel: 0,
+					mipLevelCount: 1,
+					baseArrayLayer: renderContext.activeCubeFace,
+					dimension: GPUTextureViewDimension.TwoD
+				} );
+
+				let view, resolveTarget;
+
+				if ( textureData.msaaTexture !== undefined ) {
+
+					view = textureData.msaaTexture.createView();
+					resolveTarget = textureView;
+
+				} else {
+
+					view = textureView;
+					resolveTarget = undefined;
+
+				}
+
+				colorAttachments.push( {
+					view,
+					resolveTarget,
+					loadOp: GPULoadOp.Load,
+					storeOp: GPUStoreOp.Store
+
+				} );
 
 			}
+
+			const depthTextureData = this.get( renderContext.depthTexture );
 
 			depthStencilAttachment.view = depthTextureData.texture.createView();
 
@@ -228,16 +249,44 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( renderContext.clearColor ) {
+		if ( renderContext.textures !== null ) {
 
-			colorAttachment.clearValue = renderContext.clearColorValue;
-			colorAttachment.loadOp = GPULoadOp.Clear;
-			colorAttachment.storeOp = GPUStoreOp.Store;
+			const colorAttachments = descriptor.colorAttachments;
+
+			for ( let i = 0; i < colorAttachments.length; i ++ ) {
+
+				const colorAttachment = colorAttachments[ i ];
+
+				if ( renderContext.clearColor ) {
+
+					colorAttachment.clearValue = renderContext.clearColorValue;
+					colorAttachment.loadOp = GPULoadOp.Clear;
+					colorAttachment.storeOp = GPUStoreOp.Store;
+
+				} else {
+
+					colorAttachment.loadOp = GPULoadOp.Load;
+					colorAttachment.storeOp = GPUStoreOp.Store;
+
+				}
+
+			}
+
 
 		} else {
 
-			colorAttachment.loadOp = GPULoadOp.Load;
-			colorAttachment.storeOp = GPUStoreOp.Store;
+			if ( renderContext.clearColor ) {
+
+				colorAttachment.clearValue = renderContext.clearColorValue;
+				colorAttachment.loadOp = GPULoadOp.Clear;
+				colorAttachment.storeOp = GPUStoreOp.Store;
+
+			} else {
+
+				colorAttachment.loadOp = GPULoadOp.Load;
+				colorAttachment.storeOp = GPUStoreOp.Store;
+
+			}
 
 		}
 
@@ -366,9 +415,21 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		if ( renderContext.texture !== null && renderContext.texture.generateMipmaps === true ) {
+		if ( renderContext.textures !== null ) {
 
-			this.textureUtils.generateMipmaps( renderContext.texture );
+			const textures = renderContext.textures;
+
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				const texture = textures[ i ];
+
+				if ( texture.generateMipmaps === true ) {
+
+					this.textureUtils.generateMipmaps( texture );
+
+				}
+
+			}
 
 		}
 

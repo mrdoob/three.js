@@ -30,6 +30,7 @@ export { default as TempNode } from './core/TempNode.js';
 export { default as UniformNode, uniform } from './core/UniformNode.js';
 export { default as VarNode, temp } from './core/VarNode.js';
 export { default as VaryingNode, varying } from './core/VaryingNode.js';
+export { default as OutputStructNode, outputStruct } from './core/OutputStructNode.js';
 
 import * as NodeUtils from './core/NodeUtils.js';
 export { NodeUtils };

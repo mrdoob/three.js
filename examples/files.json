@@ -331,6 +331,7 @@
 		"webgpu_loader_gltf_sheen",
 		"webgpu_materials",
 		"webgpu_materials_video",
+		"webgpu_multiple_rendertargets",
 		"webgpu_morphtargets",
 		"webgpu_occlusion",
 		"webgpu_particles",

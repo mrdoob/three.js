@@ -20,10 +20,24 @@ class Textures extends DataMap {
 		const renderTargetData = this.get( renderTarget );
 		const sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
 
-		const texture = renderTarget.texture;
+		let texture, textures;
+
+		if ( renderTarget.isWebGLMultipleRenderTargets ) {
+
+			textures = renderTarget.texture;
+			texture = renderTarget.texture[ 0 ];
+
+		} else {
+
+			textures = [ renderTarget.texture ];
+			texture = renderTarget.texture;
+
+		}
+
 		const size = this.getSize( texture );
 
 		let depthTexture = renderTarget.depthTexture || renderTargetData.depthTexture;
+		let textureNeedsUpdate = false;
 
 		if ( depthTexture === undefined ) {
 
@@ -37,7 +51,7 @@ class Textures extends DataMap {
 
 		if ( renderTargetData.width !== size.width || size.height !== renderTargetData.height ) {
 
-			texture.needsUpdate = true;
+			textureNeedsUpdate = true;
 			depthTexture.needsUpdate = true;
 
 			depthTexture.image.width = size.width;
@@ -47,12 +61,12 @@ class Textures extends DataMap {
 
 		renderTargetData.width = size.width;
 		renderTargetData.height = size.height;
-		renderTargetData.texture = texture;
+		renderTargetData.textures = textures;
 		renderTargetData.depthTexture = depthTexture;
 
 		if ( renderTargetData.sampleCount !== sampleCount ) {
 
-			texture.needsUpdate = true;
+			textureNeedsUpdate = true;
 			depthTexture.needsUpdate = true;
 
 			renderTargetData.sampleCount = sampleCount;
@@ -61,7 +75,17 @@ class Textures extends DataMap {
 
 		const options = { sampleCount };
 
-		this.updateTexture( texture, options );
+
+		for ( let i = 0; i < textures.length; i ++ ) {
+
+			const texture = textures[ i ];
+
+			if ( textureNeedsUpdate ) texture.needsUpdate = true;
+
+			this.updateTexture( texture, options );
+
+		}
+
 		this.updateTexture( depthTexture, options );
 
 		// dispose handler
@@ -76,7 +100,20 @@ class Textures extends DataMap {
 
 				renderTarget.removeEventListener( 'dispose', onDispose );
 
-				this._destroyTexture( texture );
+				if ( textures !== undefined ) {
+
+					for ( let i = 0; i < textures.length; i ++ ) {
+
+						this._destroyTexture( textures[ i ] );
+
+					}
+
+				} else {
+
+					this._destroyTexture( texture );
+
+				}
+
 				this._destroyTexture( depthTexture );
 
 			};
