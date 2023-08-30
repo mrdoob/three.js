@@ -160,7 +160,7 @@
 		<h3>[property:Float ior]</h3>
 		<p>
 			Index-of-refraction for non-metallic materials, from `1.0` to `2.333`.
-			Default is `1.5`.<br />
+			Default is `1.5`.
 		</p>
 
 		<h3>[property:Float reflectivity]</h3>
@@ -170,6 +170,45 @@
 
 			This models the reflectivity of non-metallic materials. It has no effect
 			when [page:MeshStandardMaterial.metalness metalness] is `1.0`
+		</p>
+
+		<h3>[property:Float iridescence]</h3>
+		<p>
+			The intensity of the [link:https://en.wikipedia.org/wiki/Iridescence iridescence] layer, simulating RGB color shift based on the angle between the surface and the viewer, from `0.0` to `1.0`. Default is `0.0`.
+		</p>
+
+		<h3>[property:Texture iridescenceMap]</h3>
+		<p>
+			The red channel of this texture is multiplied against
+			[page:.iridescence], for per-pixel control over iridescence.
+			Default is `null`.
+		</p>
+
+		<h3>[property:Float iridescenceIOR]</h3>
+		<p>
+			Strength of the iridescence RGB color shift effect, represented by an index-of-refraction. Between `1.0` to `2.333`.
+			Default is `1.3`.
+		</p>
+
+		<h3>[property:Array iridescenceThicknessRange]</h3>
+		<p>
+			Array of exactly 2 elements, specifying minimum and maximum thickness of the iridescence layer.
+			Thickness of iridescence layer has an equivalent effect of the one [page:.thickness] has on [page:.ior].
+			Default is `[100, 400]`.<br />
+
+			If [page:.iridescenceThicknessMap] is not defined, iridescence thickness will use only the second element of the given array.
+		</p>
+
+		<h3>[property:Texture iridescenceThicknessMap]</h3>
+		<p>
+			A texture that defines the thickness of the iridescence layer, stored in the green channel.
+			Minimum and maximum values of thickness are defined by [page:.iridescenceThicknessRange] array:<br/>
+			<ul>
+				<li>`0.0` in the green channel will result in thickness equal to first element of the array.</li>
+				<li>`1.0` in the green channel will result in thickness equal to second element of the array.</li>
+				<li>Values in-between will linearly interpolate between the elements of the array.</li>
+			</ul>
+			Default is `null`.
 		</p>
 
 		<h3>[property:Float sheen]</h3>
@@ -201,7 +240,7 @@
 		<p>
 			A float that scales the amount of specular reflection for non-metals only.
 			When set to zero, the model is effectively Lambertian. From `0.0` to
-			`1.0`. Default is `0.0`.
+			`1.0`. Default is `1.0`.
 		</p>
 
 		<h3>[property:Texture specularIntensityMap]</h3>
@@ -233,7 +272,7 @@
 
 		<h3>[property:Texture thicknessMap]</h3>
 		<p>
-			A texture that defines the thickness, stored in the G channel. This will
+			A texture that defines the thickness, stored in the green channel. This will
 			be multiplied by [page:.thickness]. Default is `null`.
 		</p>
 

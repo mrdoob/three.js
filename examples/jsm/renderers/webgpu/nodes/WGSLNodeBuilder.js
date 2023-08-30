@@ -1,18 +1,13 @@
-import { RenderTarget, NoColorSpace } from 'three';
+import { NoColorSpace, FloatType } from 'three';
 
 import UniformsGroup from '../../common/UniformsGroup.js';
-import {
-	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
-	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
-} from '../../common/nodes/NodeUniform.js';
+
 import NodeSampler from '../../common/nodes/NodeSampler.js';
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
 import UniformBuffer from '../../common/UniformBuffer.js';
 import StorageBuffer from '../../common/StorageBuffer.js';
 import { getVectorLength, getStrideLength } from '../../common/BufferUtils.js';
-
-import CubeRenderTarget from '../../common/CubeRenderTarget.js';
 
 import { NodeBuilder, CodeNode, NodeMaterial } from '../../../nodes/Nodes.js';
 
@@ -136,7 +131,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getSampler( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+	_getSampler( texture, textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
@@ -144,17 +139,13 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			this._include( 'repeatWrapping' );
-
-			const dimension = `textureDimensions( ${textureProperty}, 0 )`;
-
-			return `textureLoad( ${textureProperty}, threejs_repeatWrapping( ${uvSnippet}, ${dimension} ), 0 )`;
+			return this.getTextureLoad( texture, textureProperty, uvSnippet );
 
 		}
 
 	}
 
-	getVideoSampler( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+	_getVideoSampler( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
@@ -168,21 +159,33 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	_getSamplerLevel( texture, textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
-		if ( shaderStage === 'fragment' ) {
+		if ( shaderStage === 'fragment' && this.isUnfilterable( texture ) === false ) {
 
 			return `textureSampleLevel( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${biasSnippet} )`;
 
 		} else {
 
-			this._include( 'repeatWrapping' );
-
-			const dimension = `textureDimensions( ${textureProperty}, 0 )`;
-
-			return `textureLoad( ${textureProperty}, threejs_repeatWrapping( ${uvSnippet}, ${dimension} ), i32( ${biasSnippet} ) )`;
+			return this.getTextureLoad( texture, textureProperty, uvSnippet, biasSnippet );
 
 		}
+
+	}
+
+	getTextureLoad( texture, textureProperty, uvSnippet, biasSnippet = '0' ) {
+
+		this._include( 'repeatWrapping' );
+
+		const dimension = `textureDimensions( ${textureProperty}, 0 )`;
+
+		return `textureLoad( ${textureProperty}, threejs_repeatWrapping( ${uvSnippet}, ${dimension} ), i32( ${biasSnippet} ) )`;
+
+	}
+
+	isUnfilterable( texture ) {
+
+		return texture.isDataTexture === true && texture.type === FloatType;
 
 	}
 
@@ -192,11 +195,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( texture.isVideoTexture === true ) {
 
-			snippet = this.getVideoSampler( textureProperty, uvSnippet, shaderStage );
+			snippet = this._getVideoSampler( textureProperty, uvSnippet, shaderStage );
+
+		} else if ( this.isUnfilterable( texture ) ) {
+
+			snippet = this.getTextureLoad( texture, textureProperty, uvSnippet );
 
 		} else {
 
-			snippet = this.getSampler( textureProperty, uvSnippet, shaderStage );
+			snippet = this._getSampler( texture, textureProperty, uvSnippet, shaderStage );
 
 		}
 
@@ -224,11 +231,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		if ( texture.isVideoTexture === true ) {
 
-			snippet = this.getVideoSampler( textureProperty, uvSnippet, shaderStage );
+			snippet = this._getVideoSampler( textureProperty, uvSnippet, shaderStage );
 
 		} else {
 
-			snippet = this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
+			snippet = this._getSamplerLevel( texture, textureProperty, uvSnippet, biasSnippet, shaderStage );
 
 		}
 
@@ -296,13 +303,14 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
+				texture.store = node.isStoreTextureNode === true;
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				// add first textures in sequence and group for last
 				const lastBinding = bindings[ bindings.length - 1 ];
 				const index = lastBinding && lastBinding.isUniformsGroup ? bindings.length - 1 : bindings.length;
 
-				if ( shaderStage === 'fragment' ) {
+				if ( shaderStage === 'fragment' && this.isUnfilterable( node.value ) === false && texture.store === false ) {
 
 					const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node );
 					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
@@ -354,7 +362,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 					for ( const uniformNode of node.nodes ) {
 
-						const uniformNodeGPU = this._getNodeUniform( uniformNode, type );
+						const uniformNodeGPU = this.getNodeUniform( uniformNode, type );
 
 						// fit bounds to buffer
 						uniformNodeGPU.boundary = getVectorLength( uniformNodeGPU.itemSize );
@@ -368,7 +376,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				} else {
 
-					uniformGPU = this._getNodeUniform( uniformNode, type );
+					uniformGPU = this.getNodeUniform( uniformNode, type );
 
 					uniformsGroup.addUniform( uniformGPU );
 
@@ -392,7 +400,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	isReference( type ) {
 
-		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube';
+		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube' || type === 'texture_storage_2d';
 
 	}
 
@@ -619,9 +627,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' ) {
 
-				if ( shaderStage === 'fragment' ) {
+				const texture = uniform.node.value;
 
-					const texture = uniform.node.value;
+				if ( shaderStage === 'fragment' && this.isUnfilterable( texture ) === false && uniform.node.isStoreTextureNode !== true ) {
 
 					if ( texture.isDepthTexture === true && texture.compareFunction !== null ) {
 
@@ -634,8 +642,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 					}
 
 				}
-
-				const texture = uniform.node.value;
 
 				let textureType;
 
@@ -650,6 +656,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 				} else if ( texture.isVideoTexture === true ) {
 
 					textureType = 'texture_external';
+
+				} else if ( uniform.node.isStoreTextureNode === true ) {
+
+					// @TODO: Add support for other formats
+					textureType = 'texture_storage_2d<rgba8unorm, write>';
 
 				} else {
 
@@ -778,18 +789,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getRenderTarget( width, height, options ) {
-
-		return new RenderTarget( width, height, options );
-
-	}
-
-	getCubeRenderTarget( size, options ) {
-
-		return new CubeRenderTarget( size, options );
-
-	}
-
 	getMethod( method ) {
 
 		if ( wgslPolyfill[ method ] !== undefined ) {
@@ -817,20 +816,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 	_include( name ) {
 
 		wgslPolyfill[ name ].build( this );
-
-	}
-
-	_getNodeUniform( uniformNode, type ) {
-
-		if ( type === 'float' ) return new FloatNodeUniform( uniformNode );
-		if ( type === 'vec2' ) return new Vector2NodeUniform( uniformNode );
-		if ( type === 'vec3' ) return new Vector3NodeUniform( uniformNode );
-		if ( type === 'vec4' ) return new Vector4NodeUniform( uniformNode );
-		if ( type === 'color' ) return new ColorNodeUniform( uniformNode );
-		if ( type === 'mat3' ) return new Matrix3NodeUniform( uniformNode );
-		if ( type === 'mat4' ) return new Matrix4NodeUniform( uniformNode );
-
-		throw new Error( `Uniform "${type}" not declared.` );
 
 	}
 

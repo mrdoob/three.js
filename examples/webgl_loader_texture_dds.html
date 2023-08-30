@@ -15,7 +15,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -41,7 +41,7 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.z = 10;
+				camera.position.z = 15;
 
 				scene = new THREE.Scene();
 
@@ -83,6 +83,19 @@
 				map6.anisotropy = 4;
 				map6.colorSpace = THREE.SRGBColorSpace;
 
+				const map7 = loader.load( 'textures/compressed/disturb_dx10_bc6h_signed_nomip.dds' );
+				map7.anisotropy = 4;
+
+				const map8 = loader.load( 'textures/compressed/disturb_dx10_bc6h_signed_mip.dds' );
+				map8.anisotropy = 4;
+
+				const map9 = loader.load( 'textures/compressed/disturb_dx10_bc6h_unsigned_nomip.dds' );
+				map9.anisotropy = 4;
+
+				const map10 = loader.load( 'textures/compressed/disturb_dx10_bc6h_unsigned_mip.dds' );
+				map10.anisotropy = 4;
+
+
 				const cubemap1 = loader.load( 'textures/compressed/Mountains.dds', function ( texture ) {
 
 					texture.magFilter = THREE.LinearFilter;
@@ -121,51 +134,79 @@
 				const material6 = new THREE.MeshBasicMaterial( { envMap: cubemap3 } );
 				const material7 = new THREE.MeshBasicMaterial( { map: map5 } );
 				const material8 = new THREE.MeshBasicMaterial( { map: map6 } );
+				const material9 = new THREE.MeshBasicMaterial( { map: map7 } );
+				const material10 = new THREE.MeshBasicMaterial( { map: map8 } );
+				const material11 = new THREE.MeshBasicMaterial( { map: map9 } );
+				const material12 = new THREE.MeshBasicMaterial( { map: map10 } );
 
 				let mesh = new THREE.Mesh( new THREE.TorusGeometry(), material1 );
-				mesh.position.x = - 6;
+				mesh.position.x = - 10;
 				mesh.position.y = - 2;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material2 );
-				mesh.position.x = - 2;
+				mesh.position.x = - 6;
 				mesh.position.y = - 2;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material3 );
-				mesh.position.x = - 2;
-				mesh.position.y = 2;
-				scene.add( mesh );
-				meshes.push( mesh );
-
-				mesh = new THREE.Mesh( geometry, material4 );
 				mesh.position.x = - 6;
 				mesh.position.y = 2;
 				scene.add( mesh );
 				meshes.push( mesh );
 
+				mesh = new THREE.Mesh( geometry, material4 );
+				mesh.position.x = - 10;
+				mesh.position.y = 2;
+				scene.add( mesh );
+				meshes.push( mesh );
+
 				mesh = new THREE.Mesh( geometry, material5 );
-				mesh.position.x = 2;
+				mesh.position.x = - 2;
 				mesh.position.y = 2;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material6 );
-				mesh.position.x = 2;
+				mesh.position.x = - 2;
 				mesh.position.y = - 2;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material7 );
-				mesh.position.x = 6;
+				mesh.position.x = 2;
 				mesh.position.y = - 2;
 				scene.add( mesh );
 				meshes.push( mesh );
 
 				mesh = new THREE.Mesh( geometry, material8 );
+				mesh.position.x = 2;
+				mesh.position.y = 2;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				mesh = new THREE.Mesh( geometry, material9 );
 				mesh.position.x = 6;
+				mesh.position.y = - 2;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				mesh = new THREE.Mesh( geometry, material10 );
+				mesh.position.x = 6;
+				mesh.position.y = 2;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				mesh = new THREE.Mesh( geometry, material11 );
+				mesh.position.x = 10;
+				mesh.position.y = - 2;
+				scene.add( mesh );
+				meshes.push( mesh );
+
+				mesh = new THREE.Mesh( geometry, material12 );
+				mesh.position.x = 10;
 				mesh.position.y = 2;
 				scene.add( mesh );
 				meshes.push( mesh );

@@ -118,7 +118,8 @@ class WebGPUPipelineUtils {
 				stencilWriteMask: material.stencilWriteMask
 			},
 			multisample: {
-				count: sampleCount
+				count: sampleCount,
+				alphaToCoverageEnabled: material.alphaToCoverage
 			},
 			layout: device.createPipelineLayout( {
 				bindGroupLayouts: [ bindingsData.layout ]
