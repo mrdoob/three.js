@@ -60,7 +60,7 @@
 				camera.position.z = 7;
 
 				scene = new THREE.Scene();
-				scene.fogNode = rangeFog( color( 0xFF00FF ), 8, 30 );
+				scene.fogNode = rangeFog( color( 0xFF00FF ), 12, 30 );
 
 				const sphereGeometry = new THREE.SphereGeometry( 0.1, 16, 8 );
 
@@ -140,7 +140,6 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = .2;
 
 				// controls
 
