@@ -643,6 +643,7 @@ class WebGPUBackend extends Backend {
 		const firstVertex = drawRange.start;
 
 		const instanceCount = this.getInstanceCount( renderObject );
+		if ( instanceCount === 0 ) return;
 
 		if ( hasIndex === true ) {
 
