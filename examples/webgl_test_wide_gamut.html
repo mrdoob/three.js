@@ -72,12 +72,14 @@
 
 			import * as THREE from 'three';
 
+			import WebGL from 'three/addons/capabilities/WebGL.js';
+
 			let container, camera, renderer, loader;
 			let sceneL, sceneR, textureL, textureR;
 
 			let sliderPos = window.innerWidth / 2;
 
-			const isP3Context = THREE.ColorManagement.isDrawingBufferColorSpaceSupported( THREE.DisplayP3ColorSpace );
+			const isP3Context = WebGL.isColorSpaceAvailable( THREE.DisplayP3ColorSpace );
 
 			if ( isP3Context ) {
 
