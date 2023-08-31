@@ -864,11 +864,9 @@ async function createRawTexture( container ) {
 
 	if ( UNCOMPRESSED_FORMATS.has( FORMAT_MAP[ vkFormat ] ) ) {
 
-		const textureData = mipmaps.length > 0 ? mipmaps[ 0 ].data : null;
-
 		texture = container.pixelDepth === 0
-		? new DataTexture( textureData, container.pixelWidth, container.pixelHeight )
-		: new Data3DTexture( textureData, container.pixelWidth, container.pixelHeight, container.pixelDepth );
+		? new DataTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight )
+		: new Data3DTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight, container.pixelDepth );
 
 	} else {
 
