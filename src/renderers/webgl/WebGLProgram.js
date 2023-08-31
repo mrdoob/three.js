@@ -38,11 +38,11 @@ function getEncodingComponents( colorSpace ) {
 
 	} else if ( workingPrimaries === P3Primaries && encodingPrimaries === Rec709Primaries ) {
 
-		gamutMapping = 'P3ToRec709';
+		gamutMapping = 'LinearDisplayP3ToLinearSRGB';
 
 	} else if ( workingPrimaries === Rec709Primaries && encodingPrimaries === P3Primaries ) {
 
-		gamutMapping = 'Rec709ToP3';
+		gamutMapping = 'LinearSRGBToLinearDisplayP3';
 
 	}
 

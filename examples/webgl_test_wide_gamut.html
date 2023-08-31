@@ -69,23 +69,10 @@
 
 			import * as THREE from 'three';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
 			let container, camera, renderer, loader;
 			let sceneL, sceneR, textureL, textureR;
 
 			let sliderPos = window.innerWidth / 2;
-
-			const IMAGE_OPTIONS = {
-				'Yellow flower': 'yellow_flower_{colorSpace}.jpg',
-				'Webkit logo': 'webkit_logo_{colorSpace}.png',
-			};
-
-			const params = {
-
-				image: Object.values( IMAGE_OPTIONS )[ 0 ],
-
-			};
 
 			const isP3Context = THREE.ColorManagement.isDrawingBufferColorSpaceSupported( THREE.DisplayP3ColorSpace );
 
@@ -107,7 +94,7 @@
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.z = 6;
 
-				loader = new THREE.TextureLoader().setPath( 'textures/wide_gamut/' );
+				loader = new THREE.TextureLoader();
 
 				initTextures();
 				initSlider();
@@ -125,10 +112,6 @@
 
 				}
 
-				const gui = new GUI();
-
-				gui.add( params, 'image', IMAGE_OPTIONS ).onChange( initTextures );
-
 				window.addEventListener( 'resize', onWindowResize );
 				window.matchMedia( '( color-gamut: p3 )' ).addEventListener( 'change', onGamutChange );
 
@@ -136,8 +119,10 @@
 
 			async function initTextures() {
 
-				textureL = await loader.loadAsync( params.image.replace( '{colorSpace}', 'srgb' ) );
-				textureR = await loader.loadAsync( params.image.replace( '{colorSpace}', 'p3' ) );
+				const path = 'textures/wide_gamut/logo_{colorSpace}.png';
+
+				textureL = await loader.loadAsync( path.replace( '{colorSpace}', 'srgb' ) );
+				textureR = await loader.loadAsync( path.replace( '{colorSpace}', 'p3' ) );
 
 				textureL.colorSpace = THREE.SRGBColorSpace;
 				textureR.colorSpace = THREE.DisplayP3ColorSpace;
