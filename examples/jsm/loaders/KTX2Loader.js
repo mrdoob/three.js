@@ -870,8 +870,6 @@ async function createRawTexture( container ) {
 		? new DataTexture( textureData, container.pixelWidth, container.pixelHeight )
 		: new Data3DTexture( textureData, container.pixelWidth, container.pixelHeight, container.pixelDepth );
 
-		texture.mipmaps = mipmaps;
-
 	} else {
 
 		if ( container.pixelDepth > 0 ) throw new Error( 'THREE.KTX2Loader: Unsupported pixelDepth.' );
