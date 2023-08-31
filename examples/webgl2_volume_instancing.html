@@ -14,7 +14,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -38,8 +38,7 @@
 
 			}
 
-			let renderer, scene, camera;
-			let controls;
+			let renderer, scene, camera, controls, clock;
 
 			init();
 			animate();
@@ -60,6 +59,8 @@
 				controls.autoRotate = true;
 				controls.autoRotateSpeed = - 1.0;
 				controls.enableDamping = true;
+
+				clock = new THREE.Clock();
 
 				// Material
 
@@ -234,8 +235,9 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				controls.update();
+			
+				const delta = clock.getDelta();
+				controls.update( delta );
 
 				renderer.render( scene, camera );
 

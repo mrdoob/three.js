@@ -76,7 +76,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -93,7 +93,6 @@
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
 			import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
@@ -161,14 +160,12 @@
 
 				const renderModel = new RenderPass( scene, camera );
 				const effectBloom = new BloomPass( 1.25 );
-				const effectFilm = new FilmPass( 0.35, 0.95, 2048, false );
 				const outputPass = new OutputPass();
 
 				composer = new EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectBloom );
-				composer.addPass( effectFilm );
 				composer.addPass( outputPass );
 
 				//

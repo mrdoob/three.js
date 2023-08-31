@@ -306,12 +306,14 @@
 		"webgl2_volume_instancing",
 		"webgl2_volume_perlin"
 	],
-	"webgpu": [
+	"webgpu (wip)": [
 		"webgpu_audio_processing",
 		"webgpu_backdrop",
 		"webgpu_backdrop_area",
 		"webgpu_clearcoat",
 		"webgpu_compute",
+		"webgpu_compute_particles",
+		"webgpu_compute_texture",
 		"webgpu_cubemap_adjustments",
 		"webgpu_cubemap_dynamic",
 		"webgpu_cubemap_mix",
@@ -329,7 +331,9 @@
 		"webgpu_loader_gltf_sheen",
 		"webgpu_materials",
 		"webgpu_materials_video",
+		"webgpu_multiple_rendertargets",
 		"webgpu_morphtargets",
+		"webgpu_occlusion",
 		"webgpu_particles",
 		"webgpu_rtt",
 		"webgpu_sandbox",

@@ -4,7 +4,7 @@ class StorageBuffer extends Buffer {
 
 	constructor( name, attribute ) {
 
-		super( name, attribute.array );
+		super( name, attribute ? attribute.array : null );
 
 		this.attribute = attribute;
 

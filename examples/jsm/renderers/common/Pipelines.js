@@ -343,7 +343,7 @@ class Pipelines extends DataMap {
 			data.stencilWrite !== material.stencilWrite || data.stencilFunc !== material.stencilFunc ||
 			data.stencilFail !== material.stencilFail || data.stencilZFail !== material.stencilZFail || data.stencilZPass !== material.stencilZPass ||
 			data.stencilFuncMask !== material.stencilFuncMask || data.stencilWriteMask !== material.stencilWriteMask ||
-			data.side !== material.side
+			data.side !== material.side || data.alphaToCoverage !== material.alphaToCoverage
 		) {
 
 			data.material = material; data.materialVersion = material.version;
@@ -355,7 +355,7 @@ class Pipelines extends DataMap {
 			data.stencilWrite = material.stencilWrite; data.stencilFunc = material.stencilFunc;
 			data.stencilFail = material.stencilFail; data.stencilZFail = material.stencilZFail; data.stencilZPass = material.stencilZPass;
 			data.stencilFuncMask = material.stencilFuncMask; data.stencilWriteMask = material.stencilWriteMask;
-			data.side = material.side;
+			data.side = material.side; data.alphaToCoverage = material.alphaToCoverage;
 
 			needsUpdate = true;
 

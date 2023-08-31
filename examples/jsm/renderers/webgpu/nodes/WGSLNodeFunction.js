@@ -2,7 +2,7 @@ import NodeFunction from '../../../nodes/core/NodeFunction.js';
 import NodeFunctionInput from '../../../nodes/core/NodeFunctionInput.js';
 
 const declarationRegexp = /^[fn]*\s*([a-z_0-9]+)?\s*\(([\s\S]*?)\)\s*[\-\>]*\s*([a-z_0-9]+)?/i;
-const propertiesRegexp = /[a-z_0-9]+/ig;
+const propertiesRegexp = /[a-z_0-9]+|<(.*?)>+/ig;
 
 const wgslTypeLib = {
 	f32: 'float'
@@ -46,7 +46,7 @@ const parse = ( source ) => {
 
 			// precision
 
-			if ( i < propsMatches.length && /^[fui]\d{2}$/.test( propsMatches[ i ][ 0 ] ) === true )
+			if ( i < propsMatches.length && propsMatches[ i ][ 0 ].startsWith( '<' ) === true )
 				i ++;
 
 			// add input

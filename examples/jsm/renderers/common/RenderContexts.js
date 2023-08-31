@@ -12,7 +12,32 @@ class RenderContexts {
 	get( scene, camera, renderTarget = null ) {
 
 		const chainKey = [ scene, camera ];
-		const attachmentState = renderTarget === null ? 'default' : `${renderTarget.texture.format}:${renderTarget.samples}:${renderTarget.depthBuffer}:${renderTarget.stencilBuffer}`;
+
+		let attachmentState;
+
+		if ( renderTarget === null ) {
+
+			attachmentState = 'default';
+
+		} else {
+
+			let format, count;
+
+			if ( renderTarget.isWebGLMultipleRenderTargets ) {
+
+				format = renderTarget.texture[ 0 ].format;
+				count = renderTarget.texture.length;
+
+			} else {
+
+				format = renderTarget.texture.format;
+				count = 1;
+
+			}
+
+			attachmentState = `${count}:${format}:${renderTarget.samples}:${renderTarget.depthBuffer}:${renderTarget.stencilBuffer}`;
+
+		}
 
 		const chainMap = this.getChainMap( attachmentState );
 

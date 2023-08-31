@@ -393,7 +393,7 @@ UTIF.toRGBA = function ( out, type ) {
 			break;
 
 		default:
-			console.error( 'THREE.LogLuvLoader: Unsupported texture data type:', type );
+			throw new Error( 'THREE.LogLuvLoader: Unsupported texture data type: ' + type );
 
 	}
 
@@ -451,7 +451,7 @@ UTIF.toRGBA = function ( out, type ) {
 
 	} else {
 
-		console.log( 'Unsupported Photometric interpretation: ' + intp );
+		throw new Error( 'THREE.LogLuvLoader: Unsupported Photometric interpretation: ' + intp );
 
 	}
 

@@ -57,5 +57,7 @@ export const iridescenceThickness = nodeImmutable( PropertyNode, 'float', 'Iride
 export const specularColor = nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
 export const shininess = nodeImmutable( PropertyNode, 'float', 'Shininess' );
 export const output = nodeImmutable( PropertyNode, 'vec4', 'Output' );
+export const dashSize = nodeImmutable( PropertyNode, 'float', 'dashScale' );
+export const gapSize= nodeImmutable( PropertyNode, 'float', 'gapSize' );
 
 addNodeClass( PropertyNode );
