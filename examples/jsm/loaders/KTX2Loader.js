@@ -864,17 +864,19 @@ async function createRawTexture( container ) {
 
 	if ( UNCOMPRESSED_FORMATS.has( FORMAT_MAP[ vkFormat ] ) ) {
 
+		const textureData = mipmaps.length > 0 ? mipmaps[ 0 ].data : null;
+
 		texture = container.pixelDepth === 0
-		? new DataTexture( mipmaps, container.pixelWidth, container.pixelHeight )
-		: new Data3DTexture( mipmaps, container.pixelWidth, container.pixelHeight, container.pixelDepth );
+		? new DataTexture( textureData, container.pixelWidth, container.pixelHeight )
+		: new Data3DTexture( textureData, container.pixelWidth, container.pixelHeight, container.pixelDepth );
+
+		texture.mipmaps = mipmaps;
 
 	} else {
 
 		if ( container.pixelDepth > 0 ) throw new Error( 'THREE.KTX2Loader: Unsupported pixelDepth.' );
 
 		texture = new CompressedTexture( mipmaps, container.pixelWidth, container.pixelHeight );
-
-
 
 	}
 
