@@ -84,7 +84,7 @@ function buildInfo( renderTarget, options = {} ) {
 	};
 
 	const WIDTH = renderTarget.width,
-		HEIGHT = renderTarget.height,
+		HEIGHT = renderTarget.height * ( renderTarget.texture.isCubeTexture ? 6 : 1 ),
 		TYPE = renderTarget.texture.type,
 		FORMAT = renderTarget.texture.format,
 		COLOR_SPACE = renderTarget.texture.colorSpace,
@@ -111,6 +111,29 @@ function buildInfo( renderTarget, options = {} ) {
 
 }
 
+/**
+ * Flip data per face along the y axis.
+ * @param {Float32Array} source
+ * @param {number} faceSize
+ * @returns {Float32Array}
+ */
+function cubeTextureBufferFlipY( source, faceSize ) {
+	const chanNum = 4;
+	const result = new Float32Array( source.length );
+	for ( let f = 0; f < 6; f++ ) {
+		for ( let y = 0; y < faceSize; y++ ) {
+			for ( let x = 0; x < faceSize; x++ ) {
+				const offset0 = ( f * faceSize * faceSize + y * faceSize + x ) * chanNum;
+				const offset1 = ( f * faceSize * faceSize + ( faceSize - 1 - y ) * faceSize + x ) * chanNum;
+				for ( let i = 0; i < chanNum; i++ ) {
+					result[offset0 + i] = source[offset1 + i];
+				}
+			}
+		}
+	}
+	return result
+}
+
 function getPixelData( renderer, rtt, info ) {
 
 	let dataBuffer;
@@ -125,7 +148,24 @@ function getPixelData( renderer, rtt, info ) {
 
 	}
 
-	renderer.readRenderTargetPixels( rtt, 0, 0, info.width, info.height, dataBuffer );
+	if ( rtt.texture.isCubeTexture ) {
+
+		const faceSize = info.width;
+		const chunkSize = faceSize * faceSize * info.numInputChannels;
+		for ( let i = 0; i < 6; i++ ) {
+			renderer.readRenderTargetPixels( rtt, 0, 0, faceSize, faceSize, dataBuffer, i );
+			const offset = chunkSize * ( 5 - i );
+			if ( offset > 0 ) {
+				dataBuffer.copyWithin( offset, 0, chunkSize );
+			}
+		}
+		dataBuffer = cubeTextureBufferFlipY( dataBuffer, faceSize );
+
+	} else {
+
+		renderer.readRenderTargetPixels( rtt, 0, 0, info.width, info.height, dataBuffer );
+
+	}
 
 	return dataBuffer;
 
