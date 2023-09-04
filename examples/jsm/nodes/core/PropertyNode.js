@@ -58,6 +58,6 @@ export const specularColor = nodeImmutable( PropertyNode, 'color', 'SpecularColo
 export const shininess = nodeImmutable( PropertyNode, 'float', 'Shininess' );
 export const output = nodeImmutable( PropertyNode, 'vec4', 'Output' );
 export const dashSize = nodeImmutable( PropertyNode, 'float', 'dashScale' );
-export const gapSize= nodeImmutable( PropertyNode, 'float', 'gapSize' );
+export const gapSize = nodeImmutable( PropertyNode, 'float', 'gapSize' );
 
 addNodeClass( PropertyNode );
