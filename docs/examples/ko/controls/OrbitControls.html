@@ -91,7 +91,8 @@
 		<h3>[property:Boolean autoRotate]</h3>
 		<p>
 			대상 주위를 자동으로 회전하려면 true로 설정합니다.<br> autoRotate를 활성할 경우, 애니메이션 루프에서 [page:.update()]를 호출해야 합니다.
-
+			Set to true to automatically rotate around the target.<br> Note that if this is enabled, you must call [page:.update]
+			() in your animation loop. If you want the auto-rotate speed to be independent of the frame rate (the refresh rate of the display), you must pass the time `deltaTime`, in seconds, to [page:.update]().
 		</p>
 
 		<h3>[property:Float autoRotateSpeed]</h3>
@@ -269,7 +270,10 @@ controls.touches = {
 			줌잉(Zooming)과 달링(Dollying)의 속도를 설정합니다. 기본값은 1 입니다.
 		</p>
 
-
+		<h3>[property:Boolean zoomToCursor]</h3>
+		<p>
+		Setting this property to `true` allows to zoom to the cursor's position. Default is `false`.
+		</p>
 
 		<h2>메서드</h2>
 
@@ -314,9 +318,12 @@ controls.touches = {
 			Removes the key event listener previously defined with [page:.listenToKeyEvents]().
 		</p>
 
-		<h3>[method:Boolean update] ()</h3>
+		<h3>[method:Boolean update] (  [param:Number deltaTime]  )</h3>
 		<p>
 			컨트롤을 업데이트합니다. 카메라를 수동으로 변환하거나, [page:.autoRotate] 또는 [page:.enableDamping]을 설정할 경우 업데이트 루프에서 호출해야 합니다.
+			Update the controls. Must be called after any manual changes to the camera's transform,
+			or in the update loop if [page:.autoRotate] or [page:.enableDamping] are set. `deltaTime`, in seconds, is optional,
+			and is only required if you want the auto-rotate speed to be independent of the frame rate (the refresh rate of the display).
 		</p>
 
 		<h2>Source</h2>

@@ -2,7 +2,7 @@ let id = 0;
 
 export default class RenderObject {
 
-	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode ) {
+	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext ) {
 
 		this._nodes = nodes;
 		this._geometries = geometries;
@@ -15,17 +15,22 @@ export default class RenderObject {
 		this.scene = scene;
 		this.camera = camera;
 		this.lightsNode = lightsNode;
+		this.context = renderContext;
 
 		this.geometry = object.geometry;
 
 		this.attributes = null;
-		this.context = null;
 		this.pipeline = null;
+		this.vertexBuffers = null;
 
+		this._nodeBuilder = null;
+		this._bindings = null;
 		this._materialVersion = - 1;
 		this._materialCacheKey = '';
 
 		this.onDispose = null;
+
+		this.isRenderObject = true;
 
 		this.onMaterialDispose = () => {
 
@@ -39,13 +44,13 @@ export default class RenderObject {
 
 	getNodeBuilder() {
 
-		return this._nodes.getForRender( this );
+		return this._nodeBuilder || ( this._nodeBuilder = this._nodes.getForRender( this ) );
 
 	}
 
 	getBindings() {
 
-		return this.getNodeBuilder().getBindings();
+		return this._bindings || ( this._bindings = this.getNodeBuilder().createBindings() );
 
 	}
 
@@ -57,7 +62,7 @@ export default class RenderObject {
 
 	getChainArray() {
 
-		return [ this.object, this.material, this.scene, this.camera, this.lightsNode ];
+		return [ this.object, this.material, this.context, this.lightsNode ];
 
 	}
 
@@ -69,16 +74,31 @@ export default class RenderObject {
 		const geometry = this.geometry;
 
 		const attributes = [];
+		const vertexBuffers = new Set();
 
 		for ( const nodeAttribute of nodeAttributes ) {
 
-			attributes.push( nodeAttribute.node && nodeAttribute.node.attribute ? nodeAttribute.node.attribute : geometry.getAttribute( nodeAttribute.name ) );
+			const attribute = nodeAttribute.node && nodeAttribute.node.attribute ? nodeAttribute.node.attribute : geometry.getAttribute( nodeAttribute.name );
+
+			attributes.push( attribute );
+
+			const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
+			vertexBuffers.add( bufferAttribute );
 
 		}
 
 		this.attributes = attributes;
+		this.vertexBuffers = Array.from( vertexBuffers.values() );
 
 		return attributes;
+
+	}
+
+	getVertexBuffers() {
+
+		if ( this.vertexBuffers === null ) this.getAttributes();
+
+		return this.vertexBuffers;
 
 	}
 

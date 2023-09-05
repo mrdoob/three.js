@@ -35,7 +35,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -116,14 +116,12 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
-				renderer.useLegacyLights = false;
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
 				//
 
 				const renderPass = new RenderPass( scene, camera );
-				renderPass.clearColor = new THREE.Color( 0, 0, 0 );
 				renderPass.clearAlpha = 0;
 
 				//

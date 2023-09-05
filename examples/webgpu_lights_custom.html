@@ -11,7 +11,7 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Custom Lighting Model
 		</div>
 
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -26,12 +26,24 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, color, lights, toneMapping, MeshStandardNodeMaterial, PointsNodeMaterial } from 'three/nodes';
+			import { color, lights, toneMapping, MeshStandardNodeMaterial, PointsNodeMaterial, LightingModel } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
+
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			class CustomLightingModel extends LightingModel {
+
+				direct( { lightColor, reflectedLight } ) {
+
+					reflectedLight.directDiffuse.addAssign( lightColor );
+
+				}
+
+			}
 
 			let camera, scene, renderer;
 
@@ -41,11 +53,11 @@
 
 			function init() {
 
-				if ( WebGPU.isAvailable() === false ) {
+				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
-					throw new Error( 'No WebGPU support' );
+					throw new Error( 'No WebGPU or WebGL2 support' );
 
 				}
 
@@ -100,13 +112,8 @@
 
 				// custom lighting model
 
-				const customLightingModel = tslFn( ( { lightColor, reflectedLight } ) => {
-
-					reflectedLight.directDiffuse.addAssign( lightColor );
-
-				} );
-
-				const lightingModelContext = allLightsNode.context( { lightingModelNode: { direct: customLightingModel } } );
+				const lightingModel = new CustomLightingModel();
+				const lightingModelContext = allLightsNode.context( { lightingModel } );
 
 				materialPoints.lightsNode = lightingModelContext;
 
@@ -117,7 +124,7 @@
 
 				//
 
-				renderer = new WebGPURenderer();
+				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

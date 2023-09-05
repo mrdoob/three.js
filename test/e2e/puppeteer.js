@@ -85,6 +85,7 @@ const exceptionList = [
 	'webgl_loader_imagebitmap',
 	'webgl_loader_texture_lottie',
 	'webgl_loader_texture_pvrtc',
+	'webgl_materials_alphahash',
 	'webgl_materials_blending',
 	'webgl_mirror',
 	'webgl_morphtargets_face',
@@ -97,6 +98,8 @@ const exceptionList = [
 	'webgl_shadowmap_progressive',
 	'webgl_test_memory2',
 	'webgl_tiled_forward',
+	'webgl2_volume_instancing',
+	'webgl_points_dynamic',
 
 	// TODO: implement determinism for setTimeout and setInterval
 	// could it fix some examples from above?
@@ -108,6 +111,8 @@ const exceptionList = [
 	'webgpu_backdrop_area',
 	'webgpu_clearcoat',
 	'webgpu_compute',
+	'webgpu_compute_particles',
+	'webgpu_compute_texture',
 	'webgpu_cubemap_adjustments',
 	'webgpu_cubemap_dynamic',
 	'webgpu_cubemap_mix',
@@ -121,10 +126,13 @@ const exceptionList = [
 	'webgpu_lights_selective',
 	'webgpu_loader_gltf',
 	'webgpu_loader_gltf_compressed',
+	'webgpu_loader_gltf_iridescence',
 	'webgpu_loader_gltf_sheen',
 	'webgpu_materials',
 	'webgpu_materials_video',
 	'webgpu_morphtargets',
+	"webgpu_multiple_rendertargets",
+	'webgpu_occlusion',
 	'webgpu_particles',
 	'webgpu_rtt',
 	'webgpu_sandbox',
@@ -229,8 +237,8 @@ async function main() {
 
 	/* Launch browser */
 
-	const flags = [ '--hide-scrollbars', '--enable-unsafe-webgpu' ];
-	flags.push( '--enable-features=Vulkan', '--use-gl=swiftshader', '--use-angle=swiftshader', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader' );
+	const flags = [ '--hide-scrollbars', '--enable-gpu' ];
+	// flags.push( '--enable-unsafe-webgpu', '--enable-features=Vulkan', '--use-gl=swiftshader', '--use-angle=swiftshader', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader' );
 	// if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
@@ -597,7 +605,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		}
 
-	} catch ( e ) { 
+	} catch ( e ) {
 
 		if ( attemptID === numAttempts - 1 ) {
 

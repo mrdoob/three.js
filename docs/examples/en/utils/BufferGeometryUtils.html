@@ -122,11 +122,19 @@
 		</p>
 
 		<h3>[method:BufferGeometry toCreasedNormals]( [param:BufferGeometry geometry], [param:Number creaseAngle] )</h3>
-		<p>
-		geometry -- The input geometry. <br />
-		creaseAngle -- The crease angle. <br /><br />
+		<ul>
+			<li>geometry -- The input geometry.</li>
+			<li>creaseAngle -- The crease angle in radians.</li>
+		</ul>
 
-		Creates a new, non-indexed geometry with smooth normals everywhere except faces that meet at an angle greater than the crease angle.
+		<p>
+		Modifies the supplied geometry if it is non-indexed, otherwise creates a new,
+		non-indexed geometry.
+		</p>
+
+		<p>
+		Returns the geometry with smooth normals everywhere except faces
+		that meet at an angle greater than the crease angle.
 		</p>
 
 		<h3>[method:BufferGeometry toTrianglesDrawMode]( [param:BufferGeometry geometry], [param:TrianglesDrawMode drawMode] )</h3>

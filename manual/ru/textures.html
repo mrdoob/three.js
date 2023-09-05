@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -65,10 +65,12 @@
 <a href="/docs/#api/en/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a> метод с URL-адресом изображения и установите для
 изображения и установите его возвращаемое значение для <code class="notranslate" translate="no">map</code> свойства материала, вместо установки <code class="notranslate" translate="no">color</code>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
++const texture = loader.load( 'resources/images/wall.jpg' );
++texture.colorSpace = THREE.SRGBColorSpace;
 
 const material = new THREE.MeshBasicMaterial({
 -  color: 0xFF8844,
-+  map: loader.load('../resources/images/wall.jpg'),
++  map: texture,
 });
 </pre>
 <p>Обратите внимание, что мы используем <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> поэтому не нужно никаких источников света.</p>
@@ -95,20 +97,28 @@ const material = new THREE.MeshBasicMaterial({
 
 <p>Мы просто создадим 6 материалов и передаем их в виде массива при создании <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+-const texture = loader.load( 'resources/images/wall.jpg' );
+-texture.colorSpace = THREE.SRGBColorSpace;
 
 -const material = new THREE.MeshBasicMaterial({
--  map: loader.load('../resources/images/wall.jpg'),
+-  map: texture,
 -});
 +const materials = [
-+  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-1.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-2.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-3.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-4.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-5.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-6.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-1.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-2.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-3.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-4.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-5.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-6.jpg')}),
 +];
 -const cube = new THREE.Mesh(geometry, material);
 +const cube = new THREE.Mesh(geometry, materials);
+
++function loadColorTexture( path ) {
++  const texture = loader.load( path );
++  texture.colorSpace = THREE.SRGBColorSpace;
++  return texture;
++}
 </pre>
 <p>Оно работает!</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">

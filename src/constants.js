@@ -1,4 +1,4 @@
-export const REVISION = '154dev';
+export const REVISION = '156dev';
 
 export const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -124,6 +124,8 @@ export const RGBA_ASTC_10x10_Format = 37819;
 export const RGBA_ASTC_12x10_Format = 37820;
 export const RGBA_ASTC_12x12_Format = 37821;
 export const RGBA_BPTC_Format = 36492;
+export const RGB_BPTC_SIGNED_Format = 36494;
+export const RGB_BPTC_UNSIGNED_Format = 36495;
 export const RED_RGTC1_Format = 36283;
 export const SIGNED_RED_RGTC1_Format = 36284;
 export const RED_GREEN_RGTC2_Format = 36285;
@@ -156,6 +158,7 @@ export const NoColorSpace = '';
 export const SRGBColorSpace = 'srgb';
 export const LinearSRGBColorSpace = 'srgb-linear';
 export const DisplayP3ColorSpace = 'display-p3';
+export const LinearDisplayP3ColorSpace = 'display-p3-linear';
 
 export const ZeroStencilOp = 0;
 export const KeepStencilOp = 7680;

@@ -386,7 +386,6 @@
 			},
 
 			"Exporters": {
-				"ColladaExporter": "examples/en/exporters/ColladaExporter",
 				"DRACOExporter": "examples/en/exporters/DRACOExporter",
 				"EXRExporter": "examples/en/exporters/EXRExporter",
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
@@ -730,6 +729,12 @@
 
 			"Renderers / WebXR": {
 				"WebXRManager": "api/ar/renderers/webxr/WebXRManager"
+			},
+
+			"Scenes": {
+				"Fog": "api/ar/scenes/Fog",
+				"FogExp2": "api/ar/scenes/FogExp2",
+				"Scene": "api/ar/scenes/Scene"
 			}
 
 		}
@@ -2241,7 +2246,6 @@
 			},
 
 			"Exporters": {
-				"ColladaExporter": "examples/en/exporters/ColladaExporter",
 				"EXRExporter": "examples/en/exporters/EXRExporter",
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
 				"OBJExporter": "examples/en/exporters/OBJExporter",

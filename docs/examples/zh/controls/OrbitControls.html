@@ -93,6 +93,8 @@
 		<p>
 			将其设为true，以自动围绕目标旋转。<br>
 			请注意，如果它被启用，你必须在你的动画循环里调用[page:.update]()。
+			Set to true to automatically rotate around the target.<br> Note that if this is enabled, you must call [page:.update]
+			() in your animation loop. If you want the auto-rotate speed to be independent of the frame rate (the refresh rate of the display), you must pass the time `deltaTime`, in seconds, to [page:.update]().
 		</p>
 
 		<h3>[property:Float autoRotateSpeed]</h3>
@@ -272,7 +274,10 @@ controls.touches = {
 			摄像机缩放的速度，其默认值为1。
 		</p>
 
-
+		<h3>[property:Boolean zoomToCursor]</h3>
+		<p>
+		Setting this property to `true` allows to zoom to the cursor's position. Default is `false`.
+		</p>
 
 		<h2>Methods</h2>
 
@@ -316,10 +321,13 @@ controls.touches = {
 			Removes the key event listener previously defined with [page:.listenToKeyEvents]().
 		</p>
 
-		<h3>[method:Boolean update] ()</h3>
+		<h3>[method:Boolean update] ( [param:Number deltaTime] )</h3>
 		<p>
 			更新控制器。必须在摄像机的变换发生任何手动改变后调用，
 			或如果[page:.autoRotate]或[page:.enableDamping]被设置时，在update循环里调用。
+			Update the controls. Must be called after any manual changes to the camera's transform,
+			or in the update loop if [page:.autoRotate] or [page:.enableDamping] are set. `deltaTime`, in seconds, is optional,
+			and is only required if you want the auto-rotate speed to be independent of the frame rate (the refresh rate of the display).
 		</p>
 
 		<h2>源代码</h2>

@@ -1,3 +1,4 @@
+import { EventDispatcher } from 'three';
 import { NodeUpdateType } from './constants.js';
 import { getNodeChildren, getCacheKey } from './NodeUtils.js';
 import { MathUtils } from 'three';
@@ -6,11 +7,11 @@ const NodeClasses = new Map();
 
 let _nodeId = 0;
 
-class Node {
+class Node extends EventDispatcher {
 
 	constructor( nodeType = null ) {
 
-		this.isNode = true;
+		super();
 
 		this.nodeType = nodeType;
 
@@ -19,6 +20,8 @@ class Node {
 
 		this.uuid = MathUtils.generateUUID();
 
+		this.isNode = true;
+
 		Object.defineProperty( this, 'id', { value: _nodeId ++ } );
 
 	}
@@ -26,6 +29,14 @@ class Node {
 	get type() {
 
 		return this.constructor.name;
+
+	}
+
+	getSelf() {
+
+		// Returns non-node object.
+
+		return this.self || this;
 
 	}
 
@@ -49,6 +60,12 @@ class Node {
 			} };
 
 		}
+
+	}
+
+	dispose() {
+
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
@@ -88,7 +105,15 @@ class Node {
 
 	}
 
-	getNodeType( /*builder*/ ) {
+	getNodeType( builder ) {
+
+		const nodeProperties = builder.getNodeProperties( this );
+
+		if ( nodeProperties.outputNode ) {
+
+			return nodeProperties.outputNode.getNodeType( builder );
+
+		}
 
 		return this.nodeType;
 

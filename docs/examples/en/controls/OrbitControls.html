@@ -91,7 +91,7 @@
 		<h3>[property:Boolean autoRotate]</h3>
 		<p>
 			Set to true to automatically rotate around the target.<br> Note that if this is enabled, you must call [page:.update]
-			() in your animation loop.
+			() in your animation loop. If you want the auto-rotate speed to be independent of the frame rate (the refresh rate of the display), you must pass the time `deltaTime`, in seconds, to [page:.update]().
 		</p>
 
 		<h3>[property:Float autoRotateSpeed]</h3>
@@ -273,7 +273,10 @@ controls.touches = {
 			Speed of zooming / dollying. Default is 1.
 		</p>
 
-
+		<h3>[property:Boolean zoomToCursor]</h3>
+		<p>
+		Setting this property to `true` allows to zoom to the cursor's position. Default is `false`.
+		</p>
 
 		<h2>Methods</h2>
 
@@ -317,10 +320,11 @@ controls.touches = {
 			Removes the key event listener previously defined with [page:.listenToKeyEvents]().
 		</p>
 
-		<h3>[method:Boolean update] ()</h3>
+		<h3>[method:Boolean update] ( [param:Number deltaTime] )</h3>
 		<p>
 			Update the controls. Must be called after any manual changes to the camera's transform,
-			or in the update loop if [page:.autoRotate] or [page:.enableDamping] are set.
+			or in the update loop if [page:.autoRotate] or [page:.enableDamping] are set. `deltaTime`, in seconds, is optional,
+			and is only required if you want the auto-rotate speed to be independent of the frame rate (the refresh rate of the display).
 		</p>
 
 		<h2>Source</h2>

@@ -2,8 +2,10 @@
 
 export { default as NodeMaterial, addNodeMaterial, createNodeMaterialFromType } from './NodeMaterial.js';
 export { default as LineBasicNodeMaterial } from './LineBasicNodeMaterial.js';
+export { default as LineDashedNodeMaterial } from './LineDashedNodeMaterial.js';
 export { default as MeshNormalNodeMaterial } from './MeshNormalNodeMaterial.js';
 export { default as MeshBasicNodeMaterial } from './MeshBasicNodeMaterial.js';
+export { default as MeshLambertNodeMaterial } from './MeshLambertNodeMaterial.js';
 export { default as MeshPhongNodeMaterial } from './MeshPhongNodeMaterial.js';
 export { default as MeshStandardNodeMaterial } from './MeshStandardNodeMaterial.js';
 export { default as MeshPhysicalNodeMaterial } from './MeshPhysicalNodeMaterial.js';

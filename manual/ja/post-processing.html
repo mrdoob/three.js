@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -89,16 +89,14 @@ composer.addPass(bloomPass);
     648,    // scanline count
     false,  // grayscale
 );
-filmPass.renderToScreen = true;
 composer.addPass(filmPass);
 </pre>
-<p><code class="notranslate" translate="no">filmPass</code> は最後のPassなので、<code class="notranslate" translate="no">renderToScreen</code> プロパティをtrueに設定し、キャンバスにレンダリングするようにします。
-この設定がないと次のレンダーターゲットにレンダリングされます。</p>
 <p>これらのクラスを使用するには、以下をインポートする必要があります。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {BloomPass} from 'three/addons/postprocessing/BloomPass.js';
 import {FilmPass} from 'three/addons/postprocessing/FilmPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 </pre>
 <p>ほとんどのポストプロセスには <code class="notranslate" translate="no">EffectComposer.js</code> と <code class="notranslate" translate="no">RenderPass.js</code> が必須です。</p>
 <p>最後に <a href="/docs/#api/ja/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> の代わりに <code class="notranslate" translate="no">EffectComposer.render</code> を使用し、<code class="notranslate" translate="no">EffectComposer</code> にキャンバスのサイズを合わせます。</p>

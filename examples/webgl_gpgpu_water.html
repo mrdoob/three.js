@@ -246,7 +246,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -322,7 +322,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -373,7 +372,7 @@
 
 				gui.add( effectController, 'mouseSize', 1.0, 100.0, 1.0 ).onChange( valuesChanger );
 				gui.add( effectController, 'viscosity', 0.9, 0.999, 0.001 ).onChange( valuesChanger );
-				gui.add( effectController, 'spheresEnabled', 0, 1, 1 ).onChange( valuesChanger );
+				gui.add( effectController, 'spheresEnabled' ).onChange( valuesChanger );
 				const buttonSmooth = {
 					smoothWater: function () {
 
@@ -415,14 +414,10 @@
 				material.lights = true;
 
 				// Material attributes from THREE.MeshPhongMaterial
-				material.color = new THREE.Color( materialColor );
-				material.specular = new THREE.Color( 0x111111 );
-				material.shininess = 50;
-
 				// Sets the uniforms with the material values
-				material.uniforms[ 'diffuse' ].value = material.color;
-				material.uniforms[ 'specular' ].value = material.specular;
-				material.uniforms[ 'shininess' ].value = Math.max( material.shininess, 1e-4 );
+				material.uniforms[ 'diffuse' ].value = new THREE.Color( materialColor );
+				material.uniforms[ 'specular' ].value = new THREE.Color( 0x111111 );
+				material.uniforms[ 'shininess' ].value = Math.max( 50, 1e-4 );
 				material.uniforms[ 'opacity' ].value = material.opacity;
 
 				// Defines
