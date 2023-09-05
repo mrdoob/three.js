@@ -1520,19 +1520,19 @@ class LDrawPartsGeometryCache {
 		const group = info.group;
 		if ( info.faces.length > 0 ) {
 
-			group.add( createObject( info.faces, 3, false, info.totalFaces ) );
+			group.add( createObject( this.loader, info.faces, 3, false, info.totalFaces ) );
 
 		}
 
 		if ( info.lineSegments.length > 0 ) {
 
-			group.add( createObject( info.lineSegments, 2 ) );
+			group.add( createObject( this.loader, info.lineSegments, 2 ) );
 
 		}
 
 		if ( info.conditionalSegments.length > 0 ) {
 
-			group.add( createObject( info.conditionalSegments, 2, true ) );
+			group.add( createObject( this.loader, info.conditionalSegments, 2, true ) );
 
 		}
 
@@ -1640,7 +1640,7 @@ function sortByMaterial( a, b ) {
 
 }
 
-function createObject( elements, elementSize, isConditionalSegments = false, totalElements = null ) {
+function createObject( loader, elements, elementSize, isConditionalSegments = false, totalElements = null ) {
 
 	// Creates a LineSegments (elementSize = 2) or a Mesh (elementSize = 3 )
 	// With per face / segment material, implemented with mesh groups and materials array
@@ -1759,11 +1759,13 @@ function createObject( elements, elementSize, isConditionalSegments = false, tot
 
 					if ( isConditionalSegments ) {
 
-						materials.push( material.userData.edgeMaterial.userData.conditionalEdgeMaterial );
+						const edgeMaterial = loader.edgeMaterialCache.get( material );
+
+						materials.push( loader.conditionalEdgeMaterialCache.get( edgeMaterial ) );
 
 					} else {
 
-						materials.push( material.userData.edgeMaterial );
+						materials.push( loader.edgeMaterialCache.get( material ) );
 
 					}
 
@@ -1886,6 +1888,8 @@ class LDrawLoader extends Loader {
 		// Array of THREE.Material
 		this.materials = [];
 		this.materialLibrary = {};
+		this.edgeMaterialCache = new WeakMap();
+		this.conditionalEdgeMaterialCache = new WeakMap();
 
 		// This also allows to handle the embedded text files ("0 FILE" lines)
 		this.partsCache = new LDrawPartsGeometryCache( this );
@@ -1906,8 +1910,8 @@ class LDrawLoader extends Loader {
 		this.missingColorMaterial = new MeshStandardMaterial( { name: Loader.DEFAULT_MATERIAL_NAME, color: 0xFF00FF, roughness: 0.3, metalness: 0 } );
 		this.missingEdgeColorMaterial = new LineBasicMaterial( { name: Loader.DEFAULT_MATERIAL_NAME, color: 0xFF00FF } );
 		this.missingConditionalEdgeColorMaterial = new LDrawConditionalLineMaterial( { name: Loader.DEFAULT_MATERIAL_NAME, fog: true, color: 0xFF00FF } );
-		this.missingColorMaterial.userData.edgeMaterial = this.missingEdgeColorMaterial;
-		this.missingEdgeColorMaterial.userData.conditionalEdgeMaterial = this.missingConditionalEdgeColorMaterial;
+		this.edgeMaterialCache.set( this.missingColorMaterial, this.missingEdgeColorMaterial );
+		this.conditionalEdgeMaterialCache.set( this.missingEdgeColorMaterial, this.missingConditionalEdgeColorMaterial );
 
 	}
 
@@ -2126,11 +2130,11 @@ class LDrawLoader extends Loader {
 
 			if ( c.isLineSegments ) {
 
-				material = material.userData.edgeMaterial;
+				material = loader.edgeMaterialCache.get( material );
 
 				if ( c.isConditionalLine ) {
 
-					material = material.userData.conditionalEdgeMaterial;
+					material = loader.conditionalEdgeMaterialCache.get( material );
 
 				}
 
@@ -2151,7 +2155,7 @@ class LDrawLoader extends Loader {
 	getMainEdgeMaterial() {
 
 		const mat = this.getMaterial( MAIN_EDGE_COLOUR_CODE );
-		return mat ? mat.userData.edgeMaterial : null;
+		return mat ? this.edgeMaterialCache.get( mat ) : null;
 
 	}
 
@@ -2236,7 +2240,7 @@ class LDrawLoader extends Loader {
 							}
 
 							// Get the edge material for this triangle material
-							edgeMaterial = edgeMaterial.userData.edgeMaterial;
+							edgeMaterial = this.edgeMaterialCache.get( edgeMaterial );
 
 						}
 
@@ -2380,7 +2384,7 @@ class LDrawLoader extends Loader {
 			edgeMaterial.name = name + ' - Edge';
 
 			// This is the material used for conditional edges
-			edgeMaterial.userData.conditionalEdgeMaterial = new LDrawConditionalLineMaterial( {
+			const conditionalEdgeMaterial = new LDrawConditionalLineMaterial( {
 
 				fog: true,
 				transparent: isTransparent,
@@ -2389,15 +2393,17 @@ class LDrawLoader extends Loader {
 				opacity: alpha,
 
 			} );
-			edgeMaterial.userData.conditionalEdgeMaterial.userData.code = code;
-			edgeMaterial.userData.conditionalEdgeMaterial.name = name + ' - Conditional Edge';
+			conditionalEdgeMaterial.userData.code = code;
+			conditionalEdgeMaterial.name = name + ' - Conditional Edge';
+
+			this.conditionalEdgeMaterialCache.set( edgeMaterial, conditionalEdgeMaterial );
 
 		}
 
 		material.userData.code = code;
 		material.name = name;
 
-		material.userData.edgeMaterial = edgeMaterial;
+		this.edgeMaterialCache.set( material, edgeMaterial );
 
 		this.addMaterial( material );
 
