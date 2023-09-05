@@ -37,6 +37,8 @@ class CurvePath extends Curve {
 
 		}
 
+		return this;
+
 	}
 
 	// To get accurate point with reference to
