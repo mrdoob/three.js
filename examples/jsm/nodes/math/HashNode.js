@@ -1,6 +1,5 @@
 import Node, { addNodeClass } from '../core/Node.js';
-import { add, mul, bitXor, shiftRight } from './OperatorNode.js';
-import { addNodeElement, nodeProxy, uint } from '../shadernode/ShaderNode.js';
+import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class HashNode extends Node {
 
@@ -14,13 +13,13 @@ class HashNode extends Node {
 
 	construct( /*builder*/ ) {
 
-		const seed = this.seedNode;
+		// Taken from https://www.shadertoy.com/view/XlGcRh, originally from pcg-random.org
 
-		const state = add( mul( uint( seed ), 747796405 ), 2891336453 );
-		const word = mul( bitXor( shiftRight( state, add( shiftRight( state, 28 ), 4 ) ), state ), 277803737 );
-		const uintResult = bitXor( shiftRight( word, 22 ), word );
+		const state = this.seedNode.uint().mul( 747796405 ).add( 2891336453 );
+		const word = state.shiftRight( state.shiftRight( 28 ).add( 4 ) ).bitXor( state ).mul( 277803737 );
+		const result = word.shiftRight( 22 ).bitXor( word );
 
-		return mul( 1 / 2 ** 32, uintResult ); // Convert to range [0, 1)
+		return result.float().mul( 1 / 2 ** 32 ); // Convert to range [0, 1)
 
 	}
 
