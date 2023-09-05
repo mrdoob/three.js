@@ -26,10 +26,7 @@
 
 <h3>[property:Boolean alphaHash]</h3>
 <p>
-	Enables alpha hashed transparency, an alternative to [page:.transparent] or [page:.alphaTest].
-	The material will not be rendered if opacity is lower than a random threshold.
-	Randomization introduces some grain or noise, but approximates alpha blending without
-	the associated problems of sorting. Using TAARenderPass can reduce the resulting noise.
+启用alphaHash透明度，这是[page:.transparent]或[page:.alphaTest]的替代方案。如果不透明度低于随机阈值，则不会渲染材质。随机化会引入一些颗粒或噪点，但相较于传统的Alpha blend方式，避免了透明度引起的深度排序问题。使用TAARenderPass可以有效减少噪点。
 </p>
 
 <h3>[property:Float alphaTest]</h3>
