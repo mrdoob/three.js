@@ -8,7 +8,7 @@ import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebXRController } from './WebXRController.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedIntType, UnsignedInt248Type, XRRightEyeLayer, XRLeftEyeLayer } from '../../constants.js';
+import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedIntType, UnsignedInt248Type } from '../../constants.js';
 
 class WebXRManager extends EventDispatcher {
 
@@ -43,22 +43,20 @@ class WebXRManager extends EventDispatcher {
 		//
 
 		const cameraL = new PerspectiveCamera();
-		cameraL.layers.enable( XRLeftEyeLayer );
 		cameraL.viewport = new Vector4();
 
 		const cameraR = new PerspectiveCamera();
-		cameraR.layers.enable( XRRightEyeLayer );
 		cameraR.viewport = new Vector4();
 
 		const cameras = [ cameraL, cameraR ];
 
 		const cameraXR = new ArrayCamera();
-		cameraXR.layers.enable( XRLeftEyeLayer );
-		cameraXR.layers.enable( XRRightEyeLayer );
 
 		let _currentDepthNear = null;
 		let _currentDepthFar = null;
 		let _currentCameraLayers = null;
+		let _leftEyeLayer = null;
+		let _rightEyeLayer = null;
 
 		//
 
@@ -504,6 +502,14 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
+		this.setEyeLayers = function ( layers ) {
+
+			_leftEyeLayer = layers[ 0 ];
+			_rightEyeLayer = layers[ 1 ];
+			_currentCameraLayers = null; // force layer setting on next update
+
+		};
+
 		this.updateCamera = function ( camera ) {
 
 			if ( session === null ) return;
@@ -527,11 +533,21 @@ class WebXRManager extends EventDispatcher {
 
 			if ( _currentCameraLayers !== camera.layers.mask ) {
 
-				cameraL.layers.mask = camera.layers.mask | 1 << XRLeftEyeLayer;
-				cameraR.layers.mask = camera.layers.mask | 1 << XRRightEyeLayer;
-				cameraXR.layers.mask = camera.layers.mask | 1 << XRRightEyeLayer | 1 << XRLeftEyeLayer;
+				const mask = camera.layers.mask;
 
-				_currentCameraLayers = camera.layers.mask;
+				if ( _leftEyeLayer && _rightEyeLayer ) {
+
+					cameraL.layers.mask = mask | 1 << _leftEyeLayer;
+					cameraR.layers.mask = mask | 1 << _rightEyeLayer;
+					cameraXR.layers.mask = mask | 1 << _rightEyeLayer | 1 << _leftEyeLayer;
+
+				} else {
+
+					cameraXR.layers.mask = cameraL.layers.mask = cameraR.layers.mask = mask;
+
+				}
+
+				_currentCameraLayers = mask;
 
 			}
 
