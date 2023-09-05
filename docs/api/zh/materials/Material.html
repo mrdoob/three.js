@@ -24,6 +24,14 @@
 
 <h2>属性(Properties)</h2>
 
+<h3>[property:Boolean alphaHash]</h3>
+<p>
+	Enables alpha hashed transparency, an alternative to [page:.transparent] or [page:.alphaTest].
+	The material will not be rendered if opacity is lower than a random threshold.
+	Randomization introduces some grain or noise, but approximates alpha blending without
+	the associated problems of sorting. Using TAARenderPass can reduce the resulting noise.
+</p>
+
 <h3>[property:Float alphaTest]</h3>
 <p>设置运行alphaTest时要使用的alpha值。如果不透明度低于此值，则不会渲染材质。默认值为*0*。
 </p>
