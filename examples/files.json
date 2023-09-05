@@ -306,7 +306,7 @@
 		"webgl2_volume_instancing",
 		"webgl2_volume_perlin"
 	],
-	"webgpu": [
+	"webgpu (wip)": [
 		"webgpu_audio_processing",
 		"webgpu_backdrop",
 		"webgpu_backdrop_area",

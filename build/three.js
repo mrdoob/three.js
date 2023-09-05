@@ -10,7 +10,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '156dev';
+	const REVISION = '157dev';
 
 	const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -45372,8 +45372,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			const sky = new Vector3( color1.r, color1.g, color1.b );
 			const ground = new Vector3( color2.r, color2.g, color2.b );
 
-			// without extra factor of PI in the shader, should = 1 / Math.sqrt( Math.PI );
-			const c0 = Math.sqrt( Math.PI );
+			const c0 = 1 / Math.sqrt( Math.PI );
 			const c1 = c0 * Math.sqrt( 0.75 );
 
 			this.sh.coefficients[ 0 ].copy( sky ).add( ground ).multiplyScalar( c0 );
@@ -45393,8 +45392,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			const color1 = new Color().set( color );
 
-			// without extra factor of PI in the shader, would be 2 / Math.sqrt( Math.PI );
-			this.sh.coefficients[ 0 ].set( color1.r, color1.g, color1.b ).multiplyScalar( 2 * Math.sqrt( Math.PI ) );
+			this.sh.coefficients[ 0 ].set( color1.r, color1.g, color1.b ).multiplyScalar( 2 / Math.sqrt( Math.PI ) );
 
 		}
 
