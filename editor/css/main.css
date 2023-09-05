@@ -67,7 +67,7 @@ textarea, input { outline: none; } /* osx */
 	position: relative;
 	display: block;
 	width: 100%;
-	min-width: 260px;
+	min-width: 260px; /* It has side effects on Resizer.js */
 }
 
 .TabbedPanel .Tabs {
