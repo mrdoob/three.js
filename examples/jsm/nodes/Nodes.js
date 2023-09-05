@@ -94,6 +94,7 @@ export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
 
 // display
 export { default as BlendModeNode, burn, dodge, overlay, screen } from './display/BlendModeNode.js';
+export { default as BumpMapNode, bumpMap } from './display/BumpMapNode.js';
 export { default as ColorAdjustmentNode, saturation, vibrance, hue, lumaCoeffs, luminance } from './display/ColorAdjustmentNode.js';
 export { default as ColorSpaceNode, linearToColorSpace, colorSpaceToLinear, linearTosRGB, sRGBToLinear } from './display/ColorSpaceNode.js';
 export { default as FrontFacingNode, frontFacing, faceDirection } from './display/FrontFacingNode.js';
@@ -163,6 +164,7 @@ export { default as BRDF_Lambert } from './functions/BSDF/BRDF_Lambert.js';
 export { default as D_GGX } from './functions/BSDF/D_GGX.js';
 export { default as DFGApprox } from './functions/BSDF/DFGApprox.js';
 export { default as F_Schlick } from './functions/BSDF/F_Schlick.js';
+export { default as Schlick_to_F0 } from './functions/BSDF/Schlick_to_F0.js';
 export { default as V_GGX_SmithCorrelated } from './functions/BSDF/V_GGX_SmithCorrelated.js';
 
 export { getDistanceAttenuation } from './lighting/LightUtils.js';
