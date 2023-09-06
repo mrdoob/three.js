@@ -22,7 +22,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 	constructor ( params = {} ) {
 
-		super( {} );
+		super();
 
 		this.normals = false;
 		this.lights = false;
@@ -434,7 +434,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			if ( this.lineColorNode ) {
 
-				lineColorNode = this.lineColorNode
+				lineColorNode = this.lineColorNode;
 
 			} else {
 
