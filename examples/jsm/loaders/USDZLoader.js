@@ -7,7 +7,7 @@ import {
 	NoColorSpace,
 	Loader,
 	Mesh,
-	MeshStandardMaterial,
+	MeshPhysicalMaterial,
 	MirroredRepeatWrapping,
 	RepeatWrapping,
 	SRGBColorSpace,
@@ -491,7 +491,7 @@ class USDZLoader extends Loader {
 
 		function buildMaterial( data ) {
 
-			const material = new MeshStandardMaterial();
+			const material = new MeshPhysicalMaterial();
 
 			if ( data !== undefined ) {
 
@@ -567,6 +567,42 @@ class USDZLoader extends Loader {
 					} else if ( 'float inputs:metallic' in surface ) {
 
 						material.metalness = parseFloat( surface[ 'float inputs:metallic' ] );
+
+					}
+
+					if ( 'float inputs:clearcoat.connect' in surface ) {
+
+						const path = surface[ 'float inputs:clearcoat.connect' ];
+						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
+
+						material.clearcoat = 1.0;
+						material.clearcoatMap = buildTexture( sampler );
+						material.clearcoatMap.colorSpace = NoColorSpace;
+
+					} else  if ( 'float inputs:clearcoat' in surface ) {
+
+						material.clearcoat = parseFloat( surface[ 'float inputs:clearcoat' ] );
+
+					}
+
+					if ( 'float inputs:clearcoatRoughness.connect' in surface ) {
+
+						const path = surface[ 'float inputs:clearcoatRoughness.connect' ];
+						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
+
+						material.clearcoatRoughness = 1.0;
+						material.clearcoatRoughnessMap = buildTexture( sampler );
+						material.clearcoatRoughnessMap.colorSpace = NoColorSpace;
+
+					} else if ( 'float inputs:clearcoatRoughness' in surface ) {
+
+						material.clearcoatRoughness = parseFloat( surface[ 'float inputs:clearcoatRoughness' ] );
+
+					}
+
+					if ( 'float inputs:ior' in surface ) {
+
+						material.ior = parseFloat( surface[ 'float inputs:ior' ] );
 
 					}
 
