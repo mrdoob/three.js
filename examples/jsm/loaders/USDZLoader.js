@@ -4,6 +4,7 @@ import {
 	ClampToEdgeWrapping,
 	FileLoader,
 	Group,
+	LinearSRGBColorSpace,
 	Loader,
 	Mesh,
 	MeshStandardMaterial,
@@ -466,24 +467,69 @@ class USDZLoader extends Loader {
 
 					}
 
+					if ( 'color3f inputs:emissiveColor.connect' in surface ) {
+
+						const path = surface[ 'color3f inputs:emissiveColor.connect' ];
+						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
+
+						material.emissiveMap = buildTexture( sampler );
+						material.emissiveMap.colorSpace = SRGBColorSpace;
+						material.emissive.set( 0xffffff );
+
+					} else if ( 'color3f inputs:emissiveColor' in surface ) {
+
+						const color = surface[ 'color3f inputs:emissiveColor' ].replace( /[()]*/g, '' );
+						material.emissive.fromArray( JSON.parse( '[' + color + ']' ) );
+
+					}
+
 					if ( 'normal3f inputs:normal.connect' in surface ) {
 
 						const path = surface[ 'normal3f inputs:normal.connect' ];
 						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
 
 						material.normalMap = buildTexture( sampler );
+						material.normalMap.colorSpace = LinearSRGBColorSpace;
 
 					}
 
-					if ( 'float inputs:roughness' in surface ) {
+					if ( 'float inputs:roughness.connect' in surface ) {
+
+						const path = surface[ 'float inputs:roughness.connect' ];
+						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
+
+						material.roughness = 1.0;
+						material.roughnessMap = buildTexture( sampler );
+						material.roughnessMap.colorSpace = LinearSRGBColorSpace;
+
+					} else if ( 'float inputs:roughness' in surface ) {
 
 						material.roughness = parseFloat( surface[ 'float inputs:roughness' ] );
 
 					}
 
-					if ( 'float inputs:metallic' in surface ) {
+					if ( 'float inputs:metallic.connect' in surface ) {
+
+						const path = surface[ 'float inputs:metallic.connect' ];
+						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
+
+						material.metalness = 1.0;
+						material.metalnessMap = buildTexture( sampler );
+						material.metalnessMap.colorSpace = LinearSRGBColorSpace;
+
+					} else if ( 'float inputs:metallic' in surface ) {
 
 						material.metalness = parseFloat( surface[ 'float inputs:metallic' ] );
+
+					}
+
+					if ( 'float inputs:occlusion.connect' in surface ) {
+
+						const path = surface[ 'float inputs:occlusion.connect' ];
+						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
+
+						material.aoMap = buildTexture( sampler );
+						material.aoMap.colorSpace = LinearSRGBColorSpace;
 
 					}
 
@@ -503,6 +549,7 @@ class USDZLoader extends Loader {
 					const sampler = data[ 'def Shader "normal_texture"' ];
 
 					material.normalMap = buildTexture( sampler );
+					material.normalMap.colorSpace = LinearSRGBColorSpace;
 
 				}
 
