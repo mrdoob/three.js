@@ -178,7 +178,14 @@ class USDZLoader extends Loader {
 
 				}
 
-				if ( filename.endsWith( 'usd' ) ) {
+				if ( filename.endsWith( 'usd' ) || filename.endsWith( 'usda' ) ) {
+
+					if ( isCrateFile( zip[ filename ] ) ) {
+
+						console.warn( 'THREE.USDZLoader: Crate files (.usdc or binary .usd) are not supported.' );
+						continue;
+
+					}
 
 					const text = fflate.strFromU8( zip[ filename ] );
 					data[ filename ] = parser.parse( text );
