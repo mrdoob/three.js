@@ -237,6 +237,7 @@ class USDZLoader extends Loader {
 					isCrate = true;
 
 				}
+
 			}
 
 			if ( isCrate ) {
@@ -296,9 +297,11 @@ class USDZLoader extends Loader {
 
 		function findGeometry( data, id ) {
 
+			if ( ! data ) return undefined;
+
 			if ( id !== undefined ) {
 
-				const def = `def "${id}"`;
+				const def = `def Mesh "${id}"`;
 
 				if ( def in data ) {
 
@@ -324,9 +327,9 @@ class USDZLoader extends Loader {
 
 					// Move st to Mesh
 
-					if ( 'float2[] primvars:st' in data ) {
+					if ( 'texCoord2f[] primvars:st' in data ) {
 
-						object[ 'float2[] primvars:st' ] = data[ 'float2[] primvars:st' ];
+						object[ 'texCoord2f[] primvars:st' ] = data[ 'texCoord2f[] primvars:st' ];
 
 					}
 
