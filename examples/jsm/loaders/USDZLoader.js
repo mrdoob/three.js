@@ -4,7 +4,7 @@ import {
 	ClampToEdgeWrapping,
 	FileLoader,
 	Group,
-	LinearSRGBColorSpace,
+	NoColorSpace,
 	Loader,
 	Mesh,
 	MeshStandardMaterial,
@@ -489,7 +489,7 @@ class USDZLoader extends Loader {
 						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
 
 						material.normalMap = buildTexture( sampler );
-						material.normalMap.colorSpace = LinearSRGBColorSpace;
+						material.normalMap.colorSpace = NoColorSpace;
 
 					}
 
@@ -500,7 +500,7 @@ class USDZLoader extends Loader {
 
 						material.roughness = 1.0;
 						material.roughnessMap = buildTexture( sampler );
-						material.roughnessMap.colorSpace = LinearSRGBColorSpace;
+						material.roughnessMap.colorSpace = NoColorSpace;
 
 					} else if ( 'float inputs:roughness' in surface ) {
 
@@ -515,7 +515,7 @@ class USDZLoader extends Loader {
 
 						material.metalness = 1.0;
 						material.metalnessMap = buildTexture( sampler );
-						material.metalnessMap.colorSpace = LinearSRGBColorSpace;
+						material.metalnessMap.colorSpace = NoColorSpace;
 
 					} else if ( 'float inputs:metallic' in surface ) {
 
@@ -529,7 +529,7 @@ class USDZLoader extends Loader {
 						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
 
 						material.aoMap = buildTexture( sampler );
-						material.aoMap.colorSpace = LinearSRGBColorSpace;
+						material.aoMap.colorSpace = NoColorSpace;
 
 					}
 
@@ -549,7 +549,7 @@ class USDZLoader extends Loader {
 					const sampler = data[ 'def Shader "normal_texture"' ];
 
 					material.normalMap = buildTexture( sampler );
-					material.normalMap.colorSpace = LinearSRGBColorSpace;
+					material.normalMap.colorSpace = NoColorSpace;
 
 				}
 
