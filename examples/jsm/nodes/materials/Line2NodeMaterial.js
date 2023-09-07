@@ -20,7 +20,7 @@ const defaultValues = new LineDashedMaterial();
 
 class Line2NodeMaterial extends NodeMaterial {
 
-	constructor ( params = {} ) {
+	constructor( params = {} ) {
 
 		super();
 
