@@ -2395,13 +2395,6 @@ class WebGLRenderer {
 
 		};
 
-		this.resetColorManagement = function () {
-
-			_gl.drawingBufferColorSpace = this._outputColorSpace === DisplayP3ColorSpace ? 'display-p3' : 'srgb';
-			_gl.unpackColorSpace = ColorManagement.workingColorSpace === LinearDisplayP3ColorSpace ? 'display-p3' : 'srgb';
-
-		};
-
 		this.resetState = function () {
 
 			_currentActiveCubeFace = 0;
@@ -2437,7 +2430,9 @@ class WebGLRenderer {
 
 		this._outputColorSpace = colorSpace;
 
-		this.resetColorManagement();
+		const gl = this.getContext();
+		gl.drawingBufferColorSpace = colorSpace === DisplayP3ColorSpace ? 'display-p3' : 'srgb';
+		gl.unpackColorSpace = ColorManagement.workingColorSpace === LinearDisplayP3ColorSpace ? 'display-p3' : 'srgb';
 
 	}
 
