@@ -178,7 +178,14 @@ class USDZLoader extends Loader {
 
 				}
 
-				if ( filename.endsWith( 'usd' ) ) {
+				if ( filename.endsWith( 'usd' ) || filename.endsWith( 'usda' ) ) {
+
+					if ( isCrateFile( zip[ filename ] ) ) {
+
+						console.warn( 'THREE.USDZLoader: Crate files (.usdc or binary .usd) are not supported.' );
+						continue;
+
+					}
 
 					const text = fflate.strFromU8( zip[ filename ] );
 					data[ filename ] = parser.parse( text );
@@ -191,17 +198,55 @@ class USDZLoader extends Loader {
 
 		}
 
+		function isCrateFile( buffer ) {
+
+			// Check if this a crate file. First 7 bytes of a crate file are "PXR-USDC".
+			const fileHeader = buffer.slice( 0, 7 );
+			const crateHeader = new Uint8Array( [ 0x50, 0x58, 0x52, 0x2D, 0x55, 0x53, 0x44, 0x43 ] );
+
+			// If this is not a crate file, we assume it is a plain USDA file.
+			return fileHeader.every( ( value, index ) => value === crateHeader[ index ] );
+
+		}
+
 		function findUSD( zip ) {
 
-			for ( const filename in zip ) {
+			if ( zip.length < 1 ) return undefined;
 
-				if ( filename.endsWith( 'usda' ) ) {
+			const firstFileName = Object.keys( zip )[ 0 ];
+			let isCrate = false;
 
-					return zip[ filename ];
+			// As per the USD specification, the first entry in the zip archive is used as the main file ("UsdStage").
+			// ASCII files can end in either .usda or .usd.
+			// See https://openusd.org/release/spec_usdz.html#layout
+			if ( firstFileName.endsWith( 'usda' ) ) return zip[ firstFileName ];
+
+			if ( firstFileName.endsWith( 'usdc' ) ) {
+
+				isCrate = true;
+
+			} else if ( firstFileName.endsWith( 'usd' ) ) {
+
+				// If this is not a crate file, we assume it is a plain USDA file.
+				if ( ! isCrateFile( zip[ firstFileName ] ) ) {
+
+					return zip[ firstFileName ];
+
+				} else {
+
+					isCrate = true;
 
 				}
 
 			}
+
+			if ( isCrate ) {
+
+				console.warn( 'THREE.USDZLoader: Crate files (.usdc or binary .usd) are not supported.' );
+
+			}
+
+			return undefined;
 
 		}
 
@@ -252,9 +297,11 @@ class USDZLoader extends Loader {
 
 		function findGeometry( data, id ) {
 
+			if ( ! data ) return undefined;
+
 			if ( id !== undefined ) {
 
-				const def = `def "${id}"`;
+				const def = `def Mesh "${id}"`;
 
 				if ( def in data ) {
 
@@ -280,9 +327,9 @@ class USDZLoader extends Loader {
 
 					// Move st to Mesh
 
-					if ( 'float2[] primvars:st' in data ) {
+					if ( 'texCoord2f[] primvars:st' in data ) {
 
-						object[ 'float2[] primvars:st' ] = data[ 'float2[] primvars:st' ];
+						object[ 'texCoord2f[] primvars:st' ] = data[ 'texCoord2f[] primvars:st' ];
 
 					}
 
