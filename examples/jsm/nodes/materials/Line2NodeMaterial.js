@@ -46,79 +46,6 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		this.constructShaders();
 
-		Object.defineProperties( this, {
-
-			worldUnits: {
-
-				enumerable: true,
-
-				get: function () {
-
-					return this.useWorldUnits;
-
-				},
-
-				set: function ( value ) {
-
-					if ( this.useWorldUnits !== value ) {
-
-						this.useWorldUnits = value;
-						this.constructShaders();
-
-					}
-
-				}
-
-			},
-
-			dashed: {
-
-				enumerable: true,
-
-				get: function () {
-
-					return this.useDash;
-
-				},
-
-				set: function ( value ) {
-
-					if ( this.useDash !== value ) {
-
-						this.useDash = value;
-						this.constructShaders();
-
-					}
-
-				}
-
-			},
-
-			alphaToCoverage: {
-
-				enumerable: true,
-
-				get: function () {
-
-					return this.useAlphaToCoverage;
-
-				},
-
-				set: function ( value ) {
-
-					if ( this.useAlphaToCoverage !== value ) {
-
-						this.useAlphaToCoverage = value;
-						this.constructShaders();
-
-					}
-
-				}
-
-			}
-
-		} );
-
 		this.setValues( params );
 
 	}
@@ -458,6 +385,60 @@ class Line2NodeMaterial extends NodeMaterial {
 		} );
 
 		this.needsUpdate = true;
+
+	}
+
+
+	get worldUnits() {
+
+		return this.useWorldUnits;
+
+	}
+
+	set worldUnits( value ) {
+
+		if ( this.useWorldUnits !== value ) {
+
+			this.useWorldUnits = value;
+			this.constructShaders();
+
+		}
+
+	}
+
+
+	get dashed() {
+
+		return this.useDash;
+
+	}
+
+	set dashed( value ) {
+
+		if ( this.useDash !== value ) {
+
+			this.useDash = value;
+			this.constructShaders();
+
+		}
+
+	}
+
+
+	get alphaToCoverage() {
+
+		return this.useAlphaToCoverage;
+
+	}
+
+	set alphaToCoverage( value ) {
+
+		if ( this.useAlphaToCoverage !== value ) {
+
+			this.useAlphaToCoverage = value;
+			this.constructShaders();
+
+		}
 
 	}
 
