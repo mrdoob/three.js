@@ -357,6 +357,12 @@ class UISelect extends UIElement {
 
 		this.dom.setAttribute( 'autocomplete', 'off' );
 
+		this.dom.addEventListener( 'pointerdown', function ( event ) {
+
+			event.stopPropagation();
+
+		} );
+
 	}
 
 	setMultiple( boolean ) {
