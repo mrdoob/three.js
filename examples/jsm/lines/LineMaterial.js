@@ -497,6 +497,7 @@ class LineMaterial extends ShaderMaterial {
 
 	set linewidth( value ) {
 
+		if ( ! this.uniforms ) return;
 		this.uniforms.linewidth.value = value;
 
 	}
@@ -583,6 +584,7 @@ class LineMaterial extends ShaderMaterial {
 
 	set opacity( value ) {
 
+		if ( ! this.uniforms ) return;
 		this.uniforms.opacity.value = value;
 
 	}
@@ -606,6 +608,8 @@ class LineMaterial extends ShaderMaterial {
 	}
 
 	set alphaToCoverage( value ) {
+
+		if ( ! this.defines ) return;
 
 		if ( ( value === true ) !== this.alphaToCoverage ) {
 
