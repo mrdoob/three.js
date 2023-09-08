@@ -497,7 +497,7 @@ class LineMaterial extends ShaderMaterial {
 
 	set linewidth( value ) {
 
-		if ( ! this.uniforms ) return;
+		if ( ! this.uniforms.linewidth ) return;
 		this.uniforms.linewidth.value = value;
 
 	}
