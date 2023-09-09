@@ -1,5 +1,4 @@
 import DataMap from '../DataMap.js';
-import ChainMap from '../ChainMap.js';
 import { NoToneMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
 import { NodeFrame, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, equirectUV, viewportBottomLeft, normalWorld } from '../../../nodes/Nodes.js';
 
@@ -12,15 +11,13 @@ class Nodes extends DataMap {
 		this.renderer = renderer;
 		this.backend = backend;
 		this.nodeFrame = new NodeFrame();
-		this.cache = new ChainMap();
+		this.nodeBuilderCache = new Map();
 
 	}
 
-	getForRenderChainKey( renderObject ) {
+	getForRenderCacheKey( renderObject ) {
 
-		const { object, material, lightsNode, context } = renderObject;
-
-		return [ object.geometry, material, lightsNode, context ];
+		return renderObject.initialCacheKey;
 
 	}
 
@@ -32,11 +29,11 @@ class Nodes extends DataMap {
 
 		if ( nodeBuilder === undefined ) {
 
-			const { cache } = this;
+			const { nodeBuilderCache } = this;
 
-			const chainKey = this.getForRenderChainKey( renderObject );
+			const cacheKey = this.getForRenderCacheKey( renderObject );
 
-			nodeBuilder = cache.get( chainKey );
+			nodeBuilder = nodeBuilderCache.get( cacheKey );
 
 			if ( nodeBuilder === undefined ) {
 
@@ -48,7 +45,7 @@ class Nodes extends DataMap {
 				nodeBuilder.toneMappingNode = this.getToneMappingNode();
 				nodeBuilder.build();
 
-				cache.set( chainKey, nodeBuilder );
+				nodeBuilderCache.set( cacheKey, nodeBuilder );
 
 			}
 
@@ -64,7 +61,7 @@ class Nodes extends DataMap {
 
 		if ( object.isRenderObject ) {
 
-			this.cache.delete( this.getForRenderChainKey( object ) );
+			this.nodeBuilderCache.delete( this.getForRenderCacheKey( object ) );
 
 		}
 

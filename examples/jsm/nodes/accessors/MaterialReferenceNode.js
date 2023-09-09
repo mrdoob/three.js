@@ -15,6 +15,14 @@ class MaterialReferenceNode extends ReferenceNode {
 
 	}
 
+	updateReference( frame ) {
+
+		this.reference = this.material !== null ? this.material : frame.material;
+
+		return this.reference;
+
+	}
+
 	construct( builder ) {
 
 		const material = this.material !== null ? this.material : builder.material;
@@ -22,14 +30,6 @@ class MaterialReferenceNode extends ReferenceNode {
 		this.node.value = material[ this.property ];
 
 		return super.construct( builder );
-
-	}
-
-	update( frame ) {
-
-		this.object = this.material !== null ? this.material : frame.material;
-
-		super.update( frame );
 
 	}
 

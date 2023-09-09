@@ -18,15 +18,16 @@ export default class RenderObject {
 		this.context = renderContext;
 
 		this.geometry = object.geometry;
+		this.version = material.version;
 
 		this.attributes = null;
 		this.pipeline = null;
 		this.vertexBuffers = null;
 
+		this.initialCacheKey = this.getCacheKey();
+
 		this._nodeBuilder = null;
 		this._bindings = null;
-		this._materialVersion = - 1;
-		this._materialCacheKey = '';
 
 		this.onDispose = null;
 
@@ -102,23 +103,35 @@ export default class RenderObject {
 
 	}
 
-	getCacheKey() {
+	getMaterialCacheKey() {
 
-		const { material, scene, lightsNode } = this;
+		const material = this.material;
 
-		if ( material.version !== this._materialVersion ) {
+		let cacheKey = material.customProgramCacheKey();
 
-			this._materialVersion = material.version;
-			this._materialCacheKey = material.customProgramCacheKey();
+		for ( const property in material ) {
+
+			if ( /^(_|is[A-Z])|^(visible|version|uuid|name|userData)$/.test( property ) ) continue;
+
+			cacheKey += /*property + ':' +*/ String( material[ property ] ) + ',';
 
 		}
 
-		const cacheKey = [];
+		return cacheKey;
 
-		cacheKey.push( 'material:' + this._materialCacheKey );
-		cacheKey.push( 'nodes:' + this._nodes.getCacheKey( scene, lightsNode ) );
+	}
 
-		return '{' + cacheKey.join( ',' ) + '}';
+	getNodesCacheKey() {
+
+		// Environment Nodes Cache Key
+
+		return this._nodes.getCacheKey( this.scene, this.lightsNode );
+
+	}
+
+	getCacheKey() {
+
+		return `{material:${ this.getMaterialCacheKey() },nodes:${ this.getNodesCacheKey()}`;
 
 	}
 
