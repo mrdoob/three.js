@@ -3,6 +3,7 @@ class WebGLAttributeUtils {
 	constructor( backend ) {
 
 		this.backend = backend;
+		this.buffers = new WeakMap();
 
 	}
 
@@ -14,11 +15,19 @@ class WebGLAttributeUtils {
 		const array = attribute.array;
 		const usage = attribute.usage || gl.STATIC_DRAW;
 
-		const bufferGPU = gl.createBuffer();
+		let bufferGPU = this.buffers.get( array );
 
-		gl.bindBuffer( bufferType, bufferGPU );
-		gl.bufferData( bufferType, array, usage );
-		gl.bindBuffer( bufferType, null );
+		if ( bufferGPU === undefined ) {
+
+			bufferGPU = gl.createBuffer();
+
+			gl.bindBuffer( bufferType, bufferGPU );
+			gl.bufferData( bufferType, array, usage );
+			gl.bindBuffer( bufferType, null );
+
+			this.buffers.set( array, bufferGPU );
+
+		}
 
 		//attribute.onUploadCallback();
 
