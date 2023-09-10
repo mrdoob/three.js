@@ -278,12 +278,12 @@ class Renderer {
 
 			const renderTargetData = this._textures.get( renderTarget );
 
-			renderContext.texture = renderTargetData.texture;
+			renderContext.textures = renderTargetData.textures;
 			renderContext.depthTexture = renderTargetData.depthTexture;
 
 		} else {
 
-			renderContext.texture = null;
+			renderContext.textures = null;
 			renderContext.depthTexture = null;
 
 		}

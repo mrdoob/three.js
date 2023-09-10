@@ -303,7 +303,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( ( emissiveNode && emissiveNode.isNode === true ) || ( material.emissive && material.emissive.isColor === true ) ) {
 
-			outgoingLightNode = outgoingLightNode.add( emissiveNode ? vec3( emissiveNode ) : materialEmissive );
+			outgoingLightNode = outgoingLightNode.add( vec3( emissiveNode ? emissiveNode : materialEmissive ) );
 
 		}
 
@@ -345,7 +345,15 @@ class NodeMaterial extends ShaderMaterial {
 
 			if ( renderTarget !== null ) {
 
-				outputColorSpace = renderTarget.texture.colorSpace;
+				if ( Array.isArray( renderTarget.texture ) ) {
+
+					outputColorSpace = renderTarget.texture[ 0 ].colorSpace;
+
+				} else {
+
+					outputColorSpace = renderTarget.texture.colorSpace;
+
+				}
 
 			} else {
 

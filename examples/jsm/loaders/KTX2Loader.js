@@ -17,12 +17,15 @@ import {
 	CompressedCubeTexture,
 	Data3DTexture,
 	DataTexture,
+	DisplayP3ColorSpace,
 	FileLoader,
 	FloatType,
 	HalfFloatType,
 	NoColorSpace,
 	LinearFilter,
 	LinearMipmapLinearFilter,
+	LinearDisplayP3ColorSpace,
+	LinearSRGBColorSpace,
 	Loader,
 	RedFormat,
 	RGB_ETC1_Format,
@@ -61,7 +64,10 @@ import {
 	VK_FORMAT_R8G8B8A8_SRGB,
 	VK_FORMAT_R8G8B8A8_UNORM,
 	VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
-	VK_FORMAT_ASTC_6x6_UNORM_BLOCK
+	VK_FORMAT_ASTC_6x6_UNORM_BLOCK,
+	KHR_DF_PRIMARIES_UNSPECIFIED,
+	KHR_DF_PRIMARIES_BT709,
+	KHR_DF_PRIMARIES_DISPLAYP3
 } from '../libs/ktx-parse.module.js';
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
 
@@ -257,7 +263,7 @@ class KTX2Loader extends Loader {
 
 	_createTextureFrom( transcodeResult, container ) {
 
-		const { faces, width, height, format, type, error, dfdTransferFn, dfdFlags } = transcodeResult;
+		const { faces, width, height, format, type, error, dfdFlags } = transcodeResult;
 
 		if ( type === 'error' ) return Promise.reject( error );
 
@@ -282,8 +288,7 @@ class KTX2Loader extends Loader {
 		texture.generateMipmaps = false;
 
 		texture.needsUpdate = true;
-		// TODO: Detect NoColorSpace vs. LinearSRGBColorSpace based on primaries.
-		texture.colorSpace = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? SRGBColorSpace : NoColorSpace;
+		texture.colorSpace = parseColorSpace( container );
 		texture.premultiplyAlpha = !! ( dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED );
 
 		return texture;
@@ -403,9 +408,9 @@ KTX2Loader.BasisWorker = function () {
 
 					try {
 
-						const { faces, buffers, width, height, hasAlpha, format, dfdTransferFn, dfdFlags } = transcode( message.buffer );
+						const { faces, buffers, width, height, hasAlpha, format, dfdFlags } = transcode( message.buffer );
 
-						self.postMessage( { type: 'transcode', id: message.id, faces, width, height, hasAlpha, format, dfdTransferFn, dfdFlags }, buffers );
+						self.postMessage( { type: 'transcode', id: message.id, faces, width, height, hasAlpha, format, dfdFlags }, buffers );
 
 					} catch ( error ) {
 
@@ -468,7 +473,6 @@ KTX2Loader.BasisWorker = function () {
 		const levelCount = ktx2File.getLevels();
 		const faceCount = ktx2File.getFaces();
 		const hasAlpha = ktx2File.getHasAlpha();
-		const dfdTransferFn = ktx2File.getDFDTransferFunc();
 		const dfdFlags = ktx2File.getDFDFlags();
 
 		const { transcoderFormat, engineFormat } = getTranscoderFormat( basisFormat, width, height, hasAlpha );
@@ -552,7 +556,7 @@ KTX2Loader.BasisWorker = function () {
 
 		cleanup();
 
-		return { faces, buffers, width, height, hasAlpha, format: engineFormat, dfdTransferFn, dfdFlags };
+		return { faces, buffers, width, height, hasAlpha, format: engineFormat, dfdFlags };
 
 	}
 
@@ -756,16 +760,6 @@ const TYPE_MAP = {
 
 };
 
-const COLOR_SPACE_MAP = {
-
-	[ VK_FORMAT_R8G8B8A8_SRGB ]: SRGBColorSpace,
-	[ VK_FORMAT_R8G8_SRGB ]: SRGBColorSpace,
-	[ VK_FORMAT_R8_SRGB ]: SRGBColorSpace,
-
-	[ VK_FORMAT_ASTC_6x6_SRGB_BLOCK ]: SRGBColorSpace,
-
-};
-
 async function createRawTexture( container ) {
 
 	const { vkFormat } = container;
@@ -871,8 +865,8 @@ async function createRawTexture( container ) {
 	if ( UNCOMPRESSED_FORMATS.has( FORMAT_MAP[ vkFormat ] ) ) {
 
 		texture = container.pixelDepth === 0
-		? new DataTexture( mipmaps, container.pixelWidth, container.pixelHeight )
-		: new Data3DTexture( mipmaps, container.pixelWidth, container.pixelHeight, container.pixelDepth );
+		? new DataTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight )
+		: new Data3DTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight, container.pixelDepth );
 
 	} else {
 
@@ -880,21 +874,43 @@ async function createRawTexture( container ) {
 
 		texture = new CompressedTexture( mipmaps, container.pixelWidth, container.pixelHeight );
 
-
-
 	}
 
 	texture.mipmaps = mipmaps;
 
 	texture.type = TYPE_MAP[ vkFormat ];
 	texture.format = FORMAT_MAP[ vkFormat ];
-	texture.colorSpace = COLOR_SPACE_MAP[ vkFormat ] || NoColorSpace;
-
+	texture.colorSpace = parseColorSpace( container );
 	texture.needsUpdate = true;
 
 	//
 
 	return Promise.resolve( texture );
+
+}
+
+function parseColorSpace( container ) {
+
+	const dfd = container.dataFormatDescriptor[ 0 ];
+
+	if ( dfd.colorPrimaries === KHR_DF_PRIMARIES_BT709 ) {
+
+		return dfd.transferFunction === KHR_DF_TRANSFER_SRGB ? SRGBColorSpace : LinearSRGBColorSpace;
+
+	} else if ( dfd.colorPrimaries === KHR_DF_PRIMARIES_DISPLAYP3 ) {
+
+		return dfd.transferFunction === KHR_DF_TRANSFER_SRGB ? DisplayP3ColorSpace : LinearDisplayP3ColorSpace;
+
+	} else if ( dfd.colorPrimaries === KHR_DF_PRIMARIES_UNSPECIFIED ) {
+
+		return NoColorSpace;
+
+	} else {
+
+		console.warn( `THREE.KTX2Loader: Unsupported color primaries, "${ dfd.colorPrimaries }"` );
+		return NoColorSpace;
+
+	}
 
 }
 

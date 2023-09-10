@@ -59,6 +59,12 @@ class WebGPUBindingUtils {
 
 				bindingGPU.externalTexture = {}; // GPUExternalTextureBindingLayout
 
+			} else if ( binding.isSampledTexture && binding.store ) {
+
+				const format = this.backend.get( binding.texture ).texture.format;
+
+				bindingGPU.storageTexture = { format }; // GPUStorageTextureBindingLayout
+
 			} else if ( binding.isSampledTexture ) {
 
 				const texture = {}; // GPUTextureBindingLayout
