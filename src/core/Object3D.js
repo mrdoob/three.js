@@ -332,14 +332,23 @@ class Object3D extends EventDispatcher {
 
 			}
 
+			let isAncestor = false;
+
 			for ( let i = this; i !== null; i = i.parent ) {
 
 				if ( i === object ) {
 
-					console.error( `THREE.Object3D.${caller}: object cannot be an ancestor of itself`, object );
-					continue;
+					isAncestor = true;
+					break;
 
 				}
+
+			}
+
+			if ( isAncestor ) {
+
+				console.error( `THREE.Object3D.${caller}: object cannot be an ancestor of itself`, object );
+				continue;
 
 			}
 
