@@ -138,6 +138,7 @@ class WebGPUBackend extends Backend {
 		const device = this.device;
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
+		let bufferHeight;
 		let occlusionQuerySet;
 
 		if ( occlusionQueryCount > 0 ) {
@@ -231,6 +232,8 @@ class WebGPUBackend extends Backend {
 
 			}
 
+			bufferHeight = Math.floor( textures[ 0 ].source.data.height );
+
 		} else {
 
 			if ( antialias === true ) {
@@ -246,6 +249,8 @@ class WebGPUBackend extends Backend {
 			}
 
 			depthStencilAttachment.view = this._getDepthBufferGPU( renderContext ).createView();
+
+			bufferHeight = this.colorBuffer.height;
 
 		}
 
@@ -342,7 +347,7 @@ class WebGPUBackend extends Backend {
 
 		if ( renderContext.viewport ) {
 
-			this.updateViewport( renderContext );
+			this.updateViewport( renderContext, bufferHeight );
 
 		}
 
@@ -350,7 +355,7 @@ class WebGPUBackend extends Backend {
 
 			const { x, y, width, height } = renderContext.scissorValue;
 
-			currentPass.setScissorRect( x, y, width, height );
+			currentPass.setScissorRect( x, bufferHeight - height - y, width, height );
 
 		}
 
@@ -481,12 +486,12 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	updateViewport( renderContext ) {
+	updateViewport( renderContext, bufferHeight ) {
 
 		const { currentPass } = this.get( renderContext );
-		const { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
+		let { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
 
-		currentPass.setViewport( x, y, width, height, minDepth, maxDepth );
+		currentPass.setViewport( x, bufferHeight - height - y, width, height, minDepth, maxDepth );
 
 	}
 
