@@ -481,7 +481,7 @@ class WebGLBackend extends Backend {
 		const vaoGPU = gl.createVertexArray();
 
 		const index = renderObject.getIndex();
-		const vertexBuffers = renderObject.getVertexBuffers();
+		const attributes = renderObject.getAttributes();
 
 		gl.bindVertexArray( vaoGPU );
 
@@ -492,8 +492,6 @@ class WebGLBackend extends Backend {
 			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexData.bufferGPU );
 
 		}
-
-		const attributes = renderObject.getAttributes();
 
 		for ( let i = 0; i < attributes.length; i ++ ) {
 
