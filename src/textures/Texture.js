@@ -19,7 +19,7 @@ import { Matrix3 } from '../math/Matrix3.js';
 import { Source } from './Source.js';
 import { warnOnce } from '../utils.js';
 
-let textureId = 0;
+let _textureId = 0;
 
 class Texture extends EventDispatcher {
 
@@ -29,7 +29,7 @@ class Texture extends EventDispatcher {
 
 		this.isTexture = true;
 
-		Object.defineProperty( this, 'id', { value: textureId ++ } );
+		Object.defineProperty( this, 'id', { value: _textureId ++ } );
 
 		this.uuid = MathUtils.generateUUID();
 

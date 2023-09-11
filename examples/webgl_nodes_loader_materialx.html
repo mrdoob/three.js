@@ -19,7 +19,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -40,7 +40,7 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
+			import { nodeFrame } from './jsm/renderers/webgl-legacy/nodes/WebGLNodes.js';
 
 			const SAMPLE_PATH = 'https://raw.githubusercontent.com/materialx/MaterialX/main/resources/Materials/Examples/StandardSurface/';
 

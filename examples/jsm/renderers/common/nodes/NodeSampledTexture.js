@@ -4,7 +4,7 @@ class NodeSampledTexture extends SampledTexture {
 
 	constructor( name, textureNode ) {
 
-		super( name, textureNode.value );
+		super( name, textureNode ? textureNode.value : null );
 
 		this.textureNode = textureNode;
 
@@ -22,7 +22,7 @@ class NodeSampledCubeTexture extends SampledCubeTexture {
 
 	constructor( name, textureNode ) {
 
-		super( name, textureNode.value );
+		super( name, textureNode ? textureNode.value : null );
 
 		this.textureNode = textureNode;
 

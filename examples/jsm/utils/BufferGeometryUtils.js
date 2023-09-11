@@ -555,7 +555,7 @@ export function deinterleaveGeometry( geometry ) {
 }
 
 /**
- * @param {Array<BufferGeometry>} geometry
+ * @param {BufferGeometry} geometry
  * @return {number}
  */
 function estimateBytesUsed( geometry ) {

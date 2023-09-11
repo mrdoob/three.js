@@ -1,6 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
+import UniformNode from '../core/UniformNode.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
 
 import { Vector3 } from 'three';
@@ -16,7 +16,7 @@ class Object3DNode extends Node {
 
 		this.updateType = NodeUpdateType.OBJECT;
 
-		this._uniformNode = uniform( null );
+		this._uniformNode = new UniformNode( null );
 
 	}
 

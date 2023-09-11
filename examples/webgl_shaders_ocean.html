@@ -15,7 +15,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -113,6 +113,8 @@
 				};
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const sceneEnv = new THREE.Scene();
+
 				let renderTarget;
 
 				function updateSun() {
@@ -127,7 +129,9 @@
 
 					if ( renderTarget !== undefined ) renderTarget.dispose();
 
-					renderTarget = pmremGenerator.fromScene( sky );
+					sceneEnv.add( sky );
+					renderTarget = pmremGenerator.fromScene( sceneEnv );
+					scene.add( sky );
 
 					scene.environment = renderTarget.texture;
 
