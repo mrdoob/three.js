@@ -117,6 +117,7 @@ const exceptionList = [
 	'webgpu_depth_texture',
 	'webgpu_instance_mesh',
 	'webgpu_lights_ies_spotlight',
+	'webgpu_lines_fat',
 	'webgpu_loader_gltf',
 	'webgpu_loader_gltf_compressed',
 	'webgpu_loader_gltf_iridescence',
