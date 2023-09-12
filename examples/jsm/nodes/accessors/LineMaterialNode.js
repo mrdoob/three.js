@@ -4,9 +4,9 @@ import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
 class LineMaterialNode extends MaterialNode {
 
-	construct( builder ) {
+	construct( /*builder*/ ) {
 
-		return this.getFloat( builder, this.scope );
+		return this.getFloat( this.scope );
 
 	}
 

@@ -1,5 +1,5 @@
 import DataMap from '../DataMap.js';
-import ChainMap from '../ChainMap.js';
+import NodeBuilderState from './NodeBuilderState.js';
 import { NoToneMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
 import { NodeFrame, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, equirectUV, viewportBottomLeft, normalWorld } from '../../../nodes/Nodes.js';
 
@@ -12,15 +12,13 @@ class Nodes extends DataMap {
 		this.renderer = renderer;
 		this.backend = backend;
 		this.nodeFrame = new NodeFrame();
-		this.cache = new ChainMap();
+		this.nodeBuilderCache = new Map();
 
 	}
 
-	getForRenderChainKey( renderObject ) {
+	getForRenderCacheKey( renderObject ) {
 
-		const { object, material, lightsNode, context } = renderObject;
-
-		return [ object.geometry, material, lightsNode, context ];
+		return renderObject.initialCacheKey;
 
 	}
 
@@ -28,19 +26,19 @@ class Nodes extends DataMap {
 
 		const renderObjectData = this.get( renderObject );
 
-		let nodeBuilder = renderObjectData.nodeBuilder;
+		let nodeBuilderState = renderObjectData.nodeBuilderState;
 
-		if ( nodeBuilder === undefined ) {
+		if ( nodeBuilderState === undefined ) {
 
-			const { cache } = this;
+			const { nodeBuilderCache } = this;
 
-			const chainKey = this.getForRenderChainKey( renderObject );
+			const cacheKey = this.getForRenderCacheKey( renderObject );
 
-			nodeBuilder = cache.get( chainKey );
+			nodeBuilderState = nodeBuilderCache.get( cacheKey );
 
-			if ( nodeBuilder === undefined ) {
+			if ( nodeBuilderState === undefined ) {
 
-				nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer, renderObject.scene );
+				const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer, renderObject.scene );
 				nodeBuilder.material = renderObject.material;
 				nodeBuilder.lightsNode = renderObject.lightsNode;
 				nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
@@ -48,15 +46,19 @@ class Nodes extends DataMap {
 				nodeBuilder.toneMappingNode = this.getToneMappingNode();
 				nodeBuilder.build();
 
-				cache.set( chainKey, nodeBuilder );
+				nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
+
+				nodeBuilderCache.set( cacheKey, nodeBuilderState );
 
 			}
 
-			renderObjectData.nodeBuilder = nodeBuilder;
+			nodeBuilderState.usedTimes ++;
+
+			renderObjectData.nodeBuilderState = nodeBuilderState;
 
 		}
 
-		return nodeBuilder;
+		return nodeBuilderState;
 
 	}
 
@@ -64,7 +66,14 @@ class Nodes extends DataMap {
 
 		if ( object.isRenderObject ) {
 
-			this.cache.delete( this.getForRenderChainKey( object ) );
+			const nodeBuilderState = this.get( object ).nodeBuilderState;
+			nodeBuilderState.usedTimes --;
+
+			if ( nodeBuilderState.usedTimes === 0 ) {
+
+				this.nodeBuilderCache.delete( this.getForRenderCacheKey( object ) );
+
+			}
 
 		}
 
@@ -76,18 +85,34 @@ class Nodes extends DataMap {
 
 		const computeData = this.get( computeNode );
 
-		let nodeBuilder = computeData.nodeBuilder;
+		let nodeBuilderState = computeData.nodeBuilderState;
 
-		if ( nodeBuilder === undefined ) {
+		if ( nodeBuilderState === undefined ) {
 
-			nodeBuilder = this.backend.createNodeBuilder( computeNode, this.renderer );
+			const nodeBuilder = this.backend.createNodeBuilder( computeNode, this.renderer );
 			nodeBuilder.build();
 
-			computeData.nodeBuilder = nodeBuilder;
+			nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
+
+			computeData.nodeBuilderState = nodeBuilder;
 
 		}
 
-		return nodeBuilder;
+		return nodeBuilderState;
+
+	}
+
+	_createNodeBuilderState( nodeBuilder ) {
+
+		return new NodeBuilderState(
+			nodeBuilder.vertexShader,
+			nodeBuilder.fragmentShader,
+			nodeBuilder.computeShader,
+			nodeBuilder.getAttributesArray(),
+			nodeBuilder.getBindings(),
+			nodeBuilder.updateNodes,
+			nodeBuilder.updateBeforeNodes
+		);
 
 	}
 
@@ -326,7 +351,7 @@ class Nodes extends DataMap {
 	updateBefore( renderObject ) {
 
 		const nodeFrame = this.getNodeFrame( renderObject );
-		const nodeBuilder = renderObject.getNodeBuilder();
+		const nodeBuilder = renderObject.getNodeBuilderState();
 
 		for ( const node of nodeBuilder.updateBeforeNodes ) {
 
@@ -341,7 +366,7 @@ class Nodes extends DataMap {
 	updateForRender( renderObject ) {
 
 		const nodeFrame = this.getNodeFrame( renderObject );
-		const nodeBuilder = renderObject.getNodeBuilder();
+		const nodeBuilder = renderObject.getNodeBuilderState();
 
 		for ( const node of nodeBuilder.updateNodes ) {
 
@@ -356,6 +381,7 @@ class Nodes extends DataMap {
 		super.dispose();
 
 		this.nodeFrame = new NodeFrame();
+		this.nodeBuilderCache = new Map();
 
 	}
 
