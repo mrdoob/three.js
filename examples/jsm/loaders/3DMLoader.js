@@ -58,8 +58,6 @@ class Rhino3dmLoader extends Loader {
 
 		this.libraryPath = path;
 
-		this._initLibrary();
-
 		return this;
 
 	}
@@ -460,6 +458,7 @@ class Rhino3dmLoader extends Loader {
 		object.userData[ 'layers' ] = data.layers;
 		object.userData[ 'groups' ] = data.groups;
 		object.userData[ 'settings' ] = data.settings;
+		object.userData.settings[ 'renderSettings' ] = data.renderSettings;
 		object.userData[ 'objectType' ] = 'File3dm';
 		object.userData[ 'materials' ] = null;
 		
