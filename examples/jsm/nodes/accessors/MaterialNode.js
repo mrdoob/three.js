@@ -3,7 +3,7 @@ import { reference } from './ReferenceNode.js';
 import { materialReference } from './MaterialReferenceNode.js';
 import { nodeImmutable, float } from '../shadernode/ShaderNode.js';
 
-const _cacheMaterial = new Map();
+const _propertyCache = new Map();
 
 class MaterialNode extends Node {
 
@@ -17,13 +17,13 @@ class MaterialNode extends Node {
 
 	getCache( property, type ) {
 
-		let node = _cacheMaterial.get( property );
+		let node = _propertyCache.get( property );
 
 		if ( node === undefined ) {
 
 			node = materialReference( property, type );
 
-			_cacheMaterial.set( property, node );
+			_propertyCache.set( property, node );
 
 		}
 
