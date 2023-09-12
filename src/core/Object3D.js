@@ -511,7 +511,9 @@ class Object3D extends EventDispatcher {
 
 		this.updateWorldMatrix( true, false );
 
-		return target.fromArray( this.matrixWorld.elements, 8 ).normalize();
+		const e = this.matrixWorld.elements;
+
+		return target.set( e[ 8 ], e[ 9 ], e[ 10 ] ).normalize();
 
 	}
 
