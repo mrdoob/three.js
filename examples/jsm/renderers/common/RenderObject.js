@@ -119,7 +119,7 @@ export default class RenderObject {
 
 				const type = typeof value;
 
-				if ( type === 'number' ) value = value !== 0 ? '1' : '0'; // Convert to on/off, important to clearcoat, transmission, etc
+				if ( type === 'number' ) value = value !== 0 ? '1' : '0'; // Convert to on/off, important for clearcoat, transmission, etc
 				else if ( type === 'object' ) value = '{}';
 
 			}
