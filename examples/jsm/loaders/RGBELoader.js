@@ -395,7 +395,7 @@ class RGBELoader extends DataTextureLoader {
 
 			default:
 
-				throw new Error( 'THREE.RGBELoader: unsupported type: ', this.type );
+				throw new Error( 'THREE.RGBELoader: Unsupported type: ' + this.type );
 				break;
 
 		}
