@@ -38,11 +38,7 @@ class Camera extends Object3D {
 
 	getWorldDirection( target ) {
 
-		this.updateWorldMatrix( true, false );
-
-		const e = this.matrixWorld.elements;
-
-		return target.set( - e[ 8 ], - e[ 9 ], - e[ 10 ] ).normalize();
+		return super.getWorldDirection( target ).negate();
 
 	}
 
