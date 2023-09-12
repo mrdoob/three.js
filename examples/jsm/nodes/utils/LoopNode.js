@@ -38,7 +38,7 @@ class LoopNode extends Node {
 
 		}
 
-		properties.returnsNode = this.params[ this.params.length - 1 ].call( inputs, builder.addStack(), builder );
+		properties.returnsNode = this.params[ this.params.length - 1 ]( inputs, builder.addStack(), builder );
 		properties.stackNode = builder.removeStack();
 
 		return properties;

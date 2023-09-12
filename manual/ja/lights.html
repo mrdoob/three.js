@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -77,6 +77,7 @@ const texture = loader.load('resources/images/checker.png');
 texture.wrapS = THREE.RepeatWrapping;
 texture.wrapT = THREE.RepeatWrapping;
 texture.magFilter = THREE.NearestFilter;
+texture.colorSpace = THREE.SRGBColorSpace;
 const repeats = planeSize / 2;
 texture.repeat.set(repeats, repeats);
 </pre>
@@ -260,7 +261,8 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 <p><a href="/docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> はある点から全方向に光を放つライトです。
 コード変更しましょう。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.PointLight(color, intensity);
 light.position.set(0, 10, 0);
@@ -311,7 +313,8 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 ライトの円錐体がターゲットに向かって照らされます。</p>
 <p>上記のヘルパーを使って <a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> を修正します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
+-const intensity = 1;
++const intensity = 150;
 -const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);
 scene.add(light);
@@ -427,41 +430,7 @@ makeXYZGUI(gui, light.position, 'position');
 </div>
 
 <p></p>
-<p>説明してない事が1つあり、 <a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> に <code class="notranslate" translate="no">physicallyCorrectLights</code> を設定します。
-ライトとの距離は、ライトの落ち方に影響を与えます。
-これは <a href="/docs/#api/ja/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> と <a href="/docs/#api/ja/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> にのみ影響します。
-<a href="/docs/#api/ja/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> は自動的にこれを行います。</p>
-<p>ライトの場合の基本的な考え方は、フェードアウトする距離を設定しない、<code class="notranslate" translate="no">intensity</code> を設定しない事です。
-代わりにライトの<a href="/docs/#api/ja/lights/PointLight#power"><code class="notranslate" translate="no">power</code></a>をルーメン単位で設定すると、three.jsは実際のライトのように物理計算を行います。
-この場合の単位はメートルで、60Wの電球であれば800ルーメン程度の明るさになります。
-また<a href="/docs/#api/ja/lights/PointLight#decay"><code class="notranslate" translate="no">decay</code></a>プロパティもあります。
-現実的な減衰のためには <code class="notranslate" translate="no">2</code> に設定します。</p>
-<p>試してみましょう。</p>
-<p>まずは物理的に正しいライトを作ります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
-+renderer.physicallyCorrectLights = true;
-</pre>
-<p>次に <code class="notranslate" translate="no">power</code> を800ルーメンにし、<code class="notranslate" translate="no">decay</code> を2にします。
-<code class="notranslate" translate="no">distance</code> は <code class="notranslate" translate="no">Infinity</code> にします。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
-const intensity = 1;
-const light = new THREE.PointLight(color, intensity);
-light.power = 800;
-light.decay = 2;
-light.distance = Infinity;
-</pre>
-<p>GUIを追加して <code class="notranslate" translate="no">power</code> と <code class="notranslate" translate="no">decay</code> を変更できるようにします。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
-gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
-gui.add(light, 'decay', 0, 4, 0.01);
-gui.add(light, 'power', 0, 2000);
-</pre>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lights-point-physically-correct.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lights-point-physically-correct.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
-</div>
 
-<p></p>
 <p>シーンにライトを追加するたびに、Three.jsのレンダリング速度が遅くなる事に注意して下さい。</p>
 <p>次は<a href="cameras.html">カメラの扱い方</a>についてです。</p>
 <p><canvas id="c"></canvas></p>

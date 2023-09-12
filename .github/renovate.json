@@ -1,7 +1,8 @@
 {
   "extends": [
     "config:base",
-    ":disableDependencyDashboard"
+    ":disableDependencyDashboard",
+    "helpers:pinGitHubActionDigests"
   ],
   "timezone": "Asia/Tokyo",
   "schedule": ["after 1am and before 7am every monday"],

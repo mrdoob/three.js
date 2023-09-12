@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -57,10 +57,12 @@
 
 <p>我们将修改我们的第一个例子中的其中一个。我们需要做的就是创建一个<a href="/docs/#api/zh/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>。调用它的<a href="/docs/#api/zh/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a>方法，同时传入图像的URL，并将材质的 <code class="notranslate" translate="no">map</code> 属性设置为该方法的返回值，而不是设置它的 <code class="notranslate" translate="no">color</code>属性。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
++const texture = loader.load( 'resources/images/wall.jpg' );
++texture.colorSpace = THREE.SRGBColorSpace;
 
 const material = new THREE.MeshBasicMaterial({
 -  color: 0xFF8844,
-+  map: loader.load('resources/images/wall.jpg'),
++  map: texture,
 });
 </pre>
 <p>注意，我们使用的是 <a href="/docs/#api/zh/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>， 所以没有必要增加光线</p>
@@ -87,20 +89,28 @@ const material = new THREE.MeshBasicMaterial({
 
 <p>我们只需制作6种材料，并在创建 <a href="/docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> 时将它们作为一个数组传递给它们。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+-const texture = loader.load( 'resources/images/wall.jpg' );
+-texture.colorSpace = THREE.SRGBColorSpace;
 
 -const material = new THREE.MeshBasicMaterial({
--  map: loader.load('resources/images/wall.jpg'),
+-  map: texture,
 -});
 +const materials = [
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-1.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-2.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-3.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-4.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-5.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-6.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-1.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-2.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-3.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-4.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-5.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-6.jpg')}),
 +];
 -const cube = new THREE.Mesh(geometry, material);
 +const cube = new THREE.Mesh(geometry, materials);
+
++function loadColorTexture( path ) {
++  const texture = loader.load( path );
++  texture.colorSpace = THREE.SRGBColorSpace;
++  return texture;
++}
 </pre>
 <p>有效果了！</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">

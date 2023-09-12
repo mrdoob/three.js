@@ -10,7 +10,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -64,9 +64,9 @@
 
 				scene = new THREE.Scene();
 
-				scene.add( new THREE.AmbientLight( 0x222244 ) );
+				scene.add( new THREE.AmbientLight( 0x999999 ) );
 
-				const light = new THREE.DirectionalLight();
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
 				light.position.set( 0.5, 0.5, 1 );
 				light.castShadow = true;
 				light.shadow.camera.zoom = 4; // tighter shadow map

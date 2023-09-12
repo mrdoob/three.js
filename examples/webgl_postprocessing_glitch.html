@@ -22,7 +22,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -40,8 +40,7 @@
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let camera, scene, renderer, composer;
 			let object, light;
@@ -99,9 +98,9 @@
 
 				}
 
-				scene.add( new THREE.AmbientLight( 0x666666 ) );
+				scene.add( new THREE.AmbientLight( 0xcccccc ) );
 
-				light = new THREE.DirectionalLight( 0xffffff );
+				light = new THREE.DirectionalLight( 0xffffff, 3 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
@@ -113,7 +112,7 @@
 				glitchPass = new GlitchPass();
 				composer.addPass( glitchPass );
 
-				const outputPass = new ShaderPass( GammaCorrectionShader );
+				const outputPass = new OutputPass();
 				composer.addPass( outputPass );
 
 

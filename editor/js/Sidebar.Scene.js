@@ -424,6 +424,10 @@ function SidebarScene( editor ) {
 				environmentType.setValue( 'Equirectangular' );
 				environmentEquirectangularTexture.setValue( scene.environment );
 
+			} else if ( scene.environment.isRenderTargetTexture === true ) {
+
+				environmentType.setValue( 'ModelViewer' );
+
 			}
 
 		} else {
@@ -479,6 +483,8 @@ function SidebarScene( editor ) {
 	signals.editorCleared.add( refreshUI );
 
 	signals.sceneGraphChanged.add( refreshUI );
+
+	signals.sceneEnvironmentChanged.add( refreshUI );
 
 	/*
 	signals.objectChanged.add( function ( object ) {

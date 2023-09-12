@@ -12,7 +12,7 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Materials
 		</div>
 
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -29,7 +29,7 @@
 			import * as THREE from 'three';
 			import * as Nodes from 'three/nodes';
 
-			import { attribute, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, ShaderNode, func, uv, vec2, vec3, vec4, oscSine, triplanarTexture, viewportBottomLeft, js, string, global, loop, MeshBasicNodeMaterial, NodeObjectLoader } from 'three/nodes';
+			import { tslFn, wgslFn, attribute, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportBottomLeft, js, string, global, loop, MeshBasicNodeMaterial, NodeObjectLoader } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -67,7 +67,6 @@
 				// Grid
 
 				const helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
-				helper.material.colorNode = attribute( 'color' );
 				helper.position.y = - 75;
 				scene.add( helper );
 
@@ -145,31 +144,31 @@
 
 				// Custom ShaderNode ( desaturate filter )
 
-				const desaturateShaderNode = new ShaderNode( ( input ) => {
+				const desaturateShaderNode = tslFn( ( input ) => {
 
 					return vec3( 0.299, 0.587, 0.114 ).dot( input.color.xyz );
 
 				} );
 
 				material = new MeshBasicNodeMaterial();
-				material.colorNode = desaturateShaderNode.call( { color: texture( uvTexture ) } );
+				material.colorNode = desaturateShaderNode( { color: texture( uvTexture ) } );
 				materials.push( material );
 
 				// Custom ShaderNode(no inputs) > Approach 2
 
-				const desaturateNoInputsShaderNode = new ShaderNode( () => {
+				const desaturateNoInputsShaderNode = tslFn( () => {
 
 					return vec3( 0.299, 0.587, 0.114 ).dot( texture( uvTexture ).xyz );
 
 				} );
 
 				material = new MeshBasicNodeMaterial();
-				material.colorNode = desaturateNoInputsShaderNode;
+				material.colorNode = desaturateNoInputsShaderNode();
 				materials.push( material );
 
 				// Custom WGSL ( desaturate filter )
 
-				const desaturateWGSLNode = func( `
+				const desaturateWGSLNode = wgslFn( `
 					fn desaturate( color:vec3<f32> ) -> vec3<f32> {
 
 						let lum = vec3<f32>( 0.299, 0.587, 0.114 );
@@ -180,12 +179,12 @@
 				` );
 
 				material = new MeshBasicNodeMaterial();
-				material.colorNode = desaturateWGSLNode.call( { color: texture( uvTexture ) } );
+				material.colorNode = desaturateWGSLNode( { color: texture( uvTexture ) } );
 				materials.push( material );
 
 				// Custom WGSL ( get texture from keywords )
 
-				const getWGSLTextureSample = func( `
+				const getWGSLTextureSample = wgslFn( `
 					fn getWGSLTextureSample( tex: texture_2d<f32>, tex_sampler: sampler, uv:vec2<f32> ) -> vec4<f32> {
 
 						return textureSample( tex, tex_sampler, uv ) * vec4<f32>( 0.0, 1.0, 0.0, 1.0 );
@@ -197,12 +196,12 @@
 				//getWGSLTextureSample.keywords = { tex: textureNode, tex_sampler: sampler( textureNode ) };
 
 				material = new MeshBasicNodeMaterial();
-				material.colorNode = getWGSLTextureSample.call( { tex: textureNode, tex_sampler: textureNode, uv: uv() } );
+				material.colorNode = getWGSLTextureSample( { tex: textureNode, tex_sampler: textureNode, uv: uv() } );
 				materials.push( material );
 
 				// Triplanar Texture Mapping
 				material = new MeshBasicNodeMaterial();
-				material.colorNode = triplanarTexture( texture( uvTexture ) );
+				material.colorNode = triplanarTexture( texture( uvTexture ), null, null, float( .01 ) );
 				materials.push( material );
 
 				// Screen Projection Texture
@@ -359,7 +358,7 @@
 
 				//
 
-				renderer = new WebGPURenderer();
+				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

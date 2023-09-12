@@ -4,7 +4,7 @@ import { bypass } from '../core/BypassNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { cond } from '../math/CondNode.js';
 import { loop } from '../utils/LoopNode.js';
-import { nodeProxy, shader } from '../shadernode/ShaderNode.js';
+import { ShaderNode, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class StackNode extends Node {
 
@@ -39,7 +39,7 @@ class StackNode extends Node {
 
 	if( boolNode, method ) {
 
-		const methodNode = shader( method );
+		const methodNode = new ShaderNode( method );
 		this._currentCond = cond( boolNode, methodNode );
 
 		return this.add( this._currentCond );
@@ -48,7 +48,7 @@ class StackNode extends Node {
 
 	elseif( boolNode, method ) {
 
-		const methodNode = shader( method );
+		const methodNode = new ShaderNode( method );
 		const ifNode = cond( boolNode, methodNode );
 
 		this._currentCond.elseNode = ifNode;
@@ -60,7 +60,7 @@ class StackNode extends Node {
 
 	else( method ) {
 
-		this._currentCond.elseNode = shader( method );
+		this._currentCond.elseNode = new ShaderNode( method );
 
 		return this;
 
@@ -82,7 +82,7 @@ class StackNode extends Node {
 
 		for ( const node of this.nodes ) {
 
-			node.build( builder );
+			node.build( builder, 'void' );
 
 		}
 

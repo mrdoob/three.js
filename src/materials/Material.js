@@ -2,7 +2,7 @@ import { EventDispatcher } from '../core/EventDispatcher.js';
 import { FrontSide, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
 import * as MathUtils from '../math/MathUtils.js';
 
-let materialId = 0;
+let _materialId = 0;
 
 class Material extends EventDispatcher {
 
@@ -12,7 +12,7 @@ class Material extends EventDispatcher {
 
 		this.isMaterial = true;
 
-		Object.defineProperty( this, 'id', { value: materialId ++ } );
+		Object.defineProperty( this, 'id', { value: _materialId ++ } );
 
 		this.uuid = MathUtils.generateUUID();
 
@@ -25,6 +25,7 @@ class Material extends EventDispatcher {
 
 		this.opacity = 1;
 		this.transparent = false;
+		this.alphaHash = false;
 
 		this.blendSrc = SrcAlphaFactor;
 		this.blendDst = OneMinusSrcAlphaFactor;
@@ -353,6 +354,7 @@ class Material extends EventDispatcher {
 		if ( this.dithering === true ) data.dithering = true;
 
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
+		if ( this.alphaHash === true ) data.alphaHash = this.alphaHash;
 		if ( this.alphaToCoverage === true ) data.alphaToCoverage = this.alphaToCoverage;
 		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
 		if ( this.forceSinglePass === true ) data.forceSinglePass = this.forceSinglePass;
@@ -474,6 +476,7 @@ class Material extends EventDispatcher {
 		this.dithering = source.dithering;
 
 		this.alphaTest = source.alphaTest;
+		this.alphaHash = source.alphaHash;
 		this.alphaToCoverage = source.alphaToCoverage;
 		this.premultipliedAlpha = source.premultipliedAlpha;
 		this.forceSinglePass = source.forceSinglePass;

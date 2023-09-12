@@ -23,7 +23,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -136,19 +136,19 @@
 				scene.add( planeLeft );
 
 				// lights
-				const mainLight = new THREE.PointLight( 0xcccccc, 1.5, 250 );
+				const mainLight = new THREE.PointLight( 0xe7e7e7, 2.5, 250, 0 );
 				mainLight.position.y = 60;
 				scene.add( mainLight );
 
-				const greenLight = new THREE.PointLight( 0x00ff00, 0.25, 1000 );
+				const greenLight = new THREE.PointLight( 0x00ff00, 0.5, 1000, 0 );
 				greenLight.position.set( 550, 50, 0 );
 				scene.add( greenLight );
 
-				const redLight = new THREE.PointLight( 0xff0000, 0.25, 1000 );
+				const redLight = new THREE.PointLight( 0xff0000, 0.5, 1000, 0 );
 				redLight.position.set( - 550, 50, 0 );
 				scene.add( redLight );
 
-				const blueLight = new THREE.PointLight( 0x7f7fff, 0.25, 1000 );
+				const blueLight = new THREE.PointLight( 0xbbbbfe, 0.5, 1000, 0 );
 				blueLight.position.set( 0, 50, 550 );
 				scene.add( blueLight );
 

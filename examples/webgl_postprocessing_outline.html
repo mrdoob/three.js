@@ -13,7 +13,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -37,7 +37,7 @@
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 			import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
-			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 
 			let container, stats;
@@ -149,9 +149,9 @@
 
 				//
 
-				scene.add( new THREE.AmbientLight( 0xaaaaaa, 0.2 ) );
+				scene.add( new THREE.AmbientLight( 0xaaaaaa, 0.6 ) );
 
-				const light = new THREE.DirectionalLight( 0xddffdd, 0.6 );
+				const light = new THREE.DirectionalLight( 0xddffdd, 2 );
 				light.position.set( 1, 1, 1 );
 				light.castShadow = true;
 				light.shadow.mapSize.width = 1024;
@@ -262,8 +262,8 @@
 
 				} );
 
-				const gammaPass = new ShaderPass( GammaCorrectionShader );
-				composer.addPass( gammaPass );
+				const outputPass = new OutputPass();
+				composer.addPass( outputPass );
 
 				effectFXAA = new ShaderPass( FXAAShader );
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );

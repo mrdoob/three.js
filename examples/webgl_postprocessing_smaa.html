@@ -15,7 +15,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -35,8 +35,7 @@
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 
 			let camera, scene, renderer, composer, stats;
@@ -88,7 +87,7 @@
 				const pass = new SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
 				composer.addPass( pass );
 
-				const outputPass = new ShaderPass( GammaCorrectionShader );
+				const outputPass = new OutputPass();
 				composer.addPass( outputPass );
 
 				window.addEventListener( 'resize', onWindowResize );

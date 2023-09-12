@@ -31,6 +31,7 @@
 		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 		import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
+		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 		</code>
 
 		<p>
@@ -58,8 +59,8 @@
 
 		<p>
 			Notre composer est maintenant prêt, il est donc possible de configurer la chaîne d'effets de post-processing. Ces effets (passes) sont chargés de la création
-			de l'apparence visuelle finale de l'application. Ils sont traités dans l'ordre de leur ajout/insertion. Dans notre example, l'instance de `RenderPass`
-			est exécutée en première, puis l'instance de `GlitchPass` est exécutée. Le dernier effet activé de la chaîne est automatiquement rendu dans la scène. Le setup
+			de l'apparence visuelle finale de l'application. Ils sont traités dans l'ordre de leur ajout/insertion. In our example, the instance of `RenderPass`
+			is executed first, then the instance of `GlitchPass` and finally `OutputPass`. Le dernier effet activé de la chaîne est automatiquement rendu dans la scène. Le setup
 			des effets ressemble à ça:
 		</p>
 
@@ -69,12 +70,15 @@
 
 		const glitchPass = new GlitchPass();
 		composer.addPass( glitchPass );
+
+		const outputPass = new OutputPass();
+		composer.addPass( outputPass );
 		</code>
 
 		<p>
 			`RenderPass` est normalement placé au début de la chaîne pour fournir la scène rendue en tant qu'entrée pour les prochaines étapes de post-processing. Dans notre cas,
-			`GlitchPass` va utiliser les données de l'image pour appliquer un effet de glitch. Regardez cet [link:https://threejs.org/examples/webgl_postprocessing_glitch exemple live]
-			pour voir cela en action.
+			`GlitchPass` va utiliser les données de l'image pour appliquer un effet de glitch.  `OutputPass` is usually the last pass in the chain which performs sRGB color space conversion and optional tone mapping.
+			Regardez cet [link:https://threejs.org/examples/webgl_postprocessing_glitch exemple live] pour voir cela en action.
 		</p>
 
 		<h2>Effets Intégrés</h2>

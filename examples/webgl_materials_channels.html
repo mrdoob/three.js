@@ -15,7 +15,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -116,17 +116,17 @@
 
 				// lights
 
-				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.1 );
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.3 );
 				scene.add( ambientLight );
 
-				const pointLight = new THREE.PointLight( 0xff0000, 0.5 );
+				const pointLight = new THREE.PointLight( 0xff0000, 1.5, 0, 0 );
 				pointLight.position.z = 2500;
 				scene.add( pointLight );
 
-				const pointLight2 = new THREE.PointLight( 0xff6666, 1 );
+				const pointLight2 = new THREE.PointLight( 0xff6666, 3, 0, 0 );
 				camera.add( pointLight2 );
 
-				const pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
+				const pointLight3 = new THREE.PointLight( 0x0000ff, 1.5, 0, 0 );
 				pointLight3.position.x = - 1000;
 				pointLight3.position.z = 1000;
 				scene.add( pointLight3 );
@@ -199,6 +199,7 @@
 					fragmentShader: VelocityShader.fragmentShader,
 					side: THREE.DoubleSide
 				} );
+				materialVelocity.displacementMap = displacementMap; // required for defines
 				materialVelocity.uniforms.displacementMap.value = displacementMap;
 				materialVelocity.uniforms.displacementScale.value = SCALE;
 				materialVelocity.uniforms.displacementBias.value = BIAS;

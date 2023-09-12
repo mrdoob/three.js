@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -68,10 +68,12 @@
 반환 받은 값을 재질(material)의 <code class="notranslate" translate="no">map</code> 속성에 지정합니다(<code class="notranslate" translate="no">color</code> 속성은 지정하지
 않습니다).</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
++const texture = loader.load( 'resources/images/wall.jpg' );
++texture.colorSpace = THREE.SRGBColorSpace;
 
 const material = new THREE.MeshBasicMaterial({
 -  color: 0xFF8844,
-+  map: loader.load('resources/images/wall.jpg'),
++  map: texture,
 });
 </pre>
 <p>※ <a href="/docs/#api/ko/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>을 사용했으므로 광원을 사용할 필요가 없습니다.</p>
@@ -98,20 +100,28 @@ const material = new THREE.MeshBasicMaterial({
 
 <p>단순히 재질을 6개 만들어 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>를 생성할 때 배열로 넘겨주기만 하면 됩니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+-const texture = loader.load( 'resources/images/wall.jpg' );
+-texture.colorSpace = THREE.SRGBColorSpace;
 
 -const material = new THREE.MeshBasicMaterial({
--  map: loader.load('resources/images/wall.jpg'),
+-  map: texture,
 -});
 +const materials = [
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-1.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-2.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-3.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-4.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-5.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-6.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-1.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-2.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-3.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-4.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-5.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-6.jpg')}),
 +];
 -const cube = new THREE.Mesh(geometry, material);
 +const cube = new THREE.Mesh(geometry, materials);
+
++function loadColorTexture( path ) {
++  const texture = loader.load( path );
++  texture.colorSpace = THREE.SRGBColorSpace;
++  return texture;
++}
 </pre>
 <p>껌이네요.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">

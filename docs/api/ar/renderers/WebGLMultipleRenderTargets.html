@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:WebGLRenderTarget] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		هدف عرض خاص يتيح لشادر الجزء الكتابة إلى عدة
+		قوام. هذا النهج مفيد لتقنيات العرض المتقدمة مثل
+		معالجة ما بعد الإنتاج أو العرض المؤجل. انتبه: [name] يمكن استخدامه فقط
+		مع سياق عرض WebGL 2.
+		</p>
+		 
+		<h2>أمثلة (Examples)</h2>
+		 
+		<p>
+		[example:webgl2_multiple_rendertargets webgl2 / multiple / rendertargets ]
+		</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>
+		[name]([param:Number width], [param:Number height], [param:Number count],
+		[param:Object options])
+		</h3>
+		 
+		<p>
+		[page:Number width] - عرض هدف العرض. الافتراضي هو `1`.<br />
+		[page:Number height] - ارتفاع هدف العرض. الافتراضي هو `1`.<br />
+		[page:Number count] - عدد أهداف العرض. الافتراضي هو `1`.<br />
+		 
+		options - (كائن اختياري يحمل معلمات القوام لـ
+		قوام الهدف المُنشأ تلقائيًا وعمق المخزن/مخططات المخزن booleans. لـ
+		شرح معلمات القوام انظر [page:Texture Texture]. لـ
+		قائمة بالخيارات الصالحة ، انظر [page:WebGLRenderTarget WebGLRenderTarget]).<br /><br />
+		</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		 
+		<h3>[property:Boolean isWebGLMultipleRenderTargets]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان كائنًا معينًا من نوع [name].</p>
+		 
+		<h3>[property:Array texture]</h3>
+		<p>
+		يتم استبدال خاصية القوام في [name] واستبدالها بمصفوفة.
+		تحتوي هذه المصفوفة على مراجع [page:WebGLRenderTarget.texture texture]
+		من أهداف العرض المعنية.
+		</p>
+		 
+		<p>
+		خصائص [page:WebGLRenderTarget WebGLRenderTarget] متوفرة على
+		هذه الفئة.
+		</p>
+		 
+		<h2>الطرق (Methods)</h2>
+		 
+		<p>
+		طرق [page:WebGLRenderTarget WebGLRenderTarget] متوفرة على هذه
+		فئة.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

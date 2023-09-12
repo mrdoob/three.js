@@ -14,7 +14,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -30,38 +30,28 @@
 			import * as THREE from 'three';
 
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-
-			let container;
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, scene, renderer;
-
-			let mouseX = 0, mouseY = 0;
-
-			let windowHalfX = window.innerWidth / 2;
-			let windowHalfY = window.innerHeight / 2;
 
 			let object;
 
 			init();
-			animate();
 
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 250;
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 20 );
+				camera.position.z = 2.5;
 
 				// scene
 
 				scene = new THREE.Scene();
 
-				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				const ambientLight = new THREE.AmbientLight( 0xffffff );
 				scene.add( ambientLight );
 
-				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				const pointLight = new THREE.PointLight( 0xffffff, 15 );
 				camera.add( pointLight );
 				scene.add( camera );
 
@@ -75,8 +65,11 @@
 
 					} );
 
-					object.position.y = - 95;
+					object.position.y = - 0.95;
+					object.scale.setScalar( 0.01 );
 					scene.add( object );
+
+					render();
 
 				}
 
@@ -85,7 +78,7 @@
 				// texture
 
 				const textureLoader = new THREE.TextureLoader( manager );
-				const texture = textureLoader.load( 'textures/uv_grid_opengl.jpg' );
+				const texture = textureLoader.load( 'textures/uv_grid_opengl.jpg', render );
 				texture.colorSpace = THREE.SRGBColorSpace;
 
 				// model
@@ -112,12 +105,17 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove );
+				//
+
+				const controls = new  OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 2;
+				controls.maxDistance = 5;
+				controls.addEventListener( 'change', render );
 
 				//
 
@@ -127,9 +125,6 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
@@ -137,28 +132,7 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX ) / 2;
-				mouseY = ( event.clientY - windowHalfY ) / 2;
-
-			}
-
-			//
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-				render();
-
-			}
-
 			function render() {
-
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
-				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

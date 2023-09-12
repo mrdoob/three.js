@@ -23,17 +23,22 @@ class Pipelines extends DataMap {
 
 	}
 
-	getForCompute( computeNode ) {
+	getForCompute( computeNode, bindings ) {
 
 		const { backend } = this;
 
 		const data = this.get( computeNode );
 
-		if ( data.pipeline === undefined ) {
+		if ( this._needsComputeUpdate( computeNode ) ) {
 
-			// release previous cache
+			const previousPipeline = data.pipeline;
 
-			this._releasePipeline( computeNode );
+			if ( previousPipeline ) {
+
+				previousPipeline.usedTimes --;
+				previousPipeline.computeProgram.usedTimes --;
+
+			}
 
 			// get shader
 
@@ -45,6 +50,8 @@ class Pipelines extends DataMap {
 
 			if ( stageCompute === undefined ) {
 
+				if ( previousPipeline && previousPipeline.computeProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.computeProgram );
+
 				stageCompute = new ProgrammableStage( nodeBuilder.computeShader, 'compute' );
 				this.programs.compute.set( nodeBuilder.computeShader, stageCompute );
 
@@ -54,7 +61,17 @@ class Pipelines extends DataMap {
 
 			// determine compute pipeline
 
-			const pipeline = this._getComputePipeline( stageCompute );
+			const cacheKey = this._getComputeCacheKey( computeNode, stageCompute );
+
+			let pipeline = this.caches.get( cacheKey );
+
+			if ( pipeline === undefined ) {
+
+				if ( previousPipeline && previousPipeline.usedTimes === 0 ) this._releasePipeline( computeNode );
+
+				pipeline = this._getComputePipeline( computeNode, stageCompute, cacheKey, bindings );
+
+			}
 
 			// keep track of all used times
 
@@ -63,6 +80,7 @@ class Pipelines extends DataMap {
 
 			//
 
+			data.version = computeNode.version;
 			data.pipeline = pipeline;
 
 		}
@@ -77,11 +95,17 @@ class Pipelines extends DataMap {
 
 		const data = this.get( renderObject );
 
-		if ( this._needsUpdate( renderObject ) ) {
+		if ( this._needsRenderUpdate( renderObject ) ) {
 
-			// release previous cache
+			const previousPipeline = data.pipeline;
 
-			this._releasePipeline( renderObject );
+			if ( previousPipeline ) {
+
+				previousPipeline.usedTimes --;
+				previousPipeline.vertexProgram.usedTimes --;
+				previousPipeline.fragmentProgram.usedTimes --;
+
+			}
 
 			// get shader
 
@@ -92,6 +116,8 @@ class Pipelines extends DataMap {
 			let stageVertex = this.programs.vertex.get( nodeBuilder.vertexShader );
 
 			if ( stageVertex === undefined ) {
+
+				if ( previousPipeline && previousPipeline.vertexProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.vertexProgram );
 
 				stageVertex = new ProgrammableStage( nodeBuilder.vertexShader, 'vertex' );
 				this.programs.vertex.set( nodeBuilder.vertexShader, stageVertex );
@@ -104,6 +130,8 @@ class Pipelines extends DataMap {
 
 			if ( stageFragment === undefined ) {
 
+				if ( previousPipeline && previousPipeline.fragmentProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.fragmentProgram );
+
 				stageFragment = new ProgrammableStage( nodeBuilder.fragmentShader, 'fragment' );
 				this.programs.fragment.set( nodeBuilder.fragmentShader, stageFragment );
 
@@ -113,7 +141,21 @@ class Pipelines extends DataMap {
 
 			// determine render pipeline
 
-			const pipeline = this._getRenderPipeline( renderObject, stageVertex, stageFragment );
+			const cacheKey = this._getRenderCacheKey( renderObject, stageVertex, stageFragment );
+
+			let pipeline = this.caches.get( cacheKey );
+
+			if ( pipeline === undefined ) {
+
+				if ( previousPipeline && previousPipeline.usedTimes === 0 ) this._releasePipeline( previousPipeline );
+
+				pipeline = this._getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey );
+
+			} else {
+
+				renderObject.pipeline = pipeline;
+
+			}
 
 			// keep track of all used times
 
@@ -133,7 +175,35 @@ class Pipelines extends DataMap {
 
 	delete( object ) {
 
-		this._releasePipeline( object );
+		const pipeline = this.get( object ).pipeline;
+
+		if ( pipeline ) {
+
+			// pipeline
+
+			pipeline.usedTimes --;
+
+			if ( pipeline.usedTimes === 0 ) this._releasePipeline( pipeline );
+
+			// programs
+
+			if ( pipeline.isComputePipeline ) {
+
+				pipeline.computeProgram.usedTimes --;
+
+				if ( pipeline.computeProgram.usedTimes === 0 ) this._releaseProgram( pipeline.computeProgram );
+
+			} else {
+
+				pipeline.fragmentProgram.usedTimes --;
+				pipeline.vertexProgram.usedTimes --;
+
+				if ( pipeline.vertexProgram.usedTimes === 0 ) this._releaseProgram( pipeline.vertexProgram );
+				if ( pipeline.fragmentProgram.usedTimes === 0 ) this._releaseProgram( pipeline.fragmentProgram );
+
+			}
+
+		}
 
 		super.delete( object );
 
@@ -152,11 +222,17 @@ class Pipelines extends DataMap {
 
 	}
 
-	_getComputePipeline( stageCompute ) {
+	updateForRender( renderObject ) {
+
+		this.getForRender( renderObject );
+
+	}
+
+	_getComputePipeline( computeNode, stageCompute, cacheKey, bindings ) {
 
 		// check for existing pipeline
 
-		const cacheKey = 'compute:' + stageCompute.id;
+		cacheKey = cacheKey || this._getComputeCacheKey( computeNode, stageCompute );
 
 		let pipeline = this.caches.get( cacheKey );
 
@@ -166,7 +242,7 @@ class Pipelines extends DataMap {
 
 			this.caches.set( cacheKey, pipeline );
 
-			this.backend.createComputePipeline( pipeline );
+			this.backend.createComputePipeline( pipeline, bindings );
 
 		}
 
@@ -174,11 +250,11 @@ class Pipelines extends DataMap {
 
 	}
 
-	_getRenderPipeline( renderObject, stageVertex, stageFragment ) {
+	_getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey ) {
 
 		// check for existing pipeline
 
-		const cacheKey = this._getRenderCacheKey( renderObject, stageVertex, stageFragment );
+		cacheKey = cacheKey || this._getRenderCacheKey( renderObject, stageVertex, stageFragment );
 
 		let pipeline = this.caches.get( cacheKey );
 
@@ -192,15 +268,15 @@ class Pipelines extends DataMap {
 
 			this.backend.createRenderPipeline( renderObject );
 
-		} else {
-
-			// assign a shared pipeline to renderObject
-
-			renderObject.pipeline = pipeline;
-
 		}
 
 		return pipeline;
+
+	}
+
+	_getComputeCacheKey( computeNode, stageCompute ) {
+
+		return 'compute' + computeNode.id + stageCompute.id;
 
 	}
 
@@ -226,45 +302,30 @@ class Pipelines extends DataMap {
 
 	}
 
-	_releasePipeline( object ) {
+	_releasePipeline( pipeline ) {
 
-		const pipeline = this.get( object ).pipeline;
-
-		//this.bindings.delete( object );
-
-		if ( pipeline && -- pipeline.usedTimes === 0 ) {
-
-			this.caches.delete( pipeline.cacheKey );
-
-			if ( pipeline.isComputePipeline ) {
-
-				this._releaseProgram( pipeline.computeProgram );
-
-			} else {
-
-				this._releaseProgram( pipeline.vertexProgram );
-				this._releaseProgram( pipeline.fragmentProgram );
-
-			}
-
-		}
+		this.caches.delete( pipeline.cacheKey );
 
 	}
 
 	_releaseProgram( program ) {
 
-		if ( -- program.usedTimes === 0 ) {
+		const code = program.code;
+		const stage = program.stage;
 
-			const code = program.code;
-			const stage = program.stage;
-
-			this.programs[ stage ].delete( code );
-
-		}
+		this.programs[ stage ].delete( code );
 
 	}
 
-	_needsUpdate( renderObject ) {
+	_needsComputeUpdate( computeNode ) {
+
+		const data = this.get( computeNode );
+
+		return data.pipeline === undefined || data.version !== computeNode.version;
+
+	}
+
+	_needsRenderUpdate( renderObject ) {
 
 		const data = this.get( renderObject );
 		const material = renderObject.material;
@@ -282,7 +343,7 @@ class Pipelines extends DataMap {
 			data.stencilWrite !== material.stencilWrite || data.stencilFunc !== material.stencilFunc ||
 			data.stencilFail !== material.stencilFail || data.stencilZFail !== material.stencilZFail || data.stencilZPass !== material.stencilZPass ||
 			data.stencilFuncMask !== material.stencilFuncMask || data.stencilWriteMask !== material.stencilWriteMask ||
-			data.side !== material.side
+			data.side !== material.side || data.alphaToCoverage !== material.alphaToCoverage
 		) {
 
 			data.material = material; data.materialVersion = material.version;
@@ -294,13 +355,13 @@ class Pipelines extends DataMap {
 			data.stencilWrite = material.stencilWrite; data.stencilFunc = material.stencilFunc;
 			data.stencilFail = material.stencilFail; data.stencilZFail = material.stencilZFail; data.stencilZPass = material.stencilZPass;
 			data.stencilFuncMask = material.stencilFuncMask; data.stencilWriteMask = material.stencilWriteMask;
-			data.side = material.side;
+			data.side = material.side; data.alphaToCoverage = material.alphaToCoverage;
 
 			needsUpdate = true;
 
 		}
 
-		return needsUpdate || data.pipeline !== undefined;
+		return needsUpdate || data.pipeline === undefined;
 
 	}
 

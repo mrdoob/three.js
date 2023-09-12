@@ -8,10 +8,17 @@ import NodeCache from './NodeCache.js';
 import { createNodeMaterialFromType } from '../materials/NodeMaterial.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
-import { REVISION, NoColorSpace, LinearEncoding, sRGBEncoding, SRGBColorSpace, Color, Vector2, Vector3, Vector4, Float16BufferAttribute } from 'three';
+import {
+	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
+	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
+} from '../../renderers/common/nodes/NodeUniform.js';
+
+import { REVISION, RenderTarget, NoColorSpace, LinearEncoding, sRGBEncoding, SRGBColorSpace, Color, Vector2, Vector3, Vector4, Float16BufferAttribute } from 'three';
 
 import { stack } from './StackNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
+
+import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 
 const typeFromLength = new Map( [
 	[ 2, 'vec2' ],
@@ -43,13 +50,14 @@ const toFloat = ( value ) => {
 
 class NodeBuilder {
 
-	constructor( object, renderer, parser ) {
+	constructor( object, renderer, parser, scene = null ) {
 
 		this.object = object;
-		this.material = object && ( object.material || null );
-		this.geometry = object && ( object.geometry || null );
+		this.material = ( object && object.material ) || null;
+		this.geometry = ( object && object.geometry ) || null;
 		this.renderer = renderer;
 		this.parser = parser;
+		this.scene = scene;
 
 		this.nodes = [];
 		this.updateNodes = [];
@@ -68,6 +76,7 @@ class NodeBuilder {
 		this.flowNodes = { vertex: [], fragment: [], compute: [] };
 		this.flowCode = { vertex: '', fragment: '', compute: [] };
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
+		this.structs = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.codes = { vertex: [], fragment: [], compute: [] };
 		this.bindings = { vertex: [], fragment: [], compute: [] };
 		this.bindingsOffset = { vertex: 0, fragment: 0, compute: 0 };
@@ -97,9 +106,35 @@ class NodeBuilder {
 
 	}
 
+	getRenderTarget( width, height, options ) {
+
+		return new RenderTarget( width, height, options );
+
+	}
+
+	getCubeRenderTarget( size, options ) {
+
+		return new CubeRenderTarget( size, options );
+
+	}
+
 	includes( node ) {
 
 		return this.nodes.includes( node );
+
+	}
+
+	createBindings() {
+
+		const bindingsArray = [];
+
+		for ( const binding of this.getBindings() ) {
+
+			bindingsArray.push( binding.clone() );
+
+		}
+
+		return bindingsArray;
 
 	}
 
@@ -127,14 +162,26 @@ class NodeBuilder {
 
 	addNode( node ) {
 
-		if ( this.nodes.indexOf( node ) === - 1 ) {
+		if ( this.nodes.includes( node ) === false ) {
+
+			this.nodes.push( node );
+
+			this.setHashNode( node, node.getHash( this ) );
+
+		}
+
+	}
+
+	buildUpdateNodes() {
+
+		for ( const node of this.nodes ) {
 
 			const updateType = node.getUpdateType();
 			const updateBeforeType = node.getUpdateBeforeType();
 
 			if ( updateType !== NodeUpdateType.NONE ) {
 
-				this.updateNodes.push( node );
+				this.updateNodes.push( node.getSelf() );
 
 			}
 
@@ -143,10 +190,6 @@ class NodeBuilder {
 				this.updateBeforeNodes.push( node );
 
 			}
-
-			this.nodes.push( node );
-
-			this.setHashNode( node, node.getHash( this ) );
 
 		}
 
@@ -231,6 +274,12 @@ class NodeBuilder {
 	isAvailable( /*name*/ ) {
 
 		return false;
+
+	}
+
+	getVertexIndex() {
+
+		console.warn( 'Abstract function.' );
 
 	}
 
@@ -324,6 +373,8 @@ class NodeBuilder {
 
 	getType( type ) {
 
+		if ( type === 'color' ) return 'vec3';
+
 		return type;
 
 	}
@@ -387,6 +438,12 @@ class NodeBuilder {
 	isReference( type ) {
 
 		return type === 'void' || type === 'property' || type === 'sampler' || type === 'texture' || type === 'cubeTexture';
+
+	}
+
+	needsColorSpaceToLinear( /*texture*/ ) {
+
+		return false;
 
 	}
 
@@ -548,17 +605,19 @@ class NodeBuilder {
 
 		if ( nodeData === undefined ) {
 
-			nodeData = { vertex: {}, fragment: {}, compute: {} };
+			nodeData = {};
 
 			cache.setNodeData( node, nodeData );
 
 		}
 
-		return shaderStage !== null ? nodeData[ shaderStage ] : nodeData;
+		if ( nodeData[ shaderStage ] === undefined ) nodeData[ shaderStage ] = {};
+
+		return nodeData[ shaderStage ];
 
 	}
 
-	getNodeProperties( node, shaderStage = this.shaderStage ) {
+	getNodeProperties( node, shaderStage = 'any' ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
@@ -588,7 +647,28 @@ class NodeBuilder {
 
 	}
 
-	getUniformFromNode( node, type, shaderStage = this.shaderStage ) {
+	getStructTypeFromNode( node, shaderStage = this.shaderStage, name = null ) {
+
+		const nodeData = this.getDataFromNode( node, shaderStage );
+
+		let nodeStruct = nodeData.structType;
+
+		if ( nodeStruct === undefined ) {
+
+			const index = this.structs.index ++;
+
+			node.name = `StructType${index}`;
+			this.structs[ shaderStage ].push( node );
+
+			nodeData.structType = node;
+
+		}
+
+		return node;
+
+	}
+
+	getUniformFromNode( node, type, shaderStage = this.shaderStage, name = null ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
@@ -598,7 +678,7 @@ class NodeBuilder {
 
 			const index = this.uniforms.index ++;
 
-			nodeUniform = new NodeUniform( 'nodeUniform' + index, type, node );
+			nodeUniform = new NodeUniform( name || ( 'nodeUniform' + index ), type, node );
 
 			this.uniforms[ shaderStage ].push( nodeUniform );
 
@@ -635,7 +715,7 @@ class NodeBuilder {
 
 	getVaryingFromNode( node, type ) {
 
-		const nodeData = this.getDataFromNode( node, null );
+		const nodeData = this.getDataFromNode( node, 'any' );
 
 		let nodeVarying = nodeData.varying;
 
@@ -799,7 +879,7 @@ class NodeBuilder {
 
 	getVar( type, name ) {
 
-		return `${type} ${name}`;
+		return `${ this.getType( type ) } ${ name }`;
 
 	}
 
@@ -923,8 +1003,23 @@ class NodeBuilder {
 		// stage 4: build code for a specific output
 
 		this.buildCode();
+		this.buildUpdateNodes();
 
 		return this;
+
+	}
+
+	getNodeUniform( uniformNode, type ) {
+
+		if ( type === 'float' ) return new FloatNodeUniform( uniformNode );
+		if ( type === 'vec2' ) return new Vector2NodeUniform( uniformNode );
+		if ( type === 'vec3' ) return new Vector3NodeUniform( uniformNode );
+		if ( type === 'vec4' ) return new Vector4NodeUniform( uniformNode );
+		if ( type === 'color' ) return new ColorNodeUniform( uniformNode );
+		if ( type === 'mat3' ) return new Matrix3NodeUniform( uniformNode );
+		if ( type === 'mat4' ) return new Matrix4NodeUniform( uniformNode );
+
+		throw new Error( `Uniform "${type}" not declared.` );
 
 	}
 

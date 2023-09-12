@@ -1,8 +1,8 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import { shininess, specularColor } from '../core/PropertyNode.js';
 import { materialShininess, materialSpecularColor } from '../accessors/MaterialNode.js';
-import phongLightingModel from '../functions/PhongLightingModel.js';
 import { float } from '../shadernode/ShaderNode.js';
+import PhongLightingModel from '../functions/PhongLightingModel.js';
 
 import { MeshPhongMaterial } from 'three';
 
@@ -29,7 +29,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	constructLightingModel( /*builder*/ ) {
 
-		return phongLightingModel;
+		return new PhongLightingModel();
 
 	}
 
@@ -51,17 +51,8 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	copy( source ) {
 
-		this.colorNode = source.colorNode;
-		this.opacityNode = source.opacityNode;
-
-		this.alphaTestNode = source.alphaTestNode;
-
 		this.shininessNode = source.shininessNode;
 		this.specularNode = source.specularNode;
-
-		this.lightNode = source.lightNode;
-
-		this.positionNode = source.positionNode;
 
 		return super.copy( source );
 

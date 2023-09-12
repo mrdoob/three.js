@@ -16,7 +16,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -91,7 +91,7 @@
 
 				// lights
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.05 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.15 );
 				dirLight.position.set( 0, - 1, 0 ).normalize();
 				dirLight.color.setHSL( 0.1, 0.7, 0.5 );
 				scene.add( dirLight );
@@ -108,7 +108,7 @@
 
 				function addLight( h, s, l, x, y, z ) {
 
-					const light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
+					const light = new THREE.PointLight( 0xffffff, 1.5, 2000, 0 );
 					light.color.setHSL( h, s, l );
 					light.position.set( x, y, z );
 					scene.add( light );

@@ -13,7 +13,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -62,9 +62,9 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x404040 ) );
+				scene.add( new THREE.AmbientLight( 0x404040, 3 ) );
 
-				spotLight = new THREE.SpotLight( 0xffffff );
+				spotLight = new THREE.SpotLight( 0xffffff, 500 );
 				spotLight.name = 'Spot Light';
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.3;
@@ -78,7 +78,7 @@
 
 				scene.add( new THREE.CameraHelper( spotLight.shadow.camera ) );
 
-				dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
 				dirLight.name = 'Dir. Light';
 				dirLight.position.set( 0, 10, 0 );
 				dirLight.castShadow = true;

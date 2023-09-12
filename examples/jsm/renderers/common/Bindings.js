@@ -34,9 +34,7 @@ class Bindings extends DataMap {
 
 			this._init( bindings );
 
-			const pipeline = this.pipelines.getForRender( renderObject );
-
-			this.backend.createBindings( bindings, pipeline );
+			this.backend.createBindings( bindings );
 
 		}
 
@@ -58,9 +56,7 @@ class Bindings extends DataMap {
 
 			this._init( bindings );
 
-			const pipeline = this.pipelines.getForCompute( computeNode );
-
-			this.backend.createBindings( bindings, pipeline );
+			this.backend.createBindings( bindings );
 
 		}
 
@@ -84,9 +80,11 @@ class Bindings extends DataMap {
 
 		for ( const binding of bindings ) {
 
-			if ( binding.isSampler || binding.isSampledTexture ) {
+			if ( binding.isSampledTexture ) {
 
-				this.textures.updateTexture( binding.texture );
+				const store = binding.store === true;
+
+				this.textures.updateTexture( binding.texture, { store } );
 
 			} else if ( binding.isStorageBuffer ) {
 
@@ -113,10 +111,9 @@ class Bindings extends DataMap {
 
 		for ( const binding of bindings ) {
 
-			const isShared = binding.isShared;
 			const isUpdated = updateMap.get( binding ) === frame;
 
-			if ( isShared && isUpdated ) continue;
+			if ( isUpdated ) continue;
 
 			if ( binding.isUniformBuffer ) {
 

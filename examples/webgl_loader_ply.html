@@ -15,7 +15,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -112,10 +112,10 @@
 
 				// Lights
 
-				scene.add( new THREE.HemisphereLight( 0x8d7c7c, 0x494966 ) );
+				scene.add( new THREE.HemisphereLight( 0x8d7c7c, 0x494966, 3 ) );
 
-				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
-				addShadowedLight( 0.5, 1, - 1, 0xffd500, 1 );
+				addShadowedLight( 1, 1, 1, 0xffffff, 3.5 );
+				addShadowedLight( 0.5, 1, - 1, 0xffd500, 3 );
 
 				// renderer
 

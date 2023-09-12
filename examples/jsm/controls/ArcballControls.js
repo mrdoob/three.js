@@ -199,6 +199,7 @@ class ArcballControls extends EventDispatcher {
 		this.cursorZoom = false;	//if wheel zoom should be cursor centered
 		this.minFov = 5;
 		this.maxFov = 90;
+		this.rotateSpeed = 1;
 
 		this.enabled = true;
 		this.enablePan = true;
@@ -445,7 +446,7 @@ class ArcballControls extends EventDispatcher {
 
 							const distance = this._startCursorPosition.distanceTo( this._currentCursorPosition );
 							const angle = this._startCursorPosition.angleTo( this._currentCursorPosition );
-							const amount = Math.max( distance / this._tbRadius, angle ); //effective rotation angle
+							const amount = Math.max( distance / this._tbRadius, angle ) * this.rotateSpeed; //effective rotation angle
 
 							this.applyTransformMatrix( this.rotate( this.calculateRotationAxis( this._startCursorPosition, this._currentCursorPosition ), amount ) );
 

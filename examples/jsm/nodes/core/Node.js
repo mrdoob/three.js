@@ -1,3 +1,4 @@
+import { EventDispatcher } from 'three';
 import { NodeUpdateType } from './constants.js';
 import { getNodeChildren, getCacheKey } from './NodeUtils.js';
 import { MathUtils } from 'three';
@@ -6,11 +7,11 @@ const NodeClasses = new Map();
 
 let _nodeId = 0;
 
-class Node {
+class Node extends EventDispatcher {
 
 	constructor( nodeType = null ) {
 
-		this.isNode = true;
+		super();
 
 		this.nodeType = nodeType;
 
@@ -19,6 +20,8 @@ class Node {
 
 		this.uuid = MathUtils.generateUUID();
 
+		this.isNode = true;
+
 		Object.defineProperty( this, 'id', { value: _nodeId ++ } );
 
 	}
@@ -26,6 +29,14 @@ class Node {
 	get type() {
 
 		return this.constructor.name;
+
+	}
+
+	getSelf() {
+
+		// Returns non-node object.
+
+		return this.self || this;
 
 	}
 
@@ -41,25 +52,20 @@ class Node {
 
 		for ( const { property, index, childNode } of getNodeChildren( this ) ) {
 
-			if ( index !== undefined ) {
+			yield { childNode, replaceNode( node ) {
 
-				yield { childNode, replaceNode( node ) {
+				if ( index === undefined ) self[ property ] = node;
+				else self[ property ][ index ] = node;
 
-					self[ property ][ index ] = node;
-
-				} };
-
-			} else {
-
-				yield { childNode, replaceNode( node ) {
-
-					self[ property ] = node;
-
-				} };
-
-			}
+			} };
 
 		}
+
+	}
+
+	dispose() {
+
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
@@ -99,7 +105,15 @@ class Node {
 
 	}
 
-	getNodeType( /*builder*/ ) {
+	getNodeType( builder ) {
+
+		const nodeProperties = builder.getNodeProperties( this );
+
+		if ( nodeProperties.outputNode ) {
+
+			return nodeProperties.outputNode.getNodeType( builder );
+
+		}
 
 		return this.nodeType;
 
@@ -206,8 +220,16 @@ class Node {
 
 			if ( properties.initialized !== true || builder.context.tempRead === false ) {
 
+				const stackNodesBeforeConstruct = builder.stack.nodes.length;
+
 				properties.initialized = true;
 				properties.outputNode = this.construct( builder );
+
+				if ( properties.outputNode !== null && builder.stack.nodes.length !== stackNodesBeforeConstruct ) {
+
+					properties.outputNode = builder.stack;
+
+				}
 
 				for ( const childNode of Object.values( properties ) ) {
 

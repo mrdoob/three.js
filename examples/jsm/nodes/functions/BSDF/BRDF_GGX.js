@@ -3,12 +3,13 @@ import V_GGX_SmithCorrelated from './V_GGX_SmithCorrelated.js';
 import D_GGX from './D_GGX.js';
 import { transformedNormalView } from '../../accessors/NormalNode.js';
 import { positionViewDirection } from '../../accessors/PositionNode.js';
-import { ShaderNode } from '../../shadernode/ShaderNode.js';
+import { iridescence } from '../../core/PropertyNode.js';
+import { tslFn } from '../../shadernode/ShaderNode.js';
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-const BRDF_GGX = new ShaderNode( ( inputs ) => {
+const BRDF_GGX = tslFn( ( inputs ) => {
 
-	const { lightDirection, f0, f90, roughness } = inputs;
+	const { lightDirection, f0, f90, roughness, iridescenceFresnel } = inputs;
 
 	const normalView = inputs.normalView || transformedNormalView;
 
@@ -21,9 +22,16 @@ const BRDF_GGX = new ShaderNode( ( inputs ) => {
 	const dotNH = normalView.dot( halfDir ).clamp();
 	const dotVH = positionViewDirection.dot( halfDir ).clamp();
 
-	const F = F_Schlick.call( { f0, f90, dotVH } );
-	const V = V_GGX_SmithCorrelated.call( { alpha, dotNL, dotNV } );
-	const D = D_GGX.call( { alpha, dotNH } );
+	let F = F_Schlick( { f0, f90, dotVH } );
+
+	if ( iridescenceFresnel ) {
+
+		F = iridescence.mix( F, iridescenceFresnel );
+
+	}
+
+	const V = V_GGX_SmithCorrelated( { alpha, dotNL, dotNV } );
+	const D = D_GGX( { alpha, dotNH } );
 
 	return F.mul( V ).mul( D );
 

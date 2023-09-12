@@ -17,7 +17,7 @@
 
 	<!-- Import maps polyfill -->
 	<!-- Remove this when import maps will be widely supported -->
-	<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+	<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 	<script type="importmap">
 		{
@@ -254,9 +254,10 @@
 
 						const offset = entity.getComponent( OffsetFromCamera );
 						const object = entity.getComponent( Object3D ).object;
-						object.position.x = camera.position.x + offset.x;
-						object.position.y = camera.position.y + offset.y;
-						object.position.z = camera.position.z + offset.z;
+						const xrCamera = this.renderer.xr.getCamera();
+						object.position.x = xrCamera.position.x + offset.x;
+						object.position.y = xrCamera.position.y + offset.y;
+						object.position.z = xrCamera.position.z + offset.z;
 						entity.removeComponent( NeedCalibration );
 
 					}
@@ -302,9 +303,9 @@
 			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 			camera.position.set( 0, 1.2, 0.3 );
 
-			scene.add( new THREE.HemisphereLight( 0xcccccc, 0x999999 ) );
+			scene.add( new THREE.HemisphereLight( 0xcccccc, 0x999999, 3 ) );
 
-			const light = new THREE.DirectionalLight( 0xffffff );
+			const light = new THREE.DirectionalLight( 0xffffff, 3 );
 			light.position.set( 0, 6, 0 );
 			light.castShadow = true;
 			light.shadow.camera.top = 2;
@@ -319,7 +320,8 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
 			renderer.xr.enabled = true;
-			renderer.xr.setUserCamera( camera );
+			renderer.xr.cameraAutoUpdate = false;
+
 			container.appendChild( renderer.domElement );
 
 			document.body.appendChild( VRButton.createButton( renderer ) );
@@ -514,6 +516,7 @@
 
 			const delta = clock.getDelta();
 			const elapsedTime = clock.elapsedTime;
+			renderer.xr.updateCamera( camera );
 			world.execute( delta, elapsedTime );
 			renderer.render( scene, camera );
 

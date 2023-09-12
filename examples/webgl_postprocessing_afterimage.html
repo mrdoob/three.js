@@ -10,7 +10,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -30,8 +30,7 @@
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { AfterimagePass } from 'three/addons/postprocessing/AfterimagePass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let camera, scene, renderer, composer;
 			let mesh;
@@ -74,7 +73,7 @@
 				afterimagePass = new AfterimagePass();
 				composer.addPass( afterimagePass );
 
-				const outputPass = new ShaderPass( GammaCorrectionShader );
+				const outputPass = new OutputPass();
 				composer.addPass( outputPass );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -95,7 +94,7 @@
 
 			function createGUI() {
 
-				const gui = new GUI( { name: 'Damp setting' } );
+				const gui = new GUI( { title: 'Damp setting' } );
 				gui.add( afterimagePass.uniforms[ 'damp' ], 'value', 0, 1 ).step( 0.001 );
 				gui.add( params, 'enable' );
 
@@ -116,15 +115,10 @@
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
 
-				if ( params.enable ) {
+				afterimagePass.enabled = params.enable;
 
-					composer.render();
+				composer.render();
 
-				} else {
-
-					renderer.render( scene, camera );
-
-				}
 
 			}
 

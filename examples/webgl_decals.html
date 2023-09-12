@@ -16,7 +16,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -111,13 +111,13 @@
 				controls.minDistance = 50;
 				controls.maxDistance = 200;
 
-				scene.add( new THREE.AmbientLight( 0x443333 ) );
+				scene.add( new THREE.AmbientLight( 0x666666 ) );
 
-				const dirLight1 = new THREE.DirectionalLight( 0xffddcc, 1 );
+				const dirLight1 = new THREE.DirectionalLight( 0xffddcc, 3 );
 				dirLight1.position.set( 1, 0.75, 0.5 );
 				scene.add( dirLight1 );
 
-				const dirLight2 = new THREE.DirectionalLight( 0xccccff, 1 );
+				const dirLight2 = new THREE.DirectionalLight( 0xccccff, 3 );
 				dirLight2.position.set( - 1, 0.75, - 0.5 );
 				scene.add( dirLight2 );
 
@@ -267,6 +267,7 @@
 				material.color.setHex( Math.random() * 0xffffff );
 
 				const m = new THREE.Mesh( new DecalGeometry( mesh, position, orientation, size ), material );
+				m.renderOrder = decals.length; // give decals a fixed render order
 
 				decals.push( m );
 				scene.add( m );

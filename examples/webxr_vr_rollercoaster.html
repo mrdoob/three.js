@@ -9,7 +9,7 @@
 	<body>
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -35,12 +35,21 @@
 
 			let mesh, material, geometry;
 
+			const renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.xr.enabled = true;
+			renderer.xr.setReferenceSpaceType( 'local' );
+			document.body.appendChild( renderer.domElement );
+
+			document.body.appendChild( VRButton.createButton( renderer ) );
+
 			//
 
 			const scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xf0f0ff );
 
-			const light = new THREE.HemisphereLight( 0xfff0f0, 0x606066 );
+			const light = new THREE.HemisphereLight( 0xfff0f0, 0x60606, 3 );
 			light.position.set( 1, 1, 1 );
 			scene.add( light );
 
@@ -178,16 +187,6 @@
 			funfairs.push( mesh );
 
 			//
-
-			const renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.xr.enabled = true;
-			renderer.xr.setReferenceSpaceType( 'local' );
-			renderer.xr.setUserCamera( camera );
-			document.body.appendChild( renderer.domElement );
-
-			document.body.appendChild( VRButton.createButton( renderer ) );
 
 			window.addEventListener( 'resize', onWindowResize );
 

@@ -17,7 +17,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -43,7 +43,8 @@
 			const params = {
 				exposure: 1.0,
 				toneMapping: 'ACESFilmic',
-				blurriness: 0.3
+				blurriness: 0.3,
+				intensity: 1.0,
 			};
 
 			const toneMappingOptions = {
@@ -71,18 +72,23 @@
 				renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
 				renderer.toneMappingExposure = params.exposure;
 
-
 				// Set CustomToneMapping to Uncharted2
 				// source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
 
 				THREE.ShaderChunk.tonemapping_pars_fragment = THREE.ShaderChunk.tonemapping_pars_fragment.replace(
+
 					'vec3 CustomToneMapping( vec3 color ) { return color; }',
+
 					`#define Uncharted2Helper( x ) max( ( ( x * ( 0.15 * x + 0.10 * 0.50 ) + 0.20 * 0.02 ) / ( x * ( 0.15 * x + 0.50 ) + 0.20 * 0.30 ) ) - 0.02 / 0.30, vec3( 0.0 ) )
+
 					float toneMappingWhitePoint = 1.0;
+
 					vec3 CustomToneMapping( vec3 color ) {
 						color *= toneMappingExposure;
 						return saturate( Uncharted2Helper( color ) / Uncharted2Helper( vec3( toneMappingWhitePoint ) ) );
+
 					}`
+
 				);
 
 				scene = new THREE.Scene();
@@ -125,19 +131,22 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 				gui = new GUI();
-
-				gui.add( params, 'toneMapping', Object.keys( toneMappingOptions ) )
+				const toneMappingFolder = gui.addFolder( 'tone mapping' );
+			
+				toneMappingFolder.add( params, 'toneMapping', Object.keys( toneMappingOptions ) )
 
 					.onChange( function () {
 
-						updateGUI();
+						updateGUI( toneMappingFolder );
 
 						renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
 						render();
 
 					} );
 
-				gui.add( params, 'blurriness', 0, 1 )
+				const backgroundFolder = gui.addFolder( 'background' );
+
+				backgroundFolder.add( params, 'blurriness', 0, 1 )
 
 					.onChange( function ( value ) {
 
@@ -146,13 +155,22 @@
 
 					} );
 
-				updateGUI();
+				backgroundFolder.add( params, 'intensity', 0, 1 )
+
+					.onChange( function ( value ) {
+
+						scene.backgroundIntensity = value;
+						render();
+
+					} );
+
+				updateGUI( toneMappingFolder );
 
 				gui.open();
 
 			}
 
-			function updateGUI() {
+			function updateGUI( folder ) {
 
 				if ( guiExposure !== null ) {
 
@@ -163,7 +181,7 @@
 
 				if ( params.toneMapping !== 'None' ) {
 
-					guiExposure = gui.add( params, 'exposure', 0, 2 )
+					guiExposure = folder.add( params, 'exposure', 0, 2 )
 
 						.onChange( function () {
 

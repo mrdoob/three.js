@@ -29,6 +29,7 @@ class RenderContext {
 		this.texture = null;
 		this.depthTexture = null;
 		this.activeCubeFace = 0;
+		this.sampleCount = 1;
 
 	}
 

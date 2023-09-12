@@ -51,6 +51,7 @@ varying vec3 vWorldPosition;
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <alphatest_pars_fragment>
+#include <alphahash_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
 void main () {
@@ -62,6 +63,7 @@ void main () {
 	#include <map_fragment>
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
+	#include <alphahash_fragment>
 
 	float dist = length( vWorldPosition - referencePosition );
 	dist = ( dist - nearDistance ) / ( farDistance - nearDistance );

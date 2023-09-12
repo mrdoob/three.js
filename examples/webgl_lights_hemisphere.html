@@ -57,7 +57,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -99,7 +99,7 @@
 
 				// LIGHTS
 
-				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 2 );
 				hemiLight.color.setHSL( 0.6, 1, 0.6 );
 				hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
 				hemiLight.position.set( 0, 50, 0 );
@@ -110,7 +110,7 @@
 
 				//
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
 				dirLight.color.setHSL( 0.1, 1, 0.95 );
 				dirLight.position.set( - 1, 1.75, 1 );
 				dirLight.position.multiplyScalar( 30 );

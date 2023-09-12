@@ -75,12 +75,6 @@ export default QUnit.module( 'Renderers', () => {
 
 		} );
 
-		QUnit.todo( 'physicallyCorrectLights', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.todo( 'toneMapping', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );

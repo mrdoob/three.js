@@ -25,7 +25,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -50,7 +50,7 @@
 				onPointerDownLon = 0,
 				onPointerDownLat = 0;
 
-			const distance = 50;
+			const distance = .5;
 
 			init();
 			animate();
@@ -59,11 +59,11 @@
 
 				const container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, .25, 10 );
 
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.SphereGeometry( 500, 60, 40 );
+				const geometry = new THREE.SphereGeometry( 5, 60, 40 );
 				// invert the geometry on the x-axis so that all of the faces point inward
 				geometry.scale( - 1, 1, 1 );
 

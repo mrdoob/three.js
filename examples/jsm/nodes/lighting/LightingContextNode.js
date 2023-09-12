@@ -6,11 +6,11 @@ import { addNodeElement, nodeProxy, float, vec3 } from '../shadernode/ShaderNode
 
 class LightingContextNode extends ContextNode {
 
-	constructor( node, lightingModelNode = null, backdropNode = null, backdropAlphaNode = null ) {
+	constructor( node, lightingModel = null, backdropNode = null, backdropAlphaNode = null ) {
 
 		super( node );
 
-		this.lightingModelNode = lightingModelNode;
+		this.lightingModel = lightingModel;
 		this.backdropNode = backdropNode;
 		this.backdropAlphaNode = backdropAlphaNode;
 
@@ -24,7 +24,7 @@ class LightingContextNode extends ContextNode {
 
 	construct( builder ) {
 
-		const { lightingModelNode, backdropNode, backdropAlphaNode } = this;
+		const { lightingModel, backdropNode, backdropAlphaNode } = this;
 
 		const context = this.context = {}; // reset context
 		const properties = builder.getNodeProperties( this );
@@ -61,17 +61,20 @@ class LightingContextNode extends ContextNode {
 		};
 
 		context.reflectedLight = reflectedLight;
-		context.lightingModelNode = lightingModelNode || context.lightingModelNode;
+		context.lightingModel = lightingModel || context.lightingModel;
 
 		Object.assign( properties, reflectedLight, lighting );
 		Object.assign( context, lighting );
 
-		// @TODO: Call needed return a new node ( or rename the ShaderNodeInternal.call() function ), it's not moment to run
-		if ( lightingModelNode && lightingModelNode.init ) lightingModelNode.init.call( context, builder.stack, builder );
+		if ( lightingModel ) {
 
-		if ( lightingModelNode && lightingModelNode.indirectDiffuse ) lightingModelNode.indirectDiffuse.call( context, builder.stack, builder );
-		if ( lightingModelNode && lightingModelNode.indirectSpecular ) lightingModelNode.indirectSpecular.call( context, builder.stack, builder );
-		if ( lightingModelNode && lightingModelNode.ambientOcclusion ) lightingModelNode.ambientOcclusion.call( context, builder.stack, builder );
+			lightingModel.init( context, builder.stack, builder );
+
+			lightingModel.indirectDiffuse( context, builder.stack, builder );
+			lightingModel.indirectSpecular( context, builder.stack, builder );
+			lightingModel.ambientOcclusion( context, builder.stack, builder );
+
+		}
 
 		return super.construct( builder );
 

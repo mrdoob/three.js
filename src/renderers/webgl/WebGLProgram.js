@@ -1,7 +1,8 @@
 import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
-import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GLSL3, LinearSRGBColorSpace, SRGBColorSpace } from '../../constants.js';
+import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GLSL3, LinearSRGBColorSpace, SRGBColorSpace, LinearDisplayP3ColorSpace, DisplayP3ColorSpace, P3Primaries, Rec709Primaries } from '../../constants.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
 
 let programIdCount = 0;
 
@@ -26,15 +27,38 @@ function handleSource( string, errorLine ) {
 
 function getEncodingComponents( colorSpace ) {
 
+	const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
+	const encodingPrimaries = ColorManagement.getPrimaries( colorSpace );
+
+	let gamutMapping;
+
+	if ( workingPrimaries === encodingPrimaries ) {
+
+		gamutMapping = '';
+
+	} else if ( workingPrimaries === P3Primaries && encodingPrimaries === Rec709Primaries ) {
+
+		gamutMapping = 'LinearDisplayP3ToLinearSRGB';
+
+	} else if ( workingPrimaries === Rec709Primaries && encodingPrimaries === P3Primaries ) {
+
+		gamutMapping = 'LinearSRGBToLinearDisplayP3';
+
+	}
+
 	switch ( colorSpace ) {
 
 		case LinearSRGBColorSpace:
-			return [ 'Linear', '( value )' ];
+		case LinearDisplayP3ColorSpace:
+			return [ gamutMapping, 'LinearTransferOETF' ];
+
 		case SRGBColorSpace:
-			return [ 'sRGB', '( value )' ];
+		case DisplayP3ColorSpace:
+			return [ gamutMapping, 'sRGBTransferOETF' ];
+
 		default:
 			console.warn( 'THREE.WebGLProgram: Unsupported color space:', colorSpace );
-			return [ 'Linear', '( value )' ];
+			return [ gamutMapping, 'LinearTransferOETF' ];
 
 	}
 
@@ -67,7 +91,7 @@ function getShaderErrors( gl, shader, type ) {
 function getTexelEncodingFunction( functionName, colorSpace ) {
 
 	const components = getEncodingComponents( colorSpace );
-	return 'vec4 ' + functionName + '( vec4 value ) { return LinearTo' + components[ 0 ] + components[ 1 ] + '; }';
+	return `vec4 ${functionName}( vec4 value ) { return ${components[ 0 ]}( ${components[ 1 ]}( value ) ); }`;
 
 }
 
@@ -211,13 +235,30 @@ function resolveIncludes( string ) {
 
 }
 
+const shaderChunkMap = new Map( [
+	[ 'encodings_fragment', 'colorspace_fragment' ], // @deprecated, r154
+	[ 'encodings_pars_fragment', 'colorspace_pars_fragment' ], // @deprecated, r154
+	[ 'output_fragment', 'opaque_fragment' ], // @deprecated, r154
+] );
+
 function includeReplacer( match, include ) {
 
-	const string = ShaderChunk[ include ];
+	let string = ShaderChunk[ include ];
 
 	if ( string === undefined ) {
 
-		throw new Error( 'Can not resolve #include <' + include + '>' );
+		const newInclude = shaderChunkMap.get( include );
+
+		if ( newInclude !== undefined ) {
+
+			string = ShaderChunk[ newInclude ];
+			console.warn( 'THREE.WebGLRenderer: Shader chunk "%s" has been deprecated. Use "%s" instead.', include, newInclude );
+
+		} else {
+
+			throw new Error( 'Can not resolve #include <' + include + '>' );
+
+		}
 
 	}
 
@@ -477,6 +518,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.displacementMap ? '#define USE_DISPLACEMENTMAP' : '',
 			parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
 
+			parameters.anisotropy ? '#define USE_ANISOTROPY' : '',
 			parameters.anisotropyMap ? '#define USE_ANISOTROPYMAP' : '',
 
 			parameters.clearcoatMap ? '#define USE_CLEARCOATMAP' : '',
@@ -493,6 +535,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
+			parameters.alphaHash ? '#define USE_ALPHAHASH' : '',
 
 			parameters.transmission ? '#define USE_TRANSMISSION' : '',
 			parameters.transmissionMap ? '#define USE_TRANSMISSIONMAP' : '',
@@ -714,6 +757,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 			parameters.alphaTest ? '#define USE_ALPHATEST' : '',
+			parameters.alphaHash ? '#define USE_ALPHAHASH' : '',
 
 			parameters.sheen ? '#define USE_SHEEN' : '',
 			parameters.sheenColorMap ? '#define USE_SHEEN_COLORMAP' : '',
@@ -746,6 +790,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.useLegacyLights ? '#define LEGACY_LIGHTS' : '',
 
+			parameters.decodeVideoTexture ? '#define DECODE_VIDEO_TEXTURE' : '',
+
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 			( parameters.logarithmicDepthBuffer && parameters.rendererExtensionFragDepth ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
 
@@ -760,7 +806,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.dithering ? '#define DITHERING' : '',
 			parameters.opaque ? '#define OPAQUE' : '',
 
-			ShaderChunk[ 'encodings_pars_fragment' ], // this code is required here because it is used by the various encoding/decoding function defined below
+			ShaderChunk[ 'colorspace_pars_fragment' ], // this code is required here because it is used by the various encoding/decoding function defined below
 			getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputColorSpace ),
 
 			parameters.useDepthPacking ? '#define DEPTH_PACKING ' + parameters.depthPacking : '',
