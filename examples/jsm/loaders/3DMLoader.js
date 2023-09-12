@@ -499,7 +499,7 @@ class Rhino3dmLoader extends Loader {
 
 							} else {
 
-								matId = null
+								matId = null;
 
 							}
 
@@ -509,11 +509,11 @@ class Rhino3dmLoader extends Loader {
 
 							if ( attributes.materialIndex >= 0 ) {
 
-								matId = attributes.materialIndex
+								matId = attributes.materialIndex;
 
 							} else {
 
-								matId = null
+								matId = null;
 
 							}
 
@@ -619,7 +619,7 @@ class Rhino3dmLoader extends Loader {
 		}
 
 		object.userData[ 'materials' ] = this.materials;
-		object.name = ''
+		object.name = '';
 		return object;
 
 	}
