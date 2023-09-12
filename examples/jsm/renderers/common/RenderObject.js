@@ -26,7 +26,7 @@ export default class RenderObject {
 
 		this.initialCacheKey = this.getCacheKey();
 
-		this._nodeBuilder = null;
+		this._nodeBuilderState = null;
 		this._bindings = null;
 
 		this.onDispose = null;
@@ -43,15 +43,15 @@ export default class RenderObject {
 
 	}
 
-	getNodeBuilder() {
+	getNodeBuilderState() {
 
-		return this._nodeBuilder || ( this._nodeBuilder = this._nodes.getForRender( this ) );
+		return this._nodeBuilderState || ( this._nodeBuilderState = this._nodes.getForRender( this ) );
 
 	}
 
 	getBindings() {
 
-		return this._bindings || ( this._bindings = this.getNodeBuilder().createBindings() );
+		return this._bindings || ( this._bindings = this.getNodeBuilderState().createBindings() );
 
 	}
 
@@ -71,7 +71,7 @@ export default class RenderObject {
 
 		if ( this.attributes !== null ) return this.attributes;
 
-		const nodeAttributes = this.getNodeBuilder().getAttributesArray();
+		const nodeAttributes = this.getNodeBuilderState().nodeAttributes;
 		const geometry = this.geometry;
 
 		const attributes = [];

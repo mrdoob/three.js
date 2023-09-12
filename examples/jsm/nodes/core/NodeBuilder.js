@@ -124,20 +124,6 @@ class NodeBuilder {
 
 	}
 
-	createBindings() {
-
-		const bindingsArray = [];
-
-		for ( const binding of this.getBindings() ) {
-
-			bindingsArray.push( binding.clone() );
-
-		}
-
-		return bindingsArray;
-
-	}
-
 	getBindings() {
 
 		let bindingsArray = this.bindingsArray;
