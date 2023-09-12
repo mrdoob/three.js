@@ -111,9 +111,20 @@ export default class RenderObject {
 
 		for ( const property in material ) {
 
-			if ( /^(_|is[A-Z])|^(visible|version|uuid|name|userData)$/.test( property ) ) continue;
+			if ( /^(is[A-Z])|^(visible|version|uuid|name|opacity|userData)$/.test( property ) ) continue;
 
-			cacheKey += /*property + ':' +*/ String( material[ property ] ) + ',';
+			let value = material[ property ];
+
+			if ( value !== null ) {
+
+				const type = typeof value;
+
+				if ( type === 'number' ) value = value !== 0 ? '1' : '0'; // Convert to on/off, important to clearcoat, transmission, etc
+				else if ( type === 'object' ) value = '{}';
+
+			}
+
+			cacheKey += /*property + ':' +*/ value + ',';
 
 		}
 
