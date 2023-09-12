@@ -114,6 +114,29 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	}
 
+	setWidths( array ) {
+
+		let widths;
+
+		if ( array instanceof Float32Array ) {
+
+			widths = array;
+
+		} else if ( Array.isArray( array ) ) {
+
+			widths = new Float32Array( array );
+
+		}
+
+		const instanceWidthBuffer = new InstancedInterleavedBuffer( widths, 2, 1 );
+
+		this.setAttribute( 'instanceWidthStart', new InterleavedBufferAttribute( instanceWidthBuffer, 1, 0 ) );
+		this.setAttribute( 'instanceWidthEnd', new InterleavedBufferAttribute( instanceWidthBuffer, 1, 1 ) );
+
+		return this;
+
+	}
+
 	fromWireframeGeometry( geometry ) {
 
 		this.setPositions( geometry.attributes.position.array );

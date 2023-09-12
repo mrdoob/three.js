@@ -62,6 +62,27 @@ class LineGeometry extends LineSegmentsGeometry {
 
 	}
 
+	setWidths( array ) {
+
+		// converts [ w1, w2 ] to pairs format
+
+		const length = array.length - 1;
+		const widths = new Float32Array( 2 * length );
+
+		for ( let i = 0; i < length; i ++ ) {
+
+			widths[ 2 * i ] = array[ i ];
+
+			widths[ 2 * i + 1 ] = array[ i + 1 ];
+
+		}
+
+		super.setWidths( widths );
+
+		return this;
+
+	}
+
 	fromLine( line ) {
 
 		const geometry = line.geometry;
