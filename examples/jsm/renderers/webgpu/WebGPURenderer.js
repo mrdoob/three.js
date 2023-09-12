@@ -22,7 +22,7 @@ class WebGPURenderer extends Renderer {
 
 		let BackendClass;
 
-		if ( ! WebGPU.isAvailable() ) {
+		if ( WebGPU.isAvailable() ) {
 
 			BackendClass = WebGPUBackend;
 
