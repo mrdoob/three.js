@@ -96,7 +96,6 @@ function Loader( editor ) {
 						object.name = filename;
 
 						editor.execute( new AddObjectCommand( editor, object ) );
-						console.log( object )
 
 					}, function ( error ) {
 
