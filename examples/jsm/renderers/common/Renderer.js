@@ -280,11 +280,15 @@ class Renderer {
 
 			renderContext.textures = renderTargetData.textures;
 			renderContext.depthTexture = renderTargetData.depthTexture;
+			renderContext.width = renderTargetData.width;
+			renderContext.height = renderTargetData.height;
 
 		} else {
 
 			renderContext.textures = null;
 			renderContext.depthTexture = null;
+			renderContext.width = this.domElement.width;
+			renderContext.height = this.domElement.height;
 
 		}
 

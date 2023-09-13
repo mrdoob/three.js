@@ -232,9 +232,6 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			renderContext.height = Math.floor( textures[ 0 ].source.data.height );
-			renderContext.width = Math.floor( textures[ 0 ].source.data.width );
-
 		} else {
 
 			if ( antialias === true ) {
@@ -250,9 +247,6 @@ class WebGPUBackend extends Backend {
 			}
 
 			depthStencilAttachment.view = this._getDepthBufferGPU( renderContext ).createView();
-
-			renderContext.height = this.colorBuffer.height;
-			renderContext.width = this.colorBuffer.width;
 
 		}
 
