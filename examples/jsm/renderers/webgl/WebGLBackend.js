@@ -273,7 +273,7 @@ class WebGLBackend extends Backend {
 			const bindingData = this.get( binding );
 			const index = bindingData.index;
 
-			if ( binding.isUniformsGroup ) {
+			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
 				gl.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
 
@@ -628,7 +628,7 @@ class WebGLBackend extends Backend {
 			const bindingData = this.get( binding );
 			const index = bindingData.index;
 
-			if ( binding.isUniformsGroup ) {
+			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
 				const location = gl.getUniformBlockIndex( programGPU, binding.name );
 				gl.uniformBlockBinding( programGPU, location, index );
@@ -735,7 +735,7 @@ class WebGLBackend extends Backend {
 
 		for ( const binding of bindings ) {
 
-			if ( binding.isUniformsGroup ) {
+			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
 				const bufferGPU = gl.createBuffer();
 				const data = binding.buffer;
@@ -769,7 +769,7 @@ class WebGLBackend extends Backend {
 
 		const gl = this.gl;
 
-		if ( binding.isUniformsGroup ) {
+		if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
 			const bindingData = this.get( binding );
 			const bufferGPU = bindingData.bufferGPU;
