@@ -138,7 +138,6 @@ class WebGPUBackend extends Backend {
 		const device = this.device;
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
-		let bufferHeight;
 		let occlusionQuerySet;
 
 		if ( occlusionQueryCount > 0 ) {
