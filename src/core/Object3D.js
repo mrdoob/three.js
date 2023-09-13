@@ -26,7 +26,6 @@ const _addedEvent = { type: 'added' };
 const _removedEvent = { type: 'removed' };
 
 const _inverse = /*@__PURE__*/ new Matrix4();
-const _keepTransform = Symbol();
 
 class Object3D extends EventDispatcher {
 
@@ -308,81 +307,12 @@ class Object3D extends EventDispatcher {
 
 	add( ... objects ) {
 
-		const isAttach = ( objects[ 1 ] === _keepTransform );
-
-		if ( isAttach ) {
-
-			objects = objects[ 0 ];
-
-			this.updateWorldMatrix( true, false );
-			_inverse.copy( this.matrixWorld ).invert();
-
-		}
-
-		const caller = isAttach ? 'attach' : 'add';
-
 		for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
 			const object = objects[ i ];
 
-			if ( ! object || ! object.isObject3D ) {
-
-				console.error( `THREE.Object3D.${caller}: object is not a THREE.Object3D instance`, object );
-				continue;
-
-			}
-
-			let isAncestor = false;
-
-			for ( let i = this; i !== null; i = i.parent ) {
-
-				if ( i === object ) {
-
-					isAncestor = true;
-					break;
-
-				}
-
-			}
-
-			if ( isAncestor ) {
-
-				console.error( `THREE.Object3D.${caller}: object cannot be an ancestor of itself`, object );
-				continue;
-
-			}
-
-			if ( isAttach ) {
-
-				// adds object as a child of this, while maintaining the object's world transform
-
-				// Note: This method does not support scene graphs having non-uniformly-scaled node(s)
-
-				if ( object.parent !== null ) {
-
-					object.parent.updateWorldMatrix( true, false );
-
-					_m1.multiplyMatrices( _inverse, object.parent.matrixWorld );
-
-					object.applyMatrix4( _m1 );
-
-				} else {
-
-					object.applyMatrix4( _inverse );
-
-				}
-
-				object.removeFromParent().parent = this;
-				this.children.push( object );
-
-				object.updateWorldMatrix( false, true );
-
-			} else {
-
-				object.removeFromParent().parent = this;
-				this.children.push( object );
-
-			}
+			object.removeFromParent().parent = this;
+			this.children.push( object );
 
 			object.dispatchEvent( _addedEvent );
 
@@ -443,7 +373,42 @@ class Object3D extends EventDispatcher {
 
 	attach( ... objects ) {
 
-		return this.add( objects, _keepTransform );
+		// adds object as a child of this, while maintaining the object's world transform
+
+		// Note: This method does not support scene graphs having non-uniformly-scaled node(s)
+
+		this.updateWorldMatrix( true, false );
+
+		_inverse.copy( this.matrixWorld ).invert();
+
+		for ( let i = 0, l = objects.length; i < l; i ++ ) {
+
+			const object = objects[ i ];
+
+			if ( object.parent !== null ) {
+
+				object.parent.updateWorldMatrix( true, false );
+
+				_m1.multiplyMatrices( _inverse, object.parent.matrixWorld );
+
+				object.applyMatrix4( _m1 );
+
+			} else {
+
+				object.applyMatrix4( _inverse );
+
+			}
+
+			object.removeFromParent().parent = this;
+			this.children.push( object );
+
+			object.updateWorldMatrix( false, true );
+
+			object.dispatchEvent( _addedEvent );
+
+		}
+
+		return this;
 
 	}
 
