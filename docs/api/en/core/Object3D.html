@@ -261,6 +261,8 @@
 			be added. Any current parent on an object passed in here will be removed,
 			since an object can have at most one parent.<br /><br />
 
+			Note: `object` must neither be `this`, nor ancestor of `this`.<br /><br />
+
 			See [page:Group] for info on manually grouping objects.
 		</p>
 
@@ -273,10 +275,15 @@
 		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>Applies the rotation represented by the quaternion to the object.</p>
 
-		<h3>[method:this attach]( [param:Object3D object] )</h3>
+		<h3>[method:this attach]( [param:Object3D object], ... )</h3>
 		<p>
 			Adds `object` as a child of this, while maintaining the object's world
-			transform.<br /><br />
+			transform. An arbitrary number of objects may be attached. Any current
+			parent on an object passed in here will be removed, since an object can
+			have at most one parent.<br /><br />
+
+			Note: `object` must neither be `this`, nor ancestor of `this`.<br /><br />
+
 			Note: This method does not support scene graphs having
 			non-uniformly-scaled nodes(s).
 		</p>

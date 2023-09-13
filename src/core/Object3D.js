@@ -25,6 +25,8 @@ const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 const _addedEvent = { type: 'added' };
 const _removedEvent = { type: 'removed' };
 
+const _inverse = /*@__PURE__*/ new Matrix4();
+
 class Object3D extends EventDispatcher {
 
 	constructor() {
@@ -303,43 +305,16 @@ class Object3D extends EventDispatcher {
 
 	}
 
-	add( object ) {
+	add( ... objects ) {
 
-		if ( arguments.length > 1 ) {
+		for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
-			for ( let i = 0; i < arguments.length; i ++ ) {
+			const object = objects[ i ];
 
-				this.add( arguments[ i ] );
-
-			}
-
-			return this;
-
-		}
-
-		if ( object === this ) {
-
-			console.error( 'THREE.Object3D.add: object can\'t be added as a child of itself.', object );
-			return this;
-
-		}
-
-		if ( object && object.isObject3D ) {
-
-			if ( object.parent !== null ) {
-
-				object.parent.remove( object );
-
-			}
-
-			object.parent = this;
+			object.removeFromParent().parent = this;
 			this.children.push( object );
 
 			object.dispatchEvent( _addedEvent );
-
-		} else {
-
-			console.error( 'THREE.Object3D.add: object not an instance of THREE.Object3D.', object );
 
 		}
 
@@ -396,29 +371,42 @@ class Object3D extends EventDispatcher {
 
 	}
 
-	attach( object ) {
+	attach( ... objects ) {
 
 		// adds object as a child of this, while maintaining the object's world transform
 
-		// Note: This method does not support scene graphs having non-uniformly-scaled nodes(s)
+		// Note: This method does not support scene graphs having non-uniformly-scaled node(s)
 
 		this.updateWorldMatrix( true, false );
 
-		_m1.copy( this.matrixWorld ).invert();
+		_inverse.copy( this.matrixWorld ).invert();
 
-		if ( object.parent !== null ) {
+		for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
-			object.parent.updateWorldMatrix( true, false );
+			const object = objects[ i ];
 
-			_m1.multiply( object.parent.matrixWorld );
+			if ( object.parent !== null ) {
+
+				object.parent.updateWorldMatrix( true, false );
+
+				_m1.multiplyMatrices( _inverse, object.parent.matrixWorld );
+
+				object.applyMatrix4( _m1 );
+
+			} else {
+
+				object.applyMatrix4( _inverse );
+
+			}
+
+			object.removeFromParent().parent = this;
+			this.children.push( object );
+
+			object.updateWorldMatrix( false, true );
+
+			object.dispatchEvent( _addedEvent );
 
 		}
-
-		object.applyMatrix4( _m1 );
-
-		this.add( object );
-
-		object.updateWorldMatrix( false, true );
 
 		return this;
 
