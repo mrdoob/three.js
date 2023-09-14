@@ -2,13 +2,13 @@ import { Quaternion } from '../math/Quaternion.js';
 import { AdditiveAnimationBlendMode } from '../constants.js';
 
 // same as Array.prototype.slice, but also works on typed arrays
-function arraySlice( array, from, to ) {
+function arraySlice( array, from, to = - 1 ) {
 
 	if ( isTypedArray( array ) ) {
 
 		// in ios9 array.subarray(from, undefined) will return empty array
 		// but array.subarray(from) or array.subarray(from, len) is correct
-		return new array.constructor( array.subarray( from, to !== undefined ? to : array.length ) );
+		return new array.constructor( array.subarray( from, to ) );
 
 	}
 
