@@ -94,7 +94,7 @@ class Texture extends EventDispatcher {
 
 	}
 
-	set image( value = null ) {
+	set image( value ) {
 
 		this.source.data = value;
 
