@@ -190,16 +190,16 @@ class WebGLBackend extends Backend {
 
 		//
 
+		const instanceCount = this.getInstanceCount( renderObject );
 
 		if ( index !== null ) {
 
 			const indexData = this.get( index );
-
 			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
 
-			if ( geometry.isInstancedBufferGeometry ) {
+			if ( instanceCount > 1 ) {
 
-				gl.drawElementsInstanced( mode, index.count, indexData.type, firstVertex, geometry.instanceCount );
+				gl.drawElementsInstanced( mode, index.count, indexData.type, firstVertex, instanceCount );
 
 			} else {
 
@@ -215,9 +215,9 @@ class WebGLBackend extends Backend {
 			const positionAttribute = geometry.attributes.position;
 			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : positionAttribute.count;
 
-			if ( geometry.isInstancedBufferGeometry ) {
+			if ( instanceCount > 1 ) {
 
-				gl.drawArraysInstanced( mode, 0, vertexCount, geometry.instanceCount );
+				gl.drawArraysInstanced( mode, 0, vertexCount, instanceCount );
 
 			} else {
 
@@ -517,7 +517,7 @@ class WebGLBackend extends Backend {
 
 			gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, false, stride, offset );
 
-			if ( attribute.isInstancedBufferAttribute ) {
+			if ( attribute.isInstancedBufferAttribute && ! attribute.isInterleavedBufferAttribute ) {
 
 				gl.vertexAttribDivisor( i, attribute.meshPerAttribute );
 
@@ -632,9 +632,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	updateAttribute( /*attribute*/ ) {
+	updateAttribute( attribute ) {
 
-		console.warn( 'Abstract class.' );
+		this.attributeUtils.updateAttribute( attribute );
 
 	}
 

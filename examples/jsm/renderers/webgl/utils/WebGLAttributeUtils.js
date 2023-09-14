@@ -3,7 +3,6 @@ class WebGLAttributeUtils {
 	constructor( backend ) {
 
 		this.backend = backend;
-		this.buffers = new WeakMap();
 
 	}
 
@@ -15,7 +14,10 @@ class WebGLAttributeUtils {
 		const array = attribute.array;
 		const usage = attribute.usage || gl.STATIC_DRAW;
 
-		let bufferGPU = this.buffers.get( array );
+		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
+		const bufferData = backend.get( bufferAttribute );
+
+		let bufferGPU = bufferData.bufferGPU;
 
 		if ( bufferGPU === undefined ) {
 
@@ -25,7 +27,9 @@ class WebGLAttributeUtils {
 			gl.bufferData( bufferType, array, usage );
 			gl.bindBuffer( bufferType, null );
 
-			this.buffers.set( array, bufferGPU );
+			bufferData.bufferGPU = bufferGPU;
+			bufferData.bufferType = bufferType;
+			bufferData.version = bufferAttribute.version;
 
 		}
 
@@ -82,9 +86,26 @@ class WebGLAttributeUtils {
 		backend.set( attribute, {
 			bufferGPU,
 			type,
-			bytesPerElement: array.BYTES_PER_ELEMENT,
-			version: attribute.version
+			bytesPerElement: array.BYTES_PER_ELEMENT
 		} );
+
+	}
+
+	updateAttribute( attribute ) {
+
+		const backend = this.backend;
+		const { gl } = backend;
+
+		const array = attribute.array;
+		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
+		const bufferData = backend.get( bufferAttribute );
+		const bufferType = bufferData.bufferType;
+
+		gl.bindBuffer( bufferType, bufferData.bufferGPU );
+		gl.bufferSubData( bufferType, 0, array );
+		gl.bindBuffer( bufferType, null );
+
+		bufferData.version = bufferAttribute.version++;
 
 	}
 
