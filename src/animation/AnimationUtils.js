@@ -2,7 +2,7 @@ import { Quaternion } from '../math/Quaternion.js';
 import { AdditiveAnimationBlendMode } from '../constants.js';
 
 // same as Array.prototype.slice, but also works on typed arrays
-function arraySlice( array, from, to = - 1 ) {
+function arraySlice( array, from, to = array.length ) {
 
 	if ( isTypedArray( array ) ) {
 
