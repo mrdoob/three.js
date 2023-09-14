@@ -30,19 +30,26 @@ export function glsl() {
 
 		transform( code, id ) {
 
-			if ( /\.glsl.js$/.test( id ) === false ) return;
-
 			code = new MagicString( code );
 
 			code.replace( /\/\* glsl \*\/\`(.*?)\`/sg, function ( match, p1 ) {
 
 				return JSON.stringify(
 					p1
-						.trim()
-						.replace( /\r/g, '' )
-						.replace( /[ \t]*\/\/.*\n/g, '' ) // remove //
-						.replace( /[ \t]*\/\*[\s\S]*?\*\//g, '' ) // remove /* */
-						.replace( /\n{2,}/g, '\n' ) // # \n+ to \n
+						.replace(/\/\*(.*?)\*\//gs, m => /\n/.test(m) ? '\n' : '') // replace multiline block comment
+						.replace(/\/\/.*$/gm, '\n') // replace line comment with '\n'
+						.replace(/\s*\n\s*/g, '\n') // remove wsp around '\n'
+						.replace(/[ \r\t]+/g, ' ') // reduce wsp (non LF) in a row
+						.replace(/^\s+/gm, '') // remove leading wsp
+						.replace(/0\.(\d)/g, '.$1') // number: remove zero before '.'; '0.1' -> '.1'
+						.replace(/(\d+)\.0+(\D|$)/gm, '$1.$2') // number: remove zeros after '.'; '1.0000' -> '1.'
+						.replace(/(?<!^#.*)(?:[ \r\t])*([=+*/?:!|&<>{}()[\];.,-])\s*(?!#)/gm, '$1') // nonmacro: remove wsp around seps
+						.replace(/^#[^\n]*/gm, (m) => // macro
+							m.replace(/\s*([=+*/?:!|&<>{}[\];.,-])\s/g, '$1') // remove wsp around seps, except braces
+							.replace(/\([ \r\t]*(.*?)/g, '($1') // remove wsp after '('
+							.replace(/(.*?)[ \r\t]*\)/g, '$1)') // remove wsp before ')'
+							.replace(/\)[ \r\t]*([&|])/g, ')$1') // remove wsp after ')' if next nonwsp ch is '&' or '|'
+						)
 				);
 
 			} );
