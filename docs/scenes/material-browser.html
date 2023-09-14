@@ -530,7 +530,8 @@
 					envMaps: envMapKeysPBR[ 0 ],
 					map: diffuseMapKeys[ 0 ],
 					roughnessMap: roughnessMapKeys[ 0 ],
-					alphaMap: alphaMapKeys[ 0 ]
+					alphaMap: alphaMapKeys[ 0 ],
+					metalnessMap: alphaMapKeys[ 0 ]
 				};
 
 				const folder = gui.addFolder( 'THREE.MeshStandardMaterial' );
@@ -548,8 +549,7 @@
 				folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
 				folder.add( data, 'roughnessMap', roughnessMapKeys ).onChange( updateTexture( material, 'roughnessMap', roughnessMaps ) );
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
-
-				// TODO metalnessMap
+				folder.add( data, 'metalnessMap', alphaMapKeys ).onChange( updateTexture( material, 'metalnessMap', alphaMaps ) );
 
 			}
 
@@ -561,7 +561,11 @@
 					envMaps: envMapKeys[ 0 ],
 					map: diffuseMapKeys[ 0 ],
 					roughnessMap: roughnessMapKeys[ 0 ],
-					alphaMap: alphaMapKeys[ 0 ]
+					alphaMap: alphaMapKeys[ 0 ],
+					metalnessMap: alphaMapKeys[ 0 ],
+					sheenColor: 0xffffff,
+					specularColor: material.specularColor.getHex(),
+					iridescenceMap: alphaMapKeys[ 0 ]
 				};
 
 				const folder = gui.addFolder( 'THREE.MeshPhysicalMaterial' );
@@ -571,9 +575,17 @@
 
 				folder.add( material, 'roughness', 0, 1 );
 				folder.add( material, 'metalness', 0, 1 );
+				folder.add( material, 'ior', 1, 2.333 );
 				folder.add( material, 'reflectivity', 0, 1 );
+				folder.add( material, 'iridescence', 0, 1 );
+				folder.add( material, 'iridescenceIOR', 1, 2.333 );
+				folder.add( material, 'sheen', 0, 1 );
+				folder.add( material, 'sheenRoughness', 0, 1 );
+				folder.addColor( data, 'sheenColor' ).onChange( handleColorChange( material.sheenColor ) );
 				folder.add( material, 'clearcoat', 0, 1 ).step( 0.01 );
 				folder.add( material, 'clearcoatRoughness', 0, 1 ).step( 0.01 );
+				folder.add( material, 'specularIntensity', 0, 1);
+				folder.addColor( data, 'specularColor' ).onChange( handleColorChange( material.specularColor ) );
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'wireframe' );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
@@ -582,8 +594,8 @@
 				folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
 				folder.add( data, 'roughnessMap', roughnessMapKeys ).onChange( updateTexture( material, 'roughnessMap', roughnessMaps ) );
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
-
-				// TODO metalnessMap
+				folder.add( data, 'metalnessMap', alphaMapKeys ).onChange( updateTexture( material, 'metalnessMap', alphaMaps ) );
+				folder.add( data, 'iridescenceMap', alphaMapKeys ).onChange( updateTexture( material, 'iridescenceMap', alphaMaps ) );
 
 			}
 
@@ -678,10 +690,6 @@
 						guiMaterial( gui, mesh, material, geometry );
 						guiMeshPhysicalMaterial( gui, mesh, material, geometry );
 
-						// only use scene environment
-
-						light1.visible = false;
-						light2.visible = false;
 						light3.visible = false;
 
 						return material;
