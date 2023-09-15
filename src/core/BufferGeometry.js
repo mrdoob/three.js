@@ -27,8 +27,6 @@ class BufferGeometry extends EventDispatcher {
 
 		this.isBufferGeometry = true;
 
-		Object.defineProperty( this, 'id', { value: _id ++ } );
-
 		this.uuid = MathUtils.generateUUID();
 
 		this.name = '';
@@ -48,6 +46,12 @@ class BufferGeometry extends EventDispatcher {
 		this.drawRange = { start: 0, count: Infinity };
 
 		this.userData = {};
+
+	}
+
+	get id() {
+
+		return _id ++;
 
 	}
 

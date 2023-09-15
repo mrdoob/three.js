@@ -33,8 +33,6 @@ class Object3D extends EventDispatcher {
 
 		this.isObject3D = true;
 
-		Object.defineProperty( this, 'id', { value: _object3DId ++ } );
-
 		this.uuid = MathUtils.generateUUID();
 
 		this.name = '';
@@ -114,6 +112,12 @@ class Object3D extends EventDispatcher {
 		this.animations = [];
 
 		this.userData = {};
+
+	}
+
+	get id() {
+
+		return _object3DId ++;
 
 	}
 

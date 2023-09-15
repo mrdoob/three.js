@@ -11,12 +11,16 @@ class UniformsGroup extends EventDispatcher {
 
 		this.isUniformsGroup = true;
 
-		Object.defineProperty( this, 'id', { value: _id ++ } );
-
 		this.name = '';
 
 		this.usage = StaticDrawUsage;
 		this.uniforms = [];
+
+	}
+
+	get id() {
+
+		return _id ++;
 
 	}
 

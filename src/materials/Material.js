@@ -12,8 +12,6 @@ class Material extends EventDispatcher {
 
 		this.isMaterial = true;
 
-		Object.defineProperty( this, 'id', { value: _materialId ++ } );
-
 		this.uuid = MathUtils.generateUUID();
 
 		this.name = '';
@@ -76,6 +74,12 @@ class Material extends EventDispatcher {
 		this.version = 0;
 
 		this._alphaTest = 0;
+
+	}
+
+	get id() {
+
+		return _materialId ++;
 
 	}
 

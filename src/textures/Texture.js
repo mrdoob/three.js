@@ -29,8 +29,6 @@ class Texture extends EventDispatcher {
 
 		this.isTexture = true;
 
-		Object.defineProperty( this, 'id', { value: _textureId ++ } );
-
 		this.uuid = MathUtils.generateUUID();
 
 		this.name = '';
@@ -85,6 +83,12 @@ class Texture extends EventDispatcher {
 
 		this.isRenderTargetTexture = false; // indicates whether a texture belongs to a render target or not
 		this.needsPMREMUpdate = false; // indicates whether this texture should be processed by PMREMGenerator or not (only relevant for render target textures)
+
+	}
+
+	get id() {
+
+		return _textureId ++;
 
 	}
 
