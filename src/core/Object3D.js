@@ -66,17 +66,10 @@ class Object3D extends EventDispatcher {
 		rotation._onChange( onRotationChange );
 		quaternion._onChange( onQuaternionChange );
 
+		this.rotation = rotation;
+		this.quaternion = quaternion;
+
 		Object.defineProperties( this, {
-			rotation: {
-				configurable: true,
-				enumerable: true,
-				value: rotation
-			},
-			quaternion: {
-				configurable: true,
-				enumerable: true,
-				value: quaternion
-			},
 			modelViewMatrix: {
 				value: new Matrix4()
 			},
