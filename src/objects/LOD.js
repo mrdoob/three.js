@@ -14,15 +14,9 @@ class LOD extends Object3D {
 
 		this.type = 'LOD';
 
-		Object.defineProperties( this, {
-			levels: {
-				enumerable: true,
-				value: []
-			},
-			isLOD: {
-				value: true,
-			}
-		} );
+		this.isLOD = true;
+
+		this.levels = [];
 
 		this.autoUpdate = true;
 
