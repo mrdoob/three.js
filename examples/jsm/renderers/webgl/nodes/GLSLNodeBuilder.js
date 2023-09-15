@@ -4,7 +4,8 @@ import UniformsGroup from '../../common/UniformsGroup.js';
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
 const glslMethods = {
-	[ MathNode.ATAN2 ]: 'atan'
+	[ MathNode.ATAN2 ]: 'atan',
+	textureDimensions: 'textureSize'
 };
 
 const precisionLib = {
@@ -34,6 +35,10 @@ class GLSLNodeBuilder extends NodeBuilder {
 		if ( texture.isTextureCube ) {
 
 			return `textureCube( ${textureProperty}, ${uvSnippet} )`;
+
+		} else if ( texture.isDepthTexture ) {
+
+			return `texture( ${textureProperty}, ${uvSnippet} ).x`;
 
 		} else {
 
