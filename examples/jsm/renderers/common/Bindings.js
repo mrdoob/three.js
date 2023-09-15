@@ -82,9 +82,7 @@ class Bindings extends DataMap {
 
 			if ( binding.isSampledTexture ) {
 
-				const store = binding.store === true;
-
-				this.textures.updateTexture( binding.texture, { store } );
+				this.textures.updateTexture( binding.texture );
 
 			} else if ( binding.isStorageBuffer ) {
 

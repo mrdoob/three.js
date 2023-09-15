@@ -153,9 +153,7 @@ class Textures extends DataMap {
 
 		//
 
-		if ( isRenderTarget || options.store === true ) {
-
-			//if ( options.store === true ) options.levels = 1; /* no mipmaps? */
+		if ( isRenderTarget || texture.isStorageTexture === true ) {
 
 			backend.createSampler( texture );
 			backend.createTexture( texture, options );
