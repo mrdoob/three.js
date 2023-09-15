@@ -45,10 +45,11 @@ class Object3D extends EventDispatcher {
 
 		this.up = Object3D.DEFAULT_UP.clone();
 
-		const position = new Vector3();
+		this.position = new Vector3();
+		this.scale = new Vector3( 1, 1, 1 );
+
 		const rotation = new Euler();
 		const quaternion = new Quaternion();
-		const scale = new Vector3( 1, 1, 1 );
 
 		function onRotationChange() {
 
@@ -66,11 +67,6 @@ class Object3D extends EventDispatcher {
 		quaternion._onChange( onQuaternionChange );
 
 		Object.defineProperties( this, {
-			position: {
-				configurable: true,
-				enumerable: true,
-				value: position
-			},
 			rotation: {
 				configurable: true,
 				enumerable: true,
@@ -80,11 +76,6 @@ class Object3D extends EventDispatcher {
 				configurable: true,
 				enumerable: true,
 				value: quaternion
-			},
-			scale: {
-				configurable: true,
-				enumerable: true,
-				value: scale
 			},
 			modelViewMatrix: {
 				value: new Matrix4()
