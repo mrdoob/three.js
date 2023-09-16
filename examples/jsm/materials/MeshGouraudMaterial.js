@@ -97,13 +97,21 @@ const GouraudShader = {
 
 			vIndirectFront += getAmbientLightIrradiance( ambientLightColor );
 
-			vIndirectFront += getLightProbeIrradiance( lightProbe, geometry.normal );
+			#if defined( USE_LIGHT_PROBES )
+
+				vIndirectFront += getLightProbeIrradiance( lightProbe, geometry.normal );
+
+			#endif
 
 			#ifdef DOUBLE_SIDED
 
 				vIndirectBack += getAmbientLightIrradiance( ambientLightColor );
 
-				vIndirectBack += getLightProbeIrradiance( lightProbe, backGeometry.normal );
+				#if defined( USE_LIGHT_PROBES )
+
+					vIndirectBack += getLightProbeIrradiance( lightProbe, backGeometry.normal );
+
+				#endif
 
 			#endif
 
