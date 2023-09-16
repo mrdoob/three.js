@@ -24993,7 +24993,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( renderTarget.depthBuffer && ! renderTarget.stencilBuffer ) {
 
-				let glInternalFormat = _gl.DEPTH_COMPONENT16;
+				let glInternalFormat = ( isWebGL2 === true ) ? _gl.DEPTH_COMPONENT24 : _gl.DEPTH_COMPONENT16;
 
 				if ( isMultisample || useMultisampledRTT( renderTarget ) ) {
 
