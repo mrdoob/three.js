@@ -161,7 +161,7 @@ class WebGLBackend extends Backend {
 
 				if ( completed < currentOcclusionQueries.length ) {
 
-					setTimeout( check, 17 );
+					requestAnimationFrame( check );
 
 				} else {
 
