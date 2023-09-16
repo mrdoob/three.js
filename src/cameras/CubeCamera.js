@@ -149,6 +149,9 @@ class CubeCamera extends Object3D {
 		renderer.setRenderTarget( renderTarget, 4 );
 		renderer.render( scene, cameraPZ );
 
+		// mipmaps are generated during the last call of render()
+		// at this point, all sides of the cube render target are defined
+
 		renderTarget.texture.generateMipmaps = generateMipmaps;
 
 		renderer.setRenderTarget( renderTarget, 5 );
