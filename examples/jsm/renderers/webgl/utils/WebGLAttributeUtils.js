@@ -105,7 +105,7 @@ class WebGLAttributeUtils {
 		gl.bufferSubData( bufferType, 0, array );
 		gl.bindBuffer( bufferType, null );
 
-		bufferData.version = bufferAttribute.version++;
+		bufferData.version = bufferAttribute.version;
 
 	}
 
