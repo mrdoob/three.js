@@ -356,6 +356,7 @@ class WebGLRenderer {
 			_this.capabilities = capabilities;
 			_this.extensions = extensions;
 			_this.properties = properties;
+			_this.attributes = attributes;
 			_this.renderLists = renderLists;
 			_this.shadowMap = shadowMap;
 			_this.state = state;

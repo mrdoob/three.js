@@ -96,6 +96,8 @@
 	"webgl_simple_gi": [ "global illumination" ],
 	"webgl2_multiple_rendertargets": [ "mrt" ],
 	"webgl2_multisampled_renderbuffers": [ "msaa" ],
+	"webgl2_transformfeedback_instancedmesh": [ "compute", "instance" ],
+	"webgl2_transformfeedback_pointcloudobb": [ "compute", "pointcloud" ],
 	"physics_ammo_cloth": [ "integration" ],
 	"physics_rapier_instancing": [ "external" ],
 	"misc_controls_arcball": [ "rotation" ],

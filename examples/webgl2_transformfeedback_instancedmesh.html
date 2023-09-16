@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - transformfeedback - instancedmesh</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl2 - transformfeedback - instancedmesh</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+			#version 300 es
+			precision highp float;
+			
+			uniform float time;     // Animation Time
+			uniform float count;    // Total Instances
+			out vec4 mtx;           // Output Data : Mat4 as Vec4 pieces at a time
+						
+			// Original Formula
+			vec3 trefoil_pos( float ang ){
+				return vec3(
+					sin( ang ) + 2.0 * sin( 2.0 * ang ),
+					cos( ang ) - 2.0 * cos( 2.0 * ang ),
+					-sin( 3.0 * ang )
+				);
+			}
+			
+			// 1st derivative
+			vec3 trefoil_tan( float ang ){
+				return normalize( vec3(
+					 cos( ang ) + 4.0 * cos( 2.0 * ang ),
+					-sin( ang ) + 4.0 * sin( 2.0 * ang ),
+					3.0 * -cos( 3.0 * ang )
+				));
+			}
+			
+			// 2st derivative
+			vec3 trefoil_norm( float ang ){
+				return normalize( vec3(
+					-sin( ang ) - 8.0 * sin( 2.0 * ang ),
+					-cos( ang ) + 8.0 * cos( 2.0 * ang ),
+					9.0 * sin( 3.0 * ang )
+				));
+			}
+			
+			void main(){
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				float radius   = 2.0;
+				float instance = floor( float( gl_VertexID ) / 4.0 );   // Instance Index
+				float rad      = time + ( instance / count ) * 6.28;    // Offset angle for each instance
+				
+				// Compute the directions of the curve
+				vec3 z  = trefoil_tan( rad );           // FORWARD
+				vec3 y  = trefoil_norm( rad );          // UP
+				vec3 x  = normalize( cross( y, z ) );   // RIGHT
+			
+				// Norm isn't orthogonal to Tan, Realign it so not to skew the shape
+				y  = normalize( cross( z, x ) );  
+				
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				// Mat4 data consists of 16 floats but output is maxed out at 4 floats
+				// This means we can stream the Mat4 has a series of Vec4. Using VertexID
+				// as our Index value, we can group every 4 Vec4 as a single Mat4 value.
+				
+				int i = int( mod( float( gl_VertexID ), 4.0 ) );
+				
+				if( i == 0 )       mtx = vec4( x, 0.0 );   		 // X Rot
+				else if( i == 1 )  mtx = vec4( y, 0.0 );   		 // Y Rot
+				else if( i == 2 )  mtx = vec4( z * 0.5, 0.0 );   // Z Rot & Scale
+				else if( i == 3 )  mtx = vec4( trefoil_pos( rad ) * radius, 1.0 );   // Translation
+			
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				// Original Test Code
+				// if( i == 0 )       mtx = vec4( 1.0, 0.0, 0.0, 0.0 );   		// X Scale & Rot
+				// else if( i == 1 )  mtx = vec4( 0.0, 1.0, 0.0, 0.0 );  		// Y Scale & Rot
+				// else if( i == 2 )  mtx = vec4( 0.0, 0.0, 1.0, 0.0 );   		// Z Scale & Rot
+				// else if( i == 3 )  mtx = vec4( trefoil_pos( rad ), 1.0 );   	// Translation
+			}
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+			#version 300 es
+			void main(){}
+		</script>
+
+		<script type="module">
+
+			// #region IMPORTS & GLOBALS
+			import * as THREE from 'three';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			const clock = new THREE.Clock();
+			let container, stats;
+			let camera, scene, renderer;
+
+			const instCnt = 50;
+			let instMesh;
+			let feedback;
+			let computeShader;
+
+			window.addEventListener( 'load', ()=>{
+
+				init();
+				animate();
+
+			} );
+			// #endregion
+
+			// #region THREEJS SETUP
+			
+			function init() {
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				if ( WebGL.isWebGL2Available() === false ) {
+
+					document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
+					return;
+
+				}
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				container = document.getElementById( 'container' );
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
+				camera.position.set( 0, 5, 15 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x3a3a3a );
+				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				scene.add( new THREE.AmbientLight( 0xcccccc ) );
+
+				const light1 = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				light1.position.set( 1, 1, 1 );
+				scene.add( light1 );
+
+				const light2 = new THREE.DirectionalLight( 0xffffff, 4.5 );
+				light2.position.set( 0, - 1, 0 );
+				scene.add( light2 );
+
+				scene.add( new THREE.GridHelper( 20, 20, 0x0c610c, 0x494949 ) );
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 2.5, 0 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize );
+				clock.start();
+				initPrototype();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			// #endregion
+
+			// #region RENDER LOOP
+			function animate() {
+
+				requestAnimationFrame( animate );
+				compute( clock.getElapsedTime() * 0.2 );
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+			// #endregion
+
+			// #region TRANFORM FEEDBACK
+
+			function initPrototype() {
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				// Create Instanced Mesh
+				const geo = new THREE.BoxGeometry( 1, 1, 1 );
+				const mat = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+
+				instMesh = new THREE.InstancedMesh( geo, mat, instCnt );
+				instMesh.scale.setScalar( 0.3 );
+				instMesh.position.set( 0, 2.5, 0 );
+				instMesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
+
+				const obj = new THREE.Object3D();
+				for ( let i = 0; i < instCnt; i ++ ) {
+
+					obj.position.set( i, 0, 0 );
+					obj.updateMatrix();
+					instMesh.setMatrixAt( i, obj.matrix );
+
+				}
+
+				instMesh.instanceMatrix.needsUpdate = true;
+				instMesh.geometry.computeBoundingSphere();
+				scene.add( instMesh );
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				// Setup TF reference
+				const gl = renderer.getContext();
+				feedback = gl.createTransformFeedback();
+
+				// Setup Compute Shader
+				const vertSrc = document.getElementById( 'vertexShader' ).textContent.trim();
+				const fragSrc = document.getElementById( 'fragmentShader' ).textContent.trim();
+
+				computeShader = new GLShader( gl );
+				computeShader.compile( vertSrc, fragSrc, [ 'mtx' ] );
+				computeShader.useUniforms( [ 'time', 'count' ] );
+
+			}
+
+			function compute( et ) {
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				// Alias
+				const rend = renderer;
+				const m = instMesh;
+
+				// GL Buffers don't exist until after the first frame render
+				// Skip frame if the gl buffer for instanceMatrix doesn't exist
+				const output = rend.attributes.get( m.instanceMatrix );
+				if ( ! output ) {
+
+					return;
+
+				}
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				// Looks like 3JS leaves VAOs bound after rendering
+				// This breaks buffer binding for transform feedback
+				// SOOO... Make sure there are no VAO bound before running TF
+				const gl = rend.getContext();
+				gl.bindVertexArray( null );
+
+				// For extra protection, lets just unbind array buffers too
+				// Doesn't seem needed but since VAO was an issue, lets do this too.
+				gl.bindBuffer( gl.ARRAY_BUFFER, null );
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				// Setup Shader
+				gl.useProgram( computeShader.prog );						// Turn on shader
+				gl.uniform1f( computeShader.uniforms.time, et );			// Set Float Uniforms
+				gl.uniform1f( computeShader.uniforms.count, instCnt );
+
+				gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, feedback );	// Bind TransformFeedback
+				gl.enable( gl.RASTERIZER_DISCARD );								// Disable fragment shader, its not needed
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				// Bind the output buffer, which is the instance matrix
+				gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, 0, output.buffer );
+
+				// Run compute shader. Special care is needed to manipulate a MAT4 buffer.
+				// TransformFeedback has a hard limit of 4 floats per output but Mat4 has 16
+				// We can work around this by breaking down the matrix by sets of four Vec4s
+				// In the compute shader we determine which Vec4 row of the instance its working
+				// on and set the correct value for that row in the matrix.
+				gl.beginTransformFeedback( gl.POINTS );			// Execute as 1 vector at a time linearly
+				gl.drawArrays( gl.POINTS, 0, 4 * instCnt );		// 4 vec4 per instance matrix
+				gl.endTransformFeedback();
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				gl.disable( gl.RASTERIZER_DISCARD );						// Turn back on Fragment shaders
+				gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );	// Turn off Transform feedback
+				gl.useProgram( null );										// Turn off shader
+
+			}
+
+			// #endregion
+
+			// #region GL HELPERS
+			class GLShader {
+
+				// #region MAIN
+				constructor( gl ) {
+
+					this.gl 		= gl;
+					this.prog		= null;
+					this.uniforms 	= {};
+
+				}
+
+				dispose() {
+
+					if ( this.prog ) this.gl.deleteProgram( this.prog );
+					this.gl = null;
+
+				}
+				// #endregion
+
+				// #region METHODS
+				compile( vSrc, fSrc, tfVarying = null ) {
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					// Compile Shader
+					const vSh = this._compileShader( vSrc, true );
+					if ( ! vSh ) return false;
+
+					const fSh = this._compileShader( fSrc, false );
+					if ( ! fSh ) {
+
+						this.gl.deleteShader( vSh );
+						return false;
+
+					}
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					this.prog = this._linkProgram( vSh, fSh, tfVarying );
+					return !! this.prog;
+
+				}
+
+				useUniforms( ary ) {
+
+					for ( const i of ary ) {
+
+						this.uniforms[ i ] = this.gl.getUniformLocation( this.prog, i );
+
+					}
+
+					return this;
+
+				}
+				// #endregion
+
+				// #region HELPERS
+				_compileShader( src, isVert = true ) {
+
+					const sh = this.gl.createShader( isVert
+						? this.gl.VERTEX_SHADER
+						: this.gl.FRAGMENT_SHADER
+					);
+
+					this.gl.shaderSource( sh, src );
+					this.gl.compileShader( sh );
+
+					if ( ! this.gl.getShaderParameter( sh, this.gl.COMPILE_STATUS ) ) {
+
+						console.log( 'SHADER COMPILE ERROR - isVert: ', isVert, 'MSG: ', this.gl.getShaderInfoLog( sh ) );
+						this.gl.deleteShader( sh );
+						return null;
+
+					}
+
+					return sh;
+
+				}
+
+				_linkProgram( vSh, fSh, tfVarying = null ) {
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					// Build Program
+					const prog = this.gl.createProgram();
+					this.gl.attachShader( prog, vSh );
+					this.gl.attachShader( prog, fSh );
+
+					if ( tfVarying ) {
+
+						// Define shader TF outputs
+						this.gl.transformFeedbackVaryings( prog, tfVarying, this.gl.SEPARATE_ATTRIBS );
+
+					}
+
+					this.gl.linkProgram( prog );
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					// Cleanup
+					this.gl.detachShader( prog, vSh );
+					this.gl.detachShader( prog, fSh );
+					this.gl.deleteShader( vSh );
+					this.gl.deleteShader( fSh );
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					// Validate
+					if ( ! this.gl.getProgramParameter( prog, this.gl.LINK_STATUS ) ) {
+
+						console.log( 'LINK ERROR', this.gl.getProgramInfoLog( prog ) );
+						this.gl.deleteProgram( prog );
+						return null;
+
+					}
+
+					return prog;
+
+				}
+				// #endregion
+
+			}
+			// #endregion
+
+		</script>
+
+	</body>
+</html>

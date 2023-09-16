@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - transformfeedback - pointcloudobb</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl2 - transformfeedback - pointcloudobb</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+			#version 300 es
+			precision highp float;
+
+			layout(location=0) in vec3 position;
+
+			uniform uint       obbCount;
+			uniform sampler2D  tex;
+
+			out vec3 color;
+
+			// #region OBB
+			struct Obb{
+				vec3 center;
+				vec3 extents;
+				vec3 xAxis;
+				vec3 yAxis;
+				vec3 zAxis;
+				vec3 color;
+			};
+
+			Obb getObbAt( int i ){
+				return Obb(
+					texelFetch( tex, ivec2( 0, i ), 0 ).rgb,
+					texelFetch( tex, ivec2( 1, i ), 0 ).rgb,
+					texelFetch( tex, ivec2( 2, i ), 0 ).rgb,
+					texelFetch( tex, ivec2( 3, i ), 0 ).rgb,
+					texelFetch( tex, ivec2( 4, i ), 0 ).rgb,
+					texelFetch( tex, ivec2( 5, i ), 0 ).rgb
+				);
+			}
+
+			bool pointInObb( vec3 pnt, Obb obb ){
+				vec3 d = pnt - obb.center;
+				return (
+					abs( dot( d, obb.xAxis ) ) <= obb.extents.x &&
+					abs( dot( d, obb.yAxis ) ) <= obb.extents.y &&
+					abs( dot( d, obb.zAxis ) ) <= obb.extents.z
+				);
+			}
+			// #endregion
+
+			void main(){
+				// Obb o = getObbAt( 0 );
+				// color = ( pointInObb( position, o ) )? o.color : vec3( 1.0 );
+
+				color = vec3( 0.0 );
+				Obb o;
+				for( int i=0; i < 2; i++ ){
+					o      = getObbAt( i );
+					color += ( pointInObb( position, o ) )? o.color : vec3( 0.0 );
+				}
+			}
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+			#version 300 es
+			void main(){}
+		</script>
+
+		<script type="module">
+
+			// #region IMPORTS & GLOBALS
+			import * as THREE from 'three';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			const clock = new THREE.Clock();
+			let container, stats;
+			let camera, scene, renderer;
+
+			let colorizer;
+			const triggerSec = 1.5; // Seconds to trigger new compute
+			let frameTime = 0; // Current frame time
+
+			window.addEventListener( 'load', ()=>{
+
+				init();
+				animate();
+
+			} );
+			// #endregion
+
+			// #region THREEJS SETUP
+			
+			function init() {
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				if ( WebGL.isWebGL2Available() === false ) {
+
+					document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
+					return;
+
+				}
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				container = document.getElementById( 'container' );
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
+				camera.position.set( 0, 70, 90 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x3a3a3a );
+				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				scene.add( new THREE.AmbientLight( 0xcccccc ) );
+
+				const light1 = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				light1.position.set( 1, 1, 1 );
+				scene.add( light1 );
+
+				const light2 = new THREE.DirectionalLight( 0xffffff, 4.5 );
+				light2.position.set( 0, - 1, 0 );
+				scene.add( light2 );
+
+				scene.add( new THREE.GridHelper( 20, 20, 0x0c610c, 0x494949 ) );
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 10, 0 );
+				controls.update();
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				initPrototype();
+				clock.start();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			// #endregion
+
+			// #region RENDER LOOP
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				// Run compute on a time basis
+				frameTime += clock.getDelta();
+    			if ( frameTime >= triggerSec ) {
+
+					frameTime = 0;
+        			colorizer.randomOBB(); // Randomize the OBBs in PointColorizer
+
+					// console.time( 'color' );
+					colorizer
+						.updateTexture() // Serialize OBB data into a data texture & ypload to GPU
+						.execute(); // Run Compute shader on all the point meshes
+					// console.timeEnd( 'color' );
+
+				}
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+			// #endregion
+
+			// #region TRANFORM FEEDBACK
+			function initPrototype() {
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				// Create 4 Random Point clouds
+				const mat = new THREE.PointsMaterial( { size: 0.01, vertexColors: true } );
+
+				const geo0 = geoBuffer( randomPointGeometry( 100000, [ 0, 0, 0 ], [ 20, 20, 20 ] ) );
+				const mesh0 = new THREE.Points( geo0, mat );
+				scene.add( mesh0 );
+
+				const geo1 = geoBuffer( randomPointGeometry( 100000, [ - 20, 0, - 20 ], [ 0, 20, 0 ] ) );
+				const mesh1 = new THREE.Points( geo1, mat );
+				scene.add( mesh1 );
+
+				const geo2 = geoBuffer( randomPointGeometry( 100000, [ - 20, 0, 20 ], [ 0, 20, 0 ] ) );
+				const mesh2 = new THREE.Points( geo2, mat );
+				scene.add( mesh2 );
+
+				const geo3 = geoBuffer( randomPointGeometry( 100000, [ 0, 0, 0 ], [ 20, 20, - 20 ] ) );
+				const mesh3 = new THREE.Points( geo3, mat );
+				scene.add( mesh3 );
+
+				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				// Setup colorizer
+				colorizer = new PointColorizer( renderer, scene );
+    			colorizer.addMesh( mesh0 );
+    			colorizer.addMesh( mesh1 );
+    			colorizer.addMesh( mesh2 );
+    			colorizer.addMesh( mesh3 );
+
+			}
+
+			class PointColorizer {
+
+				// #region MAIN
+
+				constructor( renderer, scene ) {
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					this.renderer = renderer;
+					this.gl = renderer.getContext();
+
+					this.obbList = [ // List of OBB Objects
+						new Obb( 0xff0000, 15 ),
+						new Obb( 0x00ff00, 15 ),
+					];
+
+					this.meshes = []; // List of Meshes to run compute on
+
+					for ( const o of this.obbList ) scene.add( o.mesh );
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					// Compile shader first, if unsuccessful exit out early
+					const vertSrc = document.getElementById( 'vertexShader' ).textContent.trim();
+					const fragSrc = document.getElementById( 'fragmentShader' ).textContent.trim();
+
+					this.shader = new GLShader( this.gl );
+					if ( this.shader.compile( vertSrc, fragSrc, [ 'color' ] ) ) {
+
+						this.shader.useUniforms( [ 'obbCount', 'scale', 'tex' ] );
+
+					} else return;
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					// Create other bits
+					this.feedback = this.gl.createTransformFeedback();
+
+					// Data Texture containing OBB Data
+					this.texData = new GLFloatTexture( this.gl, 6, this.obbList.length ); // 6 vec3, 2 rows of it
+					// this.texData.set( 1, [1,1,1], [2,2,2] );
+					// this.texData.upload();
+
+					this.updateTexture();
+
+				}
+
+				dispose() {
+
+					this.gl.deleteTransformFeedback( this.feedback );
+					this.shader.dispose();
+					this.texData.dispose();
+					this.gl = null;
+
+				}
+
+				randomOBB() {
+
+					const min = [ - 10, 0, - 10 ];
+    				const max = [ 10, 10, 10 ];
+    				const q = [ 0, 0, 0, 0 ];
+
+					for ( const o of this.obbList ) {
+
+						o.fromQuat( quat_rnd( q ) ); // Random Rotation
+						vec3_rnd( min, max, o.center ); // Random Position
+
+						o.mesh.position.fromArray( o.center );
+						o.mesh.quaternion.fromArray( q );
+
+    				}
+
+				}
+				// #endregion
+
+				// #region METHODS
+				addMesh( m ) {
+
+					this.meshes.push( m );
+					return this;
+
+				}
+
+				/** Convert OBB Array to DataTexture */
+				updateTexture() {
+
+					let i = 0;
+					for ( const o of this.obbList ) {
+
+						this.texData.set( i ++,
+							o.center,
+							o.extents,
+							o.xAxis,
+							o.yAxis,
+							o.zAxis,
+							o.color,
+						);
+
+					}
+
+					this.texData.upload();
+					return this;
+
+				}
+
+				/** Execute Compute shader on each mesh listed */
+				execute() {
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					// Alias
+					const rend = this.renderer;
+					const gl = this.gl;
+
+					// Looks like 3JS leaves VAOs bound after rendering
+					// This breaks buffer binding for transform feedback
+					// SOOO... Make sure there are no VAO bound before running TF
+					gl.bindVertexArray( null );
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					// Setup Shader
+					gl.useProgram( this.shader.prog ); // Turn on shader
+
+					// Simple Uniforms
+					gl.uniform1ui( this.shader.uniforms.obbCount, this.obbList.length ); // UINT
+
+					// Bind Data Texture @ SLOT 0
+					gl.uniform1i( this.shader.uniforms.tex, 0 ); // Which slot for texture uniform to use
+					gl.activeTexture( gl.TEXTURE0 ); // Activate Texture Slot
+					gl.bindTexture( gl.TEXTURE_2D, this.texData.ref ); // Bind Texture
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					// Execute compute shader for each mesh
+					let atrPos;
+					let atrCol;
+					let vertCnt;
+
+					gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, this.feedback ); // Bind TransformFeedback
+					gl.enable( gl.RASTERIZER_DISCARD ); // Disable fragment shader, its not needed
+
+					for ( const m of this.meshes ) {
+
+						// -------------------------------
+						// MESH INFO
+						// NOTE - This wouldn't work normally in THREEJS
+						// renderer.attributes only exists in a MODIFIED library to expose GL BUFFER references
+
+						atrPos = rend.attributes.get( m.geometry.attributes.position );
+						atrCol = rend.attributes.get( m.geometry.attributes.color );
+						vertCnt = m.geometry.attributes.position.array.length / 3;
+
+						// -------------------------------
+						// BIND INPUT BUFFERS ( SHADER ATTRIBUTES )
+
+						// Position Attribute
+						gl.bindBuffer( gl.ARRAY_BUFFER, atrPos.buffer ); // Bind position gl buffer
+						gl.enableVertexAttribArray( 0 ); // Turn on position attribute
+						gl.vertexAttribPointer( 0, 3, gl.FLOAT, false, 0, 0 ); // Setup as attribute @ LOC 0
+
+						// -------------------------------
+						// BIND OUTPUT BUFFERS & EXECUTE
+
+						// Color Output
+						gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, 0, atrCol.buffer ); // Bind color as output @ LOC 0
+
+						// Execute
+						gl.beginTransformFeedback( gl.POINTS );
+						gl.drawArrays( gl.POINTS, 0, vertCnt );
+						gl.endTransformFeedback();
+
+					}
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					// Cleanup
+					gl.disable( gl.RASTERIZER_DISCARD ); // Turn on fragment shaders
+					gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );
+					gl.useProgram( null );
+					gl.bindBuffer( gl.ARRAY_BUFFER, null );
+					gl.bindTexture( gl.TEXTURE_2D, null );
+
+					return this;
+
+				}
+				// #endregion
+
+			}
+			// #endregion
+
+			// #region GL HELPERS
+			class GLShader {
+
+				// #region MAIN
+				constructor( gl ) {
+
+					this.gl 		= gl;
+					this.prog		= null;
+					this.uniforms 	= {};
+
+				}
+
+				dispose() {
+
+					if ( this.prog ) this.gl.deleteProgram( this.prog );
+					this.gl = null;
+
+				}
+				// #endregion
+
+				// #region METHODS
+				compile( vSrc, fSrc, tfVarying = null ) {
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					// Compile Shader
+					const vSh = this._compileShader( vSrc, true );
+					if ( ! vSh ) return false;
+
+					const fSh = this._compileShader( fSrc, false );
+					if ( ! fSh ) {
+
+						this.gl.deleteShader( vSh );
+						return false;
+
+					}
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					this.prog = this._linkProgram( vSh, fSh, tfVarying );
+					return !! this.prog;
+
+				}
+
+				useUniforms( ary ) {
+
+					for ( const i of ary ) {
+
+						this.uniforms[ i ] = this.gl.getUniformLocation( this.prog, i );
+
+					}
+
+					return this;
+
+				}
+				// #endregion
+
+				// #region HELPERS
+				_compileShader( src, isVert = true ) {
+
+					const sh = this.gl.createShader( isVert
+						? this.gl.VERTEX_SHADER
+						: this.gl.FRAGMENT_SHADER
+					);
+
+					this.gl.shaderSource( sh, src );
+					this.gl.compileShader( sh );
+
+					if ( ! this.gl.getShaderParameter( sh, this.gl.COMPILE_STATUS ) ) {
+
+						console.log( 'SHADER COMPILE ERROR - isVert: ', isVert, 'MSG: ', this.gl.getShaderInfoLog( sh ) );
+						this.gl.deleteShader( sh );
+						return null;
+
+					}
+
+					return sh;
+
+				}
+
+				_linkProgram( vSh, fSh, tfVarying = null ) {
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					// Build Program
+					const prog = this.gl.createProgram();
+					this.gl.attachShader( prog, vSh );
+					this.gl.attachShader( prog, fSh );
+
+					if ( tfVarying ) {
+
+						// Define shader TF outputs
+						this.gl.transformFeedbackVaryings( prog, tfVarying, this.gl.SEPARATE_ATTRIBS );
+
+					}
+
+					this.gl.linkProgram( prog );
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					// Cleanup
+					this.gl.detachShader( prog, vSh );
+					this.gl.detachShader( prog, fSh );
+					this.gl.deleteShader( vSh );
+					this.gl.deleteShader( fSh );
+
+					// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+					// Validate
+					if ( ! this.gl.getProgramParameter( prog, this.gl.LINK_STATUS ) ) {
+
+						console.log( 'LINK ERROR', this.gl.getProgramInfoLog( prog ) );
+						this.gl.deleteProgram( prog );
+						return null;
+
+					}
+
+					return prog;
+
+				}
+				// #endregion
+
+			}
+			
+			class GLFloatTexture {
+
+				// #region MAIN
+				constructor( gl, colLen = 1, rowLen = 2, vecSize = 3 ) {
+
+					this.gl = gl;
+					this.type = gl.FLOAT;
+					this.colLen = colLen;
+					this.rowLen = rowLen;
+					this.vecSize = vecSize;
+
+					this.ref = null;
+					this.internalFormat = 0;
+					this.format = 0;
+
+					switch ( vecSize ) {
+
+						case 3:
+							this.internalFormat = gl.RGB32F;
+							this.format = gl.RGB;
+							break;
+						case 4:
+							this.internalFormat = gl.RGBA32F;
+							this.format = gl.RGBA;
+							break;
+						default:
+							console.error( 'GLFloatTexture - UNKNOWN VEC SIZE' );
+							break;
+
+					}
+
+					this.data = new Float32Array( vecSize * colLen * rowLen );
+					this._build();
+
+				}
+
+				dispose() {
+
+					if ( this.ref ) this.gl.deleteTexture( this.ref );
+					this.gl = null;
+
+				}
+				// #endregion
+
+				// #region METHODS
+				set( idx, ...args ) {
+
+					let ii = idx * this.colLen * this.vecSize;
+					let c = 0;
+					for ( const a of args ) {
+
+						for ( const i of a ) this.data[ ii ++ ] = i;
+
+						// Prevent writing into next row
+						if ( ++ c >= this.colLen ) break;
+
+					}
+
+					return this;
+
+				}
+
+				upload() {
+
+					this.gl.bindTexture( this.gl.TEXTURE_2D, this.ref );
+					this.gl.texSubImage2D( this.gl.TEXTURE_2D,
+						0, 0, 0,
+						this.colLen, this.rowLen,
+						this.format, this.type,
+						this.data
+					);
+					this.gl.bindTexture( this.gl.TEXTURE_2D, null );
+					return this;
+
+				}
+				// #endregion
+
+				// #region HELPERS
+				_build() {
+
+					// Create & Bind
+					const tex = this.gl.createTexture();
+					this.gl.bindTexture( this.gl.TEXTURE_2D, tex );
+
+					// No mips & no filtering
+					this.gl.texParameteri( this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST );
+					this.gl.texParameteri( this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST );
+					this.gl.texParameteri( this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE );
+					this.gl.texParameteri( this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE );
+
+					// Data might not be 4 byte aligned, so set reading by 1 byte a time
+					this.gl.pixelStorei( this.gl.UNPACK_ALIGNMENT, 1 );
+
+					// Initialize Testure buffer with Data
+					this.gl.texImage2D( this.gl.TEXTURE_2D, 0,
+						this.internalFormat,
+						this.colLen, this.rowLen, 0,
+						this.format,
+						this.type,
+						this.data,
+					);
+
+					this.gl.bindTexture( this.gl.TEXTURE_2D, null );
+
+					this.ref = tex;
+
+				}
+				// #endregion
+
+			}
+			// #endregion
+
+			// #region HELPERS
+
+			function randomPointGeometry( cnt, min, max ) {
+
+				const vert = new Float32Array( cnt * 3 );
+				const color = new Float32Array( cnt * 3 );
+				let ii = 0;
+				let t;
+
+				for ( let i = 0; i < cnt; i ++ ) {
+
+					t = Math.random();
+					color[ ii ] = 0;
+					vert[ ii ++ ] = min[ 0 ] * ( 1 - t ) + max[ 0 ] * t;
+
+					t = Math.random();
+					color[ ii ] = 0;
+					vert[ ii ++ ] = min[ 1 ] * ( 1 - t ) + max[ 1 ] * t;
+
+					t = Math.random();
+					color[ ii ] = 0;
+					vert[ ii ++ ] = min[ 2 ] * ( 1 - t ) + max[ 2 ] * t;
+
+				}
+
+				return { vertices: vert, color };
+
+			}
+
+			function lineBox( s = 1 ) {
+
+				return {
+					vertices: new Float32Array( [
+						- s, - s, - s,
+						- s, - s, s,
+						s, - s, s,
+						s, - s, - s,
+
+						- s, s, - s,
+						- s, s, s,
+						s, s, s,
+						s, s, - s,
+					] ),
+
+					indices: new Uint16Array( [
+						0, 1, 1, 2, 2, 3, 3, 0,
+						4, 5, 5, 6, 6, 7, 7, 4,
+						0, 4, 1, 5, 2, 6, 3, 7
+					] ),
+				};
+
+			}
+
+			function geoBuffer( props ) {
+
+				const geo = new THREE.BufferGeometry();
+				geo.setAttribute( 'position', new THREE.BufferAttribute( props.vertices, 3 ) );
+
+				if ( props.indices ) geo.setIndex( new THREE.BufferAttribute( props.indices, 1 ) );
+				if ( props.normal ) geo.setAttribute( 'normal', new THREE.BufferAttribute( props.normal, 3 ) );
+				if ( props.uv ) geo.setAttribute( 'uv', new THREE.BufferAttribute( props.uv, 2 ) );
+				if ( props.color ) geo.setAttribute( 'color', new THREE.BufferAttribute( props.color, 3 ) );
+
+				return geo;
+
+			}
+
+			function glColor( hex, out = [ 0, 0, 0 ] ) {
+
+				const NORMALIZE_RGB = 1 / 255;
+				out[ 0 ] = ( ( hex >> 16 ) & 255 ) * NORMALIZE_RGB;
+				out[ 1 ] = ( ( hex >> 8 ) & 255 ) * NORMALIZE_RGB;
+				out[ 2 ] = ( hex & 255 ) * NORMALIZE_RGB;
+				return out;
+
+			}
+
+			function transformQuat( v, q, out = null ) {
+
+				const qx = q[ 0 ], qy = q[ 1 ], qz = q[ 2 ], qw = q[ 3 ],
+					vx = v[ 0 ], vy = v[ 1 ], vz = v[ 2 ],
+					x1 = qy * vz - qz * vy,
+					y1 = qz * vx - qx * vz,
+					z1 = qx * vy - qy * vx,
+					x2 = qw * x1 + qy * z1 - qz * y1,
+					y2 = qw * y1 + qz * x1 - qx * z1,
+					z2 = qw * z1 + qx * y1 - qy * x1;
+
+				out = out || v;
+				out[ 0 ] = vx + 2 * x2;
+				out[ 1 ] = vy + 2 * y2;
+				out[ 2 ] = vz + 2 * z2;
+				return out;
+
+			}
+
+			function quat_rnd( out = [ 0, 0, 0, 0 ] ) {
+
+				// http://planning.cs.uiuc.edu/node198.html  uniform random quaternion
+				const u1 = Math.random();
+				const u2 = Math.random();
+				const u3 = Math.random();
+				const r1 = Math.sqrt( 1 - u1 );
+				const r2 = Math.sqrt( u1 );
+
+				out[ 0 ] = r1 * Math.sin( 6.283185307179586 * u2 );
+				out[ 1 ] = r1 * Math.cos( 6.283185307179586 * u2 );
+				out[ 2 ] = r2 * Math.sin( 6.283185307179586 * u3 );
+				out[ 3 ] = r2 * Math.cos( 6.283185307179586 * u3 );
+
+				// Normalize
+				const scl = 1 / Math.sqrt( out[ 0 ] ** 2 + out[ 1 ] ** 2 + out[ 2 ] ** 2 + out[ 3 ] ** 2 );
+				out[ 0 ] *= scl;
+				out[ 1 ] *= scl;
+				out[ 2 ] *= scl;
+				out[ 3 ] *= scl;
+
+        		return out;
+
+			}
+
+			function vec3_rnd( min, max, out = [ 0, 0, 0 ] ) {
+
+				let t = Math.random();
+				out[ 0 ] = min[ 0 ] * ( 1 - t ) + max[ 0 ] * t;
+
+				t = Math.random();
+				out[ 1 ] = min[ 1 ] * ( 1 - t ) + max[ 1 ] * t;
+
+				t = Math.random();
+				out[ 2 ] = min[ 2 ] * ( 1 - t ) + max[ 2 ] * t;
+				return out;
+
+			}
+
+			class Obb {
+
+				// #region MAIN
+				constructor( c = 0x00ff00, scl = 1 ) {
+
+					this.center = [ 0, 0, 0 ];
+					this.extents = [ scl, scl, scl ]; // Half Lengths
+					this.xAxis = [ 1, 0, 0 ];
+					this.yAxis = [ 0, 1, 0 ];
+					this.zAxis = [ 0, 0, 1 ];
+					this.color = [ 0, 0, 0 ];
+					this.iColor = c;
+					glColor( c, this.color );
+
+					this.mesh = new THREE.LineSegments(
+						geoBuffer( lineBox( 1 ) ),
+						new THREE.LineBasicMaterial( { color: c } )
+					);
+
+					this.mesh.scale.setScalar( scl );
+
+				}
+				// #endregion
+
+				// #region GETTERS // SETTERS
+				fromQuat( q ) {
+
+					transformQuat( [ 1, 0, 0 ], q, this.xAxis );
+					transformQuat( [ 0, 1, 0 ], q, this.yAxis );
+					transformQuat( [ 0, 0, 1 ], q, this.zAxis );
+					return this;
+
+				}
+
+				setPosition( p ) {
+
+					this.center[ 0 ] = p[ 0 ];
+					this.center[ 1 ] = p[ 1 ];
+					this.center[ 2 ] = p[ 2 ];
+					return this;
+
+				}
+				// #endregion
+
+			}
+
+			// #endregion
+
+		</script>
+
+	</body>
+</html>
