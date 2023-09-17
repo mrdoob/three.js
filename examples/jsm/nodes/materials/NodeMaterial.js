@@ -199,7 +199,7 @@ class NodeMaterial extends ShaderMaterial {
 		if ( this.flatShading === true ) {
 
 			const fdx = dFdx( positionView );
-			const fdy = dFdy( positionView.negate() ); // use -positionView ?
+			const fdy = dFdy( positionView );
 			const normalNode = fdx.cross( fdy ).normalize();
 
 			stack.assign( transformedNormalView, normalNode );
