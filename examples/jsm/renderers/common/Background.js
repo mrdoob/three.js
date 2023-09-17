@@ -60,7 +60,7 @@ class Background extends DataMap {
 				} ).mul( backgroundIntensity );
 
 				let viewProj = modelViewProjection();
-				viewProj = vec4( viewProj.x, viewProj.y, viewProj.w, viewProj.w );
+				viewProj = viewProj.setZ( viewProj.w );
 
 				const nodeMaterial = new NodeMaterial();
 				nodeMaterial.outputNode = this.backgroundMeshNode;
