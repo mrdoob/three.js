@@ -37,30 +37,30 @@ class RenderTarget extends EventDispatcher {
 
 		}
 
-		const {
-			generateMipmaps = false,
-			internalFormat = null,
-			minFilter = LinearFilter,
-			depthBuffer = true,
-			stencilBuffer = false,
-			depthTexture = null,
-			samples = 0
-		} = options;
+		options = Object.assign( {
+			generateMipmaps: false,
+			internalFormat: null,
+			minFilter: LinearFilter,
+			depthBuffer: true,
+			stencilBuffer: false,
+			depthTexture: null,
+			samples: 0
+		}, options );
 
 		this.texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
 		this.texture.isRenderTargetTexture = true;
 
 		this.texture.flipY = false;
-		this.texture.generateMipmaps = generateMipmaps;
-		this.texture.internalFormat = internalFormat;
-		this.texture.minFilter = minFilter;
+		this.texture.generateMipmaps = options.generateMipmaps;
+		this.texture.internalFormat = options.internalFormat;
+		this.texture.minFilter = options.minFilter;
 
-		this.depthBuffer = depthBuffer;
-		this.stencilBuffer = stencilBuffer;
+		this.depthBuffer = options.depthBuffer;
+		this.stencilBuffer = options.stencilBuffer;
 
-		this.depthTexture = depthTexture;
+		this.depthTexture = options.depthTexture;
 
-		this.samples = samples;
+		this.samples = options.samples;
 
 	}
 
