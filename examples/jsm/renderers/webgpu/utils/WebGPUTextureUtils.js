@@ -111,7 +111,7 @@ class WebGPUTextureUtils {
 
 		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC;
 
-		if ( options.store === true ) {
+		if ( texture.isStorageTexture === true ) {
 
 			usage |= GPUTextureUsage.STORAGE_BINDING;
 

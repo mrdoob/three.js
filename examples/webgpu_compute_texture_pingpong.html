@@ -1,6 +1,6 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Compute Texture</title>
+		<title>three.js - WebGPU - Compute Ping/Pong Texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -8,7 +8,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute Texture
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute Ping/Pong Texture
 			<br>Texture generated using GPU Compute.
 		</div>
 
@@ -27,13 +27,17 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { texture, textureStore, wgslFn, instanceIndex, MeshBasicNodeMaterial } from 'three/nodes';
+			import { texture, textureStore, wgslFn, code, instanceIndex } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 			import StorageTexture from 'three/addons/renderers/common/StorageTexture.js';
 
 			let camera, scene, renderer;
+			let computeToPing, computeToPong;
+			let pingTexture, pongTexture;
+			let material;
+			let phase = true;
 
 			init();
 			render();
@@ -58,19 +62,28 @@
 
 				const width = 512, height = 512;
 
-				const storageTexture = new StorageTexture( width, height );
+				pingTexture = new StorageTexture( width, height );
+				pongTexture = new StorageTexture( width, height );
 
-				// create function
+				// compute init
 
-				const computeWGSL = wgslFn( `
-					fn computeWGSL( storageTex: texture_storage_2d<rgba8unorm, write>, index: u32 ) -> void {
+				const rand2 = code( `
+					fn rand2( n: vec2f ) -> f32 {
+
+						return fract( sin( dot( n, vec2f( 12.9898, 4.1414 ) ) ) * 43758.5453 );
+
+					}
+				` );
+
+				const computeInitWGSL = wgslFn( `
+					fn computeInitWGSL( writeTex: texture_storage_2d<rgba8unorm, write>, index: u32 ) -> void {
 
 						let posX = index % ${ width };
 						let posY = index / ${ width };
 						let indexUV = vec2u( posX, posY );
 						let uv = getUV( posX, posY );
 
-						textureStore( storageTex, indexUV, vec4f( uv, 0, 1 ) );
+						textureStore( writeTex, indexUV, vec4f( vec3f( rand2( uv ) ), 1 ) );
 
 					}
 
@@ -81,15 +94,32 @@
 						return uv;
 
 					}
-				` );
+				`, [ rand2 ] );
 
-				// compute
+				const computeInitNode = computeInitWGSL( { writeTex: textureStore( pingTexture ), index: instanceIndex } ).compute( width * height );
 
-				const computeWGSLCall = computeWGSL( { storageTex: textureStore( storageTexture ), index: instanceIndex } );
-				const computeNode = computeWGSLCall.compute( width * height );
+				// compute loop
 
-				const material = new MeshBasicNodeMaterial( { color: 0x00ff00 } );
-				material.colorNode = texture( storageTexture );
+				const computePingPongWGSL = wgslFn( `
+					fn computePingPongWGSL( readTex: texture_2d<f32>, writeTex: texture_storage_2d<rgba8unorm, write>, index: u32 ) -> void {
+
+						let posX = index % ${ width };
+						let posY = index / ${ width };
+						let indexUV = vec2u( posX, posY );
+
+						let color = vec3f( rand2( textureLoad( readTex, indexUV, 0 ).xy ) );
+
+						textureStore( writeTex, indexUV, vec4f( color, 1 ) );
+
+					}
+				`, [ rand2 ] );
+
+				computeToPong = computePingPongWGSL( { readTex: texture( pingTexture ), writeTex: textureStore( pongTexture ), index: instanceIndex } ).compute( width * height );
+				computeToPing = computePingPongWGSL( { readTex: texture( pongTexture ), writeTex: textureStore( pingTexture ), index: instanceIndex } ).compute( width * height );
+
+				//
+
+				material = new THREE.MeshBasicMaterial( { color: 0xffffff, map: pongTexture } );
 
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( plane );
@@ -97,12 +127,14 @@
 				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
 				document.body.appendChild( renderer.domElement );
 
-				// compute texture
-				renderer.compute( computeNode );
-
 				window.addEventListener( 'resize', onWindowResize );
+
+				// compute init
+
+				renderer.compute( computeInitNode );
 
 			}
 
@@ -124,6 +156,18 @@
 			}
 
 			function render() {
+
+				// compute step
+
+				renderer.compute( phase ? computeToPong : computeToPing );
+
+				material.map = phase ? pongTexture : pingTexture;
+
+				phase = ! phase;
+
+				// render step
+
+				// update material texture node
 
 				renderer.render( scene, camera );
 

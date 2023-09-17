@@ -114,6 +114,7 @@ const exceptionList = [
 	'webgpu_compute',
 	'webgpu_compute_particles',
 	'webgpu_compute_texture',
+	'webgpu_compute_texture_pingpong',
 	'webgpu_cubemap_dynamic',
 	'webgpu_depth_texture',
 	'webgpu_instance_mesh',
