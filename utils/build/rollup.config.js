@@ -124,8 +124,8 @@ const builds = [
 		plugins: [
 			addons(),
 			glsl(),
-			terser(),
-			header()
+			header(),
+			terser()
 		],
 		output: [
 			{
@@ -173,9 +173,9 @@ const builds = [
 		plugins: [
 			addons(),
 			glsl(),
-			terser(),
 			header(),
-			deprecationWarning()
+			deprecationWarning(),
+			terser()
 		],
 		output: [
 			{
