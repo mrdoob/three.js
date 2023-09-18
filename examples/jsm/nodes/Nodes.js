@@ -6,9 +6,9 @@ export * from './core/constants.js';
 
 // core
 export { default as ArrayUniformNode /* @TODO: arrayUniform */ } from './core/ArrayUniformNode.js';
-export { default as AssignNode, assign } from './core/AssignNode.js';
+export { default as AssignNode } from './core/AssignNode.js';
 export { default as AttributeNode, attribute } from './core/AttributeNode.js';
-export { default as BypassNode, bypass } from './core/BypassNode.js';
+export { default as BypassNode } from './core/BypassNode.js';
 export { default as CacheNode, cache } from './core/CacheNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
 export { default as ContextNode, context, label } from './core/ContextNode.js';
