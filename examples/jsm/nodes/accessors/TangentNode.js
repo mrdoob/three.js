@@ -1,10 +1,11 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { attribute } from '../core/AttributeNode.js';
+import { temp } from '../core/VarNode.js';
 import { varying } from '../core/VaryingNode.js';
 import { normalize } from '../math/MathNode.js';
 import { cameraViewMatrix } from './CameraNode.js';
 import { modelViewMatrix } from './ModelNode.js';
-import { nodeImmutable, temp } from '../shadernode/ShaderNode.js';
+import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
 class TangentNode extends Node {
 

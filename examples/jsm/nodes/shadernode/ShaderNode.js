@@ -4,9 +4,7 @@ import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
 import SplitNode from '../utils/SplitNode.js';
 import AssignNode from '../core/AssignNode.js';
-import BypassNode from '../core/BypassNode.js';
 import ConstNode from '../core/ConstNode.js';
-import VarNode from '../core/VarNode.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 
 const NodeElements = new Map(); // @TODO: Currently only a few nodes are added, probably also add others
@@ -30,7 +28,7 @@ const shaderNodeHandler = {
 
 	},
 
-	get: function ( node, prop, nodeObj ) {
+	get( node, prop, nodeObj ) {
 
 		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
 
@@ -60,19 +58,19 @@ const shaderNodeHandler = {
 					.replace( /b|p/g, 'z' )
 					.replace( /a|q/g, 'w' );
 
-				return nodeObject( new SplitNode( node, prop ) );
+				return nodeObject( new SplitNode( nodeObj, prop ) );
 
 			} else if ( prop === 'width' || prop === 'height' ) {
 
 				// accessing property
 
-				return nodeObject( new SplitNode( node, prop === 'width' ? 'x' : 'y' ) );
+				return nodeObject( new SplitNode( nodeObj, prop === 'width' ? 'x' : 'y' ) );
 
 			} else if ( /^\d+$/.test( prop ) === true ) {
 
 				// accessing array
 
-				return nodeObject( new ArrayElementNode( node, new ConstNode( Number( prop ), 'uint' ) ) );
+				return nodeObject( new ArrayElementNode( nodeObj, new ConstNode( Number( prop ), 'uint' ) ) );
 
 			}
 
@@ -421,13 +419,9 @@ addNodeElement( 'arrayBuffer', arrayBuffer );
 // HACK - we cannot export them from the corresponding files because of the cyclic dependency
 export const element = nodeProxy( ArrayElementNode );
 export const assign = nodeProxy( AssignNode );
-export const bypass = nodeProxy( BypassNode );
-export const temp = nodeProxy( VarNode );
 export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
 export const split = ( node, channels ) => nodeObject( new SplitNode( nodeObject( node ), channels ) );
 
 addNodeElement( 'element', element );
 addNodeElement( 'assign', assign );
-addNodeElement( 'bypass', bypass );
 addNodeElement( 'convert', convert );
-addNodeElement( 'temp', temp );

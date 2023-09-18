@@ -1,4 +1,5 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
+import { temp } from '../core/VarNode.js';
 import { varying } from '../core/VaryingNode.js';
 import { property } from '../core/PropertyNode.js';
 import { attribute } from '../core/AttributeNode.js';
@@ -129,7 +130,7 @@ class Line2NodeMaterial extends NodeMaterial {
 			stack.assign( dir.x, dir.x.mul( aspect ) );
 			stack.assign( dir, dir.normalize() );
 
-			const clip = vec4().temp();
+			const clip = temp( vec4() );
 
 			if ( useWorldUnits ) {
 
@@ -184,7 +185,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				// shift the depth of the projected points so the line
 				// segments overlap neatly
-				const clipPose = vec3().temp();
+				const clipPose = temp( vec3() );
 
 				stack.assign( clipPose, positionGeometry.y.lessThan( 0.5 ).cond( ndcStart, ndcEnd ) );
 				stack.assign( clip.z, clipPose.z.mul( clip.w ) );
