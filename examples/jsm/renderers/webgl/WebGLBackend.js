@@ -41,6 +41,10 @@ class WebGLBackend extends Backend {
 		this.state = new WebGLState( this );
 		this.utils = new WebGLUtils( this );
 
+		this.vaoCache = {};
+		this.transformFeedbackCache = {};
+		this.discard = false;
+
 		this.extensions.get( 'EXT_color_buffer_float' );
 		this._currentContext = null;
 
@@ -334,26 +338,76 @@ class WebGLBackend extends Backend {
 
 	beginCompute( /*computeGroup*/ ) {
 
-		console.warn( 'Abstract class.' );
+		const gl = this.gl;
+
+		gl.bindFramebuffer( gl.FRAMEBUFFER, null );
 
 	}
 
-	compute( /*computeGroup, computeNode, bindings, pipeline*/ ) {
+	compute( computeGroup, computeNode, bindings, pipeline ) {
 
-		console.warn( 'Abstract class.' );
+		const gl = this.gl;
+
+		if ( ! this.discard )  {
+
+			// required here to handle async behaviour of render.compute()
+			gl.enable( gl.RASTERIZER_DISCARD );
+			this.discard = true;
+		}
+
+		const { programGPU, transformBuffers, attributes } = this.get( pipeline );
+
+		const vaoKey = this._getVaoKey( null, attributes );
+
+		let vaoGPU = this.vaoCache[ vaoKey ];
+
+		if ( vaoGPU === undefined ) {
+
+			vaoGPU = this._createVao( null, attributes );
+
+		} else {
+
+			gl.bindVertexArray( vaoGPU );
+
+		}
+
+		gl.useProgram( programGPU );
+
+		this._bindUniforms( bindings );
+
+		const transformFeedbackGPU = this._getTransformFeedback( transformBuffers );
+
+		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, transformFeedbackGPU );
+		gl.beginTransformFeedback( gl.POINTS );
+
+		gl.drawArraysInstanced( gl.POINTS, 0, 1, computeNode.count );
+
+		gl.endTransformFeedback();
+		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );
+
+		// switch active buffers
+		for ( let i = 0; i < transformBuffers.length; i ++ ) {
+
+			transformBuffers[ i ].switchBuffers();
+
+		}
 
 	}
 
 	finishCompute( /*computeGroup*/ ) {
 
-		console.warn( 'Abstract class.' );
+		const gl = this.gl;
+
+		this.discard = false;
+
+		gl.disable( gl.RASTERIZER_DISCARD );
 
 	}
 
 	draw( renderObject, info ) {
 
 		const { pipeline, material, context } = renderObject;
-		const { programGPU, vaoGPU } = this.get( pipeline );
+		const { programGPU } = this.get( pipeline );
 
 		const { gl, state } = this;
 
@@ -361,28 +415,34 @@ class WebGLBackend extends Backend {
 
 		//
 
-		const bindings = renderObject.getBindings();
+		this._bindUniforms( renderObject.getBindings() );
 
-		for ( const binding of bindings ) {
+		state.setMaterial( material );
 
-			const bindingData = this.get( binding );
-			const index = bindingData.index;
+		gl.useProgram( programGPU );
 
-			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+		//
 
-				gl.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
+		let vaoGPU = renderObject.staticVao;
 
-			} else if ( binding.isSampledTexture ) {
+		if ( vaoGPU === undefined ) {
 
-				state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, gl.TEXTURE0 + index );
+			const vaoKey = this._getVaoKey( renderObject.getIndex(), renderObject.getAttributes() );
+
+			vaoGPU = this.vaoCache[ vaoKey ];
+
+			if ( vaoGPU === undefined ) {
+
+				let staticVao
+
+				( { vaoGPU, staticVao } = this._createVao( renderObject.getIndex(), renderObject.getAttributes() ) );
+
+				if ( staticVao ) renderObject.staticVao = vaoGPU;
 
 			}
 
 		}
 
-		state.setMaterial( material );
-
-		gl.useProgram( programGPU );
 		gl.bindVertexArray( vaoGPU );
 
 		//
@@ -464,7 +524,6 @@ class WebGLBackend extends Backend {
 
 			}
 
-
 			info.update( object, indexCount, 1 );
 
 		} else {
@@ -487,8 +546,6 @@ class WebGLBackend extends Backend {
 			info.update( object, vertexCount, 1 );
 
 		}
-
-
 
 		//
 
@@ -570,7 +627,7 @@ class WebGLBackend extends Backend {
 		const gl = this.gl;
 		const { stage, code } = program;
 
-		const shader = stage === 'vertex' ? gl.createShader( gl.VERTEX_SHADER ) : gl.createShader( gl.FRAGMENT_SHADER );
+		const shader = stage === 'fragment' ? gl.createShader( gl.FRAGMENT_SHADER ) : gl.createShader( gl.VERTEX_SHADER );
 
 		gl.shaderSource( shader, code );
 		gl.compileShader( shader );
@@ -618,102 +675,111 @@ class WebGLBackend extends Backend {
 
 		// Bindings
 
-		const bindings = renderObject.getBindings();
-
-		for ( const binding of bindings ) {
-
-			const bindingData = this.get( binding );
-			const index = bindingData.index;
-
-			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
-
-				const location = gl.getUniformBlockIndex( programGPU, binding.name );
-				gl.uniformBlockBinding( programGPU, location, index );
-
-			} else if ( binding.isSampledTexture ) {
-
-				const location = gl.getUniformLocation( programGPU, binding.name );
-				gl.uniform1i( location, index );
-
-			}
-
-		}
-
-		// VAO
-
-		const vaoGPU = gl.createVertexArray();
-
-		const index = renderObject.getIndex();
-		const attributes = renderObject.getAttributes();
-
-		gl.bindVertexArray( vaoGPU );
-
-		if ( index !== null ) {
-
-			const indexData = this.get( index );
-
-			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexData.bufferGPU );
-
-		}
-
-		for ( let i = 0; i < attributes.length; i ++ ) {
-
-			const attribute = attributes[ i ];
-			const attributeData = this.get( attribute );
-
-			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
-			gl.enableVertexAttribArray( i );
-
-			let stride, offset;
-
-			if ( attribute.isInterleavedBufferAttribute === true ) {
-
-				stride = attribute.data.stride * attributeData.bytesPerElement;
-				offset = attribute.offset * attributeData.bytesPerElement;
-
-			} else {
-
-				stride = 0;
-				offset = 0;
-
-			}
-
-			if ( attributeData.isInteger ) {
-
-				gl.vertexAttribIPointer( i, attribute.itemSize, attributeData.type, stride, offset );
-
-			} else {
-
-				gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, attribute.normalized, stride, offset );
-
-			}
-
-			if ( attribute.isInstancedBufferAttribute && ! attribute.isInterleavedBufferAttribute ) {
-
-				gl.vertexAttribDivisor( i, attribute.meshPerAttribute );
-
-			} else if ( attribute.isInterleavedBufferAttribute && attribute.data.isInstancedInterleavedBuffer ) {
-
-				gl.vertexAttribDivisor( i, attribute.data.meshPerAttribute );
-
-			}
-
-		}
-
-		gl.bindVertexArray( null );
+		this._setupBindings( renderObject.getBindings(), programGPU );
 
 		//
 
 		this.set( pipeline, {
-			programGPU,
-			vaoGPU
+			programGPU
 		} );
 
 	}
 
-	createComputePipeline( /*computePipeline, bindings*/ ) {
+	createComputePipeline( computePipeline, bindings ) {
 
-		console.warn( 'Abstract class.' );
+		const gl = this.gl;
+
+		// Program
+
+		const fragmentProgram = {
+			stage: 'fragment',
+			code: "#version 300 es\nprecision highp float;\nvoid main() {}"
+		};
+
+		this.createProgram( fragmentProgram );
+
+		const { computeProgram } = computePipeline;
+
+		const programGPU = gl.createProgram();
+
+		const fragmentShader = this.get( fragmentProgram ).shaderGPU;
+		const vertexShader = this.get( computeProgram ).shaderGPU;
+
+		const transforms = computeProgram.transforms;
+
+		const transformVaryingNames = [];
+		const transformAttributeNodes = [];
+
+		for ( let i = 0; i < transforms.length; i ++ ) {
+
+			const transform = transforms[ i ];
+
+			transformVaryingNames.push( transform.varyingName );
+			transformAttributeNodes.push( transform.attributeNode );
+
+		}
+
+		gl.attachShader( programGPU, fragmentShader );
+		gl.attachShader( programGPU, vertexShader );
+
+		gl.transformFeedbackVaryings(
+			programGPU,
+			transformVaryingNames,
+			gl.SEPARATE_ATTRIBS,
+		);
+
+		gl.linkProgram( programGPU );
+
+		if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
+
+			console.error( 'THREE.WebGLBackend:', gl.getProgramInfoLog( programGPU ) );
+
+			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( fragmentShader ) );
+			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( vertexShader ) );
+
+		}
+
+		gl.useProgram( programGPU );
+
+		// Bindings
+
+		this.createBindings( bindings );
+
+		this._setupBindings( bindings, programGPU );
+
+		const attributeNodes = computeProgram.attributes;
+		const attributes = [];
+		const transformBuffers = [];
+
+		for ( let i = 0; i < attributeNodes.length; i ++ ) {
+
+			const attribute = attributeNodes[ i ].node.attribute;
+
+			attributes.push( attribute );
+
+			if ( ! this.has( attribute ) ) this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
+
+		}
+
+		for ( let i = 0; i < transformAttributeNodes.length; i ++ ) {
+
+			const attribute = transformAttributeNodes[ i ].attribute;
+
+			if ( ! this.has( attribute ) ) this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
+
+			const attributeData = this.get( attribute );
+
+			transformBuffers.push( attributeData );
+
+		}
+
+		//
+
+		this.set( computePipeline, {
+			programGPU,
+			transformBuffers,
+			attributes
+		} );
 
 	}
 
@@ -791,15 +857,17 @@ class WebGLBackend extends Backend {
 
 	createAttribute( attribute ) {
 
+		if ( this.has( attribute ) ) return;
+
 		const gl = this.gl;
 
 		this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
 
 	}
 
-	createStorageAttribute( /*attribute*/ ) {
+	createStorageAttribute( attribute ) {
 
-		console.warn( 'Abstract class.' );
+		//console.warn( 'Abstract class.' );
 
 	}
 
@@ -947,6 +1015,197 @@ class WebGLBackend extends Backend {
 		}
 
 		state.bindFramebuffer( gl.FRAMEBUFFER, currentFrameBuffer );
+
+	}
+
+
+	_getVaoKey( index, attributes ) {
+
+		let key = [];
+
+		if ( index !== null ) {
+
+			const indexData = this.get( index );
+
+			key += ':' + indexData.id;
+
+		}
+
+		for ( let i = 0; i < attributes.length; i ++ ) {
+
+			const attributeData = this.get( attributes[ i ] );
+
+			key += ':' + attributeData.id;
+
+		}
+
+		return key;
+
+	}
+
+	_createVao( index, attributes ) {
+
+		const { gl } = this;
+
+		const vaoGPU = gl.createVertexArray();
+		let key = '';
+
+		let staticVao = true;
+
+		gl.bindVertexArray( vaoGPU );
+
+		if ( index !== null ) {
+
+			const indexData = this.get( index );
+
+			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexData.bufferGPU );
+
+			key += ':' + indexData.id;
+
+		}
+
+		for ( let i = 0; i < attributes.length; i ++ ) {
+
+			const attribute = attributes[ i ];
+			const attributeData = this.get( attribute );
+
+			key += ':' + attributeData.id;
+
+			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
+			gl.enableVertexAttribArray( i );
+
+			if ( attribute.isStorageBufferAttribute ) staticVao = false;
+
+			let stride, offset;
+
+			if ( attribute.isInterleavedBufferAttribute === true ) {
+
+				stride = attribute.data.stride * attributeData.bytesPerElement;
+				offset = attribute.offset * attributeData.bytesPerElement;
+
+			} else {
+
+				stride = 0;
+				offset = 0;
+
+			}
+
+			if ( attributeData.isInteger ) {
+
+				gl.vertexAttribIPointer( i, attribute.itemSize, attributeData.type, stride, offset );
+
+			} else {
+
+				gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, attribute.normalized, stride, offset );
+
+			}
+
+			if ( attribute.isInstancedBufferAttribute && ! attribute.isInterleavedBufferAttribute ) {
+
+				gl.vertexAttribDivisor( i, attribute.meshPerAttribute );
+
+			} else if ( attribute.isInterleavedBufferAttribute && attribute.data.isInstancedInterleavedBuffer ) {
+
+				gl.vertexAttribDivisor( i, attribute.data.meshPerAttribute );
+
+			}
+
+		}
+
+		gl.bindBuffer( gl.ARRAY_BUFFER, null );
+
+		this.vaoCache[ key ] = vaoGPU;
+
+		return { vaoGPU, staticVao };
+
+	}
+
+	_getTransformFeedback( transformBuffers ) {
+
+		let key = '';
+
+		for ( let i = 0; i < transformBuffers.length; i ++ ) {
+
+			key += ':' + transformBuffers[ i ].id;
+
+		}
+
+		let transformFeedbackGPU = this.transformFeedbackCache[ key ];
+
+		if ( transformFeedbackGPU !== undefined ) {
+
+			return transformFeedbackGPU;
+
+		}
+
+		const gl = this.gl;
+
+		transformFeedbackGPU = gl.createTransformFeedback();
+
+		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, transformFeedbackGPU );
+
+		for ( let i = 0; i < transformBuffers.length; i ++ ) {
+
+			const attributeData = transformBuffers[ i ];
+
+			gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, i, attributeData.transformBuffer );
+
+		}
+
+		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );
+
+		this.transformFeedbackCache[ key ] = transformFeedbackGPU;
+
+		return transformFeedbackGPU;
+
+	}
+
+
+	_setupBindings( bindings, programGPU ) {
+
+		const gl = this.gl;
+
+		for ( const binding of bindings ) {
+
+			const bindingData = this.get( binding );
+			const index = bindingData.index;
+
+			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+
+				const location = gl.getUniformBlockIndex( programGPU, binding.name );
+				gl.uniformBlockBinding( programGPU, location, index );
+
+			} else if ( binding.isSampledTexture ) {
+
+				const location = gl.getUniformLocation( programGPU, binding.name );
+				gl.uniform1i( location, index );
+
+			}
+
+		}
+
+	}
+
+	_bindUniforms( bindings ) {
+
+		const { gl, state } = this;
+
+		for ( const binding of bindings ) {
+
+			const bindingData = this.get( binding );
+			const index = bindingData.index;
+
+			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+
+				gl.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
+
+			} else if ( binding.isSampledTexture ) {
+
+				state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, gl.TEXTURE0 + index );
+
+			}
+
+		}
 
 	}
 

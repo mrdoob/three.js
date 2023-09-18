@@ -101,7 +101,7 @@
 
 				//
 
-				const createBuffer = ( type = 'vec3' ) => storage( new THREE.InstancedBufferAttribute( new Float32Array( maxParticleCount * 4 ), 4 ), type, maxParticleCount );
+				const createBuffer = ( type = 'vec3' ) => storage( new THREE.InstancedBufferAttribute( new Float32Array( maxParticleCount * 3 ), 3 ), type, maxParticleCount );
 
 				const positionBuffer = createBuffer();
 				const velocityBuffer = createBuffer();
