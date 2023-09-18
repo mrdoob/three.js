@@ -83,7 +83,8 @@ class Renderer {
 		this._clearStencil = 0;
 
 		this._renderTarget = null;
-		this._currentActiveCubeFace = 0;
+		this._activeCubeFace = 0;
+		this._activeMipmapLevel = 0;
 
 		this._initialized = false;
 		this._initPromise = null;
@@ -187,6 +188,7 @@ class Renderer {
 		const renderTarget = this._renderTarget;
 		const renderContext = this._renderContexts.get( scene, camera, renderTarget );
 		const activeCubeFace = this._activeCubeFace;
+		const activeMipmapLevel = this._activeMipmapLevel;
 
 		this._currentRenderContext = renderContext;
 
@@ -238,12 +240,16 @@ class Renderer {
 		const maxDepth = ( viewport.maxDepth === undefined ) ? 1 : viewport.maxDepth;
 
 		renderContext.viewportValue.copy( viewport ).multiplyScalar( pixelRatio ).floor();
+		renderContext.viewportValue.width >>= activeMipmapLevel;
+		renderContext.viewportValue.height >>= activeMipmapLevel;
 		renderContext.viewportValue.minDepth = minDepth;
 		renderContext.viewportValue.maxDepth = maxDepth;
 		renderContext.viewport = renderContext.viewportValue.equals( _screen ) === false;
 
 		renderContext.scissorValue.copy( scissor ).multiplyScalar( pixelRatio ).floor();
 		renderContext.scissor = this._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
+		renderContext.scissorValue.width >>= activeMipmapLevel;
+		renderContext.scissorValue.height >>= activeMipmapLevel;
 
 		renderContext.depth = this.depth;
 		renderContext.stencil = this.stencil;
@@ -274,7 +280,7 @@ class Renderer {
 
 		if ( renderTarget !== null ) {
 
-			this._textures.updateRenderTarget( renderTarget );
+			this._textures.updateRenderTarget( renderTarget, activeMipmapLevel );
 
 			const renderTargetData = this._textures.get( renderTarget );
 
@@ -292,7 +298,10 @@ class Renderer {
 
 		}
 
+		renderContext.width >>= activeMipmapLevel;
+		renderContext.height >>= activeMipmapLevel;
 		renderContext.activeCubeFace = activeCubeFace;
+		renderContext.activeMipmapLevel = activeMipmapLevel;
 		renderContext.occlusionQueryCount = renderList.occlusionQueryCount;
 
 		//
@@ -330,6 +339,18 @@ class Renderer {
 		//
 
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
+
+	}
+
+	getActiveCubeFace() {
+
+		return this._activeCubeFace;
+
+	}
+
+	getActiveMipmapLevel() {
+
+		return this._activeMipmapLevel;
 
 	}
 
@@ -606,10 +627,11 @@ class Renderer {
 
 	}
 
-	setRenderTarget( renderTarget, activeCubeFace = 0 ) {
+	setRenderTarget( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0 ) {
 
 		this._renderTarget = renderTarget;
 		this._activeCubeFace = activeCubeFace;
+		this._activeMipmapLevel = activeMipmapLevel;
 
 	}
 
