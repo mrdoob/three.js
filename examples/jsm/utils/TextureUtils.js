@@ -6,8 +6,9 @@ import {
 	PerspectiveCamera,
 	Scene,
 	WebGLRenderer,
-	Texture,
-	SRGBColorSpace
+	SRGBColorSpace,
+	WebGLRenderTarget,
+	LinearSRGBColorSpace,
 } from 'three';
 
 let _renderer;
@@ -62,11 +63,33 @@ export function decompress( texture, maxTextureSize = Infinity, renderer = null 
 
 	}
 
-	renderer.setSize( Math.min( texture.image.width, maxTextureSize ), Math.min( texture.image.height, maxTextureSize ) );
-	renderer.clear();
-	renderer.render( _scene, _camera );
+	const width = Math.min(texture.image.width, maxTextureSize);
+	const height = Math.min(texture.image.height, maxTextureSize);
 
-	const readableTexture = new Texture( renderer.domElement );
+	renderer.setSize( width, height );
+	renderer.clear();
+
+	const renderTarget = new WebGLRenderTarget(width, height, {
+        stencilBuffer: true,
+        colorSpace: LinearSRGBColorSpace,
+    });
+    renderer.setRenderTarget(renderTarget);
+	renderer.render( _scene, _camera );
+	renderer.setRenderTarget(null);
+
+	const pixelBuffer = new Uint8Array(width * height * 4);
+    renderer.readRenderTargetPixels(
+        renderTarget,
+        0, 0,
+        width, height,
+        pixelBuffer
+    );
+    const imageData = new ImageData(new Uint8ClampedArray(pixelBuffer), width, height);
+
+    renderTarget.texture.image = imageData;
+    renderTarget.dispose();
+
+	const readableTexture = renderTarget.texture;
 
 	readableTexture.minFilter = texture.minFilter;
 	readableTexture.magFilter = texture.magFilter;
