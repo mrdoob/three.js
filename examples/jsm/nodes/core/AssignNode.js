@@ -32,8 +32,6 @@ class AssignNode extends TempNode {
 
 	generate( builder, output ) {
 
-		const op = this.op;
-
 		const aNode = this.aNode;
 		const bNode = this.bNode;
 
@@ -41,8 +39,6 @@ class AssignNode extends TempNode {
 
 		const a = aNode.build( builder, type );
 		const b = bNode.build( builder, type );
-
-		const outputLength = builder.getTypeLength( output );
 
 		if ( output !== 'void' ) {
 
