@@ -416,6 +416,7 @@
 	],
 	"css3d": [
 		"css3d_molecules",
+		"css3d_MuazAssessment",
 		"css3d_orthographic",
 		"css3d_periodictable",
 		"css3d_sandbox",
