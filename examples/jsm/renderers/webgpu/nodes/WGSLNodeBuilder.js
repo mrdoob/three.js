@@ -61,8 +61,7 @@ const wgslMethods = {
 	dFdy: '- dpdy',
 	mod: 'threejs_mod',
 	lessThanEqual: 'threejs_lessThanEqual',
-	inversesqrt: 'inverseSqrt',
-	textureDimensions: 'textureDimensions'
+	inversesqrt: 'inverseSqrt'
 };
 
 const wgslPolyfill = {
