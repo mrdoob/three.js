@@ -1,8 +1,7 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
-import { bypass } from '../core/BypassNode.js';
 import { context as contextNode } from '../core/ContextNode.js';
-import { addNodeElement, nodeObject, nodeArray } from '../shadernode/ShaderNode.js';
+import { addNodeElement, nodeObject, nodeArray, bypass } from '../shadernode/ShaderNode.js';
 
 class LoopNode extends Node {
 

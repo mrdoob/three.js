@@ -1,10 +1,8 @@
 import Node, { addNodeClass } from './Node.js';
-import { assign } from '../math/OperatorNode.js';
-import { bypass } from '../core/BypassNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { cond } from '../math/CondNode.js';
 import { loop } from '../utils/LoopNode.js';
-import { ShaderNode, nodeProxy } from '../shadernode/ShaderNode.js';
+import { ShaderNode, nodeProxy, assign, bypass } from '../shadernode/ShaderNode.js';
 
 class StackNode extends Node {
 
