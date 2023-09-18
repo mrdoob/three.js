@@ -6,6 +6,7 @@ import SplitNode from '../utils/SplitNode.js';
 import AssignNode from '../core/AssignNode.js';
 import BypassNode from '../core/BypassNode.js';
 import ConstNode from '../core/ConstNode.js';
+import VarNode from '../core/VarNode.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 
 const NodeElements = new Map(); // @TODO: Currently only a few nodes are added, probably also add others
@@ -421,6 +422,7 @@ addNodeElement( 'arrayBuffer', arrayBuffer );
 export const element = nodeProxy( ArrayElementNode );
 export const assign = nodeProxy( AssignNode );
 export const bypass = nodeProxy( BypassNode );
+export const temp = nodeProxy( VarNode );
 export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
 export const split = ( node, channels ) => nodeObject( new SplitNode( nodeObject( node ), channels ) );
 
@@ -428,3 +430,4 @@ addNodeElement( 'element', element );
 addNodeElement( 'assign', assign );
 addNodeElement( 'bypass', bypass );
 addNodeElement( 'convert', convert );
+addNodeElement( 'temp', temp );

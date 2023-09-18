@@ -29,7 +29,7 @@ export { default as PropertyNode, property, output, diffuseColor, roughness, met
 export { default as StackNode, stack } from './core/StackNode.js';
 export { default as TempNode } from './core/TempNode.js';
 export { default as UniformNode, uniform } from './core/UniformNode.js';
-export { default as VarNode, temp } from './core/VarNode.js';
+export { default as VarNode } from './core/VarNode.js';
 export { default as VaryingNode, varying } from './core/VaryingNode.js';
 export { default as OutputStructNode, outputStruct } from './core/OutputStructNode.js';
 
