@@ -21,15 +21,12 @@ class FogExp2 {
 
 	toJSON( /* meta */ ) {
 
-		const data = {};
-
-		data.type = 'FogExp2';
-		data.color = this.color.getHex();
-
-		if ( this.name !== '' ) data.name = this.name;
-		if ( this.density !== 0.00025 ) data.desnity = this.density;
-
-		return data;
+		return {
+			type: 'FogExp2',
+			name: this.name,
+			color: this.color.getHex(),
+			density: this.density
+		};
 
 	}
 

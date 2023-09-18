@@ -23,16 +23,13 @@ class Fog {
 
 	toJSON( /* meta */ ) {
 
-		const data = {};
-
-		data.type = 'Fog';
-		data.color = this.color.getHex();
-
-		if ( this.name !== '' ) data.name = this.name;
-		if ( this.near !== 1 ) data.near = this.near;
-		if ( this.far !== 1000 ) data.far = this.far;
-
-		return data;
+		return {
+			type: 'Fog',
+			name: this.name,
+			color: this.color.getHex(),
+			near: this.near,
+			far: this.far
+		};
 
 	}
 
