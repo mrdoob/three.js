@@ -8732,10 +8732,10 @@ class Material extends EventDispatcher {
 
 		if ( this.blending !== NormalBlending ) data.blending = this.blending;
 		if ( this.side !== FrontSide ) data.side = this.side;
-		if ( this.vertexColors ) data.vertexColors = true;
+		if ( this.vertexColors === true ) data.vertexColors = true;
 
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
-		if ( this.transparent === true ) data.transparent = this.transparent;
+		if ( this.transparent === true ) data.transparent = true;
 
 		data.depthFunc = this.depthFunc;
 		data.depthTest = this.depthTest;
@@ -8766,17 +8766,17 @@ class Material extends EventDispatcher {
 		if ( this.dithering === true ) data.dithering = true;
 
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
-		if ( this.alphaHash === true ) data.alphaHash = this.alphaHash;
-		if ( this.alphaToCoverage === true ) data.alphaToCoverage = this.alphaToCoverage;
-		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
-		if ( this.forceSinglePass === true ) data.forceSinglePass = this.forceSinglePass;
+		if ( this.alphaHash === true ) data.alphaHash = true;
+		if ( this.alphaToCoverage === true ) data.alphaToCoverage = true;
+		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = true;
+		if ( this.forceSinglePass === true ) data.forceSinglePass = true;
 
-		if ( this.wireframe === true ) data.wireframe = this.wireframe;
+		if ( this.wireframe === true ) data.wireframe = true;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
 		if ( this.wireframeLinecap !== 'round' ) data.wireframeLinecap = this.wireframeLinecap;
 		if ( this.wireframeLinejoin !== 'round' ) data.wireframeLinejoin = this.wireframeLinejoin;
 
-		if ( this.flatShading === true ) data.flatShading = this.flatShading;
+		if ( this.flatShading === true ) data.flatShading = true;
 
 		if ( this.visible === false ) data.visible = false;
 
@@ -12642,6 +12642,7 @@ class CubeCamera extends Object3D {
 
 		this.renderTarget = renderTarget;
 		this.coordinateSystem = null;
+		this.activeMipmapLevel = 0;
 
 		const cameraPX = new PerspectiveCamera( fov, aspect, near, far );
 		cameraPX.layers = this.layers;
@@ -12739,7 +12740,7 @@ class CubeCamera extends Object3D {
 
 		if ( this.parent === null ) this.updateMatrixWorld();
 
-		const renderTarget = this.renderTarget;
+		const { renderTarget, activeMipmapLevel } = this;
 
 		if ( this.coordinateSystem !== renderer.coordinateSystem ) {
 
@@ -12752,6 +12753,8 @@ class CubeCamera extends Object3D {
 		const [ cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ ] = this.children;
 
 		const currentRenderTarget = renderer.getRenderTarget();
+		const currentActiveCubeFace = renderer.getActiveCubeFace();
+		const currentActiveMipmapLevel = renderer.getActiveMipmapLevel();
 
 		const currentXrEnabled = renderer.xr.enabled;
 
@@ -12761,27 +12764,30 @@ class CubeCamera extends Object3D {
 
 		renderTarget.texture.generateMipmaps = false;
 
-		renderer.setRenderTarget( renderTarget, 0 );
+		renderer.setRenderTarget( renderTarget, 0, activeMipmapLevel );
 		renderer.render( scene, cameraPX );
 
-		renderer.setRenderTarget( renderTarget, 1 );
+		renderer.setRenderTarget( renderTarget, 1, activeMipmapLevel );
 		renderer.render( scene, cameraNX );
 
-		renderer.setRenderTarget( renderTarget, 2 );
+		renderer.setRenderTarget( renderTarget, 2, activeMipmapLevel );
 		renderer.render( scene, cameraPY );
 
-		renderer.setRenderTarget( renderTarget, 3 );
+		renderer.setRenderTarget( renderTarget, 3, activeMipmapLevel );
 		renderer.render( scene, cameraNY );
 
-		renderer.setRenderTarget( renderTarget, 4 );
+		renderer.setRenderTarget( renderTarget, 4, activeMipmapLevel );
 		renderer.render( scene, cameraPZ );
+
+		// mipmaps are generated during the last call of render()
+		// at this point, all sides of the cube render target are defined
 
 		renderTarget.texture.generateMipmaps = generateMipmaps;
 
-		renderer.setRenderTarget( renderTarget, 5 );
+		renderer.setRenderTarget( renderTarget, 5, activeMipmapLevel );
 		renderer.render( scene, cameraNZ );
 
-		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
 
 		renderer.xr.enabled = currentXrEnabled;
 
@@ -30560,6 +30566,7 @@ class FogExp2 {
 
 		return {
 			type: 'FogExp2',
+			name: this.name,
 			color: this.color.getHex(),
 			density: this.density
 		};
@@ -30593,6 +30600,7 @@ class Fog {
 
 		return {
 			type: 'Fog',
+			name: this.name,
 			color: this.color.getHex(),
 			near: this.near,
 			far: this.far
@@ -31198,7 +31206,7 @@ const _uvC = /*@__PURE__*/ new Vector2();
 
 class Sprite extends Object3D {
 
-	constructor( material ) {
+	constructor( material = new SpriteMaterial() ) {
 
 		super();
 
@@ -31226,7 +31234,7 @@ class Sprite extends Object3D {
 		}
 
 		this.geometry = _geometry;
-		this.material = ( material !== undefined ) ? material : new SpriteMaterial();
+		this.material = material;
 
 		this.center = new Vector2( 0.5, 0.5 );
 
@@ -44957,6 +44965,12 @@ class ObjectLoader extends Loader {
 					} else if ( data.fog.type === 'FogExp2' ) {
 
 						object.fog = new FogExp2( data.fog.color, data.fog.density );
+
+					}
+
+					if ( data.fog.name !== '' ) {
+
+						object.fog.name = data.fog.name;
 
 					}
 
