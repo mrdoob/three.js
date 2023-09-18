@@ -76,7 +76,27 @@ const shaderNodeHandler = {
 
 		}
 
-		return node[ prop ];
+		return Reflect.get( node, prop, nodeObj );
+
+	},
+
+	set( node, prop, value, nodeObj ) {
+
+		if ( typeof prop === 'string' && node[ prop ] === undefined && node.type === 'VarNode' ) {
+
+			// setting properties
+
+			if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true || prop === 'width' || prop === 'height' || /^\d+$/.test( prop ) === true ) {
+
+				nodeObj.assign( nodeObj[ prop ].assign( value ) );
+
+				return true;
+
+			}
+
+		}
+
+		return Reflect.set( node, prop, value, nodeObj );
 
 	}
 
