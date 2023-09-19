@@ -628,33 +628,38 @@ class WebGLBackend extends Backend {
 
 			const renderContextData = this.get( renderContext );
 
-			let fb = renderContextData.frameBuffer;
+			let fb = renderContextData.framebuffer;
 
 			if ( fb === undefined ) {
 
 				fb = gl.createFramebuffer();
-				renderContextData.frameBuffer = fb;
 
-			}
+				gl.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
-			gl.bindFramebuffer( gl.FRAMEBUFFER, fb );
+				const textures = renderContext.textures;
 
-			const textures = renderContext.textures;
+				for ( let i = 0; i < textures.length; i++ ) {
 
-			for ( let i = 0; i < textures.length; i++ ) {
+					const texture = textures[ i ];
+					const { textureGPU } = this.get( texture );
 
-				const texture = textures[ i ];
-				const { textureGPU } = this.get( texture );
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, textureGPU, 0 );
 
-				gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, textureGPU, 0 );
+				}
 
-			}
+				if ( renderContext.depthTexture !== null ) {
 
-			if ( renderContext.depthTexture !== null ) {
+					const { textureGPU } = this.get( renderContext.depthTexture );
 
-				const { textureGPU } = this.get( renderContext.depthTexture );
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureGPU, 0 );
 
-				gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureGPU, 0 );
+				}
+
+				renderContextData.framebuffer = fb;
+
+			} else {
+
+				gl.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
 			}
 
