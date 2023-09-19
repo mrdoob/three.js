@@ -102,7 +102,7 @@ class MathNode extends TempNode {
 
 		} else if ( method === MathNode.NEGATE ) {
 
-			return builder.format( '-' + a.build( builder, inputType ), type, output );
+			return builder.format( '( - ' + a.build( builder, inputType ) + ' )', type, output );
 
 		} else if ( method === MathNode.ONE_MINUS ) {
 
