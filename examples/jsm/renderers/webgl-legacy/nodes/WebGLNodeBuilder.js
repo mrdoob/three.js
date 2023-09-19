@@ -220,7 +220,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 						this.addSlot( 'fragment', new SlotNode( {
 							node: material.clearcoatNormalNode,
 							nodeType: 'vec3',
-							source: 'vec3 clearcoatNormal = geometryNormal;',
+							source: 'vec3 clearcoatNormal = nonPerturbedNormal;',
 							target: 'vec3 clearcoatNormal = %RESULT%;'
 						} ) );
 
