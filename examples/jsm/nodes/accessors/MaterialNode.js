@@ -3,7 +3,7 @@ import { reference } from './ReferenceNode.js';
 import { materialReference } from './MaterialReferenceNode.js';
 import { nodeImmutable, float } from '../shadernode/ShaderNode.js';
 
-const cache = new WeakMap();
+const _propertyCache = new Map();
 
 class MaterialNode extends Node {
 
@@ -15,27 +15,15 @@ class MaterialNode extends Node {
 
 	}
 
-	getCache( builder, property, type ) {
+	getCache( property, type ) {
 
-		const material = builder.context.material;
-
-		let cacheMaterial = cache.get( material );
-
-		if ( cacheMaterial === undefined ) {
-
-			cacheMaterial = {};
-
-			cache.set( material, cacheMaterial );
-
-		}
-
-		let node = cacheMaterial[ property ];
+		let node = _propertyCache.get( property );
 
 		if ( node === undefined ) {
 
 			node = materialReference( property, type );
 
-			cacheMaterial[ property ] = node;
+			_propertyCache.set( property, node );
 
 		}
 
@@ -43,21 +31,21 @@ class MaterialNode extends Node {
 
 	}
 
-	getFloat( builder, property ) {
+	getFloat( property ) {
 
-		return this.getCache( builder, property, 'float' );
-
-	}
-
-	getColor( builder, property ) {
-
-		return this.getCache( builder, property, 'color' );
+		return this.getCache( property, 'float' );
 
 	}
 
-	getTexture( builder, property ) {
+	getColor( property ) {
 
-		return this.getCache( builder, property, 'texture' );
+		return this.getCache( property, 'color' );
+
+	}
+
+	getTexture( property ) {
+
+		return this.getCache( property, 'texture' );
 
 	}
 
@@ -70,19 +58,19 @@ class MaterialNode extends Node {
 
 		if ( scope === MaterialNode.ALPHA_TEST || scope === MaterialNode.SHININESS || scope === MaterialNode.REFLECTIVITY || scope === MaterialNode.ROTATION || scope === MaterialNode.IRIDESCENCE || scope === MaterialNode.IRIDESCENCE_IOR ) {
 
-			node = this.getFloat( builder, scope );
+			node = this.getFloat( scope );
 
 		} else if ( scope === MaterialNode.SPECULAR_COLOR ) {
 
-			node = this.getColor( builder, 'specular' );
+			node = this.getColor( 'specular' );
 
 		} else if ( scope === MaterialNode.COLOR ) {
 
-			const colorNode = this.getColor( builder, 'color' );
+			const colorNode = this.getColor( 'color' );
 
 			if ( material.map && material.map.isTexture === true ) {
 
-				node = colorNode.mul( this.getTexture( builder, 'map' ) );
+				node = colorNode.mul( this.getTexture( 'map' ) );
 
 			} else {
 
@@ -92,11 +80,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.OPACITY ) {
 
-			const opacityNode = this.getFloat( builder, 'opacity' );
+			const opacityNode = this.getFloat( 'opacity' );
 
 			if ( material.alphaMap && material.alphaMap.isTexture === true ) {
 
-				node = opacityNode.mul( this.getTexture( builder, 'alphaMap' ) );
+				node = opacityNode.mul( this.getTexture( 'alphaMap' ) );
 
 			} else {
 
@@ -108,7 +96,7 @@ class MaterialNode extends Node {
 
 			if ( material.specularMap && material.specularMap.isTexture === true ) {
 
-				node = this.getTexture( builder, 'specularMap' ).r;
+				node = this.getTexture( 'specularMap' ).r;
 
 			} else {
 
@@ -118,11 +106,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.ROUGHNESS ) {
 
-			const roughnessNode = this.getFloat( builder, 'roughness' );
+			const roughnessNode = this.getFloat( 'roughness' );
 
 			if ( material.roughnessMap && material.roughnessMap.isTexture === true ) {
 
-				node = roughnessNode.mul( this.getTexture( builder, 'roughnessMap' ).g );
+				node = roughnessNode.mul( this.getTexture( 'roughnessMap' ).g );
 
 			} else {
 
@@ -132,11 +120,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.METALNESS ) {
 
-			const metalnessNode = this.getFloat( builder, 'metalness' );
+			const metalnessNode = this.getFloat( 'metalness' );
 
 			if ( material.metalnessMap && material.metalnessMap.isTexture === true ) {
 
-				node = metalnessNode.mul( this.getTexture( builder, 'metalnessMap' ).b );
+				node = metalnessNode.mul( this.getTexture( 'metalnessMap' ).b );
 
 			} else {
 
@@ -146,11 +134,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.EMISSIVE ) {
 
-			const emissiveNode = this.getColor( builder, 'emissive' );
+			const emissiveNode = this.getColor( 'emissive' );
 
 			if ( material.emissiveMap && material.emissiveMap.isTexture === true ) {
 
-				node = emissiveNode.mul( this.getTexture( builder, 'emissiveMap' ) );
+				node = emissiveNode.mul( this.getTexture( 'emissiveMap' ) );
 
 			} else {
 
@@ -160,11 +148,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.CLEARCOAT ) {
 
-			const clearcoatNode = this.getFloat( builder, 'clearcoat' );
+			const clearcoatNode = this.getFloat( 'clearcoat' );
 
 			if ( material.clearcoatMap && material.clearcoatMap.isTexture === true ) {
 
-				node = clearcoatNode.mul( this.getTexture( builder, 'clearcoatMap' ).r );
+				node = clearcoatNode.mul( this.getTexture( 'clearcoatMap' ).r );
 
 			} else {
 
@@ -174,11 +162,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.CLEARCOAT_ROUGHNESS ) {
 
-			const clearcoatRoughnessNode = this.getFloat( builder, 'clearcoatRoughness' );
+			const clearcoatRoughnessNode = this.getFloat( 'clearcoatRoughness' );
 
 			if ( material.clearcoatRoughnessMap && material.clearcoatRoughnessMap.isTexture === true ) {
 
-				node = clearcoatRoughnessNode.mul( this.getTexture( builder, 'clearcoatRoughnessMap' ).r );
+				node = clearcoatRoughnessNode.mul( this.getTexture( 'clearcoatRoughnessMap' ).r );
 
 			} else {
 
@@ -188,11 +176,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.SHEEN ) {
 
-			const sheenNode = this.getColor( builder, 'sheenColor' ).mul( this.getFloat( builder, 'sheen' ) ); // Move this mul() to CPU
+			const sheenNode = this.getColor( 'sheenColor' ).mul( this.getFloat( 'sheen' ) ); // Move this mul() to CPU
 
 			if ( material.sheenColorMap && material.sheenColorMap.isTexture === true ) {
 
-				node = sheenNode.mul( this.getTexture( builder, 'sheenColorMap' ).rgb );
+				node = sheenNode.mul( this.getTexture( 'sheenColorMap' ).rgb );
 
 			} else {
 
@@ -202,11 +190,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.SHEEN_ROUGHNESS ) {
 
-			const sheenRoughnessNode = this.getFloat( builder, 'sheenRoughness' );
+			const sheenRoughnessNode = this.getFloat( 'sheenRoughness' );
 
 			if ( material.sheenRoughnessMap && material.sheenRoughnessMap.isTexture === true ) {
 
-				node = sheenRoughnessNode.mul( this.getTexture( builder, 'sheenRoughnessMap' ).a );
+				node = sheenRoughnessNode.mul( this.getTexture( 'sheenRoughnessMap' ).a );
 
 			} else {
 
@@ -224,7 +212,7 @@ class MaterialNode extends Node {
 
 				const iridescenceThicknessMinimum = reference( 0, 'float', material.iridescenceThicknessRange );
 
-				node = iridescenceThicknessMaximum.sub( iridescenceThicknessMinimum ).mul( this.getTexture( builder, 'iridescenceThicknessMap' ).g ).add( iridescenceThicknessMinimum );
+				node = iridescenceThicknessMaximum.sub( iridescenceThicknessMinimum ).mul( this.getTexture( 'iridescenceThicknessMap' ).g ).add( iridescenceThicknessMinimum );
 
 			} else {
 

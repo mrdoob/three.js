@@ -1,7 +1,12 @@
 export default /* glsl */`
 uniform bool receiveShadow;
 uniform vec3 ambientLightColor;
-uniform vec3 lightProbe[ 9 ];
+
+#if defined( USE_LIGHT_PROBES )
+
+	uniform vec3 lightProbe[ 9 ];
+
+#endif
 
 // get the irradiance (radiance convolved with cosine lobe) at the point 'normal' on the unit sphere
 // source: https://graphics.stanford.edu/papers/envmap/envmap.pdf

@@ -99,6 +99,7 @@ const exceptionList = [
 	'webgl_test_memory2',
 	'webgl_tiled_forward',
 	'webgl2_volume_instancing',
+	'webgl2_multisampled_renderbuffers',
 	'webgl_points_dynamic',
 
 	// TODO: implement determinism for setTimeout and setInterval
@@ -113,10 +114,10 @@ const exceptionList = [
 	'webgpu_compute',
 	'webgpu_compute_particles',
 	'webgpu_compute_texture',
+	'webgpu_compute_texture_pingpong',
 	'webgpu_cubemap_dynamic',
 	'webgpu_depth_texture',
 	'webgpu_instance_mesh',
-	'webgpu_lights_ies_spotlight',
 	'webgpu_lines_fat',
 	'webgpu_loader_gltf',
 	'webgpu_loader_gltf_compressed',

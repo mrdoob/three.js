@@ -15,12 +15,21 @@ class ReferenceNode extends Node {
 		this.uniformType = uniformType;
 
 		this.object = object;
+		this.reference = null;
 
 		this.node = null;
 
 		this.updateType = NodeUpdateType.OBJECT;
 
 		this.setNodeType( uniformType );
+
+	}
+
+	updateReference( frame ) {
+
+		this.reference = this.object !== null ? this.object : frame.object;
+
+		return this.reference;
 
 	}
 
@@ -48,12 +57,9 @@ class ReferenceNode extends Node {
 
 	}
 
-	update( frame ) {
+	update( /*frame*/ ) {
 
-		const object = this.object !== null ? this.object : frame.object;
-		const property = this.property;
-
-		this.node.value = object[ property ];
+		this.node.value = this.reference[ this.property ];
 
 	}
 

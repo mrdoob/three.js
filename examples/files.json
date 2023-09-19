@@ -315,6 +315,7 @@
 		"webgpu_compute",
 		"webgpu_compute_particles",
 		"webgpu_compute_texture",
+		"webgpu_compute_texture_pingpong",
 		"webgpu_cubemap_adjustments",
 		"webgpu_cubemap_dynamic",
 		"webgpu_cubemap_mix",
