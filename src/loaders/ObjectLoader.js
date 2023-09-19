@@ -114,12 +114,6 @@ class ObjectLoader extends Loader {
 
 	}
 
-	loadAsync( url, onProgress ) {
-
-		return new Promise( ( resolve, reject ) => this.load( url, resolve, onProgress, reject ) );
-
-	}
-
 	parse( json, onLoad ) {
 
 		const animations = this.parseAnimations( json.animations );
