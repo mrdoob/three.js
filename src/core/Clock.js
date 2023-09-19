@@ -39,27 +39,21 @@ class Clock {
 
 	getDelta() {
 
-		let diff = 0;
-
-		if ( this.autoStart && ! this.running ) {
-
-			this.start();
-			return 0;
-
-		}
-
 		if ( this.running ) {
 
-			const newTime = now();
+			const current = now();
+			const delta = ( current - this.oldTime ) / 1000;
 
-			diff = ( newTime - this.oldTime ) / 1000;
-			this.oldTime = newTime;
+			this.oldTime = current;
+			this.elapsedTime += delta;
 
-			this.elapsedTime += diff;
+			return delta;
 
 		}
 
-		return diff;
+		if ( this.autoStart ) this.start();
+
+		return 0;
 
 	}
 
