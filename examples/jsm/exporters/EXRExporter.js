@@ -21,13 +21,15 @@ const ZIP_COMPRESSION = 3;
 
 class EXRExporter {
 
-	parse( renderer, renderTarget, options ) {
+	parse( arg1, arg2, arg3 ) {
 
-		if ( ! renderer || ! ( renderer.isWebGLRenderer || renderer.isDataTexture ) ) {
+		if ( ! arg1 || ! ( arg1.isWebGLRenderer || arg1.isDataTexture ) ) {
 
 			throw Error( 'EXRExporter.parse: Unsupported first parameter, expected instance of WebGLRenderer or DataTexture.' );
 
-		} else if ( renderer.isWebGLRenderer ) {
+		} else if ( arg1.isWebGLRenderer ) {
+
+			const renderer = arg1, renderTarget = arg2, options = arg3;
 
 			supportedRTT( renderTarget );
 
@@ -38,9 +40,10 @@ class EXRExporter {
 
 			return fillData( chunks, info );
 
-		} else if ( renderer.isDataTexture ) {
+		} else if ( arg1.isDataTexture ) {
 
-			const texture = renderer;
+			const texture = arg1, options = arg2;
+
 			supportedDT( texture );
 
 			const info = buildInfoDT( texture, options ),
