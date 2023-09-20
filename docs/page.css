@@ -221,7 +221,7 @@ matrices
 	display: inline grid;
 	grid-template-rows: repeat(var(--matrix-rows), minmax(3ch, max-content));
 	grid-template-columns: repeat(var(--matrix-cols), minmax(3ch, max-content));
-	gap: 0.5ch;
+	gap: 1.5ch;
 	margin: 0 1ch;
 	vertical-align: middle;
 }
@@ -243,7 +243,8 @@ matrices
 }
 .matrix > * {
 	text-align: center;
-	padding: 0 1.5ch;
+	padding: 0 1ch;
+	white-space: nowrap;
 }
 
 
