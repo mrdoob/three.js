@@ -53,7 +53,6 @@ class RenderTarget extends EventDispatcher {
 		this.texture.flipY = false;
 		this.texture.generateMipmaps = options.generateMipmaps;
 		this.texture.internalFormat = options.internalFormat;
-		this.texture.minFilter = options.minFilter;
 
 		this.depthBuffer = options.depthBuffer;
 		this.stencilBuffer = options.stencilBuffer;
