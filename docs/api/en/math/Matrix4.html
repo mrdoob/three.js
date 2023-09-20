@@ -191,18 +191,32 @@ m.elements = [ 11, 21, 31, 41,
 		<p>
 			Extracts the [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] 
 			of this matrix into the three axis vectors provided. If this matrix
-			is:
-		<code>
-a, b, c, d, 
-e, f, g, h, 
-i, j, k, l, 
-m, n, o, p </code>
+			is:<br /><br />
+
+			<span class="matrix mat4">
+				<i>a</i><i>b</i><i>c</i><i>d</i>
+				<i>e</i><i>f</i><i>g</i><i>h</i>
+				<i>i</i><i>j</i><i>k</i><i>l</i>
+				<i>m</i><i>n</i><i>o</i><i>p</i>
+			</span><br /><br />
+
 			then the [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis]
-			will be set to:
-			<code>
-xAxis = (a, e, i) 
-yAxis = (b, f, j) 
-zAxis = (c, g, k) </code>
+			will be set to:<br /><br />
+
+			xAxis =
+			<span class="matrix mat3x1">
+				<i>a</i><i>e</i><i>i</i>
+			</span>,
+
+			yAxis =
+			<span class="matrix mat3x1">
+				<i>b</i><i>f</i><i>j</i>
+			</span>,
+
+			zAxis =
+			<span class="matrix mat3x1">
+				<i>c</i><i>g</i><i>k</i>
+			</span>.
 		</p>
 
 		<h3>[method:this extractRotation]( [param:Matrix4 m] )</h3>
@@ -268,13 +282,14 @@ zAxis = (c, g, k) </code>
 		</h3>
 		<p>
 			Set this to the [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] 
-			matrix consisting of the three provided basis vectors:
-			<code>
-xAxis.x, yAxis.x, zAxis.x, 0, 
-xAxis.y, yAxis.y, zAxis.y, 0, 
-xAxis.z, yAxis.z, zAxis.z, 0, 
-	0, 		0, 		0, 	   1
-			</code>
+			matrix consisting of the three provided basis vectors:<br /><br />
+
+			<span class="matrix mat4">
+				<i>xAxis.x</i><i>yAxis.x</i><i>zAxis.x</i><i>0</i>
+				<i>xAxis.y</i><i>yAxis.y</i><i>zAxis.y</i><i>0</i>
+				<i>xAxis.z</i><i>yAxis.z</i><i>zAxis.z</i><i>0</i>
+				<i>0</i><i>0</i><i>0</i><i>1</i>
+			</span>
 		</p>
 
 		<h3>
@@ -311,13 +326,14 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 			[page:Quaternion q], as outlined
 			[link:https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion here]. The
 			rest of the matrix is set to the identity. So, given [page:Quaternion q] =
-			w + xi + yj + zk, the resulting matrix will be:
-			<code>
-1-2y²-2z² 	2xy-2zw 	2xz+2yw 	0 
-2xy+2zw   	1-2x²-2z² 	2yz-2xw 	0 
-2xz-2yw   	2yz+2xw   	1-2x²-2y²   0
-	0 			0	 		0 		1
-			</code>
+			w + xi + yj + zk, the resulting matrix will be:<br /><br />
+
+			<span class='matrix mat4'>
+				<i>1-2y²-2z²</i><i>2xy-2zw</i><i>2xz+2yw</i><i>0</i>
+				<i>2xy+2zw</i><i>1-2x²-2z²</i><i>2yz-2xw</i><i>0</i>
+				<i>2xz-2yw</i><i>2yz+2xw</i><i>1-2x²-2y²</i><i>0</i>
+				<i>0</i><i>0</i><i>0</i><i>1</i>
+			</span>
 		</p>
 
 		<h3>[method:this makeRotationX]( [param:Float theta] )</h3>
@@ -325,13 +341,14 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 			[page:Float theta] — Rotation angle in radians.<br /><br />
 
 			Sets this matrix as a rotational transformation around the X axis by
-			[page:Float theta] (&theta;) radians. The resulting matrix will be:
-			<code>
-	1 		0	 		0 			0 
-	0 	cos(&theta;) -sin(&theta;) 	0 
-	0 	sin(&theta;) cos(&theta;) 	0 
-	0 		0			0 			1
-			</code>
+			[page:Float theta] (&theta;) radians. The resulting matrix will be:<br /><br />
+
+			<span class="matrix mat4">
+				<i>1</i><i>0</i><i>0</i><i>0</i>
+				<i>0</i><i>cos&theta;</i><i>-sin&theta;</i><i>0</i>
+				<i>0</i><i>sin&theta;</i><i>cos&theta;</i><i>0</i>
+				<i>0</i><i>0</i><i>0</i><i>1</i>
+			</span>
 		</p>
 
 		<h3>[method:this makeRotationY]( [param:Float theta] )</h3>
@@ -339,11 +356,14 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 			[page:Float theta] — Rotation angle in radians.<br /><br />
 
 			Sets this matrix as a rotational transformation around the Y axis by
-			[page:Float theta] (&theta;) radians. The resulting matrix will be:
-			<code>
-				cos(&theta;) 0 sin(&theta;) 0 0 1 0 0 -sin(&theta;) 0 cos(&theta;) 0 0 0
-				0 1
-			</code>
+			[page:Float theta] (&theta;) radians. The resulting matrix will be:<br/><br/>
+
+			<span class="matrix mat4">
+				<i>cos&theta;</i><i>0</i><i>sin&theta;</i><i>0</i>
+				<i>0</i><i>1</i><i>0</i><i>0</i>
+				<i>-sin&theta;</i><i>0</i><i>cos&theta;</i><i>0</i>
+				<i>0</i><i>0</i><i>0</i><i>1</i>
+			</span>
 		</p>
 
 		<h3>[method:this makeRotationZ]( [param:Float theta] )</h3>
@@ -351,13 +371,14 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 			[page:Float theta] — Rotation angle in radians.<br /><br />
 
 			Sets this matrix as a rotational transformation around the Z axis by
-			[page:Float theta] (&theta;) radians. The resulting matrix will be:
-			<code>
-cos(&theta;) -sin(&theta;) 0 0 
-sin(&theta;) cos(&theta;)  0 0 
-	0 			0 		   1 0 
-	0 			0		   0 1
-			</code>
+			[page:Float theta] (&theta;) radians. The resulting matrix will be:<br /><br />
+
+			<span class="matrix mat4">
+				<i>cos&theta;</i><i>-sin&theta;</i><i>0</i><i>0</i>
+				<i>sin&theta;</i><i>cos&theta;</i><i>0</i><i>0</i>
+				<i>0</i><i>0</i><i>1</i><i>0</i>
+				<i>0</i><i>0</i><i>0</i><i>1</i>
+			</span>
 		</p>
 
 		<h3>
@@ -368,12 +389,14 @@ sin(&theta;) cos(&theta;)  0 0
 			[page:Float y] - the amount to scale in the Y axis.<br />
 			[page:Float z] - the amount to scale in the Z axis.<br /><br />
 
-			Sets this matrix as scale transform:
-			<code>
-x, 0, 0, 0, 
-0, y, 0, 0, 
-0, 0, z, 0, 
-0, 0, 0, 1 </code>
+			Sets this matrix as scale transform:<br /><br/>
+
+			<span class="matrix mat4">
+				<i>x</i><i>0</i><i>0</i><i>0</i>
+				<i>0</i><i>y</i><i>0</i><i>0</i>
+				<i>0</i><i>0</i><i>z</i><i>0</i>
+				<i>0</i><i>0</i><i>0</i><i>1</i>
+			</span>
 		</p>
 
 		<h3>
@@ -388,12 +411,14 @@ x, 0, 0, 0,
 			[page:Float zx] - the amount to shear Z by X.<br />
 			[page:Float zy] - the amount to shear Z by Y.<br /><br />
 
-			Sets this matrix as a shear transform:
-			<code> 
-1, yx, zx, 0, 
-xy, 1, zy, 0, 
-xz, yz, 1, 0, 
-0, 0, 0, 1 </code>
+			Sets this matrix as a shear transform:<br /><br />
+
+			<span class="matrix mat4">
+				<i>1</i><i>yx</i><i>zx</i><i>0</i>
+				<i>xy</i><i>1</i><i>zy</i><i>0</i>
+				<i>xz</i><i>yz</i><i>1</i><i>0</i>
+				<i>0</i><i>0</i><i>0</i><i>1</i>
+			</span>
 		</p>
 
 		<h3>[method:this makeTranslation]( [param:Vector3 v] )</h3>
@@ -402,11 +427,14 @@ xz, yz, 1, 0,
 		</h3>
 		<p>
 			Sets this matrix as a translation transform from vector [page:Vector3 v], or numbers [page:Float x], [page:Float y] and [page:Float z]:
-			<code> 
-1, 0, 0, x, 
-0, 1, 0, y, 
-0, 0, 1, z, 
-0, 0, 0, 1 </code>
+			<br /><br/>
+
+			<span class="matrix mat4">
+				<i>1</i><i>0</i><i>0</i><i>x</i>
+				<i>0</i><i>1</i><i>0</i><i>y</i>
+				<i>0</i><i>0</i><i>1</i><i>z</i>
+				<i>0</i><i>0</i><i>0</i><i>1</i>
+			</span>
 		</p>
 
 		<h3>[method:this multiply]( [param:Matrix4 m] )</h3>
@@ -449,18 +477,22 @@ xz, yz, 1, 0,
 		<p>
 			Sets the position component for this matrix from vector [page:Vector3 v],
 			without affecting the rest of the matrix - i.e. if the matrix is
-			currently:
-			<code>
-a, b, c, d, 
-e, f, g, h, 
-i, j, k, l, 
-m, n, o, p </code>
-			This becomes:
-			<code>
-a, b, c, v.x, 
-e, f, g, v.y, 
-i, j, k, v.z, 
-m, n, o, p </code>
+			currently:<br /><br />
+
+			<span class="matrix mat4">
+				<i>a</i><i>b</i><i>c</i><i>d</i>
+				<i>e</i><i>f</i><i>g</i><i>h</i>
+				<i>i</i><i>j</i><i>k</i><i>l</i>
+				<i>m</i><i>n</i><i>o</i><i>p</i>
+			</span><br /><br />
+
+			This becomes:<br /><br />
+			<span class="matrix mat4">
+				<i>a</i><i>b</i><i>c</i><b>v.x</b>
+				<i>e</i><i>f</i><i>g</i><b>v.y</b>
+				<i>i</i><i>j</i><i>k</i><b>v.z</b>
+				<i>m</i><i>n</i><i>o</i><i>p</i>
+			</span>
 		</p>
 
 		<h3>

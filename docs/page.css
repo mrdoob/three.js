@@ -209,6 +209,44 @@ strong {
 	font-weight: 600;
 }
 
+/* 
+matrices 
+*/
+
+.mat3 { --matrix-rows: 3; --matrix-cols: 3 }
+.mat4 { --matrix-rows: 4; --matrix-cols: 4 }
+.mat3x1 { --matrix-rows: 3; --matrix-cols: 1 }
+.matrix {
+	position: relative;
+	display: inline grid;
+	grid-template-rows: repeat(var(--matrix-rows), minmax(3ch, max-content));
+	grid-template-columns: repeat(var(--matrix-cols), minmax(3ch, max-content));
+	gap: 0.5ch;
+	margin: 0 1ch;
+	vertical-align: middle;
+}
+.matrix::before,
+.matrix::after {
+	content: '';
+	position: absolute; top: 0;
+	display: block; width: 0.5ch; height: 100%;
+	border: thin solid var(--text-color);
+	filter: drop-shadow(0 0 1px var(--text-color));
+}
+.matrix::before {
+	border-right: 0 none;
+	left: 0;
+}
+.matrix::after {
+	border-left: 0 none;
+	right: 0;
+}
+.matrix > * {
+	text-align: center;
+	padding: 0 1.5ch;
+}
+
+
 
 /* TODO: Duplicate styles in main.css. Needed here cause button is inside the iframe */
 #button {
