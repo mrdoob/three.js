@@ -71,6 +71,6 @@ float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
 
 // non perturbed normal for clearcoat among others
 
-vec3 geometryNormal = normal;
+vec3 nonPerturbedNormal = normal;
 
 `;
