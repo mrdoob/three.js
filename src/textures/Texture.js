@@ -53,9 +53,9 @@ class Texture extends EventDispatcher {
 		this.internalFormat = null;
 		this.type = type;
 
-		this.offset = new Vector2( 0, 0 );
+		this.offset = new Vector2();
 		this.repeat = new Vector2( 1, 1 );
-		this.center = new Vector2( 0, 0 );
+		this.center = new Vector2();
 		this.rotation = 0;
 
 		this.matrixAutoUpdate = true;
