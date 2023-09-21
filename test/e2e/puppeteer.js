@@ -125,7 +125,6 @@ const exceptionList = [
 	'webgpu_materials',
 	'webgpu_materials_video',
 	'webgpu_morphtargets',
-	"webgpu_multiple_rendertargets",
 	'webgpu_occlusion',
 	'webgpu_particles',
 	'webgpu_sandbox',
