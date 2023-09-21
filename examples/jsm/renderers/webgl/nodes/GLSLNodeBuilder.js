@@ -200,7 +200,6 @@ class GLSLNodeBuilder extends NodeBuilder {
 		for ( let index = 0, length = structs.length; index < length; index ++ ) {
 
 			const struct = structs[ index ];
-			const name = struct.name;
 
 			let snippet = `\n`;
 			snippet += this.getStructMembers( struct );
