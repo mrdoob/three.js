@@ -75,8 +75,6 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 		this.transferPipelines = {};
 		this.flipYPipelines = {};
 
-		this.textures = {};
-
 		this.mipmapVertexShaderModule = device.createShaderModule( {
 			label: 'mipmapVertex',
 			code: mipmapVertexSource
@@ -156,34 +154,19 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 	}
 
-	getTexture( format ) {
-
-		let texture = this.textures[ format ];
-
-		if ( texture === undefined ) {
-
-			const maxSize = this.device.limits.maxTextureDimension2D;
-
-			texture = this.device.createTexture( {
-				size: { width: maxSize, height: maxSize, depthOrArrayLayers: 1 },
-				format,
-				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-			} );
-
-			this.textures[ format ] = texture;
-
-		}
-
-		return texture;
-
-	}
-
 	flipY( textureGPU, textureGPUDescriptor, baseArrayLayer = 0 ) {
 
-		const transferPipeline = this.getTransferPipeline( textureGPUDescriptor.format );
-		const flipYPipeline = this.getFlipYPipeline( textureGPUDescriptor.format );
+		const format = textureGPUDescriptor.format;
+		const { width, height } = textureGPUDescriptor.size;
 
-		const tempTexture = this.getTexture( textureGPUDescriptor.format );
+		const transferPipeline = this.getTransferPipeline( format );
+		const flipYPipeline = this.getFlipYPipeline( format );
+
+		const tempTexture = this.device.createTexture( {
+			size: { width, height, depthOrArrayLayers: 1 },
+			format,
+			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+		} );
 
 		const srcView = textureGPU.createView( {
 			baseMipLevel: 0,
@@ -236,6 +219,8 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 		pass( flipYPipeline, dstView, srcView );
 
 		this.device.queue.submit( [ commandEncoder.finish() ] );
+
+		tempTexture.destroy();
 
 	}
 
