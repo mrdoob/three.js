@@ -184,7 +184,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 		const commandEncoder = this.device.createCommandEncoder( {} );
 
-		const pass = ( pipeline, sourceView, destinyView ) => {
+		const pass = ( pipeline, sourceView, destinationView ) => {
 
 			const bindGroupLayout = pipeline.getBindGroupLayout( 0 ); // @TODO: Consider making this static.
 
@@ -201,7 +201,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 			const passEncoder = commandEncoder.beginRenderPass( {
 				colorAttachments: [ {
-					view: destinyView,
+					view: destinationView,
 					loadOp: GPULoadOp.Clear,
 					storeOp: GPUStoreOp.Store,
 					clearValue: [ 0, 0, 0, 0 ]
