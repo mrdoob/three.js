@@ -64,8 +64,26 @@ class WebGLBackend extends Backend {
 
 		const clearColor = renderContext.clearColorValue;
 
-		gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearColor.a );
-		gl.clear( clear );
+		if ( clear !== 0 ) {
+
+			if ( renderContext.textures === null ) {
+
+				gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearColor.a );
+				gl.clear( clear );
+
+			} else {
+
+				for ( let i = 0; i < renderContext.textures.length; i ++ ) {
+
+					gl.clearBufferfv( gl.COLOR, i, [ clearColor.r, clearColor.g, clearColor.b, clearColor.a ] );
+
+				}
+
+				gl.clearBufferfi( gl.DEPTH_STENCIL, 0, 1, 1 );
+
+			}
+
+		}
 
 		//
 
@@ -638,14 +656,22 @@ class WebGLBackend extends Backend {
 
 				const textures = renderContext.textures;
 
+				const drawBuffers = [];
+
 				for ( let i = 0; i < textures.length; i++ ) {
 
 					const texture = textures[ i ];
 					const { textureGPU } = this.get( texture );
 
+					const attachment = gl.COLOR_ATTACHMENT0 + i;
+
 					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, textureGPU, 0 );
 
+					drawBuffers.push( attachment );
+
 				}
+
+				gl.drawBuffers( drawBuffers );
 
 				if ( renderContext.depthTexture !== null ) {
 
