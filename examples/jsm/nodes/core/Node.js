@@ -56,14 +56,9 @@ class Node extends EventDispatcher {
 
 		const self = this;
 
-		for ( const { property, index, childNode } of getNodeChildren( this ) ) {
+		for ( const { childNode } of getNodeChildren( this ) ) {
 
-			yield { childNode, replaceNode( node ) {
-
-				if ( index === undefined ) self[ property ] = node;
-				else self[ property ][ index ] = node;
-
-			} };
+			yield childNode;
 
 		}
 
@@ -75,13 +70,13 @@ class Node extends EventDispatcher {
 
 	}
 
-	traverse( callback, replaceNode = null ) {
+	traverse( callback ) {
 
-		callback( this, replaceNode );
+		callback( this );
 
-		for ( const { childNode, replaceNode } of this.getChildren() ) {
+		for ( const childNode of this.getChildren() ) {
 
-			childNode.traverse( callback, replaceNode );
+			childNode.traverse( callback );
 
 		}
 
@@ -138,7 +133,7 @@ class Node extends EventDispatcher {
 
 		const nodeProperties = builder.getNodeProperties( this );
 
-		for ( const { childNode } of this.getChildren() ) {
+		for ( const childNode of this.getChildren() ) {
 
 			nodeProperties[ '_node' + childNode.id ] = childNode;
 
