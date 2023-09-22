@@ -388,8 +388,10 @@ void main() {
 					} else if ( shaderStage === 'fragment' ) {
 
 						if ( ! node.outputNode.isOutputStructNode ) {
+
 							flow += 'fragColor = ';
 							flow += `${ flowSlotData.result };`;
+
 						}
 
 					}
