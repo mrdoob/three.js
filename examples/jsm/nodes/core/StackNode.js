@@ -1,9 +1,7 @@
 import Node, { addNodeClass } from './Node.js';
-import { assign } from '../math/OperatorNode.js';
 import { bypass } from '../core/BypassNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { cond } from '../math/CondNode.js';
-import { loop } from '../utils/LoopNode.js';
 import { ShaderNode, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class StackNode extends Node {
@@ -63,18 +61,6 @@ class StackNode extends Node {
 		this._currentCond.elseNode = new ShaderNode( method );
 
 		return this;
-
-	}
-
-	assign( targetNode, sourceValue ) {
-
-		return this.add( assign( targetNode, sourceValue ) );
-
-	}
-
-	loop( ...params ) {
-
-		return this.add( loop( ...params ) );
 
 	}
 
