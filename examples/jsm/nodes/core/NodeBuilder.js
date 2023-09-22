@@ -676,7 +676,7 @@ class NodeBuilder {
 
 	}
 
-	getVarFromNode( node, type, shaderStage = this.shaderStage ) {
+	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
@@ -685,9 +685,10 @@ class NodeBuilder {
 		if ( nodeVar === undefined ) {
 
 			const vars = this.vars[ shaderStage ];
-			const index = vars.length;
 
-			nodeVar = new NodeVar( 'nodeVar' + index, type );
+			if ( name === null ) name = 'nodeVar' + vars.length;
+
+			nodeVar = new NodeVar( name, type );
 
 			vars.push( nodeVar );
 

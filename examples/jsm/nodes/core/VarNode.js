@@ -57,18 +57,11 @@ class VarNode extends Node {
 
 		}
 
-		const type = builder.getVectorType( this.getNodeType( builder ) );
-
-		const snippet = node.build( builder, type );
-		const nodeVar = builder.getVarFromNode( this, type );
-
-		if ( name !== null ) {
-
-			nodeVar.name = name;
-
-		}
+		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ) );
 
 		const propertyName = builder.getPropertyName( nodeVar );
+
+		const snippet = node.build( builder, nodeVar.type );
 
 		builder.addLineFlowCode( `${propertyName} = ${snippet}` );
 
