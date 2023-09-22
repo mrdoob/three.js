@@ -991,6 +991,7 @@ class NodeBuilder {
 
 		this.buildCode();
 		this.buildUpdateNodes();
+		if (this.fragmentShader !== null) console.log(this.fragmentShader)
 
 		return this;
 

@@ -42,7 +42,7 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 		const irradiance = mix( groundColorNode, colorNode, hemiDiffuseWeight );
 
-		builder.context.irradiance.addAssign( irradiance );
+		builder.stack.addAssign( builder.context.irradiance, irradiance );
 
 	}
 

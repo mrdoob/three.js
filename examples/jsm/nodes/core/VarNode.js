@@ -12,22 +12,6 @@ class VarNode extends Node {
 
 	}
 
-	assign( node ) {
-
-		node.traverse( ( childNode, replaceNode ) => {
-
-			if ( replaceNode && childNode.uuid === this.uuid ) {
-
-				replaceNode( this.node );
-
-			}
-
-		} );
-		this.node = node;
-		return this;
-
-	}
-
 	isGlobal() {
 
 		return true;
