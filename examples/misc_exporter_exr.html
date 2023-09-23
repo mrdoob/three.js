@@ -31,7 +31,6 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { EXRExporter, ZIP_COMPRESSION, ZIPS_COMPRESSION, NO_COMPRESSION } from 'three/addons/exporters/EXRExporter.js';
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-			import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let scene, camera, renderer, exporter, mesh, controls, renderTarget, dataTexture;
@@ -51,7 +50,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -63,7 +61,6 @@
 
 				exporter = new EXRExporter();
 				const rgbeloader = new RGBELoader();
-				const exrloader = new EXRLoader();
 
 				//
 
@@ -79,19 +76,7 @@
 
 				} );
 
-				exrloader.load( 'textures/memorial.exr', function ( texture, textureData ) {
-
-					dataTexture = texture;
-
-					const scale = 50;
-					const material = new THREE.MeshBasicMaterial( { map: texture } );
-					const quad = new THREE.PlaneGeometry( scale * textureData.width / textureData.height, scale );
-					mesh = new THREE.Mesh( quad, material );
-					mesh.visible = false;
-
-					scene.add( mesh );
-
-				} );
+				createDataTexture();
 
 				//
 
@@ -130,6 +115,50 @@
 				requestAnimationFrame( animate );
 				controls.update();
 				renderer.render( scene, camera );
+
+			}
+
+			function createDataTexture() {
+
+				const normal = new THREE.Vector3();
+				const coord = new THREE.Vector2();
+				const size = 800, radius = 320, factor = Math.PI * 0.5 / radius;
+				const data = new Float32Array( 4 * size * size );
+
+				for ( let i = 0; i < size; i ++ ) {
+
+					for ( let j = 0; j < size; j ++ ) {
+
+						const idx = i * size * 4 + j * 4;
+						coord.set( j, i ).subScalar( size / 2 );
+
+						if ( coord.length() < radius )
+							normal.set(
+								Math.sin( coord.x * factor ),
+								Math.sin( coord.y * factor ),
+								Math.cos( coord.x * factor )
+							);
+						else
+							normal.set( 0, 0, 1 );
+
+						data[ idx + 0 ] = .5 + .5 * normal.x;
+						data[ idx + 1 ] = .5 + .5 * normal.y;
+						data[ idx + 2 ] = .5 + .5 * normal.z;
+						data[ idx + 3 ] = 1.;
+
+					}
+
+				}
+
+				dataTexture = new THREE.DataTexture( data, size, size, THREE.RGBAFormat, THREE.FloatType );
+				dataTexture.needsUpdate = true;
+
+				const material = new THREE.MeshBasicMaterial( { map: dataTexture } );
+				const quad = new THREE.PlaneGeometry( 50, 50 );
+				mesh = new THREE.Mesh( quad, material );
+				mesh.visible = false;
+
+				scene.add( mesh );
 
 			}
 
