@@ -31,7 +31,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { ShaderNode, uniform, storage, instanceIndex, float, texture, viewportTopLeft, color } from 'three/nodes';
+			import { tslFn, uniform, storage, instanceIndex, float, texture, viewportTopLeft, color } from 'three/nodes';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -136,10 +136,9 @@
 
 				// compute (shader-node)
 
-				const computeShaderNode = new ShaderNode( ( stack ) => {
+				const computeShaderFn = tslFn( ( stack ) => {
 
 					const index = float( instanceIndex );
-
 
 					// pitch
 
@@ -171,7 +170,7 @@
 
 				// compute
 
-				computeNode = computeShaderNode.compute( waveBuffer.length );
+				computeNode = computeShaderFn().compute( waveBuffer.length );
 
 
 				// gui
