@@ -196,21 +196,14 @@ const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
 };
 
-class ShaderNodeInternal extends Node {
+class ShaderCallNodeInternal extends Node {
 
-	constructor( jsFunc ) {
+	constructor( shaderNode, inputNodes ) {
 
 		super();
 
-		this._jsFunc = jsFunc;
-
-	}
-
-	call( inputs, stack, builder ) {
-
-		inputs = nodeObjects( inputs );
-
-		return nodeObject( this._jsFunc( inputs, stack, builder ) );
+		this.shaderNode = shaderNode;
+		this.inputNodes = inputNodes;
 
 	}
 
@@ -222,13 +215,64 @@ class ShaderNodeInternal extends Node {
 
 	}
 
+	call( builder ) {
+
+		const { shaderNode, inputNodes } = this;
+
+		const jsFunc = shaderNode.jsFunc;
+		const outputNode = inputNodes !== null ? jsFunc( nodeObjects( inputNodes ), builder.stack, builder ) : jsFunc( builder.stack, builder );
+
+		return nodeObject( outputNode );
+
+	}
+
 	construct( builder ) {
 
 		builder.addStack();
 
-		builder.stack.outputNode = nodeObject( this._jsFunc( builder.stack, builder ) );
+		builder.stack.outputNode = this.call( builder );
 
 		return builder.removeStack();
+
+	}
+
+	generate( builder, output ) {
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		if ( outputNode === null ) {
+
+			// TSL: It's recommended to use `tslFn` in construct() pass.
+
+			return this.call( builder ).build( builder, output );
+
+		}
+
+		return super.generate( builder, output );
+
+	}
+
+}
+
+class ShaderNodeInternal extends Node {
+
+	constructor( jsFunc ) {
+
+		super();
+
+		this.jsFunc = jsFunc;
+
+	}
+
+	call( inputs = null ) {
+
+		return nodeObject( new ShaderCallNodeInternal( this, inputs ) );
+
+	}
+
+	construct() {
+
+		return this.call();
 
 	}
 
@@ -349,15 +393,9 @@ export const shader = ( jsFunc ) => { // @deprecated, r154
 
 export const tslFn = ( jsFunc ) => {
 
-	let shaderNode = null;
+	const shaderNode = new ShaderNode( jsFunc );
 
-	return ( ...params ) => {
-
-		if ( shaderNode === null ) shaderNode = new ShaderNode( jsFunc );
-
-		return shaderNode.call( ...params );
-
-	};
+	return ( inputs ) => shaderNode.call( inputs );
 
 };
 

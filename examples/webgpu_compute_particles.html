@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { ShaderNode, uniform, texture, instanceIndex, float, vec3, storage, SpriteNodeMaterial } from 'three/nodes';
+			import { tslFn, uniform, texture, instanceIndex, float, vec3, storage, SpriteNodeMaterial } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -83,7 +83,7 @@
 
 				// compute
 
-				const computeInit = new ShaderNode( ( stack ) => {
+				const computeInit = tslFn( ( stack ) => {
 
 					const position = positionBuffer.element( instanceIndex );
 					const color = colorBuffer.element( instanceIndex );
@@ -98,11 +98,11 @@
 
 					stack.assign( color, vec3( randX, randY, randZ ) );
 
-				} ).compute( particleCount );
+				} )().compute( particleCount );
 
 				//
 
-				const computeUpdate = new ShaderNode( ( stack ) => {
+				const computeUpdate = tslFn( ( stack ) => {
 
 					const position = positionBuffer.element( instanceIndex );
 					const velocity = velocityBuffer.element( instanceIndex );
@@ -128,7 +128,7 @@
 
 				} );
 
-				computeParticles = computeUpdate.compute( particleCount );
+				computeParticles = computeUpdate().compute( particleCount );
 
 				// create nodes
 
@@ -179,7 +179,7 @@
 
 				// click event
 
-				const computeHit = new ShaderNode( ( stack ) => {
+				const computeHit = tslFn( ( stack ) => {
 
 					const position = positionBuffer.element( instanceIndex );
 					const velocity = velocityBuffer.element( instanceIndex );
@@ -193,7 +193,7 @@
 
 					stack.assign( velocity, velocity.add( direction.mul( relativePower ) ) );
 
-				} ).compute( particleCount );
+				} )().compute( particleCount );
 
 				//
 
