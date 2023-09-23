@@ -62,6 +62,20 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, shaderStage = this.shaderStage ) {
+
+		if ( shaderStage === 'fragment' ) {
+
+			return `texture( ${textureProperty}, vec3( ${uvSnippet}, ${compareSnippet} ) )`;
+
+		} else {
+
+			console.error( `WebGPURenderer: THREE.DepthTexture.compareFunction() does not support ${ shaderStage } shader.` );
+
+		}
+
+	}
+
 	getVars( shaderStage ) {
 
 		const snippets = [];
@@ -94,7 +108,15 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 			if ( uniform.type === 'texture' ) {
 
-				snippet = `sampler2D ${uniform.name};`;
+				if ( uniform.node.value.compareFunction ) {
+
+					snippet = `sampler2DShadow ${uniform.name};`;
+
+				} else {
+
+					snippet = `sampler2D ${uniform.name};`;
+
+				}
 
 			} else if ( uniform.type === 'cubeTexture' ) {
 
@@ -324,6 +346,7 @@ ${ this.getSignature() }
 // precision
 precision highp float;
 precision highp int;
+precision lowp sampler2DShadow;
 
 // uniforms
 ${shaderData.uniforms}

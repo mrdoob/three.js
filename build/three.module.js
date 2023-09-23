@@ -9355,11 +9355,7 @@ class Color {
 
 		this.getHSL( _hslA );
 
-		_hslA.h += h; _hslA.s += s; _hslA.l += l;
-
-		this.setHSL( _hslA.h, _hslA.s, _hslA.l );
-
-		return this;
+		return this.setHSL( _hslA.h + h, _hslA.s + s, _hslA.l + l );
 
 	}
 
@@ -39887,21 +39883,6 @@ class LineDashedMaterial extends LineBasicMaterial {
 
 }
 
-// same as Array.prototype.slice, but also works on typed arrays
-function arraySlice( array, from, to ) {
-
-	if ( isTypedArray( array ) ) {
-
-		// in ios9 array.subarray(from, undefined) will return empty array
-		// but array.subarray(from) or array.subarray(from, len) is correct
-		return new array.constructor( array.subarray( from, to !== undefined ? to : array.length ) );
-
-	}
-
-	return array.slice( from, to );
-
-}
-
 // converts an array to a specific type
 function convertArray( array, type, forceClone ) {
 
@@ -40165,14 +40146,14 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 			// Reference frame is earlier than the first keyframe, so just use the first keyframe
 			const startIndex = referenceOffset;
 			const endIndex = referenceValueSize - referenceOffset;
-			referenceValue = arraySlice( referenceTrack.values, startIndex, endIndex );
+			referenceValue = referenceTrack.values.slice( startIndex, endIndex );
 
 		} else if ( referenceTime >= referenceTrack.times[ lastIndex ] ) {
 
 			// Reference frame is after the last keyframe, so just use the last keyframe
 			const startIndex = lastIndex * referenceValueSize + referenceOffset;
 			const endIndex = startIndex + referenceValueSize - referenceOffset;
-			referenceValue = arraySlice( referenceTrack.values, startIndex, endIndex );
+			referenceValue = referenceTrack.values.slice( startIndex, endIndex );
 
 		} else {
 
@@ -40181,7 +40162,7 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 			const startIndex = referenceOffset;
 			const endIndex = referenceValueSize - referenceOffset;
 			interpolant.evaluate( referenceTime );
-			referenceValue = arraySlice( interpolant.resultBuffer, startIndex, endIndex );
+			referenceValue = interpolant.resultBuffer.slice( startIndex, endIndex );
 
 		}
 
@@ -40236,7 +40217,6 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 }
 
 const AnimationUtils = {
-	arraySlice: arraySlice,
 	convertArray: convertArray,
 	isTypedArray: isTypedArray,
 	getKeyframeOrder: getKeyframeOrder,
@@ -40919,8 +40899,8 @@ class KeyframeTrack {
 			}
 
 			const stride = this.getValueSize();
-			this.times = arraySlice( times, from, to );
-			this.values = arraySlice( this.values, from * stride, to * stride );
+			this.times = times.slice( from, to );
+			this.values = this.values.slice( from * stride, to * stride );
 
 		}
 
@@ -41010,8 +40990,8 @@ class KeyframeTrack {
 	optimize() {
 
 		// times or values may be shared with other tracks, so overwriting is unsafe
-		const times = arraySlice( this.times ),
-			values = arraySlice( this.values ),
+		const times = this.times.slice(),
+			values = this.values.slice(),
 			stride = this.getValueSize(),
 
 			smoothInterpolation = this.getInterpolation() === InterpolateSmooth,
@@ -41104,8 +41084,8 @@ class KeyframeTrack {
 
 		if ( writeIndex !== times.length ) {
 
-			this.times = arraySlice( times, 0, writeIndex );
-			this.values = arraySlice( values, 0, writeIndex * stride );
+			this.times = times.slice( 0, writeIndex );
+			this.values = values.slice( 0, writeIndex * stride );
 
 		} else {
 
@@ -41120,8 +41100,8 @@ class KeyframeTrack {
 
 	clone() {
 
-		const times = arraySlice( this.times, 0 );
-		const values = arraySlice( this.values, 0 );
+		const times = this.times.slice();
+		const values = this.values.slice();
 
 		const TypedKeyframeTrack = this.constructor;
 		const track = new TypedKeyframeTrack( this.name, times, values );

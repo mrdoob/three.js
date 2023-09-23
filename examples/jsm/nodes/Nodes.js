@@ -54,6 +54,7 @@ export { default as OscNode, oscSine, oscSquare, oscTriangle, oscSawtooth } from
 export { default as PackingNode, directionToColor, colorToDirection } from './utils/PackingNode.js';
 export { default as RemapNode, remap, remapClamp } from './utils/RemapNode.js';
 export { default as RotateUVNode, rotateUV } from './utils/RotateUVNode.js';
+export { default as SetNode } from './utils/SetNode.js';
 export { default as SpecularMIPLevelNode, specularMIPLevel } from './utils/SpecularMIPLevelNode.js';
 export { default as SplitNode } from './utils/SplitNode.js';
 export { default as SpriteSheetUVNode, spritesheetUV } from './utils/SpriteSheetUVNode.js';
