@@ -18,7 +18,7 @@ const _inverseMatrix = new Matrix4();
 
 class DragControls extends EventDispatcher {
 
-	constructor( _objects, _camera, _domElement) {
+	constructor( _objects, _camera, _domElement ) {
 
 		super();
 
