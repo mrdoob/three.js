@@ -212,8 +212,8 @@ void main() {
 	#endif
 
 	#include <opaque_fragment>
-	#include <tonemapping_fragment>
 	#include <fog_fragment>
+	#include <tonemapping_fragment>
 	#include <colorspace_fragment>
 	#include <premultiplied_alpha_fragment>
 	#include <dithering_fragment>
