@@ -222,7 +222,6 @@ let sdfCompute = `
 
     void main()	{ gl_FragColor=vec4( ( dist( vec3( vUv, tileNum ) * 2.0 * bounds - vec3( bounds ) ) < 0.00001 ) ? 1.0 : 0.0 ); }
 `
-// import meshShaders from './mesh.*'
 
 let defaultDist = `
     float dist( vec3 p ){
