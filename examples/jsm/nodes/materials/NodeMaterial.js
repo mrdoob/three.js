@@ -7,6 +7,7 @@ import { materialAlphaTest, materialColor, materialOpacity, materialEmissive } f
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
+import { autoInstance } from '../accessors/AutoInstanceNode.js';
 import { positionLocal, positionView } from '../accessors/PositionNode.js';
 import { skinning } from '../accessors/SkinningNode.js';
 import { morph } from '../accessors/MorphNode.js';
@@ -137,7 +138,14 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
 
-			builder.stack.add( instance( object ) );
+			builder.stack.add( instance( object.instanceMatrix ) );
+
+		} else if ( builder.instances ) {
+
+			//builder.stack.add( dynamicInstance( builder.instances ) );
+			builder.stack.add( autoInstance( builder.instances ) );
+
+			//this.vertexNode = autoInstance( builder.instances );
 
 		}
 

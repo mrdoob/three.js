@@ -46,6 +46,8 @@ class Renderer {
 		this.depth = true;
 		this.stencil = true;
 
+		this.autoInstancing = true;
+
 		// internals
 
 		this._pixelRatio = 1;
@@ -278,6 +280,57 @@ class Renderer {
 
 		//
 
+		let opaqueObjects = renderList.opaque;
+		let transparentObjects = renderList.transparent;
+
+		const lightsNode = renderList.lightsNode;
+
+		if ( this.autoInstancing === true ) {
+
+			// consider do it before renderList.sort()
+
+			const filterInstance = ( renderItems ) => {
+
+				const list = [];
+
+				for ( const renderItem of renderItems ) {
+
+					const { object, material } = renderItem;
+
+					const renderObject = this._objects.get( object, material, scene, camera, lightsNode, renderContext );
+					const renderObjectInstance = renderObject.instance;
+
+					if ( renderObject !== renderObjectInstance ) {
+
+						renderObjectInstance.instances = renderObjectInstance.instances || [];
+						renderObjectInstance.instances.push( object );
+
+						if ( list.includes( renderObjectInstance ) === false ) {
+
+							//list.push( renderObjectInstance );
+
+						}
+
+					} else {
+
+						//console.log( renderItem );
+						list.push( renderObjectInstance );
+
+					}
+
+				}
+
+				return list;
+
+			};
+
+			opaqueObjects = filterInstance( opaqueObjects );
+			transparentObjects = filterInstance( transparentObjects );
+
+		}
+
+		//
+
 		if ( renderTarget !== null ) {
 
 			this._textures.updateRenderTarget( renderTarget, activeMipmapLevel );
@@ -317,10 +370,6 @@ class Renderer {
 		this.backend.beginRender( renderContext );
 
 		// process render lists
-
-		const opaqueObjects = renderList.opaque;
-		const transparentObjects = renderList.transparent;
-		const lightsNode = renderList.lightsNode;
 
 		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
@@ -922,6 +971,10 @@ class Renderer {
 		//
 
 		this.backend.draw( renderObject, this._info );
+
+		//
+
+		renderObject.instances = null;
 
 	}
 

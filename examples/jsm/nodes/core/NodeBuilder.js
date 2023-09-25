@@ -58,6 +58,7 @@ class NodeBuilder {
 		this.renderer = renderer;
 		this.parser = parser;
 		this.scene = scene;
+		this.instances = null;
 
 		this.nodes = [];
 		this.updateNodes = [];

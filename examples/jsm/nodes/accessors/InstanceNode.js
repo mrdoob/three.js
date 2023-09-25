@@ -7,24 +7,23 @@ import { DynamicDrawUsage, InstancedInterleavedBuffer } from 'three';
 
 class InstanceNode extends Node {
 
-	constructor( instanceMesh ) {
+	constructor( instanceAttribute = null ) {
 
 		super( 'void' );
 
-		this.instanceMesh = instanceMesh;
+		this.instanceAttribute = instanceAttribute;
 
-		this.instanceMatrixNode = null;
+		this._instanceMatrixNode = null;
 
 	}
 
-	construct( builder ) {
+	constructorInstanceMatrix() {
 
-		let instanceMatrixNode = this.instanceMatrixNode;
+		let instanceMatrixNode = this._instanceMatrixNode;
 
 		if ( instanceMatrixNode === null ) {
 
-			const instanceMesh = this.instanceMesh;
-			const instanceAttribute = instanceMesh.instanceMatrix;
+			const instanceAttribute = this.instanceAttribute;
 			const buffer = new InstancedInterleavedBuffer( instanceAttribute.array, 16, 1 );
 
 			const bufferFn = instanceAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
@@ -39,9 +38,17 @@ class InstanceNode extends Node {
 
 			instanceMatrixNode = mat4( ...instanceBuffers );
 
-			this.instanceMatrixNode = instanceMatrixNode;
+			this._instanceMatrixNode = instanceMatrixNode;
 
 		}
+
+		this._instanceMatrixNode = instanceMatrixNode;
+
+	}
+
+	construct( builder ) {
+
+		const instanceMatrixNode = this.constructorInstanceMatrix();
 
 		// POSITION
 

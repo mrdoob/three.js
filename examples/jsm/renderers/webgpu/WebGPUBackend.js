@@ -706,6 +706,7 @@ class WebGPUBackend extends Backend {
 		const instanceCount = this.getInstanceCount( renderObject );
 		if ( instanceCount === 0 ) return;
 
+		console.log(instanceCount);
 		if ( hasIndex === true ) {
 
 			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
