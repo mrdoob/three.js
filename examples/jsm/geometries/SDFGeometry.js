@@ -240,7 +240,7 @@ class SDFtoMesh extends BufferGeometry{
 		const gl = document.createElement('canvas').getContext('webgl');
         let maxTexSize = gl.getParameter(gl.MAX_TEXTURE_SIZE)
 
-		let [w,h] = [0,0]
+		let w,h
 		if( res == 8 ) [w,h] = [ 32, 16]
 		else if( res == 16 ) [w,h] = [ 64, 64 ]
 		else if( res == 32 ) [w,h] = [ 256, 128 ]
