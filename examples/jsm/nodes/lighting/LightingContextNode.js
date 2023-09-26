@@ -99,4 +99,4 @@ export const lightingContext = nodeProxy( LightingContextNode );
 
 addNodeElement( 'lightingContext', lightingContext );
 
-addNodeClass( LightingContextNode );
+addNodeClass( 'LightingContextNode', LightingContextNode );

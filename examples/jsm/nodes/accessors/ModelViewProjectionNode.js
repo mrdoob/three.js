@@ -27,4 +27,4 @@ export default ModelViewProjectionNode;
 
 export const modelViewProjection = nodeProxy( ModelViewProjectionNode );
 
-addNodeClass( ModelViewProjectionNode );
+addNodeClass( 'ModelViewProjectionNode', ModelViewProjectionNode );

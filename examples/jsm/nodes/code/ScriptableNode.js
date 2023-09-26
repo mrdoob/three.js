@@ -485,4 +485,4 @@ export const scriptable = nodeProxy( ScriptableNode );
 
 addNodeElement( 'scriptable', scriptable );
 
-addNodeClass( ScriptableNode );
+addNodeClass( 'ScriptableNode', ScriptableNode );

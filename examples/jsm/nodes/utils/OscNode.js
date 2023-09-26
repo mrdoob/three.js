@@ -78,4 +78,4 @@ export const oscSquare = nodeProxy( OscNode, OscNode.SQUARE );
 export const oscTriangle = nodeProxy( OscNode, OscNode.TRIANGLE );
 export const oscSawtooth = nodeProxy( OscNode, OscNode.SAWTOOTH );
 
-addNodeClass( OscNode );
+addNodeClass( 'OscNode', OscNode );

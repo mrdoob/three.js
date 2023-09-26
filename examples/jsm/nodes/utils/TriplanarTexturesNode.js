@@ -59,4 +59,4 @@ export const triplanarTexture = ( ...params ) => triplanarTextures( ...params );
 
 addNodeElement( 'triplanarTexture', triplanarTexture );
 
-addNodeClass( TriplanarTexturesNode );
+addNodeClass( 'TriplanarTexturesNode', TriplanarTexturesNode );

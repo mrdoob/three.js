@@ -91,4 +91,4 @@ export const textureBicubic = nodeProxy( TextureBicubicNode );
 
 addNodeElement( 'bicubic', textureBicubic );
 
-addNodeClass( TextureBicubicNode );
+addNodeClass( 'TextureBicubicNode', TextureBicubicNode );

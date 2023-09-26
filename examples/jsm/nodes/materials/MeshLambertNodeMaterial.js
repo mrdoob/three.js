@@ -31,4 +31,4 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 
 export default MeshLambertNodeMaterial;
 
-addNodeMaterial( MeshLambertNodeMaterial );
+addNodeMaterial( 'MeshLambertNodeMaterial', MeshLambertNodeMaterial );

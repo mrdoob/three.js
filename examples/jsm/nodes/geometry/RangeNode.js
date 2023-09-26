@@ -101,4 +101,4 @@ export default RangeNode;
 
 export const range = nodeProxy( RangeNode );
 
-addNodeClass( RangeNode );
+addNodeClass( 'RangeNode', RangeNode );

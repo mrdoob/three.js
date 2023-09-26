@@ -24,4 +24,4 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 export default MeshBasicNodeMaterial;
 
-addNodeMaterial( MeshBasicNodeMaterial );
+addNodeMaterial( 'MeshBasicNodeMaterial', MeshBasicNodeMaterial );

@@ -51,4 +51,4 @@ class LineDashedNodeMaterial extends NodeMaterial {
 
 export default LineDashedNodeMaterial;
 
-addNodeMaterial( LineDashedNodeMaterial );
+addNodeMaterial( 'LineDashedNodeMaterial', LineDashedNodeMaterial );

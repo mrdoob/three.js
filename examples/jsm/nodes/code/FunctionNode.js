@@ -135,4 +135,4 @@ export const func = ( code, includes ) => { // @deprecated, r154
 
 };
 
-addNodeClass( FunctionNode );
+addNodeClass( 'FunctionNode', FunctionNode );

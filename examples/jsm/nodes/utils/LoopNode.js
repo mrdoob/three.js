@@ -183,4 +183,4 @@ export const loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params
 
 addNodeElement( 'loop', ( returns, ...params ) => bypass( returns, loop( ...params ) ) );
 
-addNodeClass( LoopNode );
+addNodeClass( 'LoopNode', LoopNode );

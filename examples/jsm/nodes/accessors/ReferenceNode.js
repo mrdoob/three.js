@@ -75,4 +75,4 @@ export default ReferenceNode;
 
 export const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
 
-addNodeClass( ReferenceNode );
+addNodeClass( 'ReferenceNode', ReferenceNode );

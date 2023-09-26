@@ -96,4 +96,4 @@ addNodeElement( 'dodge', dodge );
 addNodeElement( 'overlay', overlay );
 addNodeElement( 'screen', screen );
 
-addNodeClass( BlendModeNode );
+addNodeClass( 'BlendModeNode', BlendModeNode );

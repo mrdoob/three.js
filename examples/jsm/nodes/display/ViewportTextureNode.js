@@ -72,4 +72,4 @@ export const viewportMipTexture = nodeProxy( ViewportTextureNode, null, null, { 
 addNodeElement( 'viewportTexture', viewportTexture );
 addNodeElement( 'viewportMipTexture', viewportMipTexture );
 
-addNodeClass( ViewportTextureNode );
+addNodeClass( 'ViewportTextureNode', ViewportTextureNode );

@@ -29,4 +29,4 @@ export const posterize = nodeProxy( PosterizeNode );
 
 addNodeElement( 'posterize', posterize );
 
-addNodeClass( PosterizeNode );
+addNodeClass( 'PosterizeNode', PosterizeNode );

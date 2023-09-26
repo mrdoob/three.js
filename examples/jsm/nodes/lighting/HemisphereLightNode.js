@@ -52,4 +52,4 @@ export default HemisphereLightNode;
 
 addLightNode( HemisphereLight, HemisphereLightNode );
 
-addNodeClass( HemisphereLightNode );
+addNodeClass( 'HemisphereLightNode', HemisphereLightNode );

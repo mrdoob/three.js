@@ -59,4 +59,4 @@ class SetNode extends TempNode {
 
 export default SetNode;
 
-addNodeClass( SetNode );
+addNodeClass( 'SetNode', SetNode );

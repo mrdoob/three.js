@@ -126,4 +126,4 @@ export const viewportBottomLeft = nodeImmutable( ViewportNode, ViewportNode.BOTT
 export const viewportTopRight = nodeImmutable( ViewportNode, ViewportNode.TOP_RIGHT );
 export const viewportBottomRight = nodeImmutable( ViewportNode, ViewportNode.BOTTOM_RIGHT );
 
-addNodeClass( ViewportNode );
+addNodeClass( 'ViewportNode', ViewportNode );

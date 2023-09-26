@@ -49,4 +49,4 @@ export default SceneNode;
 export const backgroundBlurriness = nodeImmutable( SceneNode, SceneNode.BACKGROUND_BLURRINESS );
 export const backgroundIntensity = nodeImmutable( SceneNode, SceneNode.BACKGROUND_INTENSITY );
 
-addNodeClass( SceneNode );
+addNodeClass( 'SceneNode', SceneNode );

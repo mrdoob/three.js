@@ -37,4 +37,4 @@ export default DirectionalLightNode;
 
 addLightNode( DirectionalLight, DirectionalLightNode );
 
-addNodeClass( DirectionalLightNode );
+addNodeClass( 'DirectionalLightNode', DirectionalLightNode );

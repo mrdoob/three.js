@@ -23,4 +23,4 @@ export const discard = nodeProxy( DiscardNode );
 
 addNodeElement( 'discard', discard );
 
-addNodeClass( DiscardNode );
+addNodeClass( 'DiscardNode', DiscardNode );

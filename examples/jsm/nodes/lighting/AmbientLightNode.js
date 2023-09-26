@@ -24,4 +24,4 @@ export default AmbientLightNode;
 
 addLightNode( AmbientLight, AmbientLightNode );
 
-addNodeClass( AmbientLightNode );
+addNodeClass( 'AmbientLightNode', AmbientLightNode );

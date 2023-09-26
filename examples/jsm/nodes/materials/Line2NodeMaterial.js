@@ -446,4 +446,4 @@ class Line2NodeMaterial extends NodeMaterial {
 
 export default Line2NodeMaterial;
 
-addNodeMaterial( Line2NodeMaterial );
+addNodeMaterial( 'Line2NodeMaterial', Line2NodeMaterial );

@@ -26,4 +26,4 @@ export default TextureStoreNode;
 
 export const textureStore = nodeProxy( TextureStoreNode );
 
-addNodeClass( TextureStoreNode );
+addNodeClass( 'TextureStoreNode', TextureStoreNode );

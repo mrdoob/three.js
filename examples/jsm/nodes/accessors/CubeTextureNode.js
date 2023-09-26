@@ -115,4 +115,4 @@ export const cubeTexture = nodeProxy( CubeTextureNode );
 
 addNodeElement( 'cubeTexture', cubeTexture );
 
-addNodeClass( CubeTextureNode );
+addNodeClass( 'CubeTextureNode', CubeTextureNode );

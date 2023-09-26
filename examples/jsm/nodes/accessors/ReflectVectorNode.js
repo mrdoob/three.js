@@ -32,4 +32,4 @@ export default ReflectVectorNode;
 
 export const reflectVector = nodeImmutable( ReflectVectorNode );
 
-addNodeClass( ReflectVectorNode );
+addNodeClass( 'ReflectVectorNode', ReflectVectorNode );

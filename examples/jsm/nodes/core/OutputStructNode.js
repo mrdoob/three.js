@@ -59,4 +59,4 @@ export default OutputStructNode;
 
 export const outputStruct = nodeProxy( OutputStructNode );
 
-addNodeClass( OutputStructNode );
+addNodeClass( 'OutputStructNode', OutputStructNode );

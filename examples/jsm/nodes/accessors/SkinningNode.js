@@ -90,4 +90,4 @@ export default SkinningNode;
 
 export const skinning = nodeProxy( SkinningNode );
 
-addNodeClass( SkinningNode );
+addNodeClass( 'SkinningNode', SkinningNode );

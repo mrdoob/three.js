@@ -62,4 +62,4 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 export default MeshPhongNodeMaterial;
 
-addNodeMaterial( MeshPhongNodeMaterial );
+addNodeMaterial( 'MeshPhongNodeMaterial', MeshPhongNodeMaterial );

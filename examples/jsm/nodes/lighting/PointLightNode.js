@@ -65,4 +65,4 @@ export default PointLightNode;
 
 addLightNode( PointLight, PointLightNode );
 
-addNodeClass( PointLightNode );
+addNodeClass( 'PointLightNode', PointLightNode );
