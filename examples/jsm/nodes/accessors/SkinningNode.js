@@ -30,7 +30,7 @@ class SkinningNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const { skinIndexNode, skinWeightNode, bindMatrixNode, bindMatrixInverseNode, boneMatricesNode } = this;
 

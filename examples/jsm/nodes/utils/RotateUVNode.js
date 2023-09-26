@@ -14,7 +14,7 @@ class RotateUVNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { uvNode, rotationNode, centerNode } = this;
 

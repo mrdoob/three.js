@@ -49,7 +49,7 @@ class MaterialNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const material = builder.context.material;
 		const scope = this.scope;

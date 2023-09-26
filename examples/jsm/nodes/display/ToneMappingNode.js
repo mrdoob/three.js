@@ -104,7 +104,7 @@ class ToneMappingNode extends TempNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const colorNode = this.colorNode || builder.context.color;
 		const toneMapping = this.toneMapping;

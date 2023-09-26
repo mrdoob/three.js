@@ -27,13 +27,13 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructLightingModel( /*builder*/ ) {
+	setupLightingModel( /*builder*/ ) {
 
 		return new PhongLightingModel();
 
 	}
 
-	constructVariants( { stack } ) {
+	setupVariants( { stack } ) {
 
 		// SHININESS
 

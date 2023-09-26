@@ -29,13 +29,13 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructLightingModel( /*builder*/ ) {
+	setupLightingModel( /*builder*/ ) {
 
 		return new PhysicalLightingModel( false, false ); // ( clearcoat, sheen ) -> standard
 
 	}
 
-	constructVariants( { stack } ) {
+	setupVariants( { stack } ) {
 
 		// METALNESS
 

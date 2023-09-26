@@ -22,7 +22,7 @@ class TriplanarTexturesNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { textureXNode, textureYNode, textureZNode, scaleNode, positionNode, normalNode } = this;
 

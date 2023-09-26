@@ -52,7 +52,7 @@ class NormalMapNode extends TempNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const { normalMapType, scaleNode } = this;
 

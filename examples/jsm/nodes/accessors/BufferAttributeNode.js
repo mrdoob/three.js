@@ -43,7 +43,7 @@ class BufferAttributeNode extends InputNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		if ( this.attribute !== null ) return;
 

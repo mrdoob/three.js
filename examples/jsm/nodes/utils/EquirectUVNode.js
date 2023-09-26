@@ -13,7 +13,7 @@ class EquirectUVNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		const dir = this.dirNode;
 

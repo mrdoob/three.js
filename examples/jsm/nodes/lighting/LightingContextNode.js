@@ -22,7 +22,7 @@ class LightingContextNode extends ContextNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const { lightingModel, backdropNode, backdropAlphaNode } = this;
 
@@ -76,7 +76,7 @@ class LightingContextNode extends ContextNode {
 
 		}
 
-		return super.construct( builder );
+		return super.setup( builder );
 
 	}
 

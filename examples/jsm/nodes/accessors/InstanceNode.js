@@ -17,7 +17,7 @@ class InstanceNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		let instanceMatrixNode = this.instanceMatrixNode;
 

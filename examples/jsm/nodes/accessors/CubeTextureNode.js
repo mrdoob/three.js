@@ -97,7 +97,7 @@ class CubeTextureNode extends TextureNode {
 
 			if ( builder.needsColorSpaceToLinear( this.value ) ) {
 
-				snippet = colorSpaceToLinear( expression( snippet, nodeType ), this.value.colorSpace ).construct( builder ).build( builder, nodeType );
+				snippet = colorSpaceToLinear( expression( snippet, nodeType ), this.value.colorSpace ).setup( builder ).build( builder, nodeType );
 
 			}
 

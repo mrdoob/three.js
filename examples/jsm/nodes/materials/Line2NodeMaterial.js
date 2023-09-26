@@ -44,13 +44,13 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.dashSizeNode = null;
 		this.gapSizeNode = null;
 
-		this.constructShaders();
+		this.setupShaders();
 
 		this.setValues( params );
 
 	}
 
-	constructShaders() {
+	setupShaders() {
 
 		const useAlphaToCoverage = this.alphaToCoverage;
 		const useColor = this.useColor;
@@ -400,7 +400,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		if ( this.useWorldUnits !== value ) {
 
 			this.useWorldUnits = value;
-			this.constructShaders();
+			this.setupShaders();
 
 		}
 
@@ -418,7 +418,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		if ( this.useDash !== value ) {
 
 			this.useDash = value;
-			this.constructShaders();
+			this.setupShaders();
 
 		}
 
@@ -436,7 +436,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		if ( this.useAlphaToCoverage !== value ) {
 
 			this.useAlphaToCoverage = value;
-			this.constructShaders();
+			this.setupShaders();
 
 		}
 

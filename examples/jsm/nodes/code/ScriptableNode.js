@@ -431,7 +431,7 @@ class ScriptableNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		return this.getDefaultOutputNode();
 

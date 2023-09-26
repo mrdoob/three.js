@@ -17,7 +17,7 @@ class ViewportDepthNode extends Node {
 
 	}
 
-	construct( /*builder*/ ) {
+	setup( /*builder*/ ) {
 
 		const { scope } = this;
 

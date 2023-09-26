@@ -19,7 +19,7 @@ class OscNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		const method = this.method;
 		const timeNode = nodeObject( this.timeNode );

@@ -48,7 +48,7 @@ class ColorAdjustmentNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { method, colorNode, adjustmentNode } = this;
 

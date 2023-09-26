@@ -38,7 +38,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructPosition( { object, context } ) {
+	setupPosition( { object, context } ) {
 
 		// < VERTEX STAGE >
 

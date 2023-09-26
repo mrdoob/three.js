@@ -63,7 +63,7 @@ class ReferenceNode extends Node {
 
 	}
 
-	construct( /*builder*/ ) {
+	setup( /*builder*/ ) {
 
 		return this.node;
 

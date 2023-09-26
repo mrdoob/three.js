@@ -25,7 +25,7 @@ class CheckerNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		return checkerShaderNode( { uv: this.uvNode } );
 

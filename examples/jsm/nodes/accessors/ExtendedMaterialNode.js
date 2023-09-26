@@ -29,7 +29,7 @@ class ExtendedMaterialNode extends MaterialNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const material = builder.material;
 		const scope = this.scope;
@@ -59,7 +59,7 @@ class ExtendedMaterialNode extends MaterialNode {
 
 		}
 
-		return node || super.construct( builder );
+		return node || super.setup( builder );
 
 	}
 

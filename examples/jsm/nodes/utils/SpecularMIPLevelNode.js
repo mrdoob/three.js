@@ -13,7 +13,7 @@ class SpecularMIPLevelNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { textureNode, roughnessNode } = this;
 
