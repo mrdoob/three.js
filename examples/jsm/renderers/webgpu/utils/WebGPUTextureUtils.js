@@ -15,7 +15,7 @@ import {
 
 import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
 
-import WebGPUTextureMipmapUtils from './WebGPUTextureMipmapUtils.js';
+import WebGPUTexturePassUtils from './WebGPUTexturePassUtils.js';
 
 const _compareToWebGPU = {
 	[ NeverCompare ]: 'never',
@@ -28,13 +28,15 @@ const _compareToWebGPU = {
 	[ NotEqualCompare ]: 'not-equal'
 };
 
+const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
+
 class WebGPUTextureUtils {
 
 	constructor( backend ) {
 
 		this.backend = backend;
 
-		this.mipmapUtils = null;
+		this._passUtils = null;
 
 		this.defaultTexture = null;
 		this.defaultCubeTexture = null;
@@ -237,7 +239,7 @@ class WebGPUTextureUtils {
 
 		if ( texture.isDataTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
 
-			this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU );
+			this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
 
 		} else if ( texture.isCompressedTexture ) {
 
@@ -245,7 +247,7 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isCubeTexture ) {
 
-			this._copyCubeMapToTexture( options.images, texture, textureData.texture, textureDescriptorGPU );
+			this._copyCubeMapToTexture( options.images, textureData.texture, textureDescriptorGPU, texture.flipY );
 
 		} else if ( texture.isVideoTexture ) {
 
@@ -255,7 +257,7 @@ class WebGPUTextureUtils {
 
 		} else {
 
-			this._copyImageToTexture( options.image, textureData.texture );
+			this._copyImageToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
 
 		}
 
@@ -361,19 +363,21 @@ class WebGPUTextureUtils {
 
 	}
 
-	_copyCubeMapToTexture( images, texture, textureGPU, textureDescriptorGPU ) {
+	_copyCubeMapToTexture( images, textureGPU, textureDescriptorGPU, flipY ) {
 
 		for ( let i = 0; i < 6; i ++ ) {
 
 			const image = images[ i ];
 
+			const flipIndex = flipY === true ? _flipMap[ i ] : i;
+
 			if ( image.isDataTexture ) {
 
-				this._copyBufferToTexture( image.image, textureGPU, textureDescriptorGPU, i );
+				this._copyBufferToTexture( image.image, textureGPU, textureDescriptorGPU, flipIndex, flipY );
 
 			} else {
 
-				this._copyImageToTexture( image, textureGPU, i );
+				this._copyImageToTexture( image, textureGPU, textureDescriptorGPU, flipIndex, flipY );
 
 			}
 
@@ -381,7 +385,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	_copyImageToTexture( image, textureGPU, originDepth = 0 ) {
+	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY ) {
 
 		const device = this.backend.device;
 
@@ -399,21 +403,41 @@ class WebGPUTextureUtils {
 			}
 		);
 
+		if ( flipY === true ) {
+
+			this._flipY( textureGPU, textureDescriptorGPU, originDepth );
+
+		}
+
+	}
+
+	_getPassUtils() {
+
+		let passUtils = this._passUtils;
+
+		if ( passUtils === null ) {
+
+			this._passUtils = passUtils = new WebGPUTexturePassUtils( this.backend.device );
+
+		}
+
+		return passUtils;
+
 	}
 
 	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0 ) {
 
-		if ( this.mipmapUtils === null ) {
-
-			this.mipmapUtils = new WebGPUTextureMipmapUtils( this.backend.device );
-
-		}
-
-		this.mipmapUtils.generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer );
+		this._getPassUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer );
 
 	}
 
-	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, originDepth = 0 ) {
+	_flipY( textureGPU, textureDescriptorGPU, originDepth = 0 ) {
+
+		this._getPassUtils().flipY( textureGPU, textureDescriptorGPU, originDepth );
+
+	}
+
+	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 		// @TODO: Consider to support valid buffer layouts with other formats like RGB
@@ -441,6 +465,12 @@ class WebGPUTextureUtils {
 				height: image.height,
 				depthOrArrayLayers: ( image.depth !== undefined ) ? image.depth : 1
 			} );
+
+		if ( flipY === true ) {
+
+			this._flipY( textureGPU, textureDescriptorGPU, originDepth );
+
+		}
 
 	}
 
