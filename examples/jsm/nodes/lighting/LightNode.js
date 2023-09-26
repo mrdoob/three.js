@@ -14,7 +14,7 @@ class LightNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { scope, light } = this;
 

@@ -33,7 +33,7 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const { colorNode, groundColorNode, lightDirectionNode } = this;
 

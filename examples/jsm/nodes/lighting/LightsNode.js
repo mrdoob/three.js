@@ -28,7 +28,7 @@ class LightsNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const lightNodes = this.lightNodes;
 

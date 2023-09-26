@@ -70,7 +70,7 @@ class ColorSpaceNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { method, node } = this;
 

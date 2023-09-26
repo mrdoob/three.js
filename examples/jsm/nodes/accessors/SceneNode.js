@@ -14,7 +14,7 @@ class SceneNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const scope = this.scope;
 		const scene = this.scene !== null ? this.scene : builder.scene;

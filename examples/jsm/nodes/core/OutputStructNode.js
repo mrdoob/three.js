@@ -13,9 +13,9 @@ class OutputStructNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
-		super.construct( builder );
+		super.setup( builder );
 
 		const members = this.members;
 		const types = [];

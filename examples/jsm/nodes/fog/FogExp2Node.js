@@ -15,7 +15,7 @@ class FogExp2Node extends FogNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		const depthNode = positionView.z.negate();
 		const densityNode = this.densityNode;

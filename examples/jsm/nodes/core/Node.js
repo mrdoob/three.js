@@ -134,7 +134,7 @@ class Node extends EventDispatcher {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const nodeProperties = builder.getNodeProperties( this );
 
@@ -212,7 +212,7 @@ class Node extends EventDispatcher {
 		builder.addChain( this );
 
 		/* Build stages expected results:
-			- "construct"	-> Node
+			- "setup"		-> Node
 			- "analyze"		-> null
 			- "generate"	-> String
 		*/
@@ -220,18 +220,18 @@ class Node extends EventDispatcher {
 
 		const buildStage = builder.getBuildStage();
 
-		if ( buildStage === 'construct' ) {
+		if ( buildStage === 'setup' ) {
 
 			const properties = builder.getNodeProperties( this );
 
 			if ( properties.initialized !== true || builder.context.tempRead === false ) {
 
-				const stackNodesBeforeConstruct = builder.stack.nodes.length;
+				const stackNodesBeforeSetup = builder.stack.nodes.length;
 
 				properties.initialized = true;
-				properties.outputNode = this.construct( builder );
+				properties.outputNode = this.setup( builder );
 
-				if ( properties.outputNode !== null && builder.stack.nodes.length !== stackNodesBeforeConstruct ) {
+				if ( properties.outputNode !== null && builder.stack.nodes.length !== stackNodesBeforeSetup ) {
 
 					properties.outputNode = builder.stack;
 

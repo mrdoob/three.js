@@ -36,7 +36,7 @@ class RangeNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const object = builder.object;
 

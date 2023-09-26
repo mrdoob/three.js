@@ -13,7 +13,7 @@ class PosterizeNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { sourceNode, stepsNode } = this;
 

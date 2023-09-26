@@ -55,7 +55,7 @@ class ViewportNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const scope = this.scope;
 

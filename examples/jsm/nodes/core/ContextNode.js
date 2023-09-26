@@ -20,7 +20,7 @@ class ContextNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const previousContext = builder.getContext();
 

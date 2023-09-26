@@ -17,7 +17,7 @@ class RemapNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { node, inLowNode, inHighNode, outLowNode, outHighNode, doClamp } = this;
 

@@ -18,7 +18,7 @@ class ReflectVectorNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		const reflectView = positionViewDirection.negate().reflect( transformedNormalView );
 

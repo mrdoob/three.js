@@ -14,7 +14,7 @@ class SpriteSheetUVNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { frameNode, uvNode, countNode } = this;
 

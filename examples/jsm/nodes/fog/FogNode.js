@@ -20,7 +20,7 @@ class FogNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		return this.factorNode;
 

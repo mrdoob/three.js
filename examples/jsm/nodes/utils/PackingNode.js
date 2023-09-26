@@ -19,7 +19,7 @@ class PackingNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { scope, node } = this;
 

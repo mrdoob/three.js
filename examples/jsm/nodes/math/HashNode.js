@@ -11,7 +11,7 @@ class HashNode extends Node {
 
 	}
 
-	construct( /*builder*/ ) {
+	setup( /*builder*/ ) {
 
 		// Taken from https://www.shadertoy.com/view/XlGcRh, originally from pcg-random.org
 
