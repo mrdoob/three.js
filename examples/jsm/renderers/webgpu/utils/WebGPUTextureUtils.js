@@ -106,7 +106,7 @@ class WebGPUTextureUtils {
 		const { width, height, depth, levels } = options;
 
 		const dimension = this._getDimension( texture );
-		const format = texture.internalFormat || getFormat( texture );
+		const format = texture.internalFormat || getFormat( texture, this.device );
 
 		const sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
 		const primarySampleCount = texture.isRenderTargetTexture ? 1 : sampleCount;
@@ -651,7 +651,7 @@ class WebGPUTextureUtils {
 
 }
 
-export function getFormat( texture ) {
+export function getFormat( texture, device = null ) {
 
 	const format = texture.format;
 	const type = texture.type;
@@ -854,7 +854,7 @@ export function getFormat( texture ) {
 
 					case FloatType:
 
-						if ( this.device.features.has( GPUFeatureName.Depth32FloatStencil8 ) === false ) {
+						if ( device && device.features.has( GPUFeatureName.Depth32FloatStencil8 ) === false ) {
 
 							console.error( 'WebGPURenderer: Depth textures with DepthStencilFormat + FloatType can only be used with the "depth32float-stencil8" GPU feature.' );
 
