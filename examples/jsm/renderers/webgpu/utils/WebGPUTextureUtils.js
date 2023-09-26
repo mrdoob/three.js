@@ -239,7 +239,7 @@ class WebGPUTextureUtils {
 
 		if ( texture.isDataTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
 
-			this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
+			this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, false );
 
 		} else if ( texture.isCompressedTexture ) {
 
