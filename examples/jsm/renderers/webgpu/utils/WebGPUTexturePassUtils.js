@@ -1,6 +1,6 @@
 import { GPUTextureViewDimension, GPUIndexFormat, GPUFilterMode, GPUPrimitiveTopology, GPULoadOp, GPUStoreOp } from './WebGPUConstants.js';
 
-class WebGPUTextureMipmapUtils {
+class WebGPUTexturePassUtils {
 
 	constructor( device ) {
 
@@ -282,4 +282,4 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 }
 
-export default WebGPUTextureMipmapUtils;
+export default WebGPUTexturePassUtils;

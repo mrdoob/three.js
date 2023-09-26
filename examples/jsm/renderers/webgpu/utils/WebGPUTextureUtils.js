@@ -15,7 +15,7 @@ import {
 
 import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
 
-import WebGPUTextureMipmapUtils from './WebGPUTextureMipmapUtils.js';
+import WebGPUTexturePassUtils from './WebGPUTexturePassUtils.js';
 
 const _compareToWebGPU = {
 	[ NeverCompare ]: 'never',
@@ -36,7 +36,7 @@ class WebGPUTextureUtils {
 
 		this.backend = backend;
 
-		this.mipmapUtils = null;
+		this._passUtils = null;
 
 		this.defaultTexture = null;
 		this.defaultCubeTexture = null;
@@ -411,29 +411,29 @@ class WebGPUTextureUtils {
 
 	}
 
-	_initMipmapUtils() {
+	_getPassUtils() {
 
-		if ( this.mipmapUtils === null ) {
+		let passUtils = this._passUtils;
 
-			this.mipmapUtils = new WebGPUTextureMipmapUtils( this.backend.device );
+		if ( passUtils === null ) {
+
+			this._passUtils = passUtils = new WebGPUTexturePassUtils( this.backend.device );
 
 		}
+
+		return passUtils;
 
 	}
 
 	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0 ) {
 
-		this._initMipmapUtils();
-
-		this.mipmapUtils.generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer );
+		this._getPassUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer );
 
 	}
 
 	_flipY( textureGPU, textureDescriptorGPU, originDepth = 0 ) {
 
-		this._initMipmapUtils();
-
-		this.mipmapUtils.flipY( textureGPU, textureDescriptorGPU, originDepth );
+		this._getPassUtils().flipY( textureGPU, textureDescriptorGPU, originDepth );
 
 	}
 
