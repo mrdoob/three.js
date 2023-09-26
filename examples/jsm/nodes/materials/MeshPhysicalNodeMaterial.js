@@ -125,4 +125,4 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 export default MeshPhysicalNodeMaterial;
 
-addNodeMaterial( MeshPhysicalNodeMaterial );
+addNodeMaterial( 'MeshPhysicalNodeMaterial', MeshPhysicalNodeMaterial );

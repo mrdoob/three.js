@@ -164,4 +164,4 @@ export const scriptableValue = nodeProxy( ScriptableValueNode );
 
 addNodeElement( 'scriptableValue', scriptableValue );
 
-addNodeClass( ScriptableValueNode );
+addNodeClass( 'ScriptableValueNode', ScriptableValueNode );

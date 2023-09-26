@@ -103,4 +103,4 @@ export const normalMap = nodeProxy( NormalMapNode );
 
 export const TBNViewMatrix = mat3( tangentView, bitangentView, normalView );
 
-addNodeClass( NormalMapNode );
+addNodeClass( 'NormalMapNode', NormalMapNode );

@@ -58,4 +58,4 @@ export const label = ( node, name ) => context( node, { label: name } );
 addNodeElement( 'context', context );
 addNodeElement( 'label', label );
 
-addNodeClass( ContextNode );
+addNodeClass( 'ContextNode', ContextNode );

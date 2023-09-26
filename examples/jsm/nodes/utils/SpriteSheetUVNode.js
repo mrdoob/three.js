@@ -38,4 +38,4 @@ export default SpriteSheetUVNode;
 
 export const spritesheetUV = nodeProxy( SpriteSheetUVNode );
 
-addNodeClass( SpriteSheetUVNode );
+addNodeClass( 'SpriteSheetUVNode', SpriteSheetUVNode );

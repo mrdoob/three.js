@@ -68,4 +68,4 @@ export default InstanceNode;
 
 export const instance = nodeProxy( InstanceNode );
 
-addNodeClass( InstanceNode );
+addNodeClass( 'InstanceNode', InstanceNode );

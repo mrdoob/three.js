@@ -278,4 +278,4 @@ export const sampler = ( aTexture ) => ( aTexture.isNode === true ? aTexture : t
 addNodeElement( 'texture', texture );
 //addNodeElement( 'textureLevel', textureLevel );
 
-addNodeClass( TextureNode );
+addNodeClass( 'TextureNode', TextureNode );

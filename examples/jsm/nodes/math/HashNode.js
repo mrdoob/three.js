@@ -31,4 +31,4 @@ export const hash = nodeProxy( HashNode );
 
 addNodeElement( 'hash', hash );
 
-addNodeClass( HashNode );
+addNodeClass( 'HashNode', HashNode );

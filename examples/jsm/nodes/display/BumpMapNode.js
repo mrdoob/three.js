@@ -74,4 +74,4 @@ export default BumpMapNode;
 
 export const bumpMap = nodeProxy( BumpMapNode );
 
-addNodeClass( BumpMapNode );
+addNodeClass( 'BumpMapNode', BumpMapNode );

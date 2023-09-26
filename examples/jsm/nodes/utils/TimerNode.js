@@ -91,4 +91,4 @@ export const timerGlobal = ( timeScale, value = 0 ) => nodeObject( new TimerNode
 export const timerDelta = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.DELTA, timeScale, value ) );
 export const frameId = nodeImmutable( TimerNode, TimerNode.FRAME );
 
-addNodeClass( TimerNode );
+addNodeClass( 'TimerNode', TimerNode );

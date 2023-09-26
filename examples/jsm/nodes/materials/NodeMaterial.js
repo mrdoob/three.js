@@ -29,7 +29,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.isNodeMaterial = true;
 
-		this.type = this.constructor.name;
+		this.type = this.constructor.type;
 
 		this.forceSinglePass = false;
 
@@ -521,12 +521,13 @@ class NodeMaterial extends ShaderMaterial {
 
 export default NodeMaterial;
 
-export function addNodeMaterial( nodeMaterial ) {
+export function addNodeMaterial( type, nodeMaterial ) {
 
-	if ( typeof nodeMaterial !== 'function' || ! nodeMaterial.name ) throw new Error( `Node material ${ nodeMaterial.name } is not a class` );
-	if ( NodeMaterials.has( nodeMaterial.name ) ) throw new Error( `Redefinition of node material ${ nodeMaterial.name }` );
+	if ( typeof nodeMaterial !== 'function' || ! type ) throw new Error( `Node material ${ type } is not a class` );
+	if ( NodeMaterials.has( type ) ) throw new Error( `Redefinition of node material ${ type }` );
 
-	NodeMaterials.set( nodeMaterial.name, nodeMaterial );
+	NodeMaterials.set( type, nodeMaterial );
+	nodeMaterial.type = type;
 
 }
 
@@ -542,4 +543,4 @@ export function createNodeMaterialFromType( type ) {
 
 }
 
-addNodeMaterial( NodeMaterial );
+addNodeMaterial( 'NodeMaterial', NodeMaterial );

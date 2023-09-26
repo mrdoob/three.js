@@ -28,7 +28,7 @@ class Node extends EventDispatcher {
 
 	get type() {
 
-		return this.constructor.name;
+		return this.constructor.type;
 
 	}
 
@@ -462,12 +462,13 @@ class Node extends EventDispatcher {
 
 export default Node;
 
-export function addNodeClass( nodeClass ) {
+export function addNodeClass( type, nodeClass ) {
 
-	if ( typeof nodeClass !== 'function' || ! nodeClass.name ) throw new Error( `Node class ${ nodeClass.name } is not a class` );
-	if ( NodeClasses.has( nodeClass.name ) ) throw new Error( `Redefinition of node class ${ nodeClass.name }` );
+	if ( typeof nodeClass !== 'function' || ! type ) throw new Error( `Node class ${ type } is not a class` );
+	if ( NodeClasses.has( type ) ) throw new Error( `Redefinition of node class ${ type }` );
 
-	NodeClasses.set( nodeClass.name, nodeClass );
+	NodeClasses.set( type, nodeClass );
+	nodeClass.type = type;
 
 }
 

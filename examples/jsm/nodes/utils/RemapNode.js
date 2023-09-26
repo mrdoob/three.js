@@ -39,4 +39,4 @@ export const remapClamp = nodeProxy( RemapNode );
 addNodeElement( 'remap', remap );
 addNodeElement( 'remapClamp', remapClamp );
 
-addNodeClass( RemapNode );
+addNodeClass( 'RemapNode', RemapNode );

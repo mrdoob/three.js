@@ -60,4 +60,4 @@ export const uniform = ( arg1, arg2 ) => {
 
 };
 
-addNodeClass( UniformNode );
+addNodeClass( 'UniformNode', UniformNode );

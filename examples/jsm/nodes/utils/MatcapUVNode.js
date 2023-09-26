@@ -27,4 +27,4 @@ export default MatcapUVNode;
 
 export const matcapUV = nodeImmutable( MatcapUVNode );
 
-addNodeClass( MatcapUVNode );
+addNodeClass( 'MatcapUVNode', MatcapUVNode );

@@ -399,7 +399,7 @@ export const tslFn = ( jsFunc ) => {
 
 };
 
-addNodeClass( ShaderNode );
+addNodeClass( 'ShaderNode', ShaderNode );
 
 // types
 // @TODO: Maybe export from ConstNode.js?

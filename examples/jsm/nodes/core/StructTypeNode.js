@@ -21,4 +21,4 @@ class StructTypeNode extends Node {
 
 export default StructTypeNode;
 
-addNodeClass( StructTypeNode );
+addNodeClass( 'StructTypeNode', StructTypeNode );

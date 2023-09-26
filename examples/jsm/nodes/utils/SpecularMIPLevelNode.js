@@ -34,4 +34,4 @@ export default SpecularMIPLevelNode;
 
 export const specularMIPLevel = nodeProxy( SpecularMIPLevelNode );
 
-addNodeClass( SpecularMIPLevelNode );
+addNodeClass( 'SpecularMIPLevelNode', SpecularMIPLevelNode );

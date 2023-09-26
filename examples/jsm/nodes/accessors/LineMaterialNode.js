@@ -26,4 +26,4 @@ export const materialLineDashSize = nodeImmutable( LineMaterialNode, LineMateria
 export const materialLineGapSize = nodeImmutable( LineMaterialNode, LineMaterialNode.GAP_SIZE );
 export const materialLineWidth = nodeImmutable( LineMaterialNode, LineMaterialNode.LINEWIDTH );
 
-addNodeClass( LineMaterialNode );
+addNodeClass( 'LineMaterialNode', LineMaterialNode );

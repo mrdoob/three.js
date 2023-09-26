@@ -101,4 +101,4 @@ class SplitNode extends Node {
 
 export default SplitNode;
 
-addNodeClass( SplitNode );
+addNodeClass( 'SplitNode', SplitNode );

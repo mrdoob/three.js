@@ -73,4 +73,4 @@ export default ExtendedMaterialNode;
 export const materialNormal = nodeImmutable( ExtendedMaterialNode, ExtendedMaterialNode.NORMAL );
 export const materialClearcoatNormal = nodeImmutable( ExtendedMaterialNode, ExtendedMaterialNode.CLEARCOAT_NORMAL );
 
-addNodeClass( ExtendedMaterialNode );
+addNodeClass( 'ExtendedMaterialNode', ExtendedMaterialNode );

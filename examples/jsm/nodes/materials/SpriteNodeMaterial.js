@@ -100,4 +100,4 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 export default SpriteNodeMaterial;
 
-addNodeMaterial( SpriteNodeMaterial );
+addNodeMaterial( 'SpriteNodeMaterial', SpriteNodeMaterial );

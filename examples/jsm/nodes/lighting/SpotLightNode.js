@@ -86,4 +86,4 @@ export default SpotLightNode;
 
 addLightNode( SpotLight, SpotLightNode );
 
-addNodeClass( SpotLightNode );
+addNodeClass( 'SpotLightNode', SpotLightNode );

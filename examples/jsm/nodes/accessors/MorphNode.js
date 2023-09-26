@@ -67,4 +67,4 @@ export default MorphNode;
 
 export const morph = nodeProxy( MorphNode );
 
-addNodeClass( MorphNode );
+addNodeClass( 'MorphNode', MorphNode );

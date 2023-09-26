@@ -77,4 +77,4 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 export default MeshStandardNodeMaterial;
 
-addNodeMaterial( MeshStandardNodeMaterial );
+addNodeMaterial( 'MeshStandardNodeMaterial', MeshStandardNodeMaterial );

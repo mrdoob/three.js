@@ -84,4 +84,4 @@ export const temp = nodeProxy( VarNode );
 
 addNodeElement( 'temp', temp );
 
-addNodeClass( VarNode );
+addNodeClass( 'VarNode', VarNode );

@@ -62,4 +62,4 @@ class ConvertNode extends Node {
 
 export default ConvertNode;
 
-addNodeClass( ConvertNode );
+addNodeClass( 'ConvertNode', ConvertNode );

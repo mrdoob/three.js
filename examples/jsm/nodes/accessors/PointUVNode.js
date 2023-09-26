@@ -23,4 +23,4 @@ export default PointUVNode;
 
 export const pointUV = nodeImmutable( PointUVNode );
 
-addNodeClass( PointUVNode );
+addNodeClass( 'PointUVNode', PointUVNode );

@@ -32,4 +32,4 @@ export const textureSize = nodeProxy( TextureSizeNode );
 
 addNodeElement( 'textureSize', textureSize );
 
-addNodeClass( TextureSizeNode );
+addNodeClass( 'TextureSizeNode', TextureSizeNode );
