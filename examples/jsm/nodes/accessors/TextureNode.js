@@ -59,7 +59,7 @@ class TextureNode extends UniformNode {
 
 	}
 
-	getTextureMatrix( uvNode ) {
+	getTransformedUV( uvNode ) {
 
 		const texture = this.value;
 
@@ -94,7 +94,7 @@ class TextureNode extends UniformNode {
 
 		if ( this.updateMatrix === true ) {
 
-			uvNode = this.getTextureMatrix( uvNode );
+			uvNode = this.getTransformedUV( uvNode );
 
 		}
 
