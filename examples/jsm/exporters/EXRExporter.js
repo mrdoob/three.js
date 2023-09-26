@@ -25,35 +25,41 @@ class EXRExporter {
 
 		if ( ! arg1 || ! ( arg1.isWebGLRenderer || arg1.isDataTexture ) ) {
 
-			throw Error( 'EXRExporter.parse: Unsupported first parameter, expected instance of WebGLRenderer or DataTexture.' );
+			throw new Error( 'EXRExporter.parse: Unsupported first parameter, expected instance of WebGLRenderer or DataTexture.' );
 
-		} else if ( arg1.isWebGLRenderer ) {
+		}
 
-			const renderer = arg1, renderTarget = arg2, options = arg3;
+		let dataBuffer, texture, options;
+
+		if ( arg1.isWebGLRenderer ) {
+
+			const renderer = arg1, renderTarget = arg2;
+			options = arg3;
 
 			supportedRTT( renderTarget );
 
-			const info = buildInfoRTT( renderTarget, options ),
-				dataBuffer = getPixelData( renderer, renderTarget, info ),
-				rawContentBuffer = reorganizeDataBuffer( dataBuffer, info ),
-				chunks = compressData( rawContentBuffer, info );
+			options.width = renderTarget.width;
+			options.height = renderTarget.height;
 
-			return fillData( chunks, info );
+			texture = renderTarget.texture;
+			dataBuffer = getPixelData( renderer, renderTarget );
 
 		} else if ( arg1.isDataTexture ) {
 
-			const texture = arg1, options = arg2;
+			texture = arg1;
+			options = arg2;
 
 			supportedDT( texture );
 
-			const info = buildInfoDT( texture, options ),
-				dataBuffer = texture.image.data,
-				rawContentBuffer = reorganizeDataBuffer( dataBuffer, info ),
-				chunks = compressData( rawContentBuffer, info );
-
-			return fillData( chunks, info );
+			dataBuffer = texture.image.data;
 
 		}
+
+		const info = buildInfo( texture, options );
+		const rawContentBuffer = reorganizeDataBuffer( dataBuffer, info );
+		const chunks = compressData( rawContentBuffer, info );
+
+		return fillData( chunks, info );
 
 	}
 
@@ -61,27 +67,22 @@ class EXRExporter {
 
 function supportedRTT( renderTarget ) {
 
-	if ( ! renderTarget || ! renderTarget.isWebGLRenderTarget ) {
+	if ( ! renderTarget || ! renderTarget.isWebGLRenderTarget || renderTarget.isWebGLCubeRenderTarget
+	    || renderTarget.isWebGL3DRenderTarget || renderTarget.isWebGLArrayRenderTarget ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported second parameter, expected instance of WebGLRenderTarget.' );
-
-	}
-
-	if ( renderTarget.isWebGLCubeRenderTarget || renderTarget.isWebGL3DRenderTarget || renderTarget.isWebGLArrayRenderTarget ) {
-
-		throw Error( 'EXRExporter.parse: Unsupported render target type, expected instance of WebGLRenderTarget.' );
+		throw new Error( 'EXRExporter.parse: Unsupported render target type, expected instance of WebGLRenderTarget.' );
 
 	}
 
 	if ( renderTarget.texture.type !== FloatType && renderTarget.texture.type !== HalfFloatType ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture type.' );
+		throw new Error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture type, expected FloatType or HalfFloatType.' );
 
 	}
 
 	if ( renderTarget.texture.format !== RGBAFormat ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture format, expected RGBAFormat.' );
+		throw new Error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture format, expected RGBAFormat.' );
 
 	}
 
@@ -91,37 +92,37 @@ function supportedDT( texture ) {
 
 	if ( texture.type !== FloatType && texture.type !== HalfFloatType ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported DataTexture texture type.' );
+		throw new Error( 'EXRExporter.parse: Unsupported DataTexture texture type, expected FloatType or HalfFloatType.' );
 
 	}
 
 	if ( texture.format !== RGBAFormat ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported DataTexture texture format, expected RGBAFormat.' );
+		throw new Error( 'EXRExporter.parse: Unsupported DataTexture texture format, expected RGBAFormat.' );
 
 	}
 
 	if ( ! texture.image.data ) {
 
-		throw Error( 'EXRExporter.parse: Invalid DataTexture image data.' );
+		throw new Error( 'EXRExporter.parse: Missing DataTexture image data.' );
 
 	}
 
 	if ( texture.type === FloatType && texture.image.data.constructor.name !== 'Float32Array' ) {
 
-		throw Error( 'EXRExporter.parse: DataTexture image data doesn\'t match type, expected \'Float32Array\'.' );
+		throw new Error( 'EXRExporter.parse: DataTexture image data doesn\'t match FloatType type, expected \'Float32Array\'.' );
 
 	}
 
 	if ( texture.type === HalfFloatType && texture.image.data.constructor.name !== 'Uint16Array' ) {
 
-		throw Error( 'EXRExporter.parse: DataTexture image data doesn\'t match type, expected \'Uint16Array\'.' );
+		throw new Error( 'EXRExporter.parse: DataTexture image data doesn\'t match HalfFloatType type, expected \'Uint16Array\'.' );
 
 	}
 
 }
 
-function buildInfoRTT( renderTarget, options = {} ) {
+function buildInfo( texture, options = {} ) {
 
 	const compressionSizes = {
 		0: 1,
@@ -129,81 +130,45 @@ function buildInfoRTT( renderTarget, options = {} ) {
 		3: 16
 	};
 
-	const WIDTH = renderTarget.width,
-		HEIGHT = renderTarget.height,
-		TYPE = renderTarget.texture.type,
-		FORMAT = renderTarget.texture.format,
-		COMPRESSION = ( options.compression !== undefined ) ? options.compression : ZIP_COMPRESSION,
-		EXPORTER_TYPE = ( options.type !== undefined ) ? options.type : HalfFloatType,
-		OUT_TYPE = ( EXPORTER_TYPE === FloatType ) ? 2 : 1,
-		COMPRESSION_SIZE = compressionSizes[ COMPRESSION ],
-		NUM_CHANNELS = 4;
+	const width = options.width !== undefined ? options.width : texture.image.width;
+	const height = options.height !== undefined ? options.height : texture.image.height;
+
+	const compression = options.compression !== undefined ? options.compression : ZIP_COMPRESSION;
+	const exporterType = options.type !== undefined ? options.type : HalfFloatType;
+	const outType = exporterType === FloatType ? 2 : 1;
+	const compressionSize = compressionSizes[ compression ];
 
 	return {
-		width: WIDTH,
-		height: HEIGHT,
-		type: TYPE,
-		format: FORMAT,
-		compression: COMPRESSION,
-		blockLines: COMPRESSION_SIZE,
-		dataType: OUT_TYPE,
-		dataSize: 2 * OUT_TYPE,
-		numBlocks: Math.ceil( HEIGHT / COMPRESSION_SIZE ),
+		width,
+		height,
+		type: texture.type,
+		format: texture.format,
+		compression,
+		blockLines: compressionSize,
+		dataType: outType,
+		dataSize: 2 * outType,
+		numBlocks: Math.ceil( height / compressionSize ),
 		numInputChannels: 4,
-		numOutputChannels: NUM_CHANNELS,
+		numOutputChannels: 4
 	};
 
 }
 
-function buildInfoDT( texture, options = {} ) {
-
-	const compressionSizes = {
-		0: 1,
-		2: 1,
-		3: 16
-	};
-
-	const WIDTH = texture.image.width,
-		HEIGHT = texture.image.height,
-		TYPE = texture.type,
-		FORMAT = texture.format,
-		COMPRESSION = ( options.compression !== undefined ) ? options.compression : ZIP_COMPRESSION,
-		EXPORTER_TYPE = ( options.type !== undefined ) ? options.type : HalfFloatType,
-		OUT_TYPE = ( EXPORTER_TYPE === FloatType ) ? 2 : 1,
-		COMPRESSION_SIZE = compressionSizes[ COMPRESSION ],
-		NUM_CHANNELS = 4;
-
-	return {
-		width: WIDTH,
-		height: HEIGHT,
-		type: TYPE,
-		format: FORMAT,
-		compression: COMPRESSION,
-		blockLines: COMPRESSION_SIZE,
-		dataType: OUT_TYPE,
-		dataSize: 2 * OUT_TYPE,
-		numBlocks: Math.ceil( HEIGHT / COMPRESSION_SIZE ),
-		numInputChannels: 4,
-		numOutputChannels: NUM_CHANNELS,
-	};
-
-}
-
-function getPixelData( renderer, rtt, info ) {
+function getPixelData( renderer, rtt ) {
 
 	let dataBuffer;
 
-	if ( info.type === FloatType ) {
+	if ( rtt.texture.type === FloatType ) {
 
-		dataBuffer = new Float32Array( info.width * info.height * info.numInputChannels );
+		dataBuffer = new Float32Array( 4 * rtt.width * rtt.height );
 
 	} else {
 
-		dataBuffer = new Uint16Array( info.width * info.height * info.numInputChannels );
+		dataBuffer = new Uint16Array( 4 * rtt.width * rtt.height );
 
 	}
 
-	renderer.readRenderTargetPixels( rtt, 0, 0, info.width, info.height, dataBuffer );
+	renderer.readRenderTargetPixels( rtt, 0, 0, rtt.width, rtt.height, dataBuffer );
 
 	return dataBuffer;
 
@@ -215,9 +180,9 @@ function reorganizeDataBuffer( inBuffer, info ) {
 		h = info.height,
 		dec = { r: 0, g: 0, b: 0, a: 0 },
 		offset = { value: 0 },
-		cOffset = ( info.numOutputChannels == 4 ) ? 1 : 0,
-		getValue = ( info.type == FloatType ) ? getFloat32 : getFloat16,
-		setValue = ( info.dataType == 1 ) ? setFloat16 : setFloat32,
+		cOffset = ( info.numOutputChannels === 4 ) ? 1 : 0,
+		getValue = ( info.type === FloatType ) ? getFloat32 : getFloat16,
+		setValue = ( info.dataType === 1 ) ? setFloat16 : setFloat32,
 		outBuffer = new Uint8Array( info.width * info.height * info.numOutputChannels * info.dataSize ),
 		dv = new DataView( outBuffer.buffer );
 
@@ -232,20 +197,20 @@ function reorganizeDataBuffer( inBuffer, info ) {
 			const b = getValue( inBuffer, i + 2 );
 			const a = getValue( inBuffer, i + 3 );
 
-			const line = ( h - y - 1 ) * w * ( 3 + cOffset ) * info.dataSize;
-
 			decodeLinear( dec, r, g, b, a );
 
-			offset.value = line + x * info.dataSize;
+			const wSize = w * info.dataSize;
+
+			offset.value = ( h - y - 1 ) * wSize * ( 3 + cOffset ) + x * info.dataSize;
 			setValue( dv, dec.a, offset );
 
-			offset.value = line + ( cOffset ) * w * info.dataSize + x * info.dataSize;
+			offset.value += cOffset * wSize;
 			setValue( dv, dec.b, offset );
 
-			offset.value = line + ( 1 + cOffset ) * w * info.dataSize + x * info.dataSize;
+			offset.value += wSize;
 			setValue( dv, dec.g, offset );
 
-			offset.value = line + ( 2 + cOffset ) * w * info.dataSize + x * info.dataSize;
+			offset.value += wSize;
 			setValue( dv, dec.r, offset );
 
 		}
