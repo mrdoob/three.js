@@ -176,42 +176,30 @@ function getPixelData( renderer, rtt ) {
 
 function reorganizeDataBuffer( inBuffer, info ) {
 
-	const w = info.width,
-		h = info.height,
-		dec = { r: 0, g: 0, b: 0, a: 0 },
-		offset = { value: 0 },
-		cOffset = ( info.numOutputChannels === 4 ) ? 1 : 0,
-		getValue = ( info.type === FloatType ) ? getFloat32 : getFloat16,
-		setValue = ( info.dataType === 1 ) ? setFloat16 : setFloat32,
-		outBuffer = new Uint8Array( info.width * info.height * info.numOutputChannels * info.dataSize ),
-		dv = new DataView( outBuffer.buffer );
+	const w = info.width, h = info.height;
 
-	for ( let y = 0; y < h; ++ y ) {
+	const inHalfFloat = info.type === HalfFloatType, outHalfFloat = info.dataType === 1;
 
-		for ( let x = 0; x < w; ++ x ) {
+	const outBuffer = new Uint8Array( info.width * info.height * info.numOutputChannels * info.dataSize );
 
-			const i = y * w * 4 + x * 4;
+	const inWriter = new Writer( inBuffer );
+	const outWriter = new Writer( outBuffer );
 
-			const r = getValue( inBuffer, i );
-			const g = getValue( inBuffer, i + 1 );
-			const b = getValue( inBuffer, i + 2 );
-			const a = getValue( inBuffer, i + 3 );
+	for ( let y = 0; y < h; y ++ ) {
 
-			decodeLinear( dec, r, g, b, a );
+		for ( let x = 0; x < w; x ++ ) {
 
-			const wSize = w * info.dataSize;
+			const r = inWriter.getFloat( inHalfFloat );
+			const g = inWriter.getFloat( inHalfFloat );
+			const b = inWriter.getFloat( inHalfFloat );
+			const a = inWriter.getFloat( inHalfFloat );
 
-			offset.value = ( h - y - 1 ) * wSize * ( 3 + cOffset ) + x * info.dataSize;
-			setValue( dv, dec.a, offset );
+			outWriter.offset = ( ( h - y - 1 ) * w * info.numOutputChannels + x ) * info.dataSize;
 
-			offset.value += cOffset * wSize;
-			setValue( dv, dec.b, offset );
-
-			offset.value += wSize;
-			setValue( dv, dec.g, offset );
-
-			offset.value += wSize;
-			setValue( dv, dec.r, offset );
+			if ( info.numOutputChannels === 4 ) outWriter.setFloat( a, outHalfFloat );
+			outWriter.setFloat( b, outHalfFloat );
+			outWriter.setFloat( g, outHalfFloat );
+			outWriter.setFloat( r, outHalfFloat );
 
 		}
 
@@ -223,25 +211,10 @@ function reorganizeDataBuffer( inBuffer, info ) {
 
 function compressData( inBuffer, info ) {
 
-	let compress,
-		tmpBuffer,
-		sum = 0;
+	let tmpBuffer, sum = 0;
 
-	const chunks = { data: new Array(), totalSize: 0 },
+	const chunks = { data: [], totalSize: 0 },
 		size = info.width * info.numOutputChannels * info.blockLines * info.dataSize;
-
-	switch ( info.compression ) {
-
-		case 0:
-			compress = compressNONE;
-			break;
-
-		case 2:
-		case 3:
-			compress = compressZIP;
-			break;
-
-	}
 
 	if ( info.compression !== 0 ) {
 
@@ -253,7 +226,7 @@ function compressData( inBuffer, info ) {
 
 		const arr = inBuffer.subarray( size * i, size * ( i + 1 ) );
 
-		const block = compress( arr, tmpBuffer );
+		const block = info.compression === 0 ? arr : compressZIP( arr, tmpBuffer );
 
 		sum += block.length;
 
@@ -264,12 +237,6 @@ function compressData( inBuffer, info ) {
 	chunks.totalSize = sum;
 
 	return chunks;
-
-}
-
-function compressNONE( data ) {
-
-	return data;
 
 }
 
@@ -317,98 +284,97 @@ function compressZIP( data, tmpBuffer ) {
 
 function fillHeader( outBuffer, chunks, info ) {
 
-	const offset = { value: 0 };
-	const dv = new DataView( outBuffer.buffer );
+	const writer = new Writer( outBuffer );
 
-	setUint32( dv, 20000630, offset ); // magic
-	setUint32( dv, 2, offset ); // mask
+	writer.setUint32( 20000630 ); // magic
+	writer.setUint32( 2 ); // mask
 
 	// = HEADER =
 
-	setString( dv, 'compression', offset );
-	setString( dv, 'compression', offset );
-	setUint32( dv, 1, offset );
-	setUint8( dv, info.compression, offset );
+	writer.setString( 'compression' );
+	writer.setString( 'compression' );
+	writer.setUint32( 1 );
+	writer.setUint8( info.compression );
 
-	setString( dv, 'screenWindowCenter', offset );
-	setString( dv, 'v2f', offset );
-	setUint32( dv, 8, offset );
-	setUint32( dv, 0, offset );
-	setUint32( dv, 0, offset );
+	writer.setString( 'screenWindowCenter' );
+	writer.setString( 'v2f' );
+	writer.setUint32( 8 );
+	writer.setUint32( 0 );
+	writer.setUint32( 0 );
 
-	setString( dv, 'screenWindowWidth', offset );
-	setString( dv, 'float', offset );
-	setUint32( dv, 4, offset );
-	setFloat32( dv, 1.0, offset );
+	writer.setString( 'screenWindowWidth' );
+	writer.setString( 'float' );
+	writer.setUint32( 4 );
+	writer.setFloat32( 1.0 );
 
-	setString( dv, 'pixelAspectRatio', offset );
-	setString( dv, 'float', offset );
-	setUint32( dv, 4, offset );
-	setFloat32( dv, 1.0, offset );
+	writer.setString( 'pixelAspectRatio' );
+	writer.setString( 'float' );
+	writer.setUint32( 4 );
+	writer.setFloat32( 1.0 );
 
-	setString( dv, 'lineOrder', offset );
-	setString( dv, 'lineOrder', offset );
-	setUint32( dv, 1, offset );
-	setUint8( dv, 0, offset );
+	writer.setString( 'lineOrder' );
+	writer.setString( 'lineOrder' );
+	writer.setUint32( 1 );
+	writer.setUint8( 0 );
 
-	setString( dv, 'dataWindow', offset );
-	setString( dv, 'box2i', offset );
-	setUint32( dv, 16, offset );
-	setUint32( dv, 0, offset );
-	setUint32( dv, 0, offset );
-	setUint32( dv, info.width - 1, offset );
-	setUint32( dv, info.height - 1, offset );
+	writer.setString( 'dataWindow' );
+	writer.setString( 'box2i' );
+	writer.setUint32( 16 );
+	writer.setUint32( 0 );
+	writer.setUint32( 0 );
+	writer.setUint32( info.width - 1 );
+	writer.setUint32( info.height - 1 );
 
-	setString( dv, 'displayWindow', offset );
-	setString( dv, 'box2i', offset );
-	setUint32( dv, 16, offset );
-	setUint32( dv, 0, offset );
-	setUint32( dv, 0, offset );
-	setUint32( dv, info.width - 1, offset );
-	setUint32( dv, info.height - 1, offset );
+	writer.setString( 'displayWindow' );
+	writer.setString( 'box2i' );
+	writer.setUint32( 16 );
+	writer.setUint32( 0 );
+	writer.setUint32( 0 );
+	writer.setUint32( info.width - 1 );
+	writer.setUint32( info.height - 1 );
 
-	setString( dv, 'channels', offset );
-	setString( dv, 'chlist', offset );
-	setUint32( dv, info.numOutputChannels * 18 + 1, offset );
+	writer.setString( 'channels' );
+	writer.setString( 'chlist' );
+	writer.setUint32( info.numOutputChannels * 18 + 1 );
 
-	setString( dv, 'A', offset );
-	setUint32( dv, info.dataType, offset );
-	offset.value += 4;
-	setUint32( dv, 1, offset );
-	setUint32( dv, 1, offset );
+	writer.setString( 'A' );
+	writer.setUint32( info.dataType );
+	writer.setUint32( 0 );
+	writer.setUint32( 1 );
+	writer.setUint32( 1 );
 
-	setString( dv, 'B', offset );
-	setUint32( dv, info.dataType, offset );
-	offset.value += 4;
-	setUint32( dv, 1, offset );
-	setUint32( dv, 1, offset );
+	writer.setString( 'B' );
+	writer.setUint32( info.dataType );
+	writer.setUint32( 0 );
+	writer.setUint32( 1 );
+	writer.setUint32( 1 );
 
-	setString( dv, 'G', offset );
-	setUint32( dv, info.dataType, offset );
-	offset.value += 4;
-	setUint32( dv, 1, offset );
-	setUint32( dv, 1, offset );
+	writer.setString( 'G' );
+	writer.setUint32( info.dataType );
+	writer.setUint32( 0 );
+	writer.setUint32( 1 );
+	writer.setUint32( 1 );
 
-	setString( dv, 'R', offset );
-	setUint32( dv, info.dataType, offset );
-	offset.value += 4;
-	setUint32( dv, 1, offset );
-	setUint32( dv, 1, offset );
+	writer.setString( 'R' );
+	writer.setUint32( info.dataType );
+	writer.setUint32( 0 );
+	writer.setUint32( 1 );
+	writer.setUint32( 1 );
 
-	setUint8( dv, 0, offset );
+	writer.setUint8( 0 );
 
 	// null-byte
-	setUint8( dv, 0, offset );
+	writer.setUint8( 0 );
 
 	// = OFFSET TABLE =
 
-	let sum = offset.value + info.numBlocks * 8;
+	let sum = BigInt( offset.value + info.numBlocks * 8 );
 
 	for ( let i = 0; i < chunks.data.length; ++ i ) {
 
-		setUint64( dv, sum, offset );
+		writer.setUint64( sum );
 
-		sum += chunks.data[ i ].size + 8;
+		sum += BigInt( chunks.data[ i ].size + 8 );
 
 	}
 
@@ -416,24 +382,23 @@ function fillHeader( outBuffer, chunks, info ) {
 
 function fillData( chunks, info ) {
 
-	const TableSize = info.numBlocks * 8,
-		HeaderSize = 259 + ( 18 * info.numOutputChannels ), // 259 + 18 * chlist
-		offset = { value: HeaderSize + TableSize },
-		outBuffer = new Uint8Array( HeaderSize + TableSize + chunks.totalSize + info.numBlocks * 8 ),
-		dv = new DataView( outBuffer.buffer );
+	const headerPlusTable = 259 + info.numOutputChannels * 18 + info.numBlocks * 8;
 
+	const outBuffer = new Uint8Array( headerPlusTable + chunks.totalSize + info.numBlocks * 8 );
 	fillHeader( outBuffer, chunks, info );
+
+	const writer = new Writer( outBuffer );
+	writer.offset = headerPlusTable;
 
 	for ( let i = 0; i < chunks.data.length; ++ i ) {
 
-		const data = chunks.data[ i ].dataChunk;
-		const size = chunks.data[ i ].size;
+		const { dataChunk: data, size } = chunks.data[ i ];
 
-		setUint32( dv, i * info.blockLines, offset );
-		setUint32( dv, size, offset );
+		writer.setUint32( i * info.blockLines );
+		writer.setUint32( size );
 
 		outBuffer.set( data, offset.value );
-		offset.value += size;
+		writer.offset += size;
 
 	}
 
@@ -441,103 +406,77 @@ function fillData( chunks, info ) {
 
 }
 
-function decodeLinear( dec, r, g, b, a ) {
+class Writer {
 
-	dec.r = r;
-	dec.g = g;
-	dec.b = b;
-	dec.a = a;
+	constructor( buffer ) {
 
-}
-
-// function decodeSRGB( dec, r, g, b, a ) {
-
-// 	dec.r = r > 0.04045 ? Math.pow( r * 0.9478672986 + 0.0521327014, 2.4 ) : r * 0.0773993808;
-// 	dec.g = g > 0.04045 ? Math.pow( g * 0.9478672986 + 0.0521327014, 2.4 ) : g * 0.0773993808;
-// 	dec.b = b > 0.04045 ? Math.pow( b * 0.9478672986 + 0.0521327014, 2.4 ) : b * 0.0773993808;
-// 	dec.a = a;
-
-// }
-
-
-function setUint8( dv, value, offset ) {
-
-	dv.setUint8( offset.value, value );
-
-	offset.value += 1;
-
-}
-
-function setUint32( dv, value, offset ) {
-
-	dv.setUint32( offset.value, value, true );
-
-	offset.value += 4;
-
-}
-
-function setFloat16( dv, value, offset ) {
-
-	dv.setUint16( offset.value, DataUtils.toHalfFloat( value ), true );
-
-	offset.value += 2;
-
-}
-
-function setFloat32( dv, value, offset ) {
-
-	dv.setFloat32( offset.value, value, true );
-
-	offset.value += 4;
-
-}
-
-function setUint64( dv, value, offset ) {
-
-	dv.setBigUint64( offset.value, BigInt( value ), true );
-
-	offset.value += 8;
-
-}
-
-function setString( dv, string, offset ) {
-
-	const tmp = textEncoder.encode( string + '\0' );
-
-	for ( let i = 0; i < tmp.length; ++ i ) {
-
-		setUint8( dv, tmp[ i ], offset );
+		this.dv = buffer.buffer;
+		this.offset = 0;
 
 	}
 
-}
+	setUint8( value ) {
 
-function decodeFloat16( binary ) {
+		this.dv.setUint8( this.offset, value );
+		this.offset += 1;
 
-	const exponent = ( binary & 0x7C00 ) >> 10,
-		fraction = binary & 0x03FF;
+	}
 
-	return ( binary >> 15 ? - 1 : 1 ) * (
-		exponent ?
-			(
-				exponent === 0x1F ?
-					fraction ? NaN : Infinity :
-					Math.pow( 2, exponent - 15 ) * ( 1 + fraction / 0x400 )
-			) :
-			6.103515625e-5 * ( fraction / 0x400 )
-	);
+	setUint32( value ) {
 
-}
+		this.dv.setUint32( this.offset, value );
+		this.offset += 4;
 
-function getFloat16( arr, i ) {
+	}
 
-	return decodeFloat16( arr[ i ] );
+	setUint64( value ) {
 
-}
+		this.dv.setBigUint64( this.offset, value );
+		this.offset += 8;
 
-function getFloat32( arr, i ) {
+	}
 
-	return arr[ i ];
+	setFloat16( value ) {
+
+		this.dv.setUint16( this.offset, DataUtils.toHalfFloat( value ), true );
+		this.offset += 2;
+
+	}
+
+	setFloat32( value ) {
+
+		this.dv.setFloat32( this.offset, value, true );
+		this.offset += 4;
+
+	}
+
+	setString( string ) {
+
+		textEncoder.encode( string + '\0' ).forEach( v => this.setUint8( v ) );
+
+	}
+
+	getFloat( isHalfFloat ) {
+
+		const value = isHalfFloat ? DataUtils.fromHalfFloat( this.dv.getUint16( this.offset, true ) ) : this.dv.getFloat32( this.offset );
+		this.offset += isHalfFloat ? 2 : 4;
+		return value;
+
+	}
+
+	setFloat( value, isHalfFloat ) {
+
+		if ( isHalfFloat ) {
+
+			this.setFloat16( value );
+
+		} else {
+
+			this.setFloat32( value );
+
+		}
+
+	}
 
 }
 
