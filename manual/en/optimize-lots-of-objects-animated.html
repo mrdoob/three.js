@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -135,7 +131,7 @@ all the same properties as <code class="notranslate" translate="no">baseFile</co
     }),
   });
   fileInfos.push({
-    name: '&gt;50% women', 
+    name: '&gt;50% women',
     hueRange: [0.0, 0.4],
     file: makeDiffFile(womenFile, menFile, (women, men) =&gt; {
       return amountGreaterThan(women, men);
@@ -351,7 +347,7 @@ and for all the ones we don't want to see to we need to have an influence of 0.<
 <p>We could just set them to 0 or 1 directly but if we did that we wouldn't see any
 animation, it would just snap which would be no different than what we already
 have. We could also write some custom animation code which would be easy but
-because the original webgl globe uses 
+because the original webgl globe uses
 <a href="https://github.com/tweenjs/tween.js/">an animation library</a> let's use the same one here.</p>
 <p>We need to include the library</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
@@ -486,7 +482,7 @@ b)</code> "percent" and you'll see what I mean.</p>
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 
