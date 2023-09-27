@@ -467,7 +467,7 @@ class WebGPUBackend extends Backend {
 
 				if ( results[ i ] !== 0n ) {
 
-					occluded.add( currentOcclusionQueryObjects[ i ], true );
+					occluded.add( currentOcclusionQueryObjects[ i ] );
 
 				}
 
