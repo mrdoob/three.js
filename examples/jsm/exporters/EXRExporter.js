@@ -396,18 +396,16 @@ function fillHeader( outBuffer, chunks, info ) {
 
 function fillData( chunks, info ) {
 
-	const TableSize = info.numBlocks * 8,
-		HeaderSize = 259 + ( 18 * info.numOutputChannels ), // 259 + 18 * chlist
-		offset = { value: HeaderSize + TableSize },
-		outBuffer = new Uint8Array( HeaderSize + TableSize + chunks.totalSize + info.numBlocks * 8 ),
+	const headerPlusTable = 259 + info.numOutputChannels * 18 + info.numBlocks * 8,
+		offset = { value: headerPlusTable },
+		outBuffer = new Uint8Array( headerPlusTable + chunks.totalSize + info.numBlocks * 8 ),
 		dv = new DataView( outBuffer.buffer );
 
 	fillHeader( outBuffer, chunks, info );
 
 	for ( let i = 0; i < chunks.data.length; ++ i ) {
 
-		const data = chunks.data[ i ].dataChunk;
-		const size = chunks.data[ i ].size;
+		const { dataChunk: data, size } = chunks.data[ i ];
 
 		setUint32( dv, i * info.blockLines, offset );
 		setUint32( dv, size, offset );
