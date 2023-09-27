@@ -120,8 +120,8 @@ export const lightsWithoutWrap = nodeProxy( LightsNode );
 export function addLightNode( lightClass, lightNodeClass ) {
 
 	if ( LightNodes.has( lightClass ) ) throw new Error( `Redefinition of light node ${ lightNodeClass.name }` );
-	if ( typeof lightClass !== 'function' || ! lightClass.name ) throw new Error( `Light ${ lightClass.name } is not a class` );
-	if ( typeof lightNodeClass !== 'function' || ! lightNodeClass.name ) throw new Error( `Light node ${ lightNodeClass.name } is not a class` );
+	if ( typeof lightClass !== 'function' ) throw new Error( `Light ${ lightClass.name } is not a class` );
+	if ( typeof lightNodeClass !== 'function' ) throw new Error( `Light node ${ lightNodeClass.name } is not a class` );
 
 	LightNodes.set( lightClass, lightNodeClass );
 
