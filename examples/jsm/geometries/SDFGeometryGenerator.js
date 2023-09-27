@@ -69,7 +69,7 @@ class SDFGeometryGenerator {
 
 
 		let ps = [], ids = [];
-		let geometry = new BufferGeometry()
+		let geometry = new BufferGeometry();
 		mesh.positions.forEach( p => { ps.push( p[ 0 ], p[ 1 ], p [ 2 ], 1 ) });
 		mesh.cells.forEach( p => ids.push( p[ 0 ], p[ 1 ], p [ 2 ] ));
 		geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( ps ), 4 ) );
