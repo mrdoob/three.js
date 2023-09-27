@@ -20,11 +20,10 @@ import {
 		WebGLRenderTarget 
 } from 'three';
 
-class SDFGeometryGenerator extends BufferGeometry{
+class SDFGeometryGenerator {
 	constructor(  renderer ){
-		super();
-
-		if( !renderer ) return console.warn( 'From MeshCompute : No renderer provided' );
+		
+		if( !renderer ) throw new Error( 'THREE.SDFGeometryGenerator: No renderer provided' );
 
 		this.renderer = renderer;
 		this.maxTexSize = renderer.capabilities.maxTextureSize;
@@ -39,9 +38,10 @@ class SDFGeometryGenerator extends BufferGeometry{
 		else if( res == 128 ) [w,h] = [ 2048, 1024 ];
 		else if( res == 256 ) [w,h] = [ 4096, 4096 ];
 		else if( res == 512 ) [w,h] = [ 16384, 8096 ];
-		else return console.warn( 'From MeshCompute : Resolution must be in range 8 < res < 512 and must be ^2');
+		else if( res == 1024 ) [w,h] = [ 32768, 32768 ];
+		else throw new Error( 'THREE.SDFGeometryGenerator: Resolution must be in range 8 < res < 1024 and must be ^2');
 
-		if( w > this.maxTexSize || h > this.maxTexSize ) return console.warn( 'SDFGeometry : Your device does not support this resolution, decrease [Resolution] value.');
+		if( w > this.maxTexSize || h > this.maxTexSize ) throw new Error( 'THREE.SDFGeometryGenerator: Your device does not support this resolution ( ' + res + ' ), decrease [res] param.');
 		
 		let [ tilesX, tilesY ] = [ ( w  / res ), ( h / res ) ];
 				
@@ -53,10 +53,10 @@ class SDFGeometryGenerator extends BufferGeometry{
 				void main()	{ gl_FragColor=vec4( ( dist( vec3( vUv, tileNum ) * 2.0 * bounds - vec3( bounds ) ) < 0.00001 ) ? 1.0 : 0.0 ); }
 		`;
 
-		this.sdfRT = this.computeSDF( w, h, tilesX, tilesY, bounds,sdfCompute.replace( '[#dist#]', distFunc ) );
+		let sdfRT = this.computeSDF( w, h, tilesX, tilesY, bounds,sdfCompute.replace( '[#dist#]', distFunc ) );
 
 		var read = new Float32Array( w * h * 4 );
-		this.renderer.readRenderTargetPixels( this.sdfRT, 0, 0, w, h, read );
+		this.renderer.readRenderTargetPixels( sdfRT, 0, 0, w, h, read );
 		
 			var mesh = this.getSurfaceNets([res,res,res], (x,y,z) => {
 			x = ( x + bounds ) * ( res / ( bounds * 2 ) );
@@ -69,13 +69,13 @@ class SDFGeometryGenerator extends BufferGeometry{
 
 
 		let ps = [], ids = [];
-		
+		let geometry = new BufferGeometry()
 		mesh.positions.forEach( p => { ps.push( p[ 0 ], p[ 1 ], p [ 2 ], 1 ) });
 		mesh.cells.forEach( p => ids.push( p[ 0 ], p[ 1 ], p [ 2 ] ));
-		this.setAttribute( 'position', new BufferAttribute( new Float32Array( ps ), 4 ) );
-		this.setIndex( new BufferAttribute( new Uint32Array( ids ), 1 ) );
+		geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( ps ), 4 ) );
+		geometry.setIndex( new BufferAttribute( new Uint32Array( ids ), 1 ) );
 
-		return this;
+		return geometry;
 	}
 
 	getSurfaceNets(dims, potential, bounds) {
