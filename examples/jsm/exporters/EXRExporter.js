@@ -25,7 +25,7 @@ class EXRExporter {
 
 		if ( ! arg1 || ! ( arg1.isWebGLRenderer || arg1.isDataTexture ) ) {
 
-			throw Error( 'EXRExporter.parse: Unsupported first parameter, expected instance of WebGLRenderer or DataTexture.' );
+			throw new Error( 'EXRExporter.parse: Unsupported first parameter, expected instance of WebGLRenderer or DataTexture.' );
 
 		} else if ( arg1.isWebGLRenderer ) {
 
@@ -63,25 +63,25 @@ function supportedRTT( renderTarget ) {
 
 	if ( ! renderTarget || ! renderTarget.isWebGLRenderTarget ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported second parameter, expected instance of WebGLRenderTarget.' );
+		throw new Error( 'EXRExporter.parse: Unsupported second parameter, expected instance of WebGLRenderTarget.' );
 
 	}
 
 	if ( renderTarget.isWebGLCubeRenderTarget || renderTarget.isWebGL3DRenderTarget || renderTarget.isWebGLArrayRenderTarget ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported render target type, expected instance of WebGLRenderTarget.' );
+		throw new Error( 'EXRExporter.parse: Unsupported render target type, expected instance of WebGLRenderTarget.' );
 
 	}
 
 	if ( renderTarget.texture.type !== FloatType && renderTarget.texture.type !== HalfFloatType ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture type.' );
+		throw new Error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture type, expected FloatType or HalfFloatType.' );
 
 	}
 
 	if ( renderTarget.texture.format !== RGBAFormat ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture format, expected RGBAFormat.' );
+		throw new Error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture format, expected RGBAFormat.' );
 
 	}
 
@@ -91,31 +91,31 @@ function supportedDT( texture ) {
 
 	if ( texture.type !== FloatType && texture.type !== HalfFloatType ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported DataTexture texture type.' );
+		throw new Error( 'EXRExporter.parse: Unsupported DataTexture texture type, expected FloatType or HalfFloatType.' );
 
 	}
 
 	if ( texture.format !== RGBAFormat ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported DataTexture texture format, expected RGBAFormat.' );
+		throw new Error( 'EXRExporter.parse: Unsupported DataTexture texture format, expected RGBAFormat.' );
 
 	}
 
 	if ( ! texture.image.data ) {
 
-		throw Error( 'EXRExporter.parse: Invalid DataTexture image data.' );
+		throw new Error( 'EXRExporter.parse: Missing DataTexture image data.' );
 
 	}
 
 	if ( texture.type === FloatType && texture.image.data.constructor.name !== 'Float32Array' ) {
 
-		throw Error( 'EXRExporter.parse: DataTexture image data doesn\'t match type, expected \'Float32Array\'.' );
+		throw new Error( 'EXRExporter.parse: DataTexture image data doesn\'t match FloatType type, expected \'Float32Array\'.' );
 
 	}
 
 	if ( texture.type === HalfFloatType && texture.image.data.constructor.name !== 'Uint16Array' ) {
 
-		throw Error( 'EXRExporter.parse: DataTexture image data doesn\'t match type, expected \'Uint16Array\'.' );
+		throw new Error( 'EXRExporter.parse: DataTexture image data doesn\'t match HalfFloatType type, expected \'Uint16Array\'.' );
 
 	}
 
