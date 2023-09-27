@@ -1,5 +1,4 @@
 import { BackSide } from '../../constants.js';
-import { ColorManagement } from '../../math/ColorManagement.js';
 
 function WebGLMaterials( renderer, properties ) {
 
@@ -17,7 +16,7 @@ function WebGLMaterials( renderer, properties ) {
 
 	function refreshFogUniforms( uniforms, fog ) {
 
-		fog.color.getRGB( uniforms.fogColor.value, ColorManagement.workingColorSpace );
+		fog.color.getRGB( uniforms.fogColor.value );
 
 		if ( fog.isFog ) {
 
