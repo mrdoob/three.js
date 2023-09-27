@@ -183,7 +183,6 @@ function reorganizeDataBuffer( inBuffer, info ) {
 
 	const w = info.width,
 		h = info.height,
-		dec = { r: 0, g: 0, b: 0, a: 0 },
 		offset = { value: 0 },
 		cOffset = ( info.numOutputChannels == 4 ) ? 1 : 0,
 		getValue = ( info.type == FloatType ) ? getFloat32 : getFloat16,
@@ -204,19 +203,17 @@ function reorganizeDataBuffer( inBuffer, info ) {
 
 			const line = ( h - y - 1 ) * w * ( 3 + cOffset ) * info.dataSize;
 
-			decodeLinear( dec, r, g, b, a );
-
 			offset.value = line + x * info.dataSize;
-			setValue( dv, dec.a, offset );
+			setValue( dv, a, offset );
 
 			offset.value = line + ( cOffset ) * w * info.dataSize + x * info.dataSize;
-			setValue( dv, dec.b, offset );
+			setValue( dv, b, offset );
 
 			offset.value = line + ( 1 + cOffset ) * w * info.dataSize + x * info.dataSize;
-			setValue( dv, dec.g, offset );
+			setValue( dv, g, offset );
 
 			offset.value = line + ( 2 + cOffset ) * w * info.dataSize + x * info.dataSize;
-			setValue( dv, dec.r, offset );
+			setValue( dv, r, offset );
 
 		}
 
@@ -445,24 +442,6 @@ function fillData( chunks, info ) {
 	return outBuffer;
 
 }
-
-function decodeLinear( dec, r, g, b, a ) {
-
-	dec.r = r;
-	dec.g = g;
-	dec.b = b;
-	dec.a = a;
-
-}
-
-// function decodeSRGB( dec, r, g, b, a ) {
-
-// 	dec.r = r > 0.04045 ? Math.pow( r * 0.9478672986 + 0.0521327014, 2.4 ) : r * 0.0773993808;
-// 	dec.g = g > 0.04045 ? Math.pow( g * 0.9478672986 + 0.0521327014, 2.4 ) : g * 0.0773993808;
-// 	dec.b = b > 0.04045 ? Math.pow( b * 0.9478672986 + 0.0521327014, 2.4 ) : b * 0.0773993808;
-// 	dec.a = a;
-
-// }
 
 
 function setUint8( dv, value, offset ) {
