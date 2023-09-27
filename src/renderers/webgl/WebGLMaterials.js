@@ -1,4 +1,4 @@
-import { BackSide, LinearSRGBColorSpace, SRGBColorSpace } from '../../constants.js';
+import { BackSide } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 
 function WebGLMaterials( renderer, properties ) {
@@ -17,26 +17,7 @@ function WebGLMaterials( renderer, properties ) {
 
 	function refreshFogUniforms( uniforms, fog ) {
 
-		if ( ColorManagement.enabled ) {
-
-			fog.color.getRGB( uniforms.fogColor.value, LinearSRGBColorSpace );
-
-		} else {
-
-			if ( getUnlitUniformColorSpace( renderer ) === SRGBColorSpace ) {
-
-				// We do this to match previous behaviour, though it's a bit unintuitive to apply color management operations in case color management is disabled.
-
-				_color.copySRGBToLinear( fog.color );
-				_color.getRGB( uniforms.fogColor.value );
-
-			} else {
-
-				fog.color.getRGB( uniforms.fogColor.value );
-
-			}
-
-		}
+		fog.color.getRGB( uniforms.fogColor.value, ColorManagement.workingColorSpace );
 
 		if ( fog.isFog ) {
 
