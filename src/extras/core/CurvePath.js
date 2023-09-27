@@ -33,7 +33,7 @@ class CurvePath extends Curve {
 
 		if ( ! startPoint.equals( endPoint ) ) {
 
-			const lineType = startPoint.isVector3 ? 'LineCurve3' : 'LineCurve';
+			const lineType = ( startPoint.isVector2 === true ) ? 'LineCurve' : 'LineCurve3';
 			this.curves.push( new Curves[ lineType ]( endPoint, startPoint ) );
 
 		}
