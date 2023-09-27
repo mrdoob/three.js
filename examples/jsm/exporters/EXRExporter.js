@@ -184,9 +184,8 @@ function reorganizeDataBuffer( inBuffer, info ) {
 	const w = info.width,
 		h = info.height,
 		offset = { value: 0 },
-		cOffset = ( info.numOutputChannels == 4 ) ? 1 : 0,
-		getValue = ( info.type == FloatType ) ? getFloat32 : getFloat16,
-		setValue = ( info.dataType == 1 ) ? setFloat16 : setFloat32,
+		getValue = ( info.type === FloatType ) ? getFloat32 : getFloat16,
+		setValue = ( info.dataType === 1 ) ? setFloat16 : setFloat32,
 		outBuffer = new Uint8Array( info.width * info.height * info.numOutputChannels * info.dataSize ),
 		dv = new DataView( outBuffer.buffer );
 
@@ -201,18 +200,18 @@ function reorganizeDataBuffer( inBuffer, info ) {
 			const b = getValue( inBuffer, i + 2 );
 			const a = getValue( inBuffer, i + 3 );
 
-			const line = ( h - y - 1 ) * w * ( 3 + cOffset ) * info.dataSize;
+			const line = ( h - y - 1 ) * w * info.numOutputChannels * info.dataSize;
 
 			offset.value = line + x * info.dataSize;
 			setValue( dv, a, offset );
 
-			offset.value = line + ( cOffset ) * w * info.dataSize + x * info.dataSize;
+			if ( info.numOutputChannels === 4 ) offset.value += w * info.dataSize;
 			setValue( dv, b, offset );
 
-			offset.value = line + ( 1 + cOffset ) * w * info.dataSize + x * info.dataSize;
+			offset.value += w * info.dataSize;
 			setValue( dv, g, offset );
 
-			offset.value = line + ( 2 + cOffset ) * w * info.dataSize + x * info.dataSize;
+			offset.value += w * info.dataSize;
 			setValue( dv, r, offset );
 
 		}
