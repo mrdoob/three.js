@@ -2544,7 +2544,7 @@ class GLTFParser {
 
 			assignExtrasToUserData( result, json );
 
-			Promise.all( parser._invokeAll( function ( ext ) {
+			return Promise.all( parser._invokeAll( function ( ext ) {
 
 				return ext.afterRoot && ext.afterRoot( result );
 

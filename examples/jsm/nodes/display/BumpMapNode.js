@@ -55,7 +55,7 @@ class BumpMapNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		const bumpScale = this.scaleNode !== null ? this.scaleNode : 1;
 		const dHdxy = dHdxy_fwd( { bumpTexture: this.texture, bumpScale } );
@@ -74,4 +74,4 @@ export default BumpMapNode;
 
 export const bumpMap = nodeProxy( BumpMapNode );
 
-addNodeClass( BumpMapNode );
+addNodeClass( 'BumpMapNode', BumpMapNode );

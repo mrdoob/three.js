@@ -12,7 +12,7 @@ class AmbientLightNode extends AnalyticLightNode {
 
 	}
 
-	construct( { context } ) {
+	setup( { context } ) {
 
 		context.irradiance.addAssign( this.colorNode );
 
@@ -24,4 +24,4 @@ export default AmbientLightNode;
 
 addLightNode( AmbientLight, AmbientLightNode );
 
-addNodeClass( AmbientLightNode );
+addNodeClass( 'AmbientLightNode', AmbientLightNode );

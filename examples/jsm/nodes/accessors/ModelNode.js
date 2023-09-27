@@ -31,4 +31,4 @@ export const modelPosition = nodeImmutable( ModelNode, ModelNode.POSITION );
 export const modelScale = nodeImmutable( ModelNode, ModelNode.SCALE );
 export const modelViewPosition = nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
 
-addNodeClass( ModelNode );
+addNodeClass( 'ModelNode', ModelNode );

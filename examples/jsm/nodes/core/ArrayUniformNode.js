@@ -23,4 +23,4 @@ class ArrayUniformNode extends UniformNode {
 
 export default ArrayUniformNode;
 
-addNodeClass( ArrayUniformNode );
+addNodeClass( 'ArrayUniformNode', ArrayUniformNode );

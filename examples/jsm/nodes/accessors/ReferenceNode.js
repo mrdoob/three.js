@@ -63,7 +63,7 @@ class ReferenceNode extends Node {
 
 	}
 
-	construct( /*builder*/ ) {
+	setup( /*builder*/ ) {
 
 		return this.node;
 
@@ -75,4 +75,4 @@ export default ReferenceNode;
 
 export const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
 
-addNodeClass( ReferenceNode );
+addNodeClass( 'ReferenceNode', ReferenceNode );

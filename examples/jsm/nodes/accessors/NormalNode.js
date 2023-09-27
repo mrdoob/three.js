@@ -93,4 +93,4 @@ export const transformedNormalView = property( 'vec3', 'TransformedNormalView' )
 export const transformedNormalWorld = transformedNormalView.transformDirection( cameraViewMatrix ).normalize();
 export const transformedClearcoatNormalView = property( 'vec3', 'TransformedClearcoatNormalView' );
 
-addNodeClass( NormalNode );
+addNodeClass( 'NormalNode', NormalNode );

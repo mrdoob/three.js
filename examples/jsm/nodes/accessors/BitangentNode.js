@@ -86,4 +86,4 @@ export const bitangentWorld = nodeImmutable( BitangentNode, BitangentNode.WORLD 
 export const transformedBitangentView = normalize( transformedNormalView.cross( transformedTangentView ).mul( tangentGeometry.w ) );
 export const transformedBitangentWorld = normalize( transformedBitangentView.transformDirection( cameraViewMatrix ) );
 
-addNodeClass( BitangentNode );
+addNodeClass( 'BitangentNode', BitangentNode );

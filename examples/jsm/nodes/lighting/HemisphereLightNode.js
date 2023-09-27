@@ -33,7 +33,7 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const { colorNode, groundColorNode, lightDirectionNode } = this;
 
@@ -52,4 +52,4 @@ export default HemisphereLightNode;
 
 addLightNode( HemisphereLight, HemisphereLightNode );
 
-addNodeClass( HemisphereLightNode );
+addNodeClass( 'HemisphereLightNode', HemisphereLightNode );

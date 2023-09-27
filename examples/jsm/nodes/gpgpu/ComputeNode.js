@@ -82,4 +82,4 @@ export const compute = ( node, count, workgroupSize ) => nodeObject( new Compute
 
 addNodeElement( 'compute', compute );
 
-addNodeClass( ComputeNode );
+addNodeClass( 'ComputeNode', ComputeNode );

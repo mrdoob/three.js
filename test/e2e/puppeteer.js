@@ -107,12 +107,12 @@ const exceptionList = [
 	'physics_rapier_instancing',
 
 	// Awaiting for WebGPU support
-	'webgpu_audio_processing',
 	'webgpu_backdrop',
 	'webgpu_backdrop_area',
 	'webgpu_clearcoat',
-	'webgpu_compute',
+	'webgpu_compute_audio',
 	'webgpu_compute_particles',
+	'webgpu_compute_points',
 	'webgpu_compute_texture',
 	'webgpu_compute_texture_pingpong',
 	'webgpu_cubemap_dynamic',

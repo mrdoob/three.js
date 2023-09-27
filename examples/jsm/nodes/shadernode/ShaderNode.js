@@ -22,7 +22,7 @@ const parseSwizzle = ( props ) => props.replace( /r|s/g, 'x' ).replace( /g|t/g, 
 
 const shaderNodeHandler = {
 
-	construct( NodeClosure, params ) {
+	setup( NodeClosure, params ) {
 
 		const inputs = params.shift();
 
@@ -226,7 +226,7 @@ class ShaderCallNodeInternal extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		builder.addStack();
 
@@ -242,7 +242,7 @@ class ShaderCallNodeInternal extends Node {
 
 		if ( outputNode === null ) {
 
-			// TSL: It's recommended to use `tslFn` in construct() pass.
+			// TSL: It's recommended to use `tslFn` in setup() pass.
 
 			return this.call( builder ).build( builder, output );
 
@@ -270,7 +270,7 @@ class ShaderNodeInternal extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		return this.call();
 
@@ -399,7 +399,7 @@ export const tslFn = ( jsFunc ) => {
 
 };
 
-addNodeClass( ShaderNode );
+addNodeClass( 'ShaderNode', ShaderNode );
 
 // types
 // @TODO: Maybe export from ConstNode.js?

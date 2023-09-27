@@ -101,4 +101,4 @@ export const positionWorldDirection = nodeImmutable( PositionNode, PositionNode.
 export const positionView = nodeImmutable( PositionNode, PositionNode.VIEW );
 export const positionViewDirection = nodeImmutable( PositionNode, PositionNode.VIEW_DIRECTION );
 
-addNodeClass( PositionNode );
+addNodeClass( 'PositionNode', PositionNode );

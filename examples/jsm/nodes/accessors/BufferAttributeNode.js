@@ -43,7 +43,7 @@ class BufferAttributeNode extends InputNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		if ( this.attribute !== null ) return;
 
@@ -122,4 +122,4 @@ export const instancedDynamicBufferAttribute = ( array, type, stride, offset ) =
 
 addNodeElement( 'toAttribute', ( bufferNode ) => bufferAttribute( bufferNode.value ) );
 
-addNodeClass( BufferAttributeNode );
+addNodeClass( 'BufferAttributeNode', BufferAttributeNode );

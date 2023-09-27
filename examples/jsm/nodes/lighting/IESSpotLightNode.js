@@ -36,4 +36,4 @@ export default IESSpotLightNode;
 
 addLightNode( IESSpotLight, IESSpotLightNode );
 
-addNodeClass( IESSpotLightNode );
+addNodeClass( 'IESSpotLightNode', IESSpotLightNode );

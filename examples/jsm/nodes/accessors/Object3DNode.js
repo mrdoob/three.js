@@ -147,4 +147,4 @@ export const objectPosition = nodeProxy( Object3DNode, Object3DNode.POSITION );
 export const objectScale = nodeProxy( Object3DNode, Object3DNode.SCALE );
 export const objectViewPosition = nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
 
-addNodeClass( Object3DNode );
+addNodeClass( 'Object3DNode', Object3DNode );

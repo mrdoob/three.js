@@ -21,7 +21,7 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructLightingModel( /*builder*/ ) {
+	setupLightingModel( /*builder*/ ) {
 
 		return new PhongLightingModel( false ); // ( specular ) -> force lambert
 
@@ -31,4 +31,4 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 
 export default MeshLambertNodeMaterial;
 
-addNodeMaterial( MeshLambertNodeMaterial );
+addNodeMaterial( 'MeshLambertNodeMaterial', MeshLambertNodeMaterial );

@@ -14,7 +14,7 @@ class LightNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { scope, light } = this;
 
@@ -54,4 +54,4 @@ export default LightNode;
 
 export const lightTargetDirection = nodeProxy( LightNode, LightNode.TARGET_DIRECTION );
 
-addNodeClass( LightNode );
+addNodeClass( 'LightNode', LightNode );
