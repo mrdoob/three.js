@@ -38,9 +38,9 @@ function getShaderStageProperty( shaderStage ) {
 
 class WebGLNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer, shader ) {
+	constructor( object, renderer, shader, material = null ) {
 
-		super( object, renderer, new GLSLNodeParser() );
+		super( object, renderer, new GLSLNodeParser(), null, material );
 
 		this.shader = shader;
 		this.slots = { vertex: [], fragment: [] };
