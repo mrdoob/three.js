@@ -224,25 +224,10 @@ function reorganizeDataBuffer( inBuffer, info ) {
 
 function compressData( inBuffer, info ) {
 
-	let compress,
-		tmpBuffer,
-		sum = 0;
+	let tmpBuffer, sum = 0;
 
-	const chunks = { data: new Array(), totalSize: 0 },
+	const chunks = { data: [], totalSize: 0 },
 		size = info.width * info.numOutputChannels * info.blockLines * info.dataSize;
-
-	switch ( info.compression ) {
-
-		case 0:
-			compress = compressNONE;
-			break;
-
-		case 2:
-		case 3:
-			compress = compressZIP;
-			break;
-
-	}
 
 	if ( info.compression !== 0 ) {
 
@@ -254,7 +239,7 @@ function compressData( inBuffer, info ) {
 
 		const arr = inBuffer.subarray( size * i, size * ( i + 1 ) );
 
-		const block = compress( arr, tmpBuffer );
+		const block = info.compression !== 0 ? compressZIP( arr, tmpBuffer ) : arr;
 
 		sum += block.length;
 
@@ -265,12 +250,6 @@ function compressData( inBuffer, info ) {
 	chunks.totalSize = sum;
 
 	return chunks;
-
-}
-
-function compressNONE( data ) {
-
-	return data;
 
 }
 
