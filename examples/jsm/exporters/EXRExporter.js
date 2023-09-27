@@ -37,7 +37,7 @@ class EXRExporter {
 			options.height = renderTarget.height;
 
 			const info = buildInfo( renderTarget.texture, options ),
-				dataBuffer = getPixelData( renderer, renderTarget, info ),
+				dataBuffer = getPixelData( renderer, renderTarget ),
 				rawContentBuffer = reorganizeDataBuffer( dataBuffer, info ),
 				chunks = compressData( rawContentBuffer, info );
 
@@ -156,21 +156,21 @@ function buildInfo( texture, options = {} ) {
 
 }
 
-function getPixelData( renderer, rtt, info ) {
+function getPixelData( renderer, rtt ) {
 
 	let dataBuffer;
 
-	if ( info.type === FloatType ) {
+	if ( rtt.texture.type === FloatType ) {
 
-		dataBuffer = new Float32Array( info.width * info.height * info.numInputChannels );
+		dataBuffer = new Float32Array( 4 * rtt.width * rtt.height );
 
 	} else {
 
-		dataBuffer = new Uint16Array( info.width * info.height * info.numInputChannels );
+		dataBuffer = new Uint16Array( 4 * rtt.width * rtt.height );
 
 	}
 
-	renderer.readRenderTargetPixels( rtt, 0, 0, info.width, info.height, dataBuffer );
+	renderer.readRenderTargetPixels( rtt, 0, 0, rtt.width, rtt.height, dataBuffer );
 
 	return dataBuffer;
 
