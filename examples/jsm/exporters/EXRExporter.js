@@ -27,36 +27,39 @@ class EXRExporter {
 
 			throw new Error( 'EXRExporter.parse: Unsupported first parameter, expected instance of WebGLRenderer or DataTexture.' );
 
-		} else if ( arg1.isWebGLRenderer ) {
+		}
 
-			const renderer = arg1, renderTarget = arg2, options = arg3;
+		let dataBuffer, texture, options;
+
+		if ( arg1.isWebGLRenderer ) {
+
+			const renderer = arg1, renderTarget = arg2;
+			options = arg3;
 
 			supportedRTT( renderTarget );
 
 			options.width = renderTarget.width;
 			options.height = renderTarget.height;
 
-			const info = buildInfo( renderTarget.texture, options ),
-				dataBuffer = getPixelData( renderer, renderTarget ),
-				rawContentBuffer = reorganizeDataBuffer( dataBuffer, info ),
-				chunks = compressData( rawContentBuffer, info );
-
-			return fillData( chunks, info );
+			texture = renderTarget.texture;
+			dataBuffer = getPixelData( renderer, renderTarget );
 
 		} else if ( arg1.isDataTexture ) {
 
-			const texture = arg1, options = arg2;
+			texture = arg1;
+			options = arg2;
 
 			supportedDT( texture );
 
-			const info = buildInfo( texture, options ),
-				dataBuffer = texture.image.data,
-				rawContentBuffer = reorganizeDataBuffer( dataBuffer, info ),
-				chunks = compressData( rawContentBuffer, info );
-
-			return fillData( chunks, info );
+			dataBuffer = texture.image.data;
 
 		}
+
+		const info = buildInfo( texture, options );
+		const rawContentBuffer = reorganizeDataBuffer( dataBuffer, info );
+		const chunks = compressData( rawContentBuffer, info );
+
+		return fillData( chunks, info );
 
 	}
 
