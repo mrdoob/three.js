@@ -33,7 +33,10 @@ class EXRExporter {
 
 			supportedRTT( renderTarget );
 
-			const info = buildInfoRTT( renderTarget, options ),
+			options.width = renderTarget.width;
+			options.height = renderTarget.height;
+
+			const info = buildInfo( renderTarget.texture, options ),
 				dataBuffer = getPixelData( renderer, renderTarget, info ),
 				rawContentBuffer = reorganizeDataBuffer( dataBuffer, info ),
 				chunks = compressData( rawContentBuffer, info );
@@ -46,7 +49,7 @@ class EXRExporter {
 
 			supportedDT( texture );
 
-			const info = buildInfoDT( texture, options ),
+			const info = buildInfo( texture, options ),
 				dataBuffer = texture.image.data,
 				rawContentBuffer = reorganizeDataBuffer( dataBuffer, info ),
 				chunks = compressData( rawContentBuffer, info );
@@ -121,7 +124,7 @@ function supportedDT( texture ) {
 
 }
 
-function buildInfoRTT( renderTarget, options = {} ) {
+function buildInfo( texture, options = {} ) {
 
 	const compressionSizes = {
 		0: 1,
@@ -129,62 +132,26 @@ function buildInfoRTT( renderTarget, options = {} ) {
 		3: 16
 	};
 
-	const WIDTH = renderTarget.width,
-		HEIGHT = renderTarget.height,
-		TYPE = renderTarget.texture.type,
-		FORMAT = renderTarget.texture.format,
-		COMPRESSION = ( options.compression !== undefined ) ? options.compression : ZIP_COMPRESSION,
-		EXPORTER_TYPE = ( options.type !== undefined ) ? options.type : HalfFloatType,
-		OUT_TYPE = ( EXPORTER_TYPE === FloatType ) ? 2 : 1,
-		COMPRESSION_SIZE = compressionSizes[ COMPRESSION ],
-		NUM_CHANNELS = 4;
+	const width = options.width !== undefined ? options.width : texture.image.width;
+	const height = options.height !== undefined ? options.height : texture.image.height;
+
+	const compression = options.compression !== undefined ? options.compression : ZIP_COMPRESSION;
+	const exporterType = options.type !== undefined ? options.type : HalfFloatType;
+	const outType = exporterType === FloatType ? 2 : 1;
+	const compressionSize = compressionSizes[ compression ];
 
 	return {
-		width: WIDTH,
-		height: HEIGHT,
-		type: TYPE,
-		format: FORMAT,
-		compression: COMPRESSION,
-		blockLines: COMPRESSION_SIZE,
-		dataType: OUT_TYPE,
-		dataSize: 2 * OUT_TYPE,
-		numBlocks: Math.ceil( HEIGHT / COMPRESSION_SIZE ),
+		width,
+		height,
+		type: texture.type,
+		format: texture.format,
+		compression,
+		blockLines: compressionSize,
+		dataType: outType,
+		dataSize: 2 * outType,
+		numBlocks: Math.ceil( height / compressionSize ),
 		numInputChannels: 4,
-		numOutputChannels: NUM_CHANNELS,
-	};
-
-}
-
-function buildInfoDT( texture, options = {} ) {
-
-	const compressionSizes = {
-		0: 1,
-		2: 1,
-		3: 16
-	};
-
-	const WIDTH = texture.image.width,
-		HEIGHT = texture.image.height,
-		TYPE = texture.type,
-		FORMAT = texture.format,
-		COMPRESSION = ( options.compression !== undefined ) ? options.compression : ZIP_COMPRESSION,
-		EXPORTER_TYPE = ( options.type !== undefined ) ? options.type : HalfFloatType,
-		OUT_TYPE = ( EXPORTER_TYPE === FloatType ) ? 2 : 1,
-		COMPRESSION_SIZE = compressionSizes[ COMPRESSION ],
-		NUM_CHANNELS = 4;
-
-	return {
-		width: WIDTH,
-		height: HEIGHT,
-		type: TYPE,
-		format: FORMAT,
-		compression: COMPRESSION,
-		blockLines: COMPRESSION_SIZE,
-		dataType: OUT_TYPE,
-		dataSize: 2 * OUT_TYPE,
-		numBlocks: Math.ceil( HEIGHT / COMPRESSION_SIZE ),
-		numInputChannels: 4,
-		numOutputChannels: NUM_CHANNELS,
+		numOutputChannels: 4
 	};
 
 }
