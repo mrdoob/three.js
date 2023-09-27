@@ -1,55 +1,55 @@
-/**
- * @author munrocket / https://github.com/munrocket
- */
+import chalk from 'chalk';
+import * as fs from 'fs/promises';
 
-const fs = require( 'fs' );
+console.red = msg => console.log( chalk.red( msg ) );
+console.green = msg => console.log( chalk.green( msg ) );
 
-// examples
-const E = fs.readdirSync( './examples' )
-		.filter( s => s.slice( - 5 ) === '.html' )
-		.map( s => s.slice( 0, s.length - 5 ) )
+main();
+
+async function main() {
+
+	// examples
+	const E = ( await fs.readdir( 'examples' ) )
+		.filter( s => s.endsWith( '.html' ) )
+		.map( s => s.slice( 0, s.indexOf( '.' ) ) )
 		.filter( f => f !== 'index' );
 
-// screenshots
-const S = fs.readdirSync( './examples/screenshots' )
-		.filter( s => s.slice( - 4 ) === '.jpg' )
-		.map( s => s.slice( 0, s.length - 4 ) )
+	// screenshots
+	const S = ( await fs.readdir( 'examples/screenshots' ) )
+		.filter( s => s.indexOf( '.' ) !== -1 )
+		.map( s => s.slice( 0, s.indexOf( '.' ) ) );
 
-// files.js
-const F = [];
-eval( fs.readFileSync( './examples/files.js' ).toString() );
-for ( var key in files ) {
+	// files.js
+	const F = [];
 
-	var section = files[ key ];
-	for ( var i = 0, len = section.length; i < len; i ++ ) {
+	const files = JSON.parse( await fs.readFile( 'examples/files.json' ) );
 
-		F.push( section[ i ] );
+	for ( const section of Object.values( files ) ) {
+
+		F.push( ...section );
 
 	}
 
-}
+	const subES = E.filter( x => ! S.includes( x ) );
+	const subSE = S.filter( x => ! E.includes( x ) );
+	const subEF = E.filter( x => ! F.includes( x ) );
+	const subFE = F.filter( x => ! E.includes( x ) );
 
-let subES = E.filter( x => ! S.includes( x ) );
-let subSE = S.filter( x => ! E.includes( x ) );
-let subEF = E.filter( x => ! F.includes( x ) );
-let subFE = F.filter( x => ! E.includes( x ) );
+	if ( subES.length + subSE.length + subEF.length + subFE.length === 0 ) {
 
-console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
-console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
+		console.green( 'TEST PASSED! All examples is covered with screenshots and descriptions in files.json!' );
 
-if ( subES.length + subSE.length + subEF.length + subFE.length === 0 ) {
+	} else {
 
-	console.green( 'TEST PASSED! All examples is covered with screenshots and descriptions in files.js!' );
+		if ( subES.length > 0 ) console.red( 'Make screenshot for example(s): ' + subES.join( ' ' ) );
+		if ( subSE.length > 0 ) console.red( 'Remove unnecessary screenshot(s): ' + subSE.join( ' ' ) );
+		if ( subEF.length > 0 ) console.red( 'Add description in files.json for example(s): ' + subEF.join( ' ' ) );
+		if ( subFE.length > 0 ) console.red( 'Remove description in files.json for example(s): ' + subFE.join( ' ' ) );
 
-} else {
+		console.red( 'TEST FAILED!' );
 
-	if ( subES.length > 0 ) console.red( 'Make screenshot for example(s): ' + subES.join(' ') );
-	if ( subSE.length > 0 ) console.red( 'Remove unnecessary screenshot(s): ' + subSE.join(' ') );
-	if ( subEF.length > 0 ) console.red( 'Add description in file.js for example(s): ' + subEF.join(' ') );
-	if ( subFE.length > 0 ) console.red( 'Remove description in file.js for example(s): ' + subFE.join(' ') );
+		process.exit( 1 );
 
-	console.red( 'TEST FAILED!' );
-
-	process.exit( 1 );
+	}
 
 }

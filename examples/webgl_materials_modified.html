@@ -10,60 +10,56 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> wegbl - modified material.
-			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
+			<a href="https://casual-effects.com/data/" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			var camera, scene, renderer, stats;
-
-			var materialShader;
+			let camera, scene, renderer, stats;
 
 			init();
 			animate();
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 1500;
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 20;
 
 				scene = new THREE.Scene();
 
-				var material = new THREE.MeshNormalMaterial();
-				material.onBeforeCompile = function ( shader ) {
-
-					shader.uniforms.time = { value: 0 };
-
-					shader.vertexShader = 'uniform float time;\n' + shader.vertexShader;
-					shader.vertexShader = shader.vertexShader.replace(
-						'#include <begin_vertex>',
-						[
-							'float theta = sin( time + position.y ) / 2.0;',
-							'float c = cos( theta );',
-							'float s = sin( theta );',
-							'mat3 m = mat3( c, 0, s, 0, 1, 0, -s, 0, c );',
-							'vec3 transformed = vec3( position ) * m;',
-							'vNormal = vNormal * m;'
-						].join( '\n' )
-					);
-
-					materialShader = shader;
-
-				};
-
-				var loader = new GLTFLoader();
+				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
-					var mesh = new THREE.Mesh( gltf.scene.children[ 0 ].geometry, material );
-					mesh.position.y = - 50;
-					mesh.scale.setScalar( 100 );
+					const geometry = gltf.scene.children[ 0 ].geometry;
+
+					let mesh = new THREE.Mesh( geometry, buildTwistMaterial( 2.0 ) );
+					mesh.position.x = - 3.5;
+					mesh.position.y = - 0.5;
+					scene.add( mesh );
+
+					mesh = new THREE.Mesh( geometry, buildTwistMaterial( - 2.0 ) );
+					mesh.position.x = 3.5;
+					mesh.position.y = - 0.5;
 					scene.add( mesh );
 
 				} );
@@ -73,9 +69,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 1000;
-				controls.maxDistance = 5000;
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 10;
+				controls.maxDistance = 50;
 
 				//
 
@@ -84,7 +80,43 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function buildTwistMaterial( amount ) {
+
+				const material = new THREE.MeshNormalMaterial();
+				material.onBeforeCompile = function ( shader ) {
+
+					shader.uniforms.time = { value: 0 };
+
+					shader.vertexShader = 'uniform float time;\n' + shader.vertexShader;
+					shader.vertexShader = shader.vertexShader.replace(
+						'#include <begin_vertex>',
+						[
+							`float theta = sin( time + position.y ) / ${ amount.toFixed( 1 ) };`,
+							'float c = cos( theta );',
+							'float s = sin( theta );',
+							'mat3 m = mat3( c, 0, s, 0, 1, 0, -s, 0, c );',
+							'vec3 transformed = vec3( position ) * m;',
+							'vNormal = vNormal * m;'
+						].join( '\n' )
+					);
+
+					material.userData.shader = shader;
+
+				};
+
+				// Make sure WebGLRenderer doesnt reuse a single program
+
+				material.customProgramCacheKey = function () {
+
+					return amount.toFixed( 1 );
+
+				};
+
+				return material;
 
 			}
 
@@ -92,8 +124,8 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -116,11 +148,21 @@
 
 			function render() {
 
-				if ( materialShader ) {
+				scene.traverse( function ( child ) {
 
-					materialShader.uniforms.time.value = performance.now() / 1000;
+					if ( child.isMesh ) {
 
-				}
+						const shader = child.material.userData.shader;
+
+						if ( shader ) {
+
+							shader.uniforms.time.value = performance.now() / 1000;
+
+						}
+
+					}
+
+				} );
 
 				renderer.render( scene, camera );
 

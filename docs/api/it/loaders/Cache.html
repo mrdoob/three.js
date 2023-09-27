@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Un semplice sistema di memorizzazione nella cache, utilizzato internamente dal [page:FileLoader].
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<p>Per abilitare la memorizzazione nella cache su tutti i loader che utilizzano il [page:FileLoader], impostare</p>
+		<code>
+		THREE.Cache.enabled = true.
+		</code>
+
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_geometry_text WebGL / geometry / text ]<br />
+			[example:webgl_interactive_instances_gpu WebGL / interactive / instances / gpu]<br />
+			[example:webgl_loader_ttf WebGL / loader / ttf]
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>Indica se il caching è abilitato. Il valore predefinito è `false`.</p>
+
+		<h3>[property:Object files]</h3>
+		<p>Un [page:Object oggetto] che contiene file memorizzati nella cache.</p>
+
+
+		<h2>Metodi</h2>
+
+		<h3>[method:undefined add]( [param:String key], [param:Object file] )</h3>
+		<p>
+		[page:String key] — La [page:String chiave] (key) con cui fare riferimento al file memorizzato nella cache.<br />
+		[page:Object file] — Il file da memorizzare nella cache.<br /><br />
+
+    Aggiunge una voce della cache con una chiave che fa riferimento al file. Se questa chiave contiene 
+    già un file, sarà sovrascritta.
+		</p>
+
+		<h3>[method:Any get]( [param:String key] )</h3>
+		<p>
+		[page:String key] — Una chiave stringa.<br /><br />
+
+		Ottiene il valore di [page:String key]. Se la chiave non esiste restituirà `undefined`.
+		</p>
+
+		<h3>[method:undefined remove]( [param:String key] )</h3>
+		<p>
+		[page:String key] — Una chiave stringa che fa riferimento ad un file memorizzato nella cache.<br /><br />
+
+    Rimuove il file memorizzato nella cache associato alla chiave.
+		</p>
+
+		<h3>[method:undefined clear]()</h3>
+		<p>Rimuove tutti i valori dalla cache.</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

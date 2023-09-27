@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>ثوابت القوام (Texture Constants)</h1>
+
+ 		<h2>أوضاع التعيين (Mapping Modes)</h2>
+		<code>
+		THREE.UVMapping
+		THREE.CubeReflectionMapping 
+		THREE.CubeRefractionMapping
+		THREE.EquirectangularReflectionMapping
+		THREE.EquirectangularRefractionMapping 
+		THREE.CubeUVReflectionMapping
+		</code>
+
+ 		<p>
+ 			هذه تحدد وضع تعيين القوام. <br />
+ 			[page:Constant UVMapping] هو الافتراضي ، ويقوم بتعيين القوام باستخدام إحداثيات UV للشبكة. <br /> <br />
+ 			الباقي يحدد أنواع تعيين البيئة. <br /> <br />
+ 			[page:Constant CubeReflectionMapping] و [page:Constant CubeRefractionMapping] للاستخدام مع [page:CubeTexture CubeTexture] ،
+ 			والتي تتكون من ستة قوام ، واحد لكل وجه من النرد.
+ 			[page:Constant CubeReflectionMapping] هو الافتراضي لـ
+ 			[page:CubeTexture CubeTexture]. <br /> <br />
+ 			[page:Constant EquirectangularReflectionMapping] و [page:Constant EquirectangularRefractionMapping] للاستخدام مع خريطة بيئة مستطيلة
+			. يسمى أيضًا خريطة lat-long ، قوام مستطيل
+ 			يمثل عرض 360 درجة على طول خط المركز الأفقي ، وعرض 180 درجة على طول المحور الرأسي ، مع حواف الأعلى والأسفل من
+ 			الصورة المقابلة للقطبين الشمال والجنوب من مجال معين
+ 			كروية. <br /> <br />
+ 			راجع المثال [example:webgl_materials_envmaps materials / envmaps].
+ 		</p>
+
+ 		<h2>أوضاع التغليف (Wrapping Modes)</h2>
+ 		<code>
+		THREE.RepeatWrapping 
+		THREE.ClampToEdgeWrapping
+		THREE.MirroredRepeatWrapping
+		</code>
+ 		<p>
+ 			هذه تحدد خصائص [page:Texture.wrapS wrapS] و [page:Texture.wrapT wrapT] للقوام ، التي تحدد التغليف الأفقي والرأسي للقوام. <br /> <br />
+ 			مع [page:constant RepeatWrapping] ستتكرر القوام ببساطة إلى ما لانهاية. <br /> <br />
+ 			[page:constant ClampToEdgeWrapping] هو الافتراضي. يمتد بكسل آخر من القوام إلى حافة الشبكة. <br /> <br />
+ 			مع [page:constant MirroredRepeatWrapping] ستتكرر القوام إلى ما لانهاية ، مع عكس كل تكرار.
+ 		</p>
+
+ 		<h2>مرشحات التكبير (Magnification Filters)</h2>
+ 		<code>
+		THREE.NearestFilter 
+		THREE.LinearFilter
+		</code>
+
+ 		<p>
+ 			للاستخدام مع خاصية [page:Texture.magFilter magFilter] للقوام ،
+ 			هذه تحدد وظيفة تكبير القوام المستخدمة عندما يتم تعيين البكسل المتعين
+ 			إلى منطقة أقل من أو تساوي عنصر قوام واحد (texel). <br /> <br />
+
+ 			[page:constant NearestFilter] يعيد قيمة عنصر القوام
+ 			الأقرب (في مسافة مانهاتن) إلى الإحداثيات المحددة للقوام.
+ 			<br /> <br />
+
+ 			[page:constant LinearFilter] هو الافتراضي ويعيد المتوسط ​​المرجح
+ 			للعناصر الأربعة من القوام التي هي الأقرب إلى الإحداثيات المحددة
+ 			للقوام ، ويمكن أن يشمل عناصر ملفوفة أو مكررة من أجزاء أخرى
+ 			من قوام ، اعتمادًا على قيم [page:Texture.wrapS wrapS]
+ 			و [page:Texture.wrapT wrapT] ، وعلى التعيين الدقيق.
+ 		</p>
+
+ 		<h2>مرشحات التصغير (Minification Filters)</h2>
+		<code>
+		THREE.NearestFilter 
+		THREE.NearestMipmapNearestFilter
+		THREE.NearestMipmapLinearFilter 
+		THREE.LinearFilter
+		THREE.LinearMipmapNearestFilter 
+		THREE.LinearMipmapLinearFilter
+		</code>
+
+		<p>
+			للاستخدام مع خاصية [page:Texture.minFilter minFilter] للقوام ،
+			هذه تحدد وظيفة تصغير القوام المستخدمة كلما كانت البكسل المتعين
+			يتطابق مع منطقة أكبر من عنصر قوام واحد (texel). <br /> <br />
+		 
+			بالإضافة إلى [page:constant NearestFilter] و [page:constant LinearFilter] ، يمكن استخدام الأربع وظائف التالية لـ
+			التصغير: <br /> <br />
+		 
+			[page:constant NearestMipmapNearestFilter] يختار mipmap الذي
+			يطابق حجم البكسل المتعين بشكل أكثر تطابقًا ويستخدم
+			معيار [page:constant NearestFilter] (ال texel الأقرب إلى المركز
+			من البكسل) لإنتاج قيمة قوام. <br /> <br />
+		 
+			[page:constant NearestMipmapLinearFilter] يختار mipmaps اثنان
+			يطابق حجم البكسل المتعين بشكل أكثر تطابقًا ويستخدم
+			معيار [page:constant NearestFilter] لإنتاج قيمة قوام من
+			كل mipmap. قيمة القوام النهائية هى متوسط ​​مرجح من هذه القيمتين. <br /> <br />
+		 
+			[page:constant LinearMipmapNearestFilter] يختار mipmap الذي
+			يطابق حجم البكسل المتعين بشكل أكثر تطابقًا ويستخدم
+			معيار [page:constant LinearFilter] (المتوسط ​​المرجح لأربعة `texels`)
+			التي هي الأقرب إلى مركز البكسل) لإنتاج قيمة قوام. <br /> <br />
+		 
+			[page:constant LinearMipmapLinearFilter] هو الافتراضي ويلتقط mipmaps اثنان
+			يطابق حجم البكسل المتعين بشكل أكثر تطابقًا ويلتقط [page:constant LinearFilter]
+			معاير لإنتاج قيمة قوام من كل mipmap. قيمة القوام النهائية هى متوسط ​​مرجح من
+			هذه القيمتين.
+		 
+			انظر إلى المثال [example:webgl_materials_texture_filters materials / texture / filters].
+		</p>
+
+		<h2>الأنواع (Types)</h2>
+		<code>
+		THREE.UnsignedByteType 
+		THREE.ByteType 
+		THREE.ShortType
+		THREE.UnsignedShortType 
+		THREE.IntType 
+		THREE.UnsignedIntType
+		THREE.FloatType 
+		THREE.HalfFloatType 
+		THREE.UnsignedShort4444Type
+		THREE.UnsignedShort5551Type 
+		THREE.UnsignedInt248Type
+		</code>
+		<p>
+			للاستخدام مع خاصية [page:Texture.type type] للقوام ، التي يجب
+			أن تتوافق مع التنسيق الصحيح. انظر أدناه للحصول على التفاصيل. <br /> <br />
+		 
+			[page:constant UnsignedByteType] هو الافتراضي.
+		</p>
+		 
+		<h2>التنسيقات (Formats)</h2>
+		<code>
+		THREE.AlphaFormat 
+		THREE.RedFormat 
+		THREE.RedIntegerFormat 
+		THREE.RGFormat
+		THREE.RGIntegerFormat 
+		THREE.RGBAFormat 
+		THREE.RGBAIntegerFormat
+		THREE.LuminanceFormat 
+		THREE.LuminanceAlphaFormat 
+		THREE.DepthFormat
+		THREE.DepthStencilFormat
+		</code>
+		<p>
+			للاستخدام مع خاصية [page:Texture.format format] للقوام ، هذه
+			تحدد كيفية قراءة عناصر قوام ثنائي الأبعاد ، أو `texels` ، بواسطة المظللات. <br /> <br />
+		 
+			[page:constant AlphaFormat] يتجاهل المكونات الحمراء والخضراء والزرقاء
+			ويقرأ فقط المكون الألفا. <br /> <br />
+		 
+			[page:constant RedFormat] يتجاهل المكونات الخضراء والزرقاء ويقرأ
+			فقط المكون الأحمر. (يمكن استخدامه فقط مع سياق WebGL 2).
+			<br /> <br />
+		 
+			[page:constant RedIntegerFormat] يتجاهل المكونات الخضراء والزرقاء
+			ويقرأ فقط المكون الأحمر. يتم قراءة `texels` كأعداد صحيحة بدلاً من
+			نقطة عائمة. (يمكن استخدامه فقط مع سياق WebGL 2).
+			<br /> <br />
+		 
+			[page:constant RGFormat] يتجاهل المكونات الألفا والزرقاء ويقرأ
+			المكونات الحمراء والخضراء. (يمكن استخدامه فقط مع سياق WebGL 2).
+			<br /> <br />
+		 
+			[page:constant RGIntegerFormat] يتجاهل المكونات الألفا والزرقاء
+			ويقرأ المكونات الحمراء والخضراء. يتم قراءة `texels` كأعداد صحيحة بدلاً من
+			نقطة عائمة. (يمكن استخدامه فقط مع سياق WebGL 2).
+			<br /> <br />
+		 
+			[page:constant RGBAFormat] هو الافتراضي ويلتقط المكونات الحمراء والخضراء والزرقاء
+			والألفا. <br /> <br />
+		 
+			[page:constant RGBAIntegerFormat] هو الافتراضي ويلتقط المكونات الحمراء والخضراء ،
+			الزرقاء والألفا. يتم قراءة `texels` كأعداد صحيحة بدلاً من
+			نقطة عائمة. (يمكن استخدامه فقط مع سياق WebGL 2).
+			<br /> <br />
+		 
+			[page:constant LuminanceFormat] يقرأ كل عنصر كمكون إضاءة واحد
+			. يتم تحويله بعد ذلك إلى نقطة عائمة ، ويتم تثبيته في
+ 			النطاق [0،1] ، ثم يتم تجميعه في عنصر RGBA عن طريق وضع
+ 			قيمة الإضاءة في القنوات الحمراء والخضراء والزرقاء ، وإرفاق `1.0` بـ
+ 			قناة الألفا. <br /> <br />
+
+ 			[page:constant LuminanceAlphaFormat] يقرأ كل عنصر كـ
+ 			مزدوج إضاءة / ألفا. يحدث نفس العملية كما هو الحال في [page:constant LuminanceFormat] ، باستثناء أن قناة الألفا قد تحتوي على قيم غير
+ 			`1.0`. <br /> <br />
+
+ 			[page:constant DepthFormat] يقرأ كل عنصر كقيمة عمق واحدة ،
+ 			يتحول إلى نقطة عائمة ، ويتم تثبيته في النطاق [0،1]. هذا هو
+ 			الافتراضي لـ [page:DepthTexture DepthTexture]. <br /> <br />
+
+ 			[page:constant DepthStencilFormat] يقرأ كل عنصر هو زوج من العمق
+ 			وقيم المسح. يتم تفسير مكون العمق من الزوج كما هو مذكور في
+ 			[page:constant DepthFormat]. يتم تفسير مكون المسح بناءً على
+ 			التنسيق الداخلي للعمق + المسح.
+ 			<br /> <br />
+
+ 			لاحظ أنه يجب أن يكون للقوام نوع [page:Texture.type type] صحيحًا
+ 			كما هو مذكور أعلاه. انظر
+ 			[link:https://developer.mozilla.org/en/docs/Web/API/WebGLRenderingContext/texImage2D WebGLRenderingContext.texImage2D] للحصول على التفاصيل.
+ 		</p>
+
+ 		<h2>تنسيقات القوام المضغوطة DDS / ST3C</h2>
+		<code>
+		THREE.RGB_S3TC_DXT1_Format 
+		THREE.RGBA_S3TC_DXT1_Format
+		THREE.RGBA_S3TC_DXT3_Format 
+		THREE.RGBA_S3TC_DXT5_Format
+		</code>
+		<p>
+			للاستخدام مع خاصية [page:Texture.format format] لـ [page:CompressedTexture CompressedTexture] ،
+			هذه تتطلب دعمًا للتمديد
+			[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/ WEBGL_compressed_texture_s3tc]. <br /> <br />
+		 
+			هناك أربعة [link:https://en.wikipedia.org/wiki/S3_Texture_Compression تنسيقات S3TC]
+			متاحة عبر هذا التمديد. هذه هي: <br />
+			[page:constant RGB_S3TC_DXT1_Format]: صورة مضغوطة بتنسيق DXT1 في تنسيق صورة RGB.
+			<br />
+			[page:constant RGBA_S3TC_DXT1_Format]: صورة مضغوطة بتنسيق DXT1 في تنسيق صورة RGB
+			مع قيمة ألفا بسيطة تشغيل / إيقاف. <br />
+			[page:constant RGBA_S3TC_DXT3_Format]: صورة مضغوطة بتنسيق DXT3 في تنسيق صورة RGBA.
+			مقارنة بقوام RGBA 32 بت ، يوفر ضغطًا 4: 1. <br />
+			[page:constant RGBA_S3TC_DXT5_Format]: صورة مضغوطة بتنسيق DXT5 في تنسيق صورة RGBA.
+			كما يوفر ضغطًا 4: 1 ، ولكن يختلف عن ضغط DXT3 في كيفية ضغط الألفا. <br />
+		</p>
+		 
+		<h2>تنسيقات القوام المضغوط PVRTC</h2>
+		<code>
+		THREE.RGB_PVRTC_4BPPV1_Format
+		THREE.RGB_PVRTC_2BPPV1_Format
+		THREE.RGBA_PVRTC_4BPPV1_Format 
+		THREE.RGBA_PVRTC_2BPPV1_Format
+		</code>
+		<p>
+		للاستخدام مع خاصية [page:Texture.format format] لـ [page:CompressedTexture CompressedTexture] ،
+		هذه تتطلب دعمًا للتمديد
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/ WEBGL_compressed_texture_pvrtc]. <br />
+		عادةً ما يكون PVRTC متاحًا فقط على الأجهزة المحمولة التي تحتوي على شرائح PowerVR ،
+		والتي هي في الغالب أجهزة Apple. <br /> <br />
+		 
+		هناك أربعة [link:https://en.wikipedia.org/wiki/PVRTC تنسيقات PVRTC]
+		متاحة عبر هذا التمديد. هذه هي: <br />
+		[page:constant RGB_PVRTC_4BPPV1_Format]: ضغط RGB في وضع 4 بت.
+		كتلة واحدة لكل 4×4 بكسل. <br />
+		[page:constant RGB_PVRTC_2BPPV1_Format]: ضغط RGB في وضع 2 بت.
+		كتلة واحدة لكل 8×4 بكسل. <br />
+		[page:constant RGBA_PVRTC_4BPPV1_Format]: ضغط RGBA في وضع 4 بت.
+		كتلة واحدة لكل 4×4 بكسل. <br />
+		[page:constant RGBA_PVRTC_2BPPV1_Format]: ضغط RGBA في وضع 2 بت.
+		كتلة واحدة لكل 8×4 بكسل. <br />
+		</p>
+		 
+
+		<h2>تنسيق القوام المضغوط ETC</h2>
+		<code>
+		THREE.RGB_ETC1_Format 
+		THREE.RGB_ETC2_Format 
+		THREE.RGBA_ETC2_EAC_Format
+		</code>
+		<p>
+		للاستخدام مع خاصية [page:Texture.format format] لـ [page:CompressedTexture CompressedTexture] ،
+		هذه تتطلب دعمًا للتمديد
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/ WEBGL_compressed_texture_etc1] (ETC1) أو
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc/ WEBGL_compressed_texture_etc] (ETC2). <br /> <br />
+		</p>
+		 
+		<h2>تنسيق القوام المضغوط ASTC</h2>
+		<code>
+		THREE.RGBA_ASTC_4x4_Format 
+		THREE.RGBA_ASTC_5x4_Format
+		THREE.RGBA_ASTC_5x5_Format 
+		THREE.RGBA_ASTC_6x5_Format
+		THREE.RGBA_ASTC_6x6_Format 
+		THREE.RGBA_ASTC_8x5_Format
+		THREE.RGBA_ASTC_8x6_Format 
+		THREE.RGBA_ASTC_8x8_Format
+		THREE.RGBA_ASTC_10x5_Format 
+		THREE.RGBA_ASTC_10x6_Format
+		THREE.RGBA_ASTC_10x8_Format 
+		THREE.RGBA_ASTC_10x10_Format
+		THREE.RGBA_ASTC_12x10_Format 
+		THREE.RGBA_ASTC_12x12_Format
+		</code>
+		<p>
+			للاستخدام مع خاصية [page:Texture.format format] لـ [page:CompressedTexture CompressedTexture] ،
+			هذه تتطلب دعمًا للتمديد
+			[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_astc/ WEBGL_compressed_texture_astc]. <br /> <br />
+		</p>
+		 
+		<h2>تنسيق القوام المضغوط BPTC</h2>
+		<code>
+		THREE.RGBA_BPTC_Format
+		</code>
+		<p>
+			للاستخدام مع خاصية [page:Texture.format format] لـ [page:CompressedTexture CompressedTexture] ،
+			هذه تتطلب دعمًا للتمديد
+			[link:https://www.khronos.org/registry/webgl/extensions/EXT_texture_compression_bptc/ EXT_texture_compression_bptc]. <br /> <br />
+		</p>
+		 
+		<h2>وظائف مقارنة القوام (Texture Comparison functions)</h2>
+		<code>
+		THREE.NeverCompare
+		THREE.LessCompare
+		THREE.EqualCompare
+		THREE.LessEqualCompare
+		THREE.GreaterCompare
+		THREE.NotEqualCompare
+		THREE.GreaterEqualCompare
+		THREE.AlwaysCompare
+		</code>
+		 
+		<h2>التنسيقات الداخلية (Internal Formats)</h2>
+		<code>
+		'ALPHA'
+		'RGB'
+		'RGBA'
+		'LUMINANCE'
+		'LUMINANCE_ALPHA'
+		'RED_INTEGER'
+		'R8'
+		'R8_SNORM'
+		'R8I'
+		'R8UI'
+		'R16I'
+		'R16UI'
+		'R16F'
+		'R32I'
+		'R32UI'
+		'R32F'
+		'RG8'
+		'RG8_SNORM'
+		'RG8I'
+		'RG8UI'
+		'RG16I'
+		'RG16UI'
+		'RG16F'
+		'RG32I'
+		'RG32UI'
+		'RG32F'
+		'RGB565'
+		'RGB8'
+		'RGB8_SNORM'
+		'RGB8I'
+		'RGB8UI'
+		'RGB16I'
+		'RGB16UI'
+		'RGB16F'
+		'RGB32I'
+		'RGB32UI'
+		'RGB32F'
+		'RGB9_E5'
+		'SRGB8'
+		'R11F_G11F_B10F'
+		'RGBA4'
+		'RGBA8'
+		'RGBA8_SNORM'
+		'RGBA8I'
+		'RGBA8UI'
+		'RGBA16I'
+		'RGBA16UI'
+		'RGBA16F'
+		'RGBA32I'
+		'RGBA32UI'
+		'RGBA32F'
+		'RGB5_A1'
+		'RGB10_A2'
+		'RGB10_A2UI'
+		'SRGB8_ALPHA8'
+		'DEPTH_COMPONENT16'
+		'DEPTH_COMPONENT24'
+		'DEPTH_COMPONENT32F'
+		'DEPTH24_STENCIL8'
+		'DEPTH32F_STENCIL8'
+		</code>
+
+		<p>
+			تنبيه: تغيير التنسيق الداخلي للقوام سيؤثر فقط على
+			القوام عند استخدام سياق WebGL 2. <br /> <br />
+		 
+			للاستخدام مع خاصية [page:Texture.internalFormat internalFormat] للقوام ،
+			هذه تحدد كيفية تخزين عناصر قوام ، أو `texels` ،
+			على وحدة معالجة الرسومات. <br /> <br />
+		 
+			[page:constant R8] يخزن المكون الأحمر على 8 بت. <br /> <br />
+		 
+			[page:constant R8_SNORM] يخزن المكون الأحمر على 8 بت. المكون
+			يتم تخزينه كمعيار. <br /> <br />
+		 
+			[page:constant R8I] يخزن المكون الأحمر على 8 بت. المكون هو
+			يتم تخزينه كعدد صحيح. <br /> <br />
+		 
+			[page:constant R8UI] يخزن المكون الأحمر على 8 بت. المكون هو
+			يتم تخزينه كعدد صحيح غير موقع. <br /> <br />
+		 
+			[page:constant R16I] يخزن المكون الأحمر على 16 بت. المكون هو
+			يتم تخزينه كعدد صحيح. <br /> <br />
+		 
+			[page:constant R16UI] يخزن المكون الأحمر على 16 بت. المكون
+			يتم تخزينه كعدد صحيح غير موقع. <br /> <br />
+		 
+			[page:constant R16F] يخزن المكون الأحمر على 16 بت. المكون هو
+			يتم تخزينه كعائمة نقطية. <br /> <br />
+		 
+			[page:constant R32I] يخزن المكون الأحمر على 32 بت. المكون هو
+			يتم تخزينه كعدد صحيح. <br /> <br />
+		 
+			[page:constant R32UI] يخزن المكون الأحمر على 32 بت. المكون
+			يتم تخزينه كعدد صحيح غير موقع. <br /> <br />
+		 
+			[page:constant R32F] يخزن المكون الأحمر على 32 بت. المكون هو
+			يتم تخزينه كعائمة نقطية. <br /> <br />
+
+			[page:constant RG8] يخزن المكونات الحمراء والخضراء على 8 بت لكل منهما. <br /> <br />
+
+ 			[page:constant RG8_SNORM] يخزن المكونات الحمراء والخضراء على 8 بت
+ 			لكل منهما. يتم تخزين كل مكون كمعيار.
+ 			<br /> <br />
+
+ 			[page:constant RG8I] يخزن المكونات الحمراء والخضراء على 8 بت لكل منهما.
+ 			يتم تخزين كل مكون كعدد صحيح.
+ 			<br /> <br />
+
+ 			[page:constant RG8UI] يخزن المكونات الحمراء والخضراء على 8 بت لكل منهما.
+ 			يتم تخزين كل مكون كعدد صحيح غير موقع.
+ 			<br /> <br />
+
+ 			[page:constant RG16I] يخزن المكونات الحمراء والخضراء على 16 بت لكل منهما.
+ 			يتم تخزين كل مكون كعدد صحيح.
+ 			<br /> <br />
+
+ 			[page:constant RG16UI] يخزن المكونات الحمراء والخضراء على 16 بت
+ 			لكل منهما. يتم تخزين كل مكون كعدد صحيح غير موقع.
+ 			<br /> <br />
+
+ 			[page:constant RG16F] يخزن المكونات الحمراء والخضراء على 16 بت لكل منهما.
+ 			يتم تخزين كل مكون كعائمة نقطية.
+ 			<br /> <br />
+
+ 			[page:constant RG32I] يخزن المكونات الحمراء والخضراء على 32 بت لكل منهما.
+ 			يتم تخزين كل مكون كعدد صحيح.
+ 			<br /> <br />
+
+ 			[page:constant RG32UI] يخزن المكونات الحمراء والخضراء على 32 بت.
+ 			يتم تخزين كل مكون كعدد صحيح غير موقع.
+ 			<br /><br />
+ 
+ 			[page:constant RG32F] يخزن المكونات الحمراء والخضراء على 32 بت.
+ 			يتم تخزين كل مكون كعدد عائم.
+ 			<br /><br />
+ 
+ 			[page:constant RGB8] يخزن المكونات الحمراء والخضراء والزرقاء على 8 بت
+ 			لكل منهما. [page:constant RGB8_SNORM] يخزن المكونات الحمراء والخضراء والزرقاء
+ 			على 8 بت لكل منهما. يتم تخزين كل مكون كمعيار.
+ 			<br /><br />
+ 
+ 			[page:constant RGB8I] يخزن المكونات الحمراء والخضراء والزرقاء على 8 بت
+ 			لكل منهما. يتم تخزين كل مكون كعدد صحيح.
+ 			<br /><br />
+ 
+ 			[page:constant RGB8UI] يخزن المكونات الحمراء والخضراء والزرقاء على 8
+ 			بت لكل منهما. يتم تخزين كل مكون كعدد صحيح غير موقع.
+ 			<br /><br />
+ 
+ 			[page:constant RGB16I] يخزن المكونات الحمراء والخضراء والزرقاء على 16
+ 			بت لكل منهما. يتم تخزين كل مكون كعدد صحيح.
+ 			<br /><br />
+ 
+ 			[page:constant RGB16UI] يخزن المكونات الحمراء والخضراء والزرقاء على 16
+ 			بت لكل منهما. يتم تخزيน كل مكون كعدد صحيح غير موقع.
+ 			<br /><br />
+ 
+ 			[page:constant RGB16F] يخزن المكونات الحمراء والخضراء والزرقاء على 16
+ 			بت لكل منهما. يتم تخزين كل مكون كعدد عائم
+ 			<br /><br />
+ 
+ 			[page:constant RGB32I] يخزن المكونات الحمراء والخضراء والزرقاء على 32
+ 			بت لكل منهما. يتم تخزين كل مكون كعدد صحيح.
+ 			<br /><br />
+
+ 			[page:constant RGB32UI] يخزن المكونات الحمراء والخضراء والزرقاء على 32
+ 			بت لكل منهما. يتم تخزين كل مكون كعدد صحيح غير موقع.
+ 			<br /><br />
+ 
+ 			[page:constant RGB32F] يخزن المكونات الحمراء والخضراء والزرقاء على 32
+ 			بت لكل منهما. يتم تخزين كل مكون كعدد عائم.
+ 			<br /><br />
+ 
+ 			[page:constant R11F_G11F_B10F] يخزن المكونات الحمراء والخضراء والزرقاء
+ 			على التوالي على 11 بت ، 11 بت ، و 10 بت. يتم تخزين كل مكون كعدد عائم.
+ 			<br /><br />
+ 
+ 			[page:constant RGB565] يخزن المكونات الحمراء والخضراء والزرقاء
+ 			على التوالي على 5 بت ، 6 بت ، و 5 بت.<br /><br />
+ 
+ 			[page:constant RGB9_E5] يخزن المكونات الحمراء والخضراء والزرقاء على 9
+ 			بت لكل منهما.<br /><br />
+ 
+ 			[page:constant RGBA8] يخزن المكونات الحمراء والخضراء والزرقاء وألفا على
+ 			8 بت لكل منهما.<br /><br />
+ 
+ 			[page:constant RGBA8_SNORM] يخزن المكونات الحمراء والخضراء والزرقاء وألفا
+ 			على 8 بت. يتم تخزين كل مكون كمعيار.
+ 			<br /><br />
+ 
+ 			[page:constant RGBA8I] يخزن المكونات الحمراء والخضراء والزرقاء وألفا
+ 			على 8 بت لكل منهما. يتم تخزين كل مكون كعدد صحيح.
+ 			<br /><br />
+ 
+ 			[page:constant RGBA8UI] يخزن المكونات الحمراء والخضراء والزرقاء وألفا
+ 			على 8 بت. يتم تخزين كل مكون كعدد صحيح غير موقع.
+ 			<br /><br />
+ 
+ 			[page:constant RGBA16I] يخزن المكونات الحمراء والخضراء والزرقاء وألفا
+ 			على 16 بت. يتم تخزين كل مكون كعدد صحيح.
+ 			<br /><br />
+ 
+ 			[page:constant RGBA16UI] يخزن المكونات الحمراء والخضراء والزرقاء وألفا
+ 			على 16 بت. يتم تخزين كل مكون كعدد صحيح غير موقع.
+ 			<br /><br />
+ 
+ 			[page:constant RGBA16F] يخزن المكونات الحمراء والخضراء والزرقاء وألفا
+ 			على 16 بت. يتم تخزين كل مكون كعدد عائم.
+ 			<br /><br />
+ 
+ 			[page:constant RGBA32I] يخزن المكونات الحمراء والخضراء والزرقاء وألفا
+ 			على 32 بت. يتم تخزين كل مكون كعدد صحيح.
+ 			<br /><br />
+ 
+ 			[page:constant RGBA32UI] يخزن المكونات الحمراء والخضراء والزرقاء وألفا
+ 			على 32 بت. يتم تخزين كل مكون كعدد صحيح غير موقع.
+ 			<br /><br />
+ 
+ 			[page:constant RGBA32F] يخزن المكونات الحمراء والخضراء والزرقاء وألفا
+ 			على 32 بت. يتم تخزين كل مكون كعدد عائم.
+ 			<br /><br />
+ 
+ 			[page:constant RGB5_A1] يخزن المكونات الحمراء والخضراء والزرقاء وألفا
+ 			على التوالي على 5 بت ، 5 بت ، 5 بت ، و 1 بت.<br /><br />
+ 
+ 			[page:constant RGB10_A2] يخزن المكونات الحمراء والخضراء والزرقاء وألفا
+ 			على التوالي على 10 بت ، 10 بت ، 10 بت و 2 بت.<br /><br />
+ 
+ 			[page:constant RGB10_A2UI] يخزن المكونات الحمراء والخضراء والزرقاء وألفا
+ 			على التوالي على 10 بت ، 10 بت ، 10 بت و 2 بت. يتم تخزين كل
+ 			مكون كعدد صحيح غير موقع.
+ 			<br /><br />
+ 
+ 			[page:constant SRGB8] يخزن المكونات الحمراء والخضراء والزرقاء على 8 بت
+ 			لكل منهما.<br /><br />
+ 
+ 			[page:constant SRGB8_ALPHA8] يخزن المكونات الحمراء والخضراء والزرقاء وألفا
+ 			على 8 بت لكل منهما.<br /><br />
+ 
+ 			[page:constant DEPTH_COMPONENT16] يخزن مكون العمق على 16 بت.<br /><br />
+ 
+ 			[page:constant DEPTH_COMPONENT24] يخزن مكون العمق على 24 بت.<br /><br />
+ 
+ 			[page:constant DEPTH_COMPONENT32F] يخزن مكون العمق على 32 بت.
+ 			يتم تخزين المكون كعدد عائم.<br /><br />
+ 
+ 			[page:constant DEPTH24_STENCIL8] يخزن مكوان العمق ، ومكوان الإستانسيل
+ 			على التوالي على 24 بت و 8 بت. يتم تخزين مكوان الإستانسيل كعدد صحيح غير موقع.
+ 			<br /><br />
+ 
+ 			[page:constant DEPTH32F_STENCIL8] يخزن مكوان العمق ، ومكوان الإستانسيل
+ 			على التوالي على 32 بت و 8 بت. يتم تخزين مكوان العمق كعدد عائم ، ومكوان الإستانسيل كعدد صحيح غير موقع.
+ 			<br /><br />
+ 
+ 			لاحظ أنه يجب أن تحظى المادة المستهلكة للصورة (texture) بـ [page:Texture.type type]
+ 			صحيحة، فضلاً عن [page:Texture.format format]. اطَّلِعْ عَلى 
+ 			[link:https://developer.mozilla.org/en/docs/Web/API/WebGLRenderingContext/texImage2D WebGLRenderingContext.texImage2D], and
+ 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texImage3D WebGL2RenderingContext.texImage3D], لِلْحُصُولِ عَلىْ تَفَاصِيلَ أَكْثَرَ حَولَ 
+ 			إِجْهِادِ [page:Texture.format format],
+ 			[page:Texture.internalFormat internalFormat], and [page:Texture.type type].<br /><br />
+ 
+ 			لِلْحُصُولِ عَلىْ مَعْلُوْمَاتَ أَشْمَلَ حَولَ التَّشْكِيلَاتِ الدَّاخِلِيَّةِ، يُمْكِنُ أَيْضا أَ نْ تُشِيرُ إِلَى 
+ 			[link:https://www.khronos.org/registry/webgl/specs/latest/2.0/ WebGL2 Specification] and to the
+ 			[link:https://www.khronos.org/registry/OpenGL/specs/es/3.0/es_spec_3.0.pdf OpenGL ES 3.0 Specification].
+ 		</p>
+ 
+		<h2>تعبئة العمق (Depth Packing)</h2>
+		<code>
+		THREE.BasicDepthPacking 
+		THREE.RGBADepthPacking
+		</code>
+		<p>
+			للاستخدام مع خاصية [page:MeshDepthMaterial.depthPacking depthPacking]
+			لـ `MeshDepthMaterial`.
+		</p>
+			 
+		<h2>مساحة اللون (Color Space)</h2>
+		<code>
+		THREE.NoColorSpace = ""
+		THREE.SRGBColorSpace = "srgb"
+		THREE.LinearSRGBColorSpace = "srgb-linear"
+		</code>
+		<p>
+			يستخدم لتحديد مساحة اللون للصور (ومساحة اللون الناتجة من
+			المُصَوِّر).<br /><br />
+			 
+			إذا تم تغيير نوع مساحة اللون بعد استخدام الصورة بالفعل
+			بواسطة مادة ، ستحتاج إلى تعيين [page:Material.needsUpdate Material.needsUpdate] إلى `true` لإعادة تجميع المادة.<br /><br />
+		</p>
+
+		<h2>المصدر (Source)</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

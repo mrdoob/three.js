@@ -1,36 +1,22 @@
+import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../constants.js';
 import { Vector3 } from './Vector3.js';
 import { Sphere } from './Sphere.js';
 import { Plane } from './Plane.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author bhouston / http://clara.io
- */
+const _sphere = /*@__PURE__*/ new Sphere();
+const _vector = /*@__PURE__*/ new Vector3();
 
-var _sphere = new Sphere();
-var _vector = new Vector3();
+class Frustum {
 
-function Frustum( p0, p1, p2, p3, p4, p5 ) {
+	constructor( p0 = new Plane(), p1 = new Plane(), p2 = new Plane(), p3 = new Plane(), p4 = new Plane(), p5 = new Plane() ) {
 
-	this.planes = [
+		this.planes = [ p0, p1, p2, p3, p4, p5 ];
 
-		( p0 !== undefined ) ? p0 : new Plane(),
-		( p1 !== undefined ) ? p1 : new Plane(),
-		( p2 !== undefined ) ? p2 : new Plane(),
-		( p3 !== undefined ) ? p3 : new Plane(),
-		( p4 !== undefined ) ? p4 : new Plane(),
-		( p5 !== undefined ) ? p5 : new Plane()
+	}
 
-	];
+	set( p0, p1, p2, p3, p4, p5 ) {
 
-}
-
-Object.assign( Frustum.prototype, {
-
-	set: function ( p0, p1, p2, p3, p4, p5 ) {
-
-		var planes = this.planes;
+		const planes = this.planes;
 
 		planes[ 0 ].copy( p0 );
 		planes[ 1 ].copy( p1 );
@@ -41,19 +27,13 @@ Object.assign( Frustum.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	copy( frustum ) {
 
-		return new this.constructor().copy( this );
+		const planes = this.planes;
 
-	},
-
-	copy: function ( frustum ) {
-
-		var planes = this.planes;
-
-		for ( var i = 0; i < 6; i ++ ) {
+		for ( let i = 0; i < 6; i ++ ) {
 
 			planes[ i ].copy( frustum.planes[ i ] );
 
@@ -61,41 +41,64 @@ Object.assign( Frustum.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromProjectionMatrix: function ( m ) {
+	setFromProjectionMatrix( m, coordinateSystem = WebGLCoordinateSystem ) {
 
-		var planes = this.planes;
-		var me = m.elements;
-		var me0 = me[ 0 ], me1 = me[ 1 ], me2 = me[ 2 ], me3 = me[ 3 ];
-		var me4 = me[ 4 ], me5 = me[ 5 ], me6 = me[ 6 ], me7 = me[ 7 ];
-		var me8 = me[ 8 ], me9 = me[ 9 ], me10 = me[ 10 ], me11 = me[ 11 ];
-		var me12 = me[ 12 ], me13 = me[ 13 ], me14 = me[ 14 ], me15 = me[ 15 ];
+		const planes = this.planes;
+		const me = m.elements;
+		const me0 = me[ 0 ], me1 = me[ 1 ], me2 = me[ 2 ], me3 = me[ 3 ];
+		const me4 = me[ 4 ], me5 = me[ 5 ], me6 = me[ 6 ], me7 = me[ 7 ];
+		const me8 = me[ 8 ], me9 = me[ 9 ], me10 = me[ 10 ], me11 = me[ 11 ];
+		const me12 = me[ 12 ], me13 = me[ 13 ], me14 = me[ 14 ], me15 = me[ 15 ];
 
 		planes[ 0 ].setComponents( me3 - me0, me7 - me4, me11 - me8, me15 - me12 ).normalize();
 		planes[ 1 ].setComponents( me3 + me0, me7 + me4, me11 + me8, me15 + me12 ).normalize();
 		planes[ 2 ].setComponents( me3 + me1, me7 + me5, me11 + me9, me15 + me13 ).normalize();
 		planes[ 3 ].setComponents( me3 - me1, me7 - me5, me11 - me9, me15 - me13 ).normalize();
 		planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize();
-		planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize();
+
+		if ( coordinateSystem === WebGLCoordinateSystem ) {
+
+			planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize();
+
+		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
+
+			planes[ 5 ].setComponents( me2, me6, me10, me14 ).normalize();
+
+		} else {
+
+			throw new Error( 'THREE.Frustum.setFromProjectionMatrix(): Invalid coordinate system: ' + coordinateSystem );
+
+		}
 
 		return this;
 
-	},
+	}
 
-	intersectsObject: function ( object ) {
+	intersectsObject( object ) {
 
-		var geometry = object.geometry;
+		if ( object.boundingSphere !== undefined ) {
 
-		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+			if ( object.boundingSphere === null ) object.computeBoundingSphere();
 
-		_sphere.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+			_sphere.copy( object.boundingSphere ).applyMatrix4( object.matrixWorld );
+
+		} else {
+
+			const geometry = object.geometry;
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+			_sphere.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+
+		}
 
 		return this.intersectsSphere( _sphere );
 
-	},
+	}
 
-	intersectsSprite: function ( sprite ) {
+	intersectsSprite( sprite ) {
 
 		_sphere.center.set( 0, 0, 0 );
 		_sphere.radius = 0.7071067811865476;
@@ -103,17 +106,17 @@ Object.assign( Frustum.prototype, {
 
 		return this.intersectsSphere( _sphere );
 
-	},
+	}
 
-	intersectsSphere: function ( sphere ) {
+	intersectsSphere( sphere ) {
 
-		var planes = this.planes;
-		var center = sphere.center;
-		var negRadius = - sphere.radius;
+		const planes = this.planes;
+		const center = sphere.center;
+		const negRadius = - sphere.radius;
 
-		for ( var i = 0; i < 6; i ++ ) {
+		for ( let i = 0; i < 6; i ++ ) {
 
-			var distance = planes[ i ].distanceToPoint( center );
+			const distance = planes[ i ].distanceToPoint( center );
 
 			if ( distance < negRadius ) {
 
@@ -125,15 +128,15 @@ Object.assign( Frustum.prototype, {
 
 		return true;
 
-	},
+	}
 
-	intersectsBox: function ( box ) {
+	intersectsBox( box ) {
 
-		var planes = this.planes;
+		const planes = this.planes;
 
-		for ( var i = 0; i < 6; i ++ ) {
+		for ( let i = 0; i < 6; i ++ ) {
 
-			var plane = planes[ i ];
+			const plane = planes[ i ];
 
 			// corner at max distance
 
@@ -151,13 +154,13 @@ Object.assign( Frustum.prototype, {
 
 		return true;
 
-	},
+	}
 
-	containsPoint: function ( point ) {
+	containsPoint( point ) {
 
-		var planes = this.planes;
+		const planes = this.planes;
 
-		for ( var i = 0; i < 6; i ++ ) {
+		for ( let i = 0; i < 6; i ++ ) {
 
 			if ( planes[ i ].distanceToPoint( point ) < 0 ) {
 
@@ -171,7 +174,13 @@ Object.assign( Frustum.prototype, {
 
 	}
 
-} );
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
+}
 
 
 export { Frustum };

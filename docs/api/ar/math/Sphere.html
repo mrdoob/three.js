@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">كرة محددة بمركز ونصف قطر.</p>
+
+		<h2>المنشئ (Constructor)</h2>
+		<h3>[name]( [param:Vector3 center], [param:Float radius] )</h3>
+		<p>
+		[page:Vector3 center] - مركز الكرة. الافتراضي هو [page:Vector3]
+		عند `(0، 0، 0)`. <br />
+		[page:Float radius] - نصف قطر الكرة. الافتراضي هو -1.<br /><br />
+	 
+		ينشئ [name] جديدًا.
+		</p>
+	 
+		<h2>الخصائص (Properties)</h2>
+	 
+		<h3>[property:Vector3 center]</h3>
+		<p>
+		[page:Vector3] يحدد مركز الكرة. الافتراضي هو `(0، 0،
+		0)`.
+		</p>
+	 
+		<h3>[property:Float radius]</h3>
+		<p>نصف قطر الكرة. الافتراضي هو -1.</p>
+	 
+		<h2>الطرق (Methods)</h2>
+	 
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<p>
+		[page:Matrix4 matrix] - [Page:Matrix4] للتطبيق <br /><br />
+	 
+		يحول هذه الكرة بواسطة [page:Matrix4] المحدد.
+		</p>
+	 
+		<h3>
+		[method:Vector3 clampPoint]( [param:Vector3 point], [param:Vector3 target] )
+		</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] النقطة التي سيتم تثبيتها.<br />
+		[page:Vector3 target] — سيتم نسخ النتيجة في هذا Vector3.<br /><br />
+	 
+		يثبت نقطة داخل الكرة. إذا كانت النقطة خارج الكرة ، فسوف
+		يثبتها على أقرب نقطة على حافة الكرة. لن تتأثر النقاط
+		بالفعل داخل الكرة.
+		</p>
+	 
+		<h3>[method:Sphere clone]()</h3>
+		<p>
+		يعود بكرة جديدة بنفس [page:.center center] و [page:.radius radius] كهذه.
+		</p>
+	 
+		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - الـ[page:Vector3] المطلوب التحقق منه<br /><br />
+	 
+		يتحقق مما إذا كانت الكرة تحتوي على [page:Vector3 point] المحدد
+		شاملاً سطح الكرة.
+		</p>
+
+		<h3>[method:this copy]( [param:Sphere sphere] )</h3>
+		<p>
+		ينسخ قيم خصائص [page:.center center] و [page:.radius radius] للكرة المعطاة إلى هذه الكرة.
+		</p>
+	 
+		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
+		<p>
+		يعيد أقرب مسافة من حدود الكرة إلى
+		[page:Vector3 point]. إذا كانت الكرة تحتوي على النقطة ، فستكون المسافة
+		سلبية.
+		</p>
+	 
+		<h3>[method:this expandByPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] التي يجب تضمينها في
+		الكرة.<br /><br />
+	 
+		يوسع حدود هذه الكرة لتشمل [page:Vector3 point].
+		</p>
+	 
+		<h3>[method:Boolean isEmpty]()</h3>
+		<p>
+		يتحقق مما إذا كانت الكرة فارغة (تم تعيين نصف القطر إلى رقم
+		سلبي). <br />
+		الكرات التي يبلغ نصف قطرها 0 تحتوي فقط على نقطة مركزها ولا
+		يعتبر فارغًا.
+		</p>
+	 
+		<h3>[method:this makeEmpty]()</h3>
+		<p>
+		يجعل الكرة فارغة عن طريق تعيين [page:.center center] إلى (0، 0، 0) و
+		[page:.radius radius] إلى -1.
+		</p>
+	 
+		<h3>[method:Boolean equals]( [param:Sphere sphere] )</h3>
+		<p>يتحقق مما إذا كانت مراكز وأشعة الكرتين متساوية.</p>
+	 
+		<h3>[method:Box3 getBoundingBox]( [param:Box3 target] )</h3>
+		<p>
+		[page:Box3 target] — سيتم نسخ النتيجة في هذا Box3.<br /><br />
+	 
+		يعود بـ[link:https://en.wikipedia.org/wiki/Minimum_bounding_box Minimum Bounding Box]
+		للكرة.
+		</p>
+	 
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - [page:Box3] للتحقق من التقاطع ضدها.<br /><br />
+	 
+		يحدد ما إذا كانت هذه الكرة تتقاطع مع [page:Box3 box] المحددة أم لا.
+		</p>
+
+		<h3>[method:Boolean intersectsPlane]( [param:Plane plane] )</h3>
+		<p>
+		[page:Plane plane] - الطائرة للتحقق من التقاطع ضدها.<br /><br />
+		 
+		يحدد ما إذا كانت هذه الكرة تتقاطع مع [page:Plane plane] المحددة أم لا.
+		</p>
+		 
+		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
+		<p>
+		[page:Sphere sphere] - الكرة للتحقق من التقاطع ضدها.<br /><br />
+		 
+		يتحقق مما إذا كانت كرتين تتقاطعان.
+		</p>
+		 
+		<h3>[method:this set]( [param:Vector3 center], [param:Float radius] )</h3>
+		<p>
+		[page:Vector3 center] - مركز الكرة.<br />
+		[page:Float radius] - نصف قطر الكرة.<br /><br />
+		 
+		يضبط خصائص [page:.center center] و [page:.radius radius]
+		لهذه الكرة.<br />
+		يرجى ملاحظة أن هذه الطريقة تنسخ فقط القيم من المركز المحدد.
+		</p>
+		 
+		<h3>
+		[method:this setFromPoints]( [param:Array points], [param:Vector3 optionalCenter] )
+		</h3>
+		<p>
+		[page:Array points] - مصفوفة من مواضع [page:Vector3].<br />
+		[page:Vector3 optionalCenter] - موضع اختياري لـ[page:Vector3]
+		مركز الكرة.<br /><br />
+		 
+		يحسب الكرة المحيطة الدنيا لمصفوفة من نقاط [page:Array].
+		إذا تم إعطاء [page:Vector3 optionalCenter] ، يتم استخدامه كمركز للكرة
+		. وإلا ، يتم حساب مركز المستطيل المحيط المستوي
+		تغليف نقاط [page:Array].
+		</p>
+		 
+		<h3>[method:this translate]( [param:Vector3 offset] )</h3>
+		<p>ترجمة مركز الكرة بالإزاحة المحددة [page:Vector3].</p>
+		 
+		<h3>[method:this union]( [param:Sphere sphere] )</h3>
+		<p>
+		[page:Sphere sphere] - كرة المحيط التي ستتحد مع هذه
+		كرة.<br /><br />
+		 
+		يوسع هذه الكرة لإغلاق كل من الكرة الأصلية والمعطى
+		كرة.
+		</p>
+		 
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

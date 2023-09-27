@@ -18,33 +18,45 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MD2 Loader -
-			Ogro by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=556">Magarnigal</a><br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MD2 Loader<br />
 			use arrows to control characters, mouse for camera
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { MD2CharacterComplex } from './jsm/misc/MD2CharacterComplex.js';
-			import { Gyroscope } from './jsm/misc/Gyroscope.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { MD2CharacterComplex } from 'three/addons/misc/MD2CharacterComplex.js';
+			import { Gyroscope } from 'three/addons/misc/Gyroscope.js';
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
+			let SCREEN_WIDTH = window.innerWidth;
+			let SCREEN_HEIGHT = window.innerHeight;
 
-			var container, stats;
-			var camera, scene, renderer;
+			let container, stats;
+			let camera, scene, renderer;
 
-			var characters = [];
-			var nCharacters = 0;
+			const characters = [];
+			let nCharacters = 0;
 
-			var cameraControls;
+			let cameraControls;
 
-			var controls = {
+			const controls = {
 
 				moveForward: false,
 				moveBackward: false,
@@ -53,7 +65,7 @@
 
 			};
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -78,9 +90,9 @@
 
 				// LIGHTS
 
-				scene.add( new THREE.AmbientLight( 0x222222 ) );
+				scene.add( new THREE.AmbientLight( 0x666666, 3 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 2.25 );
+				const light = new THREE.DirectionalLight( 0xffffff, 7 );
 				light.position.set( 200, 450, 500 );
 
 				light.castShadow = true;
@@ -97,21 +109,21 @@
 				light.shadow.camera.bottom = - 350;
 
 				scene.add( light );
-				// scene.add( new CameraHelper( light.shadow.camera ) );
+				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
 
 
 				//  GROUND
 
-				var gt = new THREE.TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
-				var gg = new THREE.PlaneBufferGeometry( 16000, 16000 );
-				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
+				const gt = new THREE.TextureLoader().load( 'textures/terrain/grasslight-big.jpg' );
+				const gg = new THREE.PlaneGeometry( 16000, 16000 );
+				const gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 
-				var ground = new THREE.Mesh( gg, gm );
+				const ground = new THREE.Mesh( gg, gm );
 				ground.rotation.x = - Math.PI / 2;
 				ground.material.map.repeat.set( 64, 64 );
 				ground.material.map.wrapS = THREE.RepeatWrapping;
 				ground.material.map.wrapT = THREE.RepeatWrapping;
-				ground.material.map.encoding = THREE.sRGBEncoding;
+				ground.material.map.colorSpace = THREE.SRGBColorSpace;
 				// note that because the ground does not cast a shadow, .castShadow is left false
 				ground.receiveShadow = true;
 
@@ -126,7 +138,6 @@
 
 				//
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -137,9 +148,9 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
-				document.addEventListener( 'keydown', onKeyDown, false );
-				document.addEventListener( 'keyup', onKeyUp, false );
+				window.addEventListener( 'resize', onWindowResize );
+				document.addEventListener( 'keydown', onKeyDown );
+				document.addEventListener( 'keyup', onKeyUp );
 
 				// CONTROLS
 
@@ -149,23 +160,23 @@
 
 				// CHARACTER
 
-				var configOgro = {
+				const configOgro = {
 
-					baseUrl: "models/md2/ogro/",
+					baseUrl: 'models/md2/ogro/',
 
-					body: "ogro.md2",
-					skins: [ "grok.jpg", "ogrobase.png", "arboshak.png", "ctf_r.png", "ctf_b.png", "darkam.png", "freedom.png",
-							 "gib.png", "gordogh.png", "igdosh.png", "khorne.png", "nabogro.png",
-							 "sharokh.png" ],
-					weapons: [[ "weapon.md2", "weapon.jpg" ]],
+					body: 'ogro.md2',
+					skins: [ 'grok.jpg', 'ogrobase.png', 'arboshak.png', 'ctf_r.png', 'ctf_b.png', 'darkam.png', 'freedom.png',
+							 'gib.png', 'gordogh.png', 'igdosh.png', 'khorne.png', 'nabogro.png',
+							 'sharokh.png' ],
+					weapons: [[ 'weapon.md2', 'weapon.jpg' ]],
 					animations: {
-						move: "run",
-						idle: "stand",
-						jump: "jump",
-						attack: "attack",
-						crouchMove: "cwalk",
-						crouchIdle: "cstand",
-						crouchAttach: "crattack"
+						move: 'run',
+						idle: 'stand',
+						jump: 'jump',
+						attack: 'attack',
+						crouchMove: 'cwalk',
+						crouchIdle: 'cstand',
+						crouchAttach: 'crattack'
 					},
 
 					walkSpeed: 350,
@@ -173,32 +184,32 @@
 
 				};
 
-				var nRows = 1;
-				var nSkins = configOgro.skins.length;
+				const nRows = 1;
+				const nSkins = configOgro.skins.length;
 
 				nCharacters = nSkins * nRows;
 
-				for ( var i = 0; i < nCharacters; i ++ ) {
+				for ( let i = 0; i < nCharacters; i ++ ) {
 
-					var character = new MD2CharacterComplex();
+					const character = new MD2CharacterComplex();
 					character.scale = 3;
 					character.controls = controls;
 					characters.push( character );
 
 				}
 
-				var baseCharacter = new MD2CharacterComplex();
+				const baseCharacter = new MD2CharacterComplex();
 				baseCharacter.scale = 3;
 
 				baseCharacter.onLoadComplete = function () {
 
-					var k = 0;
+					let k = 0;
 
-					for ( var j = 0; j < nRows; j ++ ) {
+					for ( let j = 0; j < nRows; j ++ ) {
 
-						for ( var i = 0; i < nSkins; i ++ ) {
+						for ( let i = 0; i < nSkins; i ++ ) {
 
-							var cloneCharacter = characters[ k ];
+							const cloneCharacter = characters[ k ];
 
 							cloneCharacter.shareParts( baseCharacter );
 
@@ -219,7 +230,7 @@
 
 					}
 
-					var gyro = new Gyroscope();
+					const gyro = new Gyroscope();
 					gyro.add( camera );
 					gyro.add( light, light.target );
 
@@ -247,25 +258,24 @@
 
 			function onKeyDown( event ) {
 
-				event.stopPropagation();
+				switch ( event.code ) {
 
-				switch ( event.keyCode ) {
+					case 'ArrowUp':
+					case 'KeyW': controls.moveForward = true; break;
 
-					case 38: /*up*/
-					case 87: /*W*/ 	controls.moveForward = true; break;
+					case 'ArrowDown':
+					case 'KeyS': controls.moveBackward = true; break;
 
-					case 40: /*down*/
-					case 83: /*S*/ 	 controls.moveBackward = true; break;
+					case 'ArrowLeft':
+					case 'KeyA': controls.moveLeft = true; break;
 
-					case 37: /*left*/
-					case 65: /*A*/ controls.moveLeft = true; break;
+					case 'ArrowRight':
+					case 'KeyD': controls.moveRight = true; break;
 
-					case 39: /*right*/
-					case 68: /*D*/ controls.moveRight = true; break;
-
-					//case 67: /*C*/     controls.crouch = true; break;
-					//case 32: /*space*/ controls.jump = true; break;
-					//case 17: /*ctrl*/  controls.attack = true; break;
+					// case 'KeyC': controls.crouch = true; break;
+					// case 'Space': controls.jump = true; break;
+					// case 'ControlLeft':
+					// case 'ControlRight': controls.attack = true; break;
 
 				}
 
@@ -273,25 +283,24 @@
 
 			function onKeyUp( event ) {
 
-				event.stopPropagation();
+				switch ( event.code ) {
 
-				switch ( event.keyCode ) {
+					case 'ArrowUp':
+					case 'KeyW': controls.moveForward = false; break;
 
-					case 38: /*up*/
-					case 87: /*W*/ controls.moveForward = false; break;
+					case 'ArrowDown':
+					case 'KeyS': controls.moveBackward = false; break;
 
-					case 40: /*down*/
-					case 83: /*S*/ 	 controls.moveBackward = false; break;
+					case 'ArrowLeft':
+					case 'KeyA': controls.moveLeft = false; break;
 
-					case 37: /*left*/
-					case 65: /*A*/ 	 controls.moveLeft = false; break;
+					case 'ArrowRight':
+					case 'KeyD': controls.moveRight = false; break;
 
-					case 39: /*right*/
-					case 68: /*D*/ controls.moveRight = false; break;
-
-					//case 67: /*C*/     controls.crouch = false; break;
-					//case 32: /*space*/ controls.jump = false; break;
-					//case 17: /*ctrl*/  controls.attack = false; break;
+					// case 'KeyC': controls.crouch = false; break;
+					// case 'Space': controls.jump = false; break;
+					// case 'ControlLeft':
+					// case 'ControlRight': controls.attack = false; break;
 
 				}
 
@@ -310,9 +319,9 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
-				for ( var i = 0; i < nCharacters; i ++ ) {
+				for ( let i = 0; i < nCharacters; i ++ ) {
 
 					characters[ i ].update( delta );
 

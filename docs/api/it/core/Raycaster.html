@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Questa classe è progettata per aiutare il [link:https://en.wikipedia.org/wiki/Ray_casting raycasting].
+      Il raycasting viene utilizzato, tra le altre cose, per il mouse picking (per capire su quali oggetti dello spazio 3d si trova il mouse).
+		</p>
+
+		<h2>Codice di Esempio</h2>
+		<code>
+		const raycaster = new THREE.Raycaster();
+		const pointer = new THREE.Vector2();
+
+		function onPointerMove( event ) {
+
+			// calcolare la posizione del puntatore nelle coordinate del dispositivo normalizzate
+			// (-1 to +1) per entrambi i componenti
+
+			pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+		}
+
+		function render() {
+
+			// aggiornare il raggio di picking con la telecamera e la posizione del puntatore
+			raycaster.setFromCamera( pointer, camera );
+
+			// calcolare gli oggetti intersecati dal raggio di picking
+			const intersects = raycaster.intersectObjects( scene.children );
+
+			for ( let i = 0; i < intersects.length; i ++ ) {
+
+				intersects[ i ].object.material.color.set( 0xff0000 );
+
+			}
+
+			renderer.render( scene, camera );
+
+		}
+
+		window.addEventListener( 'pointermove', onPointerMove );
+
+		window.requestAnimationFrame(render);
+
+		</code>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_interactive_cubes Raycasting to a Mesh]<br />
+			[example:webgl_interactive_cubes_ortho Raycasting to a Mesh in using an OrthographicCamera]<br />
+			[example:webgl_interactive_buffergeometry Raycasting to a Mesh with BufferGeometry]<br />
+			[example:webgl_instancing_raycast Raycasting to a InstancedMesh]<br />
+			[example:webgl_interactive_lines Raycasting to a Line]<br />
+			[example:webgl_interactive_raycasting_points Raycasting to Points]<br />
+			[example:webgl_geometry_terrain_raycast Terrain raycasting]<br />
+			[example:webgl_interactive_voxelpainter Raycasting to paint voxels]<br />
+			[example:webgl_raycaster_texture Raycast to a Texture]
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Vector3 origin], [param:Vector3 direction], [param:Float near], [param:Float far] )</h3>
+		<p>
+      [page:Vector3 origin] — Il vettore di origine da cui viene proiettato il raggio.<br />
+      [page:Vector3 direction] — Il vettore direzione che fornisce la direzione del raggio. Deve essere normalizzato.<br />
+      [page:Float near] — Tutti i risultati restituiti sono più lontani che vicini. Near non può essere negativo. Il valore predefinito è 0.<br />
+      [page:Float far] — Tutti i risultati ottenuti sono più vicini che lontani. Far non può essere minore di near. Il valore predefinito è Infinity.
+		</p>
+		<p>
+      Crea un nuovo oggetto raycaster.<br />
+		</p>
+
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Float far]</h3>
+		<p>
+      Il fattore `far` del raycaster. Questo valore indica quali oggetti possono essere scartati in base alla distanza.
+      Questo valore non dovrebbe essere negativo e deve essere maggiore del valore della proprietà `near`.
+		</p>
+
+		<h3>[property:Float near]</h3>
+		<p>
+      Il fattore `near` del raycaster. Questo valore indica quali oggetti possono essere scartati in base alla distanza.
+      Questo valore non dovrebbe essere negativo e deve essere minore del valore della proprietà `far`.
+		</p>
+
+		<h3>[property:Camera camera]</h3>
+		<p>
+      La telecamera da utilizzare durante il raycast contro oggetti dipendenti dalla vista, come oggetti su cartelloni pubblicitari 
+      come [page:Sprites]. Questo campo può essere settato manualmente o viene impostato quando si chiama il metodo "setFromCamera".
+
+      L'impostazione predefinita è null.
+		</p>
+
+		<h3>[property:Layers layers]</h3>
+		<p>
+      Utilizzato da [name] per ignorare selettivamente oggetti 3D durante l'esecuzione di test di intersezione. Il seguente codice di esempio
+      assicura che solo gli oggetti 3D sul layer `1` vengano rispettati dall'istanza di [name].
+
+		<code>
+		raycaster.layers.set( 1 );
+		object.layers.enable( 1 );
+		</code>
+
+		</p>
+
+		<h3>[property:Object params]</h3>
+		<p>
+      Un oggetto con le seguenti proprietà:
+
+			<code>
+{
+	Mesh: {},
+	Line: { threshold: 1 },
+	LOD: {},
+	Points: { threshold: 1 },
+	Sprite: {}
+}
+			</code>
+
+      Dove threshold è la precisione del raycaster quando intercetta gli oggetti, in unità di world.
+		</p>
+
+		<h3>[property:Ray ray]</h3>
+		<p>Il [Page:Ray raggio] usato per il raycasting.</p>
+
+
+		<h2>Metodi</h2>
+
+		<h3>[method:undefined set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
+		<p>
+      [page:Vector3 origin] — Il vettore di origine da cui viene proiettato il raggio.<br />
+      [page:Vector3 direction] — Il vettore di direzione normalizzato che fornisce la direzione al raggio.
+		</p>
+		<p>
+      Aggiorna il raggio con una nuova origine e direzione. Si noti che questo metodo copia solamente i valori dagli argomenti.
+		</p>
+
+		<h3>[method:undefined setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
+		<p>
+      [page:Vector2 coords] — coordinate 2D del mouse, in coordinate normalizzate del dispositivo (NDC)---i componenti X e Y dovrebbero essere tra -1 e 1.<br />
+      [page:Camera camera] — telecamera da cui dovrebbe provenire il raggio.
+		</p>
+		<p>
+		  Aggiorna il raggio con una nuova origine e direzione.
+		</p>
+
+		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
+		<p>
+		[page:Object3D object] — L'oggetto da verificare per l'intersezione con il raggio.<br />
+		[page:Boolean recursive] — Se true, controlla anche tutti i discendenti. Altrimenti controlla soltanto 
+    l'intersezione con l'oggetto. Il valore predefinito è true.<br />
+		[page:Array optionalTarget] — (opzionale) obiettivo per impostare il risultato. 
+    Altrimenti viene istanziato un nuovo [page:Array]. Se impostato, è necessario cancellare questo array prima di ogni chiamata (ad esempio, array.length = 0;).
+		</p>
+		<p>
+      Controlla tutte le intersezioni tra il raggio e l'oggetto con o senza i discendenti.
+      Le intersezioni sono restituite ordinate per distanza, le più vicine prima. Viene restituito un array di intersezioni...
+		</p>
+		<code>
+				[ { distance, point, face, faceIndex, object }, ... ]
+		</code>
+		<p>
+			[page:Float distance] – distanza tra l'origine del raggio e l'intersezione<br />
+			[page:Vector3 point] – punto di intersezione, nelle coordinate world<br />
+			[page:Object face] – faccia intersecata<br />
+			[page:Integer faceIndex] – indice della faccia intersecata<br />
+			[page:Object3D object] – l'oggetto intersecato<br />
+			[page:Vector2 uv] - le coordinate U,V nel punto di intersezione<br />
+			[page:Vector2 uv1] - Secondo insieme delle coordinate U,V nel punto di intersezione<br />
+			[page:Vector3 normal] - vettore normale interpolato nel punto di intersezione<br />
+			[page:Integer instanceId] – Il numero di indice dell'istanza in cui il raggio interseca la InstancedMesh.
+		</p>
+		<p>
+      `Raycaster` delega al metodo [page:Object3D.raycast raycast] dell'oggetto passato, 
+      quando valuta se il raggio interseca l'oggetto o no. Ciò permette alle mesh di rispondere 
+      in modo diverso al raycasting rispetto alle linee e alle nuvole di punti.
+		</p>
+		<p>
+      *Nota* per le mesh, le facce devono essere puntate verso l'origine del [page:.ray raggio] per essere rilevate;
+      le intersezioni del raggio passato attraverso il retro della faccia non saranno rilevate. Per eseguire il raycast
+      su entrambe le facce dell'oggetto, ti consigliamo di impostare la proprietà [page:Material.side side] del [page:Mesh.material materiale]
+      a `THREE.DoubleSide`.
+		</p>
+
+		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
+		<p>
+      [page:Array objects] — Gli oggetti da controllare per l'intersezione con il raggio.<br />
+      [page:Boolean recursive] — Se true, controlla anche i discendenti degli oggetti. Altrimenti controlla soltanto 
+      l'intersezione con gli oggetti. Il valore predefinito è true.<br />
+      [page:Array optionalTarget] — (opzionale) obiettivo per impostare il risultato.
+      Altrimenti viene istanziato un nuovo [page:Array]. Se impostato, è necessario cancellare questo array prima di ogni chiamata (ad esempio, array.length = 0;).
+		</p>
+		<p>
+      Controlla tutte le intersezioni tra il raggio e gli oggetti con o senza i discendenti.
+      Le intersezioni sono restituite ordinate per distanza, prima le più vicine. Le intersezioni 
+      hanno la stessa forma di quelle restituite da [page:.intersectObject].
+		</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

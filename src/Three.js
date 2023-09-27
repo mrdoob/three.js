@@ -1,10 +1,12 @@
-import './polyfills.js';
 import { REVISION } from './constants.js';
 
-export { WebGLMultisampleRenderTarget } from './renderers/WebGLMultisampleRenderTarget.js';
+export { WebGLArrayRenderTarget } from './renderers/WebGLArrayRenderTarget.js';
+export { WebGL3DRenderTarget } from './renderers/WebGL3DRenderTarget.js';
+export { WebGLMultipleRenderTargets } from './renderers/WebGLMultipleRenderTargets.js';
 export { WebGLCubeRenderTarget } from './renderers/WebGLCubeRenderTarget.js';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 export { WebGLRenderer } from './renderers/WebGLRenderer.js';
+export { WebGL1Renderer } from './renderers/WebGL1Renderer.js';
 export { ShaderLib } from './renderers/shaders/ShaderLib.js';
 export { UniformsLib } from './renderers/shaders/UniformsLib.js';
 export { UniformsUtils } from './renderers/shaders/UniformsUtils.js';
@@ -25,10 +27,14 @@ export { Line } from './objects/Line.js';
 export { Points } from './objects/Points.js';
 export { Group } from './objects/Group.js';
 export { VideoTexture } from './textures/VideoTexture.js';
+export { FramebufferTexture } from './textures/FramebufferTexture.js';
+export { Source } from './textures/Source.js';
 export { DataTexture } from './textures/DataTexture.js';
-export { DataTexture2DArray } from './textures/DataTexture2DArray.js';
-export { DataTexture3D } from './textures/DataTexture3D.js';
+export { DataArrayTexture } from './textures/DataArrayTexture.js';
+export { Data3DTexture } from './textures/Data3DTexture.js';
 export { CompressedTexture } from './textures/CompressedTexture.js';
+export { CompressedArrayTexture } from './textures/CompressedArrayTexture.js';
+export { CompressedCubeTexture } from './textures/CompressedCubeTexture.js';
 export { CubeTexture } from './textures/CubeTexture.js';
 export { CanvasTexture } from './textures/CanvasTexture.js';
 export { DepthTexture } from './textures/DepthTexture.js';
@@ -37,8 +43,8 @@ export * from './geometries/Geometries.js';
 export * from './materials/Materials.js';
 export { AnimationLoader } from './loaders/AnimationLoader.js';
 export { CompressedTextureLoader } from './loaders/CompressedTextureLoader.js';
-export { DataTextureLoader } from './loaders/DataTextureLoader.js';
 export { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
+export { DataTextureLoader } from './loaders/DataTextureLoader.js';
 export { TextureLoader } from './loaders/TextureLoader.js';
 export { ObjectLoader } from './loaders/ObjectLoader.js';
 export { MaterialLoader } from './loaders/MaterialLoader.js';
@@ -46,23 +52,19 @@ export { BufferGeometryLoader } from './loaders/BufferGeometryLoader.js';
 export { DefaultLoadingManager, LoadingManager } from './loaders/LoadingManager.js';
 export { ImageLoader } from './loaders/ImageLoader.js';
 export { ImageBitmapLoader } from './loaders/ImageBitmapLoader.js';
-export { FontLoader } from './loaders/FontLoader.js';
 export { FileLoader } from './loaders/FileLoader.js';
 export { Loader } from './loaders/Loader.js';
 export { LoaderUtils } from './loaders/LoaderUtils.js';
 export { Cache } from './loaders/Cache.js';
 export { AudioLoader } from './loaders/AudioLoader.js';
-export { SpotLightShadow } from './lights/SpotLightShadow.js';
 export { SpotLight } from './lights/SpotLight.js';
 export { PointLight } from './lights/PointLight.js';
 export { RectAreaLight } from './lights/RectAreaLight.js';
 export { HemisphereLight } from './lights/HemisphereLight.js';
 export { HemisphereLightProbe } from './lights/HemisphereLightProbe.js';
-export { DirectionalLightShadow } from './lights/DirectionalLightShadow.js';
 export { DirectionalLight } from './lights/DirectionalLight.js';
 export { AmbientLight } from './lights/AmbientLight.js';
 export { AmbientLightProbe } from './lights/AmbientLightProbe.js';
-export { LightShadow } from './lights/LightShadow.js';
 export { Light } from './lights/Light.js';
 export { LightProbe } from './lights/LightProbe.js';
 export { StereoCamera } from './cameras/StereoCamera.js';
@@ -89,16 +91,18 @@ export { AnimationUtils } from './animation/AnimationUtils.js';
 export { AnimationObjectGroup } from './animation/AnimationObjectGroup.js';
 export { AnimationMixer } from './animation/AnimationMixer.js';
 export { AnimationClip } from './animation/AnimationClip.js';
+export { AnimationAction } from './animation/AnimationAction.js';
+export { RenderTarget } from './core/RenderTarget.js';
 export { Uniform } from './core/Uniform.js';
+export { UniformsGroup } from './core/UniformsGroup.js';
 export { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
 export { BufferGeometry } from './core/BufferGeometry.js';
-export { Geometry } from './core/Geometry.js';
 export { InterleavedBufferAttribute } from './core/InterleavedBufferAttribute.js';
 export { InstancedInterleavedBuffer } from './core/InstancedInterleavedBuffer.js';
 export { InterleavedBuffer } from './core/InterleavedBuffer.js';
 export { InstancedBufferAttribute } from './core/InstancedBufferAttribute.js';
+export { GLBufferAttribute } from './core/GLBufferAttribute.js';
 export * from './core/BufferAttribute.js';
-export { Face3 } from './core/Face3.js';
 export { Object3D } from './core/Object3D.js';
 export { Raycaster } from './core/Raycaster.js';
 export { Layers } from './core/Layers.js';
@@ -128,8 +132,8 @@ export { Vector3 } from './math/Vector3.js';
 export { Vector2 } from './math/Vector2.js';
 export { Quaternion } from './math/Quaternion.js';
 export { Color } from './math/Color.js';
+export { ColorManagement } from './math/ColorManagement.js';
 export { SphericalHarmonics3 } from './math/SphericalHarmonics3.js';
-export { ImmediateRenderObject } from './extras/objects/ImmediateRenderObject.js';
 export { SpotLightHelper } from './helpers/SpotLightHelper.js';
 export { SkeletonHelper } from './helpers/SkeletonHelper.js';
 export { PointLightHelper } from './helpers/PointLightHelper.js';
@@ -147,22 +151,35 @@ export * from './extras/curves/Curves.js';
 export { Shape } from './extras/core/Shape.js';
 export { Path } from './extras/core/Path.js';
 export { ShapePath } from './extras/core/ShapePath.js';
-export { Font } from './extras/core/Font.js';
 export { CurvePath } from './extras/core/CurvePath.js';
 export { Curve } from './extras/core/Curve.js';
+export { DataUtils } from './extras/DataUtils.js';
 export { ImageUtils } from './extras/ImageUtils.js';
 export { ShapeUtils } from './extras/ShapeUtils.js';
 export { PMREMGenerator } from './extras/PMREMGenerator.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
+export { createCanvasElement } from './utils.js';
 export * from './constants.js';
 export * from './Three.Legacy.js';
 
 if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
-	/* eslint-disable no-undef */
 	__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'register', { detail: {
 		revision: REVISION,
 	} } ) );
-	/* eslint-enable no-undef */
+
+}
+
+if ( typeof window !== 'undefined' ) {
+
+	if ( window.__THREE__ ) {
+
+		console.warn( 'WARNING: Multiple instances of Three.js being imported.' );
+
+	} else {
+
+		window.__THREE__ = REVISION;
+
+	}
 
 }

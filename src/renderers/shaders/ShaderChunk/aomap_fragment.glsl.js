@@ -2,7 +2,7 @@ export default /* glsl */`
 #ifdef USE_AOMAP
 
 	// reads channel R, compatible with a combined OcclusionRoughnessMetallic (RGB) texture
-	float ambientOcclusion = ( texture2D( aoMap, vUv2 ).r - 1.0 ) * aoMapIntensity + 1.0;
+	float ambientOcclusion = ( texture2D( aoMap, vAoMapUv ).r - 1.0 ) * aoMapIntensity + 1.0;
 
 	reflectedLight.indirectDiffuse *= ambientOcclusion;
 
@@ -10,7 +10,7 @@ export default /* glsl */`
 
 		float dotNV = saturate( dot( geometry.normal, geometry.viewDir ) );
 
-		reflectedLight.indirectSpecular *= computeSpecularOcclusion( dotNV, ambientOcclusion, material.specularRoughness );
+		reflectedLight.indirectSpecular *= computeSpecularOcclusion( dotNV, ambientOcclusion, material.roughness );
 
 	#endif
 

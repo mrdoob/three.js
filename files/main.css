@@ -30,6 +30,10 @@
 		--border-style: 1px solid #444;
 	}
 
+	#previewsToggler {
+		filter: invert(100%);
+	}
+
 }
 
 @font-face {
@@ -121,7 +125,6 @@ h1 a {
 	margin-left: 6px;
 	font-size: .9rem;
 }
-
 #panel {
 	position: fixed;
 	z-index: 100;
@@ -135,7 +138,7 @@ h1 a {
 	transition: 0s 0s height;
 }
 
-	#panel #exitSearchButton {
+	#panel #clearSearchButton {
 		width: 48px;
 		height: 48px;
 		display: none;
@@ -151,7 +154,7 @@ h1 a {
 		margin-right: 0px;
 	}
 
-	#panel.searchFocused #exitSearchButton {
+	#panel.searchFocused #clearSearchButton {
 		display: block;
 	}
 
@@ -217,6 +220,7 @@ h1 a {
 		display: none;
 	}
 
+
 #panel #inputWrapper {
 	display: flex;
 	align-items: center;
@@ -237,7 +241,6 @@ h1 a {
 	#panel #filterInput {
 		flex: 1;
 		width: 100%;
-		padding: 0 36px;
 		font-size: 1rem;
 		font-weight: 500;
 		color: var(--text-color);
@@ -257,7 +260,6 @@ h1 a {
 	#panel #language {
 		font-family: 'Roboto Mono', monospace;
 		font-size: 1rem;
-		line-height: 1rem;
 		font-weight: 500;
 		color: var(--text-color);
 		border: 0px;
@@ -271,6 +273,7 @@ h1 a {
 		-moz-appearance: none;
 		appearance: none;
 		margin-right: 10px;
+		text-align-last: right;
 	}
 
 		#panel #language:focus {
@@ -282,8 +285,8 @@ h1 a {
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
-		transform: translate3d(0,0,0);
 	}
+
 	#panel #content {
 		flex: 1;
 		overflow-y: auto;
@@ -301,16 +304,21 @@ h1 a {
 			margin: 1px 0;
 		}
 
-		#panel #content h2 {
+		#panel #content h2:not(.hidden) {
+			margin-top: 16px;
+			border-top: none;
+			padding-top: 0;
+		}
+
+		#panel #content h2:not(.hidden) ~ h2 {
 			margin-top: 32px;
 			border-top: var(--border-style);
 			padding-top: 12px;
 		}
 
-		#panel #content h2:first-child {
-			margin-top: 16px !important;
-			border-top: none;
-			padding-top: 0;
+	        #panel #content h3 {
+			color: var(--text-color);
+			font-weight: 900;
 		}
 
 		#panel #content a {
@@ -330,6 +338,31 @@ h1 a {
 
 		#panel #content .hidden {
 			display: none !important;
+		}
+
+		#panel #content #previewsToggler {
+			cursor: pointer;
+			float: right;
+			margin-top: 18px;
+			margin-bottom: -18px;
+			opacity: 0.25;
+		}
+
+		#panel #content.minimal .card {
+			background-color: transparent;
+			margin-bottom: 4px;
+		}
+
+		#panel #content.minimal .cover {
+			display: none;
+		}
+
+		#panel #content.minimal .title {
+			padding: 0;
+		}
+
+		#panel #content.minimal #previewsToggler {
+			opacity: 1;
 		}
 
 		body.home #panel #content h2 {
@@ -355,6 +388,10 @@ iframe {
 	width: 100%;
 	height: 100%;
 	overflow: auto;
+}
+
+iframe#viewer {
+	display: none; /* Workaround: The iframe has white background in Chrome for some reason */
 }
 
 #viewer {
@@ -497,6 +534,16 @@ iframe {
 	padding: 8px 12px 4px;
 	font-size: calc(var(--font-size) - 1px);
 	font-weight: 500;
+	line-height: calc(var(--line-height) - 6px);
+}
+
+.card .tag {
+	background-color: var(--background-color);
+	color: var(--color-blue);
+	margin-left: 6px;
+	padding: 1px 6px 2px;
+	border-radius: 2px;
+	font-size: calc(var(--font-size) - 2px);
 	line-height: calc(var(--line-height) - 6px);
 }
 

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Costanti di utilizzo degli attributi del buffer</h1>
+
+		<p>
+      Le costanti di utilizzo possono essere utilizzate per fornire un suggerimento all'API su come verrà utilizzato l'attributo
+      del buffer della geometria per ottimizzare le prestazioni.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const geometry = new THREE.BufferGeometry();
+		const positionAttribute = new THREE.BufferAttribute( array, 3 , false );
+		positionAttribute.setUsage( THREE.DynamicDrawUsage );
+		geometry.setAttribute( 'position', positionAttribute );
+		</code>
+
+		<h2>Esempi</h2>
+		<p>[example:webgl_buffergeometry_drawrange materials / buffergeometry / drawrange ]</p>
+
+		<h2>Utilizzo della Geometria</h2>
+		<code>
+		THREE.StaticDrawUsage
+		THREE.DynamicDrawUsage
+		THREE.StreamDrawUsage
+
+		THREE.StaticReadUsage
+		THREE.DynamicReadUsage
+		THREE.StreamReadUsage
+
+		THREE.StaticCopyUsage
+		THREE.DynamicCopyUsage
+		THREE.StreamCopyUsage
+		</code>
+
+    Per informazioni più dettagliate su ciascuna di queste costanti consultare 
+    [link:https://www.khronos.org/opengl/wiki/Buffer_Object#Buffer_Object_Usage questa documentazione di OpenGL].
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

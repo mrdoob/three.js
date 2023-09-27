@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,7 +16,7 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var material = new THREE.LineDashedMaterial( {
+		const material = new THREE.LineDashedMaterial( {
 			color: 0xffffff,
 			linewidth: 1,
 			scale: 1,
@@ -48,6 +47,11 @@
 
 		<h3>[property:number gapSize]</h3>
 		<p>间隙的大小，默认值为 *1*。</p>
+
+		<h3>[property:Boolean isLineDashedMaterial]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:number scale]</h3>
 		<p>线条中虚线部分的占比。默认值为 *1*。</p>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>How to use post-processing(後処理の使い方)</h1>
+
+	<p>
+		three.jsアプリケーションの多くは3Dオブジェクトをスクリーンに直接描画します。
+		しかしながら時々、一つ以上のエフェクト(被写界深度、Bloom、フィルムグレイン、様々なアンチエイリアス効果など)を適用したい場合があります。こういったエフェクトを実装するためにpost-processingは広く使用されています。
+		まず、シーンはビデオカードメモリのバッファを表す描画対象に対して描画されます。
+		次に、最終的なスクリーンへのレンダリングの前に、1つ以上のpost-processingで画像バッファにフィルタとエフェクトを適用します。
+	</p>
+	<p>
+		こういったワークフローを実装するために、three.jsは[page:EffectComposer]で完全なpost-processingを提供しています。
+	</p>
+
+	<h2>Workflow</h2>
+
+	<p>
+		プロセスの一段階目はexampleディレクトリから必要なファイルを全てimportすることです。
+		このガイドではthree.jsの[link:https://www.npmjs.com/package/three npm package](npmの公式のパッケージ)を使っていると想定しています。
+		このガイドのデモでは下に示したファイルが必要です。
+	</p>
+
+	<code>
+		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+		import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
+		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+		</code>
+
+	<p>
+		全てのファイルのimportが成功したのちに、[page:WebGLRenderer]のインスタンスを渡すことでcomposerを作成します。
+	</p>
+
+	<code>
+		const composer = new EffectComposer( renderer );
+		</code>
+
+	<p>
+		composerを使うときにはアプリケーションのアニメーションループを変更する必要があります。
+		[page:WebGLRenderer]のrenderメソッドを呼ぶ代わりに[page:EffectComposer]のそれぞれの対応するものを使います。
+	</p>
+
+	<code>
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			composer.render();
+
+		}
+		</code>
+
+	<p>
+		composerが準備できたので、post-processingパスのチェーンを設定できるようになりました。
+		これらのパスはアプリケーションの最終的なビジュアルを出力することに責任を持ちます。
+		これらのパスは追加/挿入の順番で処理されます。In our example, the instance of `RenderPass`
+		is executed first, then the instance of `GlitchPass` and finally `OutputPass`。チェーンの中で最後の有効なpassが自動的に画面に描画されます。
+		passの設定は以下のように行います。
+	</p>
+
+	<code>
+		const renderPass = new RenderPass( scene, camera );
+		composer.addPass( renderPass );
+
+		const glitchPass = new GlitchPass();
+		composer.addPass( glitchPass );
+
+		const outputPass = new OutputPass();
+		composer.addPass( outputPass );
+	</code>
+
+	<p>
+		*RenderPass*は普通チェインのはじめにあります。
+		これはレンダリングされたシーンを次のpost-processingの入力とするためです。
+		*GlitchPass*は、これらのイメージをワイルドなglitch effectを適用するために使います。
+		 `OutputPass` is usually the last pass in the chain which performs sRGB color space conversion and optional tone mapping.
+		実際に動いているものを見るために、[link:https://threejs.org/examples/webgl_postprocessing_glitch sample]を見てみましょう。
+	</p>
+
+	<h2>Built-in Passes(組み込みのpass)</h2>
+
+	<p>
+		エンジンに元から入っている定義済みの後処理passが使えます。
+		このpassは[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/postprocessing postprocessing]ディレクトリに入っていて、広範囲に使用できます。
+	</p>
+
+	<h2>Custom Passes(カスタムpass)</h2>
+
+	<p>
+		独自のpostprocessing shaderを書いて、post-processing passのチェーンの中に組み込みたい場合があります。そういった場合には、*ShaderPass*を利用することが出来ます。
+		ファイルと独自のshaderをインポートしたのちに、以下のコードでpassを設定することができます。
+	</p>
+
+	<code>
+		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
+
+		// later in your init routine
+
+		const luminosityPass = new ShaderPass( LuminosityShader );
+		composer.addPass( luminosityPass );
+		</code>
+
+	<p>
+		リポジトリには[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/shaders/CopyShader.js CopyShader]と呼ばれるファイルがあり、カスタムshaderを作る上での良いスタートコードです。
+		*CopyShader*はエフェクトを適用せずに、EffectComposerの読み込みバッファの画像内容を書き込みバッファにコピーするだけです。
+	</p>
+
+</body>
+
+</html>

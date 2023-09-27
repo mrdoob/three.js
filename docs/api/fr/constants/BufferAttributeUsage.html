@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Constantes d'utilisation des attributs de buffer</h1>
+
+		<p>
+			Les constantes d'utilisation peuvent être utilisées pour fournir une indication à l'API concernant la manière dont l'attribut de mémoire tampon (buffer attribute) de géométrie sera utilisé afin d'optimiser les performances.
+		</p>
+
+		<h2>Exemple de code</h2>
+
+		<code>
+		const geometry = new THREE.BufferGeometry();
+		const positionAttribute = new THREE.BufferAttribute( array, 3 , false );
+		positionAttribute.setUsage( THREE.DynamicDrawUsage );
+		geometry.setAttribute( 'position', positionAttribute );
+		</code>
+
+		<h2>Exemples</h2>
+		<p>[example:webgl_buffergeometry_drawrange materials / buffergeometry / drawrange ]</p>
+
+		<h2>Utilisation de la géométrie</h2>
+		<code>
+		THREE.StaticDrawUsage
+		THREE.DynamicDrawUsage
+		THREE.StreamDrawUsage
+
+		THREE.StaticReadUsage
+		THREE.DynamicReadUsage
+		THREE.StreamReadUsage
+
+		THREE.StaticCopyUsage
+		THREE.DynamicCopyUsage
+		THREE.StreamCopyUsage
+		</code>
+
+		Pour plus d'informations sur chacune de ces constantes, voir [link:https://www.khronos.org/opengl/wiki/Buffer_Object#Buffer_Object_Usage this OpenGL documentation].
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

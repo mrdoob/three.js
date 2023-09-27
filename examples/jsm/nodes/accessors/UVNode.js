@@ -1,69 +1,47 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
+import { addNodeClass } from '../core/Node.js';
+import AttributeNode from '../core/AttributeNode.js';
+import { nodeObject } from '../shadernode/ShaderNode.js';
 
-import { TempNode } from '../core/TempNode.js';
-import { NodeLib } from '../core/NodeLib.js';
+class UVNode extends AttributeNode {
 
-function UVNode( index ) {
+	constructor( index = 0 ) {
 
-	TempNode.call( this, 'v2', { shared: false } );
+		super( null, 'vec2' );
 
-	this.index = index || 0;
+		this.isUVNode = true;
 
-}
+		this.index = index;
 
-UVNode.prototype = Object.create( TempNode.prototype );
-UVNode.prototype.constructor = UVNode;
-UVNode.prototype.nodeType = "UV";
+	}
 
-UVNode.prototype.generate = function ( builder, output ) {
+	getAttributeName( /*builder*/ ) {
 
-	builder.requires.uv[ this.index ] = true;
+		const index = this.index;
 
-	var uvIndex = this.index > 0 ? this.index + 1 : '';
-	var result = builder.isShader( 'vertex' ) ? 'uv' + uvIndex : 'vUv' + uvIndex;
+		return 'uv' + ( index > 0 ? index : '' );
 
-	return builder.format( result, this.getType( builder ), output );
+	}
 
-};
+	serialize( data ) {
 
-UVNode.prototype.copy = function ( source ) {
-
-	TempNode.prototype.copy.call( this, source );
-
-	this.index = source.index;
-
-	return this;
-
-};
-
-UVNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
+		super.serialize( data );
 
 		data.index = this.index;
 
 	}
 
-	return data;
+	deserialize( data ) {
 
-};
+		super.deserialize( data );
 
-NodeLib.addKeyword( 'uv', function () {
+		this.index = data.index;
 
-	return new UVNode();
+	}
 
-} );
+}
 
-NodeLib.addKeyword( 'uv2', function () {
+export default UVNode;
 
-	return new UVNode( 1 );
+export const uv = ( ...params ) => nodeObject( new UVNode( ...params ) );
 
-} );
-
-export { UVNode };
+addNodeClass( UVNode );

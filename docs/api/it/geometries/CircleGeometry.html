@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name] è una forma semplice della geometria Euclidea.
+      È costruita a partire da una serie di segmenti triangolari orientati intorno ad un punto centrale, che si estendono fino ad un determinato raggio.
+      È costruita in senso antiorario a partire da un angolo iniziale e da un angolo centrale dato.
+      Può essere utilizzata anche per creare poligoni regolari, dove il numero di segmenti determina il numero di lati.
+		</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#CircleGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const geometry = new THREE.CircleGeometry( 5, 32 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		const circle = new THREE.Mesh( geometry, material );
+		scene.add( circle );
+		</code>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]([param:Float radius], [param:Integer segments], [param:Float thetaStart], [param:Float thetaLength])</h3>
+		<p>
+		radius — Raggio del cerchio. Il valore predefinito è 1.<br />
+		segments — Numero di segmenti (triangoli). Il valore minimo è 3. Il valore predefinito è 32.<br />
+		thetaStart — Angolo iniziale per il primo segmento. Il valore predefinito è 0 (posizione ore tre).<br />
+		thetaLength — L'angolo centrale, spesso chiamato theta, del settore circolare. Il valore predefinito è 2*Pi, che crea un cerchio completo.
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:BufferGeometry] per le proprietà comuni.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+      Un oggetto con una proprietà per ognuno dei parametri del costruttore. Qualsiasi modifica dopo l'istanziazione non cambia la geometria.
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:BufferGeometry] per i metodi comuni.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

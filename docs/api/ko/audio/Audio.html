@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			위치가 지정되지 않은 (전역) 오디오 오브젝트.<br /><br />
+
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API]를 사용합니다.
+		</p>
+
+		<h2>코드 예제</h2>
+
+		<code>
+		// create an AudioListener and add it to the camera
+		const listener = new THREE.AudioListener();
+		camera.add( listener );
+
+		// create a global audio source
+		const sound = new THREE.Audio( listener );
+
+		// load a sound and set it as the Audio object's buffer
+		const audioLoader = new THREE.AudioLoader();
+		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
+			sound.setBuffer( buffer );
+			sound.setLoop( true );
+			sound.setVolume( 0.5 );
+			sound.play();
+		});
+		</code>
+
+		<h2>예제</h2>
+
+		<p>
+			[example:webaudio_sandbox webaudio / sandbox ]<br />
+			[example:webaudio_visualizer webaudio / visualizer ]
+		</p>
+
+		<h2>생성자</h2>
+
+
+		<h3>[name]( [param:AudioListener listener] )</h3>
+		<p>
+		리스너 — (필수) [page:AudioListener AudioListener] 인스턴스.
+		</p>
+
+
+		<h2>프로퍼티</h2>
+
+		<h3>[property:Boolean autoplay]</h3>
+		<p>자동으로 재생할지에 대한 설정. 기본값은 *false*입니다.</p>
+
+		<h3>[property:AudioContext context]</h3>
+		<p>생성자로 만들어진 [page:AudioListener listener]의 [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext].</p>
+
+		<h3>[property:Number detune]</h3>
+		<p>피치를 조정하며 100 단위로 조절합니다. +/- 100 은 세미톤 조절. +/- 1200 은 옥타브 조절. 기본값은 *0*입니다.</p>
+
+		<h3>[property:Array filters]</h3>
+		<p>Represents an array of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioNode AudioNodes]. Can be used to apply a variety of low-order filters to create more complex sound effects.
+			In most cases, the array contains instances of [link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNodes]. Filters are set via [page:Audio.setFilter] or [page:Audio.setFilters].</p>
+
+		<h3>[property:GainNode gain]</h3>
+		<p> [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createGain AudioContext.createGain]()를 사용해 만들어진 [link:https://developer.mozilla.org/en-US/docs/Web/API/GainNode GainNode].</p>
+
+		<h3>[property:Boolean hasPlaybackControl]</h3>
+		<p>[page:Audio.play play](), [page:Audio.pause pause]()등의 메서드를 통해 재생 컨트롤이 가능한지에 대한 값. 기본값은 *true*입니다.</p>
+
+		<h3>[property:Boolean isPlaying]</h3>
+		<p>오지오가 현재 재생중인지에 대한 값입니다.</p>
+
+		<h3>[property:AudioListener listener]</h3>
+		<p>이 오디오의 리스터 오브젝트 자료입니다.</p>
+
+		<h3>[property:Number playbackRate]</h3>
+		<p>재생 속도. 기본값은 *1*입니다.</p>
+
+		<h3>[property:Number offset]</h3>
+		<p>재생이 시작돼야 하는 오디오 버퍼 안의 시간 오프셋입니다. [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start]()의 *offset* 파라미터와 동일. 기본값은 *0*입니다.</p>
+
+		<h3>[property:Number duration]</h3>
+		<p>오디오 길이를 오버라이드합니다. [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start]()의 *duration* 파라미터와 동일. 전체 버퍼 재생을 위한 기본값은 *undefined*입니다.</p>
+
+		<h3>[property:AudioNode source]</h3>
+		<p>
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createBufferSource AudioContext.createBufferSource]()로 생성된
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode AudioBufferSourceNode]입니다.
+		</p>
+
+		<h3>[property:String sourceType]</h3>
+		<p>오디오 소스 타입. 기본값은 문자열 'empty'.</p>
+
+		<h3>[property:String type]</h3>
+		<p>타입 표시 문자열을 표시, 'Audio'로 설정합니다.</p>
+
+
+		<h2>메서드</h2>
+
+		<h3>[method:this connect]()</h3>
+		<p>
+		[page:Audio.source]에 연결합니다. 시작 및 필터 설정/제거 시에 내부적으로 사용됩니다.
+		</p>
+
+		<h3>[method:this disconnect]()</h3>
+		<p>
+		[page:Audio.source] 연결을 해제합니다. 필터 설정/제거 시에 내부적으로 사용됩니다.
+		</p>
+
+		<h3>[method:BiquadFilterNode getFilter]()</h3>
+		<p>
+		[page:Audio.filters filters] 배열의 첫 번째 요소를 리턴합니다.
+		</p>
+
+		<h3>[method:Array getFilters]()</h3>
+		<p>
+		[page:Audio.filters filters] 배열을 리턴합니다.
+		</p>
+
+		<h3>[method:Boolean getLoop]()</h3>
+		<p>
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop source.loop]값을 리턴합니다(재생이 반복되는지).
+		</p>
+
+		<h3>[method:GainNode getOutput]()</h3>
+		<p>
+		[page:Audio.gain gainNode]를 리턴합니다.
+		</p>
+
+		<h3>[method:Float getPlaybackRate]()</h3>
+		<p>
+		[page:Audio.playbackRate playbackRate]의 값을 리턴합니다.
+		</p>
+
+		<h3>[method:Float getVolume]( value )</h3>
+		<p>
+		현재 볼륨을 리턴합니다.
+		</p>
+
+		<h3>[method:this play]( delay )</h3>
+		<p>
+		[page:Audio.hasPlaybackControl hasPlaybackControl]가 true면, 재생을 시작합니다.
+		</p>
+
+		<h3>[method:this pause]()</h3>
+		<p>
+		[page:Audio.hasPlaybackControl hasPlaybackControl]가 true면, 재생을 멈춥니다.
+		</p>
+
+		<h3>[method:undefined onEnded]()</h3>
+		<p>
+		재생이 끝나면 자동으로 호출됩니다.
+		</p>
+
+		<h3>[method:this setBuffer]( audioBuffer )</h3>
+		<p>
+		[page:Audio.source source]를 audioBuffer에 설치하고, [page:Audio.sourceType sourceType]를 'buffer'에 설정합니다.<br />
+		[page:Audio.autoplay autoplay]의 경우에는 재생도 시작합니다.
+		</p>
+
+		<h3>[method:this setFilter]( filter )</h3>
+		<p>
+		Applies a single filter node to the audio.
+		</p>
+
+		<h3>[method:this setFilters]( [param:Array value] )</h3>
+		<p>
+		value - arrays of filters.<br />
+		Applies an array of filter nodes to the audio.
+		</p>
+
+		<h3>[method:this setLoop]( [param:Boolean value] )</h3>
+		<p>
+		*value*를 [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop source.loop]로 설정합니다(재생이 반복되는지).
+		</p>
+
+		<h3>[method:this setLoopStart]( [param:Float value] )</h3>
+		<p>
+		*value*를 [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopStart source.loopStart]로 설정합니다.
+		</p>
+
+		<h3>[method:this setLoopEnd]( [param:Float value] )</h3>
+		<p>
+		*value*를 [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopEnd source.loopEnd]로 설정합니다.
+		</p>
+
+		<h3>[method:this setMediaElementSource]( mediaElement )</h3>
+		<p>
+		이 오디오 소스에 [link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement HTMLMediaElement]타입의 오브젝트를 적용합니다.<br />
+		[page:Audio.hasPlaybackControl hasPlaybackControl]를 false로 설정합니다.
+		</p>
+
+		<h3>[method:this setMediaStreamSource]( mediaStream )</h3>
+		<p>
+		이 오디오 소스에 [link:https://developer.mozilla.org/en-US/docs/Web/API/MediaStream MediaStream]타입의 오브젝트를 적용합니다.<br />
+		[page:Audio.hasPlaybackControl hasPlaybackControl]를 false로 설정합니다.
+		</p>
+
+		<h3>[method:this setNodeSource]( audioNode )</h3>
+		<p>
+		audioBuffer에 [page:Audio.source source]를 설치하고 'audioNode'를 [page:Audio.sourceType sourceType]로 설정합니다.<br />
+		[page:Audio.hasPlaybackControl hasPlaybackControl]를 false로 설정합니다.
+		</p>
+
+		<h3>[method:this setPlaybackRate]( [param:Float value] )</h3>
+		<p>
+		[page:Audio.hasPlaybackControl hasPlaybackControl]이 활성화되어 있으면 *value*를 [page:Audio.playbackRate playbackRate]로 설정합니다.
+		</p>
+
+		<h3>[method:this setVolume]( [param:Float value] )</h3>
+		<p>
+		볼륨을 설정합니다.
+		</p>
+
+		<h3>[method:this stop]()</h3>
+		<p>
+		[page:Audio.hasPlaybackControl hasPlaybackControl]가 활성화되어 있으면 재생을 중단합니다.
+		</p>
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

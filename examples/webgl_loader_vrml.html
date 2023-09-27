@@ -12,23 +12,36 @@
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - VRML loader
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { VRMLLoader } from './jsm/loaders/VRMLLoader.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { VRMLLoader } from 'three/addons/loaders/VRMLLoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			var camera, scene, renderer, stats, controls, loader;
+			let camera, scene, renderer, stats, controls, loader;
 
-			var params = {
+			const params = {
 				asset: 'house'
 			};
 
-			var assets = [
+			const assets = [
 				'creaseAngle',
 				'crystal',
 				'house',
@@ -44,7 +57,7 @@
 				'points',
 			];
 
-			var vrmlScene;
+			let vrmlScene;
 
 			init();
 			animate();
@@ -59,10 +72,10 @@
 
 				// light
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
-				scene.add( hemiLight );
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 1.2 );
+				scene.add( ambientLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 2.0 );
 				dirLight.position.set( 200, 200, 200 );
 				scene.add( dirLight );
 
@@ -90,11 +103,11 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
-				var gui = new GUI( { width: 300 } );
+				const gui = new GUI();
 				gui.add( params, 'asset', assets ).onChange( function ( value ) {
 
 					if ( vrmlScene ) {

@@ -26,7 +26,7 @@ Every command needs a constructor. In the constructor
 
 ```javascript
 
-var DoSomethingCommand = function ( editor ) {
+function DoSomethingCommand( editor ) {
 
 	Command.call( this, editor ); // Required: Call default constructor
 
@@ -36,7 +36,7 @@ var DoSomethingCommand = function ( editor ) {
 	// TODO: store all the relevant information needed to
 	// restore the old and the new state
 
-};
+}
 ```
 
 And as part of the prototype you need to implement four functions
@@ -126,7 +126,7 @@ The idea behind 'updatable commands' is that two commands of the same type which
 within a short period of time should be merged into one.
 **For example:** Dragging with your mouse over the x-position field in the sidebar
 leads to hundreds of minor changes to the x-position.
-The user expectation is not to undo every single change that happened while he dragged
-the mouse cursor but rather to go back to the position before he started to drag his mouse.
+The user expectation is not to undo every single change that happened while they dragged
+the mouse cursor but rather to go back to the position before they started to drag their mouse.
 
 When editing a script the changes are also merged into one undo-step.

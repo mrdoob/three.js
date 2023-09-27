@@ -64,6 +64,21 @@ body {
 	word-break: break-word;
 }
 
+body.rtl h1,
+body.rtl h2,
+body.rtl h3,
+body.rtl h4,
+body.rtl p,
+body.rtl ul,
+body.rtl ol,
+body.rtl table {
+	direction: rtl !important;
+}
+body.rtl code {
+	direction: ltr !important;
+	text-align: initial;
+}
+
 a {
 	color: var(--color-blue);
 	cursor: pointer;
@@ -100,7 +115,8 @@ p,
 div,
 table,
 ol,
-ul {
+ul,
+summary {
 	margin-top: 16px;
 	margin-bottom: 16px;
 }
@@ -236,6 +252,7 @@ a.param:hover {
 
 
 @media all and ( min-width: 1700px ) {
+
 	:root {
 		--panel-width: 360px;
 		--font-size: 18px;
@@ -244,10 +261,12 @@ a.param:hover {
 		--page-padding: 28px;
 		--icon-size: 24px;
 	}
+
 	h1 {
 		font-size: 42px;
 		line-height: 50px;
 	}
+
 	h2 {
 		font-size: 32px;
 		line-height: 40px;
@@ -257,15 +276,18 @@ a.param:hover {
 		font-size: 24px;
 		line-height: 32px;
 	}
+
 }
 
 /* mobile */
 
 @media all and ( max-width: 640px ) {
+
 	:root {
 		--page-padding: 16px;
 		--icon-size: 24px;
 	}
+
 	body {
 		padding: var(--page-padding);
 	}
@@ -287,4 +309,5 @@ a.param:hover {
 		font-size: 20px;
 		line-height: 28px;
 	}
+
 }

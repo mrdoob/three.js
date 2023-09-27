@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js - playground</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" href="fonts/open-sans/open-sans.css" type="text/css"/>
+		<link rel="stylesheet" href="fonts/tabler-icons/tabler-icons.min.css" type="text/css"/>
+		<style>
+
+			body {
+				overflow: hidden;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				margin: 0;
+				position: fixed;
+				overscroll-behavior: none;
+			}
+
+			.renderer {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 100%;
+				width: 100%;
+			}
+
+			flow {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 100%;
+				width: 100%;
+				box-shadow: inset 0 0 20px 0px #000000;
+				pointer-events: none;
+			}
+
+			flow > * {
+				pointer-events: auto;
+			}
+
+			flow f-canvas.focusing {
+				pointer-events: none;
+			}
+
+			flow f-canvas:not(.focusing) {
+				background: #191919ed;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<script src="https://cdn.jsdelivr.net/npm/monaco-editor@latest/min/vs/loader.min.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "../examples/jsm/",
+					"three/nodes": "../examples/jsm/nodes/Nodes.js",
+					"flow": "./libs/flow.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { nodeFrame } from 'three/addons/renderers/webgl-legacy/nodes/WebGLNodes.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+
+			import { NodeEditor } from './NodeEditor.js';
+
+			let camera, scene, renderer, composer;
+			let nodeEditor;
+
+			init();
+
+			async function init() {
+
+				const urlParams = new URLSearchParams( window.location.search );
+				const backend = urlParams.get( 'backend' );
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.5, 60 );
+				camera.position.set( 0.0, 3, 4 * 3 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x333333 );
+
+				//
+
+				if ( backend === 'webgpu' ) {
+
+					const { default: WebGPU } = await import( 'three/addons/capabilities/WebGPU.js' );
+					const { default: WebGPURenderer } = await import( 'three/addons/renderers/webgpu/WebGPURenderer.js' );
+
+					renderer = new WebGPURenderer();
+
+					if ( WebGPU.isAvailable() === false ) {
+
+						document.body.appendChild( WebGPU.getErrorMessage() );
+
+						throw new Error( 'No WebGPU support' );
+
+					}
+
+				} else {
+
+					renderer = new THREE.WebGLRenderer( { antialias: true } );
+					renderer.useLegacyLights = false;
+
+					composer = new EffectComposer( renderer );
+					composer.addPass( new RenderPass( scene, camera ) );
+
+				}
+
+				//
+
+				renderer.setAnimationLoop( render );
+				renderer.toneMapping = THREE.LinearToneMapping;
+				renderer.toneMappingExposure = 1;
+				document.body.appendChild( renderer.domElement );
+
+				renderer.domElement.className = 'renderer';
+
+				//
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 30;
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				initEditor();
+
+				onWindowResize();
+
+			}
+
+			function initEditor() {
+
+				nodeEditor = new NodeEditor( scene, renderer, composer );
+
+				nodeEditor.addEventListener( 'new', () => {
+
+					//renderer.dispose();
+
+				} );
+
+				document.body.appendChild( nodeEditor.domElement );
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				if ( composer ) composer.setSize( width, height );
+
+				nodeEditor.setSize( width, height );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				if ( renderer.isWebGLRenderer ) nodeFrame.update();
+
+				render();
+
+			}
+
+			function render() {
+
+				if ( composer && composer.passes.length > 1 ) composer.render();
+				else renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

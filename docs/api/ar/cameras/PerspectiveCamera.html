@@ -1,0 +1,219 @@
+!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Camera] &rarr;
+
+		<h1>[name]</h1>
+		<p class="desc">
+			كاميرا تستخدم تصوير منظوري 
+			[link:https://en.wikipedia.org/wiki/Perspective_(graphical) Perspective Projection].
+			تم تصميم هذا الوضع لمحاكاة الطريقة التي يرى بها العين البشرية. 
+			وهو أكثر أنماط التصوير استخدامًا لإظهار مشهد ثلاثي الأبعاد.
+		</p>
+
+		<h2>مثال للكود</h2>
+
+		<code>
+		const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+		scene.add( camera );
+		</code>
+
+		<h2>أمثلة (Examples)</h2>
+		<p>
+			[example:webgl_animation_skinning_blending animation / skinning / blending]<br />
+			[example:webgl_animation_skinning_morph animation / skinning / morph ]<br />
+			[example:webgl_effects_stereo effects / stereo ]<br />
+			[example:webgl_interactive_cubes interactive / cubes ]<br />
+			[example:webgl_loader_collada_skinning loader / collada / skinning ]
+		</p>
+
+		<h2>المنشئ (Constructor)</h2>
+
+		<h3>[name]( [param:Number fov], [param:Number aspect], [param:Number near], [param:Number far] )</h3>
+		<p>
+			fov — زاوية مجال الرؤية الرأسية للكاميرا.<br />
+			aspect — نسبة العرض إلى الارتفاع للكاميرا.<br />
+			near — سطح الهرم الأمامي للكاميرا.<br />
+			far — سطح الهرم الخلفي للكاميرا.<br /><br />
+			معًا، يحدد هذه العناصر هرم الرؤية	للكاميرا.
+			[link:https://en.wikipedia.org/wiki/Viewing_frustum هرم الرؤية]
+		</p>
+
+		<h2>الخصائص (Properties)</h2>
+		<p>
+			يرجى الرجوع إلى صفحة [page:Camera] الأساسية للحصول على الخصائص الشائعة.<br />
+			يرجى ملاحظة أنه بعد إجراء تغييرات على معظم هذه الخصائص، ستحتاج
+			إلى استدعاء [page:PerspectiveCamera.updateProjectionMatrix .updateProjectionMatrix] لجعل التغييرات سارية المفعول.
+		</p>
+
+		<h3>[property:Float aspect]</h3>
+		<p>
+			نسبة العرض إلى الارتفاع لسطح الهرم الرؤية (frustum) للكاميرا، وعادةً ما يكون العرض الخاص باللوحة السينمائية / الشاشة مقسومًا على ارتفاعها. 
+			العدد الافتراضي هو `1` (لوحة سينمائية مربعة).
+		</p>
+
+		<h3>[property:Float far]</h3>
+		<p>
+			سطح الهرم الخلفي لسطح الرؤية (frustum) للكاميرا. العدد الافتراضي هو `2000`.<br /><br />
+			يجب أن يكون أكبر من القيمة الحالية لسطح الهرم الأمامي [page:.near near].
+		</p>
+
+		<h3>[property:Float filmGauge]</h3>
+		<p>
+			حجم الفيلم المستخدم للمحور الأكبر. العدد الافتراضي هو 35 (ملم). 
+			لا يؤثر هذا المعلم على مصفوفة الإسقاط إلا إذا تم تعيين 
+			.filmOffset إلى قيمة غير صفر.
+		</p>
+
+		<h3>[property:Float filmOffset]</h3>
+		<p>
+			الإزاحة الأفقية غير المركزة في نفس وحدة `.filmGauge`. العدد الافتراضي هو 
+			`0`.
+		</p>
+
+		<h3>[property:Float focus]</h3>
+		<p>
+			مسافة الكائن المستخدمة لتحقيق تأثيرات الإسقاط المتزامن والعمق الحقيقي. 
+			هذا المعلم لا يؤثر على مصفوفة الإسقاط إلا إذا تم استخدام [page:StereoCamera]. 
+			العدد الافتراضي هو `10`.
+		</p>
+
+		<h3>[property:Float fov]</h3>
+		<p>
+			زاوية مجال الرؤية الرأسية لسطح الهرم الرؤية (frustum) للكاميرا، من أسفل الرؤية إلى أعلى الرؤية، بالدرجات. 
+			العدد الافتراضي هو `50`.
+		</p>
+
+		<h3>[property:Boolean isPerspectiveCamera]</h3>
+		<p>علامة تحقق للتحقق مما إذا كان الكائن المعطى من نوع [name]. هذه العلامة لا يمكن تعديلها.</p>
+
+		<h3>[property:Float near]</h3>
+		<p>
+			سطح الهرم الأمامي لسطح الرؤية (frustum) للكاميرا. 
+			العدد الافتراضي هو `0.1`.<br /><br />
+			النطاق الصحيح هو أكبر من `0` وأقل من القيمة الحالية لسطح الهرم الخلفي [page:.far far]. 
+			يرجى ملاحظة أنه، على عكس الكاميرا المسطحة 
+			[page:OrthographicCamera]، القيمة `0` ليست قيمة صالحة لسطح الهرم الأمامي لكاميرا من نوع PerspectiveCamera.
+		</p>
+
+		<h3>[property:Object view]</h3>
+		<p>
+			مواصفات نافذة هرم الرؤية (frustum) أو `null`.
+			يتم تعيين هذا باستخدام طريقة [page:PerspectiveCamera.setViewOffset .setViewOffset] 
+			ويتم مسحها باستخدام [page:PerspectiveCamera.clearViewOffset .clearViewOffset].
+		</p>
+
+		<h3>[property:number zoom]</h3>
+		<p>يتم الحصول على قيمة عامل التكبير أو تعيينها للكاميرا. العدد الافتراضي هو `1`.</p>
+
+		<h2>الوظائف (Methods)</h2>
+		<p>يرجى الرجوع إلى صفحة [page:Camera] الأساسية للحصول على الأساليب الشائعة.</p>
+
+		<h3>[method:undefined clearViewOffset]()</h3>
+		<p>تزيل أي إزاحة تم تعيينها باستخدام طريقة [page:PerspectiveCamera.setViewOffset .setViewOffset].</p>
+
+		<h3>[method:Float getEffectiveFOV]()</h3>
+		<p>تُرجع زاوية مجال الرؤية الرأسية الحالية بالدرجات باعتبار .zoom.</p>
+
+		<h3>[method:Float getFilmHeight]()</h3>
+		<p>
+			تُرجع ارتفاع الصورة على الفيلم. إذا كان 
+			.aspect أقل من الواحد (تنسيق صورة عمودي)، فإن النتيجة تساوي .filmGauge.
+		</p>
+
+		<h3>[method:Float getFilmWidth]()</h3>
+		<p>
+			تُرجع عرض الصورة على الفيلم. إذا كان 
+			.aspect أكبر من أو يساوي الواحد (تنسيق صورة أفقي)، فإن النتيجة تساوي .filmGauge.
+		</p>
+
+		<h3>[method:Float getFocalLength]()</h3>
+		<p>
+			تُرجع البعد البؤري للـ .fov الحالي بالنسبة لـ .filmGauge.
+		</p>
+
+		<h3>[method:undefined setFocalLength]( [param:Float focalLength] )</h3>
+		<p>
+			يتم تعيين الـ FOV بواسطة البعد البؤري بالنسبة لـ 
+			.filmGauge الحالي لـ[page:PerspectiveCamera].<br /><br />
+			بشكل افتراضي، يتم تحديد البعد البؤري للكاميرا بحجم 35 مم (إطار كامل).
+		</p>
+
+		<h3>[method:undefined setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
+		<p>
+			fullWidth — العرض الكامل لإعداد العرض المتعدد<br />
+			fullHeight — الارتفاع الكامل لإعداد العرض المتعدد<br />
+			x — الإزاحة الأفقية للكاميرا الفرعية<br />
+			y — الإزاحة الرأسية للكاميرا الفرعية<br />
+			width — عرض الكاميرا الفرعية<br />
+			height — ارتفاع الكاميرا الفرعية
+		</p>
+
+		<p>
+			يضبط الإزاحة في هرم الرؤية الأكبر. 
+			هذا مفيد لإعدادات النوافذ المتعددة أو إعدادات متعددة الشاشات/الأجهزة.
+		</p>
+
+		<p>
+			على سبيل المثال، إذا كان لديك 3x2 شاشة 
+			وكانت كل شاشة 1920x1080 وكانت الشاشات في شبكة مثل هذه:<br />
+		</p>
+
+		<pre>
++---+---+---+
+| A | B | C |
++---+---+---+
+| D | E | F |
++---+---+---+
+		</pre>
+
+		فمن أجل كل شاشة، ستقوم بالاستدعاء بهذا الشكل:<br />
+
+		<code>const w = 1920;
+const h = 1080;
+const fullWidth = w * 3;
+const fullHeight = h * 2;
+
+// A
+camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
+// B
+camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
+// C
+camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
+// D
+camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
+// E
+camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
+// F
+camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
+</code>
+		
+		<p>يرجى ملاحظة أنه لا يوجد سبب لأن تكون الشاشات بحجم متساوٍ أو متوضعة على شكل شبكة. يمكن توزيعها بأي شكل يناسب الاحتياجات المحددة.</p>
+
+		<h3>[method:undefined updateProjectionMatrix]()</h3>
+		<p>
+			يقوم بتحديث مصفوفة الإسقاط الخاصة بالكاميرا، ويجب استدعاءها بعد أي تغيير في 
+			المعاملات.
+		</p>
+
+		<h3>[method:Object toJSON]([param:Object meta])</h3>
+		<p>
+			meta -- كائن يحتوي على بيانات وصفية مثل القوام أو الصور في الكائنات 
+			الفرعية.<br />
+			يمكن تحويل الكاميرا إلى تنسيق three.js 
+			[link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
+		</p>
+
+		<h2>المصدر (Source)</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+
+	</body>
+</html>

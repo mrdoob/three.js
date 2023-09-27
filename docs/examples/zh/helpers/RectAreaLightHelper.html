@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,11 +15,22 @@
 			创建一个表示 [page:RectAreaLight] 的辅助对象.
 		</p>
 
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
+		</code>
+
 		<h2>代码示例</h2>
 
 		<code>
-		var light = new THREE.RectAreaLight( 0xffffbb, 1.0, 5, 5 );
-		var helper = new RectAreaLightHelper( light );
+		const light = new THREE.RectAreaLight( 0xffffbb, 1.0, 5, 5 );
+		const helper = new RectAreaLightHelper( light );
 		scene.add( helper );
 		</code>
 
@@ -51,12 +61,8 @@
 		<h2>方法</h2>
 		<p>请到基类 [page:Object3D] 页面查看公共方法.</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>销毁该区域光源辅助对象.</p>
-
-		<h3>[method:null update]()</h3>
-		<p>更新辅助对象，与 [page:.light] 属性的位置和方向保持一致.</p>
-
 
 		<h2>源码</h2>
 

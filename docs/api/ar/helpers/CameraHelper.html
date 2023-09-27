@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			هذا يساعد في تصور ما يحتويه الكاميرا في مخروط الرؤية الخاص بها. يُصوِّر
+			مخروط الرؤية للكاميرا باستخدام [page:LineSegments].<br /><br />
+			يجب أن يكون [name] طفلًا للمشهد.
+		</p>
+			
+		<h2>مثال الكود</h2>
+		<code>
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+const helper = new THREE.CameraHelper( camera );
+scene.add( helper );
+		</code>
+
+		<h2>أمثلة (Examples)</h2>
+		<p>
+		[example:webgl_camera WebGL / camera]<br />
+		[example:webgl_geometry_extrude_splines WebGL / extrude / splines]
+		</p>
+		
+		<h2>المنشئ (Constructor)</h2>
+		<h3>[name]( [param:Camera camera] )</h3>
+		<p>
+		[page:Camera camera] -- الكاميرا المراد تصويرها.<br /><br />
+		
+		ينشئ [Name] جديدًا للكاميرا المحددة.
+		</p>
+		
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى الفئة الأساسية [page:LineSegments] للحصول على الخصائص المشتركة.</p>
+		
+		<h3>[property:Camera camera]</h3>
+		<p>الكاميرا المُعروضة.</p>
+		
+		<h3>[property:Object pointMap]</h3>
+		<p>يحتوي هذا على النقاط المستخدمة لتصوير الكاميرا.</p>
+		
+		<h3>[property:Object matrix]</h3>
+		<p>إشارة إلى [page:Object3D.matrixWorld camera.matrixWorld].</p>
+		
+		<h3>[property:Object matrixAutoUpdate]</h3>
+		<p>
+		انظر [page:Object3D.matrixAutoUpdate]. تعيين إلى `false` هنا كما يستخدم المساعد
+		[page:Object3D.matrixWorld matrixWorld] الخاص بالكاميرا.
+		</p>
+		
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى الفئة الأساسية [page:LineSegments] للحصول على الطرق المشتركة.</p>
+		
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		يُطلِق الموارد المتعلقة بوحدة معالجة الرسومات التي تم تخصيصها من قبل هذه العيّنة. اتصل بهذه
+		الطريقة كلما لم يعد هذه العيّنة مستخدمة في تطبيقك.
+		</p>
+		
+		<h3>
+		[method:this setColors]( [param:Color frustum], [param:Color cone], [param:Color up], [param:Color target], [param:Color cross] )
+		</h3>
+		<p>يحدد ألوان المساعد.</p>
+		
+		<h3>[method:undefined update]()</h3>
+		<p>يُحدِّث المساعد بناءً على projectionMatrix للكاميرا.</p>
+		
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

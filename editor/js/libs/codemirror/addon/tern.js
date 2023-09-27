@@ -1,5 +1,5 @@
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
-// Distributed under an MIT license: http://codemirror.net/LICENSE
+// Distributed under an MIT license: https://codemirror.net/LICENSE
 
 // Glue code between CodeMirror and Tern.
 //
@@ -29,7 +29,6 @@
 //   queries.
 // * responseFilter: A function(doc, query, request, error, data) that
 //   will be applied to the Tern responses before treating them
-// * caseInsensitive: boolean to send case insensitive querys to tern
 //
 //
 // It is possible to run the Tern server in a web worker by specifying
@@ -60,6 +59,7 @@
     this.options = options || {};
     var plugins = this.options.plugins || (this.options.plugins = {});
     if (!plugins.doc_comment) plugins.doc_comment = true;
+    this.docs = Object.create(null);
     if (this.options.useWorker) {
       this.server = new WorkerServer(this);
     } else {
@@ -70,7 +70,6 @@
         plugins: plugins
       });
     }
-    this.docs = Object.create(null);
     this.trackChange = function(doc, change) { trackChange(self, doc, change); };
 
     this.cachedArgHints = null;
@@ -125,6 +124,8 @@
       var self = this;
       var doc = findDoc(this, cm.getDoc());
       var request = buildRequest(this, doc, query, pos);
+      var extraOptions = request.query && this.options.queryOptions && this.options.queryOptions[request.query.type]
+      if (extraOptions) for (var prop in extraOptions) request.query[prop] = extraOptions[prop];
 
       this.server.request(request, function (error, data) {
         if (!error && self.options.responseFilter)
@@ -134,6 +135,7 @@
     },
 
     destroy: function () {
+      closeArgHints(this)
       if (this.worker) {
         this.worker.terminate();
         this.worker = null;
@@ -177,7 +179,7 @@
     var data = findDoc(ts, doc);
 
     var argHints = ts.cachedArgHints;
-    if (argHints && argHints.doc == doc && cmpPos(argHints.start, change.to) <= 0)
+    if (argHints && argHints.doc == doc && cmpPos(argHints.start, change.to) >= 0)
       ts.cachedArgHints = null;
 
     var changed = data.changed;
@@ -203,7 +205,7 @@
   // Completion
 
   function hint(ts, cm, c) {
-    ts.request(cm, {type: "completions", types: true, docs: true, urls: true, caseInsensitive: ts.options.caseInsensitive}, function(error, data) {
+    ts.request(cm, {type: "completions", types: true, docs: true, urls: true}, function(error, data) {
       if (error) return showError(ts, cm, error);
       var completions = [], after = "";
       var from = data.start, to = data.end;
@@ -215,7 +217,7 @@
         var completion = data.completions[i], className = typeToIcon(completion.type);
         if (data.guess) className += " " + cls + "guess";
         completions.push({text: completion.name + after,
-                          displayText: completion.name,
+                          displayText: completion.displayName || completion.name,
                           className: className,
                           data: completion});
       }
@@ -229,8 +231,7 @@
         var content = ts.options.completionTip ? ts.options.completionTip(cur.data) : cur.data.doc;
         if (content) {
           tooltip = makeTooltip(node.parentNode.getBoundingClientRect().right + window.pageXOffset,
-                                node.getBoundingClientRect().top + window.pageYOffset, content);
-          tooltip.className += " " + cls + "hint-doc";
+                                node.getBoundingClientRect().top + window.pageYOffset, content, cm, cls + "hint-doc");
         }
       });
       c(obj);
@@ -265,7 +266,7 @@
           child.target = "_blank";
         }
       }
-      tempTooltip(cm, tip);
+      tempTooltip(cm, tip, ts);
       if (c) c();
     }, pos);
   }
@@ -304,7 +305,7 @@
     ts.request(cm, {type: "type", preferFunction: true, end: start}, function(error, data) {
       if (error || !data.type || !(/^fn\(/).test(data.type)) return;
       ts.cachedArgHints = {
-        start: pos,
+        start: start,
         type: parseFnType(data.type),
         name: data.exprName || data.name || "fn",
         guess: data.guess,
@@ -332,7 +333,11 @@
     tip.appendChild(document.createTextNode(tp.rettype ? ") ->\u00a0" : ")"));
     if (tp.rettype) tip.appendChild(elt("span", cls + "type", tp.rettype));
     var place = cm.cursorCoords(null, "page");
-    ts.activeArgHints = makeTooltip(place.right + 1, place.bottom, tip);
+    var tooltip = ts.activeArgHints = makeTooltip(place.right + 1, place.bottom, tip, cm)
+    setTimeout(function() {
+      tooltip.clear = onEditorActivity(cm, function() {
+        if (ts.activeArgHints == tooltip) closeArgHints(ts) })
+    }, 20)
   }
 
   function parseFnType(text) {
@@ -443,7 +448,7 @@
 
   function atInterestingExpression(cm) {
     var pos = cm.getCursor("end"), tok = cm.getTokenAt(pos);
-    if (tok.start < pos.ch && (tok.type == "comment" || tok.type == "string")) return false;
+    if (tok.start < pos.ch && tok.type == "comment") return false;
     return /[\w)\]]/.test(cm.getLine(pos.line).slice(Math.max(pos.ch - 1, 0), pos.ch + 1));
   }
 
@@ -465,11 +470,12 @@
     ts.request(cm, {type: "refs"}, function(error, data) {
       if (error) return showError(ts, cm, error);
       var ranges = [], cur = 0;
+      var curPos = cm.getCursor();
       for (var i = 0; i < data.refs.length; i++) {
         var ref = data.refs[i];
         if (ref.file == name) {
           ranges.push({anchor: ref.start, head: ref.end});
-          if (cmpPos(cur, ref.start) >= 0 && cmpPos(cur, ref.end) <= 0)
+          if (cmpPos(curPos, ref.start) >= 0 && cmpPos(curPos, ref.end) <= 0)
             cur = ranges.length - 1;
         }
       }
@@ -564,7 +570,7 @@
     return {type: "part",
             name: data.name,
             offsetLines: from.line,
-            text: doc.getRange(from, Pos(endLine, 0))};
+            text: doc.getRange(from, Pos(endLine, end.line == endLine ? null : 0))};
   }
 
   // Generic utilities
@@ -591,41 +597,83 @@
 
   // Tooltips
 
-  function tempTooltip(cm, content) {
+  function tempTooltip(cm, content, ts) {
     if (cm.state.ternTooltip) remove(cm.state.ternTooltip);
     var where = cm.cursorCoords();
-    var tip = cm.state.ternTooltip = makeTooltip(where.right + 1, where.bottom, content);
+    var tip = cm.state.ternTooltip = makeTooltip(where.right + 1, where.bottom, content, cm);
     function maybeClear() {
       old = true;
       if (!mouseOnTip) clear();
     }
     function clear() {
       cm.state.ternTooltip = null;
-      if (!tip.parentNode) return;
-      cm.off("cursorActivity", clear);
-      cm.off('blur', clear);
-      cm.off('scroll', clear);
-      fadeOut(tip);
+      if (tip.parentNode) fadeOut(tip)
+      clearActivity()
     }
     var mouseOnTip = false, old = false;
     CodeMirror.on(tip, "mousemove", function() { mouseOnTip = true; });
     CodeMirror.on(tip, "mouseout", function(e) {
-      if (!CodeMirror.contains(tip, e.relatedTarget || e.toElement)) {
+      var related = e.relatedTarget || e.toElement
+      if (!related || !CodeMirror.contains(tip, related)) {
         if (old) clear();
         else mouseOnTip = false;
       }
     });
-    setTimeout(maybeClear, 1700);
-    cm.on("cursorActivity", clear);
-    cm.on('blur', clear);
-    cm.on('scroll', clear);
+    setTimeout(maybeClear, ts.options.hintDelay ? ts.options.hintDelay : 1700);
+    var clearActivity = onEditorActivity(cm, clear)
   }
 
-  function makeTooltip(x, y, content) {
-    var node = elt("div", cls + "tooltip", content);
+  function onEditorActivity(cm, f) {
+    cm.on("cursorActivity", f)
+    cm.on("blur", f)
+    cm.on("scroll", f)
+    cm.on("setDoc", f)
+    return function() {
+      cm.off("cursorActivity", f)
+      cm.off("blur", f)
+      cm.off("scroll", f)
+      cm.off("setDoc", f)
+    }
+  }
+
+  function makeTooltip(x, y, content, cm, className) {
+    var node = elt("div", cls + "tooltip" + " " + (className || ""), content);
     node.style.left = x + "px";
     node.style.top = y + "px";
-    document.body.appendChild(node);
+    var container = ((cm.options || {}).hintOptions || {}).container || document.body;
+    container.appendChild(node);
+
+    var pos = cm.cursorCoords();
+    var winW = window.innerWidth;
+    var winH = window.innerHeight;
+    var box = node.getBoundingClientRect();
+    var hints = document.querySelector(".CodeMirror-hints");
+    var overlapY = box.bottom - winH;
+    var overlapX = box.right - winW;
+
+    if (hints && overlapX > 0) {
+      node.style.left = 0;
+      var box = node.getBoundingClientRect();
+      node.style.left = (x = x - hints.offsetWidth - box.width) + "px";
+      overlapX = box.right - winW;
+    }
+    if (overlapY > 0) {
+      var height = box.bottom - box.top, curTop = pos.top - (pos.bottom - box.top);
+      if (curTop - height > 0) { // Fits above cursor
+        node.style.top = (pos.top - height) + "px";
+      } else if (height > winH) {
+        node.style.height = (winH - 5) + "px";
+        node.style.top = (pos.bottom - box.top) + "px";
+      }
+    }
+    if (overlapX > 0) {
+      if (box.right - box.left > winW) {
+        node.style.width = (winW - 5) + "px";
+        overlapX -= (box.right - box.left) - winW;
+      }
+      node.style.left = (x - overlapX) + "px";
+    }
+
     return node;
   }
 
@@ -643,11 +691,15 @@
     if (ts.options.showError)
       ts.options.showError(cm, msg);
     else
-      tempTooltip(cm, String(msg));
+      tempTooltip(cm, String(msg), ts);
   }
 
   function closeArgHints(ts) {
-    if (ts.activeArgHints) { remove(ts.activeArgHints); ts.activeArgHints = null; }
+    if (ts.activeArgHints) {
+      if (ts.activeArgHints.clear) ts.activeArgHints.clear()
+      remove(ts.activeArgHints)
+      ts.activeArgHints = null
+    }
   }
 
   function docValue(ts, doc) {

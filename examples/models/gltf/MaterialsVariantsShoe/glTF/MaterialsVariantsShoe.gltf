@@ -1,0 +1,393 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "count": 13540,
+      "componentType": 5126,
+      "type": "VEC3",
+      "min": [
+        -0.999970018863678,
+        -1,
+        -0.9999949932098388
+      ],
+      "max": [
+        0.999809980392456,
+        0.9999020099639891,
+        0.9999240040779114
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "count": 13540,
+      "componentType": 5126,
+      "type": "VEC3",
+      "min": [
+        -1,
+        -0.5139704942703247,
+        -0.38874176144599915
+      ],
+      "max": [
+        1.0000001192092896,
+        0.5139704942703247,
+        0.38874176144599915
+      ]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "count": 13540,
+      "componentType": 5126,
+      "type": "VEC2",
+      "min": [
+        0.001952999969944358,
+        0.03520399332046509
+      ],
+      "max": [
+        0.9980469942092896,
+        0.9980469942092896
+      ]
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "count": 68100,
+      "componentType": 5125,
+      "type": "SCALAR",
+      "min": [
+        0
+      ],
+      "max": [
+        13539
+      ]
+    }
+  ],
+  "asset": {
+    "generator": "THREE.GLTFExporter",
+    "version": "2.0"
+  },
+  "buffers": [
+    {
+      "name": "shoes-processed",
+      "byteLength": 705680,
+      "uri": "MaterialsVariantsShoe.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 162480,
+      "byteOffset": 0,
+      "byteStride": 12,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 162480,
+      "byteOffset": 162480,
+      "byteStride": 12,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 108320,
+      "byteOffset": 324960,
+      "byteStride": 8,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 272400,
+      "byteOffset": 433280,
+      "target": 34963
+    }
+  ],
+  "scene": 0,
+  "extensions": {
+    "KHR_materials_variants": {
+      "variants": [
+          {"name": "midnight"},
+          {"name": "beach" },
+          {"name": "street" }
+        ]
+    }
+  },
+  "extensionsUsed": [
+    "KHR_materials_variants"
+  ],
+  "images": [
+    {
+      "mimeType": "image/jpeg",
+      "uri": "occlusionRougnessMetalness.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "uri": "diffuseMidnight.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "uri": "normal.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "uri": "diffuseBeach.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "uri": "diffuseStreet.jpg"
+    }
+  ],
+  "materials": [
+    {
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "name": "phong1SG",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "baseColorTexture": {
+          "index": 1,
+          "texCoord": 0
+        },
+        "metallicFactor": 1,
+        "roughnessFactor": 1,
+        "metallicRoughnessTexture": {
+          "index": 0,
+          "texCoord": 0
+        }
+      },
+      "normalTexture": {
+        "index": 2,
+        "scale": 1,
+        "texCoord": 0
+      },
+      "occlusionTexture": {
+        "index": 0,
+        "strength": 1,
+        "texCoord": 0
+      },
+      "emissiveFactor": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "name": "phong1SG",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "baseColorTexture": {
+          "index": 3,
+          "texCoord": 0
+        },
+        "metallicFactor": 1,
+        "roughnessFactor": 1,
+        "metallicRoughnessTexture": {
+          "index": 0,
+          "texCoord": 0
+        }
+      },
+      "normalTexture": {
+        "index": 2,
+        "scale": 1,
+        "texCoord": 0
+      },
+      "occlusionTexture": {
+        "index": 0,
+        "strength": 1,
+        "texCoord": 0
+      },
+      "emissiveFactor": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "alphaMode": "OPAQUE",
+      "doubleSided": false,
+      "name": "phong1SG",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "baseColorTexture": {
+          "index": 4,
+          "texCoord": 0
+        },
+        "metallicFactor": 1,
+        "roughnessFactor": 1,
+        "metallicRoughnessTexture": {
+          "index": 0,
+          "texCoord": 0
+        }
+      },
+      "normalTexture": {
+        "index": 2,
+        "scale": 1,
+        "texCoord": 0
+      },
+      "occlusionTexture": {
+        "index": 0,
+        "strength": 1,
+        "texCoord": 0
+      },
+      "emissiveFactor": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "meshes": [
+    {
+      "name": "shoe",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 0,
+            "POSITION": 1,
+            "TEXCOORD_0": 2
+          },
+          "extensions": {
+            "KHR_materials_variants": {
+              "mappings": [
+                {
+                  "material": 0,
+                  "variants": [
+                    0
+                  ]
+                },
+                {
+                  "material": 1,
+                  "variants": [
+                    1
+                  ]
+                },
+                {
+                  "material": 2,
+                  "variants": [
+                    2
+                  ]
+                }
+              ]
+            }
+          },
+          "indices": 3,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "extras": {
+        "name": "Shoe"
+      },
+      "mesh": 0,
+      "name": "Shoe"
+    },
+    {
+      "children": [
+        0
+      ],
+      "extras": {
+        "name": "g Shoe"
+      },
+      "name": "g_Shoe"
+    },
+    {
+      "children": [
+        1
+      ],
+      "extras": {
+        "name": "Shoe.obj"
+      },
+      "matrix": [
+        0.14893949,
+        0,
+        0,
+        0,
+        0,
+        0.14893949,
+        0,
+        0,
+        0,
+        0,
+        0.14893949,
+        0,
+        0.0016104877,
+        0.07590251,
+        0.0048509985,
+        1
+      ],
+      "name": "Shoeobj"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9985,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9729,
+      "minFilter": 9985,
+      "wrapS": 10497,
+      "wrapT": 10497
+    },
+    {
+      "magFilter": 9729,
+      "minFilter": 9985,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [
+        2
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 1,
+      "source": 1
+    },
+    {
+      "sampler": 2,
+      "source": 2
+    },
+    {
+      "sampler": 0,
+      "source": 3
+    },
+    {
+      "sampler": 0,
+      "source": 4
+    }
+  ]
+}

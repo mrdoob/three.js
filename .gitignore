@@ -6,5 +6,13 @@
 npm-debug.log
 .jshintrc
 .vs/
-**/node_modules
+
 test/unit/build
+test/treeshake/index.bundle.js
+test/treeshake/index.bundle.min.js
+test/treeshake/index-src.bundle.min.js
+test/treeshake/stats.html
+test/e2e/chromium
+test/e2e/output-screenshots
+
+**/node_modules

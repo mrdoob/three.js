@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Una superficie bidimensionale che si estende all'infinito nello spazio 3D, 
+			rappresentata in [link:http://mathworld.wolfram.com/HessianNormalForm.html forma normale Hessiana]
+			da un vettore normale di lunghezza unitaria e una costante.
+		</p>
+
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:Vector3 normal], [param:Float constant] )</h3>
+		<p>
+		[page:Vector3 normal] - (opzionale) un [page:Vector3] di lunghezza unitaria che definisce la normale del piano. Il valore predefinito è *(1, 0, 0)*.<br />
+		[page:Float constant] - (opzionale) la distanza con segno dall'origine al piano. Il valore predefinito è `0`.
+		</p>
+
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Boolean isPlane]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:Vector3 normal]</h3>
+
+		<h3>[property:Float constant]</h3>
+
+		<h2>Metodi</h2>
+
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix], [param:Matrix3 optionalNormalMatrix] )</h3>
+		<p>
+		[page:Matrix4 matrix] - la [Page:Matrix4] da applicare.<br />
+		[page:Matrix3 optionalNormalMatrix] - (opzionale) [Page:Matrix3] normale pre-calcolata della Matrix4 da applicare.<br /><br />
+
+		Applica una Matrix4 al piano. La matrice deve essere una trasformata affine e omogenea.<br />
+		Se si fornisce una [page:Matrix3 optionalNormalMatrix], può essere creata in questo modo:
+		<code>
+		const optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
+		</code>
+		</p>
+
+		<h3>[method:Plane clone]()</h3>
+		<p>Restituisce un nuovo piano con la stessa [page:.normal normal] e [page:.constant constant] di questo piano.</p>
+
+		<h3>[method:Vector3 coplanarPoint]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — il risultato verrà copiato in questo Vector3.<br /><br />
+
+		Restituisce un [page:Vector3] complanare al piano, calcolando la proiezione del vettore normale all'origine sul piano.
+		</p>
+
+		<h3>[method:this copy]( [param:Plane plane] )</h3>
+		<p>
+			Copia i valori delle proprietà [page:.normal normal] e [page:.constant constant] del piano passato in questo piano.
+		</p>
+
+		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
+		<p>Restituisce la distanza con segno dal [page:Vector3 point] al piano.</p>
+
+		<h3>[method:Float distanceToSphere]( [param:Sphere sphere] )</h3>
+		<p>Restituisce la distanza con segno dalla [page:Sphere sphere] al piano.</p>
+
+		<h3>[method:Boolean equals]( [param:Plane plane] )</h3>
+		<p>
+			Controlla se due piani sono uguali (le loro proprietà [page:.normal normal] e
+			[page:.constant constant] coincidono).
+		</p>
+
+		<h3>[method:Vector3 intersectLine]( [param:Line3 line], [param:Vector3 target] )</h3>
+		<p>
+		[page:Line3 line] - [page:Line3] per verificare l'intersezione.<br />
+		[page:Vector3 target] — il risultato verrà copiato in questo Vector3.<br /><br />
+
+		Restituisce il punto di intersezione tra la linea passata e il piano. Restituisce `null`
+		se la linea non interseca il piano. Restituisce il punto di partenza della linea se la 
+		linea è complanare al piano.
+		</p>
+
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - il [page:Box3] per verificare l'intersezione.<br /><br />
+
+		Determina se questo piano interseca il [page:Box3 box] o no.
+		</p>
+
+		<h3>[method:Boolean intersectsLine]( [param:Line3 line] )</h3>
+		<p>
+		[page:Line3 line] - la [page:Line3] per verificare l'intersezione.<br /><br />
+
+		Verifica se un segmento di linea si interseca (passa attraverso) il piano o no.
+		</p>
+
+		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
+		<p>
+		[page:Sphere sphere]  - la [page:Sphere] per verificare l'intersezione.<br /><br />
+
+		Determina se questo piano interseca la [page:Sphere sphere] o no.
+		</p>
+
+		<h3>[method:this negate]()</h3>
+		<p>
+			Nega sia la normale che la costante.
+		</p>
+
+		<h3>[method:this normalize]()</h3>
+		<p>
+			Normalizza il vettore [page:.normal normal], e aggiusta di conseguenza il valore della 
+			[page:.constant constant].
+		</p>
+
+		<h3>[method:Vector3 projectPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 point] - il [page:Vector3] da proiettare sul piano.<br />
+		[page:Vector3 target] — il risultato verrà copiato in questo Vector3.<br /><br />
+
+		Proietta un [page:Vector3 point] sul piano.
+		</p>
+
+		<h3>[method:this set]( [param:Vector3 normal], [param:Float constant] )</h3>
+		<p>
+			[page:Vector3 normal] - un [page:Vector3] di lunghezza unitaria che definisce la normale del piano.<br />
+			[page:Float constant] - la distanza con segno dall'origine al piano. Il valore predefinito è `0`.<br /><br />
+
+			Imposta le proprietà [page:.normal normal] e [page:.constant constant] del piano copiando i valori dalla normale data.
+		</p>
+
+		<h3>[method:this setComponents]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
+		<p>
+		[page:Float x] - x valore del vettore normale di lunghezza unitaria.<br />
+		[page:Float y] - y valore del vettore normale di lunghezza unitaria.<br />
+		[page:Float z] - z valore del vettore normale di lunghezza unitaria.<br />
+		[page:Float w] - il valore della proprieà [page:.constant constant] del piano.<br /><br />
+
+		Imposta i singoli componenti che definiscono il piano.
+		</p>
+
+		<h3>[method:this setFromCoplanarPoints]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] )</h3>
+		<p>
+		 [page:Vector3 a] - primo punto sul piano.<br />
+		 [page:Vector3 b] - secondo punto sul piano.<br />
+		 [page:Vector3 c] - terzo punto sul piano.<br /><br />
+
+		 Definisce il piano in base ai 3 punti forniti. Si presume che l'ordine di avvolgimento sia in senso antiorario,
+		 e determina la direzione della [page:.normal normale].
+		</p>
+
+		<h3>[method:this setFromNormalAndCoplanarPoint]( [param:Vector3 normal], [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 normal] - un [page:Vector3] di lunghezza unitaria che definisce la normale del piano.<br />
+		[page:Vector3 point] - [page:Vector3]<br /><br />
+
+		Imposta le proprietà del piano definite da una [page:Vector3 normale] e un [page:Vector3 punto] complanare arbitrario.
+		</p>
+
+		<h3>[method:this translate]( [param:Vector3 offset] )</h3>
+		<p>
+		[page:Vector3 offset] - la quantità di cui muovere il piano.<br /><br />
+
+		Trasla il piano della distanza definita dal vettore [page:Vector3 offset].
+		Si noti che questo influisce solo la costante del piano e non influenzerà il vettore normale.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

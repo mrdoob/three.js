@@ -4,7 +4,6 @@
 <head>
 	<meta charset="utf-8" />
 	<base href="../../../" />
-	<script src="list.js"></script>
 	<script src="page.js"></script>
 	<link type="text/css" rel="stylesheet" href="page.css" />
 </head>
@@ -23,26 +22,30 @@
 
 	<h2>构造器</h2>
 
-	<h3>[name]( [param:Geometry geometry], [param:Material material] )</h3>
+	<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
 	<p>
-		[page:Geometry geometry] —— （可选）是一个[page:Geometry]或者[page:BufferGeometry]的实例，默认值是一个新的[page:BufferGeometry]。
+		[page:BufferGeometry geometry] —— （可选）是一个[page:BufferGeometry]的实例，默认值是一个新的[page:BufferGeometry]。
 		<br />
-		[page:Material material] —— （可选） 是一个对象，默认值是一个具有随机颜色的新的[page:PointsMaterial]。
+		[page:Material material] —— （可选） 是一个对象，默认值是一个[page:PointsMaterial]。
 	</p>
 
 
 	<h2>属性</h2>
 	<p>共有属性请参见其基类[page:Object3D]。</p>
 
-	<h3>[property:Geometry geometry]</h3>
+	<h3>[property:BufferGeometry geometry]</h3>
 	<p>
-		一个[page:Geometry]或[page:BufferGeometry]的实例（或者派生类），定义了物体的结构。<br /><br />
-		如有可能，推荐总是使用[page:BufferGeometry]来获得最佳表现。
+		一个[page:BufferGeometry]的实例（或者派生类），定义了物体的结构。
 	</p>
+
+		<h3>[property:Boolean isPoints]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 	<h3>[property:Material material]</h3>
 	<p>
-		[page:Material]的实例。定义了物体的外观。默认值是一个具有随机颜色的[page:PointsMaterial]。
+		[page:Material]的实例。定义了物体的外观。默认值是一个的[page:PointsMaterial]。
 	</p>
 
 	<h3>[property:Array morphTargetInfluences]</h3>
@@ -60,7 +63,7 @@
 	<h2>方法</h2>
 	<p>共有方法请参见其基类[page:Object3D]。</p>
 
-	<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+	<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 	<p>
 		在一条投射出去的[page:Ray]（射线）和点之间产生交互。
 		[page:Raycaster.intersectObject]将会调用这个方法。
@@ -71,7 +74,7 @@
 		返回这个点及其子集的一个克隆对象。
 	</p>
 
-	<h3>[method:null updateMorphTargets]()</h3>
+	<h3>[method:undefined updateMorphTargets]()</h3>
 	<p>
 		更新morphTargets，使其不对对象产生影响，重置[page:Points.morphTargetInfluences morphTargetInfluences] 和
 		[page:Points.morphTargetDictionary morphTargetDictionary]属性。

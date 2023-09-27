@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,10 +16,15 @@
 			内部使用[page:ImageLoader]来加载文件。
 		</p>
 
+		<p>
+			The loaded [page:CubeTexture] is in sRGB color space. Meaning the [page:Texture.colorSpace colorSpace] 
+			property is set to `THREE.SRGBColorSpace` by default.
+		</p>
+
 		<h2>代码示例</h2>
 
 		<code>
-var scene = new THREE.Scene();
+const scene = new THREE.Scene();
 scene.background = new THREE.CubeTextureLoader()
 	.setPath( 'textures/cubeMaps/' )
 	.load( [
@@ -37,10 +41,7 @@ scene.background = new THREE.CubeTextureLoader()
 
 		<p>
 			[example:webgl_materials_cubemap materials / cubemap]<br />
-			[example:webgl_materials_cubemap_balls_reflection materials / cubemap / balls / reflection]<br />
-			[example:webgl_materials_cubemap_balls_refraction materials / cubemap / balls / refraction]<br />
 			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic]<br />
-			[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2]<br />
 			[example:webgl_materials_cubemap_refraction materials / cubemap / refraction]
 		</p>
 

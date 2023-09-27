@@ -1,0 +1,11 @@
+<svg width="377.7" height="571.5" version="1.1" viewBox="0 0 99.93 151.2" xmlns="http://www.w3.org/2000/svg">
+<style type="text/css">
+  .fill-red { fill: red; }
+  .stroke-green { stroke: green; }
+</style>
+  <g transform="translate(0 -54.56)">
+    <rect class="fill-red" x="5" y="59.56" width="89.93" height="35.5" />
+    <rect class="stroke-green" x="5" y="111.6" width="89.53" height="35.1" />
+    <rect class="fill-red stroke-green" x="5" y="165.7" width="89.53" height="35.1" />
+  </g>
+</svg>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			이 클래스는 three.js의 대부분의 객체에 대한 기본 클래스이며 3D 공간에서 객체를 조작하기 위한 일련의 속성 및 메서드를 제공합니다.<br /><br />
+
+			[page:.add]( object ) 메서드를 사용해 객체를 그룹핑해서 오브젝트를 자식으로 추가하는 데에 사용할 수도 있지만, [page:Group]를 사용하는 것이 더 낫습니다.
+		</p>
+
+
+		<h2>생성자</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+		전달인자를 받지 않는 생성자입니다.
+		</p>
+
+
+		<h2>프로퍼티</h2>
+
+		<h3>[property:AnimationClip animations]</h3>
+		<p>객체의 애니메이션 클립 배열입니다.</p>
+
+		<h3>[property:Boolean castShadow]</h3>
+		<p>객체가 섀도우 맵으로 렌더링 되는지의 여부입니다. 기본값은 *false*입니다.</p>
+
+		<h3>[property:Array children]</h3>
+		<p>객체의 자식 배열입니다. 수동으로 객체를 그룹핑하는 내용은 [page:Group]을 참고하세요.</p>
+
+		<h3>[property:Material customDepthMaterial]</h3>
+		<p>
+		뎁스맵에 렌더링할 때 사용되는 깊이 재질 커스텀입니다. 메쉬 구조체에서만 사용할 수 있습니다.
+		When shadow-casting with a [page:DirectionalLight] 혹은 [page:SpotLight]를 통해 섀도우 캐스팅을 할 때, (a) 꼭짓점의 쉐이더 위치를 수정하거나,
+		(b) displacement map을 사용하거나, (c) alphaTest를 통해 알파 맵을 사용하거나, (d) alphaTest로 투명 텍스쳐를 사용하거나 할 때
+		적절한 섀도우의 customDepthMaterial를 특정해야 합니다. 기본값은 *undefined*입니다.
+		</p>
+
+		<h3>[property:Material customDistanceMaterial]</h3>
+		<p>
+		[page:.customDepthMaterial customDepthMaterial]와 같지만, [page:PointLight]와 함게 쓰입니다. 기본값은 *undefined*입니다.
+		</p>
+
+		<h3>[property:Boolean frustumCulled]</h3>
+		<p>
+		이 값이 설정되면, 매 프레임마다 객체를 렌더링하기 전에 객체가 카메라의 절두체에 속해 있는지를 체크합니다. `false`로 설정하면
+		카메라 절두체에 속해있지 않더라도 객체는 매 프레임마다 렌더링될 것입니다. 기본값은 `true`입니다.
+		</p>
+
+		<h3>[property:Integer id]</h3>
+		<p>읽기전용 – 이 객체 인스턴스의 고유 번호입니다.</p>
+
+		<h3>[property:Boolean isObject3D]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
+		<h3>[property:Layers layers]</h3>
+		<p>
+		객체의 레이어 멤버 속성입니다. 객체는 사용중인 [page:Camera] 에 공통적으로 최소 한 개의 레이어가 있을 때만 볼 수 있습니다.
+		이 프로퍼티는 [page:Raycaster]를 사용해 레이-인터섹션 테스트를 할 때 원치 않는 객체를 필터링하는 용도로도 사용할 수 있습니다.
+		</p>
+
+		<h3>[property:Matrix4 matrix]</h3>
+		<p>로컬 변형 매트릭스입니다.</p>
+
+		<h3>[property:Boolean matrixAutoUpdate]</h3>
+		<p>
+		이 값을 설정하면 위치의 매트릭스를 계산하고 (회전 및 쿼터니언), 매 프레임마다 확대/축소하고 matrixWorld 프로퍼티를 재계산합니다.
+		기본값은 [page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE] (true)입니다.
+		</p>
+
+		<h3>[property:Matrix4 matrixWorld]</h3>
+		<p>
+		객체의 글로벌 변형입니다. Object3D가 부모를 가지고 있지 않다면, 로컬 변형 [page:.matrix]와 동일합니다.
+		</p>
+
+		<h3>[property:Boolean matrixWorldAutoUpdate]</h3>
+		<p>
+		If set, then the renderer checks every frame if the object and its children need matrix updates.
+		When it isn't, then you have to maintain all matrices in the object and its children yourself.
+		Default is [page:Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE] (true).
+		</p>
+
+		<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
+		<p>
+		이 값을 설정하면 When this is set, it calculates the 해당 프레임의 matrixWorld를 계산하고 이 프로퍼티를 false로 초기화합니다.
+		기본값은 *false*입니다.
+		</p>
+
+		<h3>[property:Matrix4 modelViewMatrix]</h3>
+		<p>이 값은 쉐이더로 전달되고 객체의 위치를 계산하는 데에 사용됩니다.</p>
+
+		<h3>[property:String name]</h3>
+		<p>객체의 임시 이름입니다(고유할 필요는 없습니다). 기본값은 빈 문자열입니다.</p>
+
+		<h3>[property:Matrix3 normalMatrix]</h3>
+		<p>
+		이 값은 쉐이더로 전달되고 객체의 광원을 계산합니다. 이 객체 modelViewMatrix의 왼쪽 위 3x3 서브매트릭스의 역 매트릭스입니다.<br /><br />
+
+		이 특별한 매트릭스를 사용하는 이유는 단순히 modelViewMatrix만을 사용하면 유닛이 아닌 법선의 길이가 결과로 나오거나(스케일링 시)
+		수직이 아닌 방향의 결과가 나올 수 있기 때문입니다(비균일 스케일링 시).<br /><br />
+
+		한편, modelViewMatrix의 이동 파트는 법선의 계산과는 상관이 없습니다. Matrix3으로 충분합니다.
+		</p>
+
+		<h3>[property:Function onAfterRender]</h3>
+		<p>
+			3D 객체가 렌더링된 후 즉시 실행되는 선택적 콜백입니다.
+			이 함수는 렌더러, 장면, 카메라, 기하학, 재질, 그룹 등의 매개 변수를 사용하여 호출됩니다.
+		</p>
+		<p>
+		이 콜백은 *렌더링 가능한* 3D 객체에만 실행됩니다. [page:Mesh], [page:Line], [page:Points] 혹은 [page:Sprite]같은 기하학 및 재질로 시각적 표현을 정의하는 3D 객체들에 한정됩니다.
+		[page:Object3D], [page:Group] 혹은 [page:Bone] 인스턴스는 렌더링할 수 없으므로 이러한 객체에 대해서는 콜백이 실행되지 않습니다.
+		</p>
+
+		<h3>[property:Function onBeforeRender]</h3>
+		<p>
+			3D 객체가 렌더링되기 바로 전에 실행되는 선택적 콜백입니다.
+			이 함수는 렌더러, 장면, 카메라, 기하학, 재질, 그룹 등의 매개 변수를 사용하여 호출됩니다.
+		</p>
+		<p>
+			이 콜백은 *렌더링 가능한* 3D 객체에만 실행됩니다. [page:Mesh], [page:Line], [page:Points] 혹은 [page:Sprite]같은 기하학 및 재질로 시각적 표현을 정의하는 3D 객체들에 한정됩니다.
+			[page:Object3D], [page:Group] 혹은 [page:Bone] 인스턴스는 렌더링할 수 없으므로 이러한 객체에 대해서는 콜백이 실행되지 않습니다.
+		</p>
+
+		<h3>[property:Object3D parent]</h3>
+		<p>[link:https://en.wikipedia.org/wiki/Scene_graph scene graph]에 있는 객체의 부모입니다. 객체는 최대 한 개의 부모만 가질 수 있습니다.</p>
+
+		<h3>[property:Vector3 position]</h3>
+		<p>객체의 로컬 위치를 나타내는 [page:Vector3]입니다. 기본값은 (0, 0, 0)입니다.</p>
+
+		<h3>[property:Quaternion quaternion]</h3>
+		<p>객체의 로컬 회전을 나타낸 [page:Quaternion Quaternion]입니다.</p>
+
+		<h3>[property:Boolean receiveShadow]</h3>
+		<p>재질이 그림자를 받는지에 대한 프로퍼티입니다. 기본값은 *false*입니다.</p>
+
+		<h3>[property:Number renderOrder]</h3>
+		<p>
+			이 값을 사용하면 불투명한 객체와 투명한 객체가 독립적으로 정렬되어 있더라도 [link:https://en.wikipedia.org/wiki/Scene_graph scene graph] 객체의
+			기본 렌더링 순서를 재정의할 수 있습니다. 이 프로퍼티가 [page:Group Group]의 인스턴스로 설정되면 모든 하위 객체들은 함께 정렬 및 렌더링 될 것입니다.
+		정렬은 renderOrder가 가장 낮은 것부터 가장 높은 순서입니다. 기본값은 *0*입니다.
+		</p>
+
+		<h3>[property:Euler rotation]</h3>
+		<p>
+		객체의 로컬 회전 라디안([link:https://en.wikipedia.org/wiki/Euler_angles Euler angles]를 참고하세요)입니다.
+		</p>
+
+		<h3>[property:Vector3 scale]</h3>
+		<p>
+		객체의 로컬 스케일입니다. 기본값은 [page:Vector3]( 1, 1, 1 )입니다.
+		</p>
+
+		<h3>[property:Vector3 up]</h3>
+		<p>
+		[page:.lookAt lookAt] 메서드에서 사용되며, 결과의 방향을 결정합니다.<br />
+		기본값은 [page:Object3D.DEFAULT_UP]값, ( 0, 1, 0 )입니다.
+		</p>
+
+		<h3>[property:Object userData]</h3>
+		<p>
+		Object3D에 대한 사용자 지정 데이터를 저장하는 데 사용할 수 있는 객체입니다. 함수는 복제되지 않으므로 해당 함수에 대한 참조를 포함해서는 안 됩니다.
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+		이 객체 인스턴스의 [link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]입니다.
+		자동으로 할당되며, 수정할 수 없습니다.
+		</p>
+
+		<h3>[property:Boolean visible]</h3>
+		<p>*true*면 객체가 렌더링됩니다. 기본값은 *true*입니다.</p>
+
+
+
+
+		<h2>정적 프로퍼티</h2>
+		<p>
+			정적 프로퍼티와 메서드는 해당 클래스의 인스턴스가 아니라 클래스 별로 정의됩니다.
+			이는 [page:Object3D.DEFAULT_UP] 혹은 [page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE]를 변경하면
+			변경이 이루어진 시점 이후의(이미 만들어진 Object3Ds는 영향을 받지 않습니다) 모든 Object3D(및 파생 클래스)의
+			[page:.up up]과 [page:.matrixAutoUpdate matrixAutoUpdate] 값을 변경시킬 것입니다.
+		</p>
+
+		<h3>[property:Vector3 DEFAULT_UP]</h3>
+		<p>
+			The default 오브젝트의 기본값 [page:.up up] 방향이며
+			[page:DirectionalLight], [page:HemisphereLight] 및 [page:Spotlight]의 기본 위치값으로도 사용됩니다(위에서 아래로 내려오는 빛을 만듭니다).<br />
+			기본값으로 ( 0, 1, 0 ) 을 설정합니다.
+		</p>
+
+		<h3>[property:Boolean DEFAULT_MATRIX_AUTO_UPDATE]</h3>
+		<p>
+			새로 만들어진 Object3D의 [page:.matrixAutoUpdate matrixAutoUpdate] 기본 세팅입니다.<br />
+
+		</p>
+
+		<h3>[property:Boolean DEFAULT_MATRIX_WORLD_AUTO_UPDATE]</h3>
+		<p>
+			새로 만들어진 Object3D의 [page:.matrixWorldAutoUpdate matrixWorldAutoUpdate] 기본 세팅입니다.<br />
+		</p>
+
+		<h2>메서드</h2>
+
+		<p>[page:EventDispatcher EventDispatcher] 메서드들은 이 클래스에서 사용 가능합니다.</p>
+
+		<h3>[method:this add]( [param:Object3D object], ... )</h3>
+		<p>
+		*object*를 이 객체의 자식으로 추가합니다. 임의 개수의 객체를 추가할 수 있습니다.
+		객체에는 상위 항목이 하나 이상 있을 수 있으므로 여기에 전달된 객체의 현재 상위 항목이 모두 제거됩니다. <br /><br />
+
+		수동으로 객체 그룹핑을 하는 내용은 [page:Group]를 참고하세요.
+		</p>
+
+		<h3>[method:undefined applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<p>매트릭스 변환을 객체에 적용하고 객체의 위치, 회전 및 스케일을 업데이트합니다.</p>
+
+		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
+		<p>쿼터니언으로 표시된 회전을 객체에 적용합니다</p>
+
+		<h3>[method:this attach]( [param:Object3D object] )</h3>
+		<p>자식에 *object*를 추가하지만 객체의 월드 변형은 유지합니다.</p>
+
+		<h3>[method:Object3D clone]( [param:Boolean recursive] )</h3>
+		<p>
+		recursive -- true면 객체의 자식들도 복제됩니다. 기본값은 true입니다.<br /><br />
+
+		해당 객체의 사본을 리턴하고 자식까지 복제할 수도 있습니다.
+		</p>
+
+		<h3>[method:this copy]( [param:Object3D object], [param:Boolean recursive] )</h3>
+		<p>
+		recursive -- true면 객체의 자식들도 복제됩니다. 기본값은 true입니다.<br /><br />
+
+		이 객체에 넘겨받은 객체를 복사합니다.
+
+		주의: 이벤트리스너와 사용자정의 콜백([page:.onAfterRender] 및 [page:.onBeforeRender])은 복제되지 않습니다.
+		</p>
+
+		<h3>[method:Object3D getObjectById]( [param:Integer id] )</h3>
+		<p>
+		id -- 객체 인스턴스의 고유 번호입니다.<br /><br />
+
+		객체 자신부터 시작하여 객체와 객체 자식 항목을 검색하고 일치하는 ID의 첫 번째 항목을 리턴합니다.
+		ID는 순차적으로 증가하며: 1, 2, 3, ... 새 객체마다 하나씩 증가합니다.
+		</p>
+
+		<h3>[method:Object3D getObjectByName]( [param:String name] )</h3>
+		<p>
+		name -- 자식의 Object3D.name 프로퍼티와 일치하는 문자열입니다. <br /><br />
+
+		객체 자신부터 시작하여 객체와 객체 자식 항목을 검색하고 일치하는 이름의 첫 번째 항목을 리턴합니다.<br />
+		대부분의 객체는 기본값으로 이름이 빈 문자열입니다. 이 메서드를 사용하기 위해서는 직접 이름을 지정해야 합니다.
+		</p>
+
+		<h3>[method:Object3D getObjectByProperty]( [param:String name], [param:Any value] )</h3>
+		<p>
+		name -- 검색하고자하는 이름 프로퍼티. <br />
+		value -- 프로퍼티의 값. <br /><br />
+
+		객체 자신부터 시작하여 객체와 객체 자식 항목을 검색하고 일치하는 값의 첫 번째 항목을 리턴합니다.
+		</p>
+
+		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value] )</h3>
+		<p>
+		name -- 검색하고자하는 이름 프로퍼티. <br />
+		value -- 프로퍼티의 값. <br /><br />
+
+		개체 자체부터 시작하여 개체와 해당 자식을 검색하고 일치하는 값의 모든 개체를 반환합니다.
+		</p>
+
+		<h3>[method:Vector3 getWorldPosition]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — 결과값은 이 Vector3에 복제됩니다. <br /><br />
+
+		객체의 월드 스페이스에서의 벡터를 리턴합니다.
+		</p>
+
+		<h3>[method:Quaternion getWorldQuaternion]( [param:Quaternion target] )</h3>
+		<p>
+		[page:Quaternion target] — 결과값은 이 Quaternion에 복제됩니다. <br /><br />
+
+		객체의 월드 스페이스에서의 회전값을 쿼터니언으로 리턴합니다.
+		</p>
+
+		<h3>[method:Vector3 getWorldScale]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — 결과값은 이 Vector3에 복제됩니다. <br /><br />
+
+		객체에 적용되는 월드 스페이스에서의 각 축의 스케일 벡터값을 리턴합니다.
+		</p>
+
+		<h3>[method:Vector3 getWorldDirection]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — 결과값은 이 Vector3에 복제됩니다. <br /><br />
+
+		객체의 월드 스페이스에서의 z축 양수 방향 벡터를 리턴합니다.
+		</p>
+
+
+		<h3>[method:Vector3 localToWorld]( [param:Vector3 vector] )</h3>
+		<p>
+		vector - 이 객체의 로컬 스페이스에서의 위치를 나타내는 벡터입니다.<br /><br />
+
+		이 객체의 로컬 스페이스를 월드 스페이스로 전환합니다.
+		</p>
+
+		<h3>[method:undefined lookAt]( [param:Vector3 vector] )<br />
+		[method:undefined lookAt]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+		vector - 로컬 스페이스에서의 위치를 나타내는 벡터입니다.<br /><br />
+		부가적으로, 월드 스페이스의 [page:.x x], [page:.y y] 및 [page:.z z] 위치 컴포넌트를 설정할 수 있습니다.<br /><br />
+
+		월드 스페이스의 한 점으로 객체의 면을 회전시킵니다.<br /><br />
+
+		이 메서드는 비균일 스케일 부모를 가진 객체들은 지원하지 않습니다.
+		</p>
+
+		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<p>
+		객체와 레이캐스팅 사이의 인터섹션을 구하는 추상 (빈) 메서드입니다.
+		Subclasses such as [page:Mesh], [page:Line], 및 [page:Points] 같은 서브클래스들은 레이캐스팅을 사용하는 순서에 따라 이 메서드를 실행합니다.
+		</p>
+
+		<h3>[method:this remove]( [param:Object3D object], ... )</h3>
+		<p>
+		이 객체의 자식 중 *object*를 제거합니다. 임의 갯수의 객체를 제거할 수 있습니다.
+		</p>
+
+		<h3>[method:this removeFromParent]()</h3>
+		<p>
+		Removes this object from its current parent.
+		</p>
+
+		<h3>[method:this clear]()</h3>
+		<p>
+		모든 자식 객체를 제거합니다.
+		</p>
+
+		<h3>[method:this rotateOnAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
+		<p>
+		axis -- 객체 스페이스의 정규화 벡터입니다. <br />
+		angle -- 라디안 각도입니다.<br /><br />
+
+		객체를 객체 스페이스의 축에 맞춰 회전시킵니다. 해당 축은 정규화되었다고 가정합니다.
+		</p>
+
+		<h3>[method:this rotateOnWorldAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
+		<p>
+		axis -- 월드 스페이스의 정규화 벡터입니다. <br />
+		angle -- 라디안 각도입니다.<br /><br />
+
+		객체를 월드 스페이스의 축에 맞춰 회전시킵니다. 해당 축은 정규화되었다고 가정합니다.
+		부모의 회전은 고려하지 않습니다.
+		</p>
+
+		<h3>[method:this rotateX]( [param:Float rad] )</h3>
+		<p>
+		rad - 회전시킬 라디안 각도입니다.<br /><br />
+
+		로컬 스페이스에서 x 축을 기준으로 회전시킵니다.
+		</p>
+
+		<h3>[method:this rotateY]( [param:Float rad] )</h3>
+		<p>
+		rad - 회전시킬 라디안 각도입니다.<br /><br />
+
+		로컬 스페이스에서 y 축을 기준으로 회전시킵니다.
+		</p>
+
+		<h3>[method:this rotateZ]( [param:Float rad] )</h3>
+		<p>
+		rad - 회전시킬 라디안 각도입니다.<br /><br />
+
+		로컬 스페이스에서 z 축을 기준으로 회전시킵니다.
+		</p>
+
+		<h3>[method:undefined setRotationFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
+		<p>
+			axis -- 오브젝트 스페이스의 정규화 벡터입니다. <br />
+			angle -- 라디안 각도입니다<br /><br />
+
+			[page:.quaternion]에서 [page:Quaternion.setFromAxisAngle setFromAxisAngle]( [page:Float axis], [page:Float angle] )를 호출합니다.
+		</p>
+
+		<h3>[method:undefined setRotationFromEuler]( [param:Euler euler] )</h3>
+		<p>
+			euler -- 회전 정도를 나타내는 오일러 각입니다.<br />
+
+			 [page:Quaternion.setRotationFromEuler setRotationFromEuler]( [page:Euler euler])를 호출합니다.
+		</p>
+
+		<h3>[method:undefined setRotationFromMatrix]( [param:Matrix4 m] )</h3>
+		<p>
+			m -- 매트릭스의 회전 컴포넌트만큼 쿼터니언을 회전시킵니다.<br />
+
+			[page:.quaternion]에서 [page:Quaternion.setFromRotationMatrix setFromRotationMatrix]( [page:Matrix4 m])를 호출합니다.<br /><br />
+
+			m의 상위 3x3은 순수 회전 매트릭스(예를 들어 스케일이 없는 매트릭스)로 가정합니다.
+		</p>
+
+		<h3>[method:undefined setRotationFromQuaternion]( [param:Quaternion q] )</h3>
+		<p>
+			q -- 정규화 쿼터니언입니다.<br /><br />
+
+			[page:.quaternion]에 해당 쿼터니언을 복사합니다.
+		</p>
+
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
+		<p>
+		meta -- 객체의 재질, 텍스쳐 및 이미지 같은 메타데이터를 포함하고 있는 객체입니다.<br />
+		객체를 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]으로 변환합니다.
+		</p>
+
+		<h3>[method:this translateOnAxis]( [param:Vector3 axis], [param:Float distance] )</h3>
+		<p>
+		axis -- 객체 스페이스에서의 정규화 벡터입니다.<br />
+		distance -- 이동할 거리입니다.<br /><br />
+
+		객체 스페이스의 축을 따라 객체를 거리만큼 이동합니다. 축은 정규화되었다고 가정합니다.
+		</p>
+
+		<h3>[method:this translateX]( [param:Float distance] )</h3>
+		<p>객체 스페이스에서 *distance*만큼 객체를 x축으로 이동시킵니다.</p>
+
+		<h3>[method:this translateY]( [param:Float distance] )</h3>
+		<p>객체 스페이스에서 *distance*만큼 객체를 y축으로 이동시킵니다.</p>
+
+		<h3>[method:this translateZ]( [param:Float distance] )</h3>
+		<p>객체 스페이스에서 *distance*만큼 객체를 z축으로 이동시킵니다.</p>
+
+		<h3>[method:undefined traverse]( [param:Function callback] )</h3>
+		<p>
+		callback - object3D 객체의 첫 번째 인자 함수입니다.<br /><br />
+
+		이 객체와 모든 자식들의 콜백을 실행합니다.<br/>
+		주의: 콜백에서 씬 그래프를 수정하는 것은 허용되지 않습니다.
+		</p>
+
+		<h3>[method:undefined traverseVisible]( [param:Function callback] )</h3>
+		<p>
+		callback - object3D 객체의 첫 번째 인자 함수입니다.<br /><br />
+
+		Like traverse와 비슷하지만, 보이는 객체들의 콜백만 실행됩니다.
+		보이지 않는 객체들의 자식들은 실행되지 않습니다.<br/>
+		주의: 콜백에서 씬 그래프를 수정하는 것은 허용되지 않습니다.
+		</p>
+
+		<h3>[method:undefined traverseAncestors]( [param:Function callback] )</h3>
+		<p>
+		callback - object3D 객체의 첫 번째 인자 함수입니다.<br /><br />
+
+		모든 부모의 콜백을 실행합니다.<br/>
+		주의: 콜백에서 씬 그래프를 수정하는 것은 허용되지 않습니다.
+		</p>
+
+		<h3>[method:undefined updateMatrix]()</h3>
+		<p>로컬 변형을 업데이트합니다.</p>
+
+		<h3>[method:undefined updateMatrixWorld]( [param:Boolean force] )</h3>
+		<p>객체와 자식들의 글로벌 변형을 업데이트합니다.</p>
+
+		<h3>[method:undefined updateWorldMatrix]( [param:Boolean updateParents], [param:Boolean updateChildren] )</h3>
+		<p>
+		updateParents - 재귀적으로 부모의 글로벌 변형을 업데이트합니다.<br />
+		updateChildren - 재귀적으로 자식의 글로벌 변형을 업데이트합니다.<br /><br />
+
+		객체의 글로벌 변형을 업데이트합니다.
+		</p>
+
+		<h3>[method:Vector3 worldToLocal]( [param:Vector3 vector] )</h3>
+		<p>
+		vector - 월드 스페이스의 위치를 나타내는 벡터입니다.<br /><br />
+
+		월드 스페이스의 벡터를 객체의 로컬 스페이스로 변환합니다.
+		</p>
+
+		<h2>소스코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

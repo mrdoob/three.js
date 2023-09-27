@@ -1,26 +1,17 @@
 import { Light } from './Light.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+class AmbientLight extends Light {
 
-function AmbientLight( color, intensity ) {
+	constructor( color, intensity ) {
 
-	Light.call( this, color, intensity );
+		super( color, intensity );
 
-	this.type = 'AmbientLight';
+		this.isAmbientLight = true;
 
-	this.castShadow = undefined;
+		this.type = 'AmbientLight';
+
+	}
 
 }
-
-AmbientLight.prototype = Object.assign( Object.create( Light.prototype ), {
-
-	constructor: AmbientLight,
-
-	isAmbientLight: true
-
-} );
-
 
 export { AmbientLight };

@@ -12,25 +12,39 @@
 			"W" translate | "E" rotate | "R" scale | "+/-" adjust size<br />
 			"Q" toggle world/local space |  "Shift" snap to grid<br />
 			"X" toggle X | "Y" toggle Y | "Z" toggle Z | "Spacebar" toggle enabled<br />
+			"Esc" reset current transform<br />
 			"C" toggle camera | "V" random zoom
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { TransformControls } from './jsm/controls/TransformControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TransformControls } from 'three/addons/controls/TransformControls.js';
 
-			var cameraPersp, cameraOrtho, currentCamera;
-			var scene, renderer, control, orbit;
+			let cameraPersp, cameraOrtho, currentCamera;
+			let scene, renderer, control, orbit;
 
 			init();
 			render();
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -41,21 +55,24 @@
 				cameraOrtho = new THREE.OrthographicCamera( - 600 * aspect, 600 * aspect, 600, - 600, 0.01, 30000 );
 				currentCamera = cameraPersp;
 
-				currentCamera.position.set( 1000, 500, 1000 );
-				currentCamera.lookAt( 0, 200, 0 );
+				currentCamera.position.set( 5, 2.5, 5 );
 
 				scene = new THREE.Scene();
-				scene.add( new THREE.GridHelper( 1000, 10 ) );
+				scene.add( new THREE.GridHelper( 5, 10, 0x888888, 0x444444 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 2 );
+				const ambientLight = new THREE.AmbientLight( 0xffffff );
+				scene.add( ambientLight );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 4 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
-				var texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
+				const texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
+				texture.colorSpace = THREE.SRGBColorSpace;
 				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-				var material = new THREE.MeshLambertMaterial( { map: texture, transparent: true } );
+				const geometry = new THREE.BoxGeometry();
+				const material = new THREE.MeshLambertMaterial( { map: texture } );
 
 				orbit = new OrbitControls( currentCamera, renderer.domElement );
 				orbit.update();
@@ -70,20 +87,20 @@
 
 				} );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				control.attach( mesh );
 				scene.add( control );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				window.addEventListener( 'keydown', function ( event ) {
 
 					switch ( event.keyCode ) {
 
 						case 81: // Q
-							control.setSpace( control.space === "local" ? "world" : "local" );
+							control.setSpace( control.space === 'local' ? 'world' : 'local' );
 							break;
 
 						case 16: // Shift
@@ -93,15 +110,15 @@
 							break;
 
 						case 87: // W
-							control.setMode( "translate" );
+							control.setMode( 'translate' );
 							break;
 
 						case 69: // E
-							control.setMode( "rotate" );
+							control.setMode( 'rotate' );
 							break;
 
 						case 82: // R
-							control.setMode( "scale" );
+							control.setMode( 'scale' );
 							break;
 
 						case 67: // C
@@ -154,6 +171,10 @@
 
 						case 32: // Spacebar
 							control.enabled = ! control.enabled;
+							break;
+
+						case 27: // Esc
+							control.reset();
 							break;
 
 					}

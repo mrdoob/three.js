@@ -12,23 +12,36 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - texture rotation
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			var mesh, renderer, scene, camera;
+			let mesh, renderer, scene, camera;
 
-			var gui;
+			let gui;
 
-			var API = {
+			const API = {
 				offsetX: 0,
 				offsetY: 0,
 				repeatX: 0.25,
 				repeatY: 0.25,
-				rotation: Math.PI / 4, // positive is counter-clockwise
+				rotation: Math.PI / 4, // positive is counterclockwise
 				centerX: 0.5,
 				centerY: 0.5
 			};
@@ -48,22 +61,23 @@
 				camera.position.set( 10, 15, 25 );
 				scene.add( camera );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 20;
 				controls.maxDistance = 50;
 				controls.maxPolarAngle = Math.PI / 2;
 
-				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+				const geometry = new THREE.BoxGeometry( 10, 10, 10 );
 
 				new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg', function ( texture ) {
 
 					texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 					texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+					texture.colorSpace = THREE.SRGBColorSpace;
 
 					//texture.matrixAutoUpdate = false; // default true; set to false to update texture.matrix manually
 
-					var material = new THREE.MeshBasicMaterial( { map: texture } );
+					const material = new THREE.MeshBasicMaterial( { map: texture } );
 
 					mesh = new THREE.Mesh( geometry, material );
 					scene.add( mesh );
@@ -76,7 +90,7 @@
 
 				} );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -100,18 +114,18 @@
 
 			function updateUvTransform() {
 
-				var texture = mesh.material.map;
+				const texture = mesh.material.map;
 
 				if ( texture.matrixAutoUpdate === true ) {
 
 					texture.offset.set( API.offsetX, API.offsetY );
 					texture.repeat.set( API.repeatX, API.repeatY );
 					texture.center.set( API.centerX, API.centerY );
-					texture.rotation = API.rotation; // rotation is around [ 0.5, 0.5 ]
+					texture.rotation = API.rotation; // rotation is around center
 
 				} else {
 
-					// one way...
+					// setting the matrix uv transform directly
 					//texture.matrix.setUvTransform( API.offsetX, API.offsetY, API.repeatX, API.repeatY, API.rotation, API.centerX, API.centerY );
 
 					// another way...

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Crée une géométrie extrudée à partir d'une forme de chemin.</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#ExtrudeGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Exemple de code : </h2>
+
+
+		<code>
+		const length = 12, width = 8;
+
+		const shape = new THREE.Shape();
+		shape.moveTo( 0,0 );
+		shape.lineTo( 0, width );
+		shape.lineTo( length, width );
+		shape.lineTo( length, 0 );
+		shape.lineTo( 0, 0 );
+
+		const extrudeSettings = {
+			steps: 2,
+			depth: 16,
+			bevelEnabled: true,
+			bevelThickness: 1,
+			bevelSize: 1,
+			bevelOffset: 0,
+			bevelSegments: 1
+		};
+
+		const geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const mesh = new THREE.Mesh( geometry, material ) ;
+		scene.add( mesh );
+		</code>
+
+
+		<h2>Constructeur</h2>
+
+
+		<h3>[name]([param:Array shapes], [param:Object options])</h3>
+		<p>
+		shapes — Forme ou tableau de formes.<br />
+		options — Objet pouvant contenir les paramètres suivants.
+
+			<ul>
+				<li>curveSegments — int. Nombre de points sur les courbes. La valeur par défaut est 12.</li>
+				<li>steps — int. Nombre de points utilisés pour subdiviser les segments le long de la profondeur de la courbe extrudée. La valeur par défaut est 1.</li>
+				<li>depth — float. Profondeur pour extruder la forme. La valeur par défaut est 1.</li>
+				<li>bevelEnabled — bool. Appliquer un biseau à la forme. La valeur par défaut est true.</li>
+				<li>bevelThickness — float. Profondeur du biseau dans la forme d'origine. La valeur par défaut est 0,2.</li>
+				<li>bevelSize — float. Distance du contour de la forme à laquelle s'étend le biseau. La valeur par défaut est bevelThickness - 0.1.</li>
+				<li>bevelOffset — float. Distance du contour de la forme à laquelle commence le biseau. La valeur par défaut est 0.</li>
+				<li>bevelSegments — int. Nombre de couches de biseau. La valeur par défaut est 3.</li>
+				<li>extrudePath — THREE.Curve. Chemin de courbe 3D le long duquel la forme doit être extrudée. Biseaux non pris en charge pour l'extrusion de chemin.</li>
+				<li>UVGenerator —  Object. Objet qui fournit des fonctions de générateur d'UV</li>
+			</ul>
+
+		</p>
+		<p>
+			Cet objet extrude une forme 2D en une géométrie 3D.
+		</p>
+
+		<p>
+			Lors de la création d'un maillage avec cette géométrie, si vous souhaitez utiliser un matériau distinct pour sa face
+			et ses côtés extrudés, vous pouvez utiliser un éventail de matériaux. Le premier matériau sera
+			appliqué sur la face, le deuxième sera appliqué sur les côtés.
+		</p>
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les propriétés communes.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		Un objet avec une propriété pour chacun des paramètres du constructeur. Toute modification après instanciation ne change pas la géométrie.
+		</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les méthodes communes.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

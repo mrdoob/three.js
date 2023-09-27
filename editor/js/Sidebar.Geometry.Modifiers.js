@@ -1,44 +1,50 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { UIDiv, UIButton, UIRow } from './libs/ui.js';
 
-import { UIRow, UIButton } from './libs/ui.js';
+function SidebarGeometryModifiers( editor, object ) {
 
-var SidebarGeometryModifiers = function ( editor, object ) {
+	const strings = editor.strings;
 
-	var signals = editor.signals;
+	const signals = editor.signals;
 
-	var container = new UIRow().setPaddingLeft( '90px' );
+	const container = new UIDiv().setPaddingLeft( '90px' );
 
-	var geometry = object.geometry;
+	const geometry = object.geometry;
 
 	// Compute Vertex Normals
 
-	var button = new UIButton( 'Compute Vertex Normals' );
-	button.onClick( function () {
+	const computeVertexNormalsButton = new UIButton( strings.getKey( 'sidebar/geometry/compute_vertex_normals' ) );
+	computeVertexNormalsButton.onClick( function () {
 
 		geometry.computeVertexNormals();
-
-		if ( geometry.isBufferGeometry ) {
-
-			geometry.attributes.normal.needsUpdate = true;
-
-		} else {
-
-			geometry.normalsNeedUpdate = true;
-
-		}
 
 		signals.geometryChanged.dispatch( object );
 
 	} );
 
-	container.add( button );
+	const computeVertexNormalsRow = new UIRow();
+	computeVertexNormalsRow.add( computeVertexNormalsButton );
+	container.add( computeVertexNormalsRow );
+
+
+	// Center Geometry
+
+	const centerButton = new UIButton( strings.getKey( 'sidebar/geometry/center' ) );
+	centerButton.onClick( function () {
+
+		geometry.center();
+
+		signals.geometryChanged.dispatch( object );
+
+	} );
+
+	const centerRow = new UIRow();
+	centerRow.add( centerButton );
+	container.add( centerRow );
 
 	//
 
 	return container;
 
-};
+}
 
 export { SidebarGeometryModifiers };

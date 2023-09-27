@@ -16,18 +16,32 @@
 	<body>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - sandbox</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { TrackballControls } from './jsm/controls/TrackballControls.js';
-			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
+			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+			import { CSS3DRenderer, CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
-			var scene2, renderer2;
+			let scene2, renderer2;
 
-			var controls;
+			let controls;
 
 			init();
 			animate();
@@ -42,19 +56,19 @@
 
 				scene2 = new THREE.Scene();
 
-				var material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1, side: THREE.DoubleSide } );
+				const material = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, wireframeLinewidth: 1, side: THREE.DoubleSide } );
 
 				//
 
-				for ( var i = 0; i < 10; i ++ ) {
+				for ( let i = 0; i < 10; i ++ ) {
 
-					var element = document.createElement( 'div' );
+					const element = document.createElement( 'div' );
 					element.style.width = '100px';
 					element.style.height = '100px';
 					element.style.opacity = ( i < 5 ) ? 0.5 : 1;
 					element.style.background = new THREE.Color( Math.random() * 0xffffff ).getStyle();
 
-					var object = new CSS3DObject( element );
+					const object = new CSS3DObject( element );
 					object.position.x = Math.random() * 200 - 100;
 					object.position.y = Math.random() * 200 - 100;
 					object.position.z = Math.random() * 200 - 100;
@@ -65,8 +79,8 @@
 					object.scale.y = Math.random() + 0.5;
 					scene2.add( object );
 
-					var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-					var mesh = new THREE.Mesh( geometry, material );
+					const geometry = new THREE.PlaneGeometry( 100, 100 );
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.copy( object.position );
 					mesh.rotation.copy( object.rotation );
 					mesh.scale.copy( object.scale );
@@ -89,6 +103,21 @@
 
 				controls = new TrackballControls( camera, renderer2.domElement );
 
+				window.addEventListener( 'resize', onWindowResize );
+				createPanel();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer2.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function animate() {
@@ -99,6 +128,70 @@
 
 				renderer.render( scene, camera );
 				renderer2.render( scene2, camera );
+
+			}
+
+			function createPanel() {
+
+				const panel = new GUI();
+				const folder1 = panel.addFolder( 'camera setViewOffset' ).close();
+
+				const settings = {
+					'setViewOffset'() {
+
+						folder1.children[ 1 ].enable().setValue( window.innerWidth );
+						folder1.children[ 2 ].enable().setValue( window.innerHeight );
+						folder1.children[ 3 ].enable().setValue( 0 );
+						folder1.children[ 4 ].enable().setValue( 0 );
+						folder1.children[ 5 ].enable().setValue( window.innerWidth );
+						folder1.children[ 6 ].enable().setValue( window.innerHeight );
+
+					},
+					'fullWidth': 0,
+					'fullHeight': 0,
+					'offsetX': 0,
+					'offsetY': 0,
+					'width': 0,
+					'height': 0,
+					'clearViewOffset'() {
+
+						folder1.children[ 1 ].setValue( 0 ).disable();
+						folder1.children[ 2 ].setValue( 0 ).disable();
+						folder1.children[ 3 ].setValue( 0 ).disable();
+						folder1.children[ 4 ].setValue( 0 ).disable();
+						folder1.children[ 5 ].setValue( 0 ).disable();
+						folder1.children[ 6 ].setValue( 0 ).disable();
+						camera.clearViewOffset();
+
+					}
+				};
+
+				folder1.add( settings, 'setViewOffset' );
+				folder1.add( settings, 'fullWidth', window.screen.width / 4, window.screen.width * 2, 1 ).onChange( ( val ) => updateCameraViewOffset( { fullWidth: val } ) ).disable();
+				folder1.add( settings, 'fullHeight', window.screen.height / 4, window.screen.height * 2, 1 ).onChange( ( val ) => updateCameraViewOffset( { fullHeight: val } ) ).disable();
+				folder1.add( settings, 'offsetX', 0, 256, 1 ).onChange( ( val ) => updateCameraViewOffset( { x: val } ) ).disable();
+				folder1.add( settings, 'offsetY', 0, 256, 1 ).onChange( ( val ) => updateCameraViewOffset( { y: val } ) ).disable();
+				folder1.add( settings, 'width', window.screen.width / 4, window.screen.width * 2, 1 ).onChange( ( val ) => updateCameraViewOffset( { width: val } ) ).disable();
+				folder1.add( settings, 'height', window.screen.height / 4, window.screen.height * 2, 1 ).onChange( ( val ) => updateCameraViewOffset( { height: val } ) ).disable();
+				folder1.add( settings, 'clearViewOffset' );
+
+			}
+
+			function updateCameraViewOffset( { fullWidth, fullHeight, x, y, width, height } ) {
+
+				if ( ! camera.view ) {
+
+					camera.setViewOffset( fullWidth || window.innerWidth, fullHeight || window.innerHeight, x || 0, y || 0, width || window.innerWidth, height || window.innerHeight );
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+
+				} else {
+
+					camera.setViewOffset( fullWidth || camera.view.fullWidth, fullHeight || camera.view.fullHeight, x || camera.view.offsetX, y || camera.view.offsetY, width || camera.view.width, height || camera.view.height );
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+
+				}
 
 			}
 

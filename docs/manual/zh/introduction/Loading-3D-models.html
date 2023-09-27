@@ -4,7 +4,6 @@
 <head>
 	<meta charset="utf-8">
 	<base href="../../../" />
-	<script src="list.js"></script>
 	<script src="page.js"></script>
 	<link type="text/css" rel="stylesheet" href="page.css" />
 </head>
@@ -26,7 +25,7 @@
 	<h2>在开始之前</h2>
 
 	<p>
-		如果你是第一次运行一个本地服务器，可以先阅读[link:#manual/introduction/How-to-run-things-locally how to run things locally]。
+		如果你是第一次运行一个本地服务器，可以先阅读[link:#manual/introduction/Installation installation]。
 		正确地托管文件，可以避免很多查看3D模型时的常见错误。
 	</p>
 
@@ -45,16 +44,16 @@
 	</p>
 
 	<ul>
-		<li><a href="https://github.com/KhronosGroup/glTF-Blender-IO" target="_blank" rel="noopener">glTF-Blender-IO</a> by the Khronos Group</li>
-		<li><a href="https://github.com/KhronosGroup/COLLADA2GLTF" target="_blank" rel="noopener">COLLADA2GLTF</a> by the Khronos Group</li>
-		<li><a href="https://github.com/facebookincubator/FBX2glTF" target="_blank" rel="noopener">FBX2GLTF</a> by Facebook</li>
-		<li><a href="https://github.com/AnalyticalGraphicsInc/obj2gltf" target="_blank" rel="noopener">OBJ2GLTF</a> by Analytical Graphics Inc</li>
+		<li><a href="https://www.blender.org/" target="_blank" rel="noopener">Blender</a> by the Blender Foundation</li>
 		<li><a href="https://www.allegorithmic.com/products/substance-painter" target="_blank" rel="noopener">Substance Painter</a> by Allegorithmic</li>
 		<li><a href="https://www.foundry.com/products/modo" target="_blank" rel="noopener">Modo</a> by Foundry</li>
 		<li><a href="https://www.marmoset.co/toolbag/" target="_blank" rel="noopener">Toolbag</a> by Marmoset</li>
 		<li><a href="https://www.sidefx.com/products/houdini/" target="_blank" rel="noopener">Houdini</a> by SideFX</li>
 		<li><a href="https://labs.maxon.net/?p=3360" target="_blank" rel="noopener">Cinema 4D</a> by MAXON</li>
-		<li>&hellip;<a href="https://github.com/khronosgroup/gltf#gltf-tools" target="_blank" rel="noopener">还有更多</a></li>
+		<li><a href="https://github.com/KhronosGroup/COLLADA2GLTF" target="_blank" rel="noopener">COLLADA2GLTF</a> by the Khronos Group</li>
+		<li><a href="https://github.com/facebookincubator/FBX2glTF" target="_blank" rel="noopener">FBX2GLTF</a> by Facebook</li>
+		<li><a href="https://github.com/AnalyticalGraphicsInc/obj2gltf" target="_blank" rel="noopener">OBJ2GLTF</a> by Analytical Graphics Inc</li>
+		<li>&hellip;and <a href="http://github.khronos.org/glTF-Project-Explorer/" target="_blank" rel="noopener">还有更多</a></li>
 	</ul>
 
 	<p>
@@ -70,12 +69,11 @@
 	<h2>加载</h2>
 
 	<p>
-		Only a few loaders (e.g. [page:ObjectLoader]) are included by default with
-		three.js — others should be added to your app individually.
+		在three.js中只会内置一部分加载器（例如：[page:ObjectLoader]） —— 其它的需要在你的应用中单独引入。
 	</p>
 
 	<code>
-		import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 	</code>
 
 	<p>
@@ -84,7 +82,7 @@
 	</p>
 
 	<code>
-		var loader = new THREE.GLTFLoader();
+		const loader = new GLTFLoader();
 
 		loader.load( 'path/to/model.glb', function ( gltf ) {
 
@@ -116,7 +114,7 @@
 		<li>
 		请在其它的应用程序中查看3D模型。对于glTF格式的模型来说，可以直接在下面的应用程序中进行查看：
 			<a href="https://gltf-viewer.donmccurdy.com/" target="_blank" rel="noopener">three.js</a>和
-		<a href="http://sandbox.babylonjs.com/" target="_blank" rel="noopener">babylon.js</a>。
+		<a href="https://sandbox.babylonjs.com/" target="_blank" rel="noopener">babylon.js</a>。
 	 如果该模型能够在一个或者多个应用程序中正确地呈现，请<a href="https://github.com/mrdoob/three.js/issues/new" target="_blank" rel="noopener">点击这里向three.js提交Bug报告</a>。
 	 如果模型不能在任意一个应用程序里显示，我们强烈鼓励你向我们提交Bug报告，并告知我们你的模型是使用哪一款应用程序创建的。
 

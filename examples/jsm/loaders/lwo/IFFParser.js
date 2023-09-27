@@ -1,7 +1,4 @@
 /**
- * @author Lewy Blue / https://github.com/looeee
- * @author Guilherme Avila / https://github/sciecode
- *
  * === IFFParser ===
  * - Parses data from the IFF buffer.
  * - LWO3 files are in IFF format and can contain the following data types, referred to by shorthand codes
@@ -35,9 +32,8 @@
  *
  **/
 
-import { LoaderUtils } from "../../../../build/three.module.js";
-import { LWO2Parser } from "./LWO2Parser.js";
-import { LWO3Parser } from "./LWO3Parser.js";
+import { LWO2Parser } from './LWO2Parser.js';
+import { LWO3Parser } from './LWO3Parser.js';
 
 function IFFParser( ) {
 
@@ -96,7 +92,7 @@ IFFParser.prototype = {
 
 		if ( topForm !== 'FORM' ) {
 
-			console.warn( "LWOLoader: Top-level FORM missing." );
+			console.warn( 'LWOLoader: Top-level FORM missing.' );
 			return;
 
 		}
@@ -580,7 +576,7 @@ IFFParser.prototype = {
 
 		var texture = {
 			index: this.reader.getUint32(),
-			fileName: ""
+			fileName: ''
 		};
 
 		// seach STIL block
@@ -911,6 +907,8 @@ function DataViewReader( buffer ) {
 
 	this.dv = new DataView( buffer );
 	this.offset = 0;
+	this._textDecoder = new TextDecoder();
+	this._bytes = new Uint8Array( buffer );
 
 }
 
@@ -1068,35 +1066,34 @@ DataViewReader.prototype = {
 
 		if ( size === 0 ) return;
 
-		// note: safari 9 doesn't support Uint8Array.indexOf; create intermediate array instead
-		var a = [];
+		const start = this.offset;
+
+		let result;
+		let length;
 
 		if ( size ) {
 
-			for ( var i = 0; i < size; i ++ ) {
-
-				a[ i ] = this.getUint8();
-
-			}
+			length = size;
+			result = this._textDecoder.decode( new Uint8Array( this.dv.buffer, start, size ) );
 
 		} else {
 
-			var currentChar;
-			var len = 0;
+			// use 1:1 mapping of buffer to avoid redundant new array creation.
+			length = this._bytes.indexOf( 0, start ) - start;
 
-			while ( currentChar !== 0 ) {
+			result = this._textDecoder.decode( new Uint8Array( this.dv.buffer, start, length ) );
 
-				currentChar = this.getUint8();
-				if ( currentChar !== 0 ) a.push( currentChar );
-				len ++;
+			// account for null byte in length
+			length ++;
 
-			}
-
-			if ( ! isEven( len + 1 ) ) this.getUint8(); // if string with terminating nullbyte is uneven, extra nullbyte is added
+			// if string with terminating nullbyte is uneven, extra nullbyte is added, skip that too
+			length += length % 2;
 
 		}
 
-		return LoaderUtils.decodeText( new Uint8Array( a ) );
+		this.skip( length );
+
+		return result;
 
 	},
 
@@ -1140,27 +1137,27 @@ Debugger.prototype = {
 		switch ( this.node ) {
 
 			case 0:
-				nodeType = "FORM";
+				nodeType = 'FORM';
 				break;
 
 			case 1:
-				nodeType = "CHK";
+				nodeType = 'CHK';
 				break;
 
 			case 2:
-				nodeType = "S-CHK";
+				nodeType = 'S-CHK';
 				break;
 
 		}
 
 		console.log(
-			"| ".repeat( this.depth ) +
+			'| '.repeat( this.depth ) +
 			nodeType,
 			this.nodeID,
 			`( ${this.offset} ) -> ( ${this.dataOffset + this.length} )`,
-			( ( this.node == 0 ) ? " {" : "" ),
-			( ( this.skipped ) ? "SKIPPED" : "" ),
-			( ( this.node == 0 && this.skipped ) ? "}" : "" )
+			( ( this.node == 0 ) ? ' {' : '' ),
+			( ( this.skipped ) ? 'SKIPPED' : '' ),
+			( ( this.node == 0 && this.skipped ) ? '}' : '' )
 		);
 
 		if ( this.node == 0 && ! this.skipped ) {
@@ -1183,7 +1180,7 @@ Debugger.prototype = {
 			if ( this.offset >= this.formList[ i ] ) {
 
 				this.depth -= 1;
-				console.log( "| ".repeat( this.depth ) + "}" );
+				console.log( '| '.repeat( this.depth ) + '}' );
 				this.formList.splice( - 1, 1 );
 
 			}
@@ -1214,7 +1211,7 @@ function stringOffset( string ) {
 // printBuffer( this.reader.dv.buffer, this.reader.offset, length );
 function printBuffer( buffer, from, to ) {
 
-	console.log( LoaderUtils.decodeText( new Uint8Array( buffer, from, to ) ) );
+	console.log( new TextDecoder().decode( new Uint8Array( buffer, from, to ) ) );
 
 }
 

@@ -19,31 +19,43 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - spline extrusion examples<br/>
-			by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - spline extrusion examples
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { Curves } from './jsm/curves/CurveExtras.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import * as Curves from 'three/addons/curves/CurveExtras.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer, splineCamera, cameraHelper, cameraEye;
+			let camera, scene, renderer, splineCamera, cameraHelper, cameraEye;
 
-			var direction = new THREE.Vector3();
-			var binormal = new THREE.Vector3();
-			var normal = new THREE.Vector3();
-			var position = new THREE.Vector3();
-			var lookAt = new THREE.Vector3();
+			const direction = new THREE.Vector3();
+			const binormal = new THREE.Vector3();
+			const normal = new THREE.Vector3();
+			const position = new THREE.Vector3();
+			const lookAt = new THREE.Vector3();
 
-			var pipeSpline = new THREE.CatmullRomCurve3( [
+			const pipeSpline = new THREE.CatmullRomCurve3( [
 				new THREE.Vector3( 0, 10, - 10 ), new THREE.Vector3( 10, 0, - 10 ),
 				new THREE.Vector3( 20, 0, 0 ), new THREE.Vector3( 30, 0, 10 ),
 				new THREE.Vector3( 30, 0, 20 ), new THREE.Vector3( 20, 0, 30 ),
@@ -60,7 +72,7 @@
 				new THREE.Vector3( 90, 0, 0 ), new THREE.Vector3( 100, 0, 0 )
 			] );
 
-			var sampleClosedSpline = new THREE.CatmullRomCurve3( [
+			const sampleClosedSpline = new THREE.CatmullRomCurve3( [
 				new THREE.Vector3( 0, - 40, - 40 ),
 				new THREE.Vector3( 0, 40, - 40 ),
 				new THREE.Vector3( 0, 140, - 40 ),
@@ -72,7 +84,7 @@
 			sampleClosedSpline.closed = true;
 
 			// Keep a dictionary of Curve instances
-			var splines = {
+			const splines = {
 				GrannyKnot: new Curves.GrannyKnot(),
 				HeartCurve: new Curves.HeartCurve( 3.5 ),
 				VivianiCurve: new Curves.VivianiCurve( 70 ),
@@ -91,9 +103,9 @@
 				SampleClosedSpline: sampleClosedSpline
 			};
 
-			var parent, tubeGeometry, mesh;
+			let parent, tubeGeometry, mesh;
 
-			var params = {
+			const params = {
 				spline: 'GrannyKnot',
 				scale: 4,
 				extrusionSegments: 100,
@@ -104,9 +116,9 @@
 				cameraHelper: false,
 			};
 
-			var material = new THREE.MeshLambertMaterial( { color: 0xff00ff } );
+			const material = new THREE.MeshLambertMaterial( { color: 0xff00ff } );
 
-			var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.3, wireframe: true, transparent: true } );
+			const wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.3, wireframe: true, transparent: true } );
 
 			function addTube() {
 
@@ -117,9 +129,9 @@
 
 				}
 
-				var extrudePath = splines[ params.spline ];
+				const extrudePath = splines[ params.spline ];
 
-				tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, params.extrusionSegments, 2, params.radiusSegments, params.closed );
+				tubeGeometry = new THREE.TubeGeometry( extrudePath, params.extrusionSegments, 2, params.radiusSegments, params.closed );
 
 				addGeometry( tubeGeometry );
 
@@ -139,7 +151,7 @@
 				// 3D shape
 
 				mesh = new THREE.Mesh( geometry, material );
-				var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
+				const wireframe = new THREE.Mesh( geometry, wireframeMaterial );
 				mesh.add( wireframe );
 
 				parent.add( mesh );
@@ -172,7 +184,9 @@
 
 				// light
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				scene.add( new THREE.AmbientLight( 0xffffff ) );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
@@ -191,7 +205,7 @@
 
 				// debug camera
 
-				cameraEye = new THREE.Mesh( new THREE.SphereBufferGeometry( 5 ), new THREE.MeshBasicMaterial( { color: 0xdddddd } ) );
+				cameraEye = new THREE.Mesh( new THREE.SphereGeometry( 5 ), new THREE.MeshBasicMaterial( { color: 0xdddddd } ) );
 				parent.add( cameraEye );
 
 				cameraHelper.visible = params.cameraHelper;
@@ -211,9 +225,9 @@
 
 				// dat.GUI
 
-				var gui = new GUI( { width: 300 } );
+				const gui = new GUI( { width: 285 } );
 
-				var folderGeometry = gui.addFolder( 'Geometry' );
+				const folderGeometry = gui.addFolder( 'Geometry' );
 				folderGeometry.add( params, 'spline', Object.keys( splines ) ).onChange( function () {
 
 					addTube();
@@ -241,7 +255,7 @@
 				} );
 				folderGeometry.open();
 
-				var folderCamera = gui.addFolder( 'Camera' );
+				const folderCamera = gui.addFolder( 'Camera' );
 				folderCamera.add( params, 'animationView' ).onChange( function () {
 
 					animateCamera();
@@ -259,11 +273,11 @@
 				} );
 				folderCamera.open();
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 100;
 				controls.maxDistance = 2000;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -291,25 +305,25 @@
 
 				// animate camera along spline
 
-				var time = Date.now();
-				var looptime = 20 * 1000;
-				var t = ( time % looptime ) / looptime;
+				const time = Date.now();
+				const looptime = 20 * 1000;
+				const t = ( time % looptime ) / looptime;
 
 				tubeGeometry.parameters.path.getPointAt( t, position );
 				position.multiplyScalar( params.scale );
 
 				// interpolation
 
-				var segments = tubeGeometry.tangents.length;
-				var pickt = t * segments;
-				var pick = Math.floor( pickt );
-				var pickNext = ( pick + 1 ) % segments;
+				const segments = tubeGeometry.tangents.length;
+				const pickt = t * segments;
+				const pick = Math.floor( pickt );
+				const pickNext = ( pick + 1 ) % segments;
 
 				binormal.subVectors( tubeGeometry.binormals[ pickNext ], tubeGeometry.binormals[ pick ] );
 				binormal.multiplyScalar( pickt - pick ).add( tubeGeometry.binormals[ pick ] );
 
 				tubeGeometry.parameters.path.getTangentAt( t, direction );
-				var offset = 15;
+				const offset = 15;
 
 				normal.copy( binormal ).cross( direction );
 

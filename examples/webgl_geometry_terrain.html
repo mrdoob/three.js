@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - geometry - terrain</title>
+		<title>three.js webgl - geometry - terrain + fog</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background-color: #bfd1e5;
+				background-color: #efd1b5;
 				color: #61443e;
 			}
 			a {
@@ -18,27 +18,36 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain demo<br />(left click: forward, right click: backward)</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain + fog demo <br />(left click: forward, right click: backward)</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
-			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 
-			var container, stats;
+			let container, stats;
+			let camera, controls, scene, renderer;
+			let mesh, texture;
 
-			var camera, controls, scene, renderer;
-
-			var mesh, texture;
-
-			var worldWidth = 256, worldDepth = 256,
-				worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2;
-
-			var clock = new THREE.Clock();
+			const worldWidth = 256, worldDepth = 256;
+			const clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -47,21 +56,23 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xbfd1e5 );
+				scene.background = new THREE.Color( 0xefd1b5 );
+				scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0025 );
 
-				var data = generateHeight( worldWidth, worldDepth );
+				const data = generateHeight( worldWidth, worldDepth );
 
-				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
+				camera.position.set( 100, 800, - 800 );
+				camera.lookAt( - 100, 810, - 800 );
 
-				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				const geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
-				var vertices = geometry.attributes.position.array;
+				const vertices = geometry.attributes.position.array;
 
-				for ( var i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
+				for ( let i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
 
 					vertices[ j + 1 ] = data[ i ] * 10;
 
@@ -70,6 +81,7 @@
 				texture = new THREE.CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
 				texture.wrapS = THREE.ClampToEdgeWrapping;
 				texture.wrapT = THREE.ClampToEdgeWrapping;
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );
@@ -80,15 +92,16 @@
 				container.appendChild( renderer.domElement );
 
 				controls = new FirstPersonControls( camera, renderer.domElement );
-				controls.movementSpeed = 1000;
+				controls.movementSpeed = 150;
 				controls.lookSpeed = 0.1;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
+
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -105,14 +118,24 @@
 
 			function generateHeight( width, height ) {
 
-				var size = width * height, data = new Uint8Array( size ),
-					perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
+				let seed = Math.PI / 4;
+				window.Math.random = function () {
 
-				for ( var j = 0; j < 4; j ++ ) {
+					const x = Math.sin( seed ++ ) * 10000;
+					return x - Math.floor( x );
 
-					for ( var i = 0; i < size; i ++ ) {
+				};
 
-						var x = i % width, y = ~ ~ ( i / width );
+				const size = width * height, data = new Uint8Array( size );
+				const perlin = new ImprovedNoise(), z = Math.random() * 100;
+
+				let quality = 1;
+
+				for ( let j = 0; j < 4; j ++ ) {
+
+					for ( let i = 0; i < size; i ++ ) {
+
+						const x = i % width, y = ~ ~ ( i / width );
 						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * quality * 1.75 );
 
 					}
@@ -127,14 +150,14 @@
 
 			function generateTexture( data, width, height ) {
 
-				var canvas, canvasScaled, context, image, imageData, vector3, sun, shade;
+				let context, image, imageData, shade;
 
-				vector3 = new THREE.Vector3( 0, 0, 0 );
+				const vector3 = new THREE.Vector3( 0, 0, 0 );
 
-				sun = new THREE.Vector3( 1, 1, 1 );
+				const sun = new THREE.Vector3( 1, 1, 1 );
 				sun.normalize();
 
-				canvas = document.createElement( 'canvas' );
+				const canvas = document.createElement( 'canvas' );
 				canvas.width = width;
 				canvas.height = height;
 
@@ -145,7 +168,7 @@
 				image = context.getImageData( 0, 0, canvas.width, canvas.height );
 				imageData = image.data;
 
-				for ( var i = 0, j = 0, l = imageData.length; i < l; i += 4, j ++ ) {
+				for ( let i = 0, j = 0, l = imageData.length; i < l; i += 4, j ++ ) {
 
 					vector3.x = data[ j - 2 ] - data[ j + 2 ];
 					vector3.y = 2;
@@ -164,7 +187,7 @@
 
 				// Scaled 4x
 
-				canvasScaled = document.createElement( 'canvas' );
+				const canvasScaled = document.createElement( 'canvas' );
 				canvasScaled.width = width * 4;
 				canvasScaled.height = height * 4;
 
@@ -175,9 +198,9 @@
 				image = context.getImageData( 0, 0, canvasScaled.width, canvasScaled.height );
 				imageData = image.data;
 
-				for ( var i = 0, l = imageData.length; i < l; i += 4 ) {
+				for ( let i = 0, l = imageData.length; i < l; i += 4 ) {
 
-					var v = ~ ~ ( Math.random() * 5 );
+					const v = ~ ~ ( Math.random() * 5 );
 
 					imageData[ i ] += v;
 					imageData[ i + 1 ] += v;
@@ -201,6 +224,7 @@
 				stats.update();
 
 			}
+
 
 			function render() {
 

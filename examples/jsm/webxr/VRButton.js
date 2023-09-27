@@ -1,27 +1,18 @@
-/**
- * @author mrdoob / http://mrdoob.com
- * @author Mugen87 / https://github.com/Mugen87
- */
+class VRButton {
 
-var VRButton = {
+	static createButton( renderer ) {
 
-	createButton: function ( renderer, options ) {
-
-		if ( options ) {
-
-			console.error( 'THREE.VRButton: The "options" parameter has been removed. Please set the reference space type via renderer.xr.setReferenceSpaceType() instead.' );
-
-		}
+		const button = document.createElement( 'button' );
 
 		function showEnterVR( /*device*/ ) {
 
-			var currentSession = null;
+			let currentSession = null;
 
-			function onSessionStarted( session ) {
+			async function onSessionStarted( session ) {
 
 				session.addEventListener( 'end', onSessionEnded );
 
-				renderer.xr.setSession( session );
+				await renderer.xr.setSession( session );
 				button.textContent = 'EXIT VR';
 
 				currentSession = session;
@@ -71,7 +62,7 @@ var VRButton = {
 					// ('local' is always available for immersive sessions and doesn't need to
 					// be requested separately.)
 
-					var sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor' ] };
+					const sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor', 'hand-tracking', 'layers' ] };
 					navigator.xr.requestSession( 'immersive-vr', sessionInit ).then( onSessionStarted );
 
 				} else {
@@ -107,6 +98,16 @@ var VRButton = {
 
 		}
 
+		function showVRNotAllowed( exception ) {
+
+			disableButton();
+
+			console.warn( 'Exception when trying to call xr.isSessionSupported', exception );
+
+			button.textContent = 'VR NOT ALLOWED';
+
+		}
+
 		function stylizeElement( element ) {
 
 			element.style.position = 'absolute';
@@ -126,7 +127,7 @@ var VRButton = {
 
 		if ( 'xr' in navigator ) {
 
-			var button = document.createElement( 'button' );
+			button.id = 'VRButton';
 			button.style.display = 'none';
 
 			stylizeElement( button );
@@ -135,13 +136,19 @@ var VRButton = {
 
 				supported ? showEnterVR() : showWebXRNotFound();
 
-			} );
+				if ( supported && VRButton.xrSessionIsGranted ) {
+
+					button.click();
+
+				}
+
+			} ).catch( showVRNotAllowed );
 
 			return button;
 
 		} else {
 
-			var message = document.createElement( 'a' );
+			const message = document.createElement( 'a' );
 
 			if ( window.isSecureContext === false ) {
 
@@ -167,6 +174,27 @@ var VRButton = {
 
 	}
 
-};
+	static registerSessionGrantedListener() {
+
+		if ( 'xr' in navigator ) {
+
+			// WebXRViewer (based on Firefox) has a bug where addEventListener
+			// throws a silent exception and aborts execution entirely.
+			if ( /WebXRViewer\//i.test( navigator.userAgent ) ) return;
+
+			navigator.xr.addEventListener( 'sessiongranted', () => {
+
+				VRButton.xrSessionIsGranted = true;
+
+			} );
+
+		}
+
+	}
+
+}
+
+VRButton.xrSessionIsGranted = false;
+VRButton.registerSessionGrantedListener();
 
 export { VRButton };

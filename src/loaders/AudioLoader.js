@@ -2,63 +2,65 @@ import { AudioContext } from '../audio/AudioContext.js';
 import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 
-/**
- * @author Reece Aaron Lecrivain / http://reecenotes.com/
- */
+class AudioLoader extends Loader {
 
-function AudioLoader( manager ) {
+	constructor( manager ) {
 
-	Loader.call( this, manager );
+		super( manager );
 
-}
+	}
 
-AudioLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	load( url, onLoad, onProgress, onError ) {
 
-	constructor: AudioLoader,
+		const scope = this;
 
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		var scope = this;
-
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
-		loader.setPath( scope.path );
+		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( buffer ) {
 
 			try {
 
 				// Create a copy of the buffer. The `decodeAudioData` method
 				// detaches the buffer when complete, preventing reuse.
-				var bufferCopy = buffer.slice( 0 );
+				const bufferCopy = buffer.slice( 0 );
 
-				var context = AudioContext.getContext();
+				const context = AudioContext.getContext();
 				context.decodeAudioData( bufferCopy, function ( audioBuffer ) {
 
 					onLoad( audioBuffer );
 
-				} );
+				}, handleError );
 
 			} catch ( e ) {
 
-				if ( onError ) {
-
-					onError( e );
-
-				} else {
-
-					console.error( e );
-
-				}
-
-				scope.manager.itemError( url );
+				handleError( e );
 
 			}
 
 		}, onProgress, onError );
 
+		function handleError( e ) {
+
+			if ( onError ) {
+
+				onError( e );
+
+			} else {
+
+				console.error( e );
+
+			}
+
+			scope.manager.itemError( url );
+
+		}
+
 	}
 
-} );
+}
 
 
 export { AudioLoader };

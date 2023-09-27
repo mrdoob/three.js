@@ -1,20 +1,16 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UISelect } from './libs/ui.js';
 
-var ViewportCamera = function ( editor ) {
+function ViewportCamera( editor ) {
 
-	var signals = editor.signals;
+	const signals = editor.signals;
 
 	//
 
-	var cameraSelect = new UISelect();
-	cameraSelect.setPosition( 'absolute' );
-	cameraSelect.setRight( '10px' );
-	cameraSelect.setTop( '10px' );
-	cameraSelect.onChange( function () {
+	const select = new UISelect();
+	select.setPosition( 'absolute' );
+	select.setRight( '120px' );
+	select.setTop( '10px' );
+	select.onChange( function () {
 
 		editor.setViewportCamera( this.getValue() );
 
@@ -29,24 +25,24 @@ var ViewportCamera = function ( editor ) {
 
 	function update() {
 
-		var options = {};
+		const options = {};
 
-		var cameras = editor.cameras;
+		const cameras = editor.cameras;
 
-		for ( var key in cameras ) {
+		for ( const key in cameras ) {
 
-			var camera = cameras[ key ];
+			const camera = cameras[ key ];
 			options[ camera.uuid ] = camera.name;
 
 		}
 
-		cameraSelect.setOptions( options );
-		cameraSelect.setValue( editor.viewportCamera.uuid );
+		select.setOptions( options );
+		select.setValue( editor.viewportCamera.uuid );
 
 	}
 
-	return cameraSelect;
+	return select;
 
-};
+}
 
 export { ViewportCamera };

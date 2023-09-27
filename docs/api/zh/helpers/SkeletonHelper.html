@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -20,7 +19,7 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var helper = new THREE.SkeletonHelper( skinnedMesh );
+		const helper = new THREE.SkeletonHelper( skinnedMesh );
 		scene.add( helper );
 		</code>
 
@@ -47,6 +46,11 @@
 		<h3>[property:Array bones]</h3>
 		<p>
 		辅助对象使用 [page:Line Lines] 渲染的骨数组.
+		</p>
+
+		<h3>[property:Boolean isSkeletonHelper]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Object3D root]</h3>

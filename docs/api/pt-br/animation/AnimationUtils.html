@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Um objeto com várias funções para auxiliar nas animações, usado internamente.
+		</p>
+
+
+		<h2>Métodos</h2>
+
+
+		<h3>[method:Array arraySlice]( array, from, to )</h3>
+		<p>
+			É o mesmo que Array.prototype.slice, mas também funciona em arrays tipados.
+		</p>
+
+		<h3>[method:Array convertArray]( array, type, forceClone )</h3>
+		<p>
+			Converte um array em um tipo específico.
+		</p>
+
+		<h3>[method:Array flattenJSON]( jsonKeys, times, values, valuePropertyName )</h3>
+		<p>
+			Usado para analisar formatos de keyframes AOS.
+		</p>
+
+		<h3>[method:Array getKeyframeOrder]( times )</h3>
+		<p>
+			Retorna uma matriz pela qual os tempos e os valores podem ser classificados.
+		</p>
+
+		<h3>[method:Boolean isTypedArray]( object )</h3>
+		<p>
+			Retorna `true` se o objeto for um array tipado.
+		</p>
+
+		<h3>[method:AnimationClip makeClipAdditive]( [param:AnimationClip targetClip], [param:Number referenceFrame], [param:AnimationClip referenceClip], [param:Number fps] )</h3>
+		<p>
+			Converte os keyframes do clipe de animação fornecido em um formato aditivo.
+		</p>
+
+		<h3>[method:Array sortedArray]( values, stride, order )</h3>
+		<p>
+			Classifica o array retornado anteriormente por [page:AnimationUtils.getKeyframeOrder getKeyframeOrder].
+		</p>
+
+		<h3>[method:AnimationClip subclip]( [param:AnimationClip clip], [param:String name], [param:Number startFrame], [param:Number endFrame], [param:Number fps] )</h3>
+		<p>
+			Cria um novo clipe, contendo apenas o segmento do clipe original entre os quadros fornecidos.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

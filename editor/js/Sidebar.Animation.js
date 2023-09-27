@@ -1,38 +1,57 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { UIPanel, UIBreak, UIButton, UIDiv, UIText, UINumber, UIRow } from './libs/ui.js';
 
-import { UIPanel, UIDiv, UIBreak, UISelect, UIButton, UIText } from './libs/ui.js';
+function SidebarAnimation( editor ) {
 
-var SidebarAnimation = function ( editor ) {
+	const strings = editor.strings;
+	const signals = editor.signals;
+	const mixer = editor.mixer;
 
-	var signals = editor.signals;
-	var mixer = editor.mixer;
+	function getButtonText( action ) {
 
-	var actions = {};
+		return action.isRunning()
+			? strings.getKey( 'sidebar/animations/stop' )
+			: strings.getKey( 'sidebar/animations/play' );
+
+	}
+
+	function Animation( animation, object ) {
+
+		const action = mixer.clipAction( animation, object );
+
+		const container = new UIRow();
+
+		const name = new UIText( animation.name ).setWidth( '200px' );
+		container.add( name );
+
+		const button = new UIButton( getButtonText( action ) );
+		button.onClick( function () {
+
+			action.isRunning() ? action.stop() : action.play();
+			button.setTextContent( getButtonText( action ) );
+
+		} );
+
+		container.add( button );
+
+		return container;
+
+	}
 
 	signals.objectSelected.add( function ( object ) {
 
-		var animations = editor.animations[ object !== null ? object.uuid : '' ];
+		if ( object !== null && object.animations.length > 0 ) {
 
-		if ( animations !== undefined ) {
+			animationsList.clear();
 
-			container.setDisplay( '' );
+			const animations = object.animations;
 
-			var options = {};
-			var firstAnimation;
+			for ( const animation of animations ) {
 
-			for ( var animation of animations ) {
-
-				if ( firstAnimation === undefined ) firstAnimation = animation.name;
-
-				actions[ animation.name ] = mixer.clipAction( animation, object );
-				options[ animation.name ] = animation.name;
+				animationsList.add( new Animation( animation, object ) );
 
 			}
 
-			animationsSelect.setOptions( options );
-			animationsSelect.setValue( firstAnimation );
+			container.setDisplay( '' );
 
 		} else {
 
@@ -44,9 +63,7 @@ var SidebarAnimation = function ( editor ) {
 
 	signals.objectRemoved.add( function ( object ) {
 
-		var animations = editor.animations[ object !== null ? object.uuid : '' ];
-
-		if ( animations !== undefined ) {
+		if ( object !== null && object.animations.length > 0 ) {
 
 			mixer.uncacheRoot( object );
 
@@ -54,35 +71,31 @@ var SidebarAnimation = function ( editor ) {
 
 	} );
 
-	function playAction() {
-
-		actions[ animationsSelect.getValue() ].play();
-
-	}
-
-	function stopAction() {
-
-		actions[ animationsSelect.getValue() ].stop();
-
-	}
-
-	var container = new UIPanel();
+	const container = new UIPanel();
 	container.setDisplay( 'none' );
 
-	container.add( new UIText( 'Animations' ).setTextTransform( 'uppercase' ) );
+	container.add( new UIText( strings.getKey( 'sidebar/animations' ) ).setTextTransform( 'uppercase' ) );
 	container.add( new UIBreak() );
 	container.add( new UIBreak() );
 
-	var div = new UIDiv();
-	container.add( div );
+	const animationsList = new UIDiv();
+	container.add( animationsList );
 
-	var animationsSelect = new UISelect().setFontSize( '12px' );
-	div.add( animationsSelect );
-	div.add( new UIButton( 'Play' ).setMarginLeft( '4px' ).onClick( playAction ) );
-	div.add( new UIButton( 'Stop' ).setMarginLeft( '4px' ).onClick( stopAction ) );
+	const mixerTimeScaleRow = new UIRow();
+	const mixerTimeScaleNumber = new UINumber( 0.5 ).setWidth( '60px' ).setRange( - 10, 10 );
+	mixerTimeScaleNumber.onChange( function () {
+
+		mixer.timeScale = mixerTimeScaleNumber.getValue();
+
+	} );
+
+	mixerTimeScaleRow.add( new UIText( strings.getKey( 'sidebar/animations/timescale' ) ).setWidth( '90px' ) );
+	mixerTimeScaleRow.add( mixerTimeScaleNumber );
+
+	container.add( mixerTimeScaleRow );
 
 	return container;
 
-};
+}
 
 export { SidebarAnimation };

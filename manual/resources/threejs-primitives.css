@@ -1,0 +1,75 @@
+div[data-primitive] {
+    padding-bottom: 2em;
+    border-bottom: 1px solid #888;
+    margin-bottom: 2em;
+}
+div[data-primitive] .pair {
+  display: flex;
+  flex-direction: column-reverse;
+  margin-bottom: 1em;
+}
+div[data-primitive] .shape {
+  flex: 0 0 auto;
+  width: 100%;
+  height: 250px;
+}
+div[data-primitive] .desc {
+  word-wrap: break-word;
+  padding: 1em;
+  min-width: 0;
+}
+div[data-primitive] .desc code {
+  white-space: normal;
+}
+
+div[data-primitive] .input {
+  display: inline-block;
+  user-select: none;
+}
+div[data-primitive] .input::before {
+  content:" ";
+}
+div[data-primitive] .input input[type=range] {
+  width: 200px;
+}
+div[data-primitive] .input>div {
+  position: absolute;
+  display: inline-block;
+}
+div[data-primitive] .input input {
+  position: absolute;
+}
+div[data-primitive] .input input[type=text] {
+  background: #444;
+  color: white;
+  border: none;
+  padding: 3px;
+}
+
+@media (max-width: 600px) {
+  div[data-primitive] .input>div {
+    right: 0;
+  }
+  div[data-primitive] .input input {
+      opacity: 0.2;
+      right: 1em;
+  }
+}
+
+@media (max-width: 550px) {
+  div[data-primitive] .shape {
+      height: 120px;
+  }
+}
+@media (max-width: 450px) {
+  div[data-primitive] .pair {
+    flex-direction: column-reverse;
+  }
+  div[data-primitive] .shape {
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+div[data-primitive] .desc {
+  flex: 1 1 auto;
+}

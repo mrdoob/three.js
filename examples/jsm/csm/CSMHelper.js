@@ -6,11 +6,11 @@ import {
 	LineBasicMaterial,
 	Box3Helper,
 	Box3,
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	MeshBasicMaterial,
 	BufferAttribute,
 	DoubleSide
-} from '../../../build/three.module.js';
+} from 'three';
 
 class CSMHelper extends Group {
 
@@ -95,7 +95,7 @@ class CSMHelper extends Group {
 
 			const cascadeLine = new Box3Helper( new Box3(), 0xffffff );
 			const planeMat = new MeshBasicMaterial( { transparent: true, opacity: 0.1, depthWrite: false, side: DoubleSide } );
-			const cascadePlane = new Mesh( new PlaneBufferGeometry(), planeMat );
+			const cascadePlane = new Mesh( new PlaneGeometry(), planeMat );
 			const shadowLineGroup = new Group();
 			const shadowLine = new Box3Helper( new Box3(), 0xffff00 );
 			shadowLineGroup.add( shadowLine );
@@ -155,6 +155,36 @@ class CSMHelper extends Group {
 		frustumLinePositions.setXYZ( 6, nearVerts[ 2 ].x, nearVerts[ 2 ].y, nearVerts[ 2 ].z );
 		frustumLinePositions.setXYZ( 7, nearVerts[ 1 ].x, nearVerts[ 1 ].y, nearVerts[ 1 ].z );
 		frustumLinePositions.needsUpdate = true;
+
+	}
+
+	dispose() {
+
+		const frustumLines = this.frustumLines;
+		const cascadeLines = this.cascadeLines;
+		const cascadePlanes = this.cascadePlanes;
+		const shadowLines = this.shadowLines;
+
+		frustumLines.geometry.dispose();
+		frustumLines.material.dispose();
+
+		const cascades = this.csm.cascades;
+
+		for ( let i = 0; i < cascades; i ++ ) {
+
+			const cascadeLine = cascadeLines[ i ];
+			const cascadePlane = cascadePlanes[ i ];
+			const shadowLineGroup = shadowLines[ i ];
+			const shadowLine = shadowLineGroup.children[ 0 ];
+
+			cascadeLine.dispose(); // Box3Helper
+
+			cascadePlane.geometry.dispose();
+			cascadePlane.material.dispose();
+
+			shadowLine.dispose(); // Box3Helper
+
+		}
 
 	}
 

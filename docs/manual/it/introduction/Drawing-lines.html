@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Disegnare linee ([name])</h1>
+		<div>
+      <p>
+				Diciamo che tu voglia disegnare una linea o un cerchio, non un wireframe [page:Mesh].
+        Prima bisogna impostare il [page:WebGLRenderer renderer], la [page:Scene scene] e la camera (vedi la pagina Creare una scena).
+			</p>
+
+			<p>Di seguito il codice che utilizzeremo:</p>
+			<code>
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+
+const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
+camera.position.set( 0, 0, 100 );
+camera.lookAt( 0, 0, 0 );
+
+const scene = new THREE.Scene();
+			</code>
+			<p>La prossima cosa da fare è definire il materiale. Per le linee possiamo usare [page:LineBasicMaterial] o [page:LineDashedMaterial].</p>
+			<code>
+//crea una LineBasicMaterial blu
+const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+			</code>
+
+			<p>
+				Dopo la definizione del materiale abbiamo bisogno di una geometria con alcuni vertici:
+			</p>
+
+			<code>
+const points = [];
+points.push( new THREE.Vector3( - 10, 0, 0 ) );
+points.push( new THREE.Vector3( 0, 10, 0 ) );
+points.push( new THREE.Vector3( 10, 0, 0 ) );
+
+const geometry = new THREE.BufferGeometry().setFromPoints( points );
+			</code>
+
+			<p>Da notare che le linee vengono tracciate tra ogni coppia consecutiva di vertici, ma non tra il primo e l'ultimo vertice (la linea non è chiusa).</p>
+
+			<p>Ora che abbiamo i punti per due linee e un materiale, possiamo unirli per formare una linea.</p>
+			<code>
+const line = new THREE.Line( geometry, material );
+			</code>
+			<p>Non resta che aggiungerlo alla scena e chiamare il [page:WebGLRenderer.render render].</p>
+
+			<code>
+scene.add( line );
+renderer.render( scene, camera );
+			</code>
+
+			<p>Ora dovresti vedere una freccia che punta verso l'alto formata da due linee blu.</p>
+		</div>
+	</body>
+</html>

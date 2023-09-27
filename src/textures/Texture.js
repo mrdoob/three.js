@@ -1,106 +1,126 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author szimek / https://github.com/szimek/
- */
-
 import { EventDispatcher } from '../core/EventDispatcher.js';
 import {
 	MirroredRepeatWrapping,
 	ClampToEdgeWrapping,
 	RepeatWrapping,
-	LinearEncoding,
 	UnsignedByteType,
 	RGBAFormat,
 	LinearMipmapLinearFilter,
 	LinearFilter,
-	UVMapping
+	UVMapping,
+	sRGBEncoding,
+	SRGBColorSpace,
+	NoColorSpace,
+	LinearEncoding
 } from '../constants.js';
-import { MathUtils } from '../math/MathUtils.js';
+import * as MathUtils from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
-import { ImageUtils } from '../extras/ImageUtils.js';
+import { Source } from './Source.js';
+import { warnOnce } from '../utils.js';
 
-var textureId = 0;
+let _textureId = 0;
 
-function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+class Texture extends EventDispatcher {
 
-	Object.defineProperty( this, 'id', { value: textureId ++ } );
+	constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = Texture.DEFAULT_ANISOTROPY, colorSpace = NoColorSpace ) {
 
-	this.uuid = MathUtils.generateUUID();
+		super();
 
-	this.name = '';
+		this.isTexture = true;
 
-	this.image = image !== undefined ? image : Texture.DEFAULT_IMAGE;
-	this.mipmaps = [];
+		Object.defineProperty( this, 'id', { value: _textureId ++ } );
 
-	this.mapping = mapping !== undefined ? mapping : Texture.DEFAULT_MAPPING;
+		this.uuid = MathUtils.generateUUID();
 
-	this.wrapS = wrapS !== undefined ? wrapS : ClampToEdgeWrapping;
-	this.wrapT = wrapT !== undefined ? wrapT : ClampToEdgeWrapping;
+		this.name = '';
 
-	this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
-	this.minFilter = minFilter !== undefined ? minFilter : LinearMipmapLinearFilter;
+		this.source = new Source( image );
+		this.mipmaps = [];
 
-	this.anisotropy = anisotropy !== undefined ? anisotropy : 1;
+		this.mapping = mapping;
+		this.channel = 0;
 
-	this.format = format !== undefined ? format : RGBAFormat;
-	this.internalFormat = null;
-	this.type = type !== undefined ? type : UnsignedByteType;
+		this.wrapS = wrapS;
+		this.wrapT = wrapT;
 
-	this.offset = new Vector2( 0, 0 );
-	this.repeat = new Vector2( 1, 1 );
-	this.center = new Vector2( 0, 0 );
-	this.rotation = 0;
+		this.magFilter = magFilter;
+		this.minFilter = minFilter;
 
-	this.matrixAutoUpdate = true;
-	this.matrix = new Matrix3();
+		this.anisotropy = anisotropy;
 
-	this.generateMipmaps = true;
-	this.premultiplyAlpha = false;
-	this.flipY = true;
-	this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
+		this.format = format;
+		this.internalFormat = null;
+		this.type = type;
 
-	// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
-	//
-	// Also changing the encoding after already used by a Material will not automatically make the Material
-	// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
-	this.encoding = encoding !== undefined ? encoding : LinearEncoding;
+		this.offset = new Vector2( 0, 0 );
+		this.repeat = new Vector2( 1, 1 );
+		this.center = new Vector2( 0, 0 );
+		this.rotation = 0;
 
-	this.version = 0;
-	this.onUpdate = null;
+		this.matrixAutoUpdate = true;
+		this.matrix = new Matrix3();
 
-}
+		this.generateMipmaps = true;
+		this.premultiplyAlpha = false;
+		this.flipY = true;
+		this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-Texture.DEFAULT_IMAGE = undefined;
-Texture.DEFAULT_MAPPING = UVMapping;
+		if ( typeof colorSpace === 'string' ) {
 
-Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+			this.colorSpace = colorSpace;
 
-	constructor: Texture,
+		} else { // @deprecated, r152
 
-	isTexture: true,
+			warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
+			this.colorSpace = colorSpace === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
 
-	updateMatrix: function () {
+		}
+
+
+		this.userData = {};
+
+		this.version = 0;
+		this.onUpdate = null;
+
+		this.isRenderTargetTexture = false; // indicates whether a texture belongs to a render target or not
+		this.needsPMREMUpdate = false; // indicates whether this texture should be processed by PMREMGenerator or not (only relevant for render target textures)
+
+	}
+
+	get image() {
+
+		return this.source.data;
+
+	}
+
+	set image( value = null ) {
+
+		this.source.data = value;
+
+	}
+
+	updateMatrix() {
 
 		this.matrix.setUvTransform( this.offset.x, this.offset.y, this.repeat.x, this.repeat.y, this.rotation, this.center.x, this.center.y );
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		this.name = source.name;
 
-		this.image = source.image;
+		this.source = source.source;
 		this.mipmaps = source.mipmaps.slice( 0 );
 
 		this.mapping = source.mapping;
+		this.channel = source.channel;
 
 		this.wrapS = source.wrapS;
 		this.wrapT = source.wrapT;
@@ -126,15 +146,19 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 		this.premultiplyAlpha = source.premultiplyAlpha;
 		this.flipY = source.flipY;
 		this.unpackAlignment = source.unpackAlignment;
-		this.encoding = source.encoding;
+		this.colorSpace = source.colorSpace;
+
+		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+
+		this.needsUpdate = true;
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
-		var isRootObject = ( meta === undefined || typeof meta === 'string' );
+		const isRootObject = ( meta === undefined || typeof meta === 'string' );
 
 		if ( ! isRootObject && meta.textures[ this.uuid ] !== undefined ) {
 
@@ -142,10 +166,10 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		}
 
-		var output = {
+		const output = {
 
 			metadata: {
-				version: 4.5,
+				version: 4.6,
 				type: 'Texture',
 				generator: 'Texture.toJSON'
 			},
@@ -153,7 +177,10 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 			uuid: this.uuid,
 			name: this.name,
 
+			image: this.source.toJSON( meta ).uuid,
+
 			mapping: this.mapping,
+			channel: this.channel,
 
 			repeat: [ this.repeat.x, this.repeat.y ],
 			offset: [ this.offset.x, this.offset.y ],
@@ -163,8 +190,9 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 			wrap: [ this.wrapS, this.wrapT ],
 
 			format: this.format,
+			internalFormat: this.internalFormat,
 			type: this.type,
-			encoding: this.encoding,
+			colorSpace: this.colorSpace,
 
 			minFilter: this.minFilter,
 			magFilter: this.magFilter,
@@ -172,57 +200,13 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 			flipY: this.flipY,
 
+			generateMipmaps: this.generateMipmaps,
 			premultiplyAlpha: this.premultiplyAlpha,
 			unpackAlignment: this.unpackAlignment
 
 		};
 
-		if ( this.image !== undefined ) {
-
-			// TODO: Move to THREE.Image
-
-			var image = this.image;
-
-			if ( image.uuid === undefined ) {
-
-				image.uuid = MathUtils.generateUUID(); // UGH
-
-			}
-
-			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
-
-				var url;
-
-				if ( Array.isArray( image ) ) {
-
-					// process array of images e.g. CubeTexture
-
-					url = [];
-
-					for ( var i = 0, l = image.length; i < l; i ++ ) {
-
-						url.push( ImageUtils.getDataURL( image[ i ] ) );
-
-					}
-
-				} else {
-
-					// process single image
-
-					url = ImageUtils.getDataURL( image );
-
-				}
-
-				meta.images[ image.uuid ] = {
-					uuid: image.uuid,
-					url: url
-				};
-
-			}
-
-			output.image = image.uuid;
-
-		}
+		if ( Object.keys( this.userData ).length > 0 ) output.userData = this.userData;
 
 		if ( ! isRootObject ) {
 
@@ -232,15 +216,15 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		return output;
 
-	},
+	}
 
-	dispose: function () {
+	dispose() {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
-	},
+	}
 
-	transformUv: function ( uv ) {
+	transformUv( uv ) {
 
 		if ( this.mapping !== UVMapping ) return uv;
 
@@ -320,17 +304,35 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	}
 
-} );
+	set needsUpdate( value ) {
 
-Object.defineProperty( Texture.prototype, "needsUpdate", {
+		if ( value === true ) {
 
-	set: function ( value ) {
+			this.version ++;
+			this.source.needsUpdate = true;
 
-		if ( value === true ) this.version ++;
+		}
 
 	}
 
-} );
+	get encoding() { // @deprecated, r152
 
+		warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
+		return this.colorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding;
+
+	}
+
+	set encoding( encoding ) { // @deprecated, r152
+
+		warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
+		this.colorSpace = encoding === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
+
+	}
+
+}
+
+Texture.DEFAULT_IMAGE = null;
+Texture.DEFAULT_MAPPING = UVMapping;
+Texture.DEFAULT_ANISOTROPY = 1;
 
 export { Texture };

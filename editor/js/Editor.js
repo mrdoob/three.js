@@ -1,23 +1,20 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { Config } from './Config.js';
 import { Loader } from './Loader.js';
 import { History as _History } from './History.js';
 import { Strings } from './Strings.js';
 import { Storage as _Storage } from './Storage.js';
+import { Selector } from './Viewport.Selector.js';
 
-var Editor = function () {
+var _DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
+_DEFAULT_CAMERA.name = 'Camera';
+_DEFAULT_CAMERA.position.set( 0, 5, 10 );
+_DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
 
-	this.DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
-	this.DEFAULT_CAMERA.name = 'Camera';
-	this.DEFAULT_CAMERA.position.set( 0, 5, 10 );
-	this.DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
+function Editor() {
 
-	var Signal = signals.Signal;
+	const Signal = signals.Signal; // eslint-disable-line no-undef
 
 	this.signals = {
 
@@ -30,6 +27,11 @@ var Editor = function () {
 		startPlayer: new Signal(),
 		stopPlayer: new Signal(),
 
+		// vr
+
+		toggleVR: new Signal(),
+		exitedVR: new Signal(),
+
 		// notifications
 
 		editorCleared: new Signal(),
@@ -40,15 +42,18 @@ var Editor = function () {
 		transformModeChanged: new Signal(),
 		snapChanged: new Signal(),
 		spaceChanged: new Signal(),
-		rendererChanged: new Signal(),
+		rendererCreated: new Signal(),
 		rendererUpdated: new Signal(),
 
 		sceneBackgroundChanged: new Signal(),
+		sceneEnvironmentChanged: new Signal(),
 		sceneFogChanged: new Signal(),
+		sceneFogSettingsChanged: new Signal(),
 		sceneGraphChanged: new Signal(),
 		sceneRendered: new Signal(),
 
 		cameraChanged: new Signal(),
+		cameraResetted: new Signal(),
 
 		geometryChanged: new Signal(),
 
@@ -76,10 +81,14 @@ var Editor = function () {
 		windowResize: new Signal(),
 
 		showGridChanged: new Signal(),
+		showHelpersChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal(),
 
-		viewportCameraChanged: new Signal()
+		viewportCameraChanged: new Signal(),
+		viewportShadingChanged: new Signal(),
+
+		intersectionsDetected: new Signal(),
 
 	};
 
@@ -87,14 +96,14 @@ var Editor = function () {
 	this.history = new _History( this );
 	this.storage = new _Storage();
 	this.strings = new Strings( this.config );
+	this.selector = new Selector( this );
 
 	this.loader = new Loader( this );
 
-	this.camera = this.DEFAULT_CAMERA.clone();
+	this.camera = _DEFAULT_CAMERA.clone();
 
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
-	this.scene.background = new THREE.Color( 0xaaaaaa );
 
 	this.sceneHelpers = new THREE.Scene();
 
@@ -106,18 +115,19 @@ var Editor = function () {
 
 	this.materialsRefCounter = new Map(); // tracks how often is a material used by a 3D object
 
-	this.animations = {};
 	this.mixer = new THREE.AnimationMixer( this.scene );
 
 	this.selected = null;
 	this.helpers = {};
 
 	this.cameras = {};
+
 	this.viewportCamera = this.camera;
+	this.viewportShading = 'default';
 
 	this.addCamera( this.camera );
 
-};
+}
 
 Editor.prototype = {
 
@@ -126,9 +136,11 @@ Editor.prototype = {
 		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
 
-		this.scene.background = ( scene.background !== null ) ? scene.background.clone() : null;
-
-		if ( scene.fog !== null ) this.scene.fog = scene.fog.clone();
+		this.scene.background = scene.background;
+		this.scene.environment = scene.environment;
+		this.scene.fog = scene.fog;
+		this.scene.backgroundBlurriness = scene.backgroundBlurriness;
+		this.scene.backgroundIntensity = scene.backgroundIntensity;
 
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
@@ -358,16 +370,6 @@ Editor.prototype = {
 
 	},
 
-	addAnimation: function ( object, animations ) {
-
-		if ( animations.length > 0 ) {
-
-			this.animations[ object.uuid ] = animations;
-
-		}
-
-	},
-
 	//
 
 	addCamera: function ( camera ) {
@@ -398,7 +400,7 @@ Editor.prototype = {
 
 	addHelper: function () {
 
-		var geometry = new THREE.SphereBufferGeometry( 2, 4, 2 );
+		var geometry = new THREE.SphereGeometry( 2, 4, 2 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: false } );
 
 		return function ( object, helper ) {
@@ -419,7 +421,7 @@ Editor.prototype = {
 
 				} else if ( object.isSpotLight ) {
 
-					helper = new THREE.SpotLightHelper( object, 1 );
+					helper = new THREE.SpotLightHelper( object );
 
 				} else if ( object.isHemisphereLight ) {
 
@@ -429,6 +431,10 @@ Editor.prototype = {
 
 					helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
 
+				} else if ( object.isBone === true && object.parent?.isBone !== true ) {
+
+					helper = new THREE.SkeletonHelper( object );
+
 				} else {
 
 					// no helper for this object type
@@ -436,7 +442,7 @@ Editor.prototype = {
 
 				}
 
-				var picker = new THREE.Mesh( geometry, material );
+				const picker = new THREE.Mesh( geometry, material );
 				picker.name = 'picker';
 				picker.userData.object = object;
 				helper.add( picker );
@@ -530,7 +536,14 @@ Editor.prototype = {
 	setViewportCamera: function ( uuid ) {
 
 		this.viewportCamera = this.cameras[ uuid ];
-		this.signals.viewportCameraChanged.dispatch( this.viewportCamera );
+		this.signals.viewportCameraChanged.dispatch();
+
+	},
+
+	setViewportShading: function( value ) {
+
+		this.viewportShading = value;
+		this.signals.viewportShadingChanged.dispatch();
 
 	},
 
@@ -538,20 +551,7 @@ Editor.prototype = {
 
 	select: function ( object ) {
 
-		if ( this.selected === object ) return;
-
-		var uuid = null;
-
-		if ( object !== null ) {
-
-			uuid = object.uuid;
-
-		}
-
-		this.selected = object;
-
-		this.config.setKey( 'selected', uuid );
-		this.signals.objectSelected.dispatch( object );
+		this.selector.select( object );
 
 	},
 
@@ -564,7 +564,7 @@ Editor.prototype = {
 
 		}
 
-		this.select( this.scene.getObjectById( id, true ) );
+		this.select( this.scene.getObjectById( id ) );
 
 	},
 
@@ -586,7 +586,7 @@ Editor.prototype = {
 
 	deselect: function () {
 
-		this.select( null );
+		this.selector.deselect();
 
 	},
 
@@ -602,7 +602,7 @@ Editor.prototype = {
 
 	focusById: function ( id ) {
 
-		this.focus( this.scene.getObjectById( id, true ) );
+		this.focus( this.scene.getObjectById( id ) );
 
 	},
 
@@ -611,10 +611,13 @@ Editor.prototype = {
 		this.history.clear();
 		this.storage.clear();
 
-		this.camera.copy( this.DEFAULT_CAMERA );
-		this.scene.name = "Scene";
+		this.camera.copy( _DEFAULT_CAMERA );
+		this.signals.cameraResetted.dispatch();
+
+		this.scene.name = 'Scene';
 		this.scene.userData = {};
-		this.scene.background = new THREE.Color( 0xaaaaaa );
+		this.scene.background = null;
+		this.scene.environment = null;
 		this.scene.fog = null;
 
 		var objects = this.scene.children;
@@ -643,25 +646,18 @@ Editor.prototype = {
 
 	//
 
-	fromJSON: function ( json ) {
-
-		var scope = this;
+	fromJSON: async function ( json ) {
 
 		var loader = new THREE.ObjectLoader();
-		var camera = loader.parse( json.camera );
+		var camera = await loader.parseAsync( json.camera );
 
 		this.camera.copy( camera );
-		this.camera.aspect = this.DEFAULT_CAMERA.aspect;
-		this.camera.updateProjectionMatrix();
+		this.signals.cameraResetted.dispatch();
 
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 
-		loader.parse( json.scene, function ( scene ) {
-
-			scope.setScene( scene );
-
-		} );
+		this.setScene( await loader.parseAsync( json.scene ) );
 
 	},
 
@@ -691,9 +687,12 @@ Editor.prototype = {
 			metadata: {},
 			project: {
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
-				vr: this.config.getKey( 'project/vr' )
+				shadowType: this.config.getKey( 'project/renderer/shadowType' ),
+				vr: this.config.getKey( 'project/vr' ),
+				toneMapping: this.config.getKey( 'project/renderer/toneMapping' ),
+				toneMappingExposure: this.config.getKey( 'project/renderer/toneMappingExposure' )
 			},
-			camera: this.camera.toJSON(),
+			camera: this.viewportCamera.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
 			history: this.history.toJSON()

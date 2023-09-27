@@ -5,34 +5,42 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			#vt { display:none }
-			#vt, #vt a { color:orange; }
-		</style>
 	</head>
 
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - (<span id="description">normal + ao + displacement + environment</span>) map demo.<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - (normal + ao + displacement + environment) map demo.<br />
 			ninja head from <a href="https://gpuopen.com/archive/gamescgi/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
-
-			<div id="vt">displacement mapping requires vertex textures</div>
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
-			var stats;
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
-			var camera, scene, renderer, controls;
-			var settings = {
+			let stats;
+			let camera, scene, renderer, controls;
+
+			const settings = {
 				metalness: 1.0,
 				roughness: 0.4,
 				ambientIntensity: 0.2,
@@ -42,13 +50,13 @@
 				normalScale: 1.0
 			};
 
-			var mesh, material;
+			let mesh, material;
 
-			var pointLight, ambientLight;
+			let pointLight, ambientLight;
 
-			var height = 500; // of camera frustum
+			const height = 500; // of camera frustum
 
-			var r = 0.0;
+			let r = 0.0;
 
 			init();
 			animate();
@@ -57,45 +65,45 @@
 			// Init gui
 			function initGui() {
 
-				var gui = new GUI();
-				//var gui = gui.addFolder( "Material" );
-				gui.add( settings, "metalness" ).min( 0 ).max( 1 ).onChange( function ( value ) {
+				const gui = new GUI();
+				//let gui = gui.addFolder( "Material" );
+				gui.add( settings, 'metalness' ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					material.metalness = value;
 
 				} );
 
-				gui.add( settings, "roughness" ).min( 0 ).max( 1 ).onChange( function ( value ) {
+				gui.add( settings, 'roughness' ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					material.roughness = value;
 
 				} );
 
-				gui.add( settings, "aoMapIntensity" ).min( 0 ).max( 1 ).onChange( function ( value ) {
+				gui.add( settings, 'aoMapIntensity' ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					material.aoMapIntensity = value;
 
 				} );
 
-				gui.add( settings, "ambientIntensity" ).min( 0 ).max( 1 ).onChange( function ( value ) {
+				gui.add( settings, 'ambientIntensity' ).min( 0 ).max( 1 ).onChange( function ( value ) {
 
 					ambientLight.intensity = value;
 
 				} );
 
-				gui.add( settings, "envMapIntensity" ).min( 0 ).max( 3 ).onChange( function ( value ) {
+				gui.add( settings, 'envMapIntensity' ).min( 0 ).max( 3 ).onChange( function ( value ) {
 
 					material.envMapIntensity = value;
 
 				} );
 
-				gui.add( settings, "displacementScale" ).min( 0 ).max( 3.0 ).onChange( function ( value ) {
+				gui.add( settings, 'displacementScale' ).min( 0 ).max( 3.0 ).onChange( function ( value ) {
 
 					material.displacementScale = value;
 
 				} );
 
-				gui.add( settings, "normalScale" ).min( - 1 ).max( 1 ).onChange( function ( value ) {
+				gui.add( settings, 'normalScale' ).min( - 1 ).max( 1 ).onChange( function ( value ) {
 
 					material.normalScale.set( 1, - 1 ).multiplyScalar( value );
 
@@ -105,20 +113,19 @@
 
 			function init() {
 
-				var container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
 				scene = new THREE.Scene();
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 				camera = new THREE.OrthographicCamera( - height * aspect, height * aspect, height, - height, 1, 10000 );
 				camera.position.z = 1500;
 				scene.add( camera );
@@ -132,43 +139,42 @@
 				ambientLight = new THREE.AmbientLight( 0xffffff, settings.ambientIntensity );
 				scene.add( ambientLight );
 
-				pointLight = new THREE.PointLight( 0xff0000, 0.5 );
+				pointLight = new THREE.PointLight( 0xff0000, 1.5, 0, 0 );
 				pointLight.position.z = 2500;
 				scene.add( pointLight );
 
-				var pointLight2 = new THREE.PointLight( 0xff6666, 1 );
+				const pointLight2 = new THREE.PointLight( 0xff6666, 3, 0, 0 );
 				camera.add( pointLight2 );
 
-				var pointLight3 = new THREE.PointLight( 0x0000ff, 0.5 );
+				const pointLight3 = new THREE.PointLight( 0x0000ff, 1.5, 0, 0 );
 				pointLight3.position.x = - 1000;
 				pointLight3.position.z = 1000;
 				scene.add( pointLight3 );
 
 				// env map
 
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
+				const path = 'textures/cube/SwedishRoyalCastle/';
+				const format = '.jpg';
+				const urls = [
 					path + 'px' + format, path + 'nx' + format,
 					path + 'py' + format, path + 'ny' + format,
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
-				reflectionCube.encoding = THREE.sRGBEncoding;
+				const reflectionCube = new THREE.CubeTextureLoader().load( urls );
 
 				// textures
 
-				var textureLoader = new THREE.TextureLoader();
-				var normalMap = textureLoader.load( "models/obj/ninja/normal.png" );
-				var aoMap = textureLoader.load( "models/obj/ninja/ao.jpg" );
-				var displacementMap = textureLoader.load( "models/obj/ninja/displacement.jpg" );
+				const textureLoader = new THREE.TextureLoader();
+				const normalMap = textureLoader.load( 'models/obj/ninja/normal.png' );
+				const aoMap = textureLoader.load( 'models/obj/ninja/ao.jpg' );
+				const displacementMap = textureLoader.load( 'models/obj/ninja/displacement.jpg' );
 
 				// material
 
 				material = new THREE.MeshStandardMaterial( {
 
-					color: 0x888888,
+					color: 0xc1c1c1,
 					roughness: settings.roughness,
 					metalness: settings.metalness,
 
@@ -191,11 +197,10 @@
 
 				//
 
-				var loader = new OBJLoader();
-				loader.load( "models/obj/ninja/ninjaHead_Low.obj", function ( group ) {
+				const loader = new OBJLoader();
+				loader.load( 'models/obj/ninja/ninjaHead_Low.obj', function ( group ) {
 
-					var geometry = group.children[ 0 ].geometry;
-					geometry.attributes.uv2 = geometry.attributes.uv;
+					const geometry = group.children[ 0 ].geometry;
 					geometry.center();
 
 					mesh = new THREE.Mesh( geometry, material );
@@ -206,24 +211,18 @@
 
 				//
 
-				var description = "normal + ao" + ( renderer.capabilities.vertexTextures ? " + displacement + environment" : " + <strike>displacement</strike>" );
-				document.getElementById( "description" ).innerHTML = description;
-				document.getElementById( "vt" ).style.display = renderer.capabilities.vertexTextures ? "none" : "block";
-
-				//
-
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function onWindowResize() {
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 
 				camera.left = - height * aspect;
 				camera.right = height * aspect;

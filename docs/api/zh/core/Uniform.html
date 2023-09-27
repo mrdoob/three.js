@@ -3,14 +3,13 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">Uniforms 是 [link:https://www.opengl.org/documentation/glsl/ GLSL] 着色器中的全局变量。
+		<p class="desc">Uniforms 是 GLSL 着色器中的全局变量。
 		</p>
 
 		<h2>代码示例</h2>
@@ -131,7 +130,7 @@
 				</tr>
 				<tr>
 					<td>mat4</td>
-					<td>[page:Matrix3 THREE.Matrix4]</td>
+					<td>[page:Matrix4 THREE.Matrix4]</td>
 				</tr>
 				<tr>
 					<td>mat4</td>
@@ -215,11 +214,11 @@
 			It's also possible to manage *structs* in arrays. The syntax for this use case looks like so:
 		</p>
 		<code>
-		var entry1 = {
+		const entry1 = {
 			position: new Vector3(),
 			direction: new Vector3( 0, 0, 1 )
 		};
-		var entry2 = {
+		const entry2 = {
 			position: new Vector3( 1, 1, 1 ),
 			direction: new Vector3( 0, 1, 0 )
 		};

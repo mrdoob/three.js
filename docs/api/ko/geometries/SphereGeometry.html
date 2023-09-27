@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">구 형상을 생성하기 위한 클래스입니다.</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#SphereGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>코드 예제</h2>
+
+		<code>
+		const geometry = new THREE.SphereGeometry( 15, 32, 16 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		const sphere = new THREE.Mesh( geometry, material );
+		scene.add( sphere );
+		</code>
+
+		<h2>생성자</h2>
+
+		<h3>[name]([param:Float radius], [param:Integer widthSegments], [param:Integer heightSegments], [param:Float phiStart], [param:Float phiLength], [param:Float thetaStart], [param:Float thetaLength])</h3>
+
+		<p>
+		radius — 구 반지름. Default is 1.<br />
+		widthSegments — 수평 세그먼트의 수입니다. 최소값은 3 입니다, 그리고 기본값은 32 입니다.<br />
+		heightSegments — 수직 세그먼트의 수입니다. 최소값은 2 입니다, 그리고 기본값은 16 입니다.<br />
+		phiStart — 수평 시작 각도를 지정합니다. 기본값은 0 입니다.<br />
+		phiLength — 수평 스위프 각도 크기를 지정합니다. 기본값은 Math.PI * 2 입니다.<br />
+		thetaStart — 수직 시작 각도를 지정합니다. 기본값은 0 입니다.<br />
+		thetaLength — 수직 스위프 각도 크기를 지정합니다. 기본값은 Math.PI 입니다.<br />
+		</p>
+
+		<p>
+		지오메트리는 Y축(수평 스윕)과 Z축(수직 스윕) 주위의 정점을 스윕하고 계산하여 생성됩니다.따라서, 우리가 정점 계산을 시작(또는 종료)하는 지점을 정의하기 위해, 다른 값의 phiStart, phiLength, 세타Start 및 세타Length를 사용하여 불완전한 구('sphere slices' 와 유사한)를 만들 수 있다.
+		</p>
+
+		<h2>프로퍼티</h2>
+		<p>일반 프로퍼티는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		각 생성자 매개 변수에 대한 속성이 있는 개체입니다. 인스턴스화 후 수정해도 형상은 변경되지 않습니다.
+		</p>
+
+		<h2>메서드</h2>
+		<p>일반 메서드는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

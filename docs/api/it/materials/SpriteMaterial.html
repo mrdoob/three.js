@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Un materiale da utilizzare con una [page:Sprite].</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const map = new THREE.TextureLoader().load( 'textures/sprite.png' );
+		const material = new THREE.SpriteMaterial( { map: map, color: 0xffffff } );
+
+		const sprite = new THREE.Sprite( material );
+		sprite.scale.set(200, 200, 1)
+		scene.add( sprite );
+		</code>
+
+		<h2>Esempi</h2>
+		<p>
+			[example:webgl_raycaster_sprite WebGL / raycast / sprite]<br />
+			[example:webgl_sprites WebGL / sprites]<br />
+			[example:svg_sandbox SVG / sandbox]
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (opzionale) un oggetto con una o più proprietà che definiscono l'aspetto del materiale.
+			Qualsiasi proprietà del materiale (inclusa qualsiasi proprietà ereditata da [page:Material]) può essere passata qui. <br /><br />
+
+			L'eccezione è la proprietà [page:Hexadecimal colore], la quale può essere passata come stringa
+			esadecimale e per impostazione predefinita è `0xffffff` (bianco). [page:Color.set]( color ) viene chiamato internamente.
+
+			Gli SpriteMaterials non vengono ritagliati utilizzando [page:Material.clippingPlanes].
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Material] per le proprietà comuni.</p>
+
+		<h3>[property:Texture alphaMap]</h3>
+		<p>
+			La mappa alfa è una texture in scala di grigi che controlla l'opacità sulla superficie
+			(nero: completamente trasparente; bianco: completamente opaco). Il valore predefinito è `null`.<br /><br />
+
+			Viene utilizzato solo il colore della texture, ignorando il canale alfa, se esiste.
+			Per le texuture RGB e RGBA, il renderer [page:WebGLRenderer WebGL] utilizzarà il canale del verde 
+			durante il campionamento di questa texture a causa del bit extra di precisione fornito per il verde
+			nei formati RGB 565 compressi e non compressi DXT. Anche le texture solo luminanza e luminanza/alfa continueranno
+			a funzionare come previsto.
+		</p>
+
+		<h3>[property:Color color]</h3>
+		<p>[page:Color Colore] del materiale, il valore predefinito è impostato a bianco (0xffffff). La [page:.map] viene moltiplicata per il colore.</p>
+
+		<h3>[property:Boolean fog]</h3>
+		<p>Indica se il materiale è influenzato dalla nebbia. Il valore predefinito è `true`.</p>
+
+		<h3>[property:Boolean isSpriteMaterial]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>
+			La mappa colore. Può includere facoltativamente un canale alfa, in genere combinato 
+			con [page:Material.transparent .transparent] o [page:Material.alphaTest .alphaTest]. Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Radians rotation]</h3>
+		<p>La rotazione della Sprite in radianti. Il valore predefinito è `0`.</p>
+
+		<h3>[property:Boolean sizeAttenuation]</h3>
+		<p>
+			Indica se la dimensione della sprite viene attenuata dalla profondità della telecamera. (Solo telecamera prosepettica). 
+			Il valore predefinito è `true`.
+		</p>
+
+		<h3>[property:Boolean transparent]</h3>
+		<p>Definisce se il materiale è trasparente. Il valore predefinto è `true`.</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Material] per i metodi comuni.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

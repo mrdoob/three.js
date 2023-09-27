@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">يقوم بإنشاء 6 كاميرات يتم تحويلها إلى [page:WebGLCubeRenderTarget].</p>
+
+		<h2>مثال التعليمة البرمجية</h2>
+
+		<code>
+		// Create cube render target
+		const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+
+		// Create cube camera
+		const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
+		scene.add( cubeCamera );
+
+		// Create car
+		const chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeRenderTarget.texture } );
+		const car = new THREE.Mesh( carGeometry, chromeMaterial );
+		scene.add( car );
+
+		// Update the render target cube
+		car.setVisible( false );
+		cubeCamera.position.copy( car.position );
+		cubeCamera.update( renderer, scene );
+
+		// Render the scene
+		car.setVisible( true );
+		renderer.render( scene, camera );
+		</code>
+
+		<h2>أمثلة (Examples)</h2>
+
+		<p>
+			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]
+		</p>
+
+		<h2>المنشئ (Constructor)</h2>
+
+
+		<h3>[name]( [param:Number near], [param:Number far], [param:WebGLCubeRenderTarget renderTarget] )</h3>
+		<p>
+		near -- مسافة الاقتطاع القريبة. <br />
+		far -- مسافة القطع البعيدة <br />
+		renderTarget -- هدف عرض مكعب الوجهة *cube render target*.
+		</p>
+
+		<p>
+			ينشئ CubeCamera الذي يحتوي على 6 [page:PerspectiveCamera PerspectiveCameras] ذلك
+			الذي سيتم عرضه من خلال [page:WebGLCubeRenderTarget].
+		</p>
+
+		<h2>الخصائص (Properties)</h2>
+		<p>راجع فئة [page:Object3D] الأساسية للخصائص العامة.</p>
+
+		<h3>[property:WebGLCubeRenderTarget renderTarget]</h3>
+		<p>
+		الهدف الخاص بـ*cube render target*.
+		</p>
+
+		<h2>الوظائف (Methods)</h2>
+		<p>راجع فئة [page:Object3D] الأساسية للخصائص العامة.</p>
+
+		<h3>[method:undefined update]( [param:WebGLRenderer renderer], [param:Scene scene] )</h3>
+		<p>
+		renderer -- عارض WebGL الحالي <br />
+		scene -- المشهد الحالي
+		</p>
+		<p>
+		استدعاء هذا لتحديث [page:CubeCamera.renderTarget renderTarget].
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

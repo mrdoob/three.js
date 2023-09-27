@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Mesh] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Una mesh che ha uno [page:Skeleton scheletro] con [page:Bone ossa] che può essere 
+			utilizzata per animare i vertici della geometria.<br /><br />
+
+			[name] può essere utilizzata solo con WebGL 2. Con WebGL 1 è necessario il supporto delle texture del vertice
+			e `OES_texture_float`.
+		</p>
+
+		<iframe id="scene" src="scenes/bones-browser.html"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
+
+		// crea manualmente gli indici della pelle e i pesi della pelle
+		// (tipicamente un loader leggerebbe questi dati da un modello 3D per te)
+
+		const position = geometry.attributes.position;
+
+		const vertex = new THREE.Vector3();
+
+		const skinIndices = [];
+		const skinWeights = [];
+
+		for ( let i = 0; i < position.count; i ++ ) {
+
+			vertex.fromBufferAttribute( position, i );
+
+			// calcola skinIndex e skinWeight in base ad alcuni dati di configurazione
+
+			const y = ( vertex.y + sizing.halfHeight );
+
+			const skinIndex = Math.floor( y / sizing.segmentHeight );
+			const skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
+
+			skinIndices.push( skinIndex, skinIndex + 1, 0, 0 );
+			skinWeights.push( 1 - skinWeight, skinWeight, 0, 0 );
+
+		}
+
+		geometry.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+		geometry.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+
+		// crea skinned mesh e skeleton
+
+		const mesh = new THREE.SkinnedMesh( geometry, material );
+		const skeleton = new THREE.Skeleton( bones );
+
+		// vedi esempio da THREE.Skeleton
+
+		const rootBone = skeleton.bones[ 0 ];
+		mesh.add( rootBone );
+
+		// lega lo scheletro alla mesh
+
+		mesh.bind( skeleton );
+
+		// muove le ossa e manipola il modello
+
+		skeleton.bones[ 0 ].rotation.x = -0.1;
+		skeleton.bones[ 1 ].rotation.x = 0.2;
+		</code>
+
+		<h2>Costruttore</h2>
+		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
+		<p>
+		[page:BufferGeometry geometry] - un'istanza di [page:BufferGeometry].<br />
+		[page:Material material] - (opzionale) un'istanza di [page:Material]. Il valore predefinito è un nuovo [page:MeshBasicMaterial].
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Mesh] per le proprietà comuni.</p>
+
+		<h3>[property:String bindMode]</h3>
+		<p>
+			O "attached" o "detached". "attached" utilizza la proprietà [page:SkinnedMesh.matrixWorld]
+			per la matrice di trasformazione delle ossa. "detached" utilizza [page:SkinnedMesh.bindMatrix]. Il valore predefinito è "attached".
+		</p>
+
+		<h3>[property:Matrix4 bindMatrix]</h3>
+		<p>
+			La matrice di base che viene utilizzata per le trasformazioni ossee vincolate.
+		</p>
+
+		<h3>[property:Matrix4 bindMatrixInverse]</h3>
+		<p>
+			La matrice di base che viene utilizzata per reimpostare le trasformazioni ossee vincolate.
+		</p>
+
+		<h3>[property:Box3 boundingBox]</h3>
+		<p>
+			Bounding box per la [name], che può essere calcolato con [page:.computeBoundingBox](). Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Sphere boundingSphere]</h3>
+		<p>
+			Bounding sphere per la [name], che può essere calcolato con [page:.computeBoundingSphere](). Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Boolean isSkinnedMesh]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:Skeleton skeleton]</h3>
+		<p>
+			[page:Skeleton] che rappresenta la gerarchia ossea della skinned mesh.
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Mesh] per i metodi comuni.</p>
+
+		<h3>[method:undefined bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
+		<p>
+		[page:Skeleton skeleton] - [page:Skeleton] creato da un albero di [page:Bone Bones].<br/>
+		[page:Matrix4 bindMatrix] - [page:Matrix4] che rappresenta la trasformazione base dello scheletro.<br /><br />
+
+		Lega uno scheletro alla skinned mesh. Il bindMatrix viene salvato nella proprietà .bindMatrix
+		e il .bindMatrixInverse viene calcolato.
+		</p>
+
+		<h3>[method:SkinnedMesh clone]()</h3>
+		<p>
+			Questo metodo attualmente non clona correttamente un'istanza di [name]. Si prega di utilizzare [page:SkeletonUtils.clone]() nel frattempo.
+		</p>
+
+		<h3>[method:undefined computeBoundingBox]()</h3>
+		<p>
+		Computes the bounding box, updating [page:.boundingBox] attribute.<br />
+		Bounding boxes aren't computed by default. They need to be explicitly computed, otherwise they are `null`.
+		If an instance of [name] is animated, this method should be called per frame to compute a correct bounding box.
+		</p>
+
+		<h3>[method:undefined computeBoundingSphere]()</h3>
+		<p>
+		Computes the bounding sphere, updating [page:.boundingSphere] attribute.<br />
+		Bounding spheres aren't computed by default. They need to be explicitly computed, otherwise they are `null`.
+		If an instance of [name] is animated, this method should be called per frame to compute a correct bounding sphere.
+		</p>
+
+		<h3>[method:undefined normalizeSkinWeights]()</h3>
+		<p>
+			Normalizza i pesi della skin.
+		</p>
+
+		<h3>[method:undefined pose]()</h3>
+		<p>
+			Questo metodo imposta la skinned mesh nella posa di riposo (reimposta la posa).
+		</p>
+
+		<h3>[method:Vector3 applyBoneTransform]( [param:Integer index], [param:Vector3 vector] )</h3>
+		<p>
+		Applies the bone transform associated with the given index to the given position vector. Returns the updated vector.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

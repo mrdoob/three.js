@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Texture] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Creates a three-dimensional texture from raw data, with parameters to
+			divide it into width, height, and depth. This type of texture can only be
+			used with a WebGL 2 rendering context.
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>
+			[name]( [param:TypedArray data], [param:Number width], [param:Number height], [param:Number depth] )
+		</h3>
+		<p>
+			[page:Object data] --
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView ArrayBufferView] of the texture.<br />
+
+			[page:Number width] -- width of the texture.<br />
+
+			[page:Number height] -- height of the texture.<br />
+
+			[page:Number depth] -- depth of the texture.
+		</p>
+
+		<h2>Code Example</h2>
+
+		<p>This creates a [name] with repeating data, 0 to 255</p>
+
+		<code>
+		// create a buffer with some data
+		const sizeX = 64;
+		const sizeY = 64;
+		const sizeZ = 64;
+
+		const data = new Uint8Array( sizeX * sizeY * sizeZ );
+		let i = 0;
+
+		for ( let z = 0; z < sizeZ; z ++ ) {
+			for ( let y = 0; y < sizeY; y ++ ) {
+				for ( let x = 0; x < sizeX; x ++ ) {
+					data[ i ] = i % 256;
+					i ++;
+				}
+			}
+		}
+		
+		// use the buffer to create the texture
+		const texture = new THREE.Data3DTexture( data, sizeX, sizeY, sizeZ );
+		texture.needsUpdate = true;
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl2_materials_texture3d WebGL2 / materials / texture3d]<br />
+			[example:webgl2_materials_texture3d_partialupdate WebGL2 / materials / texture3d / partialupdate]<br />
+			[example:webgl2_volume_cloud WebGL2 / volume / cloud]<br />
+			[example:webgl2_volume_perlin WebGL2 / volume / perlin]
+		</p>
+
+		<h2>Properties</h2>
+
+		<p>See the base [page:Texture Texture] class for common properties.</p>
+
+		<h3>[property:Boolean flipY]</h3>
+		<p>
+			Whether the texture is flipped along the Y axis when uploaded to the GPU.
+			Default is `false`.
+		</p>
+
+		<h3>[property:Boolean generateMipmaps]</h3>
+		<p>
+			Whether to generate mipmaps (if possible) for the texture. Default is
+			`false`.
+		</p>
+
+		<h3>[property:Image image]</h3>
+		<p>
+			Overridden with a record type holding data, width and height and depth.
+		</p>
+
+		<h3>[property:Boolean isData3DTexture]</h3>
+		<p>Read-only flag to check if a given object is of type [name].</p>
+
+		<h3>[property:number magFilter]</h3>
+		<p>
+			How the texture is sampled when a texel covers more than one pixel. The
+			default is [page:Textures THREE.NearestFilter], which uses the value of
+			the closest texel.<br /><br />
+
+			See the [page:Textures texture constants] page for details.
+		</p>
+
+		<h3>[property:number minFilter]</h3>
+		<p>
+			How the texture is sampled when a texel covers less than one pixel. The
+			default is [page:Textures THREE.NearestFilter], which uses the value of
+			the closest texel.<br /><br />
+
+			See the [page:Textures texture constants] page for details.
+		</p>
+
+		<h3>[property:number unpackAlignment]</h3>
+		<p>
+			`1` by default. Specifies the alignment requirements for the start of each
+			pixel row in memory. The allowable values are 1 (byte-alignment), 2 (rows
+			aligned to even-numbered bytes), 4 (word-alignment), and 8 (rows start on
+			double-word boundaries). See
+			[link:https://registry.khronos.org/OpenGL-Refpages/es3.0/html/glPixelStorei.xhtml glPixelStorei] for more information.
+		</p>
+
+		<h3>[property:number wrapR]</h3>
+		<p>
+			This defines how the texture is wrapped in the depth direction.<br />
+			The default is [page:Textures THREE.ClampToEdgeWrapping], where the edge
+			is clamped to the outer edge texels. The other two choices are
+			[page:Textures THREE.RepeatWrapping] and [page:Textures THREE.MirroredRepeatWrapping]. 
+			See the [page:Textures texture constants] page for details.
+		</p>
+
+		<h2>Methods</h2>
+
+		<p>See the base [page:Texture Texture] class for common methods.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

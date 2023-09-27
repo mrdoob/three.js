@@ -1,74 +1,31 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 import { UIPanel, UIRow, UIText, UIInput, UIButton, UISpan } from './libs/ui.js';
 
 import { SetGeometryValueCommand } from './commands/SetGeometryValueCommand.js';
 
-import { SidebarGeometryGeometry } from './Sidebar.Geometry.Geometry.js';
 import { SidebarGeometryBufferGeometry } from './Sidebar.Geometry.BufferGeometry.js';
 import { SidebarGeometryModifiers } from './Sidebar.Geometry.Modifiers.js';
 
-import { SidebarGeometryBoxGeometry } from './Sidebar.Geometry.BoxGeometry.js';
-import { SidebarGeometryCircleGeometry } from './Sidebar.Geometry.CircleGeometry.js';
-import { SidebarGeometryCylinderGeometry } from './Sidebar.Geometry.CylinderGeometry.js';
-import { SidebarGeometryDodecahedronGeometry } from './Sidebar.Geometry.DodecahedronGeometry.js';
-import { SidebarGeometryExtrudeGeometry } from './Sidebar.Geometry.ExtrudeGeometry.js';
-import { SidebarGeometryIcosahedronGeometry } from './Sidebar.Geometry.IcosahedronGeometry.js';
-import { SidebarGeometryLatheGeometry } from './Sidebar.Geometry.LatheGeometry.js';
-import { SidebarGeometryOctahedronGeometry } from './Sidebar.Geometry.OctahedronGeometry.js';
-import { SidebarGeometryPlaneGeometry } from './Sidebar.Geometry.PlaneGeometry.js';
-import { SidebarGeometryRingGeometry } from './Sidebar.Geometry.RingGeometry.js';
-import { SidebarGeometryShapeGeometry } from './Sidebar.Geometry.ShapeGeometry.js';
-import { SidebarGeometrySphereGeometry } from './Sidebar.Geometry.SphereGeometry.js';
-import { SidebarGeometryTeapotBufferGeometry } from './Sidebar.Geometry.TeapotBufferGeometry.js';
-import { SidebarGeometryTetrahedronGeometry } from './Sidebar.Geometry.TetrahedronGeometry.js';
-import { SidebarGeometryTorusGeometry } from './Sidebar.Geometry.TorusGeometry.js';
-import { SidebarGeometryTorusKnotGeometry } from './Sidebar.Geometry.TorusKnotGeometry.js';
-import { SidebarGeometryTubeGeometry } from './Sidebar.Geometry.TubeGeometry.js';
+import { VertexNormalsHelper } from 'three/addons/helpers/VertexNormalsHelper.js';
 
-import { VertexNormalsHelper } from '../../examples/jsm/helpers/VertexNormalsHelper.js';
+function SidebarGeometry( editor ) {
 
-var geometryUIClasses = {
-	'BoxBufferGeometry': SidebarGeometryBoxGeometry,
-	'CircleBufferGeometry': SidebarGeometryCircleGeometry,
-	'CylinderBufferGeometry': SidebarGeometryCylinderGeometry,
-	'DodecahedronBufferGeometry': SidebarGeometryDodecahedronGeometry,
-	'ExtrudeBufferGeometry': SidebarGeometryExtrudeGeometry,
-	'IcosahedronBufferGeometry': SidebarGeometryIcosahedronGeometry,
-	'LatheBufferGeometry': SidebarGeometryLatheGeometry,
-	'OctahedronBufferGeometry': SidebarGeometryOctahedronGeometry,
-	'PlaneBufferGeometry': SidebarGeometryPlaneGeometry,
-	'RingBufferGeometry': SidebarGeometryRingGeometry,
-	'ShapeBufferGeometry': SidebarGeometryShapeGeometry,
-	'SphereBufferGeometry': SidebarGeometrySphereGeometry,
-	'TeapotBufferGeometry': SidebarGeometryTeapotBufferGeometry,
-	'TetrahedronBufferGeometry': SidebarGeometryTetrahedronGeometry,
-	'TorusBufferGeometry': SidebarGeometryTorusGeometry,
-	'TorusKnotBufferGeometry': SidebarGeometryTorusKnotGeometry,
-	'TubeBufferGeometry': SidebarGeometryTubeGeometry
-};
+	const strings = editor.strings;
 
-var SidebarGeometry = function ( editor ) {
+	const signals = editor.signals;
 
-	var strings = editor.strings;
-
-	var signals = editor.signals;
-
-	var container = new UIPanel();
+	const container = new UIPanel();
 	container.setBorderTop( '0' );
 	container.setDisplay( 'none' );
 	container.setPaddingTop( '20px' );
 
-	var currentGeometryType = null;
+	let currentGeometryType = null;
 
 	// Actions
 
 	/*
-	var objectActions = new UISelect().setPosition( 'absolute' ).setRight( '8px' ).setFontSize( '11px' );
+	let objectActions = new UISelect().setPosition( 'absolute' ).setRight( '8px' ).setFontSize( '11px' );
 	objectActions.setOptions( {
 
 		'Actions': 'Actions',
@@ -84,10 +41,10 @@ var SidebarGeometry = function ( editor ) {
 	} );
 	objectActions.onChange( function ( event ) {
 
-		var action = this.getValue();
+		let action = this.getValue();
 
-		var object = editor.selected;
-		var geometry = object.geometry;
+		let object = editor.selected;
+		let geometry = object.geometry;
 
 		if ( confirm( action + ' ' + object.name + '?' ) === false ) return;
 
@@ -95,9 +52,9 @@ var SidebarGeometry = function ( editor ) {
 
 			case 'Center':
 
-				var offset = geometry.center();
+				let offset = geometry.center();
 
-				var newPosition = object.position.clone();
+				let newPosition = object.position.clone();
 				newPosition.sub( offset );
 				editor.execute( new SetPositionCommand( editor, object, newPosition ) );
 
@@ -105,23 +62,13 @@ var SidebarGeometry = function ( editor ) {
 
 				break;
 
-			case 'Convert':
-
-				if ( geometry && geometry.isGeometry ) {
-
-					editor.execute( new SetGeometryCommand( editor, object, new THREE.BufferGeometry().fromGeometry( geometry ) ) );
-
-				}
-
-				break;
-
 			case 'Flatten':
 
-				var newGeometry = geometry.clone();
+				let newGeometry = geometry.clone();
 				newGeometry.uuid = geometry.uuid;
 				newGeometry.applyMatrix( object.matrix );
 
-				var cmds = [ new SetGeometryCommand( editor, object, newGeometry ),
+				let cmds = [ new SetGeometryCommand( editor, object, newGeometry ),
 					new SetPositionCommand( editor, object, new THREE.Vector3( 0, 0, 0 ) ),
 					new SetRotationCommand( editor, object, new THREE.Euler( 0, 0, 0 ) ),
 					new SetScaleCommand( editor, object, new THREE.Vector3( 1, 1, 1 ) ) ];
@@ -140,8 +87,8 @@ var SidebarGeometry = function ( editor ) {
 
 	// type
 
-	var geometryTypeRow = new UIRow();
-	var geometryType = new UIText();
+	const geometryTypeRow = new UIRow();
+	const geometryType = new UIText();
 
 	geometryTypeRow.add( new UIText( strings.getKey( 'sidebar/geometry/type' ) ).setWidth( '90px' ) );
 	geometryTypeRow.add( geometryType );
@@ -150,9 +97,9 @@ var SidebarGeometry = function ( editor ) {
 
 	// uuid
 
-	var geometryUUIDRow = new UIRow();
-	var geometryUUID = new UIInput().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
-	var geometryUUIDRenew = new UIButton( strings.getKey( 'sidebar/geometry/new' ) ).setMarginLeft( '7px' ).onClick( function () {
+	const geometryUUIDRow = new UIRow();
+	const geometryUUID = new UIInput().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
+	const geometryUUIDRenew = new UIButton( strings.getKey( 'sidebar/geometry/new' ) ).setMarginLeft( '7px' ).onClick( function () {
 
 		geometryUUID.setValue( THREE.MathUtils.generateUUID() );
 
@@ -168,8 +115,8 @@ var SidebarGeometry = function ( editor ) {
 
 	// name
 
-	var geometryNameRow = new UIRow();
-	var geometryName = new UIInput().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
+	const geometryNameRow = new UIRow();
+	const geometryName = new UIInput().setWidth( '150px' ).setFontSize( '12px' ).onChange( function () {
 
 		editor.execute( new SetGeometryValueCommand( editor, editor.selected, 'name', geometryName.getValue() ) );
 
@@ -182,38 +129,35 @@ var SidebarGeometry = function ( editor ) {
 
 	// parameters
 
-	var parameters = new UISpan();
+	const parameters = new UISpan();
 	container.add( parameters );
-
-	// geometry
-
-	container.add( new SidebarGeometryGeometry( editor ) );
 
 	// buffergeometry
 
 	container.add( new SidebarGeometryBufferGeometry( editor ) );
 
-	// size
+	// Size
 
-	var geometryBoundingSphere = new UIText();
+	const geometryBoundingBox = new UIText().setFontSize( '12px' );
 
-	container.add( new UIText( strings.getKey( 'sidebar/geometry/bounds' ) ).setWidth( '90px' ) );
-	container.add( geometryBoundingSphere );
+	const geometryBoundingBoxRow = new UIRow();
+	geometryBoundingBoxRow.add( new UIText( strings.getKey( 'sidebar/geometry/bounds' ) ).setWidth( '90px' ) );
+	geometryBoundingBoxRow.add( geometryBoundingBox );
+	container.add( geometryBoundingBoxRow );
 
 	// Helpers
 
-	var helpersRow = new UIRow().setMarginTop( '16px' ).setPaddingLeft( '90px' );
+	const helpersRow = new UIRow().setPaddingLeft( '90px' );
 	container.add( helpersRow );
 
-	var vertexNormalsButton = new UIButton( strings.getKey( 'sidebar/geometry/show_vertex_normals' ) );
+	const vertexNormalsButton = new UIButton( strings.getKey( 'sidebar/geometry/show_vertex_normals' ) );
 	vertexNormalsButton.onClick( function () {
 
-		var object = editor.selected;
+		const object = editor.selected;
 
 		if ( editor.helpers[ object.id ] === undefined ) {
 
-			var helper = new VertexNormalsHelper( object );
-			editor.addHelper( object, helper );
+			editor.addHelper( object, new VertexNormalsHelper( object ) );
 
 		} else {
 
@@ -226,13 +170,13 @@ var SidebarGeometry = function ( editor ) {
 	} );
 	helpersRow.add( vertexNormalsButton );
 
-	function build() {
+	async function build() {
 
-		var object = editor.selected;
+		const object = editor.selected;
 
 		if ( object && object.geometry ) {
 
-			var geometry = object.geometry;
+			const geometry = object.geometry;
 
 			container.setDisplay( 'block' );
 
@@ -247,13 +191,15 @@ var SidebarGeometry = function ( editor ) {
 
 				parameters.clear();
 
-				if ( geometry.type === 'BufferGeometry' || geometry.type === 'Geometry' ) {
+				if ( geometry.type === 'BufferGeometry' ) {
 
 					parameters.add( new SidebarGeometryModifiers( editor, object ) );
 
-				} else if ( geometryUIClasses[ geometry.type ] !== undefined ) {
+				} else {
 
-					parameters.add( new geometryUIClasses[ geometry.type ]( editor, object ) );
+					const { GeometryParametersPanel } = await import( `./Sidebar.Geometry.${ geometry.type }.js` );
+
+					parameters.add( new GeometryParametersPanel( editor, object ) );
 
 				}
 
@@ -261,9 +207,16 @@ var SidebarGeometry = function ( editor ) {
 
 			}
 
-			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+			if ( geometry.boundingBox === null ) geometry.computeBoundingBox();
 
-			geometryBoundingSphere.setValue( Math.floor( geometry.boundingSphere.radius * 1000 ) / 1000 );
+			const boundingBox = geometry.boundingBox;
+			const x = Math.floor( ( boundingBox.max.x - boundingBox.min.x ) * 1000 ) / 1000;
+			const y = Math.floor( ( boundingBox.max.y - boundingBox.min.y ) * 1000 ) / 1000;
+			const z = Math.floor( ( boundingBox.max.z - boundingBox.min.z ) * 1000 ) / 1000;
+
+			geometryBoundingBox.setInnerHTML( `${x}<br/>${y}<br/>${z}` );
+
+			helpersRow.setDisplay( geometry.hasAttribute( 'normal' ) ? '' : 'none' );
 
 		} else {
 
@@ -285,6 +238,6 @@ var SidebarGeometry = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarGeometry };

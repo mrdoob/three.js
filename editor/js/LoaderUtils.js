@@ -1,16 +1,12 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-var LoaderUtils = {
+const LoaderUtils = {
 
 	createFilesMap: function ( files ) {
 
-		var map = {};
+		const map = {};
 
-		for ( var i = 0; i < files.length; i ++ ) {
+		for ( let i = 0; i < files.length; i ++ ) {
 
-			var file = files[ i ];
+			const file = files[ i ];
 			map[ file.name ] = file;
 
 		}
@@ -23,11 +19,11 @@ var LoaderUtils = {
 
 		// TOFIX: setURLModifier() breaks when the file being loaded is not in root
 
-		var itemsCount = 0;
-		var itemsTotal = 0;
+		let itemsCount = 0;
+		let itemsTotal = 0;
 
-		var files = [];
-		var filesMap = {};
+		const files = [];
+		const filesMap = {};
 
 		function onEntryHandled() {
 
@@ -45,10 +41,10 @@ var LoaderUtils = {
 
 			if ( entry.isDirectory ) {
 
-				var reader = entry.createReader();
+				const reader = entry.createReader();
 				reader.readEntries( function ( entries ) {
 
-					for ( var i = 0; i < entries.length; i ++ ) {
+					for ( let i = 0; i < entries.length; i ++ ) {
 
 						handleEntry( entries[ i ] );
 
@@ -64,7 +60,7 @@ var LoaderUtils = {
 
 					files.push( file );
 
-					filesMap[ entry.fullPath.substr( 1 ) ] = file;
+					filesMap[ entry.fullPath.slice( 1 ) ] = file;
 					onEntryHandled();
 
 				} );
@@ -75,9 +71,15 @@ var LoaderUtils = {
 
 		}
 
-		for ( var i = 0; i < items.length; i ++ ) {
+		for ( let i = 0; i < items.length; i ++ ) {
 
-			handleEntry( items[ i ].webkitGetAsEntry() );
+			const item = items[ i ];
+
+			if ( item.kind === 'file' ) {
+
+				handleEntry( item.webkitGetAsEntry() );
+
+			}
 
 		}
 

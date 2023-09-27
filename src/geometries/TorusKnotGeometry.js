@@ -1,194 +1,167 @@
-/**
- * @author oosmoxiecode
- * @author Mugen87 / https://github.com/Mugen87
- *
- * based on http://www.blackpawn.com/texts/pqtorus/
- */
-
-import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector3 } from '../math/Vector3.js';
 
-// TorusKnotGeometry
+class TorusKnotGeometry extends BufferGeometry {
 
-function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
+	constructor( radius = 1, tube = 0.4, tubularSegments = 64, radialSegments = 8, p = 2, q = 3 ) {
 
-	Geometry.call( this );
+		super();
 
-	this.type = 'TorusKnotGeometry';
+		this.type = 'TorusKnotGeometry';
 
-	this.parameters = {
-		radius: radius,
-		tube: tube,
-		tubularSegments: tubularSegments,
-		radialSegments: radialSegments,
-		p: p,
-		q: q
-	};
+		this.parameters = {
+			radius: radius,
+			tube: tube,
+			tubularSegments: tubularSegments,
+			radialSegments: radialSegments,
+			p: p,
+			q: q
+		};
 
-	if ( heightScale !== undefined ) console.warn( 'THREE.TorusKnotGeometry: heightScale has been deprecated. Use .scale( x, y, z ) instead.' );
+		tubularSegments = Math.floor( tubularSegments );
+		radialSegments = Math.floor( radialSegments );
 
-	this.fromBufferGeometry( new TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) );
-	this.mergeVertices();
+		// buffers
 
-}
+		const indices = [];
+		const vertices = [];
+		const normals = [];
+		const uvs = [];
 
-TorusKnotGeometry.prototype = Object.create( Geometry.prototype );
-TorusKnotGeometry.prototype.constructor = TorusKnotGeometry;
+		// helper variables
 
-// TorusKnotBufferGeometry
+		const vertex = new Vector3();
+		const normal = new Vector3();
 
-function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments, p, q ) {
+		const P1 = new Vector3();
+		const P2 = new Vector3();
 
-	BufferGeometry.call( this );
+		const B = new Vector3();
+		const T = new Vector3();
+		const N = new Vector3();
 
-	this.type = 'TorusKnotBufferGeometry';
+		// generate vertices, normals and uvs
 
-	this.parameters = {
-		radius: radius,
-		tube: tube,
-		tubularSegments: tubularSegments,
-		radialSegments: radialSegments,
-		p: p,
-		q: q
-	};
+		for ( let i = 0; i <= tubularSegments; ++ i ) {
 
-	radius = radius || 1;
-	tube = tube || 0.4;
-	tubularSegments = Math.floor( tubularSegments ) || 64;
-	radialSegments = Math.floor( radialSegments ) || 8;
-	p = p || 2;
-	q = q || 3;
+			// the radian "u" is used to calculate the position on the torus curve of the current tubular segment
 
-	// buffers
+			const u = i / tubularSegments * p * Math.PI * 2;
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+			// now we calculate two points. P1 is our current position on the curve, P2 is a little farther ahead.
+			// these points are used to create a special "coordinate space", which is necessary to calculate the correct vertex positions
 
-	// helper variables
+			calculatePositionOnCurve( u, p, q, radius, P1 );
+			calculatePositionOnCurve( u + 0.01, p, q, radius, P2 );
 
-	var i, j;
+			// calculate orthonormal basis
 
-	var vertex = new Vector3();
-	var normal = new Vector3();
+			T.subVectors( P2, P1 );
+			N.addVectors( P2, P1 );
+			B.crossVectors( T, N );
+			N.crossVectors( B, T );
 
-	var P1 = new Vector3();
-	var P2 = new Vector3();
+			// normalize B, N. T can be ignored, we don't use it
 
-	var B = new Vector3();
-	var T = new Vector3();
-	var N = new Vector3();
+			B.normalize();
+			N.normalize();
 
-	// generate vertices, normals and uvs
+			for ( let j = 0; j <= radialSegments; ++ j ) {
 
-	for ( i = 0; i <= tubularSegments; ++ i ) {
+				// now calculate the vertices. they are nothing more than an extrusion of the torus curve.
+				// because we extrude a shape in the xy-plane, there is no need to calculate a z-value.
 
-		// the radian "u" is used to calculate the position on the torus curve of the current tubular segement
+				const v = j / radialSegments * Math.PI * 2;
+				const cx = - tube * Math.cos( v );
+				const cy = tube * Math.sin( v );
 
-		var u = i / tubularSegments * p * Math.PI * 2;
+				// now calculate the final vertex position.
+				// first we orient the extrusion with our basis vectors, then we add it to the current position on the curve
 
-		// now we calculate two points. P1 is our current position on the curve, P2 is a little farther ahead.
-		// these points are used to create a special "coordinate space", which is necessary to calculate the correct vertex positions
+				vertex.x = P1.x + ( cx * N.x + cy * B.x );
+				vertex.y = P1.y + ( cx * N.y + cy * B.y );
+				vertex.z = P1.z + ( cx * N.z + cy * B.z );
 
-		calculatePositionOnCurve( u, p, q, radius, P1 );
-		calculatePositionOnCurve( u + 0.01, p, q, radius, P2 );
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
-		// calculate orthonormal basis
+				// normal (P1 is always the center/origin of the extrusion, thus we can use it to calculate the normal)
 
-		T.subVectors( P2, P1 );
-		N.addVectors( P2, P1 );
-		B.crossVectors( T, N );
-		N.crossVectors( B, T );
+				normal.subVectors( vertex, P1 ).normalize();
 
-		// normalize B, N. T can be ignored, we don't use it
+				normals.push( normal.x, normal.y, normal.z );
 
-		B.normalize();
-		N.normalize();
+				// uv
 
-		for ( j = 0; j <= radialSegments; ++ j ) {
+				uvs.push( i / tubularSegments );
+				uvs.push( j / radialSegments );
 
-			// now calculate the vertices. they are nothing more than an extrusion of the torus curve.
-			// because we extrude a shape in the xy-plane, there is no need to calculate a z-value.
+			}
 
-			var v = j / radialSegments * Math.PI * 2;
-			var cx = - tube * Math.cos( v );
-			var cy = tube * Math.sin( v );
+		}
 
-			// now calculate the final vertex position.
-			// first we orient the extrusion with our basis vectos, then we add it to the current position on the curve
+		// generate indices
 
-			vertex.x = P1.x + ( cx * N.x + cy * B.x );
-			vertex.y = P1.y + ( cx * N.y + cy * B.y );
-			vertex.z = P1.z + ( cx * N.z + cy * B.z );
+		for ( let j = 1; j <= tubularSegments; j ++ ) {
 
-			vertices.push( vertex.x, vertex.y, vertex.z );
+			for ( let i = 1; i <= radialSegments; i ++ ) {
 
-			// normal (P1 is always the center/origin of the extrusion, thus we can use it to calculate the normal)
+				// indices
 
-			normal.subVectors( vertex, P1 ).normalize();
+				const a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
+				const b = ( radialSegments + 1 ) * j + ( i - 1 );
+				const c = ( radialSegments + 1 ) * j + i;
+				const d = ( radialSegments + 1 ) * ( j - 1 ) + i;
 
-			normals.push( normal.x, normal.y, normal.z );
+				// faces
 
-			// uv
+				indices.push( a, b, d );
+				indices.push( b, c, d );
 
-			uvs.push( i / tubularSegments );
-			uvs.push( j / radialSegments );
+			}
+
+		}
+
+		// build geometry
+
+		this.setIndex( indices );
+		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+
+		// this function calculates the current position on the torus curve
+
+		function calculatePositionOnCurve( u, p, q, radius, position ) {
+
+			const cu = Math.cos( u );
+			const su = Math.sin( u );
+			const quOverP = q / p * u;
+			const cs = Math.cos( quOverP );
+
+			position.x = radius * ( 2 + cs ) * 0.5 * cu;
+			position.y = radius * ( 2 + cs ) * su * 0.5;
+			position.z = radius * Math.sin( quOverP ) * 0.5;
 
 		}
 
 	}
 
-	// generate indices
+	copy( source ) {
 
-	for ( j = 1; j <= tubularSegments; j ++ ) {
+		super.copy( source );
 
-		for ( i = 1; i <= radialSegments; i ++ ) {
+		this.parameters = Object.assign( {}, source.parameters );
 
-			// indices
-
-			var a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
-			var b = ( radialSegments + 1 ) * j + ( i - 1 );
-			var c = ( radialSegments + 1 ) * j + i;
-			var d = ( radialSegments + 1 ) * ( j - 1 ) + i;
-
-			// faces
-
-			indices.push( a, b, d );
-			indices.push( b, c, d );
-
-		}
+		return this;
 
 	}
 
-	// build geometry
+	static fromJSON( data ) {
 
-	this.setIndex( indices );
-	this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-	this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
-
-	// this function calculates the current position on the torus curve
-
-	function calculatePositionOnCurve( u, p, q, radius, position ) {
-
-		var cu = Math.cos( u );
-		var su = Math.sin( u );
-		var quOverP = q / p * u;
-		var cs = Math.cos( quOverP );
-
-		position.x = radius * ( 2 + cs ) * 0.5 * cu;
-		position.y = radius * ( 2 + cs ) * su * 0.5;
-		position.z = radius * Math.sin( quOverP ) * 0.5;
+		return new TorusKnotGeometry( data.radius, data.tube, data.tubularSegments, data.radialSegments, data.p, data.q );
 
 	}
 
 }
 
-TorusKnotBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-TorusKnotBufferGeometry.prototype.constructor = TorusKnotBufferGeometry;
-
-
-export { TorusKnotGeometry, TorusKnotBufferGeometry };
+export { TorusKnotGeometry };

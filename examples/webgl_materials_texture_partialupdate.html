@@ -13,11 +13,28 @@
 			replace parts of an existing texture with all data of another texture
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			var camera, scene, renderer, clock, dataTexture, diffuseMap;
+			let camera, scene, renderer, clock, dataTexture, diffuseMap;
+
+			let last = 0;
+			const position = new THREE.Vector2();
+			const color = new THREE.Color();
 
 			init();
 
@@ -30,24 +47,25 @@
 
 				clock = new THREE.Clock();
 
-				var loader = new THREE.TextureLoader();
+				const loader = new THREE.TextureLoader();
 				diffuseMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg', animate );
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 				diffuseMap.minFilter = THREE.LinearFilter;
 				diffuseMap.generateMipmaps = false;
 
-				var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
-				var material = new THREE.MeshBasicMaterial( { map: diffuseMap } );
+				const geometry = new THREE.PlaneGeometry( 2, 2 );
+				const material = new THREE.MeshBasicMaterial( { map: diffuseMap } );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				//
 
-				var width = 32;
-				var height = 32;
+				const width = 32;
+				const height = 32;
 
-				var data = new Uint8Array( width * height * 3 );
-				dataTexture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
+				const data = new Uint8Array( width * height * 4 );
+				dataTexture = new THREE.DataTexture( data, width, height );
 
 				//
 
@@ -58,7 +76,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -71,14 +89,11 @@
 
 			}
 
-			var last = 0;
-			var position = new THREE.Vector2();
-
 			function animate() {
 
 				requestAnimationFrame( animate );
 
-				var elapsedTime = clock.getElapsedTime();
+				const elapsedTime = clock.getElapsedTime();
 
 				if ( elapsedTime - last > 0.1 ) {
 
@@ -101,28 +116,27 @@
 
 			}
 
-			var color = new THREE.Color();
-
 			function updateDataTexture( texture ) {
 
-				var size = texture.image.width * texture.image.height;
-				var data = texture.image.data;
+				const size = texture.image.width * texture.image.height;
+				const data = texture.image.data;
 
 				// generate a random color and update texture data
 
 				color.setHex( Math.random() * 0xffffff );
 
-				var r = Math.floor( color.r * 255 );
-				var g = Math.floor( color.g * 255 );
-				var b = Math.floor( color.b * 255 );
+				const r = Math.floor( color.r * 255 );
+				const g = Math.floor( color.g * 255 );
+				const b = Math.floor( color.b * 255 );
 
-				for ( var i = 0; i < size; i ++ ) {
+				for ( let i = 0; i < size; i ++ ) {
 
-					var stride = i * 3;
+					const stride = i * 4;
 
 					data[ stride ] = r;
 					data[ stride + 1 ] = g;
 					data[ stride + 2 ] = b;
+					data[ stride + 3 ] = 1;
 
 				}
 

@@ -1,36 +1,28 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
+class NodeUniform {
 
-function NodeUniform( params ) {
+	constructor( name, type, node, needsUpdate = undefined ) {
 
-	params = params || {};
+		this.isNodeUniform = true;
 
-	this.name = params.name;
-	this.type = params.type;
-	this.node = params.node;
-	this.needsUpdate = params.needsUpdate;
-
-}
-
-Object.defineProperties( NodeUniform.prototype, {
-
-	value: {
-
-		get: function () {
-
-			return this.node.value;
-
-		},
-
-		set: function ( val ) {
-
-			this.node.value = val;
-
-		}
+		this.name = name;
+		this.type = type;
+		this.node = node.getSelf();
+		this.needsUpdate = needsUpdate;
 
 	}
 
-} );
+	get value() {
 
-export { NodeUniform };
+		return this.node.value;
+
+	}
+
+	set value( val ) {
+
+		this.node.value = val;
+
+	}
+
+}
+
+export default NodeUniform;

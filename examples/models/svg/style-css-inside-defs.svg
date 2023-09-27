@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="300"
+   height="300"
+   viewBox="0 0 79.374998 79.375002"
+   version="1.1"
+   id="svg5"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs id="defs2">
+     <style type="text/css">
+      <![CDATA[
+       .str0 {stroke:#FF0000;stroke-width:3}
+       .fil0 {fill:#FF9900}
+      ]]>
+     </style>
+  </defs>
+  <g
+     id="layer1">
+    <path
+       class="str0 fil0"
+       id="path848"
+       d="m 137.38278,139.05634 -2.47931,71.54147 62.00995,43.49145 -68.80613,19.74955 L 105.9066,346.25338 65.861386,286.91781 -9.8693534,288.18103 34.18748,231.76007 9.5839998,160.12621 76.857831,184.59172 Z"
+       transform="matrix(0.26458333,0,0,0.26458333,15.953737,-22.418478)" />
+  </g>
+</svg>

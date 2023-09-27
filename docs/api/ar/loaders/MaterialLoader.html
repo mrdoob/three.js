@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			محمل لتحميل [page:Material] بتنسيق JSON. يستخدم هذا
+			[page:FileLoader] داخليًا لتحميل الملفات.
+		</p>
+		 
+		<h2>مثال الكود</h2>
+		 
+		<code>
+		// instantiate a loader
+		const loader = new THREE.MaterialLoader();
+		
+		// load a resource
+		loader.load(
+			// resource URL
+			'path/to/material.json',
+		
+			// onLoad callback
+			function ( material ) {
+				object.material = material;
+			},
+		
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+		
+			// onError callback
+			function ( err ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — [page:LoadingManager loadingManager]
+		للمحمل الذي سيتم استخدامه. الافتراضي هو [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+		ينشئ [name] جديد.
+		</p>
+		 
+
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر الفئة الأساسية [page:Loader] للخصائص المشتركة.</p>
+	 
+		<h3>[property:Object textures]</h3>
+		<p>
+		كائن يحمل أي نسيج يستخدمه المواد. انظر [page:.setTextures].
+		</p>
+	 
+		<h2>الطرق (Methods)</h2>
+		<p>انظر الفئة الأساسية [page:Loader] للطرق المشتركة.</p>
+	 
+		<h3>
+		[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )
+		</h3>
+		<p>
+		[page:String url] — المسار أو عنوان URL للملف. يمكن أن يكون هذا أيضًا
+		[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] — سيتم استدعاؤه عند اكتمال التحميل. الحجة
+		سيكون ال [page:Material] المحمّل.<br />
+		[page:Function onProgress] (اختياري) — سيتم استدعاؤه أثناء تقدم التحميل. الحجة ستكون مثيل ProgressEvent، والذي
+		يحتوي على .[page:Boolean lengthComputable]، .[page:Integer total] و
+		.[page:Integer loaded]. إذا لم يضبط الخادم رأس Content-Length
+		؛ سيكون .[page:Integer total] 0.<br />
+		[page:Function onError] (اختياري) — سيتم استدعاؤه عند حدوث خطأ في التحميل.<br /><br />
+	 
+		ابدأ التحميل من url.
+		</p>
+	 
+		<h3>[method:Material parse]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — كائن json الذي يحتوي على معلمات
+		Material.<br /><br />
+	 
+		قم بتحليل هيكل `JSON` وإنشاء جديد [page:Material] من نوع
+		[page:String json.type] مع المعلمات المحددة في كائن json.
+		</p>
+	 
+		<h3>[method:this setTextures]( [param:Object textures] )</h3>
+		<p>
+		[page:Object textures] — كائن يحتوي على أي نسيج يستخدمه
+		المادة.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

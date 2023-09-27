@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Livello di Dettaglio - mostra mesh con più o meno geometria in base alla distanza dalla telecamera.<br /><br />
+
+			Ogni livello è associato ad un oggetto, e il rendering può essere commutato tra di loro alle distanze specificate.
+			In genere creeresti, per esempio, tre mesh, una per il lontano (dettaglio basse), una per la gamma media (medio dettaglio)
+			e una per i primi piani (alto dettaglio).
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const lod = new THREE.LOD();
+
+		// Crea sfere con 3 livelli di dettaglio e crea nuovi livelli LOD per loro
+		for( let i = 0; i < 3; i++ ) {
+
+			const geometry = new THREE.IcosahedronGeometry( 10, 3 - i )
+
+			const mesh = new THREE.Mesh( geometry, material );
+
+			lod.addLevel( mesh, i * 75 );
+
+		}
+
+		scene.add( lod );
+		</code>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_lod webgl / lod ]
+		</p>
+
+		<h2>Costruttore</h2>
+		<h3>[name]( )</h3>
+		<p>
+			Crea un nuovo [name].
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Object3D] per le proprietà comuni.</p>
+
+		<h3>[property:Boolean autoUpdate]</h3>
+		<p>
+			Indica se l'oggetto LOD viene aggiornato automaticamente dal renderer per frame o no.
+			Se impostato a false, devi chiamare da solo [page:LOD.update]() nel ciclo di rendering.
+			Il valore predefinito è true.
+		</p>
+
+		<h3>[property:Boolean isLOD]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:Array levels]</h3>
+		<p>
+			Un array di oggetti [page:Object level].<br /><br />
+
+			Ogni livello è un oggetto con due proprietà:<br />
+			[page:Object3D object] - L'[page:Object3D] da visualizzare a questo livello.<br />
+			[page:Float distance] - La distanza alla quale visualizzare questo livello di dettaglio.<br />
+			[page:Float hysteresis] - Soglia utilizzata per evitare il flickering ai confini del LOD, come frazione della distanza.
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Object3D] per i metodi comuni.</p>
+
+		<h3>[method:this addLevel]( [param:Object3D object], [param:Float distance], [param:Float hysteresis] )</h3>
+		<p>
+		[page:Object3D object] - L'[page:Object3D] da visualizzare a questo livello.<br />
+		[page:Float distance] - La distanza alla quale visualizzare questo livello di dettaglio.<br />
+		[page:Float hysteresis] - Soglia utilizzata per evitare il flickering ai confini del LOD, come frazione della distanza. Il valore predefinito è 0.0.<br /><br />
+
+		Aggiunge una mesh che sarà visualizzata ad una certa distanza e maggiore. In genere, maggiore è 
+		la distanza, minore è il dettaglio sulla mesh.
+		</p>
+
+		<h3>[method:LOD clone]()</h3>
+		<p>
+			Restituisce un clone di questo oggetto LOD e degli oggetti specifici della distanza ad esso associati.
+		</p>
+
+
+		<h3>[method:Integer getCurrentLevel]()</h3>
+		<p>
+			Ottiene il livello LOD attivo attualmente. Come indice dell'array dei livelli.
+		</p>
+
+		<h3>[method:Object3D getObjectForDistance]( [param:Float distance] )</h3>
+		<p>
+			Ottiene un riferimento al primo [page:Object3D] (mesh) che è maggiore della [page:Float distance].
+		</p>
+
+		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<p>
+			Ottiene le intersezioni tra un [page:Ray] lanciato a questo LOD.
+			[page:Raycaster.intersectObject] chiamerà questo metodo.
+		</p>
+
+		<h3>[method:Object toJSON]( meta )</h3>
+		<p>
+			Crea una struttura JSON con i dettagli di questo oggetto LOD.
+		</p>
+
+		<h3>[method:undefined update]( [param:Camera camera] )</h3>
+		<p>
+			Imposta la visibilità di ogni [page:Object3D oggetto] del [page:levels livello] in base 
+			alla distanza dalla [page:Camera telecamera].
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

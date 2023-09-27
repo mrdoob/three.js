@@ -13,17 +13,30 @@
 			Image from <a href="http://people.sc.fsu.edu/~jburkardt/data/ply/ply.html">John Burkardt</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { PLYLoader } from './jsm/loaders/PLYLoader.js';
+			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, cameraTarget, scene, renderer;
+			let camera, cameraTarget, scene, renderer;
 
 			init();
 			animate();
@@ -45,9 +58,9 @@
 
 				// Ground
 
-				var plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 40, 40 ),
-					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
+				const plane = new THREE.Mesh(
+					new THREE.PlaneGeometry( 40, 40 ),
+					new THREE.MeshPhongMaterial( { color: 0xcbcbcb, specular: 0x474747 } )
 				);
 				plane.rotation.x = - Math.PI / 2;
 				plane.position.y = - 0.5;
@@ -58,13 +71,13 @@
 
 				// PLY file
 
-				var loader = new PLYLoader();
+				const loader = new PLYLoader();
 				loader.load( './models/ply/ascii/dolphins.ply', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
-					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
-					var mesh = new THREE.Mesh( geometry, material );
+					const material = new THREE.MeshStandardMaterial( { color: 0x009cff, flatShading: true } );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.y = - 0.2;
 					mesh.position.z = 0.3;
@@ -82,8 +95,8 @@
 
 					geometry.computeVertexNormals();
 
-					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
-					var mesh = new THREE.Mesh( geometry, material );
+					const material = new THREE.MeshStandardMaterial( { color: 0x009cff, flatShading: true } );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = - 0.2;
 					mesh.position.y = - 0.02;
@@ -99,17 +112,16 @@
 
 				// Lights
 
-				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+				scene.add( new THREE.HemisphereLight( 0x8d7c7c, 0x494966, 3 ) );
 
-				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
-				addShadowedLight( 0.5, 1, - 1, 0xffaa00, 1 );
+				addShadowedLight( 1, 1, 1, 0xffffff, 3.5 );
+				addShadowedLight( 0.5, 1, - 1, 0xffd500, 3 );
 
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				renderer.shadowMap.enabled = true;
 
@@ -122,19 +134,19 @@
 
 				// resize
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function addShadowedLight( x, y, z, color, intensity ) {
 
-				var directionalLight = new THREE.DirectionalLight( color, intensity );
+				const directionalLight = new THREE.DirectionalLight( color, intensity );
 				directionalLight.position.set( x, y, z );
 				scene.add( directionalLight );
 
 				directionalLight.castShadow = true;
 
-				var d = 1;
+				const d = 1;
 				directionalLight.shadow.camera.left = - d;
 				directionalLight.shadow.camera.right = d;
 				directionalLight.shadow.camera.top = d;
@@ -170,7 +182,7 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.0005;
+				const timer = Date.now() * 0.0005;
 
 				camera.position.x = Math.sin( timer ) * 2.5;
 				camera.position.z = Math.cos( timer ) * 2.5;

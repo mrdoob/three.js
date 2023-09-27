@@ -12,52 +12,65 @@
 			Octahedron and Quantization encoding methods from Tarek Sherif
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GeometryCompressionUtils } from './jsm/utils/GeometryCompressionUtils.js';
-			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
-			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import * as GeometryCompressionUtils from 'three/addons/utils/GeometryCompressionUtils.js';
+			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			var statsEnabled = true;
+			const statsEnabled = true;
 
-			var container, stats, gui;
+			let container, stats, gui;
 
-			var camera, scene, renderer, controls;
+			let camera, scene, renderer, controls;
 
-			var lights = [];
+			const lights = [];
 
 			// options
-			var data = {
-				"model": "Icosahedron",
-				"wireframe": false,
-				"texture": false,
-				"detail": 4,
-				"rotationSpeed": 0.1,
+			const data = {
+				'model': 'Icosahedron',
+				'wireframe': false,
+				'texture': false,
+				'detail': 4,
 
-				"QuantizePosEncoding": false,
-				"NormEncodingMethods": "None", // for normal encodings
-				"DefaultUVEncoding": false,
+				'QuantizePosEncoding': false,
+				'NormEncodingMethods': 'None', // for normal encodings
+				'DefaultUVEncoding': false,
 
-				"totalGPUMemory": "0 bytes"
+				'totalGPUMemory': '0 bytes'
 			};
-			var memoryDisplay;
+			let memoryDisplay;
 
 			// geometry params
-			var radius = 100;
+			const radius = 100;
 
 			// materials
-			var lineMaterial = new THREE.LineBasicMaterial( { color: 0xaaaaaa, transparent: true, opacity: 0.8 } );
-			var meshMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x111111 } );
+			const lineMaterial = new THREE.LineBasicMaterial( { color: 0xaaaaaa, transparent: true, opacity: 0.8 } );
+			const meshMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, side: THREE.DoubleSide } );
 
 			// texture
-			var texture = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
+			const texture = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 			texture.wrapS = THREE.RepeatWrapping;
 			texture.wrapT = THREE.RepeatWrapping;
+			texture.colorSpace = THREE.SRGBColorSpace;
 
 			//
 			init();
@@ -67,6 +80,7 @@
 			function init() {
 
 				//
+
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
@@ -79,18 +93,20 @@
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 10000000 );
-				camera.position.x = 2 * radius;
-				camera.position.y = 2 * radius;
-				camera.position.z = 2 * radius;
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.setScalar( 2 * radius );
 
 				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enablePan = false;
+				controls.enableZoom = false;
 
 				//
 
-				lights[ 0 ] = new THREE.PointLight( 0xffffff, 1, 0 );
-				lights[ 1 ] = new THREE.PointLight( 0xffffff, 1, 0 );
-				lights[ 2 ] = new THREE.PointLight( 0xffffff, 1, 0 );
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.3 ) );
+
+				lights[ 0 ] = new THREE.DirectionalLight( 0xffffff, 2.5 );
+				lights[ 1 ] = new THREE.DirectionalLight( 0xffffff, 2.5 );
+				lights[ 2 ] = new THREE.DirectionalLight( 0xffffff, 2.5 );
 
 				lights[ 0 ].position.set( 0, 2 * radius, 0 );
 				lights[ 1 ].position.set( 2 * radius, - 2 * radius, 2 * radius );
@@ -106,13 +122,14 @@
 
 				//
 
-				var geom = newGeometry(data);
+				let geom = newGeometry( data );
 
-				var mesh = new THREE.Mesh( geom, meshMaterial );
-				var lineSegments = new THREE.LineSegments( new THREE.WireframeGeometry( geom ), lineMaterial );
+				const mesh = new THREE.Mesh( geom, meshMaterial );
+				scene.add( mesh );
+
+				const lineSegments = new THREE.LineSegments( new THREE.WireframeGeometry( geom ), lineMaterial );
 				lineSegments.visible = data.wireframe;
 
-				scene.add( mesh );
 				scene.add( lineSegments );
 
 				//
@@ -120,46 +137,42 @@
 				gui = new GUI();
 				gui.width = 350;
 
-				function newGeometry(data) {
+				function newGeometry( data ) {
 
-					switch (data.model) {
-						case "Icosahedron": 
-							return new THREE.IcosahedronBufferGeometry( radius, data.detail );
-						case "Cylinder": 
-							return new THREE.CylinderBufferGeometry( radius, radius, radius * 2, data.detail * 6 );
-						case "Teapot": 
-							return new TeapotBufferGeometry( radius, data.detail * 3, true, true, true, true, true );
-						case "TorusKnot": 
-							return new THREE.TorusKnotBufferGeometry( radius, 10, data.detail * 20, data.detail * 6, 3, 4 );
+					switch ( data.model ) {
+
+						case 'Icosahedron':
+							return new THREE.IcosahedronGeometry( radius, data.detail );
+						case 'Cylinder':
+							return new THREE.CylinderGeometry( radius / 1.5, radius / 1.5, radius, data.detail * 6 );
+						case 'Teapot':
+							return new TeapotGeometry( radius / 1.5, data.detail * 3, true, true, true, true, true );
+						case 'TorusKnot':
+							return new THREE.TorusKnotGeometry( radius / 2, 10, data.detail * 30, data.detail * 6, 3, 4 );
+
 					}
 
 				}
 
 				function generateGeometry() {
 
-					geom = newGeometry(data);
+					geom = newGeometry( data );
 
-					updateGroupGeometry(
-						mesh,
-						lineSegments,
-						geom,
-						data );
+					updateGroupGeometry( mesh, lineSegments, geom, data );
 
 				}
 
-				// updateLineSegments
 				function updateLineSegments() {
 
 					lineSegments.visible = data.wireframe;
 
 				}
 
-				var folder = gui.addFolder( 'Scene' );
-				folder.add( data, 'model', ["Icosahedron", "Cylinder", "TorusKnot", "Teapot"] ).onChange( generateGeometry );
+				let folder = gui.addFolder( 'Scene' );
+				folder.add( data, 'model', [ 'Icosahedron', 'Cylinder', 'TorusKnot', 'Teapot' ] ).onChange( generateGeometry );
 				folder.add( data, 'wireframe', false ).onChange( updateLineSegments );
 				folder.add( data, 'texture', false ).onChange( generateGeometry );
 				folder.add( data, 'detail', 1, 8, 1 ).onChange( generateGeometry );
-				folder.add( data, 'rotationSpeed', 0, 0.5, 0.1 );
 				folder.open();
 
 				folder = gui.addFolder( 'Position Compression' );
@@ -167,7 +180,7 @@
 				folder.open();
 
 				folder = gui.addFolder( 'Normal Compression' );
-				folder.add( data, 'NormEncodingMethods', ["None", "DEFAULT", "OCT1Byte", "OCT2Byte", "ANGLES"] ).onChange( generateGeometry );
+				folder.add( data, 'NormEncodingMethods', [ 'None', 'DEFAULT', 'OCT1Byte', 'OCT2Byte', 'ANGLES' ] ).onChange( generateGeometry );
 				folder.open();
 
 				folder = gui.addFolder( 'UV Compression' );
@@ -176,7 +189,7 @@
 
 				folder = gui.addFolder( 'Memory Info' );
 				folder.open();
-				memoryDisplay = folder.add( data, 'totalGPUMemory', "0 bytes" );
+				memoryDisplay = folder.add( data, 'totalGPUMemory', '0 bytes' );
 				computeGPUMemory( mesh );
 
 				//
@@ -188,7 +201,7 @@
 
 				}
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -199,20 +212,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				camera.aspect = window.innerWidth / window.innerHeight;
+
 				camera.updateProjectionMatrix();
-
-			}
-
-			//
-			function updateLightsPossition() {
-
-				lights.forEach( light => {
-
-					var direction = light.position.clone();
-					direction.applyAxisAngle( new THREE.Vector3( 1, 1, 0 ), data.rotationSpeed / 180 * Math.PI );
-					light.position.add( direction.sub( light.position ) );
-
-				} );
 
 			}
 
@@ -221,9 +222,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				controls.update();
-				updateLightsPossition();
 
 				renderer.render( scene, camera );
 
@@ -235,36 +233,31 @@
 
 			function updateGroupGeometry( mesh, lineSegments, geometry, data ) {
 
-				if ( geometry.isGeometry ) {
-
-					geometry = new THREE.BufferGeometry().fromGeometry( geometry );
-
-					console.log( 'THREE.GeometryCompression: Converted Geometry to BufferGeometry.' );
-
-				}
-
 				// dispose first
+
 				lineSegments.geometry.dispose();
 				mesh.geometry.dispose();
+				mesh.material.dispose();
+				if ( mesh.material.map ) mesh.material.map.dispose();
 
 				lineSegments.geometry = new THREE.WireframeGeometry( geometry );
 				mesh.geometry = geometry;
-				mesh.material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x111111 } );
+				mesh.material = new THREE.MeshPhongMaterial( { color: 0xffffff, side: THREE.DoubleSide } );
 				mesh.material.map = data.texture ? texture : null;
 
-				if ( data["QuantizePosEncoding"] ) {
+				if ( data[ 'QuantizePosEncoding' ] ) {
 
 					GeometryCompressionUtils.compressPositions( mesh );
 
 				}
 
-				if ( data["NormEncodingMethods"] !== "None" ) {
+				if ( data[ 'NormEncodingMethods' ] !== 'None' ) {
 
-					GeometryCompressionUtils.compressNormals( mesh, data["NormEncodingMethods"] );
+					GeometryCompressionUtils.compressNormals( mesh, data[ 'NormEncodingMethods' ] );
 
 				}
 
-				if ( data["DefaultUVEncoding"] ) {
+				if ( data[ 'DefaultUVEncoding' ] ) {
 
 					GeometryCompressionUtils.compressUvs( mesh );
 
@@ -278,7 +271,8 @@
 			function computeGPUMemory( mesh ) {
 
 				// Use BufferGeometryUtils to do memory calculation
-				memoryDisplay.setValue( BufferGeometryUtils.estimateBytesUsed(mesh.geometry) + " bytes");
+
+				memoryDisplay.setValue( BufferGeometryUtils.estimateBytesUsed( mesh.geometry ) + ' bytes' );
 
 			}
 

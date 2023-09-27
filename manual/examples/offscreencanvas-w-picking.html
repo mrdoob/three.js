@@ -1,0 +1,154 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - OffscreenCanvas Picking</title>
+    <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+  </body>
+<script type="module">
+import { state, init, pickPosition } from './shared-picking.js';
+
+let sendMouse;
+
+function startWorker( canvas ) {
+
+	const offscreen = canvas.transferControlToOffscreen();
+	const worker = new Worker( 'offscreencanvas-worker-picking.js', { type: 'module' } );
+	worker.postMessage( { type: 'init', canvas: offscreen }, [ offscreen ] );
+
+	sendMouse = ( x, y ) => {
+
+		worker.postMessage( {
+			type: 'mouse',
+			x,
+			y,
+		} );
+
+	};
+
+	function sendSize() {
+
+		worker.postMessage( {
+			type: 'size',
+			width: canvas.clientWidth,
+			height: canvas.clientHeight,
+		} );
+
+	}
+
+	window.addEventListener( 'resize', sendSize );
+	sendSize();
+
+	console.log( 'using OffscreenCanvas' ); /* eslint-disable-line no-console */
+
+}
+
+function startMainPage( canvas ) {
+
+	init( { canvas } );
+
+	sendMouse = ( x, y ) => {
+
+		pickPosition.x = x;
+		pickPosition.y = y;
+
+	};
+
+	function sendSize() {
+
+		state.width = canvas.clientWidth;
+		state.height = canvas.clientHeight;
+
+	}
+
+	window.addEventListener( 'resize', sendSize );
+	sendSize();
+
+	console.log( 'using regular canvas' ); /* eslint-disable-line no-console */
+
+}
+
+function main() { /* eslint consistent-return: 0 */
+
+	const canvas = document.querySelector( '#c' );
+	if ( canvas.transferControlToOffscreen ) {
+
+		startWorker( canvas );
+
+	} else {
+
+		startMainPage( canvas );
+
+	}
+
+	function getCanvasRelativePosition( event ) {
+
+		const rect = canvas.getBoundingClientRect();
+		return {
+			x: ( event.clientX - rect.left ) * canvas.width / rect.width,
+			y: ( event.clientY - rect.top ) * canvas.height / rect.height,
+		};
+
+	}
+
+	function setPickPosition( event ) {
+
+		const pos = getCanvasRelativePosition( event );
+		sendMouse(
+			( pos.x / canvas.width ) * 2 - 1,
+			( pos.y / canvas.height ) * - 2 + 1 ); // note we flip Y
+
+	}
+
+	function clearPickPosition() {
+
+		// unlike the mouse which always has a position
+		// if the user stops touching the screen we want
+		// to stop picking. For now we just pick a value
+		// unlikely to pick something
+		sendMouse( - 100000, - 100000 );
+
+	}
+
+	window.addEventListener( 'mousemove', setPickPosition );
+	window.addEventListener( 'mouseout', clearPickPosition );
+	window.addEventListener( 'mouseleave', clearPickPosition );
+
+	window.addEventListener( 'touchstart', ( event ) => {
+
+		// prevent the window from scrolling
+		event.preventDefault();
+		setPickPosition( event.touches[ 0 ] );
+
+	}, { passive: false } );
+
+	window.addEventListener( 'touchmove', ( event ) => {
+
+		setPickPosition( event.touches[ 0 ] );
+
+	} );
+
+	window.addEventListener( 'touchend', clearPickPosition );
+
+}
+
+main();
+
+</script>
+</html>
+

@@ -14,17 +14,30 @@
 			Dancing Stormtrooper by <a href="https://sketchfab.com/strykerdoesgames" target="_blank" rel="noopener">StrykerDoesAnimation</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC Attribution</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			var container, stats, clock, controls;
-			var camera, scene, renderer, mixer;
+			let container, stats, clock, controls;
+			let camera, scene, renderer, mixer;
 
 			init();
 			animate();
@@ -42,21 +55,11 @@
 
 				// collada
 
-				var loader = new ColladaLoader();
+				const loader = new ColladaLoader();
 				loader.load( './models/collada/stormtrooper/stormtrooper.dae', function ( collada ) {
 
-					var animations = collada.animations;
-					var avatar = collada.scene;
-
-					avatar.traverse( function ( node ) {
-
-						if ( node.isSkinnedMesh ) {
-
-							node.frustumCulled = false;
-
-						}
-
-					} );
+					const avatar = collada.scene;
+					const animations = avatar.animations;
 
 					mixer = new THREE.AnimationMixer( avatar );
 					mixer.clipAction( animations[ 0 ] ).play();
@@ -67,17 +70,17 @@
 
 				//
 
-				var gridHelper = new THREE.GridHelper( 10, 20 );
+				const gridHelper = new THREE.GridHelper( 10, 20, 0xc1c1c1, 0x8d8d8d );
 				scene.add( gridHelper );
 
 				//
 
-				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.2 );
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.6 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
-				scene.add( camera );
-				camera.add( pointLight );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				directionalLight.position.set( 1.5, 1, - 1.5 );
+				scene.add( directionalLight );
 
 				//
 
@@ -102,7 +105,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -126,7 +129,7 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				if ( mixer !== undefined ) {
 

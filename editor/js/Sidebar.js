@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UITabbedPanel, UISpan } from './libs/ui.js';
 
 import { SidebarScene } from './Sidebar.Scene.js';
@@ -9,29 +5,23 @@ import { SidebarProperties } from './Sidebar.Properties.js';
 import { SidebarScript } from './Sidebar.Script.js';
 import { SidebarAnimation } from './Sidebar.Animation.js';
 import { SidebarProject } from './Sidebar.Project.js';
-import { SidebarHistory } from './Sidebar.History.js';
 import { SidebarSettings } from './Sidebar.Settings.js';
 
-var Sidebar = function ( editor ) {
+function Sidebar( editor ) {
 
-	var strings = editor.strings;
+	const strings = editor.strings;
 
-	var container = new UITabbedPanel();
+	const container = new UITabbedPanel();
 	container.setId( 'sidebar' );
 
-	var scene = new UISpan().add(
+	const scene = new UISpan().add(
 		new SidebarScene( editor ),
 		new SidebarProperties( editor ),
 		new SidebarAnimation( editor ),
 		new SidebarScript( editor )
 	);
-
-	var project = new SidebarProject( editor );
-
-	var settings = new UISpan().add(
-		new SidebarSettings( editor ),
-		new SidebarHistory( editor )
-	);
+	const project = new SidebarProject( editor );
+	const settings = new SidebarSettings( editor );
 
 	container.addTab( 'scene', strings.getKey( 'sidebar/scene' ), scene );
 	container.addTab( 'project', strings.getKey( 'sidebar/project' ), project );
@@ -40,6 +30,6 @@ var Sidebar = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { Sidebar };

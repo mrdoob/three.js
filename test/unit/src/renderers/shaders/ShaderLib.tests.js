@@ -1,9 +1,6 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { ShaderLib } from '../../../../../src/renderers/shaders/ShaderLib';
+import { ShaderLib } from '../../../../../src/renderers/shaders/ShaderLib.js';
 
 export default QUnit.module( 'Renderers', () => {
 
@@ -11,9 +8,10 @@ export default QUnit.module( 'Renderers', () => {
 
 		QUnit.module( 'ShaderLib', () => {
 
-			QUnit.todo( 'write me !', ( assert ) => {
+			// INSTANCING
+			QUnit.test( 'Instancing', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( ShaderLib, 'ShaderLib is defined.' );
 
 			} );
 

@@ -1,50 +1,44 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { Vector3 } from '../math/Vector3.js';
 import { Quaternion } from '../math/Quaternion.js';
 import { Clock } from '../core/Clock.js';
 import { Object3D } from '../core/Object3D.js';
 import { AudioContext } from './AudioContext.js';
 
-var _position = new Vector3();
-var _quaternion = new Quaternion();
-var _scale = new Vector3();
-var _orientation = new Vector3();
+const _position = /*@__PURE__*/ new Vector3();
+const _quaternion = /*@__PURE__*/ new Quaternion();
+const _scale = /*@__PURE__*/ new Vector3();
+const _orientation = /*@__PURE__*/ new Vector3();
 
-function AudioListener() {
+class AudioListener extends Object3D {
 
-	Object3D.call( this );
+	constructor() {
 
-	this.type = 'AudioListener';
+		super();
 
-	this.context = AudioContext.getContext();
+		this.type = 'AudioListener';
 
-	this.gain = this.context.createGain();
-	this.gain.connect( this.context.destination );
+		this.context = AudioContext.getContext();
 
-	this.filter = null;
+		this.gain = this.context.createGain();
+		this.gain.connect( this.context.destination );
 
-	this.timeDelta = 0;
+		this.filter = null;
 
-	// private
+		this.timeDelta = 0;
 
-	this._clock = new Clock();
+		// private
 
-}
+		this._clock = new Clock();
 
-AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
+	}
 
-	constructor: AudioListener,
-
-	getInput: function () {
+	getInput() {
 
 		return this.gain;
 
-	},
+	}
 
-	removeFilter: function ( ) {
+	removeFilter() {
 
 		if ( this.filter !== null ) {
 
@@ -57,15 +51,15 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	getFilter: function () {
+	getFilter() {
 
 		return this.filter;
 
-	},
+	}
 
-	setFilter: function ( value ) {
+	setFilter( value ) {
 
 		if ( this.filter !== null ) {
 
@@ -84,28 +78,28 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	getMasterVolume: function () {
+	getMasterVolume() {
 
 		return this.gain.gain.value;
 
-	},
+	}
 
-	setMasterVolume: function ( value ) {
+	setMasterVolume( value ) {
 
 		this.gain.gain.setTargetAtTime( value, this.context.currentTime, 0.01 );
 
 		return this;
 
-	},
+	}
 
-	updateMatrixWorld: function ( force ) {
+	updateMatrixWorld( force ) {
 
-		Object3D.prototype.updateMatrixWorld.call( this, force );
+		super.updateMatrixWorld( force );
 
-		var listener = this.context.listener;
-		var up = this.up;
+		const listener = this.context.listener;
+		const up = this.up;
 
 		this.timeDelta = this._clock.getDelta();
 
@@ -117,7 +111,7 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			// code path for Chrome (see #14393)
 
-			var endTime = this.context.currentTime + this.timeDelta;
+			const endTime = this.context.currentTime + this.timeDelta;
 
 			listener.positionX.linearRampToValueAtTime( _position.x, endTime );
 			listener.positionY.linearRampToValueAtTime( _position.y, endTime );
@@ -138,6 +132,6 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
 
 export { AudioListener };

@@ -12,15 +12,28 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - 3DS loader
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { TrackballControls } from './jsm/controls/TrackballControls.js';
-			import { TDSLoader } from './jsm/loaders/TDSLoader.js';
+			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+			import { TDSLoader } from 'three/addons/loaders/TDSLoader.js';
 
-			var container, controls;
-			var camera, scene, renderer;
+			let container, controls;
+			let camera, scene, renderer;
 
 			init();
 			animate();
@@ -34,17 +47,16 @@
 				camera.position.z = 2;
 
 				scene = new THREE.Scene();
-				scene.add( new THREE.HemisphereLight() );
+				scene.add( new THREE.AmbientLight( 0xffffff, 3 ) );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+				const directionalLight = new THREE.DirectionalLight( 0xffeedd, 3 );
 				directionalLight.position.set( 0, 0, 2 );
 				scene.add( directionalLight );
 
 				//3ds files dont store normal maps
-				var loader = new THREE.TextureLoader();
-				var normal = loader.load( 'models/3ds/portalgun/textures/normal.jpg' );
+				const normal = new THREE.TextureLoader().load( 'models/3ds/portalgun/textures/normal.jpg' );
 
-				var loader = new TDSLoader( );
+				const loader = new TDSLoader( );
 				loader.setResourcePath( 'models/3ds/portalgun/textures/' );
 				loader.load( 'models/3ds/portalgun/portalgun.3ds', function ( object ) {
 
@@ -52,6 +64,7 @@
 
 						if ( child.isMesh ) {
 
+							child.material.specular.setScalar( 0.1 );
 							child.material.normalMap = normal;
 
 						}
@@ -62,14 +75,14 @@
 
 				} );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				controls = new TrackballControls( camera, renderer.domElement );
 
-				window.addEventListener( 'resize', resize, false );
+				window.addEventListener( 'resize', resize );
 
 			}
 

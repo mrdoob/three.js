@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,9 +13,8 @@
 
 		<p class="desc">
 			Within the three.js animation system you can animate various properties of your models:
-			the bones of a [page:SkinnedMesh skinned and rigged model],
-			[page:Geometry.morphTargets morph targets], different material properties (colors,
-			opacity, booleans), visibility and transforms. The animated properties can be faded in,
+			the bones of a [page:SkinnedMesh skinned and rigged model], morph targets, different material properties
+			(colors, opacity, booleans), visibility and transforms. The animated properties can be faded in,
 			faded out, crossfaded and warped. The weight and time scales of different simultaneous
 			animations on the same object as well as on different objects can be changed
 			independently. Various animations on the same and on different objects can be
@@ -41,7 +39,7 @@
 			should be an array named "animations", containing the [page:AnimationClip AnimationClips]
 			for this model (see a list of possible loaders below).<br /><br />
 
-			Each *AnimationClip* usually holds the data for a certain activity of the object. If the
+			Each `AnimationClip` usually holds the data for a certain activity of the object. If the
 			mesh is a character, for example, there may be one AnimationClip for a walkcycle, a second
 			for a jump, a third for sidestepping and so on.
 
@@ -51,14 +49,14 @@
 
 		<p class="desc">
 
-			Inside of such an *AnimationClip* the data for each animated property are stored in a
+			Inside of such an `AnimationClip` the data for each animated property are stored in a
 			separate [page:KeyframeTrack]. Assuming a character object has a [page:Skeleton skeleton],
 			one keyframe track could store the data for the position changes of the lower arm bone
 			over time, a different track the data for the rotation changes of the same bone, a third
 			the track position, rotation or scaling of another bone, and so on. It should be clear,
 			that an AnimationClip can be composed of lots of such tracks.<br /><br />
 
-			Assuming the model has [page:Geometry.morphTargets morph targets] (for example one morph
+			Assuming the model has morph targets (for example one morph
 			target showing a friendly face and another showing an angry face), each track holds the
 			information as to how the [page:Mesh.morphTargetInfluences influence] of a certain morph
 			target changes during the performance of the clip.
@@ -80,9 +78,9 @@
 
 		<p class="desc">
 
-			The *AnimationMixer* itself has only very few (general) properties and methods, because it
+			The `AnimationMixer` itself has only very few (general) properties and methods, because it
 			can be controlled by the [page:AnimationAction AnimationActions]. By configuring an
-			*AnimationAction* you can determine when a certain *AnimationClip* shall be played, paused
+			`AnimationAction` you can determine when a certain `AnimationClip` shall be played, paused
 			or stopped on one of the mixers, if and how often the clip has to be repeated, whether it
 			shall be performed with a fade or a time scaling, and some additional things, such crossfading
 			or synchronizing.
@@ -123,11 +121,11 @@
 		<h2>Example</h2>
 
 		<code>
-		var mesh;
+		let mesh;
 
 		// Create an AnimationMixer, and get the list of AnimationClip instances
-		var mixer = new THREE.AnimationMixer( mesh );
-		var clips = mesh.animations;
+		const mixer = new THREE.AnimationMixer( mesh );
+		const clips = mesh.animations;
 
 		// Update the mixer on each frame
 		function update () {
@@ -135,8 +133,8 @@
 		}
 
 		// Play a specific animation
-		var clip = THREE.AnimationClip.findByName( clips, 'dance' );
-		var action = mixer.clipAction( clip );
+		const clip = THREE.AnimationClip.findByName( clips, 'dance' );
+		const action = mixer.clipAction( clip );
 		action.play();
 
 		// Play all animations

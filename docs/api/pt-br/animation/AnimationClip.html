@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Um AnimationClip é um conjunto reutilizável de keyframe tracks que representam uma animação.<br /><br />
+
+			Para obter uma visão geral dos diferentes elementos do sistema de animação three.js, consulte o
+			artigo "Sistema de animação" na seção "Próximos Passos" do manual.
+		</p>
+
+
+		<h2>Construtor</h2>
+
+
+		<h3>[name]( [param:String name], [param:Number duration], [param:Array tracks] )</h3>
+		<p>
+			[page:String name] - um nome para este clipe.<br />
+			[page:Number duration] - a duração deste clipe (em segundos). Se for passado um valor negativo,
+			a duração será calculada a partir do array `tracks` passado.<br />
+			[page:Array tracks] - um array de [page:KeyframeTrack KeyframeTracks].<br /><br />
+
+			Nota: Em vez de instanciar um AnimationClip diretamente com o construtor, você pode usar um
+			de seus métodos estáticos para criar AnimationClips: de JSON ([page:.parse parse]), da sequência morph
+			target ([page:.CreateFromMorphTargetSequence CreateFromMorphTargetSequence],
+			[page:.CreateClipsFromMorphTargetSequences CreateClipsFromMorphTargetSequences]) ou de
+			hierarquias de animação ([page:.parseAnimation parseAnimation]) - se o seu modelo ainda não
+			contiver AnimationClips no array de animações de sua geometria.
+		</p>
+
+
+		<h2>Propriedades</h2>
+
+
+		<h3>[property:Number duration]</h3>
+		<p>
+			A duração deste clipe (em segundos). Pode ser calculado a partir do array de [page:.tracks tracks]
+			através de [page:.resetDuration resetDuration].
+		</p>
+
+		<h3>[property:String name]</h3>
+		<p>
+			Um nome para este clipe. Um determinado clipe pode ser pesquisado via [page:.findByName findByName].
+		</p>
+
+		<h3>[property:Array tracks]</h3>
+		<p>
+			Um array contendo um [page:KeyframeTrack] para cada propriedade animada por este clipe.
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+			O [link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] desta instância de clipe.
+			Ele é atribuído automaticamente e não deve ser editado.
+		</p>
+
+
+		<h2>Métodos</h2>
+
+
+		<h3>[method:AnimationClip clone]()</h3>
+		<p>
+			Retorna uma cópia deste clipe.
+		</p>
+
+		<h3>[method:this optimize]()</h3>
+		<p>
+			Otimiza cada faixa (track) removendo chaves sequenciais equivalentes (que são comuns em sequências morph target).
+		</p>
+
+		<h3>[method:this resetDuration]()</h3>
+		<p>
+			Define a [page:.duration duration] do clipe para a duração de seu maior
+			[page:KeyframeTrack].
+		</p>
+
+		<h3>[method:Object toJSON]()</h3>
+		<p>
+			Retorna um objeto JSON que representa o clipe de animação serializado.
+		</p>
+
+		<h3>[method:this trim]()</h3>
+		<p>
+			Apara todas as faixas para a duração do clipe.
+		</p>
+
+		<h3>[method:Boolean validate]()</h3>
+		<p>
+			Executa a validação mínima em cada faixa (track) do clipe. Retorna verdadeiro se todas as faixas forem válidas.
+		</p>
+
+
+		<h2>Métodos estáticos</h2>
+
+
+		<h3>[method:Array CreateClipsFromMorphTargetSequences]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
+		<p>
+			Retorna um array de novos AnimationClips criados a partir
+			de sequências morph target de uma geometria, tentando classificar nomes de morph targets em grupos de animação
+			padrão como "Walk_001, Walk_002, Run_001, Run_002 ...".
+		</p>
+
+		<h3>[method:AnimationClip CreateFromMorphTargetSequence]( [param:String name], [param:Array morphTargetSequence], [param:Number fps], [param:Boolean noLoop] )</h3>
+		<p>
+			Retorna um novo AnimationClip do array de morph targets passado de uma geometria, recebendo um nome e o número de quadros por segundo.<br /><br />
+
+			Nota: O parâmetro fps é obrigatório, mas a velocidade da animação pode ser sobrescrita em um
+			`AnimationAction` via [page:AnimationAction.setDuration animationAction.setDuration].
+		</p>
+
+		<h3>[method:AnimationClip findByName]( [param:Object objectOrClipArray], [param:String name] )</h3>
+		<p>
+			Procura um AnimationClip por nome, tendo como primeiro parâmetro um array de
+			AnimationClips ou um mesh ou geometria que contém um array chamado "animations".
+		</p>
+
+		<h3>[method:AnimationClip parse]( [param:Object json] )</h3>
+		<p>
+			Analisa uma representação JSON de um clipe e retorna um AnimationClip.
+		</p>
+
+		<h3>[method:AnimationClip parseAnimation]( [param:Object animation], [param:Array bones] )</h3>
+		<p>
+			Analisa o formato animation.hierarchy e retorna um AnimationClip.
+		</p>
+
+		<h3>[method:Object toJSON]( [param:AnimationClip clip] )</h3>
+		<p>
+			Recebe um AnimationClip e retorna um objeto JSON.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

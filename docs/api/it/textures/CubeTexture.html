@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Texture] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Crea una texture a cubo composta da sei immagini.</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const loader = new THREE.CubeTextureLoader();
+		loader.setPath( 'textures/cube/pisa/' );
+
+		const textureCube = loader.load( [
+			'px.png', 'nx.png',
+			'py.png', 'ny.png',
+			'pz.png', 'nz.png'
+		] );
+
+		const material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
+		</code>
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace )</h3>
+
+		<p>
+		CubeTexture è quasi equivalente in funzionalità ed utilizzo alla classe [page:Texture]. Le uniche differenze sono che le immagini
+		sono un array di 6 immagini anziché una singola immagine e le opzioni di mappatura sono 
+		[page:Textures THREE.CubeReflectionMapping] (predefinita) o [page:Textures THREE.CubeRefractionMapping].
+		</p>
+
+
+		<h2>Proprietà</h2>
+
+		<p>
+    	Vedi la classe base [page:Texture Texture] per le proprietà comuni.
+    </p>
+
+		<h3>[property:Boolean flipY]</h3>
+		<p>
+			Se impostato a `true`, la texture viene capovolta lungo l'asse verticale quando viene caricata sulla GPU. L'impostazione predefinita è `false`.
+		</p>
+
+		<h3>[property:Boolean isCubeTexture]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h2>Metodi</h2>
+
+    <p>
+			Vedi la classe base [page:Texture Texture] per i metodi comuni.
+    </p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

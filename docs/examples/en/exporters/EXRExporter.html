@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		An exporter for `EXR`.
+		<br /><br />
+		[link:https://www.openexr.com/ EXR] ( Extended Dynamic Range) is an
+		[link:https://github.com/AcademySoftwareFoundation/openexr open format specification]
+		for professional-grade image storage format of the motion picture industry. The purpose of
+		format is to accurately and efficiently represent high-dynamic-range scene-linear image data
+		and associated metadata. The library is widely used in host application software where accuracy
+		is critical, such as photorealistic rendering, texture access, image compositing, deep compositing,
+		and DI.
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { EXRExporter } from 'three/addons/exporters/EXRExporter.js';
+		</code>
+
+		<h2>Code Example</h2>
+
+		<code>
+		// Instantiate a exporter
+		const exporter = new EXRExporter();
+
+		// Parse the input render target data and generate the EXR output
+		const EXR = exporter.parse( renderer, renderTarget, options );
+		downloadFile( EXR );
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+		<p>
+		</p>
+		<p>
+		Creates a new [name].
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null parse]( [param:WebGLRenderer renderer], [param:WebGLRenderTarget renderTarget], [param:Object options] )</h3>
+		<p>
+			[page:Function renderTarget] — WebGLRenderTarget containing data used for exporting EXR image.<br />
+			[page:Options options] — Export options.<br />
+			<ul>
+				<li>type - Output datatype for internal EXR data. Available options:<br />
+					<code>
+THREE.HalfFloatType // default option
+THREE.FloatType
+					</code>
+				</li>
+				<li>compression - Internal compression algorithm. Available options:<br />
+					<code>
+NO_COMPRESSION
+ZIP_COMPRESSION // default option
+ZIPS_COMPRESSION
+					</code>
+				</li>
+			</ul>
+		</p>
+		<p>
+		Generates a .exr output from the input render target.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/EXRExporter.js examples/jsm/exporters/EXRExporter.js]
+		</p>
+	</body>
+</html>

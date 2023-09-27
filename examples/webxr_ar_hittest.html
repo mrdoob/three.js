@@ -12,19 +12,32 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - hit test<br/>(Chrome Android 81+)
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
-			import { ARButton } from './jsm/webxr/ARButton.js';
+			import * as THREE from 'three';
+			import { ARButton } from 'three/addons/webxr/ARButton.js';
 
-			var container;
-			var camera, scene, renderer;
-			var controller;
+			let container;
+			let camera, scene, renderer;
+			let controller;
 
-			var reticle;
+			let reticle;
 
-			var hitTestSource = null;
-			var hitTestSourceRequested = false;
+			let hitTestSource = null;
+			let hitTestSourceRequested = false;
 
 			init();
 			animate();
@@ -38,7 +51,7 @@
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
 
-				var light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 1 );
+				const light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 3 );
 				light.position.set( 0.5, 1, 0.25 );
 				scene.add( light );
 
@@ -56,15 +69,15 @@
 
 				//
 
-				var geometry = new THREE.CylinderBufferGeometry( 0.1, 0.1, 0.2, 32 ).translate( 0, 0.1, 0 );
+				const geometry = new THREE.CylinderGeometry( 0.1, 0.1, 0.2, 32 ).translate( 0, 0.1, 0 );
 
 				function onSelect() {
 
 					if ( reticle.visible ) {
 
-						var material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
-						var mesh = new THREE.Mesh( geometry, material );
-						mesh.position.setFromMatrixPosition( reticle.matrix );
+						const material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
+						const mesh = new THREE.Mesh( geometry, material );
+						reticle.matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
 						mesh.scale.y = Math.random() * 2 + 1;
 						scene.add( mesh );
 
@@ -77,7 +90,7 @@
 				scene.add( controller );
 
 				reticle = new THREE.Mesh(
-					new THREE.RingBufferGeometry( 0.15, 0.2, 32 ).rotateX( - Math.PI / 2 ),
+					new THREE.RingGeometry( 0.15, 0.2, 32 ).rotateX( - Math.PI / 2 ),
 					new THREE.MeshBasicMaterial()
 				);
 				reticle.matrixAutoUpdate = false;
@@ -86,7 +99,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -111,8 +124,8 @@
 
 				if ( frame ) {
 
-					var referenceSpace = renderer.xr.getReferenceSpace();
-					var session = renderer.xr.getSession();
+					const referenceSpace = renderer.xr.getReferenceSpace();
+					const session = renderer.xr.getSession();
 
 					if ( hitTestSourceRequested === false ) {
 
@@ -139,11 +152,11 @@
 
 					if ( hitTestSource ) {
 
-						var hitTestResults = frame.getHitTestResults( hitTestSource );
+						const hitTestResults = frame.getHitTestResults( hitTestSource );
 
 						if ( hitTestResults.length ) {
 
-							var hit = hitTestResults[ 0 ];
+							const hit = hitTestResults[ 0 ];
 
 							reticle.visible = true;
 							reticle.matrix.fromArray( hit.getPose( referenceSpace ).transform.matrix );

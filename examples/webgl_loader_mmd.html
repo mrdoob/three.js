@@ -25,26 +25,39 @@
 		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank" rel="noopener">Dance Data</a>
 		</div>
 
-		<script src="js/libs/ammo.js"></script>
+		<script src="jsm/libs/ammo.wasm.js"></script>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
-			import { MMDLoader } from './jsm/loaders/MMDLoader.js';
-			import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
+			import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
+			import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
 
-			var container, stats;
+			let stats;
 
-			var mesh, camera, scene, renderer, effect;
-			var helper, ikHelper, physicsHelper;
+			let mesh, camera, scene, renderer, effect;
+			let helper, ikHelper, physicsHelper;
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
 			Ammo().then( function ( AmmoLib ) {
 
@@ -58,7 +71,7 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -69,14 +82,14 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
-				var gridHelper = new THREE.PolarGridHelper( 30, 10 );
+				const gridHelper = new THREE.PolarGridHelper( 30, 0 );
 				gridHelper.position.y = - 10;
 				scene.add( gridHelper );
 
-				var ambient = new THREE.AmbientLight( 0x666666 );
+				const ambient = new THREE.AmbientLight( 0xaaaaaa, 3 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0x887766 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
 				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
@@ -100,7 +113,7 @@
 
 					if ( xhr.lengthComputable ) {
 
-						var percentComplete = xhr.loaded / xhr.total * 100;
+						const percentComplete = xhr.loaded / xhr.total * 100;
 						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
 
 					}
@@ -108,14 +121,14 @@
 				}
 
 
-				var modelFile = 'models/mmd/miku/miku_v2.pmd';
-				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
+				const modelFile = 'models/mmd/miku/miku_v2.pmd';
+				const vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
 
 				helper = new MMDAnimationHelper( {
 					afterglow: 2.0
 				} );
 
-				var loader = new MMDLoader();
+				const loader = new MMDLoader();
 
 				loader.loadWithAnimation( modelFile, vmdFiles, function ( mmd ) {
 
@@ -140,38 +153,16 @@
 
 				}, onProgress, null );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 10;
 				controls.maxDistance = 100;
 
-				window.addEventListener( 'resize', onWindowResize, false );
-
-				var phongMaterials;
-				var originalMaterials;
-
-				function makePhongMaterials( materials ) {
-
-					var array = [];
-
-					for ( var i = 0, il = materials.length; i < il; i ++ ) {
-
-						var m = new THREE.MeshPhongMaterial();
-						m.copy( materials[ i ] );
-						m.needsUpdate = true;
-
-						array.push( m );
-
-					}
-
-					phongMaterials = array;
-
-				}
+				window.addEventListener( 'resize', onWindowResize );
 
 				function initGui() {
 
-					var api = {
+					const api = {
 						'animation': true,
-						'gradient mapping': true,
 						'ik': true,
 						'outline': true,
 						'physics': true,
@@ -179,28 +170,11 @@
 						'show rigid bodies': false
 					};
 
-					var gui = new GUI();
+					const gui = new GUI();
 
 					gui.add( api, 'animation' ).onChange( function () {
 
 						helper.enable( 'animation', api[ 'animation' ] );
-
-					} );
-
-					gui.add( api, 'gradient mapping' ).onChange( function () {
-
-						if ( originalMaterials === undefined ) originalMaterials = mesh.material;
-						if ( phongMaterials === undefined ) makePhongMaterials( mesh.material );
-
-						if ( api[ 'gradient mapping' ] ) {
-
-							mesh.material = originalMaterials;
-
-						} else {
-
-							mesh.material = phongMaterials;
-
-						}
 
 					} );
 

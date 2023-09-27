@@ -1,0 +1,18 @@
+newmtl blinn1SG
+Ka 0.10 0.10 0.10
+
+Kd 0.00 0.00 0.00
+Ks 0.00 0.00 0.00
+Ke 0.00 0.00 0.00
+Ns 0.060000
+Ni 1.500000
+d 1.000000
+Tr 0.000000
+Tf 1.000000 1.000000 1.000000 
+illum 2
+map_Kd windmill_diffuse.tga
+
+map_Ks windmill_spec.tga
+
+map_bump windmill_normal.tga 
+bump windmill_normal.tga 

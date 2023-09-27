@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Un triangolo geometrico definito da tre [page:Vector3 Vector3] che rappresentano i suoi tre angoli.
+		</p>
+
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] )</h3>
+		<p>
+		[page:Vector3 a] - il primo angolo del triangolo. Il valore predefinito è un [page:Vector3] a `(0, 0, 0)`.<br />
+		[page:Vector3 b] - il secondo angolo del triangolo. Il valore predefinito è un [page:Vector3] a `(0, 0, 0)`.<br />
+		[page:Vector3 c] - il terzo angolo del triangolo. Il valore predefinito è un [page:Vector3] a `(0, 0, 0)`.<br /><br />
+
+		Crea un nuovo [name].
+		</p>
+
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Vector3 a]</h3>
+		<p>
+			Il primo angolo del triangolo. Il valore predefinito è un [page:Vector3] a `(0, 0, 0)`.
+		</p>
+
+		<h3>[property:Vector3 b]</h3>
+		<p>
+			Il secondo angolo del triangolo. Il valore predefinito è un [page:Vector3] a `(0, 0, 0)`.
+		</p>
+
+		<h3>[property:Vector3 c]</h3>
+		<p>
+			Il terzo angolo del triangolo. Il valore predefinito è un [page:Vector3] a `(0, 0, 0)`.
+		</p>
+
+		<h2>Metodi</h2>
+
+		<h3>[method:Triangle clone]()</h3>
+		<p>
+			Restituisce un nuovo triangolo con le stesse proprietà [page:.a a], [page:.b b] e [page:.c c] di questo.
+		</p>
+
+		<h3>[method:Vector3 closestPointToPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] <br />
+		[page:Vector3 target] — il risultato sarà copiato in questo Vector3.<br /><br />
+
+		Restituisce il punto più vicino del triangolo al [page:Vector3 punto].
+		</p>
+
+		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] da controllare.<br /><br />
+
+		Restituisce true se il punto passato, quando proiettato sul piano del triangolo, si trova all'interno del triangolo.
+		</p>
+
+		<h3>[method:this copy]( [param:Triangle triangle] )</h3>
+		<p>
+			Copia i valori delle proprietà [page:.a a], [page:.b b] e [page:.c c] del triangolo passato in questo triangolo.
+		</p>
+
+		<h3>[method:Boolean equals]( [param:Triangle triangle] )</h3>
+		<p>
+			Restituisce true se i due triangoli hanno le proprietà [page:.a a], [page:.b b] e [page:.c c] identiche.
+		</p>
+
+		<h3>[method:Float getArea]()</h3>
+		<p>Restituisce l'area del triangolo.</p>
+
+		<h3>[method:Vector3 getBarycoord]( [param:Vector3 point], [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] <br />
+		[page:Vector3 target] — il risultato sarà copiato in questo Vector3.<br /><br />
+
+		Restituisce una [link:https://en.wikipedia.org/wiki/Barycentric_coordinate_system coordinata baricentrica]
+		dal vettore dato. <br/><br/>
+
+		[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png Figura delle coordinate baricentriche]
+		</p>
+
+		<h3>[method:Vector3 getMidpoint]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — il risultato sarà copiato in questo  Vector3.<br /><br />
+
+		Calcola il punto medio del triangolo.
+		</p>
+
+		<h3>[method:Vector3 getNormal]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — il risultato sarà copiato in questo Vector3.<br /><br />
+
+		Calcola il [link:https://en.wikipedia.org/wiki/Normal_(geometry) vettore normale] del triangolo.
+		</p>
+
+		<h3>[method:Plane getPlane]( [param:Plane target] )</h3>
+		<p>
+		[page:Plane target] — il risultato sarà copiato in questo Plane.<br /><br />
+
+		Calcola il [page:Plane piano] in base al triangolo.
+		</p>
+
+		<h3>[method:Vector2 getInterpolation]( [param:Vector3 point], [param:Vector2 v1] | [param:Vector3 v1] | [param:Vector4 v1], [param:Vector2 v2] | [param:Vector3 v2] | [param:Vector4 v3], [param:Vector2 v3] | [param:Vector3 v3] | [param:Vector4 v3], [param:Vector2 target] )</h3>
+		<p>
+		[page:Vector3 point] - Il punto sul triangolo.<br />
+		[page:Vector2 v1] - La valore del primo vertice del triangolo.<br />
+		[page:Vector2 v2] - La valore del secondo vertice del triangolo.<br />
+		[page:Vector2 v3] - La valore del terzo vertice del triangolo.<br />
+		[page:Vector2 target] — il risultato sarà copiato in questo Vector.<br /><br />
+
+		Restituisce le valore interpolato baricentricamente per il punto specificato sul triangolo.
+		</p>
+
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - Box per il controllo dell'intersezione.<br /><br />
+
+		Determina se il triangolo interseca [page:Box3 box] oppure no.
+		</p>
+
+		<h3>[method:Boolean isFrontFacing]( [param:Vector3 direction] )</h3>
+		<p>
+		[page:Vector3 direction] - La distanza da testare.<br /><br />
+
+		Determina se il triangolo è orientato verso la direzione data o no.
+		</p>
+
+		<h3>[method:this set]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] ) [param:Triangle this]</h3>
+		<p>
+			Imposta le proprietà [page:.a a], [page:.b b] e [page:.c c] del triangolo ai [page:Vector3 vector3] passati.<br>
+			Si noti che questo metodo copia solamente i valori da un dato oggetto.
+		</p>
+
+		<h3>[method:this setFromAttributeAndIndices]( [param:BufferAttribute attribute], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
+		<p>
+		attribute - [page:BufferAttribute] dei dati del vertice <br />
+		i0 - [page:Integer] indice <br />
+		i1 - [page:Integer] indice <br />
+		i2 - [page:Integer] indice<br /><br />
+
+		Imposta i vertici del triangolo dai dati dei vertici dell'attributo buffer.
+		</p>
+
+		<h3>[method:this setFromPointsAndIndices]( [param:Array points], [param:Integer i0], [param:Integer i1], [param:Integer i2] ) [param:Triangle this]</h3>
+		<p>
+		points - [page:Array] di [page:Vector3] <br />
+		i0 - [page:Integer] indice <br />
+		i1 - [page:Integer] indice <br />
+		i2 - [page:Integer] indice<br /><br />
+
+		Imposta i vettori del triangolo ai vettori nell'array.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,85 @@
+name: Bug Report
+description: File a reproducible bug or regression.
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      description: How do you trigger this bug? Please walk us through it step by step.
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: code
+    attributes:
+      label: Code
+      value: |
+        ```js
+        // code goes here
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Live example
+      value: |
+        * [jsfiddle-latest-release](https://jsfiddle.net/g3atw6k5/)
+        * [jsfiddle-dev](https://jsfiddle.net/hjqw94c5/)
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem (drag and drop the image).
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of the library are you using?
+      placeholder: r
+    validations:
+      required: true
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      multiple: true
+      options:
+        - Desktop
+        - Mobile
+        - Headset
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      multiple: true
+      options:
+        - Windows
+        - MacOS
+        - Linux
+        - Android
+        - iOS

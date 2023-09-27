@@ -4,37 +4,52 @@ import { DataTexture } from '../textures/DataTexture.js';
 import { Loader } from './Loader.js';
 
 /**
- * @author Nikos M. / https://github.com/foo123/
- *
  * Abstract Base class to load generic binary textures formats (rgbe, hdr, ...)
  *
  * Sub classes have to implement the parse() method which will be used in load().
  */
 
-function DataTextureLoader( manager ) {
+class DataTextureLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-}
+		super( manager );
 
-DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: DataTextureLoader,
+	load( url, onLoad, onProgress, onError ) {
 
-	load: function ( url, onLoad, onProgress, onError ) {
+		const scope = this;
 
-		var scope = this;
+		const texture = new DataTexture();
 
-		var texture = new DataTexture();
-
-		var loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
 		loader.setPath( this.path );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( buffer ) {
 
-			var texData = scope.parse( buffer );
+			let texData;
 
-			if ( ! texData ) return;
+			try {
+
+				texData = scope.parse( buffer );
+
+			} catch ( error ) {
+
+				if ( onError !== undefined ) {
+
+					onError( error );
+
+				} else {
+
+					console.error( error );
+					return;
+
+				}
+
+			}
 
 			if ( texData.image !== undefined ) {
 
@@ -55,6 +70,22 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 			texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : LinearFilter;
 
 			texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
+
+			if ( texData.colorSpace !== undefined ) {
+
+				texture.colorSpace = texData.colorSpace;
+
+			} else if ( texData.encoding !== undefined ) { // @deprecated, r152
+
+				texture.encoding = texData.encoding;
+
+			}
+
+			if ( texData.flipY !== undefined ) {
+
+				texture.flipY = texData.flipY;
+
+			}
 
 			if ( texData.format !== undefined ) {
 
@@ -81,6 +112,12 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 			}
 
+			if ( texData.generateMipmaps !== undefined ) {
+
+				texture.generateMipmaps = texData.generateMipmaps;
+
+			}
+
 			texture.needsUpdate = true;
 
 			if ( onLoad ) onLoad( texture, texData );
@@ -92,7 +129,7 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 	}
 
-} );
+}
 
 
 export { DataTextureLoader };

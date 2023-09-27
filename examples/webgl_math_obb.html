@@ -21,18 +21,31 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - OBB (Oriented Bounding Box)
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OBB } from './jsm/math/OBB.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OBB } from 'three/addons/math/OBB.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			var camera, scene, renderer, clock, controls, stats, raycaster, hitbox;
+			let camera, scene, renderer, clock, controls, stats, raycaster, hitbox;
 
-			var objects = [], mouse = new THREE.Vector2();
+			const objects = [], mouse = new THREE.Vector2();
 
 			init();
 			animate();
@@ -49,21 +62,21 @@
 
 				raycaster = new THREE.Raycaster();
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x222222, 1.5 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x222222, 4 );
 				hemiLight.position.set( 1, 1, 1 );
 				scene.add( hemiLight );
 
-				var size = new THREE.Vector3( 10, 5, 6 );
-				var geometry = new THREE.BoxBufferGeometry( size.x, size.y, size.z );
+				const size = new THREE.Vector3( 10, 5, 6 );
+				const geometry = new THREE.BoxGeometry( size.x, size.y, size.z );
 
 				// setup OBB on geometry level (doing this manually for now)
 
 				geometry.userData.obb = new OBB();
 				geometry.userData.obb.halfSize.copy( size ).multiplyScalar( 0.5 );
 
-				for ( var i = 0; i < 100; i ++ ) {
+				for ( let i = 0; i < 100; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x00ff00 } ) );
+					const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x00ff00 } ) );
 					object.matrixAutoUpdate = false;
 
 					object.position.x = Math.random() * 80 - 40;
@@ -112,9 +125,9 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				document.addEventListener( 'click', onClick, false );
+				document.addEventListener( 'click', onClick );
 
 			}
 
@@ -127,19 +140,19 @@
 
 				raycaster.setFromCamera( mouse, camera );
 
-				var intersectionPoint = new THREE.Vector3();
-				var intersections = [];
+				const intersectionPoint = new THREE.Vector3();
+				const intersections = [];
 
-				for ( var i = 0, il = objects.length; i < il; i ++ ) {
+				for ( let i = 0, il = objects.length; i < il; i ++ ) {
 
-					var object = objects[ i ];
-					var obb = object.userData.obb;
+					const object = objects[ i ];
+					const obb = object.userData.obb;
 
-					var ray = raycaster.ray;
+					const ray = raycaster.ray;
 
 					if ( obb.intersectRay( ray, intersectionPoint ) !== null ) {
 
-						var distance = ray.origin.distanceTo( intersectionPoint );
+						const distance = ray.origin.distanceTo( intersectionPoint );
 						intersections.push( { distance: distance, object: object } );
 
 					}
@@ -156,7 +169,7 @@
 
 				} else {
 
-					var parent = hitbox.parent;
+					const parent = hitbox.parent;
 
 					if ( parent ) parent.remove( hitbox );
 
@@ -189,11 +202,11 @@
 
 				// transform cubes
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
-				for ( var i = 0, il = objects.length; i < il; i ++ ) {
+				for ( let i = 0, il = objects.length; i < il; i ++ ) {
 
-					var object = objects[ i ];
+					const object = objects[ i ];
 
 					object.rotation.x += delta * Math.PI * 0.20;
 					object.rotation.y += delta * Math.PI * 0.1;
@@ -214,15 +227,15 @@
 
 				// collision detection
 
-				for ( var i = 0, il = objects.length; i < il; i ++ ) {
+				for ( let i = 0, il = objects.length; i < il; i ++ ) {
 
-					var object = objects[ i ];
-					var obb = object.userData.obb;
+					const object = objects[ i ];
+					const obb = object.userData.obb;
 
-					for ( var j = i + 1, jl = objects.length; j < jl; j ++ ) {
+					for ( let j = i + 1, jl = objects.length; j < jl; j ++ ) {
 
-						var objectToTest = objects[ j ];
-						var obbToTest = objectToTest.userData.obb;
+						const objectToTest = objects[ j ];
+						const obbToTest = objectToTest.userData.obb;
 
 						// now perform intersection test
 

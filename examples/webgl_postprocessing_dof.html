@@ -13,39 +13,53 @@
 			shader by <a href="http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html">Martins Upitis</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { BokehPass } from './jsm/postprocessing/BokehPass.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-			var container, stats;
-			var camera, scene, renderer,
-				materials = [], objects = [],
-				singleMaterial, zmaterial = [],
-				parameters, i, j, k, h, x, y, z, nobjects, cubeMaterial;
+			let camera, scene, renderer, stats,
+				singleMaterial, zmaterial,
+				parameters, nobjects, cubeMaterial;
 
-			var mouseX = 0, mouseY = 0;
+			let mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
-			var width = window.innerWidth;
-			var height = window.innerHeight;
+			let width = window.innerWidth;
+			let height = window.innerHeight;
 
-			var postprocessing = {};
+			const materials = [], objects = [];
+
+			const postprocessing = {};
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 3000 );
@@ -58,39 +72,39 @@
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 
-				var path = "textures/cube/SwedishRoyalCastle/";
-				var format = '.jpg';
-				var urls = [
+				const path = 'textures/cube/SwedishRoyalCastle/';
+				const format = '.jpg';
+				const urls = [
 					path + 'px' + format, path + 'nx' + format,
 					path + 'py' + format, path + 'ny' + format,
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				const textureCube = new THREE.CubeTextureLoader().load( urls );
 
-				parameters = { color: 0xff1100, envMap: textureCube };
+				parameters = { color: 0xff4900, envMap: textureCube };
 				cubeMaterial = new THREE.MeshBasicMaterial( parameters );
 
 				singleMaterial = false;
 
 				if ( singleMaterial ) zmaterial = [ cubeMaterial ];
 
-				var geo = new THREE.SphereBufferGeometry( 1, 20, 10 );
+				const geo = new THREE.SphereGeometry( 1, 20, 10 );
 
-				var xgrid = 14,
-					ygrid = 9,
-					zgrid = 14;
+				const xgrid = 14, ygrid = 9, zgrid = 14;
 
 				nobjects = xgrid * ygrid * zgrid;
 
-				var s = 60;
-				var count = 0;
+				const s = 60;
+				let count = 0;
 
-				for ( i = 0; i < xgrid; i ++ )
-					for ( j = 0; j < ygrid; j ++ )
-						for ( k = 0; k < zgrid; k ++ ) {
+				for ( let i = 0; i < xgrid; i ++ ) {
 
-							var mesh;
+					for ( let j = 0; j < ygrid; j ++ ) {
+
+						for ( let k = 0; k < zgrid; k ++ ) {
+
+							let mesh;
 
 							if ( singleMaterial ) {
 
@@ -103,9 +117,9 @@
 
 							}
 
-							x = 200 * ( i - xgrid / 2 );
-							y = 200 * ( j - ygrid / 2 );
-							z = 200 * ( k - zgrid / 2 );
+							const x = 200 * ( i - xgrid / 2 );
+							const y = 200 * ( j - ygrid / 2 );
+							const z = 200 * ( k - zgrid / 2 );
 
 							mesh.position.set( x, y, z );
 							mesh.scale.set( s, s, s );
@@ -120,6 +134,10 @@
 
 						}
 
+					}
+
+				}
+
 				initPostprocessing();
 
 				renderer.autoClear = false;
@@ -127,13 +145,12 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				container.style.touchAction = 'none';
+				container.addEventListener( 'pointermove', onPointerMove );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				var effectController = {
+				const effectController = {
 
 					focus: 500.0,
 					aperture: 5,
@@ -141,54 +158,30 @@
 
 				};
 
-				var matChanger = function ( ) {
+				const matChanger = function ( ) {
 
-					postprocessing.bokeh.uniforms[ "focus" ].value = effectController.focus;
-					postprocessing.bokeh.uniforms[ "aperture" ].value = effectController.aperture * 0.00001;
-					postprocessing.bokeh.uniforms[ "maxblur" ].value = effectController.maxblur;
+					postprocessing.bokeh.uniforms[ 'focus' ].value = effectController.focus;
+					postprocessing.bokeh.uniforms[ 'aperture' ].value = effectController.aperture * 0.00001;
+					postprocessing.bokeh.uniforms[ 'maxblur' ].value = effectController.maxblur;
 
 				};
 
-				var gui = new GUI();
-				gui.add( effectController, "focus", 10.0, 3000.0, 10 ).onChange( matChanger );
-				gui.add( effectController, "aperture", 0, 10, 0.1 ).onChange( matChanger );
-				gui.add( effectController, "maxblur", 0.0, 0.01, 0.001 ).onChange( matChanger );
+				const gui = new GUI();
+				gui.add( effectController, 'focus', 10.0, 3000.0, 10 ).onChange( matChanger );
+				gui.add( effectController, 'aperture', 0, 10, 0.1 ).onChange( matChanger );
+				gui.add( effectController, 'maxblur', 0.0, 0.01, 0.001 ).onChange( matChanger );
 				gui.close();
 
 				matChanger();
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
+
+				if ( event.isPrimary === false ) return;
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
-
-			}
-
-			function onDocumentTouchStart( event ) {
-
-				if ( event.touches.length == 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-				}
-
-			}
-
-			function onDocumentTouchMove( event ) {
-
-				if ( event.touches.length == 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-				}
 
 			}
 
@@ -210,21 +203,21 @@
 
 			function initPostprocessing() {
 
-				var renderPass = new RenderPass( scene, camera );
+				const renderPass = new RenderPass( scene, camera );
 
-				var bokehPass = new BokehPass( scene, camera, {
+				const bokehPass = new BokehPass( scene, camera, {
 					focus: 1.0,
 					aperture: 0.025,
-					maxblur: 0.01,
-
-					width: width,
-					height: height
+					maxblur: 0.01
 				} );
 
-				var composer = new EffectComposer( renderer );
+				const outputPass = new OutputPass();
+
+				const composer = new EffectComposer( renderer );
 
 				composer.addPass( renderPass );
 				composer.addPass( bokehPass );
+				composer.addPass( outputPass );
 
 				postprocessing.composer = composer;
 				postprocessing.bokeh = bokehPass;
@@ -243,7 +236,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.00005;
+				const time = Date.now() * 0.00005;
 
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
 				camera.position.y += ( - ( mouseY ) - camera.position.y ) * 0.036;
@@ -252,9 +245,9 @@
 
 				if ( ! singleMaterial ) {
 
-					for ( i = 0; i < nobjects; i ++ ) {
+					for ( let i = 0; i < nobjects; i ++ ) {
 
-						h = ( 360 * ( i / nobjects + time ) % 360 ) / 360;
+						const h = ( 360 * ( i / nobjects + time ) % 360 ) / 360;
 						materials[ i ].color.setHSL( h, 1, 0.5 );
 
 					}

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Un loader per il caricamento di una risorsa JSON nel [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 formato JSON Object/Scene].<br /><br />
+
+      Utilizza internamente il [page:FileLoader] per caricare i file.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+    // istanzia un loader
+		const loader = new THREE.ObjectLoader();
+
+    // carica una risorsa
+		loader.load(
+			// URL della risorsa
+			"models/json/example.json",
+
+			// onLoad callback
+			// Qui si presume che i dati caricati siano un oggetto
+			function ( obj ) {
+				// Aggiunge l'oggetto caricato alla scena
+				scene.add( obj );
+			},
+
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+
+			// onError callback
+			function ( err ) {
+				console.error( 'An error happened' );
+			}
+		);
+
+
+		// Alternativamente, per parsare una struttura JSON precedentemente caricata
+		const object = loader.parse( a_json_object );
+
+		scene.add( object );
+		</code>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_materials_lightmap WebGL / materials / lightmap]
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — Il [page:LoadingManager loadingManager] del loader da utilizzare. Il valore predefinito è [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+
+		Crea un nuovo [name].
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Loader] per le proprietà comuni.</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Loader] per i metodi comuni.</p>
+
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — Il path o URL del file. Questo può anche essere un
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] — Verrà chiamato quando il caricamento sarà completato. L'argomento sarà l'[page:Object3D oggetto] caricato.<br />
+		[page:Function onProgress] (opzionale) — Verrà chiamato durante il caricamento. L'argomento sarà l'istanza ProgressEvent, la quale contiene 
+    .[page:Boolean lengthComputable], .[page:Integer total] e .[page:Integer loaded]. 
+    Se il server non imposta l'header Content-Length; .[page:Integer total] sarà 0.<br />
+		[page:Function onError] (opzionale) — Verrà chiamato in caso di errori di caricamento.<br />
+		</p>
+		<p>
+      Inizia il caricamento dall'url e passa il contenuto della risposta parsato a onLoad.
+		</p>
+
+
+		<h3>[method:Object3D parse]( [param:Object json], [param:Function onLoad]  )</h3>
+		<p>
+		[page:Object json] — obbligatorio. La sorgente JSON da parsare.<br /><br />
+		[page:Function onLoad] — Verrà chiamato quando il parsing sarà completato. L'argomento sarà l'[page:Object3D oggetto] parsato.<br /><br />
+
+    Parsa una struttura `JSON` e restituisce un oggetto three.js.
+    Utilizzato internamente dal metodo [page:.load](), può anche essere utilizzato direttamente per parsare una struttura JSON caricata precedentemente.
+		</p>
+
+		<h3>[method:Object parseGeometries]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — obbligatorio. La sorgente JSON da parsare.<br /><br />
+
+    Viene utilizzato dal metodo [page:.parse]() per analizzare le [page:BufferGeometry geometrie] nella struttura JSON.
+		</p>
+
+		<h3>[method:Object parseMaterials]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — obbligatorio. La sorgente JSON da parsare.<br /><br />
+
+    Viene utilizzato dal metodo [page:.parse]() per analizzare i materiali nella struttura JSON utilizzando [page:MaterialLoader].
+		</p>
+
+		<h3>[method:Object parseAnimations]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — obbligatorio. La sorgente JSON da parsare.<br /><br />
+
+    Viene utilizzato dal metodo [page:.parse]() per analizzare le animazioni nella struttura JSON, utilizzando [page:AnimationClip.parse]().
+		</p>
+
+		<h3>[method:Object parseImages]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — obbligatorio. La sorgente JSON da parsare.<br /><br />
+
+    Viene utilizzato dal metodo [page:.parse]() per analizzare le immagini nella struttura JSON, utilizzando [page:ImageLoader].
+		</p>
+
+		<h3>[method:Object parseTextures]( [param:Object json] )</h3>
+		<p>
+		[page:Object json] — obbligatorio. La sorgente JSON da parsare.<br /><br />
+
+    Viene utilizzato dal metodo [page:.parse]() per analizzare le texture nella struttura JSON.
+		</p>
+
+		<h3>[method:Object3D parseObject]( [param:Object json], [param:BufferGeometry geometries], [param:Material materials], [param:AnimationClip animations] )</h3>
+		<p>
+		[page:Object json] — obbligatorio. La sorgente JSON da parsare.<br />
+		[page:BufferGeometry geometries] — obbligatorio. Le geometrie del JSON.<br />
+		[page:Material materials] — obbligatorio. I materiali del JSON.<br />
+		[page:AnimationClip animations] — obbligatorio. Le animazioni del JSON.<br /><br />
+
+    Viene utilizzato dal metodo [page:.parse]() per analizzare gli oggetti 3D nella struttura JSON.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

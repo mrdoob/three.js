@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Una luce che viene emessa in una direzione specifica. Questa luce si comporterà come se
+      fosse infinitamente lontana e i raggi da essa prodotti fossero tutti paralleli. Il
+      caso d'uso comune di questa luce è simulare la luce del giorno; il sole è abbastanza lontano
+      che la sua posizione può essere considerata infinita, e tutti i raggi di luce 
+      che ne provengono sono paralleli.<br /><br />
+
+      Questa luce può proiettare le ombre - vedi la pagina [page:DirectionalLightShadow] per i dettagli.
+		</p>
+
+		<h2>Una nota riguardo la posione, il target e la rotazione</h2>
+		<p>
+      Un punto di confusione comune per le luci direzionali è che l'impostazione della rotazione non ha alcun effetto.
+      Questo succede perché la DirectionalLight di three.js è l'equivalente di ciò che viene spesso chiamato 
+      'Target Direct Light' in altre applicazioni.<br /><br />
+
+      Questo significa che la sua direzione viene calcolata puntando dalla [page:Object3D.position posizione] della luce
+      alla posizione del [page:.target target] (al contrario di una 'Free Direct Light' che ha solo una componente di rotazione).<br /><br />
+
+      La ragione di ciò è consentire alla luce di proiettare ombre - la telecamera delle [page:.shadow ombre]
+      ha bisogno di una posizione da cui calcolare le ombre.<br /><br />
+
+      Vedi la proprietà [page:.target target] di seguito per i dettagli sull'aggiornamento del target.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		// Luce bianca direzionale a metà intensità che brilla dall'alto.
+		const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+		scene.add( directionalLight );
+		</code>
+
+		<h2>Esempi</h2>
+		<p>
+			[example:misc_controls_fly controls / fly ]<br />
+			[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]<br />
+			[example:webgl_effects_stereo effects / stereo ]<br />
+			[example:webgl_geometry_extrude_splines geometry / extrude / splines ]<br />
+			[example:webgl_materials_bumpmap materials / bumpmap ]
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Integer color], [param:Float intensity] )</h3>
+		<p>
+			[page:Integer color] - (opzionale) colore esadecimale della luce. Il valore predefinito è 0xffffff (bianco).<br />
+			[page:Float intensity] - (opzionale) valore numerico della forza/intensità della luce. Il valore predefinito è 1.<br /><br />
+
+      Crea una nuova [name].
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>
+      Vedi la classe base [page:Light Light] per le proprietà comuni.
+		</p>
+
+		<h3>[property:Boolean castShadow]</h3>
+		<p>
+      Se impostato a `true` la luce proietterà ombre dinamiche. *Attenzione*: Questo è costoso
+      e richiede una messa a punto per ottenere le ombre giuste. Si veda [page:DirectionalLightShadow]
+      per i dettagli.
+      Il valore predefinito è `false`.
+		</p>
+
+		<h3>[property:Boolean isDirectionalLight]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è del tipo [name].
+		</p>
+
+		<h3>[property:Vector3 position]</h3>
+		<p>
+      Questo è impostato uguale a [page:Object3D.DEFAULT_UP] (0, 1, 0), in modo che la luce brilli dall'alto verso il basso.
+		</p>
+
+		<h3>[property:DirectionalLightShadow shadow]</h3>
+		<p>
+      Una [page:DirectionalLightShadow] utilizzata per calcolare le ombre per questa luce. 
+		</p>
+
+		<h3>[property:Object3D target]</h3>
+		<p>
+      DirectionalLight punta dalla sua [page:.position posizione] alla target.position. La posizione 
+      predefinita del target è `(0, 0, 0)`.<br />
+
+			*Nota*: Affinchè la posizione del target possa essere modificata in qualcosa di diverso
+      da quella predefinita, è necessario aggiungerlo alla [page:Scene scena] utilizzando
+		</p>
+		<code>
+		scene.add( light.target );
+		</code>
+		<p>
+      In questo modo il [page:Object3D.matrixWorld matrixWorld] del target viene aggiornato
+      automaticamente a ogni frame.<br /><br />
+
+      È anche possibile impostare il target in modo che sia un altro oggetto nella scena (qualsiasi
+      cosa con una proprietà [page:Object3D.position position]), in questo modo:
+		</p>
+		<code>
+		const targetObject = new THREE.Object3D();
+		scene.add(targetObject);
+
+		light.target = targetObject;
+		</code>
+		<p>
+      La directionalLight ora seguirà l'oggetto target.
+		</p>
+
+
+		<h2>Metodi</h2>
+		<p>
+      Vedi la classe base [page:Light Light] per i metodi comuni.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+      Sovrascrive il metodo [page:Light.dispose dispose] della classe base.
+      Elimina l'[page:DirectionalLightShadow ombra] di questa luce.
+		</p>
+
+		<h3>[method:this copy]( [param:DirectionalLight source] )</h3>
+		<p>
+      Copia il valore di tutte le proprietà dalla [page:DirectionalLight sorgente] (source) a questa 
+      DirectionalLight.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

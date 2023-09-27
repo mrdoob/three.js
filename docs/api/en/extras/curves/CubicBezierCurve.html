@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,37 +13,42 @@
 
 		<p class="desc">
 			Create a smooth 2d
-			<a href="http://en.wikipedia.org/wiki/B%C3%A9zier_curve#mediaviewer/File:Bezier_curve.svg" target="_blank">cubic bezier curve</a>,
-			defined by a start point, endpoint and two control points.
+			<a
+				href="http://en.wikipedia.org/wiki/B%C3%A9zier_curve#mediaviewer/File:Bezier_curve.svg"
+				target="_blank"
+				>cubic bezier curve</a
+			>, defined by a start point, endpoint and two control points.
 		</p>
 
 		<h2>Code Example</h2>
 
 		<code>
-		var curve = new THREE.CubicBezierCurve(
+		const curve = new THREE.CubicBezierCurve(
 			new THREE.Vector2( -10, 0 ),
 			new THREE.Vector2( -5, 15 ),
 			new THREE.Vector2( 20, 15 ),
 			new THREE.Vector2( 10, 0 )
 		);
 
-		var points = curve.getPoints( 50 );
-		var geometry = new THREE.BufferGeometry().setFromPoints( points );
+		const points = curve.getPoints( 50 );
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
 
-		var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+		const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 
 		// Create the final object to add to the scene
-		var curveObject = new THREE.Line( geometry, material );
+		const curveObject = new THREE.Line( geometry, material );
 		</code>
 
 		<h2>Constructor</h2>
 
-
-		<h3>[name] ( [param:Vector2 v0], [param:Vector2 v1], [param:Vector2 v2], [param:Vector2 v3] )</h3>
+		<h3>
+			[name] ( [param:Vector2 v0], [param:Vector2 v1], [param:Vector2 v2],
+			[param:Vector2 v3] )
+		</h3>
 		<p>
-			[page:Vector2 v0] – The starting point.<br/>
-			[page:Vector2 v1] – The first control point.<br/>
-			[page:Vector2 v2] – The second control point.<br/>
+			[page:Vector2 v0] – The starting point.<br />
+			[page:Vector2 v1] – The first control point.<br />
+			[page:Vector2 v2] – The second control point.<br />
 			[page:Vector2 v3] – The ending point.
 		</p>
 
@@ -62,7 +66,6 @@
 
 		<h3>[property:Vector2 v3]</h3>
 		<p>The ending point.</p>
-
 
 		<h2>Methods</h2>
 		<p>See the base [page:Curve] class for common Methods.</p>

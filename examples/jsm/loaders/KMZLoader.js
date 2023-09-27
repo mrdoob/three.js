@@ -1,33 +1,29 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import {
 	FileLoader,
 	Group,
 	Loader,
 	LoadingManager
-} from "../../../build/three.module.js";
-import { ColladaLoader } from "../loaders/ColladaLoader.js";
-import { JSZip } from "../libs/jszip.module.min.js";
+} from 'three';
+import { ColladaLoader } from '../loaders/ColladaLoader.js';
+import * as fflate from '../libs/fflate.module.js';
 
-var KMZLoader = function ( manager ) {
+class KMZLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-};
+		super( manager );
 
-KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: KMZLoader,
+	load( url, onLoad, onProgress, onError ) {
 
-	load: function ( url, onLoad, onProgress, onError ) {
+		const scope = this;
 
-		var scope = this;
-
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -52,17 +48,17 @@ KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data ) {
+	parse( data ) {
 
 		function findFile( url ) {
 
-			for ( var path in zip.files ) {
+			for ( const path in zip ) {
 
-				if ( path.substr( - url.length ) === url ) {
+				if ( path.slice( - url.length ) === url ) {
 
-					return zip.files[ path ];
+					return zip[ path ];
 
 				}
 
@@ -70,16 +66,16 @@ KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		var manager = new LoadingManager();
+		const manager = new LoadingManager();
 		manager.setURLModifier( function ( url ) {
 
-			var image = findFile( url );
+			const image = findFile( url );
 
 			if ( image ) {
 
 				console.log( 'Loading', url );
 
-				var blob = new Blob( [ image.asArrayBuffer() ], { type: 'application/octet-stream' } );
+				const blob = new Blob( [ image.buffer ], { type: 'application/octet-stream' } );
 				return URL.createObjectURL( blob );
 
 			}
@@ -90,18 +86,18 @@ KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		//
 
-		var zip = new JSZip( data );
+		const zip = fflate.unzipSync( new Uint8Array( data ) );
 
-		if ( zip.files[ 'doc.kml' ] ) {
+		if ( zip[ 'doc.kml' ] ) {
 
-			var xml = new DOMParser().parseFromString( zip.files[ 'doc.kml' ].asText(), 'application/xml' );
+			const xml = new DOMParser().parseFromString( fflate.strFromU8( zip[ 'doc.kml' ] ), 'application/xml' );
 
-			var model = xml.querySelector( 'Placemark Model Link href' );
+			const model = xml.querySelector( 'Placemark Model Link href' );
 
 			if ( model ) {
 
-				var loader = new ColladaLoader( manager );
-				return loader.parse( zip.files[ model.textContent ].asText() );
+				const loader = new ColladaLoader( manager );
+				return loader.parse( fflate.strFromU8( zip[ model.textContent ] ) );
 
 			}
 
@@ -109,14 +105,14 @@ KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			console.warn( 'KMZLoader: Missing doc.kml file.' );
 
-			for ( var path in zip.files ) {
+			for ( const path in zip ) {
 
-				var extension = path.split( '.' ).pop().toLowerCase();
+				const extension = path.split( '.' ).pop().toLowerCase();
 
 				if ( extension === 'dae' ) {
 
-					var loader = new ColladaLoader( manager );
-					return loader.parse( zip.files[ path ].asText() );
+					const loader = new ColladaLoader( manager );
+					return loader.parse( fflate.strFromU8( zip[ path ] ) );
 
 				}
 
@@ -129,6 +125,6 @@ KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
 export { KMZLoader };

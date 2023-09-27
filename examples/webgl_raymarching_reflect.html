@@ -236,22 +236,35 @@
 
 		</script>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			var dolly, camera, scene, renderer;
-			var geometry, material, mesh;
-			var stats;
+			let dolly, camera, scene, renderer;
+			let geometry, material, mesh;
+			let stats, clock;
 
-			var canvas = document.querySelector( '#canvas' );
+			const canvas = document.querySelector( '#canvas' );
 
-			var config = {
+			const config = {
 				saveImage: function () {
 
 					renderer.render( scene, camera );
@@ -268,7 +281,7 @@
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( config.resolution, config.resolution );
+				renderer.setSize( parseInt( config.resolution ), parseInt( config.resolution ) );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -278,16 +291,18 @@
 				dolly = new THREE.Group();
 				scene.add( dolly );
 
+				clock = new THREE.Clock();
+
 				camera = new THREE.PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
 				camera.position.z = 4;
 				dolly.add( camera );
 
-				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
+				geometry = new THREE.PlaneGeometry( 2.0, 2.0 );
 				material = new THREE.RawShaderMaterial( {
 					uniforms: {
 						resolution: { value: new THREE.Vector2( canvas.width, canvas.height ) },
 						cameraWorldMatrix: { value: camera.matrixWorld },
-						cameraProjectionMatrixInverse: { value: new THREE.Matrix4().getInverse( camera.projectionMatrix ) }
+						cameraProjectionMatrixInverse: { value: camera.projectionMatrixInverse.clone() }
 					},
 					vertexShader: document.getElementById( 'vertex_shader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader' ).textContent
@@ -297,11 +312,11 @@
 				scene.add( mesh );
 
 				// Controls
-				var controls = new OrbitControls( camera, canvas );
+				const controls = new OrbitControls( camera, canvas );
 				controls.enableZoom = false;
 
 				// GUI
-				var gui = new GUI();
+				const gui = new GUI();
 				gui.add( config, 'saveImage' ).name( 'Save Image' );
 				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( onWindowResize );
 
@@ -318,7 +333,7 @@
 
 				} else {
 
-					renderer.setSize( config.resolution, config.resolution );
+					renderer.setSize( parseInt( config.resolution ), parseInt( config.resolution ) );
 
 				}
 
@@ -326,15 +341,17 @@
 				camera.updateProjectionMatrix();
 
 				material.uniforms.resolution.value.set( canvas.width, canvas.height );
-				material.uniforms.cameraProjectionMatrixInverse.value.getInverse( camera.projectionMatrix );
+				material.uniforms.cameraProjectionMatrixInverse.value.copy( camera.projectionMatrixInverse );
 
 			}
 
-			function render( time ) {
+			function render() {
 
 				stats.begin();
 
-				dolly.position.z = - time / 1000;
+				const elapsedTime = clock.getElapsedTime();
+
+				dolly.position.z = - elapsedTime;
 
 				renderer.render( scene, camera );
 
