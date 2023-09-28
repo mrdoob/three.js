@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -55,19 +51,19 @@
 }
 main();
 </pre>
-<p>Важно отметить, что воркеры не могут получить доступ к <code class="notranslate" translate="no">DOM</code>. Они не могут просматривать элементы HTML, а также получать события мыши или клавиатуры. 
+<p>Важно отметить, что воркеры не могут получить доступ к <code class="notranslate" translate="no">DOM</code>. Они не могут просматривать элементы HTML, а также получать события мыши или клавиатуры.
 Единственное, что они обычно могут делать, - это отвечать на отправленные им сообщения.</p>
 <p>Чтобы отправить сообщение воркеру, мы вызываем <a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker/postMessage"><code class="notranslate" translate="no">worker.postMessage</code></a> and
-и передаем ему 1 или 2 аргумента. Первый аргумент - это объект JavaScript, который будет <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">клонирован</a> 
-и отправлен исполнителю. Второй аргумент - это необязательный массив объектов, 
+и передаем ему 1 или 2 аргумента. Первый аргумент - это объект JavaScript, который будет <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">клонирован</a>
+и отправлен исполнителю. Второй аргумент - это необязательный массив объектов,
 которые являются частью первого объекта, который мы хотим передать воркеру.
 Эти объекты не будут клонированы. Вместо этого они будут перенесены и перестанут существовать на главной странице.
 Прекращение существования - это, вероятно, неправильное описание, скорее они кастрированы.
 Вместо клонирования можно передавать только определенные типы объектов.
 Они включают <code class="notranslate" translate="no">OffscreenCanvas</code>, поэтому после переноса <code class="notranslate" translate="no">offscreen</code> обратно на главную страницу он бесполезен.</p>
-<p>Воркеры получают сообщения от своего обработчика сообщений <code class="notranslate" translate="no">onmessage</code>. Объект, 
-который мы передали в <code class="notranslate" translate="no">postMessage</code>, прибывает в объект <code class="notranslate" translate="no">event.data</code>, переданный 
-обработчику <code class="notranslate" translate="no">onmessage</code> на воркере. В приведенном выше коде объявляется <code class="notranslate" translate="no">type: 'main'</code> в объекте, который он передает воркеру. Мы создадим обработчик, 
+<p>Воркеры получают сообщения от своего обработчика сообщений <code class="notranslate" translate="no">onmessage</code>. Объект,
+который мы передали в <code class="notranslate" translate="no">postMessage</code>, прибывает в объект <code class="notranslate" translate="no">event.data</code>, переданный
+обработчику <code class="notranslate" translate="no">onmessage</code> на воркере. В приведенном выше коде объявляется <code class="notranslate" translate="no">type: 'main'</code> в объекте, который он передает воркеру. Мы создадим обработчик,
 который на основе типа будет вызывать другую функцию в воркере. Затем мы можем добавлять функции по мере необходимости и легко вызывать их с главной страницы.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const handlers = {
   main,
@@ -82,7 +78,7 @@ self.onmessage = function(e) {
 };
 </pre>
 <p>Вы можете видеть выше, что мы просто ищем обработчик в зависимости от <code class="notranslate" translate="no">type</code>, передаем ему <code class="notranslate" translate="no">data</code>, которые были отправлены с главной страницы.</p>
-<p>Итак, теперь нам просто нужно начать изменять основной файл, который мы вставили в <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> 
+<p>Итак, теперь нам просто нужно начать изменять основной файл, который мы вставили в <code class="notranslate" translate="no">offscreencanvas-cubes.js</code>
  <a href="responsive.html">из адаптивной статьи</a>.</p>
 <p>Затем вместо того, чтобы искать холст в DOM, мы получим его из данных события.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function main() {
@@ -165,8 +161,8 @@ worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 +sendSize();
 </pre>
 <p>Мы также вызываем его один раз, чтобы отправить начальный размер.</p>
-<p>И всего с этими несколькими изменениями, если ваш браузер полностью 
-поддерживает <code class="notranslate" translate="no">OffscreenCanvas</code>, он должен работать. Прежде чем запустить его, 
+<p>И всего с этими несколькими изменениями, если ваш браузер полностью
+поддерживает <code class="notranslate" translate="no">OffscreenCanvas</code>, он должен работать. Прежде чем запустить его,
 давайте проверим, действительно ли браузер поддерживает <code class="notranslate" translate="no">OffscreenCanvas</code>,
 и не отобразит ли он ошибку. Сначала добавим HTML-код для отображения ошибки.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
@@ -210,11 +206,11 @@ worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 <p></p>
 <p>Так что это здорово, но поскольку не каждый браузер поддерживает <code class="notranslate" translate="no">OffscreenCanvas</code> на данный момент,
 давайте изменим код для работы с <code class="notranslate" translate="no">OffscreenCanvas</code>, а если нет, то вернемся к использованию холста на главной странице, как обычно.</p>
-<p>Кстати, если вам нужен OffscreenCanvas, чтобы ваша страница была отзывчивой, тогда неясно, 
-в чем смысл использования запасного варианта. Возможно, в зависимости от того, выполняете ли 
-вы в конечном итоге работу на главной странице или в воркере, вы можете настроить объем выполняемой работы так, 
+<p>Кстати, если вам нужен OffscreenCanvas, чтобы ваша страница была отзывчивой, тогда неясно,
+в чем смысл использования запасного варианта. Возможно, в зависимости от того, выполняете ли
+вы в конечном итоге работу на главной странице или в воркере, вы можете настроить объем выполняемой работы так,
 чтобы при работе в воркере вы могли делать больше, чем при работе на главной странице. Что вы делаете, действительно зависит от вас.</p>
-<p>Первое, что нам, вероятно, следует сделать, - это отделить код three.js от кода, 
+<p>Первое, что нам, вероятно, следует сделать, - это отделить код three.js от кода,
 специфичного для воркера. Что мы можем использовать один и тот же код как на главной странице, так и на рабочем. Другими словами, теперь у нас будет 3 файла</p>
 <ol>
 <li><p>наш html файл.</p>
@@ -227,7 +223,7 @@ worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 <p><code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code></p>
 </li>
 </ol>
-<p><code class="notranslate" translate="no">shared-cubes.js</code> и <code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code> по сути являются разделением нашего 
+<p><code class="notranslate" translate="no">shared-cubes.js</code> и <code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code> по сути являются разделением нашего
 предыдущего файла <code class="notranslate" translate="no">offscreencanvas-cubes.js</code>. Сначала мы копируем весь файл <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> в <code class="notranslate" translate="no">shared-cube.js</code>. Затем мы переименовываем <code class="notranslate" translate="no">main</code> в <code class="notranslate" translate="no">init</code>, так как у нас уже есть <code class="notranslate" translate="no">main</code> в нашем HTML-файле, и нам нужно экспортировать <code class="notranslate" translate="no">init</code> и состояние</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 
@@ -421,7 +417,7 @@ function setPickPosition(event) {
 }
 window.addEventListener('mousemove', setPickPosition);
 </pre>
-<p>Воркер не может напрямую считывать положение мыши, поэтому, как и код размера, давайте отправим сообщение с указанием положения мыши. 
+<p>Воркер не может напрямую считывать положение мыши, поэтому, как и код размера, давайте отправим сообщение с указанием положения мыши.
 Как и код размера, мы отправим позицию мыши и обновим <code class="notranslate" translate="no">pickPosition</code></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function size(data) {
   state.width = data.width;
@@ -553,9 +549,9 @@ window.addEventListener('touchend', clearPickPosition);
 <li>wheel</li>
 <li>keydown</li>
 </ul>
-<p>Для событий мыши нам нужны свойства  <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>, 
+<p>Для событий мыши нам нужны свойства  <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>,
 <code class="notranslate" translate="no">button</code>, <code class="notranslate" translate="no">pointerType</code>, <code class="notranslate" translate="no">clientX</code>, <code class="notranslate" translate="no">clientY</code>, <code class="notranslate" translate="no">pageX</code>, и <code class="notranslate" translate="no">pageY</code>.</p>
-<p>Для событий нажатия клавиатуры нам нужны свойства  <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>, 
+<p>Для событий нажатия клавиатуры нам нужны свойства  <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>,
 и <code class="notranslate" translate="no">keyCode</code>.</p>
 <p>Для события wheel нам нужно только свойство <code class="notranslate" translate="no">deltaY</code></p>
 <p>А для событий касания нам понадобятся только <code class="notranslate" translate="no">pageX</code> и <code class="notranslate" translate="no">pageY</code> из свойства <code class="notranslate" translate="no">touches</code>.</p>
@@ -990,14 +986,14 @@ function render(time) {
 </div>
 
 <p></p>
-<p>Это, наверное, самый сложный пример на этом сайте. 
+<p>Это, наверное, самый сложный пример на этом сайте.
 Это немного сложно понять, потому что для каждого образца задействовано 3 файла. HTML-файл, рабочий файл, общий код three.js.</p>
 <p>Я надеюсь, что это было не так уж сложно понять, и что он предоставил несколько полезных примеров работы с three.js, OffscreenCanvas и веб-воркерами.</p>
 
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

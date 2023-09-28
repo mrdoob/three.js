@@ -53,7 +53,13 @@ class TextureNode extends UniformNode {
 
 	}
 
-	getTextureMatrix( uvNode ) {
+	updateReference( /*frame*/ ) {
+
+		return this.value;
+
+	}
+
+	getTransformedUV( uvNode ) {
 
 		const texture = this.value;
 
@@ -70,7 +76,7 @@ class TextureNode extends UniformNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const properties = builder.getNodeProperties( this );
 
@@ -86,9 +92,9 @@ class TextureNode extends UniformNode {
 
 		if ( ! uvNode ) uvNode = this.getDefaultUV();
 
-		if ( this.updateMatrix ) {
+		if ( this.updateMatrix === true ) {
 
-			uvNode = this.getTextureMatrix( uvNode );
+			uvNode = this.getTransformedUV( uvNode );
 
 		}
 
@@ -181,7 +187,7 @@ class TextureNode extends UniformNode {
 
 			if ( builder.needsColorSpaceToLinear( this.value ) ) {
 
-				snippet = colorSpaceToLinear( expression( snippet, nodeType ), this.value.colorSpace ).construct( builder ).build( builder, nodeType );
+				snippet = colorSpaceToLinear( expression( snippet, nodeType ), this.value.colorSpace ).setup( builder ).build( builder, nodeType );
 
 			}
 
@@ -272,4 +278,4 @@ export const sampler = ( aTexture ) => ( aTexture.isNode === true ? aTexture : t
 addNodeElement( 'texture', texture );
 //addNodeElement( 'textureLevel', textureLevel );
 
-addNodeClass( TextureNode );
+addNodeClass( 'TextureNode', TextureNode );

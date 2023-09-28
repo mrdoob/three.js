@@ -48,7 +48,7 @@ class BlendModeNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { blendMode, baseNode, blendNode } = this;
 		const params = { base: baseNode, blend: blendNode };
@@ -96,4 +96,4 @@ addNodeElement( 'dodge', dodge );
 addNodeElement( 'overlay', overlay );
 addNodeElement( 'screen', screen );
 
-addNodeClass( BlendModeNode );
+addNodeClass( 'BlendModeNode', BlendModeNode );

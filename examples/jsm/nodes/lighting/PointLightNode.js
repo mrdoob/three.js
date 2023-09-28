@@ -30,7 +30,7 @@ class PointLightNode extends AnalyticLightNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
 
@@ -63,6 +63,6 @@ class PointLightNode extends AnalyticLightNode {
 
 export default PointLightNode;
 
-addLightNode( PointLight, PointLightNode );
+addNodeClass( 'PointLightNode', PointLightNode );
 
-addNodeClass( PointLightNode );
+addLightNode( PointLight, PointLightNode );

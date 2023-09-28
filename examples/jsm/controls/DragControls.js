@@ -99,7 +99,7 @@ class DragControls extends EventDispatcher {
 				_intersections.length = 0;
 
 				_raycaster.setFromCamera( _pointer, _camera );
-				_raycaster.intersectObjects( _objects, true, _intersections );
+				_raycaster.intersectObjects( _objects, scope.recursive, _intersections );
 
 				if ( _intersections.length > 0 ) {
 
@@ -151,7 +151,7 @@ class DragControls extends EventDispatcher {
 			_intersections.length = 0;
 
 			_raycaster.setFromCamera( _pointer, _camera );
-			_raycaster.intersectObjects( _objects, true, _intersections );
+			_raycaster.intersectObjects( _objects, scope.recursive, _intersections );
 
 			if ( _intersections.length > 0 ) {
 
@@ -205,6 +205,7 @@ class DragControls extends EventDispatcher {
 		// API
 
 		this.enabled = true;
+		this.recursive = true;
 		this.transformGroup = false;
 
 		this.activate = activate;

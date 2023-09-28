@@ -24,7 +24,7 @@ class EnvironmentNode extends LightingNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		let envNode = this.envNode;
 		const properties = builder.getNodeProperties( this );
@@ -188,4 +188,4 @@ const createIrradianceContext = ( normalWorldNode ) => {
 
 export default EnvironmentNode;
 
-addNodeClass( EnvironmentNode );
+addNodeClass( 'EnvironmentNode', EnvironmentNode );

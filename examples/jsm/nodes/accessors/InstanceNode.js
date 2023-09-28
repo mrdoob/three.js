@@ -17,7 +17,7 @@ class InstanceNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		let instanceMatrixNode = this.instanceMatrixNode;
 
@@ -68,4 +68,4 @@ export default InstanceNode;
 
 export const instance = nodeProxy( InstanceNode );
 
-addNodeClass( InstanceNode );
+addNodeClass( 'InstanceNode', InstanceNode );
