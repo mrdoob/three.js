@@ -52,7 +52,7 @@ class NormalMapNode extends TempNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const { normalMapType, scaleNode } = this;
 
@@ -103,4 +103,4 @@ export const normalMap = nodeProxy( NormalMapNode );
 
 export const TBNViewMatrix = mat3( tangentView, bitangentView, normalView );
 
-addNodeClass( NormalMapNode );
+addNodeClass( 'NormalMapNode', NormalMapNode );

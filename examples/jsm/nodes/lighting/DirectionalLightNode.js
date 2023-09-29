@@ -13,9 +13,9 @@ class DirectionalLightNode extends AnalyticLightNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
-		super.construct( builder );
+		super.setup( builder );
 
 		const lightingModel = builder.context.lightingModel;
 
@@ -35,6 +35,6 @@ class DirectionalLightNode extends AnalyticLightNode {
 
 export default DirectionalLightNode;
 
-addLightNode( DirectionalLight, DirectionalLightNode );
+addNodeClass( 'DirectionalLightNode', DirectionalLightNode );
 
-addNodeClass( DirectionalLightNode );
+addLightNode( DirectionalLight, DirectionalLightNode );

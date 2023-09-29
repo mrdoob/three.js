@@ -44,15 +44,15 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
-	constructLightingModel( /*builder*/ ) {
+	setupLightingModel( /*builder*/ ) {
 
 		return new PhysicalLightingModel(); // @TODO: Optimize shader using parameters.
 
 	}
 
-	constructVariants( builder ) {
+	setupVariants( builder ) {
 
-		super.constructVariants( builder );
+		super.setupVariants( builder );
 
 		const { stack } = builder;
 
@@ -84,9 +84,9 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
-	constructNormal( builder ) {
+	setupNormal( builder ) {
 
-		super.constructNormal( builder );
+		super.setupNormal( builder );
 
 		// CLEARCOAT NORMAL
 
@@ -125,4 +125,4 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 export default MeshPhysicalNodeMaterial;
 
-addNodeMaterial( MeshPhysicalNodeMaterial );
+addNodeMaterial( 'MeshPhysicalNodeMaterial', MeshPhysicalNodeMaterial );

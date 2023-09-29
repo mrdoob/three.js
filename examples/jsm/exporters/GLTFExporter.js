@@ -2438,7 +2438,7 @@ class GLTFLightExtension {
 			if ( light.distance > 0 ) lightDef.range = light.distance;
 
 			lightDef.spot = {};
-			lightDef.spot.innerConeAngle = ( light.penumbra - 1.0 ) * light.angle * - 1.0;
+			lightDef.spot.innerConeAngle = ( 1.0 - light.penumbra ) * light.angle;
 			lightDef.spot.outerConeAngle = light.angle;
 
 		}

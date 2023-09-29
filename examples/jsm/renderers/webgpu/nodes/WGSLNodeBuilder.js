@@ -11,6 +11,8 @@ import { getVectorLength, getStrideLength } from '../../common/BufferUtils.js';
 
 import { NodeBuilder, CodeNode, NodeMaterial } from '../../../nodes/Nodes.js';
 
+import { getFormat } from '../utils/WebGPUTextureUtils.js';
+
 import WGSLNodeParser from './WGSLNodeParser.js';
 
 const gpuShaderStageLib = {
@@ -58,7 +60,7 @@ const wgslTypeLib = {
 
 const wgslMethods = {
 	dFdx: 'dpdx',
-	dFdy: 'dpdy',
+	dFdy: '- dpdy',
 	mod: 'threejs_mod',
 	lessThanEqual: 'threejs_lessThanEqual',
 	inversesqrt: 'inverseSqrt'
@@ -659,8 +661,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				} else if ( uniform.node.isStoreTextureNode === true ) {
 
-					// @TODO: Add support for other formats
-					textureType = 'texture_storage_2d<rgba8unorm, write>';
+					const format = getFormat( texture );
+
+					textureType = 'texture_storage_2d<' + format + ', write>';
 
 				} else {
 

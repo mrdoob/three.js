@@ -66,4 +66,4 @@ export const varying = nodeProxy( VaryingNode );
 
 addNodeElement( 'varying', varying );
 
-addNodeClass( VaryingNode );
+addNodeClass( 'VaryingNode', VaryingNode );

@@ -1,7 +1,7 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
 import { bypass } from '../core/BypassNode.js';
-import { context as contextNode } from '../core/ContextNode.js';
+import { context } from '../core/ContextNode.js';
 import { addNodeElement, nodeObject, nodeArray } from '../shadernode/ShaderNode.js';
 
 class LoopNode extends Node {
@@ -53,9 +53,9 @@ class LoopNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
-		// construct properties
+		// setup properties
 
 		this.getProperties( builder );
 
@@ -65,12 +65,10 @@ class LoopNode extends Node {
 
 		const properties = this.getProperties( builder );
 
-		const context = { tempWrite: false };
+		const contextData = { tempWrite: false };
 
 		const params = this.params;
 		const stackNode = properties.stackNode;
-
-		const returnsSnippet = properties.returnsNode ? properties.returnsNode.build( builder ) : '';
 
 		for ( let i = 0, l = params.length - 1; i < l; i ++ ) {
 
@@ -82,7 +80,7 @@ class LoopNode extends Node {
 			if ( param.isNode ) {
 
 				start = '0';
-				end = param.generate( builder, 'int' );
+				end = param.build( builder, 'int' );
 				direction = 'forward';
 
 			} else {
@@ -92,10 +90,10 @@ class LoopNode extends Node {
 				direction = param.direction;
 
 				if ( typeof start === 'number' ) start = start.toString();
-				else if ( start && start.isNode ) start = start.generate( builder, 'int' );
+				else if ( start && start.isNode ) start = start.build( builder, 'int' );
 
 				if ( typeof end === 'number' ) end = end.toString();
-				else if ( end && end.isNode ) end = end.generate( builder, 'int' );
+				else if ( end && end.isNode ) end = end.build( builder, 'int' );
 
 				if ( start !== undefined && end === undefined ) {
 
@@ -159,7 +157,9 @@ class LoopNode extends Node {
 
 		}
 
-		const stackSnippet = contextNode( stackNode, context ).build( builder, 'void' );
+		const stackSnippet = context( stackNode, contextData ).build( builder, 'void' );
+
+		const returnsSnippet = properties.returnsNode ? properties.returnsNode.build( builder ) : '';
 
 		builder.removeFlowTab().addFlowCode( '\n' + builder.tab + stackSnippet );
 
@@ -183,4 +183,4 @@ export const loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params
 
 addNodeElement( 'loop', ( returns, ...params ) => bypass( returns, loop( ...params ) ) );
 
-addNodeClass( LoopNode );
+addNodeClass( 'LoopNode', LoopNode );

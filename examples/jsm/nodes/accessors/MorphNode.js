@@ -19,7 +19,7 @@ class MorphNode extends Node {
 
 	}
 
-	constructAttribute( builder, name, assignNode = positionLocal ) {
+	setupAttribute( builder, name, assignNode = positionLocal ) {
 
 		const mesh = this.mesh;
 		const attributes = mesh.geometry.morphAttributes[ name ];
@@ -39,9 +39,9 @@ class MorphNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
-		this.constructAttribute( builder, 'position' );
+		this.setupAttribute( builder, 'position' );
 
 	}
 
@@ -67,4 +67,4 @@ export default MorphNode;
 
 export const morph = nodeProxy( MorphNode );
 
-addNodeClass( MorphNode );
+addNodeClass( 'MorphNode', MorphNode );

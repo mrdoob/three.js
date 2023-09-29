@@ -46,9 +46,9 @@ class SpotLightNode extends AnalyticLightNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
-		super.construct( builder );
+		super.setup( builder );
 
 		const lightingModel = builder.context.lightingModel;
 
@@ -84,6 +84,6 @@ class SpotLightNode extends AnalyticLightNode {
 
 export default SpotLightNode;
 
-addLightNode( SpotLight, SpotLightNode );
+addNodeClass( 'SpotLightNode', SpotLightNode );
 
-addNodeClass( SpotLightNode );
+addLightNode( SpotLight, SpotLightNode );

@@ -54,6 +54,8 @@ class WebGLBackend extends Backend {
 
 		//
 
+		this._setFramebuffer( renderContext );
+
 		let clear = 0;
 
 		if ( renderContext.clearColor ) clear |= gl.COLOR_BUFFER_BIT;
@@ -64,10 +66,25 @@ class WebGLBackend extends Backend {
 
 		if ( clear !== 0 ) {
 
-			gl.clearColor( clearColor.x, clearColor.y, clearColor.z, clearColor.a );
-			gl.clear( clear );
+			if ( renderContext.textures === null ) {
+
+				gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearColor.a );
+				gl.clear( clear );
+
+			} else {
+
+				for ( let i = 0; i < renderContext.textures.length; i ++ ) {
+
+					gl.clearBufferfv( gl.COLOR, i, [ clearColor.r, clearColor.g, clearColor.b, clearColor.a ] );
+
+				}
+
+				gl.clearBufferfi( gl.DEPTH_STENCIL, 0, 1, 1 );
+
+			}
 
 		}
+
 		//
 
 		if ( renderContext.viewport ) {
@@ -317,7 +334,12 @@ class WebGLBackend extends Backend {
 		textureUtils.setTextureParameters( glTextureType, texture );
 
 		gl.bindTexture( glTextureType, textureGPU );
-		gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
+
+		if ( ! texture.isVideoTexture ) {
+
+			gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
+
+		}
 
 		this.set( texture, {
 			textureGPU,
@@ -333,7 +355,7 @@ class WebGLBackend extends Backend {
 
 		const { gl } = this;
 		const { width, height } = options;
-		const { textureGPU, glTextureType, glFormat, glType } = this.get( texture );
+		const { textureGPU, glTextureType, glFormat, glType, glInternalFormat } = this.get( texture );
 
 		const getImage = ( source ) => {
 
@@ -341,9 +363,13 @@ class WebGLBackend extends Backend {
 
 				return source.image.data;
 
+			} else if ( source instanceof ImageBitmap || source instanceof OffscreenCanvas ) {
+
+				return source;
+
 			}
 
-			return source;
+			return source.data;
 
 		};
 
@@ -360,6 +386,13 @@ class WebGLBackend extends Backend {
 				gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, image );
 
 			}
+
+		} else if ( texture.isVideoTexture ) {
+
+			texture.update();
+
+			gl.texImage2D( glTextureType, 0, glInternalFormat, glFormat, glType, options.image );
+
 
 		} else {
 
@@ -659,6 +692,65 @@ class WebGLBackend extends Backend {
 	copyFramebufferToTexture( /*texture, renderContext*/ ) {
 
 		console.warn( 'Abstract class.' );
+
+	}
+
+	_setFramebuffer( renderContext ) {
+
+		const { gl } = this;
+
+		if ( renderContext.textures !== null ) {
+
+			const renderContextData = this.get( renderContext );
+
+			let fb = renderContextData.framebuffer;
+
+			if ( fb === undefined ) {
+
+				fb = gl.createFramebuffer();
+
+				gl.bindFramebuffer( gl.FRAMEBUFFER, fb );
+
+				const textures = renderContext.textures;
+
+				const drawBuffers = [];
+
+				for ( let i = 0; i < textures.length; i++ ) {
+
+					const texture = textures[ i ];
+					const { textureGPU } = this.get( texture );
+
+					const attachment = gl.COLOR_ATTACHMENT0 + i;
+
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, textureGPU, 0 );
+
+					drawBuffers.push( attachment );
+
+				}
+
+				gl.drawBuffers( drawBuffers );
+
+				if ( renderContext.depthTexture !== null ) {
+
+					const { textureGPU } = this.get( renderContext.depthTexture );
+
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureGPU, 0 );
+
+				}
+
+				renderContextData.framebuffer = fb;
+
+			} else {
+
+				gl.bindFramebuffer( gl.FRAMEBUFFER, fb );
+
+			}
+
+		} else {
+
+			gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+
+		}
 
 	}
 

@@ -7,11 +7,6 @@ export default QUnit.module( 'Animation', () => {
 	QUnit.module( 'AnimationUtils', () => {
 
 		// PUBLIC
-		QUnit.todo( 'arraySlice', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
 
 		QUnit.todo( 'convertArray', ( assert ) => {
 
