@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -293,7 +289,7 @@ loadManager.onLoad = () =&gt; {
 사용하는 대신 보통 PNG가 더 용량이 크죠. 하지만 PNG는 투명도를 지원합니다.
 PNG는 비-이미지 데이터인 법선 맵(normal maps), 그리고 나중에 살펴볼 다른
 비-이미지 데이터를 사용하기에 현재로써는 가장 적당한 파일 형식입니다.</p>
-<p>위에서 말했듯, WebGL에서는 JPG가 용량이 더 작긴 해도 
+<p>위에서 말했듯, WebGL에서는 JPG가 용량이 더 작긴 해도
 PNG 형식보다 메모리 점유율이 낮진 않습니다.</p>
 <h2 id="-a-name-filtering-and-mips-a-mips"><a name="filtering-and-mips"></a> 필터링과 Mips</h2>
 <p>이 16x16 텍스처를</p>
@@ -555,7 +551,7 @@ roughness
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

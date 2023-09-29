@@ -92,7 +92,7 @@ class ScriptableValueNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		return this.value && this.value.isNode ? this.value : float();
 
@@ -164,4 +164,4 @@ export const scriptableValue = nodeProxy( ScriptableValueNode );
 
 addNodeElement( 'scriptableValue', scriptableValue );
 
-addNodeClass( ScriptableValueNode );
+addNodeClass( 'ScriptableValueNode', ScriptableValueNode );

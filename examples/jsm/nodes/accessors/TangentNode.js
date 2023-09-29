@@ -100,4 +100,4 @@ export const tangentWorld = nodeImmutable( TangentNode, TangentNode.WORLD );
 export const transformedTangentView = temp( tangentView, 'TransformedTangentView' );
 export const transformedTangentWorld = normalize( transformedTangentView.transformDirection( cameraViewMatrix ) );
 
-addNodeClass( TangentNode );
+addNodeClass( 'TangentNode', TangentNode );

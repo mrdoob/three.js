@@ -99,17 +99,28 @@ class FunctionNode extends CodeNode {
 
 export default FunctionNode;
 
-const nativeFn = ( code, includes, language = '' ) => {
+const nativeFn = ( code, includes = [], language = '' ) => {
 
-	let functionNode = null;
+	for ( let i = 0; i < includes.length; i ++ ) {
 
-	return ( ...params ) => {
+		const include = includes[ i ];
 
-		if ( functionNode === null ) functionNode = nodeObject( new FunctionNode( code, includes, language ) );
+		// TSL Function: glslFn, wgslFn
 
-		return functionNode.call( ...params );
+		if ( typeof include === 'function' ) {
 
-	};
+			includes[ i ] = include.functionNode;
+
+		}
+
+	}
+
+	const functionNode = nodeObject( new FunctionNode( code, includes, language ) );
+
+	const fn = ( ...params ) => functionNode.call( ...params );
+	fn.functionNode = functionNode;
+
+	return fn;
 
 };
 
@@ -124,4 +135,4 @@ export const func = ( code, includes ) => { // @deprecated, r154
 
 };
 
-addNodeClass( FunctionNode );
+addNodeClass( 'FunctionNode', FunctionNode );

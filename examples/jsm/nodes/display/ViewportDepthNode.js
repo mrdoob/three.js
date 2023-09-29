@@ -17,7 +17,7 @@ class ViewportDepthNode extends Node {
 
 	}
 
-	construct( /*builder*/ ) {
+	setup( /*builder*/ ) {
 
 		const { scope } = this;
 
@@ -66,4 +66,4 @@ export default ViewportDepthNode;
 export const depth = nodeImmutable( ViewportDepthNode, ViewportDepthNode.DEPTH );
 export const depthTexture = nodeProxy( ViewportDepthNode, ViewportDepthNode.DEPTH_TEXTURE );
 
-addNodeClass( ViewportDepthNode );
+addNodeClass( 'ViewportDepthNode', ViewportDepthNode );

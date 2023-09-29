@@ -27,4 +27,4 @@ export default BufferNode;
 
 export const buffer = ( value, type, count ) => nodeObject( new BufferNode( value, type, count ) );
 
-addNodeClass( BufferNode );
+addNodeClass( 'BufferNode', BufferNode );
