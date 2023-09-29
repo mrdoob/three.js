@@ -287,7 +287,6 @@ class WebGLBackend extends Backend {
 		state.setMaterial( material );
 
 		gl.useProgram( programGPU );
-		gl.bindVertexArray( vaoGPU );
 		
 		//
 
@@ -654,66 +653,10 @@ class WebGLBackend extends Backend {
 
 		}
 
-		// VAO
-
-		const vaoGPU = gl.createVertexArray();
-
-		const index = renderObject.getIndex();
-		const attributes = renderObject.getAttributes();
-
-		gl.bindVertexArray( vaoGPU );
-
-		if ( index !== null ) {
-
-			const indexData = this.get( index );
-
-			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexData.bufferGPU );
-
-		}
-
-		for ( let i = 0; i < attributes.length; i ++ ) {
-
-			const attribute = attributes[ i ];
-			const attributeData = this.get( attribute );
-
-			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
-			gl.enableVertexAttribArray( i );
-
-			let stride, offset;
-
-			if ( attribute.isInterleavedBufferAttribute === true ) {
-
-				stride = attribute.data.stride * attributeData.bytesPerElement;
-				offset = attribute.offset * attributeData.bytesPerElement;
-
-			} else {
-
-				stride = 0;
-				offset = 0;
-
-			}
-
-			gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, false, stride, offset );
-
-			if ( attribute.isInstancedBufferAttribute && ! attribute.isInterleavedBufferAttribute ) {
-
-				gl.vertexAttribDivisor( i, attribute.meshPerAttribute );
-
-			} else if ( attribute.isInterleavedBufferAttribute && attribute.data.isInstancedInterleavedBuffer ) {
-
-				gl.vertexAttribDivisor( i, attribute.data.meshPerAttribute );
-
-			}
-
-		}
-
-		gl.bindVertexArray( null );
-
 		//
 
 		this.set( pipeline, {
-			programGPU,
-			vaoGPU
+			programGPU
 		} );
 
 	}
