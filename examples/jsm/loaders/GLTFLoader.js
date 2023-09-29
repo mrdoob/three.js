@@ -942,7 +942,7 @@ class GLTFMaterialsSheenExtension {
 		if ( extension.sheenColorFactor !== undefined ) {
 
 			const colorFactor = extension.sheenColorFactor;
-			materialParams.sheenColor.setRGB( colorFactor[ 0 ], colorFactor[ 1 ], colorFactor [ 2 ], LinearSRGBColorSpace );
+			materialParams.sheenColor.setRGB( colorFactor[ 0 ], colorFactor[ 1 ], colorFactor[ 2 ], LinearSRGBColorSpace );
 
 		}
 
