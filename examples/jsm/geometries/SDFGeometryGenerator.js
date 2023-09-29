@@ -28,7 +28,6 @@ class SDFGeometryGenerator {
 	constructor( renderer ) {
 
 		this.renderer = renderer;
-		this.maxTexSize = renderer.capabilities.maxTextureSize;
 
 	}
 
@@ -45,7 +44,9 @@ class SDFGeometryGenerator {
 		else if ( res == 1024 ) [ w, h ] = [ 32768, 32768 ];
 		else throw new Error( 'THREE.SDFGeometryGenerator: Resolution must be in range 8 < res < 1024 and must be ^2' );
 
-		if ( w > this.maxTexSize || h > this.maxTexSize ) throw new Error( 'THREE.SDFGeometryGenerator: Your device does not support this resolution ( ' + res + ' ), decrease [res] param.' );
+		const maxTexSize = this.renderer.capabilities.maxTextureSize;
+
+		if ( w > maxTexSize || h > maxTexSize ) throw new Error( 'THREE.SDFGeometryGenerator: Your device does not support this resolution ( ' + res + ' ), decrease [res] param.' );
 
 		const [ tilesX, tilesY ] = [ ( w / res ), ( h / res ) ];
 
