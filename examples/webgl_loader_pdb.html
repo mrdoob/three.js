@@ -210,7 +210,7 @@
 						start.multiplyScalar( 75 );
 						end.multiplyScalar( 75 );
 
-						const object = new THREE.Mesh( boxGeometry, new THREE.MeshPhongMaterial( 0xffffff ) );
+						const object = new THREE.Mesh( boxGeometry, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
 						object.position.copy( start );
 						object.position.lerp( end, 0.5 );
 						object.scale.set( 5, 5, start.distanceTo( end ) );
