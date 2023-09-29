@@ -97,11 +97,111 @@ class WebGLBackend extends Backend {
 
 		}
 
+		const occlusionQueryCount = renderContext.occlusionQueryCount;
+
+		if ( occlusionQueryCount > 0 ) {
+
+			const renderContextData = this.get( renderContext );
+
+			// Get a reference to the array of objects with queries. The renderContextData property
+			// can be changed by another render pass before the async reading of all previous queries complete
+			renderContextData.currentOcclusionQueries = renderContextData.occlusionQueries;
+			renderContextData.currentOcclusionQueryObjects = renderContextData.occlusionQueryObjects;
+
+			renderContextData.lastOcclusionObject = null;
+			renderContextData.occlusionQueries = new Array( occlusionQueryCount );
+			renderContextData.occlusionQueryObjects = new Array( occlusionQueryCount );
+			renderContextData.occlusionQueryIndex = 0;
+
+		}
+
 	}
 
-	finishRender( /*renderContext*/ ) {
+	finishRender( renderContext ) {
 
-		//console.warn( 'Abstract class.' );
+		const occlusionQueryCount = renderContext.occlusionQueryCount;
+
+		if ( occlusionQueryCount > 0 ) {
+
+			const renderContextData = this.get( renderContext );
+
+			if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
+
+				const { gl } = this;
+
+				gl.endQuery( gl.ANY_SAMPLES_PASSED );
+
+			}
+
+			this.resolveOccludedAsync( renderContext );
+
+		}
+
+	}
+
+	resolveOccludedAsync( renderContext ) {
+
+		const renderContextData = this.get( renderContext );
+
+		// handle occlusion query results
+
+		const { currentOcclusionQueries, currentOcclusionQueryObjects } = renderContextData;
+
+		if ( currentOcclusionQueries && currentOcclusionQueryObjects ) {
+
+			const occluded = new WeakSet();
+			const { gl } = this;
+
+			renderContextData.currentOcclusionQueryObjects = null;
+			renderContextData.currentOcclusionQueries = null;
+
+			const check = () => {
+
+				let completed = 0;
+
+				// check all queries and requeue as appropriate
+				for ( let i = 0; i < currentOcclusionQueries.length; i ++ ) {
+
+					const query = currentOcclusionQueries[ i ];
+
+					if ( query === null ) continue;
+
+					if ( gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE ) ) {
+
+						if ( gl.getQueryParameter( query, gl.QUERY_RESULT ) > 0 ) occluded.add( currentOcclusionQueryObjects[ i ] );
+
+						currentOcclusionQueries[ i ] = null;
+						gl.deleteQuery( query );
+
+						completed ++;
+
+					}
+
+				}
+
+				if ( completed < currentOcclusionQueries.length ) {
+
+					requestAnimationFrame( check );
+
+				} else {
+
+					renderContextData.occluded = occluded;
+
+				}
+
+			}
+
+			check();
+
+		}
+
+	}
+
+	isOccluded( renderContext, object ) {
+
+		const renderContextData = this.get( renderContext );
+
+		return renderContextData.occluded && renderContextData.occluded.has( object );
 
 	}
 
@@ -140,10 +240,12 @@ class WebGLBackend extends Backend {
 
 	draw( renderObject, info ) {
 
-		const { pipeline, material } = renderObject;
+		const { pipeline, material, context } = renderObject;
 		const { programGPU, vaoGPU } = this.get( pipeline );
 
 		const { gl, state } = this;
+
+		const contextData = this.get( context );
 
 		//
 
@@ -180,6 +282,35 @@ class WebGLBackend extends Backend {
 		const geometry = renderObject.geometry;
 		const drawRange = geometry.drawRange;
 		const firstVertex = drawRange.start;
+
+		//
+
+		const lastObject = contextData.lastOcclusionObject;
+
+		if ( lastObject !== object && lastObject !== undefined ) {
+
+			if ( lastObject !== null && lastObject.occlusionTest === true ) {
+
+				gl.endQuery( gl.ANY_SAMPLES_PASSED );
+
+				contextData.occlusionQueryIndex ++;
+
+			}
+
+			if ( object.occlusionTest === true ) {
+
+				const query = gl.createQuery();
+
+				gl.beginQuery( gl.ANY_SAMPLES_PASSED, query );
+
+				contextData.occlusionQueries[ contextData.occlusionQueryIndex ] = query;
+				contextData.occlusionQueryObjects[ contextData.occlusionQueryIndex ] = object;
+
+			}
+
+			contextData.lastOcclusionObject = object;
+
+		}
 
 		//
 
@@ -232,7 +363,7 @@ class WebGLBackend extends Backend {
 
 	getCacheKey( renderObject ) {
 
-		return '';
+		return renderObject.geometry.id;
 
 	}
 
