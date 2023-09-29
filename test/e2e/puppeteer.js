@@ -117,7 +117,6 @@ const exceptionList = [
 	'webgpu_compute_texture_pingpong',
 	'webgpu_cubemap_dynamic',
 	'webgpu_instance_mesh',
-	'webgpu_lines_fat',
 	'webgpu_loader_gltf',
 	'webgpu_loader_gltf_compressed',
 	'webgpu_loader_gltf_iridescence',
