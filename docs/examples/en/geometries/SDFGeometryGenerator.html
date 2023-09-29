@@ -7,12 +7,11 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:BufferGeometry] &rarr;
 
 		<h1>[name]</h1>
 
 		<p class="desc">
-			[name] returns a THREE.BufferGeometry from a Signed Distance Function</br>
+			[name] generates instances of [page:BufferGeometry] from a Signed Distance Function</br>
             Uses <a href="https://www.npmjs.com/package/isosurface" target="_blank" > Mikola Lysenko's Isosurface</a>
 		</p>
 
@@ -43,15 +42,15 @@
 
 		<h3>[name]( [param:WebGLRenderer renderer] )</h3>
 		
-        <p>
+		<p>
 			[page:WebGLRenderer renderer] -- The renderer used to render the scene. <br />
 		</p>
 
 		<h2>Methods</h2>
 
-		<h3>[method:undefined generate]( [param:Int resolution], [param:String distanceField], [param:Int bounds] )</h3>
+		<h3>[method:BufferGeometry generate]( [param:Int resolution], [param:String distanceField], [param:Int bounds] )</h3>
 		
-        <p>
+		<p>
 			<b>resolution</b> - Int [ mandatory ] Amount of 'voxels' used for triangulation. Must be power of 2. <br/>Gets heavy after 256, most machines won't be able to process over 512. Defaults to 64. 
 		</p>
 		<p>
