@@ -1,5 +1,4 @@
 import TempNode from '../core/TempNode.js';
-import { texture } from '../accessors/TextureNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { uv } from '../accessors/UVNode.js';
 import { normalView } from '../accessors/NormalNode.js';
@@ -28,7 +27,7 @@ const dHdxy_fwd = tslFn( ( { textureNode, bumpScale } ) => {
 
 	if ( texNode.isTextureNode !== true ) {
 
-		throw new Error( 'THREE.TSL: dHdxy_fwd() textureNode is not a TextureNode.' );
+		throw new Error( 'THREE.TSL: dHdxy_fwd() requires a TextureNode.' );
 
 	}
 
