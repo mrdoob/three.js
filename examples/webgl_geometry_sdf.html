@@ -652,144 +652,146 @@
 		import * as THREE from 'three';
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import Stats from 'three/addons/libs/stats.module.js';
-		import { GUI } from './jsm/libs/lil-gui.module.min.js';
-		import { SDFGeometryGenerator } from './jsm/geometries/SDFGeometryGenerator.js';
+		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+		import { SDFGeometryGenerator } from 'three/addons/geometries/SDFGeometryGenerator.js';
 		
-		let renderer, container, stats, meshFromSDF, scene, camera, clock, controls;
+		let renderer, stats, meshFromSDF, scene, camera, clock, controls;
 
-		let settings = {
-			type : 'mandelbrot',
-			res : 4,
-			bounds : 1,
-			autoRotate : true,
-			wireframe : true,
-			material : 'depth',
-			rotationSpeed : 0.0025,
-			vertexCount : '0'
+		const settings = {
+			type: 'mandelbrot',
+			res: 4,
+			bounds: 1,
+			autoRotate: true,
+			wireframe: true,
+			material: 'depth',
+			vertexCount: '0'
 		};
 
 		init();
 		animate();
 
 		function init() {
-			
-			// settings
+
+			const w = window.innerWidth;
+			const h = window.innerHeight;
+
+			camera = new THREE.OrthographicCamera( w / - 2, w / 2, h / 2, h / - 2, 0.01, 1600 );
+			camera.position.z = 1100;
+
+			scene = new THREE.Scene();
+		
+			clock = new THREE.Clock();
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			stats = new Stats();
+			document.body.appendChild( stats.dom );
+
+			controls = new OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+
+			window.addEventListener( 'resize', onWindowResize );
+
+			//
+		
 			const panel = new GUI( );
-			panel.add( settings, 'type', [ 'mandelbrot', 'head', 'suzanne' ] ).name( 'Type' ).onChange( v => compile() );
-			panel.add( settings, 'res', 1, 6, 1 ).name( 'Res' ).onFinishChange( v => compile() );
-			panel.add( settings, 'bounds', 1, 10, 1 ).name( 'Bounds' ).onFinishChange( v => compile() );
-			panel.add( settings, 'material', [ 'depth', 'normal', 'occlusion' ] ).name( 'Material' ).onChange( v => setMaterial( ) );
-			panel.add( settings, 'wireframe' ).name( 'Wireframe' ).onChange( v => setMaterial()  );
+			panel.add( settings, 'type', [ 'mandelbrot', 'head', 'suzanne' ] ).name( 'Type' ).onChange( compile );
+			panel.add( settings, 'res', 1, 6, 1 ).name( 'Res' ).onFinishChange( compile );
+			panel.add( settings, 'bounds', 1, 10, 1 ).name( 'Bounds' ).onFinishChange( compile );
+			panel.add( settings, 'material', [ 'depth', 'normal' ] ).name( 'Material' ).onChange( setMaterial );
+			panel.add( settings, 'wireframe' ).name( 'Wireframe' ).onChange( setMaterial );
 			panel.add( settings, 'autoRotate' ).name( 'Auto Rotate' );
 			panel.add( settings, 'vertexCount' ).name( 'Vertex count' ).listen().disable();
-			
-			// renderer
-			container = document.createElement( 'div' );
-			document.body.appendChild( container );
-			renderer = new THREE.WebGLRenderer( { alpha : true, antialias : true } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			container.appendChild( renderer.domElement );
 
-			// setup
-			scene = new THREE.Scene();
-			camera = new THREE.OrthographicCamera();
-			clock = new THREE.Clock()
+			//
 
-			// stats
-			stats = new Stats();
-			container.appendChild( stats.dom );
+			compile();
 
-			// camera controls
-			controls = new OrbitControls( camera, renderer.domElement )
-			controls.enableDamping = true
-
-			// EventListeners
-			window.addEventListener( 'resize', onWindowResize );
-			onWindowResize()
-
-			// compile SDF
-			compile()
 		}
 
-		function compile(){
-			
-			const generator = new SDFGeometryGenerator( renderer );
-			const geometry = generator.generate( Math.pow( 2, settings.res + 2 ), document.querySelector('textarea#'+settings.type).value, settings.bounds );
-
-			if( meshFromSDF ) { // updates mesh
-				meshFromSDF.geometry = geometry
-			} else { // inits meshFromSDF : THREE.Mesh
-				
-				meshFromSDF = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial() )
-				scene.add( meshFromSDF )
-				
-				let scale = Math.min( window.innerWidth, window.innerHeight ) / 2 * 0.66
-				meshFromSDF.scale.set( scale, scale, scale )
-				
-				setMaterial()
-			}
-
-			settings.vertexCount = geometry.attributes.position.count
-		}
-
-		function setMaterial(){
-			let passThroughShader = 'varying vec3 vPos;void main(){vPos=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(vPos,1.);}';
-			let rmNormal = 'vec3 nor(vec3 p){vec2 e=vec2(1.,-1.)*.5773*.0005;return normalize(e.xyy*dist(p+e.xyy)+e.yyx*dist(p+e.yyx)+e.yxy*dist(p+e.yxy)+e.xxx*dist(p+e.xxx));}'
-			if( settings.material == 'depth' ) {
-				meshFromSDF.material = new THREE.MeshDepthMaterial()
-			} else if( settings.material == 'occlusion' ) {
-				meshFromSDF.material = new THREE.ShaderMaterial({
-				vertexShader : passThroughShader,
-				fragmentShader : `
-					varying vec3 vPos;
-					${document.querySelector('textarea#'+settings.type).value}
-					${rmNormal}
-					float ao(vec3 p,vec3 n){float o=0.,s=1.;for(int i=0;i<5;i++){float h=.01+.12*float(i)/4.,d=dist(p+h*n);o+=(h-d)*s;s*=.95;if(o>.35)break;}return clamp(1.-3.*o,0.,1.)*(.5+.5*n.y);}
-					void main(){
-						vec3 n = nor( vPos );
-						float occ = ao( vPos, n );
-						gl_FragColor=vec4( vec3( occ ), 1.0 );
-					}
-				`
-				})
-			} else if( settings.material == 'normal' ){
-				meshFromSDF.material = new THREE.ShaderMaterial({
-				vertexShader : passThroughShader,
-				fragmentShader : `
-					varying vec3 vPos;
-					${document.querySelector('textarea#'+settings.type).value}
-					${rmNormal}
-					void main(){
-						vec3 n = nor( vPos );
-						gl_FragColor=vec4( vec3( n ), 1.0 );
-					}
-				`
-				})
-			}
-
-			meshFromSDF.material.wireframe = settings.wireframe
-		}
+		function compile() {
 		
-		function onWindowResize() {
-			let [ w, h ] = [ window.innerWidth, window.innerHeight ]
-			renderer.setSize( w, h )
-			Object.assign( camera, { left :  w / -2, right : w / 2, top : h / 2, bottom : h / -2, near : 0.01, far : 1600 } )
-			camera.position.z = 1100
-			camera.updateProjectionMatrix()
+			const generator = new SDFGeometryGenerator( renderer );
+			const geometry = generator.generate( Math.pow( 2, settings.res + 2 ), document.querySelector( 'textarea#' + settings.type ).value, settings.bounds );
+			geometry.computeVertexNormals();
+
+			if ( meshFromSDF ) { // updates mesh
+
+				meshFromSDF.geometry = geometry;
+		
+			} else { // inits meshFromSDF : THREE.Mesh
+		
+				meshFromSDF = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial() );
+				scene.add( meshFromSDF );
+		
+				const scale = Math.min( window.innerWidth, window.innerHeight ) / 2 * 0.66;
+				meshFromSDF.scale.set( scale, scale, scale );
+		
+				setMaterial();
+		
+			}
+
+			settings.vertexCount = geometry.attributes.position.count;
+
 		}
 
-		function render(){
-			renderer.render( scene, camera )
+		function setMaterial() {
+
+			if ( settings.material == 'depth' ) {
+
+				meshFromSDF.material = new THREE.MeshDepthMaterial();
+		
+			} else if ( settings.material == 'normal' ) {
+
+				meshFromSDF.material = new THREE.MeshNormalMaterial();
+		
+			}
+
+			meshFromSDF.material.wireframe = settings.wireframe;
+
+		}
+
+		function onWindowResize() {
+
+			const w = window.innerWidth;
+			const h = window.innerHeight;
+
+			renderer.setSize( w, h );
+
+			camera.left = w / - 2;
+			camera.right = w / 2;
+			camera.top = h / 2;
+			camera.bottom = h / - 2;
+
+			camera.updateProjectionMatrix();
+
+		}
+
+		function render() {
+
+			renderer.render( scene, camera );
+
 		}
 
 		function animate() {
+
 			requestAnimationFrame( animate );
+
 			controls.update();
-			if( settings.autoRotate ) settings.rotationSpeed += ( 0.0025 - settings.rotationSpeed )
-			else settings.rotationSpeed -= settings.rotationSpeed * 0.05
-			meshFromSDF.rotation.y += settings.rotationSpeed * ( clock.getDelta() / 0.016 )
+
+			if ( settings.autoRotate ) {
+
+				meshFromSDF.rotation.y += Math.PI * 0.05 * clock.getDelta();
+
+			}
+
 			render();
+
 			stats.update();
+
 		}
 
 	</script>
