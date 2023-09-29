@@ -214,9 +214,24 @@ class WebGLBackend extends Backend {
 
 	}
 
-	clear( /*renderContext, color, depth, stencil*/ ) {
+	clear( renderContext, color, depth, stencil ) {
 
-		console.warn( 'Abstract class.' );
+		const { gl } = this;
+
+		//
+
+		let clear = 0;
+
+		if ( color ) clear |= gl.COLOR_BUFFER_BIT;
+		if ( depth ) clear |= gl.DEPTH_BUFFER_BIT;
+		if ( stencil ) clear |= gl.STENCIL_BUFFER_BIT;
+
+		const clearColor = renderContext.clearColorValue;
+
+		if ( clear === 0 ) return;
+
+		gl.clearColor( clearColor.x, clearColor.y, clearColor.z, clearColor.a );
+		gl.clear( clear );
 
 	}
 
@@ -316,21 +331,30 @@ class WebGLBackend extends Backend {
 
 		let mode;
 		if ( object.isPoints ) mode = gl.POINTS;
-		else if ( object.isLine ) mode = gl.LINES;
+		else if ( object.isLine ) mode = gl.LINE_STRIP;
 		else if ( object.isLineLoop ) mode = gl.LINE_LOOP;
 		else if ( object.isLineSegments ) mode = gl.LINES;
 		else mode = gl.TRIANGLES;
 
 		//
 
+		const instanceCount = this.getInstanceCount( renderObject );
 
 		if ( index !== null ) {
 
 			const indexData = this.get( index );
-
 			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
 
-			gl.drawElements( mode, index.count, indexData.type, firstVertex );
+			if ( instanceCount > 1 ) {
+
+				gl.drawElementsInstanced( mode, index.count, indexData.type, firstVertex, instanceCount );
+
+			} else {
+
+				gl.drawElements( mode, index.count, indexData.type, firstVertex );
+
+			}
+
 
 			info.update( object, indexCount, 1 );
 
@@ -339,8 +363,16 @@ class WebGLBackend extends Backend {
 			const positionAttribute = geometry.attributes.position;
 			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : positionAttribute.count;
 
+			if ( instanceCount > 1 ) {
 
-			gl.drawArrays( mode, 0, vertexCount );
+				gl.drawArraysInstanced( mode, 0, vertexCount, instanceCount );
+
+			} else {
+
+				gl.drawArrays( mode, 0, vertexCount );
+
+			}
+
 			//gl.drawArrays( mode, vertexCount, gl.UNSIGNED_SHORT, firstVertex );
 
 			info.update( object, vertexCount, 1 );
@@ -613,7 +645,7 @@ class WebGLBackend extends Backend {
 		const vaoGPU = gl.createVertexArray();
 
 		const index = renderObject.getIndex();
-		const vertexBuffers = renderObject.getVertexBuffers();
+		const attributes = renderObject.getAttributes();
 
 		gl.bindVertexArray( vaoGPU );
 
@@ -625,14 +657,39 @@ class WebGLBackend extends Backend {
 
 		}
 
-		for ( let i = 0; i < vertexBuffers.length; i ++ ) {
+		for ( let i = 0; i < attributes.length; i ++ ) {
 
-			const attribute = vertexBuffers[ i ];
+			const attribute = attributes[ i ];
 			const attributeData = this.get( attribute );
 
 			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
 			gl.enableVertexAttribArray( i );
-			gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, false, 0, 0 );
+
+			let stride, offset;
+
+			if ( attribute.isInterleavedBufferAttribute === true ) {
+
+				stride = attribute.data.stride * attributeData.bytesPerElement;
+				offset = attribute.offset * attributeData.bytesPerElement;
+
+			} else {
+
+				stride = 0;
+				offset = 0;
+
+			}
+
+			gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, false, stride, offset );
+
+			if ( attribute.isInstancedBufferAttribute && ! attribute.isInterleavedBufferAttribute ) {
+
+				gl.vertexAttribDivisor( i, attribute.meshPerAttribute );
+
+			} else if ( attribute.isInterleavedBufferAttribute && attribute.data.isInstancedInterleavedBuffer ) {
+
+				gl.vertexAttribDivisor( i, attribute.data.meshPerAttribute );
+
+			}
 
 		}
 
@@ -739,9 +796,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	updateAttribute( /*attribute*/ ) {
+	updateAttribute( attribute ) {
 
-		console.warn( 'Abstract class.' );
+		this.attributeUtils.updateAttribute( attribute );
 
 	}
 

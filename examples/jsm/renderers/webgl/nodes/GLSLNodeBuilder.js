@@ -14,6 +14,10 @@ const precisionLib = {
 	high: 'highp'
 };
 
+const supports = {
+	instance: true
+};
+
 class GLSLNodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer, scene = null ) {
@@ -176,7 +180,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 		if ( shaderStage === 'vertex' ) {
 
-			const attributes = this.attributes;
+			const attributes = this.getAttributesArray();
 
 			let location = 0;
 
@@ -284,6 +288,13 @@ class GLSLNodeBuilder extends NodeBuilder {
 		return 'gl_FragCoord';
 
 	}
+
+	isAvailable( name ) {
+
+		return supports[ name ] === true;
+
+	}
+
 
 	isFlipY() {
 
