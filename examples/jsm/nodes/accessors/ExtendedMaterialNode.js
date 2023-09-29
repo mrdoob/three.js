@@ -44,8 +44,7 @@ class ExtendedMaterialNode extends MaterialNode {
 
 			} else if ( material.bumpMap ) {
 
-				// @TODO: Replace material.bumpMap to this.getTexture( 'bumpMap' )
-				node = bumpMap( material.bumpMap, materialReference( 'bumpScale', 'float' ) );
+				node = bumpMap( this.getTexture( 'bumpMap' ).r, materialReference( 'bumpScale', 'float' ) );
 
 			} else {
 

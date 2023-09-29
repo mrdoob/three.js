@@ -5,22 +5,42 @@ import { uv } from '../accessors/UVNode.js';
 import { normalView } from '../accessors/NormalNode.js';
 import { positionView } from '../accessors/PositionNode.js';
 import { faceDirection } from './FrontFacingNode.js';
-import { tslFn, nodeProxy, vec2 } from '../shadernode/ShaderNode.js';
+import { tslFn, nodeProxy, float, vec2 } from '../shadernode/ShaderNode.js';
 
 // Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 // https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
 
 // Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
 
-const dHdxy_fwd = tslFn( ( { bumpTexture, bumpScale } ) => {
+const dHdxy_fwd = tslFn( ( { textureNode, bumpScale } ) => {
 
-	const uvNode = uv();
+	let texNode = textureNode;
 
-	const Hll = texture( bumpTexture, uvNode ).x;
+	if ( texNode.isTextureNode !== true ) {
+
+		texNode.traverse( ( node ) => {
+
+			if ( node.isTextureNode === true ) texNode = node;
+
+		} );
+
+	}
+
+	if ( texNode.isTextureNode !== true ) {
+
+		throw new Error( 'THREE.TSL: dHdxy_fwd() textureNode is not a TextureNode.' );
+
+	}
+
+	const Hll = float( textureNode );
+	const uvNode = texNode.uvNode || uv();
+
+	// It's used to preserve the same TextureNode instance
+	const sampleTexture = ( uv ) => textureNode.cache().context( { getUVNode: () => uv } );
 
 	return vec2(
-		texture( bumpTexture, uvNode.add( uvNode.dFdx() ) ).x.sub( Hll ),
-		texture( bumpTexture, uvNode.add( uvNode.dFdy() ) ).x.sub( Hll )
+		float( sampleTexture( uvNode.add( uvNode.dFdx() ) ) ).sub( Hll ),
+		float( sampleTexture( uvNode.add( uvNode.dFdy() ) ) ).sub( Hll )
 	).mul( bumpScale );
 
 } );
@@ -46,11 +66,11 @@ const perturbNormalArb = tslFn( ( inputs ) => {
 
 class BumpMapNode extends TempNode {
 
-	constructor( texture, scaleNode = null ) {
+	constructor( textureNode, scaleNode = null ) {
 
 		super( 'vec3' );
 
-		this.texture = texture;
+		this.textureNode = textureNode;
 		this.scaleNode = scaleNode;
 
 	}
@@ -58,10 +78,10 @@ class BumpMapNode extends TempNode {
 	setup() {
 
 		const bumpScale = this.scaleNode !== null ? this.scaleNode : 1;
-		const dHdxy = dHdxy_fwd( { bumpTexture: this.texture, bumpScale } );
+		const dHdxy = dHdxy_fwd( { textureNode: this.textureNode, bumpScale } );
 
 		return perturbNormalArb( {
-			surf_pos: positionView.negate(),
+			surf_pos: positionView,
 			surf_norm: normalView,
 			dHdxy
 		} );
