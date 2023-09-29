@@ -54,6 +54,8 @@ class WebGLBackend extends Backend {
 
 		//
 
+		this._setFramebuffer( renderContext );
+
 		let clear = 0;
 
 		if ( renderContext.clearColor ) clear |= gl.COLOR_BUFFER_BIT;
@@ -62,8 +64,26 @@ class WebGLBackend extends Backend {
 
 		const clearColor = renderContext.clearColorValue;
 
-		gl.clearColor( clearColor.x, clearColor.y, clearColor.z, clearColor.a );
-		gl.clear( clear );
+		if ( clear !== 0 ) {
+
+			if ( renderContext.textures === null ) {
+
+				gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearColor.a );
+				gl.clear( clear );
+
+			} else {
+
+				for ( let i = 0; i < renderContext.textures.length; i ++ ) {
+
+					gl.clearBufferfv( gl.COLOR, i, [ clearColor.r, clearColor.g, clearColor.b, clearColor.a ] );
+
+				}
+
+				gl.clearBufferfi( gl.DEPTH_STENCIL, 0, 1, 1 );
+
+			}
+
+		}
 
 		//
 
@@ -77,11 +97,111 @@ class WebGLBackend extends Backend {
 
 		}
 
+		const occlusionQueryCount = renderContext.occlusionQueryCount;
+
+		if ( occlusionQueryCount > 0 ) {
+
+			const renderContextData = this.get( renderContext );
+
+			// Get a reference to the array of objects with queries. The renderContextData property
+			// can be changed by another render pass before the async reading of all previous queries complete
+			renderContextData.currentOcclusionQueries = renderContextData.occlusionQueries;
+			renderContextData.currentOcclusionQueryObjects = renderContextData.occlusionQueryObjects;
+
+			renderContextData.lastOcclusionObject = null;
+			renderContextData.occlusionQueries = new Array( occlusionQueryCount );
+			renderContextData.occlusionQueryObjects = new Array( occlusionQueryCount );
+			renderContextData.occlusionQueryIndex = 0;
+
+		}
+
 	}
 
-	finishRender( /*renderContext*/ ) {
+	finishRender( renderContext ) {
 
-		//console.warn( 'Abstract class.' );
+		const occlusionQueryCount = renderContext.occlusionQueryCount;
+
+		if ( occlusionQueryCount > 0 ) {
+
+			const renderContextData = this.get( renderContext );
+
+			if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
+
+				const { gl } = this;
+
+				gl.endQuery( gl.ANY_SAMPLES_PASSED );
+
+			}
+
+			this.resolveOccludedAsync( renderContext );
+
+		}
+
+	}
+
+	resolveOccludedAsync( renderContext ) {
+
+		const renderContextData = this.get( renderContext );
+
+		// handle occlusion query results
+
+		const { currentOcclusionQueries, currentOcclusionQueryObjects } = renderContextData;
+
+		if ( currentOcclusionQueries && currentOcclusionQueryObjects ) {
+
+			const occluded = new WeakSet();
+			const { gl } = this;
+
+			renderContextData.currentOcclusionQueryObjects = null;
+			renderContextData.currentOcclusionQueries = null;
+
+			const check = () => {
+
+				let completed = 0;
+
+				// check all queries and requeue as appropriate
+				for ( let i = 0; i < currentOcclusionQueries.length; i ++ ) {
+
+					const query = currentOcclusionQueries[ i ];
+
+					if ( query === null ) continue;
+
+					if ( gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE ) ) {
+
+						if ( gl.getQueryParameter( query, gl.QUERY_RESULT ) > 0 ) occluded.add( currentOcclusionQueryObjects[ i ] );
+
+						currentOcclusionQueries[ i ] = null;
+						gl.deleteQuery( query );
+
+						completed ++;
+
+					}
+
+				}
+
+				if ( completed < currentOcclusionQueries.length ) {
+
+					requestAnimationFrame( check );
+
+				} else {
+
+					renderContextData.occluded = occluded;
+
+				}
+
+			}
+
+			check();
+
+		}
+
+	}
+
+	isOccluded( renderContext, object ) {
+
+		const renderContextData = this.get( renderContext );
+
+		return renderContextData.occluded && renderContextData.occluded.has( object );
 
 	}
 
@@ -94,9 +214,24 @@ class WebGLBackend extends Backend {
 
 	}
 
-	clear( /*renderContext, color, depth, stencil*/ ) {
+	clear( renderContext, color, depth, stencil ) {
 
-		console.warn( 'Abstract class.' );
+		const { gl } = this;
+
+		//
+
+		let clear = 0;
+
+		if ( color ) clear |= gl.COLOR_BUFFER_BIT;
+		if ( depth ) clear |= gl.DEPTH_BUFFER_BIT;
+		if ( stencil ) clear |= gl.STENCIL_BUFFER_BIT;
+
+		const clearColor = renderContext.clearColorValue;
+
+		if ( clear === 0 ) return;
+
+		gl.clearColor( clearColor.x, clearColor.y, clearColor.z, clearColor.a );
+		gl.clear( clear );
 
 	}
 
@@ -120,10 +255,12 @@ class WebGLBackend extends Backend {
 
 	draw( renderObject, info ) {
 
-		const { pipeline, material } = renderObject;
+		const { pipeline, material, context } = renderObject;
 		const { programGPU } = this.get( pipeline );
 
 		const { gl, state } = this;
+
+		const contextData = this.get( context );
 
 		//
 
@@ -150,7 +287,8 @@ class WebGLBackend extends Backend {
 		state.setMaterial( material );
 
 		gl.useProgram( programGPU );
-
+		gl.bindVertexArray( vaoGPU );
+		
 		//
 
 		let { vaoGPU } = this.get( renderObject );
@@ -163,9 +301,7 @@ class WebGLBackend extends Backend {
 
 		}
 
-
 		gl.bindVertexArray( vaoGPU );
-
 
 		//
 
@@ -178,23 +314,61 @@ class WebGLBackend extends Backend {
 
 		//
 
+		const lastObject = contextData.lastOcclusionObject;
+
+		if ( lastObject !== object && lastObject !== undefined ) {
+
+			if ( lastObject !== null && lastObject.occlusionTest === true ) {
+
+				gl.endQuery( gl.ANY_SAMPLES_PASSED );
+
+				contextData.occlusionQueryIndex ++;
+
+			}
+
+			if ( object.occlusionTest === true ) {
+
+				const query = gl.createQuery();
+
+				gl.beginQuery( gl.ANY_SAMPLES_PASSED, query );
+
+				contextData.occlusionQueries[ contextData.occlusionQueryIndex ] = query;
+				contextData.occlusionQueryObjects[ contextData.occlusionQueryIndex ] = object;
+
+			}
+
+			contextData.lastOcclusionObject = object;
+
+		}
+
+		//
+
 		let mode;
 		if ( object.isPoints ) mode = gl.POINTS;
-		else if ( object.isLine ) mode = gl.LINES;
+		else if ( object.isLine ) mode = gl.LINE_STRIP;
 		else if ( object.isLineLoop ) mode = gl.LINE_LOOP;
 		else if ( object.isLineSegments ) mode = gl.LINES;
 		else mode = gl.TRIANGLES;
 
 		//
 
+		const instanceCount = this.getInstanceCount( renderObject );
 
 		if ( index !== null ) {
 
 			const indexData = this.get( index );
-
 			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
 
-			gl.drawElements( mode, index.count, indexData.type, firstVertex );
+			if ( instanceCount > 1 ) {
+
+				gl.drawElementsInstanced( mode, index.count, indexData.type, firstVertex, instanceCount );
+
+			} else {
+
+				gl.drawElements( mode, index.count, indexData.type, firstVertex );
+
+			}
+
 
 			info.update( object, indexCount, 1 );
 
@@ -203,8 +377,16 @@ class WebGLBackend extends Backend {
 			const positionAttribute = geometry.attributes.position;
 			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : positionAttribute.count;
 
+			if ( instanceCount > 1 ) {
 
-			gl.drawArrays( mode, 0, vertexCount );
+				gl.drawArraysInstanced( mode, 0, vertexCount, instanceCount );
+
+			} else {
+
+				gl.drawArrays( mode, 0, vertexCount );
+
+			}
+
 			//gl.drawArrays( mode, vertexCount, gl.UNSIGNED_SHORT, firstVertex );
 
 			info.update( object, vertexCount, 1 );
@@ -227,7 +409,7 @@ class WebGLBackend extends Backend {
 
 	getCacheKey( renderObject ) {
 
-		return '';
+		return renderObject.geometry.id;
 
 	}
 
@@ -297,7 +479,12 @@ class WebGLBackend extends Backend {
 		textureUtils.setTextureParameters( glTextureType, texture );
 
 		gl.bindTexture( glTextureType, textureGPU );
-		gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
+
+		if ( ! texture.isVideoTexture ) {
+
+			gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
+
+		}
 
 		this.set( texture, {
 			textureGPU,
@@ -313,7 +500,7 @@ class WebGLBackend extends Backend {
 
 		const { gl } = this;
 		const { width, height } = options;
-		const { textureGPU, glTextureType, glFormat, glType } = this.get( texture );
+		const { textureGPU, glTextureType, glFormat, glType, glInternalFormat } = this.get( texture );
 
 		const getImage = ( source ) => {
 
@@ -321,9 +508,13 @@ class WebGLBackend extends Backend {
 
 				return source.image.data;
 
+			} else if ( source instanceof ImageBitmap || source instanceof OffscreenCanvas ) {
+
+				return source;
+
 			}
 
-			return source;
+			return source.data;
 
 		};
 
@@ -340,6 +531,13 @@ class WebGLBackend extends Backend {
 				gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, image );
 
 			}
+
+		} else if ( texture.isVideoTexture ) {
+
+			texture.update();
+
+			gl.texImage2D( glTextureType, 0, glInternalFormat, glFormat, glType, options.image );
+
 
 		} else {
 
@@ -456,10 +654,66 @@ class WebGLBackend extends Backend {
 
 		}
 
+		// VAO
+
+		const vaoGPU = gl.createVertexArray();
+
+		const index = renderObject.getIndex();
+		const attributes = renderObject.getAttributes();
+
+		gl.bindVertexArray( vaoGPU );
+
+		if ( index !== null ) {
+
+			const indexData = this.get( index );
+
+			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexData.bufferGPU );
+
+		}
+
+		for ( let i = 0; i < attributes.length; i ++ ) {
+
+			const attribute = attributes[ i ];
+			const attributeData = this.get( attribute );
+
+			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
+			gl.enableVertexAttribArray( i );
+
+			let stride, offset;
+
+			if ( attribute.isInterleavedBufferAttribute === true ) {
+
+				stride = attribute.data.stride * attributeData.bytesPerElement;
+				offset = attribute.offset * attributeData.bytesPerElement;
+
+			} else {
+
+				stride = 0;
+				offset = 0;
+
+			}
+
+			gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, false, stride, offset );
+
+			if ( attribute.isInstancedBufferAttribute && ! attribute.isInterleavedBufferAttribute ) {
+
+				gl.vertexAttribDivisor( i, attribute.meshPerAttribute );
+
+			} else if ( attribute.isInterleavedBufferAttribute && attribute.data.isInstancedInterleavedBuffer ) {
+
+				gl.vertexAttribDivisor( i, attribute.data.meshPerAttribute );
+
+			}
+
+		}
+
+		gl.bindVertexArray( null );
+
 		//
 
 		this.set( pipeline, {
-			programGPU
+			programGPU,
+			vaoGPU
 		} );
 
 	}
@@ -556,9 +810,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	updateAttribute( /*attribute*/ ) {
+	updateAttribute( attribute ) {
 
-		console.warn( 'Abstract class.' );
+		this.attributeUtils.updateAttribute( attribute );
 
 	}
 
@@ -644,6 +898,65 @@ class WebGLBackend extends Backend {
 		gl.bindVertexArray( null );
 
 		return vaoGPU;
+
+	}
+
+	_setFramebuffer( renderContext ) {
+
+		const { gl } = this;
+
+		if ( renderContext.textures !== null ) {
+
+			const renderContextData = this.get( renderContext );
+
+			let fb = renderContextData.framebuffer;
+
+			if ( fb === undefined ) {
+
+				fb = gl.createFramebuffer();
+
+				gl.bindFramebuffer( gl.FRAMEBUFFER, fb );
+
+				const textures = renderContext.textures;
+
+				const drawBuffers = [];
+
+				for ( let i = 0; i < textures.length; i++ ) {
+
+					const texture = textures[ i ];
+					const { textureGPU } = this.get( texture );
+
+					const attachment = gl.COLOR_ATTACHMENT0 + i;
+
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, textureGPU, 0 );
+
+					drawBuffers.push( attachment );
+
+				}
+
+				gl.drawBuffers( drawBuffers );
+
+				if ( renderContext.depthTexture !== null ) {
+
+					const { textureGPU } = this.get( renderContext.depthTexture );
+
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureGPU, 0 );
+
+				}
+
+				renderContextData.framebuffer = fb;
+
+			} else {
+
+				gl.bindFramebuffer( gl.FRAMEBUFFER, fb );
+
+			}
+
+		} else {
+
+			gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+
+		}
 
 	}
 
