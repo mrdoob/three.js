@@ -17,6 +17,8 @@ class WebGLBackend extends Backend {
 
 		super( parameters );
 
+		this.isWebGLBackend = true;
+
 	}
 
 	async init( renderer ) {
