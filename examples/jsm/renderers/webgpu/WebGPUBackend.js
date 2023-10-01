@@ -33,6 +33,8 @@ class WebGPUBackend extends Backend {
 
 		super( parameters );
 
+		this.isWebGPUBackend = true;
+
 		// some parameters require default values other than "undefined"
 
 		this.parameters.antialias = ( parameters.antialias === true );
