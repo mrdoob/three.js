@@ -32,7 +32,7 @@ class SimplifyModifier {
 
 		for ( const name in attributes ) {
 
-			if ( name !== 'position' && name !== 'uv' && name !== 'tangent' && name !== 'normal' ) geometry.deleteAttribute( name );
+			if ( name !== 'position' && name !== 'uv' && name !== 'normal' && name !== 'tangent' && name !== 'color' ) geometry.deleteAttribute( name );
 
 		}
 
@@ -51,10 +51,12 @@ class SimplifyModifier {
 		const uvAttribute = geometry.getAttribute( 'uv' );
 		const normalAttribute = geometry.getAttribute( 'normal' );
 		const tangentAttribute = geometry.getAttribute( 'tangent' );
+		const colorAttribute = geometry.getAttribute( 'color' );
 
 		let t = null;
 		let v2 = null;
 		let nor = null;
+		let col = null;
 
 		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
@@ -77,7 +79,13 @@ class SimplifyModifier {
 
 			}
 
-			const vertex = new Vertex( v, v2, nor, t );
+			if ( colorAttribute ) {
+
+				col = new THREE.Color().fromBufferAttribute( colorAttribute, i );
+
+			}
+
+			const vertex = new Vertex( v, v2, nor, t, col );
 			vertices.push( vertex );
 
 		}
@@ -148,6 +156,7 @@ class SimplifyModifier {
 		const uv = [];
 		const normal = [];
 		const tangent = [];
+		const color = [];
 
 		index = [];
 
@@ -175,6 +184,13 @@ class SimplifyModifier {
 
 			}
 
+			if ( vertex.color ) {
+
+				color.push( vertex.color.r, vertex.color.g, vertex.color.b );
+
+			}
+
+
 			// cache final index to GREATLY speed up faces reconstruction
 			vertex.id = i;
 
@@ -193,6 +209,8 @@ class SimplifyModifier {
 		if ( uv.length > 0 ) simplifiedGeometry.setAttribute( 'uv', new Float32BufferAttribute( uv, 2 ) );
 		if ( normal.length > 0 ) simplifiedGeometry.setAttribute( 'normal', new Float32BufferAttribute( normal, 3 ) );
 		if ( tangent.length > 0 ) simplifiedGeometry.setAttribute( 'tangent', new Float32BufferAttribute( tangent, 4 ) );
+		if ( color.length > 0 ) simplifiedGeometry.setAttribute( 'color', new Float32BufferAttribute( color, 3 ) );
+
 		simplifiedGeometry.setIndex( index );
 
 		return simplifiedGeometry;
@@ -550,12 +568,13 @@ class Triangle {
 
 class Vertex {
 
-	constructor( v, uv, normal, tangent ) {
+	constructor( v, uv, normal, tangent, color ) {
 
 		this.position = v;
 		this.uv = uv;
 		this.normal = normal;
 		this.tangent = tangent;
+		this.color = color;
 
 		this.id = - 1; // external use position in vertices list (for e.g. face generation)
 
