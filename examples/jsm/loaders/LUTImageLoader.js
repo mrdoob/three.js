@@ -2,7 +2,7 @@
 // https://community.foundry.com/discuss/topic/103636/format-spec-for-3dl?mode=Post&postID=895258
 import {
 	Loader,
-	FileLoader,
+	TextureLoader,
 	DataTexture,
 	Data3DTexture,
 	RGBAFormat,
@@ -12,17 +12,35 @@ import {
 } from 'three';
 
 export class LUTImageLoader extends Loader {
+	constructor( flipVertical = true ){
+		super();
+
+		this.flip = flipVertical;
+	}
 
 	load( url, onLoad, onProgress, onError ) {
 
-		const loader = new FileLoader( this.manager );
+		const loader = new TextureLoader( this.manager );
+
 		loader.setPath( this.path );
-		loader.setResponseType( 'text' );
-		loader.load( url, text => {
+
+		loader.load( url, texture => {
 
 			try {
 
-				onLoad( this.parse( text ) );
+				let imageData;
+
+				if (texture.image.width < texture.image.height ){
+
+					imageData = this.getImageData( texture );
+
+				}else{
+
+					imageData = this.horz2Vert( texture );
+
+				}
+				
+				onLoad( this.parse( imageData.data, Math.min(texture.image.width, texture.image.height ) ) );
 
 			} catch ( e ) {
 
@@ -44,73 +62,56 @@ export class LUTImageLoader extends Loader {
 
 	}
 
-	parse( str ) {
+	getImageData( texture ) {
+		const width = texture.image.width;
+		const height = texture.image.height;
 
-		// remove empty lines and comment lints
-		str = str
-			.replace( /^#.*?(\n|\r)/gm, '' )
-			.replace( /^\s*?(\n|\r)/gm, '' )
-			.trim();
+		const canvas = document.createElement('canvas');
+		canvas.width = width;
+		canvas.height = height;
 
-		const lines = str.split( /[\n\r]+/g );
+		const context = canvas.getContext('2d');
 
-		// first line is the positions on the grid that are provided by the LUT
-		const gridLines = lines[ 0 ].trim().split( /\s+/g ).map( e => parseFloat( e ) );
-		const gridStep = gridLines[ 1 ] - gridLines[ 0 ];
-		const size = gridLines.length;
+		if (this.flip){
 
-		for ( let i = 1, l = gridLines.length; i < l; i ++ ) {
-
-			if ( gridStep !== ( gridLines[ i ] - gridLines[ i - 1 ] ) ) {
-
-				throw new Error( 'LUT3dlLoader: Inconsistent grid size not supported.' );
-
-			}
+			context.scale(1, -1);
+            context.translate(0, -height);
 
 		}
 
-		const dataArray = new Array( size * size * size * 4 );
-		let index = 0;
-		let maxOutputValue = 0.0;
-		for ( let i = 1, l = lines.length; i < l; i ++ ) {
+		context.drawImage( texture.image, 0, 0 );
 
-			const line = lines[ i ].trim();
-			const split = line.split( /\s/g );
+		return context.getImageData(0, 0, width, height);
+    }
+		
+    horz2Vert( texture ){
+		const width = texture.image.height;
+		const height = texture.image.width;
 
-			const r = parseFloat( split[ 0 ] );
-			const g = parseFloat( split[ 1 ] );
-			const b = parseFloat( split[ 2 ] );
-			maxOutputValue = Math.max( maxOutputValue, r, g, b );
+		const canvas = document.createElement('canvas');
+		canvas.width = width;
+		canvas.height = height;
 
-			const bLayer = index % size;
-			const gLayer = Math.floor( index / size ) % size;
-			const rLayer = Math.floor( index / ( size * size ) ) % size;
+		const context = canvas.getContext('2d');
+		if (this.flip){
 
-			// b grows first, then g, then r
-			const pixelIndex = bLayer * size * size + gLayer * size + rLayer;
-			dataArray[ 4 * pixelIndex + 0 ] = r;
-			dataArray[ 4 * pixelIndex + 1 ] = g;
-			dataArray[ 4 * pixelIndex + 2 ] = b;
-			dataArray[ 4 * pixelIndex + 3 ] = 1.0;
-			index += 1;
+			context.scale(1, -1);
+			context.translate(0, -height);
 
 		}
 
-		// Find the apparent bit depth of the stored RGB values and map the
-		// values to [ 0, 255 ].
-		const bits = Math.ceil( Math.log2( maxOutputValue ) );
-		const maxBitValue = Math.pow( 2.0, bits );
-		for ( let i = 0, l = dataArray.length; i < l; i += 4 ) {
+		for(let i=0; i<width; i++){
 
-			const r = dataArray[ i + 0 ];
-			const g = dataArray[ i + 1 ];
-			const b = dataArray[ i + 2 ];
-			dataArray[ i + 0 ] = 255 * r / maxBitValue; // r
-			dataArray[ i + 1 ] = 255 * g / maxBitValue; // g
-			dataArray[ i + 2 ] = 255 * b / maxBitValue; // b
+			const sy = i * width;
+			const dy = (this.flip) ? height - i * width : i * width;
+			context.drawImage( texture.image, sy, 0, width, width, 0, dy, width, width );
 
 		}
 
+		return context.getImageData(0, 0, width, height);
+    }
+
+    parse(dataArray, size){
 		const data = new Uint8Array( dataArray );
 		const texture = new DataTexture();
 		texture.image.data = data;
