@@ -13,6 +13,12 @@
 			a {
 				color: #08f;
 			}
+			.selectBox {
+				border: 5px solid #55aaff;
+				background-color: rgba(0, 0, 0, 0.3);
+				position: fixed;
+				border-radius: 5px;
+			}
 		</style>
 	</head>
 	<body>
@@ -35,13 +41,16 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-
 			import { DragControls } from 'three/addons/controls/DragControls.js';
-
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { SelectionBox } from 'three/addons/interactive/SelectionBox.js';
+			import { SelectionHelper } from 'three/addons/interactive/SelectionHelper.js';
+			
 			let container;
 			let camera, scene, renderer;
-			let controls, group;
+			let dragControls, group, orbitControls;
 			let enableSelection = false;
+			let selectable = false;
 
 			const objects = [];
 
@@ -111,19 +120,90 @@
 				renderer.shadowMap.type = THREE.PCFShadowMap;
 
 				container.appendChild( renderer.domElement );
+				orbitControls = new OrbitControls( camera, renderer.domElement);
+				orbitControls.update();
+				orbitControls.dampingFactor = 0.1;
+				orbitControls.enableDamping = true;
 
-				controls = new DragControls( [ ... objects ], camera, renderer.domElement );
-				controls.addEventListener( 'drag', render );
-
-				//
+				dragControls = new DragControls( [ ... objects ], camera, renderer.domElement );
+				dragControls.addEventListener('dragstart', function(event){
+					orbitControls.enabled = false;
+				});
+				dragControls.addEventListener('dragend', function(event){
+					orbitControls.enabled = true;
+				});
 
 				window.addEventListener( 'resize', onWindowResize );
-
 				document.addEventListener( 'click', onClick );
 				window.addEventListener( 'keydown', onKeyDown );
 				window.addEventListener( 'keyup', onKeyUp );
 
+				const selectionBox = new SelectionBox( camera, scene );
+				const helper = new SelectionHelper( renderer, 'selectBox' );
+				//helper.enabled = false;
+
+				document.addEventListener( 'pointerdown', function ( event ) {
+
+					if( !selectable ){
+						for ( const item of selectionBox.collection ) {
+							item.material.emissive.set( 0x000000 );
+						}
+						//helper.enabled = false;
+						return;
+					}
+
+					orbitControls.enabled = false;
+					selectionBox.startPoint.set(
+						( event.clientX / window.innerWidth ) * 2 - 1,
+						- ( event.clientY / window.innerHeight ) * 2 + 1,
+					0.5 );
+				});
+
+				document.addEventListener( 'pointermove', function ( event ) {
+
+					if(!selectable)
+					{
+						return
+						//helper.enabled = false;
+					}
+
+					orbitControls.enabled = false;
+					if ( helper.isDown && selectable ) {
+						for ( let i = 0; i < selectionBox.collection.length; i ++ ) {
+							selectionBox.collection[ i ].material.emissive.set( 0x000000 );
+						}
+						selectionBox.endPoint.set(
+						( event.clientX / window.innerWidth ) * 2 - 1,
+						- ( event.clientY / window.innerHeight ) * 2 + 1,
+						0.5 );
+
+						const allSelected = selectionBox.select();
+						for ( let i = 0; i < allSelected.length; i ++ ) {
+							allSelected[ i ].material.emissive.set( 0xffffff );
+						}
+					}		
+				} );
+
+				document.addEventListener( 'pointerup', function ( event ) {
+					if(!selectable)
+					return;
+					selectionBox.endPoint.set(
+						( event.clientX / window.innerWidth ) * 2 - 1,
+						- ( event.clientY / window.innerHeight ) * 2 + 1,
+						0.5 );
+					const allSelected = selectionBox.select();
+					for ( let i = 0; i < allSelected.length; i ++ ) {
+						allSelected[ i ].material.emissive.set( 0xffffff );
+					}
+					orbitControls.enabled = true;
+					//helper.enabled = false;
+				} );
+
+
+
 				render();
+
+
 
 			}
 
@@ -141,14 +221,20 @@
 			function onKeyDown( event ) {
 
 				enableSelection = ( event.keyCode === 16 ) ? true : false;
+				selectable = ( event.keyCode === 17 ) ? true : false;
+				helper.enabled = true;
 
 			}
 
 			function onKeyUp() {
 
 				enableSelection = false;
+				selectable =  false;
+				orbitControls.enabled = true;
+				helper.enabled = false;
 
 			}
+
 
 			function onClick( event ) {
 
@@ -156,7 +242,7 @@
 
 				if ( enableSelection === true ) {
 
-					const draggableObjects = controls.getObjects();
+					const draggableObjects = dragControls.getObjects();
 					draggableObjects.length = 0;
 
 					mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -168,6 +254,7 @@
 
 					if ( intersections.length > 0 ) {
 
+ 						dragControls.enabled = true;
 						const object = intersections[ 0 ].object;
 
 						if ( group.children.includes( object ) === true ) {
@@ -176,20 +263,17 @@
 							scene.attach( object );
 
 						} else {
-
 							object.material.emissive.set( 0xaaaaaa );
 							group.attach( object );
-
 						}
-
-						controls.transformGroup = true;
+						dragControls.transformGroup = true;
 						draggableObjects.push( group );
 
 					}
 
 					if ( group.children.length === 0 ) {
 
-						controls.transformGroup = false;
+						dragControls.transformGroup = false;
 						draggableObjects.push( ...objects );
 
 					}
@@ -205,6 +289,17 @@
 				renderer.render( scene, camera );
 
 			}
+
+
+			function animate() {
+		                requestAnimationFrame(animate);
+		                render();
+						orbitControls.update();
+		                stats.update();
+		        }
+
+			animate();
+
 
 		</script>
 
