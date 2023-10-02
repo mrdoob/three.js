@@ -31,7 +31,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	setupLightingModel( /*builder*/ ) {
 
-		return new PhysicalLightingModel( false, false ); // ( clearcoat, sheen ) -> standard
+		return new PhysicalLightingModel();
 
 	}
 
