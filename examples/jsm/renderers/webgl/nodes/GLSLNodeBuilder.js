@@ -1,4 +1,4 @@
-import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial } from '../../../nodes/Nodes.js';
+import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial, FunctionNode } from '../../../nodes/Nodes.js';
 
 import UniformsGroup from '../../common/UniformsGroup.js';
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
@@ -39,6 +39,36 @@ class GLSLNodeBuilder extends NodeBuilder {
 		if ( node.isOutputStructVar ) return '';
 
 		return super.getPropertyName( node, shaderStage );
+
+	}
+
+	buildFunctionNode( shaderNode ) {
+
+		const layout = shaderNode.layout;
+		const flowData = this.flowShaderNode( shaderNode );
+
+		const parameters = [];
+
+		for ( const input of layout.inputs ) {
+
+			parameters.push( this.getType( input.type ) + ' ' + input.name );
+
+		}
+
+		//
+
+		const code = `${ this.getType( layout.type ) } ${ layout.name }( ${ parameters.join( ', ' ) } ) {
+
+	${ flowData.vars }
+
+${ flowData.code }
+	return ${ flowData.result };
+
+}`;
+
+		//
+
+		return new FunctionNode( code );
 
 	}
 
