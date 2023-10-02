@@ -1680,7 +1680,7 @@ class GLTFMeshGpuInstancing {
 				// Add instance attributes to the geometry, excluding TRS.
 				for ( const attributeName in attributes ) {
 
-					if ( attributeName === 'COLOR' ) {
+					if ( attributeName === '_COLOR_0' ) {
 
 						const attr = attributes[ attributeName ];
 						instancedMesh.instanceColor = new InstancedBufferAttribute( attr.array, attr.itemSize, attr.normalized );
