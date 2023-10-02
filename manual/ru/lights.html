@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -30,14 +26,14 @@
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>Эта статья является частью серии статей о three.js. 
+          <p>Эта статья является частью серии статей о three.js.
 Первая была <a href="fundamentals.html">об основах</a>.
 Если вы её еще не читали, советую вам сделать это.
 <a href="textures.html">Предыдущая статья была о текстурах</a>.</p>
 <p>Давайте рассмотрим, как использовать различные виды освещения в three.js.</p>
-<p>Начинем с одного из наших предыдущих примеров, давайте обновим камеру. 
-Мы установим поле зрения (fov) на 45 градусов, дальнюю плоскость (far) на 100 единиц, 
-и мы переместим камеру на 10 единиц вверх и на 20 единиц назад от начала 
+<p>Начинем с одного из наших предыдущих примеров, давайте обновим камеру.
+Мы установим поле зрения (fov) на 45 градусов, дальнюю плоскость (far) на 100 единиц,
+и мы переместим камеру на 10 единиц вверх и на 20 единиц назад от начала
 координат.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">*const fov = 45;
 const aspect = 2;  // значение по умолчанию для холста
@@ -46,23 +42,23 @@ const near = 0.1;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +camera.position.set(0, 10, 20);
 </pre>
-<p>Далее давайте добавим <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> позволить пользователю вращать 
-или <em>поворачивать</em> камеру вокруг некоторой точки. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> - это 
-дополнительные функции three.js, поэтому сначала нам нужно 
+<p>Далее давайте добавим <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> позволить пользователю вращать
+или <em>поворачивать</em> камеру вокруг некоторой точки. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> - это
+дополнительные функции three.js, поэтому сначала нам нужно
 включить их в нашу страницу.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 +import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 </pre>
-<p>Теперь мы можем использовать их. Мы передаем в <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> камеру для 
+<p>Теперь мы можем использовать их. Мы передаем в <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> камеру для
 управления и элемент DOM для получения входных событий</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 5, 0);
 controls.update();
 </pre>
-<p>Мы также устанавливаем target на 5 орбит вокруг источника, а затем вызываем 
+<p>Мы также устанавливаем target на 5 орбит вокруг источника, а затем вызываем
 <code class="notranslate" translate="no">controls.update</code> чтобы элементы управления использовали новую цель.</p>
-<p>Далее давайте сделаем некоторые вещи, чтобы включить освещение. 
-Сначала мы сделаем плоскость земли. Мы применим крошечную текстуру 
+<p>Далее давайте сделаем некоторые вещи, чтобы включить освещение.
+Сначала мы сделаем плоскость земли. Мы применим крошечную текстуру
 шахматной доски размером 2x2, которая выглядит следующим образом</p>
 <div class="threejs_center">
   <img src="../examples/resources/images/checker.png" class="border" style="
@@ -71,11 +67,11 @@ controls.update();
   ">
 </div>
 
-<p>Сначала мы загружаем текстуру, устанавливаем фильтрацию nearest 
-и устанавливаем число повторений. 
-Поскольку текстура представляет собой шахматную доску размером 2x2 пикселя, 
-при повторении и установке повторения равным половине размера 
-плоскости каждая клетка на шахматной доске будет иметь размер 
+<p>Сначала мы загружаем текстуру, устанавливаем фильтрацию nearest
+и устанавливаем число повторений.
+Поскольку текстура представляет собой шахматную доску размером 2x2 пикселя,
+при повторении и установке повторения равным половине размера
+плоскости каждая клетка на шахматной доске будет иметь размер
 ровно 1 единицу;</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const planeSize = 40;
 
@@ -88,8 +84,8 @@ texture.colorSpace = THREE.SRGBColorSpace;
 const repeats = planeSize / 2;
 texture.repeat.set(repeats, repeats);
 </pre>
-<p>Затем мы создаем геометрию плоскости, материал для плоскости и сетку, 
-чтобы вставить ее в сцену. Плоскости по умолчанию находятся в плоскости 
+<p>Затем мы создаем геометрию плоскости, материал для плоскости и сетку,
+чтобы вставить ее в сцену. Плоскости по умолчанию находятся в плоскости
 XY, но земля находится в плоскости XZ, поэтому мы вращаем ее.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const planeGeo = new THREE.PlaneGeometry(planeSize, planeSize);
 const planeMat = new THREE.MeshPhongMaterial({
@@ -100,7 +96,7 @@ const mesh = new THREE.Mesh(planeGeo, planeMat);
 mesh.rotation.x = Math.PI * -.5;
 scene.add(mesh);
 </pre>
-<p>Давайте добавим куб и сферу, чтобы у нас было 3 вещи для освещения, 
+<p>Давайте добавим куб и сферу, чтобы у нас было 3 вещи для освещения,
 включая плоскость</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const cubeSize = 4;
@@ -129,14 +125,14 @@ const intensity = 1;
 const light = new THREE.AmbientLight(color, intensity);
 scene.add(light);
 </pre>
-<p>Давайте также сделаем так, чтобы мы могли регулировать параметры света. 
-Мы снова будем использовать <a href="https://github.com/georgealways/lil-gui">lil-gui</a>. 
-Чтобы иметь возможность настроить цвет с помощью lil-gui, нам нужен небольшой 
-помощник, который представляет свойство для lil-gui, которое выглядит как 
-шестнадцатеричная цветовая строка CSS (например: <code class="notranslate" translate="no">#FF8844</code>). 
-Наш helper получит цвет из именованного свойства, преобразует его в 
-шестнадцатеричную строку, чтобы предложить lil-gui. Когда lil-gui 
-попытается установить свойство helper'а, мы присвоим результат 
+<p>Давайте также сделаем так, чтобы мы могли регулировать параметры света.
+Мы снова будем использовать <a href="https://github.com/georgealways/lil-gui">lil-gui</a>.
+Чтобы иметь возможность настроить цвет с помощью lil-gui, нам нужен небольшой
+помощник, который представляет свойство для lil-gui, которое выглядит как
+шестнадцатеричная цветовая строка CSS (например: <code class="notranslate" translate="no">#FF8844</code>).
+Наш helper получит цвет из именованного свойства, преобразует его в
+шестнадцатеричную строку, чтобы предложить lil-gui. Когда lil-gui
+попытается установить свойство helper'а, мы присвоим результат
 обратно цвету источника света.</p>
 <p>Вот helper:</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ColorGUIHelper {
@@ -165,18 +161,18 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 
 <p></p>
 <p>Нажмите и перетащите сценy, чтобы вращать камеру.</p>
-<p>Обратите внимание, формы плоские. <a href="/docs/#api/en/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a> только умножил цвет материала 
+<p>Обратите внимание, формы плоские. <a href="/docs/#api/en/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a> только умножил цвет материала
 на цвет света с учетом интенсивности.</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">color = materialColor * light.color * light.intensity;
 </pre><p>Вот и все. У него нет направления.
-Этот стиль окружающего (ambient) освещения на самом деле не так полезен, 
-как освещение, так как он на 100% даже за исключением изменения цвета 
-всего на сцене, не очень похож на освещение. Что помогает, так это 
+Этот стиль окружающего (ambient) освещения на самом деле не так полезен,
+как освещение, так как он на 100% даже за исключением изменения цвета
+всего на сцене, не очень похож на освещение. Что помогает, так это
 делает темные не слишком темными.</p>
 <h2 id="-hemispherelight-"><a href="/docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a></h2>
 <p>Давайте переключим код на <a href="/docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>. <a href="/docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>
-принимает цвет неба и основной цвет и просто умножает цвет материала 
-между этими двумя цветами. Цвет неба, если поверхность объекта направлена 
+принимает цвет неба и основной цвет и просто умножает цвет материала
+между этими двумя цветами. Цвет неба, если поверхность объекта направлена
 ​​вверх, и цвет земли, если поверхность объекта направлена ​​вниз.</p>
 <p>Вот новый код</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const color = 0xFFFFFF;
@@ -201,13 +197,13 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 </div>
 
 <p></p>
-<p>Еще раз обратите внимание, что объема почти нет, все выглядит плоско. 
-<a href="/docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> используется в сочетании с другим светом и может 
-помочь дать хороший вид влияния цвета неба и земли. 
-Таким образом, его лучше всего использовать в сочетании с другим источником 
+<p>Еще раз обратите внимание, что объема почти нет, все выглядит плоско.
+<a href="/docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> используется в сочетании с другим светом и может
+помочь дать хороший вид влияния цвета неба и земли.
+Таким образом, его лучше всего использовать в сочетании с другим источником
 света или заменой <a href="/docs/#api/en/lights/AmbientLight"><code class="notranslate" translate="no">AmbientLight</code></a>.</p>
 <h2 id="-directionallight-"><a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a></h2>
-<p>Давайте переключим код на <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>. 
+<p>Давайте переключим код на <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>.
 <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> часто используется для воспроизведения солнца.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
 const intensity = 1;
@@ -217,9 +213,9 @@ light.target.position.set(-5, 0, 0);
 scene.add(light);
 scene.add(light.target);
 </pre>
-<p>Обратите внимание, что мы должны были добавить <code class="notranslate" translate="no">light</code> и <code class="notranslate" translate="no">light.target</code> 
+<p>Обратите внимание, что мы должны были добавить <code class="notranslate" translate="no">light</code> и <code class="notranslate" translate="no">light.target</code>
 к сцене. <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> будет светить в направлении к своей цели.</p>
-<p>Давайте сделаем так, чтобы мы могли перемещать цель, 
+<p>Давайте сделаем так, чтобы мы могли перемещать цель,
 добавляя ее в наш графический интерфейс.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
@@ -234,18 +230,18 @@ gui.add(light.target.position, 'y', 0, 10);
 </div>
 
 <p></p>
-<p>Трудно понять, что происходит. Three.js имеет несколько вспомогательных 
-объектов, которые мы можем добавить к нашей сцене, чтобы помочь 
-визуализировать невидимые части сцены. В этом случае мы будем 
-использовать тот <a href="/docs/#api/en/helpers/DirectionalLightHelper"><code class="notranslate" translate="no">DirectionalLightHelper</code></a>, который нарисует плоскость, 
-чтобы изобразить источник света, и линию от света к цели. 
+<p>Трудно понять, что происходит. Three.js имеет несколько вспомогательных
+объектов, которые мы можем добавить к нашей сцене, чтобы помочь
+визуализировать невидимые части сцены. В этом случае мы будем
+использовать тот <a href="/docs/#api/en/helpers/DirectionalLightHelper"><code class="notranslate" translate="no">DirectionalLightHelper</code></a>, который нарисует плоскость,
+чтобы изобразить источник света, и линию от света к цели.
 Мы просто передаем ему свет и добавляем его на сцену.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const helper = new THREE.DirectionalLightHelper(light);
 scene.add(helper);
 </pre>
-<p>Пока мы работаем с ним, давайте сделаем так, чтобы мы могли установить 
-как положение источника света, так и цели. Для этого мы сделаем функцию, 
-которая по заданному <a href="/docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a> скорректирует его <code class="notranslate" translate="no">x</code>, <code class="notranslate" translate="no">y</code> и <code class="notranslate" translate="no">z</code> свойства, 
+<p>Пока мы работаем с ним, давайте сделаем так, чтобы мы могли установить
+как положение источника света, так и цели. Для этого мы сделаем функцию,
+которая по заданному <a href="/docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a> скорректирует его <code class="notranslate" translate="no">x</code>, <code class="notranslate" translate="no">y</code> и <code class="notranslate" translate="no">z</code> свойства,
 используя <code class="notranslate" translate="no">lil-gui</code>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeXYZGUI(gui, vector3, name, onChangeFn) {
   const folder = gui.addFolder(name);
@@ -255,11 +251,11 @@ scene.add(helper);
   folder.open();
 }
 </pre>
-<p>Обратите внимание, что нам нужно вызывать <code class="notranslate" translate="no">update</code> функцию помощника 
-каждый раз, когда мы что-то меняем, чтобы помощник знал, что нужно 
-обновить себя. Таким образом, мы передаем <code class="notranslate" translate="no">onChangeFn</code> функцию 
+<p>Обратите внимание, что нам нужно вызывать <code class="notranslate" translate="no">update</code> функцию помощника
+каждый раз, когда мы что-то меняем, чтобы помощник знал, что нужно
+обновить себя. Таким образом, мы передаем <code class="notranslate" translate="no">onChangeFn</code> функцию
 для вызова в любое время, а lil-gui обновляет значение.</p>
-<p>Затем мы можем использовать это как для положения источника света, 
+<p>Затем мы можем использовать это как для положения источника света,
 так и для цели, как тут</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function updateLight() {
 +  light.target.updateMatrixWorld();
@@ -281,12 +277,12 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 </div>
 
 <p></p>
-<p>Вращайтесь по орбите камеры, и это станет легче видеть. Плоскость представляет собой 
-<a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> потому что <em>направленный свет</em> вычисляет свет 
-поступающий в одном направлении. Нет точки откуда исходит свет, 
+<p>Вращайтесь по орбите камеры, и это станет легче видеть. Плоскость представляет собой
+<a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> потому что <em>направленный свет</em> вычисляет свет
+поступающий в одном направлении. Нет точки откуда исходит свет,
 это бесконечная плоскость света, излучающая параллельные лучи света.</p>
 <h2 id="-pointlight-"><a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a></h2>
-<p><a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> - это свет, который сидит в какой-то точке и излучает свет 
+<p><a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> - это свет, который сидит в какой-то точке и излучает свет
 во всех направлениях от этой точки. Давайте изменим код.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
 -const intensity = 1;
@@ -310,12 +306,12 @@ scene.add(helper);
 }
 -updateLight();
 </pre>
-<p>Обратите внимание, что на каком-то уровне <a href="/docs/#api/en/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a> не имеет точки. 
-Он просто рисует маленький каркас ромба. Это может быть любая 
+<p>Обратите внимание, что на каком-то уровне <a href="/docs/#api/en/helpers/PointLightHelper"><code class="notranslate" translate="no">PointLightHelper</code></a> не имеет точки.
+Он просто рисует маленький каркас ромба. Это может быть любая
 форма, которую вы хотите, просто добавьте mesh к самому источнику света.</p>
 <p><a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> имеет дополнительное свойство <a href="/docs/#api/en/lights/PointLight#distance"><code class="notranslate" translate="no">distance</code></a>.
-Если <code class="notranslate" translate="no">distance</code> = 0, то  <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> светит до бесконечности. Если значение 
-<code class="notranslate" translate="no">distance</code> больше 0, то свет излучает свою полную интенсивность и 
+Если <code class="notranslate" translate="no">distance</code> = 0, то  <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> светит до бесконечности. Если значение
+<code class="notranslate" translate="no">distance</code> больше 0, то свет излучает свою полную интенсивность и
 исчезает, с увеличением <code class="notranslate" translate="no">distance</code> вдали от света.</p>
 <p>Давайте настроим графический интерфейс, чтобы мы могли регулировать расстояние.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
@@ -335,11 +331,11 @@ makeXYZGUI(gui, light.position, 'position', updateLight);
 <p></p>
 <p>Обратите внимание, когда <code class="notranslate" translate="no">distance</code> &gt; 0, как свет гаснет.</p>
 <h2 id="-spotlight-"><a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a></h2>
-<p>Прожекторы - это точечный источник света с прикрепленным к нему 
-конусом, который светит только внутри конуса. Там на самом деле 
-2 конуса. Внешний конус и внутренний конус. Между внутренним 
+<p>Прожекторы - это точечный источник света с прикрепленным к нему
+конусом, который светит только внутри конуса. Там на самом деле
+2 конуса. Внешний конус и внутренний конус. Между внутренним
 и внешним конусом свет исчезает от полной интенсивности до нуля.</p>
-<p>Чтобы использовать <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> нам нужна цель, т.к. это направленный свет. 
+<p>Чтобы использовать <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> нам нужна цель, т.к. это направленный свет.
 Конус света открываем по направлению к цели.</p>
 <p>Модификация нашего <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> с помощником сверху</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
@@ -354,15 +350,15 @@ scene.add(light.target);
 +const helper = new THREE.SpotLightHelper(light);
 scene.add(helper);
 </pre>
-<p>Угол конуса прожектора задается с помощью свойства <a href="/docs/#api/en/lights/SpotLight#angle"><code class="notranslate" translate="no">angle</code></a> 
-в радианах. Мы будем использовать наш <code class="notranslate" translate="no">DegRadHelper</code> из 
+<p>Угол конуса прожектора задается с помощью свойства <a href="/docs/#api/en/lights/SpotLight#angle"><code class="notranslate" translate="no">angle</code></a>
+в радианах. Мы будем использовать наш <code class="notranslate" translate="no">DegRadHelper</code> из
 <a href="textures.html">статьи про текстуры</a> для представления пользовательского интерфейса в градусах..</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">gui.add(new DegRadHelper(light, 'angle'), 'value', 0, 90).name('angle').onChange(updateLight);
 </pre>
-<p>Внутренний конус определяется путем установки свойства <a href="/docs/#api/en/lights/SpotLight#penumbra"><code class="notranslate" translate="no">penumbra</code></a> 
-в процентах от внешнего конуса. Другими словами, когда <code class="notranslate" translate="no">penumbra</code> = 0 , то внутренний код 
+<p>Внутренний конус определяется путем установки свойства <a href="/docs/#api/en/lights/SpotLight#penumbra"><code class="notranslate" translate="no">penumbra</code></a>
+в процентах от внешнего конуса. Другими словами, когда <code class="notranslate" translate="no">penumbra</code> = 0 , то внутренний код
 имеет такой же размер (0 = нет разницы) от внешнего конуса. Когда значение
-<code class="notranslate" translate="no">penumbra</code> равно 1, свет гаснет, начиная с центра конуса до внешнего конуса. 
+<code class="notranslate" translate="no">penumbra</code> равно 1, свет гаснет, начиная с центра конуса до внешнего конуса.
 Когда <code class="notranslate" translate="no">penumbra</code> равно .5, то свет гаснет, начиная с 50% между центром внешнего конуса.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">gui.add(light, 'penumbra', 0, 1, 0.01);
 </pre>
@@ -372,14 +368,14 @@ scene.add(helper);
 </div>
 
 <p></p>
-<p>Обратите внимание, что при значении по умолчанию <code class="notranslate" translate="no">penumbra</code> = 0 и прожектор 
-имеет очень резкий край. По мере того, как вы наращиваете <code class="notranslate" translate="no">penumbra</code> к 1 
+<p>Обратите внимание, что при значении по умолчанию <code class="notranslate" translate="no">penumbra</code> = 0 и прожектор
+имеет очень резкий край. По мере того, как вы наращиваете <code class="notranslate" translate="no">penumbra</code> к 1
 края размываются.</p>
-<p>Может быть трудно увидеть <em>конус</em> прожектора. Причина в том, что он ниже земли. 
+<p>Может быть трудно увидеть <em>конус</em> прожектора. Причина в том, что он ниже земли.
 Сократите расстояние до 5, и вы увидите открытый конец конуса.</p>
 <h2 id="-rectarealight-"><a href="/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a></h2>
-<p>Есть еще один тип света - <a href="/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>, который представляет именно то, 
-на что это похоже, прямоугольную область света, такую ​​как длинный флуоресцентный 
+<p>Есть еще один тип света - <a href="/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>, который представляет именно то,
+на что это похоже, прямоугольную область света, такую ​​как длинный флуоресцентный
 свет или, возможно, матовый небесный свет в потолке.</p>
 <p><a href="/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> работает только с <code class="notranslate" translate="no">MeshStandardMaterai</code> и
 <a href="/docs/#api/en/materials/MeshPhysicalMaterial"><code class="notranslate" translate="no">MeshPhysicalMaterial</code></a> поэтому давайте изменим все наши материалы на <a href="/docs/#api/en/materials/MeshStandardMaterial"><code class="notranslate" translate="no">MeshStandardMaterial</code></a></p>
@@ -426,7 +422,7 @@ scene.add(helper);
   const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  RectAreaLightUniformsLib.init();
 </pre>
-<p>Если вы забудете RectAreaLightUniformsLib, индикатор все равно будет работать, 
+<p>Если вы забудете RectAreaLightUniformsLib, индикатор все равно будет работать,
 но он будет выглядеть забавно, поэтому не забудьте включить дополнительный код.</p>
 <p>Теперь мы можем создать свет</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
@@ -443,7 +439,7 @@ scene.add(helper);
 </pre>
 <p>Единственное, что следует заметить, в отличие от <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> и <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>,
 <a href="/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> не использует цель. Он просто использует свой поворот.</p>
-<p>Давайте также настроим графический интерфейс. Мы сделаем так, чтобы мы могли вращать 
+<p>Давайте также настроим графический интерфейс. Мы сделаем так, чтобы мы могли вращать
 свет и регулировать его <code class="notranslate" translate="no">width</code> и <code class="notranslate" translate="no">height</code></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.addColor(new ColorGUIHelper(light, 'color'), 'value').name('color');
@@ -464,8 +460,8 @@ makeXYZGUI(gui, light.position, 'position');
 
 <p></p>
 
-<p>Важно отметить, что каждый источник света, который вы добавляете в сцену, 
-замедляет скорость рендеринга сцены в three.js, поэтому вы всегда должны 
+<p>Важно отметить, что каждый источник света, который вы добавляете в сцену,
+замедляет скорость рендеринга сцены в three.js, поэтому вы всегда должны
 стараться использовать как можно меньше для достижения своих целей.</p>
 <p>Далее давайте перейдем к  <a href="cameras.html">работе с камерами</a>.</p>
 <p><canvas id="c"></canvas></p>
@@ -474,7 +470,7 @@ makeXYZGUI(gui, light.position, 'position');
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

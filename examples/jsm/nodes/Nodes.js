@@ -14,6 +14,7 @@ export { default as ContextNode, context, label } from './core/ContextNode.js';
 export { default as IndexNode, vertexIndex, instanceIndex } from './core/IndexNode.js';
 export { default as LightingModel } from './core/LightingModel.js';
 export { default as Node, addNodeClass, createNodeFromType } from './core/Node.js';
+export { default as VarNode, temp } from './core/VarNode.js';
 export { default as NodeAttribute } from './core/NodeAttribute.js';
 export { default as NodeBuilder } from './core/NodeBuilder.js';
 export { default as NodeCache } from './core/NodeCache.js';
@@ -28,7 +29,6 @@ export { default as PropertyNode, property, output, diffuseColor, roughness, met
 export { default as StackNode, stack } from './core/StackNode.js';
 export { default as TempNode } from './core/TempNode.js';
 export { default as UniformNode, uniform } from './core/UniformNode.js';
-export { default as VarNode, temp } from './core/VarNode.js';
 export { default as VaryingNode, varying } from './core/VaryingNode.js';
 export { default as OutputStructNode, outputStruct } from './core/OutputStructNode.js';
 

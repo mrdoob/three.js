@@ -82,4 +82,4 @@ export default StackNode;
 
 export const stack = nodeProxy( StackNode );
 
-addNodeClass( StackNode );
+addNodeClass( 'StackNode', StackNode );

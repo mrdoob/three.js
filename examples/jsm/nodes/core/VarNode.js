@@ -32,14 +32,7 @@ class VarNode extends Node {
 
 	generate( builder ) {
 
-		const node = this.node;
-		const name = this.name;
-
-		if ( name === null && node.isTempNode === true ) {
-
-			return node.build( builder );
-
-		}
+		const { node, name } = this;
 
 		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ) );
 
@@ -61,4 +54,4 @@ export const temp = nodeProxy( VarNode );
 
 addNodeElement( 'temp', temp );
 
-addNodeClass( VarNode );
+addNodeClass( 'VarNode', VarNode );

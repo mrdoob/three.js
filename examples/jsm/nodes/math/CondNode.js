@@ -83,4 +83,4 @@ export const cond = nodeProxy( CondNode );
 
 addNodeElement( 'cond', cond );
 
-addNodeClass( CondNode );
+addNodeClass( 'CondNode', CondNode );

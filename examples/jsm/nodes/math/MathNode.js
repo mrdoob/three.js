@@ -356,4 +356,4 @@ addNodeElement( 'faceForward', faceForward );
 addNodeElement( 'difference', difference );
 addNodeElement( 'saturate', saturate );
 
-addNodeClass( MathNode );
+addNodeClass( 'MathNode', MathNode );

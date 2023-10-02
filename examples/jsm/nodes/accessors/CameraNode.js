@@ -95,4 +95,4 @@ export const cameraNormalMatrix = nodeImmutable( CameraNode, CameraNode.NORMAL_M
 export const cameraWorldMatrix = nodeImmutable( CameraNode, CameraNode.WORLD_MATRIX );
 export const cameraPosition = nodeImmutable( CameraNode, CameraNode.POSITION );
 
-addNodeClass( CameraNode );
+addNodeClass( 'CameraNode', CameraNode );

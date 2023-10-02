@@ -4,7 +4,7 @@ import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
 class LineMaterialNode extends MaterialNode {
 
-	construct( /*builder*/ ) {
+	setup( /*builder*/ ) {
 
 		return this.getFloat( this.scope );
 
@@ -26,4 +26,4 @@ export const materialLineDashSize = nodeImmutable( LineMaterialNode, LineMateria
 export const materialLineGapSize = nodeImmutable( LineMaterialNode, LineMaterialNode.GAP_SIZE );
 export const materialLineWidth = nodeImmutable( LineMaterialNode, LineMaterialNode.LINEWIDTH );
 
-addNodeClass( LineMaterialNode );
+addNodeClass( 'LineMaterialNode', LineMaterialNode );

@@ -48,7 +48,7 @@ class ColorAdjustmentNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { method, colorNode, adjustmentNode } = this;
 
@@ -97,4 +97,4 @@ addNodeElement( 'saturation', saturation );
 addNodeElement( 'vibrance', vibrance );
 addNodeElement( 'hue', hue );
 
-addNodeClass( ColorAdjustmentNode );
+addNodeClass( 'ColorAdjustmentNode', ColorAdjustmentNode );

@@ -3,7 +3,7 @@
  * Copyright 2010-2023 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '157dev';
+const REVISION = '157';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -2949,20 +2949,29 @@ class RenderTarget extends EventDispatcher {
 
 		}
 
+		options = Object.assign( {
+			generateMipmaps: false,
+			internalFormat: null,
+			minFilter: LinearFilter,
+			depthBuffer: true,
+			stencilBuffer: false,
+			depthTexture: null,
+			samples: 0
+		}, options );
+
 		this.texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
 		this.texture.isRenderTargetTexture = true;
 
 		this.texture.flipY = false;
-		this.texture.generateMipmaps = options.generateMipmaps !== undefined ? options.generateMipmaps : false;
-		this.texture.internalFormat = options.internalFormat !== undefined ? options.internalFormat : null;
-		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
+		this.texture.generateMipmaps = options.generateMipmaps;
+		this.texture.internalFormat = options.internalFormat;
 
-		this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
-		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
+		this.depthBuffer = options.depthBuffer;
+		this.stencilBuffer = options.stencilBuffer;
 
-		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
+		this.depthTexture = options.depthTexture;
 
-		this.samples = options.samples !== undefined ? options.samples : 0;
+		this.samples = options.samples;
 
 	}
 
@@ -34522,7 +34531,8 @@ class CurvePath extends Curve {
 
 		if ( ! startPoint.equals( endPoint ) ) {
 
-			this.curves.push( new LineCurve( endPoint, startPoint ) );
+			const lineType = ( startPoint.isVector2 === true ) ? 'LineCurve' : 'LineCurve3';
+			this.curves.push( new Curves[ lineType ]( endPoint, startPoint ) );
 
 		}
 

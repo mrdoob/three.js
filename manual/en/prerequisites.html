@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -34,10 +30,10 @@
 They assume you know how to program in JavaScript. They assume
 you know what the DOM is, how to write HTML as well as create DOM elements
 in JavaScript. They assume you know how to use
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import">es6 modules</a> 
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import">es6 modules</a>
 via import and via <code class="notranslate" translate="no">&lt;script type="module"&gt;</code> tags. They assume you know how to use import maps.
 They assume you know some CSS and that you know what
-<a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors">CSS selectors are</a>. 
+<a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors">CSS selectors are</a>.
 They also assume you know ES5, ES6 and maybe some ES7.
 They assume you know that the browser runs JavaScript only via events and callbacks.
 They assume you know what a closure is.</p>
@@ -45,8 +41,7 @@ They assume you know what a closure is.</p>
 <h2 id="es6-modules">es6 modules</h2>
 <p>es6 modules can be loaded via the <code class="notranslate" translate="no">import</code> keyword in a script
 or inline via a <code class="notranslate" translate="no">&lt;script type="module"&gt;</code> tag. Here's an example</p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"&gt;&lt;/script&gt;
-
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">
 &lt;script type="importmap"&gt;
 {
   "imports": {
@@ -116,7 +111,7 @@ like</p>
 </pre><p>doesn't work as someone inexperienced might expect because when
 <code class="notranslate" translate="no">loader.load</code> calls the callback it's not calling it with the dot <code class="notranslate" translate="no">.</code> operator
 so by default <code class="notranslate" translate="no">this</code> will be null (unless the loader explicitly sets it to something).
-If you want <code class="notranslate" translate="no">this</code> to be <code class="notranslate" translate="no">someobject</code> when the callback happens you need to 
+If you want <code class="notranslate" translate="no">this</code> to be <code class="notranslate" translate="no">someobject</code> when the callback happens you need to
 tell JavaScript that by binding it to the function.</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no"> const callback = someobject.somefunction.bind(someobject);
  loader.load(callback);
@@ -134,8 +129,8 @@ the time. Use <code class="notranslate" translate="no">let</code> in those cases
 }
 </pre>
 <h3 id="use-foreach-map-and-filter-where-useful">Use <code class="notranslate" translate="no">forEach</code>, <code class="notranslate" translate="no">map</code>, and <code class="notranslate" translate="no">filter</code>  where useful</h3>
-<p>Arrays added the functions <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach"><code class="notranslate" translate="no">forEach</code></a>, 
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"><code class="notranslate" translate="no">map</code></a>, and 
+<p>Arrays added the functions <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach"><code class="notranslate" translate="no">forEach</code></a>,
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"><code class="notranslate" translate="no">map</code></a>, and
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"><code class="notranslate" translate="no">filter</code></a> and
 are used fairly extensively in modern JavaScript.</p>
 <h3 id="use-destructuring">Use destructuring</h3>
@@ -208,7 +203,7 @@ someMesh.position.set(...position);
 </pre>
 <p>or copy an array</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const copiedPositionArray = [...position];
-copiedPositionArray.push(4); // [1,2,3,4] 
+copiedPositionArray.push(4); // [1,2,3,4]
 console.log(position); // [1,2,3] position is unaffected
 </pre>
 <p>or to merge objects</p>
@@ -322,7 +317,7 @@ to disable
 them</a>
 for a single line or a section of code.</p>
 <h1 id="if-you-really-need-to-support-legacy-browsers-use-a-transpiler">If you really need to support legacy browsers use a transpiler</h1>
-<p>Most modern browsers are auto-updated so using all these features will help you 
+<p>Most modern browsers are auto-updated so using all these features will help you
 be productive and avoid bugs. That said, if you're on a project that absolutely
 must support old browsers there are <a href="https://babeljs.io">tools that will take your ES5/ES6/ES7 code
 and transpile the code back to pre ES5 Javascript</a>.</p>
@@ -330,7 +325,7 @@ and transpile the code back to pre ES5 Javascript</a>.</p>
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

@@ -177,38 +177,18 @@ class PhysicalLightingModel extends LightingModel {
 
 	}
 
-	init( { reflectedLight }, stack ) {
+	start( /*context*/ ) {
 
 		if ( this.clearcoat === true ) {
 
-			this.clearcoatRadiance = vec3().temp();
-			this.clearcoatSpecular = vec3().temp();
-
-			const dotNVcc = transformedClearcoatNormalView.dot( positionViewDirection ).clamp();
-
-			const Fcc = F_Schlick( {
-				dotVH: dotNVcc,
-				f0: clearcoatF0,
-				f90: clearcoatF90
-			} );
-
-			const outgoingLight = reflectedLight.total;
-			const clearcoatLight = outgoingLight.mul( clearcoat.mul( Fcc ).oneMinus() ).add( this.clearcoatSpecular.mul( clearcoat ) );
-
-			stack.assign( outgoingLight, clearcoatLight );
+			this.clearcoatRadiance = vec3().temp( 'clearcoatRadiance' );
+			this.clearcoatSpecular = vec3().temp( 'clearcoatSpecular' )
 
 		}
 
 		if ( this.sheen === true ) {
 
-			this.sheenSpecular = vec3().temp();
-
-			const outgoingLight = reflectedLight.total;
-
-			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( 0.157 ).oneMinus();
-			const sheenLight = outgoingLight.mul( sheenEnergyComp ).add( this.sheenSpecular );
-
-			stack.assign( outgoingLight, sheenLight );
+			this.sheenSpecular = vec3().temp( 'sheenSpecular' );
 
 		}
 
@@ -306,8 +286,8 @@ class PhysicalLightingModel extends LightingModel {
 
 		// Both indirect specular and indirect diffuse light accumulate here
 
-		const singleScattering = vec3().temp();
-		const multiScattering = vec3().temp();
+		const singleScattering = vec3().temp( 'singleScattering' );
+		const multiScattering = vec3().temp( 'multiScattering' );
 		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
 
 		this.computeMultiscattering( stack, singleScattering, multiScattering );
@@ -333,8 +313,38 @@ class PhysicalLightingModel extends LightingModel {
 		const aoNode = ambientOcclusion.sub( aoNV.pow( aoExp ).oneMinus() ).clamp();
 
 		stack.mulAssign( reflectedLight.indirectDiffuse, ambientOcclusion );
-
 		stack.mulAssign( reflectedLight.indirectSpecular, aoNode );
+
+	}
+
+	finish( context, stack ) {
+
+		const { outgoingLight } = context;
+
+		if ( this.clearcoat === true ) {
+
+			const dotNVcc = transformedClearcoatNormalView.dot( positionViewDirection ).clamp();
+
+			const Fcc = F_Schlick( {
+				dotVH: dotNVcc,
+				f0: clearcoatF0,
+				f90: clearcoatF90
+			} );
+
+			const clearcoatLight = outgoingLight.mul( clearcoat.mul( Fcc ).oneMinus() ).add( this.clearcoatSpecular.mul( clearcoat ) );
+
+			stack.assign( outgoingLight, clearcoatLight );
+
+		}
+
+		if ( this.sheen === true ) {
+
+			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( 0.157 ).oneMinus();
+			const sheenLight = outgoingLight.mul( sheenEnergyComp ).add( this.sheenSpecular );
+
+			stack.assign( outgoingLight, sheenLight );
+
+		}
 
 	}
 

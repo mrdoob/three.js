@@ -15,7 +15,7 @@ class ModelViewProjectionNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		return cameraProjectionMatrix.mul( modelViewMatrix ).mul( this.positionNode );
 
@@ -27,4 +27,4 @@ export default ModelViewProjectionNode;
 
 export const modelViewProjection = nodeProxy( ModelViewProjectionNode );
 
-addNodeClass( ModelViewProjectionNode );
+addNodeClass( 'ModelViewProjectionNode', ModelViewProjectionNode );

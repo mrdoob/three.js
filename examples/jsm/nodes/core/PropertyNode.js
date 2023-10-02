@@ -9,6 +9,8 @@ class PropertyNode extends Node {
 
 		this.name = name;
 
+		this.isPropertyNode = true;
+
 	}
 
 	getHash( builder ) {
@@ -51,4 +53,4 @@ export const output = nodeImmutable( PropertyNode, 'vec4', 'Output' );
 export const dashSize = nodeImmutable( PropertyNode, 'float', 'dashSize' );
 export const gapSize = nodeImmutable( PropertyNode, 'float', 'gapSize' );
 
-addNodeClass( PropertyNode );
+addNodeClass( 'PropertyNode', PropertyNode );

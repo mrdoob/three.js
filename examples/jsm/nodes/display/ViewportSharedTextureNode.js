@@ -28,4 +28,4 @@ export const viewportSharedTexture = nodeProxy( ViewportSharedTextureNode );
 
 addNodeElement( 'viewportSharedTexture', viewportSharedTexture );
 
-addNodeClass( ViewportSharedTextureNode );
+addNodeClass( 'ViewportSharedTextureNode', ViewportSharedTextureNode );

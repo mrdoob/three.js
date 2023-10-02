@@ -55,4 +55,4 @@ class TempNode extends Node {
 
 export default TempNode;
 
-addNodeClass( TempNode );
+addNodeClass( 'TempNode', TempNode );

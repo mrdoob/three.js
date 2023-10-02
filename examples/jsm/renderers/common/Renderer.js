@@ -46,6 +46,8 @@ class Renderer {
 		this.depth = true;
 		this.stencil = true;
 
+		this.info = new Info();
+
 		// internals
 
 		this._pixelRatio = 1;
@@ -56,7 +58,6 @@ class Renderer {
 		this._scissor = new Vector4( 0, 0, this._width, this._height );
 		this._scissorTest = false;
 
-		this._info = null;
 		this._properties = null;
 		this._attributes = null;
 		this._geometries = null;
@@ -131,15 +132,14 @@ class Renderer {
 
 			}
 
-			this._info = new Info();
 			this._nodes = new Nodes( this, backend );
 			this._attributes = new Attributes( backend );
 			this._background = new Background( this, this._nodes );
-			this._geometries = new Geometries( this._attributes, this._info );
-			this._textures = new Textures( backend, this._info );
+			this._geometries = new Geometries( this._attributes, this.info );
+			this._textures = new Textures( backend, this.info );
 			this._pipelines = new Pipelines( backend, this._nodes );
-			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this._info );
-			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this._info );
+			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
+			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this.info );
 			this._renderLists = new RenderLists();
 			this._renderContexts = new RenderContexts();
 
@@ -214,9 +214,9 @@ class Renderer {
 
 		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-		if ( this._info.autoReset === true ) this._info.reset();
+		if ( this.info.autoReset === true ) this.info.reset();
 
-		this._info.render.frame ++;
+		this.info.render.frame ++;
 
 		//
 
@@ -612,12 +612,13 @@ class Renderer {
 
 	dispose() {
 
+		this.info.dispose();
+
 		this._objects.dispose();
 		this._properties.dispose();
 		this._pipelines.dispose();
 		this._nodes.dispose();
 		this._bindings.dispose();
-		this._info.dispose();
 		this._renderLists.dispose();
 		this._renderContexts.dispose();
 		this._textures.dispose();
@@ -921,7 +922,7 @@ class Renderer {
 
 		//
 
-		this.backend.draw( renderObject, this._info );
+		this.backend.draw( renderObject, this.info );
 
 	}
 

@@ -37,7 +37,7 @@ class AnalyticLightNode extends LightingNode {
 
 	}
 
-	constructShadow( builder ) {
+	setupShadow( builder ) {
 
 		let shadowNode = this.shadowNode;
 
@@ -136,9 +136,9 @@ class AnalyticLightNode extends LightingNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
-		if ( this.light.castShadow ) this.constructShadow( builder );
+		if ( this.light.castShadow ) this.setupShadow( builder );
 
 	}
 
@@ -181,4 +181,4 @@ class AnalyticLightNode extends LightingNode {
 
 export default AnalyticLightNode;
 
-addNodeClass( AnalyticLightNode );
+addNodeClass( 'AnalyticLightNode', AnalyticLightNode );

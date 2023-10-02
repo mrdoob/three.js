@@ -53,9 +53,9 @@ class LoopNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
-		// construct properties
+		// setup properties
 
 		this.getProperties( builder );
 
@@ -183,4 +183,4 @@ export const loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params
 
 addNodeElement( 'loop', ( returns, ...params ) => bypass( returns, loop( ...params ) ) );
 
-addNodeClass( LoopNode );
+addNodeClass( 'LoopNode', LoopNode );

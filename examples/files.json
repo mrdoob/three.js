@@ -308,12 +308,12 @@
 		"webgl2_volume_perlin"
 	],
 	"webgpu (wip)": [
-		"webgpu_audio_processing",
 		"webgpu_backdrop",
 		"webgpu_backdrop_area",
 		"webgpu_clearcoat",
-		"webgpu_compute",
+		"webgpu_compute_audio",
 		"webgpu_compute_particles",
+		"webgpu_compute_points",
 		"webgpu_compute_texture",
 		"webgpu_compute_texture_pingpong",
 		"webgpu_cubemap_adjustments",
@@ -409,6 +409,7 @@
 		"misc_exporter_ply",
 		"misc_exporter_stl",
 		"misc_exporter_usdz",
+		"misc_exporter_exr",
 		"misc_lookat"
 	],
 	"css2d": [

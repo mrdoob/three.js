@@ -11,6 +11,8 @@ import { getVectorLength, getStrideLength } from '../../common/BufferUtils.js';
 
 import { NodeBuilder, CodeNode, NodeMaterial } from '../../../nodes/Nodes.js';
 
+import { getFormat } from '../utils/WebGPUTextureUtils.js';
+
 import WGSLNodeParser from './WGSLNodeParser.js';
 
 const gpuShaderStageLib = {
@@ -582,7 +584,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 					let attributesSnippet = `@location( ${index} )`;
 
-					if ( varying.type === 'int' || varying.type === 'uint' ) {
+					if ( /^(int|uint|ivec|uvec)/.test( varying.type ) ) {
 
 						attributesSnippet += ' @interpolate( flat )';
 
@@ -659,8 +661,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				} else if ( uniform.node.isStoreTextureNode === true ) {
 
-					// @TODO: Add support for other formats
-					textureType = 'texture_storage_2d<rgba8unorm, write>';
+					const format = getFormat( texture );
+
+					textureType = 'texture_storage_2d<' + format + ', write>';
 
 				} else {
 

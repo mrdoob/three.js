@@ -49,7 +49,7 @@ class MaterialNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const material = builder.context.material;
 		const scope = this.scope;
@@ -274,4 +274,4 @@ export const materialIridescence = nodeImmutable( MaterialNode, MaterialNode.IRI
 export const materialIridescenceIOR = nodeImmutable( MaterialNode, MaterialNode.IRIDESCENCE_IOR );
 export const materialIridescenceThickness = nodeImmutable( MaterialNode, MaterialNode.IRIDESCENCE_THICKNESS );
 
-addNodeClass( MaterialNode );
+addNodeClass( 'MaterialNode', MaterialNode );

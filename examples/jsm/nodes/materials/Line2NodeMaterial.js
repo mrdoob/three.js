@@ -44,13 +44,13 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.dashSizeNode = null;
 		this.gapSizeNode = null;
 
-		this.constructShaders();
+		this.setupShaders();
 
 		this.setValues( params );
 
 	}
 
-	constructShaders() {
+	setupShaders() {
 
 		const useAlphaToCoverage = this.alphaToCoverage;
 		const useColor = this.useColor;
@@ -83,7 +83,6 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			stack.assign( start, modelViewMatrix.mul( vec4( instanceStart, 1.0 ) ) ); // force assignment into correct place in flow
 			stack.assign( end, modelViewMatrix.mul( vec4( instanceEnd, 1.0 ) ) );
-
 
 			if ( useWorldUnits ) {
 
@@ -124,7 +123,7 @@ class Line2NodeMaterial extends NodeMaterial {
 			const ndcEnd = clipEnd.xyz.div( clipEnd.w );
 
 			// direction
-			const dir = ndcEnd.xy.sub( ndcStart.xy );
+			const dir = ndcEnd.xy.sub( ndcStart.xy ).temp();
 
 			// account for clip-space aspect ratio
 			stack.assign( dir.x, dir.x.mul( aspect ) );
@@ -400,7 +399,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		if ( this.useWorldUnits !== value ) {
 
 			this.useWorldUnits = value;
-			this.constructShaders();
+			this.setupShaders();
 
 		}
 
@@ -418,7 +417,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		if ( this.useDash !== value ) {
 
 			this.useDash = value;
-			this.constructShaders();
+			this.setupShaders();
 
 		}
 
@@ -436,7 +435,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		if ( this.useAlphaToCoverage !== value ) {
 
 			this.useAlphaToCoverage = value;
-			this.constructShaders();
+			this.setupShaders();
 
 		}
 
@@ -446,4 +445,4 @@ class Line2NodeMaterial extends NodeMaterial {
 
 export default Line2NodeMaterial;
 
-addNodeMaterial( Line2NodeMaterial );
+addNodeMaterial( 'Line2NodeMaterial', Line2NodeMaterial );

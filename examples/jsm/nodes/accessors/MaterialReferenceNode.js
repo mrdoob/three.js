@@ -23,13 +23,13 @@ class MaterialReferenceNode extends ReferenceNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const material = this.material !== null ? this.material : builder.material;
 
 		this.node.value = material[ this.property ];
 
-		return super.construct( builder );
+		return super.setup( builder );
 
 	}
 
@@ -39,4 +39,4 @@ export default MaterialReferenceNode;
 
 export const materialReference = ( name, type, material ) => nodeObject( new MaterialReferenceNode( name, type, material ) );
 
-addNodeClass( MaterialReferenceNode );
+addNodeClass( 'MaterialReferenceNode', MaterialReferenceNode );

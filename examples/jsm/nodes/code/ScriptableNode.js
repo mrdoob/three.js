@@ -431,7 +431,7 @@ class ScriptableNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		return this.getDefaultOutputNode();
 
@@ -485,4 +485,4 @@ export const scriptable = nodeProxy( ScriptableNode );
 
 addNodeElement( 'scriptable', scriptable );
 
-addNodeClass( ScriptableNode );
+addNodeClass( 'ScriptableNode', ScriptableNode );
