@@ -333,9 +333,9 @@ class WebGLBackend extends Backend {
 
 		let mode;
 		if ( object.isPoints ) mode = gl.POINTS;
+		else if ( object.isLineSegments ) mode = gl.LINES;
 		else if ( object.isLine ) mode = gl.LINE_STRIP;
 		else if ( object.isLineLoop ) mode = gl.LINE_LOOP;
-		else if ( object.isLineSegments ) mode = gl.LINES;
 		else mode = gl.TRIANGLES;
 
 		//
