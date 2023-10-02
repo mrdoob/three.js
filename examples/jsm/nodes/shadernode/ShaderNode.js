@@ -38,7 +38,7 @@ const shaderNodeHandler = {
 
 				const nodeElement = NodeElements.get( prop );
 
-				return ( ...params ) => nodeElement( nodeObj, ...params );
+				return node.isStackNode ? ( ...params ) => nodeObj.add( nodeElement( ...params ) ) : ( ...params ) => nodeElement( nodeObj, ...params );
 
 			} else if ( prop === 'self' ) {
 
