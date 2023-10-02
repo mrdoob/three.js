@@ -686,7 +686,6 @@ class NodeBuilder {
 		if ( nodeVar === undefined ) {
 
 			const vars = this.vars[ shaderStage ] || ( this.vars[ shaderStage ] = [] );
-			const index = vars.length;
 
 			if ( name === null ) name = 'nodeVar' + vars.length;
 
