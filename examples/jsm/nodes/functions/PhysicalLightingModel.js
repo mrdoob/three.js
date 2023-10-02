@@ -161,7 +161,7 @@ const clearcoatF90 = vec3( 1 );
 
 class PhysicalLightingModel extends LightingModel {
 
-	constructor( clearcoat = true, sheen = true, iridescence = true ) {
+	constructor( clearcoat = false, sheen = false, iridescence = false ) {
 
 		super();
 
