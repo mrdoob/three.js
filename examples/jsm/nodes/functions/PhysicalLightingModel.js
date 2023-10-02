@@ -163,7 +163,7 @@ const IBLSheenBRDF = tslFn( ( { normal, viewDir, roughness } ) => {
 
 	return DG.mul( 1.0 / Math.PI ).saturate();
 
-} )
+} );
 
 const clearcoatF0 = vec3( 0.04 );
 const clearcoatF90 = vec3( 1 );
