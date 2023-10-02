@@ -97,6 +97,7 @@ const shaderNodeHandler = {
 };
 
 const nodeObjectsCacheMap = new WeakMap();
+const nodeBuilderFunctionsCacheMap = new WeakMap();
 
 const ShaderNodeObject = function ( obj, altType = null ) {
 
@@ -109,6 +110,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 		if ( nodeObject === undefined ) {
 
 			nodeObject = new Proxy( obj, shaderNodeHandler );
+
 			nodeObjectsCacheMap.set( obj, nodeObject );
 			nodeObjectsCacheMap.set( nodeObject, nodeObject );
 
@@ -219,6 +221,32 @@ class ShaderCallNodeInternal extends Node {
 
 		const { shaderNode, inputNodes } = this;
 
+		if ( shaderNode.layout ) {
+
+			let functionNodesCacheMap = nodeBuilderFunctionsCacheMap.get( builder.constructor );
+
+			if ( functionNodesCacheMap === undefined ) {
+
+				functionNodesCacheMap = new WeakMap();
+
+				nodeBuilderFunctionsCacheMap.set( builder.constructor, functionNodesCacheMap );
+
+			}
+
+			let functionNode = functionNodesCacheMap.get( shaderNode );
+
+			if ( functionNode === undefined ) {
+
+				functionNode = nodeObject( builder.buildFunctionNode( shaderNode ) );
+
+				functionNodesCacheMap.set( shaderNode, functionNode );
+
+			}
+
+			return nodeObject( functionNode.call( nodeObjects( inputNodes ) ) );
+
+		}
+
 		const jsFunc = shaderNode.jsFunc;
 		const outputNode = inputNodes !== null ? jsFunc( nodeObjects( inputNodes ), builder.stack, builder ) : jsFunc( builder.stack, builder );
 
@@ -261,6 +289,15 @@ class ShaderNodeInternal extends Node {
 		super();
 
 		this.jsFunc = jsFunc;
+		this.layout = null;
+
+	}
+
+	setLayout( layout ) {
+
+		this.layout = layout;
+
+		return this;
 
 	}
 
@@ -395,7 +432,18 @@ export const tslFn = ( jsFunc ) => {
 
 	const shaderNode = new ShaderNode( jsFunc );
 
-	return ( inputs ) => shaderNode.call( inputs );
+	const fn = ( inputs ) => shaderNode.call( inputs );
+	fn.shaderNode = shaderNode;
+
+	fn.setLayout = ( layout ) => {
+
+		shaderNode.setLayout( layout );
+
+		return fn;
+
+	}
+
+	return fn;
 
 };
 

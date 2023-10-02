@@ -13,6 +13,13 @@ const D_GGX = tslFn( ( inputs ) => {
 
 	return a2.div( denom.pow2() ).mul( 1 / Math.PI );
 
+} ).setLayout( {
+	name: 'D_GGX',
+	type: 'float',
+	inputs: [
+		{ name: 'alpha', type: 'float' },
+		{ name: 'dotNH', type: 'float' }
+	]
 } ); // validated
 
 export default D_GGX;
