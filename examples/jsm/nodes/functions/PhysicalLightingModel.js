@@ -182,7 +182,7 @@ class PhysicalLightingModel extends LightingModel {
 		if ( this.clearcoat === true ) {
 
 			this.clearcoatRadiance = vec3().temp( 'clearcoatRadiance' );
-			this.clearcoatSpecular = vec3().temp( 'clearcoatSpecular' )
+			this.clearcoatSpecular = vec3().temp( 'clearcoatSpecular' );
 
 		}
 
