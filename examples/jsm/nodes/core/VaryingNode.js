@@ -11,6 +11,8 @@ class VaryingNode extends Node {
 		this.node = node;
 		this.name = name;
 
+		this.isVaryingNode = true;
+
 	}
 
 	isGlobal() {

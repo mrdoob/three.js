@@ -10,21 +10,7 @@ class VarNode extends Node {
 		this.node = node;
 		this.name = name;
 
-	}
-
-	assign( node ) {
-
-		node.traverse( ( childNode, replaceNode ) => {
-
-			if ( replaceNode && childNode.uuid === this.uuid ) {
-
-				replaceNode( this.node );
-
-			}
-
-		} );
-		this.node = node;
-		return this;
+		this.isVarNode = true;
 
 	}
 
@@ -48,14 +34,7 @@ class VarNode extends Node {
 
 	generate( builder ) {
 
-		const node = this.node;
-		const name = this.name;
-
-		if ( name === null && node.isTempNode === true ) {
-
-			return node.build( builder );
-
-		}
+		const { node, name } = this;
 
 		const type = builder.getVectorType( this.getNodeType( builder ) );
 

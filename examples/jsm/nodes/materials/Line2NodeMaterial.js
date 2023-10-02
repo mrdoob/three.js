@@ -84,7 +84,6 @@ class Line2NodeMaterial extends NodeMaterial {
 			stack.assign( start, modelViewMatrix.mul( vec4( instanceStart, 1.0 ) ) ); // force assignment into correct place in flow
 			stack.assign( end, modelViewMatrix.mul( vec4( instanceEnd, 1.0 ) ) );
 
-
 			if ( useWorldUnits ) {
 
 				stack.assign( varying( vec3(), 'worldStart' ), start.xyz );
@@ -124,7 +123,7 @@ class Line2NodeMaterial extends NodeMaterial {
 			const ndcEnd = clipEnd.xyz.div( clipEnd.w );
 
 			// direction
-			const dir = ndcEnd.xy.sub( ndcStart.xy );
+			const dir = ndcEnd.xy.sub( ndcStart.xy ).temp();
 
 			// account for clip-space aspect ratio
 			stack.assign( dir.x, dir.x.mul( aspect ) );

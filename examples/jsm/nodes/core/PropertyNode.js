@@ -9,6 +9,8 @@ class PropertyNode extends Node {
 
 		this.name = name;
 
+		this.isPropertyNode = true;
+
 	}
 
 	getHash( builder ) {

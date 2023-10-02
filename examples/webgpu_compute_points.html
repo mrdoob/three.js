@@ -80,7 +80,7 @@
 					const pointer = uniform( pointerVector );
 					const limit = uniform( scaleVector );
 
-					const position = particle.add( velocity );
+					const position = particle.add( velocity ).temp();
 
 					stack.assign( velocity.x, position.x.abs().greaterThanEqual( limit.x ).cond( velocity.x.negate(), velocity.x ) );
 					stack.assign( velocity.y, position.y.abs().greaterThanEqual( limit.y ).cond( velocity.y.negate(), velocity.y ) );

@@ -86,7 +86,7 @@ NormalNode.WORLD = 'world';
 export default NormalNode;
 
 export const normalGeometry = nodeImmutable( NormalNode, NormalNode.GEOMETRY );
-export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL );
+export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL ).temp( 'Normal' );
 export const normalView = nodeImmutable( NormalNode, NormalNode.VIEW );
 export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );
 export const transformedNormalView = property( 'vec3', 'TransformedNormalView' );

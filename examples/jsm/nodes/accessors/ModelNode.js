@@ -1,6 +1,5 @@
 import Object3DNode from './Object3DNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { label } from '../core/ContextNode.js';
 import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
 class ModelNode extends Object3DNode {
@@ -24,7 +23,7 @@ class ModelNode extends Object3DNode {
 export default ModelNode;
 
 export const modelDirection = nodeImmutable( ModelNode, ModelNode.DIRECTION );
-export const modelViewMatrix = label( nodeImmutable( ModelNode, ModelNode.VIEW_MATRIX ), 'modelViewMatrix' );
+export const modelViewMatrix = nodeImmutable( ModelNode, ModelNode.VIEW_MATRIX ).temp( 'ModelViewMatrix' );
 export const modelNormalMatrix = nodeImmutable( ModelNode, ModelNode.NORMAL_MATRIX );
 export const modelWorldMatrix = nodeImmutable( ModelNode, ModelNode.WORLD_MATRIX );
 export const modelPosition = nodeImmutable( ModelNode, ModelNode.POSITION );

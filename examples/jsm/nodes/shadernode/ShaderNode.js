@@ -48,7 +48,7 @@ const shaderNodeHandler = {
 
 				const nodeElement = NodeElements.get( prop.slice( 0, prop.length - 'Assign'.length ) );
 
-				return ( ...params ) => nodeObj.assign( nodeElement( nodeObj, ...params ) );
+				return node.isStackNode ? ( ...params ) => nodeObj.assign( params[ 0 ], nodeElement( ...params ) ) : ( ...params ) => nodeObj.assign( nodeElement( nodeObj, ...params ) );
 
 			} else if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true ) {
 
