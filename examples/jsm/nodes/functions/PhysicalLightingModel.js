@@ -9,7 +9,7 @@ import LightingModel from '../core/LightingModel.js';
 import { diffuseColor, specularColor, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness } from '../core/PropertyNode.js';
 import { transformedNormalView, transformedClearcoatNormalView } from '../accessors/NormalNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
-import { float, vec3, mat3 } from '../shadernode/ShaderNode.js';
+import { tslFn, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
 import { cond } from '../math/CondNode.js';
 import { mix, smoothstep } from '../math/MathNode.js';
 
@@ -56,11 +56,12 @@ const evalSensitivity = ( OPD, shift ) => {
 	xyz = vec3( xyz.x.add( x ), xyz.y, xyz.z ).div( 1.0685e-7 );
 
 	const rgb = XYZ_TO_REC709.mul( xyz );
+
 	return rgb;
 
 };
 
-const evalIridescence = ( outsideIOR, eta2, cosTheta1, thinFilmThickness, baseF0 ) => {
+const evalIridescence = tslFn( ( { outsideIOR, eta2, cosTheta1, thinFilmThickness, baseF0 } ) => {
 
 	// Force iridescenceIOR -> outsideIOR when thinFilmThickness -> 0.0
 	const iridescenceIOR = mix( outsideIOR, eta2, smoothstep( 0.0, 0.03, thinFilmThickness ) );
@@ -121,7 +122,17 @@ const evalIridescence = ( outsideIOR, eta2, cosTheta1, thinFilmThickness, baseF0
 	// Since out of gamut colors might be produced, negative color values are clamped to 0.
 	return I.max( vec3( 0.0 ) );
 
-};
+} ).setLayout( {
+	name: 'evalIridescence',
+	type: 'vec3',
+	inputs: [
+		{ name: 'outsideIOR', type: 'float' },
+		{ name: 'eta2', type: 'float' },
+		{ name: 'cosTheta1', type: 'float' },
+		{ name: 'thinFilmThickness', type: 'float' },
+		{ name: 'baseF0', type: 'vec3' }
+	]
+} );
 
 //
 //	Sheen
@@ -130,7 +141,7 @@ const evalIridescence = ( outsideIOR, eta2, cosTheta1, thinFilmThickness, baseF0
 // This is a curve-fit approxmation to the "Charlie sheen" BRDF integrated over the hemisphere from
 // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF". The analysis can be found
 // in the Sheen section of https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
-const IBLSheenBRDF = ( normal, viewDir, roughness ) => {
+const IBLSheenBRDF = tslFn( ( { normal, viewDir, roughness } ) => {
 
 	const dotNV = normal.dot( viewDir ).saturate();
 
@@ -152,7 +163,7 @@ const IBLSheenBRDF = ( normal, viewDir, roughness ) => {
 
 	return DG.mul( 1.0 / Math.PI ).saturate();
 
-};
+} );
 
 const clearcoatF0 = vec3( 0.04 );
 const clearcoatF90 = vec3( 1 );
@@ -196,7 +207,14 @@ class PhysicalLightingModel extends LightingModel {
 
 			const dotNVi = transformedNormalView.dot( positionViewDirection ).clamp();
 
-			this.iridescenceFresnel = evalIridescence( float( 1.0 ), iridescenceIOR, dotNVi, iridescenceThickness, specularColor );
+			this.iridescenceFresnel = evalIridescence( {
+				outsideIOR: float( 1.0 ),
+				eta2: iridescenceIOR,
+				cosTheta1: dotNVi,
+				thinFilmThickness: iridescenceThickness,
+				baseF0: specularColor
+			} );
+
 			this.iridescenceF0 = Schlick_to_F0( { f: this.iridescenceFresnel, f90: 1.0, dotVH: dotNVi } );
 
 		}
@@ -209,7 +227,9 @@ class PhysicalLightingModel extends LightingModel {
 
 	computeMultiscattering( stack, singleScatter, multiScatter, specularF90 = float( 1 ) ) {
 
-		const fab = DFGApprox( { roughness } );
+		const dotNV = transformedNormalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
+
+		const fab = DFGApprox( { roughness, dotNV } );
 
 		const Fr = this.iridescenceF0 ? iridescence.mix( specularColor, this.iridescenceF0 ) : specularColor;
 
@@ -264,7 +284,11 @@ class PhysicalLightingModel extends LightingModel {
 
 			stack.addAssign( this.sheenSpecular, iblIrradiance.mul(
 				sheen,
-				IBLSheenBRDF( transformedNormalView, positionViewDirection, sheenRoughness )
+				IBLSheenBRDF( {
+					normal: transformedNormalView,
+					viewDir: positionViewDirection,
+					roughness: sheenRoughness
+				} )
 			) );
 
 		}

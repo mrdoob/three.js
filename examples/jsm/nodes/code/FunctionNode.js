@@ -81,7 +81,7 @@ class FunctionNode extends CodeNode {
 
 		}
 
-		nodeCode.code = code;
+		nodeCode.code = code + '\n';
 
 		if ( output === 'property' ) {
 
