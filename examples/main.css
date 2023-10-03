@@ -89,16 +89,3 @@ a, button, input, select {
 	margin-top: 20px;
 	padding: 10px;
 }
-
-/* Normalize https://w3c.github.io/mathml-core/#fractions-mfrac */
-mfrac {
-  padding-inline-start: 1px;
-  padding-inline-end: 1px;
-}
-mfrac > * {
-  math-depth: auto-add;
-  math-style: compact;
-}
-mfrac > :nth-child(2) {
-  math-shift: compact;
-}
