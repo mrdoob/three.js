@@ -12,10 +12,13 @@ import {
 } from 'three';
 
 export class LUTImageLoader extends Loader {
-	constructor( flipVertical = true ){
+
+	constructor( flipVertical = true ) {
+
 		super();
 
 		this.flip = flipVertical;
+
 	}
 
 	load( url, onLoad, onProgress, onError ) {
@@ -23,24 +26,23 @@ export class LUTImageLoader extends Loader {
 		const loader = new TextureLoader( this.manager );
 
 		loader.setPath( this.path );
-
 		loader.load( url, texture => {
 
 			try {
 
 				let imageData;
 
-				if (texture.image.width < texture.image.height ){
+				if ( texture.image.width < texture.image.height ) {
 
 					imageData = this.getImageData( texture );
 
-				}else{
+				} else {
 
 					imageData = this.horz2Vert( texture );
 
 				}
-				
-				onLoad( this.parse( imageData.data, Math.min(texture.image.width, texture.image.height ) ) );
+
+				onLoad( this.parse( imageData.data, Math.min( texture.image.width, texture.image.height ) ) );
 
 			} catch ( e ) {
 
@@ -63,55 +65,61 @@ export class LUTImageLoader extends Loader {
 	}
 
 	getImageData( texture ) {
+
 		const width = texture.image.width;
 		const height = texture.image.height;
 
-		const canvas = document.createElement('canvas');
+		const canvas = document.createElement( 'canvas' );
 		canvas.width = width;
 		canvas.height = height;
 
-		const context = canvas.getContext('2d');
+		const context = canvas.getContext( '2d' );
 
-		if (this.flip){
+		if ( this.flip === true ) {
 
-			context.scale(1, -1);
-            context.translate(0, -height);
+			context.scale( 1, - 1 );
+			context.translate( 0, - height );
 
 		}
 
 		context.drawImage( texture.image, 0, 0 );
 
-		return context.getImageData(0, 0, width, height);
-    }
-		
-    horz2Vert( texture ){
+		return context.getImageData( 0, 0, width, height );
+
+	}
+
+	horz2Vert( texture ) {
+
 		const width = texture.image.height;
 		const height = texture.image.width;
 
-		const canvas = document.createElement('canvas');
+		const canvas = document.createElement( 'canvas' );
 		canvas.width = width;
 		canvas.height = height;
 
-		const context = canvas.getContext('2d');
-		if (this.flip){
+		const context = canvas.getContext( '2d' );
 
-			context.scale(1, -1);
-			context.translate(0, -height);
+		if ( this.flip === true ) {
+
+			context.scale( 1, - 1 );
+			context.translate( 0, - height );
 
 		}
 
-		for(let i=0; i<width; i++){
+		for ( let i = 0; i < width; i ++ ) {
 
 			const sy = i * width;
-			const dy = (this.flip) ? height - i * width : i * width;
+			const dy = ( this.flip ) ? height - i * width : i * width;
 			context.drawImage( texture.image, sy, 0, width, width, 0, dy, width, width );
 
 		}
 
-		return context.getImageData(0, 0, width, height);
-    }
+		return context.getImageData( 0, 0, width, height );
 
-    parse(dataArray, size){
+	}
+
+	parse( dataArray, size ) {
+
 		const data = new Uint8Array( dataArray );
 		const texture = new DataTexture();
 		texture.image.data = data;
