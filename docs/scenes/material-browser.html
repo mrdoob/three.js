@@ -352,6 +352,7 @@
 				// folder.add( material, 'polygonOffsetFactor' );
 				// folder.add( material, 'polygonOffsetUnits' );
 				folder.add( material, 'alphaTest', 0, 1 ).step( 0.01 ).onChange( needsUpdate( material, geometry ) );
+				folder.add( material, 'alphaHash' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'visible' );
 				folder.add( material, 'side', constants.side ).onChange( needsUpdate( material, geometry ) );
 

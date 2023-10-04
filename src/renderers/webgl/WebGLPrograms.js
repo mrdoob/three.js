@@ -500,6 +500,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 16 );
 		if ( parameters.anisotropy )
 			_programLayers.enable( 17 );
+		if ( parameters.alphaHash )
+			_programLayers.enable( 18 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();
