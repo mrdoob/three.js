@@ -42,35 +42,6 @@
 				background-color: #fff;
 				z-index: -1;
 			}
-
-			.math {
-				text-align: center;
-			}
-
-			.math-frac {
-				display: inline-block;
-				vertical-align: middle;
-			}
-
-			.math-num {
-				display: block;
-			}
-
-			.math-denom {
-				display: block;
-				border-top: 1px solid;
-			}
-
-			.math-sqrt {
-				display: inline-block;
-				transform: scale(1, 1.3);
-			}
-
-			.math-sqrt-stem {
-				display: inline-block;
-				border-top: 1px solid;
-				margin-top: 5px;
-			}
 		</style>
 	</head>
 	<body>
@@ -282,52 +253,85 @@
 
 		<p>Sound waves whose geometry is determined by a single dimension, plane waves, obey the wave equation</p>
 
-		<!-- css math formatting inspired by http://mathquill.com/mathquill/mathquill.css -->
+		<math display="block">
+			<mfrac>
+				<mrow>
+					<msup>
+						<mi>&part;</mi>
+						<mn>2</mn>
+					</msup>
+					<mi>u</mi>
+				</mrow>
+				<mrow>
+					<mi>&part;</mi>
+					<msup>
+						<mi>r</mi>
+						<mn>2</mn>
+					</msup>
+				</mrow>
+			</mfrac>
+			<mo>&minus;</mo>
+			<mfrac>
+				<mn>1</mn>
+				<msup>
+					<mi>c</mi>
+					<mn>2</mn>
+				</msup>
+			</mfrac>
+			<mo>&sdot;</mo>
+			<mfrac>
+				<mrow>
+					<msup>
+						<mi>&part;</mi>
+						<mn>2</mn>
+					</msup>
+					<mi>u</mi>
+				</mrow>
+				<mrow>
+					<mi>&part;</mi>
+					<msup>
+						<mi>t</mi>
+						<mn>2</mn>
+					</msup>
+				</mrow>
+			</mfrac>
+			<mo>=</mo>
+			<mn>0</mn>
+		</math>
 
-		<div class="math">
+		<p>where <math><mi>c</mi></math> designates the speed of sound in the medium. The monochromatic solution for plane waves will be taken to be</p>
 
-			<span class="math-frac">
-				<span class="math-num">
-					&part;<sup>2</sup><i>u</i>
-				</span>
-				<span class="math-denom">
-					&part;<i>r</i><sup>2</sup>
-				</span>
-			</span>
+		<math display="block">
+			<mi>u</mi>
+			<mo>(</mo>
+			<mi>r</mi>
+			<mo>,</mo>
+			<mi>t</mi>
+			<mo>)</mo>
+			<mo>=</mo>
+			<mi>sin</mi>
+			<mo>(</mo>
+			<mi>k</mi>
+			<mi>r</mi>
+			<mo>&plusmn;</mo>
+			<mi>&omega;</mi>
+			<mi>t</mi>
+			<mo>)</mo>
+		</math>
 
-			&minus;
+		<p>
+			where <math><mi>&omega;</mi></math> is the frequency and 
 
-			<span class="math-frac">
-				<span class="math-num">
-					1<sup></sup> <!-- sup for vertical alignment -->
-				</span>
-				<span class="math-denom">
-					<i>c</i><sup>2</sup>
-				</span>
-			</span>
+			<math>
+				<mi>k</mi>
+				<mo>=</mo>
+				<mi>&omega;</mi>
+				<mo>/</mo>
+				<mi>c</mi>
+			</math>
 
-			<span class="math-frac">
-				<span class="math-num">
-					&part;<sup>2</sup><i>u</i>
-				</span>
-				<span class="math-denom">
-					&part;<i>t</i><sup>2</sup>
-				</span>
-			</span>
-
-			=&nbsp;0
-
-		</div>
-
-		<p>where <i>c</i> designates the speed of sound in the medium. The monochromatic solution for plane waves will be taken to be</p>
-
-		<div class="math">
-
-			<i>u</i>(<i>r</i>,<i>t</i>)&thinsp;=&nbsp;sin(<i>k</i><i>r</i>&thinsp;&plusmn;&thinsp;&omega;<i>t</i>)
-
-		</div>
-
-		<p>where &omega; is the frequency and <i>k</i>=&omega;/<i>c</i> is the wave number. The sign chosen in the argument determines the direction of movement of the waves.</p>
+			is the wave number. The sign chosen in the argument determines the direction of movement of the waves.
+		</p>
 
 		<p>Here is a plane wave moving on a three-dimensional lattice of atoms:</p>
 
@@ -372,77 +376,104 @@
 
 		<p>Sound waves whose geometry is determined by two dimensions, cylindrical waves, obey the wave equation</p>
 
-		<div class="math">
-
-			<span class="math-frac">
-				<span class="math-num">
-					&part;<sup>2</sup><i>u</i>
-				</span>
-				<span class="math-denom">
-					&part;<i>r</i><sup>2</sup>
-				</span>
-			</span>
-
-			&plus;
-
-			<span class="math-frac">
-				<span class="math-num">
-					1
-				</span>
-				<span class="math-denom">
-					<i>r</i>
-				</span>
-			</span>
-
-			<span class="math-frac">
-				<span class="math-num">
-					&part;<i>u</i>
-				</span>
-				<span class="math-denom">
-					&part;<i>r</i>
-				</span>
-			</span>
-
-			&minus;
-
-			<span class="math-frac">
-				<span class="math-num">
-					1<sup></sup> <!-- sup for vertical alignment -->
-				</span>
-				<span class="math-denom">
-					<i>c</i><sup>2</sup>
-				</span>
-			</span>
-
-			<span class="math-frac">
-				<span class="math-num">
-					&part;<sup>2</sup><i>u</i>
-				</span>
-				<span class="math-denom">
-					&part;<i>t</i><sup>2</sup>
-				</span>
-			</span>
-
-			=&nbsp;0
-
-		</div>
+		<math display="block">
+			<mfrac>
+				<mrow>
+					<msup>
+						<mi>&part;</mi>
+						<mn>2</mn>
+					</msup>
+					<mi>u</mi>
+				</mrow>
+				<mrow>
+					<mi>&part;</mi>
+					<msup>
+						<mi>r</mi>
+						<mn>2</mn>
+					</msup>
+				</mrow>
+			</mfrac>
+			<mo>+</mo>
+			<mfrac>
+				<mrow>
+					<mn>1</mn>
+				</mrow>
+				<mrow>
+					<mi>r</mi>
+				</mrow>
+			</mfrac>
+			<mo>&sdot;</mo>
+			<mfrac>
+				<mrow>
+					<mi>&part;</mi>
+					<mi>u</mi>
+				</mrow>
+				<mrow>
+					<mi>&part;</mi>
+					<mi>r</mi>
+				</mrow>
+			</mfrac>
+			<mo>&minus;</mo>
+			<mfrac>
+				<mrow>
+					<mn>1</mn>
+				</mrow>
+				<mrow>
+					<msup>
+						<mi>c</mi>
+						<mn>2</mn>
+					</msup>
+				</mrow>
+			</mfrac>
+			<mo>&sdot;</mo>
+			<mfrac>
+				<mrow>
+					<msup>
+						<mi>&part;</mi>
+						<mn>2</mn>
+					</msup>
+					<mi>u</mi>
+				</mrow>
+				<mrow>
+					<mi>&part;</mi>
+					<msup>
+						<mi>t</mi>
+						<mn>2</mn>
+					</msup>
+				</mrow>
+			</mfrac>
+			<mo>=</mo>
+			<mn>0</mn>
+		</math>
 
 		<p>The monochromatic solution for cylindrical sound waves will be taken to be</p>
 
-		<div class="math">
-
-			<i>u</i>(<i>r</i>,<i>t</i>)&thinsp;=
-
-			<span class="math-frac">
-				<span class="math-num">
-					sin(<i>k</i><i>r</i>&thinsp;&plusmn;&thinsp;&omega;<i>t</i>)
-				</span>
-				<span class="math-denom">
-					<span class="math-sqrt">&radic;</span><span class="math-sqrt-stem"><i>r</i></span>
-				</span>
-			</span>
-
-		</div>
+		<math display="block">
+			<mi>u</mi>
+			<mo stretchy="false">(</mo>
+			<mi>r</mi>
+			<mo>,</mo>
+			<mi>t</mi>
+			<mo stretchy="false">)</mo>
+			<mo>=</mo>
+			<mfrac>
+				<mrow>
+					<mi>sin</mi>
+					<mo>(</mo>
+					<mi>k</mi>
+					<mi>r</mi>
+					<mo>&plusmn;</mo>
+					<mi>&omega;</mi>
+					<mi>t</mi>
+					<mo>)</mo>
+				</mrow>
+				<mrow>
+					<msqrt>
+						<mi>r</mi>
+					</msqrt>
+				</mrow>
+			</mfrac>
+		</math>
 
 		<p>Here is a cylindrical wave moving on a three-dimensional lattice of atoms:</p>
 
@@ -508,77 +539,102 @@
 
 		<p>Sound waves whose geometry is determined by three dimensions, spherical waves, obey the wave equation</p>
 
-		<div class="math">
-
-			<span class="math-frac">
-				<span class="math-num">
-					&part;<sup>2</sup><i>u</i>
-				</span>
-				<span class="math-denom">
-					&part;<i>r</i><sup>2</sup>
-				</span>
-			</span>
-
-			&plus;
-
-			<span class="math-frac">
-				<span class="math-num">
-					2
-				</span>
-				<span class="math-denom">
-					<i>r</i>
-				</span>
-			</span>
-
-			<span class="math-frac">
-				<span class="math-num">
-					&part;<i>u</i>
-				</span>
-				<span class="math-denom">
-					&part;<i>r</i>
-				</span>
-			</span>
-
-			&minus;
-
-			<span class="math-frac">
-				<span class="math-num">
-					1<sup></sup> <!-- sup for vertical alignment -->
-				</span>
-				<span class="math-denom">
-					<i>c</i><sup>2</sup>
-				</span>
-			</span>
-
-			<span class="math-frac">
-				<span class="math-num">
-					&part;<sup>2</sup><i>u</i>
-				</span>
-				<span class="math-denom">
-					&part;<i>t</i><sup>2</sup>
-				</span>
-			</span>
-
-			=&nbsp;0
-
-		</div>
+		<math display="block">
+			<mfrac>
+				<mrow>
+					<msup>
+						<mi>&part;</mi>
+						<mn>2</mn>
+					</msup>
+					<mi>u</mi>
+				</mrow>
+				<mrow>
+					<mi>&part;</mi>
+					<msup>
+						<mi>r</mi>
+						<mn>2</mn>
+					</msup>
+				</mrow>
+			</mfrac>
+			<mo>+</mo>
+			<mfrac>
+				<mrow>
+					<mn>2</mn>
+				</mrow>
+				<mrow>
+					<mi>r</mi>
+				</mrow>
+			</mfrac>
+			<mo>&sdot;</mo>
+			<mfrac>
+				<mrow>
+					<mi>&part;</mi>
+					<mi>u</mi>
+				</mrow>
+				<mrow>
+					<mi>&part;</mi>
+					<mi>r</mi>
+				</mrow>
+			</mfrac>
+			<mo>&minus;</mo>
+			<mfrac>
+				<mrow>
+					<mn>1</mn>
+				</mrow>
+				<mrow>
+					<msup>
+						<mi>c</mi>
+						<mn>2</mn>
+					</msup>
+				</mrow>
+			</mfrac>
+			<mo>&sdot;</mo>
+			<mfrac>
+				<mrow>
+					<msup>
+						<mi>&part;</mi>
+						<mn>2</mn>
+					</msup>
+					<mi>u</mi>
+				</mrow>
+				<mrow>
+					<mi>&part;</mi>
+					<msup>
+						<mi>t</mi>
+						<mn>2</mn>
+					</msup>
+				</mrow>
+			</mfrac>
+			<mo>=</mo>
+			<mn>0</mn>
+		</math>
 
 		<p>The monochromatic solution for spherical sound waves will be taken to be</p>
 
-		<div class="math">
-
-			<i>u</i>(<i>r</i>,<i>t</i>)&thinsp;=
-
-			<span class="math-frac">
-				<span class="math-num">
-					sin(<i>k</i><i>r</i>&thinsp;&plusmn;&thinsp;&omega;<i>t</i>)
-				</span>
-				<span class="math-denom">
-					<i>r</i>
-				</span>
-			</span>
-
-		</div>
+		<math display="block">
+			<mi>u</mi>
+			<mo stretchy="false">(</mo>
+			<mi>r</mi>
+			<mo>,</mo>
+			<mi>t</mi>
+			<mo stretchy="false">)</mo>
+			<mo>=</mo>
+			<mfrac>
+				<mrow>
+					<mi>sin</mi>
+					<mo>(</mo>
+					<mi>k</mi>
+					<mi>r</mi>
+					<mo>&plusmn;</mo>
+					<mi>&omega;</mi>
+					<mi>t</mi>
+					<mo>)</mo>
+				</mrow>
+				<mrow>
+					<mi>r</mi>
+				</mrow>
+			</mfrac>
+		</math>
 
 		<p>Here is a spherical wave moving on a three-dimensional lattice of atoms:</p>
 
