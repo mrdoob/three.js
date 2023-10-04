@@ -22,28 +22,27 @@ export function decompress( texture, maxTextureSize = Infinity, renderer = null 
 	if ( ! fullscreenQuadMaterial ) fullscreenQuadMaterial = new ShaderMaterial( {
 		uniforms: { blitTexture: new Uniform( texture ) },
 		vertexShader: `
-            varying vec2 vUv;
-            void main(){
-                vUv = uv;
-                gl_Position = vec4(position.xy * 1.0,0.,.999999);
-            }`,
+			varying vec2 vUv;
+			void main(){
+				vUv = uv;
+				gl_Position = vec4(position.xy * 1.0,0.,.999999);
+			}`,
 		fragmentShader: `
-            uniform sampler2D blitTexture; 
-            varying vec2 vUv;
+			uniform sampler2D blitTexture; 
+			varying vec2 vUv;
 
-            void main(){ 
-                gl_FragColor = vec4(vUv.xy, 0, 1);
-                
-                #ifdef IS_SRGB
-                gl_FragColor = LinearTosRGB( texture2D( blitTexture, vUv) );
-                #else
-                gl_FragColor = texture2D( blitTexture, vUv);
-                #endif
-            }`
+			void main(){
+				#ifdef IS_SRGB
+				gl_FragColor = LinearTosRGB( texture2D( blitTexture, vUv) );
+				#else
+				gl_FragColor = texture2D( blitTexture, vUv);
+				#endif
+			}`
 	} );
 
 	fullscreenQuadMaterial.uniforms.blitTexture.value = texture;
-	fullscreenQuadMaterial.defines.IS_SRGB = texture.colorSpace == SRGBColorSpace;
+	const IS_SRGB = texture.colorSpace == SRGBColorSpace;
+	fullscreenQuadMaterial.defines.IS_SRGB = IS_SRGB;
 	fullscreenQuadMaterial.needsUpdate = true;
 
 	if ( ! fullscreenQuad ) {
@@ -70,24 +69,24 @@ export function decompress( texture, maxTextureSize = Infinity, renderer = null 
 	renderer.clear();
 
 	const renderTarget = new WebGLRenderTarget(width, height, {
-        stencilBuffer: true,
-        colorSpace: LinearSRGBColorSpace,
-    });
-    renderer.setRenderTarget(renderTarget);
+		stencilBuffer: true,
+		colorSpace: IS_SRGB ? SRGBColorSpace : LinearSRGBColorSpace,
+	});
+	renderer.setRenderTarget(renderTarget);
 	renderer.render( _scene, _camera );
 	renderer.setRenderTarget(null);
 
 	const pixelBuffer = new Uint8Array(width * height * 4);
-    renderer.readRenderTargetPixels(
-        renderTarget,
-        0, 0,
-        width, height,
-        pixelBuffer
-    );
-    const imageData = new ImageData(new Uint8ClampedArray(pixelBuffer), width, height);
+	renderer.readRenderTargetPixels(
+		renderTarget,
+		0, 0,
+		width, height,
+		pixelBuffer
+	);
+	const imageData = new ImageData(new Uint8ClampedArray(pixelBuffer), width, height);
 
-    renderTarget.texture.image = imageData;
-    renderTarget.dispose();
+	renderTarget.texture.image = imageData;
+	renderTarget.dispose();
 
 	const readableTexture = renderTarget.texture;
 
