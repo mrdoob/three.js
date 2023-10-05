@@ -62,28 +62,28 @@ export function decompress( texture, maxTextureSize = Infinity, renderer = null 
 
 	}
 
-	const width = Math.min(texture.image.width, maxTextureSize);
-	const height = Math.min(texture.image.height, maxTextureSize);
+	const width = Math.min( texture.image.width, maxTextureSize );
+	const height = Math.min( texture.image.height, maxTextureSize );
 
 	renderer.setSize( width, height );
 	renderer.clear();
 
-	const renderTarget = new WebGLRenderTarget(width, height, {
+	const renderTarget = new WebGLRenderTarget( width, height, {
 		stencilBuffer: true,
 		colorSpace: IS_SRGB ? SRGBColorSpace : LinearSRGBColorSpace,
-	});
-	renderer.setRenderTarget(renderTarget);
+	} );
+	renderer.setRenderTarget( renderTarget );
 	renderer.render( _scene, _camera );
-	renderer.setRenderTarget(null);
+	renderer.setRenderTarget( null );
 
-	const pixelBuffer = new Uint8Array(width * height * 4);
+	const pixelBuffer = new Uint8Array( width * height * 4 );
 	renderer.readRenderTargetPixels(
 		renderTarget,
 		0, 0,
 		width, height,
 		pixelBuffer
 	);
-	const imageData = new ImageData(new Uint8ClampedArray(pixelBuffer), width, height);
+	const imageData = new ImageData( new Uint8ClampedArray( pixelBuffer ), width, height );
 
 	renderTarget.texture.image = imageData;
 	renderTarget.dispose();
