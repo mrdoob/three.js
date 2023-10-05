@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -70,7 +66,7 @@ keyboard events. The only thing they can generally do is respond
 to messages sent to them and send messages back to the page.</p>
 <p>To send a message to a worker we call <a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker/postMessage"><code class="notranslate" translate="no">worker.postMessage</code></a> and
 pass it 1 or 2 arguments. The first argument is a JavaScript object
-that will be <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">cloned</a> 
+that will be <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">cloned</a>
 and sent to the worker. The second argument is an optional array
 of objects that are part of the first object that we want <em>transferred</em>
 to the worker. These objects will not be cloned. Instead they will be <em>transferred</em>
@@ -99,7 +95,7 @@ self.onmessage = function(e) {
 </pre>
 <p>You can see above we just look up the handler based on the <code class="notranslate" translate="no">type</code> pass it the <code class="notranslate" translate="no">data</code>
 that was sent from the main page.</p>
-<p>So now we just need to start changing the <code class="notranslate" translate="no">main</code> we pasted into 
+<p>So now we just need to start changing the <code class="notranslate" translate="no">main</code> we pasted into
 <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> from <a href="responsive.html">the responsive article</a>.</p>
 <p>Instead of looking up the canvas from the DOM we'll receive it from the
 event data.</p>
@@ -125,7 +121,7 @@ and <code class="notranslate" translate="no">canvas.clientHeight</code> as those
   return needResize;
 }
 </pre>
-<p>Instead we'll need to send sizes as they change to the worker. 
+<p>Instead we'll need to send sizes as they change to the worker.
 So, let's add some global state and keep the width and height there.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const state = {
   width: 300,  // canvas default
@@ -529,7 +525,7 @@ function startMainPage(canvas) {
   console.log('using regular canvas');  /* eslint-disable-line no-console */
 }
 </pre>
-<p>Then we can copy in all the mouse handling code to the main page and 
+<p>Then we can copy in all the mouse handling code to the main page and
 make just minor changes to use <code class="notranslate" translate="no">sendMouse</code></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function setPickPosition(event) {
   const pos = getCanvasRelativePosition(event);
@@ -580,7 +576,7 @@ and the keyboard.</p>
 without re-writing all the OrbitControls code to work with it.
 The OrbitControls take an <code class="notranslate" translate="no">HTMLElement</code> to which they attach most
 of the DOM events they use. Maybe we could pass in our own
-object that has the same API surface as a DOM element. 
+object that has the same API surface as a DOM element.
 We only need to support the features the OrbitControls need.</p>
 <p>Digging through the <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js">OrbitControls source code</a>
 it looks like we need to handle the following events.</p>
@@ -595,9 +591,9 @@ it looks like we need to handle the following events.</p>
 <li>wheel</li>
 <li>keydown</li>
 </ul>
-<p>For the pointer events we need the <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>, 
+<p>For the pointer events we need the <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>,
 <code class="notranslate" translate="no">button</code>, <code class="notranslate" translate="no">pointerType</code>, <code class="notranslate" translate="no">clientX</code>, <code class="notranslate" translate="no">clientY</code>, <code class="notranslate" translate="no">pageX</code>, and <code class="notranslate" translate="no">pageY</code>, properties.</p>
-<p>For the keydown events we need the <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>, 
+<p>For the keydown events we need the <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>,
 and <code class="notranslate" translate="no">keyCode</code> properties.</p>
 <p>For the wheel event we only need the <code class="notranslate" translate="no">deltaY</code> property.</p>
 <p>And for the touch events we only need <code class="notranslate" translate="no">pageX</code> and <code class="notranslate" translate="no">pageY</code> from
@@ -1054,7 +1050,7 @@ code we'll re-use our proxy for both problems.</p>
 <p>This will give the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> something to inspect which
 matches their expectations.</p>
 <p>I know that was kind of hard to follow. The short version is:
-<code class="notranslate" translate="no">ElementProxy</code> runs on the main page and forwards DOM events 
+<code class="notranslate" translate="no">ElementProxy</code> runs on the main page and forwards DOM events
 to <code class="notranslate" translate="no">ElementProxyReceiver</code> in the worker which
 masquerades as an <code class="notranslate" translate="no">HTMLElement</code> that we can use both with the
 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> and with our own code.</p>
@@ -1076,13 +1072,13 @@ All we have to do is pass the canvas itself as our <code class="notranslate" tra
 <p>This is probably the most complicated example on this site. It's a
 little hard to follow because there are 3 files involved for each
 sample. The HTML file, the worker file, the shared three.js code.</p>
-<p>I hope it wasn't too difficult to understand and that it provided some 
+<p>I hope it wasn't too difficult to understand and that it provided some
 useful examples of working with three.js, OffscreenCanvas and web workers.</p>
 
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

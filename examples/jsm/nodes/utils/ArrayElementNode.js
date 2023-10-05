@@ -10,6 +10,8 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 		this.node = node;
 		this.indexNode = indexNode;
 
+		this.isArrayElementNode = true;
+
 	}
 
 	getNodeType( builder ) {
@@ -38,4 +40,4 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 export default ArrayElementNode;
 
-addNodeClass( ArrayElementNode );
+addNodeClass( 'ArrayElementNode', ArrayElementNode );

@@ -24,10 +24,9 @@ class EnvironmentNode extends LightingNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		let envNode = this.envNode;
-		const properties = builder.getNodeProperties( this );
 
 		if ( envNode.isTextureNode && envNode.value.isCubeTexture !== true ) {
 
@@ -62,9 +61,11 @@ class EnvironmentNode extends LightingNode {
 
 		//
 
-		builder.context.radiance.addAssign( isolateRadiance );
+		const { stack } = builder;
 
-		builder.context.iblIrradiance.addAssign( irradiance );
+		stack.addAssign( builder.context.radiance, isolateRadiance );
+
+		stack.addAssign( builder.context.iblIrradiance, irradiance );
 
 		//
 
@@ -75,14 +76,9 @@ class EnvironmentNode extends LightingNode {
 			const clearcoatRadianceContext = context( envNode, createRadianceContext( clearcoatRoughness, transformedClearcoatNormalView ) ).mul( intensity );
 			const isolateClearcoatRadiance = cache( clearcoatRadianceContext );
 
-			clearcoatRadiance.addAssign( isolateClearcoatRadiance );
+			stack.addAssign( clearcoatRadiance, isolateClearcoatRadiance );
 
 		}
-
-		//
-
-		properties.radiance = isolateRadiance;
-		properties.irradiance = irradiance;
 
 	}
 
@@ -188,4 +184,4 @@ const createIrradianceContext = ( normalWorldNode ) => {
 
 export default EnvironmentNode;
 
-addNodeClass( EnvironmentNode );
+addNodeClass( 'EnvironmentNode', EnvironmentNode );

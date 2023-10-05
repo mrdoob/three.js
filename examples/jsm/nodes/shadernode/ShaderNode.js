@@ -4,6 +4,7 @@ import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
 import SplitNode from '../utils/SplitNode.js';
 import AssignNode from '../core/AssignNode.js';
+import SetNode from '../utils/SetNode.js';
 import ConstNode from '../core/ConstNode.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 
@@ -18,9 +19,11 @@ export function addNodeElement( name, nodeElement ) {
 
 }
 
+const parseSwizzle = ( props ) => props.replace( /r|s/g, 'x' ).replace( /g|t/g, 'y' ).replace( /b|p/g, 'z' ).replace( /a|q/g, 'w' );
+
 const shaderNodeHandler = {
 
-	construct( NodeClosure, params ) {
+	setup( NodeClosure, params ) {
 
 		const inputs = params.shift();
 
@@ -36,7 +39,7 @@ const shaderNodeHandler = {
 
 				const nodeElement = NodeElements.get( prop );
 
-				return ( ...params ) => nodeElement( nodeObj, ...params );
+				return node.isStackNode ? ( ...params ) => nodeObj.add( nodeElement( ...params ) ) : ( ...params ) => nodeElement( nodeObj, ...params );
 
 			} else if ( prop === 'self' ) {
 
@@ -46,25 +49,37 @@ const shaderNodeHandler = {
 
 				const nodeElement = NodeElements.get( prop.slice( 0, prop.length - 'Assign'.length ) );
 
-				return ( ...params ) => nodeObj.assign( nodeElement( nodeObj, ...params ) );
+				return node.isStackNode ? ( ...params ) => nodeObj.assign( params[ 0 ], nodeElement( ...params ) ) : ( ...params ) => nodeObj.assign( nodeElement( nodeObj, ...params ) );
 
 			} else if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true ) {
 
 				// accessing properties ( swizzle )
 
-				prop = prop
-					.replace( /r|s/g, 'x' )
-					.replace( /g|t/g, 'y' )
-					.replace( /b|p/g, 'z' )
-					.replace( /a|q/g, 'w' );
+				prop = parseSwizzle( prop );
 
 				return nodeObject( new SplitNode( nodeObj, prop ) );
 
-			} else if ( prop === 'width' || prop === 'height' ) {
+			} else if ( /^set[XYZWRGBASTPQ]{1,4}$/.test( prop ) === true ) {
+
+				// set properties ( swizzle )
+
+				prop = parseSwizzle( prop.slice( 3 ).toLowerCase() );
+
+				// sort to xyzw sequence
+
+				prop = prop.split( '' ).sort().join( '' );
+
+				return ( value ) => nodeObject( new SetNode( node, prop, value ) );
+
+			} else if ( prop === 'width' || prop === 'height' || prop === 'depth' ) {
 
 				// accessing property
 
-				return nodeObject( new SplitNode( nodeObj, prop === 'width' ? 'x' : 'y' ) );
+				if ( prop === 'width' ) prop = 'x';
+				else if ( prop === 'height' ) prop = 'y';
+				else if ( prop === 'depth' ) prop = 'z';
+
+				return nodeObject( new SplitNode( node, prop ) );
 
 			} else if ( /^\d+$/.test( prop ) === true ) {
 
@@ -103,6 +118,7 @@ const shaderNodeHandler = {
 };
 
 const nodeObjectsCacheMap = new WeakMap();
+const nodeBuilderFunctionsCacheMap = new WeakMap();
 
 const ShaderNodeObject = function ( obj, altType = null ) {
 
@@ -115,6 +131,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 		if ( nodeObject === undefined ) {
 
 			nodeObject = new Proxy( obj, shaderNodeHandler );
+
 			nodeObjectsCacheMap.set( obj, nodeObject );
 			nodeObjectsCacheMap.set( nodeObject, nodeObject );
 
@@ -202,21 +219,14 @@ const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
 };
 
-class ShaderNodeInternal extends Node {
+class ShaderCallNodeInternal extends Node {
 
-	constructor( jsFunc ) {
+	constructor( shaderNode, inputNodes ) {
 
 		super();
 
-		this._jsFunc = jsFunc;
-
-	}
-
-	call( inputs, stack, builder ) {
-
-		inputs = nodeObjects( inputs );
-
-		return nodeObject( this._jsFunc( inputs, stack, builder ) );
+		this.shaderNode = shaderNode;
+		this.inputNodes = inputNodes;
 
 	}
 
@@ -228,13 +238,99 @@ class ShaderNodeInternal extends Node {
 
 	}
 
-	construct( builder ) {
+	call( builder ) {
+
+		const { shaderNode, inputNodes } = this;
+
+		if ( shaderNode.layout ) {
+
+			let functionNodesCacheMap = nodeBuilderFunctionsCacheMap.get( builder.constructor );
+
+			if ( functionNodesCacheMap === undefined ) {
+
+				functionNodesCacheMap = new WeakMap();
+
+				nodeBuilderFunctionsCacheMap.set( builder.constructor, functionNodesCacheMap );
+
+			}
+
+			let functionNode = functionNodesCacheMap.get( shaderNode );
+
+			if ( functionNode === undefined ) {
+
+				functionNode = nodeObject( builder.buildFunctionNode( shaderNode ) );
+
+				functionNodesCacheMap.set( shaderNode, functionNode );
+
+			}
+
+			return nodeObject( functionNode.call( nodeObjects( inputNodes ) ) );
+
+		}
+
+		const jsFunc = shaderNode.jsFunc;
+		const outputNode = inputNodes !== null ? jsFunc( nodeObjects( inputNodes ), builder.stack, builder ) : jsFunc( builder.stack, builder );
+
+		return nodeObject( outputNode );
+
+	}
+
+	setup( builder ) {
 
 		builder.addStack();
 
-		builder.stack.outputNode = nodeObject( this._jsFunc( builder.stack, builder ) );
+		builder.stack.outputNode = this.call( builder );
 
 		return builder.removeStack();
+
+	}
+
+	generate( builder, output ) {
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		if ( outputNode === null ) {
+
+			// TSL: It's recommended to use `tslFn` in setup() pass.
+
+			return this.call( builder ).build( builder, output );
+
+		}
+
+		return super.generate( builder, output );
+
+	}
+
+}
+
+class ShaderNodeInternal extends Node {
+
+	constructor( jsFunc ) {
+
+		super();
+
+		this.jsFunc = jsFunc;
+		this.layout = null;
+
+	}
+
+	setLayout( layout ) {
+
+		this.layout = layout;
+
+		return this;
+
+	}
+
+	call( inputs = null ) {
+
+		return nodeObject( new ShaderCallNodeInternal( this, inputs ) );
+
+	}
+
+	setup() {
+
+		return this.call();
 
 	}
 
@@ -355,19 +451,24 @@ export const shader = ( jsFunc ) => { // @deprecated, r154
 
 export const tslFn = ( jsFunc ) => {
 
-	let shaderNode = null;
+	const shaderNode = new ShaderNode( jsFunc );
 
-	return ( ...params ) => {
+	const fn = ( inputs ) => shaderNode.call( inputs );
+	fn.shaderNode = shaderNode;
 
-		if ( shaderNode === null ) shaderNode = new ShaderNode( jsFunc );
+	fn.setLayout = ( layout ) => {
 
-		return shaderNode.call( ...params );
+		shaderNode.setLayout( layout );
 
-	};
+		return fn;
+
+	}
+
+	return fn;
 
 };
 
-addNodeClass( ShaderNode );
+addNodeClass( 'ShaderNode', ShaderNode );
 
 // types
 // @TODO: Maybe export from ConstNode.js?

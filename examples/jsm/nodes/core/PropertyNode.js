@@ -3,11 +3,14 @@ import { nodeImmutable, nodeObject } from '../shadernode/ShaderNode.js';
 
 class PropertyNode extends Node {
 
-	constructor( nodeType, name = null ) {
+	constructor( nodeType, name = null, declare = true ) {
 
 		super( nodeType );
 
 		this.name = name;
+		this.declare = declare;
+
+		this.isPropertyNode = true;
 
 	}
 
@@ -25,16 +28,9 @@ class PropertyNode extends Node {
 
 	generate( builder ) {
 
-		const nodeVary = builder.getVarFromNode( this, this.getNodeType( builder ) );
-		const name = this.name;
+		if ( this.declare === false ) return this.name;
 
-		if ( name !== null ) {
-
-			nodeVary.name = name;
-
-		}
-
-		return builder.getPropertyName( nodeVary );
+		return builder.getPropertyName( builder.getVarFromNode( this, this.name ) );
 
 	}
 
@@ -60,4 +56,4 @@ export const output = nodeImmutable( PropertyNode, 'vec4', 'Output' );
 export const dashSize = nodeImmutable( PropertyNode, 'float', 'dashSize' );
 export const gapSize = nodeImmutable( PropertyNode, 'float', 'gapSize' );
 
-addNodeClass( PropertyNode );
+addNodeClass( 'PropertyNode', PropertyNode );

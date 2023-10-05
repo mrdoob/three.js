@@ -99,4 +99,4 @@ export default AttributeNode;
 
 export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
 
-addNodeClass( AttributeNode );
+addNodeClass( 'AttributeNode', AttributeNode );

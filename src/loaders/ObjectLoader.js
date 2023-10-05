@@ -785,6 +785,12 @@ class ObjectLoader extends Loader {
 
 					}
 
+					if ( data.fog.name !== '' ) {
+
+						object.fog.name = data.fog.name;
+
+					}
+
 				}
 
 				if ( data.backgroundBlurriness !== undefined ) object.backgroundBlurriness = data.backgroundBlurriness;

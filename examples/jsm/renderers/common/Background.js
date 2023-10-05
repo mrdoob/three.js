@@ -59,8 +59,8 @@ class Background extends DataMap {
 					getSamplerLevelNode: () => backgroundBlurriness
 				} ).mul( backgroundIntensity );
 
-				const viewProj = modelViewProjection().temp();
-				viewProj.z = viewProj.w;
+				let viewProj = modelViewProjection();
+				viewProj = viewProj.z.assign( viewProj.w );
 
 				const nodeMaterial = new NodeMaterial();
 				nodeMaterial.outputNode = this.backgroundMeshNode;

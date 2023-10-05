@@ -15,10 +15,12 @@ class Textures extends DataMap {
 
 	}
 
-	updateRenderTarget( renderTarget ) {
+	updateRenderTarget( renderTarget, activeMipmapLevel = 0 ) {
 
 		const renderTargetData = this.get( renderTarget );
+
 		const sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
+		const depthTextureMips = renderTargetData.depthTextureMips || ( renderTargetData.depthTextureMips = {} );
 
 		let texture, textures;
 
@@ -36,7 +38,10 @@ class Textures extends DataMap {
 
 		const size = this.getSize( texture );
 
-		let depthTexture = renderTarget.depthTexture || renderTargetData.depthTexture;
+		const mipWidth = size.width >> activeMipmapLevel;
+		const mipHeight = size.height >> activeMipmapLevel;
+
+		let depthTexture = renderTarget.depthTexture || depthTextureMips[ activeMipmapLevel ];
 		let textureNeedsUpdate = false;
 
 		if ( depthTexture === undefined ) {
@@ -44,8 +49,10 @@ class Textures extends DataMap {
 			depthTexture = new DepthTexture();
 			depthTexture.format = DepthStencilFormat;
 			depthTexture.type = UnsignedInt248Type;
-			depthTexture.image.width = size.width;
-			depthTexture.image.height = size.height;
+			depthTexture.image.width = mipWidth;
+			depthTexture.image.height = mipHeight;
+
+			depthTextureMips[ activeMipmapLevel ] = depthTexture;
 
 		}
 
@@ -54,8 +61,8 @@ class Textures extends DataMap {
 			textureNeedsUpdate = true;
 			depthTexture.needsUpdate = true;
 
-			depthTexture.image.width = size.width;
-			depthTexture.image.height = size.height;
+			depthTexture.image.width = mipWidth;
+			depthTexture.image.height = mipHeight;
 
 		}
 

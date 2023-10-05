@@ -33,6 +33,8 @@ class WebGPUBackend extends Backend {
 
 		super( parameters );
 
+		this.isWebGPUBackend = true;
+
 		// some parameters require default values other than "undefined"
 
 		this.parameters.antialias = ( parameters.antialias === true );
@@ -191,7 +193,7 @@ class WebGPUBackend extends Backend {
 				const textureData = this.get( textures[ i ] );
 
 				const textureView = textureData.texture.createView( {
-					baseMipLevel: 0,
+					baseMipLevel: renderContext.activeMipmapLevel,
 					mipLevelCount: 1,
 					baseArrayLayer: renderContext.activeCubeFace,
 					dimension: GPUTextureViewDimension.TwoD
@@ -467,7 +469,7 @@ class WebGPUBackend extends Backend {
 
 				if ( results[ i ] !== 0n ) {
 
-					occluded.add( currentOcclusionQueryObjects[ i ], true );
+					occluded.add( currentOcclusionQueryObjects[ i ] );
 
 				}
 

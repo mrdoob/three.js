@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -395,7 +391,7 @@ Ns 0.060000
 Ni 1.500000
 d 1.000000
 Tr 0.000000
-Tf 1.000000 1.000000 1.000000 
+Tf 1.000000 1.000000 1.000000
 illum 2
 -map_Kd windmill_diffuse.tga
 +map_Kd windmill_diffuse.jpg
@@ -403,9 +399,9 @@ illum 2
 -map_Ks windmill_spec.tga
 +map_Ks windmill_spec.jpg
 
--map_bump windmill_normal.tga 
--bump windmill_normal.tga 
-+map_bump windmill_normal.jpg 
+-map_bump windmill_normal.tga
+-bump windmill_normal.tga
++map_bump windmill_normal.jpg
 +bump windmill_normal.jpg
 </pre>
 <p>现在。mtl文件指向一些合理大小的纹理，我们需要加载它，所以我们就像上面做的那样，首先加载材质，然后将它们设置在<a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>上。</p>
@@ -454,8 +450,8 @@ illum 2
 </pre>
 <p>问题3: <code class="notranslate" translate="no">windmill_normal.jpg</code> 是法线贴图而不是凹凸贴图。</p>
 <p>跟上面一样修改.MTL文件：</p>
-<pre class="prettyprint showlinemods notranslate lang-mtl" translate="no">-map_bump windmill_normal.jpg 
--bump windmill_normal.jpg 
+<pre class="prettyprint showlinemods notranslate lang-mtl" translate="no">-map_bump windmill_normal.jpg
+-bump windmill_normal.jpg
 +norm windmill_normal.jpg
 </pre>
 <p>现在试一试附带材质的效果：</p>
@@ -474,8 +470,8 @@ illum 2
 Three.js一般是以Y为上（up）。有些建模包默认是Z为上，有些是Y为上。有些是可设置的。如果你遇到这种情况，你加载一个模型，它在它的一边。你可以让代码在加载后旋转模型(不推荐)，或者你可以模型加载到你最喜欢的建模工具里旋转物体至合适的位置,就像你会为您的网站编辑图像而不是使用代码调整它。Blender导出时可以选择改变方向。</p>
 </li>
 <li><p>没有.mtl文件、错误的材质或不兼容的参数</p>
-<p>上面我们使用了一个.MTL文件，该文件可以帮助我们加载材料，但是存在问题。 我们手动编辑了.MTL文件进行修复。 
-通常，也可以在.OBJ文件中查看是否有什么材质，或者将.OBJ文件加载到THREE.js中，然后打印出所有材质。 
+<p>上面我们使用了一个.MTL文件，该文件可以帮助我们加载材料，但是存在问题。 我们手动编辑了.MTL文件进行修复。
+通常，也可以在.OBJ文件中查看是否有什么材质，或者将.OBJ文件加载到THREE.js中，然后打印出所有材质。
 然后，修改代码以制作自定义材质并在适当的位置对其进行调整，比如可以创建一个名称/材质对对象传递给加载器，而不是加载.MTL文件，也可以在场景加载后遍历场景进行调整。</p>
 </li>
 <li><p>纹理过大</p>
@@ -490,7 +486,7 @@ Three.js一般是以Y为上（up）。有些建模包默认是Z为上，有些�
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

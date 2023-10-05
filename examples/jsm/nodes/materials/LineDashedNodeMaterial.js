@@ -30,7 +30,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructVariants( { stack } ) {
+	setupVariants( { stack } ) {
 
 		const offsetNode = this.offsetNode;
 		const dashScaleNode = this.dashScaleNode ? float( this.dashScaleNode ) : materialLineScale;
@@ -51,4 +51,4 @@ class LineDashedNodeMaterial extends NodeMaterial {
 
 export default LineDashedNodeMaterial;
 
-addNodeMaterial( LineDashedNodeMaterial );
+addNodeMaterial( 'LineDashedNodeMaterial', LineDashedNodeMaterial );

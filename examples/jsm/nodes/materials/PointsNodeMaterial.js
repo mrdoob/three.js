@@ -46,4 +46,4 @@ class PointsNodeMaterial extends NodeMaterial {
 
 export default PointsNodeMaterial;
 
-addNodeMaterial( PointsNodeMaterial );
+addNodeMaterial( 'PointsNodeMaterial', PointsNodeMaterial );

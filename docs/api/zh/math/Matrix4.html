@@ -48,7 +48,7 @@
 
 		<h2>注意行优先列优先的顺序。</h2>
 		<p>
-				设置[page:set]()方法参数采用行优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]，
+				设置[page:.set set]()方法参数采用行优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major]，
 				而它们在内部是用列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]顺序存储在数组当中。<br /><br />
 
 				这意味着
@@ -152,19 +152,84 @@ m.elements = [ 11, 21, 31, 41,
 		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
 		<p>
 			将矩阵的基向量[link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis]提取到指定的3个轴向量中。
-			如果矩阵如下：
-		<code>
-a, b, c, d,
-e, f, g, h,
-i, j, k, l,
-m, n, o, p
-		</code>
-		然后x轴y轴z轴被设为：
-		<code>
-xAxis = (a, e, i)
-yAxis = (b, f, j)
-zAxis = (c, g, k)
-		</code>
+			如果矩阵如下：<br /><br />
+
+			<math>
+				<mrow>
+					<mo>[</mo>
+					<mtable>
+						<mtr>
+							<mtd><mi>a</mi></mtd>
+							<mtd><mi>b</mi></mtd>
+							<mtd><mi>c</mi></mtd>
+							<mtd><mi>d</mi></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mi>e</mi></mtd>
+							<mtd><mi>f</mi></mtd>
+							<mtd><mi>g</mi></mtd>
+							<mtd><mi>h</mi></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mi>i</mi></mtd>
+							<mtd><mi>j</mi></mtd>
+							<mtd><mi>k</mi></mtd>
+							<mtd><mi>l</mi></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mi>m</mi></mtd>
+							<mtd><mi>n</mi></mtd>
+							<mtd><mi>o</mi></mtd>
+							<mtd><mi>p</mi></mtd>
+						</mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math><br /><br />
+
+			然后x轴y轴z轴被设为：<br /><br />
+
+			<math>
+				<mrow>
+					<mi>xAxis</mi>
+					<mo>=</mo>
+					<mo>[</mo>
+					<mtable>
+						<mtr><mtd style="height: 1rem"><mi>a</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>e</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>i</mi></mtd></mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>,
+
+			<math>
+				<mrow>
+					<mi>yAxis</mi>
+					<mo>=</mo>
+					<mo>[</mo>
+					<mtable>
+						<mtr><mtd style="height: 1rem"><mi>b</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>f</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>j</mi></mtd></mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>, and
+
+			<math>
+				<mrow>
+					<mi>zAxis</mi>
+					<mo>=</mo>
+					<mo>[</mo>
+					<mtable>
+						<mtr><mtd style="height: 1rem"><mi>c</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>g</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>k</mi></mtd></mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>
 		</p>
 
 		<h3>[method:this extractRotation]( [param:Matrix4 m] )</h3>
@@ -208,13 +273,40 @@ zAxis = (c, g, k)
 
 		<h3>[method:this makeBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
 		<p>
-			通过给定的三个向量设置该矩阵为基矩阵[link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis]：
-		<code>
-xAxis.x, yAxis.x, zAxis.x, 0,
-xAxis.y, yAxis.y, zAxis.y, 0,
-xAxis.z, yAxis.z, zAxis.z, 0,
-0,       0,       0,       1
-		</code>
+			通过给定的三个向量设置该矩阵为基矩阵[link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis]：<br /><br />
+
+			<math>
+				<mrow>
+					<mo>[</mo>
+					<mtable>
+						<mtr>
+							<mtd><mi>xAxis.x</mi></mtd>
+							<mtd><mi>yAxis.x</mi></mtd>
+							<mtd><mi>zAxis.x</mi></mtd>
+							<mtd><mn>0</mn></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mi>xAxis.y</mi></mtd>
+							<mtd><mi>yAxis.y</mi></mtd>
+							<mtd><mi>zAxis.y</mi></mtd>
+							<mtd><mn>0</mn></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mi>xAxis.z</mi></mtd>
+							<mtd><mi>yAxis.z</mi></mtd>
+							<mtd><mi>zAxis.z</mi></mtd>
+							<mtd><mn>0</mn></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mn>0</mn></mtd>
+							<mtd><mn>0</mn></mtd>
+							<mtd><mn>0</mn></mtd>
+							<mtd><mn>1</mn></mtd>
+						</mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>
 		</p>
 
 		<h3>[method:this makePerspective]( [param:Float left], [param:Float right], [param:Float top], [param:Float bottom], [param:Float near], [param:Float far] )</h3>
@@ -239,13 +331,136 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 		<h3>[method:this makeRotationFromQuaternion]( [param:Quaternion q] )</h3>
 		<p>
 		将这个矩阵的旋转分量设置为四元数[page:Quaternion q]指定的旋转，如下链接所诉[link:https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion here]。
-		矩阵的其余部分被设为单位矩阵。因此，给定四元数[page:Quaternion q] = w + xi + yj + zk，得到的矩阵为:
-		<code>
-1-2y²-2z²    2xy-2zw    2xz+2yw    0
-2xy+2zw      1-2x²-2z²  2yz-2xw    0
-2xz-2yw      2yz+2xw    1-2x²-2y²  0
-0            0          0          1
-		</code>
+		矩阵的其余部分被设为单位矩阵。因此，给定四元数[page:Quaternion q] = w + xi + yj + zk，得到的矩阵为:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd>
+							<mn>1</mn>
+							<mo>-</mo>
+							<mn>2</mn>
+							<msup>
+								<mi>y</mi>
+								<mn>2</mn>
+							</msup>
+							<mo>-</mo>
+							<mn>2</mn>
+							<msup>
+								<mi>z</mi>
+								<mn>2</mn>
+							</msup>
+						</mtd>
+						<mtd>
+							<mn>2</mn>
+							<mi>x</mi>
+							<mi>y</mi>
+							<mo>-</mo>
+							<mn>2</mn>
+							<mi>z</mi>
+							<mi>w</mi>
+						</mtd>
+						<mtd>
+							<mn>2</mn>
+							<mi>x</mi>
+							<mi>z</mi>
+							<mo>+</mo>
+							<mn>2</mn>
+							<mi>y</mi>
+							<mi>w</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mn>2</mn>
+							<mi>x</mi>
+							<mi>y</mi>
+							<mo>+</mo>
+							<mn>2</mn>
+							<mi>z</mi>
+							<mi>w</mi>
+						</mtd>
+						<mtd>
+							<mn>1</mn>
+							<mo>-</mo>
+							<mn>2</mn>
+							<msup>
+								<mi>x</mi>
+								<mn>2</mn>
+							</msup>
+							<mo>-</mo>
+							<mn>2</mn>
+							<msup>
+								<mi>z</mi>
+								<mn>2</mn>
+							</msup>
+						</mtd>
+						<mtd>
+							<mn>2</mn>
+							<mi>y</mi>
+							<mi>z</mi>
+							<mo>-</mo>
+							<mn>2</mn>
+							<mi>x</mi>
+							<mi>w</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mn>2</mn>
+							<mi>x</mi>
+							<mi>z</mi>
+							<mo>-</mo>
+							<mn>2</mn>
+							<mi>y</mi>
+							<mi>w</mi>
+						</mtd>
+						<mtd>
+							<mn>2</mn>
+							<mi>y</mi>
+							<mi>z</mi>
+							<mo>+</mo>
+							<mn>2</mn>
+							<mi>x</mi>
+							<mi>w</mi>
+						</mtd>
+						<mtd>
+							<mn>1</mn>
+							<mo>-</mo>
+							<mn>2</mn>
+							<msup>
+								<mi>x</mi>
+								<mn>2</mn>
+							</msup>
+							<mo>-</mo>
+							<mn>2</mn>
+							<msup>
+								<mi>y</mi>
+								<mn>2</mn>
+							</msup>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 
 		<h3>[method:this makeRotationX]( [param:Float theta] )</h3>
@@ -253,13 +468,61 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 		[page:Float theta] — Rotation angle in radians.<br /><br />
 
 		把该矩阵设置为绕x轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
-		结果如下：
-		<code>
-1 0      0        0
-0 cos(&theta;) -sin(&theta;)  0
-0 sin(&theta;) cos(&theta;)   0
-0 0      0        1
-		</code>
+		结果如下：<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mo>-</mo>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+						<mtd>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 
 		<h3>[method:this makeRotationY]( [param:Float theta] )</h3>
@@ -267,13 +530,61 @@ xAxis.z, yAxis.z, zAxis.z, 0,
 		[page:Float theta] — Rotation angle in radians.<br /><br />
 
 		把该矩阵设置为绕Y轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
-		结果如下：
-		<code>
-cos(&theta;)  0 sin(&theta;) 0
-0       1 0      0
--sin(&theta;) 0 cos(&theta;) 0
-0       0 0      1
-		</code>
+		结果如下：<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+						<mtd>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mo>-</mo>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 
 		<h3>[method:this makeRotationZ]( [param:Float theta] )</h3>
@@ -281,13 +592,61 @@ cos(&theta;)  0 sin(&theta;) 0
 		[page:Float theta] — Rotation angle in radians.<br /><br />
 
 		把该矩阵设置为绕z轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
-		结果如下：
-		<code>
-cos(&theta;) -sin(&theta;) 0 0
-sin(&theta;) cos(&theta;)  0 0
-0      0       1 0
-0      0       0 1
-		</code>
+		结果如下：<br /><br />
+			
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mo>-</mo>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 
 		<h3>[method:this makeScale]( [param:Float x], [param:Float y], [param:Float z] )</h3>
@@ -296,13 +655,40 @@ sin(&theta;) cos(&theta;)  0 0
 			[page:Float y] - 在Y轴方向的缩放比。<br />
 			[page:Float z] - 在Z轴方向的缩放比。<br /><br />
 
-			将这个矩阵设置为缩放变换:
-			<code>
-x, 0, 0, 0,
-0, y, 0, 0,
-0, 0, z, 0,
-0, 0, 0, 1
-			</code>
+			将这个矩阵设置为缩放变换:<br /><br />
+
+			<math>
+				<mrow>
+					<mo>[</mo>
+					<mtable>
+						<mtr>
+							<mtd><mi>x</mi></mtd>
+							<mtd><mn>0</mn></mtd>
+							<mtd><mn>0</mn></mtd>
+							<mtd><mn>0</mn></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mn>0</mn></mtd>
+							<mtd><mi>y</mi></mtd>
+							<mtd><mn>0</mn></mtd>
+							<mtd><mn>0</mn></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mn>0</mn></mtd>
+							<mtd><mn>0</mn></mtd>
+							<mtd><mi>z</mi></mtd>
+							<mtd><mn>0</mn></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mn>0</mn></mtd>
+							<mtd><mn>0</mn></mtd>
+							<mtd><mn>0</mn></mtd>
+							<mtd><mn>1</mn></mtd>
+						</mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>
 		</p>
 
 		<h3>[method:this makeShear]( [param:Float x], [param:Float y], [param:Float z] )</h3>
@@ -311,13 +697,40 @@ x, 0, 0, 0,
 		[page:Float y] - 在Y轴上剪切的量。<br />
 		[page:Float z] - 在Z轴上剪切的量。<br /><br />
 
-		将此矩阵设置为剪切变换:
-<code>
-1, y, z, 0,
-x, 1, z, 0,
-x, y, 1, 0,
-0, 0, 0, 1
-</code>
+		将此矩阵设置为剪切变换:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mi>y</mi><mi>x</mi></mtd>
+						<mtd><mi>z</mi><mi>x</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>x</mi><mi>y</mi></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mi>z</mi><mi>y</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>x</mi><mi>z</mi></mtd>
+						<mtd><mi>y</mi><mi>z</mi></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 
 		<h3>[method:this makeTranslation]( [param:Vector3 v] )</h3>
@@ -325,13 +738,40 @@ x, y, 1, 0,
 			[method:this makeTranslation]( [param:Float x], [param:Float y], [param:Float z] ) // optional API
 		</h3>
 		<p>
-		取传入参数[param:Vector3 v]中值设设置该矩阵为平移变换：
-		<code>
-1, 0, 0, x,
-0, 1, 0, y,
-0, 0, 1, z,
-0, 0, 0, 1
-		</code>
+		取传入参数[param:Vector3 v]中值设设置该矩阵为平移变换：<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>x</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mi>z</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 
 		<h3>[method:this multiply]( [param:Matrix4 m] )</h3>
@@ -360,20 +800,75 @@ x, y, 1, 0,
 		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
 		<h3>[method:this setPosition]( [param:Float x], [param:Float y], [param:Float z] ) // optional API</h3>
 		<p>
-			取传入参数[param:Vector3 v]中值设置该矩阵的位置分量，不影响该矩阵的其余部分——即，如果该矩阵当前为:
-<code>
-a, b, c, d,
-e, f, g, h,
-i, j, k, l,
-m, n, o, p
-</code>
-变成:
-<code>
-a, b, c, v.x,
-e, f, g, v.y,
-i, j, k, v.z,
-m, n, o, p
-</code>
+			取传入参数[param:Vector3 v]中值设置该矩阵的位置分量，不影响该矩阵的其余部分——即，如果该矩阵当前为:<br /><br />
+
+			<math>
+				<mrow>
+					<mo>[</mo>
+					<mtable>
+						<mtr>
+							<mtd><mi>a</mi></mtd>
+							<mtd><mi>b</mi></mtd>
+							<mtd><mi>c</mi></mtd>
+							<mtd><mi>d</mi></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mi>e</mi></mtd>
+							<mtd><mi>f</mi></mtd>
+							<mtd><mi>g</mi></mtd>
+							<mtd><mi>h</mi></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mi>i</mi></mtd>
+							<mtd><mi>j</mi></mtd>
+							<mtd><mi>k</mi></mtd>
+							<mtd><mi>l</mi></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mi>m</mi></mtd>
+							<mtd><mi>n</mi></mtd>
+							<mtd><mi>o</mi></mtd>
+							<mtd><mi>p</mi></mtd>
+						</mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math><br /><br />
+
+			变成:<br /><br />
+
+			<math>
+				<mrow>
+					<mo>[</mo>
+					<mtable>
+						<mtr>
+							<mtd><mi>a</mi></mtd>
+							<mtd><mi>b</mi></mtd>
+							<mtd><mi>c</mi></mtd>
+							<mtd><mi>v.x</mi></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mi>e</mi></mtd>
+							<mtd><mi>f</mi></mtd>
+							<mtd><mi>g</mi></mtd>
+							<mtd><mi>v.y</mi></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mi>i</mi></mtd>
+							<mtd><mi>j</mi></mtd>
+							<mtd><mi>k</mi></mtd>
+							<mtd><mi>v.z</mi></mtd>
+						</mtr>
+						<mtr>
+							<mtd><mi>m</mi></mtd>
+							<mtd><mi>n</mi></mtd>
+							<mtd><mi>o</mi></mtd>
+							<mtd><mi>p</mi></mtd>
+						</mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>
 		</p>
 
 		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>

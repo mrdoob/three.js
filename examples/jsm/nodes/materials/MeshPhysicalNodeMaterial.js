@@ -44,49 +44,79 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
-	constructLightingModel( /*builder*/ ) {
+	get useClearcoat() {
 
-		return new PhysicalLightingModel(); // @TODO: Optimize shader using parameters.
+		return this.clearcoat > 0 || this.clearcoatNode !== null;
 
 	}
 
-	constructVariants( builder ) {
+	get useIridescence() {
 
-		super.constructVariants( builder );
+		return this.iridescence > 0 || this.iridescenceNode !== null;
+
+	}
+
+	get useSheen() {
+
+		return this.sheen > 0 || this.sheenNode !== null;
+
+	}
+
+	setupLightingModel( /*builder*/ ) {
+
+		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence );
+
+	}
+
+	setupVariants( builder ) {
+
+		super.setupVariants( builder );
 
 		const { stack } = builder;
 
 		// CLEARCOAT
 
-		const clearcoatNode = this.clearcoatNode ? float( this.clearcoatNode ) : materialClearcoat;
-		const clearcoatRoughnessNode = this.clearcoatRoughnessNode ? float( this.clearcoatRoughnessNode ) : materialClearcoatRoughness;
+		if ( this.useClearcoat ) {
 
-		stack.assign( clearcoat, clearcoatNode );
-		stack.assign( clearcoatRoughness, clearcoatRoughnessNode );
+			const clearcoatNode = this.clearcoatNode ? float( this.clearcoatNode ) : materialClearcoat;
+			const clearcoatRoughnessNode = this.clearcoatRoughnessNode ? float( this.clearcoatRoughnessNode ) : materialClearcoatRoughness;
+
+			stack.assign( clearcoat, clearcoatNode );
+			stack.assign( clearcoatRoughness, clearcoatRoughnessNode );
+
+		}
 
 		// SHEEN
 
-		const sheenNode = this.sheenNode ? vec3( this.sheenNode ) : materialSheen;
-		const sheenRoughnessNode = this.sheenRoughnessNode ? float( this.sheenRoughnessNode ) : materialSheenRoughness;
+		if ( this.useSheen ) {
 
-		stack.assign( sheen, sheenNode );
-		stack.assign( sheenRoughness, sheenRoughnessNode );
+			const sheenNode = this.sheenNode ? vec3( this.sheenNode ) : materialSheen;
+			const sheenRoughnessNode = this.sheenRoughnessNode ? float( this.sheenRoughnessNode ) : materialSheenRoughness;
+
+			stack.assign( sheen, sheenNode );
+			stack.assign( sheenRoughness, sheenRoughnessNode );
+
+		}
 
 		// IRIDESCENCE
 
-		const iridescenceNode = this.iridescenceNode ? float( this.iridescenceNode ) : materialIridescence;
-		const iridescenceIORNode = this.iridescenceIORNode ? float( this.iridescenceIORNode ) : materialIridescenceIOR;
-		const iridescenceThicknessNode = this.iridescenceThicknessNode ? float( this.iridescenceThicknessNode ) : materialIridescenceThickness;
+		if ( this.useIridescence ) {
 
-		stack.assign( iridescence, iridescenceNode );
-		stack.assign( iridescenceIOR, iridescenceIORNode );
-		stack.assign( iridescenceThickness, iridescenceThicknessNode );
+			const iridescenceNode = this.iridescenceNode ? float( this.iridescenceNode ) : materialIridescence;
+			const iridescenceIORNode = this.iridescenceIORNode ? float( this.iridescenceIORNode ) : materialIridescenceIOR;
+			const iridescenceThicknessNode = this.iridescenceThicknessNode ? float( this.iridescenceThicknessNode ) : materialIridescenceThickness;
+
+			stack.assign( iridescence, iridescenceNode );
+			stack.assign( iridescenceIOR, iridescenceIORNode );
+			stack.assign( iridescenceThickness, iridescenceThicknessNode );
+
+		}
 
 	}
 
-	constructNormal( builder ) {
+	setupNormal( builder ) {
 
-		super.constructNormal( builder );
+		super.setupNormal( builder );
 
 		// CLEARCOAT NORMAL
 
@@ -125,4 +155,4 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 export default MeshPhysicalNodeMaterial;
 
-addNodeMaterial( MeshPhysicalNodeMaterial );
+addNodeMaterial( 'MeshPhysicalNodeMaterial', MeshPhysicalNodeMaterial );

@@ -248,4 +248,4 @@ addNodeElement( 'bitXor', bitXor );
 addNodeElement( 'shiftLeft', shiftLeft );
 addNodeElement( 'shiftRight', shiftRight );
 
-addNodeClass( OperatorNode );
+addNodeClass( 'OperatorNode', OperatorNode );
