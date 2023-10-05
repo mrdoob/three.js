@@ -121,6 +121,7 @@ class MaterialLoader extends Loader {
 		if ( json.opacity !== undefined ) material.opacity = json.opacity;
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
 		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
+		if ( json.alphaHash !== undefined ) material.alphaHash = json.alphaHash;
 		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
 		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
@@ -141,7 +142,7 @@ class MaterialLoader extends Loader {
 
 		if ( json.rotation !== undefined ) material.rotation = json.rotation;
 
-		if ( json.linewidth !== 1 ) material.linewidth = json.linewidth;
+		if ( json.linewidth !== undefined ) material.linewidth = json.linewidth;
 		if ( json.dashSize !== undefined ) material.dashSize = json.dashSize;
 		if ( json.gapSize !== undefined ) material.gapSize = json.gapSize;
 		if ( json.scale !== undefined ) material.scale = json.scale;

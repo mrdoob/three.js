@@ -17,13 +17,15 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 		this.isMeshNormalNodeMaterial = true;
 
+		this.colorSpace = false;
+
 		this.setDefaultValues( defaultValues );
 
 		this.setValues( parameters );
 
 	}
 
-	constructDiffuseColor( { stack } ) {
+	setupDiffuseColor( { stack } ) {
 
 		const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
 
@@ -31,18 +33,8 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 	}
 
-	copy( source ) {
-
-		this.opacityNode = source.opacityNode;
-
-		this.positionNode = source.positionNode;
-
-		return super.copy( source );
-
-	}
-
 }
 
 export default MeshNormalNodeMaterial;
 
-addNodeMaterial( MeshNormalNodeMaterial );
+addNodeMaterial( 'MeshNormalNodeMaterial', MeshNormalNodeMaterial );

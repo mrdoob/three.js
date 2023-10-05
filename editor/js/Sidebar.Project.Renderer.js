@@ -27,21 +27,6 @@ function SidebarProjectRenderer( editor ) {
 	const antialiasBoolean = new UIBoolean( config.getKey( 'project/renderer/antialias' ) ).onChange( createRenderer );
 	antialiasRow.add( antialiasBoolean );
 
-	// Physically Correct lights
-
-	const useLegacyLightsRow = new UIRow();
-	container.add( useLegacyLightsRow );
-
-	useLegacyLightsRow.add( new UIText( strings.getKey( 'sidebar/project/useLegacyLights' ) ).setWidth( '90px' ) );
-
-	const useLegacyLightsBoolean = new UIBoolean( config.getKey( 'project/renderer/useLegacyLights' ) ).onChange( function () {
-
-		currentRenderer.useLegacyLights = this.getValue();
-		signals.rendererUpdated.dispatch();
-
-	} );
-	useLegacyLightsRow.add( useLegacyLightsBoolean );
-
 	// Shadows
 
 	const shadowsRow = new UIRow();
@@ -109,7 +94,6 @@ function SidebarProjectRenderer( editor ) {
 	function createRenderer() {
 
 		currentRenderer = new THREE.WebGLRenderer( { antialias: antialiasBoolean.getValue() } );
-		currentRenderer.useLegacyLights = useLegacyLightsBoolean.getValue();
 		currentRenderer.shadowMap.enabled = shadowsBoolean.getValue();
 		currentRenderer.shadowMap.type = parseFloat( shadowTypeSelect.getValue() );
 		currentRenderer.toneMapping = parseFloat( toneMappingSelect.getValue() );
@@ -127,13 +111,11 @@ function SidebarProjectRenderer( editor ) {
 
 	signals.editorCleared.add( function () {
 
-		currentRenderer.useLegacyLights = false;
 		currentRenderer.shadowMap.enabled = true;
 		currentRenderer.shadowMap.type = THREE.PCFShadowMap;
 		currentRenderer.toneMapping = THREE.NoToneMapping;
 		currentRenderer.toneMappingExposure = 1;
 
-		useLegacyLightsBoolean.setValue( currentRenderer.useLegacyLights );
 		shadowsBoolean.setValue( currentRenderer.shadowMap.enabled );
 		shadowTypeSelect.setValue( currentRenderer.shadowMap.type );
 		toneMappingSelect.setValue( currentRenderer.toneMapping );
@@ -148,7 +130,6 @@ function SidebarProjectRenderer( editor ) {
 
 		config.setKey(
 			'project/renderer/antialias', antialiasBoolean.getValue(),
-			'project/renderer/useLegacyLights', useLegacyLightsBoolean.getValue(),
 			'project/renderer/shadows', shadowsBoolean.getValue(),
 			'project/renderer/shadowType', parseFloat( shadowTypeSelect.getValue() ),
 			'project/renderer/toneMapping', parseFloat( toneMappingSelect.getValue() ),

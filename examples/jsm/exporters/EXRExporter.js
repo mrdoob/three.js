@@ -21,61 +21,107 @@ const ZIP_COMPRESSION = 3;
 
 class EXRExporter {
 
-	parse( renderer, renderTarget, options ) {
+	parse( arg1, arg2, arg3 ) {
 
-		if ( ! supported( renderer, renderTarget ) ) return undefined;
+		if ( ! arg1 || ! ( arg1.isWebGLRenderer || arg1.isDataTexture ) ) {
 
-		const info = buildInfo( renderTarget, options ),
-			dataBuffer = getPixelData( renderer, renderTarget, info ),
-			rawContentBuffer = reorganizeDataBuffer( dataBuffer, info ),
-			chunks = compressData( rawContentBuffer, info );
+			throw Error( 'EXRExporter.parse: Unsupported first parameter, expected instance of WebGLRenderer or DataTexture.' );
 
-		return fillData( chunks, info );
+		} else if ( arg1.isWebGLRenderer ) {
+
+			const renderer = arg1, renderTarget = arg2, options = arg3;
+
+			supportedRTT( renderTarget );
+
+			const info = buildInfoRTT( renderTarget, options ),
+				dataBuffer = getPixelData( renderer, renderTarget, info ),
+				rawContentBuffer = reorganizeDataBuffer( dataBuffer, info ),
+				chunks = compressData( rawContentBuffer, info );
+
+			return fillData( chunks, info );
+
+		} else if ( arg1.isDataTexture ) {
+
+			const texture = arg1, options = arg2;
+
+			supportedDT( texture );
+
+			const info = buildInfoDT( texture, options ),
+				dataBuffer = texture.image.data,
+				rawContentBuffer = reorganizeDataBuffer( dataBuffer, info ),
+				chunks = compressData( rawContentBuffer, info );
+
+			return fillData( chunks, info );
+
+		}
 
 	}
 
 }
 
-function supported( renderer, renderTarget ) {
-
-	if ( ! renderer || ! renderer.isWebGLRenderer ) {
-
-		console.error( 'EXRExporter.parse: Unsupported first parameter, expected instance of WebGLRenderer.' );
-
-		return false;
-
-	}
+function supportedRTT( renderTarget ) {
 
 	if ( ! renderTarget || ! renderTarget.isWebGLRenderTarget ) {
 
-		console.error( 'EXRExporter.parse: Unsupported second parameter, expected instance of WebGLRenderTarget.' );
+		throw Error( 'EXRExporter.parse: Unsupported second parameter, expected instance of WebGLRenderTarget.' );
 
-		return false;
+	}
+
+	if ( renderTarget.isWebGLCubeRenderTarget || renderTarget.isWebGL3DRenderTarget || renderTarget.isWebGLArrayRenderTarget ) {
+
+		throw Error( 'EXRExporter.parse: Unsupported render target type, expected instance of WebGLRenderTarget.' );
 
 	}
 
 	if ( renderTarget.texture.type !== FloatType && renderTarget.texture.type !== HalfFloatType ) {
 
-		console.error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture type.' );
-
-		return false;
+		throw Error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture type.' );
 
 	}
 
 	if ( renderTarget.texture.format !== RGBAFormat ) {
 
-		console.error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture format, expected RGBAFormat.' );
-
-		return false;
+		throw Error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture format, expected RGBAFormat.' );
 
 	}
 
+}
 
-	return true;
+function supportedDT( texture ) {
+
+	if ( texture.type !== FloatType && texture.type !== HalfFloatType ) {
+
+		throw Error( 'EXRExporter.parse: Unsupported DataTexture texture type.' );
+
+	}
+
+	if ( texture.format !== RGBAFormat ) {
+
+		throw Error( 'EXRExporter.parse: Unsupported DataTexture texture format, expected RGBAFormat.' );
+
+	}
+
+	if ( ! texture.image.data ) {
+
+		throw Error( 'EXRExporter.parse: Invalid DataTexture image data.' );
+
+	}
+
+	if ( texture.type === FloatType && texture.image.data.constructor.name !== 'Float32Array' ) {
+
+		throw Error( 'EXRExporter.parse: DataTexture image data doesn\'t match type, expected \'Float32Array\'.' );
+
+	}
+
+	if ( texture.type === HalfFloatType && texture.image.data.constructor.name !== 'Uint16Array' ) {
+
+		throw Error( 'EXRExporter.parse: DataTexture image data doesn\'t match type, expected \'Uint16Array\'.' );
+
+	}
 
 }
 
-function buildInfo( renderTarget, options = {} ) {
+function buildInfoRTT( renderTarget, options = {} ) {
 
 	const compressionSizes = {
 		0: 1,
@@ -87,7 +133,6 @@ function buildInfo( renderTarget, options = {} ) {
 		HEIGHT = renderTarget.height,
 		TYPE = renderTarget.texture.type,
 		FORMAT = renderTarget.texture.format,
-		COLOR_SPACE = renderTarget.texture.colorSpace,
 		COMPRESSION = ( options.compression !== undefined ) ? options.compression : ZIP_COMPRESSION,
 		EXPORTER_TYPE = ( options.type !== undefined ) ? options.type : HalfFloatType,
 		OUT_TYPE = ( EXPORTER_TYPE === FloatType ) ? 2 : 1,
@@ -99,7 +144,40 @@ function buildInfo( renderTarget, options = {} ) {
 		height: HEIGHT,
 		type: TYPE,
 		format: FORMAT,
-		colorSpace: COLOR_SPACE,
+		compression: COMPRESSION,
+		blockLines: COMPRESSION_SIZE,
+		dataType: OUT_TYPE,
+		dataSize: 2 * OUT_TYPE,
+		numBlocks: Math.ceil( HEIGHT / COMPRESSION_SIZE ),
+		numInputChannels: 4,
+		numOutputChannels: NUM_CHANNELS,
+	};
+
+}
+
+function buildInfoDT( texture, options = {} ) {
+
+	const compressionSizes = {
+		0: 1,
+		2: 1,
+		3: 16
+	};
+
+	const WIDTH = texture.image.width,
+		HEIGHT = texture.image.height,
+		TYPE = texture.type,
+		FORMAT = texture.format,
+		COMPRESSION = ( options.compression !== undefined ) ? options.compression : ZIP_COMPRESSION,
+		EXPORTER_TYPE = ( options.type !== undefined ) ? options.type : HalfFloatType,
+		OUT_TYPE = ( EXPORTER_TYPE === FloatType ) ? 2 : 1,
+		COMPRESSION_SIZE = compressionSizes[ COMPRESSION ],
+		NUM_CHANNELS = 4;
+
+	return {
+		width: WIDTH,
+		height: HEIGHT,
+		type: TYPE,
+		format: FORMAT,
 		compression: COMPRESSION,
 		blockLines: COMPRESSION_SIZE,
 		dataType: OUT_TYPE,

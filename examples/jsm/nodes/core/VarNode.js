@@ -12,22 +12,6 @@ class VarNode extends Node {
 
 	}
 
-	assign( node ) {
-
-		node.traverse( ( childNode, replaceNode ) => {
-
-			if ( replaceNode && childNode.uuid === this.uuid ) {
-
-				replaceNode( this.node );
-
-			}
-
-		} );
-		this.node = node;
-		return this;
-
-	}
-
 	isGlobal() {
 
 		return true;
@@ -48,27 +32,13 @@ class VarNode extends Node {
 
 	generate( builder ) {
 
-		const node = this.node;
-		const name = this.name;
+		const { node, name } = this;
 
-		if ( name === null && node.isTempNode === true ) {
-
-			return node.build( builder );
-
-		}
-
-		const type = builder.getVectorType( this.getNodeType( builder ) );
-
-		const snippet = node.build( builder, type );
-		const nodeVar = builder.getVarFromNode( this, type );
-
-		if ( name !== null ) {
-
-			nodeVar.name = name;
-
-		}
+		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ) );
 
 		const propertyName = builder.getPropertyName( nodeVar );
+
+		const snippet = node.build( builder, nodeVar.type );
 
 		builder.addLineFlowCode( `${propertyName} = ${snippet}` );
 
@@ -80,10 +50,8 @@ class VarNode extends Node {
 
 export default VarNode;
 
-export const label = nodeProxy( VarNode );
-export const temp = label;
+export const temp = nodeProxy( VarNode );
 
-addNodeElement( 'label', label );
 addNodeElement( 'temp', temp );
 
-addNodeClass( VarNode );
+addNodeClass( 'VarNode', VarNode );

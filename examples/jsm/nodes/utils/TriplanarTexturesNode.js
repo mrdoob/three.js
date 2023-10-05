@@ -22,7 +22,7 @@ class TriplanarTexturesNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { textureXNode, textureYNode, textureZNode, scaleNode, positionNode, normalNode } = this;
 
@@ -55,8 +55,8 @@ class TriplanarTexturesNode extends Node {
 export default TriplanarTexturesNode;
 
 export const triplanarTextures = nodeProxy( TriplanarTexturesNode );
-export const triplanarTexture = ( texture, ...params ) => triplanarTextures( texture, texture, texture, ...params );
+export const triplanarTexture = ( ...params ) => triplanarTextures( ...params );
 
 addNodeElement( 'triplanarTexture', triplanarTexture );
 
-addNodeClass( TriplanarTexturesNode );
+addNodeClass( 'TriplanarTexturesNode', TriplanarTexturesNode );

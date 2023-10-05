@@ -120,7 +120,7 @@ class OperatorNode extends TempNode {
 
 				typeB = typeA;
 
-			} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' ) {
+			} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' ) {
 
 				if ( builder.isVector( typeA ) ) {
 
@@ -266,4 +266,4 @@ addNodeElement( 'bitXor', bitXor );
 addNodeElement( 'shiftLeft', shiftLeft );
 addNodeElement( 'shiftRight', shiftRight );
 
-addNodeClass( OperatorNode );
+addNodeClass( 'OperatorNode', OperatorNode );

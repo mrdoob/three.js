@@ -210,6 +210,12 @@ class Audio extends Object3D {
 
 	disconnect() {
 
+		if ( this._connected === false ) {
+
+			return;
+
+		}
+
 		if ( this.filters.length > 0 ) {
 
 			this.source.disconnect( this.filters[ 0 ] );

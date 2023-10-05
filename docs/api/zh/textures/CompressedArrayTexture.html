@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -12,61 +12,58 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		Creates an texture 2D array based on data in compressed form, for example from a [link:https://en.wikipedia.org/wiki/DirectDraw_Surface DDS] file.<br /><br />
+		基于压缩形式的数据（例如从[link:https://en.wikipedia.org/wiki/DirectDraw_Surface DDS]文件）创建纹理2D数组<br /><br />
 
-
-		For use with the [page:CompressedTextureLoader CompressedTextureLoader].
+		用于 [page:CompressedTextureLoader CompressedTextureLoader].
 		</p>
 
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 
 		<h3>[name]( [param:Array mipmaps], [param:Number width], [param:Number height], [param:Constant format], [param:Constant type] )</h3>
 		<p>
-		[page:Array mipmaps] -- The mipmaps array should contain objects with data, width and height. The mipmaps should be of the correct format and type.<br />
+		[page:Array mipmaps] -- mipmaps数组应包含具有数据、宽度和高度的对象。mipmap 应具有正确的格式和类型。<br />
 
-		[page:Number width] -- The width of the biggest mipmap.<br />
+		[page:Number width] -- 最大 mipmap 的宽度<br />
 
-		[page:Number height] -- The height of the biggest mipmap.<br />
+		[page:Number height] -- 最大 mipmap 的高度<br />
 
-		[page:Number depth] -- The number of layers of the 2D array texture.<br />
+		[page:Number depth] -- 二维阵列纹理的层数。<br />
 
-		[page:Constant format] -- The format used in the mipmaps.
-		See [page:Textures ST3C Compressed Texture Formats],
-		[page:Textures PVRTC Compressed Texture Formats] and
-		[page:Textures ETC Compressed Texture Format] for other choices.<br />
+		[page:Constant format] -- mipmap 中使用的格式。 
+			有关其他选择，请参阅[page:Textures ST3C Compressed Texture Formats] 、
+			[page:Textures PVRTC Compressed Texture Formats]和[page:Textures ETC Compressed Texture Format]。
+			<br />
 
-		[page:Constant type] -- Default is [page:Textures THREE.UnsignedByteType].
-		See [page:Textures type constants] for other choices.<br />
+		[page:Constant type] -- 默认值为[page:Textures THREE.UnsignedByteType]。 有关其他选择，请参阅[page:Textures type constants]。<br />
 
 		</p>
 
 
-		<h2>Properties</h2>
-
-		See the base [page:CompressedTexture CompressedTexture] class for common properties.
+		<h2>属性</h2>
+		有关常见属性，请参阅基本[page:CompressedTexture CompressedTexture]类。
 
 		<h3>[property:number wrapR]</h3>
 		<p>
-		This defines how the texture is wrapped in the depth direction.<br />
-		The default is [page:Textures THREE.ClampToEdgeWrapping], where the edge is clamped to the outer edge texels.
-		The other two choices are [page:Textures THREE.RepeatWrapping] and [page:Textures THREE.MirroredRepeatWrapping].
-		See the [page:Textures texture constants] page for details.
+		这定义了纹理在深度方向上的包裹方式。<br />
+		默认值为[page:Textures THREE.ClampToEdgeWrapping]，其中边缘被紧贴到外边缘纹素上。 
+		另外两个选择是[page:Textures THREE.RepeatWrapping]和[page:Textures THREE.MirroredRepeatWrapping]。 
+		有关详细信息，请参阅[page:Textures texture constants]页面。
 		</p>
 
 		<h3>[property:Boolean isCompressedArrayTexture]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			只读标志，用于检查给定对象是否为[name]类型。
 		</p>
 
-		<h2>Methods</h2>
+		<h2>函数</h2>
 
 		<p>
-		See the base [page:CompressedTexture CompressedTexture] class for common methods.
+		有关常用方法，请参阅基本[page:CompressedTexture CompressedTexture]类。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

@@ -9,6 +9,7 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	RawShaderMaterial,
+	UnsignedByteType,
 	Vector2,
 	Vector3,
 	Vector4
@@ -35,6 +36,8 @@ class Lensflare extends Mesh {
 
 		const tempMap = new FramebufferTexture( 16, 16 );
 		const occlusionMap = new FramebufferTexture( 16, 16 );
+
+		let currentType = UnsignedByteType;
 
 		// material
 
@@ -161,6 +164,20 @@ class Lensflare extends Mesh {
 		this.onBeforeRender = function ( renderer, scene, camera ) {
 
 			renderer.getCurrentViewport( viewport );
+
+			const renderTarget = renderer.getRenderTarget();
+			const type = ( renderTarget !== null ) ? renderTarget.texture.type : UnsignedByteType;
+
+			if ( currentType !== type ) {
+
+				tempMap.dispose();
+				occlusionMap.dispose();
+
+				tempMap.type = occlusionMap.type = type;
+
+				currentType = type;
+
+			}
 
 			const invAspect = viewport.w / viewport.z;
 			const halfViewportWidth = viewport.z / 2.0;

@@ -1,6 +1,7 @@
 import {
 	Clock,
 	HalfFloatType,
+	NoBlending,
 	Vector2,
 	WebGLRenderTarget
 } from 'three';
@@ -47,6 +48,7 @@ class EffectComposer {
 		this.passes = [];
 
 		this.copyPass = new ShaderPass( CopyShader );
+		this.copyPass.material.blending = NoBlending;
 
 		this.clock = new Clock();
 

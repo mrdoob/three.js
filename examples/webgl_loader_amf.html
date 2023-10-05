@@ -16,10 +16,6 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - AMF loader
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -54,7 +50,7 @@
 				camera.up.set( 0, 0, 1 );
 				camera.position.set( 0, - 9, 6 );
 
-				camera.add( new THREE.PointLight( 0xffffff, 0.8 ) );
+				camera.add( new THREE.PointLight( 0xffffff, 250 ) );
 
 				scene.add( camera );
 
@@ -77,7 +73,8 @@
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
-				controls.target.set( 0, 1.2, 2 );
+				controls.target.set( 0, 0, 2 );
+				controls.enableZoom = false;
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize );

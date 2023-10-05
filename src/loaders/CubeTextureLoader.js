@@ -1,6 +1,7 @@
 import { ImageLoader } from './ImageLoader.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
 import { Loader } from './Loader.js';
+import { SRGBColorSpace } from '../constants.js';
 
 class CubeTextureLoader extends Loader {
 
@@ -13,6 +14,7 @@ class CubeTextureLoader extends Loader {
 	load( urls, onLoad, onProgress, onError ) {
 
 		const texture = new CubeTexture();
+		texture.colorSpace = SRGBColorSpace;
 
 		const loader = new ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );

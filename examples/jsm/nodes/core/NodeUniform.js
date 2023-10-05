@@ -6,7 +6,7 @@ class NodeUniform {
 
 		this.name = name;
 		this.type = type;
-		this.node = node;
+		this.node = node.getSelf();
 		this.needsUpdate = needsUpdate;
 
 	}

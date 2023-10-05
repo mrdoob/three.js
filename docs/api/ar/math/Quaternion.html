@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+		تنفيذ [link:http://en.wikipedia.org/wiki/Quaternion كواترنيون].<br />
+		يتم استخدام الكواترنيونات في three.js لتمثيل
+		[link:https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation الدوران].
+		</p>
+		 
+		<p>
+		التكرار عبر مثيل [name] سيعطي مكوناته (x، y، z، w)
+		بالترتيب المقابل.
+		</p>
+		 
+		<h2>مثال الكود</h2>
+		 
+		<code>
+		const quaternion = new THREE.Quaternion();
+		quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
+		 
+		const vector = new THREE.Vector3( 1, 0, 0 );
+		vector.applyQuaternion( quaternion );
+		</code>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>
+		[name]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )
+		</h3>
+		<p>
+		[page:Float x] - إحداثية x<br />
+		[page:Float y] - إحداثية y<br />
+		[page:Float z] - إحداثية z<br />
+		[page:Float w] - إحداثية w
+		</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		 
+		<h3>[property:Boolean isQuaternion]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان الكائن المعطى هو من نوع [name].</p>
+		 
+		<h3>[property:Float x]</h3>
+		 
+		<h3>[property:Float y]</h3>
+		 
+		<h3>[property:Float z]</h3>
+		 
+		<h3>[property:Float w]</h3>
+		 
+		<h2>الطرق (Methods)</h2>
+
+		<h3>[method:Float angleTo]( [param:Quaternion q] )</h3>
+		<p>
+		يعيد الزاوية بين هذا الكواترنيون وكواترنيون [page:Quaternion q] بالراديان.
+		</p>
+	 
+		<h3>[method:Quaternion clone]()</h3>
+		<p>
+		ينشئ كواترنيون جديدًا بخصائص [page:.x x] و [page:.y y] و [page:.z z] 
+		و [page:.w w] متطابقة مع هذا.
+		</p>
+	 
+		<h3>[method:this conjugate]()</h3>
+		<p>
+		يعيد التجانس الدوراني لهذا الكواترنيون. التجانس لـ
+		كواترنيون يمثل نفس الدوران في الاتجاه المعاكس حول
+		محور الدوران.
+		</p>
+	 
+		<h3>[method:this copy]( [param:Quaternion q] )</h3>
+		<p>
+		ينسخ خصائص [page:.x x] و [page:.y y] و [page:.z z] و [page:.w w]
+		من [page:Quaternion q] إلى هذا الكواترنيون.
+		</p>
+	 
+		<h3>[method:Boolean equals]( [param:Quaternion v] )</h3>
+		<p>
+		[page:Quaternion v] - كواترنيون سيتم مقارنة هذا الكواترنيون
+		إليه.<br /><br />
+	 
+		يقارن خصائص [page:.x x] و [page:.y y] و [page:.z z] و [page:.w w]
+		من [page:Quaternion v] إلى الخصائص المكافئة لهذا
+		كواترنيون لتحديد ما إذا كانت تمثل نفس الدوران.
+		</p>
+	 
+		<h3>[method:Float dot]( [param:Quaternion v] )</h3>
+		<p>
+		يحسب [link:https://en.wikipedia.org/wiki/Dot_product dot product]
+		من كواترنيونات [page:Quaternion v] وهذا.
+		</p>
+
+		<h3>
+		[method:this fromArray]( [param:Array array], [param:Integer offset] )
+		</h3>
+		<p>
+		[page:Array array] - مصفوفة بتنسيق (x، y، z، w) تستخدم لبناء
+		الكواترنيون.<br />
+		[page:Integer offset] - (اختياري) إزاحة في المصفوفة.<br /><br />
+		 
+		يضع خصائص [page:.x x] و [page:.y y] و [page:.z z] و [page:.w w] 
+		لهذا الكواترنيون من مصفوفة.
+		</p>
+		 
+		<h3>[method:this identity]()</h3>
+		<p>
+		يضع هذا الكواترنيون على الكواترنيون المتطابق ؛ أي إلى
+		الكواترنيون الذي يمثل "لا دوران".
+		</p>
+		 
+		<h3>[method:this invert]()</h3>
+		<p>
+		يعكس هذا الكواترنيون - يحسب [page:.conjugate conjugate]. The
+		يفترض أن الكواترنيون لديه طول وحدة.
+		</p>
+		 
+		<h3>[method:Float length]()</h3>
+		<p>
+		يحسب [link:https://en.wikipedia.org/wiki/Euclidean_distance الطول الإقليدي]
+		(طول خط مستقيم) لهذا الكواترنيون ، كما هو معتبر
+		متجه 4 أبعاد.
+		</p>
+		 
+		<h3>[method:Float lengthSq]()</h3>
+		<p>
+		يحسب المربع
+		[link:https://en.wikipedia.org/wiki/Euclidean_distance الطول الإقليدي]
+		(طول خط مستقيم) لهذا الكواترنيون ، كما هو معتبر متجه 4 أبعاد
+		. هذا يمكن أن يكون مفيدًا إذا كنت تقارن طول اثنين
+		كواترنيون ، حيث أن هذا حساب أكثر كفاءة قليلاً من
+		[page:.length length]().
+		</p>
+		 
+		<h3>[method:this normalize]()</h3>
+		<p>
+		[link:https://en.wikipedia.org/wiki/Normalized_vector يعدل] هذا
+		كواترنيون - أي حساب الكواترنيون الذي يؤدي نفس
+		دوران كهذا ، ولكن لديه [page:.length length] يساوي `1`.
+		</p>
+		 
+
+		<h3>[method:this multiply]( [param:Quaternion q] )</h3>
+		<p>يضرب هذا الكواترنيون بـ[page:Quaternion q].</p>
+	 
+		<h3>
+		[method:this multiplyQuaternions]( [param:Quaternion a], [param:Quaternion b] )
+		</h3>
+		<p>
+		يضع هذا الكواترنيون على[page:Quaternion a] x[page:Quaternion b].<br />
+		تم تكييفه من الطريقة الموضحة
+		[link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.html هنا].
+		</p>
+	 
+		<h3>[method:this premultiply]( [param:Quaternion q] )</h3>
+		<p>يضرب مسبقًا هذا الكواترنيون بـ[page:Quaternion q].</p>
+	 
+		<h3>[method:this random]()</h3>
+		<p>يضع هذا الكواترنيون على كواترنيون عشوائي معتدل ومعتدل.</p>
+	 
+		<h3>
+		[method:this rotateTowards]( [param:Quaternion q], [param:Float step] )
+		</h3>
+		<p>
+		[page:Quaternion q] - كواترنيون الهدف. <br />
+		[page:Float step] - الخطوة الزاوية بالراديان. <br /><br />
+	 
+		يدور هذا الكواترنيون بخطوة زاوية معطاة إلى كواترنيون محدد
+		*q*. تضمن الطريقة ألا يتجاوز الكواترنيون النهائي *q*.
+		</p>
+	 
+		<h3>[method:this slerp]( [param:Quaternion qb], [param:Float t] )</h3>
+		<p>
+		[page:Quaternion qb] - التدوير الكواترنيون الآخر<br />
+		[page:Float t] - عامل التداخل في الفترة المغلقة `[0، 1]`. <br /><br />
+	 
+		يتعامل مع التداخل الخطي الكروي بين كواترنيون.
+		[page:Float t] يمثل مقدار التدوير بين هذا الكواترنيون
+		(حيث[page:Float t] هو 0) و[page:Quaternion qb] (حيث[page:Float t]
+		هو 1). يتم تعيين هذا الكواترنيون على النتيجة. اطلع أيضًا على الإصدار الثابت
+		من `slerp` أدناه.
+	 
+		<code>
+		// تدور شبكة نحو كواترنيون هدف 
+		mesh.quaternion.slerp( endQuaternion، 0.01 );
+		</code>
+		</p>
+	 
+		<h3>
+		[method:this slerpQuaternions]( [param:Quaternion qa], [param:Quaternion qb], [param:Float t] )
+		</h3>
+		<p>
+		يؤدي التداخل الخطي الكروي بين كواترنيون المعطى
+		وتخزين النتائج في هذا الكواترنيون.
+		</p>
+
+		<h3>
+		[method:this set]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )
+		</h3>
+		<p>
+		يضع خصائص [page:.x x] ،[page:.y y] ،[page:.z z] ،[page:.w w] من هذا
+		كواترنيون.
+		</p>
+		 
+		<h3>
+		[method:this setFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )
+		</h3>
+		<p>
+		يضع هذا الكواترنيون من التدوير المحدد بـ[page:Vector3 axis] و
+		[page:Float angle].<br />
+		تم تكييفه من الطريقة
+		[link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.html هنا].<br />
+		يفترض أن يكون `Axis` معتدلًا ، `angle` بالراديان.
+		</p>
+		 
+		<h3>[method:this setFromEuler]( [param:Euler euler] )</h3>
+		<p>
+		يضع هذا الكواترنيون من التدوير المحدد بزاوية[page:Euler].
+		</p>
+		 
+		<h3>[method:this setFromRotationMatrix]( [param:Matrix4 m] )</h3>
+		<p>
+		[page:Matrix4 m] - a[page:Matrix4] من الذي العلوي 3x3 من المصفوفة هو
+		مصفوفة دوران نقية
+		(أي غير متساوية القياس).<br />
+		يضع هذا الكواترنيون من مكون التدوير لـ[page:Matrix4 m].<br />
+		تم تكييفه من الطريقة
+		[link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.html هنا].
+		</p>
+		 
+		<h3>
+		[method:this setFromUnitVectors]( [param:Vector3 vFrom], [param:Vector3 vTo] )
+		</h3>
+		<p>
+		يضع هذا الكواترنيون على التدوير المطلوب لتدوير متجه الاتجاه
+		[page:Vector3 vFrom] إلى متجه الاتجاه[page:Vector3 vTo].<br />
+		تم تكييفه من الطريقة
+		[link:http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors هنا].<br />
+		يفترض أن يكون[page:Vector3 vFrom] و[page:Vector3 vTo] معتدلًا.
+		</p>
+		 
+		<h3>
+		[method:Array toArray]( [param:Array array], [param:Integer offset] )
+		</h3>
+		<p>
+		[page:Array array] - مصفوفة اختيارية لتخزين الكواترنيون. إذا لم يتم
+		محدد ، سيتم إنشاء مصفوفة جديدة. <br />
+		[page:Integer offset] - (اختياري) إذا تم تحديده ، فسيتم نسخ
+		في هذه[page:Array].<br /><br />
+		 
+		يعود بالعناصر العددية لهذا الكواترنيون في مصفوفة بتنسيق
+		[x، y، z، w].
+		</p>
+		 
+		<h3>[method:Array toJSON]()</h3>
+		<p>
+		هذه الطرق تحدد نتيجة التسلسل لـ[name]. يعود
+		العناصر العددية لهذا الكواترنيون في مصفوفة بتنسيق [x، y، z، w].
+		</p>
+	 
+		<h3>
+		[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )
+		</h3>
+		<p>
+		[page:BufferAttribute attribute] - السمة المصدر. <br />
+		[page:Integer index] - فهرس في السمة. <br /><br />
+	 
+		يضع خصائص [page:.x x] ،[page:.y y] ،[page:.z z] ،[page:.w w] من هذا
+		كواترنيون من[page:BufferAttribute attribute].
+		</p>
+	 
+		<h2>طرق ثابتة (Static Methods)</h2>
+	 
+		<h3>
+		[method:undefined slerpFlat]( [param:Array dst], [param:Integer dstOffset], 
+		[param:Array src0], [param:Integer srcOffset0], [param:Array src1], 
+		[param:Integer srcOffset1], [param:Float t] )
+		</h3>
+		<p>
+		[page:Array dst] - مصفوفة الإخراج. <br />
+		[page:Integer dstOffset] - إزاحة في مصفوفة الإخراج. <br />
+		[page:Array src0] - مصفوفة المصدر للكواترنيون البدائي. <br />
+		[page:Integer srcOffset0] - إزاحة في مصفوفة `src0`. <br />
+		[page:Array src1] - مصفوفة المصدر للكواترنيون المستهدف. <br />
+		[page:Integer srcOffset1] - إزاحة في مصفوفة `src1`. <br />
+		[page:Float t] - عامل التداخل المعتدل (بين 0 و 1). <br /><br />
+	 
+		تفترض هذه التطبيقات SLERP أن بيانات الكواترنيون يتم إدارتها في
+		مصفوفات مسطحة.
+		</p>
+	 
+		<h3>
+		[method:Array multiplyQuaternionsFlat]( [param:Array dst], [param:Integer dstOffset], 
+		[param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1] )
+		</h3>
+		<p>
+		[page:Array dst] - مصفوفة الإخراج. <br />
+		[page:Integer dstOffset] - إزاحة في مصفوفة الإخراج. <br />
+		[page:Array src0] - مصفوفة المصدر للكواترنيون البدائي. <br />
+		[page:Integer srcOffset0] - إزاحة في مصفوفة `src0`. <br />
+		[page:Array src1] - مصفوفة المصدر للكواترنيون المستهدف. <br />
+		[page:Integer srcOffset1] - إزاحة في مصفوفة `src1`. <br /><br />
+	 
+		تفترض هذه التطبيقات التعددية أن بيانات الكواترنيون يتم إدارتها
+		في مصفوفات مسطحة.
+		</p>
+
+		<!-- Note: Do not add non-static methods to the bottom of this page. Put them above the <h2>Static Methods</h2> -->
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

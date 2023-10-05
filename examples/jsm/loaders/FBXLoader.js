@@ -961,6 +961,7 @@ class FBXTreeParser {
 				}
 
 				model.name = node.attrName ? PropertyBinding.sanitizeNodeName( node.attrName ) : '';
+				model.userData.originalName = node.attrName;
 
 				model.ID = id;
 
@@ -997,6 +998,7 @@ class FBXTreeParser {
 						// set name and id here - otherwise in cases where "subBone" is created it will not have a name / id
 
 						bone.name = name ? PropertyBinding.sanitizeNodeName( name ) : '';
+						bone.userData.originalName = name;
 						bone.ID = id;
 
 						skeleton.bones[ i ] = bone;
@@ -1270,7 +1272,10 @@ class FBXTreeParser {
 
 		} else {
 
-			material = new MeshPhongMaterial( { color: 0xcccccc } );
+			material = new MeshPhongMaterial( {
+				name: Loader.DEFAULT_MATERIAL_NAME,
+				color: 0xcccccc
+			} );
 			materials.push( material );
 
 		}
@@ -1311,7 +1316,11 @@ class FBXTreeParser {
 		}, null );
 
 		// FBX does not list materials for Nurbs lines, so we'll just put our own in here.
-		const material = new LineBasicMaterial( { color: 0x3300ff, linewidth: 1 } );
+		const material = new LineBasicMaterial( {
+			name: Loader.DEFAULT_MATERIAL_NAME,
+			color: 0x3300ff,
+			linewidth: 1
+		} );
 		return new Line( geometry, material );
 
 	}

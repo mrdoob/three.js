@@ -1,16 +1,17 @@
 class LightingModel {
 
-	constructor( direct = null, indirectDiffuse = null, indirectSpecular = null, ambientOcclusion = null ) {
+	start( /*input, stack, builder*/ ) { }
 
-		this.direct = direct;
-		this.indirectDiffuse = indirectDiffuse;
-		this.indirectSpecular = indirectSpecular;
-		this.ambientOcclusion = ambientOcclusion;
+	finish( /*input, stack, builder*/ ) { }
 
-	}
+	direct( /*input, stack, builder*/ ) { }
+
+	indirectDiffuse( /*input, stack, builder*/ ) { }
+
+	indirectSpecular( /*input, stack, builder*/ ) { }
+
+	ambientOcclusion( /*input, stack, builder*/ ) { }
 
 }
 
 export default LightingModel;
-
-export const lightingModel = ( ...params ) => new LightingModel( ...params );

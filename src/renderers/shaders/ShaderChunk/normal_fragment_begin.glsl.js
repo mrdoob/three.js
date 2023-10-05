@@ -27,7 +27,15 @@ float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
 
 	#else
 
-		mat3 tbn = getTangentFrame( - vViewPosition, normal, vNormalMapUv );
+		mat3 tbn = getTangentFrame( - vViewPosition, normal,
+		#if defined( USE_NORMALMAP )
+			vNormalMapUv
+		#elif defined( USE_CLEARCOAT_NORMALMAP )
+			vClearcoatNormalMapUv
+		#else
+			vUv
+		#endif
+		);
 
 	#endif
 
@@ -63,6 +71,6 @@ float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
 
 // non perturbed normal for clearcoat among others
 
-vec3 geometryNormal = normal;
+vec3 nonPerturbedNormal = normal;
 
 `;

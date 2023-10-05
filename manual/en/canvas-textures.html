@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -360,8 +356,8 @@ width like this</p>
 </div>
 
 <p></p>
-<p>Above we used a new canvas for each texture. Whether or not to use a 
-canvas per texture is up to you. If you need to update them often then 
+<p>Above we used a new canvas for each texture. Whether or not to use a
+canvas per texture is up to you. If you need to update them often then
 having one canvas per texture is probably the best option. If they are
 rarely or never updated then you can choose to use a single canvas
 for multiple textures by forcing three.js to use the texture.
@@ -408,7 +404,7 @@ function makePerson(x, labelWidth, size, name, color) {
 </div>
 
 <p></p>
-<p>Another issue is that the labels don't always face the camera. If you're using 
+<p>Another issue is that the labels don't always face the camera. If you're using
 labels as badges that's probably a good thing. If you're using labels to put
 names over players in a 3D game maybe you want the labels to always face the camera.
 We'll cover how to do that in <a href="billboards.html">an article on billboards</a>.</p>
@@ -419,7 +415,7 @@ to be hidden by other objects where as <a href="align-html-elements-to-3d.html">
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

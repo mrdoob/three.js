@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -111,7 +107,7 @@ loadAll();
     }),
   });
   fileInfos.push({
-    name: '&gt;50% women', 
+    name: '&gt;50% women',
     hueRange: [0.0, 0.4],
     file: makeDiffFile(womenFile, menFile, (women, men) =&gt; {
       return amountGreaterThan(women, men);
@@ -413,7 +409,7 @@ render();
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

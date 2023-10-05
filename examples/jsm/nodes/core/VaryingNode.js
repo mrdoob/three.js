@@ -11,6 +11,8 @@ class VaryingNode extends Node {
 		this.node = node;
 		this.name = name;
 
+		this.isVaryingNode = true;
+
 	}
 
 	isGlobal() {
@@ -66,4 +68,4 @@ export const varying = nodeProxy( VaryingNode );
 
 addNodeElement( 'varying', varying );
 
-addNodeClass( VaryingNode );
+addNodeClass( 'VaryingNode', VaryingNode );

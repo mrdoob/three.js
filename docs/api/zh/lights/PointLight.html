@@ -66,10 +66,6 @@
 
 		<h3>[property:Float distance]</h3>
 		<p>
-			默认模式下 — 当值为零时，光线不会衰减。当值不为零时，光线会从灯光的位置开始，到指定的距离之间，随着距离的增加线性衰减为零。
-		</p>
-		<p>
-			禁用 [page:WebGLRenderer.useLegacyLights legacy lighting mode] 的情况下 —
 			当值为零时，光线将根据平方反比定律衰减到无限远。
 			当值不为零时，光线会先按照平方反比定律衰减，直到距离截止点附近，然后线性衰减到 0。
 		</p>
@@ -78,15 +74,14 @@
 		<h3>[property:Float intensity]</h3>
 		<p>
 			光源的强度。默认值为 `1`。<br />
-			禁用 [page:WebGLRenderer.useLegacyLights legacy lighting mode] 的情况下，单位是坎德拉（cd）。<br /><br />
+			单位是坎德拉（cd）。<br /><br />
 			改变该值会影响到 `power` 的值。
 		</p>
 
 		<h3>[property:Float power]</h3>
 		<p>
 			光源的功率。<br />
-			禁用 [page:WebGLRenderer.useLegacyLights legacy lighting mode] 的情况下，单位为流明（lm）。
-			<br /><br />
+			单位为流明（lm）。<br /><br />
 			改变该值会影响到 `intensity` 的值。
 		</p>
 

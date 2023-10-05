@@ -2,6 +2,8 @@ import TextureNode from './TextureNode.js';
 import UniformNode from '../core/UniformNode.js';
 import { reflectVector } from './ReflectVectorNode.js';
 import { addNodeClass } from '../core/Node.js';
+import { colorSpaceToLinear } from '../display/ColorSpaceNode.js';
+import { expression } from '../code/ExpressionNode.js';
 import { addNodeElement, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
 
 class CubeTextureNode extends TextureNode {
@@ -25,6 +27,8 @@ class CubeTextureNode extends TextureNode {
 		return reflectVector;
 
 	}
+
+	setUpdateMatrix( /*updateMatrix*/ ) { } // Ignore .updateMatrix for CubeTextureNode
 
 	generate( builder, output ) {
 
@@ -59,7 +63,7 @@ class CubeTextureNode extends TextureNode {
 				const cubeUV = vec3( uvNode.x.negate(), uvNode.yz );
 				const uvSnippet = cubeUV.build( builder, 'vec3' );
 
-				const nodeVar = builder.getVarFromNode( this, 'vec4' );
+				const nodeVar = builder.getVarFromNode( this );
 
 				propertyName = builder.getPropertyName( nodeVar );
 
@@ -79,12 +83,25 @@ class CubeTextureNode extends TextureNode {
 
 				builder.addLineFlowCode( `${propertyName} = ${snippet}` );
 
-				nodeData.snippet = snippet;
-				nodeData.propertyName = propertyName;
+				if ( builder.context.tempWrite !== false ) {
+
+					nodeData.snippet = snippet;
+					nodeData.propertyName = propertyName;
+
+				}
 
 			}
 
-			return builder.format( propertyName, 'vec4', output );
+			let snippet = propertyName;
+			const nodeType = this.getNodeType( builder );
+
+			if ( builder.needsColorSpaceToLinear( this.value ) ) {
+
+				snippet = colorSpaceToLinear( expression( snippet, nodeType ), this.value.colorSpace ).setup( builder ).build( builder, nodeType );
+
+			}
+
+			return builder.format( snippet, nodeType, output );
 
 		}
 
@@ -98,4 +115,4 @@ export const cubeTexture = nodeProxy( CubeTextureNode );
 
 addNodeElement( 'cubeTexture', cubeTexture );
 
-addNodeClass( CubeTextureNode );
+addNodeClass( 'CubeTextureNode', CubeTextureNode );

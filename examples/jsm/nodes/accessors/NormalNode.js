@@ -1,7 +1,7 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { attribute } from '../core/AttributeNode.js';
-import { label } from '../core/VarNode.js';
 import { varying } from '../core/VaryingNode.js';
+import { property } from '../core/PropertyNode.js';
 import { normalize } from '../math/MathNode.js';
 import { cameraViewMatrix } from './CameraNode.js';
 import { modelNormalMatrix } from './ModelNode.js';
@@ -86,10 +86,11 @@ NormalNode.WORLD = 'world';
 export default NormalNode;
 
 export const normalGeometry = nodeImmutable( NormalNode, NormalNode.GEOMETRY );
-export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL );
+export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL ).temp( 'Normal' );
 export const normalView = nodeImmutable( NormalNode, NormalNode.VIEW );
 export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );
-export const transformedNormalView = label( normalView, 'TransformedNormalView' );
+export const transformedNormalView = property( 'vec3', 'TransformedNormalView' );
 export const transformedNormalWorld = transformedNormalView.transformDirection( cameraViewMatrix ).normalize();
+export const transformedClearcoatNormalView = property( 'vec3', 'TransformedClearcoatNormalView' );
 
-addNodeClass( NormalNode );
+addNodeClass( 'NormalNode', NormalNode );

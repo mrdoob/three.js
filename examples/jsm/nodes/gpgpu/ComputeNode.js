@@ -16,9 +16,22 @@ class ComputeNode extends Node {
 		this.workgroupSize = workgroupSize;
 		this.dispatchCount = 0;
 
+		this.version = 1;
 		this.updateType = NodeUpdateType.OBJECT;
 
 		this.updateDispatchCount();
+
+	}
+
+	dispose() {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
+	}
+
+	set needsUpdate( value ) {
+
+		if ( value === true ) this.version ++;
 
 	}
 
@@ -69,4 +82,4 @@ export const compute = ( node, count, workgroupSize ) => nodeObject( new Compute
 
 addNodeElement( 'compute', compute );
 
-addNodeClass( ComputeNode );
+addNodeClass( 'ComputeNode', ComputeNode );

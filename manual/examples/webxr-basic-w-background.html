@@ -20,10 +20,6 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -35,101 +31,119 @@
 
 <script type="module">
 import * as THREE from 'three';
-import {VRButton} from 'three/addons/webxr/VRButton.js';
+import { VRButton } from 'three/addons/webxr/VRButton.js';
 
 function main() {
-  const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
-  renderer.xr.enabled = true;
-  document.body.appendChild(VRButton.createButton(renderer));
 
-  const fov = 75;
-  const aspect = 2;  // the canvas default
-  const near = 0.1;
-  const far = 50;
-  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.set(0, 1.6, 0);
+	const canvas = document.querySelector( '#c' );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
+	renderer.xr.enabled = true;
+	document.body.appendChild( VRButton.createButton( renderer ) );
 
-  const scene = new THREE.Scene();
-  {
-    const loader = new THREE.CubeTextureLoader();
-    const texture = loader.load([
-      'resources/images/grid-1024.png',
-      'resources/images/grid-1024.png',
-      'resources/images/grid-1024.png',
-      'resources/images/grid-1024.png',
-      'resources/images/grid-1024.png',
-      'resources/images/grid-1024.png',
-    ]);
-    scene.background = texture;
-  }
+	const fov = 75;
+	const aspect = 2; // the canvas default
+	const near = 0.1;
+	const far = 50;
+	const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	camera.position.set( 0, 1.6, 0 );
 
-  {
-    const color = 0xFFFFFF;
-    const intensity = 1;
-    const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(-1, 2, 4);
-    scene.add(light);
-  }
+	const scene = new THREE.Scene();
+	{
 
-  const boxWidth = 1;
-  const boxHeight = 1;
-  const boxDepth = 1;
-  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+		const loader = new THREE.CubeTextureLoader();
+		const texture = loader.load( [
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+		] );
+		scene.background = texture;
 
-  function makeInstance(geometry, color, x) {
-    const material = new THREE.MeshPhongMaterial({color});
+	}
 
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+	{
 
-    cube.position.x = x;
-    cube.position.y = 1.6;
-    cube.position.z = -2;
+		const color = 0xFFFFFF;
+		const intensity = 3;
+		const light = new THREE.DirectionalLight( color, intensity );
+		light.position.set( - 1, 2, 4 );
+		scene.add( light );
 
-    return cube;
-  }
+	}
 
-  const cubes = [
-    makeInstance(geometry, 0x44aa88,  0),
-    makeInstance(geometry, 0x8844aa, -2),
-    makeInstance(geometry, 0xaa8844,  2),
-  ];
+	const boxWidth = 1;
+	const boxHeight = 1;
+	const boxDepth = 1;
+	const geometry = new THREE.BoxGeometry( boxWidth, boxHeight, boxDepth );
 
-  function resizeRendererToDisplaySize(renderer) {
-    const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
-    }
-    return needResize;
-  }
+	function makeInstance( geometry, color, x ) {
 
-  function render(time) {
-    time *= 0.001;
+		const material = new THREE.MeshPhongMaterial( { color } );
 
-    if (resizeRendererToDisplaySize(renderer)) {
-      const canvas = renderer.domElement;
-      camera.aspect = canvas.clientWidth / canvas.clientHeight;
-      camera.updateProjectionMatrix();
-    }
+		const cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
 
-    cubes.forEach((cube, ndx) => {
-      const speed = 1 + ndx * .1;
-      const rot = time * speed;
-      cube.rotation.x = rot;
-      cube.rotation.y = rot;
-    });
+		cube.position.x = x;
+		cube.position.y = 1.6;
+		cube.position.z = - 2;
 
-    renderer.render(scene, camera);
-  }
+		return cube;
 
-  renderer.setAnimationLoop(render);
+	}
+
+	const cubes = [
+		makeInstance( geometry, 0x44aa88, 0 ),
+		makeInstance( geometry, 0x8844aa, - 2 ),
+		makeInstance( geometry, 0xaa8844, 2 ),
+	];
+
+	function resizeRendererToDisplaySize( renderer ) {
+
+		const canvas = renderer.domElement;
+		const width = canvas.clientWidth;
+		const height = canvas.clientHeight;
+		const needResize = canvas.width !== width || canvas.height !== height;
+		if ( needResize ) {
+
+			renderer.setSize( width, height, false );
+
+		}
+
+		return needResize;
+
+	}
+
+	function render( time ) {
+
+		time *= 0.001;
+
+		if ( resizeRendererToDisplaySize( renderer ) ) {
+
+			const canvas = renderer.domElement;
+			camera.aspect = canvas.clientWidth / canvas.clientHeight;
+			camera.updateProjectionMatrix();
+
+		}
+
+		cubes.forEach( ( cube, ndx ) => {
+
+			const speed = 1 + ndx * .1;
+			const rot = time * speed;
+			cube.rotation.x = rot;
+			cube.rotation.y = rot;
+
+		} );
+
+		renderer.render( scene, camera );
+
+	}
+
+	renderer.setAnimationLoop( render );
+
 }
 
 main();
 </script>
 </html>
-

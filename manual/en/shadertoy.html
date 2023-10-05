@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -51,7 +47,7 @@ traditional techniques, drawing buildings made from triangles with textures on
 them, etc...</p>
 <p>Still, let's go over using a Shadertoy shader with three.js.</p>
 <p>This is the default shadertoy shader if you <a href="https://www.shadertoy.com/new">pick "New" on shadertoy.com</a>, at least as of January 2019.</p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By iq: https://www.shadertoy.com/user/iq  
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By iq: https://www.shadertoy.com/user/iq
 // license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
@@ -172,7 +168,7 @@ canvas. For now all we'll get is a red canvas as our plane is using a red
 uniform vec3 iResolution;
 uniform float iTime;
 
-// By iq: https://www.shadertoy.com/user/iq  
+// By iq: https://www.shadertoy.com/user/iq
 // license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
@@ -280,7 +276,7 @@ computing the color of every pixel means those examples run very slow.</p>
 <a href="https://www.shadertoy.com/view/MsXSzM">this one</a>. </p>
 <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By Daedelus: https://www.shadertoy.com/user/Daedelus
 // license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
-#define TIMESCALE 0.25 
+#define TIMESCALE 0.25
 #define TILES 8
 #define COLOR 0.7, 1.6, 2.8
 
@@ -300,7 +296,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     fragColor = vec4(COLOR, 1.0) * p;
 }
 </pre>
-<p>Passing a texture into a shader is similar to 
+<p>Passing a texture into a shader is similar to
 <a href="textures.html">passing one into a normal material</a> but we need to set
 up the texture on the uniforms.</p>
 <p>First we'll add the uniform for the texture to the shader. They're referred to
@@ -406,7 +402,7 @@ amazing, impressive, beautiful, and you can learn a ton by seeing how they work.
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

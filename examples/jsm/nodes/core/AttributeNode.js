@@ -20,11 +20,11 @@ class AttributeNode extends Node {
 
 	getNodeType( builder ) {
 
-		const attributeName = this.getAttributeName( builder );
-
 		let nodeType = super.getNodeType( builder );
 
 		if ( nodeType === null ) {
+
+			const attributeName = this.getAttributeName( builder );
 
 			if ( builder.hasGeometryAttribute( attributeName ) ) {
 
@@ -99,4 +99,4 @@ export default AttributeNode;
 
 export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
 
-addNodeClass( AttributeNode );
+addNodeClass( 'AttributeNode', AttributeNode );

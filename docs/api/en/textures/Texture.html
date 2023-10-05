@@ -133,7 +133,7 @@
 		<h3>[property:number anisotropy]</h3>
 		<p>
 			The number of samples taken along the axis through the pixel that has the
-			highest density of texels. By default, this value is 1. A higher value
+			highest density of texels. By default, this value is `1`. A higher value
 			gives a less blurry result than a basic mipmap, at the cost of more
 			texture samples being used. Use [page:WebGLRenderer.capabilities renderer.capabilities.getMaxAnisotropy]() 
 			to find the maximum valid anisotropy value for the GPU; this value is usually a power of 2.
@@ -281,6 +281,7 @@
 		<p>
 			An object that can be used to store custom data about the texture. It
 			should not hold references to functions as these will not be cloned.
+			Default is an empty object `{}`.
 		</p>
 
 		<h3>[property:Source source]</h3>

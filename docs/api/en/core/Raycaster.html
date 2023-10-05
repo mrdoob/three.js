@@ -77,7 +77,7 @@
 			[page:Vector3 direction] — The direction vector that gives direction to
 			the ray. Should be normalized.<br />
 			[page:Float near] — All results returned are further away than near. Near
-			can't be negative. Default value is 0.<br />
+			can't be negative. Default value is `0`.<br />
 			[page:Float far] — All results returned are closer than far. Far can't be
 			lower than near. Default value is Infinity.
 		</p>
@@ -155,7 +155,7 @@ object.layers.enable( 1 );
 		<h3>[method:undefined setFromCamera]( [param:Vector2 coords], [param:Camera camera] )</h3>
 		<p>
 			[page:Vector2 coords] — 2D coordinates of the mouse, in normalized device
-			coordinates (NDC)---X and Y components should be between -1 and 1.<br />
+			coordinates (NDC)---X and Y components should be between `-1` and `1`.<br />
 			[page:Camera camera] — camera from which the ray should originate
 		</p>
 		<p>Updates the ray with a new origin and direction.</p>

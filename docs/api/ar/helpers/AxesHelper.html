@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+		<p class="desc">
+			كائن المحور لتصور المحاور الثلاثة بطريقة بسيطة. <br />
+			المحور X هو اللون الأحمر. المحور Y هو اللون الأخضر. المحور Z هو اللون الأزرق.
+		</p>
+			
+		<h2>مثال الكود</h2>
+			
+		<code>
+const axesHelper = new THREE.AxesHelper( 5 );
+scene.add( axesHelper );
+		</code>
+
+		<h2>أمثلة (Examples)</h2>
+		<p>
+		[example:webgl_buffergeometry_compression WebGL / buffergeometry / compression]<br />
+		[example:webgl_geometry_convex WebGL / geometry / convex]<br />
+		[example:webgl_loader_nrrd WebGL / loader / nrrd]
+		</p>
+		
+		<h2>المنشئ (Constructor)</h2>
+		<h3>[name]( [param:Number size] )</h3>
+		<p>
+		[page:Number size] - (اختياري) حجم الخطوط التي تمثل المحاور.
+		الافتراضي هو `1`.
+		</p>
+		
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى قاعدة [page:LineSegments] class للخصائص المشتركة.</p>
+		
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى قاعدة [page:LineSegments] class للطرق المشتركة.</p>
+		
+		<h3>
+		[method:this setColors]( [param:Color xAxisColor], [param:Color yAxisColor], [param:Color zAxisColor] )
+		</h3>
+		<p>
+		يضبط ألوان المحاور إلى [page:Color xAxisColor]، [page:Color yAxisColor]،
+		[page:Color zAxisColor].
+		</p>
+		
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		يحرر الموارد المتعلقة بالـ GPU التي تم تخصيصها من قبل هذا المثيل. اتصل بهذه
+		الطريقة كلما لم يعد هذا المثيل مستخدمًا في تطبيقك.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

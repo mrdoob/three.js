@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -30,14 +26,14 @@
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>Эта статья является частью серии статей о three.js. Первая статья - <a href="fundamentals.html">основы Three.js</a>. 
+          <p>Эта статья является частью серии статей о three.js. Первая статья - <a href="fundamentals.html">основы Three.js</a>.
 Если вы еще не читали это, и вы новичок в three.js, вы можете начать там. </p>
 <p>Есть много способов оптимизировать вещи для three.js. Один из способов часто называют геометрией слияния.
 Каждая созданная вами сетка и three.js представляют 1 или более запросов системы на что-то нарисовать.
-Рисование 2 вещей имеет больше затрат, чем рисование 1, 
+Рисование 2 вещей имеет больше затрат, чем рисование 1,
 даже если результаты одинаковы, поэтому одним из способов оптимизации является объединение сеток. </p>
 <p>Давайте посмотрим пример, когда это хорошее решение для проблемы. Давайте заново создадим <a href="https://globe.chromeexperiments.com/">WebGL Globe</a>.</p>
-<p>Первое, что нам нужно сделать, это получить данные. WebGL Globe сказал, что данные, которые они используют, взяты из <a href="http://sedac.ciesin.columbia.edu/gpw/">SEDAC</a>. 
+<p>Первое, что нам нужно сделать, это получить данные. WebGL Globe сказал, что данные, которые они используют, взяты из <a href="http://sedac.ciesin.columbia.edu/gpw/">SEDAC</a>.
 Проверяя сайт, я увидел  <a href="https://beta.sedac.ciesin.columbia.edu/data/set/gpw-v4-basic-demographic-characteristics-rev10">демографические данные в виде сетки</a>.
 Я загрузил данные с 60-минутным разрешением. Затем я посмотрел на данные </p>
 <p>Это выглядит так </p>
@@ -169,7 +165,7 @@ function hsl(h, s, l) {
   scene.add(new THREE.Mesh(geometry, material));
 }
 </pre>
-<p>Обратите внимание на вызов для рендеринга после завершения загрузки текстуры. Нам это нужно, потому что мы выполняем  <a href="rendering-on-demand.html">рендеринг по требованию</a> 
+<p>Обратите внимание на вызов для рендеринга после завершения загрузки текстуры. Нам это нужно, потому что мы выполняем  <a href="rendering-on-demand.html">рендеринг по требованию</a>
 а не постоянно, поэтому нам нужно рендерить один раз при загрузке текстуры. </p>
 <p>Затем нам нужно изменить код, который рисует точку на точку данных выше, чтобы вместо этого создать прямоугольник для точки данных. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function addBoxes(file) {
@@ -227,7 +223,7 @@ function hsl(h, s, l) {
 }
 </pre>
 <p>Код в основном прямо из нашего тестового кода рисования. </p>
-<p>Мы делаем одну коробку и корректируем ее центр так, чтобы она масштабировалась от положительного Z. 
+<p>Мы делаем одну коробку и корректируем ее центр так, чтобы она масштабировалась от положительного Z.
 Если бы мы этого не делали, она бы масштабировалась от центра, но мы хотим, чтобы они росли от начала координат. </p>
 <div class="spread">
   <div>
@@ -240,8 +236,8 @@ function hsl(h, s, l) {
   </div>
 </div>
 
-<p>Конечно, мы могли бы также решить эту проблему, добавив в родительский блок больше объектов 
-THREE.Object3D, как мы покрывали в <a href="scenegraph.html">графах сцены</a> 
+<p>Конечно, мы могли бы также решить эту проблему, добавив в родительский блок больше объектов
+THREE.Object3D, как мы покрывали в <a href="scenegraph.html">графах сцены</a>
 но чем больше узлов мы добавляем в граф сцены, тем медленнее он становится. </p>
 <p>Мы также настраиваем эту небольшую иерархию узлов <code class="notranslate" translate="no">lonHelper</code>, <code class="notranslate" translate="no">latHelper</code> и <code class="notranslate" translate="no">positionHelper</code>.
 Мы используем эти объекты, чтобы вычислить положение вокруг сферы, чтобы разместить коробку. </p>
@@ -250,23 +246,23 @@ THREE.Object3D, как мы покрывали в <a href="scenegraph.html">гр
 </div>
 
 <p>Над <span style="color: green;">зелёной полосой</span> изображен  <code class="notranslate" translate="no">lonHelper</code> и используется для поворота в направлении долготы на экваторе.
-<span style="color: blue;">Синяя полоса</span> обозначает <code class="notranslate" translate="no">latHelper</code> который используется для поворота на широту выше или ниже экватора. 
+<span style="color: blue;">Синяя полоса</span> обозначает <code class="notranslate" translate="no">latHelper</code> который используется для поворота на широту выше или ниже экватора.
 <span style="color: red;">Красная сфера</span> представляет смещение, которое обеспечивает этот <code class="notranslate" translate="no">positionHelper</code>.</p>
 <p>Мы могли бы сделать всю математику вручную, чтобы выяснить позиции на земном шаре, но, делая это таким образом,
 мы оставляем большую часть математики самой библиотеке, поэтому нам не нужно иметь с ней дело. </p>
 <p>Для каждой точки данных мы создаем <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> и <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, а затем запрашиваем мировую матрицу
 <code class="notranslate" translate="no">positionHelper</code> и применяем ее к новой <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. Наконец мы масштабируем сетку в новой позиции. </p>
 <p>Как и выше, мы могли бы также создать <code class="notranslate" translate="no">latHelper</code>, <code class="notranslate" translate="no">lonHelper</code> и <code class="notranslate" translate="no">positionHelper</code> для каждого нового окна, но это было бы еще медленнее. </p>
-<p>Мы собираемся создать до 360х145 коробок. Это до 52000 коробок. 
+<p>Мы собираемся создать до 360х145 коробок. Это до 52000 коробок.
 Поскольку некоторые точки данных помечены как «NO_DATA», фактическое
-количество блоков, которые мы собираемся создать, составляет около 19000. 
+количество блоков, которые мы собираемся создать, составляет около 19000.
 Если бы мы добавили 3 дополнительных вспомогательных объекта в блок,
-это было бы почти 80000 узлов графа сцены, которые THREE.js должен был бы 
-вычислить. позиции для. Вместо этого, используя один набор помощников, 
+это было бы почти 80000 узлов графа сцены, которые THREE.js должен был бы
+вычислить. позиции для. Вместо этого, используя один набор помощников,
 чтобы просто расположить сетки, мы экономим около 60000 операций. </p>
-<p>Примечание о <code class="notranslate" translate="no">lonFudge</code> и <code class="notranslate" translate="no">latFudge</code>. <code class="notranslate" translate="no">lonFudge</code> равен π / 2, что составляет четверть оборота. 
-В этом есть смысл. Это просто означает, что текстура или координаты текстуры начинаются 
-с другого смещения по всему земному шару. <code class="notranslate" translate="no">latFudge</code> с другой стороны, я понятия не имею, 
+<p>Примечание о <code class="notranslate" translate="no">lonFudge</code> и <code class="notranslate" translate="no">latFudge</code>. <code class="notranslate" translate="no">lonFudge</code> равен π / 2, что составляет четверть оборота.
+В этом есть смысл. Это просто означает, что текстура или координаты текстуры начинаются
+с другого смещения по всему земному шару. <code class="notranslate" translate="no">latFudge</code> с другой стороны, я понятия не имею,
 почему он должен быть π * -0,135, это просто количество, которое выровняло боксы с текстурой. </p>
 <p>Последнее, что нам нужно сделать, это вызвать нашего загрузчика </p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
@@ -274,7 +270,7 @@ THREE.Object3D, как мы покрывали в <a href="scenegraph.html">гр
 -  .then(drawData)
 +  .then(addBoxes)
 +  .then(render);
-</pre><p>После того, как данные закончили загрузку и анализ, нам нужно выполнить рендеринг хотя бы один раз, поскольку мы выполняем 
+</pre><p>После того, как данные закончили загрузку и анализ, нам нужно выполнить рендеринг хотя бы один раз, поскольку мы выполняем
  <a href="rendering-on-demand.html">рендеринг по требованию</a>.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-slow.html"></iframe></div>
@@ -290,7 +286,7 @@ THREE.Object3D, как мы покрывали в <a href="scenegraph.html">гр
 <div class="threejs_center"><img src="../resources/images/fps-meter.gif"></div>
 
 <p>Это не очень хорошо для меня, и я подозреваю, что многие люди имеют более медленные машины, которые сделали бы это еще хуже. Нам лучше взглянуть на оптимизацию. </p>
-<p>Для этой конкретной задачи мы можем объединить все блоки в одну геометрию. 
+<p>Для этой конкретной задачи мы можем объединить все блоки в одну геометрию.
 В настоящее время мы рисуем около 19000 коробок. Объединяя их в одну геометрию, мы удалили 18999 операций. </p>
 <p>Вот новый код для объединения блоков в одну геометрию. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function addBoxes(file) {
@@ -374,9 +370,9 @@ THREE.Object3D, как мы покрывали в <a href="scenegraph.html">гр
 }
 </pre>
 <p>Выше мы удалили код, который изменял центральную точку геометрии бокса,
-и вместо этого делаем это, добавляя <code class="notranslate" translate="no">originHelper</code>. Раньше мы использовали 
+и вместо этого делаем это, добавляя <code class="notranslate" translate="no">originHelper</code>. Раньше мы использовали
 одну и ту же геометрию 19000 раз. На этот раз мы создаем новую геометрию
-для каждого отдельного блока, и, поскольку мы будем использовать <code class="notranslate" translate="no">applyMatrix</code> 
+для каждого отдельного блока, и, поскольку мы будем использовать <code class="notranslate" translate="no">applyMatrix</code>
 для перемещения вершин каждой геометрии блока, мы могли бы сделать это один раз, а не два. </p>
 <p>В конце мы передаем массив всех геометрий в <code class="notranslate" translate="no">BufferGeometryUtils.mergeGeometries</code>, который объединит их все в одну сетку. </p>
 <p>Нам также нужно включить <code class="notranslate" translate="no">BufferGeometryUtils</code> </p>
@@ -389,10 +385,10 @@ THREE.Object3D, как мы покрывали в <a href="scenegraph.html">гр
 </div>
 
 <p></p>
-<p>Так что это сработало, но поскольку это одна сетка, мы получаем только один материал, 
-что означает, что мы получаем только один цвет, тогда как раньше у нас был другой цвет 
+<p>Так что это сработало, но поскольку это одна сетка, мы получаем только один материал,
+что означает, что мы получаем только один цвет, тогда как раньше у нас был другой цвет
 на каждой коробке. Мы можем исправить это, используя цвета вершин. </p>
-<p>Цвета вершин добавляют цвет для каждой вершины. Установив все цвета каждой 
+<p>Цвета вершин добавляют цвет для каждой вершины. Установив все цвета каждой
 вершины каждого блока на определенные цвета, каждый блок будет иметь другой цвет. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const color = new THREE.Color();
 
@@ -447,8 +443,8 @@ data.forEach((row, latNdx) =&gt; {
   });
 });
 </pre>
-<p>Приведенный выше код ищет количество или вершины, 
-необходимые для получения атрибута <code class="notranslate" translate="no">position</code> из геометрии. 
+<p>Приведенный выше код ищет количество или вершины,
+необходимые для получения атрибута <code class="notranslate" translate="no">position</code> из геометрии.
 Затем мы создаем <code class="notranslate" translate="no">Uint8Array</code> для размещения цветов.
 Затем он добавляет это как атрибут, вызывая <code class="notranslate" translate="no">geometry.setAttribute</code>. </p>
 <p>Наконец, нам нужно указать three.js использовать цвета вершин. </p>
@@ -469,12 +465,12 @@ scene.add(mesh);
 
 <p></p>
 <p>Объединение геометрии является распространенным методом оптимизации.
-Например, вместо 100 деревьев вы можете объединить деревья в одну геометрию, 
-кучу отдельных камней в одну геометрию камней, частокол из отдельных пикетов в одну сетку. 
-Другой пример в Minecraft - он не рисует каждый куб по отдельности, а создает 
+Например, вместо 100 деревьев вы можете объединить деревья в одну геометрию,
+кучу отдельных камней в одну геометрию камней, частокол из отдельных пикетов в одну сетку.
+Другой пример в Minecraft - он не рисует каждый куб по отдельности, а создает
 группы объединенных кубов, а также выборочно удаляет грани, которые никогда не видны. </p>
 <p>Проблема создания всего одного меша состоит в том, что больше не легко перемещать какие-либо части, которые были ранее разделены.
-В зависимости от нашего варианта использования, хотя есть творческие решения. Мы рассмотрим одну в 
+В зависимости от нашего варианта использования, хотя есть творческие решения. Мы рассмотрим одну в
 <a href="optimize-lots-of-objects-animated.html">другой статье</a>.</p>
 <p><canvas id="c"></canvas></p>
 <script type="module" src="../resources/threejs-lots-of-objects.js"></script>
@@ -482,7 +478,7 @@ scene.add(mesh);
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

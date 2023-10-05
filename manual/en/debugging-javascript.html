@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -38,13 +34,13 @@ solve any issues they run into.</p>
 <p>Debugging is a big topic and I probably can't begin to cover
 everything there is to know but if you're new to JavaScript
 then here's an attempt to give a few pointers. I strongly
-suggest you take some time to learn them. They'll help you 
+suggest you take some time to learn them. They'll help you
 enormously in your learning.</p>
 <h2 id="learn-your-browser-s-developer-tools">Learn your Browser's Developer Tools</h2>
-<p>All browsers have developer tools. 
+<p>All browsers have developer tools.
 <a href="https://developers.google.com/web/tools/chrome-devtools/">Chrome</a>,
-<a href="https://developer.mozilla.org/en-US/docs/Tools">Firefox</a>, 
-<a href="https://developer.apple.com/safari/tools/">Safari</a>, 
+<a href="https://developer.mozilla.org/en-US/docs/Tools">Firefox</a>,
+<a href="https://developer.apple.com/safari/tools/">Safari</a>,
 <a href="https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide">Edge</a>.</p>
 <p>In Chrome you can click the the <code class="notranslate" translate="no">⋮</code> icon, pick More Tools-&gt;Developer Tools
 to get to the developer tools. A keyboard shortcut is also shown there.</p>
@@ -54,7 +50,7 @@ to get to the developer tools. A keyboard shortcut is also shown there.</p>
 "Toggle Tools"</p>
 <div class="threejs_center"><img class="border" src="../resources/images/devtools-firefox.jpg" style="width: 786px;"></div>
 
-<p>In Safari you first have to enable the Develop menu from the 
+<p>In Safari you first have to enable the Develop menu from the
 Advanced Safari Preferences.</p>
 <div class="threejs_center"><img class="border" src="../resources/images/devtools-enable-safari.jpg" style="width: 775px;"></div>
 
@@ -62,7 +58,7 @@ Advanced Safari Preferences.</p>
 <div class="threejs_center"><img class="border" src="../resources/images/devtools-safari.jpg" style="width: 777px;"></div>
 
 <p>With Chrome you can also <a href="https://developers.google.com/web/tools/chrome-devtools/remote-debugging/">use Chrome on your computer to debug webpages running on Chrome on your Android phone or tablet</a>.
-Similarly with Safari you can 
+Similarly with Safari you can
 <a href="https://www.google.com/search?q=safari+remote+debugging+ios">use your computer to debug webpages running on Safari on iPhones and iPads</a>.</p>
 <p>I'm most familiar with Chrome so this guide will be using Chrome
 as an example when referring to tools but most browsers have similar
@@ -227,7 +223,7 @@ function render(now) {
     const mesh = thing.mesh;
     const pos = mesh.position;
     logger.log(
-        'timer:', thing.timer.toFixed(3), 
+        'timer:', thing.timer.toFixed(3),
         'pos:', pos.x.toFixed(3), pos.y.toFixed(3), pos.z.toFixed(3));
     thing.timer -= deltaTime;
     if (thing.timer &lt;= 0) {
@@ -263,7 +259,7 @@ the search and the hash.</p>
 the debug stuff only shows up if we put <code class="notranslate" translate="no">?debug=true</code> in the URL.</p>
 <p>First we need some code to parse the query string</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">/**
-  * Returns the query parameters as a key/value object. 
+  * Returns the query parameters as a key/value object.
   * Example: If the query parameters are
   *
   *    abc=123&amp;def=456&amp;name=gman
@@ -308,7 +304,7 @@ if (debug) {
 <p>there is no debug info but if we use this url:</p>
 <p><a target="_blank" href="../examples/debug-js-params.html?debug=true">debug-js-params.html?debug=true</a></p>
 <p>there is debug info.</p>
-<p>Multiple parameters can be passed in by separating with '&amp;' as in <code class="notranslate" translate="no">somepage.html?someparam=somevalue&amp;someotherparam=someothervalue</code>. 
+<p>Multiple parameters can be passed in by separating with '&amp;' as in <code class="notranslate" translate="no">somepage.html?someparam=somevalue&amp;someotherparam=someothervalue</code>.
 Using parameters like this we can pass in all kinds of options. Maybe <code class="notranslate" translate="no">speed=0.01</code> to slow down our app for making it easier to understand something or <code class="notranslate" translate="no">showHelpers=true</code> for whether or not to add helpers
 that show the lights, shadow, or camera frustum seen in other lessons.</p>
 <h2 id="learn-to-use-the-debugger">Learn to use the Debugger</h2>
@@ -328,7 +324,7 @@ as a value when you do something that doesn't make sense mathwise.</p>
 <div class="threejs_center"><img class="border" src="../resources/images/nan-banana.png" style="width: 180px;"></div>
 
 <p>Often when I'm making something and nothing appears on the screen
-I'll check some values and if I see <code class="notranslate" translate="no">NaN</code> I will instantly have a 
+I'll check some values and if I see <code class="notranslate" translate="no">NaN</code> I will instantly have a
 place to start looking.</p>
 <p>As an example when I first started making the path for the
 <a href="load-gltf.html">article about loading gLTF files</a> I made
@@ -449,7 +445,7 @@ learn in the process.</p>
 code <a href="https://stackoverflow.blog/2014/09/16/introducing-runnable-javascript-css-and-html-code-snippets/">in a snippet</a>.</strong>
 Of course you are welcome to use JSFiddle or Codepen or similar site to test out
 your MCVE but once you actually get to posting your question on Stack Overflow
-you're required to put the code to reproduce your issue <strong>in the question itself</strong>. 
+you're required to put the code to reproduce your issue <strong>in the question itself</strong>.
 By making a snippet you satisfy that requirement.</p>
 <p>Also note all the live examples on this site should run as snippets.
 Just copy the HTML, CSS, and JavaScript parts to their respective
@@ -459,7 +455,7 @@ your issue and try to make your code the minimal amount needed.</p>
 <p>Follow these suggestions and you're far more likely to get help
 with your issue.</p>
 <h2 id="use-a-meshbasicmaterial-">Use a <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a></h2>
-<p>Because the <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> uses no lights this is one way to 
+<p>Because the <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> uses no lights this is one way to
 remove reasons something might not be showing up. If your objects
 show up using <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> but not with whatever materials
 you were using then you know the issue is likely with the materials
@@ -495,7 +491,7 @@ over <a href="debugging-glsl.html">some tips for debugging GLSL</a>.</p>
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

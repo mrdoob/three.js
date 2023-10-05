@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -74,7 +70,7 @@ than 1.</p>
 <p>You can do similar things for all values in your fragment shader. Figure out
 what their range is likely to be, add some code to set <code class="notranslate" translate="no">gl_FragColor</code> with
 that range scaled to 0.0 to 1.0</p>
-<p>To check textures try a <a href="/docs/#api/en/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> or a <a href="/docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a> that you 
+<p>To check textures try a <a href="/docs/#api/en/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a> or a <a href="/docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a> that you
 know works.</p>
 <p>Conversely, if after setting <code class="notranslate" translate="no">gl_FragColor</code> to red I still see nothing
 then I have a hint my issue might be in the direction of the things
@@ -85,8 +81,8 @@ my call to <code class="notranslate" translate="no">renderer.render(scene, camer
 things in the inspector. Is the camera's world matrix and projection
 matrix at least not full of <code class="notranslate" translate="no">NaN</code>s? Expanding the scene and looking
 at its <code class="notranslate" translate="no">children</code> I'd check that the world matrices look reasonable (no <code class="notranslate" translate="no">NaN</code>s)
-and last 4 values of each matrix look reasonable for my scene. If I 
-expect my scene to be 50x50x50 units and some matrix shows 552352623.123 
+and last 4 values of each matrix look reasonable for my scene. If I
+expect my scene to be 50x50x50 units and some matrix shows 552352623.123
 clearly something is wrong there.</p>
 <div class="threejs_center"><img src="../resources/images/inspect-matrices.gif"></div>
 
@@ -94,7 +90,7 @@ clearly something is wrong there.</p>
 vertex shader by passing them to the fragment shader. Declare a varying
 in both and pass the value you're not sure is correct. In fact if my
 shader use using normals I'll change the fragment shader to display them
-like is mentioned above and then just set <code class="notranslate" translate="no">vNormal</code> to the value I want 
+like is mentioned above and then just set <code class="notranslate" translate="no">vNormal</code> to the value I want
 to display but scaled so the values go from 0.0 to 1.0. I then look at the
 results and see if they fit my expectations.</p>
 <p>Another good thing to do is use a simpler shader. Can you draw your data
@@ -114,7 +110,7 @@ live while the code is running.</p>
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

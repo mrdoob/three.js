@@ -27,6 +27,7 @@ import {
 	Skeleton,
 	SkinnedMesh,
 	SrcAlphaFactor,
+	SRGBColorSpace,
 	TextureLoader,
 	Uint16BufferAttribute,
 	Vector3,
@@ -1133,16 +1134,17 @@ class MaterialBuilder {
 				 * MMDToonMaterial doesn't have ambient. Set it to emissive instead.
 				 * It'll be too bright if material has map texture so using coef 0.2.
 				 */
-			params.diffuse = new Color().fromArray( material.diffuse );
+			params.diffuse = new Color().setRGB(
+				material.diffuse[ 0 ],
+				material.diffuse[ 1 ],
+				material.diffuse[ 2 ],
+				SRGBColorSpace
+			);
 			params.opacity = material.diffuse[ 3 ];
-			params.specular = new Color().fromArray( material.specular );
+			params.specular = new Color().setRGB( ...material.specular, SRGBColorSpace );
 			params.shininess = material.shininess;
-			params.emissive = new Color().fromArray( material.ambient );
+			params.emissive = new Color().setRGB( ...material.ambient, SRGBColorSpace );
 			params.transparent = params.opacity !== 1.0;
-
-			params.diffuse.convertSRGBToLinear();
-			params.specular.convertSRGBToLinear();
-			params.emissive.convertSRGBToLinear();
 
 			//
 
@@ -1452,6 +1454,7 @@ class MaterialBuilder {
 			t.flipY = false;
 			t.wrapS = RepeatWrapping;
 			t.wrapT = RepeatWrapping;
+			t.colorSpace = SRGBColorSpace;
 
 			for ( let i = 0; i < texture.readyCallbacks.length; i ++ ) {
 

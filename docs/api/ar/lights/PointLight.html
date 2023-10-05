@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			ضوء ينبعث من نقطة واحدة في جميع الاتجاهات. حالة استخدام شائعة لهذا هي تكرار الضوء الذي ينبعث من مصباح عاري
+			.<br /><br />
+			
+			يمكن لهذا الضوء إلقاء الظلال - انظر صفحة [page:PointLightShadow] للحصول على
+			تفاصيل.
+		</p>
+			
+		<h2>مثال للكود</h2>
+			
+		<code>
+		const light = new THREE.PointLight( 0xff0000, 1, 100 );
+		light.position.set( 50, 50, 50 );
+		scene.add( light );
+		</code>
+			
+		<h2>أمثلة (Examples)</h2>
+			
+		<p>
+		[example:webgl_lights_pointlights lights / pointlights ]<br />
+		[example:webgl_effects_anaglyph effects / anaglyph ]<br />
+		[example:webgl_geometry_text geometry / text ]<br />
+		[example:webgl_lensflares lensflares ]
+		</p>
+			
+		<h2>المنشئ (Constructor)</h2>
+			
+		<h3>
+		[name]( [param:Integer color], [param:Float intensity], [param:Number distance], [param:Float decay] )
+		</h3>
+		<p>
+		[page:Integer color] - (اختياري) لون سداسي عشري للضوء. الافتراضي
+		هو 0xffffff (أبيض).<br />
+		[page:Float intensity] - (اختياري) قيمة رقمية لقوة / شدة الضوء.
+		الافتراضي هو 1.<br />
+		[page:Number distance] - المدى الأقصى للضوء. الافتراضي هو 0 (لا
+		حدود).<br />
+		[page:Float decay] - مقدار تضاؤل الضوء على طول مسافة الضوء.
+		الافتراضي هو 2.<br /><br />
+			
+		إنشاء جديد [name].
+		</p>
+			
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى قائمة [page:Light Light] للخصائص المشتركة.</p>
+
+		<h3>[property:Boolean castShadow]</h3>
+		<p>
+		إذا تم تعيينه إلى `true`، ستلقي الضوء ظلالًا ديناميكية. <b>تحذير</b>: هذا مكلف ويتطلب التعديل للحصول على الظلال المناسبة. راجع [page:PointLightShadow] للحصول على التفاصيل. الافتراضي هو `false`.
+		</p>
+
+		<h3>[property:Float decay]</h3>
+		<p>
+		مقدار تضاؤل الضوء على طول مسافة الضوء. القيمة الافتراضية هي
+		`2`.<br />
+		في سياق التصيير الفعلي الصحيح ، يجب عدم تغيير القيمة الافتراضية.
+		</p>
+		
+		<h3>[property:Float distance]</h3>
+		<p>
+		عندما تكون المسافة صفرًا ، سيتلاشى الضوء وفقًا لقانون المربع المعكوس
+		إلى مسافة لانهائية. عندما تكون المسافة غير صفرية ، سيتلاشى الضوء
+		وفقًا لقانون المربع المعكوس حتى قرب نقطة قطع المسافة ، حيث
+		سيتلاشى بسرعة وبسلاسة إلى 0. بطبعه، ليست نقطة القطع فيزيائية صحيحة.
+		</p>
+		<p>القيمة الافتراضية هي `0.0`.</p>
+		
+		<h3>[property:Float intensity]</h3>
+		<p>
+		شدة الضوء. القيمة الافتراضية هي `1`.<br />
+		الشدة هي شدة إضاءة الضوء المقاسة بالشمعات
+		(cd).<br /><br />
+		
+		تغيير الشدة سيغير أيضًا قوة الضوء.
+		</p>
+		
+		<h3>[property:Float power]</h3>
+		<p>
+		قوة الضوء.<br />
+		الطاقة هي قوة إضاءة الضوء المقاسة باللومن (lm).
+		<br /><br />
+		
+		تغيير الطاقة سيغير أيضًا شدة الضوء.
+		</p>
+		
+		<h3>[property:PointLightShadow shadow]</h3>
+		<p>
+		[page:PointLightShadow] يستخدم لحساب ظلال هذا الضوء.<br /><br />
+		
+		[page:LightShadow.camera كاميرا] lightShadow مُعَدَّلَهُ إلى
+		[page:PerspectiveCamera] مع [page:PerspectiveCamera.fov fov] من 90،
+		[page:PerspectiveCamera.aspect aspect] من 1، [page:PerspectiveCamera.near near]
+		clipping plane at 0.5 and [page:PerspectiveCamera.far far] clipping
+		plane at 500.
+		</p>
+		
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى قائمة [page:Light Light] للطرق المشتركة.</p>
+		
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		تحرير المصادر المتعلقة بالجهاز GPU التي تم تخصيصها من قبل هذه المثيل. اتصل بهذه
+		الطريقة كلما لم يُستخدَم هذه المثيل في تطبيقك.
+		</p>
+		
+		<h3>[method:this copy]( [param:PointLight source] )</h3>
+		<p>
+		نسخ قِيَم جميع خصائص [page:PointLight source] إلى
+		هذه PointLight.
+		</p>
+		
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

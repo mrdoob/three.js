@@ -20,10 +20,6 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -35,93 +31,112 @@
 
 <script type="module">
 import * as THREE from 'three';
-import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 function main() {
-  const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
-  const fov = 75;
-  const aspect = 2;  // the canvas default
-  const near = 0.1;
-  const far = 5;
-  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.z = 2;
+	const canvas = document.querySelector( '#c' );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
 
-  const controls = new OrbitControls(camera, canvas);
-  controls.enableDamping = true;
-  controls.target.set(0, 0, 0);
-  controls.update();
+	const fov = 75;
+	const aspect = 2; // the canvas default
+	const near = 0.1;
+	const far = 5;
+	const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	camera.position.z = 2;
 
-  const scene = new THREE.Scene();
+	const controls = new OrbitControls( camera, canvas );
+	controls.enableDamping = true;
+	controls.target.set( 0, 0, 0 );
+	controls.update();
 
-  {
-    const color = 0xFFFFFF;
-    const intensity = 1;
-    const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(-1, 2, 4);
-    scene.add(light);
-  }
+	const scene = new THREE.Scene();
 
-  const boxWidth = 1;
-  const boxHeight = 1;
-  const boxDepth = 1;
-  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+	{
 
-  function makeInstance(geometry, color, x) {
-    const material = new THREE.MeshPhongMaterial({color});
+		const color = 0xFFFFFF;
+		const intensity = 3;
+		const light = new THREE.DirectionalLight( color, intensity );
+		light.position.set( - 1, 2, 4 );
+		scene.add( light );
 
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+	}
 
-    cube.position.x = x;
+	const boxWidth = 1;
+	const boxHeight = 1;
+	const boxDepth = 1;
+	const geometry = new THREE.BoxGeometry( boxWidth, boxHeight, boxDepth );
 
-    return cube;
-  }
+	function makeInstance( geometry, color, x ) {
 
-  makeInstance(geometry, 0x44aa88,  0);
-  makeInstance(geometry, 0x8844aa, -2);
-  makeInstance(geometry, 0xaa8844,  2);
+		const material = new THREE.MeshPhongMaterial( { color } );
 
-  function resizeRendererToDisplaySize(renderer) {
-    const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
-    }
-    return needResize;
-  }
+		const cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
 
-  let renderRequested = false;
+		cube.position.x = x;
 
-  function render() {
-    renderRequested = undefined;
+		return cube;
 
-    if (resizeRendererToDisplaySize(renderer)) {
-      const canvas = renderer.domElement;
-      camera.aspect = canvas.clientWidth / canvas.clientHeight;
-      camera.updateProjectionMatrix();
-    }
+	}
 
-    controls.update();
-    renderer.render(scene, camera);
-  }
-  render();
+	makeInstance( geometry, 0x44aa88, 0 );
+	makeInstance( geometry, 0x8844aa, - 2 );
+	makeInstance( geometry, 0xaa8844, 2 );
 
-  function requestRenderIfNotRequested() {
-    if (!renderRequested) {
-      renderRequested = true;
-      requestAnimationFrame(render);
-    }
-  }
+	function resizeRendererToDisplaySize( renderer ) {
 
-  controls.addEventListener('change', requestRenderIfNotRequested);
-  window.addEventListener('resize', requestRenderIfNotRequested);
+		const canvas = renderer.domElement;
+		const width = canvas.clientWidth;
+		const height = canvas.clientHeight;
+		const needResize = canvas.width !== width || canvas.height !== height;
+		if ( needResize ) {
+
+			renderer.setSize( width, height, false );
+
+		}
+
+		return needResize;
+
+	}
+
+	let renderRequested = false;
+
+	function render() {
+
+		renderRequested = undefined;
+
+		if ( resizeRendererToDisplaySize( renderer ) ) {
+
+			const canvas = renderer.domElement;
+			camera.aspect = canvas.clientWidth / canvas.clientHeight;
+			camera.updateProjectionMatrix();
+
+		}
+
+		controls.update();
+		renderer.render( scene, camera );
+
+	}
+
+	render();
+
+	function requestRenderIfNotRequested() {
+
+		if ( ! renderRequested ) {
+
+			renderRequested = true;
+			requestAnimationFrame( render );
+
+		}
+
+	}
+
+	controls.addEventListener( 'change', requestRenderIfNotRequested );
+	window.addEventListener( 'resize', requestRenderIfNotRequested );
+
 }
 
 main();
 </script>
 </html>
-

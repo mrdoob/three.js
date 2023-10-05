@@ -1,8 +1,5 @@
 import {
-	CustomBlending,
-	OneFactor,
-	AddEquation,
-	SrcAlphaFactor,
+	AdditiveBlending,
 	Color,
 	HalfFloatType,
 	ShaderMaterial,
@@ -49,14 +46,8 @@ class SSAARenderPass extends Pass {
 			transparent: true,
 			depthTest: false,
 			depthWrite: false,
-
-			// do not use AdditiveBlending because it mixes the alpha channel instead of adding
-			blending: CustomBlending,
-			blendEquation: AddEquation,
-			blendDst: OneFactor,
-			blendDstAlpha: OneFactor,
-			blendSrc: SrcAlphaFactor,
-			blendSrcAlpha: OneFactor
+			premultipliedAlpha: true,
+			blending: AdditiveBlending
 		} );
 
 		this.fsQuad = new FullScreenQuad( this.copyMaterial );

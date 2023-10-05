@@ -1,3 +1,4 @@
+import { EventDispatcher } from 'three';
 import { NodeUpdateType } from './constants.js';
 import { getNodeChildren, getCacheKey } from './NodeUtils.js';
 import { MathUtils } from 'three';
@@ -6,11 +7,11 @@ const NodeClasses = new Map();
 
 let _nodeId = 0;
 
-class Node {
+class Node extends EventDispatcher {
 
 	constructor( nodeType = null ) {
 
-		this.isNode = true;
+		super();
 
 		this.nodeType = nodeType;
 
@@ -19,13 +20,29 @@ class Node {
 
 		this.uuid = MathUtils.generateUUID();
 
+		this.isNode = true;
+
 		Object.defineProperty( this, 'id', { value: _nodeId ++ } );
 
 	}
 
 	get type() {
 
-		return this.constructor.name;
+		return this.constructor.type;
+
+	}
+
+	getSelf() {
+
+		// Returns non-node object.
+
+		return this.self || this;
+
+	}
+
+	updateReference() {
+
+		return this;
 
 	}
 
@@ -39,37 +56,27 @@ class Node {
 
 		const self = this;
 
-		for ( const { property, index, childNode } of getNodeChildren( this ) ) {
+		for ( const { childNode } of getNodeChildren( this ) ) {
 
-			if ( index !== undefined ) {
-
-				yield { childNode, replaceNode( node ) {
-
-					self[ property ][ index ] = node;
-
-				} };
-
-			} else {
-
-				yield { childNode, replaceNode( node ) {
-
-					self[ property ] = node;
-
-				} };
-
-			}
+			yield childNode;
 
 		}
 
 	}
 
-	traverse( callback, replaceNode = null ) {
+	dispose() {
 
-		callback( this, replaceNode );
+		this.dispatchEvent( { type: 'dispose' } );
 
-		for ( const { childNode, replaceNode } of this.getChildren() ) {
+	}
 
-			childNode.traverse( callback, replaceNode );
+	traverse( callback ) {
+
+		callback( this );
+
+		for ( const childNode of this.getChildren() ) {
+
+			childNode.traverse( callback );
 
 		}
 
@@ -99,13 +106,21 @@ class Node {
 
 	}
 
-	getNodeType( /*builder*/ ) {
+	getNodeType( builder ) {
+
+		const nodeProperties = builder.getNodeProperties( this );
+
+		if ( nodeProperties.outputNode ) {
+
+			return nodeProperties.outputNode.getNodeType( builder );
+
+		}
 
 		return this.nodeType;
 
 	}
 
-	getReference( builder ) {
+	getShared( builder ) {
 
 		const hash = this.getHash( builder );
 		const nodeFromHash = builder.getNodeFromHash( hash );
@@ -114,11 +129,11 @@ class Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const nodeProperties = builder.getNodeProperties( this );
 
-		for ( const { childNode } of this.getChildren() ) {
+		for ( const childNode of this.getChildren() ) {
 
 			nodeProperties[ '_node' + childNode.id ] = childNode;
 
@@ -126,6 +141,14 @@ class Node {
 
 		// return a outputNode if exists
 		return null;
+
+	}
+
+	construct( builder ) { // @deprecated, r157
+
+		console.warn( 'THREE.Node: construct() is deprecated. Use setup() instead.' );
+
+		return this.setup( builder );
 
 	}
 
@@ -180,7 +203,7 @@ class Node {
 
 	build( builder, output = null ) {
 
-		const refNode = this.getReference( builder );
+		const refNode = this.getShared( builder );
 
 		if ( this !== refNode ) {
 
@@ -192,7 +215,7 @@ class Node {
 		builder.addChain( this );
 
 		/* Build stages expected results:
-			- "construct"	-> Node
+			- "setup"		-> Node
 			- "analyze"		-> null
 			- "generate"	-> String
 		*/
@@ -200,14 +223,22 @@ class Node {
 
 		const buildStage = builder.getBuildStage();
 
-		if ( buildStage === 'construct' ) {
+		if ( buildStage === 'setup' ) {
 
 			const properties = builder.getNodeProperties( this );
 
 			if ( properties.initialized !== true || builder.context.tempRead === false ) {
 
+				const stackNodesBeforeSetup = builder.stack.nodes.length;
+
 				properties.initialized = true;
-				properties.outputNode = this.construct( builder );
+				properties.outputNode = this.setup( builder );
+
+				if ( properties.outputNode !== null && builder.stack.nodes.length !== stackNodesBeforeSetup ) {
+
+					properties.outputNode = builder.stack;
+
+				}
 
 				for ( const childNode of Object.values( properties ) ) {
 
@@ -426,12 +457,13 @@ class Node {
 
 export default Node;
 
-export function addNodeClass( nodeClass ) {
+export function addNodeClass( type, nodeClass ) {
 
-	if ( typeof nodeClass !== 'function' || ! nodeClass.name ) throw new Error( `Node class ${ nodeClass.name } is not a class` );
-	if ( NodeClasses.has( nodeClass.name ) ) throw new Error( `Redefinition of node class ${ nodeClass.name }` );
+	if ( typeof nodeClass !== 'function' || ! type ) throw new Error( `Node class ${ type } is not a class` );
+	if ( NodeClasses.has( type ) ) throw new Error( `Redefinition of node class ${ type }` );
 
-	NodeClasses.set( nodeClass.name, nodeClass );
+	NodeClasses.set( type, nodeClass );
+	nodeClass.type = type;
 
 }
 

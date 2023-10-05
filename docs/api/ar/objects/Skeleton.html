@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+		استخدم مصفوفة من [page:Bone bones] لإنشاء هيكل عظمي يمكن استخدامه بواسطة
+		[page:SkinnedMesh].
+		</p>
+			
+		<h2>مثال للكود</h2>
+		<code>
+		// إنشاء "ذراع" بسيط
+			
+		const bones = [];
+			
+		const shoulder = new THREE.Bone();
+		const elbow = new THREE.Bone();
+		const hand = new THREE.Bone();
+			
+		shoulder.add( elbow );
+		elbow.add( hand );
+			
+		bones.push( shoulder );
+		bones.push( elbow );
+		bones.push( hand );
+			
+		shoulder.position.y = -5;
+		elbow.position.y = 0;
+		hand.position.y = 5;
+			
+		const armSkeleton = new THREE.Skeleton( bones );
+		</code>
+			
+		<p>
+		انظر إلى صفحة [page:SkinnedMesh] للحصول على مثال على الاستخدام مع
+		[page:BufferGeometry] القياسية.
+		</p>
+			
+		<h2>المنشئ (Constructor)</h2>
+			
+		<h3>[name]( [param:Array bones], [param:Array boneInverses] )</h3>
+		<p>
+		[page:Array bones] - مصفوفة من [page:Bone bones]. الافتراضي هو مصفوفة فارغة
+		.<br />
+		[page:Array boneInverses] - (اختياري) مصفوفة من [page:Matrix4 Matrix4s].<br /> <br />
+			
+		إنشاء [name] جديد.
+		</p>
+			
+		<h2>الخصائص (Properties)</h2>
+			
+		<h3>[property:Array bones]</h3>
+		<p>
+		مصفوفة من [page:bone bones]. لاحظ أن هذه نسخة من المصفوفة الأصلية،
+		وليس مرجعًا، لذلك يمكنك تعديل المصفوفة الأصلية دون التأثير
+		هذه واحدة.
+		</p>
+
+		<h3>[property:Array boneInverses]</h3>
+		<p>
+		مصفوفة من [page:Matrix4 Matrix4s] تمثل معكوس
+		[page:Matrix4 matrixWorld] للعظام الفردية.
+		</p>
+		
+		<h3>[property:Float32Array boneMatrices]</h3>
+		<p>مصفوفة البيانات التي تحمل بيانات العظام عند استخدام نسيج الرأس.</p>
+		
+		<h3>[property:DataTexture boneTexture]</h3>
+		<p>
+		[page:DataTexture] التي تحمل بيانات العظام عند استخدام نسيج الرأس.
+		</p>
+		
+		<h3>[property:Integer boneTextureSize]</h3>
+		<p>حجم [page:.boneTexture].</p>
+		
+		<h2>الطرق (Methods)</h2>
+		
+		<h3>[method:Skeleton clone]()</h3>
+		<p>إرجاع نسخة من هذا كائن Skeleton.</p>
+		
+		<h3>[method:undefined calculateInverses]()</h3>
+		<p>
+		توليد مصفوفة [page:.boneInverses boneInverses] إذا لم يتم توفيرها في
+		المُنشئ.
+		</p>
+		
+		<h3>[method:this computeBoneTexture]()</h3>
+		<p>
+		حساب نسخة من [page:DataTexture] لتمرير بيانات العظام
+		بشكل أكثر كفاءة إلى المُظلل. يتم تعيين النسيج إلى
+		[page:.boneTexture boneTexture].
+		</p>
+		
+		<h3>[method:undefined pose]()</h3>
+		<p>إعادة الهيكل العظمي إلى وضعية الأساس.</p>
+		
+		<h3>[method:undefined update]()</h3>
+		<p>
+		تحديث [page:Float32Array boneMatrices] و [page:DataTexture boneTexture]
+		بعد تغيير العظام. يتم استدعاء هذا تلقائيًا بواسطة
+		[page:WebGLRenderer] إذا تم استخدام الهيكل العظمي مع [page:SkinnedMesh].
+		</p>
+		
+		<h3>[method:Bone getBoneByName]( [param:String name] )</h3>
+		<p>
+		name -- سلسلة لتطابق خاصية .name لـ Bone. <br /> <br />
+		
+		البحث في مصفوفة عظام الهيكل العظمي وإرجاع الأولى التي تطابق
+		الاسم.<br />
+		</p>
+		
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		تحرير الموارد المتعلقة بوحدة معالجة الرسومات المخصصة من قبل هذه النسخة. استدعِ هذه
+		الطريقة كلما لم يتم استخدام هذه النسخة في تطبيقك.
+		</p>
+		
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

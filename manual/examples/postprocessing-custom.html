@@ -20,10 +20,6 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -35,70 +31,75 @@
 
 <script type="module">
 import * as THREE from 'three';
-import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
-import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
-import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
-import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 function main() {
-  const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
-  const fov = 75;
-  const aspect = 2;  // the canvas default
-  const near = 0.1;
-  const far = 5;
-  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.z = 2;
+	const canvas = document.querySelector( '#c' );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
 
-  const scene = new THREE.Scene();
+	const fov = 75;
+	const aspect = 2; // the canvas default
+	const near = 0.1;
+	const far = 5;
+	const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	camera.position.z = 2;
 
-  {
-    const color = 0xFFFFFF;
-    const intensity = 2;
-    const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(-1, 2, 4);
-    scene.add(light);
-  }
+	const scene = new THREE.Scene();
 
-  const boxWidth = 1;
-  const boxHeight = 1;
-  const boxDepth = 1;
-  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+	{
 
-  function makeInstance(geometry, color, x) {
-    const material = new THREE.MeshPhongMaterial({color});
+		const color = 0xFFFFFF;
+		const intensity = 6;
+		const light = new THREE.DirectionalLight( color, intensity );
+		light.position.set( - 1, 2, 4 );
+		scene.add( light );
 
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+	}
 
-    cube.position.x = x;
+	const boxWidth = 1;
+	const boxHeight = 1;
+	const boxDepth = 1;
+	const geometry = new THREE.BoxGeometry( boxWidth, boxHeight, boxDepth );
 
-    return cube;
-  }
+	function makeInstance( geometry, color, x ) {
 
-  const cubes = [
-    makeInstance(geometry, 0x44aa88,  0),
-    makeInstance(geometry, 0x8844aa, -2),
-    makeInstance(geometry, 0xaa8844,  2),
-  ];
+		const material = new THREE.MeshPhongMaterial( { color } );
 
-  const composer = new EffectComposer(renderer);
-  composer.addPass(new RenderPass(scene, camera));
+		const cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
 
-  const colorShader = {
-    uniforms: {
-      tDiffuse: { value: null },
-      color:    { value: new THREE.Color(0x88CCFF) },
-    },
-    vertexShader: `
+		cube.position.x = x;
+
+		return cube;
+
+	}
+
+	const cubes = [
+		makeInstance( geometry, 0x44aa88, 0 ),
+		makeInstance( geometry, 0x8844aa, - 2 ),
+		makeInstance( geometry, 0xaa8844, 2 ),
+	];
+
+	const composer = new EffectComposer( renderer );
+	composer.addPass( new RenderPass( scene, camera ) );
+
+	const colorShader = {
+		uniforms: {
+			tDiffuse: { value: null },
+			color: { value: new THREE.Color( 0x88CCFF ) },
+		},
+		vertexShader: `
       varying vec2 vUv;
       void main() {
         vUv = uv;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1);
       }
     `,
-    fragmentShader: `
+		fragmentShader: `
       uniform vec3 color;
       uniform sampler2D tDiffuse;
       varying vec2 vUv;
@@ -109,57 +110,67 @@ function main() {
             previousPassColor.a);
       }
     `,
-  };
+	};
 
-  const colorPass = new ShaderPass(colorShader);
-  colorPass.renderToScreen = true;
-  composer.addPass(colorPass);
+	const colorPass = new ShaderPass( colorShader );
+	composer.addPass( colorPass );
 
-  function resizeRendererToDisplaySize(renderer) {
-    const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
-    }
-    return needResize;
-  }
+	function resizeRendererToDisplaySize( renderer ) {
 
-  const gui = new GUI();
-  gui.add(colorPass.uniforms.color.value, 'r', 0, 4).name('red');
-  gui.add(colorPass.uniforms.color.value, 'g', 0, 4).name('green');
-  gui.add(colorPass.uniforms.color.value, 'b', 0, 4).name('blue');
+		const canvas = renderer.domElement;
+		const width = canvas.clientWidth;
+		const height = canvas.clientHeight;
+		const needResize = canvas.width !== width || canvas.height !== height;
+		if ( needResize ) {
 
-  let then = 0;
-  function render(now) {
-    now *= 0.001;  // convert to seconds
-    const deltaTime = now - then;
-    then = now;
+			renderer.setSize( width, height, false );
 
-    if (resizeRendererToDisplaySize(renderer)) {
-      const canvas = renderer.domElement;
-      camera.aspect = canvas.clientWidth / canvas.clientHeight;
-      camera.updateProjectionMatrix();
-      composer.setSize(canvas.width, canvas.height);
-    }
+		}
 
-    cubes.forEach((cube, ndx) => {
-      const speed = 1 + ndx * .1;
-      const rot = now * speed;
-      cube.rotation.x = rot;
-      cube.rotation.y = rot;
-    });
+		return needResize;
 
-    composer.render(deltaTime);
+	}
 
-    requestAnimationFrame(render);
-  }
+	const gui = new GUI();
+	gui.add( colorPass.uniforms.color.value, 'r', 0, 4 ).name( 'red' );
+	gui.add( colorPass.uniforms.color.value, 'g', 0, 4 ).name( 'green' );
+	gui.add( colorPass.uniforms.color.value, 'b', 0, 4 ).name( 'blue' );
 
-  requestAnimationFrame(render);
+	let then = 0;
+	function render( now ) {
+
+		now *= 0.001; // convert to seconds
+		const deltaTime = now - then;
+		then = now;
+
+		if ( resizeRendererToDisplaySize( renderer ) ) {
+
+			const canvas = renderer.domElement;
+			camera.aspect = canvas.clientWidth / canvas.clientHeight;
+			camera.updateProjectionMatrix();
+			composer.setSize( canvas.width, canvas.height );
+
+		}
+
+		cubes.forEach( ( cube, ndx ) => {
+
+			const speed = 1 + ndx * .1;
+			const rot = now * speed;
+			cube.rotation.x = rot;
+			cube.rotation.y = rot;
+
+		} );
+
+		composer.render( deltaTime );
+
+		requestAnimationFrame( render );
+
+	}
+
+	requestAnimationFrame( render );
+
 }
 
 main();
 </script>
 </html>
-

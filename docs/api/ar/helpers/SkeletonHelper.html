@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			كائن مساعد للمساعدة في تصور [page:Skeleton Skeleton]. يتم
+			تقديم المساعد باستخدام [page:LineBasicMaterial LineBasicMaterial].
+		</p>
+			
+		<h2>مثال الكود</h2>
+			
+		<code>
+		const helper = new THREE.SkeletonHelper( skinnedMesh );
+		scene.add( helper );
+		</code>
+
+		<h2>أمثلة (Examples)</h2>
+
+		<p>
+		[example:webgl_animation_skinning_blending WebGL / animation / skinning / blending]<br />
+		[example:webgl_animation_skinning_morph WebGL / animation / skinning / morph]<br />
+		[example:webgl_loader_bvh WebGL / loader / bvh ]
+		</p>
+		
+		<h2>المنشئ (Constructor)</h2>
+		
+		<h3>[name]( [param:Object3D object] )</h3>
+		<p>
+		object -- عادةً مثيل من [page:SkinnedMesh]. ومع ذلك ، يمكن استخدام أي مثيل
+		من [page:Object3D] إذا كان يمثل تسلسل هرمي من [page:Bone Bone]s (عبر [page:Object3D.children]).
+		</p>
+		
+		<h2>الخصائص (Properties)</h2>
+		
+		<h3>[property:Array bones]</h3>
+		<p>قائمة العظام التي يعرضها المساعد كـ [page:Line Lines].</p>
+		
+		<h3>[property:Boolean isSkeletonHelper]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان الكائن المعطى هو من نوع [name].</p>
+		
+		<h3>[property:Object3D root]</h3>
+		<p>الكائن الذي تم تمريره في المنشئ.</p>
+		
+		<h2>الطرق (Methods)</h2>
+		<p>انظر الفئة الأساسية [page:LineSegments] للطرق المشتركة.</p>
+		
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		تحرير الموارد ذات الصلة بوحدة معالجة الرسومات التي تم تخصيصها من قبل هذه الحالة. استدعاء هذه
+		الطريقة كلما لم يعد يستخدم هذا الحال في تطبيقك.
+		</p>
+		
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

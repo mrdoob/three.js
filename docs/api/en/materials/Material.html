@@ -27,6 +27,14 @@
 
 		<h2>Properties</h2>
 
+		<h3>[property:Boolean alphaHash]</h3>
+		<p>
+			Enables alpha hashed transparency, an alternative to [page:.transparent] or [page:.alphaTest].
+			The material will not be rendered if opacity is lower than a random threshold.
+			Randomization introduces some grain or noise, but approximates alpha blending without
+			the associated problems of sorting. Using TAARenderPass can reduce the resulting noise.
+		</p>
+
 		<h3>[property:Float alphaTest]</h3>
 		<p>
 			Sets the alpha value to be used when running an alpha test. The material
@@ -361,6 +369,7 @@
 		<p>
 			An object that can be used to store custom data about the Material. It
 			should not hold references to functions as these will not be cloned.
+			Default is an empty object `{}`.
 		</p>
 
 		<h2>Methods</h2>

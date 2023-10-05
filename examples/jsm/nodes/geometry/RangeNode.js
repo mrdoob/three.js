@@ -2,7 +2,7 @@ import Node, { addNodeClass } from '../core/Node.js';
 import { getValueType } from '../core/NodeUtils.js';
 import { buffer } from '../accessors/BufferNode.js';
 //import { bufferAttribute } from '../accessors/BufferAttributeNode.js';
-import { instanceIndex } from '../core/InstanceIndexNode.js';
+import { instanceIndex } from '../core/IndexNode.js';
 import { nodeProxy, float } from '../shadernode/ShaderNode.js';
 
 import { Vector4, MathUtils } from 'three';
@@ -36,7 +36,7 @@ class RangeNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const object = builder.object;
 
@@ -44,8 +44,8 @@ class RangeNode extends Node {
 
 		if ( object.isInstancedMesh === true ) {
 
-			let minValue = this.minNode.value;
-			let maxValue = this.maxNode.value;
+			const minValue = this.minNode.value;
+			const maxValue = this.maxNode.value;
 
 			const minLength = builder.getTypeLength( getValueType( minValue ) );
 			const maxLength = builder.getTypeLength( getValueType( maxValue ) );
@@ -101,4 +101,4 @@ export default RangeNode;
 
 export const range = nodeProxy( RangeNode );
 
-addNodeClass( RangeNode );
+addNodeClass( 'RangeNode', RangeNode );

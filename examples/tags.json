@@ -40,6 +40,7 @@
 	"webgl_materials_blending_custom": [ "alpha" ],
 	"webgl_materials_channels": [ "normal", "depth", "rgba packing" ],
 	"webgl_materials_cubemap_mipmaps": [ "envmap" ],
+	"webgl_materials_cubemap_render_to_mipmaps": [ "envmap", "renderTarget", "mipmap" ],
 	"webgl_materials_envmaps_hdr": [ "rgbm" ],
 	"webgl_materials_lightmap": [ "shadow" ],
 	"webgl_materials_physical_clearcoat": [ "anisotropy" ],

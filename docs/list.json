@@ -170,10 +170,8 @@
 
 			"Lights": {
 				"AmbientLight": "api/en/lights/AmbientLight",
-				"AmbientLightProbe": "api/en/lights/AmbientLightProbe",
 				"DirectionalLight": "api/en/lights/DirectionalLight",
 				"HemisphereLight": "api/en/lights/HemisphereLight",
-				"HemisphereLightProbe": "api/en/lights/HemisphereLightProbe",
 				"Light": "api/en/lights/Light",
 				"LightProbe": "api/en/lights/LightProbe",
 				"PointLight": "api/en/lights/PointLight",
@@ -386,7 +384,6 @@
 			},
 
 			"Exporters": {
-				"ColladaExporter": "examples/en/exporters/ColladaExporter",
 				"DRACOExporter": "examples/en/exporters/DRACOExporter",
 				"EXRExporter": "examples/en/exporters/EXRExporter",
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
@@ -559,6 +556,181 @@
 				"QuadraticBezierCurve": "api/ar/extras/curves/QuadraticBezierCurve",
 				"QuadraticBezierCurve3": "api/ar/extras/curves/QuadraticBezierCurve3",
 				"SplineCurve": "api/ar/extras/curves/SplineCurve"
+			},
+
+			"Geometries": {
+				"BoxGeometry": "api/ar/geometries/BoxGeometry",
+				"CapsuleGeometry": "api/ar/geometries/CapsuleGeometry",
+				"CircleGeometry": "api/ar/geometries/CircleGeometry",
+				"ConeGeometry": "api/ar/geometries/ConeGeometry",
+				"CylinderGeometry": "api/ar/geometries/CylinderGeometry",
+				"DodecahedronGeometry": "api/ar/geometries/DodecahedronGeometry",
+				"EdgesGeometry": "api/ar/geometries/EdgesGeometry",
+				"ExtrudeGeometry": "api/ar/geometries/ExtrudeGeometry",
+				"IcosahedronGeometry": "api/ar/geometries/IcosahedronGeometry",
+				"LatheGeometry": "api/ar/geometries/LatheGeometry",
+				"OctahedronGeometry": "api/ar/geometries/OctahedronGeometry",
+				"PlaneGeometry": "api/ar/geometries/PlaneGeometry",
+				"PolyhedronGeometry": "api/ar/geometries/PolyhedronGeometry",
+				"RingGeometry": "api/ar/geometries/RingGeometry",
+				"ShapeGeometry": "api/ar/geometries/ShapeGeometry",
+				"SphereGeometry": "api/ar/geometries/SphereGeometry",
+				"TetrahedronGeometry": "api/ar/geometries/TetrahedronGeometry",
+				"TorusGeometry": "api/ar/geometries/TorusGeometry",
+				"TorusKnotGeometry": "api/ar/geometries/TorusKnotGeometry",
+				"TubeGeometry": "api/ar/geometries/TubeGeometry",
+				"WireframeGeometry": "api/ar/geometries/WireframeGeometry"
+			},
+
+			"Helpers": {
+				"ArrowHelper": "api/ar/helpers/ArrowHelper",
+				"AxesHelper": "api/ar/helpers/AxesHelper",
+				"BoxHelper": "api/ar/helpers/BoxHelper",
+				"Box3Helper": "api/ar/helpers/Box3Helper",
+				"CameraHelper": "api/ar/helpers/CameraHelper",
+				"DirectionalLightHelper": "api/ar/helpers/DirectionalLightHelper",
+				"GridHelper": "api/ar/helpers/GridHelper",
+				"PolarGridHelper": "api/ar/helpers/PolarGridHelper",
+				"HemisphereLightHelper": "api/ar/helpers/HemisphereLightHelper",
+				"PlaneHelper": "api/ar/helpers/PlaneHelper",
+				"PointLightHelper": "api/ar/helpers/PointLightHelper",
+				"SkeletonHelper": "api/ar/helpers/SkeletonHelper",
+				"SpotLightHelper": "api/ar/helpers/SpotLightHelper"
+			},
+
+			"Lights": {
+				"AmbientLight": "api/ar/lights/AmbientLight",
+				"DirectionalLight": "api/ar/lights/DirectionalLight",
+				"HemisphereLight": "api/ar/lights/HemisphereLight",
+				"Light": "api/ar/lights/Light",
+				"LightProbe": "api/ar/lights/LightProbe",
+				"PointLight": "api/ar/lights/PointLight",
+				"RectAreaLight": "api/ar/lights/RectAreaLight",
+				"SpotLight": "api/ar/lights/SpotLight"
+			},
+
+			"Lights / Shadows": {
+				"LightShadow": "api/ar/lights/shadows/LightShadow",
+				"PointLightShadow": "api/ar/lights/shadows/PointLightShadow",
+				"DirectionalLightShadow": "api/ar/lights/shadows/DirectionalLightShadow",
+				"SpotLightShadow": "api/ar/lights/shadows/SpotLightShadow"
+			},
+
+			"Loaders": {
+				"AnimationLoader": "api/ar/loaders/AnimationLoader",
+				"AudioLoader": "api/ar/loaders/AudioLoader",
+				"BufferGeometryLoader": "api/ar/loaders/BufferGeometryLoader",
+				"Cache": "api/ar/loaders/Cache",
+				"CompressedTextureLoader": "api/ar/loaders/CompressedTextureLoader",
+				"CubeTextureLoader": "api/ar/loaders/CubeTextureLoader",
+				"DataTextureLoader": "api/ar/loaders/DataTextureLoader",
+				"FileLoader": "api/ar/loaders/FileLoader",
+				"ImageBitmapLoader": "api/ar/loaders/ImageBitmapLoader",
+				"ImageLoader": "api/ar/loaders/ImageLoader",
+				"Loader": "api/ar/loaders/Loader",
+				"LoaderUtils": "api/ar/loaders/LoaderUtils",
+				"MaterialLoader": "api/ar/loaders/MaterialLoader",
+				"ObjectLoader": "api/ar/loaders/ObjectLoader",
+				"TextureLoader": "api/ar/loaders/TextureLoader"
+			},
+
+			"Loaders / Managers": {
+				"DefaultLoadingManager": "api/ar/loaders/managers/DefaultLoadingManager",
+				"LoadingManager": "api/ar/loaders/managers/LoadingManager"
+			},
+
+			"Materials": {
+				"LineBasicMaterial": "api/ar/materials/LineBasicMaterial",
+				"LineDashedMaterial": "api/ar/materials/LineDashedMaterial",
+				"Material": "api/ar/materials/Material",
+				"MeshBasicMaterial": "api/ar/materials/MeshBasicMaterial",
+				"MeshDepthMaterial": "api/ar/materials/MeshDepthMaterial",
+				"MeshDistanceMaterial": "api/ar/materials/MeshDistanceMaterial",
+				"MeshLambertMaterial": "api/ar/materials/MeshLambertMaterial",
+				"MeshMatcapMaterial": "api/ar/materials/MeshMatcapMaterial",
+				"MeshNormalMaterial": "api/ar/materials/MeshNormalMaterial",
+				"MeshPhongMaterial": "api/ar/materials/MeshPhongMaterial",
+				"MeshPhysicalMaterial": "api/ar/materials/MeshPhysicalMaterial",
+				"MeshStandardMaterial": "api/ar/materials/MeshStandardMaterial",
+				"MeshToonMaterial": "api/ar/materials/MeshToonMaterial",
+				"PointsMaterial": "api/ar/materials/PointsMaterial",
+				"RawShaderMaterial": "api/ar/materials/RawShaderMaterial",
+				"ShaderMaterial": "api/ar/materials/ShaderMaterial",
+				"ShadowMaterial": "api/ar/materials/ShadowMaterial",
+				"SpriteMaterial": "api/ar/materials/SpriteMaterial"
+			},
+
+			"Math": {
+				"Box2": "api/ar/math/Box2",
+				"Box3": "api/ar/math/Box3",
+				"Color": "api/ar/math/Color",
+				"Cylindrical": "api/ar/math/Cylindrical",
+				"Euler": "api/ar/math/Euler",
+				"Frustum": "api/ar/math/Frustum",
+				"Interpolant": "api/ar/math/Interpolant",
+				"Line3": "api/ar/math/Line3",
+				"MathUtils": "api/ar/math/MathUtils",
+				"Matrix3": "api/ar/math/Matrix3",
+				"Matrix4": "api/ar/math/Matrix4",
+				"Plane": "api/ar/math/Plane",
+				"Quaternion": "api/ar/math/Quaternion",
+				"Ray": "api/ar/math/Ray",
+				"Sphere": "api/ar/math/Sphere",
+				"Spherical": "api/ar/math/Spherical",
+				"SphericalHarmonics3": "api/ar/math/SphericalHarmonics3",
+				"Triangle": "api/ar/math/Triangle",
+				"Vector2": "api/ar/math/Vector2",
+				"Vector3": "api/ar/math/Vector3",
+				"Vector4": "api/ar/math/Vector4"
+			},
+
+			"Math / Interpolants": {
+				"CubicInterpolant": "api/ar/math/interpolants/CubicInterpolant",
+				"DiscreteInterpolant": "api/ar/math/interpolants/DiscreteInterpolant",
+				"LinearInterpolant": "api/ar/math/interpolants/LinearInterpolant",
+				"QuaternionLinearInterpolant": "api/ar/math/interpolants/QuaternionLinearInterpolant"
+			},
+
+			"Objects": {
+				"Bone": "api/ar/objects/Bone",
+				"Group": "api/ar/objects/Group",
+				"InstancedMesh": "api/ar/objects/InstancedMesh",
+				"Line": "api/ar/objects/Line",
+				"LineLoop": "api/ar/objects/LineLoop",
+				"LineSegments": "api/ar/objects/LineSegments",
+				"LOD": "api/ar/objects/LOD",
+				"Mesh": "api/ar/objects/Mesh",
+				"Points": "api/ar/objects/Points",
+				"Skeleton": "api/ar/objects/Skeleton",
+				"SkinnedMesh": "api/ar/objects/SkinnedMesh",
+				"Sprite": "api/ar/objects/Sprite"
+			},
+
+			"Renderers": {
+				"WebGLMultipleRenderTargets": "api/ar/renderers/WebGLMultipleRenderTargets",
+				"WebGLRenderer": "api/ar/renderers/WebGLRenderer",
+				"WebGL1Renderer": "api/ar/renderers/WebGL1Renderer",
+				"WebGLRenderTarget": "api/ar/renderers/WebGLRenderTarget",
+				"WebGL3DRenderTarget": "api/ar/renderers/WebGL3DRenderTarget",
+				"WebGLArrayRenderTarget": "api/ar/renderers/WebGLArrayRenderTarget",
+				"WebGLCubeRenderTarget": "api/ar/renderers/WebGLCubeRenderTarget"
+			},
+
+			"Renderers / Shaders": {
+				"ShaderChunk": "api/ar/renderers/shaders/ShaderChunk",
+				"ShaderLib": "api/ar/renderers/shaders/ShaderLib",
+				"UniformsLib": "api/ar/renderers/shaders/UniformsLib",
+				"UniformsUtils": "api/ar/renderers/shaders/UniformsUtils"
+			},
+
+			"Renderers / WebXR": {
+				"WebXRManager": "api/ar/renderers/webxr/WebXRManager"
+			},
+
+			"Scenes": {
+				"Fog": "api/ar/scenes/Fog",
+				"FogExp2": "api/ar/scenes/FogExp2",
+				"Scene": "api/ar/scenes/Scene"
 			}
 
 		}
@@ -732,10 +904,8 @@
 
 			"灯光": {
 				"AmbientLight": "api/zh/lights/AmbientLight",
-				"AmbientLightProbe": "api/zh/lights/AmbientLightProbe",
 				"DirectionalLight": "api/zh/lights/DirectionalLight",
 				"HemisphereLight": "api/zh/lights/HemisphereLight",
-				"HemisphereLightProbe": "api/zh/lights/HemisphereLightProbe",
 				"Light": "api/zh/lights/Light",
 				"LightProbe": "api/zh/lights/LightProbe",
 				"PointLight": "api/zh/lights/PointLight",
@@ -1325,10 +1495,8 @@
 
 			"Luci": {
 				"AmbientLight": "api/it/lights/AmbientLight",
-				"AmbientLightProbe": "api/it/lights/AmbientLightProbe",
 				"DirectionalLight": "api/it/lights/DirectionalLight",
 				"HemisphereLight": "api/it/lights/HemisphereLight",
-				"HemisphereLightProbe": "api/it/lights/HemisphereLightProbe",
 				"Light": "api/it/lights/Light",
 				"LightProbe": "api/it/lights/LightProbe",
 				"PointLight": "api/it/lights/PointLight",
@@ -1855,10 +2023,8 @@
 
 			"Lights": {
 				"AmbientLight": "api/en/lights/AmbientLight",
-				"AmbientLightProbe": "api/en/lights/AmbientLightProbe",
 				"DirectionalLight": "api/en/lights/DirectionalLight",
 				"HemisphereLight": "api/en/lights/HemisphereLight",
-				"HemisphereLightProbe": "api/en/lights/HemisphereLightProbe",
 				"Light": "api/en/lights/Light",
 				"LightProbe": "api/en/lights/LightProbe",
 				"PointLight": "api/en/lights/PointLight",
@@ -2070,7 +2236,6 @@
 			},
 
 			"Exporters": {
-				"ColladaExporter": "examples/en/exporters/ColladaExporter",
 				"EXRExporter": "examples/en/exporters/EXRExporter",
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
 				"OBJExporter": "examples/en/exporters/OBJExporter",

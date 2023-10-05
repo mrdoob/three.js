@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		فئة تمثل كائنات مبنية على شبكات مضلعة ثلاثية الأضلاع
+		[link:https://en.wikipedia.org/wiki/Polygon_mesh]. كما تعمل كقاعدة لفئات أخرى مثل
+		[page:SkinnedMesh].
+		</p>
+			
+		<h2>مثال للكود</h2>
+			
+		<code>
+		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		const mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
+			
+		<h2>المنشئ (Constructor)</h2>
+			
+		<h3>
+		[name]( [param:BufferGeometry geometry], [param:Material material] )
+		</h3>
+		<p>
+		[page:BufferGeometry geometry] — (اختياري) نسخة من
+		[page:BufferGeometry]. الافتراضي هو [page:BufferGeometry] جديد.<br />
+		[page:Material material] — (اختياري) نسخة واحدة أو مصفوفة من
+		[page:Material]. الافتراضي هو [page:MeshBasicMaterial] جديد
+		</p>
+			
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى الفئة الأساسية [page:Object3D] للحصول على الخصائص المشتركة.</p>
+			
+		<h3>[property:BufferGeometry geometry]</h3>
+		<p>
+		نسخة من [page:BufferGeometry] (أو الفئات المشتقة منها)، تحدد بنية
+		الكائن.
+		</p>
+			
+		<h3>[property:Boolean isMesh]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان كائن معين هو من نوع [name].</p>
+			
+		<h3>[property:Material material]</h3>
+		<p>
+		نسخة من المادة المشتقة من فئة [page:Material] الأساسية أو مصفوفة من المواد، تحدد مظهر الكائن. الافتراضي هو
+		[page:MeshBasicMaterial].
+		</p>
+
+		<h3>[property:Array morphTargetInfluences]</h3>
+		<p>
+		مصفوفة من الأوزان عادةً من 0-1 تحدد مقدار التحول
+		الذي يتم تطبيقه. غير معرف بشكل افتراضي، ولكن يتم إعادة تعيينه إلى مصفوفة فارغة بواسطة
+		[page:Mesh.updateMorphTargets updateMorphTargets].
+		</p>
+		
+		<h3>[property:Object morphTargetDictionary]</h3>
+		<p>
+		قاموس من morphTargets بناءً على خاصية morphTarget.name.
+		غير معرف بشكل افتراضي، ولكن يتم إعادة بنائه [page:Mesh.updateMorphTargets updateMorphTargets].
+		</p>
+		
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى الفئة الأساسية [page:Object3D] للحصول على الطرق المشتركة.</p>
+		
+		<h3>[method:Mesh clone]()</h3>
+		<p>إرجاع نسخة من هذا كائن [name] وأحفاده.</p>
+		
+		<h3>
+		[method:Vector3 getVertexPosition]( [param:Integer index], [param:Vector3 target] )
+		</h3>
+		<p>
+		الحصول على موضع الرأس المحلي في الفهرس المحدد، مع مراعاة
+		حالة الرسوم المتحركة الحالية لكل من التحولات والتشكيل.
+		</p>
+		
+		<h3>
+		[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )
+		</h3>
+		<p>
+		الحصول على تقاطعات بين شعاع ملقى وهذه الشبكة.
+		سيتم استدعاء هذه الطريقة بواسطة [page:Raycaster.intersectObject]، ولكن النتائج
+		غير مرتبة.
+		</p>
+		
+		<h3>[method:undefined updateMorphTargets]()</h3>
+		<p>
+		تحديث التحولات لعدم التأثير على الكائن. يعيد تعيين خصائص
+		[page:Mesh.morphTargetInfluences morphTargetInfluences] و
+		[page:Mesh.morphTargetDictionary morphTargetDictionary].
+		</p>
+		
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

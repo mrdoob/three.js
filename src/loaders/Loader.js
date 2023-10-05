@@ -67,4 +67,6 @@ class Loader {
 
 }
 
+Loader.DEFAULT_MATERIAL_NAME = '__DEFAULT';
+
 export { Loader };

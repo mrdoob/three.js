@@ -431,7 +431,7 @@ Editor.prototype = {
 
 					helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
 
-				} else if ( object.isBone === true && object.parent?.isBone !== true ) {
+				} else if ( object.isBone === true && object.parent && object.parent.isBone !== true ) {
 
 					helper = new THREE.SkeletonHelper( object );
 
@@ -540,7 +540,7 @@ Editor.prototype = {
 
 	},
 
-	setViewportShading: function( value ) {
+	setViewportShading: function ( value ) {
 
 		this.viewportShading = value;
 		this.signals.viewportShadingChanged.dispatch();
@@ -659,6 +659,12 @@ Editor.prototype = {
 
 		this.setScene( await loader.parseAsync( json.scene ) );
 
+		if ( json.environment === 'ModelViewer' ) {
+
+			this.signals.sceneEnvironmentChanged.dispatch( json.environment );
+
+		}
+
 	},
 
 	toJSON: function () {
@@ -680,6 +686,16 @@ Editor.prototype = {
 
 		}
 
+		// honor modelviewer environment
+
+		let environment = null;
+
+		if ( this.scene.environment !== null && this.scene.environment.isRenderTargetTexture === true ) {
+
+			environment = 'ModelViewer';
+
+		}
+
 		//
 
 		return {
@@ -689,14 +705,14 @@ Editor.prototype = {
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				shadowType: this.config.getKey( 'project/renderer/shadowType' ),
 				vr: this.config.getKey( 'project/vr' ),
-				useLegacyLights: this.config.getKey( 'project/renderer/useLegacyLights' ),
 				toneMapping: this.config.getKey( 'project/renderer/toneMapping' ),
 				toneMappingExposure: this.config.getKey( 'project/renderer/toneMappingExposure' )
 			},
 			camera: this.viewportCamera.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
-			history: this.history.toJSON()
+			history: this.history.toJSON(),
+			environment: environment
 
 		};
 

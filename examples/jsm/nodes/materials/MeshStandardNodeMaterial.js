@@ -3,7 +3,7 @@ import { diffuseColor, metalness, roughness, specularColor } from '../core/Prope
 import { mix } from '../math/MathNode.js';
 import { materialRoughness, materialMetalness } from '../accessors/MaterialNode.js';
 import getRoughness from '../functions/material/getRoughness.js';
-import physicalLightingModel from '../functions/PhysicalLightingModel.js';
+import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
 import { MeshStandardMaterial } from 'three';
@@ -29,13 +29,13 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructLightingModel( /*builder*/ ) {
+	setupLightingModel( /*builder*/ ) {
 
-		return physicalLightingModel;
+		return new PhysicalLightingModel();
 
 	}
 
-	constructVariants( { stack } ) {
+	setupVariants( { stack } ) {
 
 		// METALNESS
 
@@ -46,7 +46,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 		// ROUGHNESS
 
 		let roughnessNode = this.roughnessNode ? float( this.roughnessNode ) : materialRoughness;
-		roughnessNode = getRoughness.call( { roughness: roughnessNode } );
+		roughnessNode = getRoughness( { roughness: roughnessNode } );
 
 		stack.assign( roughness, roughnessNode );
 
@@ -64,23 +64,10 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	copy( source ) {
 
-		this.colorNode = source.colorNode;
-		this.opacityNode = source.opacityNode;
-
-		this.alphaTestNode = source.alphaTestNode;
-
-		this.normalNode = source.normalNode;
-
 		this.emissiveNode = source.emissiveNode;
 
 		this.metalnessNode = source.metalnessNode;
 		this.roughnessNode = source.roughnessNode;
-
-		this.envNode = source.envNode;
-
-		this.lightsNode = source.lightsNode;
-
-		this.positionNode = source.positionNode;
 
 		return super.copy( source );
 
@@ -90,4 +77,4 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 export default MeshStandardNodeMaterial;
 
-addNodeMaterial( MeshStandardNodeMaterial );
+addNodeMaterial( 'MeshStandardNodeMaterial', MeshStandardNodeMaterial );

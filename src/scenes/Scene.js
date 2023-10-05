@@ -58,20 +58,6 @@ class Scene extends Object3D {
 
 	}
 
-	get autoUpdate() { // @deprecated, r144
-
-		console.warn( 'THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.' );
-		return this.matrixWorldAutoUpdate;
-
-	}
-
-	set autoUpdate( value ) { // @deprecated, r144
-
-		console.warn( 'THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.' );
-		this.matrixWorldAutoUpdate = value;
-
-	}
-
 }
 
 export { Scene };

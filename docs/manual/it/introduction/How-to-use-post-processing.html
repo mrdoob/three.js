@@ -32,6 +32,7 @@
 		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 		import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
+		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 		</code>
 
 		<p>
@@ -59,8 +60,8 @@
 
 		<p>
       Il composer è pronto, ed è possibile configurare la catena di passaggi di post-processing. Questi passaggi sono i responsabili per la creazione
-      dell'output visivo finale dell'applicazione. Vengono elaborati nello stesso ordine in cui sono stati aggiunti/inseriti. Nel nostro esempio, l'istanza
-      di `RenderPass` viene eseguita per prima, poi l'istanza di `GlitchPass`. L'ultimo passaggio abilitato della catena viene automaticamente renderizzato sullo schermo.
+      dell'output visivo finale dell'applicazione. Vengono elaborati nello stesso ordine in cui sono stati aggiunti/inseriti. In our example, the instance of `RenderPass`
+      is executed first, then the instance of `GlitchPass` and finally `OutputPass`. L'ultimo passaggio abilitato della catena viene automaticamente renderizzato sullo schermo.
       La configurazione dei passaggi è la seguente:
 		</p>
 
@@ -70,12 +71,15 @@
 
 		const glitchPass = new GlitchPass();
 		composer.addPass( glitchPass );
+
+		const outputPass = new OutputPass();
+		composer.addPass( outputPass );
 		</code>
 
 		<p>
       `RenderPass` viene normalmente posizionata all'inizio della catena per fornire la scena renderizzata come input per il passaggio successivo di post-processing.
-      Nel nostro caso `GlitchPass` utilizzarà questi dati di immagine per applicare un effetto glitch selvaggio. Guarda questo [link:https://threejs.org/examples/webgl_postprocessing_glitch esempio live]
-      per vederli in azione.
+      Nel nostro caso `GlitchPass` utilizzarà questi dati di immagine per applicare un effetto glitch selvaggio.  `OutputPass` is usually the last pass in the chain which performs sRGB color space conversion and optional tone mapping.
+      Guarda questo [link:https://threejs.org/examples/webgl_postprocessing_glitch esempio live] per vederli in azione.
 		</p>
 
 		<h2>Passi Built-in</h2>

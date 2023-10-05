@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -132,7 +128,7 @@ missing their backs.</p>
 <div class="threejs_center"><img src="../resources/images/transparency-cubes-no-backs.png" style="width: 416px;"></div>
 <div class="threejs_center">no backs</div>
 
-<p>We learned about the <a href="/docs/#api/en/materials/Material#side"><code class="notranslate" translate="no">side</code></a> material property in 
+<p>We learned about the <a href="/docs/#api/en/materials/Material#side"><code class="notranslate" translate="no">side</code></a> material property in
 <a href="materials.html">the article on materials</a>.
 So, let's set it to <code class="notranslate" translate="no">THREE.DoubleSide</code> to get both sides of each cube to be drawn.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
@@ -165,7 +161,7 @@ previously recorded depth no pixel is drawn.</p>
 drawing the stuff in front. THREE.js does this for objects like <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> otherwise
 the very first example would have failed between cubes with some cubes blocking
 out others. Unfortunately for individual triangles shorting would be extremely slow. </p>
-<p>The cube has 12 triangles, 2 for each face, and the order they are drawn is 
+<p>The cube has 12 triangles, 2 for each face, and the order they are drawn is
 <a href="custom-buffergeometry.html">the same order they are built in the geometry</a>
 so depending on which direction we are looking the triangles closer to the camera
 might get drawn first. In that case the triangles in the back aren't drawn.
@@ -384,7 +380,7 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 so the plane behind is not drawn. There is no perfect solution.
 Adjust the <code class="notranslate" translate="no">alphaTest</code> and/or turn off <code class="notranslate" translate="no">transparent</code> to find a solution
 that fits your use case.</p>
-<p>The take way from this article is perfect transparency is hard. 
+<p>The take way from this article is perfect transparency is hard.
 There are issues and trade offs and workarounds.</p>
 <p>For example say you have a car.
 Cars usually have windshields on all 4 sides. If you want to avoid the sorting issues
@@ -396,7 +392,7 @@ sort the windows and draw them in the correct order.</p>
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -40,7 +36,7 @@ and let the user choose with a pointing device </p>
 <p>Three.js makes is relatively easy by providing 2 controller objects in VR
 and tries to handle both cases of a single 3DOF controller and two 6DOF
 controllers. Each of the controllers are <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> objects which give
-the orientation and position of that controller. They also provide 
+the orientation and position of that controller. They also provide
 <code class="notranslate" translate="no">selectstart</code>, <code class="notranslate" translate="no">select</code> and <code class="notranslate" translate="no">selectend</code> events when the user starts pressing,
 is pressing, and stops pressing (ends) the "main" button on the controller.</p>
 <p>Starting with the last example from <a href="webxr-look-to-select.html">the previous article</a>
@@ -55,7 +51,7 @@ pickHelper.addEventListener('select', (event) =&gt; {
 });
 </pre>
 <p>Remember from our previous code <code class="notranslate" translate="no">meshToMeshMap</code> maps our boxes and spheres to
-each other so if we have one we can look up its partner through <code class="notranslate" translate="no">meshToMeshMap</code> 
+each other so if we have one we can look up its partner through <code class="notranslate" translate="no">meshToMeshMap</code>
 so here we're just hiding the selected object and un-hiding its partner.</p>
 <p>As for the actual implementation of <code class="notranslate" translate="no">ControllerPickHelper</code>, first we need
 to add the VR controller objects to the scene and to those add some 3D lines
@@ -106,7 +102,7 @@ function makeInstance(geometry, color, x) {
 <p>Next let's add some code to pick from the controllers. This is the first time
 we've picked with something not the camera. In our <a href="picking.html">article on picking</a>
 the user uses the mouse or finger to pick which means picking comes from the camera
-into the screen. In <a href="webxr-look-to-select.html">the previous article</a> we 
+into the screen. In <a href="webxr-look-to-select.html">the previous article</a> we
 were picking based on which way the user is looking so again that comes from the
 camera. This time though we're picking from the position of the controllers so
 we're not using the camera.</p>
@@ -389,7 +385,7 @@ in three.js</p>
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

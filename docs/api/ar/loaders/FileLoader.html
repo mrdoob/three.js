@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			فئة منخفضة المستوى لتحميل الموارد باستخدام Fetch ، يتم استخدامها داخليًا من قبل
+			معظم المحملات. يمكن أيضًا استخدامها مباشرة لتحميل أي نوع ملف لا يحتوي على
+			محمل.			
+		</p>
+		 
+		<h2>مثال الكود</h2>
+		<code>
+		const loader = new THREE.FileLoader();
+	
+		//load a text file and output the result to the console
+		loader.load(
+			// resource URL
+			'example.txt',
+	
+			// onLoad callback
+			function ( data ) {
+				// output the text to the console
+				console.log( data )
+			},
+	
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+	
+			// onError callback
+			function ( err ) {
+				console.error( 'An error happened' );
+			}
+		);
+		</code>
+		 
+		<p>
+		* ملاحظة: * يجب تمكين ذاكرة التخزين المؤقت باستخدام
+		<code>THREE.Cache.enabled = true;</code>
+		هذه خاصية عالمية ولا يحتاج إلى تعيينها مرة واحدة فقط لتستخدمها جميع
+		المحملات التي تستخدم FileLoader داخليًا. [page:Cache Cache] هو وحدة ذاكرة التخزين المؤقت
+		التي تحتوي على الاستجابة من كل طلب يتم من خلال هذا المحمل ،
+		لذلك يتم طلب كل ملف مرة واحدة.
+		</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>[name] ( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] - [page:LoadingManager loadingManager]
+		للمحمل الذي سيستخدمه. الافتراضي هو [page:DefaultLoadingManager].
+		</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى الصفحة الأساسية [page:Loader] للخصائص المشتركة.</p>
+		 
+		<h3>[property:String mimeType]</h3>
+		<p>
+		المتوقع
+		[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType].
+		انظر [page:.setMimeType]. الافتراضي هو `undefined`.
+		</p>
+		 
+		<h3>[property:String responseType]</h3>
+		<p>
+		نوع الاستجابة المتوقع. انظر [page:.setResponseType]. الافتراضي هو
+		`undefined`.
+		</p>
+
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى الصفحة الأساسية [page:Loader] للطرق المشتركة.</p>
+	 
+		<h3>
+		[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )
+		</h3>
+		<p>
+		[page:String url] - المسار أو عنوان URL للملف. يمكن أن يكون هذا أيضًا
+		[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] (اختياري) - سيتم استدعاؤه عند اكتمال التحميل.
+		الوسيطة ستكون الاستجابة المحملة.<br />
+		[page:Function onProgress] (اختياري) - سيتم استدعاؤه أثناء تقدم التحميل.
+		الوسيطة ستكون مثيل ProgressEvent ، والذي
+		يحتوي على .[page:Boolean lengthComputable]، .[page:Integer total] و
+		.[page:Integer loaded]. إذا لم يضع الخادم رأس Content-Length
+		؛ .[page:Integer total] ستكون 0.<br />
+		[page:Function onError] (اختياري) - سيتم استدعاؤه في حالة حدوث خطأ.<br /><br />
+	 
+		قم بتحميل عنوان URL وإرسال الاستجابة إلى وظيفة onLoad.
+		</p>
+	 
+		<h3>[method:this setMimeType]( [param:String mimeType] )</h3>
+		<p>
+		قم بتعيين
+		[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType]
+		المتوقع للملف الذي يتم تحميله. لاحظ أنه في كثير من الحالات سيتم
+		تحديده تلقائيًا ، لذلك بشكل افتراضي هو `undefined`.
+		</p>
+	 
+		<h3>[method:this setResponseType]( [param:String responseType] )</h3>
+		<p>
+		قم بتغيير نوع الاستجابة. القيم المقبولة هي:<br />
+		[page:String text] أو سلسلة فارغة (افتراضية) - تعود بالبيانات كـ
+		[page:String String].<br />
+		[page:String arraybuffer] - يحمل البيانات في
+		[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer ArrayBuffer]
+		ويرجع ذلك.<br />
+		[page:String blob] - يعود بالبيانات كـ
+		[link:https://developer.mozilla.org/en/docs/Web/API/Blob Blob].<br />
+		[page:String document] - يحلل الملف باستخدام
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/DOMParser DOMParser].<br />
+		[page:String json] - يحلل الملف باستخدام
+		[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse JSON.parse].<br />
+		</p>
+	 
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

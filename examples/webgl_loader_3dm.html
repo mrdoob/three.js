@@ -32,10 +32,6 @@
 		</div>
 
 		<div id="loader"></div>
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -74,12 +70,13 @@
 
 				scene = new THREE.Scene();
 
-				const directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 6 );
 				directionalLight.position.set( 0, 0, 2 );
 				scene.add( directionalLight );
 
 				const loader = new Rhino3dmLoader();
-				loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.15.0/' );
+				//generally, use this for the Library Path: https://cdn.jsdelivr.net/npm/rhino3dm@8.0.0-beta2/
+				loader.setLibraryPath( 'jsm/libs/rhino3dm/' );
 				loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
 
 					scene.add( object );

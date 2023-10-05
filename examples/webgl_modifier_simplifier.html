@@ -7,11 +7,6 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -58,9 +53,9 @@
 				controls.enablePan = false;
 				controls.enableZoom = false;
 
-				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.6 ) );
 
-				const light = new THREE.PointLight( 0xffffff, 0.7 );
+				const light = new THREE.PointLight( 0xffffff, 400 );
 				camera.add( light );
 				scene.add( camera );
 
