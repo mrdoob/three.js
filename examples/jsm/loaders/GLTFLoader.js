@@ -62,7 +62,8 @@ import {
 	Vector2,
 	Vector3,
 	VectorKeyframeTrack,
-	SRGBColorSpace
+	SRGBColorSpace,
+	InstancedBufferAttribute
 } from 'three';
 import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
 
@@ -1679,7 +1680,12 @@ class GLTFMeshGpuInstancing {
 				// Add instance attributes to the geometry, excluding TRS.
 				for ( const attributeName in attributes ) {
 
-					if ( attributeName !== 'TRANSLATION' &&
+					if ( attributeName === '_COLOR_0' ) {
+
+						const attr = attributes[ attributeName ];
+						instancedMesh.instanceColor = new InstancedBufferAttribute( attr.array, attr.itemSize, attr.normalized );
+
+					} else if ( attributeName !== 'TRANSLATION' &&
 						 attributeName !== 'ROTATION' &&
 						 attributeName !== 'SCALE' ) {
 
