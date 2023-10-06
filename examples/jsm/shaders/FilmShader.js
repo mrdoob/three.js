@@ -38,7 +38,7 @@ const FilmShader = {
 
 			vec4 base = texture2D( tDiffuse, vUv );
 
-			float noise = rand( vUv + time );
+			float noise = rand( vUv + mod(time,1) );
 
 			vec3 color = base.rgb + base.rgb * clamp( 0.1 + noise, 0.0, 1.0 );
 
