@@ -1,7 +1,6 @@
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
-import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RAD2DEG } from '../../math/MathUtils.js';
@@ -40,9 +39,6 @@ class WebXRManager extends EventDispatcher {
 
 		const controllers = [];
 		const controllerInputSources = [];
-
-		const currentSize = new Vector2();
-		let currentPixelRatio = null;
 
 		//
 
@@ -176,9 +172,6 @@ class WebXRManager extends EventDispatcher {
 
 			//
 
-			renderer.setPixelRatio( currentPixelRatio );
-			renderer.setSize( currentSize.width, currentSize.height, false );
-
 			animation.stop();
 
 			scope.isPresenting = false;
@@ -235,12 +228,6 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
-		this._getRenderTarget = function () {
-
-			return newRenderTarget;
-
-		};
-
 		this.getFrame = function () {
 
 			return xrFrame;
@@ -290,9 +277,6 @@ class WebXRManager extends EventDispatcher {
 
 					session.updateRenderState( { baseLayer: glBaseLayer } );
 
-					renderer.setPixelRatio( 1 );
-					renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
-
 					newRenderTarget = new WebGLRenderTarget(
 						glBaseLayer.framebufferWidth,
 						glBaseLayer.framebufferHeight,
@@ -330,9 +314,6 @@ class WebXRManager extends EventDispatcher {
 
 					session.updateRenderState( { layers: [ glProjLayer ] } );
 
-					renderer.setPixelRatio( 1 );
-					renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
-
 					newRenderTarget = new WebGLRenderTarget(
 						glProjLayer.textureWidth,
 						glProjLayer.textureHeight,
@@ -356,9 +337,6 @@ class WebXRManager extends EventDispatcher {
 
 				customReferenceSpace = null;
 				referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
-
-				currentPixelRatio = renderer.getPixelRatio();
-				renderer.getSize( currentSize );
 
 				animation.setContext( session );
 				animation.start();
