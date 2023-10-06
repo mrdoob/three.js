@@ -26442,6 +26442,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			const controllers = [];
 			const controllerInputSources = [];
 
+			const currentSize = new Vector2();
+			let currentPixelRatio = null;
+
 			//
 
 			const cameraL = new PerspectiveCamera();
@@ -26574,6 +26577,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				//
 
+				renderer.setPixelRatio( currentPixelRatio );
+				renderer.setSize( currentSize.width, currentSize.height, false );
+
 				animation.stop();
 
 				scope.isPresenting = false;
@@ -26630,6 +26636,12 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			};
 
+			this._getRenderTarget = function () {
+
+				return newRenderTarget;
+
+			};
+
 			this.getFrame = function () {
 
 				return xrFrame;
@@ -26679,6 +26691,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						session.updateRenderState( { baseLayer: glBaseLayer } );
 
+						renderer.setPixelRatio( 1 );
+						renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
+
 						newRenderTarget = new WebGLRenderTarget(
 							glBaseLayer.framebufferWidth,
 							glBaseLayer.framebufferHeight,
@@ -26716,6 +26731,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						session.updateRenderState( { layers: [ glProjLayer ] } );
 
+						renderer.setPixelRatio( 1 );
+						renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
+
 						newRenderTarget = new WebGLRenderTarget(
 							glProjLayer.textureWidth,
 							glProjLayer.textureHeight,
@@ -26739,6 +26757,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 					customReferenceSpace = null;
 					referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
+
+					currentPixelRatio = renderer.getPixelRatio();
+					renderer.getSize( currentSize );
 
 					animation.setContext( session );
 					animation.start();
@@ -30131,6 +30152,13 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			};
 
 			this.setRenderTarget = function ( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0 ) {
+
+				// Render to base layer instead of canvas in WebXR
+				if ( renderTarget === null && this.xr.isPresenting ) {
+
+					renderTarget = this.xr._getRenderTarget();
+
+				}
 
 				_currentRenderTarget = renderTarget;
 				_currentActiveCubeFace = activeCubeFace;
