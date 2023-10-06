@@ -26437,9 +26437,6 @@ class WebXRManager extends EventDispatcher {
 		const controllers = [];
 		const controllerInputSources = [];
 
-		const currentSize = new Vector2();
-		let currentPixelRatio = null;
-
 		//
 
 		const cameraL = new PerspectiveCamera();
@@ -26572,9 +26569,6 @@ class WebXRManager extends EventDispatcher {
 
 			//
 
-			renderer.setPixelRatio( currentPixelRatio );
-			renderer.setSize( currentSize.width, currentSize.height, false );
-
 			animation.stop();
 
 			scope.isPresenting = false;
@@ -26631,12 +26625,6 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
-		this._getRenderTarget = function () {
-
-			return newRenderTarget;
-
-		};
-
 		this.getFrame = function () {
 
 			return xrFrame;
@@ -26686,9 +26674,6 @@ class WebXRManager extends EventDispatcher {
 
 					session.updateRenderState( { baseLayer: glBaseLayer } );
 
-					renderer.setPixelRatio( 1 );
-					renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
-
 					newRenderTarget = new WebGLRenderTarget(
 						glBaseLayer.framebufferWidth,
 						glBaseLayer.framebufferHeight,
@@ -26726,9 +26711,6 @@ class WebXRManager extends EventDispatcher {
 
 					session.updateRenderState( { layers: [ glProjLayer ] } );
 
-					renderer.setPixelRatio( 1 );
-					renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
-
 					newRenderTarget = new WebGLRenderTarget(
 						glProjLayer.textureWidth,
 						glProjLayer.textureHeight,
@@ -26752,9 +26734,6 @@ class WebXRManager extends EventDispatcher {
 
 				customReferenceSpace = null;
 				referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
-
-				currentPixelRatio = renderer.getPixelRatio();
-				renderer.getSize( currentSize );
 
 				animation.setContext( session );
 				animation.start();
@@ -30147,13 +30126,6 @@ class WebGLRenderer {
 		};
 
 		this.setRenderTarget = function ( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0 ) {
-
-			// Render to base layer instead of canvas in WebXR
-			if ( renderTarget === null && this.xr.isPresenting ) {
-
-				renderTarget = this.xr._getRenderTarget();
-
-			}
 
 			_currentRenderTarget = renderTarget;
 			_currentActiveCubeFace = activeCubeFace;
