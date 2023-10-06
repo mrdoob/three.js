@@ -18,7 +18,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - postprocessing<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> VR - postprocessing<br/>
 			(Oculus Browser 15.1+)
 		</div>
 
@@ -53,9 +53,11 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
+				renderer.xr.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
-				renderer.xr.enabled = true;
 				document.body.appendChild( VRButton.createButton( renderer ) );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight );
@@ -86,7 +88,7 @@
 				composer.setSize( window.innerWidth, window.innerHeight );
 				composer.addPass( new RenderPass( scene, camera ) );
 				composer.addPass( new UnrealBloomPass( undefined, 0.5, 1, 0 ) );
-				composer.addPass( new OutputPass( THREE.ACESFilmicToneMapping ) );
+				composer.addPass( new OutputPass() );
 
 				window.addEventListener( 'resize', onWindowResize );
 
