@@ -50,7 +50,7 @@ class Bindings extends DataMap {
 
 			const nodeBuilderState = this.nodes.getForCompute( computeNode );
 
-			const bindings = nodeBuilderState.bindings;
+			const bindings = nodeBuilderState.bindings.compute;
 
 			data.bindings = bindings;
 
