@@ -235,7 +235,7 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
-		this._getRenderTarget = function () {
+		this.getRenderTarget = function () {
 
 			return newRenderTarget;
 

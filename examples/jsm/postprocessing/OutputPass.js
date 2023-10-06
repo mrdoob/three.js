@@ -67,7 +67,7 @@ class OutputPass extends Pass {
 
 		if ( this.renderToScreen === true ) {
 
-			renderer.setRenderTarget( null );
+			renderer.setRenderTarget( renderer.xr.enabled ? renderer.xr.getRenderTarget() : null );
 			this.fsQuad.render( renderer );
 
 		} else {
