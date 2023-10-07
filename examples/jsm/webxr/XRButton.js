@@ -1,4 +1,4 @@
-const XRButton = {
+class XRButton {
 
 	createButton( renderer ) {
 
@@ -193,6 +193,6 @@ const XRButton = {
 
 	}
 
-};
+}
 
 export { XRButton };
