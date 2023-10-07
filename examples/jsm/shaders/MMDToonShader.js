@@ -69,7 +69,7 @@ const mmd_toon_matcap_fragment = /* glsl */`
 #endif
 `;
 
-const MMDToonShader = {
+const MMDToonShader = /* @__PURE__ */ ( () => ( {
 
 	defines: {
 		TOON: true,
@@ -127,6 +127,6 @@ const MMDToonShader = {
 				`
 			)
 
-};
+} ) )();
 
 export { MMDToonShader };

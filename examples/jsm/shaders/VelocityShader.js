@@ -10,7 +10,7 @@ import {
 
 const VelocityShader = {
 
-	uniforms: /* @__PURE__ */ UniformsUtils.merge( [
+	uniforms: /* @__PURE__ */ ( () => UniformsUtils.merge( [
 		UniformsLib.common,
 		UniformsLib.displacementmap,
 		{
@@ -18,7 +18,7 @@ const VelocityShader = {
 			currentProjectionViewMatrix: { value: /* @__PURE__ */ new Matrix4() },
 			previousProjectionViewMatrix: { value: /* @__PURE__ */ new Matrix4() }
 		}
-	] ),
+	] ) )(),
 
 	vertexShader: /* glsl */`
 #define NORMAL

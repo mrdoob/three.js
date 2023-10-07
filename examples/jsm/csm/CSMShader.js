@@ -1,5 +1,3 @@
-import { ShaderChunk } from 'three';
-
 const CSMShader = {
 	lights_fragment_begin: /* glsl */`
 vec3 geometryPosition = - vViewPosition;
@@ -284,7 +282,9 @@ uniform vec2 CSM_cascades[CSM_CASCADES];
 uniform float cameraNear;
 uniform float shadowFar;
 #endif
-	` + ShaderChunk.lights_pars_begin
+
+#include <lights_pars_begin>
+	`
 };
 
 export { CSMShader };

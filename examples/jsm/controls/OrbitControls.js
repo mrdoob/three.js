@@ -8,7 +8,6 @@ import {
 	Vector3,
 	Plane,
 	Ray,
-	MathUtils
 } from 'three';
 
 // OrbitControls performs orbiting, dollying (zooming), and panning.
@@ -23,7 +22,7 @@ const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
 const _ray = /* @__PURE__ */ new Ray();
 const _plane = /* @__PURE__ */ new Plane();
-const TILT_LIMIT = Math.cos( 70 * MathUtils.DEG2RAD );
+const TILT_LIMIT = Math.cos( 70 * ( Math.PI / 180 ) );
 
 class OrbitControls extends EventDispatcher {
 
