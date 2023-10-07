@@ -1,4 +1,6 @@
-const CSMShader = {
+import { ShaderChunk } from 'three';
+
+const CSMShader = /* @__PURE__ */ ( () => ( {
 	lights_fragment_begin: /* glsl */`
 vec3 geometryPosition = - vViewPosition;
 vec3 geometryNormal = normal;
@@ -283,8 +285,7 @@ uniform float cameraNear;
 uniform float shadowFar;
 #endif
 
-#include <lights_pars_begin>
-	`
-};
+	` + ShaderChunk.lights_pars_begin
+} ) )();
 
 export { CSMShader };
