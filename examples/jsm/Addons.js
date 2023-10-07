@@ -54,8 +54,6 @@ export * from './helpers/RectAreaLightHelper.js';
 export * from './helpers/VertexNormalsHelper.js';
 export * from './helpers/VertexTangentsHelper.js';
 export * from './helpers/ViewHelper.js';
-export * from './index.addons.js';
-export * from './index.js';
 export * from './interactive/HTMLMesh.js';
 export * from './interactive/InteractiveGroup.js';
 export * from './interactive/SelectionBox.js';
