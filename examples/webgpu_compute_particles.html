@@ -112,7 +112,7 @@
 
 					// floor
 
-					If ( position.y.lessThan( 0 ), () => {
+					If( position.y.lessThan( 0 ), () => {
 
 						position.y.assign( 0 );
 						velocity.y.assign( velocity.y.negate().mul( bounce ) );

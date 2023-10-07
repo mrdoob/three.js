@@ -100,9 +100,9 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			const perspective = cameraProjectionMatrix.element( 2 ).element( 3 ).equal( -1.0 ); // 4th entry in the 3rd column
 
-			If ( perspective, () => {
+			If( perspective, () => {
 
-				If ( start.z.lessThan( 0.0 ).and( end.z.greaterThan( 0.0 ) ), () => {
+				If( start.z.lessThan( 0.0 ).and( end.z.greaterThan( 0.0 ) ), () => {
 
 					end.assign( trimSegment( { start: start, end: end } ) );
 
@@ -163,7 +163,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				// endcaps
 
-				If ( positionGeometry.y.greaterThan( 1.0 ).or( positionGeometry.y.lessThan( 0.0 ) ), () => {
+				If( positionGeometry.y.greaterThan( 1.0 ).or( positionGeometry.y.lessThan( 0.0 ) ), () => {
 
 					offset.assign( offset.add( vec3( dir.mul( 2.0 ).mul( forwardOffset ), 0 ) ) );
 
@@ -203,7 +203,7 @@ class Line2NodeMaterial extends NodeMaterial {
 				offset.assign( positionGeometry.x.lessThan( 0.0 ).cond( offset.negate(), offset ) );
 
 				// endcaps
-				If ( positionGeometry.y.lessThan( 0.0 ), () => {
+				If( positionGeometry.y.lessThan( 0.0 ), () => {
 
 					offset.assign( offset.sub( dir ) );
 
@@ -289,9 +289,8 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			if ( useWorldUnits ) {
 
-
-				let worldStart = varying( vec3(), 'worldStart' );
-				let worldEnd = varying( vec3(), 'worldEnd' );
+				const worldStart = varying( vec3(), 'worldStart' );
+				const worldEnd = varying( vec3(), 'worldEnd' );
 
 				// Find the closest points on the view ray and the line segment
 				const rayEnd = varying( vec4(), 'worldPos' ).xyz.normalize().mul( 1e5 );
@@ -334,7 +333,7 @@ class Line2NodeMaterial extends NodeMaterial {
 					const dlen = property( 'float', 'dlen' );
 					dlen.assign( len2.fwidth() );
 
-					If ( abs( vUv.y ).greaterThan( 1.0 ), () => {
+					If( abs( vUv.y ).greaterThan( 1.0 ), () => {
 
 						alpha.assign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
 
@@ -342,7 +341,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				} else {
 
-					If ( abs( vUv.y ).greaterThan( 1.0 ), () => {
+					If( abs( vUv.y ).greaterThan( 1.0 ), () => {
 
 						const a = vUv.x;
 						const b = vUv.y.greaterThan( 0.0 ).cond( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );

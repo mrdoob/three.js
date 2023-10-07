@@ -24,7 +24,7 @@ class MorphNode extends Node {
 		const mesh = this.mesh;
 		const attributes = mesh.geometry.morphAttributes[ name ];
 
-		assignNode.assign( assignNode.mul( this.morphBaseInfluence ) );
+		assignNode.mulAssign( this.morphBaseInfluence );
 
 		for ( let i = 0; i < attributes.length; i ++ ) {
 
@@ -33,7 +33,7 @@ class MorphNode extends Node {
 			const bufferAttrib = bufferAttribute( attribute.array, 'vec3' );
 			const influence = reference( i, 'float', mesh.morphTargetInfluences );
 
-			assignNode.assign( assignNode.add( bufferAttrib.mul( influence ) ) );
+			assignNode.addAssign( bufferAttrib.mul( influence ) );
 
 		}
 

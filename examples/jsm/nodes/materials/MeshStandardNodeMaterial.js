@@ -35,7 +35,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	}
 
-	setupVariants( { stack } ) {
+	setupVariants() {
 
 		// METALNESS
 
