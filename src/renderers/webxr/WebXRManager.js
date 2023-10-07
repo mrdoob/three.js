@@ -270,6 +270,9 @@ class WebXRManager extends EventDispatcher {
 
 				}
 
+				currentPixelRatio = renderer.getPixelRatio();
+				renderer.getSize( currentSize );
+
 				if ( ( session.renderState.layers === undefined ) || ( renderer.capabilities.isWebGL2 === false ) ) {
 
 					const layerInit = {
@@ -350,9 +353,6 @@ class WebXRManager extends EventDispatcher {
 
 				customReferenceSpace = null;
 				referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
-
-				currentPixelRatio = renderer.getPixelRatio();
-				renderer.getSize( currentSize );
 
 				animation.setContext( session );
 				animation.start();
