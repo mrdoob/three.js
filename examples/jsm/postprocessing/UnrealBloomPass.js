@@ -24,6 +24,9 @@ import { LuminosityHighPassShader } from '../shaders/LuminosityHighPassShader.js
  */
 class UnrealBloomPass extends Pass {
 
+	static BlurDirectionX = /* @__PURE__ */ new Vector2( 1.0, 0.0 );
+	static BlurDirectionY = /* @__PURE__ */ new Vector2( 0.0, 1.0 );
+
 	constructor( resolution, strength, radius, threshold ) {
 
 		super();
@@ -408,8 +411,5 @@ class UnrealBloomPass extends Pass {
 	}
 
 }
-
-UnrealBloomPass.BlurDirectionX = new Vector2( 1.0, 0.0 );
-UnrealBloomPass.BlurDirectionY = new Vector2( 0.0, 1.0 );
 
 export { UnrealBloomPass };

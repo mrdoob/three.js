@@ -23,6 +23,15 @@ import { CopyShader } from '../shaders/CopyShader.js';
 
 class SSRPass extends Pass {
 
+	static OUTPUT = {
+		'Default': 0,
+		'SSR': 1,
+		'Beauty': 3,
+		'Depth': 4,
+		'Normal': 5,
+		'Metalness': 7,
+	};
+
 	constructor( { renderer, scene, camera, width, height, selects, bouncing = false, groundReflector } ) {
 
 		super();
@@ -628,14 +637,5 @@ class SSRPass extends Pass {
 	}
 
 }
-
-SSRPass.OUTPUT = {
-	'Default': 0,
-	'SSR': 1,
-	'Beauty': 3,
-	'Depth': 4,
-	'Normal': 5,
-	'Metalness': 7,
-};
 
 export { SSRPass };

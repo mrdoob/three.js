@@ -10,7 +10,7 @@ import {
  * A shadow Mesh that follows a shadow-casting Mesh in the scene, but is confined to a single plane.
  */
 
-const _shadowMatrix = new Matrix4();
+const _shadowMatrix = /* @__PURE__ */ new Matrix4();
 
 class ShadowMesh extends Mesh {
 

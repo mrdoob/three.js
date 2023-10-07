@@ -35,18 +35,16 @@
 import { LWO2Parser } from './LWO2Parser.js';
 import { LWO3Parser } from './LWO3Parser.js';
 
-function IFFParser( ) {
+class IFFParser {
 
-	this.debugger = new Debugger();
-	// this.debugger.enable(); // un-comment to log IFF hierarchy.
+	constructor() {
 
-}
+		this.debugger = new Debugger();
+		// this.debugger.enable(); // un-comment to log IFF hierarchy.
 
-IFFParser.prototype = {
+	}
 
-	constructor: IFFParser,
-
-	parse: function ( buffer ) {
+	parse( buffer ) {
 
 		this.reader = new DataViewReader( buffer );
 
@@ -82,7 +80,7 @@ IFFParser.prototype = {
 
 		return this.tree;
 
-	},
+	}
 
 	parseTopForm() {
 
@@ -120,13 +118,11 @@ IFFParser.prototype = {
 
 		return;
 
-	},
-
+	}
 
 	///
 	// FORM PARSING METHODS
 	///
-
 	// Forms are organisational and can contain any number of sub chunks and sub forms
 	// FORM ::= 'FORM'[ID4], length[U4], type[ID4], ( chunk[CHUNK] | form[FORM] ) * }
 	parseForm( length ) {
@@ -137,7 +133,6 @@ IFFParser.prototype = {
 
 			// SKIPPED FORMS
 			// if skipForm( length ) is called, the entire form and any sub forms and chunks are skipped
-
 			case 'ISEQ': // Image sequence
 			case 'ANIM': // plug in animation
 			case 'STCC': // Color-cycling Still
@@ -199,8 +194,7 @@ IFFParser.prototype = {
 				this.parseEnvelope( length );
 				break;
 
-				// CLIP FORM AND SUB FORMS
-
+			// CLIP FORM AND SUB FORMS
 			case 'CLIP':
 				if ( this.tree.format === 'LWO2' ) {
 
@@ -226,14 +220,12 @@ IFFParser.prototype = {
 				};
 				break;
 
-				// Not in spec, used by texture nodes
-
+			// Not in spec, used by texture nodes
 			case 'IMST':
 				this.parseImageStateForm( length );
 				break;
 
-				// SURF FORM AND SUB FORMS
-
+			// SURF FORM AND SUB FORMS
 			case 'SURF':
 				this.parseSurfaceForm( length );
 				break;
@@ -269,8 +261,7 @@ IFFParser.prototype = {
 				this.parseEntryForm( length );
 				break;
 
-				// Image Map Layer
-
+			// Image Map Layer
 			case 'IMAP':
 				this.parseImageMap( length );
 				break;
@@ -279,8 +270,7 @@ IFFParser.prototype = {
 				this.parseXVAL( 'amplitude', length );
 				break;
 
-				//Texture Mapping Form
-
+			//Texture Mapping Form
 			case 'TMAP':
 				this.setupForm( 'textureMap', length );
 				break;
@@ -306,7 +296,7 @@ IFFParser.prototype = {
 		this.debugger.nodeID = type;
 		this.debugger.log();
 
-	},
+	}
 
 	setupForm( type, length ) {
 
@@ -331,13 +321,13 @@ IFFParser.prototype = {
 		}
 
 
-	},
+	}
 
 	skipForm( length ) {
 
 		this.reader.skip( length - 4 );
 
-	},
+	}
 
 	parseUnknownForm( type, length ) {
 
@@ -346,7 +336,7 @@ IFFParser.prototype = {
 		printBuffer( this.reader.dv.buffer, this.reader.offset, length - 4 );
 		this.reader.skip( length - 4 );
 
-	},
+	}
 
 	parseSurfaceForm( length ) {
 
@@ -355,7 +345,7 @@ IFFParser.prototype = {
 		var name = this.reader.getString();
 
 		var surface = {
-			attributes: {}, // LWO2 style non-node attributes will go here
+			attributes: {},
 			connections: {},
 			name: name,
 			inputName: name,
@@ -370,14 +360,14 @@ IFFParser.prototype = {
 		this.currentForm = surface;
 		this.currentFormEnd = this.reader.offset + length;
 
-	},
+	}
 
 	parseSurfaceLwo2( length ) {
 
 		var name = this.reader.getString();
 
 		var surface = {
-			attributes: {}, // LWO2 style non-node attributes will go here
+			attributes: {},
 			connections: {},
 			name: name,
 			nodes: {},
@@ -391,7 +381,7 @@ IFFParser.prototype = {
 		this.currentForm = surface;
 		this.currentFormEnd = this.reader.offset + length;
 
-	},
+	}
 
 	parseSubNode( length ) {
 
@@ -411,7 +401,7 @@ IFFParser.prototype = {
 		this.currentFormEnd = this.reader.offset + length;
 
 
-	},
+	}
 
 	// collect attributes from all nodes at the top level of a surface
 	parseConnections( length ) {
@@ -421,7 +411,7 @@ IFFParser.prototype = {
 
 		this.currentForm = this.currentSurface.connections;
 
-	},
+	}
 
 	// surface node attribute data, e.g. specular, roughness etc
 	parseEntryForm( length ) {
@@ -432,7 +422,7 @@ IFFParser.prototype = {
 
 		this.setupForm( name, length );
 
-	},
+	}
 
 	// parse values from material - doesn't match up to other LWO3 data types
 	// sub form of entry form
@@ -462,7 +452,7 @@ IFFParser.prototype = {
 
 		}
 
-	},
+	}
 
 	// holds various data about texture node image state
 	// Data other thanmipMapLevel unknown
@@ -472,7 +462,7 @@ IFFParser.prototype = {
 
 		this.currentForm.mipMapLevel = this.reader.getFloat32();
 
-	},
+	}
 
 	// LWO2 style image data node OR LWO3 textures defined at top level in editor (not as SURF node)
 	parseImageMap( length ) {
@@ -488,7 +478,7 @@ IFFParser.prototype = {
 
 		this.reader.skip( 10 ); // unknown, could be an issue if it contains a VX
 
-	},
+	}
 
 	parseTextureNodeAttribute( type ) {
 
@@ -526,19 +516,18 @@ IFFParser.prototype = {
 		this.reader.skip( 2 ); // unknown
 
 
-	},
+	}
 
 	// ENVL forms are currently ignored
 	parseEnvelope( length ) {
 
 		this.reader.skip( length - 4 ); // skipping  entirely for now
 
-	},
+	}
 
 	///
 	// CHUNK PARSING METHODS
 	///
-
 	// clips can either be defined inside a surface node, or at the top
 	// level and they have a different format in each case
 	parseClip( length ) {
@@ -570,7 +559,7 @@ IFFParser.prototype = {
 		this.tree.textures.push( texture );
 		this.currentForm = texture;
 
-	},
+	}
 
 	parseClipLwo2( length ) {
 
@@ -602,14 +591,14 @@ IFFParser.prototype = {
 		this.tree.textures.push( texture );
 		this.currentForm = texture;
 
-	},
+	}
 
 	parseImage() {
 
 		this.reader.skip( 8 ); // unknown
 		this.currentForm.fileName = this.reader.getString();
 
-	},
+	}
 
 	parseXVAL( type, length ) {
 
@@ -620,7 +609,7 @@ IFFParser.prototype = {
 
 		this.reader.setOffset( endOffset ); // set end offset directly to skip optional envelope
 
-	},
+	}
 
 	parseXVAL3( type, length ) {
 
@@ -635,7 +624,7 @@ IFFParser.prototype = {
 
 		this.reader.setOffset( endOffset );
 
-	},
+	}
 
 	// Tags associated with an object
 	// OTAG { type[ID4], tag-string[S0] }
@@ -647,7 +636,7 @@ IFFParser.prototype = {
 			tagString: this.reader.getString()
 		};
 
-	},
+	}
 
 	// Signals the start of a new layer. All the data chunks which follow will be included in this layer until another layer chunk is encountered.
 	// LAYR: number[U2], flags[U2], pivot[VEC12], name[S0], parent[U2]
@@ -655,8 +644,8 @@ IFFParser.prototype = {
 
 		var layer = {
 			number: this.reader.getUint16(),
-			flags: this.reader.getUint16(), // If the least significant bit of flags is set, the layer is hidden.
-			pivot: this.reader.getFloat32Array( 3 ), // Note: this seems to be superflous, as the geometry is translated when pivot is present
+			flags: this.reader.getUint16(),
+			pivot: this.reader.getFloat32Array( 3 ),
 			name: this.reader.getString(),
 		};
 
@@ -665,10 +654,11 @@ IFFParser.prototype = {
 
 		var parsedLength = 16 + stringOffset( this.currentLayer.name ); // index ( 2 ) + flags( 2 ) + pivot( 12 ) + stringlength
 
+
 		// if we have not reached then end of the layer block, there must be a parent defined
 		this.currentLayer.parent = ( parsedLength < length ) ? this.reader.getUint16() : - 1; // omitted or -1 for no parent
 
-	},
+	}
 
 	// VEC12 * ( F4 + F4 + F4 ) array of x,y,z vectors
 	// Converting from left to right handed coordinate system:
@@ -683,12 +673,11 @@ IFFParser.prototype = {
 
 		}
 
-	},
+	}
 
 	// parse VMAP or VMAD
 	// Associates a set of floating-point vectors with a set of points.
 	// VMAP: { type[ID4], dimension[U2], name[S0], ( vert[VX], value[F4] # dimension ) * }
-
 	// VMAD Associates a set of floating-point vectors with the vertices of specific polygons.
 	// Similar to VMAP UVs, but associates with polygon vertices rather than points
 	// to solve to problem of UV seams:  VMAD chunks are paired with VMAPs of the same name,
@@ -744,7 +733,7 @@ IFFParser.prototype = {
 
 		}
 
-	},
+	}
 
 	parseUVMapping( name, finalOffset, discontinuous ) {
 
@@ -783,7 +772,7 @@ IFFParser.prototype = {
 
 		}
 
-	},
+	}
 
 	parseMorphTargets( name, finalOffset, type ) {
 
@@ -808,7 +797,7 @@ IFFParser.prototype = {
 			type: type,
 		};
 
-	},
+	}
 
 	// A list of polygons for the current layer.
 	// POLS { type[ID4], ( numvert+flags[U2], vert[VX] # numvert ) * }
@@ -847,7 +836,7 @@ IFFParser.prototype = {
 
 		this.currentLayer.geometry = geometryData;
 
-	},
+	}
 
 	// Lists the tag strings that can be associated with polygons by the PTAG chunk.
 	// TAGS { tag-string[S0] * }
@@ -855,7 +844,7 @@ IFFParser.prototype = {
 
 		this.tree.tags = this.reader.getStringArray( length );
 
-	},
+	}
 
 	// Associates tags of a given type with polygons in the most recent POLS chunk.
 	// PTAG { type[ID4], ( poly[VX], tag[U2] ) * }
@@ -870,7 +859,7 @@ IFFParser.prototype = {
 
 		}
 
-	},
+	}
 
 	parseMaterialIndices( finalOffset ) {
 
@@ -886,7 +875,7 @@ IFFParser.prototype = {
 
 		}
 
-	},
+	}
 
 	parseUnknownCHUNK( blockID, length ) {
 
@@ -894,33 +883,31 @@ IFFParser.prototype = {
 
 		// print the chunk plus some bytes padding either side
 		// printBuffer( this.reader.dv.buffer, this.reader.offset - 20, length + 40 );
-
 		var data = this.reader.getString( length );
 
 		this.currentForm[ blockID ] = data;
 
 	}
 
-};
-
-function DataViewReader( buffer ) {
-
-	this.dv = new DataView( buffer );
-	this.offset = 0;
-	this._textDecoder = new TextDecoder();
-	this._bytes = new Uint8Array( buffer );
-
 }
 
-DataViewReader.prototype = {
 
-	constructor: DataViewReader,
+class DataViewReader {
 
-	size: function () {
+	constructor( buffer ) {
+
+		this.dv = new DataView( buffer );
+		this.offset = 0;
+		this._textDecoder = new TextDecoder();
+		this._bytes = new Uint8Array( buffer );
+
+	}
+
+	size() {
 
 		return this.dv.buffer.byteLength;
 
-	},
+	}
 
 	setOffset( offset ) {
 
@@ -934,54 +921,54 @@ DataViewReader.prototype = {
 
 		}
 
-	},
+	}
 
-	endOfFile: function () {
+	endOfFile() {
 
 		if ( this.offset >= this.size() ) return true;
 		return false;
 
-	},
+	}
 
-	skip: function ( length ) {
+	skip( length ) {
 
 		this.offset += length;
 
-	},
+	}
 
-	getUint8: function () {
+	getUint8() {
 
 		var value = this.dv.getUint8( this.offset );
 		this.offset += 1;
 		return value;
 
-	},
+	}
 
-	getUint16: function () {
+	getUint16() {
 
 		var value = this.dv.getUint16( this.offset );
 		this.offset += 2;
 		return value;
 
-	},
+	}
 
-	getInt32: function () {
+	getInt32() {
 
 		var value = this.dv.getInt32( this.offset, false );
 		this.offset += 4;
 		return value;
 
-	},
+	}
 
-	getUint32: function () {
+	getUint32() {
 
 		var value = this.dv.getUint32( this.offset, false );
 		this.offset += 4;
 		return value;
 
-	},
+	}
 
-	getUint64: function () {
+	getUint64() {
 
 		var low, high;
 
@@ -989,17 +976,17 @@ DataViewReader.prototype = {
 		low = this.getUint32();
 		return high * 0x100000000 + low;
 
-	},
+	}
 
-	getFloat32: function () {
+	getFloat32() {
 
 		var value = this.dv.getFloat32( this.offset, false );
 		this.offset += 4;
 		return value;
 
-	},
+	}
 
-	getFloat32Array: function ( size ) {
+	getFloat32Array( size ) {
 
 		var a = [];
 
@@ -1011,17 +998,17 @@ DataViewReader.prototype = {
 
 		return a;
 
-	},
+	}
 
-	getFloat64: function () {
+	getFloat64() {
 
 		var value = this.dv.getFloat64( this.offset, this.littleEndian );
 		this.offset += 8;
 		return value;
 
-	},
+	}
 
-	getFloat64Array: function ( size ) {
+	getFloat64Array( size ) {
 
 		var a = [];
 
@@ -1033,7 +1020,7 @@ DataViewReader.prototype = {
 
 		return a;
 
-	},
+	}
 
 	// get variable-length index data type
 	// VX ::= index[U2] | (index + 0xFF000000)[U4]
@@ -1053,16 +1040,16 @@ DataViewReader.prototype = {
 
 		return firstByte * 256 + this.getUint8();
 
-	},
+	}
 
 	// An ID tag is a sequence of 4 bytes containing 7-bit ASCII values
 	getIDTag() {
 
 		return this.getString( 4 );
 
-	},
+	}
 
-	getString: function ( size ) {
+	getString( size ) {
 
 		if ( size === 0 ) return;
 
@@ -1095,9 +1082,9 @@ DataViewReader.prototype = {
 
 		return result;
 
-	},
+	}
 
-	getStringArray: function ( size ) {
+	getStringArray( size ) {
 
 		var a = this.getString( size );
 		a = a.split( '\0' );
@@ -1106,29 +1093,28 @@ DataViewReader.prototype = {
 
 	}
 
-};
+}
+
 
 // ************** DEBUGGER  **************
 
-function Debugger( ) {
+class Debugger {
 
-	this.active = false;
-	this.depth = 0;
-	this.formList = [];
+	constructor() {
 
-}
+		this.active = false;
+		this.depth = 0;
+		this.formList = [];
 
-Debugger.prototype = {
+	}
 
-	constructor: Debugger,
-
-	enable: function () {
+	enable() {
 
 		this.active = true;
 
-	},
+	}
 
-	log: function () {
+	log() {
 
 		if ( ! this.active ) return;
 
@@ -1169,9 +1155,9 @@ Debugger.prototype = {
 
 		this.skipped = false;
 
-	},
+	}
 
-	closeForms: function () {
+	closeForms() {
 
 		if ( ! this.active ) return;
 
@@ -1189,7 +1175,8 @@ Debugger.prototype = {
 
 	}
 
-};
+}
+
 
 // ************** UTILITY FUNCTIONS **************
 

@@ -3942,8 +3942,8 @@ function getData( polygonVertexIndex, polygonIndex, vertexIndex, infoObject ) {
 
 }
 
-const tempEuler = new Euler();
-const tempVec = new Vector3();
+const tempEuler = /* @__PURE__ */ new Euler();
+const tempVec = /* @__PURE__ */ new Vector3();
 
 // generate transformation from FBX transform data
 // ref: https://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_10CDD63C_79C1_4F2D_BB28_AD2BE65A02ED_htm

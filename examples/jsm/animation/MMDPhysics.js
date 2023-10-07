@@ -1230,10 +1230,10 @@ class Constraint {
 
 //
 
-const _position = new Vector3();
-const _quaternion = new Quaternion();
-const _scale = new Vector3();
-const _matrixWorldInv = new Matrix4();
+const _position = /* @__PURE__ */ new Vector3();
+const _quaternion = /* @__PURE__ */ new Quaternion();
+const _scale = /* @__PURE__ */ new Vector3();
+const _matrixWorldInv = /* @__PURE__ */ new Matrix4();
 
 class MMDPhysicsHelper extends Object3D {
 

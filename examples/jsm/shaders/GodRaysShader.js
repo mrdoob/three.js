@@ -83,7 +83,7 @@ const GodRaysGenerateShader = {
 			value: 1.0
 		},
 		vSunPositionScreenSpace: {
-			value: new Vector3()
+			value: /* @__PURE__ */ new Vector3()
 		}
 
 	},
@@ -254,7 +254,7 @@ const GodRaysFakeSunShader = {
 	uniforms: {
 
 		vSunPositionScreenSpace: {
-			value: new Vector3()
+			value: /* @__PURE__ */ new Vector3()
 		},
 
 		fAspect: {
@@ -262,11 +262,11 @@ const GodRaysFakeSunShader = {
 		},
 
 		sunColor: {
-			value: new Color( 0xffee00 )
+			value: /* @__PURE__ */ new Color( 0xffee00 )
 		},
 
 		bgColor: {
-			value: new Color( 0x000000 )
+			value: /* @__PURE__ */ new Color( 0x000000 )
 		}
 
 	},

@@ -10,15 +10,15 @@ import {
 import { CSMFrustum } from './CSMFrustum.js';
 import { CSMShader } from './CSMShader.js';
 
-const _cameraToLightMatrix = new Matrix4();
-const _lightSpaceFrustum = new CSMFrustum();
-const _center = new Vector3();
-const _bbox = new Box3();
+const _cameraToLightMatrix = /* @__PURE__ */ new Matrix4();
+const _lightSpaceFrustum = /* @__PURE__ */ new CSMFrustum();
+const _center = /* @__PURE__ */ new Vector3();
+const _bbox = /* @__PURE__ */ new Box3();
 const _uniformArray = [];
 const _logArray = [];
-const _lightOrientationMatrix = new Matrix4();
-const _lightOrientationMatrixInverse = new Matrix4();
-const _up = new Vector3( 0, 1, 0 );
+const _lightOrientationMatrix = /* @__PURE__ */ new Matrix4();
+const _lightOrientationMatrixInverse = /* @__PURE__ */ new Matrix4();
+const _up = /* @__PURE__ */ new Vector3( 0, 1, 0 );
 
 export class CSM {
 

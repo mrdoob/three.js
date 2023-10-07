@@ -9,13 +9,13 @@ import {
 import { Capsule } from '../math/Capsule.js';
 
 
-const _v1 = new Vector3();
-const _v2 = new Vector3();
-const _plane = new Plane();
-const _line1 = new Line3();
-const _line2 = new Line3();
-const _sphere = new Sphere();
-const _capsule = new Capsule();
+const _v1 = /* @__PURE__ */ new Vector3();
+const _v2 = /* @__PURE__ */ new Vector3();
+const _plane = /* @__PURE__ */ new Plane();
+const _line1 = /* @__PURE__ */ new Line3();
+const _line2 = /* @__PURE__ */ new Line3();
+const _sphere = /* @__PURE__ */ new Sphere();
+const _capsule = /* @__PURE__ */ new Capsule();
 
 class Octree {
 

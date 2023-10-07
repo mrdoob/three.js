@@ -15,9 +15,11 @@ import {
  * - https://stackoverflow.com/a/4322940/1314762
  */
 
-const _face = new Triangle();
-const _color = new Vector3();
-const _uva = new Vector2(), _uvb = new Vector2(), _uvc = new Vector2();
+const _face = /* @__PURE__ */ new Triangle();
+const _color = /* @__PURE__ */ new Vector3();
+const _uva = /* @__PURE__ */ new Vector2();
+const _uvb = /* @__PURE__ */ new Vector2();
+const _uvc = /* @__PURE__ */ new Vector2();
 
 class MeshSurfaceSampler {
 

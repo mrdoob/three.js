@@ -35,7 +35,7 @@ import { ConvexGeometry } from '../geometries/ConvexGeometry.js';
  *
 */
 
-const _v1 = new Vector3();
+const _v1 = /* @__PURE__ */ new Vector3();
 
 class ConvexObjectBreaker {
 

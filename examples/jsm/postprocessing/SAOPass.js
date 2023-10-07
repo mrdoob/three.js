@@ -29,6 +29,12 @@ import { CopyShader } from '../shaders/CopyShader.js';
 
 class SAOPass extends Pass {
 
+	static OUTPUT = {
+		'Default': 0,
+		'SAO': 1,
+		'Normal': 2
+	};
+
 	constructor( scene, camera, resolution = new Vector2( 256, 256 ) ) {
 
 		super();
@@ -326,11 +332,5 @@ class SAOPass extends Pass {
 	}
 
 }
-
-SAOPass.OUTPUT = {
-	'Default': 0,
-	'SAO': 1,
-	'Normal': 2
-};
 
 export { SAOPass };

@@ -3,7 +3,7 @@ import {
 	Vector3
 } from 'three';
 
-const _tempNormal = new Vector3();
+const _tempNormal = /* @__PURE__ */ new Vector3();
 
 function getUv( faceDirVector, normal, uvAxis, projectionAxis, radius, sideLength ) {
 

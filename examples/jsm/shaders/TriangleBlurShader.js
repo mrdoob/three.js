@@ -17,7 +17,7 @@ const TriangleBlurShader = {
 	uniforms: {
 
 		'texture': { value: null },
-		'delta': { value: new Vector2( 1, 1 ) }
+		'delta': { value: /* @__PURE__ */ new Vector2( 1, 1 ) }
 
 	},
 

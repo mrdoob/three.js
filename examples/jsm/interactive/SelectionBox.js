@@ -9,29 +9,29 @@ import {
  * This is a class to check whether objects are in a selection area in 3D space
  */
 
-const _frustum = new Frustum();
-const _center = new Vector3();
+const _frustum = /* @__PURE__ */ new Frustum();
+const _center = /* @__PURE__ */ new Vector3();
 
-const _tmpPoint = new Vector3();
+const _tmpPoint = /* @__PURE__ */ new Vector3();
 
-const _vecNear = new Vector3();
-const _vecTopLeft = new Vector3();
-const _vecTopRight = new Vector3();
-const _vecDownRight = new Vector3();
-const _vecDownLeft = new Vector3();
+const _vecNear = /* @__PURE__ */ new Vector3();
+const _vecTopLeft = /* @__PURE__ */ new Vector3();
+const _vecTopRight = /* @__PURE__ */ new Vector3();
+const _vecDownRight = /* @__PURE__ */ new Vector3();
+const _vecDownLeft = /* @__PURE__ */ new Vector3();
 
-const _vecFarTopLeft = new Vector3();
-const _vecFarTopRight = new Vector3();
-const _vecFarDownRight = new Vector3();
-const _vecFarDownLeft = new Vector3();
+const _vecFarTopLeft = /* @__PURE__ */ new Vector3();
+const _vecFarTopRight = /* @__PURE__ */ new Vector3();
+const _vecFarDownRight = /* @__PURE__ */ new Vector3();
+const _vecFarDownLeft = /* @__PURE__ */ new Vector3();
 
-const _vectemp1 = new Vector3();
-const _vectemp2 = new Vector3();
-const _vectemp3 = new Vector3();
+const _vectemp1 = /* @__PURE__ */ new Vector3();
+const _vectemp2 = /* @__PURE__ */ new Vector3();
+const _vectemp3 = /* @__PURE__ */ new Vector3();
 
-const _matrix = new Matrix4();
-const _quaternion = new Quaternion();
-const _scale = new Vector3();
+const _matrix = /* @__PURE__ */ new Matrix4();
+const _quaternion = /* @__PURE__ */ new Quaternion();
+const _scale = /* @__PURE__ */ new Vector3();
 
 class SelectionBox {
 

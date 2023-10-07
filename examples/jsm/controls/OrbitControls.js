@@ -21,8 +21,8 @@ import {
 const _changeEvent = { type: 'change' };
 const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
-const _ray = new Ray();
-const _plane = new Plane();
+const _ray = /* @__PURE__ */ new Ray();
+const _plane = /* @__PURE__ */ new Plane();
 const TILT_LIMIT = Math.cos( 70 * MathUtils.DEG2RAD );
 
 class OrbitControls extends EventDispatcher {

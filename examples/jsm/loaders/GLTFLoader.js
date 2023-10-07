@@ -2030,7 +2030,7 @@ class GLTFCubicSplineInterpolant extends Interpolant {
 
 }
 
-const _q = new Quaternion();
+const _q = /* @__PURE__ */ new Quaternion();
 
 class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
 
@@ -2419,7 +2419,7 @@ function getImageURIMimeType( uri ) {
 
 }
 
-const _identityMatrix = new Matrix4();
+const _identityMatrix = /* @__PURE__ */ new Matrix4();
 
 /* GLTF PARSER */
 

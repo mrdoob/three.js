@@ -43,7 +43,7 @@ const BokehShader = {
 		'pentagon': { value: 0 },
 
 		'shaderFocus': { value: 1 },
-		'focusCoords': { value: new Vector2() }
+		'focusCoords': { value: /* @__PURE__ */ new Vector2() }
 
 
 	},

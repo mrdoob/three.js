@@ -20,15 +20,15 @@ import {
 	Vector3
 } from 'three';
 
-const _raycaster = new Raycaster();
+const _raycaster = /* @__PURE__ */ new Raycaster();
 
-const _tempVector = new Vector3();
-const _tempVector2 = new Vector3();
-const _tempQuaternion = new Quaternion();
+const _tempVector = /* @__PURE__ */ new Vector3();
+const _tempVector2 = /* @__PURE__ */ new Vector3();
+const _tempQuaternion = /* @__PURE__ */ new Quaternion();
 const _unit = {
-	X: new Vector3( 1, 0, 0 ),
-	Y: new Vector3( 0, 1, 0 ),
-	Z: new Vector3( 0, 0, 1 )
+	X: /* @__PURE__ */ new Vector3( 1, 0, 0 ),
+	Y: /* @__PURE__ */ new Vector3( 0, 1, 0 ),
+	Z: /* @__PURE__ */ new Vector3( 0, 0, 1 )
 };
 
 const _changeEvent = { type: 'change' };
@@ -745,22 +745,22 @@ function intersectObjectWithRay( object, raycaster, includeInvisible ) {
 
 // Reusable utility variables
 
-const _tempEuler = new Euler();
-const _alignVector = new Vector3( 0, 1, 0 );
-const _zeroVector = new Vector3( 0, 0, 0 );
-const _lookAtMatrix = new Matrix4();
-const _tempQuaternion2 = new Quaternion();
-const _identityQuaternion = new Quaternion();
-const _dirVector = new Vector3();
-const _tempMatrix = new Matrix4();
+const _tempEuler = /* @__PURE__ */ new Euler();
+const _alignVector = /* @__PURE__ */ new Vector3( 0, 1, 0 );
+const _zeroVector = /* @__PURE__ */ new Vector3( 0, 0, 0 );
+const _lookAtMatrix = /* @__PURE__ */ new Matrix4();
+const _tempQuaternion2 = /* @__PURE__ */ new Quaternion();
+const _identityQuaternion = /* @__PURE__ */ new Quaternion();
+const _dirVector = /* @__PURE__ */ new Vector3();
+const _tempMatrix = /* @__PURE__ */ new Matrix4();
 
-const _unitX = new Vector3( 1, 0, 0 );
-const _unitY = new Vector3( 0, 1, 0 );
-const _unitZ = new Vector3( 0, 0, 1 );
+const _unitX = /* @__PURE__ */ new Vector3( 1, 0, 0 );
+const _unitY = /* @__PURE__ */ new Vector3( 0, 1, 0 );
+const _unitZ = /* @__PURE__ */ new Vector3( 0, 0, 1 );
 
-const _v1 = new Vector3();
-const _v2 = new Vector3();
-const _v3 = new Vector3();
+const _v1 = /* @__PURE__ */ new Vector3();
+const _v2 = /* @__PURE__ */ new Vector3();
+const _v3 = /* @__PURE__ */ new Vector3();
 
 class TransformControlsGizmo extends Object3D {
 

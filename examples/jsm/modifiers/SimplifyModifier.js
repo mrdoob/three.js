@@ -15,7 +15,8 @@ import * as BufferGeometryUtils from '../utils/BufferGeometryUtils.js';
  *    - http://www.melax.com/polychop/
  */
 
-const _cb = new Vector3(), _ab = new Vector3();
+const _cb = /* @__PURE__ */ new Vector3();
+const _ab = /* @__PURE__ */ new Vector3();
 
 class SimplifyModifier {
 

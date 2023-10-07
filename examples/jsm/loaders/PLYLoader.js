@@ -42,7 +42,7 @@ import {
  *
  */
 
-const _color = new Color();
+const _color = /* @__PURE__ */ new Color();
 
 class PLYLoader extends Loader {
 

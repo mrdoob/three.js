@@ -9,9 +9,9 @@ import {
  * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
  */
 
-const _position = new Vector3();
-const _quaternion = new Quaternion();
-const _scale = new Vector3();
+const _position = /* @__PURE__ */ new Vector3();
+const _quaternion = /* @__PURE__ */ new Quaternion();
+const _scale = /* @__PURE__ */ new Vector3();
 
 class CSS3DObject extends Object3D {
 
@@ -82,8 +82,8 @@ class CSS3DSprite extends CSS3DObject {
 
 //
 
-const _matrix = new Matrix4();
-const _matrix2 = new Matrix4();
+const _matrix = /* @__PURE__ */ new Matrix4();
+const _matrix2 = /* @__PURE__ */ new Matrix4();
 
 class CSS3DRenderer {
 

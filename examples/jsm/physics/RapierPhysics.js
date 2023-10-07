@@ -4,8 +4,8 @@ const RAPIER_PATH = 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.11.2';
 
 const frameRate = 60;
 
-const _scale = new Vector3( 1, 1, 1 );
-const ZERO = new Vector3();
+const _scale = /* @__PURE__ */ new Vector3( 1, 1, 1 );
+const ZERO = /* @__PURE__ */ new Vector3();
 
 let RAPIER = null;
 

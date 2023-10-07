@@ -7,14 +7,14 @@ import {
 	Vector3
 } from 'three';
 
-const _plane = new Plane();
-const _raycaster = new Raycaster();
+const _plane = /* @__PURE__ */ new Plane();
+const _raycaster = /* @__PURE__ */ new Raycaster();
 
-const _pointer = new Vector2();
-const _offset = new Vector3();
-const _intersection = new Vector3();
-const _worldPosition = new Vector3();
-const _inverseMatrix = new Matrix4();
+const _pointer = /* @__PURE__ */ new Vector2();
+const _offset = /* @__PURE__ */ new Vector3();
+const _intersection = /* @__PURE__ */ new Vector3();
+const _worldPosition = /* @__PURE__ */ new Vector3();
+const _inverseMatrix = /* @__PURE__ */ new Matrix4();
 
 class DragControls extends EventDispatcher {
 

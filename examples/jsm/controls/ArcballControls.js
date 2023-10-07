@@ -54,8 +54,8 @@ const _center = {
 //transformation matrices for gizmos and camera
 const _transformation = {
 
-	camera: new Matrix4(),
-	gizmos: new Matrix4()
+	camera: /* @__PURE__ */ new Matrix4(),
+	gizmos: /* @__PURE__ */ new Matrix4()
 
 };
 
@@ -64,12 +64,12 @@ const _changeEvent = { type: 'change' };
 const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
 
-const _raycaster = new Raycaster();
-const _offset = new Vector3();
+const _raycaster = /* @__PURE__ */ new Raycaster();
+const _offset = /* @__PURE__ */ new Vector3();
 
-const _gizmoMatrixStateTemp = new Matrix4();
-const _cameraMatrixStateTemp = new Matrix4();
-const _scalePointTemp = new Vector3();
+const _gizmoMatrixStateTemp = /* @__PURE__ */ new Matrix4();
+const _cameraMatrixStateTemp = /* @__PURE__ */ new Matrix4();
+const _scalePointTemp = /* @__PURE__ */ new Vector3();
 /**
  *
  * @param {Camera} camera Virtual camera used in the scene

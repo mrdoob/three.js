@@ -18,6 +18,24 @@ import { Color } from 'three';
 /* global DracoEncoderModule */
 
 class DRACOExporter {
+	// Encoder methods
+
+	static MESH_EDGEBREAKER_ENCODING = 1;
+	static MESH_SEQUENTIAL_ENCODING = 0;
+
+	// Geometry type
+
+	static POINT_CLOUD = 0;
+	static TRIANGULAR_MESH = 1;
+
+	// Attribute type
+
+	static INVALID = - 1;
+	static POSITION = 0;
+	static NORMAL = 1;
+	static COLOR = 2;
+	static TEX_COORD = 3;
+	static GENERIC = 4;
 
 	parse( object, options = {} ) {
 
@@ -244,24 +262,5 @@ function createVertexColorSRGBArray( attribute ) {
 	return array;
 
 }
-
-// Encoder methods
-
-DRACOExporter.MESH_EDGEBREAKER_ENCODING = 1;
-DRACOExporter.MESH_SEQUENTIAL_ENCODING = 0;
-
-// Geometry type
-
-DRACOExporter.POINT_CLOUD = 0;
-DRACOExporter.TRIANGULAR_MESH = 1;
-
-// Attribute type
-
-DRACOExporter.INVALID = - 1;
-DRACOExporter.POSITION = 0;
-DRACOExporter.NORMAL = 1;
-DRACOExporter.COLOR = 2;
-DRACOExporter.TEX_COORD = 3;
-DRACOExporter.GENERIC = 4;
 
 export { DRACOExporter };

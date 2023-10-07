@@ -13,21 +13,21 @@ import {
 import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
 import { LineMaterial } from '../lines/LineMaterial.js';
 
-const _start = new Vector3();
-const _end = new Vector3();
+const _start = /* @__PURE__ */ new Vector3();
+const _end = /* @__PURE__ */ new Vector3();
 
-const _start4 = new Vector4();
-const _end4 = new Vector4();
+const _start4 = /* @__PURE__ */ new Vector4();
+const _end4 = /* @__PURE__ */ new Vector4();
 
-const _ssOrigin = new Vector4();
-const _ssOrigin3 = new Vector3();
-const _mvMatrix = new Matrix4();
-const _line = new Line3();
-const _closestPoint = new Vector3();
+const _ssOrigin = /* @__PURE__ */ new Vector4();
+const _ssOrigin3 = /* @__PURE__ */ new Vector3();
+const _mvMatrix = /* @__PURE__ */ new Matrix4();
+const _line = /* @__PURE__ */ new Line3();
+const _closestPoint = /* @__PURE__ */ new Vector3();
 
-const _box = new Box3();
-const _sphere = new Sphere();
-const _clipToWorldVector = new Vector4();
+const _box = /* @__PURE__ */ new Box3();
+const _sphere = /* @__PURE__ */ new Sphere();
+const _clipToWorldVector = /* @__PURE__ */ new Vector4();
 
 let _ray, _lineWidth;
 

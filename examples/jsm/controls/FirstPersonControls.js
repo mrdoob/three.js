@@ -4,9 +4,9 @@ import {
 	Vector3
 } from 'three';
 
-const _lookDirection = new Vector3();
-const _spherical = new Spherical();
-const _target = new Vector3();
+const _lookDirection = /* @__PURE__ */ new Vector3();
+const _spherical = /* @__PURE__ */ new Spherical();
+const _target = /* @__PURE__ */ new Vector3();
 
 class FirstPersonControls {
 

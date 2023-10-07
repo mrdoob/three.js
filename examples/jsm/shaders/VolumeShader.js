@@ -12,10 +12,10 @@ import {
 const VolumeRenderShader1 = {
 
 	uniforms: {
-		'u_size': { value: new Vector3( 1, 1, 1 ) },
+		'u_size': { value: /* @__PURE__ */ new Vector3( 1, 1, 1 ) },
 		'u_renderstyle': { value: 0 },
 		'u_renderthreshold': { value: 0.5 },
-		'u_clim': { value: new Vector2( 1, 1 ) },
+		'u_clim': { value: /* @__PURE__ */ new Vector2( 1, 1 ) },
 		'u_data': { value: null },
 		'u_cmdata': { value: null }
 	},

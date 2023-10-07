@@ -7,9 +7,9 @@ import {
 	Vector3
 } from 'three';
 
-const _v1 = new Vector3();
-const _v2 = new Vector3();
-const _normalMatrix = new Matrix3();
+const _v1 = /* @__PURE__ */ new Vector3();
+const _v2 = /* @__PURE__ */ new Vector3();
+const _normalMatrix = /* @__PURE__ */ new Matrix3();
 
 class VertexNormalsHelper extends LineSegments {
 

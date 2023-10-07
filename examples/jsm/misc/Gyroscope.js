@@ -4,13 +4,13 @@ import {
 	Vector3
 } from 'three';
 
-const _translationObject = new Vector3();
-const _quaternionObject = new Quaternion();
-const _scaleObject = new Vector3();
+const _translationObject = /* @__PURE__ */ new Vector3();
+const _quaternionObject = /* @__PURE__ */ new Quaternion();
+const _scaleObject = /* @__PURE__ */ new Vector3();
 
-const _translationWorld = new Vector3();
-const _quaternionWorld = new Quaternion();
-const _scaleWorld = new Vector3();
+const _translationWorld = /* @__PURE__ */ new Vector3();
+const _quaternionWorld = /* @__PURE__ */ new Quaternion();
+const _scaleWorld = /* @__PURE__ */ new Vector3();
 
 class Gyroscope extends Object3D {
 

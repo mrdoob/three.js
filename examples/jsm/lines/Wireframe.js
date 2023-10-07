@@ -7,8 +7,8 @@ import {
 import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
 import { LineMaterial } from '../lines/LineMaterial.js';
 
-const _start = new Vector3();
-const _end = new Vector3();
+const _start = /* @__PURE__ */ new Vector3();
+const _end = /* @__PURE__ */ new Vector3();
 
 class Wireframe extends Mesh {
 

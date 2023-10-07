@@ -1,6 +1,6 @@
 import { Vector3, Matrix4 } from 'three';
 
-const inverseProjectionMatrix = new Matrix4();
+const inverseProjectionMatrix = /* @__PURE__ */ new Matrix4();
 
 class CSMFrustum {
 

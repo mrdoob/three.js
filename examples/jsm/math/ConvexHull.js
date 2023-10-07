@@ -12,11 +12,11 @@ import {
 const Visible = 0;
 const Deleted = 1;
 
-const _v1 = new Vector3();
-const _line3 = new Line3();
-const _plane = new Plane();
-const _closestPoint = new Vector3();
-const _triangle = new Triangle();
+const _v1 = /* @__PURE__ */ new Vector3();
+const _line3 = /* @__PURE__ */ new Line3();
+const _plane = /* @__PURE__ */ new Plane();
+const _closestPoint = /* @__PURE__ */ new Vector3();
+const _triangle = /* @__PURE__ */ new Triangle();
 
 class ConvexHull {
 

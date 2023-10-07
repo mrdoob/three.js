@@ -13,17 +13,17 @@ import {
 	Vector3
 } from 'three';
 
-const _q = new Quaternion();
-const _targetPos = new Vector3();
-const _targetVec = new Vector3();
-const _effectorPos = new Vector3();
-const _effectorVec = new Vector3();
-const _linkPos = new Vector3();
-const _invLinkQ = new Quaternion();
-const _linkScale = new Vector3();
-const _axis = new Vector3();
-const _vector = new Vector3();
-const _matrix = new Matrix4();
+const _q = /* @__PURE__ */ new Quaternion();
+const _targetPos = /* @__PURE__ */ new Vector3();
+const _targetVec = /* @__PURE__ */ new Vector3();
+const _effectorPos = /* @__PURE__ */ new Vector3();
+const _effectorVec = /* @__PURE__ */ new Vector3();
+const _linkPos = /* @__PURE__ */ new Vector3();
+const _invLinkQ = /* @__PURE__ */ new Quaternion();
+const _linkScale = /* @__PURE__ */ new Vector3();
+const _axis = /* @__PURE__ */ new Vector3();
+const _vector = /* @__PURE__ */ new Vector3();
+const _matrix = /* @__PURE__ */ new Matrix4();
 
 
 /**

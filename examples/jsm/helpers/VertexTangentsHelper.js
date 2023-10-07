@@ -6,8 +6,8 @@ import {
 	Vector3
 } from 'three';
 
-const _v1 = new Vector3();
-const _v2 = new Vector3();
+const _v1 = /* @__PURE__ */ new Vector3();
+const _v2 = /* @__PURE__ */ new Vector3();
 
 class VertexTangentsHelper extends LineSegments {
 

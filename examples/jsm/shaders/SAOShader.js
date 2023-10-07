@@ -19,12 +19,12 @@ const SAOShader = {
 		'tDepth': { value: null },
 		'tDiffuse': { value: null },
 		'tNormal': { value: null },
-		'size': { value: new Vector2( 512, 512 ) },
+		'size': { value: /* @__PURE__ */ new Vector2( 512, 512 ) },
 
 		'cameraNear': { value: 1 },
 		'cameraFar': { value: 100 },
-		'cameraProjectionMatrix': { value: new Matrix4() },
-		'cameraInverseProjectionMatrix': { value: new Matrix4() },
+		'cameraProjectionMatrix': { value: /* @__PURE__ */ new Matrix4() },
+		'cameraInverseProjectionMatrix': { value: /* @__PURE__ */ new Matrix4() },
 
 		'scale': { value: 1.0 },
 		'intensity': { value: 0.1 },

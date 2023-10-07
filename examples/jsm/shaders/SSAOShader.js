@@ -26,8 +26,8 @@ const SSAOShader = {
 		'cameraNear': { value: null },
 		'cameraFar': { value: null },
 		'resolution': { value: new Vector2() },
-		'cameraProjectionMatrix': { value: new Matrix4() },
-		'cameraInverseProjectionMatrix': { value: new Matrix4() },
+		'cameraProjectionMatrix': { value: /* @__PURE__ */ new Matrix4() },
+		'cameraInverseProjectionMatrix': { value: /* @__PURE__ */ new Matrix4() },
 		'kernelRadius': { value: 8 },
 		'minDistance': { value: 0.005 },
 		'maxDistance': { value: 0.05 },
@@ -247,7 +247,7 @@ const SSAOBlurShader = {
 	uniforms: {
 
 		'tDiffuse': { value: null },
-		'resolution': { value: new Vector2() }
+		'resolution': { value: /* @__PURE__ */ new Vector2() }
 
 	},
 

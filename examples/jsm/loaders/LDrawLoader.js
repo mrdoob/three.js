@@ -42,8 +42,8 @@ const MAIN_EDGE_COLOUR_CODE = '24';
 
 const COLOR_SPACE_LDRAW = SRGBColorSpace;
 
-const _tempVec0 = new Vector3();
-const _tempVec1 = new Vector3();
+const _tempVec0 = /* @__PURE__ */ new Vector3();
+const _tempVec1 = /* @__PURE__ */ new Vector3();
 
 class LDrawConditionalLineMaterial extends ShaderMaterial {
 
@@ -205,7 +205,7 @@ function generateFaceNormals( faces ) {
 
 }
 
-const _ray = new Ray();
+const _ray = /* @__PURE__ */ new Ray();
 function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
 	// NOTE: 1e2 is pretty coarse but was chosen to quantize the resulting value because

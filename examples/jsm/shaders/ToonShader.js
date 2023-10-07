@@ -16,12 +16,12 @@ const ToonShader1 = {
 
 	uniforms: {
 
-		'uDirLightPos': { value: new Vector3() },
-		'uDirLightColor': { value: new Color( 0xeeeeee ) },
+		'uDirLightPos': { value: /* @__PURE__ */ new Vector3() },
+		'uDirLightColor': { value: /* @__PURE__ */ new Color( 0xeeeeee ) },
 
-		'uAmbientLightColor': { value: new Color( 0x050505 ) },
+		'uAmbientLightColor': { value: /* @__PURE__ */ new Color( 0x050505 ) },
 
-		'uBaseColor': { value: new Color( 0xffffff ) }
+		'uBaseColor': { value: /* @__PURE__ */ new Color( 0xffffff ) }
 
 	},
 
@@ -90,16 +90,16 @@ const ToonShader2 = {
 
 	uniforms: {
 
-		'uDirLightPos': { value: new Vector3() },
-		'uDirLightColor': { value: new Color( 0xeeeeee ) },
+		'uDirLightPos': { value: /* @__PURE__ */ new Vector3() },
+		'uDirLightColor': { value: /* @__PURE__ */ new Color( 0xeeeeee ) },
 
-		'uAmbientLightColor': { value: new Color( 0x050505 ) },
+		'uAmbientLightColor': { value: /* @__PURE__ */ new Color( 0x050505 ) },
 
-		'uBaseColor': { value: new Color( 0xeeeeee ) },
-		'uLineColor1': { value: new Color( 0x808080 ) },
-		'uLineColor2': { value: new Color( 0x000000 ) },
-		'uLineColor3': { value: new Color( 0x000000 ) },
-		'uLineColor4': { value: new Color( 0x000000 ) }
+		'uBaseColor': { value: /* @__PURE__ */ new Color( 0xeeeeee ) },
+		'uLineColor1': { value: /* @__PURE__ */ new Color( 0x808080 ) },
+		'uLineColor2': { value: /* @__PURE__ */ new Color( 0x000000 ) },
+		'uLineColor3': { value: /* @__PURE__ */ new Color( 0x000000 ) },
+		'uLineColor4': { value: /* @__PURE__ */ new Color( 0x000000 ) }
 
 	},
 
@@ -158,16 +158,16 @@ const ToonShaderHatching = {
 
 	uniforms: {
 
-		'uDirLightPos':	{ value: new Vector3() },
-		'uDirLightColor': { value: new Color( 0xeeeeee ) },
+		'uDirLightPos':	{ value: /* @__PURE__ */ new Vector3() },
+		'uDirLightColor': { value: /* @__PURE__ */ new Color( 0xeeeeee ) },
 
-		'uAmbientLightColor': { value: new Color( 0x050505 ) },
+		'uAmbientLightColor': { value: /* @__PURE__ */ new Color( 0x050505 ) },
 
-		'uBaseColor': { value: new Color( 0xffffff ) },
-		'uLineColor1': { value: new Color( 0x000000 ) },
-		'uLineColor2': { value: new Color( 0x000000 ) },
-		'uLineColor3': { value: new Color( 0x000000 ) },
-		'uLineColor4': { value: new Color( 0x000000 ) }
+		'uBaseColor': { value: /* @__PURE__ */ new Color( 0xffffff ) },
+		'uLineColor1': { value: /* @__PURE__ */ new Color( 0x000000 ) },
+		'uLineColor2': { value: /* @__PURE__ */ new Color( 0x000000 ) },
+		'uLineColor3': { value: /* @__PURE__ */ new Color( 0x000000 ) },
+		'uLineColor4': { value: /* @__PURE__ */ new Color( 0x000000 ) }
 
 	},
 
@@ -254,13 +254,13 @@ const ToonShaderDotted = {
 
 	uniforms: {
 
-		'uDirLightPos':	{ value: new Vector3() },
-		'uDirLightColor': { value: new Color( 0xeeeeee ) },
+		'uDirLightPos':	{ value: /* @__PURE__ */ new Vector3() },
+		'uDirLightColor': { value: /* @__PURE__ */ new Color( 0xeeeeee ) },
 
-		'uAmbientLightColor': { value: new Color( 0x050505 ) },
+		'uAmbientLightColor': { value: /* @__PURE__ */ new Color( 0x050505 ) },
 
-		'uBaseColor': { value: new Color( 0xffffff ) },
-		'uLineColor1': { value: new Color( 0x000000 ) }
+		'uBaseColor': { value: /* @__PURE__ */ new Color( 0xffffff ) },
+		'uLineColor1': { value: /* @__PURE__ */ new Color( 0x000000 ) }
 
 	},
 

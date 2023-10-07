@@ -5,9 +5,9 @@ import {
 } from 'three';
 import * as BufferGeometryUtils from '../utils/BufferGeometryUtils.js';
 
-const _A = new Vector3();
-const _B = new Vector3();
-const _C = new Vector3();
+const _A = /* @__PURE__ */ new Vector3();
+const _B = /* @__PURE__ */ new Vector3();
+const _C = /* @__PURE__ */ new Vector3();
 
 class EdgeSplitModifier {
 
@@ -273,7 +273,5 @@ class EdgeSplitModifier {
 	}
 
 }
-
-
 
 export { EdgeSplitModifier };

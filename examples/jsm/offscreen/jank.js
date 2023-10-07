@@ -42,4 +42,5 @@ function jank() {
 
 }
 
+export { initJank };
 export default initJank;

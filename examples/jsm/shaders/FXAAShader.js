@@ -15,7 +15,7 @@ const FXAAShader = {
 	uniforms: {
 
 		'tDiffuse': { value: null },
-		'resolution': { value: new Vector2( 1 / 1024, 1 / 512 ) }
+		'resolution': { value: /* @__PURE__ */ new Vector2( 1 / 1024, 1 / 512 ) }
 
 	},
 

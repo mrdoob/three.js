@@ -77,7 +77,7 @@ const MMDToonShader = {
 		MATCAP_BLENDING_ADD: true,
 	},
 
-	uniforms: UniformsUtils.merge( [
+	uniforms: /* @__PURE__ */ UniformsUtils.merge( [
 		ShaderLib.toon.uniforms,
 		ShaderLib.phong.uniforms,
 		ShaderLib.matcap.uniforms,

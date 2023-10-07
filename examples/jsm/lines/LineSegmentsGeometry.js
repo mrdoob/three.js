@@ -9,8 +9,8 @@ import {
 	WireframeGeometry
 } from 'three';
 
-const _box = new Box3();
-const _vector = new Vector3();
+const _box = /* @__PURE__ */ new Box3();
+const _vector = /* @__PURE__ */ new Vector3();
 
 class LineSegmentsGeometry extends InstancedBufferGeometry {
 

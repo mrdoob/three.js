@@ -4,8 +4,8 @@ import {
 	Vector3
 } from 'three';
 
-const _euler = new Euler( 0, 0, 0, 'YXZ' );
-const _vector = new Vector3();
+const _euler = /* @__PURE__ */ new Euler( 0, 0, 0, 'YXZ' );
+const _vector = /* @__PURE__ */ new Vector3();
 
 const _changeEvent = { type: 'change' };
 const _lockEvent = { type: 'lock' };

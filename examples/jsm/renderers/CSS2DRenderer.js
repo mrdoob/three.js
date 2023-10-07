@@ -54,11 +54,11 @@ class CSS2DObject extends Object3D {
 
 //
 
-const _vector = new Vector3();
-const _viewMatrix = new Matrix4();
-const _viewProjectionMatrix = new Matrix4();
-const _a = new Vector3();
-const _b = new Vector3();
+const _vector = /* @__PURE__ */ new Vector3();
+const _viewMatrix = /* @__PURE__ */ new Matrix4();
+const _viewProjectionMatrix = /* @__PURE__ */ new Matrix4();
+const _a = /* @__PURE__ */ new Vector3();
+const _b = /* @__PURE__ */ new Vector3();
 
 class CSS2DRenderer {
 
