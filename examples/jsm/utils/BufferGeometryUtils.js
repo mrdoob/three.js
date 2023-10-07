@@ -1359,6 +1359,23 @@ function mergeBufferAttributes( attributes ) {
 
 }
 
+const BufferGeometryUtils = {
+
+	computeMikkTSpaceTangents,
+	mergeGeometries,
+	mergeBufferGeometries,
+	mergeAttributes,
+	mergeBufferAttributes,
+	interleaveAttributes,
+	estimateBytesUsed,
+	mergeVertices,
+	toTrianglesDrawMode,
+	computeMorphedAttributes,
+	mergeGroups,
+	toCreasedNormals,
+
+};
+
 export {
 	computeMikkTSpaceTangents,
 	mergeGeometries,
@@ -1371,5 +1388,6 @@ export {
 	toTrianglesDrawMode,
 	computeMorphedAttributes,
 	mergeGroups,
-	toCreasedNormals
+	toCreasedNormals,
+	BufferGeometryUtils,
 };

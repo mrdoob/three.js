@@ -2,9 +2,12 @@ export * from './animation/AnimationClipCreator.js';
 export * from './animation/CCDIKSolver.js';
 export * from './animation/MMDAnimationHelper.js';
 export * from './animation/MMDPhysics.js';
+
 export * from './cameras/CinematicCamera.js';
-export * from './capabilities/WebGL.js';
-// export * from './capabilities/WebGPU.js';
+
+export { default as WebGL } from './capabilities/WebGL.js';
+// export { default as WebGPU } from './capabilities/WebGPU.js';
+
 export * from './controls/ArcballControls.js';
 export * from './controls/DragControls.js';
 export * from './controls/FirstPersonControls.js';
@@ -14,22 +17,27 @@ export * from './controls/OrbitControls.js';
 export * from './controls/PointerLockControls.js';
 export * from './controls/TrackballControls.js';
 export * from './controls/TransformControls.js';
+
 export * from './csm/CSM.js';
 export * from './csm/CSMFrustum.js';
 export * from './csm/CSMHelper.js';
 export * from './csm/CSMShader.js';
+
 export * from './curves/CurveExtras.js';
 export * from './curves/NURBSCurve.js';
 export * from './curves/NURBSSurface.js';
 export * from './curves/NURBSUtils.js';
+
 export * from './effects/AnaglyphEffect.js';
 export * from './effects/AsciiEffect.js';
 export * from './effects/OutlineEffect.js';
 export * from './effects/ParallaxBarrierEffect.js';
 export * from './effects/PeppersGhostEffect.js';
 export * from './effects/StereoEffect.js';
+
 export * from './environments/DebugEnvironment.js';
 export * from './environments/RoomEnvironment.js';
+
 export * from './exporters/DRACOExporter.js';
 export * from './exporters/EXRExporter.js';
 export * from './exporters/GLTFExporter.js';
@@ -39,6 +47,7 @@ export * from './exporters/OBJExporter.js';
 export * from './exporters/PLYExporter.js';
 export * from './exporters/STLExporter.js';
 export * from './exporters/USDZExporter.js';
+
 export * from './geometries/BoxLineGeometry.js';
 export * from './geometries/ConvexGeometry.js';
 export * from './geometries/DecalGeometry.js';
@@ -47,6 +56,7 @@ export * from './geometries/ParametricGeometry.js';
 export * from './geometries/RoundedBoxGeometry.js';
 export * from './geometries/TeapotGeometry.js';
 export * from './geometries/TextGeometry.js';
+
 export * from './helpers/LightProbeHelper.js';
 export * from './helpers/OctreeHelper.js';
 export * from './helpers/PositionalAudioHelper.js';
@@ -54,13 +64,16 @@ export * from './helpers/RectAreaLightHelper.js';
 export * from './helpers/VertexNormalsHelper.js';
 export * from './helpers/VertexTangentsHelper.js';
 export * from './helpers/ViewHelper.js';
+
 export * from './interactive/HTMLMesh.js';
 export * from './interactive/InteractiveGroup.js';
 export * from './interactive/SelectionBox.js';
 export * from './interactive/SelectionHelper.js';
+
 export * from './lights/IESSpotLight.js';
 export * from './lights/LightProbeGenerator.js';
 export * from './lights/RectAreaLightUniformsLib.js';
+
 export * from './lines/Line2.js';
 export * from './lines/LineGeometry.js';
 export * from './lines/LineMaterial.js';
@@ -68,6 +81,7 @@ export * from './lines/LineSegments2.js';
 export * from './lines/LineSegmentsGeometry.js';
 export * from './lines/Wireframe.js';
 export * from './lines/WireframeGeometry2.js';
+
 export * from './loaders/3DMLoader.js';
 export * from './loaders/3MFLoader.js';
 export * from './loaders/AMFLoader.js';
@@ -119,7 +133,9 @@ export * from './loaders/XYZLoader.js';
 export * from './loaders/lwo/IFFParser.js';
 export * from './loaders/lwo/LWO2Parser.js';
 export * from './loaders/lwo/LWO3Parser.js';
+
 export * from './materials/MeshGouraudMaterial.js';
+
 export * from './math/Capsule.js';
 export * from './math/ColorConverter.js';
 export * from './math/ConvexHull.js';
@@ -129,6 +145,7 @@ export * from './math/MeshSurfaceSampler.js';
 export * from './math/OBB.js';
 export * from './math/Octree.js';
 export * from './math/SimplexNoise.js';
+
 export * from './misc/ConvexObjectBreaker.js';
 export * from './misc/GPUComputationRenderer.js';
 export * from './misc/Gyroscope.js';
@@ -141,11 +158,14 @@ export * from './misc/RollerCoaster.js';
 export * from './misc/TubePainter.js';
 export * from './misc/Volume.js';
 export * from './misc/VolumeSlice.js';
+
 export * from './modifiers/CurveModifier.js';
 export * from './modifiers/EdgeSplitModifier.js';
 export * from './modifiers/SimplifyModifier.js';
 export * from './modifiers/TessellateModifier.js';
+
 // export * from './nodes/Nodes.js';
+
 export * from './objects/GroundProjectedSkybox.js';
 export * from './objects/Lensflare.js';
 export * from './objects/MarchingCubes.js';
@@ -155,12 +175,15 @@ export * from './objects/Refractor.js';
 export * from './objects/ShadowMesh.js';
 export * from './objects/Sky.js';
 export * from './objects/Water.js';
-export * from './objects/Water2.js';
+export { Water as Water2 } from './objects/Water2.js';
+
 // export * from './offscreen/jank.js';
 // export * from './offscreen/offscreen.js';
 // export * from './offscreen/scene.js';
+
 export * from './physics/AmmoPhysics.js';
 export * from './physics/RapierPhysics.js';
+
 export * from './postprocessing/AfterimagePass.js';
 export * from './postprocessing/BloomPass.js';
 export * from './postprocessing/BokehPass.js';
@@ -188,6 +211,7 @@ export * from './postprocessing/ShaderPass.js';
 export * from './postprocessing/TAARenderPass.js';
 export * from './postprocessing/TexturePass.js';
 export * from './postprocessing/UnrealBloomPass.js';
+
 export * from './renderers/CSS2DRenderer.js';
 export * from './renderers/CSS3DRenderer.js';
 export * from './renderers/Projector.js';
@@ -254,13 +278,14 @@ export * from './renderers/SVGRenderer.js';
 // export * from './renderers/webgpu/utils/WebGPUTexturePassUtils.js';
 // export * from './renderers/webgpu/utils/WebGPUTextureUtils.js';
 // export * from './renderers/webgpu/utils/WebGPUUtils.js';
+
 export * from './shaders/ACESFilmicToneMappingShader.js';
 export * from './shaders/AfterimageShader.js';
 export * from './shaders/BasicShader.js';
 export * from './shaders/BleachBypassShader.js';
 export * from './shaders/BlendShader.js';
 export * from './shaders/BokehShader.js';
-export * from './shaders/BokehShader2.js';
+export { BokehShader as BokehShader2 } from './shaders/BokehShader2.js';
 export * from './shaders/BrightnessContrastShader.js';
 export * from './shaders/ColorCorrectionShader.js';
 export * from './shaders/ColorifyShader.js';
@@ -306,7 +331,9 @@ export * from './shaders/VerticalTiltShiftShader.js';
 export * from './shaders/VignetteShader.js';
 export * from './shaders/VolumeShader.js';
 export * from './shaders/WaterRefractionShader.js';
+
 export * from './textures/FlakesTexture.js';
+
 export * from './utils/BufferGeometryUtils.js';
 export * from './utils/CameraUtils.js';
 export * from './utils/GPUStatsPanel.js';
@@ -320,6 +347,7 @@ export * from './utils/SkeletonUtils.js';
 export * from './utils/TextureUtils.js';
 export * from './utils/UVsDebug.js';
 export * from './utils/WorkerPool.js';
+
 export * from './webxr/ARButton.js';
 export * from './webxr/OculusHandModel.js';
 export * from './webxr/OculusHandPointerModel.js';

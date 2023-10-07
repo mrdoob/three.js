@@ -404,6 +404,25 @@ class DecoratedTorusKnot5c extends Curve {
 
 }
 
+const Curves = {
+
+	GrannyKnot,
+	HeartCurve,
+	VivianiCurve,
+	KnotCurve,
+	HelixCurve,
+	TrefoilKnot,
+	TorusKnot,
+	CinquefoilKnot,
+	TrefoilPolynomialKnot,
+	FigureEightPolynomialKnot,
+	DecoratedTorusKnot4a,
+	DecoratedTorusKnot4b,
+	DecoratedTorusKnot5a,
+	DecoratedTorusKnot5c,
+
+};
+
 export {
 	GrannyKnot,
 	HeartCurve,
@@ -418,5 +437,6 @@ export {
 	DecoratedTorusKnot4a,
 	DecoratedTorusKnot4b,
 	DecoratedTorusKnot5a,
-	DecoratedTorusKnot5c
+	DecoratedTorusKnot5c,
+	Curves,
 };
