@@ -3500,6 +3500,8 @@ function createParser( tokenVocabulary ) {
 
 	$.performSelfAnalysis();
 
+	return $;
+
 }
 
 class Face {
