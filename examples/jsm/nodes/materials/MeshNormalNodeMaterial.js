@@ -29,7 +29,7 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 		const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
 
-		stack.assign( diffuseColor, vec4( directionToColor( transformedNormalView ), opacityNode ) );
+		diffuseColor.assign( vec4( directionToColor( transformedNormalView ), opacityNode ) );
 
 	}
 

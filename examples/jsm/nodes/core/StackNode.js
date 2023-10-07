@@ -2,7 +2,7 @@ import Node, { addNodeClass } from './Node.js';
 import { bypass } from '../core/BypassNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { cond } from '../math/CondNode.js';
-import { ShaderNode, nodeProxy } from '../shadernode/ShaderNode.js';
+import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
 
 class StackNode extends Node {
 
@@ -66,11 +66,17 @@ class StackNode extends Node {
 
 	build( builder, ...params ) {
 
+		const previousStack = getCurrentStack();
+
+		setCurrentStack( this );
+
 		for ( const node of this.nodes ) {
 
 			node.build( builder, 'void' );
 
 		}
+
+		setCurrentStack( previousStack );
 
 		return this.outputNode ? this.outputNode.build( builder, ...params ) : super.build( builder, ...params );
 
