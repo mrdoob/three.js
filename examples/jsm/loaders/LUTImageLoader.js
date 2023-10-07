@@ -23,6 +23,8 @@ export class LUTImageLoader extends Loader {
 
 		const loader = new TextureLoader( this.manager );
 
+		loader.setCrossOrigin( this.crossOrigin );
+		
 		loader.setPath( this.path );
 		loader.load( url, texture => {
 
