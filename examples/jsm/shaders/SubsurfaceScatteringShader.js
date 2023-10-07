@@ -28,7 +28,7 @@ const SubsurfaceScatteringShader = {
 		ShaderLib[ 'phong' ].uniforms,
 		{
 			'thicknessMap': { value: null },
-			'thicknessColor': { value: new Color( 0xffffff ) },
+			'thicknessColor': { value: /* @__PURE__ */ new Color( 0xffffff ) },
 			'thicknessDistortion': { value: 0.1 },
 			'thicknessAmbient': { value: 0.0 },
 			'thicknessAttenuation': { value: 0.1 },
@@ -67,7 +67,7 @@ const SubsurfaceScatteringShader = {
 
 		meshphong_frag_body.replace( '#include <lights_fragment_begin>',
 
-			replaceAll(
+			/* @__PURE__ */ replaceAll(
 				ShaderChunk[ 'lights_fragment_begin' ],
 				'RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );',
 				[

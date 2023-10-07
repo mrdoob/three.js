@@ -248,7 +248,7 @@ export class Flow {
 	}
 
 }
-const matrix = new Matrix4();
+const matrix = /* @__PURE__ */ new Matrix4();
 
 /**
  * A helper class for creating instanced versions of flow, where the instances are placed on the curve.
