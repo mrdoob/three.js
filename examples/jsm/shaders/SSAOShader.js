@@ -25,7 +25,7 @@ const SSAOShader = {
 		'kernel': { value: null },
 		'cameraNear': { value: null },
 		'cameraFar': { value: null },
-		'resolution': { value: new Vector2() },
+		'resolution': { value: /* @__PURE__ */ new Vector2() },
 		'cameraProjectionMatrix': { value: /* @__PURE__ */ new Matrix4() },
 		'cameraInverseProjectionMatrix': { value: /* @__PURE__ */ new Matrix4() },
 		'kernelRadius': { value: 8 },
