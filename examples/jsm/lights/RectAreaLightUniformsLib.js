@@ -28,9 +28,9 @@ import {
 // by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
 // code: https://github.com/selfshadow/ltc_code/
 
-const RectAreaLightUniformsLib = {
+class RectAreaLightUniformsLib {
 
-	init() {
+	static init() {
 
 		// source: https://github.com/selfshadow/ltc_code/tree/master/fit/results/ltc.js
 
@@ -74,6 +74,6 @@ const RectAreaLightUniformsLib = {
 
 	}
 
-};
+}
 
 export { RectAreaLightUniformsLib };

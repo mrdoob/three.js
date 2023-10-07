@@ -9,9 +9,9 @@ import {
 
 import { mergeGeometries } from './BufferGeometryUtils.js';
 
-const LDrawUtils = {
+class LDrawUtils {
 
-	mergeObject( object ) {
+	static mergeObject( object ) {
 
 		// Merges geometries in object by materials and returns new object. Use on not indexed geometries.
 		// The object buffers reference the old object ones.
@@ -197,6 +197,6 @@ const LDrawUtils = {
 
 	}
 
-};
+}
 
 export { LDrawUtils };

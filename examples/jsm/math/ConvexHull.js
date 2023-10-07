@@ -921,6 +921,28 @@ class Face {
 
 	}
 
+	static create( a, b, c ) {
+
+		const face = new Face();
+
+		const e0 = new HalfEdge( a, face );
+		const e1 = new HalfEdge( b, face );
+		const e2 = new HalfEdge( c, face );
+
+		// join edges
+
+		e0.next = e2.prev = e1;
+		e1.next = e0.prev = e2;
+		e2.next = e1.prev = e0;
+
+		// main half edge reference
+
+		face.edge = e0;
+
+		return face.compute();
+
+	}
+
 	getEdge( i ) {
 
 		let edge = this.edge;
@@ -968,32 +990,6 @@ class Face {
 	}
 
 }
-
-/* @__PURE__ */ Object.assign( Face, {
-
-	create( a, b, c ) {
-
-		const face = new Face();
-
-		const e0 = new HalfEdge( a, face );
-		const e1 = new HalfEdge( b, face );
-		const e2 = new HalfEdge( c, face );
-
-		// join edges
-
-		e0.next = e2.prev = e1;
-		e1.next = e0.prev = e2;
-		e2.next = e1.prev = e0;
-
-		// main half edge reference
-
-		face.edge = e0;
-
-		return face.compute();
-
-	}
-
-} );
 
 // Entity for a Doubly-Connected Edge List (DCEL).
 

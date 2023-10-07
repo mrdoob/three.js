@@ -449,11 +449,7 @@ class ConvexObjectBreaker {
 
 	}
 
-}
-
-/* @__PURE__ */ Object.assign( ConvexObjectBreaker, {
-
-	transformFreeVector( v, m ) {
+	static transformFreeVector( v, m ) {
 
 		// input:
 		// vector interpreted as a free vector
@@ -468,9 +464,9 @@ class ConvexObjectBreaker {
 
 		return v;
 
-	},
+	}
 
-	transformFreeVectorInverse( v, m ) {
+	static transformFreeVectorInverse( v, m ) {
 
 		// input:
 		// vector interpreted as a free vector
@@ -485,9 +481,9 @@ class ConvexObjectBreaker {
 
 		return v;
 
-	},
+	}
 
-	transformTiedVectorInverse( v, m ) {
+	static transformTiedVectorInverse( v, m ) {
 
 		// input:
 		// vector interpreted as a tied (ordinary) vector
@@ -502,9 +498,9 @@ class ConvexObjectBreaker {
 
 		return v;
 
-	},
+	}
 
-	transformPlaneToLocalSpace( plane, m, resultPlane ) {
+	static transformPlaneToLocalSpace( plane, m, resultPlane ) {
 
 		resultPlane.normal.copy( plane.normal );
 		resultPlane.constant = plane.constant;
@@ -518,6 +514,6 @@ class ConvexObjectBreaker {
 
 	}
 
-} );
+}
 
 export { ConvexObjectBreaker };

@@ -1,6 +1,6 @@
-const ARButton = {
+class ARButton {
 
-	createButton( renderer, sessionInit = {} ) {
+	static createButton( renderer, sessionInit = {} ) {
 
 		const button = document.createElement( 'button' );
 
@@ -203,6 +203,6 @@ const ARButton = {
 
 	}
 
-};
+}
 
 export { ARButton };

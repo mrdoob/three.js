@@ -1916,11 +1916,7 @@ class SVGLoader extends Loader {
 
 	}
 
-}
-
-/* @__PURE__ */ Object.assign( SVGLoader, {
-
-	createShapes( shapePath ) {
+	static createShapes( shapePath ) {
 
 		// Param shapePath: a shapepath as returned by the parse function of this class
 		// Returns Shape object
@@ -2362,9 +2358,9 @@ class SVGLoader extends Loader {
 
 		return shapesToReturn;
 
-	},
+	}
 
-	getStrokeStyle( width, color, lineJoin, lineCap, miterLimit ) {
+	static getStrokeStyle( width, color, lineJoin, lineCap, miterLimit ) {
 
 		// Param width: Stroke width
 		// Param color: As returned by THREE.Color.getStyle()
@@ -2387,9 +2383,9 @@ class SVGLoader extends Loader {
 			strokeMiterLimit: miterLimit
 		};
 
-	},
+	}
 
-	pointsToStroke( points, style, arcDivisions, minDistance ) {
+	static pointsToStroke( points, style, arcDivisions, minDistance ) {
 
 		// Generates a stroke with some width around the given path.
 		// The path can be open or closed (last point equals to first point)
@@ -2416,9 +2412,9 @@ class SVGLoader extends Loader {
 
 		return geometry;
 
-	},
+	}
 
-	pointsToStrokeWithBuffers( points, style, arcDivisions, minDistance, vertices, normals, uvs, vertexOffset ) {
+	static pointsToStrokeWithBuffers( points, style, arcDivisions, minDistance, vertices, normals, uvs, vertexOffset ) {
 
 		// This function can be called to update existing arrays or buffers.
 		// Accepts same parameters as pointsToStroke, plus the buffers and optional offset.
@@ -3170,6 +3166,7 @@ class SVGLoader extends Loader {
 
 	}
 
-} );
+
+}
 
 export { SVGLoader };

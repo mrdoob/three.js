@@ -7,9 +7,9 @@ import {
 	VectorKeyframeTrack
 } from 'three';
 
-const AnimationClipCreator = {
+class AnimationClipCreator {
 
-	CreateRotationAnimation( period, axis = 'x' ) {
+	static CreateRotationAnimation( period, axis = 'x' ) {
 
 		const times = [ 0, period ], values = [ 0, 360 ];
 
@@ -19,9 +19,9 @@ const AnimationClipCreator = {
 
 		return new AnimationClip( null, period, [ track ] );
 
-	},
+	}
 
-	CreateScaleAxisAnimation( period, axis = 'x' ) {
+	static CreateScaleAxisAnimation( period, axis = 'x' ) {
 
 		const times = [ 0, period ], values = [ 0, 1 ];
 
@@ -31,9 +31,9 @@ const AnimationClipCreator = {
 
 		return new AnimationClip( null, period, [ track ] );
 
-	},
+	}
 
-	CreateShakeAnimation( duration, shakeScale ) {
+	static CreateShakeAnimation( duration, shakeScale ) {
 
 		const times = [], values = [], tmp = new Vector3();
 
@@ -53,9 +53,9 @@ const AnimationClipCreator = {
 
 		return new AnimationClip( null, duration, [ track ] );
 
-	},
+	}
 
-	CreatePulsationAnimation( duration, pulseScale ) {
+	static CreatePulsationAnimation( duration, pulseScale ) {
 
 		const times = [], values = [], tmp = new Vector3();
 
@@ -75,9 +75,9 @@ const AnimationClipCreator = {
 
 		return new AnimationClip( null, duration, [ track ] );
 
-	},
+	}
 
-	CreateVisibilityAnimation( duration ) {
+	static CreateVisibilityAnimation( duration ) {
 
 		const times = [ 0, duration / 2, duration ], values = [ true, false, true ];
 
@@ -87,9 +87,9 @@ const AnimationClipCreator = {
 
 		return new AnimationClip( null, duration, [ track ] );
 
-	},
+	}
 
-	CreateMaterialColorAnimation( duration, colors ) {
+	static CreateMaterialColorAnimation( duration, colors ) {
 
 		const times = [], values = [],
 			timeStep = duration / colors.length;
@@ -111,6 +111,6 @@ const AnimationClipCreator = {
 
 	}
 
-};
+}
 
 export { AnimationClipCreator };

@@ -2,9 +2,9 @@ import { MathUtils } from 'three';
 
 const _hsl = {};
 
-const ColorConverter = {
+class ColorConverter {
 
-	setHSV( color, h, s, v ) {
+	static setHSV( color, h, s, v ) {
 
 		// https://gist.github.com/xpansive/1337890#file-index-js
 
@@ -14,9 +14,9 @@ const ColorConverter = {
 
 		return color.setHSL( h, ( s * v ) / ( ( h = ( 2 - s ) * v ) < 1 ? h : ( 2 - h ) ), h * 0.5 );
 
-	},
+	}
 
-	getHSV( color, target ) {
+	static getHSV( color, target ) {
 
 		color.getHSL( _hsl );
 
@@ -31,6 +31,6 @@ const ColorConverter = {
 
 	}
 
-};
+}
 
 export { ColorConverter };

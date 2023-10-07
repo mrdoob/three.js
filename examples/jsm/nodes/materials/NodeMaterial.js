@@ -489,11 +489,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-}
-
-/* @__PURE__ */ Object.assign( NodeMaterial, {
-
-	fromMaterial( material ) {
+	static fromMaterial( material ) {
 
 		if ( material.isNodeMaterial === true ) { // is already a node material
 
@@ -521,7 +517,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-} );
+}
 
 export default NodeMaterial;
 
