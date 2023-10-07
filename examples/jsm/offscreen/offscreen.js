@@ -1,4 +1,4 @@
-import { init } from './scene.js';
+import init from './scene.js';
 
 /* @__PURE__ */ ( () => {
 

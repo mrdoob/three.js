@@ -83,5 +83,4 @@ function random() {
 
 }
 
-export { init };
 export default init;
