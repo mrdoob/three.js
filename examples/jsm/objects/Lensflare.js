@@ -17,27 +17,6 @@ import {
 
 class Lensflare extends Mesh {
 
-	static Geometry = /* @__PURE__ */ ( function () {
-
-		const geometry = new BufferGeometry();
-
-		const float32Array = new Float32Array( [
-			- 1, - 1, 0, 0, 0,
-			1, - 1, 0, 1, 0,
-			1, 1, 0, 1, 1,
-			- 1, 1, 0, 0, 1
-		] );
-
-		const interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
-
-		geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
-		geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
-		geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
-
-		return geometry;
-
-	} )();
-
 	constructor() {
 
 		super( Lensflare.Geometry, new MeshBasicMaterial( { opacity: 0, transparent: true } ) );
@@ -304,11 +283,49 @@ class Lensflare extends Mesh {
 
 }
 
+/* @__PURE__ */ Object.assign( Lensflare, {
+
+	Geometry: /* @__PURE__ */ ( function () {
+
+		const geometry = new BufferGeometry();
+
+		const float32Array = new Float32Array( [
+			- 1, - 1, 0, 0, 0,
+			1, - 1, 0, 1, 0,
+			1, 1, 0, 1, 1,
+			- 1, 1, 0, 0, 1
+		] );
+
+		const interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
+
+		geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
+		geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+		geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+
+		return geometry;
+
+	} )()
+
+} );
+
 //
 
 class LensflareElement {
 
-	static Shader = {
+	constructor( texture, size = 1, distance = 0, color = new Color( 0xffffff ) ) {
+
+		this.texture = texture;
+		this.size = size;
+		this.distance = distance;
+		this.color = color;
+
+	}
+
+}
+
+/* @__PURE__ */ Object.assign( LensflareElement, {
+
+	Shader: {
 
 		uniforms: {
 
@@ -378,17 +395,8 @@ class LensflareElement {
 
 			}`
 
-	};
-
-	constructor( texture, size = 1, distance = 0, color = new Color( 0xffffff ) ) {
-
-		this.texture = texture;
-		this.size = size;
-		this.distance = distance;
-		this.color = color;
-
 	}
 
-}
+} );
 
 export { Lensflare, LensflareElement };

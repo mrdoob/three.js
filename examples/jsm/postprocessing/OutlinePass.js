@@ -18,9 +18,6 @@ import { CopyShader } from '../shaders/CopyShader.js';
 
 class OutlinePass extends Pass {
 
-	static BlurDirectionX = /* @__PURE__ */ new Vector2( 1.0, 0.0 );
-	static BlurDirectionY = /* @__PURE__ */ new Vector2( 0.0, 1.0 );
-
 	constructor( resolution, scene, camera, selectedObjects ) {
 
 		super();
@@ -650,5 +647,12 @@ class OutlinePass extends Pass {
 	}
 
 }
+
+/* @__PURE__ */ Object.assign( OutlinePass, {
+
+	BlurDirectionX: /* @__PURE__ */ new Vector2( 1.0, 0.0 ),
+	BlurDirectionY: /* @__PURE__ */ new Vector2( 0.0, 1.0 )
+
+} );
 
 export { OutlinePass };

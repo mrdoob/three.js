@@ -18,15 +18,15 @@ if ( navigator.gpu !== undefined ) {
 
 }
 
-class WebGPU {
+const WebGPU = {
 
-	static isAvailable() {
+	isAvailable() {
 
 		return isAvailable;
 
-	}
+	},
 
-	static getErrorMessage() {
+	getErrorMessage() {
 
 		const message = 'Your browser does not support <a href="https://gpuweb.github.io/gpuweb/" style="color:blue">WebGPU</a> yet';
 
@@ -48,6 +48,6 @@ class WebGPU {
 
 	}
 
-}
+};
 
 export default WebGPU;

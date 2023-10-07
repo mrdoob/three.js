@@ -1,6 +1,6 @@
-class WebGL {
+const WebGL = {
 
-	static isWebGLAvailable() {
+	isWebGLAvailable() {
 
 		try {
 
@@ -13,9 +13,9 @@ class WebGL {
 
 		}
 
-	}
+	},
 
-	static isWebGL2Available() {
+	isWebGL2Available() {
 
 		try {
 
@@ -28,9 +28,9 @@ class WebGL {
 
 		}
 
-	}
+	},
 
-	static isColorSpaceAvailable( colorSpace ) {
+	isColorSpaceAvailable( colorSpace ) {
 
 		try {
 
@@ -45,21 +45,21 @@ class WebGL {
 
 		}
 
-	}
+	},
 
-	static getWebGLErrorMessage() {
+	getWebGLErrorMessage() {
 
 		return this.getErrorMessage( 1 );
 
-	}
+	},
 
-	static getWebGL2ErrorMessage() {
+	getWebGL2ErrorMessage() {
 
 		return this.getErrorMessage( 2 );
 
-	}
+	},
 
-	static getErrorMessage( version ) {
+	getErrorMessage( version ) {
 
 		const names = {
 			1: 'WebGL',
@@ -103,6 +103,6 @@ class WebGL {
 
 	}
 
-}
+};
 
 export default WebGL;

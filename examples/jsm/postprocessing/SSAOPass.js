@@ -32,14 +32,6 @@ import { CopyShader } from '../shaders/CopyShader.js';
 
 class SSAOPass extends Pass {
 
-	static OUTPUT = {
-		'Default': 0,
-		'SSAO': 1,
-		'Blur': 2,
-		'Depth': 3,
-		'Normal': 4
-	};
-
 	constructor( scene, camera, width, height, kernelSize = 32 ) {
 
 		super();
@@ -416,5 +408,17 @@ class SSAOPass extends Pass {
 	}
 
 }
+
+/* @__PURE__ */ Object.assign( SSAOPass, {
+
+	OUTPUT: {
+		Default: 0,
+		SSAO: 1,
+		Blur: 2,
+		Depth: 3,
+		Normal: 4
+	}
+
+} );
 
 export { SSAOPass };

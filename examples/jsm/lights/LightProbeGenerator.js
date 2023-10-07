@@ -10,10 +10,10 @@ import {
 	DataUtils
 } from 'three';
 
-class LightProbeGenerator {
+const LightProbeGenerator = {
 
 	// https://www.ppsloan.org/publications/StupidSH36.pdf
-	static fromCubeTexture( cubeTexture ) {
+	fromCubeTexture( cubeTexture ) {
 
 		let totalWeight = 0;
 
@@ -124,9 +124,9 @@ class LightProbeGenerator {
 
 		return new LightProbe( sh );
 
-	}
+	},
 
-	static fromCubeRenderTarget( renderer, cubeRenderTarget ) {
+	fromCubeRenderTarget( renderer, cubeRenderTarget ) {
 
 		// The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
 		let totalWeight = 0;
@@ -256,7 +256,7 @@ class LightProbeGenerator {
 
 	}
 
-}
+};
 
 function convertColorToLinear( color, colorSpace ) {
 

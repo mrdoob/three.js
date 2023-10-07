@@ -79,14 +79,275 @@ let _zstd;
 
 class KTX2Loader extends Loader {
 
+	constructor( manager ) {
+
+		super( manager );
+
+		this.transcoderPath = '';
+		this.transcoderBinary = null;
+		this.transcoderPending = null;
+
+		this.workerPool = new WorkerPool();
+		this.workerSourceURL = '';
+		this.workerConfig = null;
+
+		if ( typeof MSC_TRANSCODER !== 'undefined' ) {
+
+			console.warn(
+
+				'THREE.KTX2Loader: Please update to latest "basis_transcoder".'
+				+ ' "msc_basis_transcoder" is no longer supported in three.js r125+.'
+
+			);
+
+		}
+
+	}
+
+	setTranscoderPath( path ) {
+
+		this.transcoderPath = path;
+
+		return this;
+
+	}
+
+	setWorkerLimit( num ) {
+
+		this.workerPool.setWorkerLimit( num );
+
+		return this;
+
+	}
+
+	detectSupport( renderer ) {
+
+		if ( renderer.isWebGPURenderer === true ) {
+
+			this.workerConfig = {
+				astcSupported: renderer.hasFeature( 'texture-compression-astc' ),
+				etc1Supported: false,
+				etc2Supported: renderer.hasFeature( 'texture-compression-etc2' ),
+				dxtSupported: renderer.hasFeature( 'texture-compression-bc' ),
+				bptcSupported: false,
+				pvrtcSupported: false
+			};
+
+		} else {
+
+			this.workerConfig = {
+				astcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
+				etc1Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
+				etc2Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc' ),
+				dxtSupported: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
+				bptcSupported: renderer.extensions.has( 'EXT_texture_compression_bptc' ),
+				pvrtcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
+					|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
+			};
+
+			if ( renderer.capabilities.isWebGL2 ) {
+
+				// https://github.com/mrdoob/three.js/pull/22928
+				this.workerConfig.etc1Supported = false;
+
+			}
+
+		}
+
+		return this;
+
+	}
+
+	init() {
+
+		if ( ! this.transcoderPending ) {
+
+			// Load transcoder wrapper.
+			const jsLoader = new FileLoader( this.manager );
+			jsLoader.setPath( this.transcoderPath );
+			jsLoader.setWithCredentials( this.withCredentials );
+			const jsContent = jsLoader.loadAsync( 'basis_transcoder.js' );
+
+			// Load transcoder WASM binary.
+			const binaryLoader = new FileLoader( this.manager );
+			binaryLoader.setPath( this.transcoderPath );
+			binaryLoader.setResponseType( 'arraybuffer' );
+			binaryLoader.setWithCredentials( this.withCredentials );
+			const binaryContent = binaryLoader.loadAsync( 'basis_transcoder.wasm' );
+
+			this.transcoderPending = Promise.all( [ jsContent, binaryContent ] )
+				.then( ( [ jsContent, binaryContent ] ) => {
+
+					const fn = KTX2Loader.BasisWorker.toString();
+
+					const body = [
+						'/* constants */',
+						'let _EngineFormat = ' + JSON.stringify( KTX2Loader.EngineFormat ),
+						'let _TranscoderFormat = ' + JSON.stringify( KTX2Loader.TranscoderFormat ),
+						'let _BasisFormat = ' + JSON.stringify( KTX2Loader.BasisFormat ),
+						'/* basis_transcoder.js */',
+						jsContent,
+						'/* worker */',
+						fn.substring( fn.indexOf( '{' ) + 1, fn.lastIndexOf( '}' ) )
+					].join( '\n' );
+
+					this.workerSourceURL = URL.createObjectURL( new Blob( [ body ] ) );
+					this.transcoderBinary = binaryContent;
+
+					this.workerPool.setWorkerCreator( () => {
+
+						const worker = new Worker( this.workerSourceURL );
+						const transcoderBinary = this.transcoderBinary.slice( 0 );
+
+						worker.postMessage( { type: 'init', config: this.workerConfig, transcoderBinary }, [ transcoderBinary ] );
+
+						return worker;
+
+					} );
+
+				} );
+
+			if ( _activeLoaders > 0 ) {
+
+				// Each instance loads a transcoder and allocates workers, increasing network and memory cost.
+
+				console.warn(
+
+					'THREE.KTX2Loader: Multiple active KTX2 loaders may cause performance issues.'
+					+ ' Use a single KTX2Loader instance, or call .dispose() on old instances.'
+
+				);
+
+			}
+
+			_activeLoaders ++;
+
+		}
+
+		return this.transcoderPending;
+
+	}
+
+	load( url, onLoad, onProgress, onError ) {
+
+		if ( this.workerConfig === null ) {
+
+			throw new Error( 'THREE.KTX2Loader: Missing initialization with `.detectSupport( renderer )`.' );
+
+		}
+
+		const loader = new FileLoader( this.manager );
+
+		loader.setResponseType( 'arraybuffer' );
+		loader.setWithCredentials( this.withCredentials );
+
+		loader.load( url, ( buffer ) => {
+
+			// Check for an existing task using this buffer. A transferred buffer cannot be transferred
+			// again from this thread.
+			if ( _taskCache.has( buffer ) ) {
+
+				const cachedTask = _taskCache.get( buffer );
+
+				return cachedTask.promise.then( onLoad ).catch( onError );
+
+			}
+
+			this._createTexture( buffer )
+				.then( ( texture ) => onLoad ? onLoad( texture ) : null )
+				.catch( onError );
+
+		}, onProgress, onError );
+
+	}
+
+	_createTextureFrom( transcodeResult, container ) {
+
+		const { faces, width, height, format, type, error, dfdFlags } = transcodeResult;
+
+		if ( type === 'error' ) return Promise.reject( error );
+
+		let texture;
+
+		if ( container.faceCount === 6 ) {
+
+			texture = new CompressedCubeTexture( faces, format, UnsignedByteType );
+
+		} else {
+
+			const mipmaps = faces[ 0 ].mipmaps;
+
+			texture = container.layerCount > 1
+				? new CompressedArrayTexture( mipmaps, width, height, container.layerCount, format, UnsignedByteType )
+				: new CompressedTexture( mipmaps, width, height, format, UnsignedByteType );
+
+		}
+
+		texture.minFilter = faces[ 0 ].mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
+		texture.magFilter = LinearFilter;
+		texture.generateMipmaps = false;
+
+		texture.needsUpdate = true;
+		texture.colorSpace = parseColorSpace( container );
+		texture.premultiplyAlpha = !! ( dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED );
+
+		return texture;
+
+	}
+
+	/**
+	 * @param {ArrayBuffer} buffer
+	 * @param {object?} config
+	 * @return {Promise<CompressedTexture|CompressedArrayTexture|DataTexture|Data3DTexture>}
+	 */
+	async _createTexture( buffer, config = {} ) {
+
+		const container = read( new Uint8Array( buffer ) );
+
+		if ( container.vkFormat !== VK_FORMAT_UNDEFINED ) {
+
+			return createRawTexture( container );
+
+		}
+
+		//
+		const taskConfig = config;
+		const texturePending = this.init().then( () => {
+
+			return this.workerPool.postMessage( { type: 'transcode', buffer, taskConfig: taskConfig }, [ buffer ] );
+
+		} ).then( ( e ) => this._createTextureFrom( e.data, container ) );
+
+		// Cache the task result.
+		_taskCache.set( buffer, { promise: texturePending } );
+
+		return texturePending;
+
+	}
+
+	dispose() {
+
+		this.workerPool.dispose();
+		if ( this.workerSourceURL ) URL.revokeObjectURL( this.workerSourceURL );
+
+		_activeLoaders --;
+
+		return this;
+
+	}
+
+}
+
+/* @__PURE__ */ Object.assign( KTX2Loader, {
+
 	/* CONSTANTS */
 
-	static BasisFormat = {
+	BasisFormat: {
 		ETC1S: 0,
 		UASTC_4x4: 1,
-	};
+	},
 
-	static TranscoderFormat = {
+	TranscoderFormat: {
 		ETC1: 0,
 		ETC2: 1,
 		BC1: 2,
@@ -104,9 +365,9 @@ class KTX2Loader extends Loader {
 		RGB565: 14,
 		BGR565: 15,
 		RGBA4444: 16,
-	};
+	},
 
-	static EngineFormat = {
+	EngineFormat: {
 		RGBAFormat: RGBAFormat,
 		RGBA_ASTC_4x4_Format: RGBA_ASTC_4x4_Format,
 		RGBA_BPTC_Format: RGBA_BPTC_Format,
@@ -117,12 +378,12 @@ class KTX2Loader extends Loader {
 		RGB_ETC2_Format: RGB_ETC2_Format,
 		RGB_PVRTC_4BPPV1_Format: RGB_PVRTC_4BPPV1_Format,
 		RGB_S3TC_DXT1_Format: RGB_S3TC_DXT1_Format,
-	};
+	},
 
 
 	/* WEB WORKER */
 
-	static BasisWorker = function () {
+	BasisWorker: function () {
 
 		let config;
 		let transcoderPending;
@@ -448,267 +709,9 @@ class KTX2Loader extends Loader {
 
 		}
 
-	};
-
-	constructor( manager ) {
-
-		super( manager );
-
-		this.transcoderPath = '';
-		this.transcoderBinary = null;
-		this.transcoderPending = null;
-
-		this.workerPool = new WorkerPool();
-		this.workerSourceURL = '';
-		this.workerConfig = null;
-
-		if ( typeof MSC_TRANSCODER !== 'undefined' ) {
-
-			console.warn(
-
-				'THREE.KTX2Loader: Please update to latest "basis_transcoder".'
-				+ ' "msc_basis_transcoder" is no longer supported in three.js r125+.'
-
-			);
-
-		}
-
 	}
 
-	setTranscoderPath( path ) {
-
-		this.transcoderPath = path;
-
-		return this;
-
-	}
-
-	setWorkerLimit( num ) {
-
-		this.workerPool.setWorkerLimit( num );
-
-		return this;
-
-	}
-
-	detectSupport( renderer ) {
-
-		if ( renderer.isWebGPURenderer === true ) {
-
-			this.workerConfig = {
-				astcSupported: renderer.hasFeature( 'texture-compression-astc' ),
-				etc1Supported: false,
-				etc2Supported: renderer.hasFeature( 'texture-compression-etc2' ),
-				dxtSupported: renderer.hasFeature( 'texture-compression-bc' ),
-				bptcSupported: false,
-				pvrtcSupported: false
-			};
-
-		} else {
-
-			this.workerConfig = {
-				astcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
-				etc1Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
-				etc2Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc' ),
-				dxtSupported: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
-				bptcSupported: renderer.extensions.has( 'EXT_texture_compression_bptc' ),
-				pvrtcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
-					|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
-			};
-
-			if ( renderer.capabilities.isWebGL2 ) {
-
-				// https://github.com/mrdoob/three.js/pull/22928
-				this.workerConfig.etc1Supported = false;
-
-			}
-
-		}
-
-		return this;
-
-	}
-
-	init() {
-
-		if ( ! this.transcoderPending ) {
-
-			// Load transcoder wrapper.
-			const jsLoader = new FileLoader( this.manager );
-			jsLoader.setPath( this.transcoderPath );
-			jsLoader.setWithCredentials( this.withCredentials );
-			const jsContent = jsLoader.loadAsync( 'basis_transcoder.js' );
-
-			// Load transcoder WASM binary.
-			const binaryLoader = new FileLoader( this.manager );
-			binaryLoader.setPath( this.transcoderPath );
-			binaryLoader.setResponseType( 'arraybuffer' );
-			binaryLoader.setWithCredentials( this.withCredentials );
-			const binaryContent = binaryLoader.loadAsync( 'basis_transcoder.wasm' );
-
-			this.transcoderPending = Promise.all( [ jsContent, binaryContent ] )
-				.then( ( [ jsContent, binaryContent ] ) => {
-
-					const fn = KTX2Loader.BasisWorker.toString();
-
-					const body = [
-						'/* constants */',
-						'let _EngineFormat = ' + JSON.stringify( KTX2Loader.EngineFormat ),
-						'let _TranscoderFormat = ' + JSON.stringify( KTX2Loader.TranscoderFormat ),
-						'let _BasisFormat = ' + JSON.stringify( KTX2Loader.BasisFormat ),
-						'/* basis_transcoder.js */',
-						jsContent,
-						'/* worker */',
-						fn.substring( fn.indexOf( '{' ) + 1, fn.lastIndexOf( '}' ) )
-					].join( '\n' );
-
-					this.workerSourceURL = URL.createObjectURL( new Blob( [ body ] ) );
-					this.transcoderBinary = binaryContent;
-
-					this.workerPool.setWorkerCreator( () => {
-
-						const worker = new Worker( this.workerSourceURL );
-						const transcoderBinary = this.transcoderBinary.slice( 0 );
-
-						worker.postMessage( { type: 'init', config: this.workerConfig, transcoderBinary }, [ transcoderBinary ] );
-
-						return worker;
-
-					} );
-
-				} );
-
-			if ( _activeLoaders > 0 ) {
-
-				// Each instance loads a transcoder and allocates workers, increasing network and memory cost.
-
-				console.warn(
-
-					'THREE.KTX2Loader: Multiple active KTX2 loaders may cause performance issues.'
-					+ ' Use a single KTX2Loader instance, or call .dispose() on old instances.'
-
-				);
-
-			}
-
-			_activeLoaders ++;
-
-		}
-
-		return this.transcoderPending;
-
-	}
-
-	load( url, onLoad, onProgress, onError ) {
-
-		if ( this.workerConfig === null ) {
-
-			throw new Error( 'THREE.KTX2Loader: Missing initialization with `.detectSupport( renderer )`.' );
-
-		}
-
-		const loader = new FileLoader( this.manager );
-
-		loader.setResponseType( 'arraybuffer' );
-		loader.setWithCredentials( this.withCredentials );
-
-		loader.load( url, ( buffer ) => {
-
-			// Check for an existing task using this buffer. A transferred buffer cannot be transferred
-			// again from this thread.
-			if ( _taskCache.has( buffer ) ) {
-
-				const cachedTask = _taskCache.get( buffer );
-
-				return cachedTask.promise.then( onLoad ).catch( onError );
-
-			}
-
-			this._createTexture( buffer )
-				.then( ( texture ) => onLoad ? onLoad( texture ) : null )
-				.catch( onError );
-
-		}, onProgress, onError );
-
-	}
-
-	_createTextureFrom( transcodeResult, container ) {
-
-		const { faces, width, height, format, type, error, dfdFlags } = transcodeResult;
-
-		if ( type === 'error' ) return Promise.reject( error );
-
-		let texture;
-
-		if ( container.faceCount === 6 ) {
-
-			texture = new CompressedCubeTexture( faces, format, UnsignedByteType );
-
-		} else {
-
-			const mipmaps = faces[ 0 ].mipmaps;
-
-			texture = container.layerCount > 1
-				? new CompressedArrayTexture( mipmaps, width, height, container.layerCount, format, UnsignedByteType )
-				: new CompressedTexture( mipmaps, width, height, format, UnsignedByteType );
-
-		}
-
-		texture.minFilter = faces[ 0 ].mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
-		texture.magFilter = LinearFilter;
-		texture.generateMipmaps = false;
-
-		texture.needsUpdate = true;
-		texture.colorSpace = parseColorSpace( container );
-		texture.premultiplyAlpha = !! ( dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED );
-
-		return texture;
-
-	}
-
-	/**
-	 * @param {ArrayBuffer} buffer
-	 * @param {object?} config
-	 * @return {Promise<CompressedTexture|CompressedArrayTexture|DataTexture|Data3DTexture>}
-	 */
-	async _createTexture( buffer, config = {} ) {
-
-		const container = read( new Uint8Array( buffer ) );
-
-		if ( container.vkFormat !== VK_FORMAT_UNDEFINED ) {
-
-			return createRawTexture( container );
-
-		}
-
-		//
-		const taskConfig = config;
-		const texturePending = this.init().then( () => {
-
-			return this.workerPool.postMessage( { type: 'transcode', buffer, taskConfig: taskConfig }, [ buffer ] );
-
-		} ).then( ( e ) => this._createTextureFrom( e.data, container ) );
-
-		// Cache the task result.
-		_taskCache.set( buffer, { promise: texturePending } );
-
-		return texturePending;
-
-	}
-
-	dispose() {
-
-		this.workerPool.dispose();
-		if ( this.workerSourceURL ) URL.revokeObjectURL( this.workerSourceURL );
-
-		_activeLoaders --;
-
-		return this;
-
-	}
-
-}
-
+} );
 
 //
 // Parsing for non-Basis textures. These textures are may have supercompression

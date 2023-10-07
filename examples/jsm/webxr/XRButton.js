@@ -1,6 +1,6 @@
-class XRButton {
+const XRButton = {
 
-	static createButton( renderer ) {
+	createButton( renderer ) {
 
 		const button = document.createElement( 'button' );
 
@@ -193,6 +193,6 @@ class XRButton {
 
 	}
 
-}
+};
 
 export { XRButton };

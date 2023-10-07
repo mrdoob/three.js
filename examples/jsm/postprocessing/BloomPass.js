@@ -11,9 +11,6 @@ import { ConvolutionShader } from '../shaders/ConvolutionShader.js';
 
 class BloomPass extends Pass {
 
-	static blurX = /* @__PURE__ */ new Vector2( 0.001953125, 0.0 );
-	static blurY = /* @__PURE__ */ new Vector2( 0.0, 0.001953125 );
-
 	constructor( strength = 1, kernelSize = 25, sigma = 4 ) {
 
 		super();
@@ -129,6 +126,13 @@ class BloomPass extends Pass {
 	}
 
 }
+
+/* @__PURE__ */ Object.assign( BloomPass, {
+
+	blurX: /* @__PURE__ */ new Vector2( 0.001953125, 0.0 ),
+	blurY: /* @__PURE__ */ new Vector2( 0.0, 0.001953125 )
+
+} );
 
 const CombineShader = {
 

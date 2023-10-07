@@ -1,6 +1,6 @@
-class VRButton {
+const VRButton = {
 
-	static createButton( renderer ) {
+	createButton( renderer ) {
 
 		const button = document.createElement( 'button' );
 
@@ -172,11 +172,11 @@ class VRButton {
 
 		}
 
-	}
+	},
 
-	static xrSessionIsGranted = false;
+	xrSessionIsGranted: false,
 
-	static registerSessionGrantedListener() {
+	registerSessionGrantedListener() {
 
 		if ( 'xr' in navigator ) {
 
@@ -194,7 +194,7 @@ class VRButton {
 
 	}
 
-}
+};
 
 /* @__PURE__ */ VRButton.registerSessionGrantedListener();
 

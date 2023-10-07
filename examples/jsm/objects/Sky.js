@@ -23,7 +23,30 @@ import {
 
 class Sky extends Mesh {
 
-	static SkyShader = {
+	constructor() {
+
+		const shader = Sky.SkyShader;
+
+		const material = new ShaderMaterial( {
+			name: 'SkyShader',
+			fragmentShader: shader.fragmentShader,
+			vertexShader: shader.vertexShader,
+			uniforms: UniformsUtils.clone( shader.uniforms ),
+			side: BackSide,
+			depthWrite: false
+		} );
+
+		super( new BoxGeometry( 1, 1, 1 ), material );
+
+		this.isSky = true;
+
+	}
+
+}
+
+/* @__PURE__ */ Object.assign( Sky, {
+
+	SkyShader: {
 
 		uniforms: {
 			'turbidity': { value: 2 },
@@ -191,27 +214,8 @@ class Sky extends Mesh {
 
 			}`
 
-	};
-
-	constructor() {
-
-		const shader = Sky.SkyShader;
-
-		const material = new ShaderMaterial( {
-			name: 'SkyShader',
-			fragmentShader: shader.fragmentShader,
-			vertexShader: shader.vertexShader,
-			uniforms: UniformsUtils.clone( shader.uniforms ),
-			side: BackSide,
-			depthWrite: false
-		} );
-
-		super( new BoxGeometry( 1, 1, 1 ), material );
-
-		this.isSky = true;
-
 	}
 
-}
+} );
 
 export { Sky };
