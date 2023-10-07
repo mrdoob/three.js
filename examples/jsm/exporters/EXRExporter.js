@@ -13,7 +13,7 @@ import {
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
-const textEncoder = new TextEncoder();
+const textEncoder = /* @__PURE__ */ new TextEncoder();
 
 const NO_COMPRESSION = 0;
 const ZIPS_COMPRESSION = 2;
