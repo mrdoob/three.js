@@ -8,6 +8,10 @@ import SetNode from '../utils/SetNode.js';
 import ConstNode from '../core/ConstNode.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 
+//
+
+let currentStack = null;
+
 const NodeElements = new Map(); // @TODO: Currently only a few nodes are added, probably also add others
 
 export function addNodeElement( name, nodeElement ) {
@@ -35,7 +39,11 @@ const shaderNodeHandler = {
 
 		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
 
-			if ( NodeElements.has( prop ) ) {
+			if ( node.isStackNode !== true && prop === 'assign' ) {
+
+				return ( ...params ) => assign( node, ...params );
+
+			} else if ( NodeElements.has( prop ) ) {
 
 				const nodeElement = NodeElements.get( prop );
 
@@ -469,6 +477,18 @@ export const tslFn = ( jsFunc ) => {
 };
 
 addNodeClass( 'ShaderNode', ShaderNode );
+
+//
+
+export const setCurrentStack = stack => currentStack = stack;
+export const getCurrentStack = () => currentStack;
+
+export const If = ( ...params ) => currentStack.if( ...params );
+export const append = ( ...params ) => currentStack.add( ...params );
+
+const assign = ( ...params ) => currentStack.assign( ...params );
+
+addNodeElement( 'append', append );
 
 // types
 // @TODO: Maybe export from ConstNode.js?

@@ -79,10 +79,10 @@ class LightsNode extends Node {
 	
 			}
 
-			stack.assign( totalDiffuseNode, totalDiffuse );
-			stack.assign( totalSpecularNode, directSpecular.add( indirectSpecular ) );
+			totalDiffuseNode.assign( totalDiffuse );
+			totalSpecularNode.assign( directSpecular.add( indirectSpecular ) );
 
-			stack.assign( outgoingLightNode, totalDiffuseNode.add( totalSpecularNode ) );
+			outgoingLightNode.assign( totalDiffuseNode.add( totalSpecularNode ) );
 
 			//
 

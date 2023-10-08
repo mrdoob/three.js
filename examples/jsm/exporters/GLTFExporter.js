@@ -1646,6 +1646,8 @@ class GLTFWriter {
 		const nameConversion = {
 			uv: 'TEXCOORD_0',
 			uv1: 'TEXCOORD_1',
+			uv2: 'TEXCOORD_2',
+			uv3: 'TEXCOORD_3',
 			color: 'COLOR_0',
 			skinWeight: 'WEIGHTS_0',
 			skinIndex: 'JOINTS_0'
