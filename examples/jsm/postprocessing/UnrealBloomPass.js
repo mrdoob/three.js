@@ -409,11 +409,9 @@ class UnrealBloomPass extends Pass {
 
 }
 
-/* @__PURE__ */ Object.assign( UnrealBloomPass, {
+const BlurDirectionX = /* @__PURE__ */ new Vector2( 1.0, 0.0 );
+const BlurDirectionY = /* @__PURE__ */ new Vector2( 0.0, 1.0 );
 
-	BlurDirectionX: /* @__PURE__ */ new Vector2( 1.0, 0.0 ),
-	BlurDirectionY: /* @__PURE__ */ new Vector2( 0.0, 1.0 )
-
-} );
+/* @__PURE__ */ Object.assign( UnrealBloomPass, { BlurDirectionX, BlurDirectionY } );
 
 export { UnrealBloomPass };

@@ -1477,9 +1477,9 @@ var Decompress = /*#__PURE__*/ (function () {
  */
 var AsyncDecompress = /*#__PURE__*/ (function () {
     /**
-     * Creates an asynchronous decompression stream
-     * @param cb The callback to call whenever data is decompressed
-     */
+   * Creates an asynchronous decompression stream
+   * @param cb The callback to call whenever data is decompressed
+   */
     function AsyncDecompress(cb) {
         this.G = AsyncGunzip;
         this.I = AsyncInflate;

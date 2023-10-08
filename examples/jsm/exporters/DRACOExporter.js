@@ -245,26 +245,37 @@ function createVertexColorSRGBArray( attribute ) {
 
 }
 
+// Encoder methods
+
+const MESH_EDGEBREAKER_ENCODING = 1;
+const MESH_SEQUENTIAL_ENCODING = 0;
+
+// Geometry type
+
+const POINT_CLOUD = 0;
+const TRIANGULAR_MESH = 1;
+
+// Attribute type
+
+const INVALID = - 1;
+const POSITION = 0;
+const NORMAL = 1;
+const COLOR = 2;
+const TEX_COORD = 3;
+const GENERIC = 4;
+
 /* @__PURE__ */ Object.assign( DRACOExporter, {
 
-	// Encoder methods
-
-	MESH_EDGEBREAKER_ENCODING: 1,
-	MESH_SEQUENTIAL_ENCODING: 0,
-
-	// Geometry type
-
-	POINT_CLOUD: 0,
-	TRIANGULAR_MESH: 1,
-
-	// Attribute type
-
-	INVALID: - 1,
-	POSITION: 0,
-	NORMAL: 1,
-	COLOR: 2,
-	TEX_COORD: 3,
-	GENERIC: 4
+	MESH_EDGEBREAKER_ENCODING,
+	MESH_SEQUENTIAL_ENCODING,
+	POINT_CLOUD,
+	TRIANGULAR_MESH,
+	INVALID,
+	POSITION,
+	NORMAL,
+	COLOR,
+	TEX_COORD,
+	GENERIC,
 
 } );
 

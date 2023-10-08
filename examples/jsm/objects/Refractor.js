@@ -259,70 +259,68 @@ class Refractor extends Mesh {
 
 }
 
-/* @__PURE__ */ Object.assign( Refractor, {
+const RefractorShader = {
 
-	RefractorShader: {
+	uniforms: {
 
-		uniforms: {
-
-			'color': {
-				value: null
-			},
-
-			'tDiffuse': {
-				value: null
-			},
-
-			'textureMatrix': {
-				value: null
-			}
-
+		'color': {
+			value: null
 		},
 
-		vertexShader: /* glsl */`
+		'tDiffuse': {
+			value: null
+		},
 
-			uniform mat4 textureMatrix;
+		'textureMatrix': {
+			value: null
+		}
 
-			varying vec4 vUv;
+	},
 
-			void main() {
+	vertexShader: /* glsl */`
 
-				vUv = textureMatrix * vec4( position, 1.0 );
-				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+		uniform mat4 textureMatrix;
 
-			}`,
+		varying vec4 vUv;
 
-		fragmentShader: /* glsl */`
+		void main() {
 
-			uniform vec3 color;
-			uniform sampler2D tDiffuse;
+			vUv = textureMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-			varying vec4 vUv;
+		}`,
 
-			float blendOverlay( float base, float blend ) {
+	fragmentShader: /* glsl */`
 
-				return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );
+		uniform vec3 color;
+		uniform sampler2D tDiffuse;
 
-			}
+		varying vec4 vUv;
 
-			vec3 blendOverlay( vec3 base, vec3 blend ) {
+		float blendOverlay( float base, float blend ) {
 
-				return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );
+			return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );
 
-			}
+		}
 
-			void main() {
+		vec3 blendOverlay( vec3 base, vec3 blend ) {
 
-				vec4 base = texture2DProj( tDiffuse, vUv );
-				gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+			return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );
 
-				#include <tonemapping_fragment>
-				#include <colorspace_fragment>
+		}
 
-			}`
+		void main() {
 
-	}
+			vec4 base = texture2DProj( tDiffuse, vUv );
+			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 
-} );
+			#include <tonemapping_fragment>
+			#include <colorspace_fragment>
+
+		}`
+
+};
+
+/* @__PURE__ */ Object.assign( Refractor, { RefractorShader } );
 
 export { Refractor };

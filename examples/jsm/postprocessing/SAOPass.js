@@ -327,14 +327,12 @@ class SAOPass extends Pass {
 
 }
 
-/* @__PURE__ */ Object.assign( SAOPass, {
+const OUTPUT = {
+	'Default': 0,
+	'SAO': 1,
+	'Normal': 2
+};
 
-	OUTPUT: {
-		Default: 0,
-		SAO: 1,
-		Normal: 2
-	}
-
-} );
+/* @__PURE__ */ Object.assign( SAOPass, { OUTPUT } );
 
 export { SAOPass };

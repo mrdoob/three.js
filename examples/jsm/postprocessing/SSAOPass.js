@@ -409,16 +409,14 @@ class SSAOPass extends Pass {
 
 }
 
-/* @__PURE__ */ Object.assign( SSAOPass, {
+const OUTPUT = {
+	'Default': 0,
+	'SSAO': 1,
+	'Blur': 2,
+	'Depth': 3,
+	'Normal': 4
+};
 
-	OUTPUT: {
-		Default: 0,
-		SSAO: 1,
-		Blur: 2,
-		Depth: 3,
-		Normal: 4
-	}
-
-} );
+/* @__PURE__ */ Object.assign( SSAOPass, { OUTPUT } );
 
 export { SSAOPass };

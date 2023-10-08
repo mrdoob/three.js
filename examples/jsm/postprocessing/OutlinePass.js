@@ -648,11 +648,9 @@ class OutlinePass extends Pass {
 
 }
 
-/* @__PURE__ */ Object.assign( OutlinePass, {
+const BlurDirectionX = /* @__PURE__ */ new Vector2( 1.0, 0.0 );
+const BlurDirectionY = /* @__PURE__ */ new Vector2( 0.0, 1.0 );
 
-	BlurDirectionX: /* @__PURE__ */ new Vector2( 1.0, 0.0 ),
-	BlurDirectionY: /* @__PURE__ */ new Vector2( 0.0, 1.0 )
-
-} );
+/* @__PURE__ */ Object.assign( OutlinePass, { BlurDirectionX, BlurDirectionY } );
 
 export { OutlinePass };

@@ -629,17 +629,15 @@ class SSRPass extends Pass {
 
 }
 
-/* @__PURE__ */ Object.assign( SSRPass, {
+const OUTPUT = {
+	'Default': 0,
+	'SSR': 1,
+	'Beauty': 3,
+	'Depth': 4,
+	'Normal': 5,
+	'Metalness': 7,
+};
 
-	OUTPUT: {
-		Default: 0,
-		SSR: 1,
-		Beauty: 3,
-		Depth: 4,
-		Normal: 5,
-		Metalness: 7,
-	}
-
-} );
+/* @__PURE__ */ Object.assign( SSRPass, { OUTPUT } );
 
 export { SSRPass };

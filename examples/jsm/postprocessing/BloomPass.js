@@ -127,13 +127,6 @@ class BloomPass extends Pass {
 
 }
 
-/* @__PURE__ */ Object.assign( BloomPass, {
-
-	blurX: /* @__PURE__ */ new Vector2( 0.001953125, 0.0 ),
-	blurY: /* @__PURE__ */ new Vector2( 0.0, 0.001953125 )
-
-} );
-
 const CombineShader = {
 
 	name: 'CombineShader',
@@ -172,5 +165,10 @@ const CombineShader = {
 		}`
 
 };
+
+const blurX = /* @__PURE__ */ new Vector2( 0.001953125, 0.0 );
+const blurY = /* @__PURE__ */ new Vector2( 0.0, 0.001953125 );
+
+/* @__PURE__ */ Object.assign( BloomPass, { blurX, blurY } );
 
 export { BloomPass };

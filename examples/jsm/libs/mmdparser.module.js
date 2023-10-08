@@ -4,7 +4,7 @@
  * Simple CharsetEncoder.
  */
 
-const { CharsetEncoder, Parser } = /* @__PURE__ */ ( () => {
+const { MMDParser, CharsetEncoder, Parser } = /* @__PURE__ */ ( () => {
 
 function CharsetEncoder() {
 }
@@ -11524,13 +11524,13 @@ Parser.prototype.leftToRightVpd = function ( vpd ) {
 
 };
 
-return { CharsetEncoder, Parser };
-
-} )();
-
-const MMDParser = {
+var MMDParser = {
   CharsetEncoder,
   Parser
 };
+
+return { MMDParser, CharsetEncoder, Parser };
+
+} )();
 
 export { MMDParser, CharsetEncoder, Parser };
