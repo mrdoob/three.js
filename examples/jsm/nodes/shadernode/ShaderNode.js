@@ -41,7 +41,7 @@ const shaderNodeHandler = {
 
 			if ( node.isStackNode !== true && prop === 'assign' ) {
 
-				return ( ...params ) => assign( node, ...params );
+				return ( ...params ) => currentStack.assign( node, ...params );
 
 			} else if ( NodeElements.has( prop ) ) {
 
@@ -105,13 +105,13 @@ const shaderNodeHandler = {
 
 	set( node, prop, value, nodeObj ) {
 
-		if ( typeof prop === 'string' && node[ prop ] === undefined && node.type === 'VarNode' ) {
+		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
 
 			// setting properties
 
-			if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true || prop === 'width' || prop === 'height' || /^\d+$/.test( prop ) === true ) {
+			if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true || prop === 'width' || prop === 'height' || prop === 'depth' || /^\d+$/.test( prop ) === true ) {
 
-				nodeObj.assign( nodeObj[ prop ].assign( value ) );
+				nodeObj[ prop ].assign( value );
 
 				return true;
 
@@ -485,8 +485,6 @@ export const getCurrentStack = () => currentStack;
 
 export const If = ( ...params ) => currentStack.if( ...params );
 export const append = ( ...params ) => currentStack.add( ...params );
-
-const assign = ( ...params ) => currentStack.assign( ...params );
 
 addNodeElement( 'append', append );
 
