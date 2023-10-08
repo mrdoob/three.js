@@ -1,5 +1,4 @@
 import Node, { addNodeClass } from '../core/Node.js';
-import AssignNode from '../core/AssignNode.js';
 
 class ArrayElementNode extends Node { // @TODO: If extending from TempNode it breaks webgpu_compute
 
@@ -17,13 +16,6 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 	getNodeType( builder ) {
 
 		return this.node.getNodeType( builder );
-
-	}
-
-	assign( node ) {
-
-		this.node = this.node.temp();
-		return this.node.bypass( new AssignNode( this, node ) );
 
 	}
 

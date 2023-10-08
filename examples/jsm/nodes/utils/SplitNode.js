@@ -1,5 +1,4 @@
 import Node, { addNodeClass } from '../core/Node.js';
-import AssignNode from '../core/AssignNode.js';
 import { vectorComponents } from '../core/constants.js';
 
 const stringVectorComponents = vectorComponents.join( '' );
@@ -34,13 +33,6 @@ class SplitNode extends Node {
 	getNodeType( builder ) {
 
 		return builder.getTypeFromLength( this.components.length );
-
-	}
-
-	assign( node ) {
-
-		this.node = this.node.temp();
-		return this.node.bypass( new AssignNode( this, node ) );
 
 	}
 

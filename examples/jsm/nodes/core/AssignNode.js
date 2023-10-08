@@ -1,5 +1,6 @@
 import { addNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
+import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class AssignNode extends TempNode {
 
@@ -57,4 +58,8 @@ class AssignNode extends TempNode {
 
 export default AssignNode;
 
-addNodeClass( AssignNode );
+export const assign = nodeProxy( AssignNode );
+
+addNodeClass( 'AssignNode', AssignNode );
+
+addNodeElement( 'assign', assign );

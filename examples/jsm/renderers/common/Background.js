@@ -1,6 +1,6 @@
 import DataMap from './DataMap.js';
 import { Color, Mesh, SphereGeometry, BackSide } from 'three';
-import { context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection } from '../../nodes/Nodes.js';
+import { context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection, tslFn } from '../../nodes/Nodes.js';
 
 let _clearAlpha;
 const _clearColor = new Color();
@@ -59,8 +59,11 @@ class Background extends DataMap {
 					getSamplerLevelNode: () => backgroundBlurriness
 				} ).mul( backgroundIntensity );
 
-				let viewProj = modelViewProjection();
-				viewProj = viewProj.z.assign( viewProj.w );
+				const viewProj = tslFn( () => {
+					const matrix = modelViewProjection();
+					matrix.z = matrix.w;
+					return matrix;
+				} )();
 
 				const nodeMaterial = new NodeMaterial();
 				nodeMaterial.outputNode = this.backgroundMeshNode;

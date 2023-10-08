@@ -3,7 +3,6 @@ import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
 import SplitNode from '../utils/SplitNode.js';
-import AssignNode from '../core/AssignNode.js';
 import SetNode from '../utils/SetNode.js';
 import ConstNode from '../core/ConstNode.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
@@ -557,10 +556,8 @@ addNodeElement( 'arrayBuffer', arrayBuffer );
 // basic nodes
 // HACK - we cannot export them from the corresponding files because of the cyclic dependency
 export const element = nodeProxy( ArrayElementNode );
-export const assign = nodeProxy( AssignNode );
 export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
 export const split = ( node, channels ) => nodeObject( new SplitNode( nodeObject( node ), channels ) );
 
 addNodeElement( 'element', element );
-addNodeElement( 'assign', assign );
 addNodeElement( 'convert', convert );
