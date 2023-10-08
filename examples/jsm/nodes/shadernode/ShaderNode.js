@@ -40,7 +40,7 @@ const shaderNodeHandler = {
 
 			if ( node.isStackNode !== true && prop === 'assign' ) {
 
-				return ( ...params ) => currentStack.assign( node, ...params );
+				return ( ...params ) => currentStack.assign( nodeObj, ...params );
 
 			} else if ( NodeElements.has( prop ) ) {
 
