@@ -61,11 +61,9 @@ class EnvironmentNode extends LightingNode {
 
 		//
 
-		const { stack } = builder;
+		builder.context.radiance.addAssign( isolateRadiance );
 
-		stack.addAssign( builder.context.radiance, isolateRadiance );
-
-		stack.addAssign( builder.context.iblIrradiance, irradiance );
+		builder.context.iblIrradiance.addAssign( irradiance );
 
 		//
 
@@ -76,7 +74,7 @@ class EnvironmentNode extends LightingNode {
 			const clearcoatRadianceContext = context( envNode, createRadianceContext( clearcoatRoughness, transformedClearcoatNormalView ) ).mul( intensity );
 			const isolateClearcoatRadiance = cache( clearcoatRadianceContext );
 
-			stack.addAssign( clearcoatRadiance, isolateClearcoatRadiance );
+			clearcoatRadiance.addAssign( isolateClearcoatRadiance );
 
 		}
 

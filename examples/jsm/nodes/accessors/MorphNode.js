@@ -19,12 +19,12 @@ class MorphNode extends Node {
 
 	}
 
-	setupAttribute( builder, name, assignNode = positionLocal ) {
+	setupAttribute( name, assignNode = positionLocal ) {
 
 		const mesh = this.mesh;
 		const attributes = mesh.geometry.morphAttributes[ name ];
 
-		builder.stack.assign( assignNode, assignNode.mul( this.morphBaseInfluence ) );
+		assignNode.mulAssign( this.morphBaseInfluence );
 
 		for ( let i = 0; i < attributes.length; i ++ ) {
 
@@ -33,15 +33,15 @@ class MorphNode extends Node {
 			const bufferAttrib = bufferAttribute( attribute.array, 'vec3' );
 			const influence = reference( i, 'float', mesh.morphTargetInfluences );
 
-			builder.stack.assign( assignNode, assignNode.add( bufferAttrib.mul( influence ) ) );
+			assignNode.addAssign( bufferAttrib.mul( influence ) );
 
 		}
 
 	}
 
-	setup( builder ) {
+	setup( /*builder*/ ) {
 
-		this.setupAttribute( builder, 'position' );
+		this.setupAttribute( 'position' );
 
 	}
 

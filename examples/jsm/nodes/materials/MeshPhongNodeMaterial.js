@@ -33,19 +33,19 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	}
 
-	setupVariants( { stack } ) {
+	setupVariants() {
 
 		// SHININESS
 
 		const shininessNode = ( this.shininessNode ? float( this.shininessNode ) : materialShininess ).max( 1e-4 ); // to prevent pow( 0.0, 0.0 )
 
-		stack.assign( shininess, shininessNode );
+		shininess.assign( shininessNode );
 
 		// SPECULAR COLOR
 
 		const specularNode = this.specularNode || materialSpecularColor;
 
-		stack.assign( specularColor, specularNode );
+		specularColor.assign( specularNode );
 
 	}
 
