@@ -1,4 +1,4 @@
-const UTIF = {};
+var UTIF = {};
 
 /* @__PURE__ */ ( () => {
 
