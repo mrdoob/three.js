@@ -100,7 +100,7 @@
     "pixelmatch": "^5.3.0",
     "puppeteer-core": "^19.8.1",
     "qunit": "^2.19.4",
-    "rollup": "^3.20.2",
+    "rollup": "^4.0.0",
     "rollup-plugin-filesize": "^10.0.0",
     "rollup-plugin-visualizer": "^5.9.0",
     "servez": "^2.0.0"
