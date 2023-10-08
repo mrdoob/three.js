@@ -686,6 +686,7 @@ class IFFParser {
 	// parse VMAP or VMAD
 	// Associates a set of floating-point vectors with a set of points.
 	// VMAP: { type[ID4], dimension[U2], name[S0], ( vert[VX], value[F4] # dimension ) * }
+
 	// VMAD Associates a set of floating-point vectors with the vertices of specific polygons.
 	// Similar to VMAP UVs, but associates with polygon vertices rather than points
 	// to solve to problem of UV seams:  VMAD chunks are paired with VMAPs of the same name,
