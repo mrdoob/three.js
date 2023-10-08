@@ -120,9 +120,11 @@ class IFFParser {
 
 	}
 
+
 	///
 	// FORM PARSING METHODS
 	///
+
 	// Forms are organisational and can contain any number of sub chunks and sub forms
 	// FORM ::= 'FORM'[ID4], length[U4], type[ID4], ( chunk[CHUNK] | form[FORM] ) * }
 	parseForm( length ) {
@@ -133,6 +135,7 @@ class IFFParser {
 
 			// SKIPPED FORMS
 			// if skipForm( length ) is called, the entire form and any sub forms and chunks are skipped
+
 			case 'ISEQ': // Image sequence
 			case 'ANIM': // plug in animation
 			case 'STCC': // Color-cycling Still
@@ -194,7 +197,8 @@ class IFFParser {
 				this.parseEnvelope( length );
 				break;
 
-			// CLIP FORM AND SUB FORMS
+				// CLIP FORM AND SUB FORMS
+
 			case 'CLIP':
 				if ( this.tree.format === 'LWO2' ) {
 
@@ -220,12 +224,14 @@ class IFFParser {
 				};
 				break;
 
-			// Not in spec, used by texture nodes
+				// Not in spec, used by texture nodes
+
 			case 'IMST':
 				this.parseImageStateForm( length );
 				break;
 
-			// SURF FORM AND SUB FORMS
+				// SURF FORM AND SUB FORMS
+
 			case 'SURF':
 				this.parseSurfaceForm( length );
 				break;
@@ -261,7 +267,8 @@ class IFFParser {
 				this.parseEntryForm( length );
 				break;
 
-			// Image Map Layer
+				// Image Map Layer
+
 			case 'IMAP':
 				this.parseImageMap( length );
 				break;
@@ -270,7 +277,8 @@ class IFFParser {
 				this.parseXVAL( 'amplitude', length );
 				break;
 
-			//Texture Mapping Form
+				//Texture Mapping Form
+
 			case 'TMAP':
 				this.setupForm( 'textureMap', length );
 				break;
@@ -528,6 +536,7 @@ class IFFParser {
 	///
 	// CHUNK PARSING METHODS
 	///
+
 	// clips can either be defined inside a surface node, or at the top
 	// level and they have a different format in each case
 	parseClip( length ) {
@@ -653,7 +662,6 @@ class IFFParser {
 		this.currentLayer = layer;
 
 		var parsedLength = 16 + stringOffset( this.currentLayer.name ); // index ( 2 ) + flags( 2 ) + pivot( 12 ) + stringlength
-
 
 		// if we have not reached then end of the layer block, there must be a parent defined
 		this.currentLayer.parent = ( parsedLength < length ) ? this.reader.getUint16() : - 1; // omitted or -1 for no parent
@@ -883,6 +891,7 @@ class IFFParser {
 
 		// print the chunk plus some bytes padding either side
 		// printBuffer( this.reader.dv.buffer, this.reader.offset - 20, length + 40 );
+
 		var data = this.reader.getString( length );
 
 		this.currentForm[ blockID ] = data;
@@ -1176,7 +1185,6 @@ class Debugger {
 	}
 
 }
-
 
 // ************** UTILITY FUNCTIONS **************
 
