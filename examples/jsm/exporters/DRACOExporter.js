@@ -212,29 +212,6 @@ class DRACOExporter {
 
 }
 
-/* @__PURE__ */ Object.assign( DRACOExporter, {
-
-	// Encoder methods
-
-	MESH_EDGEBREAKER_ENCODING: 1,
-	MESH_SEQUENTIAL_ENCODING: 0,
-
-	// Geometry type
-
-	POINT_CLOUD: 0,
-	TRIANGULAR_MESH: 1,
-
-	// Attribute type
-
-	INVALID: - 1,
-	POSITION: 0,
-	NORMAL: 1,
-	COLOR: 2,
-	TEX_COORD: 3,
-	GENERIC: 4
-
-} );
-
 function createVertexColorSRGBArray( attribute ) {
 
 	// While .drc files do not specify colorspace, the only 'official' tooling
@@ -267,5 +244,28 @@ function createVertexColorSRGBArray( attribute ) {
 	return array;
 
 }
+
+/* @__PURE__ */ Object.assign( DRACOExporter, {
+
+	// Encoder methods
+
+	MESH_EDGEBREAKER_ENCODING: 1,
+	MESH_SEQUENTIAL_ENCODING: 0,
+
+	// Geometry type
+
+	POINT_CLOUD: 0,
+	TRIANGULAR_MESH: 1,
+
+	// Attribute type
+
+	INVALID: - 1,
+	POSITION: 0,
+	NORMAL: 1,
+	COLOR: 2,
+	TEX_COORD: 3,
+	GENERIC: 4
+
+} );
 
 export { DRACOExporter };

@@ -8,7 +8,7 @@ import {
 	Vector3,
 	Plane,
 	Ray,
-	MathUtils,
+	MathUtils
 } from 'three';
 
 // OrbitControls performs orbiting, dollying (zooming), and panning.

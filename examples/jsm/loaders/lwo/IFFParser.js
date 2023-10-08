@@ -345,7 +345,7 @@ class IFFParser {
 		var name = this.reader.getString();
 
 		var surface = {
-			attributes: {},
+			attributes: {}, // LWO2 style non-node attributes will go here
 			connections: {},
 			name: name,
 			inputName: name,
@@ -367,7 +367,7 @@ class IFFParser {
 		var name = this.reader.getString();
 
 		var surface = {
-			attributes: {},
+			attributes: {}, // LWO2 style non-node attributes will go here
 			connections: {},
 			name: name,
 			nodes: {},
@@ -644,8 +644,8 @@ class IFFParser {
 
 		var layer = {
 			number: this.reader.getUint16(),
-			flags: this.reader.getUint16(),
-			pivot: this.reader.getFloat32Array( 3 ),
+			flags: this.reader.getUint16(), // If the least significant bit of flags is set, the layer is hidden.
+			pivot: this.reader.getFloat32Array( 3 ), // Note: this seems to be superflous, as the geometry is translated when pivot is present
 			name: this.reader.getString(),
 		};
 
