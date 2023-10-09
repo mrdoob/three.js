@@ -4784,36 +4784,52 @@ class Box3 {
 
 		object.updateWorldMatrix( false, false );
 
-		if ( object.boundingBox !== undefined ) {
+		const geometry = object.geometry;
 
-			if ( object.boundingBox === null ) {
+		if ( geometry !== undefined ) {
 
-				object.computeBoundingBox();
+			const positionAttribute = geometry.getAttribute( 'position' );
 
-			}
+			// precise AABB computation based on vertex data requires at least a position attribute.
+			// instancing isn't supported so far and uses the normal (conservative) code path.
 
-			_box$3.copy( object.boundingBox );
-			_box$3.applyMatrix4( object.matrixWorld );
+			if ( precise === true && positionAttribute !== undefined && object.isInstancedMesh !== true ) {
 
-			this.union( _box$3 );
+				for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
 
-		} else {
+					if ( object.isMesh === true ) {
 
-			const geometry = object.geometry;
+						object.getVertexPosition( i, _vector$a );
 
-			if ( geometry !== undefined ) {
+					} else {
 
-				if ( precise && geometry.attributes !== undefined && geometry.attributes.position !== undefined ) {
-
-					const position = geometry.attributes.position;
-					for ( let i = 0, l = position.count; i < l; i ++ ) {
-
-						_vector$a.fromBufferAttribute( position, i ).applyMatrix4( object.matrixWorld );
-						this.expandByPoint( _vector$a );
+						_vector$a.fromBufferAttribute( positionAttribute, i );
 
 					}
 
+					_vector$a.applyMatrix4( object.matrixWorld );
+					this.expandByPoint( _vector$a );
+
+				}
+
+			} else {
+
+				if ( object.boundingBox !== undefined ) {
+
+					// object-level bounding box
+
+					if ( object.boundingBox === null ) {
+
+						object.computeBoundingBox();
+
+					}
+
+					_box$3.copy( object.boundingBox );
+
+
 				} else {
+
+					// geometry-level bounding box
 
 					if ( geometry.boundingBox === null ) {
 
@@ -4822,11 +4838,12 @@ class Box3 {
 					}
 
 					_box$3.copy( geometry.boundingBox );
-					_box$3.applyMatrix4( object.matrixWorld );
-
-					this.union( _box$3 );
 
 				}
+
+				_box$3.applyMatrix4( object.matrixWorld );
+
+				this.union( _box$3 );
 
 			}
 
@@ -31626,8 +31643,7 @@ class SkinnedMesh extends Mesh {
 
 		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-			_vertex.fromBufferAttribute( positionAttribute, i );
-			this.applyBoneTransform( i, _vertex );
+			this.getVertexPosition( i, _vertex );
 			this.boundingBox.expandByPoint( _vertex );
 
 		}
@@ -31650,8 +31666,7 @@ class SkinnedMesh extends Mesh {
 
 		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-			_vertex.fromBufferAttribute( positionAttribute, i );
-			this.applyBoneTransform( i, _vertex );
+			this.getVertexPosition( i, _vertex );
 			this.boundingSphere.expandByPoint( _vertex );
 
 		}
