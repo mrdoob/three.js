@@ -15,384 +15,392 @@ import {
 	Vector4
 } from 'three';
 
-class Lensflare extends Mesh {
+const Lensflare = /* @__PURE__ */ ( () => {
 
-	constructor() {
+	class Lensflare extends Mesh {
 
-		super( Lensflare.Geometry, new MeshBasicMaterial( { opacity: 0, transparent: true } ) );
+		constructor() {
 
-		this.isLensflare = true;
+			super( Lensflare.Geometry, new MeshBasicMaterial( { opacity: 0, transparent: true } ) );
 
-		this.type = 'Lensflare';
-		this.frustumCulled = false;
-		this.renderOrder = Infinity;
+			this.isLensflare = true;
 
-		//
+			this.type = 'Lensflare';
+			this.frustumCulled = false;
+			this.renderOrder = Infinity;
 
-		const positionScreen = new Vector3();
-		const positionView = new Vector3();
+			//
 
-		// textures
+			const positionScreen = new Vector3();
+			const positionView = new Vector3();
 
-		const tempMap = new FramebufferTexture( 16, 16 );
-		const occlusionMap = new FramebufferTexture( 16, 16 );
+			// textures
 
-		let currentType = UnsignedByteType;
+			const tempMap = new FramebufferTexture( 16, 16 );
+			const occlusionMap = new FramebufferTexture( 16, 16 );
 
-		// material
+			let currentType = UnsignedByteType;
 
-		const geometry = Lensflare.Geometry;
+			// material
 
-		const material1a = new RawShaderMaterial( {
-			uniforms: {
-				'scale': { value: null },
-				'screenPosition': { value: null }
-			},
-			vertexShader: /* glsl */`
+			const geometry = Lensflare.Geometry;
 
-				precision highp float;
+			const material1a = new RawShaderMaterial( {
+				uniforms: {
+					'scale': { value: null },
+					'screenPosition': { value: null }
+				},
+				vertexShader: /* glsl */`
 
-				uniform vec3 screenPosition;
-				uniform vec2 scale;
+					precision highp float;
 
-				attribute vec3 position;
+					uniform vec3 screenPosition;
+					uniform vec2 scale;
 
-				void main() {
+					attribute vec3 position;
 
-					gl_Position = vec4( position.xy * scale + screenPosition.xy, screenPosition.z, 1.0 );
+					void main() {
 
-				}`,
+						gl_Position = vec4( position.xy * scale + screenPosition.xy, screenPosition.z, 1.0 );
 
-			fragmentShader: /* glsl */`
+					}`,
 
-				precision highp float;
+				fragmentShader: /* glsl */`
 
-				void main() {
+					precision highp float;
 
-					gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );
+					void main() {
 
-				}`,
-			depthTest: true,
-			depthWrite: false,
-			transparent: false
-		} );
+						gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );
 
-		const material1b = new RawShaderMaterial( {
-			uniforms: {
-				'map': { value: tempMap },
-				'scale': { value: null },
-				'screenPosition': { value: null }
-			},
-			vertexShader: /* glsl */`
+					}`,
+				depthTest: true,
+				depthWrite: false,
+				transparent: false
+			} );
 
-				precision highp float;
+			const material1b = new RawShaderMaterial( {
+				uniforms: {
+					'map': { value: tempMap },
+					'scale': { value: null },
+					'screenPosition': { value: null }
+				},
+				vertexShader: /* glsl */`
 
-				uniform vec3 screenPosition;
-				uniform vec2 scale;
+					precision highp float;
 
-				attribute vec3 position;
-				attribute vec2 uv;
+					uniform vec3 screenPosition;
+					uniform vec2 scale;
 
-				varying vec2 vUV;
+					attribute vec3 position;
+					attribute vec2 uv;
 
-				void main() {
+					varying vec2 vUV;
 
-					vUV = uv;
+					void main() {
 
-					gl_Position = vec4( position.xy * scale + screenPosition.xy, screenPosition.z, 1.0 );
+						vUV = uv;
 
-				}`,
+						gl_Position = vec4( position.xy * scale + screenPosition.xy, screenPosition.z, 1.0 );
 
-			fragmentShader: /* glsl */`
+					}`,
 
-				precision highp float;
+				fragmentShader: /* glsl */`
 
-				uniform sampler2D map;
+					precision highp float;
 
-				varying vec2 vUV;
+					uniform sampler2D map;
 
-				void main() {
+					varying vec2 vUV;
 
-					gl_FragColor = texture2D( map, vUV );
+					void main() {
 
-				}`,
-			depthTest: false,
-			depthWrite: false,
-			transparent: false
-		} );
+						gl_FragColor = texture2D( map, vUV );
 
-		// the following object is used for occlusionMap generation
+					}`,
+				depthTest: false,
+				depthWrite: false,
+				transparent: false
+			} );
 
-		const mesh1 = new Mesh( geometry, material1a );
+			// the following object is used for occlusionMap generation
 
-		//
+			const mesh1 = new Mesh( geometry, material1a );
 
-		const elements = [];
+			//
 
-		const shader = LensflareElement.Shader;
+			const elements = [];
 
-		const material2 = new RawShaderMaterial( {
-			uniforms: {
-				'map': { value: null },
-				'occlusionMap': { value: occlusionMap },
-				'color': { value: new Color( 0xffffff ) },
-				'scale': { value: new Vector2() },
-				'screenPosition': { value: new Vector3() }
-			},
-			vertexShader: shader.vertexShader,
-			fragmentShader: shader.fragmentShader,
-			blending: AdditiveBlending,
-			transparent: true,
-			depthWrite: false
-		} );
+			const shader = LensflareElement.Shader;
 
-		const mesh2 = new Mesh( geometry, material2 );
+			const material2 = new RawShaderMaterial( {
+				uniforms: {
+					'map': { value: null },
+					'occlusionMap': { value: occlusionMap },
+					'color': { value: new Color( 0xffffff ) },
+					'scale': { value: new Vector2() },
+					'screenPosition': { value: new Vector3() }
+				},
+				vertexShader: shader.vertexShader,
+				fragmentShader: shader.fragmentShader,
+				blending: AdditiveBlending,
+				transparent: true,
+				depthWrite: false
+			} );
 
-		this.addElement = function ( element ) {
+			const mesh2 = new Mesh( geometry, material2 );
 
-			elements.push( element );
+			this.addElement = function ( element ) {
 
-		};
+				elements.push( element );
 
-		//
+			};
 
-		const scale = new Vector2();
-		const screenPositionPixels = new Vector2();
-		const validArea = new Box2();
-		const viewport = new Vector4();
+			//
 
-		this.onBeforeRender = function ( renderer, scene, camera ) {
+			const scale = new Vector2();
+			const screenPositionPixels = new Vector2();
+			const validArea = new Box2();
+			const viewport = new Vector4();
 
-			renderer.getCurrentViewport( viewport );
+			this.onBeforeRender = function ( renderer, scene, camera ) {
 
-			const renderTarget = renderer.getRenderTarget();
-			const type = ( renderTarget !== null ) ? renderTarget.texture.type : UnsignedByteType;
+				renderer.getCurrentViewport( viewport );
 
-			if ( currentType !== type ) {
+				const renderTarget = renderer.getRenderTarget();
+				const type = ( renderTarget !== null ) ? renderTarget.texture.type : UnsignedByteType;
+
+				if ( currentType !== type ) {
+
+					tempMap.dispose();
+					occlusionMap.dispose();
+
+					tempMap.type = occlusionMap.type = type;
+
+					currentType = type;
+
+				}
+
+				const invAspect = viewport.w / viewport.z;
+				const halfViewportWidth = viewport.z / 2.0;
+				const halfViewportHeight = viewport.w / 2.0;
+
+				let size = 16 / viewport.w;
+				scale.set( size * invAspect, size );
+
+				validArea.min.set( viewport.x, viewport.y );
+				validArea.max.set( viewport.x + ( viewport.z - 16 ), viewport.y + ( viewport.w - 16 ) );
+
+				// calculate position in screen space
+
+				positionView.setFromMatrixPosition( this.matrixWorld );
+				positionView.applyMatrix4( camera.matrixWorldInverse );
+
+				if ( positionView.z > 0 ) return; // lensflare is behind the camera
+
+				positionScreen.copy( positionView ).applyMatrix4( camera.projectionMatrix );
+
+				// horizontal and vertical coordinate of the lower left corner of the pixels to copy
+
+				screenPositionPixels.x = viewport.x + ( positionScreen.x * halfViewportWidth ) + halfViewportWidth - 8;
+				screenPositionPixels.y = viewport.y + ( positionScreen.y * halfViewportHeight ) + halfViewportHeight - 8;
+
+				// screen cull
+
+				if ( validArea.containsPoint( screenPositionPixels ) ) {
+
+					// save current RGB to temp texture
+
+					renderer.copyFramebufferToTexture( screenPositionPixels, tempMap );
+
+					// render pink quad
+
+					let uniforms = material1a.uniforms;
+					uniforms[ 'scale' ].value = scale;
+					uniforms[ 'screenPosition' ].value = positionScreen;
+
+					renderer.renderBufferDirect( camera, null, geometry, material1a, mesh1, null );
+
+					// copy result to occlusionMap
+
+					renderer.copyFramebufferToTexture( screenPositionPixels, occlusionMap );
+
+					// restore graphics
+
+					uniforms = material1b.uniforms;
+					uniforms[ 'scale' ].value = scale;
+					uniforms[ 'screenPosition' ].value = positionScreen;
+
+					renderer.renderBufferDirect( camera, null, geometry, material1b, mesh1, null );
+
+					// render elements
+
+					const vecX = - positionScreen.x * 2;
+					const vecY = - positionScreen.y * 2;
+
+					for ( let i = 0, l = elements.length; i < l; i ++ ) {
+
+						const element = elements[ i ];
+
+						const uniforms = material2.uniforms;
+
+						uniforms[ 'color' ].value.copy( element.color );
+						uniforms[ 'map' ].value = element.texture;
+						uniforms[ 'screenPosition' ].value.x = positionScreen.x + vecX * element.distance;
+						uniforms[ 'screenPosition' ].value.y = positionScreen.y + vecY * element.distance;
+
+						size = element.size / viewport.w;
+						const invAspect = viewport.w / viewport.z;
+
+						uniforms[ 'scale' ].value.set( size * invAspect, size );
+
+						material2.uniformsNeedUpdate = true;
+
+						renderer.renderBufferDirect( camera, null, geometry, material2, mesh2, null );
+
+					}
+
+				}
+
+			};
+
+			this.dispose = function () {
+
+				material1a.dispose();
+				material1b.dispose();
+				material2.dispose();
 
 				tempMap.dispose();
 				occlusionMap.dispose();
 
-				tempMap.type = occlusionMap.type = type;
-
-				currentType = type;
-
-			}
-
-			const invAspect = viewport.w / viewport.z;
-			const halfViewportWidth = viewport.z / 2.0;
-			const halfViewportHeight = viewport.w / 2.0;
-
-			let size = 16 / viewport.w;
-			scale.set( size * invAspect, size );
-
-			validArea.min.set( viewport.x, viewport.y );
-			validArea.max.set( viewport.x + ( viewport.z - 16 ), viewport.y + ( viewport.w - 16 ) );
-
-			// calculate position in screen space
-
-			positionView.setFromMatrixPosition( this.matrixWorld );
-			positionView.applyMatrix4( camera.matrixWorldInverse );
-
-			if ( positionView.z > 0 ) return; // lensflare is behind the camera
-
-			positionScreen.copy( positionView ).applyMatrix4( camera.projectionMatrix );
-
-			// horizontal and vertical coordinate of the lower left corner of the pixels to copy
-
-			screenPositionPixels.x = viewport.x + ( positionScreen.x * halfViewportWidth ) + halfViewportWidth - 8;
-			screenPositionPixels.y = viewport.y + ( positionScreen.y * halfViewportHeight ) + halfViewportHeight - 8;
-
-			// screen cull
-
-			if ( validArea.containsPoint( screenPositionPixels ) ) {
-
-				// save current RGB to temp texture
-
-				renderer.copyFramebufferToTexture( screenPositionPixels, tempMap );
-
-				// render pink quad
-
-				let uniforms = material1a.uniforms;
-				uniforms[ 'scale' ].value = scale;
-				uniforms[ 'screenPosition' ].value = positionScreen;
-
-				renderer.renderBufferDirect( camera, null, geometry, material1a, mesh1, null );
-
-				// copy result to occlusionMap
-
-				renderer.copyFramebufferToTexture( screenPositionPixels, occlusionMap );
-
-				// restore graphics
-
-				uniforms = material1b.uniforms;
-				uniforms[ 'scale' ].value = scale;
-				uniforms[ 'screenPosition' ].value = positionScreen;
-
-				renderer.renderBufferDirect( camera, null, geometry, material1b, mesh1, null );
-
-				// render elements
-
-				const vecX = - positionScreen.x * 2;
-				const vecY = - positionScreen.y * 2;
-
 				for ( let i = 0, l = elements.length; i < l; i ++ ) {
 
-					const element = elements[ i ];
-
-					const uniforms = material2.uniforms;
-
-					uniforms[ 'color' ].value.copy( element.color );
-					uniforms[ 'map' ].value = element.texture;
-					uniforms[ 'screenPosition' ].value.x = positionScreen.x + vecX * element.distance;
-					uniforms[ 'screenPosition' ].value.y = positionScreen.y + vecY * element.distance;
-
-					size = element.size / viewport.w;
-					const invAspect = viewport.w / viewport.z;
-
-					uniforms[ 'scale' ].value.set( size * invAspect, size );
-
-					material2.uniformsNeedUpdate = true;
-
-					renderer.renderBufferDirect( camera, null, geometry, material2, mesh2, null );
+					elements[ i ].texture.dispose();
 
 				}
 
-			}
+			};
 
-		};
-
-		this.dispose = function () {
-
-			material1a.dispose();
-			material1b.dispose();
-			material2.dispose();
-
-			tempMap.dispose();
-			occlusionMap.dispose();
-
-			for ( let i = 0, l = elements.length; i < l; i ++ ) {
-
-				elements[ i ].texture.dispose();
-
-			}
-
-		};
+		}
 
 	}
 
-}
+	Lensflare.Geometry = /* @__PURE__ */ ( function () {
 
-//
+		const geometry = new BufferGeometry();
 
-class LensflareElement {
+		const float32Array = new Float32Array( [
+			- 1, - 1, 0, 0, 0,
+			1, - 1, 0, 1, 0,
+			1, 1, 0, 1, 1,
+			- 1, 1, 0, 0, 1
+		] );
 
-	constructor( texture, size = 1, distance = 0, color = new Color( 0xffffff ) ) {
+		const interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
 
-		this.texture = texture;
-		this.size = size;
-		this.distance = distance;
-		this.color = color;
+		geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
+		geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+		geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
 
-	}
+		return geometry;
 
-}
+	} )();
 
-const Shader = {
-
-	uniforms: {
-
-		'map': { value: null },
-		'occlusionMap': { value: null },
-		'color': { value: null },
-		'scale': { value: null },
-		'screenPosition': { value: null }
-
-	},
-
-	vertexShader: /* glsl */`
-
-		precision highp float;
-
-		uniform vec3 screenPosition;
-		uniform vec2 scale;
-
-		uniform sampler2D occlusionMap;
-
-		attribute vec3 position;
-		attribute vec2 uv;
-
-		varying vec2 vUV;
-		varying float vVisibility;
-
-		void main() {
-
-			vUV = uv;
-
-			vec2 pos = position.xy;
-
-			vec4 visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 ) );
-			visibility += texture2D( occlusionMap, vec2( 0.5, 0.1 ) );
-			visibility += texture2D( occlusionMap, vec2( 0.9, 0.1 ) );
-			visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) );
-			visibility += texture2D( occlusionMap, vec2( 0.9, 0.9 ) );
-			visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) );
-			visibility += texture2D( occlusionMap, vec2( 0.1, 0.9 ) );
-			visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) );
-			visibility += texture2D( occlusionMap, vec2( 0.5, 0.5 ) );
-
-			vVisibility =        visibility.r / 9.0;
-			vVisibility *= 1.0 - visibility.g / 9.0;
-			vVisibility *=       visibility.b / 9.0;
-
-			gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );
-
-		}`,
-
-	fragmentShader: /* glsl */`
-
-		precision highp float;
-
-		uniform sampler2D map;
-		uniform vec3 color;
-
-		varying vec2 vUV;
-		varying float vVisibility;
-
-		void main() {
-
-			vec4 texture = texture2D( map, vUV );
-			texture.a *= vVisibility;
-			gl_FragColor = texture;
-			gl_FragColor.rgb *= color;
-
-		}`
-
-};
-
-/* @__PURE__ */ Object.assign( LensflareElement, { Shader } );
-
-const Geometry = /* @__PURE__ */ ( function () {
-
-	const geometry = new BufferGeometry();
-
-	const float32Array = new Float32Array( [
-		- 1, - 1, 0, 0, 0,
-		1, - 1, 0, 1, 0,
-		1, 1, 0, 1, 1,
-		- 1, 1, 0, 0, 1
-	] );
-
-	const interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
-
-	geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
-	geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
-	geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
-
-	return geometry;
+	return Lensflare;
 
 } )();
 
-/* @__PURE__ */ Object.assign( Lensflare, { Geometry } );
+//
+
+const LensflareElement = /* @__PURE__ */ ( () => {
+
+	class LensflareElement {
+
+		constructor( texture, size = 1, distance = 0, color = new Color( 0xffffff ) ) {
+
+			this.texture = texture;
+			this.size = size;
+			this.distance = distance;
+			this.color = color;
+
+		}
+
+	}
+
+	LensflareElement.Shader = {
+
+		uniforms: {
+
+			'map': { value: null },
+			'occlusionMap': { value: null },
+			'color': { value: null },
+			'scale': { value: null },
+			'screenPosition': { value: null }
+
+		},
+
+		vertexShader: /* glsl */`
+
+			precision highp float;
+
+			uniform vec3 screenPosition;
+			uniform vec2 scale;
+
+			uniform sampler2D occlusionMap;
+
+			attribute vec3 position;
+			attribute vec2 uv;
+
+			varying vec2 vUV;
+			varying float vVisibility;
+
+			void main() {
+
+				vUV = uv;
+
+				vec2 pos = position.xy;
+
+				vec4 visibility = texture2D( occlusionMap, vec2( 0.1, 0.1 ) );
+				visibility += texture2D( occlusionMap, vec2( 0.5, 0.1 ) );
+				visibility += texture2D( occlusionMap, vec2( 0.9, 0.1 ) );
+				visibility += texture2D( occlusionMap, vec2( 0.9, 0.5 ) );
+				visibility += texture2D( occlusionMap, vec2( 0.9, 0.9 ) );
+				visibility += texture2D( occlusionMap, vec2( 0.5, 0.9 ) );
+				visibility += texture2D( occlusionMap, vec2( 0.1, 0.9 ) );
+				visibility += texture2D( occlusionMap, vec2( 0.1, 0.5 ) );
+				visibility += texture2D( occlusionMap, vec2( 0.5, 0.5 ) );
+
+				vVisibility =        visibility.r / 9.0;
+				vVisibility *= 1.0 - visibility.g / 9.0;
+				vVisibility *=       visibility.b / 9.0;
+
+				gl_Position = vec4( ( pos * scale + screenPosition.xy ).xy, screenPosition.z, 1.0 );
+
+			}`,
+
+		fragmentShader: /* glsl */`
+
+			precision highp float;
+
+			uniform sampler2D map;
+			uniform vec3 color;
+
+			varying vec2 vUV;
+			varying float vVisibility;
+
+			void main() {
+
+				vec4 texture = texture2D( map, vUV );
+				texture.a *= vVisibility;
+				gl_FragColor = texture;
+				gl_FragColor.rgb *= color;
+
+			}`
+
+	};
+
+	return LensflareElement;
+
+} )();
 
 export { Lensflare, LensflareElement };

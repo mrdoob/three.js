@@ -1,6 +1,6 @@
-var UTIF = {};
+const UTIF = /* @__PURE__ */ ( () => {
 
-/* @__PURE__ */ ( () => {
+var UTIF = {};
 
 // Following lines add a JPEG decoder  to UTIF.JpegDecoder
 (function(){"use strict";var W=function a1(){function W(p){this.message="JPEG error: "+p}W.prototype=new Error;W.prototype.name="JpegError";W.constructor=W;return W}(),ak=function ag(){var p=new Uint8Array([0,1,8,16,9,2,3,10,17,24,32,25,18,11,4,5,12,19,26,33,40,48,41,34,27,20,13,6,7,14,21,28,35,42,49,56,57,50,43,36,29,22,15,23,30,37,44,51,58,59,52,45,38,31,39,46,53,60,61,54,47,55,62,63]),t=4017,ac=799,ah=3406,ao=2276,ar=1567,ai=3784,s=5793,ad=2896;function ak(Q){if(Q==null)Q={};if(Q.w==null)Q.w=-1;this.V=Q.n;this.N=Q.w}function a5(Q,h){var f=0,G=[],n,E,a=16,F;while(a>0&&!Q[a-1]){a--}G.push({children:[],index:0});var C=G[0];for(n=0;n<a;n++)
@@ -1663,6 +1663,8 @@ for(var X=0;X<p;X++){o[X]=new Uint16Array(u.A)}for(var k=0;k<u.s;k++){var j=D(Q)
 X<p;X++){for(var a=0;a<u.A;a++){o[X][a]=0}}for(var l=0;l<u.d;l++){a8(u,Q,e[k],o,j,I);for(var X=0;X<6;
 X++){for(var a=0;a<u.A;a++){o[O[X][0]][a]=o[O[X][1]][a]}}a9(u,V,o,l,k,Z);for(var X=i;X<p;X++){if([N,E,M,m].indexOf(X)==-1){for(var a=0;
 a<u.A;a++){o[X][a]=0}}}B(o)}}return V}}())
+
+return UTIF;
 
 } )();
 
