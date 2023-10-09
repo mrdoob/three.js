@@ -1,10 +1,8 @@
-
 /**
  * @author santiago / @glitch_life
  * wrapper of https://www.npmjs.com/package/isosurface by https://github.com/mikolalysenko
  *
  * Returns BufferGeometry from SDF
- *
  */
 
 import {
@@ -21,7 +19,6 @@ import {
 } from 'three';
 
 import { surfaceNet } from './../libs/surfaceNet.js';
-
 
 class SDFGeometryGenerator {
 
@@ -60,10 +57,10 @@ class SDFGeometryGenerator {
 
 		const sdfRT = this.computeSDF( w, h, tilesX, tilesY, bounds, sdfCompute.replace( '[#dist#]', distFunc ) );
 
-		var read = new Float32Array( w * h * 4 );
+		const read = new Float32Array( w * h * 4 );
 		this.renderer.readRenderTargetPixels( sdfRT, 0, 0, w, h, read );
 
-		var mesh = surfaceNet( [ res, res, res ], ( x, y, z ) => {
+		const mesh = surfaceNet( [ res, res, res ], ( x, y, z ) => {
 
 			x = ( x + bounds ) * ( res / ( bounds * 2 ) );
 			y = ( y + bounds ) * ( res / ( bounds * 2 ) );
@@ -122,6 +119,7 @@ class SDFGeometryGenerator {
 		this.renderer.setRenderTarget( rt );
 		this.renderer.render( scn, cam );
 		this.renderer.setRenderTarget( null );
+
 		return rt;
 
 	}
