@@ -17,6 +17,8 @@ import {
 import { REVISION, RenderTarget, NoColorSpace, LinearEncoding, sRGBEncoding, SRGBColorSpace, Color, Vector2, Vector3, Vector4, Float16BufferAttribute } from 'three';
 
 import { stack } from './StackNode.js';
+import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
+
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
@@ -89,6 +91,7 @@ class NodeBuilder {
 		this.flow = { code: '' };
 		this.chaining = [];
 		this.stack = stack();
+		this.stacks = [];
 		this.tab = '\t';
 
 		this.context = {
@@ -570,17 +573,21 @@ class NodeBuilder {
 
 		this.stack = stack( this.stack );
 
+		this.stacks.push( getCurrentStack() || this.stack );
+		setCurrentStack( this.stack );
+
 		return this.stack;
 
 	}
 
 	removeStack() {
 
-		const currentStack = this.stack;
+		const lastStack = this.stack;
+		this.stack = lastStack.parent;
 
-		this.stack = currentStack.parent;
+		setCurrentStack( this.stacks.pop() );
 
-		return currentStack;
+		return lastStack;
 
 	}
 

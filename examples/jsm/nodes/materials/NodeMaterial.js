@@ -98,7 +98,7 @@ class NodeMaterial extends ShaderMaterial {
 
 			// OUTPUT NODE
 
-			builder.stack.assign( output, outputNode );
+			output.assign( outputNode );
 
 			//
 
@@ -125,25 +125,25 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color ) {
 
-			builder.stack.add( morph( object ) );
+			morph( object ).append();
 
 		}
 
 		if ( object.isSkinnedMesh === true ) {
 
-			builder.stack.add( skinning( object ) );
+			skinning( object ).append();
 
 		}
 
 		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
 
-			builder.stack.add( instance( object ) );
+			instance( object ).append();
 
 		}
 
 		if ( this.positionNode !== null ) {
 
-			builder.stack.assign( positionLocal, this.positionNode );
+			positionLocal.assign( this.positionNode );
 
 		}
 
@@ -153,7 +153,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	setupDiffuseColor( { stack, geometry } ) {
+	setupDiffuseColor( { geometry } ) {
 
 		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
 
@@ -167,12 +167,12 @@ class NodeMaterial extends ShaderMaterial {
 
 		// COLOR
 
-		stack.assign( diffuseColor, colorNode );
+		diffuseColor.assign( colorNode );
 
 		// OPACITY
 
 		const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
-		stack.assign( diffuseColor.a, diffuseColor.a.mul( opacityNode ) );
+		diffuseColor.a.assign( diffuseColor.a.mul( opacityNode ) );
 
 		// ALPHA TEST
 
@@ -180,7 +180,7 @@ class NodeMaterial extends ShaderMaterial {
 
 			const alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
 
-			stack.add( diffuseColor.a.lessThanEqual( alphaTestNode ).discard() );
+			diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
 
 		}
 
@@ -192,7 +192,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	setupNormal( { stack } ) {
+	setupNormal() {
 
 		// NORMAL VIEW
 
@@ -202,13 +202,13 @@ class NodeMaterial extends ShaderMaterial {
 			const fdy = dFdy( positionView );
 			const normalNode = fdx.cross( fdy ).normalize();
 
-			stack.assign( transformedNormalView, normalNode );
+			transformedNormalView.assign( normalNode );
 
 		} else {
 
 			const normalNode = this.normalNode ? vec3( this.normalNode ) : materialNormal;
 
-			stack.assign( transformedNormalView, normalNode );
+			transformedNormalView.assign( normalNode );
 
 		}
 

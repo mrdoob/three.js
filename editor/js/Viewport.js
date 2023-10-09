@@ -713,6 +713,13 @@ function Viewport( editor ) {
 			mixer.update( delta );
 			needsUpdate = true;
 
+			if ( editor.selected !== null ) {
+
+				editor.selected.updateWorldMatrix( false, true ); // avoid frame late effect for certain skinned meshes (e.g. Michelle.glb)
+				selectionBox.box.setFromObject( editor.selected, true ); // selection box should reflect current animation state
+
+			}
+
 		}
 
 		// View Helper

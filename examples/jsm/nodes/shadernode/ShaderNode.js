@@ -7,6 +7,10 @@ import SetNode from '../utils/SetNode.js';
 import ConstNode from '../core/ConstNode.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 
+//
+
+let currentStack = null;
+
 const NodeElements = new Map(); // @TODO: Currently only a few nodes are added, probably also add others
 
 export function addNodeElement( name, nodeElement ) {
@@ -30,11 +34,15 @@ const shaderNodeHandler = {
 
 	},
 
-	get: function ( node, prop, nodeObj ) {
+	get( node, prop, nodeObj ) {
 
 		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
 
-			if ( NodeElements.has( prop ) ) {
+			if ( node.isStackNode !== true && prop === 'assign' ) {
+
+				return ( ...params ) => currentStack.assign( nodeObj, ...params );
+
+			} else if ( NodeElements.has( prop ) ) {
 
 				const nodeElement = NodeElements.get( prop );
 
@@ -56,7 +64,7 @@ const shaderNodeHandler = {
 
 				prop = parseSwizzle( prop );
 
-				return nodeObject( new SplitNode( node, prop ) );
+				return nodeObject( new SplitNode( nodeObj, prop ) );
 
 			} else if ( /^set[XYZWRGBASTPQ]{1,4}$/.test( prop ) === true ) {
 
@@ -84,13 +92,33 @@ const shaderNodeHandler = {
 
 				// accessing array
 
-				return nodeObject( new ArrayElementNode( node, new ConstNode( Number( prop ), 'uint' ) ) );
+				return nodeObject( new ArrayElementNode( nodeObj, new ConstNode( Number( prop ), 'uint' ) ) );
 
 			}
 
 		}
 
-		return node[ prop ];
+		return Reflect.get( node, prop, nodeObj );
+
+	},
+
+	set( node, prop, value, nodeObj ) {
+
+		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
+
+			// setting properties
+
+			if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true || prop === 'width' || prop === 'height' || prop === 'depth' || /^\d+$/.test( prop ) === true ) {
+
+				nodeObj[ prop ].assign( value );
+
+				return true;
+
+			}
+
+		}
+
+		return Reflect.set( node, prop, value, nodeObj );
 
 	}
 
@@ -448,6 +476,16 @@ export const tslFn = ( jsFunc ) => {
 };
 
 addNodeClass( 'ShaderNode', ShaderNode );
+
+//
+
+export const setCurrentStack = stack => currentStack = stack;
+export const getCurrentStack = () => currentStack;
+
+export const If = ( ...params ) => currentStack.if( ...params );
+export const append = ( ...params ) => currentStack.add( ...params );
+
+addNodeElement( 'append', append );
 
 // types
 // @TODO: Maybe export from ConstNode.js?

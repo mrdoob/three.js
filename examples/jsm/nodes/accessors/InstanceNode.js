@@ -17,7 +17,7 @@ class InstanceNode extends Node {
 
 	}
 
-	setup( builder ) {
+	setup( /*builder*/ ) {
 
 		let instanceMatrixNode = this.instanceMatrixNode;
 
@@ -57,8 +57,8 @@ class InstanceNode extends Node {
 
 		// ASSIGNS
 
-		builder.stack.assign( positionLocal, instancePosition );
-		builder.stack.assign( normalLocal, instanceNormal );
+		positionLocal.assign( instancePosition );
+		normalLocal.assign( instanceNormal );
 
 	}
 
