@@ -12,6 +12,8 @@ class SplitNode extends Node {
 		this.node = node;
 		this.components = components;
 
+		this.isSplitNode = true;
+
 	}
 
 	getVectorLength() {
@@ -101,4 +103,4 @@ class SplitNode extends Node {
 
 export default SplitNode;
 
-addNodeClass( SplitNode );
+addNodeClass( 'SplitNode', SplitNode );

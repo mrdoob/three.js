@@ -8,6 +8,14 @@ const Schlick_to_F0 = tslFn( ( { f, f90, dotVH } ) => {
 
 	return f.sub( vec3( f90 ).mul( x5 ) ).div( x5.oneMinus() );
 
+} ).setLayout( {
+	name: 'Schlick_to_F0',
+	type: 'vec3',
+	inputs: [
+		{ name: 'f', type: 'vec3' },
+		{ name: 'f90', type: 'float' },
+		{ name: 'dotVH', type: 'float' }
+	]
 } );
 
 export default Schlick_to_F0;

@@ -40,9 +40,10 @@ class WebGPUUtils {
 
 		let format;
 
-		if ( renderContext.texture !== null ) {
+		if ( renderContext.textures !== null ) {
 
-			format = this.getTextureFormatGPU( renderContext.texture );
+			format = this.getTextureFormatGPU( renderContext.textures[ 0 ] );
+
 
 		} else {
 
@@ -56,9 +57,9 @@ class WebGPUUtils {
 
 	getCurrentColorSpace( renderContext ) {
 
-		if ( renderContext.texture !== null ) {
+		if ( renderContext.textures !== null ) {
 
-			return renderContext.texture.colorSpace;
+			return renderContext.textures[ 0 ].colorSpace;
 
 		}
 
@@ -77,7 +78,7 @@ class WebGPUUtils {
 
 	getSampleCount( renderContext ) {
 
-		if ( renderContext.texture !== null ) {
+		if ( renderContext.textures !== null ) {
 
 			return renderContext.sampleCount;
 

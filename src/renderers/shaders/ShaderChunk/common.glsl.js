@@ -52,15 +52,6 @@ struct ReflectedLight {
 	vec3 indirectSpecular;
 };
 
-struct GeometricContext {
-	vec3 position;
-	vec3 normal;
-	vec3 viewDir;
-#ifdef USE_CLEARCOAT
-	vec3 clearcoatNormal;
-#endif
-};
-
 #ifdef USE_ALPHAHASH
 
 	varying vec3 vPosition;

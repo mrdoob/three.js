@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -176,7 +172,7 @@ For example creating a box</p>
 The biggest is probably the <a href="/docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>. It needs to load
 3D font data before it can generate a mesh for the text.
 That data loads asynchronously so we need to wait for it
-to load before trying to create the geometry. By promisifiying 
+to load before trying to create the geometry. By promisifiying
 font loading we can make it mush easier.
 We create a <a href="/docs/#api/en/loaders/FontLoader"><code class="notranslate" translate="no">FontLoader</code></a> and then a function <code class="notranslate" translate="no">loadFont</code> that returns
 a promise that on resolve will give us the font. We then create
@@ -343,7 +339,7 @@ memory they'll take. You'll have to decide for yourself what the correct
 tradeoff is for your particular situation.</p>
 <p>If none of the shapes above fit your use case you can load
 geometry for example from a <a href="load-obj.html">.obj file</a>
-or a <a href="load-gltf.html">.gltf file</a>. 
+or a <a href="load-gltf.html">.gltf file</a>.
 You can also create your own <a href="custom-buffergeometry.html">custom BufferGeometry</a>.</p>
 <p>Next up let's go over <a href="scenegraph.html">how three's scene graph works and how
 to use it</a>.</p>
@@ -354,7 +350,7 @@ to use it</a>.</p>
         </div>
       </div>
     </div>
-  
+
   <script defer src="../resources/prettify.js"></script>
   <script defer src="../resources/lesson.js"></script>
 

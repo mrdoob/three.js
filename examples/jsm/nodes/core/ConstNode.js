@@ -29,4 +29,4 @@ class ConstNode extends InputNode {
 
 export default ConstNode;
 
-addNodeClass( ConstNode );
+addNodeClass( 'ConstNode', ConstNode );

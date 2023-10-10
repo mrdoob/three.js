@@ -1,7 +1,12 @@
 export default /* glsl */`
 uniform bool receiveShadow;
 uniform vec3 ambientLightColor;
-uniform vec3 lightProbe[ 9 ];
+
+#if defined( USE_LIGHT_PROBES )
+
+	uniform vec3 lightProbe[ 9 ];
+
+#endif
 
 // get the irradiance (radiance convolved with cosine lobe) at the point 'normal' on the unit sphere
 // source: https://graphics.stanford.edu/papers/envmap/envmap.pdf
@@ -94,7 +99,7 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
 
-	void getDirectionalLightInfo( const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight light ) {
+	void getDirectionalLightInfo( const in DirectionalLight directionalLight, out IncidentLight light ) {
 
 		light.color = directionalLight.color;
 		light.direction = directionalLight.direction;
@@ -117,9 +122,9 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
 
 	// light is an out parameter as having it as a return value caused compiler errors on some devices
-	void getPointLightInfo( const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight light ) {
+	void getPointLightInfo( const in PointLight pointLight, const in vec3 geometryPosition, out IncidentLight light ) {
 
-		vec3 lVector = pointLight.position - geometry.position;
+		vec3 lVector = pointLight.position - geometryPosition;
 
 		light.direction = normalize( lVector );
 
@@ -149,9 +154,9 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
 
 	// light is an out parameter as having it as a return value caused compiler errors on some devices
-	void getSpotLightInfo( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight light ) {
+	void getSpotLightInfo( const in SpotLight spotLight, const in vec3 geometryPosition, out IncidentLight light ) {
 
-		vec3 lVector = spotLight.position - geometry.position;
+		vec3 lVector = spotLight.position - geometryPosition;
 
 		light.direction = normalize( lVector );
 

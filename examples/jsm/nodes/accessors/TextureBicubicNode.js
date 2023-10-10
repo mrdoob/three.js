@@ -77,7 +77,7 @@ class TextureBicubicNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		return textureBicubicMethod( this.textureNode, this.blurNode );
 
@@ -91,4 +91,4 @@ export const textureBicubic = nodeProxy( TextureBicubicNode );
 
 addNodeElement( 'bicubic', textureBicubic );
 
-addNodeClass( TextureBicubicNode );
+addNodeClass( 'TextureBicubicNode', TextureBicubicNode );

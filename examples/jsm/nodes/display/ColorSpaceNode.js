@@ -70,7 +70,7 @@ class ColorSpaceNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { method, node } = this;
 
@@ -105,4 +105,4 @@ addNodeElement( 'sRGBToLinear', sRGBToLinear );
 addNodeElement( 'linearToColorSpace', linearToColorSpace );
 addNodeElement( 'colorSpaceToLinear', colorSpaceToLinear );
 
-addNodeClass( ColorSpaceNode );
+addNodeClass( 'ColorSpaceNode', ColorSpaceNode );

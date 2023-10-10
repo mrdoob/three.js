@@ -64,25 +64,49 @@ class WebGPUPipelineUtils {
 
 		}
 
-		//
+		const colorWriteMask = this._getColorWriteMask( material );
+
+		const targets = [];
+
+		if ( renderObject.context.textures !== null ) {
+
+			const textures = renderObject.context.textures;
+
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				const colorFormat = utils.getTextureFormatGPU( textures[ i ] );
+
+				targets.push( {
+					format: colorFormat,
+					blend: blending,
+					writeMask: colorWriteMask
+				} );
+
+			}
+
+		} else {
+
+			const colorFormat = utils.getCurrentColorFormat( renderObject.context );
+
+			targets.push( {
+				format: colorFormat,
+				blend: blending,
+				writeMask: colorWriteMask
+			} );
+
+		}
 
 		const vertexModule = backend.get( vertexProgram ).module;
 		const fragmentModule = backend.get( fragmentProgram ).module;
 
 		const primitiveState = this._getPrimitiveState( object, geometry, material );
-		const colorWriteMask = this._getColorWriteMask( material );
 		const depthCompare = this._getDepthCompare( material );
-		const colorFormat = utils.getCurrentColorFormat( renderObject.context );
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
 		const sampleCount = utils.getSampleCount( renderObject.context );
 
 		pipelineData.pipeline = device.createRenderPipeline( {
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
-			fragment: Object.assign( {}, fragmentModule, { targets: [ {
-				format: colorFormat,
-				blend: blending,
-				writeMask: colorWriteMask
-			} ] } ),
+			fragment: Object.assign( {}, fragmentModule, { targets } ),
 			primitive: primitiveState,
 			depthStencil: {
 				format: depthStencilFormat,
@@ -442,17 +466,17 @@ class WebGPUPipelineUtils {
 		switch ( material.side ) {
 
 			case FrontSide:
-				descriptor.frontFace = GPUFrontFace.CW;
-				descriptor.cullMode = GPUCullMode.Front;
-				break;
-
-			case BackSide:
-				descriptor.frontFace = GPUFrontFace.CW;
+				descriptor.frontFace = GPUFrontFace.CCW;
 				descriptor.cullMode = GPUCullMode.Back;
 				break;
 
+			case BackSide:
+				descriptor.frontFace = GPUFrontFace.CCW;
+				descriptor.cullMode = GPUCullMode.Front;
+				break;
+
 			case DoubleSide:
-				descriptor.frontFace = GPUFrontFace.CW;
+				descriptor.frontFace = GPUFrontFace.CCW;
 				descriptor.cullMode = GPUCullMode.None;
 				break;
 

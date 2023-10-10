@@ -15,44 +15,65 @@ class Textures extends DataMap {
 
 	}
 
-	updateRenderTarget( renderTarget ) {
+	updateRenderTarget( renderTarget, activeMipmapLevel = 0 ) {
 
 		const renderTargetData = this.get( renderTarget );
-		const sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
 
-		const texture = renderTarget.texture;
+		const sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
+		const depthTextureMips = renderTargetData.depthTextureMips || ( renderTargetData.depthTextureMips = {} );
+
+		let texture, textures;
+
+		if ( renderTarget.isWebGLMultipleRenderTargets ) {
+
+			textures = renderTarget.texture;
+			texture = renderTarget.texture[ 0 ];
+
+		} else {
+
+			textures = [ renderTarget.texture ];
+			texture = renderTarget.texture;
+
+		}
+
 		const size = this.getSize( texture );
 
-		let depthTexture = renderTarget.depthTexture || renderTargetData.depthTexture;
+		const mipWidth = size.width >> activeMipmapLevel;
+		const mipHeight = size.height >> activeMipmapLevel;
+
+		let depthTexture = renderTarget.depthTexture || depthTextureMips[ activeMipmapLevel ];
+		let textureNeedsUpdate = false;
 
 		if ( depthTexture === undefined ) {
 
 			depthTexture = new DepthTexture();
 			depthTexture.format = DepthStencilFormat;
 			depthTexture.type = UnsignedInt248Type;
-			depthTexture.image.width = size.width;
-			depthTexture.image.height = size.height;
+			depthTexture.image.width = mipWidth;
+			depthTexture.image.height = mipHeight;
+
+			depthTextureMips[ activeMipmapLevel ] = depthTexture;
 
 		}
 
 		if ( renderTargetData.width !== size.width || size.height !== renderTargetData.height ) {
 
-			texture.needsUpdate = true;
+			textureNeedsUpdate = true;
 			depthTexture.needsUpdate = true;
 
-			depthTexture.image.width = size.width;
-			depthTexture.image.height = size.height;
+			depthTexture.image.width = mipWidth;
+			depthTexture.image.height = mipHeight;
 
 		}
 
 		renderTargetData.width = size.width;
 		renderTargetData.height = size.height;
-		renderTargetData.texture = texture;
+		renderTargetData.textures = textures;
 		renderTargetData.depthTexture = depthTexture;
 
 		if ( renderTargetData.sampleCount !== sampleCount ) {
 
-			texture.needsUpdate = true;
+			textureNeedsUpdate = true;
 			depthTexture.needsUpdate = true;
 
 			renderTargetData.sampleCount = sampleCount;
@@ -61,7 +82,17 @@ class Textures extends DataMap {
 
 		const options = { sampleCount };
 
-		this.updateTexture( texture, options );
+
+		for ( let i = 0; i < textures.length; i ++ ) {
+
+			const texture = textures[ i ];
+
+			if ( textureNeedsUpdate ) texture.needsUpdate = true;
+
+			this.updateTexture( texture, options );
+
+		}
+
 		this.updateTexture( depthTexture, options );
 
 		// dispose handler
@@ -76,7 +107,20 @@ class Textures extends DataMap {
 
 				renderTarget.removeEventListener( 'dispose', onDispose );
 
-				this._destroyTexture( texture );
+				if ( textures !== undefined ) {
+
+					for ( let i = 0; i < textures.length; i ++ ) {
+
+						this._destroyTexture( textures[ i ] );
+
+					}
+
+				} else {
+
+					this._destroyTexture( texture );
+
+				}
+
 				this._destroyTexture( depthTexture );
 
 			};
@@ -116,9 +160,7 @@ class Textures extends DataMap {
 
 		//
 
-		if ( isRenderTarget || options.store === true ) {
-
-			//if ( options.store === true ) options.levels = 1; /* no mipmaps? */
+		if ( isRenderTarget || texture.isStorageTexture === true ) {
 
 			backend.createSampler( texture );
 			backend.createTexture( texture, options );
@@ -171,7 +213,7 @@ class Textures extends DataMap {
 
 					backend.updateTexture( texture, options );
 
-					if ( options.needsMipmaps ) backend.generateMipmaps( texture );
+					if ( options.needsMipmaps && texture.mipmaps.length === 0 ) backend.generateMipmaps( texture );
 
 				}
 
@@ -263,7 +305,7 @@ class Textures extends DataMap {
 
 		if ( this.isEnvironmentTexture( texture ) ) return true;
 
-		return ( texture.isCompressedTexture !== true ) /*&& ( texture.generateMipmaps === true )*/ && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
+		return ( texture.isCompressedTexture === true ) || ( ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter ) );
 
 	}
 

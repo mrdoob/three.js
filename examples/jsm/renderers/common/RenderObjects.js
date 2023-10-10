@@ -1,4 +1,3 @@
-import DataMap from './DataMap.js';
 import ChainMap from './ChainMap.js';
 import RenderObject from './RenderObject.js';
 
@@ -14,7 +13,6 @@ class RenderObjects {
 		this.info = info;
 
 		this.chainMaps = {};
-		this.dataMap = new DataMap();
 
 	}
 
@@ -33,14 +31,17 @@ class RenderObjects {
 
 		} else {
 
-			const data = this.dataMap.get( renderObject );
-			const cacheKey = renderObject.getCacheKey();
+			if ( renderObject.version !== material.version ) {
 
-			if ( data.cacheKey !== cacheKey ) {
+				renderObject.version = material.version;
 
-				renderObject.dispose();
+				if ( renderObject.initialCacheKey !== renderObject.getCacheKey() ) {
 
-				renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, passId );
+					renderObject.dispose();
+
+					renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, passId );
+
+				}
 
 			}
 
@@ -59,23 +60,16 @@ class RenderObjects {
 	dispose() {
 
 		this.chainMaps = {};
-		this.dataMap = new DataMap();
 
 	}
 
 	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, passId ) {
 
 		const chainMap = this.getChainMap( passId );
-		const dataMap = this.dataMap;
 
 		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext );
 
-		const data = dataMap.get( renderObject );
-		data.cacheKey = renderObject.getCacheKey();
-
 		renderObject.onDispose = () => {
-
-			dataMap.delete( renderObject );
 
 			this.pipelines.delete( renderObject );
 			this.bindings.delete( renderObject );

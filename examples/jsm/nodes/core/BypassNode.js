@@ -42,4 +42,4 @@ export const bypass = nodeProxy( BypassNode );
 
 addNodeElement( 'bypass', bypass );
 
-addNodeClass( BypassNode );
+addNodeClass( 'BypassNode', BypassNode );

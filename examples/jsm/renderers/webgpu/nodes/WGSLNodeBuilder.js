@@ -1,10 +1,7 @@
-import { RenderTarget, NoColorSpace, FloatType } from 'three';
+import { NoColorSpace, FloatType } from 'three';
 
 import UniformsGroup from '../../common/UniformsGroup.js';
-import {
-	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
-	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
-} from '../../common/nodes/NodeUniform.js';
+
 import NodeSampler from '../../common/nodes/NodeSampler.js';
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
@@ -12,9 +9,9 @@ import UniformBuffer from '../../common/UniformBuffer.js';
 import StorageBuffer from '../../common/StorageBuffer.js';
 import { getVectorLength, getStrideLength } from '../../common/BufferUtils.js';
 
-import CubeRenderTarget from '../../common/CubeRenderTarget.js';
+import { NodeBuilder, CodeNode, NodeMaterial, FunctionNode } from '../../../nodes/Nodes.js';
 
-import { NodeBuilder, CodeNode, NodeMaterial } from '../../../nodes/Nodes.js';
+import { getFormat } from '../utils/WebGPUTextureUtils.js';
 
 import WGSLNodeParser from './WGSLNodeParser.js';
 
@@ -63,7 +60,7 @@ const wgslTypeLib = {
 
 const wgslMethods = {
 	dFdx: 'dpdx',
-	dFdy: 'dpdy',
+	dFdy: '- dpdy',
 	mod: 'threejs_mod',
 	lessThanEqual: 'threejs_lessThanEqual',
 	inversesqrt: 'inverseSqrt'
@@ -367,7 +364,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 					for ( const uniformNode of node.nodes ) {
 
-						const uniformNodeGPU = this._getNodeUniform( uniformNode, type );
+						const uniformNodeGPU = this.getNodeUniform( uniformNode, type );
 
 						// fit bounds to buffer
 						uniformNodeGPU.boundary = getVectorLength( uniformNodeGPU.itemSize );
@@ -381,7 +378,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				} else {
 
-					uniformGPU = this._getNodeUniform( uniformNode, type );
+					uniformGPU = this.getNodeUniform( uniformNode, type );
 
 					uniformsGroup.addUniform( uniformGPU );
 
@@ -436,6 +433,34 @@ class WGSLNodeBuilder extends NodeBuilder {
 		}
 
 		return 'vertexIndex';
+
+	}
+
+	buildFunctionNode( shaderNode ) {
+
+		const layout = shaderNode.layout;
+		const flowData = this.flowShaderNode( shaderNode );
+
+		const parameters = [];
+
+		for ( const input of layout.inputs ) {
+
+			parameters.push( input.name + ' : ' + this.getType( input.type ) );
+
+		}
+
+		//
+
+		const code = `fn ${ layout.name }( ${ parameters.join( ', ' ) } ) -> ${ this.getType( layout.type ) } {
+${ flowData.vars }
+${ flowData.code }
+	return ${ flowData.result };
+
+}`;
+
+		//
+
+		return new FunctionNode( code );
 
 	}
 
@@ -505,6 +530,44 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getStructMembers( struct ) {
+
+		const snippets = [];
+		const members = struct.getMemberTypes();
+
+		for ( let i = 0; i < members.length; i ++ ) {
+
+			const member = members[ i ];
+			snippets.push( `\t@location( ${i} ) m${i} : ${ member }<f32>` );
+
+		}
+
+		return snippets.join( ',\n' );
+
+	}
+
+	getStructs( shaderStage ) {
+
+		const snippets = [];
+		const structs = this.structs[ shaderStage ];
+
+		for ( let index = 0, length = structs.length; index < length; index ++ ) {
+
+			const struct = structs[ index ];
+			const name = struct.name;
+
+			let snippet = `\struct ${ name } {\n`;
+			snippet += this.getStructMembers( struct );
+			snippet += '\n}';
+
+			snippets.push( snippet );
+
+		}
+
+		return snippets.join( '\n\n' );
+
+	}
+
 	getVar( type, name ) {
 
 		return `var ${ name } : ${ this.getType( type ) }`;
@@ -516,9 +579,13 @@ class WGSLNodeBuilder extends NodeBuilder {
 		const snippets = [];
 		const vars = this.vars[ shaderStage ];
 
-		for ( const variable of vars ) {
+		if ( vars !== undefined ) {
 
-			snippets.push( `\t${ this.getVar( variable.type, variable.name ) };` );
+			for ( const variable of vars ) {
+
+				snippets.push( `\t${ this.getVar( variable.type, variable.name ) };` );
+
+			}
 
 		}
 
@@ -549,9 +616,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 					let attributesSnippet = `@location( ${index} )`;
 
-					if ( varying.type === 'int' || varying.type === 'uint' ) {
+					if ( /^(int|uint|ivec|uvec)/.test( varying.type ) ) {
 
 						attributesSnippet += ' @interpolate( flat )';
+
 
 					}
 
@@ -625,8 +693,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				} else if ( uniform.node.isStoreTextureNode === true ) {
 
-					// @TODO: Add support for other formats
-					textureType = 'texture_storage_2d<rgba8unorm, write>';
+					const format = getFormat( texture );
+
+					textureType = 'texture_storage_2d<' + format + ', write>';
 
 				} else {
 
@@ -728,13 +797,16 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			}
 
+			const outputNode = mainNode.outputNode;
 			const stageData = shadersData[ shaderStage ];
 
 			stageData.uniforms = this.getUniforms( shaderStage );
 			stageData.attributes = this.getAttributes( shaderStage );
 			stageData.varyings = this.getVaryings( shaderStage );
+			stageData.structs = this.getStructs( shaderStage );
 			stageData.vars = this.getVars( shaderStage );
 			stageData.codes = this.getCodes( shaderStage );
+			stageData.returnType = ( outputNode !== undefined && outputNode.isOutputStructNode === true ) ? outputNode.nodeType : '@location( 0 ) vec4<f32>';
 			stageData.flow = flow;
 
 		}
@@ -749,18 +821,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
 
 		}
-
-	}
-
-	getRenderTarget( width, height, options ) {
-
-		return new RenderTarget( width, height, options );
-
-	}
-
-	getCubeRenderTarget( size, options ) {
-
-		return new CubeRenderTarget( size, options );
 
 	}
 
@@ -791,20 +851,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 	_include( name ) {
 
 		wgslPolyfill[ name ].build( this );
-
-	}
-
-	_getNodeUniform( uniformNode, type ) {
-
-		if ( type === 'float' ) return new FloatNodeUniform( uniformNode );
-		if ( type === 'vec2' ) return new Vector2NodeUniform( uniformNode );
-		if ( type === 'vec3' ) return new Vector3NodeUniform( uniformNode );
-		if ( type === 'vec4' ) return new Vector4NodeUniform( uniformNode );
-		if ( type === 'color' ) return new ColorNodeUniform( uniformNode );
-		if ( type === 'mat3' ) return new Matrix3NodeUniform( uniformNode );
-		if ( type === 'mat4' ) return new Matrix4NodeUniform( uniformNode );
-
-		throw new Error( `Uniform "${type}" not declared.` );
 
 	}
 
@@ -847,11 +893,14 @@ fn main( ${shaderData.attributes} ) -> NodeVaryingsStruct {
 // uniforms
 ${shaderData.uniforms}
 
+// structs
+${shaderData.structs}
+
 // codes
 ${shaderData.codes}
 
 @fragment
-fn main( ${shaderData.varyings} ) -> @location( 0 ) vec4<f32> {
+fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 
 	// vars
 	${shaderData.vars}

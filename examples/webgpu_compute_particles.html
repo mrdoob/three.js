@@ -11,8 +11,6 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - GPU Compute Particles / 100000 Particles
 		</div>
 
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -26,12 +24,13 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { ShaderNode, uniform, texture, instanceIndex, float, vec3, storage, SpriteNodeMaterial } from 'three/nodes';
+			import { tslFn, uniform, texture, instanceIndex, float, vec3, storage, SpriteNodeMaterial, If } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -45,7 +44,7 @@
 			const clickPosition = uniform( new THREE.Vector3() );
 
 			let camera, scene, renderer;
-			let controls;
+			let controls, stats;
 			let computeParticles;
 
 			init();
@@ -82,7 +81,7 @@
 
 				// compute
 
-				const computeInit = new ShaderNode( ( stack ) => {
+				const computeInit = tslFn( () => {
 
 					const position = positionBuffer.element( instanceIndex );
 					const color = colorBuffer.element( instanceIndex );
@@ -91,43 +90,43 @@
 					const randY = instanceIndex.add( 2 ).hash();
 					const randZ = instanceIndex.add( 3 ).hash();
 
-					stack.assign( position.x, randX.mul( 60 ).add( - 30 ) );
-					stack.assign( position.y, randY.mul( 10 ) );
-					stack.assign( position.z, randZ.mul( 60 ).add( - 30 ) );
+					position.x = randX.mul( 60 ).add( - 30 );
+					position.y = randY.mul( 10 );
+					position.z = randZ.mul( 60 ).add( - 30 );
 
-					stack.assign( color, vec3( randX, randY, randZ ) );
+					color.assign( vec3( randX, randY, randZ ) );
 
-				} ).compute( particleCount );
+				} )().compute( particleCount );
 
 				//
 
-				const computeUpdate = new ShaderNode( ( stack ) => {
+				const computeUpdate = tslFn( () => {
 
 					const position = positionBuffer.element( instanceIndex );
 					const velocity = velocityBuffer.element( instanceIndex );
 
-					stack.assign( velocity, velocity.add( vec3( 0.00, gravity, 0.00 ) ) );
-					stack.assign( position, position.add( velocity ) );
+					velocity.addAssign( vec3( 0.00, gravity, 0.00 ) );
+					position.addAssign( velocity );
 
-					stack.assign( velocity, velocity.mul( friction ) );
+					velocity.mulAssign( friction );
 
 					// floor
 
-					stack.if( position.y.lessThan( 0 ), ( stack ) => {
+					If( position.y.lessThan( 0 ), () => {
 
-						stack.assign( position.y, 0 );
-						stack.assign( velocity.y, velocity.y.negate().mul( bounce ) );
+						position.y = 0;
+						velocity.y = velocity.y.negate().mul( bounce );
 
 						// floor friction
 
-						stack.assign( velocity.x, velocity.x.mul( .9 ) );
-						stack.assign( velocity.z, velocity.z.mul( .9 ) );
+						velocity.x = velocity.x.mul( .9 );
+						velocity.z = velocity.z.mul( .9 );
 
 					} );
 
 				} );
 
-				computeParticles = computeUpdate.compute( particleCount );
+				computeParticles = computeUpdate().compute( particleCount );
 
 				// create nodes
 
@@ -167,8 +166,10 @@
 				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( render );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				//
 
@@ -176,7 +177,7 @@
 
 				// click event
 
-				const computeHit = new ShaderNode( ( stack ) => {
+				const computeHit = tslFn( () => {
 
 					const position = positionBuffer.element( instanceIndex );
 					const velocity = velocityBuffer.element( instanceIndex );
@@ -188,9 +189,9 @@
 					const power = distArea.mul( .1 );
 					const relativePower = power.mul( instanceIndex.hash().mul( .5 ).add( .5 ) );
 
-					stack.assign( velocity, velocity.add( direction.mul( relativePower ) ) );
+					velocity.assign( velocity.add( direction.mul( relativePower ) ) );
 
-				} ).compute( particleCount );
+				} )().compute( particleCount );
 
 				//
 
@@ -257,8 +258,9 @@
 
 			}
 
-			function render() {
+			function animate() {
 
+				stats.update();
 				renderer.compute( computeParticles );
 				renderer.render( scene, camera );
 

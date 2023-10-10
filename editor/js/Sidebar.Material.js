@@ -231,10 +231,20 @@ function SidebarMaterial( editor ) {
 	const materialNormalMap = new SidebarMaterialMapProperty( editor, 'normalMap', strings.getKey( 'sidebar/material/normalmap' ) );
 	container.add( materialNormalMap );
 
+	// clearcoat map
+
+	const materialClearcoatMap = new SidebarMaterialMapProperty( editor, 'clearcoatMap', strings.getKey( 'sidebar/material/clearcoatmap' ) );
+	container.add( materialClearcoatMap );
+
 	// clearcoat normal map
 
 	const materialClearcoatNormalMap = new SidebarMaterialMapProperty( editor, 'clearcoatNormalMap', strings.getKey( 'sidebar/material/clearcoatnormalmap' ) );
 	container.add( materialClearcoatNormalMap );
+
+	// clearcoat roughness map
+
+	const materialClearcoatRoughnessMap = new SidebarMaterialMapProperty( editor, 'clearcoatRoughnessMap', strings.getKey( 'sidebar/material/clearcoatroughnessmap' ) );
+	container.add( materialClearcoatRoughnessMap );
 
 	// displacement map
 

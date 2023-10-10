@@ -16,8 +16,6 @@
 			<br>Click on screen to process the audio using WebGPU.
 		</div>
 
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -31,7 +29,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { ShaderNode, uniform, storage, instanceIndex, float, texture, viewportTopLeft, color } from 'three/nodes';
+			import { tslFn, uniform, storage, instanceIndex, float, texture, viewportTopLeft, color } from 'three/nodes';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -136,10 +134,9 @@
 
 				// compute (shader-node)
 
-				const computeShaderNode = new ShaderNode( ( stack ) => {
+				const computeShaderFn = tslFn( () => {
 
 					const index = float( instanceIndex );
-
 
 					// pitch
 
@@ -164,14 +161,14 @@
 
 					const waveStorageElementNode = waveStorageNode.element( instanceIndex );
 
-					stack.assign( waveStorageElementNode, wave );
+					waveStorageElementNode.assign( wave );
 
 				} );
 
 
 				// compute
 
-				computeNode = computeShaderNode.compute( waveBuffer.length );
+				computeNode = computeShaderFn().compute( waveBuffer.length );
 
 
 				// gui

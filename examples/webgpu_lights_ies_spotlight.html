@@ -12,10 +12,6 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - ies spotlight<br />
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -31,6 +27,8 @@
 			import * as THREE from 'three';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
+
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import IESSpotLight from 'three/addons/lights/IESSpotLight.js';
@@ -44,11 +42,11 @@
 
 			async function init() {
 
-				if ( WebGPU.isAvailable() === false ) {
+				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
-					throw new Error( 'No WebGPU support' );
+					throw new Error( 'No WebGPU or WebGL2 support' );
 
 				}
 

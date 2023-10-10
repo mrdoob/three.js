@@ -103,22 +103,6 @@
 			should clear the stencil buffer. Default is `true`.
 		</p>
 
-		<h3>[property:Object debug]</h3>
-		<p>
-			- [page:Boolean checkShaderErrors]: If it is true, defines whether
-			material shader programs are checked for errors during compilation and
-			linkage process. It may be useful to disable this check in production for
-			performance gain. It is strongly recommended to keep these checks enabled
-			during development. If the shader does not compile and link - it will not
-			work and associated material will not render. Default is `true`.<br />
-			- [page:Function onShaderError]( gl, program, glVertexShader,
-			glFragmentShader ): A callback function that can be used for custom error
-			reporting. The callback receives the WebGL context, an instance of
-			WebGLProgram as well two instances of WebGLShader representing the vertex
-			and fragment shader. Assigning a custom function disables the default
-			error reporting. Default is `null`.
-		</p>
-
 		<h3>[property:Object capabilities]</h3>
 		<p>
 			An object containing details about the capabilities of the current
@@ -172,6 +156,22 @@
 			the plane is negative are cut away. Default is [].
 		</p>
 
+		<h3>[property:Object debug]</h3>
+		<p>
+			- [page:Boolean checkShaderErrors]: If it is true, defines whether
+			material shader programs are checked for errors during compilation and
+			linkage process. It may be useful to disable this check in production for
+			performance gain. It is strongly recommended to keep these checks enabled
+			during development. If the shader does not compile and link - it will not
+			work and associated material will not render. Default is `true`.<br />
+			- [page:Function onShaderError]( gl, program, glVertexShader,
+			glFragmentShader ): A callback function that can be used for custom error
+			reporting. The callback receives the WebGL context, an instance of
+			WebGLProgram as well two instances of WebGLShader representing the vertex
+			and fragment shader. Assigning a custom function disables the default
+			error reporting. Default is `null`.
+		</p>
+		
 		<h3>[property:DOMElement domElement]</h3>
 		<p>
 			A [link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas] 
