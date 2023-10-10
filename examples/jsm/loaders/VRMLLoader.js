@@ -91,7 +91,7 @@ class VRMLLoader extends Loader {
 			const tokenData = createTokens();
 
 			const lexer = new VRMLLexer( tokenData.tokens );
-			const parser = VRMLParser.createParser( tokenData.tokenVocabulary );
+			const parser = new VRMLParser( tokenData.tokenVocabulary );
 			const visitor = createVisitor( parser.getBaseCstVisitorConstructor() );
 
 			// lexing
@@ -3275,11 +3275,15 @@ class VRMLLexer {
 
 }
 
-class VRMLParser {
+const { CstParser } = chevrotain;
 
-	static createParser( tokenVocabulary ) {
+class VRMLParser extends CstParser {
 
-		const $ = new chevrotain.CstParser( tokenVocabulary );
+	constructor( tokenVocabulary ) {
+
+		super( tokenVocabulary );
+
+		const $ = this;
 
 		const Version = tokenVocabulary[ 'Version' ];
 		const LCurly = tokenVocabulary[ 'LCurly' ];
@@ -3500,9 +3504,7 @@ class VRMLParser {
 
 		} );
 
-		$.performSelfAnalysis();
-
-		return $;
+		this.performSelfAnalysis();
 
 	}
 
