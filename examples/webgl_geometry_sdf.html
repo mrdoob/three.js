@@ -8,42 +8,6 @@
 </head>
 
 <body>
-	<!-- Example SDF from https://www.shadertoy.com/view/MdXSWn -->
-	<textarea id="mandelbrot">
-		float dist(vec3 p) {
-			p.xyz = p.xzy;
-			p *= 1.2;
-			vec3 z = p;
-			vec3 dz=vec3(0.0);
-			float power = 8.0;
-			float r, theta, phi;
-			float dr = 1.0;
-			
-			float t0 = 1.0;
-			for(int i = 0; i < 7; ++i) {
-				r = length(z);
-				if(r > 2.0) continue;
-				theta = atan(z.y / z.x);
-				#ifdef phase_shift_on
-				phi = asin(z.z / r) ;
-				#else
-				phi = asin(z.z / r);
-				#endif
-				
-				dr = pow(r, power - 1.0) * dr * power + 1.0;
-			
-				r = pow(r, power);
-				theta = theta * power;
-				phi = phi * power;
-				
-				z = r * vec3(cos(theta)*cos(phi), sin(theta)*cos(phi), sin(phi)) + p;
-				
-				t0 = min(t0, r);
-			}
-
-			return 0.5 * log(r) * r / dr;
-		}
-	</textarea>
 
 	<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -SDF to Mesh-<br/>
@@ -73,7 +37,6 @@
 		let renderer, stats, meshFromSDF, scene, camera, clock, controls;
 
 		const settings = {
-			type: 'mandelbrot',
 			res: 4,
 			bounds: 1,
 			autoRotate: true,
@@ -81,6 +44,44 @@
 			material: 'depth',
 			vertexCount: '0'
 		};
+
+		// Example SDF from https://www.shadertoy.com/view/MdXSWn -->
+
+		const shader = /* glsl */`
+			float dist(vec3 p) {
+				p.xyz = p.xzy;
+				p *= 1.2;
+				vec3 z = p;
+				vec3 dz=vec3(0.0);
+				float power = 8.0;
+				float r, theta, phi;
+				float dr = 1.0;
+				
+				float t0 = 1.0;
+				for(int i = 0; i < 7; ++i) {
+					r = length(z);
+					if(r > 2.0) continue;
+					theta = atan(z.y / z.x);
+					#ifdef phase_shift_on
+					phi = asin(z.z / r) ;
+					#else
+					phi = asin(z.z / r);
+					#endif
+					
+					dr = pow(r, power - 1.0) * dr * power + 1.0;
+				
+					r = pow(r, power);
+					theta = theta * power;
+					phi = phi * power;
+					
+					z = r * vec3(cos(theta)*cos(phi), sin(theta)*cos(phi), sin(phi)) + p;
+					
+					t0 = min(t0, r);
+				}
+	
+				return 0.5 * log(r) * r / dr;
+			}
+		`;
 
 		init();
 		animate();
@@ -113,7 +114,7 @@
 			//
 		
 			const panel = new GUI( );
-			
+		
 			panel.add( settings, 'res', 1, 6, 1 ).name( 'Res' ).onFinishChange( compile );
 			panel.add( settings, 'bounds', 1, 10, 1 ).name( 'Bounds' ).onFinishChange( compile );
 			panel.add( settings, 'material', [ 'depth', 'normal' ] ).name( 'Material' ).onChange( setMaterial );
@@ -130,7 +131,7 @@
 		function compile() {
 		
 			const generator = new SDFGeometryGenerator( renderer );
-			const geometry = generator.generate( Math.pow( 2, settings.res + 2 ), document.querySelector( 'textarea#' + settings.type ).value, settings.bounds );
+			const geometry = generator.generate( Math.pow( 2, settings.res + 2 ), shader, settings.bounds );
 			geometry.computeVertexNormals();
 
 			if ( meshFromSDF ) { // updates mesh
