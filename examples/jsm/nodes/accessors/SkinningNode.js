@@ -78,6 +78,16 @@ class SkinningNode extends Node {
 
 	}
 
+	generate( builder, output ) {
+
+		if ( output !== 'void' ) {
+
+			return positionLocal.build( builder, output );
+
+		}
+
+	}
+
 	update() {
 
 		this.skinnedMesh.skeleton.update();

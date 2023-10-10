@@ -213,7 +213,7 @@ class Textures extends DataMap {
 
 					backend.updateTexture( texture, options );
 
-					if ( options.needsMipmaps ) backend.generateMipmaps( texture );
+					if ( options.needsMipmaps && texture.mipmaps.length === 0 ) backend.generateMipmaps( texture );
 
 				}
 
@@ -305,7 +305,7 @@ class Textures extends DataMap {
 
 		if ( this.isEnvironmentTexture( texture ) ) return true;
 
-		return ( texture.isCompressedTexture !== true ) /*&& ( texture.generateMipmaps === true )*/ && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
+		return ( texture.isCompressedTexture === true ) || ( ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter ) );
 
 	}
 
