@@ -27,14 +27,20 @@
 			import * as THREE from 'three';
 
 			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
+			let camera, scene, renderer, composer, stats, smaaPass;
 
-			let camera, scene, renderer, composer, stats;
+			const params = {
+				enabled: true,
+				autoRotate: true
+
+			};
 
 			init();
 			animate();
@@ -66,7 +72,7 @@
 				scene.add( mesh1 );
 
 				const texture = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
-				texture.anisotropy = 4;
+				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 				texture.colorSpace = THREE.SRGBColorSpace;
 
 				const material2 = new THREE.MeshBasicMaterial( { map: texture } );
@@ -80,13 +86,21 @@
 				composer = new EffectComposer( renderer );
 				composer.addPass( new RenderPass( scene, camera ) );
 
-				const pass = new SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
-				composer.addPass( pass );
+				smaaPass = new SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
+				composer.addPass( smaaPass );
 
 				const outputPass = new OutputPass();
 				composer.addPass( outputPass );
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				const gui = new GUI();
+
+				const smaaFolder = gui.addFolder( 'SMAA' );
+				smaaFolder.add( params, 'enabled' );
+
+				const sceneFolder = gui.addFolder( 'Scene' );
+				sceneFolder.add( params, 'autoRotate' );
 
 			}
 
@@ -109,14 +123,20 @@
 
 				stats.begin();
 
-				for ( let i = 0; i < scene.children.length; i ++ ) {
+				if ( params.autoRotate === true ) {
 
-					const child = scene.children[ i ];
+					for ( let i = 0; i < scene.children.length; i ++ ) {
 
-					child.rotation.x += 0.005;
-					child.rotation.y += 0.01;
+						const child = scene.children[ i ];
+
+						child.rotation.x += 0.005;
+						child.rotation.y += 0.01;
+
+					}
 
 				}
+
+				smaaPass.enabled = params.enabled;
 
 				composer.render();
 
