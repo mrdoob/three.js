@@ -59,6 +59,9 @@ class SDFGeometryGenerator {
 
 		const read = new Float32Array( w * h * 4 );
 		this.renderer.readRenderTargetPixels( sdfRT, 0, 0, w, h, read );
+		sdfRT.dispose();
+
+		//
 
 		const mesh = surfaceNet( [ res, res, res ], ( x, y, z ) => {
 
@@ -97,12 +100,14 @@ class SDFGeometryGenerator {
 		Object.assign( cam, { left: width / - 2, right: width / 2, top: height / 2, bottom: height / - 2 } ).updateProjectionMatrix();
 		cam.position.z = 2;
 
+		const tileSize = width / tilesX;
+		const geometry = new PlaneGeometry( tileSize, tileSize );
+
 		while ( currentTile ++ < tiles ) {
 
 			const c = currentTile - 1;
-			const tileSize = width / tilesX;
 			const [ px, py ] = [ ( tileSize ) / 2 + ( c % tilesX ) * ( tileSize ) - width / 2, ( tileSize ) / 2 + Math.floor( c / tilesX ) * ( tileSize ) - height / 2 ];
-			this.compPlane = new Mesh( new PlaneGeometry( tileSize, tileSize ), new ShaderMaterial( {
+			const compPlane = new Mesh( geometry, new ShaderMaterial( {
 				uniforms: {
 					res: { value: new Vector2( width, height ) },
 					tileNum: { value: c / ( tilesX * tilesY - 1 ) },
@@ -111,14 +116,24 @@ class SDFGeometryGenerator {
 				vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
 				fragmentShader: shader
 			} ) );
-			this.compPlane.position.set( px, py, 0 );
-			scn.add( this.compPlane );
+			compPlane.position.set( px, py, 0 );
+			scn.add( compPlane );
 
 		}
 
 		this.renderer.setRenderTarget( rt );
 		this.renderer.render( scn, cam );
 		this.renderer.setRenderTarget( null );
+
+		//
+
+		geometry.dispose();
+
+		scn.traverse( function ( object ) {
+
+			if ( object.material !== undefined ) object.material.dispose();
+
+		} );
 
 		return rt;
 
