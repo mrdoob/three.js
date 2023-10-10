@@ -11525,8 +11525,8 @@ Parser.prototype.leftToRightVpd = function ( vpd ) {
 };
 
 var MMDParser = {
-  CharsetEncoder,
-  Parser
+  CharsetEncoder: CharsetEncoder,
+  Parser: Parser
 };
 
 return { MMDParser, CharsetEncoder, Parser };

@@ -22,7 +22,6 @@ import { LuminosityHighPassShader } from '../shaders/LuminosityHighPassShader.js
  * Reference:
  * - https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/
  */
-
 const UnrealBloomPass = /* @__PURE__ */ ( () => {
 
 class UnrealBloomPass extends Pass {
