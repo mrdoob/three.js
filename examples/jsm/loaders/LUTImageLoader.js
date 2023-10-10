@@ -11,8 +11,10 @@ import {
 
 export class LUTImageLoader extends Loader {
 
-	constructor( flipVertical = true ) {
-
+	constructor( flipVertical = false ) {
+		//The NeutralLUT.png has green at the bottom for Unreal ang green at the top for Unity URP Color Lookup 
+		//post-processing. If you're using lut image strips from a Unity pipeline then pass true to the constructor
+		
 		super();
 
 		this.flip = flipVertical;
@@ -24,7 +26,7 @@ export class LUTImageLoader extends Loader {
 		const loader = new TextureLoader( this.manager );
 
 		loader.setCrossOrigin( this.crossOrigin );
-		
+
 		loader.setPath( this.path );
 		loader.load( url, texture => {
 
