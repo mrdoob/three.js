@@ -263,7 +263,7 @@ const PATH_PROPERTIES = {
 	morphTargetInfluences: 'weights'
 };
 
-const DEFAULT_SPECULAR_COLOR = /* @__PURE__ */ new Color();
+const DEFAULT_SPECULAR_COLOR = new Color();
 
 // GLB constants
 // https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
@@ -343,7 +343,7 @@ function getMinMax( attribute, start, count ) {
 
 			if ( attribute.itemSize > 4 ) {
 
-				// no support for interleaved data for itemSize > 4
+				 // no support for interleaved data for itemSize > 4
 
 				value = attribute.array[ i * attribute.itemSize + a ];
 
@@ -521,7 +521,7 @@ class GLTFWriter {
 	async write( input, onDone, options = {} ) {
 
 		this.options = Object.assign( {
-		// default options
+			// default options
 			binary: false,
 			trs: false,
 			onlyVisible: true,
@@ -588,8 +588,8 @@ class GLTFWriter {
 				headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
 				headerView.setUint32( 4, GLB_VERSION, true );
 				const totalByteLength = GLB_HEADER_BYTES
-				+ jsonChunkPrefix.byteLength + jsonChunk.byteLength
-				+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
+					+ jsonChunkPrefix.byteLength + jsonChunk.byteLength
+					+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
 				headerView.setUint32( 8, totalByteLength, true );
 
 				const glbBlob = new Blob( [
@@ -672,7 +672,7 @@ class GLTFWriter {
 		} catch ( error ) {
 
 			console.warn( 'THREE.GLTFExporter: userData of \'' + object.name + '\' ' +
-			'won\'t be serialized because of JSON.stringify error - ' + error.message );
+				'won\'t be serialized because of JSON.stringify error - ' + error.message );
 
 		}
 
@@ -989,7 +989,7 @@ class GLTFWriter {
 
 				if ( attribute.itemSize > 4 ) {
 
-					// no support for interleaved data for itemSize > 4
+					 // no support for interleaved data for itemSize > 4
 
 					value = attribute.array[ i * attribute.itemSize + a ];
 
@@ -1211,13 +1211,13 @@ class GLTFWriter {
 	}
 
 	/**
-	* Process image
-	* @param  {Image} image to process
-	* @param  {Integer} format of the image (RGBAFormat)
-	* @param  {Boolean} flipY before writing out the image
-	* @param  {String} mimeType export format
-	* @return {Integer}     Index of the processed texture in the "images" array
-	*/
+	 * Process image
+	 * @param  {Image} image to process
+	 * @param  {Integer} format of the image (RGBAFormat)
+	 * @param  {Boolean} flipY before writing out the image
+	 * @param  {String} mimeType export format
+	 * @return {Integer}     Index of the processed texture in the "images" array
+	 */
 	processImage( image, format, flipY, mimeType = 'image/png' ) {
 
 		if ( image !== null ) {
@@ -1679,7 +1679,7 @@ class GLTFWriter {
 			// Prefix all geometry attributes except the ones specifically
 			// listed in the spec; non-spec attributes are considered custom.
 			const validVertexAttributes =
-				/^(POSITION|NORMAL|TANGENT|TEXCOORD_\d+|COLOR_\d+|JOINTS_\d+|WEIGHTS_\d+)$/;
+					/^(POSITION|NORMAL|TANGENT|TEXCOORD_\d+|COLOR_\d+|JOINTS_\d+|WEIGHTS_\d+)$/;
 
 			if ( ! validVertexAttributes.test( attributeName ) ) attributeName = '_' + attributeName;
 
@@ -1695,8 +1695,8 @@ class GLTFWriter {
 			const array = attribute.array;
 
 			if ( attributeName === 'JOINTS_0' &&
-			! ( array instanceof Uint16Array ) &&
-			! ( array instanceof Uint8Array ) ) {
+				! ( array instanceof Uint16Array ) &&
+				! ( array instanceof Uint8Array ) ) {
 
 				console.warn( 'GLTFExporter: Attribute "skinIndex" converted to type UNSIGNED_SHORT.' );
 				modifiedAttribute = new BufferAttribute( new Uint16Array( array ), attribute.itemSize, attribute.normalized );
@@ -2115,7 +2115,7 @@ class GLTFWriter {
 	 * @param {THREE.Object3D} object
 	 * @return {number|null}
 	 */
-	processSkin( object ) {
+	 processSkin( object ) {
 
 		const json = this.json;
 		const nodeMap = this.nodeMap;
@@ -2456,18 +2456,18 @@ class GLTFLightExtension {
 		if ( light.decay !== undefined && light.decay !== 2 ) {
 
 			console.warn( 'THREE.GLTFExporter: Light decay may be lost. glTF is physically-based, '
-			+ 'and expects light.decay=2.' );
+				+ 'and expects light.decay=2.' );
 
 		}
 
 		if ( light.target
-			&& ( light.target.parent !== light
-			|| light.target.position.x !== 0
-			|| light.target.position.y !== 0
-			|| light.target.position.z !== - 1 ) ) {
+				&& ( light.target.parent !== light
+				|| light.target.position.x !== 0
+				|| light.target.position.y !== 0
+				|| light.target.position.z !== - 1 ) ) {
 
 			console.warn( 'THREE.GLTFExporter: Light direction may be lost. For best results, '
-			+ 'make light.target a child of the light with position 0,0,-1.' );
+				+ 'make light.target a child of the light with position 0,0,-1.' );
 
 		}
 
@@ -2796,8 +2796,8 @@ class GLTFMaterialsSpecularExtension {
 	writeMaterial( material, materialDef ) {
 
 		if ( ! material.isMeshPhysicalMaterial || ( material.specularIntensity === 1.0 &&
-					material.specularColor.equals( DEFAULT_SPECULAR_COLOR ) &&
-				! material.specularIntensityMap && ! material.specularColorTexture ) ) return;
+		       material.specularColor.equals( DEFAULT_SPECULAR_COLOR ) &&
+		     ! material.specularIntensityMap && ! material.specularColorTexture ) ) return;
 
 		const writer = this.writer;
 		const extensionsUsed = writer.extensionsUsed;
@@ -3143,7 +3143,7 @@ GLTFExporter.Utils = {
 			}
 
 			if ( sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodDiscrete
-			&& sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodLinear ) {
+				&& sourceTrack.createInterpolant !== sourceTrack.InterpolantFactoryMethodLinear ) {
 
 				if ( sourceTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
 

@@ -15,7 +15,7 @@ import {
 	Vector4
 } from 'three';
 
-const Lensflare = /* @__PURE__ */ ( () => {
+const { Lensflare, LensflareElement } = /* @__PURE__ */ ( () => {
 
 class Lensflare extends Mesh {
 
@@ -285,34 +285,7 @@ class Lensflare extends Mesh {
 
 }
 
-Lensflare.Geometry = /* @__PURE__ */ ( function () {
-
-	const geometry = new BufferGeometry();
-
-	const float32Array = new Float32Array( [
-		- 1, - 1, 0, 0, 0,
-		1, - 1, 0, 1, 0,
-		1, 1, 0, 1, 1,
-		- 1, 1, 0, 0, 1
-	] );
-
-	const interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
-
-	geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
-	geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
-	geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
-
-	return geometry;
-
-} )();
-
-return Lensflare;
-
-} )();
-
 //
-
-const LensflareElement = /* @__PURE__ */ ( () => {
 
 class LensflareElement {
 
@@ -399,7 +372,28 @@ LensflareElement.Shader = {
 
 };
 
-return LensflareElement;
+Lensflare.Geometry = ( function () {
+
+	const geometry = new BufferGeometry();
+
+	const float32Array = new Float32Array( [
+		- 1, - 1, 0, 0, 0,
+		1, - 1, 0, 1, 0,
+		1, 1, 0, 1, 1,
+		- 1, 1, 0, 0, 1
+	] );
+
+	const interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
+
+	geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
+	geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+	geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+
+	return geometry;
+
+} )();
+
+return { Lensflare, LensflareElement };
 
 } )();
 

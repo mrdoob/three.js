@@ -98,7 +98,7 @@ class KTX2Loader extends Loader {
 			console.warn(
 
 				'THREE.KTX2Loader: Please update to latest "basis_transcoder".'
-			+ ' "msc_basis_transcoder" is no longer supported in three.js r125+.'
+				+ ' "msc_basis_transcoder" is no longer supported in three.js r125+.'
 
 			);
 
@@ -144,7 +144,7 @@ class KTX2Loader extends Loader {
 				dxtSupported: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
 				bptcSupported: renderer.extensions.has( 'EXT_texture_compression_bptc' ),
 				pvrtcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
-				|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
+					|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
 			};
 
 			if ( renderer.capabilities.isWebGL2 ) {
@@ -216,7 +216,7 @@ class KTX2Loader extends Loader {
 				console.warn(
 
 					'THREE.KTX2Loader: Multiple active KTX2 loaders may cause performance issues.'
-				+ ' Use a single KTX2Loader instance, or call .dispose() on old instances.'
+					+ ' Use a single KTX2Loader instance, or call .dispose() on old instances.'
 
 				);
 
@@ -298,10 +298,10 @@ class KTX2Loader extends Loader {
 	}
 
 	/**
- * @param {ArrayBuffer} buffer
- * @param {object?} config
- * @return {Promise<CompressedTexture|CompressedArrayTexture|DataTexture|Data3DTexture>}
- */
+	 * @param {ArrayBuffer} buffer
+	 * @param {object?} config
+	 * @return {Promise<CompressedTexture|CompressedArrayTexture|DataTexture|Data3DTexture>}
+	 */
 	async _createTexture( buffer, config = {} ) {
 
 		const container = read( new Uint8Array( buffer ) );
@@ -867,8 +867,8 @@ async function createRawTexture( container ) {
 	if ( UNCOMPRESSED_FORMATS.has( FORMAT_MAP[ vkFormat ] ) ) {
 
 		texture = container.pixelDepth === 0
-			? new DataTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight )
-			: new Data3DTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight, container.pixelDepth );
+		? new DataTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight )
+		: new Data3DTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight, container.pixelDepth );
 
 	} else {
 
