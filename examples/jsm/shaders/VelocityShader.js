@@ -4,21 +4,23 @@ import {
 	Matrix4
 } from 'three';
 
+const { common, displacementmap } = UniformsLib;
+
 /**
  * Mesh Velocity Shader @bhouston
  */
 
 const VelocityShader = {
 
-	uniforms: /* @__PURE__ */ ( () => UniformsUtils.merge( [
-		UniformsLib.common,
-		UniformsLib.displacementmap,
+	uniforms: /* @__PURE__ */ UniformsUtils.merge( [
+		common,
+		displacementmap,
 		{
 			modelMatrixPrev: { value: /* @__PURE__ */ new Matrix4() },
 			currentProjectionViewMatrix: { value: /* @__PURE__ */ new Matrix4() },
 			previousProjectionViewMatrix: { value: /* @__PURE__ */ new Matrix4() }
 		}
-	] ) )(),
+	] ),
 
 	vertexShader: /* glsl */`
 #define NORMAL

@@ -7,21 +7,32 @@
 
 import { UniformsUtils, UniformsLib, ShaderMaterial, Color, MultiplyOperation } from 'three';
 
+const {
+	common,
+	specularmap,
+	envmap,
+	aomap,
+	lightmap,
+	emissivemap,
+	fog,
+	lights,
+} = UniformsLib;
+
 const GouraudShader = {
 
-	uniforms: /* @__PURE__ */ ( () => UniformsUtils.merge( [
-		UniformsLib.common,
-		UniformsLib.specularmap,
-		UniformsLib.envmap,
-		UniformsLib.aomap,
-		UniformsLib.lightmap,
-		UniformsLib.emissivemap,
-		UniformsLib.fog,
-		UniformsLib.lights,
+	uniforms: /* @__PURE__ */ UniformsUtils.merge( [
+		common,
+		specularmap,
+		envmap,
+		aomap,
+		lightmap,
+		emissivemap,
+		fog,
+		lights,
 		{
 			emissive: { value: /* @__PURE__ */ new Color( 0x000000 ) }
 		}
-	] ) )(),
+	] ),
 
 	vertexShader: /* glsl */`
 
