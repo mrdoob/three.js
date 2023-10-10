@@ -66,9 +66,9 @@
 	<script type="module">
 		import * as THREE from 'three';
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { SDFGeometryGenerator } from 'three/addons/geometries/SDFGeometryGenerator.js';
 		import Stats from 'three/addons/libs/stats.module.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-		import { SDFGeometryGenerator } from 'three/addons/geometries/SDFGeometryGenerator.js';
 		
 		let renderer, stats, meshFromSDF, scene, camera, clock, controls;
 
@@ -135,6 +135,7 @@
 
 			if ( meshFromSDF ) { // updates mesh
 
+				meshFromSDF.geometry.dispose();
 				meshFromSDF.geometry = geometry;
 		
 			} else { // inits meshFromSDF : THREE.Mesh
@@ -154,6 +155,8 @@
 		}
 
 		function setMaterial() {
+
+			meshFromSDF.material.dispose();
 
 			if ( settings.material == 'depth' ) {
 
