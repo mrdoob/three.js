@@ -6,11 +6,18 @@ export default /* glsl */`
 
 	reflectedLight.indirectDiffuse *= ambientOcclusion;
 
+
 	#if defined( USE_ENVMAP ) && defined( STANDARD )
 
 		float dotNV = saturate( dot( geometryNormal, geometryViewDir ) );
 
-		reflectedLight.indirectSpecular *= computeSpecularOcclusion( dotNV, ambientOcclusion, material.roughness );
+		float specularOcclusion = computeSpecularOcclusion( dotNV, ambientOcclusion, material.roughness );
+
+		reflectedLight.indirectSpecular *= specularOcclusion;
+
+		#if defined( USE_SHEEN ) 
+			sheenSpecularIndirect *= specularOcclusion;
+		#endif
 
 	#endif
 
