@@ -83,6 +83,7 @@ function Editor() {
 		showGridChanged: new Signal(),
 		showHelpersChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
+		refreshSidebarEnvironment: new Signal(),
 		historyChanged: new Signal(),
 
 		viewportCameraChanged: new Signal(),
@@ -662,6 +663,7 @@ Editor.prototype = {
 		if ( json.environment === 'ModelViewer' ) {
 
 			this.signals.sceneEnvironmentChanged.dispatch( json.environment );
+			this.signals.refreshSidebarEnvironment.dispatch();
 
 		}
 
