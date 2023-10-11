@@ -7,7 +7,6 @@ import {
 	Vector3
 } from 'three';
 
-const _box = new Box3();
 const _vector = new Vector3();
 
 class FatPointsGeometry extends InstancedBufferGeometry {
