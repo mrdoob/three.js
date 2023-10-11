@@ -1,4 +1,4 @@
-const lottie = /* @__PURE */ ( () => {
+const lottie = /* @__PURE__ */ ( () => {
 
 const svgNS = 'http://www.w3.org/2000/svg';
 
