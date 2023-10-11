@@ -7,7 +7,7 @@ import { materialColor } from '../accessors/MaterialNode.js';
 import { modelViewMatrix } from '../accessors/ModelNode.js';
 import { positionGeometry } from '../accessors/PositionNode.js';
 import { smoothstep } from '../math/MathNode.js';
-import { tslFn, vec2, vec4, If } from '../shadernode/ShaderNode.js';
+import { tslFn, vec2, vec4 } from '../shadernode/ShaderNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { materialPointWidth } from '../accessors/FatPointsMaterialNode.js'; // or should this be a property, instead?
 import { viewport } from '../display/ViewportNode.js';
