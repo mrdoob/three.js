@@ -1,5 +1,4 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { temp } from '../core/VarNode.js';
 import { varying } from '../core/VaryingNode.js';
 import { property } from '../core/PropertyNode.js';
 import { attribute } from '../core/AttributeNode.js';
@@ -7,8 +6,8 @@ import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
 import { materialColor } from '../accessors/MaterialNode.js';
 import { modelViewMatrix } from '../accessors/ModelNode.js';
 import { positionGeometry } from '../accessors/PositionNode.js';
-import { abs, mix, mod, dot, clamp, smoothstep } from '../math/MathNode.js';
-import { tslFn, float, vec2, vec3, vec4, If } from '../shadernode/ShaderNode.js';
+import { smoothstep } from '../math/MathNode.js';
+import { tslFn, float, vec2, vec4, If } from '../shadernode/ShaderNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { materialPointWidth } from '../accessors/FatPointsMaterialNode.js'; // or should this be a property, instead?
 import { viewport } from '../display/ViewportNode.js';
