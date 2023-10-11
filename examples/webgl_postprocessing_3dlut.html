@@ -37,6 +37,7 @@
 			import { LUTPass } from 'three/addons/postprocessing/LUTPass.js';
 			import { LUTCubeLoader } from 'three/addons/loaders/LUTCubeLoader.js';
 			import { LUT3dlLoader } from 'three/addons/loaders/LUT3dlLoader.js';
+			import { LUTImageLoader } from 'three/addons/loaders/LUTImageLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			const params = {
@@ -52,7 +53,10 @@
 				'Clayton 33.CUBE': null,
 				'Cubicle 99.CUBE': null,
 				'Remy 24.CUBE': null,
-				'Presetpro-Cinematic.3dl': null
+				'Presetpro-Cinematic.3dl': null,
+				'NeutralLUT': null,
+				'B&WLUT': null,
+				'NightLUT': null
 			};
 
 			let gui;
@@ -103,6 +107,15 @@
 
 							} );
 
+					} else if ( /\LUT$/i.test( name ) ){
+						
+						new LUTImageLoader()
+							.load( `luts/${name}.png`, function ( result ) {
+
+								lutMap[ name ] = result;
+
+							} );
+					
 					} else {
 
 						new LUT3dlLoader()
