@@ -132,6 +132,8 @@ class MaterialLoader extends Loader {
 		if ( json.blendSrcAlpha !== undefined ) material.blendSrcAlpha = json.blendSrcAlpha;
 		if ( json.blendDstAlpha !== undefined ) material.blendDstAlpha = json.blendDstAlpha;
 		if ( json.blendEquationAlpha !== undefined ) material.blendEquationAlpha = json.blendEquationAlpha;
+		if ( json.blendColor !== undefined && material.blendColor !== undefined ) material.blendColor.setHex( json.blendColor );
+		if ( json.blendAlpha !== undefined ) material.blendAlpha = json.blendAlpha;
 		if ( json.stencilWriteMask !== undefined ) material.stencilWriteMask = json.stencilWriteMask;
 		if ( json.stencilFunc !== undefined ) material.stencilFunc = json.stencilFunc;
 		if ( json.stencilRef !== undefined ) material.stencilRef = json.stencilRef;

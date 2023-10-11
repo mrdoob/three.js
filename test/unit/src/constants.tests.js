@@ -47,6 +47,10 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.DstColorFactor, 208, 'DstColorFactor is equal to 208' );
 		assert.equal( Constants.OneMinusDstColorFactor, 209, 'OneMinusDstColorFactor is equal to 209' );
 		assert.equal( Constants.SrcAlphaSaturateFactor, 210, 'SrcAlphaSaturateFactor is equal to 210' );
+		assert.equal( Constants.ConstantColorFactor, 211, 'ConstantColorFactor is equal to 211' );
+		assert.equal( Constants.OneMinusConstantColorFactor, 212, 'OneMinusConstantColorFactor is equal to 212' );
+		assert.equal( Constants.ConstantAlphaFactor, 213, 'ConstantAlphaFactor is equal to 213' );
+		assert.equal( Constants.OneMinusConstantAlphaFactor, 214, 'OneMinusConstantAlphaFactor is equal to 214' );
 
 		assert.equal( Constants.NeverDepth, 0, 'NeverDepth is equal to 0' );
 		assert.equal( Constants.AlwaysDepth, 1, 'AlwaysDepth is equal to 1' );

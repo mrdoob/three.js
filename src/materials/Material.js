@@ -1,3 +1,4 @@
+import { Color } from '../math/Color.js';
 import { EventDispatcher } from '../core/EventDispatcher.js';
 import { FrontSide, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
 import * as MathUtils from '../math/MathUtils.js';
@@ -33,6 +34,8 @@ class Material extends EventDispatcher {
 		this.blendSrcAlpha = null;
 		this.blendDstAlpha = null;
 		this.blendEquationAlpha = null;
+		this.blendColor = new Color( 0, 0, 0 );
+		this.blendAlpha = 0;
 
 		this.depthFunc = LessEqualDepth;
 		this.depthTest = true;
@@ -331,6 +334,8 @@ class Material extends EventDispatcher {
 		if ( this.blendSrcAlpha !== null ) data.blendSrcAlpha = this.blendSrcAlpha;
 		if ( this.blendDstAlpha !== null ) data.blendDstAlpha = this.blendDstAlpha;
 		if ( this.blendEquationAlpha !== null ) data.blendEquationAlpha = this.blendEquationAlpha;
+		if ( this.blendColor && this.blendColor.isColor ) data.blendColor = this.blendColor.getHex();
+		if ( this.blendAlpha !== 0 ) data.blendAlpha = this.blendAlpha;
 
 		if ( this.depthFunc !== LessEqualDepth ) data.depthFunc = this.depthFunc;
 		if ( this.depthTest === false ) data.depthTest = this.depthTest;
@@ -436,6 +441,8 @@ class Material extends EventDispatcher {
 		this.blendSrcAlpha = source.blendSrcAlpha;
 		this.blendDstAlpha = source.blendDstAlpha;
 		this.blendEquationAlpha = source.blendEquationAlpha;
+		this.blendColor.copy( source.blendColor );
+		this.blendAlpha = source.blendAlpha;
 
 		this.depthFunc = source.depthFunc;
 		this.depthTest = source.depthTest;
