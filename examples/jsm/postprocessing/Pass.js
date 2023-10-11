@@ -43,15 +43,20 @@ const _camera = /* @__PURE__ */ new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
 // https://github.com/mrdoob/three.js/pull/21358
 
-const _geometry = /* @__PURE__ */ ( () => {
+class FullscreenTriangleGeometry extends BufferGeometry {
 
-	const _geometry = new BufferGeometry();
-	_geometry.setAttribute( 'position', new Float32BufferAttribute( [ - 1, 3, 0, - 1, - 1, 0, 3, - 1, 0 ], 3 ) );
-	_geometry.setAttribute( 'uv', new Float32BufferAttribute( [ 0, 2, 0, 0, 2, 0 ], 2 ) );
+	constructor() {
 
-	return _geometry;
+		super();
 
-} )();
+		this.setAttribute( 'position', new Float32BufferAttribute( [ - 1, 3, 0, - 1, - 1, 0, 3, - 1, 0 ], 3 ) );
+		this.setAttribute( 'uv', new Float32BufferAttribute( [ 0, 2, 0, 0, 2, 0 ], 2 ) );
+
+	}
+
+}
+
+const _geometry = /* @__PURE__ */ new FullscreenTriangleGeometry();
 
 class FullScreenQuad {
 
