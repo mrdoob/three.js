@@ -24,6 +24,7 @@ export default class RenderObject {
 		this.pipeline = null;
 		this.vertexBuffers = null;
 
+		this.initialNodesCacheKey = this.getNodesCacheKey();
 		this.initialCacheKey = this.getCacheKey();
 
 		this._nodeBuilderState = null;
@@ -132,6 +133,12 @@ export default class RenderObject {
 
 	}
 
+	get needsUpdate() {
+
+		return this.initialNodesCacheKey !== this.getNodesCacheKey();
+
+	}
+
 	getNodesCacheKey() {
 
 		// Environment Nodes Cache Key
@@ -142,7 +149,7 @@ export default class RenderObject {
 
 	getCacheKey() {
 
-		return `{material:${ this.getMaterialCacheKey() },nodes:${ this.getNodesCacheKey()}`;
+		return this.getMaterialCacheKey() + ',' + this.getNodesCacheKey();
 
 	}
 
