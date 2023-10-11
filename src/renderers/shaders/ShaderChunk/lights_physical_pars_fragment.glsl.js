@@ -49,7 +49,8 @@ struct PhysicalMaterial {
 };
 
 // temporary
-vec3 clearcoatSpecular = vec3( 0.0 );
+vec3 clearcoatSpecularDirect = vec3( 0.0 );
+vec3 clearcoatSpecularIndirect = vec3( 0.0 );
 vec3 sheenSpecular = vec3( 0.0 );
 
 vec3 Schlick_to_F0( const in vec3 f, const in float f90, const in float dotVH ) {
@@ -485,7 +486,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geome
 
 		vec3 ccIrradiance = dotNLcc * directLight.color;
 
-		clearcoatSpecular += ccIrradiance * BRDF_GGX_Clearcoat( directLight.direction, geometryViewDir, geometryClearcoatNormal, material );
+		clearcoatSpecularDirect += ccIrradiance * BRDF_GGX_Clearcoat( directLight.direction, geometryViewDir, geometryClearcoatNormal, material );
 
 	#endif
 
@@ -510,7 +511,7 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	#ifdef USE_CLEARCOAT
 
-		clearcoatSpecular += clearcoatRadiance * EnvironmentBRDF( geometryClearcoatNormal, geometryViewDir, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
+		clearcoatSpecularIndirect += clearcoatRadiance * EnvironmentBRDF( geometryClearcoatNormal, geometryViewDir, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
 
 	#endif
 
