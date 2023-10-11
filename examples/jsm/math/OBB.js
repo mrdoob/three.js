@@ -11,7 +11,7 @@ import {
 
 const a = {
 	c: null, // center
-	u: [ /* @__PURE__ */ new Vector3(), /* @__PURE__ */ new Vector3(), /* @__PURE__ */ /* @__PURE__ */ new Vector3() ], // basis vectors
+	u: [ /* @__PURE__ */ new Vector3(), /* @__PURE__ */ new Vector3(), /* @__PURE__ */ new Vector3() ], // basis vectors
 	e: [] // half width
 };
 
