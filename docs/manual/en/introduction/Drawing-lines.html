@@ -10,28 +10,35 @@
 		<h1>[name]</h1>
 		<div>
 			<p>
-				Let's say you want to draw a line or a circle, not a wireframe [page:Mesh].
-				First we need to set up the [page:WebGLRenderer renderer], [page:Scene scene] and camera (see the Creating a scene page).
+				When creating graphics with three.js, sometimes you might want to draw simple shapes like lines or circles, rather than a more complex wireframe [page:Mesh].
+				First we need to set up the [page:WebGLRenderer renderer], [page:Scene scene] and [page:Camera camera] (see the Creating a scene page).
 			</p>
 
 			<p>Here is the code that we will use:</p>
+			<h2>Setup</h2>
+			<p>Begin by initializing the renderer, scene, and camera.</p>
 			<code>
+// Initialize the renderer
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
+// Set up the camera
 const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
 camera.position.set( 0, 0, 100 );
 camera.lookAt( 0, 0, 0 );
 
+// Create the main scene
 const scene = new THREE.Scene();
 			</code>
-			<p>Next thing we will do is define a material. For lines we have to use [page:LineBasicMaterial] or [page:LineDashedMaterial].</p>
+			<h2>Create Material</h2>
+			<p>For your lines, you'll need to define a material. You can choose between [page:LineBasicMaterial] or [page:LineDashedMaterial]. In this instance, we're going for a straightforward blue line.</p>
 			<code>
 //create a blue LineBasicMaterial
 const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 			</code>
 
+			<h2>Define Geometry</h2>
 			<p>
 				After material we will need a geometry with some vertices:
 			</p>
@@ -45,12 +52,15 @@ points.push( new THREE.Vector3( 10, 0, 0 ) );
 const geometry = new THREE.BufferGeometry().setFromPoints( points );
 			</code>
 
-			<p>Note that lines are drawn between each consecutive pair of vertices, but not between the first and last (the line is not closed.)</p>
+			<p>Note: Lines connect each consecutive pair of vertices. However, the line doesn't circle back from the last to the first vertex, meaning it won't create a closed shape.</p>
 
+			<h2>Construct the Line</h2>
 			<p>Now that we have points for two lines and a material, we can put them together to form a line.</p>
 			<code>
 const line = new THREE.Line( geometry, material );
 			</code>
+			
+			<h2>Render the Scene</h2>
 			<p>All that's left is to add it to the scene and call [page:WebGLRenderer.render render].</p>
 
 			<code>
