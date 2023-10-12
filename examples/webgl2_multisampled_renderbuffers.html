@@ -134,7 +134,7 @@
 				//
 
 				const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
-				const renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, { samples: 4 } );
+				const renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, { samples: 4, type: THREE.HalfFloatType } );
 
 				const renderPass = new RenderPass( scene, camera );
 				const outputPass = new OutputPass();
