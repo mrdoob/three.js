@@ -344,7 +344,8 @@
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/en/geometries/DecalGeometry",
 				"ParametricGeometry": "examples/en/geometries/ParametricGeometry",
-				"TextGeometry": "examples/en/geometries/TextGeometry"
+				"TextGeometry": "examples/en/geometries/TextGeometry",
+				"SDFGeometryGenerator": "examples/en/geometries/SDFGeometryGenerator"
 			},
 
 			"Helpers": {

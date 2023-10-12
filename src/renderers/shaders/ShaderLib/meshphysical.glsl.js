@@ -197,7 +197,7 @@ void main() {
 		// https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
 		float sheenEnergyComp = 1.0 - 0.157 * max3( material.sheenColor );
 
-		outgoingLight = outgoingLight * sheenEnergyComp + sheenSpecular;
+		outgoingLight = outgoingLight * sheenEnergyComp + sheenSpecularDirect + sheenSpecularIndirect;
 
 	#endif
 

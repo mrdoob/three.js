@@ -1329,6 +1329,14 @@ class WebGLRenderer {
 
 		function renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera ) {
 
+			const overrideMaterial = scene.isScene === true ? scene.overrideMaterial : null;
+
+			if ( overrideMaterial !== null ) {
+
+				return;
+
+			}
+
 			const isWebGL2 = capabilities.isWebGL2;
 
 			if ( _transmissionRenderTarget === null ) {
