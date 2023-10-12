@@ -10,7 +10,7 @@ export default /* glsl */`
 		clearcoatSpecularIndirect *= ambientOcclusion;
 	#endif
 
-  #if defined( USE_SHEEN ) 
+	#if defined( USE_SHEEN ) 
 		sheenSpecularIndirect *= ambientOcclusion;
 	#endif
 
