@@ -48,8 +48,9 @@ const perturbNormalArb = tslFn( ( inputs ) => {
 
 	const { surf_pos, surf_norm, dHdxy } = inputs;
 
-	const vSigmaX = surf_pos.dFdx();
-	const vSigmaY = surf_pos.dFdy();
+	// normalize is done to ensure that the bump map looks the same regardless of the texture's scale
+	const vSigmaX = surf_pos.dFdx().normalize();
+	const vSigmaY = surf_pos.dFdy().normalize();
 	const vN = surf_norm; // normalized
 
 	const R1 = vSigmaY.cross( vN );
