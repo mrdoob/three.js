@@ -1343,9 +1343,9 @@ class WebGLRenderer {
 
 			// If the current render target has a stencil buffer, then the transmission render target also needs it so that it's rendered the same way.
 
-			const needStencilBuffer = currentRenderTarget !== null ? currentRenderTarget.stencilBuffer : _this.getContextAttributes().stencil;
+			const needsStencilBuffer = currentRenderTarget !== null ? currentRenderTarget.stencilBuffer : _this.getContextAttributes().stencil;
 
-			if ( _transmissionRenderTarget !== null && needStencilBuffer && ! _transmissionRenderTarget.stencilBuffer ) {
+			if ( _transmissionRenderTarget !== null && needsStencilBuffer === true && _transmissionRenderTarget.stencilBuffer === false ) {
 
 				_transmissionRenderTarget.dispose();
 				_transmissionRenderTarget = null;
@@ -1359,7 +1359,7 @@ class WebGLRenderer {
 					type: extensions.has( 'EXT_color_buffer_half_float' ) ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
 					samples: ( isWebGL2 ) ? 4 : 0,
-					stencilBuffer: needStencilBuffer
+					stencilBuffer: needsStencilBuffer
 				} );
 
 				// debug
