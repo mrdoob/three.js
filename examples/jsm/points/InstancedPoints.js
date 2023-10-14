@@ -1,7 +1,7 @@
 import {
 	Mesh
 } from 'three';
-import { InstancedPointsGeometry } from '../points/InstancedPointsGeometry.js';
+import InstancedPointsGeometry from '../points/InstancedPointsGeometry.js';
 import { InstancedPointsNodeMaterial } from 'three/nodes';
 
 class InstancedPoints extends Mesh {
@@ -18,4 +18,4 @@ class InstancedPoints extends Mesh {
 
 }
 
-export { InstancedPoints };
+export default InstancedPoints;

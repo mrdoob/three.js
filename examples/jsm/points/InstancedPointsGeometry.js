@@ -171,4 +171,4 @@ class InstancedPointsGeometry extends InstancedBufferGeometry {
 
 }
 
-export { InstancedPointsGeometry };
+export default InstancedPointsGeometry;
