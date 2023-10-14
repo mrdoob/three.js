@@ -339,6 +339,7 @@
 		"webgpu_morphtargets",
 		"webgpu_occlusion",
 		"webgpu_particles",
+		"webgpu_points_fat",
 		"webgpu_rtt",
 		"webgpu_sandbox",
 		"webgpu_shadowmap",
