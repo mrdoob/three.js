@@ -12,10 +12,10 @@ class InstancedPointsMaterialNode extends MaterialNode {
 
 }
 
-InstancedPointsMaterialNode.POINTWIDTH = 'pointWidth';
+InstancedPointsMaterialNode.POINT_WIDTH = 'pointWidth';
 
 export default InstancedPointsMaterialNode;
 
-export const materialPointWidth = nodeImmutable( InstancedPointsMaterialNode, InstancedPointsMaterialNode.POINTWIDTH );
+export const materialPointWidth = nodeImmutable( InstancedPointsMaterialNode, InstancedPointsMaterialNode.POINT_WIDTH );
 
 addNodeClass( 'FatPointsMaterialNode', InstancedPointsMaterialNode );
