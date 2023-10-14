@@ -351,8 +351,17 @@ document.body.appendChild( renderer.domElement );
 			[method:undefined compile]( [param:Object3D scene], [param:Camera camera] )
 		</h3>
 		<p>
-			Compiles all materials in the scene with the camera. This is useful to
-			precompile shaders before the first rendering.
+			Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.
+		</p>
+
+		<h3>
+			[method:Promise compileAsync]( [param:Object3D scene], [param:Camera camera] )
+		</h3>
+		<p>
+			Async version of [page:WebGLRenderer.compile .compile](). The method returns a Promise that resolves when the 
+			given 3D object or scene can be rendered without unnecessary stalling due to shader compilation.<br /><br />
+			
+			This method makes use of the *KHR_parallel_shader_compile* WebGL extension.
 		</p>
 
 		<h3>

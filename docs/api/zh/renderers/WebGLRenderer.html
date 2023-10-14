@@ -271,6 +271,14 @@
 		<h3>[method:undefined compile]( [param:Object3D scene], [param:Camera camera] )</h3>
 		<p>使用相机编译场景中的所有材质。这对于在首次渲染之前预编译着色器很有用。</p>
 
+		<h3>[method:Promise compileAsync]( [param:Object3D scene], [param:Camera camera] )</h3>
+		<p>
+			Async version of [page:WebGLRenderer.compile .compile](). The method returns a Promise that resolves when the 
+			given 3D object or scene can be rendered without unnecessary stalling due to shader compilation.<br /><br />
+			
+			This method makes use of the *KHR_parallel_shader_compile* WebGL extension.
+		</p>
+
 		<h3>[method:undefined copyFramebufferToTexture]( [param:Vector2 position], [param:FramebufferTexture texture], [param:Number level] )</h3>
 		<p>将当前WebGLFramebuffer中的像素复制到2D纹理中。可访问[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexImage2D WebGLRenderingContext.copyTexImage2D].</p>
 
