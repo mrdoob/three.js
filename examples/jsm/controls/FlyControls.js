@@ -123,7 +123,7 @@ class FlyControls extends EventDispatcher {
 
 			if ( this.dragToLook ) {
 
-				this.status ++;
+				this.status = 1;
 
 			} else {
 
@@ -144,7 +144,7 @@ class FlyControls extends EventDispatcher {
 
 			if ( this.enabled === false ) return;
 
-			if ( ! this.dragToLook || this.status > 0 ) {
+			if ( ! this.dragToLook || this.status == 1 ) {
 
 				const container = this.getContainerDimensions();
 				const halfWidth = container.size[ 0 ] / 2;
@@ -165,7 +165,7 @@ class FlyControls extends EventDispatcher {
 
 			if ( this.dragToLook ) {
 
-				this.status --;
+				this.status = 0;
 
 				this.moveState.yawLeft = this.moveState.pitchDown = 0;
 
