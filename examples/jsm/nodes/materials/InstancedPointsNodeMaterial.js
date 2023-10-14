@@ -9,7 +9,7 @@ import { positionGeometry } from '../accessors/PositionNode.js';
 import { smoothstep } from '../math/MathNode.js';
 import { tslFn, vec2, vec4 } from '../shadernode/ShaderNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { materialPointWidth } from '../accessors/FatPointsMaterialNode.js'; // or should this be a property, instead?
+import { materialPointWidth } from '../accessors/InstancedPointsMaterialNode.js'; // or should this be a property, instead?
 import { viewport } from '../display/ViewportNode.js';
 import { color } from 'three/nodes';
 
@@ -17,7 +17,7 @@ import { PointsMaterial } from 'three';
 
 const defaultValues = new PointsMaterial();
 
-class FatPointsNodeMaterial extends NodeMaterial {
+class InstancedPointsNodeMaterial extends NodeMaterial {
 
 	constructor( params = {} ) {
 
@@ -159,6 +159,6 @@ class FatPointsNodeMaterial extends NodeMaterial {
 
 }
 
-export default FatPointsNodeMaterial;
+export default InstancedPointsNodeMaterial;
 
-addNodeMaterial( 'FatPointsNodeMaterial', FatPointsNodeMaterial );
+addNodeMaterial( 'InstancedPointsNodeMaterial', InstancedPointsNodeMaterial );

@@ -72,7 +72,7 @@ export { default as BufferNode, buffer } from './accessors/BufferNode.js';
 export { default as CameraNode, cameraProjectionMatrix, cameraViewMatrix, cameraNormalMatrix, cameraWorldMatrix, cameraPosition, cameraNear, cameraFar } from './accessors/CameraNode.js';
 export { default as CubeTextureNode, cubeTexture } from './accessors/CubeTextureNode.js';
 export { default as ExtendedMaterialNode, materialNormal } from './accessors/ExtendedMaterialNode.js';
-export { default as FatPointsMaterialNode, materialPointWidth } from './accessors/FatPointsMaterialNode.js';
+export { default as InstancedPointsMaterialNode, materialPointWidth } from './accessors/InstancedPointsMaterialNode.js';
 export { default as InstanceNode, instance } from './accessors/InstanceNode.js';
 export { default as LineMaterialNode, materialLineDashSize, materialLineDashOffset, materialLineGapSize, materialLineScale, materialLineWidth } from './accessors/LineMaterialNode.js';
 export { default as MaterialNode, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecularColor, materialReflectivity, materialRoughness, materialMetalness, materialRotation, materialSheen, materialSheenRoughness } from './accessors/MaterialNode.js';
