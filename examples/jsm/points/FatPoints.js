@@ -2,11 +2,11 @@ import {
 	Mesh
 } from 'three';
 import { FatPointsGeometry } from '../points/FatPointsGeometry.js';
-import { FatPointsMaterial } from '../points/FatPointsMaterial.js';
+import { FatPointsNodeMaterial } from 'three/nodes';
 
 class FatPoints extends Mesh {
 
-	constructor( geometry = new FatPointsGeometry(), material = new FatPointsMaterial( { color: Math.random() * 0xffffff } ) ) {
+	constructor( geometry = new FatPointsGeometry(), material = new FatPointsNodeMaterial() ) {
 
 		super( geometry, material );
 

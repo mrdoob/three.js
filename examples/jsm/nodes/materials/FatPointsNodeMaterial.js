@@ -11,6 +11,7 @@ import { tslFn, vec2, vec4 } from '../shadernode/ShaderNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { materialPointWidth } from '../accessors/FatPointsMaterialNode.js'; // or should this be a property, instead?
 import { viewport } from '../display/ViewportNode.js';
+import { color } from 'three/nodes';
 
 import { PointsMaterial } from 'three';
 
@@ -121,7 +122,7 @@ class FatPointsNodeMaterial extends NodeMaterial {
 
 					const instanceColor = attribute( 'instanceColor' );
 
-					pointColorNode = instanceColor; // todo: instance color should be attenuated by material color
+					pointColorNode = color( instanceColor ).mul( color( materialColor ) );
 
 				} else {
 

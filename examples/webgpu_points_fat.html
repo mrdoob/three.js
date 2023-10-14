@@ -117,16 +117,14 @@
 				geometry.setPositions( positions );
 				geometry.setColors( colors );
 
-				geometry.instanceCount = positions.length / 3; // this shoud not be necessary
-
+				geometry.instanceCount = positions.length / 3; // this should not be necessary
 
 				material = new FatPointsNodeMaterial( {
 
-					color: 0xffffff, //todo: should attenuate vertex color
-					pointWidth: 10, // in pixel units, without size attenuation
-					vertexColors: true,
+					color: 0xffffff,
+					pointWidth: 10, // in pixel units
 
-					//resolution:  // to be set by renderer, eventually
+					vertexColors: true,
 					alphaToCoverage: true,
 
 				} );
