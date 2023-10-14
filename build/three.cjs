@@ -19120,6 +19120,9 @@ function WebGLShader( gl, type, string ) {
 
 }
 
+// From https://www.khronos.org/registry/webgl/extensions/KHR_parallel_shader_compile/
+const COMPLETION_STATUS_KHR = 0x91B1;
+
 let programIdCount = 0;
 
 function handleSource( string, errorLine ) {
@@ -20007,87 +20010,94 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 	gl.linkProgram( program );
 
-	// check for link errors
-	if ( renderer.debug.checkShaderErrors ) {
+	function onFirstUse( self ) {
 
-		const programLog = gl.getProgramInfoLog( program ).trim();
-		const vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
-		const fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
+		// check for link errors
+		if ( renderer.debug.checkShaderErrors ) {
 
-		let runnable = true;
-		let haveDiagnostics = true;
+			const programLog = gl.getProgramInfoLog( program ).trim();
+			const vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
+			const fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
 
-		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
+			let runnable = true;
+			let haveDiagnostics = true;
 
-			runnable = false;
+			if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
 
-			if ( typeof renderer.debug.onShaderError === 'function' ) {
+				runnable = false;
 
-				renderer.debug.onShaderError( gl, program, glVertexShader, glFragmentShader );
+				if ( typeof renderer.debug.onShaderError === 'function' ) {
 
-			} else {
+					renderer.debug.onShaderError( gl, program, glVertexShader, glFragmentShader );
 
-				// default error reporting
+				} else {
 
-				const vertexErrors = getShaderErrors( gl, glVertexShader, 'vertex' );
-				const fragmentErrors = getShaderErrors( gl, glFragmentShader, 'fragment' );
+					// default error reporting
 
-				console.error(
-					'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
-					'VALIDATE_STATUS ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + '\n\n' +
-					'Program Info Log: ' + programLog + '\n' +
-					vertexErrors + '\n' +
-					fragmentErrors
-				);
+					const vertexErrors = getShaderErrors( gl, glVertexShader, 'vertex' );
+					const fragmentErrors = getShaderErrors( gl, glFragmentShader, 'fragment' );
 
-			}
-
-		} else if ( programLog !== '' ) {
-
-			console.warn( 'THREE.WebGLProgram: Program Info Log:', programLog );
-
-		} else if ( vertexLog === '' || fragmentLog === '' ) {
-
-			haveDiagnostics = false;
-
-		}
-
-		if ( haveDiagnostics ) {
-
-			this.diagnostics = {
-
-				runnable: runnable,
-
-				programLog: programLog,
-
-				vertexShader: {
-
-					log: vertexLog,
-					prefix: prefixVertex
-
-				},
-
-				fragmentShader: {
-
-					log: fragmentLog,
-					prefix: prefixFragment
+					console.error(
+						'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
+						'VALIDATE_STATUS ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + '\n\n' +
+						'Program Info Log: ' + programLog + '\n' +
+						vertexErrors + '\n' +
+						fragmentErrors
+					);
 
 				}
 
-			};
+			} else if ( programLog !== '' ) {
+
+				console.warn( 'THREE.WebGLProgram: Program Info Log:', programLog );
+
+			} else if ( vertexLog === '' || fragmentLog === '' ) {
+
+				haveDiagnostics = false;
+
+			}
+
+			if ( haveDiagnostics ) {
+
+				self.diagnostics = {
+
+					runnable: runnable,
+
+					programLog: programLog,
+
+					vertexShader: {
+
+						log: vertexLog,
+						prefix: prefixVertex
+
+					},
+
+					fragmentShader: {
+
+						log: fragmentLog,
+						prefix: prefixFragment
+
+					}
+
+				};
+
+			}
 
 		}
 
+		// Clean up
+
+		// Crashes in iOS9 and iOS10. #18402
+		// gl.detachShader( program, glVertexShader );
+		// gl.detachShader( program, glFragmentShader );
+
+		gl.deleteShader( glVertexShader );
+		gl.deleteShader( glFragmentShader );
+
+		cachedUniforms = new WebGLUniforms( gl, program );
+		cachedAttributes = fetchAttributeLocations( gl, program );
+
 	}
-
-	// Clean up
-
-	// Crashes in iOS9 and iOS10. #18402
-	// gl.detachShader( program, glVertexShader );
-	// gl.detachShader( program, glFragmentShader );
-
-	gl.deleteShader( glVertexShader );
-	gl.deleteShader( glFragmentShader );
 
 	// set up caching for uniform locations
 
@@ -20097,7 +20107,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 		if ( cachedUniforms === undefined ) {
 
-			cachedUniforms = new WebGLUniforms( gl, program );
+			// Populates cachedUniforms and cachedAttributes
+			onFirstUse( this );
 
 		}
 
@@ -20113,11 +20124,29 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 		if ( cachedAttributes === undefined ) {
 
-			cachedAttributes = fetchAttributeLocations( gl, program );
+			// Populates cachedAttributes and cachedUniforms
+			onFirstUse( this );
 
 		}
 
 		return cachedAttributes;
+
+	};
+
+	// indicate when the program is ready to be used. if the KHR_parallel_shader_compile extension isn't supported,
+	// flag the program as ready immediately. It may cause a stall when it's first used.
+
+	let programReady = ( parameters.rendererExtensionParallelShaderCompile === false );
+
+	this.isReady = function () {
+
+		if ( programReady === false ) {
+
+			programReady = gl.getProgramParameter( program, COMPLETION_STATUS_KHR );
+
+		}
+
+		return programReady;
 
 	};
 
@@ -20622,6 +20651,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			rendererExtensionFragDepth: IS_WEBGL2 || extensions.has( 'EXT_frag_depth' ),
 			rendererExtensionDrawBuffers: IS_WEBGL2 || extensions.has( 'WEBGL_draw_buffers' ),
 			rendererExtensionShaderTextureLod: IS_WEBGL2 || extensions.has( 'EXT_shader_texture_lod' ),
+			rendererExtensionParallelShaderCompile: extensions.has( 'KHR_parallel_shader_compile' ),
 
 			customProgramCacheKey: material.customProgramCacheKey()
 
@@ -29037,29 +29067,29 @@ class WebGLRenderer {
 
 		// Compile
 
-		this.compile = function ( scene, camera ) {
+		function prepareMaterial( material, scene, object ) {
 
-			function prepare( material, scene, object ) {
+			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
-				if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
+				material.side = BackSide;
+				material.needsUpdate = true;
+				getProgram( material, scene, object );
 
-					material.side = BackSide;
-					material.needsUpdate = true;
-					getProgram( material, scene, object );
+				material.side = FrontSide;
+				material.needsUpdate = true;
+				getProgram( material, scene, object );
 
-					material.side = FrontSide;
-					material.needsUpdate = true;
-					getProgram( material, scene, object );
+				material.side = DoubleSide;
 
-					material.side = DoubleSide;
+			} else {
 
-				} else {
-
-					getProgram( material, scene, object );
-
-				}
+				getProgram( material, scene, object );
 
 			}
+
+		}
+
+		this.compile = function ( scene, camera ) {
 
 			currentRenderState = renderStates.get( scene );
 			currentRenderState.init();
@@ -29096,13 +29126,13 @@ class WebGLRenderer {
 
 							const material2 = material[ i ];
 
-							prepare( material2, scene, object );
+							prepareMaterial( material2, scene, object );
 
 						}
 
 					} else {
 
-						prepare( material, scene, object );
+						prepareMaterial( material, scene, object );
 
 					}
 
@@ -29112,6 +29142,122 @@ class WebGLRenderer {
 
 			renderStateStack.pop();
 			currentRenderState = null;
+
+		};
+
+		// compileAsync
+
+		this.compileAsync = function ( scene, camera ) {
+
+			currentRenderState = renderStates.get( scene );
+			currentRenderState.init();
+
+			renderStateStack.push( currentRenderState );
+
+			scene.traverseVisible( function ( object ) {
+
+				if ( object.isLight && object.layers.test( camera.layers ) ) {
+
+					currentRenderState.pushLight( object );
+
+					if ( object.castShadow ) {
+
+						currentRenderState.pushShadow( object );
+
+					}
+
+				}
+
+			} );
+
+			currentRenderState.setupLights( _this._useLegacyLights );
+
+			const compiling = new Set();
+
+			scene.traverse( function ( object ) {
+
+				const material = object.material;
+
+				if ( material ) {
+
+					if ( Array.isArray( material ) ) {
+
+						for ( let i = 0; i < material.length; i ++ ) {
+
+							const material2 = material[ i ];
+
+							prepareMaterial( material2, scene, object );
+							compiling.add( material2 );
+
+						}
+
+					} else {
+
+						prepareMaterial( material, scene, object );
+						compiling.add( material );
+
+					}
+
+				}
+
+			} );
+
+			renderStateStack.pop();
+			currentRenderState = null;
+
+			// Wait for all the materials in the new object to indicate that they're
+			// ready to be used before resolving the promise.
+
+			return new Promise( ( resolve ) => {
+
+				function checkMaterialsReady() {
+
+					compiling.forEach( function ( material ) {
+
+						const materialProperties = properties.get( material );
+						const program = materialProperties.currentProgram;
+
+						if ( program.isReady() ) {
+
+							// remove any programs that report they're ready to use from the list
+							compiling.delete( material );
+
+						}
+
+					} );
+
+					// once the list of compiling materials is empty, call the callback
+
+					if ( compiling.size === 0 ) {
+
+						resolve( scene );
+						return;
+
+					}
+
+					// if some materials are still not ready, wait a bit and check again
+
+					setTimeout( checkMaterialsReady, 10 );
+
+				}
+
+				if ( extensions.get( 'KHR_parallel_shader_compile' ) !== null ) {
+
+					// If we can check the compilation status of the materials without
+					// blocking then do so right away.
+
+					checkMaterialsReady();
+
+				} else {
+
+					// Otherwise start by waiting a bit to give the materials we just
+					// initialized a chance to finish.
+
+					setTimeout( checkMaterialsReady, 10 );
+
+				}
+
+			} );
 
 		};
 
@@ -29716,13 +29862,23 @@ class WebGLRenderer {
 
 			}
 
-			const progUniforms = program.getUniforms();
-			const uniformsList = WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
-
 			materialProperties.currentProgram = program;
-			materialProperties.uniformsList = uniformsList;
+			materialProperties.uniformsList = null;
 
 			return program;
+
+		}
+
+		function getUniformList( materialProperties ) {
+
+			if ( materialProperties.uniformsList === null ) {
+
+				const progUniforms = materialProperties.currentProgram.getUniforms();
+				materialProperties.uniformsList = WebGLUniforms.seqWithValue( progUniforms.seq, materialProperties.uniforms );
+
+			}
+
+			return materialProperties.uniformsList;
 
 		}
 
@@ -30053,13 +30209,13 @@ class WebGLRenderer {
 
 				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, _transmissionRenderTarget );
 
-				WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
+				WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 
 			}
 
 			if ( material.isShaderMaterial && material.uniformsNeedUpdate === true ) {
 
-				WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
+				WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 				material.uniformsNeedUpdate = false;
 
 			}
