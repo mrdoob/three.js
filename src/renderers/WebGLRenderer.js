@@ -997,33 +997,16 @@ class WebGLRenderer {
 
 		// compileAsync
 
-		this.compileAsync = function ( scene, targetScene = null ) {
+		this.compileAsync = function ( scene, camera ) {
 
-			// If no explicit targetScene was given use the scene instead
-			if ( ! targetScene ) {
-
-				targetScene = scene;
-
-			}
-
-			currentRenderState = renderStates.get( targetScene );
+			currentRenderState = renderStates.get( scene );
 			currentRenderState.init();
 
 			renderStateStack.push( currentRenderState );
 
-			let foundScene = scene === targetScene;
+			scene.traverseVisible( function ( object ) {
 
-			// Gather lights from both the scene and the new object that will be added
-			// to the scene.
-			targetScene.traverseVisible( function ( object ) {
-
-				if ( object === scene ) {
-
-					foundScene = true;
-
-				}
-
-				if ( object.isLight ) {
+				if ( object.isLight && object.layers.test( camera.layers ) ) {
 
 					currentRenderState.pushLight( object );
 
@@ -1037,33 +1020,9 @@ class WebGLRenderer {
 
 			} );
 
-			// If the scene wasn't already part of the targetScene, add any lights it
-			// contains as well.
-			if ( ! foundScene ) {
-
-				scene.traverseVisible( function ( object ) {
-
-					if ( object.isLight ) {
-
-						currentRenderState.pushLight( object );
-
-						if ( object.castShadow ) {
-
-							currentRenderState.pushShadow( object );
-
-						}
-
-					}
-
-				} );
-
-			}
-
 			currentRenderState.setupLights( _this._useLegacyLights );
 
 			const compiling = new Set();
-
-			// Only initialize materials in the new scene, not the targetScene.
 
 			scene.traverse( function ( object ) {
 
@@ -1077,14 +1036,14 @@ class WebGLRenderer {
 
 							const material2 = material[ i ];
 
-							prepareMaterial( material2, targetScene, object );
+							prepareMaterial( material2, scene, object );
 							compiling.add( material2 );
 
 						}
 
 					} else {
 
-						prepareMaterial( material, targetScene, object );
+						prepareMaterial( material, scene, object );
 						compiling.add( material );
 
 					}
