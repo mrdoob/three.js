@@ -65,12 +65,10 @@
 						new GLTFLoader()
 							.setPath( 'models/gltf/' )
 							.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) )
-							.load( 'IridescentDishWithOlives.glb', async function ( gltf ) {
+							.load( 'IridescentDishWithOlives.glb', function ( gltf ) {
 
 								mixer = new THREE.AnimationMixer( gltf.scene );
 								mixer.clipAction( gltf.animations[ 0 ] ).play();
-
-								await renderer.compileAsync( gltf.scene, camera );
 
 								scene.add( gltf.scene );
 
