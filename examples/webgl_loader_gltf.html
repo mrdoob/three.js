@@ -67,7 +67,7 @@
 							// to scene without unnecessary stalling on shader compilation. This helps the page
 							// stay responsive during startup.
 
-							await renderer.compileAsync( gltf.scene, scene );
+							await renderer.compileAsync( gltf.scene, camera );
 
 							scene.add( gltf.scene );
 
