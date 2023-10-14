@@ -125,6 +125,10 @@ class WebGLRenderer {
 			onShaderError: null
 		};
 
+		// shader compilation
+
+		this.asyncShaderCompilation = false;
+
 		// clearing
 
 		this.autoClear = true;
@@ -784,6 +788,8 @@ class WebGLRenderer {
 			const frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
 
 			const program = setProgram( camera, scene, geometry, material, object );
+
+			if ( program === null ) return;
 
 			state.setMaterial( material, frontFaceCW );
 
@@ -1899,6 +1905,14 @@ class WebGLRenderer {
 			if ( needsProgramChange === true ) {
 
 				program = getProgram( material, scene, object );
+
+			}
+
+			if ( _this.asyncShaderCompilation === true ) {
+
+				// check if the shader program can be already used for rendering.
+
+				if ( program.isReady() === false ) return null;
 
 			}
 
