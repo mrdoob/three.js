@@ -939,14 +939,18 @@ class WebGLRenderer {
 
 		}
 
-		this.compile = function ( scene, camera ) {
+		this.compile = function ( scene, camera, targetScene = null ) {
 
-			currentRenderState = renderStates.get( scene );
+			if ( targetScene === null ) targetScene = scene;
+
+			currentRenderState = renderStates.get( targetScene );
 			currentRenderState.init();
 
 			renderStateStack.push( currentRenderState );
 
-			scene.traverseVisible( function ( object ) {
+			// gather lights from both the target scene and the new object that will be added to the scene.
+
+			targetScene.traverseVisible( function ( object ) {
 
 				if ( object.isLight && object.layers.test( camera.layers ) ) {
 
@@ -962,7 +966,31 @@ class WebGLRenderer {
 
 			} );
 
+			if ( scene !== targetScene ) {
+
+				scene.traverseVisible( function ( object ) {
+
+					if ( object.isLight && object.layers.test( camera.layers ) ) {
+
+						currentRenderState.pushLight( object );
+
+						if ( object.castShadow ) {
+
+							currentRenderState.pushShadow( object );
+
+						}
+
+					}
+
+				} );
+
+			}
+
 			currentRenderState.setupLights( _this._useLegacyLights );
+
+			// Only initialize materials in the new scene, not the targetScene.
+
+			const materials = new Set();
 
 			scene.traverse( function ( object ) {
 
@@ -976,13 +1004,15 @@ class WebGLRenderer {
 
 							const material2 = material[ i ];
 
-							prepareMaterial( material2, scene, object );
+							prepareMaterial( material2, targetScene, object );
+							materials.add( material2 );
 
 						}
 
 					} else {
 
-						prepareMaterial( material, scene, object );
+						prepareMaterial( material, targetScene, object );
+						materials.add( material );
 
 					}
 
@@ -992,68 +1022,16 @@ class WebGLRenderer {
 
 			renderStateStack.pop();
 			currentRenderState = null;
+
+			return materials;
 
 		};
 
 		// compileAsync
 
-		this.compileAsync = function ( scene, camera ) {
+		this.compileAsync = function ( scene, camera, targetScene = null ) {
 
-			currentRenderState = renderStates.get( scene );
-			currentRenderState.init();
-
-			renderStateStack.push( currentRenderState );
-
-			scene.traverseVisible( function ( object ) {
-
-				if ( object.isLight && object.layers.test( camera.layers ) ) {
-
-					currentRenderState.pushLight( object );
-
-					if ( object.castShadow ) {
-
-						currentRenderState.pushShadow( object );
-
-					}
-
-				}
-
-			} );
-
-			currentRenderState.setupLights( _this._useLegacyLights );
-
-			const compiling = new Set();
-
-			scene.traverse( function ( object ) {
-
-				const material = object.material;
-
-				if ( material ) {
-
-					if ( Array.isArray( material ) ) {
-
-						for ( let i = 0; i < material.length; i ++ ) {
-
-							const material2 = material[ i ];
-
-							prepareMaterial( material2, scene, object );
-							compiling.add( material2 );
-
-						}
-
-					} else {
-
-						prepareMaterial( material, scene, object );
-						compiling.add( material );
-
-					}
-
-				}
-
-			} );
-
-			renderStateStack.pop();
-			currentRenderState = null;
+			const materials = this.compile( scene, camera, targetScene );
 
 			// Wait for all the materials in the new object to indicate that they're
 			// ready to be used before resolving the promise.
@@ -1062,7 +1040,7 @@ class WebGLRenderer {
 
 				function checkMaterialsReady() {
 
-					compiling.forEach( function ( material ) {
+					materials.forEach( function ( material ) {
 
 						const materialProperties = properties.get( material );
 						const program = materialProperties.currentProgram;
@@ -1070,7 +1048,7 @@ class WebGLRenderer {
 						if ( program.isReady() ) {
 
 							// remove any programs that report they're ready to use from the list
-							compiling.delete( material );
+							materials.delete( material );
 
 						}
 
@@ -1078,7 +1056,7 @@ class WebGLRenderer {
 
 					// once the list of compiling materials is empty, call the callback
 
-					if ( compiling.size === 0 ) {
+					if ( materials.size === 0 ) {
 
 						resolve( scene );
 						return;
