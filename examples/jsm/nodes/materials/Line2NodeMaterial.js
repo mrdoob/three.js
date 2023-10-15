@@ -13,6 +13,7 @@ import { uv } from '../accessors/UVNode.js';
 import { materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../accessors/LineMaterialNode.js';
 import { viewport } from '../display/ViewportNode.js';
 import { dashSize, gapSize } from '../core/PropertyNode.js';
+import { color } from 'three/nodes';
 
 import { LineDashedMaterial } from 'three';
 
@@ -368,7 +369,9 @@ class Line2NodeMaterial extends NodeMaterial {
 					const instanceColorStart = attribute( 'instanceColorStart' );
 					const instanceColorEnd = attribute( 'instanceColorEnd' );
 
-					lineColorNode = varying( positionGeometry.y.lessThan( 0.5 ).cond( instanceColorStart, instanceColorEnd ) );
+					const instanceColor = positionGeometry.y.lessThan( 0.5 ).cond( instanceColorStart, instanceColorEnd );
+
+					lineColorNode = color( instanceColor ).mul( color( materialColor ) );
 
 				} else {
 
