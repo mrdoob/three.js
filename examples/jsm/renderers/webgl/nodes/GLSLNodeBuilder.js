@@ -307,6 +307,12 @@ ${ flowData.code }
 
 	}
 
+	getInstanceIndex() {
+
+		return 'gl_InstanceID';
+
+	}
+
 	getFrontFacing() {
 
 		return 'gl_FrontFacing';
