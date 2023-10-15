@@ -2,8 +2,7 @@ import { Material, ShaderMaterial, NoColorSpace, LinearSRGBColorSpace } from 'th
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor } from '../core/PropertyNode.js';
-import { materialNormal } from '../accessors/ExtendedMaterialNode.js';
-import { materialAlphaTest, materialColor, materialOpacity, materialEmissive } from '../accessors/MaterialNode.js';
+import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
@@ -13,10 +12,9 @@ import { morph } from '../accessors/MorphNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { lightsWithoutWrap } from '../lighting/LightsNode.js';
-import { mix, dFdx, dFdy } from '../math/MathNode.js';
+import { mix } from '../math/MathNode.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import AONode from '../lighting/AONode.js';
-import { lightingContext } from '../lighting/LightingContextNode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
 
 const NodeMaterials = new Map();
@@ -198,9 +196,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( this.flatShading === true ) {
 
-			const fdx = dFdx( positionView );
-			const fdy = dFdy( positionView );
-			const normalNode = fdx.cross( fdy ).normalize();
+			const normalNode = positionView.dFdx().cross( positionView.dFdy() ).normalize();
 
 			transformedNormalView.assign( normalNode );
 
@@ -289,9 +285,9 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( lightsNode && lightsNode.hasLight !== false ) {
 
-			const lightingModelNode = this.setupLightingModel( builder );
+			const lightingModel = this.setupLightingModel( builder );
 
-			outgoingLightNode = lightingContext( lightsNode, lightingModelNode, backdropNode, backdropAlphaNode );
+			outgoingLightNode = lightsNode.lightingContext( lightingModel, backdropNode, backdropAlphaNode );
 
 		} else if ( backdropNode !== null ) {
 
