@@ -309,7 +309,7 @@ ${ flowData.code }
 
 	getInstanceIndex() {
 
-		return 'gl_InstanceID';
+		return 'uint( gl_InstanceID )';
 
 	}
 
