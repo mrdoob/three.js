@@ -91,6 +91,21 @@ export class Number {
 
 }
 
+export class Conditional {
+
+	constructor( cond = null ) {
+
+		this.cond = cond;
+
+		this.body = [];
+		this.elseConditional = null;
+
+		this.isConditional = true;
+
+	}
+
+}
+
 export class FunctionCall {
 
 	constructor( name, params = [] ) {

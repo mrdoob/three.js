@@ -1,4 +1,4 @@
-import { Program, FunctionDeclaration, FunctionParameter, VariableDeclaration, Operator, Number, FunctionCall, Return, Accessor } from './AST.js';
+import { Program, FunctionDeclaration, FunctionParameter, Conditional, VariableDeclaration, Operator, Number, FunctionCall, Return, Accessor } from './AST.js';
 
 const precedenceOperators = [
 	'*', '/', '%',
@@ -199,15 +199,6 @@ class GLSLDecoder {
 
 		this.index = 0;
 		this.tokenizer = null;
-
-		this.program = null;
-		this.scopes = [];
-
-	}
-
-	get scope() {
-
-		return this.scopes[ this.scopes.length - 1 ];
 
 	}
 
@@ -413,13 +404,7 @@ class GLSLDecoder {
 
 		const func = new FunctionDeclaration( type, name, params );
 
-		this.scopes.push( func );
-
-		this.readToken(); // skip ')'
-
-		this.parseBlock();
-
-		this.scopes.pop();
+		this.parseBlock( func );
 
 		return func;
 
@@ -458,7 +443,77 @@ class GLSLDecoder {
 
 	}
 
-	parseBlock() {
+	parseIf() {
+
+		const parseIfExpression = () => {
+
+			this.readToken(); // skip 'if'
+
+			const condTokens = this.readTokensUntil( ')' );
+
+			return this.parseExpressionFromTokens( condTokens.slice( 1, condTokens.length - 1 ) );
+
+		};
+
+		const parseIfBlock = ( cond ) => {
+
+			if ( this.getToken().str === '{' ) {
+
+				this.parseBlock( cond );
+
+			} else {
+
+				cond.body.push( this.parseExpression() );
+
+			}
+
+		};
+
+		//
+
+		const conditional = new Conditional( parseIfExpression() );
+
+		parseIfBlock( conditional );
+
+		//
+
+		let current = conditional;
+
+		while ( this.getToken().str === 'else' ) {
+
+			this.readToken(); // skip 'else'
+
+			const previous = current;
+
+			if ( this.getToken().str === 'if' ) {
+
+				current = new Conditional( parseIfExpression() );
+
+			} else {
+
+				current = new Conditional();
+
+			}
+
+			previous.elseConditional = current;
+
+			parseIfBlock( current );
+
+		}
+
+		return conditional;
+
+	}
+
+	parseBlock( scope ) {
+
+		const firstToken = this.getToken();
+
+		if ( firstToken.str === '{' ) {
+
+			this.readToken(); // skip '{'
+
+		}
 
 		while ( this.index < this.tokens.length ) {
 
@@ -499,6 +554,10 @@ class GLSLDecoder {
 
 					statement = this.parseReturn();
 
+				} else if ( token.str === 'if' ) {
+
+					statement = this.parseIf();
+
 				} else {
 
 					statement = this.parseExpression();
@@ -509,7 +568,7 @@ class GLSLDecoder {
 
 			if ( statement ) {
 
-				this.scope.body.push( statement );
+				scope.body.push( statement );
 
 			} else {
 
@@ -526,12 +585,11 @@ class GLSLDecoder {
 		this.index = 0;
 		this.tokenizer = new Tokenizer( source ).tokenize();
 
-		this.program = new Program();
-		this.scopes = [ this.program ];
+		const program = new Program();
 
-		this.parseBlock();
+		this.parseBlock( program );
 
-		return this.program;
+		return program;
 
 
 	}

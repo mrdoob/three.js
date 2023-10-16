@@ -79,11 +79,17 @@ class TSLEncoder {
 
 			code = this.emitVariableDeclaration( node );
 
+		} else if ( node.isConditional ) {
+
+			code = this.emitConditional( node );
+
 		} else {
 
 			console.error( 'Unknown node type', node );
 
 		}
+
+		if ( ! code ) code = '// unknown keyword';
 
 		return code;
 
@@ -91,16 +97,62 @@ class TSLEncoder {
 
 	emitBody( body, tab = '\t' ) {
 
-		let code = '';
+		const lines = [];
 
 		for ( const statement of body ) {
 
-			code += tab + this.emitExpression( statement ) + ';\n';
+			lines.push( tab + this.emitExpression( statement ) + ';' );
 
 		}
 
-		return code;
+		return lines.join( '\n' );
 
+
+	}
+
+	emitConditional( node ) {
+
+		const condStr = this.emitExpression( node.cond );
+		const bodyStr = this.emitBody( node.body );
+
+		let ifStr = `If ( ${ condStr }, () => {
+
+	${ bodyStr } 
+
+\t} )`;
+
+		let current = node;
+
+		while ( current.elseConditional ) {
+
+			const elseBodyStr = this.emitBody( current.elseConditional.body );
+
+			if ( current.elseConditional.cond ) {
+
+				const elseCondStr = this.emitExpression( current.elseConditional.cond );
+
+				ifStr += `.elseif( ( ${ elseCondStr } ) => {
+
+	${ elseBodyStr }
+
+\t} )`;
+
+			} else {
+
+				ifStr += `.else( () => {
+
+	${ elseBodyStr }
+
+\t} )`;
+
+			}
+
+			current = current.elseConditional;
+
+
+		}
+
+		return ifStr;
 
 	}
 
