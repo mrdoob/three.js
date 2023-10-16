@@ -22,10 +22,10 @@ export * from './csm/CSMFrustum.js';
 export * from './csm/CSMHelper.js';
 export * from './csm/CSMShader.js';
 
-export * from './curves/CurveExtras.js';
+export * as Curves from './curves/CurveExtras.js';
 export * from './curves/NURBSCurve.js';
 export * from './curves/NURBSSurface.js';
-export * from './curves/NURBSUtils.js';
+export * as NURBSUtils from './curves/NURBSUtils.js';
 
 export * from './effects/AnaglyphEffect.js';
 export * from './effects/AsciiEffect.js';
@@ -69,7 +69,7 @@ export * from './interactive/InteractiveGroup.js';
 export * from './interactive/SelectionBox.js';
 export * from './interactive/SelectionHelper.js';
 
-export * from './lights/IESSpotLight.js';
+export { default as IESSpotLight } from './lights/IESSpotLight.js';
 export * from './lights/LightProbeGenerator.js';
 export * from './lights/RectAreaLightUniformsLib.js';
 
@@ -264,16 +264,16 @@ export * from './shaders/WaterRefractionShader.js';
 
 export * from './textures/FlakesTexture.js';
 
-export * from './utils/BufferGeometryUtils.js';
-export * from './utils/CameraUtils.js';
+export * as BufferGeometryUtils from './utils/BufferGeometryUtils.js';
+export * as CameraUtils from './utils/CameraUtils.js';
 export * from './utils/GPUStatsPanel.js';
-export * from './utils/GeometryCompressionUtils.js';
-export * from './utils/GeometryUtils.js';
+export * as GeometryCompressionUtils from './utils/GeometryCompressionUtils.js';
+export * as GeometryUtils from './utils/GeometryUtils.js';
 export * from './utils/LDrawUtils.js';
 export * from './utils/PackedPhongMaterial.js';
-export * from './utils/SceneUtils.js';
+export * as SceneUtils from './utils/SceneUtils.js';
 export * from './utils/ShadowMapViewer.js';
-export * from './utils/SkeletonUtils.js';
+export * as SkeletonUtils from './utils/SkeletonUtils.js';
 export * from './utils/TextureUtils.js';
 export * from './utils/UVsDebug.js';
 export * from './utils/WorkerPool.js';

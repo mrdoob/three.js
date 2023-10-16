@@ -472,19 +472,7 @@ function calcSurfacePoint( p, q, U, V, P, u, v, target ) {
 
 }
 
-const NURBSUtils = {
 
-	findSpan,
-	calcBasisFunctions,
-	calcBSplinePoint,
-	calcBasisFunctionDerivatives,
-	calcBSplineDerivatives,
-	calcKoverI,
-	calcRationalCurveDerivatives,
-	calcNURBSDerivatives,
-	calcSurfacePoint,
-
-};
 
 export {
 	findSpan,
@@ -496,5 +484,4 @@ export {
 	calcRationalCurveDerivatives,
 	calcNURBSDerivatives,
 	calcSurfacePoint,
-	NURBSUtils,
 };

@@ -630,17 +630,10 @@ function quantizedEncodeUV( array, bytes ) {
 
 }
 
-const GeometryCompressionUtils = {
 
-	compressNormals,
-	compressPositions,
-	compressUvs,
-
-};
 
 export {
 	compressNormals,
 	compressPositions,
 	compressUvs,
-	GeometryCompressionUtils,
 };

@@ -70,10 +70,4 @@ function frameCorners( camera, bottomLeftCorner, bottomRightCorner, topLeftCorne
 
 }
 
-const CameraUtils = {
-
-	frameCorners,
-
-};
-
-export { frameCorners, CameraUtils };
+export { frameCorners };

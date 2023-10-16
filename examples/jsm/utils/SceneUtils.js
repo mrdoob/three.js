@@ -245,21 +245,10 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 }
 
-const SceneUtils = {
-
-	createMeshesFromInstancedMesh,
-	createMeshesFromMultiMaterialMesh,
-	createMultiMaterialObject,
-	reduceVertices,
-	sortInstancedMesh,
-
-};
-
 export {
 	createMeshesFromInstancedMesh,
 	createMeshesFromMultiMaterialMesh,
 	createMultiMaterialObject,
 	reduceVertices,
-	sortInstancedMesh,
-	SceneUtils,
+	sortInstancedMesh
 };

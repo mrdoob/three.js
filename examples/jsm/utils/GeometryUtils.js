@@ -212,17 +212,10 @@ function gosper( size = 1 ) {
 
 }
 
-const GeometryUtils = {
 
-	hilbert2D,
-	hilbert3D,
-	gosper,
-
-};
 
 export {
 	hilbert2D,
 	hilbert3D,
 	gosper,
-	GeometryUtils,
 };
