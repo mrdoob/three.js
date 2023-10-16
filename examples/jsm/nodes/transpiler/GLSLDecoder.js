@@ -1,14 +1,18 @@
 import { Program, FunctionDeclaration, FunctionParameter, VariableDeclaration, Operator, Number, FunctionCall, Return, Accessor } from './AST.js';
 
 const precedenceOperators = [
-	',',
-	'=',
-	'&&', '^^', '||',
-	'==', '!=',
-	'<', '>', '<=', '>=',
+	'*', '/', '%',
 	'+', '-',
-	'*', '/'
-];
+	'<<', '>>',
+	'<', '>', '<=', '>=',
+	'==', '!=',
+	'&',
+	'^',
+	'|',
+	'&&',
+	'^^',
+	'||'
+].reverse();
 
 const spaceRegExp = /^((\t| )\n*)+/;
 const lineRegExp = /^\n+/;

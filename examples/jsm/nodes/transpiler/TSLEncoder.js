@@ -20,7 +20,7 @@ const opLib = {
 	'>>': 'shiftRight'
 };
 
-const isNumber = ( value ) => Number.isNaN( parseFloat( value ) ) === false;
+const isPrimitive = ( value ) => /^(true|false|-?\d+(\.\d+)?)$/.test( value );
 
 class TSLEncoder {
 
@@ -43,13 +43,13 @@ class TSLEncoder {
 			const left = this.emitExpression( node.left );
 			const right = this.emitExpression( node.right );
 
-			if ( isNumber( left ) && isNumber( right ) ) {
+			if ( isPrimitive( left ) && isPrimitive( right ) ) {
 
 				return eval( left + node.type + right );
 
 			}
 
-			if ( isNumber( left ) ) {
+			if ( isPrimitive( left ) ) {
 
 				code = opFn + '( ' + left + ', ' + right + ' )';
 
