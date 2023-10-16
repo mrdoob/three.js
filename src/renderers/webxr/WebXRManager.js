@@ -176,12 +176,12 @@ class WebXRManager extends EventDispatcher {
 
 			//
 
-			renderer.setPixelRatio( currentPixelRatio );
-			renderer.setSize( currentSize.width, currentSize.height, false );
-
 			animation.stop();
 
 			scope.isPresenting = false;
+
+			renderer.setPixelRatio( currentPixelRatio );
+			renderer.setSize( currentSize.width, currentSize.height, false );
 
 			scope.dispatchEvent( { type: 'sessionend' } );
 
