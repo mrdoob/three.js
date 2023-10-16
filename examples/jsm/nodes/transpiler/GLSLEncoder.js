@@ -183,15 +183,13 @@ const isType = ( str ) => /void|float|u?int|(u|i)?vec[234]/.test( str );
 
 class GLSLEncoder {
 
-	constructor( source ) {
-
-		this.source = source;
+	constructor() {
 
 		this.index = 0;
-		this.tokenizer = new Tokenizer( this.source ).tokenize();
-		this.program = new Program();
+		this.tokenizer = null;
 
-		this.scopes = [ this.program ];
+		this.program = null;
+		this.scopes = [];
 
 	}
 
@@ -511,11 +509,15 @@ class GLSLEncoder {
 
 	}
 
-	parse() {
+	parse( source ) {
+
+		this.index = 0;
+		this.tokenizer = new Tokenizer( source ).tokenize();
+
+		this.program = new Program();
+		this.scopes = [ this.program ];
 
 		this.parseBlock();
-
-		console.log( this.program );
 
 		return this.program;
 

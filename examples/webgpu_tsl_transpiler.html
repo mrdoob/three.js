@@ -102,10 +102,12 @@ vec3 myResult = desaturate( myColor.rgb );
 
 						try {
 
-							const transpiler = new Transpiler( new GLSLEncoder( editor.getValue() ), new TSLDecoder() );
-							const code = transpiler.transpile();
+							const glsl = editor.getValue();
 
-							showCode( code );
+							const transpiler = new Transpiler( new GLSLEncoder(), new TSLDecoder() );
+							const tsl = transpiler.parse( glsl );
+
+							showCode( tsl );
 
 						} catch ( e ) {
 

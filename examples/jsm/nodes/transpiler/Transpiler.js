@@ -7,9 +7,9 @@ class Transpiler {
 
 	}
 
-	transpile() {
+	parse( source ) {
 
-		return this.decoder.emit( this.encoder.parse() );
+		return this.decoder.emit( this.encoder.parse( source ) );
 
 	}
 
