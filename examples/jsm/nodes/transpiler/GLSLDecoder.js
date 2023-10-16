@@ -11,7 +11,9 @@ const precedenceOperators = [
 	'|',
 	'&&',
 	'^^',
-	'||'
+	'||',
+	'=',
+	','
 ].reverse();
 
 const spaceRegExp = /^((\t| )\n*)+/;
