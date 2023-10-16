@@ -20,7 +20,7 @@ const opLib = {
 	'>>': 'shiftRight'
 };
 
-const isPrimitive = ( value ) => /^(true|false|-?\d+(\.\d+)?)$/.test( value );
+const isPrimitive = ( value ) => /^(true|false|-?\d)/.test( value );
 
 class TSLEncoder {
 
