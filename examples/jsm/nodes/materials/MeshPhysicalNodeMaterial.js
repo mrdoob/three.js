@@ -1,8 +1,7 @@
 import { addNodeMaterial } from './NodeMaterial.js';
 import { transformedClearcoatNormalView } from '../accessors/NormalNode.js';
 import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness } from '../core/PropertyNode.js';
-import { materialClearcoatNormal } from '../accessors/ExtendedMaterialNode.js';
-import { materialClearcoat, materialClearcoatRoughness, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness } from '../accessors/MaterialNode.js';
+import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness } from '../accessors/MaterialNode.js';
 import { float, vec3 } from '../shadernode/ShaderNode.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
