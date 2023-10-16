@@ -9,7 +9,7 @@ const opLib = {
 
 const isNumber = ( value ) => Number.isNaN( parseFloat( value ) ) === false;
 
-class TSLDecoder {
+class TSLEncoder {
 
 	constructor() {
 
@@ -93,7 +93,7 @@ class TSLDecoder {
 
 	emitVariableDeclaration( node ) {
 
-		const { name, type, value } = node;
+		const { name, /*type,*/ value } = node;
 
 		const valueStr = value ? this.emitExpression( value ) : '';
 		//const varStr = `const ${ name } = ${ type }( ${ valueStr } )`;
@@ -158,4 +158,4 @@ ${ bodyStr }
 
 }
 
-export default TSLDecoder;
+export default TSLEncoder;

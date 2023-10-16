@@ -181,7 +181,7 @@ class Tokenizer {
 
 const isType = ( str ) => /void|float|u?int|(u|i)?vec[234]/.test( str );
 
-class GLSLEncoder {
+class GLSLDecoder {
 
 	constructor() {
 
@@ -526,4 +526,4 @@ class GLSLEncoder {
 
 }
 
-export default GLSLEncoder;
+export default GLSLDecoder;

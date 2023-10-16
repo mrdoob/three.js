@@ -41,8 +41,8 @@
 		<script type="module">
 
 			import Transpiler from './jsm/nodes/transpiler/Transpiler.js';
-			import GLSLEncoder from './jsm/nodes/transpiler/GLSLEncoder.js';
-			import TSLDecoder from './jsm/nodes/transpiler/TSLDecoder.js';
+			import GLSLDecoder from './jsm/nodes/transpiler/GLSLDecoder.js';
+			import TSLEncoder from './jsm/nodes/transpiler/TSLEncoder.js';
 
 			init();
 
@@ -104,7 +104,7 @@ vec3 myResult = desaturate( myColor.rgb );
 
 							const glsl = editor.getValue();
 
-							const transpiler = new Transpiler( new GLSLEncoder(), new TSLDecoder() );
+							const transpiler = new Transpiler( new GLSLDecoder(), new TSLEncoder() );
 							const tsl = transpiler.parse( glsl );
 
 							showCode( tsl );
