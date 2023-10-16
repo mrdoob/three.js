@@ -6,6 +6,7 @@ export * from './core/constants.js';
 
 // core
 export { default as ArrayUniformNode /* @TODO: arrayUniform */ } from './core/ArrayUniformNode.js';
+export { default as AssignNode, assign } from './core/AssignNode.js';
 export { default as AttributeNode, attribute } from './core/AttributeNode.js';
 export { default as BypassNode, bypass } from './core/BypassNode.js';
 export { default as CacheNode, cache } from './core/CacheNode.js';
@@ -37,7 +38,7 @@ export { NodeUtils };
 
 // math
 export { default as MathNode, EPSILON, INFINITY, radians, degrees, exp, exp2, log, log2, sqrt, inverseSqrt, floor, ceil, normalize, fract, sin, cos, tan, asin, acos, atan, abs, sign, length, negate, oneMinus, dFdx, dFdy, round, reciprocal, trunc, fwidth, atan2, min, max, mod, step, reflect, distance, difference, dot, cross, pow, pow2, pow3, pow4, transformDirection, mix, clamp, saturate, refract, smoothstep, faceForward } from './math/MathNode.js';
-export { default as OperatorNode, add, sub, mul, div, remainder, equal, assign, lessThan, greaterThan, lessThanEqual, greaterThanEqual, and, or, xor, bitAnd, bitOr, bitXor, shiftLeft, shiftRight } from './math/OperatorNode.js';
+export { default as OperatorNode, add, sub, mul, div, remainder, equal, lessThan, greaterThan, lessThanEqual, greaterThanEqual, and, or, xor, bitAnd, bitOr, bitXor, shiftLeft, shiftRight } from './math/OperatorNode.js';
 export { default as CondNode, cond } from './math/CondNode.js';
 export { default as HashNode, hash } from './math/HashNode.js';
 
@@ -71,6 +72,7 @@ export { default as BufferNode, buffer } from './accessors/BufferNode.js';
 export { default as CameraNode, cameraProjectionMatrix, cameraViewMatrix, cameraNormalMatrix, cameraWorldMatrix, cameraPosition, cameraNear, cameraFar } from './accessors/CameraNode.js';
 export { default as CubeTextureNode, cubeTexture } from './accessors/CubeTextureNode.js';
 export { default as ExtendedMaterialNode, materialNormal } from './accessors/ExtendedMaterialNode.js';
+export { default as FatPointsMaterialNode, materialPointWidth } from './accessors/FatPointsMaterialNode.js';
 export { default as InstanceNode, instance } from './accessors/InstanceNode.js';
 export { default as LineMaterialNode, materialLineDashSize, materialLineDashOffset, materialLineGapSize, materialLineScale, materialLineWidth } from './accessors/LineMaterialNode.js';
 export { default as MaterialNode, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecularColor, materialReflectivity, materialRoughness, materialMetalness, materialRotation, materialSheen, materialSheenRoughness } from './accessors/MaterialNode.js';

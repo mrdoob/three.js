@@ -55,5 +55,6 @@ export const shininess = nodeImmutable( PropertyNode, 'float', 'Shininess' );
 export const output = nodeImmutable( PropertyNode, 'vec4', 'Output' );
 export const dashSize = nodeImmutable( PropertyNode, 'float', 'dashSize' );
 export const gapSize = nodeImmutable( PropertyNode, 'float', 'gapSize' );
+export const pointWidth = nodeImmutable( PropertyNode, 'float', 'pointWidth' );
 
 addNodeClass( 'PropertyNode', PropertyNode );

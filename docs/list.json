@@ -344,7 +344,8 @@
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/en/geometries/DecalGeometry",
 				"ParametricGeometry": "examples/en/geometries/ParametricGeometry",
-				"TextGeometry": "examples/en/geometries/TextGeometry"
+				"TextGeometry": "examples/en/geometries/TextGeometry",
+				"SDFGeometryGenerator": "examples/en/geometries/SDFGeometryGenerator"
 			},
 
 			"Helpers": {
@@ -748,6 +749,7 @@
 				"画线": "manual/zh/introduction/Drawing-lines",
 				"创建文字": "manual/zh/introduction/Creating-text",
 				"载入3D模型": "manual/zh/introduction/Loading-3D-models",
+				"库和插件": "manual/zh/introduction/Libraries-and-Plugins",
 				"常见问题": "manual/zh/introduction/FAQ",
 				"一些有用的链接": "manual/zh/introduction/Useful-links"
 			},

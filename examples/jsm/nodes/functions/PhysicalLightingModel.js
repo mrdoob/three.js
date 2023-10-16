@@ -181,8 +181,10 @@ class PhysicalLightingModel extends LightingModel {
 		this.iridescence = iridescence;
 
 		this.clearcoatRadiance = null;
-		this.clearcoatSpecular = null;
-		this.sheenSpecular = null;
+		this.clearcoatSpecularDirect = null;
+		this.clearcoatSpecularIndirect = null;
+		this.sheenSpecularDirect = null;
+		this.sheenSpecularIndirect = null;
 		this.iridescenceFresnel = null;
 		this.iridescenceF0 = null;
 
@@ -193,13 +195,15 @@ class PhysicalLightingModel extends LightingModel {
 		if ( this.clearcoat === true ) {
 
 			this.clearcoatRadiance = vec3().temp( 'clearcoatRadiance' );
-			this.clearcoatSpecular = vec3().temp( 'clearcoatSpecular' );
+			this.clearcoatSpecularDirect = vec3().temp( 'clearcoatSpecularDirect' );
+			this.clearcoatSpecularIndirect = vec3().temp( 'clearcoatSpecularIndirect' );
 
 		}
 
 		if ( this.sheen === true ) {
 
-			this.sheenSpecular = vec3().temp( 'sheenSpecular' );
+			this.sheenSpecularDirect = vec3().temp( 'sheenSpecularDirect' );
+			this.sheenSpecularIndirect = vec3().temp( 'sheenSpecularIndirect' );
 
 		}
 
@@ -225,7 +229,7 @@ class PhysicalLightingModel extends LightingModel {
 	// Approximates multiscattering in order to preserve energy.
 	// http://www.jcgt.org/published/0008/01/03/
 
-	computeMultiscattering( stack, singleScatter, multiScatter, specularF90 = float( 1 ) ) {
+	computeMultiscattering( singleScatter, multiScatter, specularF90 = float( 1 ) ) {
 
 		const dotNV = transformedNormalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
 
@@ -241,19 +245,19 @@ class PhysicalLightingModel extends LightingModel {
 		const Favg = specularColor.add( specularColor.oneMinus().mul( 0.047619 ) ); // 1/21
 		const Fms = FssEss.mul( Favg ).div( Ems.mul( Favg ).oneMinus() );
 
-		stack.addAssign( singleScatter, FssEss );
-		stack.addAssign( multiScatter, Fms.mul( Ems ) );
+		singleScatter.addAssign( FssEss );
+		multiScatter.addAssign( Fms.mul( Ems ) );
 
 	}
 
-	direct( { lightDirection, lightColor, reflectedLight }, stack ) {
+	direct( { lightDirection, lightColor, reflectedLight } ) {
 
 		const dotNL = transformedNormalView.dot( lightDirection ).clamp();
 		const irradiance = dotNL.mul( lightColor );
 
 		if ( this.sheen === true ) {
 
-			stack.addAssign( this.sheenSpecular, irradiance.mul( BRDF_Sheen( { lightDirection } ) ) );
+			this.sheenSpecularDirect.addAssign( irradiance.mul( BRDF_Sheen( { lightDirection } ) ) );
 
 		}
 
@@ -262,27 +266,27 @@ class PhysicalLightingModel extends LightingModel {
 			const dotNLcc = transformedClearcoatNormalView.dot( lightDirection ).clamp();
 			const ccIrradiance = dotNLcc.mul( lightColor );
 
-			stack.addAssign( this.clearcoatSpecular, ccIrradiance.mul( BRDF_GGX( { lightDirection, f0: clearcoatF0, f90: clearcoatF90, roughness: clearcoatRoughness, normalView: transformedClearcoatNormalView } ) ) );
+			this.clearcoatSpecularDirect.addAssign( ccIrradiance.mul( BRDF_GGX( { lightDirection, f0: clearcoatF0, f90: clearcoatF90, roughness: clearcoatRoughness, normalView: transformedClearcoatNormalView } ) ) );
 
 		}
 
-		stack.addAssign( reflectedLight.directDiffuse, irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
+		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
 
-		stack.addAssign( reflectedLight.directSpecular, irradiance.mul( BRDF_GGX( { lightDirection, f0: specularColor, f90: 1, roughness, iridescence: this.iridescence, iridescenceFresnel: this.iridescenceFresnel } ) ) );
-
-	}
-
-	indirectDiffuse( { irradiance, reflectedLight }, stack ) {
-
-		stack.addAssign( reflectedLight.indirectDiffuse, irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
+		reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX( { lightDirection, f0: specularColor, f90: 1, roughness, iridescence: this.iridescence, iridescenceFresnel: this.iridescenceFresnel } ) ) );
 
 	}
 
-	indirectSpecular( { radiance, iblIrradiance, reflectedLight }, stack ) {
+	indirectDiffuse( { irradiance, reflectedLight } ) {
+
+		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
+
+	}
+
+	indirectSpecular( { radiance, iblIrradiance, reflectedLight } ) {
 
 		if ( this.sheen === true ) {
 
-			stack.addAssign( this.sheenSpecular, iblIrradiance.mul(
+			this.sheenSpecularIndirect.addAssign( iblIrradiance.mul(
 				sheen,
 				IBLSheenBRDF( {
 					normal: transformedNormalView,
@@ -304,7 +308,7 @@ class PhysicalLightingModel extends LightingModel {
 				roughness: clearcoatRoughness
 			} );
 
-			stack.addAssign( this.clearcoatSpecular, this.clearcoatRadiance.mul( clearcoatEnv ) );
+			this.clearcoatSpecularIndirect.addAssign( this.clearcoatRadiance.mul( clearcoatEnv ) );
 
 		}
 
@@ -314,20 +318,20 @@ class PhysicalLightingModel extends LightingModel {
 		const multiScattering = vec3().temp( 'multiScattering' );
 		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
 
-		this.computeMultiscattering( stack, singleScattering, multiScattering );
+		this.computeMultiscattering( singleScattering, multiScattering );
 
 		const totalScattering = singleScattering.add( multiScattering );
 
 		const diffuse = diffuseColor.mul( totalScattering.r.max( totalScattering.g ).max( totalScattering.b ).oneMinus() );
 
-		stack.addAssign( reflectedLight.indirectSpecular, radiance.mul( singleScattering ) );
-		stack.addAssign( reflectedLight.indirectSpecular, multiScattering.mul( cosineWeightedIrradiance ) );
+		reflectedLight.indirectSpecular.addAssign( radiance.mul( singleScattering ) );
+		reflectedLight.indirectSpecular.addAssign( multiScattering.mul( cosineWeightedIrradiance ) );
 
-		stack.addAssign( reflectedLight.indirectDiffuse, diffuse.mul( cosineWeightedIrradiance ) );
+		reflectedLight.indirectDiffuse.addAssign( diffuse.mul( cosineWeightedIrradiance ) );
 
 	}
 
-	ambientOcclusion( { ambientOcclusion, reflectedLight }, stack ) {
+	ambientOcclusion( { ambientOcclusion, reflectedLight } ) {
 
 		const dotNV = transformedNormalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
 
@@ -336,12 +340,24 @@ class PhysicalLightingModel extends LightingModel {
 
 		const aoNode = ambientOcclusion.sub( aoNV.pow( aoExp ).oneMinus() ).clamp();
 
-		stack.mulAssign( reflectedLight.indirectDiffuse, ambientOcclusion );
-		stack.mulAssign( reflectedLight.indirectSpecular, aoNode );
+		if ( this.clearcoat === true ) {
+
+			this.clearcoatSpecularIndirect.mulAssign( ambientOcclusion );
+
+		}
+
+		if ( this.sheen === true ) {
+
+			this.sheenSpecularIndirect.mulAssign( ambientOcclusion );
+
+		}
+
+		reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
+		reflectedLight.indirectSpecular.mulAssign( aoNode );
 
 	}
 
-	finish( context, stack ) {
+	finish( context ) {
 
 		const { outgoingLight } = context;
 
@@ -355,18 +371,18 @@ class PhysicalLightingModel extends LightingModel {
 				f90: clearcoatF90
 			} );
 
-			const clearcoatLight = outgoingLight.mul( clearcoat.mul( Fcc ).oneMinus() ).add( this.clearcoatSpecular.mul( clearcoat ) );
+			const clearcoatLight = outgoingLight.mul( clearcoat.mul( Fcc ).oneMinus() ).add( this.clearcoatSpecularDirect, this.clearcoatSpecularIndirect ).mul( clearcoat );
 
-			stack.assign( outgoingLight, clearcoatLight );
+			outgoingLight.assign( clearcoatLight );
 
 		}
 
 		if ( this.sheen === true ) {
 
 			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( 0.157 ).oneMinus();
-			const sheenLight = outgoingLight.mul( sheenEnergyComp ).add( this.sheenSpecular );
+			const sheenLight = outgoingLight.mul( sheenEnergyComp ).add( this.sheenSpecularDirect, this.sheenSpecularIndirect );
 
-			stack.assign( outgoingLight, sheenLight );
+			outgoingLight.assign( sheenLight );
 
 		}
 

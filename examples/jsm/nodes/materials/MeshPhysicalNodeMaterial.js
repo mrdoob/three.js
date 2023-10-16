@@ -72,8 +72,6 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		super.setupVariants( builder );
 
-		const { stack } = builder;
-
 		// CLEARCOAT
 
 		if ( this.useClearcoat ) {
@@ -81,8 +79,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 			const clearcoatNode = this.clearcoatNode ? float( this.clearcoatNode ) : materialClearcoat;
 			const clearcoatRoughnessNode = this.clearcoatRoughnessNode ? float( this.clearcoatRoughnessNode ) : materialClearcoatRoughness;
 
-			stack.assign( clearcoat, clearcoatNode );
-			stack.assign( clearcoatRoughness, clearcoatRoughnessNode );
+			clearcoat.assign( clearcoatNode );
+			clearcoatRoughness.assign( clearcoatRoughnessNode );
 
 		}
 
@@ -93,8 +91,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 			const sheenNode = this.sheenNode ? vec3( this.sheenNode ) : materialSheen;
 			const sheenRoughnessNode = this.sheenRoughnessNode ? float( this.sheenRoughnessNode ) : materialSheenRoughness;
 
-			stack.assign( sheen, sheenNode );
-			stack.assign( sheenRoughness, sheenRoughnessNode );
+			sheen.assign( sheenNode );
+			sheenRoughness.assign( sheenRoughnessNode );
 
 		}
 
@@ -106,9 +104,9 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 			const iridescenceIORNode = this.iridescenceIORNode ? float( this.iridescenceIORNode ) : materialIridescenceIOR;
 			const iridescenceThicknessNode = this.iridescenceThicknessNode ? float( this.iridescenceThicknessNode ) : materialIridescenceThickness;
 
-			stack.assign( iridescence, iridescenceNode );
-			stack.assign( iridescenceIOR, iridescenceIORNode );
-			stack.assign( iridescenceThickness, iridescenceThicknessNode );
+			iridescence.assign( iridescenceNode );
+			iridescenceIOR.assign( iridescenceIORNode );
+			iridescenceThickness.assign( iridescenceThicknessNode );
 
 		}
 
@@ -122,7 +120,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		const clearcoatNormalNode = this.clearcoatNormalNode ? vec3( this.clearcoatNormalNode ) : materialClearcoatNormal;
 
-		builder.stack.assign( transformedClearcoatNormalView, clearcoatNormalNode );
+		transformedClearcoatNormalView.assign( clearcoatNormalNode );
 
 	}
 

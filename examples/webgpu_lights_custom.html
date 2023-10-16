@@ -37,7 +37,7 @@
 
 				direct( { lightColor, reflectedLight }, stack ) {
 
-					stack.addAssign( reflectedLight.directDiffuse, lightColor );
+					reflectedLight.directDiffuse.addAssign( lightColor );
 
 				}
 

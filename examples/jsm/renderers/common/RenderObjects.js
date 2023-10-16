@@ -31,7 +31,7 @@ class RenderObjects {
 
 		} else {
 
-			if ( renderObject.version !== material.version ) {
+			if ( renderObject.version !== material.version || renderObject.needsUpdate ) {
 
 				renderObject.version = material.version;
 

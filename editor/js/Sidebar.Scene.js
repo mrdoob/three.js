@@ -484,7 +484,7 @@ function SidebarScene( editor ) {
 
 	signals.sceneGraphChanged.add( refreshUI );
 
-	signals.sceneEnvironmentChanged.add( refreshUI );
+	signals.refreshSidebarEnvironment.add( refreshUI );
 
 	/*
 	signals.objectChanged.add( function ( object ) {
