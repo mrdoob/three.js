@@ -4,7 +4,20 @@ const opLib = {
 	'-': 'sub',
 	'*': 'mul',
 	'/': 'div',
-	'%': 'mod'
+	'%': 'remainder',
+	'<': 'lessThan',
+	'>': 'greaterThan',
+	'<=': 'lessThanEqual',
+	'>=': 'greaterThanEqual',
+	'==': 'equal',
+	'&&': 'and',
+	'||': 'or',
+	'^^': 'xor',
+	'&': 'bitAnd',
+	'|': 'bitOr',
+	'^': 'bitXor',
+	'<<': 'shiftLeft',
+	'>>': 'shiftRight'
 };
 
 const isNumber = ( value ) => Number.isNaN( parseFloat( value ) ) === false;
