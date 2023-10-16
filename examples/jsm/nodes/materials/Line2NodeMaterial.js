@@ -368,7 +368,9 @@ class Line2NodeMaterial extends NodeMaterial {
 					const instanceColorStart = attribute( 'instanceColorStart' );
 					const instanceColorEnd = attribute( 'instanceColorEnd' );
 
-					lineColorNode = varying( positionGeometry.y.lessThan( 0.5 ).cond( instanceColorStart, instanceColorEnd ) );
+					const instanceColor = positionGeometry.y.lessThan( 0.5 ).cond( instanceColorStart, instanceColorEnd );
+
+					lineColorNode = instanceColor.mul( materialColor );
 
 				} else {
 
