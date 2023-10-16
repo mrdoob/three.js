@@ -3,13 +3,12 @@ import { varying } from '../core/VaryingNode.js';
 import { property } from '../core/PropertyNode.js';
 import { attribute } from '../core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
-import { materialColor } from '../accessors/MaterialNode.js';
+import { materialColor, materialPointWidth } from '../accessors/MaterialNode.js'; // or should this be a property, instead?
 import { modelViewMatrix } from '../accessors/ModelNode.js';
 import { positionGeometry } from '../accessors/PositionNode.js';
 import { smoothstep } from '../math/MathNode.js';
 import { tslFn, vec2, vec4, color } from '../shadernode/ShaderNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { materialPointWidth } from '../accessors/InstancedPointsMaterialNode.js'; // or should this be a property, instead?
 import { viewport } from '../display/ViewportNode.js';
 
 import { PointsMaterial } from 'three';

@@ -681,7 +681,15 @@ class WebGLBackend extends Backend {
 
 			}
 
-			gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, false, stride, offset );
+			if ( attributeData.isFloat ) {
+
+				gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, false, stride, offset );
+
+			} else {
+
+				gl.vertexAttribIPointer( i, attribute.itemSize, attributeData.type, stride, offset );
+
+			}
 
 			if ( attribute.isInstancedBufferAttribute && ! attribute.isInterleavedBufferAttribute ) {
 

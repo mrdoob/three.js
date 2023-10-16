@@ -36,16 +36,19 @@ class WebGLAttributeUtils {
 		//attribute.onUploadCallback();
 
 		let type;
+		let isFloat = false;
 
 		if ( array instanceof Float32Array ) {
 
 			type = gl.FLOAT;
+			isFloat = true;
 
 		} else if ( array instanceof Uint16Array ) {
 
 			if ( attribute.isFloat16BufferAttribute ) {
 
 				type = gl.HALF_FLOAT;
+				isFloat = true;
 
 			} else {
 
@@ -86,7 +89,9 @@ class WebGLAttributeUtils {
 		backend.set( attribute, {
 			bufferGPU,
 			type,
-			bytesPerElement: array.BYTES_PER_ELEMENT
+			bytesPerElement: array.BYTES_PER_ELEMENT,
+			version: attribute.version,
+			isFloat
 		} );
 
 	}
