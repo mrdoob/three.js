@@ -1,7 +1,3 @@
-import {
-	ShaderChunk
-} from 'three';
-
 const OutputShader = {
 
 	uniforms: {
