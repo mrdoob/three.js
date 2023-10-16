@@ -147,7 +147,6 @@ class TAARenderPass extends SSAARenderPass {
 
 		super.dispose();
 
-		if ( this.sampleRenderTarget ) this.sampleRenderTarget.dispose();
 		if ( this.holdRenderTarget ) this.holdRenderTarget.dispose();
 
 	}
