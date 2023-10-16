@@ -1,0 +1,134 @@
+<html lang="en">
+	<head>
+		<title>three.js - webgpu - tsl editor</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<style>
+			#source {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 50%;
+				height: 100%;
+			}
+			#result {
+				position: absolute;
+				top: 0;
+				right: 0;
+				width: 50%;
+				height: 100%;
+			}
+		</style>
+
+		<div id="source"></div>
+		<div id="result"></div>
+		<script src="https://cdn.jsdelivr.net/npm/monaco-editor@latest/min/vs/loader.min.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import Transpiler from './jsm/nodes/transpiler/Transpiler.js';
+			import GLSLEncoder from './jsm/nodes/transpiler/GLSLEncoder.js';
+			import TSLDecoder from './jsm/nodes/transpiler/TSLDecoder.js';
+
+			init();
+
+			function init() {
+
+				// editor
+
+				window.require.config( { paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@latest/min/vs' } } );
+
+				require( [ 'vs/editor/editor.main' ], () => {
+
+					let timeout = null;
+
+					const editorDOM = document.getElementById( 'source' );
+					const resultDOM = document.getElementById( 'result' );
+
+					const glslCode = `
+vec3 desaturate( vec3 color ) {
+
+	float constantTest = 0.5 + 0.5;
+	float precedenceTest = 3 + 4 * 5;
+	float precedenceTest2 = 9 * 3 + 15 / 5 - 4 + 7; // some comments
+	float precedenceTest3 = a + b * c;
+
+	return color * vec3( 0.299, 0.587, 0.114 ) * constantTest;
+
+}
+
+vec4 myColor = vec4( 0, 0, 1, 1 );
+
+vec3 myResult = desaturate( myColor.rgb );
+`;
+
+					const editor = window.monaco.editor.create( editorDOM, {
+						value: glslCode,
+						language: 'glsl',
+						theme: 'vs-dark',
+						automaticLayout: true
+					} );
+
+					const result = window.monaco.editor.create( resultDOM, {
+						value: '',
+						language: 'javascript',
+						theme: 'vs-dark',
+						automaticLayout: true,
+						readOnly: true
+					} );
+
+					const showCode = ( code ) => {
+
+						result.setValue( code );
+						result.revealLine( 1 );
+
+					};
+
+					const build = () => {
+
+						try {
+
+							const transpiler = new Transpiler( new GLSLEncoder( editor.getValue() ), new TSLDecoder() );
+							const code = transpiler.transpile();
+
+							showCode( code );
+
+						} catch ( e ) {
+
+							result.setValue( 'Error: ' + e.message );
+
+						}
+
+					};
+
+					build();
+
+					editor.getModel().onDidChangeContent( () => {
+
+						if ( timeout ) clearTimeout( timeout );
+
+						timeout = setTimeout( build, 1000 );
+
+					} );
+
+				} );
+
+			}
+
+		</script>
+	</body>
+</html>
