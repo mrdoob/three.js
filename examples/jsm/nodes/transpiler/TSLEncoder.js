@@ -101,7 +101,15 @@ class TSLEncoder {
 
 		} else if ( node.isUnary ) {
 
-			code = unaryLib[ node.type ] + '( ' + this.emitExpression( node.expression ) + ' )';
+			let type = unaryLib[ node.type ];
+
+			if ( node.after === false && ( node.type === '++' || node.type === '--' ) ) {
+
+				type += 'Before';
+
+			}
+
+			code = type + '( ' + this.emitExpression( node.expression ) + ' )';
 
 		} else {
 
