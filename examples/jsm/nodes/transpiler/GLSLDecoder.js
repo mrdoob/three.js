@@ -1,8 +1,12 @@
-import { Program, FunctionDeclaration, FunctionParameter, Conditional, VariableDeclaration, Operator, Number, FunctionCall, Return, Accessor } from './AST.js';
+import { Program, FunctionDeclaration, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, FunctionCall, Return, Accessor } from './AST.js';
+
+const unaryOperators = [
+	'+', '-', '~', '!', '++', '--'
+];
 
 const precedenceOperators = [
 	'*', '/', '%',
-	'+', '-',
+	'-', '+',
 	'<<', '>>',
 	'<', '>', '<=', '>=',
 	'==', '!=',
@@ -13,12 +17,13 @@ const precedenceOperators = [
 	'^^',
 	'||',
 	'=',
+	'+=', '-=', '*=', '/=', '%=',
 	','
 ].reverse();
 
 const spaceRegExp = /^((\t| )\n*)+/;
 const lineRegExp = /^\n+/;
-const commentRegExp = /^\/\*.*?\*\//;
+const commentRegExp = /^\/\*[\s\S]*?\*\//;
 const inlineCommentRegExp = /^\/\/.*?(\n|$)/;
 
 const numberRegExp = /^((\.\d)|\d)(\d*)(\.)?(\d*)/;
@@ -260,27 +265,46 @@ class GLSLDecoder {
 	parseExpressionFromTokens( tokens ) {
 
 		const firstToken = tokens[ 0 ];
+		const lastToken = tokens[ tokens.length - 1 ];
 
-		// groups
+		if ( firstToken.isOperator ) {
 
-		if ( firstToken.isOperator && firstToken.str === '(' ) {
+			// groups
 
-			const leftTokens = this.getTokensUntil( ')', tokens );
+			if ( firstToken.str === '(' ) {
 
-			const left = this.parseExpressionFromTokens( leftTokens.slice( 1, leftTokens.length - 1 ) );
+				const leftTokens = this.getTokensUntil( ')', tokens );
 
-			const operator = tokens[ leftTokens.length + 2 ];
+				const left = this.parseExpressionFromTokens( leftTokens.slice( 1, leftTokens.length - 1 ) );
 
-			if ( operator ) {
+				const operator = tokens[ leftTokens.length + 2 ];
 
-				const rightTokens = tokens.slice( leftTokens.length + 3, tokens.length );
-				const right = this.parseExpressionFromTokens( rightTokens );
+				if ( operator ) {
 
-				return new Operator( operator.str, left, right );
+					const rightTokens = tokens.slice( leftTokens.length + 3, tokens.length );
+					const right = this.parseExpressionFromTokens( rightTokens );
+
+					return new Operator( operator.str, left, right );
+
+				}
+
+				return left;
 
 			}
 
-			return left;
+			// unary operators (before)
+
+			for ( const operator of unaryOperators ) {
+
+				if ( firstToken.str === operator ) {
+
+					const right = this.parseExpressionFromTokens( tokens.slice( 1 ) );
+
+					return new Unary( operator, right );
+
+				}
+
+			}
 
 		}
 
@@ -317,6 +341,24 @@ class GLSLDecoder {
 
 		}
 
+		// unary operators (after)
+
+		if ( lastToken.isOperator ) {
+
+			for ( const operator of unaryOperators ) {
+
+				if ( lastToken.str === operator ) {
+
+					const left = this.parseExpressionFromTokens( tokens.slice( 0, tokens.length - 1 ) );
+
+					return new Unary( operator, left, true );
+
+				}
+
+			}
+
+		}
+
 		// primitives and accessors
 
 		if ( firstToken.isNumber ) {
@@ -324,6 +366,12 @@ class GLSLDecoder {
 			return new Number( firstToken.str );
 
 		} else if ( firstToken.isLiteral ) {
+
+			if ( firstToken.str === 'return' ) {
+
+				return new Return( this.parseExpressionFromTokens( tokens.slice( 1 ) ) );
+
+			}
 
 			const secondToken = tokens[ 1 ];
 
@@ -380,10 +428,22 @@ class GLSLDecoder {
 
 		for ( let i = 0; i < tokens.length; i ++ ) {
 
-			const type = tokens[ i ++ ];
-			const name = tokens[ i ++ ];
+			let qualifier = tokens[ i ].str;
 
-			params.push( new FunctionParameter( type.str, name.str ) );
+			if ( /^(in|out|inout)$/.test( qualifier ) ) {
+
+				i ++;
+
+			} else {
+
+				qualifier = null;
+
+			}
+
+			const type = tokens[ i ++ ].str;
+			const name = tokens[ i ++ ].str;
+
+			params.push( new FunctionParameter( type, name, qualifier ) );
 
 			if ( tokens[ i ] && tokens[ i ].str !== ',' ) throw new Error( 'Expected ","' );
 

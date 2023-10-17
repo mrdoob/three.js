@@ -17,7 +17,21 @@ const opLib = {
 	'|': 'bitOr',
 	'^': 'bitXor',
 	'<<': 'shiftLeft',
-	'>>': 'shiftRight'
+	'>>': 'shiftRight',
+	'+=': 'addAssign',
+	'-=': 'subAssign',
+	'*=': 'mulAssign',
+	'/=': 'divAssign',
+	'%=': 'remainderAssign'
+};
+
+const unaryLib = {
+	'+': '', // positive
+	'-': 'negate',
+	'~': 'bitNot',
+	'!': 'not',
+	'++': 'increment', // incrementBefore
+	'--': 'decrement' // decrementBefore
 };
 
 const isPrimitive = ( value ) => /^(true|false|-?\d)/.test( value );
@@ -25,6 +39,8 @@ const isPrimitive = ( value ) => /^(true|false|-?\d)/.test( value );
 class TSLEncoder {
 
 	constructor() {
+
+		this.tab = '';
 
 	}
 
@@ -83,6 +99,10 @@ class TSLEncoder {
 
 			code = this.emitConditional( node );
 
+		} else if ( node.isUnary ) {
+
+			code = unaryLib[ node.type ] + '( ' + this.emitExpression( node.expression ) + ' )';
+
 		} else {
 
 			console.error( 'Unknown node type', node );
@@ -95,15 +115,37 @@ class TSLEncoder {
 
 	}
 
-	emitBody( body, tab = '\t' ) {
+	emitBody( body ) {
 
 		const lines = [];
 
+		this.tab += '\t';
+
 		for ( const statement of body ) {
 
-			lines.push( tab + this.emitExpression( statement ) + ';' );
+			let code = this.emitExpression( statement );
+
+			if ( statement.isConditional ) {
+
+				code = '\n' + this.tab + code + ';';
+
+				if ( statement !== body[ body.length - 1 ] ) {
+
+					code += '\n';
+
+				}
+
+			} else {
+
+				code = this.tab + code + ';';
+
+			}
+
+			lines.push( code );
 
 		}
+
+		this.tab = this.tab.slice( 0, - 1 );
 
 		return lines.join( '\n' );
 
@@ -117,9 +159,9 @@ class TSLEncoder {
 
 		let ifStr = `If ( ${ condStr }, () => {
 
-	${ bodyStr } 
+${ bodyStr } 
 
-\t} )`;
+${ this.tab }} )`;
 
 		let current = node;
 
@@ -133,17 +175,17 @@ class TSLEncoder {
 
 				ifStr += `.elseif( ( ${ elseCondStr } ) => {
 
-	${ elseBodyStr }
+${ elseBodyStr }
 
-\t} )`;
+${ this.tab }} )`;
 
 			} else {
 
 				ifStr += `.else( () => {
 
-	${ elseBodyStr }
+${ elseBodyStr }
 
-\t} )`;
+${ this.tab }} )`;
 
 			}
 
@@ -177,8 +219,16 @@ class TSLEncoder {
 
 		for ( const param of node.params ) {
 
+			let str = `{ name: '${ param.name }', type: '${ param.type }'`;
+
+			if ( param.qualifier ) {
+
+				str += ', qualifier: \'' + param.qualifier + '\'';
+
+			}
+
+			inputs.push( str + ' }' );
 			params.push( param.name );
-			inputs.push( `{ name: '${ param.name }', type: '${ param.type }' }` );
 
 		}
 
@@ -188,7 +238,7 @@ class TSLEncoder {
 		const funcStr = `const ${ name } = tslFn( ( ${ paramsStr } ) => {
 
 ${ bodyStr }
-			
+
 } ).setLayout( {
 	name: '${ name }',
 	type: '${ type }',

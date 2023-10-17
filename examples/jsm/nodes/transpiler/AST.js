@@ -26,10 +26,11 @@ export class VariableDeclaration {
 
 export class FunctionParameter {
 
-	constructor( type, name ) {
+	constructor( type, name, qualifier = null ) {
 
 		this.type = type;
 		this.name = name;
+		this.qualifier = qualifier;
 
 		this.isFunctionParameter = true;
 
@@ -73,6 +74,20 @@ export class Operator {
 		this.right = right;
 
 		this.isOperator = true;
+
+	}
+
+}
+
+export class Unary {
+
+	constructor( type, expression, after = false ) {
+
+		this.type = type;
+		this.expression = expression;
+		this.after = after;
+
+		this.isUnary = true;
 
 	}
 
