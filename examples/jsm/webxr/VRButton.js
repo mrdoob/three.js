@@ -176,7 +176,7 @@ class VRButton {
 
 	static registerSessionGrantedListener() {
 
-		if ( 'xr' in navigator ) {
+		if ( typeof navigator !== 'undefined' && 'xr' in navigator ) {
 
 			// WebXRViewer (based on Firefox) has a bug where addEventListener
 			// throws a silent exception and aborts execution entirely.

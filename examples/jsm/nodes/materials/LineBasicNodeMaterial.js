@@ -25,4 +25,4 @@ class LineBasicNodeMaterial extends NodeMaterial {
 
 export default LineBasicNodeMaterial;
 
-addNodeMaterial( LineBasicNodeMaterial );
+addNodeMaterial( 'LineBasicNodeMaterial', LineBasicNodeMaterial );

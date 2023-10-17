@@ -13,6 +13,7 @@ import {
 	SRGBColorSpace,
 	TextureLoader,
 	Object3D,
+	Vector2
 } from 'three';
 
 import * as fflate from '../libs/fflate.module.js';
@@ -368,7 +369,7 @@ class USDZLoader extends Loader {
 			if ( 'int[] faceVertexIndices' in data ) {
 
 				const indices = JSON.parse( data[ 'int[] faceVertexIndices' ] );
-				geometry.setIndex( new BufferAttribute( new Uint16Array( indices ), 1 ) );
+				geometry.setIndex( indices );
 
 			}
 
@@ -489,6 +490,30 @@ class USDZLoader extends Loader {
 
 		}
 
+		function setTextureParams( map, data_value ) {
+
+			// rotation, scale and translation
+
+			if ( data_value[ 'float inputs:rotation' ] ) {
+
+				map.rotation = parseFloat( data_value[ 'float inputs:rotation' ] );
+
+			}
+
+			if ( data_value[ 'float2 inputs:scale' ] ) {
+
+				map.repeat = new Vector2().fromArray( JSON.parse( '[' + data_value[ 'float2 inputs:scale' ].replace( /[()]*/g, '' ) + ']' ) );
+
+			}
+
+			if ( data_value[ 'float2 inputs:translation' ] ) {
+
+				map.offset = new Vector2().fromArray( JSON.parse( '[' + data_value[ 'float2 inputs:translation' ].replace( /[()]*/g, '' ) + ']' ) );
+
+			}
+
+		}
+
 		function buildMaterial( data ) {
 
 			const material = new MeshPhysicalMaterial();
@@ -507,6 +532,12 @@ class USDZLoader extends Loader {
 						material.map = buildTexture( sampler );
 						material.map.colorSpace = SRGBColorSpace;
 
+						if ( 'def Shader "Transform2d_diffuse"' in data ) {
+
+							setTextureParams( material.map, data[ 'def Shader "Transform2d_diffuse"' ] );
+
+						}
+
 					} else if ( 'color3f inputs:diffuseColor' in surface ) {
 
 						const color = surface[ 'color3f inputs:diffuseColor' ].replace( /[()]*/g, '' );
@@ -523,6 +554,12 @@ class USDZLoader extends Loader {
 						material.emissiveMap.colorSpace = SRGBColorSpace;
 						material.emissive.set( 0xffffff );
 
+						if ( 'def Shader "Transform2d_emissive"' in data ) {
+
+							setTextureParams( material.emissiveMap, data[ 'def Shader "Transform2d_emissive"' ] );
+
+						}
+
 					} else if ( 'color3f inputs:emissiveColor' in surface ) {
 
 						const color = surface[ 'color3f inputs:emissiveColor' ].replace( /[()]*/g, '' );
@@ -538,6 +575,12 @@ class USDZLoader extends Loader {
 						material.normalMap = buildTexture( sampler );
 						material.normalMap.colorSpace = NoColorSpace;
 
+						if ( 'def Shader "Transform2d_normal"' in data ) {
+
+							setTextureParams( material.normalMap, data[ 'def Shader "Transform2d_normal"' ] );
+
+						}
+
 					}
 
 					if ( 'float inputs:roughness.connect' in surface ) {
@@ -548,6 +591,12 @@ class USDZLoader extends Loader {
 						material.roughness = 1.0;
 						material.roughnessMap = buildTexture( sampler );
 						material.roughnessMap.colorSpace = NoColorSpace;
+
+						if ( 'def Shader "Transform2d_roughness"' in data ) {
+
+							setTextureParams( material.roughnessMap, data[ 'def Shader "Transform2d_roughness"' ] );
+
+						}
 
 					} else if ( 'float inputs:roughness' in surface ) {
 
@@ -564,6 +613,12 @@ class USDZLoader extends Loader {
 						material.metalnessMap = buildTexture( sampler );
 						material.metalnessMap.colorSpace = NoColorSpace;
 
+						if ( 'def Shader "Transform2d_metallic"' in data ) {
+
+							setTextureParams( material.metalnessMap, data[ 'def Shader "Transform2d_metallic"' ] );
+
+						}
+
 					} else if ( 'float inputs:metallic' in surface ) {
 
 						material.metalness = parseFloat( surface[ 'float inputs:metallic' ] );
@@ -579,6 +634,12 @@ class USDZLoader extends Loader {
 						material.clearcoatMap = buildTexture( sampler );
 						material.clearcoatMap.colorSpace = NoColorSpace;
 
+						if ( 'def Shader "Transform2d_clearcoat"' in data ) {
+
+							setTextureParams( material.clearcoatMap, data[ 'def Shader "Transform2d_clearcoat"' ] );
+
+						}
+
 					} else  if ( 'float inputs:clearcoat' in surface ) {
 
 						material.clearcoat = parseFloat( surface[ 'float inputs:clearcoat' ] );
@@ -593,6 +654,12 @@ class USDZLoader extends Loader {
 						material.clearcoatRoughness = 1.0;
 						material.clearcoatRoughnessMap = buildTexture( sampler );
 						material.clearcoatRoughnessMap.colorSpace = NoColorSpace;
+
+						if ( 'def Shader "Transform2d_clearcoatRoughness"' in data ) {
+
+							setTextureParams( material.clearcoatRoughnessMap, data[ 'def Shader "Transform2d_clearcoatRoughness"' ] );
+
+						}
 
 					} else if ( 'float inputs:clearcoatRoughness' in surface ) {
 
@@ -613,6 +680,12 @@ class USDZLoader extends Loader {
 
 						material.aoMap = buildTexture( sampler );
 						material.aoMap.colorSpace = NoColorSpace;
+
+						if ( 'def Shader "Transform2d_occlusion"' in data ) {
+
+							setTextureParams( material.aoMap, data[ 'def Shader "Transform2d_occlusion"' ] );
+
+						}
 
 					}
 

@@ -1,16 +1,10 @@
-import { transformedNormalView } from '../../accessors/NormalNode.js';
-import { positionViewDirection } from '../../accessors/PositionNode.js';
 import { tslFn, vec2, vec4 } from '../../shadernode/ShaderNode.js';
 
 // Analytical approximation of the DFG LUT, one half of the
 // split-sum approximation used in indirect specular lighting.
 // via 'environmentBRDF' from "Physically Based Shading on Mobile"
 // https://www.unrealengine.com/blog/physically-based-shading-on-mobile
-const DFGApprox = tslFn( ( inputs ) => {
-
-	const { roughness } = inputs;
-
-	const dotNV = inputs.dotNV || transformedNormalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
+const DFGApprox = tslFn( ( { roughness, dotNV } ) => {
 
 	const c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );
 
@@ -24,6 +18,13 @@ const DFGApprox = tslFn( ( inputs ) => {
 
 	return fab;
 
+} ).setLayout( {
+	name: 'DFGApprox',
+	type: 'vec2',
+	inputs: [
+		{ name: 'roughness', type: 'float' },
+		{ name: 'dotNV', type: 'vec3' }
+	]
 } );
 
 export default DFGApprox;

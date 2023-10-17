@@ -54,7 +54,6 @@ class CubeTextureNode extends TextureNode {
 
 		} else {
 
-			const nodeType = this.getNodeType( builder );
 			const nodeData = builder.getDataFromNode( this );
 
 			let propertyName = nodeData.propertyName;
@@ -64,7 +63,7 @@ class CubeTextureNode extends TextureNode {
 				const cubeUV = vec3( uvNode.x.negate(), uvNode.yz );
 				const uvSnippet = cubeUV.build( builder, 'vec3' );
 
-				const nodeVar = builder.getVarFromNode( this, 'vec4' );
+				const nodeVar = builder.getVarFromNode( this );
 
 				propertyName = builder.getPropertyName( nodeVar );
 
@@ -94,14 +93,15 @@ class CubeTextureNode extends TextureNode {
 			}
 
 			let snippet = propertyName;
+			const nodeType = this.getNodeType( builder );
 
 			if ( builder.needsColorSpaceToLinear( this.value ) ) {
 
-				snippet = colorSpaceToLinear( expression( snippet, nodeType ), this.value.colorSpace ).construct( builder ).build( builder, nodeType );
+				snippet = colorSpaceToLinear( expression( snippet, nodeType ), this.value.colorSpace ).setup( builder ).build( builder, nodeType );
 
 			}
 
-			return builder.format( snippet, 'vec4', output );
+			return builder.format( snippet, nodeType, output );
 
 		}
 
@@ -115,4 +115,4 @@ export const cubeTexture = nodeProxy( CubeTextureNode );
 
 addNodeElement( 'cubeTexture', cubeTexture );
 
-addNodeClass( CubeTextureNode );
+addNodeClass( 'CubeTextureNode', CubeTextureNode );

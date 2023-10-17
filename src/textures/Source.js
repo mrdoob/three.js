@@ -1,7 +1,7 @@
 import { ImageUtils } from '../extras/ImageUtils.js';
 import * as MathUtils from '../math/MathUtils.js';
 
-let sourceId = 0;
+let _sourceId = 0;
 
 class Source {
 
@@ -9,7 +9,7 @@ class Source {
 
 		this.isSource = true;
 
-		Object.defineProperty( this, 'id', { value: sourceId ++ } );
+		Object.defineProperty( this, 'id', { value: _sourceId ++ } );
 
 		this.uuid = MathUtils.generateUUID();
 

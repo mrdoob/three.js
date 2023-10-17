@@ -36,7 +36,7 @@ class RangeNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const object = builder.object;
 
@@ -101,4 +101,4 @@ export default RangeNode;
 
 export const range = nodeProxy( RangeNode );
 
-addNodeClass( RangeNode );
+addNodeClass( 'RangeNode', RangeNode );

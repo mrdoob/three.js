@@ -49,6 +49,20 @@
 			`true`). Default is `false`.
 		</p>
 
+		<h3>[property:Float blendAlpha]</h3>
+		<p>
+			Represents the alpha value of the constant blend color. Default is `0`.
+
+			This property has only an effect when using custom blending with [page:CustomBlendingEquation ConstantAlpha] or [page:CustomBlendingEquation OneMinusConstantAlpha].
+		</p>
+
+		<h3>[property:Color blendColor]</h3>
+		<p>
+			Represent the RGB values of the constant blend color. Default is `0x000000`.<br />
+
+			This property has only an effect when using custom blending with [page:CustomBlendingEquation ConstantColor] or [page:CustomBlendingEquation OneMinusConstantColor].
+		</p>
+
 		<h3>[property:Integer blendDst]</h3>
 		<p>
 			Blending destination. Default is [page:CustomBlendingEquation OneMinusSrcAlphaFactor]. 
@@ -369,6 +383,7 @@
 		<p>
 			An object that can be used to store custom data about the Material. It
 			should not hold references to functions as these will not be cloned.
+			Default is an empty object `{}`.
 		</p>
 
 		<h2>Methods</h2>

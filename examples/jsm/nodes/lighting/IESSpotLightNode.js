@@ -34,6 +34,6 @@ class IESSpotLightNode extends SpotLightNode {
 
 export default IESSpotLightNode;
 
-addLightNode( IESSpotLight, IESSpotLightNode );
+addNodeClass( 'IESSpotLightNode', IESSpotLightNode );
 
-addNodeClass( IESSpotLightNode );
+addLightNode( IESSpotLight, IESSpotLightNode );

@@ -111,9 +111,9 @@ class TessellateModifier {
 				const c2 = cs[ b ];
 				const c3 = cs[ c ];
 
-				colors2.push( c1.x, c1.y, c1.z );
-				colors2.push( c2.x, c2.y, c2.z );
-				colors2.push( c3.x, c3.y, c3.z );
+				colors2.push( c1.r, c1.g, c1.b );
+				colors2.push( c2.r, c2.g, c2.b );
+				colors2.push( c3.r, c3.g, c3.b );
 
 			}
 

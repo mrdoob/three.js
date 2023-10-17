@@ -1,7 +1,9 @@
 import {
 	BufferGeometry,
 	Float32BufferAttribute,
-	Vector3
+	Vector2,
+	Vector3,
+	Vector4
 } from 'three';
 import * as BufferGeometryUtils from '../utils/BufferGeometryUtils.js';
 
@@ -20,13 +22,17 @@ class SimplifyModifier {
 	modify( geometry, count ) {
 
 		geometry = geometry.clone();
+
+		// currently morphAttributes are not supported
+		delete geometry.morphAttributes.position;
+		delete geometry.morphAttributes.normal;
 		const attributes = geometry.attributes;
 
-		// this modifier can only process indexed and non-indexed geomtries with a position attribute
+		// this modifier can only process indexed and non-indexed geomtries with at least a position attribute
 
 		for ( const name in attributes ) {
 
-			if ( name !== 'position' ) geometry.deleteAttribute( name );
+			if ( name !== 'position' && name !== 'uv' && name !== 'normal' && name !== 'tangent' && name !== 'color' ) geometry.deleteAttribute( name );
 
 		}
 
@@ -42,12 +48,44 @@ class SimplifyModifier {
 		// add vertices
 
 		const positionAttribute = geometry.getAttribute( 'position' );
+		const uvAttribute = geometry.getAttribute( 'uv' );
+		const normalAttribute = geometry.getAttribute( 'normal' );
+		const tangentAttribute = geometry.getAttribute( 'tangent' );
+		const colorAttribute = geometry.getAttribute( 'color' );
+
+		let t = null;
+		let v2 = null;
+		let nor = null;
+		let col = null;
 
 		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
 			const v = new Vector3().fromBufferAttribute( positionAttribute, i );
+			if ( uvAttribute ) {
 
-			const vertex = new Vertex( v );
+				v2 = new Vector2().fromBufferAttribute( uvAttribute, i );
+
+			}
+
+			if ( normalAttribute ) {
+
+				nor = new Vector3().fromBufferAttribute( normalAttribute, i );
+
+			}
+
+			if ( tangentAttribute ) {
+
+				t = new Vector4().fromBufferAttribute( tangentAttribute, i );
+
+			}
+
+			if ( colorAttribute ) {
+
+				col = new THREE.Color().fromBufferAttribute( colorAttribute, i );
+
+			}
+
+			const vertex = new Vertex( v, v2, nor, t, col );
 			vertices.push( vertex );
 
 		}
@@ -115,6 +153,10 @@ class SimplifyModifier {
 
 		const simplifiedGeometry = new BufferGeometry();
 		const position = [];
+		const uv = [];
+		const normal = [];
+		const tangent = [];
+		const color = [];
 
 		index = [];
 
@@ -122,10 +164,35 @@ class SimplifyModifier {
 
 		for ( let i = 0; i < vertices.length; i ++ ) {
 
-			const vertex = vertices[ i ].position;
-			position.push( vertex.x, vertex.y, vertex.z );
+			const vertex = vertices[ i ];
+			position.push( vertex.position.x, vertex.position.y, vertex.position.z );
+			if ( vertex.uv ) {
+
+				uv.push( vertex.uv.x, vertex.uv.y );
+
+			}
+
+			if ( vertex.normal ) {
+
+				normal.push( vertex.normal.x, vertex.normal.y, vertex.normal.z );
+
+			}
+
+			if ( vertex.tangent ) {
+
+				tangent.push( vertex.tangent.x, vertex.tangent.y, vertex.tangent.z, vertex.tangent.w );
+
+			}
+
+			if ( vertex.color ) {
+
+				color.push( vertex.color.r, vertex.color.g, vertex.color.b );
+
+			}
+
+
 			// cache final index to GREATLY speed up faces reconstruction
-			vertices[ i ].id = i;
+			vertex.id = i;
 
 		}
 
@@ -138,9 +205,12 @@ class SimplifyModifier {
 
 		}
 
-		//
-
 		simplifiedGeometry.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
+		if ( uv.length > 0 ) simplifiedGeometry.setAttribute( 'uv', new Float32BufferAttribute( uv, 2 ) );
+		if ( normal.length > 0 ) simplifiedGeometry.setAttribute( 'normal', new Float32BufferAttribute( normal, 3 ) );
+		if ( tangent.length > 0 ) simplifiedGeometry.setAttribute( 'tangent', new Float32BufferAttribute( tangent, 4 ) );
+		if ( color.length > 0 ) simplifiedGeometry.setAttribute( 'color', new Float32BufferAttribute( color, 3 ) );
+
 		simplifiedGeometry.setIndex( index );
 
 		return simplifiedGeometry;
@@ -318,7 +388,7 @@ function removeFace( f, faces ) {
 
 }
 
-function collapse( vertices, faces, u, v ) { // u and v are pointers to vertices of an edge
+function collapse( vertices, faces, u, v ) {
 
 	// Collapse the edge uv by moving vertex u onto v
 
@@ -327,6 +397,24 @@ function collapse( vertices, faces, u, v ) { // u and v are pointers to vertices
 		// u is a vertex all by itself so just delete it..
 		removeVertex( u, vertices );
 		return;
+
+	}
+
+	if ( v.uv ) {
+
+		u.uv.copy( v.uv );
+
+	}
+
+	if ( v.normal ) {
+
+		v.normal.add( u.normal ).normalize();
+
+	}
+
+	if ( v.tangent ) {
+
+		v.tangent.add( u.tangent ).normalize();
 
 	}
 
@@ -480,9 +568,13 @@ class Triangle {
 
 class Vertex {
 
-	constructor( v ) {
+	constructor( v, uv, normal, tangent, color ) {
 
 		this.position = v;
+		this.uv = uv;
+		this.normal = normal;
+		this.tangent = tangent;
+		this.color = color;
 
 		this.id = - 1; // external use position in vertices list (for e.g. face generation)
 

@@ -5,9 +5,7 @@ import { Mesh } from '../../../../src/objects/Mesh.js';
 import { SkinnedMesh } from '../../../../src/objects/SkinnedMesh.js';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
-import { BoneIndexWeightsTextureAllow } from '../../../../src/constants.js';
-import { BoneIndexWeightsTextureAlways } from '../../../../src/constants.js';
-import { BoneIndexWeightsTextureNever } from '../../../../src/constants.js';
+import { AttachedBindMode, BoneIndexWeightsTextureAllow, BoneIndexWeightsTextureAlways, BoneIndexWeightsTextureNever } from '../../../../src/constants.js';
 
 QUnit.assert.arrayApproxEqual = function ( actual, expected, epsilon = 1e-14, message = '' ) {
 
@@ -357,8 +355,8 @@ export default QUnit.module( 'Objects', () => {
 
 			const object = new SkinnedMesh();
 			assert.ok(
-				object.bindMode === 'attached',
-				'SkinnedMesh.bindMode should be attached'
+				object.bindMode === AttachedBindMode,
+				'SkinnedMesh.bindMode should be AttachedBindMode'
 			);
 
 		} );

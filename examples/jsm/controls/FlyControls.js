@@ -186,6 +186,29 @@ class FlyControls extends EventDispatcher {
 
 		};
 
+		this.pointercancel = function () {
+
+			if ( this.enabled === false ) return;
+
+			if ( this.dragToLook ) {
+
+				this.status = 0;
+
+				this.moveState.yawLeft = this.moveState.pitchDown = 0;
+
+			} else {
+
+				this.moveState.forward = 0;
+				this.moveState.back = 0;
+
+				this.updateMovementVector();
+
+			}
+
+			this.updateRotationVector();
+
+		};
+
 		this.contextMenu = function ( event ) {
 
 			if ( this.enabled === false ) return;
@@ -269,6 +292,7 @@ class FlyControls extends EventDispatcher {
 			this.domElement.removeEventListener( 'pointerdown', _pointerdown );
 			this.domElement.removeEventListener( 'pointermove', _pointermove );
 			this.domElement.removeEventListener( 'pointerup', _pointerup );
+			this.domElement.removeEventListener( 'pointercancel', _pointercancel );
 
 			window.removeEventListener( 'keydown', _keydown );
 			window.removeEventListener( 'keyup', _keyup );
@@ -279,6 +303,7 @@ class FlyControls extends EventDispatcher {
 		const _pointermove = this.pointermove.bind( this );
 		const _pointerdown = this.pointerdown.bind( this );
 		const _pointerup = this.pointerup.bind( this );
+		const _pointercancel = this.pointercancel.bind( this );
 		const _keydown = this.keydown.bind( this );
 		const _keyup = this.keyup.bind( this );
 
@@ -286,6 +311,7 @@ class FlyControls extends EventDispatcher {
 		this.domElement.addEventListener( 'pointerdown', _pointerdown );
 		this.domElement.addEventListener( 'pointermove', _pointermove );
 		this.domElement.addEventListener( 'pointerup', _pointerup );
+		this.domElement.addEventListener( 'pointercancel', _pointercancel );
 
 		window.addEventListener( 'keydown', _keydown );
 		window.addEventListener( 'keyup', _keyup );

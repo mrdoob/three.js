@@ -20,10 +20,6 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -58,7 +54,7 @@ function main() {
   uniform vec3 iResolution;
   uniform float iTime;
 
-  // By iq: https://www.shadertoy.com/user/iq  
+  // By iq: https://www.shadertoy.com/user/iq
   // license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
   void mainImage( out vec4 fragColor, in vec2 fragCoord )
   {
@@ -125,4 +121,3 @@ function main() {
 main();
 </script>
 </html>
-

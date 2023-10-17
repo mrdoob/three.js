@@ -86,11 +86,11 @@ NormalNode.WORLD = 'world';
 export default NormalNode;
 
 export const normalGeometry = nodeImmutable( NormalNode, NormalNode.GEOMETRY );
-export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL );
+export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL ).temp( 'Normal' );
 export const normalView = nodeImmutable( NormalNode, NormalNode.VIEW );
 export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );
 export const transformedNormalView = property( 'vec3', 'TransformedNormalView' );
 export const transformedNormalWorld = transformedNormalView.transformDirection( cameraViewMatrix ).normalize();
 export const transformedClearcoatNormalView = property( 'vec3', 'TransformedClearcoatNormalView' );
 
-addNodeClass( NormalNode );
+addNodeClass( 'NormalNode', NormalNode );

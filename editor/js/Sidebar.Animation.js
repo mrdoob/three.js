@@ -82,7 +82,7 @@ function SidebarAnimation( editor ) {
 	container.add( animationsList );
 
 	const mixerTimeScaleRow = new UIRow();
-	const mixerTimeScaleNumber = new UINumber( 0.5 ).setWidth( '60px' ).setRange( - 10, 10 );
+	const mixerTimeScaleNumber = new UINumber( 1 ).setWidth( '60px' ).setRange( - 10, 10 );
 	mixerTimeScaleNumber.onChange( function () {
 
 		mixer.timeScale = mixerTimeScaleNumber.getValue();

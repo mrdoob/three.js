@@ -39,6 +39,8 @@ class UniformNode extends InputNode {
 		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, builder.context.label );
 		const propertyName = builder.getPropertyName( nodeUniform );
 
+		if ( builder.context.label !== undefined ) delete builder.context.label;
+
 		return builder.format( propertyName, type, output );
 
 	}
@@ -58,4 +60,4 @@ export const uniform = ( arg1, arg2 ) => {
 
 };
 
-addNodeClass( UniformNode );
+addNodeClass( 'UniformNode', UniformNode );

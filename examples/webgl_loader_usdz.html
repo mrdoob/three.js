@@ -20,10 +20,6 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - USDZLoader
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -38,6 +34,7 @@
 			import * as THREE from 'three';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 			import { USDZLoader } from 'three/addons/loaders/USDZLoader.js';
 
 			let camera, scene, renderer;
@@ -45,39 +42,50 @@
 			init();
 			animate();
 
-			function init() {
+			async function init() {
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( 0, 0.75, - 1 );
+				camera.position.set( 0, 0.75, - 1.5 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xeeeeee );
 
-				scene.add( new THREE.GridHelper( 2, 4, 0xc1c1c1, 0x8d8d8d ) );
-
-				const light = new THREE.DirectionalLight( 0xffffff, 3 );
-				light.position.set( 1, 1, 1 );
-				scene.add( light );
-
-				const light2 = new THREE.HemisphereLight( 0xffffff, 0xc1c1c1, 3 );
-				scene.add( light2 );
-
-				// renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 2.0;
 				document.body.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
 				controls.maxDistance = 8;
+				// controls.target.y = 15;
+				// controls.update();
 
-				const loader = new USDZLoader();
-				loader.load( 'models/usdz/saeukkang.usdz', function ( usd ) {
+				const rgbeLoader = new RGBELoader()
+					.setPath( 'textures/equirectangular/' );
 
-					scene.add( usd );
+				const usdzLoader = new USDZLoader()
+					.setPath( 'models/usdz/' );
 
-				} );
+				const [ texture, model ] = await Promise.all( [
+					rgbeLoader.loadAsync( 'venice_sunset_1k.hdr' ),
+					usdzLoader.loadAsync( 'saeukkang.usdz' ),
+				] );
+
+				// environment
+
+				texture.mapping = THREE.EquirectangularReflectionMapping;
+
+				scene.background = texture;
+				scene.backgroundBlurriness = 0.5;
+				scene.environment = texture;
+
+				// model
+
+				model.position.y = 0.25;
+				model.position.z = - 0.25;
+				scene.add( model );
 
 				window.addEventListener( 'resize', onWindowResize );
 

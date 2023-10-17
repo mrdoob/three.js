@@ -1,4 +1,4 @@
-export const REVISION = '157dev';
+export const REVISION = '158dev';
 
 export const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -36,6 +36,10 @@ export const OneMinusDstAlphaFactor = 207;
 export const DstColorFactor = 208;
 export const OneMinusDstColorFactor = 209;
 export const SrcAlphaSaturateFactor = 210;
+export const ConstantColorFactor = 211;
+export const OneMinusConstantColorFactor = 212;
+export const ConstantAlphaFactor = 213;
+export const OneMinusConstantAlphaFactor = 214;
 export const NeverDepth = 0;
 export const AlwaysDepth = 1;
 export const LessDepth = 2;
@@ -53,6 +57,8 @@ export const ReinhardToneMapping = 2;
 export const CineonToneMapping = 3;
 export const ACESFilmicToneMapping = 4;
 export const CustomToneMapping = 5;
+export const AttachedBindMode = 'attached';
+export const DetachedBindMode = 'detached';
 
 export const UVMapping = 300;
 export const CubeReflectionMapping = 301;

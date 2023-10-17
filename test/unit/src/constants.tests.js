@@ -47,6 +47,10 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.DstColorFactor, 208, 'DstColorFactor is equal to 208' );
 		assert.equal( Constants.OneMinusDstColorFactor, 209, 'OneMinusDstColorFactor is equal to 209' );
 		assert.equal( Constants.SrcAlphaSaturateFactor, 210, 'SrcAlphaSaturateFactor is equal to 210' );
+		assert.equal( Constants.ConstantColorFactor, 211, 'ConstantColorFactor is equal to 211' );
+		assert.equal( Constants.OneMinusConstantColorFactor, 212, 'OneMinusConstantColorFactor is equal to 212' );
+		assert.equal( Constants.ConstantAlphaFactor, 213, 'ConstantAlphaFactor is equal to 213' );
+		assert.equal( Constants.OneMinusConstantAlphaFactor, 214, 'OneMinusConstantAlphaFactor is equal to 214' );
 
 		assert.equal( Constants.NeverDepth, 0, 'NeverDepth is equal to 0' );
 		assert.equal( Constants.AlwaysDepth, 1, 'AlwaysDepth is equal to 1' );
@@ -67,6 +71,9 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.CineonToneMapping, 3, 'CineonToneMapping is equal to 3' );
 		assert.equal( Constants.ACESFilmicToneMapping, 4, 'ACESFilmicToneMapping is equal to 4' );
 		assert.equal( Constants.CustomToneMapping, 5, 'CustomToneMapping is equal to 5' );
+
+		assert.equal( Constants.AttachedBindMode, 'attached', 'AttachedBindMode is equal to attached' );
+		assert.equal( Constants.DetachedBindMode, 'detached', 'DetachedBindMode is equal to detached' );
 
 		assert.equal( Constants.UVMapping, 300, 'UVMapping is equal to 300' );
 		assert.equal( Constants.CubeReflectionMapping, 301, 'CubeReflectionMapping is equal to 301' );

@@ -36,6 +36,7 @@
 		"webgl_geometry_extrude_splines",
 		"webgl_geometry_minecraft",
 		"webgl_geometry_nurbs",
+		"webgl_geometry_sdf",
 		"webgl_geometry_shapes",
 		"webgl_geometry_spline_editor",
 		"webgl_geometry_teapot",
@@ -310,13 +311,14 @@
 		"webgl2_volume_perlin"
 	],
 	"webgpu (wip)": [
-		"webgpu_audio_processing",
 		"webgpu_backdrop",
 		"webgpu_backdrop_area",
 		"webgpu_clearcoat",
-		"webgpu_compute",
+		"webgpu_compute_audio",
 		"webgpu_compute_particles",
+		"webgpu_compute_points",
 		"webgpu_compute_texture",
+		"webgpu_compute_texture_pingpong",
 		"webgpu_cubemap_adjustments",
 		"webgpu_cubemap_dynamic",
 		"webgpu_cubemap_mix",
@@ -339,6 +341,7 @@
 		"webgpu_morphtargets",
 		"webgpu_occlusion",
 		"webgpu_particles",
+		"webgpu_points_fat",
 		"webgpu_rtt",
 		"webgpu_sandbox",
 		"webgpu_shadowmap",
@@ -410,6 +413,7 @@
 		"misc_exporter_ply",
 		"misc_exporter_stl",
 		"misc_exporter_usdz",
+		"misc_exporter_exr",
 		"misc_lookat"
 	],
 	"css2d": [

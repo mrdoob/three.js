@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name] generates instances of [page:BufferGeometry] from a Signed Distance Function</br>
+            Uses <a href="https://www.npmjs.com/package/isosurface" target="_blank" > Mikola Lysenko's Isosurface</a>
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { SDFGeometryGenerator } from 'three/addons/geometries/SDFGeometryGenerator.js';
+		</code>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const generator = new SDFGeometryGenerator( renderer );
+		const sdf = 'float dist( vec3 p ){ return length(p) - 0.5; }' // glsl
+		const geometry = generator.generate( 64, sdf, 1 ); // ~> THREE.BufferGeometry
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>[example:webgl_geometry_sdf geometry / sdf ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:WebGLRenderer renderer] )</h3>
+		
+		<p>
+			[page:WebGLRenderer renderer] -- The renderer used to render the scene. <br />
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:BufferGeometry generate]( [param:Int resolution], [param:String distanceField], [param:Int bounds] )</h3>
+		
+		<p>
+			<b>resolution</b> - Int [ mandatory ] Amount of 'voxels' used for triangulation. Must be power of 2. <br/>Gets heavy after 256, most machines won't be able to process over 512. Defaults to 64. 
+		</p>
+		<p>
+			<b>distanceField</b> - String [ mandatory ] String with glsl distance function. Name of function must be 'dist', with a vec3 argument. ( see code above ). Defaults to a sphere distance.
+		</p>
+		<p>
+			<b>bounds</b> - Int [ optional ] Bounds in which signed distance field will be evaluated. Defaults to 1.
+		</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/geometries/SDFGeometry.js examples/jsm/geometries/SDFGeometryGenerator.js]
+		</p>
+	</body>
+</html>
