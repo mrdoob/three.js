@@ -54,7 +54,7 @@ class OrbitControls extends EventDispatcher {
 
 		// Limit camera target within a spherical area around the cursor
 		this.minTargetRadius = 0;
-	    this.maxTargetRadius = Infinity;
+		this.maxTargetRadius = Infinity;
 
 		// How far you can orbit vertically, upper and lower limits.
 		// Range is 0 to Math.PI radians.
