@@ -181,6 +181,16 @@ controls.keys = {
 			How far you can zoom out ( [page:OrthographicCamera] only ). Default is Infinity.
 		</p>
 
+		<h3>[property:Float minTargetRadius]</h3>
+		<p>
+			How close you can get the target to the 3D [page:.cursor]. Default is 0.
+		</p>
+
+		<h3>[property:Float maxTargetRadius]</h3>
+		<p>
+			How far you can move the target from the 3D [page:.cursor]. Default is Infinity.
+		</p>
+
 		<h3>[property:Float minAzimuthAngle]</h3>
 		<p>
 			How far you can orbit horizontally, lower limit. If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI ). Default is Infinity.
@@ -250,6 +260,11 @@ controls.mouseButtons = {
 		<p>
 			The focus point of the controls, the [page:.object] orbits around this. It can be updated manually at any point to change
 			the focus of the controls.
+		</p>
+
+		<h3>[property:Vector3 cursor]</h3>
+		<p>
+			The focus point of the [page:.minTargetRadius] and [page:.maxTargetRadius] limits. It can be updated manually at any point to change the center of interest for the [page:.target].
 		</p>
 
 		<h3>[property:Object touches]</h3>
