@@ -435,20 +435,42 @@ class Box3 {
 
 	}
 
+	getVertexPoints( points ) {
+
+		points.length = 0;
+
+		points.push( new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3() );
+
+		if ( this.isEmpty() === false ) {
+
+			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
+			points[ 0 ].set( this.min.x, this.min.y, this.min.z ); // 000
+			points[ 1 ].set( this.min.x, this.min.y, this.max.z ); // 001
+			points[ 2 ].set( this.min.x, this.max.y, this.min.z ); // 010
+			points[ 3 ].set( this.min.x, this.max.y, this.max.z ); // 011
+			points[ 4 ].set( this.max.x, this.min.y, this.min.z ); // 100
+			points[ 5 ].set( this.max.x, this.min.y, this.max.z ); // 101
+			points[ 6 ].set( this.max.x, this.max.y, this.min.z ); // 110
+			points[ 7 ].set( this.max.x, this.max.y, this.max.z ); // 111
+
+		}
+
+		return points;
+
+	}
+
 	applyMatrix4( matrix ) {
 
 		// transform of empty box is an empty box.
 		if ( this.isEmpty() ) return this;
 
-		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
-		_points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
-		_points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
-		_points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
-		_points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
-		_points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
-		_points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
-		_points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
-		_points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 111
+		this.getVertexPoints( _points );
+
+		for ( let i = 0; i < _points.length; i ++ ) {
+
+			_points[ i ].applyMatrix4( matrix );
+
+		}
 
 		this.setFromPoints( _points );
 
