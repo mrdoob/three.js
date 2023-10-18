@@ -465,6 +465,7 @@ class Box3 {
 		if ( _points !== points ) {
 
 			points = points || [];
+			points.length = 0;
 
 			for ( let i = 0; i < _points.length; i ++ ) {
 
