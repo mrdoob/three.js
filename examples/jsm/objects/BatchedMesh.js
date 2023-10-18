@@ -34,8 +34,7 @@ const batchingParsVertex = `
 		vec4 v2 = texture2D( batchingTexture, vec2( dx * ( x + 1.5 ), y ) );
 		vec4 v3 = texture2D( batchingTexture, vec2( dx * ( x + 2.5 ), y ) );
 		vec4 v4 = texture2D( batchingTexture, vec2( dx * ( x + 3.5 ), y ) );
-		mat4 bone = mat4( v1, v2, v3, v4 );
-		return bone;
+		return mat4( v1, v2, v3, v4 );
 	}
 #endif
 `;
@@ -90,7 +89,7 @@ class BatchedMesh extends Mesh {
 		// Local matrix per geometry by using data texture
 		// @TODO: Support uniform parameter per geometry
 
-		this._matrices = []; 
+		this._matrices = [];
 		this._matricesArray = null;
 		this._matricesTexture = null;
 		this._matricesTextureSize = null;
@@ -139,7 +138,7 @@ class BatchedMesh extends Mesh {
 		const currentOnBeforeCompile = material.onBeforeCompile;
 		const customUniforms = this._customUniforms;
 
-		material.onBeforeCompile = function onBeforeCompile ( parameters, renderer ) {
+		material.onBeforeCompile = function onBeforeCompile( parameters, renderer ) {
 
 			// Is this replacement stable across any materials?
 			parameters.vertexShader = parameters.vertexShader
@@ -448,7 +447,7 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	onBeforeRender( _renderer, _scene, _camera, _geometry, material, _group ) {
+	onBeforeRender( _renderer, _scene, _camera, _geometry, material/*, _group*/ ) {
 
 		material.defines.BATCHING = true;
 
@@ -456,7 +455,7 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	onAfterRender( _renderer, _scene, _camera, _geometry, material, _group ) {
+	onAfterRender( _renderer, _scene, _camera, _geometry, material/*, _group*/ ) {
 
 		material.defines.BATCHING = false;
 
