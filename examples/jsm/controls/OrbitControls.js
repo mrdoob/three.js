@@ -270,8 +270,8 @@ class OrbitControls extends EventDispatcher {
 
 				// Limit the target distance from the cursor to create a sphere around the center of interest
 				scope.target.sub( scope.cursor );
-        		scope.target.clampLength( scope.minTargetRadius, scope.maxTargetRadius );
-        		scope.target.add( scope.cursor );
+				scope.target.clampLength( scope.minTargetRadius, scope.maxTargetRadius );
+				scope.target.add( scope.cursor );
 				offset.setFromSpherical( spherical );
 
 				// rotate offset back to "camera-up-vector-is-up" space
