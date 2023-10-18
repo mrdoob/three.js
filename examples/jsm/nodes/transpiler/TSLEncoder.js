@@ -1,3 +1,6 @@
+import { REVISION } from 'three';
+import { getNodeElement } from 'three/nodes';
+
 const opLib = {
 	'=': 'assign',
 	'+': 'add',
@@ -41,6 +44,20 @@ class TSLEncoder {
 	constructor() {
 
 		this.tab = '';
+		this.imports = new Set();
+		this.layoutsCode = '';
+
+	}
+
+	addImport( name ) {
+
+		// import only if it's a node
+
+		if ( getNodeElement( name ) !== undefined ) {
+
+			this.imports.add( name );
+
+		}
 
 	}
 
@@ -49,6 +66,8 @@ class TSLEncoder {
 		let code;
 
 		if ( node.isAccessor || node.isNumber ) {
+
+			if ( node.isAccessor ) this.addImport( node.value.split( '.' )[ 0 ] );
 
 			code = node.value;
 
@@ -85,11 +104,17 @@ class TSLEncoder {
 
 			}
 
+			this.addImport( node.name );
+
 			code = `${ node.name }( ${ params.join( ', ' ) } )`;
 
 		} else if ( node.isReturn ) {
 
 			code = `return ${ this.emitExpression( node.value ) }`;
+
+		} else if ( node.isFor ) {
+
+			code = this.emitFor( node );
 
 		} else if ( node.isVariableDeclaration ) {
 
@@ -98,6 +123,10 @@ class TSLEncoder {
 		} else if ( node.isConditional ) {
 
 			code = this.emitConditional( node );
+
+		} else if ( node.isUnary && node.expression.isNumber ) {
+
+			code = node.type + node.expression.value;
 
 		} else if ( node.isUnary ) {
 
@@ -117,7 +146,7 @@ class TSLEncoder {
 
 		}
 
-		if ( ! code ) code = '// unknown keyword';
+		if ( ! code ) code = '// unknown statement';
 
 		return code;
 
@@ -143,6 +172,10 @@ class TSLEncoder {
 
 				}
 
+			} else if ( statement.isFor ) {
+
+				code = '\n' + this.tab + code + '\n';
+
 			} else {
 
 				code = this.tab + code + ';';
@@ -165,7 +198,7 @@ class TSLEncoder {
 		const condStr = this.emitExpression( node.cond );
 		const bodyStr = this.emitBody( node.body );
 
-		let ifStr = `If ( ${ condStr }, () => {
+		let ifStr = `If( ${ condStr }, () => {
 
 ${ bodyStr } 
 
@@ -206,13 +239,93 @@ ${ this.tab }} )`;
 
 	}
 
-	emitVariableDeclaration( node ) {
+	emitLoop( node ) {
 
-		const { name, /*type,*/ value } = node;
+		const start = this.emitExpression( node.initialization.value );
+		const end = this.emitExpression( node.condition.right );
+		const name = node.initialization.name;
+		const nameParam = name !== 'i' ? `, name: '${ name }'` : '';
+
+		let loopStr = `loop( { start: ${ start }, end: ${ end + nameParam } }, ( { ${ name } } ) => {\n\n`;
+
+		loopStr += this.emitBody( node.body ) + '\n\n';
+
+		loopStr += this.tab + '} );\n\n';
+
+		return loopStr;
+
+	}
+
+	emitFor( node ) {
+
+		const { initialization, condition, afterthought } = node;
+
+		if ( ( initialization && initialization.isVariableDeclaration && initialization.next === null ) &&
+			( condition && condition.type === '<' && condition.left.isAccessor ) &&
+			( afterthought && afterthought.type === '++' ) &&
+			( initialization.name === condition.left.value ) &&
+			( initialization.name === afterthought.expression.value )
+		) {
+
+			return this.emitLoop( node );
+
+		}
+
+		return this.emitForWhile( node );
+
+	}
+
+	emitForWhile( node ) {
+
+		const initialization = this.emitExpression( node.initialization );
+		const condition = this.emitExpression( node.condition );
+		const afterthought = this.emitExpression( node.afterthought );
+
+		this.tab += '\t';
+
+		let forStr = '{\n\n' + this.tab + initialization + ';\n\n';
+		forStr += `${ this.tab }While( ${ condition }, () => {\n\n`;
+
+		forStr += this.emitBody( node.body ) + '\n\n';
+
+		forStr += this.tab + '\t' + afterthought + ';\n\n';
+
+		forStr += this.tab + '} );\n\n';
+
+		this.tab = this.tab.slice( 0, - 1 );
+
+		forStr += this.tab + '}';
+
+		return forStr;
+
+	}
+
+	emitVariableDeclaration( node, isRoot = true ) {
+
+		const { name, type, value, next } = node;
 
 		const valueStr = value ? this.emitExpression( value ) : '';
-		//const varStr = `const ${ name } = ${ type }( ${ valueStr } )`;
-		const varStr = `const ${ name } = ${ valueStr }`;
+
+		let varStr = isRoot ? 'const ' : '';
+		varStr += name;
+
+		if ( value ) {
+
+			varStr += ` = ${ type }( ${ valueStr } )`;
+
+		} else {
+
+			varStr += ` = ${ type }()`;
+
+		}
+
+		if ( next ) {
+
+			varStr += ', ' + this.emitVariableDeclaration( next, false );
+
+		}
+
+		this.addImport( type );
 
 		return varStr;
 
@@ -247,7 +360,9 @@ ${ this.tab }} )`;
 
 ${ bodyStr }
 
-} ).setLayout( {
+} )\n\n`;
+
+		this.layoutsCode += `${ name }.setLayout( {
 	name: '${ name }',
 	type: '${ type }',
 	inputs: [\n\t\t${ inputs.join( ',\n\t\t' ) }\n\t]
@@ -275,7 +390,14 @@ ${ bodyStr }
 
 		}
 
-		return code;
+		const imports = [ ...this.imports ];
+
+		const header = '// Three.js Transpiler r' + REVISION + '\n\n';
+		const importStr = imports.length > 0 ? 'import { ' + imports.join( ', ' ) + ' } from \'three/nodes\';\n\n' : '';
+
+		const layouts = this.layoutsCode.length > 0 ? '\n\n// layouts\n\n' + this.layoutsCode : '';
+
+		return header + importStr + code + layouts;
 
 	}
 

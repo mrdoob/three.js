@@ -69,7 +69,8 @@ vec3 desaturate( vec3 color ) {
 	float constantBool = 2 + 2 > 3 == true;
 	bool testBoolean = a > b && b == c;
 	float constantBool2 = true == a;
-	vec3 ab = a + -b - c++;
+	vec3 ab = a + -b - c++ - --d;
+	vec3 a, b = vec3( 11 + 11, b, c ), c = 33;
 
 	if ( a > 1 ) {
 
@@ -85,12 +86,11 @@ vec3 desaturate( vec3 color ) {
 
 	}
 
-	/*for ( int i = 0; i < int( uLightCount ); ++i ) {
+	for ( int i = -10; i < int( uLightCount ); ++i ) {
 
+		float precedenceTest8 = 5 - 4 + 7;
 
-
-	}*/
-
+	}
 
 	return color * vec3( 0.299, 0.587, 0.114 ) * constantTest;
 

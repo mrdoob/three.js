@@ -1,4 +1,4 @@
-import { Program, FunctionDeclaration, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, FunctionCall, Return, Accessor } from './AST.js';
+import { Program, FunctionDeclaration, For, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, FunctionCall, Return, Accessor } from './AST.js';
 
 const unaryOperators = [
 	'+', '-', '~', '!', '++', '--'
@@ -460,7 +460,7 @@ class GLSLDecoder {
 
 		const paramsTokens = this.readTokensUntil( ')' );
 
-		const params = this.parseFunctionParams( paramsTokens.splice( 1, paramsTokens.length - 2 ) );
+		const params = this.parseFunctionParams( paramsTokens.slice( 1, paramsTokens.length - 1 ) );
 
 		const func = new FunctionDeclaration( type, name, params );
 
@@ -470,36 +470,103 @@ class GLSLDecoder {
 
 	}
 
-	parseVariable() {
+	parseVariablesFromToken( tokens, type ) {
 
-		const type = this.readToken().str;
-		const name = this.readToken().str;
+		let index = 0;
 
-		const token = this.getToken();
+		type = type || tokens[ index ++ ].str;
+		const name = tokens[ index ++ ].str;
+
+		const token = tokens[ index ];
 
 		let init = null;
+		let next = null;
 
-		if ( token.str === '=' ) {
+		if ( token ) {
 
-			this.readToken(); // skip
+			const initTokens = this.getTokensUntil( ',', tokens, index );
 
-			init = this.parseExpression();
+			if ( initTokens[ 0 ].str === '=' ) {
+
+				const expressionTokens = initTokens.slice( 1 );
+				if ( expressionTokens[ expressionTokens.length - 1 ].str === ',' ) expressionTokens.pop();
+
+				init = this.parseExpressionFromTokens( expressionTokens );
+
+			}
+
+			const nextTokens = tokens.slice( initTokens.length + ( index - 1 ) );
+
+			if ( nextTokens[ 0 ] && nextTokens[ 0 ].str === ',' ) {
+
+				next = this.parseVariablesFromToken( nextTokens.slice( 1 ), type );
+
+			}
 
 		}
 
-		const variable = new VariableDeclaration( type, name, init );
+		const variable = new VariableDeclaration( type, name, init, next );
 
 		return variable;
 
 	}
 
+	parseVariables() {
+
+		const tokens = this.readTokensUntil( ';' );
+
+		return this.parseVariablesFromToken( tokens.slice( 0, tokens.length - 1 ) );
+
+	}
+
 	parseReturn() {
 
-		this.readToken(); // skip return
+		this.readToken(); // skip 'return'
 
 		const expression = this.parseExpression();
 
 		return new Return( expression );
+
+	}
+
+	parseFor() {
+
+		this.readToken(); // skip 'for'
+
+		const forTokens = this.readTokensUntil( ')' ).slice( 1, - 1 );
+
+		const initializationTokens = this.getTokensUntil( ';', forTokens, 0 ).slice( 0, - 1 );
+		const conditionTokens = this.getTokensUntil( ';', forTokens, initializationTokens.length + 1 ).slice( 0, - 1 );
+		const afterthoughtTokens = forTokens.slice( initializationTokens.length + conditionTokens.length + 2 );
+
+		let initialization;
+
+		if ( initializationTokens[ 0 ] && isType( initializationTokens[ 0 ].str ) ) {
+
+			initialization = this.parseVariablesFromToken( initializationTokens );
+
+		} else {
+
+			initialization = this.parseExpressionFromTokens( initializationTokens );
+
+		}
+
+		const condition = this.parseExpressionFromTokens( conditionTokens );
+		const afterthought = this.parseExpressionFromTokens( afterthoughtTokens );
+
+		const statement = new For( initialization, condition, afterthought );
+
+		if ( this.getToken().str === '{' ) {
+
+			this.parseBlock( statement );
+
+		} else {
+
+			statement.body.push( this.parseExpression() );
+
+		}
+
+		return statement;
 
 	}
 
@@ -606,7 +673,7 @@ class GLSLDecoder {
 
 					} else {
 
-						statement = this.parseVariable();
+						statement = this.parseVariables();
 
 					}
 
@@ -617,6 +684,10 @@ class GLSLDecoder {
 				} else if ( token.str === 'if' ) {
 
 					statement = this.parseIf();
+
+				} else if ( token.str === 'for' ) {
+
+					statement = this.parseFor();
 
 				} else {
 

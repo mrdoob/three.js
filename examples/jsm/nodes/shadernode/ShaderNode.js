@@ -22,6 +22,12 @@ export function addNodeElement( name, nodeElement ) {
 
 }
 
+export function getNodeElement( name ) {
+
+	return NodeElements.get( name );
+
+}
+
 const parseSwizzle = ( props ) => props.replace( /r|s/g, 'x' ).replace( /g|t/g, 'y' ).replace( /b|p/g, 'z' ).replace( /a|q/g, 'w' );
 
 const shaderNodeHandler = {

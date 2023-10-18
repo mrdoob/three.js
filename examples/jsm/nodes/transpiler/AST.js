@@ -12,11 +12,12 @@ export class Program {
 
 export class VariableDeclaration {
 
-	constructor( type, name, value = null ) {
+	constructor( type, name, value = null, next = null ) {
 
 		this.type = type;
 		this.name = name;
 		this.value = value;
+		this.next = next;
 
 		this.isVariableDeclaration = true;
 
@@ -153,6 +154,22 @@ export class Accessor {
 		this.value = value;
 
 		this.isAccessor = true;
+
+	}
+
+}
+
+export class For {
+
+	constructor( initialization, condition, afterthought ) {
+
+		this.initialization = initialization;
+		this.condition = condition;
+		this.afterthought = afterthought;
+
+		this.body = [];
+
+		this.isFor = true;
 
 	}
 
