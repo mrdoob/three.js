@@ -9,10 +9,6 @@
 		#info {
 			background-color: rgba(0,0,0,0.75);
 		}
-
-		.dg .folder .gui-stats {
-			height: auto;
-		}
 	</style>
 </head>
 <body>
@@ -22,12 +18,6 @@
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - mesh - batch
 
 	</div>
-
-	<div id="container"></div>
-
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -45,13 +35,22 @@
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-		import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 		import { BatchedMesh } from 'three/addons/objects/BatchedMesh.js';
 
-		let container, stats, gui, guiStatsEl;
+		let stats, gui, guiStatsEl;
 		let camera, controls, scene, renderer;
 		let geometries, mesh;
 		const ids = [];
+		const dummy = new THREE.Object3D();
+
+		//
+
+		const position = new THREE.Vector3();
+		const rotation = new THREE.Euler();
+		const quaternion = new THREE.Quaternion();
+		const scale = new THREE.Vector3();
+
+		//
 
 		const MAX_GEOMETRY_COUNT = 8192;
 
@@ -66,45 +65,41 @@
 			dynamic: 16
 		};
 
+		init();
+		initGeometries();
+		initMesh();
+		animate();
+
 		//
 
-		const randomizeMatrix = function () {
+		function randomizeMatrix( matrix ) {
 
-			const position = new THREE.Vector3();
-			const rotation = new THREE.Euler();
-			const quaternion = new THREE.Quaternion();
-			const scale = new THREE.Vector3();
+			position.x = Math.random() * 40 - 20;
+			position.y = Math.random() * 40 - 20;
+			position.z = Math.random() * 40 - 20;
 
-			return function ( matrix ) {
+			rotation.x = Math.random() * 2 * Math.PI;
+			rotation.y = Math.random() * 2 * Math.PI;
+			rotation.z = Math.random() * 2 * Math.PI;
 
-				position.x = Math.random() * 40 - 20;
-				position.y = Math.random() * 40 - 20;
-				position.z = Math.random() * 40 - 20;
+			quaternion.setFromEuler( rotation );
 
-				rotation.x = Math.random() * 2 * Math.PI;
-				rotation.y = Math.random() * 2 * Math.PI;
-				rotation.z = Math.random() * 2 * Math.PI;
+			scale.x = scale.y = scale.z = 0.5 + ( Math.random() * 0.5 );
 
-				quaternion.setFromEuler( rotation );
+			return matrix.compose( position, quaternion, scale );
 
-				scale.x = scale.y = scale.z = 0.5 + ( Math.random() * 0.5 );
+		}
 
-				return matrix.compose( position, quaternion, scale );
-
-			};
-
-		}();
-
-		const randomizeRotationSpeed = ( rotation ) => {
+		function randomizeRotationSpeed( rotation ) {
 
 			rotation.x = Math.random() * 0.01;
 			rotation.y = Math.random() * 0.01;
 			rotation.z = Math.random() * 0.01;
 			return rotation;
 
-		};
+		}
 
-		const initGeometries = () => {
+		function initGeometries() {
 
 			geometries = [
 				new THREE.ConeGeometry( 1.0, 2.0 ),
@@ -112,15 +107,15 @@
 				new THREE.SphereGeometry( 1.0 ),
 			];
 
-		};
+		}
 
-		const createMaterial = () => {
+		function createMaterial() {
 
 			return new THREE.MeshNormalMaterial();
 
-		};
+		}
 
-		const cleanup = () => {
+		function cleanup() {
 
 			if ( mesh ) {
 
@@ -134,9 +129,9 @@
 
 			}
 
-		};
+		}
 
-		const initMesh = () => {
+		function initMesh() {
 
 			cleanup();
 
@@ -150,11 +145,10 @@
 
 			}
 
-		};
+		}
 
-		const initRegularMesh = () => {
+		function initRegularMesh() {
 
-			const matrix = new THREE.Matrix4();
 			mesh = new THREE.Group();
 			const material = createMaterial();
 
@@ -170,9 +164,9 @@
 
 			scene.add( mesh );
 
-		};
+		}
 
-		const initBatchedMesh = () => {
+		function initBatchedMesh() {
 
 			const geometryCount = api.count;
 			const vertexCount = api.count * 512;
@@ -194,9 +188,9 @@
 
 			scene.add( mesh );
 
-		};
+		}
 
-		const init = () => {
+		function init() {
 
 			const width = window.innerWidth;
 			const height = window.innerHeight;
@@ -211,10 +205,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( width, height );
-			renderer.outputEncoding = THREE.sRGBEncoding;
-
-			container = document.getElementById( 'container' );
-			container.appendChild( renderer.domElement );
+			document.body.appendChild( renderer.domElement );
 
 			// scene
 
@@ -230,7 +221,7 @@
 			// stats
 
 			stats = new Stats();
-			container.appendChild( stats.dom );
+			document.body.appendChild( stats.dom );
 
 			// gui
 
@@ -246,13 +237,11 @@
 
 			window.addEventListener( 'resize', onWindowResize );
 
-			Object.assign( window, { scene } );
-
-		};
+		}
 
 		//
 
-		const onWindowResize = () => {
+		function onWindowResize() {
 
 			const width = window.innerWidth;
 			const height = window.innerHeight;
@@ -262,9 +251,9 @@
 
 			renderer.setSize( width, height );
 
-		};
+		}
 
-		const animate = () => {
+		function animate() {
 
 			requestAnimationFrame( animate );
 
@@ -275,71 +264,55 @@
 
 			render();
 
-		};
+		}
 
-		const animateMeshes = function () {
+		function animateMeshes() {
 
-			const matrix = new THREE.Matrix4();
-			const position = new THREE.Vector3();
-			const rotation = new THREE.Euler();
-			const quaternion = new THREE.Quaternion();
-			const quaternion2 = new THREE.Quaternion();
-			const scale = new THREE.Vector3();
+			const loopNum = Math.min( api.count, api.dynamic );
 
-			return function () {
+			if ( api.method === Method.BATCHED ) {
 
-				const loopNum = Math.min( api.count, api.dynamic );
+				for ( let i = 0; i < loopNum; i ++ ) {
 
-				if ( api.method === Method.BATCHED ) {
+					const rotationSpeed = mesh.userData.rotationSpeeds[ i ];
+					const id = ids[ i ];
 
-					for ( let i = 0; i < loopNum; i ++ ) {
-
-						const rotationSpeed = mesh.userData.rotationSpeeds[ i ];
-						const id = ids[ i ];
-
-						mesh.getMatrixAt( id, matrix );
-						matrix.decompose( position, quaternion, scale );
-						rotation.set( rotationSpeed.x, rotationSpeed.y, rotationSpeed.z );
-						quaternion2.setFromEuler( rotation );
-						quaternion.multiply( quaternion2 );
-						matrix.compose( position, quaternion, scale );
-						mesh.setMatrixAt( id, matrix );
-
-					}
-
-				} else {
-
-					for ( let i = 0; i < loopNum; i ++ ) {
-
-						const child = mesh.children[ i ];
-						const rotationSpeed = child.userData.rotationSpeed;
-
-						child.rotation.set(
-							child.rotation.x + rotationSpeed.x,
-							child.rotation.y + rotationSpeed.y,
-							child.rotation.z + rotationSpeed.z
-						);
-
-					}
+					mesh.getMatrixAt( id, dummy.matrix );
+					dummy.matrix.decompose( dummy.position, dummy.quaternion, dummy.scale );
+					dummy.rotation.set(
+						dummy.rotation.x + rotationSpeed.x,
+						dummy.rotation.y + rotationSpeed.y,
+						dummy.rotation.z + rotationSpeed.z
+					);
+					dummy.updateMatrix();
+					mesh.setMatrixAt( id, dummy.matrix );
 
 				}
 
-			};
+			} else {
 
-		}();
+				for ( let i = 0; i < loopNum; i ++ ) {
 
-		const render = () => {
+					const child = mesh.children[ i ];
+					const rotationSpeed = child.userData.rotationSpeed;
+
+					child.rotation.set(
+						child.rotation.x + rotationSpeed.x,
+						child.rotation.y + rotationSpeed.y,
+						child.rotation.z + rotationSpeed.z
+					);
+
+				}
+
+			}
+
+		}
+
+		function render() {
 
 			renderer.render( scene, camera );
 
-		};
-
-		//
-
-		init();
-		initGeometries();
-		initMesh();
-		animate();
+		}
 
 	</script>
 
