@@ -235,6 +235,8 @@ ${ this.tab }} )`;
 
 		}
 
+		this.imports.add( 'If' );
+
 		return ifStr;
 
 	}
@@ -251,6 +253,8 @@ ${ this.tab }} )`;
 		loopStr += this.emitBody( node.body ) + '\n\n';
 
 		loopStr += this.tab + '} );\n\n';
+
+		this.imports.add( 'loop' );
 
 		return loopStr;
 
@@ -295,6 +299,8 @@ ${ this.tab }} )`;
 		this.tab = this.tab.slice( 0, - 1 );
 
 		forStr += this.tab + '}';
+
+		this.imports.add( 'While' );
 
 		return forStr;
 
@@ -360,13 +366,15 @@ ${ this.tab }} )`;
 
 ${ bodyStr }
 
-} )\n\n`;
+} );\n\n`;
 
 		this.layoutsCode += `${ name }.setLayout( {
 	name: '${ name }',
 	type: '${ type }',
 	inputs: [\n\t\t${ inputs.join( ',\n\t\t' ) }\n\t]
 } );\n\n`;
+
+		this.imports.add( 'tslFn' );
 
 		return funcStr;
 
