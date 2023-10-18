@@ -462,12 +462,14 @@ class Box3 {
 
 		}
 
-		if( _points !== points ) {
+		if ( _points !== points ) {
 
 			points = points || [];
 
 			for ( let i = 0; i < _points.length; i ++ ) {
+
 				points[ i ] = _points[ i ].clone();
+
 			}
 
 		}
