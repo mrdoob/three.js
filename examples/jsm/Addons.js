@@ -128,9 +128,6 @@ export * from './loaders/VOXLoader.js';
 export * from './loaders/VRMLLoader.js';
 export * from './loaders/VTKLoader.js';
 export * from './loaders/XYZLoader.js';
-export * from './loaders/lwo/IFFParser.js';
-export * from './loaders/lwo/LWO2Parser.js';
-export * from './loaders/lwo/LWO3Parser.js';
 
 export * from './materials/MeshGouraudMaterial.js';
 
