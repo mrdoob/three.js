@@ -1,5 +1,6 @@
 import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial, FunctionNode } from '../../../nodes/Nodes.js';
 
+import UniformBuffer from '../../common/UniformBuffer.js';
 import UniformsGroup from '../../common/UniformsGroup.js';
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
@@ -155,6 +156,15 @@ ${ flowData.code }
 			} else if ( uniform.type === 'cubeTexture' ) {
 
 				snippet = `samplerCube ${uniform.name};`;
+
+			} else if ( uniform.type === 'buffer' ) {
+
+				const bufferNode = uniform.node;
+				const bufferType = this.getType( bufferNode.bufferType );
+				const bufferCount = bufferNode.bufferCount;
+
+				const bufferCountSnippet = bufferCount > 0 ? bufferCount : '';
+				snippet = `${bufferNode.name} {\n\t${bufferType} ${uniform.name}[${bufferCountSnippet}];\n};\n`;
 
 			} else {
 
@@ -522,6 +532,18 @@ void main() {
 				uniformGPU = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node );
 
 				this.bindings[ shaderStage ].push( uniformGPU );
+
+			} else if ( type === 'buffer' ) {
+
+				node.name = `NodeBuffer_${node.id}`;
+
+				const buffer = new UniformBuffer( node.name, node.value );
+
+				uniformNode.name = `buffer${node.id}`;
+
+				this.bindings[ shaderStage ].push( buffer );
+
+				uniformGPU = buffer;
 
 			} else {
 
