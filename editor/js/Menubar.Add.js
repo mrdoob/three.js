@@ -38,6 +38,25 @@ function MenubarAdd( editor ) {
 	//
 
 	options.add( new UIHorizontalRule() );
+	
+	// Bone
+
+	option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/bone' ) );
+	option.onClick( function () {
+
+		const mesh = new THREE.Bone();
+		mesh.name = 'Bone';
+
+		editor.execute( new AddObjectCommand( editor, mesh ) );
+
+	} );
+	options.add( option );
+
+	//
+
+	options.add( new UIHorizontalRule() );
 
 	// Box
 
