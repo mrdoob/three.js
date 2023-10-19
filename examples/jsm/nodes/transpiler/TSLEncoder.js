@@ -25,7 +25,12 @@ const opLib = {
 	'-=': 'subAssign',
 	'*=': 'mulAssign',
 	'/=': 'divAssign',
-	'%=': 'remainderAssign'
+	'%=': 'remainderAssign',
+	'^=': 'xorAssign',
+	'&=': 'bitAndAssign',
+	'|=': 'bitOrAssign',
+	'<<=': 'shiftLeftAssign',
+	'>>=': 'shiftRightAssign'
 };
 
 const unaryLib = {
@@ -76,7 +81,17 @@ class TSLEncoder {
 
 		} else if ( node.isNumber ) {
 
-			code = node.value;
+			if ( node.type === 'int' || node.type === 'uint' ) {
+
+				this.addImport( node.type );
+
+				code = node.type + '( ' + node.value + ' )';
+
+			} else {
+
+				code = node.value;
+
+			}
 
 		} else if ( node.isOperator ) {
 
@@ -87,7 +102,7 @@ class TSLEncoder {
 
 			if ( isPrimitive( left ) && isPrimitive( right ) ) {
 
-				return eval( left + node.type + right );
+				return left + ' ' + node.type + ' ' + right;
 
 			}
 
@@ -389,11 +404,19 @@ ${ this.tab }} )`;
 		const params = [];
 		const inputs = [];
 
+		let hasPointer = false;
+
 		for ( const param of node.params ) {
 
 			let str = `{ name: '${ param.name }', type: '${ param.type }'`;
 
 			if ( param.qualifier ) {
+
+				if ( param.qualifier === 'inout' || param.qualifier === 'out' ) {
+
+					hasPointer = true;
+
+				}
 
 				str += ', qualifier: \'' + param.qualifier + '\'';
 
@@ -415,7 +438,7 @@ ${ bodyStr }
 
 		const layoutInput = inputs.length > 0 ? '\n\t\t' + inputs.join( ',\n\t\t' ) + '\n\t' : '';
 
-		if ( node.layout !== false ) {
+		if ( node.layout !== false && hasPointer === false ) {
 
 			this.layoutsCode += `${ name }.setLayout( {
 	name: '${ name }',

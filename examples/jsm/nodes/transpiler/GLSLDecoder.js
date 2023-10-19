@@ -17,7 +17,7 @@ const precedenceOperators = [
 	'^^',
 	'||',
 	'=',
-	'+=', '-=', '*=', '/=', '%=',
+	'+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=', '<<=', '>>=',
 	','
 ].reverse();
 
@@ -26,7 +26,7 @@ const lineRegExp = /^\n+/;
 const commentRegExp = /^\/\*[\s\S]*?\*\//;
 const inlineCommentRegExp = /^\/\/.*?(\n|$)/;
 
-const numberRegExp = /^((\.\d)|\d)(\d*)(\.)?(\d*)/;
+const numberRegExp = /^((\.\d)|\d)((\w|-)*)(\.)?((\w|-)*)/;
 const stringDoubleRegExp = /^(\"((?:[^"\\]|\\.)*)\")/;
 const stringSingleRegExp = /^(\'((?:[^'\\]|\\.)*)\')/;
 const literalRegExp = /^[A-Za-z](\w|\.)*/;
@@ -277,29 +277,6 @@ class GLSLDecoder {
 
 		if ( firstToken.isOperator ) {
 
-			// groups
-
-			if ( firstToken.str === '(' ) {
-
-				const leftTokens = this.getTokensUntil( ')', tokens );
-
-				const left = this.parseExpressionFromTokens( leftTokens.slice( 1, leftTokens.length - 1 ) );
-
-				const operator = tokens[ leftTokens.length + 2 ];
-
-				if ( operator ) {
-
-					const rightTokens = tokens.slice( leftTokens.length + 3, tokens.length );
-					const right = this.parseExpressionFromTokens( rightTokens );
-
-					return new Operator( operator.str, left, right );
-
-				}
-
-				return left;
-
-			}
-
 			// unary operators (before)
 
 			for ( const operator of unaryOperators ) {
@@ -366,11 +343,43 @@ class GLSLDecoder {
 
 		}
 
+		// groups
+
+		if ( firstToken.str === '(' ) {
+
+			const leftTokens = this.getTokensUntil( ')', tokens );
+
+			const left = this.parseExpressionFromTokens( leftTokens.slice( 1, leftTokens.length - 1 ) );
+
+			const operator = tokens[ leftTokens.length ];
+
+			if ( operator ) {
+
+				const rightTokens = tokens.slice( leftTokens.length + 1 );
+				const right = this.parseExpressionFromTokens( rightTokens );
+
+				return new Operator( operator.str, left, right );
+
+			}
+
+			return left;
+
+		}
+
 		// primitives and accessors
 
 		if ( firstToken.isNumber ) {
 
-			return new Number( firstToken.str );
+			let type;
+
+			if ( /^(0x)/.test( firstToken.str ) ) type = 'int';
+			else if ( /u$/.test( firstToken.str ) ) type = 'uint';
+			else if ( /f|e|\./.test( firstToken.str ) ) type = 'float';
+			else type = 'int';
+
+			const str = firstToken.str.replace( /u$/, '' );
+
+			return new Number( str, type );
 
 		} else if ( firstToken.isLiteral ) {
 
