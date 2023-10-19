@@ -30,10 +30,12 @@ function Strings( config ) {
 			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Clone',
 			'menubar/edit/delete': 'Delete (Del)',
+		        'menubar/edit/skin': 'Skin Mesh',
 			'menubar/edit/fixcolormaps': 'Fix Color Maps',
 
 			'menubar/add': 'Add',
 			'menubar/add/group': 'Group',
+		        'menubar/add/bone': 'Bone',
 			'menubar/add/plane': 'Plane',
 			'menubar/add/box': 'Box',
 			'menubar/add/capsule': 'Capsule',
