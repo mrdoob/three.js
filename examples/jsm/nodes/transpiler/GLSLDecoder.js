@@ -1,4 +1,4 @@
-import { Program, FunctionDeclaration, For, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, FunctionCall, Return, Accessor } from './AST.js';
+import { Program, FunctionDeclaration, For, AccessorElements, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, FunctionCall, Return, Accessor } from './AST.js';
 
 const unaryOperators = [
 	'+', '-', '~', '!', '++', '--'
@@ -36,6 +36,15 @@ const operatorsRegExp = new RegExp( '^(\\' + [
 	'(', ')', '[', ']', '{', '}',
 	'.', ',', ';', '!', '=', '~', '*', '/', '%', '+', '-', '<', '>', '&', '^', '|', '?', ':', '#'
 ].join( '$' ).split( '' ).join( '\\' ).replace( /\\\$/g, '|' ) + ')' );
+
+function getGroupDelta( str ) {
+
+	if ( str === '(' || str === '[' || str === '{' ) return 1;
+	if ( str === ')' || str === ']' || str === '}' ) return - 1;
+
+	return 0;
+
+}
 
 class Token {
 
@@ -235,8 +244,7 @@ class GLSLDecoder {
 
 			const token = tokens[ i ];
 
-			if ( token.str === '(' ) groupIndex ++;
-			else if ( token.str === ')' ) groupIndex --;
+			groupIndex += getGroupDelta( token.str );
 
 			output.push( token );
 
@@ -328,8 +336,7 @@ class GLSLDecoder {
 
 				}
 
-				if ( token.str === '(' ) groupIndex ++;
-				else if ( token.str === ')' ) groupIndex --;
+				groupIndex += getGroupDelta( token.str );
 
 				if ( groupIndex < 0 ) {
 
@@ -375,11 +382,61 @@ class GLSLDecoder {
 
 			const secondToken = tokens[ 1 ];
 
-			if ( secondToken && secondToken.str === '(' ) {
+			if ( secondToken ) {
 
-				const paramsTokens = this.parseFunctionParametersFromTokens( tokens.slice( 2, tokens.length - 1 ) );
+				if ( secondToken.str === '(' ) {
 
-				return new FunctionCall( firstToken.str, paramsTokens );
+					// function call
+
+					const paramsTokens = this.parseFunctionParametersFromTokens( tokens.slice( 2, tokens.length - 1 ) );
+
+					return new FunctionCall( firstToken.str, paramsTokens );
+
+				} else if ( secondToken.str === '[' ) {
+
+					// array accessor
+
+					const elements = [];
+
+					let currentTokens = tokens.slice( 1 );
+
+					while ( currentTokens.length > 0 ) {
+
+						const token = currentTokens[ 0 ];
+
+						if ( token.str === '[' ) {
+
+							const accessorTokens = this.getTokensUntil( ']', currentTokens );
+
+							const element = this.parseExpressionFromTokens( accessorTokens.slice( 1, accessorTokens.length - 1 ) );
+
+							currentTokens = currentTokens.slice( accessorTokens.length );
+
+							elements.push( new DynamicElement( element ) );
+
+						} else if ( token.str === '.' ) {
+
+							const accessorTokens = currentTokens.slice( 1, 2 );
+
+							const element = this.parseExpressionFromTokens( accessorTokens );
+
+							currentTokens = currentTokens.slice( 2 );
+
+							elements.push( new StaticElement( element ) );
+
+						} else {
+
+							console.error( 'Unknown accessor expression', token );
+
+							break;
+
+						}
+
+					}
+
+					return new AccessorElements( firstToken.str, elements );
+
+				}
 
 			}
 
@@ -642,16 +699,15 @@ class GLSLDecoder {
 
 		}
 
+		let groupIndex = 0;
+
 		while ( this.index < this.tokens.length ) {
 
 			const token = this.getToken();
 
 			let statement = null;
 
-			let groupIndex = 0;
-
-			if ( token.isOperator && token.str === '{' ) groupIndex ++;
-			else if ( token.isOperator && token.str === '}' ) groupIndex --;
+			groupIndex += getGroupDelta( token.str );
 
 			if ( groupIndex < 0 ) {
 

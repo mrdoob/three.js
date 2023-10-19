@@ -817,11 +817,28 @@ class NodeBuilder {
 	flowShaderNode( shaderNode ) {
 
 		const layout = shaderNode.layout;
-		const inputs = {};
 
-		for ( const input of layout.inputs ) {
+		let inputs;
 
-			inputs[ input.name ] = new PropertyNode( input.type, input.name, false )
+		if ( shaderNode.isArrayInput ) {
+
+			inputs = [];
+
+			for ( const input of layout.inputs ) {
+
+				inputs.push( new PropertyNode( input.type, input.name, false ) );
+
+			}
+
+		} else {
+
+			inputs = {};
+
+			for ( const input of layout.inputs ) {
+
+				inputs[ input.name ] = new PropertyNode( input.type, input.name, false );
+
+			}
 
 		}
 

@@ -343,6 +343,7 @@
 		"webgpu_points_fat",
 		"webgpu_rtt",
 		"webgpu_sandbox",
+		"webgpu_shadertoy",
 		"webgpu_shadowmap",
 		"webgpu_skinning",
 		"webgpu_skinning_instancing",

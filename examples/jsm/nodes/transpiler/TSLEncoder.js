@@ -1,5 +1,5 @@
 import { REVISION } from 'three';
-import { getNodeElement } from 'three/nodes';
+import * as Nodes from 'three/nodes';
 
 const opLib = {
 	'=': 'assign',
@@ -45,6 +45,7 @@ class TSLEncoder {
 
 		this.tab = '';
 		this.imports = new Set();
+		this.functions = new Set();
 		this.layoutsCode = '';
 
 	}
@@ -53,7 +54,9 @@ class TSLEncoder {
 
 		// import only if it's a node
 
-		if ( getNodeElement( name ) !== undefined ) {
+		name = name.split( '.' )[ 0 ];
+
+		if ( Nodes[ name ] !== undefined ) {
 
 			this.imports.add( name );
 
@@ -65,9 +68,13 @@ class TSLEncoder {
 
 		let code;
 
-		if ( node.isAccessor || node.isNumber ) {
+		if ( node.isAccessor ) {
 
-			if ( node.isAccessor ) this.addImport( node.value.split( '.' )[ 0 ] );
+			this.addImport( node.property );
+
+			code = node.property;
+
+		} else if ( node.isNumber ) {
 
 			code = node.value;
 
@@ -106,11 +113,49 @@ class TSLEncoder {
 
 			this.addImport( node.name );
 
-			code = `${ node.name }( ${ params.join( ', ' ) } )`;
+			const paramsStr = params.length > 0 ? ' ' + params.join( ', ' ) + ' ' : '';
+
+			code = `${ node.name }(${ paramsStr })`;
 
 		} else if ( node.isReturn ) {
 
 			code = `return ${ this.emitExpression( node.value ) }`;
+
+		} else if ( node.isAccessorElements ) {
+
+			code = node.property;
+
+			for ( const element of node.elements ) {
+
+				if ( element.isStaticElement ) {
+
+					code += '.' + this.emitExpression( element.value );
+
+				} else if ( element.isDynamicElement ) {
+
+					const value = this.emitExpression( element.value );
+
+					if ( isPrimitive( value ) ) {
+
+						code += `[ ${ value } ]`;
+
+					} else {
+
+						code += `.element( ${ value } )`;
+
+					}
+
+				}
+
+			}
+
+		} else if ( node.isDynamicElement ) {
+
+			code = this.emitExpression( node.value );
+
+		} else if ( node.isStaticElement ) {
+
+			code = this.emitExpression( node.value );
 
 		} else if ( node.isFor ) {
 
@@ -118,7 +163,7 @@ class TSLEncoder {
 
 		} else if ( node.isVariableDeclaration ) {
 
-			code = this.emitVariableDeclaration( node );
+			code = this.emitVariables( node );
 
 		} else if ( node.isConditional ) {
 
@@ -306,7 +351,7 @@ ${ this.tab }} )`;
 
 	}
 
-	emitVariableDeclaration( node, isRoot = true ) {
+	emitVariables( node, isRoot = true ) {
 
 		const { name, type, value, next } = node;
 
@@ -317,17 +362,17 @@ ${ this.tab }} )`;
 
 		if ( value ) {
 
-			varStr += ` = ${ type }( ${ valueStr } )`;
+			varStr += ` = ${ type }( ${ valueStr } ).toVar()`;
 
 		} else {
 
-			varStr += ` = ${ type }()`;
+			varStr += ` = ${ type }().toVar()`;
 
 		}
 
 		if ( next ) {
 
-			varStr += ', ' + this.emitVariableDeclaration( next, false );
+			varStr += ', ' + this.emitVariables( next, false );
 
 		}
 
@@ -337,7 +382,7 @@ ${ this.tab }} )`;
 
 	}
 
-	emitFunctionDeclaration( node ) {
+	emitFunction( node ) {
 
 		const { name, type } = node;
 
@@ -359,22 +404,30 @@ ${ this.tab }} )`;
 
 		}
 
-		const paramsStr = params.length > 0 ? '{ ' + params.join( ', ' ) + ' }' : '';
+		const paramsStr = params.length > 0 ? ' [ ' + params.join( ', ' ) + ' ] ' : '';
 		const bodyStr = this.emitBody( node.body );
 
-		const funcStr = `const ${ name } = tslFn( ( ${ paramsStr } ) => {
+		const funcStr = `\nconst ${ name } = tslFn( (${ paramsStr }) => {
 
 ${ bodyStr }
 
-} );\n\n`;
+} );\n`;
 
-		this.layoutsCode += `${ name }.setLayout( {
+		const layoutInput = inputs.length > 0 ? '\n\t\t' + inputs.join( ',\n\t\t' ) + '\n\t' : '';
+
+		if ( node.layout !== false ) {
+
+			this.layoutsCode += `${ name }.setLayout( {
 	name: '${ name }',
 	type: '${ type }',
-	inputs: [\n\t\t${ inputs.join( ',\n\t\t' ) }\n\t]
+	inputs: [${ layoutInput }]
 } );\n\n`;
 
+		}
+
 		this.imports.add( 'tslFn' );
+
+		this.functions.add( node.name );
 
 		return funcStr;
 
@@ -388,7 +441,7 @@ ${ bodyStr }
 
 			if ( statement.isFunctionDeclaration ) {
 
-				code += this.emitFunctionDeclaration( statement );
+				code += this.emitFunction( statement );
 
 			} else {
 
@@ -399,13 +452,15 @@ ${ bodyStr }
 		}
 
 		const imports = [ ...this.imports ];
+		const functions = [ ...this.functions ];
 
 		const header = '// Three.js Transpiler r' + REVISION + '\n\n';
 		const importStr = imports.length > 0 ? 'import { ' + imports.join( ', ' ) + ' } from \'three/nodes\';\n\n' : '';
+		const functionsStr = functions.length > 0 ? '\nexport { ' + functions.join( ', ' ) + ' };\n' : '';
 
-		const layouts = this.layoutsCode.length > 0 ? '\n\n// layouts\n\n' + this.layoutsCode : '';
+		const layouts = this.layoutsCode.length > 0 ? '\n// layouts\n\n' + this.layoutsCode : '';
 
-		return header + importStr + code + layouts;
+		return header + importStr + code + functionsStr + layouts;
 
 	}
 

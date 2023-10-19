@@ -1,0 +1,206 @@
+<html lang="en">
+	<head>
+		<title>three.js - WebGPU - RTT</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - RTT
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
+				}
+			}
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentshader">
+			// from: https://www.shadertoy.com/view/Mt2SzR
+
+			float random(float x) {
+ 
+				return fract(sin(x) * 10000.);
+					  
+			}
+			
+			float noise(vec2 p) {
+			
+				return random(p.x + p.y * 10000.);
+						
+			}
+			
+			vec2 sw(vec2 p) { return vec2(floor(p.x), floor(p.y)); }
+			vec2 se(vec2 p) { return vec2(ceil(p.x), floor(p.y)); }
+			vec2 nw(vec2 p) { return vec2(floor(p.x), ceil(p.y)); }
+			vec2 ne(vec2 p) { return vec2(ceil(p.x), ceil(p.y)); }
+			
+			float smoothNoise(vec2 p) {
+			
+				vec2 interp = smoothstep(0., 1., fract(p));
+				float s = mix(noise(sw(p)), noise(se(p)), interp.x);
+				float n = mix(noise(nw(p)), noise(ne(p)), interp.x);
+				return mix(s, n, interp.y);
+					
+			}
+			
+			float fractalNoise(vec2 p) {
+			
+				float x = 0.;
+				x += smoothNoise(p      );
+				x += smoothNoise(p * 2. ) / 2.;
+				x += smoothNoise(p * 4. ) / 4.;
+				x += smoothNoise(p * 8. ) / 8.;
+				x += smoothNoise(p * 16.) / 16.;
+				x /= 1. + 1./2. + 1./4. + 1./8. + 1./16.;
+				return x;
+						
+			}
+			
+			float movingNoise(vec2 p) {
+			 
+				float x = fractalNoise(p + iTime);
+				float y = fractalNoise(p - iTime);
+				return fractalNoise(p + vec2(x, y));   
+				
+			}
+			
+			// call this for water noise function
+			float nestedNoise(vec2 p) {
+				
+				float x = movingNoise(p);
+				float y = movingNoise(p + 100.);
+				return movingNoise(p + vec2(x, y));
+				
+			}
+
+			void mainImage( out vec4 fragColor, in vec2 fragCoord )
+			{
+				vec2 uv = fragCoord.xy / iResolution.xy;
+				float n = nestedNoise(uv * 6.);
+				
+				fragColor = vec4(mix(vec3(.4, .6, 1.), vec3(.1, .2, 1.), n), 1.);
+			}
+
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { Node, MeshBasicNodeMaterial } from 'three/nodes';
+
+			import Transpiler from './jsm/nodes/transpiler/Transpiler.js';
+			import ShaderToyDecoder from './jsm/nodes/transpiler/ShaderToyDecoder.js';
+			import TSLEncoder from './jsm/nodes/transpiler/TSLEncoder.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
+
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+
+			class ShaderToyNode extends Node {
+
+				constructor() {
+
+					super( 'vec4' );
+
+					this.mainImage = null;
+
+				}
+
+				async parse( glsl ) {
+
+					const jsCode = new Transpiler( new ShaderToyDecoder(), new TSLEncoder() ).parse( glsl );
+
+					const { mainImage } = await import( `data:text/javascript,${ encodeURIComponent( jsCode ) }` );
+
+					this.mainImage = mainImage;
+
+				}
+
+				setup( builder ) {
+
+					if ( this.mainImage === null ) {
+
+						throw new Error( 'ShaderToyNode: .parse() must be called first.' );
+
+					}
+
+					return this.mainImage();
+
+				}
+
+
+			}
+
+			let renderer, camera, scene;
+			const dpr = window.devicePixelRatio;
+
+			await init();
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU or WebGL2 support' );
+
+				}
+
+				//
+
+				const glslCode = document.getElementById( 'fragmentshader' ).textContent;
+
+				const shaderToyNode = new ShaderToyNode();
+				await shaderToyNode.parse( glslCode );
+
+				//
+
+				camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+				scene = new THREE.Scene();
+
+				const geometry = new THREE.PlaneGeometry( 2, 2 );
+
+				const material = new MeshBasicNodeMaterial();
+				material.colorNode = shaderToyNode;
+
+				const quad = new THREE.Mesh( geometry, material );
+				scene.add( quad );
+
+				//
+
+				renderer = new WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( dpr );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

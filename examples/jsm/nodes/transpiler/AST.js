@@ -149,11 +149,48 @@ export class Return {
 
 export class Accessor {
 
+	constructor( property ) {
+
+		this.property = property;
+
+		this.isAccessor = true;
+
+	}
+
+}
+
+export class StaticElement {
+
 	constructor( value ) {
 
 		this.value = value;
 
-		this.isAccessor = true;
+		this.isStaticElement = true;
+
+	}
+
+}
+
+export class DynamicElement {
+
+	constructor( value ) {
+
+		this.value = value;
+
+		this.isDynamicElement = true;
+
+	}
+
+}
+
+export class AccessorElements {
+
+	constructor( property, elements = [] ) {
+
+		this.property = property;
+		this.elements = elements;
+
+		this.isAccessorElements = true;
 
 	}
 
