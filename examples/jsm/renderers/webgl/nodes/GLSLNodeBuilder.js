@@ -116,11 +116,15 @@ ${ flowData.code }
 
 		const vars = this.vars[ shaderStage ];
 
-		for ( const variable of vars ) {
+		if ( vars !== undefined ) {
 
-			if ( variable.isOutputStructVar ) continue;
+			for ( const variable of vars ) {
 
-			snippets.push( `${ this.getVar( variable.type, variable.name ) };` );
+				if ( variable.isOutputStructVar ) continue;
+
+				snippets.push( `${ this.getVar( variable.type, variable.name ) };` );
+
+			}
 
 		}
 
