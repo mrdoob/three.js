@@ -26,7 +26,7 @@ const lineRegExp = /^\n+/;
 const commentRegExp = /^\/\*[\s\S]*?\*\//;
 const inlineCommentRegExp = /^\/\/.*?(\n|$)/;
 
-const numberRegExp = /^((\.\d)|\d)((\w|-)*)(\.)?((\w|-)*)/;
+const numberRegExp = /^((\.\d)|\d)((\w|e-?)*)(\.)?((\w|e-?)*)/;
 const stringDoubleRegExp = /^(\"((?:[^"\\]|\\.)*)\")/;
 const stringSingleRegExp = /^(\'((?:[^'\\]|\\.)*)\')/;
 const literalRegExp = /^[A-Za-z](\w|\.)*/;
@@ -272,12 +272,47 @@ class GLSLDecoder {
 
 	parseExpressionFromTokens( tokens ) {
 
+		if ( tokens.length === 0 ) return null;
+
 		const firstToken = tokens[ 0 ];
 		const lastToken = tokens[ tokens.length - 1 ];
 
-		if ( firstToken.isOperator ) {
+		// precedence operators
 
-			// unary operators (before)
+		let groupIndex = 0;
+
+		for ( const operator of precedenceOperators ) {
+
+			for ( let i = 0; i < tokens.length; i ++ ) {
+
+				const token = tokens[ i ];
+
+				groupIndex += getGroupDelta( token.str );
+
+				if ( ! token.isOperator || i === 0 || i === tokens.length - 1 ) continue;
+
+				if ( groupIndex === 0 && token.str === operator ) {
+
+					const left = this.parseExpressionFromTokens( tokens.slice( 0, i ) );
+					const right = this.parseExpressionFromTokens( tokens.slice( i + 1, tokens.length ) );
+
+					return new Operator( operator, left, right );
+
+				}
+
+				if ( groupIndex < 0 ) {
+
+					return this.parseExpressionFromTokens( tokens.slice( 0, i ) );
+
+				}
+
+			}
+
+		}
+
+		// unary operators (before)
+
+		if ( firstToken.isOperator ) {
 
 			for ( const operator of unaryOperators ) {
 
@@ -293,37 +328,6 @@ class GLSLDecoder {
 
 		}
 
-		// precedence operators
-
-		let groupIndex = 0;
-
-		for ( const operator of precedenceOperators ) {
-
-			for ( let i = 0; i < tokens.length; i ++ ) {
-
-				const token = tokens[ i ];
-				if ( ! token.isOperator ) continue;
-
-				if ( groupIndex === 0 && token.str === operator ) {
-
-					const left = this.parseExpressionFromTokens( tokens.slice( 0, i ) );
-					const right = this.parseExpressionFromTokens( tokens.slice( i + 1, tokens.length ) );
-
-					return new Operator( operator, left, right );
-
-				}
-
-				groupIndex += getGroupDelta( token.str );
-
-				if ( groupIndex < 0 ) {
-
-					return this.parseExpressionFromTokens( tokens.slice( 0, i ) );
-
-				}
-
-			}
-
-		}
 
 		// unary operators (after)
 
@@ -539,6 +543,9 @@ class GLSLDecoder {
 	parseVariablesFromToken( tokens, type ) {
 
 		let index = 0;
+		const isConst = tokens[ 0 ].str === 'const';
+
+		if ( isConst ) index ++;
 
 		type = type || tokens[ index ++ ].str;
 		const name = tokens[ index ++ ].str;
@@ -571,7 +578,7 @@ class GLSLDecoder {
 
 		}
 
-		const variable = new VariableDeclaration( type, name, init, next );
+		const variable = new VariableDeclaration( type, name, init, next, isConst );
 
 		return variable;
 
@@ -730,7 +737,11 @@ class GLSLDecoder {
 
 			if ( token.isLiteral ) {
 
-				if ( isType( token.str ) ) {
+				if ( token.str === 'const' ) {
+
+					statement = this.parseVariables();
+
+				} else if ( isType( token.str ) ) {
 
 					if ( this.getToken( 2 ).str === '(' ) {
 

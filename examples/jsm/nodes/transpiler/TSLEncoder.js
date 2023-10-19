@@ -61,7 +61,7 @@ class TSLEncoder {
 
 		name = name.split( '.' )[ 0 ];
 
-		if ( Nodes[ name ] !== undefined ) {
+		if ( Nodes[ name ] !== undefined && this.functions.has( name ) === false ) {
 
 			this.imports.add( name );
 
@@ -81,17 +81,7 @@ class TSLEncoder {
 
 		} else if ( node.isNumber ) {
 
-			if ( node.type === 'int' || node.type === 'uint' ) {
-
-				this.addImport( node.type );
-
-				code = node.type + '( ' + node.value + ' )';
-
-			} else {
-
-				code = node.value;
-
-			}
+			code = node.value;
 
 		} else if ( node.isOperator ) {
 
@@ -116,6 +106,8 @@ class TSLEncoder {
 
 			}
 
+			this.addImport( opFn );
+
 		} else if ( node.isFunctionCall ) {
 
 			const params = [];
@@ -134,7 +126,13 @@ class TSLEncoder {
 
 		} else if ( node.isReturn ) {
 
-			code = `return ${ this.emitExpression( node.value ) }`;
+			code = 'return';
+
+			if ( node.value ) {
+
+				code += ' ' + this.emitExpression( node.value );
+
+			}
 
 		} else if ( node.isAccessorElements ) {
 
@@ -191,6 +189,8 @@ class TSLEncoder {
 		} else if ( node.isUnary ) {
 
 			let type = unaryLib[ node.type ];
+
+			this.addImport( type );
 
 			if ( node.after === false && ( node.type === '++' || node.type === '--' ) ) {
 
@@ -377,11 +377,25 @@ ${ this.tab }} )`;
 
 		if ( value ) {
 
-			varStr += ` = ${ type }( ${ valueStr } ).toVar()`;
+			if ( value.isFunctionCall && value.name === type ) {
+
+				varStr += ' = ' + valueStr;
+
+			} else {
+
+				varStr += ` = ${ type }( ${ valueStr } )`;
+
+			}
 
 		} else {
 
-			varStr += ` = ${ type }().toVar()`;
+			varStr += ` = ${ type }()`;
+
+		}
+
+		if ( node.isConst === false ) {
+
+			varStr += '.toVar()';
 
 		}
 

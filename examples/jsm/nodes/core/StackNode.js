@@ -29,7 +29,7 @@ class StackNode extends Node {
 
 	add( node ) {
 
-		this.nodes.push( bypass( expression(), node ) );
+		this.nodes.push( node );
 
 		return this;
 

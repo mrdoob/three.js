@@ -1148,7 +1148,15 @@ class NodeBuilder {
 
 		if ( toTypeLength === 4 ) { // toType is vec4-like
 
-			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, 'vec3' ) }, 1.0 )`;
+			if ( fromTypeLength === 1 ) { // fromType is float-like
+
+				return `${ this.getType( toType ) }( ${ snippet } )`;
+
+			} else {
+
+				return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, 'vec3' ) }, 1.0 )`;
+
+			}
 
 		}
 

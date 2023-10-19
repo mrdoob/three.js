@@ -78,6 +78,7 @@ vec3 desaturate( vec3 color ) {
 	float e = 0.001e2;
 	float f = 0.001e-2;
 	mx_select(h<4u, y, mx_select((h==12u)||(h==14u), x, z));
+	const mat3 rot1 = mat3(-0.37, 0.36, 0.85,-0.14,-0.93, 0.34,0.92, 0.01, 0.4);
 
 	if ( a > 1 ) {
 

@@ -1,5 +1,6 @@
 import Node, { addNodeClass } from './Node.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import { getCurrentStack } from '../shadernode/ShaderNode.js';
 
 class VarNode extends Node {
 
@@ -52,7 +53,15 @@ export default VarNode;
 
 export const temp = nodeProxy( VarNode );
 
+function toVar( node ) {
+
+	node = temp( node );
+	if ( getCurrentStack() ) getCurrentStack().add( node );
+	return node;
+
+}
+
 addNodeElement( 'temp', temp ); // @TODO: Will be removed in the future
-addNodeElement( 'toVar', temp );
+addNodeElement( 'toVar', toVar );
 
 addNodeClass( 'VarNode', VarNode );

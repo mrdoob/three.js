@@ -3,8 +3,8 @@ import GLSLDecoder from './GLSLDecoder.js';
 
 const keywords = [
 	{ name: 'iTime', polyfill: 'float iTime = timerLocal();' },
-	{ name: 'iResolution', polyfill: 'vec3 iResolution = viewportResolution;' },
-	{ name: 'fragCoord', polyfill: 'vec2 fragCoord = viewportCoordinate.setY( viewportCoordinate.y.oneMinus() ).toVar();' }
+	{ name: 'iResolution', polyfill: 'vec2 iResolution = viewportResolution;' },
+	{ name: 'fragCoord', polyfill: 'vec2 fragCoord = vec2( viewportCoordinate.x, viewportCoordinate.y.oneMinus() );' }
 ];
 
 class ShaderToyDecoder extends GLSLDecoder {
@@ -25,8 +25,20 @@ class ShaderToyDecoder extends GLSLDecoder {
 			node.type = 'vec4';
 			node.layout = false; // for now
 
+			const fragColor = new Accessor( 'fragColor' );
+
+			for ( const subNode of node.body ) {
+
+				if ( subNode.isReturn ) {
+
+					subNode.value = fragColor;
+
+				}
+
+			}
+
 			node.body.unshift( new VariableDeclaration( 'vec4', 'fragColor' ) );
-			node.body.push( new Return( new Accessor( 'fragColor' ) ) );
+			node.body.push( new Return( fragColor ) );
 
 		}
 
