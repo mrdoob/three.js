@@ -130,7 +130,7 @@ function MenubarEdit( editor ) {
 
 	} );
 	options.add( option );
-
+	
 	// Delete
 
 	option = new UIRow();
@@ -148,10 +148,89 @@ function MenubarEdit( editor ) {
 
 	} );
 	options.add( option );
-
+	
 	//
 
 	options.add( new UIHorizontalRule() );
+	
+	// Skin
+
+	option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/edit/skin' ) );
+	option.onClick( function () {
+
+		let object = editor.selected;
+
+		if ( object === null || object.parent === null || !object.isMesh ) return; // avoid cloning the camera or scene
+		
+		var i=0;
+		var bones = [];
+    object.traverse( function( o ) {
+      if ( o.isBone ) {
+        bones[i] = o;
+        i++;
+      }
+    } );
+		const skeleton = new THREE.Skeleton( bones );
+		
+		const positions = object.geometry.attributes.position;
+    const vertex = new THREE.Vector3();
+    const center = new THREE.Vector3();
+        
+    const skinIndices = [];
+    const skinWeights = [];
+        
+    for ( let i = 0; i < positions.count; i ++ ) {
+        
+      vertex.fromBufferAttribute( positions, i );
+      var d = 0;
+      var dist = 0;
+      var indx = [];
+      indx[0] = 0; indx[1] = 0; indx[2] = 0; indx[3] = 0;
+        					
+      for (var j=0; j<skeleton.bones.length; j++) {
+        					  
+        skeleton.bones[ j ].getWorldPosition( center );
+        					  
+        d = Math.abs( center.distanceTo( vertex ) );
+        if ( j == 0 || d < dist ) {
+        					    
+          dist = d;
+        	if ( skeleton.bones[ j ].children.length == 0 ) {
+        		for (var k=0; k<4; k++) {
+        			indx[k] = j;
+        		}
+        		skeleton.bones[ j ].name = 'Endsite';
+        	} else {
+        		indx[0] = j;
+        		for (var k=1; k<4; k++) {
+        			for (var l=0; l<skeleton.bones.length; l++) {
+        				if ( skeleton.bones[ indx[k-1] ].parent && skeleton.bones[ indx[k-1] ].parent == skeleton.bones[ l ] ) {
+          				indx[k] = l;
+          			}
+        			}
+      			}
+    			}
+        					    
+    		}
+      }
+      skinIndices.push( indx[0], indx[1], indx[2], indx[3] );
+      skinWeights.push( 0.4, 0.3, 0.2, 0.1 ); //have to add up to 1
+    }
+    object.geometry.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+    object.geometry.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+
+		const mesh = new THREE.SkinnedMesh( object.geometry, object.material );
+		mesh.name = 'SkinnedMesh';
+		mesh.add( bones[ 0 ] );
+		mesh.bind( skeleton );
+
+		editor.execute( new AddObjectCommand( editor, mesh ) );
+
+	} );
+	options.add( option );
+
 
 	// Set textures to sRGB. See #15903
 
