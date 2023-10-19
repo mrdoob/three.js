@@ -279,7 +279,10 @@ ${ flowData.code }
 
 			for ( const varying of varyings ) {
 
-				snippet += `${varying.needsInterpolation ? 'out' : '/*out*/'} ${varying.type} ${varying.name};\n`;
+				const type = varying.type;
+				const flat = type === 'int' || type === 'uint' ? 'flat ' : '';
+
+				snippet += `${flat}${varying.needsInterpolation ? 'out' : '/*out*/'} ${type} ${varying.name};\n`;
 
 			}
 
@@ -289,7 +292,10 @@ ${ flowData.code }
 
 				if ( varying.needsInterpolation ) {
 
-					snippet += `in ${varying.type} ${varying.name};\n`;
+					const type = varying.type;
+					const flat = type === 'int' || type === 'uint' ? 'flat ' : '';
+
+					snippet += `${flat}in ${type} ${varying.name};\n`;
 
 				}
 
