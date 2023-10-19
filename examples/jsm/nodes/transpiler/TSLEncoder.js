@@ -312,8 +312,8 @@ ${ this.tab }} )`;
 		if ( ( initialization && initialization.isVariableDeclaration && initialization.next === null ) &&
 			( condition && condition.type === '<' && condition.left.isAccessor ) &&
 			( afterthought && afterthought.type === '++' ) &&
-			( initialization.name === condition.left.value ) &&
-			( initialization.name === afterthought.expression.value )
+			( initialization.name === condition.left.property ) &&
+			( initialization.name === afterthought.expression.property )
 		) {
 
 			return this.emitLoop( node );
