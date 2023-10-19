@@ -72,6 +72,9 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.ACESFilmicToneMapping, 4, 'ACESFilmicToneMapping is equal to 4' );
 		assert.equal( Constants.CustomToneMapping, 5, 'CustomToneMapping is equal to 5' );
 
+		assert.equal( Constants.AttachedBindMode, 'attached', 'AttachedBindMode is equal to attached' );
+		assert.equal( Constants.DetachedBindMode, 'detached', 'DetachedBindMode is equal to detached' );
+
 		assert.equal( Constants.UVMapping, 300, 'UVMapping is equal to 300' );
 		assert.equal( Constants.CubeReflectionMapping, 301, 'CubeReflectionMapping is equal to 301' );
 		assert.equal( Constants.CubeRefractionMapping, 302, 'CubeRefractionMapping is equal to 302' );
