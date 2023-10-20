@@ -263,7 +263,7 @@ ${ flowData.code }
 
 		if ( structs.length === 0 ) {
 
-			return "layout( location = 0 ) out vec4 fragColor;\n";
+			return 'layout( location = 0 ) out vec4 fragColor;\n';
 
 		}
 
@@ -271,7 +271,7 @@ ${ flowData.code }
 
 			const struct = structs[ index ];
 
-			let snippet = `\n`;
+			let snippet = '\n';
 			snippet += this.getStructMembers( struct );
 			snippet += '\n';
 
