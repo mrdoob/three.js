@@ -241,7 +241,7 @@ class TSLEncoder {
 		for ( const statement of body ) {
 
 			code += this.emitExtraLine( statement );
-			code += this.tab + this.emitExpression( statement ) 
+			code += this.tab + this.emitExpression( statement );
 
 			if ( code.slice( - 1 ) !== '}' ) code += ';';
 
