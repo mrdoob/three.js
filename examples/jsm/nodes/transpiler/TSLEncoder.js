@@ -569,9 +569,9 @@ ${ this.tab }} );\n\n`;
 
 		if ( this.iife ) {
 
-			header += '( function ( Nodes ) {\n\n';
+			header += '( function ( TSL ) {\n\n';
 
-			header += imports.length > 0 ? '\tconst { ' + imports.join( ', ' ) + ' } = Nodes;\n' : '';
+			header += imports.length > 0 ? '\tconst { ' + imports.join( ', ' ) + ' } = TSL;\n' : '';
 			footer += functions.length > 0 ? '\treturn { ' + functions.join( ', ' ) + ' };\n' : '';
 
 			footer += '\n} );';
