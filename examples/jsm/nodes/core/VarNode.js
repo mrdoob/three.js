@@ -1,6 +1,5 @@
 import Node, { addNodeClass } from './Node.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
-import { getCurrentStack } from '../shadernode/ShaderNode.js';
 
 class VarNode extends Node {
 
