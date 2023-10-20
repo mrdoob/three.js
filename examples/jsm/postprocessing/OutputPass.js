@@ -24,6 +24,7 @@ class OutputPass extends Pass {
 		this.uniforms = UniformsUtils.clone( shader.uniforms );
 
 		this.material = new RawShaderMaterial( {
+			name: 'OutputShader',
 			uniforms: this.uniforms,
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader

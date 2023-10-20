@@ -12,6 +12,8 @@ import {
 
 const FXAAShader = {
 
+	name: 'FXAAShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null },
