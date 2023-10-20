@@ -81,9 +81,7 @@ class ViewportNode extends Node {
 			let outX = output.x;
 			let outY = output.y;
 
-			if ( /top/i.test( scope ) && builder.isFlipY() ) outY = outY.oneMinus();
-			else if ( /bottom/i.test( scope ) && builder.isFlipY() === false ) outY = outY.oneMinus();
-
+			if ( /bottom/i.test( scope ) ) outY = outY.oneMinus();
 			if ( /right/i.test( scope ) ) outX = outX.oneMinus();
 
 			output = vec2( outX, outY );
@@ -98,7 +96,19 @@ class ViewportNode extends Node {
 
 		if ( this.scope === ViewportNode.COORDINATE ) {
 
-			return builder.getFragCoord();
+			let coord = builder.getFragCoord();
+
+			if ( builder.isFlipY() ) {
+
+				// follow webgpu standards
+
+				const resolution = viewportResolution.build( builder );
+
+				coord = `${ builder.getType( 'vec2' ) }( ${ coord }.x, ${ resolution}.y - ${ coord }.y )`;
+
+			}
+
+			return coord;
 
 		}
 
