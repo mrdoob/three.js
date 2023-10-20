@@ -365,7 +365,6 @@ ${ this.tab }} )`;
 		if ( ( initialization && initialization.isVariableDeclaration && initialization.next === null ) &&
 			( condition && condition.left.isAccessor && condition.left.property === initialization.name ) &&
 			( afterthought && afterthought.isUnary ) &&
-			( initialization.name === condition.left.property ) &&
 			( initialization.name === afterthought.expression.property )
 		) {
 
