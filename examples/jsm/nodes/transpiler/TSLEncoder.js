@@ -54,6 +54,7 @@ class TSLEncoder {
 		this.functions = new Set();
 		this.layoutsCode = '';
 		this.iife = false;
+		this.uniqueNames = true;
 
 		this._currentProperties = {};
 		this._lastStatment = null;
@@ -512,8 +513,10 @@ ${ this.tab }} );\n`;
 
 		if ( node.layout !== false && hasPointer === false ) {
 
+			const uniqueName = this.uniqueNames ? name + '_' + Math.random().toString( 36 ).slice( 2 ) : name;
+
 			this.layoutsCode += `${ this.tab + name }.setLayout( {
-${ this.tab }\tname: '${ name }',
+${ this.tab }\tname: '${ uniqueName }',
 ${ this.tab }\ttype: '${ type }',
 ${ this.tab }\tinputs: [${ layoutInput }]
 ${ this.tab }} );\n\n`;
