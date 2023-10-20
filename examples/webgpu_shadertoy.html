@@ -23,7 +23,7 @@
 		</script>
 
 		<script type="x-shader/x-fragment" id="fragmentshader">
-			// from: https://www.shadertoy.com/view/Mt2SzR
+			// https://www.shadertoy.com/view/Mt2SzR
 
 			float random(float x) {
  
@@ -85,7 +85,7 @@
 			{
 				vec2 uv = fragCoord.xy / iResolution.xy;
 				float n = nestedNoise(uv * 6.);
-				
+
 				fragColor = vec4(mix(vec3(.4, .6, 1.), vec3(.1, .2, 1.), n), 1.);
 			}
 

@@ -55,6 +55,7 @@ class TSLEncoder {
 		this.layoutsCode = '';
 		this.iife = false;
 
+		this._currentProperties = {};
 		this._lastStatment = null;
 
 	}
@@ -65,7 +66,7 @@ class TSLEncoder {
 
 		name = name.split( '.' )[ 0 ];
 
-		if ( Nodes[ name ] !== undefined && this.functions.has( name ) === false ) {
+		if ( Nodes[ name ] !== undefined && this.functions.has( name ) === false && this._currentProperties[ name ] === undefined ) {
 
 			this.imports.add( name );
 
@@ -114,13 +115,13 @@ class TSLEncoder {
 
 				code = opFn + '( ' + left + ', ' + right + ' )';
 
+				this.addImport( opFn );
+
 			} else {
 
 				code = left + '.' + opFn + '( ' + right + ' )';
 
 			}
-
-			this.addImport( opFn );
 
 		} else if ( node.isFunctionCall ) {
 
@@ -208,15 +209,25 @@ class TSLEncoder {
 
 			let type = unaryLib[ node.type ];
 
-			this.addImport( type );
-
 			if ( node.after === false && ( node.type === '++' || node.type === '--' ) ) {
 
 				type += 'Before';
 
 			}
 
-			code = type + '( ' + this.emitExpression( node.expression ) + ' )';
+			const exp = this.emitExpression( node.expression );
+
+			if ( isPrimitive( exp ) ) {
+
+				this.addImport( type );
+
+				code = type + '( ' + exp + ' )';
+
+			} else {
+
+				code = exp + '.' + type + '()';
+
+			}
 
 		} else {
 
@@ -442,6 +453,8 @@ ${ this.tab }} )`;
 
 		const { name, type } = node;
 
+		this._currentProperties = { name: node };
+
 		const params = [];
 		const inputs = [];
 		const mutableParams = [];
@@ -454,7 +467,7 @@ ${ this.tab }} )`;
 
 			let name = param.name;
 
-			if ( param.immutable === false ) {
+			if ( param.immutable === false && ( param.qualifier !== 'inout' && param.qualifier !== 'out' ) ) {
 
 				name = name + '_immutable';
 
@@ -476,6 +489,8 @@ ${ this.tab }} )`;
 
 			inputs.push( str + ' }' );
 			params.push( name );
+
+			this._currentProperties[ name ] = param;
 
 		}
 
@@ -524,6 +539,8 @@ ${ this.tab }} );\n\n`;
 
 		const last = this._lastStatment;
 		if ( last === null ) return '';
+
+		if ( statement.isReturn ) return '\n';
 
 		const isExpression = ( st ) => st.isFunctionDeclaration !== true && st.isFor !== true && st.isConditional !== true;
 		const lastExp = isExpression( last );
