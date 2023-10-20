@@ -9,6 +9,8 @@
 
 const VerticalTiltShiftShader = {
 
+	name: 'VerticalTiltShiftShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null },

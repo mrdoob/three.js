@@ -1,5 +1,6 @@
 import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial, FunctionNode } from '../../../nodes/Nodes.js';
 
+import UniformBuffer from '../../common/UniformBuffer.js';
 import UniformsGroup from '../../common/UniformsGroup.js';
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
@@ -160,6 +161,15 @@ ${ flowData.code }
 
 				snippet = `samplerCube ${uniform.name};`;
 
+			} else if ( uniform.type === 'buffer' ) {
+
+				const bufferNode = uniform.node;
+				const bufferType = this.getType( bufferNode.bufferType );
+				const bufferCount = bufferNode.bufferCount;
+
+				const bufferCountSnippet = bufferCount > 0 ? bufferCount : '';
+				snippet = `${bufferNode.name} {\n\t${bufferType} ${uniform.name}[${bufferCountSnippet}];\n};\n`;
+
 			} else {
 
 				const vectorType = this.getVectorType( uniform.type );
@@ -283,7 +293,10 @@ ${ flowData.code }
 
 			for ( const varying of varyings ) {
 
-				snippet += `${varying.needsInterpolation ? 'out' : '/*out*/'} ${varying.type} ${varying.name};\n`;
+				const type = varying.type;
+				const flat = type === 'int' || type === 'uint' ? 'flat ' : '';
+
+				snippet += `${flat}${varying.needsInterpolation ? 'out' : '/*out*/'} ${type} ${varying.name};\n`;
 
 			}
 
@@ -293,7 +306,10 @@ ${ flowData.code }
 
 				if ( varying.needsInterpolation ) {
 
-					snippet += `in ${varying.type} ${varying.name};\n`;
+					const type = varying.type;
+					const flat = type === 'int' || type === 'uint' ? 'flat ' : '';
+
+					snippet += `${flat}in ${type} ${varying.name};\n`;
 
 				}
 
@@ -520,6 +536,18 @@ void main() {
 				uniformGPU = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node );
 
 				this.bindings[ shaderStage ].push( uniformGPU );
+
+			} else if ( type === 'buffer' ) {
+
+				node.name = `NodeBuffer_${node.id}`;
+
+				const buffer = new UniformBuffer( node.name, node.value );
+
+				uniformNode.name = `buffer${node.id}`;
+
+				this.bindings[ shaderStage ].push( buffer );
+
+				uniformGPU = buffer;
 
 			} else {
 

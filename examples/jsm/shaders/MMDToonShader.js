@@ -71,6 +71,8 @@ const mmd_toon_matcap_fragment = /* glsl */`
 
 const MMDToonShader = {
 
+	name: 'MMDToonShader',
+
 	defines: {
 		TOON: true,
 		MATCAP: true,

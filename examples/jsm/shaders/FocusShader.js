@@ -6,6 +6,8 @@
 
 const FocusShader = {
 
+	name: 'FocusShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null },

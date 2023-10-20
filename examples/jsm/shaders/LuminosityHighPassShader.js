@@ -9,6 +9,8 @@ import {
 
 const LuminosityHighPassShader = {
 
+	name: 'LuminosityHighPassShader',
+
 	shaderID: 'luminosityHighPass',
 
 	uniforms: {

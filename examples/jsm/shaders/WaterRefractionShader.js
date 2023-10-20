@@ -1,5 +1,7 @@
 const WaterRefractionShader = {
 
+	name: 'WaterRefractionShader',
+
 	uniforms: {
 
 		'color': {

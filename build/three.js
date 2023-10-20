@@ -16169,6 +16169,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
 	const _clearColor = /*@__PURE__*/ new Color();
 	let _oldTarget = null;
+	let _oldActiveCubeFace = 0;
+	let _oldActiveMipmapLevel = 0;
 
 	// Golden Ratio
 	const PHI = ( 1 + Math.sqrt( 5 ) ) / 2;
@@ -16234,6 +16236,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		fromScene( scene, sigma = 0, near = 0.1, far = 100 ) {
 
 			_oldTarget = this._renderer.getRenderTarget();
+			_oldActiveCubeFace = this._renderer.getActiveCubeFace();
+			_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
 
 			this._setSize( 256 );
 
@@ -16346,7 +16350,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		_cleanup( outputTarget ) {
 
-			this._renderer.setRenderTarget( _oldTarget );
+			this._renderer.setRenderTarget( _oldTarget, _oldActiveCubeFace, _oldActiveMipmapLevel );
 			outputTarget.scissorTest = false;
 			_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
 
@@ -16365,6 +16369,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			}
 
 			_oldTarget = this._renderer.getRenderTarget();
+			_oldActiveCubeFace = this._renderer.getActiveCubeFace();
+			_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
 
 			const cubeUVRenderTarget = renderTarget || this._allocateTargets();
 			this._textureToCubeUV( texture, cubeUVRenderTarget );
