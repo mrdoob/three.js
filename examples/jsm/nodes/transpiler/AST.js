@@ -29,11 +29,12 @@ export class VariableDeclaration {
 
 export class FunctionParameter {
 
-	constructor( type, name, qualifier = null ) {
+	constructor( type, name, qualifier = null, immutable = true ) {
 
 		this.type = type;
 		this.name = name;
 		this.qualifier = qualifier;
+		this.immutable = immutable;
 
 		this.isFunctionParameter = true;
 

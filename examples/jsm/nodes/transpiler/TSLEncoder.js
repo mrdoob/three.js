@@ -1,4 +1,5 @@
 import { REVISION } from 'three';
+import { VariableDeclaration, Accessor } from './AST.js';
 import * as Nodes from 'three/nodes';
 
 const opLib = {
@@ -451,12 +452,23 @@ ${ this.tab }} )`;
 
 		const params = [];
 		const inputs = [];
+		const mutableParams = [];
 
 		let hasPointer = false;
 
 		for ( const param of node.params ) {
 
 			let str = `{ name: '${ param.name }', type: '${ param.type }'`;
+
+			let name = param.name;
+
+			if ( param.immutable === false ) {
+
+				name = name + '_immutable';
+
+				mutableParams.push( param );
+
+			}
 
 			if ( param.qualifier ) {
 
@@ -471,7 +483,13 @@ ${ this.tab }} )`;
 			}
 
 			inputs.push( str + ' }' );
-			params.push( param.name );
+			params.push( name );
+
+		}
+
+		for ( const param of mutableParams ) {
+
+			node.body.unshift( new VariableDeclaration( param.type, param.name, new Accessor( param.name + '_immutable' ) ) );
 
 		}
 

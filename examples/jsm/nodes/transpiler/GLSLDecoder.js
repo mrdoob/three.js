@@ -216,6 +216,8 @@ class GLSLDecoder {
 		this.tokenizer = null;
 		this.keywords = [];
 
+		this._currentFunction = null;
+
 		this.addKeyword( 'gl_FragCoord', 'vec2 gl_FragCoord = vec2( viewportCoordinate.x, viewportCoordinate.y.oneMinus() );' );
 
 	}
@@ -322,7 +324,7 @@ class GLSLDecoder {
 						const left = this.parseExpressionFromTokens( tokens.slice( 0, i ) );
 						const right = this.parseExpressionFromTokens( tokens.slice( i + 1, tokens.length ) );
 
-						return new Operator( operator, left, right );
+						return this._evalOperator( new Operator( operator, left, right ) );
 
 					}
 
@@ -390,7 +392,7 @@ class GLSLDecoder {
 				const rightTokens = tokens.slice( leftTokens.length + 1 );
 				const right = this.parseExpressionFromTokens( rightTokens );
 
-				return new Operator( operator.str, left, right );
+				return this._evalOperator( new Operator( operator.str, left, right ) );
 
 			}
 
@@ -562,7 +564,11 @@ class GLSLDecoder {
 
 		const func = new FunctionDeclaration( type, name, params );
 
+		this._currentFunction = func;
+
 		this.parseBlock( func );
+
+		this._currentFunction = null;
 
 		return func;
 
@@ -808,6 +814,44 @@ class GLSLDecoder {
 			} else {
 
 				this.index ++;
+
+			}
+
+		}
+
+	}
+
+	_evalOperator( operator ) {
+
+		if ( operator.type.includes( '=' ) ) {
+
+			const parameter = this._getFunctionParameter( operator.left.property )
+
+			if ( parameter !== undefined ) {
+
+				// Parameters are immutable in WGSL
+
+				parameter.immutable = false;
+
+			}
+
+		}
+
+		return operator;
+
+	}
+
+	_getFunctionParameter( name ) {
+
+		if ( this._currentFunction ) {
+
+			for ( const param of this._currentFunction.params ) {
+
+				if ( param.name === name ) {
+
+					return param;
+
+				}
 
 			}
 
