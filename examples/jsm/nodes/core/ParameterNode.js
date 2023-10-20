@@ -1,9 +1,6 @@
 import { addNodeClass } from './Node.js';
-import { nodeObject, getCurrentStack } from '../shadernode/ShaderNode.js';
-import PropertyNode, { property } from './PropertyNode.js';
-import { temp } from './VarNode.js';
-import { assign, expression } from '../Nodes.js';
-
+import { nodeObject } from '../shadernode/ShaderNode.js';
+import PropertyNode from './PropertyNode.js';
 
 class ParameterNode extends PropertyNode {
 
