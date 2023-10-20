@@ -53,6 +53,9 @@ class TSLEncoder {
 		this.imports = new Set();
 		this.functions = new Set();
 		this.layoutsCode = '';
+		this.iife = false;
+
+		this._lastStatment = null;
 
 	}
 
@@ -229,41 +232,26 @@ class TSLEncoder {
 
 	emitBody( body ) {
 
-		const lines = [];
+		this.setLastStatement( null );
+
+		let code = '';
 
 		this.tab += '\t';
 
 		for ( const statement of body ) {
 
-			let code = this.emitExpression( statement );
+			code += this.emitExtraLine( statement );
+			code += this.tab + this.emitExpression( statement ) + ';\n';
 
-			if ( statement.isConditional ) {
-
-				code = '\n' + this.tab + code + ';';
-
-				if ( statement !== body[ body.length - 1 ] ) {
-
-					code += '\n';
-
-				}
-
-			} else if ( statement.isFor ) {
-
-				code = '\n' + this.tab + code + '\n';
-
-			} else {
-
-				code = this.tab + code + ';';
-
-			}
-
-			lines.push( code );
+			this.setLastStatement( statement );
 
 		}
 
+		code = code.slice( 0, - 1 ); // remove the last extra line
+
 		this.tab = this.tab.slice( 0, - 1 );
 
-		return lines.join( '\n' );
+		return code;
 
 
 	}
@@ -347,7 +335,7 @@ ${ this.tab }} )`;
 
 		loopStr += this.emitBody( node.body ) + '\n\n';
 
-		loopStr += this.tab + '} );\n\n';
+		loopStr += this.tab + '} )';
 
 		this.imports.add( 'loop' );
 
@@ -389,7 +377,7 @@ ${ this.tab }} )`;
 
 		forStr += this.tab + '\t' + afterthought + ';\n\n';
 
-		forStr += this.tab + '} );\n\n';
+		forStr += this.tab + '} )\n\n';
 
 		this.tab = this.tab.slice( 0, - 1 );
 
@@ -496,21 +484,21 @@ ${ this.tab }} )`;
 		const paramsStr = params.length > 0 ? ' [ ' + params.join( ', ' ) + ' ] ' : '';
 		const bodyStr = this.emitBody( node.body );
 
-		const funcStr = `\nconst ${ name } = tslFn( (${ paramsStr }) => {
+		const funcStr = `const ${ name } = tslFn( (${ paramsStr }) => {
 
 ${ bodyStr }
 
-} );\n`;
+${ this.tab }} );\n`;
 
-		const layoutInput = inputs.length > 0 ? '\n\t\t' + inputs.join( ',\n\t\t' ) + '\n\t' : '';
+		const layoutInput = inputs.length > 0 ? '\n\t\t' + this.tab + inputs.join( ',\n\t\t' + this.tab ) + '\n\t' + this.tab : '';
 
 		if ( node.layout !== false && hasPointer === false ) {
 
-			this.layoutsCode += `${ name }.setLayout( {
-	name: '${ name }',
-	type: '${ type }',
-	inputs: [${ layoutInput }]
-} );\n\n`;
+			this.layoutsCode += `${ this.tab + name }.setLayout( {
+${ this.tab }\tname: '${ name }',
+${ this.tab }\ttype: '${ type }',
+${ this.tab }\tinputs: [${ layoutInput }]
+${ this.tab }} );\n\n`;
 
 		}
 
@@ -522,34 +510,76 @@ ${ bodyStr }
 
 	}
 
+	setLastStatement( statement ) {
+
+		this._lastStatment = statement;
+
+	}
+
+	emitExtraLine( statement ) {
+
+		const last = this._lastStatment;
+		if ( last === null ) return '';
+
+		const isExpression = ( st ) => st.isFunctionDeclaration !== true && st.isFor !== true && st.isConditional !== true;
+		const lastExp = isExpression( last );
+		const currExp = isExpression( statement );
+
+		if ( lastExp !== currExp || ( ! lastExp && ! currExp ) ) return '\n';
+
+		return '';
+
+	}
+
 	emit( ast ) {
 
-		let code = '';
+		let code = '\n';
+
+		if ( this.iife ) this.tab += '\t';
 
 		for ( const statement of ast.body ) {
 
+			code += this.emitExtraLine( statement );
+
 			if ( statement.isFunctionDeclaration ) {
 
-				code += this.emitFunction( statement );
+				code += this.tab + this.emitFunction( statement );
 
 			} else {
 
-				code += this.emitExpression( statement ) + ';\n';
+				code += this.tab + this.emitExpression( statement ) + ';\n';
 
 			}
+
+			this.setLastStatement( statement );
 
 		}
 
 		const imports = [ ...this.imports ];
 		const functions = [ ...this.functions ];
 
-		const header = '// Three.js Transpiler r' + REVISION + '\n\n';
-		const importStr = imports.length > 0 ? 'import { ' + imports.join( ', ' ) + ' } from \'three/nodes\';\n\n' : '';
-		const functionsStr = functions.length > 0 ? '\nexport { ' + functions.join( ', ' ) + ' };\n' : '';
+		const layouts = this.layoutsCode.length > 0 ? `\n${ this.tab }// layouts\n\n` + this.layoutsCode : '';
 
-		const layouts = this.layoutsCode.length > 0 ? '\n// layouts\n\n' + this.layoutsCode : '';
+		let header = '// Three.js Transpiler r' + REVISION + '\n\n';
+		let footer = '';
 
-		return header + importStr + code + functionsStr + layouts;
+		if ( this.iife ) {
+
+			header += '( function ( Nodes ) {\n\n';
+
+			header += imports.length > 0 ? '\tconst { ' + imports.join( ', ' ) + ' } = Nodes;\n' : '';
+			footer += functions.length > 0 ? '\treturn { ' + functions.join( ', ' ) + ' };\n' : '';
+
+			footer += '\n} );';
+
+		} else {
+
+			header += imports.length > 0 ? 'import { ' + imports.join( ', ' ) + ' } from \'three/nodes\';\n' : '';
+			footer += functions.length > 0 ? 'export { ' + functions.join( ', ' ) + ' };\n' : '';
+
+		}
+
+		return header + code + layouts + footer;
 
 	}
 

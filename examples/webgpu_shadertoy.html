@@ -94,6 +94,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import * as Nodes from 'three/nodes';
 			import { Node, MeshBasicNodeMaterial } from 'three/nodes';
 
 			import Transpiler from './jsm/nodes/transpiler/Transpiler.js';
@@ -115,9 +116,32 @@
 
 				}
 
-				async parse( glsl ) {
+				transpile( glsl, iife = false ) {
 
-					const jsCode = new Transpiler( new ShaderToyDecoder(), new TSLEncoder() ).parse( glsl );
+					const decoder = new ShaderToyDecoder();
+
+					const encoder = new TSLEncoder();
+					encoder.iife = iife;
+
+					const jsCode = new Transpiler( decoder, encoder ).parse( glsl );
+
+					return jsCode;
+
+				}
+
+				parse( glsl ) {
+
+					const jsCode = this.transpile( glsl, true );
+
+					const { mainImage } = eval( jsCode )( Nodes );
+
+					this.mainImage = mainImage;
+
+				}
+
+				async parseAsync( glsl ) {
+
+					const jsCode = this.transpile( glsl );
 
 					const { mainImage } = await import( `data:text/javascript,${ encodeURIComponent( jsCode ) }` );
 
@@ -143,7 +167,7 @@
 			let renderer, camera, scene;
 			const dpr = window.devicePixelRatio;
 
-			await init();
+			init();
 
 			async function init() {
 
@@ -160,7 +184,7 @@
 				const glslCode = document.getElementById( 'fragmentshader' ).textContent;
 
 				const shaderToyNode = new ShaderToyNode();
-				await shaderToyNode.parse( glslCode );
+				shaderToyNode.parse( glslCode );
 
 				//
 
