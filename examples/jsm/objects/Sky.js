@@ -28,7 +28,7 @@ class Sky extends Mesh {
 		const shader = Sky.SkyShader;
 
 		const material = new ShaderMaterial( {
-			name: 'shader.name',
+			name: shader.name,
 			uniforms: UniformsUtils.clone( shader.uniforms ),
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader,
