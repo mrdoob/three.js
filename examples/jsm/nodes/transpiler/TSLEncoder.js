@@ -81,7 +81,17 @@ class TSLEncoder {
 
 		} else if ( node.isNumber ) {
 
-			code = node.value;
+			if ( node.type === 'int' || node.type === 'uint' ) {
+
+				code = node.type + '( ' + node.value + ' )';
+
+				this.addImport( node.type );
+
+			} else {
+
+				code = node.value;
+
+			}
 
 		} else if ( node.isOperator ) {
 
@@ -178,6 +188,10 @@ class TSLEncoder {
 
 			code = this.emitVariables( node );
 
+		} else if ( node.isTernary ) {
+
+			code = this.emitTernary( node );
+
 		} else if ( node.isConditional ) {
 
 			code = this.emitConditional( node );
@@ -206,7 +220,7 @@ class TSLEncoder {
 
 		}
 
-		if ( ! code ) code = '// unknown statement';
+		if ( ! code ) code = '/* unknown statement */';
 
 		return code;
 
@@ -250,6 +264,18 @@ class TSLEncoder {
 
 		return lines.join( '\n' );
 
+
+	}
+
+	emitTernary( node ) {
+
+		const condStr = this.emitExpression( node.cond );
+		const leftStr = this.emitExpression( node.left );
+		const rightStr = this.emitExpression( node.right );
+
+		this.addImport( 'cond' );
+
+		return `cond( ${ condStr }, ${ leftStr }, ${ rightStr } )`;
 
 	}
 
@@ -305,10 +331,18 @@ ${ this.tab }} )`;
 
 		const start = this.emitExpression( node.initialization.value );
 		const end = this.emitExpression( node.condition.right );
-		const name = node.initialization.name;
-		const nameParam = name !== 'i' ? `, name: '${ name }'` : '';
 
-		let loopStr = `loop( { start: ${ start }, end: ${ end + nameParam } }, ( { ${ name } } ) => {\n\n`;
+		const name = node.initialization.name;
+		const type = node.initialization.type;
+		const condition = node.condition.type;
+		const update = node.afterthought.type;
+
+		const nameParam = name !== 'i' ? `, name: '${ name }'` : '';
+		const typeParam = type !== 'int' ? `, type: '${ type }'` : '';
+		const conditionParam = condition !== '<' ? `, condition: '${ condition }'` : '';
+		const updateParam = update !== '++' ? `, update: '${ update }'` : '';
+
+		let loopStr = `loop( { start: ${ start }, end: ${ end + nameParam + typeParam + conditionParam + updateParam } }, ( { ${ name } } ) => {\n\n`;
 
 		loopStr += this.emitBody( node.body ) + '\n\n';
 
@@ -325,8 +359,8 @@ ${ this.tab }} )`;
 		const { initialization, condition, afterthought } = node;
 
 		if ( ( initialization && initialization.isVariableDeclaration && initialization.next === null ) &&
-			( condition && condition.type === '<' && condition.left.isAccessor ) &&
-			( afterthought && afterthought.type === '++' ) &&
+			( condition && condition.left.isAccessor && condition.left.property === initialization.name ) &&
+			( afterthought && afterthought.isUnary ) &&
 			( initialization.name === condition.left.property ) &&
 			( initialization.name === afterthought.expression.property )
 		) {

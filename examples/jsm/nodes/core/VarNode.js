@@ -53,15 +53,7 @@ export default VarNode;
 
 export const temp = nodeProxy( VarNode );
 
-function toVar( node ) {
-
-	node = temp( node );
-	if ( getCurrentStack() ) getCurrentStack().add( node );
-	return node;
-
-}
-
 addNodeElement( 'temp', temp ); // @TODO: Will be removed in the future
-addNodeElement( 'toVar', toVar );
+addNodeElement( 'toVar', ( ...params ) => temp( ...params ).append() );
 
 addNodeClass( 'VarNode', VarNode );

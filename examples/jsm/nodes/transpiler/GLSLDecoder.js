@@ -1,4 +1,4 @@
-import { Program, FunctionDeclaration, For, AccessorElements, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, FunctionCall, Return, Accessor } from './AST.js';
+import { Program, FunctionDeclaration, For, AccessorElements, Ternary, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, FunctionCall, Return, Accessor } from './AST.js';
 
 const unaryOperators = [
 	'+', '-', '~', '!', '++', '--'
@@ -16,6 +16,7 @@ const precedenceOperators = [
 	'&&',
 	'^^',
 	'||',
+	'?',
 	'=',
 	'+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=', '<<=', '>>=',
 	','
@@ -26,7 +27,7 @@ const lineRegExp = /^\n+/;
 const commentRegExp = /^\/\*[\s\S]*?\*\//;
 const inlineCommentRegExp = /^\/\/.*?(\n|$)/;
 
-const numberRegExp = /^((\.\d)|\d)((\w|e-?)*)(\.)?((\w|e-?)*)/;
+const numberRegExp = /^((0x\w+)|(\.?\d+\.?\d*((e-?\d+)|\w)?))/;
 const stringDoubleRegExp = /^(\"((?:[^"\\]|\\.)*)\")/;
 const stringSingleRegExp = /^(\'((?:[^'\\]|\\.)*)\')/;
 const literalRegExp = /^[A-Za-z](\w|\.)*/;
@@ -213,6 +214,17 @@ class GLSLDecoder {
 
 		this.index = 0;
 		this.tokenizer = null;
+		this.keywords = [];
+
+		this.addKeyword( 'gl_FragCoord', 'vec2 gl_FragCoord = vec2( viewportCoordinate.x, viewportCoordinate.y.oneMinus() );' );
+
+	}
+
+	addKeyword( name, polyfill ) {
+
+		this.keywords.push( { name, polyfill } );
+
+		return this;
 
 	}
 
@@ -293,10 +305,26 @@ class GLSLDecoder {
 
 				if ( groupIndex === 0 && token.str === operator ) {
 
-					const left = this.parseExpressionFromTokens( tokens.slice( 0, i ) );
-					const right = this.parseExpressionFromTokens( tokens.slice( i + 1, tokens.length ) );
+					if ( operator === '?' ) {
 
-					return new Operator( operator, left, right );
+						const conditionTokens = tokens.slice( 0, i );
+						const leftTokens = this.getTokensUntil( ':', tokens, i + 1 ).slice( 0, - 1 );
+						const rightTokens = tokens.slice( i + leftTokens.length + 2 );
+
+						const condition = this.parseExpressionFromTokens( conditionTokens );
+						const left = this.parseExpressionFromTokens( leftTokens );
+						const right = this.parseExpressionFromTokens( rightTokens );
+
+						return new Ternary( condition, left, right );
+
+					} else {
+
+						const left = this.parseExpressionFromTokens( tokens.slice( 0, i ) );
+						const right = this.parseExpressionFromTokens( tokens.slice( i + 1, tokens.length ) );
+
+						return new Operator( operator, left, right );
+
+					}
 
 				}
 
@@ -789,8 +817,26 @@ class GLSLDecoder {
 
 	parse( source ) {
 
+		let polyfill = '';
+
+		for ( const keyword of this.keywords ) {
+
+			if ( new RegExp( `(^|\\b)${ keyword.name }($|\\b)`, 'gm' ).test( source ) ) {
+
+				polyfill += keyword.polyfill + '\n';
+
+			}
+
+		}
+
+		if ( polyfill ) {
+
+			polyfill = '// Polyfills\n\n' + polyfill + '\n';
+
+		}
+
 		this.index = 0;
-		this.tokenizer = new Tokenizer( source ).tokenize();
+		this.tokenizer = new Tokenizer( polyfill + source ).tokenize();
 
 		const program = new Program();
 

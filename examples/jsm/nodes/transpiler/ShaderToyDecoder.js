@@ -1,17 +1,15 @@
 import { Return, VariableDeclaration, Accessor } from './AST.js';
 import GLSLDecoder from './GLSLDecoder.js';
 
-const keywords = [
-	{ name: 'iTime', polyfill: 'float iTime = timerLocal();' },
-	{ name: 'iResolution', polyfill: 'vec2 iResolution = viewportResolution;' },
-	{ name: 'fragCoord', polyfill: 'vec2 fragCoord = vec2( viewportCoordinate.x, viewportCoordinate.y.oneMinus() );' }
-];
-
 class ShaderToyDecoder extends GLSLDecoder {
 
 	constructor() {
 
 		super();
+
+		this.addKeyword( 'iTime', 'float iTime = timerLocal();' );
+		this.addKeyword( 'iResolution', 'vec2 iResolution = viewportResolution;' );
+		this.addKeyword( 'fragCoord', 'vec2 fragCoord = vec2( viewportCoordinate.x, viewportCoordinate.y.oneMinus() );' );
 
 	}
 
@@ -21,7 +19,7 @@ class ShaderToyDecoder extends GLSLDecoder {
 
 		if ( node.name === 'mainImage' ) {
 
-			node.params = [];
+			node.params = []; // remove default parameters
 			node.type = 'vec4';
 			node.layout = false; // for now
 
@@ -43,30 +41,6 @@ class ShaderToyDecoder extends GLSLDecoder {
 		}
 
 		return node;
-
-	}
-
-	parse( source ) {
-
-		let polyfill = '';
-
-		for ( const keyword of keywords ) {
-
-			if ( new RegExp( `(^|\\b)${ keyword.name }($|\\b)`, 'gm' ).test( source ) ) {
-
-				polyfill += keyword.polyfill + '\n';
-
-			}
-
-		}
-
-		if ( polyfill ) {
-
-			polyfill = '// Polyfills\n\n' + polyfill + '\n';
-
-		}
-
-		return super.parse( polyfill + source );
 
 	}
 

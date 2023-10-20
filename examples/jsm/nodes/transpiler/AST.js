@@ -68,6 +68,20 @@ export class Expression {
 
 }
 
+export class Ternary {
+
+	constructor( cond, left, right ) {
+
+		this.cond = cond;
+		this.left = left;
+		this.right = right;
+
+		this.isTernary = true;
+
+	}
+
+}
+
 export class Operator {
 
 	constructor( type, left, right ) {
@@ -81,6 +95,7 @@ export class Operator {
 	}
 
 }
+
 
 export class Unary {
 

@@ -509,7 +509,14 @@ export const setCurrentStack = stack => currentStack = stack;
 export const getCurrentStack = () => currentStack;
 
 export const If = ( ...params ) => currentStack.if( ...params );
-export const append = ( ...params ) => currentStack.add( ...params );
+
+export function append( node ) {
+
+	if ( currentStack ) currentStack.add( node );
+
+	return node;
+
+}
 
 addNodeElement( 'append', append );
 
