@@ -5,7 +5,7 @@ import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
-import PropertyNode from './PropertyNode.js';
+import ParameterNode from './ParameterNode.js';
 import { createNodeMaterialFromType } from '../materials/NodeMaterial.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
@@ -826,7 +826,7 @@ class NodeBuilder {
 
 			for ( const input of layout.inputs ) {
 
-				inputs.push( new PropertyNode( input.type, input.name, false ) );
+				inputs.push( new ParameterNode( input.type, input.name ) );
 
 			}
 
@@ -836,7 +836,7 @@ class NodeBuilder {
 
 			for ( const input of layout.inputs ) {
 
-				inputs[ input.name ] = new PropertyNode( input.type, input.name, false );
+				inputs[ input.name ] = new ParameterNode( input.type, input.name );
 
 			}
 
