@@ -121,6 +121,26 @@ class WebGLBackend extends Backend {
 
 	finishRender( renderContext ) {
 
+		const lastRenderContext = this.renderer._previousRenderContext;
+
+		if ( lastRenderContext !== renderContext && lastRenderContext !== null) {
+
+			this._setFramebuffer( lastRenderContext );
+
+			if ( lastRenderContext.viewport ) {
+
+				this.updateViewport( lastRenderContext );
+
+			} else {
+
+				const gl = this.gl;
+
+				gl.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
+
+			}
+
+		}
+
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
 		if ( occlusionQueryCount > 0 ) {

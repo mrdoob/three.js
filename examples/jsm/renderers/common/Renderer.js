@@ -179,7 +179,6 @@ class Renderer {
 		const nodeFrame = this._nodes.nodeFrame;
 
 		const previousRenderId = nodeFrame.renderId;
-		const previousRenderState = this._currentRenderContext;
 
 		//
 
@@ -190,6 +189,7 @@ class Renderer {
 		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
 
+		this._previousRenderContext = this._currentRenderContext;
 		this._currentRenderContext = renderContext;
 
 		nodeFrame.renderId ++;
@@ -332,7 +332,7 @@ class Renderer {
 		// restore render tree
 
 		nodeFrame.renderId = previousRenderId;
-		this._currentRenderContext = previousRenderState;
+		this._currentRenderContext = this._previousRenderContext;
 
 		this._lastRenderContext = renderContext;
 
