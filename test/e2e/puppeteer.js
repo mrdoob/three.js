@@ -124,6 +124,7 @@ const exceptionList = [
 	'webgpu_materials_video',
 	'webgpu_particles',
 	'webgpu_sandbox',
+	'webgpu_shadertoy',
 	'webgpu_shadowmap',
 	'webgpu_sprites',
 	'webgpu_tsl_editor',
