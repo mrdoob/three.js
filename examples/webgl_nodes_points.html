@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { attribute, timerLocal, positionLocal, spritesheetUV, pointUV, vec2, texture, uniform, mix, PointsNodeMaterial } from 'three/nodes';
+			import { attribute, timerLocal, positionLocal, spritesheetUV, pointUV, vec2, vec3, texture, uniform, mix, PointsNodeMaterial } from 'three/nodes';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -122,7 +122,7 @@
 					blending: THREE.AdditiveBlending
 				} );
 
-				material.colorNode = fire;
+				material.colorNode = vec3( fire );
 				material.sizeNode = particleSize;
 				material.positionNode = positionNode;
 

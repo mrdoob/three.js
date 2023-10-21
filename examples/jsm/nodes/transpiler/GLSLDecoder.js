@@ -825,7 +825,7 @@ class GLSLDecoder {
 
 		if ( operator.type.includes( '=' ) ) {
 
-			const parameter = this._getFunctionParameter( operator.left.property )
+			const parameter = this._getFunctionParameter( operator.left.property );
 
 			if ( parameter !== undefined ) {
 

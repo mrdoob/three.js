@@ -54,7 +54,7 @@ class TSLEncoder {
 		this.functions = new Set();
 		this.layoutsCode = '';
 		this.iife = false;
-		this.uniqueNames = true;
+		this.uniqueNames = false;
 
 		this._currentProperties = {};
 		this._lastStatment = null;
