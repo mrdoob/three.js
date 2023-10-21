@@ -125,7 +125,6 @@ const exceptionList = [
 	'webgpu_particles',
 	'webgpu_sandbox',
 	'webgpu_shadertoy',
-	'webgpu_shadowmap',
 	'webgpu_sprites',
 	'webgpu_tsl_editor',
 	'webgpu_tsl_transpiler',
