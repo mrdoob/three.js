@@ -31,4 +31,4 @@ export const viewportDepthTexture = nodeProxy( ViewportDepthTextureNode );
 
 addNodeElement( 'viewportDepthTexture', viewportDepthTexture );
 
-addNodeClass( ViewportDepthTextureNode );
+addNodeClass( 'ViewportDepthTextureNode', ViewportDepthTextureNode );

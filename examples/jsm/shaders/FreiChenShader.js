@@ -11,6 +11,8 @@ import {
 
 const FreiChenShader = {
 
+	name: 'FreiChenShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null },

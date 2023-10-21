@@ -14,25 +14,41 @@ class WebGLAttributeUtils {
 		const array = attribute.array;
 		const usage = attribute.usage || gl.STATIC_DRAW;
 
-		const bufferGPU = gl.createBuffer();
+		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
+		const bufferData = backend.get( bufferAttribute );
 
-		gl.bindBuffer( bufferType, bufferGPU );
-		gl.bufferData( bufferType, array, usage );
-		gl.bindBuffer( bufferType, null );
+		let bufferGPU = bufferData.bufferGPU;
+
+		if ( bufferGPU === undefined ) {
+
+			bufferGPU = gl.createBuffer();
+
+			gl.bindBuffer( bufferType, bufferGPU );
+			gl.bufferData( bufferType, array, usage );
+			gl.bindBuffer( bufferType, null );
+
+			bufferData.bufferGPU = bufferGPU;
+			bufferData.bufferType = bufferType;
+			bufferData.version = bufferAttribute.version;
+
+		}
 
 		//attribute.onUploadCallback();
 
 		let type;
+		let isFloat = false;
 
 		if ( array instanceof Float32Array ) {
 
 			type = gl.FLOAT;
+			isFloat = true;
 
 		} else if ( array instanceof Uint16Array ) {
 
 			if ( attribute.isFloat16BufferAttribute ) {
 
 				type = gl.HALF_FLOAT;
+				isFloat = true;
 
 			} else {
 
@@ -74,8 +90,27 @@ class WebGLAttributeUtils {
 			bufferGPU,
 			type,
 			bytesPerElement: array.BYTES_PER_ELEMENT,
-			version: attribute.version
+			version: attribute.version,
+			isFloat
 		} );
+
+	}
+
+	updateAttribute( attribute ) {
+
+		const backend = this.backend;
+		const { gl } = backend;
+
+		const array = attribute.array;
+		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
+		const bufferData = backend.get( bufferAttribute );
+		const bufferType = bufferData.bufferType;
+
+		gl.bindBuffer( bufferType, bufferData.bufferGPU );
+		gl.bufferSubData( bufferType, 0, array );
+		gl.bindBuffer( bufferType, null );
+
+		bufferData.version = bufferAttribute.version;
 
 	}
 

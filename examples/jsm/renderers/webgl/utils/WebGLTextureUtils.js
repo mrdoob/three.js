@@ -140,6 +140,19 @@ class WebGLTextureUtils {
 
 		}
 
+		if ( glFormat === gl.DEPTH_COMPONENT ) {
+
+			if ( glType === gl.UNSIGNED_INT ) internalFormat = gl.DEPTH_COMPONENT24;
+			if ( glType === gl.FLOAT ) internalFormat = gl.DEPTH_COMPONENT32F;
+
+		}
+
+		if ( glFormat === gl.DEPTH_STENCIL ) {
+
+			if ( glType === gl.UNSIGNED_INT_24_8 ) internalFormat = gl.DEPTH24_STENCIL8;
+
+		}
+
 		if ( internalFormat === gl.R16F || internalFormat === gl.R32F ||
 			internalFormat === gl.RG16F || internalFormat === gl.RG32F ||
 			internalFormat === gl.RGBA16F || internalFormat === gl.RGBA32F ) {

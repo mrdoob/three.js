@@ -466,17 +466,17 @@ class WebGPUPipelineUtils {
 		switch ( material.side ) {
 
 			case FrontSide:
-				descriptor.frontFace = GPUFrontFace.CW;
-				descriptor.cullMode = GPUCullMode.Front;
-				break;
-
-			case BackSide:
-				descriptor.frontFace = GPUFrontFace.CW;
+				descriptor.frontFace = GPUFrontFace.CCW;
 				descriptor.cullMode = GPUCullMode.Back;
 				break;
 
+			case BackSide:
+				descriptor.frontFace = GPUFrontFace.CCW;
+				descriptor.cullMode = GPUCullMode.Front;
+				break;
+
 			case DoubleSide:
-				descriptor.frontFace = GPUFrontFace.CW;
+				descriptor.frontFace = GPUFrontFace.CCW;
 				descriptor.cullMode = GPUCullMode.None;
 				break;
 

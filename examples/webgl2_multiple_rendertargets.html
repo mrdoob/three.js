@@ -80,7 +80,7 @@
 
 			vec4 LinearTosRGB( in vec4 value ) {
 				return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );
-			}	
+			}
 
 			layout(location = 0) out vec4 pc_FragColor;
 
@@ -107,10 +107,6 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank">threejs</a> webgl - Multiple RenderTargets
 		</div>
-
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -197,6 +193,7 @@
 				scene.add( new THREE.Mesh(
 					new THREE.TorusKnotGeometry( 1, 0.3, 128, 32 ),
 					new THREE.RawShaderMaterial( {
+						name: 'G-Buffer Shader',
 						vertexShader: document.querySelector( '#gbuffer-vert' ).textContent.trim(),
 						fragmentShader: document.querySelector( '#gbuffer-frag' ).textContent.trim(),
 						uniforms: {
@@ -215,6 +212,7 @@
 				postScene.add( new THREE.Mesh(
 					new THREE.PlaneGeometry( 2, 2 ),
 					new THREE.RawShaderMaterial( {
+						name: 'Post-FX Shader',
 						vertexShader: document.querySelector( '#render-vert' ).textContent.trim(),
 						fragmentShader: document.querySelector( '#render-frag' ).textContent.trim(),
 						uniforms: {

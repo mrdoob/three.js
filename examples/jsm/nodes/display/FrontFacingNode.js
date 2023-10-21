@@ -24,4 +24,4 @@ export default FrontFacingNode;
 export const frontFacing = nodeImmutable( FrontFacingNode );
 export const faceDirection = float( frontFacing ).mul( 2.0 ).sub( 1.0 );
 
-addNodeClass( FrontFacingNode );
+addNodeClass( 'FrontFacingNode', FrontFacingNode );

@@ -1,4 +1,4 @@
-import { SampledTexture, SampledCubeTexture } from '../SampledTexture.js';
+import { SampledTexture } from '../SampledTexture.js';
 
 class NodeSampledTexture extends SampledTexture {
 
@@ -10,27 +10,37 @@ class NodeSampledTexture extends SampledTexture {
 
 	}
 
-	getTexture() {
+	get needsBindingsUpdate() {
 
-		return this.textureNode.value;
+		return this.textureNode.value !== this.texture || super.needsBindingsUpdate;
+
+	}
+
+	update() {
+
+		const { textureNode } = this;
+
+		if ( this.texture !== textureNode.value ) {
+
+			this.texture = textureNode.value;
+
+			return true;
+
+		}
+
+		return super.update();
 
 	}
 
 }
 
-class NodeSampledCubeTexture extends SampledCubeTexture {
+class NodeSampledCubeTexture extends NodeSampledTexture {
 
 	constructor( name, textureNode ) {
 
-		super( name, textureNode ? textureNode.value : null );
+		super( name, textureNode );
 
-		this.textureNode = textureNode;
-
-	}
-
-	getTexture() {
-
-		return this.textureNode.value;
+		this.isSampledCubeTexture = true;
 
 	}
 

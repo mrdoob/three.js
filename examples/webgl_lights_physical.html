@@ -15,10 +15,6 @@
 			Reinhard inline tonemapping with real-world light falloff (decay = 2).
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -115,7 +111,7 @@
 					roughness: 0.8,
 					color: 0xffffff,
 					metalness: 0.2,
-					bumpScale: 0.0005
+					bumpScale: 1
 				} );
 				const textureLoader = new THREE.TextureLoader();
 				textureLoader.load( 'textures/hardwood2_diffuse.jpg', function ( map ) {
@@ -153,7 +149,7 @@
 				cubeMat = new THREE.MeshStandardMaterial( {
 					roughness: 0.7,
 					color: 0xffffff,
-					bumpScale: 0.002,
+					bumpScale: 1,
 					metalness: 0.2
 				} );
 				textureLoader.load( 'textures/brick_diffuse.jpg', function ( map ) {

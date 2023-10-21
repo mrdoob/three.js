@@ -93,7 +93,13 @@ function Loader( editor ) {
 					loader.setLibraryPath( '../examples/jsm/libs/rhino3dm/' );
 					loader.parse( contents, function ( object ) {
 
+						object.name = filename;
+
 						editor.execute( new AddObjectCommand( editor, object ) );
+
+					}, function ( error ) {
+
+						console.error( error )
 
 					} );
 

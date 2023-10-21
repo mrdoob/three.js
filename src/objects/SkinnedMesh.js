@@ -5,6 +5,7 @@ import { Sphere } from '../math/Sphere.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Ray } from '../math/Ray.js';
+import { AttachedBindMode, DetachedBindMode } from '../constants.js';
 
 const _basePosition = /*@__PURE__*/ new Vector3();
 
@@ -29,7 +30,7 @@ class SkinnedMesh extends Mesh {
 
 		this.type = 'SkinnedMesh';
 
-		this.bindMode = 'attached';
+		this.bindMode = AttachedBindMode;
 		this.bindMatrix = new Matrix4();
 		this.bindMatrixInverse = new Matrix4();
 
@@ -54,8 +55,7 @@ class SkinnedMesh extends Mesh {
 
 		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-			_vertex.fromBufferAttribute( positionAttribute, i );
-			this.applyBoneTransform( i, _vertex );
+			this.getVertexPosition( i, _vertex );
 			this.boundingBox.expandByPoint( _vertex );
 
 		}
@@ -78,8 +78,7 @@ class SkinnedMesh extends Mesh {
 
 		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-			_vertex.fromBufferAttribute( positionAttribute, i );
-			this.applyBoneTransform( i, _vertex );
+			this.getVertexPosition( i, _vertex );
 			this.boundingSphere.expandByPoint( _vertex );
 
 		}
@@ -205,11 +204,11 @@ class SkinnedMesh extends Mesh {
 
 		super.updateMatrixWorld( force );
 
-		if ( this.bindMode === 'attached' ) {
+		if ( this.bindMode === AttachedBindMode ) {
 
 			this.bindMatrixInverse.copy( this.matrixWorld ).invert();
 
-		} else if ( this.bindMode === 'detached' ) {
+		} else if ( this.bindMode === DetachedBindMode ) {
 
 			this.bindMatrixInverse.copy( this.bindMatrix ).invert();
 

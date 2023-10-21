@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.156.0",
+  "version": "0.157.0",
   "description": "JavaScript 3D library",
   "type": "module",
   "main": "./build/three.js",
@@ -12,6 +12,7 @@
     },
     "./examples/fonts/*": "./examples/fonts/*",
     "./examples/jsm/*": "./examples/jsm/*",
+    "./addons": "./examples/jsm/Addons.js",
     "./addons/*": "./examples/jsm/*",
     "./src/*": "./src/*",
     "./nodes": "./examples/jsm/nodes/Nodes.js"
@@ -59,6 +60,7 @@
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
+    "test-circular-deps": "dpdm --no-warning --no-tree --exit-code circular:1 examples/jsm/nodes/Nodes.js",
     "make-screenshot": "node test/e2e/puppeteer.js --make"
   },
   "keywords": [
@@ -89,6 +91,7 @@
     "@rollup/plugin-terser": "^0.4.0",
     "chalk": "^5.2.0",
     "concurrently": "^8.0.1",
+    "dpdm": "^3.14.0",
     "eslint": "^8.37.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-compat": "^4.1.2",

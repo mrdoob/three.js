@@ -83,6 +83,7 @@ function Editor() {
 		showGridChanged: new Signal(),
 		showHelpersChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
+		refreshSidebarEnvironment: new Signal(),
 		historyChanged: new Signal(),
 
 		viewportCameraChanged: new Signal(),
@@ -431,7 +432,7 @@ Editor.prototype = {
 
 					helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
 
-				} else if ( object.isBone === true && object.parent?.isBone !== true ) {
+				} else if ( object.isBone === true && object.parent && object.parent.isBone !== true ) {
 
 					helper = new THREE.SkeletonHelper( object );
 
@@ -540,7 +541,7 @@ Editor.prototype = {
 
 	},
 
-	setViewportShading: function( value ) {
+	setViewportShading: function ( value ) {
 
 		this.viewportShading = value;
 		this.signals.viewportShadingChanged.dispatch();
@@ -659,6 +660,13 @@ Editor.prototype = {
 
 		this.setScene( await loader.parseAsync( json.scene ) );
 
+		if ( json.environment === 'ModelViewer' ) {
+
+			this.signals.sceneEnvironmentChanged.dispatch( json.environment );
+			this.signals.refreshSidebarEnvironment.dispatch();
+
+		}
+
 	},
 
 	toJSON: function () {
@@ -680,6 +688,16 @@ Editor.prototype = {
 
 		}
 
+		// honor modelviewer environment
+
+		let environment = null;
+
+		if ( this.scene.environment !== null && this.scene.environment.isRenderTargetTexture === true ) {
+
+			environment = 'ModelViewer';
+
+		}
+
 		//
 
 		return {
@@ -695,7 +713,8 @@ Editor.prototype = {
 			camera: this.viewportCamera.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
-			history: this.history.toJSON()
+			history: this.history.toJSON(),
+			environment: environment
 
 		};
 

@@ -12,8 +12,6 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Materials
 		</div>
 
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -29,7 +27,7 @@
 			import * as THREE from 'three';
 			import * as Nodes from 'three/nodes';
 
-			import { tslFn, wgslFn, attribute, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportBottomLeft, js, string, global, loop, MeshBasicNodeMaterial, NodeObjectLoader } from 'three/nodes';
+			import { tslFn, wgslFn, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportBottomLeft, js, string, global, loop, MeshBasicNodeMaterial, NodeObjectLoader } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -168,7 +166,7 @@
 
 				// Custom WGSL ( desaturate filter )
 
-				const desaturateWGSLNode = wgslFn( `
+				const desaturateWGSLFn = wgslFn( `
 					fn desaturate( color:vec3<f32> ) -> vec3<f32> {
 
 						let lum = vec3<f32>( 0.299, 0.587, 0.114 );
@@ -178,8 +176,18 @@
 					}
 				` );
 
+				// include example
+
+				const someWGSLFn = wgslFn( `
+					fn someFn( color:vec3<f32> ) -> vec3<f32> {
+
+						return desaturate( color );
+
+					}
+				`, [ desaturateWGSLFn ] );
+
 				material = new MeshBasicNodeMaterial();
-				material.colorNode = desaturateWGSLNode( { color: texture( uvTexture ) } );
+				material.colorNode = someWGSLFn( { color: texture( uvTexture ) } );
 				materials.push( material );
 
 				// Custom WGSL ( get texture from keywords )
@@ -227,10 +235,10 @@
 					const topUV = uv().add( vec2( 0, scaleI ) );
 					const bottomUV = uv().add( vec2( 0, scaleINeg ) );
 
-					stack.assign( output, output.add( texture( uvTexture, leftUV ) ) );
-					stack.assign( output, output.add( texture( uvTexture, rightUV ) ) );
-					stack.assign( output, output.add( texture( uvTexture, topUV ) ) );
-					stack.assign( output, output.add( texture( uvTexture, bottomUV ) ) );
+					output.assign( output.add( texture( uvTexture, leftUV ) ) );
+					output.assign( output.add( texture( uvTexture, rightUV ) ) );
+					output.assign( output.add( texture( uvTexture, topUV ) ) );
+					output.assign( output.add( texture( uvTexture, bottomUV ) ) );
 
 					return output.div( loopCount * 4 );
 

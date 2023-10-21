@@ -31,6 +31,9 @@ class RenderContext {
 		this.activeCubeFace = 0;
 		this.sampleCount = 1;
 
+		this.width = 0;
+		this.height = 0;
+
 	}
 
 }

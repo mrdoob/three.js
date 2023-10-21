@@ -13,7 +13,7 @@ class PosterizeNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { sourceNode, stepsNode } = this;
 
@@ -29,4 +29,4 @@ export const posterize = nodeProxy( PosterizeNode );
 
 addNodeElement( 'posterize', posterize );
 
-addNodeClass( PosterizeNode );
+addNodeClass( 'PosterizeNode', PosterizeNode );

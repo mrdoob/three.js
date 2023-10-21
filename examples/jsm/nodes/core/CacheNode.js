@@ -43,4 +43,4 @@ export const cache = nodeProxy( CacheNode );
 
 addNodeElement( 'cache', cache );
 
-addNodeClass( CacheNode );
+addNodeClass( 'CacheNode', CacheNode );

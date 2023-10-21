@@ -21,7 +21,7 @@ class WebGLState {
 		this.currentFlipSided = null;
 		this.currentCullFace = null;
 		this.currentProgram = null;
-		this.currentBlendingEnabled = null;
+		this.currentBlendingEnabled = false;
 		this.currentBlending = null;
 		this.currentBlendSrc = null;
 		this.currentBlendDst = null;

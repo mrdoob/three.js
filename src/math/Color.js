@@ -442,11 +442,7 @@ class Color {
 
 		this.getHSL( _hslA );
 
-		_hslA.h += h; _hslA.s += s; _hslA.l += l;
-
-		this.setHSL( _hslA.h, _hslA.s, _hslA.l );
-
-		return this;
+		return this.setHSL( _hslA.h + h, _hslA.s + s, _hslA.l + l );
 
 	}
 

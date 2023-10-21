@@ -4,6 +4,7 @@ import {
 	Loader,
 	Object3D,
 	MeshStandardMaterial,
+	MeshPhysicalMaterial,
 	Mesh,
 	Color,
 	Points,
@@ -24,6 +25,8 @@ import {
 	TextureLoader,
 	DoubleSide
 } from 'three';
+
+import { EXRLoader } from '../loaders/EXRLoader.js';
 
 const _taskCache = new WeakMap();
 
@@ -217,7 +220,7 @@ class Rhino3dmLoader extends Loader {
 
 	}
 
-	_createMaterial( material ) {
+	_createMaterial( material, renderEnvironment ) {
 
 		if ( material === undefined ) {
 
@@ -230,27 +233,51 @@ class Rhino3dmLoader extends Loader {
 
 		}
 
-		const _diffuseColor = material.diffuseColor;
+		//console.log(material)
 
-		const diffusecolor = new Color( _diffuseColor.r / 255.0, _diffuseColor.g / 255.0, _diffuseColor.b / 255.0 );
+		let mat = new MeshPhysicalMaterial( {
 
-		if ( _diffuseColor.r === 0 && _diffuseColor.g === 0 && _diffuseColor.b === 0 ) {
+			color: new Color( material.diffuseColor.r / 255.0, material.diffuseColor.g / 255.0, material.diffuseColor.b / 255.0 ),
+			emissive: new Color( material.emissionColor.r, material.emissionColor.g, material.emissionColor.b ),
+			flatShading: material.disableLighting,
+			ior: material.indexOfRefraction,
+			name: material.name,
+			reflectivity: material.reflectivity,
+			opacity: 1.0 - material.transparency,
+			side: DoubleSide,
+			specularColor: material.specularColor,
+			transparent: material.transparency > 0 ? true : false
 
-			diffusecolor.r = 1;
-			diffusecolor.g = 1;
-			diffusecolor.b = 1;
+		} );
+
+		mat.userData.id = material.id;
+
+		if ( material.pbrSupported ) {
+
+			const pbr = material.pbr;
+
+			mat.anisotropy = pbr.anisotropy;
+			mat.anisotropyRotation = pbr.anisotropicRotation;
+			mat.color = new Color( pbr.baseColor.r, pbr.baseColor.g, pbr.baseColor.b );
+			mat.clearCoat = pbr.clearCoat;
+			mat.clearCoatRoughness = pbr.clearCoatRoughness;
+			mat.metalness = pbr.metallic;
+			mat.transmission = 1 - pbr.opacity;
+			mat.roughness = pbr.roughness;
+			mat.sheen = pbr.sheen;
+			mat.specularIntensity = pbr.specular;
+			mat.thickness = pbr.subsurface;
 
 		}
 
-		// console.log( material );
+		if ( material.pbrSupported && material.pbr.opacity === 0 && material.transparency === 1 ) {
 
-		const mat = new MeshStandardMaterial( {
-			color: diffusecolor,
-			name: material.name,
-			side: DoubleSide,
-			transparent: material.transparency > 0 ? true : false,
-			opacity: 1.0 - material.transparency
-		} );
+			//some compromises
+
+			mat.opacity = 0.2;
+			mat.transmission = 1.00;
+
+		}
 
 		const textureLoader = new TextureLoader();
 
@@ -262,7 +289,15 @@ class Rhino3dmLoader extends Loader {
 
 				const map = textureLoader.load( texture.image );
 
+				//console.log(texture.type )
+
 				switch ( texture.type ) {
+
+					case 'Bump':
+
+						mat.bumpMap = map;
+
+						break;
 
 					case 'Diffuse':
 
@@ -270,9 +305,15 @@ class Rhino3dmLoader extends Loader {
 
 						break;
 
-					case 'Bump':
+					case 'Emap':
 
-						mat.bumpMap = map;
+						mat.envMap = map;
+
+						break;
+					
+					case 'Opacity':
+
+						mat.transmissionMap = map;
 
 						break;
 
@@ -283,9 +324,97 @@ class Rhino3dmLoader extends Loader {
 
 						break;
 
-					case 'Emap':
+					case 'PBR_Alpha':
 
-						mat.envMap = map;
+						mat.alphaMap = map;
+						mat.transparent = true;
+
+						break;
+					
+					case 'PBR_AmbientOcclusion':
+
+						mat.aoMap = map;
+
+						break;
+
+					case 'PBR_Anisotropic':
+
+						mat.anisotropyMap = map;
+
+						break;
+
+					case 'PBR_BaseColor':
+
+						mat.map = map;
+
+						break;
+
+					case 'PBR_Clearcoat':
+
+						mat.clearcoatMap = map;
+
+						break;
+
+					case 'PBR_ClearcoatBump':
+
+						mat.clearcoatNormalMap = map;
+
+						break;
+
+					case 'PBR_ClearcoatRoughness':
+
+						mat.clearcoatRoughnessMap = map;
+
+						break;
+
+					case 'PBR_Displacement':
+
+						mat.displacementMap = map;
+
+						break;
+
+					case 'PBR_Emission':
+
+						mat.emissiveMap = map;
+
+						break;
+
+					case 'PBR_Metallic':
+
+						mat.metalnessMap = map;
+
+						break;
+
+					case 'PBR_Roughness':
+
+						mat.roughnessMap = map;
+
+						break;
+
+					case 'PBR_Sheen':
+
+						mat.sheenColorMap = map;
+
+						break;
+
+					case 'PBR_Specular':
+
+						mat.specularColorMap = map;
+
+						break;
+
+					case 'PBR_Subsurface':
+
+						mat.thicknessMap = map;
+
+						break;
+
+					default:
+
+						this.warnings.push( {
+							message: `THREE.3DMLoader: No conversion exists for 3dm ${texture.type}.`,
+							type: 'no conversion'
+						} );
 
 						break;
 
@@ -293,9 +422,25 @@ class Rhino3dmLoader extends Loader {
 
 				map.wrapS = texture.wrapU === 0 ? RepeatWrapping : ClampToEdgeWrapping;
 				map.wrapT = texture.wrapV === 0 ? RepeatWrapping : ClampToEdgeWrapping;
-				map.repeat.set( texture.repeat[ 0 ], texture.repeat[ 1 ] );
+
+				if ( texture.repeat ) {
+
+					map.repeat.set( texture.repeat[ 0 ], texture.repeat[ 1 ] );
+
+				}
 
 			}
+
+		}
+
+		if ( renderEnvironment ) {
+
+			new EXRLoader().load( renderEnvironment.image, function ( texture ) {
+
+				texture.mapping = THREE.EquirectangularReflectionMapping;
+				mat.envMap = texture;
+
+			} );
 
 		}
 
@@ -305,8 +450,6 @@ class Rhino3dmLoader extends Loader {
 
 	_createGeometry( data ) {
 
-		// console.log(data);
-
 		const object = new Object3D();
 		const instanceDefinitionObjects = [];
 		const instanceDefinitions = [];
@@ -315,8 +458,10 @@ class Rhino3dmLoader extends Loader {
 		object.userData[ 'layers' ] = data.layers;
 		object.userData[ 'groups' ] = data.groups;
 		object.userData[ 'settings' ] = data.settings;
+		object.userData.settings[ 'renderSettings' ] = data.renderSettings;
 		object.userData[ 'objectType' ] = 'File3dm';
 		object.userData[ 'materials' ] = null;
+		
 		object.name = this.url;
 
 		let objects = data.objects;
@@ -343,21 +488,55 @@ class Rhino3dmLoader extends Loader {
 
 				default:
 
-					let _object;
+					let matId;
 
-					if ( attributes.materialIndex >= 0 ) {
+					switch( attributes.materialSource.name ) {
+						case 'ObjectMaterialSource_MaterialFromLayer':
+							//check layer index
+							if ( attributes.layerIndex >= 0 ) {
 
-						const rMaterial = materials[ attributes.materialIndex ];
-						let material = this._createMaterial( rMaterial );
-						material = this._compareMaterials( material );
-						_object = this._createObject( obj, material );
+								matId = data.layers[ attributes.layerIndex ].renderMaterialIndex;
+
+							} else {
+
+								matId = null;
+
+							}
+
+							break;
+
+						case 'ObjectMaterialSource_MaterialFromObject':
+
+							if ( attributes.materialIndex >= 0 ) {
+
+								matId = attributes.materialIndex;
+
+							} else {
+
+								matId = null;
+
+							}
+
+							break;
+
+					}
+
+					let material;
+
+					if ( matId >= 0 ) {
+
+						const rMaterial = materials[ matId ];
+						material = this._createMaterial( rMaterial, data.renderEnvironment );
+
 
 					} else {
 
-						const material = this._createMaterial();
-						_object = this._createObject( obj, material );
+						material = this._createMaterial();
 
 					}
+
+					material = this._compareMaterials( material );
+					const _object = this._createObject( obj, material );
 
 					if ( _object === undefined ) {
 
@@ -440,6 +619,7 @@ class Rhino3dmLoader extends Loader {
 		}
 
 		object.userData[ 'materials' ] = this.materials;
+		object.name = '';
 		return object;
 
 	}
@@ -642,7 +822,7 @@ class Rhino3dmLoader extends Loader {
 						break;
 
 					case 'LightStyle_WorldLinear':
-						// not conversion exists, warning has already been printed to the console
+						// no conversion exists, warning has already been printed to the console
 						break;
 
 					default:
@@ -821,7 +1001,6 @@ function Rhino3dmWorker() {
 
 			case 'init':
 
-				// console.log(message)
 				libraryConfig = message.libraryConfig;
 				const wasmBinary = libraryConfig.wasmBinary;
 				let RhinoModule;
@@ -902,7 +1081,7 @@ function Rhino3dmWorker() {
 		// Handle instance definitions
 		// console.log( `Instance Definitions Count: ${doc.instanceDefinitions().count()}` );
 
-		for ( let i = 0; i < doc.instanceDefinitions().count(); i ++ ) {
+		for ( let i = 0; i < doc.instanceDefinitions().count; i ++ ) {
 
 			const idef = doc.instanceDefinitions().get( i );
 			const idefAttributes = extractProperties( idef );
@@ -946,94 +1125,36 @@ function Rhino3dmWorker() {
 			rhino.TextureType.PBR_Displacement
 		];
 
-		for ( let i = 0; i < doc.materials().count(); i ++ ) {
+		for ( let i = 0; i < doc.materials().count; i ++ ) {
 
 			const _material = doc.materials().get( i );
-			const _pbrMaterial = _material.physicallyBased();
 
 			let material = extractProperties( _material );
 
 			const textures = [];
 
-			for ( let j = 0; j < textureTypes.length; j ++ ) {
+			textures.push( ...extractTextures( _material, textureTypes, doc ) );
 
-				const _texture = _material.getTexture( textureTypes[ j ] );
-				if ( _texture ) {
+			material.pbrSupported = _material.physicallyBased().supported;
 
-					let textureType = textureTypes[ j ].constructor.name;
-					textureType = textureType.substring( 12, textureType.length );
-					const texture = { type: textureType };
+			if ( material.pbrSupported ) {
 
-					const image = doc.getEmbeddedFileAsBase64( _texture.fileName );
-
-					texture.wrapU = _texture.wrapU;
-					texture.wrapV = _texture.wrapV;
-					texture.wrapW = _texture.wrapW;
-					const uvw = _texture.uvwTransform.toFloatArray( true );
-					texture.repeat = [ uvw[ 0 ], uvw[ 5 ] ];
-
-					if ( image ) {
-
-						texture.image = 'data:image/png;base64,' + image;
-
-					} else {
-
-						self.postMessage( { type: 'warning', id: taskID, data: {
-							message: `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.`,
-							type: 'missing resource'
-						}
-
-						} );
-
-						texture.image = null;
-
-					}
-
-					textures.push( texture );
-
-					_texture.delete();
-
-				}
+				textures.push( ...extractTextures( _material, pbrTextureTypes, doc ) );
+				material.pbr = extractProperties( _material.physicallyBased() );
 
 			}
 
 			material.textures = textures;
 
-			if ( _pbrMaterial.supported ) {
-
-				for ( let j = 0; j < pbrTextureTypes.length; j ++ ) {
-
-					const _texture = _material.getTexture( pbrTextureTypes[ j ] );
-					if ( _texture ) {
-
-						const image = doc.getEmbeddedFileAsBase64( _texture.fileName );
-						let textureType = pbrTextureTypes[ j ].constructor.name;
-						textureType = textureType.substring( 12, textureType.length );
-						const texture = { type: textureType, image: 'data:image/png;base64,' + image };
-						textures.push( texture );
-
-						_texture.delete();
-
-					}
-
-				}
-
-				const pbMaterialProperties = extractProperties( _material.physicallyBased() );
-
-				material = Object.assign( pbMaterialProperties, material );
-
-			}
-
 			materials.push( material );
 
 			_material.delete();
-			_pbrMaterial.delete();
 
 		}
 
 		// Handle layers
 
-		for ( let i = 0; i < doc.layers().count(); i ++ ) {
+		for ( let i = 0; i < doc.layers().count; i ++ ) {
 
 			const _layer = doc.layers().get( i );
 			const layer = extractProperties( _layer );
@@ -1046,7 +1167,7 @@ function Rhino3dmWorker() {
 
 		// Handle views
 
-		for ( let i = 0; i < doc.views().count(); i ++ ) {
+		for ( let i = 0; i < doc.views().count; i ++ ) {
 
 			const _view = doc.views().get( i );
 			const view = extractProperties( _view );
@@ -1059,7 +1180,7 @@ function Rhino3dmWorker() {
 
 		// Handle named views
 
-		for ( let i = 0; i < doc.namedViews().count(); i ++ ) {
+		for ( let i = 0; i < doc.namedViews().count; i ++ ) {
 
 			const _namedView = doc.namedViews().get( i );
 			const namedView = extractProperties( _namedView );
@@ -1072,7 +1193,7 @@ function Rhino3dmWorker() {
 
 		// Handle groups
 
-		for ( let i = 0; i < doc.groups().count(); i ++ ) {
+		for ( let i = 0; i < doc.groups().count; i ++ ) {
 
 			const _group = doc.groups().get( i );
 			const group = extractProperties( _group );
@@ -1098,9 +1219,9 @@ function Rhino3dmWorker() {
 		// Handle strings
 		// console.log( `Document Strings Count: ${doc.strings().count()}` );
 		// Note: doc.strings().documentUserTextCount() counts any doc.strings defined in a section
-		//console.log( `Document User Text Count: ${doc.strings().documentUserTextCount()}` );
+		// console.log( `Document User Text Count: ${doc.strings().documentUserTextCount()}` );
 
-		const strings_count = doc.strings().count();
+		const strings_count = doc.strings().count;
 
 		for ( let i = 0; i < strings_count; i ++ ) {
 
@@ -1108,9 +1229,146 @@ function Rhino3dmWorker() {
 
 		}
 
+		// Handle Render Environments for Material Environment
+
+		// get the id of the active render environment skylight, which we'll use for environment texture
+		const reflectionId = doc.settings().renderSettings().renderEnvironments.reflectionId
+
+		const rc = doc.renderContent()
+
+		let renderEnvironment = null
+
+		for( let i = 0; i < rc.count; i++ ) {
+
+			const content = rc.get(i)
+
+			switch( content.kind ) {
+
+				case 'environment':
+
+					const id = content.id
+
+					// there could be multiple render environments in a 3dm file
+					if ( id !== reflectionId ) break;
+
+					const renderTexture = content.findChild( 'texture' )
+					const fileName = renderTexture.fileName
+
+					for ( let j = 0; j < doc.embeddedFiles().count; j ++ ) {
+
+						const _fileName = doc.embeddedFiles().get( j ).fileName
+
+						if ( fileName === _fileName ) {
+
+							const background = doc.getEmbeddedFileAsBase64( fileName )
+							const backgroundImage = 'data:image/png;base64,' + background
+							renderEnvironment = { type: 'renderEnvironment', image: backgroundImage, name: fileName };
+
+						}
+
+					}
+					
+					break;
+
+			}
+
+		}
+
+		// Handle Render Settings
+
+		const renderSettings = {
+			ambientLight: doc.settings().renderSettings().ambientLight,
+			backgroundColorTop: doc.settings().renderSettings().backgroundColorTop,
+			backgroundColorBottom: doc.settings().renderSettings().backgroundColorBottom,
+			useHiddenLights: doc.settings().renderSettings().useHiddenLights,
+			depthCue: doc.settings().renderSettings().depthCue,
+			flatShade: doc.settings().renderSettings().flatShade,
+			renderBackFaces: doc.settings().renderSettings().renderBackFaces,
+			renderPoints: doc.settings().renderSettings().renderPoints,
+			renderCurves: doc.settings().renderSettings().renderCurves,
+			renderIsoParams: doc.settings().renderSettings().renderIsoParams,
+			renderMeshEdges: doc.settings().renderSettings().renderMeshEdges,
+			renderAnnotations: doc.settings().renderSettings().renderAnnotations,
+			useViewportSize: doc.settings().renderSettings().useViewportSize,
+			scaleBackgroundToFit: doc.settings().renderSettings().scaleBackgroundToFit,
+			transparentBackground: doc.settings().renderSettings().transparentBackground,
+			imageDpi: doc.settings().renderSettings().imageDpi,
+			shadowMapLevel: doc.settings().renderSettings().shadowMapLevel,
+			namedView: doc.settings().renderSettings().namedView,
+			snapShot: doc.settings().renderSettings().snapShot,
+			specificViewport: doc.settings().renderSettings().specificViewport,
+			groundPlane: extractProperties( doc.settings().renderSettings().groundPlane ),
+			safeFrame: extractProperties( doc.settings().renderSettings().safeFrame ),
+			dithering: extractProperties( doc.settings().renderSettings().dithering ),
+			skylight: extractProperties( doc.settings().renderSettings().skylight ),
+			linearWorkflow: extractProperties( doc.settings().renderSettings().linearWorkflow ),
+			renderChannels: extractProperties( doc.settings().renderSettings().renderChannels ),
+			sun: extractProperties( doc.settings().renderSettings().sun ),
+			renderEnvironments: extractProperties( doc.settings().renderSettings().renderEnvironments ),
+			postEffects: extractProperties( doc.settings().renderSettings().postEffects ),
+
+		}
+
 		doc.delete();
 
-		return { objects, materials, layers, views, namedViews, groups, strings, settings };
+		return { objects, materials, layers, views, namedViews, groups, strings, settings, renderSettings, renderEnvironment };
+
+	}
+
+	function extractTextures( m, tTypes, d ) {
+
+		const textures = []
+
+		for ( let i = 0; i < tTypes.length; i ++ ) {
+
+			const _texture = m.getTexture( tTypes[ i ] );
+			if ( _texture ) {
+
+				let textureType = tTypes[ i ].constructor.name;
+				textureType = textureType.substring( 12, textureType.length );
+				const texture = extractTextureData( _texture, textureType, d );
+				textures.push( texture );
+				_texture.delete();
+
+			}
+
+		}
+
+		return textures;
+
+	}
+
+	function extractTextureData( t, tType, d ) {
+
+		const texture = { type: tType };
+
+		const image = d.getEmbeddedFileAsBase64( t.fileName );
+
+		texture.wrapU = t.wrapU;
+		texture.wrapV = t.wrapV;
+		texture.wrapW = t.wrapW;
+		const uvw = t.uvwTransform.toFloatArray( true );
+
+		texture.repeat = [ uvw[ 0 ], uvw[ 5 ] ];
+
+		if ( image ) {
+
+			texture.image = 'data:image/png;base64,' + image;
+
+		} else {
+
+			self.postMessage( { type: 'warning', id: taskID, data: {
+				message: `THREE.3DMLoader: Image for ${tType} texture not embedded in file.`,
+				type: 'missing resource'
+			}
+
+			} );
+
+			texture.image = null;
+
+		}
+
+		return texture;
 
 	}
 
@@ -1323,6 +1581,18 @@ function Rhino3dmWorker() {
 
 			}
 
+			if ( _attributes.decals().count > 0 ) {
+
+				self.postMessage( { type: 'warning', id: taskID, data: {
+					message: `THREE.3DMLoader: No conversion exists for the decals associated with this object.`,
+					type: 'no conversion',
+					guid: _attributes.id
+				}
+	
+				} );
+				
+			}
+
 			attributes.drawColor = _attributes.drawColor( doc );
 
 			objectType = objectType.constructor.name;
@@ -1357,6 +1627,10 @@ function Rhino3dmWorker() {
 				if ( typeof value === 'object' && value !== null && value.hasOwnProperty( 'constructor' ) ) {
 
 					result[ property ] = { name: value.constructor.name, value: value.value };
+
+				} else if ( typeof value === 'object' && value !== null ) {
+
+					result[ property ] = extractProperties( value );
 
 				} else {
 

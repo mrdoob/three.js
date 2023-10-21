@@ -63,7 +63,7 @@
 
 		<h2>ملاحظة حول ترتيب الصف الرئيسي والعمود الرئيسي</h2>
 		<p>
-		يأخذ الباني وطريقة [page:set]() المعاملات في
+		يأخذ الباني وطريقة [page:.set set]() المعاملات في
 		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major] 
 		ترتيب ، في حين يتم تخزينها داخليًا في مصفوفة [page:.elements elements] بترتيب العمود الرئيسي. <br /><br />
 	 
@@ -194,20 +194,85 @@
 		<p>
 		يستخرج[link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] 
 		من هذه المصفوفة في المتجهات الثلاثة المحورية المقدمة. إذا كانت هذه المصفوفة
-		:
-		<code>
-	 a، b، c، d، 
-	 e، f، g، h، 
-	 i، j، k، l، 
-	 m، n، o، p 
-		</code>
+		:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>a</mi></mtd>
+						<mtd><mi>b</mi></mtd>
+						<mtd><mi>c</mi></mtd>
+						<mtd><mi>d</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>e</mi></mtd>
+						<mtd><mi>f</mi></mtd>
+						<mtd><mi>g</mi></mtd>
+						<mtd><mi>h</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>i</mi></mtd>
+						<mtd><mi>j</mi></mtd>
+						<mtd><mi>k</mi></mtd>
+						<mtd><mi>l</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>m</mi></mtd>
+						<mtd><mi>n</mi></mtd>
+						<mtd><mi>o</mi></mtd>
+						<mtd><mi>p</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math><br /><br />
+
 		ثم سيتم تعيين[page:Vector3 xAxis] ،[page:Vector3 yAxis] ،[page:Vector3 zAxis]
-		إلى:
-		<code>
-	 xAxis = (a, e, i) 
-	 yAxis = (b, f, j) 
-	 zAxis = (c, g, k) 
-		</code>
+		إلى:<br /><br />
+
+		<math>
+			<mrow>
+				<mi>xAxis</mi>
+				<mo>=</mo>
+				<mo>[</mo>
+				<mtable>
+					<mtr><mtd style="height: 1rem"><mi>a</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>e</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>i</mi></mtd></mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>,
+
+		<math>
+			<mrow>
+				<mi>yAxis</mi>
+				<mo>=</mo>
+				<mo>[</mo>
+				<mtable>
+					<mtr><mtd style="height: 1rem"><mi>b</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>f</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>j</mi></mtd></mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>, and
+
+		<math>
+			<mrow>
+				<mi>zAxis</mi>
+				<mo>=</mo>
+				<mo>[</mo>
+				<mtable>
+					<mtr><mtd style="height: 1rem"><mi>c</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>g</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>k</mi></mtd></mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 
 		<h3>[method:this extractRotation]( [param:Matrix4 m] )</h3>
@@ -272,13 +337,40 @@
 		</h3>
 		<p>
 		قم بتعيين هذا إلى [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] 
-		مصفوفة تتكون من المتجهات الأساسية الثلاثة المقدمة:
-		<code>
-		xAxis.x، yAxis.x، zAxis.x، 0، 
-		xAxis.y، yAxis.y، zAxis.y، 0، 
-		xAxis.z، yAxis.z، zAxis.z، 0، 
-		0, 		0, 		0, 	   1
-		</code>
+		مصفوفة تتكون من المتجهات الأساسية الثلاثة المقدمة:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>xAxis.x</mi></mtd>
+						<mtd><mi>yAxis.x</mi></mtd>
+						<mtd><mi>zAxis.x</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>xAxis.y</mi></mtd>
+						<mtd><mi>yAxis.y</mi></mtd>
+						<mtd><mi>zAxis.y</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>xAxis.z</mi></mtd>
+						<mtd><mi>yAxis.z</mi></mtd>
+						<mtd><mi>zAxis.z</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 		 
 		<h3>
@@ -314,13 +406,136 @@
 		[page:Quaternion q] ، كما هو مبين
 		[link:https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion هنا]. ال
 		باقي من المصفوفة يتم تعيينه إلى المعرف. لذلك ، بالنظر إلى[page:Quaternion q] =
-		w + xi + yj + zk ، فإن المصفوفة الناتجة ستكون:
-		<code>
-1-2y²-2z² 	2xy-2zw 	2xz+2yw 	0 
-2xy+2zw   	1-2x²-2z² 	2yz-2xw 	0 
-2xz-2yw   	2yz+2xw   	1-2x²-2y²   0
-	0 			0	 		0 		1
-			</code>
+		w + xi + yj + zk ، فإن المصفوفة الناتجة ستكون:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd>
+							<mn>1</mn>
+							<mo>-</mo>
+							<mn>2</mn>
+							<msup>
+								<mi>y</mi>
+								<mn>2</mn>
+							</msup>
+							<mo>-</mo>
+							<mn>2</mn>
+							<msup>
+								<mi>z</mi>
+								<mn>2</mn>
+							</msup>
+						</mtd>
+						<mtd>
+							<mn>2</mn>
+							<mi>x</mi>
+							<mi>y</mi>
+							<mo>-</mo>
+							<mn>2</mn>
+							<mi>z</mi>
+							<mi>w</mi>
+						</mtd>
+						<mtd>
+							<mn>2</mn>
+							<mi>x</mi>
+							<mi>z</mi>
+							<mo>+</mo>
+							<mn>2</mn>
+							<mi>y</mi>
+							<mi>w</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mn>2</mn>
+							<mi>x</mi>
+							<mi>y</mi>
+							<mo>+</mo>
+							<mn>2</mn>
+							<mi>z</mi>
+							<mi>w</mi>
+						</mtd>
+						<mtd>
+							<mn>1</mn>
+							<mo>-</mo>
+							<mn>2</mn>
+							<msup>
+								<mi>x</mi>
+								<mn>2</mn>
+							</msup>
+							<mo>-</mo>
+							<mn>2</mn>
+							<msup>
+								<mi>z</mi>
+								<mn>2</mn>
+							</msup>
+						</mtd>
+						<mtd>
+							<mn>2</mn>
+							<mi>y</mi>
+							<mi>z</mi>
+							<mo>-</mo>
+							<mn>2</mn>
+							<mi>x</mi>
+							<mi>w</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mn>2</mn>
+							<mi>x</mi>
+							<mi>z</mi>
+							<mo>-</mo>
+							<mn>2</mn>
+							<mi>y</mi>
+							<mi>w</mi>
+						</mtd>
+						<mtd>
+							<mn>2</mn>
+							<mi>y</mi>
+							<mi>z</mi>
+							<mo>+</mo>
+							<mn>2</mn>
+							<mi>x</mi>
+							<mi>w</mi>
+						</mtd>
+						<mtd>
+							<mn>1</mn>
+							<mo>-</mo>
+							<mn>2</mn>
+							<msup>
+								<mi>x</mi>
+								<mn>2</mn>
+							</msup>
+							<mo>-</mo>
+							<mn>2</mn>
+							<msup>
+								<mi>y</mi>
+								<mn>2</mn>
+							</msup>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 
 		<h3>[method:this makeRotationX]( [param:Float theta] )</h3>
@@ -328,13 +543,61 @@
 		[page:Float theta] - زاوية الدوران بالراديان. <br /><br />
 	 
 		يضع هذه المصفوفة كتحويل دوران حول محور X بواسطة
-		[page:Float theta] (&theta;) راديان. المصفوفة الناتجة ستكون:
-		<code>
-1 		0	 		0 			0 
-0 	cos(&theta;) -sin(&theta;) 	0 
-0 	sin(&theta;) cos(&theta;) 	0 
-0 		0			0 			1
-		</code>
+		[page:Float theta] (&theta;) راديان. المصفوفة الناتجة ستكون:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mo>-</mo>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+						<mtd>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 	 
 		<h3>[method:this makeRotationY]( [param:Float theta] )</h3>
@@ -342,11 +605,61 @@
 		[page:Float theta] - زاوية الدوران بالراديان. <br /><br />
 	 
 		يضع هذه المصفوفة كتحويل دوران حول محور Y بواسطة
-		[page:Float theta] (&theta;) راديان. المصفوفة الناتجة ستكون:
-		<code>
-		cos(&theta;) 0 sin(&theta;) 0 0 1 0 0 -sin(&theta;) 0 cos(&theta;) 0 0 0
-		0 1
-		</code>
+		[page:Float theta] (&theta;) راديان. المصفوفة الناتجة ستكون:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+						<mtd>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mo>-</mo>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 	 
 		<h3>[method:this makeRotationZ]( [param:Float theta] )</h3>
@@ -354,13 +667,61 @@
 		[page:Float theta] - زاوية الدوران بالراديان. <br /><br />
 	 
 		يضع هذه المصفوفة كتحويل دوران حول محور Z بواسطة
-		[page:Float theta] (&theta;) راديان. المصفوفة الناتجة ستكون:
-		<code>
-cos(&theta;) -sin(&theta;) 0 0 
-sin(&theta;) cos(&theta;)  0 0 
-0 		0 	1   0 
-0 		0	0   1
-				</code>
+		[page:Float theta] (&theta;) راديان. المصفوفة الناتجة ستكون:<br /><br />
+			
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mo>-</mo>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 	 
 		<h3>
@@ -371,13 +732,40 @@ sin(&theta;) cos(&theta;)  0 0
 		[page:Float y] - المقدار الذي يجب تغييره في محور Y. <br />
 		[page:Float z] - المقدار الذي يجب تغييره في محور Z. <br /><br />
 	 
-		يضع هذه المصفوفة كتحويل قياس:
-		<code>
-	 x، 0، 0، 0، 
-	 0، y، 0، 0، 
-	 0، 0، z، 0، 
-	 0، 0، 0، 1 
-		</code>
+		يضع هذه المصفوفة كتحويل قياس:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>x</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>z</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 	 
 		<h3>
@@ -392,12 +780,40 @@ sin(&theta;) cos(&theta;)  0 0
 		[page:Float zx] - المقدار الذي يجب قصه Z بواسطة X. <br />
 		[page:Float zy] - المقدار الذي يجب قصه Z بواسطة Y. <br /><br />
 		 
-		يضع هذه المصفوفة كتحويل قص:
-		<code> 
-		1، yx، zx، 0، 
-		xy، 1، zy، 0، 
-		xz، yz، 1، 0، 
-		0، 0، 0، 1 </code>
+		يضع هذه المصفوفة كتحويل قص:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mi>y</mi><mi>x</mi></mtd>
+						<mtd><mi>z</mi><mi>x</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>x</mi><mi>y</mi></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mi>z</mi><mi>y</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>x</mi><mi>z</mi></mtd>
+						<mtd><mi>y</mi><mi>z</mi></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 		 
 		<h3>[method:this makeTranslation]( [param:Vector3 v] )</h3>
@@ -405,12 +821,40 @@ sin(&theta;) cos(&theta;)  0 0
 		[method:this makeTranslation]( [param:Float x], [param:Float y], [param:Float z] ) // واجهة برمجة التطبيقات الاختيارية
 		</h3>
 		<p>
-		يضع هذه المصفوفة كتحويل ترجمة من متجه [page:Vector3 v] ، أو أرقام [page:Float x] ، [page:Float y] و [page:Float z]:
-		<code> 
-		1، 0، 0، x، 
-		0، 1، 0، y، 
-		0، 0، 1، z، 
-		0، 0، 0، 1 </code>
+		يضع هذه المصفوفة كتحويل ترجمة من متجه [page:Vector3 v] ، أو أرقام [page:Float x] ، [page:Float y] و [page:Float z]:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>x</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mi>z</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 		 
 		<h3>[method:this multiply]( [param:Matrix4 m] )</h3>
@@ -453,18 +897,75 @@ sin(&theta;) cos(&theta;)  0 0
 		<p>
 		يضع مكون الموضع لهذه المصفوفة من المتجه [page:Vector3 v] ،
 		دون التأثير على بقية المصفوفة - أي إذا كانت المصفوفة هي
-		حاليا:
-		<code>
-		a, b, c, d, 
-		e, f, g, h, 
-		i, j, k, l, 
-		m, n, o, p </code>
-		هذا يصبح:
-		<code>
-		a, b, c, v.x, 
-		e, f, g, v.y, 
-		i, j, k, v.z, 
-		m, n, o, p </code>
+		حاليا:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>a</mi></mtd>
+						<mtd><mi>b</mi></mtd>
+						<mtd><mi>c</mi></mtd>
+						<mtd><mi>d</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>e</mi></mtd>
+						<mtd><mi>f</mi></mtd>
+						<mtd><mi>g</mi></mtd>
+						<mtd><mi>h</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>i</mi></mtd>
+						<mtd><mi>j</mi></mtd>
+						<mtd><mi>k</mi></mtd>
+						<mtd><mi>l</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>m</mi></mtd>
+						<mtd><mi>n</mi></mtd>
+						<mtd><mi>o</mi></mtd>
+						<mtd><mi>p</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math><br /><br />
+
+		هذا يصبح:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>a</mi></mtd>
+						<mtd><mi>b</mi></mtd>
+						<mtd><mi>c</mi></mtd>
+						<mtd><mi>v.x</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>e</mi></mtd>
+						<mtd><mi>f</mi></mtd>
+						<mtd><mi>g</mi></mtd>
+						<mtd><mi>v.y</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>i</mi></mtd>
+						<mtd><mi>j</mi></mtd>
+						<mtd><mi>k</mi></mtd>
+						<mtd><mi>v.z</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>m</mi></mtd>
+						<mtd><mi>n</mi></mtd>
+						<mtd><mi>o</mi></mtd>
+						<mtd><mi>p</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 		 
 		<h3>

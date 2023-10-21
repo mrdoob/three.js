@@ -26,7 +26,7 @@ function GeometryParametersPanel( editor, object ) {
 	// length
 
 	const lengthRow = new UIRow();
-	const length = new UINumber( parameters.height ).onChange( update );
+	const length = new UINumber( parameters.length ).onChange( update );
 
 	lengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/capsule_geometry/length' ) ).setWidth( '90px' ) );
 	lengthRow.add( length );
