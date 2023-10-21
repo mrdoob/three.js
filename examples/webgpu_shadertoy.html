@@ -271,7 +271,7 @@
 				const geometry = new THREE.PlaneGeometry( 2, 2 );
 
 				const material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = Nodes.oscSine( Nodes.timerLocal( .3 ) ).mix( shaderToy1Node, shaderToy2Node );
+				material.colorNode = Nodes.oscSine( Nodes.timerGlobal( .3 ) ).mix( shaderToy1Node, shaderToy2Node );
 
 				const quad = new THREE.Mesh( geometry, material );
 				scene.add( quad );

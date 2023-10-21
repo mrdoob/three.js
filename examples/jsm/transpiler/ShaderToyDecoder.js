@@ -7,7 +7,7 @@ class ShaderToyDecoder extends GLSLDecoder {
 
 		super();
 
-		this.addKeyword( 'iTime', 'float iTime = timerLocal();' );
+		this.addKeyword( 'iTime', 'float iTime = timerGlobal();' );
 		this.addKeyword( 'iResolution', 'vec2 iResolution = viewportResolution;' );
 		this.addKeyword( 'fragCoord', 'vec2 fragCoord = vec2( viewportCoordinate.x, viewportResolution.y - viewportCoordinate.y );' );
 
