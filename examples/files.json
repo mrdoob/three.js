@@ -343,12 +343,14 @@
 		"webgpu_particles",
 		"webgpu_rtt",
 		"webgpu_sandbox",
+		"webgpu_shadertoy",
 		"webgpu_shadowmap",
 		"webgpu_skinning",
 		"webgpu_skinning_instancing",
 		"webgpu_skinning_points",
 		"webgpu_sprites",
 		"webgpu_tsl_editor",
+		"webgpu_tsl_transpiler",
 		"webgpu_video_panorama"
 	],
 	"webaudio": [

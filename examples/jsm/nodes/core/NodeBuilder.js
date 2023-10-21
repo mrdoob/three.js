@@ -5,7 +5,7 @@ import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
-import PropertyNode from './PropertyNode.js';
+import ParameterNode from './ParameterNode.js';
 import { createNodeMaterialFromType } from '../materials/NodeMaterial.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
@@ -817,11 +817,28 @@ class NodeBuilder {
 	flowShaderNode( shaderNode ) {
 
 		const layout = shaderNode.layout;
-		const inputs = {};
 
-		for ( const input of layout.inputs ) {
+		let inputs;
 
-			inputs[ input.name ] = new PropertyNode( input.type, input.name, false )
+		if ( shaderNode.isArrayInput ) {
+
+			inputs = [];
+
+			for ( const input of layout.inputs ) {
+
+				inputs.push( new ParameterNode( input.type, input.name ) );
+
+			}
+
+		} else {
+
+			inputs = {};
+
+			for ( const input of layout.inputs ) {
+
+				inputs[ input.name ] = new ParameterNode( input.type, input.name );
+
+			}
 
 		}
 
@@ -1087,6 +1104,18 @@ class NodeBuilder {
 
 	}
 
+	getPrimitiveType( type ) {
+
+		let primitiveType;
+
+		if ( type[ 0 ] === 'i' ) primitiveType = 'int';
+		else if ( type[ 0 ] === 'u' ) primitiveType = 'uint';
+		else primitiveType = 'float';
+
+		return primitiveType;
+
+	}
+
 	format( snippet, fromType, toType ) {
 
 		fromType = this.getVectorType( fromType );
@@ -1129,7 +1158,7 @@ class NodeBuilder {
 
 		}
 
-		if ( toTypeLength === 4 ) { // toType is vec4-like
+		if ( toTypeLength === 4 && fromTypeLength > 1 ) { // toType is vec4-like
 
 			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, 'vec3' ) }, 1.0 )`;
 
@@ -1138,6 +1167,15 @@ class NodeBuilder {
 		if ( fromTypeLength === 2 ) { // fromType is vec2-like and toType is vec3-like
 
 			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, 'vec2' ) }, 0.0 )`;
+
+		}
+
+		if ( fromTypeLength === 1 && toTypeLength > 1 && fromType[ 0 ] !== toType[ 0 ] ) { // fromType is float-like
+
+			// convert a number value to vector type, e.g:
+			// vec3( 1u ) -> vec3( float( 1u ) )
+
+			snippet = `${ this.getType( this.getPrimitiveType( toType ) ) }( ${ snippet } )`;
 
 		}
 
