@@ -12,14 +12,14 @@ export class Program {
 
 export class VariableDeclaration {
 
-	constructor( type, name, value = null, next = null, isConst = false ) {
+	constructor( type, name, value = null, next = null, immutable = false ) {
 
 		this.type = type;
 		this.name = name;
 		this.value = value;
 		this.next = next;
 
-		this.isConst = isConst;
+		this.immutable = immutable;
 
 		this.isVariableDeclaration = true;
 

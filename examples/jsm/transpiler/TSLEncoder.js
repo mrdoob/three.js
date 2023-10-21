@@ -431,7 +431,7 @@ ${ this.tab }} )`;
 
 		}
 
-		if ( node.isConst === false ) {
+		if ( node.immutable === false ) {
 
 			varStr += '.toVar()';
 

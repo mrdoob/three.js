@@ -528,6 +528,9 @@ class GLSLDecoder {
 
 		for ( let i = 0; i < tokens.length; i ++ ) {
 
+			const immutable = tokens[ i ].str === 'const';
+			if ( immutable ) i ++;
+
 			let qualifier = tokens[ i ].str;
 
 			if ( /^(in|out|inout)$/.test( qualifier ) ) {
@@ -543,7 +546,7 @@ class GLSLDecoder {
 			const type = tokens[ i ++ ].str;
 			const name = tokens[ i ++ ].str;
 
-			params.push( new FunctionParameter( type, name, qualifier ) );
+			params.push( new FunctionParameter( type, name, qualifier, immutable ) );
 
 			if ( tokens[ i ] && tokens[ i ].str !== ',' ) throw new Error( 'Expected ","' );
 
@@ -577,9 +580,9 @@ class GLSLDecoder {
 	parseVariablesFromToken( tokens, type ) {
 
 		let index = 0;
-		const isConst = tokens[ 0 ].str === 'const';
+		const immutable = tokens[ 0 ].str === 'const';
 
-		if ( isConst ) index ++;
+		if ( immutable ) index ++;
 
 		type = type || tokens[ index ++ ].str;
 		const name = tokens[ index ++ ].str;
@@ -612,7 +615,7 @@ class GLSLDecoder {
 
 		}
 
-		const variable = new VariableDeclaration( type, name, init, next, isConst );
+		const variable = new VariableDeclaration( type, name, init, next, immutable );
 
 		return variable;
 
