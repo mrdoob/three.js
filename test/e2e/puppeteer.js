@@ -127,6 +127,7 @@ const exceptionList = [
 	'webgpu_shadowmap',
 	'webgpu_sprites',
 	'webgpu_tsl_editor',
+	'webgpu_tsl_transpiler',
 	'webgpu_video_panorama'
 
 ];
