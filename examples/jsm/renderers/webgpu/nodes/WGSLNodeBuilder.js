@@ -488,6 +488,12 @@ ${ flowData.code }
 
 	}
 
+	isAdjustShadowCoord() {
+
+		return true;
+
+	}
+
 	isFlipY() {
 
 		return false;
