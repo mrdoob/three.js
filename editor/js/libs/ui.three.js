@@ -124,8 +124,6 @@ class UITexture extends UISpan {
 
 			} else if ( file.type.match( 'image.*' ) ) {
 
-				console.log( 'DEBUG MATCHED IMAGE' );
-
 				reader.addEventListener( 'load', function ( event ) {
 
 					const image = document.createElement( 'img' );
