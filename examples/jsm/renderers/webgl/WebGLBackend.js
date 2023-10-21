@@ -830,9 +830,20 @@ class WebGLBackend extends Backend {
 
 	}
 
-	copyFramebufferToTexture( /*texture, renderContext*/ ) {
+	copyFramebufferToTexture( texture /*, renderContext */ ) {
 
-		console.warn( 'Abstract class.' );
+		const { gl } = this;
+
+		const { textureGPU } = this.get( texture );
+
+		gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+		gl.bindTexture( gl.TEXTURE_2D, textureGPU );
+
+		gl.copyTexSubImage2D( gl.TEXTURE_2D, 0, 0, 0, 0, 0, texture.image.width, texture.image.height );
+
+		if ( texture.generateMipmaps ) gl.generateMipmap( gl.TEXTURE_2D );
+
+		gl.bindTexture( gl.TEXTURE_2D, null );
 
 	}
 
