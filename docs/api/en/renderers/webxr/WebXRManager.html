@@ -100,6 +100,20 @@
 			Returns the `XRSession` object which allows a more fine-grained management
 			of active WebXR sessions on application level.
 		</p>
+		
+		<h3>[method:XRLightProbe getLightProbe]()</h3>
+		<p>
+			Returns an `XRLightProbe` object which can be used to read an estimation 
+			of the real-world lighting conditions, and retrieve an environment map of the
+			real-world surroundings that can be used as the environment map of the scene.
+
+			Make sure to pass "light-estimation" to `XRButton.createButton()` to request
+			light estimation on the `XRSession` before calling the method.
+
+			Note: this will only return an object if the WebXR session supports
+			light estimation. See <a href="https://developer.mozilla.org/en-US/docs/Web/API/XRLightProbe">XRLightProbe</a>
+			for compatibility details.
+		</p>
 
 		<h3>[method:undefined setFoveation]( [param:Float foveation] )</h3>
 		<p>
