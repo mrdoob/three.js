@@ -36,7 +36,7 @@ class WebXRManager extends EventDispatcher {
 		const attributes = gl.getContextAttributes();
 		let initialRenderTarget = null;
 		let newRenderTarget = null;
-		const lightProbe = null;
+		let lightProbe = null;
 
 		const controllers = [];
 		const controllerInputSources = [];
