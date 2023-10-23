@@ -7,6 +7,7 @@ import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { positionWorld } from '../accessors/PositionNode.js';
 import { normalWorld } from '../accessors/NormalNode.js';
+import { WebGPUCoordinateSystem } from 'three';
 //import { add } from '../math/OperatorNode.js';
 
 import { Color, DepthTexture, NearestFilter, LessCompare } from 'three';
@@ -74,7 +75,7 @@ class AnalyticLightNode extends LightingNode {
 				.and( shadowCoord.z.lessThanEqual( 1 ) );
 
 
-			if ( builder.isAdjustShadowCoord() ) {
+			if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) {
 
 				shadowCoord = vec3(
 					shadowCoord.x,

@@ -291,12 +291,6 @@ class NodeBuilder {
 
 	}
 
-	isAdjustShadowCoord() {
-
-		return false;
-
-	}
-
 	isFlipY() {
 
 		return false;
