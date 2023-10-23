@@ -181,8 +181,10 @@ class PhysicalLightingModel extends LightingModel {
 		this.iridescence = iridescence;
 
 		this.clearcoatRadiance = null;
-		this.clearcoatSpecular = null;
-		this.sheenSpecular = null;
+		this.clearcoatSpecularDirect = null;
+		this.clearcoatSpecularIndirect = null;
+		this.sheenSpecularDirect = null;
+		this.sheenSpecularIndirect = null;
 		this.iridescenceFresnel = null;
 		this.iridescenceF0 = null;
 
@@ -193,13 +195,15 @@ class PhysicalLightingModel extends LightingModel {
 		if ( this.clearcoat === true ) {
 
 			this.clearcoatRadiance = vec3().temp( 'clearcoatRadiance' );
-			this.clearcoatSpecular = vec3().temp( 'clearcoatSpecular' );
+			this.clearcoatSpecularDirect = vec3().temp( 'clearcoatSpecularDirect' );
+			this.clearcoatSpecularIndirect = vec3().temp( 'clearcoatSpecularIndirect' );
 
 		}
 
 		if ( this.sheen === true ) {
 
-			this.sheenSpecular = vec3().temp( 'sheenSpecular' );
+			this.sheenSpecularDirect = vec3().temp( 'sheenSpecularDirect' );
+			this.sheenSpecularIndirect = vec3().temp( 'sheenSpecularIndirect' );
 
 		}
 
@@ -253,7 +257,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		if ( this.sheen === true ) {
 
-			this.sheenSpecular.addAssign( irradiance.mul( BRDF_Sheen( { lightDirection } ) ) );
+			this.sheenSpecularDirect.addAssign( irradiance.mul( BRDF_Sheen( { lightDirection } ) ) );
 
 		}
 
@@ -262,7 +266,7 @@ class PhysicalLightingModel extends LightingModel {
 			const dotNLcc = transformedClearcoatNormalView.dot( lightDirection ).clamp();
 			const ccIrradiance = dotNLcc.mul( lightColor );
 
-			this.clearcoatSpecular.addAssign( ccIrradiance.mul( BRDF_GGX( { lightDirection, f0: clearcoatF0, f90: clearcoatF90, roughness: clearcoatRoughness, normalView: transformedClearcoatNormalView } ) ) );
+			this.clearcoatSpecularDirect.addAssign( ccIrradiance.mul( BRDF_GGX( { lightDirection, f0: clearcoatF0, f90: clearcoatF90, roughness: clearcoatRoughness, normalView: transformedClearcoatNormalView } ) ) );
 
 		}
 
@@ -282,7 +286,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		if ( this.sheen === true ) {
 
-			this.sheenSpecular.addAssign( iblIrradiance.mul(
+			this.sheenSpecularIndirect.addAssign( iblIrradiance.mul(
 				sheen,
 				IBLSheenBRDF( {
 					normal: transformedNormalView,
@@ -304,7 +308,7 @@ class PhysicalLightingModel extends LightingModel {
 				roughness: clearcoatRoughness
 			} );
 
-			this.clearcoatSpecular.addAssign( this.clearcoatRadiance.mul( clearcoatEnv ) );
+			this.clearcoatSpecularIndirect.addAssign( this.clearcoatRadiance.mul( clearcoatEnv ) );
 
 		}
 
@@ -336,6 +340,18 @@ class PhysicalLightingModel extends LightingModel {
 
 		const aoNode = ambientOcclusion.sub( aoNV.pow( aoExp ).oneMinus() ).clamp();
 
+		if ( this.clearcoat === true ) {
+
+			this.clearcoatSpecularIndirect.mulAssign( ambientOcclusion );
+
+		}
+
+		if ( this.sheen === true ) {
+
+			this.sheenSpecularIndirect.mulAssign( ambientOcclusion );
+
+		}
+
 		reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
 		reflectedLight.indirectSpecular.mulAssign( aoNode );
 
@@ -355,7 +371,7 @@ class PhysicalLightingModel extends LightingModel {
 				f90: clearcoatF90
 			} );
 
-			const clearcoatLight = outgoingLight.mul( clearcoat.mul( Fcc ).oneMinus() ).add( this.clearcoatSpecular.mul( clearcoat ) );
+			const clearcoatLight = outgoingLight.mul( clearcoat.mul( Fcc ).oneMinus() ).add( this.clearcoatSpecularDirect, this.clearcoatSpecularIndirect ).mul( clearcoat );
 
 			outgoingLight.assign( clearcoatLight );
 
@@ -364,7 +380,7 @@ class PhysicalLightingModel extends LightingModel {
 		if ( this.sheen === true ) {
 
 			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( 0.157 ).oneMinus();
-			const sheenLight = outgoingLight.mul( sheenEnergyComp ).add( this.sheenSpecular );
+			const sheenLight = outgoingLight.mul( sheenEnergyComp ).add( this.sheenSpecularDirect, this.sheenSpecularIndirect );
 
 			outgoingLight.assign( sheenLight );
 

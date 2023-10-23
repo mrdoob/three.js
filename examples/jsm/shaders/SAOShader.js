@@ -8,12 +8,16 @@ import {
  */
 
 const SAOShader = {
+
+	name: 'SAOShader',
+
 	defines: {
 		'NUM_SAMPLES': 7,
 		'NUM_RINGS': 4,
 		'DIFFUSE_TEXTURE': 0,
 		'PERSPECTIVE_CAMERA': 1
 	},
+
 	uniforms: {
 
 		'tDepth': { value: null },
@@ -34,6 +38,7 @@ const SAOShader = {
 		'kernelRadius': { value: 100.0 },
 		'randomSeed': { value: 0.0 }
 	},
+
 	vertexShader: /* glsl */`
 
 		varying vec2 vUv;

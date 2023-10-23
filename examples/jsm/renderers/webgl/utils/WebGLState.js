@@ -21,7 +21,7 @@ class WebGLState {
 		this.currentFlipSided = null;
 		this.currentCullFace = null;
 		this.currentProgram = null;
-		this.currentBlendingEnabled = null;
+		this.currentBlendingEnabled = false;
 		this.currentBlending = null;
 		this.currentBlendSrc = null;
 		this.currentBlendDst = null;
@@ -30,6 +30,7 @@ class WebGLState {
 		this.currentPremultipledAlpha = null;
 		this.currentPolygonOffsetFactor = null;
 		this.currentPolygonOffsetUnits = null;
+		this.currentColorMask = null;
 		this.currentDepthFunc = null;
 		this.currentDepthMask = null;
 		this.currentStencilFunc = null;
@@ -296,6 +297,17 @@ class WebGLState {
 
 	}
 
+	setColorMask( colorMask ) {
+
+		if ( this.currentColorMask !== colorMask ) {
+
+			this.gl.colorMask( colorMask, colorMask, colorMask, colorMask );
+			this.currentColorMask = colorMask;
+
+		}
+
+	}
+
 	setDepthTest( depthTest ) {
 
 		const { gl } = this;
@@ -462,7 +474,7 @@ class WebGLState {
 		this.setDepthFunc( material.depthFunc );
 		this.setDepthTest( material.depthTest );
 		this.setDepthMask( material.depthWrite );
-		this.setDepthMask( material.colorWrite );
+		this.setColorMask( material.colorWrite );
 
 		const stencilWrite = material.stencilWrite;
 		this.setStencilTest( stencilWrite );

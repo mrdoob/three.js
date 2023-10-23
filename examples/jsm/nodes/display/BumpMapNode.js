@@ -4,7 +4,7 @@ import { uv } from '../accessors/UVNode.js';
 import { normalView } from '../accessors/NormalNode.js';
 import { positionView } from '../accessors/PositionNode.js';
 import { faceDirection } from './FrontFacingNode.js';
-import { tslFn, nodeProxy, float, vec2 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, tslFn, nodeProxy, float, vec2 } from '../shadernode/ShaderNode.js';
 
 // Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 // https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
@@ -35,7 +35,7 @@ const dHdxy_fwd = tslFn( ( { textureNode, bumpScale } ) => {
 	const uvNode = texNode.uvNode || uv();
 
 	// It's used to preserve the same TextureNode instance
-	const sampleTexture = ( uv ) => textureNode.cache().context( { getUVNode: () => uv } );
+	const sampleTexture = ( uv ) => textureNode.cache().context( { getUVNode: () => uv, forceUVContext: true } );
 
 	return vec2(
 		float( sampleTexture( uvNode.add( uvNode.dFdx() ) ) ).sub( Hll ),
@@ -48,8 +48,9 @@ const perturbNormalArb = tslFn( ( inputs ) => {
 
 	const { surf_pos, surf_norm, dHdxy } = inputs;
 
-	const vSigmaX = surf_pos.dFdx();
-	const vSigmaY = surf_pos.dFdy();
+	// normalize is done to ensure that the bump map looks the same regardless of the texture's scale
+	const vSigmaX = surf_pos.dFdx().normalize();
+	const vSigmaY = surf_pos.dFdy().normalize();
 	const vN = surf_norm; // normalized
 
 	const R1 = vSigmaY.cross( vN );
@@ -92,5 +93,7 @@ class BumpMapNode extends TempNode {
 export default BumpMapNode;
 
 export const bumpMap = nodeProxy( BumpMapNode );
+
+addNodeElement( 'bumpMap', bumpMap );
 
 addNodeClass( 'BumpMapNode', BumpMapNode );

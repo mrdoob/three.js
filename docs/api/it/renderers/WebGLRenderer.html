@@ -307,8 +307,19 @@
 		<h3>[method:undefined clearStencil]( )</h3>
 		<p>Cancella il buffer di stencil. Equivalente a chiamare [page:WebGLRenderer.clear .clear]( false, false, true ).</p>
 
-		<h3>[method:undefined compile]( [param:Object3D scene], [param:Camera camera] )</h3>
-		<p>Compila tutti i materiali nella scena con la telecamera. Questo è utile per precompilare le ombre prima del primo rendering.</p>
+		<h3>[method:Set compile]( [param:Object3D scene], [param:Camera camera], [param:Scene targetScene] )</h3>
+		<p>
+			Compila tutti i materiali nella scena con la telecamera. Questo è utile per precompilare le ombre prima del primo rendering.
+			Se desideri aggiungere un oggetto 3D a una scena esistente, utilizza il terzo parametro opzionale per applicare la scena di destinazione.<br/>
+			Tieni presente che l'illuminazione della scena deve essere configurata prima di chiamare questo metodo.
+		</p>
+
+		<h3>[method:Promise compileAsync]( [param:Object3D scene], [param:Camera camera], [param:Scene targetScene] )</h3>
+		<p>
+			Versione asincrona di [page:WebGLRenderer.compile .compile](). Il metodo restituisce una Promise che si risolve quando è possibile eseguire 
+			il rendering di un determinato oggetto 3D o scena senza inutili stalli dovuti alla compilazione dello shader.<br /><br />
+			Questo metodo utilizza *KHR_parallel_shader_compile*.
+		</p>
 
 		<h3>[method:undefined copyFramebufferToTexture]( [param:Vector2 position], [param:FramebufferTexture texture], [param:Number level] )</h3>
 		<p>
