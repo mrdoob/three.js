@@ -122,7 +122,6 @@ const exceptionList = [
 	'webgpu_loader_gltf_sheen',
 	'webgpu_materials',
 	'webgpu_materials_video',
-	'webgpu_particles',
 	'webgpu_sandbox',
 	'webgpu_shadertoy',
 	'webgpu_shadowmap',
