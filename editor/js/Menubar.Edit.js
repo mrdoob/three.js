@@ -149,10 +149,6 @@ function MenubarEdit( editor ) {
 	} );
 	options.add( option );
 
-	//
-
-	options.add( new UIHorizontalRule() );
-
 	return container;
 
 }
