@@ -41,6 +41,7 @@ class WebGLBackend extends Backend {
 		this.defaultTextures = {};
 
 		this.extensions.get( 'EXT_color_buffer_float' );
+		this._currentContext = null;
 
 	}
 
@@ -53,8 +54,12 @@ class WebGLBackend extends Backend {
 	beginRender( renderContext ) {
 
 		const { gl } = this;
+		const renderContextData = this.get( renderContext );
 
 		//
+
+		renderContextData.previousContext = this._currentContext;
+		this._currentContext = renderContext;
 
 		this._setFramebuffer( renderContext );
 
@@ -103,8 +108,6 @@ class WebGLBackend extends Backend {
 
 		if ( occlusionQueryCount > 0 ) {
 
-			const renderContextData = this.get( renderContext );
-
 			// Get a reference to the array of objects with queries. The renderContextData property
 			// can be changed by another render pass before the async reading of all previous queries complete
 			renderContextData.currentOcclusionQueries = renderContextData.occlusionQueries;
@@ -121,15 +124,18 @@ class WebGLBackend extends Backend {
 
 	finishRender( renderContext ) {
 
-		const lastRenderContext = this.renderer._previousRenderContext;
+		const renderContextData = this.get( renderContext );
+		const previousContext = renderContextData.previousContext;
 
-		if ( lastRenderContext !== renderContext && lastRenderContext !== null) {
+		this._currentContext = previousContext;
 
-			this._setFramebuffer( lastRenderContext );
+		if ( previousContext !== null ) {
 
-			if ( lastRenderContext.viewport ) {
+			this._setFramebuffer( previousContext );
 
-				this.updateViewport( lastRenderContext );
+			if ( previousContext.viewport ) {
+
+				this.updateViewport( previousContext );
 
 			} else {
 
