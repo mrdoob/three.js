@@ -343,6 +343,7 @@
 		"webgpu_particles",
 		"webgpu_rtt",
 		"webgpu_sandbox",
+		"webgpu_shader",
 		"webgpu_shadertoy",
 		"webgpu_shadowmap",
 		"webgpu_skinning",
