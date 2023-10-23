@@ -192,7 +192,7 @@ class WebXRManager extends EventDispatcher {
 			_currentDepthNear = null;
 			_currentDepthFar = null;
 
-			lightProbe = null;	
+			lightProbe = null;
 
 			// restore framebuffer/rendering state
 
