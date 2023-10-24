@@ -2549,6 +2549,8 @@ class GLTFParser {
 				userData: {}
 			};
 
+			console.log(result);
+
 			addUnknownExtensionsToUserData( extensions, result, json );
 
 			assignExtrasToUserData( result, json );
@@ -4278,7 +4280,7 @@ class GLTFParser {
 
 		const tracks = [];
 
-		const targetName = node.name ? node.name : node.uuid;
+		const targetName = node.uuid;
 		const targetNames = [];
 
 		if ( PATH_PROPERTIES[ target.path ] === PATH_PROPERTIES.weights ) {
