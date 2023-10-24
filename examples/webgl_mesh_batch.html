@@ -41,7 +41,8 @@
 		let camera, controls, scene, renderer;
 		let geometries, mesh;
 		const ids = [];
-		const dummy = new THREE.Object3D();
+		const rotationMatrix = new THREE.Matrix4();
+		const matrix = new THREE.Matrix4();
 
 		//
 
@@ -277,15 +278,10 @@
 					const rotationSpeed = mesh.userData.rotationSpeeds[ i ];
 					const id = ids[ i ];
 
-					mesh.getMatrixAt( id, dummy.matrix );
-					dummy.matrix.decompose( dummy.position, dummy.quaternion, dummy.scale );
-					dummy.rotation.set(
-						dummy.rotation.x + rotationSpeed.x,
-						dummy.rotation.y + rotationSpeed.y,
-						dummy.rotation.z + rotationSpeed.z
-					);
-					dummy.updateMatrix();
-					mesh.setMatrixAt( id, dummy.matrix );
+					mesh.getMatrixAt( id, matrix );
+					rotationMatrix.makeRotationFromEuler( rotationSpeed );
+					matrix.multiply( rotationMatrix );
+					mesh.setMatrixAt( id, matrix );
 
 				}
 
