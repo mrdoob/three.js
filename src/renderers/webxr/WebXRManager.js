@@ -36,7 +36,6 @@ class WebXRManager extends EventDispatcher {
 		const attributes = gl.getContextAttributes();
 		let initialRenderTarget = null;
 		let newRenderTarget = null;
-		let lightProbe = null;
 
 		const controllers = [];
 		const controllerInputSources = [];
@@ -112,37 +111,6 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
-		this.getLightProbe = async function () {
-
-			if ( lightProbe === null ) {
-
-				// Try to obtain a light probe
-				try {
-
-					if ( ! session.requestLightProbe ) {
-
-						throw new Error( 'WebXR implementation doesn\'t support light estimation. (the requestLightProbe function is missing)' );
-
-					}
-
-					const lightProbe = await session.requestLightProbe( {
-						reflectionFormat: session.preferredReflectionFormat,
-					} );
-
-					this.lightProbe = lightProbe;
-
-				} catch ( error ) {
-
-					console.warn( 'THREE.WebXRManager: Failed to obtain a light probe.', error );
-
-				}
-
-			}
-
-			return lightProbe;
-
-		};
-
 		//
 
 		function onSessionEvent( event ) {
@@ -191,8 +159,6 @@ class WebXRManager extends EventDispatcher {
 
 			_currentDepthNear = null;
 			_currentDepthFar = null;
-
-			lightProbe = null;
 
 			// restore framebuffer/rendering state
 
