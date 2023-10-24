@@ -9,6 +9,9 @@ const _edge1 = /*@__PURE__*/ new Vector3();
 const _edge2 = /*@__PURE__*/ new Vector3();
 const _normal = /*@__PURE__*/ new Vector3();
 
+const _t0 = /*@__PURE__ */ new Vector3();
+const _t1 = /*@__PURE__ */ new Vector3();
+
 class Ray {
 
 	constructor( origin = new Vector3(), direction = new Vector3( 0, 0, - 1 ) ) {
@@ -322,73 +325,31 @@ class Ray {
 
 	intersectBox( box, target ) {
 
-		let tmin, tmax, tymin, tymax, tzmin, tzmax;
+		// Based on https://jcgt.org/published/0007/03/04/
 
-		const invdirx = 1 / this.direction.x,
-			invdiry = 1 / this.direction.y,
-			invdirz = 1 / this.direction.z;
+		_t0.set( ( box.min.x - this.origin.x ) / this.direction.x, ( box.min.y - this.origin.y ) / this.direction.y, ( box.min.z - this.origin.z ) / this.direction.z );
+		_t1.set( ( box.max.x - this.origin.x ) / this.direction.x, ( box.max.y - this.origin.y ) / this.direction.y, ( box.max.z - this.origin.z ) / this.direction.z );
 
-		const origin = this.origin;
+		const maxtmin = Math.max( Math.max( Math.min( _t0.x, _t1.x ), Math.min( _t0.y, _t1.y ) ), Math.min( _t0.z, _t1.z ) );
+		const mintmax = Math.min( Math.min( Math.max( _t0.x, _t1.x ), Math.max( _t0.y, _t1.y ) ), Math.max( _t0.z, _t1.z ) );
 
-		if ( invdirx >= 0 ) {
+		if ( maxtmin <= mintmax ) {
 
-			tmin = ( box.min.x - origin.x ) * invdirx;
-			tmax = ( box.max.x - origin.x ) * invdirx;
-
-		} else {
-
-			tmin = ( box.max.x - origin.x ) * invdirx;
-			tmax = ( box.min.x - origin.x ) * invdirx;
+			if ( mintmax > 0 ) return this.at( mintmax, target );
+			if ( maxtmin > 0 ) return this.at( maxtmin, target );
 
 		}
-
-		if ( invdiry >= 0 ) {
-
-			tymin = ( box.min.y - origin.y ) * invdiry;
-			tymax = ( box.max.y - origin.y ) * invdiry;
-
-		} else {
-
-			tymin = ( box.max.y - origin.y ) * invdiry;
-			tymax = ( box.min.y - origin.y ) * invdiry;
-
-		}
-
-		if ( ( tmin > tymax ) || ( tymin > tmax ) ) return null;
-
-		if ( tymin > tmin || isNaN( tmin ) ) tmin = tymin;
-
-		if ( tymax < tmax || isNaN( tmax ) ) tmax = tymax;
-
-		if ( invdirz >= 0 ) {
-
-			tzmin = ( box.min.z - origin.z ) * invdirz;
-			tzmax = ( box.max.z - origin.z ) * invdirz;
-
-		} else {
-
-			tzmin = ( box.max.z - origin.z ) * invdirz;
-			tzmax = ( box.min.z - origin.z ) * invdirz;
-
-		}
-
-		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return null;
-
-		if ( tzmin > tmin || tmin !== tmin ) tmin = tzmin;
-
-		if ( tzmax < tmax || tmax !== tmax ) tmax = tzmax;
-
-		//return point closest to the ray (positive side)
-
-		if ( tmax < 0 ) return null;
-
-		return this.at( tmin >= 0 ? tmin : tmax, target );
 
 	}
 
 	intersectsBox( box ) {
 
-		return this.intersectBox( box, _vector ) !== null;
+		// Based on https://jcgt.org/published/0007/03/04/
+
+		_t0.set( ( box.min.x - this.origin.x ) / this.direction.x, ( box.min.y - this.origin.y ) / this.direction.y, ( box.min.z - this.origin.z ) / this.direction.z );
+		_t1.set( ( box.max.x - this.origin.x ) / this.direction.x, ( box.max.y - this.origin.y ) / this.direction.y, ( box.max.z - this.origin.z ) / this.direction.z );
+
+		return Math.max( Math.max( Math.min( _t0.x, _t1.x ), Math.min( _t0.y, _t1.y ) ), Math.min( _t0.z, _t1.z ) ) <= Math.min( Math.min( Math.max( _t0.x, _t1.x ), Math.max( _t0.y, _t1.y ) ), Math.max( _t0.z, _t1.z ) );
 
 	}
 
