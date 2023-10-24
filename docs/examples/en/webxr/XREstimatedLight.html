@@ -13,7 +13,7 @@
 
 		<p class="desc">
 			XREstimatedLight uses WebXR's light estimation to create
-      a light probe, a directional light, and (optionally) an environment map
+			a light probe, a directional light, and (optionally) an environment map
 			that model the user's real-world environment and lighting.<br>
 			As WebXR updates the light and environment estimation, XREstimatedLight
 			automatically updates the light probe, directional light, and environment map.<br><br>
@@ -21,9 +21,9 @@
 			It's important to specify `light-estimation` as an optional or required
 			feature when creating the WebXR session, otherwise the light estimation
 			can't work.<br><br> 
-      
+
 			See <a href="https://developer.mozilla.org/en-US/docs/Web/API/XRLightProbe#browser_compatibility">here</a>
-      for browser compatibility information, as this is still an experimental feature in WebXR.<br><br>
+			for browser compatibility information, as this is still an experimental feature in WebXR.<br><br>
 
 
 			To use this, as with all files in the /examples directory, you will have to
@@ -38,43 +38,43 @@
 		</p>
 
 		<code>
-		  import { XREstimatedLight } from 'three/addons/webxr/XREstimatedLight.js';
+		import { XREstimatedLight } from 'three/addons/webxr/XREstimatedLight.js';
 		</code>
 
 		<h2>Code Example</h2>
 
 		<code>
-      renderer.xr.enabled = true;
+		renderer.xr.enabled = true;
 
-      // Don't add the XREstimatedLight to the scene initially.
-      // It doesn't have any estimated lighting values until an AR session starts.
-      const xrLight = new XREstimatedLight( renderer );
+		// Don't add the XREstimatedLight to the scene initially.
+		// It doesn't have any estimated lighting values until an AR session starts.
+		const xrLight = new XREstimatedLight( renderer );
 
-      xrLight.addEventListener( 'estimationstart' , () => {
+		xrLight.addEventListener( 'estimationstart' , () => {
 
-        scene.add( xrLight );
+			scene.add( xrLight );
 
-        if ( xrLight.environment ) {
+			if ( xrLight.environment ) {
 
-          scene.environment = xrLight.environment;
+				scene.environment = xrLight.environment;
 
-        }
+			}
 
-      } );
+		} );
 
-      xrLight.addEventListener( 'estimationend', () => {
+		xrLight.addEventListener( 'estimationend', () => {
 
-        scene.remove( xrLight );
+			scene.remove( xrLight );
 
-        scene.environment = null;
+			scene.environment = null;
 
-      } );
+		} );
 
-      // In order for lighting estimation to work, 'light-estimation' must be included as either
-      // an optional or required feature.
-      document.body.appendChild( XRButton.createButton( renderer, {
-        optionalFeatures: [ 'light-estimation' ]
-      } ) );
+		// In order for lighting estimation to work, 'light-estimation' must be included as either
+		// an optional or required feature.
+		document.body.appendChild( XRButton.createButton( renderer, {
+			optionalFeatures: [ 'light-estimation' ]
+		} ) );
 		</code>
 
 		<h2>Examples</h2>
