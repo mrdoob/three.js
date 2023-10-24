@@ -377,8 +377,7 @@
 			},
 
 			"Objects": {
-				"Lensflare": "examples/en/objects/Lensflare",
-				"XREstimatedLight": "examples/en/objects/XREstimatedLight"
+				"Lensflare": "examples/en/objects/Lensflare"
 			},
 
 			"Post-Processing": {
@@ -420,6 +419,10 @@
 				"CameraUtils": "examples/en/utils/CameraUtils",
 				"SceneUtils": "examples/en/utils/SceneUtils",
 				"SkeletonUtils": "examples/en/utils/SkeletonUtils"
+			},
+			
+			"WebXR": {
+				"XREstimatedLight": "examples/en/webxr/XREstimatedLight"
 			}
 
 		},

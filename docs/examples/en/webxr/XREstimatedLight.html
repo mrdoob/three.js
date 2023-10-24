@@ -14,7 +14,9 @@
 		<p class="desc">
 			XREstimatedLight uses WebXR's light estimation to create
       a light probe, a directional light, and (optionally) an environment map
-			that model the user's real-world environment and lighting.<br><br>
+			that model the user's real-world environment and lighting.<br>
+			As WebXR updates the light and environment estimation, XREstimatedLight
+			automatically updates the light probe, directional light, and environment map.<br><br>
 
 			It's important to specify `light-estimation` as an optional or required
 			feature when creating the WebXR session, otherwise the light estimation
