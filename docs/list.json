@@ -377,7 +377,8 @@
 			},
 
 			"Objects": {
-				"Lensflare": "examples/en/objects/Lensflare"
+				"Lensflare": "examples/en/objects/Lensflare",
+				"XREstimatedLight": "examples/en/objects/XREstimatedLight"
 			},
 
 			"Post-Processing": {
