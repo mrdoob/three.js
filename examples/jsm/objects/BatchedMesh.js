@@ -165,9 +165,6 @@ class BatchedMesh extends Mesh {
 
 			}
 
-			// for debug
-			// console.log( parameters.vertexShader, parameters.uniforms );
-
 			currentOnBeforeCompile.call( this, parameters, renderer );
 
 		};
@@ -316,17 +313,20 @@ class BatchedMesh extends Mesh {
 
 	deleteGeometry( geometryId ) {
 
-		if ( geometryId >= this._alives.length || this._alives[ geometryId ] === false ) {
+		// Note: User needs to call optimize() afterward to pack the data.
+
+		const alives = this._alives;
+		const matricesArray = this._matricesArray;
+		const matricesTexture = this._matricesTexture;
+		if ( geometryId >= alives.length || alives[ geometryId ] === false ) {
 
 			return this;
 
 		}
 
-		this._alives[ geometryId ] = false;
-		_zeroScaleMatrix.toArray( this._matricesArray, geometryId * 16 );
-		this._matricesTexture.needsUpdate = true;
-
-		// User needs to call optimize() to pack the data.
+		alives[ geometryId ] = false;
+		_zeroScaleMatrix.toArray( matricesArray, geometryId * 16 );
+		matricesTexture.needsUpdate = true;
 
 		return this;
 
