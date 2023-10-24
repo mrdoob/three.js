@@ -199,7 +199,7 @@ class BatchedMesh extends Mesh {
 
 		// @TODO: geometry.groups support?
 		// @TODO: geometry.drawRange support?
-		// @TODO: geometry.mortphAttributes support?
+		// @TODO: geometry.morphAttributes support?
 
 		if ( this._geometryCount >= this._maxGeometryCount ) {
 
@@ -345,20 +345,25 @@ class BatchedMesh extends Mesh {
 		// @TODO: Map geometryId to index of the arrays because
 		//        optimize() can make geometryId mismatch the index
 
-		if ( geometryId >= this._matrices.length || this._alives[ geometryId ] === false ) {
+		const visibles = this._visibles;
+		const alives = this._alives;
+		const matricesTexture = this._matricesTexture;
+		const matrices = this._matrices;
+		const matricesArray = this._matricesArray;
+		if ( geometryId >= matrices.length || alives[ geometryId ] === false ) {
 
 			return this;
 
 		}
 
-		this._matrices[ geometryId ].copy( matrix );
+		if ( visibles[ geometryId ] === true ) {
 
-		if ( this._visibles[ geometryId ] === true ) {
-
-			matrix.toArray( this._matricesArray, geometryId * 16 );
-			this._matricesTexture.needsUpdate = true;
+			matrix.toArray( matricesArray, geometryId * 16 );
+			matricesTexture.needsUpdate = true;
 
 		}
+
+		matrices[ geometryId ].copy( matrix );
 
 		return this;
 
@@ -366,55 +371,68 @@ class BatchedMesh extends Mesh {
 
 	getMatrixAt( geometryId, matrix ) {
 
-		if ( geometryId >= this._matrices.length || this._alives[ geometryId ] === false ) {
+		const matrices = this._matrices;
+		const alives = this._alives;
+		if ( geometryId >= matrices.length || alives[ geometryId ] === false ) {
 
 			return matrix;
 
 		}
 
-		return matrix.copy( this._matrices[ geometryId ] );
+		return matrix.copy( matrices[ geometryId ] );
 
 	}
 
 	setVisibleAt( geometryId, visible ) {
 
-		if ( geometryId >= this._visibles.length || this._alives[ geometryId ] === false ) {
+		const visibles = this._visibles;
+		const alives = this._alives;
+		const matricesTexture = this._matricesTexture;
+		const matrices = this._matrices;
+		const matricesArray = this._matricesArray;
+
+		// if the geometry is out of range, not active, or visibility state
+		// does not change then return early
+		if (
+			geometryId >= visibles.length ||
+			alives[ geometryId ] === false ||
+			visibles[ geometryId ] === visible
+		) {
 
 			return this;
 
 		}
 
-		if ( this._visibles[ geometryId ] === visible ) {
-
-			return this;
-
-		}
-
+		// scale the matrix to zero if it's hidden
 		if ( visible === true ) {
 
-			this._matrices[ geometryId ].toArray( this._matricesArray, geometryId * 16 );
+			matrices[ geometryId ].toArray( matricesArray, geometryId * 16 );
 
 		} else {
 
-			_zeroScaleMatrix.toArray( this._matricesArray, geometryId * 16 );
+			_zeroScaleMatrix.toArray( matricesArray, geometryId * 16 );
 
 		}
 
-		this._matricesTexture.needsUpdate = true;
-		this._visibles[ geometryId ] = visible;
+		matricesTexture.needsUpdate = true;
+		visibles[ geometryId ] = visible;
 		return this;
 
 	}
 
 	getVisibleAt( geometryId ) {
 
-		if ( geometryId >= this._visibles.length || this._alives[ geometryId ] === false ) {
+		const visibles = this._visibles;
+		const alives = this._alives;
+
+		// return early if the geometry is out of range or not active
+		if ( geometryId >= visibles.length || alives[ geometryId ] === false ) {
 
 			return false;
 
 		}
 
-		return this._visibles[ geometryId ];
+		return visibles[ geometryId ];
 
 	}
 
