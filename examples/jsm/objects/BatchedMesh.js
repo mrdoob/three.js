@@ -243,34 +243,48 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		const hasIndex = this.geometry.getIndex() !== null;
-		const dstIndex = this.geometry.getIndex();
+		const batchGeometry = this.geometry;
+		const visibles = this._visibles;
+		const alives = this._alives;
+		const matricesTexture = this._matricesTexture;
+		const matrices = this._matrices;
+		const matricesArray = this._matricesArray;
+		const vertexCount = this._vertexCount;
+		const indexCount = this._indexCount;
+
+		const indexCounts = this._indexCounts;
+		const indexStarts = this._indexStarts;
+		const vertexCounts = this._vertexCounts;
+		const vertexStarts = this._vertexStarts;
+
+		const hasIndex = batchGeometry.getIndex() !== null;
+		const dstIndex = batchGeometry.getIndex();
 		const srcIndex = geometry.getIndex();
 
 		// Assuming geometry has position attribute
 		const srcPositionAttribute = geometry.getAttribute( 'position' );
 
-		this._vertexStarts.push( this._vertexCount );
-		this._vertexCounts.push( srcPositionAttribute.count );
+		vertexStarts.push( vertexCount );
+		vertexCounts.push( srcPositionAttribute.count );
 
 		if ( hasIndex ) {
 
-			this._indexStarts.push( this._indexCount );
-			this._indexCounts.push( srcIndex.count );
+			indexStarts.push( indexCount );
+			indexCounts.push( srcIndex.count );
 
 		}
 
-		this._visibles.push( true );
-		this._alives.push( true );
+		visibles.push( true );
+		alives.push( true );
 
 		// @TODO: Error handling if exceeding maxVertexCount or maxIndexCount
 
 		for ( const attributeName in geometry.attributes ) {
 
 			const srcAttribute = geometry.getAttribute( attributeName );
-			const dstAttribute = this.geometry.getAttribute( attributeName );
+			const dstAttribute = batchGeometry.getAttribute( attributeName );
 
-			dstAttribute.array.set( srcAttribute.array, this._vertexCount * dstAttribute.itemSize );
+			dstAttribute.array.set( srcAttribute.array, vertexCount * dstAttribute.itemSize );
 			dstAttribute.needsUpdate = true;
 
 		}
@@ -279,7 +293,7 @@ class BatchedMesh extends Mesh {
 
 			for ( let i = 0; i < srcIndex.count; i ++ ) {
 
-				dstIndex.setX( this._indexCount + i, this._vertexCount + srcIndex.getX( i ) );
+				dstIndex.setX( indexCount + i, vertexCount + srcIndex.getX( i ) );
 
 			}
 
@@ -291,7 +305,7 @@ class BatchedMesh extends Mesh {
 		const geometryId = this._geometryCount;
 		this._geometryCount ++;
 
-		const idAttribute = this.geometry.getAttribute( 'id' );
+		const idAttribute = batchGeometry.getAttribute( 'id' );
 
 		for ( let i = 0; i < srcPositionAttribute.count; i ++ ) {
 
@@ -303,9 +317,9 @@ class BatchedMesh extends Mesh {
 
 		this._vertexCount += srcPositionAttribute.count;
 
-		this._matrices.push( new Matrix4() );
-		_identityMatrix.toArray( this._matricesArray, geometryId * 16 );
-		this._matricesTexture.needsUpdate = true;
+		matrices.push( new Matrix4() );
+		_identityMatrix.toArray( matricesArray, geometryId * 16 );
+		matricesTexture.needsUpdate = true;
 
 		return geometryId;
 
