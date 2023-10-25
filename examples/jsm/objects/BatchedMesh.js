@@ -257,7 +257,7 @@ class BatchedMesh extends Mesh {
 		const alives = this._alives;
 		const matricesTexture = this._matricesTexture;
 		const matrices = this._matrices;
-		const matricesArray = this._matricesArray;
+		const matricesArray = this._matricesTexture.image.data;
 		const vertexCount = this._vertexCount;
 		const indexCount = this._indexCount;
 
@@ -341,7 +341,7 @@ class BatchedMesh extends Mesh {
 		// Note: User needs to call optimize() afterward to pack the data.
 
 		const alives = this._alives;
-		const matricesArray = this._matricesArray;
+		const matricesArray = this._matricesTexture.image.data;
 		const matricesTexture = this._matricesTexture;
 		if ( geometryId >= alives.length || alives[ geometryId ] === false ) {
 
@@ -374,7 +374,7 @@ class BatchedMesh extends Mesh {
 		const alives = this._alives;
 		const matricesTexture = this._matricesTexture;
 		const matrices = this._matrices;
-		const matricesArray = this._matricesArray;
+		const matricesArray = this._matricesTexture.image.data;
 		if ( geometryId >= matrices.length || alives[ geometryId ] === false ) {
 
 			return this;
@@ -414,7 +414,7 @@ class BatchedMesh extends Mesh {
 		const alives = this._alives;
 		const matricesTexture = this._matricesTexture;
 		const matrices = this._matrices;
-		const matricesArray = this._matricesArray;
+		const matricesArray = this._matricesTexture.image.data;
 
 		// if the geometry is out of range, not active, or visibility state
 		// does not change then return early
