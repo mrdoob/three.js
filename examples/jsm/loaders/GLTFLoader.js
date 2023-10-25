@@ -3524,17 +3524,17 @@ class GLTFParser {
 
 		const sanitizedName = PropertyBinding.sanitizeNodeName( originalName || '' );
 
+		let uniqueName = sanitizedName;
+
 		if ( sanitizedName in this.nodeNamesUsed ) {
 
-			return sanitizedName + '_' + ( ++ this.nodeNamesUsed[ sanitizedName ] );
-
-		} else {
-
-			this.nodeNamesUsed[ sanitizedName ] = 0;
-
-			return sanitizedName;
+			uniqueName = sanitizedName + '_' + ( ++ this.nodeNamesUsed[ sanitizedName ] );
 
 		}
+
+		this.nodeNamesUsed[ uniqueName ] = 0;
+
+		return uniqueName;
 
 	}
 
@@ -4278,7 +4278,7 @@ class GLTFParser {
 
 		const tracks = [];
 
-		const targetName = node.uuid;
+		const targetName = node.name ? node.name : node.uuid;
 		const targetNames = [];
 
 		if ( PATH_PROPERTIES[ target.path ] === PATH_PROPERTIES.weights ) {
