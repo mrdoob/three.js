@@ -2752,7 +2752,7 @@ class AnimationParser {
 
 		const quaternionValues = [];
 
-		if(!values || !times) return new QuaternionKeyframeTrack(
+		if ( ! values || ! times ) return new QuaternionKeyframeTrack(
 			modelName + '.quaternion',
 			[],
 			[]
@@ -4233,11 +4233,5 @@ function slice( a, b, from, to ) {
 
 }
 
-// inject array a2 into array a1 at index
-function inject( a1, index, a2 ) {
-
-	return a1.slice( 0, index ).concat( a2 ).concat( a1.slice( index ) );
-
-}
 
 export { FBXLoader };
