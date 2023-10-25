@@ -207,14 +207,14 @@
 
 				const rippleTime = rippleTimeBuffer.element( instanceIndex ).x;
 
-				const rippleEffect = () => {
+				const rippleEffect = tslFn( () => {
 
 					const center = positionLocal.length().mul( 4 );
 					const distance = rippleTime.sub( center );
 
 					return distance.min( 1 ).sub( distance.max( 1 ).sub( 1 ) );
 
-				};
+				} );
 
 				const rippleMaterial = new MeshBasicNodeMaterial();
 				rippleMaterial.colorNode = rippleEffect();
