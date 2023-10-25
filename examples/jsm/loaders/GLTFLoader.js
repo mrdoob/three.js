@@ -2549,8 +2549,6 @@ class GLTFParser {
 				userData: {}
 			};
 
-			console.log(result);
-
 			addUnknownExtensionsToUserData( extensions, result, json );
 
 			assignExtrasToUserData( result, json );
