@@ -74,8 +74,8 @@ class BatchedMesh extends Mesh {
 		this._indexStarts = [];
 		this._indexCounts = [];
 
-		this._visibles = [];
-		this._alives = [];
+		this._visible = [];
+		this._active = [];
 
 		this._maxGeometryCount = maxGeometryCount;
 		this._maxVertexCount = maxVertexCount;
@@ -253,8 +253,8 @@ class BatchedMesh extends Mesh {
 		}
 
 		const batchGeometry = this.geometry;
-		const visibles = this._visibles;
-		const alives = this._alives;
+		const visible = this._visible;
+		const active = this._active;
 		const matricesTexture = this._matricesTexture;
 		const matrices = this._matrices;
 		const matricesArray = this._matricesTexture.image.data;
@@ -324,8 +324,8 @@ class BatchedMesh extends Mesh {
 		this._vertexCount += srcPositionAttribute.count;
 
 		// push new visibility states
-		visibles.push( true );
-		alives.push( true );
+		visible.push( true );
+		active.push( true );
 
 		// initialize matrix information
 		matrices.push( new Matrix4() );
@@ -340,16 +340,16 @@ class BatchedMesh extends Mesh {
 
 		// Note: User needs to call optimize() afterward to pack the data.
 
-		const alives = this._alives;
+		const active = this._active;
 		const matricesArray = this._matricesTexture.image.data;
 		const matricesTexture = this._matricesTexture;
-		if ( geometryId >= alives.length || alives[ geometryId ] === false ) {
+		if ( geometryId >= active.length || active[ geometryId ] === false ) {
 
 			return this;
 
 		}
 
-		alives[ geometryId ] = false;
+		active[ geometryId ] = false;
 		_zeroScaleMatrix.toArray( matricesArray, geometryId * 16 );
 		matricesTexture.needsUpdate = true;
 
@@ -370,18 +370,18 @@ class BatchedMesh extends Mesh {
 		// @TODO: Map geometryId to index of the arrays because
 		//        optimize() can make geometryId mismatch the index
 
-		const visibles = this._visibles;
-		const alives = this._alives;
+		const visible = this._visible;
+		const active = this._active;
 		const matricesTexture = this._matricesTexture;
 		const matrices = this._matrices;
 		const matricesArray = this._matricesTexture.image.data;
-		if ( geometryId >= matrices.length || alives[ geometryId ] === false ) {
+		if ( geometryId >= matrices.length || active[ geometryId ] === false ) {
 
 			return this;
 
 		}
 
-		if ( visibles[ geometryId ] === true ) {
+		if ( visible[ geometryId ] === true ) {
 
 			matrix.toArray( matricesArray, geometryId * 16 );
 			matricesTexture.needsUpdate = true;
@@ -397,8 +397,8 @@ class BatchedMesh extends Mesh {
 	getMatrixAt( geometryId, matrix ) {
 
 		const matrices = this._matrices;
-		const alives = this._alives;
-		if ( geometryId >= matrices.length || alives[ geometryId ] === false ) {
+		const active = this._active;
+		if ( geometryId >= matrices.length || active[ geometryId ] === false ) {
 
 			return matrix;
 
@@ -408,10 +408,10 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	setVisibleAt( geometryId, visible ) {
+	setVisibleAt( geometryId, value ) {
 
-		const visibles = this._visibles;
-		const alives = this._alives;
+		const visible = this._visible;
+		const active = this._active;
 		const matricesTexture = this._matricesTexture;
 		const matrices = this._matrices;
 		const matricesArray = this._matricesTexture.image.data;
@@ -419,9 +419,9 @@ class BatchedMesh extends Mesh {
 		// if the geometry is out of range, not active, or visibility state
 		// does not change then return early
 		if (
-			geometryId >= visibles.length ||
-			alives[ geometryId ] === false ||
-			visibles[ geometryId ] === visible
+			geometryId >= visible.length ||
+			active[ geometryId ] === false ||
+			visible[ geometryId ] === value
 		) {
 
 			return this;
@@ -429,7 +429,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		// scale the matrix to zero if it's hidden
-		if ( visible === true ) {
+		if ( value === true ) {
 
 			matrices[ geometryId ].toArray( matricesArray, geometryId * 16 );
 
@@ -440,24 +440,24 @@ class BatchedMesh extends Mesh {
 		}
 
 		matricesTexture.needsUpdate = true;
-		visibles[ geometryId ] = visible;
+		visible[ geometryId ] = value;
 		return this;
 
 	}
 
 	getVisibleAt( geometryId ) {
 
-		const visibles = this._visibles;
-		const alives = this._alives;
+		const visible = this._visible;
+		const active = this._active;
 
 		// return early if the geometry is out of range or not active
-		if ( geometryId >= visibles.length || alives[ geometryId ] === false ) {
+		if ( geometryId >= visible.length || active[ geometryId ] === false ) {
 
 			return false;
 
 		}
 
-		return visibles[ geometryId ];
+		return visible[ geometryId ];
 
 	}
 
