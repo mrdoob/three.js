@@ -329,7 +329,7 @@ class Ray {
 
 		_t0.set( ( box.min.x - this.origin.x ) / this.direction.x, ( box.min.y - this.origin.y ) / this.direction.y, ( box.min.z - this.origin.z ) / this.direction.z );
 		_t1.set( ( box.max.x - this.origin.x ) / this.direction.x, ( box.max.y - this.origin.y ) / this.direction.y, ( box.max.z - this.origin.z ) / this.direction.z );
-		
+
 		if ( isNaN( _t0.x ) ) _t0.x = Infinity;
 		if ( isNaN( _t0.y ) ) _t0.y = Infinity;
 		if ( isNaN( _t0.z ) ) _t0.z = Infinity;
@@ -355,7 +355,7 @@ class Ray {
 
 		_t0.set( ( box.min.x - this.origin.x ) / this.direction.x, ( box.min.y - this.origin.y ) / this.direction.y, ( box.min.z - this.origin.z ) / this.direction.z );
 		_t1.set( ( box.max.x - this.origin.x ) / this.direction.x, ( box.max.y - this.origin.y ) / this.direction.y, ( box.max.z - this.origin.z ) / this.direction.z );
-		
+
 		if ( isNaN( _t0.x ) ) _t0.x = Infinity;
 		if ( isNaN( _t0.y ) ) _t0.y = Infinity;
 		if ( isNaN( _t0.z ) ) _t0.z = Infinity;
