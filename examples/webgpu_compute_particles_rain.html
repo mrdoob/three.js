@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, texture, uv, uint, positionWorld, modelWorldMatrix, cameraViewMatrix, timerLocal, timerDelta, cameraProjectionMatrix, vec2, instanceIndex, frameId, positionLocal, positionGeometry, storage, MeshBasicNodeMaterial, If } from 'three/nodes';
+			import { tslFn, texture, uv, uint, positionWorld, modelWorldMatrix, cameraViewMatrix, timerLocal, timerDelta, cameraProjectionMatrix, vec2, instanceIndex, positionLocal, positionGeometry, storage, MeshBasicNodeMaterial, If } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -57,7 +57,7 @@
 
 				const { innerWidth, innerHeight } = window;
 
-				camera = new THREE.PerspectiveCamera( 50, innerWidth / innerHeight, .1, 100 );
+				camera = new THREE.PerspectiveCamera( 50, innerWidth / innerHeight, .1, 110 );
 				camera.position.set( 40, 40, 40 );
 
 				scene = new THREE.Scene();
@@ -241,7 +241,7 @@
 				collisionBox = new THREE.Mesh( new THREE.BoxGeometry( 30, 1, 15 ), new THREE.MeshBasicMaterial() );
 				collisionBox.material.color.set( 0x333333 );
 				collisionBox.position.y = 10;
-				collisionBox.scale.x = 5;
+				collisionBox.scale.x = 3.5;
 				collisionBox.layers.enable( 1 );
 				scene.add( collisionBox );
 
@@ -275,7 +275,7 @@
 				const gui = new GUI();
 
 				gui.add( collisionBox.position, 'z', - 50, 50, 1 ).name( 'position' );
-				gui.add( collisionBox.scale, 'x', .1, 5, 0.01 ).name( 'scale' );
+				gui.add( collisionBox.scale, 'x', .1, 3.5, 0.01 ).name( 'scale' );
 				gui.add( rainParticles, 'count', 200, maxParticleCount, 1 ).name( 'drop count' ).onChange( ( v ) => rippleParticles.count = v );
 
 			}
