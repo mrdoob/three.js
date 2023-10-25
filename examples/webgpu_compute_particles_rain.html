@@ -61,7 +61,7 @@
 				const { innerWidth, innerHeight } = window;
 
 				camera = new THREE.PerspectiveCamera( 50, innerWidth / innerHeight, .1, 110 );
-				camera.layers.enable( 2 ); // @TODO: Fix .castShadow and remove this
+				camera.layers.enable( 2 ); // @TODO: Fix .castShadow and remove it
 				camera.position.set( 40, 40, 40 );
 
 				scene = new THREE.Scene();
@@ -299,7 +299,7 @@
 					dirLight.shadow.bias = - 0.01;
 
 					scene.add( dirLight );
-					scene.add( new THREE.AmbientLight( 0x111122 ) );
+					scene.add( new THREE.AmbientLight( 0x111111 ) );
 
 					geometry.computeVertexNormals();
 
