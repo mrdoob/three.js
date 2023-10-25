@@ -131,7 +131,9 @@
 
 					// floor
 
-					If( position.y.lessThan( floorPosition ), () => {
+					const ripplePivotOffsetY = - .9;
+
+					If( position.y.add( ripplePivotOffsetY ).lessThan( floorPosition ), () => {
 
 						position.y = 25;
 
