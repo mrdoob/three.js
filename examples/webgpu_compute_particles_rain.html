@@ -191,6 +191,8 @@
 				rainMaterial.colorNode = uv().distance( vec2( .5, 0 ) ).oneMinus().mul( 3 ).exp().mul( .1 );
 				rainMaterial.positionNode = positionGeometry.add( positionBuffer.toAttribute() );
 				rainMaterial.opacity = .2;
+				rainMaterial.side = THREE.DoubleSide;
+				rainMaterial.forceSinglePass = true;
 				rainMaterial.depthWrite = false;
 				rainMaterial.depthTest = true;
 				rainMaterial.transparent = true;
@@ -219,6 +221,7 @@
 				rippleMaterial.positionNode = positionGeometry.add( ripplePositionBuffer.toAttribute() );
 				rippleMaterial.opacityNode = rippleTime.mul( .3 ).oneMinus().max( 0 ).mul( .5 );
 				rippleMaterial.side = THREE.DoubleSide;
+				rippleMaterial.forceSinglePass = true;
 				rippleMaterial.depthWrite = false;
 				rippleMaterial.depthTest = true;
 				rippleMaterial.transparent = true;
