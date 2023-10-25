@@ -363,7 +363,10 @@ class Ray {
 		if ( isNaN( _t1.y ) ) _t1.y = Infinity;
 		if ( isNaN( _t1.z ) ) _t1.z = Infinity;
 
-		return Math.max( Math.max( Math.min( _t0.x, _t1.x ), Math.min( _t0.y, _t1.y ) ), Math.min( _t0.z, _t1.z ) ) <= Math.min( Math.min( Math.max( _t0.x, _t1.x ), Math.max( _t0.y, _t1.y ) ), Math.max( _t0.z, _t1.z ) );
+		const maxtmin = Math.max( Math.max( Math.min( _t0.x, _t1.x ), Math.min( _t0.y, _t1.y ) ), Math.min( _t0.z, _t1.z ) );
+		const mintmax = Math.min( Math.min( Math.max( _t0.x, _t1.x ), Math.max( _t0.y, _t1.y ) ), Math.max( _t0.z, _t1.z ) );
+
+		return ( maxtmin <= mintmax ) && ( maxtmin > 0 || mintmax > 0 );
 
 	}
 
