@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, texture, uv, positionWorld, modelWorldMatrix, cameraViewMatrix, cameraProjectionMatrix, vec2, instanceIndex, frameId, positionLocal, positionGeometry, storage, MeshBasicNodeMaterial, If } from 'three/nodes';
+			import { tslFn, texture, uv, positionWorld, modelWorldMatrix, cameraViewMatrix, timerDelta, cameraProjectionMatrix, vec2, instanceIndex, frameId, positionLocal, positionGeometry, storage, MeshBasicNodeMaterial, If } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -117,8 +117,7 @@
 
 					position.addAssign( velocity );
 
-					rippleTime.x = rippleTime.x.add( rippleTime.y );
-					rippleTime.y = rippleTime.y.mul( .99 );
+					rippleTime.x = rippleTime.x.add( timerDelta().mul( 4 ) );
 
 					//
 
@@ -136,10 +135,9 @@
 						ripplePosition.y = floorPosition;
 						ripplePosition.z = position.z;
 
-						// reset hit time: x = time, y = speed
+						// reset hit time: x = time
 
 						rippleTime.x = 1;
-						rippleTime.y = .09;
 
 						// next drops will not fall in the same place
 
