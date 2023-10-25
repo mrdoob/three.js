@@ -184,7 +184,7 @@ class UITexture extends UISpan {
 				canvas.title = texture.sourceFile;
 				const scale = canvas.width / image.width;
 
-				if ( image.data !== undefined || texture.isCompressedTexture ) {
+				if ( texture.isDataTexture || texture.isCompressedTexture ) {
 
 					const canvas2 = renderToCanvas( texture );
 					context.drawImage( canvas2, 0, 0, image.width * scale, image.height * scale );
