@@ -275,19 +275,12 @@ class BatchedMesh extends Mesh {
 		// Assuming geometry has position attribute
 		const srcPositionAttribute = geometry.getAttribute( 'position' );
 
+		// push new geometry data range
 		vertexStarts.push( vertexCount );
 		vertexCounts.push( srcPositionAttribute.count );
 
-		if ( hasIndex ) {
-
-			indexStarts.push( indexCount );
-			indexCounts.push( srcIndex.count );
-
-		}
-
-		visibles.push( true );
-		alives.push( true );
-
+		// copy attribute data over
+		// @TODO: Handle case where geometry does not have common attributes
 		for ( const attributeName in geometry.attributes ) {
 
 			const srcAttribute = geometry.getAttribute( attributeName );
@@ -300,6 +293,11 @@ class BatchedMesh extends Mesh {
 
 		if ( hasIndex ) {
 
+			// push new index range
+			indexStarts.push( indexCount );
+			indexCounts.push( srcIndex.count );
+
+			// copy index data over
 			for ( let i = 0; i < srcIndex.count; i ++ ) {
 
 				dstIndex.setX( indexCount + i, vertexCount + srcIndex.getX( i ) );
@@ -311,11 +309,11 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		// fill in the geometry ids
 		const geometryId = this._geometryCount;
 		this._geometryCount ++;
 
 		const idAttribute = batchGeometry.getAttribute( 'id' );
-
 		for ( let i = 0; i < srcPositionAttribute.count; i ++ ) {
 
 			idAttribute.setX( this._vertexCount + i, geometryId );
@@ -324,8 +322,14 @@ class BatchedMesh extends Mesh {
 
 		idAttribute.needsUpdate = true;
 
+		// extend new range
 		this._vertexCount += srcPositionAttribute.count;
 
+		// push new visibility states
+		visibles.push( true );
+		alives.push( true );
+
+		// initialize matrix information
 		matrices.push( new Matrix4() );
 		_identityMatrix.toArray( matricesArray, geometryId * 16 );
 		matricesTexture.needsUpdate = true;
