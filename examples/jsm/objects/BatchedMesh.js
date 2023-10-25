@@ -92,7 +92,6 @@ class BatchedMesh extends Mesh {
 		this._matrices = [];
 		this._matricesArray = null;
 		this._matricesTexture = null;
-		this._matricesTextureSize = null;
 
 		// @TODO: Calculate the entire binding box and make frustumCulled true
 		this.frustumCulled = false;
@@ -125,10 +124,9 @@ class BatchedMesh extends Mesh {
 
 		this._matricesArray = matricesArray;
 		this._matricesTexture = matricesTexture;
-		this._matricesTextureSize = size;
 
 		this._customUniforms.batchingTexture.value = this._matricesTexture;
-		this._customUniforms.batchingTextureSize.value = this._matricesTextureSize;
+		this._customUniforms.batchingTextureSize.value = size;
 
 	}
 
