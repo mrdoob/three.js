@@ -22,6 +22,8 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	const mapType = property.replace( 'Map', '' );
 
+	const colorMaps = [ 'map', 'emissiveMap', 'sheenColorMap', 'specularColorMap', 'envMap' ];
+
 	let intensity;
 
 	if ( property === 'aoMap' ) {
@@ -111,7 +113,7 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 		if ( texture !== null ) {
 
-			if ( texture.isDataTexture !== true && texture.colorSpace !== THREE.SRGBColorSpace ) {
+			if ( colorMaps[ property ] !== undefined && texture.isDataTexture !== true && texture.colorSpace !== THREE.SRGBColorSpace ) {
 
 				texture.colorSpace = THREE.SRGBColorSpace;
 				material.needsUpdate = true;
