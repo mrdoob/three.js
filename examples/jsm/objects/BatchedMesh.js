@@ -91,7 +91,6 @@ class BatchedMesh extends Mesh {
 		// @TODO: Support uniform parameter per geometry
 
 		this._matrices = [];
-		this._matricesArray = null;
 		this._matricesTexture = null;
 
 		// @TODO: Calculate the entire binding box and make frustumCulled true
@@ -123,9 +122,7 @@ class BatchedMesh extends Mesh {
 		const matricesArray = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
 		const matricesTexture = new DataTexture( matricesArray, size, size, RGBAFormat, FloatType );
 
-		this._matricesArray = matricesArray;
 		this._matricesTexture = matricesTexture;
-
 		this._customUniforms.batchingTexture.value = this._matricesTexture;
 		this._customUniforms.batchingTextureSize.value = size;
 
