@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, texture, uv, positionWorld, modelWorldMatrix, cameraViewMatrix, timerDelta, cameraProjectionMatrix, vec2, instanceIndex, frameId, positionLocal, positionGeometry, storage, MeshBasicNodeMaterial, If } from 'three/nodes';
+			import { tslFn, texture, uv, uint, positionWorld, modelWorldMatrix, cameraViewMatrix, timerLocal, timerDelta, cameraProjectionMatrix, vec2, instanceIndex, frameId, positionLocal, positionGeometry, storage, MeshBasicNodeMaterial, If } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -86,6 +86,10 @@
 
 				// compute
 
+				const timer = timerLocal();
+
+				const randUint = () => uint( Math.random() * 0xFFFFFF );
+
 				const computeInit = tslFn( () => {
 
 					const position = positionBuffer.element( instanceIndex );
@@ -93,8 +97,8 @@
 					const rippleTime = rippleTimeBuffer.element( instanceIndex );
 
 					const randX = instanceIndex.hash();
-					const randY = instanceIndex.add( 2 ).hash();
-					const randZ = instanceIndex.add( 3 ).hash();
+					const randY = instanceIndex.add( randUint() ).hash();
+					const randZ = instanceIndex.add( randUint() ).hash();
 
 					position.x = randX.mul( 100 ).add( - 50 );
 					position.y = randY.mul( 25 );
@@ -141,8 +145,8 @@
 
 						// next drops will not fall in the same place
 
-						position.x = instanceIndex.add( frameId ).hash().mul( 100 ).add( - 50 );
-						position.z = instanceIndex.add( frameId.add( 1 ) ).hash().mul( 100 ).add( - 50 );
+						position.x = instanceIndex.add( timer ).hash().mul( 100 ).add( - 50 );
+						position.z = instanceIndex.add( timer.add( randUint() ) ).hash().mul( 100 ).add( - 50 );
 
 					} );
 
