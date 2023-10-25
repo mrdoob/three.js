@@ -243,9 +243,17 @@ class BatchedMesh extends Mesh {
 		this._initializeGeometry( geometry );
 
 		// @TODO: Error handling if exceeding maxVertexCount or maxIndexCount
+		// @TODO: Error handling if geometry does not have all the same attributes
+		// @TODO: Error handling to ensure both geometries index if needed
 		if ( this._geometryCount >= this._maxGeometryCount ) {
 
-			// @TODO: Error handling
+			throw new Error( 'BatchedMesh: maximum geometry count reached.' );
+
+		}
+
+		if ( geometry.getAttribute( ID_ATTR_NAME ) ) {
+
+			throw new Error( `BatchMesh: geometry cannot use attribute "${ ID_ATTR_NAME }"` );
 
 		}
 
@@ -275,8 +283,13 @@ class BatchedMesh extends Mesh {
 		vertexCounts.push( srcPositionAttribute.count );
 
 		// copy attribute data over
-		// @TODO: Handle case where geometry does not have common attributes
-		for ( const attributeName in geometry.attributes ) {
+		for ( const attributeName in batchGeometry.attributes ) {
+
+			if ( attributeName === ID_ATTR_NAME ) {
+
+				continue;
+
+			}
 
 			const srcAttribute = geometry.getAttribute( attributeName );
 			const dstAttribute = batchGeometry.getAttribute( attributeName );
@@ -356,9 +369,7 @@ class BatchedMesh extends Mesh {
 
 	optimize() {
 
-		// @TODO: Implement
-
-		return this;
+		throw new Error( 'BatchedMesh: optimize function not implemented.' );
 
 	}
 
@@ -458,21 +469,23 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	copy( source ) {
+	raycast() {
 
-		super.copy( source );
-
-		// @TODO: Implement
-
-		return this;
+		console.warn( 'BatchedMesh: raycast function not implemented.' );
 
 	}
 
-	toJSON( meta ) {
+	copy() {
 
-		// @TODO: Implement
+		// super.copy( source );
 
-		return super.toJSON( meta );
+		throw new Error( 'BatchedMesh: copy function not implemented.' );
+
+	}
+
+	toJSON() {
+
+		throw new Error( 'BatchedMesh: toJSON function not implemented.' );
 
 	}
 
