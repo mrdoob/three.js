@@ -61,6 +61,7 @@
 				const { innerWidth, innerHeight } = window;
 
 				camera = new THREE.PerspectiveCamera( 50, innerWidth / innerHeight, .1, 110 );
+				camera.layers.enable( 2 ); // @TODO: Fix .castShadow and remove this
 				camera.position.set( 40, 40, 40 );
 
 				scene = new THREE.Scene();
@@ -214,6 +215,8 @@
 				const rainParticles = new THREE.Mesh( new THREE.PlaneGeometry( .1, 2 ), rainMaterial );
 				rainParticles.isInstancedMesh = true;
 				rainParticles.count = instanceCount;
+				rainParticles.layers.disableAll();
+				rainParticles.layers.enable( 2 );
 				scene.add( rainParticles );
 
 				// ripple
@@ -254,6 +257,8 @@
 				const rippleParticles = new THREE.Mesh( rippleGeometry, rippleMaterial );
 				rippleParticles.isInstancedMesh = true;
 				rippleParticles.count = instanceCount;
+				rippleParticles.layers.disableAll();
+				rippleParticles.layers.enable( 2 );
 				scene.add( rippleParticles );
 
 				// floor geometry
