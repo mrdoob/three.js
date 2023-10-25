@@ -605,12 +605,6 @@ class WebGLBackend extends Backend {
 		gl.shaderSource( shader, code );
 		gl.compileShader( shader );
 
-		if ( gl.getShaderParameter( shader, gl.COMPILE_STATUS ) === false ) {
-
-			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( shader ) );
-
-		}
-
 		this.set( program, {
 			shaderGPU: shader
 		} );
@@ -633,13 +627,20 @@ class WebGLBackend extends Backend {
 		const { fragmentProgram, vertexProgram } = pipeline;
 
 		const programGPU = gl.createProgram();
-		gl.attachShader( programGPU, this.get( fragmentProgram ).shaderGPU );
-		gl.attachShader( programGPU, this.get( vertexProgram ).shaderGPU );
+
+		const fragmentShader = this.get( fragmentProgram ).shaderGPU;
+		const vertexShader = this.get( vertexProgram ).shaderGPU;
+
+		gl.attachShader( programGPU, fragmentShader );
+		gl.attachShader( programGPU, vertexShader );
 		gl.linkProgram( programGPU );
 
 		if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
 
 			console.error( 'THREE.WebGLBackend:', gl.getProgramInfoLog( programGPU ) );
+
+			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( fragmentShader ) );
+			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( vertexShader ) );
 
 		}
 
