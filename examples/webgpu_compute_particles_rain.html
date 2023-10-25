@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, texture, uv, uint, positionWorld, modelWorldMatrix, cameraViewMatrix, timerLocal, timerDelta, cameraProjectionMatrix, vec2, instanceIndex, positionLocal, positionGeometry, storage, MeshBasicNodeMaterial, If } from 'three/nodes';
+			import { tslFn, texture, uv, uint, positionWorld, modelWorldMatrix, cameraViewMatrix, timerLocal, timerDelta, cameraProjectionMatrix, vec2, instanceIndex, positionGeometry, storage, MeshBasicNodeMaterial, If } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -34,14 +34,17 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+
 			const maxParticleCount = 50000;
 			const instanceCount = maxParticleCount / 2;
 
 			let camera, scene, renderer;
 			let controls, stats;
 			let computeParticles;
+			let monkey;
 
-			let collisionBox, collisionCamera, collisionRT, collisionPosMaterial;
+			let collisionBox, collisionCamera, collisionPosRT, collisionPosMaterial;
 
 			init();
 
@@ -70,10 +73,11 @@
 				collisionCamera.layers.disableAll();
 				collisionCamera.layers.enable( 1 );
 
-				collisionRT = new THREE.RenderTarget( 1024, 1024 );
+				collisionPosRT = new THREE.RenderTarget( 1024, 1024 );
+				collisionPosRT.texture.type = THREE.HalfFloatType;
 
 				collisionPosMaterial = new MeshBasicNodeMaterial();
-				collisionPosMaterial.colorNode = positionWorld.y.div( 50 );
+				collisionPosMaterial.colorNode = positionWorld;
 
 				//
 
@@ -114,6 +118,8 @@
 
 				const computeUpdate = tslFn( () => {
 
+					const getCoord = ( pos ) => pos.add( 50 ).div( 100 );
+
 					const position = positionBuffer.element( instanceIndex );
 					const velocity = velocityBuffer.element( instanceIndex );
 					const ripplePosition = ripplePositionBuffer.element( instanceIndex );
@@ -125,9 +131,11 @@
 
 					//
 
-					const collisionArea = texture( collisionRT.texture, position.xz.add( 50 ).div( 100 ) ).mul( 50 );
+					const collisionArea = texture( collisionPosRT.texture, getCoord( position.xz ) );
 
-					const floorPosition = collisionArea.y;
+					const surfaceOffset = .05;
+
+					const floorPosition = collisionArea.y.add( surfaceOffset );
 
 					// floor
 
@@ -152,9 +160,9 @@
 
 					} );
 
-					const rippleOnSurface = texture( collisionRT.texture, ripplePosition.xz.add( 50 ).div( 100 ) ).mul( 50 );
+					const rippleOnSurface = texture( collisionPosRT.texture, getCoord( ripplePosition.xz ) );
 
-					const rippleFloorArea = rippleOnSurface.y;
+					const rippleFloorArea = rippleOnSurface.y.add( surfaceOffset );
 
 					If( ripplePosition.y.greaterThan( rippleFloorArea ), () => {
 
@@ -195,14 +203,13 @@
 
 				const rainMaterial = new MeshBasicNodeMaterial();
 				rainMaterial.colorNode = uv().distance( vec2( .5, 0 ) ).oneMinus().mul( 3 ).exp().mul( .1 );
-				rainMaterial.positionNode = positionGeometry.add( positionBuffer.toAttribute() );
+				rainMaterial.vertexNode = billboarding();
 				rainMaterial.opacity = .2;
 				rainMaterial.side = THREE.DoubleSide;
 				rainMaterial.forceSinglePass = true;
 				rainMaterial.depthWrite = false;
 				rainMaterial.depthTest = true;
 				rainMaterial.transparent = true;
-				rainMaterial.vertexNode = billboarding();
 
 				const rainParticles = new THREE.Mesh( new THREE.PlaneGeometry( .1, 2 ), rainMaterial );
 				rainParticles.isInstancedMesh = true;
@@ -215,7 +222,7 @@
 
 				const rippleEffect = tslFn( () => {
 
-					const center = positionLocal.length().mul( 4 );
+					const center = uv().add( vec2( - .5 ) ).length().mul( 7 );
 					const distance = rippleTime.sub( center );
 
 					return distance.min( 1 ).sub( distance.max( 1 ).sub( 1 ) );
@@ -232,20 +239,75 @@
 				rippleMaterial.depthTest = true;
 				rippleMaterial.transparent = true;
 
-				const rippleParticles = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), rippleMaterial );
-				rippleParticles.geometry.rotateX( - Math.PI / 2 );
+				// ripple geometry
+
+				const surfaceRippleGeometry = new THREE.PlaneGeometry( 2, 2 );
+				surfaceRippleGeometry.rotateX( - Math.PI / 2 );
+
+				const xRippleGeometry = new THREE.PlaneGeometry( 1, 2 );
+				xRippleGeometry.rotateY( - Math.PI / 2 );
+
+				const zRippleGeometry = new THREE.PlaneGeometry( 1, 2 );
+
+				const rippleGeometry = BufferGeometryUtils.mergeGeometries( [ surfaceRippleGeometry, xRippleGeometry, zRippleGeometry ] );
+
+				const rippleParticles = new THREE.Mesh( rippleGeometry, rippleMaterial );
 				rippleParticles.isInstancedMesh = true;
 				rippleParticles.count = instanceCount;
 				scene.add( rippleParticles );
 
+				// floor geometry
+
+				const floorGeometry = new THREE.PlaneGeometry( 1000, 1000 );
+				floorGeometry.rotateX( - Math.PI / 2 );
+
+				const plane = new THREE.Mesh( floorGeometry, new THREE.MeshBasicMaterial( { color: 0x050505 } ) );
+				scene.add( plane );
+
 				//
 
-				collisionBox = new THREE.Mesh( new THREE.BoxGeometry( 30, 1, 15 ), new THREE.MeshBasicMaterial() );
+				collisionBox = new THREE.Mesh( new THREE.BoxGeometry( 30, 1, 15 ), new THREE.MeshStandardMaterial() );
 				collisionBox.material.color.set( 0x333333 );
-				collisionBox.position.y = 10;
+				collisionBox.position.y = 12;
 				collisionBox.scale.x = 3.5;
 				collisionBox.layers.enable( 1 );
+				collisionBox.castShadow = true;
 				scene.add( collisionBox );
+
+				//
+
+				const loader = new THREE.BufferGeometryLoader();
+				loader.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
+
+					const dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
+					dirLight.castShadow = true;
+					dirLight.position.set( 3, 12, 17 );
+					dirLight.castShadow = true;
+					dirLight.shadow.camera.near = 5;
+					dirLight.shadow.camera.far = 50;
+					dirLight.shadow.camera.right = 10;
+					dirLight.shadow.camera.left = - 10;
+					dirLight.shadow.camera.top	= 10;
+					dirLight.shadow.camera.bottom = - 10;
+					dirLight.shadow.mapSize.width = 2048;
+					dirLight.shadow.mapSize.height = 2048;
+					dirLight.shadow.bias = - 0.01;
+
+					scene.add( dirLight );
+					scene.add( new THREE.AmbientLight( 0x111122 ) );
+
+					geometry.computeVertexNormals();
+
+					monkey = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { roughness: 1, metalness: 0 } ) );
+					monkey.receiveShadow = true;
+					monkey.scale.setScalar( 5 );
+					monkey.rotation.y = Math.PI / 2;
+					monkey.position.y = 4.5;
+					monkey.layers.enable( 1 ); // add to collision layer
+
+					scene.add( monkey );
+
+				} );
 
 				//
 
@@ -276,7 +338,7 @@
 
 				const gui = new GUI();
 
-				gui.add( collisionBox.position, 'z', - 50, 50, 1 ).name( 'position' );
+				gui.add( collisionBox.position, 'z', - 50, 50, .001 ).name( 'position' );
 				gui.add( collisionBox.scale, 'x', .1, 3.5, 0.01 ).name( 'scale' );
 				gui.add( rainParticles, 'count', 200, maxParticleCount, 1 ).name( 'drop count' ).onChange( ( v ) => rippleParticles.count = v );
 
@@ -297,11 +359,23 @@
 
 				stats.update();
 
+				if ( monkey ) {
+
+					monkey.rotation.y += 0.01;
+
+				}
+
+				// position
+
 				scene.overrideMaterial = collisionPosMaterial;
-				renderer.setRenderTarget( collisionRT );
+				renderer.setRenderTarget( collisionPosRT );
 				renderer.render( scene, collisionCamera );
 
+				// compute
+
 				renderer.compute( computeParticles );
+
+				// result
 
 				scene.overrideMaterial = null;
 				renderer.setRenderTarget( null );
