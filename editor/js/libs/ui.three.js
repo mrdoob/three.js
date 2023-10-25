@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { TGALoader } from 'three/addons/loaders/TGALoader.js';
 
@@ -93,6 +94,34 @@ class UITexture extends UISpan {
 
 				reader.readAsDataURL( file );
 
+			} else if ( extension === 'ktx2' ) {
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					const arrayBuffer = event.target.result;
+					const blobURL = URL.createObjectURL( new Blob( [ arrayBuffer ] ) );
+					const tempRenderer = new THREE.WebGLRenderer();
+					const ktx2Loader = new KTX2Loader();
+					ktx2Loader.setTranscoderPath( '../../examples/jsm/libs/basis/' );
+					ktx2Loader.detectSupport( tempRenderer );
+
+					ktx2Loader.load( blobURL, function ( texture ) {
+
+						texture.colorSpace = THREE.SRGBColorSpace;
+						texture.sourceFile = file.name;
+						texture.needsUpdate = true;
+						scope.setValue( texture );
+
+						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
+						ktx2Loader.dispose();
+						tempRenderer.dispose();
+
+					} );
+
+				} );
+
+				reader.readAsArrayBuffer( file );
+
 			} else if ( file.type.match( 'image.*' ) ) {
 
 				reader.addEventListener( 'load', function ( event ) {
@@ -155,14 +184,14 @@ class UITexture extends UISpan {
 				canvas.title = texture.sourceFile;
 				const scale = canvas.width / image.width;
 
-				if ( image.data === undefined ) {
-
-					context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
-
-				} else {
+				if ( texture.isDataTexture || texture.isCompressedTexture ) {
 
 					const canvas2 = renderToCanvas( texture );
 					context.drawImage( canvas2, 0, 0, image.width * scale, image.height * scale );
+
+				} else {
+
+					context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
 
 				}
 
