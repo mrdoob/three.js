@@ -9,6 +9,7 @@ import {
 	RGBAFormat
 } from 'three';
 
+const ID_ATTR_NAME = '_batch_id_';
 const _identityMatrix = new Matrix4();
 const _zeroScaleMatrix = new Matrix4().set(
 	0, 0, 0, 0,
@@ -20,7 +21,7 @@ const _zeroScaleMatrix = new Matrix4().set(
 // Custom shaders
 const batchingParsVertex = `
 #ifdef BATCHING
-	attribute float id;
+	attribute float ${ ID_ATTR_NAME };
 	uniform highp sampler2D batchingTexture;
 	uniform int batchingTextureSize;
 	mat4 getBatchingMatrix( const in float i ) {
@@ -41,7 +42,7 @@ const batchingParsVertex = `
 
 const batchingbaseVertex = `
 #ifdef BATCHING
-	mat4 batchingMatrix = getBatchingMatrix( id );
+	mat4 batchingMatrix = getBatchingMatrix( ${ ID_ATTR_NAME } );
 #endif
 `;
 
@@ -210,8 +211,7 @@ class BatchedMesh extends Mesh {
 			const idArray = maxGeometryCount > 65536
 				? new Uint32Array( maxVertexCount )
 				: new Uint16Array( maxVertexCount );
-			// @TODO: What if attribute name 'id' is already used?
-			geometry.setAttribute( 'id', new BufferAttribute( idArray, 1 ) );
+			geometry.setAttribute( ID_ATTR_NAME, new BufferAttribute( idArray, 1 ) );
 
 			this._geometryInitialized = true;
 
@@ -311,7 +311,7 @@ class BatchedMesh extends Mesh {
 		const geometryId = this._geometryCount;
 		this._geometryCount ++;
 
-		const idAttribute = batchGeometry.getAttribute( 'id' );
+		const idAttribute = batchGeometry.getAttribute( ID_ATTR_NAME );
 		for ( let i = 0; i < srcPositionAttribute.count; i ++ ) {
 
 			idAttribute.setX( this._vertexCount + i, geometryId );
