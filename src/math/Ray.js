@@ -327,16 +327,16 @@ class Ray {
 
 		// Based on https://jcgt.org/published/0007/03/04/
 
-		_t0.set( ( box.min.x - this.origin.x ) / this.direction.x, ( box.min.y - this.origin.y ) / this.direction.y, ( box.min.z - this.origin.z ) / this.direction.z );
-		_t1.set( ( box.max.x - this.origin.x ) / this.direction.x, ( box.max.y - this.origin.y ) / this.direction.y, ( box.max.z - this.origin.z ) / this.direction.z );
+		_t0.set( ( ( box.min.x - this.origin.x ) / this.direction.x ) || Infinity, ( ( box.min.y - this.origin.y ) / this.direction.y ) || Infinity, ( ( box.min.z - this.origin.z ) / this.direction.z ) || Infinity );
+		_t1.set( ( ( box.max.x - this.origin.x ) / this.direction.x ) || Infinity, ( ( box.max.y - this.origin.y ) / this.direction.y ) || Infinity, ( ( box.max.z - this.origin.z ) / this.direction.z ) || Infinity );
 
 		const maxtmin = Math.max( Math.max( Math.min( _t0.x, _t1.x ), Math.min( _t0.y, _t1.y ) ), Math.min( _t0.z, _t1.z ) );
 		const mintmax = Math.min( Math.min( Math.max( _t0.x, _t1.x ), Math.max( _t0.y, _t1.y ) ), Math.max( _t0.z, _t1.z ) );
 
 		if ( maxtmin <= mintmax ) {
 
-			if ( mintmax > 0 ) return this.at( mintmax, target );
 			if ( maxtmin > 0 ) return this.at( maxtmin, target );
+			if ( mintmax > 0 ) return this.at( mintmax, target );
 
 		}
 
@@ -346,8 +346,8 @@ class Ray {
 
 		// Based on https://jcgt.org/published/0007/03/04/
 
-		_t0.set( ( box.min.x - this.origin.x ) / this.direction.x, ( box.min.y - this.origin.y ) / this.direction.y, ( box.min.z - this.origin.z ) / this.direction.z );
-		_t1.set( ( box.max.x - this.origin.x ) / this.direction.x, ( box.max.y - this.origin.y ) / this.direction.y, ( box.max.z - this.origin.z ) / this.direction.z );
+		_t0.set( ( ( box.min.x - this.origin.x ) / this.direction.x ) || Infinity, ( ( box.min.y - this.origin.y ) / this.direction.y ) || Infinity, ( ( box.min.z - this.origin.z ) / this.direction.z ) || Infinity );
+		_t1.set( ( ( box.max.x - this.origin.x ) / this.direction.x ) || Infinity, ( ( box.max.y - this.origin.y ) / this.direction.y ) || Infinity, ( ( box.max.z - this.origin.z ) / this.direction.z ) || Infinity );
 
 		return Math.max( Math.max( Math.min( _t0.x, _t1.x ), Math.min( _t0.y, _t1.y ) ), Math.min( _t0.z, _t1.z ) ) <= Math.min( Math.min( Math.max( _t0.x, _t1.x ), Math.max( _t0.y, _t1.y ) ), Math.max( _t0.z, _t1.z ) );
 
