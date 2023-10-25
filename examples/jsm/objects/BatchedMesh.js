@@ -174,6 +174,57 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	_initializeGeometry( reference ) {
+
+		// @TODO: geometry.groups support?
+		// @TODO: geometry.drawRange support?
+		// @TODO: geometry.morphAttributes support?
+
+		const geometry = this.geometry;
+		const maxVertexCount = this._maxVertexCount;
+		const maxGeometryCount = this._maxGeometryCount;
+		const maxIndexCount = this._maxIndexCount;
+		if ( this._geometryInitialized === false ) {
+
+			for ( const attributeName in reference.attributes ) {
+
+				const srcAttribute = reference.getAttribute( attributeName );
+				const { array, itemSize, normalized } = srcAttribute;
+
+				const dstArray = new array.constructor( maxVertexCount * itemSize );
+				const dstAttribute = new srcAttribute.constructor( dstArray, itemSize, normalized );
+				dstAttribute.setUsage( srcAttribute.usage );
+
+				geometry.setAttribute( attributeName, dstAttribute );
+
+			}
+
+			if ( reference.getIndex() !== null ) {
+
+				const indexArray = maxVertexCount > 65536
+					? new Uint32Array( maxIndexCount )
+					: new Uint16Array( maxIndexCount );
+
+				geometry.setIndex( new BufferAttribute( indexArray, 1 ) );
+
+			}
+
+			const idArray = maxGeometryCount > 65536
+				? new Uint32Array( maxVertexCount )
+				: new Uint16Array( maxVertexCount );
+			// @TODO: What if attribute name 'id' is already used?
+			geometry.setAttribute( 'id', new BufferAttribute( idArray, 1 ) );
+
+			this._geometryInitialized = true;
+
+		} else {
+
+			// @TODO: Check if geometry has the same attributes set
+
+		}
+
+	}
+
 	getGeometryCount() {
 
 		return this._geometryCount;
@@ -194,52 +245,12 @@ class BatchedMesh extends Mesh {
 
 	applyGeometry( geometry ) {
 
-		// @TODO: geometry.groups support?
-		// @TODO: geometry.drawRange support?
-		// @TODO: geometry.morphAttributes support?
+		this._initializeGeometry( geometry );
 
+		// @TODO: Error handling if exceeding maxVertexCount or maxIndexCount
 		if ( this._geometryCount >= this._maxGeometryCount ) {
 
 			// @TODO: Error handling
-
-		}
-
-		if ( this._geometryInitialized === false ) {
-
-			for ( const attributeName in geometry.attributes ) {
-
-				const srcAttribute = geometry.getAttribute( attributeName );
-				const { array, itemSize, normalized } = srcAttribute;
-
-				const dstArray = new array.constructor( this._maxVertexCount * itemSize );
-				const dstAttribute = new srcAttribute.constructor( dstArray, itemSize, normalized );
-				dstAttribute.setUsage( srcAttribute.usage );
-
-				this.geometry.setAttribute( attributeName, dstAttribute );
-
-			}
-
-			if ( geometry.getIndex() !== null ) {
-
-				const indexArray = this._maxVertexCount > 65536
-					? new Uint32Array( this._maxIndexCount )
-					: new Uint16Array( this._maxIndexCount );
-
-				this.geometry.setIndex( new BufferAttribute( indexArray, 1 ) );
-
-			}
-
-			const idArray = this._maxGeometryCount > 65536
-				? new Uint32Array( this._maxVertexCount )
-				: new Uint16Array( this._maxVertexCount );
-			// @TODO: What if attribute name 'id' is already used?
-			this.geometry.setAttribute( 'id', new BufferAttribute( idArray, 1 ) );
-
-			this._geometryInitialized = true;
-
-		} else {
-
-			// @TODO: Check if geometry has the same attributes set
 
 		}
 
@@ -276,8 +287,6 @@ class BatchedMesh extends Mesh {
 
 		visibles.push( true );
 		alives.push( true );
-
-		// @TODO: Error handling if exceeding maxVertexCount or maxIndexCount
 
 		for ( const attributeName in geometry.attributes ) {
 
