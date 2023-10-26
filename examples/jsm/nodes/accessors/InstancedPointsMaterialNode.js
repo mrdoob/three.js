@@ -18,4 +18,4 @@ export default InstancedPointsMaterialNode;
 
 export const materialPointWidth = nodeImmutable( InstancedPointsMaterialNode, InstancedPointsMaterialNode.POINT_WIDTH );
 
-addNodeClass( 'FatPointsMaterialNode', InstancedPointsMaterialNode );
+addNodeClass( 'InstancedPointsMaterialNode', InstancedPointsMaterialNode );
