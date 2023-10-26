@@ -212,10 +212,6 @@ class BatchedMesh extends Mesh {
 
 			this._geometryInitialized = true;
 
-		} else {
-
-			// @TODO: Check if geometry has the same attributes set
-
 		}
 
 	}
@@ -243,28 +239,62 @@ class BatchedMesh extends Mesh {
 		this._initializeGeometry( geometry );
 
 		// @TODO: Error handling if exceeding maxVertexCount or maxIndexCount
-		// @TODO: Error handling if geometry does not have all the same attributes
-		// @TODO: Error handling to ensure both geometries index if needed
 		if ( this._geometryCount >= this._maxGeometryCount ) {
 
-			throw new Error( 'BatchedMesh: maximum geometry count reached.' );
+			throw new Error( 'BatchedMesh: Maximum geometry count reached.' );
 
 		}
 
 		if ( geometry.getAttribute( ID_ATTR_NAME ) ) {
 
-			throw new Error( `BatchMesh: geometry cannot use attribute "${ ID_ATTR_NAME }"` );
+			throw new Error( `BatchedMesh: Geometry cannot use attribute "${ ID_ATTR_NAME }"` );
 
 		}
 
 		const batchGeometry = this.geometry;
+		if ( Boolean( geometry.getIndex() ) !== Boolean( batchGeometry.getIndex() ) ) {
+
+			throw new Error( 'BatchedMesh: All geometries must consistently have "index".' );
+
+		}
+
+		for ( const attributeName in batchGeometry.attributes ) {
+
+			if ( attributeName === ID_ATTR_NAME ) {
+
+				continue;
+
+			}
+
+			if ( ! geometry.hasAttribute( attributeName ) ) {
+
+				throw new Error( `BatchedMesh: Added geometry missing "${ attributeName }". All geometries must have consistent attributes.` );
+
+			}
+
+		}
+
+		// Assuming geometry has position attribute
+		const srcPositionAttribute = geometry.getAttribute( 'position' );
+		const vertexCount = this._vertexCount;
+		const indexCount = this._indexCount;
+		const maxVertexCount = this._maxVertexCount;
+		const maxIndexCount = this._maxIndexCount;
+		if (
+			geometry.getIndex() !== null &&
+			indexCount + geometry.getIndex().count > maxIndexCount ||
+			vertexCount + srcPositionAttribute.count > maxVertexCount
+		) {
+
+			throw new Error( 'BatchedMesh: Added geometry is larger than available capacity.' );
+
+		}
+
 		const visible = this._visible;
 		const active = this._active;
 		const matricesTexture = this._matricesTexture;
 		const matrices = this._matrices;
 		const matricesArray = this._matricesTexture.image.data;
-		const vertexCount = this._vertexCount;
-		const indexCount = this._indexCount;
 
 		const indexCounts = this._indexCounts;
 		const indexStarts = this._indexStarts;
@@ -275,8 +305,6 @@ class BatchedMesh extends Mesh {
 		const dstIndex = batchGeometry.getIndex();
 		const srcIndex = geometry.getIndex();
 
-		// Assuming geometry has position attribute
-		const srcPositionAttribute = geometry.getAttribute( 'position' );
 
 		// push new geometry data range
 		vertexStarts.push( vertexCount );
@@ -369,7 +397,7 @@ class BatchedMesh extends Mesh {
 
 	optimize() {
 
-		throw new Error( 'BatchedMesh: optimize function not implemented.' );
+		throw new Error( 'BatchedMesh: Optimize function not implemented.' );
 
 	}
 
@@ -471,7 +499,7 @@ class BatchedMesh extends Mesh {
 
 	raycast() {
 
-		console.warn( 'BatchedMesh: raycast function not implemented.' );
+		console.warn( 'BatchedMesh: Raycast function not implemented.' );
 
 	}
 
@@ -479,7 +507,7 @@ class BatchedMesh extends Mesh {
 
 		// super.copy( source );
 
-		throw new Error( 'BatchedMesh: copy function not implemented.' );
+		throw new Error( 'BatchedMesh: Copy function not implemented.' );
 
 	}
 
