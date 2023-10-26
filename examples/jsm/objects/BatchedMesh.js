@@ -238,19 +238,21 @@ class BatchedMesh extends Mesh {
 
 		this._initializeGeometry( geometry );
 
-		// @TODO: Error handling if exceeding maxVertexCount or maxIndexCount
+		// ensure we're not over geometry
 		if ( this._geometryCount >= this._maxGeometryCount ) {
 
 			throw new Error( 'BatchedMesh: Maximum geometry count reached.' );
 
 		}
 
+		// check that the geometry doesn't have a version of our reserved id attribute
 		if ( geometry.getAttribute( ID_ATTR_NAME ) ) {
 
 			throw new Error( `BatchedMesh: Geometry cannot use attribute "${ ID_ATTR_NAME }"` );
 
 		}
 
+		// check to ensure the geometries are using consistent attributes and indices
 		const batchGeometry = this.geometry;
 		if ( Boolean( geometry.getIndex() ) !== Boolean( batchGeometry.getIndex() ) ) {
 
@@ -272,6 +274,14 @@ class BatchedMesh extends Mesh {
 
 			}
 
+			const srcAttribute = geometry.getAttribute( attributeName );
+			const dstAttribute = batchGeometry.getAttribute( attributeName );
+			if ( srcAttribute.itemSize !== dstAttribute.itemSize ) {
+
+				throw new Error( 'BatchedMesh: All attributes must have a consistent item size.' );
+
+			}
+
 		}
 
 		// Assuming geometry has position attribute
@@ -280,13 +290,15 @@ class BatchedMesh extends Mesh {
 		const indexCount = this._indexCount;
 		const maxVertexCount = this._maxVertexCount;
 		const maxIndexCount = this._maxIndexCount;
+
+		// check if we're going over our maximum buffer capacity
 		if (
 			geometry.getIndex() !== null &&
 			indexCount + geometry.getIndex().count > maxIndexCount ||
 			vertexCount + srcPositionAttribute.count > maxVertexCount
 		) {
 
-			throw new Error( 'BatchedMesh: Added geometry is larger than available capacity.' );
+			throw new Error( 'BatchedMesh: Added geometry is larger than available buffer capacity.' );
 
 		}
 
@@ -304,7 +316,6 @@ class BatchedMesh extends Mesh {
 		const hasIndex = batchGeometry.getIndex() !== null;
 		const dstIndex = batchGeometry.getIndex();
 		const srcIndex = geometry.getIndex();
-
 
 		// push new geometry data range
 		vertexStarts.push( vertexCount );
