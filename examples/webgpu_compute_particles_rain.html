@@ -43,6 +43,7 @@
 			let controls, stats;
 			let computeParticles;
 			let monkey;
+			let clock;
 
 			let collisionBox, collisionCamera, collisionPosRT, collisionPosMaterial;
 
@@ -60,11 +61,29 @@
 
 				const { innerWidth, innerHeight } = window;
 
-				camera = new THREE.PerspectiveCamera( 50, innerWidth / innerHeight, .1, 110 );
+				camera = new THREE.PerspectiveCamera( 60, innerWidth / innerHeight, .1, 110 );
 				camera.layers.enable( 2 ); // @TODO: Fix .castShadow and remove it
-				camera.position.set( 40, 40, 40 );
+				camera.position.set( 40, 8, 0 );
+				camera.lookAt( 0, 0, 0 );
 
 				scene = new THREE.Scene();
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
+				dirLight.castShadow = true;
+				dirLight.position.set( 3, 12, 17 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.near = 5;
+				dirLight.shadow.camera.far = 50;
+				dirLight.shadow.camera.right = 10;
+				dirLight.shadow.camera.left = - 10;
+				dirLight.shadow.camera.top	= 10;
+				dirLight.shadow.camera.bottom = - 10;
+				dirLight.shadow.mapSize.width = 2048;
+				dirLight.shadow.mapSize.height = 2048;
+				dirLight.shadow.bias = - 0.01;
+
+				scene.add( dirLight );
+				scene.add( new THREE.AmbientLight( 0x111111 ) );
 
 				//
 
@@ -284,23 +303,6 @@
 				const loader = new THREE.BufferGeometryLoader();
 				loader.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {
 
-					const dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
-					dirLight.castShadow = true;
-					dirLight.position.set( 3, 12, 17 );
-					dirLight.castShadow = true;
-					dirLight.shadow.camera.near = 5;
-					dirLight.shadow.camera.far = 50;
-					dirLight.shadow.camera.right = 10;
-					dirLight.shadow.camera.left = - 10;
-					dirLight.shadow.camera.top	= 10;
-					dirLight.shadow.camera.bottom = - 10;
-					dirLight.shadow.mapSize.width = 2048;
-					dirLight.shadow.mapSize.height = 2048;
-					dirLight.shadow.bias = - 0.01;
-
-					scene.add( dirLight );
-					scene.add( new THREE.AmbientLight( 0x111111 ) );
-
 					geometry.computeVertexNormals();
 
 					monkey = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { roughness: 1, metalness: 0 } ) );
@@ -313,6 +315,10 @@
 					scene.add( monkey );
 
 				} );
+
+				//
+
+				clock = new THREE.Clock();
 
 				//
 
@@ -366,7 +372,7 @@
 
 				if ( monkey ) {
 
-					monkey.rotation.y += 0.01;
+					monkey.rotation.y += clock.getDelta();
 
 				}
 
