@@ -217,6 +217,7 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	// Make sure the geometry is compatible with the existing combined geometry atributes
 	_validateGeometry( geometry ) {
 
 		// check that the geometry doesn't have a version of our reserved id attribute
@@ -409,13 +410,13 @@ class BatchedMesh extends Mesh {
 		}
 
 		// update the geometry
-		this.setGeometryAt( geometry, geometryId );
+		this.setGeometryAt( geometryId, geometry );
 
 		return geometryId;
 
 	}
 
-	setGeometryAt( geometry, id ) {
+	setGeometryAt( id, geometry ) {
 
 		if ( id >= this._geometryCount ) {
 
