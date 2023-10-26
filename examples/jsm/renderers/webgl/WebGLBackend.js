@@ -10,6 +10,8 @@ import WebGLTextureUtils from './utils/WebGLTextureUtils.js';
 import WebGLExtensions from './utils/WebGLExtensions.js';
 import WebGLCapabilities from './utils/WebGLCapabilities.js';
 import { GLFeatureName } from './utils/WebGLConstants.js';
+import { DepthFormat } from '../../../../src/constants.js';
+
 //
 
 class WebGLBackend extends Backend {
@@ -114,6 +116,24 @@ class WebGLBackend extends Backend {
 		const { gl } = this;
 		const renderContextData = this.get( renderContext );
 		const previousContext = renderContextData.previousContext;
+
+		const textures = renderContext.textures;
+
+		if ( textures !== null ) {
+
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				const texture = textures[ i ];
+
+				if ( texture.generateMipmaps ) {
+
+					this.generateMipmaps( texture );
+
+				}
+
+			}
+
+		}
 
 		this._currentContext = previousContext;
 
@@ -870,13 +890,33 @@ class WebGLBackend extends Backend {
 
 		if ( renderContext.textures !== null ) {
 
-			const renderTargetContextData = this.get( renderContext.renderTarget );
-			const { samples } = renderContext.renderTarget;
+			const renderTarget = renderContext.renderTarget
+			const renderTargetContextData = this.get( renderTarget );
+			const { samples } = renderTarget;
+			const cubeFace = this.renderer._activeCubeFace;
+			const isCube = renderTarget.isWebGLCubeRenderTarget === true
 
 			fb = renderTargetContextData.framebuffer;
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
 
+			let fb;
+
+			if ( isCube ) {
+
+				if ( renderTargetContextData.cubeFramebuffers === undefined ) {
+
+					renderTargetContextData.cubeFramebuffers = [];
+
+				}
+
+				fb = renderTargetContextData.cubeFramebuffers[ cubeFace ];
+
+			} else {
+
+				fb = renderTargetContextData.framebuffer;
+
+			}
 
 			if ( fb === undefined ) {
 
@@ -886,16 +926,24 @@ class WebGLBackend extends Backend {
 
 				const textures = renderContext.textures;
 
-				for ( let i = 0; i < textures.length; i ++ ) {
+				if ( isCube ) {
 
-					const texture = textures[ i ];
-					const textureData = this.get( texture );
-					textureData.renderTarget = renderContext.renderTarget;
+					renderTargetContextData.cubeFramebuffers[ cubeFace ] = fb;
+					const { textureGPU } = this.get( textures[ 0 ] );
 
-					const attachment = gl.COLOR_ATTACHMENT0 + i;
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureGPU, 0 );
 
+				} else {
 
-					gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+					for ( let i = 0; i < textures.length; i ++ ) {
+
+						const texture = textures[ i ];
+						const textureData = this.get( texture );
+						textureData.renderTarget = renderContext.renderTarget;
+
+						gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+					}
 
 				}
 
