@@ -64,11 +64,14 @@ const batchingVertex = /* glsl */`
 // @TODO: SkinnedMesh support?
 // @TODO: Future work if needed. Move into the core. Can be optimized more with WEBGL_multi_draw.
 
+// copies data from attribute "src" into "target" starting at "targetOffset"
 function copyAttributeData( src, target, targetOffset = 0 ) {
 
 	const itemSize = target.itemSize;
-	if ( src.isInterleavedBufferAttribute ) {
+	if ( src.isInterleavedBufferAttribute || src.array.constructor !== target.array.constructor ) {
 
+		// use the component getters and setters if the array data cannot
+		// be copied directly
 		const vertexCount = src.count;
 		for ( let i = 0; i < vertexCount; i ++ ) {
 
@@ -82,6 +85,7 @@ function copyAttributeData( src, target, targetOffset = 0 ) {
 
 	} else {
 
+		// faster copy approach using typed array set function
 		target.array.set( src.array, targetOffset * itemSize );
 		target.needsUpdate = true;
 
@@ -357,7 +361,6 @@ class BatchedMesh extends Mesh {
 
 			const srcAttribute = geometry.getAttribute( attributeName );
 			const dstAttribute = batchGeometry.getAttribute( attributeName );
-
 			copyAttributeData( srcAttribute, dstAttribute, vertexCount );
 
 		}
