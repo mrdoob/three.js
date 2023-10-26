@@ -497,7 +497,7 @@ const EXTENSIONS = {
 	KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
 	KHR_MESH_QUANTIZATION: 'KHR_mesh_quantization',
 	KHR_MATERIALS_EMISSIVE_STRENGTH: 'KHR_materials_emissive_strength',
-	EXR_MATERIALS_BUMP: 'EXT_materials_bump',
+	EXT_MATERIALS_BUMP: 'EXT_materials_bump',
 	EXT_TEXTURE_WEBP: 'EXT_texture_webp',
 	EXT_TEXTURE_AVIF: 'EXT_texture_avif',
 	EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression',
@@ -1219,7 +1219,7 @@ class GLTFMaterialsBumpExtension {
 	constructor( parser ) {
 
 		this.parser = parser;
-		this.name = EXTENSIONS.EXR_MATERIALS_BUMP;
+		this.name = EXTENSIONS.EXT_MATERIALS_BUMP;
 
 	}
 
