@@ -87,9 +87,10 @@ function copyAttributeData( src, target, targetOffset = 0 ) {
 
 		// faster copy approach using typed array set function
 		target.array.set( src.array, targetOffset * itemSize );
-		target.needsUpdate = true;
 
 	}
+
+	target.needsUpdate = true;
 
 }
 
