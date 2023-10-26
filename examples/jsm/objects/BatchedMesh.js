@@ -276,9 +276,9 @@ class BatchedMesh extends Mesh {
 
 			const srcAttribute = geometry.getAttribute( attributeName );
 			const dstAttribute = batchGeometry.getAttribute( attributeName );
-			if ( srcAttribute.itemSize !== dstAttribute.itemSize ) {
+			if ( srcAttribute.itemSize !== dstAttribute.itemSize || srcAttribute.normalized !== dstAttribute.normalized ) {
 
-				throw new Error( 'BatchedMesh: All attributes must have a consistent item size.' );
+				throw new Error( 'BatchedMesh: All attributes must have a consistent itemSize and normalized value.' );
 
 			}
 
