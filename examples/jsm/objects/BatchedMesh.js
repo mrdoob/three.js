@@ -301,7 +301,7 @@ class BatchedMesh extends Mesh {
 
 		let lastRange = null;
 		const reservedRanges = this._reservedRanges;
-		if ( this._geometryCount === 0 ) {
+		if ( this._geometryCount !== 0 ) {
 
 			lastRange = reservedRanges[ reservedRanges.length - 1 ];
 
@@ -331,7 +331,7 @@ class BatchedMesh extends Mesh {
 
 			if ( indexCount	=== - 1 ) {
 
-				indexCount = geometry.getIndex().count;
+				range.indexCount = geometry.getIndex().count;
 
 			} else {
 
@@ -376,14 +376,14 @@ class BatchedMesh extends Mesh {
 		visible.push( true );
 		active.push( true );
 
+		// update id
+		const geometryId = this._geometryCount;
+		this._geometryCount ++;
+
 		// initialize matrix information
 		matrices.push( new Matrix4() );
 		_identityMatrix.toArray( matricesArray, geometryId * 16 );
 		matricesTexture.needsUpdate = true;
-
-		// update id
-		const geometryId = this._geometryCount;
-		this._geometryCount ++;
 
 		// add the reserved range
 		reservedRanges.push( range );
@@ -444,7 +444,7 @@ class BatchedMesh extends Mesh {
 		const srcIndex = geometry.getIndex();
 
 		// copy attribute data over
-		const vertexCount = srcPositionAttribute.count;
+		const vertexCount = range.vertexStart;
 		for ( const attributeName in batchGeometry.attributes ) {
 
 			if ( attributeName === ID_ATTR_NAME ) {
@@ -457,23 +457,45 @@ class BatchedMesh extends Mesh {
 			const dstAttribute = batchGeometry.getAttribute( attributeName );
 
 			dstAttribute.array.set( srcAttribute.array, vertexCount * dstAttribute.itemSize );
+
+			// fill the rest in with zeroes
+			const itemSize = srcAttribute.itemSize;
+			const vertexStart = range.vertexStart;
+			for ( let i = srcAttribute.count; i < range.vertexLength; i ++ ) {
+
+				for ( let c = 0; c < itemSize; c ++ ) {
+
+					dstIndex.setComponent( vertexStart + i, c, 0 );
+
+				}
+
+			}
+
 			dstAttribute.needsUpdate = true;
-			// TODO: hide the remaining data
 
 		}
+
+		this._vertexCounts[ id ] = srcPositionAttribute.count;
 
 		if ( hasIndex ) {
 
 			// copy index data over
-			const indexCount = srcIndex.count;
+			const indexStart = range.indexStart;
 			for ( let i = 0; i < srcIndex.count; i ++ ) {
 
-				dstIndex.setX( indexCount + i, vertexCount + srcIndex.getX( i ) );
+				dstIndex.setX( indexStart + i, vertexCount + srcIndex.getX( i ) );
+
+			}
+
+			// fill the rest in with zeroes
+			for ( let i = srcIndex.count; i < range.indexLength; i ++ ) {
+
+				dstIndex.setX( indexStart + i, indexStart );
 
 			}
 
 			dstIndex.needsUpdate = true;
-			// TODO: hide the remaining data
+			this._indexCounts[ id ] = srcIndex.count;
 
 		}
 
