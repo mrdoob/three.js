@@ -10,8 +10,8 @@ import {
 } from 'three';
 
 const ID_ATTR_NAME = '_batch_id_';
-const _identityMatrix = /* @__PURE__ */ new Matrix4();
-const _zeroScaleMatrix = /* @__PURE__ */ new Matrix4().set(
+const _identityMatrix = new Matrix4();
+const _zeroScaleMatrix = new Matrix4().set(
 	0, 0, 0, 0,
 	0, 0, 0, 0,
 	0, 0, 0, 0,
