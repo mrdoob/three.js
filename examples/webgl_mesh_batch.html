@@ -178,9 +178,10 @@
 			mesh.userData.rotationSpeeds = [];
 			ids.length = 0;
 
+			window.BATCH = mesh;
 			for ( let i = 0; i < api.count; i ++ ) {
 
-				const id = mesh.applyGeometry( geometries[ i % geometries.length ] );
+				const id = mesh.addGeometry( geometries[ i % geometries.length ] );
 				mesh.setMatrixAt( id, randomizeMatrix( matrix ) );
 
 				const rotationMatrix = new THREE.Matrix4();
