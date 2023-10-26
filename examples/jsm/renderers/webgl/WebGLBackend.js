@@ -255,7 +255,7 @@ class WebGLBackend extends Backend {
 
 				} else if ( depth ) {
 
-					gl.clearBufferfv( gl.DEPTH, 0, [ 1.0 ] )
+					gl.clearBufferfv( gl.DEPTH, 0, [ 1.0 ] );
 
 				} else if ( stencil ) {
 
