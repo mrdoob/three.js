@@ -57,7 +57,7 @@ class TSLEncoder {
 		this.uniqueNames = false;
 
 		this._currentProperties = {};
-		this._lastStatment = null;
+		this._lastStatement = null;
 
 	}
 
@@ -533,13 +533,13 @@ ${ this.tab }} );\n\n`;
 
 	setLastStatement( statement ) {
 
-		this._lastStatment = statement;
+		this._lastStatement = statement;
 
 	}
 
 	emitExtraLine( statement ) {
 
-		const last = this._lastStatment;
+		const last = this._lastStatement;
 		if ( last === null ) return '';
 
 		if ( statement.isReturn ) return '\n';
