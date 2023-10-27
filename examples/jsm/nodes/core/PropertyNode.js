@@ -9,6 +9,8 @@ class PropertyNode extends Node {
 
 		this.name = name;
 
+		this.isPropertyNode = true;
+
 	}
 
 	getHash( builder ) {
@@ -25,16 +27,7 @@ class PropertyNode extends Node {
 
 	generate( builder ) {
 
-		const nodeVary = builder.getVarFromNode( this, this.getNodeType( builder ) );
-		const name = this.name;
-
-		if ( name !== null ) {
-
-			nodeVary.name = name;
-
-		}
-
-		return builder.getPropertyName( nodeVary );
+		return builder.getPropertyName( builder.getVarFromNode( this, this.name ) );
 
 	}
 
@@ -59,5 +52,6 @@ export const shininess = nodeImmutable( PropertyNode, 'float', 'Shininess' );
 export const output = nodeImmutable( PropertyNode, 'vec4', 'Output' );
 export const dashSize = nodeImmutable( PropertyNode, 'float', 'dashSize' );
 export const gapSize = nodeImmutable( PropertyNode, 'float', 'gapSize' );
+export const pointWidth = nodeImmutable( PropertyNode, 'float', 'pointWidth' );
 
 addNodeClass( 'PropertyNode', PropertyNode );

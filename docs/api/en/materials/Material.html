@@ -49,6 +49,20 @@
 			`true`). Default is `false`.
 		</p>
 
+		<h3>[property:Float blendAlpha]</h3>
+		<p>
+			Represents the alpha value of the constant blend color. Default is `0`.
+
+			This property has only an effect when using custom blending with [page:CustomBlendingEquation ConstantAlpha] or [page:CustomBlendingEquation OneMinusConstantAlpha].
+		</p>
+
+		<h3>[property:Color blendColor]</h3>
+		<p>
+			Represent the RGB values of the constant blend color. Default is `0x000000`.<br />
+
+			This property has only an effect when using custom blending with [page:CustomBlendingEquation ConstantColor] or [page:CustomBlendingEquation OneMinusConstantColor].
+		</p>
+
 		<h3>[property:Integer blendDst]</h3>
 		<p>
 			Blending destination. Default is [page:CustomBlendingEquation OneMinusSrcAlphaFactor]. 
@@ -147,7 +161,8 @@
 		<h3>[property:Boolean depthTest]</h3>
 		<p>
 			Whether to have depth test enabled when rendering this material. Default
-			is `true`.
+			is `true`. When the depth test is disabled, the depth write will also be
+			implicitly disabled.
 		</p>
 
 		<h3>[property:Boolean depthWrite]</h3>

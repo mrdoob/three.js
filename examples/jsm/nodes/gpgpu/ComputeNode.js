@@ -17,7 +17,7 @@ class ComputeNode extends Node {
 		this.dispatchCount = 0;
 
 		this.version = 1;
-		this.updateType = NodeUpdateType.OBJECT;
+		this.updateBeforeType = NodeUpdateType.OBJECT;
 
 		this.updateDispatchCount();
 
@@ -50,7 +50,7 @@ class ComputeNode extends Node {
 
 	onInit() { }
 
-	update( { renderer } ) {
+	updateBefore( { renderer } ) {
 
 		renderer.compute( this );
 

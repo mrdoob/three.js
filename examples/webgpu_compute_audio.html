@@ -134,7 +134,7 @@
 
 				// compute (shader-node)
 
-				const computeShaderFn = tslFn( ( stack ) => {
+				const computeShaderFn = tslFn( () => {
 
 					const index = float( instanceIndex );
 
@@ -161,7 +161,7 @@
 
 					const waveStorageElementNode = waveStorageNode.element( instanceIndex );
 
-					stack.assign( waveStorageElementNode, wave );
+					waveStorageElementNode.assign( wave );
 
 				} );
 

@@ -2,8 +2,7 @@ import { Material, ShaderMaterial, NoColorSpace, LinearSRGBColorSpace } from 'th
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor } from '../core/PropertyNode.js';
-import { materialNormal } from '../accessors/ExtendedMaterialNode.js';
-import { materialAlphaTest, materialColor, materialOpacity, materialEmissive } from '../accessors/MaterialNode.js';
+import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
@@ -13,7 +12,7 @@ import { morph } from '../accessors/MorphNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { lightsWithoutWrap } from '../lighting/LightsNode.js';
-import { mix, dFdx, dFdy } from '../math/MathNode.js';
+import { mix } from '../math/MathNode.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import AONode from '../lighting/AONode.js';
 import { lightingContext } from '../lighting/LightingContextNode.js';
@@ -98,7 +97,7 @@ class NodeMaterial extends ShaderMaterial {
 
 			// OUTPUT NODE
 
-			builder.stack.assign( output, outputNode );
+			output.assign( outputNode );
 
 			//
 
@@ -125,25 +124,25 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color ) {
 
-			builder.stack.add( morph( object ) );
+			morph( object ).append();
 
 		}
 
 		if ( object.isSkinnedMesh === true ) {
 
-			builder.stack.add( skinning( object ) );
+			skinning( object ).append();
 
 		}
 
 		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
 
-			builder.stack.add( instance( object ) );
+			instance( object ).append();
 
 		}
 
 		if ( this.positionNode !== null ) {
 
-			builder.stack.assign( positionLocal, this.positionNode );
+			positionLocal.assign( this.positionNode );
 
 		}
 
@@ -153,7 +152,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	setupDiffuseColor( { stack, geometry } ) {
+	setupDiffuseColor( { geometry } ) {
 
 		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
 
@@ -167,12 +166,12 @@ class NodeMaterial extends ShaderMaterial {
 
 		// COLOR
 
-		stack.assign( diffuseColor, colorNode );
+		diffuseColor.assign( colorNode );
 
 		// OPACITY
 
 		const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
-		stack.assign( diffuseColor.a, diffuseColor.a.mul( opacityNode ) );
+		diffuseColor.a.assign( diffuseColor.a.mul( opacityNode ) );
 
 		// ALPHA TEST
 
@@ -180,7 +179,7 @@ class NodeMaterial extends ShaderMaterial {
 
 			const alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
 
-			stack.add( diffuseColor.a.lessThanEqual( alphaTestNode ).discard() );
+			diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
 
 		}
 
@@ -192,23 +191,21 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	setupNormal( { stack } ) {
+	setupNormal() {
 
 		// NORMAL VIEW
 
 		if ( this.flatShading === true ) {
 
-			const fdx = dFdx( positionView );
-			const fdy = dFdy( positionView );
-			const normalNode = fdx.cross( fdy ).normalize();
+			const normalNode = positionView.dFdx().cross( positionView.dFdy() ).normalize();
 
-			stack.assign( transformedNormalView, normalNode );
+			transformedNormalView.assign( normalNode );
 
 		} else {
 
 			const normalNode = this.normalNode ? vec3( this.normalNode ) : materialNormal;
 
-			stack.assign( transformedNormalView, normalNode );
+			transformedNormalView.assign( normalNode );
 
 		}
 
@@ -289,9 +286,9 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( lightsNode && lightsNode.hasLight !== false ) {
 
-			const lightingModelNode = this.setupLightingModel( builder );
+			const lightingModel = this.setupLightingModel( builder );
 
-			outgoingLightNode = lightingContext( lightsNode, lightingModelNode, backdropNode, backdropAlphaNode );
+			outgoingLightNode = lightingContext( lightsNode, lightingModel, backdropNode, backdropAlphaNode );
 
 		} else if ( backdropNode !== null ) {
 

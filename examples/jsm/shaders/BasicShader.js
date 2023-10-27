@@ -4,6 +4,8 @@
 
 const BasicShader = {
 
+	name: 'BasicShader',
+
 	uniforms: {},
 
 	vertexShader: /* glsl */`

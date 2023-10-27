@@ -191,7 +191,7 @@ class Textures extends DataMap {
 
 						for ( const image of texture.images ) {
 
-							images.push( this._getUploadImage( image ) );
+							images.push( image );
 
 						}
 
@@ -199,7 +199,7 @@ class Textures extends DataMap {
 
 					} else {
 
-						options.image = this._getUploadImage( image );
+						options.image = image;
 
 					}
 
@@ -213,7 +213,7 @@ class Textures extends DataMap {
 
 					backend.updateTexture( texture, options );
 
-					if ( options.needsMipmaps ) backend.generateMipmaps( texture );
+					if ( options.needsMipmaps && texture.mipmaps.length === 0 ) backend.generateMipmaps( texture );
 
 				}
 
@@ -305,7 +305,7 @@ class Textures extends DataMap {
 
 		if ( this.isEnvironmentTexture( texture ) ) return true;
 
-		return ( texture.isCompressedTexture !== true ) /*&& ( texture.generateMipmaps === true )*/ && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
+		return ( texture.isCompressedTexture === true ) || ( ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter ) );
 
 	}
 
@@ -314,38 +314,6 @@ class Textures extends DataMap {
 		const mapping = texture.mapping;
 
 		return ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping ) || ( mapping === CubeReflectionMapping || mapping === CubeRefractionMapping );
-
-	}
-
-	_getUploadImage( image ) {
-
-		if ( this._isHTMLImage( image ) ) {
-
-			return this._imageToCanvas( image );
-
-		}
-
-		return image;
-
-	}
-
-	_imageToCanvas( image ) {
-
-		const { width, height } = image;
-
-		// eslint-disable-next-line compat/compat
-		const canvas = new OffscreenCanvas( width, height );
-
-		const context = canvas.getContext( '2d' );
-		context.drawImage( image, 0, 0, width, height );
-
-		return canvas;
-
-	}
-
-	_isHTMLImage( image ) {
-
-		return ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) || ( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement );
 
 	}
 

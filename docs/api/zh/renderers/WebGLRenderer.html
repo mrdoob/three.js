@@ -268,8 +268,18 @@
 		<h3>[method:undefined clearStencil]( )</h3>
 		<p>清除模板缓存。相当于调用[page:WebGLRenderer.clear .clear]( false, false, true )</p>
 
-		<h3>[method:undefined compile]( [param:Object3D scene], [param:Camera camera] )</h3>
-		<p>使用相机编译场景中的所有材质。这对于在首次渲染之前预编译着色器很有用。</p>
+		<h3>[method:Set compile]( [param:Object3D scene], [param:Camera camera], [param:Scene targetScene] )</h3>
+		<p>
+			使用相机编译场景中的所有材质。这对于在首次渲染之前预编译着色器很有用。
+			如果要将 3D 对象添加到现有场景，请使用第三个可选参数来应用目标场景。<br />
+			请注意，在调用此方法之前应配置场景的照明。
+		</p>
+
+		<h3>[method:Promise compileAsync]( [param:Object3D scene], [param:Camera camera], [param:Scene targetScene] )</h3>
+		<p>
+			[page:WebGLRenderer.compile .compile]() 的异步版本。该方法返回一个 Promise。它解决了何时可以渲染给定的 3D 对象或场景，而不会因着色器编译而出现不必要的停顿。<br /><br />
+			此方法利用 *KHR_parallel_shader_compile*。
+		</p>
 
 		<h3>[method:undefined copyFramebufferToTexture]( [param:Vector2 position], [param:FramebufferTexture texture], [param:Number level] )</h3>
 		<p>将当前WebGLFramebuffer中的像素复制到2D纹理中。可访问[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexImage2D WebGLRenderingContext.copyTexImage2D].</p>

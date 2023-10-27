@@ -5,6 +5,7 @@ import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
+import ParameterNode from './ParameterNode.js';
 import { createNodeMaterialFromType } from '../materials/NodeMaterial.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
@@ -16,6 +17,8 @@ import {
 import { REVISION, RenderTarget, NoColorSpace, LinearEncoding, sRGBEncoding, SRGBColorSpace, Color, Vector2, Vector3, Vector4, Float16BufferAttribute } from 'three';
 
 import { stack } from './StackNode.js';
+import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
+
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
@@ -77,17 +80,18 @@ class NodeBuilder {
 		this.flowCode = { vertex: '', fragment: '', compute: [] };
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.structs = { vertex: [], fragment: [], compute: [], index: 0 };
-		this.codes = { vertex: [], fragment: [], compute: [] };
 		this.bindings = { vertex: [], fragment: [], compute: [] };
 		this.bindingsOffset = { vertex: 0, fragment: 0, compute: 0 };
 		this.bindingsArray = null;
 		this.attributes = [];
 		this.bufferAttributes = [];
 		this.varyings = [];
-		this.vars = { vertex: [], fragment: [], compute: [] };
+		this.codes = {};
+		this.vars = {};
 		this.flow = { code: '' };
 		this.chaining = [];
 		this.stack = stack();
+		this.stacks = [];
 		this.tab = '\t';
 
 		this.context = {
@@ -569,17 +573,21 @@ class NodeBuilder {
 
 		this.stack = stack( this.stack );
 
+		this.stacks.push( getCurrentStack() || this.stack );
+		setCurrentStack( this.stack );
+
 		return this.stack;
 
 	}
 
 	removeStack() {
 
-		const currentStack = this.stack;
+		const lastStack = this.stack;
+		this.stack = lastStack.parent;
 
-		this.stack = currentStack.parent;
+		setCurrentStack( this.stacks.pop() );
 
-		return currentStack;
+		return lastStack;
 
 	}
 
@@ -676,7 +684,7 @@ class NodeBuilder {
 
 	}
 
-	getVarFromNode( node, type, shaderStage = this.shaderStage ) {
+	getVarFromNode( node, name = null, type = node.getNodeType( this ), shaderStage = this.shaderStage ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
@@ -684,10 +692,11 @@ class NodeBuilder {
 
 		if ( nodeVar === undefined ) {
 
-			const vars = this.vars[ shaderStage ];
-			const index = vars.length;
+			const vars = this.vars[ shaderStage ] || ( this.vars[ shaderStage ] = [] );
 
-			nodeVar = new NodeVar( 'nodeVar' + index, type );
+			if ( name === null ) name = 'nodeVar' + vars.length;
+
+			nodeVar = new NodeVar( name, type );
 
 			vars.push( nodeVar );
 
@@ -730,7 +739,7 @@ class NodeBuilder {
 
 		if ( nodeCode === undefined ) {
 
-			const codes = this.codes[ shaderStage ];
+			const codes = this.codes[ shaderStage ] || ( this.codes[ shaderStage ] = [] );
 			const index = codes.length;
 
 			nodeCode = new NodeCode( 'nodeCode' + index, type );
@@ -805,12 +814,84 @@ class NodeBuilder {
 
 	}
 
+	flowShaderNode( shaderNode ) {
+
+		const layout = shaderNode.layout;
+
+		let inputs;
+
+		if ( shaderNode.isArrayInput ) {
+
+			inputs = [];
+
+			for ( const input of layout.inputs ) {
+
+				inputs.push( new ParameterNode( input.type, input.name ) );
+
+			}
+
+		} else {
+
+			inputs = {};
+
+			for ( const input of layout.inputs ) {
+
+				inputs[ input.name ] = new ParameterNode( input.type, input.name );
+
+			}
+
+		}
+
+		//
+
+		shaderNode.layout = null;
+
+		const callNode = shaderNode.call( inputs );
+		const flowData = this.flowStagesNode( callNode, layout.type );
+
+		shaderNode.layout = layout;
+
+		return flowData;
+
+	}
+
+	flowStagesNode( node, output = null ) {
+
+		const previousFlow = this.flow;
+		const previousVars = this.vars;
+		const previousBuildStage = this.buildStage;
+
+		const flow = {
+			code: ''
+		};
+
+		this.flow = flow;
+		this.vars = {};
+
+		for ( const buildStage of defaultBuildStages ) {
+
+			this.setBuildStage( buildStage );
+
+			flow.result = node.build( this, output );
+
+		}
+
+		flow.vars = this.getVars( this.shaderStage );
+
+		this.flow = previousFlow;
+		this.vars = previousVars;
+		this.setBuildStage( previousBuildStage );
+
+		return flow;
+
+	}
+
 	flowChildNode( node, output = null ) {
 
 		const previousFlow = this.flow;
 
 		const flow = {
-			code: '',
+			code: ''
 		};
 
 		this.flow = flow;
@@ -875,9 +956,13 @@ class NodeBuilder {
 
 		const vars = this.vars[ shaderStage ];
 
-		for ( const variable of vars ) {
+		if ( vars !== undefined ) {
 
-			snippet += `${ this.getVar( variable.type, variable.name ) }; `;
+			for ( const variable of vars ) {
+
+				snippet += `${ this.getVar( variable.type, variable.name ) }; `;
+
+			}
 
 		}
 
@@ -897,9 +982,13 @@ class NodeBuilder {
 
 		let code = '';
 
-		for ( const nodeCode of codes ) {
+		if ( codes !== undefined ) {
 
-			code += nodeCode.code + '\n';
+			for ( const nodeCode of codes ) {
+
+				code += nodeCode.code + '\n';
+
+			}
 
 		}
 
@@ -1015,6 +1104,18 @@ class NodeBuilder {
 
 	}
 
+	getPrimitiveType( type ) {
+
+		let primitiveType;
+
+		if ( type[ 0 ] === 'i' ) primitiveType = 'int';
+		else if ( type[ 0 ] === 'u' ) primitiveType = 'uint';
+		else primitiveType = 'float';
+
+		return primitiveType;
+
+	}
+
 	format( snippet, fromType, toType ) {
 
 		fromType = this.getVectorType( fromType );
@@ -1057,7 +1158,7 @@ class NodeBuilder {
 
 		}
 
-		if ( toTypeLength === 4 ) { // toType is vec4-like
+		if ( toTypeLength === 4 && fromTypeLength > 1 ) { // toType is vec4-like
 
 			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, 'vec3' ) }, 1.0 )`;
 
@@ -1066,6 +1167,15 @@ class NodeBuilder {
 		if ( fromTypeLength === 2 ) { // fromType is vec2-like and toType is vec3-like
 
 			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, 'vec2' ) }, 0.0 )`;
+
+		}
+
+		if ( fromTypeLength === 1 && toTypeLength > 1 && fromType[ 0 ] !== toType[ 0 ] ) { // fromType is float-like
+
+			// convert a number value to vector type, e.g:
+			// vec3( 1u ) -> vec3( float( 1u ) )
+
+			snippet = `${ this.getType( this.getPrimitiveType( toType ) ) }( ${ snippet } )`;
 
 		}
 

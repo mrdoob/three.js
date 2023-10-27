@@ -1,10 +1,6 @@
 import Node, { addNodeClass } from './Node.js';
-import { assign } from '../math/OperatorNode.js';
-import { bypass } from '../core/BypassNode.js';
-import { expression } from '../code/ExpressionNode.js';
 import { cond } from '../math/CondNode.js';
-import { loop } from '../utils/LoopNode.js';
-import { ShaderNode, nodeProxy } from '../shadernode/ShaderNode.js';
+import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
 
 class StackNode extends Node {
 
@@ -31,7 +27,7 @@ class StackNode extends Node {
 
 	add( node ) {
 
-		this.nodes.push( bypass( expression(), node ) );
+		this.nodes.push( node );
 
 		return this;
 
@@ -66,25 +62,19 @@ class StackNode extends Node {
 
 	}
 
-	assign( targetNode, sourceValue ) {
-
-		return this.add( assign( targetNode, sourceValue ) );
-
-	}
-
-	loop( ...params ) {
-
-		return this.add( loop( ...params ) );
-
-	}
-
 	build( builder, ...params ) {
+
+		const previousStack = getCurrentStack();
+
+		setCurrentStack( this );
 
 		for ( const node of this.nodes ) {
 
 			node.build( builder, 'void' );
 
 		}
+
+		setCurrentStack( previousStack );
 
 		return this.outputNode ? this.outputNode.build( builder, ...params ) : super.build( builder, ...params );
 

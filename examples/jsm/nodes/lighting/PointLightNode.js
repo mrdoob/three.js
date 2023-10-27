@@ -55,7 +55,7 @@ class PointLightNode extends AnalyticLightNode {
 			lightDirection,
 			lightColor,
 			reflectedLight
-		} );
+		}, builder.stack, builder );
 
 	}
 

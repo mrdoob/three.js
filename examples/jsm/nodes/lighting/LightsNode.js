@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
-import { nodeObject, nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeObject, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
 
 const LightNodes = new WeakMap();
 
@@ -16,6 +16,11 @@ class LightsNode extends Node {
 
 		super( 'vec3' );
 
+		this.totalDiffuseNode = vec3().temp( 'totalDiffuse' );
+		this.totalSpecularNode = vec3().temp( 'totalSpecular' );
+
+		this.outgoingLightNode = vec3().temp( 'outgoingLight' );
+
 		this.lightNodes = lightNodes;
 
 		this._hash = null;
@@ -30,13 +35,66 @@ class LightsNode extends Node {
 
 	setup( builder ) {
 
-		const lightNodes = this.lightNodes;
+		const context = builder.context;
+		const lightingModel = context.lightingModel;
 
-		for ( const lightNode of lightNodes ) {
+		let outgoingLightNode = this.outgoingLightNode;
 
-			lightNode.build( builder );
+		if ( lightingModel ) {
+
+			const { lightNodes, totalDiffuseNode, totalSpecularNode } = this;
+
+			context.outgoingLight = outgoingLightNode;
+
+			const stack = builder.addStack();
+
+			//
+
+			lightingModel.start( context, stack, builder );
+
+			// lights
+
+			for ( const lightNode of lightNodes ) {
+
+				lightNode.build( builder );
+	
+			}
+
+			//
+
+			lightingModel.indirectDiffuse( context, stack, builder );
+			lightingModel.indirectSpecular( context, stack, builder );
+			lightingModel.ambientOcclusion( context, stack, builder );
+
+			//
+
+			const { backdrop, backdropAlpha } = context;
+			const { directDiffuse, directSpecular, indirectDiffuse, indirectSpecular } = context.reflectedLight;
+
+			let totalDiffuse = directDiffuse.add( indirectDiffuse );
+
+			if ( backdrop !== null ) {
+
+				totalDiffuse = vec3( backdropAlpha !== null ? backdropAlpha.mix( totalDiffuse, backdrop ) : backdrop );
+	
+			}
+
+			totalDiffuseNode.assign( totalDiffuse );
+			totalSpecularNode.assign( directSpecular.add( indirectSpecular ) );
+
+			outgoingLightNode.assign( totalDiffuseNode.add( totalSpecularNode ) );
+
+			//
+
+			lightingModel.finish( context, stack, builder );
+
+			//
+
+			outgoingLightNode = outgoingLightNode.bypass( builder.removeStack() );
 
 		}
+
+		return outgoingLightNode;
 
 	}
 

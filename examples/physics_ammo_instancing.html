@@ -66,8 +66,8 @@
 				);
 				floor.position.y = - 2.5;
 				floor.receiveShadow = true;
+				floor.userData.physics = { mass: 0 };
 				scene.add( floor );
-				physics.addMesh( floor );
 
 				//
 
@@ -83,6 +83,7 @@
 				boxes.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
 				boxes.castShadow = true;
 				boxes.receiveShadow = true;
+				boxes.userData.physics = { mass: 1 };
 				scene.add( boxes );
 
 				for ( let i = 0; i < boxes.count; i ++ ) {
@@ -93,8 +94,6 @@
 
 				}
 
-				physics.addMesh( boxes, 1 );
-
 				// Spheres
 
 				const geometrySphere = new THREE.IcosahedronGeometry( 0.05, 4 );
@@ -102,6 +101,7 @@
 				spheres.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
 				spheres.castShadow = true;
 				spheres.receiveShadow = true;
+				spheres.userData.physics = { mass: 1 };
 				scene.add( spheres );
 
 				for ( let i = 0; i < spheres.count; i ++ ) {
@@ -112,7 +112,7 @@
 
 				}
 
-				physics.addMesh( spheres, 1 );
+				physics.addScene( scene );
 
 				//
 

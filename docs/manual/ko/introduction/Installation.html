@@ -172,11 +172,11 @@
     <h3>Node.js</h3>
 
     <p>
-        Because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be resolved by using shims like [link:https://github.com/stackgl/headless-gl headless-gl], or by replacing components like [page:TextureLoader] with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
+        Three.js는 웹 환경을 위해 만들어졌기 때문에, Node.js환경에서는 존재하지 않는 browser 객체와 DOM API에 의존적입니다. Node.js환경에서 사용한다면, 일부 문제는 [link:https://github.com/stackgl/headless-gl headless-gl]과 같은 심을 사용해서 해결하거나 [page:TextureLoader]와 같은 컴포넌트로 대안으로 사용하여 해결할 수 있습니다. 다른 DOM API는 이를 사용하는 코드와 깊게 얽혀있을 수 있으며, 해결하기가 더 어려울 수 있습니다. 우리는 Node.js환경을 지원하기 위한 간단하고 유지보수 가능한 풀리퀘스트를 환영합니다만 이슈를 먼저 열어 당신이 요청하려고하는 개선 코드에 대해 토론하는 것을 추천드립니다.
     </p>
 
     <p>
-        Make sure to add `{ "type": "module" }` to your `package.json` to enable ES6 modules in your node project.
+        `package.json`에 `{ “type”: “module” }` 을 추가해서 노드 프로젝트에서도 ES6 모듈을 사용할 수 있도록 활성화하세요.
     </p>
 
 </body>

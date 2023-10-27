@@ -1,4 +1,5 @@
 import DataMap from '../DataMap.js';
+import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
 import { NoToneMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
 import { NodeFrame, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, equirectUV, viewportBottomLeft, normalWorld } from '../../../nodes/Nodes.js';
@@ -13,6 +14,7 @@ class Nodes extends DataMap {
 		this.backend = backend;
 		this.nodeFrame = new NodeFrame();
 		this.nodeBuilderCache = new Map();
+		this.frameHashCache = new ChainMap();
 
 	}
 
@@ -145,18 +147,34 @@ class Nodes extends DataMap {
 
 	getCacheKey( scene, lightsNode ) {
 
-		const environmentNode = this.getEnvironmentNode( scene );
-		const fogNode = this.getFogNode( scene );
-		const toneMappingNode = this.getToneMappingNode();
+		const chain = [ scene, lightsNode ];
+		const frameId = this.nodeFrame.frameId;
 
-		const cacheKey = [];
+		let cacheKeyData = this.frameHashCache.get( chain );
 
-		if ( lightsNode ) cacheKey.push( 'lightsNode:' + lightsNode.getCacheKey() );
-		if ( environmentNode ) cacheKey.push( 'environmentNode:' + environmentNode.getCacheKey() );
-		if ( fogNode ) cacheKey.push( 'fogNode:' + fogNode.getCacheKey() );
-		if ( toneMappingNode ) cacheKey.push( 'toneMappingNode:' + toneMappingNode.getCacheKey() );
+		if ( cacheKeyData === undefined || cacheKeyData.frameId !== frameId ) {
 
-		return '{' + cacheKey.join( ',' ) + '}';
+			const environmentNode = this.getEnvironmentNode( scene );
+			const fogNode = this.getFogNode( scene );
+			const toneMappingNode = this.getToneMappingNode();
+
+			const cacheKey = [];
+
+			if ( lightsNode ) cacheKey.push( lightsNode.getCacheKey() );
+			if ( environmentNode ) cacheKey.push( environmentNode.getCacheKey() );
+			if ( fogNode ) cacheKey.push( fogNode.getCacheKey() );
+			if ( toneMappingNode ) cacheKey.push( toneMappingNode.getCacheKey() );
+
+			cacheKeyData = {
+				frameId,
+				cacheKey: cacheKey.join( ',' )
+			};
+
+			this.frameHashCache.set( chain, cacheKeyData );
+
+		}
+
+		return cacheKeyData.cacheKey;
 
 	}
 
@@ -336,22 +354,28 @@ class Nodes extends DataMap {
 
 	}
 
-	getNodeFrame( renderObject ) {
+	getNodeFrame( renderer = this.renderer, scene = null, object = null, camera = null, material = null ) {
 
 		const nodeFrame = this.nodeFrame;
-		nodeFrame.scene = renderObject.scene;
-		nodeFrame.object = renderObject.object;
-		nodeFrame.camera = renderObject.camera;
-		nodeFrame.renderer = renderObject.renderer;
-		nodeFrame.material = renderObject.material;
+		nodeFrame.renderer = renderer;
+		nodeFrame.scene = scene;
+		nodeFrame.object = object;
+		nodeFrame.camera = camera;
+		nodeFrame.material = material;
 
 		return nodeFrame;
 
 	}
 
+	getNodeFrameForRender( renderObject ) {
+
+		return this.getNodeFrame( renderObject.renderer, renderObject.scene, renderObject.object, renderObject.camera, renderObject.material );
+
+	}
+
 	updateBefore( renderObject ) {
 
-		const nodeFrame = this.getNodeFrame( renderObject );
+		const nodeFrame = this.getNodeFrameForRender( renderObject );
 		const nodeBuilder = renderObject.getNodeBuilderState();
 
 		for ( const node of nodeBuilder.updateBeforeNodes ) {
@@ -362,11 +386,22 @@ class Nodes extends DataMap {
 
 	}
 
-	updateForCompute( /*computeNode*/ ) { }
+	updateForCompute( computeNode ) {
+
+		const nodeFrame = this.getNodeFrame();
+		const nodeBuilder = this.getForCompute( computeNode );
+
+		for ( const node of nodeBuilder.updateNodes ) {
+
+			nodeFrame.updateNode( node );
+
+		}
+
+	}
 
 	updateForRender( renderObject ) {
 
-		const nodeFrame = this.getNodeFrame( renderObject );
+		const nodeFrame = this.getNodeFrameForRender( renderObject );
 		const nodeBuilder = renderObject.getNodeBuilderState();
 
 		for ( const node of nodeBuilder.updateNodes ) {

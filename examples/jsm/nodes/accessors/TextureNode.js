@@ -84,7 +84,7 @@ class TextureNode extends UniformNode {
 
 		let uvNode = this.uvNode;
 
-		if ( uvNode === null && builder.context.getUVNode ) {
+		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUVNode ) {
 
 			uvNode = builder.context.getUVNode( this );
 
@@ -140,7 +140,6 @@ class TextureNode extends UniformNode {
 
 		} else {
 
-			const nodeType = this.getNodeType( builder );
 			const nodeData = builder.getDataFromNode( this );
 
 			let propertyName = nodeData.propertyName;
@@ -148,7 +147,7 @@ class TextureNode extends UniformNode {
 			if ( propertyName === undefined ) {
 
 				const uvSnippet = uvNode.build( builder, 'vec2' );
-				const nodeVar = builder.getVarFromNode( this, nodeType );
+				const nodeVar = builder.getVarFromNode( this );
 
 				propertyName = builder.getPropertyName( nodeVar );
 
@@ -184,6 +183,7 @@ class TextureNode extends UniformNode {
 			}
 
 			let snippet = propertyName;
+			const nodeType = this.getNodeType( builder );
 
 			if ( builder.needsColorSpaceToLinear( this.value ) ) {
 

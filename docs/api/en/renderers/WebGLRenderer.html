@@ -348,11 +348,22 @@ document.body.appendChild( renderer.domElement );
 		</p>
 
 		<h3>
-			[method:undefined compile]( [param:Object3D scene], [param:Camera camera] )
+			[method:Set compile]( [param:Object3D scene], [param:Camera camera], [param:Scene targetScene] )
 		</h3>
 		<p>
-			Compiles all materials in the scene with the camera. This is useful to
-			precompile shaders before the first rendering.
+			Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.
+			If you want to add a 3D object to an existing scene, use the third optional parameter for applying the target scene.<br />
+			Note that the (target) scene's lighting and environment should be configured before calling this method.
+		</p>	
+
+		<h3>
+			[method:Promise compileAsync]( [param:Object3D scene], [param:Camera camera], [param:Scene targetScene] )
+		</h3>
+		<p>
+			Asynchronous version of [page:WebGLRenderer.compile .compile](). The method returns a Promise that resolves when the 
+			given scene can be rendered without unnecessary stalling due to shader compilation.<br /><br />
+			
+			This method makes use of the *KHR_parallel_shader_compile* WebGL extension.
 		</p>
 
 		<h3>

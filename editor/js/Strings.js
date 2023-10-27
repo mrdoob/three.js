@@ -30,7 +30,6 @@ function Strings( config ) {
 			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Clone',
 			'menubar/edit/delete': 'Delete (Del)',
-			'menubar/edit/fixcolormaps': 'Fix Color Maps',
 
 			'menubar/add': 'Add',
 			'menubar/add/group': 'Group',
@@ -382,7 +381,6 @@ function Strings( config ) {
 			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Cloner',
 			'menubar/edit/delete': 'Supprimer (Supp)',
-			'menubar/edit/fixcolormaps': 'Correction des couleurs',
 
 			'menubar/add': 'Ajouter',
 			'menubar/add/group': 'Groupe',
@@ -732,7 +730,6 @@ function Strings( config ) {
 			'menubar/edit/center': '居中',
 			'menubar/edit/clone': '拷贝',
 			'menubar/edit/delete': '删除 (Del)',
-			'menubar/edit/fixcolormaps': '修复颜色贴图',
 
 			'menubar/add': '添加',
 			'menubar/add/group': '组',

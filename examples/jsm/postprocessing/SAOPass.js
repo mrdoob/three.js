@@ -314,7 +314,6 @@ class SAOPass extends Pass {
 		this.blurIntermediateRenderTarget.dispose();
 		this.normalRenderTarget.dispose();
 
-		this.depthMaterial.dispose();
 		this.normalMaterial.dispose();
 		this.saoMaterial.dispose();
 		this.vBlurMaterial.dispose();

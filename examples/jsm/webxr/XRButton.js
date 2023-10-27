@@ -1,6 +1,6 @@
 class XRButton {
 
-	static createButton( renderer ) {
+	static createButton( renderer, sessionInit = {} ) {
 
 		const button = document.createElement( 'button' );
 
@@ -56,16 +56,18 @@ class XRButton {
 
 				if ( currentSession === null ) {
 
-					const sessionInit = {
+					const sessionOptions = {
+						...sessionInit,
 						optionalFeatures: [
 							'local-floor',
 							'bounded-floor',
 							'hand-tracking',
-							'layers'
-						]
+							'layers',
+							...( sessionInit.optionalFeatures || [] )
+						],
 					};
 
-					navigator.xr.requestSession( mode, sessionInit )
+					navigator.xr.requestSession( mode, sessionOptions )
 						.then( onSessionStarted );
 
 				} else {

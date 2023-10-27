@@ -76,7 +76,7 @@ class SpotLightNode extends AnalyticLightNode {
 			lightDirection,
 			lightColor,
 			reflectedLight
-		} );
+		}, builder.stack, builder );
 
 	}
 

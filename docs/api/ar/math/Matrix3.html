@@ -86,19 +86,76 @@ m.elements = [ 11, 21, 31,
 		<p>
 		يستخرج [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) الأساس]
 		لهذه المصفوفة في ثلاثة متجهات محورية مقدمة. إذا كانت هذه المصفوفة
-		هي:
-		<code>
-	 a, b, c, 
-	 d, e, f, 
-	 g, h, i 
-		</code>
+		هي:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>a</mi></mtd>
+						<mtd><mi>b</mi></mtd>
+						<mtd><mi>c</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>d</mi></mtd>
+						<mtd><mi>e</mi></mtd>
+						<mtd><mi>f</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>g</mi></mtd>
+						<mtd><mi>h</mi></mtd>
+						<mtd><mi>i</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math><br /><br />
+
 		ثم سيتم تعيين [page:Vector3 xAxis] ، [page:Vector3 yAxis] ، [page:Vector3 zAxis]
-		إلى:
-		<code>
-	 xAxis = (a, d, g) 
-	 yAxis = (b, e, h) 
-	 zAxis = (c, f, i) 
-		</code>
+		إلى:<br /><br />
+
+		<math>
+			<mrow>
+				<mi>xAxis</mi>
+				<mo>=</mo>
+				<mo>[</mo>
+				<mtable>
+					<mtr><mtd style="height: 1rem"><mi>a</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>d</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>g</mi></mtd></mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>,
+
+		<math>
+			<mrow>
+				<mi>yAxis</mi>
+				<mo>=</mo>
+				<mo>[</mo>
+				<mtable>
+					<mtr><mtd style="height: 1rem"><mi>b</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>e</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>h</mi></mtd></mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>, and
+
+		<math>
+			<mrow>
+				<mi>zAxis</mi>
+				<mo>=</mo>
+				<mo>[</mo>
+				<mtable>
+					<mtr><mtd style="height: 1rem"><mi>c</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>f</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>i</mi></mtd></mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 	 
 		<h3>
@@ -135,12 +192,31 @@ m.elements = [ 11, 21, 31,
 	 
 		<h3>[method:this identity]()</h3>
 		<p>
-		يعيد هذه المصفوفة إلى مصفوفة الهوية 3x3:
-		<code> 
-	 1, 0, 0 
-	 0, 1, 0 
-	 0, 0, 1 
-		</code>
+		يعيد هذه المصفوفة إلى مصفوفة الهوية 3x3:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 	 
 		<h3>[method:this makeRotation]( [param:Float theta] )</h3>
@@ -149,12 +225,47 @@ m.elements = [ 11, 21, 31,
 		عكس عقارب الساعة.<br /><br />
 	 
 		يضع هذه المصفوفة كتحول دوران ثنائي الأبعاد بـ [page:Float theta]
-		راديان. المصفوفة الناتجة ستكون:
-		<code>
-	 cos(θ) -sin(θ) 0 
-	 sin(θ) cos(θ) 0 
-	 0 0 1
-		</code>
+		راديان. المصفوفة الناتجة ستكون:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>-sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 	 
 		<h3>[method:this makeScale]( [param:Float x], [param:Float y] )</h3>
@@ -162,12 +273,31 @@ m.elements = [ 11, 21, 31,
 		[page:Float x] - المبلغ الذي يتم قياسه في المحور X.<br />
 		[page:Float y] - المبلغ الذي يتم قياسه في المحور Y.<br />
 	 
-		يضع هذه المصفوفة كتحول قياس ثنائي الأبعاد:
-		<code> 
-	 x, 0, 0, 
-	 0, y, 0, 
-	 0, 0, 1 
-		</code>
+		يضع هذه المصفوفة كتحول قياس ثنائي الأبعاد:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>x</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 	 
 		<h3>[method:this makeTranslation]( [param:Vector2 v] )</h3>
@@ -178,12 +308,31 @@ m.elements = [ 11, 21, 31,
 		[page:Float x] - المبلغ الذي يتم ترجمته في المحور X.<br />
 		[page:Float y] - المبلغ الذي يتم ترجمته في المحور Y.<br />
 	 
-		يضع هذه المصفوفة كتحويل ترجمة ثنائي الأبعاد:
-		<code>
-	 1, 0, x, 
-	 0, 1, y, 
-	 0, 0, 1 
-		</code>
+		يضع هذه المصفوفة كتحويل ترجمة ثنائي الأبعاد:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>x</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 	 
 		<h3>[method:this multiply]( [param:Matrix3 m] )</h3>
@@ -207,15 +356,32 @@ m.elements = [ 11, 21, 31,
 		[method:this set]( [param:Float n11], [param:Float n12], [param:Float n13], [param:Float n21], [param:Float n22], [param:Float n23], [param:Float n31], [param:Float n32], [param:Float n33] )
 		</h3>
 		<p>
-		[page:Float n11] - القيمة التي يتم وضعها في الصف 1 ، العمود 1.<br />
-		[page:Float n12] - القيمة التي يتم وضعها في الصف 1 ، العمود 2.<br />
-		...<br />
-		...<br />
-		[page:Float n32] - القيمة التي يتم وضعها في الصف 3 ، العمود 2.<br />
-		[page:Float n33] - القيمة التي يتم وضعها في الصف 3 ، العمود 3.<br /><br />
-	 
 		يضع قيم المصفوفة 3x3 على
-		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order تسلسل قيم رئيسية للصف].
+		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order تسلسل قيم رئيسية للصف]:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>n11</mi></mtd>
+						<mtd><mi>n12</mi></mtd>
+						<mtd><mi>n13</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n21</mi></mtd>
+						<mtd><mi>n22</mi></mtd>
+						<mtd><mi>n23</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n31</mi></mtd>
+						<mtd><mi>n32</mi></mtd>
+						<mtd><mi>n33</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 	 
 		<h3>[method:this premultiply]( [param:Matrix3 m] )</h3>

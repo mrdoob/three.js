@@ -29,12 +29,6 @@ class OperatorNode extends TempNode {
 
 	}
 
-	hasDependencies( builder ) {
-
-		return this.op !== '=' ? super.hasDependencies( builder ) : false;
-
-	}
-
 	getNodeType( builder, output ) {
 
 		const op = this.op;
@@ -49,7 +43,7 @@ class OperatorNode extends TempNode {
 
 			return 'void';
 
-		} else if ( op === '=' || op === '%' ) {
+		} else if ( op === '%' ) {
 
 			return typeA;
 
@@ -116,11 +110,7 @@ class OperatorNode extends TempNode {
 			typeA = aNode.getNodeType( builder );
 			typeB = bNode.getNodeType( builder );
 
-			if ( op === '=' ) {
-
-				typeB = typeA;
-
-			} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' ) {
+			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' ) {
 
 				if ( builder.isVector( typeA ) ) {
 
@@ -170,13 +160,7 @@ class OperatorNode extends TempNode {
 
 		if ( output !== 'void' ) {
 
-			if ( op === '=' ) {
-
-				builder.addLineFlowCode( `${a} ${this.op} ${b}` );
-
-				return a;
-
-			} else if ( op === '<' && outputLength > 1 ) {
+			if ( op === '<' && outputLength > 1 ) {
 
 				return builder.format( `${ builder.getMethod( 'lessThan' ) }( ${a}, ${b} )`, type, output );
 
@@ -232,7 +216,7 @@ export const mul = nodeProxy( OperatorNode, '*' );
 export const div = nodeProxy( OperatorNode, '/' );
 export const remainder = nodeProxy( OperatorNode, '%' );
 export const equal = nodeProxy( OperatorNode, '==' );
-export const assign = nodeProxy( OperatorNode, '=' );
+export const notEqual = nodeProxy( OperatorNode, '!=' );
 export const lessThan = nodeProxy( OperatorNode, '<' );
 export const greaterThan = nodeProxy( OperatorNode, '>' );
 export const lessThanEqual = nodeProxy( OperatorNode, '<=' );
@@ -252,7 +236,7 @@ addNodeElement( 'mul', mul );
 addNodeElement( 'div', div );
 addNodeElement( 'remainder', remainder );
 addNodeElement( 'equal', equal );
-addNodeElement( 'assign', assign );
+addNodeElement( 'notEqual', notEqual );
 addNodeElement( 'lessThan', lessThan );
 addNodeElement( 'greaterThan', greaterThan );
 addNodeElement( 'lessThanEqual', lessThanEqual );

@@ -4,13 +4,12 @@ import { varying } from '../core/VaryingNode.js';
 import { property } from '../core/PropertyNode.js';
 import { attribute } from '../core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
-import { materialColor } from '../accessors/MaterialNode.js';
+import { materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../accessors/MaterialNode.js';
 import { modelViewMatrix } from '../accessors/ModelNode.js';
 import { positionGeometry } from '../accessors/PositionNode.js';
-import { abs, mix, mod, dot, clamp, smoothstep } from '../math/MathNode.js';
-import { tslFn, ShaderNode, float, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { mix, smoothstep } from '../math/MathNode.js';
+import { tslFn, float, vec2, vec3, vec4, If } from '../shadernode/ShaderNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../accessors/LineMaterialNode.js';
 import { viewport } from '../display/ViewportNode.js';
 import { dashSize, gapSize } from '../core/PropertyNode.js';
 
@@ -69,9 +68,9 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		} );
 
-		this.vertexNode = new ShaderNode( ( stack ) => {
+		this.vertexNode = tslFn( () => {
 
-			stack.assign( varying( vec2(), 'vUv' ), uv() );
+			varying( vec2(), 'vUv' ).assign( uv() ); // @TODO: Analyze other way to do this
 
 			const instanceStart = attribute( 'instanceStart' );
 			const instanceEnd = attribute( 'instanceEnd' );
@@ -81,14 +80,13 @@ class Line2NodeMaterial extends NodeMaterial {
 			const start = property( 'vec4', 'start' );
 			const end = property( 'vec4', 'end' );
 
-			stack.assign( start, modelViewMatrix.mul( vec4( instanceStart, 1.0 ) ) ); // force assignment into correct place in flow
-			stack.assign( end, modelViewMatrix.mul( vec4( instanceEnd, 1.0 ) ) );
-
+			start.assign( modelViewMatrix.mul( vec4( instanceStart, 1.0 ) ) ); // force assignment into correct place in flow
+			end.assign( modelViewMatrix.mul( vec4( instanceEnd, 1.0 ) ) );
 
 			if ( useWorldUnits ) {
 
-				stack.assign( varying( vec3(), 'worldStart' ), start.xyz );
-				stack.assign( varying( vec3(), 'worldEnd' ), end.xyz );
+				varying( vec3(), 'worldStart' ).assign( start.xyz );
+				varying( vec3(), 'worldEnd' ).assign( end.xyz );
 
 			}
 
@@ -101,15 +99,15 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			const perspective = cameraProjectionMatrix.element( 2 ).element( 3 ).equal( -1.0 ); // 4th entry in the 3rd column
 
-			stack.if( perspective, ( stack ) => {
+			If( perspective, () => {
 
-				stack.if( start.z.lessThan( 0.0 ).and( end.z.greaterThan( 0.0 ) ), ( stack ) => {
+				If( start.z.lessThan( 0.0 ).and( end.z.greaterThan( 0.0 ) ), () => {
 
-					stack.assign( end, trimSegment( { start: start, end: end } ) );
+					end.assign( trimSegment( { start: start, end: end } ) );
 
-				} ).elseif( end.z.lessThan( 0.0 ).and( start.z.greaterThanEqual( 0.0 ) ), ( stack ) => {
+				} ).elseif( end.z.lessThan( 0.0 ).and( start.z.greaterThanEqual( 0.0 ) ), () => {
 
-					stack.assign( start, trimSegment( { start: end, end: start } ) );
+					start.assign( trimSegment( { start: end, end: start } ) );
 
 			 	} );
 
@@ -124,11 +122,11 @@ class Line2NodeMaterial extends NodeMaterial {
 			const ndcEnd = clipEnd.xyz.div( clipEnd.w );
 
 			// direction
-			const dir = ndcEnd.xy.sub( ndcStart.xy );
+			const dir = ndcEnd.xy.sub( ndcStart.xy ).temp();
 
 			// account for clip-space aspect ratio
-			stack.assign( dir.x, dir.x.mul( aspect ) );
-			stack.assign( dir, dir.normalize() );
+			dir.x.assign( dir.x.mul( aspect ) );
+			dir.assign( dir.normalize() );
 
 			const clip = temp( vec4() );
 
@@ -144,7 +142,7 @@ class Line2NodeMaterial extends NodeMaterial {
 				);
 
 				// sign flip
-				stack.assign( offset, positionGeometry.x.lessThan( 0.0 ).cond( offset.negate(), offset ) );
+				offset.assign( positionGeometry.x.lessThan( 0.0 ).cond( offset.negate(), offset ) );
 
 				const forwardOffset = worldDir.dot( vec3( 0.0, 0.0, 1.0 ) );
 
@@ -153,86 +151,86 @@ class Line2NodeMaterial extends NodeMaterial {
 				if ( ! useDash ) {
 
 					// extend the line bounds to encompass endcaps
-					stack.assign( start, start.sub( vec4( worldDir.mul( materialLineWidth ).mul( 0.5 ), 0 ) ) );
-					stack.assign( end, end.add( vec4( worldDir.mul( materialLineWidth ).mul( 0.5 ), 0 ) ) );
+					start.assign( start.sub( vec4( worldDir.mul( materialLineWidth ).mul( 0.5 ), 0 ) ) );
+					end.assign( end.add( vec4( worldDir.mul( materialLineWidth ).mul( 0.5 ), 0 ) ) );
 
 					// shift the position of the quad so it hugs the forward edge of the line
-					stack.assign( offset, offset.sub( vec3( dir.mul( forwardOffset ), 0 ) ) );
-					stack.assign( offset.z, offset.z.add( 0.5 ) );
+					offset.assign( offset.sub( vec3( dir.mul( forwardOffset ), 0 ) ) );
+					offset.z.assign( offset.z.add( 0.5 ) );
 
 				}
 
 				// endcaps
 
-				stack.if( positionGeometry.y.greaterThan( 1.0 ).or( positionGeometry.y.lessThan( 0.0 ) ), ( stack ) => {
+				If( positionGeometry.y.greaterThan( 1.0 ).or( positionGeometry.y.lessThan( 0.0 ) ), () => {
 
-					stack.assign( offset, offset.add( vec3( dir.mul( 2.0 ).mul( forwardOffset ), 0 ) ) );
+					offset.assign( offset.add( vec3( dir.mul( 2.0 ).mul( forwardOffset ), 0 ) ) );
 
 				} );
 
 				// adjust for linewidth
-				stack.assign( offset, offset.mul( materialLineWidth ).mul( 0.5 ) );
+				offset.assign( offset.mul( materialLineWidth ).mul( 0.5 ) );
 
 				// set the world position
 
 				const worldPos = varying( vec4(), 'worldPos' );
 
-				stack.assign( worldPos, positionGeometry.y.lessThan( 0.5 ).cond( start, end ) );
-				stack.assign( worldPos, worldPos.add( vec4( offset, 0 ) ) );
+				worldPos.assign( positionGeometry.y.lessThan( 0.5 ).cond( start, end ) );
+				worldPos.assign( worldPos.add( vec4( offset, 0 ) ) );
 
 				// project the worldpos
-				stack.assign( clip, cameraProjectionMatrix.mul( worldPos ) );
+				clip.assign( cameraProjectionMatrix.mul( worldPos ) );
 
 				// shift the depth of the projected points so the line
 				// segments overlap neatly
 				const clipPose = temp( vec3() );
 
-				stack.assign( clipPose, positionGeometry.y.lessThan( 0.5 ).cond( ndcStart, ndcEnd ) );
-				stack.assign( clip.z, clipPose.z.mul( clip.w ) );
+				clipPose.assign( positionGeometry.y.lessThan( 0.5 ).cond( ndcStart, ndcEnd ) );
+				clip.z.assign( clipPose.z.mul( clip.w ) );
 
 			} else {
 
 				const offset = property( 'vec2', 'offset' );
 
-				stack.assign( offset, vec2( dir.y, dir.x.negate() ) );
+				offset.assign( vec2( dir.y, dir.x.negate() ) );
 
 				// undo aspect ratio adjustment
-				stack.assign( dir.x, dir.x.div( aspect ) );
-				stack.assign( offset.x, offset.x.div( aspect ) );
+				dir.x.assign( dir.x.div( aspect ) );
+				offset.x.assign( offset.x.div( aspect ) );
 
 				// sign flip
-				stack.assign( offset, positionGeometry.x.lessThan( 0.0 ).cond( offset.negate(), offset ) );
+				offset.assign( positionGeometry.x.lessThan( 0.0 ).cond( offset.negate(), offset ) );
 
 				// endcaps
-				stack.if( positionGeometry.y.lessThan( 0.0 ), ( stack ) => {
+				If( positionGeometry.y.lessThan( 0.0 ), () => {
 
-					stack.assign( offset, offset.sub( dir ) );
+					offset.assign( offset.sub( dir ) );
 
-				} ).elseif( positionGeometry.y.greaterThan( 1.0 ), ( stack ) => {
+				} ).elseif( positionGeometry.y.greaterThan( 1.0 ), () => {
 
-					stack.assign( offset, offset.add( dir ) );
+					offset.assign( offset.add( dir ) );
 
 				} );
 
 				// adjust for linewidth
-				stack.assign( offset, offset.mul( materialLineWidth ) );
+				offset.assign( offset.mul( materialLineWidth ) );
 
 				// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
-				stack.assign( offset, offset.div( viewport.w ) );
+				offset.assign( offset.div( viewport.w ) );
 
 				// select end
-				stack.assign( clip, positionGeometry.y.lessThan( 0.5 ).cond( clipStart, clipEnd ) );
+				clip.assign( positionGeometry.y.lessThan( 0.5 ).cond( clipStart, clipEnd ) );
 
 				// back to clip space
-				stack.assign( offset, offset.mul( clip.w ) );
+				offset.assign( offset.mul( clip.w ) );
 
-				stack.assign( clip, clip.add( vec4( offset, 0, 0 ) ) );
+				clip.assign( clip.add( vec4( offset, 0, 0 ) ) );
 
 			}
 
 			return clip;
 
-		} );
+		} )();
 
 		const closestLineToLine = tslFn( ( { p1, p2, p3, p4 } ) => {
 
@@ -241,23 +239,23 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			const p21 = p2.sub( p1 );
 
-			const d1343 = dot( p13, p43 );
-			const d4321 = dot( p43, p21 );
-			const d1321 = dot( p13, p21 );
-			const d4343 = dot( p43, p43 );
-			const d2121 = dot( p21, p21 );
+			const d1343 = p13.dot( p43 );
+			const d4321 = p43.dot( p21 );
+			const d1321 = p13.dot( p21 );
+			const d4343 = p43.dot( p43 );
+			const d2121 = p21.dot( p21 );
 
 			const denom = d2121.mul( d4343 ).sub( d4321.mul( d4321 ) );
 			const numer = d1343.mul( d4321 ).sub( d1321.mul( d4343 ) );
 
-			const mua = clamp( numer.div( denom ), 0, 1 );
-			const mub = clamp( d1343.add( d4321.mul( mua ) ).div( d4343 ), 0, 1 );
+			const mua = numer.div( denom ).clamp();
+			const mub = d1343.add( d4321.mul( mua ) ).div( d4343 ).clamp();
 
 			return vec2( mua, mub );
 
 		} );
 
-		this.colorNode = new ShaderNode( ( stack ) => {
+		this.colorNode = tslFn( () => {
 
 			const vUv = varying( vec2(), 'vUv' );
 
@@ -268,8 +266,8 @@ class Line2NodeMaterial extends NodeMaterial {
 				const dashSizeNode = this.dashSizeNode ? float( this.dashSizeNode ) : materialLineDashSize;
 				const gapSizeNode = this.dashSizeNode ? float( this.dashGapNode ) : materialLineGapSize;
 
-				stack.assign( dashSize, dashSizeNode );
-				stack.assign( gapSize, gapSizeNode );
+				dashSize.assign( dashSizeNode );
+				gapSize.assign( gapSizeNode );
 
 				const instanceDistanceStart = attribute( 'instanceDistanceStart' );
 				const instanceDistanceEnd = attribute( 'instanceDistanceEnd' );
@@ -279,20 +277,19 @@ class Line2NodeMaterial extends NodeMaterial {
 				const vLineDistance = varying( lineDistance.add( materialLineDashOffset ) );
 				const vLineDistanceOffset = offsetNode ? vLineDistance.add( offsetNode ) : vLineDistance;
 
-				stack.add( vUv.y.lessThan( - 1.0 ).or( vUv.y.greaterThan( 1.0 ) ).discard() ); // discard endcaps
-				stack.add( mod( vLineDistanceOffset, dashSize.add( gapSize ) ).greaterThan( dashSize ).discard() ); // todo - FIX
+				vUv.y.lessThan( - 1.0 ).or( vUv.y.greaterThan( 1.0 ) ).discard(); // discard endcaps
+				vLineDistanceOffset.mod( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard(); // todo - FIX
 
 			}
 
 			 // force assignment into correct place in flow
 			const alpha = property( 'float', 'alpha' );
-			stack.assign( alpha, 1 );
+			alpha.assign( 1 );
 
 			if ( useWorldUnits ) {
 
-
-				let worldStart = varying( vec3(), 'worldStart' );
-				let worldEnd = varying( vec3(), 'worldEnd' );
+				const worldStart = varying( vec3(), 'worldStart' );
+				const worldEnd = varying( vec3(), 'worldEnd' );
 
 				// Find the closest points on the view ray and the line segment
 				const rayEnd = varying( vec4(), 'worldPos' ).xyz.normalize().mul( 1e5 );
@@ -310,11 +307,11 @@ class Line2NodeMaterial extends NodeMaterial {
 					if ( useAlphaToCoverage ) {
 
 						const dnorm = norm.fwidth();
-						stack.assign( alpha, smoothstep( dnorm.negate().add( 0.5 ), dnorm.add( 0.5 ), norm ).oneMinus() );
+						alpha.assign( smoothstep( dnorm.negate().add( 0.5 ), dnorm.add( 0.5 ), norm ).oneMinus() );
 
 					} else {
 
-						stack.add( norm.greaterThan( 0.5 ).discard() );
+						norm.greaterThan( 0.5 ).discard();
 
 					}
 
@@ -333,23 +330,23 @@ class Line2NodeMaterial extends NodeMaterial {
 
 					// force assignment out of following 'if' statement - to avoid uniform control flow errors
 					const dlen = property( 'float', 'dlen' );
-					stack.assign( dlen, len2.fwidth() );
+					dlen.assign( len2.fwidth() );
 
-					stack.if( abs( vUv.y ).greaterThan( 1.0 ), ( stack ) => {
+					If( vUv.y.abs().greaterThan( 1.0 ), () => {
 
-						stack.assign( alpha, smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
+						alpha.assign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
 
 					} );
 
 				} else {
 
-					stack.if( abs( vUv.y ).greaterThan( 1.0 ), ( stack ) => {
+					If( vUv.y.abs().greaterThan( 1.0 ), () => {
 
 						const a = vUv.x;
 						const b = vUv.y.greaterThan( 0.0 ).cond( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );
 						const len2 = a.mul( a ).add( b.mul( b ) );
 
-						stack.add( len2.greaterThan( 1.0 ).discard() );
+						len2.greaterThan( 1.0 ).discard();
 
 					} );
 
@@ -370,7 +367,9 @@ class Line2NodeMaterial extends NodeMaterial {
 					const instanceColorStart = attribute( 'instanceColorStart' );
 					const instanceColorEnd = attribute( 'instanceColorEnd' );
 
-					lineColorNode = varying( positionGeometry.y.lessThan( 0.5 ).cond( instanceColorStart, instanceColorEnd ) );
+					const instanceColor = positionGeometry.y.lessThan( 0.5 ).cond( instanceColorStart, instanceColorEnd );
+
+					lineColorNode = instanceColor.mul( materialColor );
 
 				} else {
 
@@ -382,7 +381,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			return vec4( lineColorNode, alpha );
 
-		} );
+		} )();
 
 		this.needsUpdate = true;
 
