@@ -63,34 +63,7 @@ class WebGLBackend extends Backend {
 
 		this._setFramebuffer( renderContext );
 
-		let clear = 0;
-
-		if ( renderContext.clearColor ) clear |= gl.COLOR_BUFFER_BIT;
-		if ( renderContext.clearDepth ) clear |= gl.DEPTH_BUFFER_BIT;
-		if ( renderContext.clearStencil ) clear |= gl.STENCIL_BUFFER_BIT;
-
-		const clearColor = renderContext.clearColorValue;
-
-		if ( clear !== 0 ) {
-
-			if ( renderContext.textures === null ) {
-
-				gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearColor.a );
-				gl.clear( clear );
-
-			} else {
-
-				for ( let i = 0; i < renderContext.textures.length; i ++ ) {
-
-					gl.clearBufferfv( gl.COLOR, i, [ clearColor.r, clearColor.g, clearColor.b, clearColor.a ] );
-
-				}
-
-				gl.clearBufferfi( gl.DEPTH_STENCIL, 0, 1, 1 );
-
-			}
-
-		}
+		this.clear( renderContext, renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil );
 
 		//
 
@@ -254,12 +227,44 @@ class WebGLBackend extends Backend {
 		if ( depth ) clear |= gl.DEPTH_BUFFER_BIT;
 		if ( stencil ) clear |= gl.STENCIL_BUFFER_BIT;
 
-		const clearColor = renderContext.clearColorValue;
+		if ( clear !== 0 ) {
 
-		if ( clear === 0 ) return;
+			const clearColor = renderContext.clearColorValue;
 
-		gl.clearColor( clearColor.x, clearColor.y, clearColor.z, clearColor.a );
-		gl.clear( clear );
+			if ( depth ) this.state.setDepthMask( true );
+
+			if ( renderContext.textures === null ) {
+
+				gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearColor.a );
+				gl.clear( clear );
+
+			} else {
+
+				if ( color ) {
+
+					for ( let i = 0; i < renderContext.textures.length; i ++ ) {
+
+						gl.clearBufferfv( gl.COLOR, i, [ clearColor.r, clearColor.g, clearColor.b, clearColor.a ] );
+
+					}
+				}
+
+				if ( depth && stencil ) {
+
+					gl.clearBufferfi( gl.DEPTH_STENCIL, 0, 1, 0 );
+
+				} else if ( depth ) {
+
+					gl.clearBufferfv( gl.DEPTH, 0, [ 1.0 ] );
+
+				} else if ( stencil ) {
+
+					gl.clearBufferiv( gl.STENCIL, 0, [ 0 ] );
+				}
+
+			}
+
+		}
 
 	}
 
