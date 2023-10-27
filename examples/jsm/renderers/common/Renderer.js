@@ -87,6 +87,9 @@ class Renderer {
 		this._activeCubeFace = 0;
 		this._activeMipmapLevel = 0;
 
+		this._renderObject = null;
+		this._currentRenderObject = null;
+
 		this._initialized = false;
 		this._initPromise = null;
 
@@ -180,6 +183,7 @@ class Renderer {
 
 		const previousRenderId = nodeFrame.renderId;
 		const previousRenderState = this._currentRenderContext;
+		const previousRenderObject = this._currentRenderObject;
 
 		//
 
@@ -191,6 +195,7 @@ class Renderer {
 		const activeMipmapLevel = this._activeMipmapLevel;
 
 		this._currentRenderContext = renderContext;
+		this._currentRenderObject = this._renderObject || this.renderObject;
 
 		nodeFrame.renderId ++;
 
@@ -332,7 +337,9 @@ class Renderer {
 		// restore render tree
 
 		nodeFrame.renderId = previousRenderId;
+
 		this._currentRenderContext = previousRenderState;
+		this._currentRenderObject = previousRenderObject;
 
 		this._lastRenderContext = renderContext;
 
@@ -642,6 +649,18 @@ class Renderer {
 
 	}
 
+	setRenderObject( renderObject ) {
+
+		this._renderObject = renderObject;
+
+	}
+
+	getRenderObject() {
+
+		return this._renderTarget;
+
+	}
+
 	async compute( computeNodes ) {
 
 		if ( this._initialized === false ) await this.init();
@@ -825,7 +844,7 @@ class Renderer {
 			const renderItem = renderList[ i ];
 
 			// @TODO: Add support for multiple materials per object. This will require to extract
-			// the material from the renderItem object and pass it with its group data to _renderObject().
+			// the material from the renderItem object and pass it with its group data to renderObject().
 
 			const { object, geometry, material, group } = renderItem;
 
@@ -850,7 +869,7 @@ class Renderer {
 
 						this.backend.updateViewport( this._currentRenderContext );
 
-						this._renderObject( object, scene, camera2, geometry, material, group, lightsNode );
+						this._currentRenderObject( object, scene, camera2, geometry, material, group, lightsNode );
 
 					}
 
@@ -858,7 +877,7 @@ class Renderer {
 
 			} else {
 
-				this._renderObject( object, scene, camera, geometry, material, group, lightsNode );
+				this._currentRenderObject( object, scene, camera, geometry, material, group, lightsNode );
 
 			}
 
@@ -866,7 +885,7 @@ class Renderer {
 
 	}
 
-	_renderObject( object, scene, camera, geometry, material, group, lightsNode ) {
+	renderObject( object, scene, camera, geometry, material, group, lightsNode ) {
 
 		material = scene.overrideMaterial !== null ? scene.overrideMaterial : material;
 
