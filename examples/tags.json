@@ -103,5 +103,6 @@
 	"misc_controls_map": [ "drag" ],
 	"misc_controls_orbit": [ "rotation" ],
 	"misc_controls_trackball": [ "rotation" ],
-	"misc_controls_transform": [ "scale", "rotate", "translate" ]
+	"misc_controls_transform": [ "scale", "rotate", "translate" ],
+	"webxr_xr_ballshooter": [ "physics" ]
 }
