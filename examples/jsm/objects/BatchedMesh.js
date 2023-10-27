@@ -176,7 +176,7 @@ class BatchedMesh extends Mesh {
 				.replace(
 					'#include <uv_vertex>',
 					'#include <uv_vertex>\n'
-                        + batchingbaseVertex
+						+ batchingbaseVertex
 				)
 				.replace(
 					'#include <skinnormal_vertex>',
