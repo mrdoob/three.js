@@ -87,8 +87,8 @@ class Renderer {
 		this._activeCubeFace = 0;
 		this._activeMipmapLevel = 0;
 
-		this._renderObject = null;
-		this._currentRenderObject = null;
+		this._renderObjectFunction = null;
+		this._currentRenderObjectFunction = null;
 
 		this._initialized = false;
 		this._initPromise = null;
@@ -182,8 +182,8 @@ class Renderer {
 		const nodeFrame = this._nodes.nodeFrame;
 
 		const previousRenderId = nodeFrame.renderId;
-		const previousRenderState = this._currentRenderContext;
-		const previousRenderObject = this._currentRenderObject;
+		const previousRenderContext = this._currentRenderContext;
+		const previousRenderObjectFunction = this._currentRenderObjectFunction;
 
 		//
 
@@ -195,7 +195,7 @@ class Renderer {
 		const activeMipmapLevel = this._activeMipmapLevel;
 
 		this._currentRenderContext = renderContext;
-		this._currentRenderObject = this._renderObject || this.renderObject;
+		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
 
 		nodeFrame.renderId ++;
 
@@ -338,8 +338,8 @@ class Renderer {
 
 		nodeFrame.renderId = previousRenderId;
 
-		this._currentRenderContext = previousRenderState;
-		this._currentRenderObject = previousRenderObject;
+		this._currentRenderContext = previousRenderContext;
+		this._currentRenderObjectFunction = previousRenderObjectFunction;
 
 		this._lastRenderContext = renderContext;
 
@@ -649,15 +649,15 @@ class Renderer {
 
 	}
 
-	setRenderObject( renderObject ) {
+	setRenderObjectFunction( renderObject ) {
 
-		this._renderObject = renderObject;
+		this._renderObjectFunction = renderObject;
 
 	}
 
-	getRenderObject() {
+	getRenderObjectFunction() {
 
-		return this._renderTarget;
+		return this._renderObjectFunction;
 
 	}
 
@@ -869,7 +869,7 @@ class Renderer {
 
 						this.backend.updateViewport( this._currentRenderContext );
 
-						this._currentRenderObject( object, scene, camera2, geometry, material, group, lightsNode );
+						this._currentRenderObjectFunction( object, scene, camera2, geometry, material, group, lightsNode );
 
 					}
 
@@ -877,7 +877,7 @@ class Renderer {
 
 			} else {
 
-				this._currentRenderObject( object, scene, camera, geometry, material, group, lightsNode );
+				this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode );
 
 			}
 
