@@ -4165,17 +4165,17 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		applyQuaternion( q ) {
 
-			// Derived from https://raw.org/proof/vector-rotation-using-quaternions/
+			// quaternion q is assumed to have unit length
 
 			const vx = this.x, vy = this.y, vz = this.z;
 			const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
 
-			// t = 2q x v
+			// t = 2 * cross( q.xyz, v );
 			const tx = 2 * ( qy * vz - qz * vy );
 			const ty = 2 * ( qz * vx - qx * vz );
 			const tz = 2 * ( qx * vy - qy * vx );
 
-			// v + w t + q x t
+			// v + q.w * t + cross( q.xyz, t );
 			this.x = vx + qw * tx + qy * tz - qz * ty;
 			this.y = vy + qw * ty + qz * tx - qx * tz;
 			this.z = vz + qw * tz + qx * ty - qy * tx;
