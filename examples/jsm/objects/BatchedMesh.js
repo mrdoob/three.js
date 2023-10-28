@@ -127,8 +127,7 @@ class BatchedMesh extends Mesh {
 		this.frustumCulled = false;
 
 		this._customUniforms = {
-			batchingTexture: { value: null },
-			batchingTextureSize: { value: 0 }
+			batchingTexture: { value: null }
 		};
 
 		this._initMatricesTexture();
@@ -173,11 +172,11 @@ class BatchedMesh extends Mesh {
 					'#include <skinning_pars_vertex>\n'
 						+ batchingParsVertex
 				)
-                .replace(
-                    '#include <uv_vertex>',
-                    '#include <uv_vertex>\n'
-                        + batchingbaseVertex
-                )
+				.replace(
+					'#include <uv_vertex>',
+					'#include <uv_vertex>\n'
+						+ batchingbaseVertex
+				)
 				.replace(
 					'#include <skinnormal_vertex>',
 					'#include <skinnormal_vertex>\n'
@@ -512,7 +511,6 @@ class BatchedMesh extends Mesh {
 		}
 
 		this._vertexCounts[ id ] = srcPositionAttribute.count;
-        // console.log( srcIndex.count );
 
 		if ( hasIndex ) {
 
