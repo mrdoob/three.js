@@ -695,7 +695,7 @@ class BatchedMesh extends Mesh {
 
 	onBeforeRender( _renderer, _scene, _camera, _geometry, material/*, _group*/ ) {
 
-		material.defines.BATCHING = false;
+		material.defines.BATCHING = true;
 
 		// @TODO: Implement frustum culling for each geometry
 
@@ -703,7 +703,7 @@ class BatchedMesh extends Mesh {
 
 	onAfterRender( _renderer, _scene, _camera, _geometry, material/*, _group*/ ) {
 
-		material.defines.BATCHING = true;
+		material.defines.BATCHING = false;
 
 	}
 
