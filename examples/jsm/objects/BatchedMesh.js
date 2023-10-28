@@ -10,8 +10,8 @@ import {
 } from 'three';
 
 const ID_ATTR_NAME = '_batch_id_';
-const _identityMatrix = /* @__PURE__ */ new Matrix4();
-const _zeroScaleMatrix = /* @__PURE__ */ new Matrix4().set(
+const _identityMatrix = new Matrix4();
+const _zeroScaleMatrix = new Matrix4().set(
 	0, 0, 0, 0,
 	0, 0, 0, 0,
 	0, 0, 0, 0,
@@ -23,19 +23,18 @@ const batchingParsVertex = /* glsl */`
 #ifdef BATCHING
 	attribute float ${ ID_ATTR_NAME };
 	uniform highp sampler2D batchingTexture;
-	uniform int batchingTextureSize;
 	mat4 getBatchingMatrix( const in float i ) {
-		float j = i * 4.0;
-		float x = mod( j, float( batchingTextureSize ) );
-		float y = floor( j / float( batchingTextureSize ) );
-		float dx = 1.0 / float( batchingTextureSize );
-		float dy = 1.0 / float( batchingTextureSize );
-		y = dy * ( y + 0.5 );
-		vec4 v1 = texture2D( batchingTexture, vec2( dx * ( x + 0.5 ), y ) );
-		vec4 v2 = texture2D( batchingTexture, vec2( dx * ( x + 1.5 ), y ) );
-		vec4 v3 = texture2D( batchingTexture, vec2( dx * ( x + 2.5 ), y ) );
-		vec4 v4 = texture2D( batchingTexture, vec2( dx * ( x + 3.5 ), y ) );
+
+		int size = textureSize( batchingTexture, 0 ).x;
+		int j = int( i ) * 4;
+		int x = j % size;
+		int y = j / size;
+		vec4 v1 = texelFetch( batchingTexture, ivec2( x, y ), 0 );
+		vec4 v2 = texelFetch( batchingTexture, ivec2( x + 1, y ), 0 );
+		vec4 v3 = texelFetch( batchingTexture, ivec2( x + 2, y ), 0 );
+		vec4 v4 = texelFetch( batchingTexture, ivec2( x + 3, y ), 0 );
 		return mat4( v1, v2, v3, v4 );
+
 	}
 #endif
 `;
@@ -63,6 +62,36 @@ const batchingVertex = /* glsl */`
 
 // @TODO: SkinnedMesh support?
 // @TODO: Future work if needed. Move into the core. Can be optimized more with WEBGL_multi_draw.
+
+// copies data from attribute "src" into "target" starting at "targetOffset"
+function copyAttributeData( src, target, targetOffset = 0 ) {
+
+	const itemSize = target.itemSize;
+	if ( src.isInterleavedBufferAttribute || src.array.constructor !== target.array.constructor ) {
+
+		// use the component getters and setters if the array data cannot
+		// be copied directly
+		const vertexCount = src.count;
+		for ( let i = 0; i < vertexCount; i ++ ) {
+
+			for ( let c = 0; c < itemSize; c ++ ) {
+
+				target.setComponent( i + targetOffset, c, src.getComponent( i, c ) );
+
+			}
+
+		}
+
+	} else {
+
+		// faster copy approach using typed array set function
+		target.array.set( src.array, targetOffset * itemSize );
+
+	}
+
+	target.needsUpdate = true;
+
+}
 
 class BatchedMesh extends Mesh {
 
@@ -144,10 +173,14 @@ class BatchedMesh extends Mesh {
 					'#include <skinning_pars_vertex>\n'
 						+ batchingParsVertex
 				)
+                .replace(
+                    '#include <uv_vertex>',
+                    '#include <uv_vertex>\n'
+                        + batchingbaseVertex
+                )
 				.replace(
 					'#include <skinnormal_vertex>',
 					'#include <skinnormal_vertex>\n'
-						+ batchingbaseVertex
 						+ batchingnormalVertex
 				)
 				.replace(
@@ -354,8 +387,8 @@ class BatchedMesh extends Mesh {
 
 		if (
 			range.indexStart !== - 1 &&
-			range.indexStart + range.indexLength > this._maxIndexCount ||
-			range.vertexStart + range.vertexLength > this._maxVertexCount
+			range.indexStart + range.indexCount > this._maxIndexCount ||
+			range.vertexStart + range.vertexCount > this._maxVertexCount
 		) {
 
 			throw new Error();
@@ -409,6 +442,8 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		idAttribute.needsUpdate = true;
+
 		// update the geometry
 		this.setGeometryAt( geometryId, geometry );
 
@@ -445,7 +480,8 @@ class BatchedMesh extends Mesh {
 		const srcIndex = geometry.getIndex();
 
 		// copy attribute data over
-		const vertexCount = range.vertexStart;
+		const vertexStart = range.vertexStart;
+		const vertexCount = range.vertexCount;
 		for ( const attributeName in batchGeometry.attributes ) {
 
 			if ( attributeName === ID_ATTR_NAME ) {
@@ -456,17 +492,16 @@ class BatchedMesh extends Mesh {
 
 			const srcAttribute = geometry.getAttribute( attributeName );
 			const dstAttribute = batchGeometry.getAttribute( attributeName );
-
-			dstAttribute.array.set( srcAttribute.array, vertexCount * dstAttribute.itemSize );
+			copyAttributeData( srcAttribute, dstAttribute, vertexStart );
 
 			// fill the rest in with zeroes
 			const itemSize = srcAttribute.itemSize;
-			const vertexStart = range.vertexStart;
-			for ( let i = srcAttribute.count; i < range.vertexLength; i ++ ) {
+			for ( let i = srcAttribute.count, l = vertexCount; i < l; i ++ ) {
 
+				const index = vertexStart + i;
 				for ( let c = 0; c < itemSize; c ++ ) {
 
-					dstIndex.setComponent( vertexStart + i, c, 0 );
+					dstAttribute.setComponent( index, c, 0 );
 
 				}
 
@@ -477,21 +512,24 @@ class BatchedMesh extends Mesh {
 		}
 
 		this._vertexCounts[ id ] = srcPositionAttribute.count;
+        // console.log( srcIndex.count );
 
 		if ( hasIndex ) {
 
-			// copy index data over
+			// fill the rest in with zeroes
 			const indexStart = range.indexStart;
+
+			// copy index data over
 			for ( let i = 0; i < srcIndex.count; i ++ ) {
 
-				dstIndex.setX( indexStart + i, vertexCount + srcIndex.getX( i ) );
+				dstIndex.setX( indexStart + i, vertexStart + srcIndex.getX( i ) );
 
 			}
 
 			// fill the rest in with zeroes
-			for ( let i = srcIndex.count; i < range.indexLength; i ++ ) {
+			for ( let i = srcIndex.count, l = range.indexCount; i < l; i ++ ) {
 
-				dstIndex.setX( indexStart + i, indexStart );
+				dstIndex.setX( indexStart + i, vertexStart );
 
 			}
 
@@ -668,7 +706,7 @@ class BatchedMesh extends Mesh {
 
 	onAfterRender( _renderer, _scene, _camera, _geometry, material/*, _group*/ ) {
 
-		material.defines.BATCHING = false;
+		material.defines.BATCHING = true;
 
 	}
 
