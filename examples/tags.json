@@ -1,4 +1,12 @@
 {
+	"misc_controls_arcball": [ "rotation" ],
+	"misc_controls_drag": [ "translate" ],
+	"misc_controls_map": [ "drag" ],
+	"misc_controls_orbit": [ "rotation" ],
+	"misc_controls_trackball": [ "rotation" ],
+	"misc_controls_transform": [ "scale", "rotate", "translate" ],
+	"physics_ammo_cloth": [ "integration" ],
+	"physics_rapier_instancing": [ "external" ],
 	"webgl_clipping": [ "solid" ],
 	"webgl_clipping_advanced": [ "solid" ],
 	"webgl_clipping_intersection": [ "solid" ],
@@ -96,12 +104,5 @@
 	"webgl_simple_gi": [ "global illumination" ],
 	"webgl2_multiple_rendertargets": [ "mrt" ],
 	"webgl2_multisampled_renderbuffers": [ "msaa" ],
-	"physics_ammo_cloth": [ "integration" ],
-	"physics_rapier_instancing": [ "external" ],
-	"misc_controls_arcball": [ "rotation" ],
-	"misc_controls_drag": [ "translate" ],
-	"misc_controls_map": [ "drag" ],
-	"misc_controls_orbit": [ "rotation" ],
-	"misc_controls_trackball": [ "rotation" ],
-	"misc_controls_transform": [ "scale", "rotate", "translate" ]
+	"webxr_xr_ballshooter": [ "physics" ]
 }

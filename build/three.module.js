@@ -3,7 +3,7 @@
  * Copyright 2010-2023 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '158dev';
+const REVISION = '158';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -4158,17 +4158,17 @@ class Vector3 {
 
 	applyQuaternion( q ) {
 
-		// Derived from https://raw.org/proof/vector-rotation-using-quaternions/
+		// quaternion q is assumed to have unit length
 
 		const vx = this.x, vy = this.y, vz = this.z;
 		const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
 
-		// t = 2q x v
+		// t = 2 * cross( q.xyz, v );
 		const tx = 2 * ( qy * vz - qz * vy );
 		const ty = 2 * ( qz * vx - qx * vz );
 		const tz = 2 * ( qx * vy - qy * vx );
 
-		// v + w t + q x t
+		// v + q.w * t + cross( q.xyz, t );
 		this.x = vx + qw * tx + qy * tz - qz * ty;
 		this.y = vy + qw * ty + qz * tx - qx * tz;
 		this.z = vz + qw * tz + qx * ty - qy * tx;

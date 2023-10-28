@@ -112,6 +112,7 @@ const exceptionList = [
 	'webgpu_clearcoat',
 	'webgpu_compute_audio',
 	'webgpu_compute_particles',
+	'webgpu_compute_particles_rain',
 	'webgpu_compute_points',
 	'webgpu_compute_texture',
 	'webgpu_compute_texture_pingpong',
