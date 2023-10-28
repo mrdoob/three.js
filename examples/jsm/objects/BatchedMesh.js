@@ -390,7 +390,7 @@ class BatchedMesh extends Mesh {
 			range.vertexStart + range.vertexCount > this._maxVertexCount
 		) {
 
-			throw new Error();
+			throw new Error( 'BatchedMesh: Reserved space request exceeds the maximum buffer size.');
 
 		}
 
@@ -454,7 +454,7 @@ class BatchedMesh extends Mesh {
 
 		if ( id >= this._geometryCount ) {
 
-			throw new Error();
+			throw new Error( 'BatchedMesh: Maximum geometry count reached.' );
 
 		}
 
@@ -467,7 +467,7 @@ class BatchedMesh extends Mesh {
 			geometry.attributes.position.count > range.vertexCount
 		) {
 
-			throw new Error();
+			throw new Error( 'BatchedMesh: Reserved space not large enough for provided geometry.');
 
 		}
 
