@@ -153,7 +153,6 @@ class BatchedMesh extends Mesh {
 
 		this._matricesTexture = matricesTexture;
 		this._customUniforms.batchingTexture.value = this._matricesTexture;
-		this._customUniforms.batchingTextureSize.value = size;
 
 	}
 
