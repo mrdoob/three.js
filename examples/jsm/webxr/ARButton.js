@@ -5,7 +5,7 @@ class ARButton extends WebXRButton {
 	constructor( renderer, sessionInit ) {
 
 		super( renderer, sessionInit );
-		this.id = 'ARbutton';
+		this.id = 'ARButton';
 		this.stopLabel = 'STOP AR';
 		this.startLabel = 'START AR';
 		this.notSupportedLabel = 'AR NOT SUPPORTED';

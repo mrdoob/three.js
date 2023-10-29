@@ -5,7 +5,7 @@ class VRButton extends WebXRButton {
 	constructor( renderer, sessionInit ) {
 
 		super( renderer, sessionInit );
-		this.id = 'VRbutton';
+		this.id = 'VRButton';
 		this.stopLabel = 'EXIT VR';
 		this.startLabel = 'ENTER VR';
 		this.notSupportedLabel = 'VR NOT SUPPORTED';

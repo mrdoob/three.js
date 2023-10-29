@@ -5,7 +5,7 @@ class XRButton extends WebXRButton {
 	constructor( renderer, sessionOptions ) {
 
 		super( renderer, sessionOptions );
-		this.id = 'XRbutton';
+		this.id = 'XRButton';
 		this.stopLabel = 'STOP XR';
 		this.startLabel = 'START XR';
 		this.notSupportedLabel = 'XR NOT SUPPORTED';
@@ -26,8 +26,8 @@ class XRButton extends WebXRButton {
 			],
 		};
 
-		const arButtonInstance = new XRButton( renderer, sessionOptions );
-		return arButtonInstance.createButtonElement();
+		const xrButtonInstance = new XRButton( renderer, sessionOptions );
+		return xrButtonInstance.createButtonElement();
 
 	}
 
