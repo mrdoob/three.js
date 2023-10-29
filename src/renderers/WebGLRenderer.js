@@ -939,6 +939,21 @@ class WebGLRenderer {
 
 		}
 
+		// uploads any new geometry or changed buffer attribute changes immediately
+		this.uploadGeometry = function ( scene ) {
+
+			scene.traverse( function ( object ) {
+
+				if ( object.geometry !== null ) {
+
+					objects.update( object );
+
+				}
+
+			} );
+
+		};
+
 		this.compile = function ( scene, camera, targetScene = null ) {
 
 			if ( targetScene === null ) targetScene = scene;
