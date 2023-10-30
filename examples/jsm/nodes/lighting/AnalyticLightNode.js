@@ -167,9 +167,25 @@ class AnalyticLightNode extends LightingNode {
 
 		light.shadow.updateMatrices( light );
 
+		const currentRenderTarget = renderer.getRenderTarget();
+		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
+
+		renderer.setRenderObjectFunction( ( object, ...params ) => {
+
+			if ( object.castShadow === true ) {
+
+				renderer.renderObject( object, ...params );
+
+			}
+
+		} );
+
 		renderer.setRenderTarget( rtt );
+
 		renderer.render( scene, light.shadow.camera );
-		renderer.setRenderTarget( null );
+
+		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setRenderObjectFunction( currentRenderObjectFunction );
 
 		scene.overrideMaterial = null;
 
