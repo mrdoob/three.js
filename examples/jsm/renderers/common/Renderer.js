@@ -649,9 +649,9 @@ class Renderer {
 
 	}
 
-	setRenderObjectFunction( renderObject ) {
+	setRenderObjectFunction( renderObjectFunction ) {
 
-		this._renderObjectFunction = renderObject;
+		this._renderObjectFunction = renderObjectFunction;
 
 	}
 
