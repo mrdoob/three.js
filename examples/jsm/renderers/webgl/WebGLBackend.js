@@ -190,7 +190,7 @@ class WebGLBackend extends Backend {
 
 				}
 
-			}
+			};
 
 			check();
 
@@ -247,6 +247,7 @@ class WebGLBackend extends Backend {
 						gl.clearBufferfv( gl.COLOR, i, [ clearColor.r, clearColor.g, clearColor.b, clearColor.a ] );
 
 					}
+
 				}
 
 				if ( depth && stencil ) {
@@ -260,6 +261,7 @@ class WebGLBackend extends Backend {
 				} else if ( stencil ) {
 
 					gl.clearBufferiv( gl.STENCIL, 0, [ 0 ] );
+
 				}
 
 			}
@@ -899,7 +901,7 @@ class WebGLBackend extends Backend {
 
 				const drawBuffers = [];
 
-				for ( let i = 0; i < textures.length; i++ ) {
+				for ( let i = 0; i < textures.length; i ++ ) {
 
 					const texture = textures[ i ];
 					const { textureGPU } = this.get( texture );
