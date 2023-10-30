@@ -58,7 +58,7 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Install Node
-        uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # v3
+        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4
         with:
           node-version: 18
           cache: 'npm'
