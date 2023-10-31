@@ -36,10 +36,12 @@ import {
 	Texture,
 	TextureLoader,
 	Uint16BufferAttribute,
+	Vector2,
 	Vector3,
 	Vector4,
 	VectorKeyframeTrack,
-	SRGBColorSpace
+	SRGBColorSpace,
+	ShapeUtils
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 import { NURBSCurve } from '../curves/NURBSCurve.js';
@@ -1944,8 +1946,6 @@ class GeometryParser {
 
 			if ( endOfFace ) {
 
-				if ( faceLength > 4 ) console.warn( 'THREE.FBXLoader: Polygons with more than four sides are not supported. Make sure to triangulate the geometry during export.' );
-
 				scope.genFace( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength );
 
 				polygonIndex ++;
@@ -1967,70 +1967,153 @@ class GeometryParser {
 
 	}
 
+	// See https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal
+	getNormalNewell( vertices ) {
+
+		const normal = new Vector3( 0.0, 0.0, 0.0 );
+
+		for ( let i = 0; i < vertices.length; i ++ ) {
+
+			const current = vertices[ i ];
+			const next = vertices[ ( i + 1 ) % vertices.length ];
+
+			normal.x += ( current.y - next.y ) * ( current.z + next.z );
+			normal.y += ( current.z - next.z ) * ( current.x + next.x );
+			normal.z += ( current.x - next.x ) * ( current.y + next.y );
+
+		}
+
+		normal.normalize();
+
+		return normal;
+
+	}
+
+	getNormalTangentAndBitangent( vertices ) {
+
+		const normalVector = this.getNormalNewell( vertices );
+		// Avoid up being equal or almost equal to normalVector
+		const up = Math.abs( normalVector.z ) > 0.5 ? new Vector3( 0.0, 1.0, 0.0 ) : new Vector3( 0.0, 0.0, 1.0 );
+		const tangent = up.cross( normalVector ).normalize();
+		const bitangent = normalVector.clone().cross( tangent ).normalize();
+
+		return {
+			normal: normalVector,
+			tangent: tangent,
+			bitangent: bitangent
+		};
+
+	}
+
+	flattenVertex( vertex, normalTangent, normalBitangent ) {
+
+		return new Vector2(
+			vertex.dot( normalTangent ),
+			vertex.dot( normalBitangent )
+		);
+
+	}
+
 	// Generate data for a single face in a geometry. If the face is a quad then split it into 2 tris
 	genFace( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength ) {
 
-		for ( let i = 2; i < faceLength; i ++ ) {
+		let triangles;
 
-			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ 0 ] ] );
-			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ 1 ] ] );
-			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ 2 ] ] );
+		if ( faceLength > 3 ) {
 
-			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ ( i - 1 ) * 3 ] ] );
-			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ ( i - 1 ) * 3 + 1 ] ] );
-			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ ( i - 1 ) * 3 + 2 ] ] );
+			// Triangulate n-gon using earcut
 
-			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i * 3 ] ] );
-			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i * 3 + 1 ] ] );
-			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i * 3 + 2 ] ] );
+			const vertices = [];
+
+			for ( let i = 0; i < facePositionIndexes.length; i += 3 ) {
+
+				vertices.push( new Vector3(
+					geoInfo.vertexPositions[ facePositionIndexes[ i ] ],
+					geoInfo.vertexPositions[ facePositionIndexes[ i + 1 ] ],
+					geoInfo.vertexPositions[ facePositionIndexes[ i + 2 ] ]
+				) );
+
+			}
+
+			const { tangent, bitangent } = this.getNormalTangentAndBitangent( vertices );
+			const triangulationInput = [];
+
+			for ( const vertex of vertices ) {
+
+				triangulationInput.push( this.flattenVertex( vertex, tangent, bitangent ) );
+
+			}
+
+			triangles = ShapeUtils.triangulateShape( triangulationInput, [] );
+
+		} else {
+
+			// Regular triangle, skip earcut triangulation step
+			triangles = [[ 0, 1, 2 ]];
+
+		}
+
+		for ( const [ i0, i1, i2 ] of triangles ) {
+
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i0 * 3 ] ] );
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i0 * 3 + 1 ] ] );
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i0 * 3 + 2 ] ] );
+
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i1 * 3 ] ] );
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i1 * 3 + 1 ] ] );
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i1 * 3 + 2 ] ] );
+
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i2 * 3 ] ] );
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i2 * 3 + 1 ] ] );
+			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i2 * 3 + 2 ] ] );
 
 			if ( geoInfo.skeleton ) {
 
-				buffers.vertexWeights.push( faceWeights[ 0 ] );
-				buffers.vertexWeights.push( faceWeights[ 1 ] );
-				buffers.vertexWeights.push( faceWeights[ 2 ] );
-				buffers.vertexWeights.push( faceWeights[ 3 ] );
+				buffers.vertexWeights.push( faceWeights[ i0 * 4 ] );
+				buffers.vertexWeights.push( faceWeights[ i0 * 4 + 1 ] );
+				buffers.vertexWeights.push( faceWeights[ i0 * 4 + 2 ] );
+				buffers.vertexWeights.push( faceWeights[ i0 * 4 + 3 ] );
 
-				buffers.vertexWeights.push( faceWeights[ ( i - 1 ) * 4 ] );
-				buffers.vertexWeights.push( faceWeights[ ( i - 1 ) * 4 + 1 ] );
-				buffers.vertexWeights.push( faceWeights[ ( i - 1 ) * 4 + 2 ] );
-				buffers.vertexWeights.push( faceWeights[ ( i - 1 ) * 4 + 3 ] );
+				buffers.vertexWeights.push( faceWeights[ i1 * 4 ] );
+				buffers.vertexWeights.push( faceWeights[ i1 * 4 + 1 ] );
+				buffers.vertexWeights.push( faceWeights[ i1 * 4 + 2 ] );
+				buffers.vertexWeights.push( faceWeights[ i1 * 4 + 3 ] );
 
-				buffers.vertexWeights.push( faceWeights[ i * 4 ] );
-				buffers.vertexWeights.push( faceWeights[ i * 4 + 1 ] );
-				buffers.vertexWeights.push( faceWeights[ i * 4 + 2 ] );
-				buffers.vertexWeights.push( faceWeights[ i * 4 + 3 ] );
+				buffers.vertexWeights.push( faceWeights[ i2 * 4 ] );
+				buffers.vertexWeights.push( faceWeights[ i2 * 4 + 1 ] );
+				buffers.vertexWeights.push( faceWeights[ i2 * 4 + 2 ] );
+				buffers.vertexWeights.push( faceWeights[ i2 * 4 + 3 ] );
 
-				buffers.weightsIndices.push( faceWeightIndices[ 0 ] );
-				buffers.weightsIndices.push( faceWeightIndices[ 1 ] );
-				buffers.weightsIndices.push( faceWeightIndices[ 2 ] );
-				buffers.weightsIndices.push( faceWeightIndices[ 3 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i0 * 4 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i0 * 4 + 1 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i0 * 4 + 2 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i0 * 4 + 3 ] );
 
-				buffers.weightsIndices.push( faceWeightIndices[ ( i - 1 ) * 4 ] );
-				buffers.weightsIndices.push( faceWeightIndices[ ( i - 1 ) * 4 + 1 ] );
-				buffers.weightsIndices.push( faceWeightIndices[ ( i - 1 ) * 4 + 2 ] );
-				buffers.weightsIndices.push( faceWeightIndices[ ( i - 1 ) * 4 + 3 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i1 * 4 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i1 * 4 + 1 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i1 * 4 + 2 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i1 * 4 + 3 ] );
 
-				buffers.weightsIndices.push( faceWeightIndices[ i * 4 ] );
-				buffers.weightsIndices.push( faceWeightIndices[ i * 4 + 1 ] );
-				buffers.weightsIndices.push( faceWeightIndices[ i * 4 + 2 ] );
-				buffers.weightsIndices.push( faceWeightIndices[ i * 4 + 3 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i2 * 4 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i2 * 4 + 1 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i2 * 4 + 2 ] );
+				buffers.weightsIndices.push( faceWeightIndices[ i2 * 4 + 3 ] );
 
 			}
 
 			if ( geoInfo.color ) {
 
-				buffers.colors.push( faceColors[ 0 ] );
-				buffers.colors.push( faceColors[ 1 ] );
-				buffers.colors.push( faceColors[ 2 ] );
+				buffers.colors.push( faceColors[ i0 * 3 ] );
+				buffers.colors.push( faceColors[ i0 * 3 + 1 ] );
+				buffers.colors.push( faceColors[ i0 * 3 + 2 ] );
 
-				buffers.colors.push( faceColors[ ( i - 1 ) * 3 ] );
-				buffers.colors.push( faceColors[ ( i - 1 ) * 3 + 1 ] );
-				buffers.colors.push( faceColors[ ( i - 1 ) * 3 + 2 ] );
+				buffers.colors.push( faceColors[ i1 * 3 ] );
+				buffers.colors.push( faceColors[ i1 * 3 + 1 ] );
+				buffers.colors.push( faceColors[ i1 * 3 + 2 ] );
 
-				buffers.colors.push( faceColors[ i * 3 ] );
-				buffers.colors.push( faceColors[ i * 3 + 1 ] );
-				buffers.colors.push( faceColors[ i * 3 + 2 ] );
+				buffers.colors.push( faceColors[ i2 * 3 ] );
+				buffers.colors.push( faceColors[ i2 * 3 + 1 ] );
+				buffers.colors.push( faceColors[ i2 * 3 + 2 ] );
 
 			}
 
@@ -2044,17 +2127,17 @@ class GeometryParser {
 
 			if ( geoInfo.normal ) {
 
-				buffers.normal.push( faceNormals[ 0 ] );
-				buffers.normal.push( faceNormals[ 1 ] );
-				buffers.normal.push( faceNormals[ 2 ] );
+				buffers.normal.push( faceNormals[ i0 * 3 ] );
+				buffers.normal.push( faceNormals[ i0 * 3 + 1 ] );
+				buffers.normal.push( faceNormals[ i0 * 3 + 2 ] );
 
-				buffers.normal.push( faceNormals[ ( i - 1 ) * 3 ] );
-				buffers.normal.push( faceNormals[ ( i - 1 ) * 3 + 1 ] );
-				buffers.normal.push( faceNormals[ ( i - 1 ) * 3 + 2 ] );
+				buffers.normal.push( faceNormals[ i1 * 3 ] );
+				buffers.normal.push( faceNormals[ i1 * 3 + 1 ] );
+				buffers.normal.push( faceNormals[ i1 * 3 + 2 ] );
 
-				buffers.normal.push( faceNormals[ i * 3 ] );
-				buffers.normal.push( faceNormals[ i * 3 + 1 ] );
-				buffers.normal.push( faceNormals[ i * 3 + 2 ] );
+				buffers.normal.push( faceNormals[ i2 * 3 ] );
+				buffers.normal.push( faceNormals[ i2 * 3 + 1 ] );
+				buffers.normal.push( faceNormals[ i2 * 3 + 2 ] );
 
 			}
 
@@ -2064,14 +2147,14 @@ class GeometryParser {
 
 					if ( buffers.uvs[ j ] === undefined ) buffers.uvs[ j ] = [];
 
-					buffers.uvs[ j ].push( faceUVs[ j ][ 0 ] );
-					buffers.uvs[ j ].push( faceUVs[ j ][ 1 ] );
+					buffers.uvs[ j ].push( faceUVs[ j ][ i0 * 2 ] );
+					buffers.uvs[ j ].push( faceUVs[ j ][ i0 * 2 + 1 ] );
 
-					buffers.uvs[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 ] );
-					buffers.uvs[ j ].push( faceUVs[ j ][ ( i - 1 ) * 2 + 1 ] );
+					buffers.uvs[ j ].push( faceUVs[ j ][ i1 * 2 ] );
+					buffers.uvs[ j ].push( faceUVs[ j ][ i1 * 2 + 1 ] );
 
-					buffers.uvs[ j ].push( faceUVs[ j ][ i * 2 ] );
-					buffers.uvs[ j ].push( faceUVs[ j ][ i * 2 + 1 ] );
+					buffers.uvs[ j ].push( faceUVs[ j ][ i2 * 2 ] );
+					buffers.uvs[ j ].push( faceUVs[ j ][ i2 * 2 + 1 ] );
 
 				} );
 
