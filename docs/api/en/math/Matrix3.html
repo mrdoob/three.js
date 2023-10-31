@@ -86,35 +86,39 @@ m.elements = [ 11, 21, 31,
 		<p>
 			Extracts the [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] 
 			of this matrix into the three axis vectors provided. If this matrix
-			is:<br /><br />
+			is:
+		</p>
 
-			<math>
-				<mrow>
-					<mo>[</mo>
-					<mtable>
-						<mtr>
-							<mtd><mi>a</mi></mtd>
-							<mtd><mi>b</mi></mtd>
-							<mtd><mi>c</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>d</mi></mtd>
-							<mtd><mi>e</mi></mtd>
-							<mtd><mi>f</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>g</mi></mtd>
-							<mtd><mi>h</mi></mtd>
-							<mtd><mi>i</mi></mtd>
-						</mtr>
-					</mtable>
-					<mo>]</mo>
-				</mrow>
-			</math><br /><br />
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>a</mi></mtd>
+						<mtd><mi>b</mi></mtd>
+						<mtd><mi>c</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>d</mi></mtd>
+						<mtd><mi>e</mi></mtd>
+						<mtd><mi>f</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>g</mi></mtd>
+						<mtd><mi>h</mi></mtd>
+						<mtd><mi>i</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
+		<p>
 			then the [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis]
-			will be set to:<br /><br />
+			will be set to:
+		</p>
 
+		<p style="text-align: center">
 			<math>
 				<mrow>
 					<mi>xAxis</mi>
@@ -193,32 +197,32 @@ m.elements = [ 11, 21, 31,
 
 		<h3>[method:this identity]()</h3>
 		<p>
-			Resets this matrix to the 3x3 identity matrix:<br /><br />
-
-			<math>
-				<mrow>
-					<mo>[</mo>
-					<mtable>
-						<mtr>
-							<mtd><mn>1</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>1</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>1</mn></mtd>
-						</mtr>
-					</mtable>
-					<mo>]</mo>
-				</mrow>
-			</math>
+			Resets this matrix to the 3x3 identity matrix:
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this makeRotation]( [param:Float theta] )</h3>
 		<p>
@@ -226,80 +230,80 @@ m.elements = [ 11, 21, 31,
 			counterclockwise.<br /><br />
 
 			Sets this matrix as a 2D rotational transformation by [page:Float theta]
-			radians. The resulting matrix will be:<br /><br />
-
-			<math>
-				<mrow>
-					<mo>[</mo>
-					<mtable>
-						<mtr>
-							<mtd>
-								<mi>cos</mi>
-								<mi>&theta;</mi>
-							</mtd>
-							<mtd>
-								<mi>-sin</mi>
-								<mi>&theta;</mi>
-							</mtd>
-							<mtd>
-								<mn>0</mn>
-							</mtd>
-						</mtr>
-						<mtr>
-							<mtd>
-								<mi>sin</mi>
-								<mi>&theta;</mi>
-							</mtd>
-							<mtd>
-								<mi>cos</mi>
-								<mi>&theta;</mi>
-							</mtd>
-							<mtd>
-								<mn>0</mn>
-							</mtd>
-						</mtr>
-						<mtr>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>1</mn></mtd>
-						</mtr>
-					</mtable>
-					<mo>]</mo>
-				</mrow>
-			</math>
+			radians. The resulting matrix will be:
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>-sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this makeScale]( [param:Float x], [param:Float y] )</h3>
 		<p>
 			[page:Float x] - the amount to scale in the X axis.<br />
 			[page:Float y] - the amount to scale in the Y axis.<br />
 
-			Sets this matrix as a 2D scale transform:<br /><br />
-
-			<math>
-				<mrow>
-					<mo>[</mo>
-					<mtable>
-						<mtr>
-							<mtd><mi>x</mi></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mi>y</mi></mtd>
-							<mtd><mn>0</mn></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>1</mn></mtd>
-						</mtr>
-					</mtable>
-					<mo>]</mo>
-				</mrow>
-			</math>
+			Sets this matrix as a 2D scale transform:
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>x</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this makeTranslation]( [param:Vector2 v] )</h3>
 		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y] )</h3>
@@ -309,32 +313,32 @@ m.elements = [ 11, 21, 31,
 			[page:Float x] - the amount to translate in the X axis.<br />
 			[page:Float y] - the amount to translate in the Y axis.<br />
 
-			Sets this matrix as a 2D translation transform:<br /><br />
-
-			<math>
-				<mrow>
-					<mo>[</mo>
-					<mtable>
-						<mtr>
-							<mtd><mn>1</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mi>x</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>1</mn></mtd>
-							<mtd><mi>y</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>1</mn></mtd>
-						</mtr>
-					</mtable>
-					<mo>]</mo>
-				</mrow>
-			</math>
+			Sets this matrix as a 2D translation transform:
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>x</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this multiply]( [param:Matrix3 m] )</h3>
 		<p>Post-multiplies this matrix by [page:Matrix3 m].</p>
@@ -359,32 +363,32 @@ m.elements = [ 11, 21, 31,
 		<p>
 			Sets the 3x3 matrix values to the given
 			[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major]
-			sequence of values:<br /><br />
-
-			<math>
-				<mrow>
-					<mo>[</mo>
-					<mtable>
-						<mtr>
-							<mtd><mi>n11</mi></mtd>
-							<mtd><mi>n12</mi></mtd>
-							<mtd><mi>n13</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>n21</mi></mtd>
-							<mtd><mi>n22</mi></mtd>
-							<mtd><mi>n23</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>n31</mi></mtd>
-							<mtd><mi>n32</mi></mtd>
-							<mtd><mi>n33</mi></mtd>
-						</mtr>
-					</mtable>
-					<mo>]</mo>
-				</mrow>
-			</math>
+			sequence of values:
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>n11</mi></mtd>
+						<mtd><mi>n12</mi></mtd>
+						<mtd><mi>n13</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n21</mi></mtd>
+						<mtd><mi>n22</mi></mtd>
+						<mtd><mi>n23</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n31</mi></mtd>
+						<mtd><mi>n32</mi></mtd>
+						<mtd><mi>n33</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this premultiply]( [param:Matrix3 m] )</h3>
 		<p>Pre-multiplies this matrix by [page:Matrix3 m].</p>
