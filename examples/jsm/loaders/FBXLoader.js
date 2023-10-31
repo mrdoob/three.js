@@ -44,7 +44,7 @@ import {
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 import { NURBSCurve } from '../curves/NURBSCurve.js';
-import { Earcut } from '../../../src/extras/Earcut.js';
+import { ShapeUtils } from '../../../src/extras/ShapeUtils.js';
 
 /**
  * Loader loads FBX file and generates Group representing FBX scene.
@@ -2036,29 +2036,24 @@ class GeometryParser {
 			}
 
 			const { tangent, bitangent } = this.getNormalTangentAndBitangent( vertices );
-			const earcutInput = [];
+			const triangulationInput = [];
 
 			for ( const vertex of vertices ) {
 
-				const flattened = this.flattenVertex( vertex, tangent, bitangent );
-				earcutInput.push( flattened.x, flattened.y );
+				triangulationInput.push( this.flattenVertex( vertex, tangent, bitangent ) );
 
 			}
 
-			triangles = Earcut.triangulate( earcutInput );
+			triangles = ShapeUtils.triangulateShape( triangulationInput, [] );
 
 		} else {
 
 			// Regular triangle, skip earcut triangulation step
-			triangles = [ 0, 1, 2 ];
+			triangles = [[ 0, 1, 2 ]];
 
 		}
 
-		for ( let i = 0; i < triangles.length; i += 3 ) {
-
-			const i0 = triangles[ i ];
-			const i1 = triangles[ i + 1 ];
-			const i2 = triangles[ i + 2 ];
+		for ( const [ i0, i1, i2 ] of triangles ) {
 
 			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i0 * 3 ] ] );
 			buffers.vertex.push( geoInfo.vertexPositions[ facePositionIndexes[ i0 * 3 + 1 ] ] );
