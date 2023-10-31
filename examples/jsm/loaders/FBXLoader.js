@@ -2698,29 +2698,14 @@ class AnimationParser {
 
 	}
 
-	generateRotationTrack(
-		modelName,
-		curves,
-		initialValue,
-		preRotation,
-		postRotation,
-		eulerOrder
-	) {
+	generateRotationTrack( modelName, curves, initialValue, preRotation, postRotation, eulerOrder ) {
 
 		let times;
 		let values;
-		if (
-			curves.x !== undefined &&
-			curves.y !== undefined &&
-			curves.z !== undefined
-		) {
 
-			const result = this.interpolateRotations(
-				curves.x,
-				curves.y,
-				curves.z,
-				eulerOrder
-			);
+		if ( curves.x !== undefined && curves.y !== undefined && curves.z !== undefined ) {
+
+			const result = this.interpolateRotations( curves.x, curves.y, curves.z, eulerOrder );
 
 			times = result[ 0 ];
 			values = result[ 1 ];
@@ -2752,11 +2737,7 @@ class AnimationParser {
 
 		const quaternionValues = [];
 
-		if ( ! values || ! times ) return new QuaternionKeyframeTrack(
-			modelName + '.quaternion',
-			[],
-			[]
-		);
+		if ( ! values || ! times ) return new QuaternionKeyframeTrack( modelName + '.quaternion', [], [] );
 
 		for ( let i = 0; i < values.length; i += 3 ) {
 
@@ -2773,14 +2754,10 @@ class AnimationParser {
 					quaternionValues,
 					( ( i - 3 ) / 3 ) * 4
 				);
+
 				if ( prevQuat.dot( quaternion ) < 0 ) {
 
-					quaternion.set(
-						- quaternion.x,
-						- quaternion.y,
-						- quaternion.z,
-						- quaternion.w
-					);
+					quaternion.set( - quaternion.x, - quaternion.y, - quaternion.z, - quaternion.w );
 
 				}
 
@@ -2790,11 +2767,7 @@ class AnimationParser {
 
 		}
 
-		return new QuaternionKeyframeTrack(
-			modelName + '.quaternion',
-			times,
-			quaternionValues
-		);
+		return new QuaternionKeyframeTrack( modelName + '.quaternion', times, quaternionValues );
 
 	}
 
@@ -2931,11 +2904,8 @@ class AnimationParser {
 				curvey.values[ i - 1 ],
 				curvez.values[ i - 1 ],
 			];
-			if (
-				isNaN( initialValue[ 0 ] ) ||
-				isNaN( initialValue[ 1 ] ) ||
-				isNaN( initialValue[ 2 ] )
-			) {
+
+			if ( isNaN( initialValue[ 0 ] ) || isNaN( initialValue[ 1 ] ) || isNaN( initialValue[ 2 ] ) ) {
 
 				continue;
 
@@ -2949,11 +2919,7 @@ class AnimationParser {
 				curvez.values[ i ],
 			];
 
-			if (
-				isNaN( currentValue[ 0 ] ) ||
-				isNaN( currentValue[ 1 ] ) ||
-				isNaN( currentValue[ 2 ] )
-			) {
+			if ( isNaN( currentValue[ 0 ] ) || isNaN( currentValue[ 1 ] ) || isNaN( currentValue[ 2 ] ) ) {
 
 				continue;
 
@@ -2973,11 +2939,7 @@ class AnimationParser {
 				Math.abs( valuesSpan[ 2 ] ),
 			];
 
-			if (
-				absoluteSpan[ 0 ] >= 180 ||
-				absoluteSpan[ 1 ] >= 180 ||
-				absoluteSpan[ 2 ] >= 180
-			) {
+			if ( absoluteSpan[ 0 ] >= 180 || absoluteSpan[ 1 ] >= 180 || absoluteSpan[ 2 ] >= 180 ) {
 
 				const maxAbsSpan = Math.max( ...absoluteSpan );
 
