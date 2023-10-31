@@ -103,6 +103,7 @@ class BatchedMesh extends Mesh {
 		this._vertexCounts = [];
 		this._indexStarts = [];
 		this._indexCounts = [];
+		this._reservedRanges = [];
 
 		this._visible = [];
 		this._active = [];
@@ -247,34 +248,8 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	getGeometryCount() {
-
-		return this._geometryCount;
-
-	}
-
-	getVertexCount() {
-
-		return this._vertexCount;
-
-	}
-
-	getIndexCount() {
-
-		return this._indexCount;
-
-	}
-
-	applyGeometry( geometry ) {
-
-		this._initializeGeometry( geometry );
-
-		// ensure we're not over geometry
-		if ( this._geometryCount >= this._maxGeometryCount ) {
-
-			throw new Error( 'BatchedMesh: Maximum geometry count reached.' );
-
-		}
+	// Make sure the geometry is compatible with the existing combined geometry atributes
+	_validateGeometry( geometry ) {
 
 		// check that the geometry doesn't have a version of our reserved id attribute
 		if ( geometry.getAttribute( ID_ATTR_NAME ) ) {
@@ -315,23 +290,113 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		// Assuming geometry has position attribute
-		const srcPositionAttribute = geometry.getAttribute( 'position' );
-		const vertexCount = this._vertexCount;
-		const indexCount = this._indexCount;
-		const maxVertexCount = this._maxVertexCount;
-		const maxIndexCount = this._maxIndexCount;
+	}
 
-		// check if we're going over our maximum buffer capacity
-		if (
-			geometry.getIndex() !== null &&
-			indexCount + geometry.getIndex().count > maxIndexCount ||
-			vertexCount + srcPositionAttribute.count > maxVertexCount
-		) {
+	getGeometryCount() {
 
-			throw new Error( 'BatchedMesh: Added geometry is larger than available buffer capacity.' );
+		return this._geometryCount;
+
+	}
+
+	getVertexCount() {
+
+		return this._vertexCount;
+
+	}
+
+	getIndexCount() {
+
+		return this._indexCount;
+
+	}
+
+	addGeometry( geometry, vertexCount = - 1, indexCount = - 1 ) {
+
+		this._initializeGeometry( geometry );
+
+		this._validateGeometry( geometry );
+
+		// ensure we're not over geometry
+		if ( this._geometryCount >= this._maxGeometryCount ) {
+
+			throw new Error( 'BatchedMesh: Maximum geometry count reached.' );
 
 		}
+
+		// get the necessary range fo the geometry
+		const range = {
+			vertexStart: - 1,
+			vertexCount: - 1,
+			indexStart: - 1,
+			indexCount: - 1,
+		};
+
+		let lastRange = null;
+		const reservedRanges = this._reservedRanges;
+		if ( this._geometryCount !== 0 ) {
+
+			lastRange = reservedRanges[ reservedRanges.length - 1 ];
+
+		}
+
+		if ( vertexCount === - 1 ) {
+
+			range.vertexCount = geometry.getAttribute( 'position' ).count;
+
+		} else {
+
+			range.vertexCount = vertexCount;
+
+		}
+
+		if ( lastRange === null ) {
+
+			range.vertexStart = 0;
+
+		} else {
+
+			range.vertexStart = lastRange.vertexStart + lastRange.vertexCount;
+
+		}
+
+		if ( geometry.getIndex() !== null ) {
+
+			if ( indexCount	=== - 1 ) {
+
+				range.indexCount = geometry.getIndex().count;
+
+			} else {
+
+				range.indexCount = indexCount;
+
+			}
+
+			if ( lastRange === null ) {
+
+				range.indexStart = 0;
+
+			} else {
+
+				range.indexStart = lastRange.indexStart + lastRange.indexCount;
+
+			}
+
+		}
+
+		if (
+			range.indexStart !== - 1 &&
+			range.indexStart + range.indexCount > this._maxIndexCount ||
+			range.vertexStart + range.vertexCount > this._maxVertexCount
+		) {
+
+			throw new Error( 'BatchedMesh: Reserved space request exceeds the maximum buffer size.' );
+
+		}
+
+		const indexCounts = this._indexCounts;
+		const indexStarts = this._indexStarts;
+		const vertexCounts = this._vertexCounts;
+		const vertexStarts = this._vertexStarts;
 
 		const visible = this._visible;
 		const active = this._active;
@@ -339,20 +404,82 @@ class BatchedMesh extends Mesh {
 		const matrices = this._matrices;
 		const matricesArray = this._matricesTexture.image.data;
 
-		const indexCounts = this._indexCounts;
-		const indexStarts = this._indexStarts;
-		const vertexCounts = this._vertexCounts;
-		const vertexStarts = this._vertexStarts;
+		// push new visibility states
+		visible.push( true );
+		active.push( true );
 
+		// update id
+		const geometryId = this._geometryCount;
+		this._geometryCount ++;
+
+		// initialize matrix information
+		matrices.push( new Matrix4() );
+		_identityMatrix.toArray( matricesArray, geometryId * 16 );
+		matricesTexture.needsUpdate = true;
+
+		// add the reserved range
+		reservedRanges.push( range );
+
+		// push new geometry data range
+		vertexStarts.push( range.vertexStart );
+		vertexCounts.push( range.vertexCount );
+
+		if ( geometry.getIndex() !== null ) {
+
+			// push new index range
+			indexStarts.push( range.indexCount );
+			indexCounts.push( range.indexCount );
+
+		}
+
+		// set the id for the geometry
+		const idAttribute = this.geometry.getAttribute( ID_ATTR_NAME );
+		for ( let i = 0; i < range.vertexCount; i ++ ) {
+
+			idAttribute.setX( range.vertexStart + i, geometryId );
+
+		}
+
+		idAttribute.needsUpdate = true;
+
+		// update the geometry
+		this.setGeometryAt( geometryId, geometry );
+
+		return geometryId;
+
+	}
+
+	setGeometryAt( id, geometry ) {
+
+		if ( id >= this._geometryCount ) {
+
+			throw new Error( 'BatchedMesh: Maximum geometry count reached.' );
+
+		}
+
+		this._validateGeometry( geometry );
+
+		const range = this._reservedRanges[ id ];
+		if (
+			geometry.getIndex() !== null &&
+			geometry.getIndex().count > range.indexCount ||
+			geometry.attributes.position.count > range.vertexCount
+		) {
+
+			throw new Error( 'BatchedMesh: Reserved space not large enough for provided geometry.' );
+
+		}
+
+		// copy geometry over
+		const batchGeometry = this.geometry;
+		const srcPositionAttribute = geometry.getAttribute( 'position' );
 		const hasIndex = batchGeometry.getIndex() !== null;
 		const dstIndex = batchGeometry.getIndex();
 		const srcIndex = geometry.getIndex();
 
-		// push new geometry data range
-		vertexStarts.push( vertexCount );
-		vertexCounts.push( srcPositionAttribute.count );
-
 		// copy attribute data over
+		const vertexStart = range.vertexStart;
+		const vertexCount = range.vertexCount;
 		for ( const attributeName in batchGeometry.attributes ) {
 
 			if ( attributeName === ID_ATTR_NAME ) {
@@ -363,54 +490,52 @@ class BatchedMesh extends Mesh {
 
 			const srcAttribute = geometry.getAttribute( attributeName );
 			const dstAttribute = batchGeometry.getAttribute( attributeName );
-			copyAttributeData( srcAttribute, dstAttribute, vertexCount );
+			copyAttributeData( srcAttribute, dstAttribute, vertexStart );
+
+			// fill the rest in with zeroes
+			const itemSize = srcAttribute.itemSize;
+			for ( let i = srcAttribute.count, l = vertexCount; i < l; i ++ ) {
+
+				const index = vertexStart + i;
+				for ( let c = 0; c < itemSize; c ++ ) {
+
+					dstAttribute.setComponent( index, c, 0 );
+
+				}
+
+			}
+
+			dstAttribute.needsUpdate = true;
 
 		}
 
+		this._vertexCounts[ id ] = srcPositionAttribute.count;
+
 		if ( hasIndex ) {
 
-			// push new index range
-			indexStarts.push( indexCount );
-			indexCounts.push( srcIndex.count );
+			// fill the rest in with zeroes
+			const indexStart = range.indexStart;
 
 			// copy index data over
 			for ( let i = 0; i < srcIndex.count; i ++ ) {
 
-				dstIndex.setX( indexCount + i, vertexCount + srcIndex.getX( i ) );
+				dstIndex.setX( indexStart + i, vertexStart + srcIndex.getX( i ) );
 
 			}
 
-			this._indexCount += srcIndex.count;
+			// fill the rest in with zeroes
+			for ( let i = srcIndex.count, l = range.indexCount; i < l; i ++ ) {
+
+				dstIndex.setX( indexStart + i, vertexStart );
+
+			}
+
 			dstIndex.needsUpdate = true;
+			this._indexCounts[ id ] = srcIndex.count;
 
 		}
 
-		// fill in the geometry ids
-		const geometryId = this._geometryCount;
-		this._geometryCount ++;
-
-		const idAttribute = batchGeometry.getAttribute( ID_ATTR_NAME );
-		for ( let i = 0; i < srcPositionAttribute.count; i ++ ) {
-
-			idAttribute.setX( this._vertexCount + i, geometryId );
-
-		}
-
-		idAttribute.needsUpdate = true;
-
-		// extend new range
-		this._vertexCount += srcPositionAttribute.count;
-
-		// push new visibility states
-		visible.push( true );
-		active.push( true );
-
-		// initialize matrix information
-		matrices.push( new Matrix4() );
-		_identityMatrix.toArray( matricesArray, geometryId * 16 );
-		matricesTexture.needsUpdate = true;
-
-		return geometryId;
+		return id;
 
 	}
 
