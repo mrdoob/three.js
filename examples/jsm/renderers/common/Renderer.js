@@ -100,9 +100,12 @@ class Renderer {
 
 		this._renderObjectFunction = null;
 		this._currentRenderObjectFunction = null;
+		this._handleObjectFunction = this._renderObjectDirect;
 
 		this._initialized = false;
 		this._initPromise = null;
+
+		this._compilationPromises = [];
 
 		// backwards compatibility
 
@@ -176,9 +179,102 @@ class Renderer {
 
 	}
 
-	async compile( /*scene, camera*/ ) {
+	async compileAsync( scene, camera, targetScene = null ) {
 
-		console.warn( 'THREE.Renderer: .compile() is not implemented yet.' );
+		if ( this._initialized === false ) await this.init();
+
+		// preserve render tree
+
+		const nodeFrame = this._nodes.nodeFrame;
+
+		const previousRenderId = nodeFrame.renderId;
+		const previousRenderContext = this._currentRenderContext;
+
+		//
+
+		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
+
+		const renderTarget = this._renderTarget;
+		const renderContext = this._renderContexts.get( scene, camera, renderTarget );
+		const activeMipmapLevel = this._activeMipmapLevel;
+
+		this._currentRenderContext = renderContext;
+		this._currentRenderObjectFunction = this.renderObject;
+		this._handleObjectFunction = this._createObjectPipeline;
+
+		nodeFrame.renderId ++;
+
+		//
+
+		nodeFrame.update();
+
+		//
+
+		renderContext.depth = this.depth;
+		renderContext.stencil = this.stencil;
+
+		//
+
+		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
+
+		//
+
+		const renderList = this._renderLists.get( scene, camera );
+		renderList.begin();
+
+		this._projectObject( scene, camera, 0, renderList );
+
+		renderList.finish();
+
+		//
+
+		if ( renderTarget !== null ) {
+
+			this._textures.updateRenderTarget( renderTarget, activeMipmapLevel );
+
+			const renderTargetData = this._textures.get( renderTarget );
+
+			renderContext.textures = renderTargetData.textures;
+			renderContext.depthTexture = renderTargetData.depthTexture;
+
+		} else {
+
+			renderContext.textures = null;
+			renderContext.depthTexture = null;
+
+		}
+
+		//
+
+		this._nodes.updateScene( sceneRef );
+
+		//
+
+		this._background.update( sceneRef, renderList, renderContext );
+
+		// process render lists
+
+		const opaqueObjects = renderList.opaque;
+		const transparentObjects = renderList.transparent;
+		const lightsNode = renderList.lightsNode;
+
+		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
+
+		// restore render tree
+
+		nodeFrame.renderId = previousRenderId;
+
+		this._currentRenderContext = previousRenderContext;
+		this._lastRenderContext = renderContext;
+
+		this._handleObjectFunction = this._renderObjectDirect;
+
+		// wait for all promises setup by backends awaiting compilation/linking/pipeline creation to complete
+
+		await Promise.all( this._compilationPromises );
+
+		this._compilationPromises = [];
 
 	}
 
@@ -993,16 +1089,16 @@ class Renderer {
 		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 			material.side = BackSide;
-			this._renderObjectDirect( object, material, scene, camera, lightsNode, 'backSide' ); // create backSide pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, 'backSide' ); // create backSide pass id
 
 			material.side = FrontSide;
-			this._renderObjectDirect( object, material, scene, camera, lightsNode ); // use default pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode ); // use default pass id
 
 			material.side = DoubleSide;
 
 		} else {
 
-			this._renderObjectDirect( object, material, scene, camera, lightsNode );
+			this._handleObjectFunction( object, material, scene, camera, lightsNode );
 
 		}
 
@@ -1056,6 +1152,24 @@ class Renderer {
 	get render() {
 
 		return this.renderAsync;
+
+	}
+
+	_createObjectPipeline( object, material, scene, camera, lightsNode, passId ) {
+
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
+
+		//
+
+		this._nodes.updateBefore( renderObject );
+
+		//
+
+		this._nodes.updateForRender( renderObject );
+		this._geometries.updateForRender( renderObject );
+		this._bindings.updateForRender( renderObject );
+
+		this._pipelines.getForRender( renderObject, this._compilationPromises );
 
 	}
 

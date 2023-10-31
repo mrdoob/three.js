@@ -1140,9 +1140,9 @@ class WebGPUBackend extends Backend {
 
 	// pipelines
 
-	createRenderPipeline( renderObject ) {
+	createRenderPipeline( renderObject, promises ) {
 
-		this.pipelineUtils.createRenderPipeline( renderObject );
+		this.pipelineUtils.createRenderPipeline( renderObject, promises );
 
 	}
 
