@@ -74,24 +74,19 @@ class AnalyticLightNode extends LightingNode {
 				.and( shadowCoord.y.lessThanEqual( 1 ) )
 				.and( shadowCoord.z.lessThanEqual( 1 ) );
 
+			let coordZ = shadowCoord.z.add( bias );
 
 			if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) {
 
-				shadowCoord = vec3(
-					shadowCoord.x,
-					shadowCoord.y.oneMinus(), // WebGPU: Flip Y
-					shadowCoord.z.add( bias ).mul( 2 ).sub( 1 ) // WebGPU: Convertion [ 0, 1 ] to [ - 1, 1 ]
-				);
-
-			} else {
-
-				shadowCoord = vec3(
-					shadowCoord.x,
-					shadowCoord.y,
-					shadowCoord.z.add( bias )
-				);
+				coordZ = coordZ.mul( 2 ).sub( 1 ); // WebGPU: Convertion [ 0, 1 ] to [ - 1, 1 ]
 
 			}
+
+			shadowCoord = vec3(
+				shadowCoord.x,
+				shadowCoord.y.oneMinus(), // follow webgpu standards
+				coordZ
+			);
 
 			const textureCompare = ( depthTexture, shadowCoord, compare ) => texture( depthTexture, shadowCoord ).compare( compare );
 			//const textureCompare = ( depthTexture, shadowCoord, compare ) => compare.step( texture( depthTexture, shadowCoord ) );
