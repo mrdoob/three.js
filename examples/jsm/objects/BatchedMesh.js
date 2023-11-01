@@ -323,11 +323,9 @@ class BatchedMesh extends Mesh {
 		} else {
 
 			const finalRange = reservedRanges[ reservedRanges.length - 1 ];
-			return finalRange.vertexStart + finalRange.vertexCount;
+			return finalRange.indexStart + finalRange.indexCount;
 
 		}
-
-		return this._indexCount;
 
 	}
 
