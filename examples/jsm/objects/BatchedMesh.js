@@ -114,8 +114,6 @@ class BatchedMesh extends Mesh {
 
 		this._geometryInitialized = false;
 		this._geometryCount = 0;
-		this._vertexCount = 0;
-		this._indexCount = 0;
 
 		// Local matrix per geometry by using data texture
 		// @TODO: Support uniform parameter per geometry
@@ -300,11 +298,34 @@ class BatchedMesh extends Mesh {
 
 	getVertexCount() {
 
-		return this._vertexCount;
+		const reservedRanges = this._reservedRanges;
+		if ( reservedRanges.length === 0 ) {
+
+			return 0;
+
+		} else {
+
+			const finalRange = reservedRanges[ reservedRanges.length - 1 ];
+			return finalRange.vertexStart + finalRange.vertexCount;
+
+		}
 
 	}
 
 	getIndexCount() {
+
+		const reservedRanges = this._reservedRanges;
+		const geometry = this.geometry;
+		if ( geometry.getIndex() === null || reservedRanges.length === 0 ) {
+
+			return 0;
+
+		} else {
+
+			const finalRange = reservedRanges[ reservedRanges.length - 1 ];
+			return finalRange.vertexStart + finalRange.vertexCount;
+
+		}
 
 		return this._indexCount;
 
