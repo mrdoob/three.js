@@ -117,7 +117,10 @@ class TextureNode extends UniformNode {
 
 	generate( builder, output ) {
 
-		const { uvNode, levelNode } = builder.getNodeProperties( this );
+		const properties = builder.getNodeProperties( this );
+
+		let { uvNode } = properties;
+		const { levelNode } = properties;
 
 		const compareNode = this.compareNode;
 		const texture = this.value;
@@ -125,6 +128,12 @@ class TextureNode extends UniformNode {
 		if ( ! texture || texture.isTexture !== true ) {
 
 			throw new Error( 'TextureNode: Need a three.js texture.' );
+
+		}
+
+		if ( builder.isFlipY() && ( texture.isFramebufferTexture === true || texture.isDepthTexture === true ) ) {
+
+			uvNode = uvNode.setY( uvNode.y.fract().oneMinus() );
 
 		}
 
@@ -212,7 +221,7 @@ class TextureNode extends UniformNode {
 		textureNode.levelNode = levelNode;
 
 		return context( textureNode, {
-			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => levelNode
+			getMIPLevelAlgorithmNode: ( reqTextureNode, levelNode ) => levelNode
 		} );
 
 	}
