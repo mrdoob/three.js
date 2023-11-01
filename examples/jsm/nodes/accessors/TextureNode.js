@@ -131,7 +131,7 @@ class TextureNode extends UniformNode {
 
 		}
 
-		if ( builder.isFlipY() && ( texture.isFramebufferTexture === true || texture.isDepthTexture === true ) ) {
+		if ( builder.isFlipY() && ( texture.isFramebufferTexture === true ) ) {
 
 			uvNode = uvNode.setY( uvNode.y.fract().oneMinus() );
 
