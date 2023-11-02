@@ -51,8 +51,7 @@ export default QUnit.module( 'Loaders', () => {
 			const attr = new BufferAttribute( new Float32Array( [ 7, 8, 9, 10, 11, 12 ] ), 2, true );
 			attr.name = 'attribute';
 			attr.setUsage( DynamicDrawUsage );
-			attr.updateRange.offset = 1;
-			attr.updateRange.count = 2;
+			attr.addUpdateRange( 1, 2 );
 
 			geometry.setAttribute( 'attr', attr );
 

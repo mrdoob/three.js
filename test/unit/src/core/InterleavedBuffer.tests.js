@@ -56,7 +56,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( 'updateRange', ( assert ) => {
+		QUnit.todo( 'updateRanges', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
