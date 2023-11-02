@@ -21,7 +21,7 @@ class ViewportNode extends Node {
 
 	getNodeType() {
 
-		return this.scope === ViewportNode.COORDINATE || this.scope === ViewportNode.VIEWPORT ? 'vec4' : 'vec2';
+		return this.scope === ViewportNode.VIEWPORT ? 'vec4' : 'vec2';
 
 	}
 
@@ -55,7 +55,7 @@ class ViewportNode extends Node {
 
 	}
 
-	setup( builder ) {
+	setup( /*builder*/ ) {
 
 		const scope = this.scope;
 
@@ -73,17 +73,12 @@ class ViewportNode extends Node {
 
 		} else {
 
-			const coordinateNode = vec2( new ViewportNode( ViewportNode.COORDINATE ) );
-			const resolutionNode = new ViewportNode( ViewportNode.RESOLUTION );
-
-			output = coordinateNode.div( resolutionNode );
+			output = viewportCoordinate.div( viewportResolution );
 
 			let outX = output.x;
 			let outY = output.y;
 
-			if ( /top/i.test( scope ) && builder.isFlipY() ) outY = outY.oneMinus();
-			else if ( /bottom/i.test( scope ) && builder.isFlipY() === false ) outY = outY.oneMinus();
-
+			if ( /bottom/i.test( scope ) ) outY = outY.oneMinus();
 			if ( /right/i.test( scope ) ) outX = outX.oneMinus();
 
 			output = vec2( outX, outY );
@@ -98,7 +93,19 @@ class ViewportNode extends Node {
 
 		if ( this.scope === ViewportNode.COORDINATE ) {
 
-			return builder.getFragCoord();
+			let coord = builder.getFragCoord();
+
+			if ( builder.isFlipY() ) {
+
+				// follow webgpu standards
+
+				const resolution = builder.getNodeProperties( viewportResolution ).outputNode.build( builder );
+
+				coord = `${ builder.getType( 'vec2' ) }( ${ coord }.x, ${ resolution }.y - ${ coord }.y )`;
+
+			}
+
+			return coord;
 
 		}
 

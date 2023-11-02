@@ -6,7 +6,7 @@ vec3 geometryPosition = - vViewPosition;
 vec3 geometryNormal = normal;
 vec3 geometryViewDir = ( isOrthographic ) ? vec3( 0, 0, 1 ) : normalize( vViewPosition );
 
-vec3 geometryClearcoatNormal;
+vec3 geometryClearcoatNormal = vec3( 0.0 );
 
 #ifdef USE_CLEARCOAT
 

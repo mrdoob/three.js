@@ -1,6 +1,4 @@
 import Node, { addNodeClass } from './Node.js';
-import { bypass } from '../core/BypassNode.js';
-import { expression } from '../code/ExpressionNode.js';
 import { cond } from '../math/CondNode.js';
 import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
 
@@ -29,7 +27,7 @@ class StackNode extends Node {
 
 	add( node ) {
 
-		this.nodes.push( bypass( expression(), node ) );
+		this.nodes.push( node );
 
 		return this;
 

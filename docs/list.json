@@ -419,6 +419,10 @@
 				"CameraUtils": "examples/en/utils/CameraUtils",
 				"SceneUtils": "examples/en/utils/SceneUtils",
 				"SkeletonUtils": "examples/en/utils/SkeletonUtils"
+			},
+			
+			"WebXR": {
+				"XREstimatedLight": "examples/en/webxr/XREstimatedLight"
 			}
 
 		},

@@ -132,6 +132,7 @@ class Lensflare extends Mesh {
 		const shader = LensflareElement.Shader;
 
 		const material2 = new RawShaderMaterial( {
+			name: shader.name,
 			uniforms: {
 				'map': { value: null },
 				'occlusionMap': { value: occlusionMap },
@@ -299,6 +300,8 @@ class LensflareElement {
 }
 
 LensflareElement.Shader = {
+
+	name: 'LensflareElementShader',
 
 	uniforms: {
 

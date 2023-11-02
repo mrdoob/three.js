@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.157.0",
+  "version": "0.158.0",
   "description": "JavaScript 3D library",
   "type": "module",
   "main": "./build/three.js",
@@ -12,6 +12,7 @@
     },
     "./examples/fonts/*": "./examples/fonts/*",
     "./examples/jsm/*": "./examples/jsm/*",
+    "./addons": "./examples/jsm/Addons.js",
     "./addons/*": "./examples/jsm/*",
     "./src/*": "./src/*",
     "./nodes": "./examples/jsm/nodes/Nodes.js"

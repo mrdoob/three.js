@@ -1,4 +1,4 @@
-export const REVISION = '158dev';
+export const REVISION = '159dev';
 
 export const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -57,6 +57,8 @@ export const ReinhardToneMapping = 2;
 export const CineonToneMapping = 3;
 export const ACESFilmicToneMapping = 4;
 export const CustomToneMapping = 5;
+export const AttachedBindMode = 'attached';
+export const DetachedBindMode = 'detached';
 
 export const UVMapping = 300;
 export const CubeReflectionMapping = 301;

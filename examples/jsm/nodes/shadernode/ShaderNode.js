@@ -271,12 +271,12 @@ class ShaderCallNodeInternal extends Node {
 
 			}
 
-			return nodeObject( functionNode.call( nodeObjects( inputNodes ) ) );
+			return nodeObject( functionNode.call( inputNodes ) );
 
 		}
 
 		const jsFunc = shaderNode.jsFunc;
-		const outputNode = inputNodes !== null ? jsFunc( nodeObjects( inputNodes ), builder.stack, builder ) : jsFunc( builder.stack, builder );
+		const outputNode = inputNodes !== null ? jsFunc( inputNodes, builder.stack, builder ) : jsFunc( builder.stack, builder );
 
 		return nodeObject( outputNode );
 
@@ -321,6 +321,12 @@ class ShaderNodeInternal extends Node {
 
 	}
 
+	get isArrayInput() {
+
+		return /^\(\s+?\[/.test( this.jsFunc.toString() );
+
+	}
+
 	setLayout( layout ) {
 
 		this.layout = layout;
@@ -330,6 +336,8 @@ class ShaderNodeInternal extends Node {
 	}
 
 	call( inputs = null ) {
+
+		nodeObjects( inputs );
 
 		return nodeObject( new ShaderCallNodeInternal( this, inputs ) );
 
@@ -460,16 +468,34 @@ export const tslFn = ( jsFunc ) => {
 
 	const shaderNode = new ShaderNode( jsFunc );
 
-	const fn = ( inputs ) => shaderNode.call( inputs );
-	fn.shaderNode = shaderNode;
+	const fn = ( ...params ) => {
 
+		let inputs;
+
+		nodeObjects( params );
+
+		if ( params[ 0 ] && params[ 0 ].isNode ) {
+
+			inputs = [ ...params ];
+
+		} else {
+
+			inputs = params[ 0 ];
+
+		}
+
+		return shaderNode.call( inputs );
+
+	};
+
+	fn.shaderNode = shaderNode;
 	fn.setLayout = ( layout ) => {
 
 		shaderNode.setLayout( layout );
 
 		return fn;
 
-	}
+	};
 
 	return fn;
 
@@ -483,7 +509,14 @@ export const setCurrentStack = stack => currentStack = stack;
 export const getCurrentStack = () => currentStack;
 
 export const If = ( ...params ) => currentStack.if( ...params );
-export const append = ( ...params ) => currentStack.add( ...params );
+
+export function append( node ) {
+
+	if ( currentStack ) currentStack.add( node );
+
+	return node;
+
+}
 
 addNodeElement( 'append', append );
 

@@ -11,11 +11,74 @@ import { Capsule } from '../math/Capsule.js';
 
 const _v1 = new Vector3();
 const _v2 = new Vector3();
+const _point1 = new Vector3();
+const _point2 = new Vector3();
 const _plane = new Plane();
 const _line1 = new Line3();
 const _line2 = new Line3();
 const _sphere = new Sphere();
 const _capsule = new Capsule();
+
+const _temp1 = new Vector3();
+const _temp2 = new Vector3();
+const _temp3 = new Vector3();
+const EPS = 1e-10;
+
+function lineToLineClosestPoints( line1, line2, target1 = null, target2 = null ) {
+
+	const r = _temp1.copy( line1.end ).sub( line1.start );
+	const s = _temp2.copy( line2.end ).sub( line2.start );
+	const w = _temp3.copy( line2.start ).sub( line1.start );
+
+	const a = r.dot( s ),
+		b = r.dot( r ),
+		c = s.dot( s ),
+		d = s.dot( w ),
+		e = r.dot( w );
+
+	let t1, t2;
+	const divisor = b * c - a * a;
+
+	if ( Math.abs( divisor ) < EPS ) {
+
+		const d1 = - d / c;
+		const d2 = ( a - d ) / c;
+
+		if ( Math.abs( d1 - 0.5 ) < Math.abs( d2 - 0.5 ) ) {
+
+			t1 = 0;
+			t2 = d1;
+
+		} else {
+
+			t1 = 1;
+			t2 = d2;
+
+		}
+
+	} else {
+
+		t1 = ( d * a + e * c ) / divisor;
+		t2 = ( t1 * a - d ) / c;
+
+	}
+
+	t2 = Math.max( 0, Math.min( 1, t2 ) );
+	t1 = Math.max( 0, Math.min( 1, t1 ) );
+
+	if ( target1 ) {
+
+		target1.copy( r ).multiplyScalar( t1 ).add( line1.start );
+
+	}
+
+	if ( target2 ) {
+
+		target2.copy( s ).multiplyScalar( t2 ).add( line2.start );
+
+	}
+
+}
 
 class Octree {
 
@@ -195,11 +258,15 @@ class Octree {
 
 			const line2 = _line2.set( lines[ i ][ 0 ], lines[ i ][ 1 ] );
 
-			const [ point1, point2 ] = capsule.lineLineMinimumPoints( line1, line2 );
+			lineToLineClosestPoints( line1, line2, _point1, _point2 );
 
-			if ( point1.distanceToSquared( point2 ) < r2 ) {
+			if ( _point1.distanceToSquared( _point2 ) < r2 ) {
 
-				return { normal: point1.clone().sub( point2 ).normalize(), point: point2.clone(), depth: capsule.radius - point1.distanceTo( point2 ) };
+				return {
+					normal: _point1.clone().sub( _point2 ).normalize(),
+					point: _point2.clone(),
+					depth: capsule.radius - _point1.distanceTo( _point2 )
+				};
 
 			}
 

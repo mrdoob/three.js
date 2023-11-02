@@ -32,9 +32,12 @@ class LoopNode extends Node {
 
 		for ( let i = 0, l = this.params.length - 1; i < l; i ++ ) {
 
-			const prop = this.getVarName( i );
+			const param = this.params[ i ];
 
-			inputs[ prop ] = expression( prop, 'int' );
+			const name = ( param.isNode !== true && param.name ) || this.getVarName( i );
+			const type = ( param.isNode !== true && param.type ) || 'int';
+
+			inputs[ name ] = expression( name, type );
 
 		}
 
@@ -73,50 +76,54 @@ class LoopNode extends Node {
 		for ( let i = 0, l = params.length - 1; i < l; i ++ ) {
 
 			const param = params[ i ];
-			const property = this.getVarName( i );
 
-			let start = null, end = null, direction = null;
+			let start = null, end = null, name = null, type = null, condition = null, update = null;
 
 			if ( param.isNode ) {
 
+				type = 'int';
+				name = this.getVarName( i );
 				start = '0';
-				end = param.build( builder, 'int' );
-				direction = 'forward';
+				end = param.build( builder, type );
+				condition = '<';
 
 			} else {
 
+				type = param.type || 'int';
+				name = param.name || this.getVarName( i );
 				start = param.start;
 				end = param.end;
-				direction = param.direction;
+				condition = param.condition;
+				update = param.update;
 
 				if ( typeof start === 'number' ) start = start.toString();
-				else if ( start && start.isNode ) start = start.build( builder, 'int' );
+				else if ( start && start.isNode ) start = start.build( builder, type );
 
 				if ( typeof end === 'number' ) end = end.toString();
-				else if ( end && end.isNode ) end = end.build( builder, 'int' );
+				else if ( end && end.isNode ) end = end.build( builder, type );
 
 				if ( start !== undefined && end === undefined ) {
 
 					start = start + ' - 1';
 					end = '0';
-					direction = 'backwards';
+					condition = '>=';
 
 				} else if ( end !== undefined && start === undefined ) {
 
 					start = '0';
-					direction = 'forward';
+					condition = '<';
 
 				}
 
-				if ( direction === undefined ) {
+				if ( condition === undefined ) {
 
 					if ( Number( start ) > Number( end ) ) {
 
-						direction = 'backwards';
+						condition = '>=';
 
 					} else {
 
-						direction = 'forward';
+						condition = '<';
 
 					}
 
@@ -124,7 +131,7 @@ class LoopNode extends Node {
 
 			}
 
-			const internalParam = { start, end, direction };
+			const internalParam = { start, end, condition };
 
 			//
 
@@ -135,21 +142,26 @@ class LoopNode extends Node {
 			let conditionalSnippet = '';
 			let updateSnippet = '';
 
-			declarationSnippet += builder.getVar( 'int', property ) + ' = ' + startSnippet;
+			if ( ! update ) {
 
-			if ( internalParam.direction === 'backwards' ) {
+				if ( type === 'int' ) {
 
-				conditionalSnippet += property + ' >= ' + endSnippet;
-				updateSnippet += property + ' --';
+					if ( condition.includes( '<' ) ) update = '++';
+					else update = '--';
 
-			} else {
+				} else {
 
-				// forward
+					if ( condition.includes( '<' ) ) update = '+= 1';
+					else update = '-= 1';
 
-				conditionalSnippet += property + ' < ' + endSnippet;
-				updateSnippet += property + ' ++';
+				}
 
 			}
+
+			declarationSnippet += builder.getVar( type, name ) + ' = ' + startSnippet;
+
+			conditionalSnippet += name + ' ' + condition + ' ' + endSnippet;
+			updateSnippet += name + ' ' + update;
 
 			const forSnippet = `for ( ${ declarationSnippet }; ${ conditionalSnippet }; ${ updateSnippet } )`;
 
@@ -179,7 +191,7 @@ class LoopNode extends Node {
 
 export default LoopNode;
 
-export const loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) );
+export const loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).append();
 
 addNodeElement( 'loop', ( returns, ...params ) => bypass( returns, loop( ...params ) ) );
 

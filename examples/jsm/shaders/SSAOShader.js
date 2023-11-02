@@ -12,6 +12,8 @@ import {
 
 const SSAOShader = {
 
+	name: 'SSAOShader',
+
 	defines: {
 		'PERSPECTIVE_CAMERA': 1,
 		'KERNEL_SIZE': 32
@@ -183,6 +185,8 @@ const SSAOShader = {
 
 const SSAODepthShader = {
 
+	name: 'SSAODepthShader',
+
 	defines: {
 		'PERSPECTIVE_CAMERA': 1
 	},
@@ -243,6 +247,8 @@ const SSAODepthShader = {
 };
 
 const SSAOBlurShader = {
+
+	name: 'SSAOBlurShader',
 
 	uniforms: {
 
