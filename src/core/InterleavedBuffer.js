@@ -31,7 +31,7 @@ class InterleavedBuffer {
 
 	get updateRange() {
 
-		console.warn( 'InterleavedBuffer: "updateRange" is deprecated and removed in r169. Use "updateRanges" instead.' );
+		console.warn( 'InterleavedBuffer: "updateRange" is deprecated and removed in r169. Use "addUpdateRange" instead.' );
 		return this._updateRange;
 
 	}
