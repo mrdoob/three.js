@@ -23,7 +23,7 @@ class Animation {
 
 		};
 
-		this.requestId = self.requestAnimationFrame( update );
+		update();
 
 	}
 
