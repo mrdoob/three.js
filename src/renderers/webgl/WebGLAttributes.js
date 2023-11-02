@@ -94,7 +94,9 @@ function WebGLAttributes( gl, capabilities ) {
 			// Not using update ranges
 			gl.bufferSubData( bufferType, 0, array );
 
-		} else {
+		}
+
+		if ( updateRanges.length !== 0 ) {
 
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
@@ -115,7 +117,11 @@ function WebGLAttributes( gl, capabilities ) {
 
 			attribute.clearUpdateRanges();
 
-			// deprecated
+		}
+
+		// deprecated
+		if ( updateRange.count !== - 1 ) {
+
 			if ( isWebGL2 ) {
 
 				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
