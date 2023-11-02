@@ -132,6 +132,18 @@ class BufferGeometryLoader extends Loader {
 
 			}
 
+			if ( attribute.updateRanges !== undefined ) {
+
+				const updateRanges = attribute.updateRanges;
+				for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
+
+					const range = updateRanges[ i ];
+					bufferAttribute.addUpdateRange( range.offset, range.count );
+
+				}
+
+			}
+
 			geometry.setAttribute( key, bufferAttribute );
 
 		}
