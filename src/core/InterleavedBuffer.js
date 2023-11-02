@@ -12,7 +12,8 @@ class InterleavedBuffer {
 		this.count = array !== undefined ? array.length / stride : 0;
 
 		this.usage = StaticDrawUsage;
-		this.updateRange = { offset: 0, count: - 1 };
+		this._updateRange = { offset: 0, count: - 1 };
+		this.updateRanges = [];
 
 		this.version = 0;
 
@@ -28,11 +29,30 @@ class InterleavedBuffer {
 
 	}
 
+	get updateRange() {
+
+		console.warn( 'InterleavedBuffer: "updateRange" is deprecated and removed in r169. Use "updateRanges" instead.' );
+		return this._updateRange;
+
+	}
+
 	setUsage( value ) {
 
 		this.usage = value;
 
 		return this;
+
+	}
+
+	addUpdateRange( offset, count ) {
+
+		this.updateRanges.push( { offset, count } );
+
+	}
+
+	clearUpdateRanges() {
+
+		this.updateRanges.length = 0;
 
 	}
 
