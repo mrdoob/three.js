@@ -89,7 +89,7 @@ function WebGLAttributes( gl, capabilities ) {
 
 		gl.bindBuffer( bufferType, buffer );
 
-		if ( updateRange.count === - 1 || updateRanges.length === 0 ) {
+		if ( updateRange.count === - 1 && updateRanges.length === 0 ) {
 
 			// Not using update ranges
 			gl.bufferSubData( bufferType, 0, array );
@@ -112,6 +112,8 @@ function WebGLAttributes( gl, capabilities ) {
 				}
 
 			}
+
+			attribute.clearUpdateRanges();
 
 			// deprecated
 			if ( isWebGL2 ) {
