@@ -62,6 +62,7 @@ class Renderer {
 		this._attributes = null;
 		this._geometries = null;
 		this._nodes = null;
+		this._animation = null;
 		this._bindings = null;
 		this._objects = null;
 		this._pipelines = null;
@@ -69,8 +70,6 @@ class Renderer {
 		this._renderContexts = null;
 		this._textures = null;
 		this._background = null;
-
-		this._animation = new Animation();
 
 		this._currentRenderContext = null;
 		this._lastRenderContext = null;
@@ -136,6 +135,7 @@ class Renderer {
 			}
 
 			this._nodes = new Nodes( this, backend );
+			this._animation = new Animation( this._nodes );
 			this._attributes = new Attributes( backend );
 			this._background = new Background( this, this._nodes );
 			this._geometries = new Geometries( this._attributes, this.info );
@@ -147,9 +147,6 @@ class Renderer {
 			this._renderContexts = new RenderContexts();
 
 			//
-
-			this._animation.setNodes( this._nodes );
-			this._animation.start();
 
 			this._initialized = true;
 
@@ -197,7 +194,13 @@ class Renderer {
 		this._currentRenderContext = renderContext;
 		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
 
+		//
+
 		nodeFrame.renderId ++;
+
+		this.info.call ++;
+
+		this.info.render.call ++;
 
 		//
 
@@ -213,15 +216,11 @@ class Renderer {
 
 		//
 
-		if ( this._animation.isAnimating === false ) nodeFrame.update();
-
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
 		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 		if ( this.info.autoReset === true ) this.info.reset();
-
-		this.info.render.frame ++;
 
 		//
 
@@ -361,15 +360,11 @@ class Renderer {
 
 	}
 
-	setAnimationLoop( callback ) {
+	async setAnimationLoop( callback ) {
 
-		if ( this._initialized === false ) this.init();
+		if ( this._initialized === false ) await this.init();
 
-		const animation = this._animation;
-
-		animation.setAnimationLoop( callback );
-
-		( callback === null ) ? animation.stop() : animation.start();
+		this._animation.setAnimationLoop( callback );
 
 	}
 
@@ -621,6 +616,7 @@ class Renderer {
 
 		this.info.dispose();
 
+		this._animation.dispose();
 		this._objects.dispose();
 		this._properties.dispose();
 		this._pipelines.dispose();
@@ -665,11 +661,25 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
+		//
+
+		this.info.call ++;
+
+		this.info.compute.call ++;
+
+		//
+
 		const backend = this.backend;
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
 		const nodes = this._nodes;
 		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
+
+		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
+
+			throw new Error( 'THREE.Renderer: .compute() expects a ComputeNode.' );
+
+		}
 
 		backend.beginCompute( computeNodes );
 
