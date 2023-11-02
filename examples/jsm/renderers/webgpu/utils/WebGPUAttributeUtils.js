@@ -100,6 +100,8 @@ class WebGPUAttributeUtils {
 
 			}
 
+			bufferAttribute.clearUpdateRanges();
+
 		}
 
 	}
