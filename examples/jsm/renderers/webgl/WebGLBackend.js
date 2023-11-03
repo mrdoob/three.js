@@ -53,6 +53,12 @@ class WebGLBackend extends Backend {
 
 	}
 
+	async getArrayBufferAsync( attribute ) {
+
+		return await this.attributeUtils.getArrayBufferAsync( attribute );
+
+	}
+
 	beginRender( renderContext ) {
 
 		const { gl } = this;
