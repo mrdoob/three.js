@@ -10,7 +10,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '158';
+	const REVISION = '159dev';
 
 	const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -26533,6 +26533,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			const controllers = [];
 			const controllerInputSources = [];
 
+			const currentSize = new Vector2();
+			let currentPixelRatio = null;
+
 			//
 
 			const cameraL = new PerspectiveCamera();
@@ -26669,6 +26672,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				scope.isPresenting = false;
 
+				renderer.setPixelRatio( currentPixelRatio );
+				renderer.setSize( currentSize.width, currentSize.height, false );
+
 				scope.dispatchEvent( { type: 'sessionend' } );
 
 			}
@@ -26756,6 +26762,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 					}
 
+					currentPixelRatio = renderer.getPixelRatio();
+					renderer.getSize( currentSize );
+
 					if ( ( session.renderState.layers === undefined ) || ( renderer.capabilities.isWebGL2 === false ) ) {
 
 						const layerInit = {
@@ -26769,6 +26778,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
 
 						session.updateRenderState( { baseLayer: glBaseLayer } );
+
+						renderer.setPixelRatio( 1 );
+						renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
 
 						newRenderTarget = new WebGLRenderTarget(
 							glBaseLayer.framebufferWidth,
@@ -26806,6 +26818,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
 
 						session.updateRenderState( { layers: [ glProjLayer ] } );
+
+						renderer.setPixelRatio( 1 );
+						renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
 
 						newRenderTarget = new WebGLRenderTarget(
 							glProjLayer.textureWidth,
