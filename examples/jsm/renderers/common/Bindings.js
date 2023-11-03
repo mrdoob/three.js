@@ -101,7 +101,7 @@ class Bindings extends DataMap {
 		const { backend } = this;
 
 		const updateMap = this.updateMap;
-		const callId = this.info.call;
+		const callId = this.info.calls;
 
 		let needsBindingsUpdate = false;
 

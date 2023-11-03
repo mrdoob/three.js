@@ -5,10 +5,10 @@ class Info {
 		this.autoReset = true;
 
 		this.frame = 0;
-		this.call = 0;
+		this.calls = 0;
 
 		this.render = {
-			call: 0,
+			calls: 0,
 			drawCalls: 0,
 			triangles: 0,
 			points: 0,
@@ -16,7 +16,7 @@ class Info {
 		};
 
 		this.compute = {
-			call: 0
+			calls: 0
 		};
 
 		this.memory = {
@@ -67,10 +67,10 @@ class Info {
 
 		this.reset();
 
-		this.call = 0;
+		this.calls = 0;
 
-		this.render.call = 0;
-		this.compute.call = 0;
+		this.render.calls = 0;
+		this.compute.calls = 0;
 
 		this.memory.geometries = 0;
 		this.memory.textures = 0;

@@ -198,9 +198,8 @@ class Renderer {
 
 		nodeFrame.renderId ++;
 
-		this.info.call ++;
-
-		this.info.render.call ++;
+		this.info.calls ++;
+		this.info.render.calls ++;
 
 		//
 
@@ -663,9 +662,8 @@ class Renderer {
 
 		//
 
-		this.info.call ++;
-
-		this.info.compute.call ++;
+		this.info.calls ++;
+		this.info.compute.calls ++;
 
 		//
 

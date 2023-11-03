@@ -162,7 +162,7 @@ class Geometries extends DataMap {
 
 	updateAttribute( attribute, type ) {
 
-		const callId = this.info.render.call;
+		const callId = this.info.render.calls;
 
 		if ( this.attributeCall.get( attribute ) !== callId ) {
 

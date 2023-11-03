@@ -148,7 +148,7 @@ class Nodes extends DataMap {
 	getCacheKey( scene, lightsNode ) {
 
 		const chain = [ scene, lightsNode ];
-		const callId = this.renderer.info.call;
+		const callId = this.renderer.info.calls;
 
 		let cacheKeyData = this.callHashCache.get( chain );
 
