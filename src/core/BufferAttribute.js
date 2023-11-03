@@ -45,7 +45,7 @@ class BufferAttribute {
 
 	get updateRange() {
 
-		console.warn( 'BufferAttribute: "updateRange" is deprecated and removed in r169. Use "addUpdateRange" instead.' );
+		console.warn( 'THREE.BufferAttribute: "updateRange" is deprecated and removed in r169. Use "addUpdateRange()" instead.' );
 		return this._updateRange;
 
 	}
