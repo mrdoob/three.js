@@ -68,9 +68,13 @@ function createElementNS( name ) {
 
 }
 
+function createElement( name ){
+	return document.createElement( name );
+}
+
 function createCanvasElement() {
 
-	const canvas = createElementNS( 'canvas' );
+	const canvas = createElement( 'canvas' );
 	canvas.style.display = 'block';
 	return canvas;
 
@@ -88,4 +92,4 @@ function warnOnce( message ) {
 
 }
 
-export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, createCanvasElement, warnOnce };
+export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, createElement, createCanvasElement, warnOnce };
