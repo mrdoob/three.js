@@ -1,8 +1,9 @@
 class Animation {
 
-	constructor( nodes ) {
+	constructor( nodes, info ) {
 
 		this.nodes = nodes;
+		this.info = info;
 
 		this.animationLoop = null;
 		this.requestId = null;
@@ -18,6 +19,8 @@ class Animation {
 			this.requestId = self.requestAnimationFrame( update );
 
 			this.nodes.nodeFrame.update();
+
+			this.info.frame = this.nodes.nodeFrame.frameId;
 
 			if ( this.animationLoop !== null ) this.animationLoop( time, frame );
 

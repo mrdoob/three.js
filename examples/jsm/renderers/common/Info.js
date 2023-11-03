@@ -4,6 +4,7 @@ class Info {
 
 		this.autoReset = true;
 
+		this.frame = 0;
 		this.call = 0;
 
 		this.render = {
