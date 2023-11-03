@@ -113,6 +113,9 @@ class BatchedMesh extends Mesh {
 
 		this._geometryInitialized = false;
 		this._geometryCount = 0;
+		this._multiDrawCounts = null;
+		this._multiDrawStarts = null;
+		this._multiDrawCount = 0;
 
 		// Local matrix per geometry by using data texture
 		// @TODO: Support uniform parameter per geometry
@@ -240,6 +243,8 @@ class BatchedMesh extends Mesh {
 			geometry.setAttribute( ID_ATTR_NAME, new BufferAttribute( idArray, 1 ) );
 
 			this._geometryInitialized = true;
+			this._multiDrawCounts = new Int32Array( maxGeometryCount );
+			this._multiDrawStarts = new Int32Array( maxGeometryCount );
 
 		}
 
@@ -705,7 +710,29 @@ class BatchedMesh extends Mesh {
 
 		material.defines.BATCHING = true;
 
+		const visible = this._visible;
+		const multiDrawCounts = this._multiDrawCounts;
+		const multiDrawStarts = this._multiDrawStarts;
+		const drawRanges = this._drawRanges;
+		let count = 0;
+		for ( let i = 0, l = visible.length; i < l; i ++ ) {
+
+			if ( visible[ i ] ) {
+
+				const range = drawRanges[ i ];
+				multiDrawStarts[ count ] = range.start;
+				multiDrawCounts[ count ] = range.count;
+				count ++;
+
+			}
+
+		}
+
+		this._multiDrawCount = count;
+
 		// @TODO: Implement frustum culling for each geometry
+
+		// @TODO: Implement geometry sorting for transparent and opaque materials
 
 	}
 
