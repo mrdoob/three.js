@@ -342,7 +342,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		// get the necessary range fo the geometry
-		const range = {
+		const reservedRange = {
 			vertexStart: - 1,
 			vertexCount: - 1,
 			indexStart: - 1,
@@ -360,21 +360,21 @@ class BatchedMesh extends Mesh {
 
 		if ( vertexCount === - 1 ) {
 
-			range.vertexCount = geometry.getAttribute( 'position' ).count;
+			reservedRange.vertexCount = geometry.getAttribute( 'position' ).count;
 
 		} else {
 
-			range.vertexCount = vertexCount;
+			reservedRange.vertexCount = vertexCount;
 
 		}
 
 		if ( lastRange === null ) {
 
-			range.vertexStart = 0;
+			reservedRange.vertexStart = 0;
 
 		} else {
 
-			range.vertexStart = lastRange.vertexStart + lastRange.vertexCount;
+			reservedRange.vertexStart = lastRange.vertexStart + lastRange.vertexCount;
 
 		}
 
@@ -384,30 +384,30 @@ class BatchedMesh extends Mesh {
 
 			if ( indexCount	=== - 1 ) {
 
-				range.indexCount = index.count;
+				reservedRange.indexCount = index.count;
 
 			} else {
 
-				range.indexCount = indexCount;
+				reservedRange.indexCount = indexCount;
 
 			}
 
 			if ( lastRange === null ) {
 
-				range.indexStart = 0;
+				reservedRange.indexStart = 0;
 
 			} else {
 
-				range.indexStart = lastRange.indexStart + lastRange.indexCount;
+				reservedRange.indexStart = lastRange.indexStart + lastRange.indexCount;
 
 			}
 
 		}
 
 		if (
-			range.indexStart !== - 1 &&
-			range.indexStart + range.indexCount > this._maxIndexCount ||
-			range.vertexStart + range.vertexCount > this._maxVertexCount
+			reservedRange.indexStart !== - 1 &&
+			reservedRange.indexStart + reservedRange.indexCount > this._maxIndexCount ||
+			reservedRange.vertexStart + reservedRange.vertexCount > this._maxVertexCount
 		) {
 
 			throw new Error( 'BatchedMesh: Reserved space request exceeds the maximum buffer size.' );
@@ -433,18 +433,18 @@ class BatchedMesh extends Mesh {
 		_identityMatrix.toArray( matricesArray, geometryId * 16 );
 		matricesTexture.needsUpdate = true;
 
-		// add the reserved range
-		reservedRanges.push( range );
+		// add the reserved range and draw range objects
+		reservedRanges.push( reservedRange );
 		drawRanges.push( {
-			start: hasIndex ? range.indexStart * 3 : range.vertexStart * 3,
+			start: hasIndex ? reservedRange.indexStart * 3 : reservedRange.vertexStart * 3,
 			count: - 1
 		} );
 
 		// set the id for the geometry
 		const idAttribute = this.geometry.getAttribute( ID_ATTR_NAME );
-		for ( let i = 0; i < range.vertexCount; i ++ ) {
+		for ( let i = 0; i < reservedRange.vertexCount; i ++ ) {
 
-			idAttribute.setX( range.vertexStart + i, geometryId );
+			idAttribute.setX( reservedRange.vertexStart + i, geometryId );
 
 		}
 
@@ -538,7 +538,7 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		// set drawRange
+		// set drawRange count
 		const drawRange = this._drawRanges[ id ];
 		const posAttr = geometry.getAttribute( 'position' );
 		drawRange.count = hasIndex ? srcIndex.count * 3 : posAttr.count * 3;
