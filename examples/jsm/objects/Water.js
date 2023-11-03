@@ -182,9 +182,9 @@ class Water extends Mesh {
 					vec3 outgoingLight = albedo;
 					gl_FragColor = vec4( outgoingLight, alpha );
 
+					#include <fog_fragment>
 					#include <tonemapping_fragment>
 					#include <colorspace_fragment>
-					#include <fog_fragment>	
 				}`
 
 		};
