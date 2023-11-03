@@ -441,7 +441,7 @@ class BatchedMesh extends Mesh {
 		// add the reserved range and draw range objects
 		reservedRanges.push( reservedRange );
 		drawRanges.push( {
-			start: hasIndex ? reservedRange.indexStart * 3 : reservedRange.vertexStart * 3,
+			start: hasIndex ? reservedRange.indexStart : reservedRange.vertexStart,
 			count: - 1
 		} );
 
@@ -546,7 +546,7 @@ class BatchedMesh extends Mesh {
 		// set drawRange count
 		const drawRange = this._drawRanges[ id ];
 		const posAttr = geometry.getAttribute( 'position' );
-		drawRange.count = hasIndex ? srcIndex.count * 3 : posAttr.count * 3;
+		drawRange.count = hasIndex ? srcIndex.count : posAttr.count;
 
 		return id;
 
@@ -710,17 +710,23 @@ class BatchedMesh extends Mesh {
 
 		material.defines.BATCHING = true;
 
+		// the indexed version of the multi draw function requires specifying the start
+		// offset in bytes.
+		const index = _geometry.getIndex();
+		const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
+
 		const visible = this._visible;
-		const multiDrawCounts = this._multiDrawCounts;
 		const multiDrawStarts = this._multiDrawStarts;
+		const multiDrawCounts = this._multiDrawCounts;
 		const drawRanges = this._drawRanges;
+
 		let count = 0;
 		for ( let i = 0, l = visible.length; i < l; i ++ ) {
 
 			if ( visible[ i ] ) {
 
 				const range = drawRanges[ i ];
-				multiDrawStarts[ count ] = range.start;
+				multiDrawStarts[ count ] = range.start * bytesPerElement;
 				multiDrawCounts[ count ] = range.count;
 				count ++;
 
