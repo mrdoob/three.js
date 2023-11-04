@@ -14,7 +14,7 @@ class Nodes extends DataMap {
 		this.backend = backend;
 		this.nodeFrame = new NodeFrame();
 		this.nodeBuilderCache = new Map();
-		this.frameHashCache = new ChainMap();
+		this.callHashCache = new ChainMap();
 
 	}
 
@@ -148,11 +148,11 @@ class Nodes extends DataMap {
 	getCacheKey( scene, lightsNode ) {
 
 		const chain = [ scene, lightsNode ];
-		const frameId = this.nodeFrame.frameId;
+		const callId = this.renderer.info.calls;
 
-		let cacheKeyData = this.frameHashCache.get( chain );
+		let cacheKeyData = this.callHashCache.get( chain );
 
-		if ( cacheKeyData === undefined || cacheKeyData.frameId !== frameId ) {
+		if ( cacheKeyData === undefined || cacheKeyData.callId !== callId ) {
 
 			const environmentNode = this.getEnvironmentNode( scene );
 			const fogNode = this.getFogNode( scene );
@@ -166,11 +166,11 @@ class Nodes extends DataMap {
 			if ( toneMappingNode ) cacheKey.push( toneMappingNode.getCacheKey() );
 
 			cacheKeyData = {
-				frameId,
+				callId,
 				cacheKey: cacheKey.join( ',' )
 			};
 
-			this.frameHashCache.set( chain, cacheKeyData );
+			this.callHashCache.set( chain, cacheKeyData );
 
 		}
 
