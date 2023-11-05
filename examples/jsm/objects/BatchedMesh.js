@@ -113,6 +113,9 @@ class BatchedMesh extends Mesh {
 
 		this._geometryInitialized = false;
 		this._geometryCount = 0;
+		this._multiDrawCounts = null;
+		this._multiDrawStarts = null;
+		this._multiDrawCount = 0;
 
 		// Local matrix per geometry by using data texture
 		// @TODO: Support uniform parameter per geometry
@@ -240,6 +243,8 @@ class BatchedMesh extends Mesh {
 			geometry.setAttribute( ID_ATTR_NAME, new BufferAttribute( idArray, 1 ) );
 
 			this._geometryInitialized = true;
+			this._multiDrawCounts = new Int32Array( maxGeometryCount );
+			this._multiDrawStarts = new Int32Array( maxGeometryCount );
 
 		}
 
@@ -436,7 +441,7 @@ class BatchedMesh extends Mesh {
 		// add the reserved range and draw range objects
 		reservedRanges.push( reservedRange );
 		drawRanges.push( {
-			start: hasIndex ? reservedRange.indexStart * 3 : reservedRange.vertexStart * 3,
+			start: hasIndex ? reservedRange.indexStart : reservedRange.vertexStart,
 			count: - 1
 		} );
 
@@ -541,7 +546,7 @@ class BatchedMesh extends Mesh {
 		// set drawRange count
 		const drawRange = this._drawRanges[ id ];
 		const posAttr = geometry.getAttribute( 'position' );
-		drawRange.count = hasIndex ? srcIndex.count * 3 : posAttr.count * 3;
+		drawRange.count = hasIndex ? srcIndex.count : posAttr.count;
 
 		return id;
 
@@ -705,7 +710,35 @@ class BatchedMesh extends Mesh {
 
 		material.defines.BATCHING = true;
 
+		// the indexed version of the multi draw function requires specifying the start
+		// offset in bytes.
+		const index = _geometry.getIndex();
+		const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
+
+		const visible = this._visible;
+		const multiDrawStarts = this._multiDrawStarts;
+		const multiDrawCounts = this._multiDrawCounts;
+		const drawRanges = this._drawRanges;
+
+		let count = 0;
+		for ( let i = 0, l = visible.length; i < l; i ++ ) {
+
+			if ( visible[ i ] ) {
+
+				const range = drawRanges[ i ];
+				multiDrawStarts[ count ] = range.start * bytesPerElement;
+				multiDrawCounts[ count ] = range.count;
+				count ++;
+
+			}
+
+		}
+
+		this._multiDrawCount = count;
+
 		// @TODO: Implement frustum culling for each geometry
+
+		// @TODO: Implement geometry sorting for transparent and opaque materials
 
 	}
 
