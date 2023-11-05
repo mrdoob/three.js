@@ -6,10 +6,16 @@ import {
 	MathUtils,
 	Matrix4,
 	Mesh,
-	RGBAFormat
+	RGBAFormat,
+	Box3,
+	Sphere,
+	Frustum,
+	WebGLCoordinateSystem,
+	WebGPUCoordinateSystem,
 } from 'three';
 
 const ID_ATTR_NAME = '_batch_id_';
+const _matrix = new Matrix4();
 const _identityMatrix = new Matrix4();
 const _zeroScaleMatrix = new Matrix4().set(
 	0, 0, 0, 0,
@@ -17,6 +23,10 @@ const _zeroScaleMatrix = new Matrix4().set(
 	0, 0, 0, 0,
 	0, 0, 0, 1,
 );
+const _projScreenMatrix = new Matrix4();
+const _frustum = new Frustum();
+const _box = new Box3();
+const _sphere = new Sphere();
 
 // Custom shaders
 const batchingParsVertex = /* glsl */`
@@ -106,6 +116,7 @@ class BatchedMesh extends Mesh {
 
 		this._visible = [];
 		this._active = [];
+		this._bounds = [];
 
 		this._maxGeometryCount = maxGeometryCount;
 		this._maxVertexCount = maxVertexCount;
@@ -122,9 +133,6 @@ class BatchedMesh extends Mesh {
 
 		this._matrices = [];
 		this._matricesTexture = null;
-
-		// @TODO: Calculate the entire binding box and make frustumCulled true
-		this.frustumCulled = false;
 
 		this._customUniforms = {
 			batchingTexture: { value: null }
@@ -242,6 +250,16 @@ class BatchedMesh extends Mesh {
 				: new Uint16Array( maxVertexCount );
 			geometry.setAttribute( ID_ATTR_NAME, new BufferAttribute( idArray, 1 ) );
 
+			// Use infinitely large bounds since frustum culling will occur in onBeforeRender
+			const box = new Box3();
+			box.min.setScalar( - Infinity );
+			box.max.setScalar( Infinity );
+			geometry.boundingBox = box;
+
+			const sphere = new Sphere();
+			sphere.radius = Infinity;
+			geometry.boundingSphere = sphere;
+
 			this._geometryInitialized = true;
 			this._multiDrawCounts = new Int32Array( maxGeometryCount );
 			this._multiDrawStarts = new Int32Array( maxGeometryCount );
@@ -357,6 +375,7 @@ class BatchedMesh extends Mesh {
 		let lastRange = null;
 		const reservedRanges = this._reservedRanges;
 		const drawRanges = this._drawRanges;
+		const bounds = this._bounds;
 		if ( this._geometryCount !== 0 ) {
 
 			lastRange = reservedRanges[ reservedRanges.length - 1 ];
@@ -443,6 +462,10 @@ class BatchedMesh extends Mesh {
 		drawRanges.push( {
 			start: hasIndex ? reservedRange.indexStart : reservedRange.vertexStart,
 			count: - 1
+		} );
+		bounds.push( {
+			box: new Box3(),
+			sphere: new Sphere()
 		} );
 
 		// set the id for the geometry
@@ -542,6 +565,23 @@ class BatchedMesh extends Mesh {
 			dstIndex.needsUpdate = true;
 
 		}
+
+		// store the bounding boxes
+		if ( geometry.boundingBox === null ) {
+
+			geometry.computeBoundingBox();
+
+		}
+
+		if ( geometry.boundingSphere === null ) {
+
+			geometry.computeBoundingSphere();
+
+		}
+
+		const bound = this._bounds[ id ];
+		bound.box.copy( geometry.boundingBox );
+		bound.sphere.copy( geometry.boundingSphere );
 
 		// set drawRange count
 		const drawRange = this._drawRanges[ id ];
@@ -706,7 +746,7 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	onBeforeRender( _renderer, _scene, _camera, _geometry, material/*, _group*/ ) {
+	onBeforeRender( _renderer, _scene, camera, _geometry, material/*, _group*/ ) {
 
 		material.defines.BATCHING = true;
 
@@ -719,24 +759,48 @@ class BatchedMesh extends Mesh {
 		const multiDrawStarts = this._multiDrawStarts;
 		const multiDrawCounts = this._multiDrawCounts;
 		const drawRanges = this._drawRanges;
+		const bounds = this._bounds;
+		const frustumCulled = this.frustumCulled;
+
+		if ( frustumCulled ) {
+
+			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			_frustum.setFromProjectionMatrix(
+				_projScreenMatrix,
+				_renderer.isWebGPURenderer ? WebGPUCoordinateSystem : WebGLCoordinateSystem
+			);
+
+		}
 
 		let count = 0;
 		for ( let i = 0, l = visible.length; i < l; i ++ ) {
 
 			if ( visible[ i ] ) {
 
-				const range = drawRanges[ i ];
-				multiDrawStarts[ count ] = range.start * bytesPerElement;
-				multiDrawCounts[ count ] = range.count;
-				count ++;
+				let culled = false;
+				if ( frustumCulled ) {
+
+					this.getMatrixAt( i, _matrix ).premultiply( this.matrixWorld );
+					_box.copy( bounds[ i ].box ).applyMatrix4( _matrix );
+					_sphere.copy( bounds[ i ].sphere ).applyMatrix4( _matrix );
+					culled = ! _frustum.intersectsBox( _box ) || ! _frustum.intersectsSphere( _sphere );
+
+				}
+
+				if ( ! culled ) {
+
+					const range = drawRanges[ i ];
+					multiDrawStarts[ count ] = range.start * bytesPerElement;
+					multiDrawCounts[ count ] = range.count;
+					count ++;
+
+				}
 
 			}
 
 		}
 
 		this._multiDrawCount = count;
-
-		// @TODO: Implement frustum culling for each geometry
 
 		// @TODO: Implement geometry sorting for transparent and opaque materials
 
