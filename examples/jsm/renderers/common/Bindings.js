@@ -101,7 +101,7 @@ class Bindings extends DataMap {
 		const { backend } = this;
 
 		const updateMap = this.updateMap;
-		const frame = this.info.render.frame;
+		const callId = this.info.calls;
 
 		let needsBindingsUpdate = false;
 
@@ -109,7 +109,7 @@ class Bindings extends DataMap {
 
 		for ( const binding of bindings ) {
 
-			const isUpdated = updateMap.get( binding ) === frame;
+			const isUpdated = updateMap.get( binding ) === callId;
 
 			if ( isUpdated ) continue;
 
@@ -137,7 +137,7 @@ class Bindings extends DataMap {
 
 			}
 
-			updateMap.set( binding, frame );
+			updateMap.set( binding, callId );
 
 		}
 
