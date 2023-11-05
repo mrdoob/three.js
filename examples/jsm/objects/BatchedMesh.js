@@ -45,15 +45,6 @@ const batchingbaseVertex = /* glsl */`
 #endif
 `;
 
-const batchingnormalVertex = /* glsl */`
-#ifdef USE_BATCHING
-	objectNormal = vec4( batchingMatrix * vec4( objectNormal, 0.0 ) ).xyz;
-	#ifdef USE_TANGENT
-		objectTangent = vec4( batchingMatrix * vec4( objectTangent, 0.0 ) ).xyz;
-	#endif
-#endif
-`;
-
 const batchingVertex = /* glsl */`
 #ifdef USE_BATCHING
 	transformed = ( batchingMatrix * vec4( transformed, 1.0 ) ).xyz;
@@ -175,11 +166,6 @@ class BatchedMesh extends Mesh {
 					'#include <uv_vertex>',
 					'#include <uv_vertex>\n'
 						+ batchingbaseVertex
-				)
-				.replace(
-					'#include <skinnormal_vertex>',
-					'#include <skinnormal_vertex>\n'
-						+ batchingnormalVertex
 				)
 				.replace(
 					'#include <skinning_vertex>',
