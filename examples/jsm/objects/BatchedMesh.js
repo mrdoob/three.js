@@ -19,26 +19,6 @@ const _zeroScaleMatrix = new Matrix4().set(
 );
 
 // Custom shaders
-const batchingParsVertex = /* glsl */`
-#ifdef USE_BATCHING
-	attribute float ${ ID_ATTR_NAME };
-	uniform highp sampler2D batchingTexture;
-	mat4 getBatchingMatrix( const in float i ) {
-
-		int size = textureSize( batchingTexture, 0 ).x;
-		int j = int( i ) * 4;
-		int x = j % size;
-		int y = j / size;
-		vec4 v1 = texelFetch( batchingTexture, ivec2( x, y ), 0 );
-		vec4 v2 = texelFetch( batchingTexture, ivec2( x + 1, y ), 0 );
-		vec4 v3 = texelFetch( batchingTexture, ivec2( x + 2, y ), 0 );
-		vec4 v4 = texelFetch( batchingTexture, ivec2( x + 3, y ), 0 );
-		return mat4( v1, v2, v3, v4 );
-
-	}
-#endif
-`;
-
 const batchingbaseVertex = /* glsl */`
 #ifdef USE_BATCHING
 	mat4 batchingMatrix = getBatchingMatrix( ${ ID_ATTR_NAME } );
@@ -151,11 +131,6 @@ class BatchedMesh extends Mesh {
 
 			// Is this replacement stable across any materials?
 			parameters.vertexShader = parameters.vertexShader
-				.replace(
-					'#include <skinning_pars_vertex>',
-					'#include <skinning_pars_vertex>\n'
-						+ batchingParsVertex
-				)
 				.replace(
 					'#include <uv_vertex>',
 					'#include <uv_vertex>\n'
