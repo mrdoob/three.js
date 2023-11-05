@@ -762,6 +762,7 @@ class BatchedMesh extends Mesh {
 		const bounds = this._bounds;
 		const frustumCulled = this.frustumCulled;
 
+		// prepare the frustum
 		if ( frustumCulled ) {
 
 			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
@@ -777,10 +778,14 @@ class BatchedMesh extends Mesh {
 
 			if ( visible[ i ] ) {
 
+				// determine whether the batched geometry is within the frustum
 				let culled = false;
 				if ( frustumCulled ) {
 
+					// get the bounds in camera space
 					this.getMatrixAt( i, _matrix ).premultiply( this.matrixWorld );
+
+					// get the bounds
 					_box.copy( bounds[ i ].box ).applyMatrix4( _matrix );
 					_sphere.copy( bounds[ i ].sphere ).applyMatrix4( _matrix );
 					culled = ! _frustum.intersectsBox( _box ) || ! _frustum.intersectsSphere( _sphere );
