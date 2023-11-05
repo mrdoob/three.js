@@ -89,7 +89,6 @@ class BatchedMesh extends Mesh {
 		};
 
 		this._initMatricesTexture();
-		this._initShader();
 
 	}
 
@@ -111,29 +110,6 @@ class BatchedMesh extends Mesh {
 
 		this._matricesTexture = matricesTexture;
 		this._customUniforms.batchingTexture.value = this._matricesTexture;
-
-	}
-
-	_initShader() {
-
-		const material = this.material;
-		const currentOnBeforeCompile = material.onBeforeCompile;
-		const customUniforms = this._customUniforms;
-
-		material.onBeforeCompile = function onBeforeCompile( parameters, renderer ) {
-
-			for ( const uniformName in customUniforms ) {
-
-				parameters.uniforms[ uniformName ] = customUniforms[ uniformName ];
-
-			}
-
-			currentOnBeforeCompile.call( this, parameters, renderer );
-
-		};
-
-		material.defines = material.defines || {};
-		material.defines.BATCHING = false;
 
 	}
 
@@ -641,13 +617,11 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	onBeforeRender( _renderer, _scene, _camera, _geometry, material/*, _group*/ ) {
-
-		material.defines.BATCHING = true;
+	onBeforeRender( _renderer, _scene, _camera, geometry ) {
 
 		// the indexed version of the multi draw function requires specifying the start
 		// offset in bytes.
-		const index = _geometry.getIndex();
+		const index = geometry.getIndex();
 		const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
 
 		const visible = this._visible;
@@ -674,12 +648,6 @@ class BatchedMesh extends Mesh {
 		// @TODO: Implement frustum culling for each geometry
 
 		// @TODO: Implement geometry sorting for transparent and opaque materials
-
-	}
-
-	onAfterRender( _renderer, _scene, _camera, _geometry, material/*, _group*/ ) {
-
-		material.defines.BATCHING = false;
 
 	}
 

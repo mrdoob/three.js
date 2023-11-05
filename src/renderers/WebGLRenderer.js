@@ -1996,6 +1996,13 @@ class WebGLRenderer {
 
 			}
 
+			if ( object.isBatchedMesh ) {
+
+				p_uniforms.setOptional( _gl, object, 'batchingTexture' );
+				p_uniforms.setValue( _gl, 'batchingTexture', object._matricesTexture, textures );
+
+			}
+
 			const morphAttributes = geometry.morphAttributes;
 
 			if ( morphAttributes.position !== undefined || morphAttributes.normal !== undefined || ( morphAttributes.color !== undefined && capabilities.isWebGL2 === true ) ) {
