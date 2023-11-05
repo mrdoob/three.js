@@ -18,13 +18,6 @@ const _zeroScaleMatrix = new Matrix4().set(
 	0, 0, 0, 1,
 );
 
-// Custom shaders
-const batchingbaseVertex = /* glsl */`
-#ifdef USE_BATCHING
-	mat4 batchingMatrix = getBatchingMatrix( ${ ID_ATTR_NAME } );
-#endif
-`;
-
 // @TODO: SkinnedMesh support?
 // @TODO: Future work if needed. Move into the core. Can be optimized more with WEBGL_multi_draw.
 
@@ -128,14 +121,6 @@ class BatchedMesh extends Mesh {
 		const customUniforms = this._customUniforms;
 
 		material.onBeforeCompile = function onBeforeCompile( parameters, renderer ) {
-
-			// Is this replacement stable across any materials?
-			parameters.vertexShader = parameters.vertexShader
-				.replace(
-					'#include <uv_vertex>',
-					'#include <uv_vertex>\n'
-						+ batchingbaseVertex
-				);
 
 			for ( const uniformName in customUniforms ) {
 
