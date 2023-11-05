@@ -20,7 +20,7 @@ const _zeroScaleMatrix = new Matrix4().set(
 
 // Custom shaders
 const batchingParsVertex = /* glsl */`
-#ifdef BATCHING
+#ifdef USE_BATCHING
 	attribute float ${ ID_ATTR_NAME };
 	uniform highp sampler2D batchingTexture;
 	mat4 getBatchingMatrix( const in float i ) {
@@ -40,13 +40,13 @@ const batchingParsVertex = /* glsl */`
 `;
 
 const batchingbaseVertex = /* glsl */`
-#ifdef BATCHING
+#ifdef USE_BATCHING
 	mat4 batchingMatrix = getBatchingMatrix( ${ ID_ATTR_NAME } );
 #endif
 `;
 
 const batchingnormalVertex = /* glsl */`
-#ifdef BATCHING
+#ifdef USE_BATCHING
 	objectNormal = vec4( batchingMatrix * vec4( objectNormal, 0.0 ) ).xyz;
 	#ifdef USE_TANGENT
 		objectTangent = vec4( batchingMatrix * vec4( objectTangent, 0.0 ) ).xyz;
@@ -55,7 +55,7 @@ const batchingnormalVertex = /* glsl */`
 `;
 
 const batchingVertex = /* glsl */`
-#ifdef BATCHING
+#ifdef USE_BATCHING
 	transformed = ( batchingMatrix * vec4( transformed, 1.0 ) ).xyz;
 #endif
 `;
