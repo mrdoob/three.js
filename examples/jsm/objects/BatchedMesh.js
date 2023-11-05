@@ -45,12 +45,6 @@ const batchingbaseVertex = /* glsl */`
 #endif
 `;
 
-const batchingVertex = /* glsl */`
-#ifdef USE_BATCHING
-	transformed = ( batchingMatrix * vec4( transformed, 1.0 ) ).xyz;
-#endif
-`;
-
 // @TODO: SkinnedMesh support?
 // @TODO: Future work if needed. Move into the core. Can be optimized more with WEBGL_multi_draw.
 
@@ -166,11 +160,6 @@ class BatchedMesh extends Mesh {
 					'#include <uv_vertex>',
 					'#include <uv_vertex>\n'
 						+ batchingbaseVertex
-				)
-				.replace(
-					'#include <skinning_vertex>',
-					'#include <skinning_vertex>\n'
-						+ batchingVertex
 				);
 
 			for ( const uniformName in customUniforms ) {
