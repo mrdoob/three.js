@@ -333,7 +333,6 @@ class BatchedMesh extends Mesh {
 		const visible = this._visible;
 		const active = this._active;
 		const matricesTexture = this._matricesTexture;
-		const matrices = this._matrices;
 		const matricesArray = this._matricesTexture.image.data;
 
 		// push new visibility states
@@ -345,7 +344,6 @@ class BatchedMesh extends Mesh {
 		this._geometryCount ++;
 
 		// initialize matrix information
-		matrices.push( new Matrix4() );
 		_identityMatrix.toArray( matricesArray, geometryId * 16 );
 		matricesTexture.needsUpdate = true;
 
@@ -495,25 +493,18 @@ class BatchedMesh extends Mesh {
 		// @TODO: Map geometryId to index of the arrays because
 		//        optimize() can make geometryId mismatch the index
 
-		const visible = this._visible;
 		const active = this._active;
 		const matricesTexture = this._matricesTexture;
-		const matrices = this._matrices;
 		const matricesArray = this._matricesTexture.image.data;
-		if ( geometryId >= matrices.length || active[ geometryId ] === false ) {
+		const geometryCount = this._geometryCount;
+		if ( geometryId >= geometryCount || active[ geometryId ] === false ) {
 
 			return this;
 
 		}
 
-		if ( visible[ geometryId ] === true ) {
-
-			matrix.toArray( matricesArray, geometryId * 16 );
-			matricesTexture.needsUpdate = true;
-
-		}
-
-		matrices[ geometryId ].copy( matrix );
+		matrix.toArray( matricesArray, geometryId * 16 );
+		matricesTexture.needsUpdate = true;
 
 		return this;
 
@@ -521,15 +512,16 @@ class BatchedMesh extends Mesh {
 
 	getMatrixAt( geometryId, matrix ) {
 
-		const matrices = this._matrices;
 		const active = this._active;
-		if ( geometryId >= matrices.length || active[ geometryId ] === false ) {
+		const matricesArray = this._matricesTexture.image.data;
+		const geometryCount = this._geometryCount;
+		if ( geometryId >= geometryCount || active[ geometryId ] === false ) {
 
-			return matrix;
+			return null;
 
 		}
 
-		return matrix.copy( matrices[ geometryId ] );
+		return matrix.fromArray( matricesArray, geometryId * 16 );
 
 	}
 
@@ -537,14 +529,12 @@ class BatchedMesh extends Mesh {
 
 		const visible = this._visible;
 		const active = this._active;
-		const matricesTexture = this._matricesTexture;
-		const matrices = this._matrices;
-		const matricesArray = this._matricesTexture.image.data;
+		const geometryCount = this._geometryCount;
 
 		// if the geometry is out of range, not active, or visibility state
 		// does not change then return early
 		if (
-			geometryId >= visible.length ||
+			geometryId >= geometryCount ||
 			active[ geometryId ] === false ||
 			visible[ geometryId ] === value
 		) {
@@ -553,18 +543,6 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		// scale the matrix to zero if it's hidden
-		if ( value === true ) {
-
-			matrices[ geometryId ].toArray( matricesArray, geometryId * 16 );
-
-		} else {
-
-			_zeroScaleMatrix.toArray( matricesArray, geometryId * 16 );
-
-		}
-
-		matricesTexture.needsUpdate = true;
 		visible[ geometryId ] = value;
 		return this;
 
@@ -574,9 +552,10 @@ class BatchedMesh extends Mesh {
 
 		const visible = this._visible;
 		const active = this._active;
+		const geometryCount = this._geometryCount;
 
 		// return early if the geometry is out of range or not active
-		if ( geometryId >= visible.length || active[ geometryId ] === false ) {
+		if ( geometryId >= geometryCount || active[ geometryId ] === false ) {
 
 			return false;
 
