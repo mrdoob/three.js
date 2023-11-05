@@ -20,6 +20,10 @@ const _zeroScaleMatrix = new Matrix4().set(
 
 // @TODO: SkinnedMesh support?
 // @TODO: Future work if needed. Move into the core. Can be optimized more with WEBGL_multi_draw.
+// @TODO: geometry.groups support?
+// @TODO: geometry.drawRange support?
+// @TODO: geometry.morphAttributes support?
+// @TODO: Support uniform parameter per geometry
 
 // copies data from attribute "src" into "target" starting at "targetOffset"
 function copyAttributeData( src, target, targetOffset = 0 ) {
@@ -76,9 +80,6 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCount = 0;
 
 		// Local matrix per geometry by using data texture
-		// @TODO: Support uniform parameter per geometry
-
-		this._matrices = [];
 		this._matricesTexture = null;
 
 		// @TODO: Calculate the entire binding box and make frustumCulled true
@@ -109,10 +110,6 @@ class BatchedMesh extends Mesh {
 	}
 
 	_initializeGeometry( reference ) {
-
-		// @TODO: geometry.groups support?
-		// @TODO: geometry.drawRange support?
-		// @TODO: geometry.morphAttributes support?
 
 		const geometry = this.geometry;
 		const maxVertexCount = this._maxVertexCount;
