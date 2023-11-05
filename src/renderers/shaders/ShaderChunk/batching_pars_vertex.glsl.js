@@ -1,6 +1,6 @@
 export default /* glsl */`
 #ifdef USE_BATCHING
-	attribute float _batch_id_;
+	attribute float batchId;
 	uniform highp sampler2D batchingTexture;
 	mat4 getBatchingMatrix( const in float i ) {
 

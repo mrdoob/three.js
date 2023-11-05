@@ -9,7 +9,7 @@ import {
 	RGBAFormat
 } from 'three';
 
-const ID_ATTR_NAME = '_batch_id_';
+const ID_ATTR_NAME = 'batchId';
 const _identityMatrix = new Matrix4();
 const _zeroScaleMatrix = new Matrix4().set(
 	0, 0, 0, 0,
