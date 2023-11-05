@@ -1,60 +1,38 @@
 <!DOCTYPE html>
 <html lang="ar">
-	<head>
-		<meta charset="utf-8">
-		<base href="../../../" />
-		<script src="page.js"></script>
-		<link type="text/css" rel="stylesheet" href="page.css" />
-	</head>
-	<body class="rtl">
-		<h1>إنشاء مشهد（[name]）</h1>
 
-		<p>الهدف من هذا القسم هو تقديم لمحة وجيزة عن كيفية عمل المكتبة. سنبدأ بتحضير مشهد يتمثل في مكعب ثلاثي الأبعاد .الصفحة مرفوقة بمثال أسفلها في حالة واجهتك بعض المشاكل وإحتجت إلى المساعدة.</p>
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
 
-		<h2>قبل أن نبدأ</h2>
+<body class="rtl">
+	<h1>إنشاء مشهد（[name])</h1>
 
-		<p>قبل أن تتمكن من استخدام three.js ، تحتاج إلى مكان لعرضه. احفظ HTML التالي في ملف على جهاز الكمبيوتر الخاص بك وافتحه في المتصفح الخاص بك.</p>
+	<p>الهدف من هذا القسم هو تقديم مقدمة مختصرة عن three.js. سنبدأ بإعداد مشهد باستخدام مكعب دوار. متوفر مثال عملي جاهز في أسفل الصفحة في حالة واجهتك مشكلة و علقت واحتجت إلى المساعدة.</p>
 
-		<code>
-		&lt;!DOCTYPE html&gt;
-		&lt;html&gt;
-			&lt;head&gt;
-				&lt;meta charset="utf-8"&gt;
-				&lt;title&gt;My first three.js app&lt;/title&gt;
-				&lt;style&gt;
-					body { margin: 0; }
-				&lt;/style&gt;
-			&lt;/head&gt;
-			&lt;body&gt;
-				&lt;script type="module"&gt;
-					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+	<h2>قبل أن تبدأ</h2>
 
-					// Our Javascript will go here.
-				&lt;/script&gt;
-			&lt;/body&gt;
-		&lt;/html&gt;
-		</code>
+	<p>إذا لم تقم بذلك بعد، فانتقل إلى دليل [link:#manual/ar/introduction/Installation تثبيت]. سنفترض أنك قمت بالفعل بإعداد نفس هيكل المشروع (يشمل ذلك Index.html وmain.js)، وقمت بتثبيت three.js، وأنك تقوم بستخدم أداة بناء ، أو تستخدم خادم محلي مع CDN و import maps.</p>
 
-		<p>
-			هذا كل شيء. بقية الأوامر البرمجية ستكون محتوات في وسم &lt;script&gt; الفارغ حاليا.
-		</p>
+	<h2>إنشاء المشهد</h2>
 
-		<h2>إنشاء مشهد</h2>
+	<p>لكي نتمكن فعلًا من عرض أي شيء باستخدام three.js، نحتاج إلى ثلاثة عناصر: المشهد (scene) والكاميرا (camera) والعارض (renderer)، بحيث يمكننا عرض المشهد بواسطة الكاميرا.</p>
 
-		<p>
-			لنتمكن من إظهار أي شيء بإستهمال three.js، نحتاج ثلاثة عناصر أساسية: المسرح (Scene)، الكاميرا (Camera)، و العارض
-			(Renderer).
-		</p>
+	<p class="RtlTitle"><i >main.js —</i></p>
 
-		<code>
-		const scene = new THREE.Scene();
-		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+	<code>
+	import * as THREE from 'three';
 
-		const renderer = new THREE.WebGLRenderer();
-		renderer.setSize( window.innerWidth, window.innerHeight );
-		document.body.appendChild( renderer.domElement );
-		</code>
+	const scene = new THREE.Scene();
+	const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
+	const renderer = new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+	</code>
 		<p>
 			لنتمهل لحظة من أجل توضيح ما يحصل هنا. لقد قمنا بتحضير كل من المسرح، الكاميرا، و العارض.
 		</p>
