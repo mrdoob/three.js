@@ -5,16 +5,17 @@ export default /* glsl */`
 	uniform mat4 bindMatrixInverse;
 
 	uniform highp sampler2D boneTexture;
-	uniform int boneTextureSize;
 
 	mat4 getBoneMatrix( const in float i ) {
 
-		float j = i * 4.0;
-		float x = mod( j, float( boneTextureSize ) );
-		float y = floor( j / float( boneTextureSize ) );
+		float boneTextureSize = textureSize( boneTexture, 0 ).x;
 
-		float dx = 1.0 / float( boneTextureSize );
-		float dy = 1.0 / float( boneTextureSize );
+		float j = i * 4.0;
+		float x = mod( j, boneTextureSize );
+		float y = floor( j / boneTextureSize );
+
+		float dx = 1.0 / boneTextureSize;
+		float dy = 1.0 / boneTextureSize;
 
 		y = dy * ( y + 0.5 );
 
