@@ -696,7 +696,6 @@ class BatchedMesh extends Mesh {
 
 	}
 
-
 	raycast( raycaster, intersects ) {
 
 		const visible = this._visible;
