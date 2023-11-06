@@ -12,6 +12,7 @@ import {
 	Frustum,
 	WebGLCoordinateSystem,
 	WebGPUCoordinateSystem,
+	Vector3,
 } from 'three';
 
 const ID_ATTR_NAME = 'batchId';
@@ -27,6 +28,7 @@ const _projScreenMatrix = new Matrix4();
 const _frustum = new Frustum();
 const _box = new Box3();
 const _sphere = new Sphere();
+const _vector = new Vector3();
 
 // @TODO: SkinnedMesh support?
 // @TODO: Future work if needed. Move into the core. Can be optimized more with WEBGL_multi_draw.
@@ -370,7 +372,10 @@ class BatchedMesh extends Mesh {
 			count: - 1
 		} );
 		bounds.push( {
+			boxInitialized: false,
 			box: new Box3(),
+
+			sphereInitialized: false,
 			sphere: new Sphere()
 		} );
 
@@ -473,21 +478,28 @@ class BatchedMesh extends Mesh {
 		}
 
 		// store the bounding boxes
-		if ( geometry.boundingBox === null ) {
-
-			geometry.computeBoundingBox();
-
-		}
-
-		if ( geometry.boundingSphere === null ) {
-
-			geometry.computeBoundingSphere();
-
-		}
-
 		const bound = this._bounds[ id ];
-		bound.box.copy( geometry.boundingBox );
-		bound.sphere.copy( geometry.boundingSphere );
+		if ( geometry.boundingBox !== null ) {
+
+			bound.box.copy( geometry.boundingBox );
+			bound.boxInitialized = true;
+
+		} else {
+
+			bound.boxInitialized = false;
+
+		}
+
+		if ( geometry.boundingSphere !== null ) {
+
+			bound.sphere.copy( geometry.boundingSphere );
+			bound.sphereInitialized = true;
+
+		} else {
+
+			bound.sphereInitialized = false;
+
+		}
 
 		// set drawRange count
 		const drawRange = this._drawRanges[ id ];
@@ -516,6 +528,99 @@ class BatchedMesh extends Mesh {
 		matricesTexture.needsUpdate = true;
 
 		return this;
+
+	}
+
+	// get bounding box and compute it if it doesn't exist
+	getBoundingBoxAt( id, target ) {
+
+		const active = this._active;
+		if ( active[ id ] === false ) {
+
+			return this;
+
+		}
+
+		// compute bounding box
+		const bound = this._bounds[ id ];
+		const box = bound.box;
+		const geometry = this.geometry;
+		if ( bound.boxInitialized === false ) {
+
+			box.makeEmpty();
+
+			const index = geometry.index;
+			const position = geometry.attributes.position;
+			const drawRange = this._drawRanges[ id ];
+			for ( let i = drawRange.start, l = drawRange.start + drawRange.count; i < l; i ++ ) {
+
+				let iv = i;
+				if ( index ) {
+
+					iv = index.getX( iv );
+
+				}
+
+				box.expandByPoint( _vector.fromBufferAttribute( position, iv ) );
+
+			}
+
+			bound.boxInitialized = true;
+
+		}
+
+		target.copy( box );
+		return target;
+
+	}
+
+	// get bounding sphere and compute it if it doesn't exist
+	getBoundingSphereAt( id, target ) {
+
+		const active = this._active;
+		if ( active[ id ] === false ) {
+
+			return this;
+
+		}
+
+		// compute bounding sphere
+		const bound = this._bounds[ id ];
+		const sphere = bound.sphere;
+		const geometry = this.geometry;
+		if ( bound.sphereInitialized === false ) {
+
+			sphere.makeEmpty();
+
+			this.getBoundingBoxAt( id, _box );
+			_box.getCenter( sphere.center );
+
+			const index = geometry.index;
+			const position = geometry.attributes.position;
+			const drawRange = this._drawRanges[ id ];
+
+			let maxRadiusSq = 0;
+			for ( let i = drawRange.start, l = drawRange.start + drawRange.count; i < l; i ++ ) {
+
+				let iv = i;
+				if ( index ) {
+
+					iv = index.getX( iv );
+
+				}
+
+				_vector.fromBufferAttribute( position, iv );
+				maxRadiusSq = Math.max( maxRadiusSq, sphere.center.distanceToSquared( _vector ) );
+
+			}
+
+			sphere.radius = Math.sqrt( maxRadiusSq );
+			bound.sphereInitialized = true;
+
+		}
+
+		target.copy( sphere );
+		return target;
 
 	}
 
@@ -663,7 +768,6 @@ class BatchedMesh extends Mesh {
 		const multiDrawStarts = this._multiDrawStarts;
 		const multiDrawCounts = this._multiDrawCounts;
 		const drawRanges = this._drawRanges;
-		const bounds = this._bounds;
 		const frustumCulled = this.frustumCulled;
 
 		// prepare the frustum
@@ -690,8 +794,8 @@ class BatchedMesh extends Mesh {
 					this.getMatrixAt( i, _matrix ).premultiply( this.matrixWorld );
 
 					// get the bounds
-					_box.copy( bounds[ i ].box ).applyMatrix4( _matrix );
-					_sphere.copy( bounds[ i ].sphere ).applyMatrix4( _matrix );
+					this.getBoundingBoxAt( i, _box ).applyMatrix4( _matrix );
+					this.getBoundingSphereAt( i, _sphere ).applyMatrix4( _matrix );
 					culled = ! _frustum.intersectsBox( _box ) || ! _frustum.intersectsSphere( _sphere );
 
 				}
