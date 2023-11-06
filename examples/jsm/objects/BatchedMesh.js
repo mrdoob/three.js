@@ -9,7 +9,7 @@ import {
 	RGBAFormat
 } from 'three';
 
-const ID_ATTR_NAME = '_batch_id_';
+const ID_ATTR_NAME = 'batchId';
 const _identityMatrix = new Matrix4();
 const _zeroScaleMatrix = new Matrix4().set(
 	0, 0, 0, 0,
@@ -17,48 +17,6 @@ const _zeroScaleMatrix = new Matrix4().set(
 	0, 0, 0, 0,
 	0, 0, 0, 1,
 );
-
-// Custom shaders
-const batchingParsVertex = /* glsl */`
-#ifdef BATCHING
-	attribute float ${ ID_ATTR_NAME };
-	uniform highp sampler2D batchingTexture;
-	mat4 getBatchingMatrix( const in float i ) {
-
-		int size = textureSize( batchingTexture, 0 ).x;
-		int j = int( i ) * 4;
-		int x = j % size;
-		int y = j / size;
-		vec4 v1 = texelFetch( batchingTexture, ivec2( x, y ), 0 );
-		vec4 v2 = texelFetch( batchingTexture, ivec2( x + 1, y ), 0 );
-		vec4 v3 = texelFetch( batchingTexture, ivec2( x + 2, y ), 0 );
-		vec4 v4 = texelFetch( batchingTexture, ivec2( x + 3, y ), 0 );
-		return mat4( v1, v2, v3, v4 );
-
-	}
-#endif
-`;
-
-const batchingbaseVertex = /* glsl */`
-#ifdef BATCHING
-	mat4 batchingMatrix = getBatchingMatrix( ${ ID_ATTR_NAME } );
-#endif
-`;
-
-const batchingnormalVertex = /* glsl */`
-#ifdef BATCHING
-	objectNormal = vec4( batchingMatrix * vec4( objectNormal, 0.0 ) ).xyz;
-	#ifdef USE_TANGENT
-		objectTangent = vec4( batchingMatrix * vec4( objectTangent, 0.0 ) ).xyz;
-	#endif
-#endif
-`;
-
-const batchingVertex = /* glsl */`
-#ifdef BATCHING
-	transformed = ( batchingMatrix * vec4( transformed, 1.0 ) ).xyz;
-#endif
-`;
 
 // @TODO: SkinnedMesh support?
 // @TODO: Future work if needed. Move into the core. Can be optimized more with WEBGL_multi_draw.
@@ -126,12 +84,7 @@ class BatchedMesh extends Mesh {
 		// @TODO: Calculate the entire binding box and make frustumCulled true
 		this.frustumCulled = false;
 
-		this._customUniforms = {
-			batchingTexture: { value: null }
-		};
-
 		this._initMatricesTexture();
-		this._initShader();
 
 	}
 
@@ -152,53 +105,6 @@ class BatchedMesh extends Mesh {
 		const matricesTexture = new DataTexture( matricesArray, size, size, RGBAFormat, FloatType );
 
 		this._matricesTexture = matricesTexture;
-		this._customUniforms.batchingTexture.value = this._matricesTexture;
-
-	}
-
-	_initShader() {
-
-		const material = this.material;
-		const currentOnBeforeCompile = material.onBeforeCompile;
-		const customUniforms = this._customUniforms;
-
-		material.onBeforeCompile = function onBeforeCompile( parameters, renderer ) {
-
-			// Is this replacement stable across any materials?
-			parameters.vertexShader = parameters.vertexShader
-				.replace(
-					'#include <skinning_pars_vertex>',
-					'#include <skinning_pars_vertex>\n'
-						+ batchingParsVertex
-				)
-				.replace(
-					'#include <uv_vertex>',
-					'#include <uv_vertex>\n'
-						+ batchingbaseVertex
-				)
-				.replace(
-					'#include <skinnormal_vertex>',
-					'#include <skinnormal_vertex>\n'
-						+ batchingnormalVertex
-				)
-				.replace(
-					'#include <skinning_vertex>',
-					'#include <skinning_vertex>\n'
-						+ batchingVertex
-				);
-
-			for ( const uniformName in customUniforms ) {
-
-				parameters.uniforms[ uniformName ] = customUniforms[ uniformName ];
-
-			}
-
-			currentOnBeforeCompile.call( this, parameters, renderer );
-
-		};
-
-		material.defines = material.defines || {};
-		material.defines.BATCHING = false;
 
 	}
 
@@ -706,13 +612,11 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	onBeforeRender( _renderer, _scene, _camera, _geometry, material/*, _group*/ ) {
-
-		material.defines.BATCHING = true;
+	onBeforeRender( _renderer, _scene, _camera, geometry ) {
 
 		// the indexed version of the multi draw function requires specifying the start
 		// offset in bytes.
-		const index = _geometry.getIndex();
+		const index = geometry.getIndex();
 		const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
 
 		const visible = this._visible;
@@ -739,12 +643,6 @@ class BatchedMesh extends Mesh {
 		// @TODO: Implement frustum culling for each geometry
 
 		// @TODO: Implement geometry sorting for transparent and opaque materials
-
-	}
-
-	onAfterRender( _renderer, _scene, _camera, _geometry, material/*, _group*/ ) {
-
-		material.defines.BATCHING = false;
 
 	}
 
