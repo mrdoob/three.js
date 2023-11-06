@@ -29,6 +29,8 @@ const _frustum = new Frustum();
 const _box = new Box3();
 const _sphere = new Sphere();
 const _vector = new Vector3();
+const _mesh = new Mesh();
+const _batchIntersects = [];
 
 // @TODO: SkinnedMesh support?
 // @TODO: Future work if needed. Move into the core. Can be optimized more with WEBGL_multi_draw.
@@ -694,9 +696,62 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	raycast() {
 
-		console.warn( 'BatchedMesh: Raycast function not implemented.' );
+	raycast( raycaster, intersects ) {
+
+		const visible = this._visible;
+		const active = this._active;
+		const geometryCount = this._geometryCount;
+		const matrixWorld = this.matrixWorld;
+		const batchGeometry = this.geometry;
+
+		// iterate over each geometry
+		_mesh.material = this.material;
+		_mesh.geometry.index = batchGeometry.index;
+		_mesh.geometry.attributes = batchGeometry.attributes;
+		if ( _mesh.geometry.boundingBox === null ) {
+
+			_mesh.geometry.boundingBox = new Box3();
+
+		}
+
+		if ( _mesh.geometry.boundingSphere === null ) {
+
+			_mesh.geometry.boundingSphere = new Sphere();
+
+		}
+
+		for ( let i = 0; i < geometryCount; i ++ ) {
+
+			if ( ! visible[ i ] || ! active[ i ] ) {
+
+				continue;
+
+			}
+
+			// ge the intersects
+			this.getMatrixAt( i, _mesh.matrixWorld ).premultiply( matrixWorld );
+			this.getBoundingBoxAt( i, _mesh.geometry.boundingBox );
+			this.getBoundingSphereAt( i, _mesh.geometry.boundingSphere );
+			_mesh.raycast( raycaster, _batchIntersects );
+
+			// add batch id to the intersects
+			for ( let j = 0, l = _batchIntersects.length; j < l; j ++ ) {
+
+				const intersect = _batchIntersects[ j ];
+				intersect.object = this;
+				intersect.batchId = i;
+				intersects.push( intersect );
+
+			}
+
+			_batchIntersects.length = 0;
+
+		}
+
+		_mesh.material = null;
+		_mesh.geometry.index = null;
+		_mesh.geometry.attributes = {};
 
 	}
 
