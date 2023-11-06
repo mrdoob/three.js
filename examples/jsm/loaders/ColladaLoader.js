@@ -42,12 +42,6 @@ import { TGALoader } from '../loaders/TGALoader.js';
 
 class ColladaLoader extends Loader {
 
-	constructor( manager ) {
-
-		super( manager );
-
-	}
-
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
