@@ -589,12 +589,6 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	toJSON() {
-
-		throw new Error( 'BatchedMesh: toJSON function not implemented.' );
-
-	}
-
 	dispose() {
 
 		// Assuming the geometry is not shared with other meshes
