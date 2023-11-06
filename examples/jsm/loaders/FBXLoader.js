@@ -2648,13 +2648,11 @@ class AnimationParser {
 		const tracks = [];
 
 		let initialPosition = new Vector3();
-		let initialRotation = new Quaternion();
 		let initialScale = new Vector3();
 
-		if ( rawTracks.transform ) rawTracks.transform.decompose( initialPosition, initialRotation, initialScale );
+		if ( rawTracks.transform ) rawTracks.transform.decompose( initialPosition, new Quaternion(), initialScale );
 
 		initialPosition = initialPosition.toArray();
-		initialRotation = new Euler().setFromQuaternion( initialRotation, rawTracks.eulerOrder ).toArray();
 		initialScale = initialScale.toArray();
 
 		if ( rawTracks.T !== undefined && Object.keys( rawTracks.T.curves ).length > 0 ) {
