@@ -719,6 +719,26 @@ class Object3D extends EventDispatcher {
 
 		}
 
+		if ( this.isBatchedMesh ) {
+
+			object.type = 'BatchedMesh';
+			object._drawRanges = this._drawRanges;
+			object._reservedRanges = this._reservedRanges;
+
+			object._visible = this._visible;
+			object._active = this._active;
+
+			object._maxGeometryCount = this._maxGeometryCount;
+			object._maxVertexCount = this._maxVertexCount;
+			object._maxIndexCount = this._maxIndexCount;
+
+			object._geometryInitialized = this._geometryInitialized;
+			object._geometryCount = this._geometryCount;
+
+			object._matricesTexture = this._matricesTexture.toJSON();
+
+		}
+
 		//
 
 		function serialize( library, element ) {
