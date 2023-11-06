@@ -2666,7 +2666,7 @@ class AnimationParser {
 
 		if ( rawTracks.R !== undefined && Object.keys( rawTracks.R.curves ).length > 0 ) {
 
-			const rotationTrack = this.generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, initialRotation, rawTracks.preRotation, rawTracks.postRotation, rawTracks.eulerOrder );
+			const rotationTrack = this.generateRotationTrack( rawTracks.modelName, rawTracks.R.curves, rawTracks.preRotation, rawTracks.postRotation, rawTracks.eulerOrder );
 			if ( rotationTrack !== undefined ) tracks.push( rotationTrack );
 
 		}
@@ -2698,7 +2698,7 @@ class AnimationParser {
 
 	}
 
-	generateRotationTrack( modelName, curves, initialValue, preRotation, postRotation, eulerOrder ) {
+	generateRotationTrack( modelName, curves, preRotation, postRotation, eulerOrder ) {
 
 		let times;
 		let values;
