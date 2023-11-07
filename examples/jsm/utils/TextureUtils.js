@@ -6,7 +6,7 @@ import {
 	PerspectiveCamera,
 	Scene,
 	WebGLRenderer,
-	Texture,
+	CanvasTexture,
 	SRGBColorSpace
 } from 'three';
 
@@ -56,17 +56,28 @@ export function decompress( texture, maxTextureSize = Infinity, renderer = null 
 	const _scene = new Scene();
 	_scene.add( fullscreenQuad );
 
-	if ( ! renderer ) {
+	if ( renderer === null ) {
 
 		renderer = _renderer = new WebGLRenderer( { antialias: false } );
 
 	}
 
-	renderer.setSize( Math.min( texture.image.width, maxTextureSize ), Math.min( texture.image.height, maxTextureSize ) );
+	const width = Math.min( texture.image.width, maxTextureSize );
+	const height = Math.min( texture.image.height, maxTextureSize );
+
+	renderer.setSize( width, height );
 	renderer.clear();
 	renderer.render( _scene, _camera );
 
-	const readableTexture = new Texture( renderer.domElement );
+	const canvas = document.createElement( 'canvas' );
+	const context = canvas.getContext( '2d' );
+
+	canvas.width = width;
+	canvas.height = height;
+
+	context.drawImage( renderer.domElement, 0, 0, width, height );
+
+	const readableTexture = new CanvasTexture( canvas );
 
 	readableTexture.minFilter = texture.minFilter;
 	readableTexture.magFilter = texture.magFilter;
