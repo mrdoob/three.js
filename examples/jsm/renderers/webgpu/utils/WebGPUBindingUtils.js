@@ -91,7 +91,7 @@ class WebGPUBindingUtils {
 
 			} else {
 
-				console.error( 'WebGPUBindingUtils: Unsupported binding "${ binding }".' );
+				console.error( `WebGPUBindingUtils: Unsupported binding "${ binding }".` );
 
 			}
 
@@ -152,7 +152,7 @@ class WebGPUBindingUtils {
 					const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
 
 					const bufferGPU = device.createBuffer( {
-						label: 'bindingBuffer',
+						label: 'bindingBuffer_' + binding.name,
 						size: byteLength,
 						usage: usage
 					} );

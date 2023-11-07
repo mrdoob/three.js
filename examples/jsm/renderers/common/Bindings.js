@@ -16,8 +16,6 @@ class Bindings extends DataMap {
 
 		this.pipelines.bindings = this; // assign bindings to pipelines
 
-		this.updateMap = new WeakMap();
-
 	}
 
 	getForRender( renderObject ) {
@@ -100,24 +98,25 @@ class Bindings extends DataMap {
 
 		const { backend } = this;
 
-		const updateMap = this.updateMap;
-		const callId = this.info.calls;
-
 		let needsBindingsUpdate = false;
 
 		// iterate over all bindings and check if buffer updates or a new binding group is required
 
 		for ( const binding of bindings ) {
 
-			const isUpdated = updateMap.get( binding ) === callId;
+			if ( binding.isNodeUniformsGroup ) {
 
-			if ( isUpdated ) continue;
+				const updated = this.nodes.updateGroup( binding );
+
+				if ( ! updated ) continue;
+
+			}
 
 			if ( binding.isUniformBuffer ) {
 
-				const needsUpdate = binding.update();
+				const updated = binding.update();
 
-				if ( needsUpdate ) {
+				if ( updated ) {
 
 					backend.updateBinding( binding );
 
@@ -127,17 +126,15 @@ class Bindings extends DataMap {
 
 				if ( binding.needsBindingsUpdate ) needsBindingsUpdate = true;
 
-				const needsUpdate = binding.update();
+				const updated = binding.update();
 
-				if ( needsUpdate ) {
+				if ( updated ) {
 
 					this.textures.updateTexture( binding.texture );
 
 				}
 
 			}
-
-			updateMap.set( binding, callId );
 
 		}
 
@@ -148,14 +145,6 @@ class Bindings extends DataMap {
 			this.backend.updateBindings( bindings, pipeline );
 
 		}
-
-	}
-
-	dispose() {
-
-		super.dispose();
-
-		this.updateMap = new WeakMap();
 
 	}
 

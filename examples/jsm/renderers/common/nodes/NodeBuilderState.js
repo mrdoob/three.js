@@ -20,9 +20,17 @@ class NodeBuilderState {
 
 		const bindingsArray = [];
 
-		for ( const binding of this.bindings ) {
+		for ( const instanceBinding of this.bindings ) {
 
-			bindingsArray.push( binding.clone() );
+			let binding = instanceBinding;
+
+			if ( instanceBinding.shared !== true ) {
+
+				binding = instanceBinding.clone();
+
+			}
+
+			bindingsArray.push( binding );
 
 		}
 

@@ -1,4 +1,5 @@
 import InputNode from './InputNode.js';
+import { objectGroup } from './UniformGroupNode.js';
 import { addNodeClass } from './Node.js';
 import { nodeObject, getConstNodeType } from '../shadernode/ShaderNode.js';
 
@@ -9,6 +10,22 @@ class UniformNode extends InputNode {
 		super( value, nodeType );
 
 		this.isUniformNode = true;
+
+		this.groupNode = objectGroup;
+
+	}
+
+	setGroup( group ) {
+
+		this.groupNode = group;
+
+		return this;
+
+	}
+
+	getGroup() {
+
+		return this.groupNode;
 
 	}
 
