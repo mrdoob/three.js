@@ -95,6 +95,9 @@ class BatchedMesh extends Mesh {
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
 
+		this.frustumCulled = false;
+		this.perObjectFrustumCulled = true;
+
 		this._initMatricesTexture();
 
 	}
@@ -154,16 +157,6 @@ class BatchedMesh extends Mesh {
 				? new Uint32Array( maxVertexCount )
 				: new Uint16Array( maxVertexCount );
 			geometry.setAttribute( ID_ATTR_NAME, new BufferAttribute( idArray, 1 ) );
-
-			// Use infinitely large bounds since frustum culling will occur in onBeforeRender
-			const box = new Box3();
-			box.min.setScalar( - Infinity );
-			box.max.setScalar( Infinity );
-			geometry.boundingBox = box;
-
-			const sphere = new Sphere();
-			sphere.radius = Infinity;
-			geometry.boundingSphere = sphere;
 
 			this._geometryInitialized = true;
 			this._multiDrawCounts = new Int32Array( maxGeometryCount );
@@ -744,10 +737,10 @@ class BatchedMesh extends Mesh {
 		const multiDrawStarts = this._multiDrawStarts;
 		const multiDrawCounts = this._multiDrawCounts;
 		const drawRanges = this._drawRanges;
-		const frustumCulled = this.frustumCulled;
+		const perObjectFrustumCulled = this.perObjectFrustumCulled;
 
 		// prepare the frustum
-		if ( frustumCulled ) {
+		if ( perObjectFrustumCulled ) {
 
 			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 			_frustum.setFromProjectionMatrix(
@@ -764,7 +757,7 @@ class BatchedMesh extends Mesh {
 
 				// determine whether the batched geometry is within the frustum
 				let culled = false;
-				if ( frustumCulled ) {
+				if ( perObjectFrustumCulled ) {
 
 					// get the bounds in camera space
 					this.getMatrixAt( i, _matrix ).premultiply( this.matrixWorld );
