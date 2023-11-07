@@ -21,24 +21,24 @@ export function decompress( texture, maxTextureSize = Infinity, renderer = null 
 	if ( ! fullscreenQuadMaterial ) fullscreenQuadMaterial = new ShaderMaterial( {
 		uniforms: { blitTexture: new Uniform( texture ) },
 		vertexShader: `
-            varying vec2 vUv;
-            void main(){
-                vUv = uv;
-                gl_Position = vec4(position.xy * 1.0,0.,.999999);
-            }`,
+			varying vec2 vUv;
+			void main(){
+				vUv = uv;
+				gl_Position = vec4(position.xy * 1.0,0.,.999999);
+			}`,
 		fragmentShader: `
-            uniform sampler2D blitTexture; 
-            varying vec2 vUv;
+			uniform sampler2D blitTexture; 
+			varying vec2 vUv;
 
-            void main(){ 
-                gl_FragColor = vec4(vUv.xy, 0, 1);
-                
-                #ifdef IS_SRGB
-                gl_FragColor = LinearTosRGB( texture2D( blitTexture, vUv) );
-                #else
-                gl_FragColor = texture2D( blitTexture, vUv);
-                #endif
-            }`
+			void main(){ 
+				gl_FragColor = vec4(vUv.xy, 0, 1);
+				
+				#ifdef IS_SRGB
+				gl_FragColor = LinearTosRGB( texture2D( blitTexture, vUv) );
+				#else
+				gl_FragColor = texture2D( blitTexture, vUv);
+				#endif
+			}`
 	} );
 
 	fullscreenQuadMaterial.uniforms.blitTexture.value = texture;
@@ -76,6 +76,7 @@ export function decompress( texture, maxTextureSize = Infinity, renderer = null 
 
 	if ( _renderer ) {
 
+		_renderer.forceContextLoss();
 		_renderer.dispose();
 		_renderer = null;
 
