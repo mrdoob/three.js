@@ -701,17 +701,29 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	copy() {
+	copy( source ) {
 
-		// super.copy( source );
+		super.copy( source );
 
-		throw new Error( 'BatchedMesh: Copy function not implemented.' );
+		this.geometry = source.geometry.clone();
 
-	}
+		this._drawRanges = source._drawRanges.map( range => ( { ...range } ) );
+		this._reservedRanges = source._reservedRanges.map( range => ( { ...range } ) );
 
-	toJSON() {
+		this._visible = source._visible.slice();
+		this._active = source._active.slice();
 
-		throw new Error( 'BatchedMesh: toJSON function not implemented.' );
+		this._maxGeometryCount = source._maxGeometryCount;
+		this._maxVertexCount = source._maxVertexCount;
+		this._maxIndexCount = source._maxIndexCount;
+
+		this._geometryInitialized = source._geometryInitialized;
+		this._geometryCount = source._geometryCount;
+		this._multiDrawCounts = source._multiDrawCounts.slice();
+		this._multiDrawStarts = source._multiDrawStarts.slice();
+
+		this._matricesTexture = source._matricesTexture.clone();
+		this._matricesTexture.image.data = this._matricesTexture.image.slice();
 
 	}
 
