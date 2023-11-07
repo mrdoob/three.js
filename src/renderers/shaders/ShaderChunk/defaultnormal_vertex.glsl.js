@@ -19,7 +19,6 @@ vec3 transformedNormal = objectNormal;
 
 	#ifdef USE_TANGENT
 
-		transformedTangent /= vec3( dot( bm[ 0 ], bm[ 0 ] ), dot( bm[ 1 ], bm[ 1 ] ), dot( bm[ 2 ], bm[ 2 ] ) );
 		transformedTangent = bm * transformedTangent;
 
 	#endif
@@ -37,7 +36,6 @@ vec3 transformedNormal = objectNormal;
 
 	#ifdef USE_TANGENT
 
-		transformedTangent /= vec3( dot( im[ 0 ], im[ 0 ] ), dot( im[ 1 ], im[ 1 ] ), dot( im[ 2 ], im[ 2 ] ) );
 		transformedTangent = im * transformedTangent;
 
 	#endif
