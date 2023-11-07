@@ -722,11 +722,20 @@ class Object3D extends EventDispatcher {
 		if ( this.isBatchedMesh ) {
 
 			object.type = 'BatchedMesh';
+			object.perObjectFrustumCulled = this.perObjectFrustumCulled;
+
 			object.drawRanges = this._drawRanges;
 			object.reservedRanges = this._reservedRanges;
 
 			object.visible = this._visible;
 			object.active = this._active;
+			object.bounds = this._bounds.map( bound => ( {
+				boxInitialized: bound.boxInitialized,
+				box: bound.box.toJSON(),
+
+				sphereInitialized: bound.sphereInitialized,
+				sphere: bound.sphere.toJSON()
+			} ) );
 
 			object.maxGeometryCount = this._maxGeometryCount;
 			object.maxVertexCount = this._maxVertexCount;
