@@ -742,7 +742,9 @@ class BatchedMesh extends Mesh {
 		// prepare the frustum
 		if ( perObjectFrustumCulled ) {
 
-			_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			_projScreenMatrix
+				.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
+				.multiply( this.matrixWorld );
 			_frustum.setFromProjectionMatrix(
 				_projScreenMatrix,
 				_renderer.isWebGPURenderer ? WebGPUCoordinateSystem : WebGLCoordinateSystem
@@ -760,7 +762,7 @@ class BatchedMesh extends Mesh {
 				if ( perObjectFrustumCulled ) {
 
 					// get the bounds in camera space
-					this.getMatrixAt( i, _matrix ).premultiply( this.matrixWorld );
+					this.getMatrixAt( i, _matrix );
 
 					// get the bounds
 					this.getBoundingBoxAt( i, _box ).applyMatrix4( _matrix );
