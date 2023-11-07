@@ -9,7 +9,6 @@ import RenderLists from './RenderLists.js';
 import RenderContexts from './RenderContexts.js';
 import Textures from './Textures.js';
 import Background from './Background.js';
-import UniformGroupNode from '../../nodes/core/UniformGroupNode.js';
 import Nodes from './nodes/Nodes.js';
 import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, Color, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping } from 'three';
 
