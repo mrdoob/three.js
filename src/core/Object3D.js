@@ -731,10 +731,12 @@ class Object3D extends EventDispatcher {
 			object.active = this._active;
 			object.bounds = this._bounds.map( bound => ( {
 				boxInitialized: bound.boxInitialized,
-				box: bound.box.toJSON(),
+				boxMin: bound.box.min.toArray(),
+				boxMax: bound.box.max.toArray(),
 
 				sphereInitialized: bound.sphereInitialized,
-				sphere: bound.sphere.toJSON()
+				sphereRadius: bound.sphere.radius,
+				sphereCenter: bound.sphere.center.toArray()
 			} ) );
 
 			object.maxGeometryCount = this._maxGeometryCount;
