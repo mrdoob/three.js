@@ -74,6 +74,8 @@ class BatchedMesh extends Mesh {
 		super( new BufferGeometry(), material );
 
 		this.isBatchedMesh = true;
+		this.perObjectFrustumCulled = true;
+		this.frustumCulled = false;
 
 		this._drawRanges = [];
 		this._reservedRanges = [];
@@ -94,9 +96,6 @@ class BatchedMesh extends Mesh {
 
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
-
-		this.frustumCulled = false;
-		this.perObjectFrustumCulled = true;
 
 		this._initMatricesTexture();
 
@@ -706,12 +705,20 @@ class BatchedMesh extends Mesh {
 		super.copy( source );
 
 		this.geometry = source.geometry.clone();
+		this.perObjectFrustumCulled = source.perObjectFrustumCulled;
 
 		this._drawRanges = source._drawRanges.map( range => ( { ...range } ) );
 		this._reservedRanges = source._reservedRanges.map( range => ( { ...range } ) );
 
 		this._visible = source._visible.slice();
 		this._active = source._active.slice();
+		this._bounds = source._bounds.map( bound => ( {
+			boxInitialized: bound.boxInitialized,
+			box: bound.box.clone(),
+
+			sphereInitialized: bound.sphereInitialized,
+			sphere: bound.sphere.clone()
+		} ) );
 
 		this._maxGeometryCount = source._maxGeometryCount;
 		this._maxVertexCount = source._maxVertexCount;
