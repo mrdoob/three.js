@@ -1,4 +1,10 @@
 export default /* glsl */`
+#ifdef USE_ENVMAP
+
+	float envMapIntensityFactor = envMapIntensity;
+
+#endif
+
 #if defined( RE_IndirectDiffuse )
 
 	#ifdef USE_LIGHTMAP
@@ -12,7 +18,7 @@ export default /* glsl */`
 
 	#if defined( USE_ENVMAP ) && defined( STANDARD ) && defined( ENVMAP_TYPE_CUBE_UV )
 
-		iblIrradiance += getIBLIrradiance( geometryNormal );
+		iblIrradiance += getIBLIrradiance( geometryNormal ) * envMapIntensityFactor;
 
 	#endif
 
@@ -22,17 +28,17 @@ export default /* glsl */`
 
 	#ifdef USE_ANISOTROPY
 
-		radiance += getIBLAnisotropyRadiance( geometryViewDir, geometryNormal, material.roughness, material.anisotropyB, material.anisotropy );
+		radiance += getIBLAnisotropyRadiance( geometryViewDir, geometryNormal, material.roughness, material.anisotropyB, material.anisotropy ) * envMapIntensityFactor;
 
 	#else
 
-		radiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness );
+		radiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness ) * envMapIntensityFactor;
 
 	#endif
 
 	#ifdef USE_CLEARCOAT
 
-		clearcoatRadiance += getIBLRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness );
+		clearcoatRadiance += getIBLRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness ) * envMapIntensityFactor;
 
 	#endif
 

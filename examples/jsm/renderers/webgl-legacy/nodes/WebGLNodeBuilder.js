@@ -46,7 +46,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 		this.slots = { vertex: [], fragment: [] };
 
 		this._parseShaderLib();
-		this._parseInclude( 'fragment', 'lights_physical_fragment', 'clearcoat_normal_fragment_begin', 'transmission_fragment' );
+		this._parseInclude( 'fragment', 'lights_physical_fragment', 'clearcoat_normal_fragment_begin', 'transmission_fragment', 'lights_fragment_maps' );
 		this._parseObject();
 
 		this._sortSlotsToFlow();
@@ -163,6 +163,17 @@ class WebGLNodeBuilder extends NodeBuilder {
 				source: getIncludeSnippet( 'emissivemap_fragment' ),
 				target: 'totalEmissiveRadiance = %RESULT%;',
 				inclusionType: 'append'
+			} ) );
+
+		}
+
+		if ( material.envMapIntensityNode && material.envMapIntensityNode.isNode ) {
+
+			this.addSlot( 'fragment', new SlotNode( {
+				node: material.envMapIntensityNode,
+				nodeType: 'float',
+				source: 'float envMapIntensityFactor = envMapIntensity;',
+				target: 'float envMapIntensityFactor = %RESULT%;'
 			} ) );
 
 		}
