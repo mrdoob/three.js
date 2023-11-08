@@ -105,7 +105,7 @@ class WebGLAttributeUtils {
 		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
 		const bufferData = backend.get( bufferAttribute );
 		const bufferType = bufferData.bufferType;
-		const updateRanges = attribute.updateRanges;
+		const updateRanges = attribute.isInterleavedBufferAttribute ? attribute.data.updateRanges : attribute.updateRanges;
 
 		gl.bindBuffer( bufferType, bufferData.bufferGPU );
 
