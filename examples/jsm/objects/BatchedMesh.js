@@ -757,6 +757,8 @@ class BatchedMesh extends Mesh {
 
 		this.geometry = source.geometry.clone();
 		this.perObjectFrustumCulled = source.perObjectFrustumCulled;
+		this.boundingBox = source.boundingBox !== null ? source.boundingBox.clone() : null;
+		this.boundingSphere = source.boundingSphere !== null ? source.boundingSphere.clone() : null;
 
 		this._drawRanges = source._drawRanges.map( range => ( { ...range } ) );
 		this._reservedRanges = source._reservedRanges.map( range => ( { ...range } ) );
