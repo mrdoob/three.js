@@ -196,10 +196,10 @@ class Renderer {
 
 		//
 
-		nodeFrame.renderId ++;
-
 		this.info.calls ++;
 		this.info.render.calls ++;
+
+		nodeFrame.renderId = this.info.calls;
 
 		//
 
@@ -660,10 +660,16 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
+		const nodeFrame = this._nodes.nodeFrame;
+
+		const previousRenderId = nodeFrame.renderId;
+
 		//
 
 		this.info.calls ++;
 		this.info.compute.calls ++;
+
+		nodeFrame.renderId = this.info.calls;
 
 		//
 
@@ -716,6 +722,10 @@ class Renderer {
 		}
 
 		backend.finishCompute( computeNodes );
+
+		//
+
+		nodeFrame.renderId = previousRenderId;
 
 	}
 

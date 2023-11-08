@@ -1,7 +1,8 @@
 import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial, FunctionNode } from '../../../nodes/Nodes.js';
 
 import UniformBuffer from '../../common/UniformBuffer.js';
-import UniformsGroup from '../../common/UniformsGroup.js';
+import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
+
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
 const glslMethods = {
@@ -25,7 +26,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 		super( object, renderer, new GLSLNodeParser(), scene );
 
-		this.uniformsGroup = {};
+		this.uniformGroups = {};
 
 	}
 
@@ -138,7 +139,7 @@ ${ flowData.code }
 		const uniforms = this.uniforms[ shaderStage ];
 
 		const bindingSnippets = [];
-		const groupSnippets = [];
+		const uniformGroups = {};
 
 		for ( const uniform of uniforms ) {
 
@@ -192,6 +193,9 @@ ${ flowData.code }
 
 				snippet = '\t' + snippet;
 
+				const groupName = uniform.groupNode.name;
+				const groupSnippets = uniformGroups[ groupName ] || ( uniformGroups[ groupName ] = [] );
+
 				groupSnippets.push( snippet );
 
 			} else {
@@ -206,9 +210,11 @@ ${ flowData.code }
 
 		let output = '';
 
-		if ( groupSnippets.length > 0 ) {
+		for ( const name in uniformGroups ) {
 
-			output += this._getGLSLUniformStruct( shaderStage + 'NodeUniforms', groupSnippets.join( '\n' ) ) + '\n';
+			const groupSnippets = uniformGroups[ name ];
+
+			output += this._getGLSLUniformStruct( shaderStage + '_' + name, groupSnippets.join( '\n' ) ) + '\n';
 
 		}
 
@@ -551,14 +557,19 @@ void main() {
 
 			} else {
 
-				let uniformsGroup = this.uniformsGroup[ shaderStage ];
+				const group = node.groupNode;
+				const groupName = group.name;
+
+				const uniformsStage = this.uniformGroups[ shaderStage ] || ( this.uniformGroups[ shaderStage ] = {} );
+
+				let uniformsGroup = uniformsStage[ groupName ];
 
 				if ( uniformsGroup === undefined ) {
 
-					uniformsGroup = new UniformsGroup( shaderStage + 'NodeUniforms' );
+					uniformsGroup = new NodeUniformsGroup( shaderStage + '_' + groupName, group );
 					//uniformsGroup.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
-					this.uniformsGroup[ shaderStage ] = uniformsGroup;
+					uniformsStage[ groupName ] = uniformsGroup;
 
 					this.bindings[ shaderStage ].push( uniformsGroup );
 
