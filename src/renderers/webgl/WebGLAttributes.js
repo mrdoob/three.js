@@ -84,17 +84,43 @@ function WebGLAttributes( gl, capabilities ) {
 	function updateBuffer( buffer, attribute, bufferType ) {
 
 		const array = attribute.array;
-		const updateRange = attribute.updateRange;
+		const updateRange = attribute._updateRange; // deprecated
+		const updateRanges = attribute.updateRanges;
 
 		gl.bindBuffer( bufferType, buffer );
 
-		if ( updateRange.count === - 1 ) {
+		if ( updateRange.count === - 1 && updateRanges.length === 0 ) {
 
 			// Not using update ranges
-
 			gl.bufferSubData( bufferType, 0, array );
 
-		} else {
+		}
+
+		if ( updateRanges.length !== 0 ) {
+
+			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
+
+				const range = updateRanges[ i ];
+				if ( isWebGL2 ) {
+
+					gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
+						array, range.start, range.count );
+
+				} else {
+
+					gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
+						array.subarray( range.start, range.start + range.count ) );
+
+				}
+
+			}
+
+			attribute.clearUpdateRanges();
+
+		}
+
+		// deprecated
+		if ( updateRange.count !== - 1 ) {
 
 			if ( isWebGL2 ) {
 
