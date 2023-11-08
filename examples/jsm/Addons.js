@@ -60,6 +60,7 @@ export * from './helpers/LightProbeHelper.js';
 export * from './helpers/OctreeHelper.js';
 export * from './helpers/PositionalAudioHelper.js';
 export * from './helpers/RectAreaLightHelper.js';
+export * from './helpers/TextureHelper.js';
 export * from './helpers/VertexNormalsHelper.js';
 export * from './helpers/VertexTangentsHelper.js';
 export * from './helpers/ViewHelper.js';
