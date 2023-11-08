@@ -28,11 +28,21 @@ class AnalyticLightNode extends LightingNode {
 		this.shadowNode = null;
 
 		this.color = new Color();
-		this.colorNode = uniform( this.color );
+		this._defaultColorNode = uniform( this.color );
+
+		this.colorNode = this._defaultColorNode;
+
+		this.isAnalyticLightNode = true;
 
 	}
 
-	getHash( /*builder*/ ) {
+	getCacheKey() {
+
+		return super.getCacheKey() + '-' + ( this.light.id + '-' + ( this.light.castShadow ? '1' : '0' ) );
+
+	}
+
+	getHash() {
 
 		return this.light.uuid;
 
@@ -148,6 +158,7 @@ class AnalyticLightNode extends LightingNode {
 	setup( builder ) {
 
 		if ( this.light.castShadow ) this.setupShadow( builder );
+		else if ( this.shadowNode !== null ) this.disposeShadow();
 
 	}
 
@@ -155,6 +166,8 @@ class AnalyticLightNode extends LightingNode {
 
 		const { rtt, light } = this;
 		const { renderer, scene } = frame;
+
+		const currentOverrideMaterial = scene.overrideMaterial;
 
 		scene.overrideMaterial = depthMaterial;
 
@@ -182,7 +195,18 @@ class AnalyticLightNode extends LightingNode {
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setRenderObjectFunction( currentRenderObjectFunction );
 
-		scene.overrideMaterial = null;
+		scene.overrideMaterial = currentOverrideMaterial;
+
+	}
+
+	disposeShadow() {
+
+		this.rtt.dispose();
+
+		this.shadowNode = null;
+		this.rtt = null;
+
+		this.colorNode = this._defaultColorNode;
 
 	}
 
