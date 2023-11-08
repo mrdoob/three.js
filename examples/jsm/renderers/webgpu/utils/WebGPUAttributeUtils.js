@@ -94,7 +94,7 @@ class WebGPUAttributeUtils {
 					buffer,
 					0,
 					array,
-					range.offset * array.BYTES_PER_ELEMENT,
+					range.start * array.BYTES_PER_ELEMENT,
 					range.count * array.BYTES_PER_ELEMENT
 				);
 
