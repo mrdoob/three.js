@@ -3106,8 +3106,8 @@ class SVGLoader extends Loader {
 
 						} else {
 
-							tempV2_3.toArray( vertices, vl - 2 * 3 );
-							tempV2_4.toArray( vertices, vl - 1 * 3 );
+							tempV2_4.toArray( vertices, vl - 2 * 3 );
+							tempV2_3.toArray( vertices, vl - 1 * 3 );
 							tempV2_4.toArray( vertices, vl - 4 * 3 );
 
 						}
