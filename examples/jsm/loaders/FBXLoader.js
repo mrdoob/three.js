@@ -2978,6 +2978,13 @@ class AnimationParser {
 
 		const times = [];
 		const values = [];
+
+		// Add first frame
+		times.push( curvex.times[ 0 ] );
+		values.push( MathUtils.degToRad( curvex.values[ 0 ] ) );
+		values.push( MathUtils.degToRad( curvey.values[ 0 ] ) );
+		values.push( MathUtils.degToRad( curvez.values[ 0 ] ) );
+
 		for ( let i = 1; i < curvex.values.length; i ++ ) {
 
 			const initialValue = [

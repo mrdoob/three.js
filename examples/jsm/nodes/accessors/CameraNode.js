@@ -1,13 +1,21 @@
 import Object3DNode from './Object3DNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { label } from '../core/ContextNode.js';
+import { NodeUpdateType } from '../core/constants.js';
+//import { sharedUniformGroup } from '../core/UniformGroupNode.js';
 import { nodeImmutable } from '../shadernode/ShaderNode.js';
+
+//const cameraGroup = sharedUniformGroup( 'camera' );
 
 class CameraNode extends Object3DNode {
 
 	constructor( scope = CameraNode.POSITION ) {
 
 		super( scope );
+
+		this.updateType = NodeUpdateType.RENDER;
+
+		//this._uniformNode.groupNode = cameraGroup;
 
 	}
 
@@ -34,6 +42,8 @@ class CameraNode extends Object3DNode {
 		const camera = frame.camera;
 		const uniformNode = this._uniformNode;
 		const scope = this.scope;
+
+		//cameraGroup.needsUpdate = true;
 
 		if ( scope === CameraNode.VIEW_MATRIX ) {
 
