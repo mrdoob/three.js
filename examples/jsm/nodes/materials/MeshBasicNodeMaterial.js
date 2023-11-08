@@ -13,6 +13,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 		this.isMeshBasicNodeMaterial = true;
 
 		this.lights = false;
+		//this.normals = false; @TODO: normals usage by context
 
 		this.setDefaultValues( defaultValues );
 

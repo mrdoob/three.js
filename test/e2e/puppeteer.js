@@ -122,11 +122,14 @@ const exceptionList = [
 	'webgpu_materials',
 	'webgpu_materials_video',
 	'webgpu_sandbox',
-	'webgpu_shadertoy',
 	'webgpu_sprites',
+	'webgpu_video_panorama',
+
+	// WebGPURenderer: Unknown problem
+	'webgpu_particles',
+	'webgpu_shadertoy',
 	'webgpu_tsl_editor',
-	'webgpu_tsl_transpiler',
-	'webgpu_video_panorama'
+	'webgpu_tsl_transpiler'
 
 ];
 

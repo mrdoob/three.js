@@ -1,5 +1,6 @@
 export const vertex = /* glsl */`
 #include <common>
+#include <batching_pars_vertex>
 #include <fog_pars_vertex>
 #include <morphtarget_pars_vertex>
 #include <skinning_pars_vertex>
