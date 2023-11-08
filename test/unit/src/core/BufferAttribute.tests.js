@@ -304,7 +304,6 @@ export default QUnit.module( 'Core', () => {
 				normalized: true,
 				name: 'attributeName',
 				usage: DynamicDrawUsage,
-				updateRanges: [ { offset: 1, count: 2 } ]
 			}, 'Serialized to JSON as expected with non-default values' );
 
 		} );
