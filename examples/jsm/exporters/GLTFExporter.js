@@ -2796,7 +2796,7 @@ class GLTFMaterialsSpecularExtension {
 
 		if ( ! material.isMeshPhysicalMaterial || ( material.specularIntensity === 1.0 &&
 		       material.specularColor.equals( DEFAULT_SPECULAR_COLOR ) &&
-		     ! material.specularIntensityMap && ! material.specularColorTexture ) ) return;
+		     ! material.specularIntensityMap && ! material.specularColorMap ) ) return;
 
 		const writer = this.writer;
 		const extensionsUsed = writer.extensionsUsed;
