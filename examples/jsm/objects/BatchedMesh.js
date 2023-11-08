@@ -700,6 +700,7 @@ class BatchedMesh extends Mesh {
 
 		const visible = this._visible;
 		const active = this._active;
+		const drawRanges = this._drawRanges;
 		const geometryCount = this._geometryCount;
 		const matrixWorld = this.matrixWorld;
 		const batchGeometry = this.geometry;
@@ -728,6 +729,9 @@ class BatchedMesh extends Mesh {
 
 			}
 
+			const drawRange = drawRanges[ i ];
+			_mesh.geometry.setDrawRange( drawRange.start, drawRange.count );
+
 			// ge the intersects
 			this.getMatrixAt( i, _mesh.matrixWorld ).premultiply( matrixWorld );
 			this.getBoundingBoxAt( i, _mesh.geometry.boundingBox );
@@ -751,6 +755,7 @@ class BatchedMesh extends Mesh {
 		_mesh.material = null;
 		_mesh.geometry.index = null;
 		_mesh.geometry.attributes = {};
+		_mesh.geometry.setDrawRange( 0, Infinity );
 
 	}
 
