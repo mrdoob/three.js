@@ -105,9 +105,30 @@ class WebGLAttributeUtils {
 		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
 		const bufferData = backend.get( bufferAttribute );
 		const bufferType = bufferData.bufferType;
+		const updateRanges = attribute.updateRanges;
 
 		gl.bindBuffer( bufferType, bufferData.bufferGPU );
-		gl.bufferSubData( bufferType, 0, array );
+
+		if ( updateRanges.length === 0 ) {
+
+			// Not using update ranges
+
+			gl.bufferSubData( bufferType, 0, array );
+
+		} else {
+
+			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
+
+				const range = updateRanges[ i ];
+				gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
+					array, range.start, range.count );
+
+			}
+
+			bufferAttribute.clearUpdateRanges();
+
+		}
+
 		gl.bindBuffer( bufferType, null );
 
 		bufferData.version = bufferAttribute.version;
