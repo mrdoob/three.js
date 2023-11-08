@@ -175,6 +175,7 @@
 			const euler = new THREE.Euler();
 			const matrix = new THREE.Matrix4();
 			mesh = new BatchedMesh( geometryCount, vertexCount, indexCount, createMaterial() );
+			mesh.frustumCulled = false;
 			mesh.userData.rotationSpeeds = [];
 			ids.length = 0;
 
