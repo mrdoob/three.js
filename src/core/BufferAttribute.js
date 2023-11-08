@@ -380,8 +380,6 @@ class BufferAttribute {
 
 		if ( this.name !== '' ) data.name = this.name;
 		if ( this.usage !== StaticDrawUsage ) data.usage = this.usage;
-		if ( this._updateRange.offset !== 0 || this._updateRange.count !== - 1 ) data.updateRange = this._updateRange;
-		if ( this.updateRanges.length !== 0 ) data.updateRanges = this.updateRanges;
 
 		return data;
 
