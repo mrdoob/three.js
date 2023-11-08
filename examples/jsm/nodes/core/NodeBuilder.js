@@ -22,6 +22,9 @@ import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
+import ChainMap from '../../renderers/common/ChainMap.js';
+
+const uniformsGroupCache = new ChainMap();
 
 const typeFromLength = new Map( [
 	[ 2, 'vec2' ],
@@ -128,6 +131,41 @@ class NodeBuilder {
 
 	}
 
+	_getSharedBindings( bindings ) {
+
+		const shared = [];
+
+		for ( const binding of bindings ) {
+
+			if ( binding.shared === true ) {
+
+				// nodes is the chainmap key
+				const nodes = binding.getNodes();
+
+				let sharedBinding = uniformsGroupCache.get( nodes );
+
+				if ( sharedBinding === undefined ) {
+
+					uniformsGroupCache.set( nodes, binding );
+
+					sharedBinding = binding;
+
+				}
+
+				shared.push( sharedBinding );
+
+			} else {
+
+				shared.push( binding );
+
+			}
+
+		}
+
+		return shared;
+
+	}
+
 	getBindings() {
 
 		let bindingsArray = this.bindingsArray;
@@ -136,7 +174,7 @@ class NodeBuilder {
 
 			const bindings = this.bindings;
 
-			this.bindingsArray = bindingsArray = ( this.material !== null ) ? [ ...bindings.vertex, ...bindings.fragment ] : bindings.compute;
+			this.bindingsArray = bindingsArray = this._getSharedBindings( ( this.material !== null ) ? [ ...bindings.vertex, ...bindings.fragment ] : bindings.compute );
 
 		}
 
