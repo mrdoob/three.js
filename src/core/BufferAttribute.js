@@ -58,9 +58,9 @@ class BufferAttribute {
 
 	}
 
-	addUpdateRange( offset, count ) {
+	addUpdateRange( start, count ) {
 
-		this.updateRanges.push( { offset, count } );
+		this.updateRanges.push( { start, count } );
 
 	}
 

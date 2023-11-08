@@ -103,13 +103,13 @@ function WebGLAttributes( gl, capabilities ) {
 				const range = updateRanges[ i ];
 				if ( isWebGL2 ) {
 
-					gl.bufferSubData( bufferType, range.offset * array.BYTES_PER_ELEMENT,
-						array, range.offset, range.count );
+					gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
+						array, range.start, range.count );
 
 				} else {
 
-					gl.bufferSubData( bufferType, range.offset * array.BYTES_PER_ELEMENT,
-						array.subarray( range.offset, range.offset + range.count ) );
+					gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
+						array.subarray( range.start, range.start + range.count ) );
 
 				}
 
