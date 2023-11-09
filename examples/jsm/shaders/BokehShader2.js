@@ -11,6 +11,8 @@ import {
  */
 const BokehShader = {
 
+	name: 'BokehShader',
+
 	uniforms: {
 
 		'textureWidth': { value: 1.0 },
@@ -353,6 +355,8 @@ const BokehShader = {
 };
 
 const BokehDepthShader = {
+
+	name: 'BokehDepthShader',
 
 	uniforms: {
 

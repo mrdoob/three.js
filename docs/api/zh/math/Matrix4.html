@@ -152,43 +152,45 @@ m.elements = [ 11, 21, 31, 41,
 		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
 		<p>
 			将矩阵的基向量[link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis]提取到指定的3个轴向量中。
-			如果矩阵如下：<br /><br />
+			如果矩阵如下：
+		</p>
 
-			<math>
-				<mrow>
-					<mo>[</mo>
-					<mtable>
-						<mtr>
-							<mtd><mi>a</mi></mtd>
-							<mtd><mi>b</mi></mtd>
-							<mtd><mi>c</mi></mtd>
-							<mtd><mi>d</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>e</mi></mtd>
-							<mtd><mi>f</mi></mtd>
-							<mtd><mi>g</mi></mtd>
-							<mtd><mi>h</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>i</mi></mtd>
-							<mtd><mi>j</mi></mtd>
-							<mtd><mi>k</mi></mtd>
-							<mtd><mi>l</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>m</mi></mtd>
-							<mtd><mi>n</mi></mtd>
-							<mtd><mi>o</mi></mtd>
-							<mtd><mi>p</mi></mtd>
-						</mtr>
-					</mtable>
-					<mo>]</mo>
-				</mrow>
-			</math><br /><br />
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>a</mi></mtd>
+						<mtd><mi>b</mi></mtd>
+						<mtd><mi>c</mi></mtd>
+						<mtd><mi>d</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>e</mi></mtd>
+						<mtd><mi>f</mi></mtd>
+						<mtd><mi>g</mi></mtd>
+						<mtd><mi>h</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>i</mi></mtd>
+						<mtd><mi>j</mi></mtd>
+						<mtd><mi>k</mi></mtd>
+						<mtd><mi>l</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>m</mi></mtd>
+						<mtd><mi>n</mi></mtd>
+						<mtd><mi>o</mi></mtd>
+						<mtd><mi>p</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
-			然后x轴y轴z轴被设为：<br /><br />
+		<p>然后x轴y轴z轴被设为：</p>
 
+		<div style="text-align: center">
 			<math>
 				<mrow>
 					<mi>xAxis</mi>
@@ -230,7 +232,7 @@ m.elements = [ 11, 21, 31, 41,
 					<mo>]</mo>
 				</mrow>
 			</math>
-		</p>
+		</div>
 
 		<h3>[method:this extractRotation]( [param:Matrix4 m] )</h3>
 		<p>
@@ -273,41 +275,41 @@ m.elements = [ 11, 21, 31, 41,
 
 		<h3>[method:this makeBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
 		<p>
-			通过给定的三个向量设置该矩阵为基矩阵[link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis]：<br /><br />
-
-			<math>
-				<mrow>
-					<mo>[</mo>
-					<mtable>
-						<mtr>
-							<mtd><mi>xAxis.x</mi></mtd>
-							<mtd><mi>yAxis.x</mi></mtd>
-							<mtd><mi>zAxis.x</mi></mtd>
-							<mtd><mn>0</mn></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>xAxis.y</mi></mtd>
-							<mtd><mi>yAxis.y</mi></mtd>
-							<mtd><mi>zAxis.y</mi></mtd>
-							<mtd><mn>0</mn></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>xAxis.z</mi></mtd>
-							<mtd><mi>yAxis.z</mi></mtd>
-							<mtd><mi>zAxis.z</mi></mtd>
-							<mtd><mn>0</mn></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>1</mn></mtd>
-						</mtr>
-					</mtable>
-					<mo>]</mo>
-				</mrow>
-			</math>
+			通过给定的三个向量设置该矩阵为基矩阵[link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis]：
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>xAxis.x</mi></mtd>
+						<mtd><mi>yAxis.x</mi></mtd>
+						<mtd><mi>zAxis.x</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>xAxis.y</mi></mtd>
+						<mtd><mi>yAxis.y</mi></mtd>
+						<mtd><mi>zAxis.y</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>xAxis.z</mi></mtd>
+						<mtd><mi>yAxis.z</mi></mtd>
+						<mtd><mi>zAxis.z</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this makePerspective]( [param:Float left], [param:Float right], [param:Float top], [param:Float bottom], [param:Float near], [param:Float far] )</h3>
 		<p>
@@ -331,9 +333,10 @@ m.elements = [ 11, 21, 31, 41,
 		<h3>[method:this makeRotationFromQuaternion]( [param:Quaternion q] )</h3>
 		<p>
 		将这个矩阵的旋转分量设置为四元数[page:Quaternion q]指定的旋转，如下链接所诉[link:https://en.wikipedia.org/wiki/Rotation_matrix#Quaternion here]。
-		矩阵的其余部分被设为单位矩阵。因此，给定四元数[page:Quaternion q] = w + xi + yj + zk，得到的矩阵为:<br /><br />
+		矩阵的其余部分被设为单位矩阵。因此，给定四元数[page:Quaternion q] = w + xi + yj + zk，得到的矩阵为:
+		</p>
 
-		<math>
+		<math display="block">
 			<mrow>
 				<mo>[</mo>
 				<mtable>
@@ -461,16 +464,16 @@ m.elements = [ 11, 21, 31, 41,
 				<mo>]</mo>
 			</mrow>
 		</math>
-		</p>
 
 		<h3>[method:this makeRotationX]( [param:Float theta] )</h3>
 		<p>
 		[page:Float theta] — Rotation angle in radians.<br /><br />
 
 		把该矩阵设置为绕x轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
-		结果如下：<br /><br />
+		结果如下：
+		</p>
 
-		<math>
+		<math display="block">
 			<mrow>
 				<mo>[</mo>
 				<mtable>
@@ -523,16 +526,16 @@ m.elements = [ 11, 21, 31, 41,
 				<mo>]</mo>
 			</mrow>
 		</math>
-		</p>
 
 		<h3>[method:this makeRotationY]( [param:Float theta] )</h3>
 		<p>
 		[page:Float theta] — Rotation angle in radians.<br /><br />
 
 		把该矩阵设置为绕Y轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
-		结果如下：<br /><br />
+		结果如下：
+		</p>
 
-		<math>
+		<math display="block">
 			<mrow>
 				<mo>[</mo>
 				<mtable>
@@ -585,16 +588,16 @@ m.elements = [ 11, 21, 31, 41,
 				<mo>]</mo>
 			</mrow>
 		</math>
-		</p>
 
 		<h3>[method:this makeRotationZ]( [param:Float theta] )</h3>
 		<p>
 		[page:Float theta] — Rotation angle in radians.<br /><br />
 
 		把该矩阵设置为绕z轴旋转弧度[page:Float theta] (&theta;)大小的矩阵。
-		结果如下：<br /><br />
-			
-		<math>
+		结果如下：
+		</p>
+
+		<math display="block">
 			<mrow>
 				<mo>[</mo>
 				<mtable>
@@ -647,7 +650,6 @@ m.elements = [ 11, 21, 31, 41,
 				<mo>]</mo>
 			</mrow>
 		</math>
-		</p>
 
 		<h3>[method:this makeScale]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
@@ -655,41 +657,41 @@ m.elements = [ 11, 21, 31, 41,
 			[page:Float y] - 在Y轴方向的缩放比。<br />
 			[page:Float z] - 在Z轴方向的缩放比。<br /><br />
 
-			将这个矩阵设置为缩放变换:<br /><br />
-
-			<math>
-				<mrow>
-					<mo>[</mo>
-					<mtable>
-						<mtr>
-							<mtd><mi>x</mi></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mi>y</mi></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mi>z</mi></mtd>
-							<mtd><mn>0</mn></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>1</mn></mtd>
-						</mtr>
-					</mtable>
-					<mo>]</mo>
-				</mrow>
-			</math>
+			将这个矩阵设置为缩放变换:
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>x</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>z</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this makeShear]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
@@ -697,9 +699,10 @@ m.elements = [ 11, 21, 31, 41,
 		[page:Float y] - 在Y轴上剪切的量。<br />
 		[page:Float z] - 在Z轴上剪切的量。<br /><br />
 
-		将此矩阵设置为剪切变换:<br /><br />
+		将此矩阵设置为剪切变换:
+		</p>
 
-		<math>
+		<math display="block">
 			<mrow>
 				<mo>[</mo>
 				<mtable>
@@ -731,16 +734,16 @@ m.elements = [ 11, 21, 31, 41,
 				<mo>]</mo>
 			</mrow>
 		</math>
-		</p>
 
 		<h3>[method:this makeTranslation]( [param:Vector3 v] )</h3>
 		<h3>
 			[method:this makeTranslation]( [param:Float x], [param:Float y], [param:Float z] ) // optional API
 		</h3>
 		<p>
-		取传入参数[param:Vector3 v]中值设设置该矩阵为平移变换：<br /><br />
+		取传入参数[param:Vector3 v]中值设设置该矩阵为平移变换：
+		</p>
 
-		<math>
+		<math display="block">
 			<mrow>
 				<mo>[</mo>
 				<mtable>
@@ -772,7 +775,6 @@ m.elements = [ 11, 21, 31, 41,
 				<mo>]</mo>
 			</mrow>
 		</math>
-		</p>
 
 		<h3>[method:this multiply]( [param:Matrix4 m] )</h3>
 		<p>将当前矩阵乘以矩阵[page:Matrix4 m]。</p>
@@ -800,76 +802,76 @@ m.elements = [ 11, 21, 31, 41,
 		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
 		<h3>[method:this setPosition]( [param:Float x], [param:Float y], [param:Float z] ) // optional API</h3>
 		<p>
-			取传入参数[param:Vector3 v]中值设置该矩阵的位置分量，不影响该矩阵的其余部分——即，如果该矩阵当前为:<br /><br />
-
-			<math>
-				<mrow>
-					<mo>[</mo>
-					<mtable>
-						<mtr>
-							<mtd><mi>a</mi></mtd>
-							<mtd><mi>b</mi></mtd>
-							<mtd><mi>c</mi></mtd>
-							<mtd><mi>d</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>e</mi></mtd>
-							<mtd><mi>f</mi></mtd>
-							<mtd><mi>g</mi></mtd>
-							<mtd><mi>h</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>i</mi></mtd>
-							<mtd><mi>j</mi></mtd>
-							<mtd><mi>k</mi></mtd>
-							<mtd><mi>l</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>m</mi></mtd>
-							<mtd><mi>n</mi></mtd>
-							<mtd><mi>o</mi></mtd>
-							<mtd><mi>p</mi></mtd>
-						</mtr>
-					</mtable>
-					<mo>]</mo>
-				</mrow>
-			</math><br /><br />
-
-			变成:<br /><br />
-
-			<math>
-				<mrow>
-					<mo>[</mo>
-					<mtable>
-						<mtr>
-							<mtd><mi>a</mi></mtd>
-							<mtd><mi>b</mi></mtd>
-							<mtd><mi>c</mi></mtd>
-							<mtd><mi>v.x</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>e</mi></mtd>
-							<mtd><mi>f</mi></mtd>
-							<mtd><mi>g</mi></mtd>
-							<mtd><mi>v.y</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>i</mi></mtd>
-							<mtd><mi>j</mi></mtd>
-							<mtd><mi>k</mi></mtd>
-							<mtd><mi>v.z</mi></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mi>m</mi></mtd>
-							<mtd><mi>n</mi></mtd>
-							<mtd><mi>o</mi></mtd>
-							<mtd><mi>p</mi></mtd>
-						</mtr>
-					</mtable>
-					<mo>]</mo>
-				</mrow>
-			</math>
+			取传入参数[param:Vector3 v]中值设置该矩阵的位置分量，不影响该矩阵的其余部分——即，如果该矩阵当前为:
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>a</mi></mtd>
+						<mtd><mi>b</mi></mtd>
+						<mtd><mi>c</mi></mtd>
+						<mtd><mi>d</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>e</mi></mtd>
+						<mtd><mi>f</mi></mtd>
+						<mtd><mi>g</mi></mtd>
+						<mtd><mi>h</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>i</mi></mtd>
+						<mtd><mi>j</mi></mtd>
+						<mtd><mi>k</mi></mtd>
+						<mtd><mi>l</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>m</mi></mtd>
+						<mtd><mi>n</mi></mtd>
+						<mtd><mi>o</mi></mtd>
+						<mtd><mi>p</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+
+		<p>变成:</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>a</mi></mtd>
+						<mtd><mi>b</mi></mtd>
+						<mtd><mi>c</mi></mtd>
+						<mtd><mi>v.x</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>e</mi></mtd>
+						<mtd><mi>f</mi></mtd>
+						<mtd><mi>g</mi></mtd>
+						<mtd><mi>v.y</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>i</mi></mtd>
+						<mtd><mi>j</mi></mtd>
+						<mtd><mi>k</mi></mtd>
+						<mtd><mi>v.z</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>m</mi></mtd>
+						<mtd><mi>n</mi></mtd>
+						<mtd><mi>o</mi></mtd>
+						<mtd><mi>p</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>

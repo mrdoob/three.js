@@ -9,15 +9,15 @@ import {
 
 const _vector = new Vector3();
 
-class FatPointsGeometry extends InstancedBufferGeometry {
+class InstancedPointsGeometry extends InstancedBufferGeometry {
 
 	constructor() {
 
 		super();
 
-		this.isFatPointsGeometry = true;
+		this.isInstancedPointsGeometry = true;
 
-		this.type = 'FatPointsGeometry';
+		this.type = 'InstancedPointsGeometry';
 
 		const positions = [ - 1, 1, 0, 1, 1, 0, - 1, - 1, 0, 1, - 1, 0 ];
 		const uvs = [ - 1, 1, 1, 1, - 1, - 1, 1, - 1 ];
@@ -155,7 +155,7 @@ class FatPointsGeometry extends InstancedBufferGeometry {
 
 			if ( isNaN( this.boundingSphere.radius ) ) {
 
-				console.error( 'THREE.FatPointsGeometry.computeBoundingSphere(): Computed radius is NaN. The instanced position data is likely to have NaN values.', this );
+				console.error( 'THREE.InstancedPointsGeometry.computeBoundingSphere(): Computed radius is NaN. The instanced position data is likely to have NaN values.', this );
 
 			}
 
@@ -171,4 +171,4 @@ class FatPointsGeometry extends InstancedBufferGeometry {
 
 }
 
-export { FatPointsGeometry };
+export default InstancedPointsGeometry;

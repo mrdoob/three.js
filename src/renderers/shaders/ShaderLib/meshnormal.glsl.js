@@ -8,6 +8,7 @@ export const vertex = /* glsl */`
 #endif
 
 #include <common>
+#include <batching_pars_vertex>
 #include <uv_pars_vertex>
 #include <displacementmap_pars_vertex>
 #include <normal_pars_vertex>

@@ -60,6 +60,7 @@ export * from './helpers/LightProbeHelper.js';
 export * from './helpers/OctreeHelper.js';
 export * from './helpers/PositionalAudioHelper.js';
 export * from './helpers/RectAreaLightHelper.js';
+export * from './helpers/TextureHelper.js';
 export * from './helpers/VertexNormalsHelper.js';
 export * from './helpers/VertexTangentsHelper.js';
 export * from './helpers/ViewHelper.js';
@@ -128,9 +129,6 @@ export * from './loaders/VOXLoader.js';
 export * from './loaders/VRMLLoader.js';
 export * from './loaders/VTKLoader.js';
 export * from './loaders/XYZLoader.js';
-export * from './loaders/lwo/IFFParser.js';
-export * from './loaders/lwo/LWO2Parser.js';
-export * from './loaders/lwo/LWO3Parser.js';
 
 export * from './materials/MeshGouraudMaterial.js';
 
@@ -162,6 +160,7 @@ export * from './modifiers/EdgeSplitModifier.js';
 export * from './modifiers/SimplifyModifier.js';
 export * from './modifiers/TessellateModifier.js';
 
+export * from './objects/BatchedMesh.js';
 export * from './objects/GroundProjectedSkybox.js';
 export * from './objects/Lensflare.js';
 export * from './objects/MarchingCubes.js';

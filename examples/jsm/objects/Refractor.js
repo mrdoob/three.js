@@ -51,6 +51,7 @@ class Refractor extends Mesh {
 		// material
 
 		this.material = new ShaderMaterial( {
+			name: ( shader.name !== undefined ) ? shader.name : 'unspecified',
 			uniforms: UniformsUtils.clone( shader.uniforms ),
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader,
@@ -260,6 +261,8 @@ class Refractor extends Mesh {
 }
 
 Refractor.RefractorShader = {
+
+	name: 'RefractorShader',
 
 	uniforms: {
 

@@ -1,5 +1,7 @@
 const OutputShader = {
 
+	name: 'OutputShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null },

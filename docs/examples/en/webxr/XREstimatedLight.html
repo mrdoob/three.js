@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Group] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			XREstimatedLight uses WebXR's light estimation to create
+			a light probe, a directional light, and (optionally) an environment map
+			that model the user's real-world environment and lighting.<br>
+			As WebXR updates the light and environment estimation, XREstimatedLight
+			automatically updates the light probe, directional light, and environment map.<br><br>
+
+			It's important to specify `light-estimation` as an optional or required
+			feature when creating the WebXR session, otherwise the light estimation
+			can't work.<br><br> 
+
+			See <a href="https://developer.mozilla.org/en-US/docs/Web/API/XRLightProbe#browser_compatibility">here</a>
+			for browser compatibility information, as this is still an experimental feature in WebXR.<br><br>
+
+
+			To use this, as with all files in the /examples directory, you will have to
+			include the file separately in your HTML.
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+		import { XREstimatedLight } from 'three/addons/webxr/XREstimatedLight.js';
+		</code>
+
+		<h2>Code Example</h2>
+
+		<code>
+		renderer.xr.enabled = true;
+
+		// Don't add the XREstimatedLight to the scene initially.
+		// It doesn't have any estimated lighting values until an AR session starts.
+		const xrLight = new XREstimatedLight( renderer );
+
+		xrLight.addEventListener( 'estimationstart' , () => {
+
+			scene.add( xrLight );
+
+			if ( xrLight.environment ) {
+
+				scene.environment = xrLight.environment;
+
+			}
+
+		} );
+
+		xrLight.addEventListener( 'estimationend', () => {
+
+			scene.remove( xrLight );
+
+			scene.environment = null;
+
+		} );
+
+		// In order for lighting estimation to work, 'light-estimation' must be included as either
+		// an optional or required feature.
+		document.body.appendChild( XRButton.createButton( renderer, {
+			optionalFeatures: [ 'light-estimation' ]
+		} ) );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>[example:webxr_ar_lighting webxr / light estimation]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:WebGLRenderer renderer], [param:Boolean environmentEstimation] )</h3>
+		<p>
+			[page:WebGLRenderer renderer]: (required) The renderer used to render the Scene. Mainly used to interact with WebXRManager.<br><br>
+
+			environmentEstimation: If `true`, use WebXR to estimate an environment map.
+		</p>
+
+		<h2>Events</h2>
+
+		<h3>estimationstart</h3>
+		<p>
+			Fires when the estimated lighting values start being updated.
+		</p>
+
+		<h3>estimationend</h3>
+		<p>
+			Fires when the estimated lighting values stop being updated.
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Texture environment]</h3>
+		<p>
+			The environment map estimated by WebXR. This is only available if environmentEstimation is `true`.<br><br>
+
+			It can be used as the [page:Scene.environment], for
+			[page:MeshStandardMaterial.envMap], or
+			as the [page:Scene.background].
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/XREstimatedLight.js examples/jsm/webxr/XREstimatedLight.js]
+		</p>
+	</body>
+</html>

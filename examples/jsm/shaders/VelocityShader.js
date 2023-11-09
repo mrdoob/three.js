@@ -10,6 +10,8 @@ import {
 
 const VelocityShader = {
 
+	name: 'VelocityShader',
+
 	uniforms: UniformsUtils.merge( [
 		UniformsLib.common,
 		UniformsLib.displacementmap,

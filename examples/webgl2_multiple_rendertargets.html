@@ -193,6 +193,7 @@
 				scene.add( new THREE.Mesh(
 					new THREE.TorusKnotGeometry( 1, 0.3, 128, 32 ),
 					new THREE.RawShaderMaterial( {
+						name: 'G-Buffer Shader',
 						vertexShader: document.querySelector( '#gbuffer-vert' ).textContent.trim(),
 						fragmentShader: document.querySelector( '#gbuffer-frag' ).textContent.trim(),
 						uniforms: {
@@ -211,6 +212,7 @@
 				postScene.add( new THREE.Mesh(
 					new THREE.PlaneGeometry( 2, 2 ),
 					new THREE.RawShaderMaterial( {
+						name: 'Post-FX Shader',
 						vertexShader: document.querySelector( '#render-vert' ).textContent.trim(),
 						fragmentShader: document.querySelector( '#render-frag' ).textContent.trim(),
 						uniforms: {

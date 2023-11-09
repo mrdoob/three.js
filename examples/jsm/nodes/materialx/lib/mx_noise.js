@@ -609,10 +609,10 @@ export const mx_perlin_noise_vec3 = glslFn( 'vec3 mx_perlin_noise_vec3( any p )'
 export const mx_cell_noise_float = glslFn( 'float mx_cell_noise_float( vec3 p )', includes );
 
 export const mx_worley_noise_float = glslFn( 'float mx_worley_noise_float( any p, float jitter, int metric )', includes );
-export const mx_worley_noise_vec2 = glslFn( 'float mx_worley_noise_vec2( any p, float jitter, int metric )', includes );
-export const mx_worley_noise_vec3 = glslFn( 'float mx_worley_noise_vec3( any p, float jitter, int metric )', includes );
+export const mx_worley_noise_vec2 = glslFn( 'vec2 mx_worley_noise_vec2( any p, float jitter, int metric )', includes );
+export const mx_worley_noise_vec3 = glslFn( 'vec3 mx_worley_noise_vec3( any p, float jitter, int metric )', includes );
 
 export const mx_fractal_noise_float = glslFn( 'float mx_fractal_noise_float( vec3 p, int octaves, float lacunarity, float diminish )', includes );
-export const mx_fractal_noise_vec2 = glslFn( 'float mx_fractal_noise_vec2( vec3 p, int octaves, float lacunarity, float diminish )', includes );
-export const mx_fractal_noise_vec3 = glslFn( 'float mx_fractal_noise_vec3( vec3 p, int octaves, float lacunarity, float diminish )', includes );
-export const mx_fractal_noise_vec4 = glslFn( 'float mx_fractal_noise_vec4( vec3 p, int octaves, float lacunarity, float diminish )', includes );
+export const mx_fractal_noise_vec2 = glslFn( 'vec2 mx_fractal_noise_vec2( vec3 p, int octaves, float lacunarity, float diminish )', includes );
+export const mx_fractal_noise_vec3 = glslFn( 'vec3 mx_fractal_noise_vec3( vec3 p, int octaves, float lacunarity, float diminish )', includes );
+export const mx_fractal_noise_vec4 = glslFn( 'vec4 mx_fractal_noise_vec4( vec3 p, int octaves, float lacunarity, float diminish )', includes );

@@ -88,6 +88,7 @@ class Water extends Mesh {
 		// material
 
 		this.material = new ShaderMaterial( {
+			name: shader.name,
 			uniforms: UniformsUtils.merge( [
 				UniformsLib[ 'fog' ],
 				shader.uniforms
@@ -204,6 +205,8 @@ class Water extends Mesh {
 }
 
 Water.WaterShader = {
+
+	name: 'WaterShader',
 
 	uniforms: {
 

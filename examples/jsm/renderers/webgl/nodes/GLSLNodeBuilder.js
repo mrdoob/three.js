@@ -1,6 +1,8 @@
 import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial, FunctionNode } from '../../../nodes/Nodes.js';
 
-import UniformsGroup from '../../common/UniformsGroup.js';
+import UniformBuffer from '../../common/UniformBuffer.js';
+import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
+
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
 const glslMethods = {
@@ -24,7 +26,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 		super( object, renderer, new GLSLNodeParser(), scene );
 
-		this.uniformsGroup = {};
+		this.uniformGroups = {};
 
 	}
 
@@ -116,11 +118,15 @@ ${ flowData.code }
 
 		const vars = this.vars[ shaderStage ];
 
-		for ( const variable of vars ) {
+		if ( vars !== undefined ) {
 
-			if ( variable.isOutputStructVar ) continue;
+			for ( const variable of vars ) {
 
-			snippets.push( `${ this.getVar( variable.type, variable.name ) };` );
+				if ( variable.isOutputStructVar ) continue;
+
+				snippets.push( `${ this.getVar( variable.type, variable.name ) };` );
+
+			}
 
 		}
 
@@ -133,7 +139,7 @@ ${ flowData.code }
 		const uniforms = this.uniforms[ shaderStage ];
 
 		const bindingSnippets = [];
-		const groupSnippets = [];
+		const uniformGroups = {};
 
 		for ( const uniform of uniforms ) {
 
@@ -155,6 +161,15 @@ ${ flowData.code }
 			} else if ( uniform.type === 'cubeTexture' ) {
 
 				snippet = `samplerCube ${uniform.name};`;
+
+			} else if ( uniform.type === 'buffer' ) {
+
+				const bufferNode = uniform.node;
+				const bufferType = this.getType( bufferNode.bufferType );
+				const bufferCount = bufferNode.bufferCount;
+
+				const bufferCountSnippet = bufferCount > 0 ? bufferCount : '';
+				snippet = `${bufferNode.name} {\n\t${bufferType} ${uniform.name}[${bufferCountSnippet}];\n};\n`;
 
 			} else {
 
@@ -178,6 +193,9 @@ ${ flowData.code }
 
 				snippet = '\t' + snippet;
 
+				const groupName = uniform.groupNode.name;
+				const groupSnippets = uniformGroups[ groupName ] || ( uniformGroups[ groupName ] = [] );
+
 				groupSnippets.push( snippet );
 
 			} else {
@@ -192,9 +210,11 @@ ${ flowData.code }
 
 		let output = '';
 
-		if ( groupSnippets.length > 0 ) {
+		for ( const name in uniformGroups ) {
 
-			output += this._getGLSLUniformStruct( shaderStage + 'NodeUniforms', groupSnippets.join( '\n' ) ) + '\n';
+			const groupSnippets = uniformGroups[ name ];
+
+			output += this._getGLSLUniformStruct( shaderStage + '_' + name, groupSnippets.join( '\n' ) ) + '\n';
 
 		}
 
@@ -249,7 +269,7 @@ ${ flowData.code }
 
 		if ( structs.length === 0 ) {
 
-			return "layout( location = 0 ) out vec4 fragColor;\n";
+			return 'layout( location = 0 ) out vec4 fragColor;\n';
 
 		}
 
@@ -257,7 +277,7 @@ ${ flowData.code }
 
 			const struct = structs[ index ];
 
-			let snippet = `\n`;
+			let snippet = '\n';
 			snippet += this.getStructMembers( struct );
 			snippet += '\n';
 
@@ -279,7 +299,10 @@ ${ flowData.code }
 
 			for ( const varying of varyings ) {
 
-				snippet += `${varying.needsInterpolation ? 'out' : '/*out*/'} ${varying.type} ${varying.name};\n`;
+				const type = varying.type;
+				const flat = type === 'int' || type === 'uint' ? 'flat ' : '';
+
+				snippet += `${flat}${varying.needsInterpolation ? 'out' : '/*out*/'} ${type} ${varying.name};\n`;
 
 			}
 
@@ -289,7 +312,10 @@ ${ flowData.code }
 
 				if ( varying.needsInterpolation ) {
 
-					snippet += `in ${varying.type} ${varying.name};\n`;
+					const type = varying.type;
+					const flat = type === 'int' || type === 'uint' ? 'flat ' : '';
+
+					snippet += `${flat}in ${type} ${varying.name};\n`;
 
 				}
 
@@ -517,16 +543,33 @@ void main() {
 
 				this.bindings[ shaderStage ].push( uniformGPU );
 
+			} else if ( type === 'buffer' ) {
+
+				node.name = `NodeBuffer_${node.id}`;
+
+				const buffer = new UniformBuffer( node.name, node.value );
+
+				uniformNode.name = `buffer${node.id}`;
+
+				this.bindings[ shaderStage ].push( buffer );
+
+				uniformGPU = buffer;
+
 			} else {
 
-				let uniformsGroup = this.uniformsGroup[ shaderStage ];
+				const group = node.groupNode;
+				const groupName = group.name;
+
+				const uniformsStage = this.uniformGroups[ shaderStage ] || ( this.uniformGroups[ shaderStage ] = {} );
+
+				let uniformsGroup = uniformsStage[ groupName ];
 
 				if ( uniformsGroup === undefined ) {
 
-					uniformsGroup = new UniformsGroup( shaderStage + 'NodeUniforms' );
+					uniformsGroup = new NodeUniformsGroup( shaderStage + '_' + groupName, group );
 					//uniformsGroup.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
-					this.uniformsGroup[ shaderStage ] = uniformsGroup;
+					uniformsStage[ groupName ] = uniformsGroup;
 
 					this.bindings[ shaderStage ].push( uniformsGroup );
 

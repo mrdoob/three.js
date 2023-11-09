@@ -3,12 +3,11 @@ import { nodeImmutable, nodeObject } from '../shadernode/ShaderNode.js';
 
 class PropertyNode extends Node {
 
-	constructor( nodeType, name = null, declare = true ) {
+	constructor( nodeType, name = null ) {
 
 		super( nodeType );
 
 		this.name = name;
-		this.declare = declare;
 
 		this.isPropertyNode = true;
 
@@ -27,8 +26,6 @@ class PropertyNode extends Node {
 	}
 
 	generate( builder ) {
-
-		if ( this.declare === false ) return this.name;
 
 		return builder.getPropertyName( builder.getVarFromNode( this, this.name ) );
 

@@ -108,6 +108,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const currentRenderTarget = renderer.getRenderTarget();
 
 		const IS_INSTANCEDMESH = object.isInstancedMesh === true;
+		const IS_BATCHEDMESH = object.isBatchedMesh === true;
 
 		const HAS_MAP = !! material.map;
 		const HAS_MATCAP = !! material.matcap;
@@ -193,6 +194,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			precision: precision,
 
+			batching: IS_BATCHEDMESH,
 			instancing: IS_INSTANCEDMESH,
 			instancingColor: IS_INSTANCEDMESH && object.instanceColor !== null,
 
@@ -512,6 +514,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 17 );
 		if ( parameters.alphaHash )
 			_programLayers.enable( 18 );
+		if ( parameters.batching )
+			_programLayers.enable( 19 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();

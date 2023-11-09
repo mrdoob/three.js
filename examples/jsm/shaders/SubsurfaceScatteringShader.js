@@ -24,6 +24,8 @@ const meshphong_frag_body = ShaderChunk[ 'meshphong_frag' ].slice( ShaderChunk[ 
 
 const SubsurfaceScatteringShader = {
 
+	name: 'SubsurfaceScatteringShader',
+
 	uniforms: UniformsUtils.merge( [
 		ShaderLib[ 'phong' ].uniforms,
 		{

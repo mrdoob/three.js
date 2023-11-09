@@ -11,7 +11,7 @@ import { skinning } from '../accessors/SkinningNode.js';
 import { morph } from '../accessors/MorphNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
-import { lightsWithoutWrap } from '../lighting/LightsNode.js';
+import { lightNodes } from '../lighting/LightsNode.js';
 import { mix } from '../math/MathNode.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import AONode from '../lighting/AONode.js';
@@ -257,7 +257,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( materialLightsNode.length > 0 ) {
 
-			lightsNode = lightsWithoutWrap( [ ...lightsNode.lightNodes, ...materialLightsNode ] );
+			lightsNode = lightNodes( [ ...lightsNode.lightNodes, ...materialLightsNode ] );
 
 		}
 

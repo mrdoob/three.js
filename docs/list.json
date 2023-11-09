@@ -420,6 +420,10 @@
 				"CameraUtils": "examples/en/utils/CameraUtils",
 				"SceneUtils": "examples/en/utils/SceneUtils",
 				"SkeletonUtils": "examples/en/utils/SkeletonUtils"
+			},
+			
+			"WebXR": {
+				"XREstimatedLight": "examples/en/webxr/XREstimatedLight"
 			}
 
 		},
@@ -445,6 +449,7 @@
 				"رسم خطوط": "manual/ar/introduction/Drawing-lines",
 				"إنشاء نص": "manual/ar/introduction/Creating-text",
 				"تحميل نماذج ثلاثية الأبعاد": "manual/ar/introduction/Loading-3D-models",
+				"المكتبات والإضافات": "manual/ar/introduction/Libraries-and-Plugins",
 				"الأسئلة الشائعة": "manual/ar/introduction/FAQ",
 				"روابط مفيدة": "manual/ar/introduction/Useful-links"
 			},

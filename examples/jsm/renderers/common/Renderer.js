@@ -62,6 +62,7 @@ class Renderer {
 		this._attributes = null;
 		this._geometries = null;
 		this._nodes = null;
+		this._animation = null;
 		this._bindings = null;
 		this._objects = null;
 		this._pipelines = null;
@@ -69,8 +70,6 @@ class Renderer {
 		this._renderContexts = null;
 		this._textures = null;
 		this._background = null;
-
-		this._animation = new Animation();
 
 		this._currentRenderContext = null;
 		this._lastRenderContext = null;
@@ -86,6 +85,9 @@ class Renderer {
 		this._renderTarget = null;
 		this._activeCubeFace = 0;
 		this._activeMipmapLevel = 0;
+
+		this._renderObjectFunction = null;
+		this._currentRenderObjectFunction = null;
 
 		this._initialized = false;
 		this._initPromise = null;
@@ -133,6 +135,7 @@ class Renderer {
 			}
 
 			this._nodes = new Nodes( this, backend );
+			this._animation = new Animation( this._nodes, this.info );
 			this._attributes = new Attributes( backend );
 			this._background = new Background( this, this._nodes );
 			this._geometries = new Geometries( this._attributes, this.info );
@@ -144,9 +147,6 @@ class Renderer {
 			this._renderContexts = new RenderContexts();
 
 			//
-
-			this._animation.setNodes( this._nodes );
-			this._animation.start();
 
 			this._initialized = true;
 
@@ -179,7 +179,8 @@ class Renderer {
 		const nodeFrame = this._nodes.nodeFrame;
 
 		const previousRenderId = nodeFrame.renderId;
-		const previousRenderState = this._currentRenderContext;
+		const previousRenderContext = this._currentRenderContext;
+		const previousRenderObjectFunction = this._currentRenderObjectFunction;
 
 		//
 
@@ -191,8 +192,14 @@ class Renderer {
 		const activeMipmapLevel = this._activeMipmapLevel;
 
 		this._currentRenderContext = renderContext;
+		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
 
-		nodeFrame.renderId ++;
+		//
+
+		this.info.calls ++;
+		this.info.render.calls ++;
+
+		nodeFrame.renderId = this.info.calls;
 
 		//
 
@@ -208,15 +215,11 @@ class Renderer {
 
 		//
 
-		if ( this._animation.isAnimating === false ) nodeFrame.update();
-
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
 		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 		if ( this.info.autoReset === true ) this.info.reset();
-
-		this.info.render.frame ++;
 
 		//
 
@@ -332,7 +335,9 @@ class Renderer {
 		// restore render tree
 
 		nodeFrame.renderId = previousRenderId;
-		this._currentRenderContext = previousRenderState;
+
+		this._currentRenderContext = previousRenderContext;
+		this._currentRenderObjectFunction = previousRenderObjectFunction;
 
 		this._lastRenderContext = renderContext;
 
@@ -354,15 +359,11 @@ class Renderer {
 
 	}
 
-	setAnimationLoop( callback ) {
+	async setAnimationLoop( callback ) {
 
-		if ( this._initialized === false ) this.init();
+		if ( this._initialized === false ) await this.init();
 
-		const animation = this._animation;
-
-		animation.setAnimationLoop( callback );
-
-		( callback === null ) ? animation.stop() : animation.start();
+		this._animation.setAnimationLoop( callback );
 
 	}
 
@@ -614,6 +615,7 @@ class Renderer {
 
 		this.info.dispose();
 
+		this._animation.dispose();
 		this._objects.dispose();
 		this._properties.dispose();
 		this._pipelines.dispose();
@@ -642,15 +644,46 @@ class Renderer {
 
 	}
 
+	setRenderObjectFunction( renderObjectFunction ) {
+
+		this._renderObjectFunction = renderObjectFunction;
+
+	}
+
+	getRenderObjectFunction() {
+
+		return this._renderObjectFunction;
+
+	}
+
 	async compute( computeNodes ) {
 
 		if ( this._initialized === false ) await this.init();
+
+		const nodeFrame = this._nodes.nodeFrame;
+
+		const previousRenderId = nodeFrame.renderId;
+
+		//
+
+		this.info.calls ++;
+		this.info.compute.calls ++;
+
+		nodeFrame.renderId = this.info.calls;
+
+		//
 
 		const backend = this.backend;
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
 		const nodes = this._nodes;
 		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
+
+		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
+
+			throw new Error( 'THREE.Renderer: .compute() expects a ComputeNode.' );
+
+		}
 
 		backend.beginCompute( computeNodes );
 
@@ -689,6 +722,10 @@ class Renderer {
 		}
 
 		backend.finishCompute( computeNodes );
+
+		//
+
+		nodeFrame.renderId = previousRenderId;
 
 	}
 
@@ -825,7 +862,7 @@ class Renderer {
 			const renderItem = renderList[ i ];
 
 			// @TODO: Add support for multiple materials per object. This will require to extract
-			// the material from the renderItem object and pass it with its group data to _renderObject().
+			// the material from the renderItem object and pass it with its group data to renderObject().
 
 			const { object, geometry, material, group } = renderItem;
 
@@ -850,7 +887,7 @@ class Renderer {
 
 						this.backend.updateViewport( this._currentRenderContext );
 
-						this._renderObject( object, scene, camera2, geometry, material, group, lightsNode );
+						this._currentRenderObjectFunction( object, scene, camera2, geometry, material, group, lightsNode );
 
 					}
 
@@ -858,7 +895,7 @@ class Renderer {
 
 			} else {
 
-				this._renderObject( object, scene, camera, geometry, material, group, lightsNode );
+				this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode );
 
 			}
 
@@ -866,7 +903,7 @@ class Renderer {
 
 	}
 
-	_renderObject( object, scene, camera, geometry, material, group, lightsNode ) {
+	renderObject( object, scene, camera, geometry, material, group, lightsNode ) {
 
 		material = scene.overrideMaterial !== null ? scene.overrideMaterial : material;
 

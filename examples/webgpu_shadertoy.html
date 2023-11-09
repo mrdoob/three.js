@@ -1,0 +1,309 @@
+<html lang="en">
+	<head>
+		<title>three.js - shadertoy</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - ShaderToy
+			<br />Shader created by <a href="https://www.shadertoy.com/view/Mt2SzR" target="_blank" rel="noopener">jackdavenport</a> and <a href="https://www.shadertoy.com/view/3tcBzH" target="_blank" rel="noopener">trinketMage</a>.
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
+				}
+			}
+		</script>
+
+		<script type="x-shader/x-fragment" id="example1">
+			// https://www.shadertoy.com/view/Mt2SzR
+
+			float random(float x) {
+ 
+				return fract(sin(x) * 10000.);
+					  
+			}
+			
+			float noise(vec2 p) {
+			
+				return random(p.x + p.y * 10000.);
+						
+			}
+			
+			vec2 sw(vec2 p) { return vec2(floor(p.x), floor(p.y)); }
+			vec2 se(vec2 p) { return vec2(ceil(p.x), floor(p.y)); }
+			vec2 nw(vec2 p) { return vec2(floor(p.x), ceil(p.y)); }
+			vec2 ne(vec2 p) { return vec2(ceil(p.x), ceil(p.y)); }
+			
+			float smoothNoise(vec2 p) {
+			
+				vec2 interp = smoothstep(0., 1., fract(p));
+				float s = mix(noise(sw(p)), noise(se(p)), interp.x);
+				float n = mix(noise(nw(p)), noise(ne(p)), interp.x);
+				return mix(s, n, interp.y);
+					
+			}
+			
+			float fractalNoise(vec2 p) {
+			
+				float x = 0.;
+				x += smoothNoise(p      );
+				x += smoothNoise(p * 2. ) / 2.;
+				x += smoothNoise(p * 4. ) / 4.;
+				x += smoothNoise(p * 8. ) / 8.;
+				x += smoothNoise(p * 16.) / 16.;
+				x /= 1. + 1./2. + 1./4. + 1./8. + 1./16.;
+				return x;
+						
+			}
+			
+			float movingNoise(vec2 p) {
+			 
+				float x = fractalNoise(p + iTime);
+				float y = fractalNoise(p - iTime);
+				return fractalNoise(p + vec2(x, y));   
+				
+			}
+			
+			// call this for water noise function
+			float nestedNoise(vec2 p) {
+				
+				float x = movingNoise(p);
+				float y = movingNoise(p + 100.);
+				return movingNoise(p + vec2(x, y));
+				
+			}
+
+			void mainImage( out vec4 fragColor, in vec2 fragCoord )
+			{
+				vec2 uv = fragCoord.xy / iResolution.xy;
+				float n = nestedNoise(uv * 6.);
+
+				fragColor = vec4(mix(vec3(.4, .6, 1.), vec3(.1, .2, 1.), n), 1.);
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="example2">
+			// https://www.shadertoy.com/view/3tcBzH
+
+			float rand(vec2 co){
+				return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+			}
+			
+			float hermite(float t)
+			{
+			  return t * t * (3.0 - 2.0 * t);
+			}
+			
+			float noise(vec2 co, float frequency)
+			{
+			  vec2 v = vec2(co.x * frequency, co.y * frequency);
+			
+			  float ix1 = floor(v.x);
+			  float iy1 = floor(v.y);
+			  float ix2 = floor(v.x + 1.0);
+			  float iy2 = floor(v.y + 1.0);
+			
+			  float fx = hermite(fract(v.x));
+			  float fy = hermite(fract(v.y));
+			
+			  float fade1 = mix(rand(vec2(ix1, iy1)), rand(vec2(ix2, iy1)), fx);
+			  float fade2 = mix(rand(vec2(ix1, iy2)), rand(vec2(ix2, iy2)), fx);
+			
+			  return mix(fade1, fade2, fy);
+			}
+			
+			float pnoise(vec2 co, float freq, int steps, float persistence)
+			{
+			  float value = 0.0;
+			  float ampl = 1.0;
+			  float sum = 0.0;
+			  for(int i=0 ; i<steps ; i++)
+			  {
+				sum += ampl;
+				value += noise(co, freq) * ampl;
+				freq *= 2.0;
+				ampl *= persistence;
+			  }
+			  return value / sum;
+			}
+			
+			void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+				vec2 uv = fragCoord.xy / iResolution.xy;
+				float gradient = 1.0 - uv.y;
+				float gradientStep = 0.2;
+				
+				vec2 pos = fragCoord.xy / iResolution.x;
+				pos.y -= iTime * 0.3125;
+				
+				vec4 brighterColor = vec4(1.0, 0.65, 0.1, 0.25);
+				vec4 darkerColor = vec4(1.0, 0.0, 0.15, 0.0625);
+				vec4 middleColor = mix(brighterColor, darkerColor, 0.5);
+			
+				float noiseTexel = pnoise(pos, 10.0, 5, 0.5);
+				
+				float firstStep = smoothstep(0.0, noiseTexel, gradient);
+				float darkerColorStep = smoothstep(0.0, noiseTexel, gradient - gradientStep);
+				float darkerColorPath = firstStep - darkerColorStep;
+				vec4 color = mix(brighterColor, darkerColor, darkerColorPath);
+			
+				float middleColorStep = smoothstep(0.0, noiseTexel, gradient - 0.2 * 2.0);
+				
+				color = mix(color, middleColor, darkerColorStep - middleColorStep);
+				color = mix(vec4(0.0), color, firstStep);
+				fragColor = color;
+			}
+
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import * as Nodes from 'three/nodes';
+
+			import Transpiler from './jsm/transpiler/Transpiler.js';
+			import ShaderToyDecoder from './jsm/transpiler/ShaderToyDecoder.js';
+			import TSLEncoder from './jsm/transpiler/TSLEncoder.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
+
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+
+			class ShaderToyNode extends Nodes.Node {
+
+				constructor() {
+
+					super( 'vec4' );
+
+					this.mainImage = null;
+
+				}
+
+				transpile( glsl, iife = false ) {
+
+					const decoder = new ShaderToyDecoder();
+
+					const encoder = new TSLEncoder();
+					encoder.iife = iife;
+					encoder.uniqueNames = true;
+
+					const jsCode = new Transpiler( decoder, encoder ).parse( glsl );
+
+					return jsCode;
+
+				}
+
+				parse( glsl ) {
+
+					const jsCode = this.transpile( glsl, true );
+
+					const { mainImage } = eval( jsCode )( Nodes );
+
+					this.mainImage = mainImage;
+
+				}
+
+				async parseAsync( glsl ) {
+
+					const jsCode = this.transpile( glsl );
+
+					const { mainImage } = await import( `data:text/javascript,${ encodeURIComponent( jsCode ) }` );
+
+					this.mainImage = mainImage;
+
+				}
+
+				setup( builder ) {
+
+					if ( this.mainImage === null ) {
+
+						throw new Error( 'ShaderToyNode: .parse() must be called first.' );
+
+					}
+
+					return this.mainImage();
+
+				}
+
+
+			}
+
+			let renderer, camera, scene;
+			const dpr = window.devicePixelRatio;
+
+			init();
+
+			function init() {
+
+				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU or WebGL2 support' );
+
+				}
+
+				//
+
+				const example1Code = document.getElementById( 'example1' ).textContent;
+				const example2Code = document.getElementById( 'example2' ).textContent;
+
+				const shaderToy1Node = new ShaderToyNode();
+				shaderToy1Node.parse( example1Code );
+
+				const shaderToy2Node = new ShaderToyNode();
+				shaderToy2Node.parse( example2Code );
+
+				//
+
+				camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+				scene = new THREE.Scene();
+
+				const geometry = new THREE.PlaneGeometry( 2, 2 );
+
+				const material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = Nodes.oscSine( Nodes.timerLocal( .3 ) ).mix( shaderToy1Node, shaderToy2Node );
+
+				const quad = new THREE.Mesh( geometry, material );
+				scene.add( quad );
+
+				//
+
+				renderer = new WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( dpr );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

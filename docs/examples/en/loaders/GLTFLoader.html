@@ -124,22 +124,12 @@
 
 		<h2>Textures</h2>
 
-		<p>Textures containing color information (.map, .emissiveMap, and .specularMap) always use sRGB colorspace in
-		glTF, while vertex colors and material properties (.color, .emissive, .specular) use linear colorspace. In a
-		typical rendering workflow, textures are converted to linear colorspace by the renderer, lighting calculations
-		are made, then final output is converted back to sRGB and displayed on screen. Unless you need post-processing
-		in linear colorspace, always configure [page:WebGLRenderer] as follows when using glTF:</p>
+		<p>When loading textures externally (e.g., using [page:TextureLoader]) and applying them to a glTF model,
+		textures must be configured. Textures referenced from the glTF model are configured automatically by
+		GLTFLoader.</p>
 
 		<code>
-		renderer.outputColorSpace = THREE.SRGBColorSpace;
-		</code>
-
-		<p>GLTFLoader will automatically configure textures referenced from a .gltf or .glb file correctly, with the
-		assumption that the renderer is set up as shown above. When loading textures externally (e.g., using
-		[page:TextureLoader]) and applying them to a glTF model, colorspace and orientation must be given:</p>
-
-		<code>
-		// If texture is used for color information, set colorspace.
+		// If texture is used for color information (.map, .emissiveMap, .specularMap, ...), set color space
 		texture.colorSpace = THREE.SRGBColorSpace;
 
 		// UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.

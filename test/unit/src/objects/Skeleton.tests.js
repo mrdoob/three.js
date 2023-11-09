@@ -45,12 +45,6 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'boneTextureSize', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.todo( 'frame', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );

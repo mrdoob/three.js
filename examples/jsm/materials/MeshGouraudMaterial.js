@@ -9,6 +9,8 @@ import { UniformsUtils, UniformsLib, ShaderMaterial, Color, MultiplyOperation } 
 
 const GouraudShader = {
 
+	name: 'GouraudShader',
+
 	uniforms: UniformsUtils.merge( [
 		UniformsLib.common,
 		UniformsLib.specularmap,

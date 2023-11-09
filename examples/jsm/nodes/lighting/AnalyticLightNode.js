@@ -7,6 +7,7 @@ import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { positionWorld } from '../accessors/PositionNode.js';
 import { normalWorld } from '../accessors/NormalNode.js';
+import { WebGPUCoordinateSystem } from 'three';
 //import { add } from '../math/OperatorNode.js';
 
 import { Color, DepthTexture, NearestFilter, LessCompare } from 'three';
@@ -27,11 +28,21 @@ class AnalyticLightNode extends LightingNode {
 		this.shadowNode = null;
 
 		this.color = new Color();
-		this.colorNode = uniform( this.color );
+		this._defaultColorNode = uniform( this.color );
+
+		this.colorNode = this._defaultColorNode;
+
+		this.isAnalyticLightNode = true;
 
 	}
 
-	getHash( /*builder*/ ) {
+	getCacheKey() {
+
+		return super.getCacheKey() + '-' + ( this.light.id + '-' + ( this.light.castShadow ? '1' : '0' ) );
+
+	}
+
+	getHash() {
 
 		return this.light.uuid;
 
@@ -73,10 +84,18 @@ class AnalyticLightNode extends LightingNode {
 				.and( shadowCoord.y.lessThanEqual( 1 ) )
 				.and( shadowCoord.z.lessThanEqual( 1 ) );
 
+			let coordZ = shadowCoord.z.add( bias );
+
+			if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem ) {
+
+				coordZ = coordZ.mul( 2 ).sub( 1 ); // WebGPU: Convertion [ 0, 1 ] to [ - 1, 1 ]
+
+			}
+
 			shadowCoord = vec3(
 				shadowCoord.x,
-				shadowCoord.y.oneMinus(), // WebGPU: Flip Y
-				shadowCoord.z.add( bias ).mul( 2 ).sub( 1 ) // WebGPU: Convertion [ 0, 1 ] to [ - 1, 1 ]
+				shadowCoord.y.oneMinus(), // follow webgpu standards
+				coordZ
 			);
 
 			const textureCompare = ( depthTexture, shadowCoord, compare ) => texture( depthTexture, shadowCoord ).compare( compare );
@@ -139,6 +158,7 @@ class AnalyticLightNode extends LightingNode {
 	setup( builder ) {
 
 		if ( this.light.castShadow ) this.setupShadow( builder );
+		else if ( this.shadowNode !== null ) this.disposeShadow();
 
 	}
 
@@ -147,17 +167,46 @@ class AnalyticLightNode extends LightingNode {
 		const { rtt, light } = this;
 		const { renderer, scene } = frame;
 
+		const currentOverrideMaterial = scene.overrideMaterial;
+
 		scene.overrideMaterial = depthMaterial;
 
 		rtt.setSize( light.shadow.mapSize.width, light.shadow.mapSize.height );
 
 		light.shadow.updateMatrices( light );
 
-		renderer.setRenderTarget( rtt );
-		renderer.render( scene, light.shadow.camera );
-		renderer.setRenderTarget( null );
+		const currentRenderTarget = renderer.getRenderTarget();
+		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
 
-		scene.overrideMaterial = null;
+		renderer.setRenderObjectFunction( ( object, ...params ) => {
+
+			if ( object.castShadow === true ) {
+
+				renderer.renderObject( object, ...params );
+
+			}
+
+		} );
+
+		renderer.setRenderTarget( rtt );
+
+		renderer.render( scene, light.shadow.camera );
+
+		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setRenderObjectFunction( currentRenderObjectFunction );
+
+		scene.overrideMaterial = currentOverrideMaterial;
+
+	}
+
+	disposeShadow() {
+
+		this.rtt.dispose();
+
+		this.shadowNode = null;
+		this.rtt = null;
+
+		this.colorNode = this._defaultColorNode;
 
 	}
 
