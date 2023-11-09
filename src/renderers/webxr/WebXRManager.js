@@ -1,6 +1,7 @@
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
+import { Texture } from '../../textures/Texture.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
@@ -33,6 +34,9 @@ class WebXRManager extends EventDispatcher {
 		let glBinding = null;
 		let glProjLayer = null;
 		let glBaseLayer = null;
+		let _depthTexture = null;
+		let _nearOverride = 0;
+		let _farOverride = 0;
 		let xrFrame = null;
 		const attributes = gl.getContextAttributes();
 		let initialRenderTarget = null;
@@ -163,10 +167,12 @@ class WebXRManager extends EventDispatcher {
 
 			_currentDepthNear = null;
 			_currentDepthFar = null;
+			_depthTexture = null;
 
 			// restore framebuffer/rendering state
 
 			renderer.setRenderTarget( initialRenderTarget );
+			renderer.clearOcclusion();
 
 			glBaseLayer = null;
 			glProjLayer = null;
@@ -522,6 +528,13 @@ class WebXRManager extends EventDispatcher {
 
 			if ( session === null ) return;
 
+			if ( _depthTexture ) {
+
+				camera.near = _nearOverride;
+				camera.far = _farOverride;
+
+			}
+
 			cameraXR.near = cameraR.near = cameraL.near = camera.near;
 			cameraXR.far = cameraR.far = cameraL.far = camera.far;
 
@@ -536,6 +549,14 @@ class WebXRManager extends EventDispatcher {
 
 				_currentDepthNear = cameraXR.near;
 				_currentDepthFar = cameraXR.far;
+				cameraL.near = _nearOverride;
+				cameraL.far = _farOverride;
+				cameraR.near = _nearOverride;
+				cameraR.far = _farOverride;
+
+				cameraL.updateProjectionMatrix();
+				cameraR.updateProjectionMatrix();
+				camera.updateProjectionMatrix();
 
 			}
 
@@ -638,6 +659,12 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		this.getDepthTexture = function ( ) {
+
+			return _depthTexture;
+
+		};
+
 		// Animation Loop
 
 		let onAnimationFrameCallback = null;
@@ -727,6 +754,41 @@ class WebXRManager extends EventDispatcher {
 						cameraXR.cameras.push( camera );
 
 					}
+
+				}
+
+				let depthData = null;
+				if ( session.enabledFeatures && session.enabledFeatures.includes( 'depth-sensing' ) ) {
+
+					depthData = glBinding.getDepthInformation( views[ 0 ] );
+
+				}
+
+				if ( depthData && depthData.isValid ) {
+
+					if ( _depthTexture === null ) {
+
+						_depthTexture = depthData.texture;
+
+						const depthTexture = new Texture();
+						const texProps = renderer.properties.get( depthTexture );
+						texProps.__webglTexture = _depthTexture;
+
+						if ( ( depthData.depthNear != session.renderState.depthNear ) || ( depthData.depthFar != session.renderState.depthFar ) ) {
+
+							_nearOverride = depthData.depthNear;
+							_farOverride = depthData.depthFar;
+
+						}
+
+						const viewport = cameraXR.cameras[ 0 ].viewport;
+						renderer.setOcclusion( { depthColor: depthTexture, depthWidth: viewport.z, depthHeight: viewport.w } );
+
+					}
+
+				} else {
+
+					_depthTexture = null;
 
 				}
 

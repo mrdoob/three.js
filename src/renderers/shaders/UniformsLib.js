@@ -197,6 +197,12 @@ const UniformsLib = {
 
 	},
 
+	occlusion: {
+		depthColor: { value: null },
+		depthWidth: {},
+		depthHeight: {}
+	},
+
 	points: {
 
 		diffuse: { value: /*@__PURE__*/ new Color( 0xffffff ) },

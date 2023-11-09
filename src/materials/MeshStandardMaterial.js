@@ -60,6 +60,8 @@ class MeshStandardMaterial extends Material {
 
 		this.fog = true;
 
+		this.occlusion = true;
+
 		this.setValues( parameters );
 
 	}
@@ -114,6 +116,8 @@ class MeshStandardMaterial extends Material {
 		this.flatShading = source.flatShading;
 
 		this.fog = source.fog;
+
+		this.occlusion = source.occlusion;
 
 		return this;
 

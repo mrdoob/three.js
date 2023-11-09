@@ -32,6 +32,14 @@ function WebGLMaterials( renderer, properties ) {
 
 	}
 
+	function refreshOcclusionUniforms( uniforms, occlusion ) {
+
+		uniforms.depthColor.value = occlusion.depthColor;
+		uniforms.depthWidth.value = occlusion.depthWidth;
+		uniforms.depthHeight.value = occlusion.depthHeight;
+
+	}
+
 	function refreshMaterialUniforms( uniforms, material, pixelRatio, height, transmissionRenderTarget ) {
 
 		if ( material.isMeshBasicMaterial ) {
@@ -559,7 +567,8 @@ function WebGLMaterials( renderer, properties ) {
 
 	return {
 		refreshFogUniforms: refreshFogUniforms,
-		refreshMaterialUniforms: refreshMaterialUniforms
+		refreshMaterialUniforms: refreshMaterialUniforms,
+		refreshOcclusionUniforms: refreshOcclusionUniforms
 	};
 
 }

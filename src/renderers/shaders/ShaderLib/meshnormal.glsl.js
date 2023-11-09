@@ -64,6 +64,7 @@ uniform float opacity;
 #include <normalmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
+#include <occlusion_pars_fragment>
 
 void main() {
 
@@ -79,6 +80,8 @@ void main() {
 		gl_FragColor.a = 1.0;
 
 	#endif
+
+	#include <occlusion_fragment>
 
 }
 `;

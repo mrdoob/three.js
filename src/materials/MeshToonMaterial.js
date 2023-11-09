@@ -50,6 +50,8 @@ class MeshToonMaterial extends Material {
 
 		this.fog = true;
 
+		this.occlusion = true;
+
 		this.setValues( parameters );
 
 	}
@@ -92,6 +94,8 @@ class MeshToonMaterial extends Material {
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
 		this.fog = source.fog;
+
+		this.occlusion = source.occlusion;
 
 		return this;
 

@@ -21,6 +21,8 @@ class LineBasicMaterial extends Material {
 
 		this.fog = true;
 
+		this.occlusion = true;
+
 		this.setValues( parameters );
 
 	}
@@ -39,6 +41,8 @@ class LineBasicMaterial extends Material {
 		this.linejoin = source.linejoin;
 
 		this.fog = source.fog;
+
+		this.occlusion = source.occlusion;
 
 		return this;
 
