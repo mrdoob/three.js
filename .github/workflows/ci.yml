@@ -89,7 +89,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
-        run: npm run build
+        run: npm run build-module
 
       - name: === E2E testing ===
         run: npm run test-e2e
