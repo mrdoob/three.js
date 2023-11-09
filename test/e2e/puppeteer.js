@@ -1,6 +1,5 @@
 import chalk from 'chalk';
-import puppeteer from 'puppeteer-core';
-import { install, computeExecutablePath/*, resolveBuildId*/, detectBrowserPlatform } from '@puppeteer/browsers';
+import puppeteer from 'puppeteer';
 import express from 'express';
 import path from 'path';
 import pixelmatch from 'pixelmatch';
@@ -218,10 +217,6 @@ async function main() {
 
 	}
 
-	/* Download browser */
-
-	const executablePath = await downloadLatestChromium();
-
 	/* Launch browser */
 
 	const flags = [ '--hide-scrollbars', '--enable-gpu' ];
@@ -231,7 +226,6 @@ async function main() {
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
 	browser = await puppeteer.launch( {
-		executablePath,
 		headless: process.env.VISIBLE ? false : 'new',
 		args: flags,
 		defaultViewport: viewport,
@@ -294,25 +288,6 @@ async function main() {
 	}
 
 	setTimeout( close, 300, failedScreenshots.length );
-
-}
-
-async function downloadLatestChromium() {
-
-	platform = detectBrowserPlatform();
-
-	const revision = '1108766'; //await resolveBuildId( 'chromium', platform, chromiumChannel );
-	                            // the Chromium snapshots server doesn't work properly currently so fix the revision
-	const options = { browser: 'chromium', buildId: revision, cacheDir: path.resolve( installedBrowsersDir ) };
-
-	console.log( `Using Chromium r${ revision }, ${ chromiumChannel } channel on ${ platform }` );
-	console.log( 'Downloading...' );
-
-	await install( options );
-
-	console.log( 'Downloaded.' );
-
-	return computeExecutablePath( options );
 
 }
 
