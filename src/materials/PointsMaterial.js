@@ -22,6 +22,8 @@ class PointsMaterial extends Material {
 
 		this.fog = true;
 
+		this.occlusion = true;
+
 		this.setValues( parameters );
 
 	}
@@ -40,6 +42,8 @@ class PointsMaterial extends Material {
 		this.sizeAttenuation = source.sizeAttenuation;
 
 		this.fog = source.fog;
+
+		this.occlusion = source.occlusion;
 
 		return this;
 

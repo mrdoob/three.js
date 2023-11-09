@@ -210,6 +210,7 @@ class WebGLRenderer {
 		const _vector3 = new Vector3();
 
 		const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, isScene: true };
+		let _occlusion = null;
 
 		function getTargetPixelRatio() {
 
@@ -412,6 +413,20 @@ class WebGLRenderer {
 			_pixelRatio = value;
 
 			this.setSize( _width, _height, false );
+
+		};
+
+		this.setOcclusion = function ( value ) {
+
+			if ( value === undefined ) return;
+
+			_occlusion = value;
+
+		};
+
+		this.clearOcclusion = function () {
+
+			_occlusion = null;
 
 		};
 
@@ -1600,7 +1615,7 @@ class WebGLRenderer {
 
 			const lightsStateVersion = lights.state.version;
 
-			const parameters = programCache.getParameters( material, lights.state, shadowsArray, scene, object );
+			const parameters = programCache.getParameters( material, lights.state, shadowsArray, scene, object, _occlusion );
 			const programCacheKey = programCache.getProgramCacheKey( parameters );
 
 			let programs = materialProperties.programs;
@@ -1840,6 +1855,10 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
+				} else if ( material.occlusion === true ) {
+
+					needsProgramChange = true;
+
 				} else if ( materialProperties.numClippingPlanes !== undefined &&
 					( materialProperties.numClippingPlanes !== clipping.numPlanes ||
 					materialProperties.numIntersection !== clipping.numIntersection ) ) {
@@ -2051,6 +2070,12 @@ class WebGLRenderer {
 				if ( fog && material.fog === true ) {
 
 					materials.refreshFogUniforms( m_uniforms, fog );
+
+				}
+
+				if ( _occlusion && material.occlusion === true ) {
+
+					materials.refreshOcclusionUniforms( m_uniforms, _occlusion );
 
 				}
 
