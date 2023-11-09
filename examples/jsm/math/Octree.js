@@ -457,6 +457,16 @@ class Octree {
 
 	}
 
+	clear() {
+
+		this.subTrees = [];
+		this.triangles = [];
+		this.bounds = null;
+		this.box = null;
+
+		return this;
+	}
+
 }
 
 export { Octree };
