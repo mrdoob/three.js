@@ -6,11 +6,6 @@ on:
       - 'build/**'
       - 'docs/**'
       - 'files/**'
-  push:
-    paths-ignore:
-      - 'build/**'
-      - 'docs/**'
-      - 'files/**'
 
 permissions:
   contents: read
