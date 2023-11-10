@@ -187,8 +187,6 @@ async function main() {
 		.map( s => s.slice( 0, s.length - 5 ) )
 		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
 
-	console.log( files, exactList, exceptionList );
-
 	if ( isExactList ) {
 
 		for ( const file of exactList ) {
@@ -335,8 +333,6 @@ async function preparePage( page, injection, build, errorMessages ) {
 			text = `${ file }: Unknown error`;
 
 		}
-
-		console.log( 'text', text );
 
 		if ( text.includes( 'Unable to access the camera/webcam' ) ) {
 
@@ -490,7 +486,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		} catch ( e ) {
 
-			console.log( 'e.message', e.message );
+			console.log( 'e', e );
 
 			if ( ! e.message.includes( 'Render timeout exceeded' ) ) {
 
