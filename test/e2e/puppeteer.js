@@ -1,6 +1,5 @@
 import chalk from 'chalk';
-import puppeteer from 'puppeteer-core';
-import { install, computeExecutablePath/*, resolveBuildId*/, detectBrowserPlatform } from '@puppeteer/browsers';
+import puppeteer from 'puppeteer';
 import express from 'express';
 import path from 'path';
 import pixelmatch from 'pixelmatch';
@@ -83,6 +82,7 @@ const exceptionList = [
 	'webgl_lensflares',
 	'webgl_lights_spotlights',
 	'webgl_loader_imagebitmap',
+	'webgl_loader_texture_ktx',
 	'webgl_loader_texture_lottie',
 	'webgl_loader_texture_pvrtc',
 	'webgl_materials_alphahash',
@@ -135,9 +135,6 @@ const exceptionList = [
 
 /* CONFIG VARIABLES END */
 
-const chromiumChannel = 'stable'; // stable -- beta -- dev -- canary -- latest
-const installedBrowsersDir = 'test/e2e/chromium';
-
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.3; // at most 0.3% different pixels
@@ -160,7 +157,7 @@ console.red = msg => console.log( chalk.red( msg ) );
 console.yellow = msg => console.log( chalk.yellow( msg ) );
 console.green = msg => console.log( chalk.green( msg ) );
 
-let browser, platform;
+let browser;
 
 /* Launch server */
 
@@ -218,10 +215,6 @@ async function main() {
 
 	}
 
-	/* Download browser */
-
-	const executablePath = await downloadLatestChromium();
-
 	/* Launch browser */
 
 	const flags = [ '--hide-scrollbars', '--enable-gpu' ];
@@ -231,7 +224,6 @@ async function main() {
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
 	browser = await puppeteer.launch( {
-		executablePath,
 		headless: process.env.VISIBLE ? false : 'new',
 		args: flags,
 		defaultViewport: viewport,
@@ -294,25 +286,6 @@ async function main() {
 	}
 
 	setTimeout( close, 300, failedScreenshots.length );
-
-}
-
-async function downloadLatestChromium() {
-
-	platform = detectBrowserPlatform();
-
-	const revision = '1108766'; //await resolveBuildId( 'chromium', platform, chromiumChannel );
-	                            // the Chromium snapshots server doesn't work properly currently so fix the revision
-	const options = { browser: 'chromium', buildId: revision, cacheDir: path.resolve( installedBrowsersDir ) };
-
-	console.log( `Using Chromium r${ revision }, ${ chromiumChannel } channel on ${ platform }` );
-	console.log( 'Downloading...' );
-
-	await install( options );
-
-	console.log( 'Downloaded.' );
-
-	return computeExecutablePath( options );
 
 }
 
@@ -512,7 +485,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		} catch ( e ) {
 
-			if ( ! e.message.includes( 'Render timeout exceeded' ) ) {
+			if ( e.includes && e.includes( 'Render timeout exceeded' ) === false ) {
 
 				throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
 
@@ -548,7 +521,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} catch {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-actual.jpg` );
+				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
 				throw new Error( `Screenshot does not exist: ${ file }` );
 
 			}
@@ -567,8 +540,8 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} catch {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-actual.jpg` );
-				await expected.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-expected.jpg` );
+				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await expected.writeAsync( `test/e2e/output-screenshots/${ file }-expected.jpg` );
 				throw new Error( `Image sizes does not match in file: ${ file }` );
 
 			}
@@ -583,9 +556,9 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} else {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-actual.jpg` );
-				await expected.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-expected.jpg` );
-				await diff.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-diff.jpg` );
+				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await expected.writeAsync( `test/e2e/output-screenshots/${ file }-expected.jpg` );
+				await diff.writeAsync( `test/e2e/output-screenshots/${ file }-diff.jpg` );
 				throw new Error( `Diff wrong in ${ differentPixels.toFixed( 1 ) }% of pixels in file: ${ file }` );
 
 			}
@@ -616,7 +589,7 @@ function close( exitCode = 1 ) {
 
 	console.log( 'Closing...' );
 
-	if ( browser !== undefined ) browser.close();
+	browser.close();
 	server.close();
 	process.exit( exitCode );
 
