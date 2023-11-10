@@ -82,6 +82,7 @@ const exceptionList = [
 	'webgl_lensflares',
 	'webgl_lights_spotlights',
 	'webgl_loader_imagebitmap',
+	'webgl_loader_texture_ktx',
 	'webgl_loader_texture_lottie',
 	'webgl_loader_texture_pvrtc',
 	'webgl_materials_alphahash',
