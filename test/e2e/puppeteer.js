@@ -132,8 +132,6 @@ const exceptionList = [
 
 ];
 
-let browser;
-
 /* CONFIG VARIABLES END */
 
 const port = 1234;
@@ -157,6 +155,8 @@ const jpgQuality = 95;
 console.red = msg => console.log( chalk.red( msg ) );
 console.yellow = msg => console.log( chalk.yellow( msg ) );
 console.green = msg => console.log( chalk.green( msg ) );
+
+let browser;
 
 /* Launch server */
 
