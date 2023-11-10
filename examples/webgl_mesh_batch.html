@@ -39,7 +39,7 @@
 
 		let stats, gui, guiStatsEl;
 		let camera, controls, scene, renderer;
-		let geometries, mesh;
+		let geometries, mesh, material;
 		const ids = [];
 		const matrix = new THREE.Matrix4();
 
@@ -62,7 +62,10 @@
 		const api = {
 			method: Method.BATCHED,
 			count: 256,
-			dynamic: 16
+			dynamic: 16,
+
+			sortObjects: true,
+			opacity: 1,
 		};
 
 		init();
@@ -111,7 +114,14 @@
 
 		function createMaterial() {
 
-			return new THREE.MeshNormalMaterial();
+			if ( ! material ) {
+
+				material = new THREE.MeshNormalMaterial();
+				material.opacity = 0.1;
+
+			}
+
+			return material;
 
 		}
 
@@ -238,6 +248,25 @@
 			gui.add( api, 'count', 1, MAX_GEOMETRY_COUNT ).step( 1 ).onChange( initMesh );
 			gui.add( api, 'dynamic', 0, MAX_GEOMETRY_COUNT ).step( 1 );
 			gui.add( api, 'method', Method ).onChange( initMesh );
+			gui.add( api, 'opacity', 0, 1 ).onChange( v => {
+
+				if ( v < 1 ) {
+
+					material.transparent = true;
+					material.depthWrite = false;
+
+				} else {
+
+					material.transparent = false;
+					material.depthWrite = true;
+
+				}
+
+				material.opacity = v;
+				material.needsUpdate = true;
+
+			} );
+			gui.add( api, 'sortObjects' );
 
 			guiStatsEl = document.createElement( 'li' );
 			guiStatsEl.classList.add( 'gui-stats' );
@@ -312,6 +341,12 @@
 		}
 
 		function render() {
+
+			if ( mesh.isBatchedMesh ) {
+
+				mesh.sortObjects = api.sortObjects;
+
+			}
 
 			renderer.render( scene, camera );
 
