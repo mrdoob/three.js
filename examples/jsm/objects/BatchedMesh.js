@@ -15,6 +15,64 @@ import {
 	Vector3,
 } from 'three';
 
+function sortOpaque( a, b ) {
+
+	return a.z - b.z;
+
+}
+
+function sortTransparent( a, b ) {
+
+	return b.z - a.z;
+
+}
+
+class RenderInfoPool {
+
+	constructor() {
+
+		this.index = 0;
+		this.pool = [];
+		this.list = [];
+
+	}
+
+	getNextItem( drawRange, z ) {
+
+		const pool = this.pool;
+		const list = this.list;
+		if ( this.index >= pool.length ) {
+
+			pool.push( {
+
+				start: - 1,
+				count: - 1,
+				z: - 1,
+
+			} );
+
+		}
+
+		const item = pool[ this.index ];
+		list.push( item );
+		this.index ++;
+
+		item.start = drawRange.start;
+		item.count = drawRange.count;
+		item.z = z;
+		return item;
+
+	}
+
+	reset() {
+
+		this.list.length = 0;
+		this.index = 0;
+
+	}
+
+}
+
 const ID_ATTR_NAME = 'batchId';
 const _matrix = new Matrix4();
 const _identityMatrix = new Matrix4();
@@ -29,6 +87,7 @@ const _frustum = new Frustum();
 const _box = new Box3();
 const _sphere = new Sphere();
 const _vector = new Vector3();
+const _renderItems = new RenderInfoPool();
 
 // @TODO: SkinnedMesh support?
 // @TODO: Future work if needed. Move into the core. Can be optimized more with WEBGL_multi_draw.
@@ -75,6 +134,7 @@ class BatchedMesh extends Mesh {
 
 		this.isBatchedMesh = true;
 		this.perObjectFrustumCulled = true;
+		this.sortObjects = true;
 		this.boundingBox = null;
 		this.boundingSphere = null;
 
@@ -827,30 +887,85 @@ class BatchedMesh extends Mesh {
 		}
 
 		let count = 0;
-		for ( let i = 0, l = visible.length; i < l; i ++ ) {
 
-			if ( visible[ i ] ) {
+		if ( this.sortObjects ) {
 
-				// determine whether the batched geometry is within the frustum
-				let culled = false;
-				if ( perObjectFrustumCulled ) {
+			_vector.setFromMatrixPosition( camera.matrixWorld );
 
-					// get the bounds in camera space
+			let added = 0;
+			for ( let i = 0, l = visible.length; i < l; i ++ ) {
+
+				if ( visible[ i ] ) {
+
 					this.getMatrixAt( i, _matrix );
-
-					// get the bounds
-					this.getBoundingBoxAt( i, _box ).applyMatrix4( _matrix );
 					this.getBoundingSphereAt( i, _sphere ).applyMatrix4( _matrix );
-					culled = ! _frustum.intersectsBox( _box ) || ! _frustum.intersectsSphere( _sphere );
+					const z = _vector.distanceToSquared( _sphere.center );
+
+					// determine whether the batched geometry is within the frustum
+					let culled = false;
+					if ( perObjectFrustumCulled ) {
+
+						// get the bounds in camera space
+						this.getMatrixAt( i, _matrix );
+
+						// get the bounds
+						this.getBoundingBoxAt( i, _box ).applyMatrix4( _matrix );
+						culled = ! _frustum.intersectsBox( _box ) || ! _frustum.intersectsSphere( _sphere );
+
+					}
+
+					if ( ! culled || true ) {
+
+						_renderItems.getNextItem( drawRanges[ i ], z );
+
+					}
 
 				}
 
-				if ( ! culled ) {
+			}
 
-					const range = drawRanges[ i ];
-					multiDrawStarts[ count ] = range.start * bytesPerElement;
-					multiDrawCounts[ count ] = range.count;
-					count ++;
+			const list = _renderItems.list;
+			list.sort( material.transparent ? sortTransparent : sortOpaque );
+
+			for ( let i = 0, l = list.length; i < l; i ++ ) {
+
+				const item = list[ i ];
+				multiDrawStarts[ count ] = item.start * bytesPerElement;
+				multiDrawCounts[ count ] = item.count;
+				count ++;
+
+			}
+
+			_renderItems.reset();
+
+		} else {
+
+			for ( let i = 0, l = visible.length; i < l; i ++ ) {
+
+				if ( visible[ i ] ) {
+
+					// determine whether the batched geometry is within the frustum
+					let culled = false;
+					if ( perObjectFrustumCulled ) {
+
+						// get the bounds in camera space
+						this.getMatrixAt( i, _matrix );
+
+						// get the bounds
+						this.getBoundingBoxAt( i, _box ).applyMatrix4( _matrix );
+						this.getBoundingSphereAt( i, _sphere ).applyMatrix4( _matrix );
+						culled = ! _frustum.intersectsBox( _box ) || ! _frustum.intersectsSphere( _sphere );
+
+					}
+
+					if ( ! culled ) {
+
+						const range = drawRanges[ i ];
+						multiDrawStarts[ count ] = range.start * bytesPerElement;
+						multiDrawCounts[ count ] = range.count;
+						count ++;
+
+					}
 
 				}
 
