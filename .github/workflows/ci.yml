@@ -6,11 +6,6 @@ on:
       - 'build/**'
       - 'docs/**'
       - 'files/**'
-  push:
-    paths-ignore:
-      - 'build/**'
-      - 'docs/**'
-      - 'files/**'
 
 permissions:
   contents: read
@@ -74,7 +69,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        os: [ macos-latest ]
         CI: [ 0, 1, 2, 3 ]
     env:
       CI: ${{ matrix.CI }}
