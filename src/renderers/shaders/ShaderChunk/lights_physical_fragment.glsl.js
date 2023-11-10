@@ -133,8 +133,13 @@ material.roughness = min( material.roughness, 1.0 );
 	#endif
 
 	material.anisotropy = length( anisotropyV );
-	anisotropyV /= material.anisotropy;
-	material.anisotropy = saturate( material.anisotropy );
+
+	if( material.anisotropy == 0.0 ) {
+		anisotropyV = vec2( 1.0, 0.0 );
+	} else {
+		anisotropyV /= material.anisotropy;
+		material.anisotropy = saturate( material.anisotropy );
+	}
 
 	// Roughness along the anisotropy bitangent is the material roughness, while the tangent roughness increases with anisotropy.
 	material.alphaT = mix( pow2( material.roughness ), 1.0, pow2( material.anisotropy ) );

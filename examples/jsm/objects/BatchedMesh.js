@@ -785,6 +785,8 @@ class BatchedMesh extends Mesh {
 		this._matricesTexture = source._matricesTexture.clone();
 		this._matricesTexture.image.data = this._matricesTexture.image.slice();
 
+		return this;
+
 	}
 
 	dispose() {
