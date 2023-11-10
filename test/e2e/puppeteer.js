@@ -109,7 +109,6 @@ const exceptionList = [
 	// Awaiting for WebGPU support
 	'webgpu_clearcoat',
 	'webgpu_compute_audio',
-	'webgpu_compute_particles',
 	'webgpu_compute_particles_rain',
 	'webgpu_compute_points',
 	'webgpu_compute_texture',
