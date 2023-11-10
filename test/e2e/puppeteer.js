@@ -485,7 +485,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		} catch ( e ) {
 
-			if ( ! e.includes( 'Render timeout exceeded' ) ) {
+			if ( e.includes && e.includes( 'Render timeout exceeded' ) === false ) {
 
 				throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
 
