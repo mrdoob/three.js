@@ -948,16 +948,15 @@ class BatchedMesh extends Mesh {
 
 		if ( this.sortObjects ) {
 
+			// get the camera position
 			_vector.setFromMatrixPosition( camera.matrixWorld );
 
-			let added = 0;
 			for ( let i = 0, l = visible.length; i < l; i ++ ) {
 
 				if ( visible[ i ] ) {
 
 					this.getMatrixAt( i, _matrix );
 					this.getBoundingSphereAt( i, _sphere ).applyMatrix4( _matrix );
-					const z = _vector.distanceToSquared( _sphere.center );
 
 					// determine whether the batched geometry is within the frustum
 					let culled = false;
@@ -972,8 +971,10 @@ class BatchedMesh extends Mesh {
 
 					}
 
-					if ( ! culled || true ) {
+					if ( ! culled ) {
 
+						// get the distance from camera used for sorting
+						const z = _vector.distanceToSquared( _sphere.center );
 						_renderList.push( drawRanges[ i ], z );
 
 					}
@@ -982,6 +983,7 @@ class BatchedMesh extends Mesh {
 
 			}
 
+			// Sort the draw ranges and prep for rendering
 			const list = _renderList.list;
 			list.sort( material.transparent ? sortTransparent : sortOpaque );
 
