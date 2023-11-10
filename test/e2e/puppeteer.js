@@ -340,8 +340,6 @@ async function preparePage( page, injection, build, errorMessages ) {
 
 		}
 
-		console.log( 'errorMessages', errorMessages )
-
 		if ( errorMessages.includes( text ) ) {
 
 			return;
@@ -486,9 +484,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		} catch ( e ) {
 
-			console.log( 'e', e );
-
-			if ( ! e.message.includes( 'Render timeout exceeded' ) ) {
+			if ( ! e.includes( 'Render timeout exceeded' ) ) {
 
 				throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
 
