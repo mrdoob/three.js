@@ -27,7 +27,7 @@ function sortTransparent( a, b ) {
 
 }
 
-class RenderInfoPool {
+class MultiDrawRenderList {
 
 	constructor() {
 
@@ -37,7 +37,7 @@ class RenderInfoPool {
 
 	}
 
-	getNextItem( drawRange, z ) {
+	push( drawRange, z ) {
 
 		const pool = this.pool;
 		const list = this.list;
@@ -60,7 +60,6 @@ class RenderInfoPool {
 		item.start = drawRange.start;
 		item.count = drawRange.count;
 		item.z = z;
-		return item;
 
 	}
 
@@ -87,7 +86,7 @@ const _frustum = new Frustum();
 const _box = new Box3();
 const _sphere = new Sphere();
 const _vector = new Vector3();
-const _renderItems = new RenderInfoPool();
+const _renderList = new MultiDrawRenderList();
 
 // @TODO: SkinnedMesh support?
 // @TODO: Future work if needed. Move into the core. Can be optimized more with WEBGL_multi_draw.
@@ -916,7 +915,7 @@ class BatchedMesh extends Mesh {
 
 					if ( ! culled || true ) {
 
-						_renderItems.getNextItem( drawRanges[ i ], z );
+						_renderList.push( drawRanges[ i ], z );
 
 					}
 
@@ -924,7 +923,7 @@ class BatchedMesh extends Mesh {
 
 			}
 
-			const list = _renderItems.list;
+			const list = _renderList.list;
 			list.sort( material.transparent ? sortTransparent : sortOpaque );
 
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
@@ -936,7 +935,7 @@ class BatchedMesh extends Mesh {
 
 			}
 
-			_renderItems.reset();
+			_renderList.reset();
 
 		} else {
 
