@@ -907,6 +907,8 @@ class ObjectLoader extends Loader {
 
 				object = new BatchedMesh( data.maxGeometryCount, data.maxVertexCount, data.maxIndexCount, material );
 				object.geometry = geometry;
+				object.perObjectFrustumCulled = data.perObjectFrustumCulled;
+				object.sortObjects = data.sortObjects;
 
 				object._drawRanges = data._drawRanges;
 				object._reservedRanges = data._reservedRanges;
