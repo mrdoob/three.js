@@ -57,7 +57,14 @@
 
 		<h3>[property:Boolean perObjectFrustumCulled]</h3>
 		<p>
-			TODO
+			If true then the individual objects within the [name] are frustum culled. Default is `true`.
+		</p>
+
+		<h3>[property:Boolean sortObjects]</h3>
+		<p>
+			If true then the individual objects within the [name] are sorted to improve overdraw-related artifacts.
+			If the material is marked as "transparent" objects are rendered back to front and if not then they are
+			rendered front to back. Default is `true`.
 		</p>
 
 		<h3>[property:Boolean isBatchedMesh]</h3>
@@ -88,7 +95,7 @@
 		</p>
 
 		<h3>
-			[method:undefined getMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )
+			[method:Matrix4 getMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )
 		</h3>
 		<p>
 			[page:Integer index]: The index of an instance. Values have to be in the
@@ -101,7 +108,16 @@
 		<p>Get the local transformation matrix of the defined instance.</p>
 
 		<h3>
-			[method:undefined setMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )
+			[method:Boolean getVisibleAt]( [param:Integer index] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>Get whether the given instance is marked as "visible" or not.</p>
+
+		<h3>
+			[method:this setMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )
 		</h3>
 		<p>
 			[page:Integer index]: The index of an instance. Values have to be in the
@@ -118,7 +134,21 @@
 		</p>
 
 		<h3>
-			[method:Integer adGeometryAt]( [param:BufferGeometry geometry], [param:Integer reservedVertexRange], [param:Integer reservedIndexRange] )
+			[method:this setVisibleAt]( [param:Integer index], [param:Boolean visible] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>
+			[page:Boolean visible]: A boolean value indicating the visibility state.
+		</p>
+		<p>
+			Sets the visibility of the object at the given index.
+		</p>
+
+		<h3>
+			[method:Integer addGeometry]( [param:BufferGeometry geometry], [param:Integer reservedVertexRange], [param:Integer reservedIndexRange] )
 		</h3>
 		<p>
 			TODO
