@@ -264,6 +264,7 @@
 			"Objects": {
 				"Bone": "api/en/objects/Bone",
 				"Group": "api/en/objects/Group",
+				"BatchedMesh": "api/en/objects/BatchedMesh",
 				"InstancedMesh": "api/en/objects/InstancedMesh",
 				"Line": "api/en/objects/Line",
 				"LineLoop": "api/en/objects/LineLoop",
