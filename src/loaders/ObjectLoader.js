@@ -22,6 +22,7 @@ import { Color } from '../math/Color.js';
 import { Object3D } from '../core/Object3D.js';
 import { Group } from '../objects/Group.js';
 import { InstancedMesh } from '../objects/InstancedMesh.js';
+import { BatchedMesh } from '../../examples/jsm/objects/BatchedMesh.js';
 import { Sprite } from '../objects/Sprite.js';
 import { Points } from '../objects/Points.js';
 import { Line } from '../objects/Line.js';
@@ -59,6 +60,8 @@ import { Loader } from './Loader.js';
 import { FileLoader } from './FileLoader.js';
 import * as Geometries from '../geometries/Geometries.js';
 import { getTypedArray } from '../utils.js';
+import { Box3 } from '../math/Box3.js';
+import { Sphere } from '../math/Sphere.js';
 
 class ObjectLoader extends Loader {
 
@@ -894,6 +897,50 @@ class ObjectLoader extends Loader {
 				object = new InstancedMesh( geometry, material, count );
 				object.instanceMatrix = new InstancedBufferAttribute( new Float32Array( instanceMatrix.array ), 16 );
 				if ( instanceColor !== undefined ) object.instanceColor = new InstancedBufferAttribute( new Float32Array( instanceColor.array ), instanceColor.itemSize );
+
+				break;
+
+			case 'BatchedMesh':
+
+				geometry = getGeometry( data.geometry );
+				material = getMaterial( data.material );
+
+				object = new BatchedMesh( data.maxGeometryCount, data.maxVertexCount, data.maxIndexCount, material );
+				object.geometry = geometry;
+
+				object._drawRanges = data._drawRanges;
+				object._reservedRanges = data._reservedRanges;
+
+				object._visible = data.visible;
+				object._active = data.active;
+				object._bounds = data.bounds.map( bound => {
+
+					const box = new Box3();
+					box.min.fromArray( bound.boxMin );
+					box.max.fromArray( bound.boxMax );
+
+					const sphere = new Sphere();
+					sphere.radius = bound.sphereRadius;
+					sphere.center.fromArray( bound.sphereCenter );
+
+					return {
+						boxInitialized: bound.boxInitialized,
+						box: box,
+
+						sphereInitialized: bound.sphereInitialized,
+						sphere: sphere
+					};
+
+				} );
+
+				object._maxGeometryCount = data.maxGeometryCount;
+				object._maxVertexCount = data.maxVertexCount;
+				object._maxIndexCount = data.maxIndexCount;
+
+				object._geometryInitialized = data.geometryInitialized;
+				object._geometryCount = data.geometryCount;
+
+				object._matricesTexture = getTexture( data.matricesTexture );
 
 				break;
 
