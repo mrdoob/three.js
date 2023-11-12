@@ -6,17 +6,13 @@ export function getCacheKey( object ) {
 
 	if ( object.isNode === true ) {
 
-		cacheKey += `uuid:"${ object.uuid }"`;
+		cacheKey += object.id;
 
 	}
 
-	for ( const { property, index, childNode } of getNodeChildren( object ) ) {
+	for ( const { property, childNode } of getNodeChildren( object ) ) {
 
-		// @TODO: Think about implement NodeArray and NodeObject.
-
-		let childCacheKey = getCacheKey( childNode );
-		if ( ! childCacheKey.includes( ',' ) ) childCacheKey = childCacheKey.slice( childCacheKey.indexOf( '"' ), childCacheKey.indexOf( '}' ) );
-		cacheKey += `,${ property }${ index !== undefined ? '/' + index : '' }:${ childCacheKey }`;
+		cacheKey += ',' + property.slice( 0, - 4 ) + ':' + childNode.getCacheKey();
 
 	}
 

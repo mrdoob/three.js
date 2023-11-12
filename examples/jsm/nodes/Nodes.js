@@ -136,7 +136,7 @@ export { default as DirectionalLightNode } from './lighting/DirectionalLightNode
 export { default as SpotLightNode } from './lighting/SpotLightNode.js';
 export { default as IESSpotLightNode } from './lighting/IESSpotLightNode.js';
 export { default as AmbientLightNode } from './lighting/AmbientLightNode.js';
-export { default as LightsNode, lights, lightsWithoutWrap, addLightNode } from './lighting/LightsNode.js';
+export { default as LightsNode, lights, lightNodes, addLightNode } from './lighting/LightsNode.js';
 export { default as LightingNode /* @TODO: lighting (abstract), light */ } from './lighting/LightingNode.js';
 export { default as LightingContextNode, lightingContext } from './lighting/LightingContextNode.js';
 export { default as HemisphereLightNode } from './lighting/HemisphereLightNode.js';

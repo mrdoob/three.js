@@ -25,9 +25,7 @@ class USDAParser {
 		const data = {};
 
 		const lines = text.split( '\n' );
-		const length = lines.length;
 
-		let current = 0;
 		let string = null;
 		let target = data;
 
@@ -35,9 +33,7 @@ class USDAParser {
 
 		// debugger;
 
-		function parseNextLine() {
-
-			const line = lines[ current ];
+		for ( const line of lines ) {
 
 			// console.log( line );
 
@@ -74,7 +70,7 @@ class USDAParser {
 
 				stack.pop();
 
-				if ( stack.length === 0 ) return;
+				if ( stack.length === 0 ) continue;
 
 				target = stack[ stack.length - 1 ];
 
@@ -100,17 +96,7 @@ class USDAParser {
 
 			}
 
-			current ++;
-
-			if ( current < length ) {
-
-				parseNextLine();
-
-			}
-
 		}
-
-		parseNextLine();
 
 		return data;
 
@@ -640,7 +626,7 @@ class USDZLoader extends Loader {
 
 						}
 
-					} else  if ( 'float inputs:clearcoat' in surface ) {
+					} else if ( 'float inputs:clearcoat' in surface ) {
 
 						material.clearcoat = parseFloat( surface[ 'float inputs:clearcoat' ] );
 

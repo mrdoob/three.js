@@ -748,6 +748,24 @@ class Object3D extends EventDispatcher {
 
 			object.matricesTexture = this._matricesTexture.toJSON();
 
+			if ( this.boundingSphere !== null ) {
+
+				object.boundingSphere = {
+					center: object.boundingSphere.center.toArray(),
+					radius: object.boundingSphere.radius
+				};
+
+			}
+
+			if ( this.boundingBox !== null ) {
+
+				object.boundingBox = {
+					min: object.boundingBox.min.toArray(),
+					max: object.boundingBox.max.toArray()
+				};
+
+			}
+
 		}
 
 		//

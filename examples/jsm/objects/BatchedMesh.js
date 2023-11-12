@@ -29,6 +29,8 @@ const _frustum = new Frustum();
 const _box = new Box3();
 const _sphere = new Sphere();
 const _vector = new Vector3();
+const _mesh = new Mesh();
+const _batchIntersects = [];
 
 // @TODO: SkinnedMesh support?
 // @TODO: Future work if needed. Move into the core. Can be optimized more with WEBGL_multi_draw.
@@ -75,7 +77,8 @@ class BatchedMesh extends Mesh {
 
 		this.isBatchedMesh = true;
 		this.perObjectFrustumCulled = true;
-		this.frustumCulled = false;
+		this.boundingBox = null;
+		this.boundingSphere = null;
 
 		this._drawRanges = [];
 		this._reservedRanges = [];
@@ -243,6 +246,56 @@ class BatchedMesh extends Mesh {
 
 			const finalRange = reservedRanges[ reservedRanges.length - 1 ];
 			return finalRange.indexStart + finalRange.indexCount;
+
+		}
+
+	}
+
+	computeBoundingBox() {
+
+		if ( this.boundingBox === null ) {
+
+			this.boundingBox = new Box3();
+
+		}
+
+		const geometryCount = this._geometryCount;
+		const boundingBox = this.boundingBox;
+		const active = this._active;
+
+		boundingBox.makeEmpty();
+		for ( let i = 0; i < geometryCount; i ++ ) {
+
+			if ( active[ i ] === false ) continue;
+
+			this.getMatrixAt( i, _matrix );
+			this.getBoundingBoxAt( i, _box ).applyMatrix4( _matrix );
+			boundingBox.union( _box );
+
+		}
+
+	}
+
+	computeBoundingSphere() {
+
+		if ( this.boundingSphere === null ) {
+
+			this.boundingSphere = new Sphere();
+
+		}
+
+		const geometryCount = this._geometryCount;
+		const boundingSphere = this.boundingSphere;
+		const active = this._active;
+
+		boundingSphere.makeEmpty();
+		for ( let i = 0; i < geometryCount; i ++ ) {
+
+			if ( active[ i ] === false ) continue;
+
+			this.getMatrixAt( i, _matrix );
+			this.getBoundingSphereAt( i, _sphere ).applyMatrix4( _matrix );
+			boundingSphere.union( _sphere );
 
 		}
 
@@ -694,9 +747,66 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	raycast() {
+	raycast( raycaster, intersects ) {
 
-		console.warn( 'BatchedMesh: Raycast function not implemented.' );
+		const visible = this._visible;
+		const active = this._active;
+		const drawRanges = this._drawRanges;
+		const geometryCount = this._geometryCount;
+		const matrixWorld = this.matrixWorld;
+		const batchGeometry = this.geometry;
+
+		// iterate over each geometry
+		_mesh.material = this.material;
+		_mesh.geometry.index = batchGeometry.index;
+		_mesh.geometry.attributes = batchGeometry.attributes;
+		if ( _mesh.geometry.boundingBox === null ) {
+
+			_mesh.geometry.boundingBox = new Box3();
+
+		}
+
+		if ( _mesh.geometry.boundingSphere === null ) {
+
+			_mesh.geometry.boundingSphere = new Sphere();
+
+		}
+
+		for ( let i = 0; i < geometryCount; i ++ ) {
+
+			if ( ! visible[ i ] || ! active[ i ] ) {
+
+				continue;
+
+			}
+
+			const drawRange = drawRanges[ i ];
+			_mesh.geometry.setDrawRange( drawRange.start, drawRange.count );
+
+			// ge the intersects
+			this.getMatrixAt( i, _mesh.matrixWorld ).premultiply( matrixWorld );
+			this.getBoundingBoxAt( i, _mesh.geometry.boundingBox );
+			this.getBoundingSphereAt( i, _mesh.geometry.boundingSphere );
+			_mesh.raycast( raycaster, _batchIntersects );
+
+			// add batch id to the intersects
+			for ( let j = 0, l = _batchIntersects.length; j < l; j ++ ) {
+
+				const intersect = _batchIntersects[ j ];
+				intersect.object = this;
+				intersect.batchId = i;
+				intersects.push( intersect );
+
+			}
+
+			_batchIntersects.length = 0;
+
+		}
+
+		_mesh.material = null;
+		_mesh.geometry.index = null;
+		_mesh.geometry.attributes = {};
+		_mesh.geometry.setDrawRange( 0, Infinity );
 
 	}
 
@@ -706,6 +816,8 @@ class BatchedMesh extends Mesh {
 
 		this.geometry = source.geometry.clone();
 		this.perObjectFrustumCulled = source.perObjectFrustumCulled;
+		this.boundingBox = source.boundingBox !== null ? source.boundingBox.clone() : null;
+		this.boundingSphere = source.boundingSphere !== null ? source.boundingSphere.clone() : null;
 
 		this._drawRanges = source._drawRanges.map( range => ( { ...range } ) );
 		this._reservedRanges = source._reservedRanges.map( range => ( { ...range } ) );
@@ -731,6 +843,8 @@ class BatchedMesh extends Mesh {
 
 		this._matricesTexture = source._matricesTexture.clone();
 		this._matricesTexture.image.data = this._matricesTexture.image.slice();
+
+		return this;
 
 	}
 
