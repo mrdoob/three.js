@@ -38,6 +38,7 @@ const _batchIntersects = [];
 // @TODO: geometry.drawRange support?
 // @TODO: geometry.morphAttributes support?
 // @TODO: Support uniform parameter per geometry
+// @TODO: Add an "optimize" function to pack geometry and remove data gaps
 
 // copies data from attribute "src" into "target" starting at "targetOffset"
 function copyAttributeData( src, target, targetOffset = 0 ) {
@@ -661,12 +662,6 @@ class BatchedMesh extends Mesh {
 
 		target.copy( sphere );
 		return target;
-
-	}
-
-	optimize() {
-
-		throw new Error( 'BatchedMesh: Optimize function not implemented.' );
 
 	}
 
