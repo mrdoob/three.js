@@ -18,12 +18,6 @@ import {
 const ID_ATTR_NAME = 'batchId';
 const _matrix = new Matrix4();
 const _identityMatrix = new Matrix4();
-const _zeroScaleMatrix = new Matrix4().set(
-	0, 0, 0, 0,
-	0, 0, 0, 0,
-	0, 0, 0, 0,
-	0, 0, 0, 1,
-);
 const _projScreenMatrix = new Matrix4();
 const _frustum = new Frustum();
 const _box = new Box3();
@@ -38,6 +32,7 @@ const _batchIntersects = [];
 // @TODO: geometry.drawRange support?
 // @TODO: geometry.morphAttributes support?
 // @TODO: Support uniform parameter per geometry
+// @TODO: Add an "optimize" function to pack geometry and remove data gaps
 
 // copies data from attribute "src" into "target" starting at "targetOffset"
 function copyAttributeData( src, target, targetOffset = 0 ) {
@@ -555,8 +550,6 @@ class BatchedMesh extends Mesh {
 		// Note: User needs to call optimize() afterward to pack the data.
 
 		const active = this._active;
-		const matricesArray = this._matricesTexture.image.data;
-		const matricesTexture = this._matricesTexture;
 		if ( geometryId >= active.length || active[ geometryId ] === false ) {
 
 			return this;
@@ -564,8 +557,6 @@ class BatchedMesh extends Mesh {
 		}
 
 		active[ geometryId ] = false;
-		_zeroScaleMatrix.toArray( matricesArray, geometryId * 16 );
-		matricesTexture.needsUpdate = true;
 
 		return this;
 
@@ -661,12 +652,6 @@ class BatchedMesh extends Mesh {
 
 		target.copy( sphere );
 		return target;
-
-	}
-
-	optimize() {
-
-		throw new Error( 'BatchedMesh: Optimize function not implemented.' );
 
 	}
 
