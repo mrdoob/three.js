@@ -262,6 +262,7 @@
 			},
 
 			"Objects": {
+				"BatchedMesh": "api/en/objects/BatchedMesh",
 				"Bone": "api/en/objects/Bone",
 				"Group": "api/en/objects/Group",
 				"InstancedMesh": "api/en/objects/InstancedMesh",
