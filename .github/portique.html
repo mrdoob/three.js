@@ -1,0 +1,55 @@
+// Variables
+var scene, camera, renderer, group;
+var count = 0;
+var scale = 0.5;
+var deltaX = 50;
+var deltaY = 100;
+var rotation = Math.PI / 10;
+
+// Fonction d'initialisation
+function init() {
+ scene = new THREE.Scene();
+ camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+ renderer = new THREE.WebGLRenderer();
+ renderer.setSize(window.innerWidth, window.innerHeight);
+ document.body.appendChild(renderer.domElement);
+
+ group = new THREE.Group();
+ scene.add(group);
+
+ createPortal();
+
+ camera.position.z = 5;
+
+ animate();
+}
+
+// Fonction pour créer le portique
+function createPortal() {
+ var geometry = new THREE.BoxGeometry(1, 1, 1);
+ var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+
+ for (var i = 0; i < 5; i++) {
+    for (var j = 0; j < 5; j++) {
+      var cube = new THREE.Mesh(geometry, material);
+      cube.position.x = i * deltaX * scale;
+      cube.position.y = j * deltaY * scale;
+      cube.scale.set(scale, scale, scale);
+      group.add(cube);
+    }
+ }
+}
+
+// Fonction d'animation
+function animate() {
+ requestAnimationFrame(animate);
+
+ group.rotation.x += rotation;
+ group.rotation.y += rotation;
+ group.rotation.z += rotation;
+
+ renderer.render(scene, camera);
+}
+
+// Exécution du code
+init();
