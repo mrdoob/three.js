@@ -723,6 +723,7 @@ class Object3D extends EventDispatcher {
 
 			object.type = 'BatchedMesh';
 			object.perObjectFrustumCulled = this.perObjectFrustumCulled;
+			object.sortObjects = this.sortObjects;
 
 			object.drawRanges = this._drawRanges;
 			object.reservedRanges = this._reservedRanges;
