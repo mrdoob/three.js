@@ -151,21 +151,40 @@
 			[method:Integer addGeometry]( [param:BufferGeometry geometry], [param:Integer reservedVertexRange], [param:Integer reservedIndexRange] )
 		</h3>
 		<p>
-			TODO
+			[page:BufferGeometry index]: The geometry to add into the [name].
+		</p>
+		<p>
+			[page:Integer reservedVertexRange]: Optional parameter specifying the amount of vertex buffer space to reserve for the added geometry. This
+			is necessary if it is planned to set a new geometry at this index at a later time that is larger than the original geometry. Defaults to
+			the length of the given geometry vertex buffer.
+		</p>
+		<p>
+			[page:Integer reservedIndexRange]: Optional parameter specifying the amount of index buffer space to reserve for the added geometry. This
+			is necessary if it is planned to set a new geometry at this index at a later time that is larger than the original geometry. Defaults to
+			the length of the given geometry index buffer.
+		</p>
+		<p>
+			Adds the given geometry to the [name] and returns the associated index referring to it.
 		</p>
 
 		<h3>
 			[method:Integer setGeometryAt]( [param:Integer index], [param:BufferGeometry geometry] )
 		</h3>
 		<p>
-			TODO
+			[page:Integer index]: Which geometry index to replace with this geometry.
+		</p>
+		<p>
+			[page:BufferGeometry geometry]: The geometry to substitute at the given geometry index.
+		</p>
+		<p>
+			Replaces the geometry at `index` with the provided geometry. Throws an error if there is not enough space reserved for geometry at the index.
 		</p>
 
 		<h3>
-			[method:undefined deleteGeometry]( [param:Integer index] )
+			[method:this deleteGeometry]( [param:Integer index] )
 		</h3>
 		<p>
-			TODO
+			Marks the given geometry as deleted and to not be rendered anymore.
 		</p>
 
 		<h2>Source</h2>
