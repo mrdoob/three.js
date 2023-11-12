@@ -18,12 +18,6 @@ import {
 const ID_ATTR_NAME = 'batchId';
 const _matrix = new Matrix4();
 const _identityMatrix = new Matrix4();
-const _zeroScaleMatrix = new Matrix4().set(
-	0, 0, 0, 0,
-	0, 0, 0, 0,
-	0, 0, 0, 0,
-	0, 0, 0, 1,
-);
 const _projScreenMatrix = new Matrix4();
 const _frustum = new Frustum();
 const _box = new Box3();
@@ -556,8 +550,6 @@ class BatchedMesh extends Mesh {
 		// Note: User needs to call optimize() afterward to pack the data.
 
 		const active = this._active;
-		const matricesArray = this._matricesTexture.image.data;
-		const matricesTexture = this._matricesTexture;
 		if ( geometryId >= active.length || active[ geometryId ] === false ) {
 
 			return this;
@@ -565,8 +557,6 @@ class BatchedMesh extends Mesh {
 		}
 
 		active[ geometryId ] = false;
-		_zeroScaleMatrix.toArray( matricesArray, geometryId * 16 );
-		matricesTexture.needsUpdate = true;
 
 		return this;
 
