@@ -40,6 +40,7 @@
 	"webgl_lines_fat": [ "gpu", "stats", "panel" ],
 	"webgl_lines_fat_raycasting": [ "gpu", "stats", "panel", "raycast" ],
 	"webgl_loader_ttf": [ "text", "font" ],
+	"webgl_loader_gainmap": [ "external", "hdr", "gainmap", "ultrahdr" ],
 	"webgl_loader_pdb": [ "molecules", "css2d" ],
 	"webgl_loader_ldraw": [ "lego" ],
 	"webgl_loader_ifc": [ "external" ],
