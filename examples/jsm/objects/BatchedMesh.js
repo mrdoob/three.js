@@ -88,8 +88,8 @@ class BatchedMesh extends Mesh {
 
 		this._geometryInitialized = false;
 		this._geometryCount = 0;
-		this._multiDrawCounts = null;
-		this._multiDrawStarts = null;
+		this._multiDrawCounts = new Int32Array( maxGeometryCount );
+		this._multiDrawStarts = new Int32Array( maxGeometryCount );
 		this._multiDrawCount = 0;
 
 		// Local matrix per geometry by using data texture
@@ -156,8 +156,6 @@ class BatchedMesh extends Mesh {
 			geometry.setAttribute( ID_ATTR_NAME, new BufferAttribute( idArray, 1 ) );
 
 			this._geometryInitialized = true;
-			this._multiDrawCounts = new Int32Array( maxGeometryCount );
-			this._multiDrawStarts = new Int32Array( maxGeometryCount );
 
 		}
 
