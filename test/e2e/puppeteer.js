@@ -216,7 +216,7 @@ async function main() {
 
 	/* Launch browser */
 
-	const flags = [ '--hide-scrollbars', '--enable-gpu' ];
+	const flags = [ '--hide-scrollbars', '--enable-unsafe-webgpu' ];
 	// flags.push( '--enable-unsafe-webgpu', '--enable-features=Vulkan', '--use-gl=swiftshader', '--use-angle=swiftshader', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader' );
 	// if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
 
