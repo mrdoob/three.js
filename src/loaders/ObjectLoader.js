@@ -910,8 +910,8 @@ class ObjectLoader extends Loader {
 				object.perObjectFrustumCulled = data.perObjectFrustumCulled;
 				object.sortObjects = data.sortObjects;
 
-				object._drawRanges = data._drawRanges;
-				object._reservedRanges = data._reservedRanges;
+				object._drawRanges = data.drawRanges;
+				object._reservedRanges = data.reservedRanges;
 
 				object._visible = data.visible;
 				object._active = data.active;
@@ -942,7 +942,7 @@ class ObjectLoader extends Loader {
 				object._geometryInitialized = data.geometryInitialized;
 				object._geometryCount = data.geometryCount;
 
-				object._matricesTexture = getTexture( data.matricesTexture );
+				object._matricesTexture = getTexture( data.matricesTexture.uuid );
 
 				break;
 
