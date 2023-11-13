@@ -109,6 +109,7 @@ const exceptionList = [
 	// Awaiting for WebGPU support
 	'webgpu_clearcoat',
 	'webgpu_compute_audio',
+	'webgpu_compute_particles',
 	'webgpu_compute_particles_rain',
 	'webgpu_compute_points',
 	'webgpu_compute_texture',
@@ -236,9 +237,9 @@ async function main() {
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 	const build = ( await fs.readFile( 'build/three.module.js', 'utf8' ) ).replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
 
-	const page = await browser.newPage();
-	await page.goto('chrome://gpu');
-	await page.screenshot( { path: `test/e2e/output-screenshots/gpu.jpg`, fullPage: true } );
+	// const page = await browser.newPage();
+	// await page.goto( 'chrome://gpu' );
+	// await page.screenshot( { path: `test/e2e/output-screenshots/gpu.jpg`, fullPage: true } );
 
 	/* Prepare pages */
 
