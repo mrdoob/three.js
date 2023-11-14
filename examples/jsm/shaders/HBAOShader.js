@@ -25,7 +25,7 @@ const HBAOShader = {
 		'SAMPLE_VECTORS': generateHaboSampleKernelInitializer( 16 ),
 		'NORMAL_VECTOR_TYPE': 1,
 		'DEPTH_VALUE_SOURCE': 0,
-		'COSINE_SAMPLE_HEMISPHERE': 0,
+		'SAMPLING_FROM_NOISE': 0,
 	},
 
 	uniforms: {
@@ -142,15 +142,6 @@ const HBAOShader = {
 			return computeNormalFromDepth(uv);
 		#endif
 		}
-
-		// source: https://www.shadertoy.com/view/cll3R4
-		vec3 cosineSampleHemisphere(const vec3 n, const vec2 u) {
-			float r = sqrt(u.x);
-			float theta = 2.0 * PI * u.y;
-			vec3 b = normalize(cross(n, vec3(0.0, 1.0, 1.0)));
-			vec3 t = cross(b, n);
-			return normalize(r * sin(theta) * b + sqrt(1.0 - u.x) * n + r * cos(theta) * t);
-		}
 		
 		float getOcclusion(const vec2 uv, const vec3 viewPos, const vec3 viewNormal, const float depth, const vec4 sampleViewDir, inout float totalWeight) {
 			
@@ -190,15 +181,15 @@ const HBAOShader = {
 
 			float ao = 0.0, totalWeight = 0.0;
 			for (int i = 0; i < SAMPLES; i++) {		
-				#if COSINE_SAMPLE_HEMISPHERE == 1
+				#if SAMPLING_FROM_NOISE == 1
 					vec4 sampleNoise = noiseTexel;
 					if (i != 0) {
 						const vec4 hn = vec4(0.618033988749895, 0.3247179572447458, 0.2207440846057596, 0.1673039782614187);
 						sampleNoise = fract(sampleNoise + hn * float(i));
 						sampleNoise = mix(sampleNoise, 1.0 - sampleNoise, step(0.5, sampleNoise)) * 2.0;
 					}
-					vec3 hemisphereDir = cosineSampleHemisphere( viewNormal, sampleNoise.rg );
-					vec4 sampleViewDir = vec4(hemisphereDir, sampleNoise.b );
+					vec3 hemisphereDir = normalize(kernelMatrix * vec3(sampleNoise.xy * 2. - 1., sampleNoise.z));
+					vec4 sampleViewDir = vec4(hemisphereDir, sampleNoise.a);
 				#else
 					vec4 sampleViewDir = sampleKernel[i];
 					sampleViewDir.xyz = normalize(kernelMatrix * sampleViewDir.xyz);
