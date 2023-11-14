@@ -8,6 +8,7 @@ function WebGLAttributes( gl, capabilities ) {
 
 		const array = attribute.array;
 		const usage = attribute.usage;
+		const size = array.byteLength;
 
 		const buffer = gl.createBuffer();
 
@@ -76,7 +77,8 @@ function WebGLAttributes( gl, capabilities ) {
 			buffer: buffer,
 			type: type,
 			bytesPerElement: array.BYTES_PER_ELEMENT,
-			version: attribute.version
+			version: attribute.version,
+			size: size
 		};
 
 	}
@@ -198,6 +200,10 @@ function WebGLAttributes( gl, capabilities ) {
 			buffers.set( attribute, createBuffer( attribute, bufferType ) );
 
 		} else if ( data.version < attribute.version ) {
+
+			if ( data.size < attribute.array.byteLength ) {
+				throw new Error( 'Too many data for update current attribute, dynamic sized attributes not supported.' );
+			}
 
 			updateBuffer( data.buffer, attribute, bufferType );
 
