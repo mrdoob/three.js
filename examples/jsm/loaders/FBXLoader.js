@@ -885,7 +885,7 @@ class FBXTreeParser {
 
 		this.bindSkeleton( deformers.skeletons, geometryMap, modelMap );
 
-		this.createAmbientLight();
+		this.addGlobalSceneSettings();
 
 		sceneGraph.traverse( function ( node ) {
 
@@ -1468,20 +1468,31 @@ class FBXTreeParser {
 
 	}
 
-	// Parse ambient color in FBXTree.GlobalSettings - if it's not set to black (default), create an ambient light
-	createAmbientLight() {
+	addGlobalSceneSettings() {
 
-		if ( 'GlobalSettings' in fbxTree && 'AmbientColor' in fbxTree.GlobalSettings ) {
+		if ( 'GlobalSettings' in fbxTree ) {
 
-			const ambientColor = fbxTree.GlobalSettings.AmbientColor.value;
-			const r = ambientColor[ 0 ];
-			const g = ambientColor[ 1 ];
-			const b = ambientColor[ 2 ];
+			if ( 'AmbientColor' in fbxTree.GlobalSettings ) {
 
-			if ( r !== 0 || g !== 0 || b !== 0 ) {
+				// Parse ambient color - if it's not set to black (default), create an ambient light
 
-				const color = new Color( r, g, b ).convertSRGBToLinear();
-				sceneGraph.add( new AmbientLight( color, 1 ) );
+				const ambientColor = fbxTree.GlobalSettings.AmbientColor.value;
+				const r = ambientColor[ 0 ];
+				const g = ambientColor[ 1 ];
+				const b = ambientColor[ 2 ];
+
+				if ( r !== 0 || g !== 0 || b !== 0 ) {
+
+					const color = new Color( r, g, b ).convertSRGBToLinear();
+					sceneGraph.add( new AmbientLight( color, 1 ) );
+
+				}
+
+			}
+
+			if ( 'UnitScaleFactor' in fbxTree.GlobalSettings ) {
+
+				sceneGraph.userData.unitScaleFactor = fbxTree.GlobalSettings.UnitScaleFactor.value;
 
 			}
 
