@@ -202,7 +202,9 @@ function WebGLAttributes( gl, capabilities ) {
 		} else if ( data.version < attribute.version ) {
 
 			if ( data.size < attribute.array.byteLength ) {
+
 				throw new Error( 'Too many data for update current attribute, dynamic sized attributes not supported.' );
+
 			}
 
 			updateBuffer( data.buffer, attribute, bufferType );
