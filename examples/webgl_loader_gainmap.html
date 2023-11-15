@@ -39,7 +39,7 @@
 				"imports": {
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
-					"@monogrid/gainmap-js": "https://unpkg.com/@monogrid/gainmap-js@2.0.0/dist/decode.js"
+					"@monogrid/gainmap-js": "https://unpkg.com/@monogrid/gainmap-js@2.0.3/dist/decode.js"
 				}
 			}
 		</script>
@@ -118,7 +118,6 @@
 
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileCubemapShader();
 				pmremGenerator.compileEquirectangularShader();
 
 				THREE.DefaultLoadingManager.onLoad = function ( ) {
@@ -132,18 +131,12 @@
 				gainMap = new JPEGRLoader( renderer )
 					.load( 'textures/gainmap/spruit_sunrise_4k.jpg', function ( response ) {
 
-						gainmapRenderTarget = pmremGenerator.fromEquirectangular( response.renderTarget.texture );
-
-						gainmapBackground = response.toDataTexture();
 						resolutions[ 'JPEG Gain map' ] = response.width + 'x' + response.height;
-						fetchFileSize( 'textures/gainmap/spruit_sunrise_4k.jpg' ).then( function ( size ) {
-
-							fileSizes[ 'JPEG Gain map' ] = humanFileSize( size );
-							displayStats( 'JPEG Gain map' );
-
-						} );
-
-
+						displayStats( 'JPEG Gain map' );
+			
+						gainmapRenderTarget = pmremGenerator.fromEquirectangular( response.renderTarget.texture );
+			
+						gainmapBackground = response.toDataTexture();
 						gainmapBackground.mapping = THREE.EquirectangularReflectionMapping;
 						gainmapBackground.minFilter = THREE.LinearFilter;
 						gainmapBackground.magFilter = THREE.LinearFilter;
@@ -151,30 +144,20 @@
 
 						gainmapBackground.needsUpdate = true;
 
+					}, function ( progress ) {
+
+						fileSizes[ 'JPEG Gain map' ] = humanFileSize( progress.total );
+			
 					} );
 
 				separateGainMap = new GainMapLoader( renderer )
 					.load( [ 'textures/gainmap/spruit_sunrise_4k.webp', 'textures/gainmap/spruit_sunrise_4k-gainmap.webp', 'textures/gainmap/spruit_sunrise_4k.json' ], function ( response ) {
 
+						resolutions[ 'Webp Gain map (separate)' ] = response.width + 'x' + response.height;
+			
 						separateGainmapRenderTarget = pmremGenerator.fromEquirectangular( response.renderTarget.texture );
 
 						separateGainmapBackground = response.toDataTexture();
-						fetchFileSize( 'textures/gainmap/spruit_sunrise_4k.webp' )
-							.then( function ( sdrSize ) {
-
-								fetchFileSize( 'textures/gainmap/spruit_sunrise_4k-gainmap.webp' ).then( function ( gainMapSize ) {
-
-									fetchFileSize( 'textures/gainmap/spruit_sunrise_4k.json' ).then( function ( metadataSize ) {
-
-										fileSizes[ 'Webp Gain map (separate)' ] = humanFileSize( sdrSize + gainMapSize + metadataSize );
-
-									} );
-			
-								} );
-
-							} );
-						resolutions[ 'Webp Gain map (separate)' ] = response.width + 'x' + response.height;
-
 						separateGainmapBackground.mapping = THREE.EquirectangularReflectionMapping;
 						separateGainmapBackground.minFilter = THREE.LinearFilter;
 						separateGainmapBackground.magFilter = THREE.LinearFilter;
@@ -182,25 +165,27 @@
 
 						separateGainmapBackground.needsUpdate = true;
 			
+					}, function ( progress ) {
+
+						fileSizes[ 'Webp Gain map (separate)' ] = humanFileSize( progress.total );
+
 					} );
 
 				hdrCubeMap = new RGBELoader()
 					.load( 'textures/gainmap/spruit_sunrise_1k.hdr', function ( response ) {
 
-						fetchFileSize( 'textures/gainmap/spruit_sunrise_1k.hdr' )
-							.then( function ( size ) {
-
-								fileSizes[ 'HDR' ] = humanFileSize( size );
-			
-							} );
-			
 						resolutions[ 'HDR' ] = response.image.width + 'x' + response.image.height;
+			
 						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( response );
 
 						response.mapping = THREE.EquirectangularReflectionMapping;
 						response.minFilter = THREE.LinearFilter;
 						response.magFilter = THREE.LinearFilter;
 						response.needsUpdate = true;
+
+					}, function ( progress ) {
+
+						fileSizes[ 'HDR' ] = humanFileSize( progress.total );
 
 					} );
 
@@ -234,21 +219,6 @@
 
 			}
 
-			function fetchFileSize( url, key ) {
-
-				return new Promise( function ( resolve, reject ) {
-
-					fetch( url, { method: 'HEAD' } )
-						.then( function ( response ) {
-
-							resolve( parseInt( response.headers.get( 'Content-Length' ) ) );
-			
-						} )
-						.catch( reject );
-			
-				} );
-
-			}
 
 			function humanFileSize( bytes, si = true, dp = 1 ) {
 
