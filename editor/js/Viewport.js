@@ -388,6 +388,12 @@ function Viewport( editor ) {
 
 	} );
 
+	signals.rendererDetectKTX2Support.add( function ( ktx2Loader ) {
+
+		ktx2Loader.detectSupport( renderer );
+
+	} );
+
 	signals.sceneGraphChanged.add( function () {
 
 		render();

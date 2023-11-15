@@ -280,6 +280,8 @@ function Loader( editor ) {
 					const ktx2Loader = new KTX2Loader();
 					ktx2Loader.setTranscoderPath( '../examples/jsm/libs/basis/' );
 
+					editor.signals.rendererDetectKTX2Support.dispatch( ktx2Loader );
+
 					const loader = new GLTFLoader();
 					loader.setDRACOLoader( dracoLoader );
 					loader.setKTX2Loader( ktx2Loader );
@@ -321,6 +323,8 @@ function Loader( editor ) {
 
 					const ktx2Loader = new KTX2Loader();
 					ktx2Loader.setTranscoderPath( '../examples/jsm/libs/basis/' );
+
+					editor.signals.rendererDetectKTX2Support.dispatch( ktx2Loader );
 
 					const loader = new GLTFLoader( manager );
 					loader.setDRACOLoader( dracoLoader );
@@ -977,6 +981,8 @@ function Loader( editor ) {
 					const ktx2Loader = new KTX2Loader();
 					ktx2Loader.setTranscoderPath( '../examples/jsm/libs/basis/' );
 
+					editor.signals.rendererDetectKTX2Support.dispatch( ktx2Loader );
+
 					const loader = new GLTFLoader();
 					loader.setDRACOLoader( dracoLoader );
 					loader.setKTX2Loader( ktx2Loader );
@@ -1011,6 +1017,8 @@ function Loader( editor ) {
 
 					const ktx2Loader = new KTX2Loader();
 					ktx2Loader.setTranscoderPath( '../examples/jsm/libs/basis/' );
+
+					editor.signals.rendererDetectKTX2Support.dispatch( ktx2Loader );
 
 					const loader = new GLTFLoader();
 					loader.setDRACOLoader( dracoLoader );
