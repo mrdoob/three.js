@@ -121,12 +121,12 @@ const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 			return node;
 
 		},
-		getSamplerLevelNode: () => {
+		getTextureLevelNode: () => {
 
 			return roughnessNode;
 
 		},
-		getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => {
+		getTextureLevelAlgorithmNode: ( textureNode, levelNode ) => {
 
 			return specularMIPLevel( textureNode, levelNode );
 
@@ -166,12 +166,12 @@ const createIrradianceContext = ( normalWorldNode ) => {
 			return node;
 
 		},
-		getSamplerLevelNode: () => {
+		getTextureLevelNode: () => {
 
 			return float( 1 );
 
 		},
-		getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => {
+		getTextureLevelAlgorithmNode: ( textureNode, levelNode ) => {
 
 			return specularMIPLevel( textureNode, levelNode );
 

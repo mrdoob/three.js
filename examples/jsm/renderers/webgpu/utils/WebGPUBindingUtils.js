@@ -85,6 +85,10 @@ class WebGPUBindingUtils {
 
 					texture.viewDimension = GPUTextureViewDimension.Cube;
 
+				} else if ( binding.texture.isDataArrayTexture ) {
+
+					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
+
 				}
 
 				bindingGPU.texture = texture;
@@ -195,6 +199,10 @@ class WebGPUBindingUtils {
 				if ( binding.isSampledCubeTexture ) {
 
 					dimensionViewGPU = GPUTextureViewDimension.Cube;
+
+				} else if ( binding.texture.isDataArrayTexture ) {
+
+					dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
 
 				} else {
 
