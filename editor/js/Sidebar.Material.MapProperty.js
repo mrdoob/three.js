@@ -17,7 +17,7 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 	const enabled = new UICheckbox( false ).setMarginRight( '8px' ).onChange( onChange );
 	container.add( enabled );
 
-	const map = new UITexture().onChange( onMapChange );
+	const map = new UITexture( editor ).onChange( onMapChange );
 	container.add( map );
 
 	const mapType = property.replace( 'Map', '' );
