@@ -417,7 +417,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTexture( texture, textureProperty, uvSnippet ) {
+	generateTexture( texture, textureProperty, uvSnippet ) {
 
 		if ( texture.isTextureCube ) {
 
@@ -431,7 +431,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTextureBias( texture, textureProperty, uvSnippet, biasSnippet ) {
+	generateTextureLevel( texture, textureProperty, uvSnippet, biasSnippet ) {
 
 		if ( this.material.extensions !== undefined ) this.material.extensions.shaderTextureLOD = true;
 
