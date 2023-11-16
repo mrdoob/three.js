@@ -86,9 +86,9 @@ class TextureNode extends UniformNode {
 
 		let uvNode = this.uvNode;
 
-		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUVNode ) {
+		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
 
-			uvNode = builder.context.getUVNode( this );
+			uvNode = builder.context.getUV( this );
 
 		}
 
@@ -104,15 +104,15 @@ class TextureNode extends UniformNode {
 
 		let levelNode = this.levelNode;
 
-		if ( levelNode === null && builder.context.getTextureLevelNode ) {
+		if ( levelNode === null && builder.context.getTextureLevel ) {
 
-			levelNode = builder.context.getTextureLevelNode( this );
+			levelNode = builder.context.getTextureLevel( this );
 
 		}
 
-		if ( levelNode !== null && builder.context.getTextureLevelAlgorithmNode !== undefined ) {
+		if ( levelNode !== null && builder.context.getTextureLevelAlgorithm !== undefined ) {
 
-			levelNode = builder.context.getTextureLevelAlgorithmNode( this, levelNode );
+			levelNode = builder.context.getTextureLevelAlgorithm( this, levelNode );
 
 		}
 

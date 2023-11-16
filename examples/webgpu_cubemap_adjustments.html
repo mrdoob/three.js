@@ -122,7 +122,7 @@
 				scene.environmentNode = getEnvironmentNode( reflectVector, positionWorld );
 
 				scene.backgroundNode = getEnvironmentNode( positionWorldDirection, positionLocal ).context( {
-					getTextureLevelNode: ( textureNode ) => blurNode.mul( maxMipLevel( textureNode ) )
+					getTextureLevel: ( textureNode ) => blurNode.mul( maxMipLevel( textureNode ) )
 				} );
 
 				// scene objects
