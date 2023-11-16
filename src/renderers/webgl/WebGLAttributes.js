@@ -201,9 +201,9 @@ function WebGLAttributes( gl, capabilities ) {
 
 		} else if ( data.version < attribute.version ) {
 
-			if ( data.size < attribute.array.byteLength ) {
+			if ( data.size !== attribute.array.byteLength ) {
 
-				throw new Error( 'Too many data for update current attribute, dynamic sized attributes not supported.' );
+				throw new Error( 'THREE.WebGLAttributes: The size of the buffer attribute\'s array buffer does not match the original size. Dynamic sized attributes not supported.' );
 
 			}
 
