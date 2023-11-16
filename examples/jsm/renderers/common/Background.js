@@ -55,8 +55,8 @@ class Background extends DataMap {
 
 				this.backgroundMeshNode = context( backgroundNode, {
 					// @TODO: Add Texture2D support using node context
-					getUVNode: () => normalWorld,
-					getSamplerLevelNode: () => backgroundBlurriness
+					getUV: () => normalWorld,
+					getTextureLevel: () => backgroundBlurriness
 				} ).mul( backgroundIntensity );
 
 				let viewProj = modelViewProjection();

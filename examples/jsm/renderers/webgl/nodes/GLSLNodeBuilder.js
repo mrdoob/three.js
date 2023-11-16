@@ -74,35 +74,37 @@ ${ flowData.code }
 
 	}
 
-	getTexture( texture, textureProperty, uvSnippet ) {
+	generateTexture( texture, textureProperty, uvSnippet, depthSnippet ) {
 
 		if ( texture.isTextureCube ) {
 
-			return `textureCube( ${textureProperty}, ${uvSnippet} )`;
+			return `textureCube( ${ textureProperty }, ${ uvSnippet } )`;
 
 		} else if ( texture.isDepthTexture ) {
 
-			return `texture( ${textureProperty}, ${uvSnippet} ).x`;
+			return `texture( ${ textureProperty }, ${ uvSnippet } ).x`;
 
 		} else {
 
-			return `texture( ${textureProperty}, ${uvSnippet} )`;
+			if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
+
+			return `texture( ${ textureProperty }, ${ uvSnippet } )`;
 
 		}
 
 	}
 
-	getTextureLevel( texture, textureProperty, uvSnippet, biasSnippet ) {
+	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet ) {
 
-		return `textureLod( ${textureProperty}, ${uvSnippet}, ${biasSnippet} )`;
+		return `textureLod( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet } )`;
 
 	}
 
-	getTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, shaderStage = this.shaderStage ) {
+	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
-			return `texture( ${textureProperty}, vec3( ${uvSnippet}, ${compareSnippet} ) )`;
+			return `texture( ${ textureProperty }, vec3( ${ uvSnippet }, ${ compareSnippet } ) )`;
 
 		} else {
 
@@ -148,19 +150,25 @@ ${ flowData.code }
 
 			if ( uniform.type === 'texture' ) {
 
-				if ( uniform.node.value.compareFunction ) {
+				const texture = uniform.node.value;
 
-					snippet = `sampler2DShadow ${uniform.name};`;
+				if ( texture.compareFunction ) {
+
+					snippet = `sampler2DShadow ${ uniform.name };`;
+
+				} else if ( texture.isDataArrayTexture === true ) {
+
+					snippet = `sampler2DArray ${ uniform.name };`;
 
 				} else {
 
-					snippet = `sampler2D ${uniform.name};`;
+					snippet = `sampler2D ${ uniform.name };`;
 
 				}
 
 			} else if ( uniform.type === 'cubeTexture' ) {
 
-				snippet = `samplerCube ${uniform.name};`;
+				snippet = `samplerCube ${ uniform.name };`;
 
 			} else if ( uniform.type === 'buffer' ) {
 
@@ -169,7 +177,7 @@ ${ flowData.code }
 				const bufferCount = bufferNode.bufferCount;
 
 				const bufferCountSnippet = bufferCount > 0 ? bufferCount : '';
-				snippet = `${bufferNode.name} {\n\t${bufferType} ${uniform.name}[${bufferCountSnippet}];\n};\n`;
+				snippet = `${bufferNode.name} {\n\t${ bufferType } ${ uniform.name }[${ bufferCountSnippet }];\n};\n`;
 
 			} else {
 
@@ -419,6 +427,7 @@ ${ this.getSignature() }
 // precision
 precision highp float;
 precision highp int;
+precision highp sampler2DArray;
 precision lowp sampler2DShadow;
 
 // uniforms

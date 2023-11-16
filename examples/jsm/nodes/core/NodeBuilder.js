@@ -19,8 +19,6 @@ import { REVISION, RenderTarget, NoColorSpace, LinearEncoding, sRGBEncoding, SRG
 import { stack } from './StackNode.js';
 import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
 
-import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
-
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
 
@@ -99,8 +97,7 @@ class NodeBuilder {
 
 		this.context = {
 			keywords: new NodeKeywords(),
-			material: this.material,
-			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => levelNode.mul( maxMipLevel( textureNode ) )
+			material: this.material
 		};
 
 		this.cache = new NodeCache();
@@ -335,20 +332,19 @@ class NodeBuilder {
 
 	}
 
-	getTexture( /* texture, textureProperty, uvSnippet */ ) {
+	generateTexture( /* texture, textureProperty, uvSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
-	getTextureLevel( /* texture, textureProperty, uvSnippet, levelSnippet */ ) {
+	generateTextureLod( /* texture, textureProperty, uvSnippet, levelSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
-	// @TODO: rename to .generateConst()
-	getConst( type, value = null ) {
+	generateConst( type, value = null ) {
 
 		if ( value === null ) {
 
@@ -371,23 +367,23 @@ class NodeBuilder {
 
 		const componentType = this.getComponentType( type );
 
-		const getConst = value => this.getConst( componentType, value );
+		const generateConst = value => this.generateConst( componentType, value );
 
 		if ( typeLength === 2 ) {
 
-			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) } )`;
+			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) } )`;
 
 		} else if ( typeLength === 3 ) {
 
-			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) }, ${ getConst( value.z ) } )`;
+			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) }, ${ generateConst( value.z ) } )`;
 
 		} else if ( typeLength === 4 ) {
 
-			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) }, ${ getConst( value.z ) }, ${ getConst( value.w ) } )`;
+			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) }, ${ generateConst( value.z ) }, ${ generateConst( value.w ) } )`;
 
 		} else if ( typeLength > 4 && value && ( value.isMatrix3 || value.isMatrix4 ) ) {
 
-			return `${ this.getType( type ) }( ${ value.elements.map( getConst ).join( ', ' ) } )`;
+			return `${ this.getType( type ) }( ${ value.elements.map( generateConst ).join( ', ' ) } )`;
 
 		} else if ( typeLength > 4 ) {
 

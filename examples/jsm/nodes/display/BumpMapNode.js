@@ -35,7 +35,7 @@ const dHdxy_fwd = tslFn( ( { textureNode, bumpScale } ) => {
 	const uvNode = texNode.uvNode || uv();
 
 	// It's used to preserve the same TextureNode instance
-	const sampleTexture = ( uv ) => textureNode.cache().context( { getUVNode: () => uv, forceUVContext: true } );
+	const sampleTexture = ( uv ) => textureNode.cache().context( { getUV: () => uv, forceUVContext: true } );
 
 	return vec2(
 		float( sampleTexture( uvNode.add( uvNode.dFdx() ) ) ).sub( Hll ),
