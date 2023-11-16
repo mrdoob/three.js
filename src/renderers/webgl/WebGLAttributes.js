@@ -203,7 +203,7 @@ function WebGLAttributes( gl, capabilities ) {
 
 			if ( data.size !== attribute.array.byteLength ) {
 
-				throw new Error( 'THREE.WebGLAttributes: The size of the buffer attribute\'s array buffer does not match the original size. Dynamic sized attributes not supported.' );
+				throw new Error( 'THREE.WebGLAttributes: The size of the buffer attribute\'s array buffer does not match the original size. Resizing buffer attributes is supported.' );
 
 			}
 
