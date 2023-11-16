@@ -78,6 +78,10 @@ class WebGLTextureUtils {
 
 			glTextureType = gl.TEXTURE_CUBE_MAP;
 
+		} else if ( texture.isDataArrayTexture === true ) {
+
+			glTextureType = gl.TEXTURE_2D_ARRAY;
+
 		} else {
 
 			glTextureType = gl.TEXTURE_2D;

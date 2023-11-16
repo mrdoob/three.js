@@ -481,7 +481,7 @@ class WebGLBackend extends Backend {
 	createTexture( texture, options ) {
 
 		const { gl, utils, textureUtils } = this;
-		const { levels, width, height } = options;
+		const { levels, width, height, depth } = options;
 
 		const glFormat = utils.convert( texture.format, texture.colorSpace );
 		const glType = utils.convert( texture.type );
@@ -501,7 +501,11 @@ class WebGLBackend extends Backend {
 
 		gl.bindTexture( glTextureType, textureGPU );
 
-		if ( ! texture.isVideoTexture ) {
+		if ( texture.isDataArrayTexture ) {
+
+			gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
+
+		} else if ( ! texture.isVideoTexture ) {
 
 			gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
 
@@ -552,6 +556,12 @@ class WebGLBackend extends Backend {
 				gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, image );
 
 			}
+
+		} else if ( texture.isDataArrayTexture ) {
+
+			const image = options.image;
+
+			gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
 
 		} else if ( texture.isVideoTexture ) {
 
