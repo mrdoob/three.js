@@ -1,18 +1,16 @@
-import {
-	BufferAttribute,
-	BufferGeometry,
-	DataTexture,
-	FloatType,
-	Matrix4,
-	Mesh,
-	RGBAFormat,
-	Box3,
-	Sphere,
-	Frustum,
-	WebGLCoordinateSystem,
-	WebGPUCoordinateSystem,
-	Vector3,
-} from 'three';
+import { BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { DataTexture } from '../textures/DataTexture.js';
+import { FloatType } from '../constants.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { Mesh } from './Mesh.js';
+import { RGBAFormat } from '../constants.js';
+import { Box3 } from '../math/Box3.js';
+import { Sphere } from '../math/Sphere.js';
+import { Frustum } from '../math/Frustum.js';
+import { WebGLCoordinateSystem } from '../constants.js';
+import { WebGPUCoordinateSystem } from '../constants.js';
+import { Vector3 } from '../math/Vector3.js';
 
 function sortOpaque( a, b ) {
 
@@ -769,6 +767,7 @@ class BatchedMesh extends Mesh {
 
 		visibility[ geometryId ] = value;
 		this._visibilityChanged = true;
+
 		return this;
 
 	}
