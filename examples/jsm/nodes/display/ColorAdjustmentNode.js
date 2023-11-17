@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { dot, mix } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, tslFn, nodeProxy, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, tslFn, nodeProxy, float, vec3 } from '../shadernode/ShaderNode.js';
 
 const saturationNode = tslFn( ( { color, adjustment } ) => {
 
@@ -23,15 +23,11 @@ const vibranceNode = tslFn( ( { color, adjustment } ) => {
 
 const hueNode = tslFn( ( { color, adjustment } ) => {
 
-	const RGBtoYIQ = mat3( 0.299, 0.587, 0.114, 0.595716, - 0.274453, - 0.321263, 0.211456, - 0.522591, 0.311135 );
-	const YIQtoRGB = mat3( 1.0, 0.9563, 0.6210, 1.0, - 0.2721, - 0.6474, 1.0, - 1.107, 1.7046 );
+	const k = vec3( 0.57735, 0.57735, 0.57735 );
 
-	const yiq = RGBtoYIQ.mul( color );
+	const cosAngle = adjustment.cos();
 
-	const hue = yiq.z.atan2( yiq.y ).add( adjustment );
-	const chroma = yiq.yz.length();
-
-	return YIQtoRGB.mul( vec3( yiq.x, chroma.mul( hue.cos() ), chroma.mul( hue.sin() ) ) );
+	return vec3( color.rgb.mul( cosAngle ).add( k.cross( color.rgb ).mul( adjustment.sin() ).add( k.mul( dot( k, color.rgb ).mul( cosAngle.oneMinus() ) ) ) ) );
 
 } );
 
