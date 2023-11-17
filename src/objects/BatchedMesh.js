@@ -445,6 +445,7 @@ class BatchedMesh extends Mesh {
 		// push new visibility states
 		visibility.push( true );
 		active.push( true );
+		this._visibilityChanged = true;
 
 		// update id
 		const geometryId = this._geometryCount;
