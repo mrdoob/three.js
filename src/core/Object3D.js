@@ -728,7 +728,7 @@ class Object3D extends EventDispatcher {
 			object.drawRanges = this._drawRanges;
 			object.reservedRanges = this._reservedRanges;
 
-			object.visible = this._visible;
+			object.visibility = this._visibility;
 			object.active = this._active;
 			object.bounds = this._bounds.map( bound => ( {
 				boxInitialized: bound.boxInitialized,

@@ -913,7 +913,7 @@ class ObjectLoader extends Loader {
 				object._drawRanges = data.drawRanges;
 				object._reservedRanges = data.reservedRanges;
 
-				object._visible = data.visible;
+				object._visibility = data.visibility;
 				object._active = data.active;
 				object._bounds = data.bounds.map( bound => {
 
