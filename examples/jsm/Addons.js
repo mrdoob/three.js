@@ -160,7 +160,6 @@ export * from './modifiers/EdgeSplitModifier.js';
 export * from './modifiers/SimplifyModifier.js';
 export * from './modifiers/TessellateModifier.js';
 
-export * from './objects/BatchedMesh.js';
 export * from './objects/GroundProjectedSkybox.js';
 export * from './objects/Lensflare.js';
 export * from './objects/MarchingCubes.js';
