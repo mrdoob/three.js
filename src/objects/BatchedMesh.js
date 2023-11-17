@@ -3,7 +3,6 @@ import {
 	BufferGeometry,
 	DataTexture,
 	FloatType,
-	MathUtils,
 	Matrix4,
 	Mesh,
 	RGBAFormat,
@@ -149,6 +148,7 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCounts = new Int32Array( maxGeometryCount );
 		this._multiDrawStarts = new Int32Array( maxGeometryCount );
 		this._multiDrawCount = 0;
+		this._visibilityChanged = true;
 
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
@@ -613,6 +613,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		active[ geometryId ] = false;
+		this._visibilityChanged = true;
 
 		return this;
 
@@ -767,6 +768,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		visibility[ geometryId ] = value;
+		this._visibilityChanged = true;
 		return this;
 
 	}
@@ -903,6 +905,14 @@ class BatchedMesh extends Mesh {
 
 	onBeforeRender( _renderer, _scene, camera, geometry, material/*, _group*/ ) {
 
+		// if visibility has not changed and frustum culling and object sorting is not required
+		// then skip iterating over all items
+		if ( ! this._visibilityChanged && ! this.perObjectFrustumCulled && ! this.sortObjects ) {
+
+			return;
+
+		}
+
 		// the indexed version of the multi draw function requires specifying the start
 		// offset in bytes.
 		const index = geometry.getIndex();
@@ -1017,8 +1027,6 @@ class BatchedMesh extends Mesh {
 		}
 
 		this._multiDrawCount = count;
-
-		// @TODO: Implement geometry sorting for transparent and opaque materials
 
 	}
 
