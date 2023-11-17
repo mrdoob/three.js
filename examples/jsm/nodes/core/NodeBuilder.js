@@ -740,7 +740,7 @@ class NodeBuilder {
 
 	}
 
-	getVaryingFromNode( node, type ) {
+	getVaryingFromNode( node, name = null, type = node.getNodeType( this ) ) {
 
 		const nodeData = this.getDataFromNode( node, 'any' );
 
@@ -751,7 +751,9 @@ class NodeBuilder {
 			const varyings = this.varyings;
 			const index = varyings.length;
 
-			nodeVarying = new NodeVarying( 'nodeVarying' + index, type );
+			if ( name === null ) name = 'nodeVarying' + index;
+
+			nodeVarying = new NodeVarying( name, type );
 
 			varyings.push( nodeVarying );
 

@@ -259,7 +259,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			if ( shaderStage === 'vertex' ) {
 
-				return `NodeVaryings.${ node.name }`;
+				return `varyings.${ node.name }`;
 
 			}
 
@@ -654,7 +654,7 @@ ${ flowData.code }
 
 		const code = snippets.join( ',\n\t' );
 
-		return shaderStage === 'vertex' ? this._getWGSLStruct( 'NodeVaryingsStruct', '\t' + code ) : code;
+		return shaderStage === 'vertex' ? this._getWGSLStruct( 'VaryingsStruct', '\t' + code ) : code;
 
 	}
 
@@ -808,7 +808,7 @@ ${ flowData.code }
 
 					if ( shaderStage === 'vertex' ) {
 
-						flow += 'NodeVaryings.Vertex = ';
+						flow += 'varyings.Vertex = ';
 
 					} else if ( shaderStage === 'fragment' ) {
 
@@ -888,15 +888,13 @@ ${shaderData.uniforms}
 
 // varyings
 ${shaderData.varyings}
+var<private> varyings : VaryingsStruct;
 
 // codes
 ${shaderData.codes}
 
 @vertex
-fn main( ${shaderData.attributes} ) -> NodeVaryingsStruct {
-
-	// system
-	var NodeVaryings: NodeVaryingsStruct;
+fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 
 	// vars
 	${shaderData.vars}
@@ -904,7 +902,7 @@ fn main( ${shaderData.attributes} ) -> NodeVaryingsStruct {
 	// flow
 	${shaderData.flow}
 
-	return NodeVaryings;
+	return varyings;
 
 }
 `;
