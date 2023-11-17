@@ -1,6 +1,7 @@
 import LightingNode from './LightingNode.js';
 import { cache } from '../core/CacheNode.js';
 import { context } from '../core/ContextNode.js';
+import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 import { roughness, clearcoatRoughness } from '../core/PropertyNode.js';
 import { equirectUV } from '../utils/EquirectUVNode.js';
 import { specularMIPLevel } from '../utils/SpecularMIPLevelNode.js';
@@ -8,7 +9,7 @@ import { cameraViewMatrix } from '../accessors/CameraNode.js';
 import { transformedClearcoatNormalView, transformedNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { float, vec2 } from '../shadernode/ShaderNode.js';
+import { vec2 } from '../shadernode/ShaderNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { reference } from '../accessors/ReferenceNode.js';
 
@@ -166,14 +167,9 @@ const createIrradianceContext = ( normalWorldNode ) => {
 			return node;
 
 		},
-		getTextureLevel: () => {
+		getTextureLevel: ( textureNode ) => {
 
-			return float( 1 );
-
-		},
-		getTextureLevelAlgorithm: ( textureNode, levelNode ) => {
-
-			return specularMIPLevel( textureNode, levelNode );
+			return maxMipLevel( textureNode );
 
 		}
 	};
