@@ -22,7 +22,7 @@ import { Color } from '../math/Color.js';
 import { Object3D } from '../core/Object3D.js';
 import { Group } from '../objects/Group.js';
 import { InstancedMesh } from '../objects/InstancedMesh.js';
-import { BatchedMesh } from '../../examples/jsm/objects/BatchedMesh.js';
+import { BatchedMesh } from '../objects/BatchedMesh.js';
 import { Sprite } from '../objects/Sprite.js';
 import { Points } from '../objects/Points.js';
 import { Line } from '../objects/Line.js';

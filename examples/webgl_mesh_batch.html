@@ -35,7 +35,6 @@
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-		import { BatchedMesh } from 'three/addons/objects/BatchedMesh.js';
 
 		let stats, gui, guiStatsEl;
 		let camera, controls, scene, renderer;
@@ -184,7 +183,7 @@
 
 			const euler = new THREE.Euler();
 			const matrix = new THREE.Matrix4();
-			mesh = new BatchedMesh( geometryCount, vertexCount, indexCount, createMaterial() );
+			mesh = new THREE.BatchedMesh( geometryCount, vertexCount, indexCount, createMaterial() );
 			mesh.userData.rotationSpeeds = [];
 
 			// disable full-object frustum culling since all of the objects can be dynamic.
