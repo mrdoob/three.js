@@ -445,6 +445,22 @@ class FBXTreeParser {
 
 			}
 
+		} else if ( extension === 'dds' ) {
+
+			const loader = this.manager.getHandler( '.dds' );
+
+			if ( loader === null ) {
+
+				console.warn( 'FBXLoader: DDS loader not found, creating placeholder texture for', textureNode.RelativeFilename );
+				texture = new Texture();
+
+			} else {
+
+				loader.setPath( this.textureLoader.path );
+				texture = loader.load( fileName );
+
+			}
+
 		} else if ( extension === 'psd' ) {
 
 			console.warn( 'FBXLoader: PSD textures are not supported, creating placeholder texture for', textureNode.RelativeFilename );
