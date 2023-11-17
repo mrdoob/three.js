@@ -445,7 +445,6 @@ class BatchedMesh extends Mesh {
 		// push new visibility states
 		visibility.push( true );
 		active.push( true );
-		this._visibilityChanged = true;
 
 		// update id
 		const geometryId = this._geometryCount;
@@ -595,6 +594,7 @@ class BatchedMesh extends Mesh {
 		const drawRange = this._drawRanges[ id ];
 		const posAttr = geometry.getAttribute( 'position' );
 		drawRange.count = hasIndex ? srcIndex.count : posAttr.count;
+		this._visibilityChanged = true;
 
 		return id;
 
