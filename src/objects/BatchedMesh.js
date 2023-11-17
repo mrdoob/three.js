@@ -1026,6 +1026,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		this._multiDrawCount = count;
+		this._visibilityChanged = false;
 
 	}
 
