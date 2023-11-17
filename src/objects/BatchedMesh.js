@@ -85,7 +85,6 @@ const _mesh = new Mesh();
 const _batchIntersects = [];
 
 // @TODO: SkinnedMesh support?
-// @TODO: Future work if needed. Move into the core. Can be optimized more with WEBGL_multi_draw.
 // @TODO: geometry.groups support?
 // @TODO: geometry.drawRange support?
 // @TODO: geometry.morphAttributes support?
