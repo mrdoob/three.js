@@ -67,9 +67,9 @@
 			let container, stats;
 			let camera, scene, renderer, controls;
 			let torusMesh, planeMesh;
-			let hdrCubeRenderTarget, hdrCubeMap;
-			let gainMap, gainmapRenderTarget, gainmapBackground;
-			let separateGainMap, separateGainmapRenderTarget, separateGainmapBackground;
+			let hdrJpg, hdrJpgPMREMRenderTarget, hdrJpgEquirectangularMap;
+			let gainMap, gainMapPMREMRenderTarget, gainMapBackground;
+			let hdrPMREMRenderTarget, hdrEquirectangularMap;
 
 			
 			const fileSizes = {};
@@ -128,21 +128,21 @@
 
 
 
-				gainMap = new HDRJPGLoader( renderer )
+				hdrJpg = new HDRJPGLoader( renderer )
 					.load( 'textures/gainmap/spruit_sunrise_4k.jpg', function ( response ) {
 
 						resolutions[ 'HDR JPG' ] = response.width + 'x' + response.height;
 						displayStats( 'HDR JPG' );
 			
-						gainmapRenderTarget = pmremGenerator.fromEquirectangular( response.renderTarget.texture );
+						hdrJpgPMREMRenderTarget = pmremGenerator.fromEquirectangular( response.renderTarget.texture );
 			
-						gainmapBackground = response.toDataTexture();
-						gainmapBackground.mapping = THREE.EquirectangularReflectionMapping;
-						gainmapBackground.minFilter = THREE.LinearFilter;
-						gainmapBackground.magFilter = THREE.LinearFilter;
-						gainmapBackground.generateMipmaps = false;
+						hdrJpgEquirectangularMap = response.toDataTexture();
+						hdrJpgEquirectangularMap.mapping = THREE.EquirectangularReflectionMapping;
+						hdrJpgEquirectangularMap.minFilter = THREE.LinearFilter;
+						hdrJpgEquirectangularMap.magFilter = THREE.LinearFilter;
+						hdrJpgEquirectangularMap.generateMipmaps = false;
 
-						gainmapBackground.needsUpdate = true;
+						hdrJpgEquirectangularMap.needsUpdate = true;
 
 					}, function ( progress ) {
 
@@ -150,20 +150,24 @@
 			
 					} );
 
-				separateGainMap = new GainMapLoader( renderer )
-					.load( [ 'textures/gainmap/spruit_sunrise_4k.webp', 'textures/gainmap/spruit_sunrise_4k-gainmap.webp', 'textures/gainmap/spruit_sunrise_4k.json' ], function ( response ) {
+				gainMap = new GainMapLoader( renderer )
+					.load( [
+						'textures/gainmap/spruit_sunrise_4k.webp',
+						'textures/gainmap/spruit_sunrise_4k-gainmap.webp',
+						'textures/gainmap/spruit_sunrise_4k.json'
+					], function ( response ) {
 
 						resolutions[ 'Webp Gain map (separate)' ] = response.width + 'x' + response.height;
 			
-						separateGainmapRenderTarget = pmremGenerator.fromEquirectangular( response.renderTarget.texture );
+						gainMapPMREMRenderTarget = pmremGenerator.fromEquirectangular( response.renderTarget.texture );
 
-						separateGainmapBackground = response.toDataTexture();
-						separateGainmapBackground.mapping = THREE.EquirectangularReflectionMapping;
-						separateGainmapBackground.minFilter = THREE.LinearFilter;
-						separateGainmapBackground.magFilter = THREE.LinearFilter;
-						separateGainmapBackground.generateMipmaps = false;
+						gainMapBackground = response.toDataTexture();
+						gainMapBackground.mapping = THREE.EquirectangularReflectionMapping;
+						gainMapBackground.minFilter = THREE.LinearFilter;
+						gainMapBackground.magFilter = THREE.LinearFilter;
+						gainMapBackground.generateMipmaps = false;
 
-						separateGainmapBackground.needsUpdate = true;
+						gainMapBackground.needsUpdate = true;
 			
 					}, function ( progress ) {
 
@@ -171,17 +175,16 @@
 
 					} );
 
-				hdrCubeMap = new RGBELoader()
+				hdrEquirectangularMap = new RGBELoader()
 					.load( 'textures/gainmap/spruit_sunrise_1k.hdr', function ( response ) {
 
 						resolutions[ 'HDR' ] = response.image.width + 'x' + response.image.height;
 			
-						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( response );
+						hdrPMREMRenderTarget = pmremGenerator.fromEquirectangular( response );
 
-						response.mapping = THREE.EquirectangularReflectionMapping;
-						response.minFilter = THREE.LinearFilter;
-						response.magFilter = THREE.LinearFilter;
-						response.needsUpdate = true;
+						hdrEquirectangularMap.mapping = THREE.EquirectangularReflectionMapping;
+						hdrEquirectangularMap.minFilter = THREE.LinearFilter;
+						hdrEquirectangularMap.needsUpdate = true;
 
 					}, function ( progress ) {
 
@@ -275,26 +278,26 @@
 				torusMesh.material.roughness = params.roughness;
 				torusMesh.material.metalness = params.metalness;
 
-				let renderTarget, cubeMap;
+				let pmremRenderTarget, equirectangularMap;
 
 				switch ( params.envMap ) {
 
 					case 'HDR JPG':
-						renderTarget = gainmapRenderTarget;
-						cubeMap = gainmapBackground || gainMap.renderTarget.texture;
+						pmremRenderTarget = hdrJpgPMREMRenderTarget;
+						equirectangularMap = hdrJpgEquirectangularMap || hdrJpg.renderTarget.texture;
 						break;
 					case 'Webp Gain map (separate)':
-						renderTarget = separateGainmapRenderTarget;
-						cubeMap = separateGainmapBackground || separateGainMap.renderTarget.texture;
+						pmremRenderTarget = gainMapPMREMRenderTarget;
+						equirectangularMap = gainMapBackground || gainMap.renderTarget.texture;
 						break;
 					case 'HDR':
-						renderTarget = hdrCubeRenderTarget;
-						cubeMap = hdrCubeMap;
+						pmremRenderTarget = hdrPMREMRenderTarget;
+						equirectangularMap = hdrEquirectangularMap;
 						break;
 
 				}
 
-				const newEnvMap = renderTarget ? renderTarget.texture : null;
+				const newEnvMap = pmremRenderTarget ? pmremRenderTarget.texture : null;
 
 				if ( newEnvMap && newEnvMap !== torusMesh.material.envMap ) {
 
@@ -309,7 +312,7 @@
 				torusMesh.rotation.y += 0.005;
 				planeMesh.visible = params.debug;
 
-				scene.background = cubeMap;
+				scene.background = equirectangularMap;
 				renderer.toneMappingExposure = params.exposure;
 
 				renderer.render( scene, camera );
