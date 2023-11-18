@@ -129,14 +129,14 @@
 
 
 				hdrJpg = new HDRJPGLoader( renderer )
-					.load( 'textures/gainmap/spruit_sunrise_4k.jpg', function ( response ) {
+					.load( 'textures/gainmap/spruit_sunrise_4k.jpg', function ( ) {
 
-						resolutions[ 'HDR JPG' ] = response.width + 'x' + response.height;
+						resolutions[ 'HDR JPG' ] = hdrJpg.width + 'x' + hdrJpg.height;
 						displayStats( 'HDR JPG' );
 			
-						hdrJpgPMREMRenderTarget = pmremGenerator.fromEquirectangular( response.renderTarget.texture );
+						hdrJpgPMREMRenderTarget = pmremGenerator.fromEquirectangular( hdrJpg.renderTarget.texture );
 			
-						hdrJpgEquirectangularMap = response.toDataTexture();
+						hdrJpgEquirectangularMap = hdrJpg.toDataTexture();
 						hdrJpgEquirectangularMap.mapping = THREE.EquirectangularReflectionMapping;
 						hdrJpgEquirectangularMap.minFilter = THREE.LinearFilter;
 						hdrJpgEquirectangularMap.magFilter = THREE.LinearFilter;
@@ -155,13 +155,13 @@
 						'textures/gainmap/spruit_sunrise_4k.webp',
 						'textures/gainmap/spruit_sunrise_4k-gainmap.webp',
 						'textures/gainmap/spruit_sunrise_4k.json'
-					], function ( response ) {
+					], function ( ) {
 
-						resolutions[ 'Webp Gain map (separate)' ] = response.width + 'x' + response.height;
+						resolutions[ 'Webp Gain map (separate)' ] = gainMap.width + 'x' + gainMap.height;
 			
-						gainMapPMREMRenderTarget = pmremGenerator.fromEquirectangular( response.renderTarget.texture );
+						gainMapPMREMRenderTarget = pmremGenerator.fromEquirectangular( gainMap.renderTarget.texture );
 
-						gainMapBackground = response.toDataTexture();
+						gainMapBackground = gainMap.toDataTexture();
 						gainMapBackground.mapping = THREE.EquirectangularReflectionMapping;
 						gainMapBackground.minFilter = THREE.LinearFilter;
 						gainMapBackground.magFilter = THREE.LinearFilter;
@@ -176,11 +176,11 @@
 					} );
 
 				hdrEquirectangularMap = new RGBELoader()
-					.load( 'textures/gainmap/spruit_sunrise_1k.hdr', function ( response ) {
+					.load( 'textures/gainmap/spruit_sunrise_1k.hdr', function ( ) {
 
-						resolutions[ 'HDR' ] = response.image.width + 'x' + response.image.height;
+						resolutions[ 'HDR' ] = hdrEquirectangularMap.image.width + 'x' + hdrEquirectangularMap.image.height;
 			
-						hdrPMREMRenderTarget = pmremGenerator.fromEquirectangular( response );
+						hdrPMREMRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirectangularMap );
 
 						hdrEquirectangularMap.mapping = THREE.EquirectangularReflectionMapping;
 						hdrEquirectangularMap.minFilter = THREE.LinearFilter;
