@@ -31,7 +31,7 @@
 
 		<h2>Constructor</h2>
 		<h3>
-			[name](			
+			[name](
 				[param:Integer maxGeometryCount], [param:Integer maxVertexCount],
 				[param:Integer maxIndexCount], [param:Material material],
 			)
@@ -42,7 +42,6 @@
 			[page:Integer maxIndexCount] - the max number of indices to be used by all geometries.<br />
 			[page:Material material] - an instance of [page:Material]. Default is a
 			new [page:MeshBasicMaterial].<br />
-			[page:Integer count] - the number of instances.<br />
 		</p>
 
 		<h2>Properties</h2>
@@ -133,9 +132,7 @@
 			of a single instance.
 		</p>
 		<p>
-			Sets the given local transformation matrix to the defined instance. Make
-			sure you set [page:.instanceMatrix][page:BufferAttribute.needsUpdate .needsUpdate] 
-			to true after updating all the matrices.
+			Sets the given local transformation matrix to the defined instance.
 		</p>
 
 		<h3>
@@ -156,7 +153,7 @@
 			[method:Integer addGeometry]( [param:BufferGeometry geometry], [param:Integer reservedVertexRange], [param:Integer reservedIndexRange] )
 		</h3>
 		<p>
-			[page:BufferGeometry index]: The geometry to add into the [name].
+			[page:BufferGeometry geometry]: The geometry to add into the [name].
 		</p>
 		<p>
 			[page:Integer reservedVertexRange]: Optional parameter specifying the amount of vertex buffer space to reserve for the added geometry. This
