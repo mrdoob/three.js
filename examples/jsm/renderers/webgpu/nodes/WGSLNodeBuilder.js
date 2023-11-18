@@ -193,6 +193,20 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0u' ) {
+
+		if ( depthSnippet ) {
+
+			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, ${ levelSnippet } )`;
+
+		} else {
+
+			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet } )`;
+
+		}
+
+	}
+
 	isUnfilterable( texture ) {
 
 		return texture.isDataTexture === true && texture.type === FloatType;
