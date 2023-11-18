@@ -160,7 +160,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( this.vertexColors === true && geometry.hasAttribute( 'color' ) ) {
 
-			colorNode = vec4( colorNode.xyz.mul( attribute( 'color' ) ), colorNode.a );
+			colorNode = vec4( colorNode.xyz.mul( attribute( 'color', 'vec3' ) ), colorNode.a );
 
 		}
 
