@@ -7888,7 +7888,7 @@ class Object3D extends EventDispatcher {
 			object.drawRanges = this._drawRanges;
 			object.reservedRanges = this._reservedRanges;
 
-			object.visible = this._visible;
+			object.visibility = this._visibility;
 			object.active = this._active;
 			object.bounds = this._bounds.map( bound => ( {
 				boxInitialized: bound.boxInitialized,
@@ -32454,7 +32454,7 @@ class Skeleton {
 		//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
 
 		let size = Math.sqrt( this.bones.length * 4 ); // 4 pixels needed for 1 matrix
-		size = ceilPowerOfTwo( size );
+		size = Math.ceil( size / 4 ) * 4;
 		size = Math.max( size, 4 );
 
 		const boneMatrices = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
@@ -32873,7 +32873,6 @@ const _mesh = new Mesh();
 const _batchIntersects = [];
 
 // @TODO: SkinnedMesh support?
-// @TODO: Future work if needed. Move into the core. Can be optimized more with WEBGL_multi_draw.
 // @TODO: geometry.groups support?
 // @TODO: geometry.drawRange support?
 // @TODO: geometry.morphAttributes support?
@@ -32925,7 +32924,7 @@ class BatchedMesh extends Mesh {
 		this._drawRanges = [];
 		this._reservedRanges = [];
 
-		this._visible = [];
+		this._visibility = [];
 		this._active = [];
 		this._bounds = [];
 
@@ -32938,6 +32937,7 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCounts = new Int32Array( maxGeometryCount );
 		this._multiDrawStarts = new Int32Array( maxGeometryCount );
 		this._multiDrawCount = 0;
+		this._visibilityChanged = true;
 
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
@@ -32956,7 +32956,7 @@ class BatchedMesh extends Mesh {
 		//       64x64 pixel texture max 1024 matrices * 4 pixels = (64 * 64)
 
 		let size = Math.sqrt( this._maxGeometryCount * 4 ); // 4 pixels needed for 1 matrix
-		size = MathUtils.ceilPowerOfTwo( size );
+		size = Math.ceil( size / 4 ) * 4;
 		size = Math.max( size, 4 );
 
 		const matricesArray = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
@@ -33228,13 +33228,13 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		const visible = this._visible;
+		const visibility = this._visibility;
 		const active = this._active;
 		const matricesTexture = this._matricesTexture;
 		const matricesArray = this._matricesTexture.image.data;
 
 		// push new visibility states
-		visible.push( true );
+		visibility.push( true );
 		active.push( true );
 
 		// update id
@@ -33385,6 +33385,7 @@ class BatchedMesh extends Mesh {
 		const drawRange = this._drawRanges[ id ];
 		const posAttr = geometry.getAttribute( 'position' );
 		drawRange.count = hasIndex ? srcIndex.count : posAttr.count;
+		this._visibilityChanged = true;
 
 		return id;
 
@@ -33402,6 +33403,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		active[ geometryId ] = false;
+		this._visibilityChanged = true;
 
 		return this;
 
@@ -33539,7 +33541,7 @@ class BatchedMesh extends Mesh {
 
 	setVisibleAt( geometryId, value ) {
 
-		const visible = this._visible;
+		const visibility = this._visibility;
 		const active = this._active;
 		const geometryCount = this._geometryCount;
 
@@ -33548,21 +33550,23 @@ class BatchedMesh extends Mesh {
 		if (
 			geometryId >= geometryCount ||
 			active[ geometryId ] === false ||
-			visible[ geometryId ] === value
+			visibility[ geometryId ] === value
 		) {
 
 			return this;
 
 		}
 
-		visible[ geometryId ] = value;
+		visibility[ geometryId ] = value;
+		this._visibilityChanged = true;
+
 		return this;
 
 	}
 
 	getVisibleAt( geometryId ) {
 
-		const visible = this._visible;
+		const visibility = this._visibility;
 		const active = this._active;
 		const geometryCount = this._geometryCount;
 
@@ -33573,13 +33577,13 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		return visible[ geometryId ];
+		return visibility[ geometryId ];
 
 	}
 
 	raycast( raycaster, intersects ) {
 
-		const visible = this._visible;
+		const visibility = this._visibility;
 		const active = this._active;
 		const drawRanges = this._drawRanges;
 		const geometryCount = this._geometryCount;
@@ -33604,7 +33608,7 @@ class BatchedMesh extends Mesh {
 
 		for ( let i = 0; i < geometryCount; i ++ ) {
 
-			if ( ! visible[ i ] || ! active[ i ] ) {
+			if ( ! visibility[ i ] || ! active[ i ] ) {
 
 				continue;
 
@@ -33653,7 +33657,7 @@ class BatchedMesh extends Mesh {
 		this._drawRanges = source._drawRanges.map( range => ( { ...range } ) );
 		this._reservedRanges = source._reservedRanges.map( range => ( { ...range } ) );
 
-		this._visible = source._visible.slice();
+		this._visibility = source._visibility.slice();
 		this._active = source._active.slice();
 		this._bounds = source._bounds.map( bound => ( {
 			boxInitialized: bound.boxInitialized,
@@ -33692,12 +33696,20 @@ class BatchedMesh extends Mesh {
 
 	onBeforeRender( _renderer, _scene, camera, geometry, material/*, _group*/ ) {
 
+		// if visibility has not changed and frustum culling and object sorting is not required
+		// then skip iterating over all items
+		if ( ! this._visibilityChanged && ! this.perObjectFrustumCulled && ! this.sortObjects ) {
+
+			return;
+
+		}
+
 		// the indexed version of the multi draw function requires specifying the start
 		// offset in bytes.
 		const index = geometry.getIndex();
 		const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
 
-		const visible = this._visible;
+		const visibility = this._visibility;
 		const multiDrawStarts = this._multiDrawStarts;
 		const multiDrawCounts = this._multiDrawCounts;
 		const drawRanges = this._drawRanges;
@@ -33723,9 +33735,9 @@ class BatchedMesh extends Mesh {
 			// get the camera position
 			_vector$5.setFromMatrixPosition( camera.matrixWorld );
 
-			for ( let i = 0, l = visible.length; i < l; i ++ ) {
+			for ( let i = 0, l = visibility.length; i < l; i ++ ) {
 
-				if ( visible[ i ] ) {
+				if ( visibility[ i ] ) {
 
 					this.getMatrixAt( i, _matrix );
 					this.getBoundingSphereAt( i, _sphere$2 ).applyMatrix4( _matrix );
@@ -33772,9 +33784,9 @@ class BatchedMesh extends Mesh {
 
 		} else {
 
-			for ( let i = 0, l = visible.length; i < l; i ++ ) {
+			for ( let i = 0, l = visibility.length; i < l; i ++ ) {
 
-				if ( visible[ i ] ) {
+				if ( visibility[ i ] ) {
 
 					// determine whether the batched geometry is within the frustum
 					let culled = false;
@@ -33806,8 +33818,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		this._multiDrawCount = count;
-
-		// @TODO: Implement geometry sorting for transparent and opaque materials
+		this._visibilityChanged = false;
 
 	}
 
@@ -46526,7 +46537,7 @@ class ObjectLoader extends Loader {
 				object._drawRanges = data.drawRanges;
 				object._reservedRanges = data.reservedRanges;
 
-				object._visible = data.visible;
+				object._visibility = data.visibility;
 				object._active = data.active;
 				object._bounds = data.bounds.map( bound => {
 
