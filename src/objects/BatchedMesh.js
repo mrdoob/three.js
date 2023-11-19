@@ -11,6 +11,7 @@ import { Frustum } from '../math/Frustum.js';
 import { WebGLCoordinateSystem } from '../constants.js';
 import { WebGPUCoordinateSystem } from '../constants.js';
 import { Vector3 } from '../math/Vector3.js';
+import { radixSort } from './radixSort.js';
 
 function sortOpaque( a, b ) {
 
@@ -967,7 +968,10 @@ class BatchedMesh extends Mesh {
 					if ( ! culled ) {
 
 						// get the distance from camera used for sorting
-						const z = _vector.distanceToSquared( _sphere.center );
+						// radix sort operates on 32 bit signed integers
+						let z = _vector.distanceToSquared( _sphere.center );
+						z = z / ( camera.far * camera.far );
+						z *= 1 << 30;
 						_renderList.push( drawRanges[ i ], z );
 
 					}
@@ -978,7 +982,24 @@ class BatchedMesh extends Mesh {
 
 			// Sort the draw ranges and prep for rendering
 			const list = _renderList.list;
-			list.sort( material.transparent ? sortTransparent : sortOpaque );
+
+
+			console.time( 'SORT TIME' );
+			if ( window.RADIX === true ) {
+
+				this.__options = this.__options || {};
+				this.__options.reversed = material.transparent;
+				this.__options.get = el => el.z;
+
+				radixSort( list, this.__options );
+
+			} else {
+
+				list.sort( material.transparent ? sortTransparent : sortOpaque );
+
+			}
+
+			console.timeEnd( 'SORT TIME' );
 
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
 

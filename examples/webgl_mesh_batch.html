@@ -60,12 +60,13 @@
 
 		const api = {
 			method: Method.BATCHED,
-			count: 256,
+			count: MAX_GEOMETRY_COUNT,
 			dynamic: 16,
 
 			sortObjects: true,
 			perObjectFrustumCulled: true,
-			opacity: 1,
+			opacity: 0.9,
+			useRadix: true,
 		};
 
 		init();
@@ -117,7 +118,6 @@
 			if ( ! material ) {
 
 				material = new THREE.MeshNormalMaterial();
-				material.opacity = 0.1;
 
 			}
 
@@ -217,7 +217,7 @@
 			// camera
 
 			camera = new THREE.PerspectiveCamera( 70, width / height, 1, 100 );
-			camera.position.z = 30;
+			camera.position.z = 60;
 
 			// renderer
 
@@ -268,6 +268,7 @@
 			} );
 			gui.add( api, 'sortObjects' );
 			gui.add( api, 'perObjectFrustumCulled' );
+			gui.add( api, 'useRadix' );
 
 			guiStatsEl = document.createElement( 'li' );
 			guiStatsEl.classList.add( 'gui-stats' );
@@ -275,6 +276,7 @@
 			// listeners
 
 			window.addEventListener( 'resize', onWindowResize );
+			window.RADIX = true;
 
 		}
 
@@ -343,6 +345,10 @@
 
 		function render() {
 
+			material.opacity = parseFloat( api.opacity );
+			material.depthWrite = api.opacity === 1;
+			material.transparent = api.opacity < 1;
+
 			if ( mesh.isBatchedMesh ) {
 
 				mesh.sortObjects = api.sortObjects;
@@ -350,6 +356,7 @@
 
 			}
 
+			window.RADIX = api.useRadix;
 			renderer.render( scene, camera );
 
 		}
