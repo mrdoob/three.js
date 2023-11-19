@@ -163,7 +163,7 @@ class TextureNode extends UniformNode {
 
 		}
 
-		return uvNode.build( builder, this.sampler === true ? 'vec2' : 'uvec2' );
+		return uvNode.build( builder, this.sampler === true ? 'vec2' : 'ivec2' );
 
 	}
 
@@ -201,7 +201,7 @@ class TextureNode extends UniformNode {
 
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
-				const depthSnippet = depthNode ? depthNode.build( builder, 'uint' ) : null;
+				const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
 				const compareSnippet = compareNode ? compareNode.build( builder, 'float' ) : null;
 
 				const nodeVar = builder.getVarFromNode( this );
@@ -335,7 +335,10 @@ class TextureNode extends UniformNode {
 
 	clone() {
 
-		return new this.constructor( this.value, this.uvNode, this.levelNode );
+		const newNode = new this.constructor( this.value, this.uvNode, this.levelNode );
+		newNode.sampler = this.sampler;
+
+		return newNode;
 
 	}
 
@@ -344,6 +347,8 @@ class TextureNode extends UniformNode {
 export default TextureNode;
 
 export const texture = nodeProxy( TextureNode );
+export const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );
+
 //export const textureLevel = ( value, uv, level ) => texture( value, uv ).level( level );
 
 export const sampler = ( aTexture ) => ( aTexture.isNode === true ? aTexture : texture( aTexture ) ).convert( 'sampler' );
