@@ -982,14 +982,14 @@ class BatchedMesh extends Mesh {
 
 			// Sort the draw ranges and prep for rendering
 			const list = _renderList.list;
-
-
 			console.time( 'SORT TIME' );
 			if ( window.RADIX === true ) {
 
-				this.__options = this.__options || {};
+				this.__options = this.__options || {
+					get: el => el.z,
+					aux: new Array( list.length ),
+				};
 				this.__options.reversed = material.transparent;
-				this.__options.get = el => el.z;
 
 				radixSort( list, this.__options );
 
