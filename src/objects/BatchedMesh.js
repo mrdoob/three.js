@@ -2,7 +2,6 @@ import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { FloatType } from '../constants.js';
-import { MathUtils } from '../math/MathUtils.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Mesh } from './Mesh.js';
 import { RGBAFormat } from '../constants.js';
@@ -147,6 +146,7 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCounts = new Int32Array( maxGeometryCount );
 		this._multiDrawStarts = new Int32Array( maxGeometryCount );
 		this._multiDrawCount = 0;
+		this._visibilityChanged = true;
 
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
@@ -165,7 +165,7 @@ class BatchedMesh extends Mesh {
 		//       64x64 pixel texture max 1024 matrices * 4 pixels = (64 * 64)
 
 		let size = Math.sqrt( this._maxGeometryCount * 4 ); // 4 pixels needed for 1 matrix
-		size = MathUtils.ceilPowerOfTwo( size );
+		size = Math.ceil( size / 4 ) * 4;
 		size = Math.max( size, 4 );
 
 		const matricesArray = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
@@ -594,6 +594,7 @@ class BatchedMesh extends Mesh {
 		const drawRange = this._drawRanges[ id ];
 		const posAttr = geometry.getAttribute( 'position' );
 		drawRange.count = hasIndex ? srcIndex.count : posAttr.count;
+		this._visibilityChanged = true;
 
 		return id;
 
@@ -611,6 +612,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		active[ geometryId ] = false;
+		this._visibilityChanged = true;
 
 		return this;
 
@@ -765,6 +767,8 @@ class BatchedMesh extends Mesh {
 		}
 
 		visibility[ geometryId ] = value;
+		this._visibilityChanged = true;
+
 		return this;
 
 	}
@@ -901,6 +905,14 @@ class BatchedMesh extends Mesh {
 
 	onBeforeRender( _renderer, _scene, camera, geometry, material/*, _group*/ ) {
 
+		// if visibility has not changed and frustum culling and object sorting is not required
+		// then skip iterating over all items
+		if ( ! this._visibilityChanged && ! this.perObjectFrustumCulled && ! this.sortObjects ) {
+
+			return;
+
+		}
+
 		// the indexed version of the multi draw function requires specifying the start
 		// offset in bytes.
 		const index = geometry.getIndex();
@@ -1015,8 +1027,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		this._multiDrawCount = count;
-
-		// @TODO: Implement geometry sorting for transparent and opaque materials
+		this._visibilityChanged = false;
 
 	}
 

@@ -51,7 +51,7 @@
 
 		//
 
-		const MAX_GEOMETRY_COUNT = 8192;
+		const MAX_GEOMETRY_COUNT = 20000;
 
 		const Method = {
 			BATCHED: 'BATCHED',
@@ -64,6 +64,7 @@
 			dynamic: 16,
 
 			sortObjects: true,
+			perObjectFrustumCulled: true,
 			opacity: 1,
 		};
 
@@ -266,6 +267,7 @@
 
 			} );
 			gui.add( api, 'sortObjects' );
+			gui.add( api, 'perObjectFrustumCulled' );
 
 			guiStatsEl = document.createElement( 'li' );
 			guiStatsEl.classList.add( 'gui-stats' );
@@ -344,6 +346,7 @@
 			if ( mesh.isBatchedMesh ) {
 
 				mesh.sortObjects = api.sortObjects;
+				mesh.perObjectFrustumCulled = api.perObjectFrustumCulled;
 
 			}
 
