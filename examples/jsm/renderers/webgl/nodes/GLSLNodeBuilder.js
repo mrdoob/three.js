@@ -5,6 +5,8 @@ import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
+import { IntType } from 'three';
+
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan',
 	textureDimensions: 'textureSize'
@@ -250,6 +252,30 @@ ${ flowData.code }
 		output += bindingSnippets.join( '\n' );
 
 		return output;
+
+	}
+
+	getTypeFromAttribute( attribute ) {
+
+		let nodeType = super.getTypeFromAttribute( attribute );
+
+		if ( /^[iu]/.test( nodeType ) && attribute.gpuType !== IntType ) {
+
+			let dataAttribute = attribute;
+
+			if ( attribute.isInterleavedBufferAttribute ) dataAttribute = attribute.data;
+
+			const array = dataAttribute.array;
+
+			if ( ( array instanceof Uint32Array || array instanceof Int32Array ) === false ) {
+
+				nodeType = nodeType.slice( 1 );
+
+			}
+
+		}
+
+		return nodeType;
 
 	}
 
