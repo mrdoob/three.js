@@ -106,7 +106,7 @@ export default class RenderObject {
 
 	getMaterialCacheKey() {
 
-		const material = this.material;
+		const { object, material } = this;
 
 		let cacheKey = material.customProgramCacheKey();
 
@@ -126,6 +126,12 @@ export default class RenderObject {
 			}
 
 			cacheKey += /*property + ':' +*/ value + ',';
+
+		}
+
+		if ( object.morphTargetInfluences ) {
+
+			cacheKey += object.morphTargetInfluences.length + ',';
 
 		}
 

@@ -120,12 +120,12 @@ const exceptionList = [
 	'webgpu_loader_gltf_iridescence',
 	'webgpu_loader_gltf_sheen',
 	'webgpu_materials',
-	'webgpu_materials_video',
 	'webgpu_sandbox',
 	'webgpu_sprites',
 	'webgpu_video_panorama',
 
 	// WebGPURenderer: Unknown problem
+	'webgpu_materials_video',
 	'webgpu_particles',
 	'webgpu_shadertoy',
 	'webgpu_tsl_editor',

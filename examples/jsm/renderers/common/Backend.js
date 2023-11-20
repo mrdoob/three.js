@@ -52,9 +52,9 @@ class Backend {
 
 	// cache key
 
-	needsUpdate( renderObject ) { } // return Boolean ( fast test )
+	needsRenderUpdate( renderObject ) { } // return Boolean ( fast test )
 
-	getCacheKey( renderObject ) { } // return String
+	getRenderCacheKey( renderObject ) { } // return String
 
 	// node builder
 

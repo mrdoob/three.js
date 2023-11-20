@@ -5,6 +5,8 @@ import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
+import { IntType } from 'three';
+
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan',
 	textureDimensions: 'textureSize'
@@ -19,6 +21,13 @@ const precisionLib = {
 const supports = {
 	instance: true
 };
+
+const defaultPrecisions = `
+precision highp float;
+precision highp int;
+precision mediump sampler2DArray;
+precision lowp sampler2DShadow;
+`;
 
 class GLSLNodeBuilder extends NodeBuilder {
 
@@ -71,6 +80,20 @@ ${ flowData.code }
 		//
 
 		return new FunctionNode( code );
+
+	}
+
+	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0' ) {
+
+		if ( depthSnippet ) {
+
+			return `texelFetch( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), ${ levelSnippet } )`;
+
+		} else {
+
+			return `texelFetch( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet } )`;
+
+		}
 
 	}
 
@@ -232,6 +255,30 @@ ${ flowData.code }
 
 	}
 
+	getTypeFromAttribute( attribute ) {
+
+		let nodeType = super.getTypeFromAttribute( attribute );
+
+		if ( /^[iu]/.test( nodeType ) && attribute.gpuType !== IntType ) {
+
+			let dataAttribute = attribute;
+
+			if ( attribute.isInterleavedBufferAttribute ) dataAttribute = attribute.data;
+
+			const array = dataAttribute.array;
+
+			if ( ( array instanceof Uint32Array || array instanceof Int32Array ) === false ) {
+
+				nodeType = nodeType.slice( 1 );
+
+			}
+
+		}
+
+		return nodeType;
+
+	}
+
 	getAttributes( shaderStage ) {
 
 		let snippet = '';
@@ -337,7 +384,7 @@ ${ flowData.code }
 
 	getVertexIndex() {
 
-		return 'gl_VertexID';
+		return 'uint( gl_VertexID )';
 
 	}
 
@@ -388,8 +435,7 @@ ${vars}
 ${ this.getSignature() }
 
 // precision
-precision highp float;
-precision highp int;
+${ defaultPrecisions }
 
 // uniforms
 ${shaderData.uniforms}
@@ -425,10 +471,7 @@ void main() {
 ${ this.getSignature() }
 
 // precision
-precision highp float;
-precision highp int;
-precision highp sampler2DArray;
-precision lowp sampler2DShadow;
+${ defaultPrecisions }
 
 // uniforms
 ${shaderData.uniforms}
