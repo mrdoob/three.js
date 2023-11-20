@@ -725,13 +725,13 @@ class WebGLBackend extends Backend {
 
 			}
 
-			if ( attributeData.isFloat ) {
+			if ( attributeData.isInteger ) {
 
-				gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, false, stride, offset );
+				gl.vertexAttribIPointer( i, attribute.itemSize, attributeData.type, stride, offset );
 
 			} else {
 
-				gl.vertexAttribIPointer( i, attribute.itemSize, attributeData.type, stride, offset );
+				gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, attribute.normalized, stride, offset );
 
 			}
 
