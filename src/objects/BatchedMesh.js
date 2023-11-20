@@ -971,7 +971,6 @@ class BatchedMesh extends Mesh {
 					if ( ! culled ) {
 
 						// get the distance from camera used for sorting
-						// radix sort operates on 32 bit signed integers
 						const z = _vector.distanceTo( _sphere.center );
 						_renderList.push( drawRanges[ i ], z );
 
