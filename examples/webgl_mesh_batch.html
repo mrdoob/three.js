@@ -66,8 +66,8 @@
 
 			sortObjects: true,
 			perObjectFrustumCulled: true,
-			opacity: 0.9,
-			useRadix: true,
+			opacity: 1,
+			useCustomSort: true,
 		};
 
 		init();
@@ -269,7 +269,7 @@
 			} );
 			gui.add( api, 'sortObjects' );
 			gui.add( api, 'perObjectFrustumCulled' );
-			gui.add( api, 'useRadix' );
+			gui.add( api, 'useCustomSort' );
 
 			guiStatsEl = document.createElement( 'li' );
 			guiStatsEl.classList.add( 'gui-stats' );
@@ -284,6 +284,7 @@
 
 		function sortFunction( list, camera ) {
 
+			// initialize options
 			this._options = this._options || {
 				get: el => el.z,
 				aux: new Array( list.length ),
@@ -292,6 +293,7 @@
 			const options = this._options;
 			options.reversed = this.material.transparent;
 
+			// convert depth to unsigned 32 bit range
 			const den = camera.far;
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
 
@@ -301,7 +303,6 @@
 			}
 
 			radixSort( list, options );
-
 
 		}
 
@@ -368,15 +369,11 @@
 
 		function render() {
 
-			material.opacity = parseFloat( api.opacity );
-			material.depthWrite = api.opacity === 1;
-			material.transparent = api.opacity < 1;
-
 			if ( mesh.isBatchedMesh ) {
 
 				mesh.sortObjects = api.sortObjects;
 				mesh.perObjectFrustumCulled = api.perObjectFrustumCulled;
-				mesh.setCustomSort( api.useRadix ? sortFunction : null );
+				mesh.setCustomSort( api.useCustomSort ? sortFunction : null );
 
 			}
 
