@@ -61,7 +61,7 @@
 
 		const api = {
 			method: Method.BATCHED,
-			count: MAX_GEOMETRY_COUNT,
+			count: 256,
 			dynamic: 16,
 
 			sortObjects: true,
@@ -218,7 +218,7 @@
 			// camera
 
 			camera = new THREE.PerspectiveCamera( 70, width / height, 1, 100 );
-			camera.position.z = 60;
+			camera.position.z = 30;
 
 			// renderer
 
