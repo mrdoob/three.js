@@ -948,6 +948,7 @@ class BatchedMesh extends Mesh {
 
 				if ( visibility[ i ] ) {
 
+					// get the bounds in world space
 					this.getMatrixAt( i, _matrix );
 					this.getBoundingSphereAt( i, _sphere ).applyMatrix4( _matrix );
 
@@ -955,12 +956,7 @@ class BatchedMesh extends Mesh {
 					let culled = false;
 					if ( perObjectFrustumCulled ) {
 
-						// get the bounds in camera space
-						this.getMatrixAt( i, _matrix );
-
-						// get the bounds
-						this.getBoundingBoxAt( i, _box ).applyMatrix4( _matrix );
-						culled = ! _frustum.intersectsBox( _box ) || ! _frustum.intersectsSphere( _sphere );
+						culled = ! _frustum.intersectsSphere( _sphere );
 
 					}
 
@@ -1001,13 +997,10 @@ class BatchedMesh extends Mesh {
 					let culled = false;
 					if ( perObjectFrustumCulled ) {
 
-						// get the bounds in camera space
+						// get the bounds in world space
 						this.getMatrixAt( i, _matrix );
-
-						// get the bounds
-						this.getBoundingBoxAt( i, _box ).applyMatrix4( _matrix );
 						this.getBoundingSphereAt( i, _sphere ).applyMatrix4( _matrix );
-						culled = ! _frustum.intersectsBox( _box ) || ! _frustum.intersectsSphere( _sphere );
+						culled = ! _frustum.intersectsSphere( _sphere );
 
 					}
 
