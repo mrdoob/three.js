@@ -1,3 +1,6 @@
+// Hybrid radix sort from
+// - https://gist.github.com/sciecode/93ed864dd77c5c8803c6a86698d68dab
+// - https://github.com/mrdoob/three.js/pull/27202#issuecomment-1817640271
 const POWER = 3;
 const BIT_MAX = 32;
 const BIN_BITS = 1 << POWER;
