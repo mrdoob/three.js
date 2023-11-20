@@ -422,15 +422,15 @@ class WebGLBackend extends Backend {
 
 	}
 
-	needsUpdate( renderObject ) {
+	needsRenderUpdate( renderObject ) {
 
 		return false;
 
 	}
 
-	getCacheKey( renderObject ) {
+	getRenderCacheKey( renderObject ) {
 
-		return renderObject.geometry.id;
+		return renderObject.id;
 
 	}
 
