@@ -10,7 +10,8 @@ import RenderContexts from './RenderContexts.js';
 import Textures from './Textures.js';
 import Background from './Background.js';
 import Nodes from './nodes/Nodes.js';
-import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, Color, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping } from 'three';
+import Color4 from './Color4.js';
+import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping } from 'three';
 
 const _scene = new Scene();
 const _drawingBufferSize = new Vector2();
@@ -77,8 +78,7 @@ class Renderer {
 		this._opaqueSort = null;
 		this._transparentSort = null;
 
-		this._clearAlpha = 1;
-		this._clearColor = new Color( 0x000000 );
+		this._clearColor = new Color4( 0x000000 );
 		this._clearDepth = 1;
 		this._clearStencil = 0;
 
@@ -536,20 +536,19 @@ class Renderer {
 
 	setClearColor( color, alpha = 1 ) {
 
-		this._clearColor.set( color );
-		this._clearAlpha = alpha;
+		this._clearColor.set( color.r, color.g, color.b, alpha );
 
 	}
 
 	getClearAlpha() {
 
-		return this._clearAlpha;
+		return this._clearColor.a;
 
 	}
 
 	setClearAlpha( alpha ) {
 
-		this._clearAlpha = alpha;
+		this._clearColor.a = alpha;
 
 	}
 
