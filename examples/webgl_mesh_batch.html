@@ -35,6 +35,7 @@
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { radixSort } from 'three/addons/utils/SortUtils.js';
 
 		let stats, gui, guiStatsEl;
 		let camera, controls, scene, renderer;
@@ -276,11 +277,33 @@
 			// listeners
 
 			window.addEventListener( 'resize', onWindowResize );
-			window.RADIX = true;
 
 		}
 
 		//
+
+		function sortFunction( list, camera ) {
+
+			this._options = this._options || {
+				get: el => el.z,
+				aux: new Array( list.length ),
+			};
+
+			const options = this._options;
+			options.reversed = this.material.transparent;
+
+			const den = camera.far;
+			for ( let i = 0, l = list.length; i < l; i ++ ) {
+
+				const el = list[ i ];
+				el.z = ( 1 << 30 ) * ( el.z / den );
+
+			}
+
+			radixSort( list, options );
+
+
+		}
 
 		function onWindowResize() {
 
@@ -353,10 +376,10 @@
 
 				mesh.sortObjects = api.sortObjects;
 				mesh.perObjectFrustumCulled = api.perObjectFrustumCulled;
+				mesh.setCustomSort( api.useRadix ? sortFunction : null );
 
 			}
 
-			window.RADIX = api.useRadix;
 			renderer.render( scene, camera );
 
 		}
