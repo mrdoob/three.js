@@ -1,4 +1,3 @@
-import Color4 from './Color4.js';
 import { Vector4 } from 'three';
 
 let id = 0;
