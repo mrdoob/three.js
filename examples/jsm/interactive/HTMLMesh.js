@@ -506,7 +506,7 @@ function html2canvas( element ) {
 
 	// console.time( 'drawElement' );
 
-	context.clearRect(0, 0, canvas.width, canvas.height);
+	context.clearRect( 0, 0, canvas.width, canvas.height );
 
 	drawElement( element );
 
