@@ -461,9 +461,11 @@ class Object3D extends EventDispatcher {
 
 		if ( this[ name ] === value ) result.push( this );
 
-		for ( let i = 0, l = this.children.length; i < l; i ++ ) {
+		const children = this.children;
 
-			this.children[ i ].getObjectsByProperty( name, value, result );
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+			children[ i ].getObjectsByProperty( name, value, result );
 
 		}
 
