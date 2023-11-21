@@ -264,10 +264,13 @@
 		从该对象开始，搜索一个对象及其子级，返回第一个给定的属性中包含有匹配的值的子对象。
 	</p>
 
-	<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value] )</h3>
+	<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value], [param:Array optionalTarget] )</h3>
 	<p>
 		name —— 将要用于查找的属性的名称。<br />
-		value —— 给定的属性的值。 <br /><br />
+		value —— 给定的属性的值。 <br />
+		optionalTarget -- (optional) target to set the result.
+		Otherwise a new Array is instantiated. If set, you must clear this
+		array prior to each call (i.e., array.length = 0;). <br /><br />
 		从此对象开始，搜索一个对象及其子对象，返回包含给定属性的匹配值的所有子对象。
 	</p>
 
