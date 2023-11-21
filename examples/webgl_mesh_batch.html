@@ -40,6 +40,7 @@
 		let stats, gui, guiStatsEl;
 		let camera, controls, scene, renderer;
 		let geometries, mesh, material;
+		let aux = [];
 		const ids = [];
 		const matrix = new THREE.Matrix4();
 
@@ -49,6 +50,12 @@
 		const rotation = new THREE.Euler();
 		const quaternion = new THREE.Quaternion();
 		const scale = new THREE.Vector3();
+
+		//
+
+		const buffer = new ArrayBuffer( 4 );
+		const f32 = new Float32Array( buffer );
+		const u32 = new Uint32Array( buffer );
 
 		//
 
@@ -188,6 +195,8 @@
 			mesh = new THREE.BatchedMesh( geometryCount, vertexCount, indexCount, createMaterial() );
 			mesh.userData.rotationSpeeds = [];
 
+			aux = new Array( geometryCount );
+
 			// disable full-object frustum culling since all of the objects can be dynamic.
 			mesh.frustumCulled = false;
 
@@ -285,20 +294,18 @@
 		function sortFunction( list, camera ) {
 
 			// initialize options
-			this._options = this._options || {
+			const options = {
 				get: el => el.z,
-				aux: new Array( list.length ),
+				aux: aux,
 			};
 
-			const options = this._options;
 			options.reversed = this.material.transparent;
 
-			// convert depth to unsigned 32 bit range
-			const den = camera.far;
+			// bit-cast depth to unsigned 32-bit
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
 
-				const el = list[ i ];
-				el.z = ( 1 << 30 ) * ( el.z / den );
+				f32[ 0 ] = list[ i ].z;
+				list[ i ].z = u32[ 0 ];
 
 			}
 
