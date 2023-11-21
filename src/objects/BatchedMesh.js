@@ -129,6 +129,7 @@ class BatchedMesh extends Mesh {
 		this.sortObjects = true;
 		this.boundingBox = null;
 		this.boundingSphere = null;
+		this.customSort = null;
 
 		this._drawRanges = [];
 		this._reservedRanges = [];
@@ -297,6 +298,13 @@ class BatchedMesh extends Mesh {
 			return finalRange.indexStart + finalRange.indexCount;
 
 		}
+
+	}
+
+	setCustomSort( func ) {
+
+		this.customSort = func;
+		return this;
 
 	}
 
@@ -963,7 +971,7 @@ class BatchedMesh extends Mesh {
 					if ( ! culled ) {
 
 						// get the distance from camera used for sorting
-						const z = _vector.distanceToSquared( _sphere.center );
+						const z = _vector.distanceTo( _sphere.center );
 						_renderList.push( drawRanges[ i ], z );
 
 					}
@@ -974,7 +982,16 @@ class BatchedMesh extends Mesh {
 
 			// Sort the draw ranges and prep for rendering
 			const list = _renderList.list;
-			list.sort( material.transparent ? sortTransparent : sortOpaque );
+			const customSort = this.customSort;
+			if ( customSort === null ) {
+
+				list.sort( material.transparent ? sortTransparent : sortOpaque );
+
+			} else {
+
+				customSort.call( this, list, camera );
+
+			}
 
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
 
