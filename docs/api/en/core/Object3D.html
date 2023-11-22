@@ -334,10 +334,13 @@
 			given.
 		</p>
 
-		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value] )</h3>
+		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value], [param:Array optionalTarget] )</h3>
 		<p>
 			name -- the property name to search for. <br />
-			value -- value of the given property. <br /><br />
+			value -- value of the given property. <br />
+			optionalTarget -- (optional) target to set the result.
+			Otherwise a new Array is instantiated. If set, you must clear this
+			array prior to each call (i.e., array.length = 0;). <br /><br />
 
 			Searches through an object and its children, starting with the object
 			itself, and returns all the objects with a property that matches the value
