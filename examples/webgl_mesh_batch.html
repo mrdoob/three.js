@@ -40,7 +40,6 @@
 		let stats, gui, guiStatsEl;
 		let camera, controls, scene, renderer;
 		let geometries, mesh, material;
-		let aux = [];
 		const ids = [];
 		const matrix = new THREE.Matrix4();
 
@@ -188,8 +187,6 @@
 			const matrix = new THREE.Matrix4();
 			mesh = new THREE.BatchedMesh( geometryCount, vertexCount, indexCount, createMaterial() );
 			mesh.userData.rotationSpeeds = [];
-
-			aux = new Array( geometryCount );
 
 			// disable full-object frustum culling since all of the objects can be dynamic.
 			mesh.frustumCulled = false;
