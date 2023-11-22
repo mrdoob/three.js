@@ -131,7 +131,7 @@ export const radixSort = ( arr, opt ) => {
 
 		const shift = ( 3 - depth ) << POWER;
 		const end = start + len;
-		
+
 		const cache = bins[ depth ];
 		const bin = bins[ depth + 1 ];
 
