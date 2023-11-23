@@ -37,7 +37,8 @@ class NodeMaterial extends ShaderMaterial {
 		this.fog = true;
 		this.lights = true;
 		this.normals = true;
-		this.colorSpace = true;
+
+		this.colorSpaced = true;
 
 		this.lightsNode = null;
 		this.envNode = null;
@@ -334,7 +335,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		// ENCODING
 
-		if ( this.colorSpace === true ) {
+		if ( this.colorSpaced === true ) {
 
 			const renderTarget = renderer.getRenderTarget();
 
