@@ -505,6 +505,9 @@ class WebGPUBackend extends Backend {
 		let depthStencilAttachment;
 		let clearValue;
 
+		let supportsDepth;
+		let supportsStencil;
+
 		if ( color ) {
 
 			const clearColor = this.getClearColor();
@@ -515,8 +518,11 @@ class WebGPUBackend extends Backend {
 
 		if ( renderTargetData === null ) {
 
-			depth = depth && renderer.depth;
-			stencil = stencil && renderer.stencil;
+			supportsDepth = renderer.depth;
+			supportsStencil = renderer.stencil;
+
+			depth = depth && supportsDepth;
+			stencil = stencil && supportsStencil;
 
 			if ( color ) {
 
@@ -546,15 +552,18 @@ class WebGPUBackend extends Backend {
 			if ( depth || stencil ) {
 
 				depthStencilAttachment = {
-					view: this.textureUtils.getDepthBuffer( depth, stencil ).createView()
+					view: this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView()
 				};
 
 			}
 
 		} else {
 
-			depth = depth && renderTargetData.depth;
-			stencil = stencil && renderTargetData.stencil && renderTargetData.depthTexture.format === DepthFormat;
+			supportsDepth = renderTargetData.depth;
+			supportsStencil = renderTargetData.stencil;
+
+			depth = depth && supportsDepth;
+			stencil = stencil && supportsStencil;
 
 			if ( color ) {
 
@@ -609,14 +618,14 @@ class WebGPUBackend extends Backend {
 
 				depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
 				depthStencilAttachment.depthClearValue = renderer.getClearDepth();
+				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
-			} else {
+			} else if ( supportsDepth ) {
 
 				depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
 			}
-
-			depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
 			//
 
@@ -624,14 +633,14 @@ class WebGPUBackend extends Backend {
 
 				depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
 				depthStencilAttachment.stencilClearValue = renderer.getClearStencil();
+				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
-			} else {
+			} else if ( supportsStencil ) {
 
 				depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
 			}
-
-			depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
 		}
 

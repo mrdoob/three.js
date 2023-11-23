@@ -623,7 +623,9 @@ class Renderer {
 
 		if ( renderTarget !== null ) {
 
-			return renderTarget.colorSpace;
+			const texture = renderTarget.texture;
+
+			return ( Array.isArray( texture ) ? texture[ 0 ] : texture ).colorSpace;
 
 		}
 
