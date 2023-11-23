@@ -70,15 +70,16 @@ class MultiDrawRenderList {
 }
 
 const ID_ATTR_NAME = 'batchId';
-const _matrix = new Matrix4();
-const _identityMatrix = new Matrix4();
-const _projScreenMatrix = new Matrix4();
-const _frustum = new Frustum();
-const _box = new Box3();
-const _sphere = new Sphere();
-const _vector = new Vector3();
-const _renderList = new MultiDrawRenderList();
-const _mesh = new Mesh();
+const _matrix = /* @__PURE__ */ new Matrix4();
+const _invMatrixWorld = /* @__PURE__ */ new Matrix4();
+const _identityMatrix = /* @__PURE__ */ new Matrix4();
+const _projScreenMatrix = /* @__PURE__ */ new Matrix4();
+const _frustum = /* @__PURE__ */ new Frustum();
+const _box = /* @__PURE__ */ new Box3();
+const _sphere = /* @__PURE__ */ new Sphere();
+const _vector = /* @__PURE__ */ new Vector3();
+const _renderList = /* @__PURE__ */ new MultiDrawRenderList();
+const _mesh = /* @__PURE__ */ new Mesh();
 const _batchIntersects = [];
 
 // @TODO: SkinnedMesh support?
@@ -899,7 +900,7 @@ class BatchedMesh extends Mesh {
 		const drawRanges = this._drawRanges;
 		const perObjectFrustumCulled = this.perObjectFrustumCulled;
 
-		// prepare the frustum
+		// prepare the frustum in the local frame
 		if ( perObjectFrustumCulled ) {
 
 			_projScreenMatrix
@@ -913,11 +914,11 @@ class BatchedMesh extends Mesh {
 		}
 
 		let count = 0;
-
 		if ( this.sortObjects ) {
 
-			// get the camera position
-			_vector.setFromMatrixPosition( camera.matrixWorld );
+			// get the camera position in the local frame
+			_invMatrixWorld.copy( this.matrixWorld ).invert();
+			_vector.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _invMatrixWorld );
 
 			for ( let i = 0, l = visibility.length; i < l; i ++ ) {
 
