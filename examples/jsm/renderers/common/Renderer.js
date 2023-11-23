@@ -73,7 +73,6 @@ class Renderer {
 		this._background = null;
 
 		this._currentRenderContext = null;
-		this._lastRenderContext = null;
 
 		this._opaqueSort = null;
 		this._transparentSort = null;
@@ -339,8 +338,6 @@ class Renderer {
 		this._currentRenderContext = previousRenderContext;
 		this._currentRenderObjectFunction = previousRenderObjectFunction;
 
-		this._lastRenderContext = renderContext;
-
 		//
 
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
@@ -536,7 +533,8 @@ class Renderer {
 
 	setClearColor( color, alpha = 1 ) {
 
-		this._clearColor.set( color.r, color.g, color.b, alpha );
+		this._clearColor.set( color );
+		this._clearColor.a = alpha;
 
 	}
 
@@ -578,7 +576,7 @@ class Renderer {
 
 	isOccluded( object ) {
 
-		const renderContext = this._currentRenderContext || this._lastRenderContext;
+		const renderContext = this._currentRenderContext;
 
 		return renderContext && this.backend.isOccluded( renderContext, object );
 
@@ -586,9 +584,18 @@ class Renderer {
 
 	clear( color = true, depth = true, stencil = true ) {
 
-		const renderContext = this._currentRenderContext || this._lastRenderContext;
+		let renderTargetData = null;
+		const renderTarget = this._renderTarget;
 
-		if ( renderContext ) this.backend.clear( renderContext, color, depth, stencil );
+		if ( renderTarget !== null ) {
+
+			this._textures.updateRenderTarget( renderTarget );
+
+			renderTargetData = this._textures.get( renderTarget );
+
+		}
+
+		this.backend.clear( color, depth, stencil, renderTargetData );
 
 	}
 
@@ -607,6 +614,20 @@ class Renderer {
 	clearStencil() {
 
 		this.clear( false, false, true );
+
+	}
+
+	get currentColorSpace() {
+
+		const renderTarget = this._renderTarget;
+
+		if ( renderTarget !== null ) {
+
+			return renderTarget.colorSpace;
+
+		}
+
+		return this.outputColorSpace;
 
 	}
 
@@ -736,7 +757,7 @@ class Renderer {
 
 	copyFramebufferToTexture( framebufferTexture ) {
 
-		const renderContext = this._currentRenderContext || this._lastRenderContext;
+		const renderContext = this._currentRenderContext;
 
 		this._textures.updateTexture( framebufferTexture );
 
