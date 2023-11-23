@@ -120,6 +120,12 @@ function copyAttributeData( src, target, targetOffset = 0 ) {
 
 class BatchedMesh extends Mesh {
 
+	get maxGeometryCount() {
+
+		return this._maxGeometryCount;
+
+	}
+
 	constructor( maxGeometryCount, maxVertexCount, maxIndexCount = maxVertexCount * 2, material ) {
 
 		super( new BufferGeometry(), material );
@@ -257,45 +263,6 @@ class BatchedMesh extends Mesh {
 				throw new Error( 'BatchedMesh: All attributes must have a consistent itemSize and normalized value.' );
 
 			}
-
-		}
-
-	}
-
-	getGeometryCount() {
-
-		return this._geometryCount;
-
-	}
-
-	getVertexCount() {
-
-		const reservedRanges = this._reservedRanges;
-		if ( reservedRanges.length === 0 ) {
-
-			return 0;
-
-		} else {
-
-			const finalRange = reservedRanges[ reservedRanges.length - 1 ];
-			return finalRange.vertexStart + finalRange.vertexCount;
-
-		}
-
-	}
-
-	getIndexCount() {
-
-		const reservedRanges = this._reservedRanges;
-		const geometry = this.geometry;
-		if ( geometry.getIndex() === null || reservedRanges.length === 0 ) {
-
-			return 0;
-
-		} else {
-
-			const finalRange = reservedRanges[ reservedRanges.length - 1 ];
-			return finalRange.indexStart + finalRange.indexCount;
 
 		}
 
