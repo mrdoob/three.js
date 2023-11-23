@@ -287,18 +287,17 @@
 			// initialize options
 			this._options = this._options || {
 				get: el => el.z,
-				aux: new Array( list.length ),
+				aux: new Array( this._maxGeometryCount )
 			};
 
 			const options = this._options;
 			options.reversed = this.material.transparent;
 
 			// convert depth to unsigned 32 bit range
-			const den = camera.far;
+			const factor = ( 2**32 - 1 ) / camera.far; // UINT32_MAX / max_depth
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
 
-				const el = list[ i ];
-				el.z = ( 1 << 30 ) * ( el.z / den );
+				list[i].z *= factor;
 
 			}
 

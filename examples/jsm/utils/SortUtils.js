@@ -5,20 +5,16 @@ const POWER = 3;
 const BIT_MAX = 32;
 const BIN_BITS = 1 << POWER;
 const BIN_SIZE = 1 << BIN_BITS;
+const BIN_MAX = BIN_SIZE - 1;
 const ITERATIONS = BIT_MAX / BIN_BITS;
 
 const bins = new Array( ITERATIONS );
-const caches = new Array( ITERATIONS );
-const bins_buffer = new ArrayBuffer( 2 * ITERATIONS * BIN_SIZE * 4 );
+const bins_buffer = new ArrayBuffer( ( ITERATIONS + 1 ) * BIN_SIZE * 4 );
 
 let c = 0;
-for ( let i = 0; i < ITERATIONS; i ++ ) {
-
+for ( let i = 0; i < ( ITERATIONS + 1 ); i ++ ) {
 	bins[ i ] = new Uint32Array( bins_buffer, c, BIN_SIZE );
 	c += BIN_SIZE * 4;
-	caches[ i ] = new Uint32Array( bins_buffer, c, BIN_SIZE );
-	c += BIN_SIZE * 4;
-
 }
 
 const defaultGet = ( el ) => el;
@@ -48,7 +44,7 @@ export const radixSort = ( arr, opt ) => {
 		recurse = ( cache, depth, start ) => {
 
 			let prev = 0;
-			for ( let j = BIN_SIZE - 1; j >= 0; j -- ) {
+			for ( let j = BIN_MAX; j >= 0; j -- ) {
 
 				const cur = cache[ j ], diff = cur - prev;
 				if ( diff != 0 ) {
@@ -136,20 +132,20 @@ export const radixSort = ( arr, opt ) => {
 		const shift = ( 3 - depth ) << POWER;
 		const end = start + len;
 
-		const bin = bins[ depth ];
-		const cache = caches[ depth ];
+		const cache = bins[ depth ];
+		const bin = bins[ depth + 1 ];
 
 		bin.fill( 0 );
 
 		for ( let j = start; j < end; j ++ )
-			bin[ ( get( a[ j ] ) >> shift ) & ( BIN_SIZE - 1 ) ] ++;
+			bin[ ( get( a[ j ] ) >> shift ) & BIN_MAX ] ++;
 
 		accumulate( bin );
 
 		cache.set( bin );
 
 		for ( let j = end - 1; j >= start; j -- )
-			b[ start + -- bin[ ( get( a[ j ] ) >> shift ) & ( BIN_SIZE - 1 ) ] ] = a[ j ];
+			b[ start + -- bin[ ( get( a[ j ] ) >> shift ) & BIN_MAX ] ] = a[ j ];
 
 		if ( depth == ITERATIONS - 1 ) return;
 
