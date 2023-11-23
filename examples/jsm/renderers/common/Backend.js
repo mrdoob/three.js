@@ -3,7 +3,7 @@ let vector4 = null;
 let color4 = null;
 
 import Color4 from './Color4.js';
-import { Vector2, Vector4, REVISION, LinearSRGBColorSpace, createCanvasElement } from 'three';
+import { Vector2, Vector4, REVISION, createCanvasElement } from 'three';
 
 class Backend {
 
