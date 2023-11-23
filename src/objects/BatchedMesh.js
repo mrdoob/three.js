@@ -70,16 +70,16 @@ class MultiDrawRenderList {
 }
 
 const ID_ATTR_NAME = 'batchId';
-const _matrix = /* @__PURE__ */ new Matrix4();
-const _invMatrixWorld = /* @__PURE__ */ new Matrix4();
-const _identityMatrix = /* @__PURE__ */ new Matrix4();
-const _projScreenMatrix = /* @__PURE__ */ new Matrix4();
-const _frustum = /* @__PURE__ */ new Frustum();
-const _box = /* @__PURE__ */ new Box3();
-const _sphere = /* @__PURE__ */ new Sphere();
-const _vector = /* @__PURE__ */ new Vector3();
-const _renderList = /* @__PURE__ */ new MultiDrawRenderList();
-const _mesh = /* @__PURE__ */ new Mesh();
+const _matrix = /*@__PURE__*/ new Matrix4();
+const _invMatrixWorld = /*@__PURE__*/ new Matrix4();
+const _identityMatrix = /*@__PURE__*/ new Matrix4();
+const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
+const _frustum = /*@__PURE__*/ new Frustum();
+const _box = /*@__PURE__*/ new Box3();
+const _sphere = /*@__PURE__*/ new Sphere();
+const _vector = /*@__PURE__*/ new Vector3();
+const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
+const _mesh = /*@__PURE__*/ new Mesh();
 const _batchIntersects = [];
 
 // @TODO: SkinnedMesh support?
