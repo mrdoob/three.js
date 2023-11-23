@@ -255,7 +255,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		} );
 
-		this.colorNode = tslFn( () => {
+		this.fragmentNode = tslFn( () => {
 
 			const vUv = varyingProperty( 'vec2', 'vUv' );
 

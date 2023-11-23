@@ -21,13 +21,6 @@ class SpriteNodeMaterial extends NodeMaterial {
 		this.lights = false;
 		this.normals = false;
 
-		this.colorNode = null;
-		this.opacityNode = null;
-
-		this.alphaTestNode = null;
-
-		this.lightNode = null;
-
 		this.positionNode = null;
 		this.rotationNode = null;
 		this.scaleNode = null;
