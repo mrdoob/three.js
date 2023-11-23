@@ -72,9 +72,9 @@ class WebGPUAttributeUtils {
 		const buffer = backend.get( bufferAttribute ).buffer;
 
 		const array = bufferAttribute.array;
-		const updateRange = bufferAttribute.updateRange;
+		const updateRanges = bufferAttribute.updateRanges;
 
-		if ( updateRange.count === - 1 ) {
+		if ( updateRanges.length === 0 ) {
 
 			// Not using update ranges
 
@@ -87,15 +87,20 @@ class WebGPUAttributeUtils {
 
 		} else {
 
-			device.queue.writeBuffer(
-				buffer,
-				0,
-				array,
-				updateRange.offset * array.BYTES_PER_ELEMENT,
-				updateRange.count * array.BYTES_PER_ELEMENT
-			);
+			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
-			updateRange.count = - 1; // reset range
+				const range = updateRanges[ i ];
+				device.queue.writeBuffer(
+					buffer,
+					0,
+					array,
+					range.start * array.BYTES_PER_ELEMENT,
+					range.count * array.BYTES_PER_ELEMENT
+				);
+
+			}
+
+			bufferAttribute.clearUpdateRanges();
 
 		}
 

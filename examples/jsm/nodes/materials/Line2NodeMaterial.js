@@ -1,7 +1,7 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import { temp } from '../core/VarNode.js';
 import { varying } from '../core/VaryingNode.js';
-import { property } from '../core/PropertyNode.js';
+import { property, varyingProperty } from '../core/PropertyNode.js';
 import { attribute } from '../core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
 import { materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../accessors/MaterialNode.js';
@@ -60,7 +60,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			const a = cameraProjectionMatrix.element( 2 ).element( 2 ); // 3nd entry in 3th column
 			const b = cameraProjectionMatrix.element( 3 ).element( 2 ); // 3nd entry in 4th column
-			const nearEstimate = b.mul( -0.5 ).div( a );
+			const nearEstimate = b.mul( - 0.5 ).div( a );
 
 			const alpha = nearEstimate.sub( start.z ).div( end.z.sub( start.z ) );
 
@@ -70,7 +70,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		this.vertexNode = tslFn( () => {
 
-			varying( vec2(), 'vUv' ).assign( uv() ); // @TODO: Analyze other way to do this
+			varyingProperty( 'vec2', 'vUv' ).assign( uv() );
 
 			const instanceStart = attribute( 'instanceStart' );
 			const instanceEnd = attribute( 'instanceEnd' );
@@ -85,8 +85,8 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			if ( useWorldUnits ) {
 
-				varying( vec3(), 'worldStart' ).assign( start.xyz );
-				varying( vec3(), 'worldEnd' ).assign( end.xyz );
+				varyingProperty( 'vec3', 'worldStart' ).assign( start.xyz );
+				varyingProperty( 'vec3', 'worldEnd' ).assign( end.xyz );
 
 			}
 
@@ -97,7 +97,7 @@ class Line2NodeMaterial extends NodeMaterial {
 			// but we need to perform ndc-space calculations in the shader, so we must address this issue directly
 			// perhaps there is a more elegant solution -- WestLangley
 
-			const perspective = cameraProjectionMatrix.element( 2 ).element( 3 ).equal( -1.0 ); // 4th entry in the 3rd column
+			const perspective = cameraProjectionMatrix.element( 2 ).element( 3 ).equal( - 1.0 ); // 4th entry in the 3rd column
 
 			If( perspective, () => {
 
@@ -173,7 +173,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				// set the world position
 
-				const worldPos = varying( vec4(), 'worldPos' );
+				const worldPos = varyingProperty( 'vec4', 'worldPos' );
 
 				worldPos.assign( positionGeometry.y.lessThan( 0.5 ).cond( start, end ) );
 				worldPos.assign( worldPos.add( vec4( offset, 0 ) ) );
@@ -257,7 +257,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		this.colorNode = tslFn( () => {
 
-			const vUv = varying( vec2(), 'vUv' );
+			const vUv = varyingProperty( 'vec2', 'vUv' );
 
 			if ( useDash ) {
 
@@ -288,11 +288,11 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			if ( useWorldUnits ) {
 
-				const worldStart = varying( vec3(), 'worldStart' );
-				const worldEnd = varying( vec3(), 'worldEnd' );
+				const worldStart = varyingProperty( 'vec3', 'worldStart' );
+				const worldEnd = varyingProperty( 'vec3', 'worldEnd' );
 
 				// Find the closest points on the view ray and the line segment
-				const rayEnd = varying( vec4(), 'worldPos' ).xyz.normalize().mul( 1e5 );
+				const rayEnd = varyingProperty( 'vec4', 'worldPos' ).xyz.normalize().mul( 1e5 );
 				const lineDir = worldEnd.sub( worldStart );
 				const params = closestLineToLine( { p1: worldStart, p2: worldEnd, p3: vec3( 0.0, 0.0, 0.0 ), p4: rayEnd } );
 

@@ -21,7 +21,7 @@
     "type": "git",
     "url": "https://github.com/mrdoob/three.js"
   },
-  "sideEffects": false,
+  "sideEffects": ["./examples/jsm/nodes/Nodes.js"],
   "files": [
     "build",
     "examples/jsm",
@@ -44,7 +44,7 @@
     "test": "npm run lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
     "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
-    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080 --ssl\"",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
     "lint-core": "eslint src",
     "lint-addons": "eslint examples/jsm --ext .js --ignore-pattern libs --ignore-pattern ifc",
     "lint-examples": "eslint examples --ext .html",
@@ -86,7 +86,6 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@puppeteer/browsers": "^1.4.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-terser": "^0.4.0",
     "chalk": "^5.2.0",
@@ -101,7 +100,7 @@
     "jimp": "^0.22.7",
     "magic-string": "^0.30.0",
     "pixelmatch": "^5.3.0",
-    "puppeteer-core": "^19.8.1",
+    "puppeteer": "^21.5.1",
     "qunit": "^2.19.4",
     "rollup": "^3.20.2",
     "rollup-plugin-filesize": "^10.0.0",

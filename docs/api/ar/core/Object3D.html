@@ -322,11 +322,14 @@
 			معطى.
 		</p>
 			 
-		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value] )</h3>
+		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value], [param:Array optionalTarget] )</h3>
 		<p>
 			name -- اسم الخاصية التي يتم البحث عنها. <br />
-			value -- قيمة الخاصية المعطاة. <br /><br />
-			 
+			value -- قيمة الخاصية المعطاة. <br />
+			optionalTarget -- (optional) target to set the result.
+			Otherwise a new Array is instantiated. If set, you must clear this
+			array prior to each call (i.e., array.length = 0;). <br /><br />
+
 			يبحث في كائن وأطفاله، بدءًا من الكائن
 			نفسه، ويرجع جميع الكائنات مع خاصية تطابق القيمة
 			معطى.

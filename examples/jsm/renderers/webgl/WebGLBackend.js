@@ -190,7 +190,7 @@ class WebGLBackend extends Backend {
 
 				}
 
-			}
+			};
 
 			check();
 
@@ -247,6 +247,7 @@ class WebGLBackend extends Backend {
 						gl.clearBufferfv( gl.COLOR, i, [ clearColor.r, clearColor.g, clearColor.b, clearColor.a ] );
 
 					}
+
 				}
 
 				if ( depth && stencil ) {
@@ -260,6 +261,7 @@ class WebGLBackend extends Backend {
 				} else if ( stencil ) {
 
 					gl.clearBufferiv( gl.STENCIL, 0, [ 0 ] );
+
 				}
 
 			}
@@ -420,15 +422,15 @@ class WebGLBackend extends Backend {
 
 	}
 
-	needsUpdate( renderObject ) {
+	needsRenderUpdate( renderObject ) {
 
 		return false;
 
 	}
 
-	getCacheKey( renderObject ) {
+	getRenderCacheKey( renderObject ) {
 
-		return renderObject.geometry.id;
+		return renderObject.id;
 
 	}
 
@@ -479,7 +481,7 @@ class WebGLBackend extends Backend {
 	createTexture( texture, options ) {
 
 		const { gl, utils, textureUtils } = this;
-		const { levels, width, height } = options;
+		const { levels, width, height, depth } = options;
 
 		const glFormat = utils.convert( texture.format, texture.colorSpace );
 		const glType = utils.convert( texture.type );
@@ -499,7 +501,11 @@ class WebGLBackend extends Backend {
 
 		gl.bindTexture( glTextureType, textureGPU );
 
-		if ( ! texture.isVideoTexture ) {
+		if ( texture.isDataArrayTexture ) {
+
+			gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
+
+		} else if ( ! texture.isVideoTexture ) {
 
 			gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
 
@@ -550,6 +556,12 @@ class WebGLBackend extends Backend {
 				gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, image );
 
 			}
+
+		} else if ( texture.isDataArrayTexture ) {
+
+			const image = options.image;
+
+			gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
 
 		} else if ( texture.isVideoTexture ) {
 
@@ -713,13 +725,13 @@ class WebGLBackend extends Backend {
 
 			}
 
-			if ( attributeData.isFloat ) {
+			if ( attributeData.isInteger ) {
 
-				gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, false, stride, offset );
+				gl.vertexAttribIPointer( i, attribute.itemSize, attributeData.type, stride, offset );
 
 			} else {
 
-				gl.vertexAttribIPointer( i, attribute.itemSize, attributeData.type, stride, offset );
+				gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, attribute.normalized, stride, offset );
 
 			}
 
@@ -862,20 +874,42 @@ class WebGLBackend extends Backend {
 
 	}
 
-	copyFramebufferToTexture( texture /*, renderContext */ ) {
+	copyFramebufferToTexture( texture, renderContext ) {
 
 		const { gl } = this;
 
 		const { textureGPU } = this.get( texture );
 
-		gl.bindFramebuffer( gl.FRAMEBUFFER, null );
-		gl.bindTexture( gl.TEXTURE_2D, textureGPU );
+		const width = texture.image.width;
+		const height = texture.image.height;
 
-		gl.copyTexSubImage2D( gl.TEXTURE_2D, 0, 0, 0, 0, 0, texture.image.width, texture.image.height );
+		gl.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
 
-		if ( texture.generateMipmaps ) gl.generateMipmap( gl.TEXTURE_2D );
+		if ( texture.isDepthTexture ) {
 
-		gl.bindTexture( gl.TEXTURE_2D, null );
+			const fb = gl.createFramebuffer();
+
+			gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+
+			gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureGPU, 0 );
+
+			gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, gl.DEPTH_BUFFER_BIT, gl.NEAREST );
+
+			gl.deleteFramebuffer( fb );
+
+
+		} else {
+
+			gl.bindTexture( gl.TEXTURE_2D, textureGPU );
+			gl.copyTexSubImage2D( gl.TEXTURE_2D, 0, 0, 0, 0, 0, width, height );
+
+			gl.bindTexture( gl.TEXTURE_2D, null );
+
+		}
+
+		if ( texture.generateMipmaps ) this.generateMipmaps( texture );
+
+		this._setFramebuffer( renderContext );
 
 	}
 
@@ -899,7 +933,7 @@ class WebGLBackend extends Backend {
 
 				const drawBuffers = [];
 
-				for ( let i = 0; i < textures.length; i++ ) {
+				for ( let i = 0; i < textures.length; i ++ ) {
 
 					const texture = textures[ i ];
 					const { textureGPU } = this.get( texture );

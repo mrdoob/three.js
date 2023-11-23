@@ -731,9 +731,9 @@ class WebGPUBackend extends Backend {
 
 	// cache key
 
-	needsUpdate( renderObject ) {
+	needsRenderUpdate( renderObject ) {
 
-		const renderObjectGPU = this.get( renderObject );
+		const data = this.get( renderObject );
 
 		const { object, material } = renderObject;
 
@@ -747,15 +747,35 @@ class WebGPUBackend extends Backend {
 
 		let needsUpdate = false;
 
-		if ( renderObjectGPU.sampleCount !== sampleCount || renderObjectGPU.colorSpace !== colorSpace ||
-			renderObjectGPU.colorFormat !== colorFormat || renderObjectGPU.depthStencilFormat !== depthStencilFormat ||
-            renderObjectGPU.primitiveTopology !== primitiveTopology ) {
+		if ( data.material !== material || data.materialVersion !== material.version ||
+			data.transparent !== material.transparent || data.blending !== material.blending || data.premultipliedAlpha !== material.premultipliedAlpha ||
+			data.blendSrc !== material.blendSrc || data.blendDst !== material.blendDst || data.blendEquation !== material.blendEquation ||
+			data.blendSrcAlpha !== material.blendSrcAlpha || data.blendDstAlpha !== material.blendDstAlpha || data.blendEquationAlpha !== material.blendEquationAlpha ||
+			data.colorWrite !== material.colorWrite || data.depthWrite !== material.depthWrite || data.depthTest !== material.depthTest || data.depthFunc !== material.depthFunc ||
+			data.stencilWrite !== material.stencilWrite || data.stencilFunc !== material.stencilFunc ||
+			data.stencilFail !== material.stencilFail || data.stencilZFail !== material.stencilZFail || data.stencilZPass !== material.stencilZPass ||
+			data.stencilFuncMask !== material.stencilFuncMask || data.stencilWriteMask !== material.stencilWriteMask ||
+			data.side !== material.side || data.alphaToCoverage !== material.alphaToCoverage ||
+			data.sampleCount !== sampleCount || data.colorSpace !== colorSpace ||
+			data.colorFormat !== colorFormat || data.depthStencilFormat !== depthStencilFormat ||
+			data.primitiveTopology !== primitiveTopology 
+		) {
 
-			renderObjectGPU.sampleCount = sampleCount;
-			renderObjectGPU.colorSpace = colorSpace;
-			renderObjectGPU.colorFormat = colorFormat;
-			renderObjectGPU.depthStencilFormat = depthStencilFormat;
-			renderObjectGPU.primitiveTopology = primitiveTopology;
+			data.material = material; data.materialVersion = material.version;
+			data.transparent = material.transparent; data.blending = material.blending; data.premultipliedAlpha = material.premultipliedAlpha;
+			data.blendSrc = material.blendSrc; data.blendDst = material.blendDst; data.blendEquation = material.blendEquation;
+			data.blendSrcAlpha = material.blendSrcAlpha; data.blendDstAlpha = material.blendDstAlpha; data.blendEquationAlpha = material.blendEquationAlpha;
+			data.colorWrite = material.colorWrite;
+			data.depthWrite = material.depthWrite; data.depthTest = material.depthTest; data.depthFunc = material.depthFunc;
+			data.stencilWrite = material.stencilWrite; data.stencilFunc = material.stencilFunc;
+			data.stencilFail = material.stencilFail; data.stencilZFail = material.stencilZFail; data.stencilZPass = material.stencilZPass;
+			data.stencilFuncMask = material.stencilFuncMask; data.stencilWriteMask = material.stencilWriteMask;
+			data.side = material.side; data.alphaToCoverage = material.alphaToCoverage;
+			data.sampleCount = sampleCount;
+			data.colorSpace = colorSpace;
+			data.colorFormat = colorFormat;
+			data.depthStencilFormat = depthStencilFormat;
+			data.primitiveTopology = primitiveTopology;
 
 			needsUpdate = true;
 
@@ -765,7 +785,7 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	getCacheKey( renderObject ) {
+	getRenderCacheKey( renderObject ) {
 
 		const { object, material } = renderObject;
 
@@ -773,6 +793,15 @@ class WebGPUBackend extends Backend {
 		const renderContext = renderObject.context;
 
 		return [
+			material.transparent, material.blending, material.premultipliedAlpha,
+			material.blendSrc, material.blendDst, material.blendEquation,
+			material.blendSrcAlpha, material.blendDstAlpha, material.blendEquationAlpha,
+			material.colorWrite,
+			material.depthWrite, material.depthTest, material.depthFunc,
+			material.stencilWrite, material.stencilFunc,
+			material.stencilFail, material.stencilZFail, material.stencilZPass,
+			material.stencilFuncMask, material.stencilWriteMask,
+			material.side,
 			utils.getSampleCount( renderContext ),
 			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
 			utils.getPrimitiveTopology( object, material )

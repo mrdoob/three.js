@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mix, oscSine, timerLocal, cubeTexture, float, toneMapping } from 'three/nodes';
+			import { mix, oscSine, timerLocal, cubeTexture, maxMipLevel, toneMapping } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
@@ -81,7 +81,7 @@
 				scene.environmentNode = mix( cubeTexture( cube2Texture ), cubeTexture( cube1Texture ), oscSine( timerLocal( .1 ) ) );
 
 				scene.backgroundNode = scene.environmentNode.context( {
-					getSamplerLevelNode: () => float( 1 )
+					getTextureLevel: ( textureNode ) => maxMipLevel( textureNode )
 				} );
 
 				const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );

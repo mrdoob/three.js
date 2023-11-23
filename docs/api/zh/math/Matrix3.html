@@ -79,9 +79,10 @@ m.elements = [ 11, 21, 31,
 
 		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
 		<p>
-		将该矩阵的基向量 [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] 提取到提供的三个轴向中。如果该矩阵如下：<br /><br />
+		将该矩阵的基向量 [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] 提取到提供的三个轴向中。如果该矩阵如下：
+		</p>
 
-		<math>
+		<math display="block">
 			<mrow>
 				<mo>[</mo>
 				<mtable>
@@ -103,10 +104,13 @@ m.elements = [ 11, 21, 31,
 				</mtable>
 				<mo>]</mo>
 			</mrow>
-		</math><br /><br />
+		</math>
 
-		那么 [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] 将会被设置为：<br /><br />
+		<p>
+		那么 [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] 将会被设置为：
+		</p>
 
+		<div style="text-align: center">
 		<math>
 			<mrow>
 				<mi>xAxis</mi>
@@ -148,7 +152,7 @@ m.elements = [ 11, 21, 31,
 				<mo>]</mo>
 			</mrow>
 		</math>
-		</p>
+		</div>
 
 		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
@@ -173,41 +177,42 @@ m.elements = [ 11, 21, 31,
 
 		<h3>[method:this identity]()</h3>
 		<p>
-			将此矩阵重置为3x3单位矩阵:<br /><br />
-
-			<math>
-				<mrow>
-					<mo>[</mo>
-					<mtable>
-						<mtr>
-							<mtd><mn>1</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>1</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-						</mtr>
-						<mtr>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>0</mn></mtd>
-							<mtd><mn>1</mn></mtd>
-						</mtr>
-					</mtable>
-					<mo>]</mo>
-				</mrow>
-			</math>
+			将此矩阵重置为3x3单位矩阵:
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this makeRotation]( [param:Float theta] )</h3>
 		<p>
 		[page:Float theta] — Rotation angle in radians. Positive values rotate counterclockwise.<br /><br />
 
 		Sets this matrix as a 2D rotational transformation by [page:Float theta] radians.
-		The resulting matrix will be:<br /><br />
+		The resulting matrix will be:
+		</p>
 
-		<math>
+		<math display="block">
 			<mrow>
 				<mo>[</mo>
 				<mtable>
@@ -246,7 +251,6 @@ m.elements = [ 11, 21, 31,
 				<mo>]</mo>
 			</mrow>
 		</math>
-		</p>
 
 		<h3>[method:this makeScale]( [param:Float x], [param:Float y] )</h3>
 		<p>
@@ -288,9 +292,10 @@ m.elements = [ 11, 21, 31,
 		[page:Float x] - the amount to translate in the X axis.<br />
 		[page:Float y] - the amount to translate in the Y axis.<br />
 
-		Sets this matrix as a 2D translation transform:<br /><br />
+		Sets this matrix as a 2D translation transform:
+		</p>
 
-		<math>
+		<math display="block">
 			<mrow>
 				<mo>[</mo>
 				<mtable>
@@ -313,7 +318,6 @@ m.elements = [ 11, 21, 31,
 				<mo>]</mo>
 			</mrow>
 		</math>
-		</p>
 
 		<h3>[method:this multiply]( [param:Matrix3 m] )</h3>
 		<p>将当前矩阵乘以矩阵[page:Matrix3 m]。</p>
@@ -326,9 +330,10 @@ m.elements = [ 11, 21, 31,
 
 		<h3>[method:this set]( [param:Float n11], [param:Float n12], [param:Float n13], [param:Float n21], [param:Float n22], [param:Float n23], [param:Float n31], [param:Float n32], [param:Float n33] )</h3>
 		<p>
-		使用行优先 [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major] 的格式来设置该矩阵:<br /><br />
+		使用行优先 [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major] 的格式来设置该矩阵:
+		</p>
 
-		<math>
+		<math display="block">
 			<mrow>
 				<mo>[</mo>
 				<mtable>
@@ -351,7 +356,6 @@ m.elements = [ 11, 21, 31,
 				<mo>]</mo>
 			</mrow>
 		</math>
-		</p>
 
 		<h3>[method:this premultiply]( [param:Matrix3 m] )</h3>
 		<p>将矩阵[page:Matrix3 m]乘以当前矩阵。</p>

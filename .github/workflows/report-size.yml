@@ -29,7 +29,7 @@ jobs:
       # Using actions/download-artifact doesn't work here
       # https://github.com/actions/download-artifact/issues/60
       - name: Download artifact
-        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
         id: download-artifact
         with:
           result-encoding: string
@@ -58,7 +58,7 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Install Node
-        uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3
+        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4
         with:
           node-version: 18
           cache: 'npm'
@@ -133,7 +133,7 @@ jobs:
           comment-author: 'github-actions[bot]'
           body-includes: Bundle size
       - name: Comment on PR
-        uses: peter-evans/create-or-update-comment@c6c9a1a66007646a28c153e2a8580a5bad27bcfa # v3
+        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3
         with:
           issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}
           comment-id: ${{ steps.find-comment.outputs.comment-id }}

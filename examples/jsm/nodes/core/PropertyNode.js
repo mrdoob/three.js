@@ -3,11 +3,12 @@ import { nodeImmutable, nodeObject } from '../shadernode/ShaderNode.js';
 
 class PropertyNode extends Node {
 
-	constructor( nodeType, name = null ) {
+	constructor( nodeType, name = null, varying = false ) {
 
 		super( nodeType );
 
 		this.name = name;
+		this.varying = varying;
 
 		this.isPropertyNode = true;
 
@@ -27,7 +28,20 @@ class PropertyNode extends Node {
 
 	generate( builder ) {
 
-		return builder.getPropertyName( builder.getVarFromNode( this, this.name ) );
+		let nodeVar;
+
+		if ( this.varying === true ) {
+
+			nodeVar = builder.getVaryingFromNode( this, this.name );
+			nodeVar.needsInterpolation = true;
+
+		} else {
+
+			nodeVar = builder.getVarFromNode( this, this.name );
+
+		}
+
+		return builder.getPropertyName( nodeVar );
 
 	}
 
@@ -36,6 +50,7 @@ class PropertyNode extends Node {
 export default PropertyNode;
 
 export const property = ( type, name ) => nodeObject( new PropertyNode( type, name ) );
+export const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( type, name, true ) );
 
 export const diffuseColor = nodeImmutable( PropertyNode, 'vec4', 'DiffuseColor' );
 export const roughness = nodeImmutable( PropertyNode, 'float', 'Roughness' );

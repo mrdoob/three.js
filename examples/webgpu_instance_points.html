@@ -54,7 +54,6 @@
 			let insetHeight;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -69,6 +68,7 @@
 				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -160,8 +160,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				stats.update();
 

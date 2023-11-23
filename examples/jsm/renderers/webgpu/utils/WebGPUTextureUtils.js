@@ -237,9 +237,17 @@ class WebGPUTextureUtils {
 
 		// transfer texture data
 
-		if ( texture.isDataTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
+		if ( texture.isDataTexture || texture.isData3DTexture ) {
 
 			this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, false );
+
+		} else if ( texture.isDataArrayTexture ) {
+
+			for ( let i = 0; i < options.image.depth; i ++ ) {
+
+				this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, i, false, i );
+
+			}
 
 		} else if ( texture.isCompressedTexture ) {
 
@@ -437,7 +445,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY ) {
+	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, depth = 0 ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 		// @TODO: Consider to support valid buffer layouts with other formats like RGB
@@ -457,13 +465,13 @@ class WebGPUTextureUtils {
 			},
 			data,
 			{
-				offset: 0,
+				offset: image.width * image.height * bytesPerTexel * depth,
 				bytesPerRow
 			},
 			{
 				width: image.width,
 				height: image.height,
-				depthOrArrayLayers: ( image.depth !== undefined ) ? image.depth : 1
+				depthOrArrayLayers: 1
 			} );
 
 		if ( flipY === true ) {

@@ -74,7 +74,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( 'updateRange', ( assert ) => {
+		QUnit.todo( 'updateRanges', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
@@ -296,8 +296,7 @@ export default QUnit.module( 'Core', () => {
 			const attr2 = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3, true );
 			attr2.name = 'attributeName';
 			attr2.setUsage( DynamicDrawUsage );
-			attr2.updateRange.offset = 1;
-			attr2.updateRange.count = 2;
+			attr2.addUpdateRange( 1, 2 );
 			assert.deepEqual( attr2.toJSON(), {
 				itemSize: 3,
 				type: 'Float32Array',
@@ -305,7 +304,6 @@ export default QUnit.module( 'Core', () => {
 				normalized: true,
 				name: 'attributeName',
 				usage: DynamicDrawUsage,
-				updateRange: { offset: 1, count: 2 }
 			}, 'Serialized to JSON as expected with non-default values' );
 
 		} );

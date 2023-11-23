@@ -33,13 +33,15 @@ class RenderObjects {
 
 			if ( renderObject.version !== material.version || renderObject.needsUpdate ) {
 
-				renderObject.version = material.version;
-
 				if ( renderObject.initialCacheKey !== renderObject.getCacheKey() ) {
 
 					renderObject.dispose();
 
 					renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, passId );
+
+				} else {
+
+					renderObject.version = material.version;
 
 				}
 
