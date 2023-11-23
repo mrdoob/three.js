@@ -15,9 +15,18 @@ import * as fflate from '../libs/fflate.module.js';
 
 const textEncoder = new TextEncoder();
 
+// New compression schemes OpenEXR 4.0
+
 const NO_COMPRESSION = 0;
-const ZIPS_COMPRESSION = 2;
+// const RLE_COMPRESSION = 1 TODO: Add RLE Compression
+const ZIPS_COMPRESSION = 2; // TODO: ZIPS, ZIP compression level option
 const ZIP_COMPRESSION = 3;
+// const PIZ_COMPRESSION = 4 TODO: Add PIZ Compression
+// const PXR24_COMPRESSION = 5 TODO: Add PXR24 Compression
+// const B44_COMPRESSION = 6 TODO: Add B44 Compression
+// const B44A_COMPRESSION = 7 TODO: Add B44A Compression
+// const DWAA_COMPRESSION = 8 TODO: Add DWAA Compression, compression level option
+// const DWAB_COMPRESSION = 9 TODO: Add DWAB Compression, compression level option
 
 class EXRExporter {
 
