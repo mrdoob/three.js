@@ -21,8 +21,28 @@
 			<br/>
 			<br/>
 
-			Requires platform support for the [link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_multi_draw WEBGL_multi_draw extension].
+			If the [link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_multi_draw WEBGL_multi_draw extension] is
+			not supported then a less performant callback is used.
 		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const box = new THREE.BoxGeometry( 1, 1, 1 );
+		const sphere = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+
+		// initialize and add geometries into the batched mesh
+		const batchedMesh = new BatchedMesh( 10, 5000, 10000, material );
+		const boxId = batchedMesh.addGeometry( box );
+		const sphereId = batchedMesh.addGeometry( sphere );
+
+		// position the geometries
+		batchedMesh.setMatrixAt( boxId, boxMatrix );
+		batchedMesh.setMatrixAt( sphereId, sphereMatrix );
+
+		scene.add( batchedMesh );
+		</code>
 
 		<h2>Examples</h2>
 		<p>
@@ -69,6 +89,11 @@
 			If true then the individual objects within the [name] are sorted to improve overdraw-related artifacts.
 			If the material is marked as "transparent" objects are rendered back to front and if not then they are
 			rendered front to back. Default is `true`.
+		</p>
+
+		<h3>[property:Integer maxGeometryCount]</h3>
+		<p>
+			The maximum number of individual geometries that can be stored in the [name]. Read only.
 		</p>
 
 		<h3>[property:Boolean isBatchedMesh]</h3>
