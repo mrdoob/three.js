@@ -35,6 +35,7 @@
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { radixSort } from 'three/addons/utils/SortUtils.js';
 
 		let stats, gui, guiStatsEl;
 		let camera, controls, scene, renderer;
@@ -66,6 +67,7 @@
 			sortObjects: true,
 			perObjectFrustumCulled: true,
 			opacity: 1,
+			useCustomSort: true,
 		};
 
 		init();
@@ -117,7 +119,6 @@
 			if ( ! material ) {
 
 				material = new THREE.MeshNormalMaterial();
-				material.opacity = 0.1;
 
 			}
 
@@ -268,6 +269,7 @@
 			} );
 			gui.add( api, 'sortObjects' );
 			gui.add( api, 'perObjectFrustumCulled' );
+			gui.add( api, 'useCustomSort' );
 
 			guiStatsEl = document.createElement( 'li' );
 			guiStatsEl.classList.add( 'gui-stats' );
@@ -279,6 +281,30 @@
 		}
 
 		//
+
+		function sortFunction( list, camera ) {
+
+			// initialize options
+			this._options = this._options || {
+				get: el => el.z,
+				aux: new Array( this.maxGeometryCount )
+			};
+
+			const options = this._options;
+			options.reversed = this.material.transparent;
+
+			// convert depth to unsigned 32 bit range
+			const factor = ( 2 ** 32 - 1 ) / camera.far; // UINT32_MAX / max_depth
+			for ( let i = 0, l = list.length; i < l; i ++ ) {
+
+				list[ i ].z *= factor;
+
+			}
+
+			// perform a fast-sort using the hybrid radix sort function
+			radixSort( list, options );
+
+		}
 
 		function onWindowResize() {
 
@@ -347,6 +373,7 @@
 
 				mesh.sortObjects = api.sortObjects;
 				mesh.perObjectFrustumCulled = api.perObjectFrustumCulled;
+				mesh.setCustomSort( api.useCustomSort ? sortFunction : null );
 
 			}
 

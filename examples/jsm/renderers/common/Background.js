@@ -63,12 +63,12 @@ class Background extends DataMap {
 				viewProj = viewProj.setZ( viewProj.w );
 
 				const nodeMaterial = new NodeMaterial();
-				nodeMaterial.outputNode = this.backgroundMeshNode;
 				nodeMaterial.side = BackSide;
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
 				nodeMaterial.fog = false;
 				nodeMaterial.vertexNode = viewProj;
+				nodeMaterial.fragmentNode = this.backgroundMeshNode;
 
 				this.backgroundMesh = backgroundMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );
 				backgroundMesh.frustumCulled = false;

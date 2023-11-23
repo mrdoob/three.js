@@ -20,6 +20,7 @@ export const vertex = /* glsl */`
 void main() {
 
 	#include <uv_vertex>
+	#include <batching_vertex>
 
 	#include <beginnormal_vertex>
 	#include <morphnormal_vertex>

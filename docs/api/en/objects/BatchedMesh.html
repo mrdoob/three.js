@@ -21,8 +21,28 @@
 			<br/>
 			<br/>
 
-			Requires platform support for the [link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_multi_draw WEBGL_multi_draw extension].
+			If the [link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_multi_draw WEBGL_multi_draw extension] is
+			not supported then a less performant callback is used.
 		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const box = new THREE.BoxGeometry( 1, 1, 1 );
+		const sphere = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+
+		// initialize and add geometries into the batched mesh
+		const batchedMesh = new BatchedMesh( 10, 5000, 10000, material );
+		const boxId = batchedMesh.addGeometry( box );
+		const sphereId = batchedMesh.addGeometry( sphere );
+
+		// position the geometries
+		batchedMesh.setMatrixAt( boxId, boxMatrix );
+		batchedMesh.setMatrixAt( sphereId, sphereMatrix );
+
+		scene.add( batchedMesh );
+		</code>
 
 		<h2>Examples</h2>
 		<p>
@@ -71,6 +91,11 @@
 			rendered front to back. Default is `true`.
 		</p>
 
+		<h3>[property:Integer maxGeometryCount]</h3>
+		<p>
+			The maximum number of individual geometries that can be stored in the [name]. Read only.
+		</p>
+
 		<h3>[property:Boolean isBatchedMesh]</h3>
 		<p>Read-only flag to check if a given object is of type [name].</p>
 
@@ -96,6 +121,12 @@
 		<p>
 			Frees the GPU-related resources allocated by this instance. Call this
 			method whenever this instance is no longer used in your app.
+		</p>
+
+		<h3>[method:this setCustomSort]( [param:Function sortFunction] )</h3>
+		<p>
+			Takes a sort a function that is run before render. The function takes a list of items to sort and a camera. The objects
+			in the list include a "z" field to perform a depth-ordered sort with.
 		</p>
 
 		<h3>

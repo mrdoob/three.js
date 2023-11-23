@@ -120,6 +120,12 @@ function copyAttributeData( src, target, targetOffset = 0 ) {
 
 class BatchedMesh extends Mesh {
 
+	get maxGeometryCount() {
+
+		return this._maxGeometryCount;
+
+	}
+
 	constructor( maxGeometryCount, maxVertexCount, maxIndexCount = maxVertexCount * 2, material ) {
 
 		super( new BufferGeometry(), material );
@@ -129,6 +135,7 @@ class BatchedMesh extends Mesh {
 		this.sortObjects = true;
 		this.boundingBox = null;
 		this.boundingSphere = null;
+		this.customSort = null;
 
 		this._drawRanges = [];
 		this._reservedRanges = [];
@@ -261,42 +268,10 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	getGeometryCount() {
+	setCustomSort( func ) {
 
-		return this._geometryCount;
-
-	}
-
-	getVertexCount() {
-
-		const reservedRanges = this._reservedRanges;
-		if ( reservedRanges.length === 0 ) {
-
-			return 0;
-
-		} else {
-
-			const finalRange = reservedRanges[ reservedRanges.length - 1 ];
-			return finalRange.vertexStart + finalRange.vertexCount;
-
-		}
-
-	}
-
-	getIndexCount() {
-
-		const reservedRanges = this._reservedRanges;
-		const geometry = this.geometry;
-		if ( geometry.getIndex() === null || reservedRanges.length === 0 ) {
-
-			return 0;
-
-		} else {
-
-			const finalRange = reservedRanges[ reservedRanges.length - 1 ];
-			return finalRange.indexStart + finalRange.indexCount;
-
-		}
+		this.customSort = func;
+		return this;
 
 	}
 
@@ -963,7 +938,7 @@ class BatchedMesh extends Mesh {
 					if ( ! culled ) {
 
 						// get the distance from camera used for sorting
-						const z = _vector.distanceToSquared( _sphere.center );
+						const z = _vector.distanceTo( _sphere.center );
 						_renderList.push( drawRanges[ i ], z );
 
 					}
@@ -974,7 +949,16 @@ class BatchedMesh extends Mesh {
 
 			// Sort the draw ranges and prep for rendering
 			const list = _renderList.list;
-			list.sort( material.transparent ? sortTransparent : sortOpaque );
+			const customSort = this.customSort;
+			if ( customSort === null ) {
+
+				list.sort( material.transparent ? sortTransparent : sortOpaque );
+
+			} else {
+
+				customSort.call( this, list, camera );
+
+			}
 
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
 

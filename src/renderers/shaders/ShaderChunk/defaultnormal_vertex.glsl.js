@@ -12,7 +12,6 @@ vec3 transformedNormal = objectNormal;
 	// this is in lieu of a per-instance normal-matrix
 	// shear transforms in the instance matrix are not supported
 
-	mat4 batchingMatrix = getBatchingMatrix( batchId );
 	mat3 bm = mat3( batchingMatrix );
 	transformedNormal /= vec3( dot( bm[ 0 ], bm[ 0 ] ), dot( bm[ 1 ], bm[ 1 ] ), dot( bm[ 2 ], bm[ 2 ] ) );
 	transformedNormal = bm * transformedNormal;

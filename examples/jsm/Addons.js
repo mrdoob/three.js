@@ -272,6 +272,7 @@ export * from './utils/PackedPhongMaterial.js';
 export * as SceneUtils from './utils/SceneUtils.js';
 export * from './utils/ShadowMapViewer.js';
 export * as SkeletonUtils from './utils/SkeletonUtils.js';
+export * as SortUtils from './utils/SortUtils.js';
 export * from './utils/TextureUtils.js';
 export * from './utils/UVsDebug.js';
 export * from './utils/WorkerPool.js';
