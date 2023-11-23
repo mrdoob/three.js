@@ -32,8 +32,6 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.forceSinglePass = false;
 
-		this.unlit = this.constructor === NodeMaterial.prototype.constructor; // Extended materials are not unlit by default
-
 		this.fog = true;
 		this.lights = true;
 		this.normals = true;
@@ -52,7 +50,9 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.positionNode = null;
 
-		this.outputNode = null; // @TODO: Rename to fragmentNode
+		this.outputNode = null;
+
+		this.fragmentNode = null;
 		this.vertexNode = null;
 
 	}
@@ -83,9 +83,9 @@ class NodeMaterial extends ShaderMaterial {
 
 		builder.addStack();
 
-		let outputNode;
+		let resultNode;
 
-		if ( this.unlit === false ) {
+		if ( this.fragmentNode === null ) {
 
 			if ( this.normals === true ) this.setupNormal( builder );
 
@@ -94,23 +94,23 @@ class NodeMaterial extends ShaderMaterial {
 
 			const outgoingLightNode = this.setupLighting( builder );
 
-			outputNode = this.setupOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
+			resultNode = this.setupOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
 
 			// OUTPUT NODE
 
-			output.assign( outputNode );
+			output.assign( resultNode );
 
 			//
 
-			if ( this.outputNode !== null ) outputNode = this.outputNode;
+			if ( this.outputNode !== null ) resultNode = this.outputNode;
 
 		} else {
 
-			outputNode = this.setupOutput( builder, this.outputNode || vec4( 0, 0, 0, 1 ) );
+			resultNode = this.setupOutput( builder, this.fragmentNode );
 
 		}
 
-		builder.stack.outputNode = outputNode;
+		builder.stack.outputNode = resultNode;
 
 		builder.addFlow( 'fragment', builder.removeStack() );
 
@@ -481,6 +481,8 @@ class NodeMaterial extends ShaderMaterial {
 		this.positionNode = source.positionNode;
 
 		this.outputNode = source.outputNode;
+
+		this.fragmentNode = source.fragmentNode;
 		this.vertexNode = source.vertexNode;
 
 		return super.copy( source );
