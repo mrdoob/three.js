@@ -17,6 +17,8 @@ import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import AONode from '../lighting/AONode.js';
 import { lightingContext } from '../lighting/LightingContextNode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
+import { depthPixel } from '../display/ViewportDepthNode.js';
+import { cameraLogDepth } from '../accessors/CameraNode.js';
 
 const NodeMaterials = new Map();
 
@@ -50,6 +52,8 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.positionNode = null;
 
+		this.depthNode = null;
+
 		this.outputNode = null;
 
 		this.fragmentNode = null;
@@ -75,7 +79,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		builder.addStack();
 
-		builder.stack.outputNode = this.setupPosition( builder );
+		builder.stack.outputNode = this.vertexNode || this.setupPosition( builder );
 
 		builder.addFlow( 'vertex', builder.removeStack() );
 
@@ -86,6 +90,8 @@ class NodeMaterial extends ShaderMaterial {
 		let resultNode;
 
 		if ( this.fragmentNode === null ) {
+
+			if ( this.depthWrite === true ) this.setupDepth( builder );
 
 			if ( this.normals === true ) this.setupNormal( builder );
 
@@ -116,12 +122,38 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
+	setupDepth( builder ) {
+
+		const { renderer } = builder;
+
+		// Depth
+
+		let depthNode = this.depthNode;
+
+		if ( renderer.logarithmicDepthBuffer === true ) {
+
+			const fragDepth = modelViewProjection().w.add( 1 );
+
+			depthNode = fragDepth.log2().mul( cameraLogDepth ).mul( 0.5 );
+
+		}
+
+		if ( depthNode !== null ) {
+
+			depthPixel.assign( depthNode ).append();
+
+		}
+
+	}
+
 	setupPosition( builder ) {
 
-		const object = builder.object;
+		const { object } = builder;
 		const geometry = object.geometry;
 
 		builder.addStack();
+
+		// Vertex
 
 		if ( geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color ) {
 
@@ -147,9 +179,12 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		builder.context.vertex = builder.removeStack();
+		const mvp = modelViewProjection();
 
-		return this.vertexNode || modelViewProjection();
+		builder.context.vertex = builder.removeStack();
+		builder.context.mvp = mvp;
+
+		return mvp;
 
 	}
 
@@ -479,6 +514,8 @@ class NodeMaterial extends ShaderMaterial {
 		this.alphaTestNode = source.alphaTestNode;
 
 		this.positionNode = source.positionNode;
+
+		this.depthNode = source.depthNode;
 
 		this.outputNode = source.outputNode;
 

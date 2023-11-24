@@ -406,6 +406,12 @@ ${ flowData.code }
 
 	}
 
+	getFragDepth() {
+
+		return 'gl_FragDepth';
+
+	}
+
 	isAvailable( name ) {
 
 		return supports[ name ] === true;
