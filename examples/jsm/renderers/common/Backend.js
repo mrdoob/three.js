@@ -1,6 +1,8 @@
 let vector2 = null;
 let vector4 = null;
+let color4 = null;
 
+import Color4 from './Color4.js';
 import { Vector2, Vector4, REVISION, createCanvasElement } from 'three';
 
 class Backend {
@@ -109,6 +111,20 @@ class Backend {
 		vector4 = vector4 || new Vector4();
 
 		return this.renderer.getScissor( vector4 );
+
+	}
+
+	getClearColor() {
+
+		const renderer = this.renderer;
+
+		color4 = color4 || new Color4();
+
+		renderer.getClearColor( color4 );
+
+		color4.getRGB( color4, this.renderer.currentColorSpace );
+
+		return color4;
 
 	}
 

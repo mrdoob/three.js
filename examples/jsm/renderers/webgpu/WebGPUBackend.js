@@ -7,7 +7,7 @@ import { GPUFeatureName, GPUTextureFormat, GPULoadOp, GPUStoreOp, GPUIndexFormat
 import WGSLNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
 
-import { DepthTexture, DepthFormat, DepthStencilFormat, UnsignedInt248Type, UnsignedIntType, WebGPUCoordinateSystem } from 'three';
+import { DepthFormat, WebGPUCoordinateSystem } from 'three';
 
 import WebGPUUtils from './utils/WebGPUUtils.js';
 import WebGPUAttributeUtils from './utils/WebGPUAttributeUtils.js';
@@ -55,9 +55,6 @@ class WebGPUBackend extends Backend {
 		this.device = null;
 		this.context = null;
 		this.colorBuffer = null;
-
-		this.defaultDepthTexture = new DepthTexture();
-		this.defaultDepthTexture.name = 'depthBuffer';
 
 		this.utils = new WebGPUUtils( this );
 		this.attributeUtils = new WebGPUAttributeUtils( this );
@@ -116,6 +113,13 @@ class WebGPUBackend extends Backend {
 		this.adapter = adapter;
 		this.device = device;
 		this.context = context;
+
+		this.context.configure( {
+			device: this.device,
+			format: GPUTextureFormat.BGRA8Unorm,
+			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+			alphaMode: 'premultiplied'
+		} );
 
 		this.updateSize();
 
@@ -218,7 +222,6 @@ class WebGPUBackend extends Backend {
 					resolveTarget,
 					loadOp: GPULoadOp.Load,
 					storeOp: GPUStoreOp.Store
-
 				} );
 
 			}
@@ -247,7 +250,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			depthStencilAttachment.view = this._getDepthBufferGPU( renderContext ).createView();
+			depthStencilAttachment.view = this.textureUtils.getDepthBuffer( renderContext.depth, renderContext.stencil ).createView();
 
 		}
 
@@ -492,75 +495,166 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	clear( renderContext, color, depth, stencil ) {
+	clear( color, depth, stencil, renderTargetData = null ) {
 
 		const device = this.device;
-		const renderContextData = this.get( renderContext );
+		const renderer = this.renderer;
 
-		const { descriptor } = renderContextData;
+		const colorAttachments = [];
 
-		depth = depth && renderContext.depth;
-		stencil = stencil && renderContext.stencil;
+		let depthStencilAttachment;
+		let clearValue;
 
-		const colorAttachment = descriptor.colorAttachments[ 0 ];
-		const depthStencilAttachment = descriptor.depthStencilAttachment;
-
-		const antialias = this.parameters.antialias;
-
-		// @TODO: Include render target in clear operation.
-		if ( antialias === true ) {
-
-			colorAttachment.view = this.colorBuffer.createView();
-			colorAttachment.resolveTarget = this.context.getCurrentTexture().createView();
-
-		} else {
-
-			colorAttachment.view = this.context.getCurrentTexture().createView();
-			colorAttachment.resolveTarget = undefined;
-
-		}
-
-		descriptor.depthStencilAttachment.view = this._getDepthBufferGPU( renderContext ).createView();
+		let supportsDepth;
+		let supportsStencil;
 
 		if ( color ) {
 
-			colorAttachment.loadOp = GPULoadOp.Clear;
-			colorAttachment.clearValue = renderContext.clearColorValue;
+			const clearColor = this.getClearColor();
 
-		} else {
-
-			colorAttachment.loadOp = GPULoadOp.Load;
+			clearValue = { r: clearColor.r, g: clearColor.g, b: clearColor.b, a: clearColor.a };
 
 		}
 
-		if ( depth ) {
+		if ( renderTargetData === null ) {
 
-			depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
-			depthStencilAttachment.depthClearValue = renderContext.clearDepthValue;
+			supportsDepth = renderer.depth;
+			supportsStencil = renderer.stencil;
+
+			depth = depth && supportsDepth;
+			stencil = stencil && supportsStencil;
+
+			if ( color ) {
+
+				const antialias = this.parameters.antialias;
+
+				const colorAttachment = {};
+
+				if ( antialias === true ) {
+
+					colorAttachment.view = this.colorBuffer.createView();
+					colorAttachment.resolveTarget = this.context.getCurrentTexture().createView();
+		
+				} else {
+		
+					colorAttachment.view = this.context.getCurrentTexture().createView();
+		
+				}
+
+				colorAttachment.clearValue = clearValue;
+				colorAttachment.loadOp = GPULoadOp.Clear;
+				colorAttachment.storeOp = GPUStoreOp.Store;
+
+				colorAttachments.push( colorAttachment );
+
+			}
+
+			if ( depth || stencil ) {
+
+				depthStencilAttachment = {
+					view: this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView()
+				};
+
+			}
 
 		} else {
 
-			depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+			supportsDepth = renderTargetData.depth;
+			supportsStencil = renderTargetData.stencil;
+
+			depth = depth && supportsDepth;
+			stencil = stencil && supportsStencil;
+
+			if ( color ) {
+
+				for ( const texture of renderTargetData.textures ) {
+
+					const textureData = this.get( texture );
+					const textureView = textureData.texture.createView();
+
+					let view, resolveTarget;
+
+					if ( textureData.msaaTexture !== undefined ) {
+
+						view = textureData.msaaTexture.createView();
+						resolveTarget = textureView;
+
+					} else {
+
+						view = textureView;
+						resolveTarget = undefined;
+
+					}
+
+					colorAttachments.push( {
+						view,
+						resolveTarget,
+						clearValue,
+						loadOp: GPULoadOp.Clear,
+						storeOp: GPUStoreOp.Store
+					} );
+
+				}
+
+			}
+
+			if ( depth || stencil ) {
+
+				const depthTextureData = this.get( renderTargetData.depthTexture );
+
+				depthStencilAttachment = {
+					view: depthTextureData.texture.createView()
+				};
+
+			}
 
 		}
 
-		if ( stencil ) {
+		//
 
-			depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
-			depthStencilAttachment.stencilClearValue = renderContext.clearStencilValue;
+		if ( depthStencilAttachment !== undefined ) {
 
-		} else {
+			if ( depth ) {
 
-			depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+				depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
+				depthStencilAttachment.depthClearValue = renderer.getClearDepth();
+				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+
+			} else if ( supportsDepth ) {
+
+				depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+
+			}
+
+			//
+
+			if ( stencil ) {
+
+				depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
+				depthStencilAttachment.stencilClearValue = renderer.getClearStencil();
+				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+
+			} else if ( supportsStencil ) {
+
+				depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
+
+			}
 
 		}
 
-		renderContextData.encoder = device.createCommandEncoder( {} );
-		renderContextData.currentPass = renderContextData.encoder.beginRenderPass( descriptor );
+		//
 
-		renderContextData.currentPass.end();
+		const encoder = device.createCommandEncoder( {} );
+		const currentPass = encoder.beginRenderPass( {
+			colorAttachments,
+			depthStencilAttachment
+		} );
 
-		device.queue.submit( [ renderContextData.encoder.finish() ] );
+		currentPass.end();
+
+		device.queue.submit( [ encoder.finish() ] );
 
 	}
 
@@ -956,9 +1050,8 @@ class WebGPUBackend extends Backend {
 
 	updateSize() {
 
-		this._configureContext();
-		this._setupColorBuffer();
-
+		this.colorBuffer = this.textureUtils.getColorBuffer();
+	
 	}
 
 	// utils public
@@ -997,7 +1090,7 @@ class WebGPUBackend extends Backend {
 
 		} else if ( texture.isDepthTexture ) {
 
-			sourceGPU = this._getDepthBufferGPU( renderContext );
+			sourceGPU = this.textureUtils.getDepthBuffer( renderContext.depth, renderContext.stencil );
 
 		}
 
@@ -1027,85 +1120,6 @@ class WebGPUBackend extends Backend {
 
 		renderContextData.currentPass = encoder.beginRenderPass( descriptor );
 		renderContextData.currentSets = { attributes: {} };
-
-	}
-
-	// utils
-
-	_getDepthBufferGPU( renderContext ) {
-
-		const { width, height } = this.getDrawingBufferSize();
-
-		const depthTexture = this.defaultDepthTexture;
-		const depthTextureGPU = this.get( depthTexture ).texture;
-
-		let format, type;
-
-		if ( renderContext.stencil ) {
-
-			format = DepthStencilFormat;
-			type = UnsignedInt248Type;
-
-		} else if ( renderContext.depth ) {
-
-			format = DepthFormat;
-			type = UnsignedIntType;
-
-		}
-
-		if ( depthTextureGPU !== undefined ) {
-
-			if ( depthTexture.image.width === width && depthTexture.image.height === height && depthTexture.format === format && depthTexture.type === type ) {
-
-				return depthTextureGPU;
-
-			}
-
-			this.textureUtils.destroyTexture( depthTexture );
-
-		}
-
-		depthTexture.name = 'depthBuffer';
-		depthTexture.format = format;
-		depthTexture.type = type;
-		depthTexture.image.width = width;
-		depthTexture.image.height = height;
-
-		this.textureUtils.createTexture( depthTexture, { sampleCount: this.parameters.sampleCount, width, height } );
-
-		return this.get( depthTexture ).texture;
-
-	}
-
-	_configureContext() {
-
-		this.context.configure( {
-			device: this.device,
-			format: GPUTextureFormat.BGRA8Unorm,
-			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
-			alphaMode: 'premultiplied'
-		} );
-
-	}
-
-	_setupColorBuffer() {
-
-		if ( this.colorBuffer ) this.colorBuffer.destroy();
-
-		const { width, height } = this.getDrawingBufferSize();
-		//const format = navigator.gpu.getPreferredCanvasFormat(); // @TODO: Move to WebGPUUtils
-
-		this.colorBuffer = this.device.createTexture( {
-			label: 'colorBuffer',
-			size: {
-				width: width,
-				height: height,
-				depthOrArrayLayers: 1
-			},
-			sampleCount: this.parameters.sampleCount,
-			format: GPUTextureFormat.BGRA8Unorm,
-			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
-		} );
 
 	}
 

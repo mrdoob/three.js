@@ -337,27 +337,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( this.colorSpaced === true ) {
 
-			const renderTarget = renderer.getRenderTarget();
-
-			let outputColorSpace;
-
-			if ( renderTarget !== null ) {
-
-				if ( Array.isArray( renderTarget.texture ) ) {
-
-					outputColorSpace = renderTarget.texture[ 0 ].colorSpace;
-
-				} else {
-
-					outputColorSpace = renderTarget.texture.colorSpace;
-
-				}
-
-			} else {
-
-				outputColorSpace = renderer.outputColorSpace;
-
-			}
+			const outputColorSpace = renderer.currentColorSpace;
 
 			if ( outputColorSpace !== LinearSRGBColorSpace && outputColorSpace !== NoColorSpace ) {
 
