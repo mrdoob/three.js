@@ -161,6 +161,10 @@ class TextureNode extends UniformNode {
 
 			uvNode = uvNode.setY( uvNode.y.fract().oneMinus() );
 
+		} else if ( builder.isFlipY() === false && texture.isRenderTargetTexture === true ) {
+
+			uvNode = uvNode.setY( uvNode.y.fract().oneMinus() );
+
 		}
 
 		return uvNode.build( builder, this.sampler === true ? 'vec2' : 'ivec2' );
