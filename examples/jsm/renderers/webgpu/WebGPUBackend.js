@@ -620,7 +620,7 @@ class WebGPUBackend extends Backend {
 				depthStencilAttachment.depthClearValue = renderer.getClearDepth();
 				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
-			} else if ( supportsDepth ) {
+			} else {
 
 				depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
 				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
@@ -635,7 +635,7 @@ class WebGPUBackend extends Backend {
 				depthStencilAttachment.stencilClearValue = renderer.getClearStencil();
 				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
-			} else if ( supportsStencil ) {
+			} else {
 
 				depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
