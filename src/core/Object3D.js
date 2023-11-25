@@ -583,8 +583,6 @@ class Object3D extends EventDispatcher {
 
 			this.matrixWorldNeedsUpdate = false;
 
-			force = true;
-
 		}
 
 		// update children
