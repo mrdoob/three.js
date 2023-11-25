@@ -130,7 +130,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		let depthNode = this.depthNode;
 
-		if ( renderer.logarithmicDepthBuffer === true ) {
+		if ( depthNode === null && renderer.logarithmicDepthBuffer === true ) {
 
 			const fragDepth = modelViewProjection().w.add( 1 );
 
