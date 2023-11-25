@@ -52,7 +52,7 @@ class ViewportDepthNode extends Node {
 
 			if ( this.valueNode !== null ) {
 
-				depthPixelBase().assign( this.valueNode );
+ 				node = depthPixelBase().assign( this.valueNode );
 
 			}
 
