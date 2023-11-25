@@ -22,9 +22,15 @@ const _vector3 = new Vector3();
 
 class Renderer {
 
-	constructor( backend ) {
+	constructor( backend, parameters = {} ) {
 
 		this.isRenderer = true;
+
+		//
+
+		const {
+			logarithmicDepthBuffer = false,
+		} = parameters;
 
 		// public
 
@@ -36,6 +42,8 @@ class Renderer {
 		this.autoClearColor = true;
 		this.autoClearDepth = true;
 		this.autoClearStencil = true;
+
+		this.logarithmicDepthBuffer = logarithmicDepthBuffer;
 
 		this.outputColorSpace = SRGBColorSpace;
 

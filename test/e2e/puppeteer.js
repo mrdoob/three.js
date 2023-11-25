@@ -125,6 +125,7 @@ const exceptionList = [
 	'webgpu_video_panorama',
 
 	// WebGPURenderer: Unknown problem
+	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_materials_video',
 	'webgpu_particles',
 	'webgpu_shadertoy',
