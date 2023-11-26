@@ -38,7 +38,7 @@ const _objectChangeEvent = { type: 'objectChange' };
 
 class TransformControls extends Object3D {
 
-	constructor( camera, domElement ) {
+	constructor( camera, domElement, colorX, colorY, colorZ, colorAccent ) {
 
 		super();
 
@@ -55,7 +55,7 @@ class TransformControls extends Object3D {
 		this.domElement = domElement;
 		this.domElement.style.touchAction = 'none'; // disable touch scroll
 
-		const _gizmo = new TransformControlsGizmo();
+		const _gizmo = new TransformControlsGizmo(colorX, colorY, colorZ, colorAccent);
 		this._gizmo = _gizmo;
 		this.add( _gizmo );
 
@@ -780,7 +780,7 @@ const _v3 = new Vector3();
 
 class TransformControlsGizmo extends Object3D {
 
-	constructor() {
+	constructor(colorX=0xff0000, colorY=0x00ff00, colorZ=0x0000ff, colorAccent=0xffff00) {
 
 		super();
 
@@ -814,36 +814,38 @@ class TransformControlsGizmo extends Object3D {
 		const matHelper = gizmoLineMaterial.clone();
 		matHelper.opacity = 0.5;
 
-		const matRed = gizmoMaterial.clone();
-		matRed.color.setHex( 0xff0000 );
+		const matX = gizmoMaterial.clone();
+		matX.color.setHex( colorX );
 
-		const matGreen = gizmoMaterial.clone();
-		matGreen.color.setHex( 0x00ff00 );
+		const matY = gizmoMaterial.clone();
+		matY.color.setHex( colorY );
 
-		const matBlue = gizmoMaterial.clone();
-		matBlue.color.setHex( 0x0000ff );
+		const matZ = gizmoMaterial.clone();
+		matZ.color.setHex( colorZ );
 
-		const matRedTransparent = gizmoMaterial.clone();
-		matRedTransparent.color.setHex( 0xff0000 );
-		matRedTransparent.opacity = 0.5;
+		const matXTransparent = gizmoMaterial.clone();
+		matXTransparent.color.setHex( colorX );
+		matXTransparent.opacity = 0.5;
 
-		const matGreenTransparent = gizmoMaterial.clone();
-		matGreenTransparent.color.setHex( 0x00ff00 );
-		matGreenTransparent.opacity = 0.5;
+		const matYTransparent = gizmoMaterial.clone();
+		matYTransparent.color.setHex( colorY );
+		matYTransparent.opacity = 0.5;
 
-		const matBlueTransparent = gizmoMaterial.clone();
-		matBlueTransparent.color.setHex( 0x0000ff );
-		matBlueTransparent.opacity = 0.5;
+		const matZTransparent = gizmoMaterial.clone();
+		matZTransparent.color.setHex( colorZ );
+		matZTransparent.opacity = 0.5;
 
 		const matWhiteTransparent = gizmoMaterial.clone();
 		matWhiteTransparent.opacity = 0.25;
 
-		const matYellowTransparent = gizmoMaterial.clone();
-		matYellowTransparent.color.setHex( 0xffff00 );
-		matYellowTransparent.opacity = 0.25;
+		const matAccentTransparent = gizmoMaterial.clone();
+		matAccentTransparent.color.setHex( colorAccent );
+		matAccentTransparent.opacity = 0.25;
 
-		const matYellow = gizmoMaterial.clone();
-		matYellow.color.setHex( 0xffff00 );
+		const matAccent = gizmoMaterial.clone();
+		matAccent.color.setHex( colorAccent );
+
+		this.colorAccent = colorAccent
 
 		const matGray = gizmoMaterial.clone();
 		matGray.color.setHex( 0x787878 );
@@ -887,31 +889,31 @@ class TransformControlsGizmo extends Object3D {
 
 		const gizmoTranslate = {
 			X: [
-				[ new Mesh( arrowGeometry, matRed ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
-				[ new Mesh( arrowGeometry, matRed ), [ - 0.5, 0, 0 ], [ 0, 0, Math.PI / 2 ]],
-				[ new Mesh( lineGeometry2, matRed ), [ 0, 0, 0 ], [ 0, 0, - Math.PI / 2 ]]
+				[ new Mesh( arrowGeometry, matX ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
+				[ new Mesh( arrowGeometry, matX ), [ - 0.5, 0, 0 ], [ 0, 0, Math.PI / 2 ]],
+				[ new Mesh( lineGeometry2, matX ), [ 0, 0, 0 ], [ 0, 0, - Math.PI / 2 ]]
 			],
 			Y: [
-				[ new Mesh( arrowGeometry, matGreen ), [ 0, 0.5, 0 ]],
-				[ new Mesh( arrowGeometry, matGreen ), [ 0, - 0.5, 0 ], [ Math.PI, 0, 0 ]],
-				[ new Mesh( lineGeometry2, matGreen ) ]
+				[ new Mesh( arrowGeometry, matY ), [ 0, 0.5, 0 ]],
+				[ new Mesh( arrowGeometry, matY ), [ 0, - 0.5, 0 ], [ Math.PI, 0, 0 ]],
+				[ new Mesh( lineGeometry2, matY ) ]
 			],
 			Z: [
-				[ new Mesh( arrowGeometry, matBlue ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ]],
-				[ new Mesh( arrowGeometry, matBlue ), [ 0, 0, - 0.5 ], [ - Math.PI / 2, 0, 0 ]],
-				[ new Mesh( lineGeometry2, matBlue ), null, [ Math.PI / 2, 0, 0 ]]
+				[ new Mesh( arrowGeometry, matZ ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ]],
+				[ new Mesh( arrowGeometry, matZ ), [ 0, 0, - 0.5 ], [ - Math.PI / 2, 0, 0 ]],
+				[ new Mesh( lineGeometry2, matZ ), null, [ Math.PI / 2, 0, 0 ]]
 			],
 			XYZ: [
 				[ new Mesh( new OctahedronGeometry( 0.1, 0 ), matWhiteTransparent.clone() ), [ 0, 0, 0 ]]
 			],
 			XY: [
-				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matBlueTransparent.clone() ), [ 0.15, 0.15, 0 ]]
+				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matZTransparent.clone() ), [ 0.15, 0.15, 0 ]]
 			],
 			YZ: [
-				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matRedTransparent.clone() ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ]]
+				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matXTransparent.clone() ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ]]
 			],
 			XZ: [
-				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matGreenTransparent.clone() ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]]
+				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matYTransparent.clone() ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]]
 			]
 		};
 
@@ -968,16 +970,16 @@ class TransformControlsGizmo extends Object3D {
 				[ new Mesh( CircleGeometry( 0.5, 1 ), matGray ), null, [ 0, Math.PI / 2, 0 ]]
 			],
 			X: [
-				[ new Mesh( CircleGeometry( 0.5, 0.5 ), matRed ) ]
+				[ new Mesh( CircleGeometry( 0.5, 0.5 ), matX ) ]
 			],
 			Y: [
-				[ new Mesh( CircleGeometry( 0.5, 0.5 ), matGreen ), null, [ 0, 0, - Math.PI / 2 ]]
+				[ new Mesh( CircleGeometry( 0.5, 0.5 ), matY ), null, [ 0, 0, - Math.PI / 2 ]]
 			],
 			Z: [
-				[ new Mesh( CircleGeometry( 0.5, 0.5 ), matBlue ), null, [ 0, Math.PI / 2, 0 ]]
+				[ new Mesh( CircleGeometry( 0.5, 0.5 ), matZ ), null, [ 0, Math.PI / 2, 0 ]]
 			],
 			E: [
-				[ new Mesh( CircleGeometry( 0.75, 1 ), matYellowTransparent ), null, [ 0, Math.PI / 2, 0 ]]
+				[ new Mesh( CircleGeometry( 0.75, 1 ), matAccentTransparent ), null, [ 0, Math.PI / 2, 0 ]]
 			]
 		};
 
@@ -1007,28 +1009,28 @@ class TransformControlsGizmo extends Object3D {
 
 		const gizmoScale = {
 			X: [
-				[ new Mesh( scaleHandleGeometry, matRed ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
-				[ new Mesh( lineGeometry2, matRed ), [ 0, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
-				[ new Mesh( scaleHandleGeometry, matRed ), [ - 0.5, 0, 0 ], [ 0, 0, Math.PI / 2 ]],
+				[ new Mesh( scaleHandleGeometry, matX ), [ 0.5, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
+				[ new Mesh( lineGeometry2, matX ), [ 0, 0, 0 ], [ 0, 0, - Math.PI / 2 ]],
+				[ new Mesh( scaleHandleGeometry, matX ), [ - 0.5, 0, 0 ], [ 0, 0, Math.PI / 2 ]],
 			],
 			Y: [
-				[ new Mesh( scaleHandleGeometry, matGreen ), [ 0, 0.5, 0 ]],
-				[ new Mesh( lineGeometry2, matGreen ) ],
-				[ new Mesh( scaleHandleGeometry, matGreen ), [ 0, - 0.5, 0 ], [ 0, 0, Math.PI ]],
+				[ new Mesh( scaleHandleGeometry, matY ), [ 0, 0.5, 0 ]],
+				[ new Mesh( lineGeometry2, matY ) ],
+				[ new Mesh( scaleHandleGeometry, matY ), [ 0, - 0.5, 0 ], [ 0, 0, Math.PI ]],
 			],
 			Z: [
-				[ new Mesh( scaleHandleGeometry, matBlue ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ]],
-				[ new Mesh( lineGeometry2, matBlue ), [ 0, 0, 0 ], [ Math.PI / 2, 0, 0 ]],
-				[ new Mesh( scaleHandleGeometry, matBlue ), [ 0, 0, - 0.5 ], [ - Math.PI / 2, 0, 0 ]]
+				[ new Mesh( scaleHandleGeometry, matZ ), [ 0, 0, 0.5 ], [ Math.PI / 2, 0, 0 ]],
+				[ new Mesh( lineGeometry2, matZ ), [ 0, 0, 0 ], [ Math.PI / 2, 0, 0 ]],
+				[ new Mesh( scaleHandleGeometry, matZ ), [ 0, 0, - 0.5 ], [ - Math.PI / 2, 0, 0 ]]
 			],
 			XY: [
-				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matBlueTransparent ), [ 0.15, 0.15, 0 ]]
+				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matZTransparent ), [ 0.15, 0.15, 0 ]]
 			],
 			YZ: [
-				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matRedTransparent ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ]]
+				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matXTransparent ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ]]
 			],
 			XZ: [
-				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matGreenTransparent ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]]
+				[ new Mesh( new BoxGeometry( 0.15, 0.15, 0.01 ), matYTransparent ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]]
 			],
 			XYZ: [
 				[ new Mesh( new BoxGeometry( 0.1, 0.1, 0.1 ), matWhiteTransparent.clone() ) ],
@@ -1451,7 +1453,7 @@ class TransformControlsGizmo extends Object3D {
 
 				if ( handle.name === this.axis ) {
 
-					handle.material.color.setHex( 0xffff00 );
+					handle.material.color.setHex( this.colorAccent );
 					handle.material.opacity = 1.0;
 
 				} else if ( this.axis.split( '' ).some( function ( a ) {
@@ -1460,7 +1462,7 @@ class TransformControlsGizmo extends Object3D {
 
 				} ) ) {
 
-					handle.material.color.setHex( 0xffff00 );
+					handle.material.color.setHex( this.colorAccent );
 					handle.material.opacity = 1.0;
 
 				}
