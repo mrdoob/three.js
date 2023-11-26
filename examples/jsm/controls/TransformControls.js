@@ -55,7 +55,7 @@ class TransformControls extends Object3D {
 		this.domElement = domElement;
 		this.domElement.style.touchAction = 'none'; // disable touch scroll
 
-		const _gizmo = new TransformControlsGizmo(colorX, colorY, colorZ, colorAccent);
+		const _gizmo = new TransformControlsGizmo( colorX, colorY, colorZ, colorAccent );
 		this._gizmo = _gizmo;
 		this.add( _gizmo );
 
@@ -780,7 +780,7 @@ const _v3 = new Vector3();
 
 class TransformControlsGizmo extends Object3D {
 
-	constructor(colorX=0xff0000, colorY=0x00ff00, colorZ=0x0000ff, colorAccent=0xffff00) {
+	constructor( colorX = 0xff0000, colorY = 0x00ff00, colorZ = 0x0000ff, colorAccent = 0xffff00 ) {
 
 		super();
 
@@ -845,7 +845,7 @@ class TransformControlsGizmo extends Object3D {
 		const matAccent = gizmoMaterial.clone();
 		matAccent.color.setHex( colorAccent );
 
-		this.colorAccent = colorAccent
+		this.colorAccent = colorAccent;
 
 		const matGray = gizmoMaterial.clone();
 		matGray.color.setHex( 0x787878 );
