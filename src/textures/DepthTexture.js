@@ -3,7 +3,7 @@ import { NearestFilter, UnsignedIntType, UnsignedInt248Type, DepthFormat, DepthS
 
 class DepthTexture extends Texture {
 
-	constructor( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
+	constructor( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format, compareFunction ) {
 
 		format = format !== undefined ? format : DepthFormat;
 
@@ -28,7 +28,7 @@ class DepthTexture extends Texture {
 		this.flipY = false;
 		this.generateMipmaps = false;
 
-		this.compareFunction = null;
+		this.compareFunction = compareFunction;
 
 	}
 
