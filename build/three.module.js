@@ -3083,9 +3083,9 @@ class DataArrayTexture extends Texture {
 
 class WebGLArrayRenderTarget extends WebGLRenderTarget {
 
-	constructor( width = 1, height = 1, depth = 1 ) {
+	constructor( width = 1, height = 1, depth = 1, options = {} ) {
 
-		super( width, height );
+		super( width, height, options );
 
 		this.isWebGLArrayRenderTarget = true;
 
@@ -3132,9 +3132,9 @@ class Data3DTexture extends Texture {
 
 class WebGL3DRenderTarget extends WebGLRenderTarget {
 
-	constructor( width = 1, height = 1, depth = 1 ) {
+	constructor( width = 1, height = 1, depth = 1, options = {} ) {
 
-		super( width, height );
+		super( width, height, options );
 
 		this.isWebGL3DRenderTarget = true;
 
@@ -7276,6 +7276,10 @@ class Object3D extends EventDispatcher {
 		this.userData = {};
 
 	}
+
+	onBeforeShadow( /* renderer, object, camera, shadowCamera, geometry, depthMaterial, group */ ) {}
+
+	onAfterShadow( /* renderer, object, camera, shadowCamera, geometry, depthMaterial, group */ ) {}
 
 	onBeforeRender( /* renderer, scene, camera, geometry, material, group */ ) {}
 
@@ -22509,7 +22513,11 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 							const depthMaterial = getDepthMaterial( object, groupMaterial, light, type );
 
+							object.onBeforeShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, group );
+
 							_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
+
+							object.onAfterShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, group );
 
 						}
 
@@ -22519,7 +22527,11 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 					const depthMaterial = getDepthMaterial( object, material, light, type );
 
+					object.onBeforeShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, null );
+
 					_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
+
+					object.onAfterShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, null );
 
 				}
 
@@ -32858,15 +32870,16 @@ class MultiDrawRenderList {
 }
 
 const ID_ATTR_NAME = 'batchId';
-const _matrix = new Matrix4();
-const _identityMatrix = new Matrix4();
-const _projScreenMatrix$2 = new Matrix4();
-const _frustum = new Frustum();
-const _box$1 = new Box3();
-const _sphere$2 = new Sphere();
-const _vector$5 = new Vector3();
-const _renderList = new MultiDrawRenderList();
-const _mesh = new Mesh();
+const _matrix = /*@__PURE__*/ new Matrix4();
+const _invMatrixWorld = /*@__PURE__*/ new Matrix4();
+const _identityMatrix = /*@__PURE__*/ new Matrix4();
+const _projScreenMatrix$2 = /*@__PURE__*/ new Matrix4();
+const _frustum = /*@__PURE__*/ new Frustum();
+const _box$1 = /*@__PURE__*/ new Box3();
+const _sphere$2 = /*@__PURE__*/ new Sphere();
+const _vector$5 = /*@__PURE__*/ new Vector3();
+const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
+const _mesh = /*@__PURE__*/ new Mesh();
 const _batchIntersects = [];
 
 // @TODO: SkinnedMesh support?
@@ -33666,7 +33679,7 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	onBeforeRender( _renderer, _scene, camera, geometry, material/*, _group*/ ) {
+	onBeforeRender( renderer, scene, camera, geometry, material/*, _group*/ ) {
 
 		// if visibility has not changed and frustum culling and object sorting is not required
 		// then skip iterating over all items
@@ -33687,7 +33700,7 @@ class BatchedMesh extends Mesh {
 		const drawRanges = this._drawRanges;
 		const perObjectFrustumCulled = this.perObjectFrustumCulled;
 
-		// prepare the frustum
+		// prepare the frustum in the local frame
 		if ( perObjectFrustumCulled ) {
 
 			_projScreenMatrix$2
@@ -33695,17 +33708,17 @@ class BatchedMesh extends Mesh {
 				.multiply( this.matrixWorld );
 			_frustum.setFromProjectionMatrix(
 				_projScreenMatrix$2,
-				_renderer.isWebGPURenderer ? WebGPUCoordinateSystem : WebGLCoordinateSystem
+				renderer.isWebGPURenderer ? WebGPUCoordinateSystem : WebGLCoordinateSystem
 			);
 
 		}
 
 		let count = 0;
-
 		if ( this.sortObjects ) {
 
-			// get the camera position
-			_vector$5.setFromMatrixPosition( camera.matrixWorld );
+			// get the camera position in the local frame
+			_invMatrixWorld.copy( this.matrixWorld ).invert();
+			_vector$5.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _invMatrixWorld );
 
 			for ( let i = 0, l = visibility.length; i < l; i ++ ) {
 
@@ -33793,6 +33806,12 @@ class BatchedMesh extends Mesh {
 
 		this._multiDrawCount = count;
 		this._visibilityChanged = false;
+
+	}
+
+	onBeforeShadow( renderer, object, camera, shadowCamera, geometry, depthMaterial/* , group */ ) {
+
+		this.onBeforeRender( renderer, null, shadowCamera, geometry, depthMaterial );
 
 	}
 
