@@ -2,17 +2,21 @@ import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 import { DataArrayTexture } from '../textures/DataArrayTexture.js';
 
 class WebGLArrayRenderTarget extends WebGLRenderTarget {
-  constructor(width = 1, height = 1, depth = 1, options = {}) {
-    super(width, height, options);
 
-    this.isWebGLArrayRenderTarget = true;
+	constructor( width = 1, height = 1, depth = 1, options = {} ) {
 
-    this.depth = depth;
+		super( width, height, options );
 
-    this.texture = new DataArrayTexture(null, width, height, depth);
+		this.isWebGLArrayRenderTarget = true;
 
-    this.texture.isRenderTargetTexture = true;
-  }
+		this.depth = depth;
+
+		this.texture = new DataArrayTexture( null, width, height, depth );
+
+		this.texture.isRenderTargetTexture = true;
+
+	}
+
 }
 
 export { WebGLArrayRenderTarget };
