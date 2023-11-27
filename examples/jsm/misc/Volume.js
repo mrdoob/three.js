@@ -293,7 +293,7 @@ class Volume {
 		const axisInIJK = new Vector3(),
 			firstDirection = new Vector3(),
 			secondDirection = new Vector3(),
-			planeMatrix = new Matrix4(),
+			planeMatrix = ( new Matrix4() ).identity(),
 			volume = this;
 
 		const dimensions = new Vector3( this.xLength, this.yLength, this.zLength );
@@ -309,7 +309,7 @@ class Volume {
 				secondSpacing = this.spacing[ this.axisOrder.indexOf( 'y' ) ];
 				IJKIndex = new Vector3( RASIndex, 0, 0 );
 
-				planeMatrix.makeRotationY( Math.PI / 2 );
+				planeMatrix.multiply( ( new Matrix4() ).makeRotationY( Math.PI / 2 ) );
 				positionOffset = ( volume.RASDimensions[ 0 ] - 1 ) / 2;
 				planeMatrix.setPosition( new Vector3( RASIndex - positionOffset, 0, 0 ) );
 				break;
@@ -321,7 +321,7 @@ class Volume {
 				secondSpacing = this.spacing[ this.axisOrder.indexOf( 'z' ) ];
 				IJKIndex = new Vector3( 0, RASIndex, 0 );
 
-				planeMatrix.makeRotationX( - Math.PI / 2 );
+				planeMatrix.multiply( ( new Matrix4() ).makeRotationX( - Math.PI / 2 ) );
 				positionOffset = ( volume.RASDimensions[ 1 ] - 1 ) / 2;
 				planeMatrix.setPosition( new Vector3( 0, RASIndex - positionOffset, 0 ) );
 				break;
