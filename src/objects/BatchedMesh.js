@@ -879,7 +879,7 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	onBeforeRender( _renderer, _scene, camera, geometry, material/*, _group*/ ) {
+	onBeforeRender( renderer, scene, camera, geometry, material/*, _group*/ ) {
 
 		// if visibility has not changed and frustum culling and object sorting is not required
 		// then skip iterating over all items
@@ -908,7 +908,7 @@ class BatchedMesh extends Mesh {
 				.multiply( this.matrixWorld );
 			_frustum.setFromProjectionMatrix(
 				_projScreenMatrix,
-				_renderer.isWebGPURenderer ? WebGPUCoordinateSystem : WebGLCoordinateSystem
+				renderer.isWebGPURenderer ? WebGPUCoordinateSystem : WebGLCoordinateSystem
 			);
 
 		}
@@ -1006,6 +1006,12 @@ class BatchedMesh extends Mesh {
 
 		this._multiDrawCount = count;
 		this._visibilityChanged = false;
+
+	}
+
+	onBeforeShadow( renderer, object, camera, shadowCamera, geometry, depthMaterial/* , group */ ) {
+
+		this.onBeforeRender( renderer, null, shadowCamera, geometry, depthMaterial );
 
 	}
 
