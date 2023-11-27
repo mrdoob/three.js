@@ -2,21 +2,17 @@ import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 import { Data3DTexture } from '../textures/Data3DTexture.js';
 
 class WebGL3DRenderTarget extends WebGLRenderTarget {
+  constructor(width = 1, height = 1, depth = 1) {
+    super(width, height);
 
-	constructor( width = 1, height = 1, depth = 1 ) {
+    this.isWebGL3DRenderTarget = true;
 
-		super( width, height );
+    this.depth = depth;
 
-		this.isWebGL3DRenderTarget = true;
+    this.texture = new Data3DTexture(null, width, height, depth);
 
-		this.depth = depth;
-
-		this.texture = new Data3DTexture( null, width, height, depth );
-
-		this.texture.isRenderTargetTexture = true;
-
-	}
-
+    this.texture.isRenderTargetTexture = true;
+  }
 }
 
 export { WebGL3DRenderTarget };
