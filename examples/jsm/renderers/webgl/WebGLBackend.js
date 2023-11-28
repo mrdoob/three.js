@@ -605,9 +605,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	copyTextureToBuffer( /*texture, x, y, width, height*/ ) {
+	copyTextureToBuffer( texture, x, y, width, height ) {
 
-		console.warn( 'Abstract class.' );
+		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height );
 
 	}
 
