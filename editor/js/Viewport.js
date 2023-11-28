@@ -6,8 +6,7 @@ import { UIPanel } from './libs/ui.js';
 
 import { EditorControls } from './EditorControls.js';
 
-import { ViewportCamera } from './Viewport.Camera.js';
-import { ViewportShading } from './Viewport.Shading.js';
+import { ViewportControls } from './Viewport.Controls.js';
 import { ViewportInfo } from './Viewport.Info.js';
 
 import { ViewHelper } from './Viewport.ViewHelper.js';
@@ -27,8 +26,7 @@ function Viewport( editor ) {
 	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
 
-	container.add( new ViewportCamera( editor ) );
-	container.add( new ViewportShading( editor ) );
+	container.add( new ViewportControls( editor ) );
 	container.add( new ViewportInfo( editor ) );
 
 	//
