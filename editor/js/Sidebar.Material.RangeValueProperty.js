@@ -12,6 +12,7 @@ function SidebarMaterialRangeValueProperty( editor, property, name, isMin, range
 	container.add( number );
 
 	let object = null;
+	let materialSlot = null;
 	let material = null;
 
 	function onChange() {
@@ -21,18 +22,21 @@ function SidebarMaterialRangeValueProperty( editor, property, name, isMin, range
 			const minValue = isMin ? number.getValue() : material[ property ][ 0 ];
 			const maxValue = isMin ? material[ property ][ 1 ] : number.getValue();
 
-			editor.execute( new SetMaterialRangeCommand( editor, object, property, minValue, maxValue, 0 /* TODO: currentMaterialSlot */ ) );
+			editor.execute( new SetMaterialRangeCommand( editor, object, property, minValue, maxValue, materialSlot ) );
 
 		}
 
 	}
 
-	function update() {
+	function update( currentObject, currentMaterialSlot = 0 ) {
+
+		object = currentObject;
+		materialSlot = currentMaterialSlot;
 
 		if ( object === null ) return;
 		if ( object.material === undefined ) return;
 
-		material = object.material;
+		material = editor.getObjectMaterial( object, materialSlot );
 
 		if ( property in material ) {
 
@@ -49,14 +53,7 @@ function SidebarMaterialRangeValueProperty( editor, property, name, isMin, range
 
 	//
 
-	signals.objectSelected.add( function ( selected ) {
-
-		object = selected;
-
-		update();
-
-	} );
-
+	signals.objectSelected.add( update );
 	signals.materialChanged.add( update );
 
 	return container;

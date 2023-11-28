@@ -223,7 +223,7 @@ function Script( editor ) {
 
 					currentObject.material[ currentScript ] = string;
 					currentObject.material.needsUpdate = true;
-					signals.materialChanged.dispatch( currentObject.material );
+					signals.materialChanged.dispatch( currentObject, 0 ); // TODO: Add multi-material support
 
 					const programs = renderer.info.programs;
 
