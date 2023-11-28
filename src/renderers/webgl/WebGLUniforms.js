@@ -50,7 +50,8 @@ import { LessEqualCompare } from '../../constants.js';
 
 const emptyTexture = /*@__PURE__*/ new Texture();
 
-const emptyShadowTexture = /*@__PURE__*/ new DepthTexture( 1, 1, null, null, null, null, null, null, null, null, LessEqualCompare );
+const emptyShadowTexture = /*@__PURE__*/ new DepthTexture( 1, 1 );
+emptyShadowTexture.compareFunction = LessEqualCompare;
 
 const emptyArrayTexture = /*@__PURE__*/ new DataArrayTexture();
 const empty3dTexture = /*@__PURE__*/ new Data3DTexture();
