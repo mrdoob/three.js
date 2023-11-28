@@ -19,10 +19,12 @@ class StereoCamera {
 		this.cameraL = new PerspectiveCamera();
 		this.cameraL.layers.enable( 1 );
 		this.cameraL.matrixAutoUpdate = false;
+		this.cameraL.matrixWorldAutoUpdate = false;
 
 		this.cameraR = new PerspectiveCamera();
 		this.cameraR.layers.enable( 2 );
 		this.cameraR.matrixAutoUpdate = false;
+		this.cameraR.matrixWorldAutoUpdate = false;
 
 		this._cache = {
 			focus: null,
@@ -92,6 +94,9 @@ class StereoCamera {
 
 		this.cameraL.matrixWorld.copy( camera.matrixWorld ).multiply( _eyeLeft );
 		this.cameraR.matrixWorld.copy( camera.matrixWorld ).multiply( _eyeRight );
+
+		this.cameraL.matrixWorldInverse.copy( this.cameraL.matrixWorld ).invert();
+		this.cameraR.matrixWorldInverse.copy( this.cameraR.matrixWorld ).invert();
 
 	}
 

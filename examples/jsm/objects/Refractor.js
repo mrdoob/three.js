@@ -37,6 +37,7 @@ class Refractor extends Mesh {
 
 		const virtualCamera = this.camera;
 		virtualCamera.matrixAutoUpdate = false;
+		virtualCamera.matrixWorldAutoUpdate = false;
 		virtualCamera.userData.refractor = true;
 
 		//
