@@ -70,7 +70,7 @@ function SidebarProjectVideo( editor ) {
 
 		//
 
-		const { createFFmpeg, fetchFile } = FFmpeg; // eslint-disable-line no-undef
+		const { createFFmpeg, fetchFile } = FFmpeg;
 		const ffmpeg = createFFmpeg( { log: true } );
 
 		await ffmpeg.load();

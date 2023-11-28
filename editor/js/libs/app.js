@@ -8,7 +8,7 @@ var APP = {
 		var loader = new THREE.ObjectLoader();
 		var camera, scene;
 
-		var vrButton = VRButton.createButton( renderer ); // eslint-disable-line no-undef
+		var vrButton = VRButton.createButton( renderer );
 
 		var events = {};
 
