@@ -81,5 +81,6 @@ body:
         - Windows
         - MacOS
         - Linux
+        - ChromeOS
         - Android
         - iOS

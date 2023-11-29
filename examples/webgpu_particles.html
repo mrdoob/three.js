@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { range, texture, mix, uv, color, positionLocal, timerLocal, attribute, SpriteNodeMaterial } from 'three/nodes';
+			import { range, texture, mix, uv, color, positionLocal, timerLocal, SpriteNodeMaterial } from 'three/nodes';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -122,7 +122,6 @@
 				//
 
 				const helper = new THREE.GridHelper( 3000, 40, 0x303030, 0x303030 );
-				helper.material.colorNode = attribute( 'color' );
 				helper.position.y = - 75;
 				scene.add( helper );
 

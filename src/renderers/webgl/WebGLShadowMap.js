@@ -355,7 +355,11 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 							const depthMaterial = getDepthMaterial( object, groupMaterial, light, type );
 
+							object.onBeforeShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, group );
+
 							_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
+
+							object.onAfterShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, group );
 
 						}
 
@@ -365,7 +369,11 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 					const depthMaterial = getDepthMaterial( object, material, light, type );
 
+					object.onBeforeShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, null );
+
 					_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
+
+					object.onAfterShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, null );
 
 				}
 

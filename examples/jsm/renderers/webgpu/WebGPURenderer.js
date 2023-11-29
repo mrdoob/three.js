@@ -37,7 +37,7 @@ class WebGPURenderer extends Renderer {
 		const backend = new BackendClass( parameters );
 
 		//super( new Proxy( backend, debugHandler ) );
-		super( backend );
+		super( backend, parameters );
 
 		this.isWebGPURenderer = true;
 

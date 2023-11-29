@@ -82,18 +82,17 @@ function lineToLineClosestPoints( line1, line2, target1 = null, target2 = null )
 
 class Octree {
 
-
 	constructor( box ) {
 
-		this.triangles = [];
 		this.box = box;
+		this.bounds = new Box3();
+
 		this.subTrees = [];
+		this.triangles = [];
 
 	}
 
 	addTriangle( triangle ) {
-
-		if ( ! this.bounds ) this.bounds = new Box3();
 
 		this.bounds.min.x = Math.min( this.bounds.min.x, triangle.a.x, triangle.b.x, triangle.c.x );
 		this.bounds.min.y = Math.min( this.bounds.min.y, triangle.a.y, triangle.b.y, triangle.c.y );
@@ -519,6 +518,18 @@ class Octree {
 		} );
 
 		this.build();
+
+		return this;
+
+	}
+
+	clear() {
+
+		this.box = null;
+		this.bounds.makeEmpty();
+
+		this.subTrees.length = 0;
+		this.triangles.length = 0;
 
 		return this;
 

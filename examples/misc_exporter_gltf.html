@@ -236,9 +236,10 @@
 					color: 0xffff00,
 					metalness: 0.5,
 					roughness: 1.0,
-					flatShading: true
+					flatShading: true,
 				} );
 				material.map = gradientTexture;
+				material.bumpMap = mapGrid;
 				sphere = new THREE.Mesh( new THREE.SphereGeometry( 70, 10, 10 ), material );
 				sphere.position.set( 0, 0, 0 );
 				sphere.name = 'Sphere';

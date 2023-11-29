@@ -12,20 +12,17 @@ function ViewportInfo( editor ) {
 	container.setBottom( '10px' );
 	container.setFontSize( '12px' );
 	container.setColor( '#fff' );
+	container.setTextTransform( 'lowercase' );
 
 	const objectsText = new UIText( '0' ).setMarginLeft( '6px' );
 	const verticesText = new UIText( '0' ).setMarginLeft( '6px' );
 	const trianglesText = new UIText( '0' ).setMarginLeft( '6px' );
 	const frametimeText = new UIText( '0' ).setMarginLeft( '6px' );
 
-	container.add( new UIText( strings.getKey( 'viewport/info/objects' ) ).setTextTransform( 'lowercase' ) );
-	container.add( objectsText, new UIBreak() );
-	container.add( new UIText( strings.getKey( 'viewport/info/vertices' ) ).setTextTransform( 'lowercase' ) );
-	container.add( verticesText, new UIBreak() );
-	container.add( new UIText( strings.getKey( 'viewport/info/triangles' ) ).setTextTransform( 'lowercase' ) );
-	container.add( trianglesText, new UIBreak() );
-	container.add( new UIText( strings.getKey( 'viewport/info/frametime' ) ).setTextTransform( 'lowercase' ) );
-	container.add( frametimeText, new UIBreak() );
+	container.add( new UIText( strings.getKey( 'viewport/info/objects' ) ), objectsText, new UIBreak() );
+	container.add( new UIText( strings.getKey( 'viewport/info/vertices' ) ), verticesText, new UIBreak() );
+	container.add( new UIText( strings.getKey( 'viewport/info/triangles' ) ), trianglesText, new UIBreak() );
+	container.add( new UIText( strings.getKey( 'viewport/info/frametime' ) ), frametimeText, new UIBreak() );
 
 	signals.objectAdded.add( update );
 	signals.objectRemoved.add( update );

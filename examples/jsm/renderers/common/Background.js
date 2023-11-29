@@ -1,9 +1,9 @@
 import DataMap from './DataMap.js';
-import { Color, Mesh, SphereGeometry, BackSide } from 'three';
+import Color4 from './Color4.js';
+import { Mesh, SphereGeometry, BackSide } from 'three';
 import { context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection } from '../../nodes/Nodes.js';
 
-let _clearAlpha;
-const _clearColor = new Color();
+const _clearColor = new Color4();
 
 class Background extends DataMap {
 
@@ -30,15 +30,16 @@ class Background extends DataMap {
 
 			// no background settings, use clear color configuration from the renderer
 
-			_clearColor.copyLinearToSRGB( renderer._clearColor );
-			_clearAlpha = renderer._clearAlpha;
+			renderer._clearColor.getRGB( _clearColor, this.renderer.currentColorSpace );
+			_clearColor.a = renderer._clearColor.a;
 
 		} else if ( background.isColor === true ) {
 
 			// background is an opaque color
 
-			_clearColor.copyLinearToSRGB( background );
-			_clearAlpha = 1;
+			background.getRGB( _clearColor, this.renderer.currentColorSpace );
+			_clearColor.a = 1;
+
 			forceClear = true;
 
 		} else if ( background.isNode === true ) {
@@ -47,7 +48,6 @@ class Background extends DataMap {
 			const backgroundNode = background;
 
 			_clearColor.copy( renderer._clearColor );
-			_clearAlpha = renderer._clearAlpha;
 
 			let backgroundMesh = this.backgroundMesh;
 
@@ -55,20 +55,20 @@ class Background extends DataMap {
 
 				this.backgroundMeshNode = context( backgroundNode, {
 					// @TODO: Add Texture2D support using node context
-					getUVNode: () => normalWorld,
-					getSamplerLevelNode: () => backgroundBlurriness
+					getUV: () => normalWorld,
+					getTextureLevel: () => backgroundBlurriness
 				} ).mul( backgroundIntensity );
 
 				let viewProj = modelViewProjection();
 				viewProj = viewProj.setZ( viewProj.w );
 
 				const nodeMaterial = new NodeMaterial();
-				nodeMaterial.outputNode = this.backgroundMeshNode;
 				nodeMaterial.side = BackSide;
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
 				nodeMaterial.fog = false;
 				nodeMaterial.vertexNode = viewProj;
+				nodeMaterial.fragmentNode = this.backgroundMeshNode;
 
 				this.backgroundMesh = backgroundMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );
 				backgroundMesh.frustumCulled = false;
@@ -105,14 +105,14 @@ class Background extends DataMap {
 
 		if ( renderer.autoClear === true || forceClear === true ) {
 
-			_clearColor.multiplyScalar( _clearAlpha );
+			_clearColor.multiplyScalar( _clearColor.a );
 
 			const clearColorValue = renderContext.clearColorValue;
 
 			clearColorValue.r = _clearColor.r;
 			clearColorValue.g = _clearColor.g;
 			clearColorValue.b = _clearColor.b;
-			clearColorValue.a = _clearAlpha;
+			clearColorValue.a = _clearColor.a;
 
 			renderContext.depthClearValue = renderer._clearDepth;
 			renderContext.stencilClearValue = renderer._clearStencil;

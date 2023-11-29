@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, mix, cubeTexture, reference, positionLocal, positionWorld, normalWorld, positionWorldDirection, reflectVector, toneMapping } from 'three/nodes';
+			import { uniform, mix, cubeTexture, reference, positionLocal, positionWorld, normalWorld, positionWorldDirection, reflectVector, toneMapping, maxMipLevel } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
@@ -122,7 +122,7 @@
 				scene.environmentNode = getEnvironmentNode( reflectVector, positionWorld );
 
 				scene.backgroundNode = getEnvironmentNode( positionWorldDirection, positionLocal ).context( {
-					getSamplerLevelNode: () => blurNode
+					getTextureLevel: ( textureNode ) => blurNode.mul( maxMipLevel( textureNode ) )
 				} );
 
 				// scene objects

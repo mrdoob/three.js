@@ -10,7 +10,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '158';
+	const REVISION = '159dev';
 
 	const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -3090,9 +3090,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	class WebGLArrayRenderTarget extends WebGLRenderTarget {
 
-		constructor( width = 1, height = 1, depth = 1 ) {
+		constructor( width = 1, height = 1, depth = 1, options = {} ) {
 
-			super( width, height );
+			super( width, height, options );
 
 			this.isWebGLArrayRenderTarget = true;
 
@@ -3139,9 +3139,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	class WebGL3DRenderTarget extends WebGLRenderTarget {
 
-		constructor( width = 1, height = 1, depth = 1 ) {
+		constructor( width = 1, height = 1, depth = 1, options = {} ) {
 
-			super( width, height );
+			super( width, height, options );
 
 			this.isWebGL3DRenderTarget = true;
 
@@ -4419,9 +4419,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		projectOnPlane( planeNormal ) {
 
-			_vector$b.copy( this ).projectOnVector( planeNormal );
+			_vector$c.copy( this ).projectOnVector( planeNormal );
 
-			return this.sub( _vector$b );
+			return this.sub( _vector$c );
 
 		}
 
@@ -4430,7 +4430,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			// reflect incident vector off plane orthogonal to normal
 			// normal is assumed to have unit length
 
-			return this.sub( _vector$b.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
+			return this.sub( _vector$c.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
 		}
 
@@ -4632,7 +4632,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	const _vector$b = /*@__PURE__*/ new Vector3();
+	const _vector$c = /*@__PURE__*/ new Vector3();
 	const _quaternion$4 = /*@__PURE__*/ new Quaternion();
 
 	class Box3 {
@@ -4661,7 +4661,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			for ( let i = 0, il = array.length; i < il; i += 3 ) {
 
-				this.expandByPoint( _vector$a.fromArray( array, i ) );
+				this.expandByPoint( _vector$b.fromArray( array, i ) );
 
 			}
 
@@ -4675,7 +4675,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			for ( let i = 0, il = attribute.count; i < il; i ++ ) {
 
-				this.expandByPoint( _vector$a.fromBufferAttribute( attribute, i ) );
+				this.expandByPoint( _vector$b.fromBufferAttribute( attribute, i ) );
 
 			}
 
@@ -4699,7 +4699,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		setFromCenterAndSize( center, size ) {
 
-			const halfSize = _vector$a.copy( size ).multiplyScalar( 0.5 );
+			const halfSize = _vector$b.copy( size ).multiplyScalar( 0.5 );
 
 			this.min.copy( center ).sub( halfSize );
 			this.max.copy( center ).add( halfSize );
@@ -4809,16 +4809,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						if ( object.isMesh === true ) {
 
-							object.getVertexPosition( i, _vector$a );
+							object.getVertexPosition( i, _vector$b );
 
 						} else {
 
-							_vector$a.fromBufferAttribute( positionAttribute, i );
+							_vector$b.fromBufferAttribute( positionAttribute, i );
 
 						}
 
-						_vector$a.applyMatrix4( object.matrixWorld );
-						this.expandByPoint( _vector$a );
+						_vector$b.applyMatrix4( object.matrixWorld );
+						this.expandByPoint( _vector$b );
 
 					}
 
@@ -4834,7 +4834,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						}
 
-						_box$3.copy( object.boundingBox );
+						_box$4.copy( object.boundingBox );
 
 
 					} else {
@@ -4847,13 +4847,13 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						}
 
-						_box$3.copy( geometry.boundingBox );
+						_box$4.copy( geometry.boundingBox );
 
 					}
 
-					_box$3.applyMatrix4( object.matrixWorld );
+					_box$4.applyMatrix4( object.matrixWorld );
 
-					this.union( _box$3 );
+					this.union( _box$4 );
 
 				}
 
@@ -4912,10 +4912,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		intersectsSphere( sphere ) {
 
 			// Find the point on the AABB closest to the sphere center.
-			this.clampPoint( sphere.center, _vector$a );
+			this.clampPoint( sphere.center, _vector$b );
 
 			// If that point is inside the sphere, the AABB and sphere intersect.
-			return _vector$a.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
+			return _vector$b.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
 
 		}
 
@@ -5027,7 +5027,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		distanceToPoint( point ) {
 
-			return this.clampPoint( point, _vector$a ).distanceTo( point );
+			return this.clampPoint( point, _vector$b ).distanceTo( point );
 
 		}
 
@@ -5041,7 +5041,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				this.getCenter( target.center );
 
-				target.radius = this.getSize( _vector$a ).length() * 0.5;
+				target.radius = this.getSize( _vector$b ).length() * 0.5;
 
 			}
 
@@ -5119,9 +5119,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		/*@__PURE__*/ new Vector3()
 	];
 
-	const _vector$a = /*@__PURE__*/ new Vector3();
+	const _vector$b = /*@__PURE__*/ new Vector3();
 
-	const _box$3 = /*@__PURE__*/ new Box3();
+	const _box$4 = /*@__PURE__*/ new Box3();
 
 	// triangle centered vertices
 
@@ -5166,7 +5166,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	const _box$2 = /*@__PURE__*/ new Box3();
+	const _box$3 = /*@__PURE__*/ new Box3();
 	const _v1$6 = /*@__PURE__*/ new Vector3();
 	const _v2$3 = /*@__PURE__*/ new Vector3();
 
@@ -5198,7 +5198,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			} else {
 
-				_box$2.setFromPoints( points ).getCenter( center );
+				_box$3.setFromPoints( points ).getCenter( center );
 
 			}
 
@@ -5405,7 +5405,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	const _vector$9 = /*@__PURE__*/ new Vector3();
+	const _vector$a = /*@__PURE__*/ new Vector3();
 	const _segCenter = /*@__PURE__*/ new Vector3();
 	const _segDir = /*@__PURE__*/ new Vector3();
 	const _diff = /*@__PURE__*/ new Vector3();
@@ -5457,7 +5457,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		recast( t ) {
 
-			this.origin.copy( this.at( t, _vector$9 ) );
+			this.origin.copy( this.at( t, _vector$a ) );
 
 			return this;
 
@@ -5487,7 +5487,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		distanceSqToPoint( point ) {
 
-			const directionDistance = _vector$9.subVectors( point, this.origin ).dot( this.direction );
+			const directionDistance = _vector$a.subVectors( point, this.origin ).dot( this.direction );
 
 			// point behind the ray
 
@@ -5497,9 +5497,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			_vector$9.copy( this.origin ).addScaledVector( this.direction, directionDistance );
+			_vector$a.copy( this.origin ).addScaledVector( this.direction, directionDistance );
 
-			return _vector$9.distanceToSquared( point );
+			return _vector$a.distanceToSquared( point );
 
 		}
 
@@ -5624,9 +5624,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		intersectSphere( sphere, target ) {
 
-			_vector$9.subVectors( sphere.center, this.origin );
-			const tca = _vector$9.dot( this.direction );
-			const d2 = _vector$9.dot( _vector$9 ) - tca * tca;
+			_vector$a.subVectors( sphere.center, this.origin );
+			const tca = _vector$a.dot( this.direction );
+			const d2 = _vector$a.dot( _vector$a ) - tca * tca;
 			const radius2 = sphere.radius * sphere.radius;
 
 			if ( d2 > radius2 ) return null;
@@ -5793,7 +5793,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		intersectsBox( box ) {
 
-			return this.intersectBox( box, _vector$9 ) !== null;
+			return this.intersectBox( box, _vector$a ) !== null;
 
 		}
 
@@ -6806,7 +6806,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	const _y = /*@__PURE__*/ new Vector3();
 	const _z = /*@__PURE__*/ new Vector3();
 
-	const _matrix = /*@__PURE__*/ new Matrix4();
+	const _matrix$1 = /*@__PURE__*/ new Matrix4();
 	const _quaternion$3 = /*@__PURE__*/ new Quaternion();
 
 	class Euler {
@@ -7041,9 +7041,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		setFromQuaternion( q, order, update ) {
 
-			_matrix.makeRotationFromQuaternion( q );
+			_matrix$1.makeRotationFromQuaternion( q );
 
-			return this.setFromRotationMatrix( _matrix, order, update );
+			return this.setFromRotationMatrix( _matrix$1, order, update );
 
 		}
 
@@ -7283,6 +7283,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.userData = {};
 
 		}
+
+		onBeforeShadow( /* renderer, object, camera, shadowCamera, geometry, depthMaterial, group */ ) {}
+
+		onAfterShadow( /* renderer, object, camera, shadowCamera, geometry, depthMaterial, group */ ) {}
 
 		onBeforeRender( /* renderer, scene, camera, geometry, material, group */ ) {}
 
@@ -7624,21 +7628,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		getObjectsByProperty( name, value ) {
-
-			let result = [];
+		getObjectsByProperty( name, value, result = [] ) {
 
 			if ( this[ name ] === value ) result.push( this );
 
-			for ( let i = 0, l = this.children.length; i < l; i ++ ) {
+			const children = this.children;
 
-				const childResult = this.children[ i ].getObjectsByProperty( name, value );
+			for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-				if ( childResult.length > 0 ) {
-
-					result = result.concat( childResult );
-
-				}
+				children[ i ].getObjectsByProperty( name, value, result );
 
 			}
 
@@ -7883,6 +7881,56 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				object.count = this.count;
 				object.instanceMatrix = this.instanceMatrix.toJSON();
 				if ( this.instanceColor !== null ) object.instanceColor = this.instanceColor.toJSON();
+
+			}
+
+			if ( this.isBatchedMesh ) {
+
+				object.type = 'BatchedMesh';
+				object.perObjectFrustumCulled = this.perObjectFrustumCulled;
+				object.sortObjects = this.sortObjects;
+
+				object.drawRanges = this._drawRanges;
+				object.reservedRanges = this._reservedRanges;
+
+				object.visibility = this._visibility;
+				object.active = this._active;
+				object.bounds = this._bounds.map( bound => ( {
+					boxInitialized: bound.boxInitialized,
+					boxMin: bound.box.min.toArray(),
+					boxMax: bound.box.max.toArray(),
+
+					sphereInitialized: bound.sphereInitialized,
+					sphereRadius: bound.sphere.radius,
+					sphereCenter: bound.sphere.center.toArray()
+				} ) );
+
+				object.maxGeometryCount = this._maxGeometryCount;
+				object.maxVertexCount = this._maxVertexCount;
+				object.maxIndexCount = this._maxIndexCount;
+
+				object.geometryInitialized = this._geometryInitialized;
+				object.geometryCount = this._geometryCount;
+
+				object.matricesTexture = this._matricesTexture.toJSON( meta );
+
+				if ( this.boundingSphere !== null ) {
+
+					object.boundingSphere = {
+						center: object.boundingSphere.center.toArray(),
+						radius: object.boundingSphere.radius
+					};
+
+				}
+
+				if ( this.boundingBox !== null ) {
+
+					object.boundingBox = {
+						min: object.boundingBox.min.toArray(),
+						max: object.boundingBox.max.toArray()
+					};
+
+				}
 
 			}
 
@@ -9829,7 +9877,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		fromHalfFloat: fromHalfFloat,
 	};
 
-	const _vector$8 = /*@__PURE__*/ new Vector3();
+	const _vector$9 = /*@__PURE__*/ new Vector3();
 	const _vector2$1 = /*@__PURE__*/ new Vector2();
 
 	class BufferAttribute {
@@ -9852,7 +9900,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.normalized = normalized;
 
 			this.usage = StaticDrawUsage;
-			this.updateRange = { offset: 0, count: - 1 };
+			this._updateRange = { offset: 0, count: - 1 };
+			this.updateRanges = [];
 			this.gpuType = FloatType;
 
 			this.version = 0;
@@ -9867,11 +9916,30 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
+		get updateRange() {
+
+			console.warn( 'THREE.BufferAttribute: "updateRange" is deprecated and removed in r169. Use "addUpdateRange()" instead.' ); // @deprecated, r159
+			return this._updateRange;
+
+		}
+
 		setUsage( value ) {
 
 			this.usage = value;
 
 			return this;
+
+		}
+
+		addUpdateRange( start, count ) {
+
+			this.updateRanges.push( { start, count } );
+
+		}
+
+		clearUpdateRanges() {
+
+			this.updateRanges.length = 0;
 
 		}
 
@@ -9930,10 +9998,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-					_vector$8.fromBufferAttribute( this, i );
-					_vector$8.applyMatrix3( m );
+					_vector$9.fromBufferAttribute( this, i );
+					_vector$9.applyMatrix3( m );
 
-					this.setXYZ( i, _vector$8.x, _vector$8.y, _vector$8.z );
+					this.setXYZ( i, _vector$9.x, _vector$9.y, _vector$9.z );
 
 				}
 
@@ -9947,11 +10015,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector$8.fromBufferAttribute( this, i );
+				_vector$9.fromBufferAttribute( this, i );
 
-				_vector$8.applyMatrix4( m );
+				_vector$9.applyMatrix4( m );
 
-				this.setXYZ( i, _vector$8.x, _vector$8.y, _vector$8.z );
+				this.setXYZ( i, _vector$9.x, _vector$9.y, _vector$9.z );
 
 			}
 
@@ -9963,11 +10031,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector$8.fromBufferAttribute( this, i );
+				_vector$9.fromBufferAttribute( this, i );
 
-				_vector$8.applyNormalMatrix( m );
+				_vector$9.applyNormalMatrix( m );
 
-				this.setXYZ( i, _vector$8.x, _vector$8.y, _vector$8.z );
+				this.setXYZ( i, _vector$9.x, _vector$9.y, _vector$9.z );
 
 			}
 
@@ -9979,11 +10047,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector$8.fromBufferAttribute( this, i );
+				_vector$9.fromBufferAttribute( this, i );
 
-				_vector$8.transformDirection( m );
+				_vector$9.transformDirection( m );
 
-				this.setXYZ( i, _vector$8.x, _vector$8.y, _vector$8.z );
+				this.setXYZ( i, _vector$9.x, _vector$9.y, _vector$9.z );
 
 			}
 
@@ -10185,7 +10253,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( this.name !== '' ) data.name = this.name;
 			if ( this.usage !== StaticDrawUsage ) data.usage = this.usage;
-			if ( this.updateRange.offset !== 0 || this.updateRange.count !== - 1 ) data.updateRange = this.updateRange;
 
 			return data;
 
@@ -10443,9 +10510,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	const _m1 = /*@__PURE__*/ new Matrix4();
 	const _obj = /*@__PURE__*/ new Object3D();
 	const _offset = /*@__PURE__*/ new Vector3();
-	const _box$1 = /*@__PURE__*/ new Box3();
+	const _box$2 = /*@__PURE__*/ new Box3();
 	const _boxMorphTargets = /*@__PURE__*/ new Box3();
-	const _vector$7 = /*@__PURE__*/ new Vector3();
+	const _vector$8 = /*@__PURE__*/ new Vector3();
 
 	class BufferGeometry extends EventDispatcher {
 
@@ -10750,20 +10817,20 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 					for ( let i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
 
 						const morphAttribute = morphAttributesPosition[ i ];
-						_box$1.setFromBufferAttribute( morphAttribute );
+						_box$2.setFromBufferAttribute( morphAttribute );
 
 						if ( this.morphTargetsRelative ) {
 
-							_vector$7.addVectors( this.boundingBox.min, _box$1.min );
-							this.boundingBox.expandByPoint( _vector$7 );
+							_vector$8.addVectors( this.boundingBox.min, _box$2.min );
+							this.boundingBox.expandByPoint( _vector$8 );
 
-							_vector$7.addVectors( this.boundingBox.max, _box$1.max );
-							this.boundingBox.expandByPoint( _vector$7 );
+							_vector$8.addVectors( this.boundingBox.max, _box$2.max );
+							this.boundingBox.expandByPoint( _vector$8 );
 
 						} else {
 
-							this.boundingBox.expandByPoint( _box$1.min );
-							this.boundingBox.expandByPoint( _box$1.max );
+							this.boundingBox.expandByPoint( _box$2.min );
+							this.boundingBox.expandByPoint( _box$2.max );
 
 						}
 
@@ -10812,7 +10879,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				const center = this.boundingSphere.center;
 
-				_box$1.setFromBufferAttribute( position );
+				_box$2.setFromBufferAttribute( position );
 
 				// process morph attributes if present
 
@@ -10825,16 +10892,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						if ( this.morphTargetsRelative ) {
 
-							_vector$7.addVectors( _box$1.min, _boxMorphTargets.min );
-							_box$1.expandByPoint( _vector$7 );
+							_vector$8.addVectors( _box$2.min, _boxMorphTargets.min );
+							_box$2.expandByPoint( _vector$8 );
 
-							_vector$7.addVectors( _box$1.max, _boxMorphTargets.max );
-							_box$1.expandByPoint( _vector$7 );
+							_vector$8.addVectors( _box$2.max, _boxMorphTargets.max );
+							_box$2.expandByPoint( _vector$8 );
 
 						} else {
 
-							_box$1.expandByPoint( _boxMorphTargets.min );
-							_box$1.expandByPoint( _boxMorphTargets.max );
+							_box$2.expandByPoint( _boxMorphTargets.min );
+							_box$2.expandByPoint( _boxMorphTargets.max );
 
 						}
 
@@ -10842,7 +10909,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				}
 
-				_box$1.getCenter( center );
+				_box$2.getCenter( center );
 
 				// second, try to find a boundingSphere with a radius smaller than the
 				// boundingSphere of the boundingBox: sqrt(3) smaller in the best case
@@ -10851,9 +10918,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				for ( let i = 0, il = position.count; i < il; i ++ ) {
 
-					_vector$7.fromBufferAttribute( position, i );
+					_vector$8.fromBufferAttribute( position, i );
 
-					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$7 ) );
+					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$8 ) );
 
 				}
 
@@ -10868,16 +10935,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						for ( let j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
 
-							_vector$7.fromBufferAttribute( morphAttribute, j );
+							_vector$8.fromBufferAttribute( morphAttribute, j );
 
 							if ( morphTargetsRelative ) {
 
 								_offset.fromBufferAttribute( position, j );
-								_vector$7.add( _offset );
+								_vector$8.add( _offset );
 
 							}
 
-							maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$7 ) );
+							maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$8 ) );
 
 						}
 
@@ -11160,11 +11227,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			for ( let i = 0, il = normals.count; i < il; i ++ ) {
 
-				_vector$7.fromBufferAttribute( normals, i );
+				_vector$8.fromBufferAttribute( normals, i );
 
-				_vector$7.normalize();
+				_vector$8.normalize();
 
-				normals.setXYZ( i, _vector$7.x, _vector$7.y, _vector$7.z );
+				normals.setXYZ( i, _vector$8.x, _vector$8.y, _vector$8.z );
 
 			}
 
@@ -11506,7 +11573,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	const _inverseMatrix$3 = /*@__PURE__*/ new Matrix4();
 	const _ray$3 = /*@__PURE__*/ new Ray();
-	const _sphere$5 = /*@__PURE__*/ new Sphere();
+	const _sphere$6 = /*@__PURE__*/ new Sphere();
 	const _sphereHitAt = /*@__PURE__*/ new Vector3();
 
 	const _vA$1 = /*@__PURE__*/ new Vector3();
@@ -11654,16 +11721,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			_sphere$5.copy( geometry.boundingSphere );
-			_sphere$5.applyMatrix4( matrixWorld );
+			_sphere$6.copy( geometry.boundingSphere );
+			_sphere$6.applyMatrix4( matrixWorld );
 
 			// check distance from ray origin to bounding sphere
 
 			_ray$3.copy( raycaster.ray ).recast( raycaster.near );
 
-			if ( _sphere$5.containsPoint( _ray$3.origin ) === false ) {
+			if ( _sphere$6.containsPoint( _ray$3.origin ) === false ) {
 
-				if ( _ray$3.intersectSphere( _sphere$5, _sphereHitAt ) === null ) return;
+				if ( _ray$3.intersectSphere( _sphere$6, _sphereHitAt ) === null ) return;
 
 				if ( _ray$3.origin.distanceToSquared( _sphereHitAt ) > ( raycaster.far - raycaster.near ) ** 2 ) return;
 
@@ -13216,8 +13283,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	const _sphere$4 = /*@__PURE__*/ new Sphere();
-	const _vector$6 = /*@__PURE__*/ new Vector3();
+	const _sphere$5 = /*@__PURE__*/ new Sphere();
+	const _vector$7 = /*@__PURE__*/ new Vector3();
 
 	class Frustum {
 
@@ -13295,7 +13362,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				if ( object.boundingSphere === null ) object.computeBoundingSphere();
 
-				_sphere$4.copy( object.boundingSphere ).applyMatrix4( object.matrixWorld );
+				_sphere$5.copy( object.boundingSphere ).applyMatrix4( object.matrixWorld );
 
 			} else {
 
@@ -13303,21 +13370,21 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-				_sphere$4.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+				_sphere$5.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
 
 			}
 
-			return this.intersectsSphere( _sphere$4 );
+			return this.intersectsSphere( _sphere$5 );
 
 		}
 
 		intersectsSprite( sprite ) {
 
-			_sphere$4.center.set( 0, 0, 0 );
-			_sphere$4.radius = 0.7071067811865476;
-			_sphere$4.applyMatrix4( sprite.matrixWorld );
+			_sphere$5.center.set( 0, 0, 0 );
+			_sphere$5.radius = 0.7071067811865476;
+			_sphere$5.applyMatrix4( sprite.matrixWorld );
 
-			return this.intersectsSphere( _sphere$4 );
+			return this.intersectsSphere( _sphere$5 );
 
 		}
 
@@ -13353,11 +13420,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				// corner at max distance
 
-				_vector$6.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-				_vector$6.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-				_vector$6.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+				_vector$7.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+				_vector$7.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+				_vector$7.z = plane.normal.z > 0 ? box.max.z : box.min.z;
 
-				if ( plane.distanceToPoint( _vector$6 ) < 0 ) {
+				if ( plane.distanceToPoint( _vector$7 ) < 0 ) {
 
 					return false;
 
@@ -13457,6 +13524,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			const array = attribute.array;
 			const usage = attribute.usage;
+			const size = array.byteLength;
 
 			const buffer = gl.createBuffer();
 
@@ -13525,7 +13593,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				buffer: buffer,
 				type: type,
 				bytesPerElement: array.BYTES_PER_ELEMENT,
-				version: attribute.version
+				version: attribute.version,
+				size: size
 			};
 
 		}
@@ -13533,17 +13602,43 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		function updateBuffer( buffer, attribute, bufferType ) {
 
 			const array = attribute.array;
-			const updateRange = attribute.updateRange;
+			const updateRange = attribute._updateRange; // deprecated
+			const updateRanges = attribute.updateRanges;
 
 			gl.bindBuffer( bufferType, buffer );
 
-			if ( updateRange.count === - 1 ) {
+			if ( updateRange.count === - 1 && updateRanges.length === 0 ) {
 
 				// Not using update ranges
-
 				gl.bufferSubData( bufferType, 0, array );
 
-			} else {
+			}
+
+			if ( updateRanges.length !== 0 ) {
+
+				for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
+
+					const range = updateRanges[ i ];
+					if ( isWebGL2 ) {
+
+						gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
+							array, range.start, range.count );
+
+					} else {
+
+						gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
+							array.subarray( range.start, range.start + range.count ) );
+
+					}
+
+				}
+
+				attribute.clearUpdateRanges();
+
+			}
+
+			// deprecated
+			if ( updateRange.count !== - 1 ) {
 
 				if ( isWebGL2 ) {
 
@@ -13621,6 +13716,12 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				buffers.set( attribute, createBuffer( attribute, bufferType ) );
 
 			} else if ( data.version < attribute.version ) {
+
+				if ( data.size !== attribute.array.byteLength ) {
+
+					throw new Error( 'THREE.WebGLAttributes: The size of the buffer attribute\'s array buffer does not match the original size. Resizing buffer attributes is not supported.' );
+
+				}
 
 				updateBuffer( data.buffer, attribute, bufferType );
 
@@ -13750,6 +13851,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	var aomap_pars_fragment = "#ifdef USE_AOMAP\n\tuniform sampler2D aoMap;\n\tuniform float aoMapIntensity;\n#endif";
 
+	var batching_pars_vertex = "#ifdef USE_BATCHING\n\tattribute float batchId;\n\tuniform highp sampler2D batchingTexture;\n\tmat4 getBatchingMatrix( const in float i ) {\n\t\tint size = textureSize( batchingTexture, 0 ).x;\n\t\tint j = int( i ) * 4;\n\t\tint x = j % size;\n\t\tint y = j / size;\n\t\tvec4 v1 = texelFetch( batchingTexture, ivec2( x, y ), 0 );\n\t\tvec4 v2 = texelFetch( batchingTexture, ivec2( x + 1, y ), 0 );\n\t\tvec4 v3 = texelFetch( batchingTexture, ivec2( x + 2, y ), 0 );\n\t\tvec4 v4 = texelFetch( batchingTexture, ivec2( x + 3, y ), 0 );\n\t\treturn mat4( v1, v2, v3, v4 );\n\t}\n#endif";
+
+	var batching_vertex = "#ifdef USE_BATCHING\n\tmat4 batchingMatrix = getBatchingMatrix( batchId );\n#endif";
+
 	var begin_vertex = "vec3 transformed = vec3( position );\n#ifdef USE_ALPHAHASH\n\tvPosition = vec3( position );\n#endif";
 
 	var beginnormal_vertex = "vec3 objectNormal = vec3( normal );\n#ifdef USE_TANGENT\n\tvec3 objectTangent = vec3( tangent.xyz );\n#endif";
@@ -13780,7 +13885,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	var cube_uv_reflection_fragment = "#ifdef ENVMAP_TYPE_CUBE_UV\n\t#define cubeUV_minMipLevel 4.0\n\t#define cubeUV_minTileSize 16.0\n\tfloat getFace( vec3 direction ) {\n\t\tvec3 absDirection = abs( direction );\n\t\tfloat face = - 1.0;\n\t\tif ( absDirection.x > absDirection.z ) {\n\t\t\tif ( absDirection.x > absDirection.y )\n\t\t\t\tface = direction.x > 0.0 ? 0.0 : 3.0;\n\t\t\telse\n\t\t\t\tface = direction.y > 0.0 ? 1.0 : 4.0;\n\t\t} else {\n\t\t\tif ( absDirection.z > absDirection.y )\n\t\t\t\tface = direction.z > 0.0 ? 2.0 : 5.0;\n\t\t\telse\n\t\t\t\tface = direction.y > 0.0 ? 1.0 : 4.0;\n\t\t}\n\t\treturn face;\n\t}\n\tvec2 getUV( vec3 direction, float face ) {\n\t\tvec2 uv;\n\t\tif ( face == 0.0 ) {\n\t\t\tuv = vec2( direction.z, direction.y ) / abs( direction.x );\n\t\t} else if ( face == 1.0 ) {\n\t\t\tuv = vec2( - direction.x, - direction.z ) / abs( direction.y );\n\t\t} else if ( face == 2.0 ) {\n\t\t\tuv = vec2( - direction.x, direction.y ) / abs( direction.z );\n\t\t} else if ( face == 3.0 ) {\n\t\t\tuv = vec2( - direction.z, direction.y ) / abs( direction.x );\n\t\t} else if ( face == 4.0 ) {\n\t\t\tuv = vec2( - direction.x, direction.z ) / abs( direction.y );\n\t\t} else {\n\t\t\tuv = vec2( direction.x, direction.y ) / abs( direction.z );\n\t\t}\n\t\treturn 0.5 * ( uv + 1.0 );\n\t}\n\tvec3 bilinearCubeUV( sampler2D envMap, vec3 direction, float mipInt ) {\n\t\tfloat face = getFace( direction );\n\t\tfloat filterInt = max( cubeUV_minMipLevel - mipInt, 0.0 );\n\t\tmipInt = max( mipInt, cubeUV_minMipLevel );\n\t\tfloat faceSize = exp2( mipInt );\n\t\thighp vec2 uv = getUV( direction, face ) * ( faceSize - 2.0 ) + 1.0;\n\t\tif ( face > 2.0 ) {\n\t\t\tuv.y += faceSize;\n\t\t\tface -= 3.0;\n\t\t}\n\t\tuv.x += face * faceSize;\n\t\tuv.x += filterInt * 3.0 * cubeUV_minTileSize;\n\t\tuv.y += 4.0 * ( exp2( CUBEUV_MAX_MIP ) - faceSize );\n\t\tuv.x *= CUBEUV_TEXEL_WIDTH;\n\t\tuv.y *= CUBEUV_TEXEL_HEIGHT;\n\t\t#ifdef texture2DGradEXT\n\t\t\treturn texture2DGradEXT( envMap, uv, vec2( 0.0 ), vec2( 0.0 ) ).rgb;\n\t\t#else\n\t\t\treturn texture2D( envMap, uv ).rgb;\n\t\t#endif\n\t}\n\t#define cubeUV_r0 1.0\n\t#define cubeUV_v0 0.339\n\t#define cubeUV_m0 - 2.0\n\t#define cubeUV_r1 0.8\n\t#define cubeUV_v1 0.276\n\t#define cubeUV_m1 - 1.0\n\t#define cubeUV_r4 0.4\n\t#define cubeUV_v4 0.046\n\t#define cubeUV_m4 2.0\n\t#define cubeUV_r5 0.305\n\t#define cubeUV_v5 0.016\n\t#define cubeUV_m5 3.0\n\t#define cubeUV_r6 0.21\n\t#define cubeUV_v6 0.0038\n\t#define cubeUV_m6 4.0\n\tfloat roughnessToMip( float roughness ) {\n\t\tfloat mip = 0.0;\n\t\tif ( roughness >= cubeUV_r1 ) {\n\t\t\tmip = ( cubeUV_r0 - roughness ) * ( cubeUV_m1 - cubeUV_m0 ) / ( cubeUV_r0 - cubeUV_r1 ) + cubeUV_m0;\n\t\t} else if ( roughness >= cubeUV_r4 ) {\n\t\t\tmip = ( cubeUV_r1 - roughness ) * ( cubeUV_m4 - cubeUV_m1 ) / ( cubeUV_r1 - cubeUV_r4 ) + cubeUV_m1;\n\t\t} else if ( roughness >= cubeUV_r5 ) {\n\t\t\tmip = ( cubeUV_r4 - roughness ) * ( cubeUV_m5 - cubeUV_m4 ) / ( cubeUV_r4 - cubeUV_r5 ) + cubeUV_m4;\n\t\t} else if ( roughness >= cubeUV_r6 ) {\n\t\t\tmip = ( cubeUV_r5 - roughness ) * ( cubeUV_m6 - cubeUV_m5 ) / ( cubeUV_r5 - cubeUV_r6 ) + cubeUV_m5;\n\t\t} else {\n\t\t\tmip = - 2.0 * log2( 1.16 * roughness );\t\t}\n\t\treturn mip;\n\t}\n\tvec4 textureCubeUV( sampler2D envMap, vec3 sampleDir, float roughness ) {\n\t\tfloat mip = clamp( roughnessToMip( roughness ), cubeUV_m0, CUBEUV_MAX_MIP );\n\t\tfloat mipF = fract( mip );\n\t\tfloat mipInt = floor( mip );\n\t\tvec3 color0 = bilinearCubeUV( envMap, sampleDir, mipInt );\n\t\tif ( mipF == 0.0 ) {\n\t\t\treturn vec4( color0, 1.0 );\n\t\t} else {\n\t\t\tvec3 color1 = bilinearCubeUV( envMap, sampleDir, mipInt + 1.0 );\n\t\t\treturn vec4( mix( color0, color1, mipF ), 1.0 );\n\t\t}\n\t}\n#endif";
 
-	var defaultnormal_vertex = "vec3 transformedNormal = objectNormal;\n#ifdef USE_INSTANCING\n\tmat3 m = mat3( instanceMatrix );\n\ttransformedNormal /= vec3( dot( m[ 0 ], m[ 0 ] ), dot( m[ 1 ], m[ 1 ] ), dot( m[ 2 ], m[ 2 ] ) );\n\ttransformedNormal = m * transformedNormal;\n#endif\ntransformedNormal = normalMatrix * transformedNormal;\n#ifdef FLIP_SIDED\n\ttransformedNormal = - transformedNormal;\n#endif\n#ifdef USE_TANGENT\n\tvec3 transformedTangent = ( modelViewMatrix * vec4( objectTangent, 0.0 ) ).xyz;\n\t#ifdef FLIP_SIDED\n\t\ttransformedTangent = - transformedTangent;\n\t#endif\n#endif";
+	var defaultnormal_vertex = "vec3 transformedNormal = objectNormal;\n#ifdef USE_TANGENT\n\tvec3 transformedTangent = objectTangent;\n#endif\n#ifdef USE_BATCHING\n\tmat3 bm = mat3( batchingMatrix );\n\ttransformedNormal /= vec3( dot( bm[ 0 ], bm[ 0 ] ), dot( bm[ 1 ], bm[ 1 ] ), dot( bm[ 2 ], bm[ 2 ] ) );\n\ttransformedNormal = bm * transformedNormal;\n\t#ifdef USE_TANGENT\n\t\ttransformedTangent = bm * transformedTangent;\n\t#endif\n#endif\n#ifdef USE_INSTANCING\n\tmat3 im = mat3( instanceMatrix );\n\ttransformedNormal /= vec3( dot( im[ 0 ], im[ 0 ] ), dot( im[ 1 ], im[ 1 ] ), dot( im[ 2 ], im[ 2 ] ) );\n\ttransformedNormal = im * transformedNormal;\n\t#ifdef USE_TANGENT\n\t\ttransformedTangent = im * transformedTangent;\n\t#endif\n#endif\ntransformedNormal = normalMatrix * transformedNormal;\n#ifdef FLIP_SIDED\n\ttransformedNormal = - transformedNormal;\n#endif\n#ifdef USE_TANGENT\n\ttransformedTangent = ( modelViewMatrix * vec4( transformedTangent, 0.0 ) ).xyz;\n\t#ifdef FLIP_SIDED\n\t\ttransformedTangent = - transformedTangent;\n\t#endif\n#endif";
 
 	var displacementmap_pars_vertex = "#ifdef USE_DISPLACEMENTMAP\n\tuniform sampler2D displacementMap;\n\tuniform float displacementScale;\n\tuniform float displacementBias;\n#endif";
 
@@ -13834,7 +13939,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	var lights_phong_pars_fragment = "varying vec3 vViewPosition;\nstruct BlinnPhongMaterial {\n\tvec3 diffuseColor;\n\tvec3 specularColor;\n\tfloat specularShininess;\n\tfloat specularStrength;\n};\nvoid RE_Direct_BlinnPhong( const in IncidentLight directLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\n\tfloat dotNL = saturate( dot( geometryNormal, directLight.direction ) );\n\tvec3 irradiance = dotNL * directLight.color;\n\treflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );\n\treflectedLight.directSpecular += irradiance * BRDF_BlinnPhong( directLight.direction, geometryViewDir, geometryNormal, material.specularColor, material.specularShininess ) * material.specularStrength;\n}\nvoid RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\n\treflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );\n}\n#define RE_Direct\t\t\t\tRE_Direct_BlinnPhong\n#define RE_IndirectDiffuse\t\tRE_IndirectDiffuse_BlinnPhong";
 
-	var lights_physical_fragment = "PhysicalMaterial material;\nmaterial.diffuseColor = diffuseColor.rgb * ( 1.0 - metalnessFactor );\nvec3 dxy = max( abs( dFdx( nonPerturbedNormal ) ), abs( dFdy( nonPerturbedNormal ) ) );\nfloat geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );\nmaterial.roughness = max( roughnessFactor, 0.0525 );material.roughness += geometryRoughness;\nmaterial.roughness = min( material.roughness, 1.0 );\n#ifdef IOR\n\tmaterial.ior = ior;\n\t#ifdef USE_SPECULAR\n\t\tfloat specularIntensityFactor = specularIntensity;\n\t\tvec3 specularColorFactor = specularColor;\n\t\t#ifdef USE_SPECULAR_COLORMAP\n\t\t\tspecularColorFactor *= texture2D( specularColorMap, vSpecularColorMapUv ).rgb;\n\t\t#endif\n\t\t#ifdef USE_SPECULAR_INTENSITYMAP\n\t\t\tspecularIntensityFactor *= texture2D( specularIntensityMap, vSpecularIntensityMapUv ).a;\n\t\t#endif\n\t\tmaterial.specularF90 = mix( specularIntensityFactor, 1.0, metalnessFactor );\n\t#else\n\t\tfloat specularIntensityFactor = 1.0;\n\t\tvec3 specularColorFactor = vec3( 1.0 );\n\t\tmaterial.specularF90 = 1.0;\n\t#endif\n\tmaterial.specularColor = mix( min( pow2( ( material.ior - 1.0 ) / ( material.ior + 1.0 ) ) * specularColorFactor, vec3( 1.0 ) ) * specularIntensityFactor, diffuseColor.rgb, metalnessFactor );\n#else\n\tmaterial.specularColor = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessFactor );\n\tmaterial.specularF90 = 1.0;\n#endif\n#ifdef USE_CLEARCOAT\n\tmaterial.clearcoat = clearcoat;\n\tmaterial.clearcoatRoughness = clearcoatRoughness;\n\tmaterial.clearcoatF0 = vec3( 0.04 );\n\tmaterial.clearcoatF90 = 1.0;\n\t#ifdef USE_CLEARCOATMAP\n\t\tmaterial.clearcoat *= texture2D( clearcoatMap, vClearcoatMapUv ).x;\n\t#endif\n\t#ifdef USE_CLEARCOAT_ROUGHNESSMAP\n\t\tmaterial.clearcoatRoughness *= texture2D( clearcoatRoughnessMap, vClearcoatRoughnessMapUv ).y;\n\t#endif\n\tmaterial.clearcoat = saturate( material.clearcoat );\tmaterial.clearcoatRoughness = max( material.clearcoatRoughness, 0.0525 );\n\tmaterial.clearcoatRoughness += geometryRoughness;\n\tmaterial.clearcoatRoughness = min( material.clearcoatRoughness, 1.0 );\n#endif\n#ifdef USE_IRIDESCENCE\n\tmaterial.iridescence = iridescence;\n\tmaterial.iridescenceIOR = iridescenceIOR;\n\t#ifdef USE_IRIDESCENCEMAP\n\t\tmaterial.iridescence *= texture2D( iridescenceMap, vIridescenceMapUv ).r;\n\t#endif\n\t#ifdef USE_IRIDESCENCE_THICKNESSMAP\n\t\tmaterial.iridescenceThickness = (iridescenceThicknessMaximum - iridescenceThicknessMinimum) * texture2D( iridescenceThicknessMap, vIridescenceThicknessMapUv ).g + iridescenceThicknessMinimum;\n\t#else\n\t\tmaterial.iridescenceThickness = iridescenceThicknessMaximum;\n\t#endif\n#endif\n#ifdef USE_SHEEN\n\tmaterial.sheenColor = sheenColor;\n\t#ifdef USE_SHEEN_COLORMAP\n\t\tmaterial.sheenColor *= texture2D( sheenColorMap, vSheenColorMapUv ).rgb;\n\t#endif\n\tmaterial.sheenRoughness = clamp( sheenRoughness, 0.07, 1.0 );\n\t#ifdef USE_SHEEN_ROUGHNESSMAP\n\t\tmaterial.sheenRoughness *= texture2D( sheenRoughnessMap, vSheenRoughnessMapUv ).a;\n\t#endif\n#endif\n#ifdef USE_ANISOTROPY\n\t#ifdef USE_ANISOTROPYMAP\n\t\tmat2 anisotropyMat = mat2( anisotropyVector.x, anisotropyVector.y, - anisotropyVector.y, anisotropyVector.x );\n\t\tvec3 anisotropyPolar = texture2D( anisotropyMap, vAnisotropyMapUv ).rgb;\n\t\tvec2 anisotropyV = anisotropyMat * normalize( 2.0 * anisotropyPolar.rg - vec2( 1.0 ) ) * anisotropyPolar.b;\n\t#else\n\t\tvec2 anisotropyV = anisotropyVector;\n\t#endif\n\tmaterial.anisotropy = length( anisotropyV );\n\tanisotropyV /= material.anisotropy;\n\tmaterial.anisotropy = saturate( material.anisotropy );\n\tmaterial.alphaT = mix( pow2( material.roughness ), 1.0, pow2( material.anisotropy ) );\n\tmaterial.anisotropyT = tbn[ 0 ] * anisotropyV.x - tbn[ 1 ] * anisotropyV.y;\n\tmaterial.anisotropyB = tbn[ 1 ] * anisotropyV.x + tbn[ 0 ] * anisotropyV.y;\n#endif";
+	var lights_physical_fragment = "PhysicalMaterial material;\nmaterial.diffuseColor = diffuseColor.rgb * ( 1.0 - metalnessFactor );\nvec3 dxy = max( abs( dFdx( nonPerturbedNormal ) ), abs( dFdy( nonPerturbedNormal ) ) );\nfloat geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );\nmaterial.roughness = max( roughnessFactor, 0.0525 );material.roughness += geometryRoughness;\nmaterial.roughness = min( material.roughness, 1.0 );\n#ifdef IOR\n\tmaterial.ior = ior;\n\t#ifdef USE_SPECULAR\n\t\tfloat specularIntensityFactor = specularIntensity;\n\t\tvec3 specularColorFactor = specularColor;\n\t\t#ifdef USE_SPECULAR_COLORMAP\n\t\t\tspecularColorFactor *= texture2D( specularColorMap, vSpecularColorMapUv ).rgb;\n\t\t#endif\n\t\t#ifdef USE_SPECULAR_INTENSITYMAP\n\t\t\tspecularIntensityFactor *= texture2D( specularIntensityMap, vSpecularIntensityMapUv ).a;\n\t\t#endif\n\t\tmaterial.specularF90 = mix( specularIntensityFactor, 1.0, metalnessFactor );\n\t#else\n\t\tfloat specularIntensityFactor = 1.0;\n\t\tvec3 specularColorFactor = vec3( 1.0 );\n\t\tmaterial.specularF90 = 1.0;\n\t#endif\n\tmaterial.specularColor = mix( min( pow2( ( material.ior - 1.0 ) / ( material.ior + 1.0 ) ) * specularColorFactor, vec3( 1.0 ) ) * specularIntensityFactor, diffuseColor.rgb, metalnessFactor );\n#else\n\tmaterial.specularColor = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessFactor );\n\tmaterial.specularF90 = 1.0;\n#endif\n#ifdef USE_CLEARCOAT\n\tmaterial.clearcoat = clearcoat;\n\tmaterial.clearcoatRoughness = clearcoatRoughness;\n\tmaterial.clearcoatF0 = vec3( 0.04 );\n\tmaterial.clearcoatF90 = 1.0;\n\t#ifdef USE_CLEARCOATMAP\n\t\tmaterial.clearcoat *= texture2D( clearcoatMap, vClearcoatMapUv ).x;\n\t#endif\n\t#ifdef USE_CLEARCOAT_ROUGHNESSMAP\n\t\tmaterial.clearcoatRoughness *= texture2D( clearcoatRoughnessMap, vClearcoatRoughnessMapUv ).y;\n\t#endif\n\tmaterial.clearcoat = saturate( material.clearcoat );\tmaterial.clearcoatRoughness = max( material.clearcoatRoughness, 0.0525 );\n\tmaterial.clearcoatRoughness += geometryRoughness;\n\tmaterial.clearcoatRoughness = min( material.clearcoatRoughness, 1.0 );\n#endif\n#ifdef USE_IRIDESCENCE\n\tmaterial.iridescence = iridescence;\n\tmaterial.iridescenceIOR = iridescenceIOR;\n\t#ifdef USE_IRIDESCENCEMAP\n\t\tmaterial.iridescence *= texture2D( iridescenceMap, vIridescenceMapUv ).r;\n\t#endif\n\t#ifdef USE_IRIDESCENCE_THICKNESSMAP\n\t\tmaterial.iridescenceThickness = (iridescenceThicknessMaximum - iridescenceThicknessMinimum) * texture2D( iridescenceThicknessMap, vIridescenceThicknessMapUv ).g + iridescenceThicknessMinimum;\n\t#else\n\t\tmaterial.iridescenceThickness = iridescenceThicknessMaximum;\n\t#endif\n#endif\n#ifdef USE_SHEEN\n\tmaterial.sheenColor = sheenColor;\n\t#ifdef USE_SHEEN_COLORMAP\n\t\tmaterial.sheenColor *= texture2D( sheenColorMap, vSheenColorMapUv ).rgb;\n\t#endif\n\tmaterial.sheenRoughness = clamp( sheenRoughness, 0.07, 1.0 );\n\t#ifdef USE_SHEEN_ROUGHNESSMAP\n\t\tmaterial.sheenRoughness *= texture2D( sheenRoughnessMap, vSheenRoughnessMapUv ).a;\n\t#endif\n#endif\n#ifdef USE_ANISOTROPY\n\t#ifdef USE_ANISOTROPYMAP\n\t\tmat2 anisotropyMat = mat2( anisotropyVector.x, anisotropyVector.y, - anisotropyVector.y, anisotropyVector.x );\n\t\tvec3 anisotropyPolar = texture2D( anisotropyMap, vAnisotropyMapUv ).rgb;\n\t\tvec2 anisotropyV = anisotropyMat * normalize( 2.0 * anisotropyPolar.rg - vec2( 1.0 ) ) * anisotropyPolar.b;\n\t#else\n\t\tvec2 anisotropyV = anisotropyVector;\n\t#endif\n\tmaterial.anisotropy = length( anisotropyV );\n\tif( material.anisotropy == 0.0 ) {\n\t\tanisotropyV = vec2( 1.0, 0.0 );\n\t} else {\n\t\tanisotropyV /= material.anisotropy;\n\t\tmaterial.anisotropy = saturate( material.anisotropy );\n\t}\n\tmaterial.alphaT = mix( pow2( material.roughness ), 1.0, pow2( material.anisotropy ) );\n\tmaterial.anisotropyT = tbn[ 0 ] * anisotropyV.x + tbn[ 1 ] * anisotropyV.y;\n\tmaterial.anisotropyB = tbn[ 1 ] * anisotropyV.x - tbn[ 0 ] * anisotropyV.y;\n#endif";
 
 	var lights_physical_pars_fragment = "struct PhysicalMaterial {\n\tvec3 diffuseColor;\n\tfloat roughness;\n\tvec3 specularColor;\n\tfloat specularF90;\n\t#ifdef USE_CLEARCOAT\n\t\tfloat clearcoat;\n\t\tfloat clearcoatRoughness;\n\t\tvec3 clearcoatF0;\n\t\tfloat clearcoatF90;\n\t#endif\n\t#ifdef USE_IRIDESCENCE\n\t\tfloat iridescence;\n\t\tfloat iridescenceIOR;\n\t\tfloat iridescenceThickness;\n\t\tvec3 iridescenceFresnel;\n\t\tvec3 iridescenceF0;\n\t#endif\n\t#ifdef USE_SHEEN\n\t\tvec3 sheenColor;\n\t\tfloat sheenRoughness;\n\t#endif\n\t#ifdef IOR\n\t\tfloat ior;\n\t#endif\n\t#ifdef USE_TRANSMISSION\n\t\tfloat transmission;\n\t\tfloat transmissionAlpha;\n\t\tfloat thickness;\n\t\tfloat attenuationDistance;\n\t\tvec3 attenuationColor;\n\t#endif\n\t#ifdef USE_ANISOTROPY\n\t\tfloat anisotropy;\n\t\tfloat alphaT;\n\t\tvec3 anisotropyT;\n\t\tvec3 anisotropyB;\n\t#endif\n};\nvec3 clearcoatSpecularDirect = vec3( 0.0 );\nvec3 clearcoatSpecularIndirect = vec3( 0.0 );\nvec3 sheenSpecularDirect = vec3( 0.0 );\nvec3 sheenSpecularIndirect = vec3(0.0 );\nvec3 Schlick_to_F0( const in vec3 f, const in float f90, const in float dotVH ) {\n    float x = clamp( 1.0 - dotVH, 0.0, 1.0 );\n    float x2 = x * x;\n    float x5 = clamp( x * x2 * x2, 0.0, 0.9999 );\n    return ( f - vec3( f90 ) * x5 ) / ( 1.0 - x5 );\n}\nfloat V_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {\n\tfloat a2 = pow2( alpha );\n\tfloat gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n\tfloat gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n\treturn 0.5 / max( gv + gl, EPSILON );\n}\nfloat D_GGX( const in float alpha, const in float dotNH ) {\n\tfloat a2 = pow2( alpha );\n\tfloat denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0;\n\treturn RECIPROCAL_PI * a2 / pow2( denom );\n}\n#ifdef USE_ANISOTROPY\n\tfloat V_GGX_SmithCorrelated_Anisotropic( const in float alphaT, const in float alphaB, const in float dotTV, const in float dotBV, const in float dotTL, const in float dotBL, const in float dotNV, const in float dotNL ) {\n\t\tfloat gv = dotNL * length( vec3( alphaT * dotTV, alphaB * dotBV, dotNV ) );\n\t\tfloat gl = dotNV * length( vec3( alphaT * dotTL, alphaB * dotBL, dotNL ) );\n\t\tfloat v = 0.5 / ( gv + gl );\n\t\treturn saturate(v);\n\t}\n\tfloat D_GGX_Anisotropic( const in float alphaT, const in float alphaB, const in float dotNH, const in float dotTH, const in float dotBH ) {\n\t\tfloat a2 = alphaT * alphaB;\n\t\thighp vec3 v = vec3( alphaB * dotTH, alphaT * dotBH, a2 * dotNH );\n\t\thighp float v2 = dot( v, v );\n\t\tfloat w2 = a2 / v2;\n\t\treturn RECIPROCAL_PI * a2 * pow2 ( w2 );\n\t}\n#endif\n#ifdef USE_CLEARCOAT\n\tvec3 BRDF_GGX_Clearcoat( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material) {\n\t\tvec3 f0 = material.clearcoatF0;\n\t\tfloat f90 = material.clearcoatF90;\n\t\tfloat roughness = material.clearcoatRoughness;\n\t\tfloat alpha = pow2( roughness );\n\t\tvec3 halfDir = normalize( lightDir + viewDir );\n\t\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\t\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\t\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\t\tfloat dotVH = saturate( dot( viewDir, halfDir ) );\n\t\tvec3 F = F_Schlick( f0, f90, dotVH );\n\t\tfloat V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\t\tfloat D = D_GGX( alpha, dotNH );\n\t\treturn F * ( V * D );\n\t}\n#endif\nvec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {\n\tvec3 f0 = material.specularColor;\n\tfloat f90 = material.specularF90;\n\tfloat roughness = material.roughness;\n\tfloat alpha = pow2( roughness );\n\tvec3 halfDir = normalize( lightDir + viewDir );\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\tfloat dotVH = saturate( dot( viewDir, halfDir ) );\n\tvec3 F = F_Schlick( f0, f90, dotVH );\n\t#ifdef USE_IRIDESCENCE\n\t\tF = mix( F, material.iridescenceFresnel, material.iridescence );\n\t#endif\n\t#ifdef USE_ANISOTROPY\n\t\tfloat dotTL = dot( material.anisotropyT, lightDir );\n\t\tfloat dotTV = dot( material.anisotropyT, viewDir );\n\t\tfloat dotTH = dot( material.anisotropyT, halfDir );\n\t\tfloat dotBL = dot( material.anisotropyB, lightDir );\n\t\tfloat dotBV = dot( material.anisotropyB, viewDir );\n\t\tfloat dotBH = dot( material.anisotropyB, halfDir );\n\t\tfloat V = V_GGX_SmithCorrelated_Anisotropic( material.alphaT, alpha, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL );\n\t\tfloat D = D_GGX_Anisotropic( material.alphaT, alpha, dotNH, dotTH, dotBH );\n\t#else\n\t\tfloat V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\t\tfloat D = D_GGX( alpha, dotNH );\n\t#endif\n\treturn F * ( V * D );\n}\nvec2 LTC_Uv( const in vec3 N, const in vec3 V, const in float roughness ) {\n\tconst float LUT_SIZE = 64.0;\n\tconst float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;\n\tconst float LUT_BIAS = 0.5 / LUT_SIZE;\n\tfloat dotNV = saturate( dot( N, V ) );\n\tvec2 uv = vec2( roughness, sqrt( 1.0 - dotNV ) );\n\tuv = uv * LUT_SCALE + LUT_BIAS;\n\treturn uv;\n}\nfloat LTC_ClippedSphereFormFactor( const in vec3 f ) {\n\tfloat l = length( f );\n\treturn max( ( l * l + f.z ) / ( l + 1.0 ), 0.0 );\n}\nvec3 LTC_EdgeVectorFormFactor( const in vec3 v1, const in vec3 v2 ) {\n\tfloat x = dot( v1, v2 );\n\tfloat y = abs( x );\n\tfloat a = 0.8543985 + ( 0.4965155 + 0.0145206 * y ) * y;\n\tfloat b = 3.4175940 + ( 4.1616724 + y ) * y;\n\tfloat v = a / b;\n\tfloat theta_sintheta = ( x > 0.0 ) ? v : 0.5 * inversesqrt( max( 1.0 - x * x, 1e-7 ) ) - v;\n\treturn cross( v1, v2 ) * theta_sintheta;\n}\nvec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in mat3 mInv, const in vec3 rectCoords[ 4 ] ) {\n\tvec3 v1 = rectCoords[ 1 ] - rectCoords[ 0 ];\n\tvec3 v2 = rectCoords[ 3 ] - rectCoords[ 0 ];\n\tvec3 lightNormal = cross( v1, v2 );\n\tif( dot( lightNormal, P - rectCoords[ 0 ] ) < 0.0 ) return vec3( 0.0 );\n\tvec3 T1, T2;\n\tT1 = normalize( V - N * dot( V, N ) );\n\tT2 = - cross( N, T1 );\n\tmat3 mat = mInv * transposeMat3( mat3( T1, T2, N ) );\n\tvec3 coords[ 4 ];\n\tcoords[ 0 ] = mat * ( rectCoords[ 0 ] - P );\n\tcoords[ 1 ] = mat * ( rectCoords[ 1 ] - P );\n\tcoords[ 2 ] = mat * ( rectCoords[ 2 ] - P );\n\tcoords[ 3 ] = mat * ( rectCoords[ 3 ] - P );\n\tcoords[ 0 ] = normalize( coords[ 0 ] );\n\tcoords[ 1 ] = normalize( coords[ 1 ] );\n\tcoords[ 2 ] = normalize( coords[ 2 ] );\n\tcoords[ 3 ] = normalize( coords[ 3 ] );\n\tvec3 vectorFormFactor = vec3( 0.0 );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 0 ], coords[ 1 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 1 ], coords[ 2 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 2 ], coords[ 3 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 3 ], coords[ 0 ] );\n\tfloat result = LTC_ClippedSphereFormFactor( vectorFormFactor );\n\treturn vec3( result );\n}\n#if defined( USE_SHEEN )\nfloat D_Charlie( float roughness, float dotNH ) {\n\tfloat alpha = pow2( roughness );\n\tfloat invAlpha = 1.0 / alpha;\n\tfloat cos2h = dotNH * dotNH;\n\tfloat sin2h = max( 1.0 - cos2h, 0.0078125 );\n\treturn ( 2.0 + invAlpha ) * pow( sin2h, invAlpha * 0.5 ) / ( 2.0 * PI );\n}\nfloat V_Neubelt( float dotNV, float dotNL ) {\n\treturn saturate( 1.0 / ( 4.0 * ( dotNL + dotNV - dotNL * dotNV ) ) );\n}\nvec3 BRDF_Sheen( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, vec3 sheenColor, const in float sheenRoughness ) {\n\tvec3 halfDir = normalize( lightDir + viewDir );\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\tfloat D = D_Charlie( sheenRoughness, dotNH );\n\tfloat V = V_Neubelt( dotNV, dotNL );\n\treturn sheenColor * ( D * V );\n}\n#endif\nfloat IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat r2 = roughness * roughness;\n\tfloat a = roughness < 0.25 ? -339.2 * r2 + 161.4 * roughness - 25.9 : -8.48 * r2 + 14.3 * roughness - 9.95;\n\tfloat b = roughness < 0.25 ? 44.0 * r2 - 23.7 * roughness + 3.26 : 1.97 * r2 - 3.27 * roughness + 0.72;\n\tfloat DG = exp( a * dotNV + b ) + ( roughness < 0.25 ? 0.0 : 0.1 * ( roughness - 0.25 ) );\n\treturn saturate( DG * RECIPROCAL_PI );\n}\nvec2 DFGApprox( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tconst vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );\n\tconst vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );\n\tvec4 r = roughness * c0 + c1;\n\tfloat a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;\n\tvec2 fab = vec2( - 1.04, 1.04 ) * a004 + r.zw;\n\treturn fab;\n}\nvec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness ) {\n\tvec2 fab = DFGApprox( normal, viewDir, roughness );\n\treturn specularColor * fab.x + specularF90 * fab.y;\n}\n#ifdef USE_IRIDESCENCE\nvoid computeMultiscatteringIridescence( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float iridescence, const in vec3 iridescenceF0, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {\n#else\nvoid computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {\n#endif\n\tvec2 fab = DFGApprox( normal, viewDir, roughness );\n\t#ifdef USE_IRIDESCENCE\n\t\tvec3 Fr = mix( specularColor, iridescenceF0, iridescence );\n\t#else\n\t\tvec3 Fr = specularColor;\n\t#endif\n\tvec3 FssEss = Fr * fab.x + specularF90 * fab.y;\n\tfloat Ess = fab.x + fab.y;\n\tfloat Ems = 1.0 - Ess;\n\tvec3 Favg = Fr + ( 1.0 - Fr ) * 0.047619;\tvec3 Fms = FssEss * Favg / ( 1.0 - Ems * Favg );\n\tsingleScatter += FssEss;\n\tmultiScatter += Fms * Ems;\n}\n#if NUM_RECT_AREA_LIGHTS > 0\n\tvoid RE_Direct_RectArea_Physical( const in RectAreaLight rectAreaLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\t\tvec3 normal = geometryNormal;\n\t\tvec3 viewDir = geometryViewDir;\n\t\tvec3 position = geometryPosition;\n\t\tvec3 lightPos = rectAreaLight.position;\n\t\tvec3 halfWidth = rectAreaLight.halfWidth;\n\t\tvec3 halfHeight = rectAreaLight.halfHeight;\n\t\tvec3 lightColor = rectAreaLight.color;\n\t\tfloat roughness = material.roughness;\n\t\tvec3 rectCoords[ 4 ];\n\t\trectCoords[ 0 ] = lightPos + halfWidth - halfHeight;\t\trectCoords[ 1 ] = lightPos - halfWidth - halfHeight;\n\t\trectCoords[ 2 ] = lightPos - halfWidth + halfHeight;\n\t\trectCoords[ 3 ] = lightPos + halfWidth + halfHeight;\n\t\tvec2 uv = LTC_Uv( normal, viewDir, roughness );\n\t\tvec4 t1 = texture2D( ltc_1, uv );\n\t\tvec4 t2 = texture2D( ltc_2, uv );\n\t\tmat3 mInv = mat3(\n\t\t\tvec3( t1.x, 0, t1.y ),\n\t\t\tvec3(    0, 1,    0 ),\n\t\t\tvec3( t1.z, 0, t1.w )\n\t\t);\n\t\tvec3 fresnel = ( material.specularColor * t2.x + ( vec3( 1.0 ) - material.specularColor ) * t2.y );\n\t\treflectedLight.directSpecular += lightColor * fresnel * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords );\n\t\treflectedLight.directDiffuse += lightColor * material.diffuseColor * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );\n\t}\n#endif\nvoid RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\tfloat dotNL = saturate( dot( geometryNormal, directLight.direction ) );\n\tvec3 irradiance = dotNL * directLight.color;\n\t#ifdef USE_CLEARCOAT\n\t\tfloat dotNLcc = saturate( dot( geometryClearcoatNormal, directLight.direction ) );\n\t\tvec3 ccIrradiance = dotNLcc * directLight.color;\n\t\tclearcoatSpecularDirect += ccIrradiance * BRDF_GGX_Clearcoat( directLight.direction, geometryViewDir, geometryClearcoatNormal, material );\n\t#endif\n\t#ifdef USE_SHEEN\n\t\tsheenSpecularDirect += irradiance * BRDF_Sheen( directLight.direction, geometryViewDir, geometryNormal, material.sheenColor, material.sheenRoughness );\n\t#endif\n\treflectedLight.directSpecular += irradiance * BRDF_GGX( directLight.direction, geometryViewDir, geometryNormal, material );\n\treflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );\n}\nvoid RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\treflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );\n}\nvoid RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearcoatRadiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {\n\t#ifdef USE_CLEARCOAT\n\t\tclearcoatSpecularIndirect += clearcoatRadiance * EnvironmentBRDF( geometryClearcoatNormal, geometryViewDir, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );\n\t#endif\n\t#ifdef USE_SHEEN\n\t\tsheenSpecularIndirect += irradiance * material.sheenColor * IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n\t#endif\n\tvec3 singleScattering = vec3( 0.0 );\n\tvec3 multiScattering = vec3( 0.0 );\n\tvec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;\n\t#ifdef USE_IRIDESCENCE\n\t\tcomputeMultiscatteringIridescence( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScattering, multiScattering );\n\t#else\n\t\tcomputeMultiscattering( geometryNormal, geometryViewDir, material.specularColor, material.specularF90, material.roughness, singleScattering, multiScattering );\n\t#endif\n\tvec3 totalScattering = singleScattering + multiScattering;\n\tvec3 diffuse = material.diffuseColor * ( 1.0 - max( max( totalScattering.r, totalScattering.g ), totalScattering.b ) );\n\treflectedLight.indirectSpecular += radiance * singleScattering;\n\treflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;\n\treflectedLight.indirectDiffuse += diffuse * cosineWeightedIrradiance;\n}\n#define RE_Direct\t\t\t\tRE_Direct_Physical\n#define RE_Direct_RectArea\t\tRE_Direct_RectArea_Physical\n#define RE_IndirectDiffuse\t\tRE_IndirectDiffuse_Physical\n#define RE_IndirectSpecular\t\tRE_IndirectSpecular_Physical\nfloat computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {\n\treturn saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );\n}";
 
@@ -13898,7 +14003,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	var premultiplied_alpha_fragment = "#ifdef PREMULTIPLIED_ALPHA\n\tgl_FragColor.rgb *= gl_FragColor.a;\n#endif";
 
-	var project_vertex = "vec4 mvPosition = vec4( transformed, 1.0 );\n#ifdef USE_INSTANCING\n\tmvPosition = instanceMatrix * mvPosition;\n#endif\nmvPosition = modelViewMatrix * mvPosition;\ngl_Position = projectionMatrix * mvPosition;";
+	var project_vertex = "vec4 mvPosition = vec4( transformed, 1.0 );\n#ifdef USE_BATCHING\n\tmvPosition = batchingMatrix * mvPosition;\n#endif\n#ifdef USE_INSTANCING\n\tmvPosition = instanceMatrix * mvPosition;\n#endif\nmvPosition = modelViewMatrix * mvPosition;\ngl_Position = projectionMatrix * mvPosition;";
 
 	var dithering_fragment = "#ifdef DITHERING\n\tgl_FragColor.rgb = dithering( gl_FragColor.rgb );\n#endif";
 
@@ -13918,7 +14023,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	var skinbase_vertex = "#ifdef USE_SKINNING\n\tmat4 boneMatX = getBoneMatrix( skinIndex.x );\n\tmat4 boneMatY = getBoneMatrix( skinIndex.y );\n\tmat4 boneMatZ = getBoneMatrix( skinIndex.z );\n\tmat4 boneMatW = getBoneMatrix( skinIndex.w );\n#endif";
 
-	var skinning_pars_vertex = "#ifdef USE_SKINNING\n\tuniform mat4 bindMatrix;\n\tuniform mat4 bindMatrixInverse;\n\tuniform highp sampler2D boneTexture;\n\tuniform int boneTextureSize;\n\tmat4 getBoneMatrix( const in float i ) {\n\t\tfloat j = i * 4.0;\n\t\tfloat x = mod( j, float( boneTextureSize ) );\n\t\tfloat y = floor( j / float( boneTextureSize ) );\n\t\tfloat dx = 1.0 / float( boneTextureSize );\n\t\tfloat dy = 1.0 / float( boneTextureSize );\n\t\ty = dy * ( y + 0.5 );\n\t\tvec4 v1 = texture2D( boneTexture, vec2( dx * ( x + 0.5 ), y ) );\n\t\tvec4 v2 = texture2D( boneTexture, vec2( dx * ( x + 1.5 ), y ) );\n\t\tvec4 v3 = texture2D( boneTexture, vec2( dx * ( x + 2.5 ), y ) );\n\t\tvec4 v4 = texture2D( boneTexture, vec2( dx * ( x + 3.5 ), y ) );\n\t\tmat4 bone = mat4( v1, v2, v3, v4 );\n\t\treturn bone;\n\t}\n#endif";
+	var skinning_pars_vertex = "#ifdef USE_SKINNING\n\tuniform mat4 bindMatrix;\n\tuniform mat4 bindMatrixInverse;\n\tuniform highp sampler2D boneTexture;\n\tmat4 getBoneMatrix( const in float i ) {\n\t\tint size = textureSize( boneTexture, 0 ).x;\n\t\tint j = int( i ) * 4;\n\t\tint x = j % size;\n\t\tint y = j / size;\n\t\tvec4 v1 = texelFetch( boneTexture, ivec2( x, y ), 0 );\n\t\tvec4 v2 = texelFetch( boneTexture, ivec2( x + 1, y ), 0 );\n\t\tvec4 v3 = texelFetch( boneTexture, ivec2( x + 2, y ), 0 );\n\t\tvec4 v4 = texelFetch( boneTexture, ivec2( x + 3, y ), 0 );\n\t\treturn mat4( v1, v2, v3, v4 );\n\t}\n#endif";
 
 	var skinning_vertex = "#ifdef USE_SKINNING\n\tvec4 skinVertex = bindMatrix * vec4( transformed, 1.0 );\n\tvec4 skinned = vec4( 0.0 );\n\tskinned += boneMatX * skinVertex * skinWeight.x;\n\tskinned += boneMatY * skinVertex * skinWeight.y;\n\tskinned += boneMatZ * skinVertex * skinWeight.z;\n\tskinned += boneMatW * skinVertex * skinWeight.w;\n\ttransformed = ( bindMatrixInverse * skinned ).xyz;\n#endif";
 
@@ -13942,7 +14047,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	var uv_vertex = "#if defined( USE_UV ) || defined( USE_ANISOTROPY )\n\tvUv = vec3( uv, 1 ).xy;\n#endif\n#ifdef USE_MAP\n\tvMapUv = ( mapTransform * vec3( MAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_ALPHAMAP\n\tvAlphaMapUv = ( alphaMapTransform * vec3( ALPHAMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_LIGHTMAP\n\tvLightMapUv = ( lightMapTransform * vec3( LIGHTMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_AOMAP\n\tvAoMapUv = ( aoMapTransform * vec3( AOMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_BUMPMAP\n\tvBumpMapUv = ( bumpMapTransform * vec3( BUMPMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_NORMALMAP\n\tvNormalMapUv = ( normalMapTransform * vec3( NORMALMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_DISPLACEMENTMAP\n\tvDisplacementMapUv = ( displacementMapTransform * vec3( DISPLACEMENTMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_EMISSIVEMAP\n\tvEmissiveMapUv = ( emissiveMapTransform * vec3( EMISSIVEMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_METALNESSMAP\n\tvMetalnessMapUv = ( metalnessMapTransform * vec3( METALNESSMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_ROUGHNESSMAP\n\tvRoughnessMapUv = ( roughnessMapTransform * vec3( ROUGHNESSMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_ANISOTROPYMAP\n\tvAnisotropyMapUv = ( anisotropyMapTransform * vec3( ANISOTROPYMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_CLEARCOATMAP\n\tvClearcoatMapUv = ( clearcoatMapTransform * vec3( CLEARCOATMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_CLEARCOAT_NORMALMAP\n\tvClearcoatNormalMapUv = ( clearcoatNormalMapTransform * vec3( CLEARCOAT_NORMALMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_CLEARCOAT_ROUGHNESSMAP\n\tvClearcoatRoughnessMapUv = ( clearcoatRoughnessMapTransform * vec3( CLEARCOAT_ROUGHNESSMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_IRIDESCENCEMAP\n\tvIridescenceMapUv = ( iridescenceMapTransform * vec3( IRIDESCENCEMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_IRIDESCENCE_THICKNESSMAP\n\tvIridescenceThicknessMapUv = ( iridescenceThicknessMapTransform * vec3( IRIDESCENCE_THICKNESSMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_SHEEN_COLORMAP\n\tvSheenColorMapUv = ( sheenColorMapTransform * vec3( SHEEN_COLORMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_SHEEN_ROUGHNESSMAP\n\tvSheenRoughnessMapUv = ( sheenRoughnessMapTransform * vec3( SHEEN_ROUGHNESSMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_SPECULARMAP\n\tvSpecularMapUv = ( specularMapTransform * vec3( SPECULARMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_SPECULAR_COLORMAP\n\tvSpecularColorMapUv = ( specularColorMapTransform * vec3( SPECULAR_COLORMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_SPECULAR_INTENSITYMAP\n\tvSpecularIntensityMapUv = ( specularIntensityMapTransform * vec3( SPECULAR_INTENSITYMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_TRANSMISSIONMAP\n\tvTransmissionMapUv = ( transmissionMapTransform * vec3( TRANSMISSIONMAP_UV, 1 ) ).xy;\n#endif\n#ifdef USE_THICKNESSMAP\n\tvThicknessMapUv = ( thicknessMapTransform * vec3( THICKNESSMAP_UV, 1 ) ).xy;\n#endif";
 
-	var worldpos_vertex = "#if defined( USE_ENVMAP ) || defined( DISTANCE ) || defined ( USE_SHADOWMAP ) || defined ( USE_TRANSMISSION ) || NUM_SPOT_LIGHT_COORDS > 0\n\tvec4 worldPosition = vec4( transformed, 1.0 );\n\t#ifdef USE_INSTANCING\n\t\tworldPosition = instanceMatrix * worldPosition;\n\t#endif\n\tworldPosition = modelMatrix * worldPosition;\n#endif";
+	var worldpos_vertex = "#if defined( USE_ENVMAP ) || defined( DISTANCE ) || defined ( USE_SHADOWMAP ) || defined ( USE_TRANSMISSION ) || NUM_SPOT_LIGHT_COORDS > 0\n\tvec4 worldPosition = vec4( transformed, 1.0 );\n\t#ifdef USE_BATCHING\n\t\tworldPosition = batchingMatrix * worldPosition;\n\t#endif\n\t#ifdef USE_INSTANCING\n\t\tworldPosition = instanceMatrix * worldPosition;\n\t#endif\n\tworldPosition = modelMatrix * worldPosition;\n#endif";
 
 	const vertex$h = "varying vec2 vUv;\nuniform mat3 uvTransform;\nvoid main() {\n\tvUv = ( uvTransform * vec3( uv, 1 ) ).xy;\n\tgl_Position = vec4( position.xy, 1.0, 1.0 );\n}";
 
@@ -13956,11 +14061,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	const fragment$f = "uniform samplerCube tCube;\nuniform float tFlip;\nuniform float opacity;\nvarying vec3 vWorldDirection;\nvoid main() {\n\tvec4 texColor = textureCube( tCube, vec3( tFlip * vWorldDirection.x, vWorldDirection.yz ) );\n\tgl_FragColor = texColor;\n\tgl_FragColor.a *= opacity;\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n}";
 
-	const vertex$e = "#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvarying vec2 vHighPrecisionZW;\nvoid main() {\n\t#include <uv_vertex>\n\t#include <skinbase_vertex>\n\t#ifdef USE_DISPLACEMENTMAP\n\t\t#include <beginnormal_vertex>\n\t\t#include <morphnormal_vertex>\n\t\t#include <skinnormal_vertex>\n\t#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvHighPrecisionZW = gl_Position.zw;\n}";
+	const vertex$e = "#include <common>\n#include <batching_pars_vertex>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvarying vec2 vHighPrecisionZW;\nvoid main() {\n\t#include <uv_vertex>\n\t#include <batching_vertex>\n\t#include <skinbase_vertex>\n\t#ifdef USE_DISPLACEMENTMAP\n\t\t#include <beginnormal_vertex>\n\t\t#include <morphnormal_vertex>\n\t\t#include <skinnormal_vertex>\n\t#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvHighPrecisionZW = gl_Position.zw;\n}";
 
 	const fragment$e = "#if DEPTH_PACKING == 3200\n\tuniform float opacity;\n#endif\n#include <common>\n#include <packing>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvarying vec2 vHighPrecisionZW;\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( 1.0 );\n\t#if DEPTH_PACKING == 3200\n\t\tdiffuseColor.a = opacity;\n\t#endif\n\t#include <map_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\t#include <logdepthbuf_fragment>\n\tfloat fragCoordZ = 0.5 * vHighPrecisionZW[0] / vHighPrecisionZW[1] + 0.5;\n\t#if DEPTH_PACKING == 3200\n\t\tgl_FragColor = vec4( vec3( 1.0 - fragCoordZ ), opacity );\n\t#elif DEPTH_PACKING == 3201\n\t\tgl_FragColor = packDepthToRGBA( fragCoordZ );\n\t#endif\n}";
 
-	const vertex$d = "#define DISTANCE\nvarying vec3 vWorldPosition;\n#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <skinbase_vertex>\n\t#ifdef USE_DISPLACEMENTMAP\n\t\t#include <beginnormal_vertex>\n\t\t#include <morphnormal_vertex>\n\t\t#include <skinnormal_vertex>\n\t#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <worldpos_vertex>\n\t#include <clipping_planes_vertex>\n\tvWorldPosition = worldPosition.xyz;\n}";
+	const vertex$d = "#define DISTANCE\nvarying vec3 vWorldPosition;\n#include <common>\n#include <batching_pars_vertex>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <batching_vertex>\n\t#include <skinbase_vertex>\n\t#ifdef USE_DISPLACEMENTMAP\n\t\t#include <beginnormal_vertex>\n\t\t#include <morphnormal_vertex>\n\t\t#include <skinnormal_vertex>\n\t#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <worldpos_vertex>\n\t#include <clipping_planes_vertex>\n\tvWorldPosition = worldPosition.xyz;\n}";
 
 	const fragment$d = "#define DISTANCE\nuniform vec3 referencePosition;\nuniform float nearDistance;\nuniform float farDistance;\nvarying vec3 vWorldPosition;\n#include <common>\n#include <packing>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main () {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( 1.0 );\n\t#include <map_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\tfloat dist = length( vWorldPosition - referencePosition );\n\tdist = ( dist - nearDistance ) / ( farDistance - nearDistance );\n\tdist = saturate( dist );\n\tgl_FragColor = packDepthToRGBA( dist );\n}";
 
@@ -13972,31 +14077,31 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	const fragment$b = "uniform vec3 diffuse;\nuniform float opacity;\nuniform float dashSize;\nuniform float totalSize;\nvarying float vLineDistance;\n#include <common>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tif ( mod( vLineDistance, totalSize ) > dashSize ) {\n\t\tdiscard;\n\t}\n\tvec3 outgoingLight = vec3( 0.0 );\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\toutgoingLight = diffuseColor.rgb;\n\t#include <opaque_fragment>\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n}";
 
-	const vertex$a = "#include <common>\n#include <uv_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphcolor_vertex>\n\t#if defined ( USE_ENVMAP ) || defined ( USE_SKINNING )\n\t\t#include <beginnormal_vertex>\n\t\t#include <morphnormal_vertex>\n\t\t#include <skinbase_vertex>\n\t\t#include <skinnormal_vertex>\n\t\t#include <defaultnormal_vertex>\n\t#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <worldpos_vertex>\n\t#include <envmap_vertex>\n\t#include <fog_vertex>\n}";
+	const vertex$a = "#include <common>\n#include <batching_pars_vertex>\n#include <uv_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphcolor_vertex>\n\t#include <batching_vertex>\n\t#if defined ( USE_ENVMAP ) || defined ( USE_SKINNING )\n\t\t#include <beginnormal_vertex>\n\t\t#include <morphnormal_vertex>\n\t\t#include <skinbase_vertex>\n\t\t#include <skinnormal_vertex>\n\t\t#include <defaultnormal_vertex>\n\t#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <worldpos_vertex>\n\t#include <envmap_vertex>\n\t#include <fog_vertex>\n}";
 
 	const fragment$a = "uniform vec3 diffuse;\nuniform float opacity;\n#ifndef FLAT_SHADED\n\tvarying vec3 vNormal;\n#endif\n#include <common>\n#include <dithering_pars_fragment>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <envmap_common_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\t#include <specularmap_fragment>\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\t#ifdef USE_LIGHTMAP\n\t\tvec4 lightMapTexel = texture2D( lightMap, vLightMapUv );\n\t\treflectedLight.indirectDiffuse += lightMapTexel.rgb * lightMapIntensity * RECIPROCAL_PI;\n\t#else\n\t\treflectedLight.indirectDiffuse += vec3( 1.0 );\n\t#endif\n\t#include <aomap_fragment>\n\treflectedLight.indirectDiffuse *= diffuseColor.rgb;\n\tvec3 outgoingLight = reflectedLight.indirectDiffuse;\n\t#include <envmap_fragment>\n\t#include <opaque_fragment>\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n\t#include <dithering_fragment>\n}";
 
-	const vertex$9 = "#define LAMBERT\nvarying vec3 vViewPosition;\n#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphcolor_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <envmap_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
+	const vertex$9 = "#define LAMBERT\nvarying vec3 vViewPosition;\n#include <common>\n#include <batching_pars_vertex>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphcolor_vertex>\n\t#include <batching_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <envmap_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
 
 	const fragment$9 = "#define LAMBERT\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <dithering_pars_fragment>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_common_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <normal_pars_fragment>\n#include <lights_lambert_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\tvec3 totalEmissiveRadiance = emissive;\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\t#include <specularmap_fragment>\n\t#include <normal_fragment_begin>\n\t#include <normal_fragment_maps>\n\t#include <emissivemap_fragment>\n\t#include <lights_lambert_fragment>\n\t#include <lights_fragment_begin>\n\t#include <lights_fragment_maps>\n\t#include <lights_fragment_end>\n\t#include <aomap_fragment>\n\tvec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;\n\t#include <envmap_fragment>\n\t#include <opaque_fragment>\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n\t#include <dithering_fragment>\n}";
 
-	const vertex$8 = "#define MATCAP\nvarying vec3 vViewPosition;\n#include <common>\n#include <uv_pars_vertex>\n#include <color_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <fog_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphcolor_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <fog_vertex>\n\tvViewPosition = - mvPosition.xyz;\n}";
+	const vertex$8 = "#define MATCAP\nvarying vec3 vViewPosition;\n#include <common>\n#include <batching_pars_vertex>\n#include <uv_pars_vertex>\n#include <color_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <fog_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphcolor_vertex>\n\t#include <batching_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <fog_vertex>\n\tvViewPosition = - mvPosition.xyz;\n}";
 
 	const fragment$8 = "#define MATCAP\nuniform vec3 diffuse;\nuniform float opacity;\nuniform sampler2D matcap;\nvarying vec3 vViewPosition;\n#include <common>\n#include <dithering_pars_fragment>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <fog_pars_fragment>\n#include <normal_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\t#include <normal_fragment_begin>\n\t#include <normal_fragment_maps>\n\tvec3 viewDir = normalize( vViewPosition );\n\tvec3 x = normalize( vec3( viewDir.z, 0.0, - viewDir.x ) );\n\tvec3 y = cross( viewDir, x );\n\tvec2 uv = vec2( dot( x, normal ), dot( y, normal ) ) * 0.495 + 0.5;\n\t#ifdef USE_MATCAP\n\t\tvec4 matcapColor = texture2D( matcap, uv );\n\t#else\n\t\tvec4 matcapColor = vec4( vec3( mix( 0.2, 0.8, uv.y ) ), 1.0 );\n\t#endif\n\tvec3 outgoingLight = diffuseColor.rgb * matcapColor.rgb;\n\t#include <opaque_fragment>\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n\t#include <dithering_fragment>\n}";
 
-	const vertex$7 = "#define NORMAL\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP_TANGENTSPACE )\n\tvarying vec3 vViewPosition;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP_TANGENTSPACE )\n\tvViewPosition = - mvPosition.xyz;\n#endif\n}";
+	const vertex$7 = "#define NORMAL\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP_TANGENTSPACE )\n\tvarying vec3 vViewPosition;\n#endif\n#include <common>\n#include <batching_pars_vertex>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <batching_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP_TANGENTSPACE )\n\tvViewPosition = - mvPosition.xyz;\n#endif\n}";
 
 	const fragment$7 = "#define NORMAL\nuniform float opacity;\n#if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP_TANGENTSPACE )\n\tvarying vec3 vViewPosition;\n#endif\n#include <packing>\n#include <uv_pars_fragment>\n#include <normal_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\t#include <logdepthbuf_fragment>\n\t#include <normal_fragment_begin>\n\t#include <normal_fragment_maps>\n\tgl_FragColor = vec4( packNormalToRGB( normal ), opacity );\n\t#ifdef OPAQUE\n\t\tgl_FragColor.a = 1.0;\n\t#endif\n}";
 
-	const vertex$6 = "#define PHONG\nvarying vec3 vViewPosition;\n#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphcolor_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <envmap_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
+	const vertex$6 = "#define PHONG\nvarying vec3 vViewPosition;\n#include <common>\n#include <batching_pars_vertex>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphcolor_vertex>\n\t#include <batching_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <envmap_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
 
 	const fragment$6 = "#define PHONG\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform vec3 specular;\nuniform float shininess;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <dithering_pars_fragment>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_common_pars_fragment>\n#include <envmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <normal_pars_fragment>\n#include <lights_phong_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\tvec3 totalEmissiveRadiance = emissive;\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\t#include <specularmap_fragment>\n\t#include <normal_fragment_begin>\n\t#include <normal_fragment_maps>\n\t#include <emissivemap_fragment>\n\t#include <lights_phong_fragment>\n\t#include <lights_fragment_begin>\n\t#include <lights_fragment_maps>\n\t#include <lights_fragment_end>\n\t#include <aomap_fragment>\n\tvec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;\n\t#include <envmap_fragment>\n\t#include <opaque_fragment>\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n\t#include <dithering_fragment>\n}";
 
-	const vertex$5 = "#define STANDARD\nvarying vec3 vViewPosition;\n#ifdef USE_TRANSMISSION\n\tvarying vec3 vWorldPosition;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphcolor_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n#ifdef USE_TRANSMISSION\n\tvWorldPosition = worldPosition.xyz;\n#endif\n}";
+	const vertex$5 = "#define STANDARD\nvarying vec3 vViewPosition;\n#ifdef USE_TRANSMISSION\n\tvarying vec3 vWorldPosition;\n#endif\n#include <common>\n#include <batching_pars_vertex>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphcolor_vertex>\n\t#include <batching_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n#ifdef USE_TRANSMISSION\n\tvWorldPosition = worldPosition.xyz;\n#endif\n}";
 
 	const fragment$5 = "#define STANDARD\n#ifdef PHYSICAL\n\t#define IOR\n\t#define USE_SPECULAR\n#endif\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform float roughness;\nuniform float metalness;\nuniform float opacity;\n#ifdef IOR\n\tuniform float ior;\n#endif\n#ifdef USE_SPECULAR\n\tuniform float specularIntensity;\n\tuniform vec3 specularColor;\n\t#ifdef USE_SPECULAR_COLORMAP\n\t\tuniform sampler2D specularColorMap;\n\t#endif\n\t#ifdef USE_SPECULAR_INTENSITYMAP\n\t\tuniform sampler2D specularIntensityMap;\n\t#endif\n#endif\n#ifdef USE_CLEARCOAT\n\tuniform float clearcoat;\n\tuniform float clearcoatRoughness;\n#endif\n#ifdef USE_IRIDESCENCE\n\tuniform float iridescence;\n\tuniform float iridescenceIOR;\n\tuniform float iridescenceThicknessMinimum;\n\tuniform float iridescenceThicknessMaximum;\n#endif\n#ifdef USE_SHEEN\n\tuniform vec3 sheenColor;\n\tuniform float sheenRoughness;\n\t#ifdef USE_SHEEN_COLORMAP\n\t\tuniform sampler2D sheenColorMap;\n\t#endif\n\t#ifdef USE_SHEEN_ROUGHNESSMAP\n\t\tuniform sampler2D sheenRoughnessMap;\n\t#endif\n#endif\n#ifdef USE_ANISOTROPY\n\tuniform vec2 anisotropyVector;\n\t#ifdef USE_ANISOTROPYMAP\n\t\tuniform sampler2D anisotropyMap;\n\t#endif\n#endif\nvarying vec3 vViewPosition;\n#include <common>\n#include <packing>\n#include <dithering_pars_fragment>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <iridescence_fragment>\n#include <cube_uv_reflection_fragment>\n#include <envmap_common_pars_fragment>\n#include <envmap_physical_pars_fragment>\n#include <fog_pars_fragment>\n#include <lights_pars_begin>\n#include <normal_pars_fragment>\n#include <lights_physical_pars_fragment>\n#include <transmission_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <clearcoat_pars_fragment>\n#include <iridescence_pars_fragment>\n#include <roughnessmap_pars_fragment>\n#include <metalnessmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\tvec3 totalEmissiveRadiance = emissive;\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\t#include <roughnessmap_fragment>\n\t#include <metalnessmap_fragment>\n\t#include <normal_fragment_begin>\n\t#include <normal_fragment_maps>\n\t#include <clearcoat_normal_fragment_begin>\n\t#include <clearcoat_normal_fragment_maps>\n\t#include <emissivemap_fragment>\n\t#include <lights_physical_fragment>\n\t#include <lights_fragment_begin>\n\t#include <lights_fragment_maps>\n\t#include <lights_fragment_end>\n\t#include <aomap_fragment>\n\tvec3 totalDiffuse = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse;\n\tvec3 totalSpecular = reflectedLight.directSpecular + reflectedLight.indirectSpecular;\n\t#include <transmission_fragment>\n\tvec3 outgoingLight = totalDiffuse + totalSpecular + totalEmissiveRadiance;\n\t#ifdef USE_SHEEN\n\t\tfloat sheenEnergyComp = 1.0 - 0.157 * max3( material.sheenColor );\n\t\toutgoingLight = outgoingLight * sheenEnergyComp + sheenSpecularDirect + sheenSpecularIndirect;\n\t#endif\n\t#ifdef USE_CLEARCOAT\n\t\tfloat dotNVcc = saturate( dot( geometryClearcoatNormal, geometryViewDir ) );\n\t\tvec3 Fcc = F_Schlick( material.clearcoatF0, material.clearcoatF90, dotNVcc );\n\t\toutgoingLight = outgoingLight * ( 1.0 - material.clearcoat * Fcc ) + ( clearcoatSpecularDirect + clearcoatSpecularIndirect ) * material.clearcoat;\n\t#endif\n\t#include <opaque_fragment>\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n\t#include <dithering_fragment>\n}";
 
-	const vertex$4 = "#define TOON\nvarying vec3 vViewPosition;\n#include <common>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphcolor_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
+	const vertex$4 = "#define TOON\nvarying vec3 vViewPosition;\n#include <common>\n#include <batching_pars_vertex>\n#include <uv_pars_vertex>\n#include <displacementmap_pars_vertex>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <normal_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <color_vertex>\n\t#include <morphcolor_vertex>\n\t#include <batching_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <normal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <displacementmap_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\tvViewPosition = - mvPosition.xyz;\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
 
 	const fragment$4 = "#define TOON\nuniform vec3 diffuse;\nuniform vec3 emissive;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <dithering_pars_fragment>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <gradientmap_pars_fragment>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <normal_pars_fragment>\n#include <lights_toon_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <bumpmap_pars_fragment>\n#include <normalmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\tvec3 totalEmissiveRadiance = emissive;\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\t#include <normal_fragment_begin>\n\t#include <normal_fragment_maps>\n\t#include <emissivemap_fragment>\n\t#include <lights_toon_fragment>\n\t#include <lights_fragment_begin>\n\t#include <lights_fragment_maps>\n\t#include <lights_fragment_end>\n\t#include <aomap_fragment>\n\tvec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;\n\t#include <opaque_fragment>\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n\t#include <dithering_fragment>\n}";
 
@@ -14004,7 +14109,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	const fragment$3 = "uniform vec3 diffuse;\nuniform float opacity;\n#include <common>\n#include <color_pars_fragment>\n#include <map_particle_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec3 outgoingLight = vec3( 0.0 );\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_particle_fragment>\n\t#include <color_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\toutgoingLight = diffuseColor.rgb;\n\t#include <opaque_fragment>\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n}";
 
-	const vertex$2 = "#include <common>\n#include <fog_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <shadowmap_pars_vertex>\nvoid main() {\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
+	const vertex$2 = "#include <common>\n#include <batching_pars_vertex>\n#include <fog_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <shadowmap_pars_vertex>\nvoid main() {\n\t#include <batching_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
 
 	const fragment$2 = "uniform vec3 color;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <logdepthbuf_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\nvoid main() {\n\t#include <logdepthbuf_fragment>\n\tgl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n}";
 
@@ -14021,6 +14126,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		alphatest_pars_fragment: alphatest_pars_fragment,
 		aomap_fragment: aomap_fragment,
 		aomap_pars_fragment: aomap_pars_fragment,
+		batching_pars_vertex: batching_pars_vertex,
+		batching_vertex: batching_vertex,
 		begin_vertex: begin_vertex,
 		beginnormal_vertex: beginnormal_vertex,
 		bsdfs: bsdfs,
@@ -15634,11 +15741,42 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
+		function renderMultiDraw( starts, counts, drawCount ) {
+
+			if ( drawCount === 0 ) return;
+
+			const extension = extensions.get( 'WEBGL_multi_draw' );
+			if ( extension === null ) {
+
+				for ( let i = 0; i < drawCount; i ++ ) {
+
+					this.render( starts[ i ], counts[ i ] );
+
+				}
+
+			} else {
+
+				extension.multiDrawArraysWEBGL( mode, starts, 0, counts, 0, drawCount );
+
+				let elementCount = 0;
+				for ( let i = 0; i < drawCount; i ++ ) {
+
+					elementCount += counts[ i ];
+
+				}
+
+				info.update( elementCount, mode, 1 );
+
+			}
+
+		}
+
 		//
 
 		this.setMode = setMode;
 		this.render = render;
 		this.renderInstances = renderInstances;
+		this.renderMultiDraw = renderMultiDraw;
 
 	}
 
@@ -15948,7 +16086,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		function get( texture ) {
 
-			if ( texture && texture.isTexture && texture.isRenderTargetTexture === false ) {
+			if ( texture && texture.isTexture ) {
 
 				const mapping = texture.mapping;
 
@@ -17520,12 +17658,43 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
+		function renderMultiDraw( starts, counts, drawCount ) {
+
+			if ( drawCount === 0 ) return;
+
+			const extension = extensions.get( 'WEBGL_multi_draw' );
+			if ( extension === null ) {
+
+				for ( let i = 0; i < drawCount; i ++ ) {
+
+					this.render( starts[ i ] / bytesPerElement, counts[ i ] );
+
+				}
+
+			} else {
+
+				extension.multiDrawElementsWEBGL( mode, counts, 0, type, starts, 0, drawCount );
+
+				let elementCount = 0;
+				for ( let i = 0; i < drawCount; i ++ ) {
+
+					elementCount += counts[ i ];
+
+				}
+
+				info.update( elementCount, mode, 1 );
+
+			}
+
+		}
+
 		//
 
 		this.setMode = setMode;
 		this.setIndex = setIndex;
 		this.render = render;
 		this.renderInstances = renderInstances;
+		this.renderMultiDraw = renderMultiDraw;
 
 	}
 
@@ -19632,6 +19801,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				customDefines,
 
+				parameters.batching ? '#define USE_BATCHING' : '',
 				parameters.instancing ? '#define USE_INSTANCING' : '',
 				parameters.instancingColor ? '#define USE_INSTANCING_COLOR' : '',
 
@@ -20414,6 +20584,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			const currentRenderTarget = renderer.getRenderTarget();
 
 			const IS_INSTANCEDMESH = object.isInstancedMesh === true;
+			const IS_BATCHEDMESH = object.isBatchedMesh === true;
 
 			const HAS_MAP = !! material.map;
 			const HAS_MATCAP = !! material.matcap;
@@ -20499,6 +20670,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				precision: precision,
 
+				batching: IS_BATCHEDMESH,
 				instancing: IS_INSTANCEDMESH,
 				instancingColor: IS_INSTANCEDMESH && object.instanceColor !== null,
 
@@ -20809,6 +20981,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				_programLayers.enable( 17 );
 			if ( parameters.alphaHash )
 				_programLayers.enable( 18 );
+			if ( parameters.batching )
+				_programLayers.enable( 19 );
 
 			array.push( _programLayers.mask );
 			_programLayers.disableAll();
@@ -22346,7 +22520,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 								const depthMaterial = getDepthMaterial( object, groupMaterial, light, type );
 
+								object.onBeforeShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, group );
+
 								_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
+
+								object.onAfterShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, group );
 
 							}
 
@@ -22356,7 +22534,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						const depthMaterial = getDepthMaterial( object, material, light, type );
 
+						object.onBeforeShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, null );
+
 						_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
+
+						object.onAfterShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, null );
 
 					}
 
@@ -24457,7 +24639,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				let mipmap;
 				const mipmaps = texture.mipmaps;
 
-				const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
+				const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true && glInternalFormat !== RGB_ETC1_Format );
 				const allocateMemory = ( sourceProperties.__version === undefined ) || ( forceUpload === true );
 				const levels = getMipLevels( texture, image, supportsMips );
 
@@ -26533,6 +26715,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			const controllers = [];
 			const controllerInputSources = [];
 
+			const currentSize = new Vector2();
+			let currentPixelRatio = null;
+
 			//
 
 			const cameraL = new PerspectiveCamera();
@@ -26669,6 +26854,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				scope.isPresenting = false;
 
+				renderer.setPixelRatio( currentPixelRatio );
+				renderer.setSize( currentSize.width, currentSize.height, false );
+
 				scope.dispatchEvent( { type: 'sessionend' } );
 
 			}
@@ -26756,6 +26944,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 					}
 
+					currentPixelRatio = renderer.getPixelRatio();
+					renderer.getSize( currentSize );
+
 					if ( ( session.renderState.layers === undefined ) || ( renderer.capabilities.isWebGL2 === false ) ) {
 
 						const layerInit = {
@@ -26769,6 +26960,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
 
 						session.updateRenderState( { baseLayer: glBaseLayer } );
+
+						renderer.setPixelRatio( 1 );
+						renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
 
 						newRenderTarget = new WebGLRenderTarget(
 							glBaseLayer.framebufferWidth,
@@ -26806,6 +27000,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
 
 						session.updateRenderState( { layers: [ glProjLayer ] } );
+
+						renderer.setPixelRatio( 1 );
+						renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
 
 						newRenderTarget = new WebGLRenderTarget(
 							glProjLayer.textureWidth,
@@ -29059,7 +29256,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				}
 
-				if ( object.isInstancedMesh ) {
+				if ( object.isBatchedMesh ) {
+
+					renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+
+				} else if ( object.isInstancedMesh ) {
 
 					renderer.renderInstances( drawStart, drawCount, object.count );
 
@@ -29878,6 +30079,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				const materialProperties = properties.get( material );
 
 				materialProperties.outputColorSpace = parameters.outputColorSpace;
+				materialProperties.batching = parameters.batching;
 				materialProperties.instancing = parameters.instancing;
 				materialProperties.instancingColor = parameters.instancingColor;
 				materialProperties.skinning = parameters.skinning;
@@ -29955,6 +30157,14 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						needsProgramChange = true;
 
 					} else if ( materialProperties.outputColorSpace !== colorSpace ) {
+
+						needsProgramChange = true;
+
+					} else if ( object.isBatchedMesh && materialProperties.batching === false ) {
+
+						needsProgramChange = true;
+
+					} else if ( ! object.isBatchedMesh && materialProperties.batching === true ) {
 
 						needsProgramChange = true;
 
@@ -30134,7 +30344,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 							if ( skeleton.boneTexture === null ) skeleton.computeBoneTexture();
 
 							p_uniforms.setValue( _gl, 'boneTexture', skeleton.boneTexture, textures );
-							p_uniforms.setValue( _gl, 'boneTextureSize', skeleton.boneTextureSize );
 
 						} else {
 
@@ -30143,6 +30352,13 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						}
 
 					}
+
+				}
+
+				if ( object.isBatchedMesh ) {
+
+					p_uniforms.setOptional( _gl, object, 'batchingTexture' );
+					p_uniforms.setValue( _gl, 'batchingTexture', object._matricesTexture, textures );
 
 				}
 
@@ -30902,7 +31118,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.count = array !== undefined ? array.length / stride : 0;
 
 			this.usage = StaticDrawUsage;
-			this.updateRange = { offset: 0, count: - 1 };
+			this._updateRange = { offset: 0, count: - 1 };
+			this.updateRanges = [];
 
 			this.version = 0;
 
@@ -30918,11 +31135,30 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
+		get updateRange() {
+
+			console.warn( 'THREE.InterleavedBuffer: "updateRange" is deprecated and removed in r169. Use "addUpdateRange()" instead.' ); // @deprecated, r159
+			return this._updateRange;
+
+		}
+
 		setUsage( value ) {
 
 			this.usage = value;
 
 			return this;
+
+		}
+
+		addUpdateRange( start, count ) {
+
+			this.updateRanges.push( { start, count } );
+
+		}
+
+		clearUpdateRanges() {
+
+			this.updateRanges.length = 0;
 
 		}
 
@@ -31032,7 +31268,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	const _vector$5 = /*@__PURE__*/ new Vector3();
+	const _vector$6 = /*@__PURE__*/ new Vector3();
 
 	class InterleavedBufferAttribute {
 
@@ -31072,11 +31308,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			for ( let i = 0, l = this.data.count; i < l; i ++ ) {
 
-				_vector$5.fromBufferAttribute( this, i );
+				_vector$6.fromBufferAttribute( this, i );
 
-				_vector$5.applyMatrix4( m );
+				_vector$6.applyMatrix4( m );
 
-				this.setXYZ( i, _vector$5.x, _vector$5.y, _vector$5.z );
+				this.setXYZ( i, _vector$6.x, _vector$6.y, _vector$6.z );
 
 			}
 
@@ -31088,11 +31324,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector$5.fromBufferAttribute( this, i );
+				_vector$6.fromBufferAttribute( this, i );
 
-				_vector$5.applyNormalMatrix( m );
+				_vector$6.applyNormalMatrix( m );
 
-				this.setXYZ( i, _vector$5.x, _vector$5.y, _vector$5.z );
+				this.setXYZ( i, _vector$6.x, _vector$6.y, _vector$6.z );
 
 			}
 
@@ -31104,11 +31340,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector$5.fromBufferAttribute( this, i );
+				_vector$6.fromBufferAttribute( this, i );
 
-				_vector$5.transformDirection( m );
+				_vector$6.transformDirection( m );
 
-				this.setXYZ( i, _vector$5.x, _vector$5.y, _vector$5.z );
+				this.setXYZ( i, _vector$6.x, _vector$6.y, _vector$6.z );
 
 			}
 
@@ -31795,7 +32031,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	const _matrix4 = /*@__PURE__*/ new Matrix4();
 	const _vertex = /*@__PURE__*/ new Vector3();
 
-	const _sphere$3 = /*@__PURE__*/ new Sphere();
+	const _sphere$4 = /*@__PURE__*/ new Sphere();
 	const _inverseMatrix$2 = /*@__PURE__*/ new Matrix4();
 	const _ray$2 = /*@__PURE__*/ new Ray();
 
@@ -31892,10 +32128,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( this.boundingSphere === null ) this.computeBoundingSphere();
 
-			_sphere$3.copy( this.boundingSphere );
-			_sphere$3.applyMatrix4( matrixWorld );
+			_sphere$4.copy( this.boundingSphere );
+			_sphere$4.applyMatrix4( matrixWorld );
 
-			if ( raycaster.ray.intersectsSphere( _sphere$3 ) === false ) return;
+			if ( raycaster.ray.intersectsSphere( _sphere$4 ) === false ) return;
 
 			// convert ray to local space of skinned mesh
 
@@ -32074,7 +32310,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	}
 
 	const _offsetMatrix = /*@__PURE__*/ new Matrix4();
-	const _identityMatrix = /*@__PURE__*/ new Matrix4();
+	const _identityMatrix$1 = /*@__PURE__*/ new Matrix4();
 
 	class Skeleton {
 
@@ -32087,7 +32323,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.boneMatrices = null;
 
 			this.boneTexture = null;
-			this.boneTextureSize = 0;
 
 			this.init();
 
@@ -32204,7 +32439,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				// compute the offset between the current and the original transform
 
-				const matrix = bones[ i ] ? bones[ i ].matrixWorld : _identityMatrix;
+				const matrix = bones[ i ] ? bones[ i ].matrixWorld : _identityMatrix$1;
 
 				_offsetMatrix.multiplyMatrices( matrix, boneInverses[ i ] );
 				_offsetMatrix.toArray( boneMatrices, i * 16 );
@@ -32235,7 +32470,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
 
 			let size = Math.sqrt( this.bones.length * 4 ); // 4 pixels needed for 1 matrix
-			size = ceilPowerOfTwo( size );
+			size = Math.ceil( size / 4 ) * 4;
 			size = Math.max( size, 4 );
 
 			const boneMatrices = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
@@ -32246,7 +32481,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.boneMatrices = boneMatrices;
 			this.boneTexture = boneTexture;
-			this.boneTextureSize = size;
 
 			return this;
 
@@ -32385,8 +32619,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	const _box3 = /*@__PURE__*/ new Box3();
 	const _identity = /*@__PURE__*/ new Matrix4();
-	const _mesh = /*@__PURE__*/ new Mesh();
-	const _sphere$2 = /*@__PURE__*/ new Sphere();
+	const _mesh$1 = /*@__PURE__*/ new Mesh();
+	const _sphere$3 = /*@__PURE__*/ new Sphere();
 
 	class InstancedMesh extends Mesh {
 
@@ -32466,9 +32700,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				this.getMatrixAt( i, _instanceLocalMatrix );
 
-				_sphere$2.copy( geometry.boundingSphere ).applyMatrix4( _instanceLocalMatrix );
+				_sphere$3.copy( geometry.boundingSphere ).applyMatrix4( _instanceLocalMatrix );
 
-				this.boundingSphere.union( _sphere$2 );
+				this.boundingSphere.union( _sphere$3 );
 
 			}
 
@@ -32508,19 +32742,19 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			const matrixWorld = this.matrixWorld;
 			const raycastTimes = this.count;
 
-			_mesh.geometry = this.geometry;
-			_mesh.material = this.material;
+			_mesh$1.geometry = this.geometry;
+			_mesh$1.material = this.material;
 
-			if ( _mesh.material === undefined ) return;
+			if ( _mesh$1.material === undefined ) return;
 
 			// test with bounding sphere first
 
 			if ( this.boundingSphere === null ) this.computeBoundingSphere();
 
-			_sphere$2.copy( this.boundingSphere );
-			_sphere$2.applyMatrix4( matrixWorld );
+			_sphere$3.copy( this.boundingSphere );
+			_sphere$3.applyMatrix4( matrixWorld );
 
-			if ( raycaster.ray.intersectsSphere( _sphere$2 ) === false ) return;
+			if ( raycaster.ray.intersectsSphere( _sphere$3 ) === false ) return;
 
 			// now test each instance
 
@@ -32534,9 +32768,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				// the mesh represents this single instance
 
-				_mesh.matrixWorld = _instanceWorldMatrix;
+				_mesh$1.matrixWorld = _instanceWorldMatrix;
 
-				_mesh.raycast( raycaster, _instanceIntersects );
+				_mesh$1.raycast( raycaster, _instanceIntersects );
 
 				// process the result of raycast
 
@@ -32580,6 +32814,1011 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		dispose() {
 
 			this.dispatchEvent( { type: 'dispose' } );
+
+		}
+
+	}
+
+	function sortOpaque( a, b ) {
+
+		return a.z - b.z;
+
+	}
+
+	function sortTransparent( a, b ) {
+
+		return b.z - a.z;
+
+	}
+
+	class MultiDrawRenderList {
+
+		constructor() {
+
+			this.index = 0;
+			this.pool = [];
+			this.list = [];
+
+		}
+
+		push( drawRange, z ) {
+
+			const pool = this.pool;
+			const list = this.list;
+			if ( this.index >= pool.length ) {
+
+				pool.push( {
+
+					start: - 1,
+					count: - 1,
+					z: - 1,
+
+				} );
+
+			}
+
+			const item = pool[ this.index ];
+			list.push( item );
+			this.index ++;
+
+			item.start = drawRange.start;
+			item.count = drawRange.count;
+			item.z = z;
+
+		}
+
+		reset() {
+
+			this.list.length = 0;
+			this.index = 0;
+
+		}
+
+	}
+
+	const ID_ATTR_NAME = 'batchId';
+	const _matrix = /*@__PURE__*/ new Matrix4();
+	const _invMatrixWorld = /*@__PURE__*/ new Matrix4();
+	const _identityMatrix = /*@__PURE__*/ new Matrix4();
+	const _projScreenMatrix$2 = /*@__PURE__*/ new Matrix4();
+	const _frustum = /*@__PURE__*/ new Frustum();
+	const _box$1 = /*@__PURE__*/ new Box3();
+	const _sphere$2 = /*@__PURE__*/ new Sphere();
+	const _vector$5 = /*@__PURE__*/ new Vector3();
+	const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
+	const _mesh = /*@__PURE__*/ new Mesh();
+	const _batchIntersects = [];
+
+	// @TODO: SkinnedMesh support?
+	// @TODO: geometry.groups support?
+	// @TODO: geometry.drawRange support?
+	// @TODO: geometry.morphAttributes support?
+	// @TODO: Support uniform parameter per geometry
+	// @TODO: Add an "optimize" function to pack geometry and remove data gaps
+
+	// copies data from attribute "src" into "target" starting at "targetOffset"
+	function copyAttributeData( src, target, targetOffset = 0 ) {
+
+		const itemSize = target.itemSize;
+		if ( src.isInterleavedBufferAttribute || src.array.constructor !== target.array.constructor ) {
+
+			// use the component getters and setters if the array data cannot
+			// be copied directly
+			const vertexCount = src.count;
+			for ( let i = 0; i < vertexCount; i ++ ) {
+
+				for ( let c = 0; c < itemSize; c ++ ) {
+
+					target.setComponent( i + targetOffset, c, src.getComponent( i, c ) );
+
+				}
+
+			}
+
+		} else {
+
+			// faster copy approach using typed array set function
+			target.array.set( src.array, targetOffset * itemSize );
+
+		}
+
+		target.needsUpdate = true;
+
+	}
+
+	class BatchedMesh extends Mesh {
+
+		get maxGeometryCount() {
+
+			return this._maxGeometryCount;
+
+		}
+
+		constructor( maxGeometryCount, maxVertexCount, maxIndexCount = maxVertexCount * 2, material ) {
+
+			super( new BufferGeometry(), material );
+
+			this.isBatchedMesh = true;
+			this.perObjectFrustumCulled = true;
+			this.sortObjects = true;
+			this.boundingBox = null;
+			this.boundingSphere = null;
+			this.customSort = null;
+
+			this._drawRanges = [];
+			this._reservedRanges = [];
+
+			this._visibility = [];
+			this._active = [];
+			this._bounds = [];
+
+			this._maxGeometryCount = maxGeometryCount;
+			this._maxVertexCount = maxVertexCount;
+			this._maxIndexCount = maxIndexCount;
+
+			this._geometryInitialized = false;
+			this._geometryCount = 0;
+			this._multiDrawCounts = new Int32Array( maxGeometryCount );
+			this._multiDrawStarts = new Int32Array( maxGeometryCount );
+			this._multiDrawCount = 0;
+			this._visibilityChanged = true;
+
+			// Local matrix per geometry by using data texture
+			this._matricesTexture = null;
+
+			this._initMatricesTexture();
+
+		}
+
+		_initMatricesTexture() {
+
+			// layout (1 matrix = 4 pixels)
+			//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
+			//  with  8x8  pixel texture max   16 matrices * 4 pixels =  (8 * 8)
+			//       16x16 pixel texture max   64 matrices * 4 pixels = (16 * 16)
+			//       32x32 pixel texture max  256 matrices * 4 pixels = (32 * 32)
+			//       64x64 pixel texture max 1024 matrices * 4 pixels = (64 * 64)
+
+			let size = Math.sqrt( this._maxGeometryCount * 4 ); // 4 pixels needed for 1 matrix
+			size = Math.ceil( size / 4 ) * 4;
+			size = Math.max( size, 4 );
+
+			const matricesArray = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
+			const matricesTexture = new DataTexture( matricesArray, size, size, RGBAFormat, FloatType );
+
+			this._matricesTexture = matricesTexture;
+
+		}
+
+		_initializeGeometry( reference ) {
+
+			const geometry = this.geometry;
+			const maxVertexCount = this._maxVertexCount;
+			const maxGeometryCount = this._maxGeometryCount;
+			const maxIndexCount = this._maxIndexCount;
+			if ( this._geometryInitialized === false ) {
+
+				for ( const attributeName in reference.attributes ) {
+
+					const srcAttribute = reference.getAttribute( attributeName );
+					const { array, itemSize, normalized } = srcAttribute;
+
+					const dstArray = new array.constructor( maxVertexCount * itemSize );
+					const dstAttribute = new srcAttribute.constructor( dstArray, itemSize, normalized );
+					dstAttribute.setUsage( srcAttribute.usage );
+
+					geometry.setAttribute( attributeName, dstAttribute );
+
+				}
+
+				if ( reference.getIndex() !== null ) {
+
+					const indexArray = maxVertexCount > 65536
+						? new Uint32Array( maxIndexCount )
+						: new Uint16Array( maxIndexCount );
+
+					geometry.setIndex( new BufferAttribute( indexArray, 1 ) );
+
+				}
+
+				const idArray = maxGeometryCount > 65536
+					? new Uint32Array( maxVertexCount )
+					: new Uint16Array( maxVertexCount );
+				geometry.setAttribute( ID_ATTR_NAME, new BufferAttribute( idArray, 1 ) );
+
+				this._geometryInitialized = true;
+
+			}
+
+		}
+
+		// Make sure the geometry is compatible with the existing combined geometry atributes
+		_validateGeometry( geometry ) {
+
+			// check that the geometry doesn't have a version of our reserved id attribute
+			if ( geometry.getAttribute( ID_ATTR_NAME ) ) {
+
+				throw new Error( `BatchedMesh: Geometry cannot use attribute "${ ID_ATTR_NAME }"` );
+
+			}
+
+			// check to ensure the geometries are using consistent attributes and indices
+			const batchGeometry = this.geometry;
+			if ( Boolean( geometry.getIndex() ) !== Boolean( batchGeometry.getIndex() ) ) {
+
+				throw new Error( 'BatchedMesh: All geometries must consistently have "index".' );
+
+			}
+
+			for ( const attributeName in batchGeometry.attributes ) {
+
+				if ( attributeName === ID_ATTR_NAME ) {
+
+					continue;
+
+				}
+
+				if ( ! geometry.hasAttribute( attributeName ) ) {
+
+					throw new Error( `BatchedMesh: Added geometry missing "${ attributeName }". All geometries must have consistent attributes.` );
+
+				}
+
+				const srcAttribute = geometry.getAttribute( attributeName );
+				const dstAttribute = batchGeometry.getAttribute( attributeName );
+				if ( srcAttribute.itemSize !== dstAttribute.itemSize || srcAttribute.normalized !== dstAttribute.normalized ) {
+
+					throw new Error( 'BatchedMesh: All attributes must have a consistent itemSize and normalized value.' );
+
+				}
+
+			}
+
+		}
+
+		setCustomSort( func ) {
+
+			this.customSort = func;
+			return this;
+
+		}
+
+		computeBoundingBox() {
+
+			if ( this.boundingBox === null ) {
+
+				this.boundingBox = new Box3();
+
+			}
+
+			const geometryCount = this._geometryCount;
+			const boundingBox = this.boundingBox;
+			const active = this._active;
+
+			boundingBox.makeEmpty();
+			for ( let i = 0; i < geometryCount; i ++ ) {
+
+				if ( active[ i ] === false ) continue;
+
+				this.getMatrixAt( i, _matrix );
+				this.getBoundingBoxAt( i, _box$1 ).applyMatrix4( _matrix );
+				boundingBox.union( _box$1 );
+
+			}
+
+		}
+
+		computeBoundingSphere() {
+
+			if ( this.boundingSphere === null ) {
+
+				this.boundingSphere = new Sphere();
+
+			}
+
+			const geometryCount = this._geometryCount;
+			const boundingSphere = this.boundingSphere;
+			const active = this._active;
+
+			boundingSphere.makeEmpty();
+			for ( let i = 0; i < geometryCount; i ++ ) {
+
+				if ( active[ i ] === false ) continue;
+
+				this.getMatrixAt( i, _matrix );
+				this.getBoundingSphereAt( i, _sphere$2 ).applyMatrix4( _matrix );
+				boundingSphere.union( _sphere$2 );
+
+			}
+
+		}
+
+		addGeometry( geometry, vertexCount = - 1, indexCount = - 1 ) {
+
+			this._initializeGeometry( geometry );
+
+			this._validateGeometry( geometry );
+
+			// ensure we're not over geometry
+			if ( this._geometryCount >= this._maxGeometryCount ) {
+
+				throw new Error( 'BatchedMesh: Maximum geometry count reached.' );
+
+			}
+
+			// get the necessary range fo the geometry
+			const reservedRange = {
+				vertexStart: - 1,
+				vertexCount: - 1,
+				indexStart: - 1,
+				indexCount: - 1,
+			};
+
+			let lastRange = null;
+			const reservedRanges = this._reservedRanges;
+			const drawRanges = this._drawRanges;
+			const bounds = this._bounds;
+			if ( this._geometryCount !== 0 ) {
+
+				lastRange = reservedRanges[ reservedRanges.length - 1 ];
+
+			}
+
+			if ( vertexCount === - 1 ) {
+
+				reservedRange.vertexCount = geometry.getAttribute( 'position' ).count;
+
+			} else {
+
+				reservedRange.vertexCount = vertexCount;
+
+			}
+
+			if ( lastRange === null ) {
+
+				reservedRange.vertexStart = 0;
+
+			} else {
+
+				reservedRange.vertexStart = lastRange.vertexStart + lastRange.vertexCount;
+
+			}
+
+			const index = geometry.getIndex();
+			const hasIndex = index !== null;
+			if ( hasIndex ) {
+
+				if ( indexCount	=== - 1 ) {
+
+					reservedRange.indexCount = index.count;
+
+				} else {
+
+					reservedRange.indexCount = indexCount;
+
+				}
+
+				if ( lastRange === null ) {
+
+					reservedRange.indexStart = 0;
+
+				} else {
+
+					reservedRange.indexStart = lastRange.indexStart + lastRange.indexCount;
+
+				}
+
+			}
+
+			if (
+				reservedRange.indexStart !== - 1 &&
+				reservedRange.indexStart + reservedRange.indexCount > this._maxIndexCount ||
+				reservedRange.vertexStart + reservedRange.vertexCount > this._maxVertexCount
+			) {
+
+				throw new Error( 'BatchedMesh: Reserved space request exceeds the maximum buffer size.' );
+
+			}
+
+			const visibility = this._visibility;
+			const active = this._active;
+			const matricesTexture = this._matricesTexture;
+			const matricesArray = this._matricesTexture.image.data;
+
+			// push new visibility states
+			visibility.push( true );
+			active.push( true );
+
+			// update id
+			const geometryId = this._geometryCount;
+			this._geometryCount ++;
+
+			// initialize matrix information
+			_identityMatrix.toArray( matricesArray, geometryId * 16 );
+			matricesTexture.needsUpdate = true;
+
+			// add the reserved range and draw range objects
+			reservedRanges.push( reservedRange );
+			drawRanges.push( {
+				start: hasIndex ? reservedRange.indexStart : reservedRange.vertexStart,
+				count: - 1
+			} );
+			bounds.push( {
+				boxInitialized: false,
+				box: new Box3(),
+
+				sphereInitialized: false,
+				sphere: new Sphere()
+			} );
+
+			// set the id for the geometry
+			const idAttribute = this.geometry.getAttribute( ID_ATTR_NAME );
+			for ( let i = 0; i < reservedRange.vertexCount; i ++ ) {
+
+				idAttribute.setX( reservedRange.vertexStart + i, geometryId );
+
+			}
+
+			idAttribute.needsUpdate = true;
+
+			// update the geometry
+			this.setGeometryAt( geometryId, geometry );
+
+			return geometryId;
+
+		}
+
+		setGeometryAt( id, geometry ) {
+
+			if ( id >= this._geometryCount ) {
+
+				throw new Error( 'BatchedMesh: Maximum geometry count reached.' );
+
+			}
+
+			this._validateGeometry( geometry );
+
+			const batchGeometry = this.geometry;
+			const hasIndex = batchGeometry.getIndex() !== null;
+			const dstIndex = batchGeometry.getIndex();
+			const srcIndex = geometry.getIndex();
+			const reservedRange = this._reservedRanges[ id ];
+			if (
+				hasIndex &&
+				srcIndex.count > reservedRange.indexCount ||
+				geometry.attributes.position.count > reservedRange.vertexCount
+			) {
+
+				throw new Error( 'BatchedMesh: Reserved space not large enough for provided geometry.' );
+
+			}
+
+			// copy geometry over
+			const vertexStart = reservedRange.vertexStart;
+			const vertexCount = reservedRange.vertexCount;
+			for ( const attributeName in batchGeometry.attributes ) {
+
+				if ( attributeName === ID_ATTR_NAME ) {
+
+					continue;
+
+				}
+
+				// copy attribute data
+				const srcAttribute = geometry.getAttribute( attributeName );
+				const dstAttribute = batchGeometry.getAttribute( attributeName );
+				copyAttributeData( srcAttribute, dstAttribute, vertexStart );
+
+				// fill the rest in with zeroes
+				const itemSize = srcAttribute.itemSize;
+				for ( let i = srcAttribute.count, l = vertexCount; i < l; i ++ ) {
+
+					const index = vertexStart + i;
+					for ( let c = 0; c < itemSize; c ++ ) {
+
+						dstAttribute.setComponent( index, c, 0 );
+
+					}
+
+				}
+
+				dstAttribute.needsUpdate = true;
+
+			}
+
+			// copy index
+			if ( hasIndex ) {
+
+				const indexStart = reservedRange.indexStart;
+
+				// copy index data over
+				for ( let i = 0; i < srcIndex.count; i ++ ) {
+
+					dstIndex.setX( indexStart + i, vertexStart + srcIndex.getX( i ) );
+
+				}
+
+				// fill the rest in with zeroes
+				for ( let i = srcIndex.count, l = reservedRange.indexCount; i < l; i ++ ) {
+
+					dstIndex.setX( indexStart + i, vertexStart );
+
+				}
+
+				dstIndex.needsUpdate = true;
+
+			}
+
+			// store the bounding boxes
+			const bound = this._bounds[ id ];
+			if ( geometry.boundingBox !== null ) {
+
+				bound.box.copy( geometry.boundingBox );
+				bound.boxInitialized = true;
+
+			} else {
+
+				bound.boxInitialized = false;
+
+			}
+
+			if ( geometry.boundingSphere !== null ) {
+
+				bound.sphere.copy( geometry.boundingSphere );
+				bound.sphereInitialized = true;
+
+			} else {
+
+				bound.sphereInitialized = false;
+
+			}
+
+			// set drawRange count
+			const drawRange = this._drawRanges[ id ];
+			const posAttr = geometry.getAttribute( 'position' );
+			drawRange.count = hasIndex ? srcIndex.count : posAttr.count;
+			this._visibilityChanged = true;
+
+			return id;
+
+		}
+
+		deleteGeometry( geometryId ) {
+
+			// Note: User needs to call optimize() afterward to pack the data.
+
+			const active = this._active;
+			if ( geometryId >= active.length || active[ geometryId ] === false ) {
+
+				return this;
+
+			}
+
+			active[ geometryId ] = false;
+			this._visibilityChanged = true;
+
+			return this;
+
+		}
+
+		// get bounding box and compute it if it doesn't exist
+		getBoundingBoxAt( id, target ) {
+
+			const active = this._active;
+			if ( active[ id ] === false ) {
+
+				return this;
+
+			}
+
+			// compute bounding box
+			const bound = this._bounds[ id ];
+			const box = bound.box;
+			const geometry = this.geometry;
+			if ( bound.boxInitialized === false ) {
+
+				box.makeEmpty();
+
+				const index = geometry.index;
+				const position = geometry.attributes.position;
+				const drawRange = this._drawRanges[ id ];
+				for ( let i = drawRange.start, l = drawRange.start + drawRange.count; i < l; i ++ ) {
+
+					let iv = i;
+					if ( index ) {
+
+						iv = index.getX( iv );
+
+					}
+
+					box.expandByPoint( _vector$5.fromBufferAttribute( position, iv ) );
+
+				}
+
+				bound.boxInitialized = true;
+
+			}
+
+			target.copy( box );
+			return target;
+
+		}
+
+		// get bounding sphere and compute it if it doesn't exist
+		getBoundingSphereAt( id, target ) {
+
+			const active = this._active;
+			if ( active[ id ] === false ) {
+
+				return this;
+
+			}
+
+			// compute bounding sphere
+			const bound = this._bounds[ id ];
+			const sphere = bound.sphere;
+			const geometry = this.geometry;
+			if ( bound.sphereInitialized === false ) {
+
+				sphere.makeEmpty();
+
+				this.getBoundingBoxAt( id, _box$1 );
+				_box$1.getCenter( sphere.center );
+
+				const index = geometry.index;
+				const position = geometry.attributes.position;
+				const drawRange = this._drawRanges[ id ];
+
+				let maxRadiusSq = 0;
+				for ( let i = drawRange.start, l = drawRange.start + drawRange.count; i < l; i ++ ) {
+
+					let iv = i;
+					if ( index ) {
+
+						iv = index.getX( iv );
+
+					}
+
+					_vector$5.fromBufferAttribute( position, iv );
+					maxRadiusSq = Math.max( maxRadiusSq, sphere.center.distanceToSquared( _vector$5 ) );
+
+				}
+
+				sphere.radius = Math.sqrt( maxRadiusSq );
+				bound.sphereInitialized = true;
+
+			}
+
+			target.copy( sphere );
+			return target;
+
+		}
+
+		setMatrixAt( geometryId, matrix ) {
+
+			// @TODO: Map geometryId to index of the arrays because
+			//        optimize() can make geometryId mismatch the index
+
+			const active = this._active;
+			const matricesTexture = this._matricesTexture;
+			const matricesArray = this._matricesTexture.image.data;
+			const geometryCount = this._geometryCount;
+			if ( geometryId >= geometryCount || active[ geometryId ] === false ) {
+
+				return this;
+
+			}
+
+			matrix.toArray( matricesArray, geometryId * 16 );
+			matricesTexture.needsUpdate = true;
+
+			return this;
+
+		}
+
+		getMatrixAt( geometryId, matrix ) {
+
+			const active = this._active;
+			const matricesArray = this._matricesTexture.image.data;
+			const geometryCount = this._geometryCount;
+			if ( geometryId >= geometryCount || active[ geometryId ] === false ) {
+
+				return null;
+
+			}
+
+			return matrix.fromArray( matricesArray, geometryId * 16 );
+
+		}
+
+		setVisibleAt( geometryId, value ) {
+
+			const visibility = this._visibility;
+			const active = this._active;
+			const geometryCount = this._geometryCount;
+
+			// if the geometry is out of range, not active, or visibility state
+			// does not change then return early
+			if (
+				geometryId >= geometryCount ||
+				active[ geometryId ] === false ||
+				visibility[ geometryId ] === value
+			) {
+
+				return this;
+
+			}
+
+			visibility[ geometryId ] = value;
+			this._visibilityChanged = true;
+
+			return this;
+
+		}
+
+		getVisibleAt( geometryId ) {
+
+			const visibility = this._visibility;
+			const active = this._active;
+			const geometryCount = this._geometryCount;
+
+			// return early if the geometry is out of range or not active
+			if ( geometryId >= geometryCount || active[ geometryId ] === false ) {
+
+				return false;
+
+			}
+
+			return visibility[ geometryId ];
+
+		}
+
+		raycast( raycaster, intersects ) {
+
+			const visibility = this._visibility;
+			const active = this._active;
+			const drawRanges = this._drawRanges;
+			const geometryCount = this._geometryCount;
+			const matrixWorld = this.matrixWorld;
+			const batchGeometry = this.geometry;
+
+			// iterate over each geometry
+			_mesh.material = this.material;
+			_mesh.geometry.index = batchGeometry.index;
+			_mesh.geometry.attributes = batchGeometry.attributes;
+			if ( _mesh.geometry.boundingBox === null ) {
+
+				_mesh.geometry.boundingBox = new Box3();
+
+			}
+
+			if ( _mesh.geometry.boundingSphere === null ) {
+
+				_mesh.geometry.boundingSphere = new Sphere();
+
+			}
+
+			for ( let i = 0; i < geometryCount; i ++ ) {
+
+				if ( ! visibility[ i ] || ! active[ i ] ) {
+
+					continue;
+
+				}
+
+				const drawRange = drawRanges[ i ];
+				_mesh.geometry.setDrawRange( drawRange.start, drawRange.count );
+
+				// ge the intersects
+				this.getMatrixAt( i, _mesh.matrixWorld ).premultiply( matrixWorld );
+				this.getBoundingBoxAt( i, _mesh.geometry.boundingBox );
+				this.getBoundingSphereAt( i, _mesh.geometry.boundingSphere );
+				_mesh.raycast( raycaster, _batchIntersects );
+
+				// add batch id to the intersects
+				for ( let j = 0, l = _batchIntersects.length; j < l; j ++ ) {
+
+					const intersect = _batchIntersects[ j ];
+					intersect.object = this;
+					intersect.batchId = i;
+					intersects.push( intersect );
+
+				}
+
+				_batchIntersects.length = 0;
+
+			}
+
+			_mesh.material = null;
+			_mesh.geometry.index = null;
+			_mesh.geometry.attributes = {};
+			_mesh.geometry.setDrawRange( 0, Infinity );
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.geometry = source.geometry.clone();
+			this.perObjectFrustumCulled = source.perObjectFrustumCulled;
+			this.sortObjects = source.sortObjects;
+			this.boundingBox = source.boundingBox !== null ? source.boundingBox.clone() : null;
+			this.boundingSphere = source.boundingSphere !== null ? source.boundingSphere.clone() : null;
+
+			this._drawRanges = source._drawRanges.map( range => ( { ...range } ) );
+			this._reservedRanges = source._reservedRanges.map( range => ( { ...range } ) );
+
+			this._visibility = source._visibility.slice();
+			this._active = source._active.slice();
+			this._bounds = source._bounds.map( bound => ( {
+				boxInitialized: bound.boxInitialized,
+				box: bound.box.clone(),
+
+				sphereInitialized: bound.sphereInitialized,
+				sphere: bound.sphere.clone()
+			} ) );
+
+			this._maxGeometryCount = source._maxGeometryCount;
+			this._maxVertexCount = source._maxVertexCount;
+			this._maxIndexCount = source._maxIndexCount;
+
+			this._geometryInitialized = source._geometryInitialized;
+			this._geometryCount = source._geometryCount;
+			this._multiDrawCounts = source._multiDrawCounts.slice();
+			this._multiDrawStarts = source._multiDrawStarts.slice();
+
+			this._matricesTexture = source._matricesTexture.clone();
+			this._matricesTexture.image.data = this._matricesTexture.image.slice();
+
+			return this;
+
+		}
+
+		dispose() {
+
+			// Assuming the geometry is not shared with other meshes
+			this.geometry.dispose();
+
+			this._matricesTexture.dispose();
+			this._matricesTexture = null;
+			return this;
+
+		}
+
+		onBeforeRender( renderer, scene, camera, geometry, material/*, _group*/ ) {
+
+			// if visibility has not changed and frustum culling and object sorting is not required
+			// then skip iterating over all items
+			if ( ! this._visibilityChanged && ! this.perObjectFrustumCulled && ! this.sortObjects ) {
+
+				return;
+
+			}
+
+			// the indexed version of the multi draw function requires specifying the start
+			// offset in bytes.
+			const index = geometry.getIndex();
+			const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
+
+			const visibility = this._visibility;
+			const multiDrawStarts = this._multiDrawStarts;
+			const multiDrawCounts = this._multiDrawCounts;
+			const drawRanges = this._drawRanges;
+			const perObjectFrustumCulled = this.perObjectFrustumCulled;
+
+			// prepare the frustum in the local frame
+			if ( perObjectFrustumCulled ) {
+
+				_projScreenMatrix$2
+					.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
+					.multiply( this.matrixWorld );
+				_frustum.setFromProjectionMatrix(
+					_projScreenMatrix$2,
+					renderer.isWebGPURenderer ? WebGPUCoordinateSystem : WebGLCoordinateSystem
+				);
+
+			}
+
+			let count = 0;
+			if ( this.sortObjects ) {
+
+				// get the camera position in the local frame
+				_invMatrixWorld.copy( this.matrixWorld ).invert();
+				_vector$5.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _invMatrixWorld );
+
+				for ( let i = 0, l = visibility.length; i < l; i ++ ) {
+
+					if ( visibility[ i ] ) {
+
+						// get the bounds in world space
+						this.getMatrixAt( i, _matrix );
+						this.getBoundingSphereAt( i, _sphere$2 ).applyMatrix4( _matrix );
+
+						// determine whether the batched geometry is within the frustum
+						let culled = false;
+						if ( perObjectFrustumCulled ) {
+
+							culled = ! _frustum.intersectsSphere( _sphere$2 );
+
+						}
+
+						if ( ! culled ) {
+
+							// get the distance from camera used for sorting
+							const z = _vector$5.distanceTo( _sphere$2.center );
+							_renderList.push( drawRanges[ i ], z );
+
+						}
+
+					}
+
+				}
+
+				// Sort the draw ranges and prep for rendering
+				const list = _renderList.list;
+				const customSort = this.customSort;
+				if ( customSort === null ) {
+
+					list.sort( material.transparent ? sortTransparent : sortOpaque );
+
+				} else {
+
+					customSort.call( this, list, camera );
+
+				}
+
+				for ( let i = 0, l = list.length; i < l; i ++ ) {
+
+					const item = list[ i ];
+					multiDrawStarts[ count ] = item.start * bytesPerElement;
+					multiDrawCounts[ count ] = item.count;
+					count ++;
+
+				}
+
+				_renderList.reset();
+
+			} else {
+
+				for ( let i = 0, l = visibility.length; i < l; i ++ ) {
+
+					if ( visibility[ i ] ) {
+
+						// determine whether the batched geometry is within the frustum
+						let culled = false;
+						if ( perObjectFrustumCulled ) {
+
+							// get the bounds in world space
+							this.getMatrixAt( i, _matrix );
+							this.getBoundingSphereAt( i, _sphere$2 ).applyMatrix4( _matrix );
+							culled = ! _frustum.intersectsSphere( _sphere$2 );
+
+						}
+
+						if ( ! culled ) {
+
+							const range = drawRanges[ i ];
+							multiDrawStarts[ count ] = range.start * bytesPerElement;
+							multiDrawCounts[ count ] = range.count;
+							count ++;
+
+						}
+
+					}
+
+				}
+
+			}
+
+			this._multiDrawCount = count;
+			this._visibilityChanged = false;
+
+		}
+
+		onBeforeShadow( renderer, object, camera, shadowCamera, geometry, depthMaterial/* , group */ ) {
+
+			this.onBeforeRender( renderer, null, shadowCamera, geometry, depthMaterial );
 
 		}
 
@@ -44359,13 +45598,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
 				if ( attribute.usage !== undefined ) bufferAttribute.setUsage( attribute.usage );
 
-				if ( attribute.updateRange !== undefined ) {
-
-					bufferAttribute.updateRange.offset = attribute.updateRange.offset;
-					bufferAttribute.updateRange.count = attribute.updateRange.count;
-
-				}
-
 				geometry.setAttribute( key, bufferAttribute );
 
 			}
@@ -45292,6 +46524,52 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 					break;
 
+				case 'BatchedMesh':
+
+					geometry = getGeometry( data.geometry );
+					material = getMaterial( data.material );
+
+					object = new BatchedMesh( data.maxGeometryCount, data.maxVertexCount, data.maxIndexCount, material );
+					object.geometry = geometry;
+					object.perObjectFrustumCulled = data.perObjectFrustumCulled;
+					object.sortObjects = data.sortObjects;
+
+					object._drawRanges = data.drawRanges;
+					object._reservedRanges = data.reservedRanges;
+
+					object._visibility = data.visibility;
+					object._active = data.active;
+					object._bounds = data.bounds.map( bound => {
+
+						const box = new Box3();
+						box.min.fromArray( bound.boxMin );
+						box.max.fromArray( bound.boxMax );
+
+						const sphere = new Sphere();
+						sphere.radius = bound.sphereRadius;
+						sphere.center.fromArray( bound.sphereCenter );
+
+						return {
+							boxInitialized: bound.boxInitialized,
+							box: box,
+
+							sphereInitialized: bound.sphereInitialized,
+							sphere: sphere
+						};
+
+					} );
+
+					object._maxGeometryCount = data.maxGeometryCount;
+					object._maxVertexCount = data.maxVertexCount;
+					object._maxIndexCount = data.maxIndexCount;
+
+					object._geometryInitialized = data.geometryInitialized;
+					object._geometryCount = data.geometryCount;
+
+					object._matricesTexture = getTexture( data.matricesTexture.uuid );
+
+					break;
+
 				case 'LOD':
 
 					object = new LOD();
@@ -45640,7 +46918,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						onLoad( audioBuffer );
 
-					}, handleError );
+					} ).catch( handleError );
 
 				} catch ( e ) {
 
@@ -51739,6 +53017,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	exports.BackSide = BackSide;
 	exports.BasicDepthPacking = BasicDepthPacking;
 	exports.BasicShadowMap = BasicShadowMap;
+	exports.BatchedMesh = BatchedMesh;
 	exports.Bone = Bone;
 	exports.BooleanKeyframeTrack = BooleanKeyframeTrack;
 	exports.Box2 = Box2;

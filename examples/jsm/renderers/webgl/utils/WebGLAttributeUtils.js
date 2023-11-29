@@ -1,3 +1,5 @@
+import { IntType } from 'three';
+
 class WebGLAttributeUtils {
 
 	constructor( backend ) {
@@ -36,19 +38,16 @@ class WebGLAttributeUtils {
 		//attribute.onUploadCallback();
 
 		let type;
-		let isFloat = false;
 
 		if ( array instanceof Float32Array ) {
 
 			type = gl.FLOAT;
-			isFloat = true;
 
 		} else if ( array instanceof Uint16Array ) {
 
 			if ( attribute.isFloat16BufferAttribute ) {
 
 				type = gl.HALF_FLOAT;
-				isFloat = true;
 
 			} else {
 
@@ -91,7 +90,7 @@ class WebGLAttributeUtils {
 			type,
 			bytesPerElement: array.BYTES_PER_ELEMENT,
 			version: attribute.version,
-			isFloat
+			isInteger: type === gl.INT || type === gl.UNSIGNED_INT || attribute.gpuType === IntType
 		} );
 
 	}
@@ -105,9 +104,30 @@ class WebGLAttributeUtils {
 		const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
 		const bufferData = backend.get( bufferAttribute );
 		const bufferType = bufferData.bufferType;
+		const updateRanges = attribute.isInterleavedBufferAttribute ? attribute.data.updateRanges : attribute.updateRanges;
 
 		gl.bindBuffer( bufferType, bufferData.bufferGPU );
-		gl.bufferSubData( bufferType, 0, array );
+
+		if ( updateRanges.length === 0 ) {
+
+			// Not using update ranges
+
+			gl.bufferSubData( bufferType, 0, array );
+
+		} else {
+
+			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
+
+				const range = updateRanges[ i ];
+				gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
+					array, range.start, range.count );
+
+			}
+
+			bufferAttribute.clearUpdateRanges();
+
+		}
+
 		gl.bindBuffer( bufferType, null );
 
 		bufferData.version = bufferAttribute.version;

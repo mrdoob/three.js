@@ -10,7 +10,8 @@ import RenderContexts from './RenderContexts.js';
 import Textures from './Textures.js';
 import Background from './Background.js';
 import Nodes from './nodes/Nodes.js';
-import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, Color, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping } from 'three';
+import Color4 from './Color4.js';
+import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping } from 'three';
 
 const _scene = new Scene();
 const _drawingBufferSize = new Vector2();
@@ -21,9 +22,15 @@ const _vector3 = new Vector3();
 
 class Renderer {
 
-	constructor( backend ) {
+	constructor( backend, parameters = {} ) {
 
 		this.isRenderer = true;
+
+		//
+
+		const {
+			logarithmicDepthBuffer = false,
+		} = parameters;
 
 		// public
 
@@ -35,6 +42,8 @@ class Renderer {
 		this.autoClearColor = true;
 		this.autoClearDepth = true;
 		this.autoClearStencil = true;
+
+		this.logarithmicDepthBuffer = logarithmicDepthBuffer;
 
 		this.outputColorSpace = SRGBColorSpace;
 
@@ -62,6 +71,7 @@ class Renderer {
 		this._attributes = null;
 		this._geometries = null;
 		this._nodes = null;
+		this._animation = null;
 		this._bindings = null;
 		this._objects = null;
 		this._pipelines = null;
@@ -70,16 +80,12 @@ class Renderer {
 		this._textures = null;
 		this._background = null;
 
-		this._animation = new Animation();
-
 		this._currentRenderContext = null;
-		this._lastRenderContext = null;
 
 		this._opaqueSort = null;
 		this._transparentSort = null;
 
-		this._clearAlpha = 1;
-		this._clearColor = new Color( 0x000000 );
+		this._clearColor = new Color4( 0x000000 );
 		this._clearDepth = 1;
 		this._clearStencil = 0;
 
@@ -136,6 +142,7 @@ class Renderer {
 			}
 
 			this._nodes = new Nodes( this, backend );
+			this._animation = new Animation( this._nodes, this.info );
 			this._attributes = new Attributes( backend );
 			this._background = new Background( this, this._nodes );
 			this._geometries = new Geometries( this._attributes, this.info );
@@ -147,9 +154,6 @@ class Renderer {
 			this._renderContexts = new RenderContexts();
 
 			//
-
-			this._animation.setNodes( this._nodes );
-			this._animation.start();
 
 			this._initialized = true;
 
@@ -197,7 +201,12 @@ class Renderer {
 		this._currentRenderContext = renderContext;
 		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
 
-		nodeFrame.renderId ++;
+		//
+
+		this.info.calls ++;
+		this.info.render.calls ++;
+
+		nodeFrame.renderId = this.info.calls;
 
 		//
 
@@ -213,15 +222,11 @@ class Renderer {
 
 		//
 
-		if ( this._animation.isAnimating === false ) nodeFrame.update();
-
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
 		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 		if ( this.info.autoReset === true ) this.info.reset();
-
-		this.info.render.frame ++;
 
 		//
 
@@ -341,8 +346,6 @@ class Renderer {
 		this._currentRenderContext = previousRenderContext;
 		this._currentRenderObjectFunction = previousRenderObjectFunction;
 
-		this._lastRenderContext = renderContext;
-
 		//
 
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
@@ -361,15 +364,11 @@ class Renderer {
 
 	}
 
-	setAnimationLoop( callback ) {
+	async setAnimationLoop( callback ) {
 
-		if ( this._initialized === false ) this.init();
+		if ( this._initialized === false ) await this.init();
 
-		const animation = this._animation;
-
-		animation.setAnimationLoop( callback );
-
-		( callback === null ) ? animation.stop() : animation.start();
+		this._animation.setAnimationLoop( callback );
 
 	}
 
@@ -543,19 +542,19 @@ class Renderer {
 	setClearColor( color, alpha = 1 ) {
 
 		this._clearColor.set( color );
-		this._clearAlpha = alpha;
+		this._clearColor.a = alpha;
 
 	}
 
 	getClearAlpha() {
 
-		return this._clearAlpha;
+		return this._clearColor.a;
 
 	}
 
 	setClearAlpha( alpha ) {
 
-		this._clearAlpha = alpha;
+		this._clearColor.a = alpha;
 
 	}
 
@@ -585,7 +584,7 @@ class Renderer {
 
 	isOccluded( object ) {
 
-		const renderContext = this._currentRenderContext || this._lastRenderContext;
+		const renderContext = this._currentRenderContext;
 
 		return renderContext && this.backend.isOccluded( renderContext, object );
 
@@ -593,9 +592,18 @@ class Renderer {
 
 	clear( color = true, depth = true, stencil = true ) {
 
-		const renderContext = this._currentRenderContext || this._lastRenderContext;
+		let renderTargetData = null;
+		const renderTarget = this._renderTarget;
 
-		if ( renderContext ) this.backend.clear( renderContext, color, depth, stencil );
+		if ( renderTarget !== null ) {
+
+			this._textures.updateRenderTarget( renderTarget );
+
+			renderTargetData = this._textures.get( renderTarget );
+
+		}
+
+		this.backend.clear( color, depth, stencil, renderTargetData );
 
 	}
 
@@ -617,10 +625,27 @@ class Renderer {
 
 	}
 
+	get currentColorSpace() {
+
+		const renderTarget = this._renderTarget;
+
+		if ( renderTarget !== null ) {
+
+			const texture = renderTarget.texture;
+
+			return ( Array.isArray( texture ) ? texture[ 0 ] : texture ).colorSpace;
+
+		}
+
+		return this.outputColorSpace;
+
+	}
+
 	dispose() {
 
 		this.info.dispose();
 
+		this._animation.dispose();
 		this._objects.dispose();
 		this._properties.dispose();
 		this._pipelines.dispose();
@@ -665,11 +690,30 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
+		const nodeFrame = this._nodes.nodeFrame;
+
+		const previousRenderId = nodeFrame.renderId;
+
+		//
+
+		this.info.calls ++;
+		this.info.compute.calls ++;
+
+		nodeFrame.renderId = this.info.calls;
+
+		//
+
 		const backend = this.backend;
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
 		const nodes = this._nodes;
 		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
+
+		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
+
+			throw new Error( 'THREE.Renderer: .compute() expects a ComputeNode.' );
+
+		}
 
 		backend.beginCompute( computeNodes );
 
@@ -709,6 +753,10 @@ class Renderer {
 
 		backend.finishCompute( computeNodes );
 
+		//
+
+		nodeFrame.renderId = previousRenderId;
+
 	}
 
 	hasFeature( name ) {
@@ -719,7 +767,7 @@ class Renderer {
 
 	copyFramebufferToTexture( framebufferTexture ) {
 
-		const renderContext = this._currentRenderContext || this._lastRenderContext;
+		const renderContext = this._currentRenderContext;
 
 		this._textures.updateTexture( framebufferTexture );
 

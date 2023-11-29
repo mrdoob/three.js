@@ -33,6 +33,26 @@ class LightsNode extends Node {
 
 	}
 
+	getHash() {
+
+		if ( this._hash === null ) {
+
+			const hash = [];
+
+			for ( const lightNode of this.lightNodes ) {
+
+				hash.push( lightNode.getHash() );
+
+			}
+
+			this._hash = 'lights-' + hash.join( ',' );
+
+		}
+
+		return this._hash;
+
+	}
+
 	setup( builder ) {
 
 		const context = builder.context;
@@ -57,7 +77,7 @@ class LightsNode extends Node {
 			for ( const lightNode of lightNodes ) {
 
 				lightNode.build( builder );
-	
+
 			}
 
 			//
@@ -76,7 +96,7 @@ class LightsNode extends Node {
 			if ( backdrop !== null ) {
 
 				totalDiffuse = vec3( backdropAlpha !== null ? backdropAlpha.mix( totalDiffuse, backdrop ) : backdrop );
-	
+
 			}
 
 			totalDiffuseNode.assign( totalDiffuse );
@@ -98,35 +118,11 @@ class LightsNode extends Node {
 
 	}
 
-	getHash( builder ) {
+	_getLightNodeById( id ) {
 
-		if ( this._hash === null ) {
+		for ( const lightNode of this.lightNodes ) {
 
-			let hash = '';
-
-			const lightNodes = this.lightNodes;
-
-			for ( const lightNode of lightNodes ) {
-
-				hash += lightNode.getHash( builder ) + ' ';
-
-			}
-
-			this._hash = hash;
-
-		}
-
-		return this._hash;
-
-	}
-
-	getLightNodeByHash( hash ) {
-
-		const lightNodes = this.lightNodes;
-
-		for ( const lightNode of lightNodes ) {
-
-			if ( lightNode.light.uuid === hash ) {
+			if ( lightNode.isAnalyticLightNode && lightNode.light.id === id ) {
 
 				return lightNode;
 
@@ -146,7 +142,7 @@ class LightsNode extends Node {
 
 		for ( const light of lights ) {
 
-			let lightNode = this.getLightNodeByHash( light.uuid );
+			let lightNode = this._getLightNodeById( light.id );
 
 			if ( lightNode === null ) {
 
@@ -173,7 +169,7 @@ class LightsNode extends Node {
 export default LightsNode;
 
 export const lights = ( lights ) => nodeObject( new LightsNode().fromLights( lights ) );
-export const lightsWithoutWrap = nodeProxy( LightsNode );
+export const lightNodes = nodeProxy( LightsNode );
 
 export function addLightNode( lightClass, lightNodeClass ) {
 

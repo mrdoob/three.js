@@ -6,14 +6,28 @@ import { viewportDepthTexture } from './ViewportDepthTextureNode.js';
 
 class ViewportDepthNode extends Node {
 
-	constructor( scope, textureNode = null ) {
+	constructor( scope, valueNode = null ) {
 
 		super( 'float' );
 
 		this.scope = scope;
-		this.textureNode = textureNode;
+		this.valueNode = valueNode;
 
 		this.isViewportDepthNode = true;
+
+	}
+
+	generate( builder ) {
+
+		const { scope } = this;
+
+		if ( scope === ViewportDepthNode.DEPTH_PIXEL ) {
+
+			return builder.getFragDepth();
+
+		}
+
+		return super.generate( builder );
 
 	}
 
@@ -29,10 +43,18 @@ class ViewportDepthNode extends Node {
 
 		} else if ( scope === ViewportDepthNode.DEPTH_TEXTURE ) {
 
-			const texture = this.textureNode || viewportDepthTexture();
+			const texture = this.valueNode || viewportDepthTexture();
 
 			const viewZ = perspectiveDepthToViewZ( texture, cameraNear, cameraFar );
 			node = viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
+
+		} else if ( scope === ViewportDepthNode.DEPTH_PIXEL ) {
+
+			if ( this.valueNode !== null ) {
+
+ 				node = depthPixelBase().assign( this.valueNode );
+
+			}
 
 		}
 
@@ -60,10 +82,16 @@ export const perspectiveDepthToViewZ = ( depth, near, far ) => near.mul( far ).d
 
 ViewportDepthNode.DEPTH = 'depth';
 ViewportDepthNode.DEPTH_TEXTURE = 'depthTexture';
+ViewportDepthNode.DEPTH_PIXEL = 'depthPixel';
 
 export default ViewportDepthNode;
 
+const depthPixelBase = nodeProxy( ViewportDepthNode, ViewportDepthNode.DEPTH_PIXEL );
+
 export const depth = nodeImmutable( ViewportDepthNode, ViewportDepthNode.DEPTH );
 export const depthTexture = nodeProxy( ViewportDepthNode, ViewportDepthNode.DEPTH_TEXTURE );
+export const depthPixel = nodeImmutable( ViewportDepthNode, ViewportDepthNode.DEPTH_PIXEL );
+
+depthPixel.assign = ( value ) => depthPixelBase( value );
 
 addNodeClass( 'ViewportDepthNode', ViewportDepthNode );
