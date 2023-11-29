@@ -39,7 +39,7 @@
 				"imports": {
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
-					"@monogrid/gainmap-js": "https://unpkg.com/@monogrid/gainmap-js@2.0.6/dist/decode.js"
+					"@monogrid/gainmap-js": "https://unpkg.com/@monogrid/gainmap-js@3.0.0/dist/decode.js"
 				}
 			}
 		</script>
@@ -138,11 +138,9 @@
 						hdrJpgPMREMRenderTarget = pmremGenerator.fromEquirectangular( hdrJpgEquirectangularMap );
 			
 						hdrJpgEquirectangularMap.mapping = THREE.EquirectangularReflectionMapping;
-						hdrJpgEquirectangularMap.minFilter = THREE.LinearFilter;
-						hdrJpgEquirectangularMap.magFilter = THREE.LinearFilter;
-						hdrJpgEquirectangularMap.generateMipmaps = false;
-
 						hdrJpgEquirectangularMap.needsUpdate = true;
+
+						hdrJpg.dispose();
 
 					}, function ( progress ) {
 
@@ -163,11 +161,9 @@
 						gainMapPMREMRenderTarget = pmremGenerator.fromEquirectangular( gainMapBackground );
 
 						gainMapBackground.mapping = THREE.EquirectangularReflectionMapping;
-						gainMapBackground.minFilter = THREE.LinearFilter;
-						gainMapBackground.magFilter = THREE.LinearFilter;
-						gainMapBackground.generateMipmaps = false;
-
 						gainMapBackground.needsUpdate = true;
+
+						gainMap.dispose();
 			
 					}, function ( progress ) {
 
