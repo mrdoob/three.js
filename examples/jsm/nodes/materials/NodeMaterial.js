@@ -42,6 +42,9 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.lightsNode = null;
 		this.envNode = null;
+
+		// Only used by WebGLRenderer for scaling the environment illumination
+		// For WebGPURenderer, scaling of the environment intensity can be achieved as envNode.mul(...)
 		this.envMapIntensityNode = null;
 
 		this.colorNode = null;
@@ -230,12 +233,6 @@ class NodeMaterial extends ShaderMaterial {
 		} else if ( builder.environmentNode ) {
 
 			node = builder.environmentNode;
-
-		}
-
-		if( this.envMapIntensityNode && node ) {
-
-			node = node.mul( this.envMapIntensityNode );
 
 		}
 
@@ -479,6 +476,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.lightsNode = source.lightsNode;
 		this.envNode = source.envNode;
+
 		this.envMapIntensityNode = source.envMapIntensityNode;
 
 		this.colorNode = source.colorNode;
