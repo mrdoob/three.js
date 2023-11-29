@@ -48,22 +48,23 @@ class ImageBitmapLoader extends Loader {
 		if ( cached !== undefined ) {
 
 			scope.manager.itemStart( url );
-			
+
 			// If cached is a promise, wait for it to resolve
-			if(cached.then)
-			{
-				cached.then(imageBitmap => {
+			if ( cached.then ) {
 
-					if (onLoad) onLoad(imageBitmap);
+				cached.then( imageBitmap => {
 
-					scope.manager.itemEnd(url);
+					if ( onLoad ) onLoad( imageBitmap );
 
-				}).catch(e => {
+					scope.manager.itemEnd( url );
 
-						if (onError) onError(e);
-						
-				});
+				} ).catch( e => {
+
+					if ( onError ) onError( e );
+
+				} );
 				return;
+
 			}
 
 			// If cached is not a promise (i.e., it's already an imageBitmap)
@@ -100,14 +101,16 @@ class ImageBitmapLoader extends Loader {
 			scope.manager.itemEnd( url );
 
 			return imageBitmap;
+
 		} ).catch( function ( e ) {
 
 			if ( onError ) onError( e );
-			
+
 			Cache.remove( url );
 
 			scope.manager.itemError( url );
 			scope.manager.itemEnd( url );
+
 		} );
 
 		Cache.add( url, promise );
