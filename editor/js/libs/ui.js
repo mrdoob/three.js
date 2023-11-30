@@ -616,7 +616,7 @@ class UINumber extends UIElement {
 				prevPointer.x = event.touches[ 0 ].pageX;
 				prevPointer.y = event.touches[ 0 ].pageY;
 
-				document.addEventListener( 'touchmove', onTouchMove );
+				document.addEventListener( 'touchmove', onTouchMove, { passive: false } );
 				document.addEventListener( 'touchend', onTouchEnd );
 
 			}
@@ -624,6 +624,8 @@ class UINumber extends UIElement {
 		}
 
 		function onTouchMove( event ) {
+
+			event.preventDefault();
 
 			const currentValue = scope.value;
 
