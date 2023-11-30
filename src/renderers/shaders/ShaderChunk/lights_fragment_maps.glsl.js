@@ -1,7 +1,7 @@
 export default /* glsl */`
 #ifdef USE_ENVMAP
 
-	float envMapIntensityFactor = envMapIntensity;
+	float envMapIntensityFactor = 1.0;
 
 #endif
 

@@ -172,7 +172,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 			this.addSlot( 'fragment', new SlotNode( {
 				node: material.envMapIntensityNode,
 				nodeType: 'float',
-				source: 'float envMapIntensityFactor = envMapIntensity;',
+				source: 'float envMapIntensityFactor = 1.0;',
 				target: 'float envMapIntensityFactor = %RESULT%;'
 			} ) );
 
