@@ -206,13 +206,13 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				for ( let i = 0; i < cachedObjects.length; i ++ ) {
 
-					let cachedObject = cachedObjects[ i ];
+					const cachedObject = cachedObjects[ i ];
 
 					if ( typeof cachedObject === 'number' || typeof cachedObject === 'boolean' ) {
 
 						if ( cachedObject !== values[ i ] ) {
 
-							cachedObject = values[ i ];
+							cachedObjects[ i ] = values[ i ];
 							return true;
 
 						}
