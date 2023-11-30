@@ -569,13 +569,7 @@ function setValueT1( gl, v, textures ) {
 
 	}
 
-	let emptyTexture2D = emptyTexture;
-
-	if ( ! v && this.type === gl.SAMPLER_2D_SHADOW ) {
-
-		emptyTexture2D = emptyShadowTexture;
-
-	}
+	const emptyTexture2D = ( this.type === gl.SAMPLER_2D_SHADOW ) ? emptyShadowTexture : emptyTexture;
 
 	textures.setTexture2D( v || emptyTexture2D, unit );
 
