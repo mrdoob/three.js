@@ -126,15 +126,15 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 						uniform.__data[ 0 ] = value.elements[ 0 ];
 						uniform.__data[ 1 ] = value.elements[ 1 ];
 						uniform.__data[ 2 ] = value.elements[ 2 ];
-						uniform.__data[ 3 ] = value.elements[ 0 ];
+						uniform.__data[ 3 ] = 0;
 						uniform.__data[ 4 ] = value.elements[ 3 ];
 						uniform.__data[ 5 ] = value.elements[ 4 ];
 						uniform.__data[ 6 ] = value.elements[ 5 ];
-						uniform.__data[ 7 ] = value.elements[ 0 ];
+						uniform.__data[ 7 ] = 0;
 						uniform.__data[ 8 ] = value.elements[ 6 ];
 						uniform.__data[ 9 ] = value.elements[ 7 ];
 						uniform.__data[ 10 ] = value.elements[ 8 ];
-						uniform.__data[ 11 ] = value.elements[ 0 ];
+						uniform.__data[ 11 ] = 0;
 
 					} else {
 
