@@ -4,7 +4,6 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 	let updateList = {};
 	let allocatedBindingPoints = [];
 
-
 	const maxBindingPoints = ( capabilities.isWebGL2 ) ? gl.getParameter( gl.MAX_UNIFORM_BUFFER_BINDINGS ) : 0; // binding points are global whereas block indices are per shader program
 
 	function bind( uniformsGroup, program ) {
@@ -17,15 +16,10 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 	function update( uniformsGroup, program ) {
 
 		let buffer = buffers[ uniformsGroup.id ];
-		const size = uniformsGroup.__size;
-
-		if ( uniformsGroup.uniforms.length !== uniformsGroup.__cacheCount ) {
-
-			prepareUniformsGroup( uniformsGroup );
-
-		}
 
 		if ( buffer === undefined ) {
+
+			prepareUniformsGroup( uniformsGroup );
 
 			buffer = createBuffer( uniformsGroup );
 			buffers[ uniformsGroup.id ] = buffer;
@@ -43,7 +37,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		const frame = info.render.frame;
 
-		if ( updateList[ uniformsGroup.id ] !== frame && size > 0 ) {
+		if ( updateList[ uniformsGroup.id ] !== frame ) {
 
 			updateBufferData( uniformsGroup );
 
@@ -61,7 +55,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 		uniformsGroup.__bindingPointIndex = bindingPointIndex;
 
 		const buffer = gl.createBuffer();
-		const size = uniformsGroup.__size * uniformsGroup.count;
+		const size = uniformsGroup.__size;
 		const usage = uniformsGroup.usage;
 
 		gl.bindBuffer( gl.UNIFORM_BUFFER, buffer );
@@ -105,7 +99,10 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 			const uniform = uniforms[ i ];
 
 			// partly update the buffer if necessary
-			if ( hasUniformChanged( uniform, i, cache ) === true || uniformsGroup.__sizeChanged === true ) {
+
+			if ( hasUniformChanged( uniform, i, cache ) === true ) {
+
+				const offset = uniform.__offset;
 
 				const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
 
@@ -117,10 +114,10 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 					const info = getUniformSize( value );
 
-					if ( typeof value === 'number' || typeof value === 'boolean' ) {
+					if ( typeof value === 'number' ) {
 
 						uniform.__data[ 0 ] = value;
-						gl.bufferSubData( gl.UNIFORM_BUFFER, arrayOffset, uniform.__data );
+						gl.bufferSubData( gl.UNIFORM_BUFFER, offset + arrayOffset, uniform.__data );
 
 					} else if ( value.isMatrix3 ) {
 
@@ -129,10 +126,8 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 						uniform.__data[ 0 ] = value.elements[ 0 ];
 						uniform.__data[ 1 ] = value.elements[ 1 ];
 						uniform.__data[ 2 ] = value.elements[ 2 ];
-
 						// Conversion to 3x4 matrix
 						uniform.__data[ 3 ] = 0;
-
 						uniform.__data[ 4 ] = value.elements[ 3 ];
 						uniform.__data[ 5 ] = value.elements[ 4 ];
 						uniform.__data[ 6 ] = value.elements[ 5 ];
@@ -152,30 +147,11 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				}
 
-				if ( uniform.__data && uniform.__data.length >= 0 ) {
-
-					uniformsGroup.__offsetNeedsUpdate.push( [ uniform.__offset, uniform.__data ] );
-
-				}
+				gl.bufferSubData( gl.UNIFORM_BUFFER, offset, uniform.__data );
 
 			}
 
-
 		}
-
-		for ( let i = uniformsGroup.__offsetNeedsUpdate.length - 1; i >= 0; i -- ) {
-
-			const uniform = uniformsGroup.__offsetNeedsUpdate[ i ];
-			// 0 is offset, 1 is data
-
-			gl.bufferSubData( gl.UNIFORM_BUFFER, uniform[ 0 ], uniform[ 1 ] );
-
-			uniformsGroup.__offsetNeedsUpdate.pop();
-
-		}
-
-
-		uniformsGroup.__sizeChanged = false;
 
 		gl.bindBuffer( gl.UNIFORM_BUFFER, null );
 
@@ -189,7 +165,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			// cache entry does not exist so far
 
-			if ( typeof value === 'number' || typeof value === 'boolean' ) {
+			if ( typeof value === 'number' ) {
 
 				cache[ index ] = value;
 
@@ -201,15 +177,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				for ( let i = 0; i < values.length; i ++ ) {
 
-					if ( typeof values[ i ] === 'number' || typeof values[ i ] === 'boolean' ) {
-
-						tempValues[ i ] = values[ i ];
-
-					} else {
-
-						tempValues.push( values[ i ].clone() );
-
-					}
+					tempValues.push( values[ i ].clone() );
 
 				}
 
@@ -223,7 +191,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			// compare current value with cached entry
 
-			if ( typeof value === 'number' || typeof value === 'boolean' ) {
+			if ( typeof value === 'number' ) {
 
 				if ( cache[ index ] !== value ) {
 
@@ -239,18 +207,9 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				for ( let i = 0; i < cachedObjects.length; i ++ ) {
 
-					let cachedObject = cachedObjects[ i ];
+					const cachedObject = cachedObjects[ i ];
 
-					if ( typeof cachedObject === 'number' || typeof cachedObject === 'boolean' ) {
-
-						if ( cachedObject !== values[ i ] ) {
-
-							cachedObject = values[ i ];
-							return true;
-
-						}
-
-					} else if ( cachedObject.equals( values[ i ] ) === false ) {
+					if ( cachedObject.equals( values[ i ] ) === false ) {
 
 						cachedObject.copy( values[ i ] );
 						return true;
@@ -302,12 +261,9 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			// the following two properties will be used for partial buffer updates
 
-			if ( ! uniform.__data ) {
+			uniform.__data = new Float32Array( infos.storage / Float32Array.BYTES_PER_ELEMENT );
+			uniform.__offset = offset;
 
-				uniform.__data = new Float32Array( infos.storage / Float32Array.BYTES_PER_ELEMENT );
-				uniform.__offset = offset;
-
-			}
 			//
 
 			if ( i > 0 ) {
@@ -342,16 +298,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 		//
 
 		uniformsGroup.__size = offset;
-
-		if ( ! uniformsGroup.__cache ) {
-
-			uniformsGroup.__cache = {};
-
-		}
-
-		const count = uniformsGroup.uniforms.length;
-		uniformsGroup.__cacheCount = count;
-		uniformsGroup.__sizeChanged = true;
+		uniformsGroup.__cache = {};
 
 		return this;
 
@@ -366,9 +313,9 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		// determine sizes according to STD140
 
-		if ( typeof value === 'number' || typeof value === 'boolean' ) {
+		if ( typeof value === 'number' ) {
 
-			// float/int/bool
+			// float/int
 
 			info.boundary = 4;
 			info.storage = 4;
