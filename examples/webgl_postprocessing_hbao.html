@@ -7,7 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background-color: #bfe3dd;
+				background-color: #ffffff;
 				color: #000;
 			}
 			a {
@@ -56,6 +56,7 @@
 			container.appendChild( stats.dom );
 
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
+			// renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
 
