@@ -206,7 +206,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				for ( let i = 0; i < cachedObjects.length; i ++ ) {
 
-					const cachedObject = cachedObjects[ i ];
+					let cachedObject = cachedObjects[ i ];
 
 					if ( typeof cachedObject === 'number' || typeof cachedObject === 'boolean' ) {
 
