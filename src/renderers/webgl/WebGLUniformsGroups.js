@@ -114,7 +114,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 					const info = getUniformSize( value );
 
-					if ( typeof value === 'number' ) {
+					if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
 						uniform.__data[ 0 ] = value;
 						gl.bufferSubData( gl.UNIFORM_BUFFER, offset + arrayOffset, uniform.__data );
@@ -164,7 +164,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			// cache entry does not exist so far
 
-			if ( typeof value === 'number' ) {
+			if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
 				cache[ index ] = value;
 
@@ -190,7 +190,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			// compare current value with cached entry
 
-			if ( typeof value === 'number' ) {
+			if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
 				if ( cache[ index ] !== value ) {
 
@@ -208,7 +208,16 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 					const cachedObject = cachedObjects[ i ];
 
-					if ( cachedObject.equals( values[ i ] ) === false ) {
+					if ( typeof cachedObject === 'number' || typeof cachedObject === 'boolean' ) {
+
+						if ( cachedObject !== values[ i ] ) {
+
+							cachedObject = values[ i ];
+							return true;
+
+						}
+
+					} else if ( cachedObject.equals( values[ i ] ) === false ) {
 
 						cachedObject.copy( values[ i ] );
 						return true;
@@ -312,7 +321,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		// determine sizes according to STD140
 
-		if ( typeof value === 'number' ) {
+		if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
 			// float/int
 
