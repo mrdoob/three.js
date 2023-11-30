@@ -1,4 +1,4 @@
-import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, UnsignedByteType, _SRGBAFormat, NoColorSpace, LinearSRGBColorSpace, SRGBColorSpace, NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare } from 'three';
+import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, FloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, SRGBColorSpace, NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare } from 'three';
 
 let initialized = false, wrappingToGL, filterToGL, compareToGL;
 
@@ -78,6 +78,10 @@ class WebGLTextureUtils {
 
 			glTextureType = gl.TEXTURE_CUBE_MAP;
 
+		} else if ( texture.isDataArrayTexture === true ) {
+
+			glTextureType = gl.TEXTURE_2D_ARRAY;
+
 		} else {
 
 			glTextureType = gl.TEXTURE_2D;
@@ -142,7 +146,7 @@ class WebGLTextureUtils {
 
 		if ( glFormat === gl.DEPTH_COMPONENT ) {
 
-			if ( glType === gl.UNSIGNED_INT ) internalFormat = gl.DEPTH_COMPONENT24;
+			if ( glType === gl.UNSIGNED_INT ) internalFormat = gl.DEPTH24_STENCIL8;
 			if ( glType === gl.FLOAT ) internalFormat = gl.DEPTH_COMPONENT32F;
 
 		}
@@ -204,6 +208,109 @@ class WebGLTextureUtils {
 			}
 
 		}
+
+	}
+
+	async copyTextureToBuffer( texture, x, y, width, height ) {
+
+		const { gl } = this;
+
+		const { textureGPU, glFormat, glType } = this.backend.get( texture );
+
+		const fb = gl.createFramebuffer();
+
+		gl.bindFramebuffer( gl.READ_FRAMEBUFFER, fb );
+		gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureGPU, 0 );
+
+		const typedArrayType = this._getTypedArrayType( glType );
+		const bytesPerTexel = this._getBytesPerTexel( glFormat );
+
+		const elementCount = width * height;
+		const byteLength = elementCount * bytesPerTexel;
+
+		const buffer = gl.createBuffer();
+
+		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, buffer );
+		gl.bufferData( gl.PIXEL_PACK_BUFFER, byteLength, gl.STREAM_READ );
+		gl.readPixels( x, y, width, height, glFormat, glType, 0 );
+		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, null );
+
+		const sync = gl.fenceSync( gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
+
+		gl.flush();
+
+		await this._clientWaitAsync( sync );
+
+		gl.deleteSync( sync );
+
+		const dstBuffer = new typedArrayType( elementCount );
+
+		gl.bindBuffer(  gl.PIXEL_PACK_BUFFER, buffer );
+		gl.getBufferSubData( gl.PIXEL_PACK_BUFFER, 0, dstBuffer );
+		gl.bindBuffer(  gl.PIXEL_PACK_BUFFER, null );
+
+		return dstBuffer;
+
+	}
+
+	_getTypedArrayType( glType ) {
+
+		const { gl } = this;
+
+		if ( glType === gl.UNSIGNED_BYTE ) return Uint8Array;
+
+		if ( glType === gl.UNSIGNED_SHORT_4_4_4_4 ) return Uint16Array;
+		if ( glType === gl.UNSIGNED_SHORT_5_5_5_1 ) return Uint16Array;
+		if ( glType === gl.UNSIGNED_SHORT_5_6_5 ) return Uint16Array;
+		if ( glType === gl.UNSIGNED_SHORT ) return Uint16Array;
+
+		if ( glType === gl.UNSIGNED_INT ) return Uint32Array;
+
+		if ( glType === gl.UNSIGNED_FLOAT ) return Float32Array;
+
+	}
+
+	_getBytesPerTexel( glFormat ) {
+
+		const { gl } = this;
+
+		if ( glFormat === gl.RGBA ) return 4;
+		if ( glFormat === gl.RGB ) return 3;
+		if ( glFormat === gl.ALPHA ) return 1;
+
+	}
+
+	_clientWaitAsync( sync ) {
+
+		const { gl } = this;
+
+		return new Promise( ( resolve, reject ) => {
+
+			function test() {
+
+				const res = gl.clientWaitSync( sync, gl.SYNC_FLUSH_COMMANDS_BIT, 0 );
+
+				if ( res === gl.WAIT_FAILED) {
+
+					reject();
+					return;
+
+				}
+
+				if ( res === gl.TIMEOUT_EXPIRED) {
+
+					requestAnimationFrame( test );
+					return;
+
+				}
+
+				resolve();
+
+			}
+
+			test();
+
+		} );
 
 	}
 

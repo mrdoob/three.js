@@ -262,6 +262,7 @@
 			},
 
 			"Objects": {
+				"BatchedMesh": "api/en/objects/BatchedMesh",
 				"Bone": "api/en/objects/Bone",
 				"Group": "api/en/objects/Group",
 				"InstancedMesh": "api/en/objects/InstancedMesh",
@@ -448,6 +449,7 @@
 				"رسم خطوط": "manual/ar/introduction/Drawing-lines",
 				"إنشاء نص": "manual/ar/introduction/Creating-text",
 				"تحميل نماذج ثلاثية الأبعاد": "manual/ar/introduction/Loading-3D-models",
+				"المكتبات والإضافات": "manual/ar/introduction/Libraries-and-Plugins",
 				"الأسئلة الشائعة": "manual/ar/introduction/FAQ",
 				"روابط مفيدة": "manual/ar/introduction/Useful-links"
 			},

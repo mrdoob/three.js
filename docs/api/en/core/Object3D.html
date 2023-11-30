@@ -144,11 +144,41 @@
 			for such objects.
 		</p>
 
+		<h3>[property:Function onAfterShadow]</h3>
+		<p>
+			An optional callback that is executed immediately after a 3D object is
+			rendered to a shadow map. This function is called with the following parameters: renderer,
+			scene, camera, shadowCamera, geometry, depthMaterial, group.
+		</p>
+		<p>
+			Please notice that this callback is only executed for `renderable` 3D
+			objects. Meaning 3D objects which define their visual appearance with
+			geometries and materials like instances of [page:Mesh], [page:Line],
+			[page:Points] or [page:Sprite]. Instances of [page:Object3D], [page:Group]
+			or [page:Bone] are not renderable and thus this callback is not executed
+			for such objects.
+		</p>
+
 		<h3>[property:Function onBeforeRender]</h3>
 		<p>
 			An optional callback that is executed immediately before a 3D object is
 			rendered. This function is called with the following parameters: renderer,
 			scene, camera, geometry, material, group.
+		</p>
+		<p>
+			Please notice that this callback is only executed for `renderable` 3D
+			objects. Meaning 3D objects which define their visual appearance with
+			geometries and materials like instances of [page:Mesh], [page:Line],
+			[page:Points] or [page:Sprite]. Instances of [page:Object3D], [page:Group]
+			or [page:Bone] are not renderable and thus this callback is not executed
+			for such objects.
+		</p>
+
+		<h3>[property:Function onBeforeShadow]</h3>
+		<p>
+			An optional callback that is executed immediately before a 3D object is
+			rendered to a shadow map. This function is called with the following parameters: renderer,
+			scene, camera, shadowCamera, geometry, depthMaterial, group.
 		</p>
 		<p>
 			Please notice that this callback is only executed for `renderable` 3D
@@ -334,10 +364,13 @@
 			given.
 		</p>
 
-		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value] )</h3>
+		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value], [param:Array optionalTarget] )</h3>
 		<p>
 			name -- the property name to search for. <br />
-			value -- value of the given property. <br /><br />
+			value -- value of the given property. <br />
+			optionalTarget -- (optional) target to set the result.
+			Otherwise a new Array is instantiated. If set, you must clear this
+			array prior to each call (i.e., array.length = 0;). <br /><br />
 
 			Searches through an object and its children, starting with the object
 			itself, and returns all the objects with a property that matches the value

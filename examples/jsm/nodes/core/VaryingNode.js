@@ -40,16 +40,10 @@ class VaryingNode extends Node {
 		const { name, node } = this;
 		const type = this.getNodeType( builder );
 
-		const nodeVarying = builder.getVaryingFromNode( this, type );
+		const nodeVarying = builder.getVaryingFromNode( this, name, type );
 
 		// this property can be used to check if the varying can be optimized for a var
 		nodeVarying.needsInterpolation || ( nodeVarying.needsInterpolation = ( builder.shaderStage === 'fragment' ) );
-
-		if ( name !== null ) {
-
-			nodeVarying.name = name;
-
-		}
 
 		const propertyName = builder.getPropertyName( nodeVarying, NodeShaderStage.VERTEX );
 

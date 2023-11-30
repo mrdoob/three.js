@@ -19,9 +19,10 @@ import { REVISION, RenderTarget, NoColorSpace, LinearEncoding, sRGBEncoding, SRG
 import { stack } from './StackNode.js';
 import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
 
-import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
-
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
+import ChainMap from '../../renderers/common/ChainMap.js';
+
+const uniformsGroupCache = new ChainMap();
 
 const typeFromLength = new Map( [
 	[ 2, 'vec2' ],
@@ -96,8 +97,7 @@ class NodeBuilder {
 
 		this.context = {
 			keywords: new NodeKeywords(),
-			material: this.material,
-			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => levelNode.mul( maxMipLevel( textureNode ) )
+			material: this.material
 		};
 
 		this.cache = new NodeCache();
@@ -128,6 +128,41 @@ class NodeBuilder {
 
 	}
 
+	_getSharedBindings( bindings ) {
+
+		const shared = [];
+
+		for ( const binding of bindings ) {
+
+			if ( binding.shared === true ) {
+
+				// nodes is the chainmap key
+				const nodes = binding.getNodes();
+
+				let sharedBinding = uniformsGroupCache.get( nodes );
+
+				if ( sharedBinding === undefined ) {
+
+					uniformsGroupCache.set( nodes, binding );
+
+					sharedBinding = binding;
+
+				}
+
+				shared.push( sharedBinding );
+
+			} else {
+
+				shared.push( binding );
+
+			}
+
+		}
+
+		return shared;
+
+	}
+
 	getBindings() {
 
 		let bindingsArray = this.bindingsArray;
@@ -136,7 +171,7 @@ class NodeBuilder {
 
 			const bindings = this.bindings;
 
-			this.bindingsArray = bindingsArray = ( this.material !== null ) ? [ ...bindings.vertex, ...bindings.fragment ] : bindings.compute;
+			this.bindingsArray = bindingsArray = this._getSharedBindings( ( this.material !== null ) ? [ ...bindings.vertex, ...bindings.fragment ] : bindings.compute );
 
 		}
 
@@ -297,20 +332,19 @@ class NodeBuilder {
 
 	}
 
-	getTexture( /* texture, textureProperty, uvSnippet */ ) {
+	generateTexture( /* texture, textureProperty, uvSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
-	getTextureLevel( /* texture, textureProperty, uvSnippet, levelSnippet */ ) {
+	generateTextureLod( /* texture, textureProperty, uvSnippet, levelSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
-	// @TODO: rename to .generateConst()
-	getConst( type, value = null ) {
+	generateConst( type, value = null ) {
 
 		if ( value === null ) {
 
@@ -333,23 +367,23 @@ class NodeBuilder {
 
 		const componentType = this.getComponentType( type );
 
-		const getConst = value => this.getConst( componentType, value );
+		const generateConst = value => this.generateConst( componentType, value );
 
 		if ( typeLength === 2 ) {
 
-			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) } )`;
+			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) } )`;
 
 		} else if ( typeLength === 3 ) {
 
-			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) }, ${ getConst( value.z ) } )`;
+			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) }, ${ generateConst( value.z ) } )`;
 
 		} else if ( typeLength === 4 ) {
 
-			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) }, ${ getConst( value.z ) }, ${ getConst( value.w ) } )`;
+			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) }, ${ generateConst( value.z ) }, ${ generateConst( value.w ) } )`;
 
 		} else if ( typeLength > 4 && value && ( value.isMatrix3 || value.isMatrix4 ) ) {
 
-			return `${ this.getType( type ) }( ${ value.elements.map( getConst ).join( ', ' ) } )`;
+			return `${ this.getType( type ) }( ${ value.elements.map( generateConst ).join( ', ' ) } )`;
 
 		} else if ( typeLength > 4 ) {
 
@@ -641,17 +675,15 @@ class NodeBuilder {
 
 	}
 
-	getStructTypeFromNode( node, shaderStage = this.shaderStage, name = null ) {
+	getStructTypeFromNode( node, shaderStage = this.shaderStage ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
-		let nodeStruct = nodeData.structType;
-
-		if ( nodeStruct === undefined ) {
+		if ( nodeData.structType === undefined ) {
 
 			const index = this.structs.index ++;
 
-			node.name = `StructType${index}`;
+			node.name = `StructType${ index }`;
 			this.structs[ shaderStage ].push( node );
 
 			nodeData.structType = node;
@@ -708,7 +740,7 @@ class NodeBuilder {
 
 	}
 
-	getVaryingFromNode( node, type ) {
+	getVaryingFromNode( node, name = null, type = node.getNodeType( this ) ) {
 
 		const nodeData = this.getDataFromNode( node, 'any' );
 
@@ -719,7 +751,9 @@ class NodeBuilder {
 			const varyings = this.varyings;
 			const index = varyings.length;
 
-			nodeVarying = new NodeVarying( 'nodeVarying' + index, type );
+			if ( name === null ) name = 'nodeVarying' + index;
+
+			nodeVarying = new NodeVarying( name, type );
 
 			varyings.push( nodeVarying );
 

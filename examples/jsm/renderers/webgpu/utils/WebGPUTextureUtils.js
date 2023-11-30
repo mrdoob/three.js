@@ -13,7 +13,7 @@ import {
 	NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare
 } from 'three';
 
-import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
+import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping, DepthTexture } from 'three';
 
 import WebGPUTexturePassUtils from './WebGPUTexturePassUtils.js';
 
@@ -40,6 +40,11 @@ class WebGPUTextureUtils {
 
 		this.defaultTexture = null;
 		this.defaultCubeTexture = null;
+
+		this.colorBuffer = null;
+
+		this.depthTexture = new DepthTexture();
+		this.depthTexture.name = 'depthBuffer';
 
 	}
 
@@ -106,7 +111,7 @@ class WebGPUTextureUtils {
 		const { width, height, depth, levels } = options;
 
 		const dimension = this._getDimension( texture );
-		const format = texture.internalFormat || getFormat( texture, this.device );
+		const format = texture.internalFormat || getFormat( texture, backend.device );
 
 		const sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
 		const primarySampleCount = texture.isRenderTargetTexture ? 1 : sampleCount;
@@ -226,6 +231,75 @@ class WebGPUTextureUtils {
 
 	}
 
+	getColorBuffer() {
+
+		if ( this.colorBuffer ) this.colorBuffer.destroy();
+
+		const backend = this.backend;
+		const { width, height } = backend.getDrawingBufferSize();
+
+		this.colorBuffer = backend.device.createTexture( {
+			label: 'colorBuffer',
+			size: {
+				width: width,
+				height: height,
+				depthOrArrayLayers: 1
+			},
+			sampleCount: backend.parameters.sampleCount,
+			format: GPUTextureFormat.BGRA8Unorm,
+			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
+		} );
+
+		return this.colorBuffer;
+
+	}
+
+	getDepthBuffer( depth = true, stencil = true ) {
+
+		const backend = this.backend;
+		const { width, height } = backend.getDrawingBufferSize();
+
+		const depthTexture = this.depthTexture;
+		const depthTextureGPU = backend.get( depthTexture ).texture;
+
+		let format, type;
+
+		if ( stencil ) {
+
+			format = DepthStencilFormat;
+			type = UnsignedInt248Type;
+
+		} else if ( depth ) {
+
+			format = DepthFormat;
+			type = UnsignedIntType;
+
+		}
+
+		if ( depthTextureGPU !== undefined ) {
+
+			if ( depthTexture.image.width === width && depthTexture.image.height === height && depthTexture.format === format && depthTexture.type === type ) {
+
+				return depthTextureGPU;
+
+			}
+
+			this.destroyTexture( depthTexture );
+
+		}
+
+		depthTexture.name = 'depthBuffer';
+		depthTexture.format = format;
+		depthTexture.type = type;
+		depthTexture.image.width = width;
+		depthTexture.image.height = height;
+
+		this.createTexture( depthTexture, { sampleCount: backend.parameters.sampleCount, width, height } );
+
+		return backend.get( depthTexture ).texture;
+
+	}
+
 	updateTexture( texture, options ) {
 
 		const textureData = this.backend.get( texture );
@@ -237,9 +311,17 @@ class WebGPUTextureUtils {
 
 		// transfer texture data
 
-		if ( texture.isDataTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
+		if ( texture.isDataTexture || texture.isData3DTexture ) {
 
 			this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, false );
+
+		} else if ( texture.isDataArrayTexture ) {
+
+			for ( let i = 0; i < options.image.depth; i ++ ) {
+
+				this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, i, false, i );
+
+			}
 
 		} else if ( texture.isCompressedTexture ) {
 
@@ -437,7 +519,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY ) {
+	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, depth = 0 ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 		// @TODO: Consider to support valid buffer layouts with other formats like RGB
@@ -457,13 +539,13 @@ class WebGPUTextureUtils {
 			},
 			data,
 			{
-				offset: 0,
+				offset: image.width * image.height * bytesPerTexel * depth,
 				bytesPerRow
 			},
 			{
 				width: image.width,
 				height: image.height,
-				depthOrArrayLayers: ( image.depth !== undefined ) ? image.depth : 1
+				depthOrArrayLayers: 1
 			} );
 
 		if ( flipY === true ) {

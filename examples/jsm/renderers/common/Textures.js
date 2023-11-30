@@ -70,6 +70,8 @@ class Textures extends DataMap {
 		renderTargetData.height = size.height;
 		renderTargetData.textures = textures;
 		renderTargetData.depthTexture = depthTexture;
+		renderTargetData.depth = renderTarget.depthBuffer;
+		renderTargetData.stencil = renderTarget.stencilBuffer;
 
 		if ( renderTargetData.sampleCount !== sampleCount ) {
 
@@ -80,8 +82,9 @@ class Textures extends DataMap {
 
 		}
 
-		const options = { sampleCount };
+		//
 
+		const options = { sampleCount };
 
 		for ( let i = 0; i < textures.length; i ++ ) {
 

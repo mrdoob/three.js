@@ -54,8 +54,6 @@ class Node extends EventDispatcher {
 
 	* getChildren() {
 
-		const self = this;
-
 		for ( const { childNode } of getNodeChildren( this ) ) {
 
 			yield childNode;

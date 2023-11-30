@@ -81,7 +81,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		} )();
 
-		this.colorNode = tslFn( () => {
+		this.fragmentNode = tslFn( () => {
 
 			const vUv = varying( vec2(), 'vUv' );
 

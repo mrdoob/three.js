@@ -1,5 +1,6 @@
 import ReferenceNode from './ReferenceNode.js';
-import { NodeUpdateType } from '../core/constants.js';
+//import { renderGroup } from '../core/UniformGroupNode.js';
+//import { NodeUpdateType } from '../core/constants.js';
 import { addNodeClass } from '../core/Node.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 
@@ -11,9 +12,17 @@ class MaterialReferenceNode extends ReferenceNode {
 
 		this.material = material;
 
-		this.updateType = NodeUpdateType.RENDER;
+		//this.updateType = NodeUpdateType.RENDER;
 
 	}
+
+	/*setNodeType( node ) {
+
+		super.setNodeType( node );
+
+		this.node.groupNode = renderGroup;
+
+	}*/
 
 	updateReference( frame ) {
 
