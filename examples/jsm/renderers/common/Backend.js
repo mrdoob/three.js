@@ -137,7 +137,7 @@ class Backend {
 			domElement = ( this.parameters.canvas !== undefined ) ? this.parameters.canvas : createCanvasElement();
 
 			// OffscreenCanvas does not have setAttribute, see #22811
-			if ( 'setAttribute' in domElement ) domElement.setAttribute( 'data-engine', `three.js r${REVISION}` );
+			if ( 'setAttribute' in domElement ) domElement.setAttribute( 'data-engine', `three.js r${REVISION} webgpu` );
 
 			this.domElement = domElement;
 
