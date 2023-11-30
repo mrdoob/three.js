@@ -126,7 +126,6 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 						uniform.__data[ 0 ] = value.elements[ 0 ];
 						uniform.__data[ 1 ] = value.elements[ 1 ];
 						uniform.__data[ 2 ] = value.elements[ 2 ];
-						// Conversion to 3x4 matrix
 						uniform.__data[ 3 ] = 0;
 						uniform.__data[ 4 ] = value.elements[ 3 ];
 						uniform.__data[ 5 ] = value.elements[ 4 ];
