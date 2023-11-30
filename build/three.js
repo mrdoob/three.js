@@ -7265,9 +7265,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.matrixWorld = new Matrix4();
 
 			this.matrixAutoUpdate = Object3D.DEFAULT_MATRIX_AUTO_UPDATE;
-			this.matrixWorldNeedsUpdate = false;
 
 			this.matrixWorldAutoUpdate = Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE; // checked by the renderer
+			this.matrixWorldNeedsUpdate = false;
 
 			this.layers = new Layers();
 			this.visible = true;
@@ -8134,9 +8134,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.matrixWorld.copy( source.matrixWorld );
 
 			this.matrixAutoUpdate = source.matrixAutoUpdate;
-			this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
 			this.matrixWorldAutoUpdate = source.matrixWorldAutoUpdate;
+			this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
 			this.layers.mask = source.layers.mask;
 			this.visible = source.visible;
@@ -18150,6 +18150,60 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
+	class DepthTexture extends Texture {
+
+		constructor( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
+
+			format = format !== undefined ? format : DepthFormat;
+
+			if ( format !== DepthFormat && format !== DepthStencilFormat ) {
+
+				throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' );
+
+			}
+
+			if ( type === undefined && format === DepthFormat ) type = UnsignedIntType;
+			if ( type === undefined && format === DepthStencilFormat ) type = UnsignedInt248Type;
+
+			super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+
+			this.isDepthTexture = true;
+
+			this.image = { width: width, height: height };
+
+			this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
+			this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
+
+			this.flipY = false;
+			this.generateMipmaps = false;
+
+			this.compareFunction = null;
+
+		}
+
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.compareFunction = source.compareFunction;
+
+			return this;
+
+		}
+
+		toJSON( meta ) {
+
+			const data = super.toJSON( meta );
+
+			if ( this.compareFunction !== null ) data.compareFunction = this.compareFunction;
+
+			return data;
+
+		}
+
+	}
+
 	/**
 	 * Uniforms of a program.
 	 * Those form a tree structure with a special top-level container for the root,
@@ -18195,6 +18249,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 
 	const emptyTexture = /*@__PURE__*/ new Texture();
+
+	const emptyShadowTexture = /*@__PURE__*/ new DepthTexture( 1, 1 );
+	emptyShadowTexture.compareFunction = LessEqualCompare;
+
 	const emptyArrayTexture = /*@__PURE__*/ new DataArrayTexture();
 	const empty3dTexture = /*@__PURE__*/ new Data3DTexture();
 	const emptyCubeTexture = /*@__PURE__*/ new CubeTexture();
@@ -18711,7 +18769,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		textures.setTexture2D( v || emptyTexture, unit );
+		const emptyTexture2D = ( this.type === gl.SAMPLER_2D_SHADOW ) ? emptyShadowTexture : emptyTexture;
+
+		textures.setTexture2D( v || emptyTexture2D, unit );
 
 	}
 
@@ -19095,6 +19155,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.id = id;
 			this.addr = addr;
 			this.cache = [];
+			this.type = activeInfo.type;
 			this.setValue = getSingularSetter( activeInfo.type );
 
 			// this.path = activeInfo.name; // DEBUG
@@ -19110,6 +19171,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.id = id;
 			this.addr = addr;
 			this.cache = [];
+			this.type = activeInfo.type;
 			this.size = activeInfo.size;
 			this.setValue = getPureArraySetter( activeInfo.type );
 
@@ -26626,60 +26688,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			}
 
 			return hand.joints[ inputjoint.jointName ];
-
-		}
-
-	}
-
-	class DepthTexture extends Texture {
-
-		constructor( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
-
-			format = format !== undefined ? format : DepthFormat;
-
-			if ( format !== DepthFormat && format !== DepthStencilFormat ) {
-
-				throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' );
-
-			}
-
-			if ( type === undefined && format === DepthFormat ) type = UnsignedIntType;
-			if ( type === undefined && format === DepthStencilFormat ) type = UnsignedInt248Type;
-
-			super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
-
-			this.isDepthTexture = true;
-
-			this.image = { width: width, height: height };
-
-			this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
-			this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
-
-			this.flipY = false;
-			this.generateMipmaps = false;
-
-			this.compareFunction = null;
-
-		}
-
-
-		copy( source ) {
-
-			super.copy( source );
-
-			this.compareFunction = source.compareFunction;
-
-			return this;
-
-		}
-
-		toJSON( meta ) {
-
-			const data = super.toJSON( meta );
-
-			if ( this.compareFunction !== null ) data.compareFunction = this.compareFunction;
-
-			return data;
 
 		}
 
@@ -35639,6 +35647,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.v2 = v2;
 
 		}
+
 		getPoint( t, optionalTarget = new Vector3() ) {
 
 			const point = optionalTarget;
@@ -35657,6 +35666,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			return point;
 
 		}
+
 		// Line curve is linear, so we can overwrite default getPointAt
 		getPointAt( u, optionalTarget ) {
 
@@ -35686,6 +35696,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			return this;
 
 		}
+
 		toJSON() {
 
 			const data = super.toJSON();
@@ -35696,6 +35707,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			return data;
 
 		}
+
 		fromJSON( json ) {
 
 			super.fromJSON( json );
