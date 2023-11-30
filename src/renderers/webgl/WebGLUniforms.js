@@ -571,8 +571,7 @@ function setValueT1( gl, v, textures ) {
 
 	let emptyTexture2D = emptyTexture;
 
-	// if type is a sampler2DShadow, use the empty shadow texture.
-	if ( ! v && this.type === 0x8b62 ) {
+	if ( ! v && this.type === gl.SAMPLER_2D_SHADOW ) {
 
 		emptyTexture2D = emptyShadowTexture;
 
