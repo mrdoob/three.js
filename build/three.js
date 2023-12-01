@@ -10,7 +10,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '159';
+	const REVISION = '160dev';
 
 	const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -9918,7 +9918,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		get updateRange() {
 
-			console.warn( 'THREE.BufferAttribute: "updateRange" is deprecated and removed in r169. Use "addUpdateRange()" instead.' ); // @deprecated, r159
+			console.warn( 'THREE.BufferAttribute: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
 			return this._updateRange;
 
 		}
@@ -28136,7 +28136,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						const info = getUniformSize( value );
 
-						if ( typeof value === 'number' ) {
+						if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
 							uniform.__data[ 0 ] = value;
 							gl.bufferSubData( gl.UNIFORM_BUFFER, offset + arrayOffset, uniform.__data );
@@ -28148,15 +28148,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 							uniform.__data[ 0 ] = value.elements[ 0 ];
 							uniform.__data[ 1 ] = value.elements[ 1 ];
 							uniform.__data[ 2 ] = value.elements[ 2 ];
-							uniform.__data[ 3 ] = value.elements[ 0 ];
+							uniform.__data[ 3 ] = 0;
 							uniform.__data[ 4 ] = value.elements[ 3 ];
 							uniform.__data[ 5 ] = value.elements[ 4 ];
 							uniform.__data[ 6 ] = value.elements[ 5 ];
-							uniform.__data[ 7 ] = value.elements[ 0 ];
+							uniform.__data[ 7 ] = 0;
 							uniform.__data[ 8 ] = value.elements[ 6 ];
 							uniform.__data[ 9 ] = value.elements[ 7 ];
 							uniform.__data[ 10 ] = value.elements[ 8 ];
-							uniform.__data[ 11 ] = value.elements[ 0 ];
+							uniform.__data[ 11 ] = 0;
 
 						} else {
 
@@ -28186,7 +28186,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				// cache entry does not exist so far
 
-				if ( typeof value === 'number' ) {
+				if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
 					cache[ index ] = value;
 
@@ -28212,7 +28212,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				// compare current value with cached entry
 
-				if ( typeof value === 'number' ) {
+				if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
 					if ( cache[ index ] !== value ) {
 
@@ -28230,7 +28230,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						const cachedObject = cachedObjects[ i ];
 
-						if ( cachedObject.equals( values[ i ] ) === false ) {
+						if ( typeof cachedObject === 'number' || typeof cachedObject === 'boolean' ) {
+
+							if ( cachedObject !== values[ i ] ) {
+
+								cachedObjects[ i ] = values[ i ];
+								return true;
+
+							}
+
+						} else if ( cachedObject.equals( values[ i ] ) === false ) {
 
 							cachedObject.copy( values[ i ] );
 							return true;
@@ -28334,9 +28343,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			// determine sizes according to STD140
 
-			if ( typeof value === 'number' ) {
+			if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
-				// float/int
+				// float/int/bool
 
 				info.boundary = 4;
 				info.storage = 4;
@@ -31145,7 +31154,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		get updateRange() {
 
-			console.warn( 'THREE.InterleavedBuffer: "updateRange" is deprecated and removed in r169. Use "addUpdateRange()" instead.' ); // @deprecated, r159
+			console.warn( 'THREE.InterleavedBuffer: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
 			return this._updateRange;
 
 		}
