@@ -323,7 +323,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
-			// float/int
+			// float/int/bool
 
 			info.boundary = 4;
 			info.storage = 4;
