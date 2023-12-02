@@ -30,6 +30,16 @@ class UniformsGroup extends EventDispatcher {
 
 	remove( uniform ) {
 
+		// Cannot remove the last uniform or UBO will break (use a uniform buffer that is too small)
+		if ( this.uniforms.length === 1 ) {
+
+			console.warn( 'THREE.UniformsGroup: Can not remove the last uniform from a UniformsGroup.' );
+
+			// TODO: Should we unbind in the renderer instead?
+			return;
+
+		}
+
 		const index = this.uniforms.indexOf( uniform );
 
 		if ( index !== - 1 ) this.uniforms.splice( index, 1 );
@@ -73,7 +83,13 @@ class UniformsGroup extends EventDispatcher {
 
 		for ( let i = 0, l = uniformsSource.length; i < l; i ++ ) {
 
-			this.uniforms.push( uniformsSource[ i ].clone() );
+			const uniforms = Array.isArray( uniformsSource[ i ] ) ? uniformsSource[ i ] : [ uniformsSource[ i ] ];
+
+			for ( let j = 0; j < uniforms.length; j ++ ) {
+
+				this.uniforms.push( uniforms[ j ].clone() );
+
+			}
 
 		}
 

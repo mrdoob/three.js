@@ -96,57 +96,63 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		for ( let i = 0, il = uniforms.length; i < il; i ++ ) {
 
-			const uniform = uniforms[ i ];
+			const uniformArray = Array.isArray( uniforms[ i ] ) ? uniforms[ i ] : [ uniforms[ i ] ];
 
-			// partly update the buffer if necessary
+			for ( let j = 0, jl = uniformArray.length; j < jl; j ++ ) {
 
-			if ( hasUniformChanged( uniform, i, cache ) === true ) {
+				const uniform = uniformArray[ j ];
+				// partly update the buffer if necessary
 
-				const offset = uniform.__offset;
+				if ( hasUniformChanged( uniform, i, cache ) === true ) {
 
-				const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
+					const offset = uniform.__offset;
 
-				let arrayOffset = 0;
+					const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
 
-				for ( let i = 0; i < values.length; i ++ ) {
+					let arrayOffset = 0;
 
-					const value = values[ i ];
+					for ( let i = 0; i < values.length; i ++ ) {
 
-					const info = getUniformSize( value );
+						const value = values[ i ];
 
-					if ( typeof value === 'number' || typeof value === 'boolean' ) {
+						const info = getUniformSize( value );
 
-						uniform.__data[ 0 ] = value;
-						gl.bufferSubData( gl.UNIFORM_BUFFER, offset + arrayOffset, uniform.__data );
+						// TODO add integer and struct support
+						if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
-					} else if ( value.isMatrix3 ) {
+							uniform.__data[ 0 ] = value;
+							gl.bufferSubData( gl.UNIFORM_BUFFER, offset + arrayOffset, uniform.__data );
 
-						// manually converting 3x3 to 3x4
+						} else if ( value.isMatrix3 ) {
 
-						uniform.__data[ 0 ] = value.elements[ 0 ];
-						uniform.__data[ 1 ] = value.elements[ 1 ];
-						uniform.__data[ 2 ] = value.elements[ 2 ];
-						uniform.__data[ 3 ] = 0;
-						uniform.__data[ 4 ] = value.elements[ 3 ];
-						uniform.__data[ 5 ] = value.elements[ 4 ];
-						uniform.__data[ 6 ] = value.elements[ 5 ];
-						uniform.__data[ 7 ] = 0;
-						uniform.__data[ 8 ] = value.elements[ 6 ];
-						uniform.__data[ 9 ] = value.elements[ 7 ];
-						uniform.__data[ 10 ] = value.elements[ 8 ];
-						uniform.__data[ 11 ] = 0;
+							// manually converting 3x3 to 3x4
 
-					} else {
+							uniform.__data[ 0 ] = value.elements[ 0 ];
+							uniform.__data[ 1 ] = value.elements[ 1 ];
+							uniform.__data[ 2 ] = value.elements[ 2 ];
+							uniform.__data[ 3 ] = 0;
+							uniform.__data[ 4 ] = value.elements[ 3 ];
+							uniform.__data[ 5 ] = value.elements[ 4 ];
+							uniform.__data[ 6 ] = value.elements[ 5 ];
+							uniform.__data[ 7 ] = 0;
+							uniform.__data[ 8 ] = value.elements[ 6 ];
+							uniform.__data[ 9 ] = value.elements[ 7 ];
+							uniform.__data[ 10 ] = value.elements[ 8 ];
+							uniform.__data[ 11 ] = 0;
 
-						value.toArray( uniform.__data, arrayOffset );
+						} else {
 
-						arrayOffset += info.storage / Float32Array.BYTES_PER_ELEMENT;
+							value.toArray( uniform.__data, arrayOffset );
+
+							arrayOffset += info.storage / Float32Array.BYTES_PER_ELEMENT;
+
+						}
 
 					}
 
-				}
+					gl.bufferSubData( gl.UNIFORM_BUFFER, offset, uniform.__data );
 
-				gl.bufferSubData( gl.UNIFORM_BUFFER, offset, uniform.__data );
+				}
 
 			}
 
@@ -243,63 +249,54 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		let offset = 0; // global buffer offset in bytes
 		const chunkSize = 16; // size of a chunk in bytes
-		let chunkOffset = 0; // offset within a single chunk in bytes
 
 		for ( let i = 0, l = uniforms.length; i < l; i ++ ) {
 
-			const uniform = uniforms[ i ];
+			const uniformArray = Array.isArray( uniforms[ i ] ) ? uniforms[ i ] : [ uniforms[ i ] ];
 
-			const infos = {
-				boundary: 0, // bytes
-				storage: 0 // bytes
-			};
 
-			const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
+			for ( let j = 0, jl = uniformArray.length; j < jl; j ++ ) {
 
-			for ( let j = 0, jl = values.length; j < jl; j ++ ) {
+				const uniform = uniformArray[ j ];
 
-				const value = values[ j ];
+				const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
 
-				const info = getUniformSize( value );
+				for ( let k = 0, kl = values.length; k < kl; k ++ ) {
 
-				infos.boundary += info.boundary;
-				infos.storage += info.storage;
+					const value = values[ k ];
 
-			}
+					const info = getUniformSize( value );
 
-			// the following two properties will be used for partial buffer updates
+					// Calculate the chunk offset
+					const chunkOffsetUniform = offset % chunkSize;
 
-			uniform.__data = new Float32Array( infos.storage / Float32Array.BYTES_PER_ELEMENT );
-			uniform.__offset = offset;
+					// Check for chunk overflow
+					if ( chunkOffsetUniform !== 0 && ( chunkSize - chunkOffsetUniform ) < info.boundary ) {
 
-			//
+						// Add padding and adjust offset
+						offset += ( chunkSize - chunkOffsetUniform );
 
-			if ( i > 0 ) {
+					}
 
-				chunkOffset = offset % chunkSize;
+					// the following two properties will be used for partial buffer updates
 
-				const remainingSizeInChunk = chunkSize - chunkOffset;
-
-				// check for chunk overflow
-
-				if ( chunkOffset !== 0 && ( remainingSizeInChunk - infos.boundary ) < 0 ) {
-
-					// add padding and adjust offset
-
-					offset += ( chunkSize - chunkOffset );
+					uniform.__data = new Float32Array( info.storage / Float32Array.BYTES_PER_ELEMENT );
 					uniform.__offset = offset;
+
+
+					// Update the global offset
+					offset += info.storage;
+
 
 				}
 
 			}
 
-			offset += infos.storage;
-
 		}
 
 		// ensure correct final padding
 
-		chunkOffset = offset % chunkSize;
+		const chunkOffset = offset % chunkSize;
 
 		if ( chunkOffset > 0 ) offset += ( chunkSize - chunkOffset );
 
