@@ -63,7 +63,8 @@ const wgslMethods = {
 	dFdy: '- dpdy',
 	mod: 'threejs_mod',
 	lessThanEqual: 'threejs_lessThanEqual',
-	inversesqrt: 'inverseSqrt'
+	greaterThan: 'threejs_greaterThan',
+	inversesqrt: 'inverseSqrt',
 	bitcast: 'bitcast<f32>'
 };
 
@@ -72,6 +73,13 @@ const wgslPolyfill = {
 fn threejs_lessThanEqual( a : vec3<f32>, b : vec3<f32> ) -> vec3<bool> {
 
 	return vec3<bool>( a.x <= b.x, a.y <= b.y, a.z <= b.z );
+
+}
+` ),
+	greaterThan: new CodeNode( `
+fn threejs_greaterThan( a : vec3<f32>, b : vec3<f32> ) -> vec3<bool> {
+
+	return vec3<bool>( a.x > b.x, a.y > b.y, a.z > b.z );
 
 }
 ` ),
