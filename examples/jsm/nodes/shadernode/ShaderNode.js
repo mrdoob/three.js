@@ -271,6 +271,12 @@ class ShaderCallNodeInternal extends Node {
 
 			}
 
+			if ( builder.currentFunctionNode !== null ) {
+
+				builder.currentFunctionNode.includes.push( functionNode );
+
+			}
+
 			return nodeObject( functionNode.call( inputNodes ) );
 
 		}
@@ -505,7 +511,18 @@ addNodeClass( 'ShaderNode', ShaderNode );
 
 //
 
-export const setCurrentStack = stack => currentStack = stack;
+export const setCurrentStack = ( stack ) => {
+
+	if ( currentStack === stack ) {
+
+		//throw new Error( 'Stack already defined.' );
+
+	}
+
+	currentStack = stack;
+
+};
+
 export const getCurrentStack = () => currentStack;
 
 export const If = ( ...params ) => currentStack.if( ...params );

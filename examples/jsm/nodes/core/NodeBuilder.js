@@ -6,6 +6,7 @@ import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
 import ParameterNode from './ParameterNode.js';
+import FunctionNode from '../code/FunctionNode.js';
 import { createNodeMaterialFromType } from '../materials/NodeMaterial.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
@@ -94,6 +95,8 @@ class NodeBuilder {
 		this.stack = stack();
 		this.stacks = [];
 		this.tab = '\t';
+
+		this.currentFunctionNode = null;
 
 		this.context = {
 			keywords: new NodeKeywords(),
@@ -848,6 +851,15 @@ class NodeBuilder {
 
 	}
 
+	buildFunctionNode( shaderNode ) {
+
+		const fn = new FunctionNode();
+
+		const previous = this.currentFunctionNode;
+
+
+	}
+
 	flowShaderNode( shaderNode ) {
 
 		const layout = shaderNode.layout;
@@ -917,6 +929,12 @@ class NodeBuilder {
 		this.setBuildStage( previousBuildStage );
 
 		return flow;
+
+	}
+
+	getFunctionOperator() {
+
+		return null;
 
 	}
 
