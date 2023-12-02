@@ -43,8 +43,6 @@ const typeFromArray = new Map( [
 	[ Float32Array, 'float' ]
 ] );
 
-const isNonPaddingElementArray = new Set( [ Int32Array, Uint32Array, Float32Array ] );
-
 const toFloat = ( value ) => {
 
 	value = Number( value );
@@ -555,7 +553,7 @@ class NodeBuilder {
 		if ( attribute.isInterleavedBufferAttribute ) dataAttribute = attribute.data;
 
 		const array = dataAttribute.array;
-		const itemSize = isNonPaddingElementArray.has( array.constructor ) ? attribute.itemSize : dataAttribute.stride || attribute.itemSize;
+		const itemSize = attribute.itemSize;
 		const normalized = attribute.normalized;
 
 		let arrayType;
