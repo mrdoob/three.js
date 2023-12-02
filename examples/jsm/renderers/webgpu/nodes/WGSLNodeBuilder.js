@@ -25,6 +25,10 @@ const supports = {
 	instance: true
 };
 
+const wgslFnOpLib = {
+	'^^': 'threejs_xor'
+};
+
 const wgslTypeLib = {
 	float: 'f32',
 	int: 'i32',
@@ -69,6 +73,13 @@ const wgslMethods = {
 };
 
 const wgslPolyfill = {
+	threejs_xor: new CodeNode( `
+fn threejs_xor( a : bool, b : bool ) -> bool {
+
+	return ( a || b ) && !( a && b );
+
+}
+` ),
 	lessThanEqual: new CodeNode( `
 fn threejs_lessThanEqual( a : vec3<f32>, b : vec3<f32> ) -> vec3<bool> {
 
@@ -309,6 +320,22 @@ class WGSLNodeBuilder extends NodeBuilder {
 	_getUniformGroupCount( shaderStage ) {
 
 		return Object.keys( this.uniforms[ shaderStage ] ).length;
+
+	}
+
+	getFunctionOperator( op ) {
+
+		const fnOp = wgslFnOpLib[ op ];
+
+		if ( fnOp !== undefined ) {
+
+			this._include( fnOp );
+
+			return fnOp;
+
+		}
+
+		return null;
 
 	}
 
