@@ -30,9 +30,15 @@ class SplitNode extends Node {
 
 	}
 
+	getPrimitiveType( builder ) {
+
+		return builder.getPrimitiveType( this.node.getNodeType( builder ) );
+
+	}
+
 	getNodeType( builder ) {
 
-		return builder.getTypeFromLength( this.components.length );
+		return builder.getTypeFromLength( this.components.length, this.getPrimitiveType( builder ) );
 
 	}
 
@@ -53,7 +59,7 @@ class SplitNode extends Node {
 
 				// needed expand the input node
 
-				type = builder.getTypeFromLength( this.getVectorLength() );
+				type = builder.getTypeFromLength( this.getVectorLength(), this.getPrimitiveType( builder ) );
 
 			}
 
