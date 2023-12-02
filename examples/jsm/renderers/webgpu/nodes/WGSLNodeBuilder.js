@@ -64,6 +64,7 @@ const wgslMethods = {
 	mod: 'threejs_mod',
 	lessThanEqual: 'threejs_lessThanEqual',
 	inversesqrt: 'inverseSqrt'
+	bitcast: 'bitcast<f32>'
 };
 
 const wgslPolyfill = {
