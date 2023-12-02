@@ -12,13 +12,13 @@ class CodeNode extends Node {
 		this.code = code;
 		this.language = language;
 
-		this._includes = includes;
+		this.includes = includes;
 
 	}
 
 	setIncludes( includes ) {
 
-		this._includes = includes;
+		this.includes = includes;
 
 		return this;
 
@@ -26,7 +26,7 @@ class CodeNode extends Node {
 
 	getIncludes( /*builder*/ ) {
 
-		return this._includes;
+		return this.includes;
 
 	}
 

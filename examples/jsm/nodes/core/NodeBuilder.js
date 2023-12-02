@@ -855,6 +855,13 @@ class NodeBuilder {
 
 		const previous = this.currentFunctionNode;
 
+		this.currentFunctionNode = fn;
+
+		fn.code = this.buildFunctionCode( shaderNode );
+
+		this.currentFunctionNode = previous;
+
+		return fn;
 
 	}
 
