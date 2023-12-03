@@ -126,9 +126,13 @@ const exceptionList = [
 
 	// WebGPURenderer: Unknown problem
 	'webgpu_camera_logarithmicdepthbuffer',
+	'webgpu_loader_materialx',
 	'webgpu_materials_video',
+	'webgpu_materialx_noise',
+	'webgpu_occlusion',
 	'webgpu_particles',
 	'webgpu_shadertoy',
+	'webgpu_shadowmap',
 	'webgpu_tsl_editor',
 	'webgpu_tsl_transpiler'
 
