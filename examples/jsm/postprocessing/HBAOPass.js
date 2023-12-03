@@ -41,8 +41,9 @@ class HBAOPass extends Pass {
 		this._renderGBuffer = true;
 		this._visibilityCache = new Map();
 
-		this.rings = 4;
-		this.samples = 16;
+		this.pdRings = 2.;
+		this.pdRadiusExponent = 2.;
+		this.pdSamples = 16;
 
 		this.noiseTexture = this.generateNoise();
 
@@ -232,25 +233,31 @@ class HBAOPass extends Pass {
 
 		}
 
-		if ( parameters.rings !== undefined && parameters.rings !== this.rings ) {
+		if ( parameters.radiusExponent !== undefined && parameters.radiusExponent !== this.pdRadiusExponent ) {
 
-			this.rings = parameters.rings;
+			this.pdRadiusExponent = parameters.radiusExponent;
 			updateShader = true;
 
 		}
 
-		if ( parameters.samples !== undefined && parameters.samples !== this.samples ) {
+		if ( parameters.rings !== undefined && parameters.rings !== this.pdRings ) {
 
-			this.samples = parameters.samples;
+			this.pdRings = parameters.rings;
+			updateShader = true;
+
+		}
+
+		if ( parameters.samples !== undefined && parameters.samples !== this.pdSamples ) {
+
+			this.pdSamples = parameters.samples;
 			updateShader = true;
 
 		}
 
 		if ( updateShader ) {
 
-
-			this.pdMaterial.defines[ 'SAMPLES' ] = parameters.samples;
-			this.pdMaterial.defines[ 'SAMPLE_VECTORS' ] = generatePdSamplePointInitializer( parameters.samples, this.rings );
+			this.pdMaterial.defines.SAMPLES = this.pdSamples;
+			this.pdMaterial.defines.SAMPLE_VECTORS = generatePdSamplePointInitializer( this.pdSamples, this.pdRings, this.pdRadiusExponent );
 			this.pdMaterial.needsUpdate = true;
 
 		}
@@ -469,10 +476,10 @@ class HBAOPass extends Pass {
 				const x = i;
 				const y = j;
 
-				data[ ( i * size + j ) * 4 ] = ( simplex.noise( x, y ) + 1.0 ) * 255.0;
-				data[ ( i * size + j ) * 4 + 1 ] = ( simplex.noise( x + size, y ) + 1.0 ) * 255.0;
-				data[ ( i * size + j ) * 4 + 2 ] = ( simplex.noise( x, y + size ) + 1.0 ) * 255.0;
-				data[ ( i * size + j ) * 4 + 3 ] = ( simplex.noise( x + size, y + size ) + 1.0 ) * 255.0;
+				data[ ( i * size + j ) * 4 ] = ( simplex.noise( x, y ) * 0.5 + 0.5 ) * 255;
+				data[ ( i * size + j ) * 4 + 1 ] = ( simplex.noise( x + size, y ) * 0.5 + 0.5 ) * 255;
+				data[ ( i * size + j ) * 4 + 2 ] = ( simplex.noise( x, y + size ) * 0.5 + 0.5 ) * 255;
+				data[ ( i * size + j ) * 4 + 3 ] = ( simplex.noise( x + size, y + size ) * 0.5 + 0.5 ) * 255;
 
 			}
 

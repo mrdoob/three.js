@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing - Horizon Based Ambient Occlusion</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #bfe3dd;
+				color: #000;
+			}
+			a {
+				color: #2983ff;
+			}
+		</style>f
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - ambient occlusion by <a href="https://github.com/Rabbid76" target="_blank" rel="noopener">Rabbid76</a><br/>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { AOPass } from 'three/addons/postprocessing/AOPass.js';
+			import { AOShader } from 'three/addons/shaders/AOShader.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+			const dracoLoader = new DRACOLoader();
+			dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
+			dracoLoader.setDecoderConfig( { type: 'js' } );
+			const loader = new GLTFLoader();
+			loader.setDRACOLoader( dracoLoader );
+			loader.setPath( 'models/gltf/' );
+			const plyLoader = new PLYLoader();
+
+			let mixer;
+
+			const generateLittlestTokyoScene = ( scene ) => {
+
+				loader.load( 'LittlestTokyo.glb', ( gltf ) => {
+
+					const model = gltf.scene;
+					model.position.set( 1, 1, 0 );
+					model.scale.set( 0.01, 0.01, 0.01 );
+					scene.add( model );
+
+					mixer = new THREE.AnimationMixer( model );
+					mixer.clipAction( gltf.animations[ 0 ] ).play();
+
+					animate();
+
+				}, undefined, ( e ) => console.error( e ) );
+
+			};
+
+			const generateAoTestScene = ( scene ) => {
+
+				scene.position.set( 0, - 0.5, 0 );
+				const ground = new THREE.Mesh( new THREE.BoxGeometry( 6, 0.1, 6 ), new THREE.MeshStandardMaterial( { color: 0xc0c0c0 } ) );
+				ground.position.set( 0, - 0.05, 0 );
+				scene.add( ground );
+				const backBox = new THREE.Mesh( new THREE.BoxGeometry( 6, 2, 0.1 ), new THREE.MeshStandardMaterial( { color: 0xc0c0c0 } ) );
+				backBox.position.set( 0, 1, - 1.76 );
+				scene.add( backBox );
+				const topBox = new THREE.Mesh( new THREE.BoxGeometry( 6, 0.05, 0.5 ), new THREE.MeshStandardMaterial( { color: 0xc0c0c0 } ) );
+				topBox.position.set( 0, 2.025, - 1.56 );
+				scene.add( topBox );
+				const xPiles = 23;
+				const yPiles = 12;
+				const pillars = new THREE.InstancedMesh( new THREE.CylinderGeometry( 0.075, 0.075, 2, 32 ), new THREE.MeshStandardMaterial( { color: 0xc0c0c0 } ), xPiles + yPiles );
+				scene.add( pillars );
+				[ ...Array( 23 ).keys() ].forEach( ( i ) => pillars.setMatrixAt( i, new THREE.Matrix4().makeTranslation( - 2.75 + 5.5 * i / ( xPiles - 1 ), 1, - 1.5 ) ) );
+				[ ...Array( 12 ).keys() ].forEach( ( i ) => pillars.setMatrixAt( xPiles + i, new THREE.Matrix4().makeTranslation( - 2.75, 1, - 1.5 + 0.25 * ( i + 1 ) ) ) );
+				loader.load( 'SheenChair.glb', ( gltf ) => scene.add( gltf.scene ), undefined, ( e ) => console.error( e ) );
+
+				const leftGroup = new THREE.Group();
+				leftGroup.position.set( - 1.5, 0, 0 );
+				scene.add( leftGroup );
+				const rightGroup = new THREE.Group();
+				rightGroup.position.set( 1.5, 0, 0 );
+				scene.add( rightGroup );
+
+				const cylinder = new THREE.Mesh( new THREE.CylinderGeometry( 0.5, 0.5, 0.2, 32 ), new THREE.MeshStandardMaterial( { color: 0xc0c0c0 } ) );
+				cylinder.position.set( 0, 0.1, 0 );
+				leftGroup.add( cylinder );
+				const boxes = new THREE.InstancedMesh( new THREE.BoxGeometry( 0.05, 0.5, 0.1 ), new THREE.MeshStandardMaterial( { color: 0xc0c0c0 } ), 30 );
+				leftGroup.add( boxes );
+				[ ...Array( 30 ).keys() ].forEach( ( i ) => {
+
+					const angle = i / 30 * Math.PI * 2;
+					boxes.setMatrixAt( i, new THREE.Matrix4().makeRotationY( angle ).setPosition( Math.sin( angle ) * 0.6, 0.25, Math.cos( angle ) * 0.6 ) );
+					boxes.setColorAt( i, new THREE.Color( `hsl(${Math.floor( 360 * i / 30 )}, 100%, 90%)` ) );
+			
+				} );
+				plyLoader.load( 'models/ply/binary/Lucy100k.ply', ( geometry ) => {
+
+					geometry.computeVertexNormals();
+					const lucy = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { color: 0xffffff } ) );
+					lucy.scale.setScalar( 0.001 );
+					lucy.rotation.set( 0, Math.PI, 0 );
+					lucy.position.set( 0, 1, 0 );
+					leftGroup.add( lucy );
+
+				} );
+
+				const box1 = new THREE.Mesh( new THREE.CylinderGeometry( 0.6, 0.6, 0.05, 32 ), new THREE.MeshStandardMaterial( { color: 0xc0c0c0 } ) );
+				box1.position.set( 0, 0.49, 0 );
+				rightGroup.add( box1 );
+				const box2 = new THREE.Mesh( new THREE.CylinderGeometry( 0.5, 0.5, 0.5, 32 ), new THREE.MeshStandardMaterial( { color: 0xc0c0c0 } ) );
+				box2.position.set( 0, 0.25, 0 );
+				rightGroup.add( box2 );
+				const smallPillars = new THREE.InstancedMesh( new THREE.CylinderGeometry( 0.04, 0.04, 0.5, 16 ), new THREE.MeshStandardMaterial( { color: 0xc0c0c0 } ), 32 );
+				rightGroup.add( smallPillars );
+				[ ...Array( 32 ).keys() ].forEach( ( i ) => {
+
+					const angle = i / 32 * Math.PI * 2;
+					smallPillars.setMatrixAt( i, new THREE.Matrix4().makeRotationY( angle ).setPosition( Math.sin( angle ) * 0.55, 0.25, Math.cos( angle ) * 0.55 ) );
+					smallPillars.setColorAt( i, new THREE.Color( `hsl(${Math.floor( 360 * i / 32 )}, 100%, 90%)` ) );
+
+				} );
+				dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
+
+					geometry.computeVertexNormals();
+					const bunny = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial( { color: 0xffffff } ) );
+					bunny.scale.setScalar( 5 );
+					bunny.rotation.set( 0, Math.PI / 4, 0 );
+					bunny.position.set( 0, 0.34, - 0.1 );
+					rightGroup.add( bunny );
+
+				} );
+			
+			};
+
+			const clock = new THREE.Clock();
+			const container = document.createElement( 'div' );
+			document.body.appendChild( container );
+
+			const stats = new Stats();
+			container.appendChild( stats.dom );
+
+			const renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xbfe3dd );
+			scene.environment = pmremGenerator.fromScene( new RoomEnvironment( renderer ), 0.04 ).texture;
+			const sceneGroups = [ new THREE.Group(), new THREE.Group() ];
+			sceneGroups.forEach( ( group ) => scene.add( group ) );
+			generateLittlestTokyoScene( sceneGroups[ 0 ] );
+			generateAoTestScene( sceneGroups[ 1 ] );
+			sceneGroups[ 1 ].visible = false;
+			const sceneParameter = {
+				scene: 0,
+			};
+
+			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+			camera.position.set( 5, 2, 8 );
+
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 0.5, 0 );
+			controls.update();
+			controls.enablePan = false;
+			controls.enableDamping = true;
+
+			const width = window.innerWidth;
+			const height = window.innerHeight;
+			const pixelRatio = renderer.getPixelRatio();
+			const maxSamples = renderer.capabilities.maxSamples;
+
+			const renderTarget = new THREE.WebGLRenderTarget( width * pixelRatio, height * pixelRatio, {
+				type: THREE.HalfFloatType,
+				samples: maxSamples,
+			} );
+			renderTarget.texture.name = 'EffectComposer.rt1';
+			const composer = new EffectComposer( renderer, renderTarget );
+
+			const renderPass = new RenderPass( scene, camera );
+			composer.addPass( renderPass );
+
+			const aoPass = new AOPass( scene, camera, width, height );
+			aoPass.output = AOPass.OUTPUT.Denoise;
+			composer.addPass( aoPass );
+
+			const outputPass = new OutputPass();
+			composer.addPass( outputPass );
+
+			// Init gui
+			const gui = new GUI();
+
+			gui.add( sceneParameter, 'scene', {
+				'Littlest Tokyo': 0,
+				'AO test scene': 1,
+			} ).onChange( ( value ) => {
+			
+				for ( let i = 0; i < sceneGroups.length; ++ i ) sceneGroups[ i ].visible = i == value;
+
+			} );
+
+			gui.add( aoPass, 'output', {
+				'Default': AOPass.OUTPUT.Default,
+				'Diffuse': AOPass.OUTPUT.Diffuse,
+				'AO Only': AOPass.OUTPUT.AO,
+				'AO Only + Denoise': AOPass.OUTPUT.Denoise,
+				'Depth': AOPass.OUTPUT.Depth,
+				'Normal': AOPass.OUTPUT.Normal
+			} ).onChange( function ( value ) {
+
+				aoPass.output = value;
+
+			} );
+
+			const aoParameters = {
+				algorithm: AOShader.ALGORITHM.GTAO,
+				radius: 0.3,
+				distanceExponent: 1.,
+				thickness: 1.,
+				bias: 0.001,
+				scale: 1.,
+				samples: 16,
+				distanceFallOff: true,
+				clipRangeCheck: true,
+				depthRelativeBias: false,
+				nvAlignedSamples: false,
+				screenSpaceRadius: false,
+				aoNoiseType: 'magic-square',
+			};
+			const pdParameters = {
+				lumaPhi: 10.,
+				depthPhi: 2.,
+				normalPhi: 3.,
+				radius: 4.,
+				radiusExponent: 1.,
+				rings: 2.,
+				samples: 16,
+			};
+			aoPass.updateAoMaterial( aoParameters );
+			aoPass.updatePdMaterial( pdParameters );
+			gui.add( aoPass, 'intensity' ).min( 0 ).max( 1 ).step( 0.01 );
+			gui.add( aoParameters, 'algorithm', {
+				'SSAO': AOShader.ALGORITHM.SSAO,
+				'SAO': AOShader.ALGORITHM.SAO,
+				'N8AO': AOShader.ALGORITHM.N8AO,
+				'HBAO': AOShader.ALGORITHM.HBAO,
+				'GTAO': AOShader.ALGORITHM.GTAO,
+			} ).onChange( () => {
+
+				aoParameters.nvAlignedSamples = aoParameters.algorithm === AOShader.ALGORITHM.GTAO || aoParameters.algorithm === AOShader.ALGORITHM.HBAO ? 0 : 1;
+				nvAlignedSamplesController.updateDisplay();
+				aoPass.updateAoMaterial( aoParameters );
+			
+			} );
+			gui.add( aoParameters, 'radius' ).min( 0.01 ).max( 10 ).step( 0.01 ).onChange( () => aoPass.updateAoMaterial( aoParameters ) );
+			gui.add( aoParameters, 'distanceExponent' ).min( 1 ).max( 4 ).step( 0.01 ).onChange( () => aoPass.updateAoMaterial( aoParameters ) );
+			gui.add( aoParameters, 'thickness' ).min( 0.01 ).max( 10 ).step( 0.01 ).onChange( () => aoPass.updateAoMaterial( aoParameters ) );
+			gui.add( aoParameters, 'bias' ).min( 0 ).max( 0.1 ).step( 0.0001 ).onChange( () => aoPass.updateAoMaterial( aoParameters ) );
+			gui.add( aoParameters, 'scale' ).min( 0.01 ).max( 2.0 ).step( 0.01 ).onChange( () => aoPass.updateAoMaterial( aoParameters ) );
+			gui.add( aoParameters, 'samples' ).min( 2 ).max( 32 ).step( 1 ).onChange( () => aoPass.updateAoMaterial( aoParameters ) );
+			gui.add( aoParameters, 'distanceFallOff' ).onChange( () => aoPass.updateAoMaterial( aoParameters ) );
+			const nvAlignedSamplesController = gui.add( aoParameters, 'nvAlignedSamples' ).onChange( () => aoPass.updateAoMaterial( aoParameters ) );
+			gui.add( aoParameters, 'screenSpaceRadius' ).onChange( () => aoPass.updateAoMaterial( aoParameters ) );
+			gui.add( aoParameters, 'aoNoiseType', [ 'magic-square', 'random' ] ).onChange( () => aoPass.updateAoMaterial( aoParameters ) );
+			gui.add( pdParameters, 'lumaPhi' ).min( 0 ).max( 20 ).step( 0.01 ).onChange( () => aoPass.updatePdMaterial( pdParameters ) );
+			gui.add( pdParameters, 'depthPhi' ).min( 0.01 ).max( 20 ).step( 0.01 ).onChange( () => aoPass.updatePdMaterial( pdParameters ) );
+			gui.add( pdParameters, 'normalPhi' ).min( 0.01 ).max( 20 ).step( 0.01 ).onChange( () => aoPass.updatePdMaterial( pdParameters ) );
+			gui.add( pdParameters, 'radius' ).min( 0 ).max( 32 ).step( 1 ).onChange( () => aoPass.updatePdMaterial( pdParameters ) );
+			gui.add( pdParameters, 'radiusExponent' ).min( 0.1 ).max( 4. ).step( 0.1 ).onChange( () => aoPass.updatePdMaterial( pdParameters ) );
+			gui.add( pdParameters, 'rings' ).min( 1 ).max( 16 ).step( 0.125 ).onChange( () => aoPass.updatePdMaterial( pdParameters ) );
+			gui.add( pdParameters, 'samples' ).min( 2 ).max( 32 ).step( 1 ).onChange( () => aoPass.updatePdMaterial( pdParameters ) );
+			
+			window.addEventListener( 'resize', onWindowResize );
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				composer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				const delta = clock.getDelta();
+
+				if ( mixer ) {
+
+					mixer.update( delta );
+
+				}
+
+				controls.update();
+
+				stats.begin();
+				composer.render();
+				stats.end();
+
+			}
+
+			animate();
+
+		</script>
+	</body>
+</html>

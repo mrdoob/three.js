@@ -239,6 +239,7 @@
 		"webgl_postprocessing_3dlut",
 		"webgl_postprocessing_advanced",
 		"webgl_postprocessing_afterimage",
+		"webgl_postprocessing_ao",
 		"webgl_postprocessing_backgrounds",
 		"webgl_postprocessing_crossfade",
 		"webgl_postprocessing_dof",
