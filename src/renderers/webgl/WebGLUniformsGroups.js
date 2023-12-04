@@ -101,7 +101,6 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 			for ( let j = 0, jl = uniformArray.length; j < jl; j ++ ) {
 
 				const uniform = uniformArray[ j ];
-				// partly update the buffer if necessary
 
 				if ( hasUniformChanged( uniform, i, cache ) === true ) {
 
@@ -253,7 +252,6 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 		for ( let i = 0, l = uniforms.length; i < l; i ++ ) {
 
 			const uniformArray = Array.isArray( uniforms[ i ] ) ? uniforms[ i ] : [ uniforms[ i ] ];
-
 
 			for ( let j = 0, jl = uniformArray.length; j < jl; j ++ ) {
 
