@@ -157,12 +157,7 @@ class DRACOLoader extends Loader {
 				} );
 
 			} )
-			.then( ( message ) => this._createGeometry( message.geometry ) )
-			.catch( ( error ) => {
-
-				throw new Error( error );
-
-			} );
+			.then( ( message ) => this._createGeometry( message.geometry ) );
 
 		// Remove task from the task list.
 		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
