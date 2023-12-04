@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js WebGL 2 - Uniform Buffer Objects Arrays </title>
+		<title>three.js WebGL 2 - Uniform Buffer Objects Arrays</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -14,7 +14,7 @@
 		</div>
 		<div id="container"></div>
 
-		<script id="vertexShader2" type="x-shader/x-vertex">
+		<script id="vertexShader" type="x-shader/x-vertex">
 
 			uniform ViewData {
 				mat4 projectionMatrix;
@@ -47,6 +47,57 @@
 
 		</script>
 
+		<script id="fragmentShader" type="x-shader/x-vertex">
+
+			precision highp float;
+			precision highp int;
+
+			uniform LightingData {
+				vec4 lightPosition[POINTLIGHTS_MAX];
+				vec4 lightColor[POINTLIGHTS_MAX];
+				float pointLightsCount;
+			};
+			
+			#include <common>
+			float getDistanceAttenuation( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
+		
+				float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );
+		
+				if ( cutoffDistance > 0.0 ) {
+		
+					distanceFalloff *= pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );
+		
+				}
+		
+				return distanceFalloff;
+			
+			}
+
+			in vec2 vUv;
+			in vec3 vPositionEye;
+			in vec3 vNormalEye;
+			out vec4 fragColor;
+
+			void main()	{
+
+				vec4 color = vec4(vec3(0.), 1.);
+				for (int x = 0; x < int(pointLightsCount); x++) {
+					vec3 offset = lightPosition[x].xyz - vPositionEye;
+					vec3 dirToLight = normalize( offset );
+					float distance = length( offset );
+
+					float diffuse = max(0.0, dot(vNormalEye, dirToLight));
+					float attenuation = 1.0 / (distance * distance);
+
+					vec3 lightWeighting = lightColor[x].xyz * getDistanceAttenuation( distance, 4., .7 );
+					color.rgb += lightWeighting;
+				}
+				fragColor = color;
+
+			}
+
+		</script>
+
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
 		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
@@ -60,8 +111,6 @@
 			}
 		</script>
 
-
-
 		<script type="module">
 
 			import * as THREE from 'three';
@@ -71,67 +120,19 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, scene, renderer, clock;
+			let camera, scene, renderer, clock, stats;
 
+			let lightingUniformsGroup, lightCenters;
 
 			const container = document.getElementById( 'container' );
 
 			const pointLightsMax = 300;
 
-
 			const api = {
 				count: 200,
 			};
 
-			const lightingUniformsGroup = new THREE.UniformsGroup();
-			lightingUniformsGroup.setName( 'LightingData' );
-
-			const data = [];
-			const dataColors = [];
-			const lightCenters = [];
-
-			for ( let i = 0; i < pointLightsMax; i ++ ) {
-
-				const col = new THREE.Color( 0xffffff * Math.random() ).toArray();
-				const x = Math.random() * 50 - 25;
-				const z = Math.random() * 50 - 25;
-
-				data.push( new THREE.Uniform( new THREE.Vector4( x, 1, z, 0 ) ) ); // light position
-				dataColors.push( new THREE.Uniform( new THREE.Vector4( col[ 0 ], col[ 1 ], col[ 2 ], 0 ) ) ); // light color
-
-				// Store the center positions
-				lightCenters.push( { x, z } );
-
-			}
-
-			lightingUniformsGroup.add( data ); // light position
-			lightingUniformsGroup.add( dataColors ); // light position
-			lightingUniformsGroup.add( new THREE.Uniform( pointLightsMax ) ); // light position
-
-			// gui
-			const gui = new GUI();
-			gui.add( api, 'count', 1, pointLightsMax ).step( 1 ).onChange( function () {
-
-				lightingUniformsGroup.uniforms[ 2 ].value = api.count;
-
-			} );
-
-
 			init();
-
-
-			// controls
-
-			const controls = new OrbitControls( camera, renderer.domElement );
-			controls.autoRotate = false;
-			controls.autoRotateSpeed = 1.0;
-
-			// stats
-
-			const stats = new Stats();
-			document.body.appendChild( stats.dom );
-
-
 			animate();
 
 			function init() {
@@ -142,7 +143,6 @@
 					return;
 
 				}
-
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
 				camera.position.set( 0, 50, 50 );
@@ -158,8 +158,30 @@
 
 				// uniforms groups
 
-				// Camera and lighting related data are perfect examples of using UBOs since you have to store these
-				// data just once. They can be shared across all shader programs.
+				lightingUniformsGroup = new THREE.UniformsGroup();
+				lightingUniformsGroup.setName( 'LightingData' );
+
+				const data = [];
+				const dataColors = [];
+				lightCenters = [];
+
+				for ( let i = 0; i < pointLightsMax; i ++ ) {
+
+					const col = new THREE.Color( 0xffffff * Math.random() ).toArray();
+					const x = Math.random() * 50 - 25;
+					const z = Math.random() * 50 - 25;
+
+					data.push( new THREE.Uniform( new THREE.Vector4( x, 1, z, 0 ) ) ); // light position
+					dataColors.push( new THREE.Uniform( new THREE.Vector4( col[ 0 ], col[ 1 ], col[ 2 ], 0 ) ) ); // light color
+
+					// Store the center positions
+					lightCenters.push( { x, z } );
+
+				}
+
+				lightingUniformsGroup.add( data ); // light position
+				lightingUniformsGroup.add( dataColors ); // light position
+				lightingUniformsGroup.add( new THREE.Uniform( pointLightsMax ) ); // light position
 
 				const cameraUniformsGroup = new THREE.UniformsGroup();
 				cameraUniformsGroup.setName( 'ViewData' );
@@ -176,55 +198,8 @@
 					defines: {
 						POINTLIGHTS_MAX: pointLightsMax
 					},
-					vertexShader: document.getElementById( 'vertexShader2' ).textContent,
-					fragmentShader: /* glsl */`
-					precision highp float;
-					precision highp int;
-
-					uniform LightingData {
-						vec4 lightPosition[POINTLIGHTS_MAX];
-						vec4 lightColor[POINTLIGHTS_MAX];
-						float pointLightsCount;
-					};
-					
-					#include <common>
-					float getDistanceAttenuation( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
-				
-						float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );
-				
-						if ( cutoffDistance > 0.0 ) {
-				
-							distanceFalloff *= pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );
-				
-						}
-				
-						return distanceFalloff;
-					
-					}
-
-					in vec2 vUv;
-					in vec3 vPositionEye;
-					in vec3 vNormalEye;
-					out vec4 fragColor;
-
-					void main()	{
-
-						vec4 color = vec4(vec3(0.), 1.);
-						for (int x = 0; x < int(pointLightsCount); x++) {
-							vec3 offset = lightPosition[x].xyz - vPositionEye;
-							vec3 dirToLight = normalize( offset );
-							float distance = length( offset );
-
-							float diffuse = max(0.0, dot(vNormalEye, dirToLight));
-							float attenuation = 1.0 / (distance * distance);
-
-							vec3 lightWeighting = lightColor[x].xyz * getDistanceAttenuation( distance, 4., .7 );
-							color.rgb += lightWeighting;
-						}
-						fragColor = color;
-
-					}
-					`,
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
 					glslVersion: THREE.GLSL3
 				} );
 
@@ -266,11 +241,28 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				// controls
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.enabledPan = false;
+
+				// stats
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				// gui
+				const gui = new GUI();
+				gui.add( api, 'count', 1, pointLightsMax ).step( 1 ).onChange( function () {
+
+					lightingUniformsGroup.uniforms[ 2 ].value = api.count;
+
+				} );
 
 			}
 
@@ -289,15 +281,12 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update();
 				stats.update();
 
-				renderer.clear();
-
-				clock.getDelta();
-				const { elapsedTime } = clock;
+				const elapsedTime = clock.getElapsedTime();
 
 				const lights = lightingUniformsGroup.uniforms[ 0 ];
+			
 				// Parameters for circular movement
 				const radius = 5; // Smaller radius for individual circular movements
 				const speed = 0.5; // Speed of rotation
