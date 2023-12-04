@@ -1938,7 +1938,7 @@ class GLTFDracoMeshCompressionExtension {
 
 					resolve( geometry );
 
-				}, threeAttributeMap, attributeTypeMap, reject );
+				}, threeAttributeMap, attributeTypeMap, undefined, reject );
 
 			} );
 
