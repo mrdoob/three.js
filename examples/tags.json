@@ -87,7 +87,6 @@
 	"webgl_postprocessing_dof2": [ "bokeh" ],
 	"webgl_postprocessing_fxaa": [ "msaa", "multisampled" ],
 	"webgl_postprocessing_godrays": [ "light scattering" ],
-	"webgl_postprocessing_hbao": [ "ambient occlusion" ],
 	"webgl_shadowmap_progressive": [ "shadow", "soft", "lightmap", "onBeforeCompile" ],
 	"webgl_postprocessing_ssaa": [ "msaa", "multisampled" ],
 	"webgl_postprocessing_ssaa_unbiased": [ "msaa", "multisampled" ],
