@@ -82,13 +82,18 @@ class DRACOLoader extends Loader {
 
 	}
 
+
 	parse( buffer, onLoad, onError ) {
 
-		this.decodeDracoFile( buffer, onLoad, null, null, SRGBColorSpace ).catch( onError );
+		this.decodeDracoFile( buffer, onLoad, null, null, SRGBColorSpace ).catch( ( error ) => {
+
+			onError && onError( error );
+
+		} );
 
 	}
 
-	decodeDracoFile( buffer, callback, attributeIDs, attributeTypes, vertexColorSpace = LinearSRGBColorSpace ) {
+	decodeDracoFile( buffer, callback, attributeIDs, attributeTypes, vertexColorSpace = LinearSRGBColorSpace, onError = undefined ) {
 
 		const taskConfig = {
 			attributeIDs: attributeIDs || this.defaultAttributeIDs,
@@ -97,7 +102,11 @@ class DRACOLoader extends Loader {
 			vertexColorSpace: vertexColorSpace,
 		};
 
-		return this.decodeGeometry( buffer, taskConfig ).then( callback );
+		return this.decodeGeometry( buffer, taskConfig ).then( callback ).catch( ( error ) => {
+
+			onError && onError( error );
+
+		} );
 
 	}
 
@@ -156,7 +165,12 @@ class DRACOLoader extends Loader {
 				} );
 
 			} )
-			.then( ( message ) => this._createGeometry( message.geometry ) );
+			.then( ( message ) => this._createGeometry( message.geometry ) )
+			.catch( ( error ) => {
+
+				throw new Error( error );
+
+			} );
 
 		// Remove task from the task list.
 		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
