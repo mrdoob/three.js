@@ -2091,8 +2091,6 @@ class WebGLRenderer {
 
 						const group = groups[ i ];
 
-						if ( group.uniforms.length === 0 ) continue;
-
 						uniformsGroups.update( group, program );
 						uniformsGroups.bind( group, program );
 
