@@ -14,18 +14,18 @@ import {
  *
  * - other AO algorithms that are not implemented here:
  *   - Screen Space Ambient Occlusion (SSAO), see also SSAOShader.js
- *     - http://john-chapman-graphics.blogspot.com/2013/01/ssao-tutorial.html
- *     - https://learnopengl.com/Advanced-Lighting/SSAO
- *     - https://creativecoding.soe.ucsc.edu/courses/cmpm164/_schedule/AmbientOcclusion.pdf
- *     - https://drive.google.com/file/d/1SyagcEVplIm2KkRD3WQYSO9O0Iyi1hfy/edit
+ *	 - http://john-chapman-graphics.blogspot.com/2013/01/ssao-tutorial.html
+ *	 - https://learnopengl.com/Advanced-Lighting/SSAO
+ *	 - https://creativecoding.soe.ucsc.edu/courses/cmpm164/_schedule/AmbientOcclusion.pdf
+ *	 - https://drive.google.com/file/d/1SyagcEVplIm2KkRD3WQYSO9O0Iyi1hfy/edit
  *   - Scalable Ambient Occlusion (SAO), see also SAOShader.js
- *     - https://casual-effects.com/research/McGuire2012SAO/index.html
+ *	 - https://casual-effects.com/research/McGuire2012SAO/index.html
  *	   - https://research.nvidia.com/sites/default/files/pubs/2012-06_Scalable-Ambient-Obscurance/McGuire12SAO.pdf
  *   - N8HO
- *     - https://github.com/N8python/n8ao
+ *	 - https://github.com/N8python/n8ao
  *   - Horizon Based Ambient Occlusion (HBAO)
- *     - http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.577.2286&rep=rep1&type=pdf
- *     - https://www.derschmale.com/2013/12/20/an-alternative-implementation-for-hbao-2/
+ *	 - http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.577.2286&rep=rep1&type=pdf
+ *	 - https://www.derschmale.com/2013/12/20/an-alternative-implementation-for-hbao-2/
  *
  * - further reading
  * 	 - https://ceur-ws.org/Vol-3027/paper5.pdf
@@ -66,7 +66,7 @@ const GTAOShader = {
 		bias: { value: 0.001 },
 		scale: { value: 1. },
 		sceneBoxMin: { value: new Vector3( - 1, - 1, - 1 ) },
-      	sceneBoxMax: { value: new Vector3( 1, 1, 1 ) },
+		sceneBoxMax: { value: new Vector3( 1, 1, 1 ) },
 	},
 
 	vertexShader: /* glsl */`
@@ -130,27 +130,25 @@ const GTAOShader = {
 		}
 
 		vec3 computeNormalFromDepth(const vec2 uv) {
-            vec2 size = vec2(textureSize(tDepth, 0));
-            ivec2 p = ivec2(uv * size);
-            float c0 = fetchDepth(p);
-            float l2 = fetchDepth(p - ivec2(2, 0));
-            float l1 = fetchDepth(p - ivec2(1, 0));
-            float r1 = fetchDepth(p + ivec2(1, 0));
-            float r2 = fetchDepth(p + ivec2(2, 0));
-            float b2 = fetchDepth(p - ivec2(0, 2));
-            float b1 = fetchDepth(p - ivec2(0, 1));
-            float t1 = fetchDepth(p + ivec2(0, 1));
-            float t2 = fetchDepth(p + ivec2(0, 2));
-            float dl = abs((2.0 * l1 - l2) - c0);
-            float dr = abs((2.0 * r1 - r2) - c0);
-            float db = abs((2.0 * b1 - b2) - c0);
-            float dt = abs((2.0 * t1 - t2) - c0);
-            vec3 ce = getViewPosition(uv, c0).xyz;
-            vec3 dpdx = (dl < dr) ?  ce - getViewPosition((uv - vec2(1.0 / size.x, 0.0)), l1).xyz
-                                  : -ce + getViewPosition((uv + vec2(1.0 / size.x, 0.0)), r1).xyz;
-            vec3 dpdy = (db < dt) ?  ce - getViewPosition((uv - vec2(0.0, 1.0 / size.y)), b1).xyz
-                                  : -ce + getViewPosition((uv + vec2(0.0, 1.0 / size.y)), t1).xyz;
-            return normalize(cross(dpdx, dpdy));
+			vec2 size = vec2(textureSize(tDepth, 0));
+			ivec2 p = ivec2(uv * size);
+			float c0 = fetchDepth(p);
+			float l2 = fetchDepth(p - ivec2(2, 0));
+			float l1 = fetchDepth(p - ivec2(1, 0));
+			float r1 = fetchDepth(p + ivec2(1, 0));
+			float r2 = fetchDepth(p + ivec2(2, 0));
+			float b2 = fetchDepth(p - ivec2(0, 2));
+			float b1 = fetchDepth(p - ivec2(0, 1));
+			float t1 = fetchDepth(p + ivec2(0, 1));
+			float t2 = fetchDepth(p + ivec2(0, 2));
+			float dl = abs((2.0 * l1 - l2) - c0);
+			float dr = abs((2.0 * r1 - r2) - c0);
+			float db = abs((2.0 * b1 - b2) - c0);
+			float dt = abs((2.0 * t1 - t2) - c0);
+			vec3 ce = getViewPosition(uv, c0).xyz;
+			vec3 dpdx = (dl < dr) ? ce - getViewPosition((uv - vec2(1.0 / size.x, 0.0)), l1).xyz : -ce + getViewPosition((uv + vec2(1.0 / size.x, 0.0)), r1).xyz;
+			vec3 dpdy = (db < dt) ? ce - getViewPosition((uv - vec2(0.0, 1.0 / size.y)), b1).xyz : -ce + getViewPosition((uv + vec2(0.0, 1.0 / size.y)), t1).xyz;
+			return normalize(cross(dpdx, dpdy));
 		}
 
 		vec3 getViewNormal(const vec2 uv) {
@@ -182,14 +180,14 @@ const GTAOShader = {
 			float radiusToUse = radius;
 			float distanceFalloffToUse = thickness;
 			#if SCREEN_SPACE_RADIUS == 1
-			    float radiusScale = getViewPosition(vec2(0.5 + float(SCREEN_SPACE_RADIUS_SCALE) / resolution.x, 0.0), depth).x;
+				float radiusScale = getViewPosition(vec2(0.5 + float(SCREEN_SPACE_RADIUS_SCALE) / resolution.x, 0.0), depth).x;
 				radiusToUse *= radiusScale;
 				distanceFalloffToUse *= radiusScale;
 			#endif
 
 			#if SCENE_CLIP_BOX == 1
 				vec3 worldPos = (cameraWorldMatrix * vec4(viewPos, 1.0)).xyz;
-      			float boxDistance = length(max(vec3(0.0), max(sceneBoxMin - worldPos, worldPos - sceneBoxMax)));
+				float boxDistance = length(max(vec3(0.0), max(sceneBoxMin - worldPos, worldPos - sceneBoxMax)));
 				if (boxDistance > radiusToUse) {
 					discard;
 					return;
@@ -345,6 +343,7 @@ function generateMagicSquareNoise( size = 5 ) {
 	const magicSquare = generateMagicSquare( noiseSize );
 	const noiseSquareSize = magicSquare.length;
 	const data = new Uint8Array( noiseSquareSize * 4 );
+
 	for ( let inx = 0; inx < noiseSquareSize; ++ inx ) {
 
 		const iAng = magicSquare[ inx ];
@@ -365,21 +364,22 @@ function generateMagicSquareNoise( size = 5 ) {
 	noiseTexture.wrapS = RepeatWrapping;
 	noiseTexture.wrapT = RepeatWrapping;
 	noiseTexture.needsUpdate = true;
+
 	return noiseTexture;
 
 }
 
 function generateMagicSquare( size ) {
 
-	const noiseSize =
-	  Math.floor( size ) % 2 === 0 ? Math.floor( size ) + 1 : Math.floor( size );
+	const noiseSize = Math.floor( size ) % 2 === 0 ? Math.floor( size ) + 1 : Math.floor( size );
 	const noiseSquareSize = noiseSize * noiseSize;
 	const magicSquare = Array( noiseSquareSize ).fill( 0 );
 	let i = Math.floor( noiseSize / 2 );
 	let j = noiseSize - 1;
+
 	for ( let num = 1; num <= noiseSquareSize; ) {
 
-	  if ( i === - 1 && j === noiseSize ) {
+		if ( i === - 1 && j === noiseSize ) {
 
 			j = noiseSize - 2;
 			i = 0;
@@ -388,19 +388,19 @@ function generateMagicSquare( size ) {
 
 			if ( j === noiseSize ) {
 
-		  j = 0;
+				j = 0;
 
 			}
 
 			if ( i < 0 ) {
 
-		  i = noiseSize - 1;
+				i = noiseSize - 1;
 
 			}
 
 		}
 
-	  if ( magicSquare[ i * noiseSize + j ] !== 0 ) {
+		if ( magicSquare[ i * noiseSize + j ] !== 0 ) {
 
 			j -= 2;
 			i ++;
@@ -412,8 +412,8 @@ function generateMagicSquare( size ) {
 
 		}
 
-	  j ++;
-	  i --;
+		j ++;
+		i --;
 
 	}
 
