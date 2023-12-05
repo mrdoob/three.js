@@ -49,7 +49,6 @@ const SAOShader = {
 		}`,
 
 	fragmentShader: /* glsl */`
-
 		#include <common>
 
 		varying vec2 vUv;
@@ -58,7 +57,7 @@ const SAOShader = {
 		uniform sampler2D tDiffuse;
 		#endif
 
-		uniform sampler2D tDepth;
+		uniform highp sampler2D tDepth;
 		uniform sampler2D tNormal;
 
 		uniform float cameraNear;
