@@ -403,8 +403,17 @@ function WebGLLights( extensions, capabilities ) {
 
 				// WebGL 2
 
-				state.rectAreaLTC1 = UniformsLib.LTC_FLOAT_1;
-				state.rectAreaLTC2 = UniformsLib.LTC_FLOAT_2;
+				if ( extensions.has( 'OES_texture_float_linear' ) === true ) {
+
+					state.rectAreaLTC1 = UniformsLib.LTC_FLOAT_1;
+					state.rectAreaLTC2 = UniformsLib.LTC_FLOAT_2;
+
+				} else {
+
+					state.rectAreaLTC1 = UniformsLib.LTC_HALF_1;
+					state.rectAreaLTC2 = UniformsLib.LTC_HALF_2;
+
+				}
 
 			} else {
 
