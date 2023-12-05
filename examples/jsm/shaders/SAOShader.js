@@ -58,7 +58,7 @@ const SAOShader = {
 		#endif
 
 		uniform highp sampler2D tDepth;
-		uniform sampler2D tNormal;
+		uniform highp sampler2D tNormal;
 
 		uniform float cameraNear;
 		uniform float cameraFar;

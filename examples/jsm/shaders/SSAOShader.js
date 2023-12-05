@@ -49,7 +49,7 @@ const SSAOShader = {
 		}`,
 
 	fragmentShader: /* glsl */`
-		uniform sampler2D tNormal;
+		uniform highp sampler2D tNormal;
 		uniform highp sampler2D tDepth;
 		uniform sampler2D tNoise;
 
