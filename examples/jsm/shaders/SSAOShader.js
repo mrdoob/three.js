@@ -49,10 +49,8 @@ const SSAOShader = {
 		}`,
 
 	fragmentShader: /* glsl */`
-		precision highp sampler2D;
-
 		uniform sampler2D tNormal;
-		uniform sampler2D tDepth;
+		uniform highp sampler2D tDepth;
 		uniform sampler2D tNoise;
 
 		uniform vec3 kernel[ KERNEL_SIZE ];

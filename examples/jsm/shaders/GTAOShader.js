@@ -79,10 +79,9 @@ const GTAOShader = {
 		}`,
 
 	fragmentShader: /* glsl */`
-		precision highp sampler2D;
 		varying vec2 vUv;
 		uniform sampler2D tNormal;
-		uniform sampler2D tDepth;
+		uniform highp sampler2D tDepth;
 		uniform sampler2D tNoise;
 		uniform vec2 resolution;
 		uniform float cameraNear;
