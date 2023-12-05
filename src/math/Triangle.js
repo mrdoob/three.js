@@ -60,7 +60,8 @@ class Triangle {
 		// collinear or singular triangle
 		if ( denom === 0 ) {
 
-			throw new Error( 'THREE.Triangle: Barycoordinate for degenerate triangle cannot be computed.' );
+			target.set( 0, 0, 0 );
+			return null;
 
 		}
 
