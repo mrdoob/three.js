@@ -65,7 +65,6 @@
 				container.appendChild( stats.dom );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -84,8 +83,8 @@
 				controls.enablePan = false;
 				controls.enableDamping = true;
 
-				const width = window.innerWidth * window.devicePixelRatio;
-				const height = window.innerHeight * window.devicePixelRatio;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				composer = new EffectComposer( renderer );
 
