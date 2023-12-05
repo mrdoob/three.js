@@ -49,6 +49,7 @@ const SAOShader = {
 		}`,
 
 	fragmentShader: /* glsl */`
+		precision highp sampler2D;
 
 		#include <common>
 
