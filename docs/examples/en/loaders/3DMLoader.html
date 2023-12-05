@@ -14,7 +14,7 @@
 			A loader for Rhinoceros 3d files and objects. <br /><br />
 			Rhinoceros is a 3D modeler used to create, edit, analyze, document, render, animate, and translate NURBS curves, surfaces, breps, extrusions, point clouds, as well as polygon meshes and SubD objects.
 			[link:https://github.com/mcneel/rhino3dm rhino3dm.js] is compiled to WebAssembly from the open source geometry library [link:https://github.com/mcneel/opennurbs openNURBS].
-			The loader currently uses [link:https://www.npmjs.com/package/rhino3dm/v/8.0.0-beta2 rhino3dm.js 8.0.0-beta2.]
+			The loader currently uses [link:https://www.npmjs.com/package/rhino3dm/v/8.0.1 rhino3dm.js 8.0.1.]
 		</p>
 
 		<h2>Import</h2>
@@ -166,7 +166,7 @@
 			// Specify path to a folder containing WASM/JS libraries or a CDN.
 			// For example, /jsm/libs/rhino3dm/ is the location of the library inside the three.js repository
 			// loader.setLibraryPath( '/path_to_library/rhino3dm/' );
-			loader.setLibraryPath( 'https://unpkg.com/rhino3dm@8.0.0-beta2/' );
+			loader.setLibraryPath( 'https://unpkg.com/rhino3dm@8.0.1/' );
 	
 			// Load a 3DM file
 			loader.load(
@@ -205,13 +205,13 @@
 		</p>
 
 		<code>
-		import rhino3dm from 'https://unpkg.com/rhino3dm@8.0.0-beta2/'
+		import rhino3dm from 'https://unpkg.com/rhino3dm@8.0.1'
 
 		// Instantiate a loader
 		const loader = new Rhino3dmLoader();
 
 		// Specify path to a folder containing WASM/JS libraries or a CDN.
-		loader.setLibraryPath( 'https://unpkg.com/rhino3dm@8.0.0-beta2/' );
+		loader.setLibraryPath( 'https://unpkg.com/rhino3dm@8.0.1' );
 
 		const rhino = await rhino3dm();
 		console.log('Loaded rhino3dm.');
@@ -244,7 +244,7 @@
 		// Specify path to a folder containing the WASM/JS library:
 		loader.setLibraryPath( '/path_to_library/rhino3dm/' );
 		// or from a CDN:
-		loader.setLibraryPath( 'https://unpkg.com/rhino3dm@8.0.0-beta2/' );
+		loader.setLibraryPath( 'https://unpkg.com/rhino3dm@8.0.1' );
 		</code>
 
 		<h3>[method:this setWorkerLimit]( [param:Number workerLimit] )</h3>

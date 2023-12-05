@@ -10,7 +10,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '159dev';
+	const REVISION = '160dev';
 
 	const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -3090,9 +3090,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	class WebGLArrayRenderTarget extends WebGLRenderTarget {
 
-		constructor( width = 1, height = 1, depth = 1 ) {
+		constructor( width = 1, height = 1, depth = 1, options = {} ) {
 
-			super( width, height );
+			super( width, height, options );
 
 			this.isWebGLArrayRenderTarget = true;
 
@@ -3139,9 +3139,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	class WebGL3DRenderTarget extends WebGLRenderTarget {
 
-		constructor( width = 1, height = 1, depth = 1 ) {
+		constructor( width = 1, height = 1, depth = 1, options = {} ) {
 
-			super( width, height );
+			super( width, height, options );
 
 			this.isWebGL3DRenderTarget = true;
 
@@ -7265,9 +7265,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.matrixWorld = new Matrix4();
 
 			this.matrixAutoUpdate = Object3D.DEFAULT_MATRIX_AUTO_UPDATE;
-			this.matrixWorldNeedsUpdate = false;
 
 			this.matrixWorldAutoUpdate = Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE; // checked by the renderer
+			this.matrixWorldNeedsUpdate = false;
 
 			this.layers = new Layers();
 			this.visible = true;
@@ -7283,6 +7283,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.userData = {};
 
 		}
+
+		onBeforeShadow( /* renderer, object, camera, shadowCamera, geometry, depthMaterial, group */ ) {}
+
+		onAfterShadow( /* renderer, object, camera, shadowCamera, geometry, depthMaterial, group */ ) {}
 
 		onBeforeRender( /* renderer, scene, camera, geometry, material, group */ ) {}
 
@@ -8130,9 +8134,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.matrixWorld.copy( source.matrixWorld );
 
 			this.matrixAutoUpdate = source.matrixAutoUpdate;
-			this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
 			this.matrixWorldAutoUpdate = source.matrixWorldAutoUpdate;
+			this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
 			this.layers.mask = source.layers.mask;
 			this.visible = source.visible;
@@ -9914,7 +9918,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		get updateRange() {
 
-			console.warn( 'THREE.BufferAttribute: "updateRange" is deprecated and removed in r169. Use "addUpdateRange()" instead.' ); // @deprecated, r159
+			console.warn( 'THREE.BufferAttribute: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
 			return this._updateRange;
 
 		}
@@ -18146,6 +18150,60 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
+	class DepthTexture extends Texture {
+
+		constructor( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
+
+			format = format !== undefined ? format : DepthFormat;
+
+			if ( format !== DepthFormat && format !== DepthStencilFormat ) {
+
+				throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' );
+
+			}
+
+			if ( type === undefined && format === DepthFormat ) type = UnsignedIntType;
+			if ( type === undefined && format === DepthStencilFormat ) type = UnsignedInt248Type;
+
+			super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+
+			this.isDepthTexture = true;
+
+			this.image = { width: width, height: height };
+
+			this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
+			this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
+
+			this.flipY = false;
+			this.generateMipmaps = false;
+
+			this.compareFunction = null;
+
+		}
+
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.compareFunction = source.compareFunction;
+
+			return this;
+
+		}
+
+		toJSON( meta ) {
+
+			const data = super.toJSON( meta );
+
+			if ( this.compareFunction !== null ) data.compareFunction = this.compareFunction;
+
+			return data;
+
+		}
+
+	}
+
 	/**
 	 * Uniforms of a program.
 	 * Those form a tree structure with a special top-level container for the root,
@@ -18191,6 +18249,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 
 	const emptyTexture = /*@__PURE__*/ new Texture();
+
+	const emptyShadowTexture = /*@__PURE__*/ new DepthTexture( 1, 1 );
+	emptyShadowTexture.compareFunction = LessEqualCompare;
+
 	const emptyArrayTexture = /*@__PURE__*/ new DataArrayTexture();
 	const empty3dTexture = /*@__PURE__*/ new Data3DTexture();
 	const emptyCubeTexture = /*@__PURE__*/ new CubeTexture();
@@ -18707,7 +18769,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		textures.setTexture2D( v || emptyTexture, unit );
+		const emptyTexture2D = ( this.type === gl.SAMPLER_2D_SHADOW ) ? emptyShadowTexture : emptyTexture;
+
+		textures.setTexture2D( v || emptyTexture2D, unit );
 
 	}
 
@@ -19091,6 +19155,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.id = id;
 			this.addr = addr;
 			this.cache = [];
+			this.type = activeInfo.type;
 			this.setValue = getSingularSetter( activeInfo.type );
 
 			// this.path = activeInfo.name; // DEBUG
@@ -19106,6 +19171,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.id = id;
 			this.addr = addr;
 			this.cache = [];
+			this.type = activeInfo.type;
 			this.size = activeInfo.size;
 			this.setValue = getPureArraySetter( activeInfo.type );
 
@@ -22516,7 +22582,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 								const depthMaterial = getDepthMaterial( object, groupMaterial, light, type );
 
+								object.onBeforeShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, group );
+
 								_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
+
+								object.onAfterShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, group );
 
 							}
 
@@ -22526,7 +22596,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						const depthMaterial = getDepthMaterial( object, material, light, type );
 
+						object.onBeforeShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, null );
+
 						_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
+
+						object.onAfterShadow( _renderer, object, camera, shadowCamera, geometry, depthMaterial, null );
 
 					}
 
@@ -26619,60 +26693,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	class DepthTexture extends Texture {
-
-		constructor( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
-
-			format = format !== undefined ? format : DepthFormat;
-
-			if ( format !== DepthFormat && format !== DepthStencilFormat ) {
-
-				throw new Error( 'DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat' );
-
-			}
-
-			if ( type === undefined && format === DepthFormat ) type = UnsignedIntType;
-			if ( type === undefined && format === DepthStencilFormat ) type = UnsignedInt248Type;
-
-			super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
-
-			this.isDepthTexture = true;
-
-			this.image = { width: width, height: height };
-
-			this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
-			this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
-
-			this.flipY = false;
-			this.generateMipmaps = false;
-
-			this.compareFunction = null;
-
-		}
-
-
-		copy( source ) {
-
-			super.copy( source );
-
-			this.compareFunction = source.compareFunction;
-
-			return this;
-
-		}
-
-		toJSON( meta ) {
-
-			const data = super.toJSON( meta );
-
-			if ( this.compareFunction !== null ) data.compareFunction = this.compareFunction;
-
-			return data;
-
-		}
-
-	}
-
 	class WebXRManager extends EventDispatcher {
 
 		constructor( renderer, gl ) {
@@ -28116,7 +28136,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						const info = getUniformSize( value );
 
-						if ( typeof value === 'number' ) {
+						if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
 							uniform.__data[ 0 ] = value;
 							gl.bufferSubData( gl.UNIFORM_BUFFER, offset + arrayOffset, uniform.__data );
@@ -28128,15 +28148,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 							uniform.__data[ 0 ] = value.elements[ 0 ];
 							uniform.__data[ 1 ] = value.elements[ 1 ];
 							uniform.__data[ 2 ] = value.elements[ 2 ];
-							uniform.__data[ 3 ] = value.elements[ 0 ];
+							uniform.__data[ 3 ] = 0;
 							uniform.__data[ 4 ] = value.elements[ 3 ];
 							uniform.__data[ 5 ] = value.elements[ 4 ];
 							uniform.__data[ 6 ] = value.elements[ 5 ];
-							uniform.__data[ 7 ] = value.elements[ 0 ];
+							uniform.__data[ 7 ] = 0;
 							uniform.__data[ 8 ] = value.elements[ 6 ];
 							uniform.__data[ 9 ] = value.elements[ 7 ];
 							uniform.__data[ 10 ] = value.elements[ 8 ];
-							uniform.__data[ 11 ] = value.elements[ 0 ];
+							uniform.__data[ 11 ] = 0;
 
 						} else {
 
@@ -28166,7 +28186,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				// cache entry does not exist so far
 
-				if ( typeof value === 'number' ) {
+				if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
 					cache[ index ] = value;
 
@@ -28192,7 +28212,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				// compare current value with cached entry
 
-				if ( typeof value === 'number' ) {
+				if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
 					if ( cache[ index ] !== value ) {
 
@@ -28210,7 +28230,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						const cachedObject = cachedObjects[ i ];
 
-						if ( cachedObject.equals( values[ i ] ) === false ) {
+						if ( typeof cachedObject === 'number' || typeof cachedObject === 'boolean' ) {
+
+							if ( cachedObject !== values[ i ] ) {
+
+								cachedObjects[ i ] = values[ i ];
+								return true;
+
+							}
+
+						} else if ( cachedObject.equals( values[ i ] ) === false ) {
 
 							cachedObject.copy( values[ i ] );
 							return true;
@@ -28314,9 +28343,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			// determine sizes according to STD140
 
-			if ( typeof value === 'number' ) {
+			if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
-				// float/int
+				// float/int/bool
 
 				info.boundary = 4;
 				info.storage = 4;
@@ -31125,7 +31154,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		get updateRange() {
 
-			console.warn( 'THREE.InterleavedBuffer: "updateRange" is deprecated and removed in r169. Use "addUpdateRange()" instead.' ); // @deprecated, r159
+			console.warn( 'THREE.InterleavedBuffer: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
 			return this._updateRange;
 
 		}
@@ -32865,15 +32894,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	}
 
 	const ID_ATTR_NAME = 'batchId';
-	const _matrix = new Matrix4();
-	const _identityMatrix = new Matrix4();
-	const _projScreenMatrix$2 = new Matrix4();
-	const _frustum = new Frustum();
-	const _box$1 = new Box3();
-	const _sphere$2 = new Sphere();
-	const _vector$5 = new Vector3();
-	const _renderList = new MultiDrawRenderList();
-	const _mesh = new Mesh();
+	const _matrix = /*@__PURE__*/ new Matrix4();
+	const _invMatrixWorld = /*@__PURE__*/ new Matrix4();
+	const _identityMatrix = /*@__PURE__*/ new Matrix4();
+	const _projScreenMatrix$2 = /*@__PURE__*/ new Matrix4();
+	const _frustum = /*@__PURE__*/ new Frustum();
+	const _box$1 = /*@__PURE__*/ new Box3();
+	const _sphere$2 = /*@__PURE__*/ new Sphere();
+	const _vector$5 = /*@__PURE__*/ new Vector3();
+	const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
+	const _mesh = /*@__PURE__*/ new Mesh();
 	const _batchIntersects = [];
 
 	// @TODO: SkinnedMesh support?
@@ -33673,7 +33703,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		onBeforeRender( _renderer, _scene, camera, geometry, material/*, _group*/ ) {
+		onBeforeRender( renderer, scene, camera, geometry, material/*, _group*/ ) {
 
 			// if visibility has not changed and frustum culling and object sorting is not required
 			// then skip iterating over all items
@@ -33694,7 +33724,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			const drawRanges = this._drawRanges;
 			const perObjectFrustumCulled = this.perObjectFrustumCulled;
 
-			// prepare the frustum
+			// prepare the frustum in the local frame
 			if ( perObjectFrustumCulled ) {
 
 				_projScreenMatrix$2
@@ -33702,17 +33732,17 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 					.multiply( this.matrixWorld );
 				_frustum.setFromProjectionMatrix(
 					_projScreenMatrix$2,
-					_renderer.isWebGPURenderer ? WebGPUCoordinateSystem : WebGLCoordinateSystem
+					renderer.isWebGPURenderer ? WebGPUCoordinateSystem : WebGLCoordinateSystem
 				);
 
 			}
 
 			let count = 0;
-
 			if ( this.sortObjects ) {
 
-				// get the camera position
-				_vector$5.setFromMatrixPosition( camera.matrixWorld );
+				// get the camera position in the local frame
+				_invMatrixWorld.copy( this.matrixWorld ).invert();
+				_vector$5.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _invMatrixWorld );
 
 				for ( let i = 0, l = visibility.length; i < l; i ++ ) {
 
@@ -33800,6 +33830,12 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this._multiDrawCount = count;
 			this._visibilityChanged = false;
+
+		}
+
+		onBeforeShadow( renderer, object, camera, shadowCamera, geometry, depthMaterial/* , group */ ) {
+
+			this.onBeforeRender( renderer, null, shadowCamera, geometry, depthMaterial );
 
 		}
 
@@ -35620,6 +35656,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.v2 = v2;
 
 		}
+
 		getPoint( t, optionalTarget = new Vector3() ) {
 
 			const point = optionalTarget;
@@ -35638,6 +35675,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			return point;
 
 		}
+
 		// Line curve is linear, so we can overwrite default getPointAt
 		getPointAt( u, optionalTarget ) {
 
@@ -35667,6 +35705,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			return this;
 
 		}
+
 		toJSON() {
 
 			const data = super.toJSON();
@@ -35677,6 +35716,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			return data;
 
 		}
+
 		fromJSON( json ) {
 
 			super.fromJSON( json );

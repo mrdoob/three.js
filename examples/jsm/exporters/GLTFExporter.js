@@ -1835,6 +1835,24 @@ class GLTFWriter {
 
 		if ( isMultiMaterial && geometry.groups.length === 0 ) return null;
 
+		let didForceIndices = false;
+
+		if ( isMultiMaterial && geometry.index === null ) {
+
+			const indices = [];
+
+			for ( let i = 0, il = geometry.attributes.position.count; i < il; i ++ ) {
+
+				indices[ i ] = i;
+
+			}
+
+			geometry.setIndex( indices );
+
+			didForceIndices = true;
+
+		}
+
 		const materials = isMultiMaterial ? mesh.material : [ mesh.material ];
 		const groups = isMultiMaterial ? geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
 
@@ -1879,6 +1897,12 @@ class GLTFWriter {
 			if ( material !== null ) primitive.material = material;
 
 			primitives.push( primitive );
+
+		}
+
+		if ( didForceIndices === true ) {
+
+			geometry.setIndex( null );
 
 		}
 
