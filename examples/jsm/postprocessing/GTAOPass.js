@@ -4,6 +4,7 @@ import {
 	CustomBlending,
 	DataTexture,
 	DepthTexture,
+	DepthStencilFormat,
 	DstAlphaFactor,
 	DstColorFactor,
 	HalfFloatType,
@@ -15,6 +16,7 @@ import {
 	ShaderMaterial,
 	UniformsUtils,
 	UnsignedByteType,
+	UnsignedInt248Type,
 	WebGLRenderTarget,
 	ZeroFactor
 } from 'three';
@@ -171,6 +173,8 @@ class GTAOPass extends Pass {
 		} else {
 
 			this.depthTexture = new DepthTexture();
+			this.depthTexture.format = DepthStencilFormat;
+			this.depthTexture.type = UnsignedInt248Type;
 			this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 				minFilter: NearestFilter,
 				magFilter: NearestFilter,
