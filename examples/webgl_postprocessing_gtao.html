@@ -64,7 +64,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -85,15 +85,8 @@
 
 				const width = window.innerWidth;
 				const height = window.innerHeight;
-				const pixelRatio = renderer.getPixelRatio();
-				const maxSamples = renderer.capabilities.maxSamples;
 
-				const renderTarget = new THREE.WebGLRenderTarget( width * pixelRatio, height * pixelRatio, {
-					type: THREE.HalfFloatType,
-					samples: maxSamples,
-				} );
-				renderTarget.texture.name = 'EffectComposer.rt1';
-				composer = new EffectComposer( renderer, renderTarget );
+				composer = new EffectComposer( renderer );
 
 				const renderPass = new RenderPass( scene, camera );
 				composer.addPass( renderPass );
