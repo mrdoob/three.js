@@ -398,7 +398,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 		material.removeEventListener( 'dispose', onMaterialDispose );
 
-		// make sure to remove the unique distance or depth material used for shadow map rendering
+		// make sure to remove the unique distance/depth materials used for shadow map rendering
 
 		for ( const id in _materialCache ) {
 
