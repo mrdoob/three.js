@@ -245,9 +245,9 @@ class WebGLTextureUtils {
 
 		const dstBuffer = new typedArrayType( elementCount );
 
-		gl.bindBuffer(  gl.PIXEL_PACK_BUFFER, buffer );
+		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, buffer );
 		gl.getBufferSubData( gl.PIXEL_PACK_BUFFER, 0, dstBuffer );
-		gl.bindBuffer(  gl.PIXEL_PACK_BUFFER, null );
+		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, null );
 
 		return dstBuffer;
 
@@ -290,14 +290,14 @@ class WebGLTextureUtils {
 
 				const res = gl.clientWaitSync( sync, gl.SYNC_FLUSH_COMMANDS_BIT, 0 );
 
-				if ( res === gl.WAIT_FAILED) {
+				if ( res === gl.WAIT_FAILED ) {
 
 					reject();
 					return;
 
 				}
 
-				if ( res === gl.TIMEOUT_EXPIRED) {
+				if ( res === gl.TIMEOUT_EXPIRED ) {
 
 					requestAnimationFrame( test );
 					return;
