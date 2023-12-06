@@ -60,9 +60,8 @@ class Triangle {
 		// collinear or singular triangle
 		if ( denom === 0 ) {
 
-			// arbitrary location outside of triangle?
-			// not sure if this is the best idea, maybe should be returning undefined
-			return target.set( - 2, - 1, - 1 );
+			target.set( 0, 0, 0 );
+			return null;
 
 		}
 
@@ -77,7 +76,12 @@ class Triangle {
 
 	static containsPoint( point, a, b, c ) {
 
-		this.getBarycoord( point, a, b, c, _v3 );
+		// if the triangle is degenerate then we can't contain a point
+		if ( this.getBarycoord( point, a, b, c, _v3 ) === null ) {
+
+			return false;
+
+		}
 
 		return ( _v3.x >= 0 ) && ( _v3.y >= 0 ) && ( ( _v3.x + _v3.y ) <= 1 );
 
