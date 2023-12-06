@@ -214,8 +214,26 @@ export class Flow {
 				child instanceof InstancedMesh
 			) {
 
-				child.material = child.material.clone();
-				modifyShader( child.material, uniforms, numberOfCurves );
+				if ( Array.isArray( child.material ) ) {
+
+					const materials = [];
+
+					for ( const material of child.material ) {
+
+						const newMaterial = material.clone();
+						modifyShader( newMaterial, uniforms, numberOfCurves );
+						materials.push( newMaterial );
+
+					}
+
+					child.material = materials;
+
+				} else {
+
+					child.material = child.material.clone();
+					modifyShader( child.material, uniforms, numberOfCurves );
+
+				}
 
 			}
 
