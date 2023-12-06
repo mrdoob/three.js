@@ -422,7 +422,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	isReference( type ) {
 
-		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube' || type === 'texture_storage_2d';
+		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube' || type === 'texture_depth_2d' || type === 'texture_storage_2d';
 
 	}
 
