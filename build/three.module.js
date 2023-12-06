@@ -17914,6 +17914,8 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 			let morphInfluencesSum = 0;
 
+			let objectInfluences = []; 
+
 			for ( let i = 0; i < objectInfluences.length; i ++ ) {
 
 				morphInfluencesSum += objectInfluences[ i ];
