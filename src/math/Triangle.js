@@ -103,7 +103,12 @@ class Triangle {
 
 	static getInterpolation( point, p1, p2, p3, v1, v2, v3, target ) {
 
-		this.getBarycoord( point, p1, p2, p3, _v3 );
+		if ( this.getBarycoord( point, p1, p2, p3, _v3 ) === null ) {
+
+			target.set( 0, 0, 0 );
+			return null;
+
+		}
 
 		target.setScalar( 0 );
 		target.addScaledVector( v1, _v3.x );
