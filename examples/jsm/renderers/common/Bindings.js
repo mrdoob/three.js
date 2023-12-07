@@ -144,7 +144,7 @@ class Bindings extends DataMap {
 
 						textureData.needsMipmap = true;
 
-					} else if ( textureData.needsMipmap === true ) {
+					} else if ( this.textures.needsMipmaps( texture ) && textureData.needsMipmap === true ) {
 
 						this.backend.generateMipmaps( texture );
 
