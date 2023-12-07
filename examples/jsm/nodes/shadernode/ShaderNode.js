@@ -40,7 +40,13 @@ const shaderNodeHandler = {
 
 			if ( node.isStackNode !== true && prop === 'assign' ) {
 
-				return ( ...params ) => currentStack.assign( nodeObj, ...params );
+				return ( ...params ) => {
+
+					currentStack.assign( nodeObj, ...params );
+
+					return nodeObj;
+
+				};
 
 			} else if ( NodeElements.has( prop ) ) {
 
@@ -268,6 +274,12 @@ class ShaderCallNodeInternal extends Node {
 				functionNode = nodeObject( builder.buildFunctionNode( shaderNode ) );
 
 				functionNodesCacheMap.set( shaderNode, functionNode );
+
+			}
+
+			if ( builder.currentFunctionNode !== null ) {
+
+				builder.currentFunctionNode.includes.push( functionNode );
 
 			}
 
@@ -505,7 +517,18 @@ addNodeClass( 'ShaderNode', ShaderNode );
 
 //
 
-export const setCurrentStack = stack => currentStack = stack;
+export const setCurrentStack = ( stack ) => {
+
+	if ( currentStack === stack ) {
+
+		//throw new Error( 'Stack already defined.' );
+
+	}
+
+	currentStack = stack;
+
+};
+
 export const getCurrentStack = () => currentStack;
 
 export const If = ( ...params ) => currentStack.if( ...params );
