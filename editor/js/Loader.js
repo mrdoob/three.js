@@ -963,7 +963,7 @@ function Loader( editor ) {
 
 				{
 
-					const loader = await createGLTFLoader();
+					const loader = await createGLTFLoader( manager );
 					
 					loader.parse( strFromU8( file ), '', function ( result ) {
 
