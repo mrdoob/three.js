@@ -1056,6 +1056,12 @@ class WebGPUBackend extends Backend {
 
 	// utils public
 
+	getMaxAnisotropy() {
+
+		return 16;
+
+	}
+
 	hasFeature( name ) {
 
 		const adapter = this.adapter || _staticAdapter;

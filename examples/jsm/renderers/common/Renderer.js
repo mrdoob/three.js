@@ -352,6 +352,12 @@ class Renderer {
 
 	}
 
+	getMaxAnisotropy() {
+
+		return this.backend.getMaxAnisotropy();
+
+	}
+
 	getActiveCubeFace() {
 
 		return this._activeCubeFace;
