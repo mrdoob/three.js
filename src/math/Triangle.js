@@ -105,7 +105,10 @@ class Triangle {
 
 		if ( this.getBarycoord( point, p1, p2, p3, _v3 ) === null ) {
 
-			target.set( 0, 0, 0 );
+			target.x = 0;
+			target.y = 0;
+			if ( 'z' in target ) target.z = 0;
+			if ( 'w' in target ) target.w = 0;
 			return null;
 
 		}
