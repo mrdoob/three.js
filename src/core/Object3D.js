@@ -43,12 +43,40 @@ class Object3D extends EventDispatcher {
 		this.parent = null;
 		this.children = [];
 
+		this.onMatrixWorldNeedsUpdate = false;
 		this.up = Object3D.DEFAULT_UP.clone();
+		const scope = this;
+		const position = new Proxy( new Vector3(), {
+			set( a, b, c ) {
 
-		const position = new Vector3();
-		const rotation = new Euler();
+				a[ b ] = c;
+				a._onChangeCallback && a._onChangeCallback();
+				// scope.onUpdateV3();
+				return true;
+
+			}
+		} );
+		const rotation = new Proxy( new Euler(), {
+			set( a, b, c ) {
+
+				a[ b ] = c;
+				a._onChangeCallback && a._onChangeCallback();
+				// scope.onUpdateV3();
+				return true;
+
+			}
+		} );
 		const quaternion = new Quaternion();
-		const scale = new Vector3( 1, 1, 1 );
+		const scale = new Proxy( new Vector3( 1, 1, 1 ), {
+			set( a, b, c ) {
+
+				a[ b ] = c;
+				a._onChangeCallback && a._onChangeCallback();
+				// scope.onUpdateV3();
+				return true;
+
+			}
+		} );
 
 		function onRotationChange() {
 
@@ -142,7 +170,6 @@ class Object3D extends EventDispatcher {
 	setRotationFromAxisAngle( axis, angle ) {
 
 		// assumes axis is normalized
-
 		this.quaternion.setFromAxisAngle( axis, angle );
 
 	}
@@ -568,10 +595,17 @@ class Object3D extends EventDispatcher {
 		this.matrix.compose( this.position, this.quaternion, this.scale );
 
 		this.matrixWorldNeedsUpdate = true;
+		// this.matrixAutoUpdate = false;
 
 	}
 
-	updateMatrixWorld( force ) {
+	updateMatrixWorld( force, deep ) {
+
+		if ( deep === undefined ) {
+
+			deep = this.onMatrixWorldNeedsUpdate;
+
+		}
 
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
@@ -589,6 +623,12 @@ class Object3D extends EventDispatcher {
 
 			this.matrixWorldNeedsUpdate = false;
 
+			if ( deep ) {
+
+				this.onUpdateMatrixWorld( );
+
+			}
+
 			force = true;
 
 		}
@@ -603,11 +643,12 @@ class Object3D extends EventDispatcher {
 
 			if ( child.matrixWorldAutoUpdate === true || force === true ) {
 
-				child.updateMatrixWorld( force );
+				child.updateMatrixWorld( force, deep );
 
 			}
 
 		}
+
 
 	}
 
@@ -948,6 +989,22 @@ class Object3D extends EventDispatcher {
 		}
 
 		return this;
+
+	}
+	updateLocal( state = true ) {
+
+		this.matrixAutoUpdate = state;
+		this.matrixWorldNeedsUpdate = state;
+		this.matrixWorldAutoUpdate = state;
+		if ( state ) {
+
+			this.updateMatrix();
+
+		}
+
+	}
+
+	onUpdateMatrixWorld( force ) {
 
 	}
 

@@ -12,6 +12,15 @@ class Vector3 {
 		this.z = z;
 
 	}
+	_onChange( callback ) {
+
+		this._onChangeCallback = callback;
+
+		return this;
+
+	}
+
+	_onChangeCallback() {}
 
 	set( x, y, z ) {
 
@@ -20,6 +29,7 @@ class Vector3 {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+
 
 		return this;
 
