@@ -27,21 +27,40 @@
 		</p>
 
 		<code>
-			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+			import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 		</code>
 
 		<h2>Code Example</h2>
 
 		<code>
 		const loader = new FontLoader();
-		const font = loader.load(
+		loader.load(
 			// resource URL
 			'fonts/helvetiker_bold.typeface.json',
 
 			// onLoad callback
 			function ( font ) {
-				// do something with the font
-				console.log( font );
+				//Add font geometry to scene
+				const textGeometry = new TextGeometry(
+				'Threejs',
+				    {
+					font: font,
+					size: 0.5,
+					height: 0.2,
+					curveSegments: 12,
+					bevelEnabled: true,
+					bevelThickness: 0.03,
+					bevelSize: 0.02,
+					bevelOffset: 0,
+					bevelSegments: 5
+				    }
+				)
+				const textMaterial = new THREE.MeshBasicMaterial()
+				const text = new THREE.Mesh(
+				    textGeometry,
+				    textMaterial
+				)
+				scene.add(text)
 			},
 
 			// onProgress callback
