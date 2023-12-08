@@ -141,6 +141,24 @@ export default QUnit.module( 'Maths', () => {
 			a = new Triangle( new Vector3( 2, 0, 0 ), new Vector3( 0, 0, 0 ), new Vector3( 3, 0, 0 ) );
 			assert.ok( a.getArea() == 0, 'Passed!' );
 
+		});
+
+		QUnit.test( 'getAreaSquared', ( assert ) => {
+
+			let a = new Triangle();
+
+			assert.ok( a.getAreaSquared() == 0, 'Passed!' );
+
+			a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
+			assert.ok( a.getAreaSquared() == 0.25, 'Passed!' );
+
+			a = new Triangle( new Vector3( 2, 0, 0 ), new Vector3( 0, 0, 0 ), new Vector3( 0, 0, 2 ) );
+			assert.ok( a.getAreaSquared() == 4, 'Passed!' );
+
+			// colinear triangle.
+			a = new Triangle( new Vector3( 2, 0, 0 ), new Vector3( 0, 0, 0 ), new Vector3( 3, 0, 0 ) );
+			assert.ok( a.getAreaSquared() == 0, 'Passed!' );
+
 		} );
 
 		QUnit.test( 'getMidpoint', ( assert ) => {

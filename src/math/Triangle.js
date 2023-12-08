@@ -179,6 +179,15 @@ class Triangle {
 
 	}
 
+	getAreaSquared() {
+
+		_v0.subVectors( this.c, this.b );
+		_v1.subVectors( this.a, this.b );
+
+		return _v0.cross( _v1 ).lengthSq() * 0.25;
+
+	}
+
 	getMidpoint( target ) {
 
 		return target.addVectors( this.a, this.b ).add( this.c ).multiplyScalar( 1 / 3 );
