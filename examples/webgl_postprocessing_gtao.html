@@ -135,7 +135,6 @@
 					radius: 0.25,
 					distanceExponent: 1.,
 					thickness: 1.,
-					bias: 0.001,
 					scale: 1.,
 					samples: 16,
 					distanceFallOff: true,
@@ -159,7 +158,6 @@
 				gui.add( aoParameters, 'radius' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
 				gui.add( aoParameters, 'distanceExponent' ).min( 1 ).max( 4 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
 				gui.add( aoParameters, 'thickness' ).min( 0.01 ).max( 10 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
-				gui.add( aoParameters, 'bias' ).min( 0 ).max( 0.1 ).step( 0.0001 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
 				gui.add( aoParameters, 'scale' ).min( 0.01 ).max( 2.0 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
 				gui.add( aoParameters, 'samples' ).min( 2 ).max( 32 ).step( 1 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
 				gui.add( aoParameters, 'screenSpaceRadius' ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
