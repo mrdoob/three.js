@@ -299,7 +299,7 @@ function Loader( editor ) {
 
 					const contents = event.target.result;
 
-					const loader = await createGLTFLoader();
+					const loader = await createGLTFLoader( manager );
 
 					loader.parse( contents, '', function ( result ) {
 
@@ -963,7 +963,7 @@ function Loader( editor ) {
 
 				{
 
-					const loader = await createGLTFLoader();
+					const loader = await createGLTFLoader( manager );
 					
 					loader.parse( strFromU8( file ), '', function ( result ) {
 
@@ -987,7 +987,7 @@ function Loader( editor ) {
 
 	}
 
-	async function createGLTFLoader() {
+	async function createGLTFLoader( manager ) {
 
 		const { GLTFLoader } = await import( 'three/addons/loaders/GLTFLoader.js' );
 		const { DRACOLoader } = await import( 'three/addons/loaders/DRACOLoader.js' );
@@ -1002,7 +1002,7 @@ function Loader( editor ) {
 
 		editor.signals.rendererDetectKTX2Support.dispatch( ktx2Loader );
 
-		const loader = new GLTFLoader();
+		const loader = new GLTFLoader( manager );
 		loader.setDRACOLoader( dracoLoader );
 		loader.setKTX2Loader( ktx2Loader );
 		loader.setMeshoptDecoder( MeshoptDecoder );

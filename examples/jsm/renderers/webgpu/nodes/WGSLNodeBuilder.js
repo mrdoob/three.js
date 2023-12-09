@@ -9,7 +9,7 @@ import UniformBuffer from '../../common/UniformBuffer.js';
 import StorageBuffer from '../../common/StorageBuffer.js';
 import { getVectorLength, getStrideLength } from '../../common/BufferUtils.js';
 
-import { NodeBuilder, CodeNode, NodeMaterial, FunctionNode } from '../../../nodes/Nodes.js';
+import { NodeBuilder, CodeNode, NodeMaterial } from '../../../nodes/Nodes.js';
 
 import { getFormat } from '../utils/WebGPUTextureUtils.js';
 
@@ -23,6 +23,10 @@ const gpuShaderStageLib = {
 
 const supports = {
 	instance: true
+};
+
+const wgslFnOpLib = {
+	'^^': 'threejs_xor'
 };
 
 const wgslTypeLib = {
@@ -63,14 +67,30 @@ const wgslMethods = {
 	dFdy: '- dpdy',
 	mod: 'threejs_mod',
 	lessThanEqual: 'threejs_lessThanEqual',
-	inversesqrt: 'inverseSqrt'
+	greaterThan: 'threejs_greaterThan',
+	inversesqrt: 'inverseSqrt',
+	bitcast: 'bitcast<f32>'
 };
 
 const wgslPolyfill = {
+	threejs_xor: new CodeNode( `
+fn threejs_xor( a : bool, b : bool ) -> bool {
+
+	return ( a || b ) && !( a && b );
+
+}
+` ),
 	lessThanEqual: new CodeNode( `
 fn threejs_lessThanEqual( a : vec3<f32>, b : vec3<f32> ) -> vec3<bool> {
 
 	return vec3<bool>( a.x <= b.x, a.y <= b.y, a.z <= b.z );
+
+}
+` ),
+	greaterThan: new CodeNode( `
+fn threejs_greaterThan( a : vec3<f32>, b : vec3<f32> ) -> vec3<bool> {
+
+	return vec3<bool>( a.x > b.x, a.y > b.y, a.z > b.z );
 
 }
 ` ),
@@ -303,6 +323,22 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getFunctionOperator( op ) {
+
+		const fnOp = wgslFnOpLib[ op ];
+
+		if ( fnOp !== undefined ) {
+
+			this._include( fnOp );
+
+			return fnOp;
+
+		}
+
+		return null;
+
+	}
+
 	getUniformFromNode( node, type, shaderStage, name = null ) {
 
 		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
@@ -422,7 +458,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	isReference( type ) {
 
-		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube' || type === 'texture_storage_2d';
+		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube' || type === 'texture_depth_2d' || type === 'texture_storage_2d';
 
 	}
 
@@ -456,7 +492,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	buildFunctionNode( shaderNode ) {
+	buildFunctionCode( shaderNode ) {
 
 		const layout = shaderNode.layout;
 		const flowData = this.flowShaderNode( shaderNode );
@@ -480,7 +516,7 @@ ${ flowData.code }
 
 		//
 
-		return new FunctionNode( code );
+		return code;
 
 	}
 
@@ -926,7 +962,16 @@ ${ flowData.code }
 
 	_include( name ) {
 
-		wgslPolyfill[ name ].build( this );
+		const codeNode = wgslPolyfill[ name ];
+		codeNode.build( this );
+
+		if ( this.currentFunctionNode !== null ) {
+
+			this.currentFunctionNode.includes.push( codeNode );
+
+		}
+
+		return codeNode;
 
 	}
 

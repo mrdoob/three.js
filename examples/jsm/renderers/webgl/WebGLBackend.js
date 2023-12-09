@@ -8,6 +8,7 @@ import WebGLState from './utils/WebGLState.js';
 import WebGLUtils from './utils/WebGLUtils.js';
 import WebGLTextureUtils from './utils/WebGLTextureUtils.js';
 import WebGLExtensions from './utils/WebGLExtensions.js';
+import WebGLCapabilities from './utils/WebGLCapabilities.js';
 
 //
 
@@ -34,6 +35,7 @@ class WebGLBackend extends Backend {
 		this.gl = glContext;
 
 		this.extensions = new WebGLExtensions( this );
+		this.capabilities = new WebGLCapabilities( this );
 		this.attributeUtils = new WebGLAttributeUtils( this );
 		this.textureUtils = new WebGLTextureUtils( this );
 		this.state = new WebGLState( this );
@@ -877,9 +879,15 @@ class WebGLBackend extends Backend {
 
 	}
 
-	hasFeature( name ) {
+	hasFeature( /*name*/ ) {
 
 		return true;
+
+	}
+
+	getMaxAnisotropy() {
+
+		return this.capabilities.getMaxAnisotropy();
 
 	}
 

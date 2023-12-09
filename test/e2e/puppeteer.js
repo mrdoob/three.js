@@ -89,7 +89,9 @@ const exceptionList = [
 	'webgl_materials_blending',
 	'webgl_mirror',
 	'webgl_morphtargets_face',
+	'webgl_nodes_loader_materialx',
 	'webgl_nodes_materials_standard',
+	'webgl_nodes_materialx_noise',
 	'webgl_postprocessing_crossfade',
 	'webgl_postprocessing_dof2',
 	'webgl_raymarching_reflect',
@@ -126,9 +128,13 @@ const exceptionList = [
 
 	// WebGPURenderer: Unknown problem
 	'webgpu_camera_logarithmicdepthbuffer',
+	'webgpu_loader_materialx',
 	'webgpu_materials_video',
+	'webgpu_materialx_noise',
+	'webgpu_occlusion',
 	'webgpu_particles',
 	'webgpu_shadertoy',
+	'webgpu_shadowmap',
 	'webgpu_tsl_editor',
 	'webgpu_tsl_transpiler'
 

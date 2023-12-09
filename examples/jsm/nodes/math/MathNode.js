@@ -220,6 +220,7 @@ MathNode.ROUND = 'round';
 MathNode.RECIPROCAL = 'reciprocal';
 MathNode.TRUNC = 'trunc';
 MathNode.FWIDTH = 'fwidth';
+MathNode.BITCAST = 'bitcast';
 
 // 2 inputs
 
@@ -278,6 +279,7 @@ export const round = nodeProxy( MathNode, MathNode.ROUND );
 export const reciprocal = nodeProxy( MathNode, MathNode.RECIPROCAL );
 export const trunc = nodeProxy( MathNode, MathNode.TRUNC );
 export const fwidth = nodeProxy( MathNode, MathNode.FWIDTH );
+export const bitcast = nodeProxy( MathNode, MathNode.BITCAST );
 
 export const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
 export const min = nodeProxy( MathNode, MathNode.MIN );

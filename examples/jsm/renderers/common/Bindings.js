@@ -124,6 +124,8 @@ class Bindings extends DataMap {
 
 			} else if ( binding.isSampledTexture ) {
 
+				const texture = binding.texture;
+
 				if ( binding.needsBindingsUpdate ) needsBindingsUpdate = true;
 
 				const updated = binding.update();
@@ -131,6 +133,24 @@ class Bindings extends DataMap {
 				if ( updated ) {
 
 					this.textures.updateTexture( binding.texture );
+
+				}
+
+				if ( texture.isStorageTexture === true ) {
+
+					const textureData = this.get( texture );
+
+					if ( binding.store === true ) {
+
+						textureData.needsMipmap = true;
+
+					} else if ( texture.generateMipmaps === true && this.textures.needsMipmaps( texture ) && textureData.needsMipmap === true ) {
+
+						this.backend.generateMipmaps( texture );
+
+						textureData.needsMipmap = false;
+
+					}
 
 				}
 

@@ -439,6 +439,36 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
+	buildFunctionCode( shaderNode ) {
+
+		const layout = shaderNode.layout;
+		const flowData = this.flowShaderNode( shaderNode );
+
+		const parameters = [];
+
+		for ( const input of layout.inputs ) {
+
+			parameters.push( this.getType( input.type ) + ' ' + input.name );
+
+		}
+
+		//
+
+		const code = `${ this.getType( layout.type ) } ${ layout.name }( ${ parameters.join( ', ' ) } ) {
+
+	${ flowData.vars }
+
+${ flowData.code }
+	return ${ flowData.result };
+
+}`;
+
+		//
+
+		return code;
+
+	}
+
 	getUniforms( shaderStage ) {
 
 		const uniforms = this.uniforms[ shaderStage ];

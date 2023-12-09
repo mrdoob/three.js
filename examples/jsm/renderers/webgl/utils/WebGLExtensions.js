@@ -7,11 +7,21 @@ class WebGLExtensions {
 		this.gl = this.backend.gl;
 		this.availableExtensions = this.gl.getSupportedExtensions();
 
+		this.extensions = {};
+
 	}
 
 	get( name ) {
 
-		return this.gl.getExtension( name );
+		let extension = this.extensions[ name ];
+
+		if ( extension === undefined ) {
+
+			extension = this.gl.getExtension( name );
+
+		}
+
+		return extension;
 
 	}
 

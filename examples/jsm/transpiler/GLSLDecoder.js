@@ -1,4 +1,4 @@
-import { Program, FunctionDeclaration, For, AccessorElements, Ternary, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, FunctionCall, Return, Accessor } from './AST.js';
+import { Program, FunctionDeclaration, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform } from './AST.js';
 
 const unaryOperators = [
 	'+', '-', '~', '!', '++', '--'
@@ -180,7 +180,7 @@ class Tokenizer {
 
 				const token = new Token( this, parser.type, result[ parser.group || 0 ], this.position );
 
-				this.position += token.str.length;
+				this.position += result[ 0 ].length;
 
 				if ( parser.isTag ) {
 
@@ -218,11 +218,11 @@ class GLSLDecoder {
 
 		this._currentFunction = null;
 
-		this.addKeyword( 'gl_FragCoord', 'vec2 gl_FragCoord = vec2( viewportCoordinate.x, viewportCoordinate.y.oneMinus() );' );
+		this.addPolyfill( 'gl_FragCoord', 'vec2 gl_FragCoord = vec2( viewportCoordinate.x, viewportCoordinate.y.oneMinus() );' );
 
 	}
 
-	addKeyword( name, polyfill ) {
+	addPolyfill( name, polyfill ) {
 
 		this.keywords.push( { name, polyfill } );
 
@@ -406,14 +406,26 @@ class GLSLDecoder {
 
 			let type;
 
-			if ( /^(0x)/.test( firstToken.str ) ) type = 'int';
+			const isHex = /^(0x)/.test( firstToken.str );
+
+			if ( isHex ) type = 'int';
 			else if ( /u$/.test( firstToken.str ) ) type = 'uint';
 			else if ( /f|e|\./.test( firstToken.str ) ) type = 'float';
 			else type = 'int';
 
-			const str = firstToken.str.replace( /u$/, '' );
+			let str = firstToken.str.replace( /u|i$/, '' );
+
+			if ( isHex === false ) {
+
+				str = str.replace( /f$/, '' );
+
+			}
 
 			return new Number( str, type );
+
+		} else if ( firstToken.isString ) {
+
+			return new String( firstToken.str );
 
 		} else if ( firstToken.isLiteral ) {
 
@@ -629,6 +641,28 @@ class GLSLDecoder {
 
 	}
 
+	parseUniform() {
+
+		const tokens = this.readTokensUntil( ';' );
+
+		const type = tokens[ 1 ].str;
+		const name = tokens[ 2 ].str;
+
+		return new Uniform( type, name );
+
+	}
+
+	parseVarying() {
+
+		const tokens = this.readTokensUntil( ';' );
+
+		const type = tokens[ 1 ].str;
+		const name = tokens[ 2 ].str;
+
+		return new Varying( type, name );
+
+	}
+
 	parseReturn() {
 
 		this.readToken(); // skip 'return'
@@ -716,7 +750,7 @@ class GLSLDecoder {
 
 		let current = conditional;
 
-		while ( this.getToken().str === 'else' ) {
+		while ( this.getToken() && this.getToken().str === 'else' ) {
 
 			this.readToken(); // skip 'else'
 
@@ -777,6 +811,14 @@ class GLSLDecoder {
 				if ( token.str === 'const' ) {
 
 					statement = this.parseVariables();
+
+				} else if ( token.str === 'uniform' ) {
+
+					statement = this.parseUniform();
+
+				} else if ( token.str === 'varying' ) {
+
+					statement = this.parseVarying();
 
 				} else if ( isType( token.str ) ) {
 

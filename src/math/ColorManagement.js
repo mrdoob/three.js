@@ -64,22 +64,6 @@ export const ColorManagement = {
 
 	_workingColorSpace: LinearSRGBColorSpace,
 
-	get legacyMode() {
-
-		console.warn( 'THREE.ColorManagement: .legacyMode=false renamed to .enabled=true in r150.' );
-
-		return ! this.enabled;
-
-	},
-
-	set legacyMode( legacyMode ) {
-
-		console.warn( 'THREE.ColorManagement: .legacyMode=false renamed to .enabled=true in r150.' );
-
-		this.enabled = ! legacyMode;
-
-	},
-
 	get workingColorSpace() {
 
 		return this._workingColorSpace;
