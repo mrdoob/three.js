@@ -241,12 +241,6 @@ class GTAOPass extends Pass {
 
 		}
 
-		if ( parameters.bias !== undefined ) {
-
-			this.gtaoMaterial.uniforms.bias.value = parameters.bias;
-
-		}
-
 		if ( parameters.scale !== undefined ) {
 
 			this.gtaoMaterial.uniforms.scale.value = parameters.scale;
