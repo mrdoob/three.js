@@ -52,14 +52,14 @@
 			const container = document.createElement( 'div' );
 			document.body.appendChild( container );
 
-			const stats = new Stats();
-			container.appendChild( stats.dom );
-			stats.init( renderer );
-
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			// renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
+
+			const stats = new Stats();
+			container.appendChild( stats.dom );
+			stats.init( renderer );
 
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
