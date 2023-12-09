@@ -27,7 +27,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -80,6 +80,7 @@
 			stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top = '0px';
 			container.appendChild( stats.domElement );
+			stats.init( renderer );
 
 			const GRAVITY = 30;
 

@@ -24,7 +24,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer, stats;
@@ -138,6 +138,7 @@
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+				stats.init( renderer );
 
 				//
 

@@ -27,7 +27,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			import { FlyControls } from 'three/addons/controls/FlyControls.js';
 			import { Lensflare, LensflareElement } from 'three/addons/objects/Lensflare.js';
@@ -140,6 +140,7 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
+			stats.init( renderer );
 
 				// events
 

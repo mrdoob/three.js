@@ -26,7 +26,7 @@
 	<script type="module">
 		import * as THREE from 'three';
 
-		import Stats from 'three/addons/libs/stats.module.js';
+		import Stats from 'three/addons/libs/stats-gl.js';
 
 		let container, stats;
 		let camera, scene, renderer, mesh;
@@ -174,6 +174,7 @@
 
 			stats = new Stats();
 			container.appendChild( stats.dom );
+			stats.init( renderer );
 
 			window.addEventListener( 'resize', onWindowResize );
 

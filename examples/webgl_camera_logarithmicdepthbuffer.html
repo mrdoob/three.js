@@ -78,7 +78,7 @@
 			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			// 1 micrometer to 100 billion light years in one scene, with 1 unit = 1 meter?  preposterous!  and yet...
 			const NEAR = 1e-6, FAR = 1e27;
@@ -158,6 +158,8 @@
 				renderer.domElement.style.position = 'relative';
 				renderer.domElement.id = 'renderer_' + name;
 				framecontainer.appendChild( renderer.domElement );
+
+				stats.init( renderer );
 
 				return { container: framecontainer, renderer: renderer, scene: scene, camera: camera };
 

@@ -27,7 +27,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
@@ -116,6 +116,7 @@
 				//stats
 				stats = new Stats();
 				container.appendChild( stats.dom );
+			stats.init( renderer );
 
 				window.addEventListener( 'resize', onWindowResize );
 

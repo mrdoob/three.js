@@ -25,7 +25,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			let stats, clock;
 			let scene, camera, renderer, mixer;
@@ -103,6 +103,7 @@
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+				stats.init( renderer );
 
 				//
 

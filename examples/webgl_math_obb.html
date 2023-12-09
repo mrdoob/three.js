@@ -37,7 +37,7 @@
 			import { OBB } from 'three/addons/math/OBB.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			let camera, scene, renderer, clock, controls, stats, raycaster, hitbox;
 
@@ -117,6 +117,7 @@
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+				stats.init( renderer );
 
 
 				//

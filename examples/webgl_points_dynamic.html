@@ -28,7 +28,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -131,6 +131,7 @@
 				//stats
 				stats = new Stats();
 				container.appendChild( stats.dom );
+			stats.init( renderer );
 
 				window.addEventListener( 'resize', onWindowResize );
 

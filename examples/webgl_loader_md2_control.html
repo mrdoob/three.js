@@ -35,7 +35,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { MD2CharacterComplex } from 'three/addons/misc/MD2CharacterComplex.js';
@@ -141,6 +141,7 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
+			stats.init( renderer );
 
 				// EVENTS
 

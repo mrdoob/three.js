@@ -32,7 +32,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			let camera, scene, renderer, stats;
 
@@ -83,6 +83,7 @@
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+				stats.init( renderer );
 
 				//
 

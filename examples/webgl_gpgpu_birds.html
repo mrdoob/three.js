@@ -310,7 +310,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';
@@ -457,6 +457,7 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
+			stats.init( renderer );
 
 				container.style.touchAction = 'none';
 				container.addEventListener( 'pointermove', onPointerMove );

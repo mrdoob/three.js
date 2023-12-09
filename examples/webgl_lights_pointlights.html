@@ -26,7 +26,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
@@ -89,6 +89,7 @@
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+				stats.init( renderer );
 
 				window.addEventListener( 'resize', onWindowResize );
 

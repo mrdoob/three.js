@@ -33,7 +33,7 @@
 
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { HorizontalBlurShader } from 'three/addons/shaders/HorizontalBlurShader.js';
 			import { VerticalBlurShader } from 'three/addons/shaders/VerticalBlurShader.js';
@@ -76,6 +76,7 @@
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+				stats.init( renderer );
 
 				window.addEventListener( 'resize', onWindowResize );
 

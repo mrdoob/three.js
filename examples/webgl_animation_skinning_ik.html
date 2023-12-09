@@ -36,7 +36,7 @@
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 		import { CCDIKSolver, CCDIKHelper } from './jsm/animation/CCDIKSolver.js';
-		import Stats from 'three/addons/libs/stats.module.js';
+		import Stats from 'three/addons/libs/stats-gl.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 		let scene, camera, renderer, orbitControls, transformControls;
@@ -77,6 +77,7 @@
 
 			stats = new Stats();
 			document.body.appendChild( stats.dom );
+			stats.init( renderer );
 
 			orbitControls = new OrbitControls( camera, renderer.domElement );
 			orbitControls.minDistance = 0.2;

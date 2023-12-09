@@ -26,8 +26,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-			import { GPUStatsPanel } from 'three/addons/utils/GPUStatsPanel.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -40,7 +39,7 @@
 			let line, thresholdLine, segments, thresholdSegments;
 			let renderer, scene, camera, controls;
 			let sphereInter, sphereOnLine;
-			let stats, gpuPanel;
+			let stats;
 			let gui;
 			let clock;
 
@@ -198,10 +197,8 @@
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+				stats.init( renderer );
 
-				gpuPanel = new GPUStatsPanel( renderer.getContext() );
-				stats.addPanel( gpuPanel );
-				stats.showPanel( 0 );
 				initGui();
 
 			}
@@ -278,9 +275,7 @@
 
 				}
 
-				gpuPanel.startQuery();
 				renderer.render( scene, camera );
-				gpuPanel.endQuery();
 
 			}
 

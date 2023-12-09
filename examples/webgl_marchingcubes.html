@@ -28,7 +28,7 @@
 	<script type="module">
 		import * as THREE from 'three';
 
-		import Stats from 'three/addons/libs/stats.module.js';
+		import Stats from 'three/addons/libs/stats-gl.js';
 
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -116,6 +116,7 @@
 
 			stats = new Stats();
 			container.appendChild( stats.dom );
+			stats.init( renderer );
 
 			// GUI
 

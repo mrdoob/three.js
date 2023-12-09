@@ -40,7 +40,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -53,13 +53,14 @@
 			const clock = new THREE.Clock();
 			const container = document.getElementById( 'container' );
 
-			const stats = new Stats();
-			container.appendChild( stats.dom );
-
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
+
+			const stats = new Stats();
+			container.appendChild( stats.dom );
+			stats.init( renderer );
 
 			const pmremGenerator = new THREE.PMREMGenerator( renderer );
 

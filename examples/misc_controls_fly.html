@@ -40,7 +40,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			import { FlyControls } from 'three/addons/controls/FlyControls.js';
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
@@ -217,6 +217,7 @@
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+				stats.init( renderer );
 
 				window.addEventListener( 'resize', onWindowResize );
 

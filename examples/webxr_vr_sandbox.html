@@ -30,7 +30,7 @@
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			let camera, scene, renderer;
 			let reflector;
@@ -200,6 +200,7 @@
 				stats.dom.style.width = '80px';
 				stats.dom.style.height = '48px';
 				document.body.appendChild( stats.dom );
+				stats.init( renderer );
 
 				statsMesh = new HTMLMesh( stats.dom );
 				statsMesh.position.x = - 0.75;

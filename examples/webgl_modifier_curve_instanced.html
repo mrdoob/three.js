@@ -26,7 +26,7 @@
 		<script type="module">
 			import * as THREE from 'three';
 			import { TransformControls } from 'three/addons/controls/TransformControls.js';
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 			import { InstancedFlow } from 'three/addons/modifiers/CurveModifier.js';
 			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
@@ -188,6 +188,7 @@
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+				stats.init( renderer );
 
 				window.addEventListener( 'resize', onWindowResize );
 

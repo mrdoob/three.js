@@ -28,7 +28,7 @@
 	<script type="module">
 		import * as THREE from 'three';
 
-		import Stats from 'three/addons/libs/stats.module.js';
+		import Stats from 'three/addons/libs/stats-gl.js';
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -122,6 +122,7 @@
 			stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top = '0px';
 			container.appendChild( stats.domElement );
+			stats.init( renderer );
 
 			//
 

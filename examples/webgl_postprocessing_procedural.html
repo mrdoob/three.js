@@ -67,7 +67,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let postCamera, postScene, renderer;
@@ -99,6 +99,7 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
+			stats.init( renderer );
 
 				// Setup post processing stage
 				postCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );

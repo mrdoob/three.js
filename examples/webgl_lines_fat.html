@@ -26,8 +26,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-			import { GPUStatsPanel } from 'three/addons/utils/GPUStatsPanel.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -39,7 +38,7 @@
 			let line, renderer, scene, camera, camera2, controls;
 			let line1;
 			let matLine, matLineBasic, matLineDashed;
-			let stats, gpuPanel;
+			let stats;
 			let gui;
 
 			// viewport
@@ -141,10 +140,7 @@
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
-
-				gpuPanel = new GPUStatsPanel( renderer.getContext() );
-				stats.addPanel( gpuPanel );
-				stats.showPanel( 0 );
+				stats.init( renderer );
 
 				initGui();
 
@@ -182,9 +178,7 @@
 				// renderer will set this eventually
 				matLine.resolution.set( window.innerWidth, window.innerHeight ); // resolution of the viewport
 
-				gpuPanel.startQuery();
 				renderer.render( scene, camera );
-				gpuPanel.endQuery();
 
 				// inset scene
 

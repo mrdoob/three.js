@@ -25,7 +25,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 
 			let container, stats;
 
@@ -200,6 +200,7 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
+			stats.init( renderer );
 
 				//
 
