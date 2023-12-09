@@ -32,7 +32,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats-gl.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -61,12 +61,13 @@
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+				stats.init( renderer );
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
@@ -202,9 +203,9 @@
 
 				controls.update();
 
-				stats.begin();
+
 				composer.render();
-				stats.end();
+				stats.update();
 
 			}
 

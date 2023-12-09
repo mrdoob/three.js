@@ -182,7 +182,7 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
-			stats.init( renderer );
+				stats.init( renderer );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -281,6 +281,8 @@
 				// Step 2 - Renders the scene containing the plane with a material
 				// sampling the render target texture.
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

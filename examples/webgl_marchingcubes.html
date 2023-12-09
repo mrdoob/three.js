@@ -325,7 +325,6 @@
 			requestAnimationFrame( animate );
 
 			render();
-			stats.update();
 
 		}
 
@@ -355,6 +354,8 @@
 			// render
 
 			renderer.render( scene, camera );
+
+			stats.update();
 
 		}
 

@@ -63,10 +63,6 @@
 
 				const container = document.getElementById( 'container' );
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
-			stats.init( renderer );
-
 				clock = new THREE.Clock();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -74,6 +70,10 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+				stats.init( renderer );
 
 				const scene = new THREE.Scene();
 

@@ -211,11 +211,6 @@
 				ground.receiveShadow = true;
 				scene.add( ground );
 
-				// Stats
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-				stats.init( renderer );
-
 				// Renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.shadowMap.enabled = true;
@@ -226,6 +221,11 @@
 				document.body.appendChild( renderer.domElement );
 
 				renderer.localClippingEnabled = true;
+
+				// Stats
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+				stats.init( renderer );
 
 				// Controls
 				const controls = new OrbitControls( camera, renderer.domElement );
@@ -307,9 +307,9 @@
 
 				}
 
-				stats.begin();
+
 				renderer.render( scene, camera );
-				stats.end();
+				stats.update();
 
 			}
 

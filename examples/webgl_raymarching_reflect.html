@@ -344,7 +344,7 @@
 
 			function render() {
 
-				stats.begin();
+
 
 				const elapsedTime = clock.getElapsedTime();
 
@@ -352,7 +352,7 @@
 
 				renderer.render( scene, camera );
 
-				stats.end();
+				stats.update();
 				requestAnimationFrame( render );
 
 			}

@@ -330,7 +330,7 @@
 
 				requestAnimationFrame( animate );
 
-				stats.begin();
+
 
 				const timer = performance.now();
 
@@ -344,7 +344,7 @@
 
 				composer.render();
 
-				stats.end();
+				stats.update();
 
 			}
 

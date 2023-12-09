@@ -293,7 +293,7 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
-			stats.init( renderer );
+				stats.init( renderer );
 
 				// Controls
 
@@ -427,9 +427,9 @@
 
 				assignTransformedPlanes( globalClippingPlanes, GlobalClippingPlanes, transform );
 
-				stats.begin();
 				renderer.render( scene, camera );
-				stats.end();
+
+				stats.update();
 
 			}
 

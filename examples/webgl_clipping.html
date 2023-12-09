@@ -101,11 +101,6 @@
 				ground.receiveShadow = true;
 				scene.add( ground );
 
-				// Stats
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-				stats.init( renderer );
 
 				// Renderer
 
@@ -115,6 +110,12 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				window.addEventListener( 'resize', onWindowResize );
 				document.body.appendChild( renderer.domElement );
+
+				// Stats
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+				stats.init( renderer );
 
 				// ***** Clipping setup (renderer): *****
 				const globalPlanes = [ globalPlane ],
@@ -230,9 +231,9 @@
 				object.rotation.y = time * 0.2;
 				object.scale.setScalar( Math.cos( time ) * 0.125 + 0.875 );
 
-				stats.begin();
 				renderer.render( scene, camera );
-				stats.end();
+
+				stats.update();
 
 			}
 
