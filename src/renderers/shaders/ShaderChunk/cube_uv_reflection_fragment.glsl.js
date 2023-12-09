@@ -119,19 +119,14 @@ export default /* glsl */`
 	// These defines must match with PMREMGenerator
 
 	#define cubeUV_r0 1.0
-	#define cubeUV_v0 0.339
 	#define cubeUV_m0 - 2.0
 	#define cubeUV_r1 0.8
-	#define cubeUV_v1 0.276
 	#define cubeUV_m1 - 1.0
 	#define cubeUV_r4 0.4
-	#define cubeUV_v4 0.046
 	#define cubeUV_m4 2.0
 	#define cubeUV_r5 0.305
-	#define cubeUV_v5 0.016
 	#define cubeUV_m5 3.0
 	#define cubeUV_r6 0.21
-	#define cubeUV_v6 0.0038
 	#define cubeUV_m6 4.0
 
 	float roughnessToMip( float roughness ) {
