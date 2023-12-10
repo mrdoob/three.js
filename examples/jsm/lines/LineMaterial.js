@@ -323,6 +323,38 @@ ShaderLib[ 'line' ] = {
 
 		}
 
+		// https://iquilezles.org/articles/intersectors
+		float capIntersect( in vec3 ro, in vec3 rd, in vec3 pa, in vec3 pb, in float ra ) {
+
+			vec3  ba = pb - pa;
+			vec3  oa = ro - pa;
+			float baba = dot(ba,ba);
+			float bard = dot(ba,rd);
+			float baoa = dot(ba,oa);
+			float rdoa = dot(rd,oa);
+			float oaoa = dot(oa,oa);
+			float a = baba      - bard*bard;
+			float b = baba*rdoa - baoa*bard;
+			float c = baba*oaoa - baoa*baoa - ra*ra*baba;
+			float h = b*b - a*c;
+			if( h >= 0.0 ) {
+
+				float t = (-b-sqrt(h))/a;
+				float y = baoa + t*bard;
+				// body
+				if( y>0.0 && y<baba ) return t;
+				// caps
+				vec3 oc = (y <= 0.0) ? oa : ro - pb;
+				b = dot(rd,oc);
+				c = dot(oc,oc) - ra*ra;
+				h = b*b - c;
+				if( h>0.0 ) return -b - sqrt(h);
+
+			}
+			return -1.0;
+
+		}
+
 		void main() {
 
 			#include <clipping_planes_fragment>
@@ -339,35 +371,60 @@ ShaderLib[ 'line' ] = {
 
 			#ifdef WORLD_UNITS
 
+
 				// Find the closest points on the view ray and the line segment
-				vec3 rayEnd = normalize( worldPos.xyz ) * 1e5;
-				vec3 lineDir = worldEnd - worldStart;
-				vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
+				vec3 rayEnd = normalize( worldPos.xyz );
+				// vec3 lineDir = worldEnd - worldStart;
+				// vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
+				float dist = capIntersect( vec3( 0, 0, 0 ), rayEnd, worldStart, worldEnd, linewidth * 0.5 );
 
-				vec3 p1 = worldStart + lineDir * params.x;
-				vec3 p2 = rayEnd * params.y;
-				vec3 delta = p1 - p2;
-				float len = length( delta );
-				float norm = len / linewidth;
+				float didHit = dist == - 1.0 ? 0.0 : 1.0;
+				float fw = fwidth( didHit );
 
-				#ifndef USE_DASH
+				if ( fw == 0.0 ) {
 
-					#ifdef USE_ALPHA_TO_COVERAGE
+					discard;
 
-						float dnorm = fwidth( norm );
-						alpha = 1.0 - smoothstep( 0.5 - dnorm, 0.5 + dnorm, norm );
+				}
 
-					#else
+				// depth calc
+				// https://stackoverflow.com/questions/10264949/glsl-gl-fragcoord-z-calculation-and-setting-gl-fragdepth
 
-						if ( norm > 0.5 ) {
+				// float dnorm = fwidth( norm );
+				// alpha = 1.0 - smoothstep( 0.5 - dnorm, 0.5 + dnorm, norm );
 
-							discard;
 
-						}
 
-					#endif
+				// if ( dist < 0.0 ) {
 
-				#endif
+				// 	discard;
+
+				// }
+
+				// vec3 p1 = worldStart + lineDir * params.x;
+				// vec3 p2 = rayEnd * params.y;
+				// vec3 delta = p1 - p2;
+				// float len = length( delta );
+				// float norm = len / linewidth;
+
+				// #ifndef USE_DASH
+
+				// 	#ifdef USE_ALPHA_TO_COVERAGE
+
+				// 		float dnorm = fwidth( norm );
+				// 		alpha = 1.0 - smoothstep( 0.5 - dnorm, 0.5 + dnorm, norm );
+
+				// 	#else
+
+				// 		if ( norm > 0.5 ) {
+
+				// 			discard;
+
+				// 		}
+
+				// 	#endif
+
+				// #endif
 
 			#else
 
