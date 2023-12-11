@@ -541,7 +541,12 @@ export default NodeMaterial;
 export function addNodeMaterial( type, nodeMaterial ) {
 
 	if ( typeof nodeMaterial !== 'function' || ! type ) throw new Error( `Node material ${ type } is not a class` );
-	if ( NodeMaterials.has( type ) ) throw new Error( `Redefinition of node material ${ type }` );
+	if ( NodeMaterials.has( type ) ) {
+
+		console.warn( `Redefinition of node material ${ type }` );
+		return;
+
+	}
 
 	NodeMaterials.set( type, nodeMaterial );
 	nodeMaterial.type = type;
