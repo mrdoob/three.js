@@ -162,7 +162,7 @@ IncidentLight directLight;
 
 		}
 		#pragma unroll_loop_end
-	#else
+	#elif defined (USE_SHADOWMAP)
 
 		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
@@ -170,7 +170,7 @@ IncidentLight directLight;
 			directionalLight = directionalLights[ i ];
 			getDirectionalLightInfo( directionalLight, directLight );
 
-			#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_DIR_LIGHT_SHADOWS )
+			#if ( UNROLLED_LOOP_INDEX < NUM_DIR_LIGHT_SHADOWS )
 
 				directionalLightShadow = directionalLightShadows[ i ];
 				if(linearDepth >= CSM_cascades[UNROLLED_LOOP_INDEX].x && linearDepth < CSM_cascades[UNROLLED_LOOP_INDEX].y) directLight.color *= ( directLight.visible && receiveShadow ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
@@ -181,6 +181,11 @@ IncidentLight directLight;
 
 		}
 		#pragma unroll_loop_end
+
+	#elif ( NUM_DIR_LIGHT_SHADOWS > 0 )
+		// note: no loop here - all CSM lights are in fact one light only
+		getDirectionalLightInfo( directionalLights[0], directLight );
+		RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );
 
 	#endif
 
