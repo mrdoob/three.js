@@ -360,6 +360,16 @@ ShaderLib[ 'line' ] = {
 
 		}
 
+		// compute normal
+		vec3 capNormal( in vec3 pos, in vec3 a, in vec3 b, in float r ) {
+
+			vec3  ba = b - a;
+			vec3  pa = pos - a;
+			float h = clamp( dot( pa, ba ) / dot( ba, ba ), 0.0, 1.0 );
+			return ( pa - h * ba ) / r;
+
+		}
+
 		// https://stackoverflow.com/questions/10264949/glsl-gl-fragcoord-z-calculation-and-setting-gl-fragdepth
 		uniform mat4 projectionMatrix;
 		float zToFragDepth( vec3 eye_space_pos ) {
@@ -392,18 +402,54 @@ ShaderLib[ 'line' ] = {
 
 			#ifdef WORLD_UNITS
 
-				// Find the closest points on the view ray and the line segment
-				vec3 rayEnd = normalize( worldPos.xyz );
-				float dist = capIntersect( vec3( 0, 0, 0 ), rayEnd, worldStart, worldEnd, linewidth * 0.5 );
+				#if defined( WRITE_WORLD_UNIT_DEPTH ) && ! defined( USE_DASH )
 
-				// TODO: how do we handle alpha 2 coverage here?
-				if ( dist < 0.0 ) {
+					// Find the closest points on the view ray and the line segment
+					vec3 rayEnd = normalize( worldPos.xyz );
+					float dist = capIntersect( vec3( 0, 0, 0 ), rayEnd, worldStart, worldEnd, linewidth * 0.5 );
+					vec3 pos = rayEnd * dist;
 
-					discard;
+					if ( dist < 0.0 ) {
 
-				}
+						discard;
 
-				gl_FragDepth = zToFragDepth( rayEnd * dist );
+					}
+
+					gl_FragDepth = zToFragDepth( pos );
+
+				#else
+
+					// Find the closest points on the view ray and the line segment
+					vec3 rayEnd = normalize( worldPos.xyz ) * 1e5;
+					vec3 lineDir = worldEnd - worldStart;
+					vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
+
+					vec3 p1 = worldStart + lineDir * params.x;
+					vec3 p2 = rayEnd * params.y;
+					vec3 delta = p1 - p2;
+					float len = length( delta );
+					float norm = len / linewidth;
+
+					#ifndef USE_DASH
+
+						#ifdef USE_ALPHA_TO_COVERAGE
+
+							float dnorm = fwidth( norm );
+							alpha = 1.0 - smoothstep( 0.5 - dnorm, 0.5 + dnorm, norm );
+
+						#else
+
+							if ( norm > 0.5 ) {
+
+								discard;
+
+							}
+
+						#endif
+
+					#endif
+
+				#endif
 
 			#else
 
@@ -503,6 +549,26 @@ class LineMaterial extends ShaderMaterial {
 		} else {
 
 			delete this.defines.WORLD_UNITS;
+
+		}
+
+	}
+
+	get adjustDepth() {
+
+		return 'WRITE_WORLD_UNIT_DEPTH' in this.defines;
+
+	}
+
+	set adjustDepth( value ) {
+
+		if ( value === true ) {
+
+			this.defines.WRITE_WORLD_UNIT_DEPTH = '';
+
+		} else {
+
+			delete this.defines.WRITE_WORLD_UNIT_DEPTH;
 
 		}
 
