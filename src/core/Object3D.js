@@ -50,8 +50,7 @@ class Object3D extends EventDispatcher {
 			set( a, b, c ) {
 
 				a[ b ] = c;
-				a._onChangeCallback && a._onChangeCallback();
-				// scope.onUpdateV3();
+				scope._onChangeCallback && a._onChangeCallback( 'position' );
 				return true;
 
 			}
@@ -60,8 +59,7 @@ class Object3D extends EventDispatcher {
 			set( a, b, c ) {
 
 				a[ b ] = c;
-				a._onChangeCallback && a._onChangeCallback();
-				// scope.onUpdateV3();
+				scope._onChangeCallback && a._onChangeCallback( 'rotation' );
 				return true;
 
 			}
@@ -71,8 +69,7 @@ class Object3D extends EventDispatcher {
 			set( a, b, c ) {
 
 				a[ b ] = c;
-				a._onChangeCallback && a._onChangeCallback();
-				// scope.onUpdateV3();
+				scope._onChangeCallback && a._onChangeCallback( 'scale' );
 				return true;
 
 			}
