@@ -63,7 +63,6 @@ const GTAOShader = {
 		radius: { value: 0.25 },
 		distanceExponent: { value: 1. },
 		thickness: { value: 1. },
-		bias: { value: 0.001 },
 		scale: { value: 1. },
 		sceneBoxMin: { value: new Vector3( - 1, - 1, - 1 ) },
 		sceneBoxMax: { value: new Vector3( 1, 1, 1 ) },
@@ -92,7 +91,6 @@ const GTAOShader = {
 		uniform float radius;
 		uniform float distanceExponent;
 		uniform float thickness;
-		uniform float bias;
 		uniform float scale;
 		#if SCENE_CLIP_BOX == 1
 			uniform vec3 sceneBoxMin;
