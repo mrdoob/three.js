@@ -108,6 +108,13 @@ class ARButton {
 
 			};
 
+			if ( navigator.xr.offerSession !== undefined ) {
+
+				navigator.xr.offerSession( 'immersive-ar', sessionInit )
+					.then( onSessionStarted );
+
+			}
+
 		}
 
 		function disableButton() {
