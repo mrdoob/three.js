@@ -650,6 +650,8 @@ class Quaternion {
 		this._z = attribute.getZ( index );
 		this._w = attribute.getW( index );
 
+		this._onChangeCallback();
+
 		return this;
 
 	}
