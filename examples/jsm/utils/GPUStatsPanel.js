@@ -83,6 +83,17 @@ export class GPUStatsPanel extends Stats.Panel {
 
 					}
 
+					// release the query
+					if ( isWebGL2 ) {
+
+						gl.deleteQuery( query );
+
+					} else {
+
+						ext.deleteQueryEXT( query );
+
+					}
+
 					this.activeQueries --;
 
 
