@@ -363,7 +363,7 @@ class WebGLBackend extends Backend {
 
 		if ( vaoGPU === undefined ) {
 
-			vaoGPU = this._createVao( null, attributes );
+			this._createVao( null, attributes );
 
 		} else {
 
@@ -433,7 +433,7 @@ class WebGLBackend extends Backend {
 
 			if ( vaoGPU === undefined ) {
 
-				let staticVao
+				let staticVao;
 
 				( { vaoGPU, staticVao } = this._createVao( renderObject.getIndex(), renderObject.getAttributes() ) );
 
