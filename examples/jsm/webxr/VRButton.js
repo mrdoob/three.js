@@ -70,6 +70,13 @@ class VRButton {
 
 					currentSession.end();
 
+					if ( navigator.xr.offerSession !== undefined ) {
+
+						navigator.xr.offerSession( 'immersive-vr', sessionInit )
+							.then( onSessionStarted );
+
+					}
+
 				}
 
 			};
