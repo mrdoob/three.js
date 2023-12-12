@@ -74,6 +74,13 @@ class XRButton {
 
 					currentSession.end();
 
+					if ( navigator.xr.offerSession !== undefined ) {
+
+						navigator.xr.offerSession( mode, sessionOptions )
+							.then( onSessionStarted );
+
+					}
+
 				}
 
 			};
