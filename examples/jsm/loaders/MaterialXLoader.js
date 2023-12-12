@@ -588,11 +588,30 @@ class MaterialXNode {
 
 		//
 
+		let normalNode = null;
+
+		if ( inputs.normal ) normalNode = inputs.normal;
+
+		//
+
+		let emissiveNode = null;
+
+		if ( inputs.emission ) emissiveNode = inputs.emission;
+		if ( inputs.emissionColor )  {
+
+			emissiveNode = emissiveNode ? mul( emissiveNode, inputs.emissionColor ) : emissiveNode;
+
+		}
+
+		//
+
 		material.colorNode = colorNode || color( 0.8, 0.8, 0.8 );
 		material.roughnessNode = roughnessNode || float( 0.2 );
 		material.metalnessNode = metalnessNode || float( 0 );
 		material.clearcoatNode = clearcoatNode || float( 0 );
 		material.clearcoatRoughnessNode = clearcoatRoughnessNode || float( 0 );
+		if ( normalNode ) material.normalNode = normalNode;
+		if ( emissiveNode ) material.emissiveNode = emissiveNode;
 
 	}
 
