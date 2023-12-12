@@ -6,7 +6,7 @@ export class SplitEditor extends BaseNodeEditor {
 
 	constructor() {
 
-		super( 'Split', null, 175 );
+		super( 'Split', null, 1, 175 );
 
 		let node = null;
 

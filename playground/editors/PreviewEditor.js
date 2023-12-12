@@ -53,7 +53,7 @@ export class PreviewEditor extends BaseNodeEditor {
 		const width = 300;
 		const height = 300;
 
-		super( 'Preview', null, height );
+		super( 'Preview', null, 0, width );
 
 		const material = new MeshBasicNodeMaterial();
 		material.colorNode = float();

@@ -10,9 +10,7 @@ export class Vector3Editor extends BaseNodeEditor {
 			inputConnection: false
 		} );
 
-		super( 'Vector 3', inputNode, 325 );
-
-		this.setOutputLength( 3 );
+		super( 'Vector 3', inputNode, 3, 325 );
 
 		element.addEventListener( 'changeInput', () => this.invalidate() );
 

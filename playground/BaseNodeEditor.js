@@ -1,9 +1,9 @@
 import { Node, ButtonInput, TitleElement, ContextMenu } from 'flow';
-import { exportJSON, onValidNode, getColorFromValue, getTypeFromValue, getColorFromType } from './NodeEditorUtils.js';
+import { exportJSON, onValidNode, getColorFromNode, getTypeFromValue } from './NodeEditorUtils.js';
 
 export class BaseNodeEditor extends Node {
 
-	constructor( name, value = null, width = 300 ) {
+	constructor( name, value = null, outputLength = 1, width = 300 ) {
 
 		super();
 
@@ -15,12 +15,11 @@ export class BaseNodeEditor extends Node {
 
 		this.setWidth( width );
 
-		this.outputLength = 1;
-
 		const title = new TitleElement( name )
 			.setObjectCallback( getObjectCallback )
 			.setSerializable( false )
-			.setOutput( this.outputLength );
+			.setOutput( outputLength )
+			.setOutputColor( getColorFromNode(value) );
 
 		const contextButton = new ButtonInput().onClick( () => {
 
@@ -78,19 +77,13 @@ export class BaseNodeEditor extends Node {
 
 		this.onValidElement = onValidNode;
 
-		this.updateOutputConnection();
-
-	}
-
-	getOutputType() {
-
-		return getTypeFromValue( this.value );
-
+		this.outputLength = outputLength;
+		this.title.setOutput( this.value ? this.outputLength : 0 );
 	}
 
 	getColor() {
 
-		return ( getColorFromType( this.getOutputType() ) || '#777777' ) + 'BB';
+		return ( getColorFromNode( this.value ) ) + 'BB';
 
 	}
 
@@ -162,16 +155,6 @@ export class BaseNodeEditor extends Node {
 
 	}
 
-	setOutputLength( value ) {
-
-		this.outputLength = value;
-
-		this.updateOutputConnection();
-
-		return;
-
-	}
-
 	setObjectCallback( callback ) {
 
 		this.title.setObjectCallback( callback );
@@ -191,14 +174,6 @@ export class BaseNodeEditor extends Node {
 		this.title.setColor( color );
 
 		return this;
-
-	}
-
-	updateOutputConnection() {
-
-		this.title.setOutputColor( getColorFromValue( this.value ) );
-
-		this.title.setOutput( this.value ? this.outputLength : 0 );
 
 	}
 

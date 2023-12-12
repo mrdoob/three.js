@@ -8,7 +8,7 @@ export class SliderEditor extends BaseNodeEditor {
 
 		const node = float( 0 );
 
-		super( 'Slider', node );
+		super( 'Slider', node, 1 );
 
 		this.collapse = true;
 

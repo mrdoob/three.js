@@ -61,18 +61,42 @@ export function disposeMaterial( material )	{
 export const colorLib = {
 	// gpu
 	string: '#ff0000',
+	float: '#eeeeee',
+	vec2: '#0000ff',
+	vec3: '#0000ff',
+	vec4: '#0000ff',
+	color: '#00ffff',
 	// cpu
+	String: '#ff0000',
+	Number: '#eeeeee',
+	Vector2: '#0000ff',
+	Vector3: '#0000ff',
+	Vector4: '#0000ff',
+	Color: '#00ffff',
 	Material: '#228b22',
 	Object3D: '#00a1ff',
 	CodeNode: '#ff00ff',
 	Texture: '#ffa500',
 	URL: '#ff0080',
-	String: '#ff0000'
+	node: '#ff00ff'
 };
+
+const defaultColor = '#777777';
+
+export function getColorFromNode( value ) {
+
+	if (!value)
+		return defaultColor;
+
+	if (value.isMaterial)
+		return getColorFromType('Material');
+
+	return getColorFromType(value.nodeType === 'ArrayBuffer' ? 'URL' : (value.nodeType || getTypeFromValue(value.value)));
+}
 
 export function getColorFromType( type ) {
 
-	return colorLib[ type ];
+	return colorLib[ type ] || '#777777';
 
 }
 

@@ -21,9 +21,7 @@ export class TextureEditor extends BaseNodeEditor {
 
 		const node = texture( defaultTexture );
 
-		super( 'Texture', node, 250 );
-
-		this.setOutputLength( 4 );
+		super( 'Texture', node, 4, 250 );
 
 		this.texture = null;
 

@@ -9,7 +9,7 @@ export class SwizzleEditor extends BaseNodeEditor {
 
 		const node = split( float(), 'x' );
 
-		super( 'Swizzle', node, 175 );
+		super( 'Swizzle', node, 1, 175 );
 
 		const inputElement = new LabelElement( 'Input' ).setInput( 1 ).onConnect( () => {
 

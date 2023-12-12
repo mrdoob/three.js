@@ -25,7 +25,7 @@ export class ScriptableEditor extends BaseNodeEditor {
 
 		scriptableNode = scriptable( codeNode );
 
-		super( defaultTitle, scriptableNode, defaultWidth );
+		super( defaultTitle, scriptableNode, 1, defaultWidth );
 
 		this.scriptableNode = scriptableNode;
 		this.editorCodeNode = codeNode;
@@ -67,9 +67,9 @@ export class ScriptableEditor extends BaseNodeEditor {
 
 	}
 
-	getOutputType() {
+	getColor() {
 
-		return this.layout ? this.layout.outputType : null;
+		return ( getColorFromType( this.layout ? this.layout.outputType : null ) ) + 'BB';
 
 	}
 
