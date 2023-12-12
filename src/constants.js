@@ -56,7 +56,8 @@ export const LinearToneMapping = 1;
 export const ReinhardToneMapping = 2;
 export const CineonToneMapping = 3;
 export const ACESFilmicToneMapping = 4;
-export const CustomToneMapping = 5;
+export const AGXToneMapping = 5;
+export const CustomToneMapping = 6;
 export const AttachedBindMode = 'attached';
 export const DetachedBindMode = 'detached';
 
