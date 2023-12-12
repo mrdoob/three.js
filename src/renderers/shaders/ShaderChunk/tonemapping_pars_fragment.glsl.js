@@ -128,9 +128,7 @@ vec3 agxEotf( vec3 val ) {
  	// Inverse input transform (outset)
 	val = agx_mat_inv * val;
 
-	// sRGB IEC 61966-2-1 2.2 Exponent Reference EOTF Display
-	// NOTE: We're linearizing the output here. Comment/adjust when
-	// *not* using a sRGB render target
+	// Encode output to Linear-sRGB.
 	val = pow( val, vec3( 2.2 ) );
 
 	return val;
