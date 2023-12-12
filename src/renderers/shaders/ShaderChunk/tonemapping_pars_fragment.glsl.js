@@ -137,8 +137,9 @@ vec3 agxEotf( vec3 val ) {
 
 }
 
-vec3 AGXToneMapping( vec3 color ) {
+vec3 AgXToneMapping( vec3 color ) {
 
+	color *= toneMappingExposure;
 	color = agx( color );
 	color = agxEotf( color );
 	return color;
