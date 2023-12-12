@@ -561,8 +561,7 @@ class Quaternion {
 			this._y = s * y + t * this._y;
 			this._z = s * z + t * this._z;
 
-			this.normalize();
-			this._onChangeCallback();
+			this.normalize(); // normalize calls _onChangeCallback()
 
 			return this;
 
