@@ -138,6 +138,7 @@ vec3 agxEotf( vec3 val ) {
 // Input and output encoded as Linear-sRGB.
 vec3 AgXToneMapping( vec3 color ) {
 
+	color = max( vec3( 0.0 ), color );
 	color *= toneMappingExposure;
 	color = agx( color );
 	color = agxEotf( color );
