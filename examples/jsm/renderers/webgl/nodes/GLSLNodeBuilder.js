@@ -583,7 +583,7 @@ void main() {
 	getUniformFromNode( node, type, shaderStage, name = null ) {
 
 		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
-		const nodeData = this.getDataFromNode( node, shaderStage );
+		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
 		let uniformGPU = nodeData.uniformGPU;
 

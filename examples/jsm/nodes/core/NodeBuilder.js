@@ -626,9 +626,9 @@ class NodeBuilder {
 
 	}
 
-	getDataFromNode( node, shaderStage = this.shaderStage ) {
+	getDataFromNode( node, shaderStage = this.shaderStage, cache = null ) {
 
-		const cache = node.isGlobal( this ) ? this.globalCache : this.cache;
+		cache = cache === null ? ( node.isGlobal( this ) ? this.globalCache : this.cache ) : cache;
 
 		let nodeData = cache.getNodeData( node );
 
@@ -697,7 +697,7 @@ class NodeBuilder {
 
 	getUniformFromNode( node, type, shaderStage = this.shaderStage, name = null ) {
 
-		const nodeData = this.getDataFromNode( node, shaderStage );
+		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
 		let nodeUniform = nodeData.uniform;
 

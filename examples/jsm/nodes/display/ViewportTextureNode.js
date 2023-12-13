@@ -49,6 +49,7 @@ class ViewportTextureNode extends TextureNode {
 
 		const currentGenerateMipmaps = framebufferTexture.generateMipmaps;
 		framebufferTexture.generateMipmaps = this.generateMipmaps;
+		framebufferTexture.isFramebufferTexture = true; // force usage in DepthTexture
 
 		renderer.copyFramebufferToTexture( framebufferTexture );
 
