@@ -162,7 +162,7 @@ class WebGLAttributeUtils {
 
 		gl.deleteBuffer( writeBuffer );
 
-		return dstBuffer;
+		return dstBuffer.buffer;
 
 	}
 
