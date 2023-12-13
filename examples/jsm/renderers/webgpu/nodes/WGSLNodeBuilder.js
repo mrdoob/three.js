@@ -124,24 +124,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	build() {
-
-		const { object, material } = this;
-
-		if ( material !== null ) {
-
-			NodeMaterial.fromMaterial( material ).build( this );
-
-		} else {
-
-			this.addFlow( 'compute', object );
-
-		}
-
-		return super.build();
-
-	}
-
 	needsColorSpaceToLinear( texture ) {
 
 		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;

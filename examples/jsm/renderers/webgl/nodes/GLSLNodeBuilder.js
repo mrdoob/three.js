@@ -647,26 +647,6 @@ void main() {
 
 	}
 
-	build() {
-
-		// @TODO: Move this code to super.build()
-
-		const { object, material } = this;
-
-		if ( material !== null ) {
-
-			NodeMaterial.fromMaterial( material ).build( this );
-
-		} else {
-
-			this.addFlow( 'compute', object );
-
-		}
-
-		return super.build();
-
-	}
-
 }
 
 export default GLSLNodeBuilder;
