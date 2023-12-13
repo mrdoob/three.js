@@ -461,7 +461,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 	const customExtensions = parameters.isWebGL2 ? '' : generateExtensions( parameters );
 
-	const customWebGLVertexExtensions = parameters.isWebGL2 ? generateVertexExtensions( parameters ) : '';
+	const customWebGLVertexExtensions = generateVertexExtensions( parameters );
 
 	const customDefines = generateDefines( defines );
 
