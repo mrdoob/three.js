@@ -241,6 +241,13 @@ class GTAOPass extends Pass {
 
 		}
 
+		if ( parameters.distanceFallOff !== undefined ) {
+
+			this.gtaoMaterial.uniforms.distanceFallOff.value = parameters.distanceFallOff;
+			this.gtaoMaterial.needsUpdate = true;
+
+		}
+
 		if ( parameters.scale !== undefined ) {
 
 			this.gtaoMaterial.uniforms.scale.value = parameters.scale;
