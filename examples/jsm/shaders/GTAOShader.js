@@ -63,7 +63,7 @@ const GTAOShader = {
 		radius: { value: 0.25 },
 		distanceExponent: { value: 1. },
 		thickness: { value: 1. },
-		bias: { value: 0.001 },
+		distanceFallOff: { value: 1. },
 		scale: { value: 1. },
 		sceneBoxMin: { value: new Vector3( - 1, - 1, - 1 ) },
 		sceneBoxMax: { value: new Vector3( 1, 1, 1 ) },
@@ -92,7 +92,7 @@ const GTAOShader = {
 		uniform float radius;
 		uniform float distanceExponent;
 		uniform float thickness;
-		uniform float bias;
+		uniform float distanceFallOff;
 		uniform float scale;
 		#if SCENE_CLIP_BOX == 1
 			uniform vec3 sceneBoxMin;
@@ -226,7 +226,7 @@ const GTAOShader = {
 					vec3 viewDelta = sampleSceneViewPos - viewPos;
 					if (abs(viewDelta.z) < thickness) {
 						float sampleCosHorizon = dot(viewDir, normalize(viewDelta));
-						cosHorizons.x = max(cosHorizons.x, sampleCosHorizon);	
+						cosHorizons.x += max(0., (sampleCosHorizon - cosHorizons.x) * mix(1., 2. / float(j + 2), distanceFallOff));
 					}		
 
 					sampleSceneUvDepth = getSceneUvAndDepth(viewPos - sampleViewOffset);
@@ -234,7 +234,7 @@ const GTAOShader = {
 					viewDelta = sampleSceneViewPos - viewPos;
 					if (abs(viewDelta.z) < thickness) {
 						float sampleCosHorizon = dot(viewDir, normalize(viewDelta));
-						cosHorizons.y = max(cosHorizons.y, sampleCosHorizon);	
+						cosHorizons.y += max(0., (sampleCosHorizon - cosHorizons.y) * mix(1., 2. / float(j + 2), distanceFallOff));
 					}
 				}
 
@@ -355,7 +355,7 @@ function generateMagicSquareNoise( size = 5 ) {
 		data[ inx * 4 ] = ( randomVec.x * 0.5 + 0.5 ) * 255;
 		data[ inx * 4 + 1 ] = ( randomVec.y * 0.5 + 0.5 ) * 255;
 		data[ inx * 4 + 2 ] = 127;
-		data[ inx * 4 + 3 ] = 0;
+		data[ inx * 4 + 3 ] = 255;
 
 	}
 
