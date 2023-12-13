@@ -3,7 +3,8 @@ import { Color, Vector2, Vector3, Vector4 } from 'three';
 import * as Nodes from 'three/nodes';
 import { uniform } from 'three/nodes';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
-import { createInputLib, getColorFromType } from '../NodeEditorUtils.js';
+import { createInputLib } from '../NodeEditorUtils.js';
+import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
 const typeToValue = {
 	'color': Color,
@@ -33,7 +34,7 @@ const createElementFromProperty = ( node, property ) => {
 
 	node[ property.name ] = defaultValue;
 
-	const element = new LabelElement( label ).setInput( property.defaultLength || 1 ).setInputColor( getColorFromType(nodeType) );
+	const element = setInputAestheticsFromType( new LabelElement( label ), nodeType );
 
 	if ( createInputLib[ nodeType ] !== undefined ) {
 

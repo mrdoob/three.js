@@ -1,5 +1,6 @@
 import { Node, ButtonInput, TitleElement, ContextMenu } from 'flow';
-import { exportJSON, onValidNode, getColorFromNode, getTypeFromValue } from './NodeEditorUtils.js';
+import { exportJSON, onValidNode } from './NodeEditorUtils.js';
+import { setOutputAestheticsFromNode, getColorFromNode } from './DataTypeLib.js';
 
 export class BaseNodeEditor extends Node {
 
@@ -17,9 +18,9 @@ export class BaseNodeEditor extends Node {
 
 		const title = new TitleElement( name )
 			.setObjectCallback( getObjectCallback )
-			.setSerializable( false )
-			.setOutput( outputLength )
-			.setOutputColor( getColorFromNode(value) );
+			.setSerializable( false );
+		
+		setOutputAestheticsFromNode(title, value);
 
 		const contextButton = new ButtonInput().onClick( () => {
 
@@ -78,7 +79,6 @@ export class BaseNodeEditor extends Node {
 		this.onValidElement = onValidNode;
 
 		this.outputLength = outputLength;
-		this.title.setOutput( this.value ? this.outputLength : 0 );
 	}
 
 	getColor() {

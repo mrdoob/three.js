@@ -4,6 +4,7 @@ import { Element, LabelElement, SelectInput } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { MeshBasicNodeMaterial, float } from 'three/nodes';
 import { WebGLRenderer, PerspectiveCamera, Scene, Mesh, DoubleSide, SphereGeometry, BoxGeometry, PlaneGeometry, TorusKnotGeometry } from 'three';
+import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
 const sceneDict = {};
 
@@ -74,7 +75,7 @@ export class PreviewEditor extends BaseNodeEditor {
 			{ name: 'Torus', value: 'torus' }
 		], 'box' );
 
-		const inputElement = new LabelElement( 'Input' ).setInput( 4 ).onConnect( () => {
+		const inputElement = setInputAestheticsFromType( new LabelElement( 'Input' ), 'Color' ).onConnect( () => {
 
 			material.colorNode = inputElement.getLinkedObject() || float();
 			material.dispose();

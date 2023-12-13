@@ -1,7 +1,7 @@
 import { ColorInput, SliderInput, LabelElement } from 'flow';
 import { MaterialEditor } from './MaterialEditor.js';
 import { MeshStandardNodeMaterial } from 'three/nodes';
-import { getColorFromType } from '../NodeEditorUtils.js';
+import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
 export class StandardMaterialEditor extends MaterialEditor {
 
@@ -11,13 +11,13 @@ export class StandardMaterialEditor extends MaterialEditor {
 
 		super( 'Standard Material', material, 1 );
 
-		const color = new LabelElement( 'color' ).setInput( 3 ).setInputColor( getColorFromType('Color') );
-		const opacity = new LabelElement( 'opacity' ).setInput( 1 ).setInputColor( getColorFromType('Number') );
-		const metalness = new LabelElement( 'metalness' ).setInput( 1 ).setInputColor( getColorFromType('Number') );
-		const roughness = new LabelElement( 'roughness' ).setInput( 1 ).setInputColor( getColorFromType('Number') );
-		const emissive = new LabelElement( 'emissive' ).setInput( 3 ).setInputColor( getColorFromType('Color') );
-		const normal = new LabelElement( 'normal' ).setInput( 3 ).setInputColor( getColorFromType('Vector3') );
-		const position = new LabelElement( 'position' ).setInput( 3 ).setInputColor( getColorFromType('Vector3') );
+		const color = setInputAestheticsFromType( new LabelElement( 'color' ), 'Color' );
+		const opacity = setInputAestheticsFromType( new LabelElement( 'opacity' ), 'Number' );
+		const metalness = setInputAestheticsFromType( new LabelElement( 'metalness' ), 'Number' );
+		const roughness = setInputAestheticsFromType( new LabelElement( 'roughness' ), 'Number' );
+		const emissive = setInputAestheticsFromType( new LabelElement( 'emissive' ), 'Color' );
+		const normal = setInputAestheticsFromType( new LabelElement( 'normal' ), 'Vector3' );
+		const position = setInputAestheticsFromType( new LabelElement( 'position' ), 'Vector3' );
 
 		color.add( new ColorInput( material.color.getHex() ).onChange( ( input ) => {
 

@@ -1,5 +1,6 @@
 import { StringInput, NumberInput, ColorInput, Element, LabelElement } from 'flow';
 import { string, float, vec2, vec3, vec4, color } from 'three/nodes';
+import { getColorFromType } from './DataTypeLib.js';
 
 export function exportJSON( object, name ) {
 
@@ -55,72 +56,6 @@ export function disposeMaterial( material )	{
 		}
 
 	}
-
-}
-
-export const colorLib = {
-	// gpu
-	string: '#ff0000',
-	float: '#eeeeee',
-	vec2: '#0000ff',
-	vec3: '#0000ff',
-	vec4: '#0000ff',
-	color: '#00ffff',
-	// cpu
-	String: '#ff0000',
-	Number: '#eeeeee',
-	Vector2: '#0000ff',
-	Vector3: '#0000ff',
-	Vector4: '#0000ff',
-	Color: '#00ffff',
-	Material: '#228b22',
-	Object3D: '#00a1ff',
-	CodeNode: '#ff00ff',
-	Texture: '#ffa500',
-	URL: '#ff0080',
-	node: '#ff00ff'
-};
-
-const defaultColor = '#777777';
-
-export function getColorFromNode( value ) {
-
-	if (!value)
-		return defaultColor;
-
-	if (value.isMaterial)
-		return getColorFromType('Material');
-
-	return getColorFromType(value.nodeType === 'ArrayBuffer' ? 'URL' : (value.nodeType || getTypeFromValue(value.value)));
-}
-
-export function getColorFromType( type ) {
-
-	return colorLib[ type ] || '#777777';
-
-}
-
-export function getTypeFromValue( value ) {
-
-	if ( value && value.isScriptableValueNode ) value = value.value;
-	if ( ! value ) return;
-
-	if ( value.isNode && value.nodeType === 'string' ) return 'string';
-	if ( value.isNode && value.nodeType === 'ArrayBuffer' ) return 'URL';
-
-	for ( const type of Object.keys( colorLib ).reverse() ) {
-
-		if ( value[ 'is' + type ] === true ) return type;
-
-	}
-
-}
-
-export function getColorFromValue( value ) {
-
-	const type = getTypeFromValue( value );
-
-	return getColorFromType( type );
 
 }
 
