@@ -213,7 +213,7 @@ class WebGLTextureUtils {
 
 	async copyTextureToBuffer( texture, x, y, width, height ) {
 
-		const { gl } = this;
+		const { backend, gl } = this;
 
 		const { textureGPU, glFormat, glType } = this.backend.get( texture );
 
@@ -235,13 +235,7 @@ class WebGLTextureUtils {
 		gl.readPixels( x, y, width, height, glFormat, glType, 0 );
 		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, null );
 
-		const sync = gl.fenceSync( gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
-
-		gl.flush();
-
-		await this._clientWaitAsync( sync );
-
-		gl.deleteSync( sync );
+		await backend.utils._clientWaitAsync();
 
 		const dstBuffer = new typedArrayType( elementCount );
 
@@ -277,40 +271,6 @@ class WebGLTextureUtils {
 		if ( glFormat === gl.RGBA ) return 4;
 		if ( glFormat === gl.RGB ) return 3;
 		if ( glFormat === gl.ALPHA ) return 1;
-
-	}
-
-	_clientWaitAsync( sync ) {
-
-		const { gl } = this;
-
-		return new Promise( ( resolve, reject ) => {
-
-			function test() {
-
-				const res = gl.clientWaitSync( sync, gl.SYNC_FLUSH_COMMANDS_BIT, 0 );
-
-				if ( res === gl.WAIT_FAILED) {
-
-					reject();
-					return;
-
-				}
-
-				if ( res === gl.TIMEOUT_EXPIRED) {
-
-					requestAnimationFrame( test );
-					return;
-
-				}
-
-				resolve();
-
-			}
-
-			test();
-
-		} );
 
 	}
 
