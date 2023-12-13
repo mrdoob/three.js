@@ -31,8 +31,6 @@ class StorageBufferNode extends BufferNode {
 
 		if ( this._attribute === null ) {
 
-			this.value.isStorageBufferAttribute = true;
-
 			this._attribute = bufferAttribute( this.value );
 			this._varying = varying( this._attribute );
 
