@@ -151,6 +151,7 @@ function generateVertexExtensions( parameters ) {
 
 	const chunks = [
 		parameters.extensionClipCullDistance ? '#extension GL_ANGLE_clip_cull_distance : require' : '',
+		parameters.extensionClipCullDistance ? '#extension GL_EXT_clip_cull_distance : enable' : '',
 	];
 
 	return chunks.filter( filterEmptyLine ).join( '\n' );
