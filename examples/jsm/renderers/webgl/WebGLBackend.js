@@ -453,12 +453,6 @@ class WebGLBackend extends Backend {
 
 	}
 
-	destroySampler( /*texture*/ ) {
-
-		console.warn( 'Abstract class.' );
-
-	}
-
 	createDefaultTexture( texture ) {
 
 		const { gl, textureUtils, defaultTextures } = this;
