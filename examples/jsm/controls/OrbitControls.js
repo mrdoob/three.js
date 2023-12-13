@@ -21,6 +21,8 @@ import {
 const _changeEvent = { type: 'change' };
 const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
+const _startWhileRotatingEvent = { type: 'startWhileRotating' };
+const _endWhileRotatingEvent = { type: 'endWhileRotating' };
 const _ray = new Ray();
 const _plane = new Plane();
 const TILT_LIMIT = Math.cos( 70 * MathUtils.DEG2RAD );
@@ -108,6 +110,9 @@ class OrbitControls extends EventDispatcher {
 
 		// the target DOM element for key events
 		this._domElementKeyEvents = null;
+
+		// allow zooming while rotating or not
+		this.enableZoomWhileRotating = false;
 
 		//
 		// public methods
@@ -1174,15 +1179,33 @@ class OrbitControls extends EventDispatcher {
 
 		function onMouseWheel( event ) {
 
-			if ( scope.enabled === false || scope.enableZoom === false || state !== STATE.NONE ) return;
+			if ( scope.enabled === false || scope.enableZoom === false) return;
 
-			event.preventDefault();
+			if ( scope.enableZoomWhileRotating ) {
 
-			scope.dispatchEvent( _startEvent );
+				if (state !== STATE.NONE && state !== STATE.ROTATE) return;
 
-			handleMouseWheel( event );
+				event.preventDefault();
 
-			scope.dispatchEvent( _endEvent );
+				scope.dispatchEvent( _startWhileRotatingEvent );
+
+				handleMouseWheel( event );
+
+				scope.dispatchEvent( _endWhileRotatingEvent );
+
+			} else {
+
+				if (state !== STATE.NONE) return;
+
+				event.preventDefault();
+
+				scope.dispatchEvent(_startEvent);
+
+				handleMouseWheel(event);
+
+				scope.dispatchEvent(_endEvent);
+
+			}
 
 		}
 
