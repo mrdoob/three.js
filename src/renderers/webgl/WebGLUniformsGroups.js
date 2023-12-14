@@ -184,11 +184,13 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		} else {
 
+			const cachedObject = cache[ indexString ];
+
 			// compare current value with cached entry
 
 			if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
-				if ( cache[ indexString ] !== value ) {
+				if ( cachedObject !== value ) {
 
 					cache[ indexString ] = value;
 					return true;
@@ -197,18 +199,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			} else {
 
-				const cachedObject = cache[ indexString ];
-
-				if ( typeof cachedObject === 'number' || typeof cachedObject === 'boolean' ) {
-
-					if ( cachedObject !== value ) {
-
-						cache[ indexString ] = value;
-						return true;
-
-					}
-
-				} else if ( cachedObject.equals( value ) === false ) {
+				if ( cachedObject.equals( value ) === false ) {
 
 					cachedObject.copy( value );
 					return true;
