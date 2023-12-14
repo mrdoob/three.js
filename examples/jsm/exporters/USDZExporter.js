@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as fflate from '../libs/fflate.module.js';
+import { decompress } from './../utils/TextureUtils.js';
 
 class USDZExporter {
 
@@ -76,7 +77,14 @@ class USDZExporter {
 
 		for ( const id in textures ) {
 
-			const texture = textures[ id ];
+			let texture = textures[ id ];
+
+      // make non-readable textures (e.g. CompressedTexture) readable by blitting them into a new texture
+      if ( texture instanceof THREE.CompressedTexture ) {
+
+        texture = decompress( texture, Infinity );
+
+      }
 
 			const canvas = imageToCanvas( texture.image, texture.flipY );
 			const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/png', 1 ) );

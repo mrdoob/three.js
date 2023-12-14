@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - USDZ exporter (Compressed model)</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #eee;
+			}
+			#info {
+				color: #222;
+			}
+			a {
+				color: #00f
+			}
+			#button {
+				position: absolute;
+				bottom: 15px;
+				left: calc(50% - 40px);
+
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - USDZ exporter (Compressed model)<br />
+			Coffeemat model by
+			<a href="https://sketchfab.com/OFFcours1" target="_blank" rel="noopener">Roman Red</a>
+		</div>
+
+		<a id="link" rel="ar" href="" download="asset.usdz">
+			<img id="button" width="100" src="files/arkit.png">
+		</a>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { USDZExporter } from 'three/addons/exporters/USDZExporter.js';
+
+      import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			let camera, scene, renderer;
+
+			const params = {
+				exportUSDZ: exportUSDZ
+			};
+
+			init();
+			render();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( - 2.5, 0.6, 3.0 );
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xf0f0f0 );
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment( renderer ), 0.04 ).texture;
+
+        const ktx2Loader = new KTX2Loader()
+					.setTranscoderPath( 'jsm/libs/basis/' )
+					.detectSupport( renderer );
+
+        const loader = new GLTFLoader().setPath( 'models/gltf/' );
+        loader.setKTX2Loader( ktx2Loader );
+				loader.setMeshoptDecoder( MeshoptDecoder );
+				loader.load( 'coffeemat.glb', async function ( gltf ) {
+
+          gltf.scene.scale.set(0.01, 0.01, 0.01);
+          gltf.scene.position.y = - 1.0;
+
+					scene.add( gltf.scene );
+
+					render();
+
+					// USDZ
+
+					const exporter = new USDZExporter();
+					const arraybuffer = await exporter.parse( gltf.scene );
+					const blob = new Blob( [ arraybuffer ], { type: 'application/octet-stream' } );
+
+					const link = document.getElementById( 'link' );
+					link.href = URL.createObjectURL( blob );
+
+				} );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
+				controls.minDistance = 2;
+				controls.maxDistance = 10;
+				controls.target.set( 0, - 0.15, - 0.2 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				const isIOS = /iPad|iPhone|iPod/.test( navigator.userAgent );
+
+				if ( isIOS === false ) {
+
+					const gui = new GUI();
+
+					gui.add( params, 'exportUSDZ' ).name( 'Export USDZ' );
+					gui.open();
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function exportUSDZ() {
+
+				const link = document.getElementById( 'link' );
+				link.click();
+
+			}
+
+			//
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
