@@ -1,7 +1,7 @@
 import DataMap from './DataMap.js';
 import Color4 from './Color4.js';
 import { Mesh, SphereGeometry, BackSide } from 'three';
-import { context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection } from '../../nodes/Nodes.js';
+import { vec4, context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection } from '../../nodes/Nodes.js';
 
 const _clearColor = new Color4();
 
@@ -13,9 +13,6 @@ class Background extends DataMap {
 
 		this.renderer = renderer;
 		this.nodes = nodes;
-
-		this.backgroundMesh = null;
-		this.backgroundMeshNode = null;
 
 	}
 
@@ -49,11 +46,11 @@ class Background extends DataMap {
 
 			_clearColor.copy( renderer._clearColor );
 
-			let backgroundMesh = this.backgroundMesh;
+			let backgroundMesh = sceneData.backgroundMesh;
 
-			if ( backgroundMesh === null ) {
+			if ( backgroundMesh === undefined ) {
 
-				this.backgroundMeshNode = context( backgroundNode, {
+				const backgroundMeshNode = context( vec4( backgroundNode ), {
 					// @TODO: Add Texture2D support using node context
 					getUV: () => normalWorld,
 					getTextureLevel: () => backgroundBlurriness
@@ -68,9 +65,10 @@ class Background extends DataMap {
 				nodeMaterial.depthWrite = false;
 				nodeMaterial.fog = false;
 				nodeMaterial.vertexNode = viewProj;
-				nodeMaterial.fragmentNode = this.backgroundMeshNode;
+				nodeMaterial.fragmentNode = backgroundMeshNode;
 
-				this.backgroundMesh = backgroundMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );
+				sceneData.backgroundMeshNode = backgroundMeshNode;
+				sceneData.backgroundMesh = backgroundMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );
 				backgroundMesh.frustumCulled = false;
 
 				backgroundMesh.onBeforeRender = function ( renderer, scene, camera ) {
@@ -85,7 +83,7 @@ class Background extends DataMap {
 
 			if ( sceneData.backgroundCacheKey !== backgroundCacheKey ) {
 
-				this.backgroundMeshNode.node = backgroundNode;
+				sceneData.backgroundMeshNode.node = vec4( backgroundNode );
 
 				backgroundMesh.material.needsUpdate = true;
 
