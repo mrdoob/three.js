@@ -79,12 +79,11 @@ class USDZExporter {
 
 			let texture = textures[ id ];
 
-      // make non-readable textures (e.g. CompressedTexture) readable by blitting them into a new texture
-      if ( texture instanceof THREE.CompressedTexture ) {
+			if ( texture.isCompressedTexture === true ) {
 
-        texture = decompress( texture, Infinity );
+				texture = decompress( texture, Infinity );
 
-      }
+			}
 
 			const canvas = imageToCanvas( texture.image, texture.flipY );
 			const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/png', 1 ) );
