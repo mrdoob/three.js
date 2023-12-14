@@ -138,11 +138,9 @@
 
 				//
 
-				const scenePass = pass( scenePortal, camera );
-
 				const geometry = new THREE.PlaneGeometry( 1.7, 2 );
 				const material = new MeshBasicNodeMaterial();
-				material.colorNode = scenePass.getTextureNode().context( { getUV: () => viewportTopLeft } );
+				material.colorNode = pass( scenePortal, camera ).getTextureNode().context( { getUV: () => viewportTopLeft } );
 				material.opacityNode = uv().distance( .5 ).remapClamp( .3, .5 ).oneMinus();
 				material.side = THREE.DoubleSide;
 				material.transparent = true;
