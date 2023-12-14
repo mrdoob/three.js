@@ -1,265 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>three.js webgl2 - clip cull distance</title>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-    <link
-      type="text/css"
-      rel="stylesheet"
-      href="main.css" />
-  </head>
-  <body>
-    <div id="container"></div>
-
-    <div id="info">
-      <a
-        href="https://threejs.org"
-        target="_blank"
-        rel="noopener"
-        >three.js</a
-      >
-      - clip cull distance
-      <a
-        href="https://registry.khronos.org/webgl/extensions/EXT_clip_cull_distance/"
-        target="_blank"
-        rel="noopener"
-        >EXT_clip_cull_distance</a
-      >
-	  <div id="notSupported" style="display:none">WEBGL_clip_cull_distance not supported</div>
-    </div>
+	<head>
+		<title>three.js WebGL 2 - clip cull distance</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+		<link type="text/css" rel="stylesheet" href="main.css" />
+	</head>
+	<body>
+		<div id="container"></div>
 
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "../build/three.module.js",
-          "three/addons/": "./jsm/"
-        }
-      }
-    </script>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener" >three.js</a> - clip cull distance
+			<a href="https://registry.khronos.org/webgl/extensions/WEBGL_clip_cull_distance/" target="_blank" rel="noopener" >WEBGL_clip_cull_distance</a>
+		<div id="notSupported" style="display:none">WEBGL_clip_cull_distance not supported</div>
+		</div>
 
-    <script type="module">
-	import * as THREE from 'three';
-	import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-	import Stats from 'three/addons/libs/stats.module.js';
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
-	let stats;
-	let camera, controls, scene, renderer;
-	let geometries, mesh, material;
-	const ids = [];
-	const matrix = new THREE.Matrix4();
+		<script type="module">
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-	//
+			let stats;
+			let camera, controls, scene, renderer;
+			let geometries, mesh, material;
+			const ids = [];
+			const matrix = new THREE.Matrix4();
 
-	const position = new THREE.Vector3();
-	const rotation = new THREE.Euler();
-	const quaternion = new THREE.Quaternion();
-	const scale = new THREE.Vector3();
+			//
 
-	const api = {
-		count: 10000,
-		clipCullExtension: true
-	};
+			const position = new THREE.Vector3();
+			const rotation = new THREE.Euler();
+			const quaternion = new THREE.Quaternion();
+			const scale = new THREE.Vector3();
 
-	const time = new THREE.Uniform( 0 );
+			const api = {
+				count: 10000,
+				clipCullExtension: true
+			};
 
-	//
+			const time = new THREE.Uniform( 0 );
 
-	init();
-	animate();
+			//
 
-	function init() {
+			init();
+			animate();
 
-		const container = document.getElementById( 'container' );
+			function init() {
 
-		const width = window.innerWidth;
-		const height = window.innerHeight;
+				const container = document.getElementById( 'container' );
 
-		camera = new THREE.PerspectiveCamera( 70, width / height, 1, 100 );
-		camera.position.z = 30;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
-		scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 100 );
+				camera.position.z = 30;
 
-		renderer = new THREE.WebGLRenderer();
-		renderer.setPixelRatio( 1 );
-		renderer.setSize( window.innerWidth, window.innerHeight );
-		container.appendChild( renderer.domElement );
+				scene = new THREE.Scene();
 
-		if ( renderer.extensions.has( 'WEBGL_clip_cull_distance' ) === false ) {
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
-			document.getElementById( 'notSupported' ).style.display = '';
-			return;
+				if ( renderer.extensions.has( 'WEBGL_clip_cull_distance' ) === false ) {
 
-		}
+					document.getElementById( 'notSupported' ).style.display = '';
+					return;
 
-		// controls
-		controls = new OrbitControls( camera, renderer.domElement );
+				}
 
-		// stats
-		stats = new Stats();
-		document.body.appendChild( stats.dom );
+				// controls
+				controls = new OrbitControls( camera, renderer.domElement );
 
+				// stats
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
-		const ext = renderer
-			.getContext()
-			.getExtension( 'WEBGL_clip_cull_distance' );
-		const gl = renderer.getContext();
 
-		gl.enable( ext.CLIP_DISTANCE0_WEBGL );
+				const ext = renderer
+					.getContext()
+					.getExtension( 'WEBGL_clip_cull_distance' );
+				const gl = renderer.getContext();
 
-		initGeometries();
-		initBatchedMesh();
-		onWindowResize();
+				gl.enable( ext.CLIP_DISTANCE0_WEBGL );
 
-		window.addEventListener( 'resize', onWindowResize );
+				initGeometries();
+				initBatchedMesh();
+				onWindowResize();
 
-	}
+				window.addEventListener( 'resize', onWindowResize );
 
-	function onWindowResize() {
+			}
 
-		camera.aspect = window.innerWidth / window.innerHeight;
-		camera.updateProjectionMatrix();
+			function onWindowResize() {
 
-		renderer.setSize( window.innerWidth, window.innerHeight );
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
 
-	}
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-	function randomizeMatrix( matrix ) {
+			}
 
-		position.x = Math.random() * 40 - 20;
-		position.y = Math.random() * 40 - 20;
-		position.z = Math.random() * 40 - 20;
+			function randomizeMatrix( matrix ) {
 
-		rotation.x = Math.random() * 2 * Math.PI;
-		rotation.y = Math.random() * 2 * Math.PI;
-		rotation.z = Math.random() * 2 * Math.PI;
+				position.x = Math.random() * 40 - 20;
+				position.y = Math.random() * 40 - 20;
+				position.z = Math.random() * 40 - 20;
 
-		quaternion.setFromEuler( rotation );
+				rotation.x = Math.random() * 2 * Math.PI;
+				rotation.y = Math.random() * 2 * Math.PI;
+				rotation.z = Math.random() * 2 * Math.PI;
 
-		scale.x = scale.y = scale.z = 0.5 + Math.random() * 0.5;
+				quaternion.setFromEuler( rotation );
 
-		return matrix.compose( position, quaternion, scale );
+				scale.x = scale.y = scale.z = 0.5 + Math.random() * 0.5;
 
-	}
+				return matrix.compose( position, quaternion, scale );
 
-	function randomizeRotationSpeed( rotation ) {
+			}
 
-		rotation.x = Math.random() * 0.01;
-		rotation.y = Math.random() * 0.01;
-		rotation.z = Math.random() * 0.01;
-		return rotation;
+			function randomizeRotationSpeed( rotation ) {
 
-	}
+				rotation.x = Math.random() * 0.01;
+				rotation.y = Math.random() * 0.01;
+				rotation.z = Math.random() * 0.01;
+				return rotation;
 
-	function initGeometries() {
+			}
 
-		geometries = [
-			new THREE.ConeGeometry( 1.0, 2.0 ),
-			new THREE.BoxGeometry( 2.0, 2.0, 2.0 ),
-			new THREE.SphereGeometry( 1.0, 16, 8 ),
-		];
+			function initGeometries() {
 
-	}
+				geometries = [
+					new THREE.ConeGeometry( 1.0, 2.0 ),
+					new THREE.BoxGeometry( 2.0, 2.0, 2.0 ),
+					new THREE.SphereGeometry( 1.0, 16, 8 ),
+				];
 
-	function initBatchedMesh() {
+			}
 
-		const geometryCount = api.count;
-		const vertexCount = api.count * 512;
-		const indexCount = api.count * 1024;
+			function initBatchedMesh() {
 
-		const euler = new THREE.Euler();
-		const matrix = new THREE.Matrix4();
+				const geometryCount = api.count;
+				const vertexCount = api.count * 512;
+				const indexCount = api.count * 1024;
 
-		material = new THREE.MeshNormalMaterial();
-		material.extensions = {
-			clipCullDistance: true,
-		};
+				const euler = new THREE.Euler();
+				const matrix = new THREE.Matrix4();
 
-		material.onBeforeCompile = function ( shader ) {
+				material = new THREE.MeshNormalMaterial();
+				material.extensions = {
+					clipCullDistance: true,
+				};
 
-			shader.vertexShader = shader.vertexShader.replace(
-				'#include <common>',
-				`
-				#include <common>
-				uniform float time;
-				`
-			);
-			shader.vertexShader = shader.vertexShader.replace(
-				'#include <project_vertex>',
-				`
-				#include <project_vertex>
-				#ifdef USE_CLIP_DISTANCE
-					vec4 worldPosition = modelMatrix * batchingMatrix * vec4(transformed, 1.);
-					gl_ClipDistance[ 0 ] = worldPosition.x - sin(time) * (20. + 1.5);
-				#endif
-				`
-			);
+				material.onBeforeCompile = function ( shader ) {
 
-			shader.uniforms.time = time;
+					shader.vertexShader = shader.vertexShader.replace(
+						'#include <common>',
+						`
+						#include <common>
+						uniform float time;
+						`
+					);
+					shader.vertexShader = shader.vertexShader.replace(
+						'#include <project_vertex>',
+						`
+						#include <project_vertex>
+						#ifdef USE_CLIP_DISTANCE
+							vec4 worldPosition = modelMatrix * batchingMatrix * vec4(transformed, 1.);
+							gl_ClipDistance[ 0 ] = worldPosition.x - sin(time) * (20. + 1.5);
+						#endif
+						`
+					);
 
-		};
+					shader.uniforms.time = time;
 
-		mesh = new THREE.BatchedMesh(
-			geometryCount,
-			vertexCount,
-			indexCount,
-			material
-		);
-		mesh.userData.rotationSpeeds = [];
+				};
 
-		mesh.frustumCulled = false;
+				mesh = new THREE.BatchedMesh(
+					geometryCount,
+					vertexCount,
+					indexCount,
+					material
+				);
+				mesh.userData.rotationSpeeds = [];
 
-		ids.length = 0;
+				mesh.frustumCulled = false;
 
-		for ( let i = 0; i < api.count; i ++ ) {
+				ids.length = 0;
 
-			const id = mesh.addGeometry( geometries[ i % geometries.length ] );
-			mesh.setMatrixAt( id, randomizeMatrix( matrix ) );
+				for ( let i = 0; i < api.count; i ++ ) {
 
-			const rotationMatrix = new THREE.Matrix4();
-			rotationMatrix.makeRotationFromEuler( randomizeRotationSpeed( euler ) );
-			mesh.userData.rotationSpeeds.push( rotationMatrix );
+					const id = mesh.addGeometry( geometries[ i % geometries.length ] );
+					mesh.setMatrixAt( id, randomizeMatrix( matrix ) );
 
-			ids.push( id );
+					const rotationMatrix = new THREE.Matrix4();
+					rotationMatrix.makeRotationFromEuler( randomizeRotationSpeed( euler ) );
+					mesh.userData.rotationSpeeds.push( rotationMatrix );
 
-		}
+					ids.push( id );
 
-		scene.add( mesh );
+				}
 
-	}
+				scene.add( mesh );
 
-	function animateMeshes() {
+			}
 
-		const loopNum = Math.min( api.count, api.dynamic );
+			function animateMeshes() {
 
-		for ( let i = 0; i < loopNum; i ++ ) {
+				const loopNum = Math.min( api.count, api.dynamic );
 
-			const rotationMatrix = mesh.userData.rotationSpeeds[ i ];
-			const id = ids[ i ];
+				for ( let i = 0; i < loopNum; i ++ ) {
 
-			mesh.getMatrixAt( id, matrix );
-			matrix.multiply( rotationMatrix );
-			mesh.setMatrixAt( id, matrix );
+					const rotationMatrix = mesh.userData.rotationSpeeds[ i ];
+					const id = ids[ i ];
 
-		}
+					mesh.getMatrixAt( id, matrix );
+					matrix.multiply( rotationMatrix );
+					mesh.setMatrixAt( id, matrix );
 
-	}
-	//
+				}
 
-	function animate() {
+			}
+			//
 
-		requestAnimationFrame( animate );
+			function animate() {
 
-		animateMeshes();
-		controls.update();
-		stats.update();
-		time.value = performance.now() * 0.001;
+				requestAnimationFrame( animate );
 
-		renderer.render( scene, camera );
+				animateMeshes();
+				controls.update();
+				stats.update();
+				time.value = performance.now() * 0.001;
 
-	}
-    </script>
-  </body>
+				renderer.render( scene, camera );
+
+			}
+		</script>
+	</body>
 </html>
