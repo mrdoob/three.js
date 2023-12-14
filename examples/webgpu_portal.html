@@ -73,11 +73,11 @@
 
 				// lights
 
-				const light = new THREE.PointLight( 0x0066ff, 1, 100 );
+				const light = new THREE.PointLight( 0xffffff, 1 );
 				light.position.set( 0, 1, 5 );
-				light.power = 30000;
+				light.power = 17000;
 
-				sceneMain.add( new THREE.HemisphereLight( 0xff0066, 0x0066ff, 10 ) );
+				sceneMain.add( new THREE.HemisphereLight( 0xff0066, 0x0066ff, 7 ) );
 				sceneMain.add( light );
 				scenePortal.add( light.clone() );
 
