@@ -15,6 +15,79 @@
 		<div id="notSupported" style="display:none">WEBGL_clip_cull_distance not supported</div>
 		</div>
 
+		<script id="vertexShader" type="x-shader/x-vertex">
+
+			uniform float time;
+
+			#include <common>
+			#include <batching_pars_vertex>
+			#include <uv_pars_vertex>
+			#include <displacementmap_pars_vertex>
+			#include <normal_pars_vertex>
+			#include <morphtarget_pars_vertex>
+			#include <skinning_pars_vertex>
+			#include <logdepthbuf_pars_vertex>
+			#include <clipping_planes_pars_vertex>
+				
+			void main()	{
+
+				#include <uv_vertex>
+				#include <batching_vertex>
+			
+				#include <beginnormal_vertex>
+				#include <morphnormal_vertex>
+				#include <skinbase_vertex>
+				#include <skinnormal_vertex>
+				#include <defaultnormal_vertex>
+				#include <normal_vertex>
+			
+				#include <begin_vertex>
+				#include <morphtarget_vertex>
+				#include <skinning_vertex>
+				#include <displacementmap_vertex>
+				#include <project_vertex>
+				#include <logdepthbuf_vertex>
+				#include <clipping_planes_vertex>
+
+				#ifdef USE_CLIP_DISTANCE
+					vec4 worldPosition = modelMatrix * batchingMatrix * vec4(transformed, 1.);
+					gl_ClipDistance[ 0 ] = worldPosition.x - sin(time) * (20. + 1.5);
+				#endif
+			}
+
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-vertex">
+
+			uniform float opacity;
+			
+			#include <packing>
+			#include <uv_pars_fragment>
+			#include <normal_pars_fragment>
+			#include <bumpmap_pars_fragment>
+			#include <normalmap_pars_fragment>
+			#include <logdepthbuf_pars_fragment>
+			#include <clipping_planes_pars_fragment>
+			
+			void main() {
+			
+				#include <clipping_planes_fragment>
+				#include <logdepthbuf_fragment>
+				#include <normal_fragment_begin>
+				#include <normal_fragment_maps>
+			
+				gl_FragColor = vec4( packNormalToRGB( normal ), opacity );
+			
+				#ifdef OPAQUE
+			
+					gl_FragColor.a = 1.0;
+			
+				#endif
+			
+			}
+
+		</script>
+
 		<script type="importmap">
 			{
 				"imports": {
@@ -156,34 +229,18 @@
 				const euler = new THREE.Euler();
 				const matrix = new THREE.Matrix4();
 
-				material = new THREE.MeshNormalMaterial();
-				material.extensions = {
-					clipCullDistance: true,
-				};
 
-				material.onBeforeCompile = function ( shader ) {
+				material = new THREE.ShaderMaterial( {
+					uniforms: {
+						opacity: { value: 1 },
+						time: { value: 0 },
+					},
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+				} );
 
-					shader.vertexShader = shader.vertexShader.replace(
-						'#include <common>',
-						`
-						#include <common>
-						uniform float time;
-						`
-					);
-					shader.vertexShader = shader.vertexShader.replace(
-						'#include <project_vertex>',
-						`
-						#include <project_vertex>
-						#ifdef USE_CLIP_DISTANCE
-							vec4 worldPosition = modelMatrix * batchingMatrix * vec4(transformed, 1.);
-							gl_ClipDistance[ 0 ] = worldPosition.x - sin(time) * (20. + 1.5);
-						#endif
-						`
-					);
+				material.extensions.clipCullDistance = true;
 
-					shader.uniforms.time = time;
-
-				};
 
 				mesh = new THREE.BatchedMesh(
 					geometryCount,
@@ -239,7 +296,8 @@
 				animateMeshes();
 				controls.update();
 				stats.update();
-				time.value = performance.now() * 0.001;
+
+				material.uniforms.time.value = performance.now() * 0.001;
 
 				renderer.render( scene, camera );
 
