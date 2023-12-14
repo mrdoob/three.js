@@ -21,7 +21,7 @@
     "type": "git",
     "url": "https://github.com/mrdoob/three.js"
   },
-  "sideEffects": ["./examples/jsm/nodes/Nodes.js"],
+  "sideEffects": ["./examples/jsm/nodes/**/*"],
   "files": [
     "build",
     "examples/jsm",
