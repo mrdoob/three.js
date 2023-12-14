@@ -19,7 +19,7 @@ import {
 	mx_safepower, mx_contrast,
 	mx_srgb_texture_to_lin_rec709,
 	saturation
-} from 'three/nodes';
+} from '../nodes/Nodes.js';
 
 const colorSpaceLib = {
 	mx_srgb_texture_to_lin_rec709
