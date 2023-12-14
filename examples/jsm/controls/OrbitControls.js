@@ -93,7 +93,14 @@ class OrbitControls extends EventDispatcher {
 		this.autoRotateSpeed = 2.0; // 30 seconds per orbit when fps is 60
 
 		// The four arrow keys
-		this.keys = { LEFT: 'ArrowLeft', UP: 'ArrowUp', RIGHT: 'ArrowRight', BOTTOM: 'ArrowDown' };
+		this.keys = {
+			LEFT: 'ArrowLeft',
+			UP: 'ArrowUp',
+			RIGHT: 'ArrowRight',
+			BOTTOM: 'ArrowDown',
+			TOGGLE: ['ctrlKey', 'metaKey', 'shiftKey'],
+			CUSTOM_TOGGLE: []
+		};
 
 		// Mouse buttons
 		this.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
@@ -134,6 +141,7 @@ class OrbitControls extends EventDispatcher {
 		this.listenToKeyEvents = function ( domElement ) {
 
 			domElement.addEventListener( 'keydown', onKeyDown );
+			domElement.addEventListener( 'keyup', onKeyUp );
 			this._domElementKeyEvents = domElement;
 
 		};
@@ -141,6 +149,7 @@ class OrbitControls extends EventDispatcher {
 		this.stopListenToKeyEvents = function () {
 
 			this._domElementKeyEvents.removeEventListener( 'keydown', onKeyDown );
+			this._domElementKeyEvents.removeEventListener( 'keyup', onKeyUp );
 			this._domElementKeyEvents = null;
 
 		};
@@ -423,6 +432,7 @@ class OrbitControls extends EventDispatcher {
 			if ( scope._domElementKeyEvents !== null ) {
 
 				scope._domElementKeyEvents.removeEventListener( 'keydown', onKeyDown );
+				scope._domElementKeyEvents.removeEventListener( 'keyup', onKeyUp );
 				scope._domElementKeyEvents = null;
 
 			}
@@ -449,6 +459,8 @@ class OrbitControls extends EventDispatcher {
 		};
 
 		let state = STATE.NONE;
+
+		let pushedToggleKeys = [];
 
 		const EPS = 0.000001;
 
@@ -753,7 +765,7 @@ class OrbitControls extends EventDispatcher {
 
 				case scope.keys.UP:
 
-					if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+					if ( isToggleRotateAndPan(event) ) {
 
 						rotateUp( 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight );
 
@@ -768,7 +780,7 @@ class OrbitControls extends EventDispatcher {
 
 				case scope.keys.BOTTOM:
 
-					if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+					if ( isToggleRotateAndPan(event) ) {
 
 						rotateUp( - 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight );
 
@@ -783,7 +795,7 @@ class OrbitControls extends EventDispatcher {
 
 				case scope.keys.LEFT:
 
-					if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+					if ( isToggleRotateAndPan(event) ) {
 
 						rotateLeft( 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight );
 
@@ -798,7 +810,7 @@ class OrbitControls extends EventDispatcher {
 
 				case scope.keys.RIGHT:
 
-					if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+					if ( isToggleRotateAndPan(event) ) {
 
 						rotateLeft( - 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight );
 
@@ -822,6 +834,34 @@ class OrbitControls extends EventDispatcher {
 
 			}
 
+
+		}
+
+		function handleToggleKeyDown(event) {
+
+			if ( !scope.keys.CUSTOM_TOGGLE.includes(event.code) || pushedToggleKeys.includes(event.code)) return;
+
+			pushedToggleKeys.push(event.code);
+
+		}
+
+		function handleToggleKeyUp(event) {
+
+			if ( !scope.keys.CUSTOM_TOGGLE.includes(event.code)) return;
+
+			pushedToggleKeys = pushedToggleKeys.filter(item => item !== event.code);
+
+		}
+
+		/**
+		 * Detects whether the key is pressed which required to toggle between rotation and pan
+		 *
+		 * @param {Event} event
+		 * @returns {boolean}
+		 */
+		function isToggleRotateAndPan(event) {
+
+			return pushedToggleKeys.length  > 0 || scope.keys.TOGGLE.some(toggleKey => event[toggleKey])
 
 		}
 
@@ -1084,7 +1124,7 @@ class OrbitControls extends EventDispatcher {
 
 				case MOUSE.ROTATE:
 
-					if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+					if ( isToggleRotateAndPan(event) ) {
 
 						if ( scope.enablePan === false ) return;
 
@@ -1106,7 +1146,7 @@ class OrbitControls extends EventDispatcher {
 
 				case MOUSE.PAN:
 
-					if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+					if ( isToggleRotateAndPan(event) ) {
 
 						if ( scope.enableRotate === false ) return;
 
@@ -1188,9 +1228,17 @@ class OrbitControls extends EventDispatcher {
 
 		function onKeyDown( event ) {
 
+			handleToggleKeyDown( event);
+
 			if ( scope.enabled === false || scope.enablePan === false ) return;
 
 			handleKeyDown( event );
+
+		}
+
+		function onKeyUp( event ) {
+
+			handleToggleKeyUp( event);
 
 		}
 
