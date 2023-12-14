@@ -27,6 +27,12 @@ class PassTextureNode extends TextureNode {
 
 	}
 
+	clone() {
+
+		return new this.constructor( this.passNode, this.value );
+
+	}
+
 }
 
 class PassNode extends TempNode {
@@ -76,6 +82,12 @@ class PassNode extends TempNode {
 	getTextureNode() {
 
 		return this._textureNode;
+
+	}
+
+	getTextureDepthNode() {
+
+		return this._depthTextureNode;
 
 	}
 
