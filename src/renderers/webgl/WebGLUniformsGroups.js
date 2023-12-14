@@ -102,7 +102,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				const uniform = uniformArray[ j ];
 
-				if ( hasUniformChanged( uniform, i, cache ) === true ) {
+				if ( hasUniformChanged( uniform, i, j, cache ) === true ) {
 
 					const offset = uniform.__offset;
 
@@ -110,9 +110,9 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 					let arrayOffset = 0;
 
-					for ( let i = 0; i < values.length; i ++ ) {
+					for ( let k = 0; k < values.length; k ++ ) {
 
-						const value = values[ i ];
+						const value = values[ k ];
 
 						const info = getUniformSize( value );
 
@@ -161,31 +161,22 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 	}
 
-	function hasUniformChanged( uniform, index, cache ) {
+	function hasUniformChanged( uniform, index, indexArray, cache ) {
 
 		const value = uniform.value;
+		const indexString = index + '_' + indexArray;
 
-		if ( cache[ index ] === undefined ) {
+		if ( cache[ indexString ] === undefined ) {
 
 			// cache entry does not exist so far
 
 			if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
-				cache[ index ] = value;
+				cache[ indexString ] = value;
 
 			} else {
 
-				const values = Array.isArray( value ) ? value : [ value ];
-
-				const tempValues = [];
-
-				for ( let i = 0; i < values.length; i ++ ) {
-
-					tempValues.push( values[ i ].clone() );
-
-				}
-
-				cache[ index ] = tempValues;
+				cache[ indexString ] = value.clone();
 
 			}
 
@@ -197,37 +188,30 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			if ( typeof value === 'number' || typeof value === 'boolean' ) {
 
-				if ( cache[ index ] !== value ) {
+				if ( cache[ indexString ] !== value ) {
 
-					cache[ index ] = value;
+					cache[ indexString ] = value;
 					return true;
 
 				}
 
 			} else {
 
-				const cachedObjects = Array.isArray( cache[ index ] ) ? cache[ index ] : [ cache[ index ] ];
-				const values = Array.isArray( value ) ? value : [ value ];
+				const cachedObject = cache[ indexString ];
 
-				for ( let i = 0; i < cachedObjects.length; i ++ ) {
+				if ( typeof cachedObject === 'number' || typeof cachedObject === 'boolean' ) {
 
-					const cachedObject = cachedObjects[ i ];
+					if ( cachedObject !== value ) {
 
-					if ( typeof cachedObject === 'number' || typeof cachedObject === 'boolean' ) {
-
-						if ( cachedObject !== values[ i ] ) {
-
-							cachedObjects[ i ] = values[ i ];
-							return true;
-
-						}
-
-					} else if ( cachedObject.equals( values[ i ] ) === false ) {
-
-						cachedObject.copy( values[ i ] );
+						cache[ indexString ] = value;
 						return true;
 
 					}
+
+				} else if ( cachedObject.equals( value ) === false ) {
+
+					cachedObject.copy( value );
+					return true;
 
 				}
 
