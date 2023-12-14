@@ -108,7 +108,11 @@
 		const gl = renderer.getContext();
 
 		gl.enable( ext.CLIP_DISTANCE0_WEBGL );
-
+		gl.enable( ext.CLIP_DISTANCE1_WEBGL );
+		gl.enable( ext.CLIP_DISTANCE2_WEBGL );
+		gl.enable( ext.CLIP_DISTANCE3_WEBGL );
+		gl.enable( ext.CLIP_DISTANCE4_WEBGL );
+		gl.enable( ext.CLIP_DISTANCE5_WEBGL );
 
 		initGeometries();
 		initBatchedMesh();
@@ -210,8 +214,6 @@
 		);
 		mesh.userData.rotationSpeeds = [];
 
-		mesh.isMesh = false;
-		mesh.isPoints = true;
 		mesh.frustumCulled = false;
 
 		ids.length = 0;
