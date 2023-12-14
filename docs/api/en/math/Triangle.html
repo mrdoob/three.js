@@ -97,7 +97,7 @@
 			[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
 			Return a [link:https://en.wikipedia.org/wiki/Barycentric_coordinate_system barycentric coordinate] 
-			from the given vector. <br /><br />
+			from the given vector. Returns `null` if the triangle is degenerate.<br /><br />
 
 			[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png Picture of barycentric coordinates]
 		</p>
@@ -137,7 +137,7 @@
 			[page:Vector target] — Result will be copied into this Vector.<br /><br />
 
 			Returns the value barycentrically interpolated for the given point on the
-			triangle.
+			triangle. Returns `null` if the triangle is degenerate.
 		</p>
 
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>

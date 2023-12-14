@@ -110,8 +110,6 @@ class SMAAPass extends Pass {
 			fragmentShader: SMAABlendShader.fragmentShader
 		} );
 
-		this.needsSwap = false;
-
 		this.fsQuad = new FullScreenQuad( null );
 
 	}

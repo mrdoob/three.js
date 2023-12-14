@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -46,7 +42,7 @@ covered in <a href="setup.html">the article on setting up</a>. </p>
 <p>If the device you are using to view VR is not the same computer you're running
 on you need to serve your webpage via https or else the browser will not allow using
 the WebXR API. The server mentioned in <a href="setup.html">the article on setting up</a>
-called <a href="https://greggman.github.io/servez">Servez</a> has an option to use https. 
+called <a href="https://greggman.github.io/servez">Servez</a> has an option to use https.
 Check it and start the server. </p>
 <div class="threejs_center"><img src="../resources/images/servez-https.png" class="nobg" style="width: 912px;"></div>
 
@@ -62,7 +58,7 @@ machine to machine connection.</p>
 <p>Now you can run your examples.</p>
 <p>If you're really going to do WebXR development another thing you should learn about is
 <a href="https://developers.google.com/web/tools/chrome-devtools/remote-debugging/">remote debugging</a>
-so that you can see console warnings, errors, and of course actually 
+so that you can see console warnings, errors, and of course actually
 <a href="debugging-javascript.html">debug your code</a>.</p>
 <p>If you just want to see the code work below you can just run the code from
 this site.</p>
@@ -264,7 +260,7 @@ out of VR mode so that you could turn the controls on/off.</p>
 </li>
 </ul>
 <p>If three.js adds some support to do both I'll try to update
-this article. Until then you might need 2 versions of your 
+this article. Until then you might need 2 versions of your
 site OR pass in a flag in the URL, something like</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">https://mysite.com/mycooldemo?allowvr=true
 </pre><p>Then we could add some links in to switch modes</p>
@@ -324,7 +320,7 @@ between what's needed for VR and what's needed for non-VR are often
 very different so for all but the most simple things maybe 2 separate pages
 are better? You'll have to decide.</p>
 <p>Note for various reasons this will not work in the live editor
-on this site so if you want to check it out 
+on this site so if you want to check it out
 <a href="../examples/webxr-basic-vr-optional.html" target="_blank">click here</a>.
 It should start in non-VR mode and you can use the mouse or fingers to move
 the camera. Clicking "Allow VR" should switch to allow VR mode and you should
@@ -359,7 +355,7 @@ I suspect the most common thing is the user still has to look
 to point and the controller is just used for buttons.</p>
 <p>The last level is a user with a 6DOF headset and 2 6DOF controllers.
 Those users will find an experience that is only 3DOF to often
-be frustrating. Similarly they usually expect to be able to 
+be frustrating. Similarly they usually expect to be able to
 virtually manipulate things with their hands in VR so you'll
 have to decide if you want to support that or not.</p>
 </li>
@@ -373,7 +369,7 @@ cover some of the input methods in <a href="webxr-look-to-select.html">future ar
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

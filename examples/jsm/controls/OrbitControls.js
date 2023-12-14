@@ -41,6 +41,9 @@ class OrbitControls extends EventDispatcher {
 		// "target" sets the location of focus, where the object orbits around
 		this.target = new Vector3();
 
+		// Sets the 3D cursor (similar to Blender), from which the maxTargetRadius takes effect
+		this.cursor = new Vector3();
+
 		// How far you can dolly in and out ( PerspectiveCamera only )
 		this.minDistance = 0;
 		this.maxDistance = Infinity;
@@ -48,6 +51,10 @@ class OrbitControls extends EventDispatcher {
 		// How far you can zoom in and out ( OrthographicCamera only )
 		this.minZoom = 0;
 		this.maxZoom = Infinity;
+
+		// Limit camera target within a spherical area around the cursor
+		this.minTargetRadius = 0;
+		this.maxTargetRadius = Infinity;
 
 		// How far you can orbit vertically, upper and lower limits.
 		// Range is 0 to Math.PI radians.
@@ -176,7 +183,7 @@ class OrbitControls extends EventDispatcher {
 
 			const twoPI = 2 * Math.PI;
 
-			return function update() {
+			return function update( deltaTime = null ) {
 
 				const position = scope.object.position;
 
@@ -190,7 +197,7 @@ class OrbitControls extends EventDispatcher {
 
 				if ( scope.autoRotate && state === STATE.NONE ) {
 
-					rotateLeft( getAutoRotationAngle() );
+					rotateLeft( getAutoRotationAngle( deltaTime ) );
 
 				}
 
@@ -249,6 +256,11 @@ class OrbitControls extends EventDispatcher {
 
 				}
 
+				// Limit the target distance from the cursor to create a sphere around the center of interest
+				scope.target.sub( scope.cursor );
+				scope.target.clampLength( scope.minTargetRadius, scope.maxTargetRadius );
+				scope.target.add( scope.cursor );
+
 				// adjust the camera position based on zoom only if we're not zooming to the cursor or if it's an ortho camera
 				// we adjust zoom later in these cases
 				if ( scope.zoomToCursor && performCursorZoom || scope.object.isOrthographicCamera ) {
@@ -260,7 +272,6 @@ class OrbitControls extends EventDispatcher {
 					spherical.radius = clampDistance( spherical.radius * scale );
 
 				}
-
 
 				offset.setFromSpherical( spherical );
 
@@ -387,8 +398,6 @@ class OrbitControls extends EventDispatcher {
 					lastQuaternion.copy( scope.object.quaternion );
 					lastTargetPosition.copy( scope.target );
 
-					zoomChanged = false;
-
 					return true;
 
 				}
@@ -469,9 +478,17 @@ class OrbitControls extends EventDispatcher {
 		const pointers = [];
 		const pointerPositions = {};
 
-		function getAutoRotationAngle() {
+		function getAutoRotationAngle( deltaTime ) {
 
-			return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
+			if ( deltaTime !== null ) {
+
+				return ( 2 * Math.PI / 60 * scope.autoRotateSpeed ) * deltaTime;
+
+			} else {
+
+				return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
+
+			}
 
 		}
 
@@ -623,7 +640,7 @@ class OrbitControls extends EventDispatcher {
 			mouse.x = ( x / w ) * 2 - 1;
 			mouse.y = - ( y / h ) * 2 + 1;
 
-			dollyDirection.set( mouse.x, mouse.y, 1 ).unproject( object ).sub( object.position ).normalize();
+			dollyDirection.set( mouse.x, mouse.y, 1 ).unproject( scope.object ).sub( scope.object.position ).normalize();
 
 		}
 

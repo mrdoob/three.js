@@ -74,7 +74,8 @@ body.rtl ol,
 body.rtl table {
 	direction: rtl !important;
 }
-body.rtl code {
+body.rtl code,
+body.rtl .RtlTitle {
 	direction: ltr !important;
 	text-align: initial;
 }

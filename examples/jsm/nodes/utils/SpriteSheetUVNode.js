@@ -14,7 +14,7 @@ class SpriteSheetUVNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { frameNode, uvNode, countNode } = this;
 
@@ -38,4 +38,4 @@ export default SpriteSheetUVNode;
 
 export const spritesheetUV = nodeProxy( SpriteSheetUVNode );
 
-addNodeClass( SpriteSheetUVNode );
+addNodeClass( 'SpriteSheetUVNode', SpriteSheetUVNode );

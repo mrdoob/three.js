@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -130,13 +126,13 @@ manager.onLoad = init;
   height: 1em;
   background-color: #888;
   background-image: linear-gradient(
-    -45deg, 
-    rgba(255, 255, 255, .5) 25%, 
-    transparent 25%, 
-    transparent 50%, 
-    rgba(255, 255, 255, .5) 50%, 
-    rgba(255, 255, 255, .5) 75%, 
-    transparent 75%, 
+    -45deg,
+    rgba(255, 255, 255, .5) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, .5) 50%,
+    rgba(255, 255, 255, .5) 75%,
+    transparent 75%,
     transparent
   );
   background-size: 50px 50px;
@@ -628,13 +624,13 @@ function render(now) {
 <p>이제 사용자 입력 시스템을 추가해봅시다. 단순히 키보드 이벤트에 직접 코드를 작성하기보다 클래스를 만들어 코드의 다른 부분에서도 <code class="notranslate" translate="no">왼쪽</code>, <code class="notranslate" translate="no">오른쪽</code>을 확인할 수 있도록 하겠습니다. 이러면 <code class="notranslate" translate="no">왼쪽</code>, <code class="notranslate" translate="no">오른쪽</code> 등 다양한 키를 다양한 방법으로 지정할 수 있겠죠. 먼저 키보드 이벤트부터 지정합시다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">/**
  * 키 또는 버튼의 상태를 추적합니다.
- * 
+ *
  * 왼쪽 방향키가 눌렸는지 확인하려면
- * 
+ *
  *     inputManager.keys.left.down
  *
  * 을 확인하고, 현재 프레임에서 왼쪽 키를 눌렀는지 확인하려면
- * 
+ *
  *     inputManager.keys.left.justPressed
  *
  * 를 확인하면 됩니다.
@@ -1648,7 +1644,7 @@ function* animalCoroutine() {
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

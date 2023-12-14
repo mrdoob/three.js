@@ -30,9 +30,11 @@ class PointLightNode extends AnalyticLightNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
+
+		const lightingModel = builder.context.lightingModel;
 
 		const lVector = objectViewPosition( light ).sub( positionView ); // @TODO: Add it into LightNode
 
@@ -47,18 +49,13 @@ class PointLightNode extends AnalyticLightNode {
 
 		const lightColor = colorNode.mul( lightAttenuation );
 
-		const lightingModelFunctionNode = builder.context.lightingModelNode;
 		const reflectedLight = builder.context.reflectedLight;
 
-		if ( lightingModelFunctionNode && lightingModelFunctionNode.direct ) {
-
-			lightingModelFunctionNode.direct( {
-				lightDirection,
-				lightColor,
-				reflectedLight
-			} );
-
-		}
+		lightingModel.direct( {
+			lightDirection,
+			lightColor,
+			reflectedLight
+		}, builder.stack, builder );
 
 	}
 
@@ -66,6 +63,6 @@ class PointLightNode extends AnalyticLightNode {
 
 export default PointLightNode;
 
-addLightNode( PointLight, PointLightNode );
+addNodeClass( 'PointLightNode', PointLightNode );
 
-addNodeClass( PointLightNode );
+addLightNode( PointLight, PointLightNode );

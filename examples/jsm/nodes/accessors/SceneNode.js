@@ -14,7 +14,7 @@ class SceneNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const scope = this.scope;
 		const scene = this.scene !== null ? this.scene : builder.scene;
@@ -24,6 +24,10 @@ class SceneNode extends Node {
 		if ( scope === SceneNode.BACKGROUND_BLURRINESS ) {
 
 			output = reference( 'backgroundBlurriness', 'float', scene );
+
+		} else if ( scope === SceneNode.BACKGROUND_INTENSITY ) {
+
+			output = reference( 'backgroundIntensity', 'float', scene );
 
 		} else {
 
@@ -38,9 +42,11 @@ class SceneNode extends Node {
 }
 
 SceneNode.BACKGROUND_BLURRINESS = 'backgroundBlurriness';
+SceneNode.BACKGROUND_INTENSITY = 'backgroundIntensity';
 
 export default SceneNode;
 
 export const backgroundBlurriness = nodeImmutable( SceneNode, SceneNode.BACKGROUND_BLURRINESS );
+export const backgroundIntensity = nodeImmutable( SceneNode, SceneNode.BACKGROUND_INTENSITY );
 
-addNodeClass( SceneNode );
+addNodeClass( 'SceneNode', SceneNode );

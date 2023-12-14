@@ -18,4 +18,4 @@ class LightingNode extends Node {
 
 export default LightingNode;
 
-addNodeClass( LightingNode );
+addNodeClass( 'LightingNode', LightingNode );

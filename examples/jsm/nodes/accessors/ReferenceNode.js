@@ -11,16 +11,40 @@ class ReferenceNode extends Node {
 		super();
 
 		this.property = property;
+		this.index = null;
 
 		this.uniformType = uniformType;
 
 		this.object = object;
+		this.reference = null;
 
 		this.node = null;
 
 		this.updateType = NodeUpdateType.OBJECT;
 
 		this.setNodeType( uniformType );
+
+	}
+
+	updateReference( frame ) {
+
+		this.reference = this.object !== null ? this.object : frame.object;
+
+		return this.reference;
+
+	}
+
+	setIndex( index ) {
+
+		this.index = index;
+
+		return this;
+
+	}
+
+	getIndex() {
+
+		return this.index;
 
 	}
 
@@ -48,16 +72,21 @@ class ReferenceNode extends Node {
 
 	}
 
-	update( frame ) {
+	update( /*frame*/ ) {
 
-		const object = this.object !== null ? this.object : frame.object;
-		const property = this.property;
+		let value = this.reference[ this.property ];
 
-		this.node.value = object[ property ];
+		if ( this.index !== null ) {
+
+			value = value[ this.index ];
+
+		}
+
+		this.node.value = value;
 
 	}
 
-	construct( /*builder*/ ) {
+	setup( /*builder*/ ) {
 
 		return this.node;
 
@@ -68,5 +97,6 @@ class ReferenceNode extends Node {
 export default ReferenceNode;
 
 export const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
+export const referenceIndex = ( name, index, type, object ) => nodeObject( new ReferenceNode( name, type, object ).setIndex( index ) );
 
-addNodeClass( ReferenceNode );
+addNodeClass( 'ReferenceNode', ReferenceNode );

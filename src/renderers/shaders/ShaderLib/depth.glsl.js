@@ -1,5 +1,6 @@
 export const vertex = /* glsl */`
 #include <common>
+#include <batching_pars_vertex>
 #include <uv_pars_vertex>
 #include <displacementmap_pars_vertex>
 #include <morphtarget_pars_vertex>
@@ -16,6 +17,7 @@ void main() {
 
 	#include <uv_vertex>
 
+	#include <batching_vertex>
 	#include <skinbase_vertex>
 
 	#ifdef USE_DISPLACEMENTMAP

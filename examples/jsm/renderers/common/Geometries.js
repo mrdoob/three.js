@@ -76,7 +76,7 @@ class Geometries extends DataMap {
 		this.info = info;
 
 		this.wireframes = new WeakMap();
-		this.attributeFrame = new WeakMap();
+		this.attributeCall = new WeakMap();
 
 	}
 
@@ -162,13 +162,13 @@ class Geometries extends DataMap {
 
 	updateAttribute( attribute, type ) {
 
-		const frame = this.info.render.frame;
+		const callId = this.info.render.calls;
 
-		if ( this.attributeFrame.get( attribute ) !== frame ) {
+		if ( this.attributeCall.get( attribute ) !== callId ) {
 
 			this.attributes.update( attribute, type );
 
-			this.attributeFrame.set( attribute, frame );
+			this.attributeCall.set( attribute, callId );
 
 		}
 

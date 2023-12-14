@@ -28,11 +28,21 @@ class JoinNode extends TempNode {
 		const type = this.getNodeType( builder );
 		const nodes = this.nodes;
 
+		const primitiveType = builder.getPrimitiveType( type );
+
 		const snippetValues = [];
 
 		for ( const input of nodes ) {
 
-			const inputSnippet = input.build( builder );
+			let inputSnippet = input.build( builder );
+
+			const inputPrimitiveType = builder.getPrimitiveType( input.getNodeType( builder ) );
+
+			if ( inputPrimitiveType !== primitiveType ) {
+
+				inputSnippet = builder.format( inputSnippet, inputPrimitiveType, primitiveType );
+
+			}
 
 			snippetValues.push( inputSnippet );
 
@@ -48,4 +58,4 @@ class JoinNode extends TempNode {
 
 export default JoinNode;
 
-addNodeClass( JoinNode );
+addNodeClass( 'JoinNode', JoinNode );

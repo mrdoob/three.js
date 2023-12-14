@@ -175,11 +175,11 @@ function SidebarScene( editor ) {
 	const backgroundColor = new UIColor().setValue( '#000000' ).setMarginLeft( '8px' ).onInput( onBackgroundChanged );
 	backgroundRow.add( backgroundColor );
 
-	const backgroundTexture = new UITexture().setMarginLeft( '8px' ).onChange( onBackgroundChanged );
+	const backgroundTexture = new UITexture( editor ).setMarginLeft( '8px' ).onChange( onBackgroundChanged );
 	backgroundTexture.setDisplay( 'none' );
 	backgroundRow.add( backgroundTexture );
 
-	const backgroundEquirectangularTexture = new UITexture().setMarginLeft( '8px' ).onChange( onBackgroundChanged );
+	const backgroundEquirectangularTexture = new UITexture( editor ).setMarginLeft( '8px' ).onChange( onBackgroundChanged );
 	backgroundEquirectangularTexture.setDisplay( 'none' );
 	backgroundRow.add( backgroundEquirectangularTexture );
 
@@ -244,7 +244,7 @@ function SidebarScene( editor ) {
 	environmentRow.add( new UIText( strings.getKey( 'sidebar/scene/environment' ) ).setWidth( '90px' ) );
 	environmentRow.add( environmentType );
 
-	const environmentEquirectangularTexture = new UITexture().setMarginLeft( '8px' ).onChange( onEnvironmentChanged );
+	const environmentEquirectangularTexture = new UITexture( editor ).setMarginLeft( '8px' ).onChange( onEnvironmentChanged );
 	environmentEquirectangularTexture.setDisplay( 'none' );
 	environmentRow.add( environmentEquirectangularTexture );
 
@@ -424,6 +424,10 @@ function SidebarScene( editor ) {
 				environmentType.setValue( 'Equirectangular' );
 				environmentEquirectangularTexture.setValue( scene.environment );
 
+			} else if ( scene.environment.isRenderTargetTexture === true ) {
+
+				environmentType.setValue( 'ModelViewer' );
+
 			}
 
 		} else {
@@ -479,6 +483,8 @@ function SidebarScene( editor ) {
 	signals.editorCleared.add( refreshUI );
 
 	signals.sceneGraphChanged.add( refreshUI );
+
+	signals.refreshSidebarEnvironment.add( refreshUI );
 
 	/*
 	signals.objectChanged.add( function ( object ) {

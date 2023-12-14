@@ -18,6 +18,8 @@ class SetMaterialColorCommand extends Command {
 		this.updatable = true;
 
 		this.object = object;
+		this.materialSlot = materialSlot;
+
 		this.material = ( this.object !== undefined ) ? this.editor.getObjectMaterial( object, materialSlot ) : undefined;
 
 		this.oldValue = ( this.material !== undefined ) ? this.material[ attributeName ].getHex() : undefined;
@@ -31,7 +33,7 @@ class SetMaterialColorCommand extends Command {
 
 		this.material[ this.attributeName ].setHex( this.newValue );
 
-		this.editor.signals.materialChanged.dispatch( this.material );
+		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
 
 	}
 
@@ -39,7 +41,7 @@ class SetMaterialColorCommand extends Command {
 
 		this.material[ this.attributeName ].setHex( this.oldValue );
 
-		this.editor.signals.materialChanged.dispatch( this.material );
+		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
 
 	}
 

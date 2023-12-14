@@ -12,7 +12,7 @@ class MatcapUVNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		const x = vec3( positionViewDirection.z, 0, positionViewDirection.x.negate() ).normalize();
 		const y = positionViewDirection.cross( x );
@@ -27,4 +27,4 @@ export default MatcapUVNode;
 
 export const matcapUV = nodeImmutable( MatcapUVNode );
 
-addNodeClass( MatcapUVNode );
+addNodeClass( 'MatcapUVNode', MatcapUVNode );

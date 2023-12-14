@@ -30,7 +30,6 @@ function Strings( config ) {
 			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Clone',
 			'menubar/edit/delete': 'Delete (Del)',
-			'menubar/edit/fixcolormaps': 'Fix Color Maps',
 
 			'menubar/add': 'Add',
 			'menubar/add/group': 'Group',
@@ -274,7 +273,9 @@ function Strings( config ) {
 			'sidebar/material/alphamap': 'Alpha Map',
 			'sidebar/material/bumpmap': 'Bump Map',
 			'sidebar/material/normalmap': 'Normal Map',
+			'sidebar/material/clearcoatmap': 'Clearcoat Map',
 			'sidebar/material/clearcoatnormalmap': 'Clearcoat Normal Map',
+			'sidebar/material/clearcoatroughnessmap': 'Clearcoat Roughness Map',
 			'sidebar/material/displacementmap': 'Displace Map',
 			'sidebar/material/roughnessmap': 'Rough. Map',
 			'sidebar/material/metalnessmap': 'Metal. Map',
@@ -335,10 +336,6 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/undo': 'Undo',
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
-			'sidebar/settings/viewport': 'Viewport',
-			'sidebar/settings/viewport/grid': 'Grid',
-			'sidebar/settings/viewport/helpers': 'Helpers',
-
 			'sidebar/history': 'History',
 			'sidebar/history/persistent': 'persistent',
 
@@ -346,6 +343,9 @@ function Strings( config ) {
 			'toolbar/rotate': 'Rotate',
 			'toolbar/scale': 'Scale',
 			'toolbar/local': 'Local',
+
+			'viewport/controls/grid': 'Grid',
+			'viewport/controls/helpers': 'Helpers',
 
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
@@ -380,7 +380,6 @@ function Strings( config ) {
 			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Cloner',
 			'menubar/edit/delete': 'Supprimer (Supp)',
-			'menubar/edit/fixcolormaps': 'Correction des couleurs',
 
 			'menubar/add': 'Ajouter',
 			'menubar/add/group': 'Groupe',
@@ -685,10 +684,6 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/undo': 'Annuler',
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
-			'sidebar/settings/viewport': 'Viewport',
-			'sidebar/settings/viewport/grid': 'Grille',
-			'sidebar/settings/viewport/helpers': 'Helpers',
-
 			'sidebar/history': 'Historique',
 			'sidebar/history/persistent': 'permanent',
 
@@ -696,6 +691,9 @@ function Strings( config ) {
 			'toolbar/rotate': 'Rotation',
 			'toolbar/scale': 'Échelle',
 			'toolbar/local': 'Local',
+
+			'viewport/controls/grid': 'Grille',
+			'viewport/controls/helpers': 'Helpers',
 
 			'viewport/info/objects': 'Objets',
 			'viewport/info/vertices': 'Sommets',
@@ -730,7 +728,6 @@ function Strings( config ) {
 			'menubar/edit/center': '居中',
 			'menubar/edit/clone': '拷贝',
 			'menubar/edit/delete': '删除 (Del)',
-			'menubar/edit/fixcolormaps': '修复颜色贴图',
 
 			'menubar/add': '添加',
 			'menubar/add/group': '组',
@@ -1035,10 +1032,6 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/undo': '撤销',
 			'sidebar/settings/shortcuts/focus': '聚焦',
 
-			'sidebar/settings/viewport': '视窗',
-			'sidebar/settings/viewport/grid': '网格',
-			'sidebar/settings/viewport/helpers': '辅助',
-
 			'sidebar/history': '历史记录',
 			'sidebar/history/persistent': '本地存储',
 
@@ -1046,6 +1039,9 @@ function Strings( config ) {
 			'toolbar/rotate': '旋转',
 			'toolbar/scale': '缩放',
 			'toolbar/local': '本地',
+
+			'viewport/controls/grid': '网格',
+			'viewport/controls/helpers': '辅助',
 
 			'viewport/info/objects': '物体',
 			'viewport/info/vertices': '顶点',

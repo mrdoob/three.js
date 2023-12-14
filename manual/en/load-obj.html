@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -59,7 +55,7 @@ to really go through some lessons.</p>
 <div class="threejs_center"><img style="width: 239px;" src="../resources/images/windmill-export-options.jpg"></div>
 
 <p>Let's try to display it!</p>
-<p>I started with the directional lighting example from 
+<p>I started with the directional lighting example from
 <a href="lights.html">the lights article</a> and I combined it with
 the hemispherical lighting example so I ended up with one
 <a href="/docs/#api/en/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> and one <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>. I also removed all the GUI stuff
@@ -138,7 +134,7 @@ export those files to by picking <strong>File-&gt;External Data-&gt;Unpack All I
 <p>and then choosing <strong>Write Files to Current Directory</strong></p>
 <div class="threejs_center"><img style="width: 828px;" src="../resources/images/windmill-overwrite.jpg"></div>
 
-<p>This ends up writing the files in the same folder as the .blend file 
+<p>This ends up writing the files in the same folder as the .blend file
 in a sub folder called <strong>textures</strong>.</p>
 <div class="threejs_center"><img style="width: 758px;" src="../resources/images/windmill-exported-texture-files.png"></div>
 
@@ -180,7 +176,7 @@ disappears</p>
 
 <p>We need the material on the blades to be double sided, something
 we went over in <a href="materials.html">the article on materials</a>.
-There is no easy way to fix this in the .MTL file. Off the top of my 
+There is no easy way to fix this in the .MTL file. Off the top of my
 head I can think of 3 ways to fix this.</p>
 <ol>
 <li><p>Loop over all the materials after loading them and set them all to double sided.</p>
@@ -313,7 +309,7 @@ we just loaded and ask for its size and center</p>
 center p {x: -0.00006103515625, y: 770.0909731090069, z: -3.313507080078125}
 </pre>
 <p>Our camera is currently only showing about 100 units with <code class="notranslate" translate="no">near</code> at 0.1 and <code class="notranslate" translate="no">far</code> at 100.
-Our ground plane is only 40 units across so basically this windmill model is so big, 2000 units, 
+Our ground plane is only 40 units across so basically this windmill model is so big, 2000 units,
 that it's surrounding our camera and all parts of it our outside our frustum.</p>
 <div class="threejs_center"><img style="width: 280px;" src="../resources/images/camera-inside-windmill.svg"></div>
 
@@ -334,7 +330,7 @@ extended forever. In other words let's assume <code class="notranslate" translat
 front of it. We just computed the box that contains the the windmill. We need to
 compute how far way the camera should be from the box so that the box appears
 inside the frustum.</p>
-<p>Using basic <em>right triangle</em> trigonometry and <a href="https://www.google.com/search?q=SOHCAHTOA">SOHCAHTOA</a>, 
+<p>Using basic <em>right triangle</em> trigonometry and <a href="https://www.google.com/search?q=SOHCAHTOA">SOHCAHTOA</a>,
 given we know the field of view for the frustum and we know the size of the box we can compute the <em>distance</em>.</p>
 <div class="threejs_center"><img style="width: 600px;" src="../resources/images/field-of-view-camera.svg"></div>
 
@@ -370,7 +366,7 @@ camera at the <code class="notranslate" translate="no">center</code> of the box.
 </pre>
 <p>We pass in 2 sizes. The <code class="notranslate" translate="no">boxSize</code> and the <code class="notranslate" translate="no">sizeToFitOnScreen</code>. If we just passed in <code class="notranslate" translate="no">boxSize</code>
 and used that as <code class="notranslate" translate="no">sizeToFitOnScreen</code> then the math would make the box fit perfectly inside
-the frustum. We want a little extra space above and below so we'll pass in a slightly 
+the frustum. We want a little extra space above and below so we'll pass in a slightly
 larger size. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const objLoader = new OBJLoader();
@@ -393,7 +389,7 @@ larger size. </p>
   });
 }
 </pre>
-<p>You can see above we pass in <code class="notranslate" translate="no">boxSize * 1.2</code> to give us 20% more space above and below the box when trying 
+<p>You can see above we pass in <code class="notranslate" translate="no">boxSize * 1.2</code> to give us 20% more space above and below the box when trying
 to fit it inside the frustum. We also updated the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> so the camera will orbit the center
 of the scene.</p>
 <p>Now if we try that we get...</p>
@@ -466,10 +462,10 @@ If you're making a viewer where you want to allow users to view random 3D files 
 find on the net then maybe, just maybe, you might want to load TGA files. (<a href="#loading-scenes">*</a>)</p>
 <p>One problem with TGA files are they can't be compressed well at all. TGA only supports very
 simple compression and looking above we can see the files are not compressed at all
-as the odds of them being all exactly the same size are extremely low. Further they 
+as the odds of them being all exactly the same size are extremely low. Further they
 are 12 megabytes each!!! If we used those files the user would have to download 36meg
 to see the windmill.</p>
-<p>Another issue with TGA is the browser itself has no support for them so loading them 
+<p>Another issue with TGA is the browser itself has no support for them so loading them
 is likely going to be slower than loading supported formats like .JPG and .PNG</p>
 <p>I'm pretty sure for our purposes converting them to .JPG will be the best option.
 Looking inside I see they are 3 channels each, RGB, there is no alpha channel. JPG
@@ -499,7 +495,7 @@ Ns 0.060000
 Ni 1.500000
 d 1.000000
 Tr 0.000000
-Tf 1.000000 1.000000 1.000000 
+Tf 1.000000 1.000000 1.000000
 illum 2
 -map_Kd windmill_diffuse.tga
 +map_Kd windmill_diffuse.jpg
@@ -507,9 +503,9 @@ illum 2
 -map_Ks windmill_spec.tga
 +map_Ks windmill_spec.jpg
 
--map_bump windmill_normal.tga 
--bump windmill_normal.tga 
-+map_bump windmill_normal.jpg 
+-map_bump windmill_normal.tga
+-bump windmill_normal.tga
++map_bump windmill_normal.jpg
 +bump windmill_normal.jpg
 </pre>
 <p>Now that the .MTL file points to some reasonable size textures we need to load it so we'll just do like we did above, first load the materials
@@ -563,8 +559,8 @@ needs a specular color set.</p>
 </pre>
 <p>Issue #3: The <code class="notranslate" translate="no">windmill_normal.jpg</code> is a normal map not a bump map.</p>
 <p>Just like above we just need to edit the .MTL file</p>
-<pre class="prettyprint showlinemods notranslate lang-mtl" translate="no">-map_bump windmill_normal.jpg 
--bump windmill_normal.jpg 
+<pre class="prettyprint showlinemods notranslate lang-mtl" translate="no">-map_bump windmill_normal.jpg
+-bump windmill_normal.jpg
 +norm windmill_normal.jpg
 </pre>
 <p>Given all that if we now try it out it should load up with materials.</p>
@@ -581,10 +577,10 @@ needs a specular color set.</p>
 to do is to make your own models or download the models, load them up in some 3D software and look at their scale and adjust if need be.</p>
 </li>
 <li><p>Orientation Wrong</p>
-<p>THREE.js is generally Y = up. Some modeling packages default to Z = up, some Y = up. Some are settable. 
+<p>THREE.js is generally Y = up. Some modeling packages default to Z = up, some Y = up. Some are settable.
 If you run into this case where you load a model and it's on its side. You can either hack your code to rotate the model after loading (not recommended),
 or you can load the model into your favorite modeling package or use some command line tools to rotate the object in the orientation you need it to be
-just like you'd edit an image for your website rather than download it and apply code to adjust it. Blender even has options when you export to 
+just like you'd edit an image for your website rather than download it and apply code to adjust it. Blender even has options when you export to
 change the orientation.</p>
 </li>
 <li><p>No .MTL file or wrong materials or incompatible parameters</p>
@@ -618,7 +614,7 @@ an architectural image and there's no need to animate anything it's not a bad wa
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

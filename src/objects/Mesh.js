@@ -65,7 +65,7 @@ class Mesh extends Object3D {
 
 		}
 
-		this.material = source.material;
+		this.material = Array.isArray( source.material ) ? source.material.slice() : source.material;
 		this.geometry = source.geometry;
 
 		return this;

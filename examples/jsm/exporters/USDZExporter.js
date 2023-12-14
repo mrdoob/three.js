@@ -165,6 +165,7 @@ function buildHeader() {
 	customLayerData = {
 		string creator = "Three.js USDZExporter"
 	}
+	defaultPrim = "Root"
 	metersPerUnit = 1
 	upAxis = "Y"
 )
@@ -286,7 +287,7 @@ function buildMesh( geometry ) {
 			interpolation = "vertex"
 		)
 		point3f[] points = [${ buildVector3Array( attributes.position, count )}]
-${ buildPrimvars( attributes, count ) }
+${ buildPrimvars( attributes ) }
 		uniform token subdivisionScheme = "none"
 	}
 `;
@@ -355,14 +356,7 @@ function buildVector3Array( attribute, count ) {
 
 }
 
-function buildVector2Array( attribute, count ) {
-
-	if ( attribute === undefined ) {
-
-		console.warn( 'USDZExporter: UVs missing.' );
-		return Array( count ).fill( '(0, 0)' ).join( ', ' );
-
-	}
+function buildVector2Array( attribute ) {
 
 	const array = [];
 
@@ -379,7 +373,7 @@ function buildVector2Array( attribute, count ) {
 
 }
 
-function buildPrimvars( attributes, count ) {
+function buildPrimvars( attributes ) {
 
 	let string = '';
 
@@ -391,7 +385,7 @@ function buildPrimvars( attributes, count ) {
 		if ( attribute !== undefined ) {
 
 			string += `
-		texCoord2f[] primvars:st${ id } = [${ buildVector2Array( attribute, count )}] (
+		texCoord2f[] primvars:st${ id } = [${ buildVector2Array( attribute )}] (
 			interpolation = "vertex"
 		)`;
 

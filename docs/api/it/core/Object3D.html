@@ -128,6 +128,17 @@
       Invece, le istanze di [page:Object3D], [page:Group] o [page:Bone] non sono renderizzabili e quindi questa callback non viene eseguita su questi oggetti.
 		</p>
 
+		<h3>[property:Function onAfterShadow]</h3>
+		<p>
+			An optional callback that is executed immediately after a 3D object is rendered to a shadow map. 
+			Questa funzione è chiamata con i seguenti parametri: renderer, scene, camera, shadowCamera, geometry, depthMaterial, group.
+		</p>
+		<p>
+			Si noti che questa funzione di callback viene eseguita per oggi 3D `renderizzabili` (renderable). Ovvero oggetti 3D che definiscono
+			il loro aspetto visivo con geometrie e materiali come istanze di [page:Mesh], [page:Line], [page:Points] o [page:Sprite].
+			Invece, le istanze di [page:Object3D], [page:Group] o [page:Bone] non sono renderizzabili e quindi questa callback non viene eseguita su questi oggetti.
+		</p>
+
 		<h3>[property:Function onBeforeRender]</h3>
 		<p>
       Una callback opzionale che viene eseguita immediatamente prima che un oggetto 3D è stato renderizzato.
@@ -137,6 +148,17 @@
       Si noti che questa funzione di callback viene eseguita per oggi 3D `renderizzabili` (renderable). Ovvero oggetti 3D che definiscono
       il loro aspetto visivo con geometrie e materiali come istanze di [page:Mesh], [page:Line], [page:Points] o [page:Sprite].
       Invece, le istanze di [page:Object3D], [page:Group] o [page:Bone] non sono renderizzabili e quindi questa callback non viene eseguita su questi oggetti.
+		</p>
+
+		<h3>[property:Function onBeforeShadow]</h3>
+		<p>
+			An optional callback that is executed immediately before a 3D object is rendered to a shadow map. 
+			Questa funzione è chiamata con i seguenti parametri: renderer, scene, camera, shadowCamera, geometry, depthMaterial, group.
+		</p>
+		<p>
+			Si noti che questa funzione di callback viene eseguita per oggi 3D `renderizzabili` (renderable). Ovvero oggetti 3D che definiscono
+			il loro aspetto visivo con geometrie e materiali come istanze di [page:Mesh], [page:Line], [page:Points] o [page:Sprite].
+			Invece, le istanze di [page:Object3D], [page:Group] o [page:Bone] non sono renderizzabili e quindi questa callback non viene eseguita su questi oggetti.
 		</p>
 
 		<h3>[property:Object3D parent]</h3>
@@ -285,10 +307,13 @@
       Cerca in un oggetto e nei suoi figli, partendo dall'oggetto stesso, e restituisce il primo con la proprietà che corrisponde al valore passato.
 		</p>
 
-		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value] )</h3>
+		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value], [param:Array optionalTarget] )</h3>
 		<p>
 		  name -- il nome della proprietà da cercare. <br />
-		  value -- il valore della proprietà data. <br /><br />
+		  value -- il valore della proprietà data. <br />
+		  optionalTarget -- (opzionale) array dove impostare il risultato.
+		  Altrimenti viene istanziato un nuovo Array. 
+		  Se impostato, è necessario cancellare questo array prima di ogni chiamata (ad esempio, array.length = 0;). <br /><br />
 
       Cerca in un oggetto e nei suoi figli, partendo dall'oggetto stesso, e restituisce tutti gli oggetti con la proprietà che corrisponde al valore passato.
 		</p>

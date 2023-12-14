@@ -4,6 +4,7 @@ export const vertex = /* glsl */`
 varying vec3 vViewPosition;
 
 #include <common>
+#include <batching_pars_vertex>
 #include <uv_pars_vertex>
 #include <color_pars_vertex>
 #include <displacementmap_pars_vertex>
@@ -20,6 +21,8 @@ void main() {
 	#include <uv_vertex>
 	#include <color_vertex>
 	#include <morphcolor_vertex>
+	#include <batching_vertex>
+
 	#include <beginnormal_vertex>
 	#include <morphnormal_vertex>
 	#include <skinbase_vertex>

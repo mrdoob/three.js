@@ -99,8 +99,10 @@
 	<h3>What happens when I call `dispose()` and then use the respective object at a later point?</h3>
 
 	<p>
-		The deleted internal resources will be created again by the engine. So no runtime error will occur but you might notice a negative performance impact for the current frame,
-		especially when shader programs have to be compiled.
+		That depends. For geometries, materials, textures, render targets and post processing passes the deleted internal resources can be created again by the engine. 
+		So no runtime error will occur but you might notice a negative performance impact for the current frame, especially when shader programs have to be compiled.
+
+		Controls and renderers are an exception. Instances of these classes can not be used after `dispose()` has been called. You have to create new instances in this case.
 	</p>
 
 	<h3>How should I manage *three.js* objects in my app? When do I know how to dispose things?</h3>

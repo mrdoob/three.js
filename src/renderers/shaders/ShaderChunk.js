@@ -6,6 +6,8 @@ import alphatest_fragment from './ShaderChunk/alphatest_fragment.glsl.js';
 import alphatest_pars_fragment from './ShaderChunk/alphatest_pars_fragment.glsl.js';
 import aomap_fragment from './ShaderChunk/aomap_fragment.glsl.js';
 import aomap_pars_fragment from './ShaderChunk/aomap_pars_fragment.glsl.js';
+import batching_pars_vertex from './ShaderChunk/batching_pars_vertex.glsl.js';
+import batching_vertex from './ShaderChunk/batching_vertex.glsl.js';
 import begin_vertex from './ShaderChunk/begin_vertex.glsl.js';
 import beginnormal_vertex from './ShaderChunk/beginnormal_vertex.glsl.js';
 import bsdfs from './ShaderChunk/bsdfs.glsl.js';
@@ -131,6 +133,8 @@ export const ShaderChunk = {
 	alphatest_pars_fragment: alphatest_pars_fragment,
 	aomap_fragment: aomap_fragment,
 	aomap_pars_fragment: aomap_pars_fragment,
+	batching_pars_vertex: batching_pars_vertex,
+	batching_vertex: batching_vertex,
 	begin_vertex: begin_vertex,
 	beginnormal_vertex: beginnormal_vertex,
 	bsdfs: bsdfs,

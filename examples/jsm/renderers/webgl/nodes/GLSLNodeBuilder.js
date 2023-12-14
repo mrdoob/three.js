@@ -1,7 +1,15 @@
-import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial } from 'three/nodes';
+import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial } from '../../../nodes/Nodes.js';
+
+import UniformBuffer from '../../common/UniformBuffer.js';
+import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
+
+import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
+
+import { IntType } from 'three';
 
 const glslMethods = {
-	[ MathNode.ATAN2 ]: 'atan'
+	[ MathNode.ATAN2 ]: 'atan',
+	textureDimensions: 'textureSize'
 };
 
 const precisionLib = {
@@ -10,11 +18,24 @@ const precisionLib = {
 	high: 'highp'
 };
 
+const supports = {
+	instance: true
+};
+
+const defaultPrecisions = `
+precision highp float;
+precision highp int;
+precision mediump sampler2DArray;
+precision lowp sampler2DShadow;
+`;
+
 class GLSLNodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer, scene = null ) {
 
 		super( object, renderer, new GLSLNodeParser(), scene );
+
+		this.uniformGroups = {};
 
 	}
 
@@ -24,25 +45,95 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTexture( texture, textureProperty, uvSnippet ) {
+	getPropertyName( node, shaderStage ) {
 
-		if ( texture.isTextureCube ) {
+		if ( node.isOutputStructVar ) return '';
 
-			return `textureCube( ${textureProperty}, ${uvSnippet} )`;
+		return super.getPropertyName( node, shaderStage );
+
+	}
+
+	buildFunctionCode( shaderNode ) {
+
+		const layout = shaderNode.layout;
+		const flowData = this.flowShaderNode( shaderNode );
+
+		const parameters = [];
+
+		for ( const input of layout.inputs ) {
+
+			parameters.push( this.getType( input.type ) + ' ' + input.name );
+
+		}
+
+		//
+
+		const code = `${ this.getType( layout.type ) } ${ layout.name }( ${ parameters.join( ', ' ) } ) {
+
+	${ flowData.vars }
+
+${ flowData.code }
+	return ${ flowData.result };
+
+}`;
+
+		//
+
+		return code;
+
+	}
+
+	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0' ) {
+
+		if ( depthSnippet ) {
+
+			return `texelFetch( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), ${ levelSnippet } )`;
 
 		} else {
 
-			return `texture2D( ${textureProperty}, ${uvSnippet} )`;
+			return `texelFetch( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet } )`;
 
 		}
 
 	}
 
-	getTextureBias( texture, textureProperty, uvSnippet, biasSnippet ) {
+	generateTexture( texture, textureProperty, uvSnippet, depthSnippet ) {
 
-		if ( this.material.extensions !== undefined ) this.material.extensions.shaderTextureLOD = true;
+		if ( texture.isTextureCube ) {
 
-		return `textureLod( ${textureProperty}, ${uvSnippet}, ${biasSnippet} )`;
+			return `textureCube( ${ textureProperty }, ${ uvSnippet } )`;
+
+		} else if ( texture.isDepthTexture ) {
+
+			return `texture( ${ textureProperty }, ${ uvSnippet } ).x`;
+
+		} else {
+
+			if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
+
+			return `texture( ${ textureProperty }, ${ uvSnippet } )`;
+
+		}
+
+	}
+
+	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet ) {
+
+		return `textureLod( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet } )`;
+
+	}
+
+	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+
+		if ( shaderStage === 'fragment' ) {
+
+			return `texture( ${ textureProperty }, vec3( ${ uvSnippet }, ${ compareSnippet } ) )`;
+
+		} else {
+
+			console.error( `WebGPURenderer: THREE.DepthTexture.compareFunction() does not support ${ shaderStage } shader.` );
+
+		}
 
 	}
 
@@ -52,9 +143,15 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 		const vars = this.vars[ shaderStage ];
 
-		for ( const variable of vars ) {
+		if ( vars !== undefined ) {
 
-			snippets.push( `${ this.getVar( variable.type, variable.name ) };` );
+			for ( const variable of vars ) {
+
+				if ( variable.isOutputStructVar ) continue;
+
+				snippets.push( `${ this.getVar( variable.type, variable.name ) };` );
+
+			}
 
 		}
 
@@ -66,25 +163,52 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 		const uniforms = this.uniforms[ shaderStage ];
 
-		let output = '';
+		const bindingSnippets = [];
+		const uniformGroups = {};
 
 		for ( const uniform of uniforms ) {
 
 			let snippet = null;
+			let group = false;
 
 			if ( uniform.type === 'texture' ) {
 
-				snippet = `sampler2D ${uniform.name};\n`;
+				const texture = uniform.node.value;
+
+				if ( texture.compareFunction ) {
+
+					snippet = `sampler2DShadow ${ uniform.name };`;
+
+				} else if ( texture.isDataArrayTexture === true ) {
+
+					snippet = `sampler2DArray ${ uniform.name };`;
+
+				} else {
+
+					snippet = `sampler2D ${ uniform.name };`;
+
+				}
 
 			} else if ( uniform.type === 'cubeTexture' ) {
 
-				snippet = `samplerCube ${uniform.name};\n`;
+				snippet = `samplerCube ${ uniform.name };`;
+
+			} else if ( uniform.type === 'buffer' ) {
+
+				const bufferNode = uniform.node;
+				const bufferType = this.getType( bufferNode.bufferType );
+				const bufferCount = bufferNode.bufferCount;
+
+				const bufferCountSnippet = bufferCount > 0 ? bufferCount : '';
+				snippet = `${bufferNode.name} {\n\t${ bufferType } ${ uniform.name }[${ bufferCountSnippet }];\n};\n`;
 
 			} else {
 
 				const vectorType = this.getVectorType( uniform.type );
 
-				snippet = `${vectorType} ${uniform.name};\n`;
+				snippet = `${vectorType} ${uniform.name};`;
+
+				group = true;
 
 			}
 
@@ -92,19 +216,66 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 			if ( precision !== null ) {
 
-				snippet = 'uniform ' + precisionLib[ precision ] + ' ' + snippet;
+				snippet = precisionLib[ precision ] + ' ' + snippet;
+
+			}
+
+			if ( group ) {
+
+				snippet = '\t' + snippet;
+
+				const groupName = uniform.groupNode.name;
+				const groupSnippets = uniformGroups[ groupName ] || ( uniformGroups[ groupName ] = [] );
+
+				groupSnippets.push( snippet );
 
 			} else {
 
 				snippet = 'uniform ' + snippet;
 
-			}
+				bindingSnippets.push( snippet );
 
-			output += snippet;
+			}
 
 		}
 
+		let output = '';
+
+		for ( const name in uniformGroups ) {
+
+			const groupSnippets = uniformGroups[ name ];
+
+			output += this._getGLSLUniformStruct( shaderStage + '_' + name, groupSnippets.join( '\n' ) ) + '\n';
+
+		}
+
+		output += bindingSnippets.join( '\n' );
+
 		return output;
+
+	}
+
+	getTypeFromAttribute( attribute ) {
+
+		let nodeType = super.getTypeFromAttribute( attribute );
+
+		if ( /^[iu]/.test( nodeType ) && attribute.gpuType !== IntType ) {
+
+			let dataAttribute = attribute;
+
+			if ( attribute.isInterleavedBufferAttribute ) dataAttribute = attribute.data;
+
+			const array = dataAttribute.array;
+
+			if ( ( array instanceof Uint32Array || array instanceof Int32Array ) === false ) {
+
+				nodeType = nodeType.slice( 1 );
+
+			}
+
+		}
+
+		return nodeType;
 
 	}
 
@@ -114,17 +285,62 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 		if ( shaderStage === 'vertex' ) {
 
-			const attributes = this.attributes;
+			const attributes = this.getAttributesArray();
+
+			let location = 0;
 
 			for ( const attribute of attributes ) {
 
-				snippet += `attribute ${attribute.type} ${attribute.name};\n`;
+				snippet += `layout( location = ${ location ++ } ) in ${ attribute.type } ${ attribute.name };\n`;
 
 			}
 
 		}
 
 		return snippet;
+
+	}
+
+	getStructMembers( struct ) {
+
+		const snippets = [];
+		const members = struct.getMemberTypes();
+
+		for ( let i = 0; i < members.length; i ++ ) {
+
+			const member = members[ i ];
+			snippets.push( `layout( location = ${i} ) out ${ member} m${i};` );
+
+		}
+
+		return snippets.join( '\n' );
+
+	}
+
+	getStructs( shaderStage ) {
+
+		const snippets = [];
+		const structs = this.structs[ shaderStage ];
+
+		if ( structs.length === 0 ) {
+
+			return 'layout( location = 0 ) out vec4 fragColor;\n';
+
+		}
+
+		for ( let index = 0, length = structs.length; index < length; index ++ ) {
+
+			const struct = structs[ index ];
+
+			let snippet = '\n';
+			snippet += this.getStructMembers( struct );
+			snippet += '\n';
+
+			snippets.push( snippet );
+
+		}
+
+		return snippets.join( '\n\n' );
 
 	}
 
@@ -138,7 +354,10 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 			for ( const varying of varyings ) {
 
-				snippet += `${varying.needsInterpolation ? 'varying' : '/*varying*/'} ${varying.type} ${varying.name};\n`;
+				const type = varying.type;
+				const flat = type === 'int' || type === 'uint' ? 'flat ' : '';
+
+				snippet += `${flat}${varying.needsInterpolation ? 'out' : '/*out*/'} ${type} ${varying.name};\n`;
 
 			}
 
@@ -148,7 +367,10 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 				if ( varying.needsInterpolation ) {
 
-					snippet += `varying ${varying.type} ${varying.name};\n`;
+					const type = varying.type;
+					const flat = type === 'int' || type === 'uint' ? 'flat ' : '';
+
+					snippet += `${flat}in ${type} ${varying.name};\n`;
 
 				}
 
@@ -162,7 +384,13 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	getVertexIndex() {
 
-		return 'gl_VertexID';
+		return 'uint( gl_VertexID )';
+
+	}
+
+	getInstanceIndex() {
+
+		return 'uint( gl_InstanceID )';
 
 	}
 
@@ -178,15 +406,42 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getFragDepth() {
+
+		return 'gl_FragDepth';
+
+	}
+
+	isAvailable( name ) {
+
+		return supports[ name ] === true;
+
+	}
+
+
 	isFlipY() {
 
 		return true;
 
 	}
 
+	_getGLSLUniformStruct( name, vars ) {
+
+		return `
+layout( std140 ) uniform ${name} {
+${vars}
+};`;
+
+	}
+
 	_getGLSLVertexCode( shaderData ) {
 
-		return `${ this.getSignature() }
+		return `#version 300 es
+
+${ this.getSignature() }
+
+// precision
+${ defaultPrecisions }
 
 // uniforms
 ${shaderData.uniforms}
@@ -208,6 +463,8 @@ void main() {
 	// flow
 	${shaderData.flow}
 
+	gl_PointSize = 1.0;
+
 }
 `;
 
@@ -215,11 +472,12 @@ void main() {
 
 	_getGLSLFragmentCode( shaderData ) {
 
-		return `${ this.getSignature() }
+		return `#version 300 es
+
+${ this.getSignature() }
 
 // precision
-precision highp float;
-precision highp int;
+${ defaultPrecisions }
 
 // uniforms
 ${shaderData.uniforms}
@@ -229,6 +487,8 @@ ${shaderData.varyings}
 
 // codes
 ${shaderData.codes}
+
+${shaderData.structs}
 
 void main() {
 
@@ -277,14 +537,18 @@ void main() {
 					if ( shaderStage === 'vertex' ) {
 
 						flow += 'gl_Position = ';
+						flow += `${ flowSlotData.result };`;
 
 					} else if ( shaderStage === 'fragment' ) {
 
-						flow += 'gl_FragColor = ';
+						if ( ! node.outputNode.isOutputStructNode ) {
+
+							flow += 'fragColor = ';
+							flow += `${ flowSlotData.result };`;
+
+						}
 
 					}
-
-					flow += `${ flowSlotData.result };`;
 
 				}
 
@@ -296,6 +560,7 @@ void main() {
 			stageData.attributes = this.getAttributes( shaderStage );
 			stageData.varyings = this.getVaryings( shaderStage );
 			stageData.vars = this.getVars( shaderStage );
+			stageData.structs = this.getStructs( shaderStage );
 			stageData.codes = this.getCodes( shaderStage );
 			stageData.flow = flow;
 
@@ -312,6 +577,73 @@ void main() {
 			//this.computeShader = this._getGLSLComputeCode( shadersData.compute );
 
 		}
+
+	}
+
+	getUniformFromNode( node, type, shaderStage, name = null ) {
+
+		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
+		const nodeData = this.getDataFromNode( node, shaderStage );
+
+		let uniformGPU = nodeData.uniformGPU;
+
+		if ( uniformGPU === undefined ) {
+
+			if ( type === 'texture' ) {
+
+				uniformGPU = new NodeSampledTexture( uniformNode.name, uniformNode.node );
+
+				this.bindings[ shaderStage ].push( uniformGPU );
+
+			} else if ( type === 'cubeTexture' ) {
+
+				uniformGPU = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node );
+
+				this.bindings[ shaderStage ].push( uniformGPU );
+
+			} else if ( type === 'buffer' ) {
+
+				node.name = `NodeBuffer_${node.id}`;
+
+				const buffer = new UniformBuffer( node.name, node.value );
+
+				uniformNode.name = `buffer${node.id}`;
+
+				this.bindings[ shaderStage ].push( buffer );
+
+				uniformGPU = buffer;
+
+			} else {
+
+				const group = node.groupNode;
+				const groupName = group.name;
+
+				const uniformsStage = this.uniformGroups[ shaderStage ] || ( this.uniformGroups[ shaderStage ] = {} );
+
+				let uniformsGroup = uniformsStage[ groupName ];
+
+				if ( uniformsGroup === undefined ) {
+
+					uniformsGroup = new NodeUniformsGroup( shaderStage + '_' + groupName, group );
+					//uniformsGroup.setVisibility( gpuShaderStageLib[ shaderStage ] );
+
+					uniformsStage[ groupName ] = uniformsGroup;
+
+					this.bindings[ shaderStage ].push( uniformsGroup );
+
+				}
+
+				uniformGPU = this.getNodeUniform( uniformNode, type );
+
+				uniformsGroup.addUniform( uniformGPU );
+
+			}
+
+			nodeData.uniformGPU = uniformGPU;
+
+		}
+
+		return uniformNode;
 
 	}
 

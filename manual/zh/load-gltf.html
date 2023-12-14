@@ -14,10 +14,6 @@
 
 	<link rel="stylesheet" href="../resources/lesson.css">
 	<link rel="stylesheet" href="../resources/lang.css">
-	<!-- Import maps polyfill -->
-	<!-- Remove this when import maps will be widely supported -->
-	<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 	<script type="importmap">
 {
 "imports": {
@@ -521,7 +517,7 @@ scene.add(curveObject);
 					接下来，我们选取曲线远一点的点。
 					使用<code class="notranslate" translate="no">lookAt</code> 设置汽车的朝向 并将汽车放置在两点重点。</p>
 				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
-// 创建两个向量用于路径计算 
+// 创建两个向量用于路径计算
 const carPosition = new THREE.Vector3();
 const carTarget = new THREE.Vector3();
 
@@ -543,7 +539,7 @@ function render(time) {
 +      curve.getPointAt(u % 1, carPosition);
 +      carPosition.applyMatrix4(curveObject.matrixWorld);
 +
-+      // 曲线再远点获取第二个点 
++      // 曲线再远点获取第二个点
 +      curve.getPointAt((u + targetOffset) % 1, carTarget);
 +      carTarget.applyMatrix4(curveObject.matrixWorld);
 +

@@ -30,7 +30,7 @@ class SkinningNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const { skinIndexNode, skinWeightNode, bindMatrixNode, bindMatrixInverseNode, boneMatricesNode } = this;
 
@@ -67,12 +67,22 @@ class SkinningNode extends Node {
 
 		// ASSIGNS
 
-		builder.stack.assign( positionLocal, skinPosition );
-		builder.stack.assign( normalLocal, skinNormal );
+		positionLocal.assign( skinPosition );
+		normalLocal.assign( skinNormal );
 
 		if ( builder.hasGeometryAttribute( 'tangent' ) ) {
 
-			builder.stack.assign( tangentLocal, skinNormal );
+			tangentLocal.assign( skinNormal );
+
+		}
+
+	}
+
+	generate( builder, output ) {
+
+		if ( output !== 'void' ) {
+
+			return positionLocal.build( builder, output );
 
 		}
 
@@ -90,4 +100,4 @@ export default SkinningNode;
 
 export const skinning = nodeProxy( SkinningNode );
 
-addNodeClass( SkinningNode );
+addNodeClass( 'SkinningNode', SkinningNode );

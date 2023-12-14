@@ -57,6 +57,26 @@ async function AmmoPhysics() {
 	const meshes = [];
 	const meshMap = new WeakMap();
 
+	function addScene( scene ) {
+
+		scene.traverse( function ( child ) {
+
+			if ( child.isMesh ) {
+
+				const physics = child.userData.physics;
+
+				if ( physics ) {
+
+					addMesh( child, physics.mass );
+
+				}
+
+			}
+
+		} );
+
+	}
+
 	function addMesh( mesh, mass = 0 ) {
 
 		const shape = getShape( mesh.geometry );
@@ -245,6 +265,7 @@ async function AmmoPhysics() {
 	setInterval( step, 1000 / frameRate );
 
 	return {
+		addScene: addScene,
 		addMesh: addMesh,
 		setMeshPosition: setMeshPosition
 		// addCompoundMesh

@@ -14,7 +14,7 @@ class UserDataNode extends ReferenceNode {
 
 	update( frame ) {
 
-		this.object = this.userData !== null ? this.userData : frame.object.userData;
+		this.reference = this.userData !== null ? this.userData : frame.object.userData;
 
 		super.update( frame );
 
@@ -26,4 +26,4 @@ export default UserDataNode;
 
 export const userData = ( name, inputType, userData ) => nodeObject( new UserDataNode( name, inputType, userData ) );
 
-addNodeClass( UserDataNode );
+addNodeClass( 'UserDataNode', UserDataNode );

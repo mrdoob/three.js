@@ -13,24 +13,21 @@ class DirectionalLightNode extends AnalyticLightNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
-		super.construct( builder );
+		super.setup( builder );
+
+		const lightingModel = builder.context.lightingModel;
 
 		const lightColor = this.colorNode;
 		const lightDirection = lightTargetDirection( this.light );
-		const lightingModelFunctionNode = builder.context.lightingModelNode;
 		const reflectedLight = builder.context.reflectedLight;
 
-		if ( lightingModelFunctionNode && lightingModelFunctionNode.direct ) {
-
-			lightingModelFunctionNode.direct( {
-				lightDirection,
-				lightColor,
-				reflectedLight
-			} );
-
-		}
+		lightingModel.direct( {
+			lightDirection,
+			lightColor,
+			reflectedLight
+		}, builder.stack, builder );
 
 	}
 
@@ -38,6 +35,6 @@ class DirectionalLightNode extends AnalyticLightNode {
 
 export default DirectionalLightNode;
 
-addLightNode( DirectionalLight, DirectionalLightNode );
+addNodeClass( 'DirectionalLightNode', DirectionalLightNode );
 
-addNodeClass( DirectionalLightNode );
+addLightNode( DirectionalLight, DirectionalLightNode );

@@ -12,6 +12,8 @@ import {
 
 const SSAOShader = {
 
+	name: 'SSAOShader',
+
 	defines: {
 		'PERSPECTIVE_CAMERA': 1,
 		'KERNEL_SIZE': 32
@@ -19,7 +21,6 @@ const SSAOShader = {
 
 	uniforms: {
 
-		'tDiffuse': { value: null },
 		'tNormal': { value: null },
 		'tDepth': { value: null },
 		'tNoise': { value: null },
@@ -48,10 +49,8 @@ const SSAOShader = {
 		}`,
 
 	fragmentShader: /* glsl */`
-
-		uniform sampler2D tDiffuse;
-		uniform sampler2D tNormal;
-		uniform sampler2D tDepth;
+		uniform highp sampler2D tNormal;
+		uniform highp sampler2D tDepth;
 		uniform sampler2D tNoise;
 
 		uniform vec3 kernel[ KERNEL_SIZE ];
@@ -128,53 +127,64 @@ const SSAOShader = {
 		void main() {
 
 			float depth = getDepth( vUv );
-			float viewZ = getViewZ( depth );
 
-			vec3 viewPosition = getViewPosition( vUv, depth, viewZ );
-			vec3 viewNormal = getViewNormal( vUv );
+			if ( depth == 1.0 ) {
 
-			vec2 noiseScale = vec2( resolution.x / 4.0, resolution.y / 4.0 );
-			vec3 random = vec3( texture2D( tNoise, vUv * noiseScale ).r );
+				gl_FragColor = vec4( 1.0 ); // don't influence background
+				
+			} else {
 
-			// compute matrix used to reorient a kernel vector
+				float viewZ = getViewZ( depth );
 
-			vec3 tangent = normalize( random - viewNormal * dot( random, viewNormal ) );
-			vec3 bitangent = cross( viewNormal, tangent );
-			mat3 kernelMatrix = mat3( tangent, bitangent, viewNormal );
+				vec3 viewPosition = getViewPosition( vUv, depth, viewZ );
+				vec3 viewNormal = getViewNormal( vUv );
 
-		 float occlusion = 0.0;
+				vec2 noiseScale = vec2( resolution.x / 4.0, resolution.y / 4.0 );
+				vec3 random = vec3( texture2D( tNoise, vUv * noiseScale ).r );
 
-		 for ( int i = 0; i < KERNEL_SIZE; i ++ ) {
+				// compute matrix used to reorient a kernel vector
 
-				vec3 sampleVector = kernelMatrix * kernel[ i ]; // reorient sample vector in view space
-				vec3 samplePoint = viewPosition + ( sampleVector * kernelRadius ); // calculate sample point
+				vec3 tangent = normalize( random - viewNormal * dot( random, viewNormal ) );
+				vec3 bitangent = cross( viewNormal, tangent );
+				mat3 kernelMatrix = mat3( tangent, bitangent, viewNormal );
 
-				vec4 samplePointNDC = cameraProjectionMatrix * vec4( samplePoint, 1.0 ); // project point and calculate NDC
-				samplePointNDC /= samplePointNDC.w;
+				float occlusion = 0.0;
 
-				vec2 samplePointUv = samplePointNDC.xy * 0.5 + 0.5; // compute uv coordinates
+				for ( int i = 0; i < KERNEL_SIZE; i ++ ) {
 
-				float realDepth = getLinearDepth( samplePointUv ); // get linear depth from depth texture
-				float sampleDepth = viewZToOrthographicDepth( samplePoint.z, cameraNear, cameraFar ); // compute linear depth of the sample view Z value
-				float delta = sampleDepth - realDepth;
+					vec3 sampleVector = kernelMatrix * kernel[ i ]; // reorient sample vector in view space
+					vec3 samplePoint = viewPosition + ( sampleVector * kernelRadius ); // calculate sample point
 
-				if ( delta > minDistance && delta < maxDistance ) { // if fragment is before sample point, increase occlusion
+					vec4 samplePointNDC = cameraProjectionMatrix * vec4( samplePoint, 1.0 ); // project point and calculate NDC
+					samplePointNDC /= samplePointNDC.w;
 
-					occlusion += 1.0;
+					vec2 samplePointUv = samplePointNDC.xy * 0.5 + 0.5; // compute uv coordinates
+
+					float realDepth = getLinearDepth( samplePointUv ); // get linear depth from depth texture
+					float sampleDepth = viewZToOrthographicDepth( samplePoint.z, cameraNear, cameraFar ); // compute linear depth of the sample view Z value
+					float delta = sampleDepth - realDepth;
+
+					if ( delta > minDistance && delta < maxDistance ) { // if fragment is before sample point, increase occlusion
+
+						occlusion += 1.0;
+
+					}
 
 				}
 
+				occlusion = clamp( occlusion / float( KERNEL_SIZE ), 0.0, 1.0 );
+
+				gl_FragColor = vec4( vec3( 1.0 - occlusion ), 1.0 );
+
 			}
-
-			occlusion = clamp( occlusion / float( KERNEL_SIZE ), 0.0, 1.0 );
-
-			gl_FragColor = vec4( vec3( 1.0 - occlusion ), 1.0 );
 
 		}`
 
 };
 
 const SSAODepthShader = {
+
+	name: 'SSAODepthShader',
 
 	defines: {
 		'PERSPECTIVE_CAMERA': 1
@@ -236,6 +246,8 @@ const SSAODepthShader = {
 };
 
 const SSAOBlurShader = {
+
+	name: 'SSAOBlurShader',
 
 	uniforms: {
 

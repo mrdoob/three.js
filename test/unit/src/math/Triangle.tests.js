@@ -211,16 +211,12 @@ export default QUnit.module( 'Maths', () => {
 
 			let a = new Triangle();
 
-			const bad = new Vector3( - 2, - 1, - 1 );
 			const barycoord = new Vector3();
 			const midpoint = new Vector3();
 
-			a.getBarycoord( a.a, barycoord );
-			assert.ok( barycoord.equals( bad ), 'Passed!' );
-			a.getBarycoord( a.b, barycoord );
-			assert.ok( barycoord.equals( bad ), 'Passed!' );
-			a.getBarycoord( a.c, barycoord );
-			assert.ok( barycoord.equals( bad ), 'Passed!' );
+			assert.ok( a.getBarycoord( a.a, barycoord ) === null, 'Passed!' );
+			assert.ok( a.getBarycoord( a.b, barycoord ) === null, 'Passed!' );
+			assert.ok( a.getBarycoord( a.c, barycoord ) === null, 'Passed!' );
 
 			a = new Triangle( new Vector3( 0, 0, 0 ), new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ) );
 			a.getMidpoint( midpoint );

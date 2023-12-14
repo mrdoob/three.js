@@ -17,7 +17,7 @@ class RemapNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { node, inLowNode, inHighNode, outLowNode, outHighNode, doClamp } = this;
 
@@ -39,4 +39,4 @@ export const remapClamp = nodeProxy( RemapNode );
 addNodeElement( 'remap', remap );
 addNodeElement( 'remapClamp', remapClamp );
 
-addNodeClass( RemapNode );
+addNodeClass( 'RemapNode', RemapNode );

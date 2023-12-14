@@ -24,6 +24,11 @@
 
 <h2>属性(Properties)</h2>
 
+<h3>[property:Boolean alphaHash]</h3>
+<p>
+启用alphaHash透明度，这是[page:.transparent]或[page:.alphaTest]的替代方案。如果不透明度低于随机阈值，则不会渲染材质。随机化会引入一些颗粒或噪点，但相较于传统的Alpha blend方式，避免了透明度引起的深度排序问题。使用TAARenderPass可以有效减少噪点。
+</p>
+
 <h3>[property:Float alphaTest]</h3>
 <p>设置运行alphaTest时要使用的alpha值。如果不透明度低于此值，则不会渲染材质。默认值为*0*。
 </p>

@@ -1996,7 +1996,7 @@ class EXRLoader extends DataTextureLoader {
 
 			if ( dataView.getUint32( 0, true ) != 20000630 ) { // magic
 
-				throw new Error( 'THREE.EXRLoader: provided file doesn\'t appear to be in OpenEXR format.' );
+				throw new Error( 'THREE.EXRLoader: Provided file doesn\'t appear to be in OpenEXR format.' );
 
 			}
 
@@ -2033,7 +2033,7 @@ class EXRLoader extends DataTextureLoader {
 
 					if ( attributeValue === undefined ) {
 
-						console.warn( `EXRLoader.parse: skipped unknown header attribute type \'${attributeType}\'.` );
+						console.warn( `THREE.EXRLoader: Skipped unknown header attribute type \'${attributeType}\'.` );
 
 					} else {
 
@@ -2047,8 +2047,8 @@ class EXRLoader extends DataTextureLoader {
 
 			if ( ( spec & ~ 0x04 ) != 0 ) { // unsupported tiled, deep-image, multi-part
 
-				console.error( 'EXRHeader:', EXRHeader );
-				throw new Error( 'THREE.EXRLoader: provided file is currently unsupported.' );
+				console.error( 'THREE.EXRHeader:', EXRHeader );
+				throw new Error( 'THREE.EXRLoader: Provided file is currently unsupported.' );
 
 			}
 
