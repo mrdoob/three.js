@@ -1,5 +1,13 @@
-import * as THREE from 'three';
-import * as fflate from '../libs/fflate.module.js';
+import {
+  NoColorSpace,
+  DoubleSide,
+} from 'three';
+
+import {
+  strToU8,
+  zipSync,
+} from '../libs/fflate.module.js';
+
 import { decompress } from './../utils/TextureUtils.js';
 
 class USDZExporter {
@@ -72,7 +80,7 @@ class USDZExporter {
 
 		output += buildMaterials( materials, textures, options.quickLookCompatible );
 
-		files[ modelFileName ] = fflate.strToU8( output );
+		files[ modelFileName ] = strToU8( output );
 		output = null;
 
 		for ( const id in textures ) {
@@ -119,7 +127,7 @@ class USDZExporter {
 
 		}
 
-		return fflate.zipSync( files, { level: 0 } );
+		return zipSync( files, { level: 0 } );
 
 	}
 
@@ -219,7 +227,7 @@ function buildUSDFileAsString( dataToInsert ) {
 
 	let output = buildHeader();
 	output += dataToInsert;
-	return fflate.strToU8( output );
+	return strToU8( output );
 
 }
 
@@ -506,7 +514,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 			asset inputs:file = @textures/Texture_${ id }.png@
 			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
 			${ color !== undefined ? 'float4 inputs:scale = ' + buildColor4( color ) : '' }
-			token inputs:sourceColorSpace = "${ texture.colorSpace === THREE.NoColorSpace ? 'raw' : 'sRGB' }"
+			token inputs:sourceColorSpace = "${ texture.colorSpace === NoColorSpace ? 'raw' : 'sRGB' }"
 			token inputs:wrapS = "${ WRAPPINGS[ texture.wrapS ] }"
 			token inputs:wrapT = "${ WRAPPINGS[ texture.wrapT ] }"
 			float outputs:r
@@ -519,7 +527,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 	}
 
 
-	if ( material.side === THREE.DoubleSide ) {
+	if ( material.side === DoubleSide ) {
 
 		console.warn( 'THREE.USDZExporter: USDZ does not support double sided materials', material );
 
