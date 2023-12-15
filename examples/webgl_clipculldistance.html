@@ -12,78 +12,38 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener" >three.js</a> - clip cull distance
 			<a href="https://registry.khronos.org/webgl/extensions/WEBGL_clip_cull_distance/" target="_blank" rel="noopener" >WEBGL_clip_cull_distance</a>
-		<div id="notSupported" style="display:none">WEBGL_clip_cull_distance not supported</div>
+			<div id="notSupported" style="display:none">WEBGL_clip_cull_distance not supported</div>
 		</div>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
 			uniform float time;
 
-			#include <common>
-			#include <batching_pars_vertex>
-			#include <uv_pars_vertex>
-			#include <displacementmap_pars_vertex>
-			#include <normal_pars_vertex>
-			#include <morphtarget_pars_vertex>
-			#include <skinning_pars_vertex>
-			#include <logdepthbuf_pars_vertex>
-			#include <clipping_planes_pars_vertex>
-				
-			void main()	{
+			varying vec4 vColor;
 
-				#include <uv_vertex>
-				#include <batching_vertex>
-			
-				#include <beginnormal_vertex>
-				#include <morphnormal_vertex>
-				#include <skinbase_vertex>
-				#include <skinnormal_vertex>
-				#include <defaultnormal_vertex>
-				#include <normal_vertex>
-			
-				#include <begin_vertex>
-				#include <morphtarget_vertex>
-				#include <skinning_vertex>
-				#include <displacementmap_vertex>
-				#include <project_vertex>
-				#include <logdepthbuf_vertex>
-				#include <clipping_planes_vertex>
+			void main() {
+
+				vColor = color;
 
 				#ifdef USE_CLIP_DISTANCE
-					vec4 worldPosition = modelMatrix * batchingMatrix * vec4(transformed, 1.);
-					gl_ClipDistance[ 0 ] = worldPosition.x - sin(time) * (20. + 1.5);
+					vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+					gl_ClipDistance[ 0 ] = worldPosition.x - sin( time ) * ( 0.5 );
 				#endif
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
 			}
 
 		</script>
 
-		<script id="fragmentShader" type="x-shader/x-vertex">
+		<script id="fragmentShader" type="x-shader/x-fragment">
 
-			uniform float opacity;
-			
-			#include <packing>
-			#include <uv_pars_fragment>
-			#include <normal_pars_fragment>
-			#include <bumpmap_pars_fragment>
-			#include <normalmap_pars_fragment>
-			#include <logdepthbuf_pars_fragment>
-			#include <clipping_planes_pars_fragment>
-			
+			varying vec4 vColor;
+
 			void main() {
-			
-				#include <clipping_planes_fragment>
-				#include <logdepthbuf_fragment>
-				#include <normal_fragment_begin>
-				#include <normal_fragment_maps>
-			
-				gl_FragColor = vec4( packNormalToRGB( normal ), opacity );
-			
-				#ifdef OPAQUE
-			
-					gl_FragColor.a = 1.0;
-			
-				#endif
-			
+
+				gl_FragColor = vColor;
+
 			}
 
 		</script>
@@ -102,45 +62,28 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			let stats;
-			let camera, controls, scene, renderer;
-			let geometries, mesh, material;
-			const ids = [];
-			const matrix = new THREE.Matrix4();
+			let camera, controls, clock, scene, renderer, stats;
 
-			//
-
-			const position = new THREE.Vector3();
-			const rotation = new THREE.Euler();
-			const quaternion = new THREE.Quaternion();
-			const scale = new THREE.Vector3();
-
-			const api = {
-				count: 10000,
-				clipCullExtension: true
-			};
-
-			//
+			let material;
 
 			init();
 			animate();
 
 			function init() {
 
-				const container = document.getElementById( 'container' );
-
-				const width = window.innerWidth;
-				const height = window.innerHeight;
-
-				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 100 );
-				camera.position.z = 30;
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10 );
+				camera.position.z = 2;
 
 				scene = new THREE.Scene();
+
+				clock = new THREE.Clock();
+
+				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				if ( renderer.extensions.has( 'WEBGL_clip_cull_distance' ) === false ) {
 
@@ -149,14 +92,6 @@
 
 				}
 
-				// controls
-				controls = new OrbitControls( camera, renderer.domElement );
-
-				// stats
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
-
 				const ext = renderer
 					.getContext()
 					.getExtension( 'WEBGL_clip_cull_distance' );
@@ -164,9 +99,65 @@
 
 				gl.enable( ext.CLIP_DISTANCE0_WEBGL );
 
-				initGeometries();
-				initBatchedMesh();
-				onWindowResize();
+				// geometry
+
+				const vertexCount = 200 * 3;
+
+				const geometry = new THREE.BufferGeometry();
+
+				const positions = [];
+				const colors = [];
+
+				for ( let i = 0; i < vertexCount; i ++ ) {
+
+					// adding x,y,z
+					positions.push( Math.random() - 0.5 );
+					positions.push( Math.random() - 0.5 );
+					positions.push( Math.random() - 0.5 );
+
+					// adding r,g,b,a
+					colors.push( Math.random() * 255 );
+					colors.push( Math.random() * 255 );
+					colors.push( Math.random() * 255 );
+					colors.push( Math.random() * 255 );
+
+				}
+
+				const positionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
+				const colorAttribute = new THREE.Uint8BufferAttribute( colors, 4 );
+				colorAttribute.normalized = true;
+
+				geometry.setAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'color', colorAttribute );
+
+				// material
+
+				material = new THREE.ShaderMaterial( {
+
+					uniforms: {
+						time: { value: 1.0 }
+					},
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+					side: THREE.DoubleSide,
+					transparent: true,
+					vertexColors: true
+
+				} );
+
+				material.extensions.clipCullDistance = true;
+
+				const mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
+
+				//
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -181,121 +172,14 @@
 
 			}
 
-			function randomizeMatrix( matrix ) {
-
-				position.x = Math.random() * 40 - 20;
-				position.y = Math.random() * 40 - 20;
-				position.z = Math.random() * 40 - 20;
-
-				rotation.x = Math.random() * 2 * Math.PI;
-				rotation.y = Math.random() * 2 * Math.PI;
-				rotation.z = Math.random() * 2 * Math.PI;
-
-				quaternion.setFromEuler( rotation );
-
-				scale.x = scale.y = scale.z = 0.5 + Math.random() * 0.5;
-
-				return matrix.compose( position, quaternion, scale );
-
-			}
-
-			function randomizeRotationSpeed( rotation ) {
-
-				rotation.x = Math.random() * 0.01;
-				rotation.y = Math.random() * 0.01;
-				rotation.z = Math.random() * 0.01;
-				return rotation;
-
-			}
-
-			function initGeometries() {
-
-				geometries = [
-					new THREE.ConeGeometry( 1.0, 2.0 ),
-					new THREE.BoxGeometry( 2.0, 2.0, 2.0 ),
-					new THREE.SphereGeometry( 1.0, 16, 8 ),
-				];
-
-			}
-
-			function initBatchedMesh() {
-
-				const geometryCount = api.count;
-				const vertexCount = api.count * 512;
-				const indexCount = api.count * 1024;
-
-				const euler = new THREE.Euler();
-				const matrix = new THREE.Matrix4();
-
-
-				material = new THREE.ShaderMaterial( {
-					uniforms: {
-						opacity: { value: 1 },
-						time: { value: 0 },
-					},
-					vertexShader: document.getElementById( 'vertexShader' ).textContent,
-					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
-				} );
-
-				material.extensions.clipCullDistance = true;
-
-
-				mesh = new THREE.BatchedMesh(
-					geometryCount,
-					vertexCount,
-					indexCount,
-					material
-				);
-				mesh.userData.rotationSpeeds = [];
-
-				mesh.frustumCulled = false;
-
-				ids.length = 0;
-
-				for ( let i = 0; i < api.count; i ++ ) {
-
-					const id = mesh.addGeometry( geometries[ i % geometries.length ] );
-					mesh.setMatrixAt( id, randomizeMatrix( matrix ) );
-
-					const rotationMatrix = new THREE.Matrix4();
-					rotationMatrix.makeRotationFromEuler( randomizeRotationSpeed( euler ) );
-					mesh.userData.rotationSpeeds.push( rotationMatrix );
-
-					ids.push( id );
-
-				}
-
-				scene.add( mesh );
-
-			}
-
-			function animateMeshes() {
-
-				const loopNum = Math.min( api.count, api.dynamic );
-
-				for ( let i = 0; i < loopNum; i ++ ) {
-
-					const rotationMatrix = mesh.userData.rotationSpeeds[ i ];
-					const id = ids[ i ];
-
-					mesh.getMatrixAt( id, matrix );
-					matrix.multiply( rotationMatrix );
-					mesh.setMatrixAt( id, matrix );
-
-				}
-
-			}
-			//
-
 			function animate() {
 
 				requestAnimationFrame( animate );
 
-				animateMeshes();
 				controls.update();
 				stats.update();
 
-				material.uniforms.time.value = performance.now() * 0.001;
+				material.uniforms.time.value = clock.getElapsedTime();
 
 				renderer.render( scene, camera );
 
