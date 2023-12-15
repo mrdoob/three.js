@@ -839,9 +839,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	destroyAttribute( /*attribute*/ ) {
+	destroyAttribute( attribute ) {
 
-		console.warn( 'Abstract class.' );
+		this.attributeUtils.destroyAttribute( attribute );
 
 	}
 
