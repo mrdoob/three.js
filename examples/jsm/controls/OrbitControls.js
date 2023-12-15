@@ -621,7 +621,7 @@ class OrbitControls extends EventDispatcher {
 
 		}
 
-		function updateMouseParameters( event ) {
+		function updateZoomParameters( x, y ) {
 
 			if ( ! scope.zoomToCursor ) {
 
@@ -632,13 +632,13 @@ class OrbitControls extends EventDispatcher {
 			performCursorZoom = true;
 
 			const rect = scope.domElement.getBoundingClientRect();
-			const x = event.clientX - rect.left;
-			const y = event.clientY - rect.top;
+			const dx = x - rect.left;
+			const dy = y - rect.top;
 			const w = rect.width;
 			const h = rect.height;
 
-			mouse.x = ( x / w ) * 2 - 1;
-			mouse.y = - ( y / h ) * 2 + 1;
+			mouse.x = ( dx / w ) * 2 - 1;
+			mouse.y = - ( dy / h ) * 2 + 1;
 
 			dollyDirection.set( mouse.x, mouse.y, 1 ).unproject( scope.object ).sub( scope.object.position ).normalize();
 
@@ -662,7 +662,7 @@ class OrbitControls extends EventDispatcher {
 
 		function handleMouseDownDolly( event ) {
 
-			updateMouseParameters( event );
+			updateZoomParameters( event.clientX, event.clientX );
 			dollyStart.set( event.clientX, event.clientY );
 
 		}
@@ -729,7 +729,7 @@ class OrbitControls extends EventDispatcher {
 
 		function handleMouseWheel( event ) {
 
-			updateMouseParameters( event );
+			updateZoomParameters( event.clientX, event.clientY );
 
 			if ( event.deltaY < 0 ) {
 
@@ -956,6 +956,11 @@ class OrbitControls extends EventDispatcher {
 			dollyOut( dollyDelta.y );
 
 			dollyStart.copy( dollyEnd );
+
+			const centerX = ( event.pageX + position.x ) * 0.5;
+			const centerY = ( event.pageY + position.y ) * 0.5;
+
+			updateZoomParameters( centerX, centerY );
 
 		}
 
