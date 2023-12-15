@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mix, range, color, oscSine, timerLocal, toneMapping, MeshStandardNodeMaterial } from 'three/nodes';
+			import { pass, mix, range, color, oscSine, timerLocal, MeshStandardNodeMaterial } from 'three/nodes';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -33,8 +33,10 @@
 			import WebGL from 'three/addons/capabilities/WebGL.js';
 
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import PostProcessing from 'three/addons/renderers/common/PostProcessing.js';
 
 			let camera, scene, renderer;
+			let postProcessing;
 
 			let mixer, clock;
 
@@ -50,7 +52,7 @@
 
 				}
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 40 );
 				camera.position.set( 1, 2, 3 );
 
 				scene = new THREE.Scene();
@@ -58,18 +60,24 @@
 
 				clock = new THREE.Clock();
 
-				//lights
+				// lights
 
 				const centerLight = new THREE.PointLight( 0xff9900, 1, 100 );
 				centerLight.position.y = 4.5;
 				centerLight.position.z = - 2;
-				centerLight.power = 1700;
+				centerLight.power = 400;
 				scene.add( centerLight );
 
 				const cameraLight = new THREE.PointLight( 0x0099ff, 1, 100 );
-				cameraLight.power = 1700;
+				cameraLight.power = 400;
 				camera.add( cameraLight );
 				scene.add( camera );
+
+				const geometry = new THREE.PlaneGeometry( 1000, 1000 );
+				geometry.rotateX( - Math.PI / 2 );
+
+				const plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, visible: true } ) );
+				scene.add( plane );
 
 				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
@@ -124,14 +132,31 @@
 
 				} );
 
-				//renderer
+				// renderer
 
 				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, .17 );
 				document.body.appendChild( renderer.domElement );
+
+				// post processing ( just for WebGPUBackend for now )
+
+				if ( renderer.backend.isWebGPUBackend ) {
+
+					const scenePass = pass( scene, camera );
+					const scenePassColor = scenePass.getTextureNode();
+					const scenePassDepth = scenePass.getDepthNode().remapClamp( .15, .3 );
+
+					const scenePassColorBlurred = scenePassColor.gaussianBlur();
+					scenePassColorBlurred.directionNode = scenePassDepth;
+
+					postProcessing = new PostProcessing( renderer );
+					postProcessing.outputNode = scenePassColorBlurred;
+
+				}
+
+				// events
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -152,7 +177,15 @@
 
 				if ( mixer ) mixer.update( delta );
 
-				renderer.render( scene, camera );
+				if ( renderer.backend.isWebGPUBackend ) {
+
+					postProcessing.render();
+
+				} else {
+
+					renderer.render( scene, camera );
+
+				}
 
 			}
 

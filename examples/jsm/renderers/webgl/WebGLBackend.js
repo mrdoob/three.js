@@ -459,12 +459,6 @@ class WebGLBackend extends Backend {
 
 	}
 
-	destroySampler( /*texture*/ ) {
-
-		console.warn( 'Abstract class.' );
-
-	}
-
 	createDefaultTexture( texture ) {
 
 		const { gl, textureUtils, defaultTextures } = this;
@@ -607,11 +601,18 @@ class WebGLBackend extends Backend {
 
 	}
 
-	destroyTexture( /*texture*/ ) {
+	destroyTexture( texture ) {
 
-		console.warn( 'Abstract class.' );
+		const { gl } = this;
+		const { textureGPU } = this.get( texture );
+
+		gl.deleteTexture( textureGPU );
+
+		this.delete( texture );
 
 	}
+
+	destroySampler() {}
 
 	copyTextureToBuffer( texture, x, y, width, height ) {
 

@@ -108,7 +108,7 @@ const exceptionList = [
 	// could it fix some examples from above?
 	'physics_rapier_instancing',
 
-	// Awaiting for WebGPU support
+	// Awaiting for WebGL backend support
 	'webgpu_clearcoat',
 	'webgpu_compute_audio',
 	'webgpu_compute_particles',
@@ -122,6 +122,7 @@ const exceptionList = [
 	'webgpu_loader_gltf_iridescence',
 	'webgpu_loader_gltf_sheen',
 	'webgpu_materials',
+	'webgpu_portal',
 	'webgpu_sandbox',
 	'webgpu_sprites',
 	'webgpu_video_panorama',

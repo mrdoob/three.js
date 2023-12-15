@@ -12,6 +12,12 @@ class AttributeNode extends Node {
 
 	}
 
+	isGlobal() {
+
+		return true;
+
+	}
+
 	getHash( builder ) {
 
 		return this.getAttributeName( builder );

@@ -110,6 +110,8 @@ export { default as ViewportTextureNode, viewportTexture, viewportMipTexture } f
 export { default as ViewportSharedTextureNode, viewportSharedTexture } from './display/ViewportSharedTextureNode.js';
 export { default as ViewportDepthTextureNode, viewportDepthTexture } from './display/ViewportDepthTextureNode.js';
 export { default as ViewportDepthNode, viewZToOrthographicDepth, orthographicDepthToViewZ, viewZToPerspectiveDepth, perspectiveDepthToViewZ, depth, depthTexture, depthPixel } from './display/ViewportDepthNode.js';
+export { default as GaussianBlurNode, gaussianBlur } from './display/GaussianBlurNode.js';
+export { default as PassNode, pass, depthPass } from './display/PassNode.js';
 
 // code
 export { default as ExpressionNode, expression } from './code/ExpressionNode.js';
