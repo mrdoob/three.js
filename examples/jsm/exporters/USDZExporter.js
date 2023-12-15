@@ -81,7 +81,7 @@ class USDZExporter {
 
 			if ( texture.isCompressedTexture === true ) {
 
-				texture = decompress( texture, Infinity );
+				texture = decompress( texture );
 
 			}
 
