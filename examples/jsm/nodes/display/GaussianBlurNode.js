@@ -5,12 +5,10 @@ import { mul } from '../math/OperatorNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { uniform } from '../core/UniformNode.js';
-import { Vector2, RenderTarget, OrthographicCamera, Scene, Mesh, PlaneGeometry } from 'three';
+import { Vector2, RenderTarget } from 'three';
+import QuadMesh from '../../objects/QuadMesh.js';
 
-const cameraRT = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-const sceneRT = new Scene();
-const meshRT = new Mesh( new PlaneGeometry( 2, 2 ) );
-sceneRT.add( meshRT );
+const quadMesh = new QuadMesh();
 
 class GaussianBlurNode extends TempNode {
 
@@ -51,7 +49,7 @@ class GaussianBlurNode extends TempNode {
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentTexture = textureNode.value;
 
-		meshRT.material = this._material;
+		quadMesh.material = this._material;
 
 		this.setSize( map.image.width, map.image.height );
 
@@ -61,7 +59,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 1, 0 );
 
-		renderer.render( sceneRT, cameraRT );
+		quadMesh.render( renderer );
 
 		// vertical
 
@@ -70,7 +68,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 0, 1 );
 
-		renderer.render( sceneRT, cameraRT );
+		quadMesh.render( renderer );
 
 		// restore
 
