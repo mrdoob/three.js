@@ -81,6 +81,14 @@ class GaussianBlurNode extends TempNode {
 
 		const textureNode = this.textureNode;
 
+		if ( textureNode.isTextureNode !== true ) {
+
+			console.error( 'GaussianBlurNode requires a TextureNode.' );
+
+			return vec4();
+
+		}
+
 		//
 
 		const uvNode = textureNode.uvNode || uv();
