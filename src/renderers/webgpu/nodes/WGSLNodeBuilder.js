@@ -151,7 +151,7 @@ if ( /Windows/g.test( navigator.userAgent ) ) {
 
 class WGSLNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer ) {
+	constructor( object, renderer, commonUniformBuffer = null ) {
 
 		super( object, renderer, new WGSLNodeParser() );
 
@@ -160,6 +160,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 		this.builtins = {};
 
 		this.directives = {};
+		this.commonUniformBuffer = commonUniformBuffer;
 
 	}
 
@@ -530,7 +531,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( uniformsGroup === undefined ) {
 
-					uniformsGroup = new NodeUniformsGroup( groupName, group );
+					uniformsGroup = new NodeUniformsGroup( groupName, group, this.commonUniformBuffer );
 					uniformsGroup.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 					uniformsStage[ groupName ] = uniformsGroup;
