@@ -160,8 +160,8 @@ vec3 AgXToneMapping( vec3 color ) {
 	);
 	const mat3 AgXOutsetMatrix = inverse(AgXOutsetMatrixInv);
 
-	const float AgxMinEv = -12.47393;      // log2(pow(2, LOG2_MIN) * MIDDLE_GRAY)
-	const float AgxMaxEv = 4.026069;       // log2(pow(2, LOG2_MAX) * MIDDLE_GRAY)
+	const float AgxMinEv = -12.47393;	  // log2(pow(2, LOG2_MIN) * MIDDLE_GRAY)
+	const float AgxMaxEv = 4.026069;	   // log2(pow(2, LOG2_MAX) * MIDDLE_GRAY)
 
 	vec3 v = color;
 	v = LINEAR_SRGB_TO_LINEAR_REC2020 * v;
@@ -169,25 +169,25 @@ vec3 AgXToneMapping( vec3 color ) {
 	v = max( vec3( 0.0 ), v );
 	v *= toneMappingExposure;
 
-    v = AgXInsetMatrix * v;
+	v = AgXInsetMatrix * v;
 
-    // Log2 encoding
-    v = max(v, 1E-10); // avoid 0 or negative numbers for log2
-    v = log2(v);
-    v = (v - AgxMinEv) / (AgxMaxEv - AgxMinEv);
+	// Log2 encoding
+	v = max(v, 1E-10); // avoid 0 or negative numbers for log2
+	v = log2(v);
+	v = (v - AgxMinEv) / (AgxMaxEv - AgxMinEv);
 
-    v = clamp(v, 0.0, 1.0);
+	v = clamp(v, 0.0, 1.0);
 
-    // Apply sigmoid
-    v = agxDefaultContrastApprox(v);
+	// Apply sigmoid
+	v = agxDefaultContrastApprox(v);
 
-    // Apply AgX look
-    // v = agxLook(v, look);
+	// Apply AgX look
+	// v = agxLook(v, look);
 
-    v = AgXOutsetMatrix * v;
+	v = AgXOutsetMatrix * v;
 
-    // Linearize
-    v = pow(max(vec3(0.0), v), vec3( 2.2 ));
+	// Linearize
+	v = pow(max(vec3(0.0), v), vec3( 2.2 ));
 
 	v = LINEAR_REC2020_TO_LINEAR_SRGB * v;
 
