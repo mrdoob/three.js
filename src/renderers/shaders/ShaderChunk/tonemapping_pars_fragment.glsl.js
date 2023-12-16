@@ -74,13 +74,13 @@ vec3 ACESFilmicToneMapping( vec3 color ) {
 }
 
 // https://www.itu.int/pub/R-REP-BT.2407-2017
-const mat3 LINEAR_SRGB_TO_LINEAR_REC2020 = mat3(
-	1.6605, 0.5876, 0.0728,
-	0.1246, 1.1329, 0.0083,
-	0.0182, 0.1006, 1.1187
-);
+const mat3 LINEAR_REC2020_TO_LINEAR_SRGB = transpose( mat3(
+	vec3( 1.6605, - 0.5876, - 0.0728 ),
+	vec3( - 0.1246, 1.1329, - 0.0083 ),
+	vec3( - 0.0182, - 0.1006, 1.1187 )
+) );
 
-const mat3 LINEAR_REC2020_TO_LINEAR_SRGB = inverse( LINEAR_SRGB_TO_LINEAR_REC2020 );
+const mat3 LINEAR_SRGB_TO_LINEAR_REC2020 = inverse( LINEAR_REC2020_TO_LINEAR_SRGB );
 
 // AGX Tone Mapping implementation from
 // https://iolite-engine.com/blog_posts/minimal_agx_implementation
