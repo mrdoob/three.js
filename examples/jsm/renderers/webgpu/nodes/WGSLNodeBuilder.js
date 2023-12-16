@@ -132,13 +132,15 @@ fn threejs_repeatWrapping( uv : vec2<f32>, dimension : vec2<u32> ) -> vec2<u32> 
 
 class WGSLNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer, scene = null ) {
+	constructor( object, renderer, scene = null, commonUniformBuffer = null ) {
 
 		super( object, renderer, new WGSLNodeParser(), scene );
 
 		this.uniformGroups = {};
 
 		this.builtins = {};
+
+		this.commonUniformBuffer = commonUniformBuffer;
 
 	}
 
@@ -471,7 +473,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( uniformsGroup === undefined ) {
 
-					uniformsGroup = new NodeUniformsGroup( groupName, group );
+					uniformsGroup = new NodeUniformsGroup( groupName, group, this.commonUniformBuffer );
 					uniformsGroup.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 					uniformsStage[ groupName ] = uniformsGroup;

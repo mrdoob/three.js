@@ -4,7 +4,7 @@ let id = 0;
 
 class NodeUniformsGroup extends UniformsGroup {
 
-	constructor( name, groupNode ) {
+	constructor( name, groupNode, commonUniformBuffer = null ) {
 
 		super( name );
 
@@ -12,12 +12,55 @@ class NodeUniformsGroup extends UniformsGroup {
 		this.groupNode = groupNode;
 
 		this.isNodeUniformsGroup = true;
+		this.commonUniformBuffer = commonUniformBuffer;
+		this._isCommon = null;
 
 	}
 
 	get shared() {
 
 		return this.groupNode.shared;
+
+	}
+
+	allocateCommon() {
+
+		if ( this._isCommon === null ) {
+
+			this._isCommon = false;
+
+			if ( this.commonUniformBuffer !== null ) {
+
+				const buffer = this.commonUniformBuffer.allocate( this.byteLength );
+
+				if ( buffer ) {
+
+					this._buffer = buffer;
+					this._isCommon = true;
+
+				}
+
+			}
+
+		}
+
+		return this._isCommon;
+
+	}
+
+	get buffer() {
+
+		if ( this._buffer === null ) {
+
+			if (  ! this.allocateCommon() ) {
+
+				return super.buffer;
+
+			}
+
+		}
+
+		return this._buffer;
 
 	}
 

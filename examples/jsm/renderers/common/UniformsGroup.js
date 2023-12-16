@@ -13,6 +13,9 @@ class UniformsGroup extends UniformBuffer {
 
 		this.uniforms = [];
 
+		this._buffer = null;
+		this._byteLength = null;
+
 	}
 
 	addUniform( uniform ) {
@@ -57,6 +60,8 @@ class UniformsGroup extends UniformBuffer {
 
 	get byteLength() {
 
+		if ( this._byteLength !== null ) return this._byteLength;
+
 		let offset = 0; // global buffer offset in bytes
 
 		for ( let i = 0, l = this.uniforms.length; i < l; i ++ ) {
@@ -92,7 +97,9 @@ class UniformsGroup extends UniformBuffer {
 
 		}
 
-		return Math.ceil( offset / GPU_CHUNK_BYTES ) * GPU_CHUNK_BYTES;
+		this._byteLength = Math.ceil( offset / GPU_CHUNK_BYTES ) * GPU_CHUNK_BYTES;
+
+		return this._byteLength;
 
 	}
 
