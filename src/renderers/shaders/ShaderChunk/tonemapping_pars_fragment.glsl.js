@@ -73,15 +73,6 @@ vec3 ACESFilmicToneMapping( vec3 color ) {
 
 }
 
-// https://www.itu.int/pub/R-REP-BT.2407-2017
-const mat3 LINEAR_REC2020_TO_LINEAR_SRGB = transpose( mat3(
-	vec3( 1.6605, - 0.5876, - 0.0728 ),
-	vec3( - 0.1246, 1.1329, - 0.0083 ),
-	vec3( - 0.0182, - 0.1006, 1.1187 )
-) );
-
-const mat3 LINEAR_SRGB_TO_LINEAR_REC2020 = inverse( LINEAR_REC2020_TO_LINEAR_SRGB );
-
 // AGX Tone Mapping implementation from
 // https://iolite-engine.com/blog_posts/minimal_agx_implementation
 // https://www.shadertoy.com/view/cd3XWr
@@ -147,11 +138,60 @@ vec3 agxEotf( vec3 val ) {
 // Input and output encoded as Linear-sRGB.
 vec3 AgXToneMapping( vec3 color ) {
 
-	color = max( vec3( 0.0 ), color );
-	color *= toneMappingExposure;
-	color = agx( color );
-	color = agxEotf( color );
-	return color;
+	// https://www.itu.int/pub/R-REP-BT.2407-2017
+	// matrix provided in row-major order so we transpose
+	const mat3 LINEAR_REC2020_TO_LINEAR_SRGB = transpose( mat3(
+		vec3( 1.6605, - 0.5876, - 0.0728 ),
+		vec3( - 0.1246, 1.1329, - 0.0083 ),
+		vec3( - 0.0182, - 0.1006, 1.1187 )
+	) );
+
+	const mat3 LINEAR_SRGB_TO_LINEAR_REC2020 = inverse( LINEAR_REC2020_TO_LINEAR_SRGB );
+
+	const mat3 AgXInsetMatrix = mat3(
+		vec3( 0.856627153315983, 0.137318972929847, 0.11189821299995 ),
+		vec3( 0.0951212405381588, 0.761241990602591, 0.0767994186031903 ),
+		vec3( 0.0482516061458583, 0.101439036467562, 0.811302368396859 )
+	);
+	const mat3 AgXOutsetMatrixInv = mat3(
+		vec3( 0.899796955911611, 0.11142098895748, 0.11142098895748 ),
+		vec3( 0.0871996192028351, 0.875575586156966, 0.0871996192028349 ),
+		vec3( 0.013003424885555, 0.0130034248855548, 0.801379391839686 )
+	);
+	const mat3 AgXOutsetMatrix = inverse(AgXOutsetMatrixInv);
+
+	const float AgxMinEv = -12.47393;      // log2(pow(2, LOG2_MIN) * MIDDLE_GRAY)
+	const float AgxMaxEv = 4.026069;       // log2(pow(2, LOG2_MAX) * MIDDLE_GRAY)
+
+	vec3 v = color;
+	v = LINEAR_SRGB_TO_LINEAR_REC2020 * v;
+
+	v = max( vec3( 0.0 ), v );
+	v *= toneMappingExposure;
+
+    v = AgXInsetMatrix * v;
+
+    // Log2 encoding
+    v = max(v, 1E-10); // avoid 0 or negative numbers for log2
+    v = log2(v);
+    v = (v - AgxMinEv) / (AgxMaxEv - AgxMinEv);
+
+    v = clamp(v, 0.0, 1.0);
+
+    // Apply sigmoid
+    v = agxDefaultContrastApprox(v);
+
+    // Apply AgX look
+    // v = agxLook(v, look);
+
+    v = AgXOutsetMatrix * v;
+
+    // Linearize
+    v = pow(max(vec3(0.0), v), vec3( 2.2 ));
+
+	v = LINEAR_REC2020_TO_LINEAR_SRGB * v;
+
+	return v;
 
 }
 
