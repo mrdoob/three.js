@@ -89,7 +89,7 @@ jobs:
       - name: === E2E testing ===
         run: npm run test-e2e
       - name: Upload output screenshots
-        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4
         if: always()
         with:
           name: Output screenshots
