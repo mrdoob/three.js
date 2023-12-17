@@ -80,6 +80,8 @@ export class CustomNodeEditor extends BaseNodeEditor {
 
 		}
 
+		node.nodeType = node.nodeType || settings.nodeType;
+
 		super( settings.name, node, 1, 300 );
 
 		this.title.setIcon( 'ti ti-' + settings.icon );
