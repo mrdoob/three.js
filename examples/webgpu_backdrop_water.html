@@ -145,10 +145,6 @@
 				water.position.set( 0, .4, 0 );
 				scene.add( water );
 
-				const floor = new THREE.Mesh( new THREE.BoxGeometry( 100, .01, 100 ), new MeshBasicNodeMaterial( { color: 0x000000 } ) );
-				floor.position.set( 0, - 10, 0 );
-				scene.add( floor );
-
 				// renderer
 
 				renderer = new WebGPURenderer( /*{ antialias: true }*/ );
