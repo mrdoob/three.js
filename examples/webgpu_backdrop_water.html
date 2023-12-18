@@ -52,7 +52,7 @@
 				}
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.25, 30 );
-				camera.position.set( - 3, 3, 5 );
+				camera.position.set( 3, 3, 4 );
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x74ccf4, 7, 25 );
@@ -144,6 +144,10 @@
 				const water = new THREE.Mesh( new THREE.BoxGeometry( 100, .8, 100 ), waterMaterial );
 				water.position.set( 0, .4, 0 );
 				scene.add( water );
+
+				const floor = new THREE.Mesh( new THREE.BoxGeometry( 1.7, 5, 1.7 ), new MeshBasicNodeMaterial( { color: 0x777777 } ) );
+				floor.position.set( 0, - 2.5, 0 );
+				scene.add( floor );
 
 				// renderer
 
