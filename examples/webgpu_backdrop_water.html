@@ -67,7 +67,7 @@
 
 				clock = new THREE.Clock();
 
-				// model
+				// animated model
 
 				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
@@ -82,7 +82,7 @@
 
 				} );
 
-				// torus knot
+				// objects
 
 				const textureLoader = new THREE.TextureLoader();
 				const brick_diffuse = textureLoader.load( './textures/brick_diffuse.jpg' );
@@ -120,7 +120,7 @@
 
 				scene.add( objects );
 
-				// box / floor
+				// water
 
 				const depthEffect = depthTexture().distance( depth ).remapClamp( 0, .05 );
 
