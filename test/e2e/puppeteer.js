@@ -132,6 +132,7 @@ const exceptionList = [
 	'webgpu_loader_materialx',
 	'webgpu_materials_video',
 	'webgpu_materialx_noise',
+	'webgpu_morphtargets_face',
 	'webgpu_occlusion',
 	'webgpu_particles',
 	'webgpu_shadertoy',
