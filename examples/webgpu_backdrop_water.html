@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, depth, depthTexture, normalWorld, triplanarTexture, toneMapping, texture, viewportSharedTexture, mx_worley_noise_float, positionWorld, timerLocal, MeshStandardNodeMaterial, MeshBasicNodeMaterial } from 'three/nodes';
+			import { color, depth, depthTexture, normalWorld, triplanarTexture, texture, viewportSharedTexture, mx_worley_noise_float, positionWorld, timerLocal, MeshStandardNodeMaterial, MeshBasicNodeMaterial } from 'three/nodes';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -36,8 +36,11 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
 			let camera, scene, renderer;
 			let mixer, objects, clock;
+			let model, floor, floorPosition;
 
 			init();
 
@@ -72,13 +75,13 @@
 				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
 
-					const object = gltf.scene;
-					mixer = new THREE.AnimationMixer( object );
+					model = gltf.scene;
+					mixer = new THREE.AnimationMixer( model );
 
 					const action = mixer.clipAction( gltf.animations[ 0 ] );
 					action.play();
 
-					scene.add( object );
+					scene.add( model );
 
 				} );
 
@@ -90,9 +93,11 @@
 				brick_diffuse.wrapT = THREE.RepeatWrapping;
 				brick_diffuse.colorSpace = THREE.NoColorSpace;
 
+				const brick = triplanarTexture( texture( brick_diffuse ) );
+
 				const geometry = new THREE.TorusKnotGeometry( .6, 0.3, 128, 64 );
 				const material = new MeshStandardNodeMaterial();
-				material.colorNode = triplanarTexture( texture( brick_diffuse ) );
+				material.colorNode = brick;
 
 				const count = 100;
 				const scale = 3.5;
@@ -125,13 +130,13 @@
 				const depthEffect = depthTexture().distance( depth ).remapClamp( 0, .05 );
 
 				const timer = timerLocal( .8 );
-				const floorUV = positionWorld.xz;
+				const floorUV = positionWorld.xzy;
 
 				const waterLayer0 = mx_worley_noise_float( floorUV.mul( 4 ).add( timer ) );
 				const waterLayer1 = mx_worley_noise_float( floorUV.mul( 2 ).add( timer ) );
 				const waterLayer2 = mx_worley_noise_float( floorUV.mul( 3 ).add( timer ) );
 
-				const waterIntensity = waterLayer0.mul( waterLayer1 ).mul( waterLayer2 ).mul( 10 );
+				const waterIntensity = waterLayer0.mul( waterLayer1 ).mul( waterLayer2 ).mul( 5 );
 				const waterColor = waterIntensity.mix( color( 0x0f5e9c ), color( 0x74ccf4 ) );
 				const viewportTexture = viewportSharedTexture();
 
@@ -141,13 +146,25 @@
 				waterMaterial.backdropAlphaNode = depthEffect.oneMinus();
 				waterMaterial.transparent = true;
 
-				const water = new THREE.Mesh( new THREE.BoxGeometry( 100, .8, 100 ), waterMaterial );
-				water.position.set( 0, .4, 0 );
+				const water = new THREE.Mesh( new THREE.BoxGeometry( 100, .1, 100 ), waterMaterial );
+				water.position.set( 0, .8, 0 );
 				scene.add( water );
 
-				const floor = new THREE.Mesh( new THREE.BoxGeometry( 1.7, 5, 1.7 ), new MeshBasicNodeMaterial( { color: 0x777777 } ) );
-				floor.position.set( 0, - 2.5, 0 );
+				// floor
+
+				floor = new THREE.Mesh( new THREE.BoxGeometry( 1.7, 10, 1.7 ), new MeshBasicNodeMaterial( { colorNode: brick } ) );
+				floor.position.set( 0, - 5, 0 );
 				scene.add( floor );
+
+				// caustics
+
+				const waterPosY = positionWorld.y.sub( water.position.y );
+
+				let transition = waterPosY.add( .1 ).saturate().oneMinus();
+				transition = waterPosY.lessThan( 0 ).cond( transition, normalWorld.y.mix( transition, 0 ) ).toVar();
+
+				material.colorNode = transition.mix( material.colorNode, material.colorNode.add( waterLayer0 ) );
+				floor.material.colorNode = material.colorNode;
 
 				// renderer
 
@@ -156,15 +173,23 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, 1 );
 				document.body.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
 				controls.maxDistance = 10;
-				controls.maxPolarAngle = Math.PI / 2;
 				controls.target.set( 0, 1, 0 );
 				controls.update();
+
+				// gui
+
+				const gui = new GUI();
+
+				floorPosition = new THREE.Vector3();
+
+				gui.add( floorPosition, 'y', 0, 4, .001 ).name( 'position' );
+
+				//
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -183,7 +208,15 @@
 
 				const delta = clock.getDelta();
 
-				if ( mixer ) mixer.update( delta );
+				floor.position.y = floorPosition.y - 5;
+
+				if ( model ) {
+
+					mixer.update( delta );
+
+					model.position.y = floorPosition.y;
+
+				}
 
 				for ( const object of objects.children ) {
 
