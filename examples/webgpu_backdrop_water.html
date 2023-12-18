@@ -63,10 +63,24 @@
 				camera.lookAt( 0, 1, 0 );
 
 				const sunLight = new THREE.DirectionalLight( 0xFFE499, 5 );
-				const ambientLight = new THREE.HemisphereLight( 0x333366, 0x74ccf4, 10 );
+				sunLight.castShadow = true;
+				sunLight.shadow.camera.near = .1;
+				sunLight.shadow.camera.far = 5;
+				sunLight.shadow.camera.right = 5;
+				sunLight.shadow.camera.left = - 5;
+				sunLight.shadow.camera.top = 5;
+				sunLight.shadow.camera.bottom = - 5;
+				sunLight.shadow.mapSize.width = 2048;
+				sunLight.shadow.mapSize.height = 2048;
+				sunLight.shadow.bias = - 0.001;
+				sunLight.position.set( 1, 3, 1 );
+
+				const waterAmbientLight = new THREE.HemisphereLight( 0x333366, 0x74ccf4, 5 );
+				const skyAmbientLight = new THREE.HemisphereLight( 0x74ccf4, 0, 1 );
 
 				scene.add( sunLight );
-				scene.add( ambientLight );
+				scene.add( skyAmbientLight );
+				scene.add( waterAmbientLight );
 
 				clock = new THREE.Clock();
 
@@ -76,6 +90,8 @@
 				loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
 
 					model = gltf.scene;
+					model.children[ 0 ].children[ 0 ].castShadow = true;
+
 					mixer = new THREE.AnimationMixer( model );
 
 					const action = mixer.clipAction( gltf.animations[ 0 ] );
@@ -152,7 +168,7 @@
 
 				// floor
 
-				floor = new THREE.Mesh( new THREE.BoxGeometry( 1.7, 10, 1.7 ), new MeshBasicNodeMaterial( { colorNode: brick } ) );
+				floor = new THREE.Mesh( new THREE.BoxGeometry( 1.7, 10, 1.7 ), new MeshStandardNodeMaterial( { colorNode: brick } ) );
 				floor.position.set( 0, - 5, 0 );
 				scene.add( floor );
 
@@ -185,7 +201,7 @@
 
 				const gui = new GUI();
 
-				floorPosition = new THREE.Vector3();
+				floorPosition = new THREE.Vector3( 0, 1, 0 );
 
 				gui.add( floorPosition, 'y', 0, 2, .001 ).name( 'position' );
 
