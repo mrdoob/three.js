@@ -137,7 +137,7 @@
 
 				const waterMaterial = new MeshBasicNodeMaterial();
 				waterMaterial.colorNode = waterColor;
-				waterMaterial.backdropNode = depthEffect.mul( 3 ).mix( viewportTexture, viewportTexture.mul( color( 0x74ccf4 ) ) );
+				waterMaterial.backdropNode = depthEffect.mul( 3 ).min( 1.4 ).mix( viewportTexture, viewportTexture.mul( color( 0x74ccf4 ) ) );
 				waterMaterial.backdropAlphaNode = depthEffect.oneMinus();
 				waterMaterial.transparent = true;
 
