@@ -129,6 +129,12 @@ export default class RenderObject {
 
 		}
 
+		if ( object.skeleton ) {
+
+			cacheKey += object.skeleton.uuid + ',';
+
+		}
+
 		if ( object.morphTargetInfluences ) {
 
 			cacheKey += object.morphTargetInfluences.length + ',';
