@@ -114,7 +114,7 @@
 
 				objects.position.set(
 					( ( column - 1 ) * scale ) * - .5,
-					- .1,
+					- .3,
 					( ( count / column ) * scale ) * - .5
 				);
 
@@ -183,7 +183,8 @@
 
 				for ( const object of objects.children ) {
 
-					object.position.y = Math.sin( clock.elapsedTime + object.id ) * .5;
+					object.position.y = Math.sin( clock.elapsedTime + object.id ) * .3;
+					object.rotation.y += delta * .3;
 
 				}
 
