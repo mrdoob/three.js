@@ -146,7 +146,7 @@
 				waterMaterial.backdropAlphaNode = depthEffect.oneMinus();
 				waterMaterial.transparent = true;
 
-				const water = new THREE.Mesh( new THREE.BoxGeometry( 100, .1, 100 ), waterMaterial );
+				const water = new THREE.Mesh( new THREE.BoxGeometry( 100, .001, 100 ), waterMaterial );
 				water.position.set( 0, .8, 0 );
 				scene.add( water );
 
@@ -187,7 +187,7 @@
 
 				floorPosition = new THREE.Vector3();
 
-				gui.add( floorPosition, 'y', 0, 4, .001 ).name( 'position' );
+				gui.add( floorPosition, 'y', 0, 2, .001 ).name( 'position' );
 
 				//
 
