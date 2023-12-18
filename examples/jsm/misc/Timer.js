@@ -1,12 +1,3 @@
-/**
- * This class is a new alternative to THREE.Clock with a different API design and behavior.
- * The goal is to avoid the conceptual flaws that became apparent in THREE.Clock over time.
- *
- * - THREE.Timer has an update() method that updates its internal state. That makes it possible to call .getDeltaTime() and
- *    .getElapsedTime() multiple times per simulation step without getting different values.
- * - The class uses the Page Visibility API to avoid large time delta values when the app is inactive (e.g. tab switched or browser hidden).
- * - It's possible to configure a fixed time delta and a time scale value (similar to Unity's Time interface).
- */
 class Timer {
 
 	constructor() {
