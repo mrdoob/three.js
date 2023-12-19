@@ -54,6 +54,17 @@ function getBBForVertices( vertices ) {
 
 }
 
+function getBBForVertices2D( vertices ) {
+
+	const geometry = new BufferGeometry();
+
+	geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 2 ) );
+	geometry.computeBoundingBox();
+
+	return geometry.boundingBox;
+
+}
+
 function getBSForVertices( vertices ) {
 
 	const geometry = new BufferGeometry();
@@ -444,6 +455,11 @@ export default QUnit.module( 'Core', () => {
 
 			assert.ok( bb.min.x === bb.max.x && bb.min.y === bb.max.y && bb.min.z === bb.max.z, 'since there is only one vertex, max and min are equal' );
 			assert.ok( bb.min.x === - 1 && bb.min.y === - 1 && bb.min.z === - 1, 'since there is only one vertex, min and max are this vertex' );
+
+			bb = getBBForVertices2D( [ - 1, - 3, 7, 13 ] );
+
+			assert.ok( bb.min.x === - 1 && bb.min.y === - 3 && bb.min.z === 0, 'min values are set correctly' );
+			assert.ok( bb.max.x === 7 && bb.max.y === 13 && bb.max.z === 0, 'max values are set correctly' );
 
 		} );
 

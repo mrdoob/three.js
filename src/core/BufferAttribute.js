@@ -257,6 +257,12 @@ class BufferAttribute {
 
 	getZ( index ) {
 
+		if ( this.itemSize < 3 ) {
+
+			return 0;
+
+		}
+
 		let z = this.array[ index * this.itemSize + 2 ];
 
 		if ( this.normalized ) z = denormalize( z, this.array );
