@@ -131,7 +131,7 @@
 
 					scale.xyz = instanceIndex.add( Math.random() ).hash().mul( .8 ).add( .2 );
 
-					staticPositionBuffer.element( instanceIndex ).assign( vec3( 1000, 10000, 10000 ) );
+					staticPositionBuffer.element( instanceIndex ).assign( vec3( 1000, 10000, 1000 ) );
 
 					particleData.y = randY.mul( - .1 ).add( - .02 );
 
@@ -151,13 +151,14 @@
 					const getCoord = ( pos ) => pos.add( 50 ).div( 100 );
 
 					const position = positionBuffer.element( instanceIndex );
+					const scale = scaleBuffer.element( instanceIndex );
 					const particleData = dataBuffer.element( instanceIndex );
 
 					const velocity = particleData.y;
 					const random = particleData.w;
 
 					const rippleOnSurface = texture( collisionPosRT.texture, getCoord( position.xz ) );
-					const rippleFloorArea = rippleOnSurface.y.add( surfaceOffset );
+					const rippleFloorArea = rippleOnSurface.y.add( scale.x.mul( surfaceOffset ) );
 
 					If( position.y.greaterThan( rippleFloorArea ), () => {
 
