@@ -288,7 +288,7 @@
 
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode();
-				const vignet = viewportTopLeft.distance( .5 ).mul( 1.5 ).clamp().oneMinus();
+				const vignet = viewportTopLeft.distance( .5 ).mul( 1.35 ).clamp().oneMinus();
 
 				const teapotTreePass = pass( teapotTree, camera ).getTextureNode();
 				const teapotTreePassBlurred = teapotTreePass.gaussianBlur( 3 );
@@ -301,8 +301,8 @@
 				// compose
 
 				let totalPass = scenePass;
-				totalPass = totalPass.mul( vignet );
 				totalPass = totalPass.add( scenePassColorBlurred.mul( .1 ) );
+				totalPass = totalPass.mul( vignet );
 				totalPass = totalPass.add( teapotTreePass.mul( 10 ).add( teapotTreePassBlurred ) );
 
 				postProcessing = new PostProcessing( renderer );
