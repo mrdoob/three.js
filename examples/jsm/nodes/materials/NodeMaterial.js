@@ -352,7 +352,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		const toneMappingNode = builder.toneMappingNode;
 
-		if ( toneMappingNode ) {
+		if ( this.toneMapped === true && toneMappingNode ) {
 
 			outputNode = vec4( toneMappingNode.context( { color: outputNode.rgb } ), outputNode.a );
 
