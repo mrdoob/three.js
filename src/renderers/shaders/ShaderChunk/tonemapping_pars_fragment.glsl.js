@@ -129,8 +129,6 @@ vec3 AgXToneMapping( vec3 color ) {
 	// on Blender's implementation for rec 2020 colors:
 	// https://github.com/google/filament/pull/7236
 	color = LINEAR_SRGB_TO_LINEAR_REC2020 * color;
-
-	color = max( vec3( 0.0 ), color );
 	color *= toneMappingExposure;
 
 	color = AgXInsetMatrix * color;
