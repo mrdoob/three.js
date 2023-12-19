@@ -65,11 +65,11 @@
 				const sunLight = new THREE.DirectionalLight( 0xFFE499, 5 );
 				sunLight.castShadow = true;
 				sunLight.shadow.camera.near = .1;
-				sunLight.shadow.camera.far = 5;
-				sunLight.shadow.camera.right = 5;
-				sunLight.shadow.camera.left = - 5;
-				sunLight.shadow.camera.top = 5;
-				sunLight.shadow.camera.bottom = - 5;
+				sunLight.shadow.camera.far = 3;
+				sunLight.shadow.camera.right = 2;
+				sunLight.shadow.camera.left = - 2;
+				sunLight.shadow.camera.top = 2;
+				sunLight.shadow.camera.bottom = - 2;
 				sunLight.shadow.mapSize.width = 2048;
 				sunLight.shadow.mapSize.height = 2048;
 				sunLight.shadow.bias = - 0.001;
