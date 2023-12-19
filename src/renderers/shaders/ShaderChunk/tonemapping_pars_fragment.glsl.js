@@ -89,7 +89,6 @@ const mat3 LINEAR_SRGB_TO_LINEAR_REC2020 = mat3(
 );
 
 // https://iolite-engine.com/blog_posts/minimal_agx_implementation
-//
 // Mean error^2: 3.6705141e-06
 vec3 agxDefaultContrastApprox( vec3 x ) {
 
@@ -116,7 +115,7 @@ vec3 AgXToneMapping( vec3 color ) {
 		vec3( 0.0482516061458583, 0.101439036467562, 0.811302368396859 )
 	);
 
-	// explicit AgXOutsetMatrix generated from Filaments AgXOutsetMatixInv
+	// explicit AgXOutsetMatrix generated from Filaments AgXOutsetMatrixInv
 	const mat3 AgXOutsetMatrix = mat3(
 		vec3( 1.1271005818144368, - 0.1413297634984383, - 0.14132976349843826 ),
 		vec3( - 0.11060664309660323, 1.157823702216272, - 0.11060664309660294 ),
