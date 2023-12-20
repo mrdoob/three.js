@@ -30,6 +30,7 @@
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import StorageBufferAttribute from 'three/addons/renderers/common/StorageBufferAttribute.js';
 
 			import PostProcessing from 'three/addons/renderers/common/PostProcessing.js';
 
@@ -102,7 +103,7 @@
 
 				//
 
-				const createBuffer = ( type = 'vec3' ) => storage( new THREE.InstancedBufferAttribute( new Float32Array( maxParticleCount * 4 ), 4 ), type, maxParticleCount );
+				const createBuffer = ( type = 'vec3' ) => storage( new StorageBufferAttribute( Float32Array, type === 'vec4' ? 4 : 3, maxParticleCount ), type, maxParticleCount );
 
 				const positionBuffer = createBuffer();
 				const scaleBuffer = createBuffer();
