@@ -38,9 +38,12 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			import Stats from 'three/addons/libs/stats.module.js';
+
 			let camera, scene, renderer;
 			let mixer, objects, clock;
 			let model, floor, floorPosition;
+			let stats;
 
 			init();
 
@@ -150,9 +153,8 @@
 
 				const waterLayer0 = mx_worley_noise_float( floorUV.mul( 4 ).add( timer ) );
 				const waterLayer1 = mx_worley_noise_float( floorUV.mul( 2 ).add( timer ) );
-				const waterLayer2 = mx_worley_noise_float( floorUV.mul( 3 ).add( timer ) );
 
-				const waterIntensity = waterLayer0.mul( waterLayer1 ).mul( waterLayer2 ).mul( 5 );
+				const waterIntensity = waterLayer0.mul( waterLayer1 ).mul( 1.4 );
 				const waterColor = waterIntensity.mix( color( 0x0f5e9c ), color( 0x74ccf4 ) );
 				const viewportTexture = viewportSharedTexture();
 
@@ -179,8 +181,10 @@
 				let transition = waterPosY.add( .1 ).saturate().oneMinus();
 				transition = waterPosY.lessThan( 0 ).cond( transition, normalWorld.y.mix( transition, 0 ) ).toVar();
 
-				material.colorNode = transition.mix( material.colorNode, material.colorNode.add( waterLayer0 ) );
-				floor.material.colorNode = material.colorNode;
+				const colorNode = transition.mix( material.colorNode, material.colorNode.add( waterLayer0 ) );
+
+				//material.colorNode = colorNode;
+				floor.material.colorNode = colorNode;
 
 				// renderer
 
@@ -190,6 +194,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
@@ -222,6 +229,8 @@
 			}
 
 			function animate() {
+
+				stats.update();
 
 				const delta = clock.getDelta();
 
