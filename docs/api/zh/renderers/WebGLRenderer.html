@@ -351,11 +351,11 @@
 		<p>
 			用相机([page:Camera camera])渲染一个场景([page:Scene scene])或是其它类型的[page:Object3D object]。<br />
 
-			渲染一般是在canvas上完成的，或者是[page:WebGLRenderTarget renderTarget](如果有指定)<br />
+			渲染一般是在canvas上完成的，或者是[page:WebGLRenderTarget renderTarget](通过[page:WebGLRenderer.setRenderTarget .setRenderTarget]指定)。<br />
 
-			如果[page:Boolean forceClear]值是*true*，那么颜色、深度及模板缓存将会在渲染之前清除，即使渲染器的[page:WebGLRenderer.autoClear autoClear]属性值是false<br />
-
-			即便forceClear设为true, 也可以通过将[page:WebGLRenderer.autoClearColor autoClearColor]、[page:WebGLRenderer.autoClearStencil autoClearStencil]或[page:WebGLRenderer.autoClearDepth autoClearDepth]属性的值设为false来阻止对应缓存被清除。
+			默认情况下渲染缓存是会被清除的，但是你可以通过设置[page:WebGLRenderer.autoClear autoClear] 属性的值为false来阻止渲染缓存被清除。
+			如果你想阻止某个指定的缓存被清空，可以设置[page:WebGLRenderer.autoClearColor autoClearColor]、[page:WebGLRenderer.autoClearStencil autoClearStencil]或[page:WebGLRenderer.autoClearDepth autoClearDepth]属性的值为false来阻止其被清除。
+			如果想要强制清除一个或多个缓存，可以调用[page:WebGLRenderer.clear .clear]。
 		</p>
 
 		<h3>[method:undefined resetState]()</h3>
