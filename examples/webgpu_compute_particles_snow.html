@@ -8,7 +8,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - GPU Compute Snow - 300.000 Particles
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - GPU Compute Snow - 100.000 Particles
 		</div>
 
 		<script type="importmap">
@@ -37,7 +37,7 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			const maxParticleCount = 300000;
+			const maxParticleCount = 100000;
 
 			let camera, scene, renderer;
 			let controls, stats;
@@ -126,7 +126,7 @@
 					const randZ = instanceIndex.add( randUint() ).hash();
 
 					position.x = randX.mul( 100 ).add( - 50 );
-					position.y = randY.mul( 1000 ).add( 3 );
+					position.y = randY.mul( 500 ).add( 3 );
 					position.z = randZ.mul( 100 ).add( - 50 );
 
 					scale.xyz = instanceIndex.add( Math.random() ).hash().mul( .8 ).add( .2 );
