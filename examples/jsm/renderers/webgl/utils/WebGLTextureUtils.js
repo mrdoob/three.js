@@ -243,6 +243,8 @@ class WebGLTextureUtils {
 		gl.getBufferSubData( gl.PIXEL_PACK_BUFFER, 0, dstBuffer );
 		gl.bindBuffer(  gl.PIXEL_PACK_BUFFER, null );
 
+		gl.deleteFramebuffer( fb );
+
 		return dstBuffer;
 
 	}

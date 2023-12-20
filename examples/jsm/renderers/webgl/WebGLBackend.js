@@ -943,7 +943,7 @@ class WebGLBackend extends Backend {
 
 		if ( renderContext.textures !== null ) {
 
-			const renderContextData = this.get( renderContext );
+			const renderContextData = this.get( renderContext.renderTarget );
 
 			let fb = renderContextData.framebuffer;
 
