@@ -223,7 +223,6 @@ class PerspectiveCamera extends Camera {
 
 		data.object.filmGauge = this.filmGauge;
 		data.object.filmOffset = this.filmOffset;
-
 		return data;
 
 	}

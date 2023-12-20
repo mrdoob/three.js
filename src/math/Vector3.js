@@ -30,7 +30,7 @@ class Vector3 {
 		this.y = y;
 		this.z = z;
 
-
+		this._onChangeCallback( 'set' );
 		return this;
 
 	}
@@ -40,7 +40,6 @@ class Vector3 {
 		this.x = scalar;
 		this.y = scalar;
 		this.z = scalar;
-
 		return this;
 
 	}
@@ -109,6 +108,7 @@ class Vector3 {
 		this.y = v.y;
 		this.z = v.z;
 
+		this._onChangeCallback( 'copy' );
 		return this;
 
 	}

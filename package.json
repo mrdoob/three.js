@@ -1,7 +1,7 @@
 {
-  "name": "three",
-  "version": "0.158.0",
-  "description": "JavaScript 3D library",
+  "name": "run-scene-core",
+  "version": "158.0.1",
+  "description": "JavaScript 3D library Fork Three",
   "type": "module",
   "main": "./build/three.js",
   "module": "./build/three.module.js",

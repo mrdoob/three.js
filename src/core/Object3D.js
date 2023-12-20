@@ -42,34 +42,63 @@ class Object3D extends EventDispatcher {
 
 		this.parent = null;
 		this.children = [];
+		this._onChangeCallback = ()=>{
+
+		};
 
 		this.onMatrixWorldNeedsUpdate = false;
 		this.up = Object3D.DEFAULT_UP.clone();
 		const scope = this;
-		const position = new Proxy( new Vector3(), {
+
+		const positionCallback = ()=>{
+
+			scope.onChange( {
+				type: 'v3', subType: 'position'
+			} );
+
+		};
+
+		const rotationCallback = ()=>{
+
+			scope.onChange( {
+				type: 'v3', subType: 'rotation'
+			} );
+
+		};
+
+		const scaleCallback = ()=>{
+
+			scope.onChange( {
+				type: 'v3', subType: 'scale'
+			} );
+
+		};
+
+
+		const position = new Proxy( new Vector3()._onChange( positionCallback ), {
 			set( a, b, c ) {
 
 				a[ b ] = c;
-				scope._onChangeCallback && a._onChangeCallback( 'position' );
+				positionCallback();
 				return true;
 
 			}
 		} );
-		const rotation = new Proxy( new Euler(), {
+		const rotation = new Proxy( new Euler()._onChange( rotationCallback ), {
 			set( a, b, c ) {
 
 				a[ b ] = c;
-				scope._onChangeCallback && a._onChangeCallback( 'rotation' );
+				rotationCallback();
 				return true;
 
 			}
 		} );
 		const quaternion = new Quaternion();
-		const scale = new Proxy( new Vector3( 1, 1, 1 ), {
+		const scale = new Proxy( new Vector3( 1, 1, 1 )._onChange( scaleCallback ), {
 			set( a, b, c ) {
 
 				a[ b ] = c;
-				scope._onChangeCallback && a._onChangeCallback( 'scale' );
+				scaleCallback();
 				return true;
 
 			}
@@ -591,8 +620,17 @@ class Object3D extends EventDispatcher {
 
 		this.matrix.compose( this.position, this.quaternion, this.scale );
 
+		const scope = this;
 		this.matrixWorldNeedsUpdate = true;
-		// this.matrixAutoUpdate = false;
+		if ( ! scope.keepUpdate && ! scope.isCamera && ! scope.isLight && scope.type !== 'instanceModel' ) {
+
+			if ( scope.isObject3D || scope.isMesh ) {
+
+				scope.matrixAutoUpdate = false;
+
+			}
+
+		}
 
 	}
 
@@ -620,13 +658,14 @@ class Object3D extends EventDispatcher {
 
 			this.matrixWorldNeedsUpdate = false;
 
-			if ( deep ) {
-
-				this.onUpdateMatrixWorld( );
-
-			}
 
 			force = true;
+
+		}
+
+		if ( deep ) {
+
+			this._onChangeCallback( 'updateMatrixWorld' );
 
 		}
 
@@ -1000,8 +1039,28 @@ class Object3D extends EventDispatcher {
 		}
 
 	}
+	setChange( changeFn ) {
 
-	onUpdateMatrixWorld( force ) {
+		this._onChangeCallback = changeFn;
+
+	}
+	onChange( map ) {
+
+		if ( map.type === 'v3' ) {
+
+			if ( ! this.keepUpdate && ! this.isCamera && ! this.isLight && this.type !== 'instanceModel' ) {
+
+				if ( this.isObject3D || this.isMesh ) {
+
+					this.matrixAutoUpdate = true;
+
+				}
+
+			}
+
+		}
+
+		this._onChangeCallback( map );
 
 	}
 

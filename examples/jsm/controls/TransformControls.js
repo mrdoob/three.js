@@ -80,6 +80,8 @@ class TransformControls extends Object3D {
 
 				set: function ( value ) {
 
+
+
 					if ( propValue !== value ) {
 
 						propValue = value;
@@ -119,9 +121,7 @@ class TransformControls extends Object3D {
 		defineProperty( 'showX', true );
 		defineProperty( 'showY', true );
 		defineProperty( 'showZ', true );
-
 		// Reusable utility variables
-
 		const worldPosition = new Vector3();
 		const worldPositionStart = new Vector3();
 		const worldQuaternion = new Quaternion();
@@ -181,6 +181,7 @@ class TransformControls extends Object3D {
 	// updateMatrixWorld  updates key transformation variables
 	updateMatrixWorld() {
 
+		if ( ! this.enabled || ! this.visible ) return;
 		if ( this.object !== undefined ) {
 
 			this.object.updateMatrixWorld();
@@ -1161,6 +1162,9 @@ class TransformControlsGizmo extends Object3D {
 
 	updateMatrixWorld( force ) {
 
+		if ( ! this.enabled ) return;
+
+
 		const space = ( this.mode === 'scale' ) ? 'local' : this.space; // scale always oriented to local rotation
 
 		const quaternion = ( space === 'local' ) ? this.worldQuaternion : _identityQuaternion;
@@ -1493,6 +1497,8 @@ class TransformControlsPlane extends Mesh {
 	}
 
 	updateMatrixWorld( force ) {
+
+		if ( ! this.enabled ) return;
 
 		let space = this.space;
 
