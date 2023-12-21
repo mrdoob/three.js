@@ -105,7 +105,11 @@ vec3 agxDefaultContrastApprox( vec3 x ) {
 
 }
 
-// Input and output encoded as Linear-sRGB.
+// AgX Tone Mapping implementation based on Filament, which in turn is based
+// on Blender's implementation using rec 2020 primaries
+// https://github.com/google/filament/pull/7236
+// Inputs and outputs are encoded as Linear-sRGB.
+
 vec3 AgXToneMapping( vec3 color ) {
 
 	// AgX constants
@@ -122,14 +126,15 @@ vec3 AgXToneMapping( vec3 color ) {
 		vec3( - 0.016493938717834573, - 0.016493938717834257, 1.2519364065950405 )
 	);
 
-	const float AgxMinEv = - 12.47393;  // log2(pow(2, LOG2_MIN) * MIDDLE_GRAY)
-	const float AgxMaxEv = 4.026069;    // log2(pow(2, LOG2_MAX) * MIDDLE_GRAY)
+	// LOG2_MIN      = -10.0
+	// LOG2_MAX      =  +6.5
+	// MIDDLE_GRAY   =  0.18
+	const float AgxMinEv = - 12.47393;  // log2( pow( 2, LOG2_MIN ) * MIDDLE_GRAY )
+	const float AgxMaxEv = 4.026069;    // log2( pow( 2, LOG2_MAX ) * MIDDLE_GRAY )
 
-	// AGX Tone Mapping implementation based on Filament, which is in turn based
-	// on Blender's implementation for rec 2020 colors:
-	// https://github.com/google/filament/pull/7236
-	color = LINEAR_SRGB_TO_LINEAR_REC2020 * color;
 	color *= toneMappingExposure;
+
+	color = LINEAR_SRGB_TO_LINEAR_REC2020 * color;
 
 	color = AgXInsetMatrix * color;
 
@@ -152,6 +157,9 @@ vec3 AgXToneMapping( vec3 color ) {
 	color = pow( max( vec3( 0.0 ), color ), vec3( 2.2 ) );
 
 	color = LINEAR_REC2020_TO_LINEAR_SRGB * color;
+
+	// Gamut mapping. Simple clamp for now.
+	color = clamp( color, 0.0, 1.0 );
 
 	return color;
 
