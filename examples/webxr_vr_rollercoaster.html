@@ -31,7 +31,7 @@
 
 			let mesh, material, geometry;
 
-			const renderer = new THREE.WebGLRenderer( { antialias: true } );
+			const renderer = new THREE.WebGLRenderer( { antialias: true, useMultiview: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.xr.enabled = true;
