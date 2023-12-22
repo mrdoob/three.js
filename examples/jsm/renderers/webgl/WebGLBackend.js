@@ -894,7 +894,7 @@ class WebGLBackend extends Backend {
 			const renderTargetContextData = this.get( renderTarget );
 			const { samples } = renderTarget;
 			const cubeFace = this.renderer._activeCubeFace;
-			const isCube = renderTarget.isWebGLCubeRenderTarget === true
+			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
 
 			fb = renderTargetContextData.framebuffer;
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
