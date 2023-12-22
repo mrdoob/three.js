@@ -17,7 +17,6 @@
 			<ul>
 				<li>[name] has an [page:.update]() method that updates its internal state. That makes it possible to call [page:.getDelta]() and [page:.getElapsed]() multiple times per simulation step without getting different values.</li>
 				<li>The class uses the Page Visibility API to avoid large time delta values when the app is inactive (e.g. tab switched or browser hidden).</li>
-				<li>It's possible to configure a fixed time delta and a time scale value (similar to Unity's Time interface).</li>
 			</ul>
 		</p>
 
@@ -65,21 +64,6 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:this disableFixedDelta]()</h3>
-		<p>
-			Disables the usage of a fixed delta time.
-		</p>
-
-		<h3>[method:this dispose]()</h3>
-		<p>
-			Can be used to free all internal resources. Usually called when the timer instance isn't required anymore.
-		</p>
-
-		<h3>[method:this enableFixedDelta]()</h3>
-		<p>
-			Enables the usage of a fixed delta time.
-		</p>
-
 		<h3>[method:Number getDelta]()</h3>
 		<p>
 			Returns the time delta in seconds.
@@ -90,9 +74,9 @@
 			Returns the elapsed time in seconds.
 		</p>
 
-		<h3>[method:Number getFixedDelta]()</h3>
+		<h3>[method:this setTimescale]( [param:Number timescale] )</h3>
 		<p>
-			Returns the fixed time delta that has been previously configured via [page:.setFixedDelta]().
+			Sets a time scale that scales the time delta in [page:.update]().
 		</p>
 
 		<h3>[method:this reset]()</h3>
@@ -100,14 +84,9 @@
 			Resets the time computation for the current simulation step.
 		</p>
 
-		<h3>[method:this setFixedDelta]( [param:Number delta] )</h3>
+		<h3>[method:this dispose]()</h3>
 		<p>
-			Defines a fixed time delta value which is used to update the timer per simulation step.
-		</p>
-
-		<h3>[method:this setTimescale]( [param:Number timescale] )</h3>
-		<p>
-			Sets a time scale that scales the time delta in [page:.update]().
+			Can be used to free all internal resources. Usually called when the timer instance isn't required anymore.
 		</p>
 
 		<h3>[method:this update]( [param:Number timestamp] )</h3>
@@ -115,8 +94,7 @@
 			timestamp -- (optional) The current time in milliseconds. Can be obtained from the
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]
 			callback argument. If not provided, the current time will be determined with
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/Performance/now performance.now]. Please note that this
-			parameter has no effect when using a fixed time delta.<br /><br />
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/Performance/now performance.now].<br /><br />
 
 			Updates the internal state of the timer. This method should be called once per simulation step
 			and before you perform queries against the timer (e.g. via [page:.getDelta]()).
