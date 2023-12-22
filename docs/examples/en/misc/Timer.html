@@ -11,7 +11,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			This class is an alternative to [page:Clock] with a different API design and behavior
+			This class is an alternative to [page:Clock] with a different API design and behavior.
 			The goal is to avoid the conceptual flaws that became apparent in [page:Clock] over time.
 
 			<ul>
@@ -37,11 +37,12 @@
 		<code>
 		const timer = new Timer();
 
-		function animate() {
+		function animate( timestamp ) {
 
 			requestAnimationFrame( animate );
-			
-			timer.update();
+
+			// timestamp is optional
+			timer.update( timestamp );
 
 			const delta = timer.getDelta();
 
@@ -109,8 +110,14 @@
 			Sets a time scale that scales the time delta in [page:.update]().
 		</p>
 
-		<h3>[method:this update]()</h3>
+		<h3>[method:this update]( [param:Number timestamp] )</h3>
 		<p>
+			timestamp -- (optional) The current time in milliseconds. Can be obtained from the
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]
+			callback argument. If not provided, the current time will be determined with
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/Performance/now performance.now]. Please note that this
+			parameter has no effect when using a fixed time delta.<br /><br />
+
 			Updates the internal state of the timer. This method should be called once per simulation step
 			and before you perform queries against the timer (e.g. via [page:.getDelta]()).
 		</p>
