@@ -373,10 +373,15 @@ class OrbitControls extends EventDispatcher {
 					}
 
 				} else if ( scope.object.isOrthographicCamera ) {
-
-					scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom / scale ) );
-					scope.object.updateProjectionMatrix();
+					
 					zoomChanged = scale != 1;
+
+					if ( zoomChanged ) {
+
+						scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom / scale ) );
+						scope.object.updateProjectionMatrix();
+						
+					}
 
 				}
 
