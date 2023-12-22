@@ -237,6 +237,48 @@ class WebGLUtils {
 
 	}
 
+	_clientWaitAsync() {
+
+		const { gl } = this;
+
+		const sync = gl.fenceSync( gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
+
+		gl.flush();
+
+		return new Promise( ( resolve, reject ) => {
+
+			function test() {
+
+				const res = gl.clientWaitSync( sync, gl.SYNC_FLUSH_COMMANDS_BIT, 0 );
+
+				if ( res === gl.WAIT_FAILED) {
+
+					gl.deleteSync( sync );
+
+					reject();
+					return;
+
+				}
+
+				if ( res === gl.TIMEOUT_EXPIRED) {
+
+					requestAnimationFrame( test );
+					return;
+
+				}
+
+				gl.deleteSync( sync );
+
+				resolve();
+
+			}
+
+			test();
+
+		} );
+
+	}
+
 }
 
 export default WebGLUtils;

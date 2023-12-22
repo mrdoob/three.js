@@ -6,7 +6,7 @@ import { addNodeElement, tslFn, nodeProxy, float, vec3 } from '../shadernode/Sha
 
 const saturationNode = tslFn( ( { color, adjustment } ) => {
 
-	return adjustment.mix( luminance( color ), color );
+	return adjustment.mix( luminance( color.rgb ), color.rgb );
 
 } );
 
@@ -17,7 +17,7 @@ const vibranceNode = tslFn( ( { color, adjustment } ) => {
 	const mx = color.r.max( color.g.max( color.b ) );
 	const amt = mx.sub( average ).mul( adjustment ).mul( - 3.0 );
 
-	return mix( color, mx, amt );
+	return mix( color.rgb, mx, amt );
 
 } );
 

@@ -338,8 +338,9 @@
 
 		<h3>[property:Boolean toneMapped]</h3>
 		<p>
-			Defines whether this material is tone mapped according to the renderer's
-			[page:WebGLRenderer.toneMapping toneMapping] setting. Default is `true`.
+			Defines whether this material is tone mapped according to the renderer's			
+			[page:WebGLRenderer.toneMapping toneMapping] setting. It is ignored when rendering to a render target.
+			Default is `true`.
 		</p>
 
 		<h3>[property:Boolean transparent]</h3>
@@ -348,7 +349,7 @@
 			rendering as transparent objects need special treatment and are rendered
 			after non-transparent objects. <br />
 			When set to true, the extent to which the material is transparent is
-			controlled by setting its [page:Float opacity] property. <br />
+			controlled by setting its [page:Float opacity] property.
 			Default is `false`.
 		</p>
 

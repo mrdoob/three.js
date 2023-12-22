@@ -400,6 +400,10 @@
 				"OBB": "examples/en/math/OBB"
 			},
 
+			"Misc": {
+				"Timer": "examples/en/misc/Timer"
+			},
+
 			"ConvexHull": {
 				"Face": "examples/en/math/convexhull/Face",
 				"HalfEdge": "examples/en/math/convexhull/HalfEdge",

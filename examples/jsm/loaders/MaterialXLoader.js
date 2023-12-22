@@ -19,13 +19,13 @@ import {
 	mx_safepower, mx_contrast,
 	mx_srgb_texture_to_lin_rec709,
 	saturation
-} from 'three/nodes';
+} from '../nodes/Nodes.js';
 
 const colorSpaceLib = {
 	mx_srgb_texture_to_lin_rec709
 };
 
-class MtlXElement {
+class MXElement {
 
 	constructor( name, nodeFunc, params = null ) {
 
@@ -39,41 +39,41 @@ class MtlXElement {
 
 // Ref: https://github.com/mrdoob/three.js/issues/24674
 
-const MtlXElements = [
+const MXElements = [
 
 	// << Math >>
-	new MtlXElement( 'add', add, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'subtract', sub, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'multiply', mul, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'divide', div, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'modulo', mod, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'absval', abs, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'sign', sign, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'floor', floor, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'ceil', ceil, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'round', round, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'power', pow, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'sin', sin, [ 'in' ] ),
-	new MtlXElement( 'cos', cos, [ 'in' ] ),
-	new MtlXElement( 'tan', tan, [ 'in' ] ),
-	new MtlXElement( 'asin', asin, [ 'in' ] ),
-	new MtlXElement( 'acos', acos, [ 'in' ] ),
-	new MtlXElement( 'atan2', atan2, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'sqrt', sqrt, [ 'in' ] ),
+	new MXElement( 'add', add, [ 'in1', 'in2' ] ),
+	new MXElement( 'subtract', sub, [ 'in1', 'in2' ] ),
+	new MXElement( 'multiply', mul, [ 'in1', 'in2' ] ),
+	new MXElement( 'divide', div, [ 'in1', 'in2' ] ),
+	new MXElement( 'modulo', mod, [ 'in1', 'in2' ] ),
+	new MXElement( 'absval', abs, [ 'in1', 'in2' ] ),
+	new MXElement( 'sign', sign, [ 'in1', 'in2' ] ),
+	new MXElement( 'floor', floor, [ 'in1', 'in2' ] ),
+	new MXElement( 'ceil', ceil, [ 'in1', 'in2' ] ),
+	new MXElement( 'round', round, [ 'in1', 'in2' ] ),
+	new MXElement( 'power', pow, [ 'in1', 'in2' ] ),
+	new MXElement( 'sin', sin, [ 'in' ] ),
+	new MXElement( 'cos', cos, [ 'in' ] ),
+	new MXElement( 'tan', tan, [ 'in' ] ),
+	new MXElement( 'asin', asin, [ 'in' ] ),
+	new MXElement( 'acos', acos, [ 'in' ] ),
+	new MXElement( 'atan2', atan2, [ 'in1', 'in2' ] ),
+	new MXElement( 'sqrt', sqrt, [ 'in' ] ),
 	//new MtlXElement( 'ln', ... ),
-	new MtlXElement( 'exp', exp, [ 'in' ] ),
-	new MtlXElement( 'clamp', clamp, [ 'in', 'low', 'high' ] ),
-	new MtlXElement( 'min', min, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'max', max, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'normalize', normalize, [ 'in' ] ),
-	new MtlXElement( 'magnitude', length, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'dotproduct', dot, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'crossproduct', cross, [ 'in' ] ),
+	new MXElement( 'exp', exp, [ 'in' ] ),
+	new MXElement( 'clamp', clamp, [ 'in', 'low', 'high' ] ),
+	new MXElement( 'min', min, [ 'in1', 'in2' ] ),
+	new MXElement( 'max', max, [ 'in1', 'in2' ] ),
+	new MXElement( 'normalize', normalize, [ 'in' ] ),
+	new MXElement( 'magnitude', length, [ 'in1', 'in2' ] ),
+	new MXElement( 'dotproduct', dot, [ 'in1', 'in2' ] ),
+	new MXElement( 'crossproduct', cross, [ 'in' ] ),
 	//new MtlXElement( 'transformpoint', ... ),
 	//new MtlXElement( 'transformvector', ... ),
 	//new MtlXElement( 'transformnormal', ... ),
 	//new MtlXElement( 'transformmatrix', ... ),
-	new MtlXElement( 'normalmap', normalMap, [ 'in', 'scale' ] ),
+	new MXElement( 'normalmap', normalMap, [ 'in', 'scale' ] ),
 	//new MtlXElement( 'transpose', ... ),
 	//new MtlXElement( 'determinant', ... ),
 	//new MtlXElement( 'invertmatrix', ... ),
@@ -83,44 +83,44 @@ const MtlXElements = [
 	//new MtlXElement( 'dot', ... ),
 
 	// << Adjustment >>
-	new MtlXElement( 'remap', remap, [ 'in', 'inlow', 'inhigh', 'outlow', 'outhigh' ] ),
-	new MtlXElement( 'smoothstep', smoothstep, [ 'in', 'low', 'high' ] ),
+	new MXElement( 'remap', remap, [ 'in', 'inlow', 'inhigh', 'outlow', 'outhigh' ] ),
+	new MXElement( 'smoothstep', smoothstep, [ 'in', 'low', 'high' ] ),
 	//new MtlXElement( 'curveadjust', ... ),
 	//new MtlXElement( 'curvelookup', ... ),
-	new MtlXElement( 'luminance', luminance, [ 'in', 'lumacoeffs' ] ),
-	new MtlXElement( 'rgbtohsv', mx_rgbtohsv, [ 'in' ] ),
-	new MtlXElement( 'hsvtorgb', mx_hsvtorgb, [ 'in' ] ),
+	new MXElement( 'luminance', luminance, [ 'in', 'lumacoeffs' ] ),
+	new MXElement( 'rgbtohsv', mx_rgbtohsv, [ 'in' ] ),
+	new MXElement( 'hsvtorgb', mx_hsvtorgb, [ 'in' ] ),
 
 	// << Mix >>
-	new MtlXElement( 'mix', mix, [ 'bg', 'fg', 'mix' ] ),
+	new MXElement( 'mix', mix, [ 'bg', 'fg', 'mix' ] ),
 
 	// << Channel >>
-	new MtlXElement( 'combine2', vec2, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'combine3', vec3, [ 'in1', 'in2', 'in3' ] ),
-	new MtlXElement( 'combine4', vec4, [ 'in1', 'in2', 'in3', 'in4' ] ),
+	new MXElement( 'combine2', vec2, [ 'in1', 'in2' ] ),
+	new MXElement( 'combine3', vec3, [ 'in1', 'in2', 'in3' ] ),
+	new MXElement( 'combine4', vec4, [ 'in1', 'in2', 'in3', 'in4' ] ),
 
 	// << Procedural >>
-	new MtlXElement( 'ramplr', mx_ramplr, [ 'valuel', 'valuer', 'texcoord' ] ),
-	new MtlXElement( 'ramptb', mx_ramptb, [ 'valuet', 'valueb', 'texcoord' ] ),
-	new MtlXElement( 'splitlr', mx_splitlr, [ 'valuel', 'valuer', 'texcoord' ] ),
-	new MtlXElement( 'splittb', mx_splittb, [ 'valuet', 'valueb', 'texcoord' ] ),
-	new MtlXElement( 'noise2d', mx_noise_float, [ 'texcoord', 'amplitude', 'pivot' ] ),
-	new MtlXElement( 'noise3d', mx_noise_float, [ 'texcoord', 'amplitude', 'pivot' ] ),
-	new MtlXElement( 'fractal3d', mx_fractal_noise_float, [ 'position', 'octaves', 'lacunarity', 'diminish', 'amplitude' ] ),
-	new MtlXElement( 'cellnoise2d', mx_cell_noise_float, [ 'texcoord' ] ),
-	new MtlXElement( 'cellnoise3d', mx_cell_noise_float, [ 'texcoord' ] ),
-	new MtlXElement( 'worleynoise2d', mx_worley_noise_float, [ 'texcoord', 'jitter' ] ),
-	new MtlXElement( 'worleynoise3d', mx_worley_noise_float, [ 'texcoord', 'jitter' ] ),
+	new MXElement( 'ramplr', mx_ramplr, [ 'valuel', 'valuer', 'texcoord' ] ),
+	new MXElement( 'ramptb', mx_ramptb, [ 'valuet', 'valueb', 'texcoord' ] ),
+	new MXElement( 'splitlr', mx_splitlr, [ 'valuel', 'valuer', 'texcoord' ] ),
+	new MXElement( 'splittb', mx_splittb, [ 'valuet', 'valueb', 'texcoord' ] ),
+	new MXElement( 'noise2d', mx_noise_float, [ 'texcoord', 'amplitude', 'pivot' ] ),
+	new MXElement( 'noise3d', mx_noise_float, [ 'texcoord', 'amplitude', 'pivot' ] ),
+	new MXElement( 'fractal3d', mx_fractal_noise_float, [ 'position', 'octaves', 'lacunarity', 'diminish', 'amplitude' ] ),
+	new MXElement( 'cellnoise2d', mx_cell_noise_float, [ 'texcoord' ] ),
+	new MXElement( 'cellnoise3d', mx_cell_noise_float, [ 'texcoord' ] ),
+	new MXElement( 'worleynoise2d', mx_worley_noise_float, [ 'texcoord', 'jitter' ] ),
+	new MXElement( 'worleynoise3d', mx_worley_noise_float, [ 'texcoord', 'jitter' ] ),
 
 	// << Supplemental >>
 	//new MtlXElement( 'tiledimage', ... ),
 	//new MtlXElement( 'triplanarprojection', triplanarTextures, [ 'filex', 'filey', 'filez' ] ),
 	//new MtlXElement( 'ramp4', ... ),
 	//new MtlXElement( 'place2d', mx_place2d, [ 'texcoord', 'pivot', 'scale', 'rotate', 'offset' ] ),
-	new MtlXElement( 'safepower', mx_safepower, [ 'in1', 'in2' ] ),
-	new MtlXElement( 'contrast', mx_contrast, [ 'in', 'amount', 'pivot' ] ),
+	new MXElement( 'safepower', mx_safepower, [ 'in1', 'in2' ] ),
+	new MXElement( 'contrast', mx_contrast, [ 'in', 'amount', 'pivot' ] ),
 	//new MtlXElement( 'hsvadjust', ... ),
-	new MtlXElement( 'saturate', saturation, [ 'in', 'amount' ] ),
+	new MXElement( 'saturate', saturation, [ 'in', 'amount' ] ),
 	//new MtlXElement( 'extract', ... ),
 	//new MtlXElement( 'separate2', ... ),
 	//new MtlXElement( 'separate3', ... ),
@@ -129,7 +129,7 @@ const MtlXElements = [
 ];
 
 const MtlXLibrary = {};
-MtlXElements.forEach( element => MtlXLibrary[ element.name ] = element );
+MXElements.forEach( element => MtlXLibrary[ element.name ] = element );
 
 class MaterialXLoader extends Loader {
 
@@ -588,11 +588,30 @@ class MaterialXNode {
 
 		//
 
+		let normalNode = null;
+
+		if ( inputs.normal ) normalNode = inputs.normal;
+
+		//
+
+		let emissiveNode = null;
+
+		if ( inputs.emission ) emissiveNode = inputs.emission;
+		if ( inputs.emissionColor )  {
+
+			emissiveNode = emissiveNode ? mul( emissiveNode, inputs.emissionColor ) : emissiveNode;
+
+		}
+
+		//
+
 		material.colorNode = colorNode || color( 0.8, 0.8, 0.8 );
 		material.roughnessNode = roughnessNode || float( 0.2 );
 		material.metalnessNode = metalnessNode || float( 0 );
 		material.clearcoatNode = clearcoatNode || float( 0 );
 		material.clearcoatRoughnessNode = clearcoatRoughnessNode || float( 0 );
+		if ( normalNode ) material.normalNode = normalNode;
+		if ( emissiveNode ) material.emissiveNode = emissiveNode;
 
 	}
 

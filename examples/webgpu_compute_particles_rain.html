@@ -46,6 +46,7 @@
 			let clock;
 
 			let collisionBox, collisionCamera, collisionPosRT, collisionPosMaterial;
+			let collisionBoxPos, collisionBoxPosUI;
 
 			init();
 
@@ -69,14 +70,14 @@
 
 				const dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
 				dirLight.castShadow = true;
-				dirLight.position.set( 3, 12, 17 );
+				dirLight.position.set( 3, 17, 17 );
 				dirLight.castShadow = true;
-				dirLight.shadow.camera.near = 5;
+				dirLight.shadow.camera.near = 1;
 				dirLight.shadow.camera.far = 50;
-				dirLight.shadow.camera.right = 10;
-				dirLight.shadow.camera.left = - 10;
-				dirLight.shadow.camera.top	= 10;
-				dirLight.shadow.camera.bottom = - 10;
+				dirLight.shadow.camera.right = 25;
+				dirLight.shadow.camera.left = - 25;
+				dirLight.shadow.camera.top = 25;
+				dirLight.shadow.camera.bottom = - 25;
 				dirLight.shadow.mapSize.width = 2048;
 				dirLight.shadow.mapSize.height = 2048;
 				dirLight.shadow.bias = - 0.01;
@@ -344,7 +345,11 @@
 
 				const gui = new GUI();
 
-				gui.add( collisionBox.position, 'z', - 50, 50, .001 ).name( 'position' );
+				// use lerp to smooth the movement
+				collisionBoxPosUI = new THREE.Vector3().copy( collisionBox.position );
+				collisionBoxPos = new THREE.Vector3();
+
+				gui.add( collisionBoxPosUI, 'z', - 50, 50, .001 ).name( 'position' );
 				gui.add( collisionBox.scale, 'x', .1, 3.5, 0.01 ).name( 'scale' );
 				gui.add( rainParticles, 'count', 200, maxParticleCount, 1 ).name( 'drop count' ).onChange( ( v ) => rippleParticles.count = v );
 
@@ -365,11 +370,17 @@
 
 				stats.update();
 
+				const delta = clock.getDelta();
+
 				if ( monkey ) {
 
-					monkey.rotation.y += clock.getDelta();
+					monkey.rotation.y += delta;
 
 				}
+
+				collisionBoxPos.set( collisionBoxPosUI.x, collisionBoxPosUI.y, - collisionBoxPosUI.z );
+
+				collisionBox.position.lerp( collisionBoxPos, 10 * delta );
 
 				// position
 

@@ -8,6 +8,7 @@ import WebGLState from './utils/WebGLState.js';
 import WebGLUtils from './utils/WebGLUtils.js';
 import WebGLTextureUtils from './utils/WebGLTextureUtils.js';
 import WebGLExtensions from './utils/WebGLExtensions.js';
+import WebGLCapabilities from './utils/WebGLCapabilities.js';
 
 //
 
@@ -34,6 +35,7 @@ class WebGLBackend extends Backend {
 		this.gl = glContext;
 
 		this.extensions = new WebGLExtensions( this );
+		this.capabilities = new WebGLCapabilities( this );
 		this.attributeUtils = new WebGLAttributeUtils( this );
 		this.textureUtils = new WebGLTextureUtils( this );
 		this.state = new WebGLState( this );
@@ -48,6 +50,12 @@ class WebGLBackend extends Backend {
 	get coordinateSystem() {
 
 		return WebGLCoordinateSystem;
+
+	}
+
+	async getArrayBufferAsync( attribute ) {
+
+		return await this.attributeUtils.getArrayBufferAsync( attribute );
 
 	}
 
@@ -451,12 +459,6 @@ class WebGLBackend extends Backend {
 
 	}
 
-	destroySampler( /*texture*/ ) {
-
-		console.warn( 'Abstract class.' );
-
-	}
-
 	createDefaultTexture( texture ) {
 
 		const { gl, textureUtils, defaultTextures } = this;
@@ -599,11 +601,18 @@ class WebGLBackend extends Backend {
 
 	}
 
-	destroyTexture( /*texture*/ ) {
+	destroyTexture( texture ) {
 
-		console.warn( 'Abstract class.' );
+		const { gl } = this;
+		const { textureGPU } = this.get( texture );
+
+		gl.deleteTexture( textureGPU );
+
+		this.delete( texture );
 
 	}
+
+	destroySampler() {}
 
 	copyTextureToBuffer( texture, x, y, width, height ) {
 
@@ -877,9 +886,15 @@ class WebGLBackend extends Backend {
 
 	}
 
-	hasFeature( name ) {
+	hasFeature( /*name*/ ) {
 
 		return true;
+
+	}
+
+	getMaxAnisotropy() {
+
+		return this.capabilities.getMaxAnisotropy();
 
 	}
 
@@ -928,7 +943,7 @@ class WebGLBackend extends Backend {
 
 		if ( renderContext.textures !== null ) {
 
-			const renderContextData = this.get( renderContext );
+			const renderContextData = this.get( renderContext.renderTarget );
 
 			let fb = renderContextData.framebuffer;
 

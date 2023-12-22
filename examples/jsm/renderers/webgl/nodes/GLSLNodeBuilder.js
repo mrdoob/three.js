@@ -1,4 +1,4 @@
-import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial, FunctionNode } from '../../../nodes/Nodes.js';
+import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial } from '../../../nodes/Nodes.js';
 
 import UniformBuffer from '../../common/UniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
@@ -53,7 +53,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	buildFunctionNode( shaderNode ) {
+	buildFunctionCode( shaderNode ) {
 
 		const layout = shaderNode.layout;
 		const flowData = this.flowShaderNode( shaderNode );
@@ -79,7 +79,7 @@ ${ flowData.code }
 
 		//
 
-		return new FunctionNode( code );
+		return code;
 
 	}
 
@@ -583,7 +583,7 @@ void main() {
 	getUniformFromNode( node, type, shaderStage, name = null ) {
 
 		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
-		const nodeData = this.getDataFromNode( node, shaderStage );
+		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
 		let uniformGPU = nodeData.uniformGPU;
 

@@ -8,7 +8,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - GPU Compute Particles / 100000 Particles
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute - 1M Particles
 		</div>
 
 		<script type="importmap">
@@ -34,7 +34,7 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			const particleCount = 100000;
+			const particleCount = 1000000;
 
 			const gravity = uniform( - .0098 );
 			const bounce = uniform( .8 );
@@ -62,7 +62,7 @@
 				const { innerWidth, innerHeight } = window;
 
 				camera = new THREE.PerspectiveCamera( 50, innerWidth / innerHeight, .1, 1000 );
-				camera.position.set( 40, 15, 40 );
+				camera.position.set( 15, 30, 15 );
 
 				scene = new THREE.Scene();
 
@@ -90,9 +90,9 @@
 					const randY = instanceIndex.add( 2 ).hash();
 					const randZ = instanceIndex.add( 3 ).hash();
 
-					position.x = randX.mul( 60 ).add( - 30 );
-					position.y = randY.mul( 10 );
-					position.z = randZ.mul( 60 ).add( - 30 );
+					position.x = randX.mul( 100 ).add( - 50 );
+					position.y = 0; // randY.mul( 10 );
+					position.z = randZ.mul( 100 ).add( - 50 );
 
 					color.assign( vec3( randX, randY, randZ ) );
 
@@ -145,6 +145,7 @@
 				const particles = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), particleMaterial );
 				particles.isInstancedMesh = true;
 				particles.count = particleCount;
+				particles.frustumCulled = false;
 				scene.add( particles );
 
 				//
@@ -168,6 +169,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
+
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
@@ -184,9 +186,9 @@
 
 					const dist = position.distance( clickPosition );
 					const direction = position.sub( clickPosition ).normalize();
-					const distArea = float( 7 ).sub( dist ).max( 0 );
+					const distArea = float( 6 ).sub( dist ).max( 0 );
 
-					const power = distArea.mul( .1 );
+					const power = distArea.mul( .01 );
 					const relativePower = power.mul( instanceIndex.hash().mul( .5 ).add( .5 ) );
 
 					velocity.assign( velocity.add( direction.mul( relativePower ) ) );
@@ -195,7 +197,7 @@
 
 				//
 
-				function onHit( event ) {
+				function onMove( event ) {
 
 					pointer.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
 
@@ -222,14 +224,14 @@
 
 				// events
 
-				renderer.domElement.addEventListener( 'pointerdown', onHit );
+				renderer.domElement.addEventListener( 'pointermove', onMove );
 
 				//
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 5;
-				controls.maxDistance = 70;
-				controls.target.set( 0, - 1, 0 );
+				controls.maxDistance = 200;
+				controls.target.set( 0, 0, 0 );
 				controls.update();
 
 				//

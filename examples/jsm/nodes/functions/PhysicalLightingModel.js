@@ -371,7 +371,7 @@ class PhysicalLightingModel extends LightingModel {
 				f90: clearcoatF90
 			} );
 
-			const clearcoatLight = outgoingLight.mul( clearcoat.mul( Fcc ).oneMinus() ).add( this.clearcoatSpecularDirect, this.clearcoatSpecularIndirect ).mul( clearcoat );
+			const clearcoatLight = outgoingLight.mul( clearcoat.mul( Fcc ).oneMinus() ).add( this.clearcoatSpecularDirect.add( this.clearcoatSpecularIndirect ).mul( clearcoat ) );
 
 			outgoingLight.assign( clearcoatLight );
 

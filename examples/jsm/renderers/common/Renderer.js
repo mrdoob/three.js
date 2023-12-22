@@ -298,6 +298,7 @@ class Renderer {
 			renderContext.depthTexture = renderTargetData.depthTexture;
 			renderContext.width = renderTargetData.width;
 			renderContext.height = renderTargetData.height;
+			renderContext.renderTarget = renderTarget;
 
 		} else {
 
@@ -349,6 +350,12 @@ class Renderer {
 		//
 
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
+
+	}
+
+	getMaxAnisotropy() {
+
+		return this.backend.getMaxAnisotropy();
 
 	}
 
@@ -935,13 +942,31 @@ class Renderer {
 
 	renderObject( object, scene, camera, geometry, material, group, lightsNode ) {
 
-		material = scene.overrideMaterial !== null ? scene.overrideMaterial : material;
+		let overridePositionNode;
 
 		//
 
 		object.onBeforeRender( this, scene, camera, geometry, material, group );
 
 		material.onBeforeRender( this, scene, camera, geometry, material, group );
+
+		//
+
+		if ( scene.overrideMaterial !== null ) {
+
+			const overrideMaterial = scene.overrideMaterial;
+
+			if ( material.positionNode && material.positionNode.isNode ) {
+
+				overridePositionNode = overrideMaterial.positionNode;
+
+				overrideMaterial.positionNode = material.positionNode;
+
+			}
+
+			material = overrideMaterial;
+
+		}
 
 		//
 
@@ -958,6 +983,14 @@ class Renderer {
 		} else {
 
 			this._renderObjectDirect( object, material, scene, camera, lightsNode );
+
+		}
+
+		//
+
+		if ( overridePositionNode !== undefined ) {
+
+			scene.overrideMaterial.positionNode = overridePositionNode;
 
 		}
 

@@ -27,9 +27,14 @@ class CubeTextureNode extends TextureNode {
 
 	setUpdateMatrix( /*updateMatrix*/ ) { } // Ignore .updateMatrix for CubeTextureNode
 
-	generateUV( builder, uvNode ) {
+	setupUV( builder, uvNode ) {
 
-		const cubeUV = vec3( uvNode.x.negate(), uvNode.yz );
+		return vec3( uvNode.x.negate(), uvNode.yz );
+
+	}
+
+	generateUV( builder, cubeUV ) {
+
 		return cubeUV.build( builder, 'vec3' );
 
 	}
