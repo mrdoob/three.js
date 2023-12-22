@@ -71,10 +71,10 @@ class Timer {
 
 	}
 
-	update() {
+	update( timestamp ) {
 
 		this._previousTime = this._currentTime;
-		this._currentTime = now() - this._startTime;
+		this._currentTime = ( timestamp !== undefined ? timestamp : now() ) - this._startTime;
 
 		this._delta = ( this._currentTime - this._previousTime ) * this._timescale;
 		this._elapsed += this._delta; // _elapsed is the accumulation of all previous deltas
