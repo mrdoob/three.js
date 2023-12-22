@@ -376,7 +376,7 @@ class OrbitControls extends EventDispatcher {
 
 					scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom / scale ) );
 					scope.object.updateProjectionMatrix();
-					zoomChanged = true;
+					zoomChanged = scale != 1;
 
 				}
 
