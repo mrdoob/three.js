@@ -123,10 +123,10 @@ export class LUTCubeLoader extends Loader {
 
 		while ( ( result = regExpDataPoints.exec( input ) ) !== null ) {
 
-			data[ i++ ] = Number( result[ 1 ] ) * scale;
-			data[ i++ ] = Number( result[ 2 ] ) * scale;
-			data[ i++ ] = Number( result[ 3 ] ) * scale;
-			data[ i++ ] = scale;
+			data[ i ++ ] = Number( result[ 1 ] ) * scale;
+			data[ i ++ ] = Number( result[ 2 ] ) * scale;
+			data[ i ++ ] = Number( result[ 3 ] ) * scale;
+			data[ i ++ ] = scale;
 
 		}
 

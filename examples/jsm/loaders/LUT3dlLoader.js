@@ -82,12 +82,12 @@ export class LUT3dlLoader extends Loader {
 
 		}
 
-		const gridLines = result[ 0 ].trim().split( /\s+/g ).map(Number);
+		const gridLines = result[ 0 ].trim().split( /\s+/g ).map( Number );
 		const gridStep = gridLines[ 1 ] - gridLines[ 0 ];
 		const size = gridLines.length;
 		const sizeSq = size ** 2;
 
-		for ( let i = 1, l = gridLines.length; i < l; ++i ) {
+		for ( let i = 1, l = gridLines.length; i < l; ++ i ) {
 
 			if ( gridStep !== ( gridLines[ i ] - gridLines[ i - 1 ] ) ) {
 
@@ -119,7 +119,7 @@ export class LUT3dlLoader extends Loader {
 			dataFloat[ d4 + 1 ] = g;
 			dataFloat[ d4 + 2 ] = b;
 
-			++index;
+			++ index;
 
 		}
 
