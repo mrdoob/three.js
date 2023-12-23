@@ -141,6 +141,20 @@ class MaterialXLoader extends Loader {
 
 	load( url, onLoad, onProgress, onError ) {
 
+		const _onError = function ( e ) {
+
+			if ( onError ) {
+
+				onError( e );
+
+			} else {
+
+				console.error( e );
+
+			}
+
+		};
+
 		new FileLoader( this.manager )
 			.setPath( this.path )
 			.load( url, async ( text ) => {
@@ -151,11 +165,11 @@ class MaterialXLoader extends Loader {
 
 				} catch ( e ) {
 
-					onError( e );
+					_onError( e );
 
 				}
 
-			}, onProgress, onError );
+			}, onProgress, _onError );
 
 		return this;
 
