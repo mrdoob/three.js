@@ -312,7 +312,17 @@ class MaterialXNode {
 
 		const filePrefix = this.getRecursiveAttribute( 'fileprefix' ) || '';
 
-		const texture = this.materialX.textureLoader.load( filePrefix + this.value );
+		let loader = this.materialX.textureLoader;
+		const uri = filePrefix + this.value;
+
+		if ( uri ) {
+
+			const handler = this.materialX.manager.getHandler( uri );
+			if ( handler !== null ) loader = handler;
+
+		}
+
+		const texture = loader.load( uri );
 		texture.wrapS = texture.wrapT = RepeatWrapping;
 		texture.flipY = false;
 
