@@ -368,6 +368,8 @@
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
 				"KTX2Loader": "examples/en/loaders/KTX2Loader",
 				"LDrawLoader": "examples/en/loaders/LDrawLoader",
+				"LUT3dlLoader": "examples/en/loaders/LUT3dlLoader",
+				"LUTCubeLoader": "examples/en/loaders/LUTCubeLoader",
 				"MMDLoader": "examples/en/loaders/MMDLoader",
 				"MTLLoader": "examples/en/loaders/MTLLoader",
 				"OBJLoader": "examples/en/loaders/OBJLoader",
