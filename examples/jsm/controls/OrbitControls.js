@@ -374,7 +374,7 @@ class OrbitControls extends EventDispatcher {
 
 				} else if ( scope.object.isOrthographicCamera ) {
 					
-					zoomChanged = scale != 1;
+					zoomChanged = scale !== 1;
 
 					if ( zoomChanged ) {
 
