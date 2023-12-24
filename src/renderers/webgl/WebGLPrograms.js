@@ -300,7 +300,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			fog: !! fog,
 			useFog: material.fog === true,
-			fogExp2: ( fog && fog.isFogExp2 ),
+			fogExp2: ( !! fog && fog.isFogExp2 ),
 
 			flatShading: material.flatShading === true,
 
