@@ -1058,6 +1058,16 @@ class OrbitControls extends EventDispatcher {
 
 			state = STATE.NONE;
 
+			if ( pointers.length == 1 ) {
+
+				const pointerId = pointers[ 0 ];
+				const position = pointerPositions[ pointerId ];
+
+				// minimal placeholder event - allows state correction on pointer-up
+				onTouchStart( { pointerId: pointerId, pageX: position.x, pageY: position.y } );
+
+			}
+
 		}
 
 		function onMouseDown( event ) {
