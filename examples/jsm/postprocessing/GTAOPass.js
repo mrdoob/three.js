@@ -61,7 +61,7 @@ class GTAOPass extends Pass {
 			depthTest: false,
 			depthWrite: false,
 		} );
-		this.gtaoMaterial.definesPERSPECTIVE_CAMERA = this.camera.isPerspectiveCamera ? 1 : 0;
+		this.gtaoMaterial.defines.PERSPECTIVE_CAMERA = this.camera.isPerspectiveCamera ? 1 : 0;
 		this.gtaoMaterial.uniforms.tNoise.value = this.gtaoNoiseTexture;
 		this.gtaoMaterial.uniforms.resolution.value.set( this.width, this.height );
 		this.gtaoMaterial.uniforms.cameraNear.value = this.camera.near;
