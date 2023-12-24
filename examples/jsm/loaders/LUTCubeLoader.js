@@ -26,7 +26,7 @@ export class LUTCubeLoader extends Loader {
 
 		if ( type !== UnsignedByteType && type !== FloatType ) {
 
-			throw new Error( 'Unsupported type' );
+			throw new Error( 'LUTCubeLoader: Unsupported type' );
 
 		}
 
@@ -82,7 +82,7 @@ export class LUTCubeLoader extends Loader {
 
 		if ( result === null ) {
 
-			throw new Error( 'Missing LUT_3D_SIZE information' );
+			throw new Error( 'LUTCubeLoader: Missing LUT_3D_SIZE information' );
 
 		}
 
@@ -114,7 +114,7 @@ export class LUTCubeLoader extends Loader {
 			domainMin.set( 0, 0, 0 );
 			domainMax.set( 1, 1, 1 );
 
-			throw new Error( 'Invalid input domain' );
+			throw new Error( 'LUTCubeLoader: Invalid input domain' );
 
 		}
 

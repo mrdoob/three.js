@@ -27,7 +27,7 @@ export class LUT3dlLoader extends Loader {
 
 		if ( type !== UnsignedByteType && type !== FloatType ) {
 
-			throw new Error( 'Unsupported type' );
+			throw new Error( 'LUT3dlLoader: Unsupported type' );
 
 		}
 
@@ -78,7 +78,7 @@ export class LUT3dlLoader extends Loader {
 
 		if ( result === null ) {
 
-			throw new Error( 'Missing grid information' );
+			throw new Error( 'LUT3dlLoader: Missing grid information' );
 
 		}
 
@@ -91,7 +91,7 @@ export class LUT3dlLoader extends Loader {
 
 			if ( gridStep !== ( gridLines[ i ] - gridLines[ i - 1 ] ) ) {
 
-				throw new Error( 'Inconsistent grid size' );
+				throw new Error( 'LUT3dlLoader: Inconsistent grid size' );
 
 			}
 
