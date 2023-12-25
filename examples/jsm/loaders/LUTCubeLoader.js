@@ -111,9 +111,6 @@ export class LUTCubeLoader extends Loader {
 
 		if ( domainMin.x > domainMax.x || domainMin.y > domainMax.y || domainMin.z > domainMax.z ) {
 
-			domainMin.set( 0, 0, 0 );
-			domainMax.set( 1, 1, 1 );
-
 			throw new Error( 'LUTCubeLoader: Invalid input domain' );
 
 		}
