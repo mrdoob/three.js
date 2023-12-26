@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Visualizes an object's vertex tangents.
+			Requires that tangents have been specified in a [page:BufferAttribute custom attribute] or
+			have been calculated using [page:BufferGeometry.computeTangents computeTangents].<br /><br />
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { VertexTangentsHelper } from 'three/addons/helpers/VertexTangentsHelper.js';
+		</code>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const geometry = new THREE.BoxGeometry( 10, 10, 10, 2, 2, 2 );
+		const material = new THREE.MeshStandardMaterial();
+		const mesh = new THREE.Mesh( geometry, material );
+
+		const helper = new VertexTangentsHelper( mesh, 1, 0x00ffff );
+
+		scene.add( mesh );
+		scene.add( helper );
+		</code>
+
+		<h2>Examples</h2>
+		<p>
+			[example:webgl_helpers WebGL / helpers]
+		</p>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:Object3D object], [param:Number size], [param:Hex color] )</h3>
+		<p>
+			[page:Object3D object] -- object for which to render vertex tangents.<br />
+			[page:Number size] -- (optional) length of the arrows. Default is *1*.<br />
+			[page:Hex color] -- (optional) hex color of the arrows. Default is *0x00ffff*.
+		</p>
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:LineSegments] class for common properties.</p>
+
+		<h3>[property:Object matrixAutoUpdate]</h3>
+		<p>
+			See [page:Object3D.matrixAutoUpdate]. Set to `false` here as the helper is using the
+			object's [page:Object3D.matrixWorld matrixWorld].
+		</p>
+
+		<h3>[property:Object3D object]</h3>
+		<p>The object for which the vertex tangents are being visualized.</p>
+
+		<h3>[property:Number size]</h3>
+		<p>Length of the arrows. Default is *1*.</p>
+
+
+		<h2>Methods</h2>
+		<p>See the base [page:LineSegments] class for common methods.</p>
+
+
+		<h3>[method:undefined update]()</h3>
+		<p>Updates the vertex tangents preview based on the object's world transform.</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/helpers/VertexTangentsHelper.js examples/jsm/helpers/VertexTangentsHelper.js]
+		</p>
+	</body>
+</html>
