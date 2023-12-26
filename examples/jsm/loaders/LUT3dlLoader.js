@@ -136,7 +136,7 @@ export class LUT3dlLoader extends Loader {
 			const i2 = i + 2;
 			const i3 = i + 3;
 
-			// Note: data is dataFloat when convertToUint8 is true
+			// Note: data is dataFloat when type is FloatType.
 			data[ i ] = dataFloat[ i ] / maxBitValue * scale;
 			data[ i1 ] = dataFloat[ i1 ] / maxBitValue * scale;
 			data[ i2 ] = dataFloat[ i2 ] / maxBitValue * scale;
