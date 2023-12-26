@@ -186,7 +186,7 @@ class WebGPUBackend extends Backend {
 		const depthStencilAttachment = descriptor.depthStencilAttachment;
 
 		const antialias = this.parameters.antialias;
-		
+
 		if ( renderContext.textures !== null ) {
 
 			const textures = renderContext.textures;
