@@ -30,6 +30,7 @@ class Renderer {
 
 		const {
 			logarithmicDepthBuffer = false,
+			alpha = true
 		} = parameters;
 
 		// public
@@ -42,6 +43,8 @@ class Renderer {
 		this.autoClearColor = true;
 		this.autoClearDepth = true;
 		this.autoClearStencil = true;
+
+		this.alpha = alpha;
 
 		this.logarithmicDepthBuffer = logarithmicDepthBuffer;
 
@@ -85,7 +88,10 @@ class Renderer {
 		this._opaqueSort = null;
 		this._transparentSort = null;
 
-		this._clearColor = new Color4( 0x000000 );
+
+		const alphaClear = this.alpha === true ? 0 : 1;
+
+		this._clearColor = new Color4( 0, 0, 0, alphaClear );
 		this._clearDepth = 1;
 		this._clearStencil = 0;
 
