@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { nodeObject, addNodeElement, tslFn, float, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { nodeObject, addNodeElement, tslFn, float, vec2, vec4 } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { mul } from '../math/OperatorNode.js';
 import { uv } from '../accessors/UVNode.js';
@@ -109,7 +109,7 @@ class GaussianBlurNode extends TempNode {
 			const direction = vec2( this.directionNode ).mul( this._passDirection );
 
 			const weightSum = float( gaussianCoefficients[ 0 ] ).toVar();
-			const diffuseSum = vec3( sampleTexture( uvNode ).mul( weightSum ) ).toVar();
+			const diffuseSum = vec4( sampleTexture( uvNode ).mul( weightSum ) ).toVar();
 
 			for ( let i = 1; i < kernelSize; i ++ ) {
 
@@ -118,15 +118,15 @@ class GaussianBlurNode extends TempNode {
 
 				const uvOffset = vec2( direction.mul( invSize.mul( x ) ) ).toVar();
 
-				const sample1 = vec3( sampleTexture( uvNode.add( uvOffset ) ) );
-				const sample2 = vec3( sampleTexture( uvNode.sub( uvOffset ) ) );
+				const sample1 = vec4( sampleTexture( uvNode.add( uvOffset ) ) );
+				const sample2 = vec4( sampleTexture( uvNode.sub( uvOffset ) ) );
 
 				diffuseSum.addAssign( sample1.add( sample2 ).mul( w ) );
 				weightSum.addAssign( mul( 2.0, w ) );
 
 			}
 
-			return vec4( diffuseSum.div( weightSum ), 1.0 );
+			return diffuseSum.div( weightSum );
 
 		} );
 
