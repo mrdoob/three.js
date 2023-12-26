@@ -1,6 +1,9 @@
 {
+
 	"en": {
+
 		"Manual": {
+
 			"Getting Started": {
 				"Installation": "manual/en/introduction/Installation",
 				"Creating a scene": "manual/en/introduction/Creating-a-scene",
@@ -12,6 +15,7 @@
 				"FAQ": "manual/en/introduction/FAQ",
 				"Useful links": "manual/en/introduction/Useful-links"
 			},
+
 			"Next Steps": {
 				"Updating resources": "manual/en/introduction/How-to-update-things",
 				"Disposing resources": "manual/en/introduction/How-to-dispose-of-objects",
@@ -21,8 +25,11 @@
 				"Animation system": "manual/en/introduction/Animation-system",
 				"Color management": "manual/en/introduction/Color-management"
 			}
+
 		},
+
 		"Reference": {
+
 			"Animation": {
 				"AnimationAction": "api/en/animation/AnimationAction",
 				"AnimationClip": "api/en/animation/AnimationClip",
@@ -33,6 +40,7 @@
 				"PropertyBinding": "api/en/animation/PropertyBinding",
 				"PropertyMixer": "api/en/animation/PropertyMixer"
 			},
+
 			"Animation / Tracks": {
 				"BooleanKeyframeTrack": "api/en/animation/tracks/BooleanKeyframeTrack",
 				"ColorKeyframeTrack": "api/en/animation/tracks/ColorKeyframeTrack",
@@ -41,6 +49,7 @@
 				"StringKeyframeTrack": "api/en/animation/tracks/StringKeyframeTrack",
 				"VectorKeyframeTrack": "api/en/animation/tracks/VectorKeyframeTrack"
 			},
+
 			"Audio": {
 				"Audio": "api/en/audio/Audio",
 				"AudioAnalyser": "api/en/audio/AudioAnalyser",
@@ -48,6 +57,7 @@
 				"AudioListener": "api/en/audio/AudioListener",
 				"PositionalAudio": "api/en/audio/PositionalAudio"
 			},
+
 			"Cameras": {
 				"ArrayCamera": "api/en/cameras/ArrayCamera",
 				"Camera": "api/en/cameras/Camera",
@@ -56,6 +66,7 @@
 				"PerspectiveCamera": "api/en/cameras/PerspectiveCamera",
 				"StereoCamera": "api/en/cameras/StereoCamera"
 			},
+
 			"Constants": {
 				"Animation": "api/en/constants/Animation",
 				"Core": "api/en/constants/Core",
@@ -65,6 +76,7 @@
 				"Renderer": "api/en/constants/Renderer",
 				"Textures": "api/en/constants/Textures"
 			},
+
 			"Core": {
 				"BufferAttribute": "api/en/core/BufferAttribute",
 				"BufferGeometry": "api/en/core/BufferGeometry",
@@ -81,9 +93,11 @@
 				"Raycaster": "api/en/core/Raycaster",
 				"Uniform": "api/en/core/Uniform"
 			},
+
 			"Core / BufferAttributes": {
 				"BufferAttribute Types": "api/en/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
+
 			"Extras": {
 				"DataUtils": "api/en/extras/DataUtils",
 				"Earcut": "api/en/extras/Earcut",
@@ -91,6 +105,7 @@
 				"PMREMGenerator": "api/en/extras/PMREMGenerator",
 				"ShapeUtils": "api/en/extras/ShapeUtils"
 			},
+
 			"Extras / Core": {
 				"Curve": "api/en/extras/core/Curve",
 				"CurvePath": "api/en/extras/core/CurvePath",
@@ -99,6 +114,7 @@
 				"Shape": "api/en/extras/core/Shape",
 				"ShapePath": "api/en/extras/core/ShapePath"
 			},
+
 			"Extras / Curves": {
 				"ArcCurve": "api/en/extras/curves/ArcCurve",
 				"CatmullRomCurve3": "api/en/extras/curves/CatmullRomCurve3",
@@ -111,6 +127,7 @@
 				"QuadraticBezierCurve3": "api/en/extras/curves/QuadraticBezierCurve3",
 				"SplineCurve": "api/en/extras/curves/SplineCurve"
 			},
+
 			"Geometries": {
 				"BoxGeometry": "api/en/geometries/BoxGeometry",
 				"CapsuleGeometry": "api/en/geometries/CapsuleGeometry",
@@ -134,6 +151,7 @@
 				"TubeGeometry": "api/en/geometries/TubeGeometry",
 				"WireframeGeometry": "api/en/geometries/WireframeGeometry"
 			},
+
 			"Helpers": {
 				"ArrowHelper": "api/en/helpers/ArrowHelper",
 				"AxesHelper": "api/en/helpers/AxesHelper",
@@ -149,6 +167,7 @@
 				"SkeletonHelper": "api/en/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/en/helpers/SpotLightHelper"
 			},
+
 			"Lights": {
 				"AmbientLight": "api/en/lights/AmbientLight",
 				"DirectionalLight": "api/en/lights/DirectionalLight",
@@ -159,12 +178,14 @@
 				"RectAreaLight": "api/en/lights/RectAreaLight",
 				"SpotLight": "api/en/lights/SpotLight"
 			},
+
 			"Lights / Shadows": {
 				"LightShadow": "api/en/lights/shadows/LightShadow",
 				"PointLightShadow": "api/en/lights/shadows/PointLightShadow",
 				"DirectionalLightShadow": "api/en/lights/shadows/DirectionalLightShadow",
 				"SpotLightShadow": "api/en/lights/shadows/SpotLightShadow"
 			},
+
 			"Loaders": {
 				"AnimationLoader": "api/en/loaders/AnimationLoader",
 				"AudioLoader": "api/en/loaders/AudioLoader",
@@ -182,10 +203,12 @@
 				"ObjectLoader": "api/en/loaders/ObjectLoader",
 				"TextureLoader": "api/en/loaders/TextureLoader"
 			},
+
 			"Loaders / Managers": {
 				"DefaultLoadingManager": "api/en/loaders/managers/DefaultLoadingManager",
 				"LoadingManager": "api/en/loaders/managers/LoadingManager"
 			},
+
 			"Materials": {
 				"LineBasicMaterial": "api/en/materials/LineBasicMaterial",
 				"LineDashedMaterial": "api/en/materials/LineDashedMaterial",
@@ -206,6 +229,7 @@
 				"ShadowMaterial": "api/en/materials/ShadowMaterial",
 				"SpriteMaterial": "api/en/materials/SpriteMaterial"
 			},
+
 			"Math": {
 				"Box2": "api/en/math/Box2",
 				"Box3": "api/en/math/Box3",
@@ -229,12 +253,14 @@
 				"Vector3": "api/en/math/Vector3",
 				"Vector4": "api/en/math/Vector4"
 			},
+
 			"Math / Interpolants": {
 				"CubicInterpolant": "api/en/math/interpolants/CubicInterpolant",
 				"DiscreteInterpolant": "api/en/math/interpolants/DiscreteInterpolant",
 				"LinearInterpolant": "api/en/math/interpolants/LinearInterpolant",
 				"QuaternionLinearInterpolant": "api/en/math/interpolants/QuaternionLinearInterpolant"
 			},
+
 			"Objects": {
 				"BatchedMesh": "api/en/objects/BatchedMesh",
 				"Bone": "api/en/objects/Bone",
@@ -250,6 +276,7 @@
 				"SkinnedMesh": "api/en/objects/SkinnedMesh",
 				"Sprite": "api/en/objects/Sprite"
 			},
+
 			"Renderers": {
 				"WebGLMultipleRenderTargets": "api/en/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
@@ -259,20 +286,24 @@
 				"WebGLArrayRenderTarget": "api/en/renderers/WebGLArrayRenderTarget",
 				"WebGLCubeRenderTarget": "api/en/renderers/WebGLCubeRenderTarget"
 			},
+
 			"Renderers / Shaders": {
 				"ShaderChunk": "api/en/renderers/shaders/ShaderChunk",
 				"ShaderLib": "api/en/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/en/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/en/renderers/shaders/UniformsUtils"
 			},
+
 			"Renderers / WebXR": {
 				"WebXRManager": "api/en/renderers/webxr/WebXRManager"
 			},
+
 			"Scenes": {
 				"Fog": "api/en/scenes/Fog",
 				"FogExp2": "api/en/scenes/FogExp2",
 				"Scene": "api/en/scenes/Scene"
 			},
+
 			"Textures": {
 				"CanvasTexture": "api/en/textures/CanvasTexture",
 				"CompressedTexture": "api/en/textures/CompressedTexture",
@@ -287,13 +318,17 @@
 				"Texture": "api/en/textures/Texture",
 				"VideoTexture": "api/en/textures/VideoTexture"
 			}
+
 		},
+
 		"Addons": {
+
 			"Animations": {
 				"CCDIKSolver": "examples/en/animations/CCDIKSolver",
 				"MMDAnimationHelper": "examples/en/animations/MMDAnimationHelper",
 				"MMDPhysics": "examples/en/animations/MMDPhysics"
 			},
+
 			"Controls": {
 				"ArcballControls": "examples/en/controls/ArcballControls",
 				"DragControls": "examples/en/controls/DragControls",
@@ -305,6 +340,7 @@
 				"TrackballControls": "examples/en/controls/TrackballControls",
 				"TransformControls": "examples/en/controls/TransformControls"
 			},
+
 			"Geometries": {
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/en/geometries/DecalGeometry",
@@ -312,6 +348,7 @@
 				"TextGeometry": "examples/en/geometries/TextGeometry",
 				"SDFGeometryGenerator": "examples/en/geometries/SDFGeometryGenerator"
 			},
+
 			"Helpers": {
 				"LightProbeHelper": "examples/en/helpers/LightProbeHelper",
 				"PositionalAudioHelper": "examples/en/helpers/PositionalAudioHelper",
@@ -319,9 +356,11 @@
 				"VertexNormalsHelper": "examples/en/helpers/VertexNormalsHelper",
 				"VertexTangentsHelper": "examples/en/helpers/VertexTangentsHelper"
 			},
+
 			"Lights": {
 				"LightProbeGenerator": "examples/en/lights/LightProbeGenerator"
 			},
+
 			"Loaders": {
 				"3DMLoader": "examples/en/loaders/3DMLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
@@ -337,12 +376,15 @@
 				"SVGLoader": "examples/en/loaders/SVGLoader",
 				"TGALoader": "examples/en/loaders/TGALoader"
 			},
+
 			"Objects": {
 				"Lensflare": "examples/en/objects/Lensflare"
 			},
+
 			"Post-Processing": {
 				"EffectComposer": "examples/en/postprocessing/EffectComposer"
 			},
+
 			"Exporters": {
 				"DRACOExporter": "examples/en/exporters/DRACOExporter",
 				"EXRExporter": "examples/en/exporters/EXRExporter",
@@ -351,14 +393,17 @@
 				"PLYExporter": "examples/en/exporters/PLYExporter",
 				"STLExporter": "examples/en/exporters/STLExporter"
 			},
+
 			"Math": {
 				"LookupTable": "examples/en/math/Lut",
 				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler",
 				"OBB": "examples/en/math/OBB"
 			},
+
 			"Misc": {
 				"Timer": "examples/en/misc/Timer"
 			},
+
 			"ConvexHull": {
 				"Face": "examples/en/math/convexhull/Face",
 				"HalfEdge": "examples/en/math/convexhull/HalfEdge",
@@ -366,29 +411,41 @@
 				"VertexNode": "examples/en/math/convexhull/VertexNode",
 				"VertexList": "examples/en/math/convexhull/VertexList"
 			},
+
 			"Renderers": {
 				"CSS2DRenderer": "examples/en/renderers/CSS2DRenderer",
 				"CSS3DRenderer": "examples/en/renderers/CSS3DRenderer",
 				"SVGRenderer": "examples/en/renderers/SVGRenderer"
+
 			},
+
 			"Utils": {
 				"BufferGeometryUtils": "examples/en/utils/BufferGeometryUtils",
 				"CameraUtils": "examples/en/utils/CameraUtils",
 				"SceneUtils": "examples/en/utils/SceneUtils",
 				"SkeletonUtils": "examples/en/utils/SkeletonUtils"
 			},
+			
 			"WebXR": {
 				"XREstimatedLight": "examples/en/webxr/XREstimatedLight"
 			}
+
 		},
+
 		"Developer Reference": {
+
 			"WebGLRenderer": {
 				"WebGLProgram": "api/en/renderers/webgl/WebGLProgram"
 			}
+
 		}
+
 	},
+
 	"ar": {
+
 		"الكتيب": {
+
 			"البدء": {
 				"التثبيت": "manual/ar/introduction/Installation",
 				"إنشاء مشهد": "manual/ar/introduction/Creating-a-scene",
@@ -400,6 +457,7 @@
 				"الأسئلة الشائعة": "manual/ar/introduction/FAQ",
 				"روابط مفيدة": "manual/ar/introduction/Useful-links"
 			},
+
 			"الخطوات التالية": {
 				"كيفية تحديث الأشياء": "manual/ar/introduction/How-to-update-things",
 				"كيفية التخلص من الأشياء": "manual/ar/introduction/How-to-dispose-of-objects",
@@ -408,8 +466,11 @@
 				"تحولات المصفوفة (Matrix transformations)": "manual/ar/introduction/Matrix-transformations",
 				"نظام الحركات": "manual/ar/introduction/Animation-system"
 			}
+
 		},
+
 		"المرجع": {
+
 			"الحركات": {
 				"AnimationAction": "api/ar/animation/AnimationAction",
 				"AnimationClip": "api/ar/animation/AnimationClip",
@@ -420,6 +481,7 @@
 				"PropertyBinding": "api/ar/animation/PropertyBinding",
 				"PropertyMixer": "api/ar/animation/PropertyMixer"
 			},
+
 			"الحركات / Tracks": {
 				"BooleanKeyframeTrack": "api/ar/animation/tracks/BooleanKeyframeTrack",
 				"ColorKeyframeTrack": "api/ar/animation/tracks/ColorKeyframeTrack",
@@ -428,6 +490,7 @@
 				"StringKeyframeTrack": "api/ar/animation/tracks/StringKeyframeTrack",
 				"VectorKeyframeTrack": "api/ar/animation/tracks/VectorKeyframeTrack"
 			},
+
 			"Audio": {
 				"Audio": "api/ar/audio/Audio",
 				"AudioAnalyser": "api/ar/audio/AudioAnalyser",
@@ -435,6 +498,7 @@
 				"AudioListener": "api/ar/audio/AudioListener",
 				"PositionalAudio": "api/ar/audio/PositionalAudio"
 			},
+
 			"Cameras": {
 				"ArrayCamera": "api/ar/cameras/ArrayCamera",
 				"Camera": "api/ar/cameras/Camera",
@@ -443,6 +507,7 @@
 				"PerspectiveCamera": "api/ar/cameras/PerspectiveCamera",
 				"StereoCamera": "api/ar/cameras/StereoCamera"
 			},
+
 			"Constants": {
 				"Animation": "api/ar/constants/Animation",
 				"Core": "api/ar/constants/Core",
@@ -452,6 +517,7 @@
 				"Renderer": "api/ar/constants/Renderer",
 				"Textures": "api/ar/constants/Textures"
 			},
+
 			"Core": {
 				"BufferAttribute": "api/ar/core/BufferAttribute",
 				"BufferGeometry": "api/ar/core/BufferGeometry",
@@ -468,9 +534,11 @@
 				"Raycaster": "api/ar/core/Raycaster",
 				"Uniform": "api/ar/core/Uniform"
 			},
+
 			"Core / BufferAttributes": {
 				"BufferAttribute Types": "api/ar/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
+
 			"Extras": {
 				"DataUtils": "api/ar/extras/DataUtils",
 				"Earcut": "api/ar/extras/Earcut",
@@ -478,6 +546,7 @@
 				"PMREMGenerator": "api/ar/extras/PMREMGenerator",
 				"ShapeUtils": "api/ar/extras/ShapeUtils"
 			},
+
 			"Extras / Core": {
 				"Curve": "api/ar/extras/core/Curve",
 				"CurvePath": "api/ar/extras/core/CurvePath",
@@ -486,6 +555,7 @@
 				"Shape": "api/ar/extras/core/Shape",
 				"ShapePath": "api/ar/extras/core/ShapePath"
 			},
+
 			"Extras / Curves": {
 				"ArcCurve": "api/ar/extras/curves/ArcCurve",
 				"CatmullRomCurve3": "api/ar/extras/curves/CatmullRomCurve3",
@@ -498,6 +568,7 @@
 				"QuadraticBezierCurve3": "api/ar/extras/curves/QuadraticBezierCurve3",
 				"SplineCurve": "api/ar/extras/curves/SplineCurve"
 			},
+
 			"Geometries": {
 				"BoxGeometry": "api/ar/geometries/BoxGeometry",
 				"CapsuleGeometry": "api/ar/geometries/CapsuleGeometry",
@@ -521,6 +592,7 @@
 				"TubeGeometry": "api/ar/geometries/TubeGeometry",
 				"WireframeGeometry": "api/ar/geometries/WireframeGeometry"
 			},
+
 			"Helpers": {
 				"ArrowHelper": "api/ar/helpers/ArrowHelper",
 				"AxesHelper": "api/ar/helpers/AxesHelper",
@@ -536,6 +608,7 @@
 				"SkeletonHelper": "api/ar/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/ar/helpers/SpotLightHelper"
 			},
+
 			"Lights": {
 				"AmbientLight": "api/ar/lights/AmbientLight",
 				"DirectionalLight": "api/ar/lights/DirectionalLight",
@@ -546,12 +619,14 @@
 				"RectAreaLight": "api/ar/lights/RectAreaLight",
 				"SpotLight": "api/ar/lights/SpotLight"
 			},
+
 			"Lights / Shadows": {
 				"LightShadow": "api/ar/lights/shadows/LightShadow",
 				"PointLightShadow": "api/ar/lights/shadows/PointLightShadow",
 				"DirectionalLightShadow": "api/ar/lights/shadows/DirectionalLightShadow",
 				"SpotLightShadow": "api/ar/lights/shadows/SpotLightShadow"
 			},
+
 			"Loaders": {
 				"AnimationLoader": "api/ar/loaders/AnimationLoader",
 				"AudioLoader": "api/ar/loaders/AudioLoader",
@@ -569,10 +644,12 @@
 				"ObjectLoader": "api/ar/loaders/ObjectLoader",
 				"TextureLoader": "api/ar/loaders/TextureLoader"
 			},
+
 			"Loaders / Managers": {
 				"DefaultLoadingManager": "api/ar/loaders/managers/DefaultLoadingManager",
 				"LoadingManager": "api/ar/loaders/managers/LoadingManager"
 			},
+
 			"Materials": {
 				"LineBasicMaterial": "api/ar/materials/LineBasicMaterial",
 				"LineDashedMaterial": "api/ar/materials/LineDashedMaterial",
@@ -593,6 +670,7 @@
 				"ShadowMaterial": "api/ar/materials/ShadowMaterial",
 				"SpriteMaterial": "api/ar/materials/SpriteMaterial"
 			},
+
 			"Math": {
 				"Box2": "api/ar/math/Box2",
 				"Box3": "api/ar/math/Box3",
@@ -616,12 +694,14 @@
 				"Vector3": "api/ar/math/Vector3",
 				"Vector4": "api/ar/math/Vector4"
 			},
+
 			"Math / Interpolants": {
 				"CubicInterpolant": "api/ar/math/interpolants/CubicInterpolant",
 				"DiscreteInterpolant": "api/ar/math/interpolants/DiscreteInterpolant",
 				"LinearInterpolant": "api/ar/math/interpolants/LinearInterpolant",
 				"QuaternionLinearInterpolant": "api/ar/math/interpolants/QuaternionLinearInterpolant"
 			},
+
 			"Objects": {
 				"Bone": "api/ar/objects/Bone",
 				"Group": "api/ar/objects/Group",
@@ -636,6 +716,7 @@
 				"SkinnedMesh": "api/ar/objects/SkinnedMesh",
 				"Sprite": "api/ar/objects/Sprite"
 			},
+
 			"Renderers": {
 				"WebGLMultipleRenderTargets": "api/ar/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/ar/renderers/WebGLRenderer",
@@ -645,24 +726,32 @@
 				"WebGLArrayRenderTarget": "api/ar/renderers/WebGLArrayRenderTarget",
 				"WebGLCubeRenderTarget": "api/ar/renderers/WebGLCubeRenderTarget"
 			},
+
 			"Renderers / Shaders": {
 				"ShaderChunk": "api/ar/renderers/shaders/ShaderChunk",
 				"ShaderLib": "api/ar/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/ar/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/ar/renderers/shaders/UniformsUtils"
 			},
+
 			"Renderers / WebXR": {
 				"WebXRManager": "api/ar/renderers/webxr/WebXRManager"
 			},
+
 			"Scenes": {
 				"Fog": "api/ar/scenes/Fog",
 				"FogExp2": "api/ar/scenes/FogExp2",
 				"Scene": "api/ar/scenes/Scene"
 			}
+
 		}
+
 	},
+
 	"zh": {
+
 		"手册": {
+
 			"起步": {
 				"安装": "manual/zh/introduction/Installation",
 				"创建一个场景": "manual/zh/introduction/Creating-a-scene",
@@ -674,6 +763,7 @@
 				"常见问题": "manual/zh/introduction/FAQ",
 				"一些有用的链接": "manual/zh/introduction/Useful-links"
 			},
+
 			"进阶": {
 				"如何更新场景": "manual/zh/introduction/How-to-update-things",
 				"如何废置对象": "manual/zh/introduction/How-to-dispose-of-objects",
@@ -683,8 +773,11 @@
 				"动画系统": "manual/zh/introduction/Animation-system",
 				"色彩管理": "manual/zh/introduction/Color-management"
 			}
+
 		},
+
 		"参考": {
+
 			"动画": {
 				"AnimationAction": "api/zh/animation/AnimationAction",
 				"AnimationClip": "api/zh/animation/AnimationClip",
@@ -695,6 +788,7 @@
 				"PropertyBinding": "api/zh/animation/PropertyBinding",
 				"PropertyMixer": "api/zh/animation/PropertyMixer"
 			},
+
 			"动画 / 轨道": {
 				"BooleanKeyframeTrack": "api/zh/animation/tracks/BooleanKeyframeTrack",
 				"ColorKeyframeTrack": "api/zh/animation/tracks/ColorKeyframeTrack",
@@ -703,6 +797,7 @@
 				"StringKeyframeTrack": "api/zh/animation/tracks/StringKeyframeTrack",
 				"VectorKeyframeTrack": "api/zh/animation/tracks/VectorKeyframeTrack"
 			},
+
 			"音频": {
 				"Audio": "api/zh/audio/Audio",
 				"AudioAnalyser": "api/zh/audio/AudioAnalyser",
@@ -710,6 +805,7 @@
 				"AudioListener": "api/zh/audio/AudioListener",
 				"PositionalAudio": "api/zh/audio/PositionalAudio"
 			},
+
 			"摄像机": {
 				"ArrayCamera": "api/zh/cameras/ArrayCamera",
 				"Camera": "api/zh/cameras/Camera",
@@ -718,6 +814,7 @@
 				"PerspectiveCamera": "api/zh/cameras/PerspectiveCamera",
 				"StereoCamera": "api/zh/cameras/StereoCamera"
 			},
+
 			"常量": {
 				"Animation": "api/zh/constants/Animation",
 				"Core": "api/zh/constants/Core",
@@ -727,6 +824,7 @@
 				"Renderer": "api/zh/constants/Renderer",
 				"Textures": "api/zh/constants/Textures"
 			},
+
 			"核心": {
 				"BufferAttribute": "api/zh/core/BufferAttribute",
 				"BufferGeometry": "api/zh/core/BufferGeometry",
@@ -743,9 +841,11 @@
 				"Raycaster": "api/zh/core/Raycaster",
 				"Uniform": "api/zh/core/Uniform"
 			},
+
 			"核心 / BufferAttributes": {
 				"BufferAttribute Types": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
+
 			"附件": {
 				"DataUtils": "api/zh/extras/DataUtils",
 				"Earcut": "api/zh/extras/Earcut",
@@ -753,6 +853,7 @@
 				"PMREMGenerator": "api/zh/extras/PMREMGenerator",
 				"ShapeUtils": "api/zh/extras/ShapeUtils"
 			},
+
 			"附件 / 核心": {
 				"Curve": "api/zh/extras/core/Curve",
 				"CurvePath": "api/zh/extras/core/CurvePath",
@@ -761,6 +862,7 @@
 				"Shape": "api/zh/extras/core/Shape",
 				"ShapePath": "api/zh/extras/core/ShapePath"
 			},
+
 			"附件 / 曲线": {
 				"ArcCurve": "api/zh/extras/curves/ArcCurve",
 				"CatmullRomCurve3": "api/zh/extras/curves/CatmullRomCurve3",
@@ -773,6 +875,7 @@
 				"QuadraticBezierCurve3": "api/zh/extras/curves/QuadraticBezierCurve3",
 				"SplineCurve": "api/zh/extras/curves/SplineCurve"
 			},
+
 			"几何体": {
 				"BoxGeometry": "api/zh/geometries/BoxGeometry",
 				"CapsuleGeometry": "api/zh/geometries/CapsuleGeometry",
@@ -796,6 +899,7 @@
 				"TubeGeometry": "api/zh/geometries/TubeGeometry",
 				"WireframeGeometry": "api/zh/geometries/WireframeGeometry"
 			},
+
 			"辅助对象": {
 				"ArrowHelper": "api/zh/helpers/ArrowHelper",
 				"AxesHelper": "api/zh/helpers/AxesHelper",
@@ -811,6 +915,7 @@
 				"SkeletonHelper": "api/zh/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/zh/helpers/SpotLightHelper"
 			},
+
 			"灯光": {
 				"AmbientLight": "api/zh/lights/AmbientLight",
 				"DirectionalLight": "api/zh/lights/DirectionalLight",
@@ -821,12 +926,14 @@
 				"RectAreaLight": "api/zh/lights/RectAreaLight",
 				"SpotLight": "api/zh/lights/SpotLight"
 			},
+
 			"灯光 / 阴影": {
 				"LightShadow": "api/zh/lights/shadows/LightShadow",
 				"PointLightShadow": "api/zh/lights/shadows/PointLightShadow",
 				"DirectionalLightShadow": "api/zh/lights/shadows/DirectionalLightShadow",
 				"SpotLightShadow": "api/zh/lights/shadows/SpotLightShadow"
 			},
+
 			"加载器": {
 				"AnimationLoader": "api/zh/loaders/AnimationLoader",
 				"AudioLoader": "api/zh/loaders/AudioLoader",
@@ -844,10 +951,12 @@
 				"ObjectLoader": "api/zh/loaders/ObjectLoader",
 				"TextureLoader": "api/zh/loaders/TextureLoader"
 			},
+
 			"加载器 / 管理器": {
 				"DefaultLoadingManager": "api/zh/loaders/managers/DefaultLoadingManager",
 				"LoadingManager": "api/zh/loaders/managers/LoadingManager"
 			},
+
 			"材质": {
 				"LineBasicMaterial": "api/zh/materials/LineBasicMaterial",
 				"LineDashedMaterial": "api/zh/materials/LineDashedMaterial",
@@ -868,6 +977,7 @@
 				"ShadowMaterial": "api/zh/materials/ShadowMaterial",
 				"SpriteMaterial": "api/zh/materials/SpriteMaterial"
 			},
+
 			"数学库": {
 				"Box2": "api/zh/math/Box2",
 				"Box3": "api/zh/math/Box3",
@@ -891,12 +1001,14 @@
 				"Vector3": "api/zh/math/Vector3",
 				"Vector4": "api/zh/math/Vector4"
 			},
+
 			"数学库 / 插值": {
 				"CubicInterpolant": "api/zh/math/interpolants/CubicInterpolant",
 				"DiscreteInterpolant": "api/zh/math/interpolants/DiscreteInterpolant",
 				"LinearInterpolant": "api/zh/math/interpolants/LinearInterpolant",
 				"QuaternionLinearInterpolant": "api/zh/math/interpolants/QuaternionLinearInterpolant"
 			},
+
 			"物体": {
 				"BatchedMesh": "api/zh/objects/BatchedMesh",
 				"Bone": "api/zh/objects/Bone",
@@ -912,6 +1024,7 @@
 				"SkinnedMesh": "api/zh/objects/SkinnedMesh",
 				"Sprite": "api/zh/objects/Sprite"
 			},
+
 			"渲染器": {
 				"WebGLMultipleRenderTargets": "api/zh/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
@@ -921,20 +1034,24 @@
 				"WebGLArrayRenderTarget": "api/zh/renderers/WebGLArrayRenderTarget",
 				"WebGLCubeRenderTarget": "api/zh/renderers/WebGLCubeRenderTarget"
 			},
+
 			"渲染器 / 着色器": {
 				"ShaderChunk": "api/zh/renderers/shaders/ShaderChunk",
 				"ShaderLib": "api/zh/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/zh/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/zh/renderers/shaders/UniformsUtils"
 			},
+
 			"渲染器 / WebXR": {
 				"WebXRManager": "api/zh/renderers/webxr/WebXRManager"
 			},
+
 			"场景": {
 				"Fog": "api/zh/scenes/Fog",
 				"FogExp2": "api/zh/scenes/FogExp2",
 				"Scene": "api/zh/scenes/Scene"
 			},
+
 			"纹理贴图": {
 				"CanvasTexture": "api/zh/textures/CanvasTexture",
 				"CompressedTexture": "api/zh/textures/CompressedTexture",
@@ -949,13 +1066,17 @@
 				"Texture": "api/zh/textures/Texture",
 				"VideoTexture": "api/zh/textures/VideoTexture"
 			}
+
 		},
+
 		"附加": {
+
 			"动画": {
 				"CCDIKSolver": "examples/zh/animations/CCDIKSolver",
 				"MMDAnimationHelper": "examples/zh/animations/MMDAnimationHelper",
 				"MMDPhysics": "examples/zh/animations/MMDPhysics"
 			},
+
 			"控制": {
 				"ArcballControls": "examples/zh/controls/ArcballControls",
 				"DragControls": "examples/zh/controls/DragControls",
@@ -967,6 +1088,7 @@
 				"TrackballControls": "examples/zh/controls/TrackballControls",
 				"TransformControls": "examples/zh/controls/TransformControls"
 			},
+
 			"几何体": {
 				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry",
@@ -974,6 +1096,7 @@
 				"TextGeometry": "examples/zh/geometries/TextGeometry",
 				"SDFGeometryGenerator": "examples/zh/geometries/SDFGeometryGenerator"
 			},
+
 			"辅助对象": {
 				"LightProbeHelper": "examples/zh/helpers/LightProbeHelper",
 				"PositionalAudioHelper": "examples/zh/helpers/PositionalAudioHelper",
@@ -981,9 +1104,11 @@
 				"VertexNormalsHelper": "examples/zh/helpers/VertexNormalsHelper",
 				"VertexTangentsHelper": "examples/zh/helpers/VertexTangentsHelper"
 			},
+
 			"灯光": {
 				"LightProbeGenerator": "examples/zh/lights/LightProbeGenerator"
 			},
+
 			"加载器": {
 				"3DMLoader": "examples/zh/loaders/3DMLoader",
 				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
@@ -999,12 +1124,15 @@
 				"SVGLoader": "examples/zh/loaders/SVGLoader",
 				"TGALoader": "examples/zh/loaders/TGALoader"
 			},
+
 			"物体": {
 				"Lensflare": "examples/zh/objects/Lensflare"
 			},
+
 			"后期处理": {
 				"EffectComposer": "examples/zh/postprocessing/EffectComposer"
 			},
+
 			"导出器": {
 				"DRACOExporter": "examples/zh/exporters/DRACOExporter",
 				"EXRExporter": "examples/zh/exporters/EXRExporter",
@@ -1013,14 +1141,17 @@
 				"PLYExporter": "examples/zh/exporters/PLYExporter",
 				"STLExporter": "examples/zh/exporters/STLExporter"
 			},
+
 			"数学库": {
 				"LookupTable": "examples/zh/math/Lut",
 				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler",
 				"OBB": "examples/zh/math/OBB"
 			},
+
 			"杂项": {
 				"Timer": "examples/zh/misc/Timer"
 			},
+
 			"凸包": {
 				"Face": "examples/zh/math/convexhull/Face",
 				"HalfEdge": "examples/zh/math/convexhull/HalfEdge",
@@ -1028,29 +1159,40 @@
 				"VertexNode": "examples/zh/math/convexhull/VertexNode",
 				"VertexList": "examples/zh/math/convexhull/VertexList"
 			},
+
 			"渲染器": {
 				"CSS2DRenderer": "examples/zh/renderers/CSS2DRenderer",
 				"CSS3DRenderer": "examples/zh/renderers/CSS3DRenderer",
 				"SVGRenderer": "examples/zh/renderers/SVGRenderer"
 			},
+
 			"实用工具": {
 				"BufferGeometryUtils": "examples/zh/utils/BufferGeometryUtils",
 				"CameraUtils": "examples/zh/utils/CameraUtils",
 				"SceneUtils": "examples/zh/utils/SceneUtils",
 				"SkeletonUtils": "examples/zh/utils/SkeletonUtils"
 			},
+
 			"WebXR": {
 				"XREstimatedLight": "examples/zh/webxr/XREstimatedLight"
 			}
+
 		},
+
 		"开发者参考": {
+
 			"WebGL渲染器": {
 				"WebGLProgram": "api/zh/renderers/webgl/WebGLProgram"
 			}
+
 		}
+
 	},
+
 	"ko": {
+
 		"매뉴얼": {
+
 			"시작하기": {
 				"설치": "manual/ko/introduction/Installation",
 				"장면 만들기": "manual/ko/introduction/Creating-a-scene",
@@ -1061,6 +1203,7 @@
 				"FAQ": "manual/ko/introduction/FAQ",
 				"참고 링크": "manual/ko/introduction/Useful-links"
 			},
+
 			"심화 과정": {
 				"오브젝트를 업데이트하는 방법": "manual/ko/introduction/How-to-update-things",
 				"오브젝트를 폐기하는 방법": "manual/ko/introduction/How-to-dispose-of-objects",
@@ -1069,8 +1212,11 @@
 				"행렬 변환": "manual/ko/introduction/Matrix-transformations",
 				"애니메이션 시스템": "manual/ko/introduction/Animation-system"
 			}
+
 		},
+
 		"레퍼런스": {
+
 			"애니메이션": {
 				"AnimationAction": "api/ko/animation/AnimationAction",
 				"AnimationClip": "api/ko/animation/AnimationClip",
@@ -1081,6 +1227,7 @@
 				"PropertyBinding": "api/ko/animation/PropertyBinding",
 				"PropertyMixer": "api/ko/animation/PropertyMixer"
 			},
+
 			"애니메이션 / 트랙": {
 				"BooleanKeyframeTrack": "api/ko/animation/tracks/BooleanKeyframeTrack",
 				"ColorKeyframeTrack": "api/ko/animation/tracks/ColorKeyframeTrack",
@@ -1089,6 +1236,7 @@
 				"StringKeyframeTrack": "api/ko/animation/tracks/StringKeyframeTrack",
 				"VectorKeyframeTrack": "api/ko/animation/tracks/VectorKeyframeTrack"
 			},
+
 			"오디오": {
 				"Audio": "api/ko/audio/Audio",
 				"AudioAnalyser": "api/ko/audio/AudioAnalyser",
@@ -1096,6 +1244,7 @@
 				"AudioListener": "api/ko/audio/AudioListener",
 				"PositionalAudio": "api/ko/audio/PositionalAudio"
 			},
+
 			"카메라": {
 				"ArrayCamera": "api/ko/cameras/ArrayCamera",
 				"Camera": "api/ko/cameras/Camera",
@@ -1104,6 +1253,7 @@
 				"PerspectiveCamera": "api/ko/cameras/PerspectiveCamera",
 				"StereoCamera": "api/ko/cameras/StereoCamera"
 			},
+
 			"상수": {
 				"Animation": "api/ko/constants/Animation",
 				"BufferAttributeUsage": "api/ko/constants/BufferAttributeUsage",
@@ -1113,6 +1263,7 @@
 				"Renderer": "api/ko/constants/Renderer",
 				"Textures": "api/ko/constants/Textures"
 			},
+
 			"Core": {
 				"BufferAttribute": "api/ko/core/BufferAttribute",
 				"BufferGeometry": "api/ko/core/BufferGeometry",
@@ -1129,9 +1280,11 @@
 				"Raycaster": "api/ko/core/Raycaster",
 				"Uniform": "api/ko/core/Uniform"
 			},
+
 			"Core / BufferAttributes": {
 				"BufferAttribute Types": "api/ko/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
+
 			"Extras": {
 				"DataUtils": "api/ko/extras/DataUtils",
 				"Earcut": "api/ko/extras/Earcut",
@@ -1139,6 +1292,7 @@
 				"PMREMGenerator": "api/ko/extras/PMREMGenerator",
 				"ShapeUtils": "api/ko/extras/ShapeUtils"
 			},
+
 			"Extras / Core": {
 				"Curve": "api/ko/extras/core/Curve",
 				"CurvePath": "api/ko/extras/core/CurvePath",
@@ -1147,6 +1301,7 @@
 				"Shape": "api/ko/extras/core/Shape",
 				"ShapePath": "api/ko/extras/core/ShapePath"
 			},
+
 			"Extras / Curves": {
 				"ArcCurve": "api/ko/extras/curves/ArcCurve",
 				"CatmullRomCurve3": "api/ko/extras/curves/CatmullRomCurve3",
@@ -1159,6 +1314,7 @@
 				"QuadraticBezierCurve3": "api/ko/extras/curves/QuadraticBezierCurve3",
 				"SplineCurve": "api/ko/extras/curves/SplineCurve"
 			},
+
 			"Geometries": {
 				"BoxGeometry": "api/ko/geometries/BoxGeometry",
 				"CapsuleGeometry": "api/ko/geometries/CapsuleGeometry",
@@ -1182,8 +1338,11 @@
 				"TubeGeometry": "api/ko/geometries/TubeGeometry",
 				"WireframeGeometry": "api/ko/geometries/WireframeGeometry"
 			}
+
 		},
+
 		"Addons": {
+
 			"컨트롤": {
 				"DragControls": "examples/ko/controls/DragControls",
 				"FirstPersonControls": "examples/ko/controls/FirstPersonControls",
@@ -1193,10 +1352,15 @@
 				"TrackballControls": "examples/ko/controls/TrackballControls",
 				"TransformControls": "examples/ko/controls/TransformControls"
 			}
+
 		}
+
 	},
+
 	"ja": {
+
 		"マニュアル": {
+
 			"はじめてみましょう": {
 				"インストールの方法": "manual/ja/introduction/Installation",
 				"シーンの作成": "manual/ja/introduction/Creating-a-scene",
@@ -1208,6 +1372,7 @@
 				"FAQ": "manual/ja/introduction/FAQ",
 				"役にたつリンク集": "manual/ja/introduction/Useful-links"
 			},
+
 			"次の段階": {
 				"更新の仕方": "manual/ja/introduction/How-to-update-things",
 				"オブジェクトを廃棄する方法": "manual/ja/introduction/How-to-dispose-of-objects",
@@ -1216,10 +1381,15 @@
 				"行列の変換": "manual/ja/introduction/Matrix-transformations",
 				"アニメーションシステム": "manual/ja/introduction/Animation-system"
 			}
+
 		}
+
 	},
+
 	"it": {
+
 		"Manuale": {
+
 			"Per iniziare": {
 				"Installazione": "manual/it/introduction/Installation",
 				"Creare una scena": "manual/it/introduction/Creating-a-scene",
@@ -1231,6 +1401,7 @@
 				"FAQ": "manual/it/introduction/FAQ",
 				"Link utili": "manual/it/introduction/Useful-links"
 			},
+
 			"Prossimi passi": {
 				"Come aggiornare le cose": "manual/it/introduction/How-to-update-things",
 				"Come liberare le risorse": "manual/it/introduction/How-to-dispose-of-objects",
@@ -1240,8 +1411,11 @@
 				"Sistema di animazione": "manual/it/introduction/Animation-system",
 				"Gestione del colore": "manual/it/introduction/Color-management"
 			}
+
 		},
+
 		"Riferimenti": {
+
 			"Animazione": {
 				"AnimationAction": "api/it/animation/AnimationAction",
 				"AnimationClip": "api/it/animation/AnimationClip",
@@ -1252,6 +1426,7 @@
 				"PropertyBinding": "api/it/animation/PropertyBinding",
 				"PropertyMixer": "api/it/animation/PropertyMixer"
 			},
+
 			"Animazione / Tracks": {
 				"BooleanKeyframeTrack": "api/it/animation/tracks/BooleanKeyframeTrack",
 				"ColorKeyframeTrack": "api/it/animation/tracks/ColorKeyframeTrack",
@@ -1260,6 +1435,7 @@
 				"StringKeyframeTrack": "api/it/animation/tracks/StringKeyframeTrack",
 				"VectorKeyframeTrack": "api/it/animation/tracks/VectorKeyframeTrack"
 			},
+
 			"Audio": {
 				"Audio": "api/it/audio/Audio",
 				"AudioAnalyser": "api/it/audio/AudioAnalyser",
@@ -1267,6 +1443,7 @@
 				"AudioListener": "api/it/audio/AudioListener",
 				"PositionalAudio": "api/it/audio/PositionalAudio"
 			},
+
 			"Telecamere": {
 				"ArrayCamera": "api/it/cameras/ArrayCamera",
 				"Camera": "api/it/cameras/Camera",
@@ -1275,6 +1452,7 @@
 				"PerspectiveCamera": "api/it/cameras/PerspectiveCamera",
 				"StereoCamera": "api/it/cameras/StereoCamera"
 			},
+
 			"Costanti": {
 				"Animazione": "api/it/constants/Animation",
 				"Core": "api/it/constants/Core",
@@ -1284,6 +1462,7 @@
 				"Renderer": "api/it/constants/Renderer",
 				"Texture": "api/it/constants/Textures"
 			},
+
 			"Core": {
 				"BufferAttribute": "api/it/core/BufferAttribute",
 				"BufferGeometry": "api/it/core/BufferGeometry",
@@ -1300,9 +1479,11 @@
 				"Raycaster": "api/it/core/Raycaster",
 				"Uniform": "api/it/core/Uniform"
 			},
+
 			"Core / BufferAttributes": {
 				"BufferAttribute Types": "api/it/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
+
 			"Extras": {
 				"DataUtils": "api/it/extras/DataUtils",
 				"Earcut": "api/it/extras/Earcut",
@@ -1310,6 +1491,7 @@
 				"PMREMGenerator": "api/it/extras/PMREMGenerator",
 				"ShapeUtils": "api/it/extras/ShapeUtils"
 			},
+
 			"Extras / Core": {
 				"Curve": "api/it/extras/core/Curve",
 				"CurvePath": "api/it/extras/core/CurvePath",
@@ -1318,6 +1500,7 @@
 				"Shape": "api/it/extras/core/Shape",
 				"ShapePath": "api/it/extras/core/ShapePath"
 			},
+
 			"Extras / Curves": {
 				"ArcCurve": "api/it/extras/curves/ArcCurve",
 				"CatmullRomCurve3": "api/it/extras/curves/CatmullRomCurve3",
@@ -1330,6 +1513,7 @@
 				"QuadraticBezierCurve3": "api/it/extras/curves/QuadraticBezierCurve3",
 				"SplineCurve": "api/it/extras/curves/SplineCurve"
 			},
+
 			"Geometrie": {
 				"BoxGeometry": "api/it/geometries/BoxGeometry",
 				"CapsuleGeometry": "api/it/geometries/CapsuleGeometry",
@@ -1353,6 +1537,7 @@
 				"TubeGeometry": "api/it/geometries/TubeGeometry",
 				"WireframeGeometry": "api/it/geometries/WireframeGeometry"
 			},
+
 			"Helpers": {
 				"ArrowHelper": "api/it/helpers/ArrowHelper",
 				"AxesHelper": "api/it/helpers/AxesHelper",
@@ -1368,6 +1553,7 @@
 				"SkeletonHelper": "api/it/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/it/helpers/SpotLightHelper"
 			},
+
 			"Luci": {
 				"AmbientLight": "api/it/lights/AmbientLight",
 				"DirectionalLight": "api/it/lights/DirectionalLight",
@@ -1378,12 +1564,14 @@
 				"RectAreaLight": "api/it/lights/RectAreaLight",
 				"SpotLight": "api/it/lights/SpotLight"
 			},
+
 			"Luci / Ombre": {
 				"LightShadow": "api/it/lights/shadows/LightShadow",
 				"PointLightShadow": "api/it/lights/shadows/PointLightShadow",
 				"DirectionalLightShadow": "api/it/lights/shadows/DirectionalLightShadow",
 				"SpotLightShadow": "api/it/lights/shadows/SpotLightShadow"
 			},
+
 			"Loaders": {
 				"AnimationLoader": "api/it/loaders/AnimationLoader",
 				"AudioLoader": "api/it/loaders/AudioLoader",
@@ -1401,10 +1589,12 @@
 				"ObjectLoader": "api/it/loaders/ObjectLoader",
 				"TextureLoader": "api/it/loaders/TextureLoader"
 			},
+
 			"Loaders / Managers": {
 				"DefaultLoadingManager": "api/it/loaders/managers/DefaultLoadingManager",
 				"LoadingManager": "api/it/loaders/managers/LoadingManager"
 			},
+
 			"Materiali": {
 				"LineBasicMaterial": "api/it/materials/LineBasicMaterial",
 				"LineDashedMaterial": "api/it/materials/LineDashedMaterial",
@@ -1425,6 +1615,7 @@
 				"ShadowMaterial": "api/it/materials/ShadowMaterial",
 				"SpriteMaterial": "api/it/materials/SpriteMaterial"
 			},
+
 			"Math": {
 				"Box2": "api/it/math/Box2",
 				"Box3": "api/it/math/Box3",
@@ -1448,12 +1639,14 @@
 				"Vector3": "api/it/math/Vector3",
 				"Vector4": "api/it/math/Vector4"
 			},
+
 			"Math / Interpolants": {
 				"CubicInterpolant": "api/it/math/interpolants/CubicInterpolant",
 				"DiscreteInterpolant": "api/it/math/interpolants/DiscreteInterpolant",
 				"LinearInterpolant": "api/it/math/interpolants/LinearInterpolant",
 				"QuaternionLinearInterpolant": "api/it/math/interpolants/QuaternionLinearInterpolant"
 			},
+
 			"Oggetti": {
 				"Bone": "api/it/objects/Bone",
 				"Group": "api/it/objects/Group",
@@ -1468,6 +1661,7 @@
 				"SkinnedMesh": "api/it/objects/SkinnedMesh",
 				"Sprite": "api/it/objects/Sprite"
 			},
+
 			"Renderers": {
 				"WebGLMultipleRenderTargets": "api/it/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/it/renderers/WebGLRenderer",
@@ -1477,20 +1671,24 @@
 				"WebGLArrayRenderTarget": "api/it/renderers/WebGLArrayRenderTarget",
 				"WebGLCubeRenderTarget": "api/it/renderers/WebGLCubeRenderTarget"
 			},
+
 			"Renderers / Shaders": {
 				"ShaderChunk": "api/it/renderers/shaders/ShaderChunk",
 				"ShaderLib": "api/it/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/it/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/it/renderers/shaders/UniformsUtils"
 			},
+
 			"Renderers / WebXR": {
 				"WebXRManager": "api/it/renderers/webxr/WebXRManager"
 			},
+
 			"Scene": {
 				"Fog": "api/it/scenes/Fog",
 				"FogExp2": "api/it/scenes/FogExp2",
 				"Scene": "api/it/scenes/Scene"
 			},
+
 			"Textures": {
 				"CanvasTexture": "api/it/textures/CanvasTexture",
 				"CompressedTexture": "api/it/textures/CompressedTexture",
@@ -1508,7 +1706,9 @@
 		}
 	},
 	"pt-br": {
+
 		"Manual": {
+
 			"Comece a usar": {
 				"Instalação": "manual/pt-br/introduction/Installation",
 				"Criando uma cena": "manual/pt-br/introduction/Creating-a-scene",
@@ -1520,6 +1720,7 @@
 				"FAQ": "manual/pt-br/introduction/FAQ",
 				"Links úteis": "manual/pt-br/introduction/Useful-links"
 			},
+
 			"Próximos Passos": {
 				"Como atualizar as coisas": "manual/pt-br/introduction/How-to-update-things",
 				"Como descartar objetos": "manual/pt-br/introduction/How-to-dispose-of-objects",
@@ -1529,8 +1730,11 @@
 				"Sistema de animação": "manual/pt-br/introduction/Animation-system",
 				"Gerenciamento de cor": "manual/pt-br/introduction/Color-management"
 			}
+
 		},
+
 		"Referência": {
+
 			"Animation": {
 				"AnimationAction": "api/pt-br/animation/AnimationAction",
 				"AnimationClip": "api/pt-br/animation/AnimationClip",
@@ -1541,6 +1745,7 @@
 				"PropertyBinding": "api/pt-br/animation/PropertyBinding",
 				"PropertyMixer": "api/pt-br/animation/PropertyMixer"
 			},
+
 			"Animation / Tracks": {
 				"BooleanKeyframeTrack": "api/pt-br/animation/tracks/BooleanKeyframeTrack",
 				"ColorKeyframeTrack": "api/pt-br/animation/tracks/ColorKeyframeTrack",
@@ -1549,6 +1754,7 @@
 				"StringKeyframeTrack": "api/pt-br/animation/tracks/StringKeyframeTrack",
 				"VectorKeyframeTrack": "api/pt-br/animation/tracks/VectorKeyframeTrack"
 			},
+
 			"Audio": {
 				"Audio": "api/pt-br/audio/Audio",
 				"AudioAnalyser": "api/pt-br/audio/AudioAnalyser",
@@ -1556,6 +1762,7 @@
 				"AudioListener": "api/pt-br/audio/AudioListener",
 				"PositionalAudio": "api/pt-br/audio/PositionalAudio"
 			},
+
 			"Cameras": {
 				"ArrayCamera": "api/pt-br/cameras/ArrayCamera",
 				"Camera": "api/pt-br/cameras/Camera",
@@ -1564,6 +1771,7 @@
 				"PerspectiveCamera": "api/pt-br/cameras/PerspectiveCamera",
 				"StereoCamera": "api/pt-br/cameras/StereoCamera"
 			},
+
 			"Constantes": {
 				"Animation": "api/pt-br/constants/Animation",
 				"Core": "api/pt-br/constants/Core",
@@ -1573,10 +1781,15 @@
 				"Renderer": "api/pt-br/constants/Renderer",
 				"Textures": "api/pt-br/constants/Textures"
 			}
+
 		}
+
 	},
+
 	"fr": {
+
 		"Manuel": {
+
 			"Débuter": {
 				"Installation": "manual/fr/introduction/Installation",
 				"Créer une scène": "manual/fr/introduction/Creating-a-scene",
@@ -1588,6 +1801,7 @@
 				"FAQ": "manual/fr/introduction/FAQ",
 				"Liens Utiles": "manual/fr/introduction/Useful-links"
 			},
+
 			"Étapes Suivantes": {
 				"Mettre les éléments à jour": "manual/fr/introduction/How-to-update-things",
 				"Supprimer un objet": "manual/fr/introduction/How-to-dispose-of-objects",
@@ -1597,8 +1811,11 @@
 				"Système d'animation": "manual/fr/introduction/Animation-system",
 				"Gestion des couleurs": "manual/fr/introduction/Color-management"
 			}
+
 		},
+
 		"Référence": {
+
 			"Animation": {
 				"AnimationAction": "api/fr/animation/AnimationAction",
 				"AnimationClip": "api/fr/animation/AnimationClip",
@@ -1609,6 +1826,7 @@
 				"PropertyBinding": "api/fr/animation/PropertyBinding",
 				"PropertyMixer": "api/fr/animation/PropertyMixer"
 			},
+
 			"Animation / Tracks": {
 				"BooleanKeyframeTrack": "api/fr/animation/tracks/BooleanKeyframeTrack",
 				"ColorKeyframeTrack": "api/fr/animation/tracks/ColorKeyframeTrack",
@@ -1617,6 +1835,7 @@
 				"StringKeyframeTrack": "api/fr/animation/tracks/StringKeyframeTrack",
 				"VectorKeyframeTrack": "api/fr/animation/tracks/VectorKeyframeTrack"
 			},
+
 			"Audio": {
 				"Audio": "api/fr/audio/Audio",
 				"AudioAnalyser": "api/fr/audio/AudioAnalyser",
@@ -1624,6 +1843,7 @@
 				"AudioListener": "api/fr/audio/AudioListener",
 				"PositionalAudio": "api/fr/audio/PositionalAudio"
 			},
+
 			"Caméras": {
 				"ArrayCamera": "api/fr/cameras/ArrayCamera",
 				"Camera": "api/fr/cameras/Camera",
@@ -1684,14 +1904,20 @@
 				"ShadowMaterial": "api/fr/materials/ShadowMaterial",
 				"SpriteMaterial": "api/fr/materials/SpriteMaterial"
 			},
+
 			"Noyau": {
 				"BufferAttribute": "api/fr/core/BufferAttribute",
 				"BufferGeometry": "api/fr/core/BufferGeometry"
 			}
+
 		}
+
 	},
+
 	"ru": {
+
 		"Руководство": {
+
 			"Приступая к работе": {
 				"Установка": "manual/ru/introduction/Installation",
 				"Создание сцены": "manual/ru/introduction/Creating-a-scene",
@@ -1703,6 +1929,7 @@
 				"Часто задаваемые вопросы": "manual/ru/introduction/FAQ",
 				"Полезные ссылки": "manual/ru/introduction/Useful-links"
 			},
+
 			"Next Steps": {
 				"How to update things": "manual/en/introduction/How-to-update-things",
 				"How to dispose of objects": "manual/en/introduction/How-to-dispose-of-objects",
@@ -1712,8 +1939,11 @@
 				"Animation system": "manual/en/introduction/Animation-system",
 				"Color management": "manual/en/introduction/Color-management"
 			}
+
 		},
+
 		"Reference": {
+
 			"Animation": {
 				"AnimationAction": "api/en/animation/AnimationAction",
 				"AnimationClip": "api/en/animation/AnimationClip",
@@ -1724,6 +1954,7 @@
 				"PropertyBinding": "api/en/animation/PropertyBinding",
 				"PropertyMixer": "api/en/animation/PropertyMixer"
 			},
+
 			"Animation / Tracks": {
 				"BooleanKeyframeTrack": "api/en/animation/tracks/BooleanKeyframeTrack",
 				"ColorKeyframeTrack": "api/en/animation/tracks/ColorKeyframeTrack",
@@ -1732,6 +1963,7 @@
 				"StringKeyframeTrack": "api/en/animation/tracks/StringKeyframeTrack",
 				"VectorKeyframeTrack": "api/en/animation/tracks/VectorKeyframeTrack"
 			},
+
 			"Audio": {
 				"Audio": "api/en/audio/Audio",
 				"AudioAnalyser": "api/en/audio/AudioAnalyser",
@@ -1739,6 +1971,7 @@
 				"AudioListener": "api/en/audio/AudioListener",
 				"PositionalAudio": "api/en/audio/PositionalAudio"
 			},
+
 			"Cameras": {
 				"ArrayCamera": "api/en/cameras/ArrayCamera",
 				"Camera": "api/en/cameras/Camera",
@@ -1747,6 +1980,7 @@
 				"PerspectiveCamera": "api/en/cameras/PerspectiveCamera",
 				"StereoCamera": "api/en/cameras/StereoCamera"
 			},
+
 			"Constants": {
 				"Animation": "api/en/constants/Animation",
 				"Core": "api/en/constants/Core",
@@ -1756,6 +1990,7 @@
 				"Renderer": "api/en/constants/Renderer",
 				"Textures": "api/en/constants/Textures"
 			},
+
 			"Core": {
 				"BufferAttribute": "api/en/core/BufferAttribute",
 				"BufferGeometry": "api/en/core/BufferGeometry",
@@ -1772,9 +2007,11 @@
 				"Raycaster": "api/en/core/Raycaster",
 				"Uniform": "api/en/core/Uniform"
 			},
+
 			"Core / BufferAttributes": {
 				"BufferAttribute Types": "api/en/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
+
 			"Extras": {
 				"DataUtils": "api/en/extras/DataUtils",
 				"Earcut": "api/en/extras/Earcut",
@@ -1782,6 +2019,7 @@
 				"PMREMGenerator": "api/en/extras/PMREMGenerator",
 				"ShapeUtils": "api/en/extras/ShapeUtils"
 			},
+
 			"Extras / Core": {
 				"Curve": "api/en/extras/core/Curve",
 				"CurvePath": "api/en/extras/core/CurvePath",
@@ -1790,6 +2028,7 @@
 				"Shape": "api/en/extras/core/Shape",
 				"ShapePath": "api/en/extras/core/ShapePath"
 			},
+
 			"Extras / Curves": {
 				"ArcCurve": "api/en/extras/curves/ArcCurve",
 				"CatmullRomCurve3": "api/en/extras/curves/CatmullRomCurve3",
@@ -1802,6 +2041,7 @@
 				"QuadraticBezierCurve3": "api/en/extras/curves/QuadraticBezierCurve3",
 				"SplineCurve": "api/en/extras/curves/SplineCurve"
 			},
+
 			"Geometries": {
 				"BoxGeometry": "api/en/geometries/BoxGeometry",
 				"CapsuleGeometry": "api/en/geometries/CapsuleGeometry",
@@ -1825,6 +2065,7 @@
 				"TubeGeometry": "api/en/geometries/TubeGeometry",
 				"WireframeGeometry": "api/en/geometries/WireframeGeometry"
 			},
+
 			"Helpers": {
 				"ArrowHelper": "api/en/helpers/ArrowHelper",
 				"AxesHelper": "api/en/helpers/AxesHelper",
@@ -1840,6 +2081,7 @@
 				"SkeletonHelper": "api/en/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/en/helpers/SpotLightHelper"
 			},
+
 			"Lights": {
 				"AmbientLight": "api/en/lights/AmbientLight",
 				"DirectionalLight": "api/en/lights/DirectionalLight",
@@ -1850,12 +2092,14 @@
 				"RectAreaLight": "api/en/lights/RectAreaLight",
 				"SpotLight": "api/en/lights/SpotLight"
 			},
+
 			"Lights / Shadows": {
 				"LightShadow": "api/en/lights/shadows/LightShadow",
 				"PointLightShadow": "api/en/lights/shadows/PointLightShadow",
 				"DirectionalLightShadow": "api/en/lights/shadows/DirectionalLightShadow",
 				"SpotLightShadow": "api/en/lights/shadows/SpotLightShadow"
 			},
+
 			"Loaders": {
 				"AnimationLoader": "api/en/loaders/AnimationLoader",
 				"AudioLoader": "api/en/loaders/AudioLoader",
@@ -1873,10 +2117,12 @@
 				"ObjectLoader": "api/en/loaders/ObjectLoader",
 				"TextureLoader": "api/en/loaders/TextureLoader"
 			},
+
 			"Loaders / Managers": {
 				"DefaultLoadingManager": "api/en/loaders/managers/DefaultLoadingManager",
 				"LoadingManager": "api/en/loaders/managers/LoadingManager"
 			},
+
 			"Materials": {
 				"LineBasicMaterial": "api/en/materials/LineBasicMaterial",
 				"LineDashedMaterial": "api/en/materials/LineDashedMaterial",
@@ -1897,6 +2143,7 @@
 				"ShadowMaterial": "api/en/materials/ShadowMaterial",
 				"SpriteMaterial": "api/en/materials/SpriteMaterial"
 			},
+
 			"Math": {
 				"Box2": "api/en/math/Box2",
 				"Box3": "api/en/math/Box3",
@@ -1920,12 +2167,14 @@
 				"Vector3": "api/en/math/Vector3",
 				"Vector4": "api/en/math/Vector4"
 			},
+
 			"Math / Interpolants": {
 				"CubicInterpolant": "api/en/math/interpolants/CubicInterpolant",
 				"DiscreteInterpolant": "api/en/math/interpolants/DiscreteInterpolant",
 				"LinearInterpolant": "api/en/math/interpolants/LinearInterpolant",
 				"QuaternionLinearInterpolant": "api/en/math/interpolants/QuaternionLinearInterpolant"
 			},
+
 			"Objects": {
 				"Bone": "api/en/objects/Bone",
 				"Group": "api/en/objects/Group",
@@ -1940,6 +2189,7 @@
 				"SkinnedMesh": "api/en/objects/SkinnedMesh",
 				"Sprite": "api/en/objects/Sprite"
 			},
+
 			"Renderers": {
 				"WebGLMultipleRenderTargets": "api/en/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
@@ -1949,20 +2199,24 @@
 				"WebGLArrayRenderTarget": "api/en/renderers/WebGLArrayRenderTarget",
 				"WebGLCubeRenderTarget": "api/en/renderers/WebGLCubeRenderTarget"
 			},
+
 			"Renderers / Shaders": {
 				"ShaderChunk": "api/en/renderers/shaders/ShaderChunk",
 				"ShaderLib": "api/en/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/en/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/en/renderers/shaders/UniformsUtils"
 			},
+
 			"Renderers / WebXR": {
 				"WebXRManager": "api/en/renderers/webxr/WebXRManager"
 			},
+
 			"Scenes": {
 				"Fog": "api/en/scenes/Fog",
 				"FogExp2": "api/en/scenes/FogExp2",
 				"Scene": "api/en/scenes/Scene"
 			},
+
 			"Textures": {
 				"CanvasTexture": "api/en/textures/CanvasTexture",
 				"CompressedTexture": "api/en/textures/CompressedTexture",
@@ -1977,13 +2231,17 @@
 				"Texture": "api/en/textures/Texture",
 				"VideoTexture": "api/en/textures/VideoTexture"
 			}
+
 		},
+
 		"Examples": {
+
 			"Animations": {
 				"CCDIKSolver": "examples/en/animations/CCDIKSolver",
 				"MMDAnimationHelper": "examples/en/animations/MMDAnimationHelper",
 				"MMDPhysics": "examples/en/animations/MMDPhysics"
 			},
+
 			"Controls": {
 				"ArcballControls": "examples/en/controls/ArcballControls",
 				"DragControls": "examples/en/controls/DragControls",
@@ -1994,12 +2252,14 @@
 				"TrackballControls": "examples/en/controls/TrackballControls",
 				"TransformControls": "examples/en/controls/TransformControls"
 			},
+
 			"Geometries": {
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/en/geometries/DecalGeometry",
 				"ParametricGeometry": "examples/en/geometries/ParametricGeometry",
 				"TextGeometry": "examples/en/geometries/TextGeometry"
 			},
+
 			"Helpers": {
 				"LightProbeHelper": "examples/en/helpers/LightProbeHelper",
 				"PositionalAudioHelper": "examples/en/helpers/PositionalAudioHelper",
@@ -2007,9 +2267,11 @@
 				"VertexNormalsHelper": "examples/en/helpers/VertexNormalsHelper",
 				"VertexTangentsHelper": "examples/en/helpers/VertexTangentsHelper"
 			},
+
 			"Lights": {
 				"LightProbeGenerator": "examples/en/lights/LightProbeGenerator"
 			},
+
 			"Loaders": {
 				"3DMLoader": "examples/en/loaders/3DMLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
@@ -2025,23 +2287,28 @@
 				"SVGLoader": "examples/en/loaders/SVGLoader",
 				"TGALoader": "examples/en/loaders/TGALoader"
 			},
+
 			"Objects": {
 				"Lensflare": "examples/en/objects/Lensflare"
 			},
+
 			"Post-Processing": {
 				"EffectComposer": "examples/en/postprocessing/EffectComposer"
 			},
+
 			"Exporters": {
 				"EXRExporter": "examples/en/exporters/EXRExporter",
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
 				"OBJExporter": "examples/en/exporters/OBJExporter",
 				"PLYExporter": "examples/en/exporters/PLYExporter"
 			},
+
 			"Math": {
 				"LookupTable": "examples/en/math/Lut",
 				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler",
 				"OBB": "examples/en/math/OBB"
 			},
+
 			"ConvexHull": {
 				"Face": "examples/en/math/convexhull/Face",
 				"HalfEdge": "examples/en/math/convexhull/HalfEdge",
@@ -2049,22 +2316,30 @@
 				"VertexNode": "examples/en/math/convexhull/VertexNode",
 				"VertexList": "examples/en/math/convexhull/VertexList"
 			},
+
 			"Renderers": {
 				"CSS2DRenderer": "examples/en/renderers/CSS2DRenderer",
 				"CSS3DRenderer": "examples/en/renderers/CSS3DRenderer",
 				"SVGRenderer": "examples/en/renderers/SVGRenderer"
+
 			},
+
 			"Utils": {
 				"BufferGeometryUtils": "examples/en/utils/BufferGeometryUtils",
 				"CameraUtils": "examples/en/utils/CameraUtils",
 				"SceneUtils": "examples/en/utils/SceneUtils",
 				"SkeletonUtils": "examples/en/utils/SkeletonUtils"
 			}
+
 		},
+
 		"Developer Reference": {
+
 			"WebGLRenderer": {
 				"WebGLProgram": "api/en/renderers/webgl/WebGLProgram"
 			}
+
 		}
+
 	}
 }
