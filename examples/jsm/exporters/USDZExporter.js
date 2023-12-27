@@ -1,11 +1,11 @@
 import {
-  NoColorSpace,
-  DoubleSide,
+	NoColorSpace,
+	DoubleSide,
 } from 'three';
 
 import {
-  strToU8,
-  zipSync,
+	strToU8,
+	zipSync,
 } from '../libs/fflate.module.js';
 
 import { decompress } from './../utils/TextureUtils.js';
