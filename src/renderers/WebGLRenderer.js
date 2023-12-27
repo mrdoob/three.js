@@ -2623,7 +2623,7 @@ class WebGLRenderer {
 
 	get useMultiview() {
 
-		return ( this._useMultiview === true ) && this.extensions.has( 'OCULUS_multiview' );
+		return ( this._useMultiview === true ) && this.extensions.has( 'OVR_multiview2' );
 
 	}
 

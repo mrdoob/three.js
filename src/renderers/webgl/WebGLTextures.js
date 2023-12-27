@@ -8,7 +8,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	const isWebGL2 = capabilities.isWebGL2;
 	const multisampledRTTExt = extensions.has( 'WEBGL_multisampled_render_to_texture' ) ? extensions.get( 'WEBGL_multisampled_render_to_texture' ) : null;
-	const multiviewExt = extensions.has( 'OCULUS_multiview' ) ? extensions.get( 'OCULUS_multiview' ) : null;
+	const multiviewExt = extensions.has( 'OVR_multiview2' ) ? extensions.get( 'OVR_multiview2' ) : null;
 	const supportsInvalidateFramebuffer = typeof navigator === 'undefined' ? false : /OculusBrowser/g.test( navigator.userAgent );
 
 	const _videoTextures = new WeakMap();
