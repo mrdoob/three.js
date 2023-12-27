@@ -5,8 +5,8 @@ import { uv } from '../accessors/UVNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { RenderTarget } from 'three';
-import QuadMesh from '../../objects/QuadMesh.js';
 import { sign, max } from '../math/MathNode.js';
+import QuadMesh from '../../objects/QuadMesh.js';
 
 const quadMeshComp = new QuadMesh();
 
@@ -25,7 +25,6 @@ class AfterImageNode extends TempNode {
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
-
 	}
 
 	setSize( width, height ) {
@@ -39,7 +38,6 @@ class AfterImageNode extends TempNode {
 
 		const { renderer } = frame;
 
-
 		const textureNode = this.textureNode;
 
 		const currentRenderTarget = renderer.getRenderTarget();
@@ -50,7 +48,6 @@ class AfterImageNode extends TempNode {
 		// comp
 		renderer.setRenderTarget( this._compRT );
 		quadMeshComp.render( renderer );
-
 
 		// Swap the textures
 		const temp = this._oldRT;
@@ -80,12 +77,12 @@ class AfterImageNode extends TempNode {
 		}
 
 		//
+
 		const uvNode = textureNode.uvNode || uv();
 
 		textureNodeOld.uvNode = uvNode;
 
 		const sampleTexture = ( uv ) => textureNode.cache().context( { getUV: () => uv, forceUVContext: true } );
-
 
 		const when_gt = tslFn( ( [ x_immutable, y_immutable ] ) => {
 
@@ -95,7 +92,6 @@ class AfterImageNode extends TempNode {
 			return max( sign( x.sub( y ) ), 0.0 );
 
 		} );
-
 
 		const afterImg = tslFn( () => {
 
@@ -107,11 +103,13 @@ class AfterImageNode extends TempNode {
 
 		} );
 
+		//
 
 		const materialComposed = this._materialComposed || ( this._materialComposed = builder.createNodeMaterial( 'MeshBasicNodeMaterial' ) );
 		materialComposed.fragmentNode = afterImg();
 
 		quadMeshComp.material = materialComposed;
+
 		//
 
 		const properties = builder.getNodeProperties( this );
