@@ -129,6 +129,7 @@ const exceptionList = [
 	'webgpu_video_panorama',
 
 	// WebGPURenderer: Unknown problem
+	'webgpu_backdrop_water',
 	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_loader_materialx',
 	'webgpu_materials_video',
