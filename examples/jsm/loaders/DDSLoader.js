@@ -221,6 +221,7 @@ class DDSLoader extends CompressedTextureLoader {
 					}
 
 				}
+
 				break;
 
 			default:

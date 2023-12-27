@@ -621,7 +621,7 @@ class MaterialXNode {
 		let emissiveNode = null;
 
 		if ( inputs.emission ) emissiveNode = inputs.emission;
-		if ( inputs.emissionColor )  {
+		if ( inputs.emissionColor ) {
 
 			emissiveNode = emissiveNode ? mul( emissiveNode, inputs.emissionColor ) : emissiveNode;
 
