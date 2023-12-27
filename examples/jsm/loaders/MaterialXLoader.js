@@ -8,7 +8,8 @@ import {
 import {
 	MeshPhysicalNodeMaterial,
 	float, bool, int, vec2, vec3, vec4, color, texture,
-	positionLocal,
+	positionLocal, positionWorld, uv, vertexColor,
+	normalLocal, normalWorld, tangentLocal, tangentWorld,
 	add, sub, mul, div, mod, abs, sign, floor, ceil, round, pow, sin, cos, tan,
 	asin, acos, atan2, sqrt, exp, clamp, min, max, normalize, length, dot, cross, normalMap,
 	remap, smoothstep, luminance, mx_rgbtohsv, mx_hsvtorgb,
@@ -400,7 +401,32 @@ class MaterialXNode {
 
 			} else if ( element === 'position' ) {
 
-				node = positionLocal;
+				const space = this.getAttribute( 'space' );
+				node = space === 'world' ? positionWorld : positionLocal;
+
+			} else if ( element === 'normal' ) {
+
+				const space = this.getAttribute( 'space' );
+				node = space === 'world' ? normalWorld : normalLocal;
+
+			} else if ( element === 'tangent' ) {
+
+				const space = this.getAttribute( 'space' );
+				node = space === 'world' ? tangentWorld : tangentLocal;
+
+			} else if ( element === 'texcoord' ) {
+
+				const indexNode = this.getChildByName( 'index' );
+				const index = indexNode ? parseInt( indexNode.value ) : 0;
+
+				node = uv( index );
+
+			} else if ( element === 'geomcolor' ) {
+
+				const indexNode = this.getChildByName( 'index' );
+				const index = indexNode ? parseInt( indexNode.value ) : 0;
+
+				node = vertexColor( index );
 
 			} else if ( element === 'tiledimage' ) {
 
