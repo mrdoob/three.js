@@ -8,7 +8,11 @@ import { uniform } from '../core/UniformNode.js';
 import { Vector2, RenderTarget } from 'three';
 import QuadMesh from '../../objects/QuadMesh.js';
 
-const quadMesh = new QuadMesh();
+// WebGPU: The use of a single QuadMesh for both gaussian blur passes results in a single RenderObject with a SampledTexture binding that
+// alternates between source textures and triggers creation of new BindGroups and BindGroupLayouts every frame.
+
+const quadMesh1 = new QuadMesh();
+const quadMesh2 = new QuadMesh();
 
 class GaussianBlurNode extends TempNode {
 
@@ -54,7 +58,8 @@ class GaussianBlurNode extends TempNode {
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentTexture = textureNode.value;
 
-		quadMesh.material = this._material;
+		quadMesh1.material = this._material;
+		quadMesh2.material = this._material;
 
 		this.setSize( map.image.width, map.image.height );
 
@@ -64,7 +69,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 1, 0 );
 
-		quadMesh.render( renderer );
+		quadMesh1.render( renderer );
 
 		// vertical
 
@@ -73,7 +78,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 0, 1 );
 
-		quadMesh.render( renderer );
+		quadMesh2.render( renderer );
 
 		// restore
 
