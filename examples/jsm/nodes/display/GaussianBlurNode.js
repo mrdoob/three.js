@@ -8,6 +8,9 @@ import { uniform } from '../core/UniformNode.js';
 import { Vector2, RenderTarget } from 'three';
 import QuadMesh from '../../objects/QuadMesh.js';
 
+// WebGPU: The use of a single QuadMesh for both gaussian blur passes results in a single RenderObject with a SampledTexture binding that
+// alternates between source textures and triggers creation of new BindGroups and BindGroupLayouts every frame.
+
 const quadMesh1 = new QuadMesh();
 const quadMesh2 = new QuadMesh();
 
