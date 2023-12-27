@@ -10,8 +10,8 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - KTX2 texture loader<br />
-			<a href="http://github.khronos.org/KTX-Specification/" target="_blank" rel="noopener">KTX2</a> with
-			<a href="https://github.com/binomialLLC/basis_universal" target="_blank">Basis Universal GPU Texture Codec</a>
+			<a href="http://github.khronos.org/KTX-Specification/" target="_blank" rel="noopener">KTX2</a>
+			with various layouts and compression
 		</div>
 
 		<script type="importmap">
@@ -29,19 +29,46 @@
 
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TextureHelper } from 'three/addons/helpers/TextureHelper.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, scene, renderer, controls, loader, material;
+			let camera, scene, renderer, controls, loader, helper;
 
 			const SAMPLES = {
-				'BasisU ETC1S': '2d_etc1s.ktx2',
-				'BasisU UASTC': '2d_uastc.ktx2',
-				'RGBA8 sRGB': '2d_rgba8.ktx2',
-				'RGBA8 Linear': '2d_rgba8_linear.ktx2',
-				// 'RGBA8 Display P3': '2d_rgba8_displayp3.ktx2',
-				'RGBA16 Linear': '2d_rgba16_linear.ktx2',
-				'RGBA32 Linear': '2d_rgba32_linear.ktx2',
-				'ASTC 6x6 (mobile)': '2d_astc_6x6.ktx2',
+				// 2D
+				'2D / BasisU ETC1S': '2d_etc1s.ktx2',
+				'2D / BasisU UASTC': '2d_uastc.ktx2',
+				'2D / RGBA8 sRGB': '2d_rgba8.ktx2',
+				'2D / RGBA8 Linear': '2d_rgba8_linear.ktx2',
+				// '2D / RGBA8 Display P3': '2d_rgba8_displayp3.ktx2',
+				'2D / RGBA16 Linear': '2d_rgba16_linear.ktx2',
+				'2D / RGBA32 Linear': '2d_rgba32_linear.ktx2',
+				'2D / ASTC 6x6 (mobile)': '2d_astc_6x6.ktx2',
+
+				// 3D
+				'3D / BasisU ETC1S': '3d_etc1s.ktx2',
+				'3D / BasisU UASTC': '3d_uastc.ktx2',
+				'3D / RGBA8 sRGB': '3d_rgba8.ktx2',
+				'3D / RGBA8 Linear': '3d_rgba8_linear.ktx2',
+				'3D / RGBA16 Linear': '3d_rgba16_linear.ktx2',
+				'3D / RGBA32 Linear': '3d_rgba32_linear.ktx2',
+				'3D / RGBA32 LUT': '3d_rgba32_lut.ktx2',
+
+				// Cube
+				'Cube / BasisU ETC1S': 'cubemap_etc1s.ktx2',
+				'Cube / BasisU UASTC': 'cubemap_uastc.ktx2',
+				'Cube / RGBA8 sRGB': 'cubemap_rgba8.ktx2',
+				'Cube / RGBA8 Linear': 'cubemap_rgba8_linear.ktx2',
+				'Cube / RGBA16 Linear': 'cubemap_rgba16_linear.ktx2',
+				'Cube / RGBA32 Linear': 'cubemap_rgba32_linear.ktx2',
+
+				// Array
+				'Array / BasisU ETC1S': 'array_etc1s.ktx2',
+				'Array / BasisU UASTC': 'array_uastc.ktx2',
+				'Array / RGBA8 sRGB': 'array_rgba8.ktx2',
+				'Array / RGBA8 Linear': 'array_rgba8_linear.ktx2',
+				'Array / RGBA16 Linear': 'array_rgba16_linear.ktx2',
+				'Array / RGBA32 Linear': 'array_rgba32_linear.ktx2',
 			};
 
 			const FORMAT_LABELS = {
@@ -87,7 +114,6 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x202020 );
 
 				camera = new THREE.PerspectiveCamera( 60, width / height, 0.1, 100 );
 				camera.position.set( 0, 0, 2.5 );
@@ -95,16 +121,6 @@
 				scene.add( camera );
 
 				controls = new OrbitControls( camera, renderer.domElement );
-
-				// PlaneGeometry UVs assume flipY=true, which compressed textures don't support.
-				const geometry = flipY( new THREE.PlaneGeometry() );
-				material = new THREE.MeshBasicMaterial( {
-					color: 0xFFFFFF,
-					side: THREE.DoubleSide,
-					transparent: true,
-				} );
-				const mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
 
 				loader = new KTX2Loader()
 					.setTranscoderPath( 'jsm/libs/basis/' )
@@ -146,10 +162,19 @@
 
 					const texture = await loader.loadAsync( `./textures/compressed/${path}` );
 					texture.minFilter = THREE.NearestMipmapNearestFilter;
+					texture.needsUpdate = true;
 
-					material.map = texture;
-					material.needsUpdate = true;
+					if ( helper ) {
 
+						scene.remove( helper );
+						helper.dispose();
+
+					}
+
+					helper = new TextureHelper( texture );
+					scene.add( helper );
+
+					console.info( `class: ${ texture.constructor.name }` );
 					console.info( `format: ${ FORMAT_LABELS[ texture.format ] }` );
 					console.info( `type: ${ TYPE_LABELS[ texture.type ] }` );
 					console.info( `colorSpace: ${ texture.colorSpace }` );
@@ -161,22 +186,6 @@
 				}
 
 				// NOTE: Call `loader.dispose()` when finished loading textures.
-
-
-			}
-
-			/** Correct UVs to be compatible with `flipY=false` textures. */
-			function flipY( geometry ) {
-
-				const uv = geometry.attributes.uv;
-
-				for ( let i = 0; i < uv.count; i ++ ) {
-
-					uv.setY( i, 1 - uv.getY( i ) );
-
-				}
-
-				return geometry;
 
 			}
 

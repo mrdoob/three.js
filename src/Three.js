@@ -32,6 +32,7 @@ export { FramebufferTexture } from './textures/FramebufferTexture.js';
 export { Source } from './textures/Source.js';
 export { DataTexture } from './textures/DataTexture.js';
 export { DataArrayTexture } from './textures/DataArrayTexture.js';
+export { DataCubeTexture } from './textures/DataCubeTexture.js';
 export { Data3DTexture } from './textures/Data3DTexture.js';
 export { CompressedTexture } from './textures/CompressedTexture.js';
 export { CompressedArrayTexture } from './textures/CompressedArrayTexture.js';

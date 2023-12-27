@@ -16,6 +16,8 @@ import {
 	CompressedArrayTexture,
 	CompressedCubeTexture,
 	Data3DTexture,
+	DataArrayTexture,
+	DataCubeTexture,
 	DataTexture,
 	DisplayP3ColorSpace,
 	FileLoader,
@@ -796,7 +798,6 @@ async function createRawTexture( container ) {
 
 	const mipmaps = [];
 
-
 	for ( let levelIndex = 0; levelIndex < container.levels.length; levelIndex ++ ) {
 
 		const levelWidth = Math.max( 1, container.pixelWidth >> levelIndex );
@@ -864,19 +865,55 @@ async function createRawTexture( container ) {
 
 	if ( UNCOMPRESSED_FORMATS.has( FORMAT_MAP[ vkFormat ] ) ) {
 
-		texture = container.pixelDepth === 0
-		? new DataTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight )
-		: new Data3DTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight, container.pixelDepth );
+		if ( container.faceCount === 6 ) {
+
+			texture = new DataCubeTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight );
+
+		} else if ( container.layerCount > 1 ) {
+
+			texture = new DataArrayTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight, container.layerCount );
+
+		} else if ( container.pixelDepth === 0 ) {
+
+			texture = new DataTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight );
+
+		} else {
+
+			texture = new Data3DTexture( mipmaps[ 0 ].data, container.pixelWidth, container.pixelHeight, container.pixelDepth );
+
+		}
 
 	} else {
 
-		if ( container.pixelDepth > 0 ) throw new Error( 'THREE.KTX2Loader: Unsupported pixelDepth.' );
+		if ( container.faceCount === 6 ) {
 
-		texture = new CompressedTexture( mipmaps, container.pixelWidth, container.pixelHeight );
+			texture = new CompressedCubeTexture( mipmaps );
+
+		} else if ( container.layerCount > 1 ) {
+
+			texture = new CompressedArrayTexture( mipmaps, container.pixelWidth, container.pixelHeight, container.layerCount );
+
+		} else if ( container.pixelDepth === 0 ) {
+
+			texture = new CompressedTexture( mipmaps, container.pixelWidth, container.pixelHeight );
+
+		} else {
+
+			throw new Error( 'THREE.KTX2Loader: Unsupported pixelDepth.' );
+
+		}
 
 	}
 
-	texture.mipmaps = mipmaps;
+	if ( texture.isDataCubeTexture ) {
+
+		texture.mipmaps = mipmaps.map( ( mip ) => new DataCubeTexture( mip.data, mip.width, mip.height ) );
+
+	} else {
+
+		texture.mipmaps = mipmaps;
+
+	}
 
 	texture.type = TYPE_MAP[ vkFormat ];
 	texture.format = FORMAT_MAP[ vkFormat ];
