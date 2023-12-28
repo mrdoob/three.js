@@ -536,61 +536,6 @@ class WebGLBackend extends Backend {
 
 		this.textureUtils.updateTexture( texture, options );
 
-		const { gl } = this;
-		const { width, height } = options;
-		const { textureGPU, glTextureType, glFormat, glType, glInternalFormat } = this.get( texture );
-
-		const getImage = ( source ) => {
-
-			if ( source.isDataTexture ) {
-
-				return source.image.data;
-
-			} else if ( source instanceof ImageBitmap || source instanceof OffscreenCanvas || source instanceof HTMLImageElement || source instanceof HTMLCanvasElement ) {
-
-				return source;
-
-			}
-
-			return source.data;
-
-		};
-
-		gl.bindTexture( glTextureType, textureGPU );
-
-		if ( texture.isCubeTexture ) {
-
-			const images = options.images;
-
-			for ( let i = 0; i < 6; i ++ ) {
-
-				const image = getImage( images[ i ] );
-
-				gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, image );
-
-			}
-
-		} else if ( texture.isDataArrayTexture ) {
-
-			const image = options.image;
-
-			gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
-
-		} else if ( texture.isVideoTexture ) {
-
-			texture.update();
-
-			gl.texImage2D( glTextureType, 0, glInternalFormat, glFormat, glType, options.image );
-
-
-		} else {
-
-			const image = getImage( options.image );
-
-			gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, image );
-
-		}
-
 	}
 
 	generateMipmaps( texture ) {
