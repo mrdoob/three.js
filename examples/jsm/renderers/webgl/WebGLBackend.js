@@ -9,7 +9,7 @@ import WebGLUtils from './utils/WebGLUtils.js';
 import WebGLTextureUtils from './utils/WebGLTextureUtils.js';
 import WebGLExtensions from './utils/WebGLExtensions.js';
 import WebGLCapabilities from './utils/WebGLCapabilities.js';
-
+import { GLFeatureName } from './utils/WebGLConstants.js';
 //
 
 class WebGLBackend extends Backend {
@@ -22,9 +22,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	async init( renderer ) {
+	init( renderer ) {
 
-		await super.init( renderer );
+		super.init( renderer );
 
 		//
 
@@ -534,6 +534,8 @@ class WebGLBackend extends Backend {
 
 	updateTexture( texture, options ) {
 
+		this.textureUtils.updateTexture( texture, options );
+
 		const { gl } = this;
 		const { width, height } = options;
 		const { textureGPU, glTextureType, glFormat, glType, glInternalFormat } = this.get( texture );
@@ -886,11 +888,28 @@ class WebGLBackend extends Backend {
 
 	}
 
-	hasFeature( /*name*/ ) {
+	hasFeature( name ) {
 
-		return true;
+		const feature = GLFeatureName[ name ];
+		if ( ! feature ) {
+
+			console.warn( 'Unknown WebGL feature: ' + name );
+			return false;
+
+		}
+
+		if ( Array.isArray( feature ) ) {
+
+			return feature.some( ext => this.extensions.has( ext ) );
+
+		} else {
+
+			return this.extensions.has( feature );
+
+		}
 
 	}
+
 
 	getMaxAnisotropy() {
 

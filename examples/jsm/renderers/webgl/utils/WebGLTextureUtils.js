@@ -211,6 +211,90 @@ class WebGLTextureUtils {
 
 	}
 
+	updateTexture( texture, options ) {
+
+		const { gl } = this;
+		const { width, height } = options;
+		const { textureGPU, glTextureType, glFormat, glType, glInternalFormat } = this.backend.get( texture );
+
+		const getImage = ( source ) => {
+
+			if ( source.isDataTexture ) {
+
+				return source.image.data;
+
+			} else if ( source instanceof ImageBitmap || source instanceof OffscreenCanvas || source instanceof HTMLImageElement || source instanceof HTMLCanvasElement ) {
+
+				return source;
+
+			}
+
+			return source.data;
+
+		};
+
+		gl.bindTexture( glTextureType, textureGPU );
+
+		if ( texture.isCompressedTexture ) {
+
+			const mipmaps = texture.mipmaps;
+
+			for ( let i = 0; i < mipmaps.length; i ++ ) {
+
+				const mipmap = mipmaps[ i ];
+				if ( texture.isCompressedArrayTexture ) {
+					// TODO Handle compressed array textures
+				} else {
+
+					if ( glFormat !== null ) {
+
+						gl.compressedTexSubImage2D( gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data );
+
+					} else {
+
+						console.warn( 'Unsupported compressed texture format' );
+
+					}
+
+				}
+
+			}
+
+		} else if ( texture.isCubeTexture ) {
+
+			const images = options.images;
+
+			for ( let i = 0; i < 6; i ++ ) {
+
+				const image = getImage( images[ i ] );
+
+				gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, image );
+
+			}
+
+		} else if ( texture.isDataArrayTexture ) {
+
+			const image = options.image;
+
+			gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+
+		} else if ( texture.isVideoTexture ) {
+
+			texture.update();
+
+			gl.texImage2D( glTextureType, 0, glInternalFormat, glFormat, glType, options.image );
+
+
+		} else {
+
+			const image = getImage( options.image );
+
+			gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, image );
+
+		}
+
+	}
+
 	async copyTextureToBuffer( texture, x, y, width, height ) {
 
 		const { backend, gl } = this;

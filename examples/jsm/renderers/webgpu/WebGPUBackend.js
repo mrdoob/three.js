@@ -1075,7 +1075,7 @@ class WebGPUBackend extends Backend {
 
 		if ( features.includes( name ) === false ) {
 
-			throw new Error( 'THREE.WebGPURenderer: Unknown WebGPU GPU feature: ' + name );
+			console.warn( 'THREE.WebGPURenderer: Unknown WebGPU GPU feature: ' + name );
 
 		}
 
