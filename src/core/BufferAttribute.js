@@ -333,7 +333,12 @@ class BufferAttribute {
 
 		this.array[ index + 0 ] = x;
 		this.array[ index + 1 ] = y;
-		this.array[ index + 2 ] = z;
+
+		if ( this.itemSize > 2 ) {
+
+			this.array[ index + 2 ] = z;
+
+		}
 
 		return this;
 

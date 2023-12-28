@@ -15,6 +15,7 @@ import { Sphere } from '../../../../src/math/Sphere.js';
 import { x, y, z } from '../../utils/math-constants.js';
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
 import { toHalfFloat } from '../../../../src/extras/DataUtils.js';
+import { Vector2 } from '../../../../src/math/Vector2.js';
 
 const DegToRad = Math.PI / 180;
 
@@ -43,33 +44,26 @@ function bufferAttributeEquals( a, b, tolerance ) {
 
 }
 
-function getBBForVertices( vertices ) {
+function getBBForVertices( vertices, itemSize ) {
+
+	itemSize = itemSize || 3;
 
 	const geometry = new BufferGeometry();
 
-	geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
+	geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), itemSize ) );
 	geometry.computeBoundingBox();
 
 	return geometry.boundingBox;
 
 }
 
-function getBBForVertices2D( vertices ) {
+function getBSForVertices( vertices, itemSize ) {
+
+	itemSize = itemSize || 3;
 
 	const geometry = new BufferGeometry();
 
-	geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 2 ) );
-	geometry.computeBoundingBox();
-
-	return geometry.boundingBox;
-
-}
-
-function getBSForVertices( vertices ) {
-
-	const geometry = new BufferGeometry();
-
-	geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
+	geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), itemSize ) );
 	geometry.computeBoundingSphere();
 
 	return geometry.boundingSphere;
@@ -315,6 +309,27 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'applyMatrix4 - 2D', ( assert ) => {
+
+			const geometry = new BufferGeometry();
+			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( 4 ), 2 ) );
+
+			const matrix = new Matrix4().set(
+				1, 0, 0, 1.5,
+				0, 1, 0, - 2,
+				0, 0, 1, 0,
+				0, 0, 0, 1
+			);
+			geometry.applyMatrix4( matrix );
+
+			const position = geometry.attributes.position.array;
+			const m = matrix.elements;
+			assert.ok( position[ 0 ] === m[ 12 ] && position[ 1 ] === m[ 13 ], 'position was extracted from 2d matrix' );
+			assert.ok( position[ 2 ] === m[ 12 ] && position[ 3 ] === m[ 13 ], 'position was extracted from 2d matrix twice' );
+			assert.ok( geometry.attributes.position.version === 1, 'version was increased during update' );
+
+		} );
+
 		QUnit.test( 'applyQuaternion', ( assert ) => {
 
 			const geometry = new BufferGeometry();
@@ -456,7 +471,11 @@ export default QUnit.module( 'Core', () => {
 			assert.ok( bb.min.x === bb.max.x && bb.min.y === bb.max.y && bb.min.z === bb.max.z, 'since there is only one vertex, max and min are equal' );
 			assert.ok( bb.min.x === - 1 && bb.min.y === - 1 && bb.min.z === - 1, 'since there is only one vertex, min and max are this vertex' );
 
-			bb = getBBForVertices2D( [ - 1, - 3, 7, 13 ] );
+		} );
+
+		QUnit.test( 'computeBoundingBox - 2D', ( assert ) => {
+
+			const bb = getBBForVertices( [ - 1, - 3, 7, 13 ], 2 );
 
 			assert.ok( bb.min.x === - 1 && bb.min.y === - 3 && bb.min.z === 0, 'min values are set correctly' );
 			assert.ok( bb.max.x === 7 && bb.max.y === 13 && bb.max.z === 0, 'max values are set correctly' );
@@ -468,13 +487,23 @@ export default QUnit.module( 'Core', () => {
 			let bs = getBSForVertices( [ - 10, 0, 0, 10, 0, 0 ] );
 
 			assert.ok( bs.radius === 10, 'radius is equal to deltaMinMax / 2' );
-			assert.ok( bs.center.x === 0 && bs.center.y === 0 && bs.center.y === 0, 'bounding sphere is at ( 0, 0, 0 )' );
+			assert.ok( bs.center.x === 0 && bs.center.y === 0 && bs.center.z === 0, 'bounding sphere is at ( 0, 0, 0 )' );
 
 			bs = getBSForVertices( [ - 5, 11, - 3, 5, - 11, 3 ] );
 			const radius = new Vector3( 5, 11, 3 ).length();
 
 			assert.ok( bs.radius === radius, 'radius is equal to directionLength' );
-			assert.ok( bs.center.x === 0 && bs.center.y === 0 && bs.center.y === 0, 'bounding sphere is at ( 0, 0, 0 )' );
+			assert.ok( bs.center.x === 0 && bs.center.y === 0 && bs.center.z === 0, 'bounding sphere is at ( 0, 0, 0 )' );
+
+		} );
+
+		QUnit.test( 'computeBoundingSphere - 2D', ( assert ) => {
+
+			const bs = getBSForVertices( [ - 1, - 3, 1, 3 ], 2 );
+			const radius = new Vector2( 1, 3 ).length();
+
+			assert.ok( bs.radius === radius, 'radius is equal to directionLength' );
+			assert.ok( bs.center.x === 0 && bs.center.y === 0 && bs.center.z === 0, 'bounding sphere is at ( 0, 0, 0 )' );
 
 		} );
 

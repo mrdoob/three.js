@@ -492,7 +492,9 @@ class BufferGeometry extends EventDispatcher {
 		const normals = attributes.normal.array;
 		const uvs = attributes.uv.array;
 
-		const nVertices = positions.length / 3;
+		const positionItemSize = attributes.position.itemSize;
+
+		const nVertices = positions.length / positionItemSize;
 
 		if ( this.hasAttribute( 'tangent' ) === false ) {
 
@@ -524,9 +526,19 @@ class BufferGeometry extends EventDispatcher {
 
 		function handleTriangle( a, b, c ) {
 
-			vA.fromArray( positions, a * 3 );
-			vB.fromArray( positions, b * 3 );
-			vC.fromArray( positions, c * 3 );
+			if ( positionItemSize === 3 ) {
+
+				vA.fromArray( positions, a * 3 );
+				vB.fromArray( positions, b * 3 );
+				vC.fromArray( positions, c * 3 );
+
+			} else {
+
+				vA.fromBufferAttribute( positions, a );
+				vB.fromBufferAttribute( positions, b );
+				vC.fromBufferAttribute( positions, c );
+
+			}
 
 			uvA.fromArray( uvs, a * 2 );
 			uvB.fromArray( uvs, b * 2 );
