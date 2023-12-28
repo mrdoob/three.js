@@ -40,6 +40,8 @@ class MXElement {
 
 // Ref: https://github.com/mrdoob/three.js/issues/24674
 
+const mx_modulo = ( in1, in2 = float( 1 ) ) => mod( in1, in2 );
+
 const MXElements = [
 
 	// << Math >>
@@ -47,7 +49,7 @@ const MXElements = [
 	new MXElement( 'subtract', sub, [ 'in1', 'in2' ] ),
 	new MXElement( 'multiply', mul, [ 'in1', 'in2' ] ),
 	new MXElement( 'divide', div, [ 'in1', 'in2' ] ),
-	new MXElement( 'modulo', mod, [ 'in1', 'in2' ] ),
+	new MXElement( 'modulo', mx_modulo, [ 'in1', 'in2' ] ),
 	new MXElement( 'absval', abs, [ 'in1', 'in2' ] ),
 	new MXElement( 'sign', sign, [ 'in1', 'in2' ] ),
 	new MXElement( 'floor', floor, [ 'in1', 'in2' ] ),
