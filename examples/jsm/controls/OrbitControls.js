@@ -1045,26 +1045,30 @@ class OrbitControls extends EventDispatcher {
 
 			removePointer( event );
 
-			if ( pointers.length === 0 ) {
+			switch ( pointers.length ) {
 
-				scope.domElement.releasePointerCapture( event.pointerId );
+				case 0:
 
-				scope.domElement.removeEventListener( 'pointermove', onPointerMove );
-				scope.domElement.removeEventListener( 'pointerup', onPointerUp );
+					scope.domElement.releasePointerCapture( event.pointerId );
 
-			}
+					scope.domElement.removeEventListener( 'pointermove', onPointerMove );
+					scope.domElement.removeEventListener( 'pointerup', onPointerUp );
 
-			scope.dispatchEvent( _endEvent );
+					scope.dispatchEvent( _endEvent );
 
-			state = STATE.NONE;
+					state = STATE.NONE;
 
-			if ( pointers.length == 1 ) {
+					break;
 
-				const pointerId = pointers[ 0 ];
-				const position = pointerPositions[ pointerId ];
+				case 1:
 
-				// minimal placeholder event - allows state correction on pointer-up
-				onTouchStart( { pointerId: pointerId, pageX: position.x, pageY: position.y } );
+					const pointerId = pointers[ 0 ];
+					const position = pointerPositions[ pointerId ];
+
+					// minimal placeholder event - allows state correction on pointer-up
+					onTouchStart( { pointerId: pointerId, pageX: position.x, pageY: position.y } );
+
+					break;
 
 			}
 
