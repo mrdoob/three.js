@@ -1089,17 +1089,21 @@ class NodeBuilder {
 
 	}
 
-	build() {
+	build( convertMaterial = true ) {
 
 		const { object, material } = this;
 
-		if ( material !== null ) {
+		if ( convertMaterial ) {
 
-			NodeMaterial.fromMaterial( material ).build( this );
+			if ( material !== null ) {
 
-		} else {
+				NodeMaterial.fromMaterial( material ).build( this );
 
-			this.addFlow( 'compute', object );
+			} else {
+
+				this.addFlow( 'compute', object );
+
+			}
 
 		}
 
