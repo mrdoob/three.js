@@ -242,32 +242,27 @@ class WebGLTextureUtils {
 			for ( let i = 0; i < mipmaps.length; i ++ ) {
 
 				const mipmap = mipmaps[ i ];
+
 				if ( texture.isCompressedArrayTexture ) {
 
 					const image = options.image;
 
-					for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+					if ( texture.format !== gl.RGBA ) {
 
-						mipmap = mipmaps[ i ];
+						if ( glFormat !== null ) {
 
-						if ( texture.format !== gl.RGBA ) {
+							gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
 
-							if ( glFormat !== null ) {
-
-								gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
-
-
-							} else {
-
-								console.warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
-
-							}
 
 						} else {
 
-							gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, glType, mipmap.data );
+							console.warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
 
 						}
+
+					} else {
+
+						gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, glType, mipmap.data );
 
 					}
 
