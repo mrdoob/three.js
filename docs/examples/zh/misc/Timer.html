@@ -1,39 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<base href="../../../" />
-		<script src="page.js"></script>
-		<link type="text/css" rel="stylesheet" href="page.css" />
-	</head>
-	<body>
 
-		<h1>[name]</h1>
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
 
-		<p class="desc">
-			This class is an alternative to [page:Clock] with a different API design and behavior.
-			The goal is to avoid the conceptual flaws that became apparent in [page:Clock] over time.
+<body>
 
-			<ul>
-				<li>[name] has an [page:.update]() method that updates its internal state. That makes it possible to call [page:.getDelta]() and [page:.getElapsed]() multiple times per simulation step without getting different values.</li>
-				<li>The class uses the Page Visibility API to avoid large time delta values when the app is inactive (e.g. tab switched or browser hidden).</li>
-			</ul>
-		</p>
+	<h1>定时器([name])</h1>
 
-		<h2>Import</h2>
+	<p class="desc">
+		此类是 [page:Clock] 的替代品，具有不同的 API 设计和行为。目标是避免随着时间的推移 [page:Clock] 中变得明显的概念缺陷。
 
-		<p>
-			[name] is an add-on, and must be imported explicitly.
-			See [link:#manual/introduction/Installation Installation / Addons].
-		</p>
+	<ul>
+		<li>[name] 具有 [page:.update]() 方法，用于更新其内部状态。这使得可以在模拟步骤中多次调用 [page:.getDelta]() 和 [page:.getElapsed]() 而不会得到不同的值。
+		</li>
+		<li>该类使用页面可见性 API（Page Visibility API），以避免在应用程序处于非活动状态（例如切换标签或浏览器隐藏）时出现大的时间差值。</li>
+	</ul>
+	</p>
 
-		<code>
+	<h2>引入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons].
+	</p>
+
+	<code>
 			import { Timer } from 'three/addons/misc/Timer.js';
 		</code>
 
-		<h2>Code Example</h2>
+	<h2>代码示例</h2>
 
-		<code>
+	<code>
 		const timer = new Timer();
 
 		function animate( timestamp ) {
@@ -52,58 +53,58 @@
 		}
 		</code>
 
-		<h2>Examples</h2>
+	<h2>例子</h2>
 
-		<p>
-			[example:webgl_morphtargets_sphere WebGL / morphtargets / sphere]
-		</p>
+	<p>
+		[example:webgl_morphtargets_sphere WebGL / morphtargets / sphere]
+	</p>
 
-		<h2>Constructor</h2>
+	<h2>构造函数</h2>
 
-		<h3>Timer()</h3>
+	<h3>Timer()</h3>
 
-		<h2>Methods</h2>
+	<h2>方法</h2>
 
-		<h3>[method:Number getDelta]()</h3>
-		<p>
-			Returns the time delta in seconds.
-		</p>
+	<h3>[method:Number getDelta]()</h3>
+	<p>
+		返回以秒为单位的时间增量。
+	</p>
 
-		<h3>[method:Number getElapsed]()</h3>
-		<p>
-			Returns the elapsed time in seconds.
-		</p>
+	<h3>[method:Number getElapsed]()</h3>
+	<p>
+		返回经过的时间（以秒为单位）。
+	</p>
 
-		<h3>[method:this setTimescale]( [param:Number timescale] )</h3>
-		<p>
-			Sets a time scale that scales the time delta in [page:.update]().
-		</p>
+	<h3>[method:this setTimescale]( [param:Number timescale] )</h3>
+	<p>
+		设置一个时间刻度，缩放 [page:.update]() 中的时间增量。
+	</p>
 
-		<h3>[method:this reset]()</h3>
-		<p>
-			Resets the time computation for the current simulation step.
-		</p>
+	<h3>[method:this reset]()</h3>
+	<p>
+		重置当前模拟步骤的时间计算。
+	</p>
 
-		<h3>[method:this dispose]()</h3>
-		<p>
-			Can be used to free all internal resources. Usually called when the timer instance isn't required anymore.
-		</p>
+	<h3>[method:this dispose]()</h3>
+	<p>
+		可用于释放所有内部资源。通常在不再需要计时器实例时调用。
+	</p>
 
-		<h3>[method:this update]( [param:Number timestamp] )</h3>
-		<p>
-			timestamp -- (optional) The current time in milliseconds. Can be obtained from the
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]
-			callback argument. If not provided, the current time will be determined with
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/Performance/now performance.now].<br /><br />
+	<h3>[method:this update]( [param:Number timestamp] )</h3>
+	<p>
+		timestamp -- （可选）当前时间（以毫秒为单位）。可以从
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]
+		回调参数中获取 。如果未提供，当前时间将由 [link:https://developer.mozilla.org/en-US/docs/Web/API/Performance/now performance.now]
+		确定。<br /><br />
 
-			Updates the internal state of the timer. This method should be called once per simulation step
-			and before you perform queries against the timer (e.g. via [page:.getDelta]()).
-		</p>
+		更新定时器的内部状态。该方法应该在每个模拟步骤以及对计时器执行查询之前调用一次（例如通过 [page:.getDelta]()）。
+	</p>
 
-		<h2>Source</h2>
+	<h2>源代码</h2>
 
-		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/misc/Timer.js examples/jsm/misc/Timer.js]
-		</p>
-	</body>
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/misc/Timer.js examples/jsm/misc/Timer.js]
+	</p>
+</body>
+
 </html>
