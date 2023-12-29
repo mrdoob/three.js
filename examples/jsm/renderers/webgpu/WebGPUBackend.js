@@ -1065,17 +1065,16 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	hasFeature( name ) {
+	hasFeature( name, silentError ) {
 
 		const adapter = this.adapter || _staticAdapter;
 
 		//
-
 		const features = Object.values( GPUFeatureName );
 
-		if ( features.includes( name ) === false ) {
+		if ( ! silentError && features.includes( name ) === false ) {
 
-			console.warn( 'THREE.WebGPURenderer: Unknown WebGPU GPU feature: ' + name );
+			throw new Error( 'THREE.WebGPURenderer: Unknown WebGPU GPU feature: ' + name );
 
 		}
 

@@ -833,25 +833,27 @@ class WebGLBackend extends Backend {
 
 	}
 
-	hasFeature( name ) {
+	hasFeature( name, silentError ) {
 
-		const feature = GLFeatureName[ name ];
-		if ( ! feature ) {
 
-			console.warn( 'Unknown WebGL feature: ' + name );
-			return false;
+		const keysMatching = Object.keys( GLFeatureName ).filter( key => GLFeatureName[ key ] === name );
+
+		if ( ! silentError && keysMatching.length === 0 ) {
+
+			throw new Error( 'THREE.WebGPURenderer: Unknown WebGPU GPU feature: ' + name );
+
+		}
+
+		const extensions = this.extensions;
+
+		for ( let i = 0; i < keysMatching.length; i ++ ) {
+
+
+			if ( extensions.has( keysMatching[ i ] ) ) return true;
 
 		}
 
-		if ( Array.isArray( feature ) ) {
-
-			return feature.some( ext => this.extensions.has( ext ) );
-
-		} else {
-
-			return this.extensions.has( feature );
-
-		}
+		return false;
 
 	}
 

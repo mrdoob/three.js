@@ -88,7 +88,7 @@ class Backend {
 
 	// utils
 
-	hasFeature( name ) { } // return Boolean
+	hasFeature( name, silentError ) { } // return Boolean
 
 	getInstanceCount( renderObject ) {
 

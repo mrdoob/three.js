@@ -243,7 +243,34 @@ class WebGLTextureUtils {
 
 				const mipmap = mipmaps[ i ];
 				if ( texture.isCompressedArrayTexture ) {
-					// TODO Handle compressed array textures
+
+					const image = options.image;
+
+					for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
+
+						mipmap = mipmaps[ i ];
+
+						if ( texture.format !== gl.RGBA ) {
+
+							if ( glFormat !== null ) {
+
+								gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
+
+
+							} else {
+
+								console.warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
+
+							}
+
+						} else {
+
+							gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, glType, mipmap.data );
+
+						}
+
+					}
+
 				} else {
 
 					if ( glFormat !== null ) {
