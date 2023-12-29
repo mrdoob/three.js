@@ -1,32 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<base href="../../../" />
-		<script src="page.js"></script>
-		<link type="text/css" rel="stylesheet" href="page.css" />
-	</head>
-	<body>
-		<h1>[name]</h1>
 
-		<p class="desc"> A Physics handler for <a href="https://sites.google.com/view/evpvp/">`MMD`</a> resources. <br /><br />
-		[name] calculates Physics for model loaded by [page:MMDLoader] with [link:https://github.com/kripken/ammo.js/ ammo.js] (Bullet-based JavaScript Physics engine).
-		</p>
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
 
-		<h2>Import</h2>
+<body>
+	<h1>[name]</h1>
 
-		<p>
-			[name] is an add-on, and must be imported explicitly.
-			See [link:#manual/introduction/Installation Installation / Addons].
-		</p>
+	<p class="desc"> 资源的物理处理程序 <a href="https://sites.google.com/view/evpvp/">`MMD`</a>。 <br /><br />
+		[name] 使用 [link:https://github.com/kripken/ammo.js/ ammo.js] （基于 Bullet 的 JavaScript 物理引擎）为 [page:MMDLoader]
+		计算加载模型的物理量。
+	</p>
 
-		<code>
+	<h2>引入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
 			import { MMDPhysics } from 'three/addons/animation/MMDPhysics.js';
 		</code>
 
-		<h2>Code Example</h2>
+	<h2>代码示例</h2>
 
-		<code>
+	<code>
 		let physics;
 
 		// Load MMD resources and instantiate MMDPhysics
@@ -50,76 +52,79 @@
 		}
 		</code>
 
-		<h2>Examples</h2>
+	<h2>例子</h2>
 
-		<p>
-			[example:webgl_loader_mmd]<br />
-			[example:webgl_loader_mmd_audio]
-		</p>
+	<p>
+		[example:webgl_loader_mmd]<br />
+		[example:webgl_loader_mmd_audio]
+	</p>
 
-		<h2>Constructor</h2>
+	<h2>构造函数</h2>
 
-		<h3>[name]( [param:SkinnedMesh mesh], [param:Array rigidBodyParams], [param:Array constraintParams], [param:Object params] )</h3>
-		<p>
-		[page:SkinnedMesh mesh] — [page:SkinnedMesh] for which [name] calculates Physics.<br />
-		[page:Array rigidBodyParams] — An array of [page:Object] specifying Rigid Body parameters.<br />
-		[page:Array constraintParams] — (optional) An array of [page:Object] specifying Constraint parameters.<br />
-		[page:Object params] — (optional)<br />
-		</p>
-		<ul>
-			<li>[page:Number unitStep] - Default is 1 / 65.</li>
-			<li>[page:Integer maxStepNum] - Default is 3.</li>
-			<li>[page:Vector3 gravity] - Default is ( 0, - 9.8 * 10, 0 )</li>
-		</ul>
-		<p>
-		Creates a new [name].
-		</p>
+	<h3>[name]( [param:SkinnedMesh mesh], [param:Array rigidBodyParams], [param:Array constraintParams], [param:Object
+		params] )</h3>
+	<p>
+		[page:SkinnedMesh mesh] — [page:SkinnedMesh]， [name] 为其计算物理。<br />
+		[page:Array rigidBodyParams] — 指定刚体参数的 [page:Object] 数组。<br />
+		[page:Array constraintParams] — 可选）指定约束参数的 [page:Object] 数组。<br />
+		[page:Object params] — （可选）<br />
+	</p>
+	<ul>
+		<li>[page:Number unitStep] - 默认为 1 / 65</li>
+		<li>[page:Integer maxStepNum] - 默认为 3</li>
+		<li>[page:Vector3 gravity] - 默认为 ( 0, - 9.8 * 10, 0 )</li>
+	</ul>
+	<p>
+		创建一个新的 [name]。
+	</p>
 
-		<h2>Properties</h2>
+	<h2>属性</h2>
 
-		<h3>[property:Array mesh]</h3>
-		<p>[page:SkinnedMesh] passed to the constructor.</p>
+	<h3>[property:Array mesh]</h3>
+	<p>[page:SkinnedMesh] 传递给构造函数。</p>
 
-		<h2>Methods</h2>
+	<h2>方法</h2>
 
-		<h3>[method:MMDPhysicsHelper createHelper]()</h3>
-		<p>
-		Return [page:MMDPhysicsHelper]. You can visualize Rigid bodies by adding the helper to scene.
-		</p>
+	<h3>[method:MMDPhysicsHelper createHelper]()</h3>
+	<p>
+		返回 [page:MMDPhysicsHelper]。您可以通过将辅助对象添加到场景来可视化刚体。
+	</p>
 
-		<h3>[method:this reset]()</h3>
-		<p>
-		Resets Rigid bodies transform to current bone's.
-		</p>
+	<h3>[method:this reset]()</h3>
+	<p>
+		重置刚体变换为当前骨骼的刚体。
+	</p>
 
-		<h3>[method:this setGravity]( [param:Vector3 gravity] )</h3>
-		<p>
-		[page:Vector3 gravity] — Direction and volume of gravity.
-		</p>
-		<p>
-		Set gravity.
-		</p>
+	<h3>[method:this setGravity]( [param:Vector3 gravity] )</h3>
+	<p>
+		[page:Vector3 gravity] — 重力的方向和体积。
+	</p>
+	<p>
+		设置重力。
+	</p>
 
-		<h3>[method:this update]( [param:Number delta] )</h3>
-		<p>
-		[page:Number delta] — Time in second.
-		</p>
-		<p>
-		Advance Physics calculation and updates bones.
-		</p>
+	<h3>[method:this update]( [param:Number delta] )</h3>
+	<p>
+		[page:Number delta] — 时间（以秒为单位）
+	</p>
+	<p>
+		高级物理计算和更新骨骼。
+	</p>
 
-		<h3>[method:this warmup]( [param:Integer cycles] )</h3>
-		<p>
-		[page:Number delta] — Time in second.
-		</p>
-		<p>
-		Warm up Rigid bodies. Calculates cycles steps.
-		</p>
+	<h3>[method:this warmup]( [param:Integer cycles] )</h3>
+	<p>
+		[page:Number delta] — 时间（以秒为单位）
+	</p>
+	<p>
+		热身刚体。计算循环步数。
+	</p>
 
-		<h2>Source</h2>
+	<h2>源代码</h2>
 
-		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/animation/MMDPhysics.js examples/jsm/animation/MMDPhysics.js]
-		</p>
-	</body>
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/animation/MMDPhysics.js
+		examples/jsm/animation/MMDPhysics.js]
+	</p>
+</body>
+
 </html>
