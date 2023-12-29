@@ -762,16 +762,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	hasFeature( name, silentError ) {
-
+	hasFeature( name ) {
 
 		const keysMatching = Object.keys( GLFeatureName ).filter( key => GLFeatureName[ key ] === name );
-
-		if ( ! silentError && keysMatching.length === 0 ) {
-
-			throw new Error( 'THREE.WebGPURenderer: Unknown WebGPU GPU feature: ' + name );
-
-		}
 
 		const extensions = this.extensions;
 

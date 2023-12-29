@@ -772,9 +772,9 @@ class Renderer {
 
 	}
 
-	hasFeature( name, silentError ) {
+	hasFeature( name ) {
 
-		return this.backend.hasFeature( name, silentError );
+		return this.backend.hasFeature( name );
 
 	}
 
