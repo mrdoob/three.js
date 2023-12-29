@@ -1,36 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<base href="../../../" />
-		<script src="page.js"></script>
-		<link type="text/css" rel="stylesheet" href="page.css" />
-	</head>
-	<body>
-		<h1>[name]</h1>
 
-		<p class="desc">
-			An exporter for the STL file format. <br /><br />
-			[link:https://en.wikipedia.org/wiki/STL_(file_format) STL] files describe only the surface geometry
-			of a three-dimensional object without any representation of color, texture or other common model attributes.
-			The STL format specifies both ASCII and binary representations, with binary being more compact. 
-			STL files contain no scale information or indexes, and the units are arbitrary.
-		</p>
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
 
-		<h2>Import</h2>
+<body>
+	<h1>STL导出器([name])</h1>
 
-		<p>
-			[name] is an add-on, and must be imported explicitly.
-			See [link:#manual/introduction/Installation Installation / Addons].
-		</p>
+	<p class="desc">
+		一个用于 STL 文件格式的导出器。<br /><br />
+		[link:https://en.wikipedia.org/wiki/STL_(file_format) STL] 文件仅描述三维对象的表面几何，不包含颜色、纹理或其他常见的模型属性。STL 格式指定了 ASCII
+		和二进制两种表示方式，其中二进制表示更加紧凑。STL 文件不包含比例信息或索引，单位是任意的。
+	</p>
 
-		<code>
+	<h2>引入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
 			import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 		</code>
 
-		<h2>Code Example</h2>
+	<h2>代码示例</h2>
 
-		<code>
+	<code>
 		// Instantiate an exporter
 		const exporter = new STLExporter();
 
@@ -41,35 +40,37 @@
 		const result = exporter.parse( mesh, options );
 		</code>
 
-		<h2>Examples</h2>
+	<h2>例子</h2>
 
-		<p>
-			[example:misc_exporter_stl]
-		</p>
+	<p>
+		[example:misc_exporter_stl]
+	</p>
 
-		<h2>Constructor</h2>
+	<h2>构造函数</h2>
 
-		<h3>[name]()</h3>
-		<p>
-		Creates a new [name].
-		</p>
+	<h3>[name]()</h3>
+	<p>
+		创建一个新的 [name] 实例。
+	</p>
 
-		<h2>Methods</h2>
+	<h2>方法</h2>
 
-		<h3>[method:Object parse]( [param:Object3D scene], [param:Object options] )</h3>
+	<h3>[method:Object parse]( [param:Object3D scene], [param:Object options] )</h3>
 
-		<p>
-		[page:Object3D scene] — Scene, Mesh, or other Object3D based class containing Meshes to encode.<br />
-		[page:Options options] — Optional export options<br />
-		<ul>
-			<li>binary - bool. Return an ASCII encoded string or binary data buffer. Default is `false`.</li>
-		</ul>
-		</p>
+	<p>
+		[page:Object3D scene] — 场景、网格或其他包含要编码的网格的基于 Object3D 的类。<br />
+		[page:Options options] — 可选的导出选项<br />
+	<ul>
+		<li>binary - bool. 返回 ASCII 编码字符串或二进制数据缓冲区。默认为 `false`。</li>
+	</ul>
+	</p>
 
-		<h2>Source</h2>
+	<h2>源代码</h2>
 
-		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/STLExporter.js examples/jsm/exporters/STLExporter.js]
-		</p>
-	</body>
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/STLExporter.js
+		examples/jsm/exporters/STLExporter.js]
+	</p>
+</body>
+
 </html>
