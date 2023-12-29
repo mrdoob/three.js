@@ -1,35 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<base href="../../../" />
-		<script src="page.js"></script>
-		<link type="text/css" rel="stylesheet" href="page.css" />
-	</head>
-	<body>
-		[page:OrbitControls] &rarr;
 
-		<h1>[name]</h1>
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
 
-		<p class="desc">
-			[name] is intended for transforming a camera over a map from bird's eye perspective.
-			The class shares its implementation with [page:OrbitControls] but uses a specific preset for mouse/touch interaction and disables screen space panning by default.
-		</p>
+<body>
+	[page:OrbitControls] &rarr;
 
-		<h2>Import</h2>
+	<h1>地图控制器([name])</h1>
 
-		<p>
-			[name] is an add-on, and must be imported explicitly.
-			See [link:#manual/introduction/Installation Installation / Addons].
-		</p>
+	<p class="desc">
+		[name] 旨在从鸟瞰角度在地图上转换相机。该类与 [page:OrbitControls] 共享其实现，但使用特定的预设进行鼠标/触摸交互，并默认禁用屏幕空间平移。
+	</p>
 
-		<code>
+	<h2>引入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons].
+	</p>
+
+	<code>
 			import { MapControls } from 'three/addons/controls/MapControls.js';
 		</code>
 
-		<h2>Code Example</h2>
+	<h2>代码示例</h2>
 
-		<code>
+	<code>
 		const renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
@@ -54,66 +54,66 @@
 		}
 		</code>
 
-		<h2>Examples</h2>
+	<h2>例子</h2>
 
-		<p>[example:misc_controls_map misc / controls / map ]</p>
+	<p>[example:misc_controls_map misc / controls / map ]</p>
 
-		<h2>Constructor</h2>
+	<h2>构造函数</h2>
 
-		<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
-		<p>
-			[page:Camera object]: (required) The camera to be controlled. The camera must not be a child of another object, unless that object is the scene itself.<br><br>
+	<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
+	<p>
+		[page:Camera object]：（必填）要控制的相机。相机不能是另一个对象的子对象，除非该对象是场景本身。<br><br>
 
-			[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
-		</p>
+		[page:HTMLDOMElement domElement]： 用于事件侦听器的 HTML 元素。
+	</p>
 
-		<h2>Events</h2>
+	<h2>事件</h2>
 
-		<p>See the base [page:OrbitControls] class for common events.</p>
+	<p>有关常见事件，请参阅 [page:OrbitControls] 基类。</p>
 
-		<h2>Properties</h2>
+	<h2>属性</h2>
 
-		<p>See the base [page:OrbitControls] class for common properties.</p>
+	<p>有关常见属性，请参阅 [page:OrbitControls] 基类。</p>
 
-		<h3>
-			[property:Object mouseButtons]</h3>
-		<p>
-			This object contains references to the mouse actions used by the controls.
-			<code>
+	<h3>
+		[property:Object mouseButtons]</h3>
+	<p>
+		该对象包含对控件使用的鼠标操作的引用。
+		<code>
 controls.mouseButtons = {
 	LEFT: THREE.MOUSE.PAN,
 	MIDDLE: THREE.MOUSE.DOLLY,
 	RIGHT: THREE.MOUSE.ROTATE
 }
 			</code>
-		</p>
+	</p>
 
-		<h3>[property:Boolean screenSpacePanning]</h3>
-		<p>
-		Defines how the camera's position is translated when panning. If true, the camera pans in screen space.
-		Otherwise, the camera pans in the plane orthogonal to the camera's up direction.
-		Default is `false`.
-		</p>
+	<h3>[property:Boolean screenSpacePanning]</h3>
+	<p>
+		定义平移时摄像机位置的平移方式。如果为 true，相机将在屏幕空间中平移。否则，摄像机将在与摄像机向上方向正交的平面中平移。默认为 `false`。
+	</p>
 
-		<h3>[property:Object touches]</h3>
-		<p>
-			This object contains references to the touch actions used by the controls.
-			<code>
+	<h3>[property:Object touches]</h3>
+	<p>
+		该对象包含对控件使用的触摸操作的引用。
+		<code>
 controls.touches = {
 	ONE: THREE.TOUCH.PAN,
 	TWO: THREE.TOUCH.DOLLY_ROTATE
 }
 			</code>
-		</p>
+	</p>
 
-		<h2>Methods</h2>
+	<h2>方法</h2>
 
-		<p>See the base [page:OrbitControls] class for common methods.</p>
+	<p>有关常用方法，请参阅 [page:OrbitControls]。</p>
 
-		<h2>Source</h2>
+	<h2>源代码</h2>
 
-		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/MapControls.js examples/jsm/controls/MapControls.js]
-		</p>
-	</body>
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/MapControls.js
+		examples/jsm/controls/MapControls.js]
+	</p>
+</body>
+
 </html>

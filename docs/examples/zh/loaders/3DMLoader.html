@@ -1,165 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<base href="../../../" />
-		<script src="page.js"></script>
-		<link type="text/css" rel="stylesheet" href="page.css" />
-	</head>
-	<body>
-		[page:Loader] &rarr;
-		<h1>[name]</h1>
 
-		<p class="desc">
-			A loader for Rhinoceros 3d files and objects. <br /><br />
-			Rhinoceros is a 3D modeler used to create, edit, analyze, document, render, animate, and translate NURBS curves, surfaces, breps, extrusions, point clouds, as well as polygon meshes and SubD objects.
-			[link:https://github.com/mcneel/rhino3dm rhino3dm.js] is compiled to WebAssembly from the open source geometry library [link:https://github.com/mcneel/opennurbs openNURBS].
-			The loader currently uses [link:https://www.npmjs.com/package/rhino3dm/v/8.0.1 rhino3dm.js 8.0.1.]
-		</p>
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
 
-		<h2>Import</h2>
+<body>
+	[page:Loader] &rarr;
+	<h1>3DM加载器([name])</h1>
 
-		<p>
-			[name] is an add-on, and must be imported explicitly.
-			See [link:#manual/introduction/Installation Installation / Addons].
-		</p>
+	<p class="desc">
+		用于加载 Rhinoceros 3d 模型文件。<br /><br />
+		Rhinoceros 是一个 3D 建模器，用于创建、编辑、分析、记录、渲染、动画和转换 NURBS 曲线、曲面、breps、挤压、点云以及多边形网格和 SubD 对象。
+		[link:https://github.com/mcneel/rhino3dm rhino3dm.js] 从开源几何库 [link:https://github.com/mcneel/opennurbs openNURBS]
+		编译为 WebAssembly 。加载器当前使用 [link:https://www.npmjs.com/package/rhino3dm/v/8.0.1 rhino3dm.js 8.0.1.]。
+	</p>
 
-		<code>
+	<h2>引入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
 			import { Rhino3dmLoader } from 'three/addons/loaders/3DMLoader.js';
 		</code>
 
-		<h2>Supported Conversions</h2>
+	<h2>支持的转换</h2>
 
-		<p>
-			The [name] converts Rhino objects to the following three.js types:
-		</p>
+	<p>
+		[name] 将 Rhino 对象转换为以下 three.js 类型：
+	</p>
 
-		<table>
-			<tr>
-				<th>3dm type</th>
-				<th>three.js type</th>
-			</tr>
-			<tr>
-				<td>Point</td>
-				<td>[page:Points Points]</td>
-			</tr>
-			<tr>
-				<td>PointSet / PointCloud</td>
-				<td>[page:Points Points]</td>
-			</tr>
-			<tr>
-				<td>TextDot</td>
-				<td>[page:Sprite Sprite]</td>
-			</tr>
-			<tr>
-				<td>Curve</td>
-				<td>[page:Line Line] <sup> 1</sup></td>
-			</tr>
-			<tr>
-				<td>Mesh</td>
-				<td>[page:Mesh Mesh]</td>
-			</tr>
-			<tr>
-				<td>Extrusion</td>
-				<td>[page:Mesh Mesh]<sup> 2</sup></td>
-			</tr>
-			<tr>
-				<td>BREP</td>
-				<td>[page:Mesh Mesh]<sup> 2</sup></td>
-			</tr>
-			<tr>
-				<td>SubD</td>
-				<td>[page:Mesh Mesh]<sup> 3</sup></td>
-			</tr>
-			<tr>
-				<td>InstanceReferences</td>
-				<td>[page:Object3D Object3D]</td>
-			</tr>
-			<tr>
-				<td>DirectionalLight</td>
-				<td>[page:DirectionalLight DirectionalLight]</td>
-			</tr>
-			<tr>
-				<td>PointLight</td>
-				<td>[page:PointLight PointLight]</td>
-			</tr>
-			<tr>
-				<td>RectangularLight</td>
-				<td>[page:RectAreaLight RectAreaLight]</td>
-			</tr>
-			<tr>
-				<td>SpotLight</td>
-				<td>[page:SpotLight SpotLight]</td>
-			</tr>
-			<tr>
-				<td>File3dm</td>
-				<td>[page:Object3D Object3D]<sup> 4</sup></td>
-			</tr>
-			<tr>
-				<td>Material / Physically Based Material</td>
-				<td>[page:MeshPhysicalMaterial MeshPhysicalMaterial]</td>
-			</tr>
-		</table>
+	<table>
+		<tr>
+			<th>3dm type</th>
+			<th>three.js type</th>
+		</tr>
+		<tr>
+			<td>Point</td>
+			<td>[page:Points Points]</td>
+		</tr>
+		<tr>
+			<td>PointSet / PointCloud</td>
+			<td>[page:Points Points]</td>
+		</tr>
+		<tr>
+			<td>TextDot</td>
+			<td>[page:Sprite Sprite]</td>
+		</tr>
+		<tr>
+			<td>Curve</td>
+			<td>[page:Line Line] <sup> 1</sup></td>
+		</tr>
+		<tr>
+			<td>Mesh</td>
+			<td>[page:Mesh Mesh]</td>
+		</tr>
+		<tr>
+			<td>Extrusion</td>
+			<td>[page:Mesh Mesh]<sup> 2</sup></td>
+		</tr>
+		<tr>
+			<td>BREP</td>
+			<td>[page:Mesh Mesh]<sup> 2</sup></td>
+		</tr>
+		<tr>
+			<td>SubD</td>
+			<td>[page:Mesh Mesh]<sup> 3</sup></td>
+		</tr>
+		<tr>
+			<td>InstanceReferences</td>
+			<td>[page:Object3D Object3D]</td>
+		</tr>
+		<tr>
+			<td>DirectionalLight</td>
+			<td>[page:DirectionalLight DirectionalLight]</td>
+		</tr>
+		<tr>
+			<td>PointLight</td>
+			<td>[page:PointLight PointLight]</td>
+		</tr>
+		<tr>
+			<td>RectangularLight</td>
+			<td>[page:RectAreaLight RectAreaLight]</td>
+		</tr>
+		<tr>
+			<td>SpotLight</td>
+			<td>[page:SpotLight SpotLight]</td>
+		</tr>
+		<tr>
+			<td>File3dm</td>
+			<td>[page:Object3D Object3D]<sup> 4</sup></td>
+		</tr>
+		<tr>
+			<td>Material / Physically Based Material</td>
+			<td>[page:MeshPhysicalMaterial MeshPhysicalMaterial]</td>
+		</tr>
+	</table>
 
-		<h3>Notes:</h3>
+	<h3>注意：</h3>
 
-		<p><i>
-			<sup>1</sup> NURBS curves are discretized to a hardcoded resolution.
+	<p><i>
+			<sup>1</sup> NURBS 曲线被离散化为硬编码分辨率。
 		</i></p>
-		<p><i>
-			<sup>2</sup> Types which are based on BREPs and NURBS surfaces are represented with their "Render Mesh". Render meshes might not be associated with these objects if they have not been displayed in an appropriate display mode in Rhino (i.e. "Shaded", "Rendered", etc), or are created programmatically, for example, via Grasshopper or directly with the rhino3dm library. As of rhino3dm.js@8.0.0-beta2, BrepFace and Extrusions can be assigned a mesh representation, but these must be generated by the user.
+	<p><i>
+			<sup>2</sup> 基于 BREP 和 NURBS 曲面的类型用其“渲染网格”表示。如果渲染网格未在 Rhino 中以适当的显示模式显示（即“着色”、“渲染”等），或者以编程方式创建（例如通过 Grasshopper
+			或直接使用 rhino3dm），则渲染网格可能不会与这些对象关联图书馆。从 rhino3dm.js@8.0.0-beta2 开始，BrepFace 和 Extrusions 可以分配网格表示，但这些必须由用户生成。
 		</i></p>
-		<p><i>
-			<sup>3</sup> SubD objects are represented by subdividing their control net.
+	<p><i>
+			<sup>3</sup> SubD 对象通过细分其控制网来表示。
 		</i></p>
-		<p><i>
-			<sup>4</sup> Whether a Rhino Document (File3dm) is loaded or parsed, the returned object is an [page:Object3D Object3D] with all Rhino objects (File3dmObject) as children. File3dm layers and other file level properties are added to the resulting object's userData.
+	<p><i>
+			<sup>4</sup> 无论 Rhino 文件(File3dm)被加载还是解析，返回的对象都是一个 [page:Object3D
+			Object3D] ，所有 Rhino 对象(File3dmObject)都是子对象。File3dm 图层和其他文件级属性将添加到生成对象的 userData 中。
 		</i></p>
-		<p><i>
-			<sup>5</sup> All resulting three.js objects have useful properties from the Rhino object (i.e. layer index, name, etc.) populated in their userData object.
+	<p><i>
+			<sup>5</sup> 所有生成的 Three.js 对象都具有来自填充在其 userData 对象中的 Rhino 对象的有用属性（即图层索引、名称等）。
 		</i></p>
-		<p><i>
-			<sup>6</sup> Rhino and Three.js have a different coordinate system. Upon import, you should rotate the resulting [page:Object3D Object3D] by -90º in x or set the THREE.Object3D.DEFAULT_UP at the beginning of your application: 
+	<p><i>
+			<sup>6</sup> Rhino 和 Three.js 有不同的坐标系。导入后，您应该将生成的 [page:Object3D Object3D] 在 x 方向上旋转 -90° 或在应用程序开始时设置
+			THREE.Object3D.DEFAULT_UP：
 			<code>THREE.Object3D.DEFAULT_UP.set( 0, 0, 1 );</code>
-			Keep in mind that this will affect the orientation of all of the Object3Ds in your application.
+			请记住，这将影响应用程序中所有 Object3D 的方向。
 		</i></p>
 
-		<h2>Examples</h2>
+	<h2>例子</h2>
 
-		<p>
-			[example:webgl_loader_3dm]
-		</p>
+	<p>
+		[example:webgl_loader_3dm]
+	</p>
 
-		<hr>
+	<h2>构造函数</h2>
 
-		<h2>Constructor</h2>
+	<h3>Rhino3dmLoader( [param:LoadingManager manager] )</h3>
+	<p>
+		[page:LoadingManager manager] — 加载器使用的 [page:LoadingManager loadingManager]。默认值为 [page:LoadingManager
+		THREE.DefaultLoadingManager]。
+	</p>
+	<p>
+		创建一个新的 Rhino3dmLoader。
+	</p>
 
-		<h3>Rhino3dmLoader( [param:LoadingManager manager] )</h3>
-		<p>
-		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
-		</p>
-		<p>
-		Creates a new Rhino3dmLoader.
-		</p>
+	<h2>属性</h2>
+	<p>有关常用属性，请参阅 [page:Loader] 基类。</p>
 
-		<h2>Properties</h2>
-		<p>See the base [page:Loader] class for common properties.</p>
+	<h2>方法</h2>
+	<p>有关常用方法，请参阅 [page:Loader] 基类。</p>
 
-		<h2>Methods</h2>
-		<p>See the base [page:Loader] class for common methods.</p>
+	<h3>[method:Object3D load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function
+		onError] )</h3>
+	<p>
+		[page:String url] — 包含 `.3dm` 文件路径/URL的字符串<br />
+		[page:Function onLoad] — 加载成功完成后调用的函数<br />
+		[page:Function onProgress] — （可选）加载过程中调用的函数。参数将是 XMLHttpRequest 实例，其中包含 .[page:Integer total] 和 .[page:Integer
+		loaded] 字节。如果服务器没有设置 Content-Length，.[page:Integer total] 将为 0。<br />
+		[page:Function onError] — （可选）加载期间发生错误时调用的函数。该函数接收错误作为参数。<br />
+	</p>
+	<p>
+		开始从 url 加载并在解析得到 Object3d 后调用 `onLoad` 。
+	</p>
 
-		<h3>[method:Object3D load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
-		<p>
-		[page:String url] — A string containing the path/URL of the `.3dm` file.<br />
-		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
-		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
-		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
-		</p>
-		<p>
-		Begin loading from url and call the `onLoad` function with the resulting Object3d.
-		</p>
-
-		<code>
+	<code>
 			// Instantiate a loader
 			const loader = new Rhino3dmLoader();
 	
@@ -193,18 +198,20 @@
 			);
 			</code>
 
-		<h3>[method:Object3D parse]( [param:ArrayBuffer buffer], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
-		<p>
-		[page:ArrayBuffer buffer] — An ArrayBuffer representing the Rhino `File3dm` document.<br />
-		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
-		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
-		</p>
-		<p>
-		Parse a File3dm ArrayBuffer and call the `onLoad` function with the resulting Object3d.
-		See [link:https://github.com/mcneel/rhino-developer-samples/tree/7/rhino3dm/js/SampleParse3dmObjects this example] for further reference.
-		</p>
+	<h3>[method:Object3D parse]( [param:ArrayBuffer buffer], [param:Function onLoad], [param:Function onProgress],
+		[param:Function onError] )</h3>
+	<p>
+		[page:ArrayBuffer buffer] — 代表 Rhino `File3dm` 文档的 ArrayBuffer<br />
+		[page:Function onLoad] — 加载成功完成后调用的函数。<br />
+		[page:Function onError] — （可选）加载期间发生错误时调用的函数。该函数接收错误作为参数。<br />
+	</p>
+	<p>
+		解析 File3dm ArrayBuffer 并在得到 Object3d 后调用 `onLoad`。
+		请参阅 [link:https://github.com/mcneel/rhino-developer-samples/tree/7/rhino3dm/js/SampleParse3dmObjects this example]
+		以获取更多参考。
+	</p>
 
-		<code>
+	<code>
 		import rhino3dm from 'https://unpkg.com/rhino3dm@8.0.1'
 
 		// Instantiate a loader
@@ -233,11 +240,11 @@
 
 		</code>
 
-		<h3>[method:this setLibraryPath]( [param:String value] )</h3>
-		<p>
-		[page:String value] — Path to folder containing the JS and WASM libraries.
-		</p>
-		<code>
+	<h3>[method:this setLibraryPath]( [param:String value] )</h3>
+	<p>
+		[page:String value] — 包含 JS 和 WASM 库的文件夹的路径。
+	</p>
+	<code>
 		// Instantiate a loader
 		const loader = new Rhino3dmLoader();
 
@@ -247,25 +254,26 @@
 		loader.setLibraryPath( 'https://unpkg.com/rhino3dm@8.0.1' );
 		</code>
 
-		<h3>[method:this setWorkerLimit]( [param:Number workerLimit] )</h3>
-		<p>
-			[page:Number workerLimit] - Maximum number of workers to be allocated. Default is 4.<br />
-		</p>
-		<p>
-		Sets the maximum number of [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers Web Workers]
-		to be used during decoding. A lower limit may be preferable if workers are also for other tasks
-		in the application.
-		</p>
+	<h3>[method:this setWorkerLimit]( [param:Number workerLimit] )</h3>
+	<p>
+		[page:Number workerLimit] - 要分配的最大 worker 数量。默认值为 4。<br />
+	</p>
+	<p>
+		设置解码期间要使用的 [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
+		Web Workers] 的最大数量。如果 worker 还负责应用程序中的其他任务，则较低的限制可能更好。
+	</p>
 
-		<h3>[method:this dispose]()</h3>
-		<p>
-		Disposes of the loader resources and deallocates memory.
-		</p>
+	<h3>[method:this dispose]()</h3>
+	<p>
+		处理加载程序资源并释放内存。
+	</p>
 
-		<h2>Source</h2>
+	<h2>源代码</h2>
 
-		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/3DMLoader.js examples/jsm/loaders/3DMLoader.js]
-		</p>
-	</body>
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/3DMLoader.js
+		examples/jsm/loaders/3DMLoader.js]
+	</p>
+</body>
+
 </html>
