@@ -40,7 +40,6 @@ class WebGLBackend extends Backend {
 		this.textureUtils = new WebGLTextureUtils( this );
 		this.state = new WebGLState( this );
 		this.utils = new WebGLUtils( this );
-		this.defaultTextures = {};
 
 		this.extensions.get( 'EXT_color_buffer_float' );
 		this._currentContext = null;
@@ -439,7 +438,7 @@ class WebGLBackend extends Backend {
 
 	}
 
-	needsRenderUpdate( renderObject ) {
+	needsRenderUpdate( /*renderObject*/ ) {
 
 		return false;
 
@@ -453,82 +452,15 @@ class WebGLBackend extends Backend {
 
 	// textures
 
-	createSampler( /*texture*/ ) {
-
-		//console.warn( 'Abstract class.' );
-
-	}
-
 	createDefaultTexture( texture ) {
 
-		const { gl, textureUtils, defaultTextures } = this;
-
-		const glTextureType = textureUtils.getGLTextureType( texture );
-
-		let textureGPU = defaultTextures[ glTextureType ];
-
-		if ( textureGPU === undefined ) {
-
-			textureGPU = gl.createTexture();
-
-			gl.bindTexture( glTextureType, textureGPU );
-			gl.texParameteri( glTextureType, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
-			gl.texParameteri( glTextureType, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
-
-			//gl.texImage2D( target + i, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data );
-
-			defaultTextures[ glTextureType ] = textureGPU;
-
-		}
-
-		this.set( texture, {
-			textureGPU,
-			glTextureType,
-			isDefault: true
-		} );
+		this.textureUtils.createDefaultTexture( texture );
 
 	}
 
 	createTexture( texture, options ) {
 
-		const { gl, utils, textureUtils } = this;
-		const { levels, width, height, depth } = options;
-
-		const glFormat = utils.convert( texture.format, texture.colorSpace );
-		const glType = utils.convert( texture.type );
-		const glInternalFormat = textureUtils.getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace, texture.isVideoTexture );
-
-		const textureGPU = gl.createTexture();
-		const glTextureType = textureUtils.getGLTextureType( texture );
-
-		gl.bindTexture( glTextureType, textureGPU );
-
-		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
-		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
-		gl.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
-		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE );
-
-		textureUtils.setTextureParameters( glTextureType, texture );
-
-		gl.bindTexture( glTextureType, textureGPU );
-
-		if ( texture.isDataArrayTexture ) {
-
-			gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
-
-		} else if ( ! texture.isVideoTexture ) {
-
-			gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
-
-		}
-
-		this.set( texture, {
-			textureGPU,
-			glTextureType,
-			glFormat,
-			glType,
-			glInternalFormat
-		} );
+		this.textureUtils.createTexture( texture, options );
 
 	}
 
@@ -540,32 +472,29 @@ class WebGLBackend extends Backend {
 
 	generateMipmaps( texture ) {
 
-		const { gl } = this;
-		const { textureGPU, glTextureType } = this.get( texture );
-
-		gl.bindTexture( glTextureType, textureGPU );
-		gl.generateMipmap( glTextureType );
+		this.textureUtils.generateMipmaps( texture );
 
 	}
 
 	destroyTexture( texture ) {
 
-		const { gl } = this;
-		const { textureGPU } = this.get( texture );
-
-		gl.deleteTexture( textureGPU );
-
-		this.delete( texture );
+		this.textureUtils.destroyTexture( texture );
 
 	}
-
-	destroySampler() {}
 
 	copyTextureToBuffer( texture, x, y, width, height ) {
 
 		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height );
 
 	}
+
+	createSampler( /*texture*/ ) {
+
+		//console.warn( 'Abstract class.' );
+
+	}
+
+	destroySampler() {}
 
 	// node builder
 
