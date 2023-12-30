@@ -114,7 +114,6 @@ class WebGPUBackend extends Backend {
 		this.adapter = adapter;
 		this.device = device;
 		this.context = context;
-		this.renderer._context = context;
 
 		const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
 
@@ -138,6 +137,12 @@ class WebGPUBackend extends Backend {
 	async getArrayBufferAsync( attribute ) {
 
 		return await this.attributeUtils.getArrayBufferAsync( attribute );
+
+	}
+
+	getContext() {
+
+		return this.context;
 
 	}
 
