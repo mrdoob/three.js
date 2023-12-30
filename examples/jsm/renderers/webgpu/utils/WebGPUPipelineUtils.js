@@ -117,7 +117,7 @@ class WebGPUPipelineUtils {
 
 		}
 
-		const piplineDescriptor = {
+		const pipelineDescriptor = {
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
 			fragment: Object.assign( {}, fragmentModule, { targets } ),
 			primitive: primitiveState,
@@ -141,13 +141,13 @@ class WebGPUPipelineUtils {
 
 		if ( promises === null ) {
 
-			pipelineData.pipeline = device.createRenderPipeline( piplineDescriptor );
+			pipelineData.pipeline = device.createRenderPipeline( pipelineDescriptor );
 
 		} else {
 
 			const p = new Promise( ( resolve /*, reject*/ ) => {
 
-				device.createRenderPipelineAsync( piplineDescriptor ).then( pipeline => {
+				device.createRenderPipelineAsync( pipelineDescriptor ).then( pipeline => {
 
 					pipelineData.pipeline = pipeline;
 					resolve();
