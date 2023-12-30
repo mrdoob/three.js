@@ -33,6 +33,7 @@ class WebGLBackend extends Backend {
 		const glContext = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgl2' );
 
 		this.gl = glContext;
+		this.renderer._context = glContext;
 
 		this.extensions = new WebGLExtensions( this );
 		this.capabilities = new WebGLCapabilities( this );
