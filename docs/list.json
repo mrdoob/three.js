@@ -772,7 +772,8 @@
 				"如何创建VR内容": "manual/zh/introduction/How-to-create-VR-content",
 				"如何使用后期处理": "manual/zh/introduction/How-to-use-post-processing",
 				"矩阵变换": "manual/zh/introduction/Matrix-transformations",
-				"动画系统": "manual/zh/introduction/Animation-system"
+				"动画系统": "manual/zh/introduction/Animation-system",
+				"色彩管理": "manual/zh/introduction/Color-management"
 			}
 
 		},
@@ -820,6 +821,7 @@
 				"Animation": "api/zh/constants/Animation",
 				"Core": "api/zh/constants/Core",
 				"CustomBlendingEquation": "api/zh/constants/CustomBlendingEquations",
+				"BufferAttributeUsage": "api/zh/constants/BufferAttributeUsage",
 				"Materials": "api/zh/constants/Materials",
 				"Renderer": "api/zh/constants/Renderer",
 				"Textures": "api/zh/constants/Textures"
@@ -1010,6 +1012,7 @@
 			},
 
 			"物体": {
+				"BatchedMesh": "api/zh/objects/BatchedMesh",
 				"Bone": "api/zh/objects/Bone",
 				"Group": "api/zh/objects/Group",
 				"InstancedMesh": "api/zh/objects/InstancedMesh",
@@ -1025,12 +1028,12 @@
 			},
 
 			"渲染器": {
-				"WebGL3DRenderTarget": "api/zh/renderers/WebGL3DRenderTarget",
-				"WebGLArrayRenderTarget": "api/zh/renderers/WebGLArrayRenderTarget",
 				"WebGLMultipleRenderTargets": "api/zh/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
 				"WebGL1Renderer": "api/zh/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/zh/renderers/WebGLRenderTarget",
+				"WebGL3DRenderTarget": "api/zh/renderers/WebGL3DRenderTarget",
+				"WebGLArrayRenderTarget": "api/zh/renderers/WebGLArrayRenderTarget",
 				"WebGLCubeRenderTarget": "api/zh/renderers/WebGLCubeRenderTarget"
 			},
 
@@ -1056,8 +1059,8 @@
 				"CompressedTexture": "api/zh/textures/CompressedTexture",
 				"CompressedArrayTexture": "api/zh/textures/CompressedArrayTexture",
 				"CubeTexture": "api/zh/textures/CubeTexture",
-				"DataArrayTexture": "api/zh/textures/DataArrayTexture",
 				"Data3DTexture": "api/zh/textures/Data3DTexture",
+				"DataArrayTexture": "api/zh/textures/DataArrayTexture",
 				"DataTexture": "api/zh/textures/DataTexture",
 				"DepthTexture": "api/zh/textures/DepthTexture",
 				"FramebufferTexture": "api/zh/textures/FramebufferTexture",
@@ -1068,12 +1071,20 @@
 
 		},
 
-		"Addons": {
+		"附加": {
+
+			"动画": {
+				"CCDIKSolver": "examples/zh/animations/CCDIKSolver",
+				"MMDAnimationHelper": "examples/zh/animations/MMDAnimationHelper",
+				"MMDPhysics": "examples/zh/animations/MMDPhysics"
+			},
 
 			"控制": {
+				"ArcballControls": "examples/zh/controls/ArcballControls",
 				"DragControls": "examples/zh/controls/DragControls",
 				"FirstPersonControls": "examples/zh/controls/FirstPersonControls",
 				"FlyControls": "examples/zh/controls/FlyControls",
+				"MapControls": "examples/zh/controls/MapControls",
 				"OrbitControls": "examples/zh/controls/OrbitControls",
 				"PointerLockControls": "examples/zh/controls/PointerLockControls",
 				"TrackballControls": "examples/zh/controls/TrackballControls",
@@ -1084,14 +1095,16 @@
 				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry",
 				"ParametricGeometry": "examples/zh/geometries/ParametricGeometry",
-				"TextGeometry": "examples/zh/geometries/TextGeometry"
+				"TextGeometry": "examples/zh/geometries/TextGeometry",
+				"SDFGeometryGenerator": "examples/zh/geometries/SDFGeometryGenerator"
 			},
 
 			"辅助对象": {
 				"LightProbeHelper": "examples/zh/helpers/LightProbeHelper",
 				"PositionalAudioHelper": "examples/zh/helpers/PositionalAudioHelper",
 				"RectAreaLightHelper": "examples/zh/helpers/RectAreaLightHelper",
-				"VertexNormalsHelper": "examples/zh/helpers/VertexNormalsHelper"
+				"VertexNormalsHelper": "examples/zh/helpers/VertexNormalsHelper",
+				"VertexTangentsHelper": "examples/zh/helpers/VertexTangentsHelper"
 			},
 
 			"灯光": {
@@ -1099,13 +1112,17 @@
 			},
 
 			"加载器": {
+				"3DMLoader": "examples/zh/loaders/3DMLoader",
+				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
 				"FontLoader": "examples/zh/loaders/FontLoader",
-				"DracoLoader": "examples/zh/loaders/DracoLoader",
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
+				"KTX2Loader": "examples/zh/loaders/KTX2Loader",
+				"LDrawLoader": "examples/zh/loaders/LDrawLoader",
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
 				"PCDLoader": "examples/zh/loaders/PCDLoader",
+				"PDBLoader": "examples/en/loaders/PDBLoader",
 				"SVGLoader": "examples/zh/loaders/SVGLoader",
 				"TGALoader": "examples/zh/loaders/TGALoader"
 			},
@@ -1118,6 +1135,33 @@
 				"EffectComposer": "examples/zh/postprocessing/EffectComposer"
 			},
 
+			"导出器": {
+				"DRACOExporter": "examples/zh/exporters/DRACOExporter",
+				"EXRExporter": "examples/zh/exporters/EXRExporter",
+				"GLTFExporter": "examples/zh/exporters/GLTFExporter",
+				"OBJExporter": "examples/zh/exporters/OBJExporter",
+				"PLYExporter": "examples/zh/exporters/PLYExporter",
+				"STLExporter": "examples/zh/exporters/STLExporter"
+			},
+
+			"数学库": {
+				"LookupTable": "examples/zh/math/Lut",
+				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler",
+				"OBB": "examples/zh/math/OBB"
+			},
+
+			"杂项": {
+				"Timer": "examples/zh/misc/Timer"
+			},
+
+			"凸包": {
+				"Face": "examples/zh/math/convexhull/Face",
+				"HalfEdge": "examples/zh/math/convexhull/HalfEdge",
+				"ConvexHull": "examples/zh/math/convexhull/ConvexHull",
+				"VertexNode": "examples/zh/math/convexhull/VertexNode",
+				"VertexList": "examples/zh/math/convexhull/VertexList"
+			},
+
 			"渲染器": {
 				"CSS2DRenderer": "examples/zh/renderers/CSS2DRenderer",
 				"CSS3DRenderer": "examples/zh/renderers/CSS3DRenderer",
@@ -1126,8 +1170,13 @@
 
 			"实用工具": {
 				"BufferGeometryUtils": "examples/zh/utils/BufferGeometryUtils",
+				"CameraUtils": "examples/zh/utils/CameraUtils",
 				"SceneUtils": "examples/zh/utils/SceneUtils",
 				"SkeletonUtils": "examples/zh/utils/SkeletonUtils"
+			},
+
+			"WebXR": {
+				"XREstimatedLight": "examples/zh/webxr/XREstimatedLight"
 			}
 
 		},
