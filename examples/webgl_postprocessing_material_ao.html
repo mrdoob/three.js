@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing - GTAO</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #ffffff;
+				color: #000;
+			}
+			a {
+				color: #2983ff;
+			}
+			.splitSlider {
+				position: absolute;
+				cursor: ew-resize;
+
+				width: 40px;
+				height: 40px;
+				background-color: #F32196;
+				opacity: 0.7;
+				border-radius: 50%;
+
+				top: calc(50% - 20px);
+				left: calc(50% - 20px);
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Mesh Post Processing Material by <a href="https://github.com/Rabbid76" target="_blank" rel="noopener">Rabbid76</a><br/>
+			<p>left side: blend GTAO with final diffuse color buffer - right side: apply GTAO to ambient and environment light in mesh material</p>
+		</div>
+
+		<div class="container">
+			<div class="splitSlider"></div>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { MeshPostProcessingMaterial } from 'three/addons/materials/MeshPostProcessingMaterial.js';
+
+			let renderer, camera, scenes, composers, controls, stats;
+			let sliderPos = window.innerWidth / 2;
+			const sceneParameters = {
+				envMapIntensity: 1.0,
+				ambientLightIntensity: 0.0,
+				lightIntensity: 50,
+				shadow: true,
+			};
+			const aoParameters = {
+				radius: 0.5,
+				distanceExponent: 2.,
+				thickness: 10.,
+				scale: 1.,
+				samples: 16,
+				distanceFallOff: 1.,
+			};
+
+			init();
+			initSlider();
+			animate();
+
+			function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setScissorTest( true );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+				renderer.shadowMap.enabled = sceneParameters.shadow;
+
+				const plyLoader = new PLYLoader();
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const rgbeloader = new RGBELoader();
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 50 );
+				camera.position.set( 0, 3, 5 );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1, 0 );
+				controls.update();
+				controls.enablePan = false;
+				controls.enableDamping = true;
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				scenes = [ new THREE.Scene(), new THREE.Scene() ];
+				composers = [ new EffectComposer( renderer ), new EffectComposer( renderer ) ];
+
+				const gtaoPasses = [ new GTAOPass( scenes[ 0 ], camera, width, height ), new GTAOPass( scenes[ 1 ], camera, width, height ) ];
+				gtaoPasses[ 1 ].output = GTAOPass.OUTPUT.Off;
+
+				const renderPasses = [ new RenderPass( scenes[ 0 ], camera ), new RenderPass( scenes[ 1 ], camera ) ];
+
+				composers[ 0 ].addPass( renderPasses[ 0 ] );
+				composers[ 0 ].addPass( gtaoPasses[ 0 ] );
+				composers[ 0 ].addPass( new OutputPass() );
+
+				composers[ 1 ].addPass( gtaoPasses[ 1 ] );
+				composers[ 1 ].addPass( renderPasses[ 1 ] );
+				composers[ 1 ].addPass( new OutputPass() );
+
+				rgbeloader.load( 'textures/equirectangular/royal_esplanade_1k.hdr', function ( texture ) {
+
+					texture.mapping = THREE.EquirectangularReflectionMapping;
+					const renderTarget = pmremGenerator.fromEquirectangular( texture );
+					scenes.forEach( scene => scene.environment = renderTarget.texture );
+			
+				} );
+
+				const updateGtaoMaterial = () => gtaoPasses.forEach( gtaoPass => gtaoPass.updateGtaoMaterial( aoParameters ) );
+				updateGtaoMaterial();
+			
+				const groundMaterials = [
+					new THREE.MeshPhysicalMaterial( { color: 0x7f7f7f, envMapIntensity: sceneParameters.envMapIntensity } ),
+					new MeshPostProcessingMaterial( { color: 0x7f7f7f, envMapIntensity: sceneParameters.envMapIntensity, aoPassMap: gtaoPasses[ 1 ].gtaoMap } ) ];
+				const objectMaterials = [
+					new THREE.MeshPhysicalMaterial( { color: 0xffffff, roughness: 0.5, metalness: 0.5, envMapIntensity: sceneParameters.envMapIntensity } ),
+					new MeshPostProcessingMaterial( { color: 0xffffff, roughness: 0.5, metalness: 0.5, envMapIntensity: sceneParameters.envMapIntensity, aoPassMap: gtaoPasses[ 1 ].gtaoMap } ) ];
+				const emissiveMaterials = [
+					new THREE.MeshPhysicalMaterial( { color: 0, emissive: 0xffffff } ),
+					new MeshPostProcessingMaterial( { color: 0, emissive: 0xffffff, aoPassMap: gtaoPasses[ 1 ].gtaoMap } ) ];
+				plyLoader.load( 'models/ply/binary/Lucy100k.ply', ( geometry ) => {
+
+					geometry.computeVertexNormals();
+
+					for ( let i = 0; i < 2; ++ i ) {
+
+						const lucy = new THREE.Mesh( geometry, objectMaterials[ i ] );
+						lucy.receiveShadow = true;
+						lucy.castShadow = true;
+						lucy.scale.setScalar( 0.001 );
+						lucy.rotation.set( 0, Math.PI, 0 );
+						lucy.position.set( 0.04, 1.8, 0.02 );
+						scenes[ i ].add( lucy );
+
+					}
+
+				} );
+				const ambientLights = [ new THREE.AmbientLight( 0xffffff, sceneParameters.ambientLightIntensity ), new THREE.AmbientLight( 0xffffff, sceneParameters.ambientLightIntensity ) ];
+				const lightGroups = [ new THREE.Group(), new THREE.Group() ];
+				const planeGeometry = new THREE.PlaneGeometry( 6, 6 );
+				const cylinderGeometry = new THREE.CylinderGeometry( 0.5, 0.5, 1, 64 );
+				const sphereGeometry = new THREE.SphereGeometry( 0.5, 32, 32 );
+				const lightSphereGeometry = new THREE.SphereGeometry( 0.1, 32, 32 );
+				for ( let i = 0; i < 2; ++ i ) {
+
+					scenes[ i ].background = new THREE.Color( 0xbfe3dd );
+			
+					scenes[ i ].add( ambientLights[ i ] );
+					scenes[ i ].add( lightGroups[ i ] );
+					const targetObject = new THREE.Object3D();
+					targetObject.position.set( 0, 1, 0 );
+					scenes[ i ].add( targetObject );
+					const lightColors = [ 0xff4040, 0x40ff40, 0x4040ff ];
+					for ( let j = 0; j < 3; ++ j ) {
+			
+						const light = new THREE.SpotLight( lightColors[ j ], sceneParameters.lightIntensity, 0, Math.PI / 9 );
+						light.castShadow = true;
+						light.shadow.camera.far = 15;
+					 	light.position.set( 5 * Math.cos( Math.PI * j * 2 / 3 ), 2.5, 5 * Math.sin( Math.PI * j * 2 / 3 ) );
+						light.target = targetObject;
+						lightGroups[ i ].add( light );
+
+					}
+
+					const groundPlane = new THREE.Mesh( planeGeometry, groundMaterials[ i ] );
+					groundPlane.rotation.x = - Math.PI / 2;
+					groundPlane.position.set( 0, 0, 0 );
+					groundPlane.receiveShadow = true;
+					scenes[ i ].add( groundPlane );
+					const pedestal = new THREE.Mesh( cylinderGeometry, groundMaterials[ i ] );
+					pedestal.position.set( 0, 0.5, 0 );
+					pedestal.receiveShadow = true;
+					pedestal.castShadow = true;
+					scenes[ i ].add( pedestal );
+					const sphereMesh = new THREE.InstancedMesh( sphereGeometry, objectMaterials[ i ], 6 );
+					sphereMesh.receiveShadow = true;
+					sphereMesh.castShadow = true;
+					scenes[ i ].add( sphereMesh );
+					[ ...Array( 6 ).keys() ].forEach( ( i ) => sphereMesh.setMatrixAt( i, new THREE.Matrix4().makeTranslation( Math.cos( Math.PI * i / 3 ), 0.5, Math.sin( Math.PI * i / 3 ) ) ) );
+					const lightSphereMesh = new THREE.InstancedMesh( lightSphereGeometry, emissiveMaterials[ i ], 4 );
+					scenes[ i ].add( lightSphereMesh );
+					[ ...Array( 4 ).keys() ].forEach( ( i ) => lightSphereMesh.setMatrixAt( i, new THREE.Matrix4().makeTranslation( 0.4 * Math.cos( Math.PI * ( i + 0.5 ) / 2 ), 1.1, 0.45 * Math.sin( Math.PI * ( i + 0.5 ) / 2 ) ) ) );
+			
+				}
+
+				const gui = new GUI();
+				gui.add( gtaoPasses[ 0 ], 'output', {
+					'Default': GTAOPass.OUTPUT.Default,
+					'Diffuse (right side)': GTAOPass.OUTPUT.Diffuse,
+					'AO': GTAOPass.OUTPUT.Denoise,
+
+				} ).onChange( function ( value ) {
+
+					gtaoPasses[ 0 ].output = value;
+					gtaoPasses[ 1 ].output = value === GTAOPass.OUTPUT.Denoise ? value : GTAOPass.OUTPUT.Off;
+					renderPasses[ 1 ].enabled = value !== GTAOPass.OUTPUT.Denoise;
+
+				} );
+				gui.add( sceneParameters, 'envMapIntensity' ).min( 0 ).max( 1 ).step( 0.01 ).onChange( () => {
+
+					groundMaterials.forEach( material => material.envMapIntensity = sceneParameters.envMapIntensity );
+					objectMaterials.forEach( material => material.envMapIntensity = sceneParameters.envMapIntensity );
+
+				} );
+				gui.add( sceneParameters, 'ambientLightIntensity' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( () => {
+
+					ambientLights.forEach( light => light.intensity = sceneParameters.ambientLightIntensity );
+
+				} );
+				gui.add( sceneParameters, 'lightIntensity' ).min( 0 ).max( 100 ).step( 1 ).onChange( () => {
+
+					lightGroups.forEach( group => group.children.forEach( light => light.intensity = sceneParameters.lightIntensity ) );
+
+				} );
+				gui.add( sceneParameters, 'shadow' ).onChange( ( value ) => renderer.shadowMap.enabled = value );
+				gui.add( aoParameters, 'radius' ).min( 0.01 ).max( 2 ).step( 0.01 ).onChange( () => updateGtaoMaterial() );
+				gui.add( aoParameters, 'distanceExponent' ).min( 1 ).max( 4 ).step( 0.01 ).onChange( () => updateGtaoMaterial() );
+				gui.add( aoParameters, 'thickness' ).min( 0.01 ).max( 10 ).step( 0.01 ).onChange( () => updateGtaoMaterial() );
+				gui.add( aoParameters, 'distanceFallOff' ).min( 0 ).max( 1 ).step( 0.01 ).onChange( () => updateGtaoMaterial() );
+				gui.add( aoParameters, 'scale' ).min( 0.01 ).max( 2.0 ).step( 0.01 ).onChange( () => updateGtaoMaterial() );
+				gui.add( aoParameters, 'samples' ).min( 2 ).max( 32 ).step( 1 ).onChange( () => updateGtaoMaterial() );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function initSlider() {
+
+				const slider = document.querySelector( '.splitSlider' );
+
+				function onPointerDown() {
+
+					if ( event.isPrimary === false ) return;
+
+					controls.enabled = false;
+
+					window.addEventListener( 'pointermove', onPointerMove );
+					window.addEventListener( 'pointerup', onPointerUp );
+
+				}
+
+				function onPointerUp() {
+
+					controls.enabled = true;
+
+					window.removeEventListener( 'pointermove', onPointerMove );
+					window.removeEventListener( 'pointerup', onPointerUp );
+
+				}
+
+				function onPointerMove( e ) {
+
+					if ( event.isPrimary === false ) return;
+
+					sliderPos = Math.max( 0, Math.min( window.innerWidth, e.pageX ) );
+
+					slider.style.left = sliderPos - ( slider.offsetWidth / 2 ) + 'px';
+
+				}
+
+				slider.style.touchAction = 'none'; // disable touch scroll
+				slider.addEventListener( 'pointerdown', onPointerDown );
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				composers.forEach( composer => composer.setSize( width, height ) );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+				stats.begin();
+
+				renderer.setScissor( 0, 0, sliderPos, window.innerHeight );
+				composers[ 0 ].render();
+
+				renderer.setScissor( sliderPos, 0, window.innerWidth, window.innerHeight );
+				composers[ 1 ].render();
+
+				stats.end();
+
+			}
+
+		</script>
+	</body>
+</html>
