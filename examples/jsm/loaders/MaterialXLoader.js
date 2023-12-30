@@ -40,26 +40,34 @@ class MXElement {
 
 // Ref: https://github.com/mrdoob/three.js/issues/24674
 
+const mx_add = ( in1, in2 = float( 0 ) ) => add( in1, in2 );
+const mx_subtract = ( in1, in2 = float( 0 ) ) => sub( in1, in2 );
+const mx_multiply = ( in1, in2 = float( 1 ) ) => mul( in1, in2 );
+const mx_divide = ( in1, in2 = float( 1 ) ) => div( in1, in2 );
+const mx_modulo = ( in1, in2 = float( 1 ) ) => mod( in1, in2 );
+const mx_power = ( in1, in2 = float( 1 ) ) => pow( in1, in2 );
+const mx_atan2 = ( in1 = float( 0 ), in2 = float( 1 ) ) => atan2( in1, in2 );
+
 const MXElements = [
 
 	// << Math >>
-	new MXElement( 'add', add, [ 'in1', 'in2' ] ),
-	new MXElement( 'subtract', sub, [ 'in1', 'in2' ] ),
-	new MXElement( 'multiply', mul, [ 'in1', 'in2' ] ),
-	new MXElement( 'divide', div, [ 'in1', 'in2' ] ),
-	new MXElement( 'modulo', mod, [ 'in1', 'in2' ] ),
+	new MXElement( 'add', mx_add, [ 'in1', 'in2' ] ),
+	new MXElement( 'subtract', mx_subtract, [ 'in1', 'in2' ] ),
+	new MXElement( 'multiply', mx_multiply, [ 'in1', 'in2' ] ),
+	new MXElement( 'divide', mx_divide, [ 'in1', 'in2' ] ),
+	new MXElement( 'modulo', mx_modulo, [ 'in1', 'in2' ] ),
 	new MXElement( 'absval', abs, [ 'in1', 'in2' ] ),
 	new MXElement( 'sign', sign, [ 'in1', 'in2' ] ),
 	new MXElement( 'floor', floor, [ 'in1', 'in2' ] ),
 	new MXElement( 'ceil', ceil, [ 'in1', 'in2' ] ),
 	new MXElement( 'round', round, [ 'in1', 'in2' ] ),
-	new MXElement( 'power', pow, [ 'in1', 'in2' ] ),
+	new MXElement( 'power', mx_power, [ 'in1', 'in2' ] ),
 	new MXElement( 'sin', sin, [ 'in' ] ),
 	new MXElement( 'cos', cos, [ 'in' ] ),
 	new MXElement( 'tan', tan, [ 'in' ] ),
 	new MXElement( 'asin', asin, [ 'in' ] ),
 	new MXElement( 'acos', acos, [ 'in' ] ),
-	new MXElement( 'atan2', atan2, [ 'in1', 'in2' ] ),
+	new MXElement( 'atan2', mx_atan2, [ 'in1', 'in2' ] ),
 	new MXElement( 'sqrt', sqrt, [ 'in' ] ),
 	//new MtlXElement( 'ln', ... ),
 	new MXElement( 'exp', exp, [ 'in' ] ),
