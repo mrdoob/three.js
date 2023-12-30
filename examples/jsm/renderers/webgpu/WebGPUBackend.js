@@ -140,6 +140,12 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	getContext() {
+
+		return this.context;
+
+	}
+
 	beginRender( renderContext ) {
 
 		const renderContextData = this.get( renderContext );

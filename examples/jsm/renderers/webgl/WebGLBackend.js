@@ -59,6 +59,12 @@ class WebGLBackend extends Backend {
 
 	}
 
+	getContext() {
+
+		return this.gl;
+
+	}
+
 	beginRender( renderContext ) {
 
 		const { gl } = this;
