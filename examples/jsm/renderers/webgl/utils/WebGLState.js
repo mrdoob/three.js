@@ -40,6 +40,7 @@ class WebGLState {
 		this.currentStencilZFail = null;
 		this.currentStencilZPass = null;
 		this.currentStencilMask = null;
+		this.currentLineWidth = null;
 
 		if ( initialized === false ) {
 
@@ -160,6 +161,21 @@ class WebGLState {
 		this.currentCullFace = cullFace;
 
 	}
+
+	setLineWidth( width ) {
+
+		const { currentLineWidth, gl } = this;
+
+		if ( width !== currentLineWidth ) {
+
+			gl.lineWidth( width );
+
+			this.currentLineWidth = width;
+
+		}
+
+	}
+
 
 	setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
 
