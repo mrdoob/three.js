@@ -1148,17 +1148,16 @@ class WebGLBackend extends Backend {
 					renderContextData.msaaRenderbuffer = msaaRenderbuffer;
 					renderContextData.msaaFrameBuffer = msaaFb;
 
+					if ( depthRenderbuffer === undefined ) {
+
+						depthRenderbuffer = gl.createRenderbuffer();
+						this.setupRenderBufferStorage( depthRenderbuffer, renderContext.renderTarget );
+
+						renderContextData.depthRenderbuffer = depthRenderbuffer;
+
+					}
+
 				}
-
-				if ( depthRenderbuffer === undefined ) {
-
-					depthRenderbuffer = gl.createRenderbuffer();
-					this.setupRenderBufferStorage( depthRenderbuffer, renderContext.renderTarget );
-
-					renderContextData.depthRenderbuffer = depthRenderbuffer;
-
-				}
-
 
 				renderContextData.framebuffer = fb;
 
