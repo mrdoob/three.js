@@ -28,11 +28,15 @@ class MeshPostProcessingMaterial extends MeshPhysicalMaterial {
 	constructor( parameters ) {
 
 		const aoPassMap = parameters.aoPassMap;
+		const aoPassMapScale = parameters.aoPassMapScale || 1.0;
 		delete parameters.aoPassMap;
+		delete parameters.aoPassMapScale;
+
 		super( parameters );
 
 		this.onBeforeCompile = this._onBeforeCompile;
 		this._aoPassMap = aoPassMap;
+		this.aoPassMapScale = aoPassMapScale;
 
 	}
 
@@ -53,27 +57,16 @@ class MeshPostProcessingMaterial extends MeshPhysicalMaterial {
 
 		if ( this._aoPassMap !== undefined ) {
 
-			shader.vertexShader = shader.vertexShader.replace(
-				'#include <common>',
-				`varying vec4 vClipSpacePosition;
-                #include <common>`
-			);
-			shader.vertexShader = shader.vertexShader.replace(
-				'#include <fog_vertex>',
-				`#include <fog_vertex>
-                vClipSpacePosition = gl_Position;`
-			);
 			shader.fragmentShader = shader.fragmentShader.replace(
-				'#include <common>',
-				`varying vec4 vClipSpacePosition;
-				uniform sampler2D tAoPassMap;
-                #include <common>`
+				'#include <aomap_pars_fragment>',
+				aomap_pars_fragment_replacement
 			);
 			shader.fragmentShader = shader.fragmentShader.replace(
 				'#include <aomap_fragment>',
 				aomap_fragment_replacement
 			);
 			shader.uniforms.tAoPassMap = { value: this._aoPassMap };
+			shader.uniforms.aoPassMapScale = { value: this.aoPassMapScale };
 
 		}
 
@@ -81,16 +74,29 @@ class MeshPostProcessingMaterial extends MeshPhysicalMaterial {
 
 }
 
+const aomap_pars_fragment_replacement = /* glsl */`
+#ifdef USE_AOMAP
+
+	uniform sampler2D aoMap;
+	uniform float aoMapIntensity;
+
+#endif
+
+	uniform sampler2D tAoPassMap;
+	uniform float aoPassMapScale;
+`;
+
 const aomap_fragment_replacement = /* glsl */`
 #ifndef AOPASSMAP_SWIZZLE
 	#define AOPASSMAP_SWIZZLE r
 #endif
-	float ambientOcclusion = texture2D( tAoPassMap, vClipSpacePosition.xy / vClipSpacePosition.w * 0.5 + 0.5 ).AOPASSMAP_SWIZZLE;
+	float ambientOcclusion = texelFetch( tAoPassMap, ivec2( gl_FragCoord.xy * aoPassMapScale ), 0 ).AOPASSMAP_SWIZZLE;
 
 #ifdef USE_AOMAP
 
 	// reads channel R, compatible with a combined OcclusionRoughnessMetallic (RGB) texture
-	ambientOcclusion *= ( texture2D( aoMap, vAoMapUv ).r - 1.0 ) * aoMapIntensity + 1.0;
+	ambientOcclusion = min( ambientOcclusion, texture2D( aoMap, vAoMapUv ).r );
+	ambientOcclusion *= ( ambientOcclusion - 1.0 ) * aoMapIntensity + 1.0;
 
 #endif
 
