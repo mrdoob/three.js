@@ -651,11 +651,12 @@ class WebGLBackend extends Backend {
 	}
 
 	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
-	setupRenderBufferStorage( renderbuffer, renderTarget ) {
+	setupRenderBufferStorage( renderbuffer, renderContext ) {
 
 		const { gl } = this;
+		const renderTarget = renderContext.renderTarget;
 
-		const { samples, depthBuffer, stencilBuffer } = renderTarget;
+		const { samples, depthTexture, depthBuffer, stencilBuffer, width, height } = renderTarget;
 
 		gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
 
@@ -665,7 +666,6 @@ class WebGLBackend extends Backend {
 
 			if ( samples > 0 ) {
 
-				const depthTexture = renderTarget.depthTexture;
 
 				if ( depthTexture && depthTexture.isDepthTexture ) {
 
@@ -681,25 +681,25 @@ class WebGLBackend extends Backend {
 
 				}
 
-				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
+				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, glInternalFormat, width, height );
 
 			} else {
 
-				gl.renderbufferStorage( gl.RENDERBUFFER, glInternalFormat, renderTarget.width, renderTarget.height );
+				gl.renderbufferStorage( gl.RENDERBUFFER, glInternalFormat, width, height );
 
 			}
 
 			gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer );
 
-		} else if ( renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
+		} else if ( depthBuffer && stencilBuffer ) {
 
 			if ( samples > 0 ) {
 
-				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, gl.DEPTH24_STENCIL8, renderTarget.width, renderTarget.height );
+				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, gl.DEPTH24_STENCIL8, width, height );
 
 			} else {
 
-				gl.renderbufferStorage( gl.RENDERBUFFER, gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height );
+				gl.renderbufferStorage( gl.RENDERBUFFER, gl.DEPTH_STENCIL, width, height );
 
 			}
 
@@ -708,7 +708,7 @@ class WebGLBackend extends Backend {
 
 		} else {
 
-			const textures = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture : [ renderTarget.texture ];
+			const textures = renderContext.textures;
 
 			for ( let i = 0; i < textures.length; i ++ ) {
 
@@ -717,11 +717,11 @@ class WebGLBackend extends Backend {
 
 				if ( samples > 0 ) {
 
-					gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
+					gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, glInternalFormat, width, height );
 
 				} else {
 
-					gl.renderbufferStorage( gl.RENDERBUFFER, glInternalFormat, renderTarget.width, renderTarget.height );
+					gl.renderbufferStorage( gl.RENDERBUFFER, glInternalFormat, width, height );
 
 				}
 
@@ -1151,7 +1151,7 @@ class WebGLBackend extends Backend {
 					if ( depthRenderbuffer === undefined ) {
 
 						depthRenderbuffer = gl.createRenderbuffer();
-						this.setupRenderBufferStorage( depthRenderbuffer, renderContext.renderTarget );
+						this.setupRenderBufferStorage( depthRenderbuffer, renderContext );
 
 						renderContextData.depthRenderbuffer = depthRenderbuffer;
 
