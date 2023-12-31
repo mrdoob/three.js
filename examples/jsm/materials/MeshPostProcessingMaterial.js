@@ -35,8 +35,10 @@ class MeshPostProcessingMaterial extends MeshPhysicalMaterial {
 		super( parameters );
 
 		this.onBeforeCompile = this._onBeforeCompile;
+		this.customProgramCacheKey = this._customProgramCacheKey;
 		this._aoPassMap = aoPassMap;
 		this.aoPassMapScale = aoPassMapScale;
+		this._shader = null;
 
 	}
 
@@ -50,12 +52,21 @@ class MeshPostProcessingMaterial extends MeshPhysicalMaterial {
 
 		this._aoPassMap = aoPassMap;
 		this.needsUpdate = true;
+		this._setUniforms();
+
+	}
+
+	_customProgramCacheKey() {
+
+		return this._aoPassMap !== undefined && this._aoPassMap !== null ? 'aoPassMap' : '';
 
 	}
 
 	_onBeforeCompile( shader ) {
 
-		if ( this._aoPassMap !== undefined ) {
+		this._shader = shader;
+
+		if ( this._aoPassMap !== undefined && this._aoPassMap !== null ) {
 
 			shader.fragmentShader = shader.fragmentShader.replace(
 				'#include <aomap_pars_fragment>',
@@ -65,8 +76,19 @@ class MeshPostProcessingMaterial extends MeshPhysicalMaterial {
 				'#include <aomap_fragment>',
 				aomap_fragment_replacement
 			);
-			shader.uniforms.tAoPassMap = { value: this._aoPassMap };
-			shader.uniforms.aoPassMapScale = { value: this.aoPassMapScale };
+
+		}
+
+		this._setUniforms();
+
+	}
+
+	_setUniforms() {
+
+		if ( this._shader ) {
+
+			this._shader.uniforms.tAoPassMap = { value: this._aoPassMap };
+			this._shader.uniforms.aoPassMapScale = { value: this.aoPassMapScale };
 
 		}
 
