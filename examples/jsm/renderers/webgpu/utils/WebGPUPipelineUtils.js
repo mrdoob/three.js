@@ -102,7 +102,20 @@ class WebGPUPipelineUtils {
 		const primitiveState = this._getPrimitiveState( object, geometry, material );
 		const depthCompare = this._getDepthCompare( material );
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
-		const sampleCount = utils.getSampleCount( renderObject.context );
+		let sampleCount = utils.getSampleCount( renderObject.context );
+
+		if ( sampleCount > 1 ) {
+
+			// WebGPU only supports power-of-two sample counts and 2 is not a valid value
+			sampleCount = Math.pow( 2, Math.floor( Math.log2( sampleCount ) ) );
+
+			if ( sampleCount === 2 ) {
+
+				sampleCount = 4;
+
+			}
+
+		}
 
 		pipelineData.pipeline = device.createRenderPipeline( {
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
