@@ -147,7 +147,7 @@ class WebGLBackend extends Backend {
 
 		const previousContext = renderContextData.previousContext;
 
-		if ( renderContext !== null && previousContext !== undefined ) {
+		if ( previousContext !== undefined ) {
 
 			this._setFramebuffer( previousContext );
 
@@ -672,10 +672,6 @@ class WebGLBackend extends Backend {
 					if ( depthTexture.type === gl.FLOAT ) {
 
 						glInternalFormat = gl.DEPTH_COMPONENT32F;
-
-					} else if ( depthTexture.type === gl.UNSIGNED_INT ) {
-
-						glInternalFormat = gl.DEPTH_COMPONENT24;
 
 					}
 
