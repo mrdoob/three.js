@@ -194,8 +194,10 @@ class Renderer {
 
 		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
 
+		if ( targetScene === null ) targetScene = scene;
+
 		const renderTarget = this._renderTarget;
-		const renderContext = this._renderContexts.get( scene, camera, renderTarget );
+		const renderContext = this._renderContexts.get( targetScene, camera, renderTarget );
 		const activeMipmapLevel = this._activeMipmapLevel;
 
 		this._currentRenderContext = renderContext;
@@ -223,6 +225,21 @@ class Renderer {
 		renderList.begin();
 
 		this._projectObject( scene, camera, 0, renderList );
+
+		// include lights from target scene
+		if ( targetScene !== scene ) {
+
+			targetScene.traverseVisible( function ( object ) {
+
+				if ( object.isLight && object.layers.test( camera.layers ) ) {
+
+					renderList.pushLight( object );
+
+				}
+
+			} );
+
+		}
 
 		renderList.finish();
 
