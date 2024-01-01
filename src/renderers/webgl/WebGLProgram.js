@@ -313,7 +313,30 @@ function loopReplacer( match, start, end, snippet ) {
 
 function generatePrecision( parameters ) {
 
-	let precisionstring = 'precision ' + parameters.precision + ' float;\nprecision ' + parameters.precision + ' int;';
+	let precisionstring = `precision ${parameters.precision} float;
+	precision ${parameters.precision} int;
+	precision ${parameters.precision} sampler2D;
+	precision ${parameters.precision} samplerCube;
+	`;
+
+	if ( parameters.isWebGL2 ) {
+
+		precisionstring += `precision ${parameters.precision} sampler3D;
+		precision ${parameters.precision} sampler2DArray;
+		precision ${parameters.precision} sampler2DShadow;
+		precision ${parameters.precision} samplerCubeShadow;
+		precision ${parameters.precision} sampler2DArrayShadow;
+		precision ${parameters.precision} isampler2D;
+		precision ${parameters.precision} isampler3D;
+		precision ${parameters.precision} isamplerCube;
+		precision ${parameters.precision} isampler2DArray;
+		precision ${parameters.precision} usampler2D;
+		precision ${parameters.precision} usampler3D;
+		precision ${parameters.precision} usamplerCube;
+		precision ${parameters.precision} usampler2DArray;
+		`;
+
+	}
 
 	if ( parameters.precision === 'highp' ) {
 
