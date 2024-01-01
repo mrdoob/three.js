@@ -140,6 +140,12 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	getContext() {
+
+		return this.context;
+
+	}
+
 	beginRender( renderContext ) {
 
 		const renderContextData = this.get( renderContext );
@@ -1068,16 +1074,6 @@ class WebGPUBackend extends Backend {
 	hasFeature( name ) {
 
 		const adapter = this.adapter || _staticAdapter;
-
-		//
-
-		const features = Object.values( GPUFeatureName );
-
-		if ( features.includes( name ) === false ) {
-
-			throw new Error( 'THREE.WebGPURenderer: Unknown WebGPU GPU feature: ' + name );
-
-		}
 
 		//
 

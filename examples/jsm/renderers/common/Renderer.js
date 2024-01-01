@@ -70,7 +70,6 @@ class Renderer {
 		this._scissor = new Vector4( 0, 0, this._width, this._height );
 		this._scissorTest = false;
 
-		this._properties = null;
 		this._attributes = null;
 		this._geometries = null;
 		this._nodes = null;
@@ -401,7 +400,7 @@ class Renderer {
 
 	getContext() {
 
-		return this._context;
+		return this.backend.getContext();
 
 	}
 
@@ -660,7 +659,6 @@ class Renderer {
 
 		this._animation.dispose();
 		this._objects.dispose();
-		this._properties.dispose();
 		this._pipelines.dispose();
 		this._nodes.dispose();
 		this._bindings.dispose();

@@ -9,7 +9,7 @@ import WebGLUtils from './utils/WebGLUtils.js';
 import WebGLTextureUtils from './utils/WebGLTextureUtils.js';
 import WebGLExtensions from './utils/WebGLExtensions.js';
 import WebGLCapabilities from './utils/WebGLCapabilities.js';
-
+import { GLFeatureName } from './utils/WebGLConstants.js';
 //
 
 class WebGLBackend extends Backend {
@@ -22,9 +22,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	async init( renderer ) {
+	init( renderer ) {
 
-		await super.init( renderer );
+		super.init( renderer );
 
 		//
 
@@ -40,7 +40,6 @@ class WebGLBackend extends Backend {
 		this.textureUtils = new WebGLTextureUtils( this );
 		this.state = new WebGLState( this );
 		this.utils = new WebGLUtils( this );
-		this.defaultTextures = {};
 
 		this.extensions.get( 'EXT_color_buffer_float' );
 		this._currentContext = null;
@@ -56,6 +55,12 @@ class WebGLBackend extends Backend {
 	async getArrayBufferAsync( attribute ) {
 
 		return await this.attributeUtils.getArrayBufferAsync( attribute );
+
+	}
+
+	getContext() {
+
+		return this.gl;
 
 	}
 
@@ -490,7 +495,7 @@ class WebGLBackend extends Backend {
 
 	}
 
-	needsRenderUpdate( renderObject ) {
+	needsRenderUpdate( /*renderObject*/ ) {
 
 		return false;
 
@@ -504,260 +509,50 @@ class WebGLBackend extends Backend {
 
 	// textures
 
-	createSampler( /*texture*/ ) {
-
-		//console.warn( 'Abstract class.' );
-
-	}
-
 	createDefaultTexture( texture ) {
 
-		const { gl, textureUtils, defaultTextures } = this;
-
-		const glTextureType = textureUtils.getGLTextureType( texture );
-
-		let textureGPU = defaultTextures[ glTextureType ];
-
-		if ( textureGPU === undefined ) {
-
-			textureGPU = gl.createTexture();
-
-			gl.bindTexture( glTextureType, textureGPU );
-			gl.texParameteri( glTextureType, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
-			gl.texParameteri( glTextureType, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
-
-			// gl.texImage2D( glTextureType, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data );
-
-			defaultTextures[ glTextureType ] = textureGPU;
-
-		}
-
-		this.set( texture, {
-			textureGPU,
-			glTextureType,
-			isDefault: true
-		} );
+		this.textureUtils.createDefaultTexture( texture );
 
 	}
 
 	createTexture( texture, options ) {
 
-		const { gl, utils, textureUtils } = this;
-		const { levels, width, height, depth } = options;
-
-		const glFormat = utils.convert( texture.format, texture.colorSpace );
-		const glType = utils.convert( texture.type );
-		const glInternalFormat = textureUtils.getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace, texture.isVideoTexture );
-
-		const textureGPU = gl.createTexture();
-		const glTextureType = textureUtils.getGLTextureType( texture );
-
-		gl.bindTexture( glTextureType, textureGPU );
-
-		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
-		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
-		gl.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
-		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE );
-
-		textureUtils.setTextureParameters( glTextureType, texture );
-
-		if ( texture.isDataArrayTexture ) {
-
-			gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
-
-		} else if ( ! texture.isVideoTexture ) {
-
-			gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
-
-		}
-
-		this.set( texture, {
-			textureGPU,
-			glTextureType,
-			glFormat,
-			glType,
-			glInternalFormat
-		} );
+		this.textureUtils.createTexture( texture, options );
 
 	}
 
 	updateTexture( texture, options ) {
 
-		const { gl } = this;
-		const { width, height } = options;
-		const { textureGPU, glTextureType, glFormat, glType, glInternalFormat } = this.get( texture );
-
-		const getImage = ( source ) => {
-
-			if ( source.isDataTexture ) {
-
-				return source.image.data;
-
-			} else if ( source instanceof ImageBitmap || source instanceof OffscreenCanvas || source instanceof HTMLImageElement || source instanceof HTMLCanvasElement ) {
-
-				return source;
-
-			}
-
-			return source.data;
-
-		};
-
-		gl.bindTexture( glTextureType, textureGPU );
-
-		if ( texture.isCubeTexture ) {
-
-			const images = options.images;
-
-			for ( let i = 0; i < 6; i ++ ) {
-
-				const image = getImage( images[ i ] );
-
-				gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, image );
-
-			}
-
-		} else if ( texture.isDataArrayTexture ) {
-
-			const image = options.image;
-
-			gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
-
-		} else if ( texture.isVideoTexture ) {
-
-			texture.update();
-
-			gl.texImage2D( glTextureType, 0, glInternalFormat, glFormat, glType, options.image );
-
-
-		} else {
-
-			const image = getImage( options.image );
-
-			gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, image );
-
-		}
+		this.textureUtils.updateTexture( texture, options );
 
 	}
 
 	generateMipmaps( texture ) {
 
-		const { gl } = this;
-		const { textureGPU, glTextureType } = this.get( texture );
-
-		gl.bindTexture( glTextureType, textureGPU );
-		gl.generateMipmap( glTextureType );
-
-	}
-
-	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
-	setupRenderBufferStorage( renderbuffer, renderContext ) {
-
-		const { gl } = this;
-		const renderTarget = renderContext.renderTarget;
-
-		const { samples, depthTexture, depthBuffer, stencilBuffer, width, height } = renderTarget;
-
-		gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
-
-		if ( depthBuffer && ! stencilBuffer ) {
-
-			let glInternalFormat = gl.DEPTH_COMPONENT24;
-
-			if ( samples > 0 ) {
-
-
-				if ( depthTexture && depthTexture.isDepthTexture ) {
-
-					if ( depthTexture.type === gl.FLOAT ) {
-
-						glInternalFormat = gl.DEPTH_COMPONENT32F;
-
-					}
-
-				}
-
-				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, glInternalFormat, width, height );
-
-			} else {
-
-				gl.renderbufferStorage( gl.RENDERBUFFER, glInternalFormat, width, height );
-
-			}
-
-			gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer );
-
-		} else if ( depthBuffer && stencilBuffer ) {
-
-			if ( samples > 0 ) {
-
-				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, gl.DEPTH24_STENCIL8, width, height );
-
-			} else {
-
-				gl.renderbufferStorage( gl.RENDERBUFFER, gl.DEPTH_STENCIL, width, height );
-
-			}
-
-
-			gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, renderbuffer );
-
-		} else {
-
-			const textures = renderContext.textures;
-
-			for ( let i = 0; i < textures.length; i ++ ) {
-
-				const texture = textures[ i ];
-				const { glInternalFormat } = this.get( texture );
-
-				if ( samples > 0 ) {
-
-					gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, glInternalFormat, width, height );
-
-				} else {
-
-					gl.renderbufferStorage( gl.RENDERBUFFER, glInternalFormat, width, height );
-
-				}
-
-			}
-
-		}
-
-		gl.bindRenderbuffer( gl.RENDERBUFFER, null );
+		this.textureUtils.generateMipmaps( texture );
 
 	}
 
 
 	destroyTexture( texture ) {
 
-		const { gl } = this;
-		const { textureGPU, renderTarget } = this.get( texture );
-
-		// remove framebuffer reference
-		if ( renderTarget ) {
-
-			const renderContextData = this.get( renderTarget );
-			renderContextData.framebuffer = undefined;
-			renderContextData.msaaFrameBuffer = undefined;
-			renderContextData.depthRenderbuffer = undefined;
-
-		}
-
-		gl.deleteTexture( textureGPU );
-
-		this.delete( texture );
+		this.textureUtils.destroyTexture( texture );
 
 	}
-
-	destroySampler() {}
 
 	copyTextureToBuffer( texture, x, y, width, height ) {
 
 		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height );
 
 	}
+
+	createSampler( /*texture*/ ) {
+
+		//console.warn( 'Abstract class.' );
+
+	}
+
+	destroySampler() {}
 
 	// node builder
 
@@ -1025,11 +820,23 @@ class WebGLBackend extends Backend {
 
 	}
 
-	hasFeature( /*name*/ ) {
+	hasFeature( name ) {
 
-		return true;
+		const keysMatching = Object.keys( GLFeatureName ).filter( key => GLFeatureName[ key ] === name );
+
+		const extensions = this.extensions;
+
+		for ( let i = 0; i < keysMatching.length; i ++ ) {
+
+
+			if ( extensions.has( keysMatching[ i ] ) ) return true;
+
+		}
+
+		return false;
 
 	}
+
 
 	getMaxAnisotropy() {
 
@@ -1147,7 +954,7 @@ class WebGLBackend extends Backend {
 					if ( depthRenderbuffer === undefined ) {
 
 						depthRenderbuffer = gl.createRenderbuffer();
-						this.setupRenderBufferStorage( depthRenderbuffer, renderContext );
+						this.textureUtils.setupRenderBufferStorage( depthRenderbuffer, renderContext );
 
 						renderContextData.depthRenderbuffer = depthRenderbuffer;
 

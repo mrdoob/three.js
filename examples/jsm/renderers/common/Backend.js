@@ -84,6 +84,8 @@ class Backend {
 
 	// canvas
 
+	getContext() { }
+
 	updateSize() { }
 
 	// utils
