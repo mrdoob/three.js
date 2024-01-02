@@ -42,6 +42,9 @@ class WebGLState {
 		this.currentStencilMask = null;
 		this.currentLineWidth = null;
 
+		this.currentBoundFramebuffers = {};
+		this.currentDrawbuffers = new WeakMap();
+
 		if ( initialized === false ) {
 
 			this._init( this.gl );
@@ -551,6 +554,98 @@ class WebGLState {
 
 	}
 
+	// framebuffer
+
+
+	bindFramebuffer( target, framebuffer ) {
+
+		const { gl, currentBoundFramebuffers } = this;
+
+		if ( currentBoundFramebuffers[ target ] !== framebuffer ) {
+
+			gl.bindFramebuffer( target, framebuffer );
+
+			currentBoundFramebuffers[ target ] = framebuffer;
+
+			// gl.DRAW_FRAMEBUFFER is equivalent to gl.FRAMEBUFFER
+
+			if ( target === gl.DRAW_FRAMEBUFFER ) {
+
+				currentBoundFramebuffers[ gl.FRAMEBUFFER ] = framebuffer;
+
+			}
+
+			if ( target === gl.FRAMEBUFFER ) {
+
+				currentBoundFramebuffers[ gl.DRAW_FRAMEBUFFER ] = framebuffer;
+
+			}
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
+	drawBuffers( renderContext, framebuffer ) {
+
+		const { gl } = this;
+
+		let drawBuffers = [];
+
+		let needsUpdate = false;
+
+		if ( renderContext.textures !== null ) {
+
+			drawBuffers = this.currentDrawbuffers.get( framebuffer );
+
+			if ( drawBuffers === undefined ) {
+
+				drawBuffers = [];
+				this.currentDrawbuffers.set( framebuffer, drawBuffers );
+
+			}
+
+
+			const textures = renderContext.textures;
+
+			if ( drawBuffers.length !== textures.length || drawBuffers[ 0 ] !== gl.COLOR_ATTACHMENT0 ) {
+
+				for ( let i = 0, il = textures.length; i < il; i ++ ) {
+
+					drawBuffers[ i ] = gl.COLOR_ATTACHMENT0 + i;
+
+				}
+
+				drawBuffers.length = textures.length;
+
+				needsUpdate = true;
+
+			}
+
+
+		} else {
+
+			if ( drawBuffers[ 0 ] !== gl.BACK ) {
+
+				drawBuffers[ 0 ] = gl.BACK;
+
+				needsUpdate = true;
+
+			}
+
+		}
+
+		if ( needsUpdate ) {
+
+			gl.drawBuffers( drawBuffers );
+
+		}
+
+
+	}
 
 }
 

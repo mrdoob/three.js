@@ -264,8 +264,6 @@ class WebGLTextureUtils {
 
 		this.setTextureParameters( glTextureType, texture );
 
-		gl.bindTexture( glTextureType, textureGPU );
-
 		if ( texture.isDataArrayTexture ) {
 
 			gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );

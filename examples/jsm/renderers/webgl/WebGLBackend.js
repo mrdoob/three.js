@@ -885,27 +885,28 @@ class WebGLBackend extends Backend {
 
 	_setFramebuffer( renderContext ) {
 
-		const { gl } = this;
+		const { gl, state } = this;
+
+		let fb = null;
+		let currentFrameBuffer = null;
 
 		if ( renderContext.textures !== null ) {
 
-			const renderContextData = this.get( renderContext.renderTarget );
+			const renderTargetContextData = this.get( renderContext.renderTarget );
 			const { samples } = renderContext.renderTarget;
 
-			let fb = renderContextData.framebuffer;
-			let msaaFb = renderContextData.msaaFrameBuffer;
-			let depthRenderbuffer = renderContextData.depthRenderbuffer;
+			fb = renderTargetContextData.framebuffer;
+			let msaaFb = renderTargetContextData.msaaFrameBuffer;
+			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
 
 
 			if ( fb === undefined ) {
 
 				fb = gl.createFramebuffer();
 
-				gl.bindFramebuffer( gl.FRAMEBUFFER, fb );
+				state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
 				const textures = renderContext.textures;
-
-				const drawBuffers = [];
 
 				for ( let i = 0; i < textures.length; i ++ ) {
 
@@ -915,13 +916,10 @@ class WebGLBackend extends Backend {
 
 					const attachment = gl.COLOR_ATTACHMENT0 + i;
 
-					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, textureData.textureGPU, 0 );
 
-					drawBuffers.push( attachment );
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0 );
 
 				}
-
-				gl.drawBuffers( drawBuffers );
 
 				if ( renderContext.depthTexture !== null ) {
 
@@ -932,11 +930,17 @@ class WebGLBackend extends Backend {
 				}
 
 
-				if ( msaaFb === undefined && samples > 0 ) {
+				renderTargetContextData.framebuffer = fb;
+
+			}
+
+			if ( samples > 0 ) {
+
+				if ( msaaFb === undefined ) {
 
 					msaaFb = gl.createFramebuffer();
 
-					gl.bindFramebuffer( gl.FRAMEBUFFER, msaaFb );
+					state.bindFramebuffer( gl.FRAMEBUFFER, msaaFb );
 
 					// TODO For loop support MRT
 					const msaaRenderbuffer = gl.createRenderbuffer();
@@ -948,40 +952,35 @@ class WebGLBackend extends Backend {
 					gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, textureData.glInternalFormat, renderContext.width, renderContext.height );
 					gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, msaaRenderbuffer );
 
-					renderContextData.msaaRenderbuffer = msaaRenderbuffer;
-					renderContextData.msaaFrameBuffer = msaaFb;
+					renderTargetContextData.msaaRenderbuffer = msaaRenderbuffer;
+					renderTargetContextData.msaaFrameBuffer = msaaFb;
 
 					if ( depthRenderbuffer === undefined ) {
 
 						depthRenderbuffer = gl.createRenderbuffer();
 						this.textureUtils.setupRenderBufferStorage( depthRenderbuffer, renderContext );
 
-						renderContextData.depthRenderbuffer = depthRenderbuffer;
+						renderTargetContextData.depthRenderbuffer = depthRenderbuffer;
 
 					}
 
 				}
 
-				renderContextData.framebuffer = fb;
+				currentFrameBuffer = renderTargetContextData.msaaFrameBuffer;
 
 			} else {
 
-				if ( samples > 0 ) {
-
-					gl.bindFramebuffer( gl.FRAMEBUFFER, renderContextData.msaaFrameBuffer );
-
-				} else {
-
-					gl.bindFramebuffer( gl.FRAMEBUFFER, fb );
-
-				}
+				currentFrameBuffer = fb;
 
 			}
 
+		}
 
-		} else {
+		const framebufferBound = state.bindFramebuffer( gl.FRAMEBUFFER, currentFrameBuffer );
 
-			gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+		if ( framebufferBound && currentFrameBuffer ) {
+
+			state.drawBuffers( renderContext, currentFrameBuffer );
 
 		}
 
