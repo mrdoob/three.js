@@ -600,7 +600,7 @@ class BatchedMesh extends Mesh {
 		const active = this._active;
 		if ( active[ id ] === false ) {
 
-			return this;
+			return null;
 
 		}
 
@@ -643,7 +643,7 @@ class BatchedMesh extends Mesh {
 		const active = this._active;
 		if ( active[ id ] === false ) {
 
-			return this;
+			return null;
 
 		}
 
@@ -894,6 +894,7 @@ class BatchedMesh extends Mesh {
 		const index = geometry.getIndex();
 		const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
 
+		const active = this._active;
 		const visibility = this._visibility;
 		const multiDrawStarts = this._multiDrawStarts;
 		const multiDrawCounts = this._multiDrawCounts;
@@ -922,7 +923,7 @@ class BatchedMesh extends Mesh {
 
 			for ( let i = 0, l = visibility.length; i < l; i ++ ) {
 
-				if ( visibility[ i ] ) {
+				if ( visibility[ i ] && active[ i ] ) {
 
 					// get the bounds in world space
 					this.getMatrixAt( i, _matrix );
@@ -976,7 +977,7 @@ class BatchedMesh extends Mesh {
 
 			for ( let i = 0, l = visibility.length; i < l; i ++ ) {
 
-				if ( visibility[ i ] ) {
+				if ( visibility[ i ] && active[ i ] ) {
 
 					// determine whether the batched geometry is within the frustum
 					let culled = false;
