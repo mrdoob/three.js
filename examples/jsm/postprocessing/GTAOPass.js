@@ -162,6 +162,12 @@ class GTAOPass extends Pass {
 
 	}
 
+	get gtaoMap() {
+
+		return this.pdRenderTarget.texture;
+
+	}
+
 	setGBuffer( depthTexture, normalTexture ) {
 
 		if ( depthTexture !== undefined ) {
@@ -358,6 +364,9 @@ class GTAOPass extends Pass {
 		// output result to screen
 
 		switch ( this.output ) {
+
+			case GTAOPass.OUTPUT.Off:
+				break;
 
 			case GTAOPass.OUTPUT.Diffuse:
 
@@ -561,6 +570,7 @@ class GTAOPass extends Pass {
 }
 
 GTAOPass.OUTPUT = {
+	'Off': - 1,
 	'Default': 0,
 	'Diffuse': 1,
 	'Depth': 2,
