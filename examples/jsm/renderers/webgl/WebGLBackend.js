@@ -117,23 +117,6 @@ class WebGLBackend extends Backend {
 
 		this._currentContext = previousContext;
 
-		if ( previousContext !== null ) {
-
-			this._setFramebuffer( previousContext );
-
-			if ( previousContext.viewport ) {
-
-				this.updateViewport( previousContext );
-
-			} else {
-
-				const gl = this.gl;
-
-				gl.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
-
-			}
-
-		}
 
 		if ( renderContext.textures !== null && renderContext.renderTarget ) {
 
@@ -168,6 +151,24 @@ class WebGLBackend extends Backend {
 
 			}
 
+
+		}
+
+		if ( previousContext !== null ) {
+
+			this._setFramebuffer( previousContext );
+
+			if ( previousContext.viewport ) {
+
+				this.updateViewport( previousContext );
+
+			} else {
+
+				const gl = this.gl;
+
+				gl.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
+
+			}
 
 		}
 
