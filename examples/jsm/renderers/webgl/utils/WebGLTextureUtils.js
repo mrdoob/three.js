@@ -225,7 +225,7 @@ class WebGLTextureUtils {
 
 			textureGPU = gl.createTexture();
 
-			gl.bindTexture( glTextureType, textureGPU );
+			backend.state.bindTexture( glTextureType, textureGPU );
 			gl.texParameteri( glTextureType, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
 			gl.texParameteri( glTextureType, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
 
@@ -255,7 +255,7 @@ class WebGLTextureUtils {
 		const textureGPU = gl.createTexture();
 		const glTextureType = this.getGLTextureType( texture );
 
-		gl.bindTexture( glTextureType, textureGPU );
+		backend.state.bindTexture( glTextureType, textureGPU );
 
 		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
@@ -309,7 +309,7 @@ class WebGLTextureUtils {
 
 		};
 
-		gl.bindTexture( glTextureType, textureGPU );
+		this.backend.state.bindTexture( glTextureType, textureGPU );
 
 		if ( texture.isCompressedTexture ) {
 

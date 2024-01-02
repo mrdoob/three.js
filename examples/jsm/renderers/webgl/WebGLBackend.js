@@ -377,8 +377,9 @@ class WebGLBackend extends Backend {
 
 			} else if ( binding.isSampledTexture ) {
 
-				gl.activeTexture( gl.TEXTURE0 + index );
-				gl.bindTexture( bindingData.glTextureType, bindingData.textureGPU );
+				const textureId = contextData.renderTarget ? gl.TEXTURE0 + index : gl.TEXTURE0 + index;
+
+				state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, textureId );
 
 			}
 
@@ -937,6 +938,8 @@ class WebGLBackend extends Backend {
 
 				renderTargetContextData.framebuffer = fb;
 
+				state.drawBuffers( renderContext, fb );
+
 			}
 
 			if ( samples > 0 ) {
@@ -981,13 +984,7 @@ class WebGLBackend extends Backend {
 
 		}
 
-		const framebufferBound = state.bindFramebuffer( gl.FRAMEBUFFER, currentFrameBuffer );
-
-		if ( framebufferBound && currentFrameBuffer ) {
-
-			state.drawBuffers( renderContext, currentFrameBuffer );
-
-		}
+		state.bindFramebuffer( gl.FRAMEBUFFER, currentFrameBuffer );
 
 	}
 

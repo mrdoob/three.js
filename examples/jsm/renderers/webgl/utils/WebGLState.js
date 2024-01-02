@@ -45,6 +45,10 @@ class WebGLState {
 		this.currentBoundFramebuffers = {};
 		this.currentDrawbuffers = new WeakMap();
 
+		this.maxTextures = this.gl.getParameter( this.gl.MAX_TEXTURE_IMAGE_UNITS );
+		this.currentTextureSlot = null;
+		this.currentBoundTextures = {};
+
 		if ( initialized === false ) {
 
 			this._init( this.gl );
@@ -644,6 +648,88 @@ class WebGLState {
 
 		}
 
+
+	}
+
+
+	// texture
+
+	activeTexture( webglSlot ) {
+
+		const { gl, currentTextureSlot, maxTextures } = this;
+
+		if ( webglSlot === undefined ) webglSlot = gl.TEXTURE0 + maxTextures - 1;
+
+		if ( currentTextureSlot !== webglSlot ) {
+
+			gl.activeTexture( webglSlot );
+			this.currentTextureSlot = webglSlot;
+
+		}
+
+	}
+
+	bindTexture( webglType, webglTexture, webglSlot ) {
+
+		const { gl, currentTextureSlot, currentBoundTextures, maxTextures, emptyTextures } = this;
+
+		if ( webglSlot === undefined ) {
+
+			if ( currentTextureSlot === null ) {
+
+				webglSlot = gl.TEXTURE0 + maxTextures - 1;
+
+			} else {
+
+				webglSlot = currentTextureSlot;
+
+			}
+
+		}
+
+		let boundTexture = currentBoundTextures[ webglSlot ];
+
+		if ( boundTexture === undefined ) {
+
+			boundTexture = { type: undefined, texture: undefined };
+			currentBoundTextures[ webglSlot ] = boundTexture;
+
+		}
+
+		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
+
+			if ( currentTextureSlot !== webglSlot ) {
+
+				gl.activeTexture( webglSlot );
+				this.currentTextureSlot = webglSlot;
+
+			}
+
+			gl.bindTexture( webglType, webglTexture || emptyTextures[ webglType ] );
+
+			boundTexture.type = webglType;
+			boundTexture.texture = webglTexture;
+
+
+		}
+
+
+	}
+
+	unbindTexture() {
+
+		const { gl, currentTextureSlot, currentBoundTextures } = this;
+
+		const boundTexture = currentBoundTextures[ currentTextureSlot ];
+
+		if ( boundTexture !== undefined && boundTexture.type !== undefined ) {
+
+			gl.bindTexture( boundTexture.type, null );
+
+			boundTexture.type = undefined;
+			boundTexture.texture = undefined;
+
+		}
 
 	}
 
