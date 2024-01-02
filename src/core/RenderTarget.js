@@ -45,7 +45,7 @@ class RenderTarget extends EventDispatcher {
 			stencilBuffer: false,
 			depthTexture: null,
 			samples: 0,
-			useMultiview: false
+			multiview: false
 		}, options );
 
 		this.texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
@@ -58,7 +58,7 @@ class RenderTarget extends EventDispatcher {
 		this.depthBuffer = options.depthBuffer;
 		this.stencilBuffer = options.stencilBuffer;
 
-		this.useMultiview = options.useMultiview;
+		this.multiview = options.multiview;
 
 		this.depthTexture = options.depthTexture;
 
@@ -115,7 +115,7 @@ class RenderTarget extends EventDispatcher {
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
 
-		this.useMultiview = source.useMultiview;
+		this.multiview = source.multiview;
 
 		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
 

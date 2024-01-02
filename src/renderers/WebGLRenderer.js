@@ -151,7 +151,7 @@ class WebGLRenderer {
 		this._useLegacyLights = false;
 
 		// WebXR multiview
-		this._useMultiview = parameters.useMultiview === true;
+		this._multiview = parameters.multiview === true;
 
 		// tone mapping
 
@@ -1221,7 +1221,7 @@ class WebGLRenderer {
 			// render scene
 
 			currentRenderState.setupLights( _this._useLegacyLights );
-			const useMultiplePasses = camera.isArrayCamera && ( ( _currentRenderTarget === null ) || ! _currentRenderTarget.useMultiview );
+			const useMultiplePasses = camera.isArrayCamera && ( ( _currentRenderTarget === null ) || ! _currentRenderTarget.multiview );
 
 			if ( useMultiplePasses ) {
 
@@ -1758,7 +1758,7 @@ class WebGLRenderer {
 			const morphTargets = !! geometry.morphAttributes.position;
 			const morphNormals = !! geometry.morphAttributes.normal;
 			const morphColors = !! geometry.morphAttributes.color;
-			const isMultiview = ( _currentRenderTarget !== null ) && _currentRenderTarget.useMultiview;
+			const isMultiview = ( _currentRenderTarget !== null ) && _currentRenderTarget.multiview;
 
 			let toneMapping = NoToneMapping;
 
@@ -2222,7 +2222,7 @@ class WebGLRenderer {
 
 				if ( ! renderTargetProperties.__autoAllocateDepthBuffer && renderTarget.__useRenderToTexture ) {
 
-					renderTargetProperties.__useRenderToTexture = extensions.has( 'WEBGL_multisampled_render_to_texture' ) && ! renderTarget.useMultiview;
+					renderTargetProperties.__useRenderToTexture = extensions.has( 'WEBGL_multisampled_render_to_texture' ) && ! renderTarget.multiview;
 
 				}
 
@@ -2294,7 +2294,7 @@ class WebGLRenderer {
 
 					isCube = true;
 
-				} else if ( ( capabilities.isWebGL2 && renderTarget.samples > 0 ) && textures.useMultisampledRTT( renderTarget ) === false && renderTarget.useMultiview === false ) {
+				} else if ( ( capabilities.isWebGL2 && renderTarget.samples > 0 ) && textures.useMultisampledRTT( renderTarget ) === false && renderTarget.multiview === false ) {
 
 					framebuffer = properties.get( renderTarget ).__webglMultisampledFramebuffer;
 
@@ -2621,9 +2621,9 @@ class WebGLRenderer {
 
 	}
 
-	get useMultiview() {
+	get multiview() {
 
-		return ( this._useMultiview === true ) && this.extensions.has( 'OVR_multiview2' );
+		return ( this._multiview === true ) && this.extensions.has( 'OVR_multiview2' );
 
 	}
 

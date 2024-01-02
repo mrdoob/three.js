@@ -1378,7 +1378,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
-		if ( renderTarget.useMultiview ) {
+		if ( renderTarget.multiview ) {
 
 			multiviewExt.framebufferTextureMultisampleMultiviewOVR( _gl.FRAMEBUFFER, attachment, properties.get( texture ).__webglTexture, 0, getRenderTargetSamples( renderTarget ), 0, 2 );
 
@@ -1525,7 +1525,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		if ( renderTarget.useMultiview ) {
+		if ( renderTarget.multiview ) {
 
 			setTexture2DArray( renderTarget.depthTexture, 0 );
 
@@ -1540,7 +1540,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.depthTexture.format === DepthFormat ) {
 
-			if ( renderTarget.useMultiview ) {
+			if ( renderTarget.multiview ) {
 
 				multiviewExt.framebufferTextureMultisampleMultiviewOVR( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, webglDepthTexture, 0, samples, 0, 2 );
 
@@ -1556,7 +1556,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else if ( renderTarget.depthTexture.format === DepthStencilFormat ) {
 
-			if ( renderTarget.useMultiview ) {
+			if ( renderTarget.multiview ) {
 
 				multiviewExt.framebufferTextureMultisampleMultiviewOVR( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, webglDepthTexture, 0, samples, 0, 2 );
 
@@ -1736,7 +1736,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			if ( ( isWebGL2 && renderTarget.samples > 0 ) && useMultisampledRTT( renderTarget ) === false && renderTarget.useMultiview === false ) {
+			if ( ( isWebGL2 && renderTarget.samples > 0 ) && useMultisampledRTT( renderTarget ) === false && renderTarget.multiview === false ) {
 
 				const textures = isMultipleRenderTargets ? texture : [ texture ];
 
@@ -1837,7 +1837,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			let glTextureType = _gl.TEXTURE_2D;
 
-			if ( renderTarget.isWebGL3DRenderTarget || renderTarget.isWebGLArrayRenderTarget || renderTarget.useMultiview ) {
+			if ( renderTarget.isWebGL3DRenderTarget || renderTarget.isWebGLArrayRenderTarget || renderTarget.multiview ) {
 
 				if ( isWebGL2 ) {
 
@@ -1915,7 +1915,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function updateMultisampleRenderTarget( renderTarget ) {
 
-		if ( ( isWebGL2 && renderTarget.samples > 0 ) && ! renderTarget.useMultiview && useMultisampledRTT( renderTarget ) === false ) {
+		if ( ( isWebGL2 && renderTarget.samples > 0 ) && ! renderTarget.multiview && useMultisampledRTT( renderTarget ) === false ) {
 
 			const textures = renderTarget.isWebGLMultipleRenderTargets ? renderTarget.texture : [ renderTarget.texture ];
 			const width = renderTarget.width;

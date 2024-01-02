@@ -253,7 +253,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			combine: material.combine,
 
-			isMultiview: renderer.getRenderTarget() !== null && renderer.getRenderTarget().useMultiview === true,
+			isMultiview: renderer.getRenderTarget() !== null && renderer.getRenderTarget().multiview === true,
 
 			//
 
