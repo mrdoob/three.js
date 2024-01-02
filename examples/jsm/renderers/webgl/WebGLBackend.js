@@ -71,6 +71,9 @@ class WebGLBackend extends Backend {
 
 		//
 
+		//
+
+		renderContextData.previousContext = this._currentContext;
 		this._currentContext = renderContext;
 
 		this._setFramebuffer( renderContext );
@@ -110,6 +113,27 @@ class WebGLBackend extends Backend {
 
 		const { gl } = this;
 		const renderContextData = this.get( renderContext );
+		const previousContext = renderContextData.previousContext;
+
+		this._currentContext = previousContext;
+
+		if ( previousContext !== null ) {
+
+			this._setFramebuffer( previousContext );
+
+			if ( previousContext.viewport ) {
+
+				this.updateViewport( previousContext );
+
+			} else {
+
+				const gl = this.gl;
+
+				gl.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
+
+			}
+
+		}
 
 		if ( renderContext.textures !== null && renderContext.renderTarget ) {
 
@@ -150,25 +174,6 @@ class WebGLBackend extends Backend {
 
 		this._currentContext = renderContext;
 
-		const previousContext = renderContextData.previousContext;
-
-		if ( previousContext !== undefined ) {
-
-			this._setFramebuffer( previousContext );
-
-			if ( previousContext.viewport ) {
-
-				this.updateViewport( previousContext );
-
-			} else {
-
-
-				gl.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
-
-			}
-
-		}
-
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
 		if ( occlusionQueryCount > 0 ) {
@@ -187,7 +192,6 @@ class WebGLBackend extends Backend {
 
 		}
 
-		renderContextData.previousContext = renderContext;
 
 	}
 
