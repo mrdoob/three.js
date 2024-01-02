@@ -78,7 +78,6 @@
 				renderer.shadowMap.enabled = sceneParameters.shadow;
 
 				const plyLoader = new PLYLoader();
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				const rgbeloader = new RGBELoader();
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 50 );
@@ -107,8 +106,7 @@
 				rgbeloader.load( 'textures/equirectangular/royal_esplanade_1k.hdr', function ( texture ) {
 
 					texture.mapping = THREE.EquirectangularReflectionMapping;
-					const renderTarget = pmremGenerator.fromEquirectangular( texture );
-					scene.environment = renderTarget.texture;
+					scene.environment = texture;
 
 				} );
 			
