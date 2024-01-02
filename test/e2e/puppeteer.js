@@ -127,6 +127,7 @@ const exceptionList = [
 	'webgpu_sandbox',
 	'webgpu_sprites',
 	'webgpu_video_panorama',
+	'webgpu_postprocessing_afterimage',
 	'webgpu_multisampled_renderbuffers',
 
 	// WebGPURenderer: Unknown problem

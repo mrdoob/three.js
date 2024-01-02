@@ -377,9 +377,8 @@ class WebGLBackend extends Backend {
 
 			} else if ( binding.isSampledTexture ) {
 
-				const textureId = contextData.renderTarget ? undefined : gl.TEXTURE0 + index;
-
-				state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, textureId );
+				// debugger
+				state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, gl.TEXTURE0 + index );
 
 			}
 
