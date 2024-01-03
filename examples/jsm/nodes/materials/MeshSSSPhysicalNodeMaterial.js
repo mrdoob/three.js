@@ -44,11 +44,11 @@ class MeshSSSPhysicalNodeMaterial extends MeshPhysicalNodeMaterial {
 		super( parameters );
 
 		this.thicknessColorNode = null;
-		this.thicknessDistortionNode = float( .1 );
-		this.thicknessAmbientNode = float( .4 );
-		this.thicknessAttenuationNode = float( .8 );
-		this.thicknessPowerNode = float( 2 );
-		this.thicknessScaleNode = float( 16 );
+		this.thicknessDistortionNode = float( 0.1 );
+		this.thicknessAmbientNode = float( 0.0 );
+		this.thicknessAttenuationNode = float( .1 );
+		this.thicknessPowerNode = float( 2.0 );
+		this.thicknessScaleNode = float( 10.0 );
 
 	}
 
