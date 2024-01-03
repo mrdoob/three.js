@@ -52,7 +52,7 @@ class MeshSSSPhysicalNodeMaterial extends MeshPhysicalNodeMaterial {
 
 	}
 
-	get useFSSS() {
+	get useSSS() {
 
 		return this.thicknessColorNode !== null;
 
@@ -60,7 +60,7 @@ class MeshSSSPhysicalNodeMaterial extends MeshPhysicalNodeMaterial {
 
 	setupLightingModel( /*builder*/ ) {
 
-		return new SSSPhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useFSSS );
+		return new SSSPhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useSSS );
 
 	}
 
