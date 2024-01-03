@@ -10,7 +10,6 @@ import WebGLTextureUtils from './utils/WebGLTextureUtils.js';
 import WebGLExtensions from './utils/WebGLExtensions.js';
 import WebGLCapabilities from './utils/WebGLCapabilities.js';
 import { GLFeatureName } from './utils/WebGLConstants.js';
-import { DepthFormat } from '../../../../src/constants.js';
 
 //
 
@@ -885,7 +884,6 @@ class WebGLBackend extends Backend {
 
 		const { gl, state } = this;
 
-		let fb = null;
 		let currentFrameBuffer = null;
 
 		if ( renderContext.textures !== null ) {
@@ -896,7 +894,6 @@ class WebGLBackend extends Backend {
 			const cubeFace = this.renderer._activeCubeFace;
 			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
 
-			fb = renderTargetContextData.framebuffer;
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
 
@@ -941,9 +938,15 @@ class WebGLBackend extends Backend {
 						const textureData = this.get( texture );
 						textureData.renderTarget = renderContext.renderTarget;
 
+						const attachment = gl.COLOR_ATTACHMENT0 + i;
+
 						gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0 );
 
 					}
+
+					renderTargetContextData.framebuffer = fb;
+
+					state.drawBuffers( renderContext, fb );
 
 				}
 
@@ -954,11 +957,6 @@ class WebGLBackend extends Backend {
 					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureData.textureGPU, 0 );
 
 				}
-
-
-				renderTargetContextData.framebuffer = fb;
-
-				state.drawBuffers( renderContext, fb );
 
 			}
 
