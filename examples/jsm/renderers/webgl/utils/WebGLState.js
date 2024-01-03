@@ -671,7 +671,7 @@ class WebGLState {
 
 	bindTexture( webglType, webglTexture, webglSlot ) {
 
-		const { gl, currentTextureSlot, currentBoundTextures, maxTextures, emptyTextures } = this;
+		const { gl, currentTextureSlot, currentBoundTextures, maxTextures } = this;
 
 		if ( webglSlot === undefined ) {
 
@@ -705,7 +705,7 @@ class WebGLState {
 
 			}
 
-			gl.bindTexture( webglType, webglTexture || emptyTextures[ webglType ] );
+			gl.bindTexture( webglType, webglTexture );
 
 			boundTexture.type = webglType;
 			boundTexture.texture = webglTexture;

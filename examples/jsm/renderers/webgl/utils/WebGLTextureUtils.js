@@ -424,7 +424,45 @@ class WebGLTextureUtils {
 
 	}
 
+	copyFramebufferToTexture( texture, renderContext ) {
 
+		const { gl } = this;
+		const { state } = this.backend;
+
+		const { textureGPU } = this.backend.get( texture );
+
+		const width = texture.image.width;
+		const height = texture.image.height;
+
+		state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
+
+		if ( texture.isDepthTexture ) {
+
+			const fb = gl.createFramebuffer();
+
+			gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+
+			gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureGPU, 0 );
+
+			gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, gl.DEPTH_BUFFER_BIT, gl.NEAREST );
+
+			gl.deleteFramebuffer( fb );
+
+
+		} else {
+
+			state.bindTexture( gl.TEXTURE_2D, textureGPU );
+			gl.copyTexSubImage2D( gl.TEXTURE_2D, 0, 0, 0, 0, 0, width, height );
+
+			state.unbindTexture();
+
+		}
+
+		if ( texture.generateMipmaps ) this.generateMipmaps( texture );
+
+		this.backend._setFramebuffer( renderContext );
+
+	}
 
 	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
 	setupRenderBufferStorage( renderbuffer, renderContext ) {
