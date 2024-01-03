@@ -890,7 +890,7 @@ class WebGLBackend extends Backend {
 
 		if ( renderContext.textures !== null ) {
 
-			const renderTarget = renderContext.renderTarget
+			const renderTarget = renderContext.renderTarget;
 			const renderTargetContextData = this.get( renderTarget );
 			const { samples } = renderTarget;
 			const cubeFace = this.renderer._activeCubeFace;
