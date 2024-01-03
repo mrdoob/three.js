@@ -75,6 +75,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.setAnimationLoop( animate );
 
 				container.appendChild( renderer.domElement );
 
@@ -132,7 +133,9 @@
 				const stats = new Stats();
 				container.appendChild( stats.dom );
 
-				renderer.setAnimationLoop( () => {
+
+
+				function animate() {
 
 					const delta = clock.getDelta();
 
@@ -148,7 +151,7 @@
 
 					stats.update();
 
-				} );
+				}
 
 				window.addEventListener( 'resize', () => {
 
