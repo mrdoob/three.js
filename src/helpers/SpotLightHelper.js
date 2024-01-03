@@ -4,8 +4,11 @@ import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Matrix4 } from '../math/Matrix4.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
+const _invMatrix = /*@__PURE__*/ new Matrix4();
+const _localMatrix = /*@__PURE__*/ new Matrix4();
 
 class SpotLightHelper extends Object3D {
 
@@ -14,9 +17,6 @@ class SpotLightHelper extends Object3D {
 		super();
 
 		this.light = light;
-
-		this.matrix = light.matrixWorld;
-		this.matrixAutoUpdate = false;
 
 		this.color = color;
 
@@ -62,10 +62,38 @@ class SpotLightHelper extends Object3D {
 
 	}
 
+	updateMatrixWorld() {
+
+		const parent = this.parent;
+		const light = this.light;
+
+		// transform into the parents local frame from world frame
+		if ( parent ) {
+
+			_invMatrix.copy( parent.matrixWorld ).invert();
+
+		} else {
+
+			_invMatrix.identity();
+
+		}
+
+		// transform the targets frame into the local frame
+		_localMatrix
+			.copy( light.matrixWorld )
+			.premultiply( _invMatrix )
+			.decompose( this.position, this.quaternion, this.scale );
+
+		this.updateMatrix();
+		this.matrixWorld.copy( light.matrixWorld );
+
+	}
+
 	update() {
 
 		this.light.updateWorldMatrix( true, false );
 		this.light.target.updateWorldMatrix( true, false );
+		this.updateMatrixWorld();
 
 		const coneLength = this.light.distance ? this.light.distance : 1000;
 		const coneWidth = coneLength * Math.tan( this.light.angle );
