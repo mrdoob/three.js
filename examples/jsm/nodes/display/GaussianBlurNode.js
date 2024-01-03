@@ -29,7 +29,9 @@ class GaussianBlurNode extends TempNode {
 		this._passDirection = uniform( new Vector2() );
 
 		this._horizontalRT = new RenderTarget();
+		this._horizontalRT.texture.name = 'GaussianBlurNode.horizontal';
 		this._verticalRT = new RenderTarget();
+		this._verticalRT.texture.name = 'GaussianBlurNode.vertical';
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 

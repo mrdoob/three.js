@@ -40,6 +40,14 @@ class WebGLState {
 		this.currentStencilZFail = null;
 		this.currentStencilZPass = null;
 		this.currentStencilMask = null;
+		this.currentLineWidth = null;
+
+		this.currentBoundFramebuffers = {};
+		this.currentDrawbuffers = new WeakMap();
+
+		this.maxTextures = this.gl.getParameter( this.gl.MAX_TEXTURE_IMAGE_UNITS );
+		this.currentTextureSlot = null;
+		this.currentBoundTextures = {};
 
 		if ( initialized === false ) {
 
@@ -160,6 +168,21 @@ class WebGLState {
 		this.currentCullFace = cullFace;
 
 	}
+
+	setLineWidth( width ) {
+
+		const { currentLineWidth, gl } = this;
+
+		if ( width !== currentLineWidth ) {
+
+			gl.lineWidth( width );
+
+			this.currentLineWidth = width;
+
+		}
+
+	}
+
 
 	setBlending( blending, blendEquation, blendSrc, blendDst, blendEquationAlpha, blendSrcAlpha, blendDstAlpha, premultipliedAlpha ) {
 
@@ -535,6 +558,180 @@ class WebGLState {
 
 	}
 
+	// framebuffer
+
+
+	bindFramebuffer( target, framebuffer ) {
+
+		const { gl, currentBoundFramebuffers } = this;
+
+		if ( currentBoundFramebuffers[ target ] !== framebuffer ) {
+
+			gl.bindFramebuffer( target, framebuffer );
+
+			currentBoundFramebuffers[ target ] = framebuffer;
+
+			// gl.DRAW_FRAMEBUFFER is equivalent to gl.FRAMEBUFFER
+
+			if ( target === gl.DRAW_FRAMEBUFFER ) {
+
+				currentBoundFramebuffers[ gl.FRAMEBUFFER ] = framebuffer;
+
+			}
+
+			if ( target === gl.FRAMEBUFFER ) {
+
+				currentBoundFramebuffers[ gl.DRAW_FRAMEBUFFER ] = framebuffer;
+
+			}
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
+	drawBuffers( renderContext, framebuffer ) {
+
+		const { gl } = this;
+
+		let drawBuffers = [];
+
+		let needsUpdate = false;
+
+		if ( renderContext.textures !== null ) {
+
+			drawBuffers = this.currentDrawbuffers.get( framebuffer );
+
+			if ( drawBuffers === undefined ) {
+
+				drawBuffers = [];
+				this.currentDrawbuffers.set( framebuffer, drawBuffers );
+
+			}
+
+
+			const textures = renderContext.textures;
+
+			if ( drawBuffers.length !== textures.length || drawBuffers[ 0 ] !== gl.COLOR_ATTACHMENT0 ) {
+
+				for ( let i = 0, il = textures.length; i < il; i ++ ) {
+
+					drawBuffers[ i ] = gl.COLOR_ATTACHMENT0 + i;
+
+				}
+
+				drawBuffers.length = textures.length;
+
+				needsUpdate = true;
+
+			}
+
+
+		} else {
+
+			if ( drawBuffers[ 0 ] !== gl.BACK ) {
+
+				drawBuffers[ 0 ] = gl.BACK;
+
+				needsUpdate = true;
+
+			}
+
+		}
+
+		if ( needsUpdate ) {
+
+			gl.drawBuffers( drawBuffers );
+
+		}
+
+
+	}
+
+
+	// texture
+
+	activeTexture( webglSlot ) {
+
+		const { gl, currentTextureSlot, maxTextures } = this;
+
+		if ( webglSlot === undefined ) webglSlot = gl.TEXTURE0 + maxTextures - 1;
+
+		if ( currentTextureSlot !== webglSlot ) {
+
+			gl.activeTexture( webglSlot );
+			this.currentTextureSlot = webglSlot;
+
+		}
+
+	}
+
+	bindTexture( webglType, webglTexture, webglSlot ) {
+
+		const { gl, currentTextureSlot, currentBoundTextures, maxTextures } = this;
+
+		if ( webglSlot === undefined ) {
+
+			if ( currentTextureSlot === null ) {
+
+				webglSlot = gl.TEXTURE0 + maxTextures - 1;
+
+			} else {
+
+				webglSlot = currentTextureSlot;
+
+			}
+
+		}
+
+		let boundTexture = currentBoundTextures[ webglSlot ];
+
+		if ( boundTexture === undefined ) {
+
+			boundTexture = { type: undefined, texture: undefined };
+			currentBoundTextures[ webglSlot ] = boundTexture;
+
+		}
+
+		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
+
+			if ( currentTextureSlot !== webglSlot ) {
+
+				gl.activeTexture( webglSlot );
+				this.currentTextureSlot = webglSlot;
+
+			}
+
+			gl.bindTexture( webglType, webglTexture );
+
+			boundTexture.type = webglType;
+			boundTexture.texture = webglTexture;
+
+
+		}
+
+
+	}
+
+	unbindTexture() {
+
+		const { gl, currentTextureSlot, currentBoundTextures } = this;
+
+		const boundTexture = currentBoundTextures[ currentTextureSlot ];
+
+		if ( boundTexture !== undefined && boundTexture.type !== undefined ) {
+
+			gl.bindTexture( boundTexture.type, null );
+
+			boundTexture.type = undefined;
+			boundTexture.texture = undefined;
+
+		}
+
+	}
 
 }
 
