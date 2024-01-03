@@ -9,7 +9,7 @@ class SSSPhysicalLightingModel extends PhysicalLightingModel {
 
 	constructor( useClearcoat, useSheen, useIridescence, useSSS ) {
 
-		super( useClearcoat, useSheen, useIridescence, useSSS );
+		super( useClearcoat, useSheen, useIridescence );
 
 		this.useSSS = useSSS;
 
