@@ -398,7 +398,7 @@ class WebGLTextureUtils {
 		const { gl, backend } = this;
 		const { textureGPU, glTextureType } = backend.get( texture );
 
-		gl.bindTexture( glTextureType, textureGPU );
+		backend.state.bindTexture( glTextureType, textureGPU );
 		gl.generateMipmap( glTextureType );
 
 	}
