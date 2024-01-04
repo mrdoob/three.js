@@ -1,4 +1,4 @@
-import { BackSide, Mesh, MeshBasicMaterial, SphereGeometry, Vector3 } from 'three';
+import { Mesh, MeshBasicMaterial, SphereGeometry, Vector3 } from 'three';
 
 /**
  * A ground-projected skybox. The height is how far the camera that took the photo was above the ground - 
