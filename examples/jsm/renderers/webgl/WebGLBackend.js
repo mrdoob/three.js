@@ -122,21 +122,10 @@ class WebGLBackend extends Backend {
 
 			const renderTargetContextData = this.get( renderContext.renderTarget );
 
-			const { samples, stencilBuffer } = renderContext.renderTarget;
+			const { samples } = renderContext.renderTarget;
 			const fb = renderTargetContextData.framebuffer;
 
 			if ( samples > 0 ) {
-
-				const invalidationArray = [];
-				const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
-
-				invalidationArray.push( gl.COLOR_ATTACHMENT0 );
-
-				if ( renderTargetContextData.depthBuffer ) {
-
-					invalidationArray.push( depthStyle );
-
-				}
 
 				// TODO For loop support MRT
 				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
@@ -147,7 +136,7 @@ class WebGLBackend extends Backend {
 
 				gl.blitFramebuffer( 0, 0, renderContext.width, renderContext.height, 0, 0, renderContext.width, renderContext.height, gl.COLOR_BUFFER_BIT, gl.NEAREST );
 
-				gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, invalidationArray );
+				gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray );
 
 			}
 
@@ -861,7 +850,7 @@ class WebGLBackend extends Backend {
 		if ( renderContext.textures !== null ) {
 
 			const renderTargetContextData = this.get( renderContext.renderTarget );
-			const { samples } = renderContext.renderTarget;
+			const { samples, stencilBuffer } = renderContext.renderTarget;
 
 			fb = renderTargetContextData.framebuffer;
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
@@ -892,8 +881,9 @@ class WebGLBackend extends Backend {
 				if ( renderContext.depthTexture !== null ) {
 
 					const textureData = this.get( renderContext.depthTexture );
+					const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
 
-					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
 
 				}
 
@@ -907,6 +897,8 @@ class WebGLBackend extends Backend {
 			if ( samples > 0 ) {
 
 				if ( msaaFb === undefined ) {
+
+					const invalidationArray = [];
 
 					msaaFb = gl.createFramebuffer();
 
@@ -922,6 +914,8 @@ class WebGLBackend extends Backend {
 					gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, textureData.glInternalFormat, renderContext.width, renderContext.height );
 					gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, msaaRenderbuffer );
 
+					invalidationArray.push( gl.COLOR_ATTACHMENT0 );
+
 					renderTargetContextData.msaaRenderbuffer = msaaRenderbuffer;
 					renderTargetContextData.msaaFrameBuffer = msaaFb;
 
@@ -932,7 +926,12 @@ class WebGLBackend extends Backend {
 
 						renderTargetContextData.depthRenderbuffer = depthRenderbuffer;
 
+						const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
+						invalidationArray.push( depthStyle );
+
 					}
+
+					renderTargetContextData.invalidationArray = invalidationArray;
 
 				}
 
