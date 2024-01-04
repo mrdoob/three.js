@@ -8,7 +8,6 @@ import { Matrix4 } from '../math/Matrix4.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
 const _invMatrix = /*@__PURE__*/ new Matrix4();
-const _localMatrix = /*@__PURE__*/ new Matrix4();
 
 class SpotLightHelper extends Object3D {
 
@@ -62,30 +61,48 @@ class SpotLightHelper extends Object3D {
 
 	}
 
-	updateMatrixWorld() {
+	updateMatrixWorld( force ) {
 
-		const parent = this.parent;
-		const light = this.light;
+		if ( this.matrixWorldNeedsUpdate || force ) {
 
-		// transform into the parents local frame from world frame
-		if ( parent ) {
+			const parent = this.parent;
+			const light = this.light;
 
-			_invMatrix.copy( parent.matrixWorld ).invert();
+			// transform into the parents local frame from world frame
+			if ( parent ) {
 
-		} else {
+				_invMatrix.copy( parent.matrixWorld ).invert();
 
-			_invMatrix.identity();
+			} else {
+
+				_invMatrix.identity();
+
+			}
+
+			// transform the targets frame into the local frame
+			this.matrix
+				.copy( light.matrixWorld )
+				.premultiply( _invMatrix )
+				.decompose( this.position, this.quaternion, this.scale );
+
+			this.matrixWorld
+				.copy( light.matrixWorld );
 
 		}
 
-		// transform the targets frame into the local frame
-		_localMatrix
-			.copy( light.matrixWorld )
-			.premultiply( _invMatrix )
-			.decompose( this.position, this.quaternion, this.scale );
+		// update the children
+		const children = this.children;
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-		this.updateMatrix();
-		this.matrixWorld.copy( light.matrixWorld );
+			const child = children[ i ];
+
+			if ( child.matrixWorldAutoUpdate === true || force === true ) {
+
+				child.updateMatrixWorld( force );
+
+			}
+
+		}
 
 	}
 
