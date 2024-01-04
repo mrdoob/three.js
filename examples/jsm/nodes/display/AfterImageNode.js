@@ -21,7 +21,10 @@ class AfterImageNode extends TempNode {
 		this.damp = uniform( damp );
 
 		this._compRT = new RenderTarget();
+		this._compRT.texture.name = 'AfterImageNode.comp';
+
 		this._oldRT = new RenderTarget();
+		this._oldRT.texture.name = 'AfterImageNode.old';
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 

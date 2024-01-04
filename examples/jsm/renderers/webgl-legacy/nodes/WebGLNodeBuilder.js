@@ -671,7 +671,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 	build() {
 
-		super.build();
+		super.build( false );
 
 		this._addSnippets();
 		this._addUniforms();

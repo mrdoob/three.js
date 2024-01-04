@@ -225,11 +225,11 @@ class WebGLTextureUtils {
 
 			textureGPU = gl.createTexture();
 
-			gl.bindTexture( glTextureType, textureGPU );
+			backend.state.bindTexture( glTextureType, textureGPU );
 			gl.texParameteri( glTextureType, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
 			gl.texParameteri( glTextureType, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
 
-			//gl.texImage2D( target + i, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data );
+			// gl.texImage2D( glTextureType, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data );
 
 			defaultTextures[ glTextureType ] = textureGPU;
 
@@ -255,7 +255,7 @@ class WebGLTextureUtils {
 		const textureGPU = gl.createTexture();
 		const glTextureType = this.getGLTextureType( texture );
 
-		gl.bindTexture( glTextureType, textureGPU );
+		backend.state.bindTexture( glTextureType, textureGPU );
 
 		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
@@ -263,8 +263,6 @@ class WebGLTextureUtils {
 		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE );
 
 		this.setTextureParameters( glTextureType, texture );
-
-		gl.bindTexture( glTextureType, textureGPU );
 
 		if ( texture.isDataArrayTexture ) {
 
@@ -311,7 +309,7 @@ class WebGLTextureUtils {
 
 		};
 
-		gl.bindTexture( glTextureType, textureGPU );
+		this.backend.state.bindTexture( glTextureType, textureGPU );
 
 		if ( texture.isCompressedTexture ) {
 
@@ -408,11 +406,140 @@ class WebGLTextureUtils {
 	destroyTexture( texture ) {
 
 		const { gl, backend } = this;
-		const { textureGPU } = backend.get( texture );
+		const { textureGPU, renderTarget } = backend.get( texture );
+
+		// remove framebuffer reference
+		if ( renderTarget ) {
+
+			const renderContextData = backend.get( renderTarget );
+			renderContextData.framebuffer = undefined;
+			renderContextData.msaaFrameBuffer = undefined;
+			renderContextData.depthRenderbuffer = undefined;
+
+		}
 
 		gl.deleteTexture( textureGPU );
 
 		backend.delete( texture );
+
+	}
+
+	copyFramebufferToTexture( texture, renderContext ) {
+
+		const { gl } = this;
+		const { state } = this.backend;
+
+		const { textureGPU } = this.backend.get( texture );
+
+		const width = texture.image.width;
+		const height = texture.image.height;
+
+		state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
+
+		if ( texture.isDepthTexture ) {
+
+			const fb = gl.createFramebuffer();
+
+			gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+
+			gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureGPU, 0 );
+
+			gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, gl.DEPTH_BUFFER_BIT, gl.NEAREST );
+
+			gl.deleteFramebuffer( fb );
+
+
+		} else {
+
+			state.bindTexture( gl.TEXTURE_2D, textureGPU );
+			gl.copyTexSubImage2D( gl.TEXTURE_2D, 0, 0, 0, 0, 0, width, height );
+
+			state.unbindTexture();
+
+		}
+
+		if ( texture.generateMipmaps ) this.generateMipmaps( texture );
+
+		this.backend._setFramebuffer( renderContext );
+
+	}
+
+	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
+	setupRenderBufferStorage( renderbuffer, renderContext ) {
+
+		const { gl } = this;
+		const renderTarget = renderContext.renderTarget;
+
+		const { samples, depthTexture, depthBuffer, stencilBuffer, width, height } = renderTarget;
+
+		gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
+
+		if ( depthBuffer && ! stencilBuffer ) {
+
+			let glInternalFormat = gl.DEPTH_COMPONENT24;
+
+			if ( samples > 0 ) {
+
+
+				if ( depthTexture && depthTexture.isDepthTexture ) {
+
+					if ( depthTexture.type === gl.FLOAT ) {
+
+						glInternalFormat = gl.DEPTH_COMPONENT32F;
+
+					}
+
+				}
+
+				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, glInternalFormat, width, height );
+
+			} else {
+
+				gl.renderbufferStorage( gl.RENDERBUFFER, glInternalFormat, width, height );
+
+			}
+
+			gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer );
+
+		} else if ( depthBuffer && stencilBuffer ) {
+
+			if ( samples > 0 ) {
+
+				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, gl.DEPTH24_STENCIL8, width, height );
+
+			} else {
+
+				gl.renderbufferStorage( gl.RENDERBUFFER, gl.DEPTH_STENCIL, width, height );
+
+			}
+
+
+			gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, renderbuffer );
+
+		} else {
+
+			const textures = renderContext.textures;
+
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				const texture = textures[ i ];
+				const { glInternalFormat } = this.get( texture );
+
+				if ( samples > 0 ) {
+
+					gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, glInternalFormat, width, height );
+
+				} else {
+
+					gl.renderbufferStorage( gl.RENDERBUFFER, glInternalFormat, width, height );
+
+				}
+
+			}
+
+		}
+
+		gl.bindRenderbuffer( gl.RENDERBUFFER, null );
 
 	}
 

@@ -128,6 +128,7 @@ const exceptionList = [
 	'webgpu_sprites',
 	'webgpu_video_panorama',
 	'webgpu_postprocessing_afterimage',
+	'webgpu_multisampled_renderbuffers',
 
 	// WebGPURenderer: Unknown problem
 	'webgpu_backdrop_water',

@@ -71,6 +71,8 @@ class WebGLBackend extends Backend {
 
 		//
 
+		//
+
 		renderContextData.previousContext = this._currentContext;
 		this._currentContext = renderContext;
 
@@ -79,7 +81,6 @@ class WebGLBackend extends Backend {
 		this.clear( renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil, renderContext );
 
 		//
-
 		if ( renderContext.viewport ) {
 
 			this.updateViewport( renderContext );
@@ -110,10 +111,48 @@ class WebGLBackend extends Backend {
 
 	finishRender( renderContext ) {
 
+		const { gl } = this;
 		const renderContextData = this.get( renderContext );
 		const previousContext = renderContextData.previousContext;
 
 		this._currentContext = previousContext;
+
+
+		if ( renderContext.textures !== null && renderContext.renderTarget ) {
+
+			const renderTargetContextData = this.get( renderContext.renderTarget );
+
+			const { samples, stencilBuffer } = renderContext.renderTarget;
+			const fb = renderTargetContextData.framebuffer;
+
+			if ( samples > 0 ) {
+
+				const invalidationArray = [];
+				const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
+
+				invalidationArray.push( gl.COLOR_ATTACHMENT0 );
+
+				if ( renderTargetContextData.depthBuffer ) {
+
+					invalidationArray.push( depthStyle );
+
+				}
+
+				// TODO For loop support MRT
+				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
+
+				gl.bindFramebuffer( gl.READ_FRAMEBUFFER, msaaFrameBuffer );
+				gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+
+
+				gl.blitFramebuffer( 0, 0, renderContext.width, renderContext.height, 0, 0, renderContext.width, renderContext.height, gl.COLOR_BUFFER_BIT, gl.NEAREST );
+
+				gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, invalidationArray );
+
+			}
+
+
+		}
 
 		if ( previousContext !== null ) {
 
@@ -150,6 +189,7 @@ class WebGLBackend extends Backend {
 			this.resolveOccludedAsync( renderContext );
 
 		}
+
 
 	}
 
@@ -334,8 +374,7 @@ class WebGLBackend extends Backend {
 
 			} else if ( binding.isSampledTexture ) {
 
-				gl.activeTexture( gl.TEXTURE0 + index );
-				gl.bindTexture( bindingData.glTextureType, bindingData.textureGPU );
+				state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, gl.TEXTURE0 + index );
 
 			}
 
@@ -391,7 +430,20 @@ class WebGLBackend extends Backend {
 		else if ( object.isLineSegments ) mode = gl.LINES;
 		else if ( object.isLine ) mode = gl.LINE_STRIP;
 		else if ( object.isLineLoop ) mode = gl.LINE_LOOP;
-		else mode = gl.TRIANGLES;
+		else {
+
+			if ( material.wireframe === true ) {
+
+				state.setLineWidth( material.wireframeLinewidth * this.renderer.getPixelRatio() );
+				mode = gl.LINES;
+
+			} else {
+
+				mode = gl.TRIANGLES;
+
+			}
+
+		}
 
 		//
 
@@ -481,6 +533,7 @@ class WebGLBackend extends Backend {
 		this.textureUtils.generateMipmaps( texture );
 
 	}
+
 
 	destroyTexture( texture ) {
 
@@ -794,99 +847,106 @@ class WebGLBackend extends Backend {
 
 	copyFramebufferToTexture( texture, renderContext ) {
 
-		const { gl } = this;
-
-		const { textureGPU } = this.get( texture );
-
-		const width = texture.image.width;
-		const height = texture.image.height;
-
-		gl.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
-
-		if ( texture.isDepthTexture ) {
-
-			const fb = gl.createFramebuffer();
-
-			gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
-
-			gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureGPU, 0 );
-
-			gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, gl.DEPTH_BUFFER_BIT, gl.NEAREST );
-
-			gl.deleteFramebuffer( fb );
-
-
-		} else {
-
-			gl.bindTexture( gl.TEXTURE_2D, textureGPU );
-			gl.copyTexSubImage2D( gl.TEXTURE_2D, 0, 0, 0, 0, 0, width, height );
-
-			gl.bindTexture( gl.TEXTURE_2D, null );
-
-		}
-
-		if ( texture.generateMipmaps ) this.generateMipmaps( texture );
-
-		this._setFramebuffer( renderContext );
+		this.textureUtils.copyFramebufferToTexture( texture, renderContext );
 
 	}
 
 	_setFramebuffer( renderContext ) {
 
-		const { gl } = this;
+		const { gl, state } = this;
+
+		let fb = null;
+		let currentFrameBuffer = null;
 
 		if ( renderContext.textures !== null ) {
 
-			const renderContextData = this.get( renderContext.renderTarget );
+			const renderTargetContextData = this.get( renderContext.renderTarget );
+			const { samples } = renderContext.renderTarget;
 
-			let fb = renderContextData.framebuffer;
+			fb = renderTargetContextData.framebuffer;
+			let msaaFb = renderTargetContextData.msaaFrameBuffer;
+			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
+
 
 			if ( fb === undefined ) {
 
 				fb = gl.createFramebuffer();
 
-				gl.bindFramebuffer( gl.FRAMEBUFFER, fb );
+				state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
 				const textures = renderContext.textures;
-
-				const drawBuffers = [];
 
 				for ( let i = 0; i < textures.length; i ++ ) {
 
 					const texture = textures[ i ];
-					const { textureGPU } = this.get( texture );
+					const textureData = this.get( texture );
+					textureData.renderTarget = renderContext.renderTarget;
 
 					const attachment = gl.COLOR_ATTACHMENT0 + i;
 
-					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, textureGPU, 0 );
 
-					drawBuffers.push( attachment );
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0 );
 
 				}
-
-				gl.drawBuffers( drawBuffers );
 
 				if ( renderContext.depthTexture !== null ) {
 
-					const { textureGPU } = this.get( renderContext.depthTexture );
+					const textureData = this.get( renderContext.depthTexture );
 
-					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureGPU, 0 );
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureData.textureGPU, 0 );
 
 				}
 
-				renderContextData.framebuffer = fb;
 
-			} else {
+				renderTargetContextData.framebuffer = fb;
 
-				gl.bindFramebuffer( gl.FRAMEBUFFER, fb );
+				state.drawBuffers( renderContext, fb );
 
 			}
 
-		} else {
+			if ( samples > 0 ) {
 
-			gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+				if ( msaaFb === undefined ) {
+
+					msaaFb = gl.createFramebuffer();
+
+					state.bindFramebuffer( gl.FRAMEBUFFER, msaaFb );
+
+					// TODO For loop support MRT
+					const msaaRenderbuffer = gl.createRenderbuffer();
+					gl.bindRenderbuffer( gl.RENDERBUFFER, msaaRenderbuffer );
+
+					const texture = renderContext.textures[ 0 ];
+					const textureData = this.get( texture );
+
+					gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, textureData.glInternalFormat, renderContext.width, renderContext.height );
+					gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, msaaRenderbuffer );
+
+					renderTargetContextData.msaaRenderbuffer = msaaRenderbuffer;
+					renderTargetContextData.msaaFrameBuffer = msaaFb;
+
+					if ( depthRenderbuffer === undefined ) {
+
+						depthRenderbuffer = gl.createRenderbuffer();
+						this.textureUtils.setupRenderBufferStorage( depthRenderbuffer, renderContext );
+
+						renderTargetContextData.depthRenderbuffer = depthRenderbuffer;
+
+					}
+
+				}
+
+				currentFrameBuffer = renderTargetContextData.msaaFrameBuffer;
+
+			} else {
+
+				currentFrameBuffer = fb;
+
+			}
 
 		}
+
+		state.bindFramebuffer( gl.FRAMEBUFFER, currentFrameBuffer );
 
 	}
 

@@ -9,16 +9,19 @@ import UniformBuffer from '../../common/UniformBuffer.js';
 import StorageBuffer from '../../common/StorageBuffer.js';
 import { getVectorLength, getStrideLength } from '../../common/BufferUtils.js';
 
-import { NodeBuilder, CodeNode, NodeMaterial } from '../../../nodes/Nodes.js';
+import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
 
 import { getFormat } from '../utils/WebGPUTextureUtils.js';
 
 import WGSLNodeParser from './WGSLNodeParser.js';
 
+// GPUShaderStage is not defined in browsers not supporting WebGPU
+const GPUShaderStage = window.GPUShaderStage;
+
 const gpuShaderStageLib = {
-	'vertex': GPUShaderStage.VERTEX,
-	'fragment': GPUShaderStage.FRAGMENT,
-	'compute': GPUShaderStage.COMPUTE
+	'vertex': GPUShaderStage ? GPUShaderStage.VERTEX : 1,
+	'fragment': GPUShaderStage ? GPUShaderStage.FRAGMENT : 2,
+	'compute': GPUShaderStage ? GPUShaderStage.COMPUTE : 4
 };
 
 const supports = {
@@ -121,24 +124,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 		this.uniformGroups = {};
 
 		this.builtins = {};
-
-	}
-
-	build() {
-
-		const { object, material } = this;
-
-		if ( material !== null ) {
-
-			NodeMaterial.fromMaterial( material ).build( this );
-
-		} else {
-
-			this.addFlow( 'compute', object );
-
-		}
-
-		return super.build();
 
 	}
 

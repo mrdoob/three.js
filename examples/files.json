@@ -346,6 +346,7 @@
 		"webgpu_loader_gltf_sheen",
 		"webgpu_loader_materialx",
 		"webgpu_materials",
+		"webgpu_materials_sss",
 		"webgpu_materials_video",
 		"webgpu_materialx_noise",
 		"webgpu_multiple_rendertargets",
@@ -366,7 +367,8 @@
 		"webgpu_tsl_editor",
 		"webgpu_tsl_transpiler",
 		"webgpu_video_panorama",
-		"webgpu_postprocessing_afterimage"
+		"webgpu_postprocessing_afterimage",
+		"webgpu_multisampled_renderbuffers"
 	],
 	"webaudio": [
 		"webaudio_orientation",

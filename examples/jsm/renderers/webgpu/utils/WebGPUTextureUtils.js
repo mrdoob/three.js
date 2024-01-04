@@ -113,7 +113,21 @@ class WebGPUTextureUtils {
 		const dimension = this._getDimension( texture );
 		const format = texture.internalFormat || getFormat( texture, backend.device );
 
-		const sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
+		let sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
+
+		if ( sampleCount > 1 ) {
+
+			// WebGPU only supports power-of-two sample counts and 2 is not a valid value
+			sampleCount = Math.pow( 2, Math.floor( Math.log2( sampleCount ) ) );
+
+			if ( sampleCount === 2 ) {
+
+				sampleCount = 4;
+
+			}
+
+		}
+
 		const primarySampleCount = texture.isRenderTargetTexture ? 1 : sampleCount;
 
 		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC;
