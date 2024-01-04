@@ -100,6 +100,10 @@ class MathNode extends TempNode {
 
 			return normalize( mulNode ).build( builder, output );
 
+		} else if ( method === MathNode.CBRT ) {
+
+			return mul( sign( a ), pow( abs( a ), 1.0 / 3.0 ) ).build( builder, output );
+
 		} else if ( method === MathNode.NEGATE ) {
 
 			return builder.format( '( - ' + a.build( builder, inputType ) + ' )', type, output );
@@ -221,6 +225,7 @@ MathNode.RECIPROCAL = 'reciprocal';
 MathNode.TRUNC = 'trunc';
 MathNode.FWIDTH = 'fwidth';
 MathNode.BITCAST = 'bitcast';
+MathNode.CBRT = 'cbrt';
 
 // 2 inputs
 
@@ -297,6 +302,7 @@ export const pow3 = nodeProxy( MathNode, MathNode.POW, 3 );
 export const pow4 = nodeProxy( MathNode, MathNode.POW, 4 );
 export const transformDirection = nodeProxy( MathNode, MathNode.TRANSFORM_DIRECTION );
 
+export const cbrt = nodeProxy( MathNode, MathNode.CBRT );
 export const mix = nodeProxy( MathNode, MathNode.MIX );
 export const clamp = ( value, low = 0, high = 1 ) => nodeObject( new MathNode( MathNode.CLAMP, nodeObject( value ), nodeObject( low ), nodeObject( high ) ) );
 export const saturate = ( value ) => clamp( value );
@@ -357,5 +363,6 @@ addNodeElement( 'smoothstep', smoothstepElement );
 addNodeElement( 'faceForward', faceForward );
 addNodeElement( 'difference', difference );
 addNodeElement( 'saturate', saturate );
+addNodeElement( 'cbrt', cbrt );
 
 addNodeClass( 'MathNode', MathNode );
