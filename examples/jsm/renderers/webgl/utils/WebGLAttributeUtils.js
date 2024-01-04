@@ -134,6 +134,25 @@ class WebGLAttributeUtils {
 
 	}
 
+	destroyAttribute( attribute ) {
+
+		const backend = this.backend;
+		const { gl } = backend;
+
+		if ( attribute.isInterleavedBufferAttribute ) {
+
+			backend.delete( attribute.data );
+
+		}
+
+		const attributeData = backend.get( attribute );
+
+		gl.deleteBuffer( attributeData.bufferGPU );
+
+		backend.delete( attribute );
+
+	}
+
 	async getArrayBufferAsync( attribute ) {
 
 		const backend = this.backend;

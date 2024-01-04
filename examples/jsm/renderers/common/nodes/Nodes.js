@@ -314,6 +314,7 @@ class Nodes extends DataMap {
 					if ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) {
 
 						nodeUV = equirectUV();
+						background.flipY = false;
 
 					} else {
 
