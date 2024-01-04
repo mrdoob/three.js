@@ -1,4 +1,4 @@
-import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial } from '../../../nodes/Nodes.js';
+import { MathNode, GLSLNodeParser, NodeBuilder } from '../../../nodes/Nodes.js';
 
 import UniformBuffer from '../../common/UniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
@@ -640,26 +640,6 @@ void main() {
 		}
 
 		return uniformNode;
-
-	}
-
-	build() {
-
-		// @TODO: Move this code to super.build()
-
-		const { object, material } = this;
-
-		if ( material !== null ) {
-
-			NodeMaterial.fromMaterial( material ).build( this );
-
-		} else {
-
-			this.addFlow( 'compute', object );
-
-		}
-
-		return super.build();
 
 	}
 

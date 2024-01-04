@@ -191,9 +191,6 @@ class WebGLBackend extends Backend {
 
 		}
 
-
-		this._currentContext = renderContext;
-
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
 		if ( occlusionQueryCount > 0 ) {
@@ -374,7 +371,7 @@ class WebGLBackend extends Backend {
 
 	draw( renderObject, info ) {
 
-		const { pipeline, material, context, isRenderObject } = renderObject;
+		const { pipeline, material, context } = renderObject;
 		const { programGPU, vaoGPU } = this.get( pipeline );
 
 		const { gl, state } = this;
@@ -382,13 +379,6 @@ class WebGLBackend extends Backend {
 		const contextData = this.get( context );
 
 		//
-
-		if ( isRenderObject ) {
-
-			// we need to bind the framebuffer per object in multi pass pipeline
-			this._setFramebuffer( context );
-
-		}
 
 		const bindings = renderObject.getBindings();
 
