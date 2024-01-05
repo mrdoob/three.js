@@ -107,7 +107,12 @@ class ARButton {
 					if ( navigator.xr.offerSession !== undefined ) {
 
 						navigator.xr.offerSession( 'immersive-ar', sessionInit )
-							.then( onSessionStarted );
+							.then( onSessionStarted )
+							.catch( ( err ) => {
+
+								console.warn( err );
+
+							} );
 
 					}
 
@@ -118,7 +123,12 @@ class ARButton {
 			if ( navigator.xr.offerSession !== undefined ) {
 
 				navigator.xr.offerSession( 'immersive-ar', sessionInit )
-					.then( onSessionStarted );
+					.then( onSessionStarted )
+					.catch( ( err ) => {
+
+						console.warn( err );
+
+					} );
 
 			}
 

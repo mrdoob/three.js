@@ -77,7 +77,12 @@ class XRButton {
 					if ( navigator.xr.offerSession !== undefined ) {
 
 						navigator.xr.offerSession( mode, sessionOptions )
-							.then( onSessionStarted );
+							.then( onSessionStarted )
+							.catch( ( err ) => {
+
+								console.warn( err );
+
+							} );
 
 					}
 
@@ -88,7 +93,12 @@ class XRButton {
 			if ( navigator.xr.offerSession !== undefined ) {
 
 				navigator.xr.offerSession( mode, sessionOptions )
-					.then( onSessionStarted );
+					.then( onSessionStarted )
+					.catch( ( err ) => {
+
+						console.warn( err );
+
+					} );
 
 			}
 
