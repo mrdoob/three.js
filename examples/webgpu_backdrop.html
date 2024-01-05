@@ -75,7 +75,6 @@
 					const material = object.children[ 0 ].children[ 0 ].material;
 
 					// output material effect ( better using hsv )
-					// ignore output.sRGBToLinear().linearTosRGB() for now
 
 					material.outputNode = oscSine( timerLocal( .1 ) ).mix( output, output.add( .1 ).posterize( 4 ).mul( 2 ) );
 
@@ -121,7 +120,7 @@
 				addBackdropSphere( viewportSharedTexture().rgb.oneMinus() );
 				addBackdropSphere( viewportSharedTexture().rgb.saturation( 0 ) );
 				addBackdropSphere( viewportSharedTexture().rgb.saturation( 10 ), oscSine() );
-				addBackdropSphere( viewportSharedTexture().rgb.overlay( checker( uv().mul( 10 ) ) ) );
+				addBackdropSphere( viewportSharedTexture().rgb.temp().overlay( checker( uv().mul( 10 ) ) ) ); // @TODO: remove this .temp() after making TempNodes work with non-uniform control flows
 				addBackdropSphere( viewportSharedTexture( viewportTopLeft.mul( 40 ).floor().div( 40 ) ) );
 				addBackdropSphere( viewportSharedTexture( viewportTopLeft.mul( 80 ).floor().div( 80 ) ).add( color( 0x0033ff ) ) );
 				addBackdropSphere( vec3( 0, 0, viewportSharedTexture().b ) );

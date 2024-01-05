@@ -6,7 +6,6 @@ import {
 } from './lib/mx_noise.js';
 import { mx_hsvtorgb, mx_rgbtohsv } from './lib/mx_hsv.js';
 import { mx_srgb_texture_to_lin_rec709 } from './lib/mx_transform_color.js';
-import { mix, smoothstep } from '../math/MathNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { float, vec2, vec4 } from '../shadernode/ShaderNode.js';
 
@@ -15,19 +14,19 @@ export const mx_aastep = ( threshold, value ) => {
 	threshold = float( threshold );
 	value = float( value );
 
-	const afwidth = vec2( value.dFdx(), value.dFdy() ).length().mul( 0.70710678118654757 );
+	const afwidth = vec2( value.dFdx(), value.dFdy() ).length().mul( Math.SQRT1_2 );
 
-	return smoothstep( threshold.sub( afwidth ), threshold.add( afwidth ), value );
+	return value.smoothstep( threshold.sub( afwidth ), threshold.add( afwidth ) );
 
 };
 
-const _ramp = ( a, b, uv, p ) => mix( a, b, uv[ p ].clamp() );
-export const mx_ramplr = ( valuel, valuer, texcoord = uv() ) => _ramp( valuel, valuer, texcoord, 'x' );
-export const mx_ramptb = ( valuet, valueb, texcoord = uv() ) => _ramp( valuet, valueb, texcoord, 'y' );
+const _ramp = ( a, b, uv ) => uv.clamp().mix( a, b );
+export const mx_ramplr = ( valuel, valuer, texcoord = uv() ) => _ramp( valuel, valuer, texcoord.x );
+export const mx_ramptb = ( valuet, valueb, texcoord = uv() ) => _ramp( valuet, valueb, texcoord.y );
 
-const _split = ( a, b, center, uv, p ) => mix( a, b, mx_aastep( center, uv[ p ] ) );
-export const mx_splitlr = ( valuel, valuer, center, texcoord = uv() ) => _split( valuel, valuer, center, texcoord, 'x' );
-export const mx_splittb = ( valuet, valueb, center, texcoord = uv() ) => _split( valuet, valueb, center, texcoord, 'y' );
+const _split = ( a, b, center, uv ) => mx_aastep( center, uv ).mix( a, b );
+export const mx_splitlr = ( valuel, valuer, center, texcoord = uv() ) => _split( valuel, valuer, center, texcoord.x );
+export const mx_splittb = ( valuet, valueb, center, texcoord = uv() ) => _split( valuet, valueb, center, texcoord.y );
 
 export const mx_transform_uv = ( uv_scale = 1, uv_offset = 0, uv_geo = uv() ) => uv_geo.mul( uv_scale ).add( uv_offset );
 
@@ -39,7 +38,7 @@ export const mx_safepower = ( in1, in2 = 1 ) => {
 
 };
 
-export const mx_contrast = ( input, amount = 1, pivot = .5 ) => float( input ).sub( pivot ).mul( amount ).add( pivot );
+export const mx_contrast = ( input, amount = 1, pivot = .5 ) => float( amount ).mix( pivot, input );
 
 export const mx_noise_float = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_float( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );
 export const mx_noise_vec2 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => mx_perlin_noise_vec2( texcoord.convert( 'vec2|vec3' ) ).mul( amplitude ).add( pivot );

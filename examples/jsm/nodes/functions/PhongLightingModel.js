@@ -6,9 +6,9 @@ import { transformedNormalView } from '../accessors/NormalNode.js';
 import { materialSpecularStrength } from '../accessors/MaterialNode.js';
 import { shininess, specularColor } from '../core/PropertyNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
-import { tslFn, float } from '../shadernode/ShaderNode.js';
+import { tslFn } from '../shadernode/ShaderNode.js';
 
-const G_BlinnPhong_Implicit = () => float( 0.25 );
+const G_BlinnPhong_Implicit = () => 0.25;
 
 const D_BlinnPhong = tslFn( ( { dotNH } ) => {
 
@@ -27,7 +27,7 @@ const BRDF_BlinnPhong = tslFn( ( { lightDirection } ) => {
 	const G = G_BlinnPhong_Implicit();
 	const D = D_BlinnPhong( { dotNH } );
 
-	return F.mul( G ).mul( D );
+	return F.mul( G, D );
 
 } );
 
@@ -50,7 +50,7 @@ class PhongLightingModel extends LightingModel {
 
 		if ( this.specular === true ) {
 
-			reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_BlinnPhong( { lightDirection } ) ).mul( materialSpecularStrength ) );
+			reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_BlinnPhong( { lightDirection } ), materialSpecularStrength ) );
 
 		}
 

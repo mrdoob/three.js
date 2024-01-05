@@ -1,16 +1,17 @@
-import Node, { addNodeClass } from './Node.js';
+import TempNode from './TempNode.js';
+import { addNodeClass } from './Node.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
-class ContextNode extends Node {
+class ContextNode extends TempNode {
 
-	constructor( node, context = {} ) {
+	constructor( node, context = {}, isolate = true ) {
 
 		super();
 
 		this.isContextNode = true;
 
-		this.node = node;
-		this.context = context;
+		this.node = isolate === true ? node.cache() : node;
+		this._context = context;
 
 	}
 
@@ -24,7 +25,9 @@ class ContextNode extends Node {
 
 		const previousContext = builder.getContext();
 
-		builder.setContext( { ...builder.context, ...this.context } );
+		builder.setContext( { ...builder.context, ...this._context } );
+
+		super.setup( builder );
 
 		const node = this.node.build( builder );
 
@@ -38,7 +41,7 @@ class ContextNode extends Node {
 
 		const previousContext = builder.getContext();
 
-		builder.setContext( { ...builder.context, ...this.context } );
+		builder.setContext( { ...builder.context, ...this._context } );
 
 		const snippet = this.node.build( builder, output );
 
@@ -53,7 +56,7 @@ class ContextNode extends Node {
 export default ContextNode;
 
 export const context = nodeProxy( ContextNode );
-export const label = ( node, name ) => context( node, { label: name } );
+export const label = ( node, name ) => context( node, { label: name }, false );
 
 addNodeElement( 'context', context );
 addNodeElement( 'label', label );

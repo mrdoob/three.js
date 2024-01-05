@@ -39,7 +39,7 @@ class LightingContextNode extends ContextNode {
 			ambientOcclusion: float( 1 ).temp( 'ambientOcclusion' ),
 			reflectedLight,
 			backdrop: backdropNode,
-			backdropAlpha : backdropAlphaNode
+			backdropAlpha: backdropAlphaNode
 		};
 
 		return context;

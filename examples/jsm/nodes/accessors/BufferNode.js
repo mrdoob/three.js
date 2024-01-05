@@ -21,6 +21,12 @@ class BufferNode extends UniformNode {
 
 	}
 
+	getNodeType() {
+
+		return `${ this.bufferType }[ ${ this.bufferCount } ]`;
+
+	}
+
 }
 
 export default BufferNode;

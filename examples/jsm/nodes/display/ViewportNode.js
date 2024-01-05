@@ -1,4 +1,5 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { nodeImmutable, vec2 } from '../shadernode/ShaderNode.js';
@@ -7,7 +8,7 @@ import { Vector2, Vector4 } from 'three';
 
 let resolution, viewportResult;
 
-class ViewportNode extends Node {
+class ViewportNode extends TempNode {
 
 	constructor( scope ) {
 
@@ -73,20 +74,10 @@ class ViewportNode extends Node {
 
 		} else {
 
-			const coordinateNode = vec2( new ViewportNode( ViewportNode.COORDINATE ) );
-			const resolutionNode = new ViewportNode( ViewportNode.RESOLUTION );
+			output = vec2( viewportCoordinate ).div( viewportResolution );
 
-			output = coordinateNode.div( resolutionNode );
-
-			let outX = output.x;
-			let outY = output.y;
-
-			if ( /top/i.test( scope ) && builder.isFlipY() ) outY = outY.oneMinus();
-			else if ( /bottom/i.test( scope ) && builder.isFlipY() === false ) outY = outY.oneMinus();
-
-			if ( /right/i.test( scope ) ) outX = outX.oneMinus();
-
-			output = vec2( outX, outY );
+			if ( /right/i.test( scope ) === true ) output.x = output.x.oneMinus();
+			if ( /top/i.test( scope ) === builder.isFlipY() ) output.y = output.y.oneMinus();
 
 		}
 

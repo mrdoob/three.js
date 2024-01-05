@@ -1,13 +1,14 @@
-import { addNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { cameraProjectionMatrix } from './CameraNode.js';
 import { modelViewMatrix } from './ModelNode.js';
-import { positionLocal } from './PositionNode.js';
+import { position } from '../core/PropertyNode.js';
+import { positionView } from './PositionNode.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
 
 class ModelViewProjectionNode extends TempNode {
 
-	constructor( positionNode = positionLocal ) {
+	constructor( positionNode = position ) {
 
 		super( 'vec4' );
 
@@ -17,7 +18,11 @@ class ModelViewProjectionNode extends TempNode {
 
 	setup() {
 
-		return cameraProjectionMatrix.mul( modelViewMatrix ).mul( this.positionNode );
+		let view = modelViewMatrix.mul( this.positionNode );
+
+		if ( this.positionNode === position ) view = positionView; // caching
+
+		return cameraProjectionMatrix.mul( view );
 
 	}
 

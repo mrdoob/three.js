@@ -1,14 +1,10 @@
 import LightingNode from './LightingNode.js';
-import { cache } from '../core/CacheNode.js';
-import { context } from '../core/ContextNode.js';
 import { roughness, clearcoatRoughness } from '../core/PropertyNode.js';
-import { equirectUV } from '../utils/EquirectUVNode.js';
-import { specularMIPLevel } from '../utils/SpecularMIPLevelNode.js';
 import { cameraViewMatrix } from '../accessors/CameraNode.js';
 import { transformedClearcoatNormalView, transformedNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { float, vec2 } from '../shadernode/ShaderNode.js';
+import { float, vec2, setCurrentBuilder } from '../shadernode/ShaderNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { reference } from '../accessors/ReferenceNode.js';
 
@@ -26,44 +22,38 @@ class EnvironmentNode extends LightingNode {
 
 	setup( builder ) {
 
+		//super.setup( builder );
+
 		let envNode = this.envNode;
 
-		if ( envNode.isTextureNode && envNode.value.isCubeTexture !== true ) {
+		if ( envNode.isTextureNode === true && envNode.isCubeTextureNode !== true ) {
 
-			let cacheEnvNode = envNodeCache.get( envNode.value );
+			const texture = envNode.value;
 
-			if ( cacheEnvNode === undefined ) {
+			envNode = envNodeCache.get( texture );
 
-				const texture = envNode.value;
-				const renderer = builder.renderer;
+			if ( envNode === undefined ) {
 
 				// @TODO: Add dispose logic here
-				const cubeRTT = builder.getCubeRenderTarget( 512 ).fromEquirectangularTexture( renderer, texture );
+				const cubeRTT = builder.getCubeRenderTarget( 512 ).fromEquirectangularTexture( builder.renderer, texture );
 
-				cacheEnvNode = cubeTexture( cubeRTT.texture );
+				setCurrentBuilder( builder ); // we need this because .fromEquirectangularTexture() makes some .render() calls, which change the current node builder
 
-				envNodeCache.set( envNode.value, cacheEnvNode );
+				envNode = cubeTexture( cubeRTT.texture );
+
+				envNodeCache.set( texture, envNode );
 
 			}
 
-			envNode	= cacheEnvNode;
-
 		}
 
-		//
-
 		const intensity = reference( 'envMapIntensity', 'float', builder.material ); // @TODO: Add materialEnvIntensity in MaterialNode
-
-		const radiance = context( envNode, createRadianceContext( roughness, transformedNormalView ) ).mul( intensity );
-		const irradiance = context( envNode, createIrradianceContext( transformedNormalWorld ) ).mul( Math.PI ).mul( intensity );
-
-		const isolateRadiance = cache( radiance );
+		envNode = envNode.rgb.mul( intensity );
 
 		//
 
-		builder.context.radiance.addAssign( isolateRadiance );
-
-		builder.context.iblIrradiance.addAssign( irradiance );
+		builder.context.radiance.addAssign( envNode.context( createRadianceContext( roughness, transformedNormalView ) ) );
+		builder.context.iblIrradiance.addAssign( envNode.context( createIrradianceContext( transformedNormalWorld ) ).mul( Math.PI ) );
 
 		//
 
@@ -71,10 +61,7 @@ class EnvironmentNode extends LightingNode {
 
 		if ( clearcoatRadiance ) {
 
-			const clearcoatRadianceContext = context( envNode, createRadianceContext( clearcoatRoughness, transformedClearcoatNormalView ) ).mul( intensity );
-			const isolateClearcoatRadiance = cache( clearcoatRadianceContext );
-
-			clearcoatRadiance.addAssign( isolateClearcoatRadiance );
+			clearcoatRadiance.addAssign( envNode.context( createRadianceContext( clearcoatRoughness, transformedClearcoatNormalView ) ) );
 
 		}
 
@@ -88,7 +75,7 @@ const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 	let textureUVNode = null;
 
 	return {
-		getUVNode: ( textureNode ) => {
+		getUVNode( textureNode ) {
 
 			let node = null;
 
@@ -110,7 +97,7 @@ const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 
 					// @TODO: Needed PMREM
 
-					textureUVNode = equirectUV( reflectVec );
+					textureUVNode = reflectVec.equirectUV();
 
 				}
 
@@ -121,14 +108,16 @@ const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 			return node;
 
 		},
-		getSamplerLevelNode: () => {
+
+		getSamplerLevelNode() {
 
 			return roughnessNode;
 
 		},
-		getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => {
 
-			return specularMIPLevel( textureNode, levelNode );
+		getMipLevelAlgorithmNode( textureNode, levelNode ) {
+
+			return textureNode.specularMipLevel( levelNode );
 
 		}
 	};
@@ -140,7 +129,7 @@ const createIrradianceContext = ( normalWorldNode ) => {
 	let textureUVNode = null;
 
 	return {
-		getUVNode: ( textureNode ) => {
+		getUVNode( textureNode ) {
 
 			let node = null;
 
@@ -154,8 +143,8 @@ const createIrradianceContext = ( normalWorldNode ) => {
 
 					// @TODO: Needed PMREM
 
-					textureUVNode = equirectUV( normalWorldNode );
-					textureUVNode = vec2( textureUVNode.x, textureUVNode.y.oneMinus() );
+					textureUVNode = normalWorldNode.equirectUV();
+					textureUVNode.y.oneMinusAssign();
 
 				}
 
@@ -166,14 +155,16 @@ const createIrradianceContext = ( normalWorldNode ) => {
 			return node;
 
 		},
-		getSamplerLevelNode: () => {
+
+		getSamplerLevelNode() {
 
 			return float( 1 );
 
 		},
-		getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => {
 
-			return specularMIPLevel( textureNode, levelNode );
+		getMipLevelAlgorithmNode( textureNode, levelNode ) {
+
+			return textureNode.specularMipLevel( levelNode );
 
 		}
 	};

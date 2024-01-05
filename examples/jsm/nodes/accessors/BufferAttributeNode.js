@@ -1,6 +1,5 @@
 import InputNode from '../core/InputNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { varying } from '../core/VaryingNode.js';
 import { nodeObject, addNodeElement } from '../shadernode/ShaderNode.js';
 import { InterleavedBufferAttribute, InterleavedBuffer, StaticDrawUsage, DynamicDrawUsage } from 'three';
 
@@ -61,30 +60,18 @@ class BufferAttributeNode extends InputNode {
 		this.attribute = bufferAttribute;
 		this.attribute.isInstancedBufferAttribute = this.instanced; // @TODO: Add a possible: InstancedInterleavedBufferAttribute
 
+		if ( builder.getShaderStage() !== 'vertex' ) return this.varying();
+
 	}
 
 	generate( builder ) {
 
-		const nodeType = this.getNodeType( builder );
+		if ( builder.getShaderStage() !== 'vertex' ) return super.generate( builder );
 
-		const nodeUniform = builder.getBufferAttributeFromNode( this, nodeType );
+		const nodeUniform = builder.getBufferAttributeFromNode( this );
 		const propertyName = builder.getPropertyName( nodeUniform );
 
-		let output = null;
-
-		if ( builder.shaderStage === 'vertex' ) {
-
-			output = propertyName;
-
-		} else {
-
-			const nodeVarying = varying( this );
-
-			output = nodeVarying.build( builder, nodeType );
-
-		}
-
-		return output;
+		return propertyName;
 
 	}
 

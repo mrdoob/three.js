@@ -218,7 +218,7 @@ class UniformsGroup extends UniformBuffer {
 		const a = this.buffer;
 		const c = uniform.getValue();
 		const offset = uniform.offset;
-
+if(c===undefined)console.log(uniform)
 		if ( a[ offset + 0 ] !== c.r || a[ offset + 1 ] !== c.g || a[ offset + 2 ] !== c.b ) {
 
 			a[ offset + 0 ] = c.r;

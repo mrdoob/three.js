@@ -15,8 +15,7 @@ class TimerNode extends UniformNode {
 		this.updateType = NodeUpdateType.FRAME;
 
 	}
-	/*
-	@TODO:
+
 	getNodeType( builder ) {
 
 		const scope = this.scope;
@@ -30,7 +29,7 @@ class TimerNode extends UniformNode {
 		return 'float';
 
 	}
-*/
+
 	update( frame ) {
 
 		const scope = this.scope;
@@ -48,9 +47,7 @@ class TimerNode extends UniformNode {
 
 			this.value = frame.frameId;
 
-		} else {
-
-			// global
+		} else if ( scope === TimerNode.GLOBAL ) {
 
 			this.value = frame.time * scale;
 
@@ -89,6 +86,6 @@ export default TimerNode;
 export const timerLocal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale, value ) );
 export const timerGlobal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.GLOBAL, timeScale, value ) );
 export const timerDelta = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.DELTA, timeScale, value ) );
-export const frameId = nodeImmutable( TimerNode, TimerNode.FRAME ).uint();
+export const frameId = nodeImmutable( TimerNode, TimerNode.FRAME );
 
 addNodeClass( 'TimerNode', TimerNode );

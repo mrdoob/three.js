@@ -1,13 +1,11 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { attribute } from '../core/AttributeNode.js';
-import { varying } from '../core/VaryingNode.js';
-import { property } from '../core/PropertyNode.js';
-import { normalize } from '../math/MathNode.js';
+import { property, normal } from '../core/PropertyNode.js';
 import { cameraViewMatrix } from './CameraNode.js';
 import { modelNormalMatrix } from './ModelNode.js';
 import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
-class NormalNode extends Node {
+class NormalNode extends Node { // @TODO: TempNode doesn't really work if its setup's outputNode is a `property` or variable? This seems similar to the problem with node varyings (that currently is fixed by statements' reordering)
 
 	constructor( scope = NormalNode.LOCAL ) {
 
@@ -17,19 +15,13 @@ class NormalNode extends Node {
 
 	}
 
-	isGlobal() {
-
-		return true;
-
-	}
-
 	getHash( /*builder*/ ) {
 
 		return `normal-${this.scope}`;
 
 	}
 
-	generate( builder ) {
+	setup( /*builder*/ ) {
 
 		const scope = this.scope;
 
@@ -41,22 +33,31 @@ class NormalNode extends Node {
 
 		} else if ( scope === NormalNode.LOCAL ) {
 
-			outputNode = varying( normalGeometry );
+			outputNode = normal.varying();
 
 		} else if ( scope === NormalNode.VIEW ) {
 
-			const vertexNode = modelNormalMatrix.mul( normalLocal );
-			outputNode = normalize( varying( vertexNode ) );
+			outputNode = modelNormalMatrix.mul( normal ).varying().normalize();
 
 		} else if ( scope === NormalNode.WORLD ) {
 
-			// To use inverseTransformDirection only inverse the param order like this: cameraViewMatrix.transformDirection( normalView )
-			const vertexNode = normalView.transformDirection( cameraViewMatrix );
-			outputNode = normalize( varying( vertexNode ) );
+			outputNode = normalView.transformDirection( cameraViewMatrix ).varying().normalize();
+
+		} else if ( scope === NormalNode.TRANSFORMED_VIEW ) {
+
+			outputNode = property( 'vec3', 'TransformedNormalView' );
+
+		} else if ( scope === NormalNode.TRANSFORMED_WORLD ) {
+
+			outputNode = transformedNormalView.transformDirection( cameraViewMatrix ).normalize();
+
+		} else if ( scope === NormalNode.TRANSFORMED_CLEARCOAT_VIEW ) {
+
+			outputNode = property( 'vec3', 'TransformedClearcoatNormalView' );
 
 		}
 
-		return outputNode.build( builder, this.getNodeType( builder ) );
+		return outputNode;
 
 	}
 
@@ -82,15 +83,18 @@ NormalNode.GEOMETRY = 'geometry';
 NormalNode.LOCAL = 'local';
 NormalNode.VIEW = 'view';
 NormalNode.WORLD = 'world';
+NormalNode.TRANSFORMED_VIEW = 'transformedView';
+NormalNode.TRANSFORMED_WORLD = 'transformedWorld';
+NormalNode.TRANSFORMED_CLEARCOAT_VIEW = 'transformedClearcoatView';
 
 export default NormalNode;
 
 export const normalGeometry = nodeImmutable( NormalNode, NormalNode.GEOMETRY );
-export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL ).temp( 'Normal' );
+export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL ).label( 'Normal' );
 export const normalView = nodeImmutable( NormalNode, NormalNode.VIEW );
 export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );
-export const transformedNormalView = property( 'vec3', 'TransformedNormalView' );
-export const transformedNormalWorld = transformedNormalView.transformDirection( cameraViewMatrix ).normalize();
-export const transformedClearcoatNormalView = property( 'vec3', 'TransformedClearcoatNormalView' );
+export const transformedNormalView = nodeImmutable( NormalNode, NormalNode.TRANSFORMED_VIEW );
+export const transformedNormalWorld = nodeImmutable( NormalNode, NormalNode.TRANSFORMED_WORLD );
+export const transformedClearcoatNormalView = nodeImmutable( NormalNode, NormalNode.TRANSFORMED_CLEARCOAT_VIEW );
 
 addNodeClass( 'NormalNode', NormalNode );

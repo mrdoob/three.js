@@ -4,7 +4,6 @@ import { mix } from '../math/MathNode.js';
 import { materialRoughness, materialMetalness } from '../accessors/MaterialNode.js';
 import getRoughness from '../functions/material/getRoughness.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
-import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
 import { MeshStandardMaterial } from 'three';
 
@@ -39,26 +38,20 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 		// METALNESS
 
-		const metalnessNode = this.metalnessNode ? float( this.metalnessNode ) : materialMetalness;
-
+		const metalnessNode = this.metalnessNode || materialMetalness;
 		metalness.assign( metalnessNode );
 
 		// ROUGHNESS
 
-		let roughnessNode = this.roughnessNode ? float( this.roughnessNode ) : materialRoughness;
-		roughnessNode = getRoughness( { roughness: roughnessNode } );
-
-		roughness.assign( roughnessNode );
+		roughness.assign( getRoughness( { roughness: this.roughnessNode || materialRoughness } ) );
 
 		// SPECULAR COLOR
 
-		const specularColorNode = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessNode );
-
-		specularColor.assign( specularColorNode );
+		specularColor.assign( metalnessNode.mix( 0.04, diffuseColor.rgb ) );
 
 		// DIFFUSE COLOR
 
-		diffuseColor.assign( vec4( diffuseColor.rgb.mul( metalnessNode.oneMinus() ), diffuseColor.a ) );
+		diffuseColor.rgb.mulAssign( metalnessNode.oneMinus() );
 
 	}
 

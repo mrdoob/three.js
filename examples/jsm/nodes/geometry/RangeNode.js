@@ -1,4 +1,5 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { getValueType } from '../core/NodeUtils.js';
 import { buffer } from '../accessors/BufferNode.js';
 //import { bufferAttribute } from '../accessors/BufferAttributeNode.js';
@@ -10,7 +11,7 @@ import { Vector4, MathUtils } from 'three';
 let min = null;
 let max = null;
 
-class RangeNode extends Node {
+class RangeNode extends TempNode {
 
 	constructor( minNode = float(), maxNode = float() ) {
 
@@ -37,6 +38,8 @@ class RangeNode extends Node {
 	}
 
 	setup( builder ) {
+
+		super.setup( builder );
 
 		const object = builder.object;
 

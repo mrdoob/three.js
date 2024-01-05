@@ -1,4 +1,5 @@
 import InputNode from './InputNode.js';
+//import TempNode from './TempNode.js';
 import { addNodeClass } from './Node.js';
 import { nodeObject, getConstNodeType } from '../shadernode/ShaderNode.js';
 
@@ -9,41 +10,40 @@ class UniformNode extends InputNode {
 		super( value, nodeType );
 
 		this.isUniformNode = true;
+		//this.isTempNode = true;
 
 	}
 
-	getUniformHash( builder ) {
+	isGlobal() {
 
-		return this.getHash( builder );
+		return true;
 
 	}
 
-	generate( builder, output ) {
+	/*hasDependencies( builder ) {
 
-		const type = this.getNodeType( builder );
+		return TempNode.prototype.hasDependencies.call( this, builder );
 
-		const hash = this.getUniformHash( builder );
+	}*/
 
-		let sharedNode = builder.getNodeFromHash( hash );
+	generate( builder ) {
 
-		if ( sharedNode === undefined ) {
+		const sharedNode = this.getShared( builder );
 
-			builder.setHashNode( this, hash );
-
-			sharedNode = this;
-
-		}
-
-		const sharedNodeType = sharedNode.getInputType( builder );
-
-		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, builder.context.label );
+		const nodeUniform = builder.getUniformFromNode( sharedNode, builder.context.label, sharedNode.getInputType( builder ) );
 		const propertyName = builder.getPropertyName( nodeUniform );
 
 		if ( builder.context.label !== undefined ) delete builder.context.label;
 
-		return builder.format( propertyName, type, output );
+		return propertyName;
 
 	}
+
+	/*build( builder, output ) {
+
+		return TempNode.prototype.build.call( this, builder, output );
+
+	}*/
 
 }
 

@@ -100,7 +100,7 @@ class WebGPUTextureUtils {
 		}
 
 		if ( options.needsMipmaps === undefined ) options.needsMipmaps = false;
-		if ( options.levels === undefined ) options.levels = 1;
+		if ( options.levels === undefined || options.levels === - Infinity ) options.levels = 1; // @TODO: why -Infinity levels happen?
 		if ( options.depth === undefined ) options.depth = 1;
 
 		const { width, height, depth, levels } = options;
@@ -386,6 +386,8 @@ class WebGPUTextureUtils {
 	}
 
 	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY ) {
+
+		if ( image.width === 0 || image.height === 0 ) return; // @TODO: why this happens?
 
 		const device = this.backend.device;
 

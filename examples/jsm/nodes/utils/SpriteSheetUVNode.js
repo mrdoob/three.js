@@ -1,8 +1,9 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { uv } from '../accessors/UVNode.js';
 import { nodeProxy, float, vec2 } from '../shadernode/ShaderNode.js';
 
-class SpriteSheetUVNode extends Node {
+class SpriteSheetUVNode extends TempNode {
 
 	constructor( countNode, uvNode = uv(), frameNode = float( 0 ) ) {
 
@@ -28,7 +29,7 @@ class SpriteSheetUVNode extends Node {
 		const scale = countNode.reciprocal();
 		const uvFrameOffset = vec2( column, row );
 
-		return uvNode.add( uvFrameOffset ).mul( scale );
+		return uvNode.add( uvFrameOffset ).div( countNode );
 
 	}
 

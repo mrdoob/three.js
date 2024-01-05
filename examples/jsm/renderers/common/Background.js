@@ -1,6 +1,6 @@
 import DataMap from './DataMap.js';
 import { Color, Mesh, SphereGeometry, BackSide } from 'three';
-import { context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection } from '../../nodes/Nodes.js';
+import { context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection } from 'three/nodes';
 
 let _clearAlpha;
 const _clearColor = new Color();
@@ -15,7 +15,6 @@ class Background extends DataMap {
 		this.nodes = nodes;
 
 		this.backgroundMesh = null;
-		this.backgroundMeshNode = null;
 
 	}
 
@@ -44,7 +43,6 @@ class Background extends DataMap {
 		} else if ( background.isNode === true ) {
 
 			const sceneData = this.get( scene );
-			const backgroundNode = background;
 
 			_clearColor.copy( renderer._clearColor );
 			_clearAlpha = renderer._clearAlpha;
@@ -53,17 +51,10 @@ class Background extends DataMap {
 
 			if ( backgroundMesh === null ) {
 
-				this.backgroundMeshNode = context( backgroundNode, {
-					// @TODO: Add Texture2D support using node context
-					getUVNode: () => normalWorld,
-					getSamplerLevelNode: () => backgroundBlurriness
-				} ).mul( backgroundIntensity );
-
 				let viewProj = modelViewProjection();
 				viewProj = viewProj.setZ( viewProj.w );
 
 				const nodeMaterial = new NodeMaterial();
-				nodeMaterial.outputNode = this.backgroundMeshNode;
 				nodeMaterial.side = BackSide;
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
@@ -81,11 +72,15 @@ class Background extends DataMap {
 
 			}
 
-			const backgroundCacheKey = backgroundNode.getCacheKey();
+			const backgroundCacheKey = background.getCacheKey();
 
 			if ( sceneData.backgroundCacheKey !== backgroundCacheKey ) {
 
-				this.backgroundMeshNode.node = backgroundNode;
+				backgroundMesh.material.colorNode = background.context( {
+					// @TODO: Add Texture2D support using node context
+					getUVNode: () => normalWorld,
+					getSamplerLevelNode: () => backgroundBlurriness
+				} ).mul( backgroundIntensity );
 
 				backgroundMesh.material.needsUpdate = true;
 

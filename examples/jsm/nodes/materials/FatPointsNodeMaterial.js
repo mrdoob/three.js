@@ -1,12 +1,10 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { varying } from '../core/VaryingNode.js';
 import { property } from '../core/PropertyNode.js';
 import { attribute } from '../core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
 import { materialColor } from '../accessors/MaterialNode.js';
 import { modelViewMatrix } from '../accessors/ModelNode.js';
 import { positionGeometry } from '../accessors/PositionNode.js';
-import { smoothstep } from '../math/MathNode.js';
 import { tslFn, vec2, vec4 } from '../shadernode/ShaderNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { materialPointWidth } from '../accessors/FatPointsMaterialNode.js'; // or should this be a property, instead?
@@ -50,14 +48,11 @@ class FatPointsNodeMaterial extends NodeMaterial {
 
 		this.vertexNode = tslFn( () => {
 
-			//vUv = uv;
-			varying( vec2(), 'vUv' ).assign( uv() ); // @TODO: Analyze other way to do this
-
 			const instancePosition = attribute( 'instancePosition' );
 
 			// camera space
 			const mvPos = property( 'vec4', 'mvPos' );
-			mvPos.assign( modelViewMatrix.mul( vec4( instancePosition, 1.0 ) ) );
+			mvPos.assign( modelViewMatrix.mul( instancePosition ) );
 
 			const aspect = viewport.z.div( viewport.w );
 
@@ -66,16 +61,13 @@ class FatPointsNodeMaterial extends NodeMaterial {
 
 			// offset in ndc space
 			const offset = property( 'vec2', 'offset' );
-			offset.assign( positionGeometry.xy );
-			offset.assign( offset.mul( materialPointWidth ) );
-			offset.assign( offset.div( viewport.z ) );
-			offset.y.assign( offset.y.mul( aspect ) );
+			offset.assign( positionGeometry.xy.mul( materialPointWidth ).div( viewport.z ) );
+			offset.y.mulAssign( aspect );
 
 			// back to clip space
-			offset.assign( offset.mul( clipPos.w ) );
+			offset.mulAssign( clipPos.w );
 
-			//clipPos.xy += offset;
-			clipPos.assign( clipPos.add( vec4( offset, 0, 0 ) ) );
+			clipPos.xy.addAssign( offset );
 
 			return clipPos;
 
@@ -85,52 +77,23 @@ class FatPointsNodeMaterial extends NodeMaterial {
 
 		this.colorNode = tslFn( () => {
 
-			const vUv = varying( vec2(), 'vUv' );
+			let alpha;
 
-			// force assignment into correct place in flow
-			const alpha = property( 'float', 'alpha' );
-			alpha.assign( 1 );
-
-			const a = vUv.x;
-			const b = vUv.y;
-
-			const len2 = a.mul( a ).add( b.mul( b ) );
+			const len2 = uv().length();
 
 			if ( useAlphaToCoverage ) {
 
-				// force assignment out of following 'if' statement - to avoid uniform control flow errors
-				const dlen = property( 'float', 'dlen' );
-				dlen.assign( len2.fwidth() );
-
-				alpha.assign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
+				const dlen = len2.fwidth();
+				alpha = len2.smoothstep( dlen.oneMinus(), dlen.add( 1 ) ).oneMinus();
 
 			} else {
 
 				len2.greaterThan( 1.0 ).discard();
+				alpha = 1.0;
 
 			}
 
-			let pointColorNode;
-
-			if ( this.pointColorNode ) {
-
-				pointColorNode = this.pointColorNode;
-
-			} else {
-
-				if ( useColor ) {
-
-					const instanceColor = attribute( 'instanceColor' );
-
-					pointColorNode = color( instanceColor ).mul( color( materialColor ) );
-
-				} else {
-
-					pointColorNode = materialColor;
-
-				}
-
-			}
+			const pointColorNode = this.pointColorNode || ( useColor === true ? attribute( 'instanceColor', 'color' ).mul( materialColor ) : materialColor );
 
 			return vec4( pointColorNode, alpha );
 

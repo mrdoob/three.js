@@ -1,7 +1,8 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
-class HashNode extends Node {
+class HashNode extends TempNode {
 
 	constructor( seedNode ) {
 

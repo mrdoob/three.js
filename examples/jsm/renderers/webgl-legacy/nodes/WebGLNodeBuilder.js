@@ -1,6 +1,6 @@
-import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder, normalView } from 'three/nodes';
-import SlotNode from './SlotNode.js';
 import { PerspectiveCamera, ShaderChunk, ShaderLib, UniformsUtils, UniformsLib } from 'three';
+import { defaultShaderStages, defaultBuildStages, NodeFrame, GLSLNodeParser, NodeBuilder, normalView } from 'three/nodes';
+import SlotNode from './SlotNode.js';
 
 const nodeFrame = new NodeFrame();
 nodeFrame.camera = new PerspectiveCamera();
@@ -15,13 +15,7 @@ const nodeShaderLib = {
 };
 
 const glslMethods = {
-	[ MathNode.ATAN2 ]: 'atan'
-};
-
-const precisionLib = {
-	low: 'lowp',
-	medium: 'mediump',
-	high: 'highp'
+	atan2: 'atan'
 };
 
 function getIncludeSnippet( name ) {
@@ -30,17 +24,14 @@ function getIncludeSnippet( name ) {
 
 }
 
-function getShaderStageProperty( shaderStage ) {
-
-	return `${shaderStage}Shader`;
-
-}
-
 class WebGLNodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer, shader, material = null ) {
 
 		super( object, renderer, new GLSLNodeParser(), null, material );
+
+		this.flowsData = new WeakMap();
+		this.flowCode = { vertex: '' };
 
 		this.shader = shader;
 		this.slots = { vertex: [], fragment: [] };
@@ -51,11 +42,38 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		this._sortSlotsToFlow();
 
+		this.isGLSLNodeBuilder = true;
+
 	}
 
 	getMethod( method ) {
 
 		return glslMethods[ method ] || method;
+
+	}
+
+	formatFunction( name, inputs, type, code ) {
+
+		const parameters = inputs.map( input => input.type + ' ' + input.name ).join( ', ' );
+		return `${ type } ${ name }( ${ parameters } ) {\n\n${ code }\n\n}`;
+
+	}
+
+	addFlowCode( code ) {
+
+		// a very crude approximation -- if in vertex stage, most likely varying, if in fragment, definitely not varying -- but works
+
+		if ( this.shaderStage === 'vertex' ) {
+
+			this.flowCode.vertex += code;
+
+		} else {
+
+			this.flow.code += code;
+
+		}
+
+		return this;
 
 	}
 
@@ -439,7 +457,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getUniforms( shaderStage ) {
+	getUniforms( shaderStage = this.shaderStage ) {
 
 		const uniforms = this.uniforms[ shaderStage ];
 
@@ -472,11 +490,11 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 			if ( precision !== null ) {
 
-				snippet = 'uniform ' + precisionLib[ precision ] + ' ' + snippet;
+				snippet = `uniform ${ precision }p ${ snippet }`;
 
 			} else {
 
-				snippet = 'uniform ' + snippet;
+				snippet = `uniform ${ snippet }`;
 
 			}
 
@@ -488,7 +506,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getAttributes( shaderStage ) {
+	getAttributes( shaderStage = this.shaderStage ) {
 
 		let snippet = '';
 
@@ -512,7 +530,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getVaryings( shaderStage ) {
+	getVaryings( shaderStage = this.shaderStage ) {
 
 		let snippet = '';
 
@@ -546,7 +564,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	addCode( shaderStage, source, code, scope = this ) {
 
-		const shaderProperty = getShaderStageProperty( shaderStage );
+		const shaderProperty = shaderStage + 'Shader';
 
 		let snippet = scope[ shaderProperty ];
 
@@ -567,9 +585,27 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	replaceCode( shaderStage, source, target, scope = this ) {
 
-		const shaderProperty = getShaderStageProperty( shaderStage );
+		const shaderProperty = shaderStage + 'Shader';
 
 		scope[ shaderProperty ] = scope[ shaderProperty ].replaceAll( source, target );
+
+	}
+
+	getFlowData( node/*, shaderStage*/ ) {
+
+		return this.flowsData.get( node );
+
+	}
+
+	flowNode( node ) {
+
+		const output = node.getNodeType( this );
+
+		const flow = this.flowChildNode( node, output );
+
+		this.flowsData.set( node, flow );
+
+		return flow;
 
 	}
 
@@ -599,17 +635,23 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	buildCode() {
 
-		const shaderData = {};
+		// populate vertex shader's Position, Normal, and Tangent
+		if ( this.vars.vertex.some( v => v.name === 'Position' ) ) this.flowCode.vertex += '\n\tPosition = position;';
+		if ( this.vars.vertex.some( v => v.name === 'Normal' ) ) this.flowCode.vertex += '\n\tNormal = normal;';
+		if ( this.vars.vertex.some( v => v.name === 'Tangent' ) ) this.flowCode.vertex += '\n\tTangent = tangent;';
 
 		for ( const shaderStage of defaultShaderStages ) {
 
-			const uniforms = this.getUniforms( shaderStage );
-			const attributes = this.getAttributes( shaderStage );
-			const varyings = this.getVaryings( shaderStage );
-			const vars = this.getVars( shaderStage );
-			const codes = this.getCodes( shaderStage );
+			this.setShaderStage( shaderStage );
 
-			shaderData[ shaderStage ] = `${this.getSignature()}
+			const uniforms = this.getUniforms();
+			const attributes = this.getAttributes();
+			const varyings = this.getVaryings();
+			const vars = this.getVars();
+			const codes = this.getCodes();
+
+			this[ shaderStage + 'Shader' ] = `${this.getSignature()}
+
 // <node_builder>
 
 // uniforms
@@ -629,19 +671,56 @@ ${codes}
 
 // </node_builder>
 
-${this.shader[ getShaderStageProperty( shaderStage ) ]}
+${this.shader[ shaderStage + 'Shader' ]}
 `;
 
 		}
 
-		this.vertexShader = shaderData.vertex;
-		this.fragmentShader = shaderData.fragment;
+		this.setShaderStage( null );
 
 	}
 
 	build() {
 
-		super.build();
+		// setup() -> stage 1: create possible new nodes and returns an output reference node
+		// analyze()   -> stage 2: analyze nodes to possible optimization and validation
+		// generate()  -> stage 3: generate shader
+
+		for ( const buildStage of defaultBuildStages ) {
+
+			this.setBuildStage( buildStage );
+
+			for ( const shaderStage of defaultShaderStages ) {
+
+				this.setShaderStage( shaderStage );
+
+				const flowNodes = this.flowNodes[ shaderStage ];
+
+				for ( const node of flowNodes ) {
+
+					if ( buildStage === 'generate' ) {
+
+						this.flowNode( node );
+
+					} else {
+
+						node.build( this );
+
+					}
+
+				}
+
+			}
+
+		}
+
+		this.setBuildStage( null );
+		this.setShaderStage( null );
+
+		// stage 4: build code for a specific output
+
+		this.buildCode();
+		this.buildUpdateNodes();
 
 		this._addSnippets();
 		this._addUniforms();
@@ -662,7 +741,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 			const includeSnippet = getIncludeSnippet( name );
 			const code = ShaderChunk[ name ];
 
-			const shaderProperty = getShaderStageProperty( shaderStage );
+			const shaderProperty = shaderStage + 'Shader';
 
 			this.shader[ shaderProperty ] = this.shader[ shaderProperty ].replaceAll( includeSnippet, code );
 
@@ -674,17 +753,17 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 		for ( const shaderStage of defaultShaderStages ) {
 
-			const sourceCode = this.shader[ getShaderStageProperty( shaderStage ) ];
+			const sourceCode = this.shader[ shaderStage + 'Shader' ];
 
 			const slots = this.slots[ shaderStage ].sort( ( slotA, slotB ) => {
 
-				return sourceCode.indexOf( slotA.source ) > sourceCode.indexOf( slotB.source ) ? 1 : - 1;
+				return sourceCode.indexOf( slotA.source ) - sourceCode.indexOf( slotB.source );
 
 			} );
 
 			for ( const slotNode of slots ) {
 
-				this.addFlow( shaderStage, slotNode );
+				this.addFlowNode( shaderStage, slotNode );
 
 			}
 
@@ -720,13 +799,11 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 			}
 
-			this.addCode(
-				shaderStage,
-				'main() {',
-				'\n\t' + this.flowCode[ shaderStage ]
-			);
-
 		}
+
+		// add flow code to the vertex shader and sort varyings
+		this.vertexShader = this.vertexShader.slice( 0, this.vertexShader.lastIndexOf( '}' ) ) + this.flowCode.vertex;
+		this.vertexShader = this.vertexShader.slice( 0, this.vertexShader.indexOf( 'void main()' ) ) + this._sortVaryingSnippets( this.vertexShader.slice( this.vertexShader.indexOf( 'void main()' ) ), [ ...this.varyings, { name: 'Position' }, { name: 'Normal' }, { name: 'Tangent' } ] ) + '\n}';
 
 	}
 
@@ -756,6 +833,37 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 			nodeFrame.updateNode( node );
 
 		}
+
+	}
+
+	_getOperators() {
+
+		return { // https://registry.khronos.org/OpenGL/specs/es/3.0/GLSL_ES_Specification_3.00.pdf, section 5.1
+			ops: [
+				{ ops: [ '[]', '()', '.', 'post++', 'post--' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ 'pre++', 'pre--', 'un+', 'un-', 'un~', 'un!' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '*', '/', '%' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '+', '-' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '<<', '>>' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '<', '>', '<=', '>=' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '==', '!=' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '&' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '^' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '|' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '&&' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '^^' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '||' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '=', '+=', '-=', '*=', '/=', '%=', '<<=', '>>=', '&=', '^=', '|=' ], maxPrec: Infinity, allowSelf: true }
+			],
+			replace: { // section 5.9
+				'<': 'lessThan()',
+				'<=': 'lessThanEqual()',
+				'>': 'greaterThan()',
+				'>=': 'greaterThanEqual()',
+				'==': 'equal()',
+				'!=': 'notEqual()'
+			}
+		};
 
 	}
 

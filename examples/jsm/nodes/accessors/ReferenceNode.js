@@ -1,10 +1,11 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { texture } from './TextureNode.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 
-class ReferenceNode extends Node {
+class ReferenceNode extends TempNode {
 
 	constructor( property, uniformType, object = null ) {
 
@@ -59,7 +60,7 @@ class ReferenceNode extends Node {
 
 	update( /*frame*/ ) {
 
-		this.node.value = this.reference[ this.property ];
+		if ( this.reference[ this.property ] !== undefined && this.reference[ this.property ] !== null ) this.node.value = this.reference[ this.property ];
 
 	}
 

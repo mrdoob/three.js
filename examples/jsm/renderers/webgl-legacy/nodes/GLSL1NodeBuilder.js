@@ -1,13 +1,7 @@
-import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial } from '../../../nodes/Nodes.js';
+import { GLSLNodeParser, NodeBuilder } from 'three/nodes';
 
 const glslMethods = {
-	[ MathNode.ATAN2 ]: 'atan'
-};
-
-const precisionLib = {
-	low: 'lowp',
-	medium: 'mediump',
-	high: 'highp'
+	atan2: 'atan'
 };
 
 class GLSL1NodeBuilder extends NodeBuilder {
@@ -16,11 +10,20 @@ class GLSL1NodeBuilder extends NodeBuilder {
 
 		super( object, renderer, new GLSLNodeParser(), scene );
 
+		this.isGLSLNodeBuilder = true;
+
 	}
 
 	getMethod( method ) {
 
 		return glslMethods[ method ] || method;
+
+	}
+
+	formatFunction( name, inputs, type, code ) {
+
+		const parameters = inputs.map( input => input.type + ' ' + input.name ).join( ', ' );
+		return `${ type } ${ name }( ${ parameters } ) {\n\n${ code }\n\n}`;
 
 	}
 
@@ -46,7 +49,7 @@ class GLSL1NodeBuilder extends NodeBuilder {
 
 	}
 
-	getVars( shaderStage ) {
+	getVars( shaderStage = this.shaderStage ) {
 
 		const snippets = [];
 
@@ -62,7 +65,7 @@ class GLSL1NodeBuilder extends NodeBuilder {
 
 	}
 
-	getUniforms( shaderStage ) {
+	getUniforms( shaderStage = this.shaderStage ) {
 
 		const uniforms = this.uniforms[ shaderStage ];
 
@@ -92,11 +95,11 @@ class GLSL1NodeBuilder extends NodeBuilder {
 
 			if ( precision !== null ) {
 
-				snippet = 'uniform ' + precisionLib[ precision ] + ' ' + snippet;
+				snippet = `uniform ${ precision }p ${ snippet }`;
 
 			} else {
 
-				snippet = 'uniform ' + snippet;
+				snippet = `uniform ${ snippet }`;
 
 			}
 
@@ -108,7 +111,7 @@ class GLSL1NodeBuilder extends NodeBuilder {
 
 	}
 
-	getAttributes( shaderStage ) {
+	getAttributes( shaderStage = this.shaderStage ) {
 
 		let snippet = '';
 
@@ -128,7 +131,7 @@ class GLSL1NodeBuilder extends NodeBuilder {
 
 	}
 
-	getVaryings( shaderStage ) {
+	getVaryings( shaderStage = this.shaderStage ) {
 
 		let snippet = '';
 
@@ -243,95 +246,58 @@ void main() {
 
 	}
 
-	buildCode() {
+	_getGLSLComputeCode( /*shaderData*/ ) {
 
-		const shadersData = this.material !== null ? { fragment: {}, vertex: {} } : { compute: {} };
-
-		for ( const shaderStage in shadersData ) {
-
-			let flow = '// code\n\n';
-			flow += this.flowCode[ shaderStage ];
-
-			const flowNodes = this.flowNodes[ shaderStage ];
-			const mainNode = flowNodes[ flowNodes.length - 1 ];
-
-			for ( const node of flowNodes ) {
-
-				const flowSlotData = this.getFlowData( node/*, shaderStage*/ );
-				const slotName = node.name;
-
-				if ( slotName ) {
-
-					if ( flow.length > 0 ) flow += '\n';
-
-					flow += `\t// flow -> ${ slotName }\n\t`;
-
-				}
-
-				flow += `${ flowSlotData.code }\n\t`;
-
-				if ( node === mainNode && shaderStage !== 'compute' ) {
-
-					flow += '// result\n\t';
-
-					if ( shaderStage === 'vertex' ) {
-
-						flow += 'gl_Position = ';
-
-					} else if ( shaderStage === 'fragment' ) {
-
-						flow += 'gl_FragColor = ';
-
-					}
-
-					flow += `${ flowSlotData.result };`;
-
-				}
-
-			}
-
-			const stageData = shadersData[ shaderStage ];
-
-			stageData.uniforms = this.getUniforms( shaderStage );
-			stageData.attributes = this.getAttributes( shaderStage );
-			stageData.varyings = this.getVaryings( shaderStage );
-			stageData.vars = this.getVars( shaderStage );
-			stageData.codes = this.getCodes( shaderStage );
-			stageData.flow = flow;
-
-		}
-
-		if ( this.material !== null ) {
-
-			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
-			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
-
-		} else {
-
-			console.warn( 'GLSLNodeBuilder: compute shaders are not supported.' );
-			//this.computeShader = this._getGLSLComputeCode( shadersData.compute );
-
-		}
+		console.warn( 'GLSL1NodeBuilder: compute shaders are not supported.' );
 
 	}
 
-	build() {
+	buildCode() {
 
-		// @TODO: Move this code to super.build()
+		for ( const shaderStage of this.getShaderStages() ) {
 
-		const { object, material } = this;
+			this.setShaderStage( shaderStage );
 
-		if ( material !== null ) {
-
-			NodeMaterial.fromMaterial( material ).build( this );
-
-		} else {
-
-			this.addFlow( 'compute', object );
+			this[ shaderStage + 'Shader' ] = this[ `_getGLSL${ shaderStage[ 0 ].toUpperCase() + shaderStage.slice( 1 )}Code` ]( {
+				uniforms: this.getUniforms(),
+				attributes: this.getAttributes(),
+				varyings: this.getVaryings(),
+				vars: this.getVars(),
+				structs: this.getStructs(),
+				codes: this.getCodes(),
+				flow: this.prepareShaderFlow( 'gl_Position = ', 'gl_FragColor = ' )
+			} );
 
 		}
 
-		return super.build();
+		this.setShaderStage( null );
+
+	}
+
+	_getOperators() {
+
+		return { // https://www.khronos.org/files/opengles_shading_language.pdf, section 5.1
+			ops: [
+				{ ops: [ '[]', '()', '.', 'post++', 'post--' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ 'pre++', 'pre--', 'un+', 'un-', 'un!' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '*', '/' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '+', '-' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '<', '>', '<=', '>=' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '==', '!=' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '&&' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '^^' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '||' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '=', '+=', '-=', '*=', '/=' ], maxPrec: Infinity, allowSelf: true }
+			],
+			replace: { // section 5.9
+				'<': 'lessThan()',
+				'<=': 'lessThanEqual()',
+				'>': 'greaterThan()',
+				'>=': 'greaterThanEqual()',
+				'==': 'equal()',
+				'!=': 'notEqual()'
+			}
+		};
 
 	}
 

@@ -1,11 +1,12 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { reference } from './ReferenceNode.js';
 import { materialReference } from './MaterialReferenceNode.js';
 import { nodeImmutable, float } from '../shadernode/ShaderNode.js';
 
 const _propertyCache = new Map();
 
-class MaterialNode extends Node {
+class MaterialNode extends TempNode {
 
 	constructor( scope ) {
 

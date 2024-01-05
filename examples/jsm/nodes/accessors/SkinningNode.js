@@ -3,11 +3,8 @@ import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
 import { attribute } from '../core/AttributeNode.js';
 import { uniform } from '../core/UniformNode.js';
-import { add } from '../math/OperatorNode.js';
 import { buffer } from './BufferNode.js';
-import { normalLocal } from './NormalNode.js';
-import { positionLocal } from './PositionNode.js';
-import { tangentLocal } from './TangentNode.js';
+import { position, normal, tangent } from '../core/PropertyNode.js';
 
 class SkinningNode extends Node {
 
@@ -34,57 +31,26 @@ class SkinningNode extends Node {
 
 		const { skinIndexNode, skinWeightNode, bindMatrixNode, bindMatrixInverseNode, boneMatricesNode } = this;
 
-		const boneMatX = boneMatricesNode.element( skinIndexNode.x );
-		const boneMatY = boneMatricesNode.element( skinIndexNode.y );
-		const boneMatZ = boneMatricesNode.element( skinIndexNode.z );
-		const boneMatW = boneMatricesNode.element( skinIndexNode.w );
+		const boneMatX = boneMatricesNode.element( skinIndexNode.x ).mul( skinWeightNode.x );
+		const boneMatY = boneMatricesNode.element( skinIndexNode.y ).mul( skinWeightNode.y );
+		const boneMatZ = boneMatricesNode.element( skinIndexNode.z ).mul( skinWeightNode.z );
+		const boneMatW = boneMatricesNode.element( skinIndexNode.w ).mul( skinWeightNode.w );
 
-		// POSITION
+		const skinMatrix = boneMatX.add( boneMatY, boneMatZ, boneMatW );
 
-		const skinVertex = bindMatrixNode.mul( positionLocal );
+		const transformationMatrix = bindMatrixInverseNode.mul( skinMatrix ).mul( bindMatrixNode );
 
-		const skinned = add(
-			boneMatX.mul( skinWeightNode.x ).mul( skinVertex ),
-			boneMatY.mul( skinWeightNode.y ).mul( skinVertex ),
-			boneMatZ.mul( skinWeightNode.z ).mul( skinVertex ),
-			boneMatW.mul( skinWeightNode.w ).mul( skinVertex )
-		);
+		position.assign( transformationMatrix.mul( position ) );
 
-		const skinPosition = bindMatrixInverseNode.mul( skinned ).xyz;
-
-		// NORMAL
-
-		let skinMatrix = add(
-			skinWeightNode.x.mul( boneMatX ),
-			skinWeightNode.y.mul( boneMatY ),
-			skinWeightNode.z.mul( boneMatZ ),
-			skinWeightNode.w.mul( boneMatW )
-		);
-
-		skinMatrix = bindMatrixInverseNode.mul( skinMatrix ).mul( bindMatrixNode );
-
-		const skinNormal = skinMatrix.transformDirection( normalLocal ).xyz;
-
-		// ASSIGNS
-
-		positionLocal.assign( skinPosition );
-		normalLocal.assign( skinNormal );
+		normal.assign( transformationMatrix.transformDirection( normal ) );
 
 		if ( builder.hasGeometryAttribute( 'tangent' ) ) {
 
-			tangentLocal.assign( skinNormal );
+			tangent.assign( normal );
 
 		}
 
-	}
-
-	generate( builder, output ) {
-
-		if ( output !== 'void' ) {
-
-			return positionLocal.build( builder, output );
-
-		}
+		builder.stack.outputNode = position;
 
 	}
 

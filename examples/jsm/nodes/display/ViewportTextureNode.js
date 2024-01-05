@@ -1,7 +1,7 @@
 import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import { addNodeElement, nodeProxy, nodeObject } from '../shadernode/ShaderNode.js';
 import { viewportTopLeft } from './ViewportNode.js';
 import { Vector2, FramebufferTexture, LinearMipmapLinearFilter } from 'three';
 
@@ -58,7 +58,7 @@ class ViewportTextureNode extends TextureNode {
 
 	clone() {
 
-		return new this.constructor( this.uvNode, this.levelNode, this.value );
+		return nodeObject( new this.constructor( this.uvNode, this.levelNode, this.value ) );
 
 	}
 

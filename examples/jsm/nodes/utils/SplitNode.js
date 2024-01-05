@@ -9,6 +9,13 @@ class SplitNode extends Node {
 
 		super();
 
+		/*if ( node.isSplitNode === true ) {
+
+			components = components.split( '' ).map( c => node.components[ vectorComponents.indexOf( c ) ] ).join( '' );
+			node = node.node;
+
+		}*/
+
 		this.node = node;
 		this.components = components;
 
@@ -32,14 +39,15 @@ class SplitNode extends Node {
 
 	getNodeType( builder ) {
 
-		return builder.getTypeFromLength( this.components.length );
+		return builder.getTypeFromLength( this.components.length, builder.getComponentType( this.node.getNodeType( builder ) ) );
 
 	}
 
 	generate( builder, output ) {
 
 		const node = this.node;
-		const nodeTypeLength = builder.getTypeLength( node.getNodeType( builder ) );
+		const nodeType = node.getNodeType( builder );
+		const nodeTypeLength = builder.getTypeLength( nodeType );
 
 		let snippet = null;
 
@@ -49,13 +57,13 @@ class SplitNode extends Node {
 
 			const componentsLength = this.getVectorLength();
 
-			if ( componentsLength >= nodeTypeLength ) {
+			if ( componentsLength > nodeTypeLength ) { // need to expand the input node
 
-				// needed expand the input node
-
-				type = builder.getTypeFromLength( this.getVectorLength() );
+				type = builder.getTypeFromLength( this.getVectorLength(), builder.getComponentType( nodeType ) );
 
 			}
+
+			if ( output === 'void' ) type = 'void';
 
 			const nodeSnippet = node.build( builder, type );
 
@@ -67,7 +75,7 @@ class SplitNode extends Node {
 
 			} else {
 
-				snippet = builder.format( `${nodeSnippet}.${this.components}`, this.getNodeType( builder ), output );
+				snippet = builder.format( builder.formatOperation( '.', nodeSnippet, this.components ), this.getNodeType( builder ), output );
 
 			}
 

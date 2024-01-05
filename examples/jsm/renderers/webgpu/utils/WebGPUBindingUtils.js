@@ -127,6 +127,8 @@ class WebGPUBindingUtils {
 		const buffer = binding.buffer;
 		const bufferGPU = backend.get( binding ).buffer;
 
+		if ( bufferGPU === undefined ) return; // @TODO: why this happens?
+
 		device.queue.writeBuffer( bufferGPU, 0, buffer, 0 );
 
 	}

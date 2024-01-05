@@ -1,7 +1,13 @@
 import TempNode from '../core/TempNode.js';
-import { sub, mul, div } from './OperatorNode.js';
+import { sub, div } from './OperatorNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeObject, nodeProxy, float, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, nodeObject, nodeProxy, float, vec3 } from '../shadernode/ShaderNode.js';
+
+function removeUnaryMinus( snippet, fallback = snippet ) {
+
+	return snippet.trimLeft().startsWith( '-' ) ? snippet.slice( snippet.indexOf( '-' ) + 1 ).trimLeft() : fallback;
+
+}
 
 class MathNode extends TempNode {
 
@@ -65,18 +71,14 @@ class MathNode extends TempNode {
 
 	}
 
-	generate( builder, output ) {
+	setup( builder ) {
+
+		super.setup( builder );
 
 		const method = this.method;
 
-		const type = this.getNodeType( builder );
-		const inputType = this.getInputType( builder );
-
 		const a = this.aNode;
 		const b = this.bNode;
-		const c = this.cNode;
-
-		const isWebGL = builder.renderer.isWebGLRenderer === true;
 
 		if ( method === MathNode.TRANSFORM_DIRECTION ) {
 
@@ -88,86 +90,108 @@ class MathNode extends TempNode {
 
 			if ( builder.isMatrix( tA.getNodeType( builder ) ) ) {
 
-				tB = vec4( vec3( tB ), 0.0 );
+				tB = vec3( tB ).vec4( 0.0 );
 
 			} else {
 
-				tA = vec4( vec3( tA ), 0.0 );
+				tA = vec3( tA ).vec4( 0.0 );
 
 			}
 
-			const mulNode = mul( tA, tB ).xyz;
+			const mulNode = tA.mul( tB ).xyz;
 
-			return normalize( mulNode ).build( builder, output );
-
-		} else if ( method === MathNode.NEGATE ) {
-
-			return builder.format( '( - ' + a.build( builder, inputType ) + ' )', type, output );
+			return mulNode.normalize();
 
 		} else if ( method === MathNode.ONE_MINUS ) {
 
-			return sub( 1.0, a ).build( builder, output );
+			return sub( 1.0, a );
 
 		} else if ( method === MathNode.RECIPROCAL ) {
 
-			return div( 1.0, a ).build( builder, output );
+			return div( 1.0, a );
 
 		} else if ( method === MathNode.DIFFERENCE ) {
 
-			return abs( sub( a, b ) ).build( builder, output );
+			return sub( a, b ).abs();
+
+		}
+
+	}
+
+	generate( builder, output ) {
+
+		const method = this.method;
+
+		if ( method === MathNode.TRANSFORM_DIRECTION || method === MathNode.ONE_MINUS || method === MathNode.RECIPROCAL || method === MathNode.DIFFERENCE ) return super.generate( builder, output );
+
+		const type = this.getNodeType( builder );
+		const inputType = this.getInputType( builder );
+
+		const a = this.aNode;
+		const b = this.bNode;
+		const c = this.cNode;
+
+		if ( method === MathNode.NEGATE ) {
+
+			const snippet = a.build( builder, inputType );
+			return builder.format( removeUnaryMinus( snippet, builder.formatOperation( '-', snippet ) ), type, output );
+
+		}
+
+		const isGLSL = builder.isGLSLNodeBuilder === true;
+
+		const params = [];
+
+		if ( method === MathNode.CROSS ) {
+
+			params.push(
+				a.build( builder, type ),
+				b.build( builder, type )
+			);
+
+		} else if ( method === MathNode.STEP ) {
+
+			params.push(
+				a.build( builder, builder.getTypeLength( a.getNodeType( builder ) ) === 1 ? 'float' : inputType ),
+				b.build( builder, inputType )
+			);
+
+		} else if ( ( isGLSL && ( method === MathNode.MIN || method === MathNode.MAX ) ) || method === MathNode.MOD ) {
+
+			params.push(
+				a.build( builder, inputType ),
+				b.build( builder, builder.getTypeLength( b.getNodeType( builder ) ) === 1 ? 'float' : inputType )
+			);
+
+		} else if ( method === MathNode.REFRACT ) {
+
+			params.push(
+				a.build( builder, inputType ),
+				b.build( builder, inputType ),
+				c.build( builder, 'float' )
+			);
+
+		} else if ( method === MathNode.MIX ) {
+
+			params.push(
+				a.build( builder, inputType ),
+				b.build( builder, inputType ),
+				c.build( builder, builder.getTypeLength( c.getNodeType( builder ) ) === 1 ? 'float' : inputType )
+			);
+
+		} else if ( method === MathNode.ABS ) {
+
+			params.push( removeUnaryMinus( a.build( builder, inputType ) ) );
 
 		} else {
 
-			const params = [];
-
-			if ( method === MathNode.CROSS ) {
-
-				params.push(
-					a.build( builder, type ),
-					b.build( builder, type )
-				);
-
-			} else if ( method === MathNode.STEP ) {
-
-				params.push(
-					a.build( builder, builder.getTypeLength( a.getNodeType( builder ) ) === 1 ? 'float' : inputType ),
-					b.build( builder, inputType )
-				);
-
-			} else if ( ( isWebGL && ( method === MathNode.MIN || method === MathNode.MAX ) ) || method === MathNode.MOD ) {
-
-				params.push(
-					a.build( builder, inputType ),
-					b.build( builder, builder.getTypeLength( b.getNodeType( builder ) ) === 1 ? 'float' : inputType )
-				);
-
-			} else if ( method === MathNode.REFRACT ) {
-
-				params.push(
-					a.build( builder, inputType ),
-					b.build( builder, inputType ),
-					c.build( builder, 'float' )
-				);
-
-			} else if ( method === MathNode.MIX ) {
-
-				params.push(
-					a.build( builder, inputType ),
-					b.build( builder, inputType ),
-					c.build( builder, builder.getTypeLength( c.getNodeType( builder ) ) === 1 ? 'float' : inputType )
-				);
-
-			} else {
-
-				params.push( a.build( builder, inputType ) );
-				if ( b !== null ) params.push( b.build( builder, inputType ) );
-				if ( c !== null ) params.push( c.build( builder, inputType ) );
-
-			}
-
-			return builder.format( `${ builder.getMethod( method ) }( ${params.join( ', ' )} )`, type, output );
+			params.push( a.build( builder, inputType ) );
+			if ( b !== null ) params.push( b.build( builder, inputType ) );
+			if ( c !== null ) params.push( c.build( builder, inputType ) );
 
 		}
+
+		return builder.format( builder.formatOperation( '()', builder.getMethod( method ), params ), type, output );
 
 	}
 
@@ -244,6 +268,8 @@ MathNode.REFRACT = 'refract';
 MathNode.SMOOTHSTEP = 'smoothstep';
 MathNode.FACEFORWARD = 'faceforward';
 
+// @TODO: add methods from GLSL 3.00 (WebGL 2) and WGSL
+
 export default MathNode;
 
 export const EPSILON = float( 1e-6 );
@@ -280,8 +306,6 @@ export const trunc = nodeProxy( MathNode, MathNode.TRUNC );
 export const fwidth = nodeProxy( MathNode, MathNode.FWIDTH );
 
 export const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
-export const min = nodeProxy( MathNode, MathNode.MIN );
-export const max = nodeProxy( MathNode, MathNode.MAX );
 export const mod = nodeProxy( MathNode, MathNode.MOD );
 export const step = nodeProxy( MathNode, MathNode.STEP );
 export const reflect = nodeProxy( MathNode, MathNode.REFLECT );
@@ -296,11 +320,18 @@ export const pow4 = nodeProxy( MathNode, MathNode.POW, 4 );
 export const transformDirection = nodeProxy( MathNode, MathNode.TRANSFORM_DIRECTION );
 
 export const mix = nodeProxy( MathNode, MathNode.MIX );
-export const clamp = ( value, low = 0, high = 1 ) => nodeObject( new MathNode( MathNode.CLAMP, nodeObject( value ), nodeObject( low ), nodeObject( high ) ) );
-export const saturate = ( value ) => clamp( value );
 export const refract = nodeProxy( MathNode, MathNode.REFRACT );
 export const smoothstep = nodeProxy( MathNode, MathNode.SMOOTHSTEP );
 export const faceForward = nodeProxy( MathNode, MathNode.FACEFORWARD );
+
+export const minInternal = nodeProxy( MathNode, MathNode.MIN );
+export const maxInternal = nodeProxy( MathNode, MathNode.MAX );
+export const clampInternal = nodeProxy( MathNode, MathNode.CLAMP );
+
+export const min = ( a, b, ...c ) => minInternal( a, c.length === 0 ? b : min( b, ...c ) );
+export const max = ( a, b, ...c ) => maxInternal( a, c.length === 0 ? b : max( b, ...c ) );
+export const clamp = ( value, low = 0, high = 1 ) => clampInternal( value, low, high );
+export const saturate = clamp;
 
 export const mixElement = ( t, e1, e2 ) => mix( e1, e2, t );
 export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );

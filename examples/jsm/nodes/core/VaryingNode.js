@@ -1,5 +1,4 @@
 import Node, { addNodeClass } from './Node.js';
-import { NodeShaderStage } from './constants.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class VaryingNode extends Node {
@@ -12,6 +11,8 @@ class VaryingNode extends Node {
 		this.name = name;
 
 		this.isVaryingNode = true;
+
+		this.needsInterpolation = false;
 
 	}
 
@@ -35,28 +36,90 @@ class VaryingNode extends Node {
 
 	}
 
-	generate( builder ) {
+	setup( builder ) {
 
-		const { name, node } = this;
-		const type = this.getNodeType( builder );
+		const shaderStage = builder.getShaderStage();
 
-		const nodeVarying = builder.getVaryingFromNode( this, type );
+		// force node run in vertex stage
+
+		builder.setShaderStage( 'vertex' );
+		super.setup( builder );
+		this.node.build( builder );
+		builder.setShaderStage( shaderStage );
+
+	}
+
+	analyze( builder ) {
+
+		const shaderStage = builder.getShaderStage();
+
+		if ( shaderStage === 'vertex' ) return super.analyze( builder );
 
 		// this property can be used to check if the varying can be optimized for a var
-		nodeVarying.needsInterpolation || ( nodeVarying.needsInterpolation = ( builder.shaderStage === 'fragment' ) );
+		this.needsInterpolation = true;
 
-		if ( name !== null ) {
+		// do a run in the current stage that doesn't act on children
 
-			nodeVarying.name = name;
+		const original = builder.getNodeProperties( this );
+		const properties = { ...original };
+
+		for ( const prop in properties ) delete original[ prop ];
+		super.analyze( builder );
+		for ( const prop in properties ) original[ prop ] = properties[ prop ];
+
+		// force node run in vertex stage
+
+		builder.setShaderStage( 'vertex' );
+		super.analyze( builder );
+		builder.setShaderStage( shaderStage );
+
+	}
+
+	generate( builder ) {
+
+		const generated = builder.getNodeData( this, 'any' ).varying !== undefined;
+
+		const nodeVarying = builder.getVaryingFromNode( this, this.name, this.needsInterpolation );
+
+		if ( generated === false ) {
+
+			// force node run in vertex stage
+
+			const shaderStage = builder.getShaderStage();
+			builder.setShaderStage( 'vertex' );
+
+			const propertyName = builder.getPropertyName( nodeVarying );
+			const snippet = this.node.build( builder );
+			builder.addLineFlowCode( builder.formatOperation( '=', propertyName, snippet ) );
+
+			builder.setShaderStage( shaderStage );
 
 		}
 
-		const propertyName = builder.getPropertyName( nodeVarying, NodeShaderStage.VERTEX );
-
-		// force node run in vertex stage
-		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, node, type, propertyName );
-
 		return builder.getPropertyName( nodeVarying );
+
+	}
+
+	build( builder, output ) {
+
+		if ( builder.getBuildStage() === 'setup' ) {
+
+			const properties = builder.getNodeProperties( this, builder.getShaderStage() );
+			const cacheKey = this.getCacheKey();
+
+			if ( properties.cacheKey !== cacheKey ) {
+
+				properties.cacheKey = cacheKey;
+
+				this.setup( builder );
+
+			}
+
+			return;
+
+		}
+
+		return super.build( builder, output );
 
 	}
 

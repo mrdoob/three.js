@@ -3,7 +3,6 @@ import { transformedClearcoatNormalView } from '../accessors/NormalNode.js';
 import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness } from '../core/PropertyNode.js';
 import { materialClearcoatNormal } from '../accessors/ExtendedMaterialNode.js';
 import { materialClearcoat, materialClearcoatRoughness, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness } from '../accessors/MaterialNode.js';
-import { float, vec3 } from '../shadernode/ShaderNode.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
 
@@ -72,41 +71,25 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		super.setupVariants( builder );
 
-		// CLEARCOAT
-
 		if ( this.useClearcoat ) {
 
-			const clearcoatNode = this.clearcoatNode ? float( this.clearcoatNode ) : materialClearcoat;
-			const clearcoatRoughnessNode = this.clearcoatRoughnessNode ? float( this.clearcoatRoughnessNode ) : materialClearcoatRoughness;
-
-			clearcoat.assign( clearcoatNode );
-			clearcoatRoughness.assign( clearcoatRoughnessNode );
+			clearcoat.assign( this.clearcoatNode || materialClearcoat );
+			clearcoatRoughness.assign( this.clearcoatRoughnessNode || materialClearcoatRoughness );
 
 		}
-
-		// SHEEN
 
 		if ( this.useSheen ) {
 
-			const sheenNode = this.sheenNode ? vec3( this.sheenNode ) : materialSheen;
-			const sheenRoughnessNode = this.sheenRoughnessNode ? float( this.sheenRoughnessNode ) : materialSheenRoughness;
-
-			sheen.assign( sheenNode );
-			sheenRoughness.assign( sheenRoughnessNode );
+			sheen.assign( this.sheenNode || materialSheen );
+			sheenRoughness.assign( this.sheenRoughnessNode || materialSheenRoughness );
 
 		}
 
-		// IRIDESCENCE
-
 		if ( this.useIridescence ) {
 
-			const iridescenceNode = this.iridescenceNode ? float( this.iridescenceNode ) : materialIridescence;
-			const iridescenceIORNode = this.iridescenceIORNode ? float( this.iridescenceIORNode ) : materialIridescenceIOR;
-			const iridescenceThicknessNode = this.iridescenceThicknessNode ? float( this.iridescenceThicknessNode ) : materialIridescenceThickness;
-
-			iridescence.assign( iridescenceNode );
-			iridescenceIOR.assign( iridescenceIORNode );
-			iridescenceThickness.assign( iridescenceThicknessNode );
+			iridescence.assign( this.iridescenceNode || materialIridescence );
+			iridescenceIOR.assign( this.iridescenceIORNode || materialIridescenceIOR );
+			iridescenceThickness.assign( this.iridescenceThicknessNode || materialIridescenceThickness );
 
 		}
 
@@ -116,11 +99,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		super.setupNormal( builder );
 
-		// CLEARCOAT NORMAL
-
-		const clearcoatNormalNode = this.clearcoatNormalNode ? vec3( this.clearcoatNormalNode ) : materialClearcoatNormal;
-
-		transformedClearcoatNormalView.assign( clearcoatNormalNode );
+		transformedClearcoatNormalView.assign( this.clearcoatNormalNode || materialClearcoatNormal );
 
 	}
 

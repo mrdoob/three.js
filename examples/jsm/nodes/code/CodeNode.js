@@ -40,7 +40,7 @@ class CodeNode extends Node {
 
 		}
 
-		const nodeCode = builder.getCodeFromNode( this, this.getNodeType( builder ) );
+		const nodeCode = builder.getCodeFromNode( this );
 		nodeCode.code = this.code;
 
 		return nodeCode.code;

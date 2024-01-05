@@ -1,7 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './BufferAttributeNode.js';
-import { normalLocal } from './NormalNode.js';
-import { positionLocal } from './PositionNode.js';
+import { position, normal } from '../core/PropertyNode.js';
 import { nodeProxy, vec3, mat3, mat4 } from '../shadernode/ShaderNode.js';
 import { DynamicDrawUsage, InstancedInterleavedBuffer } from 'three';
 
@@ -17,7 +16,7 @@ class InstanceNode extends Node {
 
 	}
 
-	setup( /*builder*/ ) {
+	setup( builder ) {
 
 		let instanceMatrixNode = this.instanceMatrixNode;
 
@@ -29,36 +28,28 @@ class InstanceNode extends Node {
 
 			const bufferFn = instanceAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
 
-			const instanceBuffers = [
+			instanceMatrixNode = this.instanceMatrixNode = mat4(
 				// F.Signature -> bufferAttribute( array, type, stride, offset )
 				bufferFn( buffer, 'vec4', 16, 0 ),
 				bufferFn( buffer, 'vec4', 16, 4 ),
 				bufferFn( buffer, 'vec4', 16, 8 ),
 				bufferFn( buffer, 'vec4', 16, 12 )
-			];
-
-			instanceMatrixNode = mat4( ...instanceBuffers );
-
-			this.instanceMatrixNode = instanceMatrixNode;
+			);
 
 		}
 
 		// POSITION
 
-		const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
+		position.assign( instanceMatrixNode.mul( position ) ); // @TODO: introduce .inverseTransformDirection() for this
 
 		// NORMAL
 
-		const m = mat3( instanceMatrixNode[ 0 ].xyz, instanceMatrixNode[ 1 ].xyz, instanceMatrixNode[ 2 ].xyz );
+		const m = mat3( instanceMatrixNode[ 0 ].xyz, instanceMatrixNode[ 1 ].xyz, instanceMatrixNode[ 2 ].xyz ); // @TODO: make mat4 -> mat3 autoconversion
 
-		const transformedNormal = normalLocal.div( vec3( m[ 0 ].dot( m[ 0 ] ), m[ 1 ].dot( m[ 1 ] ), m[ 2 ].dot( m[ 2 ] ) ) );
+		const transformedNormal = normal.div( vec3( m[ 0 ].dot( m[ 0 ] ), m[ 1 ].dot( m[ 1 ] ), m[ 2 ].dot( m[ 2 ] ) ) );
+		normal.assign( m.mul( transformedNormal ) ); // @TODO: introduce .premul() for this
 
-		const instanceNormal = m.mul( transformedNormal ).xyz;
-
-		// ASSIGNS
-
-		positionLocal.assign( instancePosition );
-		normalLocal.assign( instanceNormal );
+		return super.setup( builder );
 
 	}
 

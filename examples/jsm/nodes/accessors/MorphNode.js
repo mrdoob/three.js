@@ -4,7 +4,7 @@ import { nodeProxy } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { reference } from './ReferenceNode.js';
 import { bufferAttribute } from './BufferAttributeNode.js';
-import { positionLocal } from './PositionNode.js';
+import { position } from '../core/PropertyNode.js';
 
 class MorphNode extends Node {
 
@@ -19,7 +19,7 @@ class MorphNode extends Node {
 
 	}
 
-	setupAttribute( name, assignNode = positionLocal ) {
+	setupAttribute( name, assignNode = position ) {
 
 		const mesh = this.mesh;
 		const attributes = mesh.geometry.morphAttributes[ name ];

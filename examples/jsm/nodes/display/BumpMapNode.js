@@ -4,7 +4,7 @@ import { uv } from '../accessors/UVNode.js';
 import { normalView } from '../accessors/NormalNode.js';
 import { positionView } from '../accessors/PositionNode.js';
 import { faceDirection } from './FrontFacingNode.js';
-import { tslFn, nodeProxy, float, vec2 } from '../shadernode/ShaderNode.js';
+import { tslFn, nodeProxy, vec2 } from '../shadernode/ShaderNode.js';
 
 // Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 // https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
@@ -31,16 +31,13 @@ const dHdxy_fwd = tslFn( ( { textureNode, bumpScale } ) => {
 
 	}
 
-	const Hll = float( textureNode );
+	const Hll = textureNode.float();
 	const uvNode = texNode.uvNode || uv();
 
 	// It's used to preserve the same TextureNode instance
-	const sampleTexture = ( uv ) => textureNode.cache().context( { getUVNode: () => uv } );
+	const sampleTexture = ( uv ) => textureNode.cache().context( { getUVNode: () => uv } ).float();
 
-	return vec2(
-		float( sampleTexture( uvNode.add( uvNode.dFdx() ) ) ).sub( Hll ),
-		float( sampleTexture( uvNode.add( uvNode.dFdy() ) ) ).sub( Hll )
-	).mul( bumpScale );
+	return vec2( sampleTexture( uvNode.add( uvNode.dFdx() ) ), sampleTexture( uvNode.add( uvNode.dFdy() ) ) ).sub( H11 ).mul( bumpScale );
 
 } );
 
@@ -81,7 +78,7 @@ class BumpMapNode extends TempNode {
 		const dHdxy = dHdxy_fwd( { textureNode: this.textureNode, bumpScale } );
 
 		return perturbNormalArb( {
-			surf_pos: positionView,
+			surf_pos: positionView.xyz,
 			surf_norm: normalView,
 			dHdxy
 		} );

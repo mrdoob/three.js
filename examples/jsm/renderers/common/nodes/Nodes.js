@@ -2,7 +2,7 @@ import DataMap from '../DataMap.js';
 import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
 import { NoToneMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
-import { NodeFrame, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, equirectUV, viewportBottomLeft, normalWorld } from '../../../nodes/Nodes.js';
+import { NodeFrame, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, equirectUV, viewportBottomLeft, normalWorld } from 'three/nodes';
 
 class Nodes extends DataMap {
 
@@ -70,9 +70,8 @@ class Nodes extends DataMap {
 		if ( object.isRenderObject ) {
 
 			const nodeBuilderState = this.get( object ).nodeBuilderState;
-			nodeBuilderState.usedTimes --;
 
-			if ( nodeBuilderState.usedTimes === 0 ) {
+			if ( nodeBuilderState !== undefined && -- nodeBuilderState.usedTimes === 0 ) {
 
 				this.nodeBuilderCache.delete( this.getForRenderCacheKey( object ) );
 

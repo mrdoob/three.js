@@ -1,8 +1,9 @@
 import { WebGLCubeRenderTarget, Scene, CubeCamera, BoxGeometry, Mesh, BackSide, NoBlending, LinearFilter, LinearMipmapLinearFilter } from 'three';
-import { equirectUV } from '../../nodes/utils/EquirectUVNode.js';
+
+// @TODO: fix the circular dependency in some more elegant way
 import { texture as TSL_Texture } from '../../nodes/accessors/TextureNode.js';
 import { positionWorldDirection } from '../../nodes/accessors/PositionNode.js';
-import { createNodeMaterialFromType } from '../../nodes/materials/NodeMaterial.js';
+import MeshBasicNodeMaterial from '../../nodes/materials/MeshBasicNodeMaterial.js';
 
 // @TODO: Consider rename WebGLCubeRenderTarget to just CubeRenderTarget
 
@@ -32,9 +33,9 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 		const geometry = new BoxGeometry( 5, 5, 5 );
 
-		const uvNode = equirectUV( positionWorldDirection );
+		const uvNode = positionWorldDirection.equirectUV();
 
-		const material = createNodeMaterialFromType( 'MeshBasicNodeMaterial' );
+		const material = new MeshBasicNodeMaterial();
 		material.colorNode = TSL_Texture( texture, uvNode, 0 );
 		material.side = BackSide;
 		material.blending = NoBlending;

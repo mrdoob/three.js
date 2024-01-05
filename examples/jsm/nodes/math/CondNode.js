@@ -1,6 +1,5 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { property } from '../core/PropertyNode.js';
-import { context as contextNode } from '../core/ContextNode.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class CondNode extends Node {
@@ -39,20 +38,18 @@ class CondNode extends Node {
 	generate( builder ) {
 
 		const type = this.getNodeType( builder );
-		const context = { tempWrite: false };
 
-		const { ifNode, elseNode } = this;
+		const { condNode, ifNode, elseNode } = this;
 
 		const needsProperty = ifNode.getNodeType( builder ) !== 'void' || ( elseNode && elseNode.getNodeType( builder ) !== 'void' );
-		const nodeProperty = needsProperty ? property( type ).build( builder ) : '';
+		const nodeProperty = needsProperty ? property( type ).fullBuild( builder ) : '';
 
-		const nodeSnippet = contextNode( this.condNode/*, context*/ ).build( builder, 'bool' );
+		const nodeSnippet = condNode.build( builder, 'bool' );
 
 		builder.addFlowCode( `\n${ builder.tab }if ( ${ nodeSnippet } ) {\n\n` ).addFlowTab();
 
-		let ifSnippet = contextNode( this.ifNode, context ).build( builder, type );
-
-		ifSnippet = needsProperty ? nodeProperty + ' = ' + ifSnippet + ';' : ifSnippet;
+		let ifSnippet = ifNode.context( { isUniformControlFlow: false } ).cache().fullBuild( builder, type );
+		ifSnippet = needsProperty ? builder.formatOperation( '=', nodeProperty, ifSnippet ) + ';' : ifSnippet;
 
 		builder.removeFlowTab().addFlowCode( builder.tab + '\t' + ifSnippet + '\n\n' + builder.tab + '}' );
 
@@ -60,16 +57,14 @@ class CondNode extends Node {
 
 			builder.addFlowCode( ' else {\n\n' ).addFlowTab();
 
-			let elseSnippet = contextNode( elseNode, context ).build( builder, type );
-			elseSnippet = nodeProperty ? nodeProperty + ' = ' + elseSnippet + ';' : elseSnippet;
+			let elseSnippet = elseNode.context( { isUniformControlFlow: false } ).cache().fullBuild( builder, type );
+			elseSnippet = needsProperty ? builder.formatOperation( '=', nodeProperty, elseSnippet ) + ';' : elseSnippet;
 
-			builder.removeFlowTab().addFlowCode( builder.tab + '\t' + elseSnippet + '\n\n' + builder.tab + '}\n\n' );
-
-		} else {
-
-			builder.addFlowCode( '\n\n' );
+			builder.removeFlowTab().addFlowCode( builder.tab + '\t' + elseSnippet + '\n\n' + builder.tab + '}' );
 
 		}
+
+		builder.addFlowCode( '\n\n' );
 
 		return nodeProperty;
 

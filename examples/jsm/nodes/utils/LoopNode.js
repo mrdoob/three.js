@@ -1,7 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
 import { bypass } from '../core/BypassNode.js';
-import { context } from '../core/ContextNode.js';
 import { addNodeElement, nodeObject, nodeArray } from '../shadernode/ShaderNode.js';
 
 class LoopNode extends Node {
@@ -20,13 +19,19 @@ class LoopNode extends Node {
 
 	}
 
-	getProperties( builder ) {
+	getNodeType( builder ) {
+
+		const { returnsNode } = builder.getNodeProperties( this );
+
+		return returnsNode ? returnsNode.getNodeType( builder ) : 'void';
+
+	}
+
+	setup( builder ) {
+
+		super.setup( builder );
 
 		const properties = builder.getNodeProperties( this );
-
-		if ( properties.stackNode !== undefined ) return properties;
-
-		//
 
 		const inputs = {};
 
@@ -38,37 +43,16 @@ class LoopNode extends Node {
 
 		}
 
-		properties.returnsNode = this.params[ this.params.length - 1 ]( inputs, builder.addStack(), builder );
-		properties.stackNode = builder.removeStack();
-
-		return properties;
-
-	}
-
-	getNodeType( builder ) {
-
-		const { returnsNode } = this.getProperties( builder );
-
-		return returnsNode ? returnsNode.getNodeType( builder ) : 'void';
-
-	}
-
-	setup( builder ) {
-
-		// setup properties
-
-		this.getProperties( builder );
+		properties.returnsNode = this.params[ this.params.length - 1 ]( inputs, builder.stack, builder );
 
 	}
 
 	generate( builder ) {
 
-		const properties = this.getProperties( builder );
-
-		const contextData = { tempWrite: false };
+		const properties = builder.getNodeProperties( this );
 
 		const params = this.params;
-		const stackNode = properties.stackNode;
+		const stackNode = properties.outputNode;
 
 		for ( let i = 0, l = params.length - 1; i < l; i ++ ) {
 
@@ -97,7 +81,7 @@ class LoopNode extends Node {
 
 				if ( start !== undefined && end === undefined ) {
 
-					start = start + ' - 1';
+					start = builder.formatOperation( '-', start, '1' );
 					end = '0';
 					direction = 'backwards';
 
@@ -135,19 +119,19 @@ class LoopNode extends Node {
 			let conditionalSnippet = '';
 			let updateSnippet = '';
 
-			declarationSnippet += builder.getVar( 'int', property ) + ' = ' + startSnippet;
+			declarationSnippet += builder.formatOperation( '=', builder.getVar( 'int', property ), startSnippet );
 
 			if ( internalParam.direction === 'backwards' ) {
 
-				conditionalSnippet += property + ' >= ' + endSnippet;
-				updateSnippet += property + ' --';
+				conditionalSnippet += builder.formatOperation( '>=', property, endSnippet );
+				updateSnippet += builder.formatOperation( 'post--', property );
 
 			} else {
 
 				// forward
 
-				conditionalSnippet += property + ' < ' + endSnippet;
-				updateSnippet += property + ' ++';
+				conditionalSnippet += builder.formatOperation( '<', property, endSnippet );
+				updateSnippet += builder.formatOperation( 'post++', property );
 
 			}
 
@@ -157,7 +141,7 @@ class LoopNode extends Node {
 
 		}
 
-		const stackSnippet = context( stackNode, contextData ).build( builder, 'void' );
+		const stackSnippet = stackNode ? stackNode.cache().build( builder, 'void' ) : '';
 
 		const returnsSnippet = properties.returnsNode ? properties.returnsNode.build( builder ) : '';
 

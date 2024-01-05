@@ -1,4 +1,4 @@
-import { LightsNode } from '../../nodes/Nodes.js';
+import { lights } from 'three/nodes';
 
 function painterSortStable( a, b ) {
 
@@ -58,7 +58,7 @@ class RenderList {
 		this.opaque = [];
 		this.transparent = [];
 
-		this.lightsNode = new LightsNode( [] );
+		this.lightsNode = lights();
 		this.lightsArray = [];
 
 		this.occlusionQueryCount = 0;

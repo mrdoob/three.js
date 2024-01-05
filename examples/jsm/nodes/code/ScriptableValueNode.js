@@ -1,9 +1,10 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { arrayBufferToBase64, base64ToArrayBuffer } from '../core/NodeUtils.js';
 import { addNodeElement, nodeProxy, float } from '../shadernode/ShaderNode.js';
 import { EventDispatcher } from 'three';
 
-class ScriptableValueNode extends Node {
+class ScriptableValueNode extends TempNode {
 
 	constructor( value = null ) {
 
@@ -13,7 +14,7 @@ class ScriptableValueNode extends Node {
 		this._cache = null;
 
 		this.inputType = null;
-		this.outpuType = null;
+		this.outputType = null;
 
 		this.events = new EventDispatcher();
 

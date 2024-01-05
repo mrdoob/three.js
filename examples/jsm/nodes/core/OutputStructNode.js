@@ -1,8 +1,11 @@
-import Node, { addNodeClass } from './Node.js';
+import TempNode from './TempNode.js';
+import { addNodeClass } from './Node.js';
 import StructTypeNode from './StructTypeNode.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
 
-class OutputStructNode extends Node {
+// @TODO: clean up structs-related code (rename StructTypeNode to NodeStruct, OutputStructNode to StructNode possibly, NodeBuilder.getStructTypeFromNode to NodeBuilder.getStructFromNode, remove NodeBuilder._getWGSLStruct and NodeBuilder._getWGSLStructBinding)
+
+class OutputStructNode extends TempNode {
 
 	constructor( ...members ) {
 

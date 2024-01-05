@@ -9,7 +9,7 @@ const F_Schlick = tslFn( ( { f0, f90, dotVH } ) => {
 	// https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
 	const fresnel = dotVH.mul( - 5.55473 ).sub( 6.98316 ).mul( dotVH ).exp2();
 
-	return f0.mul( fresnel.oneMinus() ).add( f90.mul( fresnel ) );
+	return fresnel.mix( f0, f90 );
 
 } ); // validated
 

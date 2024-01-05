@@ -1,5 +1,4 @@
-import NodeFunction from '../../../nodes/core/NodeFunction.js';
-import NodeFunctionInput from '../../../nodes/core/NodeFunctionInput.js';
+import { NodeFunction, NodeFunctionInput } from 'three/nodes';
 
 const declarationRegexp = /^[fn]*\s*([a-z_0-9]+)?\s*\(([\s\S]*?)\)\s*[\-\>]*\s*([a-z_0-9]+)?/i;
 const propertiesRegexp = /[a-z_0-9]+|<(.*?)>+/ig;
@@ -95,7 +94,7 @@ class WGSLNodeFunction extends NodeFunction {
 
 		const type = this.type !== 'void' ? '-> ' + this.type : '';
 
-		return `fn ${ name } ( ${ this.inputsCode.trim() } ) ${ type }` + this.blockCode;
+		return `fn ${ name }( ${ this.inputsCode.trim() } ) ${ type }` + this.blockCode;
 
 	}
 

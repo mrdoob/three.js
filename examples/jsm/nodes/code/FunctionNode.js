@@ -10,6 +10,14 @@ class FunctionNode extends CodeNode {
 
 		this.keywords = {};
 
+		this._shaderNode = null;
+
+	}
+
+	isGlobal() {
+
+		return true;
+
 	}
 
 	getNodeType( builder ) {
@@ -26,7 +34,7 @@ class FunctionNode extends CodeNode {
 
 	getNodeFunction( builder ) {
 
-		const nodeData = builder.getDataFromNode( this );
+		const nodeData = builder.getNodeData( this );
 
 		let nodeFunction = nodeData.nodeFunction;
 
@@ -39,6 +47,22 @@ class FunctionNode extends CodeNode {
 		}
 
 		return nodeFunction;
+
+	}
+
+	setup( builder ) {
+
+		super.setup( builder );
+
+		if ( this._shaderNode !== null ) this._shaderNode.build( builder );
+
+	}
+
+	analyze( builder ) {
+
+		super.analyze( builder );
+
+		if ( this._shaderNode !== null ) this._shaderNode.build( builder );
 
 	}
 
@@ -63,7 +87,7 @@ class FunctionNode extends CodeNode {
 
 		const propertyName = builder.getPropertyName( nodeCode );
 
-		let code = this.getNodeFunction( builder ).getCode( propertyName );
+		let code = nodeFunction.getCode( propertyName );
 
 		const keywords = this.keywords;
 		const keywordsProperties = Object.keys( keywords );
@@ -99,7 +123,7 @@ class FunctionNode extends CodeNode {
 
 export default FunctionNode;
 
-const nativeFn = ( code, includes = [], language = '' ) => {
+export const nativeFn = ( code, includes = [], language = '' ) => {
 
 	for ( let i = 0; i < includes.length; i ++ ) {
 

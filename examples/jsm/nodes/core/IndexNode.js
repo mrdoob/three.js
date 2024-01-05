@@ -1,8 +1,8 @@
-import Node, { addNodeClass } from './Node.js';
-import { varying } from './VaryingNode.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
-class IndexNode extends Node {
+class IndexNode extends TempNode {
 
 	constructor( scope ) {
 
@@ -14,9 +14,16 @@ class IndexNode extends Node {
 
 	}
 
+	setup( builder ) {
+
+		if ( builder.getShaderStage() !== 'vertex' && builder.getShaderStage() !== 'compute' ) return this.varying();
+
+	}
+
 	generate( builder ) {
 
-		const nodeType = this.getNodeType( builder );
+		if ( builder.getShaderStage() !== 'vertex' && builder.getShaderStage() !== 'compute' ) return super.generate( builder );
+
 		const scope = this.scope;
 
 		let propertyName;
@@ -35,21 +42,7 @@ class IndexNode extends Node {
 
 		}
 
-		let output;
-
-		if ( builder.shaderStage === 'vertex' || builder.shaderStage === 'compute' ) {
-
-			output = propertyName;
-
-		} else {
-
-			const nodeVarying = varying( this );
-
-			output = nodeVarying.build( builder, nodeType );
-
-		}
-
-		return output;
+		return propertyName;
 
 	}
 

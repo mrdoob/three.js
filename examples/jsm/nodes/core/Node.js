@@ -1,7 +1,6 @@
-import { EventDispatcher } from 'three';
-import { NodeUpdateType } from './constants.js';
+import { EventDispatcher, MathUtils } from 'three';
+import { NodeUpdateType, defaultBuildStages } from './constants.js';
 import { getNodeChildren, getCacheKey } from './NodeUtils.js';
-import { MathUtils } from 'three';
 
 const NodeClasses = new Map();
 
@@ -90,6 +89,7 @@ class Node extends EventDispatcher {
 
 	getHash( /*builder*/ ) {
 
+		// @TODO: rework getHash in such a way that it wouldn't use this.uuid (and would be more like getCacheKey()). ideally they should be unified together
 		return this.uuid;
 
 	}
@@ -108,6 +108,8 @@ class Node extends EventDispatcher {
 
 	getNodeType( builder ) {
 
+		if ( this.nodeType !== null ) return this.nodeType;
+
 		const nodeProperties = builder.getNodeProperties( this );
 
 		if ( nodeProperties.outputNode ) {
@@ -116,16 +118,17 @@ class Node extends EventDispatcher {
 
 		}
 
-		return this.nodeType;
+		return null;
 
 	}
 
 	getShared( builder ) {
 
-		const hash = this.getHash( builder );
-		const nodeFromHash = builder.getNodeFromHash( hash );
+		const nodeData = builder.getNodeData( this, 'any' );
 
-		return nodeFromHash || this;
+		if ( nodeData.uniqueNode === undefined ) nodeData.uniqueNode = this;
+
+		return nodeData.uniqueNode;
 
 	}
 
@@ -139,8 +142,7 @@ class Node extends EventDispatcher {
 
 		}
 
-		// return a outputNode if exists
-		return null;
+		// return an outputNode if exists
 
 	}
 
@@ -154,16 +156,33 @@ class Node extends EventDispatcher {
 
 	analyze( builder ) {
 
-		const nodeData = builder.getDataFromNode( this );
-		nodeData.dependenciesCount = nodeData.dependenciesCount === undefined ? 1 : nodeData.dependenciesCount + 1;
+		const nodeData = builder.getNodeData( this );
 
-		if ( nodeData.dependenciesCount === 1 ) {
+		if ( nodeData.dependenciesCount === undefined ) nodeData.dependenciesCount = 0;
+
+		if ( ++ nodeData.dependenciesCount === 1 ) {
 
 			// node flow children
 
 			const nodeProperties = builder.getNodeProperties( this );
 
-			for ( const childNode of Object.values( nodeProperties ) ) {
+			const children = new Set( Object.values( nodeProperties ) );
+
+			if ( nodeProperties.outputNode ) {
+
+				nodeProperties.outputNode.traverse( node => {
+
+					if ( node !== nodeProperties.outputNode && children.has( node ) ) {
+
+						children.delete( node ); // don't iterate over that child nodes that are already included in the output one
+
+					}
+
+				} );
+
+			}
+
+			for ( const childNode of children ) {
 
 				if ( childNode && childNode.isNode === true ) {
 
@@ -212,7 +231,6 @@ class Node extends EventDispatcher {
 		}
 
 		builder.addNode( this );
-		builder.addChain( this );
 
 		/* Build stages expected results:
 			- "setup"		-> Node
@@ -226,19 +244,24 @@ class Node extends EventDispatcher {
 		if ( buildStage === 'setup' ) {
 
 			const properties = builder.getNodeProperties( this );
+			const cacheKey = this.getCacheKey();
 
-			if ( properties.initialized !== true || builder.context.tempRead === false ) {
+			if ( properties.cacheKey !== cacheKey ) {
 
-				const stackNodesBeforeSetup = builder.stack.nodes.length;
+				builder.addStack();
 
-				properties.initialized = true;
-				properties.outputNode = this.setup( builder );
+				properties.cacheKey = cacheKey;
+				properties.outputNode = this.setup( builder ) || null;
 
-				if ( properties.outputNode !== null && builder.stack.nodes.length !== stackNodesBeforeSetup ) {
+				if ( properties.outputNode === null && builder.stack.nodes.length > 0 ) {
 
 					properties.outputNode = builder.stack;
 
 				}
+
+				result = properties.outputNode;
+
+				builder.removeStack();
 
 				for ( const childNode of Object.values( properties ) ) {
 
@@ -263,19 +286,15 @@ class Node extends EventDispatcher {
 			if ( isGenerateOnce ) {
 
 				const type = this.getNodeType( builder );
-				const nodeData = builder.getDataFromNode( this );
+				const nodeData = builder.getNodeData( this );
 
-				result = nodeData.snippet;
+				if ( nodeData.snippet === undefined ) {
 
-				if ( result === undefined /*|| builder.context.tempRead === false*/ ) {
-
-					result = this.generate( builder ) || '';
-
-					nodeData.snippet = result;
+					nodeData.snippet = this.generate( builder ) || '';
 
 				}
 
-				result = builder.format( result, type, output );
+				result = builder.format( nodeData.snippet, type, output );
 
 			} else {
 
@@ -285,21 +304,33 @@ class Node extends EventDispatcher {
 
 		}
 
-		builder.removeChain( this );
+		return result;
+
+	}
+
+	fullBuild( builder, output ) {
+
+		const previousBuildStage = builder.getBuildStage();
+
+		let result = null;
+
+		for ( const buildStage of defaultBuildStages ) {
+
+			builder.setBuildStage( buildStage );
+
+			result = this.build( builder, output );
+
+		}
+
+		builder.setBuildStage( previousBuildStage );
 
 		return result;
 
 	}
 
-	getSerializeChildren() {
-
-		return getNodeChildren( this );
-
-	}
-
 	serialize( json ) {
 
-		const nodeChildren = this.getSerializeChildren();
+		const nodeChildren = getNodeChildren( this );
 
 		const inputNodes = {};
 

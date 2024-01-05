@@ -18,7 +18,7 @@ const BRDF_GGX = tslFn( ( inputs ) => {
 	const halfDir = lightDirection.add( positionViewDirection ).normalize();
 
 	const dotNL = normalView.dot( lightDirection ).clamp();
-	const dotNV = normalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
+	const dotNV = normalView.dot( positionViewDirection ).clamp(); // @TODO: Move to core dotNV (maybe along with other dotSomethings?)
 	const dotNH = normalView.dot( halfDir ).clamp();
 	const dotVH = positionViewDirection.dot( halfDir ).clamp();
 
@@ -33,7 +33,7 @@ const BRDF_GGX = tslFn( ( inputs ) => {
 	const V = V_GGX_SmithCorrelated( { alpha, dotNL, dotNV } );
 	const D = D_GGX( { alpha, dotNH } );
 
-	return F.mul( V ).mul( D );
+	return F.mul( V, D );
 
 } ); // validated
 

@@ -58,9 +58,7 @@ class ComputeNode extends Node {
 
 	generate( builder ) {
 
-		const { shaderStage } = builder;
-
-		if ( shaderStage === 'compute' ) {
+		if ( builder.getShaderStage() === 'compute' ) {
 
 			const snippet = this.computeNode.build( builder, 'void' );
 

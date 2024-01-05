@@ -1,53 +1,60 @@
 import TempNode from '../core/TempNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { add, mul, div } from '../math/OperatorNode.js';
-import { floor, ceil, fract, pow } from '../math/MathNode.js';
-import { nodeProxy, addNodeElement, float, vec2, vec4, int } from '../shadernode/ShaderNode.js';
+import { nodeProxy, addNodeElement, float, vec2 } from '../shadernode/ShaderNode.js';
 
 // Mipped Bicubic Texture Filtering by N8
 // https://www.shadertoy.com/view/Dl2SDW
 
 const bC = 1.0 / 6.0;
 
-const w0 = ( a ) => mul( bC, mul( a, mul( a, a.negate().add( 3.0 ) ).sub( 3.0 ) ).add( 1.0 ) );
+const w0 = ( a ) => a.negate().add( 3.0 ).mul( a ).sub( 3.0 ).mul( a ).add( 1.0 ).mul( bC );
 
-const w1 = ( a ) => mul( bC, mul( a, mul( a, mul( 3.0, a ).sub( 6.0 ) ) ).add( 4.0 ) );
+const w1 = ( a ) => a.mul( 3.0 ).sub( 6.0 ).mul( a ).mul( a ).add( 4.0 ).mul( bC );
 
-const w2 = ( a ) => mul( bC, mul( a, mul( a, mul( - 3.0, a ).add( 3.0 ) ).add( 3.0 ) ).add( 1.0 ) );
+const w2 = ( a ) => a.mul( - 3.0 ).add( 3.0 ).mul( a ).add( 3.0 ).mul( a ).add( 1.0 ).mul( bC );
 
-const w3 = ( a ) => mul( bC, pow( a, 3 ) );
+const w3 = ( a ) => a.mul( a ).mul( a ).mul( bC );
 
 const g0 = ( a ) => w0( a ).add( w1( a ) );
 
 const g1 = ( a ) => w2( a ).add( w3( a ) );
 
 // h0 and h1 are the two offset functions
-const h0 = ( a ) => add( - 1.0, w1( a ).div( w0( a ).add( w1( a ) ) ) );
+const h0 = ( a ) => {
+	const zero = w0( a );
+	return zero.negate().div( zero.add( w1( a ) ) );
+};
 
-const h1 = ( a ) => add( 1.0, w3( a ).div( w2( a ).add( w3( a ) ) ) );
+const h1 = ( a ) => {
+	const three = w3( a );
+	return three.div( three.add( w2( a ) ) ).add( 1.0 );
+};
 
 const bicubic = ( textureNode, texelSize, lod ) => {
 
 	const uv = textureNode.uvNode;
-	const uvScaled = mul( uv, texelSize.zw ).add( 0.5 );
+	const uvScaled = uv.mul( texelSize ).add( 0.5 );
 
-	const iuv = floor( uvScaled );
-	const fuv = fract( uvScaled );
+	const iuv = uvScaled.floor();
+	const fuv = uvScaled.fract();
 
-	const g0x = g0( fuv.x );
-	const g1x = g1( fuv.x );
 	const h0x = h0( fuv.x );
 	const h1x = h1( fuv.x );
 	const h0y = h0( fuv.y );
 	const h1y = h1( fuv.y );
 
-	const p0 = vec2( iuv.x.add( h0x ), iuv.y.add( h0y ) ).sub( 0.5 ).mul( texelSize.xy );
-	const p1 = vec2( iuv.x.add( h1x ), iuv.y.add( h0y ) ).sub( 0.5 ).mul( texelSize.xy );
-	const p2 = vec2( iuv.x.add( h0x ), iuv.y.add( h1y ) ).sub( 0.5 ).mul( texelSize.xy );
-	const p3 = vec2( iuv.x.add( h1x ), iuv.y.add( h1y ) ).sub( 0.5 ).mul( texelSize.xy );
+	const rec = texelSize.vec2().reciprocal();
 
-	const a = g0( fuv.y ).mul( add( g0x.mul( textureNode.uv( p0 ).level( lod ) ), g1x.mul( textureNode.uv( p1 ).level( lod ) ) ) );
-	const b = g1( fuv.y ).mul( add( g0x.mul( textureNode.uv( p2 ).level( lod ) ), g1x.mul( textureNode.uv( p3 ).level( lod ) ) ) );
+	const p0 = iuv.add( vec2( h0x, h0y ) ).sub( 0.5 ).mul( rec );
+	const p1 = iuv.add( vec2( h1x, h0y ) ).sub( 0.5 ).mul( rec );
+	const p2 = iuv.add( vec2( h0x, h1y ) ).sub( 0.5 ).mul( rec );
+	const p3 = iuv.add( vec2( h1x, h1y ) ).sub( 0.5 ).mul( rec );
+
+	const g0x = g0( fuv.x );
+	const g1x = g1( fuv.x );
+
+	const a = g0( fuv.y ).mul( g0x.mul( textureNode.uv( p0 ).level( lod ) ).add( g1x.mul( textureNode.uv( p1 ).level( lod ) ) ) );
+	const b = g1( fuv.y ).mul( g0x.mul( textureNode.uv( p2 ).level( lod ) ).add( g1x.mul( textureNode.uv( p3 ).level( lod ) ) ) );
 
 	return a.add( b );
 
@@ -55,14 +62,13 @@ const bicubic = ( textureNode, texelSize, lod ) => {
 
 const textureBicubicMethod = ( textureNode, lodNode ) => {
 
-	const fLodSize = vec2( textureNode.size( int( lodNode ) ) );
-	const cLodSize = vec2( textureNode.size( int( lodNode.add( 1.0 ) ) ) );
-	const fLodSizeInv = div( 1.0, fLodSize );
-	const cLodSizeInv = div( 1.0, cLodSize );
-	const fSample = bicubic( textureNode, vec4( fLodSizeInv, fLodSize ), floor( lodNode ) );
-	const cSample = bicubic( textureNode, vec4( cLodSizeInv, cLodSize ), ceil( lodNode ) );
+	const fLodSize = textureNode.size( lodNode );
+	const cLodSize = textureNode.size( lodNode.add( 1 ) );
 
-	return fract( lodNode ).mix( fSample, cSample );
+	const fSample = bicubic( textureNode, fLodSize, lodNode.floor() );
+	const cSample = bicubic( textureNode, cLodSize, lodNode.ceil() );
+
+	return lodNode.fract().mix( fSample, cSample );
 
 };
 

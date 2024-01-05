@@ -1,8 +1,8 @@
-import Node from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
-class TextureSizeNode extends Node {
+class TextureSizeNode extends TempNode {
 
 	constructor( textureNode, levelNode = null ) {
 
@@ -17,10 +17,10 @@ class TextureSizeNode extends Node {
 
 	generate( builder, output ) {
 
-		const textureProperty = this.textureNode.build( builder, 'property' );
+		const textureProperty = this.textureNode.texture.build( builder );
 		const levelNode = this.levelNode.build( builder, 'int' );
 
-		return builder.format( `${builder.getMethod( 'textureDimensions' )}( ${textureProperty}, ${levelNode} )`, this.getNodeType( builder ), output );
+		return builder.format( builder.formatOperation( '()', builder.getMethod( 'textureDimensions' ), [ textureProperty, levelNode ] ), this.getNodeType( builder ), output );
 
 	}
 

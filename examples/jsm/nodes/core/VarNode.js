@@ -12,12 +12,6 @@ class VarNode extends Node {
 
 	}
 
-	isGlobal() {
-
-		return true;
-
-	}
-
 	getHash( builder ) {
 
 		return this.name || super.getHash( builder );
@@ -40,7 +34,7 @@ class VarNode extends Node {
 
 		const snippet = node.build( builder, nodeVar.type );
 
-		builder.addLineFlowCode( `${propertyName} = ${snippet}` );
+		builder.addLineFlowCode( builder.formatOperation( '=', propertyName, snippet ) );
 
 		return propertyName;
 

@@ -61,7 +61,7 @@ const ACESFilmicToneMappingNode = tslFn( ( { color, exposure } ) => {
 		- 0.00327, - 0.07276, 1.07602
 	);
 
-	color = color.mul( exposure ).div( 0.6 );
+	color = color.mul( exposure, 1 / 0.6 );
 
 	color = ACESInputMat.mul( color );
 
@@ -97,10 +97,7 @@ class ToneMappingNode extends TempNode {
 
 	getCacheKey() {
 
-		let cacheKey = super.getCacheKey();
-		cacheKey = '{toneMapping:' + this.toneMapping + ',nodes:' + cacheKey + '}';
-
-		return cacheKey;
+		return '{toneMapping:' + this.toneMapping + ',nodes:' + super.getCacheKey() + '}';
 
 	}
 

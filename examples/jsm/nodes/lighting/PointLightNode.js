@@ -1,4 +1,5 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
+import { lightTargetDirection } from './LightNode.js';
 import { addLightNode } from './LightsNode.js';
 import { getDistanceAttenuation } from './LightUtils.js';
 import { uniform } from '../core/UniformNode.js';
@@ -32,26 +33,34 @@ class PointLightNode extends AnalyticLightNode {
 
 	setup( builder ) {
 
+		super.setup( builder );
+
 		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
 
-		const lightingModel = builder.context.lightingModel;
+		const lVector = objectViewPosition( light ).sub( positionView.xyz ); // @TODO: Add it into LightNode
 
-		const lVector = objectViewPosition( light ).sub( positionView ); // @TODO: Add it into LightNode
-
-		const lightDirection = lVector.normalize();
 		const lightDistance = lVector.length();
+		const lightDirection = lVector.div( lightDistance );
+
+		let lightColor = colorNode;
+
+		if ( this.getSpotAttenuation ) {
+
+			const angleCos = lightDirection.dot( lightTargetDirection( light ) );
+			const spotAttenuation = this.getSpotAttenuation( angleCos );
+			lightColor = lightColor.mul( spotAttenuation );
+
+		}
 
 		const lightAttenuation = getDistanceAttenuation( {
 			lightDistance,
 			cutoffDistance: cutoffDistanceNode,
 			decayExponent: decayExponentNode
 		} );
-
-		const lightColor = colorNode.mul( lightAttenuation );
+		lightColor = lightColor.mul( lightAttenuation );
 
 		const reflectedLight = builder.context.reflectedLight;
-
-		lightingModel.direct( {
+		builder.context.lightingModel.direct( {
 			lightDirection,
 			lightColor,
 			reflectedLight

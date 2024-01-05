@@ -1,11 +1,11 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { add } from '../math/OperatorNode.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { normalWorld } from '../accessors/NormalNode.js';
 import { positionWorld } from '../accessors/PositionNode.js';
 import { texture } from '../accessors/TextureNode.js';
-import { addNodeElement, nodeProxy, float, vec3 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, nodeProxy, float } from '../shadernode/ShaderNode.js';
 
-class TriplanarTexturesNode extends Node {
+class TriplanarTexturesNode extends TempNode {
 
 	constructor( textureXNode, textureYNode = null, textureZNode = null, scaleNode = float( 1 ), positionNode = positionWorld, normalNode = normalWorld ) {
 
@@ -30,7 +30,7 @@ class TriplanarTexturesNode extends Node {
 
 		// Blending factor of triplanar mapping
 		let bf = normalNode.abs().normalize();
-		bf = bf.div( bf.dot( vec3( 1.0 ) ) );
+		bf = bf.div( bf.x.add( bf.y, bf.z ) );
 
 		// Triplanar mapping
 		const tx = positionNode.yz.mul( scaleNode );
@@ -46,7 +46,7 @@ class TriplanarTexturesNode extends Node {
 		const cy = texture( textureY, ty ).mul( bf.y );
 		const cz = texture( textureZ, tz ).mul( bf.z );
 
-		return add( cx, cy, cz );
+		return cx.add( cy, cz );
 
 	}
 

@@ -1,11 +1,12 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import UniformNode from '../core/UniformNode.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
 
 import { Vector3 } from 'three';
 
-class Object3DNode extends Node {
+class Object3DNode extends TempNode {
 
 	constructor( scope = Object3DNode.VIEW_MATRIX, object3d = null ) {
 
@@ -89,7 +90,7 @@ class Object3DNode extends Node {
 
 	}
 
-	generate( builder ) {
+	setup() {
 
 		const scope = this.scope;
 
@@ -107,7 +108,7 @@ class Object3DNode extends Node {
 
 		}
 
-		return this._uniformNode.build( builder );
+		return this._uniformNode;
 
 	}
 

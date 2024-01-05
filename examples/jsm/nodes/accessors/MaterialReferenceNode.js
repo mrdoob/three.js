@@ -27,7 +27,7 @@ class MaterialReferenceNode extends ReferenceNode {
 
 		const material = this.material !== null ? this.material : builder.material;
 
-		this.node.value = material[ this.property ];
+		if ( material[ this.property ] !== undefined && material[ this.property ] !== null ) this.node.value = material[ this.property ];
 
 		return super.setup( builder );
 

@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, uniform, storage, attribute, float, vec2, vec3, color, instanceIndex, PointsNodeMaterial } from 'three/nodes';
+			import { tslFn, If, uniform, storage, attribute, float, vec2, color, instanceIndex, PointsNodeMaterial } from 'three/nodes';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -80,17 +80,17 @@
 					const pointer = uniform( pointerVector );
 					const limit = uniform( scaleVector );
 
-					const position = particle.add( velocity ).temp();
+					const position = particle.add( velocity );
 
-					velocity.x = position.x.abs().greaterThanEqual( limit.x ).cond( velocity.x.negate(), velocity.x );
-					velocity.y = position.y.abs().greaterThanEqual( limit.y ).cond( velocity.y.negate(), velocity.y );
+					If( position.x.abs().greaterThanEqual( limit.x ), () => velocity.x.negateAssign() );
+					If( position.y.abs().greaterThanEqual( limit.y ), () => velocity.y.negateAssign() );
 
-					position.assign( position.min( limit ).max( limit.negate() ) );
+					position.clampAssign( limit.negate(), limit );
 
 					const pointerSize = 0.1;
 					const distanceFromPointer = pointer.sub( position ).length();
 
-					particle.assign( distanceFromPointer.lessThanEqual( pointerSize ).cond( vec3(), position ) );
+					If( distanceFromPointer.lessThanEqual( pointerSize ), () => particle.assign( 0 ), () => particle.assign( position ) );
 
 				} );
 
@@ -104,14 +104,11 @@
 						const particleIndex = float( instanceIndex );
 
 						const randomAngle = particleIndex.mul( .005 ).mul( Math.PI * 2 );
-						const randomSpeed = particleIndex.mul( 0.00000001 ).add( 0.0000001 );
-
-						const velX = randomAngle.sin().mul( randomSpeed );
-						const velY = randomAngle.cos().mul( randomSpeed );
+						const randomSpeed = particleIndex.add( 10 ).mul( 0.00000001 );
 
 						const velocity = velocityBufferNode.element( instanceIndex );
 
-						velocity.xy = vec2( velX, velY );
+						velocity.assign( vec2( randomAngle.sin(), randomAngle.cos() ).mul( randomSpeed ) );
 
 					} );
 

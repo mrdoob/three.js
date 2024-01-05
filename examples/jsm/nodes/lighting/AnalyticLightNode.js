@@ -7,9 +7,9 @@ import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { positionWorld } from '../accessors/PositionNode.js';
 import { normalWorld } from '../accessors/NormalNode.js';
-//import { add } from '../math/OperatorNode.js';
+import MeshBasicNodeMaterial from '../materials/MeshBasicNodeMaterial.js';
 
-import { Color, DepthTexture, NearestFilter, LessCompare } from 'three';
+import { RenderTarget, Color, DepthTexture, NearestFilter, LessCompare } from 'three';
 
 let depthMaterial = null;
 
@@ -39,14 +39,10 @@ class AnalyticLightNode extends LightingNode {
 
 	setupShadow( builder ) {
 
-		let shadowNode = this.shadowNode;
-
-		if ( shadowNode === null ) {
-
-			if ( depthMaterial === null ) depthMaterial = builder.createNodeMaterial( 'MeshBasicNodeMaterial' );
+		if ( this.shadowNode === null ) {
 
 			const shadow = this.light.shadow;
-			const rtt = builder.getRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
+			const rtt = new RenderTarget( shadow.mapSize.width, shadow.mapSize.height );
 
 			const depthTexture = new DepthTexture();
 			depthTexture.minFilter = NearestFilter;
@@ -84,25 +80,23 @@ class AnalyticLightNode extends LightingNode {
 
 			// BasicShadowMap
 
-			shadowNode = textureCompare( depthTexture, shadowCoord.xy, shadowCoord.z );
+			const shadowNode = textureCompare( depthTexture, shadowCoord.xy, shadowCoord.z );
 
 			// PCFShadowMap
 			/*
 			const mapSize = reference( 'mapSize', 'vec2', shadow );
 			const radius = reference( 'radius', 'float', shadow );
 
-			const texelSize = vec2( 1 ).div( mapSize );
-			const dx0 = texelSize.x.negate().mul( radius );
-			const dy0 = texelSize.y.negate().mul( radius );
-			const dx1 = texelSize.x.mul( radius );
-			const dy1 = texelSize.y.mul( radius );
-			const dx2 = dx0.mul( 2 );
-			const dy2 = dy0.mul( 2 );
+			const dx1 = radius.div( mapSize.x );
+			const dy1 = radius.div( mapSize.y );
+			const dx0 = dx1.negate();
+			const dy0 = dy1.negate();
 			const dx3 = dx1.mul( 2 );
 			const dy3 = dy1.mul( 2 );
+			const dx2 = dx3.negate();
+			const dy2 = dy3.negate();
 
-			shadowNode = add(
-				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx0, dy0 ) ), shadowCoord.z ),
+			shadowNode = textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx0, dy0 ) ), shadowCoord.z ).add(
 				textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy0 ) ), shadowCoord.z ),
 				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx1, dy0 ) ), shadowCoord.z ),
 				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx2, dy2 ) ), shadowCoord.z ),
@@ -124,7 +118,7 @@ class AnalyticLightNode extends LightingNode {
 			//
 
 			this.rtt = rtt;
-			this.colorNode = this.colorNode.mul( frustumTest.mix( 1, shadowNode ) );
+			this.colorNode = frustumTest.mix( this.colorNode, this.colorNode.mul( shadowNode ) ); // @TODO: change to .cond() after making TempNodes work with non-uniform control flows
 
 			this.shadowNode = shadowNode;
 
@@ -138,6 +132,8 @@ class AnalyticLightNode extends LightingNode {
 
 	setup( builder ) {
 
+		super.setup( builder );
+
 		if ( this.light.castShadow ) this.setupShadow( builder );
 
 	}
@@ -147,7 +143,7 @@ class AnalyticLightNode extends LightingNode {
 		const { rtt, light } = this;
 		const { renderer, scene } = frame;
 
-		scene.overrideMaterial = depthMaterial;
+		scene.overrideMaterial = depthMaterial || ( depthMaterial = new MeshBasicNodeMaterial() );
 
 		rtt.setSize( light.shadow.mapSize.width, light.shadow.mapSize.height );
 

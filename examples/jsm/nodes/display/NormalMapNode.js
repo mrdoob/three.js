@@ -1,5 +1,4 @@
 import TempNode from '../core/TempNode.js';
-import { add } from '../math/OperatorNode.js';
 import { bitangentView } from '../accessors/BitangentNode.js';
 import { modelNormalMatrix } from '../accessors/ModelNode.js';
 import { normalView } from '../accessors/NormalNode.js';
@@ -35,7 +34,7 @@ const perturbNormal2Arb = tslFn( ( inputs ) => {
 	const det = T.dot( T ).max( B.dot( B ) );
 	const scale = faceDirection.mul( det.inverseSqrt() );
 
-	return add( T.mul( mapN.x, scale ), B.mul( mapN.y, scale ), N.mul( mapN.z ) ).normalize();
+	return T.mul( mapN.x ).add( B.mul( mapN.y ) ).mul( scale ).add( N.mul( mapN.z ) ).normalize();
 
 } );
 
@@ -81,7 +80,7 @@ class NormalMapNode extends TempNode {
 			} else {
 
 				outputNode = perturbNormal2Arb( {
-					eye_pos: positionView,
+					eye_pos: positionView.xyz,
 					surf_norm: normalView,
 					mapN: normalMap,
 					uv: uv()

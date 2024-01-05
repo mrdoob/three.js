@@ -35,7 +35,7 @@
 
 			class CustomLightingModel extends LightingModel {
 
-				direct( { lightColor, reflectedLight }, stack ) {
+				direct( { lightColor, reflectedLight } ) {
 
 					reflectedLight.directDiffuse.addAssign( lightColor );
 

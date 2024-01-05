@@ -1,4 +1,5 @@
 import Node, { addNodeClass } from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
@@ -9,7 +10,7 @@ import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 
 //
 
-let currentStack = null;
+let currentBuilder = null;
 
 const NodeElements = new Map(); // @TODO: Currently only a few nodes are added, probably also add others
 
@@ -40,7 +41,7 @@ const shaderNodeHandler = {
 
 			if ( node.isStackNode !== true && prop === 'assign' ) {
 
-				return ( ...params ) => currentStack.assign( nodeObj, ...params );
+				return ( ...params ) => currentBuilder.stack.assign( nodeObj, ...params );
 
 			} else if ( NodeElements.has( prop ) ) {
 
@@ -226,7 +227,7 @@ const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
 };
 
-class ShaderCallNodeInternal extends Node {
+class ShaderCallNodeInternal extends TempNode { // @TODO: not sure if this class can extend TempNode... Maybe use the FunctionCallNode somehow *directly* (i.e. so its .build() is called, which is TempNode's) instead of this class in case of ShaderNode with layout
 
 	constructor( shaderNode, inputNodes ) {
 
@@ -284,11 +285,17 @@ class ShaderCallNodeInternal extends Node {
 
 	setup( builder ) {
 
-		builder.addStack();
+		const node = this.call( builder );
 
-		builder.stack.outputNode = this.call( builder );
+		if ( builder.stack.nodes.length > 0 ) {
 
-		return builder.removeStack();
+			builder.stack.outputNode = node;
+
+		} else {
+
+			return node;
+
+		}
 
 	}
 
@@ -479,11 +486,10 @@ addNodeClass( 'ShaderNode', ShaderNode );
 
 //
 
-export const setCurrentStack = stack => currentStack = stack;
-export const getCurrentStack = () => currentStack;
+export const setCurrentBuilder = builder => currentBuilder = builder;
 
-export const If = ( ...params ) => currentStack.if( ...params );
-export const append = ( ...params ) => currentStack.add( ...params );
+export const If = ( ...params ) => currentBuilder.stack.if( ...params );
+export const append = ( ...params ) => currentBuilder.stack.add( ...params );
 
 addNodeElement( 'append', append );
 

@@ -1,14 +1,20 @@
-import Node, { addNodeClass } from './Node.js';
-import { varying } from './VaryingNode.js';
+import TempNode from './TempNode.js';
+import { addNodeClass } from './Node.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 
-class AttributeNode extends Node {
+class AttributeNode extends TempNode {
 
 	constructor( attributeName, nodeType = null ) {
 
 		super( nodeType );
 
 		this._attributeName = attributeName;
+
+	}
+
+	isGlobal() {
+
+		return true;
 
 	}
 
@@ -20,7 +26,7 @@ class AttributeNode extends Node {
 
 	getNodeType( builder ) {
 
-		let nodeType = super.getNodeType( builder );
+		let nodeType = this.nodeType;
 
 		if ( nodeType === null ) {
 
@@ -58,6 +64,16 @@ class AttributeNode extends Node {
 
 	}
 
+	setup( builder ) {
+
+		if ( builder.hasGeometryAttribute( this.getAttributeName( builder ) ) && builder.getShaderStage() !== 'vertex' ) {
+
+			return this.varying();
+
+		}
+
+	}
+
 	generate( builder ) {
 
 		const attributeName = this.getAttributeName( builder );
@@ -71,15 +87,13 @@ class AttributeNode extends Node {
 
 			const nodeAttribute = builder.getAttribute( attributeName, attributeType );
 
-			if ( builder.shaderStage === 'vertex' ) {
+			if ( builder.getShaderStage() === 'vertex' ) {
 
 				return builder.format( nodeAttribute.name, attributeType, nodeType );
 
 			} else {
 
-				const nodeVarying = varying( this );
-
-				return nodeVarying.build( builder, nodeType );
+				return super.generate( builder );
 
 			}
 

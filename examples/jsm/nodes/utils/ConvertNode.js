@@ -1,6 +1,7 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 
-class ConvertNode extends Node {
+class ConvertNode extends TempNode {
 
 	constructor( node, convertTo ) {
 
@@ -31,6 +32,17 @@ class ConvertNode extends Node {
 
 	}
 
+	generate( builder, output ) {
+
+		const node = this.node;
+		const type = this.getNodeType( builder );
+
+		const snippet = node.build( builder, type );
+
+		return builder.format( snippet, type, output );
+
+	}
+
 	serialize( data ) {
 
 		super.serialize( data );
@@ -44,17 +56,6 @@ class ConvertNode extends Node {
 		super.deserialize( data );
 
 		this.convertTo = data.convertTo;
-
-	}
-
-	generate( builder, output ) {
-
-		const node = this.node;
-		const type = this.getNodeType( builder );
-
-		const snippet = node.build( builder, type );
-
-		return builder.format( snippet, type, output );
 
 	}
 

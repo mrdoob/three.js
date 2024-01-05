@@ -1,37 +1,34 @@
 import TempNode from '../core/TempNode.js';
-import { mix } from '../math/MathNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, tslFn, nodeObject, nodeProxy, vec4 } from '../shadernode/ShaderNode.js';
 
 import { LinearSRGBColorSpace, SRGBColorSpace } from 'three';
 
-const sRGBToLinearShader = tslFn( ( inputs ) => {
+const sRGBToLinearShader = tslFn( ( { value } ) => {
 
-	const { value } = inputs;
 	const { rgb } = value;
 
 	const a = rgb.mul( 0.9478672986 ).add( 0.0521327014 ).pow( 2.4 );
 	const b = rgb.mul( 0.0773993808 );
 	const factor = rgb.lessThanEqual( 0.04045 );
 
-	const rgbResult = mix( a, b, factor );
+	value.rgb = factor.mix( a, b );
 
-	return vec4( rgbResult, value.a );
+	return value;
 
 } );
 
-const LinearTosRGBShader = tslFn( ( inputs ) => {
+const LinearTosRGBShader = tslFn( ( { value } ) => {
 
-	const { value } = inputs;
 	const { rgb } = value;
 
 	const a = rgb.pow( 0.41666 ).mul( 1.055 ).sub( 0.055 );
 	const b = rgb.mul( 12.92 );
 	const factor = rgb.lessThanEqual( 0.0031308 );
 
-	const rgbResult = mix( a, b, factor );
+	value.rgb = factor.mix( a, b );
 
-	return vec4( rgbResult, value.a );
+	return value;
 
 } );
 
@@ -74,8 +71,7 @@ class ColorSpaceNode extends TempNode {
 
 		const { method, node } = this;
 
-		if ( method === ColorSpaceNode.LINEAR_TO_LINEAR )
-			return node;
+		if ( method === ColorSpaceNode.LINEAR_TO_LINEAR ) return node;
 
 		return Methods[ method ]( { value: node } );
 

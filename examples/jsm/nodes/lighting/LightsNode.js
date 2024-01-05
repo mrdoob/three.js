@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { nodeObject, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
 
@@ -46,7 +46,7 @@ class LightsNode extends Node {
 
 			context.outgoingLight = outgoingLightNode;
 
-			const stack = builder.addStack();
+			const stack = builder.stack;
 
 			//
 
@@ -56,7 +56,8 @@ class LightsNode extends Node {
 
 			for ( const lightNode of lightNodes ) {
 
-				lightNode.build( builder );
+				const result = lightNode.build( builder );
+				if ( result !== null ) stack.add( result );
 	
 			}
 
@@ -90,7 +91,7 @@ class LightsNode extends Node {
 
 			//
 
-			outgoingLightNode = outgoingLightNode.bypass( builder.removeStack() );
+			outgoingLightNode = outgoingLightNode.bypass( stack );
 
 		}
 
@@ -102,7 +103,7 @@ class LightsNode extends Node {
 
 		if ( this._hash === null ) {
 
-			let hash = '';
+			let hash = 'lights: ';
 
 			const lightNodes = this.lightNodes;
 
@@ -112,7 +113,7 @@ class LightsNode extends Node {
 
 			}
 
-			this._hash = hash;
+			this._hash = hash.slice( 0, - 1 );
 
 		}
 
@@ -184,3 +185,5 @@ export function addLightNode( lightClass, lightNodeClass ) {
 	LightNodes.set( lightClass, lightNodeClass );
 
 }
+
+addNodeClass( 'LightsNode', LightsNode );

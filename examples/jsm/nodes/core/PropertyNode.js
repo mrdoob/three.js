@@ -40,6 +40,13 @@ export default PropertyNode;
 
 export const property = ( type, name ) => nodeObject( new PropertyNode( type, name ) );
 
+export const vertexPosition = nodeImmutable( PropertyNode, 'vec4', 'Vertex' );
+export const output = nodeImmutable( PropertyNode, 'vec4', 'Output' );
+
+export const position = nodeImmutable( PropertyNode, 'vec3', 'Position' );
+export const normal = nodeImmutable( PropertyNode, 'vec3', 'Normal' );
+export const tangent = nodeImmutable( PropertyNode, 'vec3', 'Tangent' );
+
 export const diffuseColor = nodeImmutable( PropertyNode, 'vec4', 'DiffuseColor' );
 export const roughness = nodeImmutable( PropertyNode, 'float', 'Roughness' );
 export const metalness = nodeImmutable( PropertyNode, 'float', 'Metalness' );
@@ -52,7 +59,6 @@ export const iridescenceIOR = nodeImmutable( PropertyNode, 'float', 'Iridescence
 export const iridescenceThickness = nodeImmutable( PropertyNode, 'float', 'IridescenceThickness' );
 export const specularColor = nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
 export const shininess = nodeImmutable( PropertyNode, 'float', 'Shininess' );
-export const output = nodeImmutable( PropertyNode, 'vec4', 'Output' );
 export const dashSize = nodeImmutable( PropertyNode, 'float', 'dashSize' );
 export const gapSize = nodeImmutable( PropertyNode, 'float', 'gapSize' );
 export const pointWidth = nodeImmutable( PropertyNode, 'float', 'pointWidth' );

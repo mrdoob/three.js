@@ -1,9 +1,10 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
 import { cameraViewMatrix } from '../accessors/CameraNode.js';
 
-class LightNode extends Node {
+class LightNode extends TempNode {
 
 	constructor( scope = LightNode.TARGET_DIRECTION, light = null ) {
 

@@ -1,17 +1,16 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { attribute } from '../core/AttributeNode.js';
-import { temp } from '../core/VarNode.js';
-import { varying } from '../core/VaryingNode.js';
-import { normalize } from '../math/MathNode.js';
+import { tangent } from '../core/PropertyNode.js';
 import { cameraViewMatrix } from './CameraNode.js';
 import { modelViewMatrix } from './ModelNode.js';
 import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
-class TangentNode extends Node {
+class TangentNode extends TempNode {
 
 	constructor( scope = TangentNode.LOCAL ) {
 
-		super();
+		super( scope === TangentNode.GEOMETRY ? 'vec4' : 'vec3' );
 
 		this.scope = scope;
 
@@ -23,22 +22,7 @@ class TangentNode extends Node {
 
 	}
 
-	getNodeType() {
-
-		const scope = this.scope;
-
-		if ( scope === TangentNode.GEOMETRY ) {
-
-			return 'vec4';
-
-		}
-
-		return 'vec3';
-
-	}
-
-
-	generate( builder ) {
+	setup( /*builder*/ ) {
 
 		const scope = this.scope;
 
@@ -50,21 +34,27 @@ class TangentNode extends Node {
 
 		} else if ( scope === TangentNode.LOCAL ) {
 
-			outputNode = varying( tangentGeometry.xyz );
+			outputNode = tangent.varying();
 
 		} else if ( scope === TangentNode.VIEW ) {
 
-			const vertexNode = modelViewMatrix.mul( tangentLocal ).xyz;
-			outputNode = normalize( varying( vertexNode ) );
+			outputNode = modelViewMatrix.transformDirection( tangent ).varying().normalize();
 
 		} else if ( scope === TangentNode.WORLD ) {
 
-			const vertexNode = tangentView.transformDirection( cameraViewMatrix );
-			outputNode = normalize( varying( vertexNode ) );
+			outputNode = tangentView.transformDirection( cameraViewMatrix ).varying().normalize();
+
+		} else if ( scope === TangentNode.TRANSFORMED_VIEW ) {
+
+			outputNode = transformedTangentView;
+
+		} else if ( scope === TangentNode.TRANSFORMED_WORLD ) {
+
+			outputNode = transformedTangentView.transformDirection( cameraViewMatrix ).normalize();
 
 		}
 
-		return outputNode.build( builder, this.getNodeType( builder ) );
+		return outputNode;
 
 	}
 
@@ -90,6 +80,8 @@ TangentNode.GEOMETRY = 'geometry';
 TangentNode.LOCAL = 'local';
 TangentNode.VIEW = 'view';
 TangentNode.WORLD = 'world';
+TangentNode.TRANSFORMED_VIEW = 'transformedView';
+TangentNode.TRANSFORMED_WORLD = 'transformedWorld';
 
 export default TangentNode;
 
@@ -97,7 +89,7 @@ export const tangentGeometry = nodeImmutable( TangentNode, TangentNode.GEOMETRY 
 export const tangentLocal = nodeImmutable( TangentNode, TangentNode.LOCAL );
 export const tangentView = nodeImmutable( TangentNode, TangentNode.VIEW );
 export const tangentWorld = nodeImmutable( TangentNode, TangentNode.WORLD );
-export const transformedTangentView = temp( tangentView, 'TransformedTangentView' );
-export const transformedTangentWorld = normalize( transformedTangentView.transformDirection( cameraViewMatrix ) );
+export const transformedTangentView = tangentView.label( 'TransformedTangentView' );
+export const transformedTangentWorld = nodeImmutable( TangentNode, TangentNode.TRANSFORMED_WORLD );
 
 addNodeClass( 'TangentNode', TangentNode );

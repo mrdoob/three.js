@@ -6,7 +6,7 @@ export function getCacheKey( object ) {
 
 	if ( object.isNode === true ) {
 
-		cacheKey += `uuid:"${ object.uuid }"`;
+		cacheKey += `hash:"${ object.getHash() }"`;
 
 	}
 

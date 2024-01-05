@@ -1,5 +1,5 @@
-import { addNodeClass } from '../core/Node.js';
-import TempNode from '../core/TempNode.js';
+import TempNode from './TempNode.js';
+import { addNodeClass } from './Node.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class AssignNode extends TempNode {
@@ -25,17 +25,50 @@ class AssignNode extends TempNode {
 
 	}
 
+	setup( builder ) {
+
+		super.setup( builder );
+
+		const targetNode = this.targetNode;
+		const sourceNode = this.sourceNode;
+
+		// WGSL bug workaround
+		// @TODO: remove this when https://github.com/gpuweb/gpuweb/issues/737 will be fixed
+
+		if ( builder.isWGSLNodeBuilder === true && targetNode.isSplitNode === true && targetNode.components.length > 1 ) {
+
+			for ( const c of targetNode.components ) {
+
+				targetNode.node[ c ] = sourceNode[ c ];
+
+			}
+
+		}
+
+	}
+
 	generate( builder, output ) {
 
 		const targetNode = this.targetNode;
 		const sourceNode = this.sourceNode;
 
+		// WGSL bug workaround
+		// @TODO: remove this when https://github.com/gpuweb/gpuweb/issues/737 will be fixed
+
+		if ( builder.isWGSLNodeBuilder === true && targetNode.isSplitNode === true && targetNode.components.length > 1 ) {
+
+			super.generate( builder, 'void' );
+
+			return;
+
+		}
+
 		const targetType = targetNode.getNodeType( builder );
 
-		const target = targetNode.build( builder );
+		const target = targetNode.build( builder, output === 'void' ? 'void' : null );
 		const source = sourceNode.build( builder, targetType );
 
-		const snippet = `${ target } = ${ source }`;
+		const snippet = builder.formatOperation( '=', target, source );
 
 		if ( output === 'void' ) {
 

@@ -1,6 +1,5 @@
 import Object3DNode from './Object3DNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { label } from '../core/ContextNode.js';
 import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
 class CameraNode extends Object3DNode {
@@ -61,7 +60,7 @@ class CameraNode extends Object3DNode {
 
 	}
 
-	generate( builder ) {
+	setup() {
 
 		const scope = this.scope;
 
@@ -75,7 +74,7 @@ class CameraNode extends Object3DNode {
 
 		}
 
-		return super.generate( builder );
+		return super.setup();
 
 	}
 
@@ -87,7 +86,7 @@ CameraNode.FAR = 'far';
 
 export default CameraNode;
 
-export const cameraProjectionMatrix = label( nodeImmutable( CameraNode, CameraNode.PROJECTION_MATRIX ), 'projectionMatrix' );
+export const cameraProjectionMatrix = nodeImmutable( CameraNode, CameraNode.PROJECTION_MATRIX ).label( 'projectionMatrix' );
 export const cameraNear = nodeImmutable( CameraNode, CameraNode.NEAR );
 export const cameraFar = nodeImmutable( CameraNode, CameraNode.FAR );
 export const cameraViewMatrix = nodeImmutable( CameraNode, CameraNode.VIEW_MATRIX );

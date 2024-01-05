@@ -1,8 +1,9 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { timerLocal } from './TimerNode.js';
 import { nodeObject, nodeProxy } from '../shadernode/ShaderNode.js';
 
-class OscNode extends Node {
+class OscNode extends TempNode {
 
 	constructor( method = OscNode.SINE, timeNode = timerLocal() ) {
 

@@ -1,7 +1,9 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { mix } from '../math/MathNode.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
-class FogNode extends Node {
+class FogNode extends TempNode {
 
 	constructor( colorNode, factorNode ) {
 
@@ -14,14 +16,15 @@ class FogNode extends Node {
 
 	}
 
-	mixAssign( outputNode ) {
+	mix( outputNode ) {
 
-		return this.mix( outputNode, this.colorNode );
+		return mix( outputNode, this.colorNode, this );
 
 	}
 
-	setup() {
+	setup( builder ) {
 
+		super.setup( builder );
 		return this.factorNode;
 
 	}

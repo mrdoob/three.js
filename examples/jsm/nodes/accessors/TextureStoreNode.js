@@ -4,13 +4,13 @@ import { nodeProxy } from '../shadernode/ShaderNode.js';
 
 class TextureStoreNode extends TextureNode {
 
-	constructor( value, uvNode, storeNode = null ) {
+	constructor( value, uvNode/*, storeNode = null*/ ) {
 
 		super( value, uvNode );
 
-		this.storeNode = storeNode;
+		//this.storeNode = storeNode;
 
-		this.isStoreTextureNode = true;
+		this.texture.isStoreTextureNode = true;
 
 	}
 

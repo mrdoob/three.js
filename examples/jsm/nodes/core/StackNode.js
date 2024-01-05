@@ -1,8 +1,6 @@
 import Node, { addNodeClass } from './Node.js';
-import { bypass } from '../core/BypassNode.js';
 import { expression } from '../code/ExpressionNode.js';
-import { cond } from '../math/CondNode.js';
-import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
+import { ShaderNode, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class StackNode extends Node {
 
@@ -11,13 +9,32 @@ class StackNode extends Node {
 		super();
 
 		this.nodes = [];
-		this.outputNode = null;
+		this.outputNodeInternal = null; // shouldn't start with _, because otherwise getNodeChildren() works incorrectly
 
-		this.parent = parent;
+		this._parent = parent;
 
 		this._currentCond = null;
 
 		this.isStackNode = true;
+
+	}
+
+	get parent() {
+
+		return this._parent;
+
+	}
+
+	get outputNode() {
+
+		return this.outputNodeInternal;
+
+	}
+
+	set outputNode( value ) {
+
+		if ( value === this ) value = null; // @TODO: fix the cause of the possibility of outputNode being set to the same stack
+		this.outputNodeInternal = value;
 
 	}
 
@@ -29,16 +46,15 @@ class StackNode extends Node {
 
 	add( node ) {
 
-		this.nodes.push( bypass( expression(), node ) );
+		this.nodes.push( expression().bypass( node ) );
 
 		return this;
 
 	}
 
-	if( boolNode, method ) {
+	if( boolNode, method, method2 ) {
 
-		const methodNode = new ShaderNode( method );
-		this._currentCond = cond( boolNode, methodNode );
+		this._currentCond = boolNode.cond( new ShaderNode( method ), method2 !== undefined ? new ShaderNode( method2 ) : null );
 
 		return this.add( this._currentCond );
 
@@ -46,8 +62,7 @@ class StackNode extends Node {
 
 	elseif( boolNode, method ) {
 
-		const methodNode = new ShaderNode( method );
-		const ifNode = cond( boolNode, methodNode );
+		const ifNode = boolNode.cond( new ShaderNode( method ) );
 
 		this._currentCond.elseNode = ifNode;
 		this._currentCond = ifNode;
@@ -64,11 +79,14 @@ class StackNode extends Node {
 
 	}
 
-	build( builder, ...params ) {
+	build( builder, output ) {
 
-		const previousStack = getCurrentStack();
+		if ( builder.getBuildStage() === 'analyze' ) return super.build( builder, output );
+		if ( builder.getBuildStage() === 'setup' ) super.build( builder, output );
 
-		setCurrentStack( this );
+		const previousStack = builder.stack;
+
+		builder.stack = this;
 
 		for ( const node of this.nodes ) {
 
@@ -76,9 +94,9 @@ class StackNode extends Node {
 
 		}
 
-		setCurrentStack( previousStack );
+		builder.stack = previousStack;
 
-		return this.outputNode ? this.outputNode.build( builder, ...params ) : super.build( builder, ...params );
+		return this.outputNode && output !== 'void' ? this.outputNode.build( builder, output ) : super.build( builder, output );
 
 	}
 

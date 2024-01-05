@@ -3,8 +3,9 @@ import { uniform } from '../core/UniformNode.js';
 import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
 import { materialRotation } from '../accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../accessors/ModelNode.js';
-import { positionLocal } from '../accessors/PositionNode.js';
-import { float, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { positionGeometry } from '../accessors/PositionNode.js';
+import { vertexPosition } from '../core/PropertyNode.js';
+import { float, vec2, vec3 } from '../shadernode/ShaderNode.js';
 
 import { SpriteMaterial } from 'three';
 
@@ -44,19 +45,17 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		const { positionNode, rotationNode, scaleNode } = this;
 
-		const vertex = positionLocal;
-
 		let mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
 
 		let scale = vec2( modelWorldMatrix[ 0 ].xyz.length(), modelWorldMatrix[ 1 ].xyz.length() );
 
-		if ( scaleNode !== null ) {
+		if ( scaleNode ) {
 
 			scale = scale.mul( scaleNode );
 
 		}
 
-		let alignedPosition = vertex.xy;
+		let alignedPosition = positionGeometry.xy;
 
 		if ( object.center && object.center.isVector2 === true ) {
 
@@ -76,13 +75,9 @@ class SpriteNodeMaterial extends NodeMaterial {
 			vec2( sinAngle, cosAngle ).dot( alignedPosition )
 		);
 
-		mvPosition = vec4( mvPosition.xy.add( rotatedPosition ), mvPosition.zw );
+		mvPosition.xy.addAssign( rotatedPosition );
 
-		const modelViewProjection = cameraProjectionMatrix.mul( mvPosition );
-
-		context.vertex = vertex;
-
-		return modelViewProjection;
+		vertexPosition.assign( cameraProjectionMatrix.mul( mvPosition ) );
 
 	}
 

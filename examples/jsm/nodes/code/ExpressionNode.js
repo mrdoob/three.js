@@ -22,7 +22,7 @@ class ExpressionNode extends Node {
 
 		} else {
 
-			return builder.format( `( ${ snippet } )`, type, output );
+			return builder.format( snippet, type, output );
 
 		}
 
