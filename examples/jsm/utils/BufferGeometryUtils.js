@@ -106,6 +106,11 @@ function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
  */
 function mergeGeometries( geometries, useGroups = false ) {
 
+	// Ensure that we have a non-empty array. If not, make the developer aware with an informative error message
+	if (!Array.isArray(geometries) || geometries.length === 0) {
+        throw new Error('mergeGeometries() was provided an empty array or a non-array type object. The expected input is an array of Geometries.');
+    }
+
 	const isIndexed = geometries[ 0 ].index !== null;
 
 	const attributesUsed = new Set( Object.keys( geometries[ 0 ].attributes ) );
