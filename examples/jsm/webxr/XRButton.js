@@ -80,7 +80,7 @@ class XRButton {
 							.then( onSessionStarted )
 							.catch( ( err ) => {
 
-								console.log( err );
+								console.warn( err );
 
 							} );
 
@@ -96,7 +96,7 @@ class XRButton {
 					.then( onSessionStarted )
 					.catch( ( err ) => {
 
-						console.log( err );
+						console.warn( err );
 
 					} );
 
