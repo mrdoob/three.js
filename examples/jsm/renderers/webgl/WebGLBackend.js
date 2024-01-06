@@ -886,16 +886,6 @@ class WebGLBackend extends Backend {
 
 			let fb;
 
-			const samplesCached = renderTargetContextData.samplesCached;
-
-
-			if ( samplesCached !== samples ) {
-
-				renderTargetContextData.samplesCached = samples;
-				this.textureUtils.deallocateRenderBuffers( renderTarget );
-
-			}
-
 			if ( isCube ) {
 
 				if ( renderTargetContextData.cubeFramebuffers === undefined ) {

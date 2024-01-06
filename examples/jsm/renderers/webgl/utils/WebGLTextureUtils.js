@@ -519,7 +519,7 @@ class WebGLTextureUtils {
 	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
 	setupRenderBufferStorage( renderbuffer, renderContext ) {
 
-		const { gl, backend } = this;
+		const { gl } = this;
 		const renderTarget = renderContext.renderTarget;
 
 		const { samples, depthTexture, depthBuffer, stencilBuffer, width, height } = renderTarget;
