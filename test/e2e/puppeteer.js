@@ -103,6 +103,7 @@ const exceptionList = [
 	'webgl2_volume_instancing',
 	'webgl2_multisampled_renderbuffers',
 	'webgl_points_dynamic',
+	'webgpu_multisampled_renderbuffers',
 
 	// TODO: implement determinism for setTimeout and setInterval
 	// could it fix some examples from above?
@@ -117,14 +118,10 @@ const exceptionList = [
 	'webgpu_compute_points',
 	'webgpu_compute_texture',
 	'webgpu_compute_texture_pingpong',
-	'webgpu_loader_gltf_compressed',
 	'webgpu_materials',
-	'webgpu_portal',
 	'webgpu_sandbox',
 	'webgpu_sprites',
 	'webgpu_video_panorama',
-	'webgpu_postprocessing_afterimage',
-	'webgpu_multisampled_renderbuffers',
 
 	// WebGPURenderer: Unknown problem
 	'webgpu_backdrop_water',
