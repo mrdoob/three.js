@@ -57,6 +57,10 @@ class MathNode extends TempNode {
 
 			return 'vec3';
 
+		} else if ( method === MathNode.MOD ) {
+
+			return this.aNode.getNodeType( builder );
+
 		} else {
 
 			return this.getInputType( builder );
@@ -120,7 +124,7 @@ class MathNode extends TempNode {
 
 			const params = [];
 
-			if ( method === MathNode.CROSS ) {
+			if ( method === MathNode.CROSS || method === MathNode.MOD ) {
 
 				params.push(
 					a.build( builder, type ),
@@ -165,7 +169,7 @@ class MathNode extends TempNode {
 
 			}
 
-			return builder.format( `${ builder.getMethod( method ) }( ${params.join( ', ' )} )`, type, output );
+			return builder.format( `${ builder.getMethod( method, type ) }( ${params.join( ', ' )} )`, type, output );
 
 		}
 
