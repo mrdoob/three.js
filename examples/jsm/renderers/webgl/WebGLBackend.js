@@ -112,7 +112,7 @@ class WebGLBackend extends Backend {
 
 	finishRender( renderContext ) {
 
-		const { gl } = this;
+		const { gl, state } = this;
 		const renderContextData = this.get( renderContext );
 		const previousContext = renderContextData.previousContext;
 
@@ -144,18 +144,26 @@ class WebGLBackend extends Backend {
 			const { samples } = renderContext.renderTarget;
 			const fb = renderTargetContextData.framebuffer;
 
+			const mask = gl.COLOR_BUFFER_BIT;
+
 			if ( samples > 0 ) {
 
-				// TODO For loop support MRT
 				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
 
-				gl.bindFramebuffer( gl.READ_FRAMEBUFFER, msaaFrameBuffer );
-				gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+				const textures = renderContext.textures;
 
+				state.bindFramebuffer( gl.READ_FRAMEBUFFER, msaaFrameBuffer );
+				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
 
-				gl.blitFramebuffer( 0, 0, renderContext.width, renderContext.height, 0, 0, renderContext.width, renderContext.height, gl.COLOR_BUFFER_BIT, gl.NEAREST );
+				for ( let i = 0; i < textures.length; i ++ ) {
 
-				gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray );
+					// TODO Add support for MRT
+
+					gl.blitFramebuffer( 0, 0, renderContext.width, renderContext.height, 0, 0, renderContext.width, renderContext.height, mask, gl.NEAREST );
+
+					gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray );
+
+				}
 
 			}
 
@@ -869,7 +877,7 @@ class WebGLBackend extends Backend {
 
 			const renderTarget = renderContext.renderTarget;
 			const renderTargetContextData = this.get( renderTarget );
-			const { samples, stencilBuffer } = renderTarget;
+			const { samples, depthBuffer, stencilBuffer } = renderTarget;
 			const cubeFace = this.renderer._activeCubeFace;
 			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
 
@@ -950,20 +958,37 @@ class WebGLBackend extends Backend {
 
 					state.bindFramebuffer( gl.FRAMEBUFFER, msaaFb );
 
-					// TODO For loop support MRT
-					const msaaRenderbuffer = gl.createRenderbuffer();
-					gl.bindRenderbuffer( gl.RENDERBUFFER, msaaRenderbuffer );
+					const msaaRenderbuffers = [];
 
-					const texture = renderContext.textures[ 0 ];
-					const textureData = this.get( texture );
+					const textures = renderContext.textures;
 
-					gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, textureData.glInternalFormat, renderContext.width, renderContext.height );
-					gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, msaaRenderbuffer );
+					for ( let i = 0; i < textures.length; i ++ ) {
 
-					invalidationArray.push( gl.COLOR_ATTACHMENT0 );
 
-					renderTargetContextData.msaaRenderbuffer = msaaRenderbuffer;
+						msaaRenderbuffers[ i ] = gl.createRenderbuffer();
+
+						gl.bindRenderbuffer( gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
+
+						invalidationArray.push( gl.COLOR_ATTACHMENT0 + i );
+
+						if ( depthBuffer ) {
+
+							const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
+							invalidationArray.push( depthStyle );
+
+						}
+
+						const texture = renderContext.textures[ i ];
+						const textureData = this.get( texture );
+
+						gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, textureData.glInternalFormat, renderContext.width, renderContext.height );
+						gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
+
+
+					}
+
 					renderTargetContextData.msaaFrameBuffer = msaaFb;
+					renderTargetContextData.msaaRenderbuffers = msaaRenderbuffers;
 
 					if ( depthRenderbuffer === undefined ) {
 
