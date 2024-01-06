@@ -211,7 +211,11 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( renderTargetData.width !== renderTarget.width || renderTargetData.height !== renderTarget.height || renderTargetData.activeMipmapLevel !== renderTarget.activeMipmapLevel ) {
+		if ( renderTargetData.width !== renderTarget.width ||
+			renderTargetData.height !== renderTarget.height ||
+			renderTargetData.activeMipmapLevel !== renderTarget.activeMipmapLevel ||
+			renderTargetData.samples !== renderTarget.samples
+		) {
 
 			descriptors.length = 0;
 
@@ -279,6 +283,7 @@ class WebGPUBackend extends Backend {
 
 			renderTargetData.width = renderTarget.width;
 			renderTargetData.height = renderTarget.height;
+			renderTargetData.samples = renderTarget.samples;
 			renderTargetData.activeMipmapLevel = renderTarget.activeMipmapLevel;
 
 		}
