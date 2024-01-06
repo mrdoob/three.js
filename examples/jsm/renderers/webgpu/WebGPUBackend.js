@@ -56,6 +56,7 @@ class WebGPUBackend extends Backend {
 		this.device = null;
 		this.context = null;
 		this.colorBuffer = null;
+		this.defaultRenderPassdescriptor = null;
 
 		this.utils = new WebGPUUtils( this );
 		this.attributeUtils = new WebGPUAttributeUtils( this );
@@ -146,60 +147,82 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	beginRender( renderContext ) {
+	_getDefaultRenderPassDescriptor( renderContext ) {
 
-		const renderContextData = this.get( renderContext );
-
-		const device = this.device;
-		const occlusionQueryCount = renderContext.occlusionQueryCount;
-
-		let occlusionQuerySet;
-
-		if ( occlusionQueryCount > 0 ) {
-
-			if ( renderContextData.currentOcclusionQuerySet ) renderContextData.currentOcclusionQuerySet.destroy();
-			if ( renderContextData.currentOcclusionQueryBuffer ) renderContextData.currentOcclusionQueryBuffer.destroy();
-
-			// Get a reference to the array of objects with queries. The renderContextData property
-			// can be changed by another render pass before the buffer.mapAsyc() completes.
-			renderContextData.currentOcclusionQuerySet = renderContextData.occlusionQuerySet;
-			renderContextData.currentOcclusionQueryBuffer = renderContextData.occlusionQueryBuffer;
-			renderContextData.currentOcclusionQueryObjects = renderContextData.occlusionQueryObjects;
-
-			//
-
-			occlusionQuerySet = device.createQuerySet( { type: 'occlusion', count: occlusionQueryCount } );
-
-			renderContextData.occlusionQuerySet = occlusionQuerySet;
-			renderContextData.occlusionQueryIndex = 0;
-			renderContextData.occlusionQueryObjects = new Array( occlusionQueryCount );
-
-			renderContextData.lastOcclusionObject = null;
-
-		}
-
-		const descriptor = {
-			colorAttachments: [ {
-				view: null
-			} ],
-			depthStencilAttachment: {
-				view: null
-			},
-			occlusionQuerySet
-		};
-
-		const colorAttachment = descriptor.colorAttachments[ 0 ];
-		const depthStencilAttachment = descriptor.depthStencilAttachment;
+		let descriptor = this.defaultRenderPassdescriptor;
 
 		const antialias = this.parameters.antialias;
 
-		if ( renderContext.textures !== null ) {
+		if ( descriptor === null ) {
+
+			descriptor = {
+				colorAttachments: [ {
+					view: null
+				} ],
+				depthStencilAttachment: {
+					view: this.textureUtils.getDepthBuffer( renderContext.depth, renderContext.stencil ).createView()
+				}
+			};
+
+			const colorAttachment = descriptor.colorAttachments[ 0 ];
+
+			if ( antialias === true ) {
+
+				colorAttachment.view = this.colorBuffer.createView();
+
+			} else {
+
+				colorAttachment.resolveTarget = undefined;
+
+			}
+
+			this.defaultRenderPassdescriptor = descriptor;
+
+		}
+
+		const colorAttachment = descriptor.colorAttachments[ 0 ];
+
+		if ( antialias === true ) {
+
+			colorAttachment.resolveTarget = this.context.getCurrentTexture().createView();
+
+		} else {
+
+			colorAttachment.view = this.context.getCurrentTexture().createView();
+
+		}
+
+		return descriptor;
+
+	}
+
+	_getRenderPassDescriptor( renderContext ) {
+
+		const renderTarget = renderContext.renderTarget;
+		const renderTargetData = this.get( renderTarget );
+
+		let descriptors = renderTargetData.descriptors;
+
+		if ( descriptors === undefined ) {
+
+			descriptors = [];
+
+			renderTargetData.descriptors = descriptors;
+
+		}
+
+		if ( renderTargetData.width !== renderTarget.width || renderTargetData.height !== renderTarget.height || renderTargetData.activeMipmapLevel !== renderTarget.activeMipmapLevel ) {
+
+			descriptors.length = 0;
+
+		}
+
+		let descriptor = descriptors[ renderContext.activeCubeFace ];
+
+		if ( descriptor === undefined ) {
 
 			const textures = renderContext.textures;
-
-			descriptor.colorAttachments = [];
-
-			const colorAttachments = descriptor.colorAttachments;
+			const colorAttachments = [];
 
 			for ( let i = 0; i < textures.length; i ++ ) {
 
@@ -237,7 +260,9 @@ class WebGPUBackend extends Backend {
 
 			const depthTextureData = this.get( renderContext.depthTexture );
 
-			depthStencilAttachment.view = depthTextureData.texture.createView();
+			const depthStencilAttachment = {
+				view: depthTextureData.texture.createView(),
+			}
 
 			if ( renderContext.stencil && renderContext.depthTexture.format === DepthFormat ) {
 
@@ -245,23 +270,70 @@ class WebGPUBackend extends Backend {
 
 			}
 
-		} else {
+			descriptor = {
+				colorAttachments,
+				depthStencilAttachment
+			};
 
-			if ( antialias === true ) {
+			descriptors[ renderContext.activeCubeFace ] = descriptor;
 
-				colorAttachment.view = this.colorBuffer.createView();
-				colorAttachment.resolveTarget = this.context.getCurrentTexture().createView();
-
-			} else {
-
-				colorAttachment.view = this.context.getCurrentTexture().createView();
-				colorAttachment.resolveTarget = undefined;
-
-			}
-
-			depthStencilAttachment.view = this.textureUtils.getDepthBuffer( renderContext.depth, renderContext.stencil ).createView();
+			renderTargetData.width = renderTarget.width;
+			renderTargetData.height = renderTarget.height;
+			renderTargetData.activeMipmapLevel = renderTarget.activeMipmapLevel;
 
 		}
+
+		return descriptor;
+
+	}
+
+	beginRender( renderContext ) {
+
+		const renderContextData = this.get( renderContext );
+
+		const device = this.device;
+		const occlusionQueryCount = renderContext.occlusionQueryCount;
+
+		let occlusionQuerySet;
+
+		if ( occlusionQueryCount > 0 ) {
+
+			if ( renderContextData.currentOcclusionQuerySet ) renderContextData.currentOcclusionQuerySet.destroy();
+			if ( renderContextData.currentOcclusionQueryBuffer ) renderContextData.currentOcclusionQueryBuffer.destroy();
+
+			// Get a reference to the array of objects with queries. The renderContextData property
+			// can be changed by another render pass before the buffer.mapAsyc() completes.
+			renderContextData.currentOcclusionQuerySet = renderContextData.occlusionQuerySet;
+			renderContextData.currentOcclusionQueryBuffer = renderContextData.occlusionQueryBuffer;
+			renderContextData.currentOcclusionQueryObjects = renderContextData.occlusionQueryObjects;
+
+			//
+
+			occlusionQuerySet = device.createQuerySet( { type: 'occlusion', count: occlusionQueryCount } );
+
+			renderContextData.occlusionQuerySet = occlusionQuerySet;
+			renderContextData.occlusionQueryIndex = 0;
+			renderContextData.occlusionQueryObjects = new Array( occlusionQueryCount );
+
+			renderContextData.lastOcclusionObject = null;
+
+		}
+
+		let descriptor;
+
+		if ( renderContext.textures !== null ) {
+
+			descriptor = this._getRenderPassDescriptor( renderContext );
+
+		} else {
+
+			descriptor = this._getDefaultRenderPassDescriptor( renderContext );
+
+		}
+
+		descriptor.occlusionQuerySet = occlusionQuerySet;
+
+		const depthStencilAttachment = descriptor.depthStencilAttachment;
 
 		if ( renderContext.textures !== null ) {
 
@@ -286,8 +358,9 @@ class WebGPUBackend extends Backend {
 
 			}
 
-
 		} else {
+
+			const colorAttachment = descriptor.colorAttachments[ 0 ];
 
 			if ( renderContext.clearColor ) {
 
@@ -1060,7 +1133,8 @@ class WebGPUBackend extends Backend {
 	updateSize() {
 
 		this.colorBuffer = this.textureUtils.getColorBuffer();
-	
+		this.defaultRenderPassdescriptor = null;
+
 	}
 
 	// utils public
