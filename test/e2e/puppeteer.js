@@ -57,7 +57,6 @@ const exceptionList = [
 	'webxr_xr_ballshooter',
 
 	'webgl_worker_offscreencanvas', // in a worker, not robust
-	'webgpu_worker_offscreencanvas', // in a worker, not robust
 
 	// Windows-Linux text rendering differences
 	// TODO: Fix these by e.g. disabling text rendering altogether -- this can also fix a bunch of 0.1%-0.2% examples
@@ -137,7 +136,8 @@ const exceptionList = [
 	'webgpu_shadertoy',
 	'webgpu_shadowmap',
 	'webgpu_tsl_editor',
-	'webgpu_tsl_transpiler'
+	'webgpu_tsl_transpiler',
+	'webgpu_portal'
 
 ];
 
