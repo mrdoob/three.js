@@ -139,7 +139,7 @@ class KTX2Loader extends Loader {
 
 		if ( renderer.isWebGPURenderer === true ) {
 
-			this.detectSupportAsync( renderer );
+			return this.detectSupportAsync( renderer );
 
 		} else {
 
