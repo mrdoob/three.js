@@ -120,17 +120,17 @@ class KTX2Loader extends Loader {
 
 	}
 
-	detectSupport( renderer ) {
+	async detectSupport( renderer ) {
 
 		if ( renderer.isWebGPURenderer === true ) {
 
 			this.workerConfig = {
-				astcSupported: renderer.hasFeature( 'texture-compression-astc' ),
-				etc1Supported: renderer.hasFeature( 'texture-compression-etc1' ),
-				etc2Supported: renderer.hasFeature( 'texture-compression-etc2' ),
-				dxtSupported: renderer.hasFeature( 'texture-compression-bc' ),
-				bptcSupported: renderer.hasFeature( 'texture-compression-bptc' ),
-				pvrtcSupported: renderer.hasFeature( 'texture-compression-pvrtc' )
+				astcSupported: await renderer.hasFeature( 'texture-compression-astc' ),
+				etc1Supported: await renderer.hasFeature( 'texture-compression-etc1' ),
+				etc2Supported: await renderer.hasFeature( 'texture-compression-etc2' ),
+				dxtSupported: await renderer.hasFeature( 'texture-compression-bc' ),
+				bptcSupported: await renderer.hasFeature( 'texture-compression-bptc' ),
+				pvrtcSupported: await renderer.hasFeature( 'texture-compression-pvrtc' )
 			};
 
 		} else {

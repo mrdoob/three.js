@@ -48,7 +48,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
 
@@ -79,7 +79,7 @@
 
 				container.appendChild( renderer.domElement );
 
-				const ktx2Loader = new KTX2Loader()
+				const ktx2Loader = await new KTX2Loader()
 					.setTranscoderPath( 'jsm/libs/basis/' )
 					.detectSupport( renderer );
 

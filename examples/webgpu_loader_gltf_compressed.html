@@ -67,7 +67,7 @@
 				controls.maxDistance = 6;
 				controls.update();
 
-				const ktx2Loader = new KTX2Loader()
+				const ktx2Loader = await new KTX2Loader()
 					.setTranscoderPath( 'jsm/libs/basis/' )
 					.detectSupport( renderer );
 

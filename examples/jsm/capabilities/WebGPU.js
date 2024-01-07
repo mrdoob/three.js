@@ -4,29 +4,55 @@ if ( self.GPUShaderStage === undefined ) {
 
 }
 
-let isAvailable = false;
+class WebGPU {
 
-( async () => {
+	static async checkAvailability() {
 
-	if ( navigator.gpu !== undefined ) {
+		if ( navigator.gpu ) {
 
-		const adapter = await navigator.gpu.requestAdapter();
-
-		if ( adapter !== null ) {
-
-			isAvailable = true;
+			const adapter = await navigator.gpu.requestAdapter();
+			return adapter !== null;
 
 		}
 
+		return false;
+
 	}
 
-} )();
+	static async isAvailable() {
 
-class WebGPU {
+		if ( this._isAvailablePromise === undefined ) {
 
-	static isAvailable() {
+			this._isAvailablePromise = WebGPU.checkAvailability();
 
-		return isAvailable;
+		}
+
+		return await this._isAvailablePromise;
+
+	}
+
+
+	static async requestStaticAdapter() {
+
+		if ( navigator.gpu ) {
+
+			return await navigator.gpu.requestAdapter();
+
+		}
+
+		return false;
+
+	}
+
+	static async getStaticAdapter() {
+
+		if ( this._adapterPromise === undefined ) {
+
+			this._adapterPromise = WebGPU.requestStaticAdapter();
+
+		}
+
+		return await this._adapterPromise;
 
 	}
 
@@ -53,5 +79,10 @@ class WebGPU {
 	}
 
 }
+
+// Initialize static properties.
+
+WebGPU.isAvailable();
+WebGPU.getStaticAdapter();
 
 export default WebGPU;

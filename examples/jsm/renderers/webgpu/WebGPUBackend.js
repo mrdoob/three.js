@@ -14,20 +14,7 @@ import WebGPUAttributeUtils from './utils/WebGPUAttributeUtils.js';
 import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
-
-// statics
-
-let _staticAdapter = null;
-
-( async () => {
-
-	if ( navigator.gpu !== undefined ) {
-
-		_staticAdapter = await navigator.gpu.requestAdapter();
-
-	}
-
-} )();
+import WebGPU from '../../capabilities/WebGPU.js';
 
 //
 
@@ -1075,9 +1062,9 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	hasFeature( name ) {
+	async hasFeature( name ) {
 
-		const adapter = this.adapter || _staticAdapter;
+		const adapter = this.adapter || await WebGPU.getStaticAdapter();
 
 		//
 
