@@ -23,7 +23,7 @@ class WebGPURenderer extends Renderer {
 
 		let BackendClass;
 
-		if ( navigator.gpu ) {
+		if ( WebGPU.isAvailable() ) {
 
 			BackendClass = WebGPUBackend;
 
