@@ -138,8 +138,13 @@ const exceptionList = [
 	'webgpu_shadertoy',
 	'webgpu_shadowmap',
 	'webgpu_tsl_editor',
-	'webgpu_tsl_transpiler'
+	'webgpu_tsl_transpiler',
 
+	// WebGPU idleTime and parseTime too low
+	'webgpu_compute_particles',
+	'webgpu_compute_particles_rain',
+	'webgpu_compute_particles_snow',
+	'webgpu_compute_points',
 ];
 
 /* CONFIG VARIABLES END */
