@@ -105,7 +105,7 @@
 				const thicknessTexture = loader.load( 'models/fbx/bunny_thickness.jpg' );
 				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 
-				const material = new Nodes.MeshSSSPhysicalNodeMaterial();
+				const material = new Nodes.MeshSSSNodeMaterial();
 				material.color = new THREE.Color( 1.0, 0.2, 0.2 );
 				material.roughness = 0.3;
 				material.thicknessColorNode = Nodes.texture( thicknessTexture ).mul( Nodes.vec3( 0.5, 0.3, 0.0 ) );

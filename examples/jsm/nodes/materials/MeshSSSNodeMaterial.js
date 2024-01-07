@@ -5,7 +5,7 @@ import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
 import MeshPhysicalNodeMaterial from './MeshPhysicalNodeMaterial.js';
 import { float, vec3 } from '../shadernode/ShaderNode.js';
 
-class SSSPhysicalLightingModel extends PhysicalLightingModel {
+class SSSLightingModel extends PhysicalLightingModel {
 
 	constructor( useClearcoat, useSheen, useIridescence, useSSS ) {
 
@@ -37,7 +37,7 @@ class SSSPhysicalLightingModel extends PhysicalLightingModel {
 
 }
 
-class MeshSSSPhysicalNodeMaterial extends MeshPhysicalNodeMaterial {
+class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 
 	constructor( parameters ) {
 
@@ -60,7 +60,7 @@ class MeshSSSPhysicalNodeMaterial extends MeshPhysicalNodeMaterial {
 
 	setupLightingModel( /*builder*/ ) {
 
-		return new SSSPhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useSSS );
+		return new SSSLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useSSS );
 
 	}
 
@@ -79,6 +79,6 @@ class MeshSSSPhysicalNodeMaterial extends MeshPhysicalNodeMaterial {
 
 }
 
-export default MeshSSSPhysicalNodeMaterial;
+export default MeshSSSNodeMaterial;
 
-addNodeMaterial( 'MeshSSSPhysicalNodeMaterial', MeshSSSPhysicalNodeMaterial );
+addNodeMaterial( 'MeshSSSNodeMaterial', MeshSSSNodeMaterial );

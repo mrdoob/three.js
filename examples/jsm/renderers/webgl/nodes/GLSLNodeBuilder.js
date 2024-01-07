@@ -100,11 +100,7 @@ ${ flowData.code }
 
 	generateTexture( texture, textureProperty, uvSnippet, depthSnippet ) {
 
-		if ( texture.isTextureCube ) {
-
-			return `textureCube( ${ textureProperty }, ${ uvSnippet } )`;
-
-		} else if ( texture.isDepthTexture ) {
+		if ( texture.isDepthTexture ) {
 
 			return `texture( ${ textureProperty }, ${ uvSnippet } ).x`;
 
