@@ -6,28 +6,9 @@ if ( self.GPUShaderStage === undefined ) {
 
 class WebGPU {
 
-	static async checkAvailability() {
+	static isAvailable() {
 
-		if ( navigator.gpu ) {
-
-			const adapter = await navigator.gpu.requestAdapter();
-			return adapter !== null;
-
-		}
-
-		return false;
-
-	}
-
-	static async isAvailable() {
-
-		if ( this._isAvailablePromise === undefined ) {
-
-			this._isAvailablePromise = WebGPU.checkAvailability();
-
-		}
-
-		return await this._isAvailablePromise;
+		return navigator.gpu !== undefined;
 
 	}
 
@@ -82,7 +63,6 @@ class WebGPU {
 
 // Initialize static properties.
 
-WebGPU.isAvailable();
 WebGPU.getStaticAdapter();
 
 export default WebGPU;
