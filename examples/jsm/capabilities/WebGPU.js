@@ -1,22 +1,26 @@
-if ( window.GPUShaderStage === undefined ) {
+if ( self.GPUShaderStage === undefined ) {
 
-	window.GPUShaderStage = { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
+	self.GPUShaderStage = { VERTEX: 1, FRAGMENT: 2, COMPUTE: 4 };
 
 }
 
 let isAvailable = false;
 
-if ( navigator.gpu !== undefined ) {
+( async () => {
 
-	const adapter = await navigator.gpu.requestAdapter();
+	if ( navigator.gpu !== undefined ) {
 
-	if ( adapter !== null ) {
+		const adapter = await navigator.gpu.requestAdapter();
 
-		isAvailable = true;
+		if ( adapter !== null ) {
+
+			isAvailable = true;
+
+		}
 
 	}
 
-}
+} )();
 
 class WebGPU {
 

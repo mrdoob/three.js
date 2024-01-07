@@ -19,11 +19,15 @@ import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
 let _staticAdapter = null;
 
-if ( navigator.gpu !== undefined ) {
+( async () => {
 
-	_staticAdapter = await navigator.gpu.requestAdapter();
+	if ( navigator.gpu !== undefined ) {
 
-}
+		_staticAdapter = await navigator.gpu.requestAdapter();
+
+	}
+
+} )();
 
 //
 
