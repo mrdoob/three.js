@@ -111,10 +111,6 @@ const exceptionList = [
 	// Awaiting for WebGL backend support
 	'webgpu_clearcoat',
 	'webgpu_compute_audio',
-	'webgpu_compute_particles',
-	'webgpu_compute_particles_rain',
-	'webgpu_compute_particles_snow',
-	'webgpu_compute_points',
 	'webgpu_compute_texture',
 	'webgpu_compute_texture_pingpong',
 	'webgpu_cubemap_dynamic',
