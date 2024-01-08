@@ -1259,7 +1259,13 @@ class OrbitControls extends EventDispatcher {
 
 				controlActive = true;
 
-				scope.domElement.addEventListener( 'keyup', interceptControlUp, { passive: true, capture: true } );
+				if ( typeof scope.domElement.getRootNode === 'function' ) {
+
+					const document = scope.domElement.getRootNode();
+
+					document.addEventListener( 'keyup', interceptControlUp, { passive: true, capture: true } );
+
+				}
 
 			}
 
@@ -1271,7 +1277,13 @@ class OrbitControls extends EventDispatcher {
 
 				controlActive = false;
 
-				scope.domElement.removeEventListener( 'keyup', interceptControlUp, { passive: true, capture: true } );
+				if ( typeof scope.domElement.getRootNode === 'function' ) {
+
+					const document = scope.domElement.getRootNode();
+
+					document.removeEventListener( 'keyup', interceptControlUp, { passive: true, capture: true } );
+
+				}
 
 			}
 
@@ -1485,7 +1497,14 @@ class OrbitControls extends EventDispatcher {
 		scope.domElement.addEventListener( 'pointercancel', onPointerUp );
 		scope.domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
 
-		scope.domElement.addEventListener( 'keydown', interceptControlDown, { passive: true, capture: true } );
+
+		if ( typeof scope.domElement.getRootNode === 'function' ) {
+
+			const document = scope.domElement.getRootNode();
+
+			document.addEventListener( 'keydown', interceptControlDown, { passive: true, capture: true } );
+
+		}
 
 		// force an update at start
 
