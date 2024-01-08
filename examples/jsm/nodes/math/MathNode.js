@@ -377,5 +377,4 @@ addNodeElement( 'gain', gain );
 addNodeElement( 'pcurve', pcurve );
 addNodeElement( 'sinc', sinc );
 
-
 addNodeClass( 'MathNode', MathNode );
