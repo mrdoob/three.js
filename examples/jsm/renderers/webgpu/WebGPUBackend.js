@@ -1078,7 +1078,7 @@ class WebGPUBackend extends Backend {
 
 			console.warn( 'WebGPUBackend: WebGPU adapter has not been initialized yet. Please use detectSupportAsync instead' );
 
-			return true;
+			return false;
 
 		}
 

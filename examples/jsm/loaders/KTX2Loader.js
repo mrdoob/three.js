@@ -139,8 +139,6 @@ class KTX2Loader extends Loader {
 
 		if ( renderer.isWebGPURenderer === true ) {
 
-			console.warn( 'THREE.KTX2Loader.detectSupport: For the WebGPURenderer use detectSupportAsync instead.' );
-
 			this.workerConfig = {
 				astcSupported: renderer.hasFeature( 'texture-compression-astc' ),
 				etc1Supported: renderer.hasFeature( 'texture-compression-etc1' ),
@@ -149,7 +147,6 @@ class KTX2Loader extends Loader {
 				bptcSupported: renderer.hasFeature( 'texture-compression-bptc' ),
 				pvrtcSupported: renderer.hasFeature( 'texture-compression-pvrtc' )
 			};
-
 
 		} else {
 
