@@ -19,13 +19,13 @@ class WebGPU {
 
 	static isAvailable() {
 
-		return isAvailable;
+		return Boolean( isAvailable );
 
 	}
 
-	static async getStaticAdapter() {
+	static getStaticAdapter() {
 
-		return await isAvailable;
+		return isAvailable;
 
 	}
 
