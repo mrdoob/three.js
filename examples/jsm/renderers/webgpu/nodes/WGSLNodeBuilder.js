@@ -16,7 +16,7 @@ import { getFormat } from '../utils/WebGPUTextureUtils.js';
 import WGSLNodeParser from './WGSLNodeParser.js';
 
 // GPUShaderStage is not defined in browsers not supporting WebGPU
-const GPUShaderStage = window.GPUShaderStage;
+const GPUShaderStage = self.GPUShaderStage;
 
 const gpuShaderStageLib = {
 	'vertex': GPUShaderStage ? GPUShaderStage.VERTEX : 1,
