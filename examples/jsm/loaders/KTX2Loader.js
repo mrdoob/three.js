@@ -123,12 +123,12 @@ class KTX2Loader extends Loader {
 	async detectSupportAsync( renderer ) {
 
 		this.workerConfig = {
-			astcSupported: await renderer.hasFeature( 'texture-compression-astc' ),
-			etc1Supported: await renderer.hasFeature( 'texture-compression-etc1' ),
-			etc2Supported: await renderer.hasFeature( 'texture-compression-etc2' ),
-			dxtSupported: await renderer.hasFeature( 'texture-compression-bc' ),
-			bptcSupported: await renderer.hasFeature( 'texture-compression-bptc' ),
-			pvrtcSupported: await renderer.hasFeature( 'texture-compression-pvrtc' )
+			astcSupported: await renderer.hasFeatureAsync( 'texture-compression-astc' ),
+			etc1Supported: await renderer.hasFeatureAsync( 'texture-compression-etc1' ),
+			etc2Supported: await renderer.hasFeatureAsync( 'texture-compression-etc2' ),
+			dxtSupported: await renderer.hasFeatureAsync( 'texture-compression-bc' ),
+			bptcSupported: await renderer.hasFeatureAsync( 'texture-compression-bptc' ),
+			pvrtcSupported: await renderer.hasFeatureAsync( 'texture-compression-pvrtc' )
 		};
 
 		return this;
@@ -139,7 +139,17 @@ class KTX2Loader extends Loader {
 
 		if ( renderer.isWebGPURenderer === true ) {
 
-			return this.detectSupportAsync( renderer );
+			console.warn( 'THREE.KTX2Loader.detectSupport: For the WebGPURenderer use detectSupportAsync instead.' );
+
+			this.workerConfig = {
+				astcSupported: renderer.hasFeature( 'texture-compression-astc' ),
+				etc1Supported: renderer.hasFeature( 'texture-compression-etc1' ),
+				etc2Supported: renderer.hasFeature( 'texture-compression-etc2' ),
+				dxtSupported: renderer.hasFeature( 'texture-compression-bc' ),
+				bptcSupported: renderer.hasFeature( 'texture-compression-bptc' ),
+				pvrtcSupported: renderer.hasFeature( 'texture-compression-pvrtc' )
+			};
+
 
 		} else {
 

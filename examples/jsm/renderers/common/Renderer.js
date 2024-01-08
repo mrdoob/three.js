@@ -770,6 +770,12 @@ class Renderer {
 
 	}
 
+	hasFeatureAsync( name ) {
+
+		return this.backend.hasFeatureAsync( name );
+
+	}
+
 	hasFeature( name ) {
 
 		return this.backend.hasFeature( name );

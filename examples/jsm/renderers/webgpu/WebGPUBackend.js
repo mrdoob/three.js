@@ -1061,14 +1061,28 @@ class WebGPUBackend extends Backend {
 		return 16;
 
 	}
-
-	async hasFeature( name ) {
+		
+	async hasFeatureAsync( name ) {
 
 		const adapter = this.adapter || await WebGPU.getStaticAdapter();
 
 		//
 
 		return adapter.features.has( name );
+
+	}
+
+	hasFeature( name ) {
+
+		if ( !this.adapter ) {
+
+			console.warn( 'WebGPUBackend: WebGPU adapter has not been initialized yet. Please use detectSupportAsync instead' );
+
+			return true;
+
+		}
+
+		return this.adapter.features.has( name );
 
 	}
 
