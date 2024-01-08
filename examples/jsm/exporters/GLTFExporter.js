@@ -2399,7 +2399,11 @@ class GLTFWriter {
 
 		for ( let i = 0; i < options.animations.length; ++ i ) {
 
-			this.processAnimation( options.animations[ i ], input[ 0 ] );
+			let animation = options.animations[ i ];
+
+			animation = animation.clone().optimize();
+
+			this.processAnimation( animation, input[ 0 ] );
 
 		}
 
