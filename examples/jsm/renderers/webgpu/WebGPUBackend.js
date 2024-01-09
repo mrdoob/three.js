@@ -138,7 +138,7 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	_getDefaultRenderPassDescriptor( renderContext ) {
+	_getDefaultRenderPassDescriptor() {
 
 		let descriptor = this.defaultRenderPassdescriptor;
 
@@ -146,12 +146,14 @@ class WebGPUBackend extends Backend {
 
 		if ( descriptor === null ) {
 
+			const renderer = this.renderer;
+
 			descriptor = {
 				colorAttachments: [ {
 					view: null
 				} ],
 				depthStencilAttachment: {
-					view: this.textureUtils.getDepthBuffer( renderContext.depth, renderContext.stencil ).createView()
+					view: this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView()
 				}
 			};
 
@@ -311,13 +313,13 @@ class WebGPUBackend extends Backend {
 
 		let descriptor;
 
-		if ( renderContext.textures !== null ) {
+		if ( renderContext.textures === null ) {
 
-			descriptor = this._getRenderPassDescriptor( renderContext );
+			descriptor = this._getDefaultRenderPassDescriptor();
 
 		} else {
 
-			descriptor = this._getDefaultRenderPassDescriptor( renderContext );
+			descriptor = this._getRenderPassDescriptor( renderContext );
 
 		}
 
@@ -572,7 +574,7 @@ class WebGPUBackend extends Backend {
 		const device = this.device;
 		const renderer = this.renderer;
 
-		const colorAttachments = [];
+		let colorAttachments = [];
 
 		let depthStencilAttachment;
 		let clearValue;
@@ -596,36 +598,23 @@ class WebGPUBackend extends Backend {
 			depth = depth && supportsDepth;
 			stencil = stencil && supportsStencil;
 
+			const descriptor = this._getDefaultRenderPassDescriptor();
+
 			if ( color ) {
 
-				const antialias = this.parameters.antialias;
+				colorAttachments = descriptor.colorAttachments;
 
-				const colorAttachment = {};
-
-				if ( antialias === true ) {
-
-					colorAttachment.view = this.colorBuffer.createView();
-					colorAttachment.resolveTarget = this.context.getCurrentTexture().createView();
-
-				} else {
-
-					colorAttachment.view = this.context.getCurrentTexture().createView();
-
-				}
+				const colorAttachment = colorAttachments[ 0 ];
 
 				colorAttachment.clearValue = clearValue;
 				colorAttachment.loadOp = GPULoadOp.Clear;
 				colorAttachment.storeOp = GPUStoreOp.Store;
 
-				colorAttachments.push( colorAttachment );
-
 			}
 
 			if ( depth || stencil ) {
 
-				depthStencilAttachment = {
-					view: this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView()
-				};
+				depthStencilAttachment = descriptor.depthStencilAttachment;
 
 			}
 
