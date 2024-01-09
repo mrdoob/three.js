@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { sub, mul, div } from './OperatorNode.js';
+import { sub, mul, div, add } from './OperatorNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeObject, nodeProxy, float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
@@ -253,6 +253,8 @@ export default MathNode;
 
 export const EPSILON = float( 1e-6 );
 export const INFINITY = float( 1e6 );
+export const PI = float( Math.PI );
+export const PI2 = float( Math.PI * 2 );
 
 export const radians = nodeProxy( MathNode, MathNode.RADIANS );
 export const degrees = nodeProxy( MathNode, MathNode.DEGREES );
@@ -300,6 +302,12 @@ export const pow2 = nodeProxy( MathNode, MathNode.POW, 2 );
 export const pow3 = nodeProxy( MathNode, MathNode.POW, 3 );
 export const pow4 = nodeProxy( MathNode, MathNode.POW, 4 );
 export const transformDirection = nodeProxy( MathNode, MathNode.TRANSFORM_DIRECTION );
+
+// remapping functions https://iquilezles.org/articles/functions/
+export const parabola = ( x, k ) => pow( mul( 4.0, x.mul( sub( 1.0, x ) ) ), k );
+export const gain = ( x, k ) => x.lessThan( 0.5 ) ? parabola( x.mul( 2.0 ), k ).div( 2.0 ) : sub( 1.0, parabola( mul( sub( 1.0, x ), 2.0 ), k ).div( 2.0 ) );
+export const pcurve = ( x, a, b ) => pow( div( pow( x, a ), add( pow( x, a ), pow( sub( 1.0, x ), b ) ) ), 1.0 / a );
+export const sinc = ( x, k ) => sin( PI.mul( k.mul( x ).sub( 1.0 ) ) ).div( PI.mul( k.mul( x ).sub( 1.0 ) ) );
 
 export const cbrt = ( a ) => mul( sign( a ), pow( abs( a ), 1.0 / 3.0 ) );
 export const mix = nodeProxy( MathNode, MathNode.MIX );
@@ -363,5 +371,10 @@ addNodeElement( 'faceForward', faceForward );
 addNodeElement( 'difference', difference );
 addNodeElement( 'saturate', saturate );
 addNodeElement( 'cbrt', cbrt );
+
+addNodeElement( 'parabola', parabola );
+addNodeElement( 'gain', gain );
+addNodeElement( 'pcurve', pcurve );
+addNodeElement( 'sinc', sinc );
 
 addNodeClass( 'MathNode', MathNode );

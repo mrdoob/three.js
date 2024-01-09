@@ -201,7 +201,7 @@ const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 be specified using standard CSS style 6 digit hex color values.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
 </pre>
-<p>We then create a <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. A <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> in three represents the combination
+<p>We then create a <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. A <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> in three.js represents the combination
 of three things</p>
 <ol>
 <li>A <code class="notranslate" translate="no">Geometry</code> (the shape of the object)</li>
@@ -267,13 +267,11 @@ our loop.</p>
 <p>It's a little better but it's still hard to see the 3d. What would help is to
 add some lighting so let's add a light. There are many kinds of lights in
 three.js which we'll go over in <a href="lights.html">a future article</a>. For now let's create a directional light.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
-  const color = 0xFFFFFF;
-  const intensity = 3;
-  const light = new THREE.DirectionalLight(color, intensity);
-  light.position.set(-1, 2, 4);
-  scene.add(light);
-}
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
+const intensity = 3;
+const light = new THREE.DirectionalLight(color, intensity);
+light.position.set(-1, 2, 4);
+scene.add(light);
 </pre>
 <p>Directional lights have a position and a target. Both default to 0, 0, 0. In our
 case we're setting the light's position to -1, 2, 4 so it's slightly on the left,

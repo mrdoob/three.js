@@ -905,6 +905,12 @@ class WebGLBackend extends Backend {
 
 	}
 
+	async hasFeatureAsync( name ) {
+
+		return this.hasFeature( name );
+
+	}
+
 	hasFeature( name ) {
 
 		const keysMatching = Object.keys( GLFeatureName ).filter( key => GLFeatureName[ key ] === name );
