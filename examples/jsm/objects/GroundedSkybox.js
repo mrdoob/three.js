@@ -1,4 +1,4 @@
-import { BackSide, Mesh, MeshBasicMaterial, SphereGeometry, Vector3 } from 'three';
+import { Mesh, MeshBasicMaterial, SphereGeometry, Vector3 } from 'three';
 
 /**
  * A ground-projected skybox. The height is how far the camera that took the photo was above the ground - 
@@ -18,6 +18,7 @@ class GroundedSkybox extends Mesh {
 		}
 
 		const geometry = new SphereGeometry( radius, 2 * resolution, resolution );
+		geometry.scale( 1, 1, -1 );
 
 		const pos = geometry.getAttribute( 'position' );
 		const tmp = new Vector3();
@@ -40,7 +41,7 @@ class GroundedSkybox extends Mesh {
 
 		pos.needsUpdate = true;
 
-		super( geometry, new MeshBasicMaterial( { map, side: BackSide } ) );
+		super( geometry, new MeshBasicMaterial( { map, depthWrite: false } ) );
 
 	}
 
