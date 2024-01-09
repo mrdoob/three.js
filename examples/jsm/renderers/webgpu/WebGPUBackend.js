@@ -546,9 +546,9 @@ class WebGPUBackend extends Backend {
 			const buffer = currentOcclusionQueryBuffer.getMappedRange();
 			const results = new BigUint64Array( buffer );
 
-			for ( let i = 0; i < currentOcclusionQueryObjects.length; i++ ) {
+			for ( let i = 0; i < currentOcclusionQueryObjects.length; i ++ ) {
 
-				if ( results[ i ] !== 0n ) {
+				if ( results[ i ] !== 0 ) {
 
 					occluded.add( currentOcclusionQueryObjects[ i ] );
 
@@ -567,7 +567,7 @@ class WebGPUBackend extends Backend {
 	updateViewport( renderContext ) {
 
 		const { currentPass } = this.get( renderContext );
-		let { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
+		const { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
 
 		currentPass.setViewport( x, renderContext.height - height - y, width, height, minDepth, maxDepth );
 
@@ -612,11 +612,11 @@ class WebGPUBackend extends Backend {
 
 					colorAttachment.view = this.colorBuffer.createView();
 					colorAttachment.resolveTarget = this.context.getCurrentTexture().createView();
-		
+
 				} else {
-		
+
 					colorAttachment.view = this.context.getCurrentTexture().createView();
-		
+
 				}
 
 				colorAttachment.clearValue = clearValue;
@@ -846,7 +846,7 @@ class WebGPUBackend extends Backend {
 
 		// occlusion queries - handle multiple consecutive draw calls for an object
 
-		if ( contextData.occlusionQuerySet !== undefined  ) {
+		if ( contextData.occlusionQuerySet !== undefined ) {
 
 			const lastObject = contextData.lastOcclusionObject;
 
@@ -930,7 +930,7 @@ class WebGPUBackend extends Backend {
 			data.side !== material.side || data.alphaToCoverage !== material.alphaToCoverage ||
 			data.sampleCount !== sampleCount || data.colorSpace !== colorSpace ||
 			data.colorFormat !== colorFormat || data.depthStencilFormat !== depthStencilFormat ||
-			data.primitiveTopology !== primitiveTopology 
+			data.primitiveTopology !== primitiveTopology
 		) {
 
 			data.material = material; data.materialVersion = material.version;
@@ -1140,7 +1140,7 @@ class WebGPUBackend extends Backend {
 		return 16;
 
 	}
-		
+
 	async hasFeatureAsync( name ) {
 
 		const adapter = this.adapter || await WebGPU.getStaticAdapter();
@@ -1153,7 +1153,7 @@ class WebGPUBackend extends Backend {
 
 	hasFeature( name ) {
 
-		if ( !this.adapter ) {
+		if ( ! this.adapter ) {
 
 			console.warn( 'WebGPUBackend: WebGPU adapter has not been initialized yet. Please use detectSupportAsync instead' );
 
