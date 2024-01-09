@@ -2,11 +2,17 @@ import { InstancedBufferAttribute } from 'three';
 
 class StorageBufferAttribute extends InstancedBufferAttribute {
 
-	constructor( type, size, count ) {
+	constructor( array, itemSize ) {
 
-		super( new type( count * size ), size );
+		super( array, itemSize );
 
 		this.isStorageBufferAttribute = true;
+
+	}
+
+	static create( count, itemSize, typeClass = Float32Array ) {
+
+		return new StorageBufferAttribute( new typeClass( count * itemSize ), itemSize );
 
 	}
 

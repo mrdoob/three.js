@@ -75,7 +75,7 @@
 
 				//
 
-				const createBuffer = () => storage( new StorageBufferAttribute( Float32Array, 3, particleCount ), 'vec3', particleCount );
+				const createBuffer = () => storage( StorageBufferAttribute.create( particleCount, 3 ), 'vec3', particleCount );
 
 				const positionBuffer = createBuffer();
 				const velocityBuffer = createBuffer();

@@ -67,8 +67,8 @@
 
 				// create buffers
 
-				const particleBuffer = new StorageBufferAttribute( Float32Array, particleSize, particleNum );
-				const velocityBuffer = new StorageBufferAttribute( Float32Array, particleSize, particleNum );
+				const particleBuffer = StorageBufferAttribute.create( particleNum, particleSize );
+				const velocityBuffer = StorageBufferAttribute.create( particleNum, particleSize );
 
 				const particleBufferNode = storage( particleBuffer, 'vec2', particleNum );
 				const velocityBufferNode = storage( velocityBuffer, 'vec2', particleNum );
