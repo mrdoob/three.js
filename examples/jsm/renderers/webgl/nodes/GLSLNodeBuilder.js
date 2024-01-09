@@ -36,6 +36,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 		super( object, renderer, new GLSLNodeParser(), scene );
 
 		this.uniformGroups = {};
+		this.transforms = [];
 
 	}
 
@@ -279,7 +280,7 @@ ${ flowData.code }
 
 		let snippet = '';
 
-		if ( shaderStage === 'vertex' ) {
+		if ( shaderStage === 'vertex' || shaderStage === 'compute' ) {
 
 			const attributes = this.getAttributesArray();
 
@@ -346,10 +347,11 @@ ${ flowData.code }
 
 		const varyings = this.varyings;
 
-		if ( shaderStage === 'vertex' ) {
+		if ( shaderStage === 'vertex' || shaderStage === 'compute' ) {
 
 			for ( const varying of varyings ) {
 
+				if ( shaderStage === 'compute' ) varying.needsInterpolation = true;
 				const type = varying.type;
 				const flat = type === 'int' || type === 'uint' ? 'flat ' : '';
 
@@ -421,6 +423,32 @@ ${ flowData.code }
 
 	}
 
+	registerTransform( varyingName, attributeNode ) {
+
+		this.transforms.push( { varyingName, attributeNode } );
+
+	}
+
+	getTransforms( /* shaderStage  */ ) {
+
+		const transforms = this.transforms;
+
+		let snippet = '';
+
+		for ( let i = 0; i < transforms.length; i ++ ) {
+
+			const transform = transforms[ i ];
+
+			const attributeName = this.getPropertyName( transform.attributeNode );
+
+			snippet += `${ transform.varyingName } = ${ attributeName };\n\t`;
+
+		}
+
+		return snippet;
+
+	}
+
 	_getGLSLUniformStruct( name, vars ) {
 
 		return `
@@ -455,6 +483,9 @@ void main() {
 
 	// vars
 	${shaderData.vars}
+
+	// transforms
+	${shaderData.transforms}
 
 	// flow
 	${shaderData.flow}
@@ -558,6 +589,7 @@ void main() {
 			stageData.vars = this.getVars( shaderStage );
 			stageData.structs = this.getStructs( shaderStage );
 			stageData.codes = this.getCodes( shaderStage );
+			stageData.transforms = this.getTransforms( shaderStage );
 			stageData.flow = flow;
 
 		}
@@ -569,8 +601,7 @@ void main() {
 
 		} else {
 
-			console.warn( 'GLSLNodeBuilder: compute shaders are not supported.' );
-			//this.computeShader = this._getGLSLComputeCode( shadersData.compute );
+			this.computeShader = this._getGLSLVertexCode( shadersData.compute );
 
 		}
 

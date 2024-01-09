@@ -112,10 +112,6 @@ const exceptionList = [
 	// Awaiting for WebGL backend support
 	'webgpu_clearcoat',
 	'webgpu_compute_audio',
-	'webgpu_compute_particles',
-	'webgpu_compute_particles_rain',
-	'webgpu_compute_particles_snow',
-	'webgpu_compute_points',
 	'webgpu_compute_texture',
 	'webgpu_compute_texture_pingpong',
 	'webgpu_materials',
@@ -137,7 +133,13 @@ const exceptionList = [
 	'webgpu_shadowmap',
 	'webgpu_tsl_editor',
 	'webgpu_tsl_transpiler',
-	'webgpu_portal'
+	'webgpu_portal',
+
+	// WebGPU idleTime and parseTime too low
+	'webgpu_compute_particles',
+	'webgpu_compute_particles_rain',
+	'webgpu_compute_particles_snow',
+	'webgpu_compute_points'
 
 ];
 

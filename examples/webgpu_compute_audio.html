@@ -35,6 +35,7 @@
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import StorageBufferAttribute from 'three/addons/renderers/common/StorageBufferAttribute.js';
 
 			let camera, scene, renderer;
 			let computeNode;
@@ -115,14 +116,14 @@
 
 				// create webgpu buffers
 
-				waveGPUBuffer = new THREE.InstancedBufferAttribute( waveBuffer, 1 );
+				waveGPUBuffer = new StorageBufferAttribute( waveBuffer, 1 );
 
 				const waveStorageNode = storage( waveGPUBuffer, 'float', waveBuffer.length );
 
 
 				// read-only buffer
 
-				const waveNode = storage( new THREE.InstancedBufferAttribute( waveBuffer, 1 ), 'float', waveBuffer.length );
+				const waveNode = storage( new StorageBufferAttribute( waveBuffer, 1 ), 'float', waveBuffer.length );
 
 
 				// params

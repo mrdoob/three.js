@@ -42,7 +42,15 @@ class WebGPUAttributeUtils {
 
 			const device = backend.device;
 
-			const array = bufferAttribute.array;
+			let array = bufferAttribute.array;
+
+			if ( bufferAttribute.isStorageBufferAttribute && bufferAttribute.itemSize === 3 ) {
+
+				bufferAttribute.itemSize = 4;
+				array = new array.constructor( bufferAttribute.count * 4 );
+
+			}
+
 			const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
 
 			buffer = device.createBuffer( {
