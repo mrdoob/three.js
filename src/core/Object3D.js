@@ -519,14 +519,14 @@ class Object3D extends EventDispatcher {
 
 	traverse( callback, cancellable ) {
 
-		if(callback( this ) && cancellable)
+		if ( callback( this ) && cancellable )
 			return;
 
 		const children = this.children;
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			if(children[ i ].traverse( callback ) && cancellable)
+			if ( children[ i ].traverse( callback ) && cancellable )
 				return;
 
 		}
