@@ -64,8 +64,8 @@
 				camera.position.set( 3, 2, 4 );
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x74ccf4, 7, 25 );
-				scene.backgroundNode = normalWorld.y.mix( color( 0x74ccf4 ), color( 0x0066ff ) );
+				scene.fog = new THREE.Fog( 0x0487e2, 7, 25 );
+				scene.backgroundNode = normalWorld.y.mix( color( 0x0487e2 ), color( 0x0066ff ) );
 				camera.lookAt( 0, 1, 0 );
 
 				const sunLight = new THREE.DirectionalLight( 0xFFE499, 5 );
@@ -155,7 +155,7 @@
 				const waterLayer1 = mx_worley_noise_float( floorUV.mul( 2 ).add( timer ) );
 
 				const waterIntensity = waterLayer0.mul( waterLayer1 );
-				const waterColor = waterIntensity.mul( 1.4 ).mix( color( 0x0f5e9c ), color( 0x74ccf4 ) );
+				const waterColor = waterIntensity.mul( 1.4 ).mix( color( 0x0487e2 ), color( 0x74ccf4 ) );
 
 				const depthWater = depthTexture( viewportDepthTexture() ).sub( depth );
 				const depthEffect = depthWater.remapClamp( - .002, .02 );
