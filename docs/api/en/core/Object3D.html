@@ -548,10 +548,10 @@
 		<h3>[method:this translateZ]( [param:Float distance] )</h3>
 		<p>Translates object along z axis in object space by `distance` units.</p>
 
-		<h3>[method:undefined traverse]( [param:Function callback] )</h3>
+		<h3>[method:undefined traverse]( [param:Function callback], [param:Boolean cancellable] )</h3>
 		<p>
 			callback - A function with as first argument an object3D object.<br /><br />
-
+			cancellable - if true, traverse can be ended early by placing 'return true' within callback function.
 			Executes the callback on this object and all descendants.<br />
 			Note: Modifying the scene graph inside the callback is discouraged.
 		</p>

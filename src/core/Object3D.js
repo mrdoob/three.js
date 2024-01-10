@@ -517,15 +517,17 @@ class Object3D extends EventDispatcher {
 
 	raycast( /* raycaster, intersects */ ) {}
 
-	traverse( callback ) {
+	traverse( callback, cancellable ) {
 
-		callback( this );
+		if(callback( this ) && cancellable)
+			return;
 
 		const children = this.children;
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			children[ i ].traverse( callback );
+			if(children[ i ].traverse( callback ) && cancellable)
+				return;
 
 		}
 
