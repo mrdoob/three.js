@@ -13,9 +13,6 @@ class ViewportDepthTextureNode extends ViewportTextureNode {
 		if ( sharedDepthbuffer === null ) {
 
 			sharedDepthbuffer = new DepthTexture();
-			sharedDepthbuffer.minFilter = NearestMipmapNearestFilter;
-			sharedDepthbuffer.type = UnsignedIntType;
-			sharedDepthbuffer.format = DepthFormat;
 
 		}
 

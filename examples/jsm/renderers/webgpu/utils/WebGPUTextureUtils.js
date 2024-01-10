@@ -755,7 +755,7 @@ export function getFormat( texture, device = null ) {
 
 	let formatGPU;
 
-	if ( /*texture.isRenderTargetTexture === true ||*/ texture.isFramebufferTexture === true ) {
+	if ( texture.isFramebufferTexture === true && texture.type === UnsignedByteType ) {
 
 		formatGPU = GPUTextureFormat.BGRA8Unorm;
 

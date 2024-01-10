@@ -1173,17 +1173,41 @@ class WebGPUBackend extends Backend {
 
 		let sourceGPU = null;
 
-		if ( texture.isFramebufferTexture ) {
+		if ( renderContext.renderTarget ) {
 
-			sourceGPU = this.context.getCurrentTexture();
+			if ( texture.isDepthTexture ) {
 
-		} else if ( texture.isDepthTexture ) {
+				sourceGPU = this.get( renderContext.depthTexture ).texture;
 
-			sourceGPU = this.textureUtils.getDepthBuffer( renderContext.depth, renderContext.stencil );
+			} else {
+
+				sourceGPU = this.get( renderContext.textures[ 0 ] ).texture;
+
+			}
+
+		} else {
+
+			if ( texture.isDepthTexture ) {
+
+				sourceGPU = this.textureUtils.getDepthBuffer( renderContext.depth, renderContext.stencil );
+
+			} else {
+
+				sourceGPU = this.context.getCurrentTexture();
+
+			}
 
 		}
 
 		const destinationGPU = this.get( texture ).texture;
+
+		if ( sourceGPU.format !== destinationGPU.format ) {
+
+			console.error( 'WebGPUBackend: copyFramebufferToTexture: Source and destination formats do not match.', sourceGPU.format, destinationGPU.format );
+
+			return;
+
+		}
 
 		renderContextData.currentPass.end();
 
