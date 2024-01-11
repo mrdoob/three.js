@@ -49,10 +49,10 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'getUV', ( assert ) => {
+		QUnit.todo( 'getInterpolation', ( assert ) => {
 
 			// static version of class member below
-			// getUV( point, p1, p2, p3, uv1, uv2, uv3, target )
+			// getInterpolation( point, p1, p2, p3, uv1, uv2, uv3, target )
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
@@ -244,10 +244,10 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'getUV', ( assert ) => {
+		QUnit.todo( 'getInterpolation', ( assert ) => {
 
 			// class member version
-			// getUV( point, uv1, uv2, uv3, target )
+			// getInterpolation( point, uv1, uv2, uv3, target )
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );

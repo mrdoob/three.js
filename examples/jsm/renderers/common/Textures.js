@@ -1,6 +1,6 @@
 import DataMap from './DataMap.js';
 
-import { Vector3, DepthTexture, DepthStencilFormat, UnsignedInt248Type, LinearFilter, NearestFilter, EquirectangularReflectionMapping, EquirectangularRefractionMapping, CubeReflectionMapping, CubeRefractionMapping } from 'three';
+import { Vector3, DepthTexture, DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, LinearFilter, NearestFilter, EquirectangularReflectionMapping, EquirectangularRefractionMapping, CubeReflectionMapping, CubeRefractionMapping } from 'three';
 
 const _size = new Vector3();
 
@@ -47,8 +47,8 @@ class Textures extends DataMap {
 		if ( depthTexture === undefined ) {
 
 			depthTexture = new DepthTexture();
-			depthTexture.format = DepthStencilFormat;
-			depthTexture.type = UnsignedInt248Type;
+			depthTexture.format = renderTarget.stencilBuffer ? DepthStencilFormat : DepthFormat;
+			depthTexture.type = renderTarget.stencilBuffer ? UnsignedInt248Type : UnsignedIntType;
 			depthTexture.image.width = mipWidth;
 			depthTexture.image.height = mipHeight;
 

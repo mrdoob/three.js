@@ -1,9 +1,9 @@
 {
   "name": "three",
-  "version": "0.159.0",
+  "version": "0.160.0",
   "description": "JavaScript 3D library",
   "type": "module",
-  "main": "./build/three.js",
+  "main": "./build/three.cjs",
   "module": "./build/three.module.js",
   "exports": {
     ".": {
@@ -21,7 +21,7 @@
     "type": "git",
     "url": "https://github.com/mrdoob/three.js"
   },
-  "sideEffects": ["./examples/jsm/nodes/Nodes.js"],
+  "sideEffects": ["./examples/jsm/nodes/**/*"],
   "files": [
     "build",
     "examples/jsm",

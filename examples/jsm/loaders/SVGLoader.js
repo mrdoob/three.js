@@ -2924,8 +2924,8 @@ class SVGLoader extends Loader {
 			addVertex( currentPointL, u1, 0 );
 
 			addVertex( lastPointR, u0, 1 );
-			addVertex( currentPointL, u1, 1 );
-			addVertex( currentPointR, u1, 0 );
+			addVertex( currentPointL, u1, 0 );
+			addVertex( currentPointR, u1, 1 );
 
 		}
 
@@ -3082,7 +3082,8 @@ class SVGLoader extends Loader {
 						} else {
 
 							tempV2_3.toArray( vertices, 1 * 3 );
-							tempV2_3.toArray( vertices, 3 * 3 );
+							// using tempV2_4 to update 3rd vertex if the uv.y of 3rd vertex is 1
+							uvs[ 3 * 2 + 1 ] === 1 ? tempV2_4.toArray( vertices, 3 * 3 ) : tempV2_3.toArray( vertices, 3 * 3 );
 							tempV2_4.toArray( vertices, 0 * 3 );
 
 						}

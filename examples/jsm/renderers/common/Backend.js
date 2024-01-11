@@ -84,9 +84,13 @@ class Backend {
 
 	// canvas
 
+	getContext() { }
+
 	updateSize() { }
 
 	// utils
+
+	hasFeatureAsync( name ) { } // return Boolean
 
 	hasFeature( name ) { } // return Boolean
 
@@ -167,6 +171,12 @@ class Backend {
 		}
 
 		return map;
+
+	}
+
+	has( object ) {
+
+		return this.data.has( object );
 
 	}
 

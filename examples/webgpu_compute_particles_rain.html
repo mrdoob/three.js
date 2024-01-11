@@ -27,7 +27,9 @@
 			import { tslFn, texture, uv, uint, positionWorld, modelWorldMatrix, cameraViewMatrix, timerLocal, timerDelta, cameraProjectionMatrix, vec2, instanceIndex, positionGeometry, storage, MeshBasicNodeMaterial, If } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import StorageBufferAttribute from 'three/addons/renderers/common/StorageBufferAttribute.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -46,17 +48,17 @@
 			let clock;
 
 			let collisionBox, collisionCamera, collisionPosRT, collisionPosMaterial;
-			let collisionBoxPos;
+			let collisionBoxPos, collisionBoxPosUI;
 
 			init();
 
 			function init() {
 
-				if ( WebGPU.isAvailable() === false ) {
+				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
-					throw new Error( 'No WebGPU support' );
+					throw new Error( 'No WebGPU or WebGL2 support' );
 
 				}
 
@@ -101,7 +103,7 @@
 
 				//
 
-				const createBuffer = ( type = 'vec3' ) => storage( new THREE.InstancedBufferAttribute( new Float32Array( maxParticleCount * 4 ), 4 ), type, maxParticleCount );
+				const createBuffer = ( type = 'vec3' ) => storage( StorageBufferAttribute.create( maxParticleCount, 3 ), type, maxParticleCount );
 
 				const positionBuffer = createBuffer();
 				const velocityBuffer = createBuffer();
@@ -138,7 +140,7 @@
 
 				const computeUpdate = tslFn( () => {
 
-					const getCoord = ( pos ) => pos.add( 50 ).div( 100 ).mul( vec2( 1, - 1 ) );
+					const getCoord = ( pos ) => pos.add( 50 ).div( 100 );
 
 					const position = positionBuffer.element( instanceIndex );
 					const velocity = velocityBuffer.element( instanceIndex );
@@ -346,9 +348,10 @@
 				const gui = new GUI();
 
 				// use lerp to smooth the movement
-				collisionBoxPos = new THREE.Vector3().copy( collisionBox.position );
+				collisionBoxPosUI = new THREE.Vector3().copy( collisionBox.position );
+				collisionBoxPos = new THREE.Vector3();
 
-				gui.add( collisionBoxPos, 'z', - 50, 50, .001 ).name( 'position' );
+				gui.add( collisionBoxPosUI, 'z', - 50, 50, .001 ).name( 'position' );
 				gui.add( collisionBox.scale, 'x', .1, 3.5, 0.01 ).name( 'scale' );
 				gui.add( rainParticles, 'count', 200, maxParticleCount, 1 ).name( 'drop count' ).onChange( ( v ) => rippleParticles.count = v );
 
@@ -376,6 +379,8 @@
 					monkey.rotation.y += delta;
 
 				}
+
+				collisionBoxPos.set( collisionBoxPosUI.x, collisionBoxPosUI.y, - collisionBoxPosUI.z );
 
 				collisionBox.position.lerp( collisionBoxPos, 10 * delta );
 

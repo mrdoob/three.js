@@ -567,6 +567,14 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function setTextureParameters( textureType, texture, supportsMips ) {
 
+		if ( texture.type === FloatType && extensions.has( 'OES_texture_float_linear' ) === false &&
+			( texture.magFilter === LinearFilter || texture.magFilter === LinearMipmapNearestFilter || texture.magFilter === NearestMipmapLinearFilter || texture.magFilter === LinearMipmapLinearFilter ||
+			texture.minFilter === LinearFilter || texture.minFilter === LinearMipmapNearestFilter || texture.minFilter === NearestMipmapLinearFilter || texture.minFilter === LinearMipmapLinearFilter ) ) {
+
+			console.warn( 'THREE.WebGLRenderer: Unable to use linear filtering with floating point textures. OES_texture_float_linear not supported on this device.' );
+
+		}
+
 		if ( supportsMips ) {
 
 			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, wrappingToGL[ texture.wrapS ] );

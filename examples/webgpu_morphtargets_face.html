@@ -48,7 +48,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
 
@@ -75,12 +75,13 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.setAnimationLoop( animate );
 
 				container.appendChild( renderer.domElement );
 
-				const ktx2Loader = new KTX2Loader()
+				const ktx2Loader = await new KTX2Loader()
 					.setTranscoderPath( 'jsm/libs/basis/' )
-					.detectSupport( renderer );
+					.detectSupportAsync( renderer );
 
 				new GLTFLoader()
 					.setKTX2Loader( ktx2Loader )
@@ -132,7 +133,9 @@
 				const stats = new Stats();
 				container.appendChild( stats.dom );
 
-				renderer.setAnimationLoop( () => {
+
+
+				function animate() {
 
 					const delta = clock.getDelta();
 
@@ -148,7 +151,7 @@
 
 					stats.update();
 
-				} );
+				}
 
 				window.addEventListener( 'resize', () => {
 

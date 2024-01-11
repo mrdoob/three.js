@@ -5,6 +5,7 @@ import {
 	LinearToneMapping,
 	ReinhardToneMapping,
 	CineonToneMapping,
+	AgXToneMapping,
 	ACESFilmicToneMapping,
 	SRGBTransfer
 } from 'three';
@@ -59,6 +60,7 @@ class OutputPass extends Pass {
 			else if ( this._toneMapping === ReinhardToneMapping ) this.material.defines.REINHARD_TONE_MAPPING = '';
 			else if ( this._toneMapping === CineonToneMapping ) this.material.defines.CINEON_TONE_MAPPING = '';
 			else if ( this._toneMapping === ACESFilmicToneMapping ) this.material.defines.ACES_FILMIC_TONE_MAPPING = '';
+			else if ( this._toneMapping === AgXToneMapping ) this.material.defines.AGX_TONE_MAPPING = '';
 
 			this.material.needsUpdate = true;
 

@@ -7,7 +7,7 @@ import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
 import ParameterNode from './ParameterNode.js';
 import FunctionNode from '../code/FunctionNode.js';
-import { createNodeMaterialFromType } from '../materials/NodeMaterial.js';
+import { createNodeMaterialFromType, default as NodeMaterial } from '../materials/NodeMaterial.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import {
@@ -626,9 +626,9 @@ class NodeBuilder {
 
 	}
 
-	getDataFromNode( node, shaderStage = this.shaderStage ) {
+	getDataFromNode( node, shaderStage = this.shaderStage, cache = null ) {
 
-		const cache = node.isGlobal( this ) ? this.globalCache : this.cache;
+		cache = cache === null ? ( node.isGlobal( this ) ? this.globalCache : this.cache ) : cache;
 
 		let nodeData = cache.getNodeData( node );
 
@@ -697,7 +697,7 @@ class NodeBuilder {
 
 	getUniformFromNode( node, type, shaderStage = this.shaderStage, name = null ) {
 
-		const nodeData = this.getDataFromNode( node, shaderStage );
+		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
 		let nodeUniform = nodeData.uniform;
 
@@ -1089,7 +1089,23 @@ class NodeBuilder {
 
 	}
 
-	build() {
+	build( convertMaterial = true ) {
+
+		const { object, material } = this;
+
+		if ( convertMaterial ) {
+
+			if ( material !== null ) {
+
+				NodeMaterial.fromMaterial( material ).build( this );
+
+			} else {
+
+				this.addFlow( 'compute', object );
+
+			}
+
+		}
 
 		// setup() -> stage 1: create possible new nodes and returns an output reference node
 		// analyze()   -> stage 2: analyze nodes to possible optimization and validation

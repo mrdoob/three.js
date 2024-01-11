@@ -12,8 +12,6 @@ const _vap = /*@__PURE__*/ new Vector3();
 const _vbp = /*@__PURE__*/ new Vector3();
 const _vcp = /*@__PURE__*/ new Vector3();
 
-let warnedGetUV = false;
-
 class Triangle {
 
 	constructor( a = new Vector3(), b = new Vector3(), c = new Vector3() ) {
@@ -84,20 +82,6 @@ class Triangle {
 		}
 
 		return ( _v3.x >= 0 ) && ( _v3.y >= 0 ) && ( ( _v3.x + _v3.y ) <= 1 );
-
-	}
-
-	static getUV( point, p1, p2, p3, uv1, uv2, uv3, target ) { // @deprecated, r151
-
-		if ( warnedGetUV === false ) {
-
-			console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' );
-
-			warnedGetUV = true;
-
-		}
-
-		return this.getInterpolation( point, p1, p2, p3, uv1, uv2, uv3, target );
 
 	}
 
@@ -208,20 +192,6 @@ class Triangle {
 	getBarycoord( point, target ) {
 
 		return Triangle.getBarycoord( point, this.a, this.b, this.c, target );
-
-	}
-
-	getUV( point, uv1, uv2, uv3, target ) { // @deprecated, r151
-
-		if ( warnedGetUV === false ) {
-
-			console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' );
-
-			warnedGetUV = true;
-
-		}
-
-		return Triangle.getInterpolation( point, this.a, this.b, this.c, uv1, uv2, uv3, target );
 
 	}
 

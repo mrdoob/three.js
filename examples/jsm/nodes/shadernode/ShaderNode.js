@@ -15,7 +15,13 @@ const NodeElements = new Map(); // @TODO: Currently only a few nodes are added, 
 
 export function addNodeElement( name, nodeElement ) {
 
-	if ( NodeElements.has( name ) ) throw new Error( `Redefinition of node element ${ name }` );
+	if ( NodeElements.has( name ) ) {
+
+		console.warn( `Redefinition of node element ${ name }` );
+		return;
+
+	}
+
 	if ( typeof nodeElement !== 'function' ) throw new Error( `Node element ${ name } is not a function` );
 
 	NodeElements.set( name, nodeElement );
@@ -335,7 +341,7 @@ class ShaderNodeInternal extends Node {
 
 	get isArrayInput() {
 
-		return /^\(\s+?\[/.test( this.jsFunc.toString() );
+		return /^\((\s+)?\[/.test( this.jsFunc.toString() );
 
 	}
 

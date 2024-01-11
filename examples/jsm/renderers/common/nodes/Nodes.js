@@ -164,7 +164,7 @@ class Nodes extends DataMap {
 
 			nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
 
-			computeData.nodeBuilderState = nodeBuilder;
+			computeData.nodeBuilderState = nodeBuilderState;
 
 		}
 
@@ -181,7 +181,8 @@ class Nodes extends DataMap {
 			nodeBuilder.getAttributesArray(),
 			nodeBuilder.getBindings(),
 			nodeBuilder.updateNodes,
-			nodeBuilder.updateBeforeNodes
+			nodeBuilder.updateBeforeNodes,
+			nodeBuilder.transforms
 		);
 
 	}
@@ -314,6 +315,7 @@ class Nodes extends DataMap {
 					if ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) {
 
 						nodeUV = equirectUV();
+						background.flipY = false;
 
 					} else {
 
