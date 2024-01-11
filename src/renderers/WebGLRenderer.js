@@ -2013,11 +2013,7 @@ class WebGLRenderer {
 
 			// Refresh opacity uniforms per frame and upload if necessary
 
-			if ( m_uniforms.opacity ) {
-
-				m_uniforms.opacity.value = opacity;
-
-			}
+			materials.refreshMaterialOpacity( m_uniforms, material, opacity );
 
 			if ( ! refreshMaterial && m_uniforms.opacity !== opacity ) {
 

@@ -551,9 +551,66 @@ function WebGLMaterials( renderer, properties ) {
 
 	}
 
+	// Same as refreshMaterialUniforms, but for opacity only
+
+	function refreshMaterialOpacity( uniforms, material, opacity ) {
+
+		if ( material.isMeshBasicMaterial ) {
+
+			uniforms.opacity.value = opacity;
+
+		} else if ( material.isMeshLambertMaterial ) {
+
+			uniforms.opacity.value = opacity;
+
+		} else if ( material.isMeshToonMaterial ) {
+
+			uniforms.opacity.value = opacity;
+
+		} else if ( material.isMeshPhongMaterial ) {
+
+			uniforms.opacity.value = opacity;
+
+		} else if ( material.isMeshStandardMaterial ) {
+
+			uniforms.opacity.value = opacity;
+
+		} else if ( material.isMeshMatcapMaterial ) {
+
+			uniforms.opacity.value = opacity;
+
+		} else if ( material.isMeshDepthMaterial ) {
+
+			uniforms.opacity.value = opacity;
+
+		} else if ( material.isMeshDistanceMaterial ) {
+
+			uniforms.opacity.value = opacity;
+
+		} else if ( material.isMeshNormalMaterial ) {
+
+			uniforms.opacity.value = opacity;
+
+		} else if ( material.isLineBasicMaterial ) {
+
+			uniforms.opacity.value = opacity;
+
+		} else if ( material.isPointsMaterial ) {
+
+			uniforms.opacity.value = opacity;
+
+		} else if ( material.isSpriteMaterial ) {
+
+			uniforms.opacity.value = opacity;
+
+		}
+
+	}
+
 	return {
 		refreshFogUniforms: refreshFogUniforms,
-		refreshMaterialUniforms: refreshMaterialUniforms
+		refreshMaterialUniforms: refreshMaterialUniforms,
+		refreshMaterialOpacity: refreshMaterialOpacity
 	};
 
 }
