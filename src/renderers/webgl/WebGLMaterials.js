@@ -603,6 +603,10 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.opacity.value = opacity;
 
+		} else if ( material.isShadowMaterial ) {
+
+			uniforms.opacity.value = opacity;
+
 		}
 
 	}
