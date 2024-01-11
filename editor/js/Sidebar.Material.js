@@ -121,6 +121,21 @@ function SidebarMaterial( editor ) {
 	const materialMetalness = new SidebarMaterialNumberProperty( editor, 'metalness', strings.getKey( 'sidebar/material/metalness' ), [ 0, 1 ] );
 	container.add( materialMetalness );
 
+	// anisotropy
+
+	const materialAnisotropy = new SidebarMaterialNumberProperty( editor, 'anisotropy', strings.getKey( 'sidebar/material/anisotropy' ), [ 0, 1 ] );
+	container.add( materialAnisotropy );
+
+	// anisotropy rotation
+
+	const materialAnisotropyRotation = new SidebarMaterialNumberProperty( editor, 'anisotropyRotation', strings.getKey( 'sidebar/material/anisotropyRotation' ) );
+	container.add( materialAnisotropyRotation );
+
+	// anisotropy map
+
+	const anisotropyMap = new SidebarMaterialMapProperty( editor, 'anisotropyMap', strings.getKey( 'sidebar/material/anisotropyMap' ) );
+	container.add( anisotropyMap );
+
 	// clearcoat
 
 	const materialClearcoat = new SidebarMaterialNumberProperty( editor, 'clearcoat', strings.getKey( 'sidebar/material/clearcoat' ), [ 0, 1 ] );
