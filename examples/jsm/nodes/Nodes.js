@@ -54,6 +54,8 @@ export { default as EquirectUVNode, equirectUV } from './utils/EquirectUVNode.js
 export { default as FunctionOverloadingNode, overloadingFn } from './utils/FunctionOverloadingNode.js';
 export { default as JoinNode } from './utils/JoinNode.js';
 export { default as LoopNode, loop } from './utils/LoopNode.js';
+export { default as LoopBreakNode, loopBreak } from './utils/LoopBreakNode.js';
+export { default as LoopContinueNode, loopContinue } from './utils/LoopContinueNode.js';
 export { default as MatcapUVNode, matcapUV } from './utils/MatcapUVNode.js';
 export { default as MaxMipLevelNode, maxMipLevel } from './utils/MaxMipLevelNode.js';
 export { default as OscNode, oscSine, oscSquare, oscTriangle, oscSawtooth } from './utils/OscNode.js';
