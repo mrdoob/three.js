@@ -84,6 +84,38 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	}
 
+	let tileOffsetX, tileOffsetY;
+	let tileRepeatX, tileRepeatY;
+
+	if ( property !== 'envMap' && property !== 'lightMap' && property !== 'aoMap' ) {
+
+		const tile = new UIDiv().setMarginLeft( '3px' );
+		container.add( tile );
+
+		const tileOffsetRow = new UIRow().setMarginBottom( '0px' ).setStyle( 'min-height', '0px' );
+		tile.add( tileOffsetRow );
+
+		tileOffsetRow.add( new UIText( 'offset:' ).setWidth( '40px' ) );
+
+		tileOffsetX = new UINumber( 0 ).setWidth( '40px' ).setRange( 0, 1 ).onChange( onTileChange );
+		tileOffsetRow.add( tileOffsetX );
+
+		tileOffsetY = new UINumber( 0 ).setWidth( '40px' ).setRange( 0, 1 ).onChange( onTileChange );
+		tileOffsetRow.add( tileOffsetY );
+
+		const tileRepeatRow = new UIRow().setMarginBottom( '6px' ).setStyle( 'min-height', '0px' );
+		tile.add( tileRepeatRow );
+
+		tileRepeatRow.add( new UIText( 'repeat:' ).setWidth( '40px' ) );
+
+		tileRepeatX = new UINumber( 1 ).setWidth( '40px' ).onChange( onTileChange );
+		tileRepeatRow.add( tileRepeatX );
+
+		tileRepeatY = new UINumber( 1 ).setWidth( '40px' ).onChange( onTileChange );
+		tileRepeatRow.add( tileRepeatY );
+
+	}
+
 	let object = null;
 	let materialSlot = null;
 	let material = null;
@@ -102,9 +134,39 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 				if ( property === 'envMap' ) newMap.mapping = THREE.EquirectangularReflectionMapping;
 
+				if ( property !== 'envMap' && property !== 'lightMap' && property !== 'aoMap' ) {
+
+					newMap.wrapS = newMap.wrapT = THREE.RepeatWrapping;
+					newMap.offset.fromArray( [ tileOffsetX.getValue(), tileOffsetY.getValue() ] );
+					newMap.repeat.fromArray( [ tileRepeatX.getValue(), tileRepeatY.getValue() ] );
+
+				}
+
 			}
 
 			editor.execute( new SetMaterialMapCommand( editor, object, property, newMap, materialSlot ) );
+
+		}
+
+	}
+
+	function onTileChange() {
+
+		const newMap = enabled.getValue() ? map.getValue() : null;
+
+		if ( newMap !== null ) {
+
+			if ( property !== 'envMap' && property !== 'lightMap' && property !== 'aoMap' ) {
+
+				const newOffset = [ tileOffsetX.getValue(), tileOffsetY.getValue() ];
+				const newRepeat = [ tileRepeatX.getValue(), tileRepeatY.getValue() ];
+
+				newMap.offset.fromArray( newOffset );
+				newMap.repeat.fromArray( newRepeat );
+
+				editor.execute( new SetMaterialMapCommand( editor, object, property, newMap, materialSlot ) );
+
+			}
 
 		}
 
@@ -188,6 +250,36 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 			if ( material[ property ] !== null ) {
 
 				map.setValue( material[ property ] );
+
+				if ( tileOffsetX !== undefined ) {
+
+					tileOffsetX.setValue( material[ property ].offset.x );
+					tileOffsetY.setValue( material[ property ].offset.y );
+
+				}
+
+				if ( tileRepeatX !== undefined ) {
+
+					tileRepeatX.setValue( material[ property ].repeat.x );
+					tileRepeatY.setValue( material[ property ].repeat.y );
+
+				}
+
+			} else {
+
+				if ( tileOffsetX !== undefined ) {
+
+					tileOffsetX.setValue( 0 );
+					tileOffsetY.setValue( 0 );
+
+				}
+
+				if ( tileRepeatX !== undefined ) {
+
+					tileRepeatX.setValue( 1 );
+					tileRepeatY.setValue( 1 );
+
+				}
 
 			}
 
