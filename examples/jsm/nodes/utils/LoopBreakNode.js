@@ -20,8 +20,8 @@ class LoopBreakNode extends CondNode {
 export default LoopBreakNode;
 
 export const inlineBreak = nodeProxy( LoopBreakNode );
-export const loopBreak = ( condNode ) => inlineBreak( condNode ).append();
+export const Break = ( condNode ) => inlineBreak( condNode ).append();
 
-addNodeElement( 'break', loopBreak ); // @TODO: Check... this cause a little confusing using in chaining
+addNodeElement( 'break', Break ); // @TODO: Check... this cause a little confusing using in chaining
 
 addNodeClass( 'LoopBreakNode', LoopBreakNode );

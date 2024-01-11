@@ -20,8 +20,8 @@ class LoopContinueNode extends CondNode {
 export default LoopContinueNode;
 
 export const inlineContinue = nodeProxy( LoopContinueNode );
-export const loopContinue = ( condNode ) => inlineContinue( condNode ).append();
+export const Continue = ( condNode ) => inlineContinue( condNode ).append();
 
-addNodeElement( 'continue', loopContinue ); // @TODO: Check... this cause a little confusing using in chaining
+addNodeElement( 'continue', Continue ); // @TODO: Check... this cause a little confusing using in chaining
 
 addNodeClass( 'LoopContinueNode', LoopContinueNode );
