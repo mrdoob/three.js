@@ -31,7 +31,7 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
-import { floorPowerOfTwo } from '../math/MathUtils.js';
+import { clamp, floorPowerOfTwo } from '../math/MathUtils.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
 import { WebGLAttributes } from './webgl/WebGLAttributes.js';
 import { WebGLBackground } from './webgl/WebGLBackground.js';
@@ -785,7 +785,7 @@ class WebGLRenderer {
 
 			const program = setProgram( camera, scene, geometry, material, object );
 
-			state.setMaterial( material, frontFaceCW );
+			state.setMaterial( material, object, frontFaceCW );
 
 			//
 
@@ -923,7 +923,7 @@ class WebGLRenderer {
 
 		function prepareMaterial( material, scene, object ) {
 
-			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
+			if ( ( material.transparent === true || object.visibility < 1.0 ) && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 				material.side = BackSide;
 				material.needsUpdate = true;
@@ -1567,7 +1567,7 @@ class WebGLRenderer {
 
 			material.onBeforeRender( _this, scene, camera, geometry, object, group );
 
-			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
+			if ( ( material.transparent === true || object.visibility < 1.0 ) && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 				material.side = BackSide;
 				material.needsUpdate = true;
@@ -1610,6 +1610,9 @@ class WebGLRenderer {
 			materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 			materialProperties.fog = scene.fog;
 			materialProperties.envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || materialProperties.environment );
+
+			// check if the object needs to render transparent (by material or object.visibility)
+			materialProperties.transparent = material.transparent || object.visibility < 1.0;
 
 			if ( programs === undefined ) {
 
@@ -1744,6 +1747,8 @@ class WebGLRenderer {
 			const fog = scene.fog;
 			const environment = material.isMeshStandardMaterial ? scene.environment : null;
 			const colorSpace = ( _currentRenderTarget === null ) ? _this.outputColorSpace : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace );
+			const transparent = material.transparent || object.visibility < 1.0;
+			const opacity = ( material.transparent ? material.opacity : 1.0 ) * clamp( object.visibility, 0, 1 );
 			const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
 			const vertexAlphas = material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4;
 			const vertexTangents = !! geometry.attributes.tangent && ( !! material.normalMap || material.anisotropy > 0 );
@@ -1801,6 +1806,10 @@ class WebGLRenderer {
 					needsProgramChange = true;
 
 				} else if ( object.isBatchedMesh && materialProperties.batching === false ) {
+
+					needsProgramChange = true;
+
+				} else if ( materialProperties.transparent !== transparent ) {
 
 					needsProgramChange = true;
 
@@ -1999,6 +2008,20 @@ class WebGLRenderer {
 
 				p_uniforms.setOptional( _gl, object, 'batchingTexture' );
 				p_uniforms.setValue( _gl, 'batchingTexture', object._matricesTexture, textures );
+
+			}
+
+			// Refresh opacity uniforms per frame and upload if necessary
+
+			if ( m_uniforms.opacity ) {
+
+				m_uniforms.opacity.value = opacity;
+
+			}
+
+			if ( ! refreshMaterial && m_uniforms.opacity !== opacity ) {
+
+				p_uniforms.setValue( _gl, 'opacity', opacity );
 
 			}
 

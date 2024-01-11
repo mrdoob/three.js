@@ -102,7 +102,6 @@ function WebGLMaterials( renderer, properties ) {
 		} else if ( material.isShadowMaterial ) {
 
 			uniforms.color.value.copy( material.color );
-			uniforms.opacity.value = material.opacity;
 
 		} else if ( material.isShaderMaterial ) {
 
@@ -113,8 +112,6 @@ function WebGLMaterials( renderer, properties ) {
 	}
 
 	function refreshUniformsCommon( uniforms, material ) {
-
-		uniforms.opacity.value = material.opacity;
 
 		if ( material.color ) {
 
@@ -250,7 +247,6 @@ function WebGLMaterials( renderer, properties ) {
 	function refreshUniformsLine( uniforms, material ) {
 
 		uniforms.diffuse.value.copy( material.color );
-		uniforms.opacity.value = material.opacity;
 
 		if ( material.map ) {
 
@@ -273,7 +269,6 @@ function WebGLMaterials( renderer, properties ) {
 	function refreshUniformsPoints( uniforms, material, pixelRatio, height ) {
 
 		uniforms.diffuse.value.copy( material.color );
-		uniforms.opacity.value = material.opacity;
 		uniforms.size.value = material.size * pixelRatio;
 		uniforms.scale.value = height * 0.5;
 
@@ -304,7 +299,6 @@ function WebGLMaterials( renderer, properties ) {
 	function refreshUniformsSprites( uniforms, material ) {
 
 		uniforms.diffuse.value.copy( material.color );
-		uniforms.opacity.value = material.opacity;
 		uniforms.rotation.value = material.rotation;
 
 		if ( material.map ) {

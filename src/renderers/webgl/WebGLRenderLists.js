@@ -112,7 +112,7 @@ function WebGLRenderList() {
 
 			transmissive.push( renderItem );
 
-		} else if ( material.transparent === true ) {
+		} else if ( material.transparent === true || object.visibility < 1.0 ) {
 
 			transparent.push( renderItem );
 
@@ -132,7 +132,7 @@ function WebGLRenderList() {
 
 			transmissive.unshift( renderItem );
 
-		} else if ( material.transparent === true ) {
+		} else if ( material.transparent === true || object.visibility < 1.0 ) {
 
 			transparent.unshift( renderItem );
 

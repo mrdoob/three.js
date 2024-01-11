@@ -141,7 +141,7 @@ class BatchedMesh extends Mesh {
 		this._drawRanges = [];
 		this._reservedRanges = [];
 
-		this._visibility = [];
+		this._visibilityState = [];
 		this._active = [];
 		this._bounds = [];
 
@@ -413,7 +413,7 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		const visibility = this._visibility;
+		const visibility = this._visibilityState;
 		const active = this._active;
 		const matricesTexture = this._matricesTexture;
 		const matricesArray = this._matricesTexture.image.data;
@@ -726,7 +726,7 @@ class BatchedMesh extends Mesh {
 
 	setVisibleAt( geometryId, value ) {
 
-		const visibility = this._visibility;
+		const visibility = this._visibilityState;
 		const active = this._active;
 		const geometryCount = this._geometryCount;
 
@@ -751,7 +751,7 @@ class BatchedMesh extends Mesh {
 
 	getVisibleAt( geometryId ) {
 
-		const visibility = this._visibility;
+		const visibility = this._visibilityState;
 		const active = this._active;
 		const geometryCount = this._geometryCount;
 
@@ -768,7 +768,7 @@ class BatchedMesh extends Mesh {
 
 	raycast( raycaster, intersects ) {
 
-		const visibility = this._visibility;
+		const visibility = this._visibilityState;
 		const active = this._active;
 		const drawRanges = this._drawRanges;
 		const geometryCount = this._geometryCount;
@@ -895,7 +895,7 @@ class BatchedMesh extends Mesh {
 		const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
 
 		const active = this._active;
-		const visibility = this._visibility;
+		const visibility = this._visibilityState;
 		const multiDrawStarts = this._multiDrawStarts;
 		const multiDrawCounts = this._multiDrawCounts;
 		const drawRanges = this._drawRanges;
@@ -954,7 +954,7 @@ class BatchedMesh extends Mesh {
 			const customSort = this.customSort;
 			if ( customSort === null ) {
 
-				list.sort( material.transparent ? sortTransparent : sortOpaque );
+				list.sort( material.transparent || this.visibility < 1.0 ? sortTransparent : sortOpaque );
 
 			} else {
 

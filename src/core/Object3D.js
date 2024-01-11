@@ -105,6 +105,8 @@ class Object3D extends EventDispatcher {
 		this.layers = new Layers();
 		this.visible = true;
 
+		this.visibility = 1.0;
+
 		this.castShadow = false;
 		this.receiveShadow = false;
 
@@ -696,6 +698,7 @@ class Object3D extends EventDispatcher {
 		if ( this.castShadow === true ) object.castShadow = true;
 		if ( this.receiveShadow === true ) object.receiveShadow = true;
 		if ( this.visible === false ) object.visible = false;
+		if ( this.visibility !== 1.0 ) object.visibility = this.visibility;
 		if ( this.frustumCulled === false ) object.frustumCulled = false;
 		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
 		if ( Object.keys( this.userData ).length > 0 ) object.userData = this.userData;
@@ -726,7 +729,8 @@ class Object3D extends EventDispatcher {
 			object.drawRanges = this._drawRanges;
 			object.reservedRanges = this._reservedRanges;
 
-			object.visibility = this._visibility;
+			object.visibilityState = this._visibilityState;
+
 			object.active = this._active;
 			object.bounds = this._bounds.map( bound => ( {
 				boxInitialized: bound.boxInitialized,
@@ -973,6 +977,8 @@ class Object3D extends EventDispatcher {
 
 		this.layers.mask = source.layers.mask;
 		this.visible = source.visible;
+
+		this.visibility = source.visibility;
 
 		this.castShadow = source.castShadow;
 		this.receiveShadow = source.receiveShadow;
