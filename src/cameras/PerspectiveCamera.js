@@ -99,6 +99,41 @@ class PerspectiveCamera extends Camera {
 
 	}
 
+	/*
+	 * Calculates the frustum's viewable margins at a given distance from the camera.
+	 * Useful to scale and position objects consistently acros variable aspect ratio.
+	 */
+	getMarginAt( distance ){
+
+		// Calculate dimensions
+		const height = 2 * Math.tan(this.fov * MathUtils.RAD2DEG / 2) * distance; 
+		const width = height * this.aspect; 
+
+		// Calculate corner positions
+		const topLeft = new THREE.Vector3(-width / 2, height / 2, -distance);
+		const topRight = new THREE.Vector3(width / 2, height / 2, -distance);
+		const bottomRight = new THREE.Vector3(width / 2, -height / 2, -distance);
+		const bottomLeft = new THREE.Vector3(width / 2, height / 2, -distance);
+
+		// Account for camera position/rotation/scale
+		this.updateMatixWorld();
+		topLeft.applyMatrix4(this.matrixWorld);
+		topRight.applyMatrix4(this.matrixWorld);
+		bottomLeft.applyMatrix4(this.matrixWorld);
+		bottomRight.applyMatrix4(this.matrixWorld);
+
+		// Probably wanna make a THREE.Rectangle() class or something instead of an object literal.
+		return {
+			topLeft,
+			topRight,
+			bottomRight,
+			bottomLeft,
+			height,
+			width
+		}
+
+	}
+
 	/**
 	 * Sets an offset in a larger frustum. This is useful for multi-window or
 	 * multi-monitor/multi-machine setups.
