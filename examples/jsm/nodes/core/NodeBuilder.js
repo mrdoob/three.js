@@ -29,6 +29,7 @@ const typeFromLength = new Map( [
 	[ 2, 'vec2' ],
 	[ 3, 'vec3' ],
 	[ 4, 'vec4' ],
+	[ 4, 'mat2' ],
 	[ 9, 'mat3' ],
 	[ 16, 'mat4' ]
 ] );
@@ -575,6 +576,7 @@ class NodeBuilder {
 
 		if ( vecNum !== null ) return Number( vecNum[ 1 ] );
 		if ( vecType === 'float' || vecType === 'bool' || vecType === 'int' || vecType === 'uint' ) return 1;
+		if ( /mat2/.test( type ) === true ) return 4;
 		if ( /mat3/.test( type ) === true ) return 9;
 		if ( /mat4/.test( type ) === true ) return 16;
 
