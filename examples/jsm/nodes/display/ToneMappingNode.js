@@ -2,9 +2,9 @@ import TempNode from '../core/TempNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { tslFn, nodeObject, float, mat3, vec3 } from '../shadernode/ShaderNode.js';
 
-import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping } from 'three';
-import { AgXToneMapping } from '../../../../src/constants.js';
-import { clamp, log2, max, mul, pow } from '../Nodes.js';
+import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping } from 'three';
+import { clamp, log2, max, pow } from '../math/MathNode.js';
+import { mul } from '../math/OperatorNode.js';
 
 // exposure only
 const LinearToneMappingNode = tslFn( ( { color, exposure } ) => {
