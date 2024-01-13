@@ -90,6 +90,8 @@ class Backend {
 
 	// utils
 
+	hasFeatureAsync( name ) { } // return Boolean
+
 	hasFeature( name ) { } // return Boolean
 
 	getInstanceCount( renderObject ) {
@@ -169,6 +171,12 @@ class Backend {
 		}
 
 		return map;
+
+	}
+
+	has( object ) {
+
+		return this.data.has( object );
 
 	}
 

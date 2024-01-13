@@ -1228,7 +1228,7 @@ class OrbitControls extends EventDispatcher {
 				clientX: event.clientX,
 				clientY: event.clientY,
 				deltaY: event.deltaY,
-			}
+			};
 
 			switch ( mode ) {
 
@@ -1243,7 +1243,7 @@ class OrbitControls extends EventDispatcher {
 			}
 
 			// detect if event was triggered by pinching
-			if ( event.ctrlKey && !controlActive ) {
+			if ( event.ctrlKey && ! controlActive ) {
 
 				newEvent.deltaY *= 10;
 
@@ -1255,11 +1255,14 @@ class OrbitControls extends EventDispatcher {
 
 		function interceptControlDown( event ) {
 
-			if ( event.key === "Control" ) {
+			if ( event.key === 'Control' ) {
 
 				controlActive = true;
-				
-				document.addEventListener('keyup', interceptControlUp, { passive: true, capture: true });
+
+
+				const document = scope.domElement.getRootNode(); // offscreen canvas compatibility
+
+				document.addEventListener( 'keyup', interceptControlUp, { passive: true, capture: true } );
 
 			}
 
@@ -1267,11 +1270,14 @@ class OrbitControls extends EventDispatcher {
 
 		function interceptControlUp( event ) {
 
-			if ( event.key === "Control" ) {
+			if ( event.key === 'Control' ) {
 
 				controlActive = false;
-				
-				document.removeEventListener('keyup', interceptControlUp, { passive: true, capture: true });
+
+
+				const document = scope.domElement.getRootNode(); // offscreen canvas compatibility
+
+				document.removeEventListener( 'keyup', interceptControlUp, { passive: true, capture: true } );
 
 			}
 
@@ -1484,6 +1490,8 @@ class OrbitControls extends EventDispatcher {
 		scope.domElement.addEventListener( 'pointerdown', onPointerDown );
 		scope.domElement.addEventListener( 'pointercancel', onPointerUp );
 		scope.domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
+
+		const document = scope.domElement.getRootNode(); // offscreen canvas compatibility
 
 		document.addEventListener( 'keydown', interceptControlDown, { passive: true, capture: true } );
 

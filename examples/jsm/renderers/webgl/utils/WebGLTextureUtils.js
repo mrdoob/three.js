@@ -184,7 +184,12 @@ class WebGLTextureUtils {
 		}
 
 		gl.texParameteri( textureType, gl.TEXTURE_MAG_FILTER, filterToGL[ texture.magFilter ] );
-		gl.texParameteri( textureType, gl.TEXTURE_MIN_FILTER, filterToGL[ texture.minFilter ] );
+
+
+		// follow WebGPU backend mapping for texture filtering
+		const minFilter = texture.minFilter === LinearFilter ? LinearMipmapLinearFilter : texture.minFilter;
+
+		gl.texParameteri( textureType, gl.TEXTURE_MIN_FILTER, filterToGL[ minFilter ] );
 
 		if ( texture.compareFunction ) {
 
@@ -398,8 +403,64 @@ class WebGLTextureUtils {
 		const { gl, backend } = this;
 		const { textureGPU, glTextureType } = backend.get( texture );
 
-		gl.bindTexture( glTextureType, textureGPU );
+		backend.state.bindTexture( glTextureType, textureGPU );
 		gl.generateMipmap( glTextureType );
+
+	}
+
+	deallocateRenderBuffers( renderTarget ) {
+
+
+		const { gl, backend } = this;
+
+		// remove framebuffer reference
+		if ( renderTarget ) {
+
+			const renderContextData = backend.get( renderTarget );
+
+			renderContextData.renderBufferStorageSetup = undefined;
+
+			if ( renderContextData.framebuffer ) {
+
+				gl.deleteFramebuffer( renderContextData.framebuffer );
+				renderContextData.framebuffer = undefined;
+
+			}
+
+			if ( renderContextData.depthRenderbuffer ) {
+
+				gl.deleteRenderbuffer( renderContextData.depthRenderbuffer );
+				renderContextData.depthRenderbuffer = undefined;
+
+			}
+
+			if ( renderContextData.stencilRenderbuffer ) {
+
+				gl.deleteRenderbuffer( renderContextData.stencilRenderbuffer );
+				renderContextData.stencilRenderbuffer = undefined;
+
+			}
+
+			if ( renderContextData.msaaFrameBuffer ) {
+
+				gl.deleteFramebuffer( renderContextData.msaaFrameBuffer );
+				renderContextData.msaaFrameBuffer = undefined;
+
+			}
+
+			if ( renderContextData.msaaRenderbuffers ) {
+
+				for ( let i = 0; i < renderContextData.msaaRenderbuffers.length; i ++ ) {
+
+					gl.deleteRenderbuffer( renderContextData.msaaRenderbuffers[ i ] );
+
+				}
+
+				renderContextData.msaaRenderbuffers = undefined;
+
+			}
+
+		}
 
 	}
 
@@ -408,16 +469,7 @@ class WebGLTextureUtils {
 		const { gl, backend } = this;
 		const { textureGPU, renderTarget } = backend.get( texture );
 
-		// remove framebuffer reference
-		if ( renderTarget ) {
-
-			const renderContextData = backend.get( renderTarget );
-			renderContextData.framebuffer = undefined;
-			renderContextData.msaaFrameBuffer = undefined;
-			renderContextData.depthRenderbuffer = undefined;
-
-		}
-
+		this.deallocateRenderBuffers( renderTarget );
 		gl.deleteTexture( textureGPU );
 
 		backend.delete( texture );
@@ -516,30 +568,7 @@ class WebGLTextureUtils {
 
 			gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, renderbuffer );
 
-		} else {
-
-			const textures = renderContext.textures;
-
-			for ( let i = 0; i < textures.length; i ++ ) {
-
-				const texture = textures[ i ];
-				const { glInternalFormat } = this.get( texture );
-
-				if ( samples > 0 ) {
-
-					gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, glInternalFormat, width, height );
-
-				} else {
-
-					gl.renderbufferStorage( gl.RENDERBUFFER, glInternalFormat, width, height );
-
-				}
-
-			}
-
 		}
-
-		gl.bindRenderbuffer( gl.RENDERBUFFER, null );
 
 	}
 

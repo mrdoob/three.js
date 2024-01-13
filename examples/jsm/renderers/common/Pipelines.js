@@ -42,18 +42,18 @@ class Pipelines extends DataMap {
 
 			// get shader
 
-			const nodeBuilder = this.nodes.getForCompute( computeNode );
+			const nodeBuilderState = this.nodes.getForCompute( computeNode );
 
 			// programmable stage
 
-			let stageCompute = this.programs.compute.get( nodeBuilder.computeShader );
+			let stageCompute = this.programs.compute.get( nodeBuilderState.computeShader );
 
 			if ( stageCompute === undefined ) {
 
 				if ( previousPipeline && previousPipeline.computeProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.computeProgram );
 
-				stageCompute = new ProgrammableStage( nodeBuilder.computeShader, 'compute' );
-				this.programs.compute.set( nodeBuilder.computeShader, stageCompute );
+				stageCompute = new ProgrammableStage( nodeBuilderState.computeShader, 'compute', nodeBuilderState.transforms, nodeBuilderState.nodeAttributes );
+				this.programs.compute.set( nodeBuilderState.computeShader, stageCompute );
 
 				backend.createProgram( stageCompute );
 

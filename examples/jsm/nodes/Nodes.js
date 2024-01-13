@@ -39,7 +39,9 @@ import * as NodeUtils from './core/NodeUtils.js';
 export { NodeUtils };
 
 // math
-export { default as MathNode, EPSILON, INFINITY, radians, degrees, exp, exp2, log, log2, sqrt, inverseSqrt, floor, ceil, normalize, fract, sin, cos, tan, asin, acos, atan, abs, sign, length, negate, oneMinus, dFdx, dFdy, round, reciprocal, trunc, fwidth, bitcast, atan2, min, max, mod, step, reflect, distance, difference, dot, cross, pow, pow2, pow3, pow4, transformDirection, mix, clamp, saturate, refract, smoothstep, faceForward } from './math/MathNode.js';
+export { default as MathNode, EPSILON, INFINITY, radians, degrees, exp, exp2, log, log2, sqrt, inverseSqrt, floor, ceil, normalize, fract, sin, cos, tan, asin, acos, atan, abs, sign, length, negate, oneMinus, dFdx, dFdy, round, reciprocal, trunc, fwidth, bitcast, atan2, min, max, mod, step, reflect, distance, difference, dot, cross, pow, pow2, pow3, pow4, transformDirection, mix, clamp, saturate, refract, smoothstep, faceForward, cbrt } from './math/MathNode.js';
+export { parabola, gain, pcurve, sinc } from './math/MathNode.js';
+
 export { default as OperatorNode, add, sub, mul, div, remainder, equal, lessThan, greaterThan, lessThanEqual, greaterThanEqual, and, or, xor, bitAnd, bitOr, bitXor, shiftLeft, shiftRight } from './math/OperatorNode.js';
 export { default as CondNode, cond } from './math/CondNode.js';
 export { default as HashNode, hash } from './math/HashNode.js';
@@ -58,6 +60,7 @@ export { default as OscNode, oscSine, oscSquare, oscTriangle, oscSawtooth } from
 export { default as PackingNode, directionToColor, colorToDirection } from './utils/PackingNode.js';
 export { default as RemapNode, remap, remapClamp } from './utils/RemapNode.js';
 export { default as RotateUVNode, rotateUV } from './utils/RotateUVNode.js';
+export { default as RotateNode, rotate } from './utils/RotateNode.js';
 export { default as SetNode } from './utils/SetNode.js';
 export { default as SpecularMIPLevelNode, specularMIPLevel } from './utils/SpecularMIPLevelNode.js';
 export { default as SplitNode } from './utils/SplitNode.js';

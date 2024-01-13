@@ -114,7 +114,7 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 		if ( texture !== null ) {
 
-			if ( colorMaps[ property ] !== undefined && texture.isDataTexture !== true && texture.colorSpace !== THREE.SRGBColorSpace ) {
+			if ( colorMaps.includes( property ) && texture.isDataTexture !== true && texture.colorSpace !== THREE.SRGBColorSpace ) {
 
 				texture.colorSpace = THREE.SRGBColorSpace;
 				material.needsUpdate = true;

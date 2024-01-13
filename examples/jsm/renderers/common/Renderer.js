@@ -266,9 +266,6 @@ class Renderer {
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
-		renderContext.depth = this.depth;
-		renderContext.stencil = this.stencil;
-
 		//
 
 		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
@@ -304,6 +301,8 @@ class Renderer {
 			renderContext.width = renderTargetData.width;
 			renderContext.height = renderTargetData.height;
 			renderContext.renderTarget = renderTarget;
+			renderContext.depth = renderTarget.depthBuffer;
+			renderContext.stencil = renderTarget.stencilBuffer;
 
 		} else {
 
@@ -311,6 +310,8 @@ class Renderer {
 			renderContext.depthTexture = null;
 			renderContext.width = this.domElement.width;
 			renderContext.height = this.domElement.height;
+			renderContext.depth = this.depth;
+			renderContext.stencil = this.stencil;
 
 		}
 
@@ -767,6 +768,12 @@ class Renderer {
 		//
 
 		nodeFrame.renderId = previousRenderId;
+
+	}
+
+	hasFeatureAsync( name ) {
+
+		return this.backend.hasFeatureAsync( name );
 
 	}
 
