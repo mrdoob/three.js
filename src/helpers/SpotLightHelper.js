@@ -4,10 +4,8 @@ import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
-import { Matrix4 } from '../math/Matrix4.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
-const _invMatrix = /*@__PURE__*/ new Matrix4();
 
 class SpotLightHelper extends Object3D {
 
@@ -61,56 +59,33 @@ class SpotLightHelper extends Object3D {
 
 	}
 
-	updateMatrixWorld( force ) {
-
-		if ( this.matrixWorldNeedsUpdate || force ) {
-
-			const parent = this.parent;
-			const light = this.light;
-
-			// transform into the parents local frame from world frame
-			if ( parent ) {
-
-				_invMatrix.copy( parent.matrixWorld ).invert();
-
-			} else {
-
-				_invMatrix.identity();
-
-			}
-
-			// transform the targets frame into the local frame
-			this.matrix
-				.copy( light.matrixWorld )
-				.premultiply( _invMatrix )
-				.decompose( this.position, this.quaternion, this.scale );
-
-			this.matrixWorld
-				.copy( light.matrixWorld );
-
-		}
-
-		// update the children
-		const children = this.children;
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-			const child = children[ i ];
-
-			if ( child.matrixWorldAutoUpdate === true || force === true ) {
-
-				child.updateMatrixWorld( force );
-
-			}
-
-		}
-
-	}
-
 	update() {
 
 		this.light.updateWorldMatrix( true, false );
 		this.light.target.updateWorldMatrix( true, false );
-		this.updateMatrixWorld();
+
+		// update the local matrix based on the parent and light target transforms
+		if ( this.parent ) {
+
+			this.matrix
+				.copy( this.parent.matrixWorld )
+				.invert()
+				.multiply( this.light.matrixWorld );
+
+		} else {
+
+			this.matrix
+				.copy( this.light.matrixWorld );
+
+		}
+
+		this.matrix.decompose(
+			this.position,
+			this.quaternion,
+			this.scale,
+		);
+
+		this.matrixWorld.copy( this.light.matrixWorld );
 
 		const coneLength = this.light.distance ? this.light.distance : 1000;
 		const coneWidth = coneLength * Math.tan( this.light.angle );
