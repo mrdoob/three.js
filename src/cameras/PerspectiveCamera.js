@@ -106,8 +106,8 @@ class PerspectiveCamera extends Camera {
 	getMarginAt( distance ){
 
 		// Calculate dimensions
-		const height = 2 * Math.tan(this.fov * MathUtils.DEG2RAD / 2) * distance; 
-		const width = height * this.aspect; 
+		let height = 2 * Math.tan(this.fov * MathUtils.DEG2RAD / 2) * distance; 
+		let width = height * this.aspect; 
 
 		// Calculate corner positions
 		const topLeft = new THREE.Vector3(-width / 2, height / 2, -distance);
@@ -121,6 +121,10 @@ class PerspectiveCamera extends Camera {
 		topRight.applyMatrix4(this.matrixWorld);
 		bottomLeft.applyMatrix4(this.matrixWorld);
 		bottomRight.applyMatrix4(this.matrixWorld);
+
+		// Take MatrixWorld into account for true height/width.
+		height = bottomLeft.distanceTo(topLeft);
+		width = topLeft.distanceTo(topRight);
 
 		// Probably wanna make a THREE.Rectangle() class or something instead of an object literal?
 		return {
