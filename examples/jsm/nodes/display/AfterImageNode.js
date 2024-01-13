@@ -109,7 +109,7 @@ class AfterImageNode extends TempNode {
 		//
 
 		const materialComposed = this._materialComposed || ( this._materialComposed = builder.createNodeMaterial( 'MeshBasicNodeMaterial' ) );
-		materialComposed.toneMapping = false;
+		materialComposed.toneMapped = false;
 		materialComposed.fragmentNode = afterImg();
 
 		quadMeshComp.material = materialComposed;
