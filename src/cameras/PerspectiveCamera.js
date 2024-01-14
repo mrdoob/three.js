@@ -99,15 +99,27 @@ class PerspectiveCamera extends Camera {
 
 	}
 
+	frustumHeight( distance ) {
+		let height = (2 * Math.tan(MathUtils.DEG2RAD * 0.5 * this.fov) * distance / this.zoom) * this.scale.y;
+		this.traverseAncestors( ( parent ) => {height *= parent.scale.y;});
+		return height;
+	}
+
+	frustumWidth( distance ) {
+		let width = this.frustumHeight(distance) * this.aspect * this.scale.x;
+		this.traverseAncestors((parent) => { width *= parent.scale.x; });
+		return width;
+	}
+
 	/*
-	 * Calculates the frustum's viewable margins at a given distance from the camera.
-	 * Useful to scale and position objects consistently agnostic to variable aspect ratio.
+	 * Calculates the frustum's viewable area corners at a given distance from the camera.
 	 */
-	getMarginAt( distance ){
+	frustumCorners( distance ){
 
 		// Calculate dimensions
-		let height = 2 * Math.tan(this.fov * MathUtils.DEG2RAD / 2) * distance; 
-		let width = height * this.aspect; 
+		// We don't use frustumWidth/frustumHeight because they partially account for camera's matrix4 we apply below
+		const height = 2 * Math.tan(this.fov * MathUtils.DEG2RAD / 2) * distance / this.zoom; 
+		const width = height * this.aspect; 
 
 		// Calculate corner positions
 		const topLeft = new THREE.Vector3(-width / 2, height / 2, -distance);
@@ -116,25 +128,18 @@ class PerspectiveCamera extends Camera {
 		const bottomLeft = new THREE.Vector3(-width / 2, -height / 2, -distance);
 
 		// Account for camera position/rotation/scale
-		this.updateMatrixWorld(); // <- Is this needed?
+		this.updateMatrixWorld();
 		topLeft.applyMatrix4(this.matrixWorld);
 		topRight.applyMatrix4(this.matrixWorld);
 		bottomLeft.applyMatrix4(this.matrixWorld);
 		bottomRight.applyMatrix4(this.matrixWorld);
 
-		// Take MatrixWorld into account for true height/width.
-		height = bottomLeft.distanceTo(topLeft);
-		width = topLeft.distanceTo(topRight);
-
-		// Probably wanna make a THREE.Rectangle() class or something instead of an object literal?
 		return {
 			topLeft,
 			topRight,
 			bottomRight,
 			bottomLeft,
-			height,
-			width
-		}
+		};
 
 	}
 
