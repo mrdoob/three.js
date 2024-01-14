@@ -79,12 +79,7 @@ class SpotLightHelper extends Object3D {
 
 		}
 
-		this.matrix.decompose(
-			this.position,
-			this.quaternion,
-			this.scale,
-		);
-
+		this.matrix.decompose( this.position, this.quaternion, this.scale );
 		this.matrixWorld.copy( this.light.matrixWorld );
 
 		const coneLength = this.light.distance ? this.light.distance : 1000;
