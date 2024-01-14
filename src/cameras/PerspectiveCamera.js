@@ -99,27 +99,25 @@ class PerspectiveCamera extends Camera {
 
 	}
 
-	frustumHeight( distance ) {
-		let height = (2 * Math.tan(MathUtils.DEG2RAD * 0.5 * this.fov) * distance / this.zoom) * this.scale.y;
-		this.traverseAncestors( ( parent ) => {height *= parent.scale.y;});
-		return height;
-	}
+	/*
+	 * Calculates the height/width of the camera's frustum at a given distance
+	 * Ignores scale of camera & camera ancestors. See relevant discussion https://github.com/mrdoob/three.js/issues/27556#issuecomment-1890901252
+	 */
+	frustumDimensions( distance ){
 
-	frustumWidth( distance ) {
-		let width = this.frustumHeight(distance) * this.aspect * this.scale.x;
-		this.traverseAncestors((parent) => { width *= parent.scale.x; });
-		return width;
+		const height = 2 * Math.tan(MathUtils.DEG2RAD * 0.5 * this.fov) * distance / this.zoom;
+		const width = height * this.aspect;
+		return { height, width };
+
 	}
 
 	/*
-	 * Calculates the frustum's viewable area corners at a given distance from the camera.
+	 * Calculates <Vec3>s of the frustum's corners at a given distance from the camera.
 	 */
 	frustumCorners( distance ){
 
 		// Calculate dimensions
-		// We don't use frustumWidth/frustumHeight because they partially account for camera's matrix4 we apply below
-		const height = 2 * Math.tan(this.fov * MathUtils.DEG2RAD / 2) * distance / this.zoom; 
-		const width = height * this.aspect; 
+		const { height, width } = this.frustumDimensions(distance);
 
 		// Calculate corner positions
 		const topLeft = new THREE.Vector3(-width / 2, height / 2, -distance);
