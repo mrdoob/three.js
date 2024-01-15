@@ -966,6 +966,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 					console.error(
 						'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
 						'VALIDATE_STATUS ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + '\n\n' +
+						'Shader Info: ' + self.name + '(' + self.type + ')' + '\n' +
 						'Program Info Log: ' + programLog + '\n' +
 						vertexErrors + '\n' +
 						fragmentErrors
