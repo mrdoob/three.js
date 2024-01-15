@@ -158,18 +158,22 @@
 				const waterColor = waterIntensity.mul( 1.4 ).mix( color( 0x0487e2 ), color( 0x74ccf4 ) );
 
 				const depthWater = depthTexture( viewportDepthTexture() ).sub( depth );
-				const depthEffect = depthWater.remapClamp( - .002, .02 );
+				const depthEffect = depthWater.remapClamp( - .002, .04 );
 
-				const refractionUV = viewportTopLeft.add( vec2( 0, waterIntensity.mul( .5 ) ) );
+				const refractionUV = viewportTopLeft.add( vec2( 0, waterIntensity.mul( .1 ) ) );
 
 				const depthTestForRefraction = depthTexture( viewportDepthTexture( refractionUV ) ).sub( depth );
+
+				const depthRefraction = depthTestForRefraction.remapClamp( 0, .1 );
 
 				const finalUV = depthTestForRefraction.lessThan( 0 ).cond( viewportTopLeft, refractionUV );
 
 				const viewportTexture = viewportSharedTexture( finalUV );
 
 				const waterMaterial = new MeshBasicNodeMaterial();
-				waterMaterial.backdropNode = depthEffect.mix( viewportSharedTexture(), viewportTexture.mul( waterColor ).sub( depthWater.remapClamp( 0, .09 ).mul( .05 ) ) );
+				waterMaterial.colorNode = waterColor;
+				waterMaterial.backdropNode = depthEffect.mix( viewportSharedTexture(), viewportTexture.mul( depthRefraction.mix( 1, waterColor ) ) );
+				waterMaterial.backdropAlphaNode = depthRefraction.oneMinus();
 				waterMaterial.transparent = true;
 
 				const water = new THREE.Mesh( new THREE.BoxGeometry( 50, .001, 50 ), waterMaterial );
@@ -232,7 +236,7 @@
 				const waterMask = objectPosition( camera ).y.greaterThan( 0 );
 
 				const scenePassColorBlurred = scenePassColor.gaussianBlur();
-				scenePassColorBlurred.directionNode = waterMask.cond( scenePassDepth, scenePass.getDepthNode().mul( 10 ) );
+				scenePassColorBlurred.directionNode = waterMask.cond( scenePassDepth, scenePass.getDepthNode().mul( 5 ) );
 
 				const vignet = viewportTopLeft.distance( .5 ).mul( 1.35 ).clamp().oneMinus();
 
