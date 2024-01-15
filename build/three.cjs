@@ -13567,7 +13567,7 @@ function WebGLAttributes( gl, capabilities ) {
 	function updateBuffer( buffer, attribute, bufferType ) {
 
 		const array = attribute.array;
-		const updateRange = attribute._updateRange; // deprecated
+		const updateRange = attribute._updateRange; // @deprecated, r159
 		const updateRanges = attribute.updateRanges;
 
 		gl.bindBuffer( bufferType, buffer );
@@ -13602,7 +13602,7 @@ function WebGLAttributes( gl, capabilities ) {
 
 		}
 
-		// deprecated
+		// @deprecated, r159
 		if ( updateRange.count !== - 1 ) {
 
 			if ( isWebGL2 ) {
@@ -16068,7 +16068,7 @@ function WebGLCubeMaps( renderer ) {
 
 					if ( image && image.height > 0 ) {
 
-						const renderTarget = new WebGLCubeRenderTarget( image.height / 2 );
+						const renderTarget = new WebGLCubeRenderTarget( image.height );
 						renderTarget.fromEquirectangularTexture( renderer, texture );
 						cubemaps.set( texture, renderTarget );
 
@@ -20292,6 +20292,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 					console.error(
 						'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
 						'VALIDATE_STATUS ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + '\n\n' +
+						'Material Name: ' + self.name + '\n' +
+						'Material Type: ' + self.type + '\n\n' +
 						'Program Info Log: ' + programLog + '\n' +
 						vertexErrors + '\n' +
 						fragmentErrors
