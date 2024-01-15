@@ -67,6 +67,8 @@ class SpotLightHelper extends Object3D {
 		// update the local matrix based on the parent and light target transforms
 		if ( this.parent ) {
 
+			this.parent.updateWorldMatrix( true );
+
 			this.matrix
 				.copy( this.parent.matrixWorld )
 				.invert()
@@ -74,8 +76,7 @@ class SpotLightHelper extends Object3D {
 
 		} else {
 
-			this.matrix
-				.copy( this.light.matrixWorld );
+			this.matrix.copy( this.light.matrixWorld );
 
 		}
 
