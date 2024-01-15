@@ -116,6 +116,22 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	}
 
+	const uvChannelRow = new UIRow().setMarginBottom( '6px' ).setStyle( 'min-height', '0px' );
+	container.add( uvChannelRow );
+
+	uvChannelRow.add( new UIText( 'uv chan.:' ).setWidth( '40px' ) );
+
+	const uvChannel = new UINumber( ( property === 'aoMap' || property === 'lightMap' ) ? 1 : 0 ).setPrecision( 0 ).setRange( 0, 3 ).setStep( 1 ).setWidth( '40px' ).onChange( onUVChannelChange );
+	uvChannelRow.add( uvChannel );
+
+	const flipYRow = new UIRow().setMarginBottom( '6px' ).setStyle( 'min-height', '0px' );
+	container.add( flipYRow );
+
+	flipYRow.add( new UIText( 'flipY:' ).setWidth( '40px' ) );
+
+	const flipY = new UICheckbox( false ).setMarginRight( '8px' ).onChange( onFlipYChange );
+	flipYRow.add( flipY );
+
 	let object = null;
 	let materialSlot = null;
 	let material = null;
@@ -167,6 +183,34 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 				editor.execute( new SetMaterialMapCommand( editor, object, property, newMap, materialSlot ) );
 
 			}
+
+		}
+
+	}
+
+	function onUVChannelChange() {
+
+		const newMap = enabled.getValue() ? map.getValue() : null;
+
+		if ( newMap !== null ) {
+
+			newMap.channel = uvChannel.getValue();
+
+			editor.execute( new SetMaterialMapCommand( editor, object, property, newMap, materialSlot ) );
+
+		}
+
+	}
+
+	function onFlipYChange() {
+
+		const newMap = enabled.getValue() ? map.getValue() : null;
+
+		if ( newMap !== null ) {
+
+			newMap.flipY = flipY.getValue();
+
+			editor.execute( new SetMaterialMapCommand( editor, object, property, newMap, materialSlot ) );
 
 		}
 
@@ -262,6 +306,18 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 					tileRepeatX.setValue( material[ property ].repeat.x );
 					tileRepeatY.setValue( material[ property ].repeat.y );
+
+				}
+
+				if ( material[ property ].channel !== undefined ) {
+
+					uvChannel.setValue( material[ property ].channel );
+
+				}
+
+				if ( material[ property ].flipY !== undefined ) {
+
+					flipY.setValue( material[ property ].flipY );
 
 				}
 
