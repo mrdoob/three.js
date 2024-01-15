@@ -8,8 +8,6 @@ import { RGBAFormat } from '../constants.js';
 import { Box3 } from '../math/Box3.js';
 import { Sphere } from '../math/Sphere.js';
 import { Frustum } from '../math/Frustum.js';
-import { WebGLCoordinateSystem } from '../constants.js';
-import { WebGPUCoordinateSystem } from '../constants.js';
 import { Vector3 } from '../math/Vector3.js';
 
 function sortOpaque( a, b ) {
@@ -909,7 +907,7 @@ class BatchedMesh extends Mesh {
 				.multiply( this.matrixWorld );
 			_frustum.setFromProjectionMatrix(
 				_projScreenMatrix,
-				renderer.isWebGPURenderer ? WebGPUCoordinateSystem : WebGLCoordinateSystem
+				renderer.coordinateSystem
 			);
 
 		}
