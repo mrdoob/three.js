@@ -39,7 +39,7 @@ import * as NodeUtils from './core/NodeUtils.js';
 export { NodeUtils };
 
 // math
-export { default as MathNode, EPSILON, INFINITY, radians, degrees, exp, exp2, log, log2, sqrt, inverseSqrt, floor, ceil, normalize, fract, sin, cos, tan, asin, acos, atan, abs, sign, length, negate, oneMinus, dFdx, dFdy, round, reciprocal, trunc, fwidth, bitcast, atan2, min, max, mod, step, reflect, distance, difference, dot, cross, pow, pow2, pow3, pow4, transformDirection, mix, clamp, saturate, refract, smoothstep, faceForward, cbrt } from './math/MathNode.js';
+export { default as MathNode, EPSILON, INFINITY, radians, degrees, exp, exp2, log, log2, sqrt, inverseSqrt, floor, ceil, normalize, fract, sin, cos, tan, asin, acos, atan, abs, sign, length, lengthSq, negate, oneMinus, dFdx, dFdy, round, reciprocal, trunc, fwidth, bitcast, atan2, min, max, mod, step, reflect, distance, difference, dot, cross, pow, pow2, pow3, pow4, transformDirection, mix, clamp, saturate, refract, smoothstep, faceForward, cbrt } from './math/MathNode.js';
 export { parabola, gain, pcurve, sinc } from './math/MathNode.js';
 
 export { default as OperatorNode, add, sub, mul, div, remainder, equal, lessThan, greaterThan, lessThanEqual, greaterThanEqual, and, or, xor, bitAnd, bitOr, bitXor, shiftLeft, shiftRight } from './math/OperatorNode.js';
