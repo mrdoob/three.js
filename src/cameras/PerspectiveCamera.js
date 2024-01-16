@@ -4,14 +4,11 @@ import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 
 // Constants used by getBounds, frustumDimensions, and frustumCorners
-const _getBoundsTemp = new Vector3();
+const _tempV3 = new Vector3();
 const _minTarget = new Vector2();
 const _maxTarget = new Vector2();
 const _dimensions = new Vector2();
-const _topLeft = new Vector3();
-const _topRight = new Vector3();
-const _bottomRight= new Vector3();
-const _bottomLeft = new Vector3();
+
 
 class PerspectiveCamera extends Camera {
 
@@ -119,15 +116,15 @@ class PerspectiveCamera extends Camera {
 				
 		this.updateMatrixWorld( true, false );
 
-		_getBoundsTemp.set(- 1, - 1, 0.5).unproject(this).applyMatrix4(this.matrixWorldInverse);
-		_getBoundsTemp.multiplyScalar(distance / Math.abs(_getBoundsTemp.z));
-		minTarget.x = _getBoundsTemp.x;
-		minTarget.y = _getBoundsTemp.y;
+		_tempV3.set(- 1, - 1, 0.5).unproject(this).applyMatrix4(this.matrixWorldInverse);
+		_tempV3.multiplyScalar(distance / Math.abs(_tempV3.z));
+		minTarget.x = _tempV3.x;
+		minTarget.y = _tempV3.y;
 
-		_getBoundsTemp.set(1, 1, 0.5).unproject(this).applyMatrix4(this.matrixWorldInverse);
-		_getBoundsTemp.multiplyScalar(distance / Math.abs(_getBoundsTemp.z));
-		maxTarget.x = _getBoundsTemp.x;
-		maxTarget.y = _getBoundsTemp.y;
+		_tempV3.set(1, 1, 0.5).unproject(this).applyMatrix4(this.matrixWorldInverse);
+		_tempV3.multiplyScalar(distance / Math.abs(_tempV3.z));
+		maxTarget.x = _tempV3.x;
+		maxTarget.y = _tempV3.y;
 
 	}
 
@@ -153,23 +150,13 @@ class PerspectiveCamera extends Camera {
 
 		this.getBounds(distance, _minTarget, _maxTarget);
 
-		// Calculate corner positions
-		_topLeft.set(_minTarget.x, _maxTarget.y, -distance);
-		_topRight.set(_maxTarget.x, _maxTarget.y, -distance);
-		_bottomRight.set(_maxTarget.x, _minTarget.y, -distance);
-		_bottomLeft.set(_minTarget.x, _minTarget.y, -distance);
-
-		// Account for camera position/rotation/scale
-		_topLeft.applyMatrix4(this.matrixWorld);
-		_topRight.applyMatrix4(this.matrixWorld);
-		_bottomRight.applyMatrix4(this.matrixWorld);
-		_bottomLeft.applyMatrix4(this.matrixWorld);
-
+		// .set() -> Calculates the corner position 
+		// .applyMatrix4() -> Accounts for camera position/rotation/scale
 		return {
-			topLeft:_topLeft.clone(),
-			topRight:_topRight.clone(),
-			bottomRight:_bottomRight.clone(),
-			bottomLeft:_bottomLeft.clone(),
+			topLeft: _tempV3.set(_minTarget.x, _maxTarget.y, -distance).applyMatrix4(this.matrixWorld).clone(),
+			topRight: _tempV3.set(_maxTarget.x, _maxTarget.y, -distance).applyMatrix4(this.matrixWorld).clone(),
+			bottomRight: _tempV3.set(_maxTarget.x, _minTarget.y, -distance).applyMatrix4(this.matrixWorld).clone(),
+			bottomLeft: _tempV3.set(_minTarget.x, _minTarget.y, -distance).applyMatrix4(this.matrixWorld).clone(),
 		};
 
 	}
