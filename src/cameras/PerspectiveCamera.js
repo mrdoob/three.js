@@ -1,5 +1,17 @@
 import { Camera } from './Camera.js';
 import * as MathUtils from '../math/MathUtils.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+
+// Constants used by getBounds, frustumDimensions, and frustumCorners
+const _getBoundsTemp = new Vector3();
+const _minTarget = new Vector2();
+const _maxTarget = new Vector2();
+const _dimensions = new Vector2();
+const _topLeft = new Vector3();
+const _topRight = new Vector3();
+const _bottomRight= new Vector3();
+const _bottomLeft = new Vector3();
 
 class PerspectiveCamera extends Camera {
 
@@ -104,20 +116,18 @@ class PerspectiveCamera extends Camera {
 	 * Results are copied into minTarget and maxTarget input vars.
 	 */
 	getBounds(distance, minTarget, maxTarget) {
-		
-		const temp = new THREE.Vector3();
-		
-		this.updateMatrixWorld();
+				
+		this.updateMatrixWorld( true, false );
 
-		temp.set(- 1, - 1, 0.5).unproject(this).applyMatrix4(this.matrixWorldInverse);
-		temp.multiplyScalar(distance / Math.abs(temp.z));
-		minTarget.x = temp.x;
-		minTarget.y = temp.y;
+		_getBoundsTemp.set(- 1, - 1, 0.5).unproject(this).applyMatrix4(this.matrixWorldInverse);
+		_getBoundsTemp.multiplyScalar(distance / Math.abs(_getBoundsTemp.z));
+		minTarget.x = _getBoundsTemp.x;
+		minTarget.y = _getBoundsTemp.y;
 
-		temp.set(1, 1, 0.5).unproject(this).applyMatrix4(this.matrixWorldInverse);
-		temp.multiplyScalar(distance / Math.abs(temp.z));
-		maxTarget.x = temp.x;
-		maxTarget.y = temp.y;
+		_getBoundsTemp.set(1, 1, 0.5).unproject(this).applyMatrix4(this.matrixWorldInverse);
+		_getBoundsTemp.multiplyScalar(distance / Math.abs(_getBoundsTemp.z));
+		maxTarget.x = _getBoundsTemp.x;
+		maxTarget.y = _getBoundsTemp.y;
 
 	}
 
@@ -127,15 +137,11 @@ class PerspectiveCamera extends Camera {
 	 */
 	frustumDimensions( distance ){
 
-		const dimensions = new THREE.Vector2();
-		const minTarget = new THREE.Vector2();
-		const maxTarget = new THREE.Vector2();
+		this.getBounds(distance, _minTarget, _maxTarget);
+		_dimensions.x = _maxTarget.x - _minTarget.x;
+		_dimensions.y = _maxTarget.y - _minTarget.y;
 
-		this.getBounds(distance, minTarget, maxTarget);
-		dimensions.x = maxTarget.x - minTarget.x;
-		dimensions.y = maxTarget.y - minTarget.y;
-
-		return dimensions;
+		return _dimensions.clone();
 
 	}
 
@@ -145,27 +151,25 @@ class PerspectiveCamera extends Camera {
 	 */
 	frustumCorners( distance ){
 
-		const minTarget = new THREE.Vector2();
-		const maxTarget = new THREE.Vector2();
-		this.getBounds(distance, minTarget, maxTarget);
+		this.getBounds(distance, _minTarget, _maxTarget);
 
 		// Calculate corner positions
-		const topLeft = new THREE.Vector3(minTarget.x, maxTarget.y, -distance);
-		const topRight = new THREE.Vector3(maxTarget.x, maxTarget.y, -distance);
-		const bottomRight = new THREE.Vector3(maxTarget.x, minTarget.y, -distance);
-		const bottomLeft = new THREE.Vector3(minTarget.x, minTarget.y, -distance);
+		_topLeft.set(_minTarget.x, _maxTarget.y, -distance);
+		_topRight.set(_maxTarget.x, _maxTarget.y, -distance);
+		_bottomRight.set(_maxTarget.x, _minTarget.y, -distance);
+		_bottomLeft.set(_minTarget.x, _minTarget.y, -distance);
 
 		// Account for camera position/rotation/scale
-		topLeft.applyMatrix4(this.matrixWorld);
-		topRight.applyMatrix4(this.matrixWorld);
-		bottomLeft.applyMatrix4(this.matrixWorld);
-		bottomRight.applyMatrix4(this.matrixWorld);
+		_topLeft.applyMatrix4(this.matrixWorld);
+		_topRight.applyMatrix4(this.matrixWorld);
+		_bottomRight.applyMatrix4(this.matrixWorld);
+		_bottomLeft.applyMatrix4(this.matrixWorld);
 
 		return {
-			topLeft,
-			topRight,
-			bottomRight,
-			bottomLeft,
+			topLeft:_topLeft.clone(),
+			topRight:_topRight.clone(),
+			bottomRight:_bottomRight.clone(),
+			bottomLeft:_bottomLeft.clone(),
 		};
 
 	}
