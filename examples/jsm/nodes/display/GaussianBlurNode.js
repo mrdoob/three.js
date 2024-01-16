@@ -140,6 +140,7 @@ class GaussianBlurNode extends TempNode {
 		//
 
 		const material = this._material || ( this._material = builder.createNodeMaterial( 'MeshBasicNodeMaterial' ) );
+		material.toneMapped = false;
 		material.fragmentNode = blur();
 
 		//

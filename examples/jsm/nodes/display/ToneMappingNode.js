@@ -1,8 +1,10 @@
 import TempNode from '../core/TempNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { tslFn, nodeObject, float, mat3 } from '../shadernode/ShaderNode.js';
+import { tslFn, nodeObject, float, mat3, vec3 } from '../shadernode/ShaderNode.js';
 
-import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping } from 'three';
+import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping } from 'three';
+import { clamp, log2, max, pow } from '../math/MathNode.js';
+import { mul } from '../math/OperatorNode.js';
 
 // exposure only
 const LinearToneMappingNode = tslFn( ( { color, exposure } ) => {
@@ -75,11 +77,52 @@ const ACESFilmicToneMappingNode = tslFn( ( { color, exposure } ) => {
 
 } );
 
+
+
+const LINEAR_REC2020_TO_LINEAR_SRGB = mat3( vec3( 1.6605, - 0.1246, - 0.0182 ), vec3( - 0.5876, 1.1329, - 0.1006 ), vec3( - 0.0728, - 0.0083, 1.1187 ) );
+const LINEAR_SRGB_TO_LINEAR_REC2020 = mat3( vec3( 0.6274, 0.0691, 0.0164 ), vec3( 0.3293, 0.9195, 0.0880 ), vec3( 0.0433, 0.0113, 0.8956 ) );
+
+const agxDefaultContrastApprox = tslFn( ( [ x_immutable ] ) => {
+
+	const x = vec3( x_immutable ).toVar();
+	const x2 = vec3( x.mul( x ) ).toVar();
+	const x4 = vec3( x2.mul( x2 ) ).toVar();
+
+	return float( 15.5 ).mul( x4.mul( x2 ) ).sub( mul( 40.14, x4.mul( x ) ) ).add( mul( 31.96, x4 ).sub( mul( 6.868, x2.mul( x ) ) ).add( mul( 0.4298, x2 ).add( mul( 0.1191, x ).sub( 0.00232 ) ) ) );
+
+} );
+
+const AGXToneMappingNode = tslFn( ( { color, exposure } ) => {
+
+	const colortone = vec3( color ).toVar();
+	const AgXInsetMatrix = mat3( vec3( 0.856627153315983, 0.137318972929847, 0.11189821299995 ), vec3( 0.0951212405381588, 0.761241990602591, 0.0767994186031903 ), vec3( 0.0482516061458583, 0.101439036467562, 0.811302368396859 ) );
+	const AgXOutsetMatrix = mat3( vec3( 1.1271005818144368, - 0.1413297634984383, - 0.14132976349843826 ), vec3( - 0.11060664309660323, 1.157823702216272, - 0.11060664309660294 ), vec3( - 0.016493938717834573, - 0.016493938717834257, 1.2519364065950405 ) );
+	const AgxMinEv = float( - 12.47393 );
+	const AgxMaxEv = float( 4.026069 );
+	colortone.mulAssign( exposure );
+	colortone.assign( LINEAR_SRGB_TO_LINEAR_REC2020.mul( colortone ) );
+	colortone.assign( AgXInsetMatrix.mul( colortone ) );
+	colortone.assign( max( colortone, 1e-10 ) );
+	colortone.assign( log2( colortone ) );
+	colortone.assign( colortone.sub( AgxMinEv ).div( AgxMaxEv.sub( AgxMinEv ) ) );
+	colortone.assign( clamp( colortone, 0.0, 1.0 ) );
+	colortone.assign( agxDefaultContrastApprox( colortone ) );
+	colortone.assign( AgXOutsetMatrix.mul( colortone ) );
+	colortone.assign( pow( max( vec3( 0.0 ), colortone ), vec3( 2.2 ) ) );
+	colortone.assign( LINEAR_REC2020_TO_LINEAR_SRGB.mul( colortone ) );
+	colortone.assign( clamp( colortone, 0.0, 1.0 ) );
+
+	return colortone;
+
+} );
+
+
 const toneMappingLib = {
 	[ LinearToneMapping ]: LinearToneMappingNode,
 	[ ReinhardToneMapping ]: ReinhardToneMappingNode,
 	[ CineonToneMapping ]: OptimizedCineonToneMappingNode,
-	[ ACESFilmicToneMapping ]: ACESFilmicToneMappingNode
+	[ ACESFilmicToneMapping ]: ACESFilmicToneMappingNode,
+	[ AgXToneMapping ]: AGXToneMappingNode
 };
 
 class ToneMappingNode extends TempNode {

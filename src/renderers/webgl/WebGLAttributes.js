@@ -86,7 +86,7 @@ function WebGLAttributes( gl, capabilities ) {
 	function updateBuffer( buffer, attribute, bufferType ) {
 
 		const array = attribute.array;
-		const updateRange = attribute._updateRange; // deprecated
+		const updateRange = attribute._updateRange; // @deprecated, r159
 		const updateRanges = attribute.updateRanges;
 
 		gl.bindBuffer( bufferType, buffer );
@@ -121,7 +121,7 @@ function WebGLAttributes( gl, capabilities ) {
 
 		}
 
-		// deprecated
+		// @deprecated, r159
 		if ( updateRange.count !== - 1 ) {
 
 			if ( isWebGL2 ) {

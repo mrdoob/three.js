@@ -27,7 +27,7 @@
 			
 		// إنشاء كرات مع 3 مستويات من التفاصيل وإنشاء مستويات LOD جديدة لهم
 		for( let i = 0; i < 3; i++ ) {
-			const geometry = new THREE.IcosahedronGeometry( 10, 3 - i )
+			const geometry = new THREE.IcosahedronGeometry( 10, 3 - i );
 			const mesh = new THREE.Mesh( geometry, material );
 			lod.addLevel( mesh, i * 75 );
 		}
