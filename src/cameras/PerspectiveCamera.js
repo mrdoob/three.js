@@ -113,8 +113,6 @@ class PerspectiveCamera extends Camera {
 	 * Results are copied into minTarget and maxTarget input vars.
 	 */
 	getBounds(distance, minTarget, maxTarget) {
-				
-		this.updateMatrixWorld( true, false );
 
 		_tempV3.set(- 1, - 1, 0.5).applyMatrix4(this.projectionMatrixInverse);
 		_tempV3.multiplyScalar(distance / Math.abs(_tempV3.z));
@@ -149,6 +147,8 @@ class PerspectiveCamera extends Camera {
 	frustumCorners( distance ){
 
 		this.getBounds(distance, _minTarget, _maxTarget);
+		
+		this.updateMatrixWorld(true, false);
 
 		// .set() -> Calculates the corner position 
 		// .applyMatrix4() -> Accounts for camera position/rotation/scale
