@@ -375,7 +375,7 @@ class WebGPUTextureUtils {
 		const bytesPerTexel = this._getBytesPerTexel( format );
 
 		let bytesPerRow = width * bytesPerTexel;
-		bytesPerRow = Math.ceil( bytesPerRow / 256 ) * 256;
+		bytesPerRow = Math.ceil( bytesPerRow / 256 ) * 256; // Align to 256 bytes
 
 		const readBuffer = device.createBuffer(
 			{

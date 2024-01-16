@@ -622,9 +622,9 @@ class WebGLTextureUtils {
 		if ( glType === gl.UNSIGNED_SHORT ) return Uint16Array;
 		if ( glType === gl.UNSIGNED_INT ) return Uint32Array;
 
-		if ( glType === gl.FLOAT ) return Float32Array; // Corrected from gl.UNSIGNED_FLOAT to gl.FLOAT
-		throw new Error( `Unsupported WebGL type: ${glType}` );
+		if ( glType === gl.FLOAT ) return Float32Array;
 
+		throw new Error( `Unsupported WebGL type: ${glType}` );
 
 	}
 
