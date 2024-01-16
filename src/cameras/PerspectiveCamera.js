@@ -3,7 +3,7 @@ import * as MathUtils from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 
-// Constants used by getBounds, frustumDimensions, and frustumCorners
+// Temp constants used by getBounds(), frustumDimensions(), and frustumCorners()
 const _tempV3 = new Vector3();
 const _minTarget = new Vector2();
 const _maxTarget = new Vector2();
@@ -116,12 +116,12 @@ class PerspectiveCamera extends Camera {
 				
 		this.updateMatrixWorld( true, false );
 
-		_tempV3.set(- 1, - 1, 0.5).unproject(this).applyMatrix4(this.matrixWorldInverse);
+		_tempV3.set(- 1, - 1, 0.5).applyMatrix4(this.projectionMatrixInverse);
 		_tempV3.multiplyScalar(distance / Math.abs(_tempV3.z));
 		minTarget.x = _tempV3.x;
 		minTarget.y = _tempV3.y;
 
-		_tempV3.set(1, 1, 0.5).unproject(this).applyMatrix4(this.matrixWorldInverse);
+		_tempV3.set(1, 1, 0.5).applyMatrix4(this.projectionMatrixInverse);
 		_tempV3.multiplyScalar(distance / Math.abs(_tempV3.z));
 		maxTarget.x = _tempV3.x;
 		maxTarget.y = _tempV3.y;
