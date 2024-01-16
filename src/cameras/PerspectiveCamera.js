@@ -4,10 +4,10 @@ import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 
 // Temp constants used by getBounds(), frustumDimensions(), and frustumCorners()
-const _tempV3 = new Vector3();
-const _minTarget = new Vector2();
-const _maxTarget = new Vector2();
-const _dimensions = new Vector2();
+const _tempV3 = /*@__PURE__*/ new Vector3();
+const _minTarget = /*@__PURE__*/ new Vector2();
+const _maxTarget = /*@__PURE__*/ new Vector2();
+const _dimensions = /*@__PURE__*/ new Vector2();
 
 
 class PerspectiveCamera extends Camera {
