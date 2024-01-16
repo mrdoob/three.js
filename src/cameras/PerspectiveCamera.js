@@ -112,15 +112,15 @@ class PerspectiveCamera extends Camera {
 	 * Provides the topRight and bottomLeft corners of the camera's 2D frustum slice at a given distance.
 	 * Results are copied into minTarget and maxTarget input vars.
 	 */
-	getBounds(distance, minTarget, maxTarget) {
+	getBounds( distance, minTarget, maxTarget ) {
 
-		_tempV3.set(- 1, - 1, 0.5).applyMatrix4(this.projectionMatrixInverse);
-		_tempV3.multiplyScalar(distance / Math.abs(_tempV3.z));
+		_tempV3.set( - 1, - 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
+		_tempV3.multiplyScalar( distance / Math.abs( _tempV3.z ) );
 		minTarget.x = _tempV3.x;
 		minTarget.y = _tempV3.y;
 
-		_tempV3.set(1, 1, 0.5).applyMatrix4(this.projectionMatrixInverse);
-		_tempV3.multiplyScalar(distance / Math.abs(_tempV3.z));
+		_tempV3.set( 1, 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
+		_tempV3.multiplyScalar( distance / Math.abs( _tempV3.z ) );
 		maxTarget.x = _tempV3.x;
 		maxTarget.y = _tempV3.y;
 
@@ -130,9 +130,9 @@ class PerspectiveCamera extends Camera {
 	 * Calculates the height/width of the camera's frustum at a given distance.
 	 * returns a Vector2 where x is width and y is height.
 	 */
-	frustumDimensions( distance ){
+	frustumDimensions( distance ) {
 
-		this.getBounds(distance, _minTarget, _maxTarget);
+		this.getBounds( distance, _minTarget, _maxTarget );
 		_dimensions.x = _maxTarget.x - _minTarget.x;
 		_dimensions.y = _maxTarget.y - _minTarget.y;
 
@@ -144,19 +144,19 @@ class PerspectiveCamera extends Camera {
 	 * Calculates Vector3s of the frustum's corners at a given distance from the camera.
 	 * Returns an object with topLeft, topRight, bottomRight, and bottomLeft properties. Each property is a Vector3.
 	 */
-	frustumCorners( distance ){
+	frustumCorners( distance ) {
 
-		this.getBounds(distance, _minTarget, _maxTarget);
-		
-		this.updateMatrixWorld(true, false);
+		this.getBounds( distance, _minTarget, _maxTarget );
 
-		// .set() -> Calculates the corner position 
+		this.updateMatrixWorld( true, false );
+
+		// .set() -> Calculates the corner position
 		// .applyMatrix4() -> Accounts for camera position/rotation/scale
 		return {
-			topLeft: _tempV3.set(_minTarget.x, _maxTarget.y, -distance).applyMatrix4(this.matrixWorld).clone(),
-			topRight: _tempV3.set(_maxTarget.x, _maxTarget.y, -distance).applyMatrix4(this.matrixWorld).clone(),
-			bottomRight: _tempV3.set(_maxTarget.x, _minTarget.y, -distance).applyMatrix4(this.matrixWorld).clone(),
-			bottomLeft: _tempV3.set(_minTarget.x, _minTarget.y, -distance).applyMatrix4(this.matrixWorld).clone(),
+			topLeft: _tempV3.set( _minTarget.x, _maxTarget.y, - distance ).applyMatrix4( this.matrixWorld ).clone(),
+			topRight: _tempV3.set( _maxTarget.x, _maxTarget.y, - distance ).applyMatrix4( this.matrixWorld ).clone(),
+			bottomRight: _tempV3.set( _maxTarget.x, _minTarget.y, - distance ).applyMatrix4( this.matrixWorld ).clone(),
+			bottomLeft: _tempV3.set( _minTarget.x, _minTarget.y, - distance ).applyMatrix4( this.matrixWorld ).clone(),
 		};
 
 	}
