@@ -100,33 +100,62 @@ class PerspectiveCamera extends Camera {
 	}
 
 	/*
-	 * Calculates the height/width of the camera's frustum at a given distance
-	 * Ignores scale of camera & camera ancestors. See relevant discussion https://github.com/mrdoob/three.js/issues/27556#issuecomment-1890901252
+	 * Provides the topRight and bottomLeft corners of the camera's 2D frustum slice at a given distance.
+	 * Results are copied into minTarget and maxTarget input vars.
 	 */
-	frustumDimensions( distance ){
+	getBounds(distance, minTarget, maxTarget) {
+		
+		const temp = new THREE.Vector3();
+		
+		this.updateMatrixWorld();
 
-		const height = 2 * Math.tan(MathUtils.DEG2RAD * 0.5 * this.fov) * distance / this.zoom;
-		const width = height * this.aspect;
-		return { height, width };
+		temp.set(- 1, - 1, 0.5).unproject(this).applyMatrix4(this.matrixWorldInverse);
+		temp.multiplyScalar(distance / Math.abs(temp.z));
+		minTarget.x = temp.x;
+		minTarget.y = temp.y;
+
+		temp.set(1, 1, 0.5).unproject(this).applyMatrix4(this.matrixWorldInverse);
+		temp.multiplyScalar(distance / Math.abs(temp.z));
+		maxTarget.x = temp.x;
+		maxTarget.y = temp.y;
 
 	}
 
 	/*
-	 * Calculates <Vec3>s of the frustum's corners at a given distance from the camera.
+	 * Calculates the height/width of the camera's frustum at a given distance.
+	 * returns a Vector2 where x is width and y is height.
+	 */
+	frustumDimensions( distance ){
+
+		const dimensions = new THREE.Vector2();
+		const minTarget = new THREE.Vector2();
+		const maxTarget = new THREE.Vector2();
+
+		this.getBounds(distance, minTarget, maxTarget);
+		dimensions.x = maxTarget.x - minTarget.x;
+		dimensions.y = maxTarget.y - minTarget.y;
+
+		return dimensions;
+
+	}
+
+	/*
+	 * Calculates Vector3s of the frustum's corners at a given distance from the camera.
+	 * Returns an object with topLeft, topRight, bottomRight, and bottomLeft properties. Each property is a Vector3.
 	 */
 	frustumCorners( distance ){
 
-		// Calculate dimensions
-		const { height, width } = this.frustumDimensions(distance);
+		const minTarget = new THREE.Vector2();
+		const maxTarget = new THREE.Vector2();
+		this.getBounds(distance, minTarget, maxTarget);
 
 		// Calculate corner positions
-		const topLeft = new THREE.Vector3(-width / 2, height / 2, -distance);
-		const topRight = new THREE.Vector3(width / 2, height / 2, -distance);
-		const bottomRight = new THREE.Vector3(width / 2, -height / 2, -distance);
-		const bottomLeft = new THREE.Vector3(-width / 2, -height / 2, -distance);
+		const topLeft = new THREE.Vector3(minTarget.x, maxTarget.y, -distance);
+		const topRight = new THREE.Vector3(maxTarget.x, maxTarget.y, -distance);
+		const bottomRight = new THREE.Vector3(maxTarget.x, minTarget.y, -distance);
+		const bottomLeft = new THREE.Vector3(minTarget.x, minTarget.y, -distance);
 
 		// Account for camera position/rotation/scale
-		this.updateMatrixWorld();
 		topLeft.applyMatrix4(this.matrixWorld);
 		topRight.applyMatrix4(this.matrixWorld);
 		bottomLeft.applyMatrix4(this.matrixWorld);
