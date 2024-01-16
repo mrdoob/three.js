@@ -542,6 +542,12 @@ class WebGPUTextureUtils {
 
 		const data = image.data;
 
+		if ( data === null ) {
+
+			return;
+
+		}
+
 		const bytesPerTexel = this._getBytesPerTexel( textureDescriptorGPU.format );
 		const bytesPerRow = image.width * bytesPerTexel;
 
