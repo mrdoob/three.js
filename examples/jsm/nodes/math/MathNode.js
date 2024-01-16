@@ -216,7 +216,6 @@ MathNode.ATAN = 'atan';
 MathNode.ABS = 'abs';
 MathNode.SIGN = 'sign';
 MathNode.LENGTH = 'length';
-MathNode.LENGTH_SQ = 'lengthSq';
 MathNode.NEGATE = 'negate';
 MathNode.ONE_MINUS = 'oneMinus';
 MathNode.DFDX = 'dFdx';
