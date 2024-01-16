@@ -278,7 +278,6 @@ export const atan = nodeProxy( MathNode, MathNode.ATAN );
 export const abs = nodeProxy( MathNode, MathNode.ABS );
 export const sign = nodeProxy( MathNode, MathNode.SIGN );
 export const length = nodeProxy( MathNode, MathNode.LENGTH );
-export const lengthSq = nodeProxy( MathNode, MathNode.LENGTH_SQ );
 export const negate = nodeProxy( MathNode, MathNode.NEGATE );
 export const oneMinus = nodeProxy( MathNode, MathNode.ONE_MINUS );
 export const dFdx = nodeProxy( MathNode, MathNode.DFDX );
@@ -312,6 +311,7 @@ export const pcurve = ( x, a, b ) => pow( div( pow( x, a ), add( pow( x, a ), po
 export const sinc = ( x, k ) => sin( PI.mul( k.mul( x ).sub( 1.0 ) ) ).div( PI.mul( k.mul( x ).sub( 1.0 ) ) );
 
 export const cbrt = ( a ) => mul( sign( a ), pow( abs( a ), 1.0 / 3.0 ) );
+export const lengthSq = ( a ) => dot( a, a );
 export const mix = nodeProxy( MathNode, MathNode.MIX );
 export const clamp = ( value, low = 0, high = 1 ) => nodeObject( new MathNode( MathNode.CLAMP, nodeObject( value ), nodeObject( low ), nodeObject( high ) ) );
 export const saturate = ( value ) => clamp( value );
