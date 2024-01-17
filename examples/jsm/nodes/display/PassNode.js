@@ -5,7 +5,7 @@ import { NodeUpdateType } from '../core/constants.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
-import { RenderTarget, Vector2, HalfFloatType, DepthTexture, FloatType, NoToneMapping } from 'three';
+import { RenderTarget, Vector2, HalfFloatType, DepthTexture, NoToneMapping/*, FloatType*/ } from 'three';
 
 class PassTextureNode extends TextureNode {
 
@@ -51,7 +51,7 @@ class PassNode extends TempNode {
 
 		const depthTexture = new DepthTexture();
 		depthTexture.isRenderTargetTexture = true;
-		depthTexture.type = FloatType;
+		//depthTexture.type = FloatType;
 		depthTexture.name = 'PostProcessingDepth';
 
 		const renderTarget = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType } );

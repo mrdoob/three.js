@@ -2,7 +2,7 @@ import ViewportTextureNode from './ViewportTextureNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 import { viewportTopLeft } from './ViewportNode.js';
-import { DepthTexture, NearestMipmapNearestFilter, DepthFormat, UnsignedIntType } from 'three';
+import { DepthTexture } from 'three';
 
 let sharedDepthbuffer = null;
 
@@ -13,9 +13,6 @@ class ViewportDepthTextureNode extends ViewportTextureNode {
 		if ( sharedDepthbuffer === null ) {
 
 			sharedDepthbuffer = new DepthTexture();
-			sharedDepthbuffer.minFilter = NearestMipmapNearestFilter;
-			sharedDepthbuffer.type = UnsignedIntType;
-			sharedDepthbuffer.format = DepthFormat;
 
 		}
 
