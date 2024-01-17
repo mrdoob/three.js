@@ -56,6 +56,9 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.outputNode = null;
 
+		this.outputFinalNode = null;
+		this.outputFinalFactor = 0;
+
 		this.fragmentNode = null;
 		this.vertexNode = null;
 
@@ -109,6 +112,7 @@ class NodeMaterial extends ShaderMaterial {
 			//
 
 			if ( this.outputNode !== null ) resultNode = this.outputNode;
+			console.log( resultNode );
 
 		} else {
 
@@ -379,6 +383,12 @@ class NodeMaterial extends ShaderMaterial {
 				outputNode = outputNode.linearToColorSpace( outputColorSpace );
 
 			}
+
+		}
+
+		if ( this.outputFinalNode !== null ) {
+
+			outputNode = mix( outputNode, this.outputFinalNode, this.outputFinalFactor );
 
 		}
 
