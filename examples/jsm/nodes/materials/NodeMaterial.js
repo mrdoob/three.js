@@ -112,7 +112,6 @@ class NodeMaterial extends ShaderMaterial {
 			//
 
 			if ( this.outputNode !== null ) resultNode = this.outputNode;
-			console.log( resultNode );
 
 		} else {
 
