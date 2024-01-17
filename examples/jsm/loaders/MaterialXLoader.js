@@ -9,7 +9,7 @@ import {
 	MeshBasicNodeMaterial, MeshPhysicalNodeMaterial,
 	float, bool, int, vec2, vec3, vec4, color, texture,
 	positionLocal, positionWorld, uv, vertexColor,
-	normalLocal, normalWorld, tangentLocal, tangentWorld, viewDirectionWorld,
+	normalLocal, normalWorld, tangentLocal, tangentWorld,
 	add, sub, mul, div, mod, abs, sign, floor, ceil, round, pow, sin, cos, tan,
 	asin, acos, atan2, sqrt, exp, clamp, min, max, normalize, length, dot, cross, normalMap,
 	remap, smoothstep, luminance, mx_rgbtohsv, mx_hsvtorgb,
@@ -421,10 +421,6 @@ class MaterialXNode {
 
 				const space = this.getAttribute( 'space' );
 				node = space === 'world' ? tangentWorld : tangentLocal;
-
-			} else if ( element === 'viewdirection' ) {
-
-				node = viewDirectionWorld;
 
 			} else if ( element === 'texcoord' ) {
 
