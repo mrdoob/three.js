@@ -99,7 +99,6 @@ export { default as TextureNode, texture, textureLoad, /*textureLevel,*/ sampler
 export { default as TextureStoreNode, textureStore } from './accessors/TextureStoreNode.js';
 export { default as UVNode, uv } from './accessors/UVNode.js';
 export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
-export { default as ViewDirectionNode, viewDirection, viewDirectionLocal, viewDirectionWorld } from './accessors/ViewDirectionNode.js';
 
 // display
 export { default as BlendModeNode, burn, dodge, overlay, screen } from './display/BlendModeNode.js';
