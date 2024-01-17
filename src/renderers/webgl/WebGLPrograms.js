@@ -308,6 +308,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			useOcclusion: material.occlusion === true,
 
+			useOcclusion: material.occlusion === true,
+
 			flatShading: material.flatShading === true,
 
 			sizeAttenuation: material.sizeAttenuation === true,
