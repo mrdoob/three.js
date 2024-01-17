@@ -6,10 +6,11 @@ const _size = new Vector3();
 
 class Textures extends DataMap {
 
-	constructor( backend, info ) {
+	constructor( renderer, backend, info ) {
 
 		super();
 
+		this.renderer = renderer;
 		this.backend = backend;
 		this.info = info;
 
@@ -155,7 +156,7 @@ class Textures extends DataMap {
 
 		if ( texture.isFramebufferTexture ) {
 
-			const renderer = this.backend.renderer;
+			const renderer = this.renderer;
 			const renderTarget = renderer.getRenderTarget();
 
 			if ( renderTarget ) {
