@@ -4,19 +4,19 @@ import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 import { viewportTopLeft } from './ViewportNode.js';
 import { FramebufferTexture } from 'three';
 
-let sharedFramebuffer = null;
+let _sharedFramebuffer = null;
 
 class ViewportSharedTextureNode extends ViewportTextureNode {
 
 	constructor( uvNode = viewportTopLeft, levelNode = null ) {
 
-		if ( sharedFramebuffer === null ) {
+		if ( _sharedFramebuffer === null ) {
 
-			sharedFramebuffer = new FramebufferTexture();
+			_sharedFramebuffer = new FramebufferTexture();
 
 		}
 
-		super( uvNode, levelNode, sharedFramebuffer );
+		super( uvNode, levelNode, _sharedFramebuffer );
 
 	}
 
