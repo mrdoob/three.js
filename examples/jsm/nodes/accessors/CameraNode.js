@@ -23,7 +23,7 @@ class CameraNode extends Object3DNode {
 
 		const scope = this.scope;
 
-		if ( scope === CameraNode.PROJECTION_MATRIX ) {
+		if ( scope === CameraNode.PROJECTION_MATRIX || scope === CameraNode.PROJECTION_MATRIX_INVERSE ) {
 
 			return 'mat4';
 
@@ -83,7 +83,7 @@ class CameraNode extends Object3DNode {
 
 		const scope = this.scope;
 
-		if ( scope === CameraNode.PROJECTION_MATRIX ) {
+		if ( scope === CameraNode.PROJECTION_MATRIX || scope === CameraNode.PROJECTION_MATRIX_INVERSE ) {
 
 			this._uniformNode.nodeType = 'mat4';
 
