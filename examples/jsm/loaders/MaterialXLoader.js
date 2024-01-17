@@ -6,10 +6,10 @@ import {
 } from 'three';
 
 import {
-	MeshPhysicalNodeMaterial,
+	MeshBasicNodeMaterial, MeshPhysicalNodeMaterial,
 	float, bool, int, vec2, vec3, vec4, color, texture,
 	positionLocal, positionWorld, uv, vertexColor,
-	normalLocal, normalWorld, tangentLocal, tangentWorld,
+	normalLocal, normalWorld, tangentLocal, tangentWorld, viewDirectionWorld,
 	add, sub, mul, div, mod, abs, sign, floor, ceil, round, pow, sin, cos, tan,
 	asin, acos, atan2, sqrt, exp, clamp, min, max, normalize, length, dot, cross, normalMap,
 	remap, smoothstep, luminance, mx_rgbtohsv, mx_hsvtorgb,
@@ -422,6 +422,10 @@ class MaterialXNode {
 				const space = this.getAttribute( 'space' );
 				node = space === 'world' ? tangentWorld : tangentLocal;
 
+			} else if ( element === 'viewdirection' ) {
+
+				node = viewDirectionWorld;
+
 			} else if ( element === 'texcoord' ) {
 
 				const indexNode = this.getChildByName( 'index' );
@@ -697,7 +701,28 @@ class MaterialXNode {
 
 	}
 
-	toMaterial() {
+	toBasicMaterial() {
+
+		const material = new MeshBasicNodeMaterial();
+		material.name = this.name;
+
+		for ( const nodeX of this.children.toReversed() ) {
+
+			if ( nodeX.name === 'out' ) {
+
+				material.colorNode = nodeX.getNode();
+
+				break;
+
+			}
+
+		}
+
+		return material;
+
+	}
+
+	toPhysicalMaterial() {
 
 		const material = new MeshPhysicalNodeMaterial();
 		material.name = this.name;
@@ -717,13 +742,33 @@ class MaterialXNode {
 
 		const materials = {};
 
+		let isUnlit = true;
+
 		for ( const nodeX of this.children ) {
 
 			if ( nodeX.element === 'surfacematerial' ) {
 
-				const material = nodeX.toMaterial();
+				const material = nodeX.toPhysicalMaterial();
 
 				materials[ material.name ] = material;
+
+				isUnlit = false;
+
+			}
+
+		}
+
+		if ( isUnlit ) {
+
+			for ( const nodeX of this.children ) {
+
+				if ( nodeX.element === 'nodegraph' ) {
+
+					const material = nodeX.toBasicMaterial();
+
+					materials[ material.name ] = material;
+
+				}
 
 			}
 
