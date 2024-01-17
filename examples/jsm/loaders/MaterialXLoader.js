@@ -6,7 +6,7 @@ import {
 } from 'three';
 
 import {
-	MeshPhysicalNodeMaterial,
+	MeshBasicNodeMaterial, MeshPhysicalNodeMaterial,
 	float, bool, int, vec2, vec3, vec4, color, texture,
 	positionLocal, positionWorld, uv, vertexColor,
 	normalLocal, normalWorld, tangentLocal, tangentWorld,
@@ -697,7 +697,28 @@ class MaterialXNode {
 
 	}
 
-	toMaterial() {
+	toBasicMaterial() {
+
+		const material = new MeshBasicNodeMaterial();
+		material.name = this.name;
+
+		for ( const nodeX of this.children.toReversed() ) {
+
+			if ( nodeX.name === 'out' ) {
+
+				material.colorNode = nodeX.getNode();
+
+				break;
+
+			}
+
+		}
+
+		return material;
+
+	}
+
+	toPhysicalMaterial() {
 
 		const material = new MeshPhysicalNodeMaterial();
 		material.name = this.name;
@@ -717,13 +738,33 @@ class MaterialXNode {
 
 		const materials = {};
 
+		let isUnlit = true;
+
 		for ( const nodeX of this.children ) {
 
 			if ( nodeX.element === 'surfacematerial' ) {
 
-				const material = nodeX.toMaterial();
+				const material = nodeX.toPhysicalMaterial();
 
 				materials[ material.name ] = material;
+
+				isUnlit = false;
+
+			}
+
+		}
+
+		if ( isUnlit ) {
+
+			for ( const nodeX of this.children ) {
+
+				if ( nodeX.element === 'nodegraph' ) {
+
+					const material = nodeX.toBasicMaterial();
+
+					materials[ material.name ] = material;
+
+				}
 
 			}
 
