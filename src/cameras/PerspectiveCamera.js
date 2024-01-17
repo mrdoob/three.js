@@ -7,7 +7,6 @@ import { Vector3 } from '../math/Vector3.js';
 const _tempV3 = /*@__PURE__*/ new Vector3();
 const _minTarget = /*@__PURE__*/ new Vector2();
 const _maxTarget = /*@__PURE__*/ new Vector2();
-const _dimensions = /*@__PURE__*/ new Vector2();
 
 
 class PerspectiveCamera extends Camera {
@@ -130,13 +129,13 @@ class PerspectiveCamera extends Camera {
 	 * Calculates the height/width of the camera's frustum at a given distance.
 	 * returns a Vector2 where x is width and y is height.
 	 */
-	frustumDimensions( distance ) {
+	getfrustumDimensions( distance, target ) {
 
 		this.getBounds( distance, _minTarget, _maxTarget );
-		_dimensions.x = _maxTarget.x - _minTarget.x;
-		_dimensions.y = _maxTarget.y - _minTarget.y;
+		target.x = _maxTarget.x - _minTarget.x;
+		target.y = _maxTarget.y - _minTarget.y;
 
-		return _dimensions.clone();
+		return target;
 
 	}
 
