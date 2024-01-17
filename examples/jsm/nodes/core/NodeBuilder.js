@@ -1171,7 +1171,7 @@ class NodeBuilder {
 
 	}
 
-	createNodeMaterial( type ) {
+	createNodeMaterial( type = 'NodeMaterial' ) {
 
 		return createNodeMaterialFromType( type );
 
