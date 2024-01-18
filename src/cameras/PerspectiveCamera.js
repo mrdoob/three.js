@@ -3,8 +3,7 @@ import * as MathUtils from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 
-// Temp constants used by getFrustumBounds()/getFrustumDimensions()
-const _tempV3 = /*@__PURE__*/ new Vector3();
+const _v3 = /*@__PURE__*/ new Vector3();
 const _minTarget = /*@__PURE__*/ new Vector2();
 const _maxTarget = /*@__PURE__*/ new Vector2();
 
@@ -114,15 +113,15 @@ class PerspectiveCamera extends Camera {
 	 */
 	getFrustumBounds( distance, minTarget, maxTarget ) {
 
-		_tempV3.set( - 1, - 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
-		_tempV3.multiplyScalar( distance / Math.abs( _tempV3.z ) );
-		minTarget.x = _tempV3.x;
-		minTarget.y = _tempV3.y;
+		_v3.set( - 1, - 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
+		_v3.multiplyScalar( distance / Math.abs( _v3.z ) );
+		minTarget.x = _v3.x;
+		minTarget.y = _v3.y;
 
-		_tempV3.set( 1, 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
-		_tempV3.multiplyScalar( distance / Math.abs( _tempV3.z ) );
-		maxTarget.x = _tempV3.x;
-		maxTarget.y = _tempV3.y;
+		_v3.set( 1, 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
+		_v3.multiplyScalar( distance / Math.abs( _v3.z ) );
+		maxTarget.x = _v3.x;
+		maxTarget.y = _v3.y;
 
 	}
 
