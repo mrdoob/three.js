@@ -1,7 +1,8 @@
 import {
 	MathUtils,
 	Quaternion,
-	Vector3
+	Vector3,
+	Vector2
 } from 'three';
 
 const _va = /*@__PURE__*/ new Vector3(), // from pe to pa
@@ -11,8 +12,9 @@ const _va = /*@__PURE__*/ new Vector3(), // from pe to pa
 	_vu = /*@__PURE__*/ new Vector3(), // up axis of screen
 	_vn = /*@__PURE__*/ new Vector3(), // normal vector of screen
 	_vec = /*@__PURE__*/ new Vector3(), // temporary vector
-	_quat = /*@__PURE__*/ new Quaternion(); // temporary quaternion
-
+	_quat = /*@__PURE__*/ new Quaternion(), // temporary quaternion
+	_minTarget = /*@__PURE__*/ new Vector2(), // temporary vector2 for minBound
+	_maxTarget = /*@__PURE__*/ new Vector2(); // temporary vector2 for maxBound
 
 /** Set a PerspectiveCamera's projectionMatrix and quaternion
  * to exactly frame the corners of an arbitrary rectangle.
@@ -64,10 +66,33 @@ function frameCorners( camera, bottomLeftCorner, bottomRightCorner, topLeftCorne
 		camera.fov =
 			MathUtils.RAD2DEG / Math.min( 1.0, camera.aspect ) *
 			Math.atan( ( _vec.copy( pb ).sub( pa ).length() +
-							( _vec.copy( pc ).sub( pa ).length() ) ) / _va.length() );
+				( _vec.copy( pc ).sub( pa ).length() ) ) / _va.length() );
 
 	}
 
 }
 
-export { frameCorners };
+/** Calculate a PerspectiveCamera frustum's corners at a given distance from the camera.
+ * Returns an object with topLeft, topRight, bottomRight, and bottomLeft properties. Each property is a Vector3.
+ * Should work on all PerspectiveCameras where the frustum is rectangular in shape.
+ * Including asymmetric rectangular frustums like those used by webXR cameras.
+ * @param {number} distance - Distance from the camera
+ * @param {camera} camera - The PerspectiveCamera to calculate the frustum corners from */
+function getFrustumCorners( camera, distance ) {
+
+	camera.getBounds( distance, _minTarget, _maxTarget );
+
+	camera.updateMatrixWorld( true, false );
+
+	// .set() -> Calculates the corner position
+	// .applyMatrix4() -> Accounts for camera position/rotation/scale
+	return {
+		topLeft: _vec.set( _minTarget.x, _maxTarget.y, - distance ).applyMatrix4( camera.matrixWorld ).clone(),
+		topRight: _vec.set( _maxTarget.x, _maxTarget.y, - distance ).applyMatrix4( camera.matrixWorld ).clone(),
+		bottomRight: _vec.set( _maxTarget.x, _minTarget.y, - distance ).applyMatrix4( camera.matrixWorld ).clone(),
+		bottomLeft: _vec.set( _minTarget.x, _minTarget.y, - distance ).applyMatrix4( camera.matrixWorld ).clone(),
+	};
+
+}
+
+export { frameCorners, getFrustumCorners };

@@ -139,27 +139,6 @@ class PerspectiveCamera extends Camera {
 
 	}
 
-	/*
-	 * Calculates Vector3s of the frustum's corners at a given distance from the camera.
-	 * Returns an object with topLeft, topRight, bottomRight, and bottomLeft properties. Each property is a Vector3.
-	 */
-	frustumCorners( distance ) {
-
-		this.getBounds( distance, _minTarget, _maxTarget );
-
-		this.updateMatrixWorld( true, false );
-
-		// .set() -> Calculates the corner position
-		// .applyMatrix4() -> Accounts for camera position/rotation/scale
-		return {
-			topLeft: _tempV3.set( _minTarget.x, _maxTarget.y, - distance ).applyMatrix4( this.matrixWorld ).clone(),
-			topRight: _tempV3.set( _maxTarget.x, _maxTarget.y, - distance ).applyMatrix4( this.matrixWorld ).clone(),
-			bottomRight: _tempV3.set( _maxTarget.x, _minTarget.y, - distance ).applyMatrix4( this.matrixWorld ).clone(),
-			bottomLeft: _tempV3.set( _minTarget.x, _minTarget.y, - distance ).applyMatrix4( this.matrixWorld ).clone(),
-		};
-
-	}
-
 	/**
 	 * Sets an offset in a larger frustum. This is useful for multi-window or
 	 * multi-monitor/multi-machine setups.
