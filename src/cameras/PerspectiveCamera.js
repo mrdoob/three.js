@@ -127,10 +127,10 @@ class PerspectiveCamera extends Camera {
 	}
 
 	/*
-	 * Calculates the height/width of the camera's frustum at a given distance.
-	 * returns a Vector2 where x is width and y is height.
-	 */
-	getfrustumDimensions( distance, target ) {
+	 * Computes the height/width of the camera's frustum at a given distance along the viewing direction.
+	 * Copies the result into provided target Vector2 where x is width and y is height.
+ 	 */
+	getFrustumDimensions( distance, target ) {
 
 		this.getBounds( distance, _minTarget, _maxTarget );
 		target.x = _maxTarget.x - _minTarget.x;
