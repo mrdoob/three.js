@@ -29,7 +29,7 @@
 				"imports": {
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
-					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.6.0/build/index.module.js"
+					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.7.0/build/index.module.js"
 				}
 			}
 		</script>
@@ -37,7 +37,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast, MeshBVHVisualizer } from 'three-mesh-bvh';
+			import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast, MeshBVHHelper } from 'three-mesh-bvh';
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -138,7 +138,7 @@
 					scene.add( mesh );
 					mesh.scale.setScalar( 0.0075 );
 
-					helper = new MeshBVHVisualizer( mesh );
+					helper = new MeshBVHHelper( mesh );
 					helper.color.set( 0xE91E63 );
 					scene.add( helper );
 
