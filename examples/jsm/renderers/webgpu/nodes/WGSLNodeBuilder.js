@@ -208,6 +208,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	generateTextureStore( texture, textureProperty, uvIndexSnippet, valueSnippet ) {
+
+		return `textureStore( ${ textureProperty }, ${ uvIndexSnippet }, ${ valueSnippet } )`;
+
+	}
+
 	isUnfilterable( texture ) {
 
 		return texture.isDataTexture === true && texture.type === FloatType;
@@ -283,7 +289,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			const name = node.name;
 			const type = node.type;
 
-			if ( type === 'texture' || type === 'cubeTexture' ) {
+			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' ) {
 
 				return name;
 
@@ -336,11 +342,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			const bindings = this.bindings[ shaderStage ];
 
-			if ( type === 'texture' || type === 'cubeTexture' ) {
+			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' ) {
 
 				let texture = null;
 
-				if ( type === 'texture' ) {
+				if ( type === 'texture' || type === 'storageTexture' ) {
 
 					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node );
 
@@ -723,7 +729,7 @@ ${ flowData.code }
 
 		for ( const uniform of uniforms ) {
 
-			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' ) {
+			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'storageTexture' ) {
 
 				const texture = uniform.node.value;
 
