@@ -61,6 +61,7 @@ class UITexture extends UISpan {
 					loader.load( event.target.result, function ( hdrTexture ) {
 
 						hdrTexture.sourceFile = file.name;
+						hdrTexture.userData = { sourceFile: file.name };
 						hdrTexture.isHDRTexture = true;
 
 						scope.setValue( hdrTexture );
@@ -82,6 +83,7 @@ class UITexture extends UISpan {
 
 						texture.colorSpace = THREE.SRGBColorSpace;
 						texture.sourceFile = file.name;
+						texture.userData = { sourceFile: file.name };
 
 						scope.setValue( texture );
 
@@ -108,6 +110,7 @@ class UITexture extends UISpan {
 
 						texture.colorSpace = THREE.SRGBColorSpace;
 						texture.sourceFile = file.name;
+						texture.userData = { sourceFile: file.name };
 						texture.needsUpdate = true;
 						scope.setValue( texture );
 
@@ -130,6 +133,7 @@ class UITexture extends UISpan {
 						const texture = new THREE.Texture( this );
 						texture.sourceFile = file.name;
 						texture.needsUpdate = true;
+						texture.userData = { sourceFile: file.name };
 
 						scope.setValue( texture );
 
