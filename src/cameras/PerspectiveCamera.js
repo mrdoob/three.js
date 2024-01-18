@@ -112,7 +112,7 @@ class PerspectiveCamera extends Camera {
 	 * Copies max/min height and width of the frustum's rectangle into minTarget and maxTarget.
 	 * Results are in the camera's local coordinate space, independent of its global position/rotation/scale.
 	 */
-	getFrustumBounds( distance, minTarget, maxTarget ) {
+	getFrustumSize( distance, minTarget, maxTarget ) {
 
 		_tempV3.set( - 1, - 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
 		_tempV3.multiplyScalar( distance / Math.abs( _tempV3.z ) );
@@ -132,7 +132,7 @@ class PerspectiveCamera extends Camera {
  	 */
 	getFrustumDimensions( distance, target ) {
 
-		this.getBounds( distance, _minTarget, _maxTarget );
+		this.getFrustumSize( distance, _minTarget, _maxTarget );
 		target.x = _maxTarget.x - _minTarget.x;
 		target.y = _maxTarget.y - _minTarget.y;
 
