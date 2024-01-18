@@ -60,7 +60,6 @@ uniform float opacity;
 #include <fog_pars_fragment>
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
-#include <occlusion_pars_fragment>
 
 void main() {
 
@@ -82,7 +81,6 @@ void main() {
 	#include <colorspace_fragment>
 	#include <fog_fragment>
 	#include <premultiplied_alpha_fragment>
-	#include <occlusion_fragment>
 
 }
 `;

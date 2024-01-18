@@ -80,8 +80,6 @@ class ShaderMaterial extends Material {
 		this.lights = source.lights;
 		this.clipping = source.clipping;
 
-		this.occlusion = source.occlusion;
-
 		this.extensions = Object.assign( {}, source.extensions );
 
 		this.glslVersion = source.glslVersion;

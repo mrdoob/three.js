@@ -16,8 +16,7 @@ const ShaderLib = {
 			UniformsLib.envmap,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
-			UniformsLib.fog,
-			UniformsLib.occlusion
+			UniformsLib.fog
 		] ),
 
 		vertexShader: ShaderChunk.meshbasic_vert,
@@ -39,7 +38,6 @@ const ShaderLib = {
 			UniformsLib.displacementmap,
 			UniformsLib.fog,
 			UniformsLib.lights,
-			UniformsLib.occlusion,
 			{
 				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) }
 			}
@@ -64,7 +62,6 @@ const ShaderLib = {
 			UniformsLib.displacementmap,
 			UniformsLib.fog,
 			UniformsLib.lights,
-			UniformsLib.occlusion,
 			{
 				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 				specular: { value: /*@__PURE__*/ new Color( 0x111111 ) },
@@ -92,7 +89,6 @@ const ShaderLib = {
 			UniformsLib.metalnessmap,
 			UniformsLib.fog,
 			UniformsLib.lights,
-			UniformsLib.occlusion,
 			{
 				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 				roughness: { value: 1.0 },
@@ -119,7 +115,6 @@ const ShaderLib = {
 			UniformsLib.gradientmap,
 			UniformsLib.fog,
 			UniformsLib.lights,
-			UniformsLib.occlusion,
 			{
 				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) }
 			}
@@ -138,7 +133,6 @@ const ShaderLib = {
 			UniformsLib.normalmap,
 			UniformsLib.displacementmap,
 			UniformsLib.fog,
-			UniformsLib.occlusion,
 			{
 				matcap: { value: null }
 			}
@@ -153,8 +147,7 @@ const ShaderLib = {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.points,
-			UniformsLib.fog,
-			UniformsLib.occlusion
+			UniformsLib.fog
 		] ),
 
 		vertexShader: ShaderChunk.points_vert,
@@ -198,7 +191,6 @@ const ShaderLib = {
 			UniformsLib.bumpmap,
 			UniformsLib.normalmap,
 			UniformsLib.displacementmap,
-			UniformsLib.occlusion,
 			{
 				opacity: { value: 1.0 }
 			}
