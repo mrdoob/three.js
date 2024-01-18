@@ -3,7 +3,7 @@ import * as MathUtils from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 
-// Temp constants used by getBounds(), frustumDimensions(), and frustumCorners()
+// Temp constants used by getFrustumBounds()/getFrustumDimensions()
 const _tempV3 = /*@__PURE__*/ new Vector3();
 const _minTarget = /*@__PURE__*/ new Vector2();
 const _maxTarget = /*@__PURE__*/ new Vector2();
@@ -108,10 +108,11 @@ class PerspectiveCamera extends Camera {
 	}
 
 	/*
-	 * Provides the topRight and bottomLeft corners of the camera's 2D frustum slice at a given distance.
-	 * Results are copied into minTarget and maxTarget input vars.
+	 * Computes 2D bounds of the camera's frustum at a given distance along the viewing direction.
+	 * Copies max/min height and width of the frustum's rectangle into minTarget and maxTarget.
+	 * Results are in the camera's local coordinate space, independent of its global position/rotation/scale.
 	 */
-	getBounds( distance, minTarget, maxTarget ) {
+	getFrustumBounds( distance, minTarget, maxTarget ) {
 
 		_tempV3.set( - 1, - 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
 		_tempV3.multiplyScalar( distance / Math.abs( _tempV3.z ) );
