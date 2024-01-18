@@ -1,17 +1,40 @@
 // https://wwwimages2.adobe.com/content/dam/acom/en/products/speedgrade/cc/pdfs/cube-lut-specification-1.0.pdf
 
 import {
-	Loader,
-	FileLoader,
-	Vector3,
+	ClampToEdgeWrapping,
 	DataTexture,
 	Data3DTexture,
-	UnsignedByteType,
-	ClampToEdgeWrapping,
+	FileLoader,
+	FloatType,
 	LinearFilter,
+	Loader,
+	UnsignedByteType,
+	Vector3,
 } from 'three';
 
 export class LUTCubeLoader extends Loader {
+
+	constructor( manager ) {
+
+		super( manager );
+
+		this.type = UnsignedByteType;
+
+	}
+
+	setType( type ) {
+
+		if ( type !== UnsignedByteType && type !== FloatType ) {
+
+			throw new Error( 'LUTCubeLoader: Unsupported type' );
+
+		}
+
+		this.type = type;
+
+		return this;
+
+	}
 
 	load( url, onLoad, onProgress, onError ) {
 
@@ -44,72 +67,63 @@ export class LUTCubeLoader extends Loader {
 
 	}
 
-	parse( str ) {
+	parse( input ) {
 
-		// Remove empty lines and comments
-		str = str
-			.replace( /^#.*?(\n|\r)/gm, '' )
-			.replace( /^\s*?(\n|\r)/gm, '' )
-			.trim();
+		const regExpTitle = /TITLE +"([^"]*)"/;
+		const regExpSize = /LUT_3D_SIZE +(\d+)/;
+		const regExpDomainMin = /DOMAIN_MIN +([\d.]+) +([\d.]+) +([\d.]+)/;
+		const regExpDomainMax = /DOMAIN_MAX +([\d.]+) +([\d.]+) +([\d.]+)/;
+		const regExpDataPoints = /^([\d.e+-]+) +([\d.e+-]+) +([\d.e+-]+) *$/gm;
 
-		let title = null;
-		let size = null;
+		let result = regExpTitle.exec( input );
+		const title = ( result !== null ) ? result[ 1 ] : null;
+
+		result = regExpSize.exec( input );
+
+		if ( result === null ) {
+
+			throw new Error( 'LUTCubeLoader: Missing LUT_3D_SIZE information' );
+
+		}
+
+		const size = Number( result[ 1 ] );
+		const length = size ** 3 * 4;
+		const data = this.type === UnsignedByteType ? new Uint8Array( length ) : new Float32Array( length );
+
 		const domainMin = new Vector3( 0, 0, 0 );
 		const domainMax = new Vector3( 1, 1, 1 );
 
-		const lines = str.split( /[\n\r]+/g );
-		let data = null;
+		result = regExpDomainMin.exec( input );
 
-		let currIndex = 0;
-		for ( let i = 0, l = lines.length; i < l; i ++ ) {
+		if ( result !== null ) {
 
-			const line = lines[ i ].trim();
-			const split = line.split( /\s/g );
+			domainMin.set( Number( result[ 1 ] ), Number( result[ 2 ] ), Number( result[ 3 ] ) );
 
-			switch ( split[ 0 ] ) {
+		}
 
-				case 'TITLE':
-					title = line.substring( 7, line.length - 1 );
-					break;
-				case 'LUT_3D_SIZE':
-					// TODO: A .CUBE LUT file specifies floating point values and could be represented with
-					// more precision than can be captured with Uint8Array.
-					const sizeToken = split[ 1 ];
-					size = parseFloat( sizeToken );
-					data = new Uint8Array( size * size * size * 4 );
-					break;
-				case 'DOMAIN_MIN':
-					domainMin.x = parseFloat( split[ 1 ] );
-					domainMin.y = parseFloat( split[ 2 ] );
-					domainMin.z = parseFloat( split[ 3 ] );
-					break;
-				case 'DOMAIN_MAX':
-					domainMax.x = parseFloat( split[ 1 ] );
-					domainMax.y = parseFloat( split[ 2 ] );
-					domainMax.z = parseFloat( split[ 3 ] );
-					break;
-				default:
-					const r = parseFloat( split[ 0 ] );
-					const g = parseFloat( split[ 1 ] );
-					const b = parseFloat( split[ 2 ] );
+		result = regExpDomainMax.exec( input );
 
-					if (
-						r > 1.0 || r < 0.0 ||
-						g > 1.0 || g < 0.0 ||
-						b > 1.0 || b < 0.0
-					) {
+		if ( result !== null ) {
 
-						throw new Error( 'LUTCubeLoader : Non normalized values not supported.' );
+			domainMax.set( Number( result[ 1 ] ), Number( result[ 2 ] ), Number( result[ 3 ] ) );
 
-					}
+		}
 
-					data[ currIndex + 0 ] = r * 255;
-					data[ currIndex + 1 ] = g * 255;
-					data[ currIndex + 2 ] = b * 255;
-					data[ currIndex + 3 ] = 255;
-					currIndex += 4;
+		if ( domainMin.x > domainMax.x || domainMin.y > domainMax.y || domainMin.z > domainMax.z ) {
 
-			}
+			throw new Error( 'LUTCubeLoader: Invalid input domain' );
+
+		}
+
+		const scale = this.type === UnsignedByteType ? 255 : 1;
+		let i = 0;
+
+		while ( ( result = regExpDataPoints.exec( input ) ) !== null ) {
+
+			data[ i ++ ] = Number( result[ 1 ] ) * scale;
+			data[ i ++ ] = Number( result[ 2 ] ) * scale;
+			data[ i ++ ] = Number( result[ 3 ] ) * scale;
+			data[ i ++ ] = scale;
 
 		}
 
@@ -117,7 +131,7 @@ export class LUTCubeLoader extends Loader {
 		texture.image.data = data;
 		texture.image.width = size;
 		texture.image.height = size * size;
-		texture.type = UnsignedByteType;
+		texture.type = this.type;
 		texture.magFilter = LinearFilter;
 		texture.minFilter = LinearFilter;
 		texture.wrapS = ClampToEdgeWrapping;
@@ -130,7 +144,7 @@ export class LUTCubeLoader extends Loader {
 		texture3D.image.width = size;
 		texture3D.image.height = size;
 		texture3D.image.depth = size;
-		texture3D.type = UnsignedByteType;
+		texture3D.type = this.type;
 		texture3D.magFilter = LinearFilter;
 		texture3D.minFilter = LinearFilter;
 		texture3D.wrapS = ClampToEdgeWrapping;

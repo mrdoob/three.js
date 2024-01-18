@@ -40,7 +40,7 @@ function WebGLCubeMaps( renderer ) {
 
 					if ( image && image.height > 0 ) {
 
-						const renderTarget = new WebGLCubeRenderTarget( image.height / 2 );
+						const renderTarget = new WebGLCubeRenderTarget( image.height );
 						renderTarget.fromEquirectangularTexture( renderer, texture );
 						cubemaps.set( texture, renderTarget );
 

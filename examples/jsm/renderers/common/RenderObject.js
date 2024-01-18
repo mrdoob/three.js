@@ -82,6 +82,8 @@ export default class RenderObject {
 
 			const attribute = nodeAttribute.node && nodeAttribute.node.attribute ? nodeAttribute.node.attribute : geometry.getAttribute( nodeAttribute.name );
 
+			if ( attribute === undefined ) continue;
+
 			attributes.push( attribute );
 
 			const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
@@ -126,6 +128,12 @@ export default class RenderObject {
 			}
 
 			cacheKey += /*property + ':' +*/ value + ',';
+
+		}
+
+		if ( object.skeleton ) {
+
+			cacheKey += object.skeleton.uuid + ',';
 
 		}
 

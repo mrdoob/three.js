@@ -252,14 +252,6 @@ class SkinnedMesh extends Mesh {
 
 	}
 
-	boneTransform( index, vector ) { // @deprecated, r151
-
-		console.warn( 'THREE.SkinnedMesh: .boneTransform() was renamed to .applyBoneTransform() in r151.' );
-		return this.applyBoneTransform( index, vector );
-
-	}
-
-
 }
 
 export { SkinnedMesh };

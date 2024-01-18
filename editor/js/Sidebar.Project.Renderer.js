@@ -67,7 +67,8 @@ function SidebarProjectRenderer( editor ) {
 		1: 'Linear',
 		2: 'Reinhard',
 		3: 'Cineon',
-		4: 'ACESFilmic'
+		4: 'ACESFilmic',
+		6: 'AgX'
 	} ).setWidth( '120px' ).onChange( updateToneMapping );
 	toneMappingSelect.setValue( config.getKey( 'project/renderer/toneMapping' ) );
 	toneMappingRow.add( toneMappingSelect );

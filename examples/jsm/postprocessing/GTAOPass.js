@@ -61,7 +61,7 @@ class GTAOPass extends Pass {
 			depthTest: false,
 			depthWrite: false,
 		} );
-		this.gtaoMaterial.definesPERSPECTIVE_CAMERA = this.camera.isPerspectiveCamera ? 1 : 0;
+		this.gtaoMaterial.defines.PERSPECTIVE_CAMERA = this.camera.isPerspectiveCamera ? 1 : 0;
 		this.gtaoMaterial.uniforms.tNoise.value = this.gtaoNoiseTexture;
 		this.gtaoMaterial.uniforms.resolution.value.set( this.width, this.height );
 		this.gtaoMaterial.uniforms.cameraNear.value = this.camera.near;
@@ -159,6 +159,12 @@ class GTAOPass extends Pass {
 		this.copyMaterial.dispose();
 		this.depthRenderMaterial.dispose();
 		this.fsQuad.dispose();
+
+	}
+
+	get gtaoMap() {
+
+		return this.pdRenderTarget.texture;
 
 	}
 
@@ -358,6 +364,9 @@ class GTAOPass extends Pass {
 		// output result to screen
 
 		switch ( this.output ) {
+
+			case GTAOPass.OUTPUT.Off:
+				break;
 
 			case GTAOPass.OUTPUT.Diffuse:
 
@@ -561,6 +570,7 @@ class GTAOPass extends Pass {
 }
 
 GTAOPass.OUTPUT = {
+	'Off': - 1,
 	'Default': 0,
 	'Diffuse': 1,
 	'Depth': 2,

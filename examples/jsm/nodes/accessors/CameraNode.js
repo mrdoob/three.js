@@ -23,7 +23,7 @@ class CameraNode extends Object3DNode {
 
 		const scope = this.scope;
 
-		if ( scope === CameraNode.PROJECTION_MATRIX ) {
+		if ( scope === CameraNode.PROJECTION_MATRIX || scope === CameraNode.PROJECTION_MATRIX_INVERSE ) {
 
 			return 'mat4';
 
@@ -53,6 +53,10 @@ class CameraNode extends Object3DNode {
 
 			uniformNode.value = camera.projectionMatrix;
 
+		} else if ( scope === CameraNode.PROJECTION_MATRIX_INVERSE ) {
+
+			uniformNode.value = camera.projectionMatrixInverse;
+
 		} else if ( scope === CameraNode.NEAR ) {
 
 			uniformNode.value = camera.near;
@@ -79,7 +83,7 @@ class CameraNode extends Object3DNode {
 
 		const scope = this.scope;
 
-		if ( scope === CameraNode.PROJECTION_MATRIX ) {
+		if ( scope === CameraNode.PROJECTION_MATRIX || scope === CameraNode.PROJECTION_MATRIX_INVERSE ) {
 
 			this._uniformNode.nodeType = 'mat4';
 
@@ -96,6 +100,7 @@ class CameraNode extends Object3DNode {
 }
 
 CameraNode.PROJECTION_MATRIX = 'projectionMatrix';
+CameraNode.PROJECTION_MATRIX_INVERSE = 'projectionMatrixInverse';
 CameraNode.NEAR = 'near';
 CameraNode.FAR = 'far';
 CameraNode.LOG_DEPTH = 'logDepth';
@@ -103,6 +108,7 @@ CameraNode.LOG_DEPTH = 'logDepth';
 export default CameraNode;
 
 export const cameraProjectionMatrix = label( nodeImmutable( CameraNode, CameraNode.PROJECTION_MATRIX ), 'projectionMatrix' );
+export const cameraProjectionMatrixInverse = label( nodeImmutable( CameraNode, CameraNode.PROJECTION_MATRIX_INVERSE ), 'projectionMatrixInverse' );
 export const cameraNear = nodeImmutable( CameraNode, CameraNode.NEAR );
 export const cameraFar = nodeImmutable( CameraNode, CameraNode.FAR );
 export const cameraLogDepth = nodeImmutable( CameraNode, CameraNode.LOG_DEPTH );

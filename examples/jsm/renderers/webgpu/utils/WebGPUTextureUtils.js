@@ -113,7 +113,21 @@ class WebGPUTextureUtils {
 		const dimension = this._getDimension( texture );
 		const format = texture.internalFormat || getFormat( texture, backend.device );
 
-		const sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
+		let sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
+
+		if ( sampleCount > 1 ) {
+
+			// WebGPU only supports power-of-two sample counts and 2 is not a valid value
+			sampleCount = Math.pow( 2, Math.floor( Math.log2( sampleCount ) ) );
+
+			if ( sampleCount === 2 ) {
+
+				sampleCount = 4;
+
+			}
+
+		}
+
 		const primarySampleCount = texture.isRenderTargetTexture ? 1 : sampleCount;
 
 		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC;
@@ -360,6 +374,9 @@ class WebGPUTextureUtils {
 		const format = textureData.textureDescriptorGPU.format;
 		const bytesPerTexel = this._getBytesPerTexel( format );
 
+		let bytesPerRow = width * bytesPerTexel;
+		bytesPerRow = Math.ceil( bytesPerRow / 256 ) * 256; // Align to 256 bytes
+
 		const readBuffer = device.createBuffer(
 			{
 				size: width * height * bytesPerTexel,
@@ -376,7 +393,7 @@ class WebGPUTextureUtils {
 			},
 			{
 				buffer: readBuffer,
-				bytesPerRow: width * bytesPerTexel
+				bytesPerRow: bytesPerRow
 			},
 			{
 				width: width,
@@ -665,15 +682,57 @@ class WebGPUTextureUtils {
 
 	_getBytesPerTexel( format ) {
 
-		if ( format === GPUTextureFormat.R8Unorm ) return 1;
-		if ( format === GPUTextureFormat.R16Float ) return 2;
-		if ( format === GPUTextureFormat.RG8Unorm ) return 2;
-		if ( format === GPUTextureFormat.RG16Float ) return 4;
-		if ( format === GPUTextureFormat.R32Float ) return 4;
-		if ( format === GPUTextureFormat.RGBA8Unorm || format === GPUTextureFormat.RGBA8UnormSRGB ) return 4;
-		if ( format === GPUTextureFormat.RG32Float ) return 8;
-		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
-		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
+		// 8-bit formats
+		if ( format === GPUTextureFormat.R8Unorm ||
+			format === GPUTextureFormat.R8Snorm ||
+			format === GPUTextureFormat.R8Uint ||
+			format === GPUTextureFormat.R8Sint ) return 1;
+
+		// 16-bit formats
+		if ( format === GPUTextureFormat.R16Uint ||
+			format === GPUTextureFormat.R16Sint ||
+			format === GPUTextureFormat.R16Float ||
+			format === GPUTextureFormat.RG8Unorm ||
+			format === GPUTextureFormat.RG8Snorm ||
+			format === GPUTextureFormat.RG8Uint ||
+			format === GPUTextureFormat.RG8Sint ) return 2;
+
+		// 32-bit formats
+		if ( format === GPUTextureFormat.R32Uint ||
+			format === GPUTextureFormat.R32Sint ||
+			format === GPUTextureFormat.R32Float ||
+			format === GPUTextureFormat.RG16Uint ||
+			format === GPUTextureFormat.RG16Sint ||
+			format === GPUTextureFormat.RG16Float ||
+			format === GPUTextureFormat.RGBA8Unorm ||
+			format === GPUTextureFormat.RGBA8UnormSRGB ||
+			format === GPUTextureFormat.RGBA8Snorm ||
+			format === GPUTextureFormat.RGBA8Uint ||
+			format === GPUTextureFormat.RGBA8Sint ||
+			format === GPUTextureFormat.BGRA8Unorm ||
+			format === GPUTextureFormat.BGRA8UnormSRGB ||
+			// Packed 32-bit formats
+			format === GPUTextureFormat.RGB9E5UFloat ||
+			format === GPUTextureFormat.RGB10A2Unorm ||
+			format === GPUTextureFormat.RG11B10UFloat ||
+			format === GPUTextureFormat.Depth32Float ||
+			format === GPUTextureFormat.Depth24Plus ||
+			format === GPUTextureFormat.Depth24PlusStencil8 ||
+			format === GPUTextureFormat.Depth32FloatStencil8 ) return 4;
+
+		// 64-bit formats
+		if ( format === GPUTextureFormat.RG32Uint ||
+			format === GPUTextureFormat.RG32Sint ||
+			format === GPUTextureFormat.RG32Float ||
+			format === GPUTextureFormat.RGBA16Uint ||
+			format === GPUTextureFormat.RGBA16Sint ||
+			format === GPUTextureFormat.RGBA16Float ) return 8;
+
+		// 128-bit formats
+		if ( format === GPUTextureFormat.RGBA32Uint ||
+			format === GPUTextureFormat.RGBA32Sint ||
+			format === GPUTextureFormat.RGBA32Float ) return 16;
+
 
 	}
 
@@ -699,6 +758,9 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.RG16Sint ) return Int16Array;
 		if ( format === GPUTextureFormat.RGBA16Uint ) return Uint16Array;
 		if ( format === GPUTextureFormat.RGBA16Sint ) return Int16Array;
+		if ( format === GPUTextureFormat.R16Float ) return Float32Array;
+		if ( format === GPUTextureFormat.RG16Float ) return Float32Array;
+		if ( format === GPUTextureFormat.RGBA16Float ) return Float32Array;
 
 
 		if ( format === GPUTextureFormat.R32Uint ) return Uint32Array;
@@ -710,6 +772,17 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.RGBA32Uint ) return Uint32Array;
 		if ( format === GPUTextureFormat.RGBA32Sint ) return Int32Array;
 		if ( format === GPUTextureFormat.RGBA32Float ) return Float32Array;
+
+		if ( format === GPUTextureFormat.BGRA8Unorm ) return Uint8Array;
+		if ( format === GPUTextureFormat.BGRA8UnormSRGB ) return Uint8Array;
+		if ( format === GPUTextureFormat.RGB10A2Unorm ) return Uint32Array;
+		if ( format === GPUTextureFormat.RGB9E5UFloat ) return Uint32Array;
+		if ( format === GPUTextureFormat.RG11B10UFloat ) return Uint32Array;
+
+		if ( format === GPUTextureFormat.Depth32Float ) return Float32Array;
+		if ( format === GPUTextureFormat.Depth24Plus ) return Uint32Array;
+		if ( format === GPUTextureFormat.Depth24PlusStencil8 ) return Uint32Array;
+		if ( format === GPUTextureFormat.Depth32FloatStencil8 ) return Float32Array;
 
 	}
 
@@ -741,7 +814,7 @@ export function getFormat( texture, device = null ) {
 
 	let formatGPU;
 
-	if ( /*texture.isRenderTargetTexture === true ||*/ texture.isFramebufferTexture === true ) {
+	if ( texture.isFramebufferTexture === true && texture.type === UnsignedByteType ) {
 
 		formatGPU = GPUTextureFormat.BGRA8Unorm;
 

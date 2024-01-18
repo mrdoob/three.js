@@ -59,8 +59,6 @@ class ViewportNode extends Node {
 
 		const scope = this.scope;
 
-		if ( scope === ViewportNode.COORDINATE ) return;
-
 		let output = null;
 
 		if ( scope === ViewportNode.RESOLUTION ) {

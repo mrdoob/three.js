@@ -251,7 +251,7 @@ class WebGLUtils {
 
 				const res = gl.clientWaitSync( sync, gl.SYNC_FLUSH_COMMANDS_BIT, 0 );
 
-				if ( res === gl.WAIT_FAILED) {
+				if ( res === gl.WAIT_FAILED ) {
 
 					gl.deleteSync( sync );
 
@@ -260,7 +260,7 @@ class WebGLUtils {
 
 				}
 
-				if ( res === gl.TIMEOUT_EXPIRED) {
+				if ( res === gl.TIMEOUT_EXPIRED ) {
 
 					requestAnimationFrame( test );
 					return;

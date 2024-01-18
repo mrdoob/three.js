@@ -1,4 +1,4 @@
-import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder, normalView } from 'three/nodes';
+import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder, normalView } from '../../../nodes/Nodes.js';
 import SlotNode from './SlotNode.js';
 import { PerspectiveCamera, ShaderChunk, ShaderLib, UniformsUtils, UniformsLib } from 'three';
 
@@ -671,7 +671,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 	build() {
 
-		super.build();
+		super.build( false );
 
 		this._addSnippets();
 		this._addUniforms();

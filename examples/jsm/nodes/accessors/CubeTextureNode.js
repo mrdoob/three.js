@@ -2,6 +2,7 @@ import TextureNode from './TextureNode.js';
 import { reflectVector } from './ReflectVectorNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
+import { WebGPUCoordinateSystem } from 'three';
 
 class CubeTextureNode extends TextureNode {
 
@@ -27,9 +28,24 @@ class CubeTextureNode extends TextureNode {
 
 	setUpdateMatrix( /*updateMatrix*/ ) { } // Ignore .updateMatrix for CubeTextureNode
 
-	generateUV( builder, uvNode ) {
+	setupUV( builder, uvNode ) {
 
-		const cubeUV = vec3( uvNode.x.negate(), uvNode.yz );
+		const texture = this.value;
+
+		if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem || ! texture.isRenderTargetTexture ) {
+
+			return vec3( uvNode.x.negate(), uvNode.yz );
+
+		} else {
+
+			return uvNode;
+
+		}
+
+	}
+
+	generateUV( builder, cubeUV ) {
+
 		return cubeUV.build( builder, 'vec3' );
 
 	}

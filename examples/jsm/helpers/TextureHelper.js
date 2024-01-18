@@ -216,8 +216,8 @@ function createSliceGeometry( texture, width, height, depth ) {
 			const w = sliceCount === 1
 				? 1
 				: texture.isDataArrayTexture || texture.isCompressedArrayTexture
-				? i
-				: i / ( sliceCount - 1 );
+					? i
+					: i / ( sliceCount - 1 );
 
 			uvw.setXYZ( j, u, v, w );
 

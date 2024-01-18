@@ -1,4 +1,4 @@
-export const REVISION = '160dev';
+export const REVISION = '161dev';
 
 export const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -13,7 +13,6 @@ export const VSMShadowMap = 3;
 export const FrontSide = 0;
 export const BackSide = 1;
 export const DoubleSide = 2;
-export const TwoPassDoubleSide = 2; // r149
 export const NoBlending = 0;
 export const NormalBlending = 1;
 export const AdditiveBlending = 2;
@@ -57,6 +56,7 @@ export const ReinhardToneMapping = 2;
 export const CineonToneMapping = 3;
 export const ACESFilmicToneMapping = 4;
 export const CustomToneMapping = 5;
+export const AgXToneMapping = 6;
 export const AttachedBindMode = 'attached';
 export const DetachedBindMode = 'detached';
 

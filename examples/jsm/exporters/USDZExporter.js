@@ -1,5 +1,14 @@
-import * as THREE from 'three';
-import * as fflate from '../libs/fflate.module.js';
+import {
+	NoColorSpace,
+	DoubleSide,
+} from 'three';
+
+import {
+	strToU8,
+	zipSync,
+} from '../libs/fflate.module.js';
+
+import { decompress } from './../utils/TextureUtils.js';
 
 class USDZExporter {
 
@@ -11,6 +20,7 @@ class USDZExporter {
 				planeAnchoring: { alignment: 'horizontal' }
 			},
 			quickLookCompatible: false,
+			maxTextureSize: 1024,
 		}, options );
 
 		const files = {};
@@ -71,14 +81,20 @@ class USDZExporter {
 
 		output += buildMaterials( materials, textures, options.quickLookCompatible );
 
-		files[ modelFileName ] = fflate.strToU8( output );
+		files[ modelFileName ] = strToU8( output );
 		output = null;
 
 		for ( const id in textures ) {
 
-			const texture = textures[ id ];
+			let texture = textures[ id ];
 
-			const canvas = imageToCanvas( texture.image, texture.flipY );
+			if ( texture.isCompressedTexture === true ) {
+
+				texture = decompress( texture );
+
+			}
+
+			const canvas = imageToCanvas( texture.image, texture.flipY, options.maxTextureSize );
 			const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/png', 1 ) );
 
 			files[ `textures/Texture_${ id }.png` ] = new Uint8Array( await blob.arrayBuffer() );
@@ -112,20 +128,20 @@ class USDZExporter {
 
 		}
 
-		return fflate.zipSync( files, { level: 0 } );
+		return zipSync( files, { level: 0 } );
 
 	}
 
 }
 
-function imageToCanvas( image, flipY ) {
+function imageToCanvas( image, flipY, maxTextureSize ) {
 
 	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
 		( typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas ) ||
 		( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
-		const scale = 1024 / Math.max( image.width, image.height );
+		const scale = maxTextureSize / Math.max( image.width, image.height );
 
 		const canvas = document.createElement( 'canvas' );
 		canvas.width = image.width * Math.min( 1, scale );
@@ -212,7 +228,7 @@ function buildUSDFileAsString( dataToInsert ) {
 
 	let output = buildHeader();
 	output += dataToInsert;
-	return fflate.strToU8( output );
+	return strToU8( output );
 
 }
 
@@ -499,7 +515,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 			asset inputs:file = @textures/Texture_${ id }.png@
 			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
 			${ color !== undefined ? 'float4 inputs:scale = ' + buildColor4( color ) : '' }
-			token inputs:sourceColorSpace = "${ texture.colorSpace === THREE.NoColorSpace ? 'raw' : 'sRGB' }"
+			token inputs:sourceColorSpace = "${ texture.colorSpace === NoColorSpace ? 'raw' : 'sRGB' }"
 			token inputs:wrapS = "${ WRAPPINGS[ texture.wrapS ] }"
 			token inputs:wrapT = "${ WRAPPINGS[ texture.wrapT ] }"
 			float outputs:r
@@ -512,7 +528,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 	}
 
 
-	if ( material.side === THREE.DoubleSide ) {
+	if ( material.side === DoubleSide ) {
 
 		console.warn( 'THREE.USDZExporter: USDZ does not support double sided materials', material );
 

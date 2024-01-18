@@ -249,6 +249,7 @@
 		"webgl_postprocessing_gtao",
 		"webgl_postprocessing_rgb_halftone",
 		"webgl_postprocessing_masking",
+		"webgl_postprocessing_material_ao",
 		"webgl_postprocessing_ssaa",
 		"webgl_postprocessing_outline",
 		"webgl_postprocessing_pixel",
@@ -299,6 +300,7 @@
 	"webgl2": [
 		"webgl2_buffergeometry_attributes_integer",
 		"webgl2_buffergeometry_attributes_none",
+		"webgl2_clipculldistance",
 		"webgl2_materials_texture2darray",
 		"webgl2_materials_texture3d",
 		"webgl2_materials_texture3d_partialupdate",
@@ -315,11 +317,13 @@
 	"webgpu (wip)": [
 		"webgpu_backdrop",
 		"webgpu_backdrop_area",
+		"webgpu_backdrop_water",
 		"webgpu_camera_logarithmicdepthbuffer",
 		"webgpu_clearcoat",
 		"webgpu_compute_audio",
 		"webgpu_compute_particles",
 		"webgpu_compute_particles_rain",
+		"webgpu_compute_particles_snow",
 		"webgpu_compute_points",
 		"webgpu_compute_texture",
 		"webgpu_compute_texture_pingpong",
@@ -342,6 +346,7 @@
 		"webgpu_loader_gltf_sheen",
 		"webgpu_loader_materialx",
 		"webgpu_materials",
+		"webgpu_materials_sss",
 		"webgpu_materials_video",
 		"webgpu_materialx_noise",
 		"webgpu_multiple_rendertargets",
@@ -349,6 +354,7 @@
 		"webgpu_morphtargets_face",
 		"webgpu_occlusion",
 		"webgpu_particles",
+		"webgpu_portal",
 		"webgpu_rtt",
 		"webgpu_sandbox",
 		"webgpu_shadertoy",
@@ -360,7 +366,9 @@
 		"webgpu_textures_2d-array",
 		"webgpu_tsl_editor",
 		"webgpu_tsl_transpiler",
-		"webgpu_video_panorama"
+		"webgpu_video_panorama",
+		"webgpu_postprocessing_afterimage",
+		"webgpu_multisampled_renderbuffers"
 	],
 	"webaudio": [
 		"webaudio_orientation",
