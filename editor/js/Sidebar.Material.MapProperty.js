@@ -31,12 +31,12 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 	const paramContainer = new UIDiv();
 	container.add( paramContainer );
 
-	const firstRow = new UIRow().setMarginBottom( '4px' ).setStyle( 'min-height', '0px' );
-	paramContainer.add( firstRow );
-
 	const mapType = property.replace( 'Map', '' );
 
 	const colorMaps = [ 'map', 'emissiveMap', 'sheenColorMap', 'specularColorMap', 'envMap' ];
+
+	const firstRow = new UIRow().setMarginBottom( '4px' ).setStyle( 'min-height', '0px' );
+	paramContainer.add( firstRow );
 
 	let tileOffsetX, tileOffsetY;
 	let tileRepeatX, tileRepeatY;
@@ -134,7 +134,7 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 	}
 
 	const uvDiv = new UIDiv().setMarginLeft( '3px' );
-	secondRow.add( uvDiv );
+	firstRow.add( uvDiv );
 
 	const uvChannelRow = new UIRow().setMarginBottom( '0px' ).setStyle( 'min-height', '0px' );
 	uvDiv.add( uvChannelRow );
@@ -153,7 +153,7 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 	flipYRow.add( flipY );
 
 	const wrapContainer = new UIDiv().setMarginLeft( '3px' );
-	container.add( wrapContainer );
+	secondRow.add( wrapContainer );
 
 	const wrapTypes = {
 		'RepeatWrapping': 'Repeat',
