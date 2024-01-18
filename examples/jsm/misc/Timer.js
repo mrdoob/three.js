@@ -7,15 +7,13 @@ class Timer {
 		this._startTime = now();
 
 		this._delta = 0;
-		this._elapsed = 0;
+		this._elapsed = 0; // _elapsed is the accumulation of all previous deltas
 
 		this._timescale = 1;
 
 		// use Page Visibility API to avoid large time delta values
 
-		this._usePageVisibilityAPI = ( typeof document !== 'undefined' && document.hidden !== undefined );
-
-		if ( this._usePageVisibilityAPI === true ) {
+		if ( typeof document !== 'undefined' && document.hidden !== undefined ) {
 
 			this._pageVisibilityHandler = handleVisibilityChange.bind( this );
 
@@ -61,9 +59,11 @@ class Timer {
 
 	dispose() {
 
-		if ( this._usePageVisibilityAPI === true ) {
+		if ( this._pageVisibilityHandler !== undefined ) {
 
 			document.removeEventListener( 'visibilitychange', this._pageVisibilityHandler );
+
+			this._pageVisibilityHandler = undefined;
 
 		}
 
@@ -71,13 +71,13 @@ class Timer {
 
 	}
 
-	update( timestamp ) {
+	update( timestamp = now() ) {
 
 		this._previousTime = this._currentTime;
-		this._currentTime = ( timestamp !== undefined ? timestamp : now() ) - this._startTime;
+		this._currentTime = timestamp - this._startTime;
 
 		this._delta = ( this._currentTime - this._previousTime ) * this._timescale;
-		this._elapsed += this._delta; // _elapsed is the accumulation of all previous deltas
+		this._elapsed += this._delta;
 
 		return this;
 
@@ -90,13 +90,13 @@ class FixedTimer extends Timer {
 	constructor( fps = 60 ) {
 
 		super();
-		this._delta = ( 1 / fps ) * 1000;
+		this._delta = 1000 / fps;
 
 	}
 
 	update() {
 
-		this._elapsed += ( this._delta * this._timescale ); // _elapsed is the accumulation of all previous deltas
+		this._elapsed += this._delta * this._timescale;
 
 		return this;
 
