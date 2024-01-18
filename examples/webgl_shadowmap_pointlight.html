@@ -59,6 +59,7 @@
 					light.add( sphere );
 
 					const texture = new THREE.CanvasTexture( generateTexture() );
+					texture.magFilter = THREE.NearestFilter;
 					texture.wrapT = THREE.RepeatWrapping;
 					texture.wrapS = THREE.RepeatWrapping;
 					texture.repeat.set( 1, 4.5 );
@@ -67,8 +68,7 @@
 					material = new THREE.MeshPhongMaterial( {
 						side: THREE.DoubleSide,
 						alphaMap: texture,
-						alphaTest: 0.5,
-						alphaToCoverage: true
+						alphaTest: 0.5
 					} );
 
 					sphere = new THREE.Mesh( geometry, material );
