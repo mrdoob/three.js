@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { UICheckbox, UIDiv, UINumber, UIRow, UIText } from './libs/ui.js';
+import { UICheckbox, UIDiv, UINumber, UIRow, UISelect, UIText } from './libs/ui.js';
 import { UITexture } from './libs/ui.three.js';
 import { SetMaterialMapCommand } from './commands/SetMaterialMapCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
@@ -132,6 +132,31 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 	const flipY = new UICheckbox( false ).setMarginRight( '8px' ).onChange( onFlipYChange );
 	flipYRow.add( flipY );
 
+	const wrapContainer = new UIDiv().setMarginLeft( '3px' );
+	container.add( wrapContainer );
+
+	const wrapTypes = {
+		'RepeatWrapping': 'Repeat',
+		'ClampToEdgeWrapping': 'Clamp To Edge',
+		'MirroredRepeatWrapping': 'Mirrored Repeat'
+	};
+
+	const wrapSRow = new UIRow().setMarginBottom( '6px' ).setStyle( 'min-height', '0px' );
+	wrapContainer.add( wrapSRow );
+
+	wrapSRow.add( new UIText( 'wrapS:' ).setWidth( '40px' ) );
+
+	const wrapS = new UISelect().setOptions( wrapTypes ).setWidth( '150px' ).onChange( onWrapChange );
+	wrapSRow.add( wrapS );
+
+	const wrapTRow = new UIRow().setMarginBottom( '6px' ).setStyle( 'min-height', '0px' );
+	wrapContainer.add( wrapTRow );
+
+	wrapTRow.add( new UIText( 'wrapT:' ).setWidth( '40px' ) );
+
+	const wrapT = new UISelect().setOptions( wrapTypes ).setWidth( '150px' ).onChange( onWrapChange );
+	wrapTRow.add( wrapT );
+
 	let object = null;
 	let materialSlot = null;
 	let material = null;
@@ -152,9 +177,15 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 				if ( property !== 'envMap' && property !== 'lightMap' && property !== 'aoMap' ) {
 
-					newMap.wrapS = newMap.wrapT = THREE.RepeatWrapping;
-					newMap.offset.fromArray( [ tileOffsetX.getValue(), tileOffsetY.getValue() ] );
-					newMap.repeat.fromArray( [ tileRepeatX.getValue(), tileRepeatY.getValue() ] );
+					console.log( wrapS, wrapT );
+					newMap.wrapS = THREE[ wrapS.getValue() ];
+					newMap.wrapT = THREE[ wrapT.getValue() ];
+
+					const newOffset = [ tileOffsetX.getValue(), tileOffsetY.getValue() ];
+					const newRepeat = [ tileRepeatX.getValue(), tileRepeatY.getValue() ];
+
+					newMap.offset.fromArray( newOffset );
+					newMap.repeat.fromArray( newRepeat );
 
 				}
 
@@ -209,6 +240,23 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 		if ( newMap !== null ) {
 
 			newMap.flipY = flipY.getValue();
+
+			editor.execute( new SetMaterialMapCommand( editor, object, property, newMap, materialSlot ) );
+
+		}
+
+	}
+
+	function onWrapChange() {
+
+		const newMap = enabled.getValue() ? map.getValue() : null;
+
+		if ( newMap !== null ) {
+
+			console.log( wrapS, wrapT );
+
+			newMap.wrapS = THREE[ wrapS.getValue() ];
+			newMap.wrapT = THREE[ wrapT.getValue() ];
 
 			editor.execute( new SetMaterialMapCommand( editor, object, property, newMap, materialSlot ) );
 
@@ -321,6 +369,11 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 				}
 
+				wrapS.setValue( Object.keys( wrapTypes ).find( key => THREE[ key ] === material[ property ].wrapS ) || 'RepeatWrapping' );
+				wrapT.setValue( Object.keys( wrapTypes ).find( key => THREE[ key ] === material[ property ].wrapT ) || 'RepeatWrapping' );
+
+				console.log( wrapS, wrapT );
+
 			} else {
 
 				if ( tileOffsetX !== undefined ) {
@@ -334,6 +387,25 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 					tileRepeatX.setValue( 1 );
 					tileRepeatY.setValue( 1 );
+
+				}
+
+				if ( uvChannel !== undefined ) {
+
+					uvChannel.setValue( 0 );
+
+				}
+
+				if ( flipY !== undefined ) {
+
+					flipY.setValue( false );
+
+				}
+
+				if ( wrapS !== undefined && wrapT !== undefined ) {
+
+					wrapS.setValue( 'RepeatWrapping' );
+					wrapT.setValue( 'RepeatWrapping' );
 
 				}
 
