@@ -82,7 +82,7 @@ function getFrustumCorners( camera, distance ) {
 
 	camera.getBounds( distance, _minTarget, _maxTarget );
 
-	camera.updateMatrixWorld( true, false );
+	camera.updateWorldMatrix( true, false );
 
 	// .set() -> Calculates the corner position
 	// .applyMatrix4() -> Accounts for camera position/rotation/scale
