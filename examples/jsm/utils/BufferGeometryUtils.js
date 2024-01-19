@@ -361,7 +361,7 @@ function mergeAttributes( attributes ) {
 
 				for ( let c = 0; c < itemSize; c ++ ) {
 
-					const value = attribute.getComponent( j + tupleOffset, c );
+					const value = attribute.getComponent( j, c );
 					result.setComponent( j + tupleOffset, c, value );
 
 				}
