@@ -118,6 +118,19 @@
 		<h3>[method:undefined clearViewOffset]()</h3>
 		<p>Removes any offset set by the [page:PerspectiveCamera.setViewOffset .setViewOffset] method.</p>
 
+		<h3>[method:Vector2 getFrustumSize]( [param:Float distance], [param:Vector2 target] )</h3>
+		<p>
+			Computes the height/width of the camera's viewable rectangle at a given distance along the viewing direction.
+			Copies the result into provided target [page:Vector2] where x is width and y is height.
+		</p>
+
+		<h3>[method:undefined getFrustumBounds]( [param:Float distance], [param:Vector2 minTarget], [param:Vector2 maxTarget] )
+		</h3>
+		<p>
+			Calculates the min/max 2D bounds of the camera's viewable rectangle at a given distance along the viewing direction.
+			Results are copied into minTarget and maxTarget input vars. 
+		</p>
+
 		<h3>[method:Float getEffectiveFOV]()</h3>
 		<p>Returns the current vertical field of view angle in degrees considering .zoom.</p>
 
@@ -214,6 +227,5 @@ camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 		</p>
-
 	</body>
 </html>

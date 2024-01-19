@@ -1,5 +1,12 @@
 import { Camera } from './Camera.js';
 import * as MathUtils from '../math/MathUtils.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+
+const _v3 = /*@__PURE__*/ new Vector3();
+const _minTarget = /*@__PURE__*/ new Vector2();
+const _maxTarget = /*@__PURE__*/ new Vector2();
+
 
 class PerspectiveCamera extends Camera {
 
@@ -96,6 +103,33 @@ class PerspectiveCamera extends Camera {
 
 		// film not completely covered in landscape format (aspect > 1)
 		return this.filmGauge / Math.max( this.aspect, 1 );
+
+	}
+
+	/*
+	 * Computes 2D bounds of the camera's frustum at a given distance along the viewing direction.
+	 * Copies max/min height and width of the frustum's rectangle into minTarget and maxTarget.
+	 * Results are in the camera's local coordinate space, independent of its global position/rotation/scale.
+	 */
+	getFrustumBounds( distance, minTarget, maxTarget ) {
+
+		_v3.set( - 1, - 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
+		minTarget.copy( _v3 ).multiplyScalar( - distance / _v3.z );
+
+		_v3.set( 1, 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
+		maxTarget.copy( _v3 ).multiplyScalar( - distance / _v3.z );
+
+	}
+
+	/*
+	 * Computes the height/width of the camera's frustum at a given distance along the viewing direction.
+	 * Copies the result into provided target Vector2 where x is width and y is height.
+ 	 */
+	getFrustumSize( distance, target ) {
+
+		this.getFrustumBounds( distance, _minTarget, _maxTarget );
+
+		return target.subVectors( _maxTarget, _minTarget );
 
 	}
 
