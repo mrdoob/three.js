@@ -486,8 +486,6 @@ class WebGLTextureUtils {
 		const width = texture.image.width;
 		const height = texture.image.height;
 
-		state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
-
 		if ( texture.isDepthTexture ) {
 
 			let mask = gl.DEPTH_BUFFER_BIT;
