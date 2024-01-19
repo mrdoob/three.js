@@ -72,27 +72,4 @@ function frameCorners( camera, bottomLeftCorner, bottomRightCorner, topLeftCorne
 
 }
 
-/** Calculate a PerspectiveCamera frustum's corners at a given distance from the camera.
- * Returns an object with topLeft, topRight, bottomRight, and bottomLeft properties. Each property is a Vector3.
- * Should work on all PerspectiveCameras where the frustum is rectangular in shape.
- * Including asymmetric rectangular frustums like those used by webXR cameras.
- * @param {number} distance - Distance from the camera
- * @param {camera} camera - The PerspectiveCamera to calculate the frustum corners from */
-function getFrustumCorners( camera, distance ) {
-
-	camera.getBounds( distance, _minTarget, _maxTarget );
-
-	camera.updateWorldMatrix( true, false );
-
-	// .set() -> Calculates the corner position
-	// .applyMatrix4() -> Accounts for camera position/rotation/scale
-	return {
-		topLeft: _vec.set( _minTarget.x, _maxTarget.y, - distance ).applyMatrix4( camera.matrixWorld ).clone(),
-		topRight: _vec.set( _maxTarget.x, _maxTarget.y, - distance ).applyMatrix4( camera.matrixWorld ).clone(),
-		bottomRight: _vec.set( _maxTarget.x, _minTarget.y, - distance ).applyMatrix4( camera.matrixWorld ).clone(),
-		bottomLeft: _vec.set( _minTarget.x, _minTarget.y, - distance ).applyMatrix4( camera.matrixWorld ).clone(),
-	};
-
-}
-
 export { frameCorners, getFrustumCorners };
