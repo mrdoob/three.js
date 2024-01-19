@@ -500,7 +500,6 @@ class WebGLTextureUtils {
 
 			gl.deleteFramebuffer( fb );
 
-
 		} else {
 
 			state.bindTexture( gl.TEXTURE_2D, textureGPU );
