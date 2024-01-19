@@ -200,6 +200,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			supportsVertexTextures: SUPPORTS_VERTEX_TEXTURES,
 			outputColorSpace: ( currentRenderTarget === null ) ? renderer.outputColorSpace : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace ),
+			alphaToCoverage: !! material.alphaToCoverage,
 
 			map: HAS_MAP,
 			matcap: HAS_MATCAP,
@@ -245,7 +246,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			gradientMap: HAS_GRADIENTMAP,
 
-			opaque: material.transparent === false && material.blending === NormalBlending,
+			opaque: material.transparent === false && material.blending === NormalBlending && material.alphaToCoverage === false,
 
 			alphaMap: HAS_ALPHAMAP,
 			alphaTest: HAS_ALPHATEST,
@@ -552,6 +553,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 18 );
 		if ( parameters.decodeVideoTexture )
 			_programLayers.enable( 19 );
+		if ( parameters.alphaToCoverage )
+			_programLayers.enable( 20 );
 
 		array.push( _programLayers.mask );
 

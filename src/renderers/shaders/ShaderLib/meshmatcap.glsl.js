@@ -71,9 +71,8 @@ varying vec3 vViewPosition;
 
 void main() {
 
-	#include <clipping_planes_fragment>
-
 	vec4 diffuseColor = vec4( diffuse, opacity );
+	#include <clipping_planes_fragment>
 
 	#include <logdepthbuf_fragment>
 	#include <map_fragment>

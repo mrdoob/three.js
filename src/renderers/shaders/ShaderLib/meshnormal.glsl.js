@@ -67,12 +67,14 @@ uniform float opacity;
 
 void main() {
 
+	vec4 diffuseColor = vec4( 0.0, 0.0, 0.0, opacity );
+
 	#include <clipping_planes_fragment>
 	#include <logdepthbuf_fragment>
 	#include <normal_fragment_begin>
 	#include <normal_fragment_maps>
 
-	gl_FragColor = vec4( packNormalToRGB( normal ), opacity );
+	gl_FragColor = vec4( packNormalToRGB( normal ), diffuseColor.a );
 
 	#ifdef OPAQUE
 
