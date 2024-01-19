@@ -114,14 +114,10 @@ class PerspectiveCamera extends Camera {
 	getFrustumBounds( distance, minTarget, maxTarget ) {
 
 		_v3.set( - 1, - 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
-		_v3.multiplyScalar( distance / Math.abs( _v3.z ) );
-		minTarget.x = _v3.x;
-		minTarget.y = _v3.y;
+		minTarget.copy( _v3 ).multiplyScalar( - distance / _v3.z );
 
 		_v3.set( 1, 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
-		_v3.multiplyScalar( distance / Math.abs( _v3.z ) );
-		maxTarget.x = _v3.x;
-		maxTarget.y = _v3.y;
+		maxTarget.copy( _v3 ).multiplyScalar( - distance / _v3.z );
 
 	}
 
@@ -132,10 +128,8 @@ class PerspectiveCamera extends Camera {
 	getFrustumSize( distance, target ) {
 
 		this.getFrustumBounds( distance, _minTarget, _maxTarget );
-		target.x = _maxTarget.x - _minTarget.x;
-		target.y = _maxTarget.y - _minTarget.y;
 
-		return target;
+		return target.subVectors( _maxTarget, _minTarget );
 
 	}
 
