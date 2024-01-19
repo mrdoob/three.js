@@ -1,8 +1,7 @@
 import {
 	MathUtils,
 	Quaternion,
-	Vector3,
-	Vector2
+	Vector3
 } from 'three';
 
 const _va = /*@__PURE__*/ new Vector3(), // from pe to pa
@@ -13,6 +12,7 @@ const _va = /*@__PURE__*/ new Vector3(), // from pe to pa
 	_vn = /*@__PURE__*/ new Vector3(), // normal vector of screen
 	_vec = /*@__PURE__*/ new Vector3(), // temporary vector
 	_quat = /*@__PURE__*/ new Quaternion(); // temporary quaternion
+
 
 /** Set a PerspectiveCamera's projectionMatrix and quaternion
  * to exactly frame the corners of an arbitrary rectangle.
@@ -64,7 +64,7 @@ function frameCorners( camera, bottomLeftCorner, bottomRightCorner, topLeftCorne
 		camera.fov =
 			MathUtils.RAD2DEG / Math.min( 1.0, camera.aspect ) *
 			Math.atan( ( _vec.copy( pb ).sub( pa ).length() +
-				( _vec.copy( pc ).sub( pa ).length() ) ) / _va.length() );
+							( _vec.copy( pc ).sub( pa ).length() ) ) / _va.length() );
 
 	}
 
