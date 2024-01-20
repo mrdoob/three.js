@@ -486,20 +486,24 @@ class WebGLTextureUtils {
 		const width = texture.image.width;
 		const height = texture.image.height;
 
-		state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
-
 		if ( texture.isDepthTexture ) {
 
-			const fb = gl.createFramebuffer();
+			let mask = gl.DEPTH_BUFFER_BIT;
 
-			gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+			if ( renderContext.stencil ) {
+
+				mask |= gl.STENCIL_BUFFER_BIT;
+
+			}
+
+			const fb = gl.createFramebuffer();
+			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
 
 			gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureGPU, 0 );
 
-			gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, gl.DEPTH_BUFFER_BIT, gl.NEAREST );
+			gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, gl.NEAREST );
 
 			gl.deleteFramebuffer( fb );
-
 
 		} else {
 
