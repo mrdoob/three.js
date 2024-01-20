@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, fog, float, positionWorld, vec3, triNoise3D, positionView, normalWorld, timerLocal, MeshPhongNodeMaterial } from 'three/nodes';
+			import { color, fog, float, positionWorld, triNoise3D, positionView, normalWorld, timerLocal, MeshPhongNodeMaterial } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
@@ -64,12 +64,14 @@
 				const timer = timerLocal( 1 );
 				const fogNoiseDistance = positionView.z.negate().smoothstep( 0, camera.far - 300 ).oneMinus();
 
-				let colors = triNoise3D( positionWorld.mul( .005 ), 0.2, timer );
-				colors = colors.add( triNoise3D( positionWorld.mul( .005 ).add( vec3( 0, 1, 0 ) ), 0.2, timer ) );
+				const fogNoiseA = triNoise3D( positionWorld.mul( .005 ), 0.2, timer );
+				const fogNoiseB = triNoise3D( positionWorld.mul( .01 ), 0.2, timer.mul( 1.2 ) );
+
+				const fogNoise = fogNoiseA.add( fogNoiseB ).mul( groundColor );
 
 				// apply custom fog
 
-				scene.fogNode = fog( fogNoiseDistance.mix( groundColor, colors.mul( groundColor ) ), groundFogArea );
+				scene.fogNode = fog( fogNoiseDistance.mix( groundColor, fogNoise ), groundFogArea );
 				scene.backgroundNode = normalWorld.y.max( 0 ).mix( groundColor, skyColor );
 
 				// builds
@@ -128,7 +130,8 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
-				// Mouse control
+				// controls
+
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2, 0 );
 				controls.minDistance = 7;
