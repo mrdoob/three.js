@@ -23,7 +23,7 @@ class WebGPURenderer extends Renderer {
 
 		let BackendClass;
 
-		if ( parameters.preferWebGL ) {
+		if ( parameters.forceWebGL ) {
 
 			BackendClass = WebGLBackend;
 
