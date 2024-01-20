@@ -43,7 +43,7 @@ class WebGPUBackend extends Backend {
 
 		this.parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
 
-		this.trackTimestampQueries = ( parameters.trackTimestampQueries === true );
+		this.trackTimestamp = ( parameters.trackTimestamp === true );
 
 		this.adapter = null;
 		this.device = null;
@@ -1033,7 +1033,7 @@ class WebGPUBackend extends Backend {
 
 	initTimeStampQuery( renderContext, descriptor ) {
 
-		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestampQueries ) return;
+		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
 
 		const renderContextData = this.get( renderContext );
 
@@ -1061,7 +1061,7 @@ class WebGPUBackend extends Backend {
 
 	prepareTimeStampBuffer( renderContext, encoder ) {
 
-		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestampQueries ) return;
+		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
 
 		const renderContextData = this.get( renderContext );
 
@@ -1085,7 +1085,7 @@ class WebGPUBackend extends Backend {
 
 	async resolveTimeStampAsync( renderContext, type = 'render' ) {
 
-		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestampQueries ) return;
+		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
 
 		const renderContextData = this.get( renderContext );
 

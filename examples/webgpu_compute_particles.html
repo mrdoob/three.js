@@ -62,7 +62,8 @@
 			let controls, stats;
 			let computeParticles;
 
-const timestamps = document.getElementById( 'timestamps' );
+			const timestamps = document.getElementById( 'timestamps' );
+
 			init();
 
 			function init() {
@@ -180,7 +181,7 @@ const timestamps = document.getElementById( 'timestamps' );
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true, trackTimestampQueries: true } );
+				renderer = new WebGPURenderer( { antialias: true, trackTimestamp: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -190,6 +191,7 @@ const timestamps = document.getElementById( 'timestamps' );
 				document.body.appendChild( stats.dom );
 
 				//
+	            renderer.info.autoReset = false;
 
 				renderer.compute( computeInit );
 
@@ -241,7 +243,6 @@ const timestamps = document.getElementById( 'timestamps' );
 				// events
 
 				renderer.domElement.addEventListener( 'pointermove', onMove );
-
 				//
 
 				controls = new OrbitControls( camera, renderer.domElement );
@@ -276,35 +277,35 @@ const timestamps = document.getElementById( 'timestamps' );
 
 			}
 
-			function animate() {
+			async function animate() {
 
 				stats.update();
 
+				await renderer.compute( computeParticles );
 
-				renderer.compute( computeParticles );
+				await renderer.render( scene, camera );
 
+				// throttle the logging
 
-	// throttle the logging
+				if ( renderer.hasFeature( 'timestamp-query' ) ) {
 
-	if ( renderer.hasFeature( 'timestamp-query' ) ) {
+					if ( renderer.info.render.calls % 5 === 0 ) {
 
-		if ( renderer.info.render.calls % 10 === 0 ) {
+						timestamps.innerHTML = `
 
-			timestamps.innerHTML = `
+										Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.timestamp.compute}ms<br>
+										Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.timestamp.render}ms`;
 
-            Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.timestamp.compute}ms<br>
-            Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.timestamp.render}ms`;
+					}
 
-		}
+				} else {
 
-	} else {
+					timestamps.innerHTML = 'Timestamp queries not supported';
 
-		timestamps.innerHTML = 'Timestamp queries not supported';
+				}
 
-	}
-
-				renderer.render( scene, camera );
-
+	            renderer.info.resetCompute();
+				renderer.info.reset();
 
 			}
 
