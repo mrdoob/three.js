@@ -283,16 +283,23 @@ const timestamps = document.getElementById( 'timestamps' );
 
 				renderer.compute( computeParticles );
 
-	// console.log( `Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.timestamp.compute}ms` );
-	// console.log( `Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.timestamp.render}ms` );
 
 	// throttle the logging
 
-	if ( renderer.info.render.calls % 10 === 0 ) {
+	if ( renderer.hasFeature( 'timestamp-query' ) ) {
 
-		timestamps.innerHTML = `
-Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.timestamp.compute}ms<br>
-Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.timestamp.render}ms`;
+		if ( renderer.info.render.calls % 10 === 0 ) {
+
+			timestamps.innerHTML = `
+
+            Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.timestamp.compute}ms<br>
+            Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.timestamp.render}ms`;
+
+		}
+
+	} else {
+
+		timestamps.innerHTML = 'Timestamp queries not supported';
 
 	}
 
