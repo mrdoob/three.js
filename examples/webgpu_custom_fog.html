@@ -77,7 +77,7 @@
 
 				// builds
 
-				const buildWindows = positionWorld.y.mul( 10 ).floor().mod( 4 ).sign().mix( color( 0x000066 ), color( 0xffffff ) );
+				const buildWindows = positionWorld.y.mul( 10 ).floor().mod( 4 ).sign().mix( color( 0x000066 ).add( fogNoiseDistance.oneMinus() ), color( 0xffffff ) );
 
 				const buildGeometry = new THREE.BoxGeometry( 1, 1, 1 );
 				const buildMaterial = new MeshPhongNodeMaterial( {
@@ -88,6 +88,7 @@
 				scene.add( buildMesh );
 
 				const dummy = new THREE.Object3D();
+				const center = new THREE.Vector3();
 
 				for ( let i = 0; i < buildMesh.count; i ++ ) {
 
@@ -95,9 +96,13 @@
 
 					dummy.position.x = Math.random() * 600 - 300;
 					dummy.position.z = Math.random() * 600 - 300;
-					dummy.position.y = .5 * scaleY;
+
+					const distance = Math.max( dummy.position.distanceTo( center ) * .012, 1 );
+
+					dummy.position.y = .5 * scaleY * distance;
+
 					dummy.scale.x = dummy.scale.z = Math.random() * 3 + .5;
-					dummy.scale.y = scaleY;
+					dummy.scale.y = scaleY * distance;
 
 					dummy.updateMatrix();
 
