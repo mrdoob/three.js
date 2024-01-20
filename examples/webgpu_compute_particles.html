@@ -9,6 +9,19 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute - 1M Particles
+            <div id="timestamps" style="
+                position: absolute;
+                top: 60px;
+                left: 0;
+                padding: 10px;
+                background: rgba( 0, 0, 0, 0.5 );
+                color: #fff;
+                font-family: monospace;
+                font-size: 12px;
+                line-height: 1.5;
+                pointer-events: none;
+                text-align: left;
+            "></div>
 		</div>
 
 		<script type="importmap">
@@ -49,6 +62,7 @@
 			let controls, stats;
 			let computeParticles;
 
+const timestamps = document.getElementById( 'timestamps' );
 			init();
 
 			function init() {
@@ -166,7 +180,7 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new WebGPURenderer( { antialias: true, trackTimestampQueries: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -265,8 +279,25 @@
 			function animate() {
 
 				stats.update();
+
+
 				renderer.compute( computeParticles );
+
+	// console.log( `Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.timestamp.compute}ms` );
+	// console.log( `Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.timestamp.render}ms` );
+
+	// throttle the logging
+
+	if ( renderer.info.render.calls % 10 === 0 ) {
+
+		timestamps.innerHTML = `
+Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.timestamp.compute}ms<br>
+Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.timestamp.render}ms`;
+
+	}
+
 				renderer.render( scene, camera );
+
 
 			}
 
