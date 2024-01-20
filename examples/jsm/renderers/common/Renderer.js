@@ -357,6 +357,9 @@ class Renderer {
 
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
 
+
+		await this.backend.resolveTimeStampAsync( renderContext, 'render' );
+
 	}
 
 	getMaxAnisotropy() {
@@ -715,6 +718,7 @@ class Renderer {
 		nodeFrame.renderId = this.info.calls;
 
 		//
+		if ( this.info.autoReset === true ) this.info.resetCompute();
 
 		const backend = this.backend;
 		const pipelines = this._pipelines;
@@ -765,6 +769,8 @@ class Renderer {
 		}
 
 		backend.finishCompute( computeNodes );
+
+		await this.backend.resolveTimeStampAsync( computeNodes, 'compute' );
 
 		//
 

@@ -12,11 +12,11 @@ class PostProcessing {
 
 	}
 
-	render() {
+	async render() {
 
 		quadMesh.material.fragmentNode = this.outputNode;
 
-		quadMesh.render( this.renderer );
+		await quadMesh.render( this.renderer );
 
 	}
 

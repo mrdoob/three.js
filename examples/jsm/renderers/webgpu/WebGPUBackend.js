@@ -498,7 +498,6 @@ class WebGPUBackend extends Backend {
 
 		this.device.queue.submit( [ renderContextData.encoder.finish() ] );
 
-		this.resolveTimeStampAsync( renderContext, 'render' );
 
 		//
 
@@ -771,8 +770,6 @@ class WebGPUBackend extends Backend {
 		this.prepareTimeStampBuffer( computeGroup, groupData.cmdEncoderGPU );
 
 		this.device.queue.submit( [ groupData.cmdEncoderGPU.finish() ] );
-
-		this.resolveTimeStampAsync( computeGroup, 'compute' );
 
 	}
 

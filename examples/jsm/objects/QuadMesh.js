@@ -37,9 +37,9 @@ class QuadMesh {
 
 	}
 
-	render( renderer ) {
+	async render( renderer ) {
 
-		renderer.render( this._mesh, _camera );
+		await renderer.render( this._mesh, _camera );
 
 	}
 
