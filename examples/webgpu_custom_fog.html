@@ -58,12 +58,13 @@
 				const skyColor = color( 0xf0f5f5 );
 				const groundColor = color( 0xd0dee7 );
 
-				const distance = 4;
+				const fogNoiseDistance = positionView.z.negate().smoothstep( 0, camera.far - 300 );
+
+				const distance = fogNoiseDistance.mul( 20 ).max( 4 );
 				const alpha = .98;
 				const groundFogArea = float( distance ).sub( positionWorld.y ).div( distance ).pow( 3 ).saturate().mul( alpha );
 
 				const timer = timerLocal( 1 );
-				const fogNoiseDistance = positionView.z.negate().smoothstep( 0, camera.far - 300 ).oneMinus();
 
 				const fogNoiseA = triNoise3D( positionWorld.mul( .005 ), 0.2, timer );
 				const fogNoiseB = triNoise3D( positionWorld.mul( .01 ), 0.2, timer.mul( 1.2 ) );
@@ -72,12 +73,12 @@
 
 				// apply custom fog
 
-				scene.fogNode = fog( fogNoiseDistance.mix( groundColor, fogNoise ), groundFogArea );
+				scene.fogNode = fog( fogNoiseDistance.oneMinus().mix( groundColor, fogNoise ), groundFogArea );
 				scene.backgroundNode = normalWorld.y.max( 0 ).mix( groundColor, skyColor );
 
 				// builds
 
-				const buildWindows = positionWorld.y.mul( 10 ).floor().mod( 4 ).sign().mix( color( 0x000066 ).add( fogNoiseDistance.oneMinus() ), color( 0xffffff ) );
+				const buildWindows = positionWorld.y.mul( 10 ).floor().mod( 4 ).sign().mix( color( 0x000066 ).add( fogNoiseDistance ), color( 0xffffff ) );
 
 				const buildGeometry = new THREE.BoxGeometry( 1, 1, 1 );
 				const buildMaterial = new MeshPhongNodeMaterial( {
