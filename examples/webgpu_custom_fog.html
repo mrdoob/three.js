@@ -34,6 +34,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, scene, renderer;
+			let controls;
 
 			init();
 
@@ -132,11 +133,13 @@
 
 				// controls
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 2, 0 );
 				controls.minDistance = 7;
 				controls.maxDistance = 100;
 				controls.maxPolarAngle = Math.PI / 2;
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = .1;
 				controls.update();
 
 				window.addEventListener( 'resize', resize );
@@ -153,6 +156,8 @@
 			}
 
 			function animate() {
+
+				controls.update();
 
 				renderer.render( scene, camera );
 
