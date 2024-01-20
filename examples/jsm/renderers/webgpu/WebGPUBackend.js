@@ -43,6 +43,8 @@ class WebGPUBackend extends Backend {
 
 		this.parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
 
+		this.trackTimestampQueries = ( parameters.trackTimestampQueries === true );
+
 		this.adapter = null;
 		this.device = null;
 		this.context = null;
@@ -323,6 +325,8 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		this.initTimeStampQuery( renderContext, descriptor );
+
 		descriptor.occlusionQuerySet = occlusionQuerySet;
 
 		const depthStencilAttachment = descriptor.depthStencilAttachment;
@@ -490,7 +494,11 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		this.prepareTimeStampBuffer( renderContext, renderContextData.encoder );
+
 		this.device.queue.submit( [ renderContextData.encoder.finish() ] );
+
+		this.resolveTimeStampAsync( renderContext, 'render' );
 
 		//
 
@@ -725,8 +733,14 @@ class WebGPUBackend extends Backend {
 
 		const groupGPU = this.get( computeGroup );
 
-		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder( {} );
-		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass();
+
+		const descriptor = {};
+
+		this.initTimeStampQuery( computeGroup, descriptor );
+
+		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder();
+
+		groupGPU.passEncoderGPU = groupGPU.cmdEncoderGPU.beginComputePass( descriptor );
 
 	}
 
@@ -753,7 +767,12 @@ class WebGPUBackend extends Backend {
 		const groupData = this.get( computeGroup );
 
 		groupData.passEncoderGPU.end();
+
+		this.prepareTimeStampBuffer( computeGroup, groupData.cmdEncoderGPU );
+
 		this.device.queue.submit( [ groupData.cmdEncoderGPU.finish() ] );
+
+		this.resolveTimeStampAsync( computeGroup, 'compute' );
 
 	}
 
@@ -1011,6 +1030,87 @@ class WebGPUBackend extends Backend {
 	copyTextureToBuffer( texture, x, y, width, height ) {
 
 		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height );
+
+	}
+
+
+	initTimeStampQuery( renderContext, descriptor ) {
+
+		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestampQueries ) return;
+
+		const renderContextData = this.get( renderContext );
+
+		if ( ! renderContextData.timeStampQuerySet ) {
+
+			// Create a GPUQuerySet which holds 2 timestamp query results: one for the
+			// beginning and one for the end of compute pass execution.
+			const timeStampQuerySet = this.device.createQuerySet( { type: 'timestamp', count: 2 } );
+
+			const timestampWrites = {
+				querySet: timeStampQuerySet,
+				beginningOfPassWriteIndex: 0, // Write timestamp in index 0 when pass begins.
+				endOfPassWriteIndex: 1, // Write timestamp in index 1 when pass ends.
+			};
+			Object.assign( descriptor, {
+				timestampWrites,
+			} );
+			renderContextData.timeStampQuerySet = timeStampQuerySet;
+
+		}
+
+	}
+
+	// timestamp utils
+
+	prepareTimeStampBuffer( renderContext, encoder ) {
+
+		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestampQueries ) return;
+
+		const renderContextData = this.get( renderContext );
+
+		const size = 2 * BigInt64Array.BYTES_PER_ELEMENT;
+		const resolveBuffer = this.device.createBuffer( {
+			size,
+			usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC,
+		} );
+
+		const resultBuffer = this.device.createBuffer( {
+			size,
+			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+		} );
+
+		encoder.resolveQuerySet( renderContextData.timeStampQuerySet, 0, 2, resolveBuffer, 0 );
+		encoder.copyBufferToBuffer( resolveBuffer, 0, resultBuffer, 0, size );
+
+		renderContextData.currentTimeStampQueryBuffer = resultBuffer;
+
+	}
+
+	async resolveTimeStampAsync( renderContext, type = 'render' ) {
+
+		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestampQueries ) return;
+
+		const renderContextData = this.get( renderContext );
+
+		// handle timestamp query results
+
+		const { currentTimeStampQueryBuffer } = renderContextData;
+
+		if ( currentTimeStampQueryBuffer ) {
+
+			renderContextData.currentTimeStampQueryBuffer = null;
+
+			await currentTimeStampQueryBuffer.mapAsync( GPUMapMode.READ );
+
+			const times = new BigUint64Array( currentTimeStampQueryBuffer.getMappedRange() );
+
+			const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
+			// console.log( `Compute ${type} duration: ${Number( times[ 1 ] - times[ 0 ] ) / 1000000}ms` );
+			this.renderer.info.updateTimestamp( type, duration );
+
+			currentTimeStampQueryBuffer.unmap();
+
+		}
 
 	}
 

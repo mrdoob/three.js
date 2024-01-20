@@ -16,12 +16,18 @@ class Info {
 		};
 
 		this.compute = {
-			calls: 0
+			calls: 0,
+			computeCalls: 0
 		};
 
 		this.memory = {
 			geometries: 0,
 			textures: 0
+		};
+
+		this.timestamp = {
+			compute: 0,
+			render: 0
 		};
 
 	}
@@ -54,12 +60,23 @@ class Info {
 
 	}
 
+	updateTimestamp( type, time ) {
+
+		this.timestamp[ type ] += time;
+
+	}
+
 	reset() {
 
 		this.render.drawCalls = 0;
 		this.render.triangles = 0;
 		this.render.points = 0;
 		this.render.lines = 0;
+
+		this.compute.computeCalls = 0;
+
+		this.timestamp.compute = 0;
+		this.timestamp.render = 0;
 
 	}
 
@@ -72,6 +89,8 @@ class Info {
 		this.render.calls = 0;
 		this.compute.calls = 0;
 
+		this.timestamp.compute = 0;
+		this.timestamp.render = 0;
 		this.memory.geometries = 0;
 		this.memory.textures = 0;
 

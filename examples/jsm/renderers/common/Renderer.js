@@ -710,6 +710,7 @@ class Renderer {
 
 		this.info.calls ++;
 		this.info.compute.calls ++;
+		this.info.compute.computeCalls ++;
 
 		nodeFrame.renderId = this.info.calls;
 
