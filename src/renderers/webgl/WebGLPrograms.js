@@ -10,6 +10,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 	const _programLayers = new Layers();
 	const _customShaders = new WebGLShaderCache();
+	const _activeChannels = new Set();
 	const programs = [];
 
 	const IS_WEBGL2 = capabilities.isWebGL2;
@@ -37,6 +38,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	};
 
 	function getChannel( value ) {
+
+		_activeChannels.add( value );
 
 		if ( value === 0 ) return 'uv';
 
@@ -157,10 +160,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const HAS_ALPHAHASH = !! material.alphaHash;
 
 		const HAS_EXTENSIONS = !! material.extensions;
-
-		const HAS_ATTRIBUTE_UV1 = !! geometry.attributes.uv1;
-		const HAS_ATTRIBUTE_UV2 = !! geometry.attributes.uv2;
-		const HAS_ATTRIBUTE_UV3 = !! geometry.attributes.uv3;
 
 		let toneMapping = NoToneMapping;
 
@@ -293,9 +292,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			vertexTangents: !! geometry.attributes.tangent && ( HAS_NORMALMAP || HAS_ANISOTROPY ),
 			vertexColors: material.vertexColors,
 			vertexAlphas: material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4,
-			vertexUv1s: HAS_ATTRIBUTE_UV1,
-			vertexUv2s: HAS_ATTRIBUTE_UV2,
-			vertexUv3s: HAS_ATTRIBUTE_UV3,
 
 			pointsUvs: object.isPoints === true && !! geometry.attributes.uv && ( HAS_MAP || HAS_ALPHAMAP ),
 
@@ -367,6 +363,14 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			customProgramCacheKey: material.customProgramCacheKey()
 
 		};
+
+		// the usage of getChannel() determines the active texture channels for this shader
+
+		parameters.vertexUv1s = _activeChannels.has( 1 );
+		parameters.vertexUv2s = _activeChannels.has( 2 );
+		parameters.vertexUv3s = _activeChannels.has( 3 );
+
+		_activeChannels.clear();
 
 		return parameters;
 
