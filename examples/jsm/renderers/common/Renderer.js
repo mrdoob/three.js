@@ -182,7 +182,7 @@ class Renderer {
 
 	}
 
-	async render( scene, camera ) {
+	async renderAsync( scene, camera ) {
 
 		if ( this._initialized === false ) await this.init();
 
@@ -356,6 +356,9 @@ class Renderer {
 		//
 
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
+
+
+		await this.backend.resolveTimeStampAsync( renderContext, 'render' );
 
 	}
 
@@ -698,7 +701,7 @@ class Renderer {
 
 	}
 
-	async compute( computeNodes ) {
+	async computeAsync( computeNodes ) {
 
 		if ( this._initialized === false ) await this.init();
 
@@ -710,10 +713,12 @@ class Renderer {
 
 		this.info.calls ++;
 		this.info.compute.calls ++;
+		this.info.compute.computeCalls ++;
 
 		nodeFrame.renderId = this.info.calls;
 
 		//
+		if ( this.info.autoReset === true ) this.info.resetCompute();
 
 		const backend = this.backend;
 		const pipelines = this._pipelines;
@@ -764,6 +769,8 @@ class Renderer {
 		}
 
 		backend.finishCompute( computeNodes );
+
+		await this.backend.resolveTimeStampAsync( computeNodes, 'compute' );
 
 		//
 
@@ -1034,6 +1041,19 @@ class Renderer {
 		//
 
 		this.backend.draw( renderObject, this.info );
+
+	}
+
+
+	get compute() {
+
+		return this.computeAsync;
+
+	}
+
+	get render() {
+
+		return this.renderAsync;
 
 	}
 
