@@ -281,9 +281,9 @@
 
 				stats.update();
 
-				await renderer.compute( computeParticles );
+				await renderer.computeAsync( computeParticles );
 
-				await renderer.render( scene, camera );
+				await renderer.renderAsync( scene, camera );
 
 				// throttle the logging
 
@@ -304,7 +304,7 @@
 
 				}
 
-	            renderer.info.resetCompute();
+				renderer.info.resetCompute();
 				renderer.info.reset();
 
 			}

@@ -182,7 +182,7 @@ class Renderer {
 
 	}
 
-	async render( scene, camera ) {
+	async renderAsync( scene, camera ) {
 
 		if ( this._initialized === false ) await this.init();
 
@@ -701,7 +701,7 @@ class Renderer {
 
 	}
 
-	async compute( computeNodes ) {
+	async computeAsync( computeNodes ) {
 
 		if ( this._initialized === false ) await this.init();
 
@@ -1041,6 +1041,19 @@ class Renderer {
 		//
 
 		this.backend.draw( renderObject, this.info );
+
+	}
+
+
+	get compute() {
+
+		return this.computeAsync;
+
+	}
+
+	get render() {
+
+		return this.renderAsync;
 
 	}
 

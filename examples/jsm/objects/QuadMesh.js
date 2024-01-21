@@ -37,9 +37,9 @@ class QuadMesh {
 
 	}
 
-	async render( renderer ) {
+	async renderAsync( renderer ) {
 
-		await renderer.render( this._mesh, _camera );
+		await renderer.renderAsync( this._mesh, _camera );
 
 	}
 
@@ -52,6 +52,12 @@ class QuadMesh {
 	set material( value ) {
 
 		this._mesh.material = value;
+
+	}
+
+	get render() {
+
+		return this.renderAsync;
 
 	}
 
