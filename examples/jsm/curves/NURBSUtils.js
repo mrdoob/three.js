@@ -429,10 +429,10 @@ function calcNURBSDerivatives( p, U, P, u, nd ) {
 /*
 Calculate rational B-Spline surface point. See The NURBS Book, page 134, algorithm A4.3.
 
-p1, p2 : degrees of B-Spline surface
-U1, U2 : knot vectors
-P      : control points (x, y, z, w)
-u, v   : parametric values
+p, q : degrees of B-Spline surface
+U, V : knot vectors
+P    : control points (x, y, z, w)
+u, v : parametric values
 
 returns point for given (u, v)
 */
