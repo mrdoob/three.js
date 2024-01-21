@@ -106,28 +106,29 @@ class PerspectiveCamera extends Camera {
 
 	}
 
-	/*
-	 * Computes 2D bounds of the camera's frustum at a given distance along the viewing direction.
-	 * Copies max/min height and width of the frustum's rectangle into minTarget and maxTarget.
-	 * Results are in the camera's local coordinate space, independent of its global position/rotation/scale.
+	/**
+	 * Computes the 2D bounds of the camera's viewable rectangle at a given distance along the viewing direction.
+	 * Sets minTarget and maxTarget to the coordinates of the lower-left and upper-right corners of the view rectangle.
 	 */
-	getFrustumBounds( distance, minTarget, maxTarget ) {
+	getViewBounds( distance, minTarget, maxTarget ) {
 
 		_v3.set( - 1, - 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
-		minTarget.copy( _v3 ).multiplyScalar( - distance / _v3.z );
+
+		minTarget.set( _v3.x, _v3.y ).multiplyScalar( - distance / _v3.z );
 
 		_v3.set( 1, 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
-		maxTarget.copy( _v3 ).multiplyScalar( - distance / _v3.z );
+
+		maxTarget.set( _v3.x, _v3.y ).multiplyScalar( - distance / _v3.z );
 
 	}
 
-	/*
-	 * Computes the height/width of the camera's frustum at a given distance along the viewing direction.
-	 * Copies the result into provided target Vector2 where x is width and y is height.
- 	 */
-	getFrustumSize( distance, target ) {
+	/**
+	 * Computes the width and height of the camera's viewable rectangle at a given distance along the viewing direction.
+	 * Copies the result into the target Vector2, where x is width and y is height.
+	 */
+	getViewSize( distance, target ) {
 
-		this.getFrustumBounds( distance, _minTarget, _maxTarget );
+		this.getViewBounds( distance, _minTarget, _maxTarget );
 
 		return target.subVectors( _maxTarget, _minTarget );
 
