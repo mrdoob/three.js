@@ -85,6 +85,10 @@ class WebGPUBindingUtils {
 
 					texture.viewDimension = GPUTextureViewDimension.Cube;
 
+				} else if ( binding.texture.isDataArrayTexture ) {
+
+					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
+
 				}
 
 				bindingGPU.texture = texture;
@@ -196,6 +200,10 @@ class WebGPUBindingUtils {
 
 					dimensionViewGPU = GPUTextureViewDimension.Cube;
 
+				} else if ( binding.texture.isDataArrayTexture ) {
+
+					dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
+
 				} else {
 
 					dimensionViewGPU = GPUTextureViewDimension.TwoD;
@@ -212,7 +220,7 @@ class WebGPUBindingUtils {
 
 					const aspectGPU = GPUTextureAspect.All;
 
-					resourceGPU = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU } );
+					resourceGPU = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount: binding.store ? 1 : textureData.mipLevelCount } );
 
 				}
 

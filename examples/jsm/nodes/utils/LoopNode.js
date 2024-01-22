@@ -144,15 +144,15 @@ class LoopNode extends Node {
 
 			if ( ! update ) {
 
-				if ( type === 'int' ) {
+				if ( type === 'int' || type === 'uint' ) {
 
 					if ( condition.includes( '<' ) ) update = '++';
 					else update = '--';
 
 				} else {
 
-					if ( condition.includes( '<' ) ) update = '+= 1';
-					else update = '-= 1';
+					if ( condition.includes( '<' ) ) update = '+= 1.';
+					else update = '-= 1.';
 
 				}
 

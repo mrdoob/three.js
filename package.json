@@ -1,9 +1,9 @@
 {
   "name": "three",
-  "version": "0.158.0",
+  "version": "0.160.0",
   "description": "JavaScript 3D library",
   "type": "module",
-  "main": "./build/three.js",
+  "main": "./build/three.cjs",
   "module": "./build/three.module.js",
   "exports": {
     ".": {
@@ -21,7 +21,7 @@
     "type": "git",
     "url": "https://github.com/mrdoob/three.js"
   },
-  "sideEffects": false,
+  "sideEffects": ["./examples/jsm/nodes/**/*"],
   "files": [
     "build",
     "examples/jsm",
@@ -86,7 +86,6 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@puppeteer/browsers": "^1.4.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-terser": "^0.4.0",
     "chalk": "^5.2.0",
@@ -101,9 +100,9 @@
     "jimp": "^0.22.7",
     "magic-string": "^0.30.0",
     "pixelmatch": "^5.3.0",
-    "puppeteer-core": "^19.8.1",
+    "puppeteer": "^21.5.1",
     "qunit": "^2.19.4",
-    "rollup": "^3.20.2",
+    "rollup": "^4.6.0",
     "rollup-plugin-filesize": "^10.0.0",
     "rollup-plugin-visualizer": "^5.9.0",
     "servez": "^2.0.0"

@@ -1,7 +1,7 @@
 import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
-import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GLSL3, LinearSRGBColorSpace, SRGBColorSpace, LinearDisplayP3ColorSpace, DisplayP3ColorSpace, P3Primaries, Rec709Primaries } from '../../constants.js';
+import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, AgXToneMapping, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GLSL3, LinearSRGBColorSpace, SRGBColorSpace, LinearDisplayP3ColorSpace, DisplayP3ColorSpace, P3Primaries, Rec709Primaries } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 
 // From https://www.khronos.org/registry/webgl/extensions/KHR_parallel_shader_compile/
@@ -120,6 +120,10 @@ function getToneMappingFunction( functionName, toneMapping ) {
 			toneMappingName = 'ACESFilmic';
 			break;
 
+		case AgXToneMapping:
+			toneMappingName = 'AgX';
+			break;
+
 		case CustomToneMapping:
 			toneMappingName = 'Custom';
 			break;
@@ -137,10 +141,20 @@ function getToneMappingFunction( functionName, toneMapping ) {
 function generateExtensions( parameters ) {
 
 	const chunks = [
-		( parameters.extensionDerivatives || !! parameters.envMapCubeUVHeight || parameters.bumpMap || parameters.normalMapTangentSpace || parameters.clearcoatNormalMap || parameters.flatShading || parameters.shaderID === 'physical' ) ? '#extension GL_OES_standard_derivatives : enable' : '',
+		( parameters.extensionDerivatives || !! parameters.envMapCubeUVHeight || parameters.bumpMap || parameters.normalMapTangentSpace || parameters.clearcoatNormalMap || parameters.flatShading || parameters.alphaToCoverage || parameters.shaderID === 'physical' ) ? '#extension GL_OES_standard_derivatives : enable' : '',
 		( parameters.extensionFragDepth || parameters.logarithmicDepthBuffer ) && parameters.rendererExtensionFragDepth ? '#extension GL_EXT_frag_depth : enable' : '',
 		( parameters.extensionDrawBuffers && parameters.rendererExtensionDrawBuffers ) ? '#extension GL_EXT_draw_buffers : require' : '',
 		( parameters.extensionShaderTextureLOD || parameters.envMap || parameters.transmission ) && parameters.rendererExtensionShaderTextureLod ? '#extension GL_EXT_shader_texture_lod : enable' : ''
+	];
+
+	return chunks.filter( filterEmptyLine ).join( '\n' );
+
+}
+
+function generateVertexExtensions( parameters ) {
+
+	const chunks = [
+		parameters.extensionClipCullDistance ? '#extension GL_ANGLE_clip_cull_distance : require' : ''
 	];
 
 	return chunks.filter( filterEmptyLine ).join( '\n' );
@@ -299,7 +313,30 @@ function loopReplacer( match, start, end, snippet ) {
 
 function generatePrecision( parameters ) {
 
-	let precisionstring = 'precision ' + parameters.precision + ' float;\nprecision ' + parameters.precision + ' int;';
+	let precisionstring = `precision ${parameters.precision} float;
+	precision ${parameters.precision} int;
+	precision ${parameters.precision} sampler2D;
+	precision ${parameters.precision} samplerCube;
+	`;
+
+	if ( parameters.isWebGL2 ) {
+
+		precisionstring += `precision ${parameters.precision} sampler3D;
+		precision ${parameters.precision} sampler2DArray;
+		precision ${parameters.precision} sampler2DShadow;
+		precision ${parameters.precision} samplerCubeShadow;
+		precision ${parameters.precision} sampler2DArrayShadow;
+		precision ${parameters.precision} isampler2D;
+		precision ${parameters.precision} isampler3D;
+		precision ${parameters.precision} isamplerCube;
+		precision ${parameters.precision} isampler2DArray;
+		precision ${parameters.precision} usampler2D;
+		precision ${parameters.precision} usampler3D;
+		precision ${parameters.precision} usamplerCube;
+		precision ${parameters.precision} usampler2DArray;
+		`;
+
+	}
 
 	if ( parameters.precision === 'highp' ) {
 
@@ -451,6 +488,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 	const customExtensions = parameters.isWebGL2 ? '' : generateExtensions( parameters );
 
+	const customVertexExtensions = generateVertexExtensions( parameters );
+
 	const customDefines = generateDefines( defines );
 
 	const program = gl.createProgram();
@@ -503,6 +542,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			customDefines,
 
+			parameters.extensionClipCullDistance ? '#define USE_CLIP_DISTANCE' : '',
 			parameters.batching ? '#define USE_BATCHING' : '',
 			parameters.instancing ? '#define USE_INSTANCING' : '',
 			parameters.instancingColor ? '#define USE_INSTANCING_COLOR' : '',
@@ -734,6 +774,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.useFog && parameters.fog ? '#define USE_FOG' : '',
 			parameters.useFog && parameters.fogExp2 ? '#define FOG_EXP2' : '',
 
+			parameters.alphaToCoverage ? '#define ALPHA_TO_COVERAGE' : '',
 			parameters.map ? '#define USE_MAP' : '',
 			parameters.matcap ? '#define USE_MATCAP' : '',
 			parameters.envMap ? '#define USE_ENVMAP' : '',
@@ -852,6 +893,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 		versionString = '#version 300 es\n';
 
 		prefixVertex = [
+			customVertexExtensions,
 			'precision mediump sampler2DArray;',
 			'#define attribute in',
 			'#define varying out',
@@ -934,6 +976,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 					console.error(
 						'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
 						'VALIDATE_STATUS ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + '\n\n' +
+						'Material Name: ' + self.name + '\n' +
+						'Material Type: ' + self.type + '\n\n' +
 						'Program Info Log: ' + programLog + '\n' +
 						vertexErrors + '\n' +
 						fragmentErrors

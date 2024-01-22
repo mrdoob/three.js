@@ -1,9 +1,11 @@
-import { MathNode, GLSLNodeParser, NodeBuilder, NodeMaterial, FunctionNode } from '../../../nodes/Nodes.js';
+import { MathNode, GLSLNodeParser, NodeBuilder } from '../../../nodes/Nodes.js';
 
 import UniformBuffer from '../../common/UniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
+
+import { IntType } from 'three';
 
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan',
@@ -20,6 +22,13 @@ const supports = {
 	instance: true
 };
 
+const defaultPrecisions = `
+precision highp float;
+precision highp int;
+precision mediump sampler2DArray;
+precision lowp sampler2DShadow;
+`;
+
 class GLSLNodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer, scene = null ) {
@@ -27,6 +36,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 		super( object, renderer, new GLSLNodeParser(), scene );
 
 		this.uniformGroups = {};
+		this.transforms = [];
 
 	}
 
@@ -44,7 +54,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	buildFunctionNode( shaderNode ) {
+	buildFunctionCode( shaderNode ) {
 
 		const layout = shaderNode.layout;
 		const flowData = this.flowShaderNode( shaderNode );
@@ -70,39 +80,51 @@ ${ flowData.code }
 
 		//
 
-		return new FunctionNode( code );
+		return code;
 
 	}
 
-	getTexture( texture, textureProperty, uvSnippet ) {
+	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0' ) {
 
-		if ( texture.isTextureCube ) {
+		if ( depthSnippet ) {
 
-			return `textureCube( ${textureProperty}, ${uvSnippet} )`;
-
-		} else if ( texture.isDepthTexture ) {
-
-			return `texture( ${textureProperty}, ${uvSnippet} ).x`;
+			return `texelFetch( ${ textureProperty }, ivec3( ${ uvIndexSnippet }, ${ depthSnippet } ), ${ levelSnippet } )`;
 
 		} else {
 
-			return `texture( ${textureProperty}, ${uvSnippet} )`;
+			return `texelFetch( ${ textureProperty }, ${ uvIndexSnippet }, ${ levelSnippet } )`;
 
 		}
 
 	}
 
-	getTextureLevel( texture, textureProperty, uvSnippet, biasSnippet ) {
+	generateTexture( texture, textureProperty, uvSnippet, depthSnippet ) {
 
-		return `textureLod( ${textureProperty}, ${uvSnippet}, ${biasSnippet} )`;
+		if ( texture.isDepthTexture ) {
+
+			return `texture( ${ textureProperty }, ${ uvSnippet } ).x`;
+
+		} else {
+
+			if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
+
+			return `texture( ${ textureProperty }, ${ uvSnippet } )`;
+
+		}
 
 	}
 
-	getTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, shaderStage = this.shaderStage ) {
+	generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet ) {
+
+		return `textureLod( ${ textureProperty }, ${ uvSnippet }, ${ levelSnippet } )`;
+
+	}
+
+	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
-			return `texture( ${textureProperty}, vec3( ${uvSnippet}, ${compareSnippet} ) )`;
+			return `texture( ${ textureProperty }, vec3( ${ uvSnippet }, ${ compareSnippet } ) )`;
 
 		} else {
 
@@ -148,19 +170,25 @@ ${ flowData.code }
 
 			if ( uniform.type === 'texture' ) {
 
-				if ( uniform.node.value.compareFunction ) {
+				const texture = uniform.node.value;
 
-					snippet = `sampler2DShadow ${uniform.name};`;
+				if ( texture.compareFunction ) {
+
+					snippet = `sampler2DShadow ${ uniform.name };`;
+
+				} else if ( texture.isDataArrayTexture === true ) {
+
+					snippet = `sampler2DArray ${ uniform.name };`;
 
 				} else {
 
-					snippet = `sampler2D ${uniform.name};`;
+					snippet = `sampler2D ${ uniform.name };`;
 
 				}
 
 			} else if ( uniform.type === 'cubeTexture' ) {
 
-				snippet = `samplerCube ${uniform.name};`;
+				snippet = `samplerCube ${ uniform.name };`;
 
 			} else if ( uniform.type === 'buffer' ) {
 
@@ -169,7 +197,7 @@ ${ flowData.code }
 				const bufferCount = bufferNode.bufferCount;
 
 				const bufferCountSnippet = bufferCount > 0 ? bufferCount : '';
-				snippet = `${bufferNode.name} {\n\t${bufferType} ${uniform.name}[${bufferCountSnippet}];\n};\n`;
+				snippet = `${bufferNode.name} {\n\t${ bufferType } ${ uniform.name }[${ bufferCountSnippet }];\n};\n`;
 
 			} else {
 
@@ -224,11 +252,35 @@ ${ flowData.code }
 
 	}
 
+	getTypeFromAttribute( attribute ) {
+
+		let nodeType = super.getTypeFromAttribute( attribute );
+
+		if ( /^[iu]/.test( nodeType ) && attribute.gpuType !== IntType ) {
+
+			let dataAttribute = attribute;
+
+			if ( attribute.isInterleavedBufferAttribute ) dataAttribute = attribute.data;
+
+			const array = dataAttribute.array;
+
+			if ( ( array instanceof Uint32Array || array instanceof Int32Array ) === false ) {
+
+				nodeType = nodeType.slice( 1 );
+
+			}
+
+		}
+
+		return nodeType;
+
+	}
+
 	getAttributes( shaderStage ) {
 
 		let snippet = '';
 
-		if ( shaderStage === 'vertex' ) {
+		if ( shaderStage === 'vertex' || shaderStage === 'compute' ) {
 
 			const attributes = this.getAttributesArray();
 
@@ -295,10 +347,11 @@ ${ flowData.code }
 
 		const varyings = this.varyings;
 
-		if ( shaderStage === 'vertex' ) {
+		if ( shaderStage === 'vertex' || shaderStage === 'compute' ) {
 
 			for ( const varying of varyings ) {
 
+				if ( shaderStage === 'compute' ) varying.needsInterpolation = true;
 				const type = varying.type;
 				const flat = type === 'int' || type === 'uint' ? 'flat ' : '';
 
@@ -329,7 +382,7 @@ ${ flowData.code }
 
 	getVertexIndex() {
 
-		return 'gl_VertexID';
+		return 'uint( gl_VertexID )';
 
 	}
 
@@ -351,6 +404,12 @@ ${ flowData.code }
 
 	}
 
+	getFragDepth() {
+
+		return 'gl_FragDepth';
+
+	}
+
 	isAvailable( name ) {
 
 		return supports[ name ] === true;
@@ -361,6 +420,32 @@ ${ flowData.code }
 	isFlipY() {
 
 		return true;
+
+	}
+
+	registerTransform( varyingName, attributeNode ) {
+
+		this.transforms.push( { varyingName, attributeNode } );
+
+	}
+
+	getTransforms( /* shaderStage  */ ) {
+
+		const transforms = this.transforms;
+
+		let snippet = '';
+
+		for ( let i = 0; i < transforms.length; i ++ ) {
+
+			const transform = transforms[ i ];
+
+			const attributeName = this.getPropertyName( transform.attributeNode );
+
+			snippet += `${ transform.varyingName } = ${ attributeName };\n\t`;
+
+		}
+
+		return snippet;
 
 	}
 
@@ -380,8 +465,7 @@ ${vars}
 ${ this.getSignature() }
 
 // precision
-precision highp float;
-precision highp int;
+${ defaultPrecisions }
 
 // uniforms
 ${shaderData.uniforms}
@@ -400,6 +484,9 @@ void main() {
 	// vars
 	${shaderData.vars}
 
+	// transforms
+	${shaderData.transforms}
+
 	// flow
 	${shaderData.flow}
 
@@ -417,9 +504,7 @@ void main() {
 ${ this.getSignature() }
 
 // precision
-precision highp float;
-precision highp int;
-precision lowp sampler2DShadow;
+${ defaultPrecisions }
 
 // uniforms
 ${shaderData.uniforms}
@@ -504,6 +589,7 @@ void main() {
 			stageData.vars = this.getVars( shaderStage );
 			stageData.structs = this.getStructs( shaderStage );
 			stageData.codes = this.getCodes( shaderStage );
+			stageData.transforms = this.getTransforms( shaderStage );
 			stageData.flow = flow;
 
 		}
@@ -515,8 +601,7 @@ void main() {
 
 		} else {
 
-			console.warn( 'GLSLNodeBuilder: compute shaders are not supported.' );
-			//this.computeShader = this._getGLSLComputeCode( shadersData.compute );
+			this.computeShader = this._getGLSLVertexCode( shadersData.compute );
 
 		}
 
@@ -525,7 +610,7 @@ void main() {
 	getUniformFromNode( node, type, shaderStage, name = null ) {
 
 		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
-		const nodeData = this.getDataFromNode( node, shaderStage );
+		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
 		let uniformGPU = nodeData.uniformGPU;
 
@@ -586,26 +671,6 @@ void main() {
 		}
 
 		return uniformNode;
-
-	}
-
-	build() {
-
-		// @TODO: Move this code to super.build()
-
-		const { object, material } = this;
-
-		if ( material !== null ) {
-
-			NodeMaterial.fromMaterial( material ).build( this );
-
-		} else {
-
-			this.addFlow( 'compute', object );
-
-		}
-
-		return super.build();
 
 	}
 

@@ -8,6 +8,8 @@ import WebGLState from './utils/WebGLState.js';
 import WebGLUtils from './utils/WebGLUtils.js';
 import WebGLTextureUtils from './utils/WebGLTextureUtils.js';
 import WebGLExtensions from './utils/WebGLExtensions.js';
+import WebGLCapabilities from './utils/WebGLCapabilities.js';
+import { GLFeatureName } from './utils/WebGLConstants.js';
 
 //
 
@@ -21,9 +23,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	async init( renderer ) {
+	init( renderer ) {
 
-		await super.init( renderer );
+		super.init( renderer );
 
 		//
 
@@ -34,11 +36,15 @@ class WebGLBackend extends Backend {
 		this.gl = glContext;
 
 		this.extensions = new WebGLExtensions( this );
+		this.capabilities = new WebGLCapabilities( this );
 		this.attributeUtils = new WebGLAttributeUtils( this );
 		this.textureUtils = new WebGLTextureUtils( this );
 		this.state = new WebGLState( this );
 		this.utils = new WebGLUtils( this );
-		this.defaultTextures = {};
+
+		this.vaoCache = {};
+		this.transformFeedbackCache = {};
+		this.discard = false;
 
 		this.extensions.get( 'EXT_color_buffer_float' );
 		this._currentContext = null;
@@ -51,10 +57,24 @@ class WebGLBackend extends Backend {
 
 	}
 
+	async getArrayBufferAsync( attribute ) {
+
+		return await this.attributeUtils.getArrayBufferAsync( attribute );
+
+	}
+
+	getContext() {
+
+		return this.gl;
+
+	}
+
 	beginRender( renderContext ) {
 
 		const { gl } = this;
 		const renderContextData = this.get( renderContext );
+
+		//
 
 		//
 
@@ -63,10 +83,9 @@ class WebGLBackend extends Backend {
 
 		this._setFramebuffer( renderContext );
 
-		this.clear( renderContext, renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil );
+		this.clear( renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil, renderContext );
 
 		//
-
 		if ( renderContext.viewport ) {
 
 			this.updateViewport( renderContext );
@@ -97,10 +116,63 @@ class WebGLBackend extends Backend {
 
 	finishRender( renderContext ) {
 
+		const { gl, state } = this;
 		const renderContextData = this.get( renderContext );
 		const previousContext = renderContextData.previousContext;
 
+		const textures = renderContext.textures;
+
+		if ( textures !== null ) {
+
+			for ( let i = 0; i < textures.length; i ++ ) {
+
+				const texture = textures[ i ];
+
+				if ( texture.generateMipmaps ) {
+
+					this.generateMipmaps( texture );
+
+				}
+
+			}
+
+		}
+
 		this._currentContext = previousContext;
+
+
+		if ( renderContext.textures !== null && renderContext.renderTarget ) {
+
+			const renderTargetContextData = this.get( renderContext.renderTarget );
+
+			const { samples } = renderContext.renderTarget;
+			const fb = renderTargetContextData.framebuffer;
+
+			const mask = gl.COLOR_BUFFER_BIT;
+
+			if ( samples > 0 ) {
+
+				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
+
+				const textures = renderContext.textures;
+
+				state.bindFramebuffer( gl.READ_FRAMEBUFFER, msaaFrameBuffer );
+				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+
+				for ( let i = 0; i < textures.length; i ++ ) {
+
+					// TODO Add support for MRT
+
+					gl.blitFramebuffer( 0, 0, renderContext.width, renderContext.height, 0, 0, renderContext.width, renderContext.height, mask, gl.NEAREST );
+
+					gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray );
+
+				}
+
+			}
+
+
+		}
 
 		if ( previousContext !== null ) {
 
@@ -137,6 +209,7 @@ class WebGLBackend extends Backend {
 			this.resolveOccludedAsync( renderContext );
 
 		}
+
 
 	}
 
@@ -215,9 +288,18 @@ class WebGLBackend extends Backend {
 
 	}
 
-	clear( renderContext, color, depth, stencil ) {
+	clear( color, depth, stencil, descriptor = null ) {
 
 		const { gl } = this;
+
+		if ( descriptor === null ) {
+
+			descriptor = {
+				textures: null,
+				clearColorValue: this.getClearColor()
+			};
+
+		}
 
 		//
 
@@ -229,11 +311,11 @@ class WebGLBackend extends Backend {
 
 		if ( clear !== 0 ) {
 
-			const clearColor = renderContext.clearColorValue;
+			const clearColor = descriptor.clearColorValue;
 
 			if ( depth ) this.state.setDepthMask( true );
 
-			if ( renderContext.textures === null ) {
+			if ( descriptor.textures === null ) {
 
 				gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearColor.a );
 				gl.clear( clear );
@@ -242,7 +324,7 @@ class WebGLBackend extends Backend {
 
 				if ( color ) {
 
-					for ( let i = 0; i < renderContext.textures.length; i ++ ) {
+					for ( let i = 0; i < descriptor.textures.length; i ++ ) {
 
 						gl.clearBufferfv( gl.COLOR, i, [ clearColor.r, clearColor.g, clearColor.b, clearColor.a ] );
 
@@ -272,26 +354,76 @@ class WebGLBackend extends Backend {
 
 	beginCompute( /*computeGroup*/ ) {
 
-		console.warn( 'Abstract class.' );
+		const gl = this.gl;
+
+		gl.bindFramebuffer( gl.FRAMEBUFFER, null );
 
 	}
 
-	compute( /*computeGroup, computeNode, bindings, pipeline*/ ) {
+	compute( computeGroup, computeNode, bindings, pipeline ) {
 
-		console.warn( 'Abstract class.' );
+		const gl = this.gl;
+
+		if ( ! this.discard )  {
+
+			// required here to handle async behaviour of render.compute()
+			gl.enable( gl.RASTERIZER_DISCARD );
+			this.discard = true;
+		}
+
+		const { programGPU, transformBuffers, attributes } = this.get( pipeline );
+
+		const vaoKey = this._getVaoKey( null, attributes );
+
+		let vaoGPU = this.vaoCache[ vaoKey ];
+
+		if ( vaoGPU === undefined ) {
+
+			this._createVao( null, attributes );
+
+		} else {
+
+			gl.bindVertexArray( vaoGPU );
+
+		}
+
+		gl.useProgram( programGPU );
+
+		this._bindUniforms( bindings );
+
+		const transformFeedbackGPU = this._getTransformFeedback( transformBuffers );
+
+		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, transformFeedbackGPU );
+		gl.beginTransformFeedback( gl.POINTS );
+
+		gl.drawArraysInstanced( gl.POINTS, 0, 1, computeNode.count );
+
+		gl.endTransformFeedback();
+		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );
+
+		// switch active buffers
+		for ( let i = 0; i < transformBuffers.length; i ++ ) {
+
+			transformBuffers[ i ].switchBuffers();
+
+		}
 
 	}
 
 	finishCompute( /*computeGroup*/ ) {
 
-		console.warn( 'Abstract class.' );
+		const gl = this.gl;
+
+		this.discard = false;
+
+		gl.disable( gl.RASTERIZER_DISCARD );
 
 	}
 
 	draw( renderObject, info ) {
 
 		const { pipeline, material, context } = renderObject;
-		const { programGPU, vaoGPU } = this.get( pipeline );
+		const { programGPU } = this.get( pipeline );
 
 		const { gl, state } = this;
 
@@ -299,29 +431,34 @@ class WebGLBackend extends Backend {
 
 		//
 
-		const bindings = renderObject.getBindings();
+		this._bindUniforms( renderObject.getBindings() );
 
-		for ( const binding of bindings ) {
+		state.setMaterial( material );
 
-			const bindingData = this.get( binding );
-			const index = bindingData.index;
+		gl.useProgram( programGPU );
 
-			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+		//
 
-				gl.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
+		let vaoGPU = renderObject.staticVao;
 
-			} else if ( binding.isSampledTexture ) {
+		if ( vaoGPU === undefined ) {
 
-				gl.activeTexture( gl.TEXTURE0 + index );
-				gl.bindTexture( bindingData.glTextureType, bindingData.textureGPU );
+			const vaoKey = this._getVaoKey( renderObject.getIndex(), renderObject.getAttributes() );
+
+			vaoGPU = this.vaoCache[ vaoKey ];
+
+			if ( vaoGPU === undefined ) {
+
+				let staticVao;
+
+				( { vaoGPU, staticVao } = this._createVao( renderObject.getIndex(), renderObject.getAttributes() ) );
+
+				if ( staticVao ) renderObject.staticVao = vaoGPU;
 
 			}
 
 		}
 
-		state.setMaterial( material );
-
-		gl.useProgram( programGPU );
 		gl.bindVertexArray( vaoGPU );
 
 		//
@@ -369,7 +506,20 @@ class WebGLBackend extends Backend {
 		else if ( object.isLineSegments ) mode = gl.LINES;
 		else if ( object.isLine ) mode = gl.LINE_STRIP;
 		else if ( object.isLineLoop ) mode = gl.LINE_LOOP;
-		else mode = gl.TRIANGLES;
+		else {
+
+			if ( material.wireframe === true ) {
+
+				state.setLineWidth( material.wireframeLinewidth * this.renderer.getPixelRatio() );
+				mode = gl.LINES;
+
+			} else {
+
+				mode = gl.TRIANGLES;
+
+			}
+
+		}
 
 		//
 
@@ -389,7 +539,6 @@ class WebGLBackend extends Backend {
 				gl.drawElements( mode, index.count, indexData.type, firstVertex );
 
 			}
-
 
 			info.update( object, indexCount, 1 );
 
@@ -414,27 +563,62 @@ class WebGLBackend extends Backend {
 
 		}
 
-
-
 		//
 
 		gl.bindVertexArray( null );
 
 	}
 
-	needsUpdate( renderObject ) {
+	needsRenderUpdate( /*renderObject*/ ) {
 
 		return false;
 
 	}
 
-	getCacheKey( renderObject ) {
+	getRenderCacheKey( renderObject ) {
 
-		return renderObject.geometry.id;
+		return renderObject.id;
 
 	}
 
 	// textures
+
+	createDefaultTexture( texture ) {
+
+		this.textureUtils.createDefaultTexture( texture );
+
+	}
+
+	createTexture( texture, options ) {
+
+		this.textureUtils.createTexture( texture, options );
+
+	}
+
+	updateTexture( texture, options ) {
+
+		this.textureUtils.updateTexture( texture, options );
+
+	}
+
+	generateMipmaps( texture ) {
+
+		this.textureUtils.generateMipmaps( texture );
+
+	}
+
+
+	destroyTexture( texture ) {
+
+		this.textureUtils.destroyTexture( texture );
+
+	}
+
+	copyTextureToBuffer( texture, x, y, width, height ) {
+
+		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height );
+
+	}
 
 	createSampler( /*texture*/ ) {
 
@@ -442,155 +626,7 @@ class WebGLBackend extends Backend {
 
 	}
 
-	destroySampler( /*texture*/ ) {
-
-		console.warn( 'Abstract class.' );
-
-	}
-
-	createDefaultTexture( texture ) {
-
-		const { gl, textureUtils, defaultTextures } = this;
-
-		const glTextureType = textureUtils.getGLTextureType( texture );
-
-		let textureGPU = defaultTextures[ glTextureType ];
-
-		if ( textureGPU === undefined ) {
-
-			textureGPU = gl.createTexture();
-
-			gl.bindTexture( glTextureType, textureGPU );
-			gl.texParameteri( glTextureType, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
-			gl.texParameteri( glTextureType, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
-
-			//gl.texImage2D( target + i, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data );
-
-			defaultTextures[ glTextureType ] = textureGPU;
-
-		}
-
-		this.set( texture, {
-			textureGPU,
-			glTextureType,
-			isDefault: true
-		} );
-
-	}
-
-	createTexture( texture, options ) {
-
-		const { gl, utils, textureUtils } = this;
-		const { levels, width, height } = options;
-
-		const glFormat = utils.convert( texture.format, texture.colorSpace );
-		const glType = utils.convert( texture.type );
-		const glInternalFormat = textureUtils.getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace, texture.isVideoTexture );
-
-		const textureGPU = gl.createTexture();
-		const glTextureType = textureUtils.getGLTextureType( texture );
-
-		gl.bindTexture( glTextureType, textureGPU );
-
-		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
-		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
-		gl.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
-		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE );
-
-		textureUtils.setTextureParameters( glTextureType, texture );
-
-		gl.bindTexture( glTextureType, textureGPU );
-
-		if ( ! texture.isVideoTexture ) {
-
-			gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
-
-		}
-
-		this.set( texture, {
-			textureGPU,
-			glTextureType,
-			glFormat,
-			glType,
-			glInternalFormat
-		} );
-
-	}
-
-	updateTexture( texture, options ) {
-
-		const { gl } = this;
-		const { width, height } = options;
-		const { textureGPU, glTextureType, glFormat, glType, glInternalFormat } = this.get( texture );
-
-		const getImage = ( source ) => {
-
-			if ( source.isDataTexture ) {
-
-				return source.image.data;
-
-			} else if ( source instanceof ImageBitmap || source instanceof OffscreenCanvas || source instanceof HTMLImageElement || source instanceof HTMLCanvasElement ) {
-
-				return source;
-
-			}
-
-			return source.data;
-
-		};
-
-		gl.bindTexture( glTextureType, textureGPU );
-
-		if ( texture.isCubeTexture ) {
-
-			const images = options.images;
-
-			for ( let i = 0; i < 6; i ++ ) {
-
-				const image = getImage( images[ i ] );
-
-				gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, image );
-
-			}
-
-		} else if ( texture.isVideoTexture ) {
-
-			texture.update();
-
-			gl.texImage2D( glTextureType, 0, glInternalFormat, glFormat, glType, options.image );
-
-
-		} else {
-
-			const image = getImage( options.image );
-
-			gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, image );
-
-		}
-
-	}
-
-	generateMipmaps( texture ) {
-
-		const { gl } = this;
-		const { textureGPU, glTextureType } = this.get( texture );
-
-		gl.bindTexture( glTextureType, textureGPU );
-		gl.generateMipmap( glTextureType );
-
-	}
-
-	destroyTexture( /*texture*/ ) {
-
-		console.warn( 'Abstract class.' );
-
-	}
-
-	copyTextureToBuffer( /*texture, x, y, width, height*/ ) {
-
-		console.warn( 'Abstract class.' );
-
-	}
+	destroySampler() {}
 
 	// node builder
 
@@ -607,7 +643,7 @@ class WebGLBackend extends Backend {
 		const gl = this.gl;
 		const { stage, code } = program;
 
-		const shader = stage === 'vertex' ? gl.createShader( gl.VERTEX_SHADER ) : gl.createShader( gl.FRAGMENT_SHADER );
+		const shader = stage === 'fragment' ? gl.createShader( gl.FRAGMENT_SHADER ) : gl.createShader( gl.VERTEX_SHADER );
 
 		gl.shaderSource( shader, code );
 		gl.compileShader( shader );
@@ -655,102 +691,111 @@ class WebGLBackend extends Backend {
 
 		// Bindings
 
-		const bindings = renderObject.getBindings();
-
-		for ( const binding of bindings ) {
-
-			const bindingData = this.get( binding );
-			const index = bindingData.index;
-
-			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
-
-				const location = gl.getUniformBlockIndex( programGPU, binding.name );
-				gl.uniformBlockBinding( programGPU, location, index );
-
-			} else if ( binding.isSampledTexture ) {
-
-				const location = gl.getUniformLocation( programGPU, binding.name );
-				gl.uniform1i( location, index );
-
-			}
-
-		}
-
-		// VAO
-
-		const vaoGPU = gl.createVertexArray();
-
-		const index = renderObject.getIndex();
-		const attributes = renderObject.getAttributes();
-
-		gl.bindVertexArray( vaoGPU );
-
-		if ( index !== null ) {
-
-			const indexData = this.get( index );
-
-			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexData.bufferGPU );
-
-		}
-
-		for ( let i = 0; i < attributes.length; i ++ ) {
-
-			const attribute = attributes[ i ];
-			const attributeData = this.get( attribute );
-
-			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
-			gl.enableVertexAttribArray( i );
-
-			let stride, offset;
-
-			if ( attribute.isInterleavedBufferAttribute === true ) {
-
-				stride = attribute.data.stride * attributeData.bytesPerElement;
-				offset = attribute.offset * attributeData.bytesPerElement;
-
-			} else {
-
-				stride = 0;
-				offset = 0;
-
-			}
-
-			if ( attributeData.isFloat ) {
-
-				gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, false, stride, offset );
-
-			} else {
-
-				gl.vertexAttribIPointer( i, attribute.itemSize, attributeData.type, stride, offset );
-
-			}
-
-			if ( attribute.isInstancedBufferAttribute && ! attribute.isInterleavedBufferAttribute ) {
-
-				gl.vertexAttribDivisor( i, attribute.meshPerAttribute );
-
-			} else if ( attribute.isInterleavedBufferAttribute && attribute.data.isInstancedInterleavedBuffer ) {
-
-				gl.vertexAttribDivisor( i, attribute.data.meshPerAttribute );
-
-			}
-
-		}
-
-		gl.bindVertexArray( null );
+		this._setupBindings( renderObject.getBindings(), programGPU );
 
 		//
 
 		this.set( pipeline, {
-			programGPU,
-			vaoGPU
+			programGPU
 		} );
 
 	}
 
-	createComputePipeline( /*computePipeline, bindings*/ ) {
+	createComputePipeline( computePipeline, bindings ) {
 
-		console.warn( 'Abstract class.' );
+		const gl = this.gl;
+
+		// Program
+
+		const fragmentProgram = {
+			stage: 'fragment',
+			code: "#version 300 es\nprecision highp float;\nvoid main() {}"
+		};
+
+		this.createProgram( fragmentProgram );
+
+		const { computeProgram } = computePipeline;
+
+		const programGPU = gl.createProgram();
+
+		const fragmentShader = this.get( fragmentProgram ).shaderGPU;
+		const vertexShader = this.get( computeProgram ).shaderGPU;
+
+		const transforms = computeProgram.transforms;
+
+		const transformVaryingNames = [];
+		const transformAttributeNodes = [];
+
+		for ( let i = 0; i < transforms.length; i ++ ) {
+
+			const transform = transforms[ i ];
+
+			transformVaryingNames.push( transform.varyingName );
+			transformAttributeNodes.push( transform.attributeNode );
+
+		}
+
+		gl.attachShader( programGPU, fragmentShader );
+		gl.attachShader( programGPU, vertexShader );
+
+		gl.transformFeedbackVaryings(
+			programGPU,
+			transformVaryingNames,
+			gl.SEPARATE_ATTRIBS,
+		);
+
+		gl.linkProgram( programGPU );
+
+		if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
+
+			console.error( 'THREE.WebGLBackend:', gl.getProgramInfoLog( programGPU ) );
+
+			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( fragmentShader ) );
+			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( vertexShader ) );
+
+		}
+
+		gl.useProgram( programGPU );
+
+		// Bindings
+
+		this.createBindings( bindings );
+
+		this._setupBindings( bindings, programGPU );
+
+		const attributeNodes = computeProgram.attributes;
+		const attributes = [];
+		const transformBuffers = [];
+
+		for ( let i = 0; i < attributeNodes.length; i ++ ) {
+
+			const attribute = attributeNodes[ i ].node.attribute;
+
+			attributes.push( attribute );
+
+			if ( ! this.has( attribute ) ) this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
+
+		}
+
+		for ( let i = 0; i < transformAttributeNodes.length; i ++ ) {
+
+			const attribute = transformAttributeNodes[ i ].attribute;
+
+			if ( ! this.has( attribute ) ) this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
+
+			const attributeData = this.get( attribute );
+
+			transformBuffers.push( attributeData );
+
+		}
+
+		//
+
+		this.set( computePipeline, {
+			programGPU,
+			transformBuffers,
+			attributes
+		} );
 
 	}
 
@@ -828,15 +873,17 @@ class WebGLBackend extends Backend {
 
 	createAttribute( attribute ) {
 
+		if ( this.has( attribute ) ) return;
+
 		const gl = this.gl;
 
 		this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
 
 	}
 
-	createStorageAttribute( /*attribute*/ ) {
+	createStorageAttribute( attribute ) {
 
-		console.warn( 'Abstract class.' );
+		//console.warn( 'Abstract class.' );
 
 	}
 
@@ -846,9 +893,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	destroyAttribute( /*attribute*/ ) {
+	destroyAttribute( attribute ) {
 
-		console.warn( 'Abstract class.' );
+		this.attributeUtils.destroyAttribute( attribute );
 
 	}
 
@@ -858,105 +905,381 @@ class WebGLBackend extends Backend {
 
 	}
 
+	async hasFeatureAsync( name ) {
+
+		return this.hasFeature( name );
+
+	}
+
 	hasFeature( name ) {
 
-		return true;
+		const keysMatching = Object.keys( GLFeatureName ).filter( key => GLFeatureName[ key ] === name );
+
+		const extensions = this.extensions;
+
+		for ( let i = 0; i < keysMatching.length; i ++ ) {
+
+
+			if ( extensions.has( keysMatching[ i ] ) ) return true;
+
+		}
+
+		return false;
+
+	}
+
+
+	getMaxAnisotropy() {
+
+		return this.capabilities.getMaxAnisotropy();
 
 	}
 
 	copyFramebufferToTexture( texture, renderContext ) {
 
-		const { gl } = this;
-
-		const { textureGPU } = this.get( texture );
-
-		const width = texture.image.width;
-		const height = texture.image.height;
-
-		gl.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
-
-		if ( texture.isDepthTexture ) {
-
-			const fb = gl.createFramebuffer();
-
-			gl.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
-
-			gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureGPU, 0 );
-
-			gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, gl.DEPTH_BUFFER_BIT, gl.NEAREST );
-
-			gl.deleteFramebuffer( fb );
-
-
-		} else {
-
-			gl.bindTexture( gl.TEXTURE_2D, textureGPU );
-			gl.copyTexSubImage2D( gl.TEXTURE_2D, 0, 0, 0, 0, 0, width, height );
-
-			gl.bindTexture( gl.TEXTURE_2D, null );
-
-		}
-
-		if ( texture.generateMipmaps ) this.generateMipmaps( texture );
-
-		this._setFramebuffer( renderContext );
+		this.textureUtils.copyFramebufferToTexture( texture, renderContext );
 
 	}
 
 	_setFramebuffer( renderContext ) {
 
-		const { gl } = this;
+		const { gl, state } = this;
+
+		let currentFrameBuffer = null;
 
 		if ( renderContext.textures !== null ) {
 
-			const renderContextData = this.get( renderContext );
+			const renderTarget = renderContext.renderTarget;
+			const renderTargetContextData = this.get( renderTarget );
+			const { samples, depthBuffer, stencilBuffer } = renderTarget;
+			const cubeFace = this.renderer._activeCubeFace;
+			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
 
-			let fb = renderContextData.framebuffer;
+			let msaaFb = renderTargetContextData.msaaFrameBuffer;
+			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
+
+			let fb;
+
+			if ( isCube ) {
+
+				if ( renderTargetContextData.cubeFramebuffers === undefined ) {
+
+					renderTargetContextData.cubeFramebuffers = [];
+
+				}
+
+				fb = renderTargetContextData.cubeFramebuffers[ cubeFace ];
+
+			} else {
+
+				fb = renderTargetContextData.framebuffer;
+
+			}
 
 			if ( fb === undefined ) {
 
 				fb = gl.createFramebuffer();
 
-				gl.bindFramebuffer( gl.FRAMEBUFFER, fb );
+				state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
 				const textures = renderContext.textures;
 
-				const drawBuffers = [];
+				if ( isCube ) {
 
-				for ( let i = 0; i < textures.length; i ++ ) {
+					renderTargetContextData.cubeFramebuffers[ cubeFace ] = fb;
+					const { textureGPU } = this.get( textures[ 0 ] );
 
-					const texture = textures[ i ];
-					const { textureGPU } = this.get( texture );
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureGPU, 0 );
 
-					const attachment = gl.COLOR_ATTACHMENT0 + i;
+				} else {
 
-					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.TEXTURE_2D, textureGPU, 0 );
+					for ( let i = 0; i < textures.length; i ++ ) {
 
-					drawBuffers.push( attachment );
+						const texture = textures[ i ];
+						const textureData = this.get( texture );
+						textureData.renderTarget = renderContext.renderTarget;
+
+						const attachment = gl.COLOR_ATTACHMENT0 + i;
+
+						gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0 );
+
+					}
+
+					renderTargetContextData.framebuffer = fb;
+
+					state.drawBuffers( renderContext, fb );
 
 				}
-
-				gl.drawBuffers( drawBuffers );
 
 				if ( renderContext.depthTexture !== null ) {
 
-					const { textureGPU } = this.get( renderContext.depthTexture );
+					const textureData = this.get( renderContext.depthTexture );
+					const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
 
-					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureGPU, 0 );
+					gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
 
 				}
 
-				renderContextData.framebuffer = fb;
+			}
+
+			if ( samples > 0 ) {
+
+				if ( msaaFb === undefined ) {
+
+					const invalidationArray = [];
+
+					msaaFb = gl.createFramebuffer();
+
+					state.bindFramebuffer( gl.FRAMEBUFFER, msaaFb );
+
+					const msaaRenderbuffers = [];
+
+					const textures = renderContext.textures;
+
+					for ( let i = 0; i < textures.length; i ++ ) {
+
+
+						msaaRenderbuffers[ i ] = gl.createRenderbuffer();
+
+						gl.bindRenderbuffer( gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
+
+						invalidationArray.push( gl.COLOR_ATTACHMENT0 + i );
+
+						if ( depthBuffer ) {
+
+							const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
+							invalidationArray.push( depthStyle );
+
+						}
+
+						const texture = renderContext.textures[ i ];
+						const textureData = this.get( texture );
+
+						gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, textureData.glInternalFormat, renderContext.width, renderContext.height );
+						gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
+
+
+					}
+
+					renderTargetContextData.msaaFrameBuffer = msaaFb;
+					renderTargetContextData.msaaRenderbuffers = msaaRenderbuffers;
+
+					if ( depthRenderbuffer === undefined ) {
+
+						depthRenderbuffer = gl.createRenderbuffer();
+						this.textureUtils.setupRenderBufferStorage( depthRenderbuffer, renderContext );
+
+						renderTargetContextData.depthRenderbuffer = depthRenderbuffer;
+
+						const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
+						invalidationArray.push( depthStyle );
+
+					}
+
+					renderTargetContextData.invalidationArray = invalidationArray;
+
+				}
+
+				currentFrameBuffer = renderTargetContextData.msaaFrameBuffer;
 
 			} else {
 
-				gl.bindFramebuffer( gl.FRAMEBUFFER, fb );
+				currentFrameBuffer = fb;
 
 			}
 
-		} else {
+		}
 
-			gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+		state.bindFramebuffer( gl.FRAMEBUFFER, currentFrameBuffer );
+
+	}
+
+
+	_getVaoKey( index, attributes ) {
+
+		let key = [];
+
+		if ( index !== null ) {
+
+			const indexData = this.get( index );
+
+			key += ':' + indexData.id;
+
+		}
+
+		for ( let i = 0; i < attributes.length; i ++ ) {
+
+			const attributeData = this.get( attributes[ i ] );
+
+			key += ':' + attributeData.id;
+
+		}
+
+		return key;
+
+	}
+
+	_createVao( index, attributes ) {
+
+		const { gl } = this;
+
+		const vaoGPU = gl.createVertexArray();
+		let key = '';
+
+		let staticVao = true;
+
+		gl.bindVertexArray( vaoGPU );
+
+		if ( index !== null ) {
+
+			const indexData = this.get( index );
+
+			gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexData.bufferGPU );
+
+			key += ':' + indexData.id;
+
+		}
+
+		for ( let i = 0; i < attributes.length; i ++ ) {
+
+			const attribute = attributes[ i ];
+			const attributeData = this.get( attribute );
+
+			key += ':' + attributeData.id;
+
+			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
+			gl.enableVertexAttribArray( i );
+
+			if ( attribute.isStorageBufferAttribute ) staticVao = false;
+
+			let stride, offset;
+
+			if ( attribute.isInterleavedBufferAttribute === true ) {
+
+				stride = attribute.data.stride * attributeData.bytesPerElement;
+				offset = attribute.offset * attributeData.bytesPerElement;
+
+			} else {
+
+				stride = 0;
+				offset = 0;
+
+			}
+
+			if ( attributeData.isInteger ) {
+
+				gl.vertexAttribIPointer( i, attribute.itemSize, attributeData.type, stride, offset );
+
+			} else {
+
+				gl.vertexAttribPointer( i, attribute.itemSize, attributeData.type, attribute.normalized, stride, offset );
+
+			}
+
+			if ( attribute.isInstancedBufferAttribute && ! attribute.isInterleavedBufferAttribute ) {
+
+				gl.vertexAttribDivisor( i, attribute.meshPerAttribute );
+
+			} else if ( attribute.isInterleavedBufferAttribute && attribute.data.isInstancedInterleavedBuffer ) {
+
+				gl.vertexAttribDivisor( i, attribute.data.meshPerAttribute );
+
+			}
+
+		}
+
+		gl.bindBuffer( gl.ARRAY_BUFFER, null );
+
+		this.vaoCache[ key ] = vaoGPU;
+
+		return { vaoGPU, staticVao };
+
+	}
+
+	_getTransformFeedback( transformBuffers ) {
+
+		let key = '';
+
+		for ( let i = 0; i < transformBuffers.length; i ++ ) {
+
+			key += ':' + transformBuffers[ i ].id;
+
+		}
+
+		let transformFeedbackGPU = this.transformFeedbackCache[ key ];
+
+		if ( transformFeedbackGPU !== undefined ) {
+
+			return transformFeedbackGPU;
+
+		}
+
+		const gl = this.gl;
+
+		transformFeedbackGPU = gl.createTransformFeedback();
+
+		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, transformFeedbackGPU );
+
+		for ( let i = 0; i < transformBuffers.length; i ++ ) {
+
+			const attributeData = transformBuffers[ i ];
+
+			gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, i, attributeData.transformBuffer );
+
+		}
+
+		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );
+
+		this.transformFeedbackCache[ key ] = transformFeedbackGPU;
+
+		return transformFeedbackGPU;
+
+	}
+
+
+	_setupBindings( bindings, programGPU ) {
+
+		const gl = this.gl;
+
+		for ( const binding of bindings ) {
+
+			const bindingData = this.get( binding );
+			const index = bindingData.index;
+
+			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+
+				const location = gl.getUniformBlockIndex( programGPU, binding.name );
+				gl.uniformBlockBinding( programGPU, location, index );
+
+			} else if ( binding.isSampledTexture ) {
+
+				const location = gl.getUniformLocation( programGPU, binding.name );
+				gl.uniform1i( location, index );
+
+			}
+
+		}
+
+	}
+
+	_bindUniforms( bindings ) {
+
+		const { gl, state } = this;
+
+		for ( const binding of bindings ) {
+
+			const bindingData = this.get( binding );
+			const index = bindingData.index;
+
+			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+
+				gl.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
+
+			} else if ( binding.isSampledTexture ) {
+
+				state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, gl.TEXTURE0 + index );
+
+			}
 
 		}
 

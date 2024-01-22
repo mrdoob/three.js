@@ -26,6 +26,8 @@ const assets = [
 
 	'../examples/jsm/libs/meshopt_decoder.module.js',
 
+	'../examples/jsm/libs/mikktspace.module.js',
+
 	'../examples/jsm/libs/motion-controllers.module.js',
 
 	'../examples/jsm/libs/rhino3dm/rhino3dm.wasm',
@@ -72,6 +74,8 @@ const assets = [
 	'../examples/jsm/exporters/USDZExporter.js',
 
 	'../examples/jsm/helpers/VertexNormalsHelper.js',
+
+	'../examples/jsm/utils/BufferGeometryUtils.js',
 
 	'../examples/jsm/webxr/VRButton.js',
 	'../examples/jsm/webxr/XRControllerModelFactory.js',
@@ -149,7 +153,6 @@ const assets = [
 	'./js/Sidebar.Settings.js',
 	'./js/Sidebar.Settings.History.js',
 	'./js/Sidebar.Settings.Shortcuts.js',
-	'./js/Sidebar.Settings.Viewport.js',
 	'./js/Sidebar.Properties.js',
 	'./js/Sidebar.Object.js',
 	'./js/Sidebar.Geometry.js',
@@ -184,8 +187,7 @@ const assets = [
 	'./js/Strings.js',
 	'./js/Toolbar.js',
 	'./js/Viewport.js',
-	'./js/Viewport.Camera.js',
-	'./js/Viewport.Shading.js',
+	'./js/Viewport.Controls.js',
 	'./js/Viewport.Info.js',
 	'./js/Viewport.Selector.js',
 	'./js/Viewport.ViewHelper.js',

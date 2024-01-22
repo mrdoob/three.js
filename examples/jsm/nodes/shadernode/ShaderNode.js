@@ -15,7 +15,13 @@ const NodeElements = new Map(); // @TODO: Currently only a few nodes are added, 
 
 export function addNodeElement( name, nodeElement ) {
 
-	if ( NodeElements.has( name ) ) throw new Error( `Redefinition of node element ${ name }` );
+	if ( NodeElements.has( name ) ) {
+
+		console.warn( `Redefinition of node element ${ name }` );
+		return;
+
+	}
+
 	if ( typeof nodeElement !== 'function' ) throw new Error( `Node element ${ name } is not a function` );
 
 	NodeElements.set( name, nodeElement );
@@ -40,7 +46,13 @@ const shaderNodeHandler = {
 
 			if ( node.isStackNode !== true && prop === 'assign' ) {
 
-				return ( ...params ) => currentStack.assign( nodeObj, ...params );
+				return ( ...params ) => {
+
+					currentStack.assign( nodeObj, ...params );
+
+					return nodeObj;
+
+				};
 
 			} else if ( NodeElements.has( prop ) ) {
 
@@ -271,6 +283,12 @@ class ShaderCallNodeInternal extends Node {
 
 			}
 
+			if ( builder.currentFunctionNode !== null ) {
+
+				builder.currentFunctionNode.includes.push( functionNode );
+
+			}
+
 			return nodeObject( functionNode.call( inputNodes ) );
 
 		}
@@ -323,7 +341,7 @@ class ShaderNodeInternal extends Node {
 
 	get isArrayInput() {
 
-		return /^\(\s+?\[/.test( this.jsFunc.toString() );
+		return /^\((\s+)?\[/.test( this.jsFunc.toString() );
 
 	}
 
@@ -505,7 +523,18 @@ addNodeClass( 'ShaderNode', ShaderNode );
 
 //
 
-export const setCurrentStack = stack => currentStack = stack;
+export const setCurrentStack = ( stack ) => {
+
+	if ( currentStack === stack ) {
+
+		//throw new Error( 'Stack already defined.' );
+
+	}
+
+	currentStack = stack;
+
+};
+
 export const getCurrentStack = () => currentStack;
 
 export const If = ( ...params ) => currentStack.if( ...params );

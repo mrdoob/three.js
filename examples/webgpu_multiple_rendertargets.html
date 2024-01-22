@@ -28,15 +28,16 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			//import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { NodeMaterial, MeshBasicNodeMaterial, mix, modelNormalMatrix, normalGeometry, normalize, outputStruct, step, texture, uniform, uv, varying, vec2, vec4 } from 'three/nodes';
+			import { NodeMaterial, mix, modelNormalMatrix, normalGeometry, normalize, outputStruct, step, texture, uniform, uv, varying, vec2, vec4 } from 'three/nodes';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
 
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
+			import QuadMesh from 'three/addons/objects/QuadMesh.js';
+
 			let camera, scene, renderer, torus;
-			let renderTarget;
-			let postScene, postCamera;
+			let quadMesh, renderTarget;
 
 			/*
 
@@ -52,13 +53,16 @@
 
 			*/
 
-			class WriteGBufferMaterial extends MeshBasicNodeMaterial {
+			class WriteGBufferMaterial extends NodeMaterial {
 
 				constructor( diffuseTexture ) {
 
 					super();
 
 					this.lights = false;
+					this.fog = false;
+					this.colorSpaced = false;
+
 					this.diffuseTexture = diffuseTexture;
 
 					const vUv = varying( uv() );
@@ -71,7 +75,7 @@
 					const gColor = texture( this.diffuseTexture, vUv.mul( repeat ) );
 					const gNormal = vec4( normalize( vNormal ), 1.0 );
 
-					this.outputNode = outputStruct( gColor, gNormal );
+					this.fragmentNode = outputStruct( gColor, gNormal );
 
 				}
 
@@ -83,13 +87,15 @@
 
 					super();
 
+					this.lights = false;
+					this.fog = false;
+
 					const vUv = varying( uv() );
 
 					const diffuse = texture( tDiffuse, vUv );
 					const normal = texture( tNormal, vUv );
 
-					this.colorNode = mix( diffuse, normal, step( 0.5, vUv.x ) );
-					this.lights = false;
+					this.fragmentNode = mix( diffuse, normal, step( 0.5, vUv.x ) );
 
 				}
 
@@ -111,7 +117,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				// Create a multi render target with Float buffers
@@ -120,7 +125,7 @@
 					window.innerWidth * window.devicePixelRatio,
 					window.innerHeight * window.devicePixelRatio,
 					2,
-					{ minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, colorSpace: THREE.LinearSRGBColorSpace }
+					{ minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter }
 				);
 
 				// Name our G-Buffer attachments for debugging
@@ -139,6 +144,7 @@
 				const loader = new THREE.TextureLoader();
 
 				const diffuse = loader.load( 'textures/hardwood2_diffuse.jpg', render );
+				diffuse.colorSpace = THREE.SRGBColorSpace;
 				diffuse.wrapS = THREE.RepeatWrapping;
 				diffuse.wrapT = THREE.RepeatWrapping;
 
@@ -151,13 +157,7 @@
 
 				// PostProcessing setup
 
-				postScene = new THREE.Scene();
-				postCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-
-				postScene.add( new THREE.Mesh(
-					new THREE.PlaneGeometry( 2, 2 ),
-					new ReadGBufferMaterial( renderTarget.texture[ 0 ], renderTarget.texture[ 1 ] )
-				) );
+				quadMesh = new QuadMesh( new ReadGBufferMaterial( renderTarget.texture[ 0 ], renderTarget.texture[ 1 ] ) );
 
 				// Controls
 
@@ -176,8 +176,6 @@
 
 				const dpr = renderer.getPixelRatio();
 				renderTarget.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
-
-				render();
 
 			}
 
@@ -209,7 +207,7 @@
 
 				// render post FX
 				renderer.setRenderTarget( null );
-				renderer.render( postScene, postCamera );
+				quadMesh.render( renderer );
 
 			}
 

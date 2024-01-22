@@ -31,11 +31,13 @@
 
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
+			import QuadMesh from 'three/addons/objects/QuadMesh.js';
+
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, scene, controls, renderer;
 
-			let cameraFX, sceneFX, renderTarget;
+			let quad, renderTarget;
 
 			const dpr = window.devicePixelRatio;
 
@@ -100,18 +102,10 @@
 
 				// FX
 
-				cameraFX = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-				sceneFX = new THREE.Scene();
-
-				const geometryFX = new THREE.PlaneGeometry( 2, 2 );
-
-				//
-
 				const materialFX = new MeshBasicNodeMaterial();
 				materialFX.colorNode = texture( depthTexture );
 
-				const quad = new THREE.Mesh( geometryFX, materialFX );
-				sceneFX.add( quad );
+				quad = new QuadMesh( materialFX );
 
 				//
 
@@ -136,7 +130,7 @@
 				renderer.render( scene, camera );
 
 				renderer.setRenderTarget( null );
-				renderer.render( sceneFX, cameraFX );
+				quad.render( renderer );
 
 			}
 

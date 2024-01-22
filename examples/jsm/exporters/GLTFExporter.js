@@ -137,6 +137,12 @@ class GLTFExporter {
 
 		this.register( function ( writer ) {
 
+			return new GLTFMaterialsBumpExtension( writer );
+
+		} );
+
+		this.register( function ( writer ) {
+
 			return new GLTFMeshGpuInstancing( writer );
 
 		} );
@@ -1829,6 +1835,24 @@ class GLTFWriter {
 
 		if ( isMultiMaterial && geometry.groups.length === 0 ) return null;
 
+		let didForceIndices = false;
+
+		if ( isMultiMaterial && geometry.index === null ) {
+
+			const indices = [];
+
+			for ( let i = 0, il = geometry.attributes.position.count; i < il; i ++ ) {
+
+				indices[ i ] = i;
+
+			}
+
+			geometry.setIndex( indices );
+
+			didForceIndices = true;
+
+		}
+
 		const materials = isMultiMaterial ? mesh.material : [ mesh.material ];
 		const groups = isMultiMaterial ? geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
 
@@ -1873,6 +1897,12 @@ class GLTFWriter {
 			if ( material !== null ) primitive.material = material;
 
 			primitives.push( primitive );
+
+		}
+
+		if ( didForceIndices === true ) {
+
+			geometry.setIndex( null );
 
 		}
 
@@ -2961,6 +2991,54 @@ class GLTFMaterialsEmissiveStrengthExtension {
 		const extensionDef = {};
 
 		extensionDef.emissiveStrength = material.emissiveIntensity;
+
+		materialDef.extensions = materialDef.extensions || {};
+		materialDef.extensions[ this.name ] = extensionDef;
+
+		extensionsUsed[ this.name ] = true;
+
+	}
+
+}
+
+
+/**
+ * Materials bump Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/EXT_materials_bump
+ */
+class GLTFMaterialsBumpExtension {
+
+	constructor( writer ) {
+
+		this.writer = writer;
+		this.name = 'EXT_materials_bump';
+
+	}
+
+	writeMaterial( material, materialDef ) {
+
+		if ( ! material.isMeshStandardMaterial || (
+		       material.bumpScale === 1 &&
+		     ! material.bumpMap ) ) return;
+
+		const writer = this.writer;
+		const extensionsUsed = writer.extensionsUsed;
+
+		const extensionDef = {};
+
+		if ( material.bumpMap ) {
+
+			const bumpMapDef = {
+				index: writer.processTexture( material.bumpMap ),
+				texCoord: material.bumpMap.channel
+			};
+			writer.applyTextureTransform( bumpMapDef, material.bumpMap );
+			extensionDef.bumpTexture = bumpMapDef;
+
+		}
+
+		extensionDef.bumpFactor = material.bumpScale;
 
 		materialDef.extensions = materialDef.extensions || {};
 		materialDef.extensions[ this.name ] = extensionDef;

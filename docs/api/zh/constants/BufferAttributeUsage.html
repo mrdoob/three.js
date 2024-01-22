@@ -1,32 +1,34 @@
 <!DOCTYPE html>
 <html lang="zh">
-	<head>
-		<meta charset="utf-8" />
-		<base href="../../../" />
-		<script src="page.js"></script>
-		<link type="text/css" rel="stylesheet" href="page.css" />
-	</head>
-	<body>
-		<h1>Buffer Attribute Usage Constants</h1>
 
-		<p>
-			The usage constants can be used to provide a hint to the API regarding how the geometry buffer attribute will be used in order to optimize performance.
-		</p>
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
 
-		<h2>Code Example</h2>
+<body>
+	<h1>缓冲区属性使用常量([name])</h1>
 
-		<code>
+	<p>
+		使用常量可用于向 API 提供有关如何使用几何缓冲区属性以优化性能的提示。
+	</p>
+
+	<h2>代码示例</h2>
+
+	<code>
 		const geometry = new THREE.BufferGeometry();
 		const positionAttribute = new THREE.BufferAttribute( array, 3 , false );
 		positionAttribute.setUsage( THREE.DynamicDrawUsage );
 		geometry.setAttribute( 'position', positionAttribute );
 		</code>
 
-		<h2>Examples</h2>
-		<p>[example:webgl_buffergeometry_drawrange materials / buffergeometry / drawrange ]</p>
+	<h2>例子</h2>
+	<p>[example:webgl_buffergeometry_drawrange materials / buffergeometry / drawrange ]</p>
 
-		<h2>Geometry Usage</h2>
-		<code>
+	<h2>几何体相关(Geometry Usage)</h2>
+	<code>
 		THREE.StaticDrawUsage
 		THREE.DynamicDrawUsage
 		THREE.StreamDrawUsage
@@ -40,12 +42,14 @@
 		THREE.StreamCopyUsage
 		</code>
 
-		For more detailed information on each of these constants see [link:https://www.khronos.org/opengl/wiki/Buffer_Object#Buffer_Object_Usage this OpenGL documentation].
+	有关每个常量的更多详细信息，请参阅
+	[link:https://www.khronos.org/opengl/wiki/Buffer_Object#Buffer_Object_Usage OpenGL 文档]。
 
-		<h2>Source</h2>
+	<h2>源代码</h2>
 
-		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
-		</p>
-	</body>
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+	</p>
+</body>
+
 </html>

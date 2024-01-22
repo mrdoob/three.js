@@ -2,15 +2,15 @@ import UniformNode, { uniform } from '../core/UniformNode.js';
 import { uv } from './UVNode.js';
 import { textureSize } from './TextureSizeNode.js';
 import { colorSpaceToLinear } from '../display/ColorSpaceNode.js';
-import { context } from '../core/ContextNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { addNodeClass } from '../core/Node.js';
+import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 import { addNodeElement, nodeProxy, vec3, nodeObject } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 
 class TextureNode extends UniformNode {
 
-	constructor( value, uvNode = null, levelNode = null, compareNode = null ) {
+	constructor( value, uvNode = null, levelNode = null ) {
 
 		super( value );
 
@@ -18,8 +18,10 @@ class TextureNode extends UniformNode {
 
 		this.uvNode = uvNode;
 		this.levelNode = levelNode;
-		this.compareNode = compareNode;
+		this.compareNode = null;
+		this.depthNode = null;
 
+		this.sampler = true;
 		this.updateMatrix = false;
 		this.updateType = NodeUpdateType.NONE;
 
@@ -76,6 +78,20 @@ class TextureNode extends UniformNode {
 
 	}
 
+	setupUV( builder, uvNode ) {
+
+		const texture = this.value;
+
+		if ( builder.isFlipY() && ( texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true ) ) {
+
+			uvNode = uvNode.setY( uvNode.y.oneMinus() );
+
+		}
+
+		return uvNode;
+
+	}
+
 	setup( builder ) {
 
 		const properties = builder.getNodeProperties( this );
@@ -84,9 +100,9 @@ class TextureNode extends UniformNode {
 
 		let uvNode = this.uvNode;
 
-		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUVNode ) {
+		if ( ( uvNode === null || builder.context.forceUVContext === true ) && builder.context.getUV ) {
 
-			uvNode = builder.context.getUVNode( this );
+			uvNode = builder.context.getUV( this );
 
 		}
 
@@ -98,20 +114,64 @@ class TextureNode extends UniformNode {
 
 		}
 
+		uvNode = this.setupUV( builder, uvNode );
+
 		//
 
 		let levelNode = this.levelNode;
 
-		if ( levelNode === null && builder.context.getSamplerLevelNode ) {
+		if ( levelNode === null && builder.context.getTextureLevel ) {
 
-			levelNode = builder.context.getSamplerLevelNode( this );
+			levelNode = builder.context.getTextureLevel( this );
+
+		}
+
+		if ( levelNode !== null && builder.context.getTextureLevelAlgorithm !== undefined ) {
+
+			levelNode = builder.context.getTextureLevelAlgorithm( this, levelNode );
 
 		}
 
 		//
 
 		properties.uvNode = uvNode;
-		properties.levelNode = levelNode ? builder.context.getMIPLevelAlgorithmNode( this, levelNode ) : null;
+		properties.levelNode = levelNode;
+		properties.compareNode = this.compareNode;
+		properties.depthNode = this.depthNode;
+
+	}
+
+	generateUV( builder, uvNode ) {
+
+		return uvNode.build( builder, this.sampler === true ? 'vec2' : 'ivec2' );
+
+	}
+
+	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, depthSnippet, compareSnippet ) {
+
+		const texture = this.value;
+
+		let snippet;
+
+		if ( levelSnippet ) {
+
+			snippet = builder.generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet );
+
+		} else if ( compareSnippet ) {
+
+			snippet = builder.generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet );
+
+		} else if ( this.sampler === false ) {
+
+			snippet = builder.generateTextureLoad( texture, textureProperty, uvSnippet, depthSnippet );
+
+		} else {
+
+			snippet = builder.generateTexture( texture, textureProperty, uvSnippet, depthSnippet );
+
+		}
+
+		return snippet;
 
 	}
 
@@ -119,21 +179,11 @@ class TextureNode extends UniformNode {
 
 		const properties = builder.getNodeProperties( this );
 
-		let { uvNode } = properties;
-		const { levelNode } = properties;
-
-		const compareNode = this.compareNode;
 		const texture = this.value;
 
 		if ( ! texture || texture.isTexture !== true ) {
 
 			throw new Error( 'TextureNode: Need a three.js texture.' );
-
-		}
-
-		if ( builder.isFlipY() && ( texture.isFramebufferTexture === true || texture.isDepthTexture === true ) ) {
-
-			uvNode = uvNode.setY( uvNode.y.fract().oneMinus() );
 
 		}
 
@@ -155,30 +205,18 @@ class TextureNode extends UniformNode {
 
 			if ( propertyName === undefined ) {
 
-				const uvSnippet = uvNode.build( builder, 'vec2' );
+				const { uvNode, levelNode, compareNode, depthNode } = properties;
+
+				const uvSnippet = this.generateUV( builder, uvNode );
+				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
+				const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
+				const compareSnippet = compareNode ? compareNode.build( builder, 'float' ) : null;
+
 				const nodeVar = builder.getVarFromNode( this );
 
 				propertyName = builder.getPropertyName( nodeVar );
 
-				let snippet = null;
-
-				if ( levelNode && levelNode.isNode === true ) {
-
-					const levelSnippet = levelNode.build( builder, 'float' );
-
-					snippet = builder.getTextureLevel( texture, textureProperty, uvSnippet, levelSnippet );
-
-				} else if ( compareNode !== null ) {
-
-					const compareSnippet = compareNode.build( builder, 'float' );
-
-					snippet = builder.getTextureCompare( texture, textureProperty, uvSnippet, compareSnippet );
-
-				} else {
-
-					snippet = builder.getTexture( texture, textureProperty, uvSnippet );
-
-				}
+				const snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, depthSnippet, compareSnippet );
 
 				builder.addLineFlowCode( `${propertyName} = ${snippet}` );
 
@@ -194,9 +232,9 @@ class TextureNode extends UniformNode {
 			let snippet = propertyName;
 			const nodeType = this.getNodeType( builder );
 
-			if ( builder.needsColorSpaceToLinear( this.value ) ) {
+			if ( builder.needsColorSpaceToLinear( texture ) ) {
 
-				snippet = colorSpaceToLinear( expression( snippet, nodeType ), this.value.colorSpace ).setup( builder ).build( builder, nodeType );
+				snippet = colorSpaceToLinear( expression( snippet, nodeType ), texture.colorSpace ).setup( builder ).build( builder, nodeType );
 
 			}
 
@@ -205,6 +243,22 @@ class TextureNode extends UniformNode {
 		}
 
 	}
+
+	setSampler( value ) {
+
+		this.sampler = value;
+
+		return this;
+
+	}
+
+	getSampler() {
+
+		return this.sampler;
+
+	}
+
+	// @TODO: Move to TSL
 
 	uv( uvNode ) {
 
@@ -215,14 +269,21 @@ class TextureNode extends UniformNode {
 
 	}
 
+	blur( levelNode ) {
+
+		const textureNode = this.clone();
+		textureNode.levelNode = levelNode.mul( maxMipLevel( textureNode ) );
+
+		return nodeObject( textureNode );
+
+	}
+
 	level( levelNode ) {
 
 		const textureNode = this.clone();
 		textureNode.levelNode = levelNode;
 
-		return context( textureNode, {
-			getMIPLevelAlgorithmNode: ( reqTextureNode, levelNode ) => levelNode
-		} );
+		return textureNode;
 
 	}
 
@@ -240,6 +301,17 @@ class TextureNode extends UniformNode {
 		return nodeObject( textureNode );
 
 	}
+
+	depth( depthNode ) {
+
+		const textureNode = this.clone();
+		textureNode.depthNode = nodeObject( depthNode );
+
+		return nodeObject( textureNode );
+
+	}
+
+	// --
 
 	serialize( data ) {
 
@@ -271,7 +343,10 @@ class TextureNode extends UniformNode {
 
 	clone() {
 
-		return new this.constructor( this.value, this.uvNode, this.levelNode, this.compareNode );
+		const newNode = new this.constructor( this.value, this.uvNode, this.levelNode );
+		newNode.sampler = this.sampler;
+
+		return newNode;
 
 	}
 
@@ -280,6 +355,8 @@ class TextureNode extends UniformNode {
 export default TextureNode;
 
 export const texture = nodeProxy( TextureNode );
+export const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );
+
 //export const textureLevel = ( value, uv, level ) => texture( value, uv ).level( level );
 
 export const sampler = ( aTexture ) => ( aTexture.isNode === true ? aTexture : texture( aTexture ) ).convert( 'sampler' );

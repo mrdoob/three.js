@@ -200,6 +200,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			supportsVertexTextures: SUPPORTS_VERTEX_TEXTURES,
 			outputColorSpace: ( currentRenderTarget === null ) ? renderer.outputColorSpace : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace ),
+			alphaToCoverage: !! material.alphaToCoverage,
 
 			map: HAS_MAP,
 			matcap: HAS_MATCAP,
@@ -245,7 +246,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			gradientMap: HAS_GRADIENTMAP,
 
-			opaque: material.transparent === false && material.blending === NormalBlending,
+			opaque: material.transparent === false && material.blending === NormalBlending && material.alphaToCoverage === false,
 
 			alphaMap: HAS_ALPHAMAP,
 			alphaTest: HAS_ALPHATEST,
@@ -300,7 +301,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			fog: !! fog,
 			useFog: material.fog === true,
-			fogExp2: ( fog && fog.isFogExp2 ),
+			fogExp2: ( !! fog && fog.isFogExp2 ),
 
 			flatShading: material.flatShading === true,
 
@@ -364,6 +365,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			extensionFragDepth: HAS_EXTENSIONS && material.extensions.fragDepth === true,
 			extensionDrawBuffers: HAS_EXTENSIONS && material.extensions.drawBuffers === true,
 			extensionShaderTextureLOD: HAS_EXTENSIONS && material.extensions.shaderTextureLOD === true,
+			extensionClipCullDistance: HAS_EXTENSIONS && material.extensions.clipCullDistance && extensions.has( 'WEBGL_clip_cull_distance' ),
 
 			rendererExtensionFragDepth: IS_WEBGL2 || extensions.has( 'EXT_frag_depth' ),
 			rendererExtensionDrawBuffers: IS_WEBGL2 || extensions.has( 'WEBGL_draw_buffers' ),
@@ -560,6 +562,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 18 );
 		if ( parameters.decodeVideoTexture )
 			_programLayers.enable( 19 );
+		if ( parameters.alphaToCoverage )
+			_programLayers.enable( 20 );
 
 		array.push( _programLayers.mask );
 

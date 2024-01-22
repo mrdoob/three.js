@@ -98,9 +98,9 @@ class Object3D extends EventDispatcher {
 		this.matrixWorld = new Matrix4();
 
 		this.matrixAutoUpdate = Object3D.DEFAULT_MATRIX_AUTO_UPDATE;
-		this.matrixWorldNeedsUpdate = false;
 
 		this.matrixWorldAutoUpdate = Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE; // checked by the renderer
+		this.matrixWorldNeedsUpdate = false;
 
 		this.layers = new Layers();
 		this.visible = true;
@@ -116,6 +116,10 @@ class Object3D extends EventDispatcher {
 		this.userData = {};
 
 	}
+
+	onBeforeShadow( /* renderer, object, camera, shadowCamera, geometry, depthMaterial, group */ ) {}
+
+	onAfterShadow( /* renderer, object, camera, shadowCamera, geometry, depthMaterial, group */ ) {}
 
 	onBeforeRender( /* renderer, scene, camera, geometry, material, group */ ) {}
 
@@ -457,21 +461,15 @@ class Object3D extends EventDispatcher {
 
 	}
 
-	getObjectsByProperty( name, value ) {
-
-		let result = [];
+	getObjectsByProperty( name, value, result = [] ) {
 
 		if ( this[ name ] === value ) result.push( this );
 
-		for ( let i = 0, l = this.children.length; i < l; i ++ ) {
+		const children = this.children;
 
-			const childResult = this.children[ i ].getObjectsByProperty( name, value );
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			if ( childResult.length > 0 ) {
-
-				result = result.concat( childResult );
-
-			}
+			children[ i ].getObjectsByProperty( name, value, result );
 
 		}
 
@@ -723,11 +721,12 @@ class Object3D extends EventDispatcher {
 
 			object.type = 'BatchedMesh';
 			object.perObjectFrustumCulled = this.perObjectFrustumCulled;
+			object.sortObjects = this.sortObjects;
 
 			object.drawRanges = this._drawRanges;
 			object.reservedRanges = this._reservedRanges;
 
-			object.visible = this._visible;
+			object.visibility = this._visibility;
 			object.active = this._active;
 			object.bounds = this._bounds.map( bound => ( {
 				boxInitialized: bound.boxInitialized,
@@ -746,7 +745,7 @@ class Object3D extends EventDispatcher {
 			object.geometryInitialized = this._geometryInitialized;
 			object.geometryCount = this._geometryCount;
 
-			object.matricesTexture = this._matricesTexture.toJSON();
+			object.matricesTexture = this._matricesTexture.toJSON( meta );
 
 			if ( this.boundingSphere !== null ) {
 
@@ -968,9 +967,9 @@ class Object3D extends EventDispatcher {
 		this.matrixWorld.copy( source.matrixWorld );
 
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
-		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
 		this.matrixWorldAutoUpdate = source.matrixWorldAutoUpdate;
+		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
 		this.layers.mask = source.layers.mask;
 		this.visible = source.visible;

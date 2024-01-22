@@ -6,7 +6,8 @@ import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
 import ParameterNode from './ParameterNode.js';
-import { createNodeMaterialFromType } from '../materials/NodeMaterial.js';
+import FunctionNode from '../code/FunctionNode.js';
+import { createNodeMaterialFromType, default as NodeMaterial } from '../materials/NodeMaterial.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import {
@@ -18,8 +19,6 @@ import { REVISION, RenderTarget, NoColorSpace, LinearEncoding, sRGBEncoding, SRG
 
 import { stack } from './StackNode.js';
 import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
-
-import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
@@ -43,8 +42,6 @@ const typeFromArray = new Map( [
 	[ Uint32Array, 'uint' ],
 	[ Float32Array, 'float' ]
 ] );
-
-const isNonPaddingElementArray = new Set( [ Int32Array, Uint32Array, Float32Array ] );
 
 const toFloat = ( value ) => {
 
@@ -97,10 +94,11 @@ class NodeBuilder {
 		this.stacks = [];
 		this.tab = '\t';
 
+		this.currentFunctionNode = null;
+
 		this.context = {
 			keywords: new NodeKeywords(),
-			material: this.material,
-			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => levelNode.mul( maxMipLevel( textureNode ) )
+			material: this.material
 		};
 
 		this.cache = new NodeCache();
@@ -335,20 +333,19 @@ class NodeBuilder {
 
 	}
 
-	getTexture( /* texture, textureProperty, uvSnippet */ ) {
+	generateTexture( /* texture, textureProperty, uvSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
-	getTextureLevel( /* texture, textureProperty, uvSnippet, levelSnippet */ ) {
+	generateTextureLod( /* texture, textureProperty, uvSnippet, levelSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
-	// @TODO: rename to .generateConst()
-	getConst( type, value = null ) {
+	generateConst( type, value = null ) {
 
 		if ( value === null ) {
 
@@ -371,23 +368,23 @@ class NodeBuilder {
 
 		const componentType = this.getComponentType( type );
 
-		const getConst = value => this.getConst( componentType, value );
+		const generateConst = value => this.generateConst( componentType, value );
 
 		if ( typeLength === 2 ) {
 
-			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) } )`;
+			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) } )`;
 
 		} else if ( typeLength === 3 ) {
 
-			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) }, ${ getConst( value.z ) } )`;
+			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) }, ${ generateConst( value.z ) } )`;
 
 		} else if ( typeLength === 4 ) {
 
-			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) }, ${ getConst( value.z ) }, ${ getConst( value.w ) } )`;
+			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) }, ${ generateConst( value.z ) }, ${ generateConst( value.w ) } )`;
 
 		} else if ( typeLength > 4 && value && ( value.isMatrix3 || value.isMatrix4 ) ) {
 
-			return `${ this.getType( type ) }( ${ value.elements.map( getConst ).join( ', ' ) } )`;
+			return `${ this.getType( type ) }( ${ value.elements.map( generateConst ).join( ', ' ) } )`;
 
 		} else if ( typeLength > 4 ) {
 
@@ -465,7 +462,7 @@ class NodeBuilder {
 
 	isReference( type ) {
 
-		return type === 'void' || type === 'property' || type === 'sampler' || type === 'texture' || type === 'cubeTexture';
+		return type === 'void' || type === 'property' || type === 'sampler' || type === 'texture' || type === 'cubeTexture' || type === 'storageTexture';
 
 	}
 
@@ -526,7 +523,7 @@ class NodeBuilder {
 	getVectorType( type ) {
 
 		if ( type === 'color' ) return 'vec3';
-		if ( type === 'texture' ) return 'vec4';
+		if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' ) return 'vec4';
 
 		return type;
 
@@ -556,7 +553,7 @@ class NodeBuilder {
 		if ( attribute.isInterleavedBufferAttribute ) dataAttribute = attribute.data;
 
 		const array = dataAttribute.array;
-		const itemSize = isNonPaddingElementArray.has( array.constructor ) ? attribute.itemSize : dataAttribute.stride || attribute.itemSize;
+		const itemSize = attribute.itemSize;
 		const normalized = attribute.normalized;
 
 		let arrayType;
@@ -629,9 +626,9 @@ class NodeBuilder {
 
 	}
 
-	getDataFromNode( node, shaderStage = this.shaderStage ) {
+	getDataFromNode( node, shaderStage = this.shaderStage, cache = null ) {
 
-		const cache = node.isGlobal( this ) ? this.globalCache : this.cache;
+		cache = cache === null ? ( node.isGlobal( this ) ? this.globalCache : this.cache ) : cache;
 
 		let nodeData = cache.getNodeData( node );
 
@@ -700,7 +697,7 @@ class NodeBuilder {
 
 	getUniformFromNode( node, type, shaderStage = this.shaderStage, name = null ) {
 
-		const nodeData = this.getDataFromNode( node, shaderStage );
+		const nodeData = this.getDataFromNode( node, shaderStage, this.globalCache );
 
 		let nodeUniform = nodeData.uniform;
 
@@ -744,7 +741,7 @@ class NodeBuilder {
 
 	}
 
-	getVaryingFromNode( node, type ) {
+	getVaryingFromNode( node, name = null, type = node.getNodeType( this ) ) {
 
 		const nodeData = this.getDataFromNode( node, 'any' );
 
@@ -755,7 +752,9 @@ class NodeBuilder {
 			const varyings = this.varyings;
 			const index = varyings.length;
 
-			nodeVarying = new NodeVarying( 'nodeVarying' + index, type );
+			if ( name === null ) name = 'nodeVarying' + index;
+
+			nodeVarying = new NodeVarying( name, type );
 
 			varyings.push( nodeVarying );
 
@@ -850,6 +849,22 @@ class NodeBuilder {
 
 	}
 
+	buildFunctionNode( shaderNode ) {
+
+		const fn = new FunctionNode();
+
+		const previous = this.currentFunctionNode;
+
+		this.currentFunctionNode = fn;
+
+		fn.code = this.buildFunctionCode( shaderNode );
+
+		this.currentFunctionNode = previous;
+
+		return fn;
+
+	}
+
 	flowShaderNode( shaderNode ) {
 
 		const layout = shaderNode.layout;
@@ -919,6 +934,12 @@ class NodeBuilder {
 		this.setBuildStage( previousBuildStage );
 
 		return flow;
+
+	}
+
+	getFunctionOperator() {
+
+		return null;
 
 	}
 
@@ -1068,7 +1089,23 @@ class NodeBuilder {
 
 	}
 
-	build() {
+	build( convertMaterial = true ) {
+
+		const { object, material } = this;
+
+		if ( convertMaterial ) {
+
+			if ( material !== null ) {
+
+				NodeMaterial.fromMaterial( material ).build( this );
+
+			} else {
+
+				this.addFlow( 'compute', object );
+
+			}
+
+		}
 
 		// setup() -> stage 1: create possible new nodes and returns an output reference node
 		// analyze()   -> stage 2: analyze nodes to possible optimization and validation
@@ -1134,7 +1171,7 @@ class NodeBuilder {
 
 	}
 
-	createNodeMaterial( type ) {
+	createNodeMaterial( type = 'NodeMaterial' ) {
 
 		return createNodeMaterialFromType( type );
 

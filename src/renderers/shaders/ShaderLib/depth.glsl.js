@@ -17,6 +17,7 @@ void main() {
 
 	#include <uv_vertex>
 
+	#include <batching_vertex>
 	#include <skinbase_vertex>
 
 	#ifdef USE_DISPLACEMENTMAP
@@ -61,9 +62,8 @@ varying vec2 vHighPrecisionZW;
 
 void main() {
 
-	#include <clipping_planes_fragment>
-
 	vec4 diffuseColor = vec4( 1.0 );
+	#include <clipping_planes_fragment>
 
 	#if DEPTH_PACKING == 3200
 

@@ -17,7 +17,7 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 		this.isMeshNormalNodeMaterial = true;
 
-		this.colorSpace = false;
+		this.colorSpaced = false;
 
 		this.setDefaultValues( defaultValues );
 

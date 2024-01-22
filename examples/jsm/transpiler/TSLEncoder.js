@@ -1,6 +1,6 @@
 import { REVISION } from 'three';
 import { VariableDeclaration, Accessor } from './AST.js';
-import * as Nodes from 'three/nodes';
+import * as Nodes from '../nodes/Nodes.js';
 
 const opLib = {
 	'=': 'assign',
@@ -27,7 +27,7 @@ const opLib = {
 	'*=': 'mulAssign',
 	'/=': 'divAssign',
 	'%=': 'remainderAssign',
-	'^=': 'xorAssign',
+	'^=': 'bitXorAssign',
 	'&=': 'bitAndAssign',
 	'|=': 'bitOrAssign',
 	'<<=': 'shiftLeftAssign',
@@ -51,10 +51,12 @@ class TSLEncoder {
 
 		this.tab = '';
 		this.imports = new Set();
-		this.functions = new Set();
+		this.global = new Set();
+		this.overloadings = new Map();
 		this.layoutsCode = '';
 		this.iife = false;
 		this.uniqueNames = false;
+		this.reference = false;
 
 		this._currentProperties = {};
 		this._lastStatement = null;
@@ -67,7 +69,7 @@ class TSLEncoder {
 
 		name = name.split( '.' )[ 0 ];
 
-		if ( Nodes[ name ] !== undefined && this.functions.has( name ) === false && this._currentProperties[ name ] === undefined ) {
+		if ( Nodes[ name ] !== undefined && this.global.has( name ) === false && this._currentProperties[ name ] === undefined ) {
 
 			this.imports.add( name );
 
@@ -75,9 +77,44 @@ class TSLEncoder {
 
 	}
 
+	emitUniform( node ) {
+
+		let code = `const ${ node.name } = `;
+
+		if ( this.reference === true ) {
+
+			this.addImport( 'reference' );
+
+			this.global.add( node.name );
+
+			//code += `reference( '${ node.name }', '${ node.type }', uniforms )`;
+
+			// legacy
+			code += `reference( 'value', '${ node.type }', uniforms[ '${ node.name }' ] )`;
+
+		} else {
+
+			this.addImport( 'uniform' );
+
+			this.global.add( node.name );
+
+			code += `uniform( '${ node.type }' )`;
+
+		}
+
+		return code;
+
+	}
+
 	emitExpression( node ) {
 
 		let code;
+
+		/*@TODO: else if ( node.isVarying ) {
+
+			code = this.emitVarying( node );
+
+		}*/
 
 		if ( node.isAccessor ) {
 
@@ -98,6 +135,10 @@ class TSLEncoder {
 				code = node.value;
 
 			}
+
+		} else if ( node.isString ) {
+
+			code = '\'' + node.value + '\'';
 
 		} else if ( node.isOperator ) {
 
@@ -194,6 +235,10 @@ class TSLEncoder {
 
 			code = this.emitVariables( node );
 
+		} else if ( node.isUniform ) {
+
+			code = this.emitUniform( node );
+
 		} else if ( node.isTernary ) {
 
 			code = this.emitTernary( node );
@@ -204,7 +249,7 @@ class TSLEncoder {
 
 		} else if ( node.isUnary && node.expression.isNumber ) {
 
-			code = node.type + node.expression.value;
+			code = node.type + ' ' + node.expression.value;
 
 		} else if ( node.isUnary ) {
 
@@ -232,7 +277,7 @@ class TSLEncoder {
 
 		} else {
 
-			console.error( 'Unknown node type', node );
+			console.warn( 'Unknown node type', node );
 
 		}
 
@@ -291,7 +336,7 @@ class TSLEncoder {
 
 		let ifStr = `If( ${ condStr }, () => {
 
-${ bodyStr } 
+${ bodyStr }
 
 ${ this.tab }} )`;
 
@@ -305,7 +350,7 @@ ${ this.tab }} )`;
 
 				const elseCondStr = this.emitExpression( current.elseConditional.cond );
 
-				ifStr += `.elseif( ( ${ elseCondStr } ) => {
+				ifStr += `.elseif( ${ elseCondStr }, () => {
 
 ${ elseBodyStr }
 
@@ -449,6 +494,18 @@ ${ this.tab }} )`;
 
 	}
 
+	/*emitVarying( node ) { }*/
+
+	emitOverloadingFunction( nodes ) {
+
+		const { name } = nodes[ 0 ];
+
+		this.addImport( 'overloadingFn' );
+
+		return `const ${ name } = overloadingFn( [ ${ nodes.map( node => node.name + '_' + nodes.indexOf( node ) ).join( ', ' ) } ] );\n`;
+
+	}
+
 	emitFunction( node ) {
 
 		const { name, type } = node;
@@ -503,7 +560,30 @@ ${ this.tab }} )`;
 		const paramsStr = params.length > 0 ? ' [ ' + params.join( ', ' ) + ' ] ' : '';
 		const bodyStr = this.emitBody( node.body );
 
-		const funcStr = `const ${ name } = tslFn( (${ paramsStr }) => {
+		let fnName = name;
+		let overloadingNodes = null;
+
+		if ( this.overloadings.has( name ) ) {
+
+			const overloadings = this.overloadings.get( name );
+
+			if ( overloadings.length > 1 ) {
+
+				const index = overloadings.indexOf( node );
+
+				fnName += '_' + index;
+
+				if ( index === overloadings.length - 1 ) {
+
+					overloadingNodes = overloadings;
+
+				}
+
+			}
+
+		}
+
+		let funcStr = `const ${ fnName } = tslFn( (${ paramsStr }) => {
 
 ${ bodyStr }
 
@@ -513,9 +593,9 @@ ${ this.tab }} );\n`;
 
 		if ( node.layout !== false && hasPointer === false ) {
 
-			const uniqueName = this.uniqueNames ? name + '_' + Math.random().toString( 36 ).slice( 2 ) : name;
+			const uniqueName = this.uniqueNames ? fnName + '_' + Math.random().toString( 36 ).slice( 2 ) : fnName;
 
-			this.layoutsCode += `${ this.tab + name }.setLayout( {
+			this.layoutsCode += `${ this.tab + fnName }.setLayout( {
 ${ this.tab }\tname: '${ uniqueName }',
 ${ this.tab }\ttype: '${ type }',
 ${ this.tab }\tinputs: [${ layoutInput }]
@@ -525,7 +605,13 @@ ${ this.tab }} );\n\n`;
 
 		this.imports.add( 'tslFn' );
 
-		this.functions.add( node.name );
+		this.global.add( node.name );
+
+		if ( overloadingNodes !== null ) {
+
+			funcStr += '\n' + this.emitOverloadingFunction( overloadingNodes );
+
+		}
 
 		return funcStr;
 
@@ -560,6 +646,24 @@ ${ this.tab }} );\n\n`;
 
 		if ( this.iife ) this.tab += '\t';
 
+		const overloadings = this.overloadings;
+
+		for ( const statement of ast.body ) {
+
+			if ( statement.isFunctionDeclaration ) {
+
+				if ( overloadings.has( statement.name ) === false ) {
+
+					overloadings.set( statement.name, [] );
+
+				}
+
+				overloadings.get( statement.name ).push( statement );
+
+			}
+
+		}
+
 		for ( const statement of ast.body ) {
 
 			code += this.emitExtraLine( statement );
@@ -579,7 +683,7 @@ ${ this.tab }} );\n\n`;
 		}
 
 		const imports = [ ...this.imports ];
-		const functions = [ ...this.functions ];
+		const exports = [ ...this.global ];
 
 		const layouts = this.layoutsCode.length > 0 ? `\n${ this.tab }// layouts\n\n` + this.layoutsCode : '';
 
@@ -588,17 +692,17 @@ ${ this.tab }} );\n\n`;
 
 		if ( this.iife ) {
 
-			header += '( function ( TSL ) {\n\n';
+			header += '( function ( TSL, uniforms ) {\n\n';
 
 			header += imports.length > 0 ? '\tconst { ' + imports.join( ', ' ) + ' } = TSL;\n' : '';
-			footer += functions.length > 0 ? '\treturn { ' + functions.join( ', ' ) + ' };\n' : '';
+			footer += exports.length > 0 ? '\treturn { ' + exports.join( ', ' ) + ' };\n' : '';
 
 			footer += '\n} );';
 
 		} else {
 
 			header += imports.length > 0 ? 'import { ' + imports.join( ', ' ) + ' } from \'three/nodes\';\n' : '';
-			footer += functions.length > 0 ? 'export { ' + functions.join( ', ' ) + ' };\n' : '';
+			footer += exports.length > 0 ? 'export { ' + exports.join( ', ' ) + ' };\n' : '';
 
 		}
 

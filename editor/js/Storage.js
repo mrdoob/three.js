@@ -1,6 +1,6 @@
 function Storage() {
 
-	const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+	const indexedDB = window.indexedDB;
 
 	if ( indexedDB === undefined ) {
 

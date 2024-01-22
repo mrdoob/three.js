@@ -1,12 +1,13 @@
 import {
 	Matrix4,
 	Vector2,
+	Vector3,
 } from 'three';
 
 /**
  * References:
- * https://github.com/0beqz/realism-effects
- * https://github.com/N8python/n8ao
+ * https://openaccess.thecvf.com/content/WACV2021/papers/Khademi_Self-Supervised_Poisson-Gaussian_Denoising_WACV_2021_paper.pdf
+ * https://arxiv.org/pdf/2206.01856.pdf
  */
 
 const PoissonDenoiseShader = {
@@ -15,7 +16,7 @@ const PoissonDenoiseShader = {
 
 	defines: {
 		'SAMPLES': 16,
-		'SAMPLE_VECTORS': generatePdSamplePointInitializer( 16, 4 ),
+		'SAMPLE_VECTORS': generatePdSamplePointInitializer( 16, 2, 1 ),
 		'NORMAL_VECTOR_TYPE': 1,
 		'DEPTH_VALUE_SOURCE': 0,
 	},
@@ -30,7 +31,7 @@ const PoissonDenoiseShader = {
 		'lumaPhi': { value: 5. },
 		'depthPhi': { value: 5. },
 		'normalPhi': { value: 5. },
-		'radius': { value: 10. },
+		'radius': { value: 4. },
 		'index': { value: 0 }
 	},
 
@@ -39,11 +40,8 @@ const PoissonDenoiseShader = {
 		varying vec2 vUv;
 
 		void main() {
-
 			vUv = uv;
-
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
 		}`,
 
 	fragmentShader: /* glsl */`
@@ -77,7 +75,7 @@ const PoissonDenoiseShader = {
 			return SAMPLE_LUMINANCE;
 		}
 
-		const vec2 poissonDisk[SAMPLES] = SAMPLE_VECTORS;
+		const vec3 poissonDisk[SAMPLES] = SAMPLE_VECTORS;
 
 		vec3 getViewPosition(const in vec2 screenPosition, const in float depth) {
 			vec4 clipSpacePosition = vec4(vec3(screenPosition, depth) * 2.0 - 1.0, 1.0);
@@ -134,9 +132,24 @@ const PoissonDenoiseShader = {
 			return computeNormalFromDepth(uv);
 		#endif
 		}
+
+		void denoiseSample(in vec3 center, in vec3 viewNormal, in vec3 viewPos, in vec2 sampleUv, inout vec3 denoised, inout float totalWeight) {
+			vec4 sampleTexel = textureLod(tDiffuse, sampleUv, 0.0);
+			float sampleDepth = getDepth(sampleUv);
+			vec3 sampleNormal = getViewNormal(sampleUv);
+			vec3 neighborColor = sampleTexel.rgb;
+			vec3 viewPosSample = getViewPosition(sampleUv, sampleDepth);
+			
+			float normalDiff = dot(viewNormal, sampleNormal);
+			float normalSimilarity = pow(max(normalDiff, 0.), normalPhi);
+			float lumaDiff = abs(getLuminance(neighborColor) - getLuminance(center));
+			float lumaSimilarity = max(1.0 - lumaDiff / lumaPhi, 0.0);
+			float depthDiff = abs(dot(viewPos - viewPosSample, viewNormal));
+			float depthSimilarity = max(1. - depthDiff / depthPhi, 0.);
+			float w = lumaSimilarity * depthSimilarity * normalSimilarity;
 		
-		float distToPlane(const vec3 viewPos, const vec3 neighborViewPos, const vec3 viewNormal) {
-			return abs(dot(viewPos - neighborViewPos, viewNormal));
+			denoised += w * neighborColor;
+			totalWeight += w;
 		}
 		
 		void main() {
@@ -147,41 +160,22 @@ const PoissonDenoiseShader = {
 				return;
 			}
 			vec4 texel = textureLod(tDiffuse, vUv, 0.0);
-			vec3 denoised = texel.rgb;
 			vec3 center = texel.rgb;
 			vec3 viewPos = getViewPosition(vUv, depth);
 
 			vec2 noiseResolution = vec2(textureSize(tNoise, 0));
 			vec2 noiseUv = vUv * resolution / noiseResolution;
 			vec4 noiseTexel = textureLod(tNoise, noiseUv, 0.0);
-      		//vec2 noiseVec = normalize((index % 2 == 0 ? noiseTexel.xy : noiseTexel.yz) * 2.0 - 1.0);
-			vec2 noiseVec = vec2(sin(noiseTexel[index % 4] * 2. * PI), cos(noiseTexel[index % 4] * 2. * PI));
+      		vec2 noiseVec = vec2(sin(noiseTexel[index % 4] * 2. * PI), cos(noiseTexel[index % 4] * 2. * PI));
     		mat2 rotationMatrix = mat2(noiseVec.x, -noiseVec.y, noiseVec.x, noiseVec.y);
 		
 			float totalWeight = 1.0;
+			vec3 denoised = texel.rgb;
 			for (int i = 0; i < SAMPLES; i++) {
-				vec2 offset = rotationMatrix * (poissonDisk[i] * radius / resolution);
+				vec3 sampleDir = poissonDisk[i];
+				vec2 offset = rotationMatrix * (sampleDir.xy * (1. + sampleDir.z * (radius - 1.)) / resolution);
 				vec2 sampleUv = vUv + offset;
-				vec4 sampleTexel = textureLod(tDiffuse, sampleUv, 0.0);
-				float sampleDepth = getDepth(sampleUv);
-				vec3 sampleNormal = getViewNormal(sampleUv);
-				vec3 neighborColor = sampleTexel.rgb;
-		
-				vec3 viewPosSample = getViewPosition(sampleUv, sampleDepth);
-				
-				float normalDiff = dot(viewNormal, sampleNormal);
-				float normalSimilarity = pow(max(normalDiff, 0.), normalPhi);
-		
-				float lumaDiff = abs(getLuminance(neighborColor) - getLuminance(center));
-				float lumaSimilarity = max(1.0 - lumaDiff / lumaPhi, 0.0);
-		
-				float depthDiff = 1. - distToPlane(viewPos, viewPosSample, viewNormal);
-				float depthSimilarity = max(depthDiff / depthPhi, 0.);
-		
-				float w = lumaSimilarity * depthSimilarity * normalSimilarity;
-		
-				denoised += w * neighborColor;
-				totalWeight += w;
+				denoiseSample(center, viewNormal, viewPos, sampleUv, denoised, totalWeight);
 			}
 		
 			if (totalWeight > 0.) { 
@@ -192,52 +186,36 @@ const PoissonDenoiseShader = {
 
 };
 
-function generatePdSamplePointInitializer( samples, rings ) {
+function generatePdSamplePointInitializer( samples, rings, radiusExponent ) {
 
 	const poissonDisk = generateDenoiseSamples(
 		samples,
 		rings,
-
+		radiusExponent,
 	);
 
-	let glslCode = 'vec2[SAMPLES](';
+	let glslCode = 'vec3[SAMPLES](';
 
 	for ( let i = 0; i < samples; i ++ ) {
 
 		const sample = poissonDisk[ i ];
-		glslCode += `vec2(${sample.x}, ${sample.y})`;
-
-		if ( i < samples - 1 ) {
-
-			glslCode += ',';
-
-		}
+		glslCode += `vec3(${sample.x}, ${sample.y}, ${sample.z})${( i < samples - 1 ) ? ',' : ')'}`;
 
 	}
-
-	glslCode += ')';
 
 	return glslCode;
 
 }
 
-function generateDenoiseSamples( numSamples, numRings ) {
+function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
 
-	const angleStep = ( 2 * Math.PI * numRings ) / numSamples;
-	const invNumSamples = 1.0 / numSamples;
-	const radiusStep = invNumSamples;
 	const samples = [];
-	let radius = invNumSamples;
-	let angle = 0;
 
 	for ( let i = 0; i < numSamples; i ++ ) {
 
-		const v = new Vector2( Math.cos( angle ), Math.sin( angle ) )
-			.multiplyScalar( Math.pow( radius, 0.75 ) );
-
-		samples.push( v );
-		radius += radiusStep;
-		angle += angleStep;
+		const angle = 2 * Math.PI * numRings * i / numSamples;
+		const radius = Math.pow( i / ( numSamples - 1 ), radiusExponent );
+		samples.push( new Vector3( Math.cos( angle ), Math.sin( angle ), radius ) );
 
 	}
 

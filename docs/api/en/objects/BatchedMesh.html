@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Mesh] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A special version of [page:Mesh] with multi draw batch rendering support. Use
+			[name] if you have to render a large number of objects with the same
+			material but with different world transformations and geometry. The usage
+			of [name] will help you to reduce the number of draw calls and thus
+			improve the overall rendering performance in your application.
+
+			<br/>
+			<br/>
+
+			If the [link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_multi_draw WEBGL_multi_draw extension] is
+			not supported then a less performant callback is used.
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const box = new THREE.BoxGeometry( 1, 1, 1 );
+		const sphere = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+
+		// initialize and add geometries into the batched mesh
+		const batchedMesh = new BatchedMesh( 10, 5000, 10000, material );
+		const boxId = batchedMesh.addGeometry( box );
+		const sphereId = batchedMesh.addGeometry( sphere );
+
+		// position the geometries
+		batchedMesh.setMatrixAt( boxId, boxMatrix );
+		batchedMesh.setMatrixAt( sphereId, sphereMatrix );
+
+		scene.add( batchedMesh );
+		</code>
+
+		<h2>Examples</h2>
+		<p>
+			[example:webgl_mesh_batch WebGL / mesh / batch]<br />
+		</p>
+
+		<h2>Constructor</h2>
+		<h3>
+			[name](
+				[param:Integer maxGeometryCount], [param:Integer maxVertexCount],
+				[param:Integer maxIndexCount], [param:Material material],
+			)
+		</h3>
+		<p>
+			[page:Integer maxGeometryCount] - the max number of individual geometries planned to be added.<br />
+			[page:Integer maxVertexCount] - the max number of vertices to be used by all geometries.<br />
+			[page:Integer maxIndexCount] - the max number of indices to be used by all geometries.<br />
+			[page:Material material] - an instance of [page:Material]. Default is a
+			new [page:MeshBasicMaterial].<br />
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Mesh] class for common properties.</p>
+
+		<h3>[property:Box3 boundingBox]</h3>
+		<p>
+			This bounding box encloses all instances of the [name]. Can be calculated
+			with [page:.computeBoundingBox](). Default is `null`.
+		</p>
+
+		<h3>[property:Sphere boundingSphere]</h3>
+		<p>
+			This bounding sphere encloses all instances of the [name]. Can be
+			calculated with [page:.computeBoundingSphere](). Default is `null`.
+		</p>
+
+		<h3>[property:Boolean perObjectFrustumCulled]</h3>
+		<p>
+			If true then the individual objects within the [name] are frustum culled. Default is `true`.
+		</p>
+
+		<h3>[property:Boolean sortObjects]</h3>
+		<p>
+			If true then the individual objects within the [name] are sorted to improve overdraw-related artifacts.
+			If the material is marked as "transparent" objects are rendered back to front and if not then they are
+			rendered front to back. Default is `true`.
+		</p>
+
+		<h3>[property:Integer maxGeometryCount]</h3>
+		<p>
+			The maximum number of individual geometries that can be stored in the [name]. Read only.
+		</p>
+
+		<h3>[property:Boolean isBatchedMesh]</h3>
+		<p>Read-only flag to check if a given object is of type [name].</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Mesh] class for common methods.</p>
+
+		<h3>[method:undefined computeBoundingBox]()</h3>
+		<p>
+			Computes the bounding box, updating [page:.boundingBox] attribute.<br />
+			Bounding boxes aren't computed by default. They need to be explicitly
+			computed, otherwise they are `null`.
+		</p>
+
+		<h3>[method:undefined computeBoundingSphere]()</h3>
+		<p>
+			Computes the bounding sphere, updating [page:.boundingSphere]
+			attribute.<br />
+			Bounding spheres aren't computed by default. They need to be explicitly
+			computed, otherwise they are `null`.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Frees the GPU-related resources allocated by this instance. Call this
+			method whenever this instance is no longer used in your app.
+		</p>
+
+		<h3>[method:this setCustomSort]( [param:Function sortFunction] )</h3>
+		<p>
+			Takes a sort a function that is run before render. The function takes a list of items to sort and a camera. The objects
+			in the list include a "z" field to perform a depth-ordered sort with.
+		</p>
+
+		<h3>
+			[method:Matrix4 getMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>
+			[page:Matrix4 matrix]: This 4x4 matrix will be set to the local
+			transformation matrix of the defined instance.
+		</p>
+		<p>Get the local transformation matrix of the defined instance.</p>
+
+		<h3>
+			[method:Boolean getVisibleAt]( [param:Integer index] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>Get whether the given instance is marked as "visible" or not.</p>
+
+		<h3>
+			[method:this setMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>
+			[page:Matrix4 matrix]: A 4x4 matrix representing the local transformation
+			of a single instance.
+		</p>
+		<p>
+			Sets the given local transformation matrix to the defined instance.
+		</p>
+
+		<h3>
+			[method:this setVisibleAt]( [param:Integer index], [param:Boolean visible] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>
+			[page:Boolean visible]: A boolean value indicating the visibility state.
+		</p>
+		<p>
+			Sets the visibility of the object at the given index.
+		</p>
+
+		<h3>
+			[method:Integer addGeometry]( [param:BufferGeometry geometry], [param:Integer reservedVertexRange], [param:Integer reservedIndexRange] )
+		</h3>
+		<p>
+			[page:BufferGeometry geometry]: The geometry to add into the [name].
+		</p>
+		<p>
+			[page:Integer reservedVertexRange]: Optional parameter specifying the amount of vertex buffer space to reserve for the added geometry. This
+			is necessary if it is planned to set a new geometry at this index at a later time that is larger than the original geometry. Defaults to
+			the length of the given geometry vertex buffer.
+		</p>
+		<p>
+			[page:Integer reservedIndexRange]: Optional parameter specifying the amount of index buffer space to reserve for the added geometry. This
+			is necessary if it is planned to set a new geometry at this index at a later time that is larger than the original geometry. Defaults to
+			the length of the given geometry index buffer.
+		</p>
+		<p>
+			Adds the given geometry to the [name] and returns the associated index referring to it.
+		</p>
+
+		<h3>
+			[method:Integer setGeometryAt]( [param:Integer index], [param:BufferGeometry geometry] )
+		</h3>
+		<p>
+			[page:Integer index]: Which geometry index to replace with this geometry.
+		</p>
+		<p>
+			[page:BufferGeometry geometry]: The geometry to substitute at the given geometry index.
+		</p>
+		<p>
+			Replaces the geometry at `index` with the provided geometry. Throws an error if there is not enough space reserved for geometry at the index.
+		</p>
+
+		<h3>
+			[method:this deleteGeometry]( [param:Integer index] )
+		</h3>
+		<p>
+			Marks the geometry at the given index as deleted and to not be rendered anymore.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

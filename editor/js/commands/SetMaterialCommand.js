@@ -27,14 +27,16 @@ class SetMaterialCommand extends Command {
 	execute() {
 
 		this.editor.setObjectMaterial( this.object, this.materialSlot, this.newMaterial );
-		this.editor.signals.materialChanged.dispatch( this.newMaterial );
+
+		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
 
 	}
 
 	undo() {
 
 		this.editor.setObjectMaterial( this.object, this.materialSlot, this.oldMaterial );
-		this.editor.signals.materialChanged.dispatch( this.oldMaterial );
+
+		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
 
 	}
 

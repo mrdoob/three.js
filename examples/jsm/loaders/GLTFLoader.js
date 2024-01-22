@@ -157,6 +157,12 @@ class GLTFLoader extends Loader {
 
 		this.register( function ( parser ) {
 
+			return new GLTFMaterialsBumpExtension( parser );
+
+		} );
+
+		this.register( function ( parser ) {
+
 			return new GLTFLightsExtension( parser );
 
 		} );
@@ -502,6 +508,7 @@ const EXTENSIONS = {
 	KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
 	KHR_MESH_QUANTIZATION: 'KHR_mesh_quantization',
 	KHR_MATERIALS_EMISSIVE_STRENGTH: 'KHR_materials_emissive_strength',
+	EXT_MATERIALS_BUMP: 'EXT_materials_bump',
 	EXT_TEXTURE_WEBP: 'EXT_texture_webp',
 	EXT_TEXTURE_AVIF: 'EXT_texture_avif',
 	EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression',
@@ -1212,6 +1219,61 @@ class GLTFMaterialsSpecularExtension {
 
 }
 
+
+/**
+ * Materials bump Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/EXT_materials_bump
+ */
+class GLTFMaterialsBumpExtension {
+
+	constructor( parser ) {
+
+		this.parser = parser;
+		this.name = EXTENSIONS.EXT_MATERIALS_BUMP;
+
+	}
+
+	getMaterialType( materialIndex ) {
+
+		const parser = this.parser;
+		const materialDef = parser.json.materials[ materialIndex ];
+
+		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) return null;
+
+		return MeshPhysicalMaterial;
+
+	}
+
+	extendMaterialParams( materialIndex, materialParams ) {
+
+		const parser = this.parser;
+		const materialDef = parser.json.materials[ materialIndex ];
+
+		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) {
+
+			return Promise.resolve();
+
+		}
+
+		const pending = [];
+
+		const extension = materialDef.extensions[ this.name ];
+
+		materialParams.bumpScale = extension.bumpFactor !== undefined ? extension.bumpFactor : 1.0;
+
+		if ( extension.bumpTexture !== undefined ) {
+
+			pending.push( parser.assignTexture( materialParams, 'bumpMap', extension.bumpTexture ) );
+
+		}
+
+		return Promise.all( pending );
+
+	}
+
+}
+
 /**
  * Materials anisotropy Extension
  *
@@ -1866,7 +1928,7 @@ class GLTFDracoMeshCompressionExtension {
 
 		return parser.getDependency( 'bufferView', bufferViewIndex ).then( function ( bufferView ) {
 
-			return new Promise( function ( resolve ) {
+			return new Promise( function ( resolve, reject ) {
 
 				dracoLoader.decodeDracoFile( bufferView, function ( geometry ) {
 
@@ -1881,7 +1943,7 @@ class GLTFDracoMeshCompressionExtension {
 
 					resolve( geometry );
 
-				}, threeAttributeMap, attributeTypeMap );
+				}, threeAttributeMap, attributeTypeMap, LinearSRGBColorSpace, reject );
 
 			} );
 

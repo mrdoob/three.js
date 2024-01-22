@@ -32,52 +32,52 @@ const FXAAShader = {
 
 		}`,
 
-	fragmentShader: `
-	precision highp float;
+	fragmentShader: /* glsl */`
+		precision highp float;
 
-	uniform sampler2D tDiffuse;
+		uniform sampler2D tDiffuse;
 
-	uniform vec2 resolution;
+		uniform vec2 resolution;
 
-	varying vec2 vUv;
+		varying vec2 vUv;
 
-	// FXAA 3.11 implementation by NVIDIA, ported to WebGL by Agost Biro (biro@archilogic.com)
+		// FXAA 3.11 implementation by NVIDIA, ported to WebGL by Agost Biro (biro@archilogic.com)
 
-	//----------------------------------------------------------------------------------
-	// File:        es3-kepler\FXAA\assets\shaders/FXAA_DefaultES.frag
-	// SDK Version: v3.00
-	// Email:       gameworks@nvidia.com
-	// Site:        http://developer.nvidia.com/
-	//
-	// Copyright (c) 2014-2015, NVIDIA CORPORATION. All rights reserved.
-	//
-	// Redistribution and use in source and binary forms, with or without
-	// modification, are permitted provided that the following conditions
-	// are met:
-	//  * Redistributions of source code must retain the above copyright
-	//    notice, this list of conditions and the following disclaimer.
-	//  * Redistributions in binary form must reproduce the above copyright
-	//    notice, this list of conditions and the following disclaimer in the
-	//    documentation and/or other materials provided with the distribution.
-	//  * Neither the name of NVIDIA CORPORATION nor the names of its
-	//    contributors may be used to endorse or promote products derived
-	//    from this software without specific prior written permission.
-	//
-	// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
-	// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-	// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-	// PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-	// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-	// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-	// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-	// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-	// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-	// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-	// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-	//
-	//----------------------------------------------------------------------------------
+		//----------------------------------------------------------------------------------
+		// File:        es3-kepler\FXAA\assets\shaders/FXAA_DefaultES.frag
+		// SDK Version: v3.00
+		// Email:       gameworks@nvidia.com
+		// Site:        http://developer.nvidia.com/
+		//
+		// Copyright (c) 2014-2015, NVIDIA CORPORATION. All rights reserved.
+		//
+		// Redistribution and use in source and binary forms, with or without
+		// modification, are permitted provided that the following conditions
+		// are met:
+		//  * Redistributions of source code must retain the above copyright
+		//    notice, this list of conditions and the following disclaimer.
+		//  * Redistributions in binary form must reproduce the above copyright
+		//    notice, this list of conditions and the following disclaimer in the
+		//    documentation and/or other materials provided with the distribution.
+		//  * Neither the name of NVIDIA CORPORATION nor the names of its
+		//    contributors may be used to endorse or promote products derived
+		//    from this software without specific prior written permission.
+		//
+		// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
+		// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+		// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+		// PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+		// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+		// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+		// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+		// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+		// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+		// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+		// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+		//
+		//----------------------------------------------------------------------------------
 
-	#ifndef FXAA_DISCARD
+		#ifndef FXAA_DISCARD
 			//
 			// Only valid for PC OpenGL currently.
 			// Probably will not work when FXAA_GREEN_AS_LUMA = 1.
@@ -87,35 +87,35 @@ const FXAAShader = {
 			// 0 = Return unchanged color on pixels which don't need AA.
 			//
 			#define FXAA_DISCARD 0
-	#endif
+		#endif
 
-	/*--------------------------------------------------------------------------*/
-	#define FxaaTexTop(t, p) texture2D(t, p, -100.0)
-	#define FxaaTexOff(t, p, o, r) texture2D(t, p + (o * r), -100.0)
-	/*--------------------------------------------------------------------------*/
+		/*--------------------------------------------------------------------------*/
+		#define FxaaTexTop(t, p) texture2D(t, p, -100.0)
+		#define FxaaTexOff(t, p, o, r) texture2D(t, p + (o * r), -100.0)
+		/*--------------------------------------------------------------------------*/
 
-	#define NUM_SAMPLES 5
+		#define NUM_SAMPLES 5
 
-	// assumes colors have premultipliedAlpha, so that the calculated color contrast is scaled by alpha
-	float contrast( vec4 a, vec4 b ) {
+		// assumes colors have premultipliedAlpha, so that the calculated color contrast is scaled by alpha
+		float contrast( vec4 a, vec4 b ) {
 			vec4 diff = abs( a - b );
 			return max( max( max( diff.r, diff.g ), diff.b ), diff.a );
-	}
+		}
 
-	/*============================================================================
+		/*============================================================================
 
 									FXAA3 QUALITY - PC
 
-	============================================================================*/
+		============================================================================*/
 
-	/*--------------------------------------------------------------------------*/
-	vec4 FxaaPixelShader(
+		/*--------------------------------------------------------------------------*/
+		vec4 FxaaPixelShader(
 			vec2 posM,
 			sampler2D tex,
 			vec2 fxaaQualityRcpFrame,
 			float fxaaQualityEdgeThreshold,
 			float fxaaQualityinvEdgeThreshold
-	) {
+		) {
 			vec4 rgbaM = FxaaTexTop(tex, posM);
 			vec4 rgbaS = FxaaTexOff(tex, posM, vec2( 0.0, 1.0), fxaaQualityRcpFrame.xy);
 			vec4 rgbaE = FxaaTexOff(tex, posM, vec2( 1.0, 0.0), fxaaQualityRcpFrame.xy);
@@ -136,9 +136,9 @@ const FXAAShader = {
 			// . 0 .
 
 			#if (FXAA_DISCARD == 1)
-					if(earlyExit) FxaaDiscard;
+				if(earlyExit) FxaaDiscard;
 			#else
-					if(earlyExit) return rgbaM;
+				if(earlyExit) return rgbaM;
 			#endif
 
 			float contrastN = contrast( rgbaM, rgbaN );
@@ -156,46 +156,46 @@ const FXAAShader = {
 
 			// 45 deg edge detection and corners of objects, aka V/H contrast is too similar
 			if( abs( relativeVContrast ) < .3 ) {
-					// locate the edge
-					vec2 dirToEdge;
-					dirToEdge.x = contrastE > contrastW ? 1. : -1.;
-					dirToEdge.y = contrastS > contrastN ? 1. : -1.;
-					// . 2 .      . 1 .
-					// 1 0 2  ~=  0 0 1
-					// . 1 .      . 0 .
+				// locate the edge
+				vec2 dirToEdge;
+				dirToEdge.x = contrastE > contrastW ? 1. : -1.;
+				dirToEdge.y = contrastS > contrastN ? 1. : -1.;
+				// . 2 .      . 1 .
+				// 1 0 2  ~=  0 0 1
+				// . 1 .      . 0 .
 
-					// tap 2 pixels and see which ones are "outside" the edge, to
-					// determine if the edge is vertical or horizontal
+				// tap 2 pixels and see which ones are "outside" the edge, to
+				// determine if the edge is vertical or horizontal
 
-					vec4 rgbaAlongH = FxaaTexOff(tex, posM, vec2( dirToEdge.x, -dirToEdge.y ), fxaaQualityRcpFrame.xy);
-					float matchAlongH = contrast( rgbaM, rgbaAlongH );
-					// . 1 .
+				vec4 rgbaAlongH = FxaaTexOff(tex, posM, vec2( dirToEdge.x, -dirToEdge.y ), fxaaQualityRcpFrame.xy);
+				float matchAlongH = contrast( rgbaM, rgbaAlongH );
+				// . 1 .
+				// 0 0 1
+				// . 0 H
+
+				vec4 rgbaAlongV = FxaaTexOff(tex, posM, vec2( -dirToEdge.x, dirToEdge.y ), fxaaQualityRcpFrame.xy);
+				float matchAlongV = contrast( rgbaM, rgbaAlongV );
+				// V 1 .
+				// 0 0 1
+				// . 0 .
+
+				relativeVContrast = matchAlongV - matchAlongH;
+				relativeVContrast *= fxaaQualityinvEdgeThreshold;
+
+				if( abs( relativeVContrast ) < .3 ) { // 45 deg edge
+					// 1 1 .
 					// 0 0 1
-					// . 0 H
+					// . 0 1
 
-					vec4 rgbaAlongV = FxaaTexOff(tex, posM, vec2( -dirToEdge.x, dirToEdge.y ), fxaaQualityRcpFrame.xy);
-					float matchAlongV = contrast( rgbaM, rgbaAlongV );
-					// V 1 .
-					// 0 0 1
-					// . 0 .
+					// do a simple blur
+					return mix(
+						rgbaM,
+						(rgbaN + rgbaS + rgbaE + rgbaW) * .25,
+						.4
+					);
+				}
 
-					relativeVContrast = matchAlongV - matchAlongH;
-					relativeVContrast *= fxaaQualityinvEdgeThreshold;
-
-					if( abs( relativeVContrast ) < .3 ) { // 45 deg edge
-							// 1 1 .
-							// 0 0 1
-							// . 0 1
-
-							// do a simple blur
-							return mix(
-									rgbaM,
-									(rgbaN + rgbaS + rgbaE + rgbaW) * .25,
-									.4
-							);
-					}
-
-					horzSpan = relativeVContrast > 0.;
+				horzSpan = relativeVContrast > 0.;
 			}
 
 			if(!horzSpan) rgbaN = rgbaW;
@@ -224,35 +224,35 @@ const FXAAShader = {
 			int iterationsUsedN = 0;
 			int iterationsUsedP = 0;
 			for( int i = 0; i < NUM_SAMPLES; i++ ) {
-					iterationsUsed = i;
+				iterationsUsed = i;
 
-					float increment = float(i + 1);
+				float increment = float(i + 1);
 
-					if(!doneN) {
-							nDist += increment;
-							posN = posM + offNP * nDist;
-							vec4 rgbaEndN = FxaaTexTop(tex, posN.xy);
-							doneN = contrast( rgbaEndN, rgbaM ) > contrast( rgbaEndN, rgbaN );
-							iterationsUsedN = i;
-					}
+				if(!doneN) {
+					nDist += increment;
+					posN = posM + offNP * nDist;
+					vec4 rgbaEndN = FxaaTexTop(tex, posN.xy);
+					doneN = contrast( rgbaEndN, rgbaM ) > contrast( rgbaEndN, rgbaN );
+					iterationsUsedN = i;
+				}
 
-					if(!doneP) {
-							pDist += increment;
-							posP = posM - offNP * pDist;
-							vec4 rgbaEndP = FxaaTexTop(tex, posP.xy);
-							doneP = contrast( rgbaEndP, rgbaM ) > contrast( rgbaEndP, rgbaN );
-							iterationsUsedP = i;
-					}
+				if(!doneP) {
+					pDist += increment;
+					posP = posM - offNP * pDist;
+					vec4 rgbaEndP = FxaaTexTop(tex, posP.xy);
+					doneP = contrast( rgbaEndP, rgbaM ) > contrast( rgbaEndP, rgbaN );
+					iterationsUsedP = i;
+				}
 
-					if(doneN || doneP) break;
+				if(doneN || doneP) break;
 			}
 
 
 			if ( !doneP && !doneN ) return rgbaM; // failed to find end of edge
 
 			float dist = min(
-					doneN ? float( iterationsUsedN ) / float( NUM_SAMPLES - 1 ) : 1.,
-					doneP ? float( iterationsUsedP ) / float( NUM_SAMPLES - 1 ) : 1.
+				doneN ? float( iterationsUsedN ) / float( NUM_SAMPLES - 1 ) : 1.,
+				doneP ? float( iterationsUsedP ) / float( NUM_SAMPLES - 1 ) : 1.
 			);
 
 			// hacky way of reduces blurriness of mostly diagonal edges
@@ -262,25 +262,25 @@ const FXAAShader = {
 			dist = 1. - dist;
 
 			return mix(
-					rgbaM,
-					rgbaN,
-					dist * .5
+				rgbaM,
+				rgbaN,
+				dist * .5
 			);
-	}
+		}
 
-	void main() {
+		void main() {
 			const float edgeDetectionQuality = .2;
 			const float invEdgeDetectionQuality = 1. / edgeDetectionQuality;
 
 			gl_FragColor = FxaaPixelShader(
-					vUv,
-					tDiffuse,
-					resolution,
-					edgeDetectionQuality, // [0,1] contrast needed, otherwise early discard
-					invEdgeDetectionQuality
+				vUv,
+				tDiffuse,
+				resolution,
+				edgeDetectionQuality, // [0,1] contrast needed, otherwise early discard
+				invEdgeDetectionQuality
 			);
 
-	}
+		}
 	`
 
 };
