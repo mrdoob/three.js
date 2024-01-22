@@ -172,7 +172,9 @@ class WebGLTextureUtils {
 
 	setTextureParameters( textureType, texture ) {
 
-		const { gl, extensions } = this;
+		const { gl, extensions, backend } = this;
+
+		const { currentAnisotropy } = backend.get( texture );
 
 		gl.texParameteri( textureType, gl.TEXTURE_WRAP_S, wrappingToGL[ texture.wrapS ] );
 		gl.texParameteri( textureType, gl.TEXTURE_WRAP_T, wrappingToGL[ texture.wrapT ] );
@@ -200,16 +202,16 @@ class WebGLTextureUtils {
 
 		if ( extensions.has( 'EXT_texture_filter_anisotropic' ) === true ) {
 
-			//extension = extensions.get( 'EXT_texture_filter_anisotropic' );
+			const extension = extensions.get( 'EXT_texture_filter_anisotropic' );
 
 			if ( texture.magFilter === NearestFilter ) return;
 			if ( texture.minFilter !== NearestMipmapLinearFilter && texture.minFilter !== LinearMipmapLinearFilter ) return;
 			if ( texture.type === FloatType && extensions.has( 'OES_texture_float_linear' ) === false ) return; // verify extension for WebGL 1 and WebGL 2
 
-			if ( texture.anisotropy > 1 /*|| properties.get( texture ).__currentAnisotropy*/ ) {
+			if ( texture.anisotropy > 1 || currentAnisotropy !== texture.anisotropy ) {
 
-				//gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, capabilities.getMaxAnisotropy() ) );
-				//properties.get( texture ).__currentAnisotropy = texture.anisotropy;
+				gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, backend.getMaxAnisotropy() ) );
+				backend.get( texture ).currentAnisotropy = texture.anisotropy;
 
 			}
 

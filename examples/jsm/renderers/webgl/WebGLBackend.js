@@ -96,6 +96,14 @@ class WebGLBackend extends Backend {
 
 		}
 
+		if ( renderContext.scissor ) {
+
+			const { x, y, width, height } = renderContext.scissorValue;
+
+			gl.scissor( x, y, width, height );
+
+		}
+
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
 		if ( occlusionQueryCount > 0 ) {
@@ -288,6 +296,22 @@ class WebGLBackend extends Backend {
 
 	}
 
+	setScissorTest( boolean ) {
+
+		const gl = this.gl;
+
+		if ( boolean ) {
+
+			gl.enable( gl.SCISSOR_TEST );
+
+		} else {
+
+			gl.disable( gl.SCISSOR_TEST );
+
+		}
+
+	}
+
 	clear( color, depth, stencil, descriptor = null ) {
 
 		const { gl } = this;
@@ -364,18 +388,19 @@ class WebGLBackend extends Backend {
 
 		const gl = this.gl;
 
-		if ( ! this.discard )  {
+		if ( ! this.discard ) {
 
 			// required here to handle async behaviour of render.compute()
 			gl.enable( gl.RASTERIZER_DISCARD );
 			this.discard = true;
+
 		}
 
 		const { programGPU, transformBuffers, attributes } = this.get( pipeline );
 
 		const vaoKey = this._getVaoKey( null, attributes );
 
-		let vaoGPU = this.vaoCache[ vaoKey ];
+		const vaoGPU = this.vaoCache[ vaoKey ];
 
 		if ( vaoGPU === undefined ) {
 
@@ -709,7 +734,7 @@ class WebGLBackend extends Backend {
 
 		const fragmentProgram = {
 			stage: 'fragment',
-			code: "#version 300 es\nprecision highp float;\nvoid main() {}"
+			code: '#version 300 es\nprecision highp float;\nvoid main() {}'
 		};
 
 		this.createProgram( fragmentProgram );

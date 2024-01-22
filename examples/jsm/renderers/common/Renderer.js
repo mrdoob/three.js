@@ -519,6 +519,8 @@ class Renderer {
 
 		this._scissorTest = boolean;
 
+		this.backend.setScissorTest( boolean );
+
 	}
 
 	getViewport( target ) {

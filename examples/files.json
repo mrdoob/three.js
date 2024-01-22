@@ -368,7 +368,8 @@
 		"webgpu_tsl_transpiler",
 		"webgpu_video_panorama",
 		"webgpu_postprocessing_afterimage",
-		"webgpu_multisampled_renderbuffers"
+		"webgpu_multisampled_renderbuffers",
+		"webgpu_materials_texture_anisotropy"
 	],
 	"webaudio": [
 		"webaudio_orientation",
