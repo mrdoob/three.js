@@ -429,10 +429,10 @@ function calcNURBSDerivatives( p, U, P, u, nd ) {
 /*
 Calculate rational B-Spline surface point. See The NURBS Book, page 134, algorithm A4.3.
 
-p1, p2 : degrees of B-Spline surface
-U1, U2 : knot vectors
-P      : control points (x, y, z, w)
-u, v   : parametric values
+p, q : degrees of B-Spline surface
+U, V : knot vectors
+P    : control points (x, y, z, w)
+u, v : parametric values
 
 returns point for given (u, v)
 */
@@ -472,6 +472,60 @@ function calcSurfacePoint( p, q, U, V, P, u, v, target ) {
 
 }
 
+/*
+Calculate rational B-Spline volume point. See The NURBS Book, page 134, algorithm A4.3.
+
+p, q, r   : degrees of B-Splinevolume
+U, V, W   : knot vectors
+P         : control points (x, y, z, w)
+u, v, w   : parametric values
+
+returns point for given (u, v, w)
+*/
+function calcVolumePoint( p, q, r, U, V, W, P, u, v, w, target ) {
+
+	const uspan = findSpan( p, u, U );
+	const vspan = findSpan( q, v, V );
+	const wspan = findSpan( r, w, W );
+	const Nu = calcBasisFunctions( uspan, u, p, U );
+	const Nv = calcBasisFunctions( vspan, v, q, V );
+	const Nw = calcBasisFunctions( wspan, w, r, W );
+	const temp = [];
+
+	for ( let m = 0; m <= r; ++ m ) {
+
+		temp[ m ] = [];
+
+		for ( let l = 0; l <= q; ++ l ) {
+
+			temp[ m ][ l ] = new Vector4( 0, 0, 0, 0 );
+			for ( let k = 0; k <= p; ++ k ) {
+
+				const point = P[ uspan - p + k ][ vspan - q + l ][ wspan - r + m ].clone();
+				const w = point.w;
+				point.x *= w;
+				point.y *= w;
+				point.z *= w;
+				temp[ m ][ l ].add( point.multiplyScalar( Nu[ k ] ) );
+
+			}
+
+		}
+
+	}
+	const Sw = new Vector4( 0, 0, 0, 0 );
+	for ( let m = 0; m <= r; ++ m ) {
+		for ( let l = 0; l <= q; ++ l ) {
+
+			Sw.add( temp[ m ][ l ].multiplyScalar( Nw[ m ] ).multiplyScalar( Nv[ l ] ) );
+
+		}
+	}
+
+	Sw.divideScalar( Sw.w );
+	target.set( Sw.x, Sw.y, Sw.z );
+
+}
 
 
 export {
@@ -484,4 +538,5 @@ export {
 	calcRationalCurveDerivatives,
 	calcNURBSDerivatives,
 	calcSurfacePoint,
+	calcVolumePoint,
 };

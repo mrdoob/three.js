@@ -25,6 +25,7 @@ export * from './csm/CSMShader.js';
 export * as Curves from './curves/CurveExtras.js';
 export * from './curves/NURBSCurve.js';
 export * from './curves/NURBSSurface.js';
+export * from './curves/NURBSVolume.js';
 export * as NURBSUtils from './curves/NURBSUtils.js';
 
 export * from './effects/AnaglyphEffect.js';
