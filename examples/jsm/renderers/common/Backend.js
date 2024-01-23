@@ -120,6 +120,8 @@ class Backend {
 
 	}
 
+	setScissorTest( boolean ) { }
+
 	getClearColor() {
 
 		const renderer = this.renderer;

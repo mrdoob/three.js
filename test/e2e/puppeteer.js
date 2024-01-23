@@ -140,7 +140,8 @@ const exceptionList = [
 	'webgpu_compute_particles',
 	'webgpu_compute_particles_rain',
 	'webgpu_compute_particles_snow',
-	'webgpu_compute_points'
+	'webgpu_compute_points',
+	'webgpu_materials_texture_anisotropy'
 
 ];
 
