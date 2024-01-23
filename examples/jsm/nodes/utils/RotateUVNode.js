@@ -18,17 +18,9 @@ class RotateUVNode extends TempNode {
 
 		const { uvNode, rotationNode, centerNode } = this;
 
-		const cosAngle = rotationNode.cos();
-		const sinAngle = rotationNode.sin();
-
 		const vector = uvNode.sub( centerNode );
 
-		const rotatedVector = vec2( // @TODO: Maybe we can create mat2 and write something like rotationMatrix.mul( vector )?
-			vec2( cosAngle, sinAngle ).dot( vector ),
-			vec2( sinAngle.negate(), cosAngle ).dot( vector )
-		);
-
-		return rotatedVector.add( centerNode );
+		return vector.rotate( rotationNode ).add( centerNode );
 
 	}
 
