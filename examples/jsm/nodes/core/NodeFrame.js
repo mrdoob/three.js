@@ -53,9 +53,11 @@ class NodeFrame {
 
 			if ( frameMap.get( node ) !== this.frameId ) {
 
-				frameMap.set( node, this.frameId );
+				if ( node.updateBefore( this ) !== false ) {
 
-				node.updateBefore( this );
+					frameMap.set( node, this.frameId );
+
+				}
 
 			}
 
