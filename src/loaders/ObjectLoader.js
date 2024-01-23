@@ -893,10 +893,12 @@ class ObjectLoader extends Loader {
 				const count = data.count;
 				const instanceMatrix = data.instanceMatrix;
 				const instanceColor = data.instanceColor;
+				const instanceMorph = data.instanceMorph;
 
 				object = new InstancedMesh( geometry, material, count );
 				object.instanceMatrix = new InstancedBufferAttribute( new Float32Array( instanceMatrix.array ), 16 );
 				if ( instanceColor !== undefined ) object.instanceColor = new InstancedBufferAttribute( new Float32Array( instanceColor.array ), instanceColor.itemSize );
+				if ( instanceMorph !== undefined ) object.instanceMorph = new InstancedBufferAttribute( new Float32Array( instanceMorph.array ), instanceMorph.itemSize );
 
 				break;
 

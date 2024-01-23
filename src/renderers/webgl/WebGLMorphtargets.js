@@ -157,9 +157,17 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 			let morphInfluencesSum = 0;
 
-			for ( let i = 0; i < objectInfluences.length; i ++ ) {
+			if ( object.isInstancedMesh ) {
 
-				morphInfluencesSum += objectInfluences[ i ];
+				morphInfluencesSum = 1;
+
+			} else {
+
+				for ( let i = 0; i < objectInfluences.length; i ++ ) {
+
+					morphInfluencesSum += objectInfluences[ i ];
+
+				}
 
 			}
 

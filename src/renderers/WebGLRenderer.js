@@ -1832,6 +1832,14 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
+				} else if ( object.isInstancedMesh && materialProperties.instancingMorph === false && object.instanceMorph !== null ) {
+
+					needsProgramChange = true;
+
+				} else if ( object.isInstancedMesh && materialProperties.instancingMorph === true && object.instanceMorph === null ) {
+
+					needsProgramChange = true;
+
 				} else if ( materialProperties.envMap !== envMap ) {
 
 					needsProgramChange = true;

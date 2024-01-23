@@ -48,6 +48,7 @@
 		"webgl_instancing_performance",
 		"webgl_instancing_raycast",
 		"webgl_instancing_scatter",
+		"webgl_instancing_morph",
 		"webgl_interactive_buffergeometry",
 		"webgl_interactive_cubes",
 		"webgl_interactive_cubes_gpu",

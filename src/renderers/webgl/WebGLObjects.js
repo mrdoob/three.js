@@ -37,6 +37,12 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 				}
 
+				if ( object.instanceMorph !== null ) {
+
+					attributes.update( object.instanceMorph, gl.ARRAY_BUFFER );
+
+				}
+
 				updateMap.set( object, frame );
 
 			}
@@ -76,6 +82,8 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 		attributes.remove( instancedMesh.instanceMatrix );
 
 		if ( instancedMesh.instanceColor !== null ) attributes.remove( instancedMesh.instanceColor );
+
+		if ( instancedMesh.instanceMorph !== null ) attributes.remove( instancedMesh.instanceMorph );
 
 	}
 

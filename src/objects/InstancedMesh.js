@@ -24,6 +24,7 @@ class InstancedMesh extends Mesh {
 
 		this.instanceMatrix = new InstancedBufferAttribute( new Float32Array( count * 16 ), 16 );
 		this.instanceColor = null;
+		this.instanceMorph = null;
 
 		this.count = count;
 
@@ -108,6 +109,8 @@ class InstancedMesh extends Mesh {
 
 		if ( source.instanceColor !== null ) this.instanceColor = source.instanceColor.clone();
 
+		if ( source.instanceMorph !== null ) this.instanceMorph = source.instanceMorph.clone();
+
 		this.count = source.count;
 
 		if ( source.boundingBox !== null ) this.boundingBox = source.boundingBox.clone();
@@ -126,6 +129,12 @@ class InstancedMesh extends Mesh {
 	getMatrixAt( index, matrix ) {
 
 		matrix.fromArray( this.instanceMatrix.array, index * 16 );
+
+	}
+
+	getMorphAt( index, vector ) {
+
+		vector.fromArray( this.instanceMorph.array, index * 4 );
 
 	}
 
@@ -190,6 +199,56 @@ class InstancedMesh extends Mesh {
 		}
 
 		color.toArray( this.instanceColor.array, index * 3 );
+
+	}
+
+	setMorphAt( index, source ) {
+
+		if ( this.instanceMorph === null ) {
+
+			this.instanceMorph = new InstancedBufferAttribute( new Float32Array( this.instanceMatrix.count * 4 ), 4 );
+
+		}
+
+		if ( source.isVector4 ) {
+
+			source.toArray( this.instanceMorph.array, index * 4 );
+
+		} else if ( source.isMesh && source.morphTargetInfluences ) {
+
+			let index1 = - 1;
+			let index2 = - 1;
+
+			const objectInfluences = source.morphTargetInfluences;
+
+			for ( let i = 0; i < objectInfluences.length; i ++ ) {
+
+				const v = objectInfluences[ i ];
+
+				if ( v ) {
+
+					if ( index1 < 0 ) {
+
+						index1 = i;
+
+					} else if ( index2 < 0 ) {
+
+						index2 = i;
+
+					}
+
+				}
+
+				//morphInfluencesSum += v;
+
+			}
+
+			this.instanceMorph.array[ index * 4 ] = index1;
+			this.instanceMorph.array[ index * 4 + 1 ] = objectInfluences[ index1 ];
+			this.instanceMorph.array[ index * 4 + 2 ] = index2;
+			this.instanceMorph.array[ index * 4 + 3 ] = objectInfluences[ index2 ];
+
+		}
 
 	}
 

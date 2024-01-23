@@ -714,6 +714,7 @@ class Object3D extends EventDispatcher {
 			object.count = this.count;
 			object.instanceMatrix = this.instanceMatrix.toJSON();
 			if ( this.instanceColor !== null ) object.instanceColor = this.instanceColor.toJSON();
+			if ( this.instanceMorph !== null ) object.instanceMorph = this.instanceMorph.toJSON();
 
 		}
 

@@ -185,6 +185,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 					if ( name === 'instanceMatrix' && object.instanceMatrix ) geometryAttribute = object.instanceMatrix;
 					if ( name === 'instanceColor' && object.instanceColor ) geometryAttribute = object.instanceColor;
+					if ( name === 'instanceMorph' && object.instanceMorph ) geometryAttribute = object.instanceMorph;
 
 				}
 
@@ -228,6 +229,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 					if ( name === 'instanceMatrix' && object.instanceMatrix ) attribute = object.instanceMatrix;
 					if ( name === 'instanceColor' && object.instanceColor ) attribute = object.instanceColor;
+					if ( name === 'instanceMorph' && object.instanceMorph ) attribute = object.instanceMorph;
 
 				}
 
@@ -359,6 +361,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 					if ( name === 'instanceMatrix' && object.instanceMatrix ) geometryAttribute = object.instanceMatrix;
 					if ( name === 'instanceColor' && object.instanceColor ) geometryAttribute = object.instanceColor;
+					if ( name === 'instanceMorph' && object.instanceMorph ) geometryAttribute = object.instanceMorph;
 
 				}
 

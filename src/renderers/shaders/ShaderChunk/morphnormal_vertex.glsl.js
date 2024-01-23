@@ -8,12 +8,25 @@ export default /* glsl */`
 
 	#ifdef MORPHTARGETS_TEXTURE
 
-		for ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {
+		#ifdef USE_INSTANCING_MORPH
 
-			if ( morphTargetInfluences[ i ] != 0.0 ) objectNormal += getMorph( gl_VertexID, i, 1 ).xyz * morphTargetInfluences[ i ];
+			float influence = instanceMorph.y;
 
-		}
+			if ( influence != 0.0 ) objectNormal += getMorph( gl_VertexID, int(instanceMorph.x), 1 ).xyz * influence;
 
+			influence = instanceMorph.w;
+
+			if ( influence != 0.0 ) objectNormal += getMorph( gl_VertexID, int(instanceMorph.z), 1 ).xyz * influence;
+
+		#else
+
+			for ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {
+
+				if ( morphTargetInfluences[ i ] != 0.0 ) objectNormal += getMorph( gl_VertexID, i, 1 ).xyz * morphTargetInfluences[ i ];
+
+			}
+
+		#endif
 	#else
 
 		objectNormal += morphNormal0 * morphTargetInfluences[ 0 ];
