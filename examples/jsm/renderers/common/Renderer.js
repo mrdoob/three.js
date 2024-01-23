@@ -1161,7 +1161,6 @@ class Renderer {
 
 	}
 
-	
 	_createObjectPipeline( object, material, scene, camera, lightsNode, passId ) {
 
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
@@ -1180,7 +1179,6 @@ class Renderer {
 
 	}
 
-
 	get compute() {
 
 		return this.computeAsync;
@@ -1189,6 +1187,7 @@ class Renderer {
 
 	get compile() {
 
+		console.warn( 'THREE.Renderer: compile() is deprecated and will be removed in r170, use compileAsync instead.' ); // @deprecated, r170
 		return this.compileAsync;
 
 	}

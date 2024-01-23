@@ -715,7 +715,7 @@ class WebGLBackend extends Backend {
 			const p = new Promise( ( resolve /*, reject*/ ) => {
 
 				const parallel = this.parallel;
-				const test = () => {
+				const checkStatus = () => {
 
 					if ( gl.getProgramParameter( programGPU, parallel.COMPLETION_STATUS_KHR ) ) {
 
@@ -724,13 +724,13 @@ class WebGLBackend extends Backend {
 
 					} else {
 
-						requestAnimationFrame( test );
+						requestAnimationFrame( checkStatus );
 
 					}
 
 				};
 
-				test();
+				checkStatus();
 
 			} );
 
