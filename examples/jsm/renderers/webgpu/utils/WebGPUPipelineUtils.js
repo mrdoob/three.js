@@ -23,7 +23,7 @@ class WebGPUPipelineUtils {
 
 	}
 
-	createRenderPipeline( renderObject ) {
+	createRenderPipeline( renderObject, promises ) {
 
 		const { object, material, geometry, pipeline } = renderObject;
 		const { vertexProgram, fragmentProgram } = pipeline;
@@ -117,7 +117,7 @@ class WebGPUPipelineUtils {
 
 		}
 
-		pipelineData.pipeline = device.createRenderPipeline( {
+		const pipelineDescriptor = {
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
 			fragment: Object.assign( {}, fragmentModule, { targets } ),
 			primitive: primitiveState,
@@ -137,7 +137,28 @@ class WebGPUPipelineUtils {
 			layout: device.createPipelineLayout( {
 				bindGroupLayouts: [ bindingsData.layout ]
 			} )
-		} );
+		};
+
+		if ( promises === null ) {
+
+			pipelineData.pipeline = device.createRenderPipeline( pipelineDescriptor );
+
+		} else {
+
+			const p = new Promise( ( resolve /*, reject*/ ) => {
+
+				device.createRenderPipelineAsync( pipelineDescriptor ).then( pipeline => {
+
+					pipelineData.pipeline = pipeline;
+					resolve();
+
+				} );
+
+			} );
+
+			promises.push( p );
+
+		}
 
 	}
 
