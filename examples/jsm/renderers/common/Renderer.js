@@ -721,7 +721,9 @@ class Renderer {
 
 	}
 
-	clear( color = true, depth = true, stencil = true ) {
+	async clearAsync( color = true, depth = true, stencil = true ) {
+
+		if ( this._initialized === false ) await this.init();
 
 		let renderTargetData = null;
 		const renderTarget = this._renderTarget;
@@ -738,21 +740,21 @@ class Renderer {
 
 	}
 
-	clearColor() {
+	clearColorAsync() {
 
-		this.clear( true, false, false );
-
-	}
-
-	clearDepth() {
-
-		this.clear( false, true, false );
+		return this.clearAsync( true, false, false );
 
 	}
 
-	clearStencil() {
+	clearDepthAsync() {
 
-		this.clear( false, false, true );
+		return this.clearAsync( false, true, false );
+
+	}
+
+	clearStencilAsync() {
+
+		return this.clearAsync( false, false, true );
 
 	}
 
@@ -1159,6 +1161,25 @@ class Renderer {
 
 	}
 
+	
+	_createObjectPipeline( object, material, scene, camera, lightsNode, passId ) {
+
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
+
+		//
+
+		this._nodes.updateBefore( renderObject );
+
+		//
+
+		this._nodes.updateForRender( renderObject );
+		this._geometries.updateForRender( renderObject );
+		this._bindings.updateForRender( renderObject );
+
+		this._pipelines.getForRender( renderObject, this._compilationPromises );
+
+	}
+
 
 	get compute() {
 
@@ -1178,21 +1199,27 @@ class Renderer {
 
 	}
 
-	_createObjectPipeline( object, material, scene, camera, lightsNode, passId ) {
+	get clear() {
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
+		return this.clearAsync;
 
-		//
+	}
 
-		this._nodes.updateBefore( renderObject );
+	get clearColor() {
 
-		//
+		return this.clearColorAsync;
 
-		this._nodes.updateForRender( renderObject );
-		this._geometries.updateForRender( renderObject );
-		this._bindings.updateForRender( renderObject );
+	}
 
-		this._pipelines.getForRender( renderObject, this._compilationPromises );
+	get clearDepth() {
+
+		return this.clearDepthAsync;
+
+	}
+
+	get clearStencil() {
+
+		return this.clearStencilAsync;
 
 	}
 
