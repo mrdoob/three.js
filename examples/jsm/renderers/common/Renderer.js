@@ -1189,6 +1189,12 @@ class Renderer {
 	get compute() {
 
 		console.warn( 'THREE.Renderer: compile() is deprecated and will be removed in r170, use compileAsync instead.' ); // @deprecated, r170
+		return this.computeAsync;
+
+	}
+
+	get compile() {
+
 		return this.compileAsync;
 
 	}
