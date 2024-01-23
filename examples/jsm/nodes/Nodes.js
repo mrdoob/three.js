@@ -68,6 +68,7 @@ export { default as SplitNode } from './utils/SplitNode.js';
 export { default as SpriteSheetUVNode, spritesheetUV } from './utils/SpriteSheetUVNode.js';
 export { default as TimerNode, timerLocal, timerGlobal, timerDelta, frameId } from './utils/TimerNode.js';
 export { default as TriplanarTexturesNode, triplanarTextures, triplanarTexture } from './utils/TriplanarTexturesNode.js';
+export { default as ReflectorNode, reflector } from './utils/ReflectorNode.js';
 
 // shadernode
 export * from './shadernode/ShaderNode.js';
@@ -146,7 +147,7 @@ export { default as DirectionalLightNode } from './lighting/DirectionalLightNode
 export { default as SpotLightNode } from './lighting/SpotLightNode.js';
 export { default as IESSpotLightNode } from './lighting/IESSpotLightNode.js';
 export { default as AmbientLightNode } from './lighting/AmbientLightNode.js';
-export { default as LightsNode, lights, lightNodes, addLightNode } from './lighting/LightsNode.js';
+export { default as LightsNode, lights, lightsNode, addLightNode } from './lighting/LightsNode.js';
 export { default as LightingNode /* @TODO: lighting (abstract), light */ } from './lighting/LightingNode.js';
 export { default as LightingContextNode, lightingContext } from './lighting/LightingContextNode.js';
 export { default as HemisphereLightNode } from './lighting/HemisphereLightNode.js';

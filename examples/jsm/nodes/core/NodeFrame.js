@@ -53,9 +53,11 @@ class NodeFrame {
 
 			if ( frameMap.get( node ) !== this.frameId ) {
 
-				frameMap.set( node, this.frameId );
+				if ( node.updateBefore( this ) !== false ) {
 
-				node.updateBefore( this );
+					frameMap.set( node, this.frameId );
+
+				}
 
 			}
 
@@ -65,9 +67,11 @@ class NodeFrame {
 
 			if ( renderMap.get( node ) !== this.renderId ) {
 
-				renderMap.set( node, this.renderId );
+				if ( node.updateBefore( this ) !== false ) {
 
-				node.updateBefore( this );
+					renderMap.set( node, this.renderId );
+
+				}
 
 			}
 
@@ -90,9 +94,11 @@ class NodeFrame {
 
 			if ( frameMap.get( node ) !== this.frameId ) {
 
-				frameMap.set( node, this.frameId );
+				if ( node.update( this ) !== false ) {
 
-				node.update( this );
+					frameMap.set( node, this.frameId );
+
+				}
 
 			}
 
@@ -102,9 +108,11 @@ class NodeFrame {
 
 			if ( renderMap.get( node ) !== this.renderId ) {
 
-				renderMap.set( node, this.renderId );
+				if ( node.update( this ) !== false ) {
 
-				node.update( this );
+					renderMap.set( node, this.renderId );
+
+				}
 
 			}
 

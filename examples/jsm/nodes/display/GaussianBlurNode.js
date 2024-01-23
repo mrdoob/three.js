@@ -18,7 +18,7 @@ class GaussianBlurNode extends TempNode {
 
 	constructor( textureNode, sigma = 2 ) {
 
-		super( textureNode );
+		super( 'vec4' );
 
 		this.textureNode = textureNode;
 		this.sigma = sigma;
