@@ -61,13 +61,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		const rotation = float( rotationNode || materialRotation );
 
-		const cosAngle = rotation.cos();
-		const sinAngle = rotation.sin();
-
-		const rotatedPosition = vec2( // @TODO: Maybe we can create mat2 and write something like rotationMatrix.mul( alignedPosition )?
-			vec2( cosAngle, sinAngle.negate() ).dot( alignedPosition ),
-			vec2( sinAngle, cosAngle ).dot( alignedPosition )
-		);
+		const rotatedPosition = alignedPosition.rotate( rotation );
 
 		mvPosition = vec4( mvPosition.xy.add( rotatedPosition ), mvPosition.zw );
 
