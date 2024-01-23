@@ -8155,7 +8155,7 @@ Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE = true;
 const _v0$1 = /*@__PURE__*/ new Vector3();
 const _v1$3 = /*@__PURE__*/ new Vector3();
 const _v2$2 = /*@__PURE__*/ new Vector3();
-const _v3$1 = /*@__PURE__*/ new Vector3();
+const _v3$2 = /*@__PURE__*/ new Vector3();
 
 const _vab = /*@__PURE__*/ new Vector3();
 const _vac = /*@__PURE__*/ new Vector3();
@@ -8227,19 +8227,19 @@ class Triangle {
 	static containsPoint( point, a, b, c ) {
 
 		// if the triangle is degenerate then we can't contain a point
-		if ( this.getBarycoord( point, a, b, c, _v3$1 ) === null ) {
+		if ( this.getBarycoord( point, a, b, c, _v3$2 ) === null ) {
 
 			return false;
 
 		}
 
-		return ( _v3$1.x >= 0 ) && ( _v3$1.y >= 0 ) && ( ( _v3$1.x + _v3$1.y ) <= 1 );
+		return ( _v3$2.x >= 0 ) && ( _v3$2.y >= 0 ) && ( ( _v3$2.x + _v3$2.y ) <= 1 );
 
 	}
 
 	static getInterpolation( point, p1, p2, p3, v1, v2, v3, target ) {
 
-		if ( this.getBarycoord( point, p1, p2, p3, _v3$1 ) === null ) {
+		if ( this.getBarycoord( point, p1, p2, p3, _v3$2 ) === null ) {
 
 			target.x = 0;
 			target.y = 0;
@@ -8250,9 +8250,9 @@ class Triangle {
 		}
 
 		target.setScalar( 0 );
-		target.addScaledVector( v1, _v3$1.x );
-		target.addScaledVector( v2, _v3$1.y );
-		target.addScaledVector( v3, _v3$1.z );
+		target.addScaledVector( v1, _v3$2.x );
+		target.addScaledVector( v2, _v3$2.y );
+		target.addScaledVector( v3, _v3$2.z );
 
 		return target;
 
@@ -9880,7 +9880,7 @@ class BufferAttribute {
 
 	get updateRange() {
 
-		console.warn( 'THREE.BufferAttribute: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
+		warnOnce( 'THREE.BufferAttribute: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
 		return this._updateRange;
 
 	}
@@ -12475,6 +12475,11 @@ class Camera extends Object3D {
 
 }
 
+const _v3$1 = /*@__PURE__*/ new Vector3();
+const _minTarget = /*@__PURE__*/ new Vector2();
+const _maxTarget = /*@__PURE__*/ new Vector2();
+
+
 class PerspectiveCamera extends Camera {
 
 	constructor( fov = 50, aspect = 1, near = 0.1, far = 2000 ) {
@@ -12570,6 +12575,34 @@ class PerspectiveCamera extends Camera {
 
 		// film not completely covered in landscape format (aspect > 1)
 		return this.filmGauge / Math.max( this.aspect, 1 );
+
+	}
+
+	/**
+	 * Computes the 2D bounds of the camera's viewable rectangle at a given distance along the viewing direction.
+	 * Sets minTarget and maxTarget to the coordinates of the lower-left and upper-right corners of the view rectangle.
+	 */
+	getViewBounds( distance, minTarget, maxTarget ) {
+
+		_v3$1.set( - 1, - 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
+
+		minTarget.set( _v3$1.x, _v3$1.y ).multiplyScalar( - distance / _v3$1.z );
+
+		_v3$1.set( 1, 1, 0.5 ).applyMatrix4( this.projectionMatrixInverse );
+
+		maxTarget.set( _v3$1.x, _v3$1.y ).multiplyScalar( - distance / _v3$1.z );
+
+	}
+
+	/**
+	 * Computes the width and height of the camera's viewable rectangle at a given distance along the viewing direction.
+	 * Copies the result into the target Vector2, where x is width and y is height.
+	 */
+	getViewSize( distance, target ) {
+
+		this.getViewBounds( distance, _minTarget, _maxTarget );
+
+		return target.subVectors( _maxTarget, _minTarget );
 
 	}
 
@@ -20556,6 +20589,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 	const _programLayers = new Layers();
 	const _customShaders = new WebGLShaderCache();
+	const _activeChannels = new Set();
 	const programs = [];
 
 	const IS_WEBGL2 = capabilities.isWebGL2;
@@ -20583,6 +20617,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	};
 
 	function getChannel( value ) {
+
+		_activeChannels.add( value );
 
 		if ( value === 0 ) return 'uv';
 
@@ -20703,10 +20739,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const HAS_ALPHAHASH = !! material.alphaHash;
 
 		const HAS_EXTENSIONS = !! material.extensions;
-
-		const HAS_ATTRIBUTE_UV1 = !! geometry.attributes.uv1;
-		const HAS_ATTRIBUTE_UV2 = !! geometry.attributes.uv2;
-		const HAS_ATTRIBUTE_UV3 = !! geometry.attributes.uv3;
 
 		let toneMapping = NoToneMapping;
 
@@ -20839,9 +20871,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			vertexTangents: !! geometry.attributes.tangent && ( HAS_NORMALMAP || HAS_ANISOTROPY ),
 			vertexColors: material.vertexColors,
 			vertexAlphas: material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4,
-			vertexUv1s: HAS_ATTRIBUTE_UV1,
-			vertexUv2s: HAS_ATTRIBUTE_UV2,
-			vertexUv3s: HAS_ATTRIBUTE_UV3,
 
 			pointsUvs: object.isPoints === true && !! geometry.attributes.uv && ( HAS_MAP || HAS_ALPHAMAP ),
 
@@ -20913,6 +20942,14 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			customProgramCacheKey: material.customProgramCacheKey()
 
 		};
+
+		// the usage of getChannel() determines the active texture channels for this shader
+
+		parameters.vertexUv1s = _activeChannels.has( 1 );
+		parameters.vertexUv2s = _activeChannels.has( 2 );
+		parameters.vertexUv3s = _activeChannels.has( 3 );
+
+		_activeChannels.clear();
 
 		return parameters;
 
@@ -31162,7 +31199,7 @@ class InterleavedBuffer {
 
 	get updateRange() {
 
-		console.warn( 'THREE.InterleavedBuffer: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
+		warnOnce( 'THREE.InterleavedBuffer: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
 		return this._updateRange;
 
 	}
