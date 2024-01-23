@@ -20,13 +20,17 @@ class RotateNode extends TempNode {
 
 	}
 
+	getNodeType( builder ) {
+
+		return this.positionNode.getNodeType( builder );
+
+	}
+
 	setup( builder ) {
 
 		const { rotationNode, positionNode } = this;
 
-		const nodeType = positionNode.getNodeType( builder );
-
-		this.nodeType = nodeType;
+		const nodeType = this.getNodeType( builder );
 
 		if ( nodeType === 'vec2' ) {
 
