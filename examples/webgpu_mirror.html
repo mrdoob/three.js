@@ -98,7 +98,7 @@
 				const groundReflector = reflector();
 				const verticalReflector = reflector();
 
-				const groundNormalScale = 0.06;
+				const groundNormalScale = - 0.08;
 				const verticalNormalScale = 0.1;
 
 				const groundUVOffset = texture( decalNormal ).xy.mul( 2 ).sub( 1 ).mul( groundNormalScale );
@@ -107,12 +107,12 @@
 				groundReflector.uvNode = groundReflector.uvNode.add( groundUVOffset );
 				verticalReflector.uvNode = verticalReflector.uvNode.add( verticalUVOffset );
 
-				const groundNode = texture( decalDiffuse ).r.mix( color( 0xffffff ), groundReflector );
+				const groundNode = texture( decalDiffuse ).a.mix( color( 0xffffff ), groundReflector );
 				const verticalNode = color( 0x0000ff ).mul( .1 ).add( verticalReflector );
 
 				// walls
 
-				const planeGeo = new THREE.PlaneGeometry( 101.1, 101.1 );
+				const planeGeo = new THREE.PlaneGeometry( 100.1, 100.1 );
 
 				//
 
@@ -200,15 +200,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				groundMirror.getRenderTarget().setSize(
-					window.innerWidth * window.devicePixelRatio,
-					window.innerHeight * window.devicePixelRatio
-				);
-				verticalMirror.getRenderTarget().setSize(
-					window.innerWidth * window.devicePixelRatio,
-					window.innerHeight * window.devicePixelRatio
-				);
 
 			}
 
