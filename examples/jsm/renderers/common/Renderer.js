@@ -1166,6 +1166,12 @@ class Renderer {
 
 	}
 
+	get compile() {
+
+		return this.compileAsync;
+
+	}
+
 	get render() {
 
 		return this.renderAsync;
