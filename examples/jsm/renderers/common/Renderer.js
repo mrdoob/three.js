@@ -100,12 +100,13 @@ class Renderer {
 
 		this._renderObjectFunction = null;
 		this._currentRenderObjectFunction = null;
+
 		this._handleObjectFunction = this._renderObjectDirect;
 
 		this._initialized = false;
 		this._initPromise = null;
 
-		this._compilationPromises = [];
+		this._compilationPromises = null;
 
 		// backwards compatibility
 
@@ -189,6 +190,8 @@ class Renderer {
 
 		const previousRenderId = nodeFrame.renderId;
 		const previousRenderContext = this._currentRenderContext;
+		const previousRenderObjectFunction = this._currentRenderObjectFunction;
+		const previousCompilationPromises = this._compilationPromises;
 
 		//
 
@@ -200,9 +203,14 @@ class Renderer {
 		const renderContext = this._renderContexts.get( targetScene, camera, renderTarget );
 		const activeMipmapLevel = this._activeMipmapLevel;
 
+		const compilationPromises = [];
+
 		this._currentRenderContext = renderContext;
 		this._currentRenderObjectFunction = this.renderObject;
+
 		this._handleObjectFunction = this._createObjectPipeline;
+
+		this._compilationPromises = compilationPromises;
 
 		nodeFrame.renderId ++;
 
@@ -283,15 +291,14 @@ class Renderer {
 		nodeFrame.renderId = previousRenderId;
 
 		this._currentRenderContext = previousRenderContext;
-		this._lastRenderContext = renderContext;
+		this._currentRenderObjectFunction = previousRenderObjectFunction;
+		this._compilationPromises = previousCompilationPromises;
 
 		this._handleObjectFunction = this._renderObjectDirect;
 
 		// wait for all promises setup by backends awaiting compilation/linking/pipeline creation to complete
 
-		await Promise.all( this._compilationPromises );
-
-		this._compilationPromises = [];
+		await Promise.all( compilationPromises );
 
 	}
 
@@ -1180,12 +1187,6 @@ class Renderer {
 	}
 
 	get compute() {
-
-		return this.computeAsync;
-
-	}
-
-	get compile() {
 
 		console.warn( 'THREE.Renderer: compile() is deprecated and will be removed in r170, use compileAsync instead.' ); // @deprecated, r170
 		return this.compileAsync;
