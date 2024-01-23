@@ -189,7 +189,7 @@ class WebGLTextureUtils {
 
 
 		// follow WebGPU backend mapping for texture filtering
-		const minFilter = texture.minFilter === LinearFilter ? LinearMipmapLinearFilter : texture.minFilter;
+		const minFilter = ! texture.isVideoTexture && texture.minFilter === LinearFilter ? LinearMipmapLinearFilter : texture.minFilter;
 
 		gl.texParameteri( textureType, gl.TEXTURE_MIN_FILTER, filterToGL[ minFilter ] );
 
