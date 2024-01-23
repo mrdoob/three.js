@@ -28,7 +28,7 @@ class JoinNode extends TempNode {
 		const type = this.getNodeType( builder );
 		const nodes = this.nodes;
 
-		const primitiveType = builder.getPrimitiveType( type );
+		const primitiveType = builder.getComponentType( type );
 
 		const snippetValues = [];
 
@@ -36,7 +36,7 @@ class JoinNode extends TempNode {
 
 			let inputSnippet = input.build( builder );
 
-			const inputPrimitiveType = builder.getPrimitiveType( input.getNodeType( builder ) );
+			const inputPrimitiveType = builder.getComponentType( input.getNodeType( builder ) );
 
 			if ( inputPrimitiveType !== primitiveType ) {
 

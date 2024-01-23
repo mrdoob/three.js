@@ -1178,18 +1178,6 @@ class NodeBuilder {
 
 	}
 
-	getPrimitiveType( type ) {
-
-		let primitiveType;
-
-		if ( type[ 0 ] === 'i' ) primitiveType = 'int';
-		else if ( type[ 0 ] === 'u' ) primitiveType = 'uint';
-		else primitiveType = 'float';
-
-		return primitiveType;
-
-	}
-
 	format( snippet, fromType, toType ) {
 
 		fromType = this.getVectorType( fromType );
@@ -1249,7 +1237,7 @@ class NodeBuilder {
 			// convert a number value to vector type, e.g:
 			// vec3( 1u ) -> vec3( float( 1u ) )
 
-			snippet = `${ this.getType( this.getPrimitiveType( toType ) ) }( ${ snippet } )`;
+			snippet = `${ this.getType( this.getComponentType( toType ) ) }( ${ snippet } )`;
 
 		}
 
