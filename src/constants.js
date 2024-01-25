@@ -57,6 +57,7 @@ export const CineonToneMapping = 3;
 export const ACESFilmicToneMapping = 4;
 export const CustomToneMapping = 5;
 export const AgXToneMapping = 6;
+export const AgXPunchyToneMapping = 7;
 export const AttachedBindMode = 'attached';
 export const DetachedBindMode = 'detached';
 

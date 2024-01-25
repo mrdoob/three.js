@@ -88,6 +88,14 @@ const mat3 LINEAR_SRGB_TO_LINEAR_REC2020 = mat3(
 	vec3( 0.0433, 0.0113, 0.8956 )
 );
 
+// AgX Tone Mapping implementation based on Filament, which in turn is based
+// on Blender's implementation using rec 2020 primaries
+// https://github.com/google/filament/pull/7236
+// Inputs and outputs are encoded as Linear-sRGB.
+
+#define AGX_LOOK_BASE 0u
+#define AGX_LOOK_PUNCHY 1u
+
 // https://iolite-engine.com/blog_posts/minimal_agx_implementation
 // Mean error^2: 3.6705141e-06
 vec3 agxDefaultContrastApprox( vec3 x ) {
@@ -105,12 +113,27 @@ vec3 agxDefaultContrastApprox( vec3 x ) {
 
 }
 
-// AgX Tone Mapping implementation based on Filament, which in turn is based
-// on Blender's implementation using rec 2020 primaries
-// https://github.com/google/filament/pull/7236
-// Inputs and outputs are encoded as Linear-sRGB.
+vec3 agxLook( vec3 color, uint look ) {
 
-vec3 AgXToneMapping( vec3 color ) {
+    vec3 offset = vec3( 0.0 );
+    vec3 slope = vec3( 1.0 );
+    vec3 power = vec3( 1.0 );
+    float sat = 1.0;
+
+    if ( look == AGX_LOOK_PUNCHY ) {
+
+        slope = vec3( 1.0 );
+        power = vec3( 1.35, 1.35, 1.35 );
+        sat = 1.4;
+
+    }
+
+    // ASC CDL
+    return pow( color * slope + offset, power );
+
+}
+
+vec3 AgXToneMapping( vec3 color, uint look ) {
 
 	// AgX constants
 	const mat3 AgXInsetMatrix = mat3(
@@ -149,7 +172,7 @@ vec3 AgXToneMapping( vec3 color ) {
 	color = agxDefaultContrastApprox( color );
 
 	// Apply AgX look
-	// v = agxLook(v, look);
+	color = agxLook( color, look );
 
 	color = AgXOutsetMatrix * color;
 
@@ -162,6 +185,18 @@ vec3 AgXToneMapping( vec3 color ) {
 	color = clamp( color, 0.0, 1.0 );
 
 	return color;
+
+}
+
+vec3 AgXToneMapping( vec3 color ) {
+
+	return AgXToneMapping( color, AGX_LOOK_BASE );
+
+}
+
+vec3 AgXPunchyToneMapping( vec3 color ) {
+
+	return AgXToneMapping( color, AGX_LOOK_PUNCHY );
 
 }
 
