@@ -1,6 +1,6 @@
 import Object3DNode from './Object3DNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { label } from '../core/ContextNode.js';
+// import { label } from '../core/ContextNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 //import { sharedUniformGroup } from '../core/UniformGroupNode.js';
 import { nodeImmutable } from '../shadernode/ShaderNode.js';
