@@ -107,8 +107,8 @@ CameraNode.LOG_DEPTH = 'logDepth';
 
 export default CameraNode;
 
-export const cameraProjectionMatrix = label( nodeImmutable( CameraNode, CameraNode.PROJECTION_MATRIX ), 'projectionMatrix' );
-export const cameraProjectionMatrixInverse = label( nodeImmutable( CameraNode, CameraNode.PROJECTION_MATRIX_INVERSE ), 'projectionMatrixInverse' );
+export const cameraProjectionMatrix = nodeImmutable( CameraNode, CameraNode.PROJECTION_MATRIX );
+export const cameraProjectionMatrixInverse = nodeImmutable( CameraNode, CameraNode.PROJECTION_MATRIX_INVERSE );
 export const cameraNear = nodeImmutable( CameraNode, CameraNode.NEAR );
 export const cameraFar = nodeImmutable( CameraNode, CameraNode.FAR );
 export const cameraLogDepth = nodeImmutable( CameraNode, CameraNode.LOG_DEPTH );
