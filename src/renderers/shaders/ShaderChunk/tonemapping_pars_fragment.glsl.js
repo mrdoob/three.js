@@ -93,8 +93,8 @@ const mat3 LINEAR_SRGB_TO_LINEAR_REC2020 = mat3(
 // https://github.com/google/filament/pull/7236
 // Inputs and outputs are encoded as Linear-sRGB.
 
-#define AGX_LOOK_BASE 0u
-#define AGX_LOOK_PUNCHY 1u
+#define AGX_LOOK_BASE 0
+#define AGX_LOOK_PUNCHY 1
 
 // https://iolite-engine.com/blog_posts/minimal_agx_implementation
 // Mean error^2: 3.6705141e-06
@@ -113,7 +113,7 @@ vec3 agxDefaultContrastApprox( vec3 x ) {
 
 }
 
-vec3 agxLook( vec3 color, uint look ) {
+vec3 agxLook( vec3 color, int look ) {
 
     if ( look == AGX_LOOK_BASE ) {
 
@@ -145,7 +145,7 @@ vec3 agxLook( vec3 color, uint look ) {
 
 }
 
-vec3 AgXToneMapping( vec3 color, uint look ) {
+vec3 AgXToneMapping( vec3 color, int look ) {
 
 	// AgX constants
 	const mat3 AgXInsetMatrix = mat3(
