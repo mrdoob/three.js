@@ -9,15 +9,15 @@ class RenderContexts {
 
 	}
 
-	get( scene, camera, renderTarget = null ) {
+	get( scene, camera, renderTarget ) {
 
 		const chainKey = [ scene, camera ];
 
 		let attachmentState;
 
-		if ( renderTarget === null ) {
+		if ( renderTarget.isCanvasRenderTarget ) {
 
-			attachmentState = 'default';
+			attachmentState = `${ renderTarget.samples }:${ renderTarget.depth }:${ renderTarget.stencil }`;
 
 		} else {
 
@@ -38,9 +38,11 @@ class RenderContexts {
 
 			chainMap.set( chainKey, renderState );
 
-		}
+			renderState.sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
+			renderState.depth = renderTarget.depthBuffer;
+			renderState.stencil = renderTarget.stencilBuffer;
 
-		if ( renderTarget !== null ) renderState.sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
+		}
 
 		return renderState;
 

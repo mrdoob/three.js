@@ -115,6 +115,7 @@ const exceptionList = [
 	'webgpu_compute_audio',
 	'webgpu_compute_texture',
 	'webgpu_compute_texture_pingpong',
+	'webgpu_multiple_canvases',
 	'webgpu_materials',
 	'webgpu_sandbox',
 	'webgpu_sprites',

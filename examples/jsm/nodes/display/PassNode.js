@@ -135,9 +135,10 @@ class PassNode extends TempNode {
 		const { renderer } = frame;
 		const { scene, camera } = this;
 
-		this._pixelRatio = renderer.getPixelRatio();
+		const canvasRenderTarget = renderer.getActiveCanvasRenderTarget();
+		this._pixelRatio = canvasRenderTarget.getPixelRatio();
 
-		const size = renderer.getSize( _size );
+		const size = canvasRenderTarget.getSize( _size );
 
 		this.setSize( size.width, size.height );
 
