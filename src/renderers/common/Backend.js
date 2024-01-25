@@ -1,5 +1,3 @@
-let vector2 = null;
-let vector4 = null;
 let color4 = null;
 
 import Color4 from './Color4.js';
@@ -89,8 +87,6 @@ class Backend {
 
 	getContext() { }
 
-	updateSize() { }
-
 	// utils
 
 	resolveTimestampAsync( /*renderContext, type*/ ) { }
@@ -107,23 +103,7 @@ class Backend {
 
 	}
 
-	getDrawingBufferSize() {
-
-		vector2 = vector2 || new Vector2();
-
-		return this.renderer.getDrawingBufferSize( vector2 );
-
-	}
-
-	getScissor() {
-
-		vector4 = vector4 || new Vector4();
-
-		return this.renderer.getScissor( vector4 );
-
-	}
-
-	setScissorTest( /*boolean*/ ) { }
+	setScissorTest( /* boolean  */ ) { }
 
 	getClearColor() {
 

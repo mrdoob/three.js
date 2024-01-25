@@ -34,7 +34,7 @@ class ViewportTextureNode extends TextureNode {
 	updateBefore( frame ) {
 
 		const renderer = frame.renderer;
-		renderer.getDrawingBufferSize( _size );
+		renderer.getActiveCanvasRenderTarget().getDrawingBufferSize( _size );
 
 		//
 

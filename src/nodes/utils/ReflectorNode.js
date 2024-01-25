@@ -63,7 +63,7 @@ class ReflectorNode extends TextureNode {
 
 		const resolution = this.resolution;
 
-		renderer.getDrawingBufferSize( _size );
+		renderer.getActiveCanvasRenderTarget().getDrawingBufferSize( _size );
 
 		renderTarget.setSize( Math.round( _size.width * resolution ), Math.round( _size.height * resolution ) );
 
@@ -134,7 +134,7 @@ class ReflectorNode extends TextureNode {
 		const virtualCamera = this.getVirtualCamera( camera );
 		const renderTarget = this.getRenderTarget( virtualCamera );
 
-		renderer.getDrawingBufferSize( _size );
+		renderer.getActiveCanvasRenderTarget().getDrawingBufferSize( _size );
 
 		this._updateResolution( renderTarget, renderer );
 

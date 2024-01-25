@@ -5,7 +5,7 @@ import {
 import WebGPUTexturePassUtils from './WebGPUTexturePassUtils.js';
 
 import {
-	ByteType, ShortType,
+	ByteType, ShortType, CubeTexture, Texture, Vector2,
 	NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter,
 	RepeatWrapping, MirroredRepeatWrapping,
 	RGB_ETC2_Format, RGBA_ETC2_EAC_Format,
@@ -31,6 +31,7 @@ const _compareToWebGPU = {
 };
 
 const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
+const _vector2 = new Vector2();
 
 class WebGPUTextureUtils {
 
@@ -42,11 +43,6 @@ class WebGPUTextureUtils {
 
 		this.defaultTexture = {};
 		this.defaultCubeTexture = {};
-
-		this.colorBuffer = null;
-
-		this.depthTexture = new DepthTexture();
-		this.depthTexture.name = 'depthBuffer';
 
 	}
 
@@ -238,72 +234,70 @@ class WebGPUTextureUtils {
 
 	}
 
-	getColorBuffer() {
-
-		if ( this.colorBuffer ) this.colorBuffer.destroy();
+	getBuffer( canvasRenderTarget, format, label ) {
 
 		const backend = this.backend;
-		const { width, height } = backend.getDrawingBufferSize();
+		const { width, height } = canvasRenderTarget.getDrawingBufferSize( _vector2 );
 
-		this.colorBuffer = backend.device.createTexture( {
-			label: 'colorBuffer',
+		return backend.device.createTexture( {
+			label,
 			size: {
-				width: width,
-				height: height,
+				width,
+				height,
 				depthOrArrayLayers: 1
 			},
-			sampleCount: backend.utils.getSampleCount( backend.renderer.samples ),
-			format: GPUTextureFormat.BGRA8Unorm,
+			sampleCount: canvasRenderTarget.sampleCount,
+			format,
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
 		} );
 
-		return this.colorBuffer;
+	}
+
+	getColorBuffer( canvasRenderTarget ) {
+
+		const backend = this.backend;
+
+		const canvasRenderTargetData = backend.get( canvasRenderTarget );
+
+		let colorBuffer = canvasRenderTargetData.colorBuffer;
+
+		if ( colorBuffer ) colorBuffer.destroy();
+
+		colorBuffer = this.getBuffer( canvasRenderTarget, GPUTextureFormat.BGRA8Unorm, 'colorBuffer' );
+
+		canvasRenderTargetData.colorBuffer = colorBuffer;
+
+		return colorBuffer;
 
 	}
 
-	getDepthBuffer( depth = true, stencil = false ) {
+	getDepthBuffer( canvasRenderTarget ) {
 
 		const backend = this.backend;
-		const { width, height } = backend.getDrawingBufferSize();
 
-		const depthTexture = this.depthTexture;
-		const depthTextureGPU = backend.get( depthTexture ).texture;
+		const canvasRenderTargetData = backend.get( canvasRenderTarget );
 
-		let format, type;
+		let depthTextureGPU = canvasRenderTargetData.depthTextureGPU;
 
-		if ( stencil ) {
+		if ( depthTextureGPU ) depthTextureGPU.destroy();
 
-			format = DepthStencilFormat;
-			type = UnsignedInt248Type;
+		let format;
 
-		} else if ( depth ) {
+		if ( canvasRenderTarget.stencil ) {
 
-			format = DepthFormat;
-			type = UnsignedIntType;
+			format = GPUTextureFormat.Depth24PlusStencil8;
 
-		}
+		} else if ( canvasRenderTarget.depth ) {
 
-		if ( depthTextureGPU !== undefined ) {
-
-			if ( depthTexture.image.width === width && depthTexture.image.height === height && depthTexture.format === format && depthTexture.type === type ) {
-
-				return depthTextureGPU;
-
-			}
-
-			this.destroyTexture( depthTexture );
+			format = GPUTextureFormat.Depth24Plus;
 
 		}
 
-		depthTexture.name = 'depthBuffer';
-		depthTexture.format = format;
-		depthTexture.type = type;
-		depthTexture.image.width = width;
-		depthTexture.image.height = height;
+		depthTextureGPU = this.getBuffer( canvasRenderTarget, format, 'depthBuffer' );
 
-		this.createTexture( depthTexture, { sampleCount: backend.utils.getSampleCount( backend.renderer.samples ), width, height } );
+		canvasRenderTargetData.depthTextureGPU = depthTextureGPU;
 
-		return backend.get( depthTexture ).texture;
+		return depthTextureGPU;
 
 	}
 

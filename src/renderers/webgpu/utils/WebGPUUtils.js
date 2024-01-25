@@ -55,57 +55,12 @@ class WebGPUUtils {
 
 	}
 
-	getCurrentColorSpace( renderContext ) {
-
-		if ( renderContext.textures !== null ) {
-
-			return renderContext.textures[ 0 ].colorSpace;
-
-		}
-
-		return this.backend.renderer.outputColorSpace;
-
-	}
-
 	getPrimitiveTopology( object, material ) {
 
 		if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
 		else if ( object.isLineSegments || ( object.isMesh && material.wireframe === true ) ) return GPUPrimitiveTopology.LineList;
 		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 		else if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
-
-	}
-
-	getSampleCount( sampleCount ) {
-
-		let count = 1;
-
-		if ( sampleCount > 1 ) {
-
-			// WebGPU only supports power-of-two sample counts and 2 is not a valid value
-			count = Math.pow( 2, Math.floor( Math.log2( sampleCount ) ) );
-
-			if ( count === 2 ) {
-
-				count = 4;
-
-			}
-
-		}
-
-		return count;
-
-	}
-
-	getSampleCountRenderContext( renderContext ) {
-
-		if ( renderContext.textures !== null ) {
-
-			return this.getSampleCount( renderContext.sampleCount );
-
-		}
-
-		return this.getSampleCount( this.backend.renderer.samples );
 
 	}
 

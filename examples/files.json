@@ -359,6 +359,7 @@
 		"webgpu_morphtargets_face",
 		"webgpu_mrt",
 		"webgpu_mrt_mask",
+		"webgpu_multiple_canvases",
 		"webgpu_multiple_rendertargets",
 		"webgpu_multiple_rendertargets_readback",
 		"webgpu_multisampled_renderbuffers",

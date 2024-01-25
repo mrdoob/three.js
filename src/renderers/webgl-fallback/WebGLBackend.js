@@ -1196,12 +1196,6 @@ class WebGLBackend extends Backend {
 
 	}
 
-	updateSize() {
-
-		//console.warn( 'Abstract class.' );
-
-	}
-
 	hasFeature( name ) {
 
 		const keysMatching = Object.keys( GLFeatureName ).filter( key => GLFeatureName[ key ] === name );
