@@ -115,6 +115,16 @@ vec3 agxDefaultContrastApprox( vec3 x ) {
 
 vec3 agxLook( vec3 color, uint look ) {
 
+    if ( look == AGX_LOOK_BASE ) {
+
+        return color;
+
+    }
+
+    const vec3 lw = vec3( 0.2126, 0.7152, 0.0722 );
+
+    float luma = dot( color, lw );
+
     vec3 offset = vec3( 0.0 );
     vec3 slope = vec3( 1.0 );
     vec3 power = vec3( 1.0 );
@@ -129,7 +139,9 @@ vec3 agxLook( vec3 color, uint look ) {
     }
 
     // ASC CDL
-    return pow( color * slope + offset, power );
+    color = pow( color * slope + offset, power );
+
+    return luma + sat * ( color - luma );
 
 }
 
