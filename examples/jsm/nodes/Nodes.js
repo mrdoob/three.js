@@ -107,7 +107,7 @@ export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
 // display
 export { default as BlendModeNode, burn, dodge, overlay, screen } from './display/BlendModeNode.js';
 export { default as BumpMapNode, bumpMap } from './display/BumpMapNode.js';
-export { default as ColorAdjustmentNode, saturation, vibrance, hue, lumaCoeffs, luminance } from './display/ColorAdjustmentNode.js';
+export { default as ColorAdjustmentNode, saturation, vibrance, hue, lumaCoeffs, luminance, threshold } from './display/ColorAdjustmentNode.js';
 export { default as ColorSpaceNode, linearToColorSpace, colorSpaceToLinear, linearTosRGB, sRGBToLinear } from './display/ColorSpaceNode.js';
 export { default as FrontFacingNode, frontFacing, faceDirection } from './display/FrontFacingNode.js';
 export { default as NormalMapNode, normalMap, TBNViewMatrix } from './display/NormalMapNode.js';
@@ -120,6 +120,7 @@ export { default as ViewportDepthTextureNode, viewportDepthTexture } from './dis
 export { default as ViewportDepthNode, viewZToOrthographicDepth, orthographicDepthToViewZ, viewZToPerspectiveDepth, perspectiveDepthToViewZ, depth, depthTexture, depthPixel } from './display/ViewportDepthNode.js';
 export { default as GaussianBlurNode, gaussianBlur } from './display/GaussianBlurNode.js';
 export { default as AfterImageNode, afterImage } from './display/AfterImageNode.js';
+export { default as AnamorphicNode, anamorphic } from './display/AnamorphicNode.js';
 
 export { default as PassNode, pass, depthPass } from './display/PassNode.js';
 

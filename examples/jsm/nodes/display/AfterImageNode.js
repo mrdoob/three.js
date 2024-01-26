@@ -3,6 +3,7 @@ import { nodeObject, addNodeElement, tslFn, float, vec4 } from '../shadernode/Sh
 import { NodeUpdateType } from '../core/constants.js';
 import { uv } from '../accessors/UVNode.js';
 import { texture } from '../accessors/TextureNode.js';
+import { texturePass } from './PassNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { RenderTarget } from 'three';
 import { sign, max } from '../math/MathNode.js';
@@ -26,7 +27,15 @@ class AfterImageNode extends TempNode {
 		this._oldRT = new RenderTarget();
 		this._oldRT.texture.name = 'AfterImageNode.old';
 
+		this._textureNode = texturePass( this, this._compRT.texture );
+
 		this.updateBeforeType = NodeUpdateType.RENDER;
+
+	}
+
+	getTextureNode() {
+
+		return this._textureNode;
 
 	}
 
@@ -42,6 +51,12 @@ class AfterImageNode extends TempNode {
 		const { renderer } = frame;
 
 		const textureNode = this.textureNode;
+		const map = textureNode.value;
+
+		const textureType = map.type;
+
+		this._compRT.texture.type = textureType;
+		this._oldRT.texture.type = textureType;
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentTexture = textureNode.value;
@@ -58,7 +73,6 @@ class AfterImageNode extends TempNode {
 		this._compRT = temp;
 
 		// set size before swapping fails
-		const map = currentTexture;
 		this.setSize( map.image.width, map.image.height );
 
 		renderer.setRenderTarget( currentRenderTarget );
@@ -120,7 +134,7 @@ class AfterImageNode extends TempNode {
 
 		//
 
-		return texture( this._compRT.texture );
+		return this._textureNode;
 
 	}
 

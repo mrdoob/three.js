@@ -370,6 +370,7 @@
 		"webgpu_tsl_transpiler",
 		"webgpu_video_panorama",
 		"webgpu_postprocessing_afterimage",
+		"webgpu_postprocessing_anamorphic",
 		"webgpu_mirror",
 		"webgpu_multisampled_renderbuffers",
 		"webgpu_materials_texture_anisotropy"
