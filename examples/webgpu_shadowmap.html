@@ -102,9 +102,11 @@
 
 				const materialCustomShadow = material.clone();
 			
+				const discardNode = vertexIndex.hash().greaterThan( 0.5 );
+
 				materialCustomShadow.colorNode = tslFn( () => {
 
-					vertexIndex.hash().greaterThan( 0.5 ).discard();
+					discardNode.discard();
 
 					return vec4( 1. );
 
@@ -112,7 +114,7 @@
 
 				materialCustomShadow.shadowNode = tslFn( () => {
 
-					vertexIndex.hash().greaterThan( 0.8 ).discard();
+					discardNode.discard();
 
 					return vec4( 1. );
 			
