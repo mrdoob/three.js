@@ -57,7 +57,7 @@ class AnalyticLightNode extends LightingNode {
 			if ( overrideMaterial === null ) {
 
 				overrideMaterial = builder.createNodeMaterial();
-				overrideMaterial.fragmentNode = vec4( 1 );
+				overrideMaterial.fragmentNode = vec4( 0, 0, 0, 1 );
 
 			}
 
