@@ -73,12 +73,24 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 	const secondRow = new UIRow().setMarginBottom( '0px' ).setStyle( 'min-height', '0px' );
 	paramContainer.add( secondRow );
 
+	let defaultProperties;
 	let intensity;
 
 	if ( property === 'aoMap' ) {
 
+		if ( defaultProperties === undefined ) {
+
+			defaultProperties = new UIDiv().setMarginLeft( '3px' );
+			secondRow.add( defaultProperties );
+
+		}
+
+		const defaultIntensityRow = new UIRow().setMarginBottom( '6px' ).setStyle( 'min-height', '0px' );
+		defaultProperties.add( defaultIntensityRow );
+
+		defaultIntensityRow.add( new UIText( 'intst:' ).setWidth( '40px' ) );
 		intensity = new UINumber( 1 ).setWidth( '30px' ).setRange( 0, 1 ).onChange( onIntensityChange );
-		secondRow.add( intensity );
+		defaultIntensityRow.add( intensity );
 
 	}
 
@@ -86,8 +98,19 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	if ( property === 'bumpMap' || property === 'displacementMap' ) {
 
+		if ( defaultProperties === undefined ) {
+
+			defaultProperties = new UIDiv().setMarginLeft( '3px' );
+			secondRow.add( defaultProperties );
+
+		}
+
+		const defaultScaleRow = new UIRow().setMarginBottom( '6px' ).setStyle( 'min-height', '0px' );
+		defaultProperties.add( defaultScaleRow );
+
+		defaultScaleRow.add( new UIText( 'scale:' ).setWidth( '40px' ) );
 		scale = new UINumber().setWidth( '30px' ).onChange( onScaleChange );
-		secondRow.add( scale );
+		defaultScaleRow.add( scale );
 
 	}
 
@@ -95,11 +118,26 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	if ( property === 'normalMap' || property === 'clearcoatNormalMap' ) {
 
-		scaleX = new UINumber().setWidth( '30px' ).onChange( onScaleXYChange );
-		secondRow.add( scaleX );
+		if ( defaultProperties === undefined ) {
 
+			defaultProperties = new UIDiv().setMarginLeft( '3px' );
+			secondRow.add( defaultProperties );
+
+		}
+
+		const defaultScaleXRow = new UIRow().setMarginBottom( '6px' ).setStyle( 'min-height', '0px' );
+		defaultProperties.add( defaultScaleXRow );
+
+		defaultScaleXRow.add( new UIText( 'scaleX:' ).setWidth( '40px' ) );
+		scaleX = new UINumber().setWidth( '30px' ).onChange( onScaleXYChange );
+		defaultScaleXRow.add( scaleX );
+
+		const defaultScaleYRow = new UIRow().setMarginBottom( '6px' ).setStyle( 'min-height', '0px' );
+		defaultProperties.add( defaultScaleYRow );
+
+		defaultScaleYRow.add( new UIText( 'scaleY:' ).setWidth( '40px' ) );
 		scaleY = new UINumber().setWidth( '30px' ).onChange( onScaleXYChange );
-		secondRow.add( scaleY );
+		defaultScaleYRow.add( scaleY );
 
 	}
 
