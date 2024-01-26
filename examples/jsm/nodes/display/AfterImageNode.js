@@ -3,6 +3,7 @@ import { nodeObject, addNodeElement, tslFn, float, vec4 } from '../shadernode/Sh
 import { NodeUpdateType } from '../core/constants.js';
 import { uv } from '../accessors/UVNode.js';
 import { texture } from '../accessors/TextureNode.js';
+import { texturePass } from './PassNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { RenderTarget } from 'three';
 import { sign, max } from '../math/MathNode.js';
@@ -26,7 +27,15 @@ class AfterImageNode extends TempNode {
 		this._oldRT = new RenderTarget();
 		this._oldRT.texture.name = 'AfterImageNode.old';
 
+		this._textureNode = texturePass( this, this._compRT.texture );
+
 		this.updateBeforeType = NodeUpdateType.RENDER;
+
+	}
+
+	getTextureNode() {
+
+		return this._textureNode;
 
 	}
 
@@ -120,7 +129,7 @@ class AfterImageNode extends TempNode {
 
 		//
 
-		return texture( this._compRT.texture );
+		return this._textureNode;
 
 	}
 
