@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, uniform } from 'three/nodes';
+			import { pass, cubeTexture, viewportTopLeft, uniform } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
@@ -73,7 +73,7 @@
 					.loadCubemap( rgbmUrls );
 
 				scene.environment = cube1Texture;
-				scene.background = cube1Texture;
+				scene.backgroundNode = cubeTexture( cube1Texture ).mul( viewportTopLeft.distance( .5 ).oneMinus().remapClamp( .1, 4 ) ).saturation( 0 );
 
 				const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 				loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
@@ -101,18 +101,21 @@
 
 				const threshold = uniform( 1.4 );
 				const scaleNode = uniform( 5 );
+				const intensity = uniform( 1 );
 				const samples = 64;
 
 				const anamorphicPass = scenePass.getTextureNode().anamorphic( threshold, scaleNode, samples );
-				anamorphicPass.resolution = new THREE.Vector2( .4, .4 ); // 1 = full resolution
+				anamorphicPass.resolution = new THREE.Vector2( .2, .2 ); // 1 = full resolution
 
 				postProcessing = new PostProcessing( renderer );
-				postProcessing.outputNode = scenePass.add( anamorphicPass );
+				postProcessing.outputNode = scenePass.add( anamorphicPass.mul( intensity ) );
+				//postProcessing.outputNode = scenePass.add( anamorphicPass.getTextureNode().gaussianBlur() );
 
 				// gui
 
 				const gui = new GUI();
-				gui.add( threshold, 'value', .1, 2, .001 ).name( 'threshold' );
+				gui.add( intensity, 'value', 0, 4, 0.1 ).name( 'intensity' );
+				gui.add( threshold, 'value', .8, 3, .001 ).name( 'threshold' );
 				gui.add( scaleNode, 'value', 1, 10, 0.1 ).name( 'scale' );
 				gui.add( anamorphicPass.resolution, 'x', .1, 1, 0.1 ).name( 'resolution' ).onChange( ( v ) => anamorphicPass.resolution.y = v );
 
