@@ -31,7 +31,7 @@
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { vec4, tslFn, vertexIndex, MeshPhongNodeMaterial } from 'three/nodes';
+			import { vec4, tslFn, color, vertexIndex, MeshPhongNodeMaterial } from 'three/nodes';
 			let camera, scene, renderer, clock;
 			let dirLight, spotLight;
 			let torusKnot, dirGroup;
@@ -57,9 +57,9 @@
 
 				// lights
 
-				scene.add( new THREE.AmbientLight( 0x444444, 2 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff, 2 ) );
 
-				spotLight = new THREE.SpotLight( 0xff8888, 400 );
+				spotLight = new THREE.SpotLight( 0xffffff, 400 );
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.3;
 				spotLight.position.set( 8, 10, 5 );
@@ -73,7 +73,7 @@
 				scene.add( spotLight );
 
 
-				dirLight = new THREE.DirectionalLight( 0x8888ff, 3 );
+				dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
 				dirLight.position.set( 3, 12, 17 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 0.1;
@@ -116,7 +116,7 @@
 
 					discardNode.discard();
 
-					return vec4( 1. );
+					return vec4( color( 0x0000ff ), .3 );
 			
 				} )();
 
@@ -167,7 +167,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				//renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );
 
 				// Mouse control
