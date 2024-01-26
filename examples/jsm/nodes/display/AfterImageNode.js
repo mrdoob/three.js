@@ -51,6 +51,12 @@ class AfterImageNode extends TempNode {
 		const { renderer } = frame;
 
 		const textureNode = this.textureNode;
+		const map = textureNode.value;
+
+		const textureType = map.type;
+
+		this._compRT.texture.type = textureType;
+		this._oldRT.texture.type = textureType;
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentTexture = textureNode.value;
@@ -67,7 +73,6 @@ class AfterImageNode extends TempNode {
 		this._compRT = temp;
 
 		// set size before swapping fails
-		const map = currentTexture;
 		this.setSize( map.image.width, map.image.height );
 
 		renderer.setRenderTarget( currentRenderTarget );

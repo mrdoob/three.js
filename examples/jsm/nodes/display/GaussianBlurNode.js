@@ -67,6 +67,11 @@ class GaussianBlurNode extends TempNode {
 
 		this.setSize( map.image.width, map.image.height );
 
+		const textureType = map.type;
+
+		this._horizontalRT.texture.type = textureType;
+		this._verticalRT.texture.type = textureType;
+
 		// horizontal
 
 		renderer.setRenderTarget( this._horizontalRT );
