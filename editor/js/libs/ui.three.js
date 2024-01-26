@@ -27,8 +27,8 @@ class UITexture extends UISpan {
 		form.appendChild( input );
 
 		const canvas = document.createElement( 'canvas' );
-		canvas.width = 32;
-		canvas.height = 16;
+		canvas.width = 40;
+		canvas.height = 40;
 		canvas.style.cursor = 'pointer';
 		canvas.style.marginRight = '5px';
 		canvas.style.border = '1px solid #888';
