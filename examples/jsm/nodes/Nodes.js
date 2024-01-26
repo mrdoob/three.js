@@ -118,6 +118,7 @@ export { default as ViewportDepthTextureNode, viewportDepthTexture } from './dis
 export { default as ViewportDepthNode, viewZToOrthographicDepth, orthographicDepthToViewZ, viewZToPerspectiveDepth, perspectiveDepthToViewZ, depth, depthTexture, depthPixel } from './display/ViewportDepthNode.js';
 export { default as GaussianBlurNode, gaussianBlur } from './display/GaussianBlurNode.js';
 export { default as AfterImageNode, afterImage } from './display/AfterImageNode.js';
+export { default as AnamorphicNode, anamorphic } from './display/AnamorphicNode.js';
 
 export { default as PassNode, pass, depthPass } from './display/PassNode.js';
 
