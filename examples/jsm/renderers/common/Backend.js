@@ -90,7 +90,7 @@ class Backend {
 
 	// utils
 
-	resolveTimeStampAsync( renderContext, type ) { }
+	resolveTimestampAsync( renderContext, type ) { }
 
 	hasFeatureAsync( name ) { } // return Boolean
 

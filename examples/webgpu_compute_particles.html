@@ -90,7 +90,7 @@
 
 				//
 
-				const createBuffer = () => storage( StorageBufferAttribute.create( particleCount, 3 ), 'vec3', particleCount );
+				const createBuffer = () => storage( new StorageBufferAttribute( particleCount, 3 ), 'vec3', particleCount );
 
 				const positionBuffer = createBuffer();
 				const velocityBuffer = createBuffer();
@@ -294,8 +294,8 @@
 
 						timestamps.innerHTML = `
 
-										Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.timestamp.compute}ms<br>
-										Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.timestamp.render}ms`;
+							Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.timestamp.compute}ms<br>
+							Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.timestamp.render}ms`;
 
 					}
 

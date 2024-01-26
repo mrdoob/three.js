@@ -478,7 +478,7 @@ class Renderer {
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
 
 
-		await this.backend.resolveTimeStampAsync( renderContext, 'render' );
+		await this.backend.resolveTimestampAsync( renderContext, 'render' );
 
 	}
 
@@ -894,7 +894,7 @@ class Renderer {
 
 		backend.finishCompute( computeNodes );
 
-		await this.backend.resolveTimeStampAsync( computeNodes, 'compute' );
+		await this.backend.resolveTimestampAsync( computeNodes, 'compute' );
 
 		//
 
@@ -1194,7 +1194,6 @@ class Renderer {
 
 	get compile() {
 
-		console.warn( 'THREE.Renderer: compile() is deprecated and will be removed in r170, use compileAsync instead.' ); // @deprecated, r170
 		return this.compileAsync;
 
 	}

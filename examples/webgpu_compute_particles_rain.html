@@ -103,7 +103,7 @@
 
 				//
 
-				const createBuffer = ( type = 'vec3' ) => storage( StorageBufferAttribute.create( maxParticleCount, 3 ), type, maxParticleCount );
+				const createBuffer = ( type = 'vec3' ) => storage( new StorageBufferAttribute( maxParticleCount, 3 ), type, maxParticleCount );
 
 				const positionBuffer = createBuffer();
 				const velocityBuffer = createBuffer();

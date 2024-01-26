@@ -325,7 +325,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		this.initTimeStampQuery( renderContext, descriptor );
+		this.initTimestampQuery( renderContext, descriptor );
 
 		descriptor.occlusionQuerySet = occlusionQuerySet;
 
@@ -494,7 +494,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		this.prepareTimeStampBuffer( renderContext, renderContextData.encoder );
+		this.prepareTimestampBuffer( renderContext, renderContextData.encoder );
 
 		this.device.queue.submit( [ renderContextData.encoder.finish() ] );
 
@@ -735,7 +735,7 @@ class WebGPUBackend extends Backend {
 
 		const descriptor = {};
 
-		this.initTimeStampQuery( computeGroup, descriptor );
+		this.initTimestampQuery( computeGroup, descriptor );
 
 		groupGPU.cmdEncoderGPU = this.device.createCommandEncoder();
 
@@ -767,7 +767,7 @@ class WebGPUBackend extends Backend {
 
 		groupData.passEncoderGPU.end();
 
-		this.prepareTimeStampBuffer( computeGroup, groupData.cmdEncoderGPU );
+		this.prepareTimestampBuffer( computeGroup, groupData.cmdEncoderGPU );
 
 		this.device.queue.submit( [ groupData.cmdEncoderGPU.finish() ] );
 
@@ -1031,7 +1031,7 @@ class WebGPUBackend extends Backend {
 	}
 
 
-	initTimeStampQuery( renderContext, descriptor ) {
+	initTimestampQuery( renderContext, descriptor ) {
 
 		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
 
@@ -1059,7 +1059,7 @@ class WebGPUBackend extends Backend {
 
 	// timestamp utils
 
-	prepareTimeStampBuffer( renderContext, encoder ) {
+	prepareTimestampBuffer( renderContext, encoder ) {
 
 		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
 
@@ -1079,11 +1079,11 @@ class WebGPUBackend extends Backend {
 		encoder.resolveQuerySet( renderContextData.timeStampQuerySet, 0, 2, resolveBuffer, 0 );
 		encoder.copyBufferToBuffer( resolveBuffer, 0, resultBuffer, 0, size );
 
-		renderContextData.currentTimeStampQueryBuffer = resultBuffer;
+		renderContextData.currentTimestampQueryBuffer = resultBuffer;
 
 	}
 
-	async resolveTimeStampAsync( renderContext, type = 'render' ) {
+	async resolveTimestampAsync( renderContext, type = 'render' ) {
 
 		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
 
@@ -1091,21 +1091,21 @@ class WebGPUBackend extends Backend {
 
 		// handle timestamp query results
 
-		const { currentTimeStampQueryBuffer } = renderContextData;
+		const { currentTimestampQueryBuffer } = renderContextData;
 
-		if ( currentTimeStampQueryBuffer ) {
+		if ( currentTimestampQueryBuffer ) {
 
-			renderContextData.currentTimeStampQueryBuffer = null;
+			renderContextData.currentTimestampQueryBuffer = null;
 
-			await currentTimeStampQueryBuffer.mapAsync( GPUMapMode.READ );
+			await currentTimestampQueryBuffer.mapAsync( GPUMapMode.READ );
 
-			const times = new BigUint64Array( currentTimeStampQueryBuffer.getMappedRange() );
+			const times = new BigUint64Array( currentTimestampQueryBuffer.getMappedRange() );
 
 			const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
 			// console.log( `Compute ${type} duration: ${Number( times[ 1 ] - times[ 0 ] ) / 1000000}ms` );
 			this.renderer.info.updateTimestamp( type, duration );
 
-			currentTimeStampQueryBuffer.unmap();
+			currentTimestampQueryBuffer.unmap();
 
 		}
 

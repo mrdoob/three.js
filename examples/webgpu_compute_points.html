@@ -62,13 +62,10 @@
 				const particleNum = 300000;
 				const particleSize = 2; // vec2
 
-//				const particleArray = new Float32Array( particleNum * particleSize );
-//				const velocityArray = new Float32Array( particleNum * particleSize );
-
 				// create buffers
 
-				const particleBuffer = StorageBufferAttribute.create( particleNum, particleSize );
-				const velocityBuffer = StorageBufferAttribute.create( particleNum, particleSize );
+				const particleBuffer = new StorageBufferAttribute( particleNum, particleSize );
+				const velocityBuffer = new StorageBufferAttribute( particleNum, particleSize );
 
 				const particleBufferNode = storage( particleBuffer, 'vec2', particleNum );
 				const velocityBufferNode = storage( velocityBuffer, 'vec2', particleNum );
