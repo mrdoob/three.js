@@ -58,6 +58,7 @@ class AnalyticLightNode extends LightingNode {
 
 				overrideMaterial = builder.createNodeMaterial();
 				overrideMaterial.fragmentNode = vec4( 0, 0, 0, 1 );
+				overrideMaterial.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.fragmentNode unintentionally when using material.shadowNode
 
 			}
 
