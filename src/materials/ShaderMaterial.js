@@ -39,7 +39,6 @@ class ShaderMaterial extends Material {
 			shaderTextureLOD: false, // set to use shader texture LOD
 			clipCullDistance: false, // set to use vertex shader clipping
 			extensionMultidraw: false // set to use vertex shader multi_draw / enable gl_DrawID
-
 		};
 
 		// When rendered geometry doesn't include these attributes but the material does,
