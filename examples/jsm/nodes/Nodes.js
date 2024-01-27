@@ -46,7 +46,7 @@ export { default as CondNode, cond } from './math/CondNode.js';
 export { default as HashNode, hash } from './math/HashNode.js';
 
 // math utils
-export { parabola, gain, pcurve, sinc } from './math/MathUtilsNode.js';
+export { parabola, gain, pcurve, sinc } from './math/MathUtils.js';
 export { triNoise3D } from './math/TriNoise3D.js';
 
 // utils
