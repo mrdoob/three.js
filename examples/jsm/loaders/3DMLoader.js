@@ -1,29 +1,29 @@
 import {
 	BufferGeometryLoader,
-	FileLoader,
-	Loader,
-	Object3D,
-	MeshStandardMaterial,
-	MeshPhysicalMaterial,
-	Mesh,
+	CanvasTexture,
+	ClampToEdgeWrapping,
 	Color,
-	Points,
-	PointsMaterial,
+	DirectionalLight,
+	DoubleSide,
+	FileLoader,
+	LinearFilter,
 	Line,
 	LineBasicMaterial,
+	Loader,
 	Matrix4,
-	DirectionalLight,
+	Mesh,
+	MeshPhysicalMaterial,
+	MeshStandardMaterial,
+	Object3D,
 	PointLight,
-	SpotLight,
+	Points,
+	PointsMaterial,
 	RectAreaLight,
+	RepeatWrapping,
+	SpotLight,
 	Sprite,
 	SpriteMaterial,
-	CanvasTexture,
-	LinearFilter,
-	ClampToEdgeWrapping,
-	RepeatWrapping,
-	TextureLoader,
-	DoubleSide
+	TextureLoader
 } from 'three';
 
 import { EXRLoader } from '../loaders/EXRLoader.js';
@@ -226,7 +226,8 @@ class Rhino3dmLoader extends Loader {
 
 			return new MeshStandardMaterial( {
 				color: new Color( 1, 1, 1 ),
-				metalness: 0.8,
+				metalness: 0.1,
+				roughness: 0.6,
 				name: Loader.DEFAULT_MATERIAL_NAME,
 				side: DoubleSide
 			} );
@@ -256,11 +257,11 @@ class Rhino3dmLoader extends Loader {
 
 			const pbr = material.pbr;
 
-			mat.anisotropy = pbr.anisotropy;
+			mat.anisotropy = pbr.anisotropic;
 			mat.anisotropyRotation = pbr.anisotropicRotation;
 			mat.color = new Color( pbr.baseColor.r, pbr.baseColor.g, pbr.baseColor.b );
-			mat.clearCoat = pbr.clearCoat;
-			mat.clearCoatRoughness = pbr.clearCoatRoughness;
+			mat.clearcoat = pbr.clearcoat;
+			mat.clearcoatRoughness = pbr.clearcoatRoughness;
 			mat.metalness = pbr.metallic;
 			mat.transmission = 1 - pbr.opacity;
 			mat.roughness = pbr.roughness;
