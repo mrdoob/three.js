@@ -133,7 +133,7 @@ jobs:
           comment-author: 'github-actions[bot]'
           body-includes: Bundle size
       - name: Comment on PR
-        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4
         with:
           issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
