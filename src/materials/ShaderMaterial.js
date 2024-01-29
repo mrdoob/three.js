@@ -37,7 +37,8 @@ class ShaderMaterial extends Material {
 			fragDepth: false, // set to use fragment depth values
 			drawBuffers: false, // set to use draw buffers
 			shaderTextureLOD: false, // set to use shader texture LOD
-			clipCullDistance: false // set to use vertex shader clipping
+			clipCullDistance: false, // set to use vertex shader clipping
+			multiDraw: false // set to use vertex shader multi_draw / enable gl_DrawID
 		};
 
 		// When rendered geometry doesn't include these attributes but the material does,
