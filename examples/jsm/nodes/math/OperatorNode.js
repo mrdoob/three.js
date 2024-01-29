@@ -37,7 +37,7 @@ class OperatorNode extends TempNode {
 		const bNode = this.bNode;
 
 		const typeA = aNode.getNodeType( builder );
-		const typeB = bNode.getNodeType( builder );
+		const typeB = typeof bNode !== 'undefined' ? bNode.getNodeType( builder ) : null;
 
 		if ( typeA === 'void' || typeB === 'void' ) {
 
@@ -47,11 +47,11 @@ class OperatorNode extends TempNode {
 
 			return typeA;
 
-		} else if ( op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<' ) {
+		} else if ( op === '~' || op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<' ) {
 
 			return builder.getIntegerType( typeA );
 
-		} else if ( op === '==' || op === '&&' || op === '||' || op === '^^' ) {
+		} else if ( op === '!' || op === '==' || op === '&&' || op === '||' || op === '^^' ) {
 
 			return 'bool';
 
@@ -108,7 +108,7 @@ class OperatorNode extends TempNode {
 		if ( type !== 'void' ) {
 
 			typeA = aNode.getNodeType( builder );
-			typeB = bNode.getNodeType( builder );
+			typeB = typeof bNode !== 'undefined' ? bNode.getNodeType( builder ) : null;
 
 			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' ) {
 
@@ -154,7 +154,7 @@ class OperatorNode extends TempNode {
 		}
 
 		const a = aNode.build( builder, typeA );
-		const b = bNode.build( builder, typeB );
+		const b = typeof bNode !== 'undefined' ? bNode.build( builder, typeB ) : null;
 
 		const outputLength = builder.getTypeLength( output );
 		const fnOpSnippet = builder.getFunctionOperator( op );
@@ -176,6 +176,10 @@ class OperatorNode extends TempNode {
 			} else if ( op === '>=' && outputLength > 1 ) {
 
 				return builder.format( `${ builder.getMethod( 'greaterThanEqual' ) }( ${ a }, ${ b } )`, type, output );
+
+			} else if ( op === '!' || op === '~' ) {
+
+				return builder.format( `(${op}${a})`, typeA, output );
 
 			} else if ( fnOpSnippet ) {
 
@@ -236,8 +240,10 @@ export const lessThanEqual = nodeProxy( OperatorNode, '<=' );
 export const greaterThanEqual = nodeProxy( OperatorNode, '>=' );
 export const and = nodeProxy( OperatorNode, '&&' );
 export const or = nodeProxy( OperatorNode, '||' );
+export const not = nodeProxy( OperatorNode, '!' );
 export const xor = nodeProxy( OperatorNode, '^^' );
 export const bitAnd = nodeProxy( OperatorNode, '&' );
+export const bitNot = nodeProxy( OperatorNode, '~' );
 export const bitOr = nodeProxy( OperatorNode, '|' );
 export const bitXor = nodeProxy( OperatorNode, '^' );
 export const shiftLeft = nodeProxy( OperatorNode, '<<' );
@@ -256,8 +262,10 @@ addNodeElement( 'lessThanEqual', lessThanEqual );
 addNodeElement( 'greaterThanEqual', greaterThanEqual );
 addNodeElement( 'and', and );
 addNodeElement( 'or', or );
+addNodeElement( 'not', not );
 addNodeElement( 'xor', xor );
 addNodeElement( 'bitAnd', bitAnd );
+addNodeElement( 'bitNot', bitNot );
 addNodeElement( 'bitOr', bitOr );
 addNodeElement( 'bitXor', bitXor );
 addNodeElement( 'shiftLeft', shiftLeft );
