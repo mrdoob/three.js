@@ -17,6 +17,7 @@ import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { ViewportPathtracer } from './Viewport.Pathtracer.js';
 
 function Viewport( editor ) {
 
@@ -33,6 +34,7 @@ function Viewport( editor ) {
 
 	let renderer = null;
 	let pmremGenerator = null;
+	let pathtracer = null;
 
 	const camera = editor.camera;
 	const scene = editor.scene;
@@ -378,6 +380,8 @@ function Viewport( editor ) {
 		pmremGenerator = new THREE.PMREMGenerator( renderer );
 		pmremGenerator.compileEquirectangularShader();
 
+		pathtracer = new ViewportPathtracer( renderer );
+
 		container.dom.appendChild( renderer.domElement );
 
 		render();
@@ -397,6 +401,8 @@ function Viewport( editor ) {
 	} );
 
 	signals.cameraChanged.add( function () {
+
+		pathtracer.reset();
 
 		render();
 
@@ -641,7 +647,11 @@ function Viewport( editor ) {
 
 		switch ( viewportShading ) {
 
-			case 'default':
+			case 'realistic':
+				pathtracer.init( scene, camera );
+				break;
+
+			case 'solid':
 				scene.overrideMaterial = null;
 				break;
 
@@ -668,6 +678,7 @@ function Viewport( editor ) {
 		updateAspectRatio();
 
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+		pathtracer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		render();
 
@@ -741,6 +752,12 @@ function Viewport( editor ) {
 		}
 
 		if ( needsUpdate === true ) render();
+
+		if ( editor.viewportShading === 'realistic' ) {
+
+			pathtracer.update();
+
+		}
 
 	}
 

@@ -50,8 +50,8 @@ function ViewportControls( editor ) {
 	// shading
 
 	const shadingSelect = new UISelect();
-	shadingSelect.setOptions( { 'default': 'default', 'normals': 'normals', 'wireframe': 'wireframe' } );
-	shadingSelect.setValue( 'default' );
+	shadingSelect.setOptions( { 'realistic': 'realistic', 'solid': 'solid', 'normals': 'normals', 'wireframe': 'wireframe' } );
+	shadingSelect.setValue( 'solid' );
 	shadingSelect.onChange( function () {
 
 		editor.setViewportShading( this.getValue() );
