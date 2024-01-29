@@ -177,7 +177,7 @@ class OperatorNode extends TempNode {
 
 				return builder.format( `${ builder.getMethod( 'greaterThanEqual' ) }( ${ a }, ${ b } )`, type, output );
 
-			} else if ( op === '!' || op === '~' || op === '--' || op === '++' ) {
+			} else if ( op === '!' || op === '~' ) {
 
 				return builder.format( `(${op}${a})`, typeA, output );
 
