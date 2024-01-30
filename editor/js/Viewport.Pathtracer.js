@@ -66,7 +66,11 @@ function ViewportPathtracer( renderer ) {
 
 		if ( background ) {
 
-			if ( background.isColor ) {
+			if ( background.isTexture ) {
+
+				ptMaterial.backgroundMap = background;
+
+			} else if ( background.isColor ) {
 
 				ptMaterial.backgroundMap = buildColorTexture( background );
 
