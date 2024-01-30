@@ -43,7 +43,7 @@ class WebXRDepthSensing {
 
 	}
 
-	init( renderer, session, depthData ) {
+	init( renderer, depthData, renderState ) {
 
 		if ( this.texture === null ) {
 
@@ -52,7 +52,7 @@ class WebXRDepthSensing {
 			const texProps = renderer.properties.get( texture );
 			texProps.__webglTexture = depthData.texture;
 
-			if ( ( depthData.depthNear != session.renderState.depthNear ) || ( depthData.depthFar != session.renderState.depthFar ) ) {
+			if ( ( depthData.depthNear != renderState.depthNear ) || ( depthData.depthFar != renderState.depthFar ) ) {
 
 				this.depthNear = depthData.depthNear;
 				this.depthFar = depthData.depthFar;
