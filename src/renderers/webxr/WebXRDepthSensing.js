@@ -72,7 +72,8 @@ class WebXRDepthSensing {
 			if ( this.mesh === null ) {
 
 				const viewport = cameraXR.cameras[ 0 ].viewport;
-				const occlusionMaterial = new ShaderMaterial( {
+				const material = new ShaderMaterial( {
+					extensions: { fragDepth: true },
 					vertexShader: _occlusion_vertex,
 					fragmentShader: _occlusion_fragment,
 					uniforms: {
@@ -82,9 +83,7 @@ class WebXRDepthSensing {
 					}
 				} );
 
-				occlusionMaterial.extensions.fragDepth = true;
-
-				this.mesh = new Mesh( new PlaneGeometry( 20, 20 ), occlusionMaterial );
+				this.mesh = new Mesh( new PlaneGeometry( 20, 20 ), material );
 
 			}
 
