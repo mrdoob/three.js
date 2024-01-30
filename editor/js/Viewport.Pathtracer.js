@@ -60,6 +60,26 @@ function ViewportPathtracer( renderer ) {
 		ptMaterial.materials.updateFrom( materials, textures );
 		ptMaterial.lights.updateFrom( lights );
 
+		//
+
+		const background = scene.background;
+
+		if ( background ) {
+
+			if ( background.isColor ) {
+
+				ptMaterial.backgroundMap = buildColorTexture( background );
+
+			}
+
+		} else {
+
+			ptMaterial.backgroundMap = buildColorTexture( new THREE.Color( 0x000000 ) );
+
+		}
+
+		//
+
 		const environment = scene.environment;
 
 		if ( environment && environment.isTexture === true ) {
