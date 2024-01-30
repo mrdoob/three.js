@@ -92,7 +92,7 @@ function Viewport( editor ) {
 
 		}
 
-		render();
+		render( true );
 
 	} );
 	transformControls.addEventListener( 'mouseDown', function () {
@@ -302,6 +302,8 @@ function Viewport( editor ) {
 	signals.editorCleared.add( function () {
 
 		controls.center.set( 0, 0, 0 );
+		pathtracer.reset();
+
 		render();
 
 	} );
@@ -697,7 +699,7 @@ function Viewport( editor ) {
 		sceneHelpers.visible = value;
 		transformControls.enabled = value;
 
-		render();
+		render( true );
 
 	} );
 
@@ -766,7 +768,13 @@ function Viewport( editor ) {
 	let startTime = 0;
 	let endTime = 0;
 
-	function render() {
+	function render( isHelper = false ) {
+
+		if ( editor.viewportShading === 'realistic' && isHelper === false ) {
+
+			pathtracer.init( scene, camera );
+
+		}
 
 		startTime = performance.now();
 
