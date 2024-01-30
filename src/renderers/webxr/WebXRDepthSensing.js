@@ -6,7 +6,7 @@ import { Texture } from '../../textures/Texture.js';
 const _occlusion_vertex = `
 void main() {
 
-	gl_Position = vec4(position, 1.0);
+	gl_Position = vec4( position, 1.0 );
 
 }`;
 
@@ -17,16 +17,17 @@ uniform float depthHeight;
 
 void main() {
 
-	int arrayIndex = 0;
-	vec2 depthUv;
-	if (gl_FragCoord.x>=depthWidth) {
-		arrayIndex = 1;
-		depthUv = vec2((gl_FragCoord.x-depthWidth)/depthWidth, gl_FragCoord.y/depthHeight);
-	} else {
-		depthUv = vec2(gl_FragCoord.x/depthWidth, gl_FragCoord.y/depthHeight);
-	}
+	vec2 coord = vec2( gl_FragCoord.x / depthWidth, gl_FragCoord.y / depthHeight );
 
-	gl_FragDepthEXT = texture(depthColor, vec3(depthUv.x, depthUv.y, arrayIndex)).r;
+	if ( coord.x >= 1.0 ) {
+
+		gl_FragDepthEXT = texture( depthColor, vec3( coord.x - 1.0, coord.y, 1 ) ).r;
+
+	} else {
+
+		gl_FragDepthEXT = texture( depthColor, vec3( coord.x, coord.y, 0 ) ).r;
+
+	}
 
 }`;
 
