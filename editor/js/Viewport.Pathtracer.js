@@ -6,6 +6,16 @@ import {
 	PhysicalPathTracingMaterial
 } from 'three-gpu-pathtracer';
 
+function buildColorTexture( color ) {
+
+	const data = new Uint8Array( [ color.r * 255, color.g * 255, color.b * 255, 255 ] );
+	const texture = new THREE.DataTexture( data, 1, 1, THREE.RGBAFormat );
+	texture.needsUpdate = true;
+
+	return texture;
+
+}
+
 function ViewportPathtracer( renderer ) {
 
 	let pathtracer = null;
@@ -50,9 +60,15 @@ function ViewportPathtracer( renderer ) {
 		ptMaterial.materials.updateFrom( materials, textures );
 		ptMaterial.lights.updateFrom( lights );
 
-		if ( scene.environment && scene.environment.isTexture === true ) {
+		const environment = scene.environment;
+
+		if ( environment && environment.isTexture === true ) {
 
 			ptMaterial.envMapInfo.updateFrom( scene.environment );
+
+		} else {
+
+			ptMaterial.envMapInfo.updateFrom( buildColorTexture( new THREE.Color( 0xffffff ) ) );
 
 		}
 
