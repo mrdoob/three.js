@@ -93,7 +93,7 @@ class ViewportNode extends Node {
 
 			let coord = builder.getFragCoord();
 
-			if ( builder.isFlipY() ) {
+			if ( ! builder.isFlipY() ) {
 
 				// follow webgpu standards
 
