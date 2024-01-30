@@ -1,7 +1,6 @@
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { Mesh } from '../../objects/Mesh.js';
-import { Scene } from '../../scenes/Scene.js';
 import { Texture } from '../../textures/Texture.js';
 
 const _occlusion_vertex = `
