@@ -36,7 +36,7 @@ class WebXRManager extends EventDispatcher {
 		let glBaseLayer = null;
 		let xrFrame = null;
 
-		const depthSensing = new WebXRDepthSensing( renderer );
+		const depthSensing = new WebXRDepthSensing();
 		const attributes = gl.getContextAttributes();
 
 		let initialRenderTarget = null;
