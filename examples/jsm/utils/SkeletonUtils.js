@@ -210,7 +210,7 @@ function retargetClip( target, source, clip, options = {} ) {
 	}
 
 	const numFrames = Math.round( clip.duration * ( options.fps / 1000 ) * 1000 ),
-		delta = 1 / options.fps,
+		delta = clip.duration / ( numFrames - 1 ),
 		convertedTracks = [],
 		mixer = new AnimationMixer( source ),
 		bones = getBones( target.skeleton ),
@@ -287,7 +287,17 @@ function retargetClip( target, source, clip, options = {} ) {
 
 		}
 
-		mixer.update( delta );
+		if ( i === numFrames - 2 ) {
+
+			// last mixer update before final loop iteration
+			// make sure we do not go over or equal to clip duration
+			mixer.update( delta - 0.0000001 );
+
+		} else {
+
+			mixer.update( delta );
+
+		}
 
 		source.updateMatrixWorld();
 
