@@ -18,12 +18,16 @@ function buildColorTexture( color ) {
 
 function ViewportPathtracer( renderer ) {
 
+	let generator = null;
 	let pathtracer = null;
 	let quad = null;
+	let hdr = null;
 
 	function init( scene, camera ) {
 
 		if ( pathtracer === null ) {
+
+			generator = new PathTracingSceneGenerator();
 
 			pathtracer = new PathTracingRenderer( renderer );
 			pathtracer.setSize( renderer.domElement.offsetWidth, renderer.domElement.offsetHeight );
@@ -42,7 +46,14 @@ function ViewportPathtracer( renderer ) {
 		pathtracer.material.backgroundBlur = scene.backgroundBlurriness;
 		pathtracer.reset();
 
-		const generator = new PathTracingSceneGenerator();
+		// TOFIX: If the scene is empty the generator crashes so we render a tiny cube (:
+
+		if ( scene.children.length === 0 ) {
+
+			scene = new THREE.Mesh( new THREE.BoxGeometry( 0.0001, 0.0001, 0.0001 ) );
+
+		}
+
 		const { bvh, textures, materials, lights } = generator.generate( scene );
 
 		const ptGeometry = bvh.geometry;
@@ -88,7 +99,14 @@ function ViewportPathtracer( renderer ) {
 
 		if ( environment && environment.isTexture === true ) {
 
-			ptMaterial.envMapInfo.updateFrom( scene.environment );
+			// Avoid calling envMapInfo() with the same hdr
+
+			if ( scene.environment !== hdr ) {
+
+				ptMaterial.envMapInfo.updateFrom( scene.environment );
+				hdr = scene.environment;
+
+			}
 
 		} else {
 
