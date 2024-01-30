@@ -550,10 +550,10 @@ class WebXRManager extends EventDispatcher {
 				_currentDepthNear = cameraXR.near;
 				_currentDepthFar = cameraXR.far;
 
-				cameraL.near = depthSensing.depthNear; // ?
-				cameraL.far = depthSensing.depthFar; // ?
-				cameraR.near = depthSensing.depthNear; // ?
-				cameraR.far = depthSensing.depthFar; // ?
+				cameraL.near = _currentDepthNear;
+				cameraL.far = _currentDepthFar;
+				cameraR.near = _currentDepthNear;
+				cameraR.far = _currentDepthFar;
 
 				cameraL.updateProjectionMatrix();
 				cameraR.updateProjectionMatrix();
