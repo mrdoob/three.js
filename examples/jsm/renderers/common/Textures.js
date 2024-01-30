@@ -234,7 +234,7 @@ class Textures extends DataMap {
 
 					}
 
-					if ( texture.source.uploadData === true ) backend.updateTexture( texture, options );
+					if ( texture.source.dataReady === true ) backend.updateTexture( texture, options );
 
 					if ( options.needsMipmaps && texture.mipmaps.length === 0 ) backend.generateMipmaps( texture );
 
