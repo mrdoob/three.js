@@ -73,11 +73,20 @@ class Timer {
 
 	update( timestamp ) {
 
-		this._previousTime = this._currentTime;
-		this._currentTime = ( timestamp !== undefined ? timestamp : now() ) - this._startTime;
 
-		this._delta = ( this._currentTime - this._previousTime ) * this._timescale;
-		this._elapsed += this._delta; // _elapsed is the accumulation of all previous deltas
+		if ( this._usePageVisibilityAPI === true && document.hidden === true ) {
+
+			this._delta = 0;
+
+		} else {
+
+			this._previousTime = this._currentTime;
+			this._currentTime = ( timestamp !== undefined ? timestamp : now() ) - this._startTime;
+
+			this._delta = ( this._currentTime - this._previousTime ) * this._timescale;
+			this._elapsed += this._delta; // _elapsed is the accumulation of all previous deltas
+
+		}
 
 		return this;
 
