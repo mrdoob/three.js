@@ -760,13 +760,15 @@ class WebXRManager extends EventDispatcher {
 
 				//
 
-				if ( session.enabledFeatures && session.enabledFeatures.includes( 'depth-sensing' ) ) {
+				const enabledFeatures = session.enabledFeatures;
+
+				if ( enabledFeatures && enabledFeatures.includes( 'depth-sensing' ) ) {
 
 					const depthData = glBinding.getDepthInformation( views[ 0 ] );
 
 					if ( depthData && depthData.isValid && depthData.texture ) {
 
-						depthSensing.init( renderer, session, depthData );
+						depthSensing.init( renderer, depthData, session.renderState );
 
 					}
 
