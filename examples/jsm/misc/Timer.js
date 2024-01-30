@@ -74,7 +74,7 @@ class Timer {
 	update( timestamp ) {
 
 
-		if ( this._usePageVisibilityAPI === true && document.hidden ) {
+		if ( this._usePageVisibilityAPI === true && document.hidden === true ) {
 
 			this._delta = 0;
 
