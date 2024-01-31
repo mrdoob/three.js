@@ -10,6 +10,7 @@ import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebXRController } from './WebXRController.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedIntType, UnsignedInt248Type } from '../../constants.js';
+import { WebXRDepthSensing } from './WebXRDepthSensing.js';
 
 class WebXRManager extends EventDispatcher {
 
@@ -34,7 +35,10 @@ class WebXRManager extends EventDispatcher {
 		let glProjLayer = null;
 		let glBaseLayer = null;
 		let xrFrame = null;
+
+		const depthSensing = new WebXRDepthSensing();
 		const attributes = gl.getContextAttributes();
+
 		let initialRenderTarget = null;
 		let newRenderTarget = null;
 
@@ -163,6 +167,8 @@ class WebXRManager extends EventDispatcher {
 
 			_currentDepthNear = null;
 			_currentDepthFar = null;
+
+			depthSensing.reset();
 
 			// restore framebuffer/rendering state
 
@@ -522,6 +528,13 @@ class WebXRManager extends EventDispatcher {
 
 			if ( session === null ) return;
 
+			if ( depthSensing.texture !== null ) {
+
+				camera.near = depthSensing.depthNear;
+				camera.far = depthSensing.depthFar;
+
+			}
+
 			cameraXR.near = cameraR.near = cameraL.near = camera.near;
 			cameraXR.far = cameraR.far = cameraL.far = camera.far;
 
@@ -536,6 +549,15 @@ class WebXRManager extends EventDispatcher {
 
 				_currentDepthNear = cameraXR.near;
 				_currentDepthFar = cameraXR.far;
+
+				cameraL.near = _currentDepthNear;
+				cameraL.far = _currentDepthFar;
+				cameraR.near = _currentDepthNear;
+				cameraR.far = _currentDepthFar;
+
+				cameraL.updateProjectionMatrix();
+				cameraR.updateProjectionMatrix();
+				camera.updateProjectionMatrix();
 
 			}
 
@@ -638,6 +660,12 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		this.hasDepthSensing = function () {
+
+			return depthSensing.texture !== null;
+
+		};
+
 		// Animation Loop
 
 		let onAnimationFrameCallback = null;
@@ -730,6 +758,22 @@ class WebXRManager extends EventDispatcher {
 
 				}
 
+				//
+
+				const enabledFeatures = session.enabledFeatures;
+
+				if ( enabledFeatures && enabledFeatures.includes( 'depth-sensing' ) ) {
+
+					const depthData = glBinding.getDepthInformation( views[ 0 ] );
+
+					if ( depthData && depthData.isValid && depthData.texture ) {
+
+						depthSensing.init( renderer, depthData, session.renderState );
+
+					}
+
+				}
+
 			}
 
 			//
@@ -746,6 +790,8 @@ class WebXRManager extends EventDispatcher {
 				}
 
 			}
+
+			depthSensing.render( renderer, cameraXR );
 
 			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, frame );
 
