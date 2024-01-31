@@ -341,7 +341,7 @@ class ShaderNodeInternal extends Node {
 
 	get isArrayInput() {
 
-		return /^\(\s+?\[/.test( this.jsFunc.toString() );
+		return /^\((\s+)?\[/.test( this.jsFunc.toString() );
 
 	}
 
@@ -574,6 +574,11 @@ export const ivec4 = new ConvertType( 'ivec4' );
 export const uvec4 = new ConvertType( 'uvec4' );
 export const bvec4 = new ConvertType( 'bvec4' );
 
+export const mat2 = new ConvertType( 'mat2' );
+export const imat2 = new ConvertType( 'imat2' );
+export const umat2 = new ConvertType( 'umat2' );
+export const bmat2 = new ConvertType( 'bmat2' );
+
 export const mat3 = new ConvertType( 'mat3' );
 export const imat3 = new ConvertType( 'imat3' );
 export const umat3 = new ConvertType( 'umat3' );
@@ -604,6 +609,10 @@ addNodeElement( 'vec4', vec4 );
 addNodeElement( 'ivec4', ivec4 );
 addNodeElement( 'uvec4', uvec4 );
 addNodeElement( 'bvec4', bvec4 );
+addNodeElement( 'mat2', mat2 );
+addNodeElement( 'imat2', imat2 );
+addNodeElement( 'umat2', umat2 );
+addNodeElement( 'bmat2', bmat2 );
 addNodeElement( 'mat3', mat3 );
 addNodeElement( 'imat3', imat3 );
 addNodeElement( 'umat3', umat3 );

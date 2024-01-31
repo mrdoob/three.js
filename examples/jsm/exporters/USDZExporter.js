@@ -1,11 +1,11 @@
 import {
-  NoColorSpace,
-  DoubleSide,
+	NoColorSpace,
+	DoubleSide,
 } from 'three';
 
 import {
-  strToU8,
-  zipSync,
+	strToU8,
+	zipSync,
 } from '../libs/fflate.module.js';
 
 import { decompress } from './../utils/TextureUtils.js';
@@ -20,6 +20,7 @@ class USDZExporter {
 				planeAnchoring: { alignment: 'horizontal' }
 			},
 			quickLookCompatible: false,
+			maxTextureSize: 1024,
 		}, options );
 
 		const files = {};
@@ -93,7 +94,7 @@ class USDZExporter {
 
 			}
 
-			const canvas = imageToCanvas( texture.image, texture.flipY );
+			const canvas = imageToCanvas( texture.image, texture.flipY, options.maxTextureSize );
 			const blob = await new Promise( resolve => canvas.toBlob( resolve, 'image/png', 1 ) );
 
 			files[ `textures/Texture_${ id }.png` ] = new Uint8Array( await blob.arrayBuffer() );
@@ -133,14 +134,14 @@ class USDZExporter {
 
 }
 
-function imageToCanvas( image, flipY ) {
+function imageToCanvas( image, flipY, maxTextureSize ) {
 
 	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
 		( typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas ) ||
 		( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
-		const scale = 1024 / Math.max( image.width, image.height );
+		const scale = maxTextureSize / Math.max( image.width, image.height );
 
 		const canvas = document.createElement( 'canvas' );
 		canvas.width = image.width * Math.min( 1, scale );

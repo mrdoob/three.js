@@ -84,9 +84,15 @@ class Backend {
 
 	// canvas
 
+	getContext() { }
+
 	updateSize() { }
 
 	// utils
+
+	resolveTimestampAsync( renderContext, type ) { }
+
+	hasFeatureAsync( name ) { } // return Boolean
 
 	hasFeature( name ) { } // return Boolean
 
@@ -113,6 +119,8 @@ class Backend {
 		return this.renderer.getScissor( vector4 );
 
 	}
+
+	setScissorTest( boolean ) { }
 
 	getClearColor() {
 
@@ -167,6 +175,12 @@ class Backend {
 		}
 
 		return map;
+
+	}
+
+	has( object ) {
+
+		return this.data.has( object );
 
 	}
 

@@ -23,7 +23,7 @@ class WebGPUPipelineUtils {
 
 	}
 
-	createRenderPipeline( renderObject ) {
+	createRenderPipeline( renderObject, promises ) {
 
 		const { object, material, geometry, pipeline } = renderObject;
 		const { vertexProgram, fragmentProgram } = pipeline;
@@ -102,9 +102,22 @@ class WebGPUPipelineUtils {
 		const primitiveState = this._getPrimitiveState( object, geometry, material );
 		const depthCompare = this._getDepthCompare( material );
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
-		const sampleCount = utils.getSampleCount( renderObject.context );
+		let sampleCount = utils.getSampleCount( renderObject.context );
 
-		pipelineData.pipeline = device.createRenderPipeline( {
+		if ( sampleCount > 1 ) {
+
+			// WebGPU only supports power-of-two sample counts and 2 is not a valid value
+			sampleCount = Math.pow( 2, Math.floor( Math.log2( sampleCount ) ) );
+
+			if ( sampleCount === 2 ) {
+
+				sampleCount = 4;
+
+			}
+
+		}
+
+		const pipelineDescriptor = {
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
 			fragment: Object.assign( {}, fragmentModule, { targets } ),
 			primitive: primitiveState,
@@ -124,7 +137,28 @@ class WebGPUPipelineUtils {
 			layout: device.createPipelineLayout( {
 				bindGroupLayouts: [ bindingsData.layout ]
 			} )
-		} );
+		};
+
+		if ( promises === null ) {
+
+			pipelineData.pipeline = device.createRenderPipeline( pipelineDescriptor );
+
+		} else {
+
+			const p = new Promise( ( resolve /*, reject*/ ) => {
+
+				device.createRenderPipelineAsync( pipelineDescriptor ).then( pipeline => {
+
+					pipelineData.pipeline = pipeline;
+					resolve();
+
+				} );
+
+			} );
+
+			promises.push( p );
+
+		}
 
 	}
 

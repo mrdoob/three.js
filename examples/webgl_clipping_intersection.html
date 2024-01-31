@@ -29,7 +29,8 @@
 			const params = {
 				clipIntersection: true,
 				planeConstant: 0,
-				showHelpers: false
+				showHelpers: false,
+				alphaToCoverage: true,
 			};
 
 			const clipPlanes = [
@@ -73,12 +74,13 @@
 
 					const geometry = new THREE.SphereGeometry( i / 30, 48, 24 );
 
-					const material = new THREE.MeshLambertMaterial( {
+					const material = new THREE.MeshPhongMaterial( {
 
 						color: new THREE.Color().setHSL( Math.random(), 0.5, 0.5, THREE.SRGBColorSpace ),
 						side: THREE.DoubleSide,
 						clippingPlanes: clipPlanes,
-						clipIntersection: params.clipIntersection
+						clipIntersection: params.clipIntersection,
+						alphaToCoverage: true,
 
 					} );
 
@@ -100,6 +102,19 @@
 				// gui
 
 				const gui = new GUI();
+
+				gui.add( params, 'alphaToCoverage' ).onChange( function ( value ) {
+
+					group.children.forEach( c => {
+
+						c.material.alphaToCoverage = Boolean( value );
+						c.material.needsUpdate = true;
+
+					} );
+
+					render();
+
+				} );
 
 				gui.add( params, 'clipIntersection' ).name( 'clip intersection' ).onChange( function ( value ) {
 

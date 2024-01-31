@@ -102,7 +102,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 		this.addSlot( 'fragment', new SlotNode( {
 			node: normalView,
 			nodeType: 'vec3',
-			source: getIncludeSnippet( 'clipping_planes_fragment' ),
+			source: 'void main() {',
 			target: 'vec3 TransformedNormalView = %RESULT%;',
 			inclusionType: 'append'
 		} ) );
@@ -671,7 +671,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 	build() {
 
-		super.build();
+		super.build( false );
 
 		this._addSnippets();
 		this._addUniforms();

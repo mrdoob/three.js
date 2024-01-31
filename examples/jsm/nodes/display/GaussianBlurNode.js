@@ -1,20 +1,24 @@
 import TempNode from '../core/TempNode.js';
-import { nodeObject, addNodeElement, tslFn, float, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { nodeObject, addNodeElement, tslFn, float, vec2, vec4 } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { mul } from '../math/OperatorNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { texture } from '../accessors/TextureNode.js';
+import { texturePass } from './PassNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { Vector2, RenderTarget } from 'three';
 import QuadMesh from '../../objects/QuadMesh.js';
 
-const quadMesh = new QuadMesh();
+// WebGPU: The use of a single QuadMesh for both gaussian blur passes results in a single RenderObject with a SampledTexture binding that
+// alternates between source textures and triggers creation of new BindGroups and BindGroupLayouts every frame.
+
+const quadMesh1 = new QuadMesh();
+const quadMesh2 = new QuadMesh();
 
 class GaussianBlurNode extends TempNode {
 
 	constructor( textureNode, sigma = 2 ) {
 
-		super( textureNode );
+		super( 'vec4' );
 
 		this.textureNode = textureNode;
 		this.sigma = sigma;
@@ -25,7 +29,11 @@ class GaussianBlurNode extends TempNode {
 		this._passDirection = uniform( new Vector2() );
 
 		this._horizontalRT = new RenderTarget();
+		this._horizontalRT.texture.name = 'GaussianBlurNode.horizontal';
 		this._verticalRT = new RenderTarget();
+		this._verticalRT.texture.name = 'GaussianBlurNode.vertical';
+
+		this._textureNode = texturePass( this, this._verticalRT.texture );
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
@@ -54,9 +62,15 @@ class GaussianBlurNode extends TempNode {
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentTexture = textureNode.value;
 
-		quadMesh.material = this._material;
+		quadMesh1.material = this._material;
+		quadMesh2.material = this._material;
 
 		this.setSize( map.image.width, map.image.height );
+
+		const textureType = map.type;
+
+		this._horizontalRT.texture.type = textureType;
+		this._verticalRT.texture.type = textureType;
 
 		// horizontal
 
@@ -64,7 +78,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 1, 0 );
 
-		quadMesh.render( renderer );
+		quadMesh1.render( renderer );
 
 		// vertical
 
@@ -73,12 +87,18 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 0, 1 );
 
-		quadMesh.render( renderer );
+		quadMesh2.render( renderer );
 
 		// restore
 
 		renderer.setRenderTarget( currentRenderTarget );
 		textureNode.value = currentTexture;
+
+	}
+
+	getTextureNode() {
+
+		return this._textureNode;
 
 	}
 
@@ -109,7 +129,7 @@ class GaussianBlurNode extends TempNode {
 			const direction = vec2( this.directionNode ).mul( this._passDirection );
 
 			const weightSum = float( gaussianCoefficients[ 0 ] ).toVar();
-			const diffuseSum = vec3( sampleTexture( uvNode ).mul( weightSum ) ).toVar();
+			const diffuseSum = vec4( sampleTexture( uvNode ).mul( weightSum ) ).toVar();
 
 			for ( let i = 1; i < kernelSize; i ++ ) {
 
@@ -118,21 +138,21 @@ class GaussianBlurNode extends TempNode {
 
 				const uvOffset = vec2( direction.mul( invSize.mul( x ) ) ).toVar();
 
-				const sample1 = vec3( sampleTexture( uvNode.add( uvOffset ) ) );
-				const sample2 = vec3( sampleTexture( uvNode.sub( uvOffset ) ) );
+				const sample1 = vec4( sampleTexture( uvNode.add( uvOffset ) ) );
+				const sample2 = vec4( sampleTexture( uvNode.sub( uvOffset ) ) );
 
 				diffuseSum.addAssign( sample1.add( sample2 ).mul( w ) );
 				weightSum.addAssign( mul( 2.0, w ) );
 
 			}
 
-			return vec4( diffuseSum.div( weightSum ), 1.0 );
+			return diffuseSum.div( weightSum );
 
 		} );
 
 		//
 
-		const material = this._material || ( this._material = builder.createNodeMaterial( 'MeshBasicNodeMaterial' ) );
+		const material = this._material || ( this._material = builder.createNodeMaterial() );
 		material.fragmentNode = blur();
 
 		//
@@ -142,7 +162,7 @@ class GaussianBlurNode extends TempNode {
 
 		//
 
-		return texture( this._verticalRT.texture );
+		return this._textureNode;
 
 	}
 

@@ -1,7 +1,8 @@
+import WebGPU from '../../capabilities/WebGPU.js';
+
 import Renderer from '../common/Renderer.js';
 import WebGLBackend from '../webgl/WebGLBackend.js';
 import WebGPUBackend from './WebGPUBackend.js';
-import WebGPU from '../../capabilities/WebGPU.js';
 /*
 const debugHandler = {
 
@@ -22,7 +23,11 @@ class WebGPURenderer extends Renderer {
 
 		let BackendClass;
 
-		if ( WebGPU.isAvailable() ) {
+		if ( parameters.forceWebGL ) {
+
+			BackendClass = WebGLBackend;
+
+		} else if ( WebGPU.isAvailable() ) {
 
 			BackendClass = WebGPUBackend;
 

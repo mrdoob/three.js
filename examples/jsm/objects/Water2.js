@@ -34,14 +34,14 @@ class Water extends Mesh {
 		const scope = this;
 
 		const color = ( options.color !== undefined ) ? new Color( options.color ) : new Color( 0xFFFFFF );
-		const textureWidth = options.textureWidth || 512;
-		const textureHeight = options.textureHeight || 512;
-		const clipBias = options.clipBias || 0;
-		const flowDirection = options.flowDirection || new Vector2( 1, 0 );
-		const flowSpeed = options.flowSpeed || 0.03;
-		const reflectivity = options.reflectivity || 0.02;
-		const scale = options.scale || 1;
-		const shader = options.shader || Water.WaterShader;
+		const textureWidth = options.textureWidth !== undefined ? options.textureWidth : 512;
+		const textureHeight = options.textureHeight !== undefined ? options.textureHeight : 512;
+		const clipBias = options.clipBias !== undefined ? options.clipBias : 0;
+		const flowDirection = options.flowDirection !== undefined ? options.flowDirection : new Vector2( 1, 0 );
+		const flowSpeed = options.flowSpeed !== undefined ? options.flowSpeed : 0.03;
+		const reflectivity = options.reflectivity !== undefined ? options.reflectivity : 0.02;
+		const scale = options.scale !== undefined ? options.scale : 1;
+		const shader = options.shader !== undefined ? options.shader : Water.WaterShader;
 
 		const textureLoader = new TextureLoader();
 

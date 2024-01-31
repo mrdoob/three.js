@@ -45,7 +45,7 @@ class DataMap {
 
 	dispose() {
 
-		this.data.clear();
+		this.data = new WeakMap();
 
 	}
 

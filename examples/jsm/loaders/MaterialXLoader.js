@@ -6,9 +6,10 @@ import {
 } from 'three';
 
 import {
-	MeshPhysicalNodeMaterial,
+	MeshBasicNodeMaterial, MeshPhysicalNodeMaterial,
 	float, bool, int, vec2, vec3, vec4, color, texture,
-	positionLocal,
+	positionLocal, positionWorld, uv, vertexColor,
+	normalLocal, normalWorld, tangentLocal, tangentWorld,
 	add, sub, mul, div, mod, abs, sign, floor, ceil, round, pow, sin, cos, tan,
 	asin, acos, atan2, sqrt, exp, clamp, min, max, normalize, length, dot, cross, normalMap,
 	remap, smoothstep, luminance, mx_rgbtohsv, mx_hsvtorgb,
@@ -39,26 +40,34 @@ class MXElement {
 
 // Ref: https://github.com/mrdoob/three.js/issues/24674
 
+const mx_add = ( in1, in2 = float( 0 ) ) => add( in1, in2 );
+const mx_subtract = ( in1, in2 = float( 0 ) ) => sub( in1, in2 );
+const mx_multiply = ( in1, in2 = float( 1 ) ) => mul( in1, in2 );
+const mx_divide = ( in1, in2 = float( 1 ) ) => div( in1, in2 );
+const mx_modulo = ( in1, in2 = float( 1 ) ) => mod( in1, in2 );
+const mx_power = ( in1, in2 = float( 1 ) ) => pow( in1, in2 );
+const mx_atan2 = ( in1 = float( 0 ), in2 = float( 1 ) ) => atan2( in1, in2 );
+
 const MXElements = [
 
 	// << Math >>
-	new MXElement( 'add', add, [ 'in1', 'in2' ] ),
-	new MXElement( 'subtract', sub, [ 'in1', 'in2' ] ),
-	new MXElement( 'multiply', mul, [ 'in1', 'in2' ] ),
-	new MXElement( 'divide', div, [ 'in1', 'in2' ] ),
-	new MXElement( 'modulo', mod, [ 'in1', 'in2' ] ),
+	new MXElement( 'add', mx_add, [ 'in1', 'in2' ] ),
+	new MXElement( 'subtract', mx_subtract, [ 'in1', 'in2' ] ),
+	new MXElement( 'multiply', mx_multiply, [ 'in1', 'in2' ] ),
+	new MXElement( 'divide', mx_divide, [ 'in1', 'in2' ] ),
+	new MXElement( 'modulo', mx_modulo, [ 'in1', 'in2' ] ),
 	new MXElement( 'absval', abs, [ 'in1', 'in2' ] ),
 	new MXElement( 'sign', sign, [ 'in1', 'in2' ] ),
 	new MXElement( 'floor', floor, [ 'in1', 'in2' ] ),
 	new MXElement( 'ceil', ceil, [ 'in1', 'in2' ] ),
 	new MXElement( 'round', round, [ 'in1', 'in2' ] ),
-	new MXElement( 'power', pow, [ 'in1', 'in2' ] ),
+	new MXElement( 'power', mx_power, [ 'in1', 'in2' ] ),
 	new MXElement( 'sin', sin, [ 'in' ] ),
 	new MXElement( 'cos', cos, [ 'in' ] ),
 	new MXElement( 'tan', tan, [ 'in' ] ),
 	new MXElement( 'asin', asin, [ 'in' ] ),
 	new MXElement( 'acos', acos, [ 'in' ] ),
-	new MXElement( 'atan2', atan2, [ 'in1', 'in2' ] ),
+	new MXElement( 'atan2', mx_atan2, [ 'in1', 'in2' ] ),
 	new MXElement( 'sqrt', sqrt, [ 'in' ] ),
 	//new MtlXElement( 'ln', ... ),
 	new MXElement( 'exp', exp, [ 'in' ] ),
@@ -141,6 +150,20 @@ class MaterialXLoader extends Loader {
 
 	load( url, onLoad, onProgress, onError ) {
 
+		const _onError = function ( e ) {
+
+			if ( onError ) {
+
+				onError( e );
+
+			} else {
+
+				console.error( e );
+
+			}
+
+		};
+
 		new FileLoader( this.manager )
 			.setPath( this.path )
 			.load( url, async ( text ) => {
@@ -151,11 +174,11 @@ class MaterialXLoader extends Loader {
 
 				} catch ( e ) {
 
-					onError( e );
+					_onError( e );
 
 				}
 
-			}, onProgress, onError );
+			}, onProgress, _onError );
 
 		return this;
 
@@ -312,7 +335,17 @@ class MaterialXNode {
 
 		const filePrefix = this.getRecursiveAttribute( 'fileprefix' ) || '';
 
-		const texture = this.materialX.textureLoader.load( filePrefix + this.value );
+		let loader = this.materialX.textureLoader;
+		const uri = filePrefix + this.value;
+
+		if ( uri ) {
+
+			const handler = this.materialX.manager.getHandler( uri );
+			if ( handler !== null ) loader = handler;
+
+		}
+
+		const texture = loader.load( uri );
 		texture.wrapS = texture.wrapT = RepeatWrapping;
 		texture.flipY = false;
 
@@ -376,7 +409,32 @@ class MaterialXNode {
 
 			} else if ( element === 'position' ) {
 
-				node = positionLocal;
+				const space = this.getAttribute( 'space' );
+				node = space === 'world' ? positionWorld : positionLocal;
+
+			} else if ( element === 'normal' ) {
+
+				const space = this.getAttribute( 'space' );
+				node = space === 'world' ? normalWorld : normalLocal;
+
+			} else if ( element === 'tangent' ) {
+
+				const space = this.getAttribute( 'space' );
+				node = space === 'world' ? tangentWorld : tangentLocal;
+
+			} else if ( element === 'texcoord' ) {
+
+				const indexNode = this.getChildByName( 'index' );
+				const index = indexNode ? parseInt( indexNode.value ) : 0;
+
+				node = uv( index );
+
+			} else if ( element === 'geomcolor' ) {
+
+				const indexNode = this.getChildByName( 'index' );
+				const index = indexNode ? parseInt( indexNode.value ) : 0;
+
+				node = vertexColor( index );
 
 			} else if ( element === 'tiledimage' ) {
 
@@ -597,7 +655,7 @@ class MaterialXNode {
 		let emissiveNode = null;
 
 		if ( inputs.emission ) emissiveNode = inputs.emission;
-		if ( inputs.emissionColor )  {
+		if ( inputs.emissionColor ) {
 
 			emissiveNode = emissiveNode ? mul( emissiveNode, inputs.emissionColor ) : emissiveNode;
 
@@ -639,7 +697,28 @@ class MaterialXNode {
 
 	}
 
-	toMaterial() {
+	toBasicMaterial() {
+
+		const material = new MeshBasicNodeMaterial();
+		material.name = this.name;
+
+		for ( const nodeX of this.children.toReversed() ) {
+
+			if ( nodeX.name === 'out' ) {
+
+				material.colorNode = nodeX.getNode();
+
+				break;
+
+			}
+
+		}
+
+		return material;
+
+	}
+
+	toPhysicalMaterial() {
 
 		const material = new MeshPhysicalNodeMaterial();
 		material.name = this.name;
@@ -659,13 +738,33 @@ class MaterialXNode {
 
 		const materials = {};
 
+		let isUnlit = true;
+
 		for ( const nodeX of this.children ) {
 
 			if ( nodeX.element === 'surfacematerial' ) {
 
-				const material = nodeX.toMaterial();
+				const material = nodeX.toPhysicalMaterial();
 
 				materials[ material.name ] = material;
+
+				isUnlit = false;
+
+			}
+
+		}
+
+		if ( isUnlit ) {
+
+			for ( const nodeX of this.children ) {
+
+				if ( nodeX.element === 'nodegraph' ) {
+
+					const material = nodeX.toBasicMaterial();
+
+					materials[ material.name ] = material;
+
+				}
 
 			}
 

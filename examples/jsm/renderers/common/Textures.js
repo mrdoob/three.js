@@ -1,15 +1,16 @@
 import DataMap from './DataMap.js';
 
-import { Vector3, DepthTexture, DepthStencilFormat, UnsignedInt248Type, LinearFilter, NearestFilter, EquirectangularReflectionMapping, EquirectangularRefractionMapping, CubeReflectionMapping, CubeRefractionMapping } from 'three';
+import { Vector3, DepthTexture, DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, LinearFilter, NearestFilter, EquirectangularReflectionMapping, EquirectangularRefractionMapping, CubeReflectionMapping, CubeRefractionMapping, UnsignedByteType } from 'three';
 
 const _size = new Vector3();
 
 class Textures extends DataMap {
 
-	constructor( backend, info ) {
+	constructor( renderer, backend, info ) {
 
 		super();
 
+		this.renderer = renderer;
 		this.backend = backend;
 		this.info = info;
 
@@ -47,8 +48,8 @@ class Textures extends DataMap {
 		if ( depthTexture === undefined ) {
 
 			depthTexture = new DepthTexture();
-			depthTexture.format = DepthStencilFormat;
-			depthTexture.type = UnsignedInt248Type;
+			depthTexture.format = renderTarget.stencilBuffer ? DepthStencilFormat : DepthFormat;
+			depthTexture.type = renderTarget.stencilBuffer ? UnsignedInt248Type : UnsignedIntType;
 			depthTexture.image.width = mipWidth;
 			depthTexture.image.height = mipHeight;
 
@@ -153,6 +154,25 @@ class Textures extends DataMap {
 
 		//
 
+		if ( texture.isFramebufferTexture ) {
+
+			const renderer = this.renderer;
+			const renderTarget = renderer.getRenderTarget();
+
+			if ( renderTarget ) {
+
+				texture.type = renderTarget.texture.type;
+
+			} else {
+
+				texture.type = UnsignedByteType;
+
+			}
+
+		}
+
+		//
+
 		const { width, height, depth } = this.getSize( texture );
 
 		options.width = width;
@@ -214,7 +234,7 @@ class Textures extends DataMap {
 
 					}
 
-					backend.updateTexture( texture, options );
+					if ( texture.source.dataReady === true ) backend.updateTexture( texture, options );
 
 					if ( options.needsMipmaps && texture.mipmaps.length === 0 ) backend.generateMipmaps( texture );
 

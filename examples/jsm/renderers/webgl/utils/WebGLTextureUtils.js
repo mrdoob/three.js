@@ -10,6 +10,7 @@ class WebGLTextureUtils {
 
 		this.gl = backend.gl;
 		this.extensions = backend.extensions;
+		this.defaultTextures = {};
 
 		if ( initialized === false ) {
 
@@ -171,7 +172,9 @@ class WebGLTextureUtils {
 
 	setTextureParameters( textureType, texture ) {
 
-		const { gl, extensions } = this;
+		const { gl, extensions, backend } = this;
+
+		const { currentAnisotropy } = backend.get( texture );
 
 		gl.texParameteri( textureType, gl.TEXTURE_WRAP_S, wrappingToGL[ texture.wrapS ] );
 		gl.texParameteri( textureType, gl.TEXTURE_WRAP_T, wrappingToGL[ texture.wrapT ] );
@@ -183,7 +186,12 @@ class WebGLTextureUtils {
 		}
 
 		gl.texParameteri( textureType, gl.TEXTURE_MAG_FILTER, filterToGL[ texture.magFilter ] );
-		gl.texParameteri( textureType, gl.TEXTURE_MIN_FILTER, filterToGL[ texture.minFilter ] );
+
+
+		// follow WebGPU backend mapping for texture filtering
+		const minFilter = ! texture.isVideoTexture && texture.minFilter === LinearFilter ? LinearMipmapLinearFilter : texture.minFilter;
+
+		gl.texParameteri( textureType, gl.TEXTURE_MIN_FILTER, filterToGL[ minFilter ] );
 
 		if ( texture.compareFunction ) {
 
@@ -194,18 +202,375 @@ class WebGLTextureUtils {
 
 		if ( extensions.has( 'EXT_texture_filter_anisotropic' ) === true ) {
 
-			//extension = extensions.get( 'EXT_texture_filter_anisotropic' );
-
 			if ( texture.magFilter === NearestFilter ) return;
 			if ( texture.minFilter !== NearestMipmapLinearFilter && texture.minFilter !== LinearMipmapLinearFilter ) return;
 			if ( texture.type === FloatType && extensions.has( 'OES_texture_float_linear' ) === false ) return; // verify extension for WebGL 1 and WebGL 2
 
-			if ( texture.anisotropy > 1 /*|| properties.get( texture ).__currentAnisotropy*/ ) {
-
-				//gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, capabilities.getMaxAnisotropy() ) );
-				//properties.get( texture ).__currentAnisotropy = texture.anisotropy;
+			if ( texture.anisotropy > 1 || currentAnisotropy !== texture.anisotropy ) {
+				const extension = extensions.get( 'EXT_texture_filter_anisotropic' );
+				gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, backend.getMaxAnisotropy() ) );
+				backend.get( texture ).currentAnisotropy = texture.anisotropy;
 
 			}
+
+		}
+
+	}
+
+	createDefaultTexture( texture ) {
+
+		const { gl, backend, defaultTextures } = this;
+
+
+		const glTextureType = this.getGLTextureType( texture );
+
+		let textureGPU = defaultTextures[ glTextureType ];
+
+		if ( textureGPU === undefined ) {
+
+			textureGPU = gl.createTexture();
+
+			backend.state.bindTexture( glTextureType, textureGPU );
+			gl.texParameteri( glTextureType, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
+			gl.texParameteri( glTextureType, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+
+			// gl.texImage2D( glTextureType, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, data );
+
+			defaultTextures[ glTextureType ] = textureGPU;
+
+		}
+
+		backend.set( texture, {
+			textureGPU,
+			glTextureType,
+			isDefault: true
+		} );
+
+	}
+
+	createTexture( texture, options ) {
+
+		const { gl, backend } = this;
+		const { levels, width, height, depth } = options;
+
+		const glFormat = backend.utils.convert( texture.format, texture.colorSpace );
+		const glType = backend.utils.convert( texture.type );
+		const glInternalFormat = this.getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace, texture.isVideoTexture );
+
+		const textureGPU = gl.createTexture();
+		const glTextureType = this.getGLTextureType( texture );
+
+		backend.state.bindTexture( glTextureType, textureGPU );
+
+		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
+		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+		gl.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE );
+
+		this.setTextureParameters( glTextureType, texture );
+
+		if ( texture.isDataArrayTexture ) {
+
+			gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
+
+		} else if ( ! texture.isVideoTexture ) {
+
+			gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
+
+		}
+
+		backend.set( texture, {
+			textureGPU,
+			glTextureType,
+			glFormat,
+			glType,
+			glInternalFormat
+		} );
+
+	}
+
+	updateTexture( texture, options ) {
+
+		const { gl } = this;
+		const { width, height } = options;
+		const { textureGPU, glTextureType, glFormat, glType, glInternalFormat } = this.backend.get( texture );
+
+		if ( texture.isRenderTargetTexture || ( textureGPU === undefined /* unsupported texture format */ ) )
+			return;
+
+		const getImage = ( source ) => {
+
+			if ( source.isDataTexture ) {
+
+				return source.image.data;
+
+			} else if ( source instanceof ImageBitmap || source instanceof OffscreenCanvas || source instanceof HTMLImageElement || source instanceof HTMLCanvasElement ) {
+
+				return source;
+
+			}
+
+			return source.data;
+
+		};
+
+		this.backend.state.bindTexture( glTextureType, textureGPU );
+
+		if ( texture.isCompressedTexture ) {
+
+			const mipmaps = texture.mipmaps;
+
+			for ( let i = 0; i < mipmaps.length; i ++ ) {
+
+				const mipmap = mipmaps[ i ];
+
+				if ( texture.isCompressedArrayTexture ) {
+
+					const image = options.image;
+
+					if ( texture.format !== gl.RGBA ) {
+
+						if ( glFormat !== null ) {
+
+							gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
+
+
+						} else {
+
+							console.warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
+
+						}
+
+					} else {
+
+						gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, glType, mipmap.data );
+
+					}
+
+				} else {
+
+					if ( glFormat !== null ) {
+
+						gl.compressedTexSubImage2D( gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data );
+
+					} else {
+
+						console.warn( 'Unsupported compressed texture format' );
+
+					}
+
+				}
+
+			}
+
+		} else if ( texture.isCubeTexture ) {
+
+			const images = options.images;
+
+			for ( let i = 0; i < 6; i ++ ) {
+
+				const image = getImage( images[ i ] );
+
+				gl.texSubImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, image );
+
+			}
+
+		} else if ( texture.isDataArrayTexture ) {
+
+			const image = options.image;
+
+			gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+
+		} else if ( texture.isVideoTexture ) {
+
+			texture.update();
+
+			gl.texImage2D( glTextureType, 0, glInternalFormat, glFormat, glType, options.image );
+
+
+		} else {
+
+			const image = getImage( options.image );
+
+			gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, image );
+
+		}
+
+	}
+
+	generateMipmaps( texture ) {
+
+		const { gl, backend } = this;
+		const { textureGPU, glTextureType } = backend.get( texture );
+
+		backend.state.bindTexture( glTextureType, textureGPU );
+		gl.generateMipmap( glTextureType );
+
+	}
+
+	deallocateRenderBuffers( renderTarget ) {
+
+
+		const { gl, backend } = this;
+
+		// remove framebuffer reference
+		if ( renderTarget ) {
+
+			const renderContextData = backend.get( renderTarget );
+
+			renderContextData.renderBufferStorageSetup = undefined;
+
+			if ( renderContextData.framebuffer ) {
+
+				gl.deleteFramebuffer( renderContextData.framebuffer );
+				renderContextData.framebuffer = undefined;
+
+			}
+
+			if ( renderContextData.depthRenderbuffer ) {
+
+				gl.deleteRenderbuffer( renderContextData.depthRenderbuffer );
+				renderContextData.depthRenderbuffer = undefined;
+
+			}
+
+			if ( renderContextData.stencilRenderbuffer ) {
+
+				gl.deleteRenderbuffer( renderContextData.stencilRenderbuffer );
+				renderContextData.stencilRenderbuffer = undefined;
+
+			}
+
+			if ( renderContextData.msaaFrameBuffer ) {
+
+				gl.deleteFramebuffer( renderContextData.msaaFrameBuffer );
+				renderContextData.msaaFrameBuffer = undefined;
+
+			}
+
+			if ( renderContextData.msaaRenderbuffers ) {
+
+				for ( let i = 0; i < renderContextData.msaaRenderbuffers.length; i ++ ) {
+
+					gl.deleteRenderbuffer( renderContextData.msaaRenderbuffers[ i ] );
+
+				}
+
+				renderContextData.msaaRenderbuffers = undefined;
+
+			}
+
+		}
+
+	}
+
+	destroyTexture( texture ) {
+
+		const { gl, backend } = this;
+		const { textureGPU, renderTarget } = backend.get( texture );
+
+		this.deallocateRenderBuffers( renderTarget );
+		gl.deleteTexture( textureGPU );
+
+		backend.delete( texture );
+
+	}
+
+	copyFramebufferToTexture( texture, renderContext ) {
+
+		const { gl } = this;
+		const { state } = this.backend;
+
+		const { textureGPU } = this.backend.get( texture );
+
+		const width = texture.image.width;
+		const height = texture.image.height;
+
+		if ( texture.isDepthTexture ) {
+
+			let mask = gl.DEPTH_BUFFER_BIT;
+
+			if ( renderContext.stencil ) {
+
+				mask |= gl.STENCIL_BUFFER_BIT;
+
+			}
+
+			const fb = gl.createFramebuffer();
+			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+
+			gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureGPU, 0 );
+
+			gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, gl.NEAREST );
+
+			gl.deleteFramebuffer( fb );
+
+		} else {
+
+			state.bindTexture( gl.TEXTURE_2D, textureGPU );
+			gl.copyTexSubImage2D( gl.TEXTURE_2D, 0, 0, 0, 0, 0, width, height );
+
+			state.unbindTexture();
+
+		}
+
+		if ( texture.generateMipmaps ) this.generateMipmaps( texture );
+
+		this.backend._setFramebuffer( renderContext );
+
+	}
+
+	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
+	setupRenderBufferStorage( renderbuffer, renderContext ) {
+
+		const { gl } = this;
+		const renderTarget = renderContext.renderTarget;
+
+		const { samples, depthTexture, depthBuffer, stencilBuffer, width, height } = renderTarget;
+
+		gl.bindRenderbuffer( gl.RENDERBUFFER, renderbuffer );
+
+		if ( depthBuffer && ! stencilBuffer ) {
+
+			let glInternalFormat = gl.DEPTH_COMPONENT24;
+
+			if ( samples > 0 ) {
+
+
+				if ( depthTexture && depthTexture.isDepthTexture ) {
+
+					if ( depthTexture.type === gl.FLOAT ) {
+
+						glInternalFormat = gl.DEPTH_COMPONENT32F;
+
+					}
+
+				}
+
+				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, glInternalFormat, width, height );
+
+			} else {
+
+				gl.renderbufferStorage( gl.RENDERBUFFER, glInternalFormat, width, height );
+
+			}
+
+			gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer );
+
+		} else if ( depthBuffer && stencilBuffer ) {
+
+			if ( samples > 0 ) {
+
+				gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, gl.DEPTH24_STENCIL8, width, height );
+
+			} else {
+
+				gl.renderbufferStorage( gl.RENDERBUFFER, gl.DEPTH_STENCIL, width, height );
+
+			}
+
+
+			gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, renderbuffer );
 
 		}
 
@@ -239,9 +604,9 @@ class WebGLTextureUtils {
 
 		const dstBuffer = new typedArrayType( elementCount );
 
-		gl.bindBuffer(  gl.PIXEL_PACK_BUFFER, buffer );
+		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, buffer );
 		gl.getBufferSubData( gl.PIXEL_PACK_BUFFER, 0, dstBuffer );
-		gl.bindBuffer(  gl.PIXEL_PACK_BUFFER, null );
+		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, null );
 
 		gl.deleteFramebuffer( fb );
 
@@ -259,10 +624,11 @@ class WebGLTextureUtils {
 		if ( glType === gl.UNSIGNED_SHORT_5_5_5_1 ) return Uint16Array;
 		if ( glType === gl.UNSIGNED_SHORT_5_6_5 ) return Uint16Array;
 		if ( glType === gl.UNSIGNED_SHORT ) return Uint16Array;
-
 		if ( glType === gl.UNSIGNED_INT ) return Uint32Array;
 
-		if ( glType === gl.UNSIGNED_FLOAT ) return Float32Array;
+		if ( glType === gl.FLOAT ) return Float32Array;
+
+		throw new Error( `Unsupported WebGL type: ${glType}` );
 
 	}
 

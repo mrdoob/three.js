@@ -228,8 +228,8 @@ you passed in. <strong>This is strongly NOT RECOMMENDED</strong>. See below</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">    function resizeRendererToDisplaySize(renderer) {
       const canvas = renderer.domElement;
       const pixelRatio = window.devicePixelRatio;
-      const width  = canvas.clientWidth  * pixelRatio | 0;
-      const height = canvas.clientHeight * pixelRatio | 0;
+      const width  = Math.floor( canvas.clientWidth  * pixelRatio );
+      const height = Math.floor( canvas.clientHeight * pixelRatio );
       const needResize = canvas.width !== width || canvas.height !== height;
       if (needResize) {
         renderer.setSize(width, height, false);

@@ -7,7 +7,7 @@ import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
 import ParameterNode from './ParameterNode.js';
 import FunctionNode from '../code/FunctionNode.js';
-import { createNodeMaterialFromType } from '../materials/NodeMaterial.js';
+import { createNodeMaterialFromType, default as NodeMaterial } from '../materials/NodeMaterial.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import {
@@ -462,7 +462,7 @@ class NodeBuilder {
 
 	isReference( type ) {
 
-		return type === 'void' || type === 'property' || type === 'sampler' || type === 'texture' || type === 'cubeTexture';
+		return type === 'void' || type === 'property' || type === 'sampler' || type === 'texture' || type === 'cubeTexture' || type === 'storageTexture';
 
 	}
 
@@ -523,7 +523,7 @@ class NodeBuilder {
 	getVectorType( type ) {
 
 		if ( type === 'color' ) return 'vec3';
-		if ( type === 'texture' ) return 'vec4';
+		if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' ) return 'vec4';
 
 		return type;
 
@@ -575,6 +575,7 @@ class NodeBuilder {
 
 		if ( vecNum !== null ) return Number( vecNum[ 1 ] );
 		if ( vecType === 'float' || vecType === 'bool' || vecType === 'int' || vecType === 'uint' ) return 1;
+		if ( /mat2/.test( type ) === true ) return 4;
 		if ( /mat3/.test( type ) === true ) return 9;
 		if ( /mat4/.test( type ) === true ) return 16;
 
@@ -1089,7 +1090,23 @@ class NodeBuilder {
 
 	}
 
-	build() {
+	build( convertMaterial = true ) {
+
+		const { object, material } = this;
+
+		if ( convertMaterial ) {
+
+			if ( material !== null ) {
+
+				NodeMaterial.fromMaterial( material ).build( this );
+
+			} else {
+
+				this.addFlow( 'compute', object );
+
+			}
+
+		}
 
 		// setup() -> stage 1: create possible new nodes and returns an output reference node
 		// analyze()   -> stage 2: analyze nodes to possible optimization and validation
@@ -1155,21 +1172,9 @@ class NodeBuilder {
 
 	}
 
-	createNodeMaterial( type ) {
+	createNodeMaterial( type = 'NodeMaterial' ) {
 
 		return createNodeMaterialFromType( type );
-
-	}
-
-	getPrimitiveType( type ) {
-
-		let primitiveType;
-
-		if ( type[ 0 ] === 'i' ) primitiveType = 'int';
-		else if ( type[ 0 ] === 'u' ) primitiveType = 'uint';
-		else primitiveType = 'float';
-
-		return primitiveType;
 
 	}
 
@@ -1232,7 +1237,7 @@ class NodeBuilder {
 			// convert a number value to vector type, e.g:
 			// vec3( 1u ) -> vec3( float( 1u ) )
 
-			snippet = `${ this.getType( this.getPrimitiveType( toType ) ) }( ${ snippet } )`;
+			snippet = `${ this.getType( this.getComponentType( toType ) ) }( ${ snippet } )`;
 
 		}
 

@@ -42,18 +42,18 @@ class Pipelines extends DataMap {
 
 			// get shader
 
-			const nodeBuilder = this.nodes.getForCompute( computeNode );
+			const nodeBuilderState = this.nodes.getForCompute( computeNode );
 
 			// programmable stage
 
-			let stageCompute = this.programs.compute.get( nodeBuilder.computeShader );
+			let stageCompute = this.programs.compute.get( nodeBuilderState.computeShader );
 
 			if ( stageCompute === undefined ) {
 
 				if ( previousPipeline && previousPipeline.computeProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.computeProgram );
 
-				stageCompute = new ProgrammableStage( nodeBuilder.computeShader, 'compute' );
-				this.programs.compute.set( nodeBuilder.computeShader, stageCompute );
+				stageCompute = new ProgrammableStage( nodeBuilderState.computeShader, 'compute', nodeBuilderState.transforms, nodeBuilderState.nodeAttributes );
+				this.programs.compute.set( nodeBuilderState.computeShader, stageCompute );
 
 				backend.createProgram( stageCompute );
 
@@ -89,7 +89,7 @@ class Pipelines extends DataMap {
 
 	}
 
-	getForRender( renderObject ) {
+	getForRender( renderObject, promises = null ) {
 
 		const { backend } = this;
 
@@ -149,7 +149,7 @@ class Pipelines extends DataMap {
 
 				if ( previousPipeline && previousPipeline.usedTimes === 0 ) this._releasePipeline( previousPipeline );
 
-				pipeline = this._getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey );
+				pipeline = this._getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey, promises );
 
 			} else {
 
@@ -250,7 +250,7 @@ class Pipelines extends DataMap {
 
 	}
 
-	_getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey ) {
+	_getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey, promises ) {
 
 		// check for existing pipeline
 
@@ -266,7 +266,7 @@ class Pipelines extends DataMap {
 
 			renderObject.pipeline = pipeline;
 
-			this.backend.createRenderPipeline( renderObject );
+			this.backend.createRenderPipeline( renderObject, promises );
 
 		}
 

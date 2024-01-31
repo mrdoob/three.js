@@ -31,7 +31,7 @@
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
+			import { vec4, tslFn, vertexIndex, MeshPhongNodeMaterial } from 'three/nodes';
 			let camera, scene, renderer, clock;
 			let dirLight, spotLight;
 			let torusKnot, dirGroup;
@@ -93,14 +93,37 @@
 
 				// geometry
 
-				const geometry = new THREE.TorusKnotGeometry( 25, 8, 75, 20 );
-				const material = new THREE.MeshPhongMaterial( {
+				const geometry = new THREE.TorusKnotGeometry( 25, 8, 75, 80 );
+				const material = new MeshPhongNodeMaterial( {
 					color: 0x999999,
 					shininess: 0,
 					specular: 0x222222
 				} );
 
-				torusKnot = new THREE.Mesh( geometry, material );
+				const materialCustomShadow = material.clone();
+				materialCustomShadow.transparent = true;
+
+				const materialColor = vec4( 1, 0, 1, .5 );
+			
+				const discardNode = vertexIndex.hash().greaterThan( 0.5 );
+
+				materialCustomShadow.colorNode = tslFn( () => {
+
+					discardNode.discard();
+
+					return materialColor;
+
+				} )();
+
+				materialCustomShadow.shadowNode = tslFn( () => {
+
+					discardNode.discard();
+
+					return materialColor;
+			
+				} )();
+
+				torusKnot = new THREE.Mesh( geometry, materialCustomShadow );
 				torusKnot.scale.multiplyScalar( 1 / 18 );
 				torusKnot.position.y = 3;
 				torusKnot.castShadow = true;

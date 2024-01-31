@@ -2,7 +2,7 @@ import LightingNode from './LightingNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { /*vec2,*/ vec3 } from '../shadernode/ShaderNode.js';
+import { /*vec2,*/ vec3, vec4 } from '../shadernode/ShaderNode.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { positionWorld } from '../accessors/PositionNode.js';
@@ -12,7 +12,7 @@ import { WebGPUCoordinateSystem } from 'three';
 
 import { Color, DepthTexture, NearestFilter, LessCompare } from 'three';
 
-let depthMaterial = null;
+let overrideMaterial = null;
 
 class AnalyticLightNode extends LightingNode {
 
@@ -54,7 +54,13 @@ class AnalyticLightNode extends LightingNode {
 
 		if ( shadowNode === null ) {
 
-			if ( depthMaterial === null ) depthMaterial = builder.createNodeMaterial( 'MeshBasicNodeMaterial' );
+			if ( overrideMaterial === null ) {
+
+				overrideMaterial = builder.createNodeMaterial();
+				overrideMaterial.fragmentNode = vec4( 0, 0, 0, 1 );
+				overrideMaterial.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.fragmentNode unintentionally when using material.shadowNode
+
+			}
 
 			const shadow = this.light.shadow;
 			const rtt = builder.getRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
@@ -142,8 +148,10 @@ class AnalyticLightNode extends LightingNode {
 			*/
 			//
 
+			const shadowColor = texture( rtt.texture, shadowCoord );
+
 			this.rtt = rtt;
-			this.colorNode = this.colorNode.mul( frustumTest.mix( 1, shadowNode ) );
+			this.colorNode = this.colorNode.mul( frustumTest.mix( 1, shadowNode.mix( shadowColor.a.mix( 1, shadowColor ), 1 ) ) );
 
 			this.shadowNode = shadowNode;
 
@@ -169,7 +177,7 @@ class AnalyticLightNode extends LightingNode {
 
 		const currentOverrideMaterial = scene.overrideMaterial;
 
-		scene.overrideMaterial = depthMaterial;
+		scene.overrideMaterial = overrideMaterial;
 
 		rtt.setSize( light.shadow.mapSize.width, light.shadow.mapSize.height );
 

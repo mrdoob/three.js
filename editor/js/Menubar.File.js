@@ -225,6 +225,14 @@ function MenubarFile( editor ) {
 		const scene = editor.scene;
 		const animations = getAnimations( scene );
 
+		const optimizedAnimations = [];
+
+		for ( const animation of animations ) {
+
+			optimizedAnimations.push( animation.clone().optimize() );
+
+		}
+
 		const { GLTFExporter } = await import( 'three/addons/exporters/GLTFExporter.js' );
 
 		const exporter = new GLTFExporter();
@@ -233,7 +241,7 @@ function MenubarFile( editor ) {
 
 			saveArrayBuffer( result, 'scene.glb' );
 
-		}, undefined, { binary: true, animations: animations } );
+		}, undefined, { binary: true, animations: optimizedAnimations } );
 
 	} );
 	options.add( option );
@@ -248,6 +256,14 @@ function MenubarFile( editor ) {
 		const scene = editor.scene;
 		const animations = getAnimations( scene );
 
+		const optimizedAnimations = [];
+
+		for ( const animation of animations ) {
+
+			optimizedAnimations.push( animation.clone().optimize() );
+
+		}
+
 		const { GLTFExporter } = await import( 'three/addons/exporters/GLTFExporter.js' );
 
 		const exporter = new GLTFExporter();
@@ -256,7 +272,7 @@ function MenubarFile( editor ) {
 
 			saveString( JSON.stringify( result, null, 2 ), 'scene.gltf' );
 
-		}, undefined, { animations: animations } );
+		}, undefined, { animations: optimizedAnimations } );
 
 
 	} );
