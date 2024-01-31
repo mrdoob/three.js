@@ -117,7 +117,17 @@
       "README.md",
       "build/three.js",
       "build/three.min.js",
-      "build/three.module.js"
+      "build/three.module.js",
+      "build/WebGPURenderer.js",
+      "build/PMREMGenerator.js",
+      "build/EffectComposer.js",
+      "build/RenderPass.js",
+      "build/ShaderPass.js",
+      "build/CopyShader.js",
+      "build/Pass.js",
+      "build/OutlinePass.js",
+      "build/FXAAShader.js",
+      "build/KTX2Loader.js"
     ],
     "directories": {}
   }
