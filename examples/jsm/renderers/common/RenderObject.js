@@ -38,7 +38,7 @@ function getKeys( obj ) {
 
 export default class RenderObject {
 
-	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext ) {
+	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext ) {
 
 		this._nodes = nodes;
 		this._geometries = geometries;
@@ -62,7 +62,7 @@ export default class RenderObject {
 		this.pipeline = null;
 		this.vertexBuffers = null;
 
-		this.updateClipping( renderContext.clippingContext );
+		this.updateClipping( clippingContext );
 
 		this.clippingContextVersion = this.clippingContext.version;
 

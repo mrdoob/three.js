@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - clipping groups</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - clipping - groups
+		</div>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { MeshPhongNodeMaterial } from 'three/nodes';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
+
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			import ClippingGroup from 'three/addons/renderers/common/ClippingGroup.js';
+
+			let camera, scene, renderer;
+
+			const params = {
+				groups: 'XYZ',
+				localClipping: true,
+				clipIntersection: true,
+				planeConstant: 0,
+				showHelpers: false
+			};
+
+			const clipPlaneX = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
+			const clipPlaneY = new THREE.Plane( new THREE.Vector3( 0, -1, 0 ), 0 );
+			const clipPlaneZ = new THREE.Plane( new THREE.Vector3( 0, 0, -1 ), 0 );
+
+			init();
+			render();
+
+			function init() {
+
+				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU or WebGL2 support' );
+
+				}
+
+				renderer = new WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.localClippingEnabled = true;
+				document.body.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 200 );
+
+				camera.position.set( - 1.5, 2.5, 3.0 );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 10;
+				controls.enablePan = false;
+
+				controls.addEventListener( 'change', render );
+
+				const light = new THREE.HemisphereLight( 0xffffff, 0x080808, 4.5 );
+				light.position.set( - 1.25, 1, 1.25 );
+				scene.add( light );
+
+				//
+				const groupX = new ClippingGroup();
+				groupX.clippingPlanes = [ clipPlaneX ];
+				groupX.clipIntersection = true;
+
+				const groupY = new ClippingGroup();
+				groupY.clippingPlanes = [ clipPlaneY ];
+				groupY.clipIntersection = true;
+
+				const groupZ = new ClippingGroup();
+				groupZ.clippingPlanes = [ clipPlaneZ ];
+				groupZ.clipIntersection = true;
+
+				const sphereGroup = new THREE.Group();
+
+				for ( let i = 1; i <= 30; i += 2 ) {
+
+					const geometry = new THREE.SphereGeometry( i / 30, 48, 24 );
+
+					const material = new MeshPhongNodeMaterial( {
+
+						color: new THREE.Color().setHSL( Math.random(), 0.5, 0.5, THREE.SRGBColorSpace ),
+						side: THREE.DoubleSide,
+						alphaToCoverage: true,
+
+					} );
+
+					const object = new THREE.Mesh( geometry, material );
+
+					sphereGroup.add( object );
+
+				}
+
+				groupZ.add( sphereGroup );
+				groupY.add( groupZ );
+				groupX.add( groupY );
+
+				scene.add( groupX );
+
+				// helpers
+				const planeHelperX = new THREE.PlaneHelper( clipPlaneX, 2, 0xff0000 );
+				const planeHelperY = new THREE.PlaneHelper( clipPlaneY, 2, 0x00ff00 );
+				const planeHelperZ = new THREE.PlaneHelper( clipPlaneZ, 2, 0x0000ff );
+
+				const helpers = new THREE.Group();
+				helpers.add( planeHelperX );
+				helpers.add( planeHelperY );
+				helpers.add( planeHelperZ );
+
+				helpers.visible = false;
+				scene.add( helpers );
+
+				helpers.children.forEach( h => {
+					h.children[ 0 ].material.side = THREE.DoubleSide;
+				} );
+
+				// gui
+
+				const gui = new GUI();
+
+				gui.add( params, 'localClipping' ).name( 'local clipping' ).onChange( function ( value ) {
+
+					renderer.localClippingEnabled = value;
+					render();
+
+				} );
+				gui.add( params, 'clipIntersection' ).name( 'clip intersection' ).onChange( function ( value ) {
+
+					groupX.clipIntersection = value;
+					groupY.clipIntersection = value;
+					groupZ.clipIntersection = value;
+					render();
+
+				} );
+
+				gui.add( params, 'planeConstant', - 1, 1 ).step( 0.01 ).name( 'plane constant' ).onChange( function ( value ) {
+
+					clipPlaneX.constant = value;
+					clipPlaneY.constant = value;
+					clipPlaneZ.constant = value;
+
+					render();
+
+				} );
+
+				gui.add( params, 'groups', [ 'X', 'XY', 'XYZ' ] ).name( 'groups' ).onChange( function ( value ) {
+
+					switch ( value ) {
+
+						case 'X':
+
+							planeHelperX.visible = true;
+							planeHelperY.visible = false;
+							planeHelperZ.visible = false;
+
+							groupX.add( sphereGroup );
+
+							break;
+
+						case 'XY':
+
+							planeHelperX.visible = true;
+							planeHelperY.visible = true;
+							planeHelperZ.visible = false;
+
+							groupY.add( sphereGroup );
+							break;
+
+						case 'XYZ':
+
+							planeHelperX.visible = true;
+							planeHelperY.visible = true;
+							planeHelperZ.visible = true;
+
+							groupZ.add( sphereGroup );
+							break;
+
+					}
+
+					render();
+
+				} );
+
+				gui.add( params, 'showHelpers' ).name( 'show helpers' ).onChange( function ( value ) {
+
+					helpers.visible = value;
+
+					render();
+
+				} );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.renderAsync( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
