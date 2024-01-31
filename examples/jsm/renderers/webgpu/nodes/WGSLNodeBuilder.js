@@ -783,7 +783,17 @@ ${ flowData.code }
 					snippets: []
 				} );
 
-				group.snippets.push( `\t${ uniform.name } : ${ vectorType }` );
+				if ( Array.isArray( uniform.value ) === true ) {
+
+					const length = uniform.value.length;
+
+					group.snippets.push( `\t${uniform.name} : array<${vectorType}, ${length}>` );
+
+				} else {
+
+					group.snippets.push( `\t${uniform.name} : ${ vectorType}` );
+
+				}
 
 			}
 

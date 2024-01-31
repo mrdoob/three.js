@@ -19,6 +19,7 @@ import { lightingContext } from '../lighting/LightingContextNode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
 import { depthPixel } from '../display/ViewportDepthNode.js';
 import { cameraLogDepth } from '../accessors/CameraNode.js';
+import { clipping, clippingAlpha } from '../accessors/ClippingNode.js';
 
 const NodeMaterials = new Map();
 
@@ -54,6 +55,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.depthNode = null;
 		this.shadowNode = null;
+		this.clippingNode = null;
 
 		this.outputNode = null;
 
@@ -90,6 +92,8 @@ class NodeMaterial extends ShaderMaterial {
 
 		let resultNode;
 
+		this.setupClipping( builder );
+
 		if ( this.fragmentNode === null ) {
 
 			if ( this.depthWrite === true ) this.setupDepth( builder );
@@ -100,6 +104,8 @@ class NodeMaterial extends ShaderMaterial {
 			this.setupVariants( builder );
 
 			const outgoingLightNode = this.setupLighting( builder );
+
+			if ( this.clippingNode ) builder.stack.add( this.clippingNode );
 
 			resultNode = this.setupOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
 
@@ -120,6 +126,29 @@ class NodeMaterial extends ShaderMaterial {
 		builder.stack.outputNode = resultNode;
 
 		builder.addFlow( 'fragment', builder.removeStack() );
+
+	}
+
+	setupClipping( builder ) {
+
+		const { globalClippingCount, localClippingCount, localClippingEnabled } = builder.clippingContext;
+
+		this.clippingNode = null;
+
+		if ( globalClippingCount || ( localClippingEnabled && localClippingCount > 0 ) ) {
+
+			if ( this.alphaToCoverage ) {
+
+				// to be added to flow when the color/alpha value has been determined
+				this.clippingNode = clippingAlpha();
+
+			} else {
+
+				builder.stack.add( clipping() );
+
+			}
+
+		}
 
 	}
 

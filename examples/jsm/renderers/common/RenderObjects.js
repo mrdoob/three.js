@@ -16,7 +16,7 @@ class RenderObjects {
 
 	}
 
-	get( object, material, scene, camera, lightsNode, renderContext, passId ) {
+	get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {
 
 		const chainMap = this.getChainMap( passId );
 		const chainArray = [ object, material, renderContext, lightsNode ];
@@ -25,19 +25,21 @@ class RenderObjects {
 
 		if ( renderObject === undefined ) {
 
-			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, passId );
+			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId );
 
 			chainMap.set( chainArray, renderObject );
 
 		} else {
 
-			if ( renderObject.version !== material.version || renderObject.needsUpdate ) {
+			renderObject.updateClipping( clippingContext );
+
+			if ( renderObject.version !== material.version || renderObject.needsUpdate || renderObject.clippingNeedsUpdate() ) {
 
 				if ( renderObject.initialCacheKey !== renderObject.getCacheKey() ) {
 
 					renderObject.dispose();
 
-					renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, passId );
+					renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId );
 
 				} else {
 
@@ -65,11 +67,11 @@ class RenderObjects {
 
 	}
 
-	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, passId ) {
+	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {
 
 		const chainMap = this.getChainMap( passId );
 
-		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext );
+		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext );
 
 		renderObject.onDispose = () => {
 

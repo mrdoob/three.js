@@ -11,6 +11,7 @@ import Textures from './Textures.js';
 import Background from './Background.js';
 import Nodes from './nodes/Nodes.js';
 import Color4 from './Color4.js';
+import ClippingContext from './ClippingContext.js';
 import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping } from 'three';
 
 const _scene = new Scene();
@@ -57,6 +58,8 @@ class Renderer {
 
 		this.depth = true;
 		this.stencil = true;
+
+		this.clippingPlanes = [];
 
 		this.info = new Info();
 
@@ -161,6 +164,7 @@ class Renderer {
 			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this.info );
 			this._renderLists = new RenderLists();
 			this._renderContexts = new RenderContexts();
+			this._clippingContext = new ClippingContext();
 
 			//
 
@@ -386,6 +390,8 @@ class Renderer {
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
+		this._clippingContext.updateGlobal( this );
+
 		//
 
 		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
@@ -440,6 +446,7 @@ class Renderer {
 		renderContext.activeCubeFace = activeCubeFace;
 		renderContext.activeMipmapLevel = activeMipmapLevel;
 		renderContext.occlusionQueryCount = renderList.occlusionQueryCount;
+		renderContext.globalClippingCount = this.clippingPlanes !== null ? this.clippingPlanes.length: 0;
 
 		//
 
@@ -1107,10 +1114,42 @@ class Renderer {
 
 			}
 
-			if ( overrideMaterial.isShadowNodeMaterial && ( material.shadowNode && material.shadowNode.isNode ) ) {
+			if ( overrideMaterial.isShadowNodeMaterial ) {
 
-				overrideFragmentNode = overrideMaterial.fragmentNode;
-				overrideMaterial.fragmentNode = material.shadowNode;
+				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
+
+				if ( material.shadowNode && material.shadowNode.isNode ) {
+
+					overrideFragmentNode = overrideMaterial.fragmentNode;
+					overrideMaterial.fragmentNode = material.shadowNode;
+
+				}
+
+				if ( this.localClippingEnabled ) {
+
+					if ( material.clipShadows ) {
+
+						if ( overrideMaterial.clippingPlanes !== material.clippingPlanes ) {
+
+							overrideMaterial.clippingPlanes = material.clippingPlanes;
+							overrideMaterial.needsUpdate = true;
+
+						}
+
+						if ( overrideMaterial.clipIntersection !== material.clipIntersection ) {
+
+							overrideMaterial.clipIntersection = material.clipIntersection;
+
+						}
+
+					} else if ( Array.isArray( overrideMaterial.clippingPlanes ) ) {
+
+						overrideMaterial.clippingPlanes = null;
+						overrideMaterial.needsUpdate = true;
+
+					}
+
+				}
 
 			}
 
@@ -1158,7 +1197,7 @@ class Renderer {
 
 	_renderObjectDirect( object, material, scene, camera, lightsNode, passId ) {
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, this._clippingContext, passId );
 
 		//
 
@@ -1184,7 +1223,7 @@ class Renderer {
 
 	_createObjectPipeline( object, material, scene, camera, lightsNode, passId ) {
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, this._clippingContext, passId );
 
 		//
 

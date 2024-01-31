@@ -72,6 +72,8 @@ class NodeBuilder {
 		this.fogNode = null;
 		this.toneMappingNode = null;
 
+		this.clippingContext = null;
+
 		this.vertexShader = null;
 		this.fragmentShader = null;
 		this.computeShader = null;
