@@ -660,7 +660,7 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
-		this.hasOcclusion = function ( ) {
+		this.hasDepthSensing = function () {
 
 			return depthSensing.texture !== null;
 
