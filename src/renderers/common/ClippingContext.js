@@ -8,33 +8,47 @@ let _clippingContextVersion = 0;
 
 class ClippingContext {
 
-	constructor() {
+	constructor( parentContext = null ) {
 
 		this.version = ++ _clippingContextVersion;
 
-		this.globalClippingCount = 0;
+		this.clipIntersection = null;
 
-		this.localClippingCount = 0;
-		this.localClippingEnabled = false;
-		this.localClipIntersection = false;
 
-		this.planes = [];
+		if ( parentContext === null ) {
+
+			this.intersectionPlanes = [];
+			this.unionPlanes = [];
+
+			this.viewNormalMatrix = new Matrix3();
+			this.clippingGroupContexts = new WeakMap();
+
+			this.shadowPass = false;
+
+		} else {
+
+			this.viewNormalMatrix = parentContext.viewNormalMatrix;
+			this.clippingGroupContexts = parentContext.clippingGroupContexts;
+
+			this.shadowPass = parentContext.shadowPass;
+
+			this.viewMatrix = parentContext.viewMatrix;
+
+		}
 
 		this.parentVersion = 0;
-		this.viewNormalMatrix = new Matrix3();
 
 	}
 
-	projectPlanes( source, offset ) {
+	projectPlanes( source, destination, offset ) {
 
 		const l = source.length;
-		const planes = this.planes;
 
 		for ( let i = 0; i < l; i ++ ) {
 
 			_plane.copy( source[ i ] ).applyMatrix4( this.viewMatrix, this.viewNormalMatrix );
 
-			const v = planes[ offset + i ];
+			const v = destination[ offset + i ];
 			const normal = _plane.normal;
 
 			v.x = - normal.x;
@@ -46,119 +60,97 @@ class ClippingContext {
 
 	}
 
-	updateGlobal( renderer, camera ) {
+	updateGlobal( scene, camera ) {
 
-		const rendererClippingPlanes = renderer.clippingPlanes;
+		this.shadowPass = ( scene.overrideMaterial !== null && scene.overrideMaterial.isShadowNodeMaterial );
 		this.viewMatrix = camera.matrixWorldInverse;
 
 		this.viewNormalMatrix.getNormalMatrix( this.viewMatrix );
 
+	}
+
+	update( parentContext, clippingGroup ) {
+
 		let update = false;
 
-		if ( Array.isArray( rendererClippingPlanes ) && rendererClippingPlanes.length !== 0 ) {
+		if ( parentContext.version !== this.parentVersion ) {
 
-			const l = rendererClippingPlanes.length;
+			this.intersectionPlanes = Array.from( parentContext.intersectionPlanes );
+			this.unionPlanes = Array.from( parentContext.unionPlanes );
+			this.parentVersion = parentContext.version;
 
-			if ( l !== this.globalClippingCount ) {
+		}
 
-				const planes = [];
+		if ( this.clipIntersection !== clippingGroup.clipIntersection ) {
 
-				for ( let i = 0; i < l; i ++ ) {
+			this.clipIntersection = clippingGroup.clipIntersection;
 
-					planes.push( new Vector4() );
+			if ( this.clipIntersection ) {
 
-				}
+				this.unionPlanes.length = parentContext.unionPlanes.length;
 
-				this.globalClippingCount = l;
-				this.planes = planes;
+			} else {
 
-				update = true;
+				this.intersectionPlanes.length = parentContext.intersectionPlanes.length;
 
 			}
 
-			this.projectPlanes( rendererClippingPlanes, 0 );
+		}
 
-		} else if ( this.globalClippingCount !== 0 ) {
+		const srcClippingPlanes = clippingGroup.clippingPlanes;
+		const l = srcClippingPlanes.length;
 
-			this.globalClippingCount = 0;
-			this.planes = [];
+		let dstClippingPlanes;
+		let offset;
+
+		if ( this.clipIntersection ) {
+
+			dstClippingPlanes = this.intersectionPlanes;
+			offset = parentContext.intersectionPlanes.length;
+
+		} else {
+
+			dstClippingPlanes = this.unionPlanes;
+			offset = parentContext.unionPlanes.length;
+
+		}
+
+		if ( dstClippingPlanes.length !== offset + l ) {
+
+			dstClippingPlanes.length = offset + l;
+
+			for ( let i = 0; i < l; i ++ ) {
+
+				dstClippingPlanes[ offset + i ] = new Vector4();
+
+			}
+
 			update = true;
 
 		}
 
-		if ( renderer.localClippingEnabled !== this.localClippingEnabled ) {
-
-			this.localClippingEnabled = renderer.localClippingEnabled;
-			update = true;
-
-		}
+		this.projectPlanes( srcClippingPlanes, dstClippingPlanes, offset );
 
 		if ( update ) this.version = _clippingContextVersion ++;
 
 	}
 
-	update( parent, material ) {
+	getGroupContext( clippingGroup ) {
 
-		let update = false;
+		if ( this.shadowPass && ! clippingGroup.clipShadows ) return this;
 
-		if ( this !== parent && parent.version !== this.parentVersion ) {
+		let context = this.clippingGroupContexts.get( clippingGroup );
 
-			this.globalClippingCount = material.isShadowNodeMaterial ? 0 : parent.globalClippingCount;
-			this.localClippingEnabled = parent.localClippingEnabled;
-			this.planes = Array.from( parent.planes );
-			this.parentVersion = parent.version;
-			this.viewMatrix = parent.viewMatrix;
-			this.viewNormalMatrix = parent.viewNormalMatrix;
+		if ( context === undefined ) {
 
-			update = true;
+			context = new ClippingContext( this );
+			this.clippingGroupContexts.set( clippingGroup, context );
 
 		}
 
-		if ( this.localClippingEnabled ) {
+		context.update( this, clippingGroup );
 
-			const localClippingPlanes = material.clippingPlanes;
-
-			if ( ( Array.isArray( localClippingPlanes ) && localClippingPlanes.length !== 0 ) ) {
-
-				const l = localClippingPlanes.length;
-				const planes = this.planes;
-				const offset = this.globalClippingCount;
-
-				if ( update || l !== this.localClippingCount ) {
-
-					planes.length = offset + l;
-
-					for ( let i = 0; i < l; i ++ ) {
-
-						planes[ offset + i ] = new Vector4();
-
-					}
-
-					this.localClippingCount = l;
-					update = true;
-
-				}
-
-				this.projectPlanes( localClippingPlanes, offset );
-
-
-			} else if ( this.localClippingCount !== 0 ) {
-
-				this.localClippingCount = 0;
-				update = true;
-
-			}
-
-			if ( this.localClipIntersection !== material.clipIntersection ) {
-
-				this.localClipIntersection = material.clipIntersection;
-				update = true;
-
-			}
-
-		}
-
-		if ( update ) this.version = _clippingContextVersion ++;
+		return context;
 
 	}
 
