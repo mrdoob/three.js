@@ -1209,7 +1209,7 @@ class WebGLRenderer {
 
 			//
 
-			if ( xr.enabled === false || xr.isPresenting === false || xr.hasOcclusion() === false ) {
+			if ( xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false ) {
 
 				background.render( currentRenderList, scene );
 
