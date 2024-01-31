@@ -1,9 +1,8 @@
 import { EventDispatcher } from './EventDispatcher.js';
 import { Texture } from '../textures/Texture.js';
-import { LinearFilter, NoColorSpace, SRGBColorSpace, sRGBEncoding } from '../constants.js';
+import { LinearFilter } from '../constants.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Source } from '../textures/Source.js';
-import { warnOnce } from '../utils.js';
 
 /*
  In options, we can specify:
@@ -28,14 +27,6 @@ class RenderTarget extends EventDispatcher {
 		this.viewport = new Vector4( 0, 0, width, height );
 
 		const image = { width: width, height: height, depth: 1 };
-
-		if ( options.encoding !== undefined ) {
-
-			// @deprecated, r152
-			warnOnce( 'THREE.WebGLRenderTarget: option.encoding has been replaced by option.colorSpace.' );
-			options.colorSpace = options.encoding === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
-
-		}
 
 		options = Object.assign( {
 			generateMipmaps: false,
