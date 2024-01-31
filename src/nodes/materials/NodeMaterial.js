@@ -173,11 +173,11 @@ class NodeMaterial extends Material {
 
 		if ( builder.clippingContext === null ) return null;
 
-		const { globalClippingCount, localClippingCount } = builder.clippingContext;
+		const { unionPlanes, intersectionPlanes } = builder.clippingContext;
 
 		let result = null;
 
-		if ( globalClippingCount || localClippingCount ) {
+		if ( unionPlanes.length > 0 || intersectionPlanes.length > 0 ) {
 
 			if ( this.alphaToCoverage ) {
 
