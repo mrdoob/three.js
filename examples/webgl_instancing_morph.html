@@ -24,11 +24,7 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 			
-			let camera, scene, renderer, stats;
-
-			let mesh, mixer;
-
-			const dummy = new THREE.Object3D();
+			let camera, scene, renderer, stats, mesh, mixer, dummy;
 
 			const offset = 5000;
 
@@ -48,7 +44,7 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 100, 10000 );
-			
+
 				scene = new THREE.Scene();
 
 				scene.background = new THREE.Color( 0x99DDFF );
@@ -83,33 +79,31 @@
 				);
 
 				ground.rotation.x = - Math.PI / 2;
-			
+
 				ground.receiveShadow = true;
 
 				scene.add( ground );
 
 				const loader = new GLTFLoader();
 
-				loader.load( 'models/gltf/Horse.glb', function ( o ) {
+				loader.load( 'models/gltf/Horse.glb', function ( glb ) {
 
-					const object = o.scene.children[ 0 ];
+					dummy = glb.scene.children[ 0 ];
 
-					mesh = new THREE.InstancedMesh( object.geometry, object.material, 1024 );
-			
-					mesh.morphTargetInfluences = object.morphTargetInfluences;
+					mesh = new THREE.InstancedMesh( dummy.geometry, dummy.material, 1024 );
 
-					mesh.setMorphAt( 0, mesh );
+					mesh.setMorphAt( 0, dummy );
 
 					mesh.instanceMorph.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
-			
+
 					mesh.castShadow = true;
 
 					for ( let x = 0, i = 0; x < 32; x ++ ) {
 
 						for ( let y = 0; y < 32; y ++ ) {
-			
+
 							dummy.position.set( offset - 300 * x + 200 * Math.random(), 0, offset - 300 * y );
-			
+
 							dummy.updateMatrix();
 
 							mesh.setMatrixAt( i, dummy.matrix );
@@ -123,13 +117,11 @@
 			
 					}
 
-					mesh.instanceColor.needsUpdate = true;
-
 					scene.add( mesh );
 
-					mixer = new THREE.AnimationMixer( o.scene );
+					mixer = new THREE.AnimationMixer( glb.scene );
 
-					const action = mixer.clipAction( o.animations[ 0 ] );
+					const action = mixer.clipAction( glb.animations[ 0 ] );
 
 					action.play();
 			
@@ -185,16 +177,11 @@
 
 				if ( mesh ) {
 
-					for ( let x = 0, i = 0; x < 32; x ++ ) {
+					for ( let i = 0; i < 1024; i ++ ) {
 
-						for ( let y = 0; y < 32; y ++ ) {
+						mixer.setTime( time + timeOffsets[ i ] );
 
-			
-							mixer.setTime( time + timeOffsets[ x * 32 + y ] );
-
-							mesh.setMorphAt( i ++, mesh );
-
-						}
+						mesh.setMorphAt( i, dummy );
 
 					}
 

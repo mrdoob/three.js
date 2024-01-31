@@ -159,6 +159,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 			if ( object.isInstancedMesh ) {
 
+				//Only animations interpolating between two targets are supported so their sum will always be one
 				morphInfluencesSum = 1;
 
 			} else {
@@ -169,12 +170,14 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 				}
 
+				//For instanced meshes the influences are stored in the instanceMorph attribute
+				program.getUniforms().setValue( gl, 'morphTargetInfluences', objectInfluences );
+
 			}
 
 			const morphBaseInfluence = geometry.morphTargetsRelative ? 1 : 1 - morphInfluencesSum;
 
 			program.getUniforms().setValue( gl, 'morphTargetBaseInfluence', morphBaseInfluence );
-			program.getUniforms().setValue( gl, 'morphTargetInfluences', objectInfluences );
 
 			program.getUniforms().setValue( gl, 'morphTargetsTexture', entry.texture, textures );
 			program.getUniforms().setValue( gl, 'morphTargetsTextureSize', entry.size );

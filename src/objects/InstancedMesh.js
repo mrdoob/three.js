@@ -202,6 +202,7 @@ class InstancedMesh extends Mesh {
 
 	}
 
+	//Only animations where just two targets are interpolated at any time are supported
 	setMorphAt( index, source ) {
 
 		if ( this.instanceMorph === null ) {
@@ -210,12 +211,14 @@ class InstancedMesh extends Mesh {
 
 		}
 
+		// If a vec4 with the two morph target index-value pairs was provided just copy it
 		if ( source.isVector4 ) {
 
 			source.toArray( this.instanceMorph.array, index * 4 );
 
 		} else if ( source.isMesh && source.morphTargetInfluences ) {
 
+			// If a dummy mesh was provided, iterate its morphTargetInfluences to find the two targets/frames currently interpolated
 			let index1 = - 1;
 			let index2 = - 1;
 
@@ -239,14 +242,12 @@ class InstancedMesh extends Mesh {
 
 				}
 
-				//morphInfluencesSum += v;
-
 			}
 
 			this.instanceMorph.array[ index * 4 ] = index1;
-			this.instanceMorph.array[ index * 4 + 1 ] = objectInfluences[ index1 ];
+			this.instanceMorph.array[ index * 4 + 1 ] = objectInfluences[ index1 ] || 0;
 			this.instanceMorph.array[ index * 4 + 2 ] = index2;
-			this.instanceMorph.array[ index * 4 + 3 ] = objectInfluences[ index2 ];
+			this.instanceMorph.array[ index * 4 + 3 ] = objectInfluences[ index2 ] || 0; // handle case where index is still -1
 
 		}
 
