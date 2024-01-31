@@ -200,7 +200,8 @@ function retarget( target, source, options = {} ) {
 function retargetClip( target, source, clip, options = {} ) {
 
 	options.useFirstFramePosition = options.useFirstFramePosition !== undefined ? options.useFirstFramePosition : false;
-	options.fps = options.fps !== undefined ? options.fps : ( clip.tracks[ 0 ].times.length / clip.duration );
+	// Calculate the fps from the source clip based on the track with the most frames, unless fps is already provided.
+	options.fps = options.fps !== undefined ? options.fps : ( Math.max( ...clip.tracks.map( track => track.times.length ) ) / clip.duration );
 	options.names = options.names || [];
 
 	if ( ! source.isObject3D ) {
