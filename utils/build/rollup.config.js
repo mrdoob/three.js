@@ -1,6 +1,29 @@
 import terser from '@rollup/plugin-terser';
 import MagicString from 'magic-string';
 
+function addons() {
+
+	return {
+
+		transform( code, id ) {
+
+			if ( /\/examples\/jsm\//.test( id ) === false ) return;
+
+			code = new MagicString( code );
+
+			code.replace( 'build/three.module.js', 'src/Three.js' );
+
+			return {
+				code: code.toString(),
+				map: code.generateMap().toString()
+			};
+
+		}
+
+	};
+
+}
+
 export function glsl() {
 
 	return {
@@ -103,30 +126,13 @@ const builds = [
 			}
 		]
 	},
-	{
-		input: 'src/Three.js',
-		plugins: [
-			glsl(),
-			header(),
-			terser()
-		],
-		output: [
-			{
-				format: 'cjs',
-				name: 'THREE',
-				file: 'build/three.min.cjs',
-				indent: '\t'
-			}
-		]
-	},
-
 	{ // @deprecated, r150
 		input: 'src/Three.js',
 		plugins: [
 			addons(),
 			glsl(),
 			header(),
-			deprecationWarning()
+			// deprecationWarning()
 		],
 		output: [
 			{
@@ -144,7 +150,7 @@ const builds = [
 			glsl(),
 			terser(),
 			header(),
-			deprecationWarning()
+			// deprecationWarning()
 		],
 		output: [
 			{
