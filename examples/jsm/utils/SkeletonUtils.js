@@ -200,7 +200,7 @@ function retarget( target, source, options = {} ) {
 function retargetClip( target, source, clip, options = {} ) {
 
 	options.useFirstFramePosition = options.useFirstFramePosition !== undefined ? options.useFirstFramePosition : false;
-	options.fps = options.fps !== undefined ? options.fps : 30;
+	options.fps = options.fps !== undefined ? options.fps : ( clip.tracks[ 0 ].times.length / clip.duration );
 	options.names = options.names || [];
 
 	if ( ! source.isObject3D ) {
