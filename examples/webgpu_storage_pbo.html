@@ -45,16 +45,16 @@
 
 				const size = 100;
 
-				const particleBuffer = new StorageBufferAttribute( size, 1 );
+				const arrayBuffer = new StorageBufferAttribute( size, 1 );
 
-				particleBuffer.array.set( new Float32Array( size ).map( ( _, i ) => i ) );
-				const particleBufferNode = storage( particleBuffer, 'float', size, false );
+				arrayBuffer.array.set( new Float32Array( size ).map( ( _, i ) => i ) );
+				const arrayBufferNode = storage( arrayBuffer, 'float', size, false );
 
 				const computeInitRandom = tslFn( () => {
 
 					//  random between 0 and size
 					const index = float( instanceIndex.hash().mul( size ).round() );
-					particleBufferNode.element( instanceIndex ).assign( index );
+					arrayBufferNode.element( instanceIndex ).assign( index );
 
 				} );
 
@@ -66,14 +66,14 @@
 					// Ensure we're not accessing out of bounds
 					If( pairIndex.lessThan( uint( size ).sub( 1 ) ), () => {
 
-						const el = particleBufferNode.element( pairIndex ).toVar();
-						const nextEl = particleBufferNode.element( pairIndex.add( 1 ) );
+						const el = arrayBufferNode.element( pairIndex ).toVar();
+						const nextEl = arrayBufferNode.element( pairIndex.add( 1 ) );
 
 						// Swap if current element is greater than the next
 						If( el.greaterThan( nextEl ), () => {
 
-							particleBufferNode.element( pairIndex ).assign( nextEl );
-							particleBufferNode.element( pairIndex.add( 1 ) ).assign( el );
+							arrayBufferNode.element( pairIndex ).assign( nextEl );
+							arrayBufferNode.element( pairIndex.add( 1 ) ).assign( el );
 			
 						} );
 
@@ -94,7 +94,7 @@
 
 					const index = uint( uv().x.mul( float( size ) ).floor() );
 
-					const value = float( particleBufferNode.element( index ) ).div( float( size ) );
+					const value = float( arrayBufferNode.element( index ) ).div( float( size ) );
 
 					return vec3( value, value, value );
 
@@ -122,10 +122,10 @@
 					setTimeout( stepAnimation, 300.0 );
 
 					// debug storage buffer WebGPU, webgl debug is in transferBufferToTexture
-					// renderer.getArrayBufferAsync( particleBuffer ).then( ( arrayBuffer ) => {
+					// renderer.getArrayBufferAsync( arrayBuffer ).then( ( arrayBuffer ) => {
 
 					// 	const dataview = new Float32Array( arrayBuffer );
-					// 	console.log( 'particleBuffer', dataview );
+					// 	console.log( 'arrayBuffer', dataview );
 
 					// } );
 
