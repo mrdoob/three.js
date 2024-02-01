@@ -1,7 +1,6 @@
-import { texture } from '../Nodes.js';
 import Node, { addNodeClass } from '../core/Node.js';
 import { DataTexture, RGBAFormat, FloatType } from 'three';
-
+import UniformNode from '../core/UniformNode.js';
 class ArrayElementNode extends Node { // @TODO: If extending from TempNode it breaks webgpu_compute
 
 	constructor( node, indexNode ) {
@@ -38,7 +37,7 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 					const pboTexture = new DataTexture( attribute.array, width, height, RGBAFormat, FloatType );
 					pboTexture.needsUpdate = true;
 					pboTexture.isPBOTexture = true;
-					const pbo = texture( pboTexture );
+					const pbo = new UniformNode( pboTexture );
 					pbo.setPrecision( 'high' );
 
 					attribute.pboNode = pbo;
