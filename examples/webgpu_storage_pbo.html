@@ -118,29 +118,29 @@
 				renderer.compute( computeInit );
 			
 
-				const computeKernel = tslFn( ( ) => { // Assume currentPhase can be passed
+				// const computeKernel = tslFn( ( ) => { // Assume currentPhase can be passed
 
-					// Calculate the index to consider based on the current phase
-					const pairIndex = instanceIndex.mul( 2 ).add( phase ).toVar();
+				// 	// Calculate the index to consider based on the current phase
+				// 	const pairIndex = instanceIndex.mul( 2 ).add( phase ).toVar();
 
-					// Ensure we're not accessing out of bounds
-					If( pairIndex.lessThan( uint( size ).sub( 1 ) ), () => {
+				// 	// Ensure we're not accessing out of bounds
+				// 	If( pairIndex.lessThan( uint( size ).sub( 1 ) ), () => {
 
-						const el = arrayBufferNode.element( pairIndex ).toVar();
-						const nextEl = arrayBufferNode.element( pairIndex.add( 1 ) );
+				// 		const el = arrayBufferNode.element( pairIndex ).toVar();
+				// 		const nextEl = arrayBufferNode.element( pairIndex.add( 1 ) );
 
-						// Swap if current element is greater than the next
-						If( el.greaterThan( nextEl ), () => {
+				// 		// Swap if current element is greater than the next
+				// 		If( el.greaterThan( nextEl ), () => {
 
-							arrayBufferNode.element( pairIndex ).assign( nextEl );
-							arrayBufferNode.element( pairIndex.add( 1 ) ).assign( el );
+				// 			arrayBufferNode.element( pairIndex ).assign( nextEl );
+				// 			arrayBufferNode.element( pairIndex.add( 1 ) ).assign( el );
 
-						} );
+				// 		} );
 
-					} );
+				// 	} );
 
-				} );
-				const compute = computeKernel().compute( size );
+				// } );
+				// const compute = computeKernel().compute( size );
 
 
 				 const stepAnimation = async function () {
@@ -162,7 +162,7 @@
 
 					setTimeout( stepAnimation, 1000 );
 			
-	};
+				};
 
 				stepAnimation();
 				// renderer.setAnimationLoop( stepAnimation );
