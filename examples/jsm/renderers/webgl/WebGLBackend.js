@@ -432,7 +432,7 @@ class WebGLBackend extends Backend {
 
 			if ( transformBuffers[ i ].pbo ) {
 
-				this.textureUtils.transferBufferToTexture( transformBuffers[ i ].transformBuffer, transformBuffers[ i ].pbo );
+				this.textureUtils.transferBufferToTexture( transformBuffers[ i ].bufferGPU, transformBuffers[ i ].pbo );
 
 			} else {
 
@@ -1227,8 +1227,12 @@ class WebGLBackend extends Backend {
 
 			key += ':' + attributeData.id;
 
-			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
-			gl.enableVertexAttribArray( i );
+			if ( attribute.pbo === undefined ) {
+
+				gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
+				gl.enableVertexAttribArray( i );
+
+			}
 
 			if ( attribute.isStorageBufferAttribute ) staticVao = false;
 
@@ -1304,7 +1308,10 @@ class WebGLBackend extends Backend {
 
 			const attributeData = transformBuffers[ i ];
 
-			gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, i, attributeData.transformBuffer );
+			let buffer = attributeData.bufferGPU;
+			if ( attributeData.pbo !== undefined ) buffer = attributeData.bufferGPU;
+
+			gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, i, buffer );
 
 		}
 

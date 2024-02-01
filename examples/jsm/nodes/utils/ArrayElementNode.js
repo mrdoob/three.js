@@ -34,9 +34,8 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 					const square = Math.sqrt( attribute.array.length / 4 );
 					const width = Math.floor( square );
 					const height = Math.ceil( square );
-					const pboTexture = new DataTexture( new Float32Array( attribute.array.length ),
-						width, height, RGBAFormat, FloatType
-					);
+
+					const pboTexture = new DataTexture( attribute.array, width, height, RGBAFormat, FloatType );
 					pboTexture.needsUpdate = true;
 					pboTexture.isPBOTexture = true;
 					const pbo = texture( pboTexture );
