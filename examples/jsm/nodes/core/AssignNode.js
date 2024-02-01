@@ -32,7 +32,7 @@ class AssignNode extends TempNode {
 
 		const targetType = targetNode.getNodeType( builder );
 
-		const target = targetNode.build( builder );
+		const target = targetNode.build( builder, 'assign' );
 		const source = sourceNode.build( builder, targetType );
 
 		const snippet = `${ target } = ${ source }`;

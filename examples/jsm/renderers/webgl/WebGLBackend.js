@@ -430,7 +430,15 @@ class WebGLBackend extends Backend {
 		// switch active buffers
 		for ( let i = 0; i < transformBuffers.length; i ++ ) {
 
-			transformBuffers[ i ].switchBuffers();
+			if ( transformBuffers[ i ].pbo ) {
+
+				this.textureUtils.transferBufferToTexture( transformBuffers[ i ].transformBuffer, transformBuffers[ i ].pbo );
+
+			} else {
+
+				transformBuffers[ i ].switchBuffers();
+
+			}
 
 		}
 

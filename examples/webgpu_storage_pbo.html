@@ -1,0 +1,161 @@
+<html lang="en">
+	<head>
+		<title>three.js - WebGPU - Storage PBO Sorting</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Storage PBO
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { storage, vec3, uv, uniform, uint, float, If, tslFn, instanceIndex, MeshBasicNodeMaterial } from 'three/nodes';
+
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import StorageBufferAttribute from 'three/addons/renderers/common/StorageBufferAttribute.js';
+
+			let camera, scene, renderer;
+			init();
+
+			function init() {
+
+				const aspect = window.innerWidth / window.innerHeight;
+				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
+				camera.position.z = 1;
+
+				scene = new THREE.Scene();
+
+				// texture
+				const phase = uniform( 1 );
+
+				const size = 100;
+
+				const particleBuffer = new StorageBufferAttribute( size, 1 );
+
+				particleBuffer.array.set( new Float32Array( size ).map( ( _, i ) => i ) );
+				const particleBufferNode = storage( particleBuffer, 'float', size, true );
+
+				const computeInitRandom = tslFn( () => {
+
+					//  random between 0 and size
+					const index = float( instanceIndex.hash().mul( size ).round() );
+					particleBufferNode.element( instanceIndex ).assign( index );
+
+				} );
+
+				const computeKernel = tslFn( ( ) => { // Assume currentPhase can be passed
+
+					// Calculate the index to consider based on the current phase
+					const pairIndex = instanceIndex.mul( 2 ).add( phase ).toVar();
+
+					// Ensure we're not accessing out of bounds
+					If( pairIndex.lessThan( uint( size ).sub( 1 ) ), () => {
+
+						const el = particleBufferNode.element( pairIndex ).toVar();
+						const nextEl = particleBufferNode.element( pairIndex.add( 1 ) );
+
+						// Swap if current element is greater than the next
+						If( el.greaterThan( nextEl ), () => {
+
+							particleBufferNode.element( pairIndex ).assign( nextEl );
+							particleBufferNode.element( pairIndex.add( 1 ) ).assign( el );
+			
+						} );
+
+					} );
+
+				} );
+
+
+				// compute
+			
+				const compute = computeKernel().compute( size );
+			
+				const computeInit = computeInitRandom().compute( size );
+
+				const material = new MeshBasicNodeMaterial( { color: 0x00ff00 } );
+
+				material.colorNode = tslFn( () => {
+
+					const index = uint( uv().x.mul( float( size ) ).floor() );
+
+					const value = float( particleBufferNode.element( index ) ).div( float( size ) );
+
+					return vec3( value, value, value );
+
+				} )();
+			
+
+				//
+				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
+				scene.add( plane );
+
+				renderer = new WebGPURenderer( { antialias: true, forceWebGL: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				// compute texture
+				renderer.compute( computeInit );
+			
+				 const stepAnimation = async function () {
+
+					await renderer.computeAsync( compute );
+
+					phase.value = ( phase.value + 1 ) % 2;
+
+					setTimeout( stepAnimation, 10.0 );
+
+					// debug storage buffer WebGPU, webgl debug is in transferBufferToTexture
+					// renderer.getArrayBufferAsync( particleBuffer ).then( ( arrayBuffer ) => {
+
+					// 	const dataview = new Float32Array( arrayBuffer );
+					// 	console.log( 'particleBuffer', dataview );
+
+					// } );
+
+					await renderer.renderAsync( scene, camera );
+
+				};
+
+				stepAnimation();
+			
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				const aspect = window.innerWidth / window.innerHeight;
+
+				const frustumHeight = camera.top - camera.bottom;
+
+				camera.left = - frustumHeight * aspect / 2;
+				camera.right = frustumHeight * aspect / 2;
+
+				camera.updateProjectionMatrix();
+
+				renderer.renderAsync( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

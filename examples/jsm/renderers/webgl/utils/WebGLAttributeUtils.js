@@ -8,6 +8,7 @@ class DualAttributeData {
 
 		this.buffers = [ attributeData.bufferGPU, dualBuffer ];
 		this.type = attributeData.type;
+		this.pbo = attributeData.pbo;
 		this.bytesPerElement = attributeData.BYTES_PER_ELEMENT;
 		this.version = attributeData.version;
 		this.isInteger = attributeData.isInteger;
@@ -129,6 +130,7 @@ class WebGLAttributeUtils {
 			type,
 			bytesPerElement: array.BYTES_PER_ELEMENT,
 			version: attribute.version,
+			pbo: attribute.pbo,
 			isInteger: type === gl.INT || type === gl.UNSIGNED_INT || attribute.gpuType === IntType,
 			id: _id ++
 		};
