@@ -25,7 +25,7 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 		if ( this.node.isStorageBufferNode && ! builder.isAvailable( 'storageBuffer' ) ) {
 
-			if ( this.node.useExternalElements ) {
+			if ( ! this.node.instanceIndex ) {
 
 				const attribute = this.node.value;
 
@@ -42,7 +42,6 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 					const pbo = texture( pboTexture );
 					pbo.setPrecision( 'high' );
 
-					attribute.useExternalElements = true;
 					attribute.pboNode = pbo;
 					attribute.pbo = pbo.value;
 

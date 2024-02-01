@@ -6,12 +6,11 @@ import { varying } from '../core/VaryingNode.js';
 
 class StorageBufferNode extends BufferNode {
 
-	constructor( value, bufferType, bufferCount = 0, useExternalElements = false ) {
+	constructor( value, bufferType, bufferCount = 0 ) {
 
 		super( value, bufferType, bufferCount );
 
 		this.isStorageBufferNode = true;
-		this.useExternalElements = useExternalElements;
 
 		this._attribute = null;
 		this._varying = null;
@@ -50,6 +49,6 @@ class StorageBufferNode extends BufferNode {
 
 export default StorageBufferNode;
 
-export const storage = ( value, type, count, useExternalElements ) => nodeObject( new StorageBufferNode( value, type, count, useExternalElements ) );
+export const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );
 
 addNodeClass( 'StorageBufferNode', StorageBufferNode );
