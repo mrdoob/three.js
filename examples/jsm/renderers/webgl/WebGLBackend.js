@@ -1308,7 +1308,7 @@ class WebGLBackend extends Backend {
 
 			const attributeData = transformBuffers[ i ];
 
-			let buffer = attributeData.bufferGPU;
+			let buffer = attributeData.transformBuffer;
 			if ( attributeData.pbo !== undefined ) buffer = attributeData.bufferGPU;
 
 			gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, i, buffer );
