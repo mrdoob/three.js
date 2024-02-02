@@ -15,7 +15,7 @@ import {
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from '../../renderers/common/nodes/NodeUniform.js';
 
-import { REVISION, RenderTarget, NoColorSpace, LinearEncoding, sRGBEncoding, SRGBColorSpace, Color, Vector2, Vector3, Vector4, Float16BufferAttribute } from 'three';
+import { REVISION, RenderTarget, NoColorSpace, Color, Vector2, Vector3, Vector4, Float16BufferAttribute } from 'three';
 
 import { stack } from './StackNode.js';
 import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
@@ -469,14 +469,6 @@ class NodeBuilder {
 	needsColorSpaceToLinear( /*texture*/ ) {
 
 		return false;
-
-	}
-
-	/** @deprecated, r152 */
-	getTextureEncodingFromMap( map ) {
-
-		console.warn( 'THREE.NodeBuilder: Method .getTextureEncodingFromMap replaced by .getTextureColorSpaceFromMap in r152+.' );
-		return this.getTextureColorSpaceFromMap( map ) === SRGBColorSpace ? sRGBEncoding : LinearEncoding;
 
 	}
 
