@@ -546,6 +546,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.batching ? '#define USE_BATCHING' : '',
 			parameters.instancing ? '#define USE_INSTANCING' : '',
 			parameters.instancingColor ? '#define USE_INSTANCING_COLOR' : '',
+			parameters.instancingMorph ? '#define USE_INSTANCING_MORPH' : '',
 
 			parameters.useFog && parameters.fog ? '#define USE_FOG' : '',
 			parameters.useFog && parameters.fogExp2 ? '#define FOG_EXP2' : '',
@@ -664,6 +665,12 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			'uniform mat3 normalMatrix;',
 			'uniform vec3 cameraPosition;',
 			'uniform bool isOrthographic;',
+
+			'#ifdef USE_INSTANCING_MORPH',
+
+			'	uniform sampler2D morphTexture;',
+
+			'#endif',
 
 			'#ifdef USE_INSTANCING',
 

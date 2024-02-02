@@ -18,6 +18,8 @@ void main() {
 	#include <batching_vertex>
 	#include <skinbase_vertex>
 
+	#include <morphtarget_instancing>
+
 	#ifdef USE_DISPLACEMENTMAP
 
 		#include <beginnormal_vertex>

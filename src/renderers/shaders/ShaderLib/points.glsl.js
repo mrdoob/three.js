@@ -25,6 +25,7 @@ void main() {
 	#endif
 
 	#include <color_vertex>
+	#include <morphtarget_instancing>
 	#include <morphcolor_vertex>
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
