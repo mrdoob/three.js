@@ -148,7 +148,7 @@ function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, inte
 
 		if ( intersectPoint2Ray < raycaster.near || intersectPoint2Ray > raycaster.far ) return;
 
-		const distance2Ray = raycaster.ray.distanceToPoint(point);
+		const distance2Ray = raycaster.ray.distanceToPoint( point );
 
 		intersects.push( {
 			distance: distance2Ray,
