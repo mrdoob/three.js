@@ -3,7 +3,7 @@
  * Copyright 2010-2023 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '161dev';
+const REVISION = '161';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -1838,6 +1838,7 @@ class Source {
 		this.uuid = generateUUID();
 
 		this.data = data;
+		this.dataReady = true;
 
 		this.version = 0;
 
@@ -12263,7 +12264,8 @@ class ShaderMaterial extends Material {
 			fragDepth: false, // set to use fragment depth values
 			drawBuffers: false, // set to use draw buffers
 			shaderTextureLOD: false, // set to use shader texture LOD
-			clipCullDistance: false // set to use vertex shader clipping
+			clipCullDistance: false, // set to use vertex shader clipping
+			multiDraw: false // set to use vertex shader multi_draw / enable gl_DrawID
 		};
 
 		// When rendered geometry doesn't include these attributes but the material does,
@@ -19511,7 +19513,8 @@ function generateExtensions( parameters ) {
 function generateVertexExtensions( parameters ) {
 
 	const chunks = [
-		parameters.extensionClipCullDistance ? '#extension GL_ANGLE_clip_cull_distance : require' : ''
+		parameters.extensionClipCullDistance ? '#extension GL_ANGLE_clip_cull_distance : require' : '',
+		parameters.extensionMultiDraw ? '#extension GL_ANGLE_multi_draw : require' : '',
 	];
 
 	return chunks.filter( filterEmptyLine ).join( '\n' );
@@ -20932,7 +20935,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			extensionFragDepth: HAS_EXTENSIONS && material.extensions.fragDepth === true,
 			extensionDrawBuffers: HAS_EXTENSIONS && material.extensions.drawBuffers === true,
 			extensionShaderTextureLOD: HAS_EXTENSIONS && material.extensions.shaderTextureLOD === true,
-			extensionClipCullDistance: HAS_EXTENSIONS && material.extensions.clipCullDistance && extensions.has( 'WEBGL_clip_cull_distance' ),
+			extensionClipCullDistance: HAS_EXTENSIONS && material.extensions.clipCullDistance === true && extensions.has( 'WEBGL_clip_cull_distance' ),
+			extensionMultiDraw: HAS_EXTENSIONS && material.extensions.multiDraw === true && extensions.has( 'WEBGL_multi_draw' ),
 
 			rendererExtensionFragDepth: IS_WEBGL2 || extensions.has( 'EXT_frag_depth' ),
 			rendererExtensionDrawBuffers: IS_WEBGL2 || extensions.has( 'WEBGL_draw_buffers' ),
@@ -24792,6 +24796,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true && glInternalFormat !== RGB_ETC1_Format );
 			const allocateMemory = ( sourceProperties.__version === undefined ) || ( forceUpload === true );
+			const dataReady = source.dataReady;
 			const levels = getMipLevels( texture, image, supportsMips );
 
 			if ( texture.isDepthTexture ) {
@@ -24904,7 +24909,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						if ( useTexStorage ) {
 
-							state.texSubImage2D( _gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data );
+							if ( dataReady ) {
+
+								state.texSubImage2D( _gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data );
+
+							}
 
 						} else {
 
@@ -24926,7 +24935,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						}
 
-						state.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, image.width, image.height, glFormat, glType, image.data );
+						if ( dataReady ) {
+
+							state.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, image.width, image.height, glFormat, glType, image.data );
+
+						}
 
 					} else {
 
@@ -24956,7 +24969,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 								if ( useTexStorage ) {
 
-									state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
+									if ( dataReady ) {
+
+										state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
+
+									}
 
 								} else {
 
@@ -24974,7 +24991,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							if ( useTexStorage ) {
 
-								state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, glType, mipmap.data );
+								if ( dataReady ) {
+
+									state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, glType, mipmap.data );
+
+								}
 
 							} else {
 
@@ -25004,7 +25025,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 								if ( useTexStorage ) {
 
-									state.compressedTexSubImage2D( _gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data );
+									if ( dataReady ) {
+
+										state.compressedTexSubImage2D( _gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data );
+
+									}
 
 								} else {
 
@@ -25022,7 +25047,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							if ( useTexStorage ) {
 
-								state.texSubImage2D( _gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data );
+								if ( dataReady ) {
+
+									state.texSubImage2D( _gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data );
+
+								}
 
 							} else {
 
@@ -25046,7 +25075,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+					if ( dataReady ) {
+
+						state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+
+					}
 
 				} else {
 
@@ -25064,7 +25097,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					state.texSubImage3D( _gl.TEXTURE_3D, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+					if ( dataReady ) {
+
+						state.texSubImage3D( _gl.TEXTURE_3D, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+
+					}
 
 				} else {
 
@@ -25119,7 +25156,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						if ( useTexStorage ) {
 
-							state.texSubImage2D( _gl.TEXTURE_2D, i, 0, 0, glFormat, glType, mipmap );
+							if ( dataReady ) {
+
+								state.texSubImage2D( _gl.TEXTURE_2D, i, 0, 0, glFormat, glType, mipmap );
+
+							}
 
 						} else {
 
@@ -25141,7 +25182,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						}
 
-						state.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, glFormat, glType, image );
+						if ( dataReady ) {
+
+							state.texSubImage2D( _gl.TEXTURE_2D, 0, 0, 0, glFormat, glType, image );
+
+						}
 
 					} else {
 
@@ -25222,6 +25267,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
 			const allocateMemory = ( sourceProperties.__version === undefined ) || ( forceUpload === true );
+			const dataReady = source.dataReady;
 			let levels = getMipLevels( texture, image, supportsMips );
 
 			setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, supportsMips );
@@ -25250,7 +25296,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 								if ( useTexStorage ) {
 
-									state.compressedTexSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data );
+									if ( dataReady ) {
+
+										state.compressedTexSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data );
+
+									}
 
 								} else {
 
@@ -25268,7 +25318,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							if ( useTexStorage ) {
 
-								state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data );
+								if ( dataReady ) {
+
+									state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data );
+
+								}
 
 							} else {
 
@@ -25304,7 +25358,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						if ( useTexStorage ) {
 
-							state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, cubeImage[ i ].width, cubeImage[ i ].height, glFormat, glType, cubeImage[ i ].data );
+							if ( dataReady ) {
+
+								state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, cubeImage[ i ].width, cubeImage[ i ].height, glFormat, glType, cubeImage[ i ].data );
+
+							}
 
 						} else {
 
@@ -25319,7 +25377,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							if ( useTexStorage ) {
 
-								state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, 0, 0, mipmapImage.width, mipmapImage.height, glFormat, glType, mipmapImage.data );
+								if ( dataReady ) {
+
+									state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, 0, 0, mipmapImage.width, mipmapImage.height, glFormat, glType, mipmapImage.data );
+
+								}
 
 							} else {
 
@@ -25333,7 +25395,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						if ( useTexStorage ) {
 
-							state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, glFormat, glType, cubeImage[ i ] );
+							if ( dataReady ) {
+
+								state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, glFormat, glType, cubeImage[ i ] );
+
+							}
 
 						} else {
 
@@ -25347,7 +25413,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							if ( useTexStorage ) {
 
-								state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, 0, 0, glFormat, glType, mipmap.image[ i ] );
+								if ( dataReady ) {
+
+									state.texSubImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, 0, 0, glFormat, glType, mipmap.image[ i ] );
+
+								}
 
 							} else {
 
@@ -26782,6 +26852,105 @@ class WebXRController {
 
 }
 
+const _occlusion_vertex = `
+void main() {
+
+	gl_Position = vec4( position, 1.0 );
+
+}`;
+
+const _occlusion_fragment = `
+uniform sampler2DArray depthColor;
+uniform float depthWidth;
+uniform float depthHeight;
+
+void main() {
+
+	vec2 coord = vec2( gl_FragCoord.x / depthWidth, gl_FragCoord.y / depthHeight );
+
+	if ( coord.x >= 1.0 ) {
+
+		gl_FragDepthEXT = texture( depthColor, vec3( coord.x - 1.0, coord.y, 1 ) ).r;
+
+	} else {
+
+		gl_FragDepthEXT = texture( depthColor, vec3( coord.x, coord.y, 0 ) ).r;
+
+	}
+
+}`;
+
+class WebXRDepthSensing {
+
+	constructor() {
+
+		this.texture = null;
+		this.mesh = null;
+
+		this.depthNear = 0;
+		this.depthFar = 0;
+
+	}
+
+	init( renderer, depthData, renderState ) {
+
+		if ( this.texture === null ) {
+
+			const texture = new Texture();
+
+			const texProps = renderer.properties.get( texture );
+			texProps.__webglTexture = depthData.texture;
+
+			if ( ( depthData.depthNear != renderState.depthNear ) || ( depthData.depthFar != renderState.depthFar ) ) {
+
+				this.depthNear = depthData.depthNear;
+				this.depthFar = depthData.depthFar;
+
+			}
+
+			this.texture = texture;
+
+		}
+
+	}
+
+	render( renderer, cameraXR ) {
+
+		if ( this.texture !== null ) {
+
+			if ( this.mesh === null ) {
+
+				const viewport = cameraXR.cameras[ 0 ].viewport;
+				const material = new ShaderMaterial( {
+					extensions: { fragDepth: true },
+					vertexShader: _occlusion_vertex,
+					fragmentShader: _occlusion_fragment,
+					uniforms: {
+						depthColor: { value: this.texture },
+						depthWidth: { value: viewport.z },
+						depthHeight: { value: viewport.w }
+					}
+				} );
+
+				this.mesh = new Mesh( new PlaneGeometry( 20, 20 ), material );
+
+			}
+
+			renderer.render( this.mesh, cameraXR );
+
+		}
+
+	}
+
+	reset() {
+
+		this.texture = null;
+		this.mesh = null;
+
+	}
+
+}
+
 class WebXRManager extends EventDispatcher {
 
 	constructor( renderer, gl ) {
@@ -26805,7 +26974,10 @@ class WebXRManager extends EventDispatcher {
 		let glProjLayer = null;
 		let glBaseLayer = null;
 		let xrFrame = null;
+
+		const depthSensing = new WebXRDepthSensing();
 		const attributes = gl.getContextAttributes();
+
 		let initialRenderTarget = null;
 		let newRenderTarget = null;
 
@@ -26934,6 +27106,8 @@ class WebXRManager extends EventDispatcher {
 
 			_currentDepthNear = null;
 			_currentDepthFar = null;
+
+			depthSensing.reset();
 
 			// restore framebuffer/rendering state
 
@@ -27293,6 +27467,13 @@ class WebXRManager extends EventDispatcher {
 
 			if ( session === null ) return;
 
+			if ( depthSensing.texture !== null ) {
+
+				camera.near = depthSensing.depthNear;
+				camera.far = depthSensing.depthFar;
+
+			}
+
 			cameraXR.near = cameraR.near = cameraL.near = camera.near;
 			cameraXR.far = cameraR.far = cameraL.far = camera.far;
 
@@ -27307,6 +27488,15 @@ class WebXRManager extends EventDispatcher {
 
 				_currentDepthNear = cameraXR.near;
 				_currentDepthFar = cameraXR.far;
+
+				cameraL.near = _currentDepthNear;
+				cameraL.far = _currentDepthFar;
+				cameraR.near = _currentDepthNear;
+				cameraR.far = _currentDepthFar;
+
+				cameraL.updateProjectionMatrix();
+				cameraR.updateProjectionMatrix();
+				camera.updateProjectionMatrix();
 
 			}
 
@@ -27409,6 +27599,12 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		this.hasDepthSensing = function () {
+
+			return depthSensing.texture !== null;
+
+		};
+
 		// Animation Loop
 
 		let onAnimationFrameCallback = null;
@@ -27501,6 +27697,22 @@ class WebXRManager extends EventDispatcher {
 
 				}
 
+				//
+
+				const enabledFeatures = session.enabledFeatures;
+
+				if ( enabledFeatures && enabledFeatures.includes( 'depth-sensing' ) ) {
+
+					const depthData = glBinding.getDepthInformation( views[ 0 ] );
+
+					if ( depthData && depthData.isValid && depthData.texture ) {
+
+						depthSensing.init( renderer, depthData, session.renderState );
+
+					}
+
+				}
+
 			}
 
 			//
@@ -27517,6 +27729,8 @@ class WebXRManager extends EventDispatcher {
 				}
 
 			}
+
+			depthSensing.render( renderer, cameraXR );
 
 			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, frame );
 
@@ -29645,7 +29859,11 @@ class WebGLRenderer {
 
 			//
 
-			background.render( currentRenderList, scene );
+			if ( xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false ) {
+
+				background.render( currentRenderList, scene );
+
+			}
 
 			// render scene
 

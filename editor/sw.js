@@ -273,8 +273,13 @@ async function networkFirst( request ) {
 
 		}
 
-		const cache = await caches.open( cacheName );
-		cache.put( request, response.clone() );
+		if ( request.method === 'GET' ) {
+
+			const cache = await caches.open( cacheName );
+			cache.put( request, response.clone() );
+
+		}
+
 		return response;
 
 	} catch {

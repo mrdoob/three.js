@@ -59,6 +59,13 @@ function ViewportControls( editor ) {
 	} );
 	container.add( shadingSelect );
 
+	signals.editorCleared.add( function () {
+
+		shadingSelect.setValue( 'solid' );
+		editor.setViewportShading( shadingSelect.getValue() );
+
+	} );
+
 	update();
 
 	//
