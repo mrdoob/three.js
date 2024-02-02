@@ -42,15 +42,22 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 		const nodeSnippet = this.node.build( builder );
 		const indexSnippet = this.indexNode.build( builder, 'uint' );
 
+		let snippet = `${nodeSnippet}[ ${indexSnippet} ]`;
+
 		if ( this.node.isStorageBufferNode && ! builder.isAvailable( 'storageBuffer' ) ) {
 
-			const attribute = this.node.value;
+			snippet = nodeSnippet;
 
-			return output !== 'assign' ? builder.getPBOUniform( attribute.pboNode, indexSnippet, output ) : nodeSnippet;
+			if ( ! this.node.instanceIndex && output !== 'assign' ) {
+
+				snippet = builder.getPBOUniform( this.node, indexSnippet );
+				return snippet;
+
+			}
 
 		}
 
-		return `${nodeSnippet}[ ${indexSnippet} ]`;
+		return snippet;
 
 	}
 

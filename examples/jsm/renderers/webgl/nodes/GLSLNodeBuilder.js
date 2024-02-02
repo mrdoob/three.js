@@ -91,9 +91,21 @@ ${ flowData.code }
 
 		if ( attribute.pbo === undefined ) {
 
-			const square = Math.sqrt( attribute.array.length / 4 );
-			const width = Math.floor( square );
-			const height = Math.ceil( square );
+			const originalArray = attribute.array;
+			const numElements = attribute.count * attribute.itemSize;
+
+			const width = Math.pow( 2, Math.ceil( Math.log2( Math.sqrt( numElements / 4 ) ) ) );
+			let height = Math.ceil( ( numElements / 4 ) / width );
+			if ( width * height * 4 < numElements ) height ++; // Ensure enough space
+
+			const newSize = width * height * 4; // 4 floats per pixel due to RGBA format
+
+			const newArray = new Float32Array( newSize );
+
+			newArray.set( originalArray, 0 );
+
+			attribute.array = newArray;
+			attribute.count = newSize;
 
 			const pboTexture = new DataTexture( attribute.array, width, height, RGBAFormat, FloatType );
 			pboTexture.needsUpdate = true;
@@ -109,13 +121,13 @@ ${ flowData.code }
 
 	}
 
-	getPBOUniform( texture, indexSnippet ) {
+	getPBOUniform( node, indexSnippet ) {
 
+		const attribute = node.value;
 
-		const nodeUniform = this.getUniformFromNode( texture, 'texture', this.shaderStage, this.context.label );
+		const nodeUniform = this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
 
 		const textureName = this.getPropertyName( nodeUniform );
-
 
 		const snippet = /* glsl */`
 		texelFetch(
@@ -649,6 +661,7 @@ void main() {
 		} else {
 
 			this.computeShader = this._getGLSLVertexCode( shadersData.compute );
+			console.log( this.computeShader );
 
 		}
 
