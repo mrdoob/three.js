@@ -1,6 +1,5 @@
 import Node, { addNodeClass } from '../core/Node.js';
-import { DataTexture, RGBAFormat, FloatType } from 'three';
-import UniformNode from '../core/UniformNode.js';
+
 class ArrayElementNode extends Node { // @TODO: If extending from TempNode it breaks webgpu_compute
 
 	constructor( node, indexNode ) {
@@ -26,25 +25,7 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 			if ( ! this.node.instanceIndex ) {
 
-				const attribute = this.node.value;
-
-				if ( attribute.pbo === undefined ) {
-
-					const square = Math.sqrt( attribute.array.length / 4 );
-					const width = Math.floor( square );
-					const height = Math.ceil( square );
-
-					const pboTexture = new DataTexture( attribute.array, width, height, RGBAFormat, FloatType );
-					pboTexture.needsUpdate = true;
-					pboTexture.isPBOTexture = true;
-					const pbo = new UniformNode( pboTexture );
-					pbo.setPrecision( 'high' );
-
-					attribute.pboNode = pbo;
-					attribute.pbo = pbo.value;
-
-
-				}
+				builder.setupPBONode( this.node );
 
 			}
 
@@ -63,33 +44,9 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 		if ( this.node.isStorageBufferNode && ! builder.isAvailable( 'storageBuffer' ) ) {
 
-
 			const attribute = this.node.value;
 
-			if ( attribute.pboNode ) {
-
-				const nodeUniform = builder.getUniformFromNode( attribute.pboNode, 'texture', builder.shaderStage, builder.context.label );
-
-				const propertyNameTexture = builder.getPropertyName( nodeUniform );
-
-				const snippet = /* glsl */`
-					texelFetch(
-						${propertyNameTexture}, 
-						ivec2(
-							${indexSnippet} / uint(4) % uint(textureSize(${propertyNameTexture}, 0).x),
-							${indexSnippet} / (uint(4) * uint(textureSize(${propertyNameTexture}, 0).x))
-						),
-						0
-					)[${indexSnippet} % uint(4)]`;
-
-				return output !== 'assign' ? snippet : nodeSnippet;
-
-			}
-
-
-
-
-			return nodeSnippet;
+			return output !== 'assign' ? builder.getPBOUniform( attribute.pboNode, indexSnippet, output ) : nodeSnippet;
 
 		}
 

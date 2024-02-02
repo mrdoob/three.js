@@ -1,11 +1,12 @@
-import { MathNode, GLSLNodeParser, NodeBuilder } from '../../../nodes/Nodes.js';
+import { MathNode, GLSLNodeParser, NodeBuilder, UniformNode } from '../../../nodes/Nodes.js';
 
 import UniformBuffer from '../../common/UniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
-import { IntType } from 'three';
+
+import { IntType, DataTexture, RGBAFormat, FloatType } from 'three';
 
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan',
@@ -81,6 +82,52 @@ ${ flowData.code }
 		//
 
 		return code;
+
+	}
+
+	setupPBONode( node ) {
+
+		const attribute = node.value;
+
+		if ( attribute.pbo === undefined ) {
+
+			const square = Math.sqrt( attribute.array.length / 4 );
+			const width = Math.floor( square );
+			const height = Math.ceil( square );
+
+			const pboTexture = new DataTexture( attribute.array, width, height, RGBAFormat, FloatType );
+			pboTexture.needsUpdate = true;
+			pboTexture.isPBOTexture = true;
+
+			const pbo = new UniformNode( pboTexture );
+			pbo.setPrecision( 'high' );
+
+			attribute.pboNode = pbo;
+			attribute.pbo = pbo.value;
+
+		}
+
+	}
+
+	getPBOUniform( texture, indexSnippet ) {
+
+
+		const nodeUniform = this.getUniformFromNode( texture, 'texture', this.shaderStage, this.context.label );
+
+		const textureName = this.getPropertyName( nodeUniform );
+
+
+		const snippet = /* glsl */`
+		texelFetch(
+			${textureName}, 
+			ivec2(
+				${indexSnippet} / uint(4) % uint(textureSize(${textureName}, 0).x),
+				${indexSnippet} / (uint(4) * uint(textureSize(${textureName}, 0).x))
+			),
+			0
+		)[${indexSnippet} % uint(4)]`;
+
+		return snippet;
 
 	}
 
