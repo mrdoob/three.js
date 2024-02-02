@@ -144,13 +144,14 @@ function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, inte
 		_ray.closestPointToPoint( point, intersectPoint );
 		intersectPoint.applyMatrix4( matrixWorld );
 
-		const distance = raycaster.ray.origin.distanceTo( intersectPoint );
+		const intersectPoint2Ray = raycaster.ray.origin.distanceTo( intersectPoint );
+		
+		if ( intersectPoint2Ray < raycaster.near || intersectPoint2Ray > raycaster.far ) return;
 
-		if ( distance < raycaster.near || distance > raycaster.far ) return;
-
+		const distance2Ray = raycaster.ray.distanceToPoint(point);
+		
 		intersects.push( {
-
-			distance: distance,
+			distance: distance2Ray,
 			distanceToRay: Math.sqrt( rayPointDistanceSq ),
 			point: intersectPoint,
 			index: index,
