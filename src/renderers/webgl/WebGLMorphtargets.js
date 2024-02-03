@@ -154,7 +154,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 			}
 
 			//
-			if ( object.morphTexture ) {
+			if ( object.isInstancedMesh === true && object.morphTexture !== null ) {
 
 				program.getUniforms().setValue( gl, 'morphTexture', object.morphTexture, textures );
 
