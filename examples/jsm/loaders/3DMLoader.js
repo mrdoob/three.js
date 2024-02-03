@@ -681,7 +681,7 @@ class Rhino3dmLoader extends Loader {
 			const binaryLoader = new FileLoader( this.manager );
 			binaryLoader.setPath( this.libraryPath );
 			binaryLoader.setResponseType( 'arraybuffer' );
-			jsLoader.setAbortSignal( this.abortSignal );
+			binaryLoader.setAbortSignal( this.abortSignal );
 
 			const binaryContent = binaryLoader.loadAsync( 'rhino3dm.wasm' );
 
