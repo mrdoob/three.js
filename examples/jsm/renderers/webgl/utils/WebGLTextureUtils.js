@@ -306,6 +306,7 @@ class WebGLTextureUtils {
 
 		gl.bindBuffer( gl.PIXEL_UNPACK_BUFFER, null );
 
+		backend.state.unbindTexture();
 		// debug
 		// const framebuffer = gl.createFramebuffer();
 		// gl.bindFramebuffer( gl.FRAMEBUFFER, framebuffer );
