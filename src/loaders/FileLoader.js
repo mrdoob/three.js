@@ -129,7 +129,12 @@ class FileLoader extends Loader {
 
 									}
 
-								} );
+								} )
+								.catch( ( err ) => {
+
+									 onError( err );
+
+								});
 
 							}
 
