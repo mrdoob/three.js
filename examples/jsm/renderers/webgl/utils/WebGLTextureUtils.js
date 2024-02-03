@@ -298,16 +298,8 @@ class WebGLTextureUtils {
 
 		const { width, height } = texture.source.data;
 
-		if ( textureGPU === undefined ) {
-
-			console.warn( 'WebGPURenderer.transferBufferToTexture: Trying to fetch an external element but Pixel Buffer Object texture is undefined. Please init a render call first.' );
-			return;
-
-		}
-
 		gl.bindBuffer( gl.PIXEL_UNPACK_BUFFER, buffer );
 
-		// Needs a render first otherwise textureGPU is not initialized and undefined
 		backend.state.bindTexture( glTextureType, textureGPU );
 
 		gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, 0 );

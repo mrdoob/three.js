@@ -117,6 +117,10 @@ ${ flowData.code }
 			attribute.pboNode = pbo;
 			attribute.pbo = pbo.value;
 
+			// init texture for bindings
+			this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
+
+
 		}
 
 	}
@@ -129,15 +133,27 @@ ${ flowData.code }
 
 		const textureName = this.getPropertyName( nodeUniform );
 
+		let channel = '';
+
+		let padding = 1;
+
+		if ( attribute.itemSize === 1 ) {
+
+			padding = 4;
+			channel = `[${indexSnippet} % uint(${padding})]`;
+
+		}
+
+		// TODO TO DIVIDE BY UINT 4 IS NOT CORRECT AND ONLY WORKS FOR FLOATS
 		const snippet = /* glsl */`
 		texelFetch(
 			${textureName}, 
 			ivec2(
-				${indexSnippet} / uint(4) % uint(textureSize(${textureName}, 0).x),
-				${indexSnippet} / (uint(4) * uint(textureSize(${textureName}, 0).x))
+				${indexSnippet} / uint(${padding}) % uint(textureSize(${textureName}, 0).x),
+				${indexSnippet} / (uint(${padding}) * uint(textureSize(${textureName}, 0).x))
 			),
 			0
-		)[${indexSnippet} % uint(4)]`;
+		)${channel}`;
 
 		return snippet;
 
@@ -661,7 +677,6 @@ void main() {
 		} else {
 
 			this.computeShader = this._getGLSLVertexCode( shadersData.compute );
-			console.log( this.computeShader );
 
 		}
 
