@@ -43,7 +43,6 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 		const indexSnippet = this.indexNode.build( builder, 'uint' );
 
 		let snippet = `${nodeSnippet}[ ${indexSnippet} ]`;
-
 		if ( this.node.isStorageBufferNode && ! builder.isAvailable( 'storageBuffer' ) ) {
 
 			snippet = nodeSnippet;
@@ -51,13 +50,14 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 			if ( ! this.node.instanceIndex && output !== 'assign' ) {
 
 				snippet = builder.getPBOUniform( this.node, indexSnippet );
-				return snippet;
 
 			}
 
 		}
 
-		return snippet;
+		const type = this.getNodeType( builder );
+
+		return builder.format( snippet, type, output );
 
 	}
 
