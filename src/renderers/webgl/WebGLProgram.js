@@ -666,12 +666,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			'uniform vec3 cameraPosition;',
 			'uniform bool isOrthographic;',
 
-			'#ifdef USE_INSTANCING_MORPH',
-
-			'	uniform sampler2D morphTexture;',
-
-			'#endif',
-
 			'#ifdef USE_INSTANCING',
 
 			'	attribute mat4 instanceMatrix;',
@@ -681,6 +675,12 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			'#ifdef USE_INSTANCING_COLOR',
 
 			'	attribute vec3 instanceColor;',
+
+			'#endif',
+
+			'#ifdef USE_INSTANCING_MORPH',
+
+			'	uniform sampler2D morphTexture;',
 
 			'#endif',
 
