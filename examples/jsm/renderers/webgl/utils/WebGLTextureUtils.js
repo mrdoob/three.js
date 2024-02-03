@@ -298,29 +298,35 @@ class WebGLTextureUtils {
 
 		const { width, height } = texture.source.data;
 
+		if ( textureGPU === undefined ) {
+
+			console.warn( 'WebGPURenderer.transferBufferToTexture: Trying to fetch an external element but Pixel Buffer Object texture is undefined. Please init a render call first.' );
+			return;
+
+		}
 
 		gl.bindBuffer( gl.PIXEL_UNPACK_BUFFER, buffer );
 
+		// Needs a render first otherwise textureGPU is not initialized and undefined
 		backend.state.bindTexture( glTextureType, textureGPU );
 
 		gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, 0 );
 
 		gl.bindBuffer( gl.PIXEL_UNPACK_BUFFER, null );
 
-
 		// debug
-		const framebuffer = gl.createFramebuffer();
-		gl.bindFramebuffer( gl.FRAMEBUFFER, framebuffer );
-		gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, glTextureType, textureGPU, 0 );
+		// const framebuffer = gl.createFramebuffer();
+		// gl.bindFramebuffer( gl.FRAMEBUFFER, framebuffer );
+		// gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, glTextureType, textureGPU, 0 );
 
-		const readout = new Float32Array( width * height * 4 );
+		// const readout = new Float32Array( width * height * 4 );
 
-		const altFormat = gl.getParameter( gl.IMPLEMENTATION_COLOR_READ_FORMAT );
-		const altType = gl.getParameter( gl.IMPLEMENTATION_COLOR_READ_TYPE );
+		// const altFormat = gl.getParameter( gl.IMPLEMENTATION_COLOR_READ_FORMAT );
+		// const altType = gl.getParameter( gl.IMPLEMENTATION_COLOR_READ_TYPE );
 
-		gl.readPixels( 0, 0, width, height, altFormat, altType, readout );
-		gl.bindFramebuffer( gl.FRAMEBUFFER, null );
-		console.log( readout );
+		// gl.readPixels( 0, 0, width, height, altFormat, altType, readout );
+		// gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+		// console.log( readout );
 
 	}
 
