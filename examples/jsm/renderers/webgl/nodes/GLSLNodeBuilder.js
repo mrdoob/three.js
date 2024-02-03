@@ -144,7 +144,7 @@ ${ flowData.code }
 
 		}
 
-		// TODO TO DIVIDE BY UINT 4 IS NOT CORRECT AND ONLY WORKS FOR FLOATS
+		// TODO: How to cast this snippet to the proper type? (vec2, vec3, vec4)
 		const snippet = /* glsl */`
 		texelFetch(
 			${textureName}, 
@@ -677,6 +677,7 @@ void main() {
 		} else {
 
 			this.computeShader = this._getGLSLVertexCode( shadersData.compute );
+			console.log( this.computeShader );
 
 		}
 

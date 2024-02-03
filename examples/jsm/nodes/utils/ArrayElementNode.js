@@ -47,6 +47,7 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 			snippet = nodeSnippet;
 
+			// TODO: How to properly detect if the node will be used as an assign target?
 			if ( ! this.node.instanceIndex && output !== 'assign' ) {
 
 				snippet = builder.getPBOUniform( this.node, indexSnippet );
