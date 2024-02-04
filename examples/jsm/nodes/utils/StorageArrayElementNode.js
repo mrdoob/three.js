@@ -12,6 +12,18 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 	}
 
+	set storageBufferNode( value ) {
+
+		this.node = value;
+
+	}
+
+	get storageBufferNode() {
+
+		return this.node;
+
+	}
+
 	setup( builder ) {
 
 		if ( this.node.isStorageBufferNode && ! builder.isAvailable( 'storageBuffer' ) ) {
