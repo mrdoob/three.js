@@ -50,10 +50,11 @@
 				const typeSize = 1; // 1:'float', 2:'vec2', 4:'vec4' -> use power of 2
 				const size = 1024;
 
-				const array = [];
+				const array = new Array( size * typeSize );
 
 				let id = 0;
 
+				// TODO: Remove this block to init the values in the compute shader computeInitOrder instead
 				for ( let i = 0; i < size * typeSize; i ++ ) {
 
 					if ( i > 0 && i % typeSize === 0 ) {
@@ -63,7 +64,7 @@
 					}
 
 					array[ i ] = id;
-			
+
 
 				}
 
@@ -73,7 +74,14 @@
 
 				const arrayBufferNode = storage( arrayBuffer, type, size );
 
-				const computeInitRandom = tslFn( () => {
+
+				const computeInitOrder = tslFn( () => {
+
+					arrayBufferNode.element( instanceIndex ).assign( uint( instanceIndex.div( typeSize ) ) );
+
+				} );
+
+				const computeInvertOrder = tslFn( () => {
 
 					const invertIndex = arrayBufferNode.element( float( size ).sub( instanceIndex ) );
 					arrayBufferNode.element( instanceIndex ).assign( invertIndex );
@@ -82,7 +90,9 @@
 
 				// compute
 
-				const compute = computeInitRandom().compute( size );
+				const computeInit = computeInitOrder().compute( size );
+
+				const compute = computeInvertOrder().compute( size );
 
 				const material = new MeshBasicNodeMaterial( { color: 0x00ff00 } );
 
@@ -123,7 +133,10 @@
 					scene.background = new THREE.Color( 0x313131 );
 
 				}
-			
+
+				// Init Positions
+				renderer.compute( computeInit );
+
 				 const stepAnimation = async function () {
 
 					await renderer.computeAsync( compute );
