@@ -32,7 +32,8 @@
 			import StorageBufferAttribute from 'three/addons/renderers/common/StorageBufferAttribute.js';
 
 			// WebGPU Backend
-			init( );
+			init();
+
 			// WebGL Backend
 			init( true );
 
@@ -45,15 +46,16 @@
 				const scene = new THREE.Scene();
 
 				// texture
+
 				const typeSize = 1;
 				const size = 1024;
 
-
 				const array = [];
+
 				let id = 0;
+
 				for ( let i = 0; i < size * typeSize; i ++ ) {
 
-			
 					if ( i > 0 && i % typeSize === 0 ) {
 
 						id ++;
@@ -76,9 +78,8 @@
 
 				} );
 
-			
-
 				// compute
+
 				const compute = computeInitRandom().compute( size );
 
 				const material = new MeshBasicNodeMaterial( { color: 0x00ff00 } );
@@ -93,8 +94,8 @@
 
 				} )();
 			
-
 				//
+
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( plane );
 
@@ -134,7 +135,6 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-
 				function onWindowResize() {
 
 					renderer.setSize( window.innerWidth / 2, window.innerHeight );
@@ -153,7 +153,6 @@
 				}
 
 			}
-
 
 		</script>
 	</body>
