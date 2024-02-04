@@ -26,9 +26,9 @@ class EllipseCurve extends Curve {
 
 	}
 
-	getPoint( t, optionalTarget ) {
+	getPoint( t, optionalTarget = new Vector2() ) {
 
-		const point = optionalTarget || new Vector2();
+		const point = optionalTarget;
 
 		const twoPi = Math.PI * 2;
 		let deltaAngle = this.aEndAngle - this.aStartAngle;
