@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Mesh] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Dynamic Impostor - replace an object with a textured plane mesh when the object is beyond a certain distance from the camera.<br /><br />
+
+			The plane's texture showing the impersonated object is re-rendered automatically when the view angle changed more than a given threshold from the last rendered view angle. Optionally, re-renders can happen at a fixed time interval.<br /><br />
+
+			This is useful when rendering big scenes where objects in the background and only visible on a handful of pixels would waste rendering resources.
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		const impostor = new Impostor( object3D, camera, renderer, scene );
+
+		impostor.lights = [ light1, light2 ];
+		impostor.impostureDistance = 90;
+		impostor.setSize( 128 );
+		impostor.maxAngle = 0.3;
+
+		// in the render loop
+		Impostor.updateAll()
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_impostors webgl / impostors ]
+		</p>
+
+		<h3>[name]( [param:Object3D object3D], [param:Scene scene], [param:PerspectiveCamera camera], [param:Renderer renderer] )</h3>
+		<p>
+		object3D — The [page:Object3D] to impersonate.<br />
+		scene — The [page:Scene] into which the impostor is added.<br />
+		camera — The [page:PerspectiveCamera] used for rendering the impostor texture.<br />
+		renderer — The [page:Renderer] used for rendering the impostor texture.
+		</p>
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:Mesh] class for common properties.</p>
+
+		<h3>[property:PerspectiveCamera camera]</h3>
+		<p>
+		An instance of [page:PerspectiveCamera].<br /><br />
+
+		The camera used for rendering the impostor texture.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+		Wheter to replace the impersonated object with the impostor or not.<br />
+		Default is *true*.
+		</p>
+
+		<h3>[property:Number impostureDistance]</h3>
+		<p>
+		The world-space distance beyond which the object is replaced by the impostor.<br />
+		Default is *110*.
+		</p>
+
+		<h3>[property:Array lights]</h3>
+		<p>
+		An array containing the lights used to render the impostor.<br /><br />
+
+		Rendering the impostor with less lights than the real object can lead to better performances.<br />
+		Note that if [page:.lights] is an empty array, no light is used to render the impostor.
+		</p>
+
+		<h3>[property:Number maxAngle]</h3>
+		<p>
+		The threshold angle in radians beyond which the texture is re-rendered.<br />
+		Default is *0.5*.<br /><br />
+
+		When Impostor renders the object to impersonate on its texture, it saves the last view angle from the camera to the object. If the camera moves or the object rotates, the impostor becomes unrealistic and a new render is needed.
+		</p>
+
+		<h3>[property:Number redrawInterval]</h3>
+		<p>
+		The interval in milliseconds to render a new texture.<br />
+		Default is *null*.<br /><br />
+
+		Ignored if *null*. ( the object is only re-rendered according to [page:.maxAngle]).<br />
+		Useful for animated objects, or changing materials and/or lights.<br />
+		Should be avoided when not necessary, for performances.
+		</p>
+
+		<h3>[property:Renderer renderer]</h3>
+		<p>
+		The renderer used to render the impersonated object on the impostor texture.
+		</p>
+
+		<h3>[property:Scene scene]</h3>
+		<p>
+		The scene the impostor is added to.
+		</p>
+
+
+
+		<h2>Methods</h2>
+		<p>See the base [page:Mesh] class for common methods.</p>
+
+		<h3>[method:this redraw]()</h3>
+		<p>
+		Re-render the impersonated object on the impostor texture.<br />
+		As this method is called internally by [page:Impostor.updateAll], it should not be necessary to call it manually for most use-cases.
+		</p>
+
+		<h3>[method:this setSize]()</h3>
+		<p>
+		Set the size of the [page:Texture] to use as the impostor material map. This value must be power of two.<br />
+		Default is *64*.
+		</p>
+
+
+
+		<h2>Static Properties and Methods</h2>
+		<p>
+			Static properties and methods are defined per class rather than per instance of that class.<br />
+			This means that changing [page:Impostor.maxUpdatesPerFrame] affects <em>every</em> instance of [page:Impostor]. Call [page:Impostor.updateAll] <em>only once</em> in the render loop.
+		</p>
+
+		<h3>[property:Number maxUpdatesPerFrame]</h3>
+		<p>
+			Maximum number of impostor re-renders per call to [page:Impostor.updateAll].<br />
+			Default is *10*.
+		</p>
+
+		<h3>[method:null updateAll]()</h3>
+		<p>
+			Render all the impostors that need an update according to [page:.maxAngle] and [page:.redrawInterval]. The maximum number of re-renders per call of this function is capped by [page:Impostor.maxUpdatesPerFrame] for performance. If the number of impostors to re-render is greater than the limit, the visible impostors closer from the camera are re-rendered first.
+		</p>
+
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/objects/Impostor.js examples/jsm/objects/Impostor.js]
+		</p>
+
+	</body>
+</html>
