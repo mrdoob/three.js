@@ -1026,18 +1026,6 @@ class NodeBuilder {
 
 	}
 
-	setupPBONode( /*shaderStage*/ ) {
-
-		console.warn( 'Abstract function.' );
-
-	}
-
-	getPBOUniform( /*shaderStage*/ ) {
-
-		console.warn( 'Abstract function.' );
-
-	}
-
 	getCodes( shaderStage ) {
 
 		const codes = this.codes[ shaderStage ];

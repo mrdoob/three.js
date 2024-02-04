@@ -47,7 +47,7 @@
 
 				// texture
 
-				const typeSize = 1;
+				const typeSize = 1; // 1:'float', 2:'vec2', 4:'vec4' -> use power of 2
 				const size = 1024;
 
 				const array = [];
@@ -67,9 +67,11 @@
 
 				}
 
+				const type = [ 'float', 'vec2', 'vec3', 'vec4' ][ typeSize - 1 ];
+
 				const arrayBuffer = new StorageBufferAttribute( new Float32Array( array ), typeSize );
 
-				const arrayBufferNode = storage( arrayBuffer, 'float', size );
+				const arrayBufferNode = storage( arrayBuffer, type, size );
 
 				const computeInitRandom = tslFn( () => {
 

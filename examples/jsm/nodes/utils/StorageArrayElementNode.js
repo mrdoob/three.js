@@ -50,18 +50,16 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
+			const { node } = this;
+
 			// TODO: How to properly detect if the node will be used as an assign target?
-			if ( ! this.node.instanceIndex && output !== 'assign' ) {
+			if ( ! node.instanceIndex && output !== 'assign' ) {
 
-				this.indexNode.increaseUsage( builder ); // force cache generate to be used as index in x,y
-
-				const indexSnippet = this.indexNode.build( builder, 'uint' );
-
-				snippet = builder.getPBOUniform( this.node, indexSnippet );
+				snippet = builder.generatePBO( this );
 
 			} else {
 
-				const nodeSnippet = this.node.build( builder );
+				const nodeSnippet = node.build( builder );
 
 				snippet = nodeSnippet;
 

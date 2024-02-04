@@ -1,4 +1,4 @@
-import { MathNode, GLSLNodeParser, NodeBuilder, UniformNode } from '../../../nodes/Nodes.js';
+import { MathNode, GLSLNodeParser, NodeBuilder, UniformNode, vectorComponents } from '../../../nodes/Nodes.js';
 
 import UniformBuffer from '../../common/UniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
@@ -125,37 +125,80 @@ ${ flowData.code }
 
 	}
 
-	getPBOUniform( node, indexSnippet ) {
+	generatePBO( storageArrayElementNode ) {
 
+		const { node, indexNode } = storageArrayElementNode;
 		const attribute = node.value;
 
 		const nodeUniform = this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
-
 		const textureName = this.getPropertyName( nodeUniform );
 
-		let channel = '';
+		indexNode.increaseUsage( this ); // force cache generate to be used as index in x,y
+		const indexSnippet = indexNode.build( this, 'uint' );
 
-		let padding = 1;
+		const elementNodeData = this.getDataFromNode( storageArrayElementNode );
 
-		if ( attribute.itemSize === 1 ) {
+		let propertyName = elementNodeData.propertyName;
 
-			padding = 4;
-			channel = `[${indexSnippet} % uint(${padding})]`;
+		if ( propertyName === undefined ) {
+
+			// property element
+
+			const nodeVar = this.getVarFromNode( storageArrayElementNode );
+
+			propertyName = this.getPropertyName( nodeVar );
+
+			// property size
+
+			const bufferNodeData = this.getDataFromNode( node );
+
+			let propertySizeName = bufferNodeData.propertySizeName;
+
+			if ( propertySizeName === undefined ) {
+
+				propertySizeName = propertyName + '_size';
+
+				this.getVarFromNode( node, propertySizeName, 'uint' );
+
+				this.addLineFlowCode( `${ propertySizeName } = uint( textureSize( ${ textureName }, 0 ).x )` );
+
+				bufferNodeData.propertySizeName = propertySizeName;
+
+			}
+
+			//
+
+			let channel;
+			let padding;
+
+			const itemSize = attribute.itemSize;
+
+			if ( itemSize === 1 ) {
+
+				padding = 4;
+				channel = `[ ${indexSnippet} % uint( ${ padding } ) ]`;
+
+			} else {
+
+				padding = itemSize > 2 ? 1 : itemSize;
+				channel = '.' + vectorComponents.join( '' ).slice( 0, itemSize );
+
+			}
+
+			const uvSnippet = `ivec2(
+				${indexSnippet} / uint( ${ padding } ) % ${ propertySizeName },
+				${indexSnippet} / ( uint( ${ padding } ) * ${ propertySizeName } )
+			)`;
+
+			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, null, '0' );
+
+			//
+
+			this.addLineFlowCode( `${ propertyName } = ${ snippet + channel }` );
 
 		}
 
-		// TODO: How to cast this snippet to the proper type? (vec2, vec3, vec4)
-		const snippet = /* glsl */`
-		texelFetch(
-			${textureName}, 
-			ivec2(
-				${indexSnippet} / uint(${padding}) % uint(textureSize(${textureName}, 0).x),
-				${indexSnippet} / (uint(${padding}) * uint(textureSize(${textureName}, 0).x))
-			),
-			0
-		)${channel}`;
-
-		return snippet;
+		return propertyName;
 
 	}
 
