@@ -3,6 +3,7 @@ import { bufferAttribute } from './BufferAttributeNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 import { varying } from '../core/VaryingNode.js';
+import { storageElement } from '../utils/StorageArrayElementNode.js';
 
 class StorageBufferNode extends BufferNode {
 
@@ -20,6 +21,12 @@ class StorageBufferNode extends BufferNode {
 	getInputType( /*builder*/ ) {
 
 		return 'storageBuffer';
+
+	}
+
+	element( indexNode ) {
+
+		return storageElement( this, indexNode );
 
 	}
 
