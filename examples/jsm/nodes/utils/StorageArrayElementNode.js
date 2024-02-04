@@ -41,6 +41,8 @@ class StorageArrayElementNode extends ArrayElementNode {
 			// TODO: How to properly detect if the node will be used as an assign target?
 			if ( ! this.node.instanceIndex && output !== 'assign' ) {
 
+				this.indexNode.increaseUsage( builder ); // force cache generate to be used as index in x,y
+
 				const indexSnippet = this.indexNode.build( builder, 'uint' );
 
 				snippet = builder.getPBOUniform( this.node, indexSnippet );
