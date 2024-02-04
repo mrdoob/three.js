@@ -26,19 +26,17 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 	setup( builder ) {
 
-		if ( this.node.isStorageBufferNode && ! builder.isAvailable( 'storageBuffer' ) ) {
+		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
 			if ( ! this.node.instanceIndex ) {
 
-				builder.setupPBONode( this.node );
+				builder.setupPBO( this.node );
 
 			}
-
 
 		}
 
 		super.setup( builder );
-
 
 	}
 

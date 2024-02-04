@@ -85,7 +85,7 @@ ${ flowData.code }
 
 	}
 
-	setupPBONode( node ) {
+	setupPBO( node ) {
 
 		const attribute = node.value;
 
@@ -116,10 +116,6 @@ ${ flowData.code }
 
 			attribute.pboNode = pbo;
 			attribute.pbo = pbo.value;
-
-			// init texture for bindings
-			this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
-
 
 		}
 
@@ -195,6 +191,8 @@ ${ flowData.code }
 			//
 
 			this.addLineFlowCode( `${ propertyName } = ${ snippet + channel }` );
+
+			elementNodeData.propertyName = propertyName;
 
 		}
 
