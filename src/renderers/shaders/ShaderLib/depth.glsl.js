@@ -20,7 +20,7 @@ void main() {
 	#include <batching_vertex>
 	#include <skinbase_vertex>
 
-	#include <morphtarget_instancing>
+	#include <morphinstance_vertex>
 
 	#ifdef USE_DISPLACEMENTMAP
 

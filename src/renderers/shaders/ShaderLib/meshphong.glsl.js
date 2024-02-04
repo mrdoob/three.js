@@ -25,7 +25,7 @@ void main() {
 	#include <batching_vertex>
 
 	#include <beginnormal_vertex>
-	#include <morphtarget_instancing>
+	#include <morphinstance_vertex>
 	#include <morphnormal_vertex>
 	#include <skinbase_vertex>
 	#include <skinnormal_vertex>

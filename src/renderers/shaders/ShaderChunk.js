@@ -65,7 +65,7 @@ import map_particle_fragment from './ShaderChunk/map_particle_fragment.glsl.js';
 import map_particle_pars_fragment from './ShaderChunk/map_particle_pars_fragment.glsl.js';
 import metalnessmap_fragment from './ShaderChunk/metalnessmap_fragment.glsl.js';
 import metalnessmap_pars_fragment from './ShaderChunk/metalnessmap_pars_fragment.glsl.js';
-import morphtarget_instancing from './ShaderChunk/morphtarget_instancing.glsl.js';
+import morphinstance_vertex from './ShaderChunk/morphinstance_vertex.glsl.js';
 import morphcolor_vertex from './ShaderChunk/morphcolor_vertex.glsl.js';
 import morphnormal_vertex from './ShaderChunk/morphnormal_vertex.glsl.js';
 import morphtarget_pars_vertex from './ShaderChunk/morphtarget_pars_vertex.glsl.js';
@@ -193,7 +193,7 @@ export const ShaderChunk = {
 	map_particle_pars_fragment: map_particle_pars_fragment,
 	metalnessmap_fragment: metalnessmap_fragment,
 	metalnessmap_pars_fragment: metalnessmap_pars_fragment,
-	morphtarget_instancing: morphtarget_instancing,
+	morphinstance_vertex: morphinstance_vertex,
 	morphcolor_vertex: morphcolor_vertex,
 	morphnormal_vertex: morphnormal_vertex,
 	morphtarget_pars_vertex: morphtarget_pars_vertex,
