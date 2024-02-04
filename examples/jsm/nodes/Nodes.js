@@ -68,6 +68,7 @@ export { default as SetNode } from './utils/SetNode.js';
 export { default as SpecularMIPLevelNode, specularMIPLevel } from './utils/SpecularMIPLevelNode.js';
 export { default as SplitNode } from './utils/SplitNode.js';
 export { default as SpriteSheetUVNode, spritesheetUV } from './utils/SpriteSheetUVNode.js';
+export { default as StorageArrayElementNode } from './utils/StorageArrayElementNode.js';
 export { default as TimerNode, timerLocal, timerGlobal, timerDelta, frameId } from './utils/TimerNode.js';
 export { default as TriplanarTexturesNode, triplanarTextures, triplanarTexture } from './utils/TriplanarTexturesNode.js';
 export { default as ReflectorNode, reflector } from './utils/ReflectorNode.js';
