@@ -38,19 +38,20 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
-			const nodeSnippet = this.node.build( builder );
-			const indexSnippet = this.indexNode.build( builder, 'uint' );
-
-			snippet = nodeSnippet;
-
 			// TODO: How to properly detect if the node will be used as an assign target?
 			if ( ! this.node.instanceIndex && output !== 'assign' ) {
 
+				const indexSnippet = this.indexNode.build( builder, 'uint' );
+
 				snippet = builder.getPBOUniform( this.node, indexSnippet );
 
-			}
+			} else {
 
-			snippet = builder.format( snippet, type, output );
+				const nodeSnippet = this.node.build( builder );
+
+				snippet = nodeSnippet;
+
+			}
 
 		} else {
 
@@ -59,6 +60,7 @@ class StorageArrayElementNode extends ArrayElementNode {
 		}
 
 		return builder.format( snippet, type, output );
+
 	}
 
 }
