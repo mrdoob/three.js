@@ -41,18 +41,12 @@ class StorageArrayElementNode extends ArrayElementNode {
 			const nodeSnippet = this.node.build( builder );
 			const indexSnippet = this.indexNode.build( builder, 'uint' );
 
-			snippet = `${nodeSnippet}[ ${indexSnippet} ]`;
+			snippet = nodeSnippet;
 
-			if ( this.node.isStorageBufferNode && ! builder.isAvailable( 'storageBuffer' ) ) {
+			// TODO: How to properly detect if the node will be used as an assign target?
+			if ( ! this.node.instanceIndex && output !== 'assign' ) {
 
-				snippet = nodeSnippet;
-
-				// TODO: How to properly detect if the node will be used as an assign target?
-				if ( ! this.node.instanceIndex && output !== 'assign' ) {
-
-					snippet = builder.getPBOUniform( this.node, indexSnippet );
-
-				}
+				snippet = builder.getPBOUniform( this.node, indexSnippet );
 
 			}
 
