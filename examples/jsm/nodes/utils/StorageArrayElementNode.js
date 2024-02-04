@@ -12,25 +12,51 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 	}
 
-	set storageBufferNode( value ) {
+	setup( builder ) {
 
-		this.node = value;
+		if ( this.node.isStorageBufferNode && ! builder.isAvailable( 'storageBuffer' ) ) {
+
+			if ( ! this.node.instanceIndex ) {
+
+				builder.setupPBONode( this.node );
+
+			}
+
+
+		}
+
+		super.setup( builder );
+
 
 	}
 
-	get storageBufferNode() {
+	generate( builder, output ) {
 
-		return this.node;
-
-	}
-
-	generate( builder ) {
+		const type = this.getNodeType( builder );
 
 		let snippet;
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
-			snippet = this.node.build( builder );
+			const nodeSnippet = this.node.build( builder );
+			const indexSnippet = this.indexNode.build( builder, 'uint' );
+
+			snippet = `${nodeSnippet}[ ${indexSnippet} ]`;
+
+			if ( this.node.isStorageBufferNode && ! builder.isAvailable( 'storageBuffer' ) ) {
+
+				snippet = nodeSnippet;
+
+				// TODO: How to properly detect if the node will be used as an assign target?
+				if ( ! this.node.instanceIndex && output !== 'assign' ) {
+
+					snippet = builder.getPBOUniform( this.node, indexSnippet );
+
+				}
+
+			}
+
+			snippet = builder.format( snippet, type, output );
 
 		} else {
 
@@ -38,8 +64,7 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		}
 
-		return snippet;
-
+		return builder.format( snippet, type, output );
 	}
 
 }

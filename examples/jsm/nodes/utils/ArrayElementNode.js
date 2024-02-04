@@ -19,46 +19,12 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 	}
 
-	setup( builder ) {
-
-		if ( this.node.isStorageBufferNode && ! builder.isAvailable( 'storageBuffer' ) ) {
-
-			if ( ! this.node.instanceIndex ) {
-
-				builder.setupPBONode( this.node );
-
-			}
-
-
-		}
-
-		super.setup( builder );
-
-
-	}
-
-	generate( builder, output ) {
+	generate( builder ) {
 
 		const nodeSnippet = this.node.build( builder );
 		const indexSnippet = this.indexNode.build( builder, 'uint' );
 
-		let snippet = `${nodeSnippet}[ ${indexSnippet} ]`;
-		if ( this.node.isStorageBufferNode && ! builder.isAvailable( 'storageBuffer' ) ) {
-
-			snippet = nodeSnippet;
-
-			// TODO: How to properly detect if the node will be used as an assign target?
-			if ( ! this.node.instanceIndex && output !== 'assign' ) {
-
-				snippet = builder.getPBOUniform( this.node, indexSnippet );
-
-			}
-
-		}
-
-		const type = this.getNodeType( builder );
-
-		return builder.format( snippet, type, output );
+		return `${nodeSnippet}[ ${indexSnippet} ]`;
 
 	}
 
