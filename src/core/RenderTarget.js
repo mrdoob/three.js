@@ -41,9 +41,9 @@ class RenderTarget extends EventDispatcher {
 
 		const texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
 
-		this.texture.flipY = false;
-		this.texture.generateMipmaps = options.generateMipmaps;
-		this.texture.internalFormat = options.internalFormat;
+		texture.flipY = false;
+		texture.generateMipmaps = options.generateMipmaps;
+		texture.internalFormat = options.internalFormat;
 
 		this.textures = [];
 
