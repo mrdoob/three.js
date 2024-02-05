@@ -9,6 +9,7 @@ class DualAttributeData {
 		this.buffers = [ attributeData.bufferGPU, dualBuffer ];
 		this.type = attributeData.type;
 		this.pbo = attributeData.pbo;
+		this.byteLength = attributeData.byteLength;
 		this.bytesPerElement = attributeData.BYTES_PER_ELEMENT;
 		this.version = attributeData.version;
 		this.isInteger = attributeData.isInteger;
@@ -128,6 +129,7 @@ class WebGLAttributeUtils {
 		let attributeData = {
 			bufferGPU,
 			type,
+			byteLength: array.byteLength,
 			bytesPerElement: array.BYTES_PER_ELEMENT,
 			version: attribute.version,
 			pbo: attribute.pbo,
@@ -204,6 +206,26 @@ class WebGLAttributeUtils {
 		backend.delete( attribute );
 
 	}
+
+	async copyBufferToSubBuffer( buffer, dstBuffer, byteLength, byteOffset = 0, dstOffset = 0 ) {
+
+		const backend = this.backend;
+		const { gl } = backend;
+
+		gl.bindBuffer( gl.COPY_READ_BUFFER, buffer );
+
+		gl.bindBuffer( gl.COPY_WRITE_BUFFER, dstBuffer );
+		gl.bufferData( gl.COPY_WRITE_BUFFER, byteLength, gl.STREAM_READ );
+
+		gl.copyBufferSubData( gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, byteOffset, dstOffset, byteLength );
+
+		gl.bindBuffer( gl.COPY_READ_BUFFER, null );
+		gl.bindBuffer( gl.COPY_WRITE_BUFFER, null );
+
+		await backend.utils._clientWaitAsync();
+
+	}
+
 
 	async getArrayBufferAsync( attribute ) {
 

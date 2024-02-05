@@ -128,6 +128,17 @@ ${ flowData.code }
 		const { node, indexNode } = storageArrayElementNode;
 		const attribute = node.value;
 
+		if ( ! attribute.pbo && this.renderer.backend.has( attribute ) ) {
+
+			const attributeData = this.renderer.backend.get( attribute );
+			this.setupPBO( node, attributeData );
+
+			attributeData.pbo = attribute.pbo;
+			attributeData.pbo.needsTransfer = true;
+
+		}
+
+
 		const nodeUniform = this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
 		const textureName = this.getPropertyName( nodeUniform );
 
@@ -717,11 +728,9 @@ void main() {
 			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
 			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
 
-			console.log( this.fragmentShader );
 		} else {
 
 			this.computeShader = this._getGLSLVertexCode( shadersData.compute );
-			console.log( this.computeShader );
 
 		}
 

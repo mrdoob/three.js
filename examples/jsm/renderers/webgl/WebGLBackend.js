@@ -432,11 +432,20 @@ class WebGLBackend extends Backend {
 
 			if ( transformBuffers[ i ].pbo ) {
 
-				//this.textureUtils.copyBufferToTexture( transformBuffers[ i ].transformBuffer, transformBuffers[ i ].pbo );
+				if ( transformBuffers[ i ].pbo.needsTransfer ) {
+
+					this.attributeUtils.copyBufferToSubBuffer( transformBuffers[ i ].bufferGPU, transformBuffers[ i ].transformBuffer, transformBuffers[ i ].byteLength );
+					transformBuffers[ i ].pbo.needsTransfer = false;
+
+				}
+
+				this.textureUtils.copyBufferToTexture( transformBuffers[ i ].transformBuffer, transformBuffers[ i ].pbo );
+
+			} else {
+
+				transformBuffers[ i ].switchBuffers();
 
 			}
-
-			transformBuffers[ i ].switchBuffers();
 
 		}
 
