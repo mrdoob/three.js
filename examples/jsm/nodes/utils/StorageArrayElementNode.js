@@ -51,7 +51,7 @@ class StorageArrayElementNode extends ArrayElementNode {
 			const { node } = this;
 
 			// TODO: How to properly detect if the node will be used as an assign target?
-			if ( ! node.instanceIndex && output !== 'assign' ) {
+			if ( false && ! node.instanceIndex && builder.context.assign !== true ) {
 
 				snippet = builder.generatePBO( this );
 

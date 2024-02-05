@@ -117,6 +117,8 @@ ${ flowData.code }
 			attribute.pboNode = pbo;
 			attribute.pbo = pbo.value;
 
+			this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
+
 		}
 
 	}
@@ -152,7 +154,7 @@ ${ flowData.code }
 
 			if ( propertySizeName === undefined ) {
 
-				propertySizeName = propertyName + '_size';
+				propertySizeName = propertyName + 'Size';
 
 				this.getVarFromNode( node, propertySizeName, 'uint' );
 
@@ -715,6 +717,7 @@ void main() {
 			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
 			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
 
+			console.log( this.fragmentShader );
 		} else {
 
 			this.computeShader = this._getGLSLVertexCode( shadersData.compute );

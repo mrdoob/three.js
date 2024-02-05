@@ -290,7 +290,7 @@ class WebGLTextureUtils {
 
 	}
 
-	async transferBufferToTexture( buffer, texture ) {
+	copyBufferToTexture( buffer, texture ) {
 
 		const { gl, backend } = this;
 
@@ -302,6 +302,8 @@ class WebGLTextureUtils {
 
 		backend.state.bindTexture( glTextureType, textureGPU );
 
+		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, false );
+		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false );
 		gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, 0 );
 
 		gl.bindBuffer( gl.PIXEL_UNPACK_BUFFER, null );

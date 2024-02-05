@@ -19,6 +19,15 @@ class AssignNode extends TempNode {
 
 	}
 
+	setup( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+
+		properties.targetNode = this.targetNode.context( { assign: true } );
+		properties.sourceNode = this.sourceNode;
+
+	}
+
 	getNodeType( builder, output ) {
 
 		return output !== 'void' ? this.targetNode.getNodeType( builder ) : 'void';
@@ -27,12 +36,11 @@ class AssignNode extends TempNode {
 
 	generate( builder, output ) {
 
-		const targetNode = this.targetNode;
-		const sourceNode = this.sourceNode;
+		const { targetNode, sourceNode } = builder.getNodeProperties( this );
 
 		const targetType = targetNode.getNodeType( builder );
 
-		const target = targetNode.build( builder, 'assign' );
+		const target = targetNode.build( builder );
 		const source = sourceNode.build( builder, targetType );
 
 		const snippet = `${ target } = ${ source }`;
