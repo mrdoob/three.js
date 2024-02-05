@@ -632,8 +632,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			if ( isWebGL2 === false && ( texture.type === HalfFloatType && extensions.has( 'OES_texture_half_float_linear' ) === false ) ) return; // verify extension for WebGL 1 only
 
 			if ( texture.anisotropy > 1 || properties.get( texture ).__currentAnisotropy ) {
-				const extension = extensions.get( 'EXT_texture_filter_anisotropic' );
 
+				const extension = extensions.get( 'EXT_texture_filter_anisotropic' );
 				_gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, capabilities.getMaxAnisotropy() ) );
 				properties.get( texture ).__currentAnisotropy = texture.anisotropy;
 

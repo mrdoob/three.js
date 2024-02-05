@@ -2176,6 +2176,7 @@ class WebGLRenderer {
 				}
 
 			}
+
 		};
 
 		this.setRenderTargetFramebuffer = function ( renderTarget, defaultFramebuffer ) {
