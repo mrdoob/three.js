@@ -1,6 +1,6 @@
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 
-export class WebGLMultipleRenderTargets extends WebGLRenderTarget { // @deprecated, r155
+export class WebGLMultipleRenderTargets extends WebGLRenderTarget { // @deprecated, r162
 
 	constructor( width = 1, height = 1, count = 1, options = {} ) {
 
