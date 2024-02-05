@@ -165,6 +165,8 @@ vec3 AgXToneMapping( vec3 color ) {
 
 }
 
+// https://modelviewer.dev/examples/tone-mapping
+
 vec3 CommerceToneMapping( vec3 color ) {
 	float startCompression = 0.8 - 0.04;
 	float desaturation = 0.15;
