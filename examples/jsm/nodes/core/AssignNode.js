@@ -31,7 +31,7 @@ class AssignNode extends TempNode {
 
 		const targetType = targetNode.getNodeType( builder );
 
-		const target = targetNode.build( builder );
+		const target = targetNode.context( { assign: true } ).build( builder );
 		const source = sourceNode.build( builder, targetType );
 
 		const snippet = `${ target } = ${ source }`;

@@ -85,9 +85,9 @@ ${ flowData.code }
 
 	}
 
-	setupPBO( node ) {
+	setupPBO( storageBufferNode ) {
 
-		const attribute = node.value;
+		const attribute = storageBufferNode.value;
 
 		if ( attribute.pbo === undefined ) {
 

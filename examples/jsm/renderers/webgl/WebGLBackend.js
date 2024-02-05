@@ -428,24 +428,25 @@ class WebGLBackend extends Backend {
 		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );
 
 		// switch active buffers
+
 		for ( let i = 0; i < transformBuffers.length; i ++ ) {
 
-			if ( transformBuffers[ i ].pbo ) {
+			const dualAttributeData = transformBuffers[ i ];
 
-				if ( transformBuffers[ i ].pbo.needsTransfer ) {
+			if ( dualAttributeData.pbo ) {
 
-					this.attributeUtils.copyBufferToSubBuffer( transformBuffers[ i ].bufferGPU, transformBuffers[ i ].transformBuffer, transformBuffers[ i ].byteLength );
-					transformBuffers[ i ].pbo.needsTransfer = false;
+				if ( dualAttributeData.pbo.needsTransfer ) {
+
+					this.attributeUtils.copyBufferToSubBuffer( dualAttributeData.bufferGPU, dualAttributeData.transformBuffer, dualAttributeData.byteLength );
+					dualAttributeData.pbo.needsTransfer = false;
 
 				}
 
-				this.textureUtils.copyBufferToTexture( transformBuffers[ i ].transformBuffer, transformBuffers[ i ].pbo );
-
-			} else {
-
-				transformBuffers[ i ].switchBuffers();
+				this.textureUtils.copyBufferToTexture( dualAttributeData.transformBuffer, dualAttributeData.pbo );
 
 			}
+
+			dualAttributeData.switchBuffers();
 
 		}
 

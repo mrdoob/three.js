@@ -42,23 +42,23 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 	generate( builder, output ) {
 
-		const type = this.getNodeType( builder );
-
 		let snippet;
+
+		const isAssignContext = builder.context.assign;
+
+		//
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
 			const { node } = this;
 
-			if ( ! node.instanceIndex && this.node.bufferObject === true ) {
+			if ( ! node.instanceIndex && this.node.bufferObject === true && isAssignContext !== true ) {
 
 				snippet = builder.generatePBO( this );
 
 			} else {
 
-				const nodeSnippet = node.build( builder );
-
-				snippet = nodeSnippet;
+				snippet = node.build( builder );
 
 			}
 
@@ -68,7 +68,15 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		}
 
-		return builder.format( snippet, type, output );
+		if ( isAssignContext !== true ) {
+
+			const type = this.getNodeType( builder );
+
+			snippet = builder.format( snippet, type, output );
+
+		}
+
+		return snippet;
 
 	}
 
