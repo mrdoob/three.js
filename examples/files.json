@@ -44,6 +44,7 @@
 		"webgl_geometry_text_shapes",
 		"webgl_geometry_text_stroke",
 		"webgl_helpers",
+		"webgl_instancing_morph",
 		"webgl_instancing_dynamic",
 		"webgl_instancing_performance",
 		"webgl_instancing_raycast",
