@@ -2163,18 +2163,18 @@ class WebGLRenderer {
 			renderTargetProperties.__hasExternalTextures = true;
 
 			renderTargetProperties.__autoAllocateDepthBuffer = depthTexture === undefined;
-	
+
 			if ( ! renderTargetProperties.__autoAllocateDepthBuffer ) {
-	
+
 				// The multisample_render_to_texture extension doesn't work properly if there
 				// are midframe flushes and an external depth buffer. Disable use of the extension.
 				if ( extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) {
-	
+
 					console.warn( 'THREE.WebGLRenderer: Render-to-texture extension was disabled because an external texture was provided' );
 					renderTargetProperties.__useRenderToTexture = false;
-	
+
 				}
-	
+
 			}
 		};
 
