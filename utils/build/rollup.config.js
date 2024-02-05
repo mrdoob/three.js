@@ -1,29 +1,6 @@
 import terser from '@rollup/plugin-terser';
 import MagicString from 'magic-string';
 
-function addons() {
-
-	return {
-
-		transform( code, id ) {
-
-			if ( /\/examples\/jsm\//.test( id ) === false ) return;
-
-			code = new MagicString( code );
-
-			code.replace( 'build/three.module.js', 'src/Three.js' );
-
-			return {
-				code: code.toString(),
-				map: code.generateMap().toString()
-			};
-
-		}
-
-	};
-
-}
-
 export function glsl() {
 
 	return {
@@ -49,7 +26,7 @@ export function glsl() {
 
 			return {
 				code: code.toString(),
-				map: code.generateMap().toString()
+				map: code.generateMap()
 			};
 
 		}
@@ -74,28 +51,7 @@ function header() {
 
 			return {
 				code: code.toString(),
-				map: code.generateMap().toString()
-			};
-
-		}
-
-	};
-
-}
-
-function deprecationWarning() {
-
-	return {
-
-		renderChunk( code ) {
-
-			code = new MagicString( code );
-
-			code.prepend( `console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation' );\n` );
-
-			return {
-				code: code.toString(),
-				map: code.generateMap().toString()
+				map: code.generateMap()
 			};
 
 		}
@@ -108,7 +64,6 @@ const builds = [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			addons(),
 			glsl(),
 			header()
 		],
@@ -122,10 +77,9 @@ const builds = [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			addons(),
 			glsl(),
-			terser(),
-			header()
+			header(),
+			terser()
 		],
 		output: [
 			{
@@ -137,7 +91,6 @@ const builds = [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			addons(),
 			glsl(),
 			header()
 		],
@@ -147,41 +100,6 @@ const builds = [
 				name: 'THREE',
 				file: 'build/three.cjs',
 				indent: '\t'
-			}
-		]
-	},
-
-	{ // @deprecated, r150
-		input: 'src/Three.js',
-		plugins: [
-			addons(),
-			glsl(),
-			header(),
-			deprecationWarning()
-		],
-		output: [
-			{
-				format: 'umd',
-				name: 'THREE',
-				file: 'build/three.js',
-				indent: '\t'
-			}
-		]
-	},
-	{ // @deprecated, r150
-		input: 'src/Three.js',
-		plugins: [
-			addons(),
-			glsl(),
-			terser(),
-			header(),
-			deprecationWarning()
-		],
-		output: [
-			{
-				format: 'umd',
-				name: 'THREE',
-				file: 'build/three.min.js'
 			}
 		]
 	}

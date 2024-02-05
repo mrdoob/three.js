@@ -1,6 +1,8 @@
 class LightingModel {
 
-	init( /*input, stack, builder*/ ) { }
+	start( /*input, stack, builder*/ ) { }
+
+	finish( /*input, stack, builder*/ ) { }
 
 	direct( /*input, stack, builder*/ ) { }
 

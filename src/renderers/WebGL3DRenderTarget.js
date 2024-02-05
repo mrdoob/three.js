@@ -3,9 +3,9 @@ import { Data3DTexture } from '../textures/Data3DTexture.js';
 
 class WebGL3DRenderTarget extends WebGLRenderTarget {
 
-	constructor( width = 1, height = 1, depth = 1 ) {
+	constructor( width = 1, height = 1, depth = 1, options = {} ) {
 
-		super( width, height );
+		super( width, height, options );
 
 		this.isWebGL3DRenderTarget = true;
 

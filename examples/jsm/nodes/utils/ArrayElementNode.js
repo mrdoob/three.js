@@ -9,6 +9,8 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 		this.node = node;
 		this.indexNode = indexNode;
 
+		this.isArrayElementNode = true;
+
 	}
 
 	getNodeType( builder ) {
@@ -22,6 +24,12 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 		const nodeSnippet = this.node.build( builder );
 		const indexSnippet = this.indexNode.build( builder, 'uint' );
 
+		if ( this.node.isStorageBufferNode && ! builder.isAvailable( 'storageBuffer' ) ) {
+
+			return nodeSnippet;
+
+		}
+
 		return `${nodeSnippet}[ ${indexSnippet} ]`;
 
 	}
@@ -30,4 +38,4 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 export default ArrayElementNode;
 
-addNodeClass( ArrayElementNode );
+addNodeClass( 'ArrayElementNode', ArrayElementNode );

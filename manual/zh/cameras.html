@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -47,7 +43,7 @@
 <p>重新讲一遍这些东西是因为我好久没有在意过了。很多书或者文章提到<em>锥台</em>这个东西的时候我扫一眼就过去了。再了解一下不同几何体会让下面的一些表述变得更为感性...吧😅</p>
 <p><a href="/docs/#api/zh/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>通过四个属性来定义一个视锥。<code class="notranslate" translate="no">near</code>定义了视锥的前端，<code class="notranslate" translate="no">far</code>定义了后端，<code class="notranslate" translate="no">fov</code>是视野，通过计算正确的高度来从摄像机的位置获得指定的以<code class="notranslate" translate="no">near</code>为单位的视野，定义的是视锥的前端和后端的高度。<code class="notranslate" translate="no">aspect</code>间接地定义了视锥前端和后端的宽度，实际上视锥的宽度是通过高度乘以 aspect 来得到的。</p>
 <p><img src="../resources/frustum-3d.svg" width="500" class="threejs_center"></p>
-<p>我们借用<a href="lights.html">上一篇文章</a>的场景. 其中包含一个地平面，一个球和一个立方体，我们可以在其中调整摄像机的设置。 
+<p>我们借用<a href="lights.html">上一篇文章</a>的场景. 其中包含一个地平面，一个球和一个立方体，我们可以在其中调整摄像机的设置。
 我们通过<code class="notranslate" translate="no">MinMaxGUIHelper</code>来调整<code class="notranslate" translate="no">near</code>，<code class="notranslate" translate="no">far</code>的设置。显然<code class="notranslate" translate="no">near</code>应该总是比<code class="notranslate" translate="no">far</code>要小。lil-gui 有<code class="notranslate" translate="no">min</code>和<code class="notranslate" translate="no">max</code>两个属性可调，然后这两个属性将决定摄像机的设置。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class MinMaxGUIHelper {
   constructor(obj, minProp, maxProp, minDif) {
@@ -255,7 +251,7 @@ const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1);
   const sphereRadius = 3;
   const sphereWidthDivisions = 32;
   const sphereHeightDivisions = 16;
-  const sphereGeo = new THREE.SphereBufferGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions);
+  const sphereGeo = new THREE.SphereGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions);
   const numSpheres = 20;
   for (let i = 0; i &lt; numSpheres; ++i) {
     const sphereMat = new THREE.MeshPhongMaterial();
@@ -470,7 +466,7 @@ const planes = textures.map((texture) =&gt; {
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

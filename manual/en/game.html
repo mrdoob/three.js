@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -52,7 +48,7 @@ and features for displaying 3D objects added to that scene graph
 but it does not provide all the other things needed to make a game.
 No collisions, no physics, no input systems, no path finding, etc, etc...
 So, we'll have to provide those things ourselves.</p>
-<p>I ended up writing quite a bit of code to make this simple <em>unfinished</em> 
+<p>I ended up writing quite a bit of code to make this simple <em>unfinished</em>
 game like thing and again, it's certainly possible I over engineered and there
 are simpler solutions but I feel like I actually didn't write
 enough code and hopefully I can explain what I think is missing.</p>
@@ -70,12 +66,12 @@ model</a> by <a href="https://opengameart.org/users/quaternius">quaternius</a></
 
 <p>These seem like good models to start with so the first thing we need to
 do is load them.</p>
-<p>We covered <a href="load-gltf.html">loading glTF files before</a>. 
+<p>We covered <a href="load-gltf.html">loading glTF files before</a>.
 The difference this time is we need to load multiple models and
 we can't start the game until all the models are loaded.</p>
 <p>Fortunately three.js provides the <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> just for this purpose.
 We create a <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> and pass it to the other loaders. The
-<a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> provides both <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> and 
+<a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> provides both <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> and
 <a href="/docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> properties we can attach callbacks to.
 The <a href="/docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> callback will be called when
 all files have been loaded. The <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> callback
@@ -132,7 +128,7 @@ of items loaded so far as well as the total number of items.</p>
 +  &lt;/div&gt;
 &lt;/body&gt;
 </pre>
-<p>We'll look up the <code class="notranslate" translate="no">#progressbar</code> div and we can set the width from 0% to 100% 
+<p>We'll look up the <code class="notranslate" translate="no">#progressbar</code> div and we can set the width from 0% to 100%
 to show our progress. All we need to do is set that in our callback.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const manager = new THREE.LoadingManager();
 manager.onLoad = init;
@@ -180,13 +176,13 @@ a CSS animation of diagonal stripes.</p>
   height: 1em;
   background-color: #888;
   background-image: linear-gradient(
-    -45deg, 
-    rgba(255, 255, 255, .5) 25%, 
-    transparent 25%, 
-    transparent 50%, 
-    rgba(255, 255, 255, .5) 50%, 
-    rgba(255, 255, 255, .5) 75%, 
-    transparent 75%, 
+    -45deg,
+    rgba(255, 255, 255, .5) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, .5) 50%,
+    rgba(255, 255, 255, .5) 75%,
+    transparent 75%,
     transparent
   );
   background-size: 50px 50px;
@@ -264,7 +260,7 @@ in the loaded scene which means we won't have control over those positions.</p>
 An <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> contains 1 or more <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s. An
 <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> references an <a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>. <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s
 have all kinds of settings for playing then chaining to another
-action or cross fading between actions. Let's just get the first 
+action or cross fading between actions. Let's just get the first
 <a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a> and create an action for it. The default is for
 an action to play its clip in a loop forever.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const mixers = [];
@@ -324,7 +320,7 @@ function render(now) {
 
 <p></p>
 <p>Let's make it so we can check all of the animations.
-We'll add all of the clips as actions and then enable just one at 
+We'll add all of the clips as actions and then enable just one at
 a time.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const mixers = [];
 +const mixerInfos = [];
@@ -376,7 +372,7 @@ function init() {
 </pre>
 <p>The code above makes an array of <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s,
 one for each <a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>. It makes an array of objects, <code class="notranslate" translate="no">mixerInfos</code>,
-with references to the <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> and all the <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s 
+with references to the <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> and all the <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s
 for each model. It then calls <code class="notranslate" translate="no">playNextAction</code> which sets <code class="notranslate" translate="no">enabled</code> on
 all but one action for that mixer.</p>
 <p>We need to update the render loop for the new array</p>
@@ -486,8 +482,8 @@ class Component {
   }
 }
 </pre>
-<p>Do components need a base class? JavaScript is not like most strictly 
-typed languages so effectively we could have no base class and just 
+<p>Do components need a base class? JavaScript is not like most strictly
+typed languages so effectively we could have no base class and just
 leave it up to each component to do whatever it wants in its constructor
 knowing that the first argument is always the component's gameobject.
 If it doesn't care about gameobject it wouldn't store it. I kind of feel like this
@@ -604,7 +600,7 @@ takes the name of the animation to play and plays it.</p>
 }
 </pre>
 <p>You can see it's basically the code we had before that clones the scene we loaded,
-then sets up an <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>. <code class="notranslate" translate="no">setAnimation</code> adds a <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> for a 
+then sets up an <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>. <code class="notranslate" translate="no">setAnimation</code> adds a <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> for a
 particular <a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a> if one does not already exist and disables all
 existing actions.</p>
 <p>The code references <code class="notranslate" translate="no">globals.deltaTime</code>. Let's make a globals object</p>
@@ -641,7 +637,7 @@ and might teleport characters across our game world if we had code like</p>
 }
 </pre>
 <p>The player calls <code class="notranslate" translate="no">setAnimation</code> with <code class="notranslate" translate="no">'Run'</code>. To know which animations
-are available I modified our previous example to print out the names of 
+are available I modified our previous example to print out the names of
 the animations</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function prepModelsAndAnimations() {
   Object.values(models).forEach(model =&gt; {
@@ -706,7 +702,7 @@ the animations</p>
     Idle
     Run_swordAttack
 </pre><p>Fortunately the names of the animations for all the animals match
-which will come in handy later. For now we only care the that the 
+which will come in handy later. For now we only care the that the
 player has an animation called <code class="notranslate" translate="no">Run</code>.</p>
 <p>Let's use these components. Here's the updated init function.
 All it does is create a <code class="notranslate" translate="no">GameObject</code> and add a <code class="notranslate" translate="no">Player</code> component to it.</p>
@@ -832,7 +828,7 @@ class InputManager {
 if a key is currently pressed by checking for example
 <code class="notranslate" translate="no">inputManager.keys.left.down</code>. It also has a <code class="notranslate" translate="no">justPressed</code> property
 for each key so that you can check the user just pressed the key.
-For example a jump key you don't want to know if the button is being 
+For example a jump key you don't want to know if the button is being
 held down, you want to know did the user press it now.</p>
 <p>Let's create an instance of <code class="notranslate" translate="no">InputManager</code></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const globals = {
@@ -1014,7 +1010,7 @@ for mobile. First let's add some HTML to touch</p>
   display: block;
 }
 </pre>
-<p>The idea here is there is one div, <code class="notranslate" translate="no">#ui</code>, that 
+<p>The idea here is there is one div, <code class="notranslate" translate="no">#ui</code>, that
 covers the entire page. Inside will be 2 divs, <code class="notranslate" translate="no">#left</code> and <code class="notranslate" translate="no">#right</code>
 both of which are almost half the page wide and the entire screen tall.
 In between there is a 40px separator. If the user slides their finger
@@ -1584,7 +1580,7 @@ code for just checking arbitrarily oriented rectangles but it's still a ton more
 code so it seemed best to leave it out.</p>
 <p>Another solution would have been to try to find other characters that are
 mostly circular from the top. Other humanoid characters for example instead
-of animals in which case the circle checking might work animal to animal. 
+of animals in which case the circle checking might work animal to animal.
 It would not work animal to fence, well we'd have to add circle to rectangle
 checking. I thought about making the fence a fence of bushes or poles, something
 circular but then I'd need probably 120 to 200 of them to surround the play area
@@ -1692,7 +1688,7 @@ while(runner.isBusy()) {
   runner.update();
 }
 </pre>
-<p>Coroutines are removed automatically when they are finished. 
+<p>Coroutines are removed automatically when they are finished.
 To remove a coroutine early, before it reaches the end you need to keep
 a reference to its generator like this</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gen = count0To9();
@@ -1741,7 +1737,7 @@ function rand(min, max) {
 <p>You can see we make a <code class="notranslate" translate="no">CoroutineRunner</code> and we add an <code class="notranslate" translate="no">emitNotes</code> coroutine.
 That function will run forever, waiting 0.5 to 1 seconds and then creating a game object
 with a <code class="notranslate" translate="no">Note</code> component.</p>
-<p>For the <code class="notranslate" translate="no">Note</code> component first lets make a texture with a note on it and 
+<p>For the <code class="notranslate" translate="no">Note</code> component first lets make a texture with a note on it and
 instead of loading a note image let's make one using a canvas like we covered in <a href="canvas-textures.html">the article on canvas textures</a>.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeTextTexture(str) {
   const ctx = document.createElement('canvas').getContext('2d');
@@ -1796,7 +1792,7 @@ It uses <a href="/docs/#api/en/materials/SpriteMaterial"><code class="notranslat
 </pre>
 <p>All it does is setup a <a href="/docs/#api/en/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>, then pick a random velocity and move
 the transform at that velocity for 60 frames while fading out the note
-by setting the material's <a href="/docs/#api/en/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a>. 
+by setting the material's <a href="/docs/#api/en/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a>.
 After the loop it the removes the transform
 from the scene and the note itself from active gameobjects.</p>
 <p>One last thing, let's add a few more animals</p>
@@ -1926,7 +1922,7 @@ If you make a cool game post a link in the comments below.</p>
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

@@ -1,4 +1,4 @@
-import { BackSide, LinearFilter, LinearMipmapLinearFilter, NoBlending, NoColorSpace, SRGBColorSpace, sRGBEncoding } from '../constants.js';
+import { BackSide, LinearFilter, LinearMipmapLinearFilter, NoBlending } from '../constants.js';
 import { Mesh } from '../objects/Mesh.js';
 import { BoxGeometry } from '../geometries/BoxGeometry.js';
 import { ShaderMaterial } from '../materials/ShaderMaterial.js';
@@ -6,7 +6,6 @@ import { cloneUniforms } from './shaders/UniformsUtils.js';
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 import { CubeCamera } from '../cameras/CubeCamera.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
-import { warnOnce } from '../utils.js';
 
 class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
@@ -18,14 +17,6 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 		const image = { width: size, height: size, depth: 1 };
 		const images = [ image, image, image, image, image, image ];
-
-		if ( options.encoding !== undefined ) {
-
-			// @deprecated, r152
-			warnOnce( 'THREE.WebGLCubeRenderTarget: option.encoding has been replaced by option.colorSpace.' );
-			options.colorSpace = options.encoding === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
-
-		}
 
 		this.texture = new CubeTexture( images, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
 

@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -35,8 +31,8 @@
 <h2 id="-">ブラウザの開発者ツールを学ぶ</h2>
 <p>全てのブラウザには開発者ツールがあります。
 <a href="https://developers.google.com/web/tools/chrome-devtools/">Chrome</a>,
-<a href="https://developer.mozilla.org/en-US/docs/Tools">Firefox</a>, 
-<a href="https://developer.apple.com/safari/tools/">Safari</a>, 
+<a href="https://developer.mozilla.org/en-US/docs/Tools">Firefox</a>,
+<a href="https://developer.apple.com/safari/tools/">Safari</a>,
 <a href="https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide">Edge</a>.</p>
 <p>Chromeでは <code class="notranslate" translate="no">⋮</code> アイコンをクリックし、その他のツール -&gt; デベロッパーツールを選択すると開発者ツールが表示されます。そこにはキーボードのショートカットも表示されています。</p>
 <div class="threejs_center"><img class="border" src="../resources/images/devtools-chrome.jpg" style="width: 789px;"></div>
@@ -198,7 +194,7 @@ function render(now) {
     const mesh = thing.mesh;
     const pos = mesh.position;
     logger.log(
-        'timer:', thing.timer.toFixed(3), 
+        'timer:', thing.timer.toFixed(3),
         'pos:', pos.x.toFixed(3), pos.y.toFixed(3), pos.z.toFixed(3));
     thing.timer -= deltaTime;
     if (thing.timer &lt;= 0) {
@@ -231,7 +227,7 @@ function render(now) {
 <p>先ほどの例では次のようにしています。デバッグ機能はURLに <code class="notranslate" translate="no">?debug=true</code> を指定した場合にのみ表示されます。</p>
 <p>まず、クエリストリングを解析するコードが必要です。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">/**
-  * Returns the query parameters as a key/value object. 
+  * Returns the query parameters as a key/value object.
   * Example: If the query parameters are
   *
   *    abc=123&amp;def=456&amp;name=gman
@@ -390,7 +386,7 @@ IMOを無視するよりも、それらのエラーを見つける方が良い�
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

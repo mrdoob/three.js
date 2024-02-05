@@ -18,15 +18,21 @@ export default class RenderObject {
 		this.context = renderContext;
 
 		this.geometry = object.geometry;
+		this.version = material.version;
 
 		this.attributes = null;
 		this.pipeline = null;
 		this.vertexBuffers = null;
 
-		this._materialVersion = - 1;
-		this._materialCacheKey = '';
+		this.initialNodesCacheKey = this.getNodesCacheKey();
+		this.initialCacheKey = this.getCacheKey();
+
+		this._nodeBuilderState = null;
+		this._bindings = null;
 
 		this.onDispose = null;
+
+		this.isRenderObject = true;
 
 		this.onMaterialDispose = () => {
 
@@ -38,15 +44,15 @@ export default class RenderObject {
 
 	}
 
-	getNodeBuilder() {
+	getNodeBuilderState() {
 
-		return this._nodes.getForRender( this );
+		return this._nodeBuilderState || ( this._nodeBuilderState = this._nodes.getForRender( this ) );
 
 	}
 
 	getBindings() {
 
-		return this.getNodeBuilder().getBindings();
+		return this._bindings || ( this._bindings = this.getNodeBuilderState().createBindings() );
 
 	}
 
@@ -66,7 +72,7 @@ export default class RenderObject {
 
 		if ( this.attributes !== null ) return this.attributes;
 
-		const nodeAttributes = this.getNodeBuilder().getAttributesArray();
+		const nodeAttributes = this.getNodeBuilderState().nodeAttributes;
 		const geometry = this.geometry;
 
 		const attributes = [];
@@ -75,6 +81,8 @@ export default class RenderObject {
 		for ( const nodeAttribute of nodeAttributes ) {
 
 			const attribute = nodeAttribute.node && nodeAttribute.node.attribute ? nodeAttribute.node.attribute : geometry.getAttribute( nodeAttribute.name );
+
+			if ( attribute === undefined ) continue;
 
 			attributes.push( attribute );
 
@@ -98,23 +106,64 @@ export default class RenderObject {
 
 	}
 
-	getCacheKey() {
+	getMaterialCacheKey() {
 
-		const { material, scene, lightsNode } = this;
+		const { object, material } = this;
 
-		if ( material.version !== this._materialVersion ) {
+		let cacheKey = material.customProgramCacheKey();
 
-			this._materialVersion = material.version;
-			this._materialCacheKey = material.customProgramCacheKey();
+		for ( const property in material ) {
+
+			if ( /^(is[A-Z])|^(visible|version|uuid|name|opacity|userData)$/.test( property ) ) continue;
+
+			let value = material[ property ];
+
+			if ( value !== null ) {
+
+				const type = typeof value;
+
+				if ( type === 'number' ) value = value !== 0 ? '1' : '0'; // Convert to on/off, important for clearcoat, transmission, etc
+				else if ( type === 'object' ) value = '{}';
+
+			}
+
+			cacheKey += /*property + ':' +*/ value + ',';
 
 		}
 
-		const cacheKey = [];
+		if ( object.skeleton ) {
 
-		cacheKey.push( 'material:' + this._materialCacheKey );
-		cacheKey.push( 'nodes:' + this._nodes.getCacheKey( scene, lightsNode ) );
+			cacheKey += object.skeleton.uuid + ',';
 
-		return '{' + cacheKey.join( ',' ) + '}';
+		}
+
+		if ( object.morphTargetInfluences ) {
+
+			cacheKey += object.morphTargetInfluences.length + ',';
+
+		}
+
+		return cacheKey;
+
+	}
+
+	get needsUpdate() {
+
+		return this.initialNodesCacheKey !== this.getNodesCacheKey();
+
+	}
+
+	getNodesCacheKey() {
+
+		// Environment Nodes Cache Key
+
+		return this._nodes.getCacheKey( this.scene, this.lightsNode );
+
+	}
+
+	getCacheKey() {
+
+		return this.getMaterialCacheKey() + ',' + this.getNodesCacheKey();
 
 	}
 

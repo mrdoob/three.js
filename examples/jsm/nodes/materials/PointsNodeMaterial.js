@@ -14,19 +14,9 @@ class PointsNodeMaterial extends NodeMaterial {
 
 		this.lights = false;
 		this.normals = false;
-
 		this.transparent = true;
 
-		this.colorNode = null;
-		this.opacityNode = null;
-
-		this.alphaTestNode = null;
-
-		this.lightNode = null;
-
 		this.sizeNode = null;
-
-		this.positionNode = null;
 
 		this.setDefaultValues( defaultValues );
 
@@ -46,4 +36,4 @@ class PointsNodeMaterial extends NodeMaterial {
 
 export default PointsNodeMaterial;
 
-addNodeMaterial( PointsNodeMaterial );
+addNodeMaterial( 'PointsNodeMaterial', PointsNodeMaterial );

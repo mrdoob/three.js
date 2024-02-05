@@ -57,6 +57,10 @@ class MathNode extends TempNode {
 
 			return 'vec3';
 
+		} else if ( method === MathNode.MOD ) {
+
+			return this.aNode.getNodeType( builder );
+
 		} else {
 
 			return this.getInputType( builder );
@@ -102,7 +106,7 @@ class MathNode extends TempNode {
 
 		} else if ( method === MathNode.NEGATE ) {
 
-			return builder.format( '-' + a.build( builder, inputType ), type, output );
+			return builder.format( '( - ' + a.build( builder, inputType ) + ' )', type, output );
 
 		} else if ( method === MathNode.ONE_MINUS ) {
 
@@ -120,7 +124,7 @@ class MathNode extends TempNode {
 
 			const params = [];
 
-			if ( method === MathNode.CROSS ) {
+			if ( method === MathNode.CROSS || method === MathNode.MOD ) {
 
 				params.push(
 					a.build( builder, type ),
@@ -165,7 +169,7 @@ class MathNode extends TempNode {
 
 			}
 
-			return builder.format( `${ builder.getMethod( method ) }( ${params.join( ', ' )} )`, type, output );
+			return builder.format( `${ builder.getMethod( method, type ) }( ${params.join( ', ' )} )`, type, output );
 
 		}
 
@@ -220,6 +224,7 @@ MathNode.ROUND = 'round';
 MathNode.RECIPROCAL = 'reciprocal';
 MathNode.TRUNC = 'trunc';
 MathNode.FWIDTH = 'fwidth';
+MathNode.BITCAST = 'bitcast';
 
 // 2 inputs
 
@@ -248,6 +253,8 @@ export default MathNode;
 
 export const EPSILON = float( 1e-6 );
 export const INFINITY = float( 1e6 );
+export const PI = float( Math.PI );
+export const PI2 = float( Math.PI * 2 );
 
 export const radians = nodeProxy( MathNode, MathNode.RADIANS );
 export const degrees = nodeProxy( MathNode, MathNode.DEGREES );
@@ -278,6 +285,7 @@ export const round = nodeProxy( MathNode, MathNode.ROUND );
 export const reciprocal = nodeProxy( MathNode, MathNode.RECIPROCAL );
 export const trunc = nodeProxy( MathNode, MathNode.TRUNC );
 export const fwidth = nodeProxy( MathNode, MathNode.FWIDTH );
+export const bitcast = nodeProxy( MathNode, MathNode.BITCAST );
 
 export const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
 export const min = nodeProxy( MathNode, MathNode.MIN );
@@ -295,6 +303,8 @@ export const pow3 = nodeProxy( MathNode, MathNode.POW, 3 );
 export const pow4 = nodeProxy( MathNode, MathNode.POW, 4 );
 export const transformDirection = nodeProxy( MathNode, MathNode.TRANSFORM_DIRECTION );
 
+export const cbrt = ( a ) => mul( sign( a ), pow( abs( a ), 1.0 / 3.0 ) );
+export const lengthSq = ( a ) => dot( a, a );
 export const mix = nodeProxy( MathNode, MathNode.MIX );
 export const clamp = ( value, low = 0, high = 1 ) => nodeObject( new MathNode( MathNode.CLAMP, nodeObject( value ), nodeObject( low ), nodeObject( high ) ) );
 export const saturate = ( value ) => clamp( value );
@@ -326,6 +336,7 @@ addNodeElement( 'atan', atan );
 addNodeElement( 'abs', abs );
 addNodeElement( 'sign', sign );
 addNodeElement( 'length', length );
+addNodeElement( 'lengthSq', lengthSq );
 addNodeElement( 'negate', negate );
 addNodeElement( 'oneMinus', oneMinus );
 addNodeElement( 'dFdx', dFdx );
@@ -355,5 +366,6 @@ addNodeElement( 'smoothstep', smoothstepElement );
 addNodeElement( 'faceForward', faceForward );
 addNodeElement( 'difference', difference );
 addNodeElement( 'saturate', saturate );
+addNodeElement( 'cbrt', cbrt );
 
-addNodeClass( MathNode );
+addNodeClass( 'MathNode', MathNode );

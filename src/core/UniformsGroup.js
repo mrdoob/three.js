@@ -1,7 +1,7 @@
 import { EventDispatcher } from './EventDispatcher.js';
 import { StaticDrawUsage } from '../constants.js';
 
-let id = 0;
+let _id = 0;
 
 class UniformsGroup extends EventDispatcher {
 
@@ -11,7 +11,7 @@ class UniformsGroup extends EventDispatcher {
 
 		this.isUniformsGroup = true;
 
-		Object.defineProperty( this, 'id', { value: id ++ } );
+		Object.defineProperty( this, 'id', { value: _id ++ } );
 
 		this.name = '';
 
@@ -73,7 +73,13 @@ class UniformsGroup extends EventDispatcher {
 
 		for ( let i = 0, l = uniformsSource.length; i < l; i ++ ) {
 
-			this.uniforms.push( uniformsSource[ i ].clone() );
+			const uniforms = Array.isArray( uniformsSource[ i ] ) ? uniformsSource[ i ] : [ uniformsSource[ i ] ];
+
+			for ( let j = 0; j < uniforms.length; j ++ ) {
+
+				this.uniforms.push( uniforms[ j ].clone() );
+
+			}
 
 		}
 

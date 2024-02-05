@@ -28,7 +28,7 @@
 
 		//Create spheres with 3 levels of detail and create new LOD levels for them
 		for( let i = 0; i < 3; i++ ) {
-			const geometry = new THREE.IcosahedronGeometry( 10, 3 - i )
+			const geometry = new THREE.IcosahedronGeometry( 10, 3 - i );
 			const mesh = new THREE.Mesh( geometry, material );
 			lod.addLevel( mesh, i * 75 );
 		}

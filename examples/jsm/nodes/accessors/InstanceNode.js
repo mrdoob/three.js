@@ -17,7 +17,7 @@ class InstanceNode extends Node {
 
 	}
 
-	construct( builder ) {
+	setup( /*builder*/ ) {
 
 		let instanceMatrixNode = this.instanceMatrixNode;
 
@@ -57,8 +57,8 @@ class InstanceNode extends Node {
 
 		// ASSIGNS
 
-		builder.stack.assign( positionLocal, instancePosition );
-		builder.stack.assign( normalLocal, instanceNormal );
+		positionLocal.assign( instancePosition );
+		normalLocal.assign( instanceNormal );
 
 	}
 
@@ -68,4 +68,4 @@ export default InstanceNode;
 
 export const instance = nodeProxy( InstanceNode );
 
-addNodeClass( InstanceNode );
+addNodeClass( 'InstanceNode', InstanceNode );

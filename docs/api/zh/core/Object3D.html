@@ -116,6 +116,17 @@
 	[page:Object3D]、 [page:Group] 或者 [page:Bone] 这些是不可渲染的物体，因此此回调函数不会在这样的物体上执行。
 	</p>
 
+	<h3>[property:Function onAfterShadow]</h3>
+	<p>
+		An optional callback that is executed immediately after a 3D object is
+		rendered to a shadow map. This function is called with the following parameters: renderer,
+		scene, camera, shadowCamera, geometry, depthMaterial, group.
+	</p>
+	<p>
+		注意此回调函数只会在*可渲染*的3D物体上执行。可渲染的3D物体指的是那种拥有视觉表现的、定义了几何体与材质的物体，例如像是[page:Mesh]、[page:Line]、[page:Points] 或者[page:Sprite]。
+		[page:Object3D]、 [page:Group] 或者 [page:Bone] 这些是不可渲染的物体，因此此回调函数不会在这样的物体上执行。
+	</p>
+
 	<h3>[property:Function onBeforeRender]</h3>
 	<p>
 		一个可选的回调函数，在Object3D渲染之前直接执行。
@@ -124,6 +135,17 @@
 	<p>
 	注意此回调函数只会在*可渲染*的3D物体上执行。可渲染的3D物体指的是那种拥有视觉表现的、定义了几何体与材质的物体，例如像是[page:Mesh]、[page:Line]、[page:Points] 或者[page:Sprite]。
 	[page:Object3D]、 [page:Group] 或者 [page:Bone] 这些是不可渲染的物体，因此此回调函数不会在这样的物体上执行。
+	</p>
+
+	<h3>[property:Function onBeforeShadow]</h3>
+	<p>
+		An optional callback that is executed immediately before a 3D object is
+		rendered to a shadow map. This function is called with the following parameters: renderer,
+		scene, camera, shadowCamera, geometry, depthMaterial, group.
+	</p>
+	<p>
+		注意此回调函数只会在*可渲染*的3D物体上执行。可渲染的3D物体指的是那种拥有视觉表现的、定义了几何体与材质的物体，例如像是[page:Mesh]、[page:Line]、[page:Points] 或者[page:Sprite]。
+		[page:Object3D]、 [page:Group] 或者 [page:Bone] 这些是不可渲染的物体，因此此回调函数不会在这样的物体上执行。
 	</p>
 
 	<h3>[property:Object3D parent]</h3>
@@ -264,10 +286,13 @@
 		从该对象开始，搜索一个对象及其子级，返回第一个给定的属性中包含有匹配的值的子对象。
 	</p>
 
-	<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value] )</h3>
+	<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value], [param:Array optionalTarget] )</h3>
 	<p>
 		name —— 将要用于查找的属性的名称。<br />
-		value —— 给定的属性的值。 <br /><br />
+		value —— 给定的属性的值。 <br />
+		optionalTarget -- (optional) target to set the result.
+		Otherwise a new Array is instantiated. If set, you must clear this
+		array prior to each call (i.e., array.length = 0;). <br /><br />
 		从此对象开始，搜索一个对象及其子对象，返回包含给定属性的匹配值的所有子对象。
 	</p>
 

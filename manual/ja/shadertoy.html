@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -47,7 +43,7 @@
 <p>このゲームはテクスチャと三角形の建物を描画する伝統的な技術を使用しており、同じマシンで1秒間に30～60フレーム動作します。</p>
 <p>それでもthree.jsでShadertoyのシェーダーを使ってみましょう。</p>
 <p>以下は2019年1月現在で<a href="https://www.shadertoy.com/new">shadertoy.comで"New"を選ぶ</a>した時のデフォルトのshadertoyシェーダーです。</p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By iq: https://www.shadertoy.com/user/iq  
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By iq: https://www.shadertoy.com/user/iq
 // license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
@@ -160,7 +156,7 @@ main();
 uniform vec3 iResolution;
 uniform float iTime;
 
-// By iq: https://www.shadertoy.com/user/iq  
+// By iq: https://www.shadertoy.com/user/iq
 // license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
@@ -218,7 +214,7 @@ void main() {
 }
 </pre>
 <blockquote>
-<p>注意点： なぜ <code class="notranslate" translate="no">iResolution</code> が <code class="notranslate" translate="no">vec3</code> なのか、 3番目の値に何が入っているのか 
+<p>注意点： なぜ <code class="notranslate" translate="no">iResolution</code> が <code class="notranslate" translate="no">vec3</code> なのか、 3番目の値に何が入っているのか
 <a href="https://www.shadertoy.com/howto">shadertoy.comには文書化されてない</a> のでさっぱりわかりません。
 上記では使わないのでとりあえず1にしておきます。 ¯\_(ツ)_/¯</p>
 </blockquote>
@@ -265,7 +261,7 @@ void main() {
 <p>いくつかのshadertoyシェーダーは、<a href="https://www.shadertoy.com/view/MsXSzM">これ</a>のようにテクスチャを入力として受け取るものがあります。</p>
 <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By Daedelus: https://www.shadertoy.com/user/Daedelus
 // license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
-#define TIMESCALE 0.25 
+#define TIMESCALE 0.25
 #define TILES 8
 #define COLOR 0.7, 1.6, 2.8
 
@@ -383,7 +379,7 @@ uniforms.iTime.value = time;
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

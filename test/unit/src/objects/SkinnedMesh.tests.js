@@ -3,6 +3,7 @@
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
 import { SkinnedMesh } from '../../../../src/objects/SkinnedMesh.js';
+import { AttachedBindMode } from '../../../../src/constants.js';
 
 export default QUnit.module( 'Objects', () => {
 
@@ -41,8 +42,8 @@ export default QUnit.module( 'Objects', () => {
 
 			const object = new SkinnedMesh();
 			assert.ok(
-				object.bindMode === 'attached',
-				'SkinnedMesh.bindMode should be attached'
+				object.bindMode === AttachedBindMode,
+				'SkinnedMesh.bindMode should be AttachedBindMode'
 			);
 
 		} );

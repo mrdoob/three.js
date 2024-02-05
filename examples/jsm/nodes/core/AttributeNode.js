@@ -12,6 +12,12 @@ class AttributeNode extends Node {
 
 	}
 
+	isGlobal() {
+
+		return true;
+
+	}
+
 	getHash( builder ) {
 
 		return this.getAttributeName( builder );
@@ -20,11 +26,11 @@ class AttributeNode extends Node {
 
 	getNodeType( builder ) {
 
-		const attributeName = this.getAttributeName( builder );
-
 		let nodeType = super.getNodeType( builder );
 
 		if ( nodeType === null ) {
+
+			const attributeName = this.getAttributeName( builder );
 
 			if ( builder.hasGeometryAttribute( attributeName ) ) {
 
@@ -85,9 +91,9 @@ class AttributeNode extends Node {
 
 		} else {
 
-			console.warn( `AttributeNode: Attribute "${ attributeName }" not found.` );
+			console.warn( `AttributeNode: Vertex attribute "${ attributeName }" not found on geometry.` );
 
-			return builder.getConst( nodeType );
+			return builder.generateConst( nodeType );
 
 		}
 
@@ -99,4 +105,4 @@ export default AttributeNode;
 
 export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
 
-addNodeClass( AttributeNode );
+addNodeClass( 'AttributeNode', AttributeNode );

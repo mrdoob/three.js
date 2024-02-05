@@ -210,6 +210,12 @@ class Audio extends Object3D {
 
 	disconnect() {
 
+		if ( this._connected === false ) {
+
+			return;
+
+		}
+
 		if ( this.filters.length > 0 ) {
 
 			this.source.disconnect( this.filters[ 0 ] );
@@ -264,9 +270,7 @@ class Audio extends Object3D {
 
 		this.detune = value;
 
-		if ( this.source.detune === undefined ) return; // only set detune when available
-
-		if ( this.isPlaying === true ) {
+		if ( this.isPlaying === true && this.source.detune !== undefined ) {
 
 			this.source.detune.setTargetAtTime( this.detune, this.context.currentTime, 0.01 );
 

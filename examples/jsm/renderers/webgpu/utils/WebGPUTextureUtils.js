@@ -4,7 +4,7 @@ import {
 
 import {
 	CubeTexture, Texture,
-	NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter,
+	NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter,
 	RepeatWrapping, MirroredRepeatWrapping,
 	RGB_ETC2_Format, RGBA_ETC2_EAC_Format,
 	RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, SRGBColorSpace, DepthFormat, DepthStencilFormat,
@@ -13,9 +13,9 @@ import {
 	NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare
 } from 'three';
 
-import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
+import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping, DepthTexture } from 'three';
 
-import WebGPUTextureMipmapUtils from './WebGPUTextureMipmapUtils.js';
+import WebGPUTexturePassUtils from './WebGPUTexturePassUtils.js';
 
 const _compareToWebGPU = {
 	[ NeverCompare ]: 'never',
@@ -28,16 +28,23 @@ const _compareToWebGPU = {
 	[ NotEqualCompare ]: 'not-equal'
 };
 
+const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
+
 class WebGPUTextureUtils {
 
 	constructor( backend ) {
 
 		this.backend = backend;
 
-		this.mipmapUtils = null;
+		this._passUtils = null;
 
 		this.defaultTexture = null;
 		this.defaultCubeTexture = null;
+
+		this.colorBuffer = null;
+
+		this.depthTexture = new DepthTexture();
+		this.depthTexture.name = 'depthBuffer';
 
 	}
 
@@ -97,17 +104,39 @@ class WebGPUTextureUtils {
 
 		}
 
-		const { width, height, depth } = this._getSize( texture );
+		if ( options.needsMipmaps === undefined ) options.needsMipmaps = false;
+		if ( options.levels === undefined ) options.levels = 1;
+		if ( options.depth === undefined ) options.depth = 1;
 
-		const needsMipmaps = this._needsMipmaps( texture );
+		const { width, height, depth, levels } = options;
+
 		const dimension = this._getDimension( texture );
-		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
-		const format = texture.internalFormat || this._getFormat( texture );
+		const format = texture.internalFormat || getFormat( texture, backend.device );
 
-		const sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
+		let sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
+
+		if ( sampleCount > 1 ) {
+
+			// WebGPU only supports power-of-two sample counts and 2 is not a valid value
+			sampleCount = Math.pow( 2, Math.floor( Math.log2( sampleCount ) ) );
+
+			if ( sampleCount === 2 ) {
+
+				sampleCount = 4;
+
+			}
+
+		}
+
 		const primarySampleCount = texture.isRenderTargetTexture ? 1 : sampleCount;
 
 		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC;
+
+		if ( texture.isStorageTexture === true ) {
+
+			usage |= GPUTextureUsage.STORAGE_BINDING;
+
+		}
 
 		if ( texture.isCompressedTexture !== true ) {
 
@@ -122,7 +151,7 @@ class WebGPUTextureUtils {
 				height: height,
 				depthOrArrayLayers: depth,
 			},
-			mipLevelCount: mipLevelCount,
+			mipLevelCount: levels,
 			sampleCount: primarySampleCount,
 			dimension: dimension,
 			format: format,
@@ -170,7 +199,6 @@ class WebGPUTextureUtils {
 
 		textureData.initialized = true;
 
-		textureData.needsMipmaps = needsMipmaps;
 		textureData.textureDescriptorGPU = textureDescriptorGPU;
 
 	}
@@ -217,20 +245,97 @@ class WebGPUTextureUtils {
 
 	}
 
-	updateTexture( texture ) {
+	getColorBuffer() {
+
+		if ( this.colorBuffer ) this.colorBuffer.destroy();
+
+		const backend = this.backend;
+		const { width, height } = backend.getDrawingBufferSize();
+
+		this.colorBuffer = backend.device.createTexture( {
+			label: 'colorBuffer',
+			size: {
+				width: width,
+				height: height,
+				depthOrArrayLayers: 1
+			},
+			sampleCount: backend.parameters.sampleCount,
+			format: GPUTextureFormat.BGRA8Unorm,
+			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
+		} );
+
+		return this.colorBuffer;
+
+	}
+
+	getDepthBuffer( depth = true, stencil = true ) {
+
+		const backend = this.backend;
+		const { width, height } = backend.getDrawingBufferSize();
+
+		const depthTexture = this.depthTexture;
+		const depthTextureGPU = backend.get( depthTexture ).texture;
+
+		let format, type;
+
+		if ( stencil ) {
+
+			format = DepthStencilFormat;
+			type = UnsignedInt248Type;
+
+		} else if ( depth ) {
+
+			format = DepthFormat;
+			type = UnsignedIntType;
+
+		}
+
+		if ( depthTextureGPU !== undefined ) {
+
+			if ( depthTexture.image.width === width && depthTexture.image.height === height && depthTexture.format === format && depthTexture.type === type ) {
+
+				return depthTextureGPU;
+
+			}
+
+			this.destroyTexture( depthTexture );
+
+		}
+
+		depthTexture.name = 'depthBuffer';
+		depthTexture.format = format;
+		depthTexture.type = type;
+		depthTexture.image.width = width;
+		depthTexture.image.height = height;
+
+		this.createTexture( depthTexture, { sampleCount: backend.parameters.sampleCount, width, height } );
+
+		return backend.get( depthTexture ).texture;
+
+	}
+
+	updateTexture( texture, options ) {
 
 		const textureData = this.backend.get( texture );
 
-		const { needsMipmaps, textureDescriptorGPU } = textureData;
+		const { textureDescriptorGPU } = textureData;
 
-		if ( textureDescriptorGPU === undefined ) // unsupported texture format
+		if ( texture.isRenderTargetTexture || ( textureDescriptorGPU === undefined /* unsupported texture format */ ) )
 			return;
 
 		// transfer texture data
 
-		if ( texture.isDataTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
+		if ( texture.isDataTexture || texture.isData3DTexture ) {
 
-			this._copyBufferToTexture( texture.image, textureData.texture, textureDescriptorGPU, needsMipmaps );
+			this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, false );
+
+		} else if ( texture.isDataArrayTexture ) {
+
+			for ( let i = 0; i < options.image.depth; i ++ ) {
+
+				this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, i, false, i );
+
+			}
 
 		} else if ( texture.isCompressedTexture ) {
 
@@ -238,15 +343,7 @@ class WebGPUTextureUtils {
 
 		} else if ( texture.isCubeTexture ) {
 
-			if ( texture.image.length === 6 ) {
-
-				this._copyCubeMapToTexture( texture.image, texture, textureData.texture, textureDescriptorGPU, needsMipmaps );
-
-			}
-
-		} else if ( texture.isRenderTargetTexture ) {
-
-			if ( needsMipmaps === true ) this._generateMipmaps( textureData.texture, textureDescriptorGPU );
+			this._copyCubeMapToTexture( options.images, textureData.texture, textureDescriptorGPU, texture.flipY );
 
 		} else if ( texture.isVideoTexture ) {
 
@@ -254,13 +351,9 @@ class WebGPUTextureUtils {
 
 			textureData.externalTexture = video;
 
-		} else if ( texture.image !== null ) {
-
-			this._copyImageToTexture( texture.image, texture, textureData.texture, textureDescriptorGPU, needsMipmaps );
-
 		} else {
 
-			console.warn( 'WebGPUTextureUtils: Unable to update texture.' );
+			this._copyImageToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
 
 		}
 
@@ -281,6 +374,9 @@ class WebGPUTextureUtils {
 		const format = textureData.textureDescriptorGPU.format;
 		const bytesPerTexel = this._getBytesPerTexel( format );
 
+		let bytesPerRow = width * bytesPerTexel;
+		bytesPerRow = Math.ceil( bytesPerRow / 256 ) * 256; // Align to 256 bytes
+
 		const readBuffer = device.createBuffer(
 			{
 				size: width * height * bytesPerTexel,
@@ -297,7 +393,7 @@ class WebGPUTextureUtils {
 			},
 			{
 				buffer: readBuffer,
-				bytesPerRow: width * bytesPerTexel
+				bytesPerRow: bytesPerRow
 			},
 			{
 				width: width,
@@ -336,7 +432,7 @@ class WebGPUTextureUtils {
 			texture.minFilter = NearestFilter;
 			texture.magFilter = NearestFilter;
 
-			this.createTexture( texture );
+			this.createTexture( texture, { width: 1, height: 1 } );
 
 			this.defaultTexture = defaultTexture = texture;
 
@@ -356,7 +452,7 @@ class WebGPUTextureUtils {
 			texture.minFilter = NearestFilter;
 			texture.magFilter = NearestFilter;
 
-			this.createTexture( texture );
+			this.createTexture( texture, { width: 1, height: 1, depth: 6 } );
 
 			this.defaultCubeTexture = defaultCubeTexture = texture;
 
@@ -366,45 +462,21 @@ class WebGPUTextureUtils {
 
 	}
 
-	_copyImageToTexture( image, texture, textureGPU, textureDescriptorGPU, needsMipmaps, originDepth ) {
-
-		if ( this._isHTMLImage( image ) ) {
-
-			this._getImageBitmapFromHTML( image, texture ).then( imageBitmap => {
-
-				this._copyExternalImageToTexture( imageBitmap, textureGPU, textureDescriptorGPU, needsMipmaps, originDepth );
-
-			} );
-
-		} else {
-
-			// assume ImageBitmap
-
-			this._copyExternalImageToTexture( image, textureGPU, textureDescriptorGPU, needsMipmaps, originDepth );
-
-		}
-
-	}
-
-	_isHTMLImage( image ) {
-
-		return ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) || ( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement );
-
-	}
-
-	_copyCubeMapToTexture( images, texture, textureGPU, textureDescriptorGPU, needsMipmaps ) {
+	_copyCubeMapToTexture( images, textureGPU, textureDescriptorGPU, flipY ) {
 
 		for ( let i = 0; i < 6; i ++ ) {
 
 			const image = images[ i ];
 
+			const flipIndex = flipY === true ? _flipMap[ i ] : i;
+
 			if ( image.isDataTexture ) {
 
-				this._copyBufferToTexture( image.image, textureGPU, textureDescriptorGPU, needsMipmaps, i );
+				this._copyBufferToTexture( image.image, textureGPU, textureDescriptorGPU, flipIndex, flipY );
 
 			} else {
 
-				this._copyImageToTexture( image, texture, textureGPU, textureDescriptorGPU, needsMipmaps, i );
+				this._copyImageToTexture( image, textureGPU, textureDescriptorGPU, flipIndex, flipY );
 
 			}
 
@@ -412,7 +484,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	_copyExternalImageToTexture( image, textureGPU, textureDescriptorGPU, needsMipmaps, originDepth = 0 ) {
+	_copyImageToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY ) {
 
 		const device = this.backend.device;
 
@@ -430,37 +502,41 @@ class WebGPUTextureUtils {
 			}
 		);
 
-		if ( needsMipmaps ) this._generateMipmaps( textureGPU, textureDescriptorGPU, originDepth );
+		if ( flipY === true ) {
+
+			this._flipY( textureGPU, textureDescriptorGPU, originDepth );
+
+		}
+
+	}
+
+	_getPassUtils() {
+
+		let passUtils = this._passUtils;
+
+		if ( passUtils === null ) {
+
+			this._passUtils = passUtils = new WebGPUTexturePassUtils( this.backend.device );
+
+		}
+
+		return passUtils;
 
 	}
 
 	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0 ) {
 
-		if ( this.mipmapUtils === null ) {
-
-			this.mipmapUtils = new WebGPUTextureMipmapUtils( this.backend.device );
-
-		}
-
-		this.mipmapUtils.generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer );
+		this._getPassUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer );
 
 	}
 
-	_getImageBitmapFromHTML( image, texture ) {
+	_flipY( textureGPU, textureDescriptorGPU, originDepth = 0 ) {
 
-		const width = image.width;
-		const height = image.height;
-
-		const options = {};
-
-		options.imageOrientation = ( texture.flipY === true ) ? 'flipY' : 'none';
-		options.premultiplyAlpha = ( texture.premultiplyAlpha === true ) ? 'premultiply' : 'default';
-
-		return createImageBitmap( image, 0, 0, width, height, options );
+		this._getPassUtils().flipY( textureGPU, textureDescriptorGPU, originDepth );
 
 	}
 
-	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, needsMipmaps, originDepth = 0 ) {
+	_copyBufferToTexture( image, textureGPU, textureDescriptorGPU, originDepth, flipY, depth = 0 ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 		// @TODO: Consider to support valid buffer layouts with other formats like RGB
@@ -480,16 +556,20 @@ class WebGPUTextureUtils {
 			},
 			data,
 			{
-				offset: 0,
+				offset: image.width * image.height * bytesPerTexel * depth,
 				bytesPerRow
 			},
 			{
 				width: image.width,
 				height: image.height,
-				depthOrArrayLayers: ( image.depth !== undefined ) ? image.depth : 1
+				depthOrArrayLayers: 1
 			} );
 
-		if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureDescriptorGPU, originDepth );
+		if ( flipY === true ) {
+
+			this._flipY( textureGPU, textureDescriptorGPU, originDepth );
+
+		}
 
 	}
 
@@ -600,55 +680,59 @@ class WebGPUTextureUtils {
 
 	}
 
-	_getSize( texture ) {
-
-		const image = texture.image;
-
-		let width, height, depth;
-
-		if ( texture.isCubeTexture ) {
-
-			const faceImage = image.length > 0 ? image[ 0 ].image || image[ 0 ] : null;
-
-			width = faceImage ? faceImage.width : 1;
-			height = faceImage ? faceImage.height : 1;
-			depth = 6; // one image for each side of the cube map
-
-		} else if ( image !== null ) {
-
-			width = image.width;
-			height = image.height;
-			depth = ( image.depth !== undefined ) ? image.depth : 1;
-
-		} else {
-
-			width = height = depth = 1;
-
-		}
-
-		return { width, height, depth };
-
-	}
-
-	_needsMipmaps( texture ) {
-
-		if ( this._isEnvironmentTexture( texture ) ) return true;
-
-		return ( texture.isCompressedTexture !== true ) /*&& ( texture.generateMipmaps === true )*/ && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
-
-	}
-
 	_getBytesPerTexel( format ) {
 
-		if ( format === GPUTextureFormat.R8Unorm ) return 1;
-		if ( format === GPUTextureFormat.R16Float ) return 2;
-		if ( format === GPUTextureFormat.RG8Unorm ) return 2;
-		if ( format === GPUTextureFormat.RG16Float ) return 4;
-		if ( format === GPUTextureFormat.R32Float ) return 4;
-		if ( format === GPUTextureFormat.RGBA8Unorm || format === GPUTextureFormat.RGBA8UnormSRGB ) return 4;
-		if ( format === GPUTextureFormat.RG32Float ) return 8;
-		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
-		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
+		// 8-bit formats
+		if ( format === GPUTextureFormat.R8Unorm ||
+			format === GPUTextureFormat.R8Snorm ||
+			format === GPUTextureFormat.R8Uint ||
+			format === GPUTextureFormat.R8Sint ) return 1;
+
+		// 16-bit formats
+		if ( format === GPUTextureFormat.R16Uint ||
+			format === GPUTextureFormat.R16Sint ||
+			format === GPUTextureFormat.R16Float ||
+			format === GPUTextureFormat.RG8Unorm ||
+			format === GPUTextureFormat.RG8Snorm ||
+			format === GPUTextureFormat.RG8Uint ||
+			format === GPUTextureFormat.RG8Sint ) return 2;
+
+		// 32-bit formats
+		if ( format === GPUTextureFormat.R32Uint ||
+			format === GPUTextureFormat.R32Sint ||
+			format === GPUTextureFormat.R32Float ||
+			format === GPUTextureFormat.RG16Uint ||
+			format === GPUTextureFormat.RG16Sint ||
+			format === GPUTextureFormat.RG16Float ||
+			format === GPUTextureFormat.RGBA8Unorm ||
+			format === GPUTextureFormat.RGBA8UnormSRGB ||
+			format === GPUTextureFormat.RGBA8Snorm ||
+			format === GPUTextureFormat.RGBA8Uint ||
+			format === GPUTextureFormat.RGBA8Sint ||
+			format === GPUTextureFormat.BGRA8Unorm ||
+			format === GPUTextureFormat.BGRA8UnormSRGB ||
+			// Packed 32-bit formats
+			format === GPUTextureFormat.RGB9E5UFloat ||
+			format === GPUTextureFormat.RGB10A2Unorm ||
+			format === GPUTextureFormat.RG11B10UFloat ||
+			format === GPUTextureFormat.Depth32Float ||
+			format === GPUTextureFormat.Depth24Plus ||
+			format === GPUTextureFormat.Depth24PlusStencil8 ||
+			format === GPUTextureFormat.Depth32FloatStencil8 ) return 4;
+
+		// 64-bit formats
+		if ( format === GPUTextureFormat.RG32Uint ||
+			format === GPUTextureFormat.RG32Sint ||
+			format === GPUTextureFormat.RG32Float ||
+			format === GPUTextureFormat.RGBA16Uint ||
+			format === GPUTextureFormat.RGBA16Sint ||
+			format === GPUTextureFormat.RGBA16Float ) return 8;
+
+		// 128-bit formats
+		if ( format === GPUTextureFormat.RGBA32Uint ||
+			format === GPUTextureFormat.RGBA32Sint ||
+			format === GPUTextureFormat.RGBA32Float ) return 16;
+
 
 	}
 
@@ -674,6 +758,9 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.RG16Sint ) return Int16Array;
 		if ( format === GPUTextureFormat.RGBA16Uint ) return Uint16Array;
 		if ( format === GPUTextureFormat.RGBA16Sint ) return Int16Array;
+		if ( format === GPUTextureFormat.R16Float ) return Float32Array;
+		if ( format === GPUTextureFormat.RG16Float ) return Float32Array;
+		if ( format === GPUTextureFormat.RGBA16Float ) return Float32Array;
 
 
 		if ( format === GPUTextureFormat.R32Uint ) return Uint32Array;
@@ -685,6 +772,17 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.RGBA32Uint ) return Uint32Array;
 		if ( format === GPUTextureFormat.RGBA32Sint ) return Int32Array;
 		if ( format === GPUTextureFormat.RGBA32Float ) return Float32Array;
+
+		if ( format === GPUTextureFormat.BGRA8Unorm ) return Uint8Array;
+		if ( format === GPUTextureFormat.BGRA8UnormSRGB ) return Uint8Array;
+		if ( format === GPUTextureFormat.RGB10A2Unorm ) return Uint32Array;
+		if ( format === GPUTextureFormat.RGB9E5UFloat ) return Uint32Array;
+		if ( format === GPUTextureFormat.RG11B10UFloat ) return Uint32Array;
+
+		if ( format === GPUTextureFormat.Depth32Float ) return Float32Array;
+		if ( format === GPUTextureFormat.Depth24Plus ) return Uint32Array;
+		if ( format === GPUTextureFormat.Depth24PlusStencil8 ) return Uint32Array;
+		if ( format === GPUTextureFormat.Depth32FloatStencil8 ) return Float32Array;
 
 	}
 
@@ -706,258 +804,236 @@ class WebGPUTextureUtils {
 
 	}
 
-	_getMipLevelCount( texture, width, height, needsMipmaps ) {
+}
 
-		let mipLevelCount;
+export function getFormat( texture, device = null ) {
 
-		if ( texture.isCompressedTexture ) {
+	const format = texture.format;
+	const type = texture.type;
+	const colorSpace = texture.colorSpace;
 
-			mipLevelCount = texture.mipmaps.length;
+	let formatGPU;
 
-		} else if ( needsMipmaps ) {
+	if ( texture.isFramebufferTexture === true && texture.type === UnsignedByteType ) {
 
-			mipLevelCount = Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
+		formatGPU = GPUTextureFormat.BGRA8Unorm;
 
-		} else {
+	} else if ( texture.isCompressedTexture === true ) {
 
-			mipLevelCount = 1; // a texture without mipmaps has a base mip (mipLevel 0)
+		switch ( format ) {
+
+			case RGBA_S3TC_DXT1_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.BC1RGBAUnormSRGB : GPUTextureFormat.BC1RGBAUnorm;
+				break;
+
+			case RGBA_S3TC_DXT3_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.BC2RGBAUnormSRGB : GPUTextureFormat.BC2RGBAUnorm;
+				break;
+
+			case RGBA_S3TC_DXT5_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm;
+				break;
+
+			case RGB_ETC2_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ETC2RGB8UnormSRGB : GPUTextureFormat.ETC2RGB8Unorm;
+				break;
+
+			case RGBA_ETC2_EAC_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ETC2RGBA8UnormSRGB : GPUTextureFormat.ETC2RGBA8Unorm;
+				break;
+
+			case RGBA_ASTC_4x4_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC4x4UnormSRGB : GPUTextureFormat.ASTC4x4Unorm;
+				break;
+
+			case RGBA_ASTC_5x4_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC5x4UnormSRGB : GPUTextureFormat.ASTC5x4Unorm;
+				break;
+
+			case RGBA_ASTC_5x5_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC5x5UnormSRGB : GPUTextureFormat.ASTC5x5Unorm;
+				break;
+
+			case RGBA_ASTC_6x5_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC6x5UnormSRGB : GPUTextureFormat.ASTC6x5Unorm;
+				break;
+
+			case RGBA_ASTC_6x6_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC6x6UnormSRGB : GPUTextureFormat.ASTC6x6Unorm;
+				break;
+
+			case RGBA_ASTC_8x5_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC8x5UnormSRGB : GPUTextureFormat.ASTC8x5Unorm;
+				break;
+
+			case RGBA_ASTC_8x6_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC8x6UnormSRGB : GPUTextureFormat.ASTC8x6Unorm;
+				break;
+
+			case RGBA_ASTC_8x8_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC8x8UnormSRGB : GPUTextureFormat.ASTC8x8Unorm;
+				break;
+
+			case RGBA_ASTC_10x5_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC10x5UnormSRGB : GPUTextureFormat.ASTC10x5Unorm;
+				break;
+
+			case RGBA_ASTC_10x6_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC10x6UnormSRGB : GPUTextureFormat.ASTC10x6Unorm;
+				break;
+
+			case RGBA_ASTC_10x8_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC10x8UnormSRGB : GPUTextureFormat.ASTC10x8Unorm;
+				break;
+
+			case RGBA_ASTC_10x10_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC10x10UnormSRGB : GPUTextureFormat.ASTC10x10Unorm;
+				break;
+
+			case RGBA_ASTC_12x10_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC12x10UnormSRGB : GPUTextureFormat.ASTC12x10Unorm;
+				break;
+
+			case RGBA_ASTC_12x12_Format:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC12x12UnormSRGB : GPUTextureFormat.ASTC12x12Unorm;
+				break;
+
+			default:
+				console.error( 'WebGPURenderer: Unsupported texture format.', format );
 
 		}
 
-		return mipLevelCount;
+	} else {
 
-	}
+		switch ( format ) {
 
-	_getFormat( texture ) {
+			case RGBAFormat:
 
-		const format = texture.format;
-		const type = texture.type;
-		const colorSpace = texture.colorSpace;
+				switch ( type ) {
 
-		let formatGPU;
+					case UnsignedByteType:
+						formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm;
+						break;
 
-		if ( /*texture.isRenderTargetTexture === true ||*/ texture.isFramebufferTexture === true ) {
+					case HalfFloatType:
+						formatGPU = GPUTextureFormat.RGBA16Float;
+						break;
 
-			formatGPU = GPUTextureFormat.BGRA8Unorm;
+					case FloatType:
+						formatGPU = GPUTextureFormat.RGBA32Float;
+						break;
 
-		} else if ( texture.isCompressedTexture === true ) {
+					default:
+						console.error( 'WebGPURenderer: Unsupported texture type with RGBAFormat.', type );
 
-			switch ( format ) {
+				}
 
-				case RGBA_S3TC_DXT1_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.BC1RGBAUnormSRGB : GPUTextureFormat.BC1RGBAUnorm;
-					break;
+				break;
 
-				case RGBA_S3TC_DXT3_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.BC2RGBAUnormSRGB : GPUTextureFormat.BC2RGBAUnorm;
-					break;
+			case RedFormat:
 
-				case RGBA_S3TC_DXT5_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm;
-					break;
+				switch ( type ) {
 
-				case RGB_ETC2_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ETC2RGB8UnormSRGB : GPUTextureFormat.ETC2RGB8Unorm;
-					break;
+					case UnsignedByteType:
+						formatGPU = GPUTextureFormat.R8Unorm;
+						break;
 
-				case RGBA_ETC2_EAC_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ETC2RGBA8UnormSRGB : GPUTextureFormat.ETC2RGBA8Unorm;
-					break;
+					case HalfFloatType:
+						formatGPU = GPUTextureFormat.R16Float;
+						break;
 
-				case RGBA_ASTC_4x4_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC4x4UnormSRGB : GPUTextureFormat.ASTC4x4Unorm;
-					break;
+					case FloatType:
+						formatGPU = GPUTextureFormat.R32Float;
+						break;
 
-				case RGBA_ASTC_5x4_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC5x4UnormSRGB : GPUTextureFormat.ASTC5x4Unorm;
-					break;
+					default:
+						console.error( 'WebGPURenderer: Unsupported texture type with RedFormat.', type );
 
-				case RGBA_ASTC_5x5_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC5x5UnormSRGB : GPUTextureFormat.ASTC5x5Unorm;
-					break;
+				}
 
-				case RGBA_ASTC_6x5_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC6x5UnormSRGB : GPUTextureFormat.ASTC6x5Unorm;
-					break;
+				break;
 
-				case RGBA_ASTC_6x6_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC6x6UnormSRGB : GPUTextureFormat.ASTC6x6Unorm;
-					break;
+			case RGFormat:
 
-				case RGBA_ASTC_8x5_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC8x5UnormSRGB : GPUTextureFormat.ASTC8x5Unorm;
-					break;
+				switch ( type ) {
 
-				case RGBA_ASTC_8x6_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC8x6UnormSRGB : GPUTextureFormat.ASTC8x6Unorm;
-					break;
+					case UnsignedByteType:
+						formatGPU = GPUTextureFormat.RG8Unorm;
+						break;
 
-				case RGBA_ASTC_8x8_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC8x8UnormSRGB : GPUTextureFormat.ASTC8x8Unorm;
-					break;
+					case HalfFloatType:
+						formatGPU = GPUTextureFormat.RG16Float;
+						break;
 
-				case RGBA_ASTC_10x5_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC10x5UnormSRGB : GPUTextureFormat.ASTC10x5Unorm;
-					break;
+					case FloatType:
+						formatGPU = GPUTextureFormat.RG32Float;
+						break;
 
-				case RGBA_ASTC_10x6_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC10x6UnormSRGB : GPUTextureFormat.ASTC10x6Unorm;
-					break;
+					default:
+						console.error( 'WebGPURenderer: Unsupported texture type with RGFormat.', type );
 
-				case RGBA_ASTC_10x8_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC10x8UnormSRGB : GPUTextureFormat.ASTC10x8Unorm;
-					break;
+				}
 
-				case RGBA_ASTC_10x10_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC10x10UnormSRGB : GPUTextureFormat.ASTC10x10Unorm;
-					break;
+				break;
 
-				case RGBA_ASTC_12x10_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC12x10UnormSRGB : GPUTextureFormat.ASTC12x10Unorm;
-					break;
+			case DepthFormat:
 
-				case RGBA_ASTC_12x12_Format:
-					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC12x12UnormSRGB : GPUTextureFormat.ASTC12x12Unorm;
-					break;
+				switch ( type ) {
 
-				default:
-					console.error( 'WebGPURenderer: Unsupported texture format.', format );
+					case UnsignedShortType:
+						formatGPU = GPUTextureFormat.Depth16Unorm;
+						break;
 
-			}
+					case UnsignedIntType:
+						formatGPU = GPUTextureFormat.Depth24Plus;
+						break;
 
-		} else {
+					case FloatType:
+						formatGPU = GPUTextureFormat.Depth32Float;
+						break;
 
-			switch ( format ) {
+					default:
+						console.error( 'WebGPURenderer: Unsupported texture type with DepthFormat.', type );
 
-				case RGBAFormat:
+				}
 
-					switch ( type ) {
+				break;
 
-						case UnsignedByteType:
-							formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm;
-							break;
+			case DepthStencilFormat:
 
-						case HalfFloatType:
-							formatGPU = GPUTextureFormat.RGBA16Float;
-							break;
+				switch ( type ) {
 
-						case FloatType:
-							formatGPU = GPUTextureFormat.RGBA32Float;
-							break;
+					case UnsignedInt248Type:
+						formatGPU = GPUTextureFormat.Depth24PlusStencil8;
+						break;
 
-						default:
-							console.error( 'WebGPURenderer: Unsupported texture type with RGBAFormat.', type );
+					case FloatType:
 
-					}
+						if ( device && device.features.has( GPUFeatureName.Depth32FloatStencil8 ) === false ) {
 
-					break;
+							console.error( 'WebGPURenderer: Depth textures with DepthStencilFormat + FloatType can only be used with the "depth32float-stencil8" GPU feature.' );
 
-				case RedFormat:
+						}
 
-					switch ( type ) {
+						formatGPU = GPUTextureFormat.Depth32FloatStencil8;
 
-						case UnsignedByteType:
-							formatGPU = GPUTextureFormat.R8Unorm;
-							break;
+						break;
 
-						case HalfFloatType:
-							formatGPU = GPUTextureFormat.R16Float;
-							break;
+					default:
+						console.error( 'WebGPURenderer: Unsupported texture type with DepthStencilFormat.', type );
 
-						case FloatType:
-							formatGPU = GPUTextureFormat.R32Float;
-							break;
+				}
 
-						default:
-							console.error( 'WebGPURenderer: Unsupported texture type with RedFormat.', type );
+				break;
 
-					}
-
-					break;
-
-				case RGFormat:
-
-					switch ( type ) {
-
-						case UnsignedByteType:
-							formatGPU = GPUTextureFormat.RG8Unorm;
-							break;
-
-						case HalfFloatType:
-							formatGPU = GPUTextureFormat.RG16Float;
-							break;
-
-						case FloatType:
-							formatGPU = GPUTextureFormat.RG32Float;
-							break;
-
-						default:
-							console.error( 'WebGPURenderer: Unsupported texture type with RGFormat.', type );
-
-					}
-
-					break;
-
-				case DepthFormat:
-
-					switch ( type ) {
-
-						case UnsignedShortType:
-							formatGPU = GPUTextureFormat.Depth16Unorm;
-							break;
-
-						case UnsignedIntType:
-							formatGPU = GPUTextureFormat.Depth24Plus;
-							break;
-
-						case FloatType:
-							formatGPU = GPUTextureFormat.Depth32Float;
-							break;
-
-						default:
-							console.error( 'WebGPURenderer: Unsupported texture type with DepthFormat.', type );
-
-					}
-
-					break;
-
-				case DepthStencilFormat:
-
-					switch ( type ) {
-
-						case UnsignedInt248Type:
-							formatGPU = GPUTextureFormat.Depth24PlusStencil8;
-							break;
-
-						case FloatType:
-
-							if ( this.device.features.has( GPUFeatureName.Depth32FloatStencil8 ) === false ) {
-
-								console.error( 'WebGPURenderer: Depth textures with DepthStencilFormat + FloatType can only be used with the "depth32float-stencil8" GPU feature.' );
-
-							}
-
-							formatGPU = GPUTextureFormat.Depth32FloatStencil8;
-
-							break;
-
-						default:
-							console.error( 'WebGPURenderer: Unsupported texture type with DepthStencilFormat.', type );
-
-					}
-
-					break;
-
-				default:
-					console.error( 'WebGPURenderer: Unsupported texture format.', format );
-
-			}
+			default:
+				console.error( 'WebGPURenderer: Unsupported texture format.', format );
 
 		}
 
-		return formatGPU;
-
 	}
+
+	return formatGPU;
 
 }
 

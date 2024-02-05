@@ -24,14 +24,21 @@
 
 <h2>属性(Properties)</h2>
 
+<h3>[property:Boolean alphaHash]</h3>
+<p>
+启用alphaHash透明度，这是[page:.transparent]或[page:.alphaTest]的替代方案。如果不透明度低于随机阈值，则不会渲染材质。随机化会引入一些颗粒或噪点，但相较于传统的Alpha blend方式，避免了透明度引起的深度排序问题。使用TAARenderPass可以有效减少噪点。
+</p>
+
 <h3>[property:Float alphaTest]</h3>
 <p>设置运行alphaTest时要使用的alpha值。如果不透明度低于此值，则不会渲染材质。默认值为*0*。
 </p>
 
 <h3>[property:Boolean alphaToCoverage]</h3>
 <p>
-启用alpha to coverage. 只能在开启了MSAA的渲染环境中使用 (当渲染器创建的时候*antialias* 属性要*true*才能使用).
-默认为 *false*.
+	Enables alpha to coverage. Can only be used with MSAA-enabled contexts
+	(meaning when the renderer was created with *antialias* parameter set to
+	`true`). Enabling this will smooth aliasing on clip plane edges and alphaTest-clipped edges.
+	Default is `false`.
 </p>
 
 <h3>[property:Integer blendDst]</h3>

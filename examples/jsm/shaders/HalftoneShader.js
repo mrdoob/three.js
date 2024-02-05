@@ -7,6 +7,8 @@
 
 const HalftoneShader = {
 
+	name: 'HalftoneShader',
+
 	uniforms: {
 		'tDiffuse': { value: null },
 		'shape': { value: 1 },

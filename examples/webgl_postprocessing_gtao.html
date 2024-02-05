@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing - GTAO</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #ffffff;
+				color: #000;
+			}
+			a {
+				color: #2983ff;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Ground Truth Ambient Occlusion (GTAO) by <a href="https://github.com/Rabbid76" target="_blank" rel="noopener">Rabbid76</a><br/>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+			let camera, scene, renderer, composer, controls, clock, stats, mixer;
+
+			init();
+			animate();
+
+			function init() {
+
+				const dracoLoader = new DRACOLoader();
+				dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
+				dracoLoader.setDecoderConfig( { type: 'js' } );
+				const loader = new GLTFLoader();
+				loader.setDRACOLoader( dracoLoader );
+				loader.setPath( 'models/gltf/' );
+
+				clock = new THREE.Clock();
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xbfe3dd );
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment( renderer ), 0.04 ).texture;
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+				camera.position.set( 5, 2, 8 );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0.5, 0 );
+				controls.update();
+				controls.enablePan = false;
+				controls.enableDamping = true;
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				composer = new EffectComposer( renderer );
+
+				const renderPass = new RenderPass( scene, camera );
+				composer.addPass( renderPass );
+
+				const gtaoPass = new GTAOPass( scene, camera, width, height );
+				gtaoPass.output = GTAOPass.OUTPUT.Denoise;
+				composer.addPass( gtaoPass );
+
+				const outputPass = new OutputPass();
+				composer.addPass( outputPass );
+
+				//
+
+				loader.load( 'LittlestTokyo.glb', ( gltf ) => {
+
+					const model = gltf.scene;
+					model.position.set( 1, 1, 0 );
+					model.scale.set( 0.01, 0.01, 0.01 );
+					scene.add( model );
+
+					mixer = new THREE.AnimationMixer( model );
+					mixer.clipAction( gltf.animations[ 0 ] ).play();
+
+					const box = new THREE.Box3().setFromObject( scene );
+					gtaoPass.setSceneClipBox( box );
+
+				}, undefined, ( e ) => console.error( e ) );
+
+				// Init gui
+				const gui = new GUI();
+
+				gui.add( gtaoPass, 'output', {
+					'Default': GTAOPass.OUTPUT.Default,
+					'Diffuse': GTAOPass.OUTPUT.Diffuse,
+					'AO Only': GTAOPass.OUTPUT.AO,
+					'AO Only + Denoise': GTAOPass.OUTPUT.Denoise,
+					'Depth': GTAOPass.OUTPUT.Depth,
+					'Normal': GTAOPass.OUTPUT.Normal
+				} ).onChange( function ( value ) {
+
+					gtaoPass.output = value;
+
+				} );
+
+				const aoParameters = {
+					radius: 0.25,
+					distanceExponent: 1.,
+					thickness: 1.,
+					scale: 1.,
+					samples: 16,
+					distanceFallOff: 1.,
+					screenSpaceRadius: false,
+				};
+				const pdParameters = {
+					lumaPhi: 10.,
+					depthPhi: 2.,
+					normalPhi: 3.,
+					radius: 4.,
+					radiusExponent: 1.,
+					rings: 2.,
+					samples: 16,
+				};
+				gtaoPass.updateGtaoMaterial( aoParameters );
+				gtaoPass.updatePdMaterial( pdParameters );
+				gui.add( gtaoPass, 'blendIntensity' ).min( 0 ).max( 1 ).step( 0.01 );
+				gui.add( aoParameters, 'radius' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
+				gui.add( aoParameters, 'distanceExponent' ).min( 1 ).max( 4 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
+				gui.add( aoParameters, 'thickness' ).min( 0.01 ).max( 10 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
+				gui.add( aoParameters, 'distanceFallOff' ).min( 0 ).max( 1 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
+				gui.add( aoParameters, 'scale' ).min( 0.01 ).max( 2.0 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
+				gui.add( aoParameters, 'samples' ).min( 2 ).max( 32 ).step( 1 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
+				gui.add( aoParameters, 'screenSpaceRadius' ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
+				gui.add( pdParameters, 'lumaPhi' ).min( 0 ).max( 20 ).step( 0.01 ).onChange( () => gtaoPass.updatePdMaterial( pdParameters ) );
+				gui.add( pdParameters, 'depthPhi' ).min( 0.01 ).max( 20 ).step( 0.01 ).onChange( () => gtaoPass.updatePdMaterial( pdParameters ) );
+				gui.add( pdParameters, 'normalPhi' ).min( 0.01 ).max( 20 ).step( 0.01 ).onChange( () => gtaoPass.updatePdMaterial( pdParameters ) );
+				gui.add( pdParameters, 'radius' ).min( 0 ).max( 32 ).step( 1 ).onChange( () => gtaoPass.updatePdMaterial( pdParameters ) );
+				gui.add( pdParameters, 'radiusExponent' ).min( 0.1 ).max( 4. ).step( 0.1 ).onChange( () => gtaoPass.updatePdMaterial( pdParameters ) );
+				gui.add( pdParameters, 'rings' ).min( 1 ).max( 16 ).step( 0.125 ).onChange( () => gtaoPass.updatePdMaterial( pdParameters ) );
+				gui.add( pdParameters, 'samples' ).min( 2 ).max( 32 ).step( 1 ).onChange( () => gtaoPass.updatePdMaterial( pdParameters ) );
+			
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				composer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				const delta = clock.getDelta();
+
+				if ( mixer ) {
+
+					mixer.update( delta );
+
+				}
+
+				controls.update();
+
+				stats.begin();
+				composer.render();
+				stats.end();
+
+			}
+
+		</script>
+	</body>
+</html>

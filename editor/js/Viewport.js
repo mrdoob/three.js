@@ -6,8 +6,7 @@ import { UIPanel } from './libs/ui.js';
 
 import { EditorControls } from './EditorControls.js';
 
-import { ViewportCamera } from './Viewport.Camera.js';
-import { ViewportShading } from './Viewport.Shading.js';
+import { ViewportControls } from './Viewport.Controls.js';
 import { ViewportInfo } from './Viewport.Info.js';
 
 import { ViewHelper } from './Viewport.ViewHelper.js';
@@ -18,6 +17,7 @@ import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { ViewportPathtracer } from './Viewport.Pathtracer.js';
 
 function Viewport( editor ) {
 
@@ -27,24 +27,22 @@ function Viewport( editor ) {
 	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
 
-	container.add( new ViewportCamera( editor ) );
-	container.add( new ViewportShading( editor ) );
+	container.add( new ViewportControls( editor ) );
 	container.add( new ViewportInfo( editor ) );
 
 	//
 
 	let renderer = null;
 	let pmremGenerator = null;
+	let pathtracer = null;
 
 	const camera = editor.camera;
 	const scene = editor.scene;
 	const sceneHelpers = editor.sceneHelpers;
-	let showSceneHelpers = true;
 
 	// helpers
 
 	const grid = new THREE.Group();
-	sceneHelpers.add( grid );
 
 	const grid1 = new THREE.GridHelper( 30, 30, 0x888888 );
 	grid1.material.color.setHex( 0x888888 );
@@ -94,7 +92,7 @@ function Viewport( editor ) {
 
 		}
 
-		render();
+		render( true );
 
 	} );
 	transformControls.addEventListener( 'mouseDown', function () {
@@ -304,6 +302,8 @@ function Viewport( editor ) {
 	signals.editorCleared.add( function () {
 
 		controls.center.set( 0, 0, 0 );
+		pathtracer.reset();
+
 		render();
 
 	} );
@@ -382,9 +382,17 @@ function Viewport( editor ) {
 		pmremGenerator = new THREE.PMREMGenerator( renderer );
 		pmremGenerator.compileEquirectangularShader();
 
+		pathtracer = new ViewportPathtracer( renderer );
+
 		container.dom.appendChild( renderer.domElement );
 
 		render();
+
+	} );
+
+	signals.rendererDetectKTX2Support.add( function ( ktx2Loader ) {
+
+		ktx2Loader.detectSupport( renderer );
 
 	} );
 
@@ -395,6 +403,8 @@ function Viewport( editor ) {
 	} );
 
 	signals.cameraChanged.add( function () {
+
+		pathtracer.reset();
 
 		render();
 
@@ -639,7 +649,11 @@ function Viewport( editor ) {
 
 		switch ( viewportShading ) {
 
-			case 'default':
+			case 'realistic':
+				pathtracer.init( scene, camera );
+				break;
+
+			case 'solid':
 				scene.overrideMaterial = null;
 				break;
 
@@ -666,24 +680,26 @@ function Viewport( editor ) {
 		updateAspectRatio();
 
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+		pathtracer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		render();
 
 	} );
 
-	signals.showGridChanged.add( function ( showGrid ) {
+	signals.showGridChanged.add( function ( value ) {
 
-		grid.visible = showGrid;
+		grid.visible = value;
+
 		render();
 
 	} );
 
-	signals.showHelpersChanged.add( function ( showHelpers ) {
+	signals.showHelpersChanged.add( function ( value ) {
 
-		showSceneHelpers = showHelpers;
-		transformControls.enabled = showHelpers;
+		sceneHelpers.visible = value;
+		transformControls.enabled = value;
 
-		render();
+		render( true );
 
 	} );
 
@@ -713,6 +729,13 @@ function Viewport( editor ) {
 			mixer.update( delta );
 			needsUpdate = true;
 
+			if ( editor.selected !== null ) {
+
+				editor.selected.updateWorldMatrix( false, true ); // avoid frame late effect for certain skinned meshes (e.g. Michelle.glb)
+				selectionBox.box.setFromObject( editor.selected, true ); // selection box should reflect current animation state
+
+			}
+
 		}
 
 		// View Helper
@@ -732,6 +755,12 @@ function Viewport( editor ) {
 
 		if ( needsUpdate === true ) render();
 
+		if ( editor.viewportShading === 'realistic' ) {
+
+			pathtracer.update();
+
+		}
+
 	}
 
 	//
@@ -739,7 +768,13 @@ function Viewport( editor ) {
 	let startTime = 0;
 	let endTime = 0;
 
-	function render() {
+	function render( isHelper = false ) {
+
+		if ( editor.viewportShading === 'realistic' && isHelper === false ) {
+
+			pathtracer.init( scene, camera );
+
+		}
 
 		startTime = performance.now();
 
@@ -749,7 +784,8 @@ function Viewport( editor ) {
 		if ( camera === editor.viewportCamera ) {
 
 			renderer.autoClear = false;
-			if ( showSceneHelpers === true ) renderer.render( sceneHelpers, camera );
+			if ( grid.visible === true ) renderer.render( grid, camera );
+			if ( sceneHelpers.visible === true ) renderer.render( sceneHelpers, camera );
 			if ( vr.currentSession === null ) viewHelper.render( renderer );
 			renderer.autoClear = true;
 

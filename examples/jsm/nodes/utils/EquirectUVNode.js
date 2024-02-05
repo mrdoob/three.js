@@ -13,7 +13,7 @@ class EquirectUVNode extends TempNode {
 
 	}
 
-	construct() {
+	setup() {
 
 		const dir = this.dirNode;
 
@@ -30,4 +30,4 @@ export default EquirectUVNode;
 
 export const equirectUV = nodeProxy( EquirectUVNode );
 
-addNodeClass( EquirectUVNode );
+addNodeClass( 'EquirectUVNode', EquirectUVNode );

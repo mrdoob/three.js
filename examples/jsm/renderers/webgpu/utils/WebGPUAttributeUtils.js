@@ -42,7 +42,15 @@ class WebGPUAttributeUtils {
 
 			const device = backend.device;
 
-			const array = bufferAttribute.array;
+			let array = bufferAttribute.array;
+
+			if ( bufferAttribute.isStorageBufferAttribute && bufferAttribute.itemSize === 3 ) {
+
+				bufferAttribute.itemSize = 4;
+				array = new array.constructor( bufferAttribute.count * 4 );
+
+			}
+
 			const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
 
 			buffer = device.createBuffer( {
@@ -72,9 +80,9 @@ class WebGPUAttributeUtils {
 		const buffer = backend.get( bufferAttribute ).buffer;
 
 		const array = bufferAttribute.array;
-		const updateRange = bufferAttribute.updateRange;
+		const updateRanges = bufferAttribute.updateRanges;
 
-		if ( updateRange.count === - 1 ) {
+		if ( updateRanges.length === 0 ) {
 
 			// Not using update ranges
 
@@ -87,15 +95,20 @@ class WebGPUAttributeUtils {
 
 		} else {
 
-			device.queue.writeBuffer(
-				buffer,
-				0,
-				array,
-				updateRange.offset * array.BYTES_PER_ELEMENT,
-				updateRange.count * array.BYTES_PER_ELEMENT
-			);
+			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
-			updateRange.count = - 1; // reset range
+				const range = updateRanges[ i ];
+				device.queue.writeBuffer(
+					buffer,
+					0,
+					array,
+					range.start * array.BYTES_PER_ELEMENT,
+					range.count * array.BYTES_PER_ELEMENT
+				);
+
+			}
+
+			bufferAttribute.clearUpdateRanges();
 
 		}
 

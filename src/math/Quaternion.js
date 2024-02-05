@@ -198,7 +198,7 @@ class Quaternion {
 
 	}
 
-	setFromEuler( euler, update ) {
+	setFromEuler( euler, update = true ) {
 
 		const x = euler._x, y = euler._y, z = euler._z, order = euler._order;
 
@@ -266,7 +266,7 @@ class Quaternion {
 
 		}
 
-		if ( update !== false ) this._onChangeCallback();
+		if ( update === true ) this._onChangeCallback();
 
 		return this;
 
@@ -561,8 +561,7 @@ class Quaternion {
 			this._y = s * y + t * this._y;
 			this._z = s * z + t * this._z;
 
-			this.normalize();
-			this._onChangeCallback();
+			this.normalize(); // normalize calls _onChangeCallback()
 
 			return this;
 
@@ -649,6 +648,8 @@ class Quaternion {
 		this._y = attribute.getY( index );
 		this._z = attribute.getZ( index );
 		this._w = attribute.getW( index );
+
+		this._onChangeCallback();
 
 		return this;
 

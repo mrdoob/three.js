@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -408,8 +404,8 @@ loadCountryData();
 </pre>
 <p>Now let's use that data to generate and place the labels.</p>
 <p>In the article on <a href="optimize-lots-of-objects.html">optimizing lots of objects</a>
-we had setup a small scene graph of helper objects to make it easy to 
-compute latitude and longitude positions on our globe. See that article 
+we had setup a small scene graph of helper objects to make it easy to
+compute latitude and longitude positions on our globe. See that article
 for an explanation of how they work.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const lonFudge = Math.PI * 1.5;
 const latFudge = Math.PI;
@@ -720,7 +716,7 @@ elements with your 3D. A few things I might change.</p>
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

@@ -99,16 +99,16 @@
 			the attribute array data to the GPU.
 		</p>
 
-		<h3>[property:Object updateRange]</h3>
+		<h3>[property:Object updateRanges]</h3>
 		<p>
-			Object containing:<br />
-			[page:Integer offset]: Default is `0`. Position at which to start
+			Array of objects containing:<br />
+			[page:Integer start]: Position at which to start
 			update.<br />
-			[page:Integer count]: Default is `-1`, which means don't use update
-			ranges. <br /><br />
+			[page:Integer count]: The number of components to update. <br /><br />
 
 			This can be used to only update some components of stored vectors (for
-			example, just the component related to color).
+			example, just the component related to color). Use the [page:BufferAttribute.addUpdateRange addUpdateRange]
+			function to add ranges to this array.
 		</p>
 
 		<h3>[property:Usage usage]</h3>
@@ -153,6 +153,18 @@
 		<p>
 			Applies matrix [page:Matrix4 m] to every Vector3 element of this
 			BufferAttribute, interpreting the elements as a direction vectors.
+		</p>
+
+		<h3>[method:this addUpdateRange]( [param:Integer start], [param:Integer count] )</h3>
+		<p>
+			Adds a range of data in the data array to be updated on the GPU. Adds an
+			object describing the range to the [page:BufferAttribute.updateRanges updateRanges]
+			array.
+		</p>
+
+		<h3>[method:this clearUpdateRanges]()</h3>
+		<p>
+			Clears the [page:BufferAttribute.updateRanges updateRanges] array.
 		</p>
 
 		<h3>[method:BufferAttribute clone]()</h3>

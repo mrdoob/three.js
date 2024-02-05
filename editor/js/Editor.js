@@ -44,6 +44,7 @@ function Editor() {
 		spaceChanged: new Signal(),
 		rendererCreated: new Signal(),
 		rendererUpdated: new Signal(),
+		rendererDetectKTX2Support: new Signal(),
 
 		sceneBackgroundChanged: new Signal(),
 		sceneEnvironmentChanged: new Signal(),
@@ -83,6 +84,7 @@ function Editor() {
 		showGridChanged: new Signal(),
 		showHelpersChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
+		refreshSidebarEnvironment: new Signal(),
 		historyChanged: new Signal(),
 
 		viewportCameraChanged: new Signal(),
@@ -431,7 +433,7 @@ Editor.prototype = {
 
 					helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
 
-				} else if ( object.isBone === true && object.parent?.isBone !== true ) {
+				} else if ( object.isBone === true && object.parent && object.parent.isBone !== true ) {
 
 					helper = new THREE.SkeletonHelper( object );
 
@@ -540,7 +542,7 @@ Editor.prototype = {
 
 	},
 
-	setViewportShading: function( value ) {
+	setViewportShading: function ( value ) {
 
 		this.viewportShading = value;
 		this.signals.viewportShadingChanged.dispatch();
@@ -622,11 +624,15 @@ Editor.prototype = {
 
 		var objects = this.scene.children;
 
+		this.signals.sceneGraphChanged.active = false;
+
 		while ( objects.length > 0 ) {
 
 			this.removeObject( objects[ 0 ] );
 
 		}
+
+		this.signals.sceneGraphChanged.active = true;
 
 		this.geometries = {};
 		this.materials = {};
@@ -659,6 +665,13 @@ Editor.prototype = {
 
 		this.setScene( await loader.parseAsync( json.scene ) );
 
+		if ( json.environment === 'ModelViewer' ) {
+
+			this.signals.sceneEnvironmentChanged.dispatch( json.environment );
+			this.signals.refreshSidebarEnvironment.dispatch();
+
+		}
+
 	},
 
 	toJSON: function () {
@@ -680,6 +693,16 @@ Editor.prototype = {
 
 		}
 
+		// honor modelviewer environment
+
+		let environment = null;
+
+		if ( this.scene.environment !== null && this.scene.environment.isRenderTargetTexture === true ) {
+
+			environment = 'ModelViewer';
+
+		}
+
 		//
 
 		return {
@@ -695,7 +718,8 @@ Editor.prototype = {
 			camera: this.viewportCamera.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
-			history: this.history.toJSON()
+			history: this.history.toJSON(),
+			environment: environment
 
 		};
 

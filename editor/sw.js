@@ -26,6 +26,8 @@ const assets = [
 
 	'../examples/jsm/libs/meshopt_decoder.module.js',
 
+	'../examples/jsm/libs/mikktspace.module.js',
+
 	'../examples/jsm/libs/motion-controllers.module.js',
 
 	'../examples/jsm/libs/rhino3dm/rhino3dm.wasm',
@@ -40,9 +42,6 @@ const assets = [
 	'../examples/jsm/loaders/GLTFLoader.js',
 	'../examples/jsm/loaders/KMZLoader.js',
 	'../examples/jsm/loaders/KTX2Loader.js',
-	'../examples/jsm/loaders/IFCLoader.js',
-	'../examples/jsm/loaders/ifc/web-ifc-api.js',
-	'../examples/jsm/loaders/ifc/web-ifc.wasm',
 	'../examples/jsm/loaders/MD2Loader.js',
 	'../examples/jsm/loaders/OBJLoader.js',
 	'../examples/jsm/loaders/MTLLoader.js',
@@ -76,6 +75,8 @@ const assets = [
 
 	'../examples/jsm/helpers/VertexNormalsHelper.js',
 
+	'../examples/jsm/utils/BufferGeometryUtils.js',
+
 	'../examples/jsm/webxr/VRButton.js',
 	'../examples/jsm/webxr/XRControllerModelFactory.js',
 
@@ -90,7 +91,6 @@ const assets = [
 	'./js/libs/codemirror/mode/javascript.js',
 	'./js/libs/codemirror/mode/glsl.js',
 
-	'./js/libs/es-module-shims.js',
 	'./js/libs/esprima.js',
 	'./js/libs/ffmpeg.min.js',
 	'./js/libs/jsonlint.js',
@@ -153,7 +153,6 @@ const assets = [
 	'./js/Sidebar.Settings.js',
 	'./js/Sidebar.Settings.History.js',
 	'./js/Sidebar.Settings.Shortcuts.js',
-	'./js/Sidebar.Settings.Viewport.js',
 	'./js/Sidebar.Properties.js',
 	'./js/Sidebar.Object.js',
 	'./js/Sidebar.Geometry.js',
@@ -188,8 +187,7 @@ const assets = [
 	'./js/Strings.js',
 	'./js/Toolbar.js',
 	'./js/Viewport.js',
-	'./js/Viewport.Camera.js',
-	'./js/Viewport.Shading.js',
+	'./js/Viewport.Controls.js',
 	'./js/Viewport.Info.js',
 	'./js/Viewport.Selector.js',
 	'./js/Viewport.ViewHelper.js',
@@ -275,8 +273,13 @@ async function networkFirst( request ) {
 
 		}
 
-		const cache = await caches.open( cacheName );
-		cache.put( request, response.clone() );
+		if ( request.method === 'GET' ) {
+
+			const cache = await caches.open( cacheName );
+			cache.put( request, response.clone() );
+
+		}
+
 		return response;
 
 	} catch {

@@ -1,6 +1,7 @@
 import {
-	GPUTextureAspect, GPUTextureViewDimension, GPUBufferBindingType
+	GPUTextureAspect, GPUTextureViewDimension, GPUBufferBindingType, GPUTextureSampleType
 } from './WebGPUConstants.js';
+import { FloatType } from 'three';
 
 class WebGPUBindingUtils {
 
@@ -58,13 +59,25 @@ class WebGPUBindingUtils {
 
 				bindingGPU.externalTexture = {}; // GPUExternalTextureBindingLayout
 
+			} else if ( binding.isSampledTexture && binding.store ) {
+
+				const format = this.backend.get( binding.texture ).texture.format;
+
+				bindingGPU.storageTexture = { format }; // GPUStorageTextureBindingLayout
+
 			} else if ( binding.isSampledTexture ) {
 
 				const texture = {}; // GPUTextureBindingLayout
 
 				if ( binding.texture.isDepthTexture ) {
 
-					texture.sampleType = 'depth';
+					texture.sampleType = GPUTextureSampleType.Depth;
+
+				} else if ( binding.texture.isDataTexture && binding.texture.type === FloatType ) {
+
+					// @TODO: Add support for this soon: backend.hasFeature( 'float32-filterable' )
+
+					texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
 
 				}
 
@@ -72,13 +85,17 @@ class WebGPUBindingUtils {
 
 					texture.viewDimension = GPUTextureViewDimension.Cube;
 
+				} else if ( binding.texture.isDataArrayTexture ) {
+
+					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
+
 				}
 
 				bindingGPU.texture = texture;
 
 			} else {
 
-				console.error( 'WebGPUBindingUtils: Unsupported binding "${ binding }".' );
+				console.error( `WebGPUBindingUtils: Unsupported binding "${ binding }".` );
 
 			}
 
@@ -139,7 +156,7 @@ class WebGPUBindingUtils {
 					const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
 
 					const bufferGPU = device.createBuffer( {
-						label: 'bindingBuffer',
+						label: 'bindingBuffer_' + binding.name,
 						size: byteLength,
 						usage: usage
 					} );
@@ -183,6 +200,10 @@ class WebGPUBindingUtils {
 
 					dimensionViewGPU = GPUTextureViewDimension.Cube;
 
+				} else if ( binding.texture.isDataArrayTexture ) {
+
+					dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
+
 				} else {
 
 					dimensionViewGPU = GPUTextureViewDimension.TwoD;
@@ -199,7 +220,7 @@ class WebGPUBindingUtils {
 
 					const aspectGPU = GPUTextureAspect.All;
 
-					resourceGPU = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU } );
+					resourceGPU = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount: binding.store ? 1 : textureData.mipLevelCount } );
 
 				}
 

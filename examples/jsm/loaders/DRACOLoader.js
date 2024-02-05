@@ -82,13 +82,14 @@ class DRACOLoader extends Loader {
 
 	}
 
-	parse( buffer, onLoad, onError ) {
+
+	parse( buffer, onLoad, onError = ()=>{} ) {
 
 		this.decodeDracoFile( buffer, onLoad, null, null, SRGBColorSpace ).catch( onError );
 
 	}
 
-	decodeDracoFile( buffer, callback, attributeIDs, attributeTypes, vertexColorSpace = LinearSRGBColorSpace ) {
+	decodeDracoFile( buffer, callback, attributeIDs, attributeTypes, vertexColorSpace = LinearSRGBColorSpace, onError = () => {} ) {
 
 		const taskConfig = {
 			attributeIDs: attributeIDs || this.defaultAttributeIDs,
@@ -97,7 +98,7 @@ class DRACOLoader extends Loader {
 			vertexColorSpace: vertexColorSpace,
 		};
 
-		return this.decodeGeometry( buffer, taskConfig ).then( callback );
+		return this.decodeGeometry( buffer, taskConfig ).then( callback ).catch( onError );
 
 	}
 

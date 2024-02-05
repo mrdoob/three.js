@@ -54,6 +54,7 @@ function WebGLExtensions( gl ) {
 			if ( capabilities.isWebGL2 ) {
 
 				getExtension( 'EXT_color_buffer_float' );
+				getExtension( 'WEBGL_clip_cull_distance' );
 
 			} else {
 
