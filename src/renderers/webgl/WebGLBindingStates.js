@@ -5,6 +5,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 	const maxVertexAttributes = gl.getParameter( gl.MAX_VERTEX_ATTRIBS );
 
 	const extension = capabilities.isWebGL2 ? null : extensions.get( 'OES_vertex_array_object' );
+	const vaoAvailable = capabilities.isWebGL2 || extension !== null;
 
 	const bindingStates = {};
 
@@ -15,7 +16,6 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 	function setup( object, material, program, geometry, index ) {
 
 		let updateBuffers = false;
-		const vaoAvailable = capabilities.isWebGL2 || extension !== null;
 
 		if ( vaoAvailable ) {
 
