@@ -29,7 +29,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, uniform, storage, instanceIndex, float, texture, viewportTopLeft, color } from 'three/nodes';
+			import { tslFn, uniform, storageObject, instanceIndex, float, texture, viewportTopLeft, color } from 'three/nodes';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -118,12 +118,12 @@
 
 				waveGPUBuffer = new StorageBufferAttribute( waveBuffer, 1 );
 
-				const waveStorageNode = storage( waveGPUBuffer, 'float', waveBuffer.length );
+				const waveStorageNode = storageObject( waveGPUBuffer, 'float', waveBuffer.length );
 
 
 				// read-only buffer
 
-				const waveNode = storage( new StorageBufferAttribute( waveBuffer, 1 ), 'float', waveBuffer.length );
+				const waveNode = storageObject( new StorageBufferAttribute( waveBuffer, 1 ), 'float', waveBuffer.length );
 
 
 				// params

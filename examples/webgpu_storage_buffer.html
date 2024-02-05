@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { storage, vec3, uv, uint, float, tslFn, instanceIndex, MeshBasicNodeMaterial } from 'three/nodes';
+			import { storageObject, vec3, uv, uint, float, tslFn, instanceIndex, MeshBasicNodeMaterial } from 'three/nodes';
 
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 			import StorageBufferAttribute from 'three/addons/renderers/common/StorageBufferAttribute.js';
@@ -72,7 +72,7 @@
 
 				const arrayBuffer = new StorageBufferAttribute( new Float32Array( array ), typeSize );
 
-				const arrayBufferNode = storage( arrayBuffer, type, size );
+				const arrayBufferNode = storageObject( arrayBuffer, type, size );
 
 
 				const computeInitOrder = tslFn( () => {
