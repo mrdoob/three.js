@@ -99,6 +99,12 @@ class WebXRDepthSensing {
 
 	}
 
+	getDepthTexture() {
+
+		return this.texture;
+
+	}
+
 }
 
 export { WebXRDepthSensing };
