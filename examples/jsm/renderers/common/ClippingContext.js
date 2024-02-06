@@ -19,19 +19,6 @@ class ClippingContext {
 
 	}
 
-	inherit( parent ) {
-
-		if ( this === parent || parent.version === this.parentVersion ) return;
-
-		this.globalClippingPlanes = parent.globalClippingPlanes;
-		this.globalClippingCount = parent.globalClippingCount;
-		this.localClippingEnabled = parent.localClippingEnabled;
-        this.parentVersion = parent.version;
-
-		this.version = _clippingContextVersion ++;
-
-	}
-
 	updateGlobal( renderer ) {
 
 		let update = false;
@@ -60,9 +47,19 @@ class ClippingContext {
 
 	}
 
-	updateMaterial( material ) {
+	update( parent, material ) {
 
 		let update = false;
+
+		if ( this !== parent && parent.version !== this.parentVersion ) {
+
+			this.globalClippingPlanes = parent.globalClippingPlanes;
+			this.globalClippingCount = parent.globalClippingCount;
+			this.localClippingEnabled = parent.localClippingEnabled;
+   	    	this.parentVersion = parent.version;
+			update = true;
+
+		}
 
 		if ( this.localClippingEnabled ) {
 
@@ -86,9 +83,9 @@ class ClippingContext {
 
 			}
 
-			if ( update ) this.version = _clippingContextVersion ++;
-
 		}
+
+		if ( update ) this.version = _clippingContextVersion ++;
 
 	}
 

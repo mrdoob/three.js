@@ -65,8 +65,7 @@ export default class RenderObject {
 
 			}
 
-			clippingContext.inherit( parent );
-			clippingContext.updateMaterial( material );
+			clippingContext.update( parent, material );
 
 		} else if ( this.clippingContext !== parent ) {
 
