@@ -435,13 +435,6 @@ class WebGLBackend extends Backend {
 
 			if ( dualAttributeData.pbo ) {
 
-				if ( dualAttributeData.pbo.needsTransfer ) {
-
-					this.attributeUtils.copyBufferToSubBuffer( dualAttributeData.bufferGPU, dualAttributeData.transformBuffer, dualAttributeData.byteLength );
-					dualAttributeData.pbo.needsTransfer = false;
-
-				}
-
 				this.textureUtils.copyBufferToTexture( dualAttributeData.transformBuffer, dualAttributeData.pbo );
 
 			} else {

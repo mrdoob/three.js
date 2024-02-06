@@ -131,14 +131,6 @@ ${ flowData.code }
 		if ( this.renderer.backend.has( attribute ) ) {
 
 			const attributeData = this.renderer.backend.get( attribute );
-
-			if ( ! attribute.pbo ) {
-
-				this.setupPBO( node, attributeData );
-				attributeData.pbo.needsTransfer = true;
-
-			}
-
 			attributeData.pbo = attribute.pbo;
 
 		}
