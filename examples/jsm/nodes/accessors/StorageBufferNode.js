@@ -13,7 +13,7 @@ class StorageBufferNode extends BufferNode {
 
 		this.isStorageBufferNode = true;
 
-		this.bufferObject = false;
+		this.accessMode = false;
 
 		this._attribute = null;
 		this._varying = null;
@@ -32,9 +32,9 @@ class StorageBufferNode extends BufferNode {
 
 	}
 
-	setBufferObject( value ) {
+	setAccessMode( value ) {
 
-		this.bufferObject = value;
+		this.accessMode = value;
 
 		return this;
 
@@ -67,6 +67,6 @@ class StorageBufferNode extends BufferNode {
 export default StorageBufferNode;
 
 export const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );
-export const storageObject = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setBufferObject( true ) );
+export const storageBuffer = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setAccessMode( true ) );
 
 addNodeClass( 'StorageBufferNode', StorageBufferNode );
