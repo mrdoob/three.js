@@ -55,7 +55,6 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.depthNode = null;
 		this.shadowNode = null;
-		this.clippingNode = null;
 
 		this.outputNode = null;
 
@@ -92,7 +91,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		let resultNode;
 
-		this.setupClipping( builder );
+		const clippingNode = this.setupClipping( builder );
 
 		if ( this.fragmentNode === null ) {
 
@@ -105,7 +104,7 @@ class NodeMaterial extends ShaderMaterial {
 
 			const outgoingLightNode = this.setupLighting( builder );
 
-			if ( this.clippingNode ) builder.stack.add( this.clippingNode );
+			if ( clippingNode !== null ) builder.stack.add( clippingNode );
 
 			resultNode = this.setupOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
 
@@ -133,14 +132,14 @@ class NodeMaterial extends ShaderMaterial {
 
 		const { globalClippingCount, localClippingCount, localClippingEnabled } = builder.clippingContext;
 
-		this.clippingNode = null;
+		let result = null;
 
 		if ( globalClippingCount || ( localClippingEnabled && localClippingCount > 0 ) ) {
 
 			if ( this.alphaToCoverage ) {
 
 				// to be added to flow when the color/alpha value has been determined
-				this.clippingNode = clippingAlpha();
+				result = clippingAlpha();
 
 			} else {
 
@@ -149,6 +148,8 @@ class NodeMaterial extends ShaderMaterial {
 			}
 
 		}
+
+		return result;
 
 	}
 
