@@ -37,13 +37,13 @@
 
 			function init() {
 
-				// if ( WebGPU.isAvailable() === false ) {
+				if ( WebGPU.isAvailable() === false ) {
 
-				// 	document.body.appendChild( WebGPU.getErrorMessage() );
+					document.body.appendChild( WebGPU.getErrorMessage() );
 
-				// 	throw new Error( 'No WebGPU support' );
+					throw new Error( 'No WebGPU support' );
 
-				// }
+				}
 
 				const aspect = window.innerWidth / window.innerHeight;
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
@@ -95,7 +95,7 @@
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( plane );
 
-				renderer = new WebGPURenderer( { antialias: true, preferWebGL: true } );
+				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
