@@ -207,26 +207,6 @@ class WebGLAttributeUtils {
 
 	}
 
-	async copyBufferToSubBuffer( buffer, dstBuffer, byteLength, byteOffset = 0, dstOffset = 0 ) {
-
-		const backend = this.backend;
-		const { gl } = backend;
-
-		gl.bindBuffer( gl.COPY_READ_BUFFER, buffer );
-
-		gl.bindBuffer( gl.COPY_WRITE_BUFFER, dstBuffer );
-		gl.bufferData( gl.COPY_WRITE_BUFFER, byteLength, gl.STREAM_READ );
-
-		gl.copyBufferSubData( gl.COPY_READ_BUFFER, gl.COPY_WRITE_BUFFER, byteOffset, dstOffset, byteLength );
-
-		gl.bindBuffer( gl.COPY_READ_BUFFER, null );
-		gl.bindBuffer( gl.COPY_WRITE_BUFFER, null );
-
-		await backend.utils._clientWaitAsync();
-
-	}
-
-
 	async getArrayBufferAsync( attribute ) {
 
 		const backend = this.backend;
