@@ -207,6 +207,7 @@ class WebGLTextureUtils {
 			if ( texture.type === FloatType && extensions.has( 'OES_texture_float_linear' ) === false ) return; // verify extension for WebGL 1 and WebGL 2
 
 			if ( texture.anisotropy > 1 || currentAnisotropy !== texture.anisotropy ) {
+
 				const extension = extensions.get( 'EXT_texture_filter_anisotropic' );
 				gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, backend.getMaxAnisotropy() ) );
 				backend.get( texture ).currentAnisotropy = texture.anisotropy;
@@ -286,6 +287,41 @@ class WebGLTextureUtils {
 			glType,
 			glInternalFormat
 		} );
+
+	}
+
+	copyBufferToTexture( buffer, texture ) {
+
+		const { gl, backend } = this;
+
+		const { textureGPU, glTextureType, glFormat, glType } = backend.get( texture );
+
+		const { width, height } = texture.source.data;
+
+		gl.bindBuffer( gl.PIXEL_UNPACK_BUFFER, buffer );
+
+		backend.state.bindTexture( glTextureType, textureGPU );
+
+		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, false );
+		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false );
+		gl.texSubImage2D( glTextureType, 0, 0, 0, width, height, glFormat, glType, 0 );
+
+		gl.bindBuffer( gl.PIXEL_UNPACK_BUFFER, null );
+
+		backend.state.unbindTexture();
+		// debug
+		// const framebuffer = gl.createFramebuffer();
+		// gl.bindFramebuffer( gl.FRAMEBUFFER, framebuffer );
+		// gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, glTextureType, textureGPU, 0 );
+
+		// const readout = new Float32Array( width * height * 4 );
+
+		// const altFormat = gl.getParameter( gl.IMPLEMENTATION_COLOR_READ_FORMAT );
+		// const altType = gl.getParameter( gl.IMPLEMENTATION_COLOR_READ_TYPE );
+
+		// gl.readPixels( 0, 0, width, height, altFormat, altType, readout );
+		// gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+		// console.log( readout );
 
 	}
 

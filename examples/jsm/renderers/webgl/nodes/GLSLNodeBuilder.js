@@ -1,11 +1,12 @@
-import { MathNode, GLSLNodeParser, NodeBuilder } from '../../../nodes/Nodes.js';
+import { MathNode, GLSLNodeParser, NodeBuilder, UniformNode, vectorComponents } from '../../../nodes/Nodes.js';
 
 import UniformBuffer from '../../common/UniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
-import { IntType } from 'three';
+
+import { IntType, DataTexture, RGBAFormat, FloatType } from 'three';
 
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan',
@@ -81,6 +82,131 @@ ${ flowData.code }
 		//
 
 		return code;
+
+	}
+
+	setupPBO( storageBufferNode ) {
+
+		const attribute = storageBufferNode.value;
+
+		if ( attribute.pbo === undefined ) {
+
+			const originalArray = attribute.array;
+			const numElements = attribute.count * attribute.itemSize;
+
+			const width = Math.pow( 2, Math.ceil( Math.log2( Math.sqrt( numElements / 4 ) ) ) );
+			let height = Math.ceil( ( numElements / 4 ) / width );
+			if ( width * height * 4 < numElements ) height ++; // Ensure enough space
+
+			const newSize = width * height * 4; // 4 floats per pixel due to RGBA format
+
+			const newArray = new Float32Array( newSize );
+
+			newArray.set( originalArray, 0 );
+
+			attribute.array = newArray;
+			attribute.count = newSize;
+
+			const pboTexture = new DataTexture( attribute.array, width, height, RGBAFormat, FloatType );
+			pboTexture.needsUpdate = true;
+			pboTexture.isPBOTexture = true;
+
+			const pbo = new UniformNode( pboTexture );
+			pbo.setPrecision( 'high' );
+
+			attribute.pboNode = pbo;
+			attribute.pbo = pbo.value;
+
+			this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
+
+		}
+
+	}
+
+	generatePBO( storageArrayElementNode ) {
+
+		const { node, indexNode } = storageArrayElementNode;
+		const attribute = node.value;
+
+		if ( this.renderer.backend.has( attribute ) ) {
+
+			const attributeData = this.renderer.backend.get( attribute );
+			attributeData.pbo = attribute.pbo;
+
+		}
+
+
+		const nodeUniform = this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
+		const textureName = this.getPropertyName( nodeUniform );
+
+		indexNode.increaseUsage( this ); // force cache generate to be used as index in x,y
+		const indexSnippet = indexNode.build( this, 'uint' );
+
+		const elementNodeData = this.getDataFromNode( storageArrayElementNode );
+
+		let propertyName = elementNodeData.propertyName;
+
+		if ( propertyName === undefined ) {
+
+			// property element
+
+			const nodeVar = this.getVarFromNode( storageArrayElementNode );
+
+			propertyName = this.getPropertyName( nodeVar );
+
+			// property size
+
+			const bufferNodeData = this.getDataFromNode( node );
+
+			let propertySizeName = bufferNodeData.propertySizeName;
+
+			if ( propertySizeName === undefined ) {
+
+				propertySizeName = propertyName + 'Size';
+
+				this.getVarFromNode( node, propertySizeName, 'uint' );
+
+				this.addLineFlowCode( `${ propertySizeName } = uint( textureSize( ${ textureName }, 0 ).x )` );
+
+				bufferNodeData.propertySizeName = propertySizeName;
+
+			}
+
+			//
+
+			let channel;
+			let padding;
+
+			const itemSize = attribute.itemSize;
+
+			if ( itemSize === 1 ) {
+
+				padding = 4;
+				channel = `[ ${indexSnippet} % uint( ${ padding } ) ]`;
+
+			} else {
+
+				padding = itemSize > 2 ? 1 : itemSize;
+				channel = '.' + vectorComponents.join( '' ).slice( 0, itemSize );
+
+			}
+
+			const uvSnippet = `ivec2(
+				${indexSnippet} / uint( ${ padding } ) % ${ propertySizeName },
+				${indexSnippet} / ( uint( ${ padding } ) * ${ propertySizeName } )
+			)`;
+
+			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, null, '0' );
+
+			//
+
+			this.addLineFlowCode( `${ propertyName } = ${ snippet + channel }` );
+
+			elementNodeData.propertyName = propertyName;
+
+		}
+
+		return propertyName;
 
 	}
 

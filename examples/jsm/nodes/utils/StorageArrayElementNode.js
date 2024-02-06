@@ -24,17 +24,55 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 	}
 
-	generate( builder ) {
-
-		let snippet;
+	setup( builder ) {
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
-			snippet = this.node.build( builder );
+			if ( ! this.node.instanceIndex && this.node.bufferObject === true ) {
+
+				builder.setupPBO( this.node );
+
+			}
+
+		}
+
+		return super.setup( builder );
+
+	}
+
+	generate( builder, output ) {
+
+		let snippet;
+
+		const isAssignContext = builder.context.assign;
+
+		//
+
+		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
+
+			const { node } = this;
+
+			if ( ! node.instanceIndex && this.node.bufferObject === true && isAssignContext !== true ) {
+
+				snippet = builder.generatePBO( this );
+
+			} else {
+
+				snippet = node.build( builder );
+
+			}
 
 		} else {
 
 			snippet = super.generate( builder );
+
+		}
+
+		if ( isAssignContext !== true ) {
+
+			const type = this.getNodeType( builder );
+
+			snippet = builder.format( snippet, type, output );
 
 		}
 
