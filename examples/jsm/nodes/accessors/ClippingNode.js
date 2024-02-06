@@ -88,15 +88,13 @@ class ClippingNode extends Node {
 
 		if ( this.scope === ClippingNode.ALPHA_TO_COVERAGE ) {
 
-			this.setupAlphaToCoverage();
+			return this.setupAlphaToCoverage();
 
 		} else {
 
-			this.setupDefault();
+			return this.setupDefault();
 
 		}
-
-		return this.clippingNode;
 
 	}
 
@@ -105,7 +103,7 @@ class ClippingNode extends Node {
 		const numClippingPlanes = this._numClippingPlanes;
 		const numUnionClippingPlanes = this._numUnionClippingPlanes;
 
-		this.clippingNode = tslFn( () => {
+		return tslFn( () => {
 
 			const clippingPlanes = uniform( this.planes, 'vec4' );
 
@@ -165,7 +163,7 @@ class ClippingNode extends Node {
 		const numClippingPlanes = this._numClippingPlanes;
 		const numUnionClippingPlanes = this._numUnionClippingPlanes;
 
-		this.clippingNode = tslFn( () => {
+		return tslFn( () => {
 
 			const clippingPlanes = uniform( this.planes, 'vec4' );
 
