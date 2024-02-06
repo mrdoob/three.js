@@ -541,9 +541,13 @@ function WebGLState( gl, extensions, capabilities ) {
 
 				gl.drawBuffers( drawBuffers );
 
-			} else {
+			} else if ( extensions.has( 'WEBGL_draw_buffers' ) === true ) {
 
 				extensions.get( 'WEBGL_draw_buffers' ).drawBuffersWEBGL( drawBuffers );
+
+			} else {
+
+				throw new Error( 'THREE.WebGLState: Usage of gl.drawBuffers() require WebGL2 or WEBGL_draw_buffers extension' );
 
 			}
 
