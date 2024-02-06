@@ -128,13 +128,18 @@ ${ flowData.code }
 		const { node, indexNode } = storageArrayElementNode;
 		const attribute = node.value;
 
-		if ( ! attribute.pbo && this.renderer.backend.has( attribute ) ) {
+		if ( this.renderer.backend.has( attribute ) ) {
 
 			const attributeData = this.renderer.backend.get( attribute );
-			this.setupPBO( node, attributeData );
+
+			if ( ! attribute.pbo ) {
+
+				this.setupPBO( node, attributeData );
+				attributeData.pbo.needsTransfer = true;
+
+			}
 
 			attributeData.pbo = attribute.pbo;
-			attributeData.pbo.needsTransfer = true;
 
 		}
 
