@@ -948,7 +948,7 @@ class WebGPUBackend extends Backend {
 			data.colorFormat = colorFormat;
 			data.depthStencilFormat = depthStencilFormat;
 			data.primitiveTopology = primitiveTopology;
-			data.clippingContextVersion = renderObject.clippingContextVersion
+			data.clippingContextVersion = renderObject.clippingContextVersion;
 
 			needsUpdate = true;
 
