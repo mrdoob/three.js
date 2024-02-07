@@ -191,9 +191,8 @@ ${ flowData.code }
 			//
 
 			const { itemSize } = attribute;
+
 			const channel = '.' + vectorComponents.join( '' ).slice( 0, itemSize );
-
-
 			const uvSnippet = `ivec2(${indexSnippet} % ${ propertySizeName }, ${indexSnippet} / ${ propertySizeName })`;
 
 			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, null, '0' );
