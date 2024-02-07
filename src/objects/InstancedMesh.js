@@ -132,9 +132,9 @@ class InstancedMesh extends Mesh {
 
 	}
 
-	getMorphAt( index, dummy ) {
+	getMorphAt( index, object ) {
 
-		const objectInfluences = dummy.morphTargetInfluences;
+		const objectInfluences = object.morphTargetInfluences;
 
 		const array = this.morphTexture.source.data.data;
 
@@ -220,9 +220,9 @@ class InstancedMesh extends Mesh {
 
 	}
 
-	setMorphAt( index, dummy ) {
+	setMorphAt( index, object ) {
 
-		const objectInfluences = dummy.morphTargetInfluences;
+		const objectInfluences = object.morphTargetInfluences;
 
 		const len = objectInfluences.length + 1; // morphBaseInfluence + all influences
 
