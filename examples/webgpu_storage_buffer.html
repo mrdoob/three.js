@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { storageObject, vec3, uv, uint, float, tslFn, instanceIndex, MeshBasicNodeMaterial } from 'three/nodes';
+			import { storageObject, If, vec3, uv, uint, float, tslFn, instanceIndex, MeshBasicNodeMaterial } from 'three/nodes';
 
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 			import StorageBufferAttribute from 'three/addons/renderers/common/StorageBufferAttribute.js';
@@ -47,28 +47,43 @@
 
 				// texture
 
-				const typeSize = 1; // 1:'float', 2:'vec2', 4:'vec4' -> use power of 2
-				const size = 1024;
+				const size = 10000;
 
-				const array = new Array( size * typeSize ).fill( 0 );
+				const type = [ 'float', 'vec2', 'vec3', 'vec4' ];
 
-				const type = [ 'float', 'vec2', 'vec3', 'vec4' ][ typeSize - 1 ];
 
-				const arrayBuffer = new StorageBufferAttribute( new Float32Array( array ), typeSize );
+				const arrayBufferNodes = [];
 
-				const arrayBufferNode = storageObject( arrayBuffer, type, size );
+				for ( let i = 0; i < type.length; i ++ ) {
 
+					const typeSize = i + 1;
+					const array = new Array( size * typeSize ).fill( 0 );
+
+					const arrayBuffer = new StorageBufferAttribute( new Float32Array( array ), typeSize );
+
+					arrayBufferNodes.push( storageObject( arrayBuffer, type[ i ], size ) );
+
+				}
 
 				const computeInitOrder = tslFn( () => {
 
-					arrayBufferNode.element( instanceIndex ).assign( uint( instanceIndex.div( typeSize ) ) );
+					for ( let i = 0; i < type.length; i ++ ) {
+
+						const index = uint( instanceIndex.div( i + 1 ) );
+						arrayBufferNodes[ i ].element( instanceIndex ).assign( index );
+
+					}
 
 				} );
 
 				const computeInvertOrder = tslFn( () => {
 
-					const invertIndex = arrayBufferNode.element( float( size ).sub( instanceIndex ) );
-					arrayBufferNode.element( instanceIndex ).assign( invertIndex );
+					for ( let i = 0; i < type.length; i ++ ) {
+
+						const invertIndex = arrayBufferNodes[ i ].element( float( size ).sub( instanceIndex ) );
+						arrayBufferNodes[ i ].element( instanceIndex ).assign( invertIndex );
+
+					}
 
 				} );
 
@@ -83,13 +98,51 @@
 				material.colorNode = tslFn( () => {
 
 					const index = uint( uv().x.mul( float( size ) ) );
-					const indexValue = arrayBufferNode.element( index ).toVar();
-					const value = float( indexValue ).div( float( size ) ).mul( 20 ).floor().div( 20 );
+			
+					const color = vec3( 0, 0, 0 ).toVar();
 
-					return vec3( value, value, value );
+					If( uv().y.greaterThan( 0.0 ), () => {
+
+						const indexValue = arrayBufferNodes[ 0 ].element( index ).toVar();
+						const value = float( indexValue ).div( float( size ) ).mul( 20 ).floor().div( 20 );
+			
+						color.assign( vec3( value, 0, 0 ) );
+
+					} );
+
+					If( uv().y.greaterThan( 0.25 ), () => {
+
+						const indexValue = arrayBufferNodes[ 1 ].element( index ).toVar();
+						const value = float( indexValue ).div( float( size ) ).mul( 20 ).floor().div( 20 );
+			
+						color.assign( vec3( 0, value, 0 ) );
+
+					} );
+
+					If( uv().y.greaterThan( 0.5 ), () => {
+
+						const indexValue = arrayBufferNodes[ 2 ].element( index ).toVar();
+						const value = float( indexValue ).div( float( size ) ).mul( 20 ).floor().div( 20 );
+			
+						color.assign( vec3( 0, 0, value ) );
+
+					} );
+
+					If( uv().y.greaterThan( 0.75 ), () => {
+
+						const indexValue = arrayBufferNodes[ 3 ].element( index ).toVar();
+						const value = float( indexValue ).div( float( size ) ).mul( 20 ).floor().div( 20 );
+			
+						color.assign( vec3( value, value, value ) );
+
+					} );
+
+					return color;
 
 				} )();
 			
+				// TODO: Add toAttribute() test
+
 				//
 
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
