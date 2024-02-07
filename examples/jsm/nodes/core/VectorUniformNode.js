@@ -1,13 +1,13 @@
 import UniformNode from './UniformNode.js';
 import { addNodeClass } from './Node.js';
 
-class ArrayUniformNode extends UniformNode {
+class VectorUniformNode extends UniformNode {
 
 	constructor( nodes = [] ) {
 
 		super();
 
-		this.isArrayUniformNode = true;
+		this.isVectorUniformNode = true;
 
 		this.nodes = nodes;
 
@@ -21,6 +21,6 @@ class ArrayUniformNode extends UniformNode {
 
 }
 
-export default ArrayUniformNode;
+export default VectorUniformNode;
 
-addNodeClass( 'ArrayUniformNode', ArrayUniformNode );
+addNodeClass( 'VectorUniformNode', VectorUniformNode );

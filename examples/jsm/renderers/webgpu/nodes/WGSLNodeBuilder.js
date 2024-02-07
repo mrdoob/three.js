@@ -411,7 +411,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
-				if ( node.isArrayUniformNode === true ) {
+				if ( node.isVectorUniformNode === true ) {
 
 					uniformGPU = [];
 
