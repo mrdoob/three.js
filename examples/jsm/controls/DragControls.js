@@ -12,9 +12,16 @@ const _raycaster = new Raycaster();
 
 const _pointer = new Vector2();
 const _offset = new Vector3();
+const _diff = new Vector2();
+const _start = new Vector2();
+const _end = new Vector2();
 const _intersection = new Vector3();
 const _worldPosition = new Vector3();
 const _inverseMatrix = new Matrix4();
+
+const _up = new Vector3();
+const _horizen = new Vector3();
+const _lookAt = new Vector3();
 
 class DragControls extends EventDispatcher {
 
@@ -27,6 +34,8 @@ class DragControls extends EventDispatcher {
 		let _selected = null, _hovered = null;
 
 		const _intersections = [];
+
+		this.mode = "translate";
 
 		//
 
@@ -75,16 +84,30 @@ class DragControls extends EventDispatcher {
 			if ( scope.enabled === false ) return;
 
 			updatePointer( event );
-
+			_end.copy(_pointer);
+			_diff.subVectors(_end, _start);
+			_start.copy(_end);
+			
 			_raycaster.setFromCamera( _pointer, _camera );
-
+			
 			if ( _selected ) {
+				
+				if (scope.mode === "translate") {
+				
+					if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
+						
+						_selected.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
+						
+					}
+				
+				} else if (scope.mode === "rotate") {
 
-				if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
-
-					_selected.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
-
+					_diff.multiplyScalar(2); //Just a random scalling factor since it rotated too slow
+					_selected.rotateOnWorldAxis(_up, _diff.x);
+					_selected.rotateOnWorldAxis(_horizen.normalize(), -_diff.y);
+				
 				}
+
 
 				scope.dispatchEvent( { type: 'drag', object: _selected } );
 
@@ -161,9 +184,19 @@ class DragControls extends EventDispatcher {
 
 				if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-					_inverseMatrix.copy( _selected.parent.matrixWorld ).invert();
-					_offset.copy( _intersection ).sub( _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
-
+					if (scope.mode === "translate") {
+					
+						_inverseMatrix.copy( _selected.parent.matrixWorld ).invert();
+						_offset.copy( _intersection ).sub( _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
+					
+					} else if (scope.mode === "rotate") {
+					
+						_up.set(0,1,0).applyQuaternion(_camera.quaternion).normalize();
+						_horizen.set(1,0,0).applyQuaternion(_camera.quaternion).normalize();
+						_lookAt.set(0,0,-1).applyQuaternion(_camera.quaternion).normalize();
+					
+					}
+					
 				}
 
 				_domElement.style.cursor = 'move';
