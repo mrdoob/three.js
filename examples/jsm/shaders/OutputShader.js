@@ -64,7 +64,7 @@ const OutputShader = {
 
 				gl_FragColor.rgb = AgXToneMapping( gl_FragColor.rgb );
 
-			#elif defined( COMMERECE_TONE_MAPPING )
+			#elif defined( KHRONOS_NEUTRAL_TONE_MAPPING )
 
 				gl_FragColor.rgb = KhronosNeutralToneMapping( gl_FragColor.rgb );
 
