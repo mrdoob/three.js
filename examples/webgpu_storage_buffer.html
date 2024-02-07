@@ -47,7 +47,7 @@
 
 				// texture
 
-				const size = 10000;
+				const size = 1024; // non power of two buffer size is not well supported in WebGPU
 
 				const type = [ 'float', 'vec2', 'vec3', 'vec4' ];
 
@@ -69,8 +69,7 @@
 
 					for ( let i = 0; i < type.length; i ++ ) {
 
-						const index = uint( instanceIndex.div( i + 1 ) );
-						arrayBufferNodes[ i ].element( instanceIndex ).assign( index );
+						arrayBufferNodes[ i ].element( instanceIndex ).assign( instanceIndex );
 
 					}
 
@@ -80,7 +79,7 @@
 
 					for ( let i = 0; i < type.length; i ++ ) {
 
-						const invertIndex = arrayBufferNodes[ i ].element( float( size ).sub( instanceIndex ) );
+						const invertIndex = arrayBufferNodes[ i ].element( uint( size ).sub( instanceIndex ) );
 						arrayBufferNodes[ i ].element( instanceIndex ).assign( invertIndex );
 
 					}
@@ -97,8 +96,10 @@
 
 				material.colorNode = tslFn( () => {
 
-					const index = uint( uv().x.mul( float( size ) ) );
-			
+					const index = uint( uv().x.mul( size ).floor() ).toVar();
+
+					If( index.greaterThanEqual( size ), () => index.assign( uint( size ).sub( 1 ) ) );
+
 					const color = vec3( 0, 0, 0 ).toVar();
 
 					If( uv().y.greaterThan( 0.0 ), () => {

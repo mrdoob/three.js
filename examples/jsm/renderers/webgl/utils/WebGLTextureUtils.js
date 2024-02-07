@@ -135,6 +135,17 @@ class WebGLTextureUtils {
 
 		}
 
+		if ( glFormat === gl.RGB ) {
+
+			if ( glType === gl.FLOAT ) internalFormat = gl.RGB32F;
+			if ( glType === gl.HALF_FLOAT ) internalFormat = gl.RGB16F;
+			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = gl.RGB8;
+			if ( glType === gl.UNSIGNED_SHORT_5_6_5 ) internalFormat = gl.RGB565;
+			if ( glType === gl.UNSIGNED_SHORT_5_5_5_1 ) internalFormat = gl.RGB5_A1;
+			if ( glType === gl.UNSIGNED_SHORT_4_4_4_4 ) internalFormat = gl.RGB4;
+
+		}
+
 		if ( glFormat === gl.RGBA ) {
 
 			if ( glType === gl.FLOAT ) internalFormat = gl.RGBA32F;
