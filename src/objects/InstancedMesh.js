@@ -132,6 +132,24 @@ class InstancedMesh extends Mesh {
 
 	}
 
+	getMorphAt( index, dummy ) {
+
+		const objectInfluences = dummy.morphTargetInfluences;
+
+		const array = this.morphTexture.source.data.data;
+
+		const len = objectInfluences.length + 1; // All influences + the baseInfluenceSum
+
+		const dataIndex = index * len + 1; // Skip the baseInfluenceSum at the beginning
+
+		for ( let i = 0; i < objectInfluences.length; i ++ ) {
+
+			objectInfluences[ i ] = array[ dataIndex + i ];
+
+		}
+
+	}
+
 	raycast( raycaster, intersects ) {
 
 		const matrixWorld = this.matrixWorld;

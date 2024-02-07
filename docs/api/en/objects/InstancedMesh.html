@@ -79,6 +79,13 @@
 			instanced data via [page:.setMatrixAt]().
 		</p>
 
+		<h3>[property:DataTexture morphTexture]</h3>
+		<p>
+			Represents the morph target weights of all instances. You have to set its
+			[page:Texture.needsUpdate needsUpdate] flag to true if you modify
+			instanced data via [page:.setMorphAt]().
+		</p>
+
 		<h3>[property:Boolean isInstancedMesh]</h3>
 		<p>Read-only flag to check if a given object is of type [name].</p>
 
@@ -133,6 +140,18 @@
 		<p>Get the local transformation matrix of the defined instance.</p>
 
 		<h3>
+			[method:undefined getMorphAt]( [param:Integer index], [param:Mesh mesh] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>
+			[page:Mesh mesh]: The [page:Mesh.morphTargetInfluences .morphTargetInfluences] property of this mesh will be filled with the influences of the defined instance.
+		</p>
+		<p>Get the morph influences of the defined instance.</p>
+
+		<h3>
 			[method:undefined setColorAt]( [param:Integer index], [param:Color color] )
 		</h3>
 		<p>
@@ -161,6 +180,23 @@
 			Sets the given local transformation matrix to the defined instance. Make
 			sure you set [page:.instanceMatrix][page:BufferAttribute.needsUpdate .needsUpdate] 
 			to true after updating all the matrices.
+		</p>
+
+		<h3>
+			[method:undefined setMorphAt]( [param:Integer index], [param:Mesh mesh] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>
+			[page:Matrix4 matrix]: A mesh with [page:Mesh.morphTargetInfluences .morphTargetInfluences] property containing the morph target weights
+			of a single instance.
+		</p>
+		<p>
+			Sets the morph target weights to the defined instance. Make
+			sure you set [page:.morphTexture][page:Texture.needsUpdate .needsUpdate] 
+			to true after updating all the influences.
 		</p>
 
 		<h2>Source</h2>
