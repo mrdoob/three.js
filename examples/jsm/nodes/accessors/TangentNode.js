@@ -5,7 +5,7 @@ import { varying } from '../core/VaryingNode.js';
 import { normalize } from '../math/MathNode.js';
 import { cameraViewMatrix } from './CameraNode.js';
 import { modelViewMatrix } from './ModelNode.js';
-import { nodeImmutable } from '../shadernode/ShaderNode.js';
+import { nodeImmutable, vec4 } from '../shadernode/ShaderNode.js';
 
 class TangentNode extends Node {
 
@@ -54,7 +54,7 @@ class TangentNode extends Node {
 
 		} else if ( scope === TangentNode.VIEW ) {
 
-			const vertexNode = modelViewMatrix.mul( tangentLocal ).xyz;
+			const vertexNode = modelViewMatrix.mul( vec4( tangentLocal, 0 ) ).xyz;
 			outputNode = normalize( varying( vertexNode ) );
 
 		} else if ( scope === TangentNode.WORLD ) {
