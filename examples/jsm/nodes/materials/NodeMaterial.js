@@ -130,11 +130,11 @@ class NodeMaterial extends ShaderMaterial {
 
 	setupClipping( builder ) {
 
-		const { globalClippingCount, localClippingCount, localClippingEnabled } = builder.clippingContext;
+		const { globalClippingCount, localClippingCount } = builder.clippingContext;
 
 		let result = null;
 
-		if ( globalClippingCount || ( localClippingEnabled && localClippingCount > 0 ) ) {
+		if ( globalClippingCount || localClippingCount ) {
 
 			if ( this.alphaToCoverage ) {
 

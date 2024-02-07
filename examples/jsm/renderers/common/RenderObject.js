@@ -4,7 +4,7 @@ let id = 0;
 
 export default class RenderObject {
 
-	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext ) {
+	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext ) {
 
 		this._nodes = nodes;
 		this._geometries = geometries;
@@ -26,7 +26,7 @@ export default class RenderObject {
 		this.pipeline = null;
 		this.vertexBuffers = null;
 
-		this.updateClipping( clippingContext );
+		this.updateClipping( renderContext.clippingContext );
 
 		this.clippingContextVersion = this.clippingContext.version;
 

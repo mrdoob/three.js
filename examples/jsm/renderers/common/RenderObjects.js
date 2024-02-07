@@ -16,7 +16,7 @@ class RenderObjects {
 
 	}
 
-	get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {
+	get( object, material, scene, camera, lightsNode, renderContext, passId ) {
 
 		const chainMap = this.getChainMap( passId );
 		const chainArray = [ object, material, renderContext, lightsNode ];
@@ -25,13 +25,13 @@ class RenderObjects {
 
 		if ( renderObject === undefined ) {
 
-			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId );
+			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, passId );
 
 			chainMap.set( chainArray, renderObject );
 
 		} else {
 
-			renderObject.updateClipping( clippingContext );
+			renderObject.updateClipping( renderContext.clippingContext );
 
 			if ( renderObject.version !== material.version || renderObject.needsUpdate || renderObject.clippingNeedsUpdate() ) {
 
@@ -39,7 +39,7 @@ class RenderObjects {
 
 					renderObject.dispose();
 
-					renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId );
+					renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, passId );
 
 				} else {
 
@@ -67,11 +67,11 @@ class RenderObjects {
 
 	}
 
-	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {
+	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, passId ) {
 
 		const chainMap = this.getChainMap( passId );
 
-		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext );
+		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext );
 
 		renderObject.onDispose = () => {
 

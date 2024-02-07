@@ -6,12 +6,7 @@ import { diffuseColor, property } from '../core/PropertyNode.js';
 import { tslFn } from '../shadernode/ShaderNode.js';
 import { loop } from '../utils/LoopNode.js';
 import { smoothstep  } from '../math/MathNode.js';
-import { NodeUpdateType } from '../core/constants.js';
-import { Matrix3, Plane, Vector4 } from 'three';
 import { uniform } from '../core/UniformNode.js';
-
-const _plane = new Plane();
-const _viewNormalMatrix = new Matrix3();
 
 class ClippingNode extends Node {
 
@@ -20,47 +15,6 @@ class ClippingNode extends Node {
 		super();
 
 		this.scope = scope;
-		this.updateType = NodeUpdateType.FRAME;
-		this.planes = [];
-
-	}
-
-	projectPlanes( source, offset, viewMatrix ) {
-
-		const l = source.length;
-		const planes = this.planes;
-
-		for ( let i = 0; i < l; i ++ ) {
-
-			_plane.copy( source[ i ] ).applyMatrix4( viewMatrix, _viewNormalMatrix );
-
-			const v = planes[ offset + i ];
-			const normal = _plane.normal;
-
-			v.x = - normal.x;
-			v.y = - normal.y;
-			v.z = - normal.z;
-			v.w = _plane.constant;
-
-		}
-
-	}
-
-	update( frame ) {
-
-		const viewMatrix = frame.camera.matrixWorldInverse;
-
-		_viewNormalMatrix.getNormalMatrix( viewMatrix );
-
-		const globalClippingPlanes = this._globalClippingPlanes;
-		const localClippingPlanes = this._localClippingPlanes;
-
-		const lg = globalClippingPlanes.length;
-		const ll = localClippingPlanes.length;
-
-		if ( lg > 0 ) this.projectPlanes( globalClippingPlanes, 0, viewMatrix );
-
-		if ( ll > 0 ) this.projectPlanes( localClippingPlanes, lg, viewMatrix );
 
 	}
 
@@ -68,44 +22,33 @@ class ClippingNode extends Node {
 
 		super.setup( builder );
 
-		const { localClippingEnabled, localClipIntersection } = builder.clippingContext;
-		const { localClippingCount, globalClippingCount } = builder.clippingContext;
-		const { globalClippingPlanes, localClippingPlanes } = builder.clippingContext;
-
-		this._globalClippingPlanes = globalClippingPlanes;
-		this._localClippingPlanes = localClippingEnabled ? localClippingPlanes : [];
-
+		const clippingContext = builder.clippingContext;
+		const { localClipIntersection, localClippingCount, globalClippingCount } = clippingContext;
 		const l = globalClippingCount + localClippingCount;
 
 		this._numClippingPlanes = l;
 		this._numUnionClippingPlanes = localClipIntersection ? l - localClippingCount : l;
 
-		for ( let i = 0; i < l; i ++ ) {
-
-			this.planes.push( new Vector4() );
-
-		}
-
 		if ( this.scope === ClippingNode.ALPHA_TO_COVERAGE ) {
 
-			return this.setupAlphaToCoverage();
+			return this.setupAlphaToCoverage( clippingContext );
 
 		} else {
 
-			return this.setupDefault();
+			return this.setupDefault( clippingContext );
 
 		}
 
 	}
 
-	setupAlphaToCoverage() {
+	setupAlphaToCoverage( clippingContext ) {
 
 		const numClippingPlanes = this._numClippingPlanes;
 		const numUnionClippingPlanes = this._numUnionClippingPlanes;
 
 		return tslFn( () => {
 
-			const clippingPlanes = uniform( this.planes, 'vec4' );
+			const clippingPlanes = uniform( clippingContext.planes, 'vec4' );
 
 			const distanceToPlane = property( 'float', 'distanceToPlane' );
 			const distanceGradient = property( 'float', 'distanceToGradient' );
@@ -158,14 +101,14 @@ class ClippingNode extends Node {
 
 	}
 
-	setupDefault() {
+	setupDefault( clippingContext ) {
 
 		const numClippingPlanes = this._numClippingPlanes;
 		const numUnionClippingPlanes = this._numUnionClippingPlanes;
 
 		return tslFn( () => {
 
-			const clippingPlanes = uniform( this.planes, 'vec4' );
+			const clippingPlanes = uniform( clippingContext.planes, 'vec4' );
 
 			let plane;
 

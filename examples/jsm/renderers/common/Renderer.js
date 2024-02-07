@@ -390,7 +390,8 @@ class Renderer {
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
-		this._clippingContext.updateGlobal( this );
+		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
+		renderContext.clippingContext.updateGlobal( this, camera );
 
 		//
 
@@ -446,7 +447,6 @@ class Renderer {
 		renderContext.activeCubeFace = activeCubeFace;
 		renderContext.activeMipmapLevel = activeMipmapLevel;
 		renderContext.occlusionQueryCount = renderList.occlusionQueryCount;
-		renderContext.globalClippingCount = this.clippingPlanes !== null ? this.clippingPlanes.length: 0;
 
 		//
 
@@ -1197,7 +1197,7 @@ class Renderer {
 
 	_renderObjectDirect( object, material, scene, camera, lightsNode, passId ) {
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, this._clippingContext, passId );
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
 
 		//
 
