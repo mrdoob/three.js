@@ -63,7 +63,7 @@ class Raycaster {
 
 		} catch ( e ) {
 
-			if ( ! e instanceof TraversalStopException ) {
+			if ( e instanceof TraversalStopException === false ) {
 
 				throw e;
 
@@ -89,7 +89,7 @@ class Raycaster {
 
 		} catch ( e ) {
 
-			if ( ! e instanceof TraversalStopException ) {
+			if ( e instanceof TraversalStopException === false ) {
 
 				throw e;
 
