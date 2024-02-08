@@ -34,7 +34,7 @@ class DragControls extends EventDispatcher {
 
 		const _intersections = [];
 
-		this.mode = "translate";
+		this.mode = 'translate';
 
 		this.rotateSpeed = 1;
 
@@ -85,30 +85,29 @@ class DragControls extends EventDispatcher {
 			if ( scope.enabled === false ) return;
 
 			updatePointer( event );
-			_end.copy(_pointer);
-			_diff.subVectors(_end, _start);
-			_start.copy(_end);
-			
+			_end.copy( _pointer );
+			_diff.subVectors( _end, _start );
+			_start.copy( _end );
+
 			_raycaster.setFromCamera( _pointer, _camera );
-			
+
 			if ( _selected ) {
-				
-				if (scope.mode === "translate") {
-				
+
+				if ( scope.mode === 'translate' ) {
+
 					if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
-						
+
 						_selected.position.copy( _intersection.sub( _offset ).applyMatrix4( _inverseMatrix ) );
-						
+
 					}
-				
-				} else if (scope.mode === "rotate") {
 
-					_diff.multiplyScalar(this.rotateSpeed);
-					_selected.rotateOnWorldAxis(_up, _diff.x);
-					_selected.rotateOnWorldAxis(_right.normalize(), -_diff.y);
-				
+				} else if ( scope.mode === 'rotate' ) {
+
+					_diff.multiplyScalar( scope.rotateSpeed );
+					_selected.rotateOnWorldAxis( _up, _diff.x );
+					_selected.rotateOnWorldAxis( _right.normalize(), - _diff.y );
+
 				}
-
 
 				scope.dispatchEvent( { type: 'drag', object: _selected } );
 
@@ -185,19 +184,19 @@ class DragControls extends EventDispatcher {
 
 				if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-					if (scope.mode === "translate") {
-					
+					if ( scope.mode === 'translate' ) {
+
 						_inverseMatrix.copy( _selected.parent.matrixWorld ).invert();
 						_offset.copy( _intersection ).sub( _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
-					
-					} else if (scope.mode === "rotate") {
-					
+
+					} else if ( scope.mode === 'rotate' ) {
+
 						//Note: the controls only support the Y+ rotation
-						_up.set(0,1,0).applyQuaternion(_camera.quaternion).normalize();
-						_right.set(1,0,0).applyQuaternion(_camera.quaternion).normalize();
-					
+						_up.set( 0, 1, 0 ).applyQuaternion( _camera.quaternion ).normalize();
+						_right.set( 1, 0, 0 ).applyQuaternion( _camera.quaternion ).normalize();
+
 					}
-					
+
 				}
 
 				_domElement.style.cursor = 'move';
