@@ -7,8 +7,6 @@ class Uniform {
 		this.name = name;
 		this.value = value;
 
-		this.isArray = value && Array.isArray( value );
-		this.itemCount = this.isArray ? this.value.length : 1;
 		this.boundary = 0; // used to build the uniform buffer according to the STD140 layout
 		this.itemSize = 0;
 
@@ -82,8 +80,9 @@ class Vector4Uniform extends Uniform {
 		super( name, value );
 
 		this.isVector4Uniform = true;
-		this.boundary = this.itemCount * 16;
-		this.itemSize = this.itemCount * 4;
+
+		this.boundary = 16;
+		this.itemSize = 4;
 
 	}
 

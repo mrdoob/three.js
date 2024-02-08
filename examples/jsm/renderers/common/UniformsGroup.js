@@ -116,33 +116,15 @@ class UniformsGroup extends UniformBuffer {
 
 	updateByType( uniform ) {
 
-		if ( uniform.isArray ) return this.updateArray( uniform );
 		if ( uniform.isFloatUniform ) return this.updateNumber( uniform );
 		if ( uniform.isVector2Uniform ) return this.updateVector2( uniform );
 		if ( uniform.isVector3Uniform ) return this.updateVector3( uniform );
-		if ( uniform.isVector4Uniform ) return this.updateVector4( uniform.getValue(), uniform.offset );
+		if ( uniform.isVector4Uniform ) return this.updateVector4( uniform );
 		if ( uniform.isColorUniform ) return this.updateColor( uniform );
 		if ( uniform.isMatrix3Uniform ) return this.updateMatrix3( uniform );
 		if ( uniform.isMatrix4Uniform ) return this.updateMatrix4( uniform );
 
 		console.error( 'THREE.WebGPUUniformsGroup: Unsupported uniform type.', uniform );
-
-	}
-
-	updateArray( uniform ) {
-
-		const values = uniform.getValue();
-		const l = values.length;
-
-		let updated = false;
-
-		for ( let i = 0; i < l; i ++ ) {
-
-			if ( uniform.isVector4Uniform ) updated = this.updateVector4( values[ i ], uniform.offset + i * 4 ) || updated;
-
-		}
-
-		return updated;
 
 	}
 
@@ -208,11 +190,13 @@ class UniformsGroup extends UniformBuffer {
 
 	}
 
-	updateVector4( v, offset ) {
+	updateVector4( uniform ) {
 
 		let updated = false;
 
 		const a = this.buffer;
+		const v = uniform.getValue();
+		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z || a[ offset + 4 ] !== v.w ) {
 

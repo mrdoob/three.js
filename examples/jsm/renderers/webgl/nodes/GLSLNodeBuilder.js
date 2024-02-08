@@ -328,17 +328,7 @@ ${ flowData.code }
 
 				const vectorType = this.getVectorType( uniform.type );
 
-				if ( Array.isArray( uniform.value ) === true ) {
-
-					const length = uniform.value.length;
-
-					snippet = `${vectorType} ${uniform.name}[${length}];`;
-
-				} else {
-
-					snippet = `${vectorType} ${uniform.name};`;
-
-				}
+				snippet = `${vectorType} ${uniform.name};`;
 
 				group = true;
 

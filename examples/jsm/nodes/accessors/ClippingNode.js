@@ -6,7 +6,7 @@ import { diffuseColor, property } from '../core/PropertyNode.js';
 import { tslFn } from '../shadernode/ShaderNode.js';
 import { loop } from '../utils/LoopNode.js';
 import { smoothstep  } from '../math/MathNode.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniforms } from './UniformsNode.js';
 
 class ClippingNode extends Node {
 
@@ -48,7 +48,7 @@ class ClippingNode extends Node {
 
 		return tslFn( () => {
 
-			const clippingPlanes = uniform( clippingContext.planes, 'vec4' );
+			const clippingPlanes = uniforms( clippingContext.planes );
 
 			const distanceToPlane = property( 'float', 'distanceToPlane' );
 			const distanceGradient = property( 'float', 'distanceToGradient' );
@@ -108,7 +108,7 @@ class ClippingNode extends Node {
 
 		return tslFn( () => {
 
-			const clippingPlanes = uniform( clippingContext.planes, 'vec4' );
+			const clippingPlanes = uniforms( clippingContext.planes );
 
 			let plane;
 
