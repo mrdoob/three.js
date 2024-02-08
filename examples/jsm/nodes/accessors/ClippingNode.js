@@ -24,31 +24,27 @@ class ClippingNode extends Node {
 
 		const clippingContext = builder.clippingContext;
 		const { localClipIntersection, localClippingCount, globalClippingCount } = clippingContext;
-		const l = globalClippingCount + localClippingCount;
 
-		this._numClippingPlanes = l;
-		this._numUnionClippingPlanes = localClipIntersection ? l - localClippingCount : l;
+		const numClippingPlanes = globalClippingCount + localClippingCount;
+		const numUnionClippingPlanes = localClipIntersection ? numClippingPlanes - localClippingCount : numClippingPlanes;
 
 		if ( this.scope === ClippingNode.ALPHA_TO_COVERAGE ) {
 
-			return this.setupAlphaToCoverage( clippingContext );
+			return this.setupAlphaToCoverage( clippingContext.planes, numClippingPlanes, numUnionClippingPlanes );
 
 		} else {
 
-			return this.setupDefault( clippingContext );
+			return this.setupDefault( clippingContext.planes, numClippingPlanes, numUnionClippingPlanes );
 
 		}
 
 	}
 
-	setupAlphaToCoverage( clippingContext ) {
-
-		const numClippingPlanes = this._numClippingPlanes;
-		const numUnionClippingPlanes = this._numUnionClippingPlanes;
+	setupAlphaToCoverage( planes, numClippingPlanes, numUnionClippingPlanes ) {
 
 		return tslFn( () => {
 
-			const clippingPlanes = uniforms( clippingContext.planes );
+			const clippingPlanes = uniforms( planes );
 
 			const distanceToPlane = property( 'float', 'distanceToPlane' );
 			const distanceGradient = property( 'float', 'distanceToGradient' );
@@ -101,14 +97,11 @@ class ClippingNode extends Node {
 
 	}
 
-	setupDefault( clippingContext ) {
-
-		const numClippingPlanes = this._numClippingPlanes;
-		const numUnionClippingPlanes = this._numUnionClippingPlanes;
+	setupDefault( planes, numClippingPlanes, numUnionClippingPlanes ) {
 
 		return tslFn( () => {
 
-			const clippingPlanes = uniforms( clippingContext.planes );
+			const clippingPlanes = uniforms( planes );
 
 			let plane;
 
