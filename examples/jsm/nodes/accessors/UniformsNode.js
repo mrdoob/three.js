@@ -44,7 +44,7 @@ class UniformsNode extends BufferNode {
 		this._elementType = null;
 		this._elementLength = 0;
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateType = NodeUpdateType.RENDER;
 
 		this.isArrayBufferNode = true;
 
@@ -62,7 +62,7 @@ class UniformsNode extends BufferNode {
 
 	}
 
-	updateBefore( /*frame*/ ) {
+	update( /*frame*/ ) {
 
 		const { array, value } = this;
 

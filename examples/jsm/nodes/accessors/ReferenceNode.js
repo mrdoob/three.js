@@ -3,15 +3,16 @@ import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { texture } from './TextureNode.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
+import { uniforms } from './UniformsNode.js';
 
 class ReferenceNode extends Node {
 
-	constructor( property, uniformType, object = null ) {
+	constructor( property, uniformType, object = null, indexNode = null ) {
 
 		super();
 
 		this.property = property;
-		this.index = null;
+		this.indexNode = indexNode;
 
 		this.uniformType = uniformType;
 
@@ -34,20 +35,6 @@ class ReferenceNode extends Node {
 
 	}
 
-	setIndex( index ) {
-
-		this.index = index;
-
-		return this;
-
-	}
-
-	getIndex() {
-
-		return this.index;
-
-	}
-
 	setNodeType( uniformType ) {
 
 		let node = null;
@@ -55,6 +42,10 @@ class ReferenceNode extends Node {
 		if ( uniformType === 'texture' ) {
 
 			node = texture( null );
+
+		} else if ( this.indexNode !== null ) {
+
+			node = uniforms( null, uniformType ).element( this.indexNode );
 
 		} else {
 
@@ -74,19 +65,28 @@ class ReferenceNode extends Node {
 
 	update( /*frame*/ ) {
 
-		let value = this.reference[ this.property ];
+		const value = this.reference[ this.property ];
 
-		if ( this.index !== null ) {
+		if ( this.indexNode !== null ) {
 
-			value = value[ this.index ];
+			this.node.node.array = value;
+
+		} else {
+
+			this.node.value = value;
 
 		}
 
-		this.node.value = value;
 
 	}
 
-	setup( /*builder*/ ) {
+	setup( builder ) {
+
+		if ( this.indexNode !== null ) {
+
+			this.node.node.array = ( this.object !== null ? this.object : builder.object )[ this.property ];
+
+		}
 
 		return this.node;
 
@@ -97,6 +97,6 @@ class ReferenceNode extends Node {
 export default ReferenceNode;
 
 export const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
-export const referenceIndex = ( name, index, type, object ) => nodeObject( new ReferenceNode( name, type, object ).setIndex( index ) );
+export const referenceIndex = ( name, index, type, object ) => nodeObject( new ReferenceNode( name, type, object, index ) );
 
 addNodeClass( 'ReferenceNode', ReferenceNode );
