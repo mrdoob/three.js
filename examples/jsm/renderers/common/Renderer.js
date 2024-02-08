@@ -227,6 +227,9 @@ class Renderer {
 		renderContext.depth = this.depth;
 		renderContext.stencil = this.stencil;
 
+		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
+		renderContext.clippingContext.updateGlobal( this, camera );
+
 		//
 
 		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
@@ -1223,7 +1226,7 @@ class Renderer {
 
 	_createObjectPipeline( object, material, scene, camera, lightsNode, passId ) {
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, this._clippingContext, passId );
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
 
 		//
 
