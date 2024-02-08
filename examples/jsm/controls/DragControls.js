@@ -191,7 +191,7 @@ class DragControls extends EventDispatcher {
 
 					} else if ( scope.mode === 'rotate' ) {
 
-						// the controls only support the Y+ coordinate system
+						// the controls only support Y+ up
 						_up.set( 0, 1, 0 ).applyQuaternion( _camera.quaternion ).normalize();
 						_right.set( 1, 0, 0 ).applyQuaternion( _camera.quaternion ).normalize();
 
