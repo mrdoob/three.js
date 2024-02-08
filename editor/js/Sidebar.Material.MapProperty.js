@@ -129,14 +129,14 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 		defaultProperties.add( defaultScaleXRow );
 
 		defaultScaleXRow.add( new UIText( 'scaleX:' ).setWidth( '40px' ) );
-		scaleX = new UINumber().setWidth( '30px' ).onChange( onScaleXYChange );
+		scaleX = new UINumber( 1 ).setWidth( '30px' ).onChange( onScaleXYChange );
 		defaultScaleXRow.add( scaleX );
 
 		const defaultScaleYRow = new UIRow().setMarginBottom( '6px' ).setStyle( 'min-height', '0px' );
 		defaultProperties.add( defaultScaleYRow );
 
 		defaultScaleYRow.add( new UIText( 'scaleY:' ).setWidth( '40px' ) );
-		scaleY = new UINumber().setWidth( '30px' ).onChange( onScaleXYChange );
+		scaleY = new UINumber( - 1 ).setWidth( '30px' ).setDisabled( true );
 		defaultScaleYRow.add( scaleY );
 
 	}
@@ -363,7 +363,8 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	function onScaleXYChange() {
 
-		const value = [ scaleX.getValue(), scaleY.getValue() ];
+		scaleY.setValue( - scaleX.getValue() );
+		const value = [ scaleX.getValue(), - scaleX.getValue() ];
 
 		if ( material[ `${ mapType }Scale` ].x !== value[ 0 ] || material[ `${ mapType }Scale` ].y !== value[ 1 ] ) {
 
