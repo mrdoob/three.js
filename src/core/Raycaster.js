@@ -1,6 +1,8 @@
 import { Ray } from '../math/Ray.js';
 import { Layers } from './Layers.js';
 
+class TraversalStopException {}
+
 class Raycaster {
 
 	constructor( origin, direction, near = 0, far = Infinity ) {
@@ -55,7 +57,19 @@ class Raycaster {
 
 	intersectObject( object, recursive = true, intersects = [] ) {
 
-		intersectObject( object, this, intersects, recursive );
+		try {
+
+			intersectObject( object, this, intersects, recursive );
+
+		} catch ( e ) {
+
+			if ( ! e instanceof TraversalStopException ) {
+
+				throw e;
+
+			}
+
+		}
 
 		intersects.sort( ascSort );
 
@@ -65,15 +79,33 @@ class Raycaster {
 
 	intersectObjects( objects, recursive = true, intersects = [] ) {
 
-		for ( let i = 0, l = objects.length; i < l; i ++ ) {
+		try {
 
-			intersectObject( objects[ i ], this, intersects, recursive );
+			for ( let i = 0, l = objects.length; i < l; i ++ ) {
+
+				intersectObject( objects[ i ], this, intersects, recursive );
+
+			}
+
+		} catch ( e ) {
+
+			if ( ! e instanceof TraversalStopException ) {
+
+				throw e;
+
+			}
 
 		}
 
 		intersects.sort( ascSort );
 
 		return intersects;
+
+	}
+
+	stopTraversal() {
+
+		throw new TraversalStopException();
 
 	}
 
