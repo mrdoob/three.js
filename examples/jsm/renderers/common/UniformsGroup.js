@@ -63,6 +63,8 @@ class UniformsGroup extends UniformBuffer {
 
 			const uniform = this.uniforms[ i ];
 
+			const { boundary, itemSize } = uniform;
+
 			// offset within a single chunk in bytes
 
 			const chunkOffset = offset % GPU_CHUNK_BYTES;
@@ -70,23 +72,23 @@ class UniformsGroup extends UniformBuffer {
 
 			// conformance tests
 
-			if ( chunkOffset !== 0 && ( remainingSizeInChunk - uniform.boundary ) < 0 ) {
+			if ( chunkOffset !== 0 && ( remainingSizeInChunk - boundary ) < 0 ) {
 
 				// check for chunk overflow
 
 				offset += ( GPU_CHUNK_BYTES - chunkOffset );
 
-			} else if ( chunkOffset % uniform.boundary !== 0 ) {
+			} else if ( chunkOffset % boundary !== 0 ) {
 
 				// check for correct alignment
 
-				offset += ( chunkOffset % uniform.boundary );
+				offset += ( chunkOffset % boundary );
 
 			}
 
 			uniform.offset = ( offset / this.bytesPerElement );
 
-			offset += ( uniform.itemSize * this.bytesPerElement );
+			offset += ( itemSize * this.bytesPerElement );
 
 		}
 
