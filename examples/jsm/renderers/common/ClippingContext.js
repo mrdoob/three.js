@@ -28,8 +28,6 @@ class ClippingContext {
 		const l = source.length;
 		const planes = this.planes;
 
-		_viewNormalMatrix.getNormalMatrix( this.viewMatrix );
-
 		for ( let i = 0; i < l; i ++ ) {
 
 			_plane.copy( source[ i ] ).applyMatrix4( this.viewMatrix, _viewNormalMatrix );
@@ -50,6 +48,8 @@ class ClippingContext {
 
 		const rendererClippingPlanes = renderer.clippingPlanes;
 		this.viewMatrix = camera.matrixWorldInverse;
+
+		_viewNormalMatrix.getNormalMatrix( this.viewMatrix );
 
 		let update = false;
 
@@ -104,7 +104,7 @@ class ClippingContext {
 			this.globalClippingCount =  material.isShadowNodeMaterial ? 0 : parent.globalClippingCount;
 			this.localClippingEnabled = parent.localClippingEnabled;
 			this.planes = Array.from( parent.planes );
-   	    	this.parentVersion = parent.version;
+			this.parentVersion = parent.version;
 			this.viewMatrix = parent.viewMatrix;
 
 

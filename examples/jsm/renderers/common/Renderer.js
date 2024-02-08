@@ -164,7 +164,6 @@ class Renderer {
 			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this.info );
 			this._renderLists = new RenderLists();
 			this._renderContexts = new RenderContexts();
-			this._clippingContext = new ClippingContext();
 
 			//
 
