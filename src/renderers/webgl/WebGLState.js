@@ -493,33 +493,19 @@ function WebGLState( gl, extensions, capabilities ) {
 
 			}
 
-			if ( renderTarget.isWebGLMultipleRenderTargets ) {
+			const textures = renderTarget.textures;
 
-				const textures = renderTarget.texture;
+			if ( drawBuffers.length !== textures.length || drawBuffers[ 0 ] !== gl.COLOR_ATTACHMENT0 ) {
 
-				if ( drawBuffers.length !== textures.length || drawBuffers[ 0 ] !== gl.COLOR_ATTACHMENT0 ) {
+				for ( let i = 0, il = textures.length; i < il; i ++ ) {
 
-					for ( let i = 0, il = textures.length; i < il; i ++ ) {
-
-						drawBuffers[ i ] = gl.COLOR_ATTACHMENT0 + i;
-
-					}
-
-					drawBuffers.length = textures.length;
-
-					needsUpdate = true;
+					drawBuffers[ i ] = gl.COLOR_ATTACHMENT0 + i;
 
 				}
 
-			} else {
+				drawBuffers.length = textures.length;
 
-				if ( drawBuffers[ 0 ] !== gl.COLOR_ATTACHMENT0 ) {
-
-					drawBuffers[ 0 ] = gl.COLOR_ATTACHMENT0;
-
-					needsUpdate = true;
-
-				}
+				needsUpdate = true;
 
 			}
 
