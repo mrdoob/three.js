@@ -114,6 +114,7 @@
 				container.appendChild( renderer.domElement );
 
 				controls = new DragControls( [ ... objects ], camera, renderer.domElement );
+				controls.rotateSpeed = 2;
 				controls.addEventListener( 'drag', render );
 
 				//

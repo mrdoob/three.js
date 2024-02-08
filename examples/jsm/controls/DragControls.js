@@ -20,8 +20,7 @@ const _worldPosition = new Vector3();
 const _inverseMatrix = new Matrix4();
 
 const _up = new Vector3();
-const _horizen = new Vector3();
-const _lookAt = new Vector3();
+const _right = new Vector3();
 
 class DragControls extends EventDispatcher {
 
@@ -36,6 +35,8 @@ class DragControls extends EventDispatcher {
 		const _intersections = [];
 
 		this.mode = "translate";
+
+		this.rotateSpeed = 1;
 
 		//
 
@@ -102,9 +103,9 @@ class DragControls extends EventDispatcher {
 				
 				} else if (scope.mode === "rotate") {
 
-					_diff.multiplyScalar(2); //Just a random scalling factor since it rotated too slow
+					_diff.multiplyScalar(this.rotateSpeed);
 					_selected.rotateOnWorldAxis(_up, _diff.x);
-					_selected.rotateOnWorldAxis(_horizen.normalize(), -_diff.y);
+					_selected.rotateOnWorldAxis(_right.normalize(), -_diff.y);
 				
 				}
 
@@ -191,9 +192,9 @@ class DragControls extends EventDispatcher {
 					
 					} else if (scope.mode === "rotate") {
 					
+						//Note: the controls only support the Y+ rotation
 						_up.set(0,1,0).applyQuaternion(_camera.quaternion).normalize();
-						_horizen.set(1,0,0).applyQuaternion(_camera.quaternion).normalize();
-						_lookAt.set(0,0,-1).applyQuaternion(_camera.quaternion).normalize();
+						_right.set(1,0,0).applyQuaternion(_camera.quaternion).normalize();
 					
 					}
 					
