@@ -57,19 +57,7 @@ class Raycaster {
 
 	intersectObject( object, recursive = true, intersects = [] ) {
 
-		try {
-
-			intersectObject( object, this, intersects, recursive );
-
-		} catch ( e ) {
-
-			if ( e instanceof TraversalStopException === false ) {
-
-				throw e;
-
-			}
-
-		}
+		intersectObject( object, this, intersects, recursive );
 
 		intersects.sort( ascSort );
 
@@ -79,21 +67,9 @@ class Raycaster {
 
 	intersectObjects( objects, recursive = true, intersects = [] ) {
 
-		try {
+		for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
-			for ( let i = 0, l = objects.length; i < l; i ++ ) {
-
-				intersectObject( objects[ i ], this, intersects, recursive );
-
-			}
-
-		} catch ( e ) {
-
-			if ( e instanceof TraversalStopException === false ) {
-
-				throw e;
-
-			}
+			intersectObject( objects[ i ], this, intersects, recursive );
 
 		}
 
@@ -119,19 +95,31 @@ function ascSort( a, b ) {
 
 function intersectObject( object, raycaster, intersects, recursive ) {
 
-	if ( object.layers.test( raycaster.layers ) ) {
+	try {
 
-		object.raycast( raycaster, intersects );
+		if ( object.layers.test( raycaster.layers ) ) {
 
-	}
+			object.raycast( raycaster, intersects );
 
-	if ( recursive === true ) {
+		}
 
-		const children = object.children;
+		if ( recursive === true ) {
 
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
+			const children = object.children;
 
-			intersectObject( children[ i ], raycaster, intersects, true );
+			for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+				intersectObject( children[ i ], raycaster, intersects, true );
+
+			}
+
+		}
+
+	} catch ( e ) {
+
+		if ( e instanceof TraversalStopException === false ) {
+
+			throw e;
 
 		}
 
