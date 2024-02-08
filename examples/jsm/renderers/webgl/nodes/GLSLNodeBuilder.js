@@ -6,7 +6,7 @@ import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
 
-import { IntType, DataTexture, RGBAFormat, FloatType } from 'three';
+import { RedFormat, RGFormat, IntType, DataTexture, RGBAFormat, FloatType } from 'three';
 
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan',
@@ -94,20 +94,36 @@ ${ flowData.code }
 			const originalArray = attribute.array;
 			const numElements = attribute.count * attribute.itemSize;
 
-			const width = Math.pow( 2, Math.ceil( Math.log2( Math.sqrt( numElements / 4 ) ) ) );
-			let height = Math.ceil( ( numElements / 4 ) / width );
-			if ( width * height * 4 < numElements ) height ++; // Ensure enough space
+			const { itemSize } = attribute;
+			let format = RedFormat;
 
-			const newSize = width * height * 4; // 4 floats per pixel due to RGBA format
+			if ( itemSize === 2 ) {
+
+				format = RGFormat;
+
+			} else if ( itemSize === 3 ) {
+
+				format = 6407; // patch since legacy doesn't use RGBFormat for rendering but here it's needed for packing optimization
+
+			} else if ( itemSize === 4 ) {
+
+				format = RGBAFormat;
+
+			}
+
+			const width = Math.pow( 2, Math.ceil( Math.log2( Math.sqrt( numElements / itemSize ) ) ) );
+			let height = Math.ceil( ( numElements / itemSize ) / width );
+			if ( width * height * itemSize < numElements ) height ++; // Ensure enough space
+
+			const newSize = width * height * itemSize;
 
 			const newArray = new Float32Array( newSize );
 
 			newArray.set( originalArray, 0 );
 
 			attribute.array = newArray;
-			attribute.count = newSize;
 
-			const pboTexture = new DataTexture( attribute.array, width, height, RGBAFormat, FloatType );
+			const pboTexture = new DataTexture( attribute.array, width, height, format, FloatType );
 			pboTexture.needsUpdate = true;
 			pboTexture.isPBOTexture = true;
 
@@ -174,27 +190,10 @@ ${ flowData.code }
 
 			//
 
-			let channel;
-			let padding;
+			const { itemSize } = attribute;
 
-			const itemSize = attribute.itemSize;
-
-			if ( itemSize === 1 ) {
-
-				padding = 4;
-				channel = `[ ${indexSnippet} % uint( ${ padding } ) ]`;
-
-			} else {
-
-				padding = itemSize > 2 ? 1 : itemSize;
-				channel = '.' + vectorComponents.join( '' ).slice( 0, itemSize );
-
-			}
-
-			const uvSnippet = `ivec2(
-				${indexSnippet} / uint( ${ padding } ) % ${ propertySizeName },
-				${indexSnippet} / ( uint( ${ padding } ) * ${ propertySizeName } )
-			)`;
+			const channel = '.' + vectorComponents.join( '' ).slice( 0, itemSize );
+			const uvSnippet = `ivec2(${indexSnippet} % ${ propertySizeName }, ${indexSnippet} / ${ propertySizeName })`;
 
 			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, null, '0' );
 

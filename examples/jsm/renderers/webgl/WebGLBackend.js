@@ -437,11 +437,10 @@ class WebGLBackend extends Backend {
 
 				this.textureUtils.copyBufferToTexture( dualAttributeData.transformBuffer, dualAttributeData.pbo );
 
-			} else {
-
-				dualAttributeData.switchBuffers();
-
 			}
+
+			dualAttributeData.switchBuffers();
+
 
 		}
 
