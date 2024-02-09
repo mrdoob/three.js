@@ -126,6 +126,7 @@ const exceptionList = [
 	'webgpu_postprocessing_afterimage',
 	'webgpu_backdrop_water',
 	'webgpu_camera_logarithmicdepthbuffer',
+	'webgpu_clipping',
 	'webgpu_loader_materialx',
 	'webgpu_materials_video',
 	'webgpu_materialx_noise',

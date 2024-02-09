@@ -1,3 +1,5 @@
+import ClippingContext from "./ClippingContext.js";
+
 let id = 0;
 
 export default class RenderObject {
@@ -24,6 +26,10 @@ export default class RenderObject {
 		this.pipeline = null;
 		this.vertexBuffers = null;
 
+		this.updateClipping( renderContext.clippingContext );
+
+		this.clippingContextVersion = this.clippingContext.version;
+
 		this.initialNodesCacheKey = this.getNodesCacheKey();
 		this.initialCacheKey = this.getCacheKey();
 
@@ -41,6 +47,41 @@ export default class RenderObject {
 		};
 
 		this.material.addEventListener( 'dispose', this.onMaterialDispose );
+
+	}
+
+	updateClipping( parent ) {
+
+		const material = this.material;
+
+		let clippingContext = this.clippingContext;
+
+		if ( Array.isArray( material.clippingPlanes ) ) {
+
+			if ( clippingContext === parent || ! clippingContext ) {
+
+				clippingContext = new ClippingContext();
+				this.clippingContext = clippingContext;
+
+			}
+
+			clippingContext.update( parent, material );
+
+		} else if ( this.clippingContext !== parent ) {
+
+			this.clippingContext = parent;
+
+		}
+
+	}
+
+	clippingNeedsUpdate () {
+
+		if ( this.clippingContext.version === this.clippingContextVersion ) return false;
+
+		this.clippingContextVersion = this.clippingContext.version;
+
+		return true;
 
 	}
 
@@ -130,6 +171,8 @@ export default class RenderObject {
 			cacheKey += /*property + ':' +*/ value + ',';
 
 		}
+
+		cacheKey += this.clippingContextVersion + ',';
 
 		if ( object.skeleton ) {
 

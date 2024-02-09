@@ -321,6 +321,7 @@
 		"webgpu_backdrop_water",
 		"webgpu_camera_logarithmicdepthbuffer",
 		"webgpu_clearcoat",
+		"webgpu_clipping",
 		"webgpu_compute_audio",
 		"webgpu_compute_particles",
 		"webgpu_compute_particles_rain",

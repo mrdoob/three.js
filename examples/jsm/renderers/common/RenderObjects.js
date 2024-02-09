@@ -31,7 +31,9 @@ class RenderObjects {
 
 		} else {
 
-			if ( renderObject.version !== material.version || renderObject.needsUpdate ) {
+			renderObject.updateClipping( renderContext.clippingContext );
+
+			if ( renderObject.version !== material.version || renderObject.needsUpdate || renderObject.clippingNeedsUpdate() ) {
 
 				if ( renderObject.initialCacheKey !== renderObject.getCacheKey() ) {
 
