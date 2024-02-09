@@ -29,7 +29,7 @@
 			import { storageObject, If, vec3, uv, uint, float, tslFn, instanceIndex, MeshBasicNodeMaterial } from 'three/nodes';
 
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import StorageBufferAttribute from 'three/addons/renderers/common/StorageBufferAttribute.js';
+			import StorageInstancedBufferAttribute from 'three/addons/renderers/common/StorageInstancedBufferAttribute.js';
 
 			// WebGPU Backend
 			init();
@@ -59,7 +59,7 @@
 					const typeSize = i + 1;
 					const array = new Array( size * typeSize ).fill( 0 );
 
-					const arrayBuffer = new StorageBufferAttribute( new Float32Array( array ), typeSize );
+					const arrayBuffer = new StorageInstancedBufferAttribute( new Float32Array( array ), typeSize );
 
 					arrayBufferNodes.push( storageObject( arrayBuffer, type[ i ], size ) );
 
