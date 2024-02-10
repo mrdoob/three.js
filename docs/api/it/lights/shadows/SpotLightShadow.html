@@ -23,7 +23,7 @@
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
 		// Crea una SpotLight e attiva le ombre per la luce
-		const light = new THREE.SpotLight( 0xffffff );
+		const light = new THREE.SpotLight();
 		light.castShadow = true; // default false
 		scene.add( light );
 
@@ -73,8 +73,6 @@
       Il [page:PerspectiveCamera.fov fov] traccerà la proprietà dell'[page:SpotLight.angle angolo] del proprietario 
       [page:SpotLight SpotLight] tramite il metodo [page:SpotLightShadow.update update]. Allo stesso modo, la proprietà
       [page:PerspectiveCamera.aspect aspect] terrà traccia dell'aspetto della [page:LightShadow.mapSize mapSize].
-      Se la proprietà [page:SpotLight.distance distance] della luce è impostata, il piano [page:PerspectiveCamera.far far]
-      la seguirà, altrimenti il valore predefinito è `500`.
 		</p>
 
 		<h3>[property:Number focus]</h3>

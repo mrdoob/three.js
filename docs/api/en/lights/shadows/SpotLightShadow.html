@@ -24,7 +24,7 @@
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
 		//Create a SpotLight and turn on shadows for the light
-		const light = new THREE.SpotLight( 0xffffff );
+		const light = new THREE.SpotLight();
 		light.castShadow = true; // default false
 		scene.add( light );
 
@@ -79,9 +79,7 @@
 			property of the owning [page:SpotLight SpotLight] via the
 			[page:SpotLightShadow.update update] method. Similarly, the
 			[page:PerspectiveCamera.aspect aspect] property will track the aspect of
-			the [page:LightShadow.mapSize mapSize]. If the [page:SpotLight.distance distance] 
-			property of the light is set, the [page:PerspectiveCamera.far far] 
-			clipping plane will track that, otherwise it defaults to `500`.
+			the [page:LightShadow.mapSize mapSize].
 		</p>
 
 		<h3>[property:Number focus]</h3>

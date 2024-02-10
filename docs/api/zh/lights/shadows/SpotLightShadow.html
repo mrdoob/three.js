@@ -24,7 +24,7 @@
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
 		//Create a SpotLight and turn on shadows for the light
-		const light = new THREE.SpotLight( 0xffffff );
+		const light = new THREE.SpotLight();
 		light.castShadow = true;            // default false
 		scene.add( light );
 
@@ -65,7 +65,7 @@
 		<p>
 			在光的世界里。这用于生成场景的深度图;从光的角度来看，其他物体背后的物体将处于阴影中。<br /><br />
 
-			默认值为PerspectiveCamera，近剪裁平面为0.5。 fov将通过更新方法跟踪拥有SpotLight的角度属性。同样，aspect属性将跟踪mapSize的方面。如果设置了灯光的距离属性，则远剪裁平面将跟踪该值，否则默认为500。
+			默认值为PerspectiveCamera，近剪裁平面为0.5。 fov将通过更新方法跟踪拥有SpotLight的角度属性。同样，aspect属性将跟踪mapSize的方面。
 		</p>
 
 		<h3>[property:Number focus]</h3>

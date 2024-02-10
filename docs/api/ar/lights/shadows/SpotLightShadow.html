@@ -24,7 +24,7 @@
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
 		//Create a SpotLight and turn on shadows for the light
-		const light = new THREE.SpotLight( 0xffffff );
+		const light = new THREE.SpotLight();
 		light.castShadow = true; // default false
 		scene.add( light );
 
@@ -79,9 +79,7 @@
 		خاصية [page:SpotLight SpotLight] المملوكة عبر
 		[page:SpotLightShadow.update update] طريقة. بالمثل ،
 		[page:PerspectiveCamera.aspect aspect] خاصية ستتبع نسبة
-		[page:LightShadow.mapSize mapSize]. إذا تم تعيين [page:SpotLight.distance distance]
-		خاصية الضوء ، فستتبع [page:PerspectiveCamera.far far]
-		كليبينغ بلان ذلك ، وإلا فإنه يفترض `500`.
+		[page:LightShadow.mapSize mapSize].
 		</p>
 		
 		<h3>[property:Number focus]</h3>
