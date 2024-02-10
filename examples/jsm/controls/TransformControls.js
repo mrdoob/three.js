@@ -215,7 +215,13 @@ class TransformControls extends Object3D {
 
 		}
 
-		super.updateMatrixWorld( this );
+		// the TransformControl should ignore any parent matrix
+		this.matrixAutoUpdate = false;
+		this.updateMatrix();
+		this.matrixWorldNeedsUpdate = false;
+		this.matrixWorld.copy( this.matrix );
+
+		super.updateMatrixWorld();
 
 	}
 
