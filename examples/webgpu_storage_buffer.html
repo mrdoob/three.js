@@ -98,7 +98,11 @@
 
 					const index = uint( uv().x.mul( size ).floor() ).toVar();
 
-					If( index.greaterThanEqual( size ), () => index.assign( uint( size ).sub( 1 ) ) );
+					If( index.greaterThanEqual( size ), () => {
+
+						index.assign( uint( size ).sub( 1 ) );
+
+					} );
 
 					const color = vec3( 0, 0, 0 ).toVar();
 
