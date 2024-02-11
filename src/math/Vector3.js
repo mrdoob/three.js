@@ -694,15 +694,15 @@ class Vector3 {
 
 	randomDirection() {
 
-		// Derived from https://mathworld.wolfram.com/SpherePointPicking.html
+		// https://mathworld.wolfram.com/SpherePointPicking.html
 
-		const u = ( Math.random() - 0.5 ) * 2;
-		const t = Math.random() * Math.PI * 2;
-		const f = Math.sqrt( 1 - u ** 2 );
+		const theta = Math.random() * Math.PI * 2;
+		const u = Math.random() * 2 - 1;
+		const c = Math.sqrt( 1 - u * u );
 
-		this.x = f * Math.cos( t );
-		this.y = f * Math.sin( t );
-		this.z = u;
+		this.x = c * Math.cos( theta );
+		this.y = u;
+		this.z = c * Math.sin( theta );
 
 		return this;
 
