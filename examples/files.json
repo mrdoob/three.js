@@ -356,6 +356,7 @@
 		"webgpu_morphtargets",
 		"webgpu_morphtargets_face",
 		"webgpu_occlusion",
+		"webgpu_parallax_uv",
 		"webgpu_particles",
 		"webgpu_portal",
 		"webgpu_reflection",
