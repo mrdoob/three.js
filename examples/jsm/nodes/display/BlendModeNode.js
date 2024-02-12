@@ -9,6 +9,13 @@ export const BurnNode = tslFn( ( { base, blend } ) => {
 
 	return vec3( fn( 'x' ), fn( 'y' ), fn( 'z' ) );
 
+} ).setLayout( {
+	name: 'burnColor',
+	type: 'vec3',
+	inputs: [
+		{ name: 'base', type: 'vec3' },
+		{ name: 'blend', type: 'vec3' }
+	]
 } );
 
 export const DodgeNode = tslFn( ( { base, blend } ) => {
@@ -17,6 +24,13 @@ export const DodgeNode = tslFn( ( { base, blend } ) => {
 
 	return vec3( fn( 'x' ), fn( 'y' ), fn( 'z' ) );
 
+} ).setLayout( {
+	name: 'dodgeColor',
+	type: 'vec3',
+	inputs: [
+		{ name: 'base', type: 'vec3' },
+		{ name: 'blend', type: 'vec3' }
+	]
 } );
 
 export const ScreenNode = tslFn( ( { base, blend } ) => {
@@ -25,6 +39,13 @@ export const ScreenNode = tslFn( ( { base, blend } ) => {
 
 	return vec3( fn( 'x' ), fn( 'y' ), fn( 'z' ) );
 
+} ).setLayout( {
+	name: 'screenColor',
+	type: 'vec3',
+	inputs: [
+		{ name: 'base', type: 'vec3' },
+		{ name: 'blend', type: 'vec3' }
+	]
 } );
 
 export const OverlayNode = tslFn( ( { base, blend } ) => {
@@ -33,6 +54,13 @@ export const OverlayNode = tslFn( ( { base, blend } ) => {
 
 	return vec3( fn( 'x' ), fn( 'y' ), fn( 'z' ) );
 
+} ).setLayout( {
+	name: 'overlayColor',
+	type: 'vec3',
+	inputs: [
+		{ name: 'base', type: 'vec3' },
+		{ name: 'blend', type: 'vec3' }
+	]
 } );
 
 class BlendModeNode extends TempNode {
