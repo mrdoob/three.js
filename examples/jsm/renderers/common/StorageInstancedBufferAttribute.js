@@ -8,7 +8,7 @@ class StorageInstancedBufferAttribute extends InstancedBufferAttribute {
 
 		super( array, itemSize );
 
-		this.isStorageBufferAttribute = true;
+		this.isStorageInstancedBufferAttribute = true;
 
 	}
 
