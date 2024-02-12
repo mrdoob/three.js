@@ -44,14 +44,16 @@
 
 		<h3>[property:Box3 boundingBox]</h3>
 		<p>
-			This bounding box encloses all instances of the [name]. Can be calculated
-			with [page:.computeBoundingBox](). Default is `null`.
+			This bounding box encloses all instances of the [name]. If you transform any
+			instances, you are responsible for updating the bounding box as needed. Can be
+			calculated with [page:.computeBoundingBox](). Default is `null`.
 		</p>
 
 		<h3>[property:Sphere boundingSphere]</h3>
 		<p>
-			This bounding sphere encloses all instances of the [name]. Can be
-			calculated with [page:.computeBoundingSphere](). Default is `null`.
+			This bounding sphere encloses all instances of the [name]. If you transform any
+			instances, you are responsible for updating the bounding sphere as needed. Can
+			be calculated with [page:.computeBoundingSphere](). Default is `null`.
 		</p>
 
 		<h3>[property:Integer count]</h3>
@@ -179,7 +181,10 @@
 		<p>
 			Sets the given local transformation matrix to the defined instance. Make
 			sure you set [page:.instanceMatrix][page:BufferAttribute.needsUpdate .needsUpdate] 
-			to true after updating all the matrices.
+			to true after updating all the matrices. The bounding volumes should be updated
+			whenever instances are transformed. Depending on how you transform instances, the
+			bounds can be larger or smaller than before and the bounding volumes should
+			reflect that.
 		</p>
 
 		<h3>
