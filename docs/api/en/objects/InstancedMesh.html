@@ -45,7 +45,10 @@
 		<h3>[property:Box3 boundingBox]</h3>
 		<p>
 			This bounding box encloses all instances of the [name]. Can be calculated
-			with [page:.computeBoundingBox](). Default is `null`.
+			with [page:.computeBoundingBox](). Default is `null`. By default, this
+			bounding box is used for the purposes of frustum culling. You have to
+			manually update the bounding box if you transform any instances outside of
+			the current bounds.
 		</p>
 
 		<h3>[property:Sphere boundingSphere]</h3>
@@ -179,7 +182,10 @@
 		<p>
 			Sets the given local transformation matrix to the defined instance. Make
 			sure you set [page:.instanceMatrix][page:BufferAttribute.needsUpdate .needsUpdate] 
-			to true after updating all the matrices.
+			to true after updating all the matrices. Additionally, if the instance's new
+			transform is outside the current [page:.boundingBox] while
+			[page:Object3D.frustumCulled .frustumCulled] is enabled (the default), you have to
+			manually call [page:.computeBoundingBox]() to update it.
 		</p>
 
 		<h3>
