@@ -95,7 +95,7 @@
     "eslint": "^8.37.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-compat": "^4.1.2",
-    "eslint-plugin-html": "^7.1.0",
+    "eslint-plugin-html": "^8.0.0",
     "eslint-plugin-import": "^2.27.5",
     "failonlyreporter": "^1.0.0",
     "jimp": "^0.22.7",
