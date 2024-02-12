@@ -422,7 +422,7 @@ class WebGLBackend extends Backend {
 		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, transformFeedbackGPU );
 		gl.beginTransformFeedback( gl.POINTS );
 
-		if ( attributes[ 0 ].isInstancedBufferAttribute ) {
+		if ( attributes[ 0 ].isStorageInstancedBufferAttribute ) {
 
 			gl.drawArraysInstanced( gl.POINTS, 0, 1, computeNode.count );
 
@@ -1240,7 +1240,7 @@ class WebGLBackend extends Backend {
 			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
 			gl.enableVertexAttribArray( i );
 
-			if ( attribute.isStorageBufferAttribute ) staticVao = false;
+			if ( attribute.isStorageBufferAttribute || attribute.isStorageInstancedBufferAttribute ) staticVao = false;
 
 			let stride, offset;
 
