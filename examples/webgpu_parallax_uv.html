@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - mirror</title>
+		<title>three.js webgpu - parallax uv</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -91,12 +91,12 @@
 				const parallaxUVOffset = parallaxUV( uv(), offsetUV );
 				const parallaxResult = texture( bottomTexture, parallaxUVOffset );
 
-				const iceNode = texture( topTexture ).overlay( parallaxResult ).mul( 5 );
+				const iceNode = texture( topTexture ).overlay( parallaxResult );
 
 				// material
 
 				const material = new MeshStandardNodeMaterial();
-				material.colorNode = iceNode; // increase the color intensity ( contrast )
+				material.colorNode = iceNode.mul( 5 ); // increase the color intensity to 5 ( contrast )
 				material.roughnessNode = texture( roughnessTexture );
 				material.normalMap = normalTexture;
 				material.metalness = 0;
