@@ -6,5 +6,5 @@ import { positionViewDirection } from './PositionNode.js';
 
 export const TBNViewMatrix = mat3( tangentView, bitangentView, normalView );
 
-export const parallaxDelta = positionViewDirection.mul( TBNViewMatrix );
-export const parallaxUV = ( uv, scale ) => uv.sub( parallaxDelta.mul( scale ) );
+export const parallaxDirection = positionViewDirection.mul( TBNViewMatrix )/*.normalize()*/;
+export const parallaxUV = ( uv, scale ) => uv.sub( parallaxDirection.mul( scale ) );

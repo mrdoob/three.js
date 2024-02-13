@@ -76,7 +76,7 @@ export { default as ReflectorNode, reflector } from './utils/ReflectorNode.js';
 export * from './shadernode/ShaderNode.js';
 
 // accessors
-export { TBNViewMatrix, parallaxDelta, parallaxUV } from './accessors/AccessorsUtils.js';
+export { TBNViewMatrix, parallaxDirection, parallaxUV } from './accessors/AccessorsUtils.js';
 export { default as UniformsNode, uniforms } from './accessors/UniformsNode.js';
 export { default as BitangentNode, bitangentGeometry, bitangentLocal, bitangentView, bitangentWorld, transformedBitangentView, transformedBitangentWorld } from './accessors/BitangentNode.js';
 export { default as BufferAttributeNode, bufferAttribute, dynamicBufferAttribute, instancedBufferAttribute, instancedDynamicBufferAttribute } from './accessors/BufferAttributeNode.js';
