@@ -48,6 +48,12 @@ class TangentNode extends Node {
 
 			outputNode = attribute( 'tangent', 'vec4' );
 
+			if ( builder.geometry.hasAttribute( 'tangent' ) === false ) {
+
+				builder.geometry.computeTangents();
+
+			}
+
 		} else if ( scope === TangentNode.LOCAL ) {
 
 			outputNode = varying( tangentGeometry.xyz );
