@@ -48,14 +48,13 @@
 				// camera
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, .1, 50 );
-				camera.position.set( 14, 14, 14 );
+				camera.position.set( 10, 14, 10 );
 
 				// environment
 
-				const cube2Urls = [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ];
 				const environmentTexture = new THREE.CubeTextureLoader()
-					.setPath( './textures/cube/Park3Med/' )
-					.load( cube2Urls );
+					.setPath( './textures/cube/Park2/' )
+					.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
 
 
 				scene.environment = environmentTexture;
@@ -111,7 +110,7 @@
 
 				// renderer
 
-				renderer = new WebGPURenderer( { antialias: true, forceWebGL: true } );
+				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
