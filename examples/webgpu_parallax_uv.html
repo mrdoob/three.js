@@ -102,7 +102,6 @@
 				material.metalness = 0;
 
 				const geometry = new THREE.BoxGeometry( 10, 10, 10 );
-				geometry.computeTangents(); // required for parallax
 
 				const ground = new THREE.Mesh( geometry, material );
 				ground.rotateX( - Math.PI / 2 );
