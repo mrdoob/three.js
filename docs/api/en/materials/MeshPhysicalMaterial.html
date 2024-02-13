@@ -18,10 +18,19 @@
 
 		<ul>
 			<li>
+				<b>Anisotropy:</b> Ability to represent the anisotropic property of materials 
+				as observable with brushed metals.
+			</li>
+			<li>
 				<b>Clearcoat:</b> Some materials — like car paints, carbon fiber, and
 				wet surfaces — require a clear, reflective layer on top of another layer
 				that may be irregular or rough. Clearcoat approximates this effect,
 				without the need for a separate transparent surface.
+			</li>
+			<li>
+				<b>Iridescence:</b> Allows to render the effect where hue varies 
+				depending on the viewing angle and illumination angle. This can be seen on
+				soap bubbles, oil films, or on the wings of many insects.
 			</li>
 			<li>
 				<b>Physically-based transparency:</b> One limitation of
@@ -69,7 +78,9 @@
 
 		<h2>Examples</h2>
 		<p>
+			[example:webgl_loader_gltf_anisotropy loader / gltf / anisotropy]<br />
 			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
+			[example:webgl_loader_gltf_iridescence loader / gltf / iridescence]<br />
 			[example:webgl_loader_gltf_sheen loader / gltf / sheen]<br />
 			[example:webgl_materials_physical_transmission materials / physical / transmission]
 		</p>
@@ -92,6 +103,25 @@
 		<p>
 			See the base [page:Material] and [page:MeshStandardMaterial] classes for
 			common properties.
+		</p>
+
+		<h3>[property:Float anisotropy]</h3>
+		<p>
+			The anisotropy strength. Default is `0.0`.
+		</p>
+
+		<h3>[property:Texture anisotropyMap]</h3>
+		<p>
+			Red and green channels represent the anisotropy direction in `[-1, 1]` tangent,
+			bitangent space, to be rotated by [page:.anisotropyRotation]. The blue channel
+			contains strength as `[0, 1]` to be multiplied by [page:.anisotropy]. Default is `null`.
+		</p>
+
+		<h3>[property:Float anisotropyRotation]</h3>
+		<p>
+			The rotation of the anisotropy in tangent, bitangent space, measured in radians
+			counter-clockwise from the tangent. When [page:.anisotropyMap] is present, this
+			property provides additional rotation to the vectors in the texture. Default is `0.0`.
 		</p>
 
 		<h3>[property:Color attenuationColor]</h3>
