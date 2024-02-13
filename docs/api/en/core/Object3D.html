@@ -300,11 +300,6 @@
 			Applies the matrix transform to the object and updates the object's
 			position, rotation and scale.
 		</p>
-		<p>
-			Note: This method relies on [page:Matrix4.decompose], and not all matrices are decomposable in this way. 
-			For example, if an object has a non-uniformly scaled parent, then the object's world matrix may not be decomposable, 
-			and this method may not be appropriate.
-		</p>
 
 		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>Applies the rotation represented by the quaternion to the object.</p>
