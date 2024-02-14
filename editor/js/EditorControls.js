@@ -136,6 +136,10 @@ class EditorControls extends THREE.EventDispatcher {
 
 			//
 
+			if ( isTrackingPointer( event ) ) return;
+
+			//
+
 			addPointer( event );
 
 			if ( event.pointerType === 'touch' ) {
@@ -389,6 +393,18 @@ class EditorControls extends THREE.EventDispatcher {
 				}
 
 			}
+
+		}
+
+		function isTrackingPointer( event ) {
+
+			for ( var i = 0; i < pointers.length; i ++ ) {
+
+				if ( pointers[ i ] == event.pointerId ) return true;
+
+			}
+
+			return false;
 
 		}
 
