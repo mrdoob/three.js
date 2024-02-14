@@ -95,16 +95,17 @@
 		<h3>[method:undefined computeBoundingBox]()</h3>
 		<p>
 			Computes the bounding box, updating [page:.boundingBox] attribute.<br />
-			Bounding boxes aren't computed by default. They need to be explicitly
-			computed, otherwise they are `null`.
+			Bounding boxes aren't computed by default. They need to be explicitly computed, 
+			otherwise they are `null`. Once computed, it's the responsibility of the app to recompute the 
+			bounding box with this method when instances are transformed via [page:.setMatrixAt]().
 		</p>
 
 		<h3>[method:undefined computeBoundingSphere]()</h3>
 		<p>
-			Computes the bounding sphere, updating [page:.boundingSphere]
-			attribute.<br />
-			Bounding spheres aren't computed by default. They need to be explicitly
-			computed, otherwise they are `null`.
+			Computes the bounding sphere, updating [page:.boundingSphere] attribute.<br />
+			Bounding spheres are computed by the engine once when they are internally required e.g. for 
+			ray casting or view frustum culling. It's the responsibility of the app to recompute 
+			the bounding sphere with this method when instances are transformed via [page:.setMatrixAt]().
 		</p>
 
 		<h3>[method:undefined dispose]()</h3>

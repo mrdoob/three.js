@@ -159,12 +159,10 @@
 
 		<h3>[method:undefined computeBoundingSphere]()</h3>
 		<p>
-			Computes the bounding sphere, updating [page:.boundingSphere]
-			attribute.<br />
-			Bounding spheres aren't computed by default. They need to be explicitly
-			computed, otherwise they are `null`. If an instance of [name] is animated,
-			this method should be called per frame to compute a correct bounding
-			sphere.
+			Computes the bounding sphere, updating [page:.boundingSphere] attribute.<br />
+			Bounding spheres are computed by the engine once when they are internally required 
+			e.g. for ray casting or view frustum culling. If an instance of [name] is animated,
+			this method should be called per frame to compute a correct bounding sphere.
 		</p>
 
 		<h3>[method:undefined normalizeSkinWeights]()</h3>
