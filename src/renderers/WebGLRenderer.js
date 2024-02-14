@@ -1178,6 +1178,8 @@ class WebGLRenderer {
 
 			renderListStack.push( currentRenderList );
 
+			if ( _this.xr.getDepthSensingMesh() ) projectObject( _this.xr.getDepthSensingMesh(), camera, - Infinity, _this.sortObjects );
+
 			projectObject( scene, camera, 0, _this.sortObjects );
 
 			currentRenderList.finish();
