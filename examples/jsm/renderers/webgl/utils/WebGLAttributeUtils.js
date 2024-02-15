@@ -8,6 +8,7 @@ class DualAttributeData {
 
 		this.buffers = [ attributeData.bufferGPU, dualBuffer ];
 		this.type = attributeData.type;
+		this.bufferType = attributeData.bufferType;
 		this.pbo = attributeData.pbo;
 		this.byteLength = attributeData.byteLength;
 		this.bytesPerElement = attributeData.BYTES_PER_ELEMENT;
@@ -128,6 +129,7 @@ class WebGLAttributeUtils {
 
 		let attributeData = {
 			bufferGPU,
+			bufferType,
 			type,
 			byteLength: array.byteLength,
 			bytesPerElement: array.BYTES_PER_ELEMENT,
