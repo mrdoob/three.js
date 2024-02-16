@@ -26,7 +26,6 @@ function Strings( config ) {
 			'menubar/edit': 'Edit',
 			'menubar/edit/undo': 'Undo (Ctrl+Z)',
 			'menubar/edit/redo': 'Redo (Ctrl+Shift+Z)',
-			'menubar/edit/clear_history': 'Clear History',
 			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Clone',
 			'menubar/edit/delete': 'Delete (Del)',
@@ -338,7 +337,8 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
 			'sidebar/history': 'History',
-			'sidebar/history/persistent': 'persistent',
+			'sidebar/history/clear': 'Clear',
+			'sidebar/history/persistent': 'Persistent',
 
 			'toolbar/translate': 'Translate',
 			'toolbar/rotate': 'Rotate',
@@ -377,7 +377,6 @@ function Strings( config ) {
 			'menubar/edit': 'Edition',
 			'menubar/edit/undo': 'Annuler (Ctrl+Z)',
 			'menubar/edit/redo': 'Refaire (Ctrl+Shift+Z)',
-			'menubar/edit/clear_history': 'Supprimer Historique',
 			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Cloner',
 			'menubar/edit/delete': 'Supprimer (Supp)',
@@ -687,7 +686,8 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
 			'sidebar/history': 'Historique',
-			'sidebar/history/persistent': 'permanent',
+			'sidebar/history/clear': 'Supprimer',
+			'sidebar/history/persistent': 'Permanent',
 
 			'toolbar/translate': 'Position',
 			'toolbar/rotate': 'Rotation',
@@ -726,7 +726,6 @@ function Strings( config ) {
 			'menubar/edit': '编辑',
 			'menubar/edit/undo': '撤销 (Ctrl+Z)',
 			'menubar/edit/redo': '重做 (Ctrl+Shift+Z)',
-			'menubar/edit/clear_history': '清空历史记录',
 			'menubar/edit/center': '居中',
 			'menubar/edit/clone': '拷贝',
 			'menubar/edit/delete': '删除 (Del)',
@@ -1036,6 +1035,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/focus': '聚焦',
 
 			'sidebar/history': '历史记录',
+			'sidebar/history/clear': '清空',
 			'sidebar/history/persistent': '本地存储',
 
 			'toolbar/translate': '移动',
