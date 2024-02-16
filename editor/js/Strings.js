@@ -9,9 +9,6 @@ function Strings( config ) {
 			'menubar/file': 'File',
 			'menubar/file/new': 'New',
 			'menubar/file/import': 'Import',
-			'menubar/file/export/geometry': 'Export Geometry',
-			'menubar/file/export/object': 'Export Object',
-			'menubar/file/export/scene': 'Export Scene',
 			'menubar/file/export/drc': 'Export DRC',
 			'menubar/file/export/glb': 'Export GLB',
 			'menubar/file/export/gltf': 'Export GLTF',
@@ -124,6 +121,7 @@ function Strings( config ) {
 			'sidebar/object/frustumcull': 'Frustum Cull',
 			'sidebar/object/renderorder': 'Render Order',
 			'sidebar/object/userdata': 'User data',
+			'sidebar/object/export': 'Export JSON',
 
 			'sidebar/geometry/type': 'Type',
 			'sidebar/geometry/new': 'New',
@@ -134,6 +132,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_normals': 'Compute Vertex Normals',
 			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
 			'sidebar/geometry/center': 'Center',
+			'sidebar/geometry/export': 'Export JSON',
 
 			'sidebar/geometry/box_geometry/width': 'Width',
 			'sidebar/geometry/box_geometry/height': 'Height',
@@ -304,6 +303,7 @@ function Strings( config ) {
 			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Wireframe',
 			'sidebar/material/userdata': 'User data',
+			'sidebar/material/export': 'Export JSON',
 
 			'sidebar/script': 'Script',
 			'sidebar/script/new': 'New',
@@ -360,9 +360,6 @@ function Strings( config ) {
 			'menubar/file': 'Fichier',
 			'menubar/file/new': 'Nouveau',
 			'menubar/file/import': 'Importer',
-			'menubar/file/export/geometry': 'Exporter Geometrie',
-			'menubar/file/export/object': 'Exporter Objet',
-			'menubar/file/export/scene': 'Exporter Scene',
 			'menubar/file/export/drc': 'Exporter DRC',
 			'menubar/file/export/glb': 'Exporter GLB',
 			'menubar/file/export/gltf': 'Exporter GLTF',
@@ -475,6 +472,7 @@ function Strings( config ) {
 			'sidebar/object/frustumcull': 'Culling',
 			'sidebar/object/renderorder': 'Ordre de rendus',
 			'sidebar/object/userdata': 'Données utilisateur',
+			'sidebar/object/export': 'Exporter JSON',
 
 			'sidebar/geometry/type': 'Type',
 			'sidebar/geometry/new': 'Nouveau',
@@ -485,6 +483,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_normals': 'Compute Vertex Normals',
 			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
 			'sidebar/geometry/center': 'Center',
+			'sidebar/geometry/export': 'Exporter JSON',
 
 			'sidebar/geometry/box_geometry/width': 'Largeur',
 			'sidebar/geometry/box_geometry/height': 'Hauteur',
@@ -653,6 +652,7 @@ function Strings( config ) {
 			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Fil de fer',
 			'sidebar/material/userdata': 'Données utilisateur',
+			'sidebar/material/export': 'Exporter JSON',
 
 			'sidebar/script': 'Script',
 			'sidebar/script/new': 'Nouveau',
@@ -709,9 +709,6 @@ function Strings( config ) {
 			'menubar/file': '文件',
 			'menubar/file/new': '新建',
 			'menubar/file/import': '导入',
-			'menubar/file/export/geometry': '导出几何体',
-			'menubar/file/export/object': '导出物体',
-			'menubar/file/export/scene': '导出场景',
 			'menubar/file/export/drc': '导出DRC',
 			'menubar/file/export/glb': '导出GLB',
 			'menubar/file/export/gltf': '导出GLTF',
@@ -824,6 +821,7 @@ function Strings( config ) {
 			'sidebar/object/frustumcull': '视锥体裁剪',
 			'sidebar/object/renderorder': '渲染次序',
 			'sidebar/object/userdata': '自定义数据',
+			'sidebar/object/export': '导出JSON',
 
 			'sidebar/geometry/type': '类型',
 			'sidebar/geometry/new': '更新',
@@ -834,6 +832,7 @@ function Strings( config ) {
 			'sidebar/geometry/compute_vertex_normals': '计算顶点法线',
 			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
 			'sidebar/geometry/center': '居中',
+			'sidebar/geometry/export': '导出JSON',
 
 			'sidebar/geometry/box_geometry/width': '宽度',
 			'sidebar/geometry/box_geometry/height': '高度',
@@ -1002,6 +1001,7 @@ function Strings( config ) {
 			'sidebar/material/depthwrite': '深度缓冲',
 			'sidebar/material/wireframe': '线框',
 			'sidebar/material/userdata': '自定义数据',
+			'sidebar/material/export': '导出JSON',
 
 			'sidebar/script': '脚本',
 			'sidebar/script/new': '新建',

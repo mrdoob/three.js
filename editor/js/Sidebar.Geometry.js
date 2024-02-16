@@ -170,6 +170,39 @@ function SidebarGeometry( editor ) {
 	} );
 	helpersRow.add( vertexNormalsButton );
 
+	// Export JSON
+
+	const exportJson = new UIButton( strings.getKey( 'sidebar/geometry/export' ) );
+	exportJson.setMarginLeft( '90px' );
+	exportJson.onClick( function () {
+
+		const object = editor.selected;
+		const geometry = object.geometry;
+
+		let output = geometry.toJSON();
+
+		try {
+
+			output = JSON.stringify( output, null, '\t' );
+			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
+		} catch ( e ) {
+
+			output = JSON.stringify( output );
+
+		}
+
+		const left = ( screen.width / 2 ) - ( 250 );
+		const top = ( screen.height / 2 ) - ( 250 );
+
+		const url = URL.createObjectURL( new Blob( [ output ], { type: 'text/plain' } ) );
+		window.open( url, null, `location=no,left=${left},top=${top},width=500,height=500` );
+
+	} );
+	container.add( exportJson );
+
+	//
+
 	async function build() {
 
 		const object = editor.selected;

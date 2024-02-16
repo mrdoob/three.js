@@ -413,6 +413,37 @@ function SidebarMaterial( editor ) {
 
 	container.add( materialUserDataRow );
 
+	// Export JSON
+
+	const exportJson = new UIButton( strings.getKey( 'sidebar/material/export' ) );
+	exportJson.setMarginLeft( '90px' );
+	exportJson.onClick( function () {
+
+		const object = editor.selected;
+		const material = object.material;
+
+		let output = material.toJSON();
+
+		try {
+
+			output = JSON.stringify( output, null, '\t' );
+			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
+		} catch ( e ) {
+
+			output = JSON.stringify( output );
+
+		}
+
+		const left = ( screen.width / 2 ) - ( 250 );
+		const top = ( screen.height / 2 ) - ( 250 );
+
+		const url = URL.createObjectURL( new Blob( [ output ], { type: 'text/plain' } ) );
+		window.open( url, null, `location=no,left=${left},top=${top},width=500,height=500` );
+
+	} );
+	container.add( exportJson );
+
 	//
 
 	function update() {
