@@ -240,6 +240,6 @@ class MorphNode extends Node {
 
 export default MorphNode;
 
-export const morph = nodeProxy( MorphNode ); // morphReference
+export const morphReference = nodeProxy( MorphNode );
 
 addNodeClass( 'MorphNode', MorphNode );
