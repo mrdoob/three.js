@@ -8,6 +8,8 @@ import { Mesh } from '../../objects/Mesh.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { cloneUniforms, getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
 
+import * as backgroundColor from '../shaders/ShaderLib/backgroundColor.glsl.js';
+
 const _rgb = { r: 0, b: 0, g: 0 };
 
 function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha, premultipliedAlpha ) {
@@ -15,6 +17,7 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 	const clearColor = new Color( 0x000000 );
 	let clearAlpha = alpha === true ? 0 : 1;
 
+	let colorMesh;
 	let planeMesh;
 	let boxMesh;
 
@@ -24,7 +27,6 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 	function render( renderList, scene ) {
 
-		let forceClear = false;
 		let background = scene.isScene === true ? scene.background : null;
 
 		if ( background && background.isTexture ) {
@@ -37,11 +39,6 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 		if ( background === null ) {
 
 			setClear( clearColor, clearAlpha );
-
-		} else if ( background && background.isColor ) {
-
-			setClear( background, 1 );
-			forceClear = true;
 
 		}
 
@@ -57,7 +54,7 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 		}
 
-		if ( renderer.autoClear || forceClear ) {
+		if ( renderer.autoClear ) {
 
 			renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
 
@@ -191,6 +188,39 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 			// push to the pre-sorted opaque render list
 			renderList.unshift( planeMesh, planeMesh.geometry, planeMesh.material, 0, 0, null );
+
+		} else if ( background && background.isColor ) {
+
+			if ( colorMesh === undefined ) {
+
+				colorMesh = new Mesh(
+					new PlaneGeometry( 2, 2 ),
+					new ShaderMaterial( {
+						name: 'BackgroundMaterial',
+						uniforms: {
+							color: { value: /*@__PURE__*/ new Color() }
+						},
+						vertexShader: backgroundColor.vertex,
+						fragmentShader: backgroundColor.fragment,
+						side: FrontSide,
+						depthTest: false,
+						depthWrite: false,
+						fog: false
+					} )
+				);
+
+				colorMesh.geometry.deleteAttribute( 'normal' );
+				colorMesh.geometry.deleteAttribute( 'uv' );
+
+				objects.update( colorMesh );
+
+			}
+
+			colorMesh.material.uniforms.color.value.copy( background ).multiplyScalar( scene.backgroundIntensity );
+			colorMesh.layers.enableAll();
+
+			// push to the pre-sorted opaque render list
+			renderList.unshift( colorMesh, colorMesh.geometry, colorMesh.material, 0, 0, null );
 
 		}
 

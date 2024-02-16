@@ -350,9 +350,9 @@ Water.WaterShader = {
 			// multiply water color with the mix of both textures
 			gl_FragColor = vec4( color, 1.0 ) * mix( refractColor, reflectColor, reflectance );
 
+			#include <fog_fragment>
 			#include <tonemapping_fragment>
 			#include <colorspace_fragment>
-			#include <fog_fragment>
 
 		}`
 
