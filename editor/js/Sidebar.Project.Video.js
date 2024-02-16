@@ -46,15 +46,15 @@ function SidebarProjectVideo( editor ) {
 
 	// Render
 
-	container.add( new UIText( '' ).setWidth( '90px' ) );
-
 	const progress = new UIProgress( 0 );
 	progress.setDisplay( 'none' );
 	progress.setWidth( '170px' );
+	progress.setMarginLeft( '90px' );
 	container.add( progress );
 
 	const renderButton = new UIButton( strings.getKey( 'sidebar/project/render' ) );
 	renderButton.setWidth( '170px' );
+	renderButton.setMarginLeft( '90px' );
 	renderButton.onClick( async () => {
 
 		renderButton.setDisplay( 'none' );
