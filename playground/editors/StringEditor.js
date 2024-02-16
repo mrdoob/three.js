@@ -10,7 +10,7 @@ export class StringEditor extends BaseNodeEditor {
 			inputConnection: false
 		} );
 
-		super( 'String', inputNode, 1, 350 );
+		super( 'String', inputNode, 350 );
 
 		element.addEventListener( 'changeInput', () => this.invalidate() );
 

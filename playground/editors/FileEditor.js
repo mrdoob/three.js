@@ -6,7 +6,7 @@ export class FileEditor extends BaseNodeEditor {
 
 	constructor( buffer = null, name = 'File' ) {
 
-		super( 'File', arrayBuffer( buffer ), 1, 250 );
+		super( 'File', arrayBuffer( buffer ), 250 );
 
 		this.nameInput = new StringInput( name ).setReadOnly( true );
 

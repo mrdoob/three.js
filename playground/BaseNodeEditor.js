@@ -1,10 +1,10 @@
 import { Node, ButtonInput, TitleElement, ContextMenu } from 'flow';
 import { exportJSON, onValidNode } from './NodeEditorUtils.js';
-import { setOutputAestheticsFromNode, getColorFromNode } from './DataTypeLib.js';
+import { setOutputAestheticsFromNode, getColorFromNode, getLengthFromNode } from './DataTypeLib.js';
 
 export class BaseNodeEditor extends Node {
 
-	constructor( name, value = null, outputLength = 1, width = 300 ) {
+	constructor( name, value = null, width = 300 ) {
 
 		super();
 
@@ -78,7 +78,7 @@ export class BaseNodeEditor extends Node {
 
 		this.onValidElement = onValidNode;
 
-		this.outputLength = outputLength;
+		this.outputLength = getLengthFromNode( value );
 	}
 
 	getColor() {

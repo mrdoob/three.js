@@ -10,7 +10,7 @@ export class FloatEditor extends BaseNodeEditor {
 			inputConnection: false
 		} );
 
-		super( 'Float', inputNode, 1, 150 );
+		super( 'Float', inputNode, 150 );
 
 		element.addEventListener( 'changeInput', () => this.invalidate() );
 

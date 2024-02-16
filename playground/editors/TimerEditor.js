@@ -8,7 +8,7 @@ export class TimerEditor extends BaseNodeEditor {
 
 		const node = timerLocal();
 
-		super( 'Timer', node, 1, 200 );
+		super( 'Timer', node, 200 );
 
 		this.title.setIcon( 'ti ti-clock' );
 

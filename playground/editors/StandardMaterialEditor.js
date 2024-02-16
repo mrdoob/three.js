@@ -9,7 +9,7 @@ export class StandardMaterialEditor extends MaterialEditor {
 
 		const material = new MeshStandardNodeMaterial();
 
-		super( 'Standard Material', material, 1 );
+		super( 'Standard Material', material );
 
 		const color = setInputAestheticsFromType( new LabelElement( 'color' ), 'Color' );
 		const opacity = setInputAestheticsFromType( new LabelElement( 'opacity' ), 'Number' );

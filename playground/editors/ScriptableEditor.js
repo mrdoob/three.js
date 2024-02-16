@@ -26,7 +26,7 @@ export class ScriptableEditor extends BaseNodeEditor {
 
 		scriptableNode = scriptable( codeNode );
 
-		super( defaultTitle, scriptableNode, 1, defaultWidth );
+		super( defaultTitle, scriptableNode, defaultWidth );
 
 		this.scriptableNode = scriptableNode;
 		this.editorCodeNode = codeNode;

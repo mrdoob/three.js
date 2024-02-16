@@ -8,7 +8,7 @@ export class JavaScriptEditor extends BaseNodeEditor {
 
 		const codeNode = js( source );
 
-		super( 'JavaScript', codeNode, 1, 500 );
+		super( 'JavaScript', codeNode, 500 );
 
 		this.setResizable( true );
 

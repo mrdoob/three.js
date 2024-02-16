@@ -11,7 +11,7 @@ export class JoinEditor extends BaseNodeEditor {
 
 		const node = new JoinNode();
 
-		super( 'Join', node, 1, 175 );
+		super( 'Join', node, 175 );
 
 		const update = () => {
 

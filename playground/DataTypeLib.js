@@ -34,6 +34,14 @@ export function getLengthFromType( type ) {
 
 }
 
+export function getLengthFromNode( value ) {
+
+	let type = getTypeFromNode( value );
+
+	return getLengthFromType( type );
+
+}
+
 
 export const typeToColorLib = {
 	// gpu
