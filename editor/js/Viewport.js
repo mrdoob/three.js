@@ -10,7 +10,7 @@ import { ViewportControls } from './Viewport.Controls.js';
 import { ViewportInfo } from './Viewport.Info.js';
 
 import { ViewHelper } from './Viewport.ViewHelper.js';
-import { VR } from './Viewport.VR.js';
+import { XR } from './Viewport.XR.js';
 
 import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
@@ -55,7 +55,7 @@ function Viewport( editor ) {
 	grid.add( grid2 );
 
 	const viewHelper = new ViewHelper( camera, container );
-	const vr = new VR( editor );
+	const xr = new XR( editor );
 
 	//
 
@@ -72,27 +72,14 @@ function Viewport( editor ) {
 	let objectScaleOnDown = null;
 
 	const transformControls = new TransformControls( camera, container.dom );
-	transformControls.addEventListener( 'change', function () {
+	transformControls.addEventListener( 'axis-changed', function () {
 
-		const object = transformControls.object;
+		if ( editor.viewportShading !== 'realistic' ) render();
 
-		if ( object !== undefined ) {
+	} );
+	transformControls.addEventListener( 'objectChange', function () {
 
-			box.setFromObject( object, true );
-
-			const helper = editor.helpers[ object.id ];
-
-			if ( helper !== undefined && helper.isSkeletonHelper !== true ) {
-
-				helper.update();
-
-			}
-
-			signals.refreshSidebarObject3D.dispatch( object );
-
-		}
-
-		render( true );
+		signals.objectChanged.dispatch( transformControls.object );
 
 	} );
 	transformControls.addEventListener( 'mouseDown', function () {
@@ -671,8 +658,6 @@ function Viewport( editor ) {
 
 	} );
 
-	signals.exitedVR.add( render );
-
 	//
 
 	signals.windowResize.add( function () {
@@ -699,7 +684,7 @@ function Viewport( editor ) {
 		sceneHelpers.visible = value;
 		transformControls.enabled = value;
 
-		render( true );
+		render();
 
 	} );
 
@@ -747,7 +732,7 @@ function Viewport( editor ) {
 
 		}
 
-		if ( vr.currentSession !== null ) {
+		if ( renderer.xr.isPresenting === true ) {
 
 			needsUpdate = true;
 
@@ -768,9 +753,9 @@ function Viewport( editor ) {
 	let startTime = 0;
 	let endTime = 0;
 
-	function render( isHelper = false ) {
+	function render() {
 
-		if ( editor.viewportShading === 'realistic' && isHelper === false ) {
+		if ( editor.viewportShading === 'realistic' ) {
 
 			pathtracer.init( scene, camera );
 
@@ -786,7 +771,7 @@ function Viewport( editor ) {
 			renderer.autoClear = false;
 			if ( grid.visible === true ) renderer.render( grid, camera );
 			if ( sceneHelpers.visible === true ) renderer.render( sceneHelpers, camera );
-			if ( vr.currentSession === null ) viewHelper.render( renderer );
+			if ( renderer.xr.isPresenting !== true ) viewHelper.render( renderer );
 			renderer.autoClear = true;
 
 		}

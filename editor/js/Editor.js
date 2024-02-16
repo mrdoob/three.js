@@ -27,10 +27,9 @@ function Editor() {
 		startPlayer: new Signal(),
 		stopPlayer: new Signal(),
 
-		// vr
+		// xr
 
-		toggleVR: new Signal(),
-		exitedVR: new Signal(),
+		enterXR: new Signal(),
 
 		// notifications
 

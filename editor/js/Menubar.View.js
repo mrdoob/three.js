@@ -52,20 +52,41 @@ function MenubarView( editor ) {
 
 	if ( 'xr' in navigator ) {
 
-		navigator.xr.isSessionSupported( 'immersive-vr' )
+		navigator.xr.isSessionSupported( 'immersive-ar' )
 			.then( function ( supported ) {
 
 				if ( supported ) {
 
 					const option = new UIRow();
 					option.setClass( 'option' );
-					option.setTextContent( 'VR' );
+					option.setTextContent( 'AR' );
 					option.onClick( function () {
 
-						editor.signals.toggleVR.dispatch();
+						editor.signals.enterXR.dispatch( 'immersive-ar' );
 
 					} );
 					options.add( option );
+
+				} else {
+
+					navigator.xr.isSessionSupported( 'immersive-vr' )
+						.then( function ( supported ) {
+
+							if ( supported ) {
+
+								const option = new UIRow();
+								option.setClass( 'option' );
+								option.setTextContent( 'VR' );
+								option.onClick( function () {
+
+									editor.signals.enterXR.dispatch( 'immersive-vr' );
+
+								} );
+								options.add( option );
+
+							}
+
+						} );
 
 				}
 

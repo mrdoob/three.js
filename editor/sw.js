@@ -191,7 +191,7 @@ const assets = [
 	'./js/Viewport.Info.js',
 	'./js/Viewport.Selector.js',
 	'./js/Viewport.ViewHelper.js',
-	'./js/Viewport.VR.js',
+	'./js/Viewport.XR.js',
 
 	'./js/Command.js',
 	'./js/commands/AddObjectCommand.js',
