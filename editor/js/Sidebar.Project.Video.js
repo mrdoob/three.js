@@ -53,7 +53,7 @@ function SidebarProjectVideo( editor ) {
 	progress.setWidth( '170px' );
 	container.add( progress );
 
-	const renderButton = new UIButton( strings.getKey( 'sidebar/project/render' ) ).setTextTransform( 'uppercase' );
+	const renderButton = new UIButton( strings.getKey( 'sidebar/project/render' ) );
 	renderButton.setWidth( '170px' );
 	renderButton.onClick( async () => {
 

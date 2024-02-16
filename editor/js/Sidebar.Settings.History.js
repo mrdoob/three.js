@@ -60,7 +60,7 @@ function SidebarSettingsHistory( editor ) {
 
 	// Clear History
 
-	const option = new UIButton( strings.getKey( 'sidebar/history/clear' ) ).setTextTransform( 'uppercase' );
+	const option = new UIButton( strings.getKey( 'sidebar/history/clear' ) );
 	option.onClick( function () {
 
 		if ( confirm( 'The Undo/Redo History will be cleared. Are you sure?' ) ) {
