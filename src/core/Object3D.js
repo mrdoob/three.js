@@ -25,6 +25,9 @@ const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 const _addedEvent = { type: 'added' };
 const _removedEvent = { type: 'removed' };
 
+const _childaddedEvent = { type: 'childadded', child: null };
+const _childremovedEvent = { type: 'childremoved', child: null };
+
 class Object3D extends EventDispatcher {
 
 	constructor() {
@@ -340,7 +343,10 @@ class Object3D extends EventDispatcher {
 			this.children.push( object );
 
 			object.dispatchEvent( _addedEvent );
-			this.dispatchEvent( { type: 'childadded', child: object } );
+
+			_childaddedEvent.child = object;
+			this.dispatchEvent( _childaddedEvent );
+			_childaddedEvent.child = null;
 
 		} else {
 
@@ -374,7 +380,10 @@ class Object3D extends EventDispatcher {
 			this.children.splice( index, 1 );
 
 			object.dispatchEvent( _removedEvent );
-			this.dispatchEvent( { type: 'childremoved', child: object } );
+
+			_childremovedEvent.child = object;
+			this.dispatchEvent( _childremovedEvent );
+			_childremovedEvent.child = null;
 
 		}
 
