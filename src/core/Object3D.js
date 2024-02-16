@@ -340,6 +340,7 @@ class Object3D extends EventDispatcher {
 			this.children.push( object );
 
 			object.dispatchEvent( _addedEvent );
+			this.dispatchEvent( { type: 'childadded', child: object } );
 
 		} else {
 
@@ -373,6 +374,7 @@ class Object3D extends EventDispatcher {
 			this.children.splice( index, 1 );
 
 			object.dispatchEvent( _removedEvent );
+			this.dispatchEvent( { type: 'childremoved', child: object } );
 
 		}
 
