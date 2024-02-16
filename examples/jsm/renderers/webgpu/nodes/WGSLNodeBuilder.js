@@ -5,8 +5,8 @@ import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 import NodeSampler from '../../common/nodes/NodeSampler.js';
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
-import UniformBuffer from '../../common/UniformBuffer.js';
-import StorageBuffer from '../../common/StorageBuffer.js';
+import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
+import NodeStorageBuffer from '../../common/nodes/NodeStorageBuffer.js';
 
 import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
 
@@ -382,8 +382,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
 
-				const bufferClass = type === 'storageBuffer' ? StorageBuffer : UniformBuffer;
-				const buffer = new bufferClass( 'NodeBuffer_' + node.id, node.value );
+				const bufferClass = type === 'storageBuffer' ? NodeStorageBuffer : NodeUniformBuffer;
+				const buffer = new bufferClass( node );
 				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				bindings.push( buffer );
