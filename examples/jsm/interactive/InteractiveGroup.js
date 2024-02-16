@@ -10,16 +10,10 @@ const _event = { type: '', data: _pointer };
 
 class InteractiveGroup extends Group {
 
-	constructor( renderer, camera ) {
-
-		super();
+	listenToPointerEvents( renderer, camera ) {
 
 		const scope = this;
-
 		const raycaster = new Raycaster();
-		const tempMatrix = new Matrix4();
-
-		// Pointer Events
 
 		const element = renderer.domElement;
 
@@ -60,7 +54,15 @@ class InteractiveGroup extends Group {
 		element.addEventListener( 'mousemove', onPointerEvent );
 		element.addEventListener( 'click', onPointerEvent );
 
-		// WebXR Controller Events
+	}
+
+	listenToXRControllerEvents( renderer ) {
+
+		const scope = this;
+
+		const raycaster = new Raycaster();
+		const tempMatrix = new Matrix4();
+
 		// TODO: Dispatch pointerevents too
 
 		const events = {

@@ -183,7 +183,9 @@
 				gui.add( parameters, 'thickness', 0, 1 ).onChange( onThicknessChange );
 				gui.domElement.style.visibility = 'hidden';
 
-				const group = new InteractiveGroup( renderer, camera );
+				const group = new InteractiveGroup();
+				group.listenToPointerEvents( renderer, camera );
+				group.listenToXRControllerEvents( renderer );
 				scene.add( group );
 
 				const mesh = new HTMLMesh( gui.domElement );
