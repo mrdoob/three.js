@@ -6,7 +6,7 @@ export const typeToLengthLib = {
 	vec2: 2,
 	vec3: 3,
 	vec4: 4,
-	color: 4,
+	color: 3,
 	mat2: 1,
 	mat3: 1,
 	mat4: 1,
@@ -16,7 +16,7 @@ export const typeToLengthLib = {
 	Vector2: 2,
 	Vector3: 3,
 	Vector4: 4,
-	Color: 4,
+	Color: 3,
 	// cpu: other stuff
 	Material: 1,
 	Object3D: 1,
