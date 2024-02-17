@@ -55,7 +55,7 @@ class TextureNode extends UniformNode {
 
 	}
 
-	setReference( /*frame*/ ) {
+	setReference( /*state*/ ) {
 
 		return this.value;
 

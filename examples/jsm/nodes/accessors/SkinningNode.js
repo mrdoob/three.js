@@ -12,12 +12,12 @@ import { buffer } from './BufferNode.js';
 
 class SkinningNode extends Node {
 
-	constructor( skinnedMesh, isReference = false ) {
+	constructor( skinnedMesh, useReference = false ) {
 
 		super( 'void' );
 
 		this.skinnedMesh = skinnedMesh;
-		this.isReference = isReference;
+		this.useReference = useReference;
 
 		this.updateType = NodeUpdateType.OBJECT;
 
@@ -28,7 +28,7 @@ class SkinningNode extends Node {
 
 		let bindMatrixNode, bindMatrixInverseNode, boneMatricesNode;
 
-		if ( isReference ) {
+		if ( useReference ) {
 
 			bindMatrixNode = reference( 'bindMatrix', 'mat4' );
 			bindMatrixInverseNode = reference( 'bindMatrixInverse', 'mat4' );
@@ -108,7 +108,7 @@ class SkinningNode extends Node {
 
 	update( frame ) {
 
-		const object = this.isReference ? frame.object : this.skinnedMesh;
+		const object = this.useReference ? frame.object : this.skinnedMesh;
 
 		object.skeleton.update();
 
