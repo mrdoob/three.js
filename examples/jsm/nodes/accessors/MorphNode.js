@@ -2,7 +2,7 @@ import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy, tslFn } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
-import { referenceIndex } from './ReferenceNode.js';
+import { reference } from './ReferenceNode.js';
 import { positionLocal } from './PositionNode.js';
 import { normalLocal } from './NormalNode.js';
 import { textureLoad } from './TextureNode.js';
@@ -188,7 +188,7 @@ class MorphNode extends Node {
 
 		loop( morphTargetsCount, ( { i } ) => {
 
-			const influence = referenceIndex( 'morphTargetInfluences', i, 'float' );
+			const influence = reference( 'morphTargetInfluences', 'float' ).element( i );
 
 			if ( hasMorphPosition === true ) {
 
@@ -240,6 +240,6 @@ class MorphNode extends Node {
 
 export default MorphNode;
 
-export const morph = nodeProxy( MorphNode );
+export const morphReference = nodeProxy( MorphNode );
 
 addNodeClass( 'MorphNode', MorphNode );

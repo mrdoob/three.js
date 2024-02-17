@@ -7,8 +7,8 @@ import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
 import { positionLocal, positionView } from '../accessors/PositionNode.js';
-import { skinning } from '../accessors/SkinningNode.js';
-import { morph } from '../accessors/MorphNode.js';
+import { skinningReference } from '../accessors/SkinningNode.js';
+import { morphReference } from '../accessors/MorphNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { lightsNode } from '../lighting/LightsNode.js';
@@ -188,13 +188,13 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color ) {
 
-			morph( object ).append();
+			morphReference( object ).append();
 
 		}
 
 		if ( object.isSkinnedMesh === true ) {
 
-			skinning( object ).append();
+			skinningReference( object ).append();
 
 		}
 

@@ -40,7 +40,7 @@ class Node extends EventDispatcher {
 
 	}
 
-	updateReference() {
+	setReference( /*state*/ ) {
 
 		return this;
 
@@ -230,6 +230,8 @@ class Node extends EventDispatcher {
 		const buildStage = builder.getBuildStage();
 
 		if ( buildStage === 'setup' ) {
+
+			this.setReference( builder );
 
 			const properties = builder.getNodeProperties( this );
 

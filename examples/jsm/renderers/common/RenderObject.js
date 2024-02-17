@@ -176,7 +176,7 @@ export default class RenderObject {
 
 		if ( object.skeleton ) {
 
-			cacheKey += object.skeleton.uuid + ',';
+			cacheKey += object.skeleton.bones.length + ',';
 
 		}
 
