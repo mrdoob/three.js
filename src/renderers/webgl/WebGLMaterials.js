@@ -1,5 +1,10 @@
-import { BackSide } from '../../constants.js';
+import { BackSide, CubeUVReflectionMapping } from '../../constants.js';
 import { getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
+import { Euler } from '../../math/Euler.js';
+import { Matrix4 } from '../../math/Matrix4.js';
+
+const _e1 = /*@__PURE__*/ new Euler();
+const _m1 = /*@__PURE__*/ new Matrix4();
 
 function WebGLMaterials( renderer, properties ) {
 
@@ -214,6 +219,19 @@ function WebGLMaterials( renderer, properties ) {
 		if ( envMap ) {
 
 			uniforms.envMap.value = envMap;
+
+			_e1.copy( material.envMapRotation );
+
+			if ( ( envMap.isCubeTexture && envMap.isRenderTargetTexture === true ) || envMap.mapping === CubeUVReflectionMapping ) {
+
+				// cube render targets and cubeUV maps (PMREM) need to reverse Y and Z rotation (which have a different conventions than normal cube textures, see flipEnvMap)
+
+				_e1.y *= - 1;
+				_e1.z *= - 1;
+
+			}
+
+			uniforms.envMapRotation.value.setFromMatrix4( _m1.makeRotationFromEuler( _e1 ) );
 
 			uniforms.flipEnvMap.value = ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) ? - 1 : 1;
 

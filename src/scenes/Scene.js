@@ -1,4 +1,5 @@
 import { Object3D } from '../core/Object3D.js';
+import { Euler } from '../math/Euler.js';
 
 class Scene extends Object3D {
 
@@ -16,6 +17,7 @@ class Scene extends Object3D {
 
 		this.backgroundBlurriness = 0;
 		this.backgroundIntensity = 1;
+		this.backgroundRotation = new Euler();
 
 		this.overrideMaterial = null;
 
