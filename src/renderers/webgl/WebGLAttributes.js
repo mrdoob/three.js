@@ -1,4 +1,4 @@
-function WebGLAttributes( gl, capabilities ) {
+function WebGLAttributes( gl, capabilities, extensions ) {
 
 	const isWebGL2 = capabilities.isWebGL2;
 
@@ -31,9 +31,13 @@ function WebGLAttributes( gl, capabilities ) {
 
 					type = gl.HALF_FLOAT;
 
+				} else if ( extensions.has( 'OES_texture_half_float' ) ) {
+
+					type = ( extensions.get( 'OES_texture_half_float' ) ).HALF_FLOAT_OES;
+
 				} else {
 
-					throw new Error( 'THREE.WebGLAttributes: Usage of Float16BufferAttribute requires WebGL2.' );
+					throw new Error( 'THREE.WebGLAttributes: Usage of Float16BufferAttribute requires WebGL2 or OES_texture_half_float extension.' );
 
 				}
 
