@@ -17,7 +17,7 @@ export const typeToLengthLib = {
 	Vector3: 3,
 	Vector4: 4,
 	Color: 4,
-    // cpu: other stuff
+	// cpu: other stuff
 	Material: 1,
 	Object3D: 1,
 	CodeNode: 1,
@@ -54,7 +54,7 @@ export const typeToColorLib = {
 	// cpu
 	String: '#ff0000',
 	Number: '#eeeeee',
-    // cpu: other stuff
+	// cpu: other stuff
 	Material: '#228b22',
 	Object3D: '#00a1ff',
 	CodeNode: '#ff00ff',
@@ -74,17 +74,17 @@ export function getColorFromNode( value ) {
 
 	let type = getTypeFromNode( value );
 
-	return getColorFromType(type);
+	return getColorFromType( type );
 
 }
 
 export function getTypeFromNode ( value ) {
 
-	if (value) {
+	if ( value ) {
 
-		if (value.isMaterial) return 'Material';
+		if ( value.isMaterial ) return 'Material';
 
-		return value.nodeType === 'ArrayBuffer' ? 'URL' : (value.nodeType || getTypeFromValue(value.value));
+		return value.nodeType === 'ArrayBuffer' ? 'URL' : ( value.nodeType || getTypeFromValue( value.value ) );
 	}
 
 }
@@ -115,8 +115,8 @@ export function getColorFromValue( value ) {
 
 export function setInputAestheticsFromType( element, type ) {
 
-	element.setInput( getLengthFromType(type) );
-	element.setInputColor( getColorFromType(type) );
+	element.setInput( getLengthFromType( type ) );
+	element.setInputColor( getColorFromType( type ) );
 
 	return element;
 
@@ -124,9 +124,9 @@ export function setInputAestheticsFromType( element, type ) {
 
 export function setOutputAestheticsFromNode( element, node ) {
 
-	if (!node) {
+	if ( ! node ) {
 
-		element.setOutput(0);
+		element.setOutput( 0 );
 
 		return element;
 
@@ -134,16 +134,16 @@ export function setOutputAestheticsFromNode( element, node ) {
 
 	let type = getTypeFromNode( node );
 
-	if (!type) {
+	if ( ! type ) {
 
-		element.setOutput(1);
+		element.setOutput( 1 );
 
 		return element;
 
 	}
 
-	element.setOutput( getLengthFromType(type) );
-	element.setOutputColor( getColorFromType(type) );
+	element.setOutput( getLengthFromType( type ) );
+	element.setOutputColor( getColorFromType( type ) );
 
 	return element;
 

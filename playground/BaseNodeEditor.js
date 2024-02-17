@@ -20,7 +20,7 @@ export class BaseNodeEditor extends Node {
 			.setObjectCallback( getObjectCallback )
 			.setSerializable( false );
 		
-		setOutputAestheticsFromNode(title, value);
+		setOutputAestheticsFromNode( title, value );
 
 		const contextButton = new ButtonInput().onClick( () => {
 

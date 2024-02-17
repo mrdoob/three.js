@@ -70,7 +70,7 @@ export class ScriptableEditor extends BaseNodeEditor {
 
 	getColor() {
 
-		return ( getColorFromType( this.layout ? this.layout.outputType : null ) ) + 'BB';
+		return getColorFromType( this.layout ? this.layout.outputType : null ) + 'BB';
 
 	}
 
