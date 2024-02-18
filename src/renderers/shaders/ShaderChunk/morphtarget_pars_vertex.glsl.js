@@ -20,12 +20,38 @@ export default /* glsl */`
 
 		vec4 getMorph( const in int vertexIndex, const in int morphTargetIndex, const in int offset ) {
 
-			int texelIndex = vertexIndex * MORPHTARGETS_TEXTURE_STRIDE + offset;
+			int texelIndex = vertexIndex * MORPHTARGETS_TEXTURE_STRIDE + 3 * offset;
+
 			int y = texelIndex / morphTargetsTextureSize.x;
 			int x = texelIndex - y * morphTargetsTextureSize.x;
 
 			ivec3 morphUV = ivec3( x, y, morphTargetIndex );
-			return texelFetch( morphTargetsTexture, morphUV, 0 );
+
+			vec4 ret = vec4(0.);
+
+			ret.x = texelFetch( morphTargetsTexture, morphUV, 0 ).r;
+
+			morphUV.x++;
+
+			ret.y = texelFetch( morphTargetsTexture, morphUV, 0 ).r;
+
+			morphUV.x++;
+
+			ret.z = texelFetch( morphTargetsTexture, morphUV, 0 ).r;
+
+			#if MORPHTARGETS_TEXTURE_STRIDE == 10
+
+				morphUV.x++;
+
+				ret.a = offset == 2 ? texelFetch( morphTargetsTexture, morphUV, 0 ).r : 0.;
+
+			#else
+
+				ret.a = 0.;
+
+			#endif
+
+			return ret;
 
 		}
 
