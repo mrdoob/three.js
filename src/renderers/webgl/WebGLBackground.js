@@ -111,6 +111,8 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 			_e1.copy( scene.backgroundRotation );
 
+			_e1.x *= - 1;
+
 			if ( ( background.isCubeTexture && background.isRenderTargetTexture === true ) || background.mapping === CubeUVReflectionMapping ) {
 
 				// cube render targets and cubeUV maps (PMREM) need to reverse Y and Z rotation (which have a different conventions than normal cube textures, see flipEnvMap)
