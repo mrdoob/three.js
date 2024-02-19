@@ -20,6 +20,7 @@ import EnvironmentNode from '../lighting/EnvironmentNode.js';
 import { depthPixel } from '../display/ViewportDepthNode.js';
 import { cameraLogDepth } from '../accessors/CameraNode.js';
 import { clipping, clippingAlpha } from '../accessors/ClippingNode.js';
+import { faceDirection } from '../display/FrontFacingNode.js';
 
 const NodeMaterials = new Map();
 
@@ -266,13 +267,13 @@ class NodeMaterial extends ShaderMaterial {
 
 			const normalNode = positionView.dFdx().cross( positionView.dFdy() ).normalize();
 
-			transformedNormalView.assign( normalNode );
+			transformedNormalView.assign( normalNode.mul( faceDirection ) );
 
 		} else {
 
 			const normalNode = this.normalNode ? vec3( this.normalNode ) : materialNormal;
 
-			transformedNormalView.assign( normalNode );
+			transformedNormalView.assign( normalNode.mul( faceDirection ) );
 
 		}
 
