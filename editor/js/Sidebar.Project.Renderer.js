@@ -12,10 +12,7 @@ function SidebarProjectRenderer( editor ) {
 	let currentRenderer = null;
 
 	const container = new UIPanel();
-
-	const headerRow = new UIRow();
-	headerRow.add( new UIText( strings.getKey( 'sidebar/project/renderer' ).toUpperCase() ) );
-	container.add( headerRow );
+	container.setBorderTop( '0px' );
 
 	// Antialias
 

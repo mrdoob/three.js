@@ -6,6 +6,8 @@ function SidebarProjectVideo( editor ) {
 
 	const strings = editor.strings;
 
+	const save = editor.utils.save;
+
 	const container = new UIPanel();
 	container.setId( 'render' );
 
@@ -119,24 +121,6 @@ function SidebarProjectVideo( editor ) {
 
 	} );
 	container.add( renderButton );
-
-	// SAVE
-
-	const link = document.createElement( 'a' );
-
-	function save( blob, filename ) {
-
-		if ( link.href ) {
-
-			URL.revokeObjectURL( link.href );
-
-		}
-
-		link.href = URL.createObjectURL( blob );
-		link.download = filename;
-		link.dispatchEvent( new MouseEvent( 'click' ) );
-
-	}
 
 	//
 
