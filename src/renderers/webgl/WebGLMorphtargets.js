@@ -67,10 +67,10 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 				if ( width > capabilities.maxTextureSize ) {
 
-					// Align on stride to simplify the texel fetching in the shader
-					const strideWidth = Math.ceil( width / vertexDataCount ) * vertexDataCount;
-					height = Math.ceil( strideWidth / capabilities.maxTextureSize );
-					width = capabilities.maxTextureSize;
+					// Align width on stride to simplify the texel fetching in the shader
+					const strideWidth = Math.floor( capabilities.maxTextureSize / vertexDataCount ) * vertexDataCount;
+					height = Math.ceil( width / strideWidth );
+					width = strideWidth;
 
 				}
 
