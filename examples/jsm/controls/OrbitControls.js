@@ -426,8 +426,7 @@ class OrbitControls extends EventDispatcher {
 
 			const document = scope.domElement.getRootNode(); // offscreen canvas compatibility
 
-		  document.removeEventListener( 'keydown', interceptControlDown, { capture: true } );
-
+			document.removeEventListener( 'keydown', interceptControlDown, { capture: true } );
 
 			if ( scope._domElementKeyEvents !== null ) {
 
