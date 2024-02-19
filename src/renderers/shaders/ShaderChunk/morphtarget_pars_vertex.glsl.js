@@ -45,10 +45,6 @@ export default /* glsl */`
 
 				ret.a = offset == 2 ? texelFetch( morphTargetsTexture, morphUV, 0 ).r : 0.;
 
-			#else
-
-				ret.a = 0.;
-
 			#endif
 
 			return ret;
