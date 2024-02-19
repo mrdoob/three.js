@@ -154,19 +154,31 @@ class XR {
 			editor.camera.copy( camera );
 
 			signals.windowResize.dispatch();
+			signals.leaveXR.dispatch();
 
 		};
 
 		// signals
 
+		const sessionInit = { optionalFeatures: [ 'local-floor' ] };
+
 		signals.enterXR.add( ( mode ) => {
 
-			if ( 'xr' in navigator ) {
+			navigator.xr.requestSession( mode, sessionInit ).then( onSessionStarted );
 
-				const sessionInit = { optionalFeatures: [ 'local-floor' ] };
-				navigator.xr.requestSession( mode, sessionInit ).then( onSessionStarted );
+		} );
 
-			}
+		signals.offerXR.add( function ( mode ) {
+
+			navigator.xr.offerSession( mode, sessionInit )
+				.then( onSessionStarted );
+
+			signals.leaveXR.add( function () {
+
+				navigator.xr.offerSession( mode, sessionInit )
+					.then( onSessionStarted );
+	
+			} );
 
 		} );
 

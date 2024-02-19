@@ -30,6 +30,8 @@ function Editor() {
 		// xr
 
 		enterXR: new Signal(),
+		offerXR: new Signal(),
+		leaveXR: new Signal(),
 
 		// notifications
 
