@@ -747,8 +747,44 @@ Editor.prototype = {
 
 		this.history.redo();
 
+	},
+
+	utils: {
+
+		save: save,
+		saveArrayBuffer: saveArrayBuffer,
+		saveString: saveString
+
 	}
 
 };
+
+const link = document.createElement( 'a' );
+
+function save( blob, filename ) {
+
+	if ( link.href ) {
+
+		URL.revokeObjectURL( link.href );
+
+	}
+
+	link.href = URL.createObjectURL( blob );
+	link.download = filename || 'data.json';
+	link.dispatchEvent( new MouseEvent( 'click' ) );
+
+}
+
+function saveArrayBuffer( buffer, filename ) {
+
+	save( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
+
+}
+
+function saveString( text, filename ) {
+
+	save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+}
 
 export { Editor };
