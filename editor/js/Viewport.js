@@ -299,6 +299,8 @@ function Viewport( editor ) {
 
 		transformControls.setMode( mode );
 
+		render();
+
 	} );
 
 	signals.snapChanged.add( function ( dist ) {
