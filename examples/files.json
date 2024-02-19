@@ -313,8 +313,7 @@
 		"webgl2_ubo_arrays",
 		"webgl2_volume_cloud",
 		"webgl2_volume_instancing",
-		"webgl2_volume_perlin",
-		"webgl2_texture3d_compressed_partialupdate"
+		"webgl2_volume_perlin"
 	],
 	"webgpu (wip)": [
 		"webgpu_backdrop",
