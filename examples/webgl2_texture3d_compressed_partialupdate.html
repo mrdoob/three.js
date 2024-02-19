@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl2 - texture3d compressed partial update</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				color: #222;
+			}
+
+			a {
+				color: #2fa1d6;
+			}
+
+			p {
+				max-width: 600px;
+				margin-left: auto;
+				margin-right: auto;
+				padding: 0 2em;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl2 - texture3d compressed partial update<br />
+			<p>
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+
+			let container;
+			let camera, scene, renderer;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 100 );
+				camera.position.set( 0, 0, 5 );
+
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+
+				scene.background = new THREE.Color( 0xbbbbbb );
+
+				const ktx2Loader = new KTX2Loader();
+				ktx2Loader.setTranscoderPath( 'jsm/libs/basis/' );
+				ktx2Loader.detectSupport( renderer );
+
+				function obc( material ) {
+
+					material.onBeforeCompile = function ( shader ) {
+
+						shader.vertexShader = `
+						varying vec3 vWorldPosition;
+						attribute float textureId;
+						flat varying int vTextureId;
+						${shader.vertexShader}`;
+
+						shader.vertexShader = shader.vertexShader.replace(
+							'#include <worldpos_vertex>',
+							`
+							#include <worldpos_vertex>
+							vTextureId = int(gl_InstanceID);
+							vWorldPosition = position.xyz;`
+						);
+
+						shader.fragmentShader = shader.fragmentShader.replace(
+							'#include <map_pars_fragment>',
+							`
+							varying vec3 vWorldPosition;
+							flat varying int vTextureId;
+							precision highp sampler2DArray;
+							uniform sampler2DArray map;`
+						);
+
+						shader.fragmentShader = shader.fragmentShader.replace(
+							'#include <map_fragment>',
+							`
+								diffuseColor = texture( map, vec3( vMapUv, vTextureId ) );
+
+							`
+						);
+
+					};
+
+				}
+
+
+				ktx2Loader.load( './textures/compressed/sample_uastc.ktx2', function ( map ) {
+
+
+					const box3 = new THREE.Box3();
+					box3.min.set( 0, 0, 0 );
+
+					const mipmaps = [];
+					for ( let i = 0; i < map.mipmaps.length; i ++ ) {
+
+						const mipmap = map.mipmaps[ i ];
+
+						mipmaps.push( {
+							data: new Uint8Array( mipmap.data.byteLength * 10 ).fill( 128 ),
+							width: mipmap.width,
+							height: mipmap.height,
+						} );
+
+					}
+
+					const instanceMap = new THREE.CompressedArrayTexture(
+						mipmaps,
+						map.mipmaps[ 0 ].width,
+						map.mipmaps[ 0 ].height,
+						10,
+						map.format,
+						map.type
+					);
+					instanceMap.generateMipmaps = false;
+
+
+					const material = new THREE.MeshBasicMaterial( { map: instanceMap, side: THREE.DoubleSide } );
+					const mesh = new THREE.InstancedMesh( new THREE.PlaneGeometry( .8, 1 ).scale( 1, - 1, 1 ), material, 10 );
+					const numPerRow = 5; // Number of instances per row
+					const rowHeight = 1.1; // Vertical spacing between rows
+					const colWidth = .92; // Horizontal spacing between columns
+					const numRows = 2; // Total number of rows
+
+					for ( let i = 0; i < 10; i ++ ) {
+
+						// Calculate the current row and column for the instance
+						const row = Math.floor( i / numPerRow );
+						const col = i % numPerRow;
+
+						// Calculate the x and y positions based on row and column
+						const x = col * colWidth - ( numPerRow / 2 ) * colWidth + colWidth / 2; // Center the columns
+						const y = row * - rowHeight + ( numRows - 1 ) * rowHeight / 2; // Center the rows, adjust y position based on row
+
+						// Set the position of the instance
+						mesh.setMatrixAt( i, new THREE.Matrix4().makeTranslation( x, y, 0 ) );
+
+					}
+
+					mesh.instanceMatrix.needsUpdate = true;
+					mesh.material.map.needsUpdate = true;
+
+					obc( material );
+
+					scene.add( mesh );
+
+					let offset = 0;
+
+					const transferToTexture3D = () => {
+			
+						if ( offset < 10 ) {
+
+							for ( let i = 0; i < map.mipmaps.length; i ++ ) {
+
+								const img = map.mipmaps[ i ];
+								box3.max.set( img.width, img.height, 0 );
+								renderer.copyTextureToTexture3D(
+									box3,
+									new THREE.Vector3( 0, 0, offset ),
+									map,
+									instanceMap,
+									i
+								);
+
+							}
+
+							offset ++;
+
+						}
+
+					};
+
+					// init at start
+					transferToTexture3D();
+
+					setInterval( transferToTexture3D, 1000 );
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
