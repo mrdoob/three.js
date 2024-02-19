@@ -192,11 +192,11 @@ function SidebarGeometry( editor ) {
 
 		}
 
-		const left = ( screen.width / 2 ) - ( 250 );
-		const top = ( screen.height / 2 ) - ( 250 );
+		const left = ( screen.width - 500 ) / 2;
+		const top = ( screen.height - 500 ) / 2;
 
 		const url = URL.createObjectURL( new Blob( [ output ], { type: 'text/plain' } ) );
-		window.open( url, null, `location=no,left=${left},top=${top},width=500,height=500` );
+		window.open( url, '_blank', `location=no,left=${left},top=${top},width=500,height=500` );
 
 	} );
 	container.add( exportJson );
