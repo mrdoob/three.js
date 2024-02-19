@@ -77,7 +77,6 @@ const assets = [
 
 	'../examples/jsm/utils/BufferGeometryUtils.js',
 
-	'../examples/jsm/webxr/VRButton.js',
 	'../examples/jsm/webxr/XRControllerModelFactory.js',
 
 	'./images/rotate.svg',
