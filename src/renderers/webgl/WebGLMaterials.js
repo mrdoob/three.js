@@ -227,7 +227,7 @@ function WebGLMaterials( renderer, properties ) {
 
 			if ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) {
 
-				// environemnt maps which are no cube render targets and PMREMs require follow a different px/nx convention
+				// environment maps which are no cube render targets or PMREMs follow a different px/nx convention
 				_e1.x *= - 1;
 
 			}
