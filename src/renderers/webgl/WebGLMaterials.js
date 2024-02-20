@@ -214,13 +214,16 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
-		const envMap = properties.get( material ).envMap;
+		const materialProperties = properties.get( material );
+
+		const envMap = materialProperties.envMap;
+		const envMapRotation = materialProperties.envMapRotation;
 
 		if ( envMap ) {
 
 			uniforms.envMap.value = envMap;
 
-			_e1.copy( material.envMapRotation );
+			_e1.copy( envMapRotation );
 
 			// accommodate left-handed frame
 			_e1.x *= - 1; _e1.y *= - 1; _e1.z *= - 1;
