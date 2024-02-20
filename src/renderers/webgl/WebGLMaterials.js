@@ -1,4 +1,4 @@
-import { BackSide, CubeUVReflectionMapping } from '../../constants.js';
+import { BackSide } from '../../constants.js';
 import { getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
 import { Euler } from '../../math/Euler.js';
 import { Matrix4 } from '../../math/Matrix4.js';
