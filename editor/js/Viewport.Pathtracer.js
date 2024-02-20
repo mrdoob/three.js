@@ -137,9 +137,13 @@ function ViewportPathtracer( renderer ) {
 
 		pathtracer.update();
 
-		renderer.autoClear = false;
-		quad.render( renderer );
-		renderer.autoClear = true;
+		if ( pathtracer.samples >= 1 ) {
+
+			renderer.autoClear = false;
+			quad.render( renderer );
+			renderer.autoClear = true;
+
+		}
 
 	}
 
