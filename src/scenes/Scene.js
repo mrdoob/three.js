@@ -59,6 +59,8 @@ class Scene extends Object3D {
 		if ( this.backgroundBlurriness > 0 ) data.object.backgroundBlurriness = this.backgroundBlurriness;
 		if ( this.backgroundIntensity !== 1 ) data.object.backgroundIntensity = this.backgroundIntensity;
 
+		return data;
+
 	}
 
 }
