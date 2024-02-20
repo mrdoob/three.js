@@ -222,14 +222,13 @@ function WebGLMaterials( renderer, properties ) {
 
 			_e1.copy( material.envMapRotation );
 
-			_e1.x *= - 1;
+			// accommodate left-handed frame
+			_e1.x *= - 1; _e1.y *= - 1; _e1.z *= - 1;
 
-			if ( ( envMap.isCubeTexture && envMap.isRenderTargetTexture === true ) || envMap.mapping === CubeUVReflectionMapping ) {
+			if ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) {
 
-				// cube render targets and cubeUV maps (PMREM) need to reverse Y and Z rotation (which have a different conventions than normal cube textures, see flipEnvMap)
-
-				_e1.y *= - 1;
-				_e1.z *= - 1;
+				// environemnt maps which are no cube render targets and PMREMs require follow a different px/nx convention
+				_e1.x *= - 1;
 
 			}
 
