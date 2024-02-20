@@ -77,7 +77,7 @@ textarea, input { outline: none; } /* osx */
 }
 
 	.TabbedPanel .Tabs .Tab {
-		padding: 8px 9px;
+		padding: 10px 9px;
 		text-transform: uppercase;
 	}
 
