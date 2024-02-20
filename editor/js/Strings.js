@@ -300,7 +300,6 @@ function Strings( config ) {
 			'sidebar/material/userdata': 'User data',
 			'sidebar/material/export': 'Export JSON',
 
-			'sidebar/script': 'Script',
 			'sidebar/script/new': 'New',
 			'sidebar/script/edit': 'Edit',
 			'sidebar/script/remove': 'Remove',
@@ -647,7 +646,6 @@ function Strings( config ) {
 			'sidebar/material/userdata': 'Données utilisateur',
 			'sidebar/material/export': 'Exporter JSON',
 
-			'sidebar/script': 'Script',
 			'sidebar/script/new': 'Nouveau',
 			'sidebar/script/edit': 'Editer',
 			'sidebar/script/remove': 'Supprimer',
@@ -994,7 +992,6 @@ function Strings( config ) {
 			'sidebar/material/userdata': '自定义数据',
 			'sidebar/material/export': '导出JSON',
 
-			'sidebar/script': '脚本',
 			'sidebar/script/new': '新建',
 			'sidebar/script/edit': '编辑',
 			'sidebar/script/remove': '删除',

@@ -169,7 +169,7 @@ function SidebarScene( editor ) {
 
 	} );
 
-	backgroundRow.add( new UIText( strings.getKey( 'sidebar/scene/background' ) ).setWidth( '90px' ) );
+	backgroundRow.add( new UIText( strings.getKey( 'sidebar/scene/background' ) ).setClass( 'Label' ) );
 	backgroundRow.add( backgroundType );
 
 	const backgroundColor = new UIColor().setValue( '#000000' ).setMarginLeft( '8px' ).onInput( onBackgroundChanged );
@@ -187,7 +187,7 @@ function SidebarScene( editor ) {
 
 	const backgroundEquirectRow = new UIRow();
 	backgroundEquirectRow.setDisplay( 'none' );
-	backgroundEquirectRow.setMarginLeft( '90px' );
+	backgroundEquirectRow.setMarginLeft( '120px' );
 
 	const backgroundBlurriness = new UINumber( 0 ).setWidth( '40px' ).setRange( 0, 1 ).onChange( onBackgroundChanged );
 	backgroundEquirectRow.add( backgroundBlurriness );
@@ -241,7 +241,7 @@ function SidebarScene( editor ) {
 
 	} );
 
-	environmentRow.add( new UIText( strings.getKey( 'sidebar/scene/environment' ) ).setWidth( '90px' ) );
+	environmentRow.add( new UIText( strings.getKey( 'sidebar/scene/environment' ) ).setClass( 'Label' ) );
 	environmentRow.add( environmentType );
 
 	const environmentEquirectangularTexture = new UITexture( editor ).setMarginLeft( '8px' ).onChange( onEnvironmentChanged );
@@ -309,7 +309,7 @@ function SidebarScene( editor ) {
 
 	} );
 
-	fogTypeRow.add( new UIText( strings.getKey( 'sidebar/scene/fog' ) ).setWidth( '90px' ) );
+	fogTypeRow.add( new UIText( strings.getKey( 'sidebar/scene/fog' ) ).setClass( 'Label' ) );
 	fogTypeRow.add( fogType );
 
 	container.add( fogTypeRow );
@@ -318,7 +318,7 @@ function SidebarScene( editor ) {
 
 	const fogPropertiesRow = new UIRow();
 	fogPropertiesRow.setDisplay( 'none' );
-	fogPropertiesRow.setMarginLeft( '90px' );
+	fogPropertiesRow.setMarginLeft( '120px' );
 	container.add( fogPropertiesRow );
 
 	const fogColor = new UIColor().setValue( '#aaaaaa' );

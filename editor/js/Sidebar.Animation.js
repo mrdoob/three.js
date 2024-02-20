@@ -89,7 +89,7 @@ function SidebarAnimation( editor ) {
 
 	} );
 
-	mixerTimeScaleRow.add( new UIText( strings.getKey( 'sidebar/animations/timescale' ) ).setWidth( '90px' ) );
+	mixerTimeScaleRow.add( new UIText( strings.getKey( 'sidebar/animations/timescale' ) ).setClass( 'Label' ) );
 	mixerTimeScaleRow.add( mixerTimeScaleNumber );
 
 	container.add( mixerTimeScaleRow );

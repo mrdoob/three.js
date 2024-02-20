@@ -9,7 +9,7 @@ function SidebarGeometryModifiers( editor, object ) {
 
 	const signals = editor.signals;
 
-	const container = new UIDiv().setPaddingLeft( '90px' );
+	const container = new UIDiv().setMarginLeft( '120px' );
 
 	const geometry = object.geometry;
 

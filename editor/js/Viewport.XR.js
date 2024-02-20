@@ -24,7 +24,7 @@ class XR {
 			camera.copy( editor.camera );
 
 			const sidebar = document.getElementById( 'sidebar' );
-			sidebar.style.width = '300px';
+			sidebar.style.width = '350px';
 			sidebar.style.height = '700px';
 
 			//

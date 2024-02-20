@@ -20,7 +20,7 @@ function GeometryParametersPanel( editor, object ) {
 	const radiusRow = new UIRow();
 	const radius = new UINumber( parameters.radius ).onChange( update );
 
-	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/icosahedron_geometry/radius' ) ).setWidth( '90px' ) );
+	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/icosahedron_geometry/radius' ) ).setClass( 'Label' ) );
 	radiusRow.add( radius );
 
 	container.add( radiusRow );
@@ -30,7 +30,7 @@ function GeometryParametersPanel( editor, object ) {
 	const detailRow = new UIRow();
 	const detail = new UIInteger( parameters.detail ).setRange( 0, Infinity ).onChange( update );
 
-	detailRow.add( new UIText( strings.getKey( 'sidebar/geometry/icosahedron_geometry/detail' ) ).setWidth( '90px' ) );
+	detailRow.add( new UIText( strings.getKey( 'sidebar/geometry/icosahedron_geometry/detail' ) ).setClass( 'Label' ) );
 	detailRow.add( detail );
 
 	container.add( detailRow );

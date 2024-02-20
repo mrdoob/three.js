@@ -90,7 +90,7 @@ function SidebarGeometry( editor ) {
 	const geometryTypeRow = new UIRow();
 	const geometryType = new UIText();
 
-	geometryTypeRow.add( new UIText( strings.getKey( 'sidebar/geometry/type' ) ).setWidth( '90px' ) );
+	geometryTypeRow.add( new UIText( strings.getKey( 'sidebar/geometry/type' ) ).setClass( 'Label' ) );
 	geometryTypeRow.add( geometryType );
 
 	container.add( geometryTypeRow );
@@ -107,7 +107,7 @@ function SidebarGeometry( editor ) {
 
 	} );
 
-	geometryUUIDRow.add( new UIText( strings.getKey( 'sidebar/geometry/uuid' ) ).setWidth( '90px' ) );
+	geometryUUIDRow.add( new UIText( strings.getKey( 'sidebar/geometry/uuid' ) ).setClass( 'Label' ) );
 	geometryUUIDRow.add( geometryUUID );
 	geometryUUIDRow.add( geometryUUIDRenew );
 
@@ -122,7 +122,7 @@ function SidebarGeometry( editor ) {
 
 	} );
 
-	geometryNameRow.add( new UIText( strings.getKey( 'sidebar/geometry/name' ) ).setWidth( '90px' ) );
+	geometryNameRow.add( new UIText( strings.getKey( 'sidebar/geometry/name' ) ).setClass( 'Label' ) );
 	geometryNameRow.add( geometryName );
 
 	container.add( geometryNameRow );
@@ -141,13 +141,13 @@ function SidebarGeometry( editor ) {
 	const geometryBoundingBox = new UIText().setFontSize( '12px' );
 
 	const geometryBoundingBoxRow = new UIRow();
-	geometryBoundingBoxRow.add( new UIText( strings.getKey( 'sidebar/geometry/bounds' ) ).setWidth( '90px' ) );
+	geometryBoundingBoxRow.add( new UIText( strings.getKey( 'sidebar/geometry/bounds' ) ).setClass( 'Label' ) );
 	geometryBoundingBoxRow.add( geometryBoundingBox );
 	container.add( geometryBoundingBoxRow );
 
 	// Helpers
 
-	const helpersRow = new UIRow().setPaddingLeft( '90px' );
+	const helpersRow = new UIRow().setMarginLeft( '120px' );
 	container.add( helpersRow );
 
 	const vertexNormalsButton = new UIButton( strings.getKey( 'sidebar/geometry/show_vertex_normals' ) );
@@ -173,7 +173,7 @@ function SidebarGeometry( editor ) {
 	// Export JSON
 
 	const exportJson = new UIButton( strings.getKey( 'sidebar/geometry/export' ) );
-	exportJson.setMarginLeft( '90px' );
+	exportJson.setMarginLeft( '120px' );
 	exportJson.onClick( function () {
 
 		const object = editor.selected;

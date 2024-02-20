@@ -28,7 +28,7 @@ function SidebarProjectApp( editor ) {
 
 	} );
 
-	titleRow.add( new UIText( strings.getKey( 'sidebar/project/app/title' ) ).setWidth( '90px' ) );
+	titleRow.add( new UIText( strings.getKey( 'sidebar/project/app/title' ) ).setClass( 'Label' ) );
 	titleRow.add( title );
 
 	container.add( titleRow );
@@ -42,7 +42,7 @@ function SidebarProjectApp( editor ) {
 
 	} );
 
-	editableRow.add( new UIText( strings.getKey( 'sidebar/project/app/editable' ) ).setWidth( '90px' ) );
+	editableRow.add( new UIText( strings.getKey( 'sidebar/project/app/editable' ) ).setClass( 'Label' ) );
 	editableRow.add( editable );
 
 	container.add( editableRow );
@@ -53,7 +53,7 @@ function SidebarProjectApp( editor ) {
 
 	const playButton = new UIButton( strings.getKey( 'sidebar/project/app/play' ) );
 	playButton.setWidth( '170px' );
-	playButton.setMarginLeft( '90px' );
+	playButton.setMarginLeft( '120px' );
 	playButton.setMarginBottom( '10px' );
 	playButton.onClick( function () {
 
@@ -79,7 +79,7 @@ function SidebarProjectApp( editor ) {
 
 	const publishButton = new UIButton( strings.getKey( 'sidebar/project/app/publish' ) );
 	publishButton.setWidth( '170px' );
-	publishButton.setMarginLeft( '90px' );
+	publishButton.setMarginLeft( '120px' );
 	publishButton.setMarginBottom( '10px' );
 	publishButton.onClick( function () {
 
