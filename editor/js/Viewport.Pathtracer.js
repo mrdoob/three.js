@@ -3,14 +3,20 @@ import { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 import {
 	PathTracingSceneGenerator,
 	PathTracingRenderer,
-	PhysicalPathTracingMaterial
+	PhysicalPathTracingMaterial,
+	ProceduralEquirectTexture,
 } from 'three-gpu-pathtracer';
 
 function buildColorTexture( color ) {
 
-	const data = new Uint8Array( [ color.r * 255, color.g * 255, color.b * 255, 255 ] );
-	const texture = new THREE.DataTexture( data, 1, 1, THREE.RGBAFormat );
-	texture.needsUpdate = true;
+	const texture = new ProceduralEquirectTexture( 4, 4 );
+	texture.generationCallback = ( polar, uv, coord, target ) => {
+
+		target.copy( color );
+
+	};
+
+	texture.update();
 
 	return texture;
 
