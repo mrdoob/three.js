@@ -300,6 +300,7 @@ class Material extends EventDispatcher {
 
 		}
 
+		if ( this.envMapRotation !== undefined ) data.envMapRotation = this.envMapRotation.toArray();
 		if ( this.envMapIntensity !== undefined ) data.envMapIntensity = this.envMapIntensity;
 		if ( this.reflectivity !== undefined ) data.reflectivity = this.reflectivity;
 		if ( this.refractionRatio !== undefined ) data.refractionRatio = this.refractionRatio;

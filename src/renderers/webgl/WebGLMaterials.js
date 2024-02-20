@@ -1,5 +1,10 @@
 import { BackSide } from '../../constants.js';
 import { getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
+import { Euler } from '../../math/Euler.js';
+import { Matrix4 } from '../../math/Matrix4.js';
+
+const _e1 = /*@__PURE__*/ new Euler();
+const _m1 = /*@__PURE__*/ new Matrix4();
 
 function WebGLMaterials( renderer, properties ) {
 
@@ -209,11 +214,28 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
-		const envMap = properties.get( material ).envMap;
+		const materialProperties = properties.get( material );
+
+		const envMap = materialProperties.envMap;
+		const envMapRotation = materialProperties.envMapRotation;
 
 		if ( envMap ) {
 
 			uniforms.envMap.value = envMap;
+
+			_e1.copy( envMapRotation );
+
+			// accommodate left-handed frame
+			_e1.x *= - 1; _e1.y *= - 1; _e1.z *= - 1;
+
+			if ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) {
+
+				// environment maps which are no cube render targets or PMREMs follow a different px/nx convention
+				_e1.x *= - 1;
+
+			}
+
+			uniforms.envMapRotation.value.setFromMatrix4( _m1.makeRotationFromEuler( _e1 ) );
 
 			uniforms.flipEnvMap.value = ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) ? - 1 : 1;
 
