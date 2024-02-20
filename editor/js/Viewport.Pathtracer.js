@@ -52,14 +52,6 @@ function ViewportPathtracer( renderer ) {
 		pathtracer.material.backgroundBlur = scene.backgroundBlurriness;
 		pathtracer.reset();
 
-		// TOFIX: If the scene is empty the generator crashes so we render a tiny cube (:
-
-		if ( scene.children.length === 0 ) {
-
-			scene = new THREE.Mesh( new THREE.BoxGeometry( 0.0001, 0.0001, 0.0001 ) );
-
-		}
-
 		const { bvh, textures, materials, lights } = generator.generate( scene );
 
 		const ptGeometry = bvh.geometry;
