@@ -434,7 +434,7 @@ class UICheckbox extends UIElement {
 			// Workaround for TransformControls blocking events in Viewport.Controls checkboxes
 
 			event.stopPropagation();
-		
+
 		} );
 
 		this.setValue( boolean );
@@ -533,7 +533,7 @@ class UINumber extends UIElement {
 		this.min = - Infinity;
 		this.max = Infinity;
 
-		this.precision = 2;
+		this.precision = 3;
 		this.step = 1;
 		this.unit = '';
 		this.nudge = 0.01;
