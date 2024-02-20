@@ -69,6 +69,12 @@ function SidebarProjectVideo( editor ) {
 		const top = ( screen.height - height ) / 2;
 
 		const output = window.open( '', '_blank', `location=no,left=${left},top=${top},width=${width},height=${height}` );
+
+		const meta = document.createElement( 'meta' );
+		meta.name = 'viewport';
+		meta.content = 'width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0';
+		output.document.head.appendChild( meta );
+
 		output.document.body.style.background = '#000';
 		output.document.body.style.margin = '0px';
 		output.document.body.style.overflow = 'hidden';
