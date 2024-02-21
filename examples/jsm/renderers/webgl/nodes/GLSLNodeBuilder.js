@@ -19,7 +19,8 @@ const precisionLib = {
 };
 
 const supports = {
-	instance: true
+	instance: true,
+	swizzleAssign: true
 };
 
 const defaultPrecisions = `
@@ -539,7 +540,6 @@ ${ flowData.code }
 		return supports[ name ] === true;
 
 	}
-
 
 	isFlipY() {
 
