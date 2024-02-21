@@ -177,8 +177,20 @@ class DragControls extends EventDispatcher {
 			_raycaster.intersectObjects( _objects, scope.recursive, _intersections );
 
 			if ( _intersections.length > 0 ) {
-
-				_selected = ( scope.transformGroup === true ) ? _objects[ 0 ] : _intersections[ 0 ].object;
+				let mainGroup = null;
+		                if(scope.transformGroup === true){
+		
+		                    function getparent(obj){
+		                       
+		                        if(obj.parent.type === 'Scene'){
+		                            mainGroup = obj;
+		                        }else{
+		                            getparent(obj.parent)
+		                        }
+		                    }
+		                    getparent( _intersections[ 0 ].object);
+		                }
+				_selected = ( scope.transformGroup === true ) ? mainGroup : _intersections[ 0 ].object;
 
 				_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
 
