@@ -485,15 +485,11 @@ function Viewport( editor ) {
 
 	// background
 
-	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, backgroundBlurriness, backgroundIntensity ) {
+	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, backgroundBlurriness, backgroundIntensity, backgroundRotation ) {
+
+		scene.background = null;
 
 		switch ( backgroundType ) {
-
-			case 'None':
-
-				scene.background = null;
-
-				break;
 
 			case 'Color':
 
@@ -516,9 +512,19 @@ function Viewport( editor ) {
 				if ( backgroundEquirectangularTexture ) {
 
 					backgroundEquirectangularTexture.mapping = THREE.EquirectangularReflectionMapping;
+
 					scene.background = backgroundEquirectangularTexture;
 					scene.backgroundBlurriness = backgroundBlurriness;
 					scene.backgroundIntensity = backgroundIntensity;
+					scene.backgroundRotation.y = backgroundRotation * THREE.MathUtils.DEG2RAD;
+
+					if ( useBackgroundAsEnvironment ) {
+
+						scene.environment = scene.background;
+						scene.environmentRotation.y = backgroundRotation * THREE.MathUtils.DEG2RAD;
+
+					}
+
 
 				}
 
@@ -532,19 +538,27 @@ function Viewport( editor ) {
 
 	// environment
 
+	let useBackgroundAsEnvironment = false;
+
 	signals.sceneEnvironmentChanged.add( function ( environmentType, environmentEquirectangularTexture ) {
+
+		scene.environment = null;
+
+		useBackgroundAsEnvironment = false;
 
 		switch ( environmentType ) {
 
-			case 'None':
 
-				scene.environment = null;
+			case 'Background':
+
+				useBackgroundAsEnvironment = true;
+
+				scene.environment = scene.background;
+				scene.environmentRotation.y = scene.backgroundRotation.y;
 
 				break;
 
 			case 'Equirectangular':
-
-				scene.environment = null;
 
 				if ( environmentEquirectangularTexture ) {
 

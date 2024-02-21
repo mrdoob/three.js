@@ -195,6 +195,9 @@ function SidebarScene( editor ) {
 	const backgroundIntensity = new UINumber( 1 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( onBackgroundChanged );
 	backgroundEquirectRow.add( backgroundIntensity );
 
+	const backgroundRotation = new UINumber( 0 ).setWidth( '40px' ).setRange( -180, 180 ).setStep( 10 ).setNudge( 0.1 ).setUnit( '°' ).onChange( onBackgroundChanged );
+	backgroundEquirectRow.add( backgroundRotation );
+
 	container.add( backgroundEquirectRow );
 
 	function onBackgroundChanged() {
@@ -205,7 +208,8 @@ function SidebarScene( editor ) {
 			backgroundTexture.getValue(),
 			backgroundEquirectangularTexture.getValue(),
 			backgroundBlurriness.getValue(),
-			backgroundIntensity.getValue()
+			backgroundIntensity.getValue(),
+			backgroundRotation.getValue()
 		);
 
 	}
@@ -229,6 +233,7 @@ function SidebarScene( editor ) {
 	const environmentType = new UISelect().setOptions( {
 
 		'None': '',
+		'Background': 'Background',
 		'Equirectangular': 'Equirect',
 		'ModelViewer': 'ModelViewer'
 
