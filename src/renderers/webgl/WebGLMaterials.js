@@ -1,4 +1,4 @@
-import { BackSide, CubeUVReflectionMapping } from '../../constants.js';
+import { BackSide } from '../../constants.js';
 import { getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
 import { Euler } from '../../math/Euler.js';
 import { Matrix4 } from '../../math/Matrix4.js';
@@ -225,7 +225,10 @@ function WebGLMaterials( renderer, properties ) {
 
 			_e1.copy( envMapRotation );
 
-			if ( ( envMap.isCubeTexture && envMap.isRenderTargetTexture === true ) || envMap.mapping === CubeUVReflectionMapping ) {
+			// accommodate left-handed frame
+			_e1.x *= - 1; _e1.y *= - 1; _e1.z *= - 1;
+
+			if ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) {
 
 				// environment maps which are not cube render targets or PMREMs follow a different convention
 				_e1.y *= - 1;
