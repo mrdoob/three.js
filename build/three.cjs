@@ -14866,7 +14866,10 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 			_e1$1.copy( scene.backgroundRotation );
 
-			if ( ( background.isCubeTexture && background.isRenderTargetTexture === true ) || background.mapping === CubeUVReflectionMapping ) {
+			// accommodate left-handed frame
+			_e1$1.x *= - 1; _e1$1.y *= - 1; _e1$1.z *= - 1;
+
+			if ( background.isCubeTexture && background.isRenderTargetTexture === false ) {
 
 				// environment maps which are not cube render targets or PMREMs follow a different convention
 				_e1$1.y *= - 1;
@@ -27931,7 +27934,10 @@ function WebGLMaterials( renderer, properties ) {
 
 			_e1.copy( envMapRotation );
 
-			if ( ( envMap.isCubeTexture && envMap.isRenderTargetTexture === true ) || envMap.mapping === CubeUVReflectionMapping ) {
+			// accommodate left-handed frame
+			_e1.x *= - 1; _e1.y *= - 1; _e1.z *= - 1;
+
+			if ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) {
 
 				// environment maps which are not cube render targets or PMREMs follow a different convention
 				_e1.y *= - 1;
