@@ -553,6 +553,8 @@ class UINumber extends UIElement {
 
 		function onMouseDown( event ) {
 
+			if ( document.activeElement === scope.dom ) return;
+
 			event.preventDefault();
 
 			distance = 0;
@@ -820,6 +822,8 @@ class UIInteger extends UIElement {
 		const prevPointer = { x: 0, y: 0 };
 
 		function onMouseDown( event ) {
+
+			if ( document.activeElement === scope.dom ) return;
 
 			event.preventDefault();
 
