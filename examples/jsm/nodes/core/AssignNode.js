@@ -64,7 +64,11 @@ class AssignNode extends TempNode {
 
 		if ( nodeData.initialized === true ) {
 
-			snippet = target;
+			if ( output !== 'void' ) {
+
+				snippet = target;
+
+			}
 
 		} else if ( needsSplitAssign ) {
 
