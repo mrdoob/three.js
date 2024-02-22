@@ -5,7 +5,7 @@ import { Loader } from './Loader.js';
 import { History as _History } from './History.js';
 import { Strings } from './Strings.js';
 import { Storage as _Storage } from './Storage.js';
-import { Selector } from './Viewport.Selector.js';
+import { Selector } from './Selector.js';
 
 var _DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
 _DEFAULT_CAMERA.name = 'Camera';
@@ -97,9 +97,9 @@ function Editor() {
 
 	this.config = new Config();
 	this.history = new _History( this );
+	this.selector = new Selector( this );
 	this.storage = new _Storage();
 	this.strings = new Strings( this.config );
-	this.selector = new Selector( this );
 
 	this.loader = new Loader( this );
 
@@ -109,6 +109,7 @@ function Editor() {
 	this.scene.name = 'Scene';
 
 	this.sceneHelpers = new THREE.Scene();
+	this.sceneHelpers.add( new THREE.HemisphereLight( 0xffffff, 0x888888, 2 ) );
 
 	this.object = {};
 	this.geometries = {};

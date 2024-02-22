@@ -7,6 +7,8 @@ import {
 const _pointer = new Vector2();
 const _event = { type: '', data: _pointer };
 
+const _raycaster = new Raycaster();
+
 class InteractiveGroup extends Group {
 
 	listenToPointerEvents( renderer, camera ) {
@@ -55,11 +57,9 @@ class InteractiveGroup extends Group {
 
 	}
 
-	listenToXRControllerEvents( renderer ) {
+	listenToXRControllerEvents( controller ) {
 
 		const scope = this;
-
-		const raycaster = new Raycaster();
 
 		// TODO: Dispatch pointerevents too
 
@@ -74,9 +74,9 @@ class InteractiveGroup extends Group {
 
 			const controller = event.target;
 
-			raycaster.setFromXRController( controller );
+			_raycaster.setFromXRController( controller );
 
-			const intersections = raycaster.intersectObjects( scope.children, false );
+			const intersections = _raycaster.intersectObjects( scope.children, false );
 
 			if ( intersections.length > 0 ) {
 
@@ -94,17 +94,10 @@ class InteractiveGroup extends Group {
 
 		}
 
-		const controller1 = renderer.xr.getController( 0 );
-		controller1.addEventListener( 'move', onXRControllerEvent );
-		controller1.addEventListener( 'select', onXRControllerEvent );
-		controller1.addEventListener( 'selectstart', onXRControllerEvent );
-		controller1.addEventListener( 'selectend', onXRControllerEvent );
-
-		const controller2 = renderer.xr.getController( 1 );
-		controller2.addEventListener( 'move', onXRControllerEvent );
-		controller2.addEventListener( 'select', onXRControllerEvent );
-		controller2.addEventListener( 'selectstart', onXRControllerEvent );
-		controller2.addEventListener( 'selectend', onXRControllerEvent );
+		controller.addEventListener( 'move', onXRControllerEvent );
+		controller.addEventListener( 'select', onXRControllerEvent );
+		controller.addEventListener( 'selectstart', onXRControllerEvent );
+		controller.addEventListener( 'selectend', onXRControllerEvent );
 
 	}
 
