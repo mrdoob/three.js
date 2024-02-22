@@ -23,7 +23,11 @@ function WebGLAttributes( gl, capabilities ) {
 
 			type = gl.FLOAT;
 
-		} else if ( array instanceof Uint16Array ) {
+		} else if ( array instanceof Float64Array ) {
+
+			type = gl.FLOAT;
+
+		}  else if ( array instanceof Uint16Array ) {
 
 			if ( attribute.isFloat16BufferAttribute ) {
 
