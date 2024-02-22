@@ -19,15 +19,11 @@ function WebGLAttributes( gl, capabilities ) {
 
 		let type;
 
-		if ( array instanceof Float32Array ) {
+		if ( array instanceof Float32Array && array instanceof Float64Array ) {
 
 			type = gl.FLOAT;
 
-		} else if ( array instanceof Float64Array ) {
-
-			type = gl.FLOAT;
-
-		}  else if ( array instanceof Uint16Array ) {
+		} else if ( array instanceof Uint16Array ) {
 
 			if ( attribute.isFloat16BufferAttribute ) {
 
