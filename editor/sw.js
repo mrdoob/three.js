@@ -142,6 +142,7 @@ const assets = [
 	'./js/Menubar.View.js',
 	'./js/Menubar.Status.js',
 	'./js/Resizer.js',
+	'./js/Selector.js',
 	'./js/Sidebar.js',
 	'./js/Sidebar.Scene.js',
 	'./js/Sidebar.Project.js',
@@ -188,7 +189,6 @@ const assets = [
 	'./js/Viewport.js',
 	'./js/Viewport.Controls.js',
 	'./js/Viewport.Info.js',
-	'./js/Viewport.Selector.js',
 	'./js/Viewport.ViewHelper.js',
 	'./js/Viewport.XR.js',
 
