@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>three.js webgl - octree </title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+</head>
+
+<body>
+	<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+	<script type="module">
+
+		import * as THREE from 'three';
+
+		import Stats from 'three/addons/libs/stats.module.js';
+		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { Octree } from 'three/addons/math/Octree.js';
+		import { OctreeHelper } from 'three/addons/helpers/OctreeHelper.js';
+
+		let camera, scene1, scene2, renderer, controls, stats;
+		let octree, octreeHelper;
+
+		let sphereOnLine;
+		const count = 60000;
+
+		const mouse = new THREE.Vector2( 1, 1 );
+		const raycaster = new THREE.Raycaster();
+
+		const uiConfig = {
+			useOctree: true,
+			OctreeHelper: true,
+		};
+		init();
+		animate();
+
+		function init() {
+
+			camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10000 );
+			camera.position.set( 0, 0, 1000 );
+			camera.lookAt( 0, 0, 0 );
+
+			scene1 = new THREE.Scene();
+			scene2 = new THREE.Scene();
+
+			octree = new Octree();
+
+			const sphereGeometry = new THREE.CircleGeometry( 20, 32 );
+			const sphereOnLineMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00, depthTest: false } );
+			sphereOnLine = new THREE.Mesh( sphereGeometry, sphereOnLineMaterial );
+			sphereOnLine.visible = false;
+			sphereOnLine.renderOrder = 2;
+			scene2.add( sphereOnLine );
+
+			const geometry = new THREE.PlaneGeometry( 40, 40 );
+			const material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+
+			for ( let i = 0; i < count; i ++ ) {
+
+				const mesh = new THREE.Mesh( geometry, material );
+				mesh.position.set( Math.random() * 30000 - 1000, Math.random() * 30000 - 1000, 0 );
+				scene1.add( mesh );
+
+			}
+
+			octree.fromGraphNode( scene1 );
+			// create octree helper
+			octreeHelper = new OctreeHelper( octree );
+			scene1.add( octreeHelper );
+
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			controls = new OrbitControls( camera, renderer.domElement );
+
+			stats = new Stats();
+			document.body.appendChild( stats.dom );
+
+			window.addEventListener( 'resize', onWindowResize );
+			document.addEventListener( 'mousemove', onMouseMove );
+			initGui();
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		function onMouseMove( event ) {
+
+			event.preventDefault();
+
+			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+			const origin = camera.position.clone();
+			const direction = new THREE.Vector3( mouse.x, mouse.y, 0.5 ).unproject( camera ).sub( origin ).normalize();
+			const ray = new THREE.Ray( origin, direction );
+			let intersect;
+			if ( uiConfig.useOctree ) {
+
+				intersect = octree.rayIntersect( ray );
+
+
+			} else {
+
+				raycaster.setFromCamera( mouse, camera );
+
+				const intersects = raycaster.intersectObject( scene1 );
+				if ( intersects.length > 0 ) {
+
+					intersect = intersects[ 0 ];
+
+				}
+
+
+			}
+
+			if ( intersect ) {
+
+				sphereOnLine.position.copy( intersect.position || intersect.point );
+				sphereOnLine.visible = true;
+
+			} else {
+
+				sphereOnLine.visible = false;
+
+			}
+
+
+
+
+		}
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			controls.update();
+
+
+			render();
+
+			stats.update();
+
+		}
+
+		function render() {
+
+			renderer.autoClear = true;
+
+			renderer.render( scene1, camera );
+		
+			renderer.autoClear = false;
+
+			renderer.render( scene2, camera );
+
+		}
+
+		function initGui() {
+
+			const gui = new GUI();
+
+			gui.add( uiConfig, 'useOctree' ).onChange( function ( val ) {
+
+				if ( val ) {
+
+					octree.fromGraphNode( scene1 );
+
+
+				} else {
+
+					octree.clear();
+
+				}
+
+				octreeHelper.update();
+
+
+			} );
+
+
+			gui.add( uiConfig, 'OctreeHelper' ).onChange( function ( val ) {
+
+				octreeHelper.visible = val;
+
+			} );
+
+		}
+	</script>
+</body>
+
+</html>
