@@ -1,6 +1,5 @@
 import {
 	Group,
-	Matrix4,
 	Raycaster,
 	Vector2
 } from 'three';
@@ -61,7 +60,6 @@ class InteractiveGroup extends Group {
 		const scope = this;
 
 		const raycaster = new Raycaster();
-		const tempMatrix = new Matrix4();
 
 		// TODO: Dispatch pointerevents too
 
@@ -76,10 +74,7 @@ class InteractiveGroup extends Group {
 
 			const controller = event.target;
 
-			tempMatrix.identity().extractRotation( controller.matrixWorld );
-
-			raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
-			raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
+			raycaster.setFromXRController( controller );
 
 			const intersections = raycaster.intersectObjects( scope.children, false );
 
