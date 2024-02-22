@@ -32,7 +32,7 @@ class AssignNode extends TempNode {
 
 		if ( builder.isAvailable( 'swizzleAssign' ) === false && targetNode.isSplitNode && targetNode.components.length > 1 ) {
 
-			const targetLength = builder.getTypeLength( targetNode.getNodeType( builder ) );
+			const targetLength = builder.getTypeLength( targetNode.node.getNodeType( builder ) );
 			const assignDiferentVector = vectorComponents.join( '' ).slice( 0, targetLength ) !== targetNode.components;
 
 			return assignDiferentVector;
@@ -49,8 +49,6 @@ class AssignNode extends TempNode {
 
 		const needsSplitAssign = this.needsSplitAssign( builder );
 
-		if ( needsSplitAssign ) sourceNode.increaseUsage( builder ); // flag to cache system
-
 		const targetType = targetNode.getNodeType( builder );
 
 		const target = targetNode.context( { assign: true } ).build( builder );
@@ -64,15 +62,18 @@ class AssignNode extends TempNode {
 
 		if ( needsSplitAssign ) {
 
+			const sourceVar = builder.getVarFromNode( this, null, targetType );
+			const sourceProperty = builder.getPropertyName( sourceVar );
+
+			builder.addLineFlowCode( `${ sourceProperty } = ${ source }` );
+
 			const targetRoot = targetNode.node.context( { assign: true } ).build( builder );
 
 			for ( let i = 0; i < targetNode.components.length; i ++ ) {
 
 				const component = targetNode.components[ i ];
 
-				snippet = `${ targetRoot }.${ component } = ${ source }[ ${ i } ]`;
-
-				builder.addLineFlowCode( snippet );
+				builder.addLineFlowCode( `${ targetRoot }.${ component } = ${ sourceProperty }[ ${ i } ]` );
 
 			}
 
