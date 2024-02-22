@@ -56,11 +56,17 @@ class AssignNode extends TempNode {
 
 		const sourceType = sourceNode.getNodeType( builder );
 
+		const nodeData = builder.getDataFromNode( this );
+
 		//
 
 		let snippet;
 
-		if ( needsSplitAssign ) {
+		if ( nodeData.initialized === true ) {
+
+			snippet = target;
+
+		} else if ( needsSplitAssign ) {
 
 			const sourceVar = builder.getVarFromNode( this, null, targetType );
 			const sourceProperty = builder.getPropertyName( sourceVar );
@@ -100,6 +106,8 @@ class AssignNode extends TempNode {
 			}
 
 		}
+
+		nodeData.initialized = true;
 
 		return builder.format( snippet, targetType, output );
 
