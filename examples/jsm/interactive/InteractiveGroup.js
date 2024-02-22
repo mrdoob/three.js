@@ -1,6 +1,5 @@
 import {
 	Group,
-	Matrix4,
 	Raycaster,
 	Vector2
 } from 'three';
