@@ -1,8 +1,43 @@
 import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
-import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, AgXToneMapping, ACESFilmicToneMapping, NeutralToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GLSL3, LinearSRGBColorSpace, SRGBColorSpace, LinearDisplayP3ColorSpace, DisplayP3ColorSpace, P3Primaries, Rec709Primaries } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
+
+import {
+	NoToneMapping,
+	AddOperation,
+	MixOperation,
+	MultiplyOperation,
+	CubeRefractionMapping,
+	CubeUVReflectionMapping,
+	CubeReflectionMapping,
+	PCFSoftShadowMap,
+	PCFShadowMap,
+	VSMShadowMap,
+	AgXToneMapping,
+	ACESFilmicToneMapping,
+	NeutralToneMapping,
+	CineonToneMapping,
+	CustomToneMapping,
+	ReinhardToneMapping,
+	LinearToneMapping,
+	LinearSRGBColorSpace,
+	SRGBColorSpace,
+	LinearDisplayP3ColorSpace,
+	DisplayP3ColorSpace,
+	P3Primaries,
+	Rec709Primaries,
+	FloatType,
+	HalfFloatType,
+	RedFormat,
+	RGFormat,
+	IntType,
+	UnsignedIntType,
+	UnsignedShortType,
+	ShortType,
+	RedIntegerFormat,
+	RGIntegerFormat
+} from '../../constants.js';
 
 // From https://www.khronos.org/registry/webgl/extensions/KHR_parallel_shader_compile/
 const COMPLETION_STATUS_KHR = 0x91B1;
@@ -473,6 +508,88 @@ function generateCubeUVSize( parameters ) {
 
 }
 
+function getOutputPrecision( texture ) {
+
+	switch ( texture.type ) {
+
+		case IntType:
+		case UnsignedIntType:
+		case FloatType:
+			return 'highp';
+
+		case ShortType:
+		case UnsignedShortType:
+		case HalfFloatType:
+			return 'mediump';
+
+		default:
+			return 'lowp';
+
+	}
+
+}
+
+function getOutputType( texture ) {
+
+	const isIntType = texture.type === IntType || texture.type === ShortType;
+	const isUintType = texture.type === UnsignedIntType || texture.type === UnsignedShortType;
+
+	switch ( texture.format ) {
+
+		case RedFormat:
+		case RedIntegerFormat:
+			return isUintType ? 'uint' : isIntType ? 'int' : 'float';
+
+		case RGFormat:
+		case RGIntegerFormat:
+			return isUintType ? 'uvec2' : isIntType ? 'ivec2' : 'vec2';
+
+		default:
+			return isUintType ? 'uvec4' : isIntType ? 'ivec4' : 'vec4';
+
+	}
+
+}
+
+function generateOutputDefinitions( renderTarget ) {
+
+	const definitions = [];
+
+	if ( renderTarget === null ) {
+
+		// Create an output declaration for the back buffer.
+		definitions.push( 'layout(location = 0) out lowp vec4 out_FragData;' );
+		definitions.push( '#define gl_FragColor out_FragData' );
+
+		return definitions.join( '\n' );
+
+	}
+
+	for ( let i = 0, l = renderTarget.textures.length; i < l; ++ i ) {
+
+		const texture = renderTarget.textures[ i ];
+		const name = texture.name.replace( /\W*/g, '' );
+		const precision = getOutputPrecision( texture );
+		const type = getOutputType( texture );
+
+		definitions.push( `layout(location = ${i}) out ${precision} ${type} out_FragData${i};` );
+
+		if ( l > 1 && name !== '' ) {
+
+			// Define output variable macros for convenience if there are multiple textures.
+			definitions.push( `#define out_${name} out_FragData${i}` );
+
+		}
+
+	}
+
+	// Declare the first texture as the default color output.
+	definitions.push( '#define gl_FragColor out_FragData0' );
+
+	return definitions.join( '\n' );
+
+}
+
 function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 	// TODO Send this event to Three.js DevTools
@@ -889,6 +1006,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	vertexShader = unrollLoops( vertexShader );
 	fragmentShader = unrollLoops( fragmentShader );
 
+	const hasOutputDefinitions = /\blayout\b/.test( fragmentShader );
+
 	if ( parameters.isWebGL2 && parameters.isRawShaderMaterial !== true ) {
 
 		// GLSL 3.0 conversion for built-in materials and ShaderMaterial
@@ -906,8 +1025,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 		prefixFragment = [
 			'precision mediump sampler2DArray;',
 			'#define varying in',
-			( parameters.glslVersion === GLSL3 ) ? '' : 'layout(location = 0) out highp vec4 pc_fragColor;',
-			( parameters.glslVersion === GLSL3 ) ? '' : '#define gl_FragColor pc_fragColor',
+			hasOutputDefinitions ? '' : generateOutputDefinitions( renderer.getRenderTarget() ),
 			'#define gl_FragDepthEXT gl_FragDepth',
 			'#define texture2D texture',
 			'#define textureCube texture',
