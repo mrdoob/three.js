@@ -1006,7 +1006,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	vertexShader = unrollLoops( vertexShader );
 	fragmentShader = unrollLoops( fragmentShader );
 
-	const hasOutputDefinitions = /\bout\b/.test( fragmentShader );
+	const hasOutputDefinitions = /^\s*(?:layout\s*\(.*\))*\s*out\b/m.test( fragmentShader );
 
 	if ( parameters.isWebGL2 && parameters.isRawShaderMaterial !== true ) {
 
