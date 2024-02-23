@@ -11,6 +11,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	const multisampledRTTExt = extensions.has( 'WEBGL_multisampled_render_to_texture' ) ? extensions.get( 'WEBGL_multisampled_render_to_texture' ) : null;
 	const supportsInvalidateFramebuffer = typeof navigator === 'undefined' ? false : /OculusBrowser/g.test( navigator.userAgent );
 
+	const _imageDimensions = new Vector2();
 	const _videoTextures = new WeakMap();
 	let _canvas;
 
@@ -2167,23 +2168,26 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getDimensions( image ) {
 
-		const dimensions = new Vector2( image.width, image.height );
-
 		if ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) {
 
 			// if intrinsic data are not available, fallback to width/height
 
-			dimensions.width = image.naturalWidth || image.width;
-			dimensions.height = image.naturalHeight || image.height;
+			_imageDimensions.width = image.naturalWidth || image.width;
+			_imageDimensions.height = image.naturalHeight || image.height;
 
 		} else if ( typeof VideoFrame !== 'undefined' && image instanceof VideoFrame ) {
 
-			dimensions.width = image.displayWidth;
-			dimensions.height = image.displayHeight;
+			_imageDimensions.width = image.displayWidth;
+			_imageDimensions.height = image.displayHeight;
+
+		} else {
+
+			_imageDimensions.width = image.width;
+			_imageDimensions.height = image.height;
 
 		}
 
-		return dimensions;
+		return _imageDimensions;
 
 	}
 
