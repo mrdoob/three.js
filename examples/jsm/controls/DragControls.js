@@ -30,7 +30,7 @@ class DragControls extends EventDispatcher {
 		_domElement.style.touchAction = 'none'; // disable touch scroll
 
 		let _selected = null, _hovered = null;
-
+ 
 		const _intersections = [];
 
 		this.mode = 'translate';
@@ -71,6 +71,10 @@ class DragControls extends EventDispatcher {
 
 			return _objects;
 
+		}
+
+		function updateObject(_newObject){ //array of object
+			_objects = _newObject
 		}
 
 		function getRaycaster() {
@@ -177,20 +181,18 @@ class DragControls extends EventDispatcher {
 			_raycaster.intersectObjects( _objects, scope.recursive, _intersections );
 
 			if ( _intersections.length > 0 ) {
-				let mainGroup = null;
-		                if(scope.transformGroup === true){
-		
-		                    function getparent(obj){
-		                       
-		                        if(obj.parent.type === 'Scene'){
-		                            mainGroup = obj;
-		                        }else{
-		                            getparent(obj.parent)
-		                        }
-		                    }
-		                    getparent( _intersections[ 0 ].object);
-		                }
-				_selected = ( scope.transformGroup === true ) ? mainGroup : _intersections[ 0 ].object;
+
+				if ( scope.transformGroup === true ) {
+
+					// look for the outermost group in the object's upper hierarchy
+          
+					_selected = findGroup( _intersections[ 0 ].object );
+
+				} else {
+
+					_selected = _intersections[ 0 ].object;
+
+				}
 
 				_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
 
@@ -246,6 +248,16 @@ class DragControls extends EventDispatcher {
 
 		}
 
+		function findGroup( obj, group = null ) {
+			
+			if ( obj.isGroup ) group = obj;
+
+			if ( obj.parent === null ) return group;
+
+			return findGroup( obj.parent, group );
+
+		}
+  
 		activate();
 
 		// API
@@ -259,9 +271,11 @@ class DragControls extends EventDispatcher {
 		this.dispose = dispose;
 		this.getObjects = getObjects;
 		this.getRaycaster = getRaycaster;
+		this.updateObject = updateObject;
 
 	}
 
 }
+
 
 export { DragControls };
