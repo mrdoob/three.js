@@ -215,13 +215,6 @@
 
 			const transform = new THREE.Object3D();
 
-			// convert -1 to 1 value into eye rotation value
-			function mapRotation( eyeScore ) {
-
-				return THREE.MathUtils.mapLinear( eyeScore, - 1, 1, - eyeRotationLimit, eyeRotationLimit );
-
-			}
-
 			function animation() {
 
 				if ( video.readyState >= HTMLMediaElement.HAVE_METADATA ) {
@@ -273,7 +266,7 @@
 							}
 
 							// There are two blendshape for movement on each axis (up/down , in/out)
-							// Add one and subtract the other to get the final rotation in -1 to 1 range
+							// Add one and subtract the other to get the final score in -1 to 1 range
 							switch ( categoryName ) {
 
 								case 'eyeLookInLeft':
@@ -305,10 +298,10 @@
 
 						}
 
-					eyeL.rotation.z = mapRotation( eyeScore.leftHorizontal );
-      					eyeR.rotation.z = mapRotation( eyeScore.rightHorizontal );
-      					eyeL.rotation.x = mapRotation( eyeScore.leftVertical );
-      					eyeR.rotation.x = mapRotation( eyeScore.rightVertical );
+					eyeL.rotation.z = eyeScore.leftHorizontal * eyeRotationLimit;
+      					eyeR.rotation.z = eyeScore.rightHorizontal * eyeRotationLimit;
+      					eyeL.rotation.x = eyeScore.leftVertical * eyeRotationLimit;
+      					eyeR.rotation.x = eyeScore.rightVertical * eyeRotationLimit;
 			
 					}
 
