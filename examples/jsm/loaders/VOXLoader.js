@@ -56,9 +56,16 @@ class VOXLoader extends Loader {
 		const id = data.getUint32( 0, true );
 		const version = data.getUint32( 4, true );
 
-		if ( id !== 542658390 || version !== 150 ) {
+		if ( id !== 542658390 ) {
 
-			console.error( 'Not a valid VOX file' );
+			console.error( 'THREE.VOXLoader: Invalid VOX file.' );
+			return;
+
+		}
+
+		if ( version !== 150 ) {
+
+			console.error( 'THREE.VOXLoader: Invalid VOX file. Unsupported version:', version );
 			return;
 
 		}

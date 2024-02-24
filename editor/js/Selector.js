@@ -1,3 +1,8 @@
+import * as THREE from 'three';
+
+const mouse = new THREE.Vector2();
+const raycaster = new THREE.Raycaster();
+
 class Selector {
 
 	constructor( editor ) {
@@ -34,6 +39,36 @@ class Selector {
 			}
 
 		} );
+
+	}
+
+	getIntersects( raycaster ) {
+
+		const objects = [];
+
+		this.editor.scene.traverseVisible( function ( child ) {
+
+			objects.push( child );
+
+		} );
+
+		this.editor.sceneHelpers.traverseVisible( function ( child ) {
+
+			if ( child.name === 'picker' ) objects.push( child );
+
+		} );
+
+		return raycaster.intersectObjects( objects, false );
+
+	}
+
+	getPointerIntersects( point, camera ) {
+
+		mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
+
+		raycaster.setFromCamera( mouse, camera );
+
+		return this.getIntersects( raycaster );
 
 	}
 

@@ -21,6 +21,7 @@ import { ViewportPathtracer } from './Viewport.Pathtracer.js';
 
 function Viewport( editor ) {
 
+	const selector = editor.selector;
 	const signals = editor.signals;
 
 	const container = new UIPanel();
@@ -55,7 +56,6 @@ function Viewport( editor ) {
 	grid.add( grid2 );
 
 	const viewHelper = new ViewHelper( camera, container );
-	const xr = new XR( editor );
 
 	//
 
@@ -141,10 +141,9 @@ function Viewport( editor ) {
 
 	sceneHelpers.add( transformControls );
 
-	// object picking
+	//
 
-	const raycaster = new THREE.Raycaster();
-	const mouse = new THREE.Vector2();
+	const xr = new XR( editor, transformControls ); // eslint-disable-line no-unused-vars
 
 	// events
 
@@ -152,30 +151,6 @@ function Viewport( editor ) {
 
 		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
 		camera.updateProjectionMatrix();
-
-	}
-
-	function getIntersects( point ) {
-
-		mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
-
-		raycaster.setFromCamera( mouse, camera );
-
-		const objects = [];
-
-		scene.traverseVisible( function ( child ) {
-
-			objects.push( child );
-
-		} );
-
-		sceneHelpers.traverseVisible( function ( child ) {
-
-			if ( child.name === 'picker' ) objects.push( child );
-
-		} );
-
-		return raycaster.intersectObjects( objects, false );
 
 	}
 
@@ -194,7 +169,7 @@ function Viewport( editor ) {
 
 		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
-			const intersects = getIntersects( onUpPosition );
+			const intersects = selector.getPointerIntersects( onUpPosition, camera );
 			signals.intersectionsDetected.dispatch( intersects );
 
 			render();
@@ -256,7 +231,7 @@ function Viewport( editor ) {
 		const array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onDoubleClickPosition.fromArray( array );
 
-		const intersects = getIntersects( onDoubleClickPosition );
+		const intersects = selector.getPointerIntersects( onDoubleClickPosition, camera );
 
 		if ( intersects.length > 0 ) {
 
