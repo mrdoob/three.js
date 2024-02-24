@@ -1,8 +1,5 @@
 import * as THREE from 'three';
 
-import { SetPositionCommand } from './commands/SetPositionCommand.js';
-import { SetRotationCommand } from './commands/SetRotationCommand.js';
-
 import { HTMLMesh } from 'three/addons/interactive/HTMLMesh.js';
 import { InteractiveGroup } from 'three/addons/interactive/InteractiveGroup.js';
 
@@ -10,10 +7,12 @@ import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFa
 
 class XR {
 
-	constructor( editor ) {
+	constructor( editor, controls ) {
 
+		const selector = editor.selector;
 		const signals = editor.signals;
 
+		let controllers = null;
 		let group = null;
 		let renderer = null;
 
@@ -29,93 +28,97 @@ class XR {
 
 			//
 
-			if ( group === null ) {
-
-				group = new InteractiveGroup();
-				group.listenToXRControllerEvents( renderer );
-
-				const mesh = new HTMLMesh( sidebar );
-				mesh.position.set( 1, 1.5, - 0.5 );
-				mesh.rotation.y = - 0.5;
-				mesh.scale.setScalar( 2 );
-				group.add( mesh );
-
-				// controllers
-
-				const raycaster = new THREE.Raycaster();
-				const tempMatrix = new THREE.Matrix4();
-
-				function getIntersections( controller ) {
-
-					tempMatrix.identity().extractRotation( controller.matrixWorld );
-
-					raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
-					raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
-
-					return raycaster.intersectObjects( editor.scene.children, false );
-
-				}
-
-				function onSelectStart( event ) {
-
-					const controller = event.target;
-					const intersections = getIntersections( controller );
-
-					if ( intersections.length > 0 ) {
-
-						const intersection = intersections[ 0 ];
-						const object = intersection.object;
-
-						signals.objectSelected.dispatch( object );
-
-						controller.userData.selected = object;
-						controller.userData.position = object.position.clone();
-						controller.userData.rotation = object.rotation.clone();
-
-						controller.attach( object );
-
-					}
-
-				}
-
-				function onSelectEnd( event ) {
-
-					const controller = event.target;
-
-					if ( controller.userData.selected !== undefined ) {
-
-						const object = controller.userData.selected;
-						editor.scene.attach( object );
-
-						controller.userData.selected = undefined;
-
-						editor.execute( new SetPositionCommand( editor, object, object.position, controller.userData.position ) );
-						editor.execute( new SetRotationCommand( editor, object, object.rotation, controller.userData.rotation ) );
-
-						signals.objectChanged.dispatch( object );
-
-					} else {
-
-						signals.objectSelected.dispatch( null );
-
-					}
-
-				}
+			if ( controllers === null ) {
 
 				const geometry = new THREE.BufferGeometry();
-				geometry.setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 5 ) ] );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 5 ], 3 ) );
+
+				const line = new THREE.Line( geometry );
+
+				const raycaster = new THREE.Raycaster();
+
+				function onSelect( event ) {
+
+					const controller = event.target;
+
+					controller1.userData.active = false;
+					controller2.userData.active = false;
+
+					if ( controller === controller1 ) {
+
+						controller1.userData.active = true;
+						controller1.add( line );
+
+					}
+
+					if ( controller === controller2 ) {
+
+						controller2.userData.active = true;
+						controller2.add( line );
+
+					}
+
+					raycaster.setFromXRController( controller );
+
+					const intersects = selector.getIntersects( raycaster );
+
+					if ( intersects.length > 0 ) {
+
+						// Ignore menu clicks
+
+						const intersect = intersects[ 0 ];
+						if ( intersect.object === group.children[ 0 ] ) return;
+
+					}
+
+					signals.intersectionsDetected.dispatch( intersects );
+
+				}
+
+				function onControllerEvent( event ) {
+
+					const controller = event.target;
+
+					if ( controller.userData.active === false ) return;
+
+					controls.getRaycaster().setFromXRController( controller );
+
+					switch ( event.type ) {
+
+						case 'selectstart':
+							controls.pointerDown( null );
+							break;
+
+						case 'selectend':
+							controls.pointerUp( null );
+							break;
+
+						case 'move':
+							controls.pointerHover( null );
+							controls.pointerMove( null );
+							break;
+
+					}
+
+				}
+
+				controllers = new THREE.Group();
 
 				const controller1 = renderer.xr.getController( 0 );
-				controller1.addEventListener( 'selectstart', onSelectStart );
-				controller1.addEventListener( 'selectend', onSelectEnd );
-				controller1.add( new THREE.Line( geometry ) );
-				group.add( controller1 );
+				controller1.addEventListener( 'select', onSelect );
+				controller1.addEventListener( 'selectstart', onControllerEvent );
+				controller1.addEventListener( 'selectend', onControllerEvent );
+				controller1.addEventListener( 'move', onControllerEvent );
+				controller1.userData.active = false;
+				controllers.add( controller1 );
 
 				const controller2 = renderer.xr.getController( 1 );
-				controller2.addEventListener( 'selectstart', onSelectStart );
-				controller2.addEventListener( 'selectend', onSelectEnd );
-				controller2.add( new THREE.Line( geometry ) );
-				group.add( controller2 );
+				controller2.addEventListener( 'select', onSelect );
+				controller2.addEventListener( 'selectstart', onControllerEvent );
+				controller2.addEventListener( 'selectend', onControllerEvent );
+				controller2.addEventListener( 'move', onControllerEvent );
+				controller2.userData.active = true;
+				controllers.add( controller2 );
 
 				//
 
@@ -123,15 +126,29 @@ class XR {
 
 				const controllerGrip1 = renderer.xr.getControllerGrip( 0 );
 				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
-				group.add( controllerGrip1 );
+				controllers.add( controllerGrip1 );
 
 				const controllerGrip2 = renderer.xr.getControllerGrip( 1 );
 				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
-				group.add( controllerGrip2 );
+				controllers.add( controllerGrip2 );
+
+				// menu
+
+				group = new InteractiveGroup();
+
+				const mesh = new HTMLMesh( sidebar );
+				mesh.name = 'picker'; // Make Selector be aware of the menu
+				mesh.position.set( 0.5, 1.0, - 0.5 );
+				mesh.rotation.y = - 0.5;
+				group.add( mesh );
+
+				group.listenToXRControllerEvents( controller1 );
+				group.listenToXRControllerEvents( controller2 );
 
 			}
 
 			editor.sceneHelpers.add( group );
+			editor.sceneHelpers.add( controllers );
 
 			renderer.xr.enabled = true;
 			renderer.xr.addEventListener( 'sessionend', onSessionEnded );
@@ -143,6 +160,7 @@ class XR {
 		const onSessionEnded = async () => {
 
 			editor.sceneHelpers.remove( group );
+			editor.sceneHelpers.remove( controllers );
 
 			const sidebar = document.getElementById( 'sidebar' );
 			sidebar.style.width = '';
@@ -164,21 +182,30 @@ class XR {
 
 		signals.enterXR.add( ( mode ) => {
 
-			navigator.xr.requestSession( mode, sessionInit ).then( onSessionStarted );
+			if ( 'xr' in navigator ) {
+
+				navigator.xr.requestSession( mode, sessionInit )
+					.then( onSessionStarted );
+
+			}
 
 		} );
 
 		signals.offerXR.add( function ( mode ) {
 
-			navigator.xr.offerSession( mode, sessionInit )
-				.then( onSessionStarted );
-
-			signals.leaveXR.add( function () {
+			if ( 'xr' in navigator ) {
 
 				navigator.xr.offerSession( mode, sessionInit )
 					.then( onSessionStarted );
-	
-			} );
+
+				signals.leaveXR.add( function () {
+
+					navigator.xr.offerSession( mode, sessionInit )
+						.then( onSessionStarted );
+
+				} );
+
+			}
 
 		} );
 

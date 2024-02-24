@@ -128,7 +128,6 @@ function main() {
 			this.raycaster = new THREE.Raycaster();
 			this.objectToColorMap = new Map();
 			this.controllerToObjectMap = new Map();
-			this.tempMatrix = new THREE.Matrix4();
 
 			const pointerGeometry = new THREE.BufferGeometry().setFromPoints( [
 				new THREE.Vector3( 0, 0, 0 ),
@@ -178,9 +177,7 @@ function main() {
 			for ( const { controller, line } of this.controllers ) {
 
 				// cast a ray through the from the controller
-				this.tempMatrix.identity().extractRotation( controller.matrixWorld );
-				this.raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
-				this.raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( this.tempMatrix );
+				this.raycaster.setFromXRController( controller );
 				// get the list of objects the ray intersected
 				const intersections = this.raycaster.intersectObjects( pickablesParent.children );
 				if ( intersections.length ) {

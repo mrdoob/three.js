@@ -6708,7 +6708,7 @@ const _x = /*@__PURE__*/ new Vector3();
 const _y = /*@__PURE__*/ new Vector3();
 const _z = /*@__PURE__*/ new Vector3();
 
-const _matrix$1 = /*@__PURE__*/ new Matrix4();
+const _matrix$2 = /*@__PURE__*/ new Matrix4();
 const _quaternion$3 = /*@__PURE__*/ new Quaternion();
 
 class Euler {
@@ -6943,9 +6943,9 @@ class Euler {
 
 	setFromQuaternion( q, order, update ) {
 
-		_matrix$1.makeRotationFromQuaternion( q );
+		_matrix$2.makeRotationFromQuaternion( q );
 
-		return this.setFromRotationMatrix( _matrix$1, order, update );
+		return this.setFromRotationMatrix( _matrix$2, order, update );
 
 	}
 
@@ -14871,8 +14871,9 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 			if ( background.isCubeTexture && background.isRenderTargetTexture === false ) {
 
-				// environment maps which are no cube render targets or PMREMs follow a different px/nx convention
-				_e1$1.x *= - 1;
+				// environment maps which are not cube render targets or PMREMs follow a different convention
+				_e1$1.y *= - 1;
+				_e1$1.z *= - 1;
 
 			}
 
@@ -27938,8 +27939,9 @@ function WebGLMaterials( renderer, properties ) {
 
 			if ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) {
 
-				// environment maps which are no cube render targets or PMREMs follow a different px/nx convention
-				_e1.x *= - 1;
+				// environment maps which are not cube render targets or PMREMs follow a different convention
+				_e1.y *= - 1;
+				_e1.z *= - 1;
 
 			}
 
@@ -33189,7 +33191,7 @@ class MultiDrawRenderList {
 }
 
 const ID_ATTR_NAME = 'batchId';
-const _matrix = /*@__PURE__*/ new Matrix4();
+const _matrix$1 = /*@__PURE__*/ new Matrix4();
 const _invMatrixWorld = /*@__PURE__*/ new Matrix4();
 const _identityMatrix = /*@__PURE__*/ new Matrix4();
 const _projScreenMatrix$2 = /*@__PURE__*/ new Matrix4();
@@ -33412,8 +33414,8 @@ class BatchedMesh extends Mesh {
 
 			if ( active[ i ] === false ) continue;
 
-			this.getMatrixAt( i, _matrix );
-			this.getBoundingBoxAt( i, _box$1 ).applyMatrix4( _matrix );
+			this.getMatrixAt( i, _matrix$1 );
+			this.getBoundingBoxAt( i, _box$1 ).applyMatrix4( _matrix$1 );
 			boundingBox.union( _box$1 );
 
 		}
@@ -33437,8 +33439,8 @@ class BatchedMesh extends Mesh {
 
 			if ( active[ i ] === false ) continue;
 
-			this.getMatrixAt( i, _matrix );
-			this.getBoundingSphereAt( i, _sphere$2 ).applyMatrix4( _matrix );
+			this.getMatrixAt( i, _matrix$1 );
+			this.getBoundingSphereAt( i, _sphere$2 ).applyMatrix4( _matrix$1 );
 			boundingSphere.union( _sphere$2 );
 
 		}
@@ -34045,8 +34047,8 @@ class BatchedMesh extends Mesh {
 				if ( visibility[ i ] && active[ i ] ) {
 
 					// get the bounds in world space
-					this.getMatrixAt( i, _matrix );
-					this.getBoundingSphereAt( i, _sphere$2 ).applyMatrix4( _matrix );
+					this.getMatrixAt( i, _matrix$1 );
+					this.getBoundingSphereAt( i, _sphere$2 ).applyMatrix4( _matrix$1 );
 
 					// determine whether the batched geometry is within the frustum
 					let culled = false;
@@ -34103,8 +34105,8 @@ class BatchedMesh extends Mesh {
 					if ( perObjectFrustumCulled ) {
 
 						// get the bounds in world space
-						this.getMatrixAt( i, _matrix );
-						this.getBoundingSphereAt( i, _sphere$2 ).applyMatrix4( _matrix );
+						this.getMatrixAt( i, _matrix$1 );
+						this.getBoundingSphereAt( i, _sphere$2 ).applyMatrix4( _matrix$1 );
 						culled = ! _frustum.intersectsSphere( _sphere$2 );
 
 					}
@@ -51251,6 +51253,8 @@ class GLBufferAttribute {
 
 }
 
+const _matrix = /*@__PURE__*/ new Matrix4();
+
 class Raycaster {
 
 	constructor( origin, direction, near = 0, far = Infinity ) {
@@ -51300,6 +51304,17 @@ class Raycaster {
 			console.error( 'THREE.Raycaster: Unsupported camera type: ' + camera.type );
 
 		}
+
+	}
+
+	setFromXRController( controller ) {
+
+		_matrix.identity().extractRotation( controller.matrixWorld );
+
+		this.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+		this.ray.direction.set( 0, 0, - 1 ).applyMatrix4( _matrix );
+
+		return this;
 
 	}
 

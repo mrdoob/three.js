@@ -533,7 +533,7 @@ class UINumber extends UIElement {
 		this.min = - Infinity;
 		this.max = Infinity;
 
-		this.precision = 3;
+		this.precision = 2;
 		this.step = 1;
 		this.unit = '';
 		this.nudge = 0.01;
@@ -552,6 +552,8 @@ class UINumber extends UIElement {
 		const prevPointer = { x: 0, y: 0 };
 
 		function onMouseDown( event ) {
+
+			if ( document.activeElement === scope.dom ) return;
 
 			event.preventDefault();
 
@@ -820,6 +822,8 @@ class UIInteger extends UIElement {
 		const prevPointer = { x: 0, y: 0 };
 
 		function onMouseDown( event ) {
+
+			if ( document.activeElement === scope.dom ) return;
 
 			event.preventDefault();
 

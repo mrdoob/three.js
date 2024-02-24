@@ -16,7 +16,7 @@ function GeometryParametersPanel( editor, object ) {
 	// width
 
 	const widthRow = new UIRow();
-	const width = new UINumber( parameters.width ).onChange( update );
+	const width = new UINumber().setPrecision( 3 ).setValue( parameters.width ).onChange( update );
 
 	widthRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/width' ) ).setClass( 'Label' ) );
 	widthRow.add( width );
@@ -26,7 +26,7 @@ function GeometryParametersPanel( editor, object ) {
 	// height
 
 	const heightRow = new UIRow();
-	const height = new UINumber( parameters.height ).onChange( update );
+	const height = new UINumber().setPrecision( 3 ).setValue( parameters.height ).onChange( update );
 
 	heightRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/height' ) ).setClass( 'Label' ) );
 	heightRow.add( height );
@@ -36,7 +36,7 @@ function GeometryParametersPanel( editor, object ) {
 	// depth
 
 	const depthRow = new UIRow();
-	const depth = new UINumber( parameters.depth ).onChange( update );
+	const depth = new UINumber().setPrecision( 3 ).setValue( parameters.depth ).onChange( update );
 
 	depthRow.add( new UIText( strings.getKey( 'sidebar/geometry/box_geometry/depth' ) ).setClass( 'Label' ) );
 	depthRow.add( depth );
