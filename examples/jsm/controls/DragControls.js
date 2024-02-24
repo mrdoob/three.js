@@ -73,8 +73,8 @@ class DragControls extends EventDispatcher {
 
 		}
 
-		function updateObject(_newObject){ //array of object
-			_objects = _newObject
+		function setObjects(object){ //array of object
+			_objects = object
 		}
 
 		function getRaycaster() {
