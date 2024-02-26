@@ -1,8 +1,7 @@
 import DataMap from './DataMap.js';
 import Color4 from './Color4.js';
 import { Mesh, SphereGeometry, BackSide } from 'three';
-import { vec4, context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection } from '../../nodes/Nodes.js';
-import { maxMipLevel } from '../../nodes/utils/MaxMipLevelNode.js';
+import { vec4, context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection, maxMipLevel } from '../../nodes/Nodes.js';
 
 const _clearColor = new Color4();
 
