@@ -9,7 +9,8 @@ import { RedFormat, RGFormat, IntType, DataTexture, RGBAFormat, FloatType } from
 
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan',
-	textureDimensions: 'textureSize'
+	textureDimensions: 'textureSize',
+	equals: 'equal'
 };
 
 const precisionLib = {
