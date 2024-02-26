@@ -77,6 +77,7 @@ const wgslMethods = {
 	mod_vec2: 'threejs_mod_vec2',
 	mod_vec3: 'threejs_mod_vec3',
 	mod_vec4: 'threejs_mod_vec4',
+	equals_bool: 'threejs_equals_bool',
 	equals_bvec2: 'threejs_equals_bvec2',
 	equals_bvec3: 'threejs_equals_bvec3',
 	equals_bvec4: 'threejs_equals_bvec4',
