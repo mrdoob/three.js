@@ -2,6 +2,7 @@ import DataMap from './DataMap.js';
 import Color4 from './Color4.js';
 import { Mesh, SphereGeometry, BackSide } from 'three';
 import { vec4, context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection } from '../../nodes/Nodes.js';
+import { maxMipLevel } from '../../nodes/utils/MaxMipLevelNode.js';
 
 const _clearColor = new Color4();
 
@@ -53,7 +54,7 @@ class Background extends DataMap {
 				const backgroundMeshNode = context( vec4( backgroundNode ), {
 					// @TODO: Add Texture2D support using node context
 					getUV: () => normalWorld,
-					getTextureLevel: () => backgroundBlurriness
+					getTextureLevel: ( textureNode ) => backgroundBlurriness.mul( maxMipLevel( textureNode ) )
 				} ).mul( backgroundIntensity );
 
 				let viewProj = modelViewProjection();
