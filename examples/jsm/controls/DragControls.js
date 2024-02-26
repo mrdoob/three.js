@@ -30,7 +30,7 @@ class DragControls extends EventDispatcher {
 		_domElement.style.touchAction = 'none'; // disable touch scroll
 
 		let _selected = null, _hovered = null;
-
+ 
 		const _intersections = [];
 
 		this.mode = 'translate';
@@ -71,6 +71,10 @@ class DragControls extends EventDispatcher {
 
 			return _objects;
 
+		}
+
+		function setObjects(object){ //array of object
+			_objects = object
 		}
 
 		function getRaycaster() {
@@ -178,7 +182,17 @@ class DragControls extends EventDispatcher {
 
 			if ( _intersections.length > 0 ) {
 
-				_selected = ( scope.transformGroup === true ) ? _objects[ 0 ] : _intersections[ 0 ].object;
+				if ( scope.transformGroup === true ) {
+
+					// look for the outermost group in the object's upper hierarchy
+          
+					_selected = findGroup( _intersections[ 0 ].object );
+
+				} else {
+
+					_selected = _intersections[ 0 ].object;
+
+				}
 
 				_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
 
@@ -234,6 +248,16 @@ class DragControls extends EventDispatcher {
 
 		}
 
+		function findGroup( obj, group = null ) {
+			
+			if ( obj.isGroup ) group = obj;
+
+			if ( obj.parent === null ) return group;
+
+			return findGroup( obj.parent, group );
+
+		}
+  
 		activate();
 
 		// API
@@ -247,9 +271,11 @@ class DragControls extends EventDispatcher {
 		this.dispose = dispose;
 		this.getObjects = getObjects;
 		this.getRaycaster = getRaycaster;
+		this.setObjects = setObjects;
 
 	}
 
 }
+
 
 export { DragControls };
