@@ -109,6 +109,11 @@
 			*true* 값으로 설정 되어있다면, [name]은 개별 객체가 아닌 전체 그룹은 드래그 합니다. 기본 값은 *false* 입니다.
 		</p>
 
+		<h3>[property:String mode]</h3>
+		<p>
+			The current transformation mode. Possible values are `translate`, and `rotate`. Default is `translate`.
+		</p>
+
 		<h2>메소드</h2>
 
 		<p>일반적인 메소드는 [page:EventDispatcher] 클래스를 참조하세요.</p>
@@ -136,6 +141,11 @@
 		<h3>[method:Raycaster getRaycaster] ()</h3>
 		<p>
 			Returns the internal [page:Raycaster] instance that is used for intersection tests.
+		</p>
+
+		<h3>[method:undefined setObjects] ( [param:Array objects] )</h3>
+		<p>
+			Sets an array of draggable objects by overwriting the existing one.
 		</p>
 
 		<h2>Source</h2>

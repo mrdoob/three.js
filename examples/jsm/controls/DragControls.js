@@ -30,7 +30,7 @@ class DragControls extends EventDispatcher {
 		_domElement.style.touchAction = 'none'; // disable touch scroll
 
 		let _selected = null, _hovered = null;
- 
+
 		const _intersections = [];
 
 		this.mode = 'translate';
@@ -73,8 +73,10 @@ class DragControls extends EventDispatcher {
 
 		}
 
-		function setObjects(object){ //array of object
-			_objects = object
+		function setObjects( objects ) {
+
+			_objects = objects;
+
 		}
 
 		function getRaycaster() {
@@ -185,7 +187,7 @@ class DragControls extends EventDispatcher {
 				if ( scope.transformGroup === true ) {
 
 					// look for the outermost group in the object's upper hierarchy
-          
+
 					_selected = findGroup( _intersections[ 0 ].object );
 
 				} else {
@@ -249,7 +251,7 @@ class DragControls extends EventDispatcher {
 		}
 
 		function findGroup( obj, group = null ) {
-			
+
 			if ( obj.isGroup ) group = obj;
 
 			if ( obj.parent === null ) return group;
@@ -257,7 +259,7 @@ class DragControls extends EventDispatcher {
 			return findGroup( obj.parent, group );
 
 		}
-  
+
 		activate();
 
 		// API
@@ -276,6 +278,5 @@ class DragControls extends EventDispatcher {
 	}
 
 }
-
 
 export { DragControls };
