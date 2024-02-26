@@ -10393,16 +10393,6 @@ class Float32BufferAttribute extends BufferAttribute {
 
 }
 
-class Float64BufferAttribute extends BufferAttribute {
-
-	constructor( array, itemSize, normalized ) {
-
-		super( new Float64Array( array ), itemSize, normalized );
-
-	}
-
-}
-
 let _id$2 = 0;
 
 const _m1$2 = /*@__PURE__*/ new Matrix4();
@@ -23998,6 +23988,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	const multisampledRTTExt = extensions.has( 'WEBGL_multisampled_render_to_texture' ) ? extensions.get( 'WEBGL_multisampled_render_to_texture' ) : null;
 	const supportsInvalidateFramebuffer = typeof navigator === 'undefined' ? false : /OculusBrowser/g.test( navigator.userAgent );
 
+	const _imageDimensions = new Vector2();
 	const _videoTextures = new WeakMap();
 	let _canvas;
 
@@ -24035,11 +24026,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		let scale = 1;
 
+		const dimensions = getDimensions( image );
+
 		// handle case if texture exceeds max size
 
-		if ( image.width > maxSize || image.height > maxSize ) {
+		if ( dimensions.width > maxSize || dimensions.height > maxSize ) {
 
-			scale = maxSize / Math.max( image.width, image.height );
+			scale = maxSize / Math.max( dimensions.width, dimensions.height );
 
 		}
 
@@ -24051,12 +24044,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 				( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
-				( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
+				( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ||
+				( typeof VideoFrame !== 'undefined' && image instanceof VideoFrame ) ) {
 
 				const floor = needsPowerOfTwo ? floorPowerOfTwo : Math.floor;
 
-				const width = floor( scale * image.width );
-				const height = floor( scale * image.height );
+				const width = floor( scale * dimensions.width );
+				const height = floor( scale * dimensions.height );
 
 				if ( _canvas === undefined ) _canvas = createCanvas( width, height );
 
@@ -24070,7 +24064,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				const context = canvas.getContext( '2d' );
 				context.drawImage( image, 0, 0, width, height );
 
-				console.warn( 'THREE.WebGLRenderer: Texture has been resized from (' + image.width + 'x' + image.height + ') to (' + width + 'x' + height + ').' );
+				console.warn( 'THREE.WebGLRenderer: Texture has been resized from (' + dimensions.width + 'x' + dimensions.height + ') to (' + width + 'x' + height + ').' );
 
 				return canvas;
 
@@ -24078,7 +24072,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( 'data' in image ) {
 
-					console.warn( 'THREE.WebGLRenderer: Image in DataTexture is too big (' + image.width + 'x' + image.height + ').' );
+					console.warn( 'THREE.WebGLRenderer: Image in DataTexture is too big (' + dimensions.width + 'x' + dimensions.height + ').' );
 
 				}
 
@@ -24094,7 +24088,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function isPowerOfTwo$1( image ) {
 
-		return isPowerOfTwo( image.width ) && isPowerOfTwo( image.height );
+		const dimensions = getDimensions( image );
+
+		return isPowerOfTwo( dimensions.width ) && isPowerOfTwo( dimensions.height );
 
 	}
 
@@ -25102,7 +25098,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					if ( useTexStorage && allocateMemory ) {
 
-						state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, mipmaps[ 0 ].width, mipmaps[ 0 ].height );
+						const dimensions = getDimensions( mipmaps[ 0 ] );
+
+						state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, dimensions.width, dimensions.height );
 
 					}
 
@@ -25134,7 +25132,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						if ( allocateMemory ) {
 
-							state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, image.width, image.height );
+							const dimensions = getDimensions( image );
+
+							state.texStorage2D( _gl.TEXTURE_2D, levels, glInternalFormat, dimensions.width, dimensions.height );
 
 						}
 
@@ -25304,7 +25304,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					if ( mipmaps.length > 0 ) levels ++;
 
-					state.texStorage2D( _gl.TEXTURE_CUBE_MAP, levels, glInternalFormat, cubeImage[ 0 ].width, cubeImage[ 0 ].height );
+					const dimensions = getDimensions( cubeImage[ 0 ] );
+
+					state.texStorage2D( _gl.TEXTURE_CUBE_MAP, levels, glInternalFormat, dimensions.width, dimensions.height );
 
 				}
 
@@ -26138,6 +26140,31 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		}
 
 		return image;
+
+	}
+
+	function getDimensions( image ) {
+
+		if ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) {
+
+			// if intrinsic data are not available, fallback to width/height
+
+			_imageDimensions.width = image.naturalWidth || image.width;
+			_imageDimensions.height = image.naturalHeight || image.height;
+
+		} else if ( typeof VideoFrame !== 'undefined' && image instanceof VideoFrame ) {
+
+			_imageDimensions.width = image.displayWidth;
+			_imageDimensions.height = image.displayHeight;
+
+		} else {
+
+			_imageDimensions.width = image.width;
+			_imageDimensions.height = image.height;
+
+		}
+
+		return _imageDimensions;
 
 	}
 
@@ -53506,7 +53533,6 @@ exports.ExtrudeGeometry = ExtrudeGeometry;
 exports.FileLoader = FileLoader;
 exports.Float16BufferAttribute = Float16BufferAttribute;
 exports.Float32BufferAttribute = Float32BufferAttribute;
-exports.Float64BufferAttribute = Float64BufferAttribute;
 exports.FloatType = FloatType;
 exports.Fog = Fog;
 exports.FogExp2 = FogExp2;
