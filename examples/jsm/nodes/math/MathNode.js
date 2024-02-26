@@ -57,6 +57,14 @@ class MathNode extends TempNode {
 
 			return 'vec3';
 
+		} else if ( method === MathNode.ALL ) {
+
+			return 'bool';
+
+		} else if ( method === MathNode.EQUALS ) {
+
+			return builder.changeComponentType( this.aNode.getNodeType( builder ), 'bool' );
+
 		} else if ( method === MathNode.MOD ) {
 
 			return this.aNode.getNodeType( builder );
@@ -195,6 +203,10 @@ class MathNode extends TempNode {
 
 // 1 input
 
+MathNode.ALL = 'all';
+MathNode.ANY = 'any';
+MathNode.EQUALS = 'equals';
+
 MathNode.RADIANS = 'radians';
 MathNode.DEGREES = 'degrees';
 MathNode.EXP = 'exp';
@@ -256,6 +268,10 @@ export const INFINITY = float( 1e6 );
 export const PI = float( Math.PI );
 export const PI2 = float( Math.PI * 2 );
 
+export const all = nodeProxy( MathNode, MathNode.ALL );
+export const any = nodeProxy( MathNode, MathNode.ANY );
+export const equals = nodeProxy( MathNode, MathNode.EQUALS );
+
 export const radians = nodeProxy( MathNode, MathNode.RADIANS );
 export const degrees = nodeProxy( MathNode, MathNode.DEGREES );
 export const exp = nodeProxy( MathNode, MathNode.EXP );
@@ -314,6 +330,10 @@ export const faceForward = nodeProxy( MathNode, MathNode.FACEFORWARD );
 
 export const mixElement = ( t, e1, e2 ) => mix( e1, e2, t );
 export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
+
+addNodeElement( 'all', all );
+addNodeElement( 'any', any );
+addNodeElement( 'equals', equals );
 
 addNodeElement( 'radians', radians );
 addNodeElement( 'degrees', degrees );
