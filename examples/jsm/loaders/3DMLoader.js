@@ -1521,7 +1521,7 @@ function Rhino3dmWorker() {
 
 				// TODO: precalculate resulting vertices and faces and warn on excessive results
 				_geometry.subdivide( 3 );
-				mesh = rhino.Mesh.createFromSubDControlNet( _geometry );
+				mesh = rhino.Mesh.createFromSubDControlNet( _geometry, false );
 				if ( mesh ) {
 
 					geometry = mesh.toThreejsJSON();
