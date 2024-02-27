@@ -10,6 +10,8 @@ import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 import { SetColorCommand } from './commands/SetColorCommand.js';
 
+import { SidebarObjectAnimation } from './Sidebar.Object.Animation.js';
+
 function SidebarObject( editor ) {
 
 	const strings = editor.strings;
@@ -415,6 +417,10 @@ function SidebarObject( editor ) {
 
 	} );
 	container.add( exportJson );
+
+	// Animations
+
+	container.add( new SidebarObjectAnimation( editor ) );
 
 	//
 
