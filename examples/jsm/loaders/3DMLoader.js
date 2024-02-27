@@ -526,7 +526,6 @@ class Rhino3dmLoader extends Loader {
 
 					}
 
-					//material = this._compareMaterials( material );
 					const _object = this._createObject( obj, material );
 
 					if ( _object === undefined ) {
