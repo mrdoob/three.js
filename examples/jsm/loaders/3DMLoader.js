@@ -673,7 +673,7 @@ class Rhino3dmLoader extends Loader {
 
 
 				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
-					console.log(this.materials)
+
 					mat.vertexColors = true;
 
 				}
