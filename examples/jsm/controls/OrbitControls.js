@@ -315,7 +315,7 @@ class OrbitControls extends EventDispatcher {
 						scope.object.position.addScaledVector( dollyDirection, radiusDelta );
 						scope.object.updateMatrixWorld();
 
-						zoomChanged = !!radiusDelta;
+						zoomChanged = !! radiusDelta;
 
 					} else if ( scope.object.isOrthographicCamera ) {
 
@@ -327,7 +327,7 @@ class OrbitControls extends EventDispatcher {
 						scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom / scale ) );
 						scope.object.updateProjectionMatrix();
 
-						zoomChanged = prevZoom != scope.object.zoom;
+						zoomChanged = prevZoom !== scope.object.zoom;
 
 						const mouseAfter = new Vector3( mouse.x, mouse.y, 0 );
 						mouseAfter.unproject( scope.object );
@@ -383,7 +383,7 @@ class OrbitControls extends EventDispatcher {
 					const prevZoom = scope.object.zoom;
 					scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom / scale ) );
 
-					if ( prevZoom != scope.object.zoom ) {
+					if ( prevZoom !== scope.object.zoom ) {
 
 						scope.object.updateProjectionMatrix();
 						zoomChanged = true;
