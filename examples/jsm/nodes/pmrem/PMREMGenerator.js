@@ -1,8 +1,11 @@
 import NodeMaterial from '../materials/NodeMaterial.js';
 import { getDirection, blur } from './PMREMUtils.js';
 import { equirectUV } from '../utils/EquirectUVNode.js';
-import { uniform, uniforms, texture } from '../Nodes.js';
-import { float } from '../shadernode/ShaderNode.js';
+import { uniform } from '../core/UniformNode.js';
+import { uniforms } from '../accessors/UniformsNode.js';
+import { texture } from '../accessors/TextureNode.js';
+import { cubeTexture } from '../accessors/CubeTextureNode.js';
+import { float, vec3 } from '../shadernode/ShaderNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { attribute } from '../core/AttributeNode.js';
 import {
@@ -602,6 +605,7 @@ function _getBlurShader( lodMax, width, height ) {
 function _getCubemapMaterial() {
 
 	const material = _getMaterial();
+	material.fragmentNode = cubeTexture( texture, vec3( outputDirection.x, outputDirection.y.negate(), outputDirection.z ) );
 
 	return material;
 
