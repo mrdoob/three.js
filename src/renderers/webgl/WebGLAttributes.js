@@ -8,6 +8,7 @@ function WebGLAttributes( gl, capabilities ) {
 
 		const array = attribute.array;
 		const usage = attribute.usage;
+		const size = array.byteLength;
 
 		const buffer = gl.createBuffer();
 
@@ -76,7 +77,8 @@ function WebGLAttributes( gl, capabilities ) {
 			buffer: buffer,
 			type: type,
 			bytesPerElement: array.BYTES_PER_ELEMENT,
-			version: attribute.version
+			version: attribute.version,
+			size: size
 		};
 
 	}
@@ -84,17 +86,43 @@ function WebGLAttributes( gl, capabilities ) {
 	function updateBuffer( buffer, attribute, bufferType ) {
 
 		const array = attribute.array;
-		const updateRange = attribute.updateRange;
+		const updateRange = attribute._updateRange; // @deprecated, r159
+		const updateRanges = attribute.updateRanges;
 
 		gl.bindBuffer( bufferType, buffer );
 
-		if ( updateRange.count === - 1 ) {
+		if ( updateRange.count === - 1 && updateRanges.length === 0 ) {
 
 			// Not using update ranges
-
 			gl.bufferSubData( bufferType, 0, array );
 
-		} else {
+		}
+
+		if ( updateRanges.length !== 0 ) {
+
+			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
+
+				const range = updateRanges[ i ];
+				if ( isWebGL2 ) {
+
+					gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
+						array, range.start, range.count );
+
+				} else {
+
+					gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
+						array.subarray( range.start, range.start + range.count ) );
+
+				}
+
+			}
+
+			attribute.clearUpdateRanges();
+
+		}
+
+		// @deprecated, r159
+		if ( updateRange.count !== - 1 ) {
 
 			if ( isWebGL2 ) {
 
@@ -172,6 +200,12 @@ function WebGLAttributes( gl, capabilities ) {
 			buffers.set( attribute, createBuffer( attribute, bufferType ) );
 
 		} else if ( data.version < attribute.version ) {
+
+			if ( data.size !== attribute.array.byteLength ) {
+
+				throw new Error( 'THREE.WebGLAttributes: The size of the buffer attribute\'s array buffer does not match the original size. Resizing buffer attributes is not supported.' );
+
+			}
 
 			updateBuffer( data.buffer, attribute, bufferType );
 

@@ -1,5 +1,6 @@
 export const vertex = /* glsl */`
 #include <common>
+#include <batching_pars_vertex>
 #include <uv_pars_vertex>
 #include <envmap_pars_vertex>
 #include <color_pars_vertex>
@@ -13,7 +14,9 @@ void main() {
 
 	#include <uv_vertex>
 	#include <color_vertex>
+	#include <morphinstance_vertex>
 	#include <morphcolor_vertex>
+	#include <batching_vertex>
 
 	#if defined ( USE_ENVMAP ) || defined ( USE_SKINNING )
 
@@ -68,9 +71,8 @@ uniform float opacity;
 
 void main() {
 
-	#include <clipping_planes_fragment>
-
 	vec4 diffuseColor = vec4( diffuse, opacity );
+	#include <clipping_planes_fragment>
 
 	#include <logdepthbuf_fragment>
 	#include <map_fragment>

@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -101,7 +97,7 @@ the end of <a href="scenegraph.html">the article on scenegraphs</a>.</p>
 <li><p><a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> objects represent
 <a href="materials.html">the surface properties used to draw geometry</a>
 including things like the color to use and how shiny it is. A <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> can also
-reference one or more <a href="/docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> objects which can be used, for example, 
+reference one or more <a href="/docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> objects which can be used, for example,
 to wrap an image onto the surface of a geometry.</p>
 </li>
 <li><p><a href="/docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a> objects generally represent images either <a href="textures.html">loaded from image files</a>,
@@ -205,7 +201,7 @@ const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 be specified using standard CSS style 6 digit hex color values.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
 </pre>
-<p>We then create a <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. A <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> in three represents the combination
+<p>We then create a <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. A <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> in three.js represents the combination
 of three things</p>
 <ol>
 <li>A <code class="notranslate" translate="no">Geometry</code> (the shape of the object)</li>
@@ -271,13 +267,11 @@ our loop.</p>
 <p>It's a little better but it's still hard to see the 3d. What would help is to
 add some lighting so let's add a light. There are many kinds of lights in
 three.js which we'll go over in <a href="lights.html">a future article</a>. For now let's create a directional light.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
-  const color = 0xFFFFFF;
-  const intensity = 3;
-  const light = new THREE.DirectionalLight(color, intensity);
-  light.position.set(-1, 2, 4);
-  scene.add(light);
-}
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const color = 0xFFFFFF;
+const intensity = 3;
+const light = new THREE.DirectionalLight(color, intensity);
+light.position.set(-1, 2, 4);
+scene.add(light);
 </pre>
 <p>Directional lights have a position and a target. Both default to 0, 0, 0. In our
 case we're setting the light's position to -1, 2, 4 so it's slightly on the left,
@@ -388,10 +382,6 @@ Notice <code class="notranslate" translate="no">'three'</code> specifier there. 
 Note that path specifier can start only with <code class="notranslate" translate="no">./</code> or <code class="notranslate" translate="no">../</code>.
 </p>
 <p>
-Import maps are still unsupported in Firefox and Safari, so it is recommended to use <a href="https://github.com/guybedford/es-module-shims">an import maps polyfill</a> like so
-</p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"&gt;&lt;/script&gt;</pre>
-<p>
 To import addons like <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js"><code class="notranslate" translate="no">OrbitControls.js</code></a> use the following
 </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
@@ -423,8 +413,7 @@ You can also use a CDN
 <p>
 To conclude, the recommended way of using three.js is
 </p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"&gt;&lt;/script&gt;
-
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">
 &lt;script type="importmap"&gt;
 {
   "imports": {
@@ -451,7 +440,7 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

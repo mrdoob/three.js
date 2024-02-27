@@ -67,6 +67,8 @@ class Water extends Mesh {
 
 		const mirrorShader = {
 
+			name: 'MirrorShader',
+
 			uniforms: UniformsUtils.merge( [
 				UniformsLib[ 'fog' ],
 				UniformsLib[ 'lights' ],
@@ -188,9 +190,10 @@ class Water extends Mesh {
 		};
 
 		const material = new ShaderMaterial( {
-			fragmentShader: mirrorShader.fragmentShader,
-			vertexShader: mirrorShader.vertexShader,
+			name: mirrorShader.name,
 			uniforms: UniformsUtils.clone( mirrorShader.uniforms ),
+			vertexShader: mirrorShader.vertexShader,
+			fragmentShader: mirrorShader.fragmentShader,
 			lights: true,
 			side: side,
 			fog: fog

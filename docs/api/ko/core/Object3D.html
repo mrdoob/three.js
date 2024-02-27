@@ -122,10 +122,32 @@
 		[page:Object3D], [page:Group] 혹은 [page:Bone] 인스턴스는 렌더링할 수 없으므로 이러한 객체에 대해서는 콜백이 실행되지 않습니다.
 		</p>
 
+		<h3>[property:Function onAfterShadow]</h3>
+		<p>
+			An optional callback that is executed immediately after a 3D object is
+			rendered to a shadow map. This function is called with the following parameters: renderer,
+			scene, camera, shadowCamera, geometry, depthMaterial, group.
+		</p>
+		<p>
+			이 콜백은 *렌더링 가능한* 3D 객체에만 실행됩니다. [page:Mesh], [page:Line], [page:Points] 혹은 [page:Sprite]같은 기하학 및 재질로 시각적 표현을 정의하는 3D 객체들에 한정됩니다.
+			[page:Object3D], [page:Group] 혹은 [page:Bone] 인스턴스는 렌더링할 수 없으므로 이러한 객체에 대해서는 콜백이 실행되지 않습니다.
+		</p>
+
 		<h3>[property:Function onBeforeRender]</h3>
 		<p>
 			3D 객체가 렌더링되기 바로 전에 실행되는 선택적 콜백입니다.
 			이 함수는 렌더러, 장면, 카메라, 기하학, 재질, 그룹 등의 매개 변수를 사용하여 호출됩니다.
+		</p>
+		<p>
+			이 콜백은 *렌더링 가능한* 3D 객체에만 실행됩니다. [page:Mesh], [page:Line], [page:Points] 혹은 [page:Sprite]같은 기하학 및 재질로 시각적 표현을 정의하는 3D 객체들에 한정됩니다.
+			[page:Object3D], [page:Group] 혹은 [page:Bone] 인스턴스는 렌더링할 수 없으므로 이러한 객체에 대해서는 콜백이 실행되지 않습니다.
+		</p>
+
+		<h3>[property:Function onBeforeShadow]</h3>
+		<p>
+			An optional callback that is executed immediately before a 3D object is
+			rendered to a shadow map. This function is called with the following parameters: renderer,
+			scene, camera, shadowCamera, geometry, depthMaterial, group.
 		</p>
 		<p>
 			이 콜백은 *렌더링 가능한* 3D 객체에만 실행됩니다. [page:Mesh], [page:Line], [page:Points] 혹은 [page:Sprite]같은 기하학 및 재질로 시각적 표현을 정의하는 3D 객체들에 한정됩니다.
@@ -271,10 +293,13 @@
 		객체 자신부터 시작하여 객체와 객체 자식 항목을 검색하고 일치하는 값의 첫 번째 항목을 리턴합니다.
 		</p>
 
-		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value] )</h3>
+		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value], [param:Array optionalTarget] )</h3>
 		<p>
 		name -- 검색하고자하는 이름 프로퍼티. <br />
-		value -- 프로퍼티의 값. <br /><br />
+		value -- 프로퍼티의 값. <br />
+		optionalTarget -- (optional) target to set the result.
+		Otherwise a new Array is instantiated. If set, you must clear this
+		array prior to each call (i.e., array.length = 0;). <br /><br />
 
 		개체 자체부터 시작하여 개체와 해당 자식을 검색하고 일치하는 값의 모든 개체를 반환합니다.
 		</p>

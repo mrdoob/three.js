@@ -44,4 +44,4 @@ export default UVNode;
 
 export const uv = ( ...params ) => nodeObject( new UVNode( ...params ) );
 
-addNodeClass( UVNode );
+addNodeClass( 'UVNode', UVNode );

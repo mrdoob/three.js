@@ -11,11 +11,9 @@ function SidebarScript( editor ) {
 	const signals = editor.signals;
 
 	const container = new UIPanel();
+	container.setBorderTop( '0' );
+	container.setPaddingTop( '20px' );
 	container.setDisplay( 'none' );
-
-	container.add( new UIText( strings.getKey( 'sidebar/script' ) ).setTextTransform( 'uppercase' ) );
-	container.add( new UIBreak() );
-	container.add( new UIBreak() );
 
 	//
 

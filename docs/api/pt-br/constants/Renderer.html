@@ -46,6 +46,8 @@
 		THREE.ReinhardToneMapping
 		THREE.CineonToneMapping
 		THREE.ACESFilmicToneMapping
+		THREE.AgXToneMapping
+		THREE.NeutralToneMapping
 		THREE.CustomToneMapping
 		</code>
 		<p>
@@ -54,9 +56,12 @@
 		médio da faixa dinâmica baixa de um monitor de computador padrão ou tela de dispositivo móvel.
 		</p>
 		<p>
-		THREE.LinearToneMapping, THREE.ReinhardToneMapping, THREE.CineonToneMapping e THREE.ACESFilmicToneMapping são implementações internas de mapeamento de tom.
+		THREE.LinearToneMapping, THREE.ReinhardToneMapping, THREE.CineonToneMapping, THREE.ACESFilmicToneMapping, THREE.AgXToneMapping e THREE.NeutralToneMapping são implementações internas de mapeamento de tom.
 		THREE.CustomToneMapping espera uma implementação personalizada modificando o código GLSL do sombreador de fragmento do material.  
 		Vejo o exemplo [example:webgl_tonemapping WebGL / tonemapping].
+		</p>
+		<p>
+			THREE.NeutralToneMapping is an implementation based on the Khronos 3D Commerce Group standard tone mapping.
 		</p>
 
 		<h2>Source</h2>

@@ -350,11 +350,22 @@
 		</p>
 		 
 		<h3>
-		[method:undefined compile]( [param:Object3D scene], [param:Camera camera] )
+		[method:Set compile]( [param:Object3D scene], [param:Camera camera], [param:Scene targetScene] )
 		</h3>
 		<p>
-		يجمع جميع المواد في المشهد مع الكاميرا. هذا مفيد لـ
-		تجميع الشادرات قبل العرض الأول.
+		يجمع جميع المواد الموجودة في المشهد بالكاميرا. يعد هذا مفيدًا لتجميع التظليل مسبقًا قبل العرض الأول.
+		إذا كنت تريد إضافة كائن ثلاثي الأبعاد إلى مشهد موجود، فاستخدم المعلمة الاختيارية الثالثة لتطبيق المشهد المستهدف. <br />
+		لاحظ أنه يجب تكوين إضاءة المشهد قبل استدعاء هذه الطريقة.
+		</p>
+
+		<h3>
+			[method:Promise compileAsync]( [param:Object3D scene], [param:Camera camera], [param:Scene targetScene] )
+		</h3>
+		<p>
+			إصدار غير متزامن من [page:WebGLRenderer.compile .compile](). تقوم الطريقة بإرجاع Promise 
+			الذي يتم حله عندما يمكن عرض الكائن أو المشهد ثلاثي الأبعاد المحدد دون توقف غير ضروري بسبب تجميع التظليل.<br /><br />
+			
+			تستخدم هذه الطريقة *KHR_parallel_shader_compile*.
 		</p>
 		 
 		<h3>

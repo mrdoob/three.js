@@ -3,9 +3,9 @@ import { DataArrayTexture } from '../textures/DataArrayTexture.js';
 
 class WebGLArrayRenderTarget extends WebGLRenderTarget {
 
-	constructor( width = 1, height = 1, depth = 1 ) {
+	constructor( width = 1, height = 1, depth = 1, options = {} ) {
 
-		super( width, height );
+		super( width, height, options );
 
 		this.isWebGLArrayRenderTarget = true;
 

@@ -48,6 +48,8 @@
 		THREE.ReinhardToneMapping
 		THREE.CineonToneMapping
 		THREE.ACESFilmicToneMapping
+		THREE.AgXToneMapping
+		THREE.NeutralToneMapping
 		THREE.CustomToneMapping
 		</code>
 		<p>
@@ -56,10 +58,13 @@
       gamma dinamica bassa del monitor di un computer o dello schermo di un dispositivo mobile.
 		</p>
 		<p>
-      THREE.LinearToneMapping, THREE.ReinhardToneMapping, THREE.CineonToneMapping e THREE.ACESFilmicToneMapping sono implementazioni 
+      THREE.LinearToneMapping, THREE.ReinhardToneMapping, THREE.CineonToneMapping, THREE.ACESFilmicToneMapping THREE.AgXToneMapping e THREE.NeutralToneMapping sono implementazioni 
       integrate della mappatura dei toni.
       THREE.CustomToneMapping prevede un'implementazione personalizzata modificando il codice GLSL dello shader di frammenti del materiale.
       Vedi l'esempio [example:webgl_tonemapping WebGL / tonemapping].
+		</p>
+		<p>
+			THREE.NeutralToneMapping is an implementation based on the Khronos 3D Commerce Group standard tone mapping.
 		</p>
 
 

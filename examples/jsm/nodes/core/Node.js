@@ -28,7 +28,7 @@ class Node extends EventDispatcher {
 
 	get type() {
 
-		return this.constructor.name;
+		return this.constructor.type;
 
 	}
 
@@ -40,6 +40,12 @@ class Node extends EventDispatcher {
 
 	}
 
+	setReference( /*state*/ ) {
+
+		return this;
+
+	}
+
 	isGlobal( /*builder*/ ) {
 
 		return false;
@@ -48,16 +54,9 @@ class Node extends EventDispatcher {
 
 	* getChildren() {
 
-		const self = this;
+		for ( const { childNode } of getNodeChildren( this ) ) {
 
-		for ( const { property, index, childNode } of getNodeChildren( this ) ) {
-
-			yield { childNode, replaceNode( node ) {
-
-				if ( index === undefined ) self[ property ] = node;
-				else self[ property ][ index ] = node;
-
-			} };
+			yield childNode;
 
 		}
 
@@ -69,13 +68,13 @@ class Node extends EventDispatcher {
 
 	}
 
-	traverse( callback, replaceNode = null ) {
+	traverse( callback ) {
 
-		callback( this, replaceNode );
+		callback( this );
 
-		for ( const { childNode, replaceNode } of this.getChildren() ) {
+		for ( const childNode of this.getChildren() ) {
 
-			childNode.traverse( callback, replaceNode );
+			childNode.traverse( callback );
 
 		}
 
@@ -119,7 +118,7 @@ class Node extends EventDispatcher {
 
 	}
 
-	getReference( builder ) {
+	getShared( builder ) {
 
 		const hash = this.getHash( builder );
 		const nodeFromHash = builder.getNodeFromHash( hash );
@@ -128,11 +127,11 @@ class Node extends EventDispatcher {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const nodeProperties = builder.getNodeProperties( this );
 
-		for ( const { childNode } of this.getChildren() ) {
+		for ( const childNode of this.getChildren() ) {
 
 			nodeProperties[ '_node' + childNode.id ] = childNode;
 
@@ -143,12 +142,28 @@ class Node extends EventDispatcher {
 
 	}
 
-	analyze( builder ) {
+	construct( builder ) { // @deprecated, r157
+
+		console.warn( 'THREE.Node: construct() is deprecated. Use setup() instead.' );
+
+		return this.setup( builder );
+
+	}
+
+	increaseUsage( builder ) {
 
 		const nodeData = builder.getDataFromNode( this );
-		nodeData.dependenciesCount = nodeData.dependenciesCount === undefined ? 1 : nodeData.dependenciesCount + 1;
+		nodeData.usageCount = nodeData.usageCount === undefined ? 1 : nodeData.usageCount + 1;
 
-		if ( nodeData.dependenciesCount === 1 ) {
+		return nodeData.usageCount;
+
+	}
+
+	analyze( builder ) {
+
+		const usageCount = this.increaseUsage( builder );
+
+		if ( usageCount === 1 ) {
 
 			// node flow children
 
@@ -194,7 +209,7 @@ class Node extends EventDispatcher {
 
 	build( builder, output = null ) {
 
-		const refNode = this.getReference( builder );
+		const refNode = this.getShared( builder );
 
 		if ( this !== refNode ) {
 
@@ -206,7 +221,7 @@ class Node extends EventDispatcher {
 		builder.addChain( this );
 
 		/* Build stages expected results:
-			- "construct"	-> Node
+			- "setup"		-> Node
 			- "analyze"		-> null
 			- "generate"	-> String
 		*/
@@ -214,18 +229,20 @@ class Node extends EventDispatcher {
 
 		const buildStage = builder.getBuildStage();
 
-		if ( buildStage === 'construct' ) {
+		if ( buildStage === 'setup' ) {
+
+			this.setReference( builder );
 
 			const properties = builder.getNodeProperties( this );
 
 			if ( properties.initialized !== true || builder.context.tempRead === false ) {
 
-				const stackNodesBeforeConstruct = builder.stack.nodes.length;
+				const stackNodesBeforeSetup = builder.stack.nodes.length;
 
 				properties.initialized = true;
-				properties.outputNode = this.construct( builder );
+				properties.outputNode = this.setup( builder );
 
-				if ( properties.outputNode !== null && builder.stack.nodes.length !== stackNodesBeforeConstruct ) {
+				if ( properties.outputNode !== null && builder.stack.nodes.length !== stackNodesBeforeSetup ) {
 
 					properties.outputNode = builder.stack;
 
@@ -448,12 +465,18 @@ class Node extends EventDispatcher {
 
 export default Node;
 
-export function addNodeClass( nodeClass ) {
+export function addNodeClass( type, nodeClass ) {
 
-	if ( typeof nodeClass !== 'function' || ! nodeClass.name ) throw new Error( `Node class ${ nodeClass.name } is not a class` );
-	if ( NodeClasses.has( nodeClass.name ) ) throw new Error( `Redefinition of node class ${ nodeClass.name }` );
+	if ( typeof nodeClass !== 'function' || ! type ) throw new Error( `Node class ${ type } is not a class` );
+	if ( NodeClasses.has( type ) ) {
 
-	NodeClasses.set( nodeClass.name, nodeClass );
+		console.warn( `Redefinition of node class ${ type }` );
+		return;
+
+	}
+
+	NodeClasses.set( type, nodeClass );
+	nodeClass.type = type;
 
 }
 

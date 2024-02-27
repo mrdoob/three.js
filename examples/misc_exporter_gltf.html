@@ -11,10 +11,6 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - gltf
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -240,9 +236,10 @@
 					color: 0xffff00,
 					metalness: 0.5,
 					roughness: 1.0,
-					flatShading: true
+					flatShading: true,
 				} );
 				material.map = gradientTexture;
+				material.bumpMap = mapGrid;
 				sphere = new THREE.Mesh( new THREE.SphereGeometry( 70, 10, 10 ), material );
 				sphere.position.set( 0, 0, 0 );
 				sphere.name = 'Sphere';
@@ -430,6 +427,27 @@
 					scene1.add( model );
 
 				} );
+
+				// ---------------------------------------------------------------------
+				// Model requiring KHR_mesh_quantization
+				// ---------------------------------------------------------------------
+
+				material = new THREE.MeshBasicMaterial( {
+					color: 0xffffff,
+				} );
+				object = new THREE.InstancedMesh( new THREE.BoxGeometry( 10, 10, 10, 2, 2, 2 ), material, 50 );
+				const matrix = new THREE.Matrix4();
+				const color = new THREE.Color();
+				for ( let i = 0; i < 50; i ++ ) {
+
+					matrix.setPosition( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 );
+					object.setMatrixAt( i, matrix );
+					object.setColorAt( i, color.setHSL( i / 50, 1, 0.5 ) );
+
+				}
+
+				object.position.set( 400, 0, 200 );
+				scene1.add( object );
 
 				// ---------------------------------------------------------------------
 				// 2nd THREE.Scene

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>顶点列表([name])</h1>
+
+	<p class="desc">
+		顶点的双向链表。
+	</p>
+
+	<h2>引入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
+			import { VertexList } from 'three/addons/math/ConvexHull.js';
+		</code>
+
+
+	<h2>构造函数</h2>
+
+
+	<h3>[name]()</h3>
+	<p>
+		创建一个 [name] 实例。
+	</p>
+
+	<h2>属性</h2>
+
+	<h3>[property:VertexNode head]</h3>
+	<p>
+		引用链表的第一个顶点。默认为 null。
+	</p>
+
+	<h3>[property:VertexNode tail]</h3>
+	<p>
+		引用链表的最后一个顶点。默认为 null。
+	</p>
+
+	<h2>方法</h2>
+
+	<h3>[method:VertexNode first]()</h3>
+	<p>返回头引用。</p>
+
+	<h3>[method:VertexNode last]()</h3>
+	<p>返回尾部引用。</p>
+
+	<h3>[method:this clear]()</h3>
+	<p>清除链接列表。</p>
+
+	<h3>[method:this insertBefore]( [param:Vertex target], [param:Vertex vertex] )</h3>
+	<p>
+		[page:Vertex target] - 目标顶点。假设该顶点属于链表。<br />
+		[page:Vertex vertex] - 要插入的顶点。<br /><br />
+
+		在目标顶点 <strong>之前</strong> 插入一个顶点。
+	</p>
+
+	<h3>[method:this insertAfter]( [param:Vertex target], [param:Vertex vertex] )</h3>
+	<p>
+		[page:Vertex target] - 目标顶点。假设该顶点属于链表。<br />
+		[page:Vertex vertex] - 要插入的顶点。<br /><br />
+
+		在目标顶点 <strong>之后</strong> 插入一个顶点。
+	</p>
+
+	<h3>[method:this append]( [param:Vertex vertex] )</h3>
+	<p>
+		[page:Vertex vertex] - 要追加的顶点。<br /><br />
+
+		将一个顶点追加到链表的末尾。
+	</p>
+
+	<h3>[method:this appendChain]( [param:Vertex vertex] )</h3>
+	<p>
+		[page:Vertex vertex] - 顶点链的头顶点。<br /><br />
+
+		添加一个顶点链，其中给定顶点是头。
+	</p>
+
+	<h3>[method:this remove]( [param:Vertex vertex] )</h3>
+	<p>
+		[page:Vertex vertex] - 要删除的顶点。<br /><br />
+
+		从链表中删除一个顶点。
+	</p>
+
+	<h3>[method:this removeSubList]( [param:Vertex a], [param:Vertex b] )</h3>
+	<p>
+		[page:Vertex a] - 子列表的头部。<br />
+		[page:Vertex b] - 子列表的尾部。<br /><br />
+
+		从链接列表中删除顶点的子列表。
+	</p>
+
+	<h3>[method:Boolean isEmpty]()</h3>
+
+	<p>如果链表为空则返回 true。</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/ConvexHull.js examples/jsm/math/ConvexHull.js]
+	<p>
+</body>
+
+</html>

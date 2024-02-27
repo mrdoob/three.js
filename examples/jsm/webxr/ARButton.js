@@ -104,9 +104,33 @@ class ARButton {
 
 					currentSession.end();
 
+					if ( navigator.xr.offerSession !== undefined ) {
+
+						navigator.xr.offerSession( 'immersive-ar', sessionInit )
+							.then( onSessionStarted )
+							.catch( ( err ) => {
+
+								console.warn( err );
+
+							} );
+
+					}
+
 				}
 
 			};
+
+			if ( navigator.xr.offerSession !== undefined ) {
+
+				navigator.xr.offerSession( 'immersive-ar', sessionInit )
+					.then( onSessionStarted )
+					.catch( ( err ) => {
+
+						console.warn( err );
+
+					} );
+
+			}
 
 		}
 

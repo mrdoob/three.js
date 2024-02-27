@@ -1,8 +1,6 @@
-import {
-	ShaderChunk
-} from 'three';
-
 const OutputShader = {
+
+	name: 'OutputShader',
 
 	uniforms: {
 
@@ -35,7 +33,8 @@ const OutputShader = {
 
 		uniform sampler2D tDiffuse;
 
-		` + ShaderChunk[ 'tonemapping_pars_fragment' ] + ShaderChunk[ 'colorspace_pars_fragment' ] + `
+		#include <tonemapping_pars_fragment>
+		#include <colorspace_pars_fragment>
 
 		varying vec2 vUv;
 
@@ -60,6 +59,14 @@ const OutputShader = {
 			#elif defined( ACES_FILMIC_TONE_MAPPING )
 
 				gl_FragColor.rgb = ACESFilmicToneMapping( gl_FragColor.rgb );
+
+			#elif defined( AGX_TONE_MAPPING )
+
+				gl_FragColor.rgb = AgXToneMapping( gl_FragColor.rgb );
+
+			#elif defined( NEUTRAL_TONE_MAPPING )
+
+				gl_FragColor.rgb = NeutralToneMapping( gl_FragColor.rgb );
 
 			#endif
 

@@ -190,7 +190,6 @@ line.geometry.computeBoundingSphere();
 
 		</div>
 
-
 		<h2>Cameras</h2>
 		<div>
 			<p>A camera's position and target is updated automatically. If you need to change</p>
@@ -216,5 +215,35 @@ camera.aspect = window.innerWidth / window.innerHeight;
 camera.updateProjectionMatrix();
 			</code>
 		</div>
+
+		<h2>InstancedMesh</h2>
+		<div>
+			<p>
+				`InstancedMesh` is a class for conveniently access instanced rendering in `three.js`. Certain library features like view frustum culling or
+				ray casting rely on up-to-date bounding volumes (bounding sphere and bounding box). Because of the way how `InstancedMesh` works, the class 
+				has its own [page:InstancedMesh.boundingBox boundingBox] and [page:InstancedMesh.boundingSphere boundingSphere] properties that supersede
+				the bounding volumes on geometry level.
+			</p>
+			<p>
+				Similar to geometries you have to recompute the bounding box and sphere whenever you change the underlying data. In context of `InstancedMesh`, that
+				happens when you transform instances via [page:InstancedMesh.setMatrixAt setMatrixAt](). You can use the same pattern like with geometries.
+			</p>
+			<code>
+instancedMesh.computeBoundingBox();
+instancedMesh.computeBoundingSphere();
+			</code>
+
+		</div>
+
+		<h2>SkinnedMesh</h2>
+		<div>
+			<p>
+				`SkinnedMesh` follows the same principles like `InstancedMesh` in context of bounding volumes. Meaning the class has its own version of
+				[page:SkinnedMesh.boundingBox boundingBox] and [page:SkinnedMesh.boundingSphere boundingSphere] to correctly enclose animated meshes.
+				When calling `computeBoundingBox()` and `computeBoundingSphere()`, the class computes the respective bounding volumes based on the current
+				bone tranformation (or in other words the current animation state).
+			</p>
+		</div>
+
 	</body>
 </html>

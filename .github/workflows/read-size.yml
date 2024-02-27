@@ -20,9 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
-        uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Install Node
-        uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4
         with:
           node-version: 18
           cache: 'npm'
@@ -46,7 +46,7 @@ jobs:
           # write the output in a json file to upload it as artifact
           node -pe "JSON.stringify({ filesize: $FILESIZE, gzip: $FILESIZE_GZIP, treeshaken: $TREESHAKEN, treeshakenGzip: $TREESHAKEN_GZIP, pr: $PR })" > sizes.json
       - name: Upload artifact
-        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4
         with:
           name: sizes
           path: sizes.json

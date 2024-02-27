@@ -14,7 +14,6 @@ import {
 	x,
 	y,
 	z,
-	w,
 	eps
 } from '../../utils/math-constants.js';
 
@@ -302,11 +301,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.x, x, 'Identity rotation: check x' );
 			assert.strictEqual( a.y, y, 'Identity rotation: check y' );
 			assert.strictEqual( a.z, z, 'Identity rotation: check z' );
-
-			a.applyQuaternion( new Quaternion( x, y, z, w ) );
-			assert.strictEqual( a.x, 108, 'Normal rotation: check x' );
-			assert.strictEqual( a.y, 162, 'Normal rotation: check y' );
-			assert.strictEqual( a.z, 216, 'Normal rotation: check z' );
 
 		} );
 

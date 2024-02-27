@@ -1,11 +1,20 @@
 export default /* glsl */`
 #ifdef USE_MORPHTARGETS
 
-	uniform float morphTargetBaseInfluence;
+	#ifndef USE_INSTANCING_MORPH
+
+		uniform float morphTargetBaseInfluence;
+
+	#endif
 
 	#ifdef MORPHTARGETS_TEXTURE
 
-		uniform float morphTargetInfluences[ MORPHTARGETS_COUNT ];
+		#ifndef USE_INSTANCING_MORPH
+
+			uniform float morphTargetInfluences[ MORPHTARGETS_COUNT ];
+
+		#endif
+
 		uniform sampler2DArray morphTargetsTexture;
 		uniform ivec2 morphTargetsTextureSize;
 

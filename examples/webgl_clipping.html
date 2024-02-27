@@ -7,11 +7,6 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -87,7 +82,9 @@
 
 					// ***** Clipping setup (material): *****
 					clippingPlanes: [ localPlane ],
-					clipShadows: true
+					clipShadows: true,
+
+					alphaToCoverage: true,
 
 				} );
 
@@ -113,7 +110,7 @@
 
 				// Renderer
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -135,6 +132,9 @@
 				// GUI
 
 				const gui = new GUI(),
+					props = {
+						alphaToCoverage: true,
+					},
 					folderLocal = gui.addFolder( 'Local Clipping' ),
 					propsLocal = {
 
@@ -172,7 +172,6 @@
 						}
 
 					},
-
 					folderGlobal = gui.addFolder( 'Global Clipping' ),
 					propsGlobal = {
 
@@ -200,6 +199,15 @@
 
 					};
 
+				gui.add( props, 'alphaToCoverage' ).onChange( function ( value ) {
+
+					ground.material.alphaToCoverage = value;
+					ground.material.needsUpdate = true;
+
+					material.alphaToCoverage = value;
+					material.needsUpdate = true;
+
+				} );
 				folderLocal.add( propsLocal, 'Enabled' );
 				folderLocal.add( propsLocal, 'Shadows' );
 				folderLocal.add( propsLocal, 'Plane', 0.3, 1.25 );

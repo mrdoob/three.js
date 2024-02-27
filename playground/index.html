@@ -91,7 +91,7 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.5, 60 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.5, 200 );
 				camera.position.set( 0.0, 3, 4 * 3 );
 
 				scene = new THREE.Scene();
@@ -117,7 +117,6 @@
 				} else {
 
 					renderer = new THREE.WebGLRenderer( { antialias: true } );
-					renderer.useLegacyLights = false;
 
 					composer = new EffectComposer( renderer );
 					composer.addPass( new RenderPass( scene, camera ) );

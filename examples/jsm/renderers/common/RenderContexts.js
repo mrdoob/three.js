@@ -21,21 +21,10 @@ class RenderContexts {
 
 		} else {
 
-			let format, count;
+			const format = renderTarget.texture.format;
+			const count = renderTarget.count;
 
-			if ( renderTarget.isWebGLMultipleRenderTargets ) {
-
-				format = renderTarget.texture[ 0 ].format;
-				count = renderTarget.texture.length;
-
-			} else {
-
-				format = renderTarget.texture.format;
-				count = 1;
-
-			}
-
-			attachmentState = `${count}:${format}:${renderTarget.samples}:${renderTarget.depthBuffer}:${renderTarget.stencilBuffer}`;
+			attachmentState = `${ count }:${ format }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
 
 		}
 

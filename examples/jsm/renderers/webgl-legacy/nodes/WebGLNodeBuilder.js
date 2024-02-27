@@ -1,4 +1,4 @@
-import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder, normalView } from 'three/nodes';
+import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder, normalView } from '../../../nodes/Nodes.js';
 import SlotNode from './SlotNode.js';
 import { PerspectiveCamera, ShaderChunk, ShaderLib, UniformsUtils, UniformsLib } from 'three';
 
@@ -38,9 +38,9 @@ function getShaderStageProperty( shaderStage ) {
 
 class WebGLNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer, shader ) {
+	constructor( object, renderer, shader, material = null ) {
 
-		super( object, renderer, new GLSLNodeParser() );
+		super( object, renderer, new GLSLNodeParser(), null, material );
 
 		this.shader = shader;
 		this.slots = { vertex: [], fragment: [] };
@@ -102,7 +102,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 		this.addSlot( 'fragment', new SlotNode( {
 			node: normalView,
 			nodeType: 'vec3',
-			source: getIncludeSnippet( 'clipping_planes_fragment' ),
+			source: 'void main() {',
 			target: 'vec3 TransformedNormalView = %RESULT%;',
 			inclusionType: 'append'
 		} ) );
@@ -220,7 +220,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 						this.addSlot( 'fragment', new SlotNode( {
 							node: material.clearcoatNormalNode,
 							nodeType: 'vec3',
-							source: 'vec3 clearcoatNormal = geometryNormal;',
+							source: 'vec3 clearcoatNormal = nonPerturbedNormal;',
 							target: 'vec3 clearcoatNormal = %RESULT%;'
 						} ) );
 
@@ -417,7 +417,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTexture( texture, textureProperty, uvSnippet ) {
+	generateTexture( texture, textureProperty, uvSnippet ) {
 
 		if ( texture.isTextureCube ) {
 
@@ -431,11 +431,41 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTextureBias( texture, textureProperty, uvSnippet, biasSnippet ) {
+	generateTextureLevel( texture, textureProperty, uvSnippet, biasSnippet ) {
 
 		if ( this.material.extensions !== undefined ) this.material.extensions.shaderTextureLOD = true;
 
 		return `textureLod( ${textureProperty}, ${uvSnippet}, ${biasSnippet} )`;
+
+	}
+
+	buildFunctionCode( shaderNode ) {
+
+		const layout = shaderNode.layout;
+		const flowData = this.flowShaderNode( shaderNode );
+
+		const parameters = [];
+
+		for ( const input of layout.inputs ) {
+
+			parameters.push( this.getType( input.type ) + ' ' + input.name );
+
+		}
+
+		//
+
+		const code = `${ this.getType( layout.type ) } ${ layout.name }( ${ parameters.join( ', ' ) } ) {
+
+	${ flowData.vars }
+
+${ flowData.code }
+	return ${ flowData.result };
+
+}`;
+
+		//
+
+		return code;
 
 	}
 
@@ -641,7 +671,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 	build() {
 
-		super.build();
+		super.build( false );
 
 		this._addSnippets();
 		this._addUniforms();

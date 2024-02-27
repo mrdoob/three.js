@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - instancing - Morph Target Animations</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+			
+			let camera, scene, renderer, stats, mesh, mixer, dummy;
+
+			const offset = 5000;
+
+			const timeOffsets = new Float32Array( 1024 );
+
+			for ( let i = 0; i < 1024; i ++ ) {
+
+				timeOffsets[ i ] = Math.random() * 3;
+
+			}
+
+			const clock = new THREE.Clock( true );
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 100, 10000 );
+
+				scene = new THREE.Scene();
+
+				scene.background = new THREE.Color( 0x99DDFF );
+
+				scene.fog = new THREE.Fog( 0x99DDFF, 5000, 10000 );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 1 );
+
+				light.position.set( 200, 1000, 50 );
+
+				light.castShadow = true;
+
+				light.shadow.camera.left = - 5000;
+				light.shadow.camera.right = 5000;
+				light.shadow.camera.top = 5000;
+				light.shadow.camera.bottom = - 5000;
+				light.shadow.camera.far = 2000;
+
+				light.shadow.bias = - 0.01;
+
+				light.shadow.camera.updateProjectionMatrix();
+
+				scene.add( light );
+
+				const hemi = new THREE.HemisphereLight( 0x99DDFF, 0x669933, 1 / 3 );
+
+				scene.add( hemi );
+
+				const ground = new THREE.Mesh(
+					new THREE.PlaneGeometry( 1000000, 1000000 ),
+					new THREE.MeshStandardMaterial( { color: 0x669933, depthWrite: true } )
+				);
+
+				ground.rotation.x = - Math.PI / 2;
+
+				ground.receiveShadow = true;
+
+				scene.add( ground );
+
+				const loader = new GLTFLoader();
+
+				loader.load( 'models/gltf/Horse.glb', function ( glb ) {
+
+					dummy = glb.scene.children[ 0 ];
+
+					mesh = new THREE.InstancedMesh( dummy.geometry, dummy.material, 1024 );
+
+					mesh.castShadow = true;
+
+					for ( let x = 0, i = 0; x < 32; x ++ ) {
+
+						for ( let y = 0; y < 32; y ++ ) {
+
+							dummy.position.set( offset - 300 * x + 200 * Math.random(), 0, offset - 300 * y );
+
+							dummy.updateMatrix();
+
+							mesh.setMatrixAt( i, dummy.matrix );
+
+							mesh.setColorAt( i, new THREE.Color( `hsl(${Math.random() * 360}, 50%, 66%)` ) );
+
+							i ++;
+			
+						}
+
+			
+					}
+
+					scene.add( mesh );
+
+					mixer = new THREE.AnimationMixer( glb.scene );
+
+					const action = mixer.clipAction( glb.animations[ 0 ] );
+
+					action.play();
+			
+				} );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.VSMShadowMap;
+				//
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+				stats.update();
+
+			}
+
+			function render() {
+
+				const time = clock.getElapsedTime();
+
+				const r = 3000;
+				camera.position.set( Math.sin( time / 10 ) * r, 1500 + 1000 * Math.cos( time / 5 ), Math.cos( time / 10 ) * r );
+				camera.lookAt( 0, 0, 0 );
+
+				if ( mesh ) {
+
+					for ( let i = 0; i < 1024; i ++ ) {
+
+						mixer.setTime( time + timeOffsets[ i ] );
+
+						mesh.setMorphAt( i, dummy );
+
+					}
+
+					mesh.morphTexture.needsUpdate = true;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

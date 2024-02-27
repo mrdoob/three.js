@@ -6,17 +6,13 @@ export function getCacheKey( object ) {
 
 	if ( object.isNode === true ) {
 
-		cacheKey += `uuid:"${ object.uuid }"`;
+		cacheKey += object.id;
 
 	}
 
-	for ( const { property, index, childNode } of getNodeChildren( object ) ) {
+	for ( const { property, childNode } of getNodeChildren( object ) ) {
 
-		// @TODO: Think about implement NodeArray and NodeObject.
-
-		let childCacheKey = getCacheKey( childNode );
-		if ( ! childCacheKey.includes( ',' ) ) childCacheKey = childCacheKey.slice( childCacheKey.indexOf( '"' ), childCacheKey.indexOf( '}' ) );
-		cacheKey += `,${ property }${ index !== undefined ? '/' + index : '' }:${ childCacheKey }`;
+		cacheKey += ',' + property.slice( 0, - 4 ) + ':' + childNode.getCacheKey();
 
 	}
 
@@ -137,9 +133,11 @@ export function getValueFromType( type, ...params ) {
 
 	const last4 = type ? type.slice( - 4 ) : undefined;
 
-	if ( ( last4 === 'vec2' || last4 === 'vec3' || last4 === 'vec4' ) && params.length === 1 ) { // ensure same behaviour as in NodeBuilder.format()
+	if ( params.length === 1 ) { // ensure same behaviour as in NodeBuilder.format()
 
-		params = last4 === 'vec2' ? [ params[ 0 ], params[ 0 ] ] : [ params[ 0 ], params[ 0 ], params[ 0 ] ];
+		if ( last4 === 'vec2' ) params = [ params[ 0 ], params[ 0 ] ];
+		else if ( last4 === 'vec3' ) params = [ params[ 0 ], params[ 0 ], params[ 0 ] ];
+		else if ( last4 === 'vec4' ) params = [ params[ 0 ], params[ 0 ], params[ 0 ], params[ 0 ] ];
 
 	}
 

@@ -13,10 +13,6 @@
 			Equirectangular Map by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -35,7 +31,7 @@
 
 			let controls, camera, scene, renderer;
 			let textureEquirec, textureCube;
-			let sphereMesh, sphereMaterial;
+			let sphereMesh, sphereMaterial, params;
 
 			init();
 			animate();
@@ -88,7 +84,7 @@
 
 				//
 
-				const params = {
+				params = {
 					Cube: function () {
 
 						scene.background = textureCube;
@@ -105,10 +101,14 @@
 						sphereMaterial.needsUpdate = true;
 
 					},
-					Refraction: false
+					Refraction: false,
+					backgroundRotationX: false,
+					backgroundRotationY: false,
+					backgroundRotationZ: false,
+					syncMaterial: false
 				};
 
-				const gui = new GUI();
+				const gui = new GUI( { width: 300 } );
 				gui.add( params, 'Cube' );
 				gui.add( params, 'Equirectangular' );
 				gui.add( params, 'Refraction' ).onChange( function ( value ) {
@@ -128,6 +128,10 @@
 					sphereMaterial.needsUpdate = true;
 
 				} );
+				gui.add( params, 'backgroundRotationX' );
+				gui.add( params, 'backgroundRotationY' );
+				gui.add( params, 'backgroundRotationZ' );
+				gui.add( params, 'syncMaterial' );
 				gui.open();
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -154,6 +158,30 @@
 			}
 
 			function render() {
+
+				if ( params.backgroundRotationX ) {
+
+					scene.backgroundRotation.x += 0.001;
+
+				}
+
+				if ( params.backgroundRotationY ) {
+
+					scene.backgroundRotation.y += 0.001;
+
+				}
+
+				if ( params.backgroundRotationZ ) {
+
+					scene.backgroundRotation.z += 0.001;
+
+				}
+
+				if ( params.syncMaterial ) {
+
+					sphereMesh.material.envMapRotation.copy( scene.backgroundRotation );
+
+				}
 
 				camera.lookAt( scene.position );
 				renderer.render( scene, camera );

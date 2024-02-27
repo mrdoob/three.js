@@ -32,7 +32,7 @@ class AudioLoader extends Loader {
 
 					onLoad( audioBuffer );
 
-				}, handleError );
+				} ).catch( handleError );
 
 			} catch ( e ) {
 

@@ -4,7 +4,7 @@ const DEFAULT_HAND_PROFILE_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-pro
 
 class XRHandMeshModel {
 
-	constructor( handModel, controller, path, handedness, loader = null ) {
+	constructor( handModel, controller, path, handedness, loader = null, onLoad = null ) {
 
 		this.controller = controller;
 		this.handModel = handModel;
@@ -73,6 +73,8 @@ class XRHandMeshModel {
 				this.bones.push( bone );
 
 			} );
+
+			if ( onLoad ) onLoad( object );
 
 		} );
 

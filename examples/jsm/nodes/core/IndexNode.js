@@ -63,4 +63,4 @@ export default IndexNode;
 export const vertexIndex = nodeImmutable( IndexNode, IndexNode.VERTEX );
 export const instanceIndex = nodeImmutable( IndexNode, IndexNode.INSTANCE );
 
-addNodeClass( IndexNode );
+addNodeClass( 'IndexNode', IndexNode );

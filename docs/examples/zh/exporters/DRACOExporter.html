@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>DRACO导出器([name])</h1>
+
+	<p class="desc">
+		一个用于使用 Draco 库压缩几何体的导出器。<br /><br />
+		[link:https://google.github.io/draco/ Draco] 是一个用于压缩和解压缩 3D 网格和点云的开源库。压缩后的几何体可以显著减小文件大小，但在客户设备上需要额外的解码时间。
+	</p>
+
+	<p>
+		独立的 Draco 文件具有 `.drc` 扩展名，包含顶点位置、法线、颜色和其他属性。Draco 文件不包含材质、纹理、动画或节点层次结构 - 要使用这些功能，请将 Draco 几何体嵌入到 glTF
+		文件中。可以使用 [link:https://github.com/AnalyticalGraphicsInc/gltf-pipeline glTF-Pipeline] 将普通的 glTF 文件转换为经过 Draco 压缩的
+		glTF 文件。
+	</p>
+
+	<h2>引入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
+			import { DRACOExporter } from 'three/addons/exporters/DRACOExporter.js';
+		</code>
+
+	<h2>代码示例</h2>
+
+	<code>
+		// Instantiate a exporter
+		const exporter = new DRACOExporter();
+
+		// Parse the input and generate the DRACO encoded output
+		const binaryData = exporter.parse( mesh, options );
+		</code>
+
+	<h2>例子</h2>
+
+	<p>
+		[example:misc_exporter_draco]
+	</p>
+
+	<h2>构造函数</h2>
+
+	<h3>[name]()</h3>
+	<p>
+		创建一个新的 [name] 实例。
+	</p>
+
+	<h2>方法</h2>
+
+	<h3>[method:Int8Array parse]( [param:Mesh object] | [param:Points object], [param:Object options] )</h3>
+
+	<p>
+		[page:Mesh object] | [page:Points object] — 要编码的网格或点。<br />
+		[page:Options options] — 可选的导出选项<br />
+	<ul>
+		<li>decodeSpeed - int. 指示如何根据解码速度调整编码器（0 提供更好的速度，但质量最差）。默认值为 5。</li>
+		<li>encodeSpeed - int. 指示如何调整编码器参数（0 提供更好的速度，但质量最差）。默认值为 5。</li>
+		<li>encoderMethod - int. 顺序（很少压缩）或破边。Edgebreaker 以确定性、螺旋状的方式遍历网格的三角形，这提供了这种数据格式的大部分优点。默认值为
+			DRACOExporter.MESH_EDGEBREAKER_ENCODING。</li>
+		<li>quantization - Array of int. 指示按照顺序（POSITION、NORMAL、COLOR、TEX_COORD、GENERIC）存储在 draco 文件中的每种数据类型的精度。默认为 [ 16, 8,
+			8, 8, 8 ]</li>
+		<li>exportUvs - bool. 布尔值。默认为 true。</li>
+		<li>exportNormals - bool. 布尔值。默认为 true。</li>
+		<li>exportColor - bool. 布尔值。默认为 false。</li>
+	</ul>
+	</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/DRACOExporter.js examples/jsm/exporters/DRACOExporter.js]
+	</p>
+</body>
+
+</html>

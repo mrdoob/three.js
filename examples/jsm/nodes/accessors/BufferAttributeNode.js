@@ -43,7 +43,7 @@ class BufferAttributeNode extends InputNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		if ( this.attribute !== null ) return;
 
@@ -67,12 +67,14 @@ class BufferAttributeNode extends InputNode {
 
 		const nodeType = this.getNodeType( builder );
 
-		const nodeUniform = builder.getBufferAttributeFromNode( this, nodeType );
-		const propertyName = builder.getPropertyName( nodeUniform );
+		const nodeAttribute = builder.getBufferAttributeFromNode( this, nodeType );
+		const propertyName = builder.getPropertyName( nodeAttribute );
 
 		let output = null;
 
-		if ( builder.shaderStage === 'vertex' ) {
+		if ( builder.shaderStage === 'vertex' || builder.shaderStage === 'compute' ) {
+
+			this.name = propertyName;
 
 			output = propertyName;
 
@@ -122,4 +124,4 @@ export const instancedDynamicBufferAttribute = ( array, type, stride, offset ) =
 
 addNodeElement( 'toAttribute', ( bufferNode ) => bufferAttribute( bufferNode.value ) );
 
-addNodeClass( BufferAttributeNode );
+addNodeClass( 'BufferAttributeNode', BufferAttributeNode );

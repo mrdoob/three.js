@@ -12,10 +12,6 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> xr - interactive cubes
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -42,7 +38,6 @@
 
 			let controller, controllerGrip;
 			let INTERSECTED;
-			const tempMatrix = new THREE.Matrix4();
 
 			init();
 			animate();
@@ -145,7 +140,7 @@
 
 				//
 
-				document.body.appendChild( XRButton.createButton( renderer ) );
+				document.body.appendChild( XRButton.createButton( renderer, { 'optionalFeatures': [ 'depth-sensing'] } ) );
 
 			}
 
@@ -212,10 +207,7 @@
 
 				// find intersections
 
-				tempMatrix.identity().extractRotation( controller.matrixWorld );
-
-				raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
-				raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
+				raycaster.setFromXRController( controller );
 
 				const intersects = raycaster.intersectObjects( room.children, false );
 

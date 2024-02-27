@@ -33,6 +33,7 @@ const UniformsLib = {
 	envmap: {
 
 		envMap: { value: null },
+		envMapRotation: { value: /*@__PURE__*/ new Matrix3() },
 		flipEnvMap: { value: - 1 },
 		reflectivity: { value: 1.0 }, // basic, lambert, phong
 		ior: { value: 1.5 }, // physical

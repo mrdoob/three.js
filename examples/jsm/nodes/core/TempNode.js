@@ -12,7 +12,7 @@ class TempNode extends Node {
 
 	hasDependencies( builder ) {
 
-		return builder.getDataFromNode( this ).dependenciesCount > 1;
+		return builder.getDataFromNode( this ).usageCount > 1;
 
 	}
 
@@ -33,7 +33,7 @@ class TempNode extends Node {
 
 				const snippet = super.build( builder, type );
 
-				const nodeVar = builder.getVarFromNode( this, type );
+				const nodeVar = builder.getVarFromNode( this, null, type );
 				const propertyName = builder.getPropertyName( nodeVar );
 
 				builder.addLineFlowCode( `${propertyName} = ${snippet}` );
@@ -55,4 +55,4 @@ class TempNode extends Node {
 
 export default TempNode;
 
-addNodeClass( TempNode );
+addNodeClass( 'TempNode', TempNode );

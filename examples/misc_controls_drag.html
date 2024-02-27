@@ -20,12 +20,9 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - drag controls<br />
 			Use "Shift+Click" to add/remove objects to/from a group.<br />
+			Use "M" to toggle between rotate and translate mode.<br />
 			Grouped objects can be transformed as a union.
 		</div>
-
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -117,6 +114,7 @@
 				container.appendChild( renderer.domElement );
 
 				controls = new DragControls( [ ... objects ], camera, renderer.domElement );
+				controls.rotateSpeed = 2;
 				controls.addEventListener( 'drag', render );
 
 				//
@@ -145,6 +143,12 @@
 			function onKeyDown( event ) {
 
 				enableSelection = ( event.keyCode === 16 ) ? true : false;
+				
+				if ( event.keyCode === 77 ) {
+
+					controls.mode = ( controls.mode === 'translate' ) ? 'rotate' : 'translate';
+			
+				}
 
 			}
 
