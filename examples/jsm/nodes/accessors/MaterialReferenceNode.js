@@ -1,5 +1,6 @@
 import ReferenceNode from './ReferenceNode.js';
-import { NodeUpdateType } from '../core/constants.js';
+//import { renderGroup } from '../core/UniformGroupNode.js';
+//import { NodeUpdateType } from '../core/constants.js';
 import { addNodeClass } from '../core/Node.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 
@@ -11,25 +12,23 @@ class MaterialReferenceNode extends ReferenceNode {
 
 		this.material = material;
 
-		this.updateType = NodeUpdateType.RENDER;
+		//this.updateType = NodeUpdateType.RENDER;
 
 	}
 
-	updateReference( frame ) {
+	/*setNodeType( node ) {
 
-		this.reference = this.material !== null ? this.material : frame.material;
+		super.setNodeType( node );
+
+		this.node.groupNode = renderGroup;
+
+	}*/
+
+	setReference( state ) {
+
+		this.reference = this.material !== null ? this.material : state.material;
 
 		return this.reference;
-
-	}
-
-	construct( builder ) {
-
-		const material = this.material !== null ? this.material : builder.material;
-
-		this.node.value = material[ this.property ];
-
-		return super.construct( builder );
 
 	}
 
@@ -39,4 +38,4 @@ export default MaterialReferenceNode;
 
 export const materialReference = ( name, type, material ) => nodeObject( new MaterialReferenceNode( name, type, material ) );
 
-addNodeClass( MaterialReferenceNode );
+addNodeClass( 'MaterialReferenceNode', MaterialReferenceNode );

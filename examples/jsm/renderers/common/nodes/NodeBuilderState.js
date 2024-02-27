@@ -1,10 +1,11 @@
 class NodeBuilderState {
 
-	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes ) {
+	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, transforms = [] ) {
 
 		this.vertexShader = vertexShader;
 		this.fragmentShader = fragmentShader;
 		this.computeShader = computeShader;
+		this.transforms = transforms;
 
 		this.nodeAttributes = nodeAttributes;
 		this.bindings = bindings;
@@ -20,9 +21,17 @@ class NodeBuilderState {
 
 		const bindingsArray = [];
 
-		for ( const binding of this.bindings ) {
+		for ( const instanceBinding of this.bindings ) {
 
-			bindingsArray.push( binding.clone() );
+			let binding = instanceBinding;
+
+			if ( instanceBinding.shared !== true ) {
+
+				binding = instanceBinding.clone();
+
+			}
+
+			bindingsArray.push( binding );
 
 		}
 

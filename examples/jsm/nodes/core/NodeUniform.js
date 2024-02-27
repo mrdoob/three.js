@@ -23,6 +23,18 @@ class NodeUniform {
 
 	}
 
+	get id() {
+
+		return this.node.id;
+
+	}
+
+	get groupNode() {
+
+		return this.node.groupNode;
+
+	}
+
 }
 
 export default NodeUniform;

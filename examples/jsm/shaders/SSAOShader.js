@@ -12,6 +12,8 @@ import {
 
 const SSAOShader = {
 
+	name: 'SSAOShader',
+
 	defines: {
 		'PERSPECTIVE_CAMERA': 1,
 		'KERNEL_SIZE': 32
@@ -47,9 +49,8 @@ const SSAOShader = {
 		}`,
 
 	fragmentShader: /* glsl */`
-
-		uniform sampler2D tNormal;
-		uniform sampler2D tDepth;
+		uniform highp sampler2D tNormal;
+		uniform highp sampler2D tDepth;
 		uniform sampler2D tNoise;
 
 		uniform vec3 kernel[ KERNEL_SIZE ];
@@ -183,6 +184,8 @@ const SSAOShader = {
 
 const SSAODepthShader = {
 
+	name: 'SSAODepthShader',
+
 	defines: {
 		'PERSPECTIVE_CAMERA': 1
 	},
@@ -243,6 +246,8 @@ const SSAODepthShader = {
 };
 
 const SSAOBlurShader = {
+
+	name: 'SSAOBlurShader',
 
 	uniforms: {
 

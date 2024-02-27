@@ -26,4 +26,4 @@ export default UserDataNode;
 
 export const userData = ( name, inputType, userData ) => nodeObject( new UserDataNode( name, inputType, userData ) );
 
-addNodeClass( UserDataNode );
+addNodeClass( 'UserDataNode', UserDataNode );

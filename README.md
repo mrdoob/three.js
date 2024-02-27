@@ -8,7 +8,7 @@
 
 #### JavaScript 3D library
 
-The aim of the project is to create an easy to use, lightweight, cross-browser, general purpose 3D library. The current builds only include a WebGL renderer but WebGPU (experimental), SVG and CSS3D renderers are also available as addons.
+The aim of the project is to create an easy-to-use, lightweight, cross-browser, general-purpose 3D library. The current builds only include a WebGL renderer but WebGPU (experimental), SVG and CSS3D renderers are also available as addons.
 
 [Examples](https://threejs.org/examples/) &mdash;
 [Docs](https://threejs.org/docs/) &mdash;
@@ -26,9 +26,11 @@ This code creates a scene, a camera, and a geometric cube, and it adds the cube 
 ```javascript
 import * as THREE from 'three';
 
+const width = window.innerWidth, height = window.innerHeight;
+
 // init
 
-const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+const camera = new THREE.PerspectiveCamera( 70, width / height, 0.01, 10 );
 camera.position.z = 1;
 
 const scene = new THREE.Scene();
@@ -40,7 +42,7 @@ const mesh = new THREE.Mesh( geometry, material );
 scene.add( mesh );
 
 const renderer = new THREE.WebGLRenderer( { antialias: true } );
-renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.setSize( width, height );
 renderer.setAnimationLoop( animation );
 document.body.appendChild( renderer.domElement );
 
@@ -56,7 +58,7 @@ function animation( time ) {
 }
 ```
 
-If everything went well, you should see [this](https://jsfiddle.net/7u84j6kp/).
+If everything goes well, you should see [this](https://jsfiddle.net/2nyxkmco/).
 
 ### Cloning this repository
 

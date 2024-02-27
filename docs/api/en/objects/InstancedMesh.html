@@ -79,6 +79,13 @@
 			instanced data via [page:.setMatrixAt]().
 		</p>
 
+		<h3>[property:DataTexture morphTexture]</h3>
+		<p>
+			Represents the morph target weights of all instances. You have to set its
+			[page:Texture.needsUpdate needsUpdate] flag to true if you modify
+			instanced data via [page:.setMorphAt]().
+		</p>
+
 		<h3>[property:Boolean isInstancedMesh]</h3>
 		<p>Read-only flag to check if a given object is of type [name].</p>
 
@@ -87,17 +94,16 @@
 
 		<h3>[method:undefined computeBoundingBox]()</h3>
 		<p>
-			Computes the bounding box, updating [page:.boundingBox] attribute.<br />
-			Bounding boxes aren't computed by default. They need to be explicitly
-			computed, otherwise they are `null`.
+			Computes the bounding box of the instanced mesh, and updates the [page:.boundingBox] attribute.
+			The bounding box is not computed by the engine; it must be computed by your app.
+			You may need to recompute the bounding box if an instance is transformed via [page:.setMatrixAt]().
 		</p>
 
 		<h3>[method:undefined computeBoundingSphere]()</h3>
 		<p>
-			Computes the bounding sphere, updating [page:.boundingSphere]
-			attribute.<br />
-			Bounding spheres aren't computed by default. They need to be explicitly
-			computed, otherwise they are `null`.
+			Computes the bounding sphere of the instanced mesh, and updates the [page:.boundingSphere] attribute.
+			The engine automatically computes the bounding sphere when it is needed, e.g., for ray casting or view frustum culling.
+			You may need to recompute the bounding sphere if an instance is transformed via [page:.setMatrixAt]().
 		</p>
 
 		<h3>[method:undefined dispose]()</h3>
@@ -133,6 +139,18 @@
 		<p>Get the local transformation matrix of the defined instance.</p>
 
 		<h3>
+			[method:undefined getMorphAt]( [param:Integer index], [param:Mesh mesh] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>
+			[page:Mesh mesh]: The [page:Mesh.morphTargetInfluences .morphTargetInfluences] property of this mesh will be filled with the morph target weights of the defined instance.
+		</p>
+		<p>Get the morph target weights of the defined instance.</p>
+
+		<h3>
 			[method:undefined setColorAt]( [param:Integer index], [param:Color color] )
 		</h3>
 		<p>
@@ -161,6 +179,23 @@
 			Sets the given local transformation matrix to the defined instance. Make
 			sure you set [page:.instanceMatrix][page:BufferAttribute.needsUpdate .needsUpdate] 
 			to true after updating all the matrices.
+		</p>
+
+		<h3>
+			[method:undefined setMorphAt]( [param:Integer index], [param:Mesh mesh] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>
+			[page:Matrix4 matrix]: A mesh with [page:Mesh.morphTargetInfluences .morphTargetInfluences] property containing the morph target weights
+			of a single instance.
+		</p>
+		<p>
+			Sets the morph target weights to the defined instance. Make
+			sure you set [page:.morphTexture][page:Texture.needsUpdate .needsUpdate] 
+			to true after updating all the influences.
 		</p>
 
 		<h2>Source</h2>

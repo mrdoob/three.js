@@ -1,3 +1,5 @@
+import ClippingContext from "./ClippingContext.js";
+
 let id = 0;
 
 export default class RenderObject {
@@ -24,6 +26,11 @@ export default class RenderObject {
 		this.pipeline = null;
 		this.vertexBuffers = null;
 
+		this.updateClipping( renderContext.clippingContext );
+
+		this.clippingContextVersion = this.clippingContext.version;
+
+		this.initialNodesCacheKey = this.getNodesCacheKey();
 		this.initialCacheKey = this.getCacheKey();
 
 		this._nodeBuilderState = null;
@@ -40,6 +47,41 @@ export default class RenderObject {
 		};
 
 		this.material.addEventListener( 'dispose', this.onMaterialDispose );
+
+	}
+
+	updateClipping( parent ) {
+
+		const material = this.material;
+
+		let clippingContext = this.clippingContext;
+
+		if ( Array.isArray( material.clippingPlanes ) ) {
+
+			if ( clippingContext === parent || ! clippingContext ) {
+
+				clippingContext = new ClippingContext();
+				this.clippingContext = clippingContext;
+
+			}
+
+			clippingContext.update( parent, material );
+
+		} else if ( this.clippingContext !== parent ) {
+
+			this.clippingContext = parent;
+
+		}
+
+	}
+
+	clippingNeedsUpdate () {
+
+		if ( this.clippingContext.version === this.clippingContextVersion ) return false;
+
+		this.clippingContextVersion = this.clippingContext.version;
+
+		return true;
 
 	}
 
@@ -81,6 +123,8 @@ export default class RenderObject {
 
 			const attribute = nodeAttribute.node && nodeAttribute.node.attribute ? nodeAttribute.node.attribute : geometry.getAttribute( nodeAttribute.name );
 
+			if ( attribute === undefined ) continue;
+
 			attributes.push( attribute );
 
 			const bufferAttribute = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
@@ -105,7 +149,7 @@ export default class RenderObject {
 
 	getMaterialCacheKey() {
 
-		const material = this.material;
+		const { object, material } = this;
 
 		let cacheKey = material.customProgramCacheKey();
 
@@ -128,7 +172,27 @@ export default class RenderObject {
 
 		}
 
+		cacheKey += this.clippingContextVersion + ',';
+
+		if ( object.skeleton ) {
+
+			cacheKey += object.skeleton.bones.length + ',';
+
+		}
+
+		if ( object.morphTargetInfluences ) {
+
+			cacheKey += object.morphTargetInfluences.length + ',';
+
+		}
+
 		return cacheKey;
+
+	}
+
+	get needsUpdate() {
+
+		return this.initialNodesCacheKey !== this.getNodesCacheKey();
 
 	}
 
@@ -142,7 +206,7 @@ export default class RenderObject {
 
 	getCacheKey() {
 
-		return `{material:${ this.getMaterialCacheKey() },nodes:${ this.getNodesCacheKey()}`;
+		return this.getMaterialCacheKey() + ',' + this.getNodesCacheKey();
 
 	}
 

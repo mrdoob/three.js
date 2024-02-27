@@ -1,4 +1,4 @@
-export const REVISION = '157dev';
+export const REVISION = '162dev';
 
 export const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -13,7 +13,6 @@ export const VSMShadowMap = 3;
 export const FrontSide = 0;
 export const BackSide = 1;
 export const DoubleSide = 2;
-export const TwoPassDoubleSide = 2; // r149
 export const NoBlending = 0;
 export const NormalBlending = 1;
 export const AdditiveBlending = 2;
@@ -36,6 +35,10 @@ export const OneMinusDstAlphaFactor = 207;
 export const DstColorFactor = 208;
 export const OneMinusDstColorFactor = 209;
 export const SrcAlphaSaturateFactor = 210;
+export const ConstantColorFactor = 211;
+export const OneMinusConstantColorFactor = 212;
+export const ConstantAlphaFactor = 213;
+export const OneMinusConstantAlphaFactor = 214;
 export const NeverDepth = 0;
 export const AlwaysDepth = 1;
 export const LessDepth = 2;
@@ -53,6 +56,10 @@ export const ReinhardToneMapping = 2;
 export const CineonToneMapping = 3;
 export const ACESFilmicToneMapping = 4;
 export const CustomToneMapping = 5;
+export const AgXToneMapping = 6;
+export const NeutralToneMapping = 7;
+export const AttachedBindMode = 'attached';
+export const DetachedBindMode = 'detached';
 
 export const UVMapping = 300;
 export const CubeReflectionMapping = 301;
@@ -142,10 +149,6 @@ export const AdditiveAnimationBlendMode = 2501;
 export const TrianglesDrawMode = 0;
 export const TriangleStripDrawMode = 1;
 export const TriangleFanDrawMode = 2;
-/** @deprecated Use LinearSRGBColorSpace or NoColorSpace in three.js r152+. */
-export const LinearEncoding = 3000;
-/** @deprecated Use SRGBColorSpace in three.js r152+. */
-export const sRGBEncoding = 3001;
 export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;
 export const TangentSpaceNormalMap = 0;

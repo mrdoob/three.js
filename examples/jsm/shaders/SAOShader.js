@@ -8,12 +8,16 @@ import {
  */
 
 const SAOShader = {
+
+	name: 'SAOShader',
+
 	defines: {
 		'NUM_SAMPLES': 7,
 		'NUM_RINGS': 4,
 		'DIFFUSE_TEXTURE': 0,
 		'PERSPECTIVE_CAMERA': 1
 	},
+
 	uniforms: {
 
 		'tDepth': { value: null },
@@ -34,6 +38,7 @@ const SAOShader = {
 		'kernelRadius': { value: 100.0 },
 		'randomSeed': { value: 0.0 }
 	},
+
 	vertexShader: /* glsl */`
 
 		varying vec2 vUv;
@@ -44,7 +49,6 @@ const SAOShader = {
 		}`,
 
 	fragmentShader: /* glsl */`
-
 		#include <common>
 
 		varying vec2 vUv;
@@ -53,8 +57,8 @@ const SAOShader = {
 		uniform sampler2D tDiffuse;
 		#endif
 
-		uniform sampler2D tDepth;
-		uniform sampler2D tNormal;
+		uniform highp sampler2D tDepth;
+		uniform highp sampler2D tNormal;
 
 		uniform float cameraNear;
 		uniform float cameraFar;

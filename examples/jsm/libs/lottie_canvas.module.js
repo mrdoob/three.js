@@ -1,3 +1,7 @@
+const lottie = {};
+
+if (typeof document !== 'undefined') {
+
 const svgNS = 'http://www.w3.org/2000/svg';
 
 let locationHref = '';
@@ -4547,7 +4551,6 @@ const Matrix = (function () {
   };
 }());
 
-const lottie = {};
 var standalone = '__[STANDALONE]__';
 var animationData = '__[ANIMATIONDATA]__';
 var renderer = '';
@@ -14840,5 +14843,7 @@ function initialize() {
 setExpressionsPlugin(Expressions);
 initialize$1();
 initialize();
+
+}
 
 export { lottie as default };

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	[page:OrbitControls] &rarr;
+
+	<h1>地图控制器([name])</h1>
+
+	<p class="desc">
+		[name] 旨在从鸟瞰角度在地图上转换相机。该类与 [page:OrbitControls] 共享其实现，但使用特定的预设进行鼠标/触摸交互，并默认禁用屏幕空间平移。
+	</p>
+
+	<h2>引入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons].
+	</p>
+
+	<code>
+			import { MapControls } from 'three/addons/controls/MapControls.js';
+		</code>
+
+	<h2>代码示例</h2>
+
+	<code>
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		const scene = new THREE.Scene();
+
+		const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+		camera.position.set( 0, 20, 100 );
+
+		const controls = new MapControls( camera, renderer.domElement );
+		controls.enableDamping = true;
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			// required if controls.enableDamping or controls.autoRotate are set to true
+			controls.update();
+
+			renderer.render( scene, camera );
+
+		}
+		</code>
+
+	<h2>例子</h2>
+
+	<p>[example:misc_controls_map misc / controls / map ]</p>
+
+	<h2>构造函数</h2>
+
+	<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
+	<p>
+		[page:Camera object]：（必填）要控制的相机。相机不能是另一个对象的子对象，除非该对象是场景本身。<br><br>
+
+		[page:HTMLDOMElement domElement]： 用于事件侦听器的 HTML 元素。
+	</p>
+
+	<h2>事件</h2>
+
+	<p>有关常见事件，请参阅 [page:OrbitControls] 基类。</p>
+
+	<h2>属性</h2>
+
+	<p>有关常见属性，请参阅 [page:OrbitControls] 基类。</p>
+
+	<h3>
+		[property:Object mouseButtons]</h3>
+	<p>
+		该对象包含对控件使用的鼠标操作的引用。
+		<code>
+controls.mouseButtons = {
+	LEFT: THREE.MOUSE.PAN,
+	MIDDLE: THREE.MOUSE.DOLLY,
+	RIGHT: THREE.MOUSE.ROTATE
+}
+			</code>
+	</p>
+
+	<h3>[property:Boolean screenSpacePanning]</h3>
+	<p>
+		定义平移时摄像机位置的平移方式。如果为 true，相机将在屏幕空间中平移。否则，摄像机将在与摄像机向上方向正交的平面中平移。默认为 `false`。
+	</p>
+
+	<h3>[property:Object touches]</h3>
+	<p>
+		该对象包含对控件使用的触摸操作的引用。
+		<code>
+controls.touches = {
+	ONE: THREE.TOUCH.PAN,
+	TWO: THREE.TOUCH.DOLLY_ROTATE
+}
+			</code>
+	</p>
+
+	<h2>方法</h2>
+
+	<p>有关常用方法，请参阅 [page:OrbitControls]。</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/MapControls.js examples/jsm/controls/MapControls.js]
+	</p>
+</body>
+
+</html>

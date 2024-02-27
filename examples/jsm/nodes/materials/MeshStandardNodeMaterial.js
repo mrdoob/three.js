@@ -29,36 +29,36 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructLightingModel( /*builder*/ ) {
+	setupLightingModel( /*builder*/ ) {
 
-		return new PhysicalLightingModel( false, false ); // ( clearcoat, sheen ) -> standard
+		return new PhysicalLightingModel();
 
 	}
 
-	constructVariants( { stack } ) {
+	setupVariants() {
 
 		// METALNESS
 
 		const metalnessNode = this.metalnessNode ? float( this.metalnessNode ) : materialMetalness;
 
-		stack.assign( metalness, metalnessNode );
+		metalness.assign( metalnessNode );
 
 		// ROUGHNESS
 
 		let roughnessNode = this.roughnessNode ? float( this.roughnessNode ) : materialRoughness;
 		roughnessNode = getRoughness( { roughness: roughnessNode } );
 
-		stack.assign( roughness, roughnessNode );
+		roughness.assign( roughnessNode );
 
 		// SPECULAR COLOR
 
 		const specularColorNode = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessNode );
 
-		stack.assign( specularColor, specularColorNode );
+		specularColor.assign( specularColorNode );
 
 		// DIFFUSE COLOR
 
-		stack.assign( diffuseColor, vec4( diffuseColor.rgb.mul( metalnessNode.oneMinus() ), diffuseColor.a ) );
+		diffuseColor.assign( vec4( diffuseColor.rgb.mul( metalnessNode.oneMinus() ), diffuseColor.a ) );
 
 	}
 
@@ -77,4 +77,4 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 export default MeshStandardNodeMaterial;
 
-addNodeMaterial( MeshStandardNodeMaterial );
+addNodeMaterial( 'MeshStandardNodeMaterial', MeshStandardNodeMaterial );

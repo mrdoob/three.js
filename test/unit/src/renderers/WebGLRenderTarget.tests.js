@@ -94,6 +94,12 @@ export default QUnit.module( 'Renderers', () => {
 
 		} );
 
+		QUnit.todo( 'textures', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		// PUBLIC
 		QUnit.todo( 'isWebGLRenderTarget', ( assert ) => {
 

@@ -25,6 +25,7 @@ void main() {
 	#endif
 
 	#include <color_vertex>
+	#include <morphinstance_vertex>
 	#include <morphcolor_vertex>
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
@@ -63,10 +64,10 @@ uniform float opacity;
 
 void main() {
 
+	vec4 diffuseColor = vec4( diffuse, opacity );
 	#include <clipping_planes_fragment>
 
 	vec3 outgoingLight = vec3( 0.0 );
-	vec4 diffuseColor = vec4( diffuse, opacity );
 
 	#include <logdepthbuf_fragment>
 	#include <map_particle_fragment>

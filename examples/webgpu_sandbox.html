@@ -11,8 +11,6 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Sandbox
 		</div>
 
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -76,9 +74,9 @@
 				textureDisplace.wrapS = THREE.RepeatWrapping;
 				textureDisplace.wrapT = THREE.RepeatWrapping;
 
-				const ktxLoader = new KTX2Loader()
+				const ktxLoader = await new KTX2Loader()
 					.setTranscoderPath( 'jsm/libs/basis/' )
-					.detectSupport( renderer );
+					.detectSupportAsync( renderer );
 
 				const ktxTexture = await ktxLoader.loadAsync( './textures/compressed/sample_uastc_zstd.ktx2' );
 
@@ -198,7 +196,7 @@
 			function animate() {
 
 				if ( box ) {
-			
+
 					box.rotation.x += 0.01;
 					box.rotation.y += 0.02;
 

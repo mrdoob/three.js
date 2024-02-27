@@ -13,7 +13,7 @@ class ConstNode extends InputNode {
 
 	generateConst( builder ) {
 
-		return builder.getConst( this.getNodeType( builder ), this.value );
+		return builder.generateConst( this.getNodeType( builder ), this.value );
 
 	}
 
@@ -29,4 +29,4 @@ class ConstNode extends InputNode {
 
 export default ConstNode;
 
-addNodeClass( ConstNode );
+addNodeClass( 'ConstNode', ConstNode );

@@ -55,6 +55,26 @@ async function RapierPhysics() {
 	const _quaternion = new Quaternion();
 	const _matrix = new Matrix4();
 
+	function addScene( scene ) {
+
+		scene.traverse( function ( child ) {
+
+			if ( child.isMesh ) {
+
+				const physics = child.userData.physics;
+
+				if ( physics ) {
+
+					addMesh( child, physics.mass, physics.restitution );
+
+				}
+
+			}
+
+		} );
+
+	}
+
 	function addMesh( mesh, mass = 0, restitution = 0 ) {
 
 		const shape = getCollider( mesh.geometry );
@@ -189,6 +209,7 @@ async function RapierPhysics() {
 	setInterval( step, 1000 / frameRate );
 
 	return {
+		addScene: addScene,
 		addMesh: addMesh,
 		setMeshPosition: setMeshPosition,
 		setMeshVelocity: setMeshVelocity

@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -127,9 +123,9 @@ the background.</p>
 it, draw it from the inside. On each side of the cube put a texture (using
 texture coordinates) that looks like some image of the horizon. It's also often
 common to use a sky sphere or a sky dome with a texture drawn on it. You can
-probably figure that one out on your own. Just make a cube or sphere, 
-<a href="textures.html">apply a texture</a>, mark it as <code class="notranslate" translate="no">THREE.BackSide</code> so we 
-render the inside instead of the outside, and either put it in your scene directly 
+probably figure that one out on your own. Just make a cube or sphere,
+<a href="textures.html">apply a texture</a>, mark it as <code class="notranslate" translate="no">THREE.BackSide</code> so we
+render the inside instead of the outside, and either put it in your scene directly
 or like above, or, make 2 scenes, a special one to draw the skybox/sphere/dome and the
 normal one to draw everything else. You'd use your normal <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a> to
 draw. No need for the <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a>.</p>
@@ -254,7 +250,7 @@ to a cubemap beforehand. <a href="https://matheowis.github.io/HDRI-to-CubeMap/">
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

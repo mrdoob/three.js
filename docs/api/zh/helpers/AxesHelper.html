@@ -29,22 +29,31 @@
 			[example:webgl_loader_nrrd WebGL / loader / nrrd]
 		</p>
 
-		<h2>构造函数</h2>
-
-
+		<h2>构造函数（Constructor）</h2>
 		<h3>[name]( [param:Number size] )</h3>
 		<p>
-		[page:Number size] -- (可选的) 表示代表轴的线段长度. 默认为 *1*.
+		[page:Number size] -- (可选的) 表示代表轴的线段长度. 默认为 `1`.
 		</p>
 
-		<h2>属性</h2>
+		<h2>属性（Properties）</h2>
 		<p>请到基类 [page:LineSegments] 页面查看公共属性.</p>
 
-		<h2>方法</h2>
+		<h2>方法（Methods）</h2>
 		<p>请到基类 [page:LineSegments] 页面查看公共方法.</p>
 
-		<h2>源码</h2>
+		<h3>
+			[method:this setColors]( [param:Color xAxisColor], [param:Color yAxisColor], [param:Color zAxisColor] )
+		</h3>
+		<p>
+			将轴颜色设置为 [page:Color xAxisColor], [page:Color yAxisColor],[page:Color zAxisColor]。
+		</p>
 
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			释放此实例分配的GPU相关资源。每当应用程序中不再使用此实例时，请调用此方法。
+		</p>
+
+		<h2>源码（Source）</h2>
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 		</p>

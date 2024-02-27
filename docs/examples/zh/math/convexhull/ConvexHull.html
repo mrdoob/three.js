@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>凸包([name])</h1>
+
+	<p class="desc">
+		凸包类。Quickhull 算法的实现者： Dirk Gregorius。2014 年 3 月，游戏开发者大会：
+		[link:http://media.steampowered.com/apps/valve/2014/DirkGregorius_ImplementingQuickHull.pdf Implementing QuickHull]
+	</p>
+
+	<h2>引入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons].
+	</p>
+
+	<code>
+			import { ConvexHull } from 'three/addons/math/ConvexHull.js';
+		</code>
+
+
+	<h2>构造函数</h2>
+
+
+	<h3>[name]()</h3>
+	<p>
+		创建一个 [name] 实例。
+	</p>
+
+	<h2>属性</h2>
+
+	<h3>[property:VertexList assigned]</h3>
+	<p>
+		该 [page:VertexList vertex list] 包含分配给面的所有顶点。默认是一个空的顶点列表。
+	</p>
+
+	<h3>[property:Array faces]</h3>
+	<p>
+		生成的凸包面。默认是一个空数组。
+	</p>
+
+	<h3>[property:Array newFaces]</h3>
+	<p>
+		该数组保存在单次迭代中生成的面。默认是一个空数组。
+	</p>
+
+	<h3>[property:Float tolerance]</h3>
+	<p>
+		用于内部比较运算的 epsilon 值。该值的计算取决于几何形状的大小。默认值为 -1。
+	</p>
+
+	<h3>[property:VertexList unassigned]</h3>
+	<p>
+		该 [page:VertexList vertex list] 包含未分配给面的所有顶点。默认是一个空的顶点列表。
+	</p>
+
+	<h3>[property:Array vertices]</h3>
+	<p>
+		给定几何数据的内部表示（ [page:VertexNode vertices] 数组）。
+	</p>
+
+	<h2>方法</h2>
+
+	<h3>[method:HalfEdge addAdjoiningFace]( [param:VertexNode eyeVertex], [param:HalfEdge horizonEdge] )</h3>
+	<p>
+		[page:VertexNode eyeVertex] - 添加到凸包的顶点。<br />
+		[page:HalfEdge horizonEdge] - 地平线的单个边缘。<br /><br />
+
+
+		创建一个面，顶点顺序为 'eyeVertex.point'、'horizonEdge.tail' 和 'horizonEdge.head'，顺序为逆时针（CCW）。所有半边按照逆时针顺序创建，因此该面始终指向凸包的外部。
+	</p>
+
+	<h3>[method:this addNewFaces]( [param:VertexNode eyeVertex], [param:HalfEdge horizonEdge] )</h3>
+	<p>
+		[page:VertexNode eyeVertex] - 添加到凸包的顶点。<br />
+		[page:HalfEdge horizon] - 形成地平线的半边数组。<br /><br />
+
+		将 'horizon.length' 个面添加到凸包，每个面将与地平线上的相对面以及左/右相邻的面连接。
+	</p>
+
+	<h3>[method:this addVertexToFace]( [param:VertexNode vertex], [param:Face face] )</h3>
+	<p>
+		[page:VertexNodeNode vertex] - 要添加的顶点。<br />
+		[page:Face face] - 目标面。<br /><br />
+
+		将一个顶点添加到 “分配(assigned)” 顶点列表，并将其分配给给定的面。
+	</p>
+
+	<h3>[method:this addVertexToHull]( [param:VertexNode eyeVertex] )</h3>
+	<p>
+		[page:VertexNode eyeVertex] - 添加到凸包的顶点。<br /><br />
+
+		使用以下算法向凸包添加顶点：
+	<ul>
+		<li>计算“地平线”，这是一系列半边。要使一条边属于这个组，它必须是连接一个能够看到 'eyeVertex' 的面和一个不能看到 'eyeVertex' 的面的边。</li>
+		<li>所有能够看到 'eyeVertex' 的面都会从已分配顶点列表中移除其可见的顶点。</li>
+		<li>使用“地平线”和 'eyeVertex' 的每条边创建一组新的面。每个面都与相对的地平线面以及左/右相邻的面连接。</li>
+		<li>从所有可见面中移除的顶点将被分配给新的面，如果可能的话。</li>
+	</ul>
+	</p>
+
+	<h3>[method:this cleanup]()</h3>
+
+	<p>计算凸包后清理内部属性。</p>
+
+	<h3>[method:this compute]()</h3>
+
+	<p>开始执行快速凸包算法。</p>
+
+	<h3>[method:Object computeExtremes]()</h3>
+
+	<p>计算将用于计算初始凸包的极值（最小/最大向量）。</p>
+
+	<h3>[method:this computeHorizon]( [param:Vector3 eyePoint], [param:HalfEdge crossEdge], [param:Face face],
+		[param:Array horizon] )</h3>
+	<p>
+		[page:Vector3 eyePoint] - 点的 3D 坐标。<br />
+		[page:HalfEdge crossEdge] - 用于跳转到当前面的边。<br />
+		[page:Face face] - 当前正在测试的面。<br />
+		[page:Array horizon] - 按 CCW 顺序构成地平线一部分的边。<br /><br />
+
+
+		计算一个逆时针(CCW)顺序的半边链，称为“地平线”（'horizon'）。要使一条边成为地平线的一部分，它必须连接一个能够看到 'eyePoint' 的面和一个不能看到 'eyePoint' 的面。
+	</p>
+
+	<h3>[method:this computeInitialHull]()</h3>
+
+	<p>计算初始的单纯形，将所有可能成为凸包一部分的点分配给其面。
+	</p>
+
+	<h3>[method:this containsPoint]( [param:Vector3 point] )</h3>
+	<p>
+		[page:Vector3 point] - 3D 空间中的一个点。<br /><br />
+
+		返回 `true` 如果定点在此凸包内。
+	</p>
+
+	<h3>[method:this deleteFaceVertices]( [param:Face face], [param:Face absorbingFace] )</h3>
+	<p>
+		[page:Face face] - 给定的面。<br />
+		[page:Face absorbingFace] - 尝试吸收第一个面的顶点的可选面。<br /><br />
+
+		删除 “面(face)” 能够看到的所有可见顶点。
+	<ul>
+		<li>如果 'absorbingFace' 不存在，则所有已移除的顶点将被添加到 'unassigned' 顶点列表。
+		</li>
+		<li>如果 'absorbingFace' 存在，则该方法将分配所有 'face' 中可以看到 'absorbingFace' 的顶点。
+		</li>
+		<li>如果一个顶点不能看到 'absorbingFace'，则将其添加到 'unassigned' 顶点列表。</li>
+	</ul>
+	</p>
+
+	<h3>[method:Vector3 intersectRay]( [param:Ray ray], [param:Vector3 target] )</h3>
+	<p>
+		[page:Ray ray] - 给定的射线。<br />
+		[page:Vector3 target] - 表示交点的目标向量。<br /><br />
+
+		与该凸包执行光线相交测试。如果没有找到交集则返回 `null`。
+	</p>
+
+	<h3>[method:Boolean intersectsRay]( [param:Ray ray] )</h3>
+	<p>
+		[page:Ray ray] - 给定的射线。<br /><br />
+
+		返回给的射线是否与此凸包相交，如果相交则返回 `true`。
+	</p>
+
+	<h3>[method:this makeEmpty]()</h3>
+
+	<p>使这个凸包为空。</p>
+
+	<h3>[method:VertexNode nextVertexToAdd]()</h3>
+
+	<p>查找下一个顶点以使用当前凸包创建面。
+	<ul>
+		<li>让初始面成为存在于“已分配(assigned)”顶点列表中的第一个面。</li>
+		<li>如果面不存在则返回，因为没有顶点剩下。</li>
+		<li>否则，对于面能看到的每个顶点，找到距离它最远的那个。</li>
+	</ul>
+	</p>
+
+	<h3>[method:this reindexFaces]()</h3>
+
+	<p>从内部面列表中移除不活跃的（例如已删除的）面。</p>
+
+	<h3>[method:VertexNode removeAllVerticesFromFace]( [param:Face face] )</h3>
+	<p>
+		[page:Face face] - 给定的面。<br /><br />
+
+		移除给定面能够看到的所有可见顶点，这些顶点存储在“已分配(assigned)”顶点列表中。
+	</p>
+
+	<h3>[method:this removeVertexFromFace]( [param:VertexNode vertex], [param:Face face] )</h3>
+	<p>
+		[page:VertexNode vertex] - 要删除的顶点。<br />
+		[page:Face face] - 目标面。<br /><br />
+
+		从“已分配”顶点列表和给定面中移除一个顶点。在移除后，它还确保从“面”到它在“已分配”中看到的第一个顶点的链接被正确连接。
+	</p>
+
+	<h3>[method:this resolveUnassignedPoints]( [param:Array newFaces] )</h3>
+	<p>
+		[page:Face newFaces] - 一组新的面。<br /><br />
+
+		尽可能从未分配的顶点列表中重新分配顶点给新的面。
+	</p>
+
+	<h3>[method:this setFromObject]( [param:Object3D object] )</h3>
+	<p>
+		[page:Object3D object] - 用于计算凸包的 [page:Object3D]<br /><br />
+
+		计算 [page:Object3D] 的凸包（包括其子元素），考虑到对象及其子元素的世界变换。
+	</p>
+
+	<h3>[method:this setFromPoints]( [param:Array points] )</h3>
+	<p>
+		[page:Array points] - 生成的凸包将包含的 [page:Vector3 Vector3s] 数组<br /><br />
+
+		计算给定点数组的凸包。
+	</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/ConvexHull.js examples/jsm/math/ConvexHull.js]
+	</p>
+</body>
+
+</html>

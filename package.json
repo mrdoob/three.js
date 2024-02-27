@@ -1,9 +1,9 @@
 {
   "name": "three",
-  "version": "0.156.0",
+  "version": "0.161.0",
   "description": "JavaScript 3D library",
   "type": "module",
-  "main": "./build/three.js",
+  "main": "./build/three.cjs",
   "module": "./build/three.module.js",
   "exports": {
     ".": {
@@ -12,6 +12,7 @@
     },
     "./examples/fonts/*": "./examples/fonts/*",
     "./examples/jsm/*": "./examples/jsm/*",
+    "./addons": "./examples/jsm/Addons.js",
     "./addons/*": "./examples/jsm/*",
     "./src/*": "./src/*",
     "./nodes": "./examples/jsm/nodes/Nodes.js"
@@ -20,7 +21,7 @@
     "type": "git",
     "url": "https://github.com/mrdoob/three.js"
   },
-  "sideEffects": false,
+  "sideEffects": ["./examples/jsm/nodes/**/*"],
   "files": [
     "build",
     "examples/jsm",
@@ -43,7 +44,8 @@
     "test": "npm run lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
     "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
-    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080 --ssl\"",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
+    "dev-ssl": "concurrently --names \"ROLLUP,HTTPS\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080 --ssl\"",
     "lint-core": "eslint src",
     "lint-addons": "eslint examples/jsm --ext .js --ignore-pattern libs --ignore-pattern ifc",
     "lint-examples": "eslint examples --ext .html",
@@ -59,6 +61,7 @@
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
+    "test-circular-deps": "dpdm --no-warning --no-tree --exit-code circular:1 examples/jsm/nodes/Nodes.js",
     "make-screenshot": "node test/e2e/puppeteer.js --make"
   },
   "keywords": [
@@ -84,23 +87,23 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@puppeteer/browsers": "^1.4.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-terser": "^0.4.0",
     "chalk": "^5.2.0",
     "concurrently": "^8.0.1",
+    "dpdm": "^3.14.0",
     "eslint": "^8.37.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-compat": "^4.1.2",
-    "eslint-plugin-html": "^7.1.0",
+    "eslint-plugin-html": "^8.0.0",
     "eslint-plugin-import": "^2.27.5",
     "failonlyreporter": "^1.0.0",
     "jimp": "^0.22.7",
     "magic-string": "^0.30.0",
     "pixelmatch": "^5.3.0",
-    "puppeteer-core": "^19.8.1",
+    "puppeteer": "^22.0.0",
     "qunit": "^2.19.4",
-    "rollup": "^3.20.2",
+    "rollup": "^4.6.0",
     "rollup-plugin-filesize": "^10.0.0",
     "rollup-plugin-visualizer": "^5.9.0",
     "servez": "^2.0.0"

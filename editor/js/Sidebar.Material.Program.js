@@ -6,10 +6,11 @@ function SidebarMaterialProgram( editor, property ) {
 	const strings = editor.strings;
 
 	let object = null;
+	let materialSlot = null;
 	let material = null;
 
 	const container = new UIRow();
-	container.add( new UIText( strings.getKey( 'sidebar/material/program' ) ).setWidth( '90px' ) );
+	container.add( new UIText( strings.getKey( 'sidebar/material/program' ) ).setClass( 'Label' ) );
 
 	const programInfo = new UIButton( strings.getKey( 'sidebar/material/info' ) );
 	programInfo.setMarginRight( '4px' );
@@ -38,12 +39,15 @@ function SidebarMaterialProgram( editor, property ) {
 	} );
 	container.add( programFragment );
 
-	function update() {
+	function update( currentObject, currentMaterialSlot = 0 ) {
+
+		object = currentObject;
+		materialSlot = currentMaterialSlot;
 
 		if ( object === null ) return;
 		if ( object.material === undefined ) return;
 
-		material = object.material;
+		material = editor.getObjectMaterial( object, materialSlot );
 
 		if ( property in material ) {
 
@@ -59,14 +63,7 @@ function SidebarMaterialProgram( editor, property ) {
 
 	//
 
-	signals.objectSelected.add( function ( selected ) {
-
-		object = selected;
-
-		update();
-
-	} );
-
+	signals.objectSelected.add( update );
 	signals.materialChanged.add( update );
 
 	return container;

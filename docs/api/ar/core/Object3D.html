@@ -143,12 +143,42 @@
 			أو [page:Bone] ليست قابلة للتقديم وبالتالي لا يتم تنفيذ هذا الرد الاتصال
 			لمثل هذه الكائنات.
 		</p>
+
+		<h3>[property:Function onAfterShadow]</h3>
+		<p>
+			An optional callback that is executed immediately after a 3D object is
+			rendered to a shadow map. This function is called with the following parameters: renderer,
+			scene, camera, shadowCamera, geometry, depthMaterial, group.
+		</p>
+		<p>
+			يرجى ملاحظة أن هذا الرد الاتصال يتم تنفيذه فقط لـ `renderable` 3D
+			كائنات. معنى كائنات ثلاثية الأبعاد التي تحدد مظهرها المرئي مع
+			الهندسة والمواد مثل نسخ [page:Mesh]، [page:Line]،
+			[page:Points] أو [page:Sprite]. نسخ من [page:Object3D]، [page:Group]
+			أو [page:Bone] ليست قابلة للتقديم وبالتالي لا يتم تنفيذ هذا الرد الاتصال
+			لمثل هذه الكائنات.
+		</p>
 			 
 		<h3>[property:Function onBeforeRender]</h3>
 		<p>
 			رد اتصال اختياري يتم تنفيذه مباشرة قبل تقديم كائن ثلاثي الأبعاد
 			. يتم استدعاء هذه الوظيفة بالمعلمات التالية: renderer,
 			scene, camera, geometry, material, group.
+		</p>
+		<p>
+			يرجى ملاحظة أن هذا الرد الاتصال يتم تنفيذه فقط لـ `renderable` 3D
+			كائنات. معنى كائنات ثلاثية الأبعاد التي تحدد مظهرها المرئي مع
+			الهندسة والمواد مثل نسخ [page:Mesh]، [page:Line]،
+			[page:Points] أو [page:Sprite]. نسخ من [page:Object3D]، [page:Group]
+			أو [page:Bone] ليست قابلة للتقديم وبالتالي لا يتم تنفيذ هذا الرد الاتصال
+			لمثل هذه الكائنات.
+		</p>
+
+		<h3>[property:Function onBeforeShadow]</h3>
+		<p>
+			An optional callback that is executed immediately before a 3D object is
+			rendered to a shadow map. This function is called with the following parameters: renderer,
+			scene, camera, shadowCamera, geometry, depthMaterial, group.
 		</p>
 		<p>
 			يرجى ملاحظة أن هذا الرد الاتصال يتم تنفيذه فقط لـ `renderable` 3D
@@ -322,11 +352,14 @@
 			معطى.
 		</p>
 			 
-		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value] )</h3>
+		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value], [param:Array optionalTarget] )</h3>
 		<p>
 			name -- اسم الخاصية التي يتم البحث عنها. <br />
-			value -- قيمة الخاصية المعطاة. <br /><br />
-			 
+			value -- قيمة الخاصية المعطاة. <br />
+			optionalTarget -- (optional) target to set the result.
+			Otherwise a new Array is instantiated. If set, you must clear this
+			array prior to each call (i.e., array.length = 0;). <br /><br />
+
 			يبحث في كائن وأطفاله، بدءًا من الكائن
 			نفسه، ويرجع جميع الكائنات مع خاصية تطابق القيمة
 			معطى.

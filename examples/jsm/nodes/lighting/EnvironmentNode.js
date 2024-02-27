@@ -1,6 +1,7 @@
 import LightingNode from './LightingNode.js';
 import { cache } from '../core/CacheNode.js';
 import { context } from '../core/ContextNode.js';
+import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 import { roughness, clearcoatRoughness } from '../core/PropertyNode.js';
 import { equirectUV } from '../utils/EquirectUVNode.js';
 import { specularMIPLevel } from '../utils/SpecularMIPLevelNode.js';
@@ -8,7 +9,7 @@ import { cameraViewMatrix } from '../accessors/CameraNode.js';
 import { transformedClearcoatNormalView, transformedNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { float, vec2 } from '../shadernode/ShaderNode.js';
+import { vec2 } from '../shadernode/ShaderNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { reference } from '../accessors/ReferenceNode.js';
 
@@ -24,10 +25,9 @@ class EnvironmentNode extends LightingNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		let envNode = this.envNode;
-		const properties = builder.getNodeProperties( this );
 
 		if ( envNode.isTextureNode && envNode.value.isCubeTexture !== true ) {
 
@@ -79,11 +79,6 @@ class EnvironmentNode extends LightingNode {
 
 		}
 
-		//
-
-		properties.radiance = isolateRadiance;
-		properties.irradiance = irradiance;
-
 	}
 
 }
@@ -94,7 +89,7 @@ const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 	let textureUVNode = null;
 
 	return {
-		getUVNode: ( textureNode ) => {
+		getUV: ( textureNode ) => {
 
 			let node = null;
 
@@ -127,12 +122,12 @@ const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 			return node;
 
 		},
-		getSamplerLevelNode: () => {
+		getTextureLevel: () => {
 
 			return roughnessNode;
 
 		},
-		getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => {
+		getTextureLevelAlgorithm: ( textureNode, levelNode ) => {
 
 			return specularMIPLevel( textureNode, levelNode );
 
@@ -146,7 +141,7 @@ const createIrradianceContext = ( normalWorldNode ) => {
 	let textureUVNode = null;
 
 	return {
-		getUVNode: ( textureNode ) => {
+		getUV: ( textureNode ) => {
 
 			let node = null;
 
@@ -172,14 +167,9 @@ const createIrradianceContext = ( normalWorldNode ) => {
 			return node;
 
 		},
-		getSamplerLevelNode: () => {
+		getTextureLevel: ( textureNode ) => {
 
-			return float( 1 );
-
-		},
-		getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => {
-
-			return specularMIPLevel( textureNode, levelNode );
+			return maxMipLevel( textureNode );
 
 		}
 	};
@@ -188,4 +178,4 @@ const createIrradianceContext = ( normalWorldNode ) => {
 
 export default EnvironmentNode;
 
-addNodeClass( EnvironmentNode );
+addNodeClass( 'EnvironmentNode', EnvironmentNode );

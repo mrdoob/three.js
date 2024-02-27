@@ -13,10 +13,6 @@
 
 		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - fat lines</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -70,6 +66,7 @@
 				camera2.position.copy( camera.position );
 
 				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
 				controls.minDistance = 10;
 				controls.maxDistance = 500;
 
@@ -179,6 +176,8 @@
 				renderer.setClearColor( 0x000000, 0 );
 
 				renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
+
+				controls.update();
 
 				// renderer will set this eventually
 				matLine.resolution.set( window.innerWidth, window.innerHeight ); // resolution of the viewport

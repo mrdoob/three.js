@@ -1,5 +1,8 @@
+import { Matrix4 } from '../math/Matrix4.js';
 import { Ray } from '../math/Ray.js';
 import { Layers } from './Layers.js';
+
+const _matrix = /*@__PURE__*/ new Matrix4();
 
 class Raycaster {
 
@@ -50,6 +53,17 @@ class Raycaster {
 			console.error( 'THREE.Raycaster: Unsupported camera type: ' + camera.type );
 
 		}
+
+	}
+
+	setFromXRController( controller ) {
+
+		_matrix.identity().extractRotation( controller.matrixWorld );
+
+		this.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+		this.ray.direction.set( 0, 0, - 1 ).applyMatrix4( _matrix );
+
+		return this;
 
 	}
 

@@ -2,6 +2,7 @@ import { UIPanel, UIRow } from './libs/ui.js';
 
 function MenubarView( editor ) {
 
+	const signals = editor.signals;
 	const strings = editor.strings;
 
 	const container = new UIPanel();
@@ -48,28 +49,57 @@ function MenubarView( editor ) {
 	} );
 	options.add( option );
 
-	// VR (Work in progress)
+	// XR (Work in progress)
 
 	if ( 'xr' in navigator ) {
 
-		navigator.xr.isSessionSupported( 'immersive-vr' )
-			.then( function ( supported ) {
+		if ( 'offerSession' in navigator.xr ) {
 
-				if ( supported ) {
+			signals.offerXR.dispatch( 'immersive-ar' );
 
-					const option = new UIRow();
-					option.setClass( 'option' );
-					option.setTextContent( 'VR' );
-					option.onClick( function () {
+		} else {
 
-						editor.signals.toggleVR.dispatch();
+			navigator.xr.isSessionSupported( 'immersive-ar' )
+				.then( function ( supported ) {
 
-					} );
-					options.add( option );
+					if ( supported ) {
 
-				}
+						const option = new UIRow();
+						option.setClass( 'option' );
+						option.setTextContent( 'AR' );
+						option.onClick( function () {
+
+							signals.enterXR.dispatch( 'immersive-ar' );
+
+						} );
+						options.add( option );
+
+					} else {
+
+						navigator.xr.isSessionSupported( 'immersive-vr' )
+							.then( function ( supported ) {
+
+								if ( supported ) {
+
+									const option = new UIRow();
+									option.setClass( 'option' );
+									option.setTextContent( 'VR' );
+									option.onClick( function () {
+
+										signals.enterXR.dispatch( 'immersive-vr' );
+
+									} );
+									options.add( option );
+
+								}
+
+							} );
+
+					}
 
 			} );
+
+		}
 
 	}
 

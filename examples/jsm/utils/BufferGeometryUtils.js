@@ -311,13 +311,6 @@ function mergeAttributes( attributes ) {
 
 		const attribute = attributes[ i ];
 
-		if ( attribute.isInterleavedBufferAttribute ) {
-
-			console.error( 'THREE.BufferGeometryUtils: .mergeAttributes() failed. InterleavedBufferAttributes are not supported.' );
-			return null;
-
-		}
-
 		if ( TypedArray === undefined ) TypedArray = attribute.array.constructor;
 		if ( TypedArray !== attribute.array.constructor ) {
 
@@ -350,22 +343,41 @@ function mergeAttributes( attributes ) {
 
 		}
 
-		arrayLength += attribute.array.length;
+		arrayLength += attribute.count * itemSize;
 
 	}
 
 	const array = new TypedArray( arrayLength );
+	const result = new BufferAttribute( array, itemSize, normalized );
 	let offset = 0;
 
 	for ( let i = 0; i < attributes.length; ++ i ) {
 
-		array.set( attributes[ i ].array, offset );
+		const attribute = attributes[ i ];
+		if ( attribute.isInterleavedBufferAttribute ) {
 
-		offset += attributes[ i ].array.length;
+			const tupleOffset = offset / itemSize;
+			for ( let j = 0, l = attribute.count; j < l; j ++ ) {
+
+				for ( let c = 0; c < itemSize; c ++ ) {
+
+					const value = attribute.getComponent( j, c );
+					result.setComponent( j + tupleOffset, c, value );
+
+				}
+
+			}
+
+		} else {
+
+			array.set( attribute.array, offset );
+
+		}
+
+		offset += attribute.count * itemSize;
 
 	}
 
-	const result = new BufferAttribute( array, itemSize, normalized );
 	if ( gpuType !== undefined ) {
 
 		result.gpuType = gpuType;
@@ -1345,26 +1357,10 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 
 }
 
-function mergeBufferGeometries( geometries, useGroups = false ) {
-
-	console.warn( 'THREE.BufferGeometryUtils: mergeBufferGeometries() has been renamed to mergeGeometries().' ); // @deprecated, r151
-	return mergeGeometries( geometries, useGroups );
-
-}
-
-function mergeBufferAttributes( attributes ) {
-
-	console.warn( 'THREE.BufferGeometryUtils: mergeBufferAttributes() has been renamed to mergeAttributes().' ); // @deprecated, r151
-	return mergeAttributes( attributes );
-
-}
-
 export {
 	computeMikkTSpaceTangents,
 	mergeGeometries,
-	mergeBufferGeometries,
 	mergeAttributes,
-	mergeBufferAttributes,
 	interleaveAttributes,
 	estimateBytesUsed,
 	mergeVertices,

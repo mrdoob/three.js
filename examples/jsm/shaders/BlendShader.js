@@ -4,6 +4,8 @@
 
 const BlendShader = {
 
+	name: 'BlendShader',
+
 	uniforms: {
 
 		'tDiffuse1': { value: null },

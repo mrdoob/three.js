@@ -3,23 +3,36 @@ import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
 import SplitNode from '../utils/SplitNode.js';
+import SetNode from '../utils/SetNode.js';
 import ConstNode from '../core/ConstNode.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
+
+//
+
+let currentStack = null;
 
 const NodeElements = new Map(); // @TODO: Currently only a few nodes are added, probably also add others
 
 export function addNodeElement( name, nodeElement ) {
 
-	if ( NodeElements.has( name ) ) throw new Error( `Redefinition of node element ${ name }` );
+	if ( NodeElements.has( name ) ) {
+
+		console.warn( `Redefinition of node element ${ name }` );
+		return;
+
+	}
+
 	if ( typeof nodeElement !== 'function' ) throw new Error( `Node element ${ name } is not a function` );
 
 	NodeElements.set( name, nodeElement );
 
 }
 
+const parseSwizzle = ( props ) => props.replace( /r|s/g, 'x' ).replace( /g|t/g, 'y' ).replace( /b|p/g, 'z' ).replace( /a|q/g, 'w' );
+
 const shaderNodeHandler = {
 
-	construct( NodeClosure, params ) {
+	setup( NodeClosure, params ) {
 
 		const inputs = params.shift();
 
@@ -27,15 +40,25 @@ const shaderNodeHandler = {
 
 	},
 
-	get: function ( node, prop, nodeObj ) {
+	get( node, prop, nodeObj ) {
 
 		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
 
-			if ( NodeElements.has( prop ) ) {
+			if ( node.isStackNode !== true && prop === 'assign' ) {
+
+				return ( ...params ) => {
+
+					currentStack.assign( nodeObj, ...params );
+
+					return nodeObj;
+
+				};
+
+			} else if ( NodeElements.has( prop ) ) {
 
 				const nodeElement = NodeElements.get( prop );
 
-				return ( ...params ) => nodeElement( nodeObj, ...params );
+				return node.isStackNode ? ( ...params ) => nodeObj.add( nodeElement( ...params ) ) : ( ...params ) => nodeElement( nodeObj, ...params );
 
 			} else if ( prop === 'self' ) {
 
@@ -45,43 +68,76 @@ const shaderNodeHandler = {
 
 				const nodeElement = NodeElements.get( prop.slice( 0, prop.length - 'Assign'.length ) );
 
-				return ( ...params ) => nodeObj.assign( nodeElement( nodeObj, ...params ) );
+				return node.isStackNode ? ( ...params ) => nodeObj.assign( params[ 0 ], nodeElement( ...params ) ) : ( ...params ) => nodeObj.assign( nodeElement( nodeObj, ...params ) );
 
 			} else if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true ) {
 
 				// accessing properties ( swizzle )
 
-				prop = prop
-					.replace( /r|s/g, 'x' )
-					.replace( /g|t/g, 'y' )
-					.replace( /b|p/g, 'z' )
-					.replace( /a|q/g, 'w' );
+				prop = parseSwizzle( prop );
 
-				return nodeObject( new SplitNode( node, prop ) );
+				return nodeObject( new SplitNode( nodeObj, prop ) );
 
-			} else if ( prop === 'width' || prop === 'height' ) {
+			} else if ( /^set[XYZWRGBASTPQ]{1,4}$/.test( prop ) === true ) {
+
+				// set properties ( swizzle )
+
+				prop = parseSwizzle( prop.slice( 3 ).toLowerCase() );
+
+				// sort to xyzw sequence
+
+				prop = prop.split( '' ).sort().join( '' );
+
+				return ( value ) => nodeObject( new SetNode( node, prop, value ) );
+
+			} else if ( prop === 'width' || prop === 'height' || prop === 'depth' ) {
 
 				// accessing property
 
-				return nodeObject( new SplitNode( node, prop === 'width' ? 'x' : 'y' ) );
+				if ( prop === 'width' ) prop = 'x';
+				else if ( prop === 'height' ) prop = 'y';
+				else if ( prop === 'depth' ) prop = 'z';
+
+				return nodeObject( new SplitNode( node, prop ) );
 
 			} else if ( /^\d+$/.test( prop ) === true ) {
 
 				// accessing array
 
-				return nodeObject( new ArrayElementNode( node, new ConstNode( Number( prop ), 'uint' ) ) );
+				return nodeObject( new ArrayElementNode( nodeObj, new ConstNode( Number( prop ), 'uint' ) ) );
 
 			}
 
 		}
 
-		return node[ prop ];
+		return Reflect.get( node, prop, nodeObj );
+
+	},
+
+	set( node, prop, value, nodeObj ) {
+
+		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
+
+			// setting properties
+
+			if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true || prop === 'width' || prop === 'height' || prop === 'depth' || /^\d+$/.test( prop ) === true ) {
+
+				nodeObj[ prop ].assign( value );
+
+				return true;
+
+			}
+
+		}
+
+		return Reflect.set( node, prop, value, nodeObj );
 
 	}
 
 };
 
 const nodeObjectsCacheMap = new WeakMap();
+const nodeBuilderFunctionsCacheMap = new WeakMap();
 
 const ShaderNodeObject = function ( obj, altType = null ) {
 
@@ -94,6 +150,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 		if ( nodeObject === undefined ) {
 
 			nodeObject = new Proxy( obj, shaderNodeHandler );
+
 			nodeObjectsCacheMap.set( obj, nodeObject );
 			nodeObjectsCacheMap.set( nodeObject, nodeObject );
 
@@ -181,21 +238,14 @@ const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
 };
 
-class ShaderNodeInternal extends Node {
+class ShaderCallNodeInternal extends Node {
 
-	constructor( jsFunc ) {
+	constructor( shaderNode, inputNodes ) {
 
 		super();
 
-		this._jsFunc = jsFunc;
-
-	}
-
-	call( inputs, stack, builder ) {
-
-		inputs = nodeObjects( inputs );
-
-		return nodeObject( this._jsFunc( inputs, stack, builder ) );
+		this.shaderNode = shaderNode;
+		this.inputNodes = inputNodes;
 
 	}
 
@@ -207,13 +257,113 @@ class ShaderNodeInternal extends Node {
 
 	}
 
-	construct( builder ) {
+	call( builder ) {
+
+		const { shaderNode, inputNodes } = this;
+
+		if ( shaderNode.layout ) {
+
+			let functionNodesCacheMap = nodeBuilderFunctionsCacheMap.get( builder.constructor );
+
+			if ( functionNodesCacheMap === undefined ) {
+
+				functionNodesCacheMap = new WeakMap();
+
+				nodeBuilderFunctionsCacheMap.set( builder.constructor, functionNodesCacheMap );
+
+			}
+
+			let functionNode = functionNodesCacheMap.get( shaderNode );
+
+			if ( functionNode === undefined ) {
+
+				functionNode = nodeObject( builder.buildFunctionNode( shaderNode ) );
+
+				functionNodesCacheMap.set( shaderNode, functionNode );
+
+			}
+
+			if ( builder.currentFunctionNode !== null ) {
+
+				builder.currentFunctionNode.includes.push( functionNode );
+
+			}
+
+			return nodeObject( functionNode.call( inputNodes ) );
+
+		}
+
+		const jsFunc = shaderNode.jsFunc;
+		const outputNode = inputNodes !== null ? jsFunc( inputNodes, builder.stack, builder ) : jsFunc( builder.stack, builder );
+
+		return nodeObject( outputNode );
+
+	}
+
+	setup( builder ) {
 
 		builder.addStack();
 
-		builder.stack.outputNode = nodeObject( this._jsFunc( builder.stack, builder ) );
+		builder.stack.outputNode = this.call( builder );
 
 		return builder.removeStack();
+
+	}
+
+	generate( builder, output ) {
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		if ( outputNode === null ) {
+
+			// TSL: It's recommended to use `tslFn` in setup() pass.
+
+			return this.call( builder ).build( builder, output );
+
+		}
+
+		return super.generate( builder, output );
+
+	}
+
+}
+
+class ShaderNodeInternal extends Node {
+
+	constructor( jsFunc ) {
+
+		super();
+
+		this.jsFunc = jsFunc;
+		this.layout = null;
+
+	}
+
+	get isArrayInput() {
+
+		return /^\((\s+)?\[/.test( this.jsFunc.toString() );
+
+	}
+
+	setLayout( layout ) {
+
+		this.layout = layout;
+
+		return this;
+
+	}
+
+	call( inputs = null ) {
+
+		nodeObjects( inputs );
+
+		return nodeObject( new ShaderCallNodeInternal( this, inputs ) );
+
+	}
+
+	setup() {
+
+		return this.call();
 
 	}
 
@@ -334,19 +484,70 @@ export const shader = ( jsFunc ) => { // @deprecated, r154
 
 export const tslFn = ( jsFunc ) => {
 
-	let shaderNode = null;
+	const shaderNode = new ShaderNode( jsFunc );
 
-	return ( ...params ) => {
+	const fn = ( ...params ) => {
 
-		if ( shaderNode === null ) shaderNode = new ShaderNode( jsFunc );
+		let inputs;
 
-		return shaderNode.call( ...params );
+		nodeObjects( params );
+
+		if ( params[ 0 ] && params[ 0 ].isNode ) {
+
+			inputs = [ ...params ];
+
+		} else {
+
+			inputs = params[ 0 ];
+
+		}
+
+		return shaderNode.call( inputs );
 
 	};
 
+	fn.shaderNode = shaderNode;
+	fn.setLayout = ( layout ) => {
+
+		shaderNode.setLayout( layout );
+
+		return fn;
+
+	};
+
+	return fn;
+
 };
 
-addNodeClass( ShaderNode );
+addNodeClass( 'ShaderNode', ShaderNode );
+
+//
+
+export const setCurrentStack = ( stack ) => {
+
+	if ( currentStack === stack ) {
+
+		//throw new Error( 'Stack already defined.' );
+
+	}
+
+	currentStack = stack;
+
+};
+
+export const getCurrentStack = () => currentStack;
+
+export const If = ( ...params ) => currentStack.if( ...params );
+
+export function append( node ) {
+
+	if ( currentStack ) currentStack.add( node );
+
+	return node;
+
+}
+
+addNodeElement( 'append', append );
 
 // types
 // @TODO: Maybe export from ConstNode.js?
@@ -372,6 +573,11 @@ export const vec4 = new ConvertType( 'vec4' );
 export const ivec4 = new ConvertType( 'ivec4' );
 export const uvec4 = new ConvertType( 'uvec4' );
 export const bvec4 = new ConvertType( 'bvec4' );
+
+export const mat2 = new ConvertType( 'mat2' );
+export const imat2 = new ConvertType( 'imat2' );
+export const umat2 = new ConvertType( 'umat2' );
+export const bmat2 = new ConvertType( 'bmat2' );
 
 export const mat3 = new ConvertType( 'mat3' );
 export const imat3 = new ConvertType( 'imat3' );
@@ -403,6 +609,10 @@ addNodeElement( 'vec4', vec4 );
 addNodeElement( 'ivec4', ivec4 );
 addNodeElement( 'uvec4', uvec4 );
 addNodeElement( 'bvec4', bvec4 );
+addNodeElement( 'mat2', mat2 );
+addNodeElement( 'imat2', imat2 );
+addNodeElement( 'umat2', umat2 );
+addNodeElement( 'bmat2', bmat2 );
 addNodeElement( 'mat3', mat3 );
 addNodeElement( 'imat3', imat3 );
 addNodeElement( 'umat3', umat3 );

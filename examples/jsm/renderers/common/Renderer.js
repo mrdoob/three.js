@@ -10,7 +10,9 @@ import RenderContexts from './RenderContexts.js';
 import Textures from './Textures.js';
 import Background from './Background.js';
 import Nodes from './nodes/Nodes.js';
-import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, Color, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping } from 'three';
+import Color4 from './Color4.js';
+import ClippingContext from './ClippingContext.js';
+import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping } from 'three';
 
 const _scene = new Scene();
 const _drawingBufferSize = new Vector2();
@@ -21,9 +23,16 @@ const _vector3 = new Vector3();
 
 class Renderer {
 
-	constructor( backend ) {
+	constructor( backend, parameters = {} ) {
 
 		this.isRenderer = true;
+
+		//
+
+		const {
+			logarithmicDepthBuffer = false,
+			alpha = true
+		} = parameters;
 
 		// public
 
@@ -36,6 +45,10 @@ class Renderer {
 		this.autoClearDepth = true;
 		this.autoClearStencil = true;
 
+		this.alpha = alpha;
+
+		this.logarithmicDepthBuffer = logarithmicDepthBuffer;
+
 		this.outputColorSpace = SRGBColorSpace;
 
 		this.toneMapping = NoToneMapping;
@@ -45,6 +58,10 @@ class Renderer {
 
 		this.depth = true;
 		this.stencil = true;
+
+		this.clippingPlanes = [];
+
+		this.info = new Info();
 
 		// internals
 
@@ -56,11 +73,10 @@ class Renderer {
 		this._scissor = new Vector4( 0, 0, this._width, this._height );
 		this._scissorTest = false;
 
-		this._info = null;
-		this._properties = null;
 		this._attributes = null;
 		this._geometries = null;
 		this._nodes = null;
+		this._animation = null;
 		this._bindings = null;
 		this._objects = null;
 		this._pipelines = null;
@@ -69,16 +85,15 @@ class Renderer {
 		this._textures = null;
 		this._background = null;
 
-		this._animation = new Animation();
-
 		this._currentRenderContext = null;
-		this._lastRenderContext = null;
 
 		this._opaqueSort = null;
 		this._transparentSort = null;
 
-		this._clearAlpha = 1;
-		this._clearColor = new Color( 0x000000 );
+
+		const alphaClear = this.alpha === true ? 0 : 1;
+
+		this._clearColor = new Color4( 0, 0, 0, alphaClear );
 		this._clearDepth = 1;
 		this._clearStencil = 0;
 
@@ -86,8 +101,15 @@ class Renderer {
 		this._activeCubeFace = 0;
 		this._activeMipmapLevel = 0;
 
+		this._renderObjectFunction = null;
+		this._currentRenderObjectFunction = null;
+
+		this._handleObjectFunction = this._renderObjectDirect;
+
 		this._initialized = false;
 		this._initPromise = null;
+
+		this._compilationPromises = null;
 
 		// backwards compatibility
 
@@ -131,22 +153,19 @@ class Renderer {
 
 			}
 
-			this._info = new Info();
 			this._nodes = new Nodes( this, backend );
+			this._animation = new Animation( this._nodes, this.info );
 			this._attributes = new Attributes( backend );
 			this._background = new Background( this, this._nodes );
-			this._geometries = new Geometries( this._attributes, this._info );
-			this._textures = new Textures( backend, this._info );
+			this._geometries = new Geometries( this._attributes, this.info );
+			this._textures = new Textures( this, backend, this.info );
 			this._pipelines = new Pipelines( backend, this._nodes );
-			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this._info );
-			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this._info );
+			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
+			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this.info );
 			this._renderLists = new RenderLists();
 			this._renderContexts = new RenderContexts();
 
 			//
-
-			this._animation.setNodes( this._nodes );
-			this._animation.start();
 
 			this._initialized = true;
 
@@ -164,13 +183,7 @@ class Renderer {
 
 	}
 
-	async compile( /*scene, camera*/ ) {
-
-		console.warn( 'THREE.Renderer: .compile() is not implemented yet.' );
-
-	}
-
-	async render( scene, camera ) {
+	async compileAsync( scene, camera, targetScene = null ) {
 
 		if ( this._initialized === false ) await this.init();
 
@@ -179,7 +192,133 @@ class Renderer {
 		const nodeFrame = this._nodes.nodeFrame;
 
 		const previousRenderId = nodeFrame.renderId;
-		const previousRenderState = this._currentRenderContext;
+		const previousRenderContext = this._currentRenderContext;
+		const previousRenderObjectFunction = this._currentRenderObjectFunction;
+		const previousCompilationPromises = this._compilationPromises;
+
+		//
+
+		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
+
+		if ( targetScene === null ) targetScene = scene;
+
+		const renderTarget = this._renderTarget;
+		const renderContext = this._renderContexts.get( targetScene, camera, renderTarget );
+		const activeMipmapLevel = this._activeMipmapLevel;
+
+		const compilationPromises = [];
+
+		this._currentRenderContext = renderContext;
+		this._currentRenderObjectFunction = this.renderObject;
+
+		this._handleObjectFunction = this._createObjectPipeline;
+
+		this._compilationPromises = compilationPromises;
+
+		nodeFrame.renderId ++;
+
+		//
+
+		nodeFrame.update();
+
+		//
+
+		renderContext.depth = this.depth;
+		renderContext.stencil = this.stencil;
+
+		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
+		renderContext.clippingContext.updateGlobal( this, camera );
+
+		//
+
+		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
+
+		//
+
+		const renderList = this._renderLists.get( scene, camera );
+		renderList.begin();
+
+		this._projectObject( scene, camera, 0, renderList );
+
+		// include lights from target scene
+		if ( targetScene !== scene ) {
+
+			targetScene.traverseVisible( function ( object ) {
+
+				if ( object.isLight && object.layers.test( camera.layers ) ) {
+
+					renderList.pushLight( object );
+
+				}
+
+			} );
+
+		}
+
+		renderList.finish();
+
+		//
+
+		if ( renderTarget !== null ) {
+
+			this._textures.updateRenderTarget( renderTarget, activeMipmapLevel );
+
+			const renderTargetData = this._textures.get( renderTarget );
+
+			renderContext.textures = renderTargetData.textures;
+			renderContext.depthTexture = renderTargetData.depthTexture;
+
+		} else {
+
+			renderContext.textures = null;
+			renderContext.depthTexture = null;
+
+		}
+
+		//
+
+		this._nodes.updateScene( sceneRef );
+
+		//
+
+		this._background.update( sceneRef, renderList, renderContext );
+
+		// process render lists
+
+		const opaqueObjects = renderList.opaque;
+		const transparentObjects = renderList.transparent;
+		const lightsNode = renderList.lightsNode;
+
+		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
+
+		// restore render tree
+
+		nodeFrame.renderId = previousRenderId;
+
+		this._currentRenderContext = previousRenderContext;
+		this._currentRenderObjectFunction = previousRenderObjectFunction;
+		this._compilationPromises = previousCompilationPromises;
+
+		this._handleObjectFunction = this._renderObjectDirect;
+
+		// wait for all promises setup by backends awaiting compilation/linking/pipeline creation to complete
+
+		await Promise.all( compilationPromises );
+
+	}
+
+	async renderAsync( scene, camera ) {
+
+		if ( this._initialized === false ) await this.init();
+
+		// preserve render tree
+
+		const nodeFrame = this._nodes.nodeFrame;
+
+		const previousRenderId = nodeFrame.renderId;
+		const previousRenderContext = this._currentRenderContext;
+		const previousRenderObjectFunction = this._currentRenderObjectFunction;
 
 		//
 
@@ -191,8 +330,14 @@ class Renderer {
 		const activeMipmapLevel = this._activeMipmapLevel;
 
 		this._currentRenderContext = renderContext;
+		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
 
-		nodeFrame.renderId ++;
+		//
+
+		this.info.calls ++;
+		this.info.render.calls ++;
+
+		nodeFrame.renderId = this.info.calls;
 
 		//
 
@@ -208,15 +353,11 @@ class Renderer {
 
 		//
 
-		if ( this._animation.isAnimating === false ) nodeFrame.update();
-
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
 		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-		if ( this._info.autoReset === true ) this._info.reset();
-
-		this._info.render.frame ++;
+		if ( this.info.autoReset === true ) this.info.reset();
 
 		//
 
@@ -251,8 +392,8 @@ class Renderer {
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
-		renderContext.depth = this.depth;
-		renderContext.stencil = this.stencil;
+		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
+		renderContext.clippingContext.updateGlobal( this, camera );
 
 		//
 
@@ -288,6 +429,9 @@ class Renderer {
 			renderContext.depthTexture = renderTargetData.depthTexture;
 			renderContext.width = renderTargetData.width;
 			renderContext.height = renderTargetData.height;
+			renderContext.renderTarget = renderTarget;
+			renderContext.depth = renderTarget.depthBuffer;
+			renderContext.stencil = renderTarget.stencilBuffer;
 
 		} else {
 
@@ -295,6 +439,8 @@ class Renderer {
 			renderContext.depthTexture = null;
 			renderContext.width = this.domElement.width;
 			renderContext.height = this.domElement.height;
+			renderContext.depth = this.depth;
+			renderContext.stencil = this.stencil;
 
 		}
 
@@ -332,13 +478,22 @@ class Renderer {
 		// restore render tree
 
 		nodeFrame.renderId = previousRenderId;
-		this._currentRenderContext = previousRenderState;
 
-		this._lastRenderContext = renderContext;
+		this._currentRenderContext = previousRenderContext;
+		this._currentRenderObjectFunction = previousRenderObjectFunction;
 
 		//
 
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
+
+
+		await this.backend.resolveTimestampAsync( renderContext, 'render' );
+
+	}
+
+	getMaxAnisotropy() {
+
+		return this.backend.getMaxAnisotropy();
 
 	}
 
@@ -354,15 +509,11 @@ class Renderer {
 
 	}
 
-	setAnimationLoop( callback ) {
+	async setAnimationLoop( callback ) {
 
-		if ( this._initialized === false ) this.init();
+		if ( this._initialized === false ) await this.init();
 
-		const animation = this._animation;
-
-		animation.setAnimationLoop( callback );
-
-		( callback === null ) ? animation.stop() : animation.start();
+		this._animation.setAnimationLoop( callback );
 
 	}
 
@@ -382,7 +533,7 @@ class Renderer {
 
 	getContext() {
 
-		return this._context;
+		return this.backend.getContext();
 
 	}
 
@@ -500,6 +651,8 @@ class Renderer {
 
 		this._scissorTest = boolean;
 
+		this.backend.setScissorTest( boolean );
+
 	}
 
 	getViewport( target ) {
@@ -536,19 +689,19 @@ class Renderer {
 	setClearColor( color, alpha = 1 ) {
 
 		this._clearColor.set( color );
-		this._clearAlpha = alpha;
+		this._clearColor.a = alpha;
 
 	}
 
 	getClearAlpha() {
 
-		return this._clearAlpha;
+		return this._clearColor.a;
 
 	}
 
 	setClearAlpha( alpha ) {
 
-		this._clearAlpha = alpha;
+		this._clearColor.a = alpha;
 
 	}
 
@@ -578,46 +731,74 @@ class Renderer {
 
 	isOccluded( object ) {
 
-		const renderContext = this._currentRenderContext || this._lastRenderContext;
+		const renderContext = this._currentRenderContext;
 
 		return renderContext && this.backend.isOccluded( renderContext, object );
 
 	}
 
-	clear( color = true, depth = true, stencil = true ) {
+	async clearAsync( color = true, depth = true, stencil = true ) {
 
-		const renderContext = this._currentRenderContext || this._lastRenderContext;
+		if ( this._initialized === false ) await this.init();
 
-		if ( renderContext ) this.backend.clear( renderContext, color, depth, stencil );
+		let renderTargetData = null;
+		const renderTarget = this._renderTarget;
+
+		if ( renderTarget !== null ) {
+
+			this._textures.updateRenderTarget( renderTarget );
+
+			renderTargetData = this._textures.get( renderTarget );
+
+		}
+
+		this.backend.clear( color, depth, stencil, renderTargetData );
 
 	}
 
-	clearColor() {
+	clearColorAsync() {
 
-		this.clear( true, false, false );
-
-	}
-
-	clearDepth() {
-
-		this.clear( false, true, false );
+		return this.clearAsync( true, false, false );
 
 	}
 
-	clearStencil() {
+	clearDepthAsync() {
 
-		this.clear( false, false, true );
+		return this.clearAsync( false, true, false );
+
+	}
+
+	clearStencilAsync() {
+
+		return this.clearAsync( false, false, true );
+
+	}
+
+	get currentColorSpace() {
+
+		const renderTarget = this._renderTarget;
+
+		if ( renderTarget !== null ) {
+
+			const texture = renderTarget.texture;
+
+			return ( Array.isArray( texture ) ? texture[ 0 ] : texture ).colorSpace;
+
+		}
+
+		return this.outputColorSpace;
 
 	}
 
 	dispose() {
 
+		this.info.dispose();
+
+		this._animation.dispose();
 		this._objects.dispose();
-		this._properties.dispose();
 		this._pipelines.dispose();
 		this._nodes.dispose();
 		this._bindings.dispose();
-		this._info.dispose();
 		this._renderLists.dispose();
 		this._renderContexts.dispose();
 		this._textures.dispose();
@@ -641,15 +822,48 @@ class Renderer {
 
 	}
 
-	async compute( computeNodes ) {
+	setRenderObjectFunction( renderObjectFunction ) {
+
+		this._renderObjectFunction = renderObjectFunction;
+
+	}
+
+	getRenderObjectFunction() {
+
+		return this._renderObjectFunction;
+
+	}
+
+	async computeAsync( computeNodes ) {
 
 		if ( this._initialized === false ) await this.init();
+
+		const nodeFrame = this._nodes.nodeFrame;
+
+		const previousRenderId = nodeFrame.renderId;
+
+		//
+
+		this.info.calls ++;
+		this.info.compute.calls ++;
+		this.info.compute.computeCalls ++;
+
+		nodeFrame.renderId = this.info.calls;
+
+		//
+		if ( this.info.autoReset === true ) this.info.resetCompute();
 
 		const backend = this.backend;
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
 		const nodes = this._nodes;
 		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
+
+		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
+
+			throw new Error( 'THREE.Renderer: .compute() expects a ComputeNode.' );
+
+		}
 
 		backend.beginCompute( computeNodes );
 
@@ -689,6 +903,18 @@ class Renderer {
 
 		backend.finishCompute( computeNodes );
 
+		await this.backend.resolveTimestampAsync( computeNodes, 'compute' );
+
+		//
+
+		nodeFrame.renderId = previousRenderId;
+
+	}
+
+	hasFeatureAsync( name ) {
+
+		return this.backend.hasFeatureAsync( name );
+
 	}
 
 	hasFeature( name ) {
@@ -699,7 +925,7 @@ class Renderer {
 
 	copyFramebufferToTexture( framebufferTexture ) {
 
-		const renderContext = this._currentRenderContext || this._lastRenderContext;
+		const renderContext = this._currentRenderContext;
 
 		this._textures.updateTexture( framebufferTexture );
 
@@ -824,7 +1050,7 @@ class Renderer {
 			const renderItem = renderList[ i ];
 
 			// @TODO: Add support for multiple materials per object. This will require to extract
-			// the material from the renderItem object and pass it with its group data to _renderObject().
+			// the material from the renderItem object and pass it with its group data to renderObject().
 
 			const { object, geometry, material, group } = renderItem;
 
@@ -849,7 +1075,7 @@ class Renderer {
 
 						this.backend.updateViewport( this._currentRenderContext );
 
-						this._renderObject( object, scene, camera2, geometry, material, group, lightsNode );
+						this._currentRenderObjectFunction( object, scene, camera2, geometry, material, group, lightsNode );
 
 					}
 
@@ -857,7 +1083,7 @@ class Renderer {
 
 			} else {
 
-				this._renderObject( object, scene, camera, geometry, material, group, lightsNode );
+				this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode );
 
 			}
 
@@ -865,9 +1091,10 @@ class Renderer {
 
 	}
 
-	_renderObject( object, scene, camera, geometry, material, group, lightsNode ) {
+	renderObject( object, scene, camera, geometry, material, group, lightsNode ) {
 
-		material = scene.overrideMaterial !== null ? scene.overrideMaterial : material;
+		let overridePositionNode;
+		let overrideFragmentNode;
 
 		//
 
@@ -877,19 +1104,90 @@ class Renderer {
 
 		//
 
+		if ( scene.overrideMaterial !== null ) {
+
+			const overrideMaterial = scene.overrideMaterial;
+
+			if ( material.positionNode && material.positionNode.isNode ) {
+
+				overridePositionNode = overrideMaterial.positionNode;
+
+				overrideMaterial.positionNode = material.positionNode;
+
+			}
+
+			if ( overrideMaterial.isShadowNodeMaterial ) {
+
+				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
+
+				if ( material.shadowNode && material.shadowNode.isNode ) {
+
+					overrideFragmentNode = overrideMaterial.fragmentNode;
+					overrideMaterial.fragmentNode = material.shadowNode;
+
+				}
+
+				if ( this.localClippingEnabled ) {
+
+					if ( material.clipShadows ) {
+
+						if ( overrideMaterial.clippingPlanes !== material.clippingPlanes ) {
+
+							overrideMaterial.clippingPlanes = material.clippingPlanes;
+							overrideMaterial.needsUpdate = true;
+
+						}
+
+						if ( overrideMaterial.clipIntersection !== material.clipIntersection ) {
+
+							overrideMaterial.clipIntersection = material.clipIntersection;
+
+						}
+
+					} else if ( Array.isArray( overrideMaterial.clippingPlanes ) ) {
+
+						overrideMaterial.clippingPlanes = null;
+						overrideMaterial.needsUpdate = true;
+
+					}
+
+				}
+
+			}
+
+			material = overrideMaterial;
+
+		}
+
+		//
+
 		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 			material.side = BackSide;
-			this._renderObjectDirect( object, material, scene, camera, lightsNode, 'backSide' ); // create backSide pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, 'backSide' ); // create backSide pass id
 
 			material.side = FrontSide;
-			this._renderObjectDirect( object, material, scene, camera, lightsNode ); // use default pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode ); // use default pass id
 
 			material.side = DoubleSide;
 
 		} else {
 
-			this._renderObjectDirect( object, material, scene, camera, lightsNode );
+			this._handleObjectFunction( object, material, scene, camera, lightsNode );
+
+		}
+
+		//
+
+		if ( overridePositionNode !== undefined ) {
+
+			scene.overrideMaterial.positionNode = overridePositionNode;
+
+		}
+
+		if ( overrideFragmentNode !== undefined ) {
+
+			scene.overrideMaterial.fragmentNode = overrideFragmentNode;
 
 		}
 
@@ -921,7 +1219,67 @@ class Renderer {
 
 		//
 
-		this.backend.draw( renderObject, this._info );
+		this.backend.draw( renderObject, this.info );
+
+	}
+
+	_createObjectPipeline( object, material, scene, camera, lightsNode, passId ) {
+
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
+
+		//
+
+		this._nodes.updateBefore( renderObject );
+
+		//
+
+		this._nodes.updateForRender( renderObject );
+		this._geometries.updateForRender( renderObject );
+		this._bindings.updateForRender( renderObject );
+
+		this._pipelines.getForRender( renderObject, this._compilationPromises );
+
+	}
+
+	get compute() {
+
+		return this.computeAsync;
+
+	}
+
+	get compile() {
+
+		return this.compileAsync;
+
+	}
+
+	get render() {
+
+		return this.renderAsync;
+
+	}
+
+	get clear() {
+
+		return this.clearAsync;
+
+	}
+
+	get clearColor() {
+
+		return this.clearColorAsync;
+
+	}
+
+	get clearDepth() {
+
+		return this.clearDepthAsync;
+
+	}
+
+	get clearStencil() {
+
+		return this.clearStencilAsync;
 
 	}
 

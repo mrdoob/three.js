@@ -6,19 +6,19 @@ class StructTypeNode extends Node {
 
 		super();
 
-        this.types = types;
+		this.types = types;
 		this.isStructTypeNode = true;
 
 	}
 
-    getMemberTypes() {
+	getMemberTypes() {
 
-        return this.types;
+		return this.types;
 
-    }
+	}
 
 }
 
 export default StructTypeNode;
 
-addNodeClass( StructTypeNode );
+addNodeClass( 'StructTypeNode', StructTypeNode );

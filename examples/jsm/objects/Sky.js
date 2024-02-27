@@ -28,10 +28,10 @@ class Sky extends Mesh {
 		const shader = Sky.SkyShader;
 
 		const material = new ShaderMaterial( {
-			name: 'SkyShader',
-			fragmentShader: shader.fragmentShader,
-			vertexShader: shader.vertexShader,
+			name: shader.name,
 			uniforms: UniformsUtils.clone( shader.uniforms ),
+			vertexShader: shader.vertexShader,
+			fragmentShader: shader.fragmentShader,
 			side: BackSide,
 			depthWrite: false
 		} );
@@ -45,6 +45,8 @@ class Sky extends Mesh {
 }
 
 Sky.SkyShader = {
+
+	name: 'SkyShader',
 
 	uniforms: {
 		'turbidity': { value: 2 },

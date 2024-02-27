@@ -35,6 +35,7 @@ class WebGLUtils {
 		}
 
 		if ( p === AlphaFormat ) return gl.ALPHA;
+		if ( p === gl.RGB ) return gl.RGB; // patch since legacy doesn't use RGBFormat for rendering but here it's needed for packing optimization
 		if ( p === RGBAFormat ) return gl.RGBA;
 		if ( p === LuminanceFormat ) return gl.LUMINANCE;
 		if ( p === LuminanceAlphaFormat ) return gl.LUMINANCE_ALPHA;
@@ -234,6 +235,48 @@ class WebGLUtils {
 		// if "p" can't be resolved, assume the user defines a WebGL constant as a string (fallback/workaround for packed RGB formats)
 
 		return ( gl[ p ] !== undefined ) ? gl[ p ] : null;
+
+	}
+
+	_clientWaitAsync() {
+
+		const { gl } = this;
+
+		const sync = gl.fenceSync( gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
+
+		gl.flush();
+
+		return new Promise( ( resolve, reject ) => {
+
+			function test() {
+
+				const res = gl.clientWaitSync( sync, gl.SYNC_FLUSH_COMMANDS_BIT, 0 );
+
+				if ( res === gl.WAIT_FAILED ) {
+
+					gl.deleteSync( sync );
+
+					reject();
+					return;
+
+				}
+
+				if ( res === gl.TIMEOUT_EXPIRED ) {
+
+					requestAnimationFrame( test );
+					return;
+
+				}
+
+				gl.deleteSync( sync );
+
+				resolve();
+
+			}
+
+			test();
+
+		} );
 
 	}
 

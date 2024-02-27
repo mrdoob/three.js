@@ -12,10 +12,6 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - simple global illumination (<a href="http://www.iquilezles.org/www/articles/simplegi/simplegi.htm">article</a>)
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -132,8 +128,7 @@
 
 					}
 
-					attributes.color.updateRange.offset = startVertex * 3;
-					attributes.color.updateRange.count = ( currentVertex - startVertex ) * 3;
+					attributes.color.addUpdateRange( startVertex * 3, ( currentVertex - startVertex ) * 3 );
 					attributes.color.needsUpdate = true;
 
 					if ( currentVertex >= totalVertex ) {

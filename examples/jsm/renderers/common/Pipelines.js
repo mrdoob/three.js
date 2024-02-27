@@ -42,18 +42,18 @@ class Pipelines extends DataMap {
 
 			// get shader
 
-			const nodeBuilder = this.nodes.getForCompute( computeNode );
+			const nodeBuilderState = this.nodes.getForCompute( computeNode );
 
 			// programmable stage
 
-			let stageCompute = this.programs.compute.get( nodeBuilder.computeShader );
+			let stageCompute = this.programs.compute.get( nodeBuilderState.computeShader );
 
 			if ( stageCompute === undefined ) {
 
 				if ( previousPipeline && previousPipeline.computeProgram.usedTimes === 0 ) this._releaseProgram( previousPipeline.computeProgram );
 
-				stageCompute = new ProgrammableStage( nodeBuilder.computeShader, 'compute' );
-				this.programs.compute.set( nodeBuilder.computeShader, stageCompute );
+				stageCompute = new ProgrammableStage( nodeBuilderState.computeShader, 'compute', nodeBuilderState.transforms, nodeBuilderState.nodeAttributes );
+				this.programs.compute.set( nodeBuilderState.computeShader, stageCompute );
 
 				backend.createProgram( stageCompute );
 
@@ -89,7 +89,7 @@ class Pipelines extends DataMap {
 
 	}
 
-	getForRender( renderObject ) {
+	getForRender( renderObject, promises = null ) {
 
 		const { backend } = this;
 
@@ -149,7 +149,7 @@ class Pipelines extends DataMap {
 
 				if ( previousPipeline && previousPipeline.usedTimes === 0 ) this._releasePipeline( previousPipeline );
 
-				pipeline = this._getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey );
+				pipeline = this._getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey, promises );
 
 			} else {
 
@@ -250,7 +250,7 @@ class Pipelines extends DataMap {
 
 	}
 
-	_getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey ) {
+	_getRenderPipeline( renderObject, stageVertex, stageFragment, cacheKey, promises ) {
 
 		// check for existing pipeline
 
@@ -266,7 +266,7 @@ class Pipelines extends DataMap {
 
 			renderObject.pipeline = pipeline;
 
-			this.backend.createRenderPipeline( renderObject );
+			this.backend.createRenderPipeline( renderObject, promises );
 
 		}
 
@@ -276,29 +276,13 @@ class Pipelines extends DataMap {
 
 	_getComputeCacheKey( computeNode, stageCompute ) {
 
-		return 'compute' + computeNode.id + stageCompute.id;
+		return computeNode.id + ',' + stageCompute.id;
 
 	}
 
 	_getRenderCacheKey( renderObject, stageVertex, stageFragment ) {
 
-		const { material } = renderObject;
-
-		const parameters = [
-			stageVertex.id, stageFragment.id,
-			material.transparent, material.blending, material.premultipliedAlpha,
-			material.blendSrc, material.blendDst, material.blendEquation,
-			material.blendSrcAlpha, material.blendDstAlpha, material.blendEquationAlpha,
-			material.colorWrite,
-			material.depthWrite, material.depthTest, material.depthFunc,
-			material.stencilWrite, material.stencilFunc,
-			material.stencilFail, material.stencilZFail, material.stencilZPass,
-			material.stencilFuncMask, material.stencilWriteMask,
-			material.side,
-			this.backend.getCacheKey( renderObject )
-		];
-
-		return parameters.join();
+		return stageVertex.id + ',' + stageFragment.id + ',' + this.backend.getRenderCacheKey( renderObject );
 
 	}
 
@@ -328,40 +312,8 @@ class Pipelines extends DataMap {
 	_needsRenderUpdate( renderObject ) {
 
 		const data = this.get( renderObject );
-		const material = renderObject.material;
 
-		let needsUpdate = this.backend.needsUpdate( renderObject );
-
-		// check material state
-
-		if ( data.material !== material || data.materialVersion !== material.version ||
-			data.transparent !== material.transparent || data.blending !== material.blending || data.premultipliedAlpha !== material.premultipliedAlpha ||
-			data.blendSrc !== material.blendSrc || data.blendDst !== material.blendDst || data.blendEquation !== material.blendEquation ||
-			data.blendSrcAlpha !== material.blendSrcAlpha || data.blendDstAlpha !== material.blendDstAlpha || data.blendEquationAlpha !== material.blendEquationAlpha ||
-			data.colorWrite !== material.colorWrite ||
-			data.depthWrite !== material.depthWrite || data.depthTest !== material.depthTest || data.depthFunc !== material.depthFunc ||
-			data.stencilWrite !== material.stencilWrite || data.stencilFunc !== material.stencilFunc ||
-			data.stencilFail !== material.stencilFail || data.stencilZFail !== material.stencilZFail || data.stencilZPass !== material.stencilZPass ||
-			data.stencilFuncMask !== material.stencilFuncMask || data.stencilWriteMask !== material.stencilWriteMask ||
-			data.side !== material.side || data.alphaToCoverage !== material.alphaToCoverage
-		) {
-
-			data.material = material; data.materialVersion = material.version;
-			data.transparent = material.transparent; data.blending = material.blending; data.premultipliedAlpha = material.premultipliedAlpha;
-			data.blendSrc = material.blendSrc; data.blendDst = material.blendDst; data.blendEquation = material.blendEquation;
-			data.blendSrcAlpha = material.blendSrcAlpha; data.blendDstAlpha = material.blendDstAlpha; data.blendEquationAlpha = material.blendEquationAlpha;
-			data.colorWrite = material.colorWrite;
-			data.depthWrite = material.depthWrite; data.depthTest = material.depthTest; data.depthFunc = material.depthFunc;
-			data.stencilWrite = material.stencilWrite; data.stencilFunc = material.stencilFunc;
-			data.stencilFail = material.stencilFail; data.stencilZFail = material.stencilZFail; data.stencilZPass = material.stencilZPass;
-			data.stencilFuncMask = material.stencilFuncMask; data.stencilWriteMask = material.stencilWriteMask;
-			data.side = material.side; data.alphaToCoverage = material.alphaToCoverage;
-
-			needsUpdate = true;
-
-		}
-
-		return needsUpdate || data.pipeline === undefined;
+		return data.pipeline === undefined || this.backend.needsRenderUpdate( renderObject );
 
 	}
 

@@ -1,6 +1,6 @@
 class VRButton {
 
-	static createButton( renderer ) {
+	static createButton( renderer, sessionInit = {} ) {
 
 		const button = document.createElement( 'button' );
 
@@ -39,6 +39,23 @@ class VRButton {
 
 			button.textContent = 'ENTER VR';
 
+			// WebXR's requestReferenceSpace only works if the corresponding feature
+			// was requested at session creation time. For simplicity, just ask for
+			// the interesting ones as optional features, but be aware that the
+			// requestReferenceSpace call will fail if it turns out to be unavailable.
+			// ('local' is always available for immersive sessions and doesn't need to
+			// be requested separately.)
+
+			const sessionOptions = {
+				...sessionInit,
+				optionalFeatures: [
+					'local-floor',
+					'bounded-floor',
+					'layers',
+					...( sessionInit.optionalFeatures || [] )
+				],
+			};
+
 			button.onmouseenter = function () {
 
 				button.style.opacity = '1.0';
@@ -55,23 +72,39 @@ class VRButton {
 
 				if ( currentSession === null ) {
 
-					// WebXR's requestReferenceSpace only works if the corresponding feature
-					// was requested at session creation time. For simplicity, just ask for
-					// the interesting ones as optional features, but be aware that the
-					// requestReferenceSpace call will fail if it turns out to be unavailable.
-					// ('local' is always available for immersive sessions and doesn't need to
-					// be requested separately.)
-
-					const sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor', 'hand-tracking', 'layers' ] };
-					navigator.xr.requestSession( 'immersive-vr', sessionInit ).then( onSessionStarted );
+					navigator.xr.requestSession( 'immersive-vr', sessionOptions ).then( onSessionStarted );
 
 				} else {
 
 					currentSession.end();
 
+					if ( navigator.xr.offerSession !== undefined ) {
+
+						navigator.xr.offerSession( 'immersive-vr', sessionOptions )
+							.then( onSessionStarted )
+							.catch( ( err ) => {
+
+								console.warn( err );
+
+							} );
+
+					}
+
 				}
 
 			};
+
+			if ( navigator.xr.offerSession !== undefined ) {
+
+				navigator.xr.offerSession( 'immersive-vr', sessionOptions )
+					.then( onSessionStarted )
+					.catch( ( err ) => {
+
+						console.warn( err );
+
+					} );
+
+			}
 
 		}
 
@@ -176,7 +209,7 @@ class VRButton {
 
 	static registerSessionGrantedListener() {
 
-		if ( 'xr' in navigator ) {
+		if ( typeof navigator !== 'undefined' && 'xr' in navigator ) {
 
 			// WebXRViewer (based on Firefox) has a bug where addEventListener
 			// throws a silent exception and aborts execution entirely.
