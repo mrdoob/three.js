@@ -376,12 +376,6 @@ select {
 			display: block;
 		}
 
-		/* VisionOS */
-
-		#menubar .menu:active .options { 
-			display: block; 
-		}
-
 			#menubar .menu .options hr {
 				border-color: #ddd;
 			}
