@@ -160,6 +160,9 @@ export { default as EnvironmentNode } from './lighting/EnvironmentNode.js';
 export { default as AONode } from './lighting/AONode.js';
 export { default as AnalyticLightNode } from './lighting/AnalyticLightNode.js';
 
+// pmrem
+export { default as PMREMNode, pmrem } from './pmrem/PMREMNode.js';
+
 // procedural
 export { default as CheckerNode, checker } from './procedural/CheckerNode.js';
 
