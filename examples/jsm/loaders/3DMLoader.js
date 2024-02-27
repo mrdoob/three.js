@@ -192,6 +192,7 @@ class Rhino3dmLoader extends Loader {
 		mat.color.g = material.color.g;
 		mat.color.b = material.color.b;
 		mat.type = material.type;
+		mat.vertexColors = material.vertexColors;
 
 		const json = JSON.stringify( mat );
 
@@ -205,6 +206,7 @@ class Rhino3dmLoader extends Loader {
 			_mat.color.g = m.color.g;
 			_mat.color.b = m.color.b;
 			_mat.type = m.type;
+			_mat.vertexColors = m.vertexColors;
 
 			if ( JSON.stringify( _mat ) === json ) {
 
@@ -488,7 +490,7 @@ class Rhino3dmLoader extends Loader {
 
 				default:
 
-					let matId;
+					let matId = null;
 
 					switch ( attributes.materialSource.name ) {
 
@@ -497,10 +499,6 @@ class Rhino3dmLoader extends Loader {
 							if ( attributes.layerIndex >= 0 ) {
 
 								matId = data.layers[ attributes.layerIndex ].renderMaterialIndex;
-
-							} else {
-
-								matId = null;
 
 							}
 
@@ -512,17 +510,13 @@ class Rhino3dmLoader extends Loader {
 
 								matId = attributes.materialIndex;
 
-							} else {
-
-								matId = null;
-
 							}
 
 							break;
 
 					}
 
-					let material;
+					let material = null;
 
 					if ( matId >= 0 ) {
 
@@ -530,13 +524,9 @@ class Rhino3dmLoader extends Loader {
 						material = this._createMaterial( rMaterial, data.renderEnvironment );
 
 
-					} else {
-
-						material = this._createMaterial();
-
 					}
 
-					material = this._compareMaterials( material );
+					//material = this._compareMaterials( material );
 					const _object = this._createObject( obj, material );
 
 					if ( _object === undefined ) {
@@ -675,18 +665,21 @@ class Rhino3dmLoader extends Loader {
 
 				geometry = loader.parse( obj.geometry );
 
-				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
-
-					mat.vertexColors = true;
-
-				}
 
 				if ( mat === null ) {
 
 					mat = this._createMaterial();
-					mat = this._compareMaterials( mat );
 
 				}
+
+
+				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
+					console.log(this.materials)
+					mat.vertexColors = true;
+
+				}
+
+				mat = this._compareMaterials( mat );
 
 				const mesh = new Mesh( geometry, mat );
 				mesh.castShadow = attributes.castsShadows;
