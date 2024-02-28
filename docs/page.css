@@ -122,6 +122,11 @@ summary {
 	margin-bottom: 16px;
 }
 
+
+summary:hover {
+    cursor: pointer;
+}
+
 p {
 	padding-right: 16px;
 }
