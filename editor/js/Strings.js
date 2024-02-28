@@ -348,7 +348,7 @@ function Strings( config ) {
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
 			'viewport/info/triangles': 'Triangles',
-			'viewport/info/frametime': 'Frametime'
+			'viewport/info/rendertime': 'Render time'
 
 		},
 
@@ -694,7 +694,7 @@ function Strings( config ) {
 			'viewport/info/objects': 'Objets',
 			'viewport/info/vertices': 'Sommets',
 			'viewport/info/triangles': 'Triangles',
-			'viewport/info/frametime': 'Temps de trame'
+			'viewport/info/rendertime': 'Render time'
 
 		},
 
@@ -1040,7 +1040,7 @@ function Strings( config ) {
 			'viewport/info/objects': '物体',
 			'viewport/info/vertices': '顶点',
 			'viewport/info/triangles': '三角形',
-			'viewport/info/frametime': '帧时'
+			'viewport/info/rendertime': 'Render time'
 
 		}
 
