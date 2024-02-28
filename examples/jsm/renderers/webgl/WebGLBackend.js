@@ -84,7 +84,7 @@ class WebGLBackend extends Backend {
 
 		this._setFramebuffer( renderContext );
 
-		this.clear( renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil, renderContext );
+		this.clear( renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil, renderContext, false );
 
 		//
 		if ( renderContext.viewport ) {
@@ -313,7 +313,7 @@ class WebGLBackend extends Backend {
 
 	}
 
-	clear( color, depth, stencil, descriptor = null ) {
+	clear( color, depth, stencil, descriptor = null, setFrameBuffer = true ) {
 
 		const { gl } = this;
 
@@ -336,7 +336,7 @@ class WebGLBackend extends Backend {
 
 		if ( clear !== 0 ) {
 
-			const clearColor = descriptor.clearColorValue;
+			const clearColor = descriptor.clearColorValue || this.getClearColor();
 
 			if ( depth ) this.state.setDepthMask( true );
 
@@ -346,6 +346,8 @@ class WebGLBackend extends Backend {
 				gl.clear( clear );
 
 			} else {
+
+				if ( setFrameBuffer ) this._setFramebuffer( descriptor );
 
 				if ( color ) {
 
