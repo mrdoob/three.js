@@ -85,6 +85,14 @@
 					// hide spinner
 					document.getElementById( 'loader' ).style.display = 'none';
 
+				}, function ( progress ) {
+
+					console.log ( ( progress.loaded / progress.total * 100 ) + '%' );
+
+				}, function ( error ) {
+
+					console.log ( error );
+
 				} );
 
 				controls = new OrbitControls( camera, renderer.domElement );

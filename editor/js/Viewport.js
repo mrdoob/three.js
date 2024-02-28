@@ -266,6 +266,7 @@ function Viewport( editor ) {
 		controls.center.set( 0, 0, 0 );
 		pathtracer.reset();
 
+		initPT();
 		render();
 
 	} );
@@ -362,6 +363,7 @@ function Viewport( editor ) {
 
 	signals.sceneGraphChanged.add( function () {
 
+		initPT();
 		render();
 
 	} );
@@ -411,6 +413,7 @@ function Viewport( editor ) {
 
 		}
 
+		initPT();
 		render();
 
 	} );
@@ -437,6 +440,7 @@ function Viewport( editor ) {
 
 		}
 
+		initPT();
 		render();
 
 	} );
@@ -444,6 +448,7 @@ function Viewport( editor ) {
 	signals.objectRemoved.add( function ( object ) {
 
 		controls.enabled = true; // see #14180
+
 		if ( object === transformControls.object ) {
 
 			transformControls.detach();
@@ -454,6 +459,7 @@ function Viewport( editor ) {
 
 	signals.materialChanged.add( function () {
 
+		initPT();
 		render();
 
 	} );
@@ -507,6 +513,7 @@ function Viewport( editor ) {
 
 		}
 
+		initPT();
 		render();
 
 	} );
@@ -529,6 +536,7 @@ function Viewport( editor ) {
 				useBackgroundAsEnvironment = true;
 
 				scene.environment = scene.background;
+				scene.environment.mapping = THREE.EquirectangularReflectionMapping;
 				scene.environmentRotation.y = scene.backgroundRotation.y;
 
 				break;
@@ -537,8 +545,8 @@ function Viewport( editor ) {
 
 				if ( environmentEquirectangularTexture ) {
 
-					environmentEquirectangularTexture.mapping = THREE.EquirectangularReflectionMapping;
 					scene.environment = environmentEquirectangularTexture;
+					scene.environment.mapping = THREE.EquirectangularReflectionMapping;
 
 				}
 
@@ -552,6 +560,7 @@ function Viewport( editor ) {
 
 		}
 
+		initPT();
 		render();
 
 	} );
@@ -731,6 +740,22 @@ function Viewport( editor ) {
 
 		if ( needsUpdate === true ) render();
 
+		updatePT();
+
+	}
+
+	function initPT() {
+
+		if ( editor.viewportShading === 'realistic' ) {
+
+			pathtracer.init( scene, camera );
+
+		}
+
+	}
+
+	function updatePT() {
+
 		if ( editor.viewportShading === 'realistic' ) {
 
 			pathtracer.update();
@@ -745,12 +770,6 @@ function Viewport( editor ) {
 	let endTime = 0;
 
 	function render() {
-
-		if ( editor.viewportShading === 'realistic' ) {
-
-			pathtracer.init( scene, camera );
-
-		}
 
 		startTime = performance.now();
 
