@@ -602,9 +602,6 @@ class WebGPUBackend extends Backend {
 			supportsDepth = renderer.depth;
 			supportsStencil = renderer.stencil;
 
-			depth = depth && supportsDepth;
-			stencil = stencil && supportsStencil;
-
 			const descriptor = this._getDefaultRenderPassDescriptor();
 
 			if ( color ) {
@@ -619,7 +616,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			if ( depth || stencil ) {
+			if ( supportsDepth || supportsStencil ) {
 
 				depthStencilAttachment = descriptor.depthStencilAttachment;
 
