@@ -39,7 +39,6 @@
 			let camera, scene, renderer, startTime, object, stats;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -136,6 +135,7 @@
 				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				window.addEventListener( 'resize', onWindowResize );
 				document.body.appendChild( renderer.domElement );
 
@@ -270,8 +270,6 @@
 			function animate( currentTime ) {
 
 				const time = ( currentTime - startTime ) / 1000;
-
-				requestAnimationFrame( animate );
 
 				object.position.y = 0.8;
 				object.rotation.x = time * 0.5;
