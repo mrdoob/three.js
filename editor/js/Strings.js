@@ -318,7 +318,10 @@ function Strings( config ) {
 			'sidebar/project/app/editable': 'Editable',
 			'sidebar/project/app/publish': 'Publish',
 
+			'sidebar/project/image': 'Image',
 			'sidebar/project/video': 'Video',
+
+			'sidebar/project/shading': 'Shading',
 			'sidebar/project/resolution': 'Resolution',
 			'sidebar/project/duration': 'Duration',
 			'sidebar/project/render': 'Render',
@@ -664,7 +667,10 @@ function Strings( config ) {
 			'sidebar/project/app/editable': 'Modifiable',
 			'sidebar/project/app/publish': 'Publier',
 
+			'sidebar/project/image': 'Image',
 			'sidebar/project/video': 'Video',
+
+			'sidebar/project/shading': 'Shading',
 			'sidebar/project/resolution': 'Resolution',
 			'sidebar/project/duration': 'Duration',
 			'sidebar/project/render': 'Render',
@@ -1010,7 +1016,10 @@ function Strings( config ) {
 			'sidebar/project/app/editable': '编辑性',
 			'sidebar/project/app/publish': '发布',
 
+			'sidebar/project/image': 'Image',
 			'sidebar/project/video': '视频',
+
+			'sidebar/project/shading': 'Shading',
 			'sidebar/project/resolution': '分辨率',
 			'sidebar/project/duration': '时长',
 			'sidebar/project/render': '渲染',
