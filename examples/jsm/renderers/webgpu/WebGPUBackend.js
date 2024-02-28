@@ -630,9 +630,6 @@ class WebGPUBackend extends Backend {
 			supportsDepth = renderTargetData.depth;
 			supportsStencil = renderTargetData.stencil;
 
-			depth = depth && supportsDepth;
-			stencil = stencil && supportsStencil;
-
 			if ( color ) {
 
 				for ( const texture of renderTargetData.textures ) {
@@ -666,7 +663,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			if ( depth || stencil ) {
+			if ( supportsDepth || supportsStencil ) {
 
 				const depthTextureData = this.get( renderTargetData.depthTexture );
 
@@ -680,7 +677,7 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		if ( depthStencilAttachment !== undefined ) {
+		if ( supportsDepth ) {
 
 			if ( depth ) {
 
@@ -695,7 +692,11 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			//
+		}
+
+		//
+
+		if ( supportsStencil ) {
 
 			if ( stencil ) {
 

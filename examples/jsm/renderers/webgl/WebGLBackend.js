@@ -336,7 +336,7 @@ class WebGLBackend extends Backend {
 
 		if ( clear !== 0 ) {
 
-			const clearColor = descriptor.clearColorValue;
+			const clearColor = descriptor.clearColorValue || this.getClearColor();
 
 			if ( depth ) this.state.setDepthMask( true );
 
@@ -346,6 +346,8 @@ class WebGLBackend extends Backend {
 				gl.clear( clear );
 
 			} else {
+
+				if ( descriptor.isRenderContext !== true ) this._setFramebuffer( descriptor );
 
 				if ( color ) {
 
