@@ -160,23 +160,19 @@
 
 		[page:constant RedIntegerFormat] descarta os componentes verde e azul e lê apenas o componente vermelho.
 		Os texels são lidos como inteiros em vez de ponto flutuante.
-		(só pode ser usado com um contexto de renderização WebGL 2).
 		<br /><br />
 
 		[page:constant RGFormat] descarta os componentes alfa e azul e lê os componentes vermelho e verde.
-		(só pode ser usado com um contexto de renderização WebGL 2).
 		<br /><br />
 
 		[page:constant RGIntegerFormat] descarta os componentes alfa e azul e lê os componentes vermelho e verde.
 		Os texels são lidos como inteiros em vez de ponto flutuante.
-		(só pode ser usado com um contexto de renderização WebGL 2).
 		<br /><br />
 
 		[page:constant RGBAFormat] é o padrão e lê os componentes vermelho, verde, azul e alfa.<br /><br />
 
 		[page:constant RGBAIntegerFormat] é o padrão e lê os componentes vermelho, verde, azul e alfa.
 		Os texels são lidos como inteiros em vez de ponto flutuante.
-		(só pode ser usado com um contexto de renderização WebGL 2).
 		<br /><br />
 
 		[page:constant LuminanceFormat] lê cada elemento como um único componente de luminância.
@@ -346,10 +342,6 @@
 		</code>
 
 		<p>
-
-		Atenção: alterar o formato interno de uma textura afetará a
-		textura apenas quando for usado um contexto de renderização WebGL 2.<br /><br />
-
 		Para uso com a propriedade  [page:Texture.internalFormat internalFormat] de uma textura,
 		definem como os elementos de uma textura, ou `texels`, são armazenados na GPU.<br /><br />
 
