@@ -16,6 +16,12 @@ class CodeNode extends Node {
 
 	}
 
+	isGlobal() {
+
+		return true;
+
+	}
+
 	setIncludes( includes ) {
 
 		this.includes = includes;
