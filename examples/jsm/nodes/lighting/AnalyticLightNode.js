@@ -63,7 +63,7 @@ class AnalyticLightNode extends LightingNode {
 			}
 
 			const shadow = this.light.shadow;
-			const rtt = builder.getRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
+			const rtt = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
 
 			const depthTexture = new DepthTexture();
 			depthTexture.minFilter = NearestFilter;

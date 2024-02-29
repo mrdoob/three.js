@@ -6,7 +6,7 @@ import { uniform } from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
 
-import PMREMGenerator from './PMREMGenerator.js';
+let _generator = null;
 
 const _cache = new WeakMap();
 
@@ -22,21 +22,19 @@ function _generateCubeUVSize( imageHeight ) {
 
 }
 
-function _getPMREMFromTexture( renderer, texture ) {
+function _getPMREMFromTexture( texture ) {
 
 	let cacheTexture = _cache.get( texture );
 
 	if ( cacheTexture === undefined ) {
 
-		const generator = new PMREMGenerator( renderer );
-
 		if ( texture.isCubeTexture ) {
 
-			cacheTexture = generator.fromCubemap( texture );
+			cacheTexture = _generator.fromCubemap( texture );
 
 		} else {
 
-			cacheTexture = generator.fromEquirectangular( texture );
+			cacheTexture = _generator.fromEquirectangular( texture );
 
 		}
 
@@ -60,6 +58,7 @@ class PMREMNode extends TempNode {
 		this.uvNode = uvNode;
 		this.levelNode = levelNode;
 
+		this._generator = null;
 		this._texture = texture( null );
 		this._width = uniform( 0 );
 		this._height = uniform( 0 );
@@ -107,7 +106,7 @@ class PMREMNode extends TempNode {
 
 			} else {
 
-				pmrem = _getPMREMFromTexture( frame.renderer, texture );
+				pmrem = _getPMREMFromTexture( texture );
 
 			}
 
@@ -120,6 +119,14 @@ class PMREMNode extends TempNode {
 	}
 
 	setup( builder ) {
+
+		if ( _generator === null ) {
+
+			_generator = builder.createPMREMGenerator();
+
+		}
+
+		//
 
 		this.updateBefore( builder );
 

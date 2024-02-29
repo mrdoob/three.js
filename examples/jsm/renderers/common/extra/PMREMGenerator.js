@@ -1,13 +1,3 @@
-import NodeMaterial from '../materials/NodeMaterial.js';
-import { getDirection, blur } from './PMREMUtils.js';
-import { equirectUV } from '../utils/EquirectUVNode.js';
-import { uniform } from '../core/UniformNode.js';
-import { uniforms } from '../accessors/UniformsNode.js';
-import { texture } from '../accessors/TextureNode.js';
-import { cubeTexture } from '../accessors/CubeTextureNode.js';
-import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
-import { uv } from '../accessors/UVNode.js';
-import { attribute } from '../core/AttributeNode.js';
 import {
 	OrthographicCamera,
 	Color,
@@ -30,6 +20,20 @@ import {
 	MeshBasicMaterial,
 	BoxGeometry
 } from 'three';
+
+import {
+	NodeMaterial,
+	PMREMUtils,
+	equirectUV,
+	uniform,
+	uniforms,
+	texture,
+	cubeTexture,
+	float,
+	vec3,
+	uv,
+	attribute,
+} from '../../../nodes/Nodes.js';
 
 const LOD_MIN = 4;
 
@@ -76,7 +80,7 @@ const _faceLib = [
 	0, 4, 2
 ];
 
-const direction = getDirection( uv(), attribute( 'faceIndex' ) ).normalize();
+const direction = PMREMUtils.getDirection( uv(), attribute( 'faceIndex' ) ).normalize();
 const outputDirection = vec3( direction.x, direction.y.negate(), direction.z );
 
 /**
@@ -751,7 +755,7 @@ function _getBlurShader( lodMax, width, height ) {
 
 	const material = _getMaterial();
 	material.uniforms = materialUniforms; // TODO: Move to outside of the material
-	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ) } );
+	material.fragmentNode = PMREMUtils.blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ) } );
 
 	return material;
 
