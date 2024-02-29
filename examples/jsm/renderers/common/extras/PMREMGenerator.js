@@ -1,13 +1,13 @@
-import NodeMaterial from '../materials/NodeMaterial.js';
-import { getDirection, blur } from './PMREMUtils.js';
-import { equirectUV } from '../utils/EquirectUVNode.js';
-import { uniform } from '../core/UniformNode.js';
-import { uniforms } from '../accessors/UniformsNode.js';
-import { texture } from '../accessors/TextureNode.js';
-import { cubeTexture } from '../accessors/CubeTextureNode.js';
-import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
-import { uv } from '../accessors/UVNode.js';
-import { attribute } from '../core/AttributeNode.js';
+import NodeMaterial from '../../../nodes/materials/NodeMaterial.js';
+import { getDirection, blur } from '../../../nodes/pmrem/PMREMUtils.js';
+import { equirectUV } from '../../../nodes/utils/EquirectUVNode.js';
+import { uniform } from '../../../nodes/core/UniformNode.js';
+import { uniforms } from '../../../nodes/accessors/UniformsNode.js';
+import { texture } from '../../../nodes/accessors/TextureNode.js';
+import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
+import { float, vec3, vec4 } from '../../../nodes/shadernode/ShaderNode.js';
+import { uv } from '../../../nodes/accessors/UVNode.js';
+import { attribute } from '../../../nodes/core/AttributeNode.js';
 import {
 	OrthographicCamera,
 	Color,
