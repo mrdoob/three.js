@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu</title>
+		<title>three.js webgpu - pmrem scene</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -22,16 +22,11 @@
 
 			import * as THREE from 'three';
 
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import { normalWorld, uniform, normalView, positionViewDirection, cameraViewMatrix, pmrem, MeshBasicNodeMaterial } from 'three/nodes';
+			import { normalWorld, uniform, pmremTexture, MeshBasicNodeMaterial } from 'three/nodes';
 
 			import PMREMGenerator from 'three/addons/nodes/pmrem/PMREMGenerator.js';
 
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -40,17 +35,8 @@
 			let camera, scene, renderer;
 
 			init();
-			render();
 
 			async function init() {
-
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
 
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -66,9 +52,9 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				if ( renderer.init ) await renderer.init();
 				container.appendChild( renderer.domElement );
+
+				await renderer.init();
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
@@ -76,29 +62,56 @@
 				controls.maxDistance = 10;
 				controls.update();
 
-				new RGBELoader()
-					.setPath( 'textures/equirectangular/' )
-					.load( 'royal_esplanade_1k.hdr', function ( map ) {
+				//
 
-						const tex = new PMREMGenerator( renderer ).fromEquirectangular( map );
+				scene.background = new THREE.Color( 0x006699 );
 
-						const reflectVec = positionViewDirection.negate().reflect( normalView ).transformDirection( cameraViewMatrix );
+				let model;
 
-						const pmremRoughness = uniform( 0 );
-						const pmremNode = pmrem( tex.texture, reflectVec, pmremRoughness );
+				model = new THREE.Mesh( new THREE.SphereGeometry( .2, 64, 64 ), new THREE.MeshBasicMaterial( { color: 0x0000ff } ) );
+				model.position.z -= 1;
+				scene.add( model );
 
-						scene.backgroundNode = pmrem( tex.texture, normalWorld, pmremRoughness );
+				model = new THREE.Mesh( new THREE.SphereGeometry( .2, 64, 64 ), new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
+				model.position.z += 1;
+				scene.add( model );
 
-						scene.add( new THREE.Mesh( new THREE.SphereGeometry( .5, 64, 64 ), new MeshBasicNodeMaterial( { colorNode: pmremNode } ) ) );
+				model = new THREE.Mesh( new THREE.SphereGeometry( .2, 64, 64 ), new THREE.MeshBasicMaterial( { color: 0xff00ff } ) );
+				model.position.x += 1;
+				scene.add( model );
 
-						// gui
+				model = new THREE.Mesh( new THREE.SphereGeometry( .2, 64, 64 ), new THREE.MeshBasicMaterial( { color: 0x00ffff } ) );
+				model.position.x -= 1;
+				scene.add( model );
 
-						const gui = new GUI();
-						gui.add( pmremRoughness, 'value', 0, 1, 0.001 ).name( 'roughness' ).onChange( () => render() );
+				model = new THREE.Mesh( new THREE.SphereGeometry( .2, 64, 64 ), new THREE.MeshBasicMaterial( { color: 0xffff00 } ) );
+				model.position.y -= 1;
+				scene.add( model );
 
-						render();
+				model = new THREE.Mesh( new THREE.SphereGeometry( .2, 64, 64 ), new THREE.MeshBasicMaterial( { color: 0x00ff00 } ) );
+				model.position.y += 1;
+				scene.add( model );
 
-					} );
+				//while ( scene.children.length > 0 ) scene.remove( scene.children[ 0 ] );
+
+				const sceneRT = new PMREMGenerator( renderer ).fromScene( scene );
+
+				scene.background = null;
+				scene.backgroundNode = null;
+
+				//
+
+				const pmremRoughness = uniform( .5 );
+				const pmremNode = pmremTexture( sceneRT.texture, normalWorld, pmremRoughness );
+
+				scene.add( new THREE.Mesh( new THREE.SphereGeometry( .5, 64, 64 ), new MeshBasicNodeMaterial( { colorNode: pmremNode } ) ) );
+
+				// gui
+
+				const gui = new GUI();
+				gui.add( pmremRoughness, 'value', 0, 1, 0.001 ).name( 'roughness' ).onChange( () => render() );
+
+				render();
 
 				window.addEventListener( 'resize', onWindowResize );
 

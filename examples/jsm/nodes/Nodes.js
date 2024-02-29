@@ -64,7 +64,6 @@ export { default as RemapNode, remap, remapClamp } from './utils/RemapNode.js';
 export { default as RotateUVNode, rotateUV } from './utils/RotateUVNode.js';
 export { default as RotateNode, rotate } from './utils/RotateNode.js';
 export { default as SetNode } from './utils/SetNode.js';
-export { default as SpecularMIPLevelNode, specularMIPLevel } from './utils/SpecularMIPLevelNode.js';
 export { default as SplitNode } from './utils/SplitNode.js';
 export { default as SpriteSheetUVNode, spritesheetUV } from './utils/SpriteSheetUVNode.js';
 export { default as StorageArrayElementNode } from './utils/StorageArrayElementNode.js';
@@ -161,7 +160,7 @@ export { default as AONode } from './lighting/AONode.js';
 export { default as AnalyticLightNode } from './lighting/AnalyticLightNode.js';
 
 // pmrem
-export { default as PMREMNode, pmrem } from './pmrem/PMREMNode.js';
+export { default as PMREMNode, pmremTexture } from './pmrem/PMREMNode.js';
 
 // procedural
 export { default as CheckerNode, checker } from './procedural/CheckerNode.js';
