@@ -51,7 +51,6 @@
 				renderer = new WebGPURenderer( { antialias: true, forceWebGL } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
 				await renderer.init();
