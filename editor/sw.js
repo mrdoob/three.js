@@ -149,6 +149,7 @@ const assets = [
 	'./js/Sidebar.Project.Renderer.js',
 	'./js/Sidebar.Project.Materials.js',
 	'./js/Sidebar.Project.App.js',
+	'./js/Sidebar.Project.Image.js',
 	'./js/Sidebar.Project.Video.js',
 	'./js/Sidebar.Settings.js',
 	'./js/Sidebar.Settings.History.js',
