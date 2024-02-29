@@ -113,13 +113,13 @@ class NodeBuilder {
 
 	}
 
-	getRenderTarget( width, height, options ) {
+	createRenderTarget( width, height, options ) {
 
 		return new RenderTarget( width, height, options );
 
 	}
 
-	getCubeRenderTarget( size, options ) {
+	createCubeRenderTarget( size, options ) {
 
 		return new CubeRenderTarget( size, options );
 
