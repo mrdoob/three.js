@@ -5,7 +5,7 @@ import { uniform } from '../../../nodes/core/UniformNode.js';
 import { uniforms } from '../../../nodes/accessors/UniformsNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';
 import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
-import { float, vec3, vec4 } from '../../../nodes/shadernode/ShaderNode.js';
+import { float, vec3 } from '../../../nodes/shadernode/ShaderNode.js';
 import { uv } from '../../../nodes/accessors/UVNode.js';
 import { attribute } from '../../../nodes/core/AttributeNode.js';
 import {
@@ -158,14 +158,6 @@ class PMREMGenerator {
 
 	}
 
-	fromEquirectangular( equirectangular, renderTarget = this._allocateTargetsFromTexture( equirectangular ) ) {
-
-		this._fromTexture( equirectangular, renderTarget );
-
-		return renderTarget;
-
-	}
-
 	/**
 	 * Generates a PMREM from an cubemap texture, which can be either LDR
 	 * or HDR. The ideal input cube size is 256 x 256,
@@ -252,7 +244,7 @@ class PMREMGenerator {
 
 	}
 
-	_allocateTargetsFromTexture( texture ) {
+	_fromTexture( texture, renderTarget ) {
 
 		if ( texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping ) {
 
@@ -264,17 +256,11 @@ class PMREMGenerator {
 
 		}
 
-		return this._allocateTargets();
-
-	}
-
-	_fromTexture( texture, renderTarget ) {
-
 		_oldTarget = this._renderer.getRenderTarget();
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
 		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
 
-		const cubeUVRenderTarget = renderTarget || this._allocateTargetsFromTexture( texture );
+		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
 		this._applyPMREM( cubeUVRenderTarget );
 		this._cleanup( cubeUVRenderTarget );
@@ -325,13 +311,6 @@ class PMREMGenerator {
 
 		const tmpMesh = new Mesh( this._lodPlanes[ 0 ], material );
 		this._renderer.compile( tmpMesh, _flatCamera );
-
-	}
-
-	_setSize( cubeSize ) {
-
-		this._lodMax = Math.floor( Math.log2( cubeSize ) );
-		this._cubeSize = Math.pow( 2, this._lodMax );
 
 	}
 
