@@ -196,6 +196,76 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.module( 'getSkinIndexBuffers', () => {
+
+			QUnit.test( 'has no buffers', ( assert ) => {
+
+				const geometry = new BufferGeometry();
+				assert.deepEqual( geometry.getSkinIndexBuffers(), [] );
+
+			} );
+
+			QUnit.test( 'has one buffer', ( assert ) => {
+
+				const geometry = new BufferGeometry();
+
+				const skinIndex = new BufferAttribute( new Uint16Array( [] ), 4 );
+				geometry.setAttribute( 'skinIndex', skinIndex );
+
+				assert.deepEqual( geometry.getSkinIndexBuffers(), [ skinIndex ] );
+
+			} );
+
+			QUnit.test( 'has multiple buffers', ( assert ) => {
+
+				const geometry = new BufferGeometry();
+
+				const skinIndex = new BufferAttribute( new Uint16Array( [ 0, 1, 2, 3 ] ), 4 );
+				const skinIndex1 = new BufferAttribute( new Uint16Array( [ 4, 5, 6, 7 ] ), 4 );
+				geometry.setAttribute( 'skinIndex', skinIndex );
+				geometry.setAttribute( 'skinIndex1', skinIndex1 );
+
+				assert.deepEqual( geometry.getSkinIndexBuffers(), [ skinIndex, skinIndex1 ] );
+
+			} );
+
+		} );
+
+		QUnit.module( 'getSkinWeightBuffers', () => {
+
+			QUnit.test( 'has no buffers', ( assert ) => {
+
+				const geometry = new BufferGeometry();
+				assert.deepEqual( geometry.getSkinWeightBuffers(), [] );
+
+			} );
+
+			QUnit.test( 'has one buffer', ( assert ) => {
+
+				const geometry = new BufferGeometry();
+
+				const skinWeight = new BufferAttribute( new Float32Array( [] ), 4 );
+				geometry.setAttribute( 'skinWeight', skinWeight );
+
+				assert.deepEqual( geometry.getSkinWeightBuffers(), [ skinWeight ] );
+
+			} );
+
+			QUnit.test( 'has multiple buffers', ( assert ) => {
+
+				const geometry = new BufferGeometry();
+
+				const skinWeight = new BufferAttribute( new Float32Array( [ 0, 1, 2, 3 ] ), 4 );
+				const skinWeight1 = new BufferAttribute( new Float32Array( [ 4, 5, 6, 7 ] ), 4 );
+				geometry.setAttribute( 'skinWeight', skinWeight );
+				geometry.setAttribute( 'skinWeight1', skinWeight1 );
+
+				assert.deepEqual( geometry.getSkinWeightBuffers(), [ skinWeight, skinWeight1 ] );
+
+			} );
+
+		} );
+
 		QUnit.test( 'setIndex/getIndex', ( assert ) => {
 
 			const a = new BufferGeometry();
@@ -463,14 +533,20 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		const toHalfFloatArray = ( f32Array ) => {
+
 			const f16Array = new Uint16Array( f32Array.length );
-			for ( let i = 0, n = f32Array.length; i < n; ++i ) {
+			for ( let i = 0, n = f32Array.length; i < n; ++ i ) {
+
 				f16Array[ i ] = toHalfFloat( f32Array[ i ] );
+
 			}
+
 			return f16Array;
+
 		};
 
 		QUnit.test( 'computeBoundingBox - Float16', ( assert ) => {
+
 			const vertices = [ - 1, - 2, - 3, 13, - 2, - 3.5, - 1, - 20, 0, - 4, 5, 6 ];
 			const geometry = new BufferGeometry();
 
@@ -490,6 +566,7 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		QUnit.test( 'computeBoundingSphere - Float16', ( assert ) => {
+
 			const vertices = [ - 10, 0, 0, 10, 0, 0 ];
 			const geometry = new BufferGeometry();
 

@@ -6,6 +6,14 @@ export default /* glsl */`
 
 	uniform highp sampler2D boneTexture;
 
+	#ifdef USE_BONE_WEIGHTS_TEX
+
+		#define MAX_BONES_PER_VERT 64
+
+		uniform sampler2D boneIndexWeightsTexture;
+
+	#endif
+
 	mat4 getBoneMatrix( const in float i ) {
 
 		int size = textureSize( boneTexture, 0 ).x;

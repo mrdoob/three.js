@@ -218,81 +218,49 @@ class BufferAttribute {
 
 	getX( index ) {
 
-		let x = this.array[ index * this.itemSize ];
-
-		if ( this.normalized ) x = denormalize( x, this.array );
-
-		return x;
+		return this.getComponent( index, 0 );
 
 	}
 
 	setX( index, x ) {
 
-		if ( this.normalized ) x = normalize( x, this.array );
-
-		this.array[ index * this.itemSize ] = x;
-
-		return this;
+		return this.setComponent( index, 0, x );
 
 	}
 
 	getY( index ) {
 
-		let y = this.array[ index * this.itemSize + 1 ];
-
-		if ( this.normalized ) y = denormalize( y, this.array );
-
-		return y;
+		return this.getComponent( index, 1 );
 
 	}
 
 	setY( index, y ) {
 
-		if ( this.normalized ) y = normalize( y, this.array );
-
-		this.array[ index * this.itemSize + 1 ] = y;
-
-		return this;
+		return this.setComponent( index, 1, y );
 
 	}
 
 	getZ( index ) {
 
-		let z = this.array[ index * this.itemSize + 2 ];
-
-		if ( this.normalized ) z = denormalize( z, this.array );
-
-		return z;
+		return this.getComponent( index, 2 );
 
 	}
 
 	setZ( index, z ) {
 
-		if ( this.normalized ) z = normalize( z, this.array );
-
-		this.array[ index * this.itemSize + 2 ] = z;
-
-		return this;
+		return this.setComponent( index, 2, z );
 
 	}
 
 	getW( index ) {
 
-		let w = this.array[ index * this.itemSize + 3 ];
-
-		if ( this.normalized ) w = denormalize( w, this.array );
-
-		return w;
+		return this.getComponent( index, 3 );
 
 	}
 
 	setW( index, w ) {
 
-		if ( this.normalized ) w = normalize( w, this.array );
-
-		this.array[ index * this.itemSize + 3 ] = w;
-
-		return this;
+		return this.setComponent( index, 3, w );
 
 	}
 

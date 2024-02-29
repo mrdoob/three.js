@@ -51,6 +51,50 @@ class BufferGeometry extends EventDispatcher {
 
 	}
 
+	getSkinIndexBuffers() {
+
+		const buffers = [];
+
+		for ( let ii = 0; ; ++ ii ) {
+
+			const name = 'skinIndex' + ( ii === 0 ? '' : ii.toString() );
+
+			if ( ! this.hasAttribute( name ) ) {
+
+				break;
+
+			}
+
+			buffers.push( this.getAttribute( name ) );
+
+		}
+
+		return buffers;
+
+	}
+
+	getSkinWeightBuffers() {
+
+		const buffers = [];
+
+		for ( let ii = 0; ; ++ ii ) {
+
+			const name = 'skinWeight' + ( ii === 0 ? '' : ii.toString() );
+
+			if ( ! this.hasAttribute( name ) ) {
+
+				break;
+
+			}
+
+			buffers.push( this.getAttribute( name ) );
+
+		}
+
+		return buffers;
+
+	}
+
 	getIndex() {
 
 		return this.index;

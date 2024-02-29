@@ -72,6 +72,7 @@
 				"Core": "api/en/constants/Core",
 				"CustomBlendingEquation": "api/en/constants/CustomBlendingEquations",
 				"BufferAttributeUsage": "api/en/constants/BufferAttributeUsage",
+				"Loaders": "api/en/constants/Loaders",
 				"Materials": "api/en/constants/Materials",
 				"Renderer": "api/en/constants/Renderer",
 				"Textures": "api/en/constants/Textures"

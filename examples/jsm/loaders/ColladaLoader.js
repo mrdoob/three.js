@@ -42,6 +42,13 @@ import { TGALoader } from '../loaders/TGALoader.js';
 
 class ColladaLoader extends Loader {
 
+	constructor( manager, options = {} ) {
+
+		super( manager );
+		this.options = options;
+
+	}
+
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -79,6 +86,8 @@ class ColladaLoader extends Loader {
 	}
 
 	parse( text, path ) {
+
+		const options = this.options;
 
 		function getElementsByTagName( xml, name ) {
 
@@ -3626,7 +3635,6 @@ class ColladaLoader extends Loader {
 					if ( object.isSkinnedMesh ) {
 
 						object.bind( skeleton, controller.skin.bindMatrix );
-						object.normalizeSkinWeights();
 
 					}
 
@@ -3814,7 +3822,9 @@ class ColladaLoader extends Loader {
 					case 'polylist':
 						if ( skinning ) {
 
-							object = new SkinnedMesh( geometry.data, material );
+							object = new SkinnedMesh( geometry.data, material, {
+								useBoneIndexWeightsTexture: options.useBoneIndexWeightsTexture
+							} );
 
 						} else {
 

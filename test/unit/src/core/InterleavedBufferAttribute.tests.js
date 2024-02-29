@@ -98,6 +98,41 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'getComponent', ( assert ) => {
+
+			const buffer = new InterleavedBuffer( new Float32Array( [
+				0, 1, 2, 3, 4,
+				0, 5, 6, 7, 8
+			] ), 5 );
+			const attribute = new InterleavedBufferAttribute( buffer, 4, 1, false );
+
+			assert.equal( attribute.getComponent( 0, 0 ), 1, 'v0.x was not retrieved' );
+			assert.equal( attribute.getComponent( 0, 1 ), 2, 'v0.y was not retrieved' );
+			assert.equal( attribute.getComponent( 1, 2 ), 7, 'v1.z was not retrieved' );
+			assert.equal( attribute.getComponent( 1, 3 ), 8, 'v1.w was not retrieved' );
+
+		} );
+
+		QUnit.test( 'setComponent', ( assert ) => {
+
+			const buffer = new InterleavedBuffer( new Float32Array( [
+				0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0
+			] ), 5 );
+			const attribute = new InterleavedBufferAttribute( buffer, 4, 1, false );
+
+			attribute.setComponent( 0, 0, 1 );
+			attribute.setComponent( 0, 1, 2 );
+			attribute.setComponent( 1, 2, 3 );
+			attribute.setComponent( 1, 3, 4 );
+
+			assert.deepEqual( attribute.data.array, new Float32Array( [
+				0, 1, 2, 0, 0,
+				0, 0, 0, 3, 4
+			] ), 'check for incorrect values' );
+
+		} );
+
 		// setY, setZ and setW are calculated in the same way so not QUnit.testing this
 		// TODO: ( you can't be sure that will be the case in future, or a mistake was introduce in one off them ! )
 		QUnit.test( 'setX', ( assert ) => {

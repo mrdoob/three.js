@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - animation - skinning - many bone influences</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			a {
+				color: blue;
+			}
+			.control-inactive button {
+				color: #888;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			 - Skeletal Animations with <= 4 (left) and > 4 (right) Bone Influences Per Vertex<br/>
+			 (Mask model made by Iker J. de los Mozos, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC Attribution</a>)
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+
+			let scene, renderer, stats;
+			let mixer, clock;
+
+			const views = [
+				{
+					left: 0,
+					bottom: 0,
+					width: 0,
+					height: 0,
+					offset: new THREE.Vector3( 0, 0, 0 ),
+					camera: undefined,
+				},
+				{
+					left: 0,
+					bottom: 0,
+					width: 0,
+					height: 0,
+					offset: new THREE.Vector3( 2, 0, 0 ),
+					camera: undefined,
+				}
+			];
+
+
+			init();
+
+			function init() {
+
+				const container = document.getElementById( 'container' );
+				clock = new THREE.Clock();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+				container.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xa0a0a0 );
+				scene.fog = new THREE.Fog( 0xa0a0a0, 10, 50 );
+
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 3 );
+				hemiLight.position.set( 0, 20, 0 );
+				scene.add( hemiLight );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				dirLight.position.set( 1, 1, 1 );
+				scene.add( dirLight );
+
+				// ground
+
+				const mesh = new THREE.Mesh(
+					new THREE.PlaneGeometry( 100, 100 ),
+					new THREE.MeshPhongMaterial( { color: 0xcbcbcb, depthWrite: true } ) );
+
+				mesh.rotation.x = - Math.PI / 2;
+				mesh.receiveShadow = true;
+				scene.add( mesh );
+
+				views[ 0 ].camera = new THREE.PerspectiveCamera( 45, window.innerWidth / 2 / window.innerHeight, 0.1, 100 );
+				views[ 0 ].camera.position.set( 0, 1, 1 );
+
+				views[ 1 ].camera = new THREE.PerspectiveCamera( 45, window.innerWidth / 2 / window.innerHeight, 0.1, 100 );
+				views[ 1 ].camera.position.copy( views[ 0 ].camera.position ).add( views[ 1 ].offset );
+
+				const controls = new OrbitControls( views[ 0 ].camera, renderer.domElement );
+				controls.target.set( 0, 1, 0 );
+				controls.update();
+
+				const controls2 = new OrbitControls( views[ 1 ].camera, renderer.domElement );
+				controls2.target.set( 0, 1, 0 ).add( views[ 1 ].offset );
+				controls2.update();
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				onWindowResize();
+				window.addEventListener( 'resize', onWindowResize );
+
+				// Box
+			
+				const textureLoader = new THREE.TextureLoader();
+
+				const envMap = textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg' );
+				envMap.mapping = THREE.EquirectangularReflectionMapping;
+				envMap.colorSpace = THREE.SRGBColorSpace;
+
+				const loader = new GLTFLoader();
+				loader.load( 'models/gltf/HeadWithMax16Joints.glb', function ( gltf ) {
+
+					const unlimitedBonesModel = gltf.scene;
+
+					unlimitedBonesModel.traverse( ( object ) => {
+
+						if ( object.material && object.material.isMeshPhysicalMaterial ) {
+
+							// MeshPhysicalMaterial looks better with an environment map
+							object.material.envMap = envMap;
+
+						}
+
+					} );
+
+					scene.add( unlimitedBonesModel );
+
+					const limitedBonesModel = SkeletonUtils.clone( unlimitedBonesModel );
+
+					limitedBonesModel.traverse( ( object ) => {
+
+						if ( object.isSkinnedMesh ) {
+
+							// don't share the material with the "unlimited" bones model
+							// otherwise the renderer doesn't know to use different shaders
+							// for each of the models
+							object.material = object.material.clone();
+
+							// need to re-normalize the skinning buffer to 4 weights / vertex
+							object.useBoneIndexWeightsTexture = THREE.BoneIndexWeightsTextureNever;
+							object.normalizeSkinWeights();
+							object.material.needsUpdate = true;
+
+						}
+
+					} );
+
+					limitedBonesModel.position.set( 0, 0.8, 0 );
+					unlimitedBonesModel.position.copy( limitedBonesModel.position ).add( views[ 1 ].offset );
+					scene.add( limitedBonesModel );
+			
+					mixer = new THREE.AnimationMixer( scene );
+					const animations = gltf.animations;
+					const actions = [ limitedBonesModel, unlimitedBonesModel ]
+						.map( model => mixer.clipAction( animations[ 0 ], model ) );
+
+					// start the animations at the point where the artifacts show so that
+					// the automated screenshots pick it up
+					for ( const action of actions ) {
+
+						action.time = 0.35 * animations[ 0 ].duration;
+						action.play();
+			
+					}
+
+					animate();
+
+				} );
+
+			}
+
+			function onWindowResize() {
+
+				for ( const view of views ) {
+
+					view.width = window.innerWidth / 2;
+					view.height = window.innerHeight;
+					view.camera.aspect = view.width / view.height;
+					view.camera.updateProjectionMatrix();
+			
+				}
+
+				views[ 1 ].left = views[ 0 ].width;
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				// Render loop
+
+				requestAnimationFrame( animate );
+
+				const mixerUpdateDelta = clock.getDelta();
+
+				mixer.update( mixerUpdateDelta );
+
+				stats.update();
+
+				for ( const view of views ) {
+
+					renderer.setViewport( view.left, view.bottom, view.width, view.height );
+					renderer.setScissor( view.left, view.bottom, view.width, view.height );
+					renderer.setScissorTest( true );
+					renderer.setClearColor( 'white' );
+
+					renderer.render( scene, view.camera );
+			
+				}
+
+			}
+
+		</script>
+
+	</body>
+</html>

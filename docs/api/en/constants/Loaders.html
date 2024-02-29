@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Loader Constants</h1>
+
+		<h2>Skinning Modes</h2>
+
+		Controls whether or not a SkinnedMesh will create and use a bone index/weights texture instead of a vertex buffer. 
+
+		<code>
+THREE.BoneIndexWeightsTextureNever
+THREE.BoneIndexWeightsTextureAlways
+THREE.BoneIndexWeightsTextureAllow
+		</code>
+		<p>
+			[page:constant BoneIndexWeightsTextureNever] Never uses a bone index/weights texture. A single vertex buffer -- up to 4 weights per-vertex -- will always be used. If a SkinnedMesh has more than 4 weights per-vertex, the 4 highest-weighted bones will be used for each vertex.<br />
+			[page:constant BoneIndexWeightsTextureAlways] Always use a bone index/weights texture instead of a vertex buffer. Any number of vertex weights is supported per-vertex.<br />
+			[page:constant BoneIndexWeightsTextureAllow] (Default) Use a bone index/weights texture instead of a vertex buffer if a mesh has more than 4 weights per-vertex.<br />
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

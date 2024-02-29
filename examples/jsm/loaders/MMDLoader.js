@@ -76,14 +76,14 @@ import { MMDParser } from '../libs/mmdparser.module.js';
  */
 class MMDLoader extends Loader {
 
-	constructor( manager ) {
+	constructor( manager, options = {} ) {
 
 		super( manager );
 
 		this.loader = new FileLoader( this.manager );
 
 		this.parser = null; // lazy generation
-		this.meshBuilder = new MeshBuilder( this.manager );
+		this.meshBuilder = new MeshBuilder( this.manager, options );
 		this.animationBuilder = new AnimationBuilder();
 
 	}
@@ -414,11 +414,12 @@ const NON_ALPHA_CHANNEL_FORMATS = [
  */
 class MeshBuilder {
 
-	constructor( manager ) {
+	constructor( manager, options = {} ) {
 
 		this.crossOrigin = 'anonymous';
 		this.geometryBuilder = new GeometryBuilder();
 		this.materialBuilder = new MaterialBuilder( manager );
+		this.options = options;
 
 	}
 
@@ -448,7 +449,9 @@ class MeshBuilder {
 			.setResourcePath( resourcePath )
 			.build( data, geometry, onProgress, onError );
 
-		const mesh = new SkinnedMesh( geometry, material );
+		const mesh = new SkinnedMesh( geometry, material, {
+			useBoneIndexWeightsTexture: this.options.useBoneIndexWeightsTexture
+		} );
 
 		const skeleton = new Skeleton( initBones( mesh ) );
 		mesh.bind( skeleton );
