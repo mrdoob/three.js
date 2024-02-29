@@ -1,5 +1,5 @@
 export default /* glsl */`
-#if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )
+#if defined( USE_LOGDEPTHBUF )
 
 	// Doing a strict comparison with == 1.0 can cause noise artifacts
 	// on some platforms. See issue #17623.
