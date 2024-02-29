@@ -23,8 +23,6 @@ import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
 
-import PMREMGenerator from '../../renderers/common/extra/PMREMGenerator.js';
-
 const uniformsGroupCache = new ChainMap();
 
 const typeFromLength = new Map( [
@@ -115,21 +113,15 @@ class NodeBuilder {
 
 	}
 
-	createRenderTarget( width, height, options ) {
+	getRenderTarget( width, height, options ) {
 
 		return new RenderTarget( width, height, options );
 
 	}
 
-	createCubeRenderTarget( size, options ) {
+	getCubeRenderTarget( size, options ) {
 
 		return new CubeRenderTarget( size, options );
-
-	}
-
-	createPMREMGenerator() {
-
-		return new PMREMGenerator( this.renderer );
 
 	}
 

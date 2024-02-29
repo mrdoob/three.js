@@ -161,7 +161,6 @@ export { default as AnalyticLightNode } from './lighting/AnalyticLightNode.js';
 
 // pmrem
 export { default as PMREMNode, pmremTexture } from './pmrem/PMREMNode.js';
-export * as PMREMUtils from './pmrem/PMREMUtils.js';
 
 // procedural
 export { default as CheckerNode, checker } from './procedural/CheckerNode.js';
