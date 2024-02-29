@@ -44,8 +44,8 @@
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
 					"three/examples/": "./",
-					"three-gpu-pathtracer": "https://unpkg.com/three-gpu-pathtracer@0.0.17/build/index.module.js",
-					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.7.0/build/index.module.js"
+					"three-gpu-pathtracer": "https://unpkg.com/three-gpu-pathtracer@0.0.20/build/index.module.js",
+					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.7.3/build/index.module.js"
 				}
 			}
 		</script>
@@ -104,20 +104,21 @@
 				renderer.setClearColor( 0xdddddd );
 				document.body.appendChild( renderer.domElement );
 
-				// initialize the pathtracer
-				pathTracer = new PathTracingRenderer( renderer );
-				pathTracer.alpha = true;
-				pathTracer.tiles.set( params.tiles, params.tiles );
-				pathTracer.material = new PhysicalPathTracingMaterial();
-				pathTracer.material.setDefine( 'FEATURE_MIS', 1 );
-
 				const gradientMap = new GradientEquirectTexture();
 				gradientMap.topColor.set( 0xeeeeee );
 				gradientMap.bottomColor.set( 0xeaeaea );
 				gradientMap.update();
 
-				pathTracer.material.backgroundMap = gradientMap;
+				// initialize the pathtracer
+				pathTracer = new PathTracingRenderer( renderer );
 				pathTracer.camera = camera;
+				pathTracer.alpha = true;
+				pathTracer.tiles.set( params.tiles, params.tiles );
+				pathTracer.material = new PhysicalPathTracingMaterial( {
+					filterGlossyFactor: 0.5,
+					backgroundMap: gradientMap,
+				} );
+				pathTracer.material.setDefine( 'FEATURE_MIS', 1 );
 
 				fsQuad = new FullScreenQuad( new THREE.MeshBasicMaterial( {
 					map: pathTracer.target.texture,
@@ -273,7 +274,7 @@
 
 				// add the model to the scene
 				sceneInfo = result;
-				sceneInfo.scene.traverse( c => {
+				model.traverse( c => {
 
 					if ( c.isLineSegments ) {
 
@@ -282,7 +283,7 @@
 					}
 
 				} );
-				scene.add( sceneInfo.scene );
+				scene.add( model );
 
 				// update the material
 				const { bvh, textures, materials } = result;

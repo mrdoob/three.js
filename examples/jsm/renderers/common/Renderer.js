@@ -11,6 +11,7 @@ import Textures from './Textures.js';
 import Background from './Background.js';
 import Nodes from './nodes/Nodes.js';
 import Color4 from './Color4.js';
+import ClippingContext from './ClippingContext.js';
 import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping } from 'three';
 
 const _scene = new Scene();
@@ -57,6 +58,8 @@ class Renderer {
 
 		this.depth = true;
 		this.stencil = true;
+
+		this.clippingPlanes = [];
 
 		this.info = new Info();
 
@@ -223,6 +226,9 @@ class Renderer {
 		renderContext.depth = this.depth;
 		renderContext.stencil = this.stencil;
 
+		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
+		renderContext.clippingContext.updateGlobal( this, camera );
+
 		//
 
 		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
@@ -306,6 +312,27 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
+		const renderContext = this._renderContext( scene, camera );
+
+		await this.backend.resolveTimestampAsync( renderContext, 'render' );
+
+	}
+
+	render( scene, camera ) {
+
+		if ( this._initialized === false ) {
+
+			console.error( 'THREE.Renderer: .render() called before the backend is initialized. Try using .renderAsync() instead.' );
+			return;
+
+		}
+
+		this._renderContext( scene, camera );
+
+	}
+
+	_renderContext( scene, camera ) {
+
 		// preserve render tree
 
 		const nodeFrame = this._nodes.nodeFrame;
@@ -385,6 +412,9 @@ class Renderer {
 		renderContext.scissor = this._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
+
+		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
+		renderContext.clippingContext.updateGlobal( this, camera );
 
 		//
 
@@ -477,8 +507,9 @@ class Renderer {
 
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
 
+		//
 
-		await this.backend.resolveTimestampAsync( renderContext, 'render' );
+		return renderContext;
 
 	}
 
@@ -728,9 +759,7 @@ class Renderer {
 
 	}
 
-	async clearAsync( color = true, depth = true, stencil = true ) {
-
-		if ( this._initialized === false ) await this.init();
+	clear( color = true, depth = true, stencil = true ) {
 
 		let renderTargetData = null;
 		const renderTarget = this._renderTarget;
@@ -744,6 +773,32 @@ class Renderer {
 		}
 
 		this.backend.clear( color, depth, stencil, renderTargetData );
+
+	}
+
+	clearColor() {
+
+		return this.clear( true, false, false );
+
+	}
+
+	clearDepth() {
+
+		return this.clear( false, true, false );
+
+	}
+
+	clearStencil() {
+
+		return this.clear( false, false, true );
+
+	}
+
+	async clearAsync( color = true, depth = true, stencil = true ) {
+
+		if ( this._initialized === false ) await this.init();
+
+		this.clear( color, depth, stencil );
 
 	}
 
@@ -1107,10 +1162,42 @@ class Renderer {
 
 			}
 
-			if ( overrideMaterial.isShadowNodeMaterial && ( material.shadowNode && material.shadowNode.isNode ) ) {
+			if ( overrideMaterial.isShadowNodeMaterial ) {
 
-				overrideFragmentNode = overrideMaterial.fragmentNode;
-				overrideMaterial.fragmentNode = material.shadowNode;
+				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
+
+				if ( material.shadowNode && material.shadowNode.isNode ) {
+
+					overrideFragmentNode = overrideMaterial.fragmentNode;
+					overrideMaterial.fragmentNode = material.shadowNode;
+
+				}
+
+				if ( this.localClippingEnabled ) {
+
+					if ( material.clipShadows ) {
+
+						if ( overrideMaterial.clippingPlanes !== material.clippingPlanes ) {
+
+							overrideMaterial.clippingPlanes = material.clippingPlanes;
+							overrideMaterial.needsUpdate = true;
+
+						}
+
+						if ( overrideMaterial.clipIntersection !== material.clipIntersection ) {
+
+							overrideMaterial.clipIntersection = material.clipIntersection;
+
+						}
+
+					} else if ( Array.isArray( overrideMaterial.clippingPlanes ) ) {
+
+						overrideMaterial.clippingPlanes = null;
+						overrideMaterial.needsUpdate = true;
+
+					}
+
+				}
 
 			}
 
@@ -1209,36 +1296,6 @@ class Renderer {
 	get compile() {
 
 		return this.compileAsync;
-
-	}
-
-	get render() {
-
-		return this.renderAsync;
-
-	}
-
-	get clear() {
-
-		return this.clearAsync;
-
-	}
-
-	get clearColor() {
-
-		return this.clearColorAsync;
-
-	}
-
-	get clearDepth() {
-
-		return this.clearDepthAsync;
-
-	}
-
-	get clearStencil() {
-
-		return this.clearStencilAsync;
 
 	}
 

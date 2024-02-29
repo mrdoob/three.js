@@ -602,9 +602,6 @@ class WebGPUBackend extends Backend {
 			supportsDepth = renderer.depth;
 			supportsStencil = renderer.stencil;
 
-			depth = depth && supportsDepth;
-			stencil = stencil && supportsStencil;
-
 			const descriptor = this._getDefaultRenderPassDescriptor();
 
 			if ( color ) {
@@ -619,7 +616,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			if ( depth || stencil ) {
+			if ( supportsDepth || supportsStencil ) {
 
 				depthStencilAttachment = descriptor.depthStencilAttachment;
 
@@ -629,9 +626,6 @@ class WebGPUBackend extends Backend {
 
 			supportsDepth = renderTargetData.depth;
 			supportsStencil = renderTargetData.stencil;
-
-			depth = depth && supportsDepth;
-			stencil = stencil && supportsStencil;
 
 			if ( color ) {
 
@@ -666,7 +660,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			if ( depth || stencil ) {
+			if ( supportsDepth || supportsStencil ) {
 
 				const depthTextureData = this.get( renderTargetData.depthTexture );
 
@@ -680,7 +674,7 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		if ( depthStencilAttachment !== undefined ) {
+		if ( supportsDepth ) {
 
 			if ( depth ) {
 
@@ -695,7 +689,11 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			//
+		}
+
+		//
+
+		if ( supportsStencil ) {
 
 			if ( stencil ) {
 
@@ -929,7 +927,8 @@ class WebGPUBackend extends Backend {
 			data.side !== material.side || data.alphaToCoverage !== material.alphaToCoverage ||
 			data.sampleCount !== sampleCount || data.colorSpace !== colorSpace ||
 			data.colorFormat !== colorFormat || data.depthStencilFormat !== depthStencilFormat ||
-			data.primitiveTopology !== primitiveTopology
+			data.primitiveTopology !== primitiveTopology ||
+			data.clippingContextVersion !== renderObject.clippingContextVersion
 		) {
 
 			data.material = material; data.materialVersion = material.version;
@@ -947,6 +946,7 @@ class WebGPUBackend extends Backend {
 			data.colorFormat = colorFormat;
 			data.depthStencilFormat = depthStencilFormat;
 			data.primitiveTopology = primitiveTopology;
+			data.clippingContextVersion = renderObject.clippingContextVersion;
 
 			needsUpdate = true;
 
@@ -975,7 +975,8 @@ class WebGPUBackend extends Backend {
 			material.side,
 			utils.getSampleCount( renderContext ),
 			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
-			utils.getPrimitiveTopology( object, material )
+			utils.getPrimitiveTopology( object, material ),
+			renderObject.clippingContextVersion
 		].join();
 
 	}

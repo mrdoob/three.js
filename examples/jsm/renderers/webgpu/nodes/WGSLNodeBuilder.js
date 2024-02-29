@@ -5,9 +5,8 @@ import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 import NodeSampler from '../../common/nodes/NodeSampler.js';
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
-import UniformBuffer from '../../common/UniformBuffer.js';
-import StorageBuffer from '../../common/StorageBuffer.js';
-import { getVectorLength, getStrideLength } from '../../common/BufferUtils.js';
+import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
+import NodeStorageBuffer from '../../common/nodes/NodeStorageBuffer.js';
 
 import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
 
@@ -78,6 +77,10 @@ const wgslMethods = {
 	mod_vec2: 'threejs_mod_vec2',
 	mod_vec3: 'threejs_mod_vec3',
 	mod_vec4: 'threejs_mod_vec4',
+	equals_bool: 'threejs_equals_bool',
+	equals_bvec2: 'threejs_equals_bvec2',
+	equals_bvec3: 'threejs_equals_bvec3',
+	equals_bvec4: 'threejs_equals_bvec4',
 	lessThanEqual: 'threejs_lessThanEqual',
 	greaterThan: 'threejs_greaterThan',
 	inversesqrt: 'inverseSqrt',
@@ -110,6 +113,10 @@ fn threejs_greaterThan( a : vec3<f32>, b : vec3<f32> ) -> vec3<bool> {
 	mod_vec2: new CodeNode( 'fn threejs_mod_vec2( x : vec2f, y : vec2f ) -> vec2f { return x - y * floor( x / y ); }' ),
 	mod_vec3: new CodeNode( 'fn threejs_mod_vec3( x : vec3f, y : vec3f ) -> vec3f { return x - y * floor( x / y ); }' ),
 	mod_vec4: new CodeNode( 'fn threejs_mod_vec4( x : vec4f, y : vec4f ) -> vec4f { return x - y * floor( x / y ); }' ),
+	equals_bool: new CodeNode( 'fn threejs_equals_bool( a : bool, b : bool ) -> bool { return a == b; }' ),
+	equals_bvec2: new CodeNode( 'fn threejs_equals_bvec2( a : vec2f, b : vec2f ) -> vec2<bool> { return vec2<bool>( a.x == b.x, a.y == b.y ); }' ),
+	equals_bvec3: new CodeNode( 'fn threejs_equals_bvec3( a : vec3f, b : vec3f ) -> vec3<bool> { return vec3<bool>( a.x == b.x, a.y == b.y, a.z == b.z ); }' ),
+	equals_bvec4: new CodeNode( 'fn threejs_equals_bvec4( a : vec4f, b : vec4f ) -> vec4<bool> { return vec4<bool>( a.x == b.x, a.y == b.y, a.z == b.z, a.w == b.w ); }' ),
 	repeatWrapping: new CodeNode( `
 fn threejs_repeatWrapping( uv : vec2<f32>, dimension : vec2<u32> ) -> vec2<u32> {
 
@@ -383,8 +390,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
 
-				const bufferClass = type === 'storageBuffer' ? StorageBuffer : UniformBuffer;
-				const buffer = new bufferClass( 'NodeBuffer_' + node.id, node.value );
+				const bufferClass = type === 'storageBuffer' ? NodeStorageBuffer : NodeUniformBuffer;
+				const buffer = new bufferClass( node );
 				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				bindings.push( buffer );
@@ -411,31 +418,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
-				if ( node.isArrayUniformNode === true ) {
+				uniformGPU = this.getNodeUniform( uniformNode, type );
 
-					uniformGPU = [];
-
-					for ( const uniformNode of node.nodes ) {
-
-						const uniformNodeGPU = this.getNodeUniform( uniformNode, type );
-
-						// fit bounds to buffer
-						uniformNodeGPU.boundary = getVectorLength( uniformNodeGPU.itemSize );
-						uniformNodeGPU.itemSize = getStrideLength( uniformNodeGPU.itemSize );
-
-						uniformsGroup.addUniform( uniformNodeGPU );
-
-						uniformGPU.push( uniformNodeGPU );
-
-					}
-
-				} else {
-
-					uniformGPU = this.getNodeUniform( uniformNode, type );
-
-					uniformsGroup.addUniform( uniformGPU );
-
-				}
+				uniformsGroup.addUniform( uniformGPU );
 
 			}
 
@@ -806,17 +791,7 @@ ${ flowData.code }
 					snippets: []
 				} );
 
-				if ( Array.isArray( uniform.value ) === true ) {
-
-					const length = uniform.value.length;
-
-					group.snippets.push( `uniform ${vectorType}[ ${length} ] ${uniform.name}` );
-
-				} else {
-
-					group.snippets.push( `\t${uniform.name} : ${ vectorType}` );
-
-				}
+				group.snippets.push( `\t${ uniform.name } : ${ vectorType }` );
 
 			}
 

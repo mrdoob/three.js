@@ -1,6 +1,7 @@
 import { addNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import { vectorComponents } from '../core/constants.js';
 
 class AssignNode extends TempNode {
 
@@ -25,39 +26,94 @@ class AssignNode extends TempNode {
 
 	}
 
+	needsSplitAssign( builder ) {
+
+		const { targetNode } = this;
+
+		if ( builder.isAvailable( 'swizzleAssign' ) === false && targetNode.isSplitNode && targetNode.components.length > 1 ) {
+
+			const targetLength = builder.getTypeLength( targetNode.node.getNodeType( builder ) );
+			const assignDiferentVector = vectorComponents.join( '' ).slice( 0, targetLength ) !== targetNode.components;
+
+			return assignDiferentVector;
+
+		}
+
+		return false;
+
+	}
+
 	generate( builder, output ) {
 
-		const targetNode = this.targetNode;
-		const sourceNode = this.sourceNode;
+		const { targetNode, sourceNode } = this;
+
+		const needsSplitAssign = this.needsSplitAssign( builder );
 
 		const targetType = targetNode.getNodeType( builder );
 
-		const target = targetNode.build( builder );
+		const target = targetNode.context( { assign: true } ).build( builder );
 		const source = sourceNode.build( builder, targetType );
 
-		const snippet = `${ target } = ${ source }`;
+		const sourceType = sourceNode.getNodeType( builder );
 
-		if ( output === 'void' ) {
+		const nodeData = builder.getDataFromNode( this );
 
-			builder.addLineFlowCode( snippet );
+		//
 
-			return;
+		let snippet;
 
-		} else {
+		if ( nodeData.initialized === true ) {
 
-			const sourceType = sourceNode.getNodeType( builder );
+			if ( output !== 'void' ) {
 
-			if ( sourceType === 'void' ) {
-
-				builder.addLineFlowCode( snippet );
-
-				return target;
+				snippet = target;
 
 			}
 
-			return builder.format( snippet, targetType, output );
+		} else if ( needsSplitAssign ) {
+
+			const sourceVar = builder.getVarFromNode( this, null, targetType );
+			const sourceProperty = builder.getPropertyName( sourceVar );
+
+			builder.addLineFlowCode( `${ sourceProperty } = ${ source }` );
+
+			const targetRoot = targetNode.node.context( { assign: true } ).build( builder );
+
+			for ( let i = 0; i < targetNode.components.length; i ++ ) {
+
+				const component = targetNode.components[ i ];
+
+				builder.addLineFlowCode( `${ targetRoot }.${ component } = ${ sourceProperty }[ ${ i } ]` );
+
+			}
+
+			if ( output !== 'void' ) {
+
+				snippet = target;
+
+			}
+
+		} else {
+
+			snippet = `${ target } = ${ source }`;
+
+			if ( output === 'void' || sourceType === 'void' ) {
+
+				builder.addLineFlowCode( snippet );
+
+				if ( output !== 'void' ) {
+
+					snippet = target;
+
+				}
+
+			}
 
 		}
+
+		nodeData.initialized = true;
+
+		return builder.format( snippet, targetType, output );
 
 	}
 

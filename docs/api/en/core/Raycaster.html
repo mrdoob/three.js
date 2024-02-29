@@ -113,8 +113,8 @@
 			objects on layer `1` will be honored by the instance of [name].
 
 			<code>
-raycaster.layers.set( 1 ); 
-object.layers.enable( 1 ); 
+raycaster.layers.set( 1 );
+object.layers.enable( 1 );
 			</code>
 		</p>
 
@@ -123,12 +123,12 @@ object.layers.enable( 1 );
 			An object with the following properties:
 
 			<code>
-{ 
+{
 	Mesh: {},
 	Line: { threshold: 1 },
 	LOD: {},
 	Points: { threshold: 1 },
-	Sprite: {} 
+	Sprite: {}
 }
 			</code>
 
@@ -157,6 +157,12 @@ object.layers.enable( 1 );
 			[page:Vector2 coords] — 2D coordinates of the mouse, in normalized device
 			coordinates (NDC)---X and Y components should be between `-1` and `1`.<br />
 			[page:Camera camera] — camera from which the ray should originate
+		</p>
+		<p>Updates the ray with a new origin and direction.</p>
+
+		<h3>[method:this setFromXRController]( [param:WebXRController controller] )</h3>
+		<p>
+			[page:WebXRController controller] — The controller to copy the position and direction from.
 		</p>
 		<p>Updates the ray with a new origin and direction.</p>
 

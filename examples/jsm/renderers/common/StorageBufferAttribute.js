@@ -1,6 +1,6 @@
-import { InstancedBufferAttribute } from 'three';
+import { BufferAttribute } from 'three';
 
-class StorageBufferAttribute extends InstancedBufferAttribute {
+class StorageBufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, typeClass = Float32Array ) {
 

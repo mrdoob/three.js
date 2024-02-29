@@ -1,15 +1,16 @@
-import { MathNode, GLSLNodeParser, NodeBuilder } from '../../../nodes/Nodes.js';
+import { MathNode, GLSLNodeParser, NodeBuilder, UniformNode, vectorComponents } from '../../../nodes/Nodes.js';
 
-import UniformBuffer from '../../common/UniformBuffer.js';
+import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
-import { IntType } from 'three';
+import { RedFormat, RGFormat, IntType, DataTexture, RGBAFormat, FloatType } from 'three';
 
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan',
-	textureDimensions: 'textureSize'
+	textureDimensions: 'textureSize',
+	equals: 'equal'
 };
 
 const precisionLib = {
@@ -19,7 +20,8 @@ const precisionLib = {
 };
 
 const supports = {
-	instance: true
+	instance: true,
+	swizzleAssign: true
 };
 
 const defaultPrecisions = `
@@ -81,6 +83,130 @@ ${ flowData.code }
 		//
 
 		return code;
+
+	}
+
+	setupPBO( storageBufferNode ) {
+
+		const attribute = storageBufferNode.value;
+
+		if ( attribute.pbo === undefined ) {
+
+			const originalArray = attribute.array;
+			const numElements = attribute.count * attribute.itemSize;
+
+			const { itemSize } = attribute;
+			let format = RedFormat;
+
+			if ( itemSize === 2 ) {
+
+				format = RGFormat;
+
+			} else if ( itemSize === 3 ) {
+
+				format = 6407; // patch since legacy doesn't use RGBFormat for rendering but here it's needed for packing optimization
+
+			} else if ( itemSize === 4 ) {
+
+				format = RGBAFormat;
+
+			}
+
+			const width = Math.pow( 2, Math.ceil( Math.log2( Math.sqrt( numElements / itemSize ) ) ) );
+			let height = Math.ceil( ( numElements / itemSize ) / width );
+			if ( width * height * itemSize < numElements ) height ++; // Ensure enough space
+
+			const newSize = width * height * itemSize;
+
+			const newArray = new Float32Array( newSize );
+
+			newArray.set( originalArray, 0 );
+
+			attribute.array = newArray;
+
+			const pboTexture = new DataTexture( attribute.array, width, height, format, FloatType );
+			pboTexture.needsUpdate = true;
+			pboTexture.isPBOTexture = true;
+
+			const pbo = new UniformNode( pboTexture );
+			pbo.setPrecision( 'high' );
+
+			attribute.pboNode = pbo;
+			attribute.pbo = pbo.value;
+
+			this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
+
+		}
+
+	}
+
+	generatePBO( storageArrayElementNode ) {
+
+		const { node, indexNode } = storageArrayElementNode;
+		const attribute = node.value;
+
+		if ( this.renderer.backend.has( attribute ) ) {
+
+			const attributeData = this.renderer.backend.get( attribute );
+			attributeData.pbo = attribute.pbo;
+
+		}
+
+
+		const nodeUniform = this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
+		const textureName = this.getPropertyName( nodeUniform );
+
+		indexNode.increaseUsage( this ); // force cache generate to be used as index in x,y
+		const indexSnippet = indexNode.build( this, 'uint' );
+
+		const elementNodeData = this.getDataFromNode( storageArrayElementNode );
+
+		let propertyName = elementNodeData.propertyName;
+
+		if ( propertyName === undefined ) {
+
+			// property element
+
+			const nodeVar = this.getVarFromNode( storageArrayElementNode );
+
+			propertyName = this.getPropertyName( nodeVar );
+
+			// property size
+
+			const bufferNodeData = this.getDataFromNode( node );
+
+			let propertySizeName = bufferNodeData.propertySizeName;
+
+			if ( propertySizeName === undefined ) {
+
+				propertySizeName = propertyName + 'Size';
+
+				this.getVarFromNode( node, propertySizeName, 'uint' );
+
+				this.addLineFlowCode( `${ propertySizeName } = uint( textureSize( ${ textureName }, 0 ).x )` );
+
+				bufferNodeData.propertySizeName = propertySizeName;
+
+			}
+
+			//
+
+			const { itemSize } = attribute;
+
+			const channel = '.' + vectorComponents.join( '' ).slice( 0, itemSize );
+			const uvSnippet = `ivec2(${indexSnippet} % ${ propertySizeName }, ${indexSnippet} / ${ propertySizeName })`;
+
+			const snippet = this.generateTextureLoad( null, textureName, uvSnippet, null, '0' );
+
+			//
+
+			this.addLineFlowCode( `${ propertyName } = ${ snippet + channel }` );
+
+			elementNodeData.propertyName = propertyName;
+
+		}
+
+		return propertyName;
 
 	}
 
@@ -416,7 +542,6 @@ ${ flowData.code }
 
 	}
 
-
 	isFlipY() {
 
 		return true;
@@ -630,11 +755,11 @@ void main() {
 
 			} else if ( type === 'buffer' ) {
 
-				node.name = `NodeBuffer_${node.id}`;
+				node.name = `NodeBuffer_${ node.id }`;
+				uniformNode.name = `buffer${ node.id }`;
 
-				const buffer = new UniformBuffer( node.name, node.value );
-
-				uniformNode.name = `buffer${node.id}`;
+				const buffer = new NodeUniformBuffer( node );
+				buffer.name = node.name;
 
 				this.bindings[ shaderStage ].push( buffer );
 
