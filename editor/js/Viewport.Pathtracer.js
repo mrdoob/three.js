@@ -72,8 +72,28 @@ function ViewportPathtracer( renderer ) {
 
 		//
 
-		const background = scene.background;
+		setBackground( scene.background );
 
+		//
+
+		setEnvironment( scene.environment );
+
+	}
+
+	function setSize( width, height ) {
+
+		if ( pathtracer === null ) return;
+
+		pathtracer.setSize( width, height );
+		pathtracer.reset();
+
+	}
+
+	function setBackground( background ) {
+
+		if ( pathtracer === null ) return;
+
+		const ptMaterial = pathtracer.material;
 		if ( background ) {
 
 			if ( background.isTexture ) {
@@ -92,18 +112,23 @@ function ViewportPathtracer( renderer ) {
 
 		}
 
-		//
+		pathtracer.reset();
 
-		const environment = scene.environment;
+	}
 
+	function setEnvironment( environment ) {
+
+		if ( pathtracer === null ) return;
+
+		const ptMaterial = pathtracer.material;
 		if ( environment && environment.isDataTexture === true ) {
 
 			// Avoid calling envMapInfo() with the same hdr
 
-			if ( scene.environment !== hdr ) {
+			if ( environment !== hdr ) {
 
-				ptMaterial.envMapInfo.updateFrom( scene.environment );
-				hdr = scene.environment;
+				ptMaterial.envMapInfo.updateFrom( environment );
+				hdr = environment;
 
 			}
 
@@ -113,13 +138,6 @@ function ViewportPathtracer( renderer ) {
 
 		}
 
-	}
-
-	function setSize( width, height ) {
-
-		if ( pathtracer === null ) return;
-
-		pathtracer.setSize( width, height );
 		pathtracer.reset();
 
 	}
@@ -151,6 +169,8 @@ function ViewportPathtracer( renderer ) {
 	return {
 		init: init,
 		setSize: setSize,
+		setBackground: setBackground,
+		setEnvironment: setEnvironment,
 		update: update,
 		reset: reset
 	};
