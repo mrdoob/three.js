@@ -80,9 +80,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		let morphTextureStride = 0;
 
-		if ( geometry.morphAttributes.position !== undefined ) morphTextureStride = 1;
-		if ( geometry.morphAttributes.normal !== undefined ) morphTextureStride = 2;
-		if ( geometry.morphAttributes.color !== undefined ) morphTextureStride = 3;
+		if ( geometry.morphAttributes.position !== undefined ) morphTextureStride = 3;
+		if ( geometry.morphAttributes.normal !== undefined ) morphTextureStride = 6;
+		if ( geometry.morphAttributes.color !== undefined ) morphTextureStride = 10;
 
 		//
 
