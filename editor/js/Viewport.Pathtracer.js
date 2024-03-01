@@ -49,7 +49,6 @@ function ViewportPathtracer( renderer ) {
 
 		}
 
-		pathtracer.material.backgroundBlur = scene.backgroundBlurriness;
 		pathtracer.reset();
 
 		const { bvh, textures, materials, lights } = generator.generate( scene );
@@ -72,10 +71,7 @@ function ViewportPathtracer( renderer ) {
 
 		//
 
-		setBackground( scene.background );
-
-		//
-
+		setBackground( scene.background, scene.backgroundBlurriness );
 		setEnvironment( scene.environment );
 
 	}
@@ -89,26 +85,30 @@ function ViewportPathtracer( renderer ) {
 
 	}
 
-	function setBackground( background ) {
+	function setBackground( background, blurriness ) {
 
 		if ( pathtracer === null ) return;
 
 		const ptMaterial = pathtracer.material;
+
 		if ( background ) {
 
 			if ( background.isTexture ) {
 
 				ptMaterial.backgroundMap = background;
+				ptMaterial.backgroundBlur = blurriness;
 
 			} else if ( background.isColor ) {
 
 				ptMaterial.backgroundMap = buildColorTexture( background );
+				ptMaterial.backgroundBlur = 0;
 
 			}
 
 		} else {
 
 			ptMaterial.backgroundMap = buildColorTexture( new THREE.Color( 0 ) );
+			ptMaterial.backgroundBlur = 0;
 
 		}
 
@@ -121,6 +121,7 @@ function ViewportPathtracer( renderer ) {
 		if ( pathtracer === null ) return;
 
 		const ptMaterial = pathtracer.material;
+
 		if ( environment && environment.isDataTexture === true ) {
 
 			// Avoid calling envMapInfo() with the same hdr
