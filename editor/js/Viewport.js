@@ -758,7 +758,7 @@ function Viewport( editor ) {
 
 		if ( editor.viewportShading === 'realistic' ) {
 
-			pathtracer.setBackground( scene.background );
+			pathtracer.setBackground( scene.background, scene.backgroundBlurriness );
 
 		}
 
