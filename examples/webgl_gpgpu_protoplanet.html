@@ -405,8 +405,6 @@
 					fragmentShader: document.getElementById( 'particleFragmentShader' ).textContent
 				} );
 
-				material.extensions.drawBuffers = true;
-
 				const particles = new THREE.Points( geometry, material );
 				particles.matrixAutoUpdate = false;
 				particles.updateMatrix();
