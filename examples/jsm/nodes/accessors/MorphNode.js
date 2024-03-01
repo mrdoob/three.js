@@ -2,13 +2,14 @@ import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy, tslFn } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
-import { referenceIndex } from './ReferenceNode.js';
+import { reference } from './ReferenceNode.js';
 import { positionLocal } from './PositionNode.js';
 import { normalLocal } from './NormalNode.js';
 import { textureLoad } from './TextureNode.js';
 import { vertexIndex } from '../core/IndexNode.js';
 import { ivec2, int } from '../shadernode/ShaderNode.js';
 import { DataArrayTexture, Vector2, Vector4, FloatType } from 'three';
+import { loop } from '../utils/LoopNode.js';
 
 const morphTextures = new WeakMap();
 const morphVec4 = new Vector4();
@@ -185,10 +186,9 @@ class MorphNode extends Node {
 
 		const width = int( size.width );
 
-		for ( let i = 0; i < morphTargetsCount; i ++ ) {
+		loop( morphTargetsCount, ( { i } ) => {
 
-			const influence = referenceIndex( 'morphTargetInfluences', i, 'float' );
-			const depth = int( i );
+			const influence = reference( 'morphTargetInfluences', 'float' ).element( i );
 
 			if ( hasMorphPosition === true ) {
 
@@ -197,7 +197,7 @@ class MorphNode extends Node {
 					influence,
 					stride,
 					width,
-					depth,
+					depth: i,
 					offset: int( 0 )
 				} ) );
 
@@ -210,13 +210,13 @@ class MorphNode extends Node {
 					influence,
 					stride,
 					width,
-					depth,
+					depth: i,
 					offset: int( 1 )
 				} ) );
 
 			}
 
-		}
+		} );
 
 	}
 
@@ -240,6 +240,6 @@ class MorphNode extends Node {
 
 export default MorphNode;
 
-export const morph = nodeProxy( MorphNode );
+export const morphReference = nodeProxy( MorphNode );
 
 addNodeClass( 'MorphNode', MorphNode );

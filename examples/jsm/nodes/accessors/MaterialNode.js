@@ -227,11 +227,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.IRIDESCENCE_THICKNESS ) {
 
-			const iridescenceThicknessMaximum = reference( 1, 'float', material.iridescenceThicknessRange );
+			const iridescenceThicknessMaximum = reference( '1', 'float', material.iridescenceThicknessRange );
 
 			if ( material.iridescenceThicknessMap ) {
 
-				const iridescenceThicknessMinimum = reference( 0, 'float', material.iridescenceThicknessRange );
+				const iridescenceThicknessMinimum = reference( '0', 'float', material.iridescenceThicknessRange );
 
 				node = iridescenceThicknessMaximum.sub( iridescenceThicknessMinimum ).mul( this.getTexture( scope ).g ).add( iridescenceThicknessMinimum );
 

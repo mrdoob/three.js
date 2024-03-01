@@ -31,6 +31,9 @@ class EditorControls extends THREE.EventDispatcher {
 		var spherical = new THREE.Spherical();
 		var sphere = new THREE.Sphere();
 
+		var pointers = [];
+		var pointerPositions = {};
+
 		// events
 
 		var changeEvent = { type: 'change' };
@@ -122,19 +125,32 @@ class EditorControls extends THREE.EventDispatcher {
 
 			if ( scope.enabled === false ) return;
 
-			switch ( event.pointerType ) {
+			if ( pointers.length === 0 ) {
 
-				case 'mouse':
-				case 'pen':
-					onMouseDown( event );
-					break;
+				domElement.setPointerCapture( event.pointerId );
 
-				// TODO touch
+				domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove );
+				domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp );
 
 			}
 
-			domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove );
-			domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp );
+			//
+
+			if ( isTrackingPointer( event ) ) return;
+
+			//
+
+			addPointer( event );
+
+			if ( event.pointerType === 'touch' ) {
+
+				onTouchStart( event );
+
+			} else {
+
+				onMouseDown( event );
+
+			}
 
 		}
 
@@ -142,14 +158,13 @@ class EditorControls extends THREE.EventDispatcher {
 
 			if ( scope.enabled === false ) return;
 
-			switch ( event.pointerType ) {
+			if ( event.pointerType === 'touch' ) {
 
-				case 'mouse':
-				case 'pen':
-					onMouseMove( event );
-					break;
+				onTouchMove( event );
 
-				// TODO touch
+			} else {
+
+				onMouseMove( event );
 
 			}
 
@@ -157,19 +172,30 @@ class EditorControls extends THREE.EventDispatcher {
 
 		function onPointerUp( event ) {
 
-			switch ( event.pointerType ) {
+			removePointer( event );
 
-				case 'mouse':
-				case 'pen':
-					onMouseUp();
+			switch ( pointers.length ) {
+
+				case 0:
+
+					domElement.releasePointerCapture( event.pointerId );
+
+					domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
+					domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
+
 					break;
 
-				// TODO touch
+				case 1:
+
+					var pointerId = pointers[ 0 ];
+					var position = pointerPositions[ pointerId ];
+
+					// minimal placeholder event - allows state correction on pointer-up
+					onTouchStart( { pointerId: pointerId, pageX: position.x, pageY: position.y } );
+
+					break;
 
 			}
-
-			domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
-			domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
 
 		}
 
@@ -251,9 +277,6 @@ class EditorControls extends THREE.EventDispatcher {
 
 			domElement.removeEventListener( 'pointerdown', onPointerDown );
 
-			domElement.removeEventListener( 'touchstart', touchStart );
-			domElement.removeEventListener( 'touchmove', touchMove );
-
 		};
 
 		domElement.addEventListener( 'contextmenu', contextmenu );
@@ -269,20 +292,23 @@ class EditorControls extends THREE.EventDispatcher {
 
 		var prevDistance = null;
 
-		function touchStart( event ) {
+		function onTouchStart( event ) {
 
-			if ( scope.enabled === false ) return;
+			trackPointer( event );
 
-			switch ( event.touches.length ) {
+			switch ( pointers.length ) {
 
 				case 1:
-					touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
-					touches[ 1 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
+					touches[ 0 ].set( event.pageX, event.pageY, 0 ).divideScalar( window.devicePixelRatio );
+					touches[ 1 ].set( event.pageX, event.pageY, 0 ).divideScalar( window.devicePixelRatio );
 					break;
 
 				case 2:
-					touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
-					touches[ 1 ].set( event.touches[ 1 ].pageX, event.touches[ 1 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
+
+					var position = getSecondPointerPosition( event );
+
+					touches[ 0 ].set( event.pageX, event.pageY, 0 ).divideScalar( window.devicePixelRatio );
+					touches[ 1 ].set( position.x, position.y, 0 ).divideScalar( window.devicePixelRatio );
 					prevDistance = touches[ 0 ].distanceTo( touches[ 1 ] );
 					break;
 
@@ -294,12 +320,9 @@ class EditorControls extends THREE.EventDispatcher {
 		}
 
 
-		function touchMove( event ) {
+		function onTouchMove( event ) {
 
-			if ( scope.enabled === false ) return;
-
-			event.preventDefault();
-			event.stopPropagation();
+			trackPointer( event );
 
 			function getClosest( touch, touches ) {
 
@@ -315,17 +338,20 @@ class EditorControls extends THREE.EventDispatcher {
 
 			}
 
-			switch ( event.touches.length ) {
+			switch ( pointers.length ) {
 
 				case 1:
-					touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
-					touches[ 1 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
+					touches[ 0 ].set( event.pageX, event.pageY, 0 ).divideScalar( window.devicePixelRatio );
+					touches[ 1 ].set( event.pageX, event.pageY, 0 ).divideScalar( window.devicePixelRatio );
 					scope.rotate( touches[ 0 ].sub( getClosest( touches[ 0 ], prevTouches ) ).multiplyScalar( - 1 ) );
 					break;
 
 				case 2:
-					touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
-					touches[ 1 ].set( event.touches[ 1 ].pageX, event.touches[ 1 ].pageY, 0 ).divideScalar( window.devicePixelRatio );
+
+					var position = getSecondPointerPosition( event );
+
+					touches[ 0 ].set( event.pageX, event.pageY, 0 ).divideScalar( window.devicePixelRatio );
+					touches[ 1 ].set( position.x, position.y, 0 ).divideScalar( window.devicePixelRatio );
 					var distance = touches[ 0 ].distanceTo( touches[ 1 ] );
 					scope.zoom( delta.set( 0, 0, prevDistance - distance ) );
 					prevDistance = distance;
@@ -347,8 +373,63 @@ class EditorControls extends THREE.EventDispatcher {
 
 		}
 
-		domElement.addEventListener( 'touchstart', touchStart, { passive: false } );
-		domElement.addEventListener( 'touchmove', touchMove, { passive: false } );
+		function addPointer( event ) {
+
+			pointers.push( event.pointerId );
+
+		}
+
+		function removePointer( event ) {
+
+			delete pointerPositions[ event.pointerId ];
+
+			for ( var i = 0; i < pointers.length; i ++ ) {
+
+				if ( pointers[ i ] == event.pointerId ) {
+
+					pointers.splice( i, 1 );
+					return;
+
+				}
+
+			}
+
+		}
+
+		function isTrackingPointer( event ) {
+
+			for ( var i = 0; i < pointers.length; i ++ ) {
+
+				if ( pointers[ i ] == event.pointerId ) return true;
+
+			}
+
+			return false;
+
+		}
+
+		function trackPointer( event ) {
+
+			var position = pointerPositions[ event.pointerId ];
+
+			if ( position === undefined ) {
+
+				position = new THREE.Vector2();
+				pointerPositions[ event.pointerId ] = position;
+
+			}
+
+			position.set( event.pageX, event.pageY );
+
+		}
+
+		function getSecondPointerPosition( event ) {
+
+			var pointerId = ( event.pointerId === pointers[ 0 ] ) ? pointers[ 1 ] : pointers[ 0 ];
+
+			return pointerPositions[ pointerId ];
+
+		}
 
 	}
 

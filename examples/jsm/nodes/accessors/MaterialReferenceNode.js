@@ -24,21 +24,11 @@ class MaterialReferenceNode extends ReferenceNode {
 
 	}*/
 
-	updateReference( frame ) {
+	setReference( state ) {
 
-		this.reference = this.material !== null ? this.material : frame.material;
+		this.reference = this.material !== null ? this.material : state.material;
 
 		return this.reference;
-
-	}
-
-	setup( builder ) {
-
-		const material = this.material !== null ? this.material : builder.material;
-
-		this.node.value = material[ this.property ];
-
-		return super.setup( builder );
 
 	}
 

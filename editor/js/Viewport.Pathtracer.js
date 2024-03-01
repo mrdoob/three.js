@@ -3,14 +3,20 @@ import { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 import {
 	PathTracingSceneGenerator,
 	PathTracingRenderer,
-	PhysicalPathTracingMaterial
+	PhysicalPathTracingMaterial,
+	ProceduralEquirectTexture,
 } from 'three-gpu-pathtracer';
 
 function buildColorTexture( color ) {
 
-	const data = new Uint8Array( [ color.r * 255, color.g * 255, color.b * 255, 255 ] );
-	const texture = new THREE.DataTexture( data, 1, 1, THREE.RGBAFormat );
-	texture.needsUpdate = true;
+	const texture = new ProceduralEquirectTexture( 4, 4 );
+	texture.generationCallback = ( polar, uv, coord, target ) => {
+
+		target.copy( color );
+
+	};
+
+	texture.update();
 
 	return texture;
 
@@ -46,14 +52,6 @@ function ViewportPathtracer( renderer ) {
 		pathtracer.material.backgroundBlur = scene.backgroundBlurriness;
 		pathtracer.reset();
 
-		// TOFIX: If the scene is empty the generator crashes so we render a tiny cube (:
-
-		if ( scene.children.length === 0 ) {
-
-			scene = new THREE.Mesh( new THREE.BoxGeometry( 0.0001, 0.0001, 0.0001 ) );
-
-		}
-
 		const { bvh, textures, materials, lights } = generator.generate( scene );
 
 		const ptGeometry = bvh.geometry;
@@ -70,6 +68,7 @@ function ViewportPathtracer( renderer ) {
 		ptMaterial.textures.setTextures( renderer, 2048, 2048, textures );
 		ptMaterial.materials.updateFrom( materials, textures );
 		ptMaterial.lights.updateFrom( lights );
+		ptMaterial.filterGlossyFactor = 0.5;
 
 		//
 
@@ -89,7 +88,7 @@ function ViewportPathtracer( renderer ) {
 
 		} else {
 
-			ptMaterial.backgroundMap = buildColorTexture( new THREE.Color( 0x000000 ) );
+			ptMaterial.backgroundMap = buildColorTexture( new THREE.Color( 0 ) );
 
 		}
 
@@ -97,7 +96,7 @@ function ViewportPathtracer( renderer ) {
 
 		const environment = scene.environment;
 
-		if ( environment && environment.isTexture === true ) {
+		if ( environment && environment.isDataTexture === true ) {
 
 			// Avoid calling envMapInfo() with the same hdr
 
@@ -110,7 +109,7 @@ function ViewportPathtracer( renderer ) {
 
 		} else {
 
-			ptMaterial.envMapInfo.updateFrom( buildColorTexture( new THREE.Color( 0xffffff ) ) );
+			ptMaterial.envMapInfo.updateFrom( buildColorTexture( new THREE.Color( 0 ) ) );
 
 		}
 
@@ -131,9 +130,13 @@ function ViewportPathtracer( renderer ) {
 
 		pathtracer.update();
 
-		renderer.autoClear = false;
-		quad.render( renderer );
-		renderer.autoClear = true;
+		if ( pathtracer.samples >= 1 ) {
+
+			renderer.autoClear = false;
+			quad.render( renderer );
+			renderer.autoClear = true;
+
+		}
 
 	}
 

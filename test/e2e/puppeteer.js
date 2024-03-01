@@ -119,10 +119,14 @@ const exceptionList = [
 	'webgpu_sprites',
 	'webgpu_video_panorama',
 
+	// Awaiting for WebGPU Backend support in Puppeteer
+	'webgpu_storage_buffer',
+
 	// WebGPURenderer: Unknown problem
 	'webgpu_postprocessing_afterimage',
 	'webgpu_backdrop_water',
 	'webgpu_camera_logarithmicdepthbuffer',
+	'webgpu_clipping',
 	'webgpu_loader_materialx',
 	'webgpu_materials_video',
 	'webgpu_materialx_noise',

@@ -11,8 +11,6 @@ import {
 	LinearMipmapLinearFilter,
 	SRGBColorSpace,
 	LinearSRGBColorSpace,
-	sRGBEncoding,
-	LinearEncoding,
 	RGBAIntegerFormat,
 	RGIntegerFormat,
 	RedIntegerFormat,
@@ -491,7 +489,7 @@ class WebGLRenderer {
 
 			}
 
-			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).floor() );
+			state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).round() );
 
 		};
 
@@ -513,7 +511,7 @@ class WebGLRenderer {
 
 			}
 
-			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).floor() );
+			state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).round() );
 
 		};
 
@@ -1614,6 +1612,7 @@ class WebGLRenderer {
 			materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 			materialProperties.fog = scene.fog;
 			materialProperties.envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || materialProperties.environment );
+			materialProperties.envMapRotation = ( materialProperties.environment !== null && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
 
 			if ( programs === undefined ) {
 
@@ -1726,6 +1725,7 @@ class WebGLRenderer {
 			materialProperties.batching = parameters.batching;
 			materialProperties.instancing = parameters.instancing;
 			materialProperties.instancingColor = parameters.instancingColor;
+			materialProperties.instancingMorph = parameters.instancingMorph;
 			materialProperties.skinning = parameters.skinning;
 			materialProperties.morphTargets = parameters.morphTargets;
 			materialProperties.morphNormals = parameters.morphNormals;
@@ -1833,6 +1833,14 @@ class WebGLRenderer {
 					needsProgramChange = true;
 
 				} else if ( object.isInstancedMesh && materialProperties.instancingColor === false && object.instanceColor !== null ) {
+
+					needsProgramChange = true;
+
+				} else if ( object.isInstancedMesh && materialProperties.instancingMorph === true && object.morphTexture === null ) {
+
+					needsProgramChange = true;
+
+				} else if ( object.isInstancedMesh && materialProperties.instancingMorph === false && object.morphTexture !== null ) {
 
 					needsProgramChange = true;
 
@@ -2164,20 +2172,16 @@ class WebGLRenderer {
 			const renderTargetProperties = properties.get( renderTarget );
 			renderTargetProperties.__hasExternalTextures = true;
 
-			if ( renderTargetProperties.__hasExternalTextures ) {
+			renderTargetProperties.__autoAllocateDepthBuffer = depthTexture === undefined;
 
-				renderTargetProperties.__autoAllocateDepthBuffer = depthTexture === undefined;
+			if ( ! renderTargetProperties.__autoAllocateDepthBuffer ) {
 
-				if ( ! renderTargetProperties.__autoAllocateDepthBuffer ) {
+				// The multisample_render_to_texture extension doesn't work properly if there
+				// are midframe flushes and an external depth buffer. Disable use of the extension.
+				if ( extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) {
 
-					// The multisample_render_to_texture extension doesn't work properly if there
-					// are midframe flushes and an external depth buffer. Disable use of the extension.
-					if ( extensions.has( 'WEBGL_multisampled_render_to_texture' ) === true ) {
-
-						console.warn( 'THREE.WebGLRenderer: Render-to-texture extension was disabled because an external texture was provided' );
-						renderTargetProperties.__useRenderToTexture = false;
-
-					}
+					console.warn( 'THREE.WebGLRenderer: Render-to-texture extension was disabled because an external texture was provided' );
+					renderTargetProperties.__useRenderToTexture = false;
 
 				}
 
@@ -2437,8 +2441,8 @@ class WebGLRenderer {
 
 			}
 
-			const width = sourceBox.max.x - sourceBox.min.x + 1;
-			const height = sourceBox.max.y - sourceBox.min.y + 1;
+			const width = Math.round( sourceBox.max.x - sourceBox.min.x );
+			const height = Math.round( sourceBox.max.y - sourceBox.min.y );
 			const depth = sourceBox.max.z - sourceBox.min.z + 1;
 			const glFormat = utils.convert( dstTexture.format );
 			const glType = utils.convert( dstTexture.type );
@@ -2485,9 +2489,8 @@ class WebGLRenderer {
 
 			} else {
 
-				if ( srcTexture.isCompressedArrayTexture ) {
+				if ( dstTexture.isCompressedArrayTexture ) {
 
-					console.warn( 'THREE.WebGLRenderer.copyTextureToTexture3D: untested support for compressed srcTexture.' );
 					_gl.compressedTexSubImage3D( glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, image.data );
 
 				} else {
@@ -2573,20 +2576,6 @@ class WebGLRenderer {
 		const gl = this.getContext();
 		gl.drawingBufferColorSpace = colorSpace === DisplayP3ColorSpace ? 'display-p3' : 'srgb';
 		gl.unpackColorSpace = ColorManagement.workingColorSpace === LinearDisplayP3ColorSpace ? 'display-p3' : 'srgb';
-
-	}
-
-	get outputEncoding() { // @deprecated, r152
-
-		console.warn( 'THREE.WebGLRenderer: Property .outputEncoding has been removed. Use .outputColorSpace instead.' );
-		return this.outputColorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding;
-
-	}
-
-	set outputEncoding( encoding ) { // @deprecated, r152
-
-		console.warn( 'THREE.WebGLRenderer: Property .outputEncoding has been removed. Use .outputColorSpace instead.' );
-		this.outputColorSpace = encoding === sRGBEncoding ? SRGBColorSpace : LinearSRGBColorSpace;
 
 	}
 

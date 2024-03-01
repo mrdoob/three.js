@@ -44,6 +44,7 @@
 		"webgl_geometry_text_shapes",
 		"webgl_geometry_text_stroke",
 		"webgl_helpers",
+		"webgl_instancing_morph",
 		"webgl_instancing_dynamic",
 		"webgl_instancing_performance",
 		"webgl_instancing_raycast",
@@ -320,6 +321,7 @@
 		"webgpu_backdrop_water",
 		"webgpu_camera_logarithmicdepthbuffer",
 		"webgpu_clearcoat",
+		"webgpu_clipping",
 		"webgpu_compute_audio",
 		"webgpu_compute_particles",
 		"webgpu_compute_particles_rain",
@@ -354,6 +356,7 @@
 		"webgpu_morphtargets",
 		"webgpu_morphtargets_face",
 		"webgpu_occlusion",
+		"webgpu_parallax_uv",
 		"webgpu_particles",
 		"webgpu_portal",
 		"webgpu_reflection",
@@ -373,7 +376,8 @@
 		"webgpu_postprocessing_anamorphic",
 		"webgpu_mirror",
 		"webgpu_multisampled_renderbuffers",
-		"webgpu_materials_texture_anisotropy"
+		"webgpu_materials_texture_anisotropy",
+		"webgpu_storage_buffer"
 	],
 	"webaudio": [
 		"webaudio_orientation",
@@ -400,6 +404,7 @@
 		"webxr_vr_teleport",
 		"webxr_vr_video",
 		"webxr_xr_ballshooter",
+		"webxr_xr_controls_transform",
 		"webxr_xr_cubes",
 		"webxr_xr_dragging",
 		"webxr_xr_haptics",

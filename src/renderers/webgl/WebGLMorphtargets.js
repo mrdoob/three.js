@@ -154,23 +154,30 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 			}
 
 			//
+			if ( object.isInstancedMesh === true && object.morphTexture !== null ) {
 
-			let morphInfluencesSum = 0;
+				program.getUniforms().setValue( gl, 'morphTexture', object.morphTexture, textures );
 
-			for ( let i = 0; i < objectInfluences.length; i ++ ) {
+			} else {
 
-				morphInfluencesSum += objectInfluences[ i ];
+				let morphInfluencesSum = 0;
+
+				for ( let i = 0; i < objectInfluences.length; i ++ ) {
+
+					morphInfluencesSum += objectInfluences[ i ];
+
+				}
+
+				const morphBaseInfluence = geometry.morphTargetsRelative ? 1 : 1 - morphInfluencesSum;
+
+
+				program.getUniforms().setValue( gl, 'morphTargetBaseInfluence', morphBaseInfluence );
+				program.getUniforms().setValue( gl, 'morphTargetInfluences', objectInfluences );
 
 			}
 
-			const morphBaseInfluence = geometry.morphTargetsRelative ? 1 : 1 - morphInfluencesSum;
-
-			program.getUniforms().setValue( gl, 'morphTargetBaseInfluence', morphBaseInfluence );
-			program.getUniforms().setValue( gl, 'morphTargetInfluences', objectInfluences );
-
 			program.getUniforms().setValue( gl, 'morphTargetsTexture', entry.texture, textures );
 			program.getUniforms().setValue( gl, 'morphTargetsTextureSize', entry.size );
-
 
 		} else {
 

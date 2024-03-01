@@ -196,6 +196,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			batching: IS_BATCHEDMESH,
 			instancing: IS_INSTANCEDMESH,
 			instancingColor: IS_INSTANCEDMESH && object.instanceColor !== null,
+			instancingMorph: IS_INSTANCEDMESH && object.morphTexture !== null,
 
 			supportsVertexTextures: SUPPORTS_VERTEX_TEXTURES,
 			outputColorSpace: ( currentRenderTarget === null ) ? renderer.outputColorSpace : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace ),
@@ -482,38 +483,40 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 2 );
 		if ( parameters.instancingColor )
 			_programLayers.enable( 3 );
-		if ( parameters.matcap )
+		if ( parameters.instancingMorph )
 			_programLayers.enable( 4 );
-		if ( parameters.envMap )
+		if ( parameters.matcap )
 			_programLayers.enable( 5 );
-		if ( parameters.normalMapObjectSpace )
+		if ( parameters.envMap )
 			_programLayers.enable( 6 );
-		if ( parameters.normalMapTangentSpace )
+		if ( parameters.normalMapObjectSpace )
 			_programLayers.enable( 7 );
-		if ( parameters.clearcoat )
+		if ( parameters.normalMapTangentSpace )
 			_programLayers.enable( 8 );
-		if ( parameters.iridescence )
+		if ( parameters.clearcoat )
 			_programLayers.enable( 9 );
-		if ( parameters.alphaTest )
+		if ( parameters.iridescence )
 			_programLayers.enable( 10 );
-		if ( parameters.vertexColors )
+		if ( parameters.alphaTest )
 			_programLayers.enable( 11 );
-		if ( parameters.vertexAlphas )
+		if ( parameters.vertexColors )
 			_programLayers.enable( 12 );
-		if ( parameters.vertexUv1s )
+		if ( parameters.vertexAlphas )
 			_programLayers.enable( 13 );
-		if ( parameters.vertexUv2s )
+		if ( parameters.vertexUv1s )
 			_programLayers.enable( 14 );
-		if ( parameters.vertexUv3s )
+		if ( parameters.vertexUv2s )
 			_programLayers.enable( 15 );
-		if ( parameters.vertexTangents )
+		if ( parameters.vertexUv3s )
 			_programLayers.enable( 16 );
-		if ( parameters.anisotropy )
+		if ( parameters.vertexTangents )
 			_programLayers.enable( 17 );
-		if ( parameters.alphaHash )
+		if ( parameters.anisotropy )
 			_programLayers.enable( 18 );
-		if ( parameters.batching )
+		if ( parameters.alphaHash )
 			_programLayers.enable( 19 );
+		if ( parameters.batching )
+			_programLayers.enable( 20 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();

@@ -411,8 +411,15 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 					this.preview = ! this.preview;
 
-				}
+				} else if ( key === 'Delete' ) {
 
+					if ( this.canvas.selected ) this.canvas.selected.dispose();
+					
+				} else if ( key === 'Escape' ) {
+
+					this.canvas.select( null );
+
+				}
 			}
 
 		} );

@@ -47,23 +47,6 @@ function MenubarEdit( editor ) {
 	} );
 	options.add( redo );
 
-	// Clear History
-
-	let option = new UIRow();
-	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/edit/clear_history' ) );
-	option.onClick( function () {
-
-		if ( confirm( 'The Undo/Redo History will be cleared. Are you sure?' ) ) {
-
-			editor.history.clear();
-
-		}
-
-	} );
-	options.add( option );
-
-
 	editor.signals.historyChanged.add( function () {
 
 		const history = editor.history;
@@ -91,7 +74,7 @@ function MenubarEdit( editor ) {
 
 	// Center
 
-	option = new UIRow();
+	let option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/center' ) );
 	option.onClick( function () {

@@ -58,7 +58,7 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Install Node
-        uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4
         with:
           node-version: 18
           cache: 'npm'
@@ -126,7 +126,7 @@ jobs:
           echo "TREESHAKEN_DIFF=$TREESHAKEN_DIFF" >> $GITHUB_OUTPUT
 
       - name: Find existing comment
-        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2
+        uses: peter-evans/find-comment@d5fe37641ad8451bdd80312415672ba26c86575e # v3
         id: find-comment
         with:
           issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}

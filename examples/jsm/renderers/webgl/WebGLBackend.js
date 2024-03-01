@@ -84,7 +84,7 @@ class WebGLBackend extends Backend {
 
 		this._setFramebuffer( renderContext );
 
-		this.clear( renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil, renderContext );
+		this.clear( renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil, renderContext, false );
 
 		//
 		if ( renderContext.viewport ) {
@@ -313,7 +313,7 @@ class WebGLBackend extends Backend {
 
 	}
 
-	clear( color, depth, stencil, descriptor = null ) {
+	clear( color, depth, stencil, descriptor = null, setFrameBuffer = true ) {
 
 		const { gl } = this;
 
@@ -336,7 +336,7 @@ class WebGLBackend extends Backend {
 
 		if ( clear !== 0 ) {
 
-			const clearColor = descriptor.clearColorValue;
+			const clearColor = descriptor.clearColorValue || this.getClearColor();
 
 			if ( depth ) this.state.setDepthMask( true );
 
@@ -346,6 +346,8 @@ class WebGLBackend extends Backend {
 				gl.clear( clear );
 
 			} else {
+
+				if ( setFrameBuffer ) this._setFramebuffer( descriptor );
 
 				if ( color ) {
 
@@ -422,15 +424,33 @@ class WebGLBackend extends Backend {
 		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, transformFeedbackGPU );
 		gl.beginTransformFeedback( gl.POINTS );
 
-		gl.drawArraysInstanced( gl.POINTS, 0, 1, computeNode.count );
+		if ( attributes[ 0 ].isStorageInstancedBufferAttribute ) {
+
+			gl.drawArraysInstanced( gl.POINTS, 0, 1, computeNode.count );
+
+		} else {
+
+			gl.drawArrays( gl.POINTS, 0, computeNode.count );
+
+		}
 
 		gl.endTransformFeedback();
 		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );
 
 		// switch active buffers
+
 		for ( let i = 0; i < transformBuffers.length; i ++ ) {
 
-			transformBuffers[ i ].switchBuffers();
+			const dualAttributeData = transformBuffers[ i ];
+
+			if ( dualAttributeData.pbo ) {
+
+				this.textureUtils.copyBufferToTexture( dualAttributeData.transformBuffer, dualAttributeData.pbo );
+
+			}
+
+			dualAttributeData.switchBuffers();
+
 
 		}
 
@@ -1222,7 +1242,7 @@ class WebGLBackend extends Backend {
 			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
 			gl.enableVertexAttribArray( i );
 
-			if ( attribute.isStorageBufferAttribute ) staticVao = false;
+			if ( attribute.isStorageBufferAttribute || attribute.isStorageInstancedBufferAttribute ) staticVao = false;
 
 			let stride, offset;
 

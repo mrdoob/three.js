@@ -36,7 +36,7 @@ export default /* glsl */`
 
 	#ifdef ENVMAP_TYPE_CUBE
 
-		vec4 envColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );
+		vec4 envColor = textureCube( envMap, envMapRotation * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );
 
 	#else
 

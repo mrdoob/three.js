@@ -434,7 +434,7 @@ class UICheckbox extends UIElement {
 			// Workaround for TransformControls blocking events in Viewport.Controls checkboxes
 
 			event.stopPropagation();
-		
+
 		} );
 
 		this.setValue( boolean );
@@ -552,6 +552,8 @@ class UINumber extends UIElement {
 		const prevPointer = { x: 0, y: 0 };
 
 		function onMouseDown( event ) {
+
+			if ( document.activeElement === scope.dom ) return;
 
 			event.preventDefault();
 
@@ -820,6 +822,8 @@ class UIInteger extends UIElement {
 		const prevPointer = { x: 0, y: 0 };
 
 		function onMouseDown( event ) {
+
+			if ( document.activeElement === scope.dom ) return;
 
 			event.preventDefault();
 

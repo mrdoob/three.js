@@ -157,23 +157,20 @@
 
 				// Create a multi render target with Float buffers
 
-				renderTarget = new THREE.WebGLMultipleRenderTargets(
+				renderTarget = new THREE.WebGLRenderTarget(
 					window.innerWidth * window.devicePixelRatio,
 					window.innerHeight * window.devicePixelRatio,
-					2
+					{
+						count: 2,
+						minFilter: THREE.NearestFilter,
+						magFilter: THREE.NearestFilter
+					}
 				);
-
-				for ( let i = 0, il = renderTarget.texture.length; i < il; i ++ ) {
-
-					renderTarget.texture[ i ].minFilter = THREE.NearestFilter;
-					renderTarget.texture[ i ].magFilter = THREE.NearestFilter;
-
-				}
 
 				// Name our G-Buffer attachments for debugging
 
-				renderTarget.texture[ 0 ].name = 'diffuse';
-				renderTarget.texture[ 1 ].name = 'normal';
+				renderTarget.textures[ 0 ].name = 'diffuse';
+				renderTarget.textures[ 1 ].name = 'normal';
 
 				// Scene setup
 
@@ -216,8 +213,8 @@
 						vertexShader: document.querySelector( '#render-vert' ).textContent.trim(),
 						fragmentShader: document.querySelector( '#render-frag' ).textContent.trim(),
 						uniforms: {
-							tDiffuse: { value: renderTarget.texture[ 0 ] },
-							tNormal: { value: renderTarget.texture[ 1 ] },
+							tDiffuse: { value: renderTarget.textures[ 0 ] },
+							tNormal: { value: renderTarget.textures[ 1 ] },
 						},
 						glslVersion: THREE.GLSL3
 					} )
