@@ -78,6 +78,7 @@
 				const backgroundColor = color( 0x0066ff );
 
 				// get fog factor from scene pass context
+				// equivalent to: scene.fog = new THREE.Fog( 0x0066ff, 2.5, 4 );
 				const fogFactor = rangeFog( null, 2.5, 4 ).context( { viewZ: scenePassViewZ } );
 
 				// tone mapping scene pass
