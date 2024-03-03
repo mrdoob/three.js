@@ -1054,16 +1054,10 @@ class GLTFWriter {
 		if ( target !== undefined ) bufferViewDef.target = target;
 
 		if ( target === WEBGL_CONSTANTS.ARRAY_BUFFER ) {
-			
+
 			// Only define byteStride for vertex attributes.
-			
 			bufferViewDef.byteStride = attribute.itemSize * componentSize;
 
-			if(componentSize === 1){
-				const paddedArray = new Uint8Array(getPaddedArrayBuffer(attribute.array.buffer));
-				attribute.array = paddedArray;
-			}
-			
 		}
 
 		this.byteOffset += byteLength;
