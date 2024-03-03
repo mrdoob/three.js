@@ -70,7 +70,7 @@
 
 				// post processing
 
-				// render scene pass
+				// render scene pass ( the same of css )
 				const scenePass = pass( scene, camera );
 				const scenePassViewZ = scenePass.getViewZNode();
 
@@ -83,7 +83,7 @@
 				// tone mapping scene pass
 				const scenePassTM = scenePass.toneMapping( THREE.ACESFilmicToneMapping );
 
-				// compose fog from fog factor and background color
+				// mix fog from fog factor and background color
 				const compose = fogFactor.mix( scenePassTM, backgroundColor );
 
 				postProcessing = new PostProcessing( renderer );
