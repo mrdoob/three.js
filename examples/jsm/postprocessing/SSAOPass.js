@@ -13,7 +13,6 @@ import {
 	NearestFilter,
 	NoBlending,
 	RedFormat,
-	LuminanceFormat,
 	DepthStencilFormat,
 	UnsignedInt248Type,
 	RepeatWrapping,
@@ -176,8 +175,6 @@ class SSAOPass extends Pass {
 	}
 
 	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
-
-		if ( renderer.capabilities.isWebGL2 === false ) this.noiseTexture.format = LuminanceFormat;
 
 		// render normals and depth (honor only meshes, points and lines do not contribute to SSAO)
 

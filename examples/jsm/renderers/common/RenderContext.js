@@ -34,6 +34,8 @@ class RenderContext {
 		this.width = 0;
 		this.height = 0;
 
+		this.isRenderContext = true;
+
 	}
 
 }

@@ -126,12 +126,6 @@ class TextureNode extends UniformNode {
 
 		}
 
-		if ( levelNode !== null && builder.context.getTextureLevelAlgorithm !== undefined ) {
-
-			levelNode = builder.context.getTextureLevelAlgorithm( this, levelNode );
-
-		}
-
 		//
 
 		properties.uvNode = uvNode;

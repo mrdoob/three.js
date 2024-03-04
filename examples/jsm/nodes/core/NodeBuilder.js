@@ -23,6 +23,8 @@ import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
 
+import PMREMGenerator from '../../renderers/common/extras/PMREMGenerator.js';
+
 const uniformsGroupCache = new ChainMap();
 
 const typeFromLength = new Map( [
@@ -113,15 +115,23 @@ class NodeBuilder {
 
 	}
 
-	getRenderTarget( width, height, options ) {
+	createRenderTarget( width, height, options ) {
 
 		return new RenderTarget( width, height, options );
 
 	}
 
-	getCubeRenderTarget( size, options ) {
+	createCubeRenderTarget( size, options ) {
 
 		return new CubeRenderTarget( size, options );
+
+	}
+
+	createPMREMGenerator() {
+
+		// TODO: Move Materials.js to outside of the Nodes.js in order to remove this function and improve tree-shaking support
+
+		return new PMREMGenerator( this.renderer );
 
 	}
 
@@ -1167,6 +1177,8 @@ class NodeBuilder {
 	}
 
 	createNodeMaterial( type = 'NodeMaterial' ) {
+
+		// TODO: Move Materials.js to outside of the Nodes.js in order to remove this function and improve tree-shaking support
 
 		return createNodeMaterialFromType( type );
 

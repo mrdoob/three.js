@@ -318,7 +318,10 @@ function Strings( config ) {
 			'sidebar/project/app/editable': 'Editable',
 			'sidebar/project/app/publish': 'Publish',
 
+			'sidebar/project/image': 'Image',
 			'sidebar/project/video': 'Video',
+
+			'sidebar/project/shading': 'Shading',
 			'sidebar/project/resolution': 'Resolution',
 			'sidebar/project/duration': 'Duration',
 			'sidebar/project/render': 'Render',
@@ -348,7 +351,7 @@ function Strings( config ) {
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
 			'viewport/info/triangles': 'Triangles',
-			'viewport/info/frametime': 'Frametime'
+			'viewport/info/rendertime': 'Render time'
 
 		},
 
@@ -664,7 +667,10 @@ function Strings( config ) {
 			'sidebar/project/app/editable': 'Modifiable',
 			'sidebar/project/app/publish': 'Publier',
 
+			'sidebar/project/image': 'Image',
 			'sidebar/project/video': 'Video',
+
+			'sidebar/project/shading': 'Shading',
 			'sidebar/project/resolution': 'Resolution',
 			'sidebar/project/duration': 'Duration',
 			'sidebar/project/render': 'Render',
@@ -694,7 +700,7 @@ function Strings( config ) {
 			'viewport/info/objects': 'Objets',
 			'viewport/info/vertices': 'Sommets',
 			'viewport/info/triangles': 'Triangles',
-			'viewport/info/frametime': 'Temps de trame'
+			'viewport/info/rendertime': 'Render time'
 
 		},
 
@@ -1010,7 +1016,10 @@ function Strings( config ) {
 			'sidebar/project/app/editable': '编辑性',
 			'sidebar/project/app/publish': '发布',
 
+			'sidebar/project/image': 'Image',
 			'sidebar/project/video': '视频',
+
+			'sidebar/project/shading': 'Shading',
 			'sidebar/project/resolution': '分辨率',
 			'sidebar/project/duration': '时长',
 			'sidebar/project/render': '渲染',
@@ -1040,7 +1049,7 @@ function Strings( config ) {
 			'viewport/info/objects': '物体',
 			'viewport/info/vertices': '顶点',
 			'viewport/info/triangles': '三角形',
-			'viewport/info/frametime': '帧时'
+			'viewport/info/rendertime': 'Render time'
 
 		}
 
