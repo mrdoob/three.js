@@ -121,7 +121,6 @@
 
 			import * as THREE from 'three';
 
-			import WebGL from 'three/addons/capabilities/WebGL.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -142,13 +141,6 @@
 			init();
 
 			function init() {
-
-				if ( WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
-					return;
-
-				}
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );

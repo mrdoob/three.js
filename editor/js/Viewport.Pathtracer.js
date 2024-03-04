@@ -3,14 +3,20 @@ import { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 import {
 	PathTracingSceneGenerator,
 	PathTracingRenderer,
-	PhysicalPathTracingMaterial
+	PhysicalPathTracingMaterial,
+	ProceduralEquirectTexture,
 } from 'three-gpu-pathtracer';
 
 function buildColorTexture( color ) {
 
-	const data = new Uint8Array( [ color.r * 255, color.g * 255, color.b * 255, 255 ] );
-	const texture = new THREE.DataTexture( data, 1, 1, THREE.RGBAFormat );
-	texture.needsUpdate = true;
+	const texture = new ProceduralEquirectTexture( 4, 4 );
+	texture.generationCallback = ( polar, uv, coord, target ) => {
+
+		target.copy( color );
+
+	};
+
+	texture.update();
 
 	return texture;
 
@@ -43,16 +49,7 @@ function ViewportPathtracer( renderer ) {
 
 		}
 
-		pathtracer.material.backgroundBlur = scene.backgroundBlurriness;
 		pathtracer.reset();
-
-		// TOFIX: If the scene is empty the generator crashes so we render a tiny cube (:
-
-		if ( scene.children.length === 0 ) {
-
-			scene = new THREE.Mesh( new THREE.BoxGeometry( 0.0001, 0.0001, 0.0001 ) );
-
-		}
 
 		const { bvh, textures, materials, lights } = generator.generate( scene );
 
@@ -70,49 +67,12 @@ function ViewportPathtracer( renderer ) {
 		ptMaterial.textures.setTextures( renderer, 2048, 2048, textures );
 		ptMaterial.materials.updateFrom( materials, textures );
 		ptMaterial.lights.updateFrom( lights );
+		ptMaterial.filterGlossyFactor = 0.5;
 
 		//
 
-		const background = scene.background;
-
-		if ( background ) {
-
-			if ( background.isTexture ) {
-
-				ptMaterial.backgroundMap = background;
-
-			} else if ( background.isColor ) {
-
-				ptMaterial.backgroundMap = buildColorTexture( background );
-
-			}
-
-		} else {
-
-			ptMaterial.backgroundMap = buildColorTexture( new THREE.Color( 0x000000 ) );
-
-		}
-
-		//
-
-		const environment = scene.environment;
-
-		if ( environment && environment.isTexture === true ) {
-
-			// Avoid calling envMapInfo() with the same hdr
-
-			if ( scene.environment !== hdr ) {
-
-				ptMaterial.envMapInfo.updateFrom( scene.environment );
-				hdr = scene.environment;
-
-			}
-
-		} else {
-
-			ptMaterial.envMapInfo.updateFrom( buildColorTexture( new THREE.Color( 0xffffff ) ) );
-
-		}
+		setBackground( scene.background, scene.backgroundBlurriness );
+		setEnvironment( scene.environment );
 
 	}
 
@@ -125,15 +85,77 @@ function ViewportPathtracer( renderer ) {
 
 	}
 
+	function setBackground( background, blurriness ) {
+
+		if ( pathtracer === null ) return;
+
+		const ptMaterial = pathtracer.material;
+
+		if ( background ) {
+
+			if ( background.isTexture ) {
+
+				ptMaterial.backgroundMap = background;
+				ptMaterial.backgroundBlur = blurriness;
+
+			} else if ( background.isColor ) {
+
+				ptMaterial.backgroundMap = buildColorTexture( background );
+				ptMaterial.backgroundBlur = 0;
+
+			}
+
+		} else {
+
+			ptMaterial.backgroundMap = buildColorTexture( new THREE.Color( 0 ) );
+			ptMaterial.backgroundBlur = 0;
+
+		}
+
+		pathtracer.reset();
+
+	}
+
+	function setEnvironment( environment ) {
+
+		if ( pathtracer === null ) return;
+
+		const ptMaterial = pathtracer.material;
+
+		if ( environment && environment.isDataTexture === true ) {
+
+			// Avoid calling envMapInfo() with the same hdr
+
+			if ( environment !== hdr ) {
+
+				ptMaterial.envMapInfo.updateFrom( environment );
+				hdr = environment;
+
+			}
+
+		} else {
+
+			ptMaterial.envMapInfo.updateFrom( buildColorTexture( new THREE.Color( 0 ) ) );
+
+		}
+
+		pathtracer.reset();
+
+	}
+
 	function update() {
 
 		if ( pathtracer === null ) return;
 
 		pathtracer.update();
 
-		renderer.autoClear = false;
-		quad.render( renderer );
-		renderer.autoClear = true;
+		if ( pathtracer.samples >= 1 ) {
+
+			renderer.autoClear = false;
+			quad.render( renderer );
+			renderer.autoClear = true;
+
+		}
 
 	}
 
@@ -148,6 +170,8 @@ function ViewportPathtracer( renderer ) {
 	return {
 		init: init,
 		setSize: setSize,
+		setBackground: setBackground,
+		setEnvironment: setEnvironment,
 		update: update,
 		reset: reset
 	};

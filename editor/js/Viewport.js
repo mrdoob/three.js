@@ -21,6 +21,7 @@ import { ViewportPathtracer } from './Viewport.Pathtracer.js';
 
 function Viewport( editor ) {
 
+	const selector = editor.selector;
 	const signals = editor.signals;
 
 	const container = new UIPanel();
@@ -55,7 +56,6 @@ function Viewport( editor ) {
 	grid.add( grid2 );
 
 	const viewHelper = new ViewHelper( camera, container );
-	const xr = new XR( editor );
 
 	//
 
@@ -141,10 +141,9 @@ function Viewport( editor ) {
 
 	sceneHelpers.add( transformControls );
 
-	// object picking
+	//
 
-	const raycaster = new THREE.Raycaster();
-	const mouse = new THREE.Vector2();
+	const xr = new XR( editor, transformControls ); // eslint-disable-line no-unused-vars
 
 	// events
 
@@ -152,30 +151,6 @@ function Viewport( editor ) {
 
 		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
 		camera.updateProjectionMatrix();
-
-	}
-
-	function getIntersects( point ) {
-
-		mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
-
-		raycaster.setFromCamera( mouse, camera );
-
-		const objects = [];
-
-		scene.traverseVisible( function ( child ) {
-
-			objects.push( child );
-
-		} );
-
-		sceneHelpers.traverseVisible( function ( child ) {
-
-			if ( child.name === 'picker' ) objects.push( child );
-
-		} );
-
-		return raycaster.intersectObjects( objects, false );
 
 	}
 
@@ -194,7 +169,7 @@ function Viewport( editor ) {
 
 		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
-			const intersects = getIntersects( onUpPosition );
+			const intersects = selector.getPointerIntersects( onUpPosition, camera );
 			signals.intersectionsDetected.dispatch( intersects );
 
 			render();
@@ -256,7 +231,7 @@ function Viewport( editor ) {
 		const array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onDoubleClickPosition.fromArray( array );
 
-		const intersects = getIntersects( onDoubleClickPosition );
+		const intersects = selector.getPointerIntersects( onDoubleClickPosition, camera );
 
 		if ( intersects.length > 0 ) {
 
@@ -291,6 +266,7 @@ function Viewport( editor ) {
 		controls.center.set( 0, 0, 0 );
 		pathtracer.reset();
 
+		initPT();
 		render();
 
 	} );
@@ -298,6 +274,8 @@ function Viewport( editor ) {
 	signals.transformModeChanged.add( function ( mode ) {
 
 		transformControls.setMode( mode );
+
+		render();
 
 	} );
 
@@ -385,6 +363,7 @@ function Viewport( editor ) {
 
 	signals.sceneGraphChanged.add( function () {
 
+		initPT();
 		render();
 
 	} );
@@ -434,6 +413,7 @@ function Viewport( editor ) {
 
 		}
 
+		initPT();
 		render();
 
 	} );
@@ -460,6 +440,7 @@ function Viewport( editor ) {
 
 		}
 
+		initPT();
 		render();
 
 	} );
@@ -467,6 +448,7 @@ function Viewport( editor ) {
 	signals.objectRemoved.add( function ( object ) {
 
 		controls.enabled = true; // see #14180
+
 		if ( object === transformControls.object ) {
 
 			transformControls.detach();
@@ -477,21 +459,18 @@ function Viewport( editor ) {
 
 	signals.materialChanged.add( function () {
 
+		initPT();
 		render();
 
 	} );
 
 	// background
 
-	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, backgroundBlurriness, backgroundIntensity ) {
+	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, backgroundBlurriness, backgroundIntensity, backgroundRotation ) {
+
+		scene.background = null;
 
 		switch ( backgroundType ) {
-
-			case 'None':
-
-				scene.background = null;
-
-				break;
 
 			case 'Color':
 
@@ -514,9 +493,19 @@ function Viewport( editor ) {
 				if ( backgroundEquirectangularTexture ) {
 
 					backgroundEquirectangularTexture.mapping = THREE.EquirectangularReflectionMapping;
+
 					scene.background = backgroundEquirectangularTexture;
 					scene.backgroundBlurriness = backgroundBlurriness;
 					scene.backgroundIntensity = backgroundIntensity;
+					scene.backgroundRotation.y = backgroundRotation * THREE.MathUtils.DEG2RAD;
+
+					if ( useBackgroundAsEnvironment ) {
+
+						scene.environment = scene.background;
+						scene.environmentRotation.y = backgroundRotation * THREE.MathUtils.DEG2RAD;
+
+					}
+
 
 				}
 
@@ -524,30 +513,40 @@ function Viewport( editor ) {
 
 		}
 
+		updatePTBackground();
 		render();
 
 	} );
 
 	// environment
 
+	let useBackgroundAsEnvironment = false;
+
 	signals.sceneEnvironmentChanged.add( function ( environmentType, environmentEquirectangularTexture ) {
+
+		scene.environment = null;
+
+		useBackgroundAsEnvironment = false;
 
 		switch ( environmentType ) {
 
-			case 'None':
 
-				scene.environment = null;
+			case 'Background':
+
+				useBackgroundAsEnvironment = true;
+
+				scene.environment = scene.background;
+				scene.environment.mapping = THREE.EquirectangularReflectionMapping;
+				scene.environmentRotation.y = scene.backgroundRotation.y;
 
 				break;
 
 			case 'Equirectangular':
 
-				scene.environment = null;
-
 				if ( environmentEquirectangularTexture ) {
 
-					environmentEquirectangularTexture.mapping = THREE.EquirectangularReflectionMapping;
 					scene.environment = environmentEquirectangularTexture;
+					scene.environment.mapping = THREE.EquirectangularReflectionMapping;
 
 				}
 
@@ -561,6 +560,7 @@ function Viewport( editor ) {
 
 		}
 
+		updatePTEnvironment();
 		render();
 
 	} );
@@ -740,6 +740,42 @@ function Viewport( editor ) {
 
 		if ( needsUpdate === true ) render();
 
+		updatePT();
+
+	}
+
+	function initPT() {
+
+		if ( editor.viewportShading === 'realistic' ) {
+
+			pathtracer.init( scene, camera );
+
+		}
+
+	}
+
+	function updatePTBackground() {
+
+		if ( editor.viewportShading === 'realistic' ) {
+
+			pathtracer.setBackground( scene.background, scene.backgroundBlurriness );
+
+		}
+
+	}
+
+	function updatePTEnvironment() {
+
+		if ( editor.viewportShading === 'realistic' ) {
+
+			pathtracer.setEnvironment( scene.environment );
+
+		}
+
+	}
+
+	function updatePT() {
+
 		if ( editor.viewportShading === 'realistic' ) {
 
 			pathtracer.update();
@@ -754,12 +790,6 @@ function Viewport( editor ) {
 	let endTime = 0;
 
 	function render() {
-
-		if ( editor.viewportShading === 'realistic' ) {
-
-			pathtracer.init( scene, camera );
-
-		}
 
 		startTime = performance.now();
 

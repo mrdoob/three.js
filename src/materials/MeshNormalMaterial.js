@@ -28,6 +28,7 @@ class MeshNormalMaterial extends Material {
 
 		this.flatShading = false;
 
+		console.log(22222);
 		this.setValues( parameters );
 
 	}

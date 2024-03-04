@@ -9,7 +9,8 @@ import { RedFormat, RGFormat, IntType, DataTexture, RGBAFormat, FloatType } from
 
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan',
-	textureDimensions: 'textureSize'
+	textureDimensions: 'textureSize',
+	equals: 'equal'
 };
 
 const precisionLib = {
@@ -19,7 +20,8 @@ const precisionLib = {
 };
 
 const supports = {
-	instance: true
+	instance: true,
+	swizzleAssign: true
 };
 
 const defaultPrecisions = `
@@ -539,7 +541,6 @@ ${ flowData.code }
 		return supports[ name ] === true;
 
 	}
-
 
 	isFlipY() {
 

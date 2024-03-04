@@ -18,7 +18,6 @@ function Strings( config ) {
 			'menubar/file/export/stl': 'Export STL',
 			'menubar/file/export/stl_binary': 'Export STL (Binary)',
 			'menubar/file/export/usdz': 'Export USDZ',
-			'menubar/file/publish': 'Publish',
 
 			'menubar/edit': 'Edit',
 			'menubar/edit/undo': 'Undo (Ctrl+Z)',
@@ -54,10 +53,6 @@ function Strings( config ) {
 			'menubar/add/orthographiccamera': 'OrthographicCamera',
 
 			'menubar/status/autosave': 'autosave',
-
-			'menubar/play': 'Play',
-			'menubar/play/stop': 'Stop',
-			'menubar/play/play': 'Play',
 
 			'menubar/examples': 'Examples',
 			'menubar/examples/Arkanoid': 'Arkanoid',
@@ -305,23 +300,28 @@ function Strings( config ) {
 			'sidebar/material/userdata': 'User data',
 			'sidebar/material/export': 'Export JSON',
 
-			'sidebar/script': 'Script',
 			'sidebar/script/new': 'New',
 			'sidebar/script/edit': 'Edit',
 			'sidebar/script/remove': 'Remove',
 
 			'sidebar/project': 'Project',
-			'sidebar/project/title': 'Title',
-			'sidebar/project/editable': 'Editable',
-			'sidebar/project/vr': 'VR',
-			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'Antialias',
 			'sidebar/project/shadows': 'Shadows',
-			'sidebar/project/toneMapping': 'Tone mapping',
+			'sidebar/project/toneMapping': 'Tonemapping',
 			'sidebar/project/materials': 'Materials',
 			'sidebar/project/Assign': 'Assign',
 
+			'sidebar/project/app': 'App',
+			'sidebar/project/app/play': 'Play',
+			'sidebar/project/app/stop': 'Stop',
+			'sidebar/project/app/title': 'Title',
+			'sidebar/project/app/editable': 'Editable',
+			'sidebar/project/app/publish': 'Publish',
+
+			'sidebar/project/image': 'Image',
 			'sidebar/project/video': 'Video',
+
+			'sidebar/project/shading': 'Shading',
 			'sidebar/project/resolution': 'Resolution',
 			'sidebar/project/duration': 'Duration',
 			'sidebar/project/render': 'Render',
@@ -351,7 +351,7 @@ function Strings( config ) {
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
 			'viewport/info/triangles': 'Triangles',
-			'viewport/info/frametime': 'Frametime'
+			'viewport/info/rendertime': 'Render time'
 
 		},
 
@@ -369,7 +369,6 @@ function Strings( config ) {
 			'menubar/file/export/stl': 'Exporter STL',
 			'menubar/file/export/stl_binary': 'Exporter STL (Binaire)',
 			'menubar/file/export/usdz': 'Exporter USDZ',
-			'menubar/file/publish': 'Publier',
 
 			'menubar/edit': 'Edition',
 			'menubar/edit/undo': 'Annuler (Ctrl+Z)',
@@ -405,10 +404,6 @@ function Strings( config ) {
 			'menubar/add/orthographiccamera': 'Caméra orthographique',
 
 			'menubar/status/autosave': 'enregistrement automatique',
-
-			'menubar/play': 'Jouer',
-			'menubar/play/stop': 'Arrêter',
-			'menubar/play/play': 'Jouer',
 
 			'menubar/examples': 'Exemples',
 			'menubar/examples/Arkanoid': 'Arkanoid',
@@ -654,23 +649,28 @@ function Strings( config ) {
 			'sidebar/material/userdata': 'Données utilisateur',
 			'sidebar/material/export': 'Exporter JSON',
 
-			'sidebar/script': 'Script',
 			'sidebar/script/new': 'Nouveau',
 			'sidebar/script/edit': 'Editer',
 			'sidebar/script/remove': 'Supprimer',
 
 			'sidebar/project': 'Projet',
-			'sidebar/project/title': 'Titre',
-			'sidebar/project/editable': 'Modifiable',
-			'sidebar/project/vr': 'VR',
-			'sidebar/project/renderer': 'Rendus',
 			'sidebar/project/antialias': 'Anticrénelage',
 			'sidebar/project/shadows': 'Ombres',
 			'sidebar/project/toneMapping': 'Mappage des nuances',
 			'sidebar/project/materials': 'Matériaux',
 			'sidebar/project/Assign': 'Attribuer',
 
+			'sidebar/project/app': 'App',
+			'sidebar/project/app/play': 'Jouer',
+			'sidebar/project/app/stop': 'Arrêter',
+			'sidebar/project/app/title': 'Titre',
+			'sidebar/project/app/editable': 'Modifiable',
+			'sidebar/project/app/publish': 'Publier',
+
+			'sidebar/project/image': 'Image',
 			'sidebar/project/video': 'Video',
+
+			'sidebar/project/shading': 'Shading',
 			'sidebar/project/resolution': 'Resolution',
 			'sidebar/project/duration': 'Duration',
 			'sidebar/project/render': 'Render',
@@ -700,7 +700,7 @@ function Strings( config ) {
 			'viewport/info/objects': 'Objets',
 			'viewport/info/vertices': 'Sommets',
 			'viewport/info/triangles': 'Triangles',
-			'viewport/info/frametime': 'Temps de trame'
+			'viewport/info/rendertime': 'Render time'
 
 		},
 
@@ -718,7 +718,6 @@ function Strings( config ) {
 			'menubar/file/export/stl': '导出STL',
 			'menubar/file/export/stl_binary': '导出STL(二进制)',
 			'menubar/file/export/usdz': '导出USDZ',
-			'menubar/file/publish': '发布',
 
 			'menubar/edit': '编辑',
 			'menubar/edit/undo': '撤销 (Ctrl+Z)',
@@ -754,10 +753,6 @@ function Strings( config ) {
 			'menubar/add/orthographiccamera': '正交相机',
 
 			'menubar/status/autosave': '自动保存',
-
-			'menubar/play': '启动',
-			'menubar/play/stop': '暂停',
-			'menubar/play/play': '启动',
 
 			'menubar/examples': '示例',
 			'menubar/examples/Arkanoid': '打砖块',
@@ -1003,23 +998,28 @@ function Strings( config ) {
 			'sidebar/material/userdata': '自定义数据',
 			'sidebar/material/export': '导出JSON',
 
-			'sidebar/script': '脚本',
 			'sidebar/script/new': '新建',
 			'sidebar/script/edit': '编辑',
 			'sidebar/script/remove': '删除',
 
 			'sidebar/project': '项目',
-			'sidebar/project/title': '标题',
-			'sidebar/project/editable': '编辑性',
-			'sidebar/project/vr': '虚拟现实',
-			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
 			'sidebar/project/toneMapping': '色调映射',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
 
+			'sidebar/project/app': 'App',
+			'sidebar/project/app/play': '启动',
+			'sidebar/project/app/stop': '暂停',
+			'sidebar/project/app/title': '标题',
+			'sidebar/project/app/editable': '编辑性',
+			'sidebar/project/app/publish': '发布',
+
+			'sidebar/project/image': 'Image',
 			'sidebar/project/video': '视频',
+
+			'sidebar/project/shading': 'Shading',
 			'sidebar/project/resolution': '分辨率',
 			'sidebar/project/duration': '时长',
 			'sidebar/project/render': '渲染',
@@ -1049,7 +1049,7 @@ function Strings( config ) {
 			'viewport/info/objects': '物体',
 			'viewport/info/vertices': '顶点',
 			'viewport/info/triangles': '三角形',
-			'viewport/info/frametime': '帧时'
+			'viewport/info/rendertime': 'Render time'
 
 		}
 

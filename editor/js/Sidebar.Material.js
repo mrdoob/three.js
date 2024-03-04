@@ -31,7 +31,7 @@ function SidebarMaterial( editor ) {
 
 	const materialSlotRow = new UIRow();
 
-	materialSlotRow.add( new UIText( strings.getKey( 'sidebar/material/slot' ) ).setWidth( '90px' ) );
+	materialSlotRow.add( new UIText( strings.getKey( 'sidebar/material/slot' ) ).setClass( 'Label' ) );
 
 	const materialSlotSelect = new UISelect().setWidth( '170px' ).setFontSize( '12px' ).onChange( update );
 	materialSlotSelect.setOptions( { 0: '' } ).setValue( 0 );
@@ -44,7 +44,7 @@ function SidebarMaterial( editor ) {
 	const materialClassRow = new UIRow();
 	const materialClass = new UISelect().setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
 
-	materialClassRow.add( new UIText( strings.getKey( 'sidebar/material/type' ) ).setWidth( '90px' ) );
+	materialClassRow.add( new UIText( strings.getKey( 'sidebar/material/type' ) ).setClass( 'Label' ) );
 	materialClassRow.add( materialClass );
 
 	container.add( materialClassRow );
@@ -61,7 +61,7 @@ function SidebarMaterial( editor ) {
 
 	} );
 
-	materialUUIDRow.add( new UIText( strings.getKey( 'sidebar/material/uuid' ) ).setWidth( '90px' ) );
+	materialUUIDRow.add( new UIText( strings.getKey( 'sidebar/material/uuid' ) ).setClass( 'Label' ) );
 	materialUUIDRow.add( materialUUID );
 	materialUUIDRow.add( materialUUIDRenew );
 
@@ -76,7 +76,7 @@ function SidebarMaterial( editor ) {
 
 	} );
 
-	materialNameRow.add( new UIText( strings.getKey( 'sidebar/material/name' ) ).setWidth( '90px' ) );
+	materialNameRow.add( new UIText( strings.getKey( 'sidebar/material/name' ) ).setClass( 'Label' ) );
 	materialNameRow.add( materialName );
 
 	container.add( materialNameRow );
@@ -408,7 +408,7 @@ function SidebarMaterial( editor ) {
 
 	} );
 
-	materialUserDataRow.add( new UIText( strings.getKey( 'sidebar/material/userdata' ) ).setWidth( '90px' ) );
+	materialUserDataRow.add( new UIText( strings.getKey( 'sidebar/material/userdata' ) ).setClass( 'Label' ) );
 	materialUserDataRow.add( materialUserData );
 
 	container.add( materialUserDataRow );
@@ -416,7 +416,7 @@ function SidebarMaterial( editor ) {
 	// Export JSON
 
 	const exportJson = new UIButton( strings.getKey( 'sidebar/material/export' ) );
-	exportJson.setMarginLeft( '90px' );
+	exportJson.setMarginLeft( '120px' );
 	exportJson.onClick( function () {
 
 		const object = editor.selected;
@@ -435,11 +435,11 @@ function SidebarMaterial( editor ) {
 
 		}
 
-		const left = ( screen.width / 2 ) - ( 250 );
-		const top = ( screen.height / 2 ) - ( 250 );
+		const left = ( screen.width - 500 ) / 2;
+		const top = ( screen.height - 500 ) / 2;
 
 		const url = URL.createObjectURL( new Blob( [ output ], { type: 'text/plain' } ) );
-		window.open( url, null, `location=no,left=${left},top=${top},width=500,height=500` );
+		window.open( url, '_blank', `location=no,left=${left},top=${top},width=500,height=500` );
 
 	} );
 	container.add( exportJson );

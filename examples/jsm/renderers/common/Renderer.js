@@ -312,6 +312,27 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
+		const renderContext = this._renderContext( scene, camera );
+
+		await this.backend.resolveTimestampAsync( renderContext, 'render' );
+
+	}
+
+	render( scene, camera ) {
+
+		if ( this._initialized === false ) {
+
+			console.error( 'THREE.Renderer: .render() called before the backend is initialized. Try using .renderAsync() instead.' );
+			return;
+
+		}
+
+		this._renderContext( scene, camera );
+
+	}
+
+	_renderContext( scene, camera ) {
+
 		// preserve render tree
 
 		const nodeFrame = this._nodes.nodeFrame;
@@ -486,8 +507,9 @@ class Renderer {
 
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
 
+		//
 
-		await this.backend.resolveTimestampAsync( renderContext, 'render' );
+		return renderContext;
 
 	}
 
@@ -737,9 +759,7 @@ class Renderer {
 
 	}
 
-	async clearAsync( color = true, depth = true, stencil = true ) {
-
-		if ( this._initialized === false ) await this.init();
+	clear( color = true, depth = true, stencil = true ) {
 
 		let renderTargetData = null;
 		const renderTarget = this._renderTarget;
@@ -753,6 +773,32 @@ class Renderer {
 		}
 
 		this.backend.clear( color, depth, stencil, renderTargetData );
+
+	}
+
+	clearColor() {
+
+		return this.clear( true, false, false );
+
+	}
+
+	clearDepth() {
+
+		return this.clear( false, true, false );
+
+	}
+
+	clearStencil() {
+
+		return this.clear( false, false, true );
+
+	}
+
+	async clearAsync( color = true, depth = true, stencil = true ) {
+
+		if ( this._initialized === false ) await this.init();
+
+		this.clear( color, depth, stencil );
 
 	}
 
@@ -1250,36 +1296,6 @@ class Renderer {
 	get compile() {
 
 		return this.compileAsync;
-
-	}
-
-	get render() {
-
-		return this.renderAsync;
-
-	}
-
-	get clear() {
-
-		return this.clearAsync;
-
-	}
-
-	get clearColor() {
-
-		return this.clearColorAsync;
-
-	}
-
-	get clearDepth() {
-
-		return this.clearDepthAsync;
-
-	}
-
-	get clearStencil() {
-
-		return this.clearStencilAsync;
 
 	}
 

@@ -171,12 +171,6 @@ class GPUComputationRenderer {
 
 		this.init = function () {
 
-			if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'OES_texture_float' ) === false ) {
-
-				return 'No OES_texture_float support for float textures.';
-
-			}
-
 			if ( renderer.capabilities.maxVertexTextures === 0 ) {
 
 				return 'No support for vertex shader textures.';
