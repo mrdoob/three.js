@@ -17,8 +17,7 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,8 +27,7 @@
 			import * as THREE from 'three';
 
 			import Stats from 'three/addons/libs/stats.module.js';
-			import { MeshNormalNodeMaterial, MeshStandardNodeMaterial } from 'three/nodes';
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -61,7 +59,7 @@
 			const BIAS = - 0.428408; // from original model
 
 			init();
-			// animate();
+			animate();
 			initGui();
 
 			// Init gui
@@ -79,10 +77,9 @@
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				renderer = new WebGPURenderer({ forceWebGL: false });
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop(animate);
 				container.appendChild( renderer.domElement );
 
 				//
@@ -139,8 +136,8 @@
 
 				// material
 
-				materialStandard = new MeshStandardNodeMaterial( {
-					color: 0x222222,
+				materialStandard = new THREE.MeshStandardMaterial( {
+					color: 0xffffff,
 
 					metalness: 0.5,
 					roughness: 0.6,
@@ -159,28 +156,27 @@
 					side: THREE.DoubleSide
 				} );
 
-				// materialDepthBasic = new MeshDepthNodeMaterial( {
-				// 	depthPacking: THREE.BasicDepthPacking,
+				materialDepthBasic = new THREE.MeshDepthMaterial( {
+					depthPacking: THREE.BasicDepthPacking,
 
-				// 	displacementMap: displacementMap,
-				// 	displacementScale: SCALE,
-				// 	displacementBias: BIAS,
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
 
-				// 	side: THREE.DoubleSide
-				// } );
+					side: THREE.DoubleSide
+				} );
 
-				// materialDepthRGBA = new MeshDepthNodeMaterial( {
-				// 	depthPacking: THREE.RGBADepthPacking,
+				materialDepthRGBA = new THREE.MeshDepthMaterial( {
+					depthPacking: THREE.RGBADepthPacking,
 
-				// 	displacementMap: displacementMap,
-				// 	displacementScale: SCALE,
-				// 	displacementBias: BIAS,
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
 
-				// 	side: THREE.DoubleSide
-				// } );
+					side: THREE.DoubleSide
+				} );
 
-				materialNormal = new MeshNormalNodeMaterial( {
-
+				materialNormal = new THREE.MeshNormalMaterial( {
 					displacementMap: displacementMap,
 					displacementScale: SCALE,
 					displacementBias: BIAS,
@@ -255,7 +251,7 @@
 
 			function animate() {
 
-				// requestAnimationFrame( animate );
+				requestAnimationFrame( animate );
 
 				stats.begin();
 				render();
