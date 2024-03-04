@@ -151,7 +151,7 @@ function main() {
 		constructor() {
 
 			// create a 1x1 pixel render target
-			this.pickingTexture = new THREE.WebGLRenderTarget( 1, 1, { colorSpace: THREE.LinearSRGBColorSpace } );
+			this.pickingTexture = new THREE.WebGLRenderTarget( 1, 1 );
 			this.pixelBuffer = new Uint8Array( 4 );
 			this.pickedObject = null;
 			this.pickedObjectSavedColor = 0;
