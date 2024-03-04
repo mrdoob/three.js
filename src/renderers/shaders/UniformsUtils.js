@@ -86,10 +86,18 @@ export function cloneUniformsGroups( src ) {
 
 export function getUnlitUniformColorSpace( renderer ) {
 
-	if ( renderer.getRenderTarget() === null ) {
+	const currentRenderTarget = renderer.getRenderTarget();
+
+	if ( currentRenderTarget === null ) {
 
 		// https://github.com/mrdoob/three.js/pull/23937#issuecomment-1111067398
 		return renderer.outputColorSpace;
+
+	}
+
+	if ( currentRenderTarget.isXRRenderTarget === true ) {
+
+		return currentRenderTarget.texture.colorSpace;
 
 	}
 
