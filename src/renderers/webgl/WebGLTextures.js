@@ -1501,7 +1501,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else {
 
-				_gl.framebufferTexture2D( _gl.FRAMEBUFFER, ( isWebGL2 || extensions.has( 'WEBGL_depth_texture' ) ? _gl.DEPTH_STENCIL_ATTACHMENT : _gl.DEPTH_ATTACHMENT ), _gl.TEXTURE_2D, webglDepthTexture, 0 );
+				_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.TEXTURE_2D, webglDepthTexture, 0 );
 
 			}
 

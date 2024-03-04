@@ -1106,7 +1106,7 @@ class WebGLBackend extends Backend {
 				if ( renderContext.depthTexture !== null ) {
 
 					const textureData = this.get( renderContext.depthTexture );
-					const depthStyle = ( stencilBuffer && ( this.renderer.capabilities.isWebGL2 || this.extensions.has( 'WEBGL_depth_texture' ) ) ) ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
+					const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
 
 					gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
 
