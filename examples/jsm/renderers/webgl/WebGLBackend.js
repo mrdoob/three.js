@@ -131,6 +131,8 @@ class WebGLBackend extends Backend {
 				this.gl.deleteQuery( queryInfo.query );
 				renderContextData.gpuQueries.splice( i, 1 ); // Remove the processed query
 
+				i --;
+
 				this.renderer.info.updateTimestamp( type, duration );
 
 			}
