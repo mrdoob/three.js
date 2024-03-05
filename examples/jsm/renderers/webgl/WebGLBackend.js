@@ -45,8 +45,10 @@ class WebGLBackend extends Backend {
 		this.vaoCache = {};
 		this.transformFeedbackCache = {};
 		this.discard = false;
+		this.trackTimestamp = ( parameters.trackTimestamp === true );
 
 		this.extensions.get( 'EXT_color_buffer_float' );
+		this.disjoint = this.extensions.get( 'EXT_disjoint_timer_query_webgl2' );
 		this.parallel = this.extensions.get( 'KHR_parallel_shader_compile' );
 		this._currentContext = null;
 
@@ -64,6 +66,79 @@ class WebGLBackend extends Backend {
 
 	}
 
+
+	initTimestampQuery( renderContext ) {
+
+		if ( ! this.disjoint || ! this.trackTimestamp ) return;
+
+		const renderContextData = this.get( renderContext );
+
+		if ( renderContextData.activeQuery ) {
+
+			// End the previous query if it's still active
+			this.gl.endQuery( this.disjoint.TIME_ELAPSED_EXT );
+
+		}
+
+		renderContextData.activeQuery = this.gl.createQuery();
+		if ( renderContextData.activeQuery !== null ) {
+
+			this.gl.beginQuery( this.disjoint.TIME_ELAPSED_EXT, renderContextData.activeQuery );
+
+		}
+
+
+	}
+
+	// timestamp utils
+
+	prepareTimestampBuffer( renderContext ) {
+
+		if ( ! this.disjoint || ! this.trackTimestamp ) return;
+
+		const renderContextData = this.get( renderContext );
+
+		if ( renderContextData.activeQuery ) {
+
+			this.gl.endQuery( this.disjoint.TIME_ELAPSED_EXT );
+			// Add the active query to the gpuQueries array and reset it
+			if ( renderContextData.gpuQueries === undefined ) renderContextData.gpuQueries = [];
+			renderContextData.gpuQueries.push( { query: renderContextData.activeQuery } );
+			renderContextData.activeQuery = null;
+
+		}
+
+	}
+
+	async resolveTimestampAsync( renderContext, type = 'render' ) {
+
+		if ( ! this.disjoint || ! this.trackTimestamp ) return;
+
+		const renderContextData = this.get( renderContext );
+
+		for ( let i = 0; i < renderContextData.gpuQueries.length; i ++ ) {
+
+			const queryInfo = renderContextData.gpuQueries[ i ];
+
+			const available = this.gl.getQueryParameter( queryInfo.query, this.gl.QUERY_RESULT_AVAILABLE );
+			const disjoint = this.gl.getParameter( this.disjoint.GPU_DISJOINT_EXT );
+
+			if ( available && ! disjoint ) {
+
+				const elapsed = this.gl.getQueryParameter( queryInfo.query, this.gl.QUERY_RESULT );
+				const duration = Number( elapsed ) / 1000000; // Convert nanoseconds to milliseconds
+
+				this.gl.deleteQuery( queryInfo.query );
+				renderContextData.gpuQueries.splice( i, 1 ); // Remove the processed query
+
+				this.renderer.info.updateTimestamp( type, duration );
+
+			}
+
+		}
+
+	}
+
 	getContext() {
 
 		return this.gl;
@@ -78,6 +153,7 @@ class WebGLBackend extends Backend {
 		//
 
 		//
+		this.initTimestampQuery( renderContext );
 
 		renderContextData.previousContext = this._currentContext;
 		this._currentContext = renderContext;
@@ -219,6 +295,7 @@ class WebGLBackend extends Backend {
 
 		}
 
+		this.prepareTimestampBuffer( renderContext );
 
 	}
 
@@ -379,11 +456,12 @@ class WebGLBackend extends Backend {
 
 	}
 
-	beginCompute( /*computeGroup*/ ) {
+	beginCompute( computeGroup ) {
 
 		const gl = this.gl;
 
 		gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+		this.initTimestampQuery( computeGroup );
 
 	}
 
@@ -456,13 +534,15 @@ class WebGLBackend extends Backend {
 
 	}
 
-	finishCompute( /*computeGroup*/ ) {
+	finishCompute( computeGroup ) {
 
 		const gl = this.gl;
 
 		this.discard = false;
 
 		gl.disable( gl.RASTERIZER_DISCARD );
+
+		this.prepareTimestampBuffer( computeGroup );
 
 	}
 
