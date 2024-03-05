@@ -50,7 +50,6 @@
 			let postProcessing;
 
 			init();
-			render();
 
 			function init() {
 
@@ -78,8 +77,8 @@
 				const backgroundColor = color( 0x0066ff );
 
 				// get fog factor from scene pass context
-				// equivalent to: scene.fog = new THREE.Fog( 0x0066ff, 2.5, 4 );
-				const fogFactor = rangeFog( null, 2.5, 4 ).context( { viewZ: scenePassViewZ } );
+				// equivalent to: scene.fog = new THREE.Fog( 0x0066ff, 2.7, 4 );
+				const fogFactor = rangeFog( null, 2.7, 4 ).context( { viewZ: scenePassViewZ } );
 
 				// tone mapping scene pass
 				const scenePassTM = scenePass.toneMapping( THREE.ACESFilmicToneMapping );
@@ -100,8 +99,6 @@
 
 						scene.environment = texture;
 
-						render();
-
 						// model
 
 						const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
@@ -118,11 +115,11 @@
 				//
 
 				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 2;
-				controls.maxDistance = 10;
-				controls.target.set( 0, 0, - 0.2 );
+				controls.maxDistance = 5;
+				controls.target.set( 0, - 0.1, - 0.2 );
 				controls.update();
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
 
 				window.addEventListener( 'resize', onWindowResize );
 
