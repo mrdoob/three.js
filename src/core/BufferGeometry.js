@@ -132,9 +132,17 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( position !== undefined ) {
 
-			position.applyMatrix4( matrix );
+			if ( position.itemSize === 3 ) {
 
-			position.needsUpdate = true;
+				position.applyMatrix4( matrix );
+
+				position.needsUpdate = true;
+
+			} else {
+
+				console.warn( 'THREE.BufferGeometry: .applyMatrix4() requires a position attribute item size of 3.' );
+
+			}
 
 		}
 

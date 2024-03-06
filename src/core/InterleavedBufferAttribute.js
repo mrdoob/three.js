@@ -128,9 +128,13 @@ class InterleavedBufferAttribute {
 
 	setZ( index, z ) {
 
-		if ( this.normalized ) z = normalize( z, this.array );
+		if ( this.itemSize > 2 ) { // 2D vertex data support
 
-		this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
+			if ( this.normalized ) z = normalize( z, this.array );
+
+			this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
+
+		}
 
 		return this;
 
@@ -167,6 +171,8 @@ class InterleavedBufferAttribute {
 	}
 
 	getZ( index ) {
+
+		if ( this.itemSize < 3 ) return 0; // 2D vertex data support
 
 		let z = this.data.array[ index * this.data.stride + this.offset + 2 ];
 
@@ -218,7 +224,12 @@ class InterleavedBufferAttribute {
 
 		this.data.array[ index + 0 ] = x;
 		this.data.array[ index + 1 ] = y;
-		this.data.array[ index + 2 ] = z;
+
+		if ( this.itemSize > 2 ) { // 2D vertex data support
+
+			this.data.array[ index + 2 ] = z;
+
+		}
 
 		return this;
 

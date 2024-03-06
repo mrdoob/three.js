@@ -258,6 +258,8 @@ class BufferAttribute {
 
 	getZ( index ) {
 
+		if ( this.itemSize < 3 ) return 0; // 2D vertex data support
+
 		let z = this.array[ index * this.itemSize + 2 ];
 
 		if ( this.normalized ) z = denormalize( z, this.array );
@@ -268,9 +270,13 @@ class BufferAttribute {
 
 	setZ( index, z ) {
 
-		if ( this.normalized ) z = normalize( z, this.array );
+		if ( this.itemSize > 2 ) { // 2D vertex data support
 
-		this.array[ index * this.itemSize + 2 ] = z;
+			if ( this.normalized ) z = normalize( z, this.array );
+
+			this.array[ index * this.itemSize + 2 ] = z;
+
+		}
 
 		return this;
 
@@ -328,7 +334,12 @@ class BufferAttribute {
 
 		this.array[ index + 0 ] = x;
 		this.array[ index + 1 ] = y;
-		this.array[ index + 2 ] = z;
+
+		if ( this.itemSize > 2 ) { // 2D vertex data support
+
+			this.array[ index + 2 ] = z;
+
+		}
 
 		return this;
 
@@ -512,6 +523,8 @@ class Float16BufferAttribute extends BufferAttribute {
 
 	getZ( index ) {
 
+		if ( this.itemSize < 3 ) return 0; // 2D vertex data support
+
 		let z = fromHalfFloat( this.array[ index * this.itemSize + 2 ] );
 
 		if ( this.normalized ) z = denormalize( z, this.array );
@@ -522,9 +535,13 @@ class Float16BufferAttribute extends BufferAttribute {
 
 	setZ( index, z ) {
 
-		if ( this.normalized ) z = normalize( z, this.array );
+		if ( this.itemSize > 2 ) { // 2D vertex data support
 
-		this.array[ index * this.itemSize + 2 ] = toHalfFloat( z );
+			if ( this.normalized ) z = normalize( z, this.array );
+
+			this.array[ index * this.itemSize + 2 ] = toHalfFloat( z );
+
+		}
 
 		return this;
 
@@ -582,7 +599,12 @@ class Float16BufferAttribute extends BufferAttribute {
 
 		this.array[ index + 0 ] = toHalfFloat( x );
 		this.array[ index + 1 ] = toHalfFloat( y );
-		this.array[ index + 2 ] = toHalfFloat( z );
+
+		if ( this.itemSize > 2 ) { // 2D vertex data support
+
+			this.array[ index + 2 ] = toHalfFloat( z );
+
+		}
 
 		return this;
 
