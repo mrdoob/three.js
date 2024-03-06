@@ -128,21 +128,36 @@ class BufferGeometry extends EventDispatcher {
 
 	applyMatrix4( matrix ) {
 
-		const position = this.attributes.position;
+		let position = this.attributes.position;
 
 		if ( position !== undefined ) {
 
-			if ( position.itemSize === 3 ) {
+			if ( position.itemSize === 2 ) {
 
-				position.applyMatrix4( matrix );
+				// expand data to item size 3
 
-				position.needsUpdate = true;
+				const data = [];
 
-			} else {
+				for ( let i = 0; i < position.count; i ++ ) {
 
-				console.warn( 'THREE.BufferGeometry: .applyMatrix4() requires a position attribute item size of 3.' );
+					const x = position.getX( i );
+					const y = position.getY( i );
+					const z = 0;
+
+					data.push( x, y, z );
+
+				}
+
+				position = new position.constructor( data, 3 );
+				this.attributes.position = position;
+
+				console.warn( 'THREE.BufferGeometry: The position buffer attribute has been resized to item size 3 since .applyMatrix4() requires 3D data.' );
 
 			}
+
+			position.applyMatrix4( matrix );
+
+			position.needsUpdate = true;
 
 		}
 
