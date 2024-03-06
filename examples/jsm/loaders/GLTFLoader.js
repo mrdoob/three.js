@@ -2627,7 +2627,11 @@ class GLTFParser {
 
 			} ) ).then( function () {
 
-				result.scene.updateMatrixWorld();
+				for ( const scene of result.scenes ) {
+
+					scene.updateMatrixWorld();
+
+				}
 
 				onLoad( result );
 
