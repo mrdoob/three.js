@@ -95,6 +95,7 @@ export function getUnlitUniformColorSpace( renderer ) {
 
 	}
 
+	// https://github.com/mrdoob/three.js/issues/27868
 	if ( currentRenderTarget.isXRRenderTarget === true ) {
 
 		return currentRenderTarget.texture.colorSpace;
