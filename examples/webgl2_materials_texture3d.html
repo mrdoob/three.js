@@ -29,13 +29,6 @@
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { NRRDLoader } from 'three/addons/loaders/NRRDLoader.js';
 		import { VolumeRenderShader1 } from 'three/addons/shaders/VolumeShader.js';
-		import WebGL from 'three/addons/capabilities/WebGL.js';
-
-		if ( WebGL.isWebGL2Available() === false ) {
-
-			document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
-
-		}
 
 		let renderer,
 			scene,

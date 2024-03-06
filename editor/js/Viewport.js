@@ -513,7 +513,7 @@ function Viewport( editor ) {
 
 		}
 
-		initPT();
+		updatePTBackground();
 		render();
 
 	} );
@@ -560,7 +560,7 @@ function Viewport( editor ) {
 
 		}
 
-		initPT();
+		updatePTEnvironment();
 		render();
 
 	} );
@@ -749,6 +749,26 @@ function Viewport( editor ) {
 		if ( editor.viewportShading === 'realistic' ) {
 
 			pathtracer.init( scene, camera );
+
+		}
+
+	}
+
+	function updatePTBackground() {
+
+		if ( editor.viewportShading === 'realistic' ) {
+
+			pathtracer.setBackground( scene.background, scene.backgroundBlurriness );
+
+		}
+
+	}
+
+	function updatePTEnvironment() {
+
+		if ( editor.viewportShading === 'realistic' ) {
+
+			pathtracer.setEnvironment( scene.environment );
 
 		}
 

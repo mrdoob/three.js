@@ -1,7 +1,7 @@
-import { vec4, MeshBasicNodeMaterial } from '../../nodes/Nodes.js';
+import { vec4, NodeMaterial } from '../../nodes/Nodes.js';
 import QuadMesh from '../../objects/QuadMesh.js';
 
-const quadMesh = new QuadMesh( new MeshBasicNodeMaterial() );
+const quadMesh = new QuadMesh( new NodeMaterial() );
 
 class PostProcessing {
 
@@ -12,19 +12,19 @@ class PostProcessing {
 
 	}
 
-	renderAsync() {
-
-		quadMesh.material.fragmentNode = this.outputNode;
-
-		return quadMesh.renderAsync( this.renderer );
-
-	}
-
 	render() {
 
 		quadMesh.material.fragmentNode = this.outputNode;
 
 		quadMesh.render( this.renderer );
+
+	}
+
+	renderAsync() {
+
+		quadMesh.material.fragmentNode = this.outputNode;
+
+		return quadMesh.renderAsync( this.renderer );
 
 	}
 
