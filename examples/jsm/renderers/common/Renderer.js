@@ -889,6 +889,7 @@ class Renderer {
 		const previousRenderId = nodeFrame.renderId;
 
 		//
+		if ( this.info.autoReset === true ) this.info.resetCompute();
 
 		this.info.calls ++;
 		this.info.compute.calls ++;
@@ -897,7 +898,6 @@ class Renderer {
 		nodeFrame.renderId = this.info.calls;
 
 		//
-		if ( this.info.autoReset === true ) this.info.resetCompute();
 
 		const backend = this.backend;
 		const pipelines = this._pipelines;
