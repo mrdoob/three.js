@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import { UIBreak, UIButton, UIInteger, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
 
-import { ViewportPathtracer } from './Viewport.Pathtracer.js';
+// import { ViewportPathtracer } from './Viewport.Pathtracer.js';
 
 function SidebarProjectImage( editor ) {
 
@@ -66,7 +66,7 @@ function SidebarProjectImage( editor ) {
 
 		const scene = loader.parse( json.scene );
 
-		const renderer = new THREE.WebGLRenderer( { antialias: true } );		
+		const renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setSize( imageWidth.getValue(), imageHeight.getValue() );
 
 		if ( project.shadows !== undefined ) renderer.shadowMap.enabled = project.shadows;
@@ -129,7 +129,7 @@ function SidebarProjectImage( editor ) {
 					if ( output.closed === true ) return;
 
 					requestAnimationFrame( animate );
-				
+
 					pathtracer.update();
 
 					// status.textContent = Math.floor( samples );
