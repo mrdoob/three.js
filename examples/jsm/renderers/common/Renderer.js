@@ -12,7 +12,9 @@ import Background from './Background.js';
 import Nodes from './nodes/Nodes.js';
 import Color4 from './Color4.js';
 import ClippingContext from './ClippingContext.js';
-import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping } from 'three';
+import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, RenderTarget, HalfFloatType, RGBAFormat } from 'three';
+import { NodeMaterial } from '../../nodes/Nodes.js';
+import QuadMesh from '../../objects/QuadMesh.js';
 
 const _scene = new Scene();
 const _drawingBufferSize = new Vector2();
@@ -20,6 +22,7 @@ const _screen = new Vector4();
 const _frustum = new Frustum();
 const _projScreenMatrix = new Matrix4();
 const _vector3 = new Vector3();
+const _quad = new QuadMesh( new NodeMaterial() );
 
 class Renderer {
 
@@ -63,6 +66,10 @@ class Renderer {
 
 		this.info = new Info();
 
+		// nodes
+
+		this.toneMappingNode = null;
+
 		// internals
 
 		this._pixelRatio = 1;
@@ -90,6 +97,7 @@ class Renderer {
 		this._opaqueSort = null;
 		this._transparentSort = null;
 
+		this._postProcessingTarget = null;
 
 		const alphaClear = this.alpha === true ? 0 : 1;
 
@@ -331,7 +339,41 @@ class Renderer {
 
 	}
 
-	_renderContext( scene, camera ) {
+	_getPostProcessingTarget() {
+
+		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
+		const { depth, stencil } = this;
+
+		let postProcessingTarget = this._postProcessingTarget;
+
+		if ( postProcessingTarget === null ) {
+
+			postProcessingTarget = new RenderTarget( width, height, {
+				depthBuffer: depth,
+				stencilBuffer: stencil,
+				type: HalfFloatType,
+				format: RGBAFormat,
+				colorSpace: LinearSRGBColorSpace,
+				generateMipmaps: false,
+				minFilter: LinearFilter,
+				magFilter: LinearFilter
+			} );
+
+			this._postProcessingTarget = postProcessingTarget;
+
+		}
+
+		postProcessingTarget.depthBuffer = depth;
+		postProcessingTarget.stencilBuffer = stencil;
+		postProcessingTarget.setSize( width, height );
+
+		return postProcessingTarget;
+
+	}
+
+	_renderContext( scene, camera, usePostProcessing = true ) {
+
+		const needsPostProcessing = usePostProcessing && ( this.currentColorSpace === SRGBColorSpace || this.toneMapping !== NoToneMapping || this.toneMappingNode !== null );
 
 		// preserve render tree
 
@@ -345,10 +387,30 @@ class Renderer {
 
 		const sceneRef = ( scene.isScene === true ) ? scene : _scene;
 
-		const renderTarget = this._renderTarget;
-		const renderContext = this._renderContexts.get( scene, camera, renderTarget );
+		const outputRenderTarget = this._renderTarget;
+
 		const activeCubeFace = this._activeCubeFace;
 		const activeMipmapLevel = this._activeMipmapLevel;
+
+		//
+
+		let renderTarget;
+
+		if ( needsPostProcessing ) {
+
+			renderTarget = this._getPostProcessingTarget();
+
+			this.setRenderTarget( renderTarget );
+
+		} else {
+
+			renderTarget = outputRenderTarget;
+
+		}
+
+		//
+
+		const renderContext = this._renderContexts.get( scene, camera, renderTarget );
 
 		this._currentRenderContext = renderContext;
 		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
@@ -502,6 +564,18 @@ class Renderer {
 
 		this._currentRenderContext = previousRenderContext;
 		this._currentRenderObjectFunction = previousRenderObjectFunction;
+
+		//
+
+		if ( needsPostProcessing ) {
+
+			this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
+
+			_quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+
+			this._renderContext( _quad, _quad.camera, false );
+
+		}
 
 		//
 
@@ -1207,7 +1281,7 @@ class Renderer {
 
 		//
 
-		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
+		if ( material.side === DoubleSide && material.forceSinglePass === false ) {
 
 			material.side = BackSide;
 			this._handleObjectFunction( object, material, scene, camera, lightsNode, 'backSide' ); // create backSide pass id

@@ -28,6 +28,8 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+
 			const params = {
 				color: 0xffffff,
 				transmission: 1,
@@ -60,7 +62,7 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
@@ -106,6 +108,7 @@
 				} );
 
 				mesh = new THREE.Mesh( geometry, material );
+				mesh.rotation.z += Math.PI / 2;
 				scene.add( mesh );
 
 				//
@@ -246,7 +249,7 @@
 
 			function render() {
 
-				renderer.render( scene, camera );
+				renderer.renderAsync( scene, camera );
 
 			}
 

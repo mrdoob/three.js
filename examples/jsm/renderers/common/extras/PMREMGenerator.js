@@ -48,6 +48,7 @@ const _clearColor = /*@__PURE__*/ new Color();
 let _oldTarget = null;
 let _oldActiveCubeFace = 0;
 let _oldActiveMipmapLevel = 0;
+let _oldToneMapping = null;
 
 // Golden Ratio
 const PHI = ( 1 + Math.sqrt( 5 ) ) / 2;
@@ -236,8 +237,16 @@ class PMREMGenerator {
 
 	}
 
+	_ready() {
+
+		_oldToneMapping = this._renderer.toneMapping;
+		this._renderer.toneMapping = NoToneMapping;
+
+	}
+
 	_cleanup( outputTarget ) {
 
+		this._renderer.toneMapping = _oldToneMapping;
 		this._renderer.setRenderTarget( _oldTarget, _oldActiveCubeFace, _oldActiveMipmapLevel );
 		outputTarget.scissorTest = false;
 		_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
@@ -261,6 +270,8 @@ class PMREMGenerator {
 		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
 
 		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
+
+		this._ready();
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
 		this._applyPMREM( cubeUVRenderTarget );
 		this._cleanup( cubeUVRenderTarget );
@@ -689,8 +700,6 @@ function _setViewport( target, x, y, width, height ) {
 function _getMaterial() {
 
 	const material = new NodeMaterial();
-	material.colorSpaced = false;
-	material.toneMapped = false;
 	material.depthTest = false;
 	material.depthWrite = false;
 	material.blending = NoBlending;

@@ -1,12 +1,13 @@
 import { addNodeMaterial } from './NodeMaterial.js';
 import { transformedClearcoatNormalView } from '../accessors/NormalNode.js';
-import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness } from '../core/PropertyNode.js';
-import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness } from '../accessors/MaterialNode.js';
+import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, diffuseColor, metalness } from '../core/PropertyNode.js';
+import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor2 } from '../accessors/MaterialNode.js';
 import { float, vec3 } from '../shadernode/ShaderNode.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
 
 import { MeshPhysicalMaterial } from 'three';
+import { materialReference, mix, pow2, min } from '../Nodes.js';
 
 const defaultValues = new MeshPhysicalMaterial();
 
@@ -61,9 +62,23 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
+	get useTransmission() {
+
+		return this.transmission > 0 || this.transmissionNode !== null;
+
+	}
+
+	setupSpecularColor() {
+
+		const materialIOR = materialReference( 'ior', 'float' );
+
+		specularColor.assign( mix( min( pow2( materialIOR.sub( 1.0 ).div( materialIOR.add( 1.0 ) ) ).mul( materialSpecularColor2 ), vec3( 1.0 ) ).mul( materialSpecularIntensity ), diffuseColor.rgb, metalness ) );
+
+	}
+
 	setupLightingModel( /*builder*/ ) {
 
-		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence );
+		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useTransmission );
 
 	}
 

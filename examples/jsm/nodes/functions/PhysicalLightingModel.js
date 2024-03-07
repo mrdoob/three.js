@@ -7,11 +7,195 @@ import Schlick_to_F0 from './BSDF/Schlick_to_F0.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
 import LightingModel from '../core/LightingModel.js';
 import { diffuseColor, specularColor, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness } from '../core/PropertyNode.js';
-import { transformedNormalView, transformedClearcoatNormalView } from '../accessors/NormalNode.js';
-import { positionViewDirection } from '../accessors/PositionNode.js';
+import { transformedNormalView, transformedClearcoatNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
+import { positionViewDirection, positionWorld } from '../accessors/PositionNode.js';
 import { tslFn, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
 import { cond } from '../math/CondNode.js';
 import { mix, smoothstep } from '../math/MathNode.js';
+
+import { mat4, normalize, div, color, refract, int, length, clamp, vec2, log2, textureBicubic, log, exp, If, vec4, sub, viewportMipTexture, cameraPosition, modelViewMatrix, cameraProjectionMatrix, modelWorldMatrix, materialReference, faceDirection, viewportResolution, viewportTopLeft, cameraViewMatrix } from '../Nodes.js';
+import { attenuationColor, attenuationDistance, materialThickness, materialTransmission } from '../accessors/MaterialNode.js';
+
+const materialIOR = materialReference( 'ior', 'float' );
+
+//
+// Transmission
+//
+
+const getVolumeTransmissionRay = tslFn( ( [ n, v, thickness, ior, modelMatrix ] ) => {
+
+	const refractionVector = vec3( refract( v.negate(), normalize( n ), div( 1.0, ior ) ) );
+	const modelScale = vec3().toVar();
+	modelScale.x.assign( length( modelMatrix[ 0 ].xyz ) );
+	modelScale.y.assign( length( modelMatrix[ 1 ].xyz ) );
+	modelScale.z.assign( length( modelMatrix[ 2 ].xyz ) );
+
+	return normalize( refractionVector ).mul( thickness.mul( modelScale ) );
+
+} ).setLayout( {
+	name: 'getVolumeTransmissionRay',
+	type: 'vec3',
+	inputs: [
+		{ name: 'n', type: 'vec3' },
+		{ name: 'v', type: 'vec3' },
+		{ name: 'thickness', type: 'float' },
+		{ name: 'ior', type: 'float' },
+		{ name: 'modelMatrix', type: 'mat4' }
+	]
+} );
+
+const applyIorToRoughness = tslFn( ( [ roughness, ior ] ) => {
+
+	return roughness.mul( clamp( ior.mul( 2.0 ).sub( 2.0 ), 0.0, 1.0 ) );
+
+} ).setLayout( {
+	name: 'applyIorToRoughness',
+	type: 'float',
+	inputs: [
+		{ name: 'roughness', type: 'float' },
+		{ name: 'ior', type: 'float' }
+	]
+} );
+
+const getTransmissionSample = tslFn( ( [ fragCoord, roughness, ior ] ) => {
+
+	const transmissionSample = viewportMipTexture( fragCoord || viewportTopLeft );
+	//const sizeX = float( transmissionSample.size( 0 ).x ).toVar();
+	const sizeX = viewportResolution.x;
+
+	const lod = float( log2( float( sizeX ) ).mul( applyIorToRoughness( roughness, ior ) ) ).toVar();
+
+	return transmissionSample.bicubic( lod );
+
+} );
+
+const volumeAttenuation = tslFn( ( [ transmissionDistance, attenuationColor, attenuationDistance ] ) => {
+
+	If( attenuationDistance.notEqual( 0 ), () => {
+
+		const attenuationCoefficient = vec3( log( attenuationColor ).negate().div( attenuationDistance ) );
+		const transmittance = vec3( exp( attenuationCoefficient.negate().mul( transmissionDistance ) ) );
+
+		return transmittance;
+
+	} );
+
+	return vec3( 1.0 );
+
+} ).setLayout( {
+	name: 'volumeAttenuation',
+	type: 'vec3',
+	inputs: [
+		{ name: 'transmissionDistance', type: 'float' },
+		{ name: 'attenuationColor', type: 'vec3' },
+		{ name: 'attenuationDistance', type: 'float' }
+	]
+} );
+
+const getIBLVolumeRefraction = tslFn( ( [ n_immutable, v_immutable, roughness_immutable, diffuseColor_immutable, specularColor_immutable, specularF90_immutable, position_immutable, modelMatrix_immutable, viewMatrix_immutable, projMatrix_immutable, ior_immutable, thickness_immutable, attenuationColor_immutable, attenuationDistance_immutable ] ) => {
+
+	const attenuationDistance = float( attenuationDistance_immutable ).toVar();
+	const attenuationColor = vec3( attenuationColor_immutable ).toVar();
+	const thickness = float( thickness_immutable ).toVar();
+	const ior = float( ior_immutable ).toVar();
+	const projMatrix = mat4( projMatrix_immutable ).toVar();
+	const viewMatrix = mat4( viewMatrix_immutable ).toVar();
+	const modelMatrix = mat4( modelMatrix_immutable ).toVar();
+	const position = vec3( position_immutable ).toVar();
+	const specularF90 = float( specularF90_immutable ).toVar();
+	const specularColor = vec3( specularColor_immutable ).toVar();
+	const diffuseColor = vec3( diffuseColor_immutable ).toVar();
+	const roughness = float( roughness_immutable ).toVar();
+	const v = vec3( v_immutable ).toVar();
+	const n = vec3( n_immutable ).toVar();
+	const transmissionRay = vec3( getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix ) ).toVar();
+	const refractedRayExit = vec3( position.add( transmissionRay ) ).toVar();
+	const ndcPos = projMatrix.mul( viewMatrix.mul( vec4( refractedRayExit, 1.0 ) ) );
+	const refractionCoords = vec2( ndcPos.xy.div( ndcPos.w ) ).toVar();
+	refractionCoords.addAssign( 1.0 );
+	refractionCoords.divAssign( 2.0 );
+	refractionCoords.assign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
+	const uv = refractionCoords;
+	const transmittedLight = vec4( getTransmissionSample( uv, roughness, ior ) ).toVar();
+	const transmittance = vec3( diffuseColor.mul( volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance ) ) ).toVar();
+	const attenuatedColor = vec3( transmittance.mul( transmittedLight.rgb ) ).toVar();
+	const dotNV = n.dot( v ).clamp();
+	const F = vec3( EnvironmentBRDF( { // n, v, specularColor, specularF90, roughness
+		dotNV,
+		specularColor,
+		specularF90,
+		roughness
+	} ) ).toVar();
+	const transmittanceFactor = float( transmittance.r.add( transmittance.g.add( transmittance.b ) ).div( 3.0 ) ).toVar();
+
+	return vec4( sub( 1.0, F ).mul( attenuatedColor ), sub( 1.0, sub( 1.0, transmittedLight.a ).mul( transmittanceFactor ) ) );
+
+} );
+
+// layouts
+/*
+getVolumeTransmissionRay.setLayout( {
+	name: 'getVolumeTransmissionRay',
+	type: 'vec3',
+	inputs: [
+		{ name: 'n', type: 'vec3' },
+		{ name: 'v', type: 'vec3' },
+		{ name: 'thickness', type: 'float' },
+		{ name: 'ior', type: 'float' },
+		{ name: 'modelMatrix', type: 'mat4' }
+	]
+} );
+
+applyIorToRoughness.setLayout( {
+	name: 'applyIorToRoughness',
+	type: 'float',
+	inputs: [
+		{ name: 'roughness', type: 'float' },
+		{ name: 'ior', type: 'float' }
+	]
+} );
+
+getTransmissionSample.setLayout( {
+	name: 'getTransmissionSample',
+	type: 'vec4',
+	inputs: [
+		{ name: 'fragCoord', type: 'vec2' },
+		{ name: 'roughness', type: 'float' },
+		{ name: 'ior', type: 'float' }
+	]
+} );
+
+volumeAttenuation.setLayout( {
+	name: 'volumeAttenuation',
+	type: 'vec3',
+	inputs: [
+		{ name: 'transmissionDistance', type: 'float' },
+		{ name: 'attenuationColor', type: 'vec3' },
+		{ name: 'attenuationDistance', type: 'float' }
+	]
+} );
+
+getIBLVolumeRefraction.setLayout( {
+	name: 'getIBLVolumeRefraction',
+	type: 'vec4',
+	inputs: [
+		{ name: 'n', type: 'vec3' },
+		{ name: 'v', type: 'vec3' },
+		{ name: 'roughness', type: 'float' },
+		{ name: 'diffuseColor', type: 'vec3' },
+		{ name: 'specularColor', type: 'vec3' },
+		{ name: 'specularF90', type: 'float' },
+		{ name: 'position', type: 'vec3' },
+		{ name: 'modelMatrix', type: 'mat4' },
+		{ name: 'viewMatrix', type: 'mat4' },
+		{ name: 'projMatrix', type: 'mat4' },
+		{ name: 'ior', type: 'float' },
+		{ name: 'thickness', type: 'float' },
+		{ name: 'attenuationColor', type: 'vec3' },
+		{ name: 'attenuationDistance', type: 'float' }
+	]
+} );*/
+
 
 //
 // Iridescence
@@ -172,13 +356,14 @@ const clearcoatF90 = vec3( 1 );
 
 class PhysicalLightingModel extends LightingModel {
 
-	constructor( clearcoat = false, sheen = false, iridescence = false ) {
+	constructor( clearcoat = false, sheen = false, iridescence = false, transmission = false ) {
 
 		super();
 
 		this.clearcoat = clearcoat;
 		this.sheen = sheen;
 		this.iridescence = iridescence;
+		this.transmission = transmission;
 
 		this.clearcoatRadiance = null;
 		this.clearcoatSpecularDirect = null;
@@ -190,7 +375,7 @@ class PhysicalLightingModel extends LightingModel {
 
 	}
 
-	start( /*context*/ ) {
+	start( context ) {
 
 		if ( this.clearcoat === true ) {
 
@@ -220,6 +405,50 @@ class PhysicalLightingModel extends LightingModel {
 			} );
 
 			this.iridescenceF0 = Schlick_to_F0( { f: this.iridescenceFresnel, f90: 1.0, dotVH: dotNVi } );
+
+		}
+
+		if ( this.transmission === true ) {
+
+			/*{ name: 'n', type: 'vec3' },
+			{ name: 'v', type: 'vec3' },
+			{ name: 'roughness', type: 'float' },
+			{ name: 'diffuseColor', type: 'vec3' },
+			{ name: 'specularColor', type: 'vec3' },
+			{ name: 'specularF90', type: 'float' },
+			{ name: 'position', type: 'vec3' },
+			{ name: 'modelMatrix', type: 'mat4' },
+			{ name: 'viewMatrix', type: 'mat4' },
+			{ name: 'projMatrix', type: 'mat4' },
+			{ name: 'ior', type: 'float' },
+			{ name: 'thickness', type: 'float' },
+			{ name: 'attenuationColor', type: 'vec3' },
+			{ name: 'attenuationDistance', type: 'float' }*/
+
+			const position = positionWorld;
+			const v = cameraPosition.sub( positionWorld ).normalize();
+			//const v = positionViewDirection;
+			//const n = transformedNormalView.transformDirection( modelViewMatrix );
+			const n = transformedNormalWorld;
+
+			context.backdrop = getIBLVolumeRefraction(
+				n,
+				v,
+				roughness,
+				diffuseColor,
+				specularColor,
+				float( 1 ), // specularF90
+				position, // positionWorld
+				modelWorldMatrix, // modelMatrix
+				cameraViewMatrix, // viewMatrix
+				cameraProjectionMatrix, // projMatrix
+				materialIOR, // ior
+				materialThickness, // thickness
+				materialReference( 'attenuationColor', 'color' ), // attenuationColor
+				materialReference( 'attenuationDistance', 'float' ) // attenuationDistance
+			);
+
+			context.backdropAlpha = materialTransmission;
 
 		}
 

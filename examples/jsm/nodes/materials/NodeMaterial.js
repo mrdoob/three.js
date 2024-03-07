@@ -1,4 +1,4 @@
-import { Material, ShaderMaterial, NoColorSpace, LinearSRGBColorSpace } from 'three';
+import { Material, ShaderMaterial } from 'three';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor } from '../core/PropertyNode.js';
@@ -39,8 +39,6 @@ class NodeMaterial extends ShaderMaterial {
 		this.fog = true;
 		this.lights = true;
 		this.normals = true;
-
-		this.colorSpaced = true;
 
 		this.lightsNode = null;
 		this.envNode = null;
@@ -119,7 +117,15 @@ class NodeMaterial extends ShaderMaterial {
 
 		} else {
 
-			resultNode = this.setupOutput( builder, this.fragmentNode );
+			let fragmentNode = this.fragmentNode;
+
+			if ( fragmentNode.isOutputStructNode !== true ) {
+
+				fragmentNode = vec4( fragmentNode );
+
+			}
+
+			resultNode = this.setupOutput( builder, fragmentNode );
 
 		}
 
@@ -378,41 +384,11 @@ class NodeMaterial extends ShaderMaterial {
 
 	setupOutput( builder, outputNode ) {
 
-		const renderer = builder.renderer;
-
 		// FOG
 
-		if ( this.fog === true ) {
+		const fogNode = builder.fogNode;
 
-			const fogNode = builder.fogNode;
-
-			if ( fogNode ) outputNode = vec4( fogNode.mix( outputNode.rgb, fogNode.colorNode ), outputNode.a );
-
-		}
-
-		// TONE MAPPING
-
-		const toneMappingNode = builder.toneMappingNode;
-
-		if ( this.toneMapped === true && toneMappingNode ) {
-
-			outputNode = vec4( toneMappingNode.context( { color: outputNode.rgb } ), outputNode.a );
-
-		}
-
-		// ENCODING
-
-		if ( this.colorSpaced === true ) {
-
-			const outputColorSpace = renderer.currentColorSpace;
-
-			if ( outputColorSpace !== LinearSRGBColorSpace && outputColorSpace !== NoColorSpace ) {
-
-				outputNode = outputNode.linearToColorSpace( outputColorSpace );
-
-			}
-
-		}
+		if ( fogNode ) outputNode = vec4( fogNode.mix( outputNode.rgb, fogNode.colorNode ), outputNode.a );
 
 		return outputNode;
 

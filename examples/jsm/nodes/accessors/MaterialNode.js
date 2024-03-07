@@ -97,6 +97,34 @@ class MaterialNode extends Node {
 
 			}
 
+		} else if ( scope === MaterialNode.SPECULAR_INTENSITY ) {
+
+			const specularIntensity = this.getFloat( scope );
+
+			if ( material.specularMap ) {
+
+				node = specularIntensity.mul( this.getTexture( scope ).a );
+
+			} else {
+
+				node = specularIntensity;
+
+			}
+
+		} else if ( scope === MaterialNode.SPECULAR_INTENSITY ) {
+
+			const specularIntensity = this.getFloat( scope );
+
+			if ( material.specularMap ) {
+
+				node = specularIntensity.mul( this.getTexture( scope ).a );
+
+			} else {
+
+				node = specularIntensity;
+
+			}
+
 		} else if ( scope === MaterialNode.ROUGHNESS ) { // TODO: cleanup similar branches
 
 			const roughnessNode = this.getFloat( scope );
@@ -241,6 +269,34 @@ class MaterialNode extends Node {
 
 			}
 
+		} else if ( scope === MaterialNode.TRANSMISSION ) {
+
+			const transmissionNode = this.getFloat( scope );
+
+			if ( material.transmissionMap ) {
+
+				node = transmissionNode.mul( this.getTexture( scope ).r );
+
+			} else {
+
+				node = transmissionNode;
+
+			}
+
+		} else if ( scope === MaterialNode.THICKNESS ) {
+
+			const thicknessNode = this.getFloat( scope );
+
+			if ( material.thicknessMap ) {
+
+				node = thicknessNode.mul( this.getTexture( scope ).g );
+
+			} else {
+
+				node = thicknessNode;
+
+			}
+
 		} else {
 
 			const outputType = this.getNodeType( builder );
@@ -261,6 +317,8 @@ MaterialNode.OPACITY = 'opacity';
 MaterialNode.SHININESS = 'shininess';
 MaterialNode.SPECULAR_COLOR = 'specular';
 MaterialNode.SPECULAR_STRENGTH = 'specularStrength';
+MaterialNode.SPECULAR_INTENSITY = 'specularIntensity';
+MaterialNode.SPECULAR_COLOR2 = 'specularColor';
 MaterialNode.REFLECTIVITY = 'reflectivity';
 MaterialNode.ROUGHNESS = 'roughness';
 MaterialNode.METALNESS = 'metalness';
@@ -275,6 +333,10 @@ MaterialNode.SHEEN_ROUGHNESS = 'sheenRoughness';
 MaterialNode.IRIDESCENCE = 'iridescence';
 MaterialNode.IRIDESCENCE_IOR = 'iridescenceIOR';
 MaterialNode.IRIDESCENCE_THICKNESS = 'iridescenceThickness';
+MaterialNode.TRANSMISSION = 'transmission';
+MaterialNode.THICKNESS = 'thickness';
+MaterialNode.ATTENUATION_DISTANCE = 'attenuationDistance';
+MaterialNode.ATTENUATION_COLOR = 'attenuationColor';
 MaterialNode.LINE_SCALE = 'scale';
 MaterialNode.LINE_DASH_SIZE = 'dashSize';
 MaterialNode.LINE_GAP_SIZE = 'gapSize';
@@ -290,6 +352,10 @@ export const materialShininess = nodeImmutable( MaterialNode, MaterialNode.SHINI
 export const materialEmissive = nodeImmutable( MaterialNode, MaterialNode.EMISSIVE );
 export const materialOpacity = nodeImmutable( MaterialNode, MaterialNode.OPACITY );
 export const materialSpecularColor = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_COLOR );
+
+export const materialSpecularIntensity = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_INTENSITY );
+export const materialSpecularColor2 = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_COLOR2 );
+
 export const materialSpecularStrength = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_STRENGTH );
 export const materialReflectivity = nodeImmutable( MaterialNode, MaterialNode.REFLECTIVITY );
 export const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
@@ -304,6 +370,10 @@ export const materialSheenRoughness = nodeImmutable( MaterialNode, MaterialNode.
 export const materialIridescence = nodeImmutable( MaterialNode, MaterialNode.IRIDESCENCE );
 export const materialIridescenceIOR = nodeImmutable( MaterialNode, MaterialNode.IRIDESCENCE_IOR );
 export const materialIridescenceThickness = nodeImmutable( MaterialNode, MaterialNode.IRIDESCENCE_THICKNESS );
+export const materialTransmission = nodeImmutable( MaterialNode, MaterialNode.TRANSMISSION );
+export const materialThickness = nodeImmutable( MaterialNode, MaterialNode.THICKNESS );
+export const attenuationDistance = nodeImmutable( MaterialNode, MaterialNode.ATTENUATION_DISTANCE );
+export const attenuationColor = nodeImmutable( MaterialNode, MaterialNode.ATTENUATION_COLOR );
 export const materialLineScale = nodeImmutable( MaterialNode, MaterialNode.LINE_SCALE );
 export const materialLineDashSize = nodeImmutable( MaterialNode, MaterialNode.LINE_DASH_SIZE );
 export const materialLineGapSize = nodeImmutable( MaterialNode, MaterialNode.LINE_GAP_SIZE );
