@@ -113,8 +113,6 @@ class PMREMGenerator {
 		const cubeUVRenderTarget = this._allocateTargets();
 		cubeUVRenderTarget.depthBuffer = true;
 
-		this._ready();
-
 		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
 
 		if ( sigma > 0 ) {
@@ -221,16 +219,8 @@ class PMREMGenerator {
 
 	}
 
-	_ready() {
-
-		this._toneMapping = this._renderer.toneMapping;
-		this._renderer.toneMapping = NoToneMapping;
-
-	}
-
 	_cleanup( outputTarget ) {
 
-		this._renderer.toneMapping = toneMapping;
 		this._renderer.setRenderTarget( _oldTarget, _oldActiveCubeFace, _oldActiveMipmapLevel );
 		outputTarget.scissorTest = false;
 		_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
@@ -252,8 +242,6 @@ class PMREMGenerator {
 		_oldTarget = this._renderer.getRenderTarget();
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
 		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
-
-		this._ready();
 
 		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
@@ -319,8 +307,10 @@ class PMREMGenerator {
 		const renderer = this._renderer;
 
 		const originalAutoClear = renderer.autoClear;
-
+		const toneMapping = renderer.toneMapping;
 		renderer.getClearColor( _clearColor );
+
+		renderer.toneMapping = NoToneMapping;
 		renderer.autoClear = false;
 
 		const backgroundMaterial = new MeshBasicMaterial( {
@@ -392,6 +382,7 @@ class PMREMGenerator {
 		backgroundBox.geometry.dispose();
 		backgroundBox.material.dispose();
 
+		renderer.toneMapping = toneMapping;
 		renderer.autoClear = originalAutoClear;
 		scene.background = background;
 
