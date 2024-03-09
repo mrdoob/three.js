@@ -1,6 +1,6 @@
 import { StringInput, NumberInput, ColorInput, Element, LabelElement } from 'flow';
 import { string, float, vec2, vec3, vec4, color } from 'three/nodes';
-import { getColorFromType } from './DataTypeLib.js';
+import { setInputAestheticsFromType, setOutputAestheticsFromType } from './DataTypeLib.js';
 
 export function exportJSON( object, name ) {
 
@@ -265,9 +265,8 @@ export function createElementFromJSON( json ) {
 
 	if ( inputType && json.inputConnection !== false ) {
 
-		element.setInputColor( getColorFromType( inputType ) );
+		setInputAestheticsFromType( element, inputType );
 		//element.setInputStyle( 'dotted' ); // 'border-style: dotted;'
-		element.setInput( 1 );
 
 		element.onValid( onValidType( inputType ) );
 
@@ -275,9 +274,8 @@ export function createElementFromJSON( json ) {
 
 	if ( outputType ) {
 
-		element.setInputColor( getColorFromType( outputType ) );
+		setOutputAestheticsFromType( element, outputType );
 		//element.setInputStyle( 'dotted' ); // 'border-style: dotted;'
-		element.setOutput( 1 );
 
 	}
 

@@ -2,7 +2,7 @@ import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { CodeEditorElement } from '../elements/CodeEditorElement.js';
 import { disposeScene, createElementFromJSON, isGPUNode, onValidType } from '../NodeEditorUtils.js';
 import { global, scriptable, js, scriptableValue } from 'three/nodes';
-import { getColorFromType } from '../DataTypeLib.js';
+import { getColorFromType, setInputAestheticsFromType, setOutputAestheticsFromType } from '../DataTypeLib.js';
 
 const defaultTitle = 'Scriptable';
 const defaultWidth = 500;
@@ -70,7 +70,9 @@ export class ScriptableEditor extends BaseNodeEditor {
 
 	getColor() {
 
-		return getColorFromType( this.layout ? this.layout.outputType : null ) + 'BB';
+		const color = getColorFromType( this.layout ? this.layout.outputType : null );
+
+		return color ? color + 'BB' : null;
 
 	}
 
@@ -171,8 +173,7 @@ export class ScriptableEditor extends BaseNodeEditor {
 
 			const outputType = layout.outputType;
 
-			this.title.setOutputColor( getColorFromType( outputType ) );
-			this.title.setOutput( outputType && outputType !== 'void' ? this.outputLength : 0 );
+			setOutputAestheticsFromType( this.title, outputType );
 
 		} else {
 
@@ -407,7 +408,7 @@ export class ScriptableEditor extends BaseNodeEditor {
 
 	_initExternalConnection() {
 
-		this.title.setInputColor( getColorFromType( 'CodeNode' ) ).setInput( 1 ).onValid( onValidType( 'CodeNode' ) ).onConnect( () => {
+		setInputAestheticsFromType(this.title, 'CodeNode' ).onValid( onValidType( 'CodeNode' ) ).onConnect( () => {
 
 			this.hasExternalEditor ? this._toExternal() : this._toInternal();
 

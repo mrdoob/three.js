@@ -83,7 +83,9 @@ export class BaseNodeEditor extends Node {
 
 	getColor() {
 
-		return ( getColorFromNode( this.value ) ) + 'BB';
+		const color = getColorFromNode( this.value );
+
+		return color ? color + 'BB' : null;
 
 	}
 

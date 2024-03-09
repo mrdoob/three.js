@@ -42,7 +42,6 @@ export function getLengthFromNode( value ) {
 
 }
 
-
 export const typeToColorLib = {
 	// gpu
 	string: '#ff0000',
@@ -62,11 +61,9 @@ export const typeToColorLib = {
 	URL: '#ff0080'
 };
 
-export const defaultColor = '#777777';
-
 export function getColorFromType( type ) {
 
-	return typeToColorLib[ type ] || defaultColor;
+	return typeToColorLib[ type ] || null;
 
 }
 
@@ -78,7 +75,7 @@ export function getColorFromNode( value ) {
 
 }
 
-export function getTypeFromNode ( value ) {
+function getTypeFromNode( value ) {
 
 	if ( value ) {
 
@@ -89,7 +86,7 @@ export function getTypeFromNode ( value ) {
 
 }
 
-export function getTypeFromValue( value ) {
+function getTypeFromValue( value ) {
 
 	if ( value && value.isScriptableValueNode ) value = value.value;
 	if ( ! value ) return;
@@ -105,18 +102,17 @@ export function getTypeFromValue( value ) {
 
 }
 
-export function getColorFromValue( value ) {
-
-	const type = getTypeFromValue( value );
-
-	return getColorFromType( type );
-
-}
-
 export function setInputAestheticsFromType( element, type ) {
 
 	element.setInput( getLengthFromType( type ) );
-	element.setInputColor( getColorFromType( type ) );
+
+	const color = getColorFromType( type );
+
+	if ( color ) {
+
+		element.setInputColor( color );
+
+	}
 
 	return element;
 
@@ -132,7 +128,11 @@ export function setOutputAestheticsFromNode( element, node ) {
 
 	}
 
-	let type = getTypeFromNode( node );
+	return setOutputAestheticsFromType( element, getTypeFromNode( node ) );
+
+}
+
+export function setOutputAestheticsFromType( element, type ) {
 
 	if ( ! type ) {
 
@@ -142,8 +142,23 @@ export function setOutputAestheticsFromNode( element, node ) {
 
 	}
 
+	if ( type == 'void' ) {
+
+		element.setOutput( 0 );
+
+		return element;
+
+	}
+
 	element.setOutput( getLengthFromType( type ) );
-	element.setOutputColor( getColorFromType( type ) );
+
+	const color = getColorFromType( type );
+
+	if ( color ) {
+
+		element.setOutputColor( color );
+
+	}
 
 	return element;
 
