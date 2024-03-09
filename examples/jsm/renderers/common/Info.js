@@ -66,22 +66,17 @@ class Info {
 
 	}
 
-	resetCompute() {
-
-		this.compute.computeCalls = 0;
-
-		this.timestamp.compute = 0;
-
-	}
-
 	reset() {
 
 		this.render.drawCalls = 0;
+		this.compute.computeCalls = 0;
+
 		this.render.triangles = 0;
 		this.render.points = 0;
 		this.render.lines = 0;
 
 		this.timestamp.render = 0;
+		this.timestamp.compute = 0;
 
 	}
 

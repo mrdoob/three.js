@@ -9,6 +9,19 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute Snow - 100K Particles
+			<div id="timestamps" style="
+				position: absolute;
+				top: 60px;
+				left: 0;
+				padding: 10px;
+				background: rgba( 0, 0, 0, 0.5 );
+				color: #fff;
+				font-family: monospace;
+				font-size: 12px;
+				line-height: 1.5;
+				pointer-events: none;
+				text-align: left;
+			"></div>
 		</div>
 
 		<script type="importmap">
@@ -40,6 +53,7 @@
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			const maxParticleCount = 100000;
+			const timestamps = document.getElementById( 'timestamps' );
 
 			let camera, scene, renderer;
 			let controls, stats;
@@ -50,7 +64,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
 
@@ -278,7 +292,7 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new WebGPURenderer( { antialias: true, trackTimestamp: true } );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -287,6 +301,18 @@
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
+
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 10, 0 );
+				controls.minDistance = 25;
+				controls.maxDistance = 35;
+				controls.maxPolarAngle = Math.PI / 1.7;
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = - 0.7;
+				controls.update();
 
 				// post processing
 
@@ -314,18 +340,7 @@
 
 				//
 
-				renderer.compute( computeInit );
-
-				//
-
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 10, 0 );
-				controls.minDistance = 25;
-				controls.maxDistance = 35;
-				controls.maxPolarAngle = Math.PI / 1.7;
-				controls.autoRotate = true;
-				controls.autoRotateSpeed = - 0.7;
-				controls.update();
+				await renderer.computeAsync( computeInit );
 
 				//
 
@@ -344,7 +359,7 @@
 
 			}
 
-			function animate() {
+			async function animate() {
 
 				stats.update();
 
@@ -354,18 +369,37 @@
 
 				scene.overrideMaterial = collisionPosMaterial;
 				renderer.setRenderTarget( collisionPosRT );
-				renderer.render( scene, collisionCamera );
+				await renderer.renderAsync( scene, collisionCamera );
 
 				// compute
 
-				renderer.compute( computeParticles );
+				await renderer.computeAsync( computeParticles );
 
 				// result
 
 				scene.overrideMaterial = null;
 				renderer.setRenderTarget( null );
 
-				postProcessing.render();
+				await postProcessing.renderAsync();
+
+
+				// throttle the logging
+				if ( renderer.hasFeature( 'timestamp-query' ) ) {
+
+					if ( renderer.info.render.calls % 5 === 0 ) {
+
+						timestamps.innerHTML = `
+
+							Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.timestamp.compute.toFixed( 6 )}ms<br>
+							Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.timestamp.render.toFixed( 6 )}ms`;
+
+					}
+
+				} else {
+
+					timestamps.innerHTML = 'Timestamp queries not supported';
+
+				}
 
 			}
 
