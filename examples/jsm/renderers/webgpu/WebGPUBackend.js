@@ -1234,7 +1234,7 @@ class WebGPUBackend extends Backend {
 
 		if ( ! this.adapter ) {
 
-			console.warn( 'WebGPUBackend: WebGPU adapter has not been initialized yet. Please use detectSupportAsync instead' );
+			console.warn( 'WebGPUBackend: WebGPU adapter has not been initialized yet. Please use hasFeatureAsync instead' );
 
 			return false;
 
@@ -1243,6 +1243,37 @@ class WebGPUBackend extends Backend {
 		return this.adapter.features.has( name );
 
 	}
+
+	copyTextureToTexture( position, srcTexture, dstTexture, level = 0 ) {
+
+		const encoder = this.device.createCommandEncoder( { label: 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id } );
+
+		const sourceGPU = this.get( srcTexture ).texture;
+		const destinationGPU = this.get( dstTexture ).texture;
+
+		encoder.copyTextureToTexture(
+			{
+				texture: sourceGPU,
+				mipLevel: level,
+				origin: { x: 0, y: 0, z: 0 }
+			},
+			{
+				texture: destinationGPU,
+				mipLevel: level,
+				origin: { x: position.x, y: position.y, z: position.z }
+			},
+			[
+				srcTexture.image.width,
+				srcTexture.image.height
+			]
+		);
+
+		this.device.queue.submit( [ encoder.finish() ] );
+
+	}
+
+
+
 
 	copyFramebufferToTexture( texture, renderContext ) {
 

@@ -1,4 +1,4 @@
-import ClippingContext from "./ClippingContext.js";
+import ClippingContext from './ClippingContext.js';
 
 let id = 0;
 
@@ -75,7 +75,7 @@ export default class RenderObject {
 
 	}
 
-	clippingNeedsUpdate () {
+	clippingNeedsUpdate() {
 
 		if ( this.clippingContext.version === this.clippingContextVersion ) return false;
 
