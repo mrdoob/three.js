@@ -312,7 +312,7 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
-		const renderContext = this._renderContext( scene, camera );
+		const renderContext = this._renderScene( scene, camera );
 
 		await this.backend.resolveTimestampAsync( renderContext, 'render' );
 
@@ -322,16 +322,17 @@ class Renderer {
 
 		if ( this._initialized === false ) {
 
-			console.error( 'THREE.Renderer: .render() called before the backend is initialized. Try using .renderAsync() instead.' );
-			return;
+			console.warn( 'THREE.Renderer: .render() called before the backend is initialized. Try using .renderAsync() instead.' );
+
+			return this.renderAsync( scene, camera );
 
 		}
 
-		this._renderContext( scene, camera );
+		this._renderScene( scene, camera );
 
 	}
 
-	_renderContext( scene, camera ) {
+	_renderScene( scene, camera ) {
 
 		// preserve render tree
 
