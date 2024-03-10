@@ -361,6 +361,7 @@
 		"webgpu_portal",
 		"webgpu_reflection",
 		"webgpu_rtt",
+		"webgpu_materials_texture_partialupdate",
 		"webgpu_sandbox",
 		"webgpu_shadertoy",
 		"webgpu_shadowmap",
