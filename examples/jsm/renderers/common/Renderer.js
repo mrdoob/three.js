@@ -762,6 +762,14 @@ class Renderer {
 
 	clear( color = true, depth = true, stencil = true ) {
 
+		if ( this._initialized === false ) {
+
+			console.warn( 'THREE.Renderer: .clear() called before the backend is initialized. Try using .clearAsync() instead.' );
+
+			return this.clearAsync( color, depth, stencil );
+
+		}
+
 		let renderTargetData = null;
 		const renderTarget = this._renderTarget;
 
