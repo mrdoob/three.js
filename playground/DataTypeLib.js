@@ -47,18 +47,27 @@ export const typeToColorLib = {
 	string: '#ff0000',
 	float: '#eeeeee',
 	bool: '#00dd00',
+	vec2: '#0000ff',
+	vec3: '#0000ff',
+	vec4: '#0000ff',
 	mat2: '#70d030',
 	mat3: '#70d030',
 	mat4: '#70d030',
+	color: '#00ffff',
 	// cpu
 	String: '#ff0000',
 	Number: '#eeeeee',
+	Vector2: '#0000ff',
+	Vector3: '#0000ff',
+	Vector4: '#0000ff',
+	Color: '#00ffff',
 	// cpu: other stuff
 	Material: '#228b22',
 	Object3D: '#00a1ff',
 	CodeNode: '#ff00ff',
 	Texture: '#ffa500',
-	URL: '#ff0080'
+	URL: '#ff0080',
+	node: '#ff00ff'
 };
 
 export function getColorFromType( type ) {
