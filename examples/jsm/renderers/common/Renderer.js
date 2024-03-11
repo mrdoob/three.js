@@ -57,7 +57,7 @@ class Renderer {
 		this.sortObjects = true;
 
 		this.depth = true;
-		this.stencil = true;
+		this.stencil = false;
 
 		this.clippingPlanes = [];
 
