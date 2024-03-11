@@ -156,8 +156,9 @@ export class XREstimatedLight extends Group {
 		renderer.xr.addEventListener( 'sessionstart', () => {
 
 			const session = renderer.xr.getSession();
-
-			if ( 'requestLightProbe' in session ) {
+			const featureIsNotEnabled = session.enabledFeatures && !session.enabledFeatures.includes( 'light-estimation' );
+			
+			if ( !featureIsNotEnabled && 'requestLightProbe' in session ) {
 
 				session.requestLightProbe( {
 
