@@ -111,6 +111,37 @@ class PCDLoader extends Loader {
 
 		}
 
+		//find type and size of a field 
+
+		function findTypeSize(header, key) {
+			const index = header.fields.indexOf(key);
+			return {
+				type: header.type[index],
+				size: header.size[index]
+			}
+		}
+
+		//access data from dataview, based on type and size
+
+		function getValue(dataView, header, key, offset, littleEndian) {
+			const { type, size } = findTypeSize(header, key);
+			if (type === 'F') {
+				return dataView.getFloat32(offset, littleEndian);
+			}
+			if (type === 'U') {
+				if (size === 1) return dataView.getUint8(offset);
+				if (size === 2) return dataView.getUint16(offset, littleEndian);
+				if (size === 4) return dataView.getUint32(offset, littleEndian);
+			}
+
+			if (type === 'I') {
+				if (size === 1) return dataView.getInt8(offset);
+				if (size === 2) return dataView.getInt16(offset, littleEndian);
+				if (size === 4) return dataView.getInt32(offset, littleEndian);
+			}
+			return null;
+		}
+
 		function parseHeader( data ) {
 
 			const PCDheader = {};
@@ -233,6 +264,9 @@ class PCDLoader extends Loader {
 		const intensity = [];
 		const label = [];
 
+		const NON_SCALAR_FIELDS = [ 'x', 'y', 'z', 'rgb', 'normal_x', 'normal_y', 'normal_z', 'intensity', 'label' ];
+		const scalars = {};
+
 		const c = new Color();
 
 		// ascii
@@ -304,7 +338,17 @@ class PCDLoader extends Loader {
 					label.push( parseInt( line[ offset.label ] ) );
 
 				}
+				//scalar fields
+				for ( const key in offset ) {
+					if ( NON_SCALAR_FIELDS.includes( key ) ) continue;
 
+					if ( scalars[ key ] === undefined ) {
+						scalars[ key ] = [];
+					}
+
+					const { type } = findTypeSize(PCDheader, key);
+					scalars[key].push(type === 'F' ? parseFloat(line[offset[key]]) : parseInt(line[offset[key]]));
+				}
 			}
 
 		}
@@ -376,7 +420,19 @@ class PCDLoader extends Loader {
 					label.push( dataview.getInt32( ( PCDheader.points * offset.label ) + PCDheader.size[ labelIndex ] * i, this.littleEndian ) );
 
 				}
+				//TODO: scalar fields
+				for (const key in offset) {
+					if (NON_SCALAR_FIELDS.includes(key)) continue;
 
+					if (scalars[key] === undefined) {
+						scalars[key] = [];
+					}
+
+					const { size } = findTypeSize(PCDheader, key);
+					scalars[key].push(getValue(dataview,
+						PCDheader,key,
+						PCDheader.points + offset[key] + size*i, this.littleEndian));
+				}
 			}
 
 		}
@@ -430,6 +486,17 @@ class PCDLoader extends Loader {
 
 				}
 
+				//scalar fields
+				for (const key in offset) {
+					if (NON_SCALAR_FIELDS.includes(key)) continue;
+
+					if (scalars[key] === undefined) {
+						scalars[key] = [];
+					}
+					scalars[key].push(getValue(dataview,
+						PCDheader,key,
+						row + offset[key], this.littleEndian));
+				}
 			}
 
 		}
@@ -443,6 +510,15 @@ class PCDLoader extends Loader {
 		if ( color.length > 0 ) geometry.setAttribute( 'color', new Float32BufferAttribute( color, 3 ) );
 		if ( intensity.length > 0 ) geometry.setAttribute( 'intensity', new Float32BufferAttribute( intensity, 1 ) );
 		if ( label.length > 0 ) geometry.setAttribute( 'label', new Int32BufferAttribute( label, 1 ) );
+
+		for (const key in scalars) {
+			const { type } = findTypeSize(PCDheader, key);
+			if (type === 'F') {
+				geometry.setAttribute(key, new Float32BufferAttribute(scalars[key], 1));
+			} else {
+				geometry.setAttribute(key, new Int32BufferAttribute(scalars[key], 1));
+			}
+		}
 
 		geometry.computeBoundingSphere();
 
