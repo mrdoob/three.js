@@ -1,4 +1,4 @@
-export const REVISION = '161dev';
+export const REVISION = '163dev';
 
 export const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -57,6 +57,7 @@ export const CineonToneMapping = 3;
 export const ACESFilmicToneMapping = 4;
 export const CustomToneMapping = 5;
 export const AgXToneMapping = 6;
+export const NeutralToneMapping = 7;
 export const AttachedBindMode = 'attached';
 export const DetachedBindMode = 'detached';
 
@@ -148,10 +149,6 @@ export const AdditiveAnimationBlendMode = 2501;
 export const TrianglesDrawMode = 0;
 export const TriangleStripDrawMode = 1;
 export const TriangleFanDrawMode = 2;
-/** @deprecated Use LinearSRGBColorSpace or NoColorSpace in three.js r152+. */
-export const LinearEncoding = 3000;
-/** @deprecated Use SRGBColorSpace in three.js r152+. */
-export const sRGBEncoding = 3001;
 export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;
 export const TangentSpaceNormalMap = 0;
@@ -209,8 +206,6 @@ export const StreamCopyUsage = 35042;
 
 export const GLSL1 = '100';
 export const GLSL3 = '300 es';
-
-export const _SRGBAFormat = 1035; // fallback for WebGL 1
 
 export const WebGLCoordinateSystem = 2000;
 export const WebGPUCoordinateSystem = 2001;

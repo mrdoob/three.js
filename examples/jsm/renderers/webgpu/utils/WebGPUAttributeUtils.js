@@ -44,10 +44,16 @@ class WebGPUAttributeUtils {
 
 			let array = bufferAttribute.array;
 
-			if ( bufferAttribute.isStorageBufferAttribute && bufferAttribute.itemSize === 3 ) {
+			if ( ( bufferAttribute.isStorageBufferAttribute || bufferAttribute.isStorageInstancedBufferAttribute ) && bufferAttribute.itemSize === 3 ) {
 
 				bufferAttribute.itemSize = 4;
 				array = new array.constructor( bufferAttribute.count * 4 );
+
+				for ( let i = 0; i < bufferAttribute.count; i ++ ) {
+
+					array.set( bufferAttribute.array.subarray( i * 3, i * 3 + 3 ), i * 4 );
+
+				}
 
 			}
 

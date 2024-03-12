@@ -12,7 +12,7 @@ class TempNode extends Node {
 
 	hasDependencies( builder ) {
 
-		return builder.getDataFromNode( this ).dependenciesCount > 1;
+		return builder.getDataFromNode( this ).usageCount > 1;
 
 	}
 

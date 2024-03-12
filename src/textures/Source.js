@@ -14,6 +14,7 @@ class Source {
 		this.uuid = MathUtils.generateUUID();
 
 		this.data = data;
+		this.dataReady = true;
 
 		this.version = 0;
 

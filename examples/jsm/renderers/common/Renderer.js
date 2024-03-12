@@ -11,6 +11,7 @@ import Textures from './Textures.js';
 import Background from './Background.js';
 import Nodes from './nodes/Nodes.js';
 import Color4 from './Color4.js';
+import ClippingContext from './ClippingContext.js';
 import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping } from 'three';
 
 const _scene = new Scene();
@@ -57,6 +58,8 @@ class Renderer {
 
 		this.depth = true;
 		this.stencil = true;
+
+		this.clippingPlanes = [];
 
 		this.info = new Info();
 
@@ -223,6 +226,9 @@ class Renderer {
 		renderContext.depth = this.depth;
 		renderContext.stencil = this.stencil;
 
+		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
+		renderContext.clippingContext.updateGlobal( this, camera );
+
 		//
 
 		sceneRef.onBeforeRender( this, scene, camera, renderTarget );
@@ -306,6 +312,28 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
+		const renderContext = this._renderScene( scene, camera );
+
+		await this.backend.resolveTimestampAsync( renderContext, 'render' );
+
+	}
+
+	render( scene, camera ) {
+
+		if ( this._initialized === false ) {
+
+			console.warn( 'THREE.Renderer: .render() called before the backend is initialized. Try using .renderAsync() instead.' );
+
+			return this.renderAsync( scene, camera );
+
+		}
+
+		this._renderScene( scene, camera );
+
+	}
+
+	_renderScene( scene, camera ) {
+
 		// preserve render tree
 
 		const nodeFrame = this._nodes.nodeFrame;
@@ -385,6 +413,9 @@ class Renderer {
 		renderContext.scissor = this._scissorTest && renderContext.scissorValue.equals( _screen ) === false;
 		renderContext.scissorValue.width >>= activeMipmapLevel;
 		renderContext.scissorValue.height >>= activeMipmapLevel;
+
+		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
+		renderContext.clippingContext.updateGlobal( this, camera );
 
 		//
 
@@ -477,8 +508,9 @@ class Renderer {
 
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
 
+		//
 
-		await this.backend.resolveTimeStampAsync( renderContext, 'render' );
+		return renderContext;
 
 	}
 
@@ -728,9 +760,15 @@ class Renderer {
 
 	}
 
-	async clearAsync( color = true, depth = true, stencil = true ) {
+	clear( color = true, depth = true, stencil = true ) {
 
-		if ( this._initialized === false ) await this.init();
+		if ( this._initialized === false ) {
+
+			console.warn( 'THREE.Renderer: .clear() called before the backend is initialized. Try using .clearAsync() instead.' );
+
+			return this.clearAsync( color, depth, stencil );
+
+		}
 
 		let renderTargetData = null;
 		const renderTarget = this._renderTarget;
@@ -744,6 +782,32 @@ class Renderer {
 		}
 
 		this.backend.clear( color, depth, stencil, renderTargetData );
+
+	}
+
+	clearColor() {
+
+		return this.clear( true, false, false );
+
+	}
+
+	clearDepth() {
+
+		return this.clear( false, true, false );
+
+	}
+
+	clearStencil() {
+
+		return this.clear( false, false, true );
+
+	}
+
+	async clearAsync( color = true, depth = true, stencil = true ) {
+
+		if ( this._initialized === false ) await this.init();
+
+		this.clear( color, depth, stencil );
 
 	}
 
@@ -834,6 +898,7 @@ class Renderer {
 		const previousRenderId = nodeFrame.renderId;
 
 		//
+		if ( this.info.autoReset === true ) this.info.resetCompute();
 
 		this.info.calls ++;
 		this.info.compute.calls ++;
@@ -842,7 +907,6 @@ class Renderer {
 		nodeFrame.renderId = this.info.calls;
 
 		//
-		if ( this.info.autoReset === true ) this.info.resetCompute();
 
 		const backend = this.backend;
 		const pipelines = this._pipelines;
@@ -894,7 +958,7 @@ class Renderer {
 
 		backend.finishCompute( computeNodes );
 
-		await this.backend.resolveTimeStampAsync( computeNodes, 'compute' );
+		await this.backend.resolveTimestampAsync( computeNodes, 'compute' );
 
 		//
 
@@ -923,6 +987,16 @@ class Renderer {
 		this.backend.copyFramebufferToTexture( framebufferTexture, renderContext );
 
 	}
+
+	copyTextureToTexture( position, srcTexture, dstTexture, level = 0 ) {
+
+		this._textures.updateTexture( srcTexture );
+		this._textures.updateTexture( dstTexture );
+
+		this.backend.copyTextureToTexture( position, srcTexture, dstTexture, level );
+
+	}
+
 
 	readRenderTargetPixelsAsync( renderTarget, x, y, width, height ) {
 
@@ -1085,6 +1159,7 @@ class Renderer {
 	renderObject( object, scene, camera, geometry, material, group, lightsNode ) {
 
 		let overridePositionNode;
+		let overrideFragmentNode;
 
 		//
 
@@ -1103,6 +1178,45 @@ class Renderer {
 				overridePositionNode = overrideMaterial.positionNode;
 
 				overrideMaterial.positionNode = material.positionNode;
+
+			}
+
+			if ( overrideMaterial.isShadowNodeMaterial ) {
+
+				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
+
+				if ( material.shadowNode && material.shadowNode.isNode ) {
+
+					overrideFragmentNode = overrideMaterial.fragmentNode;
+					overrideMaterial.fragmentNode = material.shadowNode;
+
+				}
+
+				if ( this.localClippingEnabled ) {
+
+					if ( material.clipShadows ) {
+
+						if ( overrideMaterial.clippingPlanes !== material.clippingPlanes ) {
+
+							overrideMaterial.clippingPlanes = material.clippingPlanes;
+							overrideMaterial.needsUpdate = true;
+
+						}
+
+						if ( overrideMaterial.clipIntersection !== material.clipIntersection ) {
+
+							overrideMaterial.clipIntersection = material.clipIntersection;
+
+						}
+
+					} else if ( Array.isArray( overrideMaterial.clippingPlanes ) ) {
+
+						overrideMaterial.clippingPlanes = null;
+						overrideMaterial.needsUpdate = true;
+
+					}
+
+				}
 
 			}
 
@@ -1133,6 +1247,12 @@ class Renderer {
 		if ( overridePositionNode !== undefined ) {
 
 			scene.overrideMaterial.positionNode = overridePositionNode;
+
+		}
+
+		if ( overrideFragmentNode !== undefined ) {
+
+			scene.overrideMaterial.fragmentNode = overrideFragmentNode;
 
 		}
 
@@ -1194,38 +1314,7 @@ class Renderer {
 
 	get compile() {
 
-		console.warn( 'THREE.Renderer: compile() is deprecated and will be removed in r170, use compileAsync instead.' ); // @deprecated, r170
 		return this.compileAsync;
-
-	}
-
-	get render() {
-
-		return this.renderAsync;
-
-	}
-
-	get clear() {
-
-		return this.clearAsync;
-
-	}
-
-	get clearColor() {
-
-		return this.clearColorAsync;
-
-	}
-
-	get clearDepth() {
-
-		return this.clearDepthAsync;
-
-	}
-
-	get clearStencil() {
-
-		return this.clearStencilAsync;
 
 	}
 

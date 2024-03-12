@@ -34,11 +34,18 @@
 </p>
 
 <h3>[property:Boolean alphaToCoverage]</h3>
-<p>
-	Enables alpha to coverage. Can only be used with MSAA-enabled contexts
-	(meaning when the renderer was created with *antialias* parameter set to
-	`true`). Enabling this will smooth aliasing on clip plane edges and alphaTest-clipped edges.
-	Default is `false`.
+<p>启用 alpha 覆盖。 只能与启用 MSAA 的上下文一起使用（意味着在创建渲染器时将抗锯齿参数 *antialias* 设置为 `true`）。
+	启用此选项将平滑剪裁平面边缘和 alphaTest 剪辑边缘上的锯齿。 默认值为 `false`。
+</p>
+
+<h3>[property:Float blendAlpha]</h3>
+<p>表示恒定混合颜色的 alpha 值。 默认值为 `0`。<br />
+	此属性仅在使用 [page:CustomBlendingEquation ConstantAlpha] 或 [page:CustomBlendingEquation OneMinusConstantAlpha] 自定义混合时有效。
+</p>
+
+<h3>[property:Color blendColor]</h3>
+<p>表示恒定混合颜色的 RGB 值。 默认值为 `0x000000`。<br />
+	此属性仅在使用 [page:CustomBlendingEquation ConstantColor] 或 [page:CustomBlendingEquation OneMinusConstantColor] 自定义混合时有效。
 </p>
 
 <h3>[property:Integer blendDst]</h3>

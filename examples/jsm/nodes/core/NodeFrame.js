@@ -45,7 +45,7 @@ class NodeFrame {
 	updateBeforeNode( node ) {
 
 		const updateType = node.getUpdateBeforeType();
-		const reference = node.updateReference( this );
+		const reference = node.setReference( this );
 
 		if ( updateType === NodeUpdateType.FRAME ) {
 
@@ -86,7 +86,7 @@ class NodeFrame {
 	updateNode( node ) {
 
 		const updateType = node.getUpdateType();
-		const reference = node.updateReference( this );
+		const reference = node.setReference( this );
 
 		if ( updateType === NodeUpdateType.FRAME ) {
 

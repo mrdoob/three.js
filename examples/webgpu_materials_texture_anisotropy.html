@@ -77,11 +77,9 @@
 
 			let mouseX = 0, mouseY = 0;
 
+			init();
 
-			init().then( () => animate() );
-
-
-			async function init() {
+			function init() {
 
 				const SCREEN_WIDTH = window.innerWidth;
 				const SCREEN_HEIGHT = window.innerHeight;
@@ -91,11 +89,11 @@
 
 				renderer = new WebGPURenderer( { antialias: true, forceWebGL: false } );
 
-				await renderer.init();
 				// RENDERER
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setAnimationLoop( animate );
 				renderer.autoClear = false;
 
 				renderer.domElement.style.position = 'relative';
@@ -131,7 +129,6 @@
 
 				const texture1 = textureLoader.load( 'textures/crate.gif' );
 				const material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
-
 
 				texture1.colorSpace = THREE.SRGBColorSpace;
 				texture1.anisotropy = renderer.getMaxAnisotropy();
@@ -206,8 +203,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				render();
 				stats.update();
 
@@ -235,7 +230,6 @@
 				renderer.render( scene2, camera );
 
 				// renderer.setScissorTest( false );
-
 
 			}
 

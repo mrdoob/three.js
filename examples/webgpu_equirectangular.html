@@ -56,7 +56,6 @@
 				camera.position.set( 1, 0, 0 );
 
 				const equirectTexture = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' );
-				equirectTexture.flipY = false;
 
 				scene = new THREE.Scene();
 				scene.backgroundNode = texture( equirectTexture, equirectUV(), 0 );

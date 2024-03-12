@@ -97,9 +97,7 @@ function main() {
 	composer.addPass( bloomPass );
 
 	const filmPass = new FilmPass(
-		0.35, // noise intensity
-		0.025, // scanline intensity
-		648, // scanline count
+		0.5, // intensity
 		false, // grayscale
 	);
 	composer.addPass( filmPass );

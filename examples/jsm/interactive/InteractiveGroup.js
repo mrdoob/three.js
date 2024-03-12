@@ -1,6 +1,5 @@
 import {
 	Group,
-	Matrix4,
 	Raycaster,
 	Vector2
 } from 'three';
@@ -8,18 +7,14 @@ import {
 const _pointer = new Vector2();
 const _event = { type: '', data: _pointer };
 
+const _raycaster = new Raycaster();
+
 class InteractiveGroup extends Group {
 
-	constructor( renderer, camera ) {
-
-		super();
+	listenToPointerEvents( renderer, camera ) {
 
 		const scope = this;
-
 		const raycaster = new Raycaster();
-		const tempMatrix = new Matrix4();
-
-		// Pointer Events
 
 		const element = renderer.domElement;
 
@@ -60,7 +55,12 @@ class InteractiveGroup extends Group {
 		element.addEventListener( 'mousemove', onPointerEvent );
 		element.addEventListener( 'click', onPointerEvent );
 
-		// WebXR Controller Events
+	}
+
+	listenToXRControllerEvents( controller ) {
+
+		const scope = this;
+
 		// TODO: Dispatch pointerevents too
 
 		const events = {
@@ -74,12 +74,9 @@ class InteractiveGroup extends Group {
 
 			const controller = event.target;
 
-			tempMatrix.identity().extractRotation( controller.matrixWorld );
+			_raycaster.setFromXRController( controller );
 
-			raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
-			raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
-
-			const intersections = raycaster.intersectObjects( scope.children, false );
+			const intersections = _raycaster.intersectObjects( scope.children, false );
 
 			if ( intersections.length > 0 ) {
 
@@ -97,17 +94,10 @@ class InteractiveGroup extends Group {
 
 		}
 
-		const controller1 = renderer.xr.getController( 0 );
-		controller1.addEventListener( 'move', onXRControllerEvent );
-		controller1.addEventListener( 'select', onXRControllerEvent );
-		controller1.addEventListener( 'selectstart', onXRControllerEvent );
-		controller1.addEventListener( 'selectend', onXRControllerEvent );
-
-		const controller2 = renderer.xr.getController( 1 );
-		controller2.addEventListener( 'move', onXRControllerEvent );
-		controller2.addEventListener( 'select', onXRControllerEvent );
-		controller2.addEventListener( 'selectstart', onXRControllerEvent );
-		controller2.addEventListener( 'selectend', onXRControllerEvent );
+		controller.addEventListener( 'move', onXRControllerEvent );
+		controller.addEventListener( 'select', onXRControllerEvent );
+		controller.addEventListener( 'selectstart', onXRControllerEvent );
+		controller.addEventListener( 'selectend', onXRControllerEvent );
 
 	}
 

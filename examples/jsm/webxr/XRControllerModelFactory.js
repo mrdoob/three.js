@@ -222,6 +222,14 @@ class XRControllerModelFactory {
 
 	}
 
+	setPath( path ) {
+
+		this.path = path;
+
+		return this;
+
+	}
+
 	createControllerModel( controller ) {
 
 		const controllerModel = new XRControllerModel();

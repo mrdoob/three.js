@@ -7,6 +7,8 @@ import { TGALoader } from 'three/addons/loaders/TGALoader.js';
 import { UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
 import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
 
+const cache = new Map();
+
 class UITexture extends UISpan {
 
 	constructor( editor ) {
@@ -51,17 +53,28 @@ class UITexture extends UISpan {
 			const extension = file.name.split( '.' ).pop().toLowerCase();
 			const reader = new FileReader();
 
-			if ( extension === 'hdr' || extension === 'pic' ) {
+			const hash = `${file.lastModified}_${file.size}_${file.name}`;
+
+			if ( cache.has( hash ) ) {
+
+				const texture = cache.get( hash );
+
+				scope.setValue( texture );
+
+				if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
+
+			} else if ( extension === 'hdr' || extension === 'pic' ) {
 
 				reader.addEventListener( 'load', function ( event ) {
 
-					// assuming RGBE/Radiance HDR iamge format
+					// assuming RGBE/Radiance HDR image format
 
 					const loader = new RGBELoader();
 					loader.load( event.target.result, function ( hdrTexture ) {
 
 						hdrTexture.sourceFile = file.name;
-						hdrTexture.isHDRTexture = true;
+
+						cache.set( hash, hdrTexture );
 
 						scope.setValue( hdrTexture );
 
@@ -82,6 +95,8 @@ class UITexture extends UISpan {
 
 						texture.colorSpace = THREE.SRGBColorSpace;
 						texture.sourceFile = file.name;
+
+						cache.set( hash, texture );
 
 						scope.setValue( texture );
 
@@ -109,6 +124,9 @@ class UITexture extends UISpan {
 						texture.colorSpace = THREE.SRGBColorSpace;
 						texture.sourceFile = file.name;
 						texture.needsUpdate = true;
+
+						cache.set( hash, texture );
+
 						scope.setValue( texture );
 
 						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
@@ -130,6 +148,8 @@ class UITexture extends UISpan {
 						const texture = new THREE.Texture( this );
 						texture.sourceFile = file.name;
 						texture.needsUpdate = true;
+
+						cache.set( hash, texture );
 
 						scope.setValue( texture );
 

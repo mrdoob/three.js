@@ -229,11 +229,9 @@ import './src/objects/Sprite.tests.js';
 
 
 //src/renderers
-import './src/renderers/WebGL1Renderer.tests.js';
 import './src/renderers/WebGL3DRenderTarget.tests.js';
 import './src/renderers/WebGLArrayRenderTarget.tests.js';
 import './src/renderers/WebGLCubeRenderTarget.tests.js';
-import './src/renderers/WebGLMultipleRenderTargets.tests.js';
 import './src/renderers/WebGLRenderer.tests.js';
 import './src/renderers/WebGLRenderTarget.tests.js';
 

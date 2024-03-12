@@ -32,10 +32,10 @@
 <p>电脑中的阴影可以是一个很复杂的话题。有各种各样的解决方案，所有这些都有权衡，包括 three.js 中可用的解决方案。</p>
 <p>Three.js 默认使用<em>shadow maps（阴影贴图）</em>，阴影贴图的工作方式就是具有投射阴影的光能对所有能被投射阴影的物体从光源渲染阴影。<strong>请再读一遍，试着去理解并记住</strong></p>
 <p>换句话说，如果你有 20 个物体对象、5 个灯光，并且所有的物体都能被投射阴影，所有的光都能投射阴影，那么这个场景这个场景将会绘制 6 次。第一个灯光将会为所有的物体投影阴影，绘制场景。然后是第二个灯光绘制场景，然后是第三个灯光，以此类推。最后一次（即第六次）将通过前五个灯光渲染的数据，渲染出最终的实际场景。</p>
-<p>糟糕的是，如果你有一个能投射阴影点光源再这个场景中，那个这个场景将会为这个点光源再绘制 6 次。</p>
+<p>糟糕的是，如果你有一个能投射阴影点光源在这个场景中，那个这个场景将会为这个点光源再绘制 6 次。</p>
 <p>由于这些原因，除了寻找其他根本上的解决方案去解决一堆光源都能投射阴影的性能问题。一般还有常见的解决方案，就是允许多个光源，但只让一个光源能投射阴影。</p>
-<p>另一个解决方案就是使用光照贴图或者环境光贴图，预先计算离线照明的效果。这将导致静态光照，但是至少该方案渲染的非常快。再另一篇文章中将涵盖这两个解决方案。</p>
-<p>其他的解决方案是使用假的阴影。举个例子，做一个飞机模型，将它的平面纹理做灰值处理，将其绘制再模型的下面的地面上。</p>
+<p>另一个解决方案就是使用光照贴图或者环境光贴图，预先计算离线照明的效果。这将导致静态光照，但是至少该方案渲染得非常快。在另一篇文章中将涵盖这两个解决方案。</p>
+<p>其他的解决方案是使用假的阴影。举个例子，做一个飞机模型，将它的平面纹理做灰值处理，将其绘制在模型的下面的地面上。</p>
 <p>这个例子我们将使用假阴影</p>
 <div class="threejs_center"><img src="../examples/resources/images/roundshadow.png"></div>
 
@@ -74,8 +74,7 @@
 <p>现在让我们加载阴影贴图</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const shadowTexture = loader.load("resources/images/roundshadow.png");
 </pre>
-<p>and make an array to remember each sphere and associated objects.
-并且创建一个数组来存放每个球体和它相关的对象</p>
+<p>并且创建一个数组来存放每个球体和它相关的对象</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const sphereShadowBases = [];
 </pre>
 <p>现在我们创建一个球体</p>
@@ -146,8 +145,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
   scene.add(light);
 }
 </pre>
-<p>The other is a <a href="/docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> so the spheres get some definition
-另一个是 <a href="/docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> ，这将让球体看起来有些视觉的区别</p>
+<p>另一个是 <a href="/docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> ，这将让球体看起来有些视觉的区别</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const color = 0xffffff;
   const intensity = 1;

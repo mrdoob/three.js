@@ -24,7 +24,7 @@ function SidebarGeometryBufferGeometry( editor ) {
 
 			const attributesRow = new UIRow();
 
-			const textAttributes = new UIText( strings.getKey( 'sidebar/geometry/buffer_geometry/attributes' ) ).setWidth( '90px' );
+			const textAttributes = new UIText( strings.getKey( 'sidebar/geometry/buffer_geometry/attributes' ) ).setClass( 'Label' );
 			attributesRow.add( textAttributes );
 
 			const containerAttributes = new UISpan().setDisplay( 'inline-block' ).setVerticalAlign( 'middle' ).setWidth( '160px' );
@@ -65,7 +65,7 @@ function SidebarGeometryBufferGeometry( editor ) {
 
 				const rowMorphAttributes = new UIRow();
 
-				const textMorphAttributes = new UIText( strings.getKey( 'sidebar/geometry/buffer_geometry/morphAttributes' ) ).setWidth( '90px' );
+				const textMorphAttributes = new UIText( strings.getKey( 'sidebar/geometry/buffer_geometry/morphAttributes' ) ).setClass( 'Label' );
 				rowMorphAttributes.add( textMorphAttributes );
 
 				const containerMorphAttributes = new UISpan().setDisplay( 'inline-block' ).setVerticalAlign( 'middle' ).setWidth( '160px' );
@@ -87,7 +87,7 @@ function SidebarGeometryBufferGeometry( editor ) {
 
 				const rowMorphRelative = new UIRow();
 
-				const textMorphRelative = new UIText( strings.getKey( 'sidebar/geometry/buffer_geometry/morphRelative' ) ).setWidth( '90px' );
+				const textMorphRelative = new UIText( strings.getKey( 'sidebar/geometry/buffer_geometry/morphRelative' ) ).setClass( 'Label' );
 				rowMorphRelative.add( textMorphRelative );
 
 				const checkboxMorphRelative = new UICheckbox().setValue( geometry.morphTargetsRelative ).setDisabled( true );

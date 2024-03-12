@@ -15,13 +15,15 @@ import {
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from '../../renderers/common/nodes/NodeUniform.js';
 
-import { REVISION, RenderTarget, NoColorSpace, LinearEncoding, sRGBEncoding, SRGBColorSpace, Color, Vector2, Vector3, Vector4, Float16BufferAttribute } from 'three';
+import { REVISION, RenderTarget, NoColorSpace, Color, Vector2, Vector3, Vector4, Float16BufferAttribute } from 'three';
 
 import { stack } from './StackNode.js';
 import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
 
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
+
+import PMREMGenerator from '../../renderers/common/extras/PMREMGenerator.js';
 
 const uniformsGroupCache = new ChainMap();
 
@@ -72,6 +74,8 @@ class NodeBuilder {
 		this.fogNode = null;
 		this.toneMappingNode = null;
 
+		this.clippingContext = null;
+
 		this.vertexShader = null;
 		this.fragmentShader = null;
 		this.computeShader = null;
@@ -111,15 +115,23 @@ class NodeBuilder {
 
 	}
 
-	getRenderTarget( width, height, options ) {
+	createRenderTarget( width, height, options ) {
 
 		return new RenderTarget( width, height, options );
 
 	}
 
-	getCubeRenderTarget( size, options ) {
+	createCubeRenderTarget( size, options ) {
 
 		return new CubeRenderTarget( size, options );
+
+	}
+
+	createPMREMGenerator() {
+
+		// TODO: Move Materials.js to outside of the Nodes.js in order to remove this function and improve tree-shaking support
+
+		return new PMREMGenerator( this.renderer );
 
 	}
 
@@ -469,14 +481,6 @@ class NodeBuilder {
 	needsColorSpaceToLinear( /*texture*/ ) {
 
 		return false;
-
-	}
-
-	/** @deprecated, r152 */
-	getTextureEncodingFromMap( map ) {
-
-		console.warn( 'THREE.NodeBuilder: Method .getTextureEncodingFromMap replaced by .getTextureColorSpaceFromMap in r152+.' );
-		return this.getTextureColorSpaceFromMap( map ) === SRGBColorSpace ? sRGBEncoding : LinearEncoding;
 
 	}
 
@@ -1173,6 +1177,8 @@ class NodeBuilder {
 	}
 
 	createNodeMaterial( type = 'NodeMaterial' ) {
+
+		// TODO: Move Materials.js to outside of the Nodes.js in order to remove this function and improve tree-shaking support
 
 		return createNodeMaterialFromType( type );
 

@@ -49,7 +49,8 @@
 			<br />
 			[page:Boolean depthBuffer] - default is `true`. <br />
 			[page:Boolean stencilBuffer] - default is `false`.<br />
-			[page:Number samples] - default is `0`.<br /><br />
+			[page:Number samples] - default is `0`.<br />
+			[page:Number count] - default is `1`.<br /><br />
 
 			Creates a new [name]
 		</p>
@@ -83,6 +84,12 @@
 			further processing.
 		</p>
 
+		<h3>[property:Texture textures]</h3>
+		<p>
+			An array holding the [page:WebGLRenderTarget.texture texture] references
+			of multiple render targets configured with the [page:Number count] option.
+		</p>
+
 		<h3>[property:Boolean depthBuffer]</h3>
 		<p>Renders to the depth buffer. Default is true.</p>
 
@@ -96,8 +103,7 @@
 
 		<h3>[property:Number samples]</h3>
 		<p>
-			Defines the count of MSAA samples. Can only be used with WebGL 2. Default
-			is `0`.
+			Defines the count of MSAA samples. Default is `0`.
 		</p>
 
 		<h2>Methods</h2>

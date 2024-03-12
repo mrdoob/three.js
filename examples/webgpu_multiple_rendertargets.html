@@ -121,17 +121,16 @@
 
 				// Create a multi render target with Float buffers
 
-				renderTarget = new THREE.WebGLMultipleRenderTargets(
+				renderTarget = new THREE.RenderTarget(
 					window.innerWidth * window.devicePixelRatio,
 					window.innerHeight * window.devicePixelRatio,
-					2,
-					{ minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter }
+					{ count: 2, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter }
 				);
 
 				// Name our G-Buffer attachments for debugging
 
-				renderTarget.texture[ 0 ].name = 'diffuse';
-				renderTarget.texture[ 1 ].name = 'normal';
+				renderTarget.textures[ 0 ].name = 'diffuse';
+				renderTarget.textures[ 1 ].name = 'normal';
 
 				// Scene setup
 
@@ -157,7 +156,7 @@
 
 				// PostProcessing setup
 
-				quadMesh = new QuadMesh( new ReadGBufferMaterial( renderTarget.texture[ 0 ], renderTarget.texture[ 1 ] ) );
+				quadMesh = new QuadMesh( new ReadGBufferMaterial( renderTarget.textures[ 0 ], renderTarget.textures[ 1 ] ) );
 
 				// Controls
 

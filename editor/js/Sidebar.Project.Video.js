@@ -1,4 +1,4 @@
-import { UIBreak, UIButton, UIInteger, UIPanel, UIProgress, UIRow, UIText } from './libs/ui.js';
+import { UIBreak, UIButton, UIInteger, UIPanel, UIRow, UIText } from './libs/ui.js';
 
 import { APP } from './libs/app.js';
 
@@ -19,7 +19,7 @@ function SidebarProjectVideo( editor ) {
 	const resolutionRow = new UIRow();
 	container.add( resolutionRow );
 
-	resolutionRow.add( new UIText( strings.getKey( 'sidebar/project/resolution' ) ).setWidth( '90px' ) );
+	resolutionRow.add( new UIText( strings.getKey( 'sidebar/project/resolution' ) ).setClass( 'Label' ) );
 
 	const videoWidth = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' );
 	resolutionRow.add( videoWidth );
@@ -37,7 +37,7 @@ function SidebarProjectVideo( editor ) {
 	// Duration
 
 	const videoDurationRow = new UIRow();
-	videoDurationRow.add( new UIText( strings.getKey( 'sidebar/project/duration' ) ).setWidth( '90px' ) );
+	videoDurationRow.add( new UIText( strings.getKey( 'sidebar/project/duration' ) ).setClass( 'Label' ) );
 
 	const videoDuration = new UIInteger( 10 );
 	videoDurationRow.add( videoDuration );
@@ -46,27 +46,47 @@ function SidebarProjectVideo( editor ) {
 
 	// Render
 
-	container.add( new UIText( '' ).setWidth( '90px' ) );
-
-	const progress = new UIProgress( 0 );
-	progress.setDisplay( 'none' );
-	progress.setWidth( '170px' );
-	container.add( progress );
-
-	const renderButton = new UIButton( strings.getKey( 'sidebar/project/render' ) ).setTextTransform( 'uppercase' );
+	const renderButton = new UIButton( strings.getKey( 'sidebar/project/render' ) );
 	renderButton.setWidth( '170px' );
+	renderButton.setMarginLeft( '120px' );
 	renderButton.onClick( async () => {
-
-		renderButton.setDisplay( 'none' );
-		progress.setDisplay( '' );
-		progress.setValue( 0 );
 
 		const player = new APP.Player();
 		player.load( editor.toJSON() );
 		player.setPixelRatio( 1 );
 		player.setSize( videoWidth.getValue(), videoHeight.getValue() );
 
-		const canvas = player.dom.firstElementChild;
+		//
+
+		const width = videoWidth.getValue() / window.devicePixelRatio;
+		const height = videoHeight.getValue() / window.devicePixelRatio;
+
+		const canvas = player.canvas;
+		canvas.style.width = width + 'px';
+		canvas.style.height = height + 'px';
+
+		const left = ( screen.width - width ) / 2;
+		const top = ( screen.height - height ) / 2;
+
+		const output = window.open( '', '_blank', `location=no,left=${left},top=${top},width=${width},height=${height}` );
+
+		const meta = document.createElement( 'meta' );
+		meta.name = 'viewport';
+		meta.content = 'width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0';
+		output.document.head.appendChild( meta );
+
+		output.document.body.style.background = '#000';
+		output.document.body.style.margin = '0px';
+		output.document.body.style.overflow = 'hidden';
+		output.document.body.appendChild( canvas );
+
+		const progress = document.createElement( 'progress' );
+		progress.style.position = 'absolute';
+		progress.style.top = '10px';
+		progress.style.left = ( ( width - 170 ) / 2 ) + 'px';
+		progress.style.width = '170px';
+		progress.value = 0;
+		output.document.body.appendChild( progress );
 
 		//
 
@@ -77,7 +97,7 @@ function SidebarProjectVideo( editor ) {
 
 		ffmpeg.setProgress( ( { ratio } ) => {
 
-			progress.setValue( ( ratio * 0.5 ) + 0.5 );
+			progress.value = ( ratio * 0.5 ) + 0.5;
 
 		} );
 
@@ -95,7 +115,7 @@ function SidebarProjectVideo( editor ) {
 			ffmpeg.FS( 'writeFile', `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
 			currentTime += 1 / fps;
 
-			progress.setValue( ( i / frames ) * 0.5 );
+			progress.value = ( i / frames ) * 0.5;
 
 		}
 
@@ -110,33 +130,21 @@ function SidebarProjectVideo( editor ) {
 
 		}
 
-		save( new Blob( [ data.buffer ], { type: 'video/mp4' } ), 'out.mp4' );
+		output.document.body.removeChild( canvas );
+		output.document.body.removeChild( progress );
+
+		const video = document.createElement( 'video' );
+		video.width = width;
+		video.height = height;
+		video.controls = true;
+		video.loop = true;
+		video.src = URL.createObjectURL( new Blob( [ data.buffer ], { type: 'video/mp4' } ) );
+		output.document.body.appendChild( video );
 
 		player.dispose();
 
-		renderButton.setDisplay( '' );
-		progress.setDisplay( 'none' );
-
 	} );
 	container.add( renderButton );
-
-	// SAVE
-
-	const link = document.createElement( 'a' );
-
-	function save( blob, filename ) {
-
-		if ( link.href ) {
-
-			URL.revokeObjectURL( link.href );
-
-		}
-
-		link.href = URL.createObjectURL( blob );
-		link.download = filename;
-		link.dispatchEvent( new MouseEvent( 'click' ) );
-
-	}
 
 	//
 

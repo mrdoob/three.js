@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, mix, cubeTexture, reference, positionLocal, positionWorld, normalWorld, positionWorldDirection, reflectVector, toneMapping, maxMipLevel } from 'three/nodes';
+			import { uniform, mix, pmremTexture, reference, positionLocal, positionWorld, normalWorld, positionWorldDirection, reflectVector, toneMapping } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
@@ -107,7 +107,7 @@
 
 					const custom1UV = reflectNode.xyz.mul( uniform( rotateY1Matrix ) );
 					const custom2UV = reflectNode.xyz.mul( uniform( rotateY2Matrix ) );
-					const mixCubeMaps = mix( cubeTexture( cube1Texture, custom1UV ), cubeTexture( cube2Texture, custom2UV ), positionNode.y.add( mixNode ).clamp() );
+					const mixCubeMaps = mix( pmremTexture( cube1Texture, custom1UV ), pmremTexture( cube2Texture, custom2UV ), positionNode.y.add( mixNode ).clamp() );
 
 					const proceduralEnv = mix( mixCubeMaps, normalWorld, proceduralNode );
 
@@ -122,7 +122,7 @@
 				scene.environmentNode = getEnvironmentNode( reflectVector, positionWorld );
 
 				scene.backgroundNode = getEnvironmentNode( positionWorldDirection, positionLocal ).context( {
-					getTextureLevel: ( textureNode ) => blurNode.mul( maxMipLevel( textureNode ) )
+					getTextureLevel: () => blurNode
 				} );
 
 				// scene objects
