@@ -599,7 +599,15 @@ class WebGLRenderer {
 
 			if ( depth ) bits |= _gl.DEPTH_BUFFER_BIT;
 
-			if ( this.autoClearStencil || ( _currentRenderTarget !== null && _currentRenderTarget.stencilBuffer === false ) ) stencil = false;
+			if ( _currentRenderTarget === null ) {
+
+				stencil = this.autoClearStencil;
+
+			} else if ( _currentRenderTarget.stencilBuffer === false ) {
+
+				stencil = false;
+
+			}
 
 			if ( stencil ) {
 
