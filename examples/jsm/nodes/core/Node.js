@@ -23,7 +23,7 @@ class Node extends EventDispatcher {
 		this.version = 0;
 
 		this._cacheKey = null;
-		this._version = 0;
+		this._cacheKeyVersion = 0;
 
 		this.isNode = true;
 
@@ -97,12 +97,12 @@ class Node extends EventDispatcher {
 
 	getCacheKey( force = false ) {
 
-		force = force || this.version !== this._version;
+		force = force || this.version !== this._cacheKeyVersion;
 
 		if ( force === true || this._cacheKey === null ) {
 
 			this._cacheKey = getCacheKey( this, force );
-			this._version = this.version;
+			this._cacheKeyVersion = this.version;
 
 		}
 
