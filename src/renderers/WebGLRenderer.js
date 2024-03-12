@@ -68,7 +68,7 @@ class WebGLRenderer {
 			canvas = createCanvasElement(),
 			context = null,
 			depth = true,
-			stencil = true,
+			stencil = false,
 			alpha = false,
 			antialias = false,
 			premultipliedAlpha = true,
