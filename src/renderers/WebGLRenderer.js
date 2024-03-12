@@ -133,7 +133,7 @@ class WebGLRenderer {
 		this.autoClear = true;
 		this.autoClearColor = true;
 		this.autoClearDepth = true;
-		this.autoClearStencil = true;
+		this.autoClearStencil = stencil;
 
 		// scene graph
 
@@ -536,7 +536,7 @@ class WebGLRenderer {
 
 		};
 
-		this.clear = function ( color = true, depth = true, stencil = false ) {
+		this.clear = function ( color = true, depth = true, stencil = true ) {
 
 			let bits = 0;
 
@@ -598,6 +598,9 @@ class WebGLRenderer {
 			}
 
 			if ( depth ) bits |= _gl.DEPTH_BUFFER_BIT;
+
+			if ( this.autoClearStencil || ( _currentRenderTarget !== null && _currentRenderTarget.stencilBuffer === false ) ) stencil = false;
+
 			if ( stencil ) {
 
 				bits |= _gl.STENCIL_BUFFER_BIT;
