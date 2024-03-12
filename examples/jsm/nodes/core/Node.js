@@ -20,9 +20,24 @@ class Node extends EventDispatcher {
 
 		this.uuid = MathUtils.generateUUID();
 
+		this.version = 0;
+
+		this._cacheKey = null;
+		this._version = 0;
+
 		this.isNode = true;
 
 		Object.defineProperty( this, 'id', { value: _nodeId ++ } );
+
+	}
+
+	set needsUpdate( value ) {
+
+		if ( value === true ) {
+
+			this.version ++;
+
+		}
 
 	}
 
@@ -80,9 +95,18 @@ class Node extends EventDispatcher {
 
 	}
 
-	getCacheKey() {
+	getCacheKey( force = false ) {
 
-		return getCacheKey( this );
+		force = force || this.version !== this._version;
+
+		if ( force === true || this._cacheKey === null ) {
+
+			this._cacheKey = getCacheKey( this, force );
+			this._version = this.version;
+
+		}
+
+		return this._cacheKey;
 
 	}
 

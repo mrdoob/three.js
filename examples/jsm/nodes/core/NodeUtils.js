@@ -1,6 +1,6 @@
 import { Color, Matrix3, Matrix4, Vector2, Vector3, Vector4 } from 'three';
 
-export function getCacheKey( object ) {
+export function getCacheKey( object, force = false ) {
 
 	let cacheKey = '{';
 
@@ -12,7 +12,7 @@ export function getCacheKey( object ) {
 
 	for ( const { property, childNode } of getNodeChildren( object ) ) {
 
-		cacheKey += ',' + property.slice( 0, - 4 ) + ':' + childNode.getCacheKey();
+		cacheKey += ',' + property.slice( 0, - 4 ) + ':' + childNode.getCacheKey( force );
 
 	}
 
