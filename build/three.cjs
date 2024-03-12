@@ -21764,7 +21764,9 @@ function WebGLRenderState( extensions ) {
 		lightsArray: lightsArray,
 		shadowsArray: shadowsArray,
 
-		lights: lights
+		lights: lights,
+
+		transmissionRenderTarget: null
 	};
 
 	return {
@@ -28112,7 +28114,7 @@ class WebGLRenderer {
 			canvas = createCanvasElement(),
 			context = null,
 			depth = true,
-			stencil = true,
+			stencil = false,
 			alpha = false,
 			antialias = false,
 			premultipliedAlpha = true,
@@ -28244,10 +28246,6 @@ class WebGLRenderer {
 
 		let _clippingEnabled = false;
 		let _localClippingEnabled = false;
-
-		// transmission
-
-		let _transmissionRenderTarget = null;
 
 		// camera matrices cache
 
@@ -28697,13 +28695,6 @@ class WebGLRenderer {
 
 			xr.removeEventListener( 'sessionstart', onXRSessionStart );
 			xr.removeEventListener( 'sessionend', onXRSessionEnd );
-
-			if ( _transmissionRenderTarget ) {
-
-				_transmissionRenderTarget.dispose();
-				_transmissionRenderTarget = null;
-
-			}
 
 			animation.stop();
 
@@ -29456,9 +29447,9 @@ class WebGLRenderer {
 
 			}
 
-			if ( _transmissionRenderTarget === null ) {
+			if ( currentRenderState.state.transmissionRenderTarget === null ) {
 
-				_transmissionRenderTarget = new WebGLRenderTarget( 1, 1, {
+				currentRenderState.state.transmissionRenderTarget = new WebGLRenderTarget( 1, 1, {
 					generateMipmaps: true,
 					type: ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) ) ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
@@ -29477,13 +29468,15 @@ class WebGLRenderer {
 
 			}
 
+			const transmissionRenderTarget = currentRenderState.state.transmissionRenderTarget;
+
 			_this.getDrawingBufferSize( _vector2 );
-			_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
+			transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
 
 			//
 
 			const currentRenderTarget = _this.getRenderTarget();
-			_this.setRenderTarget( _transmissionRenderTarget );
+			_this.setRenderTarget( transmissionRenderTarget );
 
 			_this.getClearColor( _currentClearColor );
 			_currentClearAlpha = _this.getClearAlpha();
@@ -29498,8 +29491,8 @@ class WebGLRenderer {
 
 			renderObjects( opaqueObjects, scene, camera );
 
-			textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
-			textures.updateRenderTargetMipmap( _transmissionRenderTarget );
+			textures.updateMultisampleRenderTarget( transmissionRenderTarget );
+			textures.updateRenderTargetMipmap( transmissionRenderTarget );
 
 			let renderTargetNeedsUpdate = false;
 
@@ -29532,8 +29525,8 @@ class WebGLRenderer {
 
 			if ( renderTargetNeedsUpdate === true ) {
 
-				textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
-				textures.updateRenderTargetMipmap( _transmissionRenderTarget );
+				textures.updateMultisampleRenderTarget( transmissionRenderTarget );
+				textures.updateRenderTargetMipmap( transmissionRenderTarget );
 
 			}
 
@@ -30066,7 +30059,7 @@ class WebGLRenderer {
 
 				}
 
-				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, _transmissionRenderTarget );
+				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, currentRenderState.state.transmissionRenderTarget );
 
 				WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 
