@@ -11491,6 +11491,59 @@ class Mesh extends Object3D {
 
 	}
 
+	volume( precision ) {
+
+		function calculateVolume( { geometry, precision } ) {
+
+			let volume = 0;
+			const vertices = geometry.attributes.position.array;
+			let indexes = geometry.index ? geometry.index.array : null;
+
+			function triangularVolume( p1, p2, p3 ) {
+
+				const v321 = p3.x * p2.y * p1.z;
+				const v231 = p2.x * p3.y * p1.z;
+				const v312 = p3.x * p1.y * p2.z;
+				const v132 = p2.x * p1.y * p3.z;
+				const v213 = p1.x * p3.y * p2.z;
+				const v123 = p1.x * p2.y * p3.z;
+				return ( 1.0 / 6.0 ) * ( - v321 + v231 + v312 - v132 - v213 + v123 );
+
+			}
+
+			if ( ! indexes ) {
+
+				indexes = Array.from( { length: vertices.length / 3 }, ( _, i ) => i );
+
+			}
+
+			for ( let i = 0; i < indexes.length; i += 3 ) {
+
+				const a = new THREE.Vector3().fromArray( vertices, indexes[ i ] * 3 );
+				const b = new THREE.Vector3().fromArray( vertices, indexes[ i + 1 ] * 3 );
+				const c = new THREE.Vector3().fromArray( vertices, indexes[ i + 2 ] * 3 );
+				volume += triangularVolume( a, b, c );
+
+			}
+
+			if ( precision ) {
+
+				return Math.abs( volume );
+
+			} else {
+
+				return Math.abs( volume / 1000 );
+
+			}
+
+		}
+
+		const vol = calculateVolume( { geometry: this.geometry, precision: precision } );
+
+		return vol;
+
+	}
+
 	copy( source, recursive ) {
 
 		super.copy( source, recursive );
@@ -21764,7 +21817,9 @@ function WebGLRenderState( extensions ) {
 		lightsArray: lightsArray,
 		shadowsArray: shadowsArray,
 
-		lights: lights
+		lights: lights,
+
+		transmissionRenderTarget: null
 	};
 
 	return {
@@ -28245,10 +28300,6 @@ class WebGLRenderer {
 		let _clippingEnabled = false;
 		let _localClippingEnabled = false;
 
-		// transmission
-
-		let _transmissionRenderTarget = null;
-
 		// camera matrices cache
 
 		const _projScreenMatrix = new Matrix4();
@@ -28697,13 +28748,6 @@ class WebGLRenderer {
 
 			xr.removeEventListener( 'sessionstart', onXRSessionStart );
 			xr.removeEventListener( 'sessionend', onXRSessionEnd );
-
-			if ( _transmissionRenderTarget ) {
-
-				_transmissionRenderTarget.dispose();
-				_transmissionRenderTarget = null;
-
-			}
 
 			animation.stop();
 
@@ -29456,9 +29500,9 @@ class WebGLRenderer {
 
 			}
 
-			if ( _transmissionRenderTarget === null ) {
+			if ( currentRenderState.state.transmissionRenderTarget === null ) {
 
-				_transmissionRenderTarget = new WebGLRenderTarget( 1, 1, {
+				currentRenderState.state.transmissionRenderTarget = new WebGLRenderTarget( 1, 1, {
 					generateMipmaps: true,
 					type: ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) ) ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
@@ -29477,13 +29521,15 @@ class WebGLRenderer {
 
 			}
 
+			const transmissionRenderTarget = currentRenderState.state.transmissionRenderTarget;
+
 			_this.getDrawingBufferSize( _vector2 );
-			_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
+			transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
 
 			//
 
 			const currentRenderTarget = _this.getRenderTarget();
-			_this.setRenderTarget( _transmissionRenderTarget );
+			_this.setRenderTarget( transmissionRenderTarget );
 
 			_this.getClearColor( _currentClearColor );
 			_currentClearAlpha = _this.getClearAlpha();
@@ -29498,8 +29544,8 @@ class WebGLRenderer {
 
 			renderObjects( opaqueObjects, scene, camera );
 
-			textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
-			textures.updateRenderTargetMipmap( _transmissionRenderTarget );
+			textures.updateMultisampleRenderTarget( transmissionRenderTarget );
+			textures.updateRenderTargetMipmap( transmissionRenderTarget );
 
 			let renderTargetNeedsUpdate = false;
 
@@ -29532,8 +29578,8 @@ class WebGLRenderer {
 
 			if ( renderTargetNeedsUpdate === true ) {
 
-				textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
-				textures.updateRenderTargetMipmap( _transmissionRenderTarget );
+				textures.updateMultisampleRenderTarget( transmissionRenderTarget );
+				textures.updateRenderTargetMipmap( transmissionRenderTarget );
 
 			}
 
@@ -30066,7 +30112,7 @@ class WebGLRenderer {
 
 				}
 
-				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, _transmissionRenderTarget );
+				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, currentRenderState.state.transmissionRenderTarget );
 
 				WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 

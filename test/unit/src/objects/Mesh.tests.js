@@ -91,6 +91,11 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
+		QUnit.todo( 'volume', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
 		QUnit.todo( 'updateMorphTargets', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
