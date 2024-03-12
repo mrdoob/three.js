@@ -536,7 +536,7 @@ class WebGLRenderer {
 
 		};
 
-		this.clear = function ( color = true, depth = true, stencil = true ) {
+		this.clear = function ( color = true, depth = true, stencil = false ) {
 
 			let bits = 0;
 

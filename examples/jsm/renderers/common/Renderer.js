@@ -760,7 +760,7 @@ class Renderer {
 
 	}
 
-	clear( color = true, depth = true, stencil = true ) {
+	clear( color = true, depth = true, stencil = false ) {
 
 		if ( this._initialized === false ) {
 
@@ -803,7 +803,7 @@ class Renderer {
 
 	}
 
-	async clearAsync( color = true, depth = true, stencil = true ) {
+	async clearAsync( color = true, depth = true, stencil = false ) {
 
 		if ( this._initialized === false ) await this.init();
 
