@@ -49,37 +49,57 @@ class Mesh extends Object3D {
 
 	}
 
-	volume(precision) {
-		function calculateVolume({ geometry, precision }) {
+	volume( precision ) {
+
+		function calculateVolume( { geometry, precision } ) {
+
 			let volume = 0;
 			const vertices = geometry.attributes.position.array;
 			let indexes = geometry.index ? geometry.index.array : null;
-			function triangularVolume(p1, p2, p3) {
+
+			function triangularVolume( p1, p2, p3 ) {
+
 				const v321 = p3.x * p2.y * p1.z;
 				const v231 = p2.x * p3.y * p1.z;
 				const v312 = p3.x * p1.y * p2.z;
 				const v132 = p2.x * p1.y * p3.z;
 				const v213 = p1.x * p3.y * p2.z;
 				const v123 = p1.x * p2.y * p3.z;
-				return (1.0 / 6.0) * (-v321 + v231 + v312 - v132 - v213 + v123);
+				return ( 1.0 / 6.0 ) * ( - v321 + v231 + v312 - v132 - v213 + v123 );
+
 			}
-			if (!indexes) {
-				indexes = Array.from({ length: vertices.length / 3 }, (_, i) => i);
+
+			if ( ! indexes ) {
+
+				indexes = Array.from( { length: vertices.length / 3 }, ( _, i ) => i );
+
 			}
-			for (let i = 0; i < indexes.length; i += 3) {
-				const a = new THREE.Vector3().fromArray(vertices, indexes[i] * 3);
-				const b = new THREE.Vector3().fromArray(vertices, indexes[i + 1] * 3);
-				const c = new THREE.Vector3().fromArray(vertices, indexes[i + 2] * 3);
-				volume += triangularVolume(a, b, c);
+
+			for ( let i = 0; i < indexes.length; i += 3 ) {
+
+				const a = new THREE.Vector3().fromArray( vertices, indexes[ i ] * 3 );
+				const b = new THREE.Vector3().fromArray( vertices, indexes[ i + 1 ] * 3 );
+				const c = new THREE.Vector3().fromArray( vertices, indexes[ i + 2 ] * 3 );
+				volume += triangularVolume( a, b, c );
+
 			}
-			if (precision) {
-				return Math.abs(volume);
+
+			if ( precision ) {
+
+				return Math.abs( volume );
+
 			} else {
-				return Math.abs(volume / 1000);
+
+				return Math.abs( volume / 1000 );
+
 			}
+
 		}
-		const vol = calculateVolume({ geometry: this.geometry, precision: precision });
+
+		const vol = calculateVolume( { geometry: this.geometry, precision: precision } );
+
 		return vol;
+
 	}
 
 	copy( source, recursive ) {
