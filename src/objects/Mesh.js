@@ -51,54 +51,50 @@ class Mesh extends Object3D {
 
 	volume( precision ) {
 
-		function calculateVolume( { geometry, precision } ) {
+		let volume = 0;
+		const vertices = this.geometry.attributes.position.array;
+		let indexes = this.geometry.index ? this.geometry.index.array : null;
 
-			let volume = 0;
-			const vertices = geometry.attributes.position.array;
-			let indexes = geometry.index ? geometry.index.array : null;
+		function triangularVolume( p1, p2, p3 ) {
 
-			function triangularVolume( p1, p2, p3 ) {
-
-				const v321 = p3.x * p2.y * p1.z;
-				const v231 = p2.x * p3.y * p1.z;
-				const v312 = p3.x * p1.y * p2.z;
-				const v132 = p2.x * p1.y * p3.z;
-				const v213 = p1.x * p3.y * p2.z;
-				const v123 = p1.x * p2.y * p3.z;
-				return ( 1.0 / 6.0 ) * ( - v321 + v231 + v312 - v132 - v213 + v123 );
-
-			}
-
-			if ( ! indexes ) {
-
-				indexes = Array.from( { length: vertices.length / 3 }, ( _, i ) => i );
-
-			}
-
-			for ( let i = 0; i < indexes.length; i += 3 ) {
-
-				const a = new THREE.Vector3().fromArray( vertices, indexes[ i ] * 3 );
-				const b = new THREE.Vector3().fromArray( vertices, indexes[ i + 1 ] * 3 );
-				const c = new THREE.Vector3().fromArray( vertices, indexes[ i + 2 ] * 3 );
-				volume += triangularVolume( a, b, c );
-
-			}
-
-			if ( precision ) {
-
-				return Math.abs( volume );
-
-			} else {
-
-				return Math.abs( volume / 1000 );
-
-			}
+			const v321 = p3.x * p2.y * p1.z;
+			const v231 = p2.x * p3.y * p1.z;
+			const v312 = p3.x * p1.y * p2.z;
+			const v132 = p2.x * p1.y * p3.z;
+			const v213 = p1.x * p3.y * p2.z;
+			const v123 = p1.x * p2.y * p3.z;
+			return ( 1.0 / 6.0 ) * ( - v321 + v231 + v312 - v132 - v213 + v123 );
 
 		}
 
-		const vol = calculateVolume( { geometry: this.geometry, precision: precision } );
+		if ( ! indexes ) {
 
-		return vol;
+			indexes = Array.from( { length: vertices.length / 3 }, ( _, i ) => i );
+
+		}
+
+		const vectorA = new Vector3();
+		const vectorB = new Vector3();
+		const vectorC = new Vector3();
+
+		for ( let i = 0; i < indexes.length; i += 3 ) {
+
+			vectorA.fromBufferAttribute( vertices, indexes[ i ] * 3 );
+			vectorB.fromBufferAttribute( vertices, indexes[ i + 1 ] * 3 );
+			vectorC.fromBufferAttribute( vertices, indexes[ i + 2 ] * 3 );
+			volume += triangularVolume( vectorA, vectorB, vectorC );
+
+		}
+
+		if ( precision ) {
+
+			return Math.abs( volume );
+
+		} else {
+
+			return Math.abs( volume / 1000 );
+
+		}
 
 	}
 
