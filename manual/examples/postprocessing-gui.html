@@ -98,9 +98,7 @@ function main() {
 	composer.addPass( bloomPass );
 
 	const filmPass = new FilmPass(
-		0.35, // noise intensity
-		0.025, // scanline intensity
-		648, // scanline count
+		0.5, // intensity
 		false, // grayscale
 	);
 	composer.addPass( filmPass );
@@ -137,9 +135,7 @@ function main() {
 
 		const folder = gui.addFolder( 'FilmPass' );
 		folder.add( filmPass.uniforms.grayscale, 'value' ).name( 'grayscale' );
-		folder.add( filmPass.uniforms.nIntensity, 'value', 0, 1 ).name( 'noise intensity' );
-		folder.add( filmPass.uniforms.sIntensity, 'value', 0, 1 ).name( 'scanline intensity' );
-		folder.add( filmPass.uniforms.sCount, 'value', 0, 1000 ).name( 'scanline count' );
+		folder.add( filmPass.uniforms.intensity, 'value', 0, 1 ).name( 'intensity' );
 		folder.open();
 
 	}
