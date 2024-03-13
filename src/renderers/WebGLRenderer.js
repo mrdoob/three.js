@@ -133,7 +133,7 @@ class WebGLRenderer {
 		this.autoClear = true;
 		this.autoClearColor = true;
 		this.autoClearDepth = true;
-		this.autoClearStencil = stencil;
+		this.autoClearStencil = true;
 
 		// scene graph
 
