@@ -29,7 +29,8 @@
 				"imports": {
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three/nodes": "./jsm/nodes/Nodes.js",
+					"stats-gl": "https://www.unpkg.com/stats-gl@2.2.6/dist/main.js"
 				}
 			}
 		</script>
@@ -50,7 +51,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'stats-gl';
 
 			const maxParticleCount = 100000;
 			const timestamps = document.getElementById( 'timestamps' );
@@ -292,14 +293,18 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true, trackTimestamp: true } );
+				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
-				stats = new Stats();
+				stats = new Stats( {
+					precision: 3,
+					horizontal: false
+				} );
+				stats.init( renderer );
 				document.body.appendChild( stats.dom );
 
 
@@ -361,7 +366,6 @@
 
 			async function animate() {
 
-				stats.update();
 
 				controls.update();
 
@@ -383,23 +387,8 @@
 				await postProcessing.renderAsync();
 
 
-				// throttle the logging
-				if ( renderer.hasFeature( 'timestamp-query' ) ) {
-
-					if ( renderer.info.render.calls % 5 === 0 ) {
-
-						timestamps.innerHTML = `
-
-							Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.timestamp.compute.toFixed( 6 )}ms<br>
-							Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.timestamp.render.toFixed( 6 )}ms`;
-
-					}
-
-				} else {
-
-					timestamps.innerHTML = 'Timestamp queries not supported';
-
-				}
+			
+				stats.update();
 
 			}
 

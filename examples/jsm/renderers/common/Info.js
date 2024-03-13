@@ -12,22 +12,19 @@ class Info {
 			drawCalls: 0,
 			triangles: 0,
 			points: 0,
-			lines: 0
+			lines: 0,
+			timestamp: 0
 		};
 
 		this.compute = {
 			calls: 0,
-			computeCalls: 0
+			computeCalls: 0,
+			timestamp: 0
 		};
 
 		this.memory = {
 			geometries: 0,
 			textures: 0
-		};
-
-		this.timestamp = {
-			compute: 0,
-			render: 0
 		};
 
 	}
@@ -62,7 +59,7 @@ class Info {
 
 	updateTimestamp( type, time ) {
 
-		this.timestamp[ type ] += time;
+		this[ type ].timestamp += time;
 
 	}
 
@@ -75,8 +72,8 @@ class Info {
 		this.render.points = 0;
 		this.render.lines = 0;
 
-		this.timestamp.render = 0;
-		this.timestamp.compute = 0;
+		this.render.timestamp = 0;
+		this.compute.timestamp = 0;
 
 	}
 
@@ -89,8 +86,8 @@ class Info {
 		this.render.calls = 0;
 		this.compute.calls = 0;
 
-		this.timestamp.compute = 0;
-		this.timestamp.render = 0;
+		this.render.timestamp = 0;
+		this.compute.timestamp = 0;
 		this.memory.geometries = 0;
 		this.memory.textures = 0;
 
