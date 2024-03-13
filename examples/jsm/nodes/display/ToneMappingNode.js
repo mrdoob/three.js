@@ -1,10 +1,11 @@
 import TempNode from '../core/TempNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { tslFn, nodeObject, float, mat3, vec3 } from '../shadernode/ShaderNode.js';
-
-import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping } from 'three';
+import { addNodeElement, tslFn, nodeObject, float, mat3, vec3 } from '../shadernode/ShaderNode.js';
+import { rendererReference } from '../accessors/RendererReferenceNode.js';
 import { clamp, log2, max, pow } from '../math/MathNode.js';
 import { mul } from '../math/OperatorNode.js';
+
+import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping } from 'three';
 
 // exposure only
 const LinearToneMappingNode = tslFn( ( { color, exposure } ) => {
@@ -127,7 +128,7 @@ const toneMappingLib = {
 
 class ToneMappingNode extends TempNode {
 
-	constructor( toneMapping = NoToneMapping, exposureNode = float( 1 ), colorNode = null ) {
+	constructor( toneMapping = NoToneMapping, exposureNode = toneMappingExposure, colorNode = null ) {
 
 		super( 'vec3' );
 
@@ -180,5 +181,8 @@ class ToneMappingNode extends TempNode {
 export default ToneMappingNode;
 
 export const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneMappingNode( mapping, nodeObject( exposure ), nodeObject( color ) ) );
+export const toneMappingExposure = rendererReference( 'toneMappingExposure', 'float' );
+
+addNodeElement( 'toneMapping', ( color, mapping, exposure ) => toneMapping( mapping, exposure, color ) );
 
 addNodeClass( 'ToneMappingNode', ToneMappingNode );

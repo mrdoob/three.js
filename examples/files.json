@@ -333,6 +333,7 @@
 		"webgpu_cubemap_dynamic",
 		"webgpu_cubemap_mix",
 		"webgpu_custom_fog",
+		"webgpu_custom_fog_background",
 		"webgpu_depth_texture",
 		"webgpu_equirectangular",
 		"webgpu_instance_mesh",

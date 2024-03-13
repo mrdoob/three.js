@@ -380,6 +380,16 @@ class NodeMaterial extends ShaderMaterial {
 
 		const renderer = builder.renderer;
 
+		// FOG
+
+		if ( this.fog === true ) {
+
+			const fogNode = builder.fogNode;
+
+			if ( fogNode ) outputNode = vec4( fogNode.mix( outputNode.rgb, fogNode.colorNode ), outputNode.a );
+
+		}
+
 		// TONE MAPPING
 
 		const toneMappingNode = builder.toneMappingNode;
@@ -387,16 +397,6 @@ class NodeMaterial extends ShaderMaterial {
 		if ( this.toneMapped === true && toneMappingNode ) {
 
 			outputNode = vec4( toneMappingNode.context( { color: outputNode.rgb } ), outputNode.a );
-
-		}
-
-		// FOG
-
-		if ( this.fog === true ) {
-
-			const fogNode = builder.fogNode;
-
-			if ( fogNode ) outputNode = vec4( fogNode.mixAssign( outputNode.rgb ), outputNode.a );
 
 		}
 
