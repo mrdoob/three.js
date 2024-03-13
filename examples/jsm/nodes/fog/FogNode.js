@@ -17,7 +17,17 @@ class FogNode extends Node {
 
 	getViewZNode( builder ) {
 
-		return ( builder.context.viewZ || positionView.z ).negate();
+		let viewZ;
+
+		const getViewZ = builder.context.getViewZ;
+
+		if ( getViewZ !== undefined ) {
+
+			viewZ = getViewZ( this );
+
+		}
+
+		return ( viewZ || positionView.z ).negate();
 
 	}
 
