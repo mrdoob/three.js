@@ -1290,13 +1290,14 @@ class GLTFWriter {
 
 				if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 					( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
-					( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
+					( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ||
+					( typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas ) ) {
 
 					ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
 
 				} else {
 
-					throw new Error( 'THREE.GLTFExporter: Invalid image type. Use HTMLImageElement, HTMLCanvasElement or ImageBitmap.' );
+					throw new Error( 'THREE.GLTFExporter: Invalid image type. Use HTMLImageElement, HTMLCanvasElement, ImageBitmap or OffscreenCanvas.' );
 
 				}
 
