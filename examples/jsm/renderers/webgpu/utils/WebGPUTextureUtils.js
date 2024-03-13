@@ -268,7 +268,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	getDepthBuffer( depth = true, stencil = true ) {
+	getDepthBuffer( depth = true, stencil = false ) {
 
 		const backend = this.backend;
 		const { width, height } = backend.getDrawingBufferSize();
