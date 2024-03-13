@@ -54,7 +54,6 @@
 			import Stats from 'stats-gl';
 
 			const maxParticleCount = 100000;
-			const timestamps = document.getElementById( 'timestamps' );
 
 			let camera, scene, renderer;
 			let controls, stats;
@@ -366,7 +365,6 @@
 
 			async function animate() {
 
-
 				controls.update();
 
 				// position
@@ -385,8 +383,6 @@
 				renderer.setRenderTarget( null );
 
 				await postProcessing.renderAsync();
-
-
 			
 				stats.update();
 
