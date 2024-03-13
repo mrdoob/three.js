@@ -775,16 +775,6 @@ class Renderer {
 		let renderTargetData = null;
 		const renderTarget = this._renderTarget;
 
-		if ( renderTarget === null ) {
-
-			stencil = this.autoClearStencil;
-
-		} else if ( renderTarget.stencilBuffer === false ) {
-
-			stencil = false;
-
-		}
-
 		if ( renderTarget !== null ) {
 
 			this._textures.updateRenderTarget( renderTarget );
