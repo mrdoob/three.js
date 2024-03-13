@@ -312,9 +312,7 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
-		const renderContext = this._renderScene( scene, camera );
-
-		await this.backend.resolveTimestampAsync( renderContext, 'render' );
+		this._renderScene( scene, camera );
 
 	}
 
@@ -379,7 +377,6 @@ class Renderer {
 
 		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-		if ( this.info.autoReset === true ) this.info.reset();
 
 		//
 
@@ -509,6 +506,7 @@ class Renderer {
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
 
 		//
+		this.backend.resolveTimestampAsync( renderContext, 'render' );
 
 		return renderContext;
 
@@ -898,7 +896,6 @@ class Renderer {
 		const previousRenderId = nodeFrame.renderId;
 
 		//
-		if ( this.info.autoReset === true ) this.info.resetCompute();
 
 		this.info.calls ++;
 		this.info.compute.calls ++;
