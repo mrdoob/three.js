@@ -107,7 +107,11 @@ class NodeMaterial extends ShaderMaterial {
 
 			if ( clippingNode !== null ) builder.stack.add( clippingNode );
 
-			resultNode = this.setupOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
+			// force unsigned floats - useful for RenderTargets
+
+			const basicOutput = vec4( outgoingLightNode, diffuseColor.a ).max( 0 );
+
+			resultNode = this.setupOutput( builder, basicOutput );
 
 			// OUTPUT NODE
 
