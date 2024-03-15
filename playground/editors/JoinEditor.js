@@ -1,6 +1,7 @@
 import { LabelElement } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { JoinNode, UniformNode, float } from 'three/nodes';
+import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
 const NULL_VALUE = new UniformNode( 0 );
 
@@ -41,10 +42,10 @@ export class JoinEditor extends BaseNodeEditor {
 
 		};
 
-		const xElement = new LabelElement( 'x | r' ).setInput( 1 ).onConnect( update );
-		const yElement = new LabelElement( 'y | g' ).setInput( 1 ).onConnect( update );
-		const zElement = new LabelElement( 'z | b' ).setInput( 1 ).onConnect( update );
-		const wElement = new LabelElement( 'w | a' ).setInput( 1 ).onConnect( update );
+		const xElement = setInputAestheticsFromType( new LabelElement( 'x | r' ), 'Number' ).onConnect( update );
+		const yElement = setInputAestheticsFromType( new LabelElement( 'y | g' ), 'Number' ).onConnect( update );
+		const zElement = setInputAestheticsFromType( new LabelElement( 'z | b' ), 'Number' ).onConnect( update );
+		const wElement = setInputAestheticsFromType( new LabelElement( 'w | a' ), 'Number' ).onConnect( update );
 
 		this.add( xElement )
 			.add( yElement )
