@@ -57,14 +57,6 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
-
-				renderer.setAnimationLoop( animate );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
-				//
-
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
@@ -142,7 +134,14 @@
 				} );
 
 
-				//
+				// renderer
+
+				renderer = new WebGPURenderer( { antialias: true } );
+
+				renderer.setAnimationLoop( animate );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -160,14 +159,6 @@
 			//
 
 			function animate() {
-
-				render();
-
-				stats.update();
-
-			}
-
-			function render() {
 
 				const time = clock.getElapsedTime();
 
@@ -190,6 +181,8 @@
 				}
 
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 
