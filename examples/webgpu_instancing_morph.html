@@ -43,7 +43,6 @@
 			const clock = new THREE.Clock( true );
 
 			init();
-			animate();
 
 			function init() {
 
@@ -54,6 +53,20 @@
 				scene.background = new THREE.Color( 0x99DDFF );
 
 				scene.fog = new THREE.Fog( 0x99DDFF, 5000, 10000 );
+
+
+				//
+
+				renderer = new WebGPURenderer( { antialias: true } );
+
+				renderer.setAnimationLoop( animate );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+				//
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
 
 				const light = new THREE.DirectionalLight( 0xffffff, 1 );
 
@@ -128,17 +141,6 @@
 			
 				} );
 
-				//
-
-				renderer = new WebGPURenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
-				renderer.shadowMap.enabled = true;
-				//
-
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
 
 				//
 
@@ -158,8 +160,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 
