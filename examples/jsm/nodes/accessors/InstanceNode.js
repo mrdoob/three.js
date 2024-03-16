@@ -49,14 +49,12 @@ class InstanceNode extends Node {
 
 		const instanceColorAttribute = instanceMesh.instanceColor;
 
-		if ( instanceColorAttribute !== null && this.instanceColorNode === null ) {
+		if ( instanceColorAttribute && this.instanceColorNode === null ) {
 
 			const buffer = new InstancedBufferAttribute( instanceColorAttribute.array, 3 );
 			const bufferFn = instanceColorAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
 
 			this.instanceColorNode = vec3( bufferFn( buffer, 'vec3', 3, 0 ) );
-
-
 
 		}
 
