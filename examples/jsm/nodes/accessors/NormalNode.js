@@ -37,7 +37,17 @@ class NormalNode extends Node {
 
 		if ( scope === NormalNode.GEOMETRY ) {
 
-			outputNode = attribute( 'normal', 'vec3' );
+			const geometryAttribute = builder.hasGeometryAttribute( 'normal' );
+
+			if ( geometryAttribute === false ) {
+
+				outputNode = attribute( 'position', 'vec3' );
+
+			} else {
+
+				outputNode = attribute( 'normal', 'vec3' );
+
+			}
 
 		} else if ( scope === NormalNode.LOCAL ) {
 
