@@ -83,7 +83,7 @@ class Background extends DataMap {
 
 			if ( sceneData.backgroundCacheKey !== backgroundCacheKey ) {
 
-				sceneData.backgroundMeshNode.node = vec4( backgroundNode );
+				sceneData.backgroundMeshNode.node = vec4( backgroundNode ).mul( backgroundIntensity );
 
 				backgroundMesh.material.needsUpdate = true;
 
