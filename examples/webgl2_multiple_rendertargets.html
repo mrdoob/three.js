@@ -78,6 +78,10 @@
 			precision highp float;
 			precision highp int;
 
+			vec4 LinearTosRGB( in vec4 value ) {
+				return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );
+			}
+
 			layout(location = 0) out vec4 pc_FragColor;
 
 			in vec2 vUv;
@@ -87,11 +91,13 @@
 
 			void main() {
 
-				vec3 diffuse = texture( tDiffuse, vUv ).rgb;
-				vec3 normal = texture( tNormal, vUv ).rgb;
+				vec4 diffuse = texture( tDiffuse, vUv );
+				vec4 normal = texture( tNormal, vUv );
 
-				pc_FragColor.rgb = mix( diffuse, normal, step( 0.5, vUv.x ) );
+				pc_FragColor = mix( diffuse, normal, step( 0.5, vUv.x ) );
 				pc_FragColor.a = 1.0;
+
+				pc_FragColor = LinearTosRGB( pc_FragColor );
 
 			}
 		</script>
@@ -101,10 +107,6 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank">threejs</a> webgl - Multiple RenderTargets
 		</div>
-
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -119,11 +121,8 @@
 
 			import * as THREE from 'three';
 
-			import WebGL from 'three/addons/capabilities/WebGL.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
 			let camera, scene, renderer, controls;
 			let renderTarget;
@@ -143,13 +142,6 @@
 
 			function init() {
 
-				if ( WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
-					return;
-
-				}
-
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -157,23 +149,20 @@
 
 				// Create a multi render target with Float buffers
 
-				renderTarget = new THREE.WebGLMultipleRenderTargets(
+				renderTarget = new THREE.WebGLRenderTarget(
 					window.innerWidth * window.devicePixelRatio,
 					window.innerHeight * window.devicePixelRatio,
-					2
+					{
+						count: 2,
+						minFilter: THREE.NearestFilter,
+						magFilter: THREE.NearestFilter
+					}
 				);
-
-				for ( let i = 0, il = renderTarget.texture.length; i < il; i ++ ) {
-
-					renderTarget.texture[ i ].minFilter = THREE.NearestFilter;
-					renderTarget.texture[ i ].magFilter = THREE.NearestFilter;
-
-				}
 
 				// Name our G-Buffer attachments for debugging
 
-				renderTarget.texture[ 0 ].name = 'diffuse';
-				renderTarget.texture[ 1 ].name = 'normal';
+				renderTarget.textures[ 0 ].name = 'diffuse';
+				renderTarget.textures[ 1 ].name = 'normal';
 
 				// Scene setup
 
@@ -188,10 +177,12 @@
 				const diffuse = loader.load( 'textures/hardwood2_diffuse.jpg', render );
 				diffuse.wrapS = THREE.RepeatWrapping;
 				diffuse.wrapT = THREE.RepeatWrapping;
+				diffuse.colorSpace = THREE.SRGBColorSpace;
 
 				scene.add( new THREE.Mesh(
 					new THREE.TorusKnotGeometry( 1, 0.3, 128, 32 ),
 					new THREE.RawShaderMaterial( {
+						name: 'G-Buffer Shader',
 						vertexShader: document.querySelector( '#gbuffer-vert' ).textContent.trim(),
 						fragmentShader: document.querySelector( '#gbuffer-frag' ).textContent.trim(),
 						uniforms: {
@@ -210,11 +201,12 @@
 				postScene.add( new THREE.Mesh(
 					new THREE.PlaneGeometry( 2, 2 ),
 					new THREE.RawShaderMaterial( {
+						name: 'Post-FX Shader',
 						vertexShader: document.querySelector( '#render-vert' ).textContent.trim(),
 						fragmentShader: document.querySelector( '#render-frag' ).textContent.trim(),
 						uniforms: {
-							tDiffuse: { value: renderTarget.texture[ 0 ] },
-							tNormal: { value: renderTarget.texture[ 1 ] },
+							tDiffuse: { value: renderTarget.textures[ 0 ] },
+							tNormal: { value: renderTarget.textures[ 1 ] },
 						},
 						glslVersion: THREE.GLSL3
 					} )

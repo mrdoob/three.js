@@ -27,11 +27,31 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 			}
 
-			attributes.update( object.instanceMatrix, gl.ARRAY_BUFFER );
+			if ( updateMap.get( object ) !== frame ) {
 
-			if ( object.instanceColor !== null ) {
+				attributes.update( object.instanceMatrix, gl.ARRAY_BUFFER );
 
-				attributes.update( object.instanceColor, gl.ARRAY_BUFFER );
+				if ( object.instanceColor !== null ) {
+
+					attributes.update( object.instanceColor, gl.ARRAY_BUFFER );
+
+				}
+
+				updateMap.set( object, frame );
+
+			}
+
+		}
+
+		if ( object.isSkinnedMesh ) {
+
+			const skeleton = object.skeleton;
+
+			if ( updateMap.get( skeleton ) !== frame ) {
+
+				skeleton.update();
+
+				updateMap.set( skeleton, frame );
 
 			}
 

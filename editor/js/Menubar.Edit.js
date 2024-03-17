@@ -5,6 +5,7 @@ import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
 import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
 import { SetPositionCommand } from './commands/SetPositionCommand.js';
+import { clone } from '../../examples/jsm/utils/SkeletonUtils.js';
 
 function MenubarEdit( editor ) {
 
@@ -46,23 +47,6 @@ function MenubarEdit( editor ) {
 	} );
 	options.add( redo );
 
-	// Clear History
-
-	let option = new UIRow();
-	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/edit/clear_history' ) );
-	option.onClick( function () {
-
-		if ( confirm( 'The Undo/Redo History will be cleared. Are you sure?' ) ) {
-
-			editor.history.clear();
-
-		}
-
-	} );
-	options.add( option );
-
-
 	editor.signals.historyChanged.add( function () {
 
 		const history = editor.history;
@@ -90,7 +74,7 @@ function MenubarEdit( editor ) {
 
 	// Center
 
-	option = new UIRow();
+	let option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/center' ) );
 	option.onClick( function () {
@@ -123,7 +107,7 @@ function MenubarEdit( editor ) {
 
 		if ( object === null || object.parent === null ) return; // avoid cloning the camera or scene
 
-		object = object.clone();
+		object = clone( object );
 
 		editor.execute( new AddObjectCommand( editor, object ) );
 
@@ -147,71 +131,6 @@ function MenubarEdit( editor ) {
 
 	} );
 	options.add( option );
-
-	//
-
-	options.add( new UIHorizontalRule() );
-
-	// Set textures to sRGB. See #15903
-
-	option = new UIRow();
-	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/edit/fixcolormaps' ) );
-	option.onClick( function () {
-
-		editor.scene.traverse( fixColorMap );
-
-	} );
-	options.add( option );
-
-	const colorMaps = [ 'map', 'envMap', 'emissiveMap' ];
-
-	function fixColorMap( obj ) {
-
-		const material = obj.material;
-
-		if ( material !== undefined ) {
-
-			if ( Array.isArray( material ) === true ) {
-
-				for ( let i = 0; i < material.length; i ++ ) {
-
-					fixMaterial( material[ i ] );
-
-				}
-
-			} else {
-
-				fixMaterial( material );
-
-			}
-
-			editor.signals.sceneGraphChanged.dispatch();
-
-		}
-
-	}
-
-	function fixMaterial( material ) {
-
-		let needsUpdate = material.needsUpdate;
-
-		for ( let i = 0; i < colorMaps.length; i ++ ) {
-
-			const map = material[ colorMaps[ i ] ];
-
-			if ( map ) {
-
-				map.colorSpace = THREE.SRGBColorSpace;
-				needsUpdate = true;
-
-			}
-
-		}
-
-		material.needsUpdate = needsUpdate;
-
-	}
 
 	return container;
 

@@ -11,8 +11,6 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Sandbox
 		</div>
 
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -57,12 +55,11 @@
 
 				//
 
-				renderer = new WebGPURenderer();
+				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
-				await renderer.init();
 
 				// textures
 
@@ -76,9 +73,9 @@
 				textureDisplace.wrapS = THREE.RepeatWrapping;
 				textureDisplace.wrapT = THREE.RepeatWrapping;
 
-				const ktxLoader = new KTX2Loader()
+				const ktxLoader = await new KTX2Loader()
 					.setTranscoderPath( 'jsm/libs/basis/' )
-					.detectSupport( renderer );
+					.detectSupportAsync( renderer );
 
 				const ktxTexture = await ktxLoader.loadAsync( './textures/compressed/sample_uastc_zstd.ktx2' );
 
@@ -96,7 +93,7 @@
 				materialBox.colorNode = mix( textureNode, checker( animateUV ), 0.5 );
 
 				// test uv 2
-				//geometryBox.setAttribute( 'uv2', geometryBox.getAttribute( 'uv' ) );
+				//geometryBox.setAttribute( 'uv1', geometryBox.getAttribute( 'uv' ) );
 				//materialBox.colorNode = texture( uvTexture, uv( 1 ) );
 
 				box = new THREE.Mesh( geometryBox, materialBox );
@@ -169,7 +166,8 @@
 					new THREE.Vector3( - 0.5, - 0.5, 0 ),
 					new THREE.Vector3( 0.5, - 0.5, 0 ),
 					new THREE.Vector3( 0.5, 0.5, 0 ),
-					new THREE.Vector3( - 0.5, 0.5, 0 )
+					new THREE.Vector3( - 0.5, 0.5, 0 ),
+					new THREE.Vector3( - 0.5, - 0.5, 0 )
 				] );
 
 				geometryLine.setAttribute( 'color', geometryLine.getAttribute( 'position' ) );
@@ -197,7 +195,7 @@
 			function animate() {
 
 				if ( box ) {
-			
+
 					box.rotation.x += 0.01;
 					box.rotation.y += 0.02;
 

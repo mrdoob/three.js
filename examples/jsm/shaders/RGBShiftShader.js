@@ -10,6 +10,8 @@
 
 const RGBShiftShader = {
 
+	name: 'RGBShiftShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null },

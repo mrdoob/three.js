@@ -30,7 +30,7 @@ void main() {
 	gl_FragColor.a *= opacity;
 
 	#include <tonemapping_fragment>
-	#include <encodings_fragment>
+	#include <colorspace_fragment>
 
 }
 `;

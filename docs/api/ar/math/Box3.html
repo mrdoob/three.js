@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+			يمثل مربعًا محدودًا بمحاور (AABB) في الفضاء ثلاثي الأبعاد.
+		</p>
+			
+		<h2>مثال الكود</h2>
+			
+		<code>
+		const box = new THREE.Box3();
+			
+		const mesh = new THREE.Mesh(
+			new THREE.SphereGeometry(),
+			new THREE.MeshBasicMaterial()
+		);
+			
+		// تأكد من حساب مربع التحديد لهندسته
+		// يجب القيام بذلك مرة واحدة فقط (باستخدام هندسات ثابتة)
+		mesh.geometry.computeBoundingBox();
+			
+		// ...
+			
+		// في حلقة الرسوم المتحركة، احسب المربع الحالي مع المصفوفة العالمية
+		box.copy( mesh.geometry.boundingBox ).applyMatrix4( mesh.matrixWorld );
+		</code>
+			
+		<h2>المنشئ (Constructor)</h2>
+			
+		<h3>[name]( [param:Vector3 min], [param:Vector3 max] )</h3>
+		<p>
+		[page:Vector3 min] - (اختياري) [page:Vector3] يمثل الحد السفلي (x، y، z) للمربع. الافتراضي هو (+ Infinity، + Infinity، + Infinity).<br />
+			
+		[page:Vector3 max] - (اختياري) [page:Vector3] يمثل الحد العلوي (x، y، z) للمربع. الافتراضي هو (- Infinity، - Infinity، - Infinity).<br /><br />
+			
+		ينشئ [name] محدودًا بواسطة min و max.
+		</p>
+			
+		<h2>الخصائص (Properties)</h2>
+			
+		<h3>[property:Boolean isBox3]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان كائنًا معينًا من نوع [name].</p>
+			
+		<h3>[property:Vector3 min]</h3>
+		<p>
+		[page:Vector3] يمثل الحد السفلي (x، y، z) للمربع.<br />
+		الافتراضي هو (+ Infinity، + Infinity، + Infinity).
+		</p>
+			
+		<h3>[property:Vector3 max]</h3>
+		<p>
+		[page:Vector3] يمثل الحد العلوي (x، y، z) للمربع.<br />
+		الافتراضي هو (- Infinity، - Infinity، - Infinity).
+		</p>
+
+		<h2>الطرق (Methods)</h2>
+
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<p>
+		[page:Matrix4 matrix] - [page:Matrix4] للتطبيق<br /><br />
+		
+		يحول هذا Box3 مع المصفوفة الموردة.
+		</p>
+		
+		<h3>
+		[method:Vector3 clampPoint]( [param:Vector3 point], [param:Vector3 target] )
+		</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] للتثبيت. <br />
+		[page:Vector3 target] — سيتم نسخ النتيجة في هذا Vector3.<br /><br />
+		
+		[link:https://en.wikipedia.org/wiki/Clamping_(graphics) يثبت] [page:Vector3 point] داخل حدود هذا المربع.<br />
+		</p>
+		
+		<h3>[method:Box3 clone]()</h3>
+		<p>
+		يعود بـ [page:Box3] جديد مع نفس [page:.min min] و [page:.max max] كهذا المربع.
+		</p>
+		
+		<h3>[method:Boolean containsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - [page:Box3 Box3] للاختبار للتضمين.<br /><br />
+		
+		يعود بـ true إذا كان هذا المربع يشمل كامل [page:Box3 box]. إذا كان هذا و [page:Box3 box] متطابقان، <br />
+		فإن هذه الوظيفة تعود أيضًا بـ true.
+		</p>
+		
+		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] للاختبار للتضمين.<br /><br />
+		
+		يعود بـ true إذا كانت [page:Vector3 point] المحددة تقع داخل أو على حدود هذا المربع.
+		</p>
+		
+		<h3>[method:this copy]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - [page:Box3] للنسخ.<br /><br />
+		
+		ينسخ [page:.min min] و [page:.max max] من [page:Box3 box] إلى هذا المربع.
+		</p>
+		
+		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] لقياس المسافة إليها.<br /><br />
+		
+		يعود بالمسافة من أي حافة لهذا المربع إلى النقطة المحددة. إذا كانت [page:Vector3 point] داخل هذا المربع، فستكون المسافة 0.
+		</p>
+		
+		<h3>[method:Boolean equals]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - مربع للمقارنة مع هذا المربع.<br /><br />
+		
+		يعود بـ true إذا كان هذا المربع و [page:Box3 box] يشتركان في نفس الحدود السفلى والعليا.
+		</p>
+		
+		<h3>
+		[method:this expandByObject]( [param:Object3D object], [param:Boolean precise] )
+		</h3>
+		<p>
+		[page:Object3D object] - [page:Object3D] لتوسيع المربع به.<br />
+		precise - (اختياري) توسيع مربع التحديد بأقل ما يمكن على حساب المزيد من الحسابات. الافتراضي هو false.<br /><br />
+		
+		يوسع حدود هذا المربع لتضمين [page:Object3D object] وأطفاله، مع مراعاة تحولات الكائن والأطفال العالمية. قد يؤدي التابع إلى مربع أكبر من اللازم بشكل صارم (ما لم يتم تحديد معلمة precise على true).
+		</p>
+		
+		<h3>[method:this expandByPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] التي يجب تضمينها في المربع.<br /><br />
+		
+		يوسع حدود هذا المربع لتضمين [page:Vector3 point].
+		</p>
+		
+		<h3>[method:this expandByScalar]( [param:Float scalar] )</h3>
+		<p>
+		[page:Float scalar] - المسافة التي يتم توسيع المربع بها.<br /><br />
+		
+		يوسع كل بُعد من أبعاد المربع بواسطة [page:Float scalar]. إذا كانت سالبة، فستتقلص أبعاد المربع.
+		</p>
+		
+		<h3>[method:this expandByVector]( [param:Vector3 vector] )</h3>
+		<p>
+		[page:Vector3 vector] - [page:Vector3] لتوسيع المربع به.<br /><br />
+		
+		يوسع هذا المربع بشكل متساوٍ بواسطة [page:Vector3 vector]. سيتم توسيع عرض هذا المربع بمكون x من [page:Vector3 vector] في كلا الاتجاهين. ستتم توسيع ارتفاع هذا المربع بمكون y من [page:Vector3 vector] في كلا الاتجاهين. ستتم توسيع عمق هذا المربع بمكون z من `vector` في كلا الاتجاهين.
+		</p>
+
+		<h3>[method:Sphere getBoundingSphere]( [param:Sphere target] )</h3>
+		<p>
+		[page:Sphere target] — سيتم نسخ النتيجة في هذا الكرة.<br /><br />
+		
+		يحصل على [page:Sphere] يحد المربع.
+		</p>
+		
+		<h3>[method:Vector3 getCenter]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — سيتم نسخ النتيجة في هذا Vector3.<br /><br />
+		
+		يعود بنقطة المركز للمربع كـ [page:Vector3].
+		</p>
+		
+		<h3>
+		[method:Vector3 getParameter]( [param:Vector3 point], [param:Vector3 target] )
+		</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3].<br />
+		[page:Vector3 target] — سيتم نسخ النتيجة في هذا Vector3.<br /><br />
+		
+		يعود بنقطة كنسبة من عرض وارتفاع وعمق هذا المربع.
+		</p>
+		
+		<h3>[method:Vector3 getSize]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — سيتم نسخ النتيجة في هذا Vector3.<br /><br />
+		
+		يعود بعرض وارتفاع وعمق هذا المربع.
+		</p>
+		
+		<h3>[method:this intersect]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - مربع للتقاطع معه.<br /><br />
+		
+		يحسب تقاطع هذا و [page:Box3 box]، وضع الحد الأقصى لهذا المربع على أقل حدود علوية للمربعين والحد الأدنى لهذا المربع على أكبر حدود سفلى للمربعين. إذا لم يكن هناك تداخل، يجعل هذا المربع فارغًا.
+		</p>
+		
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - مربع للتحقق من التقاطع ضده.<br /><br />
+		
+		يحدد ما إذا كان هذا المربع يتقاطع مع [page:Box3 box] أم لا.
+		</p>
+
+		<h3>[method:Boolean intersectsPlane]( [param:Plane plane] )</h3>
+		<p>
+		[page:Plane plane] - [page:Plane] للتحقق من التقاطع ضده.<br /><br />
+		
+		يحدد ما إذا كان هذا المربع يتقاطع مع [page:Plane plane] أم لا.
+		</p>
+		
+		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
+		<p>
+		[page:Sphere sphere] - [page:Sphere] للتحقق من التقاطع ضده.<br /><br />
+		
+		يحدد ما إذا كان هذا المربع يتقاطع مع [page:Sphere sphere] أم لا.
+		</p>
+		
+		<h3>[method:Boolean intersectsTriangle]( [param:Triangle triangle] )</h3>
+		<p>
+		[page:Triangle triangle] - [page:Triangle] للتحقق من التقاطع ضده.<br /><br />
+		
+		يحدد ما إذا كان هذا المربع يتقاطع مع [page:Triangle triangle] أم لا.
+		</p>
+		
+		<h3>[method:Boolean isEmpty]()</h3>
+		<p>
+		يعود بـ true إذا كان هذا المربع يشمل صفر نقطة داخل حدوده.<br />
+		يرجى ملاحظة أن المربع الذي يحتوي على حدود سفلى وعلوية متساوية لا يزال يشمل نقطة واحدة، وهي النقطة التي تشترك فيها كلا الحدود.
+		</p>
+		
+		<h3>[method:this makeEmpty]()</h3>
+		<p>يجعل هذا المربع فارغًا.</p>
+		
+		<h3>[method:this set]( [param:Vector3 min], [param:Vector3 max] )</h3>
+		<p>
+		[page:Vector3 min] - [page:Vector3] يمثل الحد السفلي (x، y، z) للمربع.<br />
+		[page:Vector3 max] - [page:Vector3] يمثل الحد العلوي (x، y، z) للمربع.<br /><br />
+		
+		يضع الحدود السفلى والعلوية (x، y، z) لهذا المربع.<br />
+		يرجى ملاحظة أن هذه الطريقة تنسخ فقط القيم من الكائنات المحددة.
+		</p>
+		
+		<h3>[method:this setFromArray]( [param:Array array] )</h3>
+		<p>
+		array -- مجموعة من بيانات الموضع التي سيغلفها المربع الناتج.<br /><br />
+		
+		يضع الحدود العلوية والسفلى لهذا المربع لتشمل كل البيانات في `array`.
+		</p>
+		
+		<h3>
+			[method:this setFromBufferAttribute]( [param:BufferAttribute attribute] )
+		</h3>
+		<p>
+		[page:BufferAttribute attribute] - سمة مخزنة لبيانات الموضع التي سيغلفها المربع الناتج.<br /><br />
+			
+		يضع الحدود العلوية والسفلى لهذا المربع لتشمل كل البيانات في [page:BufferAttribute attribute].
+		</p>
+			
+		<h3>
+		[method:this setFromCenterAndSize]( [param:Vector3 center], [param:Vector3 size] )
+		</h3>
+		<p>
+		[page:Vector3 center], - الموضع المركزي المطلوب للمربع. <br />
+		[page:Vector3 size] - الأبعاد المطلوبة x و y و z للمربع.<br /><br />
+			
+		يضع هذا المربع في مركز [page:Vector3 center] ويضع عرض وارتفاع وعمق هذا المربع على القيم المحددة <br />
+		في [page:Vector3 size]
+		</p>
+			
+		<h3>
+		[method:this setFromObject]( [param:Object3D object], [param:Boolean precise] )
+		</h3>
+		<p>
+		[page:Object3D object] - [page:Object3D] لحساب مربع التحديد الخاص به.<br />
+		precise - (اختياري) حساب أصغر مربع تحديد محدود بمحاور العالم على حساب المزيد من الحسابات. الافتراضي هو false.<br /><br />
+			
+		يحسب مربع التحديد المحدود بمحاور العالم لـ [page:Object3D] (بما في ذلك أطفاله)، مع مراعاة تحولات الكائن والأطفال العالمية. قد يؤدي التابع إلى مربع أكبر من اللازم بشكل صارم.
+		</p>
+			
+		<h3>[method:this setFromPoints]( [param:Array points] )</h3>
+		<p>
+		[page:Array points] - مجموعة من [page:Vector3 Vector3s] التي سيحتوي عليها المربع الناتج.<br /><br />
+			
+		يضع الحدود العلوية والسفلى لهذا المربع لتشمل كل النقاط في [page:Array points].
+		</p>
+			
+		<h3>[method:this translate]( [param:Vector3 offset] )</h3>
+		<p>
+		[page:Vector3 offset] - اتجاه ومسافة التحويل.<br /><br />
+			
+		يضيف [page:Vector3 offset] إلى كلا من الحدود العلوية والسفلى لهذا المربع، بشكل فعال ينقل هذا المربع [page:Vector3 offset] وحدات في الفضاء ثلاثي الأبعاد.
+		</p>
+			
+		<h3>[method:this union]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - مربع سيتم دمجه مع هذا المربع.<br /><br />
+			
+		يحسب اتحاد هذا المربع و [page:Box3 box]، وضع الحد الأقصى لهذا المربع على أكبر حدود علوية للمربعين والحد الأدنى لهذا المربع على أقل حدود سفلى للمربعين.
+		</p>
+			
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -7,11 +7,6 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -34,7 +29,8 @@
 			const params = {
 				clipIntersection: true,
 				planeConstant: 0,
-				showHelpers: false
+				showHelpers: false,
+				alphaToCoverage: true,
 			};
 
 			const clipPlanes = [
@@ -66,12 +62,9 @@
 				controls.maxDistance = 10;
 				controls.enablePan = false;
 
-				const light = new THREE.HemisphereLight( 0xffffff, 0x080808, 1.5 );
+				const light = new THREE.HemisphereLight( 0xffffff, 0x080808, 4.5 );
 				light.position.set( - 1.25, 1, 1.25 );
 				scene.add( light );
-
-				// const helper = new THREE.CameraHelper( light.shadow.camera );
-				// scene.add( helper );
 
 				//
 
@@ -81,12 +74,13 @@
 
 					const geometry = new THREE.SphereGeometry( i / 30, 48, 24 );
 
-					const material = new THREE.MeshLambertMaterial( {
+					const material = new THREE.MeshPhongMaterial( {
 
 						color: new THREE.Color().setHSL( Math.random(), 0.5, 0.5, THREE.SRGBColorSpace ),
 						side: THREE.DoubleSide,
 						clippingPlanes: clipPlanes,
-						clipIntersection: params.clipIntersection
+						clipIntersection: params.clipIntersection,
+						alphaToCoverage: true,
 
 					} );
 
@@ -108,6 +102,19 @@
 				// gui
 
 				const gui = new GUI();
+
+				gui.add( params, 'alphaToCoverage' ).onChange( function ( value ) {
+
+					group.children.forEach( c => {
+
+						c.material.alphaToCoverage = Boolean( value );
+						c.material.needsUpdate = true;
+
+					} );
+
+					render();
+
+				} );
 
 				gui.add( params, 'clipIntersection' ).name( 'clip intersection' ).onChange( function ( value ) {
 

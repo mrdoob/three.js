@@ -21,10 +21,6 @@
 			(model from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">mixamo.com</a>)<br/>
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -42,8 +38,6 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
 			let scene, renderer, camera, stats;
 			let model, skeleton, mixer, clock;
@@ -76,11 +70,11 @@
 				scene.background = new THREE.Color( 0xa0a0a0 );
 				scene.fog = new THREE.Fog( 0xa0a0a0, 10, 50 );
 
-				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 3 );
 				hemiLight.position.set( 0, 20, 0 );
 				scene.add( hemiLight );
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
 				dirLight.position.set( 3, 10, 10 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.top = 2;
@@ -93,7 +87,7 @@
 
 				// ground
 
-				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshPhongMaterial( { color: 0xcbcbcb, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.receiveShadow = true;
 				scene.add( mesh );

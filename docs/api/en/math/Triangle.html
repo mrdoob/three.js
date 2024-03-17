@@ -57,8 +57,7 @@
 		</p>
 
 		<h3>
-			[method:Vector3 closestPointToPoint]( [param:Vector3 point],
-			[param:Vector3 target] )
+			[method:Vector3 closestPointToPoint]( [param:Vector3 point], [param:Vector3 target] )
 		</h3>
 		<p>
 			[page:Vector3 point] - [page:Vector3] <br />
@@ -98,7 +97,7 @@
 			[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
 			Return a [link:https://en.wikipedia.org/wiki/Barycentric_coordinate_system barycentric coordinate] 
-			from the given vector. <br /><br />
+			from the given vector. Returns `null` if the triangle is degenerate.<br /><br />
 
 			[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png Picture of barycentric coordinates]
 		</p>
@@ -125,9 +124,7 @@
 		</p>
 
 		<h3>
-			[method:Vector getInterpolation]( [param:Vector3 point], [param:Vector3 p1], 
-			[param:Vector3 p2], [param:Vector3 p3], [param:Vector v1],
-			[param:Vector v2], [param:Vector v3], [param:Vector target] )
+			[method:Vector getInterpolation]( [param:Vector3 point], [param:Vector3 p1], [param:Vector3 p2], [param:Vector3 p3], [param:Vector v1], [param:Vector v2], [param:Vector v3], [param:Vector target] )
 		</h3>
 		<p>
 			[page:Vector3 point] - Position of interpolated point.<br />
@@ -140,7 +137,7 @@
 			[page:Vector target] — Result will be copied into this Vector.<br /><br />
 
 			Returns the value barycentrically interpolated for the given point on the
-			triangle.
+			triangle. Returns `null` if the triangle is degenerate.
 		</p>
 
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
@@ -159,7 +156,6 @@
 
 		<h3>
 			[method:this set]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] ) 
-			[param:Triangle this]
 		</h3>
 		<p>
 			Sets the triangle's [page:.a a], [page:.b b] and [page:.c c] properties to
@@ -171,7 +167,6 @@
 		<h3>
 			[method:this setFromAttributeAndIndices]( [param:BufferAttribute attribute], 
 			[param:Integer i0], [param:Integer i1], [param:Integer i2] )
-			[param:Triangle this]
 		</h3>
 		<p>
 			attribute - [page:BufferAttribute] of vertex data <br />
@@ -183,9 +178,7 @@
 		</p>
 
 		<h3>
-			[method:this setFromPointsAndIndices]( [param:Array points],
-			[param:Integer i0], [param:Integer i1], [param:Integer i2] )
-			[param:Triangle this]
+			[method:this setFromPointsAndIndices]( [param:Array points], [param:Integer i0], [param:Integer i1], [param:Integer i2] )
 		</h3>
 		<p>
 			points - [page:Array] of [page:Vector3]s <br />

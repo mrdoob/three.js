@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -57,10 +53,12 @@
 
 <p>我们将修改我们的第一个例子中的其中一个。我们需要做的就是创建一个<a href="/docs/#api/zh/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>。调用它的<a href="/docs/#api/zh/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a>方法，同时传入图像的URL，并将材质的 <code class="notranslate" translate="no">map</code> 属性设置为该方法的返回值，而不是设置它的 <code class="notranslate" translate="no">color</code>属性。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
++const texture = loader.load( 'resources/images/wall.jpg' );
++texture.colorSpace = THREE.SRGBColorSpace;
 
 const material = new THREE.MeshBasicMaterial({
 -  color: 0xFF8844,
-+  map: loader.load('resources/images/wall.jpg'),
++  map: texture,
 });
 </pre>
 <p>注意，我们使用的是 <a href="/docs/#api/zh/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a>， 所以没有必要增加光线</p>
@@ -87,20 +85,28 @@ const material = new THREE.MeshBasicMaterial({
 
 <p>我们只需制作6种材料，并在创建 <a href="/docs/#api/zh/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> 时将它们作为一个数组传递给它们。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+-const texture = loader.load( 'resources/images/wall.jpg' );
+-texture.colorSpace = THREE.SRGBColorSpace;
 
 -const material = new THREE.MeshBasicMaterial({
--  map: loader.load('resources/images/wall.jpg'),
+-  map: texture,
 -});
 +const materials = [
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-1.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-2.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-3.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-4.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-5.jpg')}),
-+  new THREE.MeshBasicMaterial({map: loader.load('resources/images/flower-6.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-1.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-2.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-3.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-4.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-5.jpg')}),
++  new THREE.MeshBasicMaterial({map: loadColorTexture('resources/images/flower-6.jpg')}),
 +];
 -const cube = new THREE.Mesh(geometry, material);
 +const cube = new THREE.Mesh(geometry, materials);
+
++function loadColorTexture( path ) {
++  const texture = loader.load( path );
++  texture.colorSpace = THREE.SRGBColorSpace;
++  return texture;
++}
 </pre>
 <p>有效果了！</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -325,11 +331,11 @@ loadManager.onLoad = () =&gt; {
 </div>
 
 <p>这样就更清楚了。在左上角和中上角你可以看到第一个mip一直用到了远处。右上角和中下角你可以清楚地看到哪里使用了不同的mip。</p>
-<p>切换回原来的纹理，你可以看到右下角是最平滑的，质量最高的。你可能会问为什么不总是使用这种模式。最明显的原因是有时你希望东西是像素化的，以达到复古的效果或其他原因。其次最常见的原因是，读取8个像素并混合它们比读取1个像素并混合要慢。虽然单个纹理不太可能成为快和慢的区别，但随着我们在这些文章中的进一步深入，我们最终会有同时使用4或5个纹理的材料的情况。4个纹理*每个纹理8个像素，就是查找32个像素的永远渲染的像素。在移动设备上，这一嗲可能需要被重点考虑。</p>
+<p>切换回原来的纹理，你可以看到右下角是最平滑的，质量最高的。你可能会问为什么不总是使用这种模式。最明显的原因是有时你希望东西是像素化的，以达到复古的效果或其他原因。其次最常见的原因是，读取8个像素并混合它们比读取1个像素并混合要慢。虽然单个纹理不太可能成为快和慢的区别，但随着我们在这些文章中的进一步深入，我们最终会有同时使用4或5个纹理的材料的情况。4个纹理*每个纹理8个像素，就是查找32个像素的永远渲染的像素。在移动设备上，这一点可能需要被重点考虑。</p>
 <h2 id="-a-name-uvmanipulation-a-"><a name="uvmanipulation"></a> 重复，偏移，旋转，包裹一个纹理</h2>
 <p>纹理有重复、偏移和旋转纹理的设置。</p>
 <p>默认情况下，three.js中的纹理是不重复的。要设置纹理是否重复，有2个属性，<a href="/docs/#api/zh/textures/Texture#wrapS"><code class="notranslate" translate="no">wrapS</code></a> 用于水平包裹，<a href="/docs/#api/zh/textures/Texture#wrapT"><code class="notranslate" translate="no">wrapT</code></a> 用于垂直包裹。</p>
-<p>它们可以被设置为一下其中一个：</p>
+<p>它们可以被设置为以下其中一个：</p>
 <ul>
 <li><p><code class="notranslate" translate="no">THREE.ClampToEdgeWrapping</code></p>
 <p> 每条边上的最后一个像素无限重复。</p>
@@ -451,7 +457,7 @@ roughness
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

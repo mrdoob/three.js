@@ -4,7 +4,6 @@ import {
 	Bone,
 	BufferGeometry,
 	Color,
-	ColorManagement,
 	CustomBlending,
 	TangentSpaceNormalMap,
 	DoubleSide,
@@ -28,6 +27,7 @@ import {
 	Skeleton,
 	SkinnedMesh,
 	SrcAlphaFactor,
+	SRGBColorSpace,
 	TextureLoader,
 	Uint16BufferAttribute,
 	Vector3,
@@ -226,7 +226,15 @@ class MMDLoader extends Loader {
 			.setWithCredentials( this.withCredentials )
 			.load( url, function ( buffer ) {
 
-				onLoad( parser.parsePmd( buffer, true ) );
+				try {
+
+					onLoad( parser.parsePmd( buffer, true ) );
+
+				} catch ( e ) {
+
+					if ( onError ) onError( e );
+
+				}
 
 			}, onProgress, onError );
 
@@ -252,7 +260,15 @@ class MMDLoader extends Loader {
 			.setWithCredentials( this.withCredentials )
 			.load( url, function ( buffer ) {
 
-				onLoad( parser.parsePmx( buffer, true ) );
+				try {
+
+					onLoad( parser.parsePmx( buffer, true ) );
+
+				} catch ( e ) {
+
+					if ( onError ) onError( e );
+
+				}
 
 			}, onProgress, onError );
 
@@ -287,9 +303,17 @@ class MMDLoader extends Loader {
 
 			this.loader.load( urls[ i ], function ( buffer ) {
 
-				vmds.push( parser.parseVmd( buffer, true ) );
+				try {
 
-				if ( vmds.length === vmdNum ) onLoad( parser.mergeVmds( vmds ) );
+					vmds.push( parser.parseVmd( buffer, true ) );
+
+					if ( vmds.length === vmdNum ) onLoad( parser.mergeVmds( vmds ) );
+
+				} catch ( e ) {
+
+					if ( onError ) onError( e );
+
+				}
 
 			}, onProgress, onError );
 
@@ -318,7 +342,15 @@ class MMDLoader extends Loader {
 			.setWithCredentials( this.withCredentials )
 			.load( url, function ( text ) {
 
-				onLoad( parser.parseVpd( text, true ) );
+				try {
+
+					onLoad( parser.parseVpd( text, true ) );
+
+				} catch ( e ) {
+
+					if ( onError ) onError( e );
+
+				}
 
 			}, onProgress, onError );
 
@@ -1102,20 +1134,17 @@ class MaterialBuilder {
 				 * MMDToonMaterial doesn't have ambient. Set it to emissive instead.
 				 * It'll be too bright if material has map texture so using coef 0.2.
 				 */
-			params.diffuse = new Color().fromArray( material.diffuse );
+			params.diffuse = new Color().setRGB(
+				material.diffuse[ 0 ],
+				material.diffuse[ 1 ],
+				material.diffuse[ 2 ],
+				SRGBColorSpace
+			);
 			params.opacity = material.diffuse[ 3 ];
-			params.specular = new Color().fromArray( material.specular );
+			params.specular = new Color().setRGB( ...material.specular, SRGBColorSpace );
 			params.shininess = material.shininess;
-			params.emissive = new Color().fromArray( material.ambient );
+			params.emissive = new Color().setRGB( ...material.ambient, SRGBColorSpace );
 			params.transparent = params.opacity !== 1.0;
-
-			if ( ColorManagement.enabled === true ) {
-
-				params.diffuse.convertSRGBToLinear();
-				params.specular.convertSRGBToLinear();
-				params.emissive.convertSRGBToLinear();
-
-			}
 
 			//
 
@@ -1425,6 +1454,7 @@ class MaterialBuilder {
 			t.flipY = false;
 			t.wrapS = RepeatWrapping;
 			t.wrapT = RepeatWrapping;
+			t.colorSpace = SRGBColorSpace;
 
 			for ( let i = 0; i < texture.readyCallbacks.length; i ++ ) {
 

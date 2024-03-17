@@ -66,7 +66,7 @@
 
 		<h3>[property:Float filmGauge]</h3>
 		<p>
-			Film size used for the larger axis. Default is 35 (millimeters). This
+			Film size used for the larger axis. Default is `35` (millimeters). This
 			parameter does not influence the projection matrix unless .filmOffset is
 			set to a nonzero value.
 		</p>
@@ -96,7 +96,7 @@
 		<h3>[property:Float near]</h3>
 		<p>
 			Camera frustum near plane. Default is `0.1`.<br /><br />
-			The valid range is greater than 0 and less than the current value of the
+			The valid range is greater than `0` and less than the current value of the
 			[page:.far far] plane. Note that, unlike for the
 			[page:OrthographicCamera], `0` is <em>not</em> a valid value for a
 			PerspectiveCamera's near plane.
@@ -143,6 +143,19 @@
 			Sets the FOV by focal length in respect to the current
 			[page:PerspectiveCamera.filmGauge .filmGauge].<br /><br />
 			By default, the focal length is specified for a 35mm (full frame) camera.
+		</p>
+
+		<h3>[method:undefined getViewBounds]( [param:Float distance], [param:Vector2 minTarget], [param:Vector2 maxTarget] )
+		</h3>
+		<p>
+			Computes the 2D bounds of the camera's viewable rectangle at a given distance along the viewing direction.
+			Sets minTarget and maxTarget to the coordinates of the lower-left and upper-right corners of the view rectangle.
+		</p>
+
+		<h3>[method:Vector2 getViewSize]( [param:Float distance], [param:Vector2 target] )</h3>
+		<p>
+			Computes the width and height of the camera's viewable rectangle at a given distance along the viewing direction.
+			Copies the result into the target Vector2, where x is width and y is height.
 		</p>
 
 		<h3>[method:undefined setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
@@ -214,6 +227,5 @@ camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 		</p>
-
 	</body>
 </html>

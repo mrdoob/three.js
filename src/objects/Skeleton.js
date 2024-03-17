@@ -21,9 +21,6 @@ class Skeleton {
 		this.boneMatrices = null;
 
 		this.boneTexture = null;
-		this.boneTextureSize = 0;
-
-		this.frame = - 1;
 
 		this.init();
 
@@ -171,7 +168,7 @@ class Skeleton {
 		//       64x64 pixel texture max 1024 bones * 4 pixels = (64 * 64)
 
 		let size = Math.sqrt( this.bones.length * 4 ); // 4 pixels needed for 1 matrix
-		size = MathUtils.ceilPowerOfTwo( size );
+		size = Math.ceil( size / 4 ) * 4;
 		size = Math.max( size, 4 );
 
 		const boneMatrices = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
@@ -182,7 +179,6 @@ class Skeleton {
 
 		this.boneMatrices = boneMatrices;
 		this.boneTexture = boneTexture;
-		this.boneTextureSize = size;
 
 		return this;
 
@@ -249,7 +245,7 @@ class Skeleton {
 
 		const data = {
 			metadata: {
-				version: 4.5,
+				version: 4.6,
 				type: 'Skeleton',
 				generator: 'Skeleton.toJSON'
 			},

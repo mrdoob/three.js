@@ -20,6 +20,10 @@
 			in the corresponding order.
 		</p>
 
+		<p>
+			Note that three.js expects Quaternions to be normalized.
+		</p>
+
 		<h2>Code Example</h2>
 
 		<code>
@@ -200,8 +204,7 @@
 		</p>
 
 		<h3>
-			[method:this set]( [param:Float x], [param:Float y], [param:Float z],
-			[param:Float w] )
+			[method:this set]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )
 		</h3>
 		<p>
 			Sets [page:.x x], [page:.y y], [page:.z z], [page:.w w] properties of this
@@ -265,8 +268,7 @@
 		</p>
 
 		<h3>
-			[method:this fromBufferAttribute]( [param:BufferAttribute attribute],
-			[param:Integer index] )
+			[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )
 		</h3>
 		<p>
 			[page:BufferAttribute attribute] - the source attribute.<br />
@@ -290,7 +292,7 @@
 			[page:Integer srcOffset0] - An offset into the array `src0`.<br />
 			[page:Array src1] - The source array of the target quaternion.<br />
 			[page:Integer srcOffset1] - An offset into the array `src1`.<br />
-			[page:Float t] - Normalized interpolation factor (between 0 and 1).<br /><br />
+			[page:Float t] - Normalized interpolation factor (between `0` and `1`).<br /><br />
 
 			This SLERP implementation assumes the quaternion data are managed in flat
 			arrays.

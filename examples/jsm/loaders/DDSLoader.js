@@ -4,7 +4,9 @@ import {
 	RGBA_S3TC_DXT3_Format,
 	RGBA_S3TC_DXT5_Format,
 	RGB_ETC1_Format,
-	RGB_S3TC_DXT1_Format
+	RGB_S3TC_DXT1_Format,
+	RGB_BPTC_SIGNED_Format,
+	RGB_BPTC_UNSIGNED_Format
 } from 'three';
 
 class DDSLoader extends CompressedTextureLoader {
@@ -55,6 +57,9 @@ class DDSLoader extends CompressedTextureLoader {
 		// const DDPF_RGB = 0x40;
 		// const DDPF_YUV = 0x200;
 		// const DDPF_LUMINANCE = 0x20000;
+
+		const DXGI_FORMAT_BC6H_UF16 = 95;
+		const DXGI_FORMAT_BC6H_SF16 = 96;
 
 		function fourCCToInt32( value ) {
 
@@ -108,8 +113,10 @@ class DDSLoader extends CompressedTextureLoader {
 		const FOURCC_DXT3 = fourCCToInt32( 'DXT3' );
 		const FOURCC_DXT5 = fourCCToInt32( 'DXT5' );
 		const FOURCC_ETC1 = fourCCToInt32( 'ETC1' );
+		const FOURCC_DX10 = fourCCToInt32( 'DX10' );
 
 		const headerLengthInt = 31; // The header length in 32 bit ints
+		const extendedHeaderLengthInt = 5; // The extended header length in 32 bit ints
 
 		// Offsets into the header array
 
@@ -135,6 +142,9 @@ class DDSLoader extends CompressedTextureLoader {
 		// const off_caps3 = 29;
 		// const off_caps4 = 30;
 
+		// If fourCC = DX10, the extended header starts after 32
+		const off_dxgiFormat = 0;
+
 		// Parse header
 
 		const header = new Int32Array( buffer, 0, headerLengthInt );
@@ -151,6 +161,8 @@ class DDSLoader extends CompressedTextureLoader {
 		const fourCC = header[ off_pfFourCC ];
 
 		let isRGBAUncompressed = false;
+
+		let dataOffset = header[ off_size ] + 4;
 
 		switch ( fourCC ) {
 
@@ -176,6 +188,40 @@ class DDSLoader extends CompressedTextureLoader {
 
 				blockBytes = 8;
 				dds.format = RGB_ETC1_Format;
+				break;
+
+			case FOURCC_DX10:
+
+				dataOffset += extendedHeaderLengthInt * 4;
+				const extendedHeader = new Int32Array( buffer, ( headerLengthInt + 1 ) * 4, extendedHeaderLengthInt );
+				const dxgiFormat = extendedHeader[ off_dxgiFormat ];
+				switch ( dxgiFormat ) {
+
+					case DXGI_FORMAT_BC6H_SF16: {
+
+						blockBytes = 16;
+						dds.format = RGB_BPTC_SIGNED_Format;
+						break;
+
+					}
+
+					case DXGI_FORMAT_BC6H_UF16: {
+
+						blockBytes = 16;
+						dds.format = RGB_BPTC_UNSIGNED_Format;
+						break;
+
+					}
+
+					default: {
+
+						console.error( 'THREE.DDSLoader.parse: Unsupported DXGI_FORMAT code ', dxgiFormat );
+						return dds;
+
+					}
+
+				}
+
 				break;
 
 			default:
@@ -225,8 +271,6 @@ class DDSLoader extends CompressedTextureLoader {
 
 		dds.width = header[ off_width ];
 		dds.height = header[ off_height ];
-
-		let dataOffset = header[ off_size ] + 4;
 
 		// Extract mipmaps buffers
 

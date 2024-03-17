@@ -411,8 +411,15 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 					this.preview = ! this.preview;
 
-				}
+				} else if ( key === 'Delete' ) {
 
+					if ( this.canvas.selected ) this.canvas.selected.dispose();
+					
+				} else if ( key === 'Escape' ) {
+
+					this.canvas.select( null );
+
+				}
 			}
 
 		} );
@@ -682,7 +689,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 				const visible = buttonLabel.indexOf( value ) !== - 1;
 
-				if ( visible && button.parent !== null ) {
+				if ( visible && button.children.length === 0 ) {
 
 					nodeButtonsVisible.push( button );
 

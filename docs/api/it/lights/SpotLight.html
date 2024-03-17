@@ -88,13 +88,7 @@
 
 		<h3>[property:Float distance]</h3>
 		<p>
-      `Modalità predefinita` — Quando la distanza è zero, la luce non si attenua. Quando la distanza è diversa da zero,
-      la luce si attenuerà linearmente dalla massima intensità nella posizione della luce fino a zero a questa distanza 
-      dalla luce.
-		</p>
-		<p>
-      `Modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta]` — Quando la distanza è
-      zero, la luce si attenuerà secondo la legge dell'inverso del quadrato alla distanza infinita.
+      Quando la distanza è zero, la luce si attenuerà secondo la legge dell'inverso del quadrato alla distanza infinita.
       Quando la distanza è diversa da zero, la luce si attenuerà secondo la legge dell'inverso del quadrato 
       fino in prossimità del limite di distanza, dove si attenuerà quindi rapidamente e uniformemente fino a `0`.
       Intrinsecamente, i limiti non sono fisicamente corretti.
@@ -106,8 +100,7 @@
 		<h3>[property:Float intensity]</h3>
 		<p>
 			L'intensità della luce. Il valore predefinito è `1`.<br />
-      Nella modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta], l'intensità 
-      è l'intensità luminosa della luce misurata in candela (cd).<br /><br />
+      L'intensità è l'intensità luminosa della luce misurata in candela (cd).<br /><br />
 
       Modificando l'intensità si modificherà anche la potenza della luce.
 		</p>
@@ -132,8 +125,7 @@
 		<p>
       La potenza della luce. <br />
 
-			Nella modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta], la potenza è la potenza 
-      della luminosità della luce misurata in lumen (lm).<br /><br />
+      La potenza è la potenza della luminosità della luce misurata in lumen (lm).<br /><br />
 
       Modificando la potenza si modificherà anche l'intensità della luce.
 		</p>
@@ -174,7 +166,7 @@ light.target = targetObject;
       Una [page:Texture] utilizzata per modulare il colore della luce. Il colore della luce spot viene mescolato con il valore
       RGB di questa texture, con un rapporto corrispondente al suo valore alfa. L'effetto di mascheramento simile a quello dei cookie
       viene riprodotto utilizzando i valori (0, 0, 0, 1-cookie_value).
-      *Attenzione*: [param:SpotLight map] è disabilitata se [param:SpotLight castShadow] è *false*. 
+      *Attenzione*: [page:.map] è disabilitata se [page:.castShadow] è *false*. 
 		</p>
 
 		<h2>Metodi</h2>

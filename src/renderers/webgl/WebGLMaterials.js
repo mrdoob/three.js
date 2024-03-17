@@ -1,5 +1,10 @@
 import { BackSide } from '../../constants.js';
 import { getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
+import { Euler } from '../../math/Euler.js';
+import { Matrix4 } from '../../math/Matrix4.js';
+
+const _e1 = /*@__PURE__*/ new Euler();
+const _m1 = /*@__PURE__*/ new Matrix4();
 
 function WebGLMaterials( renderer, properties ) {
 
@@ -209,11 +214,29 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
-		const envMap = properties.get( material ).envMap;
+		const materialProperties = properties.get( material );
+
+		const envMap = materialProperties.envMap;
+		const envMapRotation = materialProperties.envMapRotation;
 
 		if ( envMap ) {
 
 			uniforms.envMap.value = envMap;
+
+			_e1.copy( envMapRotation );
+
+			// accommodate left-handed frame
+			_e1.x *= - 1; _e1.y *= - 1; _e1.z *= - 1;
+
+			if ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) {
+
+				// environment maps which are not cube render targets or PMREMs follow a different convention
+				_e1.y *= - 1;
+				_e1.z *= - 1;
+
+			}
+
+			uniforms.envMapRotation.value.setFromMatrix4( _m1.makeRotationFromEuler( _e1 ) );
 
 			uniforms.flipEnvMap.value = ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) ? - 1 : 1;
 
@@ -228,7 +251,7 @@ function WebGLMaterials( renderer, properties ) {
 			uniforms.lightMap.value = material.lightMap;
 
 			// artist-friendly light intensity scaling factor
-			const scaleFactor = ( renderer.useLegacyLights === true ) ? Math.PI : 1;
+			const scaleFactor = ( renderer._useLegacyLights === true ) ? Math.PI : 1;
 
 			uniforms.lightMapIntensity.value = material.lightMapIntensity * scaleFactor;
 
@@ -289,6 +312,8 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.alphaMap.value = material.alphaMap;
 
+			refreshTransformUniform( material.alphaMap, uniforms.alphaMapTransform );
+
 		}
 
 		if ( material.alphaTest > 0 ) {
@@ -316,6 +341,8 @@ function WebGLMaterials( renderer, properties ) {
 		if ( material.alphaMap ) {
 
 			uniforms.alphaMap.value = material.alphaMap;
+
+			refreshTransformUniform( material.alphaMap, uniforms.alphaMapTransform );
 
 		}
 
@@ -495,6 +522,20 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.attenuationDistance.value = material.attenuationDistance;
 			uniforms.attenuationColor.value.copy( material.attenuationColor );
+
+		}
+
+		if ( material.anisotropy > 0 ) {
+
+			uniforms.anisotropyVector.value.set( material.anisotropy * Math.cos( material.anisotropyRotation ), material.anisotropy * Math.sin( material.anisotropyRotation ) );
+
+			if ( material.anisotropyMap ) {
+
+				uniforms.anisotropyMap.value = material.anisotropyMap;
+
+				refreshTransformUniform( material.anisotropyMap, uniforms.anisotropyMapTransform );
+
+			}
 
 		}
 

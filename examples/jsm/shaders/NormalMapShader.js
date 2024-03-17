@@ -9,6 +9,8 @@ import {
 
 const NormalMapShader = {
 
+	name: 'NormalMapShader',
+
 	uniforms: {
 
 		'heightMap': { value: null },

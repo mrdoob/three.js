@@ -17,7 +17,7 @@ function GeometryParametersPanel( editor, object ) {
 	// points
 
 	const pointsRow = new UIRow();
-	pointsRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/path' ) ).setWidth( '90px' ) );
+	pointsRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/path' ) ).setClass( 'Label' ) );
 
 	const points = new UIPoints3().setValue( parameters.path.points ).onChange( update );
 	pointsRow.add( points );
@@ -29,7 +29,7 @@ function GeometryParametersPanel( editor, object ) {
 	const radiusRow = new UIRow();
 	const radius = new UINumber( parameters.radius ).onChange( update );
 
-	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/radius' ) ).setWidth( '90px' ) );
+	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/radius' ) ).setClass( 'Label' ) );
 	radiusRow.add( radius );
 
 	container.add( radiusRow );
@@ -39,7 +39,7 @@ function GeometryParametersPanel( editor, object ) {
 	const tubularSegmentsRow = new UIRow();
 	const tubularSegments = new UIInteger( parameters.tubularSegments ).onChange( update );
 
-	tubularSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/tubularsegments' ) ).setWidth( '90px' ) );
+	tubularSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/tubularsegments' ) ).setClass( 'Label' ) );
 	tubularSegmentsRow.add( tubularSegments );
 
 	container.add( tubularSegmentsRow );
@@ -49,7 +49,7 @@ function GeometryParametersPanel( editor, object ) {
 	const radialSegmentsRow = new UIRow();
 	const radialSegments = new UIInteger( parameters.radialSegments ).onChange( update );
 
-	radialSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/radialsegments' ) ).setWidth( '90px' ) );
+	radialSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/radialsegments' ) ).setClass( 'Label' ) );
 	radialSegmentsRow.add( radialSegments );
 
 	container.add( radialSegmentsRow );
@@ -59,7 +59,7 @@ function GeometryParametersPanel( editor, object ) {
 	const closedRow = new UIRow();
 	const closed = new UICheckbox( parameters.closed ).onChange( update );
 
-	closedRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/closed' ) ).setWidth( '90px' ) );
+	closedRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/closed' ) ).setClass( 'Label' ) );
 	closedRow.add( closed );
 
 	container.add( closedRow );
@@ -69,7 +69,7 @@ function GeometryParametersPanel( editor, object ) {
 	const curveTypeRow = new UIRow();
 	const curveType = new UISelect().setOptions( { centripetal: 'centripetal', chordal: 'chordal', catmullrom: 'catmullrom' } ).setValue( parameters.path.curveType ).onChange( update );
 
-	curveTypeRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/curvetype' ) ).setWidth( '90px' ), curveType );
+	curveTypeRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/curvetype' ) ).setClass( 'Label' ), curveType );
 
 	container.add( curveTypeRow );
 
@@ -78,7 +78,7 @@ function GeometryParametersPanel( editor, object ) {
 	const tensionRow = new UIRow().setDisplay( curveType.getValue() == 'catmullrom' ? '' : 'none' );
 	const tension = new UINumber( parameters.path.tension ).setStep( 0.01 ).onChange( update );
 
-	tensionRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/tension' ) ).setWidth( '90px' ), tension );
+	tensionRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/tension' ) ).setClass( 'Label' ), tension );
 
 	container.add( tensionRow );
 

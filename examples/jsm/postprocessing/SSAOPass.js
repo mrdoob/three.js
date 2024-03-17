@@ -7,12 +7,12 @@ import {
 	DstAlphaFactor,
 	DstColorFactor,
 	FloatType,
+	HalfFloatType,
 	MathUtils,
 	MeshNormalMaterial,
 	NearestFilter,
 	NoBlending,
 	RedFormat,
-	LuminanceFormat,
 	DepthStencilFormat,
 	UnsignedInt248Type,
 	RepeatWrapping,
@@ -31,7 +31,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
 
 class SSAOPass extends Pass {
 
-	constructor( scene, camera, width, height ) {
+	constructor( scene, camera, width, height, kernelSize = 32 ) {
 
 		super();
 
@@ -44,7 +44,6 @@ class SSAOPass extends Pass {
 		this.scene = scene;
 
 		this.kernelRadius = 8;
-		this.kernelSize = 32;
 		this.kernel = [];
 		this.noiseTexture = null;
 		this.output = 0;
@@ -56,28 +55,27 @@ class SSAOPass extends Pass {
 
 		//
 
-		this.generateSampleKernel();
+		this.generateSampleKernel( kernelSize );
 		this.generateRandomKernelRotations();
 
-		// beauty render target
+		// depth texture
 
 		const depthTexture = new DepthTexture();
 		depthTexture.format = DepthStencilFormat;
 		depthTexture.type = UnsignedInt248Type;
-
-		this.beautyRenderTarget = new WebGLRenderTarget( this.width, this.height );
 
 		// normal render target with depth buffer
 
 		this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
+			type: HalfFloatType,
 			depthTexture: depthTexture
 		} );
 
 		// ssao render target
 
-		this.ssaoRenderTarget = new WebGLRenderTarget( this.width, this.height );
+		this.ssaoRenderTarget = new WebGLRenderTarget( this.width, this.height, { type: HalfFloatType } );
 
 		this.blurRenderTarget = this.ssaoRenderTarget.clone();
 
@@ -91,7 +89,8 @@ class SSAOPass extends Pass {
 			blending: NoBlending
 		} );
 
-		this.ssaoMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+		this.ssaoMaterial.defines[ 'KERNEL_SIZE' ] = kernelSize;
+
 		this.ssaoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
 		this.ssaoMaterial.uniforms[ 'tDepth' ].value = this.normalRenderTarget.depthTexture;
 		this.ssaoMaterial.uniforms[ 'tNoise' ].value = this.noiseTexture;
@@ -158,7 +157,6 @@ class SSAOPass extends Pass {
 
 		// dispose render targets
 
-		this.beautyRenderTarget.dispose();
 		this.normalRenderTarget.dispose();
 		this.ssaoRenderTarget.dispose();
 		this.blurRenderTarget.dispose();
@@ -176,15 +174,7 @@ class SSAOPass extends Pass {
 
 	}
 
-	render( renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
-
-		if ( renderer.capabilities.isWebGL2 === false ) this.noiseTexture.format = LuminanceFormat;
-
-		// render beauty
-
-		renderer.setRenderTarget( this.beautyRenderTarget );
-		renderer.clear();
-		renderer.render( this.scene, this.camera );
+	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 		// render normals and depth (honor only meshes, points and lines do not contribute to SSAO)
 
@@ -223,14 +213,6 @@ class SSAOPass extends Pass {
 
 				break;
 
-			case SSAOPass.OUTPUT.Beauty:
-
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
-
-				break;
-
 			case SSAOPass.OUTPUT.Depth:
 
 				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
@@ -247,7 +229,7 @@ class SSAOPass extends Pass {
 
 			case SSAOPass.OUTPUT.Default:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
@@ -330,7 +312,6 @@ class SSAOPass extends Pass {
 		this.width = width;
 		this.height = height;
 
-		this.beautyRenderTarget.setSize( width, height );
 		this.ssaoRenderTarget.setSize( width, height );
 		this.normalRenderTarget.setSize( width, height );
 		this.blurRenderTarget.setSize( width, height );
@@ -343,9 +324,8 @@ class SSAOPass extends Pass {
 
 	}
 
-	generateSampleKernel() {
+	generateSampleKernel( kernelSize ) {
 
-		const kernelSize = this.kernelSize;
 		const kernel = this.kernel;
 
 		for ( let i = 0; i < kernelSize; i ++ ) {
@@ -430,9 +410,8 @@ SSAOPass.OUTPUT = {
 	'Default': 0,
 	'SSAO': 1,
 	'Blur': 2,
-	'Beauty': 3,
-	'Depth': 4,
-	'Normal': 5
+	'Depth': 3,
+	'Normal': 4
 };
 
 export { SSAOPass };

@@ -8,6 +8,8 @@ import {
 
 const ColorifyShader = {
 
+	name: 'ColorifyShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null },

@@ -7,15 +7,15 @@ struct ToonMaterial {
 
 };
 
-void RE_Direct_Toon( const in IncidentLight directLight, const in GeometricContext geometry, const in ToonMaterial material, inout ReflectedLight reflectedLight ) {
+void RE_Direct_Toon( const in IncidentLight directLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in ToonMaterial material, inout ReflectedLight reflectedLight ) {
 
-	vec3 irradiance = getGradientIrradiance( geometry.normal, directLight.direction ) * directLight.color;
+	vec3 irradiance = getGradientIrradiance( geometryNormal, directLight.direction ) * directLight.color;
 
 	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
 
 }
 
-void RE_IndirectDiffuse_Toon( const in vec3 irradiance, const in GeometricContext geometry, const in ToonMaterial material, inout ReflectedLight reflectedLight ) {
+void RE_IndirectDiffuse_Toon( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in ToonMaterial material, inout ReflectedLight reflectedLight ) {
 
 	reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
 

@@ -21,7 +21,7 @@ const m = new Matrix3();
 
 		<h2>A Note on Row-Major and Column-Major Ordering</h2>
 		<p>
-			The [page:set]() method takes arguments in
+			The constructor and [page:set]() method take arguments in
 			[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order row-major] 
 			order, while internally they are stored in the [page:.elements elements] 
 			array in column-major order.<br /><br />
@@ -49,10 +49,12 @@ m.elements = [ 11, 21, 31,
 
 		<h2>Constructor</h2>
 
-		<h3>[name]()</h3>
+		<h3>[name]( [param:Number n11], [param:Number n12], [param:Number n13],
+			[param:Number n21], [param:Number n22], [param:Number n23],
+			[param:Number n31], [param:Number n32], [param:Number n33] )</h3>
 		<p>
-			Creates and initializes the [name] to the 3x3
-			[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
+			Creates a 3x3 matrix with the given arguments in row-major order. If no arguments are provided, the constructor initializes
+			the [name] to the 3x3 [link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
 		</p>
 
 		<h2>Properties</h2>
@@ -79,25 +81,85 @@ m.elements = [ 11, 21, 31,
 		<p>Return true if this matrix and [page:Matrix3 m] are equal.</p>
 
 		<h3>
-			[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis],
-			[param:Vector3 zAxis] )
+			[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )
 		</h3>
 		<p>
 			Extracts the [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] 
 			of this matrix into the three axis vectors provided. If this matrix
 			is:
-			<code>
-a, b, c, 
-d, e, f, 
-g, h, i 
-			</code>
+		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>a</mi></mtd>
+						<mtd><mi>b</mi></mtd>
+						<mtd><mi>c</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>d</mi></mtd>
+						<mtd><mi>e</mi></mtd>
+						<mtd><mi>f</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>g</mi></mtd>
+						<mtd><mi>h</mi></mtd>
+						<mtd><mi>i</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+
+		<p>
 			then the [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis]
 			will be set to:
-			<code>
-xAxis = (a, d, g) 
-yAxis = (b, e, h) 
-zAxis = (c, f, i) 
-			</code>
+		</p>
+
+		<p style="text-align: center">
+			<math>
+				<mrow>
+					<mi>xAxis</mi>
+					<mo>=</mo>
+					<mo>[</mo>
+					<mtable>
+						<mtr><mtd style="height: 1rem"><mi>a</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>d</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>g</mi></mtd></mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>,
+
+			<math>
+				<mrow>
+					<mi>yAxis</mi>
+					<mo>=</mo>
+					<mo>[</mo>
+					<mtable>
+						<mtr><mtd style="height: 1rem"><mi>b</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>e</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>h</mi></mtd></mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>, and
+
+			<math>
+				<mrow>
+					<mi>zAxis</mi>
+					<mo>=</mo>
+					<mo>[</mo>
+					<mtable>
+						<mtr><mtd style="height: 1rem"><mi>c</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>f</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>i</mi></mtd></mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>
 		</p>
 
 		<h3>
@@ -106,7 +168,7 @@ zAxis = (c, f, i)
 		<p>
 			[page:Array array] - the array to read the elements from.<br />
 			[page:Integer offset] - (optional) index of first element in the array.
-			Default is 0.<br /><br />
+			Default is `0`.<br /><br />
 
 			Sets the elements of this matrix based on an array in
 			[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
@@ -136,11 +198,31 @@ zAxis = (c, f, i)
 		<h3>[method:this identity]()</h3>
 		<p>
 			Resets this matrix to the 3x3 identity matrix:
-			<code> 
-1, 0, 0 
-0, 1, 0 
-0, 0, 1 	</code>
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this makeRotation]( [param:Float theta] )</h3>
 		<p>
@@ -149,12 +231,47 @@ zAxis = (c, f, i)
 
 			Sets this matrix as a 2D rotational transformation by [page:Float theta]
 			radians. The resulting matrix will be:
-			<code>
-cos(&theta;) -sin(&theta;) 0 
-sin(&theta;) cos(&theta;) 0 
-0 0 1
-			</code>
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>-sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this makeScale]( [param:Float x], [param:Float y] )</h3>
 		<p>
@@ -162,23 +279,66 @@ sin(&theta;) cos(&theta;) 0
 			[page:Float y] - the amount to scale in the Y axis.<br />
 
 			Sets this matrix as a 2D scale transform:
-			<code> 
-x, 0, 0, 
-0, y, 0, 
-0, 0, 1 	</code>
 		</p>
 
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>x</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+
+		<h3>[method:this makeTranslation]( [param:Vector2 v] )</h3>
 		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y] )</h3>
 		<p>
+			[page:Vector2 v] a translation transform from vector.<br />
+			or<br />
 			[page:Float x] - the amount to translate in the X axis.<br />
 			[page:Float y] - the amount to translate in the Y axis.<br />
 
 			Sets this matrix as a 2D translation transform:
-			<code>
-1, 0, x, 
-0, 1, y, 
-0, 0, 1 	</code>
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>x</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this multiply]( [param:Matrix3 m] )</h3>
 		<p>Post-multiplies this matrix by [page:Matrix3 m].</p>
@@ -198,22 +358,37 @@ x, 0, 0,
 		<p>Scales this matrix with the given scalar values.</p>
 
 		<h3>
-			[method:this set]( [param:Float n11], [param:Float n12], [param:Float n13], 
-			[param:Float n21], [param:Float n22], [param:Float n23],
-			[param:Float n31], [param:Float n32], [param:Float n33] )
+			[method:this set]( [param:Float n11], [param:Float n12], [param:Float n13], [param:Float n21], [param:Float n22], [param:Float n23], [param:Float n31], [param:Float n32], [param:Float n33] )
 		</h3>
 		<p>
-			[page:Float n11] - value to put in row 1, col 1.<br />
-			[page:Float n12] - value to put in row 1, col 2.<br />
-			...<br />
-			...<br />
-			[page:Float n32] - value to put in row 3, col 2.<br />
-			[page:Float n33] - value to put in row 3, col 3.<br /><br />
-
 			Sets the 3x3 matrix values to the given
 			[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major]
-			sequence of values.
+			sequence of values:
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>n11</mi></mtd>
+						<mtd><mi>n12</mi></mtd>
+						<mtd><mi>n13</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n21</mi></mtd>
+						<mtd><mi>n22</mi></mtd>
+						<mtd><mi>n23</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n31</mi></mtd>
+						<mtd><mi>n32</mi></mtd>
+						<mtd><mi>n33</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this premultiply]( [param:Matrix3 m] )</h3>
 		<p>Pre-multiplies this matrix by [page:Matrix3 m].</p>
@@ -224,9 +399,7 @@ x, 0, 0,
 		</p>
 
 		<h3>
-			[method:this setUvTransform]( [param:Float tx], [param:Float ty],
-			[param:Float sx], [param:Float sy], [param:Float rotation], [param:Float cx], 
-			[param:Float cy] )
+			[method:this setUvTransform]( [param:Float tx], [param:Float ty], [param:Float sx], [param:Float sy], [param:Float rotation], [param:Float cx], [param:Float cy] )
 		</h3>
 		<p>
 			[page:Float tx] - offset x<br />

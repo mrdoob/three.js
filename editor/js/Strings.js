@@ -9,10 +9,6 @@ function Strings( config ) {
 			'menubar/file': 'File',
 			'menubar/file/new': 'New',
 			'menubar/file/import': 'Import',
-			'menubar/file/export/geometry': 'Export Geometry',
-			'menubar/file/export/object': 'Export Object',
-			'menubar/file/export/scene': 'Export Scene',
-			'menubar/file/export/dae': 'Export DAE',
 			'menubar/file/export/drc': 'Export DRC',
 			'menubar/file/export/glb': 'Export GLB',
 			'menubar/file/export/gltf': 'Export GLTF',
@@ -22,16 +18,13 @@ function Strings( config ) {
 			'menubar/file/export/stl': 'Export STL',
 			'menubar/file/export/stl_binary': 'Export STL (Binary)',
 			'menubar/file/export/usdz': 'Export USDZ',
-			'menubar/file/publish': 'Publish',
 
 			'menubar/edit': 'Edit',
 			'menubar/edit/undo': 'Undo (Ctrl+Z)',
 			'menubar/edit/redo': 'Redo (Ctrl+Shift+Z)',
-			'menubar/edit/clear_history': 'Clear History',
 			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Clone',
 			'menubar/edit/delete': 'Delete (Del)',
-			'menubar/edit/fixcolormaps': 'Fix Color Maps',
 
 			'menubar/add': 'Add',
 			'menubar/add/group': 'Group',
@@ -60,10 +53,6 @@ function Strings( config ) {
 			'menubar/add/orthographiccamera': 'OrthographicCamera',
 
 			'menubar/status/autosave': 'autosave',
-
-			'menubar/play': 'Play',
-			'menubar/play/stop': 'Stop',
-			'menubar/play/play': 'Play',
 
 			'menubar/examples': 'Examples',
 			'menubar/examples/Arkanoid': 'Arkanoid',
@@ -127,6 +116,7 @@ function Strings( config ) {
 			'sidebar/object/frustumcull': 'Frustum Cull',
 			'sidebar/object/renderorder': 'Render Order',
 			'sidebar/object/userdata': 'User data',
+			'sidebar/object/export': 'Export JSON',
 
 			'sidebar/geometry/type': 'Type',
 			'sidebar/geometry/new': 'New',
@@ -135,7 +125,9 @@ function Strings( config ) {
 			'sidebar/geometry/bounds': 'Bounds',
 			'sidebar/geometry/show_vertex_normals': 'Show Vertex Normals',
 			'sidebar/geometry/compute_vertex_normals': 'Compute Vertex Normals',
+			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
 			'sidebar/geometry/center': 'Center',
+			'sidebar/geometry/export': 'Export JSON',
 
 			'sidebar/geometry/box_geometry/width': 'Width',
 			'sidebar/geometry/box_geometry/height': 'Height',
@@ -275,7 +267,9 @@ function Strings( config ) {
 			'sidebar/material/alphamap': 'Alpha Map',
 			'sidebar/material/bumpmap': 'Bump Map',
 			'sidebar/material/normalmap': 'Normal Map',
+			'sidebar/material/clearcoatmap': 'Clearcoat Map',
 			'sidebar/material/clearcoatnormalmap': 'Clearcoat Normal Map',
+			'sidebar/material/clearcoatroughnessmap': 'Clearcoat Roughness Map',
 			'sidebar/material/displacementmap': 'Displace Map',
 			'sidebar/material/roughnessmap': 'Rough. Map',
 			'sidebar/material/metalnessmap': 'Metal. Map',
@@ -304,25 +298,30 @@ function Strings( config ) {
 			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Wireframe',
 			'sidebar/material/userdata': 'User data',
+			'sidebar/material/export': 'Export JSON',
 
-			'sidebar/script': 'Script',
 			'sidebar/script/new': 'New',
 			'sidebar/script/edit': 'Edit',
 			'sidebar/script/remove': 'Remove',
 
 			'sidebar/project': 'Project',
-			'sidebar/project/title': 'Title',
-			'sidebar/project/editable': 'Editable',
-			'sidebar/project/vr': 'VR',
-			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'Antialias',
 			'sidebar/project/shadows': 'Shadows',
-			'sidebar/project/useLegacyLights': 'Use legacy lights',
-			'sidebar/project/toneMapping': 'Tone mapping',
+			'sidebar/project/toneMapping': 'Tonemapping',
 			'sidebar/project/materials': 'Materials',
 			'sidebar/project/Assign': 'Assign',
 
+			'sidebar/project/app': 'App',
+			'sidebar/project/app/play': 'Play',
+			'sidebar/project/app/stop': 'Stop',
+			'sidebar/project/app/title': 'Title',
+			'sidebar/project/app/editable': 'Editable',
+			'sidebar/project/app/publish': 'Publish',
+
+			'sidebar/project/image': 'Image',
 			'sidebar/project/video': 'Video',
+
+			'sidebar/project/shading': 'Shading',
 			'sidebar/project/resolution': 'Resolution',
 			'sidebar/project/duration': 'Duration',
 			'sidebar/project/render': 'Render',
@@ -337,22 +336,22 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/undo': 'Undo',
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
-			'sidebar/settings/viewport': 'Viewport',
-			'sidebar/settings/viewport/grid': 'Grid',
-			'sidebar/settings/viewport/helpers': 'Helpers',
-
 			'sidebar/history': 'History',
-			'sidebar/history/persistent': 'persistent',
+			'sidebar/history/clear': 'Clear',
+			'sidebar/history/persistent': 'Persistent',
 
 			'toolbar/translate': 'Translate',
 			'toolbar/rotate': 'Rotate',
 			'toolbar/scale': 'Scale',
 			'toolbar/local': 'Local',
 
+			'viewport/controls/grid': 'Grid',
+			'viewport/controls/helpers': 'Helpers',
+
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
 			'viewport/info/triangles': 'Triangles',
-			'viewport/info/frametime': 'Frametime'
+			'viewport/info/rendertime': 'Render time'
 
 		},
 
@@ -361,10 +360,6 @@ function Strings( config ) {
 			'menubar/file': 'Fichier',
 			'menubar/file/new': 'Nouveau',
 			'menubar/file/import': 'Importer',
-			'menubar/file/export/geometry': 'Exporter Geometrie',
-			'menubar/file/export/object': 'Exporter Objet',
-			'menubar/file/export/scene': 'Exporter Scene',
-			'menubar/file/export/dae': 'Exporter DAE',
 			'menubar/file/export/drc': 'Exporter DRC',
 			'menubar/file/export/glb': 'Exporter GLB',
 			'menubar/file/export/gltf': 'Exporter GLTF',
@@ -374,16 +369,13 @@ function Strings( config ) {
 			'menubar/file/export/stl': 'Exporter STL',
 			'menubar/file/export/stl_binary': 'Exporter STL (Binaire)',
 			'menubar/file/export/usdz': 'Exporter USDZ',
-			'menubar/file/publish': 'Publier',
 
 			'menubar/edit': 'Edition',
 			'menubar/edit/undo': 'Annuler (Ctrl+Z)',
 			'menubar/edit/redo': 'Refaire (Ctrl+Shift+Z)',
-			'menubar/edit/clear_history': 'Supprimer Historique',
 			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Cloner',
 			'menubar/edit/delete': 'Supprimer (Supp)',
-			'menubar/edit/fixcolormaps': 'Correction des couleurs',
 
 			'menubar/add': 'Ajouter',
 			'menubar/add/group': 'Groupe',
@@ -412,10 +404,6 @@ function Strings( config ) {
 			'menubar/add/orthographiccamera': 'Caméra orthographique',
 
 			'menubar/status/autosave': 'enregistrement automatique',
-
-			'menubar/play': 'Jouer',
-			'menubar/play/stop': 'Arrêter',
-			'menubar/play/play': 'Jouer',
 
 			'menubar/examples': 'Exemples',
 			'menubar/examples/Arkanoid': 'Arkanoid',
@@ -479,6 +467,7 @@ function Strings( config ) {
 			'sidebar/object/frustumcull': 'Culling',
 			'sidebar/object/renderorder': 'Ordre de rendus',
 			'sidebar/object/userdata': 'Données utilisateur',
+			'sidebar/object/export': 'Exporter JSON',
 
 			'sidebar/geometry/type': 'Type',
 			'sidebar/geometry/new': 'Nouveau',
@@ -487,7 +476,9 @@ function Strings( config ) {
 			'sidebar/geometry/bounds': 'Limites',
 			'sidebar/geometry/show_vertex_normals': 'Afficher normales',
 			'sidebar/geometry/compute_vertex_normals': 'Compute Vertex Normals',
+			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
 			'sidebar/geometry/center': 'Center',
+			'sidebar/geometry/export': 'Exporter JSON',
 
 			'sidebar/geometry/box_geometry/width': 'Largeur',
 			'sidebar/geometry/box_geometry/height': 'Hauteur',
@@ -656,25 +647,30 @@ function Strings( config ) {
 			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Fil de fer',
 			'sidebar/material/userdata': 'Données utilisateur',
+			'sidebar/material/export': 'Exporter JSON',
 
-			'sidebar/script': 'Script',
 			'sidebar/script/new': 'Nouveau',
 			'sidebar/script/edit': 'Editer',
 			'sidebar/script/remove': 'Supprimer',
 
 			'sidebar/project': 'Projet',
-			'sidebar/project/title': 'Titre',
-			'sidebar/project/editable': 'Modifiable',
-			'sidebar/project/vr': 'VR',
-			'sidebar/project/renderer': 'Rendus',
 			'sidebar/project/antialias': 'Anticrénelage',
 			'sidebar/project/shadows': 'Ombres',
-			'sidebar/project/useLegacyLights': 'Use legacy lights',
 			'sidebar/project/toneMapping': 'Mappage des nuances',
 			'sidebar/project/materials': 'Matériaux',
 			'sidebar/project/Assign': 'Attribuer',
 
+			'sidebar/project/app': 'App',
+			'sidebar/project/app/play': 'Jouer',
+			'sidebar/project/app/stop': 'Arrêter',
+			'sidebar/project/app/title': 'Titre',
+			'sidebar/project/app/editable': 'Modifiable',
+			'sidebar/project/app/publish': 'Publier',
+
+			'sidebar/project/image': 'Image',
 			'sidebar/project/video': 'Video',
+
+			'sidebar/project/shading': 'Shading',
 			'sidebar/project/resolution': 'Resolution',
 			'sidebar/project/duration': 'Duration',
 			'sidebar/project/render': 'Render',
@@ -689,22 +685,22 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/undo': 'Annuler',
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
-			'sidebar/settings/viewport': 'Viewport',
-			'sidebar/settings/viewport/grid': 'Grille',
-			'sidebar/settings/viewport/helpers': 'Helpers',
-
 			'sidebar/history': 'Historique',
-			'sidebar/history/persistent': 'permanent',
+			'sidebar/history/clear': 'Supprimer',
+			'sidebar/history/persistent': 'Permanent',
 
 			'toolbar/translate': 'Position',
 			'toolbar/rotate': 'Rotation',
 			'toolbar/scale': 'Échelle',
 			'toolbar/local': 'Local',
 
+			'viewport/controls/grid': 'Grille',
+			'viewport/controls/helpers': 'Helpers',
+
 			'viewport/info/objects': 'Objets',
 			'viewport/info/vertices': 'Sommets',
 			'viewport/info/triangles': 'Triangles',
-			'viewport/info/frametime': 'Temps de trame'
+			'viewport/info/rendertime': 'Render time'
 
 		},
 
@@ -713,10 +709,6 @@ function Strings( config ) {
 			'menubar/file': '文件',
 			'menubar/file/new': '新建',
 			'menubar/file/import': '导入',
-			'menubar/file/export/geometry': '导出几何体',
-			'menubar/file/export/object': '导出物体',
-			'menubar/file/export/scene': '导出场景',
-			'menubar/file/export/dae': '导出DAE',
 			'menubar/file/export/drc': '导出DRC',
 			'menubar/file/export/glb': '导出GLB',
 			'menubar/file/export/gltf': '导出GLTF',
@@ -726,16 +718,13 @@ function Strings( config ) {
 			'menubar/file/export/stl': '导出STL',
 			'menubar/file/export/stl_binary': '导出STL(二进制)',
 			'menubar/file/export/usdz': '导出USDZ',
-			'menubar/file/publish': '发布',
 
 			'menubar/edit': '编辑',
 			'menubar/edit/undo': '撤销 (Ctrl+Z)',
 			'menubar/edit/redo': '重做 (Ctrl+Shift+Z)',
-			'menubar/edit/clear_history': '清空历史记录',
 			'menubar/edit/center': '居中',
 			'menubar/edit/clone': '拷贝',
 			'menubar/edit/delete': '删除 (Del)',
-			'menubar/edit/fixcolormaps': '修复颜色贴图',
 
 			'menubar/add': '添加',
 			'menubar/add/group': '组',
@@ -764,10 +753,6 @@ function Strings( config ) {
 			'menubar/add/orthographiccamera': '正交相机',
 
 			'menubar/status/autosave': '自动保存',
-
-			'menubar/play': '启动',
-			'menubar/play/stop': '暂停',
-			'menubar/play/play': '启动',
 
 			'menubar/examples': '示例',
 			'menubar/examples/Arkanoid': '打砖块',
@@ -831,6 +816,7 @@ function Strings( config ) {
 			'sidebar/object/frustumcull': '视锥体裁剪',
 			'sidebar/object/renderorder': '渲染次序',
 			'sidebar/object/userdata': '自定义数据',
+			'sidebar/object/export': '导出JSON',
 
 			'sidebar/geometry/type': '类型',
 			'sidebar/geometry/new': '更新',
@@ -839,7 +825,9 @@ function Strings( config ) {
 			'sidebar/geometry/bounds': '界限',
 			'sidebar/geometry/show_vertex_normals': '显示顶点法线',
 			'sidebar/geometry/compute_vertex_normals': '计算顶点法线',
+			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
 			'sidebar/geometry/center': '居中',
+			'sidebar/geometry/export': '导出JSON',
 
 			'sidebar/geometry/box_geometry/width': '宽度',
 			'sidebar/geometry/box_geometry/height': '高度',
@@ -1008,25 +996,30 @@ function Strings( config ) {
 			'sidebar/material/depthwrite': '深度缓冲',
 			'sidebar/material/wireframe': '线框',
 			'sidebar/material/userdata': '自定义数据',
+			'sidebar/material/export': '导出JSON',
 
-			'sidebar/script': '脚本',
 			'sidebar/script/new': '新建',
 			'sidebar/script/edit': '编辑',
 			'sidebar/script/remove': '删除',
 
 			'sidebar/project': '项目',
-			'sidebar/project/title': '标题',
-			'sidebar/project/editable': '编辑性',
-			'sidebar/project/vr': '虚拟现实',
-			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
-			'sidebar/project/useLegacyLights': '传统灯',
 			'sidebar/project/toneMapping': '色调映射',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
 
+			'sidebar/project/app': 'App',
+			'sidebar/project/app/play': '启动',
+			'sidebar/project/app/stop': '暂停',
+			'sidebar/project/app/title': '标题',
+			'sidebar/project/app/editable': '编辑性',
+			'sidebar/project/app/publish': '发布',
+
+			'sidebar/project/image': 'Image',
 			'sidebar/project/video': '视频',
+
+			'sidebar/project/shading': 'Shading',
 			'sidebar/project/resolution': '分辨率',
 			'sidebar/project/duration': '时长',
 			'sidebar/project/render': '渲染',
@@ -1041,11 +1034,8 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/undo': '撤销',
 			'sidebar/settings/shortcuts/focus': '聚焦',
 
-			'sidebar/settings/viewport': '视窗',
-			'sidebar/settings/viewport/grid': '网格',
-			'sidebar/settings/viewport/helpers': '辅助',
-
 			'sidebar/history': '历史记录',
+			'sidebar/history/clear': '清空',
 			'sidebar/history/persistent': '本地存储',
 
 			'toolbar/translate': '移动',
@@ -1053,10 +1043,13 @@ function Strings( config ) {
 			'toolbar/scale': '缩放',
 			'toolbar/local': '本地',
 
+			'viewport/controls/grid': '网格',
+			'viewport/controls/helpers': '辅助',
+
 			'viewport/info/objects': '物体',
 			'viewport/info/vertices': '顶点',
 			'viewport/info/triangles': '三角形',
-			'viewport/info/frametime': '帧时'
+			'viewport/info/rendertime': 'Render time'
 
 		}
 

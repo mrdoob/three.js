@@ -1,9 +1,8 @@
-﻿function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
+﻿import { IntType } from '../../constants.js';
+
+function WebGLBindingStates( gl, attributes ) {
 
 	const maxVertexAttributes = gl.getParameter( gl.MAX_VERTEX_ATTRIBS );
-
-	const extension = capabilities.isWebGL2 ? null : extensions.get( 'OES_vertex_array_object' );
-	const vaoAvailable = capabilities.isWebGL2 || extension !== null;
 
 	const bindingStates = {};
 
@@ -15,38 +14,18 @@
 
 		let updateBuffers = false;
 
-		if ( vaoAvailable ) {
+		const state = getBindingState( geometry, program, material );
 
-			const state = getBindingState( geometry, program, material );
+		if ( currentState !== state ) {
 
-			if ( currentState !== state ) {
-
-				currentState = state;
-				bindVertexArrayObject( currentState.object );
-
-			}
-
-			updateBuffers = needsUpdate( object, geometry, program, index );
-
-			if ( updateBuffers ) saveCache( object, geometry, program, index );
-
-		} else {
-
-			const wireframe = ( material.wireframe === true );
-
-			if ( currentState.geometry !== geometry.id ||
-				currentState.program !== program.id ||
-				currentState.wireframe !== wireframe ) {
-
-				currentState.geometry = geometry.id;
-				currentState.program = program.id;
-				currentState.wireframe = wireframe;
-
-				updateBuffers = true;
-
-			}
+			currentState = state;
+			bindVertexArrayObject( currentState.object );
 
 		}
+
+		updateBuffers = needsUpdate( object, geometry, program, index );
+
+		if ( updateBuffers ) saveCache( object, geometry, program, index );
 
 		if ( index !== null ) {
 
@@ -72,25 +51,19 @@
 
 	function createVertexArrayObject() {
 
-		if ( capabilities.isWebGL2 ) return gl.createVertexArray();
-
-		return extension.createVertexArrayOES();
+		return gl.createVertexArray();
 
 	}
 
 	function bindVertexArrayObject( vao ) {
 
-		if ( capabilities.isWebGL2 ) return gl.bindVertexArray( vao );
-
-		return extension.bindVertexArrayOES( vao );
+		return gl.bindVertexArray( vao );
 
 	}
 
 	function deleteVertexArrayObject( vao ) {
 
-		if ( capabilities.isWebGL2 ) return gl.deleteVertexArray( vao );
-
-		return extension.deleteVertexArrayOES( vao );
+		return gl.deleteVertexArray( vao );
 
 	}
 
@@ -288,9 +261,7 @@
 
 		if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
 
-			const extension = capabilities.isWebGL2 ? gl : extensions.get( 'ANGLE_instanced_arrays' );
-
-			extension[ capabilities.isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
+			gl.vertexAttribDivisor( attribute, meshPerAttribute );
 			attributeDivisors[ attribute ] = meshPerAttribute;
 
 		}
@@ -315,9 +286,9 @@
 
 	}
 
-	function vertexAttribPointer( index, size, type, normalized, stride, offset ) {
+	function vertexAttribPointer( index, size, type, normalized, stride, offset, integer ) {
 
-		if ( capabilities.isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT ) ) {
+		if ( integer === true ) {
 
 			gl.vertexAttribIPointer( index, size, type, stride, offset );
 
@@ -330,12 +301,6 @@
 	}
 
 	function setupVertexAttributes( object, material, program, geometry ) {
-
-		if ( capabilities.isWebGL2 === false && ( object.isInstancedMesh || geometry.isInstancedBufferGeometry ) ) {
-
-			if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) return;
-
-		}
 
 		initAttributes();
 
@@ -374,6 +339,10 @@
 					const buffer = attribute.buffer;
 					const type = attribute.type;
 					const bytesPerElement = attribute.bytesPerElement;
+
+					// check for integer attributes
+
+					const integer = ( type === gl.INT || type === gl.UNSIGNED_INT || geometryAttribute.gpuType === IntType );
 
 					if ( geometryAttribute.isInterleavedBufferAttribute ) {
 
@@ -415,7 +384,8 @@
 								type,
 								normalized,
 								stride * bytesPerElement,
-								( offset + ( size / programAttribute.locationSize ) * i ) * bytesPerElement
+								( offset + ( size / programAttribute.locationSize ) * i ) * bytesPerElement,
+								integer
 							);
 
 						}
@@ -456,7 +426,8 @@
 								type,
 								normalized,
 								size * bytesPerElement,
-								( size / programAttribute.locationSize ) * i * bytesPerElement
+								( size / programAttribute.locationSize ) * i * bytesPerElement,
+								integer
 							);
 
 						}

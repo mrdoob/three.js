@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Material] &rarr; [page:MeshStandardMaterial] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		تمديد لـ [page:MeshStandardMaterial]، يوفر خصائص تقديم
+		أكثر تقدمًا على أساس الفيزياء:
+		</p>
+			
+		<ul>
+			<li>
+				<b>طلاء شفاف:</b> بعض المواد - مثل طلاءات السيارات والألياف الكربونية و
+				الأسطح الرطبة - تتطلب طبقة شفافة عاكسة فوق طبقة أخرى
+				قد تكون غير منتظمة أو خشنة. يقرب الطلاء الشفاف هذا التأثير،
+				دون الحاجة إلى سطح شفاف منفصل.
+			</li>
+			<li>
+				<b>الشفافية المستندة إلى الفيزياء:</b> إحدى قيود
+				[page:Material.opacity .opacity] هو أن المواد شديدة الشفافية
+				أقل انعكاسية. يوفر [page:.transmission] المستند إلى الفيزياء
+				خيارًا أكثر واقعية للأسطح الشفافة الرقيقة مثل الزجاج.
+			</li>
+			<li>
+				<b>انعكاسية متقدمة:</b> انعكاسية أكثر مرونة للمواد غير المعدنية.
+			</li>
+			<li>
+				<b>اللمعان:</b> يمكن استخدامه لتمثيل مواد القماش والأقمشة.
+			</li>
+		</ul>
+			
+		<p>
+		نتيجة لهذه الميزات المعقدة للظلال، يحتوي MeshPhysicalMaterial على
+		تكلفة أداء أعلى، لكل بكسل، من مواد three.js الأخرى. معظم
+		التأثيرات معطلة افتراضيًا، وتضيف التكلفة كما يتم تمكينها. للحصول على أفضل النتائج، حدد دائمًا [page:.envMap خريطة بيئة] عند استخدام
+		هذه المادة.
+		</p>
+			
+		<iframe
+			id="scene"
+			src="scenes/material-browser.html#MeshPhysicalMaterial"
+		></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>أمثلة (Examples)</h2>
+		<p>
+		[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
+		[example:webgl_loader_gltf_sheen loader / gltf / sheen]<br />
+		[example:webgl_materials_physical_transmission materials / physical / transmission]
+		</p>
+
+		<h2>المنشئ (Constructor)</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+		[page:Object parameters] - (اختياري) كائن بواحد أو أكثر
+		خصائص تحدد مظهر المادة. يمكن تمرير أي خاصية من
+		المادة (بما في ذلك أي خاصية موروثة من [page:Material] و
+		[page:MeshStandardMaterial]) هنا.<br /><br />
+
+		الاستثناء هو الخاصية [page:Hexadecimal color]، التي يمكن
+		تمريرها كسلسلة ست عشرية وهي `0xffffff` (أبيض) بشكل افتراضي.
+		يتم استدعاء [page:Color.set]( color ) داخليًا.
+		</p>
+
+		<h2>الخصائص (Properties)</h2>
+		<p>
+		انظر إلى فئات [page:Material] و [page:MeshStandardMaterial] الأساسية للخصائص المشتركة.
+		</p>
+
+		<h3>[property:Color attenuationColor]</h3>
+		<p>
+		اللون الذي يتحول إليه الضوء الأبيض بسبب الامتصاص عند الوصول إلى
+		مسافة التخفيف. الافتراضى هو `white` (0xffffff).
+		</p>
+
+		<h3>[property:Float attenuationDistance]</h3>
+		<p>
+		كثافة الوسط المعطاة كمتوسط ​​المسافة التي يسافرها الضوء في
+		الوسط قبل التفاعل مع جزيئة. يتم إعطاء القيمة في وحدات مساحة العالم
+		، ويجب أن تكون أكبر من الصفر. الافتراضي هو `Infinity`.
+		</p>
+		
+		<h3>[property:Float clearcoat]</h3>
+		<p>
+		يمثل شدة طبقة الطلاء الشفاف، من `0.0` إلى `1.0`. استخدم
+		خصائص طلاء شفاف ذات الصلة لتمكين المواد متعددة الطبقات التي لديها
+		طبقة رقيقة شفافة فوق الطبقة الأساسية. الافتراضى هو `0.0`.
+		</p>
+		
+		<h3>[property:Texture clearcoatMap]</h3>
+		<p>
+		تتم ضرب قناة اللون الأحمر من هذه القوام ضد [page:.clearcoat]،
+		للتحكم في شدة طلاء لكل بكسل. الافتراضى هى `null`.
+		</p>
+		
+		<h3>[property:Texture clearcoatNormalMap]</h3>
+		<p>
+		يمكن استخدامه لتمكين المعايير المستقلة لطبقة الطلاء الشفاف.
+		الافتراضى هى `null`.
+		</p>
+		
+		<h3>[property:Vector2 clearcoatNormalScale]</h3>
+		<p>
+		مدى تأثير [page:.clearcoatNormalMap] على طبقة الطلاء الشفاف، من
+		`(0,0)` إلى `(1,1)`. الافتراضى هو `(1,1)`.
+		</p>
+		
+		<h3>[property:Float clearcoatRoughness]</h3>
+		<p>
+		خشونة طبقة الطلاء الشفاف، من `0.0` إلى `1.0`. الافتراضى هو `0.0`.
+		</p>
+		
+		<h3>[property:Texture clearcoatRoughnessMap]</h3>
+		<p>
+		تتم ضرب قناة اللون الأخضر من هذه القوام ضد
+		[page:.clearcoatRoughness]، للتحكم في خشونة طلاء لكل بكسل.
+		الافتراضى هى `null`.
+		</p>
+		
+		<h3>[property:Object defines]</h3>
+		<p>
+		كائن من نوع:
+		<code>
+		{ 
+			'STANDARD': '',
+			'PHYSICAL': '', 
+		};
+		</code>
+		
+		يستخدم هذا بواسطة [page:WebGLRenderer] لتحديد المُظَهِّرات.
+		</p>
+		
+
+		<h3>[property:Float ior]</h3>
+		<p>
+			Index-of-refraction for non-metallic materials, from `1.0` to `2.333`.
+			Default is `1.5`.<br />
+		</p>
+
+		<h3>[property:Float reflectivity]</h3>
+		<p>
+		درجة الانعكاسية، من `0.0` إلى `1.0`. الافتراضي هو `0.5`، الذي
+		يتوافق مع مؤشر انكسار 1.5.<br />
+		
+		هذا ينمذج انعكاسية المواد غير المعدنية. ليس له تأثير
+		عندما يكون [page:MeshStandardMaterial.metalness metalness] هو `1.0`
+		</p>
+		
+		<h3>[property:Float sheen]</h3>
+		<p>
+		شدة طبقة اللمعان، من `0.0` إلى `1.0`. الافتراضي هو `0.0`.
+		</p>
+		
+		<h3>[property:Float sheenRoughness]</h3>
+		<p>خشونة طبقة اللمعان، من `0.0` إلى `1.0`. الافتراضي هو `1.0`.</p>
+		
+		<h3>[property:Texture sheenRoughnessMap]</h3>
+		<p>
+		تتم ضرب قناة الألفا من هذه القوام ضد
+		[page:.sheenRoughness]، للتحكم في خشونة اللمعان لكل بكسل.
+		الافتراضى هى `null`.
+		</p>
+		
+		<h3>[property:Color sheenColor]</h3>
+		<p>لون اللمعان. الافتراضي هو `0x000000`، أسود.</p>
+		
+		<h3>[property:Texture sheenColorMap]</h3>
+		<p>
+		تتم ضرب قنوات RGB من هذه القوام ضد
+		[page:.sheenColor]، للتحكم في لون اللمعان لكل بكسل. الافتراضي
+		هو `null`.
+		</p>
+		
+		<h3>[property:Float specularIntensity]</h3>
+		<p>
+		عدد عائم يُقيِّس كمية الانعكاس العاكس للأشياء غير المعدنية فقط.
+		عند تعيينه على صفر، يصبح النموذج فعالًا كـ Lambertian. من `0.0` إلى
+		`1.0`. الافتراضى هو `1.0`.
+		</p>
+		
+		<h3>[property:Texture specularIntensityMap]</h3>
+		<p>
+		تتم ضرب قناة الألفا من هذه القوام ضد
+		[page:.specularIntensity]، للتحكم في شدة الانعكاس العاكس لكل بكسل.
+		الافتراضى هى `null`.
+		</p>
+
+		<h3>[property:Color specularColor]</h3>
+		<p>
+		[page:Color] يلون الانعكاس العاكس عند التعرض الطبيعي للأشياء غير المعدنية فقط. الافتراضي هو `0xffffff`، أبيض.
+		</p>
+		
+		<h3>[property:Texture specularColorMap]</h3>
+		<p>
+		تتم ضرب قنوات RGB من هذه القوام ضد
+		[page:.specularColor]، للتحكم في لون العاكس لكل بكسل. الافتراضي
+		هو `null`.
+		</p>
+		
+		<h3>[property:Float thickness]</h3>
+		<p>
+		سُمْكُ الحجمِ تحتَ السطحِ. يُعطى القيمةُ في
+		مساحة التنسيق للشبكة. إذا كانت القيمة 0 فإن المادة
+		رقيقة الجدران. وإلا فإن المادة هي حدود حجم. الافتراضي هو `0`.
+		</p>
+		
+		<h3>[property:Texture thicknessMap]</h3>
+		<p>
+		قوام يحدد السُمْكَ، مخزن في قناة G. سيتم ضرب هذا بـ
+		[page:.thickness]. الافتراضي هو `null`.
+		</p>
+		
+		<h3>[property:Float transmission]</h3>
+		<p>
+		درجة الإرسال (أو الشفافية البصرية)، من `0.0` إلى `1.0`.
+		الافتراضي هو `0.0`.<br />
+		
+		المواد البلاستيكية أو الزجاجية رقيقة أو شفافة أو نصف شفافة تظل
+		عاكسة إلى حد كبير حتى لو كانت مُرسِلَة بالكامل. يمكن استخدام خاصية الإرسال لنمذجة هذه المواد.<br />
+		
+		عندما يكون الإرسال غير صفر، يجب تعيين [page:Material.opacity opacity] `إلى `1.
+		</p>
+		
+		<h3>[property:Texture transmissionMap]</h3>
+		<p>
+		تتم ضرب قناة اللون الأحمر من هذه القوام ضد
+		[page:.transmission]، للتحكم في الشفافية البصرية لكل بكسل.
+		الافتراضى هى `null`.
+		</p>
+		
+		<h2>الطرق (Methods)</h2>
+		<p>
+		انظر إلى فئات [page:Material] و [page:MeshStandardMaterial] الأساسية للطرق المشتركة.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

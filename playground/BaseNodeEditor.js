@@ -1,5 +1,6 @@
 import { Node, ButtonInput, TitleElement, ContextMenu } from 'flow';
-import { exportJSON, onValidNode, getColorFromValue, getTypeFromValue, getColorFromType } from './NodeEditorUtils.js';
+import { exportJSON, onValidNode } from './NodeEditorUtils.js';
+import { setOutputAestheticsFromNode, getColorFromNode, getLengthFromNode } from './DataTypeLib.js';
 
 export class BaseNodeEditor extends Node {
 
@@ -15,12 +16,11 @@ export class BaseNodeEditor extends Node {
 
 		this.setWidth( width );
 
-		this.outputLength = 1;
-
 		const title = new TitleElement( name )
 			.setObjectCallback( getObjectCallback )
-			.setSerializable( false )
-			.setOutput( this.outputLength );
+			.setSerializable( false );
+		
+		setOutputAestheticsFromNode( title, value );
 
 		const contextButton = new ButtonInput().onClick( () => {
 
@@ -78,19 +78,14 @@ export class BaseNodeEditor extends Node {
 
 		this.onValidElement = onValidNode;
 
-		this.updateOutputConnection();
-
-	}
-
-	getOutputType() {
-
-		return getTypeFromValue( this.value );
-
+		this.outputLength = getLengthFromNode( value );
 	}
 
 	getColor() {
 
-		return ( getColorFromType( this.getOutputType() ) || '#777777' ) + 'BB';
+		const color = getColorFromNode( this.value );
+
+		return color ? color + 'BB' : null;
 
 	}
 
@@ -162,16 +157,6 @@ export class BaseNodeEditor extends Node {
 
 	}
 
-	setOutputLength( value ) {
-
-		this.outputLength = value;
-
-		this.updateOutputConnection();
-
-		return;
-
-	}
-
 	setObjectCallback( callback ) {
 
 		this.title.setObjectCallback( callback );
@@ -191,14 +176,6 @@ export class BaseNodeEditor extends Node {
 		this.title.setColor( color );
 
 		return this;
-
-	}
-
-	updateOutputConnection() {
-
-		this.title.setOutputColor( getColorFromValue( this.value ) );
-
-		this.title.setOutput( this.value ? this.outputLength : 0 );
 
 	}
 

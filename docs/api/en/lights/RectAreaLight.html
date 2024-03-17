@@ -58,9 +58,9 @@ rectLight.add( rectLightHelper );
 			[page:Integer color] - (optional) hexadecimal color of the light. Default
 			is 0xffffff (white).<br />
 			[page:Float intensity] - (optional) the light's intensity, or brightness.
-			Default is 1.<br />
-			[page:Float width] - (optional) width of the light. Default is 10.<br />
-			[page:Float height] - (optional) height of the light. Default is 10.<br /><br />
+			Default is `1`.<br />
+			[page:Float width] - (optional) width of the light. Default is `10`.<br />
+			[page:Float height] - (optional) height of the light. Default is `10`.<br /><br />
 
 			Creates a new [name].
 		</p>
@@ -73,10 +73,8 @@ rectLight.add( rectLightHelper );
 
 		<h3>[property:Float intensity]</h3>
 		<p>
-			The light's intensity. Default is `1`.<br />
-			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode,
-			intensity is the luminance (brightness) of the light measured in nits
-			(cd/m^2).<br /><br />
+			The light's intensity. It is the luminance (brightness) of the light measured in nits (cd/m^2). 
+			Default is `1`. <br /><br />
 
 			Changing the intensity will also change the light's power.
 		</p>
@@ -87,8 +85,7 @@ rectLight.add( rectLightHelper );
 		<h3>[property:Float power]</h3>
 		<p>
 			The light's power.<br />
-			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode,
-			power is the luminous power of the light measured in lumens (lm).
+			Power is the luminous power of the light measured in lumens (lm).
 			<br /><br />
 
 			Changing the power will also change the light's intensity.

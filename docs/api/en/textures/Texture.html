@@ -84,8 +84,8 @@
 
 		<h3>[property:Integer channel]</h3>
 		<p>
-			Lets you select the uv attribute to map the texture to. `0` for `uv` and
-			`1` for `uv2`.
+			Lets you select the uv attribute to map the texture to. `0` for `uv`,
+			`1` for `uv1`, `2` for `uv2` and `3` for `uv3`.
 		</p>
 
 		<h3>[property:number wrapS]</h3>
@@ -133,7 +133,7 @@
 		<h3>[property:number anisotropy]</h3>
 		<p>
 			The number of samples taken along the axis through the pixel that has the
-			highest density of texels. By default, this value is 1. A higher value
+			highest density of texels. By default, this value is `1`. A higher value
 			gives a less blurry result than a basic mipmap, at the cost of more
 			texture samples being used. Use [page:WebGLRenderer.capabilities renderer.capabilities.getMaxAnisotropy]() 
 			to find the maximum valid anisotropy value for the GPU; this value is usually a power of 2.
@@ -253,14 +253,11 @@
 			[link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei] for more information.
 		</p>
 
-		<h3>[property:number colorSpace]</h3>
+		<h3>[property:string colorSpace]</h3>
 		<p>
-			[page:Textures THREE.NoColorSpace] is the default. See the [page:Textures texture constants] 
-			page for details of other formats.<br /><br />
-
-			Note that if this value is changed on a texture after the material has
-			been used, it is necessary to trigger a Material.needsUpdate for this
-			value to be realized in the shader.
+			[page:Textures THREE.NoColorSpace] is the default. Textures containing color data should be
+			annotated with [page:Textures THREE.SRGBColorSpace] or
+			[page:Textures THREE.LinearSRGBColorSpace].
 		</p>
 
 		<h3>[property:Integer version]</h3>
@@ -284,6 +281,7 @@
 		<p>
 			An object that can be used to store custom data about the texture. It
 			should not hold references to functions as these will not be cloned.
+			Default is an empty object `{}`.
 		</p>
 
 		<h3>[property:Source source]</h3>

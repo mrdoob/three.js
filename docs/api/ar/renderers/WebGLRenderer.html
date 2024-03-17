@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+		يعرض مقدم WebGL مشاهدك المصنوعة بشكل جميل باستخدام
+		[link:https://en.wikipedia.org/wiki/WebGL WebGL].
+		</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+		[page:Object parameters] - (اختياري) كائن بخصائص تحدد سلوك المقدم.
+		يقبل المنشئ أيضًا عدم وجود معلمات على الإطلاق.
+		في جميع الحالات ، سيفترض الافتراضات السليمة عندما تكون المعلمات مفقودة.
+		التالية هي المعلمات الصالحة: <br /><br />
+		 
+		[page:DOMElement canvas] - A
+		[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas]
+		حيث يرسم المقدم ناتجه. يتوافق هذا مع
+		[page:WebGLRenderer.domElement domElement] property below. إذا لم يتم تمريره
+		هنا ، سيتم إنشاء عنصر قماش جديد. <br />
+		 
+		[page:WebGLRenderingContext context] - يمكن استخدام هذا لإرفاق
+		المقدم بـ
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext] موجود.
+		الافتراضي هو null. <br />
+		 
+		[page:String precision] - دقة الشادر. يمكن أن يكون `"highp"` ، `"mediump"`
+		أو `"lowp"`. الافتراضي هو `"highp"` إذا كان مدعومًا من قبل الجهاز. <br />
+		 
+		[page:Boolean alpha] - يتحكم في قيمة alpha الافتراضية الواضحة. عند تعيينه على
+		`true` ، تكون القيمة `0`. وإلا فهو `1`. الافتراضي هو `false`. <br />
+		 
+		[page:Boolean premultipliedAlpha] - ما إذا كان المقدم سيفترض أن
+		الألوان لديها
+		[link:https://en.wikipedia.org/wiki/Glossary_of_computer_graphics#Premultiplied_alpha premultiplied alpha].
+		الافتراضي هو `true`. <br />
+		 
+		[page:Boolean antialias] - ما إذا كان سيتم إجراء التنعيم. الافتراضي هو
+		`false`. <br />
+		 
+		[page:Boolean stencil] - ما إذا كانت ذاكرة التخزين المؤقت للرسم لديها
+		[link:https://en.wikipedia.org/wiki/Stencil_buffer stencil buffer] من على
+		الأقل 8 بت. الافتراضي هو `false`. <br />
+		 
+		[page:Boolean preserveDrawingBuffer] - ما إذا كان سيتم الحفاظ على المخابئ
+		حتى يتم مسحها يدويًا أو استبدالها. الافتراضي هو `false`. <br />
+		 
+		[page:String powerPreference] - يوفر تلميحًا لوكيل المستخدم
+		تشير إلى ما هو التكوين من GPU مناسب لهذه سياق WebGL.
+		يمكن أن يكون `"high-performance"` ، `"low-power"` أو `"default"`. الافتراضي هو
+		`"default"`. انظر
+		[link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2 WebGL spec] للحصول على التفاصيل. <br />
+		 
+		[page:Boolean failIfMajorPerformanceCaveat] - ما إذا كان إنشاء المقدم
+		سيفشل عند اكتشاف أداء منخفض. الافتراضي هو `false`.
+		انظر [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2 WebGL spec] للحصول على التفاصيل. <br />
+		 
+		[page:Boolean depth] - ما إذا كانت ذاكرة التخزين المؤقت للرسم لديها
+		[link:https://en.wikipedia.org/wiki/Z-buffering مخزن عمق] من على الأقل
+		16 بت. الافتراضي هو `true`. <br />
+		 
+		[page:Boolean logarithmicDepthBuffer] - ما إذا كان سيتم استخدام مخزن عمق لوغاريتمي
+		قد يكون من الضروري استخدام هذا إذا كان يتعامل مع اختلافات ضخمة
+		في المقياس في مشهد واحد. لاحظ أن هذا الإعداد يستخدم gl_FragDepth إذا
+		متوفرة والتي تعطل
+		[link:https://www.khronos.org/opengl/wiki/Early_Fragment_Test Early Fragment Test]
+		التحسين ويمكن أن يسبب انخفاضًا في الأداء.
+		الافتراضي هو `false`. انظر [example:webgl_camera_logarithmicdepthbuffer camera / logarithmicdepthbuffer] المثال.
+		</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+
+		<h3>[property:Boolean autoClear]</h3>
+		<p>
+		يحدد ما إذا كان المُعالج يجب أن يمسح تلقائيًا ناتجه قبل
+		عرض الإطار.
+		</p>
+	 
+		<h3>[property:Boolean autoClearColor]</h3>
+		<p>
+		إذا كان [page:.autoClear autoClear] صحيحًا ، يحدد ما إذا كان المُعالج
+		يجب مسح مخزن اللون. الافتراضي هو `true`.
+		</p>
+	 
+		<h3>[property:Boolean autoClearDepth]</h3>
+		<p>
+		إذا كان [page:.autoClear autoClear] صحيحًا ، يحدد ما إذا كان المُعالج
+		يجب مسح مخزن العمق. الافتراضي هو `true`.
+		</p>
+	 
+		<h3>[property:Boolean autoClearStencil]</h3>
+		<p>
+		إذا كان [page:.autoClear autoClear] صحيحًا ، يحدد ما إذا كان المُعالج
+		يجب مسح مخزن القالب. الافتراضي هو `true`.
+		</p>
+	 
+		<h3>[property:Object debug]</h3>
+		<p>
+		- [page:Boolean checkShaderErrors]: إذا كان صحيحًا ، يحدد ما إذا كان
+		يتم التحقق من برامج الشادر المادية للأخطاء أثناء التجميع و
+		عملية الربط. قد يكون من المفيد تعطيل هذا الفحص في الإنتاج لـ
+		الحصول على مكاسب في الأداء. يوصى بشدة بالاحتفاظ بهذه الفحوصات ممكّنة
+		أثناء التطوير. إذا لم يتم تجميع وربط الشادر - فلن يعمل
+		والمادة المرتبطة لن تعرض. الافتراضي هو `true`.<br />
+		- [page:Function onShaderError]( gl, program, glVertexShader,
+		glFragmentShader ): وظيفة رد اتصال يمكن استخدامها للإبلاغ عن الأخطاء المخصصة
+		التقارير. يتلقى الرد الاتصال سياق WebGL ، ومثيل من
+		WebGLProgram كذلك اثنين من مثيلات WebGLShader تمثل قمة
+		وشادر الجزء. تعيين وظيفة مخصصة يعطل الافتراضي
+		التقارير عن الأخطاء. الافتراضي هو `null`.
+		</p>
+	 
+		<h3>[property:Object capabilities]</h3>
+		<p>
+		كائن يحتوي على تفاصيل حول قدرات الحالية
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext].<br />
+	 
+		- [page:Boolean floatFragmentTextures]: ما إذا كان السياق يدعم
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/OES_texture_float OES_texture_float] extension.<br />
+		- [page:Boolean floatVertexTextures]: `true` إذا كان [page:Boolean floatFragmentTextures] 
+		و [page:Boolean vertexTextures] صحيحان على حد سواء.<br />
+		- [page:Method getMaxAnisotropy](): يعود بأقصى قدر متاح
+		التشوه.<br />
+		- [page:Method getMaxPrecision](): يعود بأقصى دقة متاحة
+		لشادرات القمة والجزء. <br />
+		- [page:Boolean isWebGL2]: `true` إذا كان السياق في استخدام هو a
+		WebGL2RenderingContext object.<br />
+		- [page:Boolean logarithmicDepthBuffer]: `true` إذا كان [page:parameter logarithmicDepthBuffer] 
+		تم تعيينه على true في المُنشئ والسياق
+		يدعم
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/EXT_frag_depth EXT_frag_depth] extension.<br />
+		- [page:Integer maxAttributes]: قيمة `gl.MAX_VERTEX_ATTRIBS`.<br />
+		- [page:Integer maxCubemapSize]: قيمة
+		`gl.MAX_CUBE_MAP_TEXTURE_SIZE`. أقصى ارتفاع * عرض لخرائط المكعبات
+		الملمسات التي يمكن استخدامها من قبل شادر.<br />
+		- [page:Integer maxFragmentUniforms]: قيمة
+		`gl.MAX_FRAGMENT_UNIFORM_VECTORS`. عدد الموحدات التي يمكن استخدامها
+		من قبل شادر جزء.<br />
+		- [page:Integer maxSamples]: قيمة `gl.MAX_SAMPLES`. أقصى عدد
+		من العينات في سياق مكافحة التعرج المتعدد (MSAA).<br />
+		- [page:Integer maxTextureSize]: قيمة `gl.MAX_TEXTURE_SIZE`.
+		أقصى ارتفاع * عرض للقوام التي يستخدمها شادر.<br />
+		- [page:Integer maxTextures]: قيمة `gl.MAX_TEXTURE_IMAGE_UNITS`.
+		أقصى عدد من الملمسات التي يمكن استخدامها من قبل شادر.<br />
+		- [page:Integer maxVaryings]: قيمة `gl.MAX_VARYING_VECTORS`. The
+		عدد المتغيرات المتغيرة التي يمكن استخدامها من قبل shaders.<br />
+		- [page:Integer maxVertexTextures]: قيمة
+		`gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS`. عدد الملمسات الت
+		يمكن استخدامها في شادر القمة.<br />
+		- [page:Integer maxVertexUniforms]: قيمة
+		`gl.MAX_VERTEX_UNIFORM_VECTORS`. أقصى عدد من الموحدات التي يمكن
+		يتم استخدامها في شادر القمة.<br />
+		- [page:String precision]: دقة الشادر التي يتم استخدامها حاليًا من قبل
+		المُعالج.<br />
+		- [page:Boolean vertexTextures]: `true` إذا كان [property:Integer maxVertexTextures] 
+		أكبر من 0 (أي يمكن استخدام ملمسات القمة).<br />
+		</p>
+
+		<h3>[property:Array clippingPlanes]</h3>
+		<p>
+		خطوط المقص المحددة من قبل المستخدم محددة كـ THREE.Plane objects في العالم
+		الفضاء. تطبق هذه الطائرات عالميًا. النقاط في الفضاء التي نقطة المنتج مع
+		الطائرة هي سلبية يتم قطعها. الافتراضي هو [].
+		</p>
+	 
+		<h3>[property:DOMElement domElement]</h3>
+		<p>
+		[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas] 
+		حيث يرسم المُعالج ناتجه.<br />
+		يتم إنشاء هذا تلقائيًا من قبل المُعالج في المُنشئ (إذا لم يكن
+		متوفر بالفعل) ؛ تحتاج فقط إلى إضافته إلى صفحتك مثل هذا:<br />
+		<code>
+	 document.body.appendChild( renderer.domElement ); 
+		</code>
+		</p>
+	 
+		<h3>[property:Object extensions]</h3>
+		<p>
+		- [page:Object get]( [param:String extensionName] ): يستخدم للتحقق مما إذا كان
+		مختلف الامتدادات مدعومة ويعود كائنًا بتفاصيل
+		التمديد إذا كان متوفرًا. يمكن لهذه الطريقة التحقق من التالية
+		extensions:<br />
+		</p>
+	 
+		<ul>
+		<li>`WEBGL_depth_texture`</li>
+		<li>`EXT_texture_filter_anisotropic`</li>
+		<li>`WEBGL_compressed_texture_s3tc`</li>
+		<li>`WEBGL_compressed_texture_pvrtc`</li>
+		<li>`WEBGL_compressed_texture_etc1`</li>
+		</ul>
+	 
+		<h3>[property:string outputColorSpace]</h3>
+		<p>
+		يحدد مساحة اللون الناتجة للمُعالج. الافتراضي هو [page:Textures THREE.SRGBColorSpace].
+		</p>
+		<p>
+		إذا تم تعيين هدف عرض باستخدام [page:WebGLRenderer.setRenderTarget .setRenderTarget] 
+		ثم سيتم استخدام renderTarget.texture.colorSpace بدلاً من ذلك.
+		</p>
+		<p>
+		انظر صفحة [page:Textures texture constants] للحصول على تفاصيل أخرى
+		صيغ.
+		</p>
+	 
+
+		<h3>[property:Object info]</h3>
+		<p>
+		كائن مع سلسلة من المعلومات الإحصائية حول ذاكرة لوحة الرسومات
+		عملية العرض. مفيد للتصحيح أو فقط لأجل
+		الفضول. يحتوي الكائن على الحقول التالية:
+		</p>
+		<ul>
+			<li>
+			ذاكرة:
+				<ul>
+					<li>الهندسة</li>
+					<li>القوام</li>
+				</ul>
+			</li>
+			<li>
+			عرض:
+				<ul>
+					<li>المكالمات</li>
+					<li>المثلثات</li>
+					<li>النقاط</li>
+					<li>خطوط</li>
+					<li>إطار</li>
+				</ul>
+			</li>
+			<li>برامج</li>
+		</ul>
+		<p>
+		بشكل افتراضي ، يتم إعادة تعيين هذه البيانات في كل مكالمة عرض ولكن عندما
+		مرورات عرض متعددة لكل إطار (على سبيل المثال عند استخدام معالجة ما بعد) يمكن
+		يفضل إعادة التعيين بنمط مخصص. أولاً ، قم بتعيين `autoReset` إلى
+		`false`.
+		<code> renderer.info.autoReset = false; </code>
+		استدعاء `reset()` كلما انتهيت من عرض إطار واحد.
+		<code> renderer.info.reset(); </code>
+		</p>
+	 
+		<h3>[property:Boolean localClippingEnabled]</h3>
+		<p>
+		يحدد ما إذا كان المُعالج يحترم خطوط المقص على مستوى الكائن.
+		الافتراضي هو `false`.
+		</p>
+	 
+		<h3>[property:Object properties]</h3>
+		<p>
+		يستخدم داخليًا من قبل المُعالج لتتبع خصائص الكائنات الفرعية المختلفة
+		خصائص.
+		</p>
+	 
+		<h3>[property:WebGLRenderLists renderLists]</h3>
+		<p>يستخدم داخليًا للتعامل مع ترتيب عرض كائنات المشهد.</p>
+	 
+		<h3>[property:WebGLShadowMap shadowMap]</h3>
+		<p>
+		يحتوي هذا على المرجع إلى خريطة الظل ، إذا تم استخدامها.<br />
+		- [page:Boolean enabled]: إذا تم تعيينه ، استخدم خرائط الظل في المشهد. الافتراضي هو
+		`false`.<br />
+		- [page:Boolean autoUpdate]: يتيح التحديثات التلقائية للظلال في
+		المشهد. الافتراضي هو `true`.<br />
+		إذا لم تكن بحاجة إلى إضاءة / ظلال ديناميكية ، فيمكنك تعيين هذا على
+		`false` عندما يتم تجزئة المُعالج.<br />
+		- [page:Boolean needsUpdate]: عند تعيينه على `true` ، ستتم تحديث خرائط الظل في المشهد
+		سيتم التحديث في الاتصال `render` التالي. الافتراضي هو `false`.<br />
+		إذا قمت بتعطيل التحديثات التلقائية لخرائط الظل
+		(`shadowMap.autoUpdate = false`) ، ستحتاج إلى تعيين هذا على `true`
+		وبعد ذلك قم بإجراء مكالمة عرض لتحديث الظلال في مشهدك.<br />
+		- [page:Integer type]: يحدد نوع خريطة الظل (غير مفلترة ، نسبة
+		تصفية قريبة ، نسبة تصفية قريبة مع التصفية الثنائية في
+		شادر). الخيارات هي:
+		</p>
+		<ul>
+			<li>THREE.BasicShadowMap</li>
+			<li>THREE.PCFShadowMap (افتراضي)</li>
+			<li>THREE.PCFSoftShadowMap</li>
+			<li>THREE.VSMShadowMap</li>
+		</ul>
+		<p>انظر [page:Renderer Renderer constants] للحصول على التفاصيل.<br /></p>
+	 
+		<h3>[property:Boolean sortObjects]</h3>
+		<p>
+		يحدد ما إذا كان المُعالج يجب أن يقوم بفرز الكائنات. الافتراضي هو `true`.<br /><br />
+	 
+		ملاحظة: يتم استخدام الترتيب لمحاولة عرض الكائنات بشكل صحيح التي لديها بعض
+		درجة من الشفافية. بالتعريف ، قد لا يعمل فرز الكائنات في جميع
+		حالات. اعتمادًا على احتياجات التطبيق ، قد يكون من الضروري إغلاق
+		الترتيب واستخدام طرق أخرى للتعامل مع عرض الشفافية مثل
+		تحديد ترتيب عرض كل كائن يدويًا.
+		</p>
+	 
+		<h3>[property:Object state]</h3>
+		<p>
+		يحتوي على وظائف لضبط خصائص مختلفة من
+		[page:WebGLRenderer.context] حالة.
+		</p>
+	 
+		<h3>[property:Constant toneMapping]</h3>
+		<p>
+		الافتراضي هو [page:Renderer NoToneMapping]. انظر [page:Renderer Renderer constants] للاختيارات الأخرى.
+		</p>
+	 
+		<h3>[property:Number toneMappingExposure]</h3>
+		<p>مستوى التعرض للإطارات. الافتراضي هو `1`.</p>
+	 
+		<h3>[property:WebXRManager xr]</h3>
+		<p>
+		يوفر وصولًا إلى واجهة [page:WebXRManager] المتعلقة بـ WebXR من
+		المُعالج.
+		</p>
+	 
+		<h2>الطُرق(Methods)</h2>	 
+
+		<h3>
+		[method:undefined clear]( [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )
+		</h3>
+		<p>
+		يخبر المُعالج بمسح مخزن الرسم الخاص به للون أو العمق أو المخطط.
+		هذه الطريقة تقوم بتهيئة مخزن اللون إلى قيمة المسح الحالية
+		قيمة.<br />
+		الحجج الافتراضية هي `true`.
+		</p>
+		 
+		<h3>[method:undefined clearColor]( )</h3>
+		<p>
+		مسح مخزن اللون. يعادل استدعاء [page:WebGLRenderer.clear .clear]( true, false, false ).
+		</p>
+		 
+		<h3>[method:undefined clearDepth]( )</h3>
+		<p>
+		مسح مخزن العمق. يعادل استدعاء [page:WebGLRenderer.clear .clear]( false, true, false ).
+		</p>
+		 
+		<h3>[method:undefined clearStencil]( )</h3>
+		<p>
+		مسح مخزنات المخططات. يعادل استدعاء [page:WebGLRenderer.clear .clear]( false, false, true ).
+		</p>
+		 
+		<h3>
+		[method:Set compile]( [param:Object3D scene], [param:Camera camera], [param:Scene targetScene] )
+		</h3>
+		<p>
+		يجمع جميع المواد الموجودة في المشهد بالكاميرا. يعد هذا مفيدًا لتجميع التظليل مسبقًا قبل العرض الأول.
+		إذا كنت تريد إضافة كائن ثلاثي الأبعاد إلى مشهد موجود، فاستخدم المعلمة الاختيارية الثالثة لتطبيق المشهد المستهدف. <br />
+		لاحظ أنه يجب تكوين إضاءة المشهد قبل استدعاء هذه الطريقة.
+		</p>
+
+		<h3>
+			[method:Promise compileAsync]( [param:Object3D scene], [param:Camera camera], [param:Scene targetScene] )
+		</h3>
+		<p>
+			إصدار غير متزامن من [page:WebGLRenderer.compile .compile](). تقوم الطريقة بإرجاع Promise 
+			الذي يتم حله عندما يمكن عرض الكائن أو المشهد ثلاثي الأبعاد المحدد دون توقف غير ضروري بسبب تجميع التظليل.<br /><br />
+			
+			تستخدم هذه الطريقة *KHR_parallel_shader_compile*.
+		</p>
+		 
+		<h3>
+		[method:undefined copyFramebufferToTexture]( [param:Vector2 position], [param:FramebufferTexture texture], [param:Number level] )
+		</h3>
+		<p>
+		ينسخ بكسلات من WebGLFramebuffer الحالي إلى قوام ثنائي الأبعاد. يتيح
+		الوصول إلى
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexImage2D WebGLRenderingContext.copyTexImage2D].
+		</p>
+		 
+		<h3>
+		[method:undefined copyTextureToTexture]( [param:Vector2 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )
+		</h3>
+		<p>
+		ينسخ جميع بكسلات قوام إلى قوام موجود بدءًا من
+		الموضع المعطى. يتيح الوصول إلى
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texSubImage2D WebGLRenderingContext.texSubImage2D].
+		</p>
+		 
+		<h3>
+		[method:undefined copyTextureToTexture3D]( [param:Box3 sourceBox], [param:Vector3 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )
+		</h3>
+		<p>
+		ينسخ بكسلات قوام في الحدود '[page:Box3 sourceBox]' في
+		قوام الوجهة بدءًا من الموضع المعطى. يتيح الوصول
+		إلى
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texSubImage3D WebGL2RenderingContext.texSubImage3D].
+		</p>
+		 
+		<h3>[method:undefined dispose]( )</h3>
+		<p>
+		يحرر الموارد المتعلقة بـ GPU التي تم تخصيصها من قبل هذا المثيل. استدعاء هذا
+		الطريقة كلما لم يعد هذا المثيل مستخدمًا في تطبيقك.
+		</p>
+		 
+		<h3>[method:undefined forceContextLoss]()</h3>
+		<p>
+		محاكاة فقدان سياق WebGL. هذا يتطلب دعمًا لـ
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context] extensions.
+		</p>
+		 
+		<h3>[method:undefined forceContextRestore]( )</h3>
+		<p>
+		محاكاة استعادة سياق WebGL. هذا يتطلب دعمًا لـ
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context] extensions.
+		</p>
+		 
+		<h3>[method:Float getClearAlpha]()</h3>
+		<p>
+		يعود [page:Float float] مع الألفا الواضح الحالي. يتراوح من 0
+		إلى 1.
+		</p>
+		 
+		<h3>[method:Color getClearColor]( [param:Color target] )</h3>
+		<p>
+		يعود مثيل [page:Color THREE.Color] مع لون المسح الحالي.
+		</p>
+		 
+		<h3>[method:WebGL2RenderingContext getContext]()</h3>
+		<p>يرجع سياق WebGL الحالي.</p>
+		 
+		<h3>[method:WebGLContextAttributes getContextAttributes]()</h3>
+		<p>
+		يعود كائنًا يصف السمات المضبوطة على سياق WebGL
+		عند إنشائه.
+		</p>
+		 
+		<h3>[method:Integer getActiveCubeFace]()</h3>
+		<p>يعيد الوجه المكعب النشط الحالي.</p>
+	 
+		<h3>[method:Integer getActiveMipmapLevel]()</h3>
+		<p>يعيد مستوى mipmap النشط الحالي.</p>
+	 
+		<h3>[method:RenderTarget getRenderTarget]()</h3>
+		<p>
+		يعيد [page:RenderTarget RenderTarget] الحالي إذا كان هناك ؛ يعود
+		`null` خلاف ذلك.
+		</p>
+	 
+		<h3>[method:Vector4 getCurrentViewport]( [param:Vector4 target] )</h3>
+		<p>
+		[page:Vector4 target] — سيتم نسخ النتيجة في هذا Vector4.<br /><br />
+	 
+		يعود نافذة العرض الحالية.
+		</p>
+	 
+		<h3>[method:Vector2 getDrawingBufferSize]( [param:Vector2 target] )</h3>
+		<p>
+		[page:Vector2 target] — سيتم نسخ النتيجة في هذا Vector2.<br /><br />
+	 
+		يعود عرض وارتفاع مخزن الرسم للمُعالج ، بالبكسل.
+		</p>
+	 
+		<h3>[method:number getPixelRatio]()</h3>
+		<p>يعود نسبة بكسل الجهاز الحالية المستخدمة.</p>
+	 
+		<h3>[method:Vector4 getScissor]( [param:Vector4 target] )</h3>
+		<p>
+		[page:Vector4 target] — سيتم نسخ النتيجة في هذا Vector4.<br /><br />
+	 
+		يعود منطقة المقص.
+		</p>
+	 
+		<h3>[method:Boolean getScissorTest]()</h3>
+		<p>يعود `true` إذا تم تمكين اختبار المقص ؛ يعود `false` خلاف ذلك.</p>
+	 
+		<h3>[method:Vector2 getSize]( [param:Vector2 target] )</h3>
+		<p>
+		[page:Vector2 target] — سيتم نسخ النتيجة في هذا Vector2.<br /><br />
+	 
+		يعود عرض وارتفاع قماش إخراج المُعالج ، بالبكسل.
+		</p>
+	 
+		<h3>[method:Vector4 getViewport]( [param:Vector4 target] )</h3>
+		<p>
+		[page:Vector4 target] — سيتم نسخ النتيجة في هذا Vector4.<br /><br />
+	 
+		يعود نافذة العرض.
+		</p>
+
+		<h3>[method:undefined initTexture]( [param:Texture texture] )</h3>
+		<p>
+		يقوم بتهيئة القوام المعطى. مفيد لتحميل القوام مسبقًا بدلاً من
+		الانتظار حتى العرض الأول (الذي يمكن أن يسبب تأخيرات ملحوظة بسبب فك تشفير
+		وتحميل GPU).
+		</p>
+	 
+		<h3>[method:undefined resetGLState]( )</h3>
+		<p>
+		إعادة تعيين حالة GL إلى الافتراضي. يتم استدعاؤها داخليًا إذا كان سياق WebGL
+		ضائع.
+		</p>
+	 
+		<h3>
+		[method:undefined readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], [param:TypedArray buffer], [param:Integer activeCubeFaceIndex] )
+		</h3>
+		<p>
+		buffer - Uint8Array هو النوع الوحيد المدعوم في جميع الحالات ،
+		أنواع أخرى هي renderTarget ومنصة مستقلة. انظر
+		[link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] للحصول على التفاصيل.
+		</p>
+		<p>
+		يقرأ بيانات البكسل من renderTarget إلى المخزن الذي تمرره.
+		هذا هو حول
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]().
+		</p>
+		<p>
+		انظر [example:webgl_interactive_cubes_gpu interactive / cubes / gpu]
+		مثال.
+		</p>
+		<p>
+		لقراءة [page:WebGLCubeRenderTarget WebGLCubeRenderTarget] استخدم
+		المعلمة الاختيارية activeCubeFaceIndex لتحديد أي وجه يجب
+		قراءة.
+		</p>
+	 
+		<h3>
+		[method:undefined render]( [param:Object3D scene], [param:Camera camera] )
+		</h3>
+		<p>
+		عرض [page:Scene scene] أو نوع آخر من [page:Object3D object]
+		باستخدام كاميرا [page:Camera].<br />
+	 
+		يتم العرض إلى [page:WebGLRenderTarget renderTarget] محدد مسبقًا
+		مجموعة من خلال استدعاء [page:WebGLRenderer.setRenderTarget .setRenderTarget] أو إلى قماش كالمعتاد.<br />
+	 
+		بشكل افتراضي ، يتم مسح مخزنات العرض قبل العرض ولكن يمكنك منع
+		هذا عن طريق تعيين خاصية [page:WebGLRenderer.autoClear autoClear] إلى
+		false. إذا كنت ترغب في منع مسح مخزنات معينة فقط ، فيمكنك
+		تعيين خصائص [page:WebGLRenderer.autoClearColor autoClearColor],
+		[page:WebGLRenderer.autoClearStencil autoClearStencil] أو
+		[page:WebGLRenderer.autoClearDepth autoClearDepth] إلى false. لإجبار مسح واحد أو أكثر من المخزنات اتصل بـ [page:WebGLRenderer.clear .clear].
+		</p>
+	 
+		<h3>[method:undefined resetState]()</h3>
+		<p>
+		يمكن استخدامها لإعادة تعيين حالة WebGL الداخلية. هذه الطريقة هي في الغالب
+		ذات صلة بالتطبيقات التي تشارك سياق WebGL واحد عبر
+		مكتبات WebGL متعددة.
+		</p>
+	 
+		<h3>[method:undefined setAnimationLoop]( [param:Function callback] )</h3>
+		<p>
+		[page:Function callback] — سيتم استدعاء الوظيفة في كل إطار متاح
+		الإطار. إذا تم تمرير `null` ، فسيتوقف أي رسم متحرك قائم بالفعل.
+		</p>
+		<p>
+		وظيفة مدمجة يمكن استخدامها بدلاً من
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. 
+		بالنسبة لمشاريع WebXR ، يجب استخدام هذه الوظيفة.
+		</p>
+	 
+		<h3>[method:undefined setClearAlpha]( [param:Float alpha] )</h3>
+		<p>يضبط الألفا الواضح. المدخلات الصالحة هي عدد عشري بين `0.0` و `1.0`.</p>
+	 
+		<h3>
+		[method:undefined setClearColor]( [param:Color color], [param:Float alpha] )
+		</h3>
+		<p>يضبط لون المسح والشفافية.</p>
+	 
+		<h3>[method:undefined setPixelRatio]( [param:number value] )</h3>
+		<p>
+		يضبط نسبة بكسل الجهاز. يتم استخدام هذا عادةً لجهاز HiDPI لمنع
+		قماش الإخراج المشوش.
+		</p>
+	 
+		<h3>
+		[method:undefined setRenderTarget]( [param:WebGLRenderTarget renderTarget], 
+		[param:Integer activeCubeFace], [param:Integer activeMipmapLevel] )
+		</h3>
+		<p>
+		renderTarget -- [page:WebGLRenderTarget renderTarget] التي تحتاج إلى
+		تفعيله. عند إعطاء `null` ، يتم تعيين قماش كـ هدف عرض نشط
+		بدلاً من ذلك.<br />
+		activeCubeFace -- يحدد جانب المكعب النشط (PX 0 ، NX 1 ، PY 2 ، NY 3 ،
+		PZ 4 ، NZ 5) من [page:WebGLCubeRenderTarget]. عند تمرير
+		[page:WebGLArrayRenderTarget] أو [page:WebGL3DRenderTarget] هذا يشير
+		إلى طبقة z للعرض فيه (اختياري).<br />
+		activeMipmapLevel -- يحدد مستوى mipmap النشط (اختياري).<br /><br />
+		هذه الطريقة تضبط rendertarget النشط.
+		</p>
+	 
+		<h3>
+		[method:undefined setScissor]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )<br />
+		[method:undefined setScissor]( [param:Vector4 vector] )
+		</h3>
+	 
+		<p>
+		معلمات x و y والعرض والارتفاع لمنطقة المقص.<br />
+		اختياريًا ، متجه مكون من 4 مكونات يحدد معلمات
+		المنطقة.<br /><br />
+		 
+		يضبط منطقة المقص من (x ، y) إلى (x + width ، y + height).<br />
+		(x ، y) هو الزاوية السفلى اليسرى لمنطقة المقص.
+		</p>
+		 
+		<h3>[method:undefined setScissorTest]( [param:Boolean boolean] )</h3>
+		<p>
+		تمكين أو تعطيل اختبار المقص. عند تمكين هذا ، فقط البكسلات
+		داخل منطقة المقص المحددة ستتأثر بإجراءات المُعالج
+		التالية.
+		</p>
+		 
+		<h3>[method:undefined setOpaqueSort]( [param:Function method] )</h3>
+		<p>
+		يضبط وظيفة الترتيب الشفاف المخصصة لـ WebGLRenderLists. امرر null
+		لاستخدام وظيفة painterSortStable الافتراضية.
+		</p>
+		 
+		<h3>[method:undefined setTransparentSort]( [param:Function method] )</h3>
+		<p>
+		يضبط وظيفة الترتيب الشفاف المخصصة لـ WebGLRenderLists. امرر
+		null لاستخدام وظيفة reversePainterSortStable الافتراضية.
+		</p>
+		 
+		<h3>
+		[method:undefined setSize]( [param:Integer width], [param:Integer height], [param:Boolean updateStyle] )
+		</h3>
+		<p>
+		يغير حجم قماش الإخراج إلى (العرض ، الارتفاع) مع نسبة بكسل الجهاز التي تؤخذ في
+		بعين الاعتبار ، ويضبط أيضًا نافذة العرض لتناسب هذا الحجم ، بدءًا من (0 ،
+		0). يؤدي تعيين [page:Boolean updateStyle] إلى false إلى منع أي تغييرات في الأسلوب
+		إلى قماش الإخراج.
+		</p>
+		 
+		<h3>
+		[method:undefined setViewport]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )<br />
+		[method:undefined setViewport]( [param:Vector4 vector] )
+		</h3>
+		 
+		<p>
+		معلمات x و y والعرض والارتفاع لنافذة العرض.<br />
+		اختياريًا ، متجه مكون من 4 مكونات يحدد معلمات
+		نافذة عرض.<br /><br />
+		 
+		يضبط نافذة العرض للعرض من (x ، y) إلى (x + width ، y + height).<br />
+		(x ، y) هو الزاوية السفلى اليسرى للمنطقة.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

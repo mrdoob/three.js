@@ -20,10 +20,6 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -36,102 +32,119 @@
 import * as THREE from 'three';
 
 function main() {
-  const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
-  renderer.autoClearColor = false;
 
-  const fov = 75;
-  const aspect = 2;  // the canvas default
-  const near = 0.1;
-  const far = 5;
-  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.z = 2;
+	const canvas = document.querySelector( '#c' );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
+	renderer.autoClearColor = false;
 
-  const scene = new THREE.Scene();
+	const fov = 75;
+	const aspect = 2; // the canvas default
+	const near = 0.1;
+	const far = 5;
+	const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	camera.position.z = 2;
 
-  {
-    const color = 0xFFFFFF;
-    const intensity = 1;
-    const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(-1, 2, 4);
-    scene.add(light);
-  }
+	const scene = new THREE.Scene();
 
-  const boxWidth = 1;
-  const boxHeight = 1;
-  const boxDepth = 1;
-  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+	{
 
-  function makeInstance(geometry, color, x) {
-    const material = new THREE.MeshPhongMaterial({color});
+		const color = 0xFFFFFF;
+		const intensity = 3;
+		const light = new THREE.DirectionalLight( color, intensity );
+		light.position.set( - 1, 2, 4 );
+		scene.add( light );
 
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+	}
 
-    cube.position.x = x;
+	const boxWidth = 1;
+	const boxHeight = 1;
+	const boxDepth = 1;
+	const geometry = new THREE.BoxGeometry( boxWidth, boxHeight, boxDepth );
 
-    return cube;
-  }
+	function makeInstance( geometry, color, x ) {
 
-  const cubes = [
-    makeInstance(geometry, 0x44aa88,  0),
-    makeInstance(geometry, 0x8844aa, -2),
-    makeInstance(geometry, 0xaa8844,  2),
-  ];
+		const material = new THREE.MeshPhongMaterial( { color } );
 
-  const loader = new THREE.TextureLoader();
-  const bgTexture = loader.load('resources/images/daikanyama.jpg');
-  scene.background = bgTexture;
+		const cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
 
-  function resizeRendererToDisplaySize(renderer) {
-    const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
-    }
-    return needResize;
-  }
+		cube.position.x = x;
 
-  function render(time) {
-    time *= 0.001;
+		return cube;
 
-    if (resizeRendererToDisplaySize(renderer)) {
-      const canvas = renderer.domElement;
-      camera.aspect = canvas.clientWidth / canvas.clientHeight;
-      camera.updateProjectionMatrix();
-    }
+	}
 
-    // Set the repeat and offset properties of the background texture
-    // to keep the image's aspect correct.
-    // Note the image may not have loaded yet.
-    const canvasAspect = canvas.clientWidth / canvas.clientHeight;
-    const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
-    const aspect = imageAspect / canvasAspect;
+	const cubes = [
+		makeInstance( geometry, 0x44aa88, 0 ),
+		makeInstance( geometry, 0x8844aa, - 2 ),
+		makeInstance( geometry, 0xaa8844, 2 ),
+	];
 
-    bgTexture.offset.x = aspect > 1 ? (1 - 1 / aspect) / 2 : 0;
-    bgTexture.repeat.x = aspect > 1 ? 1 / aspect : 1;
+	const loader = new THREE.TextureLoader();
+	const bgTexture = loader.load( 'resources/images/daikanyama.jpg' );
+	bgTexture.colorSpace = THREE.SRGBColorSpace;
+	scene.background = bgTexture;
 
-    bgTexture.offset.y = aspect > 1 ? 0 : (1 - aspect) / 2;
-    bgTexture.repeat.y = aspect > 1 ? 1 : aspect;
+	function resizeRendererToDisplaySize( renderer ) {
 
-    cubes.forEach((cube, ndx) => {
-      const speed = 1 + ndx * .1;
-      const rot = time * speed;
-      cube.rotation.x = rot;
-      cube.rotation.y = rot;
-    });
+		const canvas = renderer.domElement;
+		const width = canvas.clientWidth;
+		const height = canvas.clientHeight;
+		const needResize = canvas.width !== width || canvas.height !== height;
+		if ( needResize ) {
 
-    renderer.render(scene, camera);
+			renderer.setSize( width, height, false );
 
-    requestAnimationFrame(render);
-  }
+		}
 
-  requestAnimationFrame(render);
+		return needResize;
+
+	}
+
+	function render( time ) {
+
+		time *= 0.001;
+
+		if ( resizeRendererToDisplaySize( renderer ) ) {
+
+			const canvas = renderer.domElement;
+			camera.aspect = canvas.clientWidth / canvas.clientHeight;
+			camera.updateProjectionMatrix();
+
+		}
+
+		// Set the repeat and offset properties of the background texture
+		// to keep the image's aspect correct.
+		// Note the image may not have loaded yet.
+		const canvasAspect = canvas.clientWidth / canvas.clientHeight;
+		const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
+		const aspect = imageAspect / canvasAspect;
+
+		bgTexture.offset.x = aspect > 1 ? ( 1 - 1 / aspect ) / 2 : 0;
+		bgTexture.repeat.x = aspect > 1 ? 1 / aspect : 1;
+
+		bgTexture.offset.y = aspect > 1 ? 0 : ( 1 - aspect ) / 2;
+		bgTexture.repeat.y = aspect > 1 ? 1 : aspect;
+
+		cubes.forEach( ( cube, ndx ) => {
+
+			const speed = 1 + ndx * .1;
+			const rot = time * speed;
+			cube.rotation.x = rot;
+			cube.rotation.y = rot;
+
+		} );
+
+		renderer.render( scene, camera );
+
+		requestAnimationFrame( render );
+
+	}
+
+	requestAnimationFrame( render );
+
 }
 
 main();
 </script>
 </html>
-

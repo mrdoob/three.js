@@ -1,12 +1,7 @@
 export default /* glsl */`
-#ifdef USE_UV
+#if defined( USE_UV ) || defined( USE_ANISOTROPY )
 
 	varying vec2 vUv;
-
-#endif
-#ifdef USE_UV2
-
-	attribute vec2 uv2;
 
 #endif
 #ifdef USE_MAP
@@ -67,6 +62,12 @@ export default /* glsl */`
 
 	uniform mat3 roughnessMapTransform;
 	varying vec2 vRoughnessMapUv;
+
+#endif
+#ifdef USE_ANISOTROPYMAP
+
+	uniform mat3 anisotropyMapTransform;
+	varying vec2 vAnisotropyMapUv;
 
 #endif
 #ifdef USE_CLEARCOATMAP

@@ -293,8 +293,8 @@ class Vector2 {
 
 	roundToZero() {
 
-		this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
-		this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
+		this.x = Math.trunc( this.x );
+		this.y = Math.trunc( this.y );
 
 		return this;
 

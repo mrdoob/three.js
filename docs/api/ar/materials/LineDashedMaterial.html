@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Material] &rarr; [page:LineBasicMaterial] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			مادة لرسم الهندسة على طريقة الإطار السلكي بخطوط متقطعة.<br />
+			Note: You must call [page:Line.computeLineDistances]() when using [name].
+		</p>
+		 
+		<h2>مثال الكود</h2>
+		 
+		<code>
+		const material = new THREE.LineDashedMaterial( {
+			color: 0xffffff,
+			linewidth: 1,
+			scale: 1,
+			dashSize: 3,
+			gapSize: 1,
+		} );
+		</code>
+		 
+		<h2>أمثلة (Examples)</h2>
+		 
+		<p>[example:webgl_lines_dashed WebGL / lines / dashed]<br /></p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+		[page:Object parameters] - (اختياري) كائن به خاصية واحدة أو أكثر
+		تحدد مظهر المادة. يمكن تمرير أي خاصية من المادة (بما في ذلك أي خاصية موروثة من [page:LineBasicMaterial])
+		هنا.
+		</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		<p>انظر إلى الفئة الأساسية [page:LineBasicMaterial] للحصول على خصائص شائعة.</p>
+		 
+		<h3>[property:number dashSize]</h3>
+		<p>
+		حجم الشَرطة. هذا هو كل من الفجوة مع الضربة. الافتراضي هو
+		`3`.
+		</p>
+		 
+		<h3>[property:number gapSize]</h3>
+		<p>حجم الفجوة. الافتراضي هو `1`.</p>
+		 
+		<h3>[property:Boolean isLineDashedMaterial]</h3>
+		<p>علامة قراءة فقط للتحقق مما إذا كان كائنًا معينًا من نوع [name].</p>
+		 
+		<h3>[property:number scale]</h3>
+		<p>مقياس الجزء المتقطع من الخط. الافتراضي هو `1`.</p>
+		 
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى الفئة الأساسية [page:LineBasicMaterial] للحصول على طرق شائعة.</p>
+
+		<h2>المصدر (Source)</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -24,8 +24,6 @@ export class CSM {
 
 	constructor( data ) {
 
-		data = data || {};
-
 		this.camera = data.camera;
 		this.parent = data.parent;
 		this.cascades = data.cascades || 3;
@@ -34,7 +32,7 @@ export class CSM {
 		this.shadowMapSize = data.shadowMapSize || 2048;
 		this.shadowBias = data.shadowBias || 0.000001;
 		this.lightDirection = data.lightDirection || new Vector3( 1, - 1, 1 ).normalize();
-		this.lightIntensity = data.lightIntensity || 1;
+		this.lightIntensity = data.lightIntensity || 3;
 		this.lightNear = data.lightNear || 1;
 		this.lightFar = data.lightFar || 2000;
 		this.lightMargin = data.lightMargin || 200;

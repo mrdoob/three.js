@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -31,38 +27,31 @@
       <div class="lesson">
         <div class="lesson-main">
           <p></p>
-<p>В <a href="custom-geometry.html">предыдущей статье</a> рассказывалось, как использовать <code class="notranslate" translate="no">Geometry</code>. Эта статья о <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> обычно быстрее запускается и использует меньше памяти, но может быть сложнее в настройке. </p>
-<p>В <a href="custom-geometry.html">статье о Geometry</a> мы рассказали, что для использования <code class="notranslate" translate="no">Geometry</code> вы предоставляете массив вершин <a href="/docs/#api/en/math/Vector3"><code class="notranslate" translate="no">Vector3</code></a> (позиций). 
-Затем вы создаете объекты <a href="/docs/#api/en/core/Face3"><code class="notranslate" translate="no">Face3</code></a>, определяя по индексу 3 вершины, которые составляют каждый треугольник фигуры, которую вы делаете.
-Для каждого <a href="/docs/#api/en/core/Face3"><code class="notranslate" translate="no">Face3</code></a> вы можете указать либо нормаль грани, либо нормали для каждой отдельной вершины грани. 
-Вы также можете указать цвет грани или отдельные цвета вершин. Наконец, вы можете создать параллельный массив массивов текстурных координат (UV), 
-один массив для каждой грани, содержащий массив UV, один для каждой вершины грани. </p>
-<div class="threejs_center"><img src="../resources/threejs-geometry.svg" style="width: 700px"></div>
 
-<p><a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> с другой стороны использует названный <code class="notranslate" translate="no">BufferAttributes</code>. 
-Каждый атрибут <a href="/docs/#api/en/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> представляет собой массив данных одного типа: позиции, нормали, цвета и ультрафиолетовые лучи. 
+<p><a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> с другой стороны использует названный <code class="notranslate" translate="no">BufferAttributes</code>.
+Каждый атрибут <a href="/docs/#api/en/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> представляет собой массив данных одного типа: позиции, нормали, цвета и ультрафиолетовые лучи.
 Вместе добавленные атрибуты <code class="notranslate" translate="no">BufferAttributes</code> представляют параллельные массивы всех данных для каждой вершины. </p>
 <div class="threejs_center"><img src="../resources/threejs-attributes.svg" style="width: 700px"></div>
 
-<p>Вы можете видеть, что у нас есть 4 атрибута: <code class="notranslate" translate="no">position</code>, <code class="notranslate" translate="no">normal</code>, <code class="notranslate" translate="no">color</code>, <code class="notranslate" translate="no">uv</code>. 
-Они представляют параллельные массивы, что означает, что N-й набор данных в каждом атрибуте принадлежит одной и той же вершине. 
+<p>Вы можете видеть, что у нас есть 4 атрибута: <code class="notranslate" translate="no">position</code>, <code class="notranslate" translate="no">normal</code>, <code class="notranslate" translate="no">color</code>, <code class="notranslate" translate="no">uv</code>.
+Они представляют параллельные массивы, что означает, что N-й набор данных в каждом атрибуте принадлежит одной и той же вершине.
 Вершина с индексом = 4 подсвечивается, чтобы показать, что параллельные данные по всем атрибутам определяют одну вершину. </p>
 <p>Это поднимает точку, вот схема куба с одним выделенным углом. </p>
 <div class="threejs_center"><img src="../resources/cube-faces-vertex.svg" style="width: 500px"></div>
 
-<p>Думая об этом, один угол нуждается в разной нормали для каждой грани куба. 
+<p>Думая об этом, один угол нуждается в разной нормали для каждой грани куба.
 Для каждой стороны тоже нужны разные ультрафиолеты. Это указывает на самую большую разницу между <code class="notranslate" translate="no">Geometry</code> и <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. Ничего общего с <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>.
 Одна вершина - это комбинация всех ее частей. Если вершина нуждается в какой-либо части, то она должна быть другой. </p>
-<p>Правда в том, что когда вы используете <code class="notranslate" translate="no">Geometry</code> three.js преобразует его в этот формат. 
-Вот откуда появляется дополнительная память и время при использовании <code class="notranslate" translate="no">Geometry</code>. 
+<p>Правда в том, что когда вы используете <code class="notranslate" translate="no">Geometry</code> three.js преобразует его в этот формат.
+Вот откуда появляется дополнительная память и время при использовании <code class="notranslate" translate="no">Geometry</code>.
 Дополнительная память для всех объектов <code class="notranslate" translate="no">Vector3s</code>, <code class="notranslate" translate="no">Vector2s</code>, <code class="notranslate" translate="no">Face3s</code> и массива, а затем дополнительное время для преобразования всех этих данных
-в параллельные массивы в форме атрибутов <code class="notranslate" translate="no">BufferAttributes</code>, как указано выше. 
+в параллельные массивы в форме атрибутов <code class="notranslate" translate="no">BufferAttributes</code>, как указано выше.
 Иногда это облегчает использование Geometry. С <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> мы можем предоставить данные, уже преобразованные в этот формат. </p>
 <p>В качестве простого примера давайте сделаем куб, используя <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>.
 Куб интересен тем, что кажется, что он разделяет вершины в углах, но на самом деле это не так. В нашем примере мы перечислим все вершины со всеми их данными,
 а затем преобразуем эти данные в параллельные массивы и, наконец, используем их для создания атрибутов <code class="notranslate" translate="no">Buffer</code> и добавления их в <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>. </p>
-<p>Начиная с примера координат текстуры из предыдущей статьи, мы удалили весь код, связанный с настройкой <code class="notranslate" translate="no">Geometry</code>. 
-Затем мы перечисляем все данные, необходимые для куба. Помните еще раз, что если вершина имеет какие-либо уникальные части, она должна быть отдельной вершиной. 
+<p>Начиная с примера координат текстуры из предыдущей статьи, мы удалили весь код, связанный с настройкой <code class="notranslate" translate="no">Geometry</code>.
+Затем мы перечисляем все данные, необходимые для куба. Помните еще раз, что если вершина имеет какие-либо уникальные части, она должна быть отдельной вершиной.
 Для создания куба необходимо 36 вершин. 2 треугольника на грань, 3 вершины на треугольник, 6 граней = 36 вершин. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const vertices = [
   // front
@@ -140,9 +129,9 @@ for (const vertex of vertices) {
       'uv',
       new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents));
 </pre>
-<p>Обратите внимание, что имена являются значительными. Вы должны назвать свои атрибуты именами, которые соответствуют ожиданиям three.js 
+<p>Обратите внимание, что имена являются значительными. Вы должны назвать свои атрибуты именами, которые соответствуют ожиданиям three.js
 (если вы не создаете пользовательский шейдер). В этом случае <code class="notranslate" translate="no">position</code>, <code class="notranslate" translate="no">normal</code> и <code class="notranslate" translate="no">uv</code>. Если вы хотите цвета вершин, назовите свой атрибут <code class="notranslate" translate="no">color</code>. </p>
-<p>Выше мы создали 3 собственных массива JavaScript, <code class="notranslate" translate="no">positions</code>, <code class="notranslate" translate="no">normals</code>  и <code class="notranslate" translate="no">uvs</code> . Затем мы конвертируем их в 
+<p>Выше мы создали 3 собственных массива JavaScript, <code class="notranslate" translate="no">positions</code>, <code class="notranslate" translate="no">normals</code>  и <code class="notranslate" translate="no">uvs</code> . Затем мы конвертируем их в
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArrays</a>
 типа Float32Array. Атрибут <a href="/docs/#api/en/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> требует TypedArray, а не собственного массива. Атрибут <a href="/docs/#api/en/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a> также требует, чтобы вы указали,
 сколько компонентов в каждой вершине. Для позиций и нормалей у нас есть 3 компонента на вершину, x, y и z. Для UV у нас есть 2, u и v. </p>
@@ -152,9 +141,9 @@ for (const vertex of vertices) {
 </div>
 
 <p></p>
-<p>Это много данных. Небольшая вещь, которую мы можем сделать, это использовать индексы для ссылки на вершины. 
-Оглядываясь назад на данные нашего куба, каждая грань состоит из 2 треугольников с 3 вершинами в каждом, всего 6 вершин, но 2 из этих вершин абсолютно одинаковы; 
-Та же самая position, та же самая normal, и та же самая uv. 
+<p>Это много данных. Небольшая вещь, которую мы можем сделать, это использовать индексы для ссылки на вершины.
+Оглядываясь назад на данные нашего куба, каждая грань состоит из 2 треугольников с 3 вершинами в каждом, всего 6 вершин, но 2 из этих вершин абсолютно одинаковы;
+Та же самая position, та же самая normal, и та же самая uv.
 Таким образом, мы можем удалить совпадающие вершины и затем ссылаться на них по индексу. Сначала мы удаляем совпадающие вершины. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const vertices = [
   // front
@@ -207,7 +196,7 @@ for (const vertex of vertices) {
   { pos: [-1, -1, -1], norm: [ 0, -1,  0], uv: [1, 1], }, // 23
 ];
 </pre>
-<p>Итак, теперь у нас есть 24 уникальные вершины. 
+<p>Итак, теперь у нас есть 24 уникальные вершины.
 Затем мы указываем 36 индексов для 36 вершин, которые нам нужно нарисовать, чтобы сделать 12 треугольников, вызывая <a href="/docs/#api/en/core/BufferGeometry.setIndex"><code class="notranslate" translate="no">BufferGeometry.setIndex</code></a> с массивом индексов. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">geometry.setAttribute(
     'position',
@@ -235,7 +224,7 @@ geometry.setAttribute(
 
 <p></p>
 <p>Как и в <code class="notranslate" translate="no">Geometry</code>, в <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> есть метод <a href="/docs/#api/en/core/BufferGeometry#computeVertexNormals"><code class="notranslate" translate="no">computeVertexNormals</code></a> для вычисления нормалей,
-если вы их не предоставляете. В отличие от версии <code class="notranslate" translate="no">Geometry</code> той же функции, 
+если вы их не предоставляете. В отличие от версии <code class="notranslate" translate="no">Geometry</code> той же функции,
 поскольку позиции не могут быть общими, если любая другая часть вершины отличается, результаты вызова <code class="notranslate" translate="no">computeVertexNormals</code> будут другими. </p>
 <div class="spread">
   <div>
@@ -248,14 +237,14 @@ geometry.setAttribute(
   </div>
 </div>
 
-<p>Вот 2 цилиндра, где нормали были созданы с использованием <code class="notranslate" translate="no">computeVertexNormals</code>. 
-Если вы посмотрите внимательно, на левом цилиндре есть шов. Это связано с тем, 
+<p>Вот 2 цилиндра, где нормали были созданы с использованием <code class="notranslate" translate="no">computeVertexNormals</code>.
+Если вы посмотрите внимательно, на левом цилиндре есть шов. Это связано с тем,
 что нет возможности совместно использовать вершины в начале и конце цилиндра, так как они требуют разных UV.
-Просто небольшая вещь, чтобы быть в курсе. 
+Просто небольшая вещь, чтобы быть в курсе.
 Решение состоит в том, чтобы предоставить свои собственные normals. </p>
 <p>Мы также можем использовать <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArrays</a>
 с самого начала вместо собственных массивов JavaScript. Недостатком TypedArrays является то, что вы должны указать их размер заранее.
-Конечно, это не так уж сложно, но с помощью собственных массивов мы можем просто <code class="notranslate" translate="no">push</code> значения в них и посмотреть, 
+Конечно, это не так уж сложно, но с помощью собственных массивов мы можем просто <code class="notranslate" translate="no">push</code> значения в них и посмотреть,
 какого размера они заканчиваются, проверив их <code class="notranslate" translate="no">length</code> в конце.
 В TypedArrays нет функции push, поэтому нам нужно вести собственную бухгалтерию при добавлении значений к ним. </p>
 <p>В этом примере узнать длину заранее довольно просто, так как для начала мы используем большой блок статических данных. </p>
@@ -315,7 +304,7 @@ geometry.setIndex([
 <p>Хорошая причина использовать typedarrays - если вы хотите динамически обновлять любую часть вершин. </p>
 <p>Я не мог придумать действительно хороший пример динамического обновления вершин,
 поэтому я решил создать сферу и переместить каждый четырехугольник внутрь и наружу от центра. Надеюсь, это полезный пример. </p>
-<p>Вот код для генерации позиций и индексов для сферы. Код разделяет вершины внутри четырехугольника, 
+<p>Вот код для генерации позиций и индексов для сферы. Код разделяет вершины внутри четырехугольника,
 но не разделяет вершины между четырьмя, потому что мы хотим иметь возможность перемещать каждый четырёхугольник по отдельности. </p>
 <p>Поскольку я ленивый, я использовал небольшую иерархию из 3 объектов Object3D для вычисления точек сферы. Как это работает, объясняется в
 <a href="optimize-lots-of-objects.html">статье об оптимизации множества объектов. </a>.</p>
@@ -374,7 +363,7 @@ geometry.setIndex([
 const segmentsDown = 16;
 const {positions, indices} = makeSpherePositions(segmentsAround, segmentsDown);
 </pre>
-<p>Поскольку возвращаемые позиции являются позициями единичных сфер, 
+<p>Поскольку возвращаемые позиции являются позициями единичных сфер,
 они являются точно такими же значениями, которые нам нужны для нормалей, поэтому мы можем просто дублировать их для нормалей. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const normals = positions.slice();
 </pre>
@@ -420,8 +409,8 @@ positionAttribute.needsUpdate = true;
 
 <p></p>
 <p>Я надеюсь, что это были полезные примеры того, как использовать
-<a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> напрямую для создания собственной геометрии и как динамически 
-обновлять содержимое <a href="/docs/#api/en/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>. То, что вы используете, <code class="notranslate" translate="no">Geometry</code> или <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>, 
+<a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> напрямую для создания собственной геометрии и как динамически
+обновлять содержимое <a href="/docs/#api/en/core/BufferAttribute"><code class="notranslate" translate="no">BufferAttribute</code></a>. То, что вы используете, <code class="notranslate" translate="no">Geometry</code> или <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a>,
 действительно зависит от ваших потребностей. </p>
 <p><canvas id="c"></canvas></p>
 <script type="module" src="../resources/threejs-custom-buffergeometry.js"></script>
@@ -430,7 +419,7 @@ positionAttribute.needsUpdate = true;
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

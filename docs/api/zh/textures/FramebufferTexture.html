@@ -9,41 +9,82 @@
 	<body>
 		[page:Texture] &rarr;
 
-		<h1>[name]</h1>
+		<h1>帧缓冲纹理([name])</h1>
 
 		<p class="desc">
-			This class can only be used in combination with [page:WebGLRenderer.copyFramebufferToTexture]().
+			这个类只能与 [page:WebGLRenderer.copyFramebufferToTexture]() 结合使用。
 		</p>
 
-		<h2>Constructor</h2>
-		<h3>[name]( [param:Number width], [param:Number height], [param:Constant format] )</h3>
+		<code>
+		const pixelRatio = window.devicePixelRatio;
+		const textureSize = 128 * pixelRatio;
+
+		// instantiate a framebuffer texture
+		const frameTexture = new FramebufferTexture( textureSize, textureSize );
+
+		// calculate start position for copying part of the frame data
+		const vector = new Vector2();
+		vector.x = ( window.innerWidth * pixelRatio / 2 ) - ( textureSize / 2 );
+		vector.y = ( window.innerHeight * pixelRatio / 2 ) - ( textureSize / 2 );
+
+		// render the scene
+		renderer.clear();
+		renderer.render( scene, camera );
+
+		// copy part of the rendered frame into the framebuffer texture
+		renderer.copyFramebufferToTexture( vector, frameTexture );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>[example:webgl_framebuffer_texture]</p>
+
+		<h2>构造函数</h2>
+		<h3>[name]( [param:Number width], [param:Number height] )</h3>
 		<p>
-		[page:Number width] -- The width of the texture.<br />
+		[page:Number width] -- 纹理的宽度<br />
 
-		[page:Number height] -- The height of the texture.<br />
+		[page:Number height] -- 纹理的高度<br /><br />
 
-		[page:Constant format] -- The format used in the texture.
-		See [page:Textures format constants] for other choices.<br />
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
-		<p>See the base [page:Texture Texture] class for common properties.</p>
+		<p>共有属性请参见其基类 [page:Texture Texture] </p>
+
+		<h3>[property:Boolean generateMipmaps]</h3>
+		<p>是否为 [name] 生成 mipmaps ，默认为`false`</p>
 
 		<h3>[property:Boolean isFramebufferTexture]</h3>
+		<p>只读，检查给定对象是否为 [name] 类型</p>
+
+		<h3>[property:number magFilter]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			纹理元素覆盖多个像素时如何对纹理进行采样。默认值为 [page:Textures THREE.NearestFilter] ，它使用最接近的纹理元素。
+			<br /><br />
+
+			更多细节详见 [page:Textures texture constants]
+		</p>
+
+		<h3>[property:number minFilter]</h3>
+		<p>
+			纹理元素覆盖少于一个像素时如何对纹理进行采样。默认值为 [page:Textures THREE.NearestFilter] ，它使用最近的纹理元素。
+			<br /><br />
+
+			更多细节详见 [page:Textures texture constants]
 		</p>
 
 		<h3>[property:Boolean needsUpdate]</h3>
 
-		<h2>Methods</h2>
+		<p>默认为 `true` ，这是加载 canvas 数据所必需的</p>
 
-		<p>See the base [page:Texture Texture] class for common methods.</p>
+		<h2>方法</h2>
+
+		<p>共有方法请参见其基类 [page:Texture Texture] </p>
 
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

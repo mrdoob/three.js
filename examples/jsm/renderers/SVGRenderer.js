@@ -5,6 +5,7 @@ import {
 	Matrix3,
 	Matrix4,
 	Object3D,
+	SRGBColorSpace,
 	Vector3
 } from 'three';
 import { Projector } from '../renderers/Projector.js';
@@ -74,6 +75,8 @@ class SVGRenderer {
 		this.sortElements = true;
 
 		this.overdraw = 0.5;
+
+		this.outputColorSpace = SRGBColorSpace;
 
 		this.info = {
 
@@ -155,7 +158,7 @@ class SVGRenderer {
 		this.clear = function () {
 
 			removeChildNodes();
-			_svg.style.backgroundColor = _clearColor.getStyle();
+			_svg.style.backgroundColor = _clearColor.getStyle( _this.outputColorSpace );
 
 		};
 
@@ -173,7 +176,7 @@ class SVGRenderer {
 			if ( background && background.isColor ) {
 
 				removeChildNodes();
-				_svg.style.backgroundColor = background.getStyle();
+				_svg.style.backgroundColor = background.getStyle( _this.outputColorSpace );
 
 			} else if ( this.autoClear === true ) {
 
@@ -389,7 +392,7 @@ class SVGRenderer {
 
 			if ( material.isSpriteMaterial || material.isPointsMaterial ) {
 
-				style = 'fill:' + material.color.getStyle() + ';fill-opacity:' + material.opacity;
+				style = 'fill:' + material.color.getStyle( _this.outputColorSpace ) + ';fill-opacity:' + material.opacity;
 
 			}
 
@@ -403,7 +406,7 @@ class SVGRenderer {
 
 			if ( material.isLineBasicMaterial ) {
 
-				let style = 'fill:none;stroke:' + material.color.getStyle() + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
+				let style = 'fill:none;stroke:' + material.color.getStyle( _this.outputColorSpace ) + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
 
 				if ( material.isLineDashedMaterial ) {
 
@@ -463,11 +466,11 @@ class SVGRenderer {
 
 			if ( material.wireframe ) {
 
-				style = 'fill:none;stroke:' + _color.getStyle() + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
+				style = 'fill:none;stroke:' + _color.getStyle( _this.outputColorSpace ) + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
 
 			} else {
 
-				style = 'fill:' + _color.getStyle() + ';fill-opacity:' + material.opacity;
+				style = 'fill:' + _color.getStyle( _this.outputColorSpace ) + ';fill-opacity:' + material.opacity;
 
 			}
 

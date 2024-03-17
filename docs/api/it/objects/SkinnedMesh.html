@@ -13,10 +13,7 @@
 
 		<p class="desc">
 			Una mesh che ha uno [page:Skeleton scheletro] con [page:Bone ossa] che può essere 
-			utilizzata per animare i vertici della geometria.<br /><br />
-
-			[name] può essere utilizzata solo con WebGL 2. Con WebGL 1 è necessario il supporto delle texture del vertice
-			e `OES_texture_float`.
+			utilizzata per animare i vertici della geometria.
 		</p>
 
 		<iframe id="scene" src="scenes/bones-browser.html"></iframe>
@@ -101,10 +98,11 @@
 		<h2>Proprietà</h2>
 		<p>Vedi la classe base [page:Mesh] per le proprietà comuni.</p>
 
-		<h3>[property:String bindMode]</h3>
 		<p>
-			O "attached" o "detached". "attached" utilizza la proprietà [page:SkinnedMesh.matrixWorld]
-			per la matrice di trasformazione delle ossa. "detached" utilizza [page:SkinnedMesh.bindMatrix]. Il valore predefinito è "attached".
+			Either `AttachedBindMode` or `DetachedBindMode`. `AttachedBindMode` means the skinned mesh
+			shares the same world space as the skeleton. This is not true when using `DetachedBindMode`
+			which is useful when sharing a skeleton across multiple skinned meshes.
+			Default is `AttachedBindMode`.
 		</p>
 
 		<h3>[property:Matrix4 bindMatrix]</h3>

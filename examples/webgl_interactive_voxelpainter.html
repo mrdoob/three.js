@@ -22,10 +22,6 @@
 			<strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -94,10 +90,10 @@
 
 				// lights
 
-				const ambientLight = new THREE.AmbientLight( 0x606060 );
+				const ambientLight = new THREE.AmbientLight( 0x606060, 3 );
 				scene.add( ambientLight );
 
-				const directionalLight = new THREE.DirectionalLight( 0xffffff );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
 				directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
 				scene.add( directionalLight );
 

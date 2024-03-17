@@ -42,12 +42,6 @@ import { TGALoader } from '../loaders/TGALoader.js';
 
 class ColladaLoader extends Loader {
 
-	constructor( manager ) {
-
-		super( manager );
-
-	}
-
 	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -2337,7 +2331,7 @@ class ColladaLoader extends Loader {
 			const position = { array: [], stride: 0 };
 			const normal = { array: [], stride: 0 };
 			const uv = { array: [], stride: 0 };
-			const uv2 = { array: [], stride: 0 };
+			const uv1 = { array: [], stride: 0 };
 			const color = { array: [], stride: 0 };
 
 			const skinIndex = { array: [], stride: 4 };
@@ -2472,7 +2466,7 @@ class ColladaLoader extends Loader {
 										break;
 
 									case 'TEXCOORD1':
-										buildGeometryData( primitive, sources[ id ], input.offset, uv2.array );
+										buildGeometryData( primitive, sources[ id ], input.offset, uv1.array );
 										uv.stride = sources[ id ].stride;
 										break;
 
@@ -2501,8 +2495,8 @@ class ColladaLoader extends Loader {
 							break;
 
 						case 'TEXCOORD1':
-							buildGeometryData( primitive, sources[ input.id ], input.offset, uv2.array );
-							uv2.stride = sources[ input.id ].stride;
+							buildGeometryData( primitive, sources[ input.id ], input.offset, uv1.array );
+							uv1.stride = sources[ input.id ].stride;
 							break;
 
 					}
@@ -2517,7 +2511,7 @@ class ColladaLoader extends Loader {
 			if ( normal.array.length > 0 ) geometry.setAttribute( 'normal', new Float32BufferAttribute( normal.array, normal.stride ) );
 			if ( color.array.length > 0 ) geometry.setAttribute( 'color', new Float32BufferAttribute( color.array, color.stride ) );
 			if ( uv.array.length > 0 ) geometry.setAttribute( 'uv', new Float32BufferAttribute( uv.array, uv.stride ) );
-			if ( uv2.array.length > 0 ) geometry.setAttribute( 'uv2', new Float32BufferAttribute( uv2.array, uv2.stride ) );
+			if ( uv1.array.length > 0 ) geometry.setAttribute( 'uv1', new Float32BufferAttribute( uv1.array, uv1.stride ) );
 
 			if ( skinIndex.array.length > 0 ) geometry.setAttribute( 'skinIndex', new Float32BufferAttribute( skinIndex.array, skinIndex.stride ) );
 			if ( skinWeight.array.length > 0 ) geometry.setAttribute( 'skinWeight', new Float32BufferAttribute( skinWeight.array, skinWeight.stride ) );
@@ -3710,7 +3704,10 @@ class ColladaLoader extends Loader {
 
 		}
 
-		const fallbackMaterial = new MeshBasicMaterial( { color: 0xff00ff } );
+		const fallbackMaterial = new MeshBasicMaterial( {
+			name: Loader.DEFAULT_MATERIAL_NAME,
+			color: 0xff00ff
+		} );
 
 		function resolveMaterialBinding( keys, instanceMaterials ) {
 

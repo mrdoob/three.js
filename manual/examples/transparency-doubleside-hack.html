@@ -20,10 +20,6 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -35,111 +31,137 @@
 
 <script type="module">
 import * as THREE from 'three';
-import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 function main() {
-  const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
-  const fov = 75;
-  const aspect = 2;  // the canvas default
-  const near = 0.1;
-  const far = 25;
-  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.z = 4;
+	const canvas = document.querySelector( '#c' );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
 
-  const controls = new OrbitControls(camera, canvas);
-  controls.target.set(0, 0, 0);
-  controls.update();
+	const fov = 75;
+	const aspect = 2; // the canvas default
+	const near = 0.1;
+	const far = 25;
+	const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	camera.position.z = 4;
 
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color('white');
+	const controls = new OrbitControls( camera, canvas );
+	controls.target.set( 0, 0, 0 );
+	controls.update();
 
-  function addLight(x, y, z) {
-    const color = 0xFFFFFF;
-    const intensity = 1;
-    const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(x, y, z);
-    scene.add(light);
-  }
-  addLight(-1,  2,  4);
-  addLight( 1, -1, -2);
+	const scene = new THREE.Scene();
+	scene.background = new THREE.Color( 'white' );
 
-  const boxWidth = 1;
-  const boxHeight = 1;
-  const boxDepth = 1;
-  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+	function addLight( x, y, z ) {
 
-  function makeInstance(geometry, color, x, y, z) {
-    [THREE.BackSide, THREE.FrontSide].forEach((side) => {
-      const material = new THREE.MeshPhongMaterial({
-        color,
-        opacity: 0.5,
-        transparent: true,
-        side,
-      });
+		const color = 0xFFFFFF;
+		const intensity = 3;
+		const light = new THREE.DirectionalLight( color, intensity );
+		light.position.set( x, y, z );
+		scene.add( light );
 
-      const cube = new THREE.Mesh(geometry, material);
-      scene.add(cube);
+	}
 
-      cube.position.set(x, y, z);
-    });
-  }
+	addLight( - 1, 2, 4 );
+	addLight( 1, - 1, - 2 );
 
-  function hsl(h, s, l) {
-    return (new THREE.Color()).setHSL(h, s, l);
-  }
+	const boxWidth = 1;
+	const boxHeight = 1;
+	const boxDepth = 1;
+	const geometry = new THREE.BoxGeometry( boxWidth, boxHeight, boxDepth );
 
-  {
-    const d = 0.8;
-    makeInstance(geometry, hsl(0 / 8, 1, .5), -d, -d, -d);
-    makeInstance(geometry, hsl(1 / 8, 1, .5),  d, -d, -d);
-    makeInstance(geometry, hsl(2 / 8, 1, .5), -d,  d, -d);
-    makeInstance(geometry, hsl(3 / 8, 1, .5),  d,  d, -d);
-    makeInstance(geometry, hsl(4 / 8, 1, .5), -d, -d,  d);
-    makeInstance(geometry, hsl(5 / 8, 1, .5),  d, -d,  d);
-    makeInstance(geometry, hsl(6 / 8, 1, .5), -d,  d,  d);
-    makeInstance(geometry, hsl(7 / 8, 1, .5),  d,  d,  d);
-  }
+	function makeInstance( geometry, color, x, y, z ) {
 
-  function resizeRendererToDisplaySize(renderer) {
-    const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
-    }
-    return needResize;
-  }
+		[ THREE.BackSide, THREE.FrontSide ].forEach( ( side ) => {
 
-  let renderRequested = false;
+			const material = new THREE.MeshPhongMaterial( {
+				color,
+				opacity: 0.5,
+				transparent: true,
+				side,
+			} );
 
-  function render() {
-    renderRequested = undefined;
+			const cube = new THREE.Mesh( geometry, material );
+			scene.add( cube );
 
-    if (resizeRendererToDisplaySize(renderer)) {
-      const canvas = renderer.domElement;
-      camera.aspect = canvas.clientWidth / canvas.clientHeight;
-      camera.updateProjectionMatrix();
-    }
+			cube.position.set( x, y, z );
 
-    renderer.render(scene, camera);
-  }
-  render();
+		} );
 
-  function requestRenderIfNotRequested() {
-    if (!renderRequested) {
-      renderRequested = true;
-      requestAnimationFrame(render);
-    }
-  }
+	}
 
-  controls.addEventListener('change', requestRenderIfNotRequested);
-  window.addEventListener('resize', requestRenderIfNotRequested);
+	function hsl( h, s, l ) {
+
+		return ( new THREE.Color() ).setHSL( h, s, l );
+
+	}
+
+	{
+
+		const d = 0.8;
+		makeInstance( geometry, hsl( 0 / 8, 1, .5 ), - d, - d, - d );
+		makeInstance( geometry, hsl( 1 / 8, 1, .5 ), d, - d, - d );
+		makeInstance( geometry, hsl( 2 / 8, 1, .5 ), - d, d, - d );
+		makeInstance( geometry, hsl( 3 / 8, 1, .5 ), d, d, - d );
+		makeInstance( geometry, hsl( 4 / 8, 1, .5 ), - d, - d, d );
+		makeInstance( geometry, hsl( 5 / 8, 1, .5 ), d, - d, d );
+		makeInstance( geometry, hsl( 6 / 8, 1, .5 ), - d, d, d );
+		makeInstance( geometry, hsl( 7 / 8, 1, .5 ), d, d, d );
+
+	}
+
+	function resizeRendererToDisplaySize( renderer ) {
+
+		const canvas = renderer.domElement;
+		const width = canvas.clientWidth;
+		const height = canvas.clientHeight;
+		const needResize = canvas.width !== width || canvas.height !== height;
+		if ( needResize ) {
+
+			renderer.setSize( width, height, false );
+
+		}
+
+		return needResize;
+
+	}
+
+	let renderRequested = false;
+
+	function render() {
+
+		renderRequested = undefined;
+
+		if ( resizeRendererToDisplaySize( renderer ) ) {
+
+			const canvas = renderer.domElement;
+			camera.aspect = canvas.clientWidth / canvas.clientHeight;
+			camera.updateProjectionMatrix();
+
+		}
+
+		renderer.render( scene, camera );
+
+	}
+
+	render();
+
+	function requestRenderIfNotRequested() {
+
+		if ( ! renderRequested ) {
+
+			renderRequested = true;
+			requestAnimationFrame( render );
+
+		}
+
+	}
+
+	controls.addEventListener( 'change', requestRenderIfNotRequested );
+	window.addEventListener( 'resize', requestRenderIfNotRequested );
+
 }
 
 main();
 </script>
 </html>
-

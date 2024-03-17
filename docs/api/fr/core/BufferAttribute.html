@@ -49,10 +49,17 @@
 
 		<h3>[property:Integer count]</h3>
 		<p>
-		Stocke la longueur du tableau [page:BufferAttribute.array array] divisée par [page:BufferAttribute.itemSize itemSize].<br /><br />
+		Stocke la longueur du tableau [page:BufferAttribute.array array] divisée par [page:BufferAttribute.itemSize itemSize]. Read-only property.<br /><br />
 
 		Si le tampon stocke un vecteur à 3 composants (tel qu'une position, une normale ou une couleur),
 		cela comptera alors le nombre de ces vecteurs stockés.
+		</p>
+
+		<h3>[property:Number gpuType]</h3>
+		<p>
+			Configures the bound GPU type for use in shaders. Either [page:BufferAttribute THREE.FloatType] or [page:BufferAttribute THREE.IntType], default is [page:BufferAttribute THREE.FloatType].
+
+			Note: this only has an effect for integer arrays and is not configurable for float arrays. For lower precision float types, see [page:BufferAttributeTypes THREE.Float16BufferAttribute].
 		</p>
 
 		<h3>[property:Boolean isBufferAttribute]</h3>
@@ -139,6 +146,9 @@
 		<h3>[method:this copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
 		<p>Copie un vecteur de bufferAttribute[index2] à [page:BufferAttribute.array array][index1].</p>
 
+		<h3>[method:Number getComponent]( [param:Integer index], [param:Integer component] ) </h3>
+		<p>Returns the given component of the vector at the given index.</p>
+
 		<h3>[method:Number getX]( [param:Integer index] ) </h3>
 		<p>Renvoie le composant x d'un vecteur à l'index donné.</p>
 
@@ -177,6 +187,9 @@
 
 			Remarque : Après la première utilisation d'un tampon, son utilisation ne peut pas être modifiée. Au lieu de cela, instanciez-en un nouveau et définissez l'utilisation souhaitée avant le prochain rendu.
 		</p>
+
+		<h3>[method:Number setComponent]( [param:Integer index], [param:Integer component], [param:Float value] ) </h3>
+		<p>Sets the given component of the vector at the given index.</p>
 
 		<h3>[method:this setX]( [param:Integer index], [param:Float x] ) </h3>
 		<p>Définit la composante x du vecteur à l'indice donné.</p>

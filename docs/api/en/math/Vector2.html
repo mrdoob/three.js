@@ -215,15 +215,14 @@
 		</h3>
 		<p>
 			[page:Array array] - the source array.<br />
-			[page:Integer offset] - (optional) offset into the array. Default is 0.<br /><br />
+			[page:Integer offset] - (optional) offset into the array. Default is `0`.<br /><br />
 
 			Sets this vector's [page:.x x] value to be `array[ offset ]` and [page:.y y] 
 			value to be `array[ offset + 1 ]`.
 		</p>
 
 		<h3>
-			[method:this fromBufferAttribute]( [param:BufferAttribute attribute],
-			[param:Integer index] )
+			[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )
 		</h3>
 		<p>
 			[page:BufferAttribute attribute] - the source attribute.<br />
@@ -235,10 +234,10 @@
 
 		<h3>[method:Float getComponent]( [param:Integer index] )</h3>
 		<p>
-			[page:Integer index] - 0 or 1.<br /><br />
+			[page:Integer index] - `0` or `1`.<br /><br />
 
-			If index equals 0 returns the [page:.x x] value. <br />
-			If index equals 1 returns the [page:.y y] value.
+			If index equals `0` returns the [page:.x x] value. <br />
+			If index equals `1` returns the [page:.y y] value.
 		</p>
 
 		<h3>[method:Float length]()</h3>
@@ -273,8 +272,7 @@
 		</p>
 
 		<h3>
-			[method:this lerpVectors]( [param:Vector2 v1], [param:Vector2 v2],
-			[param:Float alpha] )
+			[method:this lerpVectors]( [param:Vector2 v1], [param:Vector2 v2], [param:Float alpha] )
 		</h3>
 		<p>
 			[page:Vector2 v1] - the starting [page:Vector2].<br />
@@ -345,11 +343,11 @@
 			[method:this setComponent]( [param:Integer index], [param:Float value] )
 		</h3>
 		<p>
-			[page:Integer index] - 0 or 1.<br />
+			[page:Integer index] - `0` or `1`.<br />
 			[page:Float value] - [page:Float]<br /><br />
 
-			If index equals 0 set [page:.x x] to [page:Float value]. <br />
-			If index equals 1 set [page:.y y] to [page:Float value]
+			If index equals `0` set [page:.x x] to [page:Float value]. <br />
+			If index equals `1` set [page:.y y] to [page:Float value]
 		</p>
 
 		<h3>[method:this setLength]( [param:Float l] )</h3>
@@ -395,8 +393,8 @@
 
 		<h3>[method:this random]()</h3>
 		<p>
-			Sets each component of this vector to a pseudo-random value between 0 and
-			1, excluding 1.
+			Sets each component of this vector to a pseudo-random value between `0` and
+			`1`, excluding `1`.
 		</p>
 
 		<h2>Source</h2>

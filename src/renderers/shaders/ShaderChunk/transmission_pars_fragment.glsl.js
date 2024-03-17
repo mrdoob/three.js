@@ -149,19 +149,19 @@ export default /* glsl */`
 
 	}
 
-	vec3 applyVolumeAttenuation( const in vec3 radiance, const in float transmissionDistance, const in vec3 attenuationColor, const in float attenuationDistance ) {
+	vec3 volumeAttenuation( const in float transmissionDistance, const in vec3 attenuationColor, const in float attenuationDistance ) {
 
 		if ( isinf( attenuationDistance ) ) {
 
 			// Attenuation distance is +∞, i.e. the transmitted color is not attenuated at all.
-			return radiance;
+			return vec3( 1.0 );
 
 		} else {
 
 			// Compute light attenuation using Beer's law.
 			vec3 attenuationCoefficient = -log( attenuationColor ) / attenuationDistance;
 			vec3 transmittance = exp( - attenuationCoefficient * transmissionDistance ); // Beer's law
-			return transmittance * radiance;
+			return transmittance;
 
 		}
 
@@ -184,12 +184,17 @@ export default /* glsl */`
 		// Sample framebuffer to get pixel the refracted ray hits.
 		vec4 transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );
 
-		vec3 attenuatedColor = applyVolumeAttenuation( transmittedLight.rgb, length( transmissionRay ), attenuationColor, attenuationDistance );
+		vec3 transmittance = diffuseColor * volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance );
+		vec3 attenuatedColor = transmittance * transmittedLight.rgb;
 
 		// Get the specular component.
 		vec3 F = EnvironmentBRDF( n, v, specularColor, specularF90, roughness );
 
-		return vec4( ( 1.0 - F ) * attenuatedColor * diffuseColor, transmittedLight.a );
+		// As less light is transmitted, the opacity should be increased. This simple approximation does a decent job 
+		// of modulating a CSS background, and has no effect when the buffer is opaque, due to a solid object or clear color.
+		float transmittanceFactor = ( transmittance.r + transmittance.g + transmittance.b ) / 3.0;
+
+		return vec4( ( 1.0 - F ) * attenuatedColor, 1.0 - ( 1.0 - transmittedLight.a ) * transmittanceFactor );
 
 	}
 #endif

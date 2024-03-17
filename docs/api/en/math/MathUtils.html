@@ -108,9 +108,9 @@
 		<p>
 			[page:Float x] — The value to pingpong.<br />
 			[page:Float length] — The positive value the function will pingpong to.
-			Default is 1.<br /><br />
+			Default is `1`.<br /><br />
 
-			Returns a value that alternates between 0 and [param:Float length].
+			Returns a value that alternates between `0` and [param:Float length].
 		</p>
 
 		<h3>[method:Integer ceilPowerOfTwo]( [param:Number n] )</h3>
@@ -121,7 +121,7 @@
 
 		<h3>[method:Integer floorPowerOfTwo]( [param:Number n] )</h3>
 		<p>
-			Returns the largest power of 2 that is less than or equal to [page:Number n].
+			Returns the largest power of `2` that is less than or equal to [page:Number n].
 		</p>
 
 		<h3>[method:Float radToDeg]( [param:Float radians] )</h3>
@@ -148,14 +148,13 @@
 		</p>
 
 		<h3>
-			[method:Float smoothstep]( [param:Float x], [param:Float min],
-			[param:Float max] )
+			[method:Float smoothstep]( [param:Float x], [param:Float min], [param:Float max] )
 		</h3>
 		<p>
 			[page:Float x] - The value to evaluate based on its position between min
 			and max. <br />
-			[page:Float min] - Any x value below min will be 0.<br />
-			[page:Float max] - Any x value above max will be 1.<br /><br />
+			[page:Float min] - Any x value below min will be `0`.<br />
+			[page:Float max] - Any x value above max will be `1`.<br /><br />
 
 			Returns a value between 0-1 that represents the percentage that x has
 			moved between min and max, but smoothed or slowed down the closer X is to
@@ -165,14 +164,13 @@
 		</p>
 
 		<h3>
-			[method:Float smootherstep]( [param:Float x], [param:Float min],
-			[param:Float max] )
+			[method:Float smootherstep]( [param:Float x], [param:Float min], [param:Float max] )
 		</h3>
 		<p>
 			[page:Float x] - The value to evaluate based on its position between min
 			and max. <br />
-			[page:Float min] - Any x value below min will be 0.<br />
-			[page:Float max] - Any x value above max will be 1.<br /><br />
+			[page:Float min] - Any x value below min will be `0`.<br />
+			[page:Float max] - Any x value above max will be `1`.<br /><br />
 
 			Returns a value between 0-1. A
 			[link:https://en.wikipedia.org/wiki/Smoothstep#Variations variation on smoothstep] 
@@ -180,8 +178,7 @@
 		</p>
 
 		<h3>
-			[method:undefined setQuaternionFromProperEuler]( [param:Quaternion q],
-			[param:Float a], [param:Float b], [param:Float c], [param:String order] )
+			[method:undefined setQuaternionFromProperEuler]( [param:Quaternion q], [param:Float a], [param:Float b], [param:Float c], [param:String order] )
 		</h3>
 		<p>
 			[page:Quaternion q] - the quaternion to be set<br />

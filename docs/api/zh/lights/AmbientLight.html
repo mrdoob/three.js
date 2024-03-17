@@ -20,18 +20,18 @@
 		<h2>代码示例</h2>
 
 		<code>
-		const light = new THREE.AmbientLight( 0x404040 ); // soft white light
+		const light = new THREE.AmbientLight( 0x404040 ); // 柔和的白光
 		scene.add( light );
 		</code>
 
 		<h2>构造函数</h2>
 
-		<h3>[name]( [param:Integer color], [param:Float intensity] )</h3>
+		<h3>[name]( [param:Color color], [param:Float intensity] )</h3>
 		<p>
-		[page:Integer color] - (参数可选）颜色的rgb数值。缺省值为 0xffffff。<br />
-		[page:Float intensity] - (参数可选)光照的强度。缺省值为 1。<br /><br />
+			[page:Color color] -（可选）一个表示颜色的 Color 的实例、字符串或数字，默认为一个白色（0xffffff）的 [page:Color Color] 对象。<br />
+			[page:Float intensity] -（可选）光照的强度。默认值为 1。<br /><br />
 
-		创建一个环境光对象。
+			创建一个环境光对象。
 		</p>
 
 		<h2>属性</h2>
@@ -39,14 +39,9 @@
 			公共属性请查看基类 [page:Light Light]。
 		</p>
 
-		<h3>[property:Boolean castShadow]</h3>
-		<p>
-			这个参数在对象构造的时候就被设置成了 *undefined* 。因为环境光不能投射阴影。
-		</p>
-
 		<h3>[property:Boolean isAmbientLight]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			只读，用于检查对象的类型是否为 [name]。
 		</p>
 
 

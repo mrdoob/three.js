@@ -18,6 +18,7 @@ void main() {
 
 	#include <uv_vertex>
 	#include <color_vertex>
+	#include <morphinstance_vertex>
 	#include <morphcolor_vertex>
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
@@ -48,6 +49,7 @@ varying float vLineDistance;
 
 void main() {
 
+	vec4 diffuseColor = vec4( diffuse, opacity );
 	#include <clipping_planes_fragment>
 
 	if ( mod( vLineDistance, totalSize ) > dashSize ) {
@@ -57,7 +59,6 @@ void main() {
 	}
 
 	vec3 outgoingLight = vec3( 0.0 );
-	vec4 diffuseColor = vec4( diffuse, opacity );
 
 	#include <logdepthbuf_fragment>
 	#include <map_fragment>
@@ -65,9 +66,9 @@ void main() {
 
 	outgoingLight = diffuseColor.rgb; // simple shader
 
-	#include <output_fragment>
+	#include <opaque_fragment>
 	#include <tonemapping_fragment>
-	#include <encodings_fragment>
+	#include <colorspace_fragment>
 	#include <fog_fragment>
 	#include <premultiplied_alpha_fragment>
 

@@ -51,10 +51,6 @@
 			<a href="https://www.codeproject.com/info/cpol10.aspx" target="_blank" rel="noopener">CPOL</a>
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -70,14 +66,6 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { unzipSync } from 'three/addons/libs/fflate.module.js';
-
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			if ( WebGL.isWebGL2Available() === false ) {
-
-				document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
-
-			}
 
 			let camera, scene, mesh, renderer, stats;
 

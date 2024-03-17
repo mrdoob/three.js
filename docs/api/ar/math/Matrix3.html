@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+		فئة تمثل 3x3
+		[link:https://en.wikipedia.org/wiki/Matrix_(mathematics) مصفوفة].
+		</p>
+		 
+		<h2>مثال الكود</h2>
+		<code>
+const m = new Matrix3(); 
+		</code>
+		 
+		<h2>ملاحظة حول الترتيب الرئيسي للصف والعمود الرئيسي</h2>
+		<p>
+			يأخذ المنشئ وطريقة [page:set]() الوسائط في
+			[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order ترتيب الصف الرئيسي]
+			، في حين أنها مخزنة داخليًا في مصفوفة [page:.elements elements]
+			بترتيب العمود الرئيسي.<br /><br />
+		 
+			هذا يعني أن استدعاء
+			<code>
+m.set( 11, 12, 13,
+		21, 22, 23,
+		31, 32, 33 );
+		</code>
+			ستؤدي إلى مصفوفة [page:.elements elements] التي تحتوي على:
+			<code> 
+m.elements = [ 11, 21, 31,
+				12, 22, 32, 
+				13, 23, 33 ];
+			</code>
+			وداخليًا يتم تنفيذ جميع الحسابات باستخدام ترتيب العمود الرئيسي.
+			ومع ذلك ، نظرًا لأن الترتيب الفعلي لا يحدث فرقًا رياضيًا و
+			معظم الناس معتادون على التفكير في المصفوفات بترتيب الصف الرئيسي ، فإن
+			وثائق three.js تظهر المصفوفات بترتيب الصف الرئيسي. فقط تحمل في
+			اذهانك أنه إذا كنت تقرأ التعليمات البرمجية المصدرية ، فستضطر إلى أخذ
+			[link:https://en.wikipedia.org/wiki/Transpose عكس] لأية مصفوفات
+			الموضحة هنا لجعل المحاسبات منطقية.
+		</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>[name]( [param:Number n11], [param:Number n12], [param:Number n13],
+		[param:Number n21], [param:Number n22], [param:Number n23],
+		[param:Number n31], [param:Number n32], [param:Number n33] )</h3>
+		<p>
+		ينشئ مصفوفة 3x3 بالوسائط المعطاة بترتيب الصف الرئيسي. إذا لم يتم توفير أية وسائط ، يقوم المنشئ بتهيئة
+		[name] إلى مصفوفة هوية 3x3 [link:https://en.wikipedia.org/wiki/Identity_matrix].
+		</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		 
+		<h3>[property:Array elements]</h3>
+		<p>
+		قائمة [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order بالعمود الرئيسي] من قيم المصفوفة.
+		</p>
+		 
+		<h2>الطرق (Methods)</h2>
+
+		<h3>[method:Matrix3 clone]()</h3>
+		<p>ينشئ Matrix3 جديدًا وبعناصر متطابقة مع هذا.</p>
+	 
+		<h3>[method:this copy]( [param:Matrix3 m] )</h3>
+		<p>ينسخ عناصر المصفوفة [page:Matrix3 m] في هذه المصفوفة.</p>
+	 
+		<h3>[method:Float determinant]()</h3>
+		<p>
+		يحسب ويعيد [link:https://en.wikipedia.org/wiki/Determinant المحدد] لهذه المصفوفة.
+		</p>
+	 
+		<h3>[method:Boolean equals]( [param:Matrix3 m] )</h3>
+		<p>يرجع صحيحًا إذا كانت هذه المصفوفة و [page:Matrix3 m] متساويتين.</p>
+	 
+		<h3>
+		[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )
+		</h3>
+		<p>
+		يستخرج [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) الأساس]
+		لهذه المصفوفة في ثلاثة متجهات محورية مقدمة. إذا كانت هذه المصفوفة
+		هي:
+		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>a</mi></mtd>
+						<mtd><mi>b</mi></mtd>
+						<mtd><mi>c</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>d</mi></mtd>
+						<mtd><mi>e</mi></mtd>
+						<mtd><mi>f</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>g</mi></mtd>
+						<mtd><mi>h</mi></mtd>
+						<mtd><mi>i</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+
+		<p>
+		ثم سيتم تعيين [page:Vector3 xAxis] ، [page:Vector3 yAxis] ، [page:Vector3 zAxis]
+		إلى:
+		</p>
+
+		<div style="text-align: center">
+			<math>
+				<mrow>
+					<mi>xAxis</mi>
+					<mo>=</mo>
+					<mo>[</mo>
+					<mtable>
+						<mtr><mtd style="height: 1rem"><mi>a</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>d</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>g</mi></mtd></mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>,
+
+			<math>
+				<mrow>
+					<mi>yAxis</mi>
+					<mo>=</mo>
+					<mo>[</mo>
+					<mtable>
+						<mtr><mtd style="height: 1rem"><mi>b</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>e</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>h</mi></mtd></mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>, and
+
+			<math>
+				<mrow>
+					<mi>zAxis</mi>
+					<mo>=</mo>
+					<mo>[</mo>
+					<mtable>
+						<mtr><mtd style="height: 1rem"><mi>c</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>f</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>i</mi></mtd></mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>
+		</div>
+	 
+		<h3>
+		[method:this fromArray]( [param:Array array], [param:Integer offset] )
+		</h3>
+		<p>
+		[page:Array array] - المصفوفة التي يتم قراءة العناصر منها.<br />
+		[page:Integer offset] - (اختياري) فهرس العنصر الأول في المصفوفة.
+		الافتراضي هو 0.<br /><br />
+	 
+		يضع عناصر هذه المصفوفة بناءً على مصفوفة في
+		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order تنسيق العمود الرئيسي].
+		</p>
+	 
+		<h3>[method:this invert]()</h3>
+		<p>
+		يعكس هذه المصفوفة ، باستخدام
+		[link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution الطريقة التحليلية].
+		لا يمكنك العكس مع محدد صفر. إذا قمت بمحاولة هذا ، فإن الطريقة تنتج مصفوفة صفرية بدلاً من ذلك.
+		</p>
+	 
+		<h3>[method:this getNormalMatrix]( [param:Matrix4 m] )</h3>
+		<p>
+		[page:Matrix4 m] - [page:Matrix4]<br /><br />
+	 
+		يضع هذه المصفوفة كـ 3x3 العلوي الأيسر من
+		[link:https://en.wikipedia.org/wiki/Normal_matrix المصفوفة الطبيعية] لل
+		مرور [page:Matrix4 matrix4].
+		المصفوفة الطبيعية هي
+		[link:https://en.wikipedia.org/wiki/Invertible_matrix العكس]
+		[link:https://en.wikipedia.org/wiki/Transpose عكس] للمصفوفة
+		[page:Matrix4 m].
+		</p>
+	 
+		<h3>[method:this identity]()</h3>
+		<p>
+		يعيد هذه المصفوفة إلى مصفوفة الهوية 3x3:
+		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+	 
+		<h3>[method:this makeRotation]( [param:Float theta] )</h3>
+		<p>
+		[page:Float theta] - زاوية الدوران بالراديان. تدور القيم الموجبة
+		عكس عقارب الساعة.<br /><br />
+	 
+		يضع هذه المصفوفة كتحول دوران ثنائي الأبعاد بـ [page:Float theta]
+		راديان. المصفوفة الناتجة ستكون:
+		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>-sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+	 
+		<h3>[method:this makeScale]( [param:Float x], [param:Float y] )</h3>
+		<p>
+		[page:Float x] - المبلغ الذي يتم قياسه في المحور X.<br />
+		[page:Float y] - المبلغ الذي يتم قياسه في المحور Y.<br />
+	 
+		يضع هذه المصفوفة كتحول قياس ثنائي الأبعاد:
+		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>x</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+	 
+		<h3>[method:this makeTranslation]( [param:Vector2 v] )</h3>
+		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y] )</h3>
+		<p>
+		[page:Vector2 v] تحويل الترجمة من المتجه.<br />
+		أو<br />
+		[page:Float x] - المبلغ الذي يتم ترجمته في المحور X.<br />
+		[page:Float y] - المبلغ الذي يتم ترجمته في المحور Y.<br />
+	 
+		يضع هذه المصفوفة كتحويل ترجمة ثنائي الأبعاد:
+		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>x</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+	 
+		<h3>[method:this multiply]( [param:Matrix3 m] )</h3>
+		<p>يضرب هذه المصفوفة بعد [page:Matrix3 m].</p>
+	 
+		<h3>
+		[method:this multiplyMatrices]( [param:Matrix3 a], [param:Matrix3 b] )
+		</h3>
+		<p>يضع هذه المصفوفة على [page:Matrix3 a] x [page:Matrix3 b].</p>
+	 
+		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
+		<p>يضرب كل مكون من مكونات المصفوفة بالقيمة العددية *s*.</p>
+	 
+		<h3>[method:this rotate]( [param:Float theta] )</h3>
+		<p>يدور هذه المصفوفة بالزاوية المعطاة (بالراديان).</p>
+	 
+		<h3>[method:this scale]( [param:Float sx], [param:Float sy] )</h3>
+		<p>يقيس هذه المصفوفة بالقيم العددية المعطاة.</p>
+	 
+		<h3>
+		[method:this set]( [param:Float n11], [param:Float n12], [param:Float n13], [param:Float n21], [param:Float n22], [param:Float n23], [param:Float n31], [param:Float n32], [param:Float n33] )
+		</h3>
+		<p>
+		يضع قيم المصفوفة 3x3 على
+		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order تسلسل قيم رئيسية للصف]:
+		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>n11</mi></mtd>
+						<mtd><mi>n12</mi></mtd>
+						<mtd><mi>n13</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n21</mi></mtd>
+						<mtd><mi>n22</mi></mtd>
+						<mtd><mi>n23</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n31</mi></mtd>
+						<mtd><mi>n32</mi></mtd>
+						<mtd><mi>n33</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+	 
+		<h3>[method:this premultiply]( [param:Matrix3 m] )</h3>
+		<p>Pre-multiplies this matrix by [page:Matrix3 m].</p>
+	 
+		<h3>[method:this setFromMatrix4]( [param:Matrix4 m] )</h3>
+		<p>
+		قم بتعيين هذه المصفوفة إلى مصفوفة 3x3 العلوية من Matrix4
+	 	[page:Matrix4 m].
+		</p>
+	 
+		<h3>
+		[method:this setUvTransform]( [param:Float tx], [param:Float ty], [param:Float sx], [param:Float sy], [param:Float rotation], [param:Float cx], [param:Float cy] )
+		</h3>
+		<p>
+		[page:Float tx] - الإزاحة x<br />
+		[page:Float ty] - الإزاحة y<br />
+		[page:Float sx] - تكرار x<br />
+		[page:Float sy] - تكرار y<br />
+		[page:Float rotation] - الدوران ، بالراديان. تدور القيم الموجبة
+		عكس عقارب الساعة<br />
+		[page:Float cx] - مركز x للدوران<br />
+		[page:Float cy] - مركز y للدوران<br /><br />
+		 
+		يضع مصفوفة التحويل UV من الإزاحة والتكرار والدوران والمركز.
+		</p>
+		 
+		<h3>
+		[method:Array toArray]( [param:Array array], [param:Integer offset] )
+		</h3>
+		<p>
+		[page:Array array] - (اختياري) مصفوفة لتخزين المتجه الناتج فيها. إذا
+		لم يتم إعطاء مصفوفة جديدة سيتم إنشاؤها.<br />
+		[page:Integer offset] - (اختياري) إزاحة في المصفوفة التي يجب وضعها فيها
+		النتيجة.<br /><br />
+		 
+		يكتب عناصر هذه المصفوفة في مصفوفة في
+		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order تنسيق العمود الرئيسي].
+		</p>
+		 
+		<h3>[method:this translate]( [param:Float tx], [param:Float ty] )</h3>
+		<p>يترجم هذه المصفوفة بالقيم العددية المعطاة.</p>
+		 
+		<h3>[method:this transpose]()</h3>
+		<p>
+		[link:https://en.wikipedia.org/wiki/Transpose يعكس] هذه المصفوفة في
+		مكان.
+		</p>
+		 
+		<h3>[method:this transposeIntoArray]( [param:Array array] )</h3>
+		<p>
+		[page:Array array] - مصفوفة لتخزين المتجه الناتج فيها.<br /><br />
+		 
+		[link:https://en.wikipedia.org/wiki/Transpose يعكس] هذه المصفوفة في
+		المصفوفة الموردة ، ويرجع نفسه دون تغيير.
+		</p>
+		 
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

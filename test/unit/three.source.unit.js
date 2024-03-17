@@ -129,11 +129,9 @@ import './src/helpers/SpotLightHelper.tests.js';
 
 //src/lights
 import './src/lights/AmbientLight.tests.js';
-import './src/lights/AmbientLightProbe.tests.js';
 import './src/lights/DirectionalLight.tests.js';
 import './src/lights/DirectionalLightShadow.tests.js';
 import './src/lights/HemisphereLight.tests.js';
-import './src/lights/HemisphereLightProbe.tests.js';
 import './src/lights/Light.tests.js';
 import './src/lights/LightProbe.tests.js';
 import './src/lights/LightShadow.tests.js';
@@ -231,11 +229,9 @@ import './src/objects/Sprite.tests.js';
 
 
 //src/renderers
-import './src/renderers/WebGL1Renderer.tests.js';
 import './src/renderers/WebGL3DRenderTarget.tests.js';
 import './src/renderers/WebGLArrayRenderTarget.tests.js';
 import './src/renderers/WebGLCubeRenderTarget.tests.js';
-import './src/renderers/WebGLMultipleRenderTargets.tests.js';
 import './src/renderers/WebGLRenderer.tests.js';
 import './src/renderers/WebGLRenderTarget.tests.js';
 

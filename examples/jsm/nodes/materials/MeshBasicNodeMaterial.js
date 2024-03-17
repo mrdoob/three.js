@@ -13,15 +13,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 		this.isMeshBasicNodeMaterial = true;
 
 		this.lights = false;
-
-		this.colorNode = null;
-		this.opacityNode = null;
-
-		this.alphaTestNode = null;
-
-		this.lightNode = null;
-
-		this.positionNode = null;
+		//this.normals = false; @TODO: normals usage by context
 
 		this.setDefaultValues( defaultValues );
 
@@ -29,23 +21,8 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 	}
 
-	copy( source ) {
-
-		this.colorNode = source.colorNode;
-		this.opacityNode = source.opacityNode;
-
-		this.alphaTestNode = source.alphaTestNode;
-
-		this.lightNode = source.lightNode;
-
-		this.positionNode = source.positionNode;
-
-		return super.copy( source );
-
-	}
-
 }
 
 export default MeshBasicNodeMaterial;
 
-addNodeMaterial( MeshBasicNodeMaterial );
+addNodeMaterial( 'MeshBasicNodeMaterial', MeshBasicNodeMaterial );

@@ -46,10 +46,12 @@ m.elements = [ 11, 21, 31,
 		<h2>Costruttore</h2>
 
 
-		<h3>[name]()</h3>
+		<h3>[name]( [param:Number n11], [param:Number n12], [param:Number n13],
+			[param:Number n21], [param:Number n22], [param:Number n23],
+			[param:Number n31], [param:Number n32], [param:Number n33] )</h3>
 		<p>
-			Crea e inizializza [name] nella 
-			[link:https://en.wikipedia.org/wiki/Identity_matrix matrice] identità 3x3.
+			Creates a 3x3 matrix with the given arguments in row-major. If no arguments are provided, the constructor initializes
+			the [name] to the 3x3 [link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
 		</p>
 
 		<h2>Proprietà</h2>
@@ -80,18 +82,79 @@ m.elements = [ 11, 21, 31,
 		<p>
 			Estrae la [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) base] di questa matrice
 			nei tre vettori asse forniti. Se questa matrice è:
-		<code>
-a, b, c,
-d, e, f,
-g, h, i
-		</code>
-		allora [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] saranno impostate a:
-		<code>
-xAxis = (a, d, g)
-yAxis = (b, e, h)
-zAxis = (c, f, i)
-		</code>
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>a</mi></mtd>
+						<mtd><mi>b</mi></mtd>
+						<mtd><mi>c</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>d</mi></mtd>
+						<mtd><mi>e</mi></mtd>
+						<mtd><mi>f</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>g</mi></mtd>
+						<mtd><mi>h</mi></mtd>
+						<mtd><mi>i</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+
+		<p>
+			allora [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] saranno impostate a:
+		</p>
+
+		<div style="text-align: center">
+			<math>
+				<mrow>
+					<mi>xAxis</mi>
+					<mo>=</mo>
+					<mo>[</mo>
+					<mtable>
+						<mtr><mtd style="height: 1rem"><mi>a</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>d</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>g</mi></mtd></mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>,
+
+			<math>
+				<mrow>
+					<mi>yAxis</mi>
+					<mo>=</mo>
+					<mo>[</mo>
+					<mtable>
+						<mtr><mtd style="height: 1rem"><mi>b</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>e</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>h</mi></mtd></mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>, and
+
+			<math>
+				<mrow>
+					<mi>zAxis</mi>
+					<mo>=</mo>
+					<mo>[</mo>
+					<mtable>
+						<mtr><mtd style="height: 1rem"><mi>c</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>f</mi></mtd></mtr>
+						<mtr><mtd style="height: 1rem"><mi>i</mi></mtd></mtr>
+					</mtable>
+					<mo>]</mo>
+				</mrow>
+			</math>
+		</div>
 
 		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
@@ -121,13 +184,31 @@ zAxis = (c, f, i)
 		<h3>[method:this identity]()</h3>
 		<p>
 			Reimposta questa matrice alla matrice identità 3x3:
-		<code>
-1, 0, 0
-0, 1, 0
-0, 0, 1
-		</code>
-
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this makeRotation]( [param:Float theta] )</h3>
 		<p>
@@ -135,12 +216,47 @@ zAxis = (c, f, i)
 
 		Imposta questa matrice come una trasformazione rotazionale 2D di [page:Float teta] radianti.
 		La matrice risultante sarà:
-		<code>
-cos(&theta;) -sin(&theta;) 0
-sin(&theta;) cos(&theta;)  0
-0      0       1
-		</code>
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>-sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this makeScale]( [param:Float x], [param:Float y] )</h3>
 		<p>
@@ -148,25 +264,66 @@ sin(&theta;) cos(&theta;)  0
 		[page:Float y] - la quantità da scalare sull'asse Y.<br />
 
 		Imposta questa matrice come una trasformazione di scala 2D:
-		<code>
-x, 0, 0,
-0, y, 0,
-0, 0, 1
-		</code>
 		</p>
 
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>x</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+
+		<h3>[method:this makeTranslation]( [param:Vector2 v] )</h3>
 		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y] )</h3>
 		<p>
+		[page:Vector2 v] a translation transform from vector.<br />
+		or<br />
 		[page:Float x] - la quantità da translare sull'asse X.<br />
 		[page:Float y] - la quantità da translare sull'asse Y.<br />
 
 		Imposta questa matrice come una trasformazione di traslazione 2D:
-		<code>
-1, 0, x,
-0, 1, y,
-0, 0, 1
-		</code>
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>x</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this multiply]( [param:Matrix3 m] )</h3>
 		<p>Post-moltiplica questa matrice per [page:Matrix3 m].</p>
@@ -185,16 +342,33 @@ x, 0, 0,
 
 		<h3>[method:this set]( [param:Float n11], [param:Float n12], [param:Float n13], [param:Float n21], [param:Float n22], [param:Float n23], [param:Float n31], [param:Float n32], [param:Float n33] )</h3>
 		<p>
-		[page:Float n11] - valore da inserire nella riga 1, colonna 1.<br />
-		[page:Float n12] - valore da inserire nella riga 1, colonna 2.<br />
-		...<br />
-		...<br />
-		[page:Float n32] - valore da inserire nella riga 3, colonna 2.<br />
-		[page:Float n33] - valore da inserire nella riga 3, colonna 3.<br /><br />
-
 		Imposta i valori della matrice 3x3 sulla sequenza di valori della
 		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major] specificata.
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>n11</mi></mtd>
+						<mtd><mi>n12</mi></mtd>
+						<mtd><mi>n13</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n21</mi></mtd>
+						<mtd><mi>n22</mi></mtd>
+						<mtd><mi>n23</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n31</mi></mtd>
+						<mtd><mi>n32</mi></mtd>
+						<mtd><mi>n33</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this premultiply]( [param:Matrix3 m] )</h3>
 		<p>Pre-moltiplica questa matrice per [page:Matrix3 m].</p>

@@ -1,13 +1,18 @@
-import { BackSide, FrontSide, CubeUVReflectionMapping, SRGBColorSpace } from '../../constants.js';
+import { BackSide, FrontSide, CubeUVReflectionMapping, SRGBTransfer } from '../../constants.js';
 import { BoxGeometry } from '../../geometries/BoxGeometry.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { Color } from '../../math/Color.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
+import { Euler } from '../../math/Euler.js';
+import { Matrix4 } from '../../math/Matrix4.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { cloneUniforms, getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
 
 const _rgb = { r: 0, b: 0, g: 0 };
+const _e1 = /*@__PURE__*/ new Euler();
+const _m1 = /*@__PURE__*/ new Matrix4();
 
 function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha, premultipliedAlpha ) {
 
@@ -44,24 +49,15 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 		}
 
-		const xr = renderer.xr;
-		const environmentBlendMode = xr.getEnvironmentBlendMode();
+		const environmentBlendMode = renderer.xr.getEnvironmentBlendMode();
 
-		switch ( environmentBlendMode ) {
+		if ( environmentBlendMode === 'additive' ) {
 
-			case 'opaque':
-				forceClear = true;
-				break;
+			state.buffers.color.setClear( 0, 0, 0, 1, premultipliedAlpha );
 
-			case 'additive':
-				state.buffers.color.setClear( 0, 0, 0, 1, premultipliedAlpha );
-				forceClear = true;
-				break;
+		} else if ( environmentBlendMode === 'alpha-blend' ) {
 
-			case 'alpha-blend':
-				state.buffers.color.setClear( 0, 0, 0, 0, premultipliedAlpha );
-				forceClear = true;
-				break;
+			state.buffers.color.setClear( 0, 0, 0, 0, premultipliedAlpha );
 
 		}
 
@@ -113,11 +109,25 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 			}
 
+			_e1.copy( scene.backgroundRotation );
+
+			// accommodate left-handed frame
+			_e1.x *= - 1; _e1.y *= - 1; _e1.z *= - 1;
+
+			if ( background.isCubeTexture && background.isRenderTargetTexture === false ) {
+
+				// environment maps which are not cube render targets or PMREMs follow a different convention
+				_e1.y *= - 1;
+				_e1.z *= - 1;
+
+			}
+
 			boxMesh.material.uniforms.envMap.value = background;
 			boxMesh.material.uniforms.flipEnvMap.value = ( background.isCubeTexture && background.isRenderTargetTexture === false ) ? - 1 : 1;
 			boxMesh.material.uniforms.backgroundBlurriness.value = scene.backgroundBlurriness;
 			boxMesh.material.uniforms.backgroundIntensity.value = scene.backgroundIntensity;
-			boxMesh.material.toneMapped = ( background.colorSpace === SRGBColorSpace ) ? false : true;
+			boxMesh.material.uniforms.backgroundRotation.value.setFromMatrix4( _m1.makeRotationFromEuler( _e1 ) );
+			boxMesh.material.toneMapped = ColorManagement.getTransfer( background.colorSpace ) !== SRGBTransfer;
 
 			if ( currentBackground !== background ||
 				currentBackgroundVersion !== background.version ||
@@ -173,7 +183,7 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 			planeMesh.material.uniforms.t2D.value = background;
 			planeMesh.material.uniforms.backgroundIntensity.value = scene.backgroundIntensity;
-			planeMesh.material.toneMapped = ( background.colorSpace === SRGBColorSpace ) ? false : true;
+			planeMesh.material.toneMapped = ColorManagement.getTransfer( background.colorSpace ) !== SRGBTransfer;
 
 			if ( background.matrixAutoUpdate === true ) {
 

@@ -10,6 +10,7 @@ varying vec3 vViewPosition;
 #endif
 
 #include <common>
+#include <batching_pars_vertex>
 #include <uv_pars_vertex>
 #include <displacementmap_pars_vertex>
 #include <color_pars_vertex>
@@ -25,7 +26,9 @@ void main() {
 
 	#include <uv_vertex>
 	#include <color_vertex>
+	#include <morphinstance_vertex>
 	#include <morphcolor_vertex>
+	#include <batching_vertex>
 
 	#include <beginnormal_vertex>
 	#include <morphnormal_vertex>
@@ -112,6 +115,14 @@ uniform float opacity;
 	#endif
 #endif
 
+#ifdef USE_ANISOTROPY
+	uniform vec2 anisotropyVector;
+
+	#ifdef USE_ANISOTROPYMAP
+		uniform sampler2D anisotropyMap;
+	#endif
+#endif
+
 varying vec3 vViewPosition;
 
 #include <common>
@@ -122,6 +133,7 @@ varying vec3 vViewPosition;
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <alphatest_pars_fragment>
+#include <alphahash_pars_fragment>
 #include <aomap_pars_fragment>
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
@@ -146,9 +158,9 @@ varying vec3 vViewPosition;
 
 void main() {
 
+	vec4 diffuseColor = vec4( diffuse, opacity );
 	#include <clipping_planes_fragment>
 
-	vec4 diffuseColor = vec4( diffuse, opacity );
 	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
 	vec3 totalEmissiveRadiance = emissive;
 
@@ -157,6 +169,7 @@ void main() {
 	#include <color_fragment>
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
+	#include <alphahash_fragment>
 	#include <roughnessmap_fragment>
 	#include <metalnessmap_fragment>
 	#include <normal_fragment_begin>
@@ -187,23 +200,23 @@ void main() {
 		// https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
 		float sheenEnergyComp = 1.0 - 0.157 * max3( material.sheenColor );
 
-		outgoingLight = outgoingLight * sheenEnergyComp + sheenSpecular;
+		outgoingLight = outgoingLight * sheenEnergyComp + sheenSpecularDirect + sheenSpecularIndirect;
 
 	#endif
 
 	#ifdef USE_CLEARCOAT
 
-		float dotNVcc = saturate( dot( geometry.clearcoatNormal, geometry.viewDir ) );
+		float dotNVcc = saturate( dot( geometryClearcoatNormal, geometryViewDir ) );
 
 		vec3 Fcc = F_Schlick( material.clearcoatF0, material.clearcoatF90, dotNVcc );
 
-		outgoingLight = outgoingLight * ( 1.0 - material.clearcoat * Fcc ) + clearcoatSpecular * material.clearcoat;
+		outgoingLight = outgoingLight * ( 1.0 - material.clearcoat * Fcc ) + ( clearcoatSpecularDirect + clearcoatSpecularIndirect ) * material.clearcoat;
 
 	#endif
 
-	#include <output_fragment>
+	#include <opaque_fragment>
 	#include <tonemapping_fragment>
-	#include <encodings_fragment>
+	#include <colorspace_fragment>
 	#include <fog_fragment>
 	#include <premultiplied_alpha_fragment>
 	#include <dithering_fragment>

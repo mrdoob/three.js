@@ -110,6 +110,8 @@ class MaterialLoader extends Loader {
 		if ( json.thickness !== undefined ) material.thickness = json.thickness;
 		if ( json.attenuationDistance !== undefined ) material.attenuationDistance = json.attenuationDistance;
 		if ( json.attenuationColor !== undefined && material.attenuationColor !== undefined ) material.attenuationColor.setHex( json.attenuationColor );
+		if ( json.anisotropy !== undefined ) material.anisotropy = json.anisotropy;
+		if ( json.anisotropyRotation !== undefined ) material.anisotropyRotation = json.anisotropyRotation;
 		if ( json.fog !== undefined ) material.fog = json.fog;
 		if ( json.flatShading !== undefined ) material.flatShading = json.flatShading;
 		if ( json.blending !== undefined ) material.blending = json.blending;
@@ -119,11 +121,19 @@ class MaterialLoader extends Loader {
 		if ( json.opacity !== undefined ) material.opacity = json.opacity;
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
 		if ( json.alphaTest !== undefined ) material.alphaTest = json.alphaTest;
+		if ( json.alphaHash !== undefined ) material.alphaHash = json.alphaHash;
+		if ( json.depthFunc !== undefined ) material.depthFunc = json.depthFunc;
 		if ( json.depthTest !== undefined ) material.depthTest = json.depthTest;
 		if ( json.depthWrite !== undefined ) material.depthWrite = json.depthWrite;
 		if ( json.colorWrite !== undefined ) material.colorWrite = json.colorWrite;
-
-		if ( json.stencilWrite !== undefined ) material.stencilWrite = json.stencilWrite;
+		if ( json.blendSrc !== undefined ) material.blendSrc = json.blendSrc;
+		if ( json.blendDst !== undefined ) material.blendDst = json.blendDst;
+		if ( json.blendEquation !== undefined ) material.blendEquation = json.blendEquation;
+		if ( json.blendSrcAlpha !== undefined ) material.blendSrcAlpha = json.blendSrcAlpha;
+		if ( json.blendDstAlpha !== undefined ) material.blendDstAlpha = json.blendDstAlpha;
+		if ( json.blendEquationAlpha !== undefined ) material.blendEquationAlpha = json.blendEquationAlpha;
+		if ( json.blendColor !== undefined && material.blendColor !== undefined ) material.blendColor.setHex( json.blendColor );
+		if ( json.blendAlpha !== undefined ) material.blendAlpha = json.blendAlpha;
 		if ( json.stencilWriteMask !== undefined ) material.stencilWriteMask = json.stencilWriteMask;
 		if ( json.stencilFunc !== undefined ) material.stencilFunc = json.stencilFunc;
 		if ( json.stencilRef !== undefined ) material.stencilRef = json.stencilRef;
@@ -131,6 +141,7 @@ class MaterialLoader extends Loader {
 		if ( json.stencilFail !== undefined ) material.stencilFail = json.stencilFail;
 		if ( json.stencilZFail !== undefined ) material.stencilZFail = json.stencilZFail;
 		if ( json.stencilZPass !== undefined ) material.stencilZPass = json.stencilZPass;
+		if ( json.stencilWrite !== undefined ) material.stencilWrite = json.stencilWrite;
 
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 		if ( json.wireframeLinewidth !== undefined ) material.wireframeLinewidth = json.wireframeLinewidth;
@@ -139,7 +150,7 @@ class MaterialLoader extends Loader {
 
 		if ( json.rotation !== undefined ) material.rotation = json.rotation;
 
-		if ( json.linewidth !== 1 ) material.linewidth = json.linewidth;
+		if ( json.linewidth !== undefined ) material.linewidth = json.linewidth;
 		if ( json.dashSize !== undefined ) material.dashSize = json.dashSize;
 		if ( json.gapSize !== undefined ) material.gapSize = json.gapSize;
 		if ( json.scale !== undefined ) material.scale = json.scale;
@@ -289,6 +300,7 @@ class MaterialLoader extends Loader {
 		if ( json.specularColorMap !== undefined ) material.specularColorMap = getTexture( json.specularColorMap );
 
 		if ( json.envMap !== undefined ) material.envMap = getTexture( json.envMap );
+		if ( json.envMapRotation !== undefined ) material.envMapRotation.fromArray( json.envMapRotation );
 		if ( json.envMapIntensity !== undefined ) material.envMapIntensity = json.envMapIntensity;
 
 		if ( json.reflectivity !== undefined ) material.reflectivity = json.reflectivity;
@@ -312,6 +324,8 @@ class MaterialLoader extends Loader {
 
 		if ( json.transmissionMap !== undefined ) material.transmissionMap = getTexture( json.transmissionMap );
 		if ( json.thicknessMap !== undefined ) material.thicknessMap = getTexture( json.thicknessMap );
+
+		if ( json.anisotropyMap !== undefined ) material.anisotropyMap = getTexture( json.anisotropyMap );
 
 		if ( json.sheenColorMap !== undefined ) material.sheenColorMap = getTexture( json.sheenColorMap );
 		if ( json.sheenRoughnessMap !== undefined ) material.sheenRoughnessMap = getTexture( json.sheenRoughnessMap );

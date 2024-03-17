@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -51,7 +47,7 @@ WebXR API. <a href="setup.html">the article on setting up</a>에 언급된 서�
 <div class="threejs_center"><img src="resources/images/https-warning.gif"></div>
 
 <p>이제 예제를 실행할 수 있습니다.</p>
-<p>실제로 WebVR 개발을 하려는 경우 배워야 할 또 다른 사항은 
+<p>실제로 WebVR 개발을 하려는 경우 배워야 할 또 다른 사항은
 <a href="https://developers.google.com/web/tools/chrome-devtools/remote-debugging/">원격 디버깅(remote debugging)</a> 입니다.
 이를 통해 콘솔 경보, 오류, 실제로 <a href="debugging-javascript.html">코드 디버그(debug your code)</a>가  가능합니다.</p>
 <p>아래 코드가 작동하는 것을 보고 싶다면 이 사이트에서 코드를 실행할 수 있습니다.</p>
@@ -66,8 +62,8 @@ WebXR API. <a href="setup.html">the article on setting up</a>에 언급된 서�
 +  renderer.xr.enabled = true;
 +  document.body.appendChild(VRButton.createButton(renderer));
 </pre>
-<p>three.js가 렌더 루프를 실행하도록 해야 합니다. 지금까지 우리는 
-<code class="notranslate" translate="no">requestAnimationFrame</code>loop 를 사용하였습니다. 하지만 VR을 지원하기 위해서 우리는 three.js가 우리의 render loop를 관리할 수 있도록 해야합니다. 이 과정을 
+<p>three.js가 렌더 루프를 실행하도록 해야 합니다. 지금까지 우리는
+<code class="notranslate" translate="no">requestAnimationFrame</code>loop 를 사용하였습니다. 하지만 VR을 지원하기 위해서 우리는 three.js가 우리의 render loop를 관리할 수 있도록 해야합니다. 이 과정을
 <a href="/docs/#api/ko/renderers/WebGLRenderer.setAnimationLoop"><code class="notranslate" translate="no">WebGLRenderer.setAnimationLoop</code></a>를 호출 및  루프를 호출하는 함수를 전달하여 진행 가능하게 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;
@@ -109,8 +105,8 @@ cube.position.x = x;
 <p>카메라가  <code class="notranslate" translate="no">z = 0</code> 에 있고 카메라는 -z축을 바라보기 때문에 우리는  <code class="notranslate" translate="no">z = -2</code>에  배치 시켰습니다(cude).</p>
 <p>이것은 매우 중요한 점을 제시합니다. <strong>Units in VR are in meters</strong>.
 다른 말로  <strong>One Unit = One Meter</strong>. 이것은 카메라가 0보다 1.6미터 위에 있음을 의미합니다.
-큐브의 중심은 카메라 앞에서 2미터입니다. 
-각 큐브 1x1x1미터 크기입니다. 
+큐브의 중심은 카메라 앞에서 2미터입니다.
+각 큐브 1x1x1미터 크기입니다.
 이것은 VR이 <em>실제 세계</em> 에 사용자에 반응하여 사물을 조정해야 하기 때문에 중요합니다. 즉 사용자의 움직임과 VR에서의 움직임을 매치 시켜줄 단위가 필요합니다.</p>
 <p>그리고 그것으로(단위) 우리는 앞으로 3개의 회전하는 큐브와 VR에 들어갈 버튼 을 카메라 앞에 가져와야 합니다.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -149,7 +145,7 @@ iOS의 경우 <a href="https://apps.apple.com/us/app/webxr-viewer/id1295998056">
 iOS에서 일반적으로 WebXR 지원은 2019년 5월 현재 지원되지 않습니다.</p>
 <p>Android 또는 iPhone에서 WebXR을 사용하려면 <em>VR 헤드셋</em>이 필요합니다.
 전화용. 골판지로 만든 1개에 5달러부터 어디에서나 구입할 수 있습니다.
-불행히도 어떤 제품을 추천해야 할지 모르겠습니다. 
+불행히도 어떤 제품을 추천해야 할지 모르겠습니다.
 저는 여러가지 제품을 구입하였습니다. 그 중 6개는 수년에 걸쳐 생산되었으며 모두 품질이 다릅니다.
 $25 이상을 지불한 적은 없습니다.</p>
 <p>VR 헤드셋의 몇 가지 문제만 언급하겠습니다.</p>
@@ -161,7 +157,7 @@ $25 이상을 지불한 적은 없습니다.</p>
 특정 크기에 맞게 설계된 잘 타협한 제품을 구매해야 합니다.</p>
 </li>
 <li><p>당신의 얼굴에 집중할 수 있습니까?</p>
-<p>일부 장치에는 다른 장치보다 더 많은 조절 요소가 있습니다. 일반적으로는 
+<p>일부 장치에는 다른 장치보다 더 많은 조절 요소가 있습니다. 일반적으로는
 렌즈가 눈에서 얼마나 멀리 떨어져 있는지, 그리고 렌즈가 얼마나 멀리 떨어져 있는지
 최대 2개의 조절 요소가 존재합니다. </p>
 </li>
@@ -317,7 +313,7 @@ VR 기기를 사용 중인 경우 "VR 입력"을 클릭할 수 있습니다.</p>
 일반적인 UX는 다음을 나타내는 개체 위에 나타날 작은 타이머를 표시하는 것입니다.
 잠시 동안 마커를 유지하면 개체/버튼이 선택됩니다.</p>
 <p>당신이 할 수 있는 최선에 대한 다른 입력이 없기 때문에
-다음 레벨에는 하나의 3DOF 입력 장치가 있습니다. 
+다음 레벨에는 하나의 3DOF 입력 장치가 있습니다.
 Daydream의 경우 일반적으로 사물을 가리킬 수 있고 사용자는 적어도 2개의 버튼을 가지고 있습니다.
 또한 일반 터치 입력을 제공하는 터치 패드가 있습니다.</p>
 <p>어쨌든 사용자가 이러한 유형의 장치를 가지고 있다면 사용자가 머리를 이용하여 가르키는 것보다
@@ -340,7 +336,7 @@ VR에서 손으로 물건을 가상으로 조작하여 지원 여부를 결정�
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

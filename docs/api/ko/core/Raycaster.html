@@ -155,6 +155,12 @@
 		레이의 새 시점과 방향을 업데이트합니다.
 		</p>
 
+		<h3>[method:this setFromXRController]( [param:WebXRController controller] )</h3>
+		<p>
+			[page:WebXRController controller] — The controller to copy the position and direction from.
+		</p>
+		<p>Updates the ray with a new origin and direction.</p>
+
 		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
 		[page:Object3D object] — 레이와의 교차 체크를 하는 객체입니다.<br />
@@ -174,7 +180,7 @@
 			[page:Integer faceIndex] – 교차 면의 인덱스<br />
 			[page:Object3D object] – 교차된 객체<br />
 			[page:Vector2 uv] - 교차점의 U,V 좌표<br />
-			[page:Vector2 uv2] - 교차점의 U,V 2차 좌표<br />
+			[page:Vector2 uv1] - 교차점의 U,V 2차 좌표<br />
 			[page:Vector3 normal] - 교차점에서 보간된 법선 벡터<br />
 			[page:Integer instanceId] – InstancedMesh에 교차하는 레이의 인스턴스 인덱스 넘버입니다.
 		</p>

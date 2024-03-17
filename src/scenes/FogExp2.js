@@ -23,6 +23,7 @@ class FogExp2 {
 
 		return {
 			type: 'FogExp2',
+			name: this.name,
 			color: this.color.getHex(),
 			density: this.density
 		};

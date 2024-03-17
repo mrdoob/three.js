@@ -303,35 +303,6 @@ function MenubarAdd( editor ) {
 	} );
 	options.add( option );
 
-	/*
-	// Teapot
-
-	option = new UIRow();
-	option.setClass( 'option' );
-	option.setTextContent( 'Teapot' );
-	option.onClick( function () {
-
-		let size = 50;
-		let segments = 10;
-		let bottom = true;
-		let lid = true;
-		let body = true;
-		let fitLid = false;
-		let blinnScale = true;
-
-		let material = new THREE.MeshStandardMaterial();
-
-		let geometry = new TeapotGeometry( size, segments, bottom, lid, body, fitLid, blinnScale );
-		let mesh = new THREE.Mesh( geometry, material );
-		mesh.name = 'Teapot';
-
-		editor.addObject( mesh );
-		editor.select( mesh );
-
-	} );
-	options.add( option );
-	*/
-
 	//
 
 	options.add( new UIHorizontalRule() );

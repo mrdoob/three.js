@@ -1,4 +1,5 @@
 import {
+	HalfFloatType,
 	MeshBasicMaterial,
 	NearestFilter,
 	ShaderMaterial,
@@ -22,10 +23,12 @@ class AfterimagePass extends Pass {
 
 		this.textureComp = new WebGLRenderTarget( window.innerWidth, window.innerHeight, {
 			magFilter: NearestFilter,
+			type: HalfFloatType
 		} );
 
 		this.textureOld = new WebGLRenderTarget( window.innerWidth, window.innerHeight, {
 			magFilter: NearestFilter,
+			type: HalfFloatType
 		} );
 
 		this.compFsMaterial = new ShaderMaterial( {

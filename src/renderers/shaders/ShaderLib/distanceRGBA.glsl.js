@@ -4,6 +4,7 @@ export const vertex = /* glsl */`
 varying vec3 vWorldPosition;
 
 #include <common>
+#include <batching_pars_vertex>
 #include <uv_pars_vertex>
 #include <displacementmap_pars_vertex>
 #include <morphtarget_pars_vertex>
@@ -14,7 +15,10 @@ void main() {
 
 	#include <uv_vertex>
 
+	#include <batching_vertex>
 	#include <skinbase_vertex>
+
+	#include <morphinstance_vertex>
 
 	#ifdef USE_DISPLACEMENTMAP
 
@@ -51,17 +55,18 @@ varying vec3 vWorldPosition;
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <alphatest_pars_fragment>
+#include <alphahash_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
 void main () {
 
-	#include <clipping_planes_fragment>
-
 	vec4 diffuseColor = vec4( 1.0 );
+	#include <clipping_planes_fragment>
 
 	#include <map_fragment>
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
+	#include <alphahash_fragment>
 
 	float dist = length( vWorldPosition - referencePosition );
 	dist = ( dist - nearDistance ) / ( farDistance - nearDistance );

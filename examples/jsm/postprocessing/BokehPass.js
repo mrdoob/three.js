@@ -1,5 +1,6 @@
 import {
 	Color,
+	HalfFloatType,
 	MeshDepthMaterial,
 	NearestFilter,
 	NoBlending,
@@ -25,7 +26,6 @@ class BokehPass extends Pass {
 		this.camera = camera;
 
 		const focus = ( params.focus !== undefined ) ? params.focus : 1.0;
-		const aspect = ( params.aspect !== undefined ) ? params.aspect : camera.aspect;
 		const aperture = ( params.aperture !== undefined ) ? params.aperture : 0.025;
 		const maxblur = ( params.maxblur !== undefined ) ? params.maxblur : 1.0;
 
@@ -33,7 +33,8 @@ class BokehPass extends Pass {
 
 		this.renderTargetDepth = new WebGLRenderTarget( 1, 1, { // will be resized later
 			minFilter: NearestFilter,
-			magFilter: NearestFilter
+			magFilter: NearestFilter,
+			type: HalfFloatType
 		} );
 
 		this.renderTargetDepth.texture.name = 'BokehPass.depth';
@@ -52,7 +53,7 @@ class BokehPass extends Pass {
 		bokehUniforms[ 'tDepth' ].value = this.renderTargetDepth.texture;
 
 		bokehUniforms[ 'focus' ].value = focus;
-		bokehUniforms[ 'aspect' ].value = aspect;
+		bokehUniforms[ 'aspect' ].value = camera.aspect;
 		bokehUniforms[ 'aperture' ].value = aperture;
 		bokehUniforms[ 'maxblur' ].value = maxblur;
 		bokehUniforms[ 'nearClip' ].value = camera.near;
@@ -66,7 +67,6 @@ class BokehPass extends Pass {
 		} );
 
 		this.uniforms = bokehUniforms;
-		this.needsSwap = false;
 
 		this.fsQuad = new FullScreenQuad( this.materialBokeh );
 
@@ -118,6 +118,8 @@ class BokehPass extends Pass {
 	}
 
 	setSize( width, height ) {
+
+		this.materialBokeh.uniforms[ 'aspect' ].value = width / height;
 
 		this.renderTargetDepth.setSize( width, height );
 

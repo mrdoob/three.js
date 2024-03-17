@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -37,7 +33,7 @@
 DOM元素。假设你知道如何使用 <code class="notranslate" translate="no">&lt;script&gt;</code>标签来
 引用外部的JavaScript文件以及行内脚本。
 假设你了解CSS并且知道
-<a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors">CSS选择器</a>. 
+<a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors">CSS选择器</a>.
 还假设你了解ES5、 ES6或者一些ES7。
 假设你知道浏览器通过事件和回调函数来运行JavaScript。
 假设你知道什么是闭包。</p>
@@ -104,14 +100,14 @@ console.log(g());  // prints 456
 变量会改变的情况下使用<code class="notranslate" translate="no">let</code>。这将会帮助避免大量bug。</p>
 <h3 id="-for-elem-of-collection-for-elem-in-collection-">使用<code class="notranslate" translate="no">for(elem of collection)</code>而不是<code class="notranslate" translate="no">for(elem in collection)</code></h3>
 <p><code class="notranslate" translate="no">for of</code>是新的，<code class="notranslate" translate="no">for in</code>是旧的。 <code class="notranslate" translate="no">for of</code>解决了<code class="notranslate" translate="no">for in</code>的问题。</p>
-<p>举个例子，你可以像这样迭代一个对象的所以键/值对</p>
+<p>举个例子，你可以像这样迭代一个对象的所有键/值对</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (const [key, value] of Object.entries(someObject)) {
   console.log(key, value);
 }
 </pre>
 <h3 id="-foreach-map-filter-">使用 <code class="notranslate" translate="no">forEach</code>, <code class="notranslate" translate="no">map</code>, 和 <code class="notranslate" translate="no">filter</code></h3>
 <p>数组新增的函数<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach"><code class="notranslate" translate="no">forEach</code></a>、
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"><code class="notranslate" translate="no">map</code></a>和 
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"><code class="notranslate" translate="no">map</code></a>和
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"><code class="notranslate" translate="no">filter</code></a>
 在现代JavaScript中使用都是相当广泛的。</p>
 <h3 id="-">使用解构赋值</h3>
@@ -252,7 +248,7 @@ JavaScript文件的顶部来告诉eslint<code class="notranslate" translate="no"
 他们</a>
 通过单行或者一段代码。</p>
 <h1 id="-">如果你确实需要支持老的浏览器请使用编译器</h1>
-<p>大多数现代浏览器都是自动更新的，所以使用这些新的特性会帮助你提高效率 
+<p>大多数现代浏览器都是自动更新的，所以使用这些新的特性会帮助你提高效率
 和避免bug。意思是说，如果你正在做一个需要支持老的浏览器的项目，
 <a href="https://babeljs.io">有工具会把ES5/ES6/ES7代码
 转换成ES5之前的Javascript</a>.</p>
@@ -260,7 +256,7 @@ JavaScript文件的顶部来告诉eslint<code class="notranslate" translate="no"
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

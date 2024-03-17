@@ -6,6 +6,8 @@
 
 const VignetteShader = {
 
+	name: 'VignetteShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null },

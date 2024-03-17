@@ -11,10 +11,10 @@ class AONode extends LightingNode {
 
 	}
 
-	construct( builder ) {
+	setup( builder ) {
 
 		const aoIntensity = 1;
-		const aoNode = this.aoNode.sub( 1.0 ).mul( aoIntensity ).add( 1.0 );
+		const aoNode = this.aoNode.x.sub( 1.0 ).mul( aoIntensity ).add( 1.0 );
 
 		builder.context.ambientOcclusion.mulAssign( aoNode );
 
@@ -24,4 +24,4 @@ class AONode extends LightingNode {
 
 export default AONode;
 
-addNodeClass( AONode );
+addNodeClass( 'AONode', AONode );

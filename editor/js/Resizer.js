@@ -36,7 +36,7 @@ function Resizer( editor ) {
 
 		const cX = clientX < 0 ? 0 : clientX > offsetWidth ? offsetWidth : clientX;
 
-		const x = offsetWidth - cX;
+		const x = Math.max( 260, offsetWidth - cX ); // .TabbedPanel min-width: 260px
 
 		dom.style.right = x + 'px';
 

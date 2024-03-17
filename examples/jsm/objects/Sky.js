@@ -28,10 +28,10 @@ class Sky extends Mesh {
 		const shader = Sky.SkyShader;
 
 		const material = new ShaderMaterial( {
-			name: 'SkyShader',
-			fragmentShader: shader.fragmentShader,
-			vertexShader: shader.vertexShader,
+			name: shader.name,
 			uniforms: UniformsUtils.clone( shader.uniforms ),
+			vertexShader: shader.vertexShader,
+			fragmentShader: shader.fragmentShader,
 			side: BackSide,
 			depthWrite: false
 		} );
@@ -45,6 +45,8 @@ class Sky extends Mesh {
 }
 
 Sky.SkyShader = {
+
+	name: 'SkyShader',
 
 	uniforms: {
 		'turbidity': { value: 2 },
@@ -138,8 +140,6 @@ Sky.SkyShader = {
 		uniform float mieDirectionalG;
 		uniform vec3 up;
 
-		const vec3 cameraPos = vec3( 0.0, 0.0, 0.0 );
-
 		// constants for atmospheric scattering
 		const float pi = 3.141592653589793238462643383279502884197169;
 
@@ -169,7 +169,7 @@ Sky.SkyShader = {
 
 		void main() {
 
-			vec3 direction = normalize( vWorldPosition - cameraPos );
+			vec3 direction = normalize( vWorldPosition - cameraPosition );
 
 			// optical length
 			// cutoff angle at 90 to avoid singularity in next formula.
@@ -210,7 +210,7 @@ Sky.SkyShader = {
 			gl_FragColor = vec4( retColor, 1.0 );
 
 			#include <tonemapping_fragment>
-			#include <encodings_fragment>
+			#include <colorspace_fragment>
 
 		}`
 

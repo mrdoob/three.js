@@ -47,6 +47,10 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.DstColorFactor, 208, 'DstColorFactor is equal to 208' );
 		assert.equal( Constants.OneMinusDstColorFactor, 209, 'OneMinusDstColorFactor is equal to 209' );
 		assert.equal( Constants.SrcAlphaSaturateFactor, 210, 'SrcAlphaSaturateFactor is equal to 210' );
+		assert.equal( Constants.ConstantColorFactor, 211, 'ConstantColorFactor is equal to 211' );
+		assert.equal( Constants.OneMinusConstantColorFactor, 212, 'OneMinusConstantColorFactor is equal to 212' );
+		assert.equal( Constants.ConstantAlphaFactor, 213, 'ConstantAlphaFactor is equal to 213' );
+		assert.equal( Constants.OneMinusConstantAlphaFactor, 214, 'OneMinusConstantAlphaFactor is equal to 214' );
 
 		assert.equal( Constants.NeverDepth, 0, 'NeverDepth is equal to 0' );
 		assert.equal( Constants.AlwaysDepth, 1, 'AlwaysDepth is equal to 1' );
@@ -67,6 +71,11 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.CineonToneMapping, 3, 'CineonToneMapping is equal to 3' );
 		assert.equal( Constants.ACESFilmicToneMapping, 4, 'ACESFilmicToneMapping is equal to 4' );
 		assert.equal( Constants.CustomToneMapping, 5, 'CustomToneMapping is equal to 5' );
+		assert.equal( Constants.AgXToneMapping, 6, 'AgXToneMapping is equal to 6' );
+		assert.equal( Constants.NeutralToneMapping, 7, 'NeutralToneMapping is equal to 7' );
+
+		assert.equal( Constants.AttachedBindMode, 'attached', 'AttachedBindMode is equal to attached' );
+		assert.equal( Constants.DetachedBindMode, 'detached', 'DetachedBindMode is equal to detached' );
 
 		assert.equal( Constants.UVMapping, 300, 'UVMapping is equal to 300' );
 		assert.equal( Constants.CubeReflectionMapping, 301, 'CubeReflectionMapping is equal to 301' );
@@ -135,6 +144,8 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.RGBA_ASTC_12x10_Format, 37820, 'Constants.RGBA_ASTC_12x10_Format is equal to 37820' );
 		assert.equal( Constants.RGBA_ASTC_12x12_Format, 37821, 'Constants.RGBA_ASTC_12x12_Format is equal to 37821' );
 		assert.equal( Constants.RGBA_BPTC_Format, 36492, 'Constants.RGBA_BPTC_Format is equal to 36492' );
+		assert.equal( Constants.RGB_BPTC_SIGNED_Format, 36494, 'Constants.RGB_BPTC_SIGNED_Format is equal to 36494' );
+		assert.equal( Constants.RGB_BPTC_UNSIGNED_Format, 36495, 'Constants.RGB_BPTC_UNSIGNED_Format is equal to 36495' );
 		assert.equal( Constants.RED_RGTC1_Format, 36283, 'Constants.RED_RGTC1_Format is equal to 36283' );
 		assert.equal( Constants.SIGNED_RED_RGTC1_Format, 36284, 'Constants.SIGNED_RED_RGTC1_Format is equal to 36284' );
 		assert.equal( Constants.RED_GREEN_RGTC2_Format, 36285, 'Constants.RED_GREEN_RGTC2_Format is equal to 36285' );
@@ -200,8 +211,6 @@ export default QUnit.module( 'Constants', () => {
 
 		assert.equal( Constants.GLSL1, '100', 'GLSL1 is equal to 100' );
 		assert.equal( Constants.GLSL3, '300 es', 'GLSL3 is equal to 300 es' );
-
-		assert.equal( Constants._SRGBAFormat, 1035, '_SRGBAFormat is equal to 1035' );
 
 	} );
 

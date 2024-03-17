@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>网格表面采样器([name])</h1>
+
+	<p class="desc">用于在网格表面上对加权随机点进行采样的实用类。</p>
+
+	<p>加权采样对于诸如地形的特定区域内更浓密的植被生长或来自网格特定部分的浓缩粒子排放等效果非常有用。顶点权重可以通过编程方式编写，也可以在 3D 工具（如 Blender）中作为顶点颜色手工绘制。</p>
+
+	<h2>引入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons].
+	</p>
+
+	<code>
+			import { MeshSurfaceSampler } from 'three/addons/math/MeshSurfaceSampler.js';
+		</code>
+
+	<h2>代码示例</h2>
+
+	<code>
+		// Create a sampler for a Mesh surface.
+		const sampler = new MeshSurfaceSampler( surfaceMesh )
+			.setWeightAttribute( 'color' )
+			.build();
+
+		const mesh = new THREE.InstancedMesh( sampleGeometry, sampleMaterial, 100 );
+
+		const position = new THREE.Vector3();
+		const matrix = new THREE.Matrix4();
+
+		// Sample randomly from the surface, creating an instance of the sample
+		// geometry at each sample point.
+		for ( let i = 0; i < 100; i ++ ) {
+
+			sampler.sample( position );
+
+			matrix.makeTranslation( position.x, position.y, position.z );
+
+			mesh.setMatrixAt( i, matrix );
+
+		}
+
+		scene.add( mesh );
+		</code>
+
+	<h2>例子</h2>
+	<p>
+		[example:webgl_instancing_scatter]
+	</p>
+
+	<h2>构造函数</h2>
+
+	<h3>[name]( [param:Mesh mesh] )</h3>
+	<p>
+		[page:Mesh mesh] — ​​进行采样的表面网格。
+	</p>
+	<p>
+		创建一个新的 [name]。如果输入的几何体是索引的，将创建一个非索引的副本。构造后，采样器无法返回样本，直到调用 [page:MeshSurfaceSampler.build build] 方法。
+	</p>
+
+	<h2>方法</h2>
+
+	<h3>[method:this setWeightAttribute]( [param:String name] )</h3>
+	<p>
+		指定从表面采样时用作权重的顶点属性。权重较高的面更有可能被采样，而权重为零的面则根本不会被采样。对于向量属性，仅使用 <i>.x</i> 进行采样。
+	</p>
+	<p>如果没有选择权重属性，则按区域随机分布采样。</p>
+
+	<h3>[method:this build]()</h3>
+	<p>
+		处理输入几何体并准备返回样本。几何体或采样器的任何配置都必须在调用此方法之前进行。对于具有 <i>n</i> 个面的曲面，时间复杂度为<i>O(n)</i>。
+	</p>
+
+	<h3>[method:this sample]( [param:Vector3 targetPosition], [param:Vector3 targetNormal], [param:Color targetColor],
+		[param:Vector2 targetUV] )</h3>
+	<p>
+		选择输入几何体表面上的随机点，返回该点的位置以及可选的法线向量、颜色和 UV 坐标。对于具有 <i>n</i> 个面的曲面，时间复杂度为<i>O(n)</i>。
+	</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/MeshSurfaceSampler.js examples/jsm/math/MeshSurfaceSampler.js]
+	</p>
+</body>
+
+</html>

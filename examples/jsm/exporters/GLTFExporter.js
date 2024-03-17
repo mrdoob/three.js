@@ -21,8 +21,11 @@ import {
 	Scene,
 	Source,
 	SRGBColorSpace,
-	Vector3
+	CompressedTexture,
+	Vector3,
+	Quaternion,
 } from 'three';
+import { decompress } from './../utils/TextureUtils.js';
 
 
 /**
@@ -122,7 +125,25 @@ class GLTFExporter {
 
 		this.register( function ( writer ) {
 
+			return new GLTFMaterialsAnisotropyExtension( writer );
+
+		} );
+
+		this.register( function ( writer ) {
+
 			return new GLTFMaterialsEmissiveStrengthExtension( writer );
+
+		} );
+
+		this.register( function ( writer ) {
+
+			return new GLTFMaterialsBumpExtension( writer );
+
+		} );
+
+		this.register( function ( writer ) {
+
+			return new GLTFMeshGpuInstancing( writer );
 
 		} );
 
@@ -821,6 +842,18 @@ class GLTFWriter {
 
 		console.warn( 'THREE.GLTFExporter: Merged metalnessMap and roughnessMap textures.' );
 
+		if ( metalnessMap instanceof CompressedTexture ) {
+
+			metalnessMap = decompress( metalnessMap );
+
+		}
+
+		if ( roughnessMap instanceof CompressedTexture ) {
+
+			roughnessMap = decompress( roughnessMap );
+
+		}
+
 		const metalness = metalnessMap ? metalnessMap.image : null;
 		const roughness = roughnessMap ? roughnessMap.image : null;
 
@@ -1140,12 +1173,12 @@ class GLTFWriter {
 
 		} else {
 
-			throw new Error( 'THREE.GLTFExporter: Unsupported bufferAttribute component type.' );
+			throw new Error( 'THREE.GLTFExporter: Unsupported bufferAttribute component type: ' + attribute.array.constructor.name );
 
 		}
 
 		if ( start === undefined ) start = 0;
-		if ( count === undefined ) count = attribute.count;
+		if ( count === undefined || count === Infinity ) count = attribute.count;
 
 		// Skip creating an accessor if the attribute doesn't have data to export
 		if ( count === 0 ) return null;
@@ -1230,7 +1263,7 @@ class GLTFWriter {
 
 				if ( format !== RGBAFormat ) {
 
-					console.error( 'GLTFExporter: Only RGBAFormat is supported.' );
+					console.error( 'GLTFExporter: Only RGBAFormat is supported.', format );
 
 				}
 
@@ -1255,7 +1288,18 @@ class GLTFWriter {
 
 			} else {
 
-				ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
+				if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+					( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+					( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ||
+					( typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas ) ) {
+
+					ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
+
+				} else {
+
+					throw new Error( 'THREE.GLTFExporter: Invalid image type. Use HTMLImageElement, HTMLCanvasElement, ImageBitmap or OffscreenCanvas.' );
+
+				}
 
 			}
 
@@ -1338,12 +1382,21 @@ class GLTFWriter {
 	 */
 	processTexture( map ) {
 
+		const writer = this;
+		const options = writer.options;
 		const cache = this.cache;
 		const json = this.json;
 
 		if ( cache.textures.has( map ) ) return cache.textures.get( map );
 
 		if ( ! json.textures ) json.textures = [];
+
+		// make non-readable textures (e.g. CompressedTexture) readable by blitting them into a new texture
+		if ( map instanceof CompressedTexture ) {
+
+			map = decompress( map, options.maxTextureSize );
+
+		}
 
 		let mimeType = map.userData.mimeType;
 
@@ -1609,7 +1662,9 @@ class GLTFWriter {
 		// Conversion between attributes names in threejs and gltf spec
 		const nameConversion = {
 			uv: 'TEXCOORD_0',
-			uv2: 'TEXCOORD_1',
+			uv1: 'TEXCOORD_1',
+			uv2: 'TEXCOORD_2',
+			uv3: 'TEXCOORD_3',
 			color: 'COLOR_0',
 			skinWeight: 'WEIGHTS_0',
 			skinIndex: 'JOINTS_0'
@@ -1791,6 +1846,24 @@ class GLTFWriter {
 
 		if ( isMultiMaterial && geometry.groups.length === 0 ) return null;
 
+		let didForceIndices = false;
+
+		if ( isMultiMaterial && geometry.index === null ) {
+
+			const indices = [];
+
+			for ( let i = 0, il = geometry.attributes.position.count; i < il; i ++ ) {
+
+				indices[ i ] = i;
+
+			}
+
+			geometry.setIndex( indices );
+
+			didForceIndices = true;
+
+		}
+
 		const materials = isMultiMaterial ? mesh.material : [ mesh.material ];
 		const groups = isMultiMaterial ? geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
 
@@ -1835,6 +1908,12 @@ class GLTFWriter {
 			if ( material !== null ) primitive.material = material;
 
 			primitives.push( primitive );
+
+		}
+
+		if ( didForceIndices === true ) {
+
+			geometry.setIndex( null );
 
 		}
 
@@ -2409,7 +2488,7 @@ class GLTFLightExtension {
 			if ( light.distance > 0 ) lightDef.range = light.distance;
 
 			lightDef.spot = {};
-			lightDef.spot.innerConeAngle = ( light.penumbra - 1.0 ) * light.angle * - 1.0;
+			lightDef.spot.innerConeAngle = ( 1.0 - light.penumbra ) * light.angle;
 			lightDef.spot.outerConeAngle = light.angle;
 
 		}
@@ -2758,7 +2837,7 @@ class GLTFMaterialsSpecularExtension {
 
 		if ( ! material.isMeshPhysicalMaterial || ( material.specularIntensity === 1.0 &&
 		       material.specularColor.equals( DEFAULT_SPECULAR_COLOR ) &&
-		     ! material.specularIntensityMap && ! material.specularColorTexture ) ) return;
+		     ! material.specularIntensityMap && ! material.specularColorMap ) ) return;
 
 		const writer = this.writer;
 		const extensionsUsed = writer.extensionsUsed;
@@ -2857,6 +2936,49 @@ class GLTFMaterialsSheenExtension {
 }
 
 /**
+ * Anisotropy Materials Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_anisotropy
+ */
+class GLTFMaterialsAnisotropyExtension {
+
+	constructor( writer ) {
+
+		this.writer = writer;
+		this.name = 'KHR_materials_anisotropy';
+
+	}
+
+	writeMaterial( material, materialDef ) {
+
+		if ( ! material.isMeshPhysicalMaterial || material.anisotropy == 0.0 ) return;
+
+		const writer = this.writer;
+		const extensionsUsed = writer.extensionsUsed;
+
+		const extensionDef = {};
+
+		if ( material.anisotropyMap ) {
+
+			const anisotropyMapDef = { index: writer.processTexture( material.anisotropyMap ) };
+			writer.applyTextureTransform( anisotropyMapDef, material.anisotropyMap );
+			extensionDef.anisotropyTexture = anisotropyMapDef;
+
+		}
+
+		extensionDef.anisotropyStrength = material.anisotropy;
+		extensionDef.anisotropyRotation = material.anisotropyRotation;
+
+		materialDef.extensions = materialDef.extensions || {};
+		materialDef.extensions[ this.name ] = extensionDef;
+
+		extensionsUsed[ this.name ] = true;
+
+	}
+
+}
+
+/**
  * Materials Emissive Strength Extension
  *
  * Specification: https://github.com/KhronosGroup/glTF/blob/5768b3ce0ef32bc39cdf1bef10b948586635ead3/extensions/2.0/Khronos/KHR_materials_emissive_strength/README.md
@@ -2885,6 +3007,115 @@ class GLTFMaterialsEmissiveStrengthExtension {
 		materialDef.extensions[ this.name ] = extensionDef;
 
 		extensionsUsed[ this.name ] = true;
+
+	}
+
+}
+
+
+/**
+ * Materials bump Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/EXT_materials_bump
+ */
+class GLTFMaterialsBumpExtension {
+
+	constructor( writer ) {
+
+		this.writer = writer;
+		this.name = 'EXT_materials_bump';
+
+	}
+
+	writeMaterial( material, materialDef ) {
+
+		if ( ! material.isMeshStandardMaterial || (
+		       material.bumpScale === 1 &&
+		     ! material.bumpMap ) ) return;
+
+		const writer = this.writer;
+		const extensionsUsed = writer.extensionsUsed;
+
+		const extensionDef = {};
+
+		if ( material.bumpMap ) {
+
+			const bumpMapDef = {
+				index: writer.processTexture( material.bumpMap ),
+				texCoord: material.bumpMap.channel
+			};
+			writer.applyTextureTransform( bumpMapDef, material.bumpMap );
+			extensionDef.bumpTexture = bumpMapDef;
+
+		}
+
+		extensionDef.bumpFactor = material.bumpScale;
+
+		materialDef.extensions = materialDef.extensions || {};
+		materialDef.extensions[ this.name ] = extensionDef;
+
+		extensionsUsed[ this.name ] = true;
+
+	}
+
+}
+
+/**
+ * GPU Instancing Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_mesh_gpu_instancing
+ */
+class GLTFMeshGpuInstancing {
+
+	constructor( writer ) {
+
+		this.writer = writer;
+		this.name = 'EXT_mesh_gpu_instancing';
+
+	}
+
+	writeNode( object, nodeDef ) {
+
+		if ( ! object.isInstancedMesh ) return;
+
+		const writer = this.writer;
+
+		const mesh = object;
+
+		const translationAttr = new Float32Array( mesh.count * 3 );
+		const rotationAttr = new Float32Array( mesh.count * 4 );
+		const scaleAttr = new Float32Array( mesh.count * 3 );
+
+		const matrix = new Matrix4();
+		const position = new Vector3();
+		const quaternion = new Quaternion();
+		const scale = new Vector3();
+
+		for ( let i = 0; i < mesh.count; i ++ ) {
+
+			mesh.getMatrixAt( i, matrix );
+			matrix.decompose( position, quaternion, scale );
+
+			position.toArray( translationAttr, i * 3 );
+			quaternion.toArray( rotationAttr, i * 4 );
+			scale.toArray( scaleAttr, i * 3 );
+
+		}
+
+		const attributes = {
+			TRANSLATION: writer.processAccessor( new BufferAttribute( translationAttr, 3 ) ),
+			ROTATION: writer.processAccessor( new BufferAttribute( rotationAttr, 4 ) ),
+			SCALE: writer.processAccessor( new BufferAttribute( scaleAttr, 3 ) ),
+		};
+
+		if ( mesh.instanceColor )
+			attributes._COLOR_0 = writer.processAccessor( mesh.instanceColor );
+
+		nodeDef.extensions = nodeDef.extensions || {};
+		nodeDef.extensions[ this.name ] = { attributes };
+
+		writer.extensionsUsed[ this.name ] = true;
+		writer.extensionsRequired[ this.name ] = true;
 
 	}
 

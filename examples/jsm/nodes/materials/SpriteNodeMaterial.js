@@ -4,7 +4,7 @@ import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
 import { materialRotation } from '../accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../accessors/ModelNode.js';
 import { positionLocal } from '../accessors/PositionNode.js';
-import { vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { float, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
 import { SpriteMaterial } from 'three';
 
@@ -21,13 +21,6 @@ class SpriteNodeMaterial extends NodeMaterial {
 		this.lights = false;
 		this.normals = false;
 
-		this.colorNode = null;
-		this.opacityNode = null;
-
-		this.alphaTestNode = null;
-
-		this.lightNode = null;
-
 		this.positionNode = null;
 		this.rotationNode = null;
 		this.scaleNode = null;
@@ -38,7 +31,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructPosition( { object, context } ) {
+	setupPosition( { object, context } ) {
 
 		// < VERTEX STAGE >
 
@@ -66,15 +59,9 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		alignedPosition = alignedPosition.mul( scale );
 
-		const rotation = rotationNode || materialRotation;
+		const rotation = float( rotationNode || materialRotation );
 
-		const cosAngle = rotation.cos();
-		const sinAngle = rotation.sin();
-
-		const rotatedPosition = vec2( // @TODO: Maybe we can create mat2 and write something like rotationMatrix.mul( alignedPosition )?
-			vec2( cosAngle, sinAngle.negate() ).dot( alignedPosition ),
-			vec2( sinAngle, cosAngle ).dot( alignedPosition )
-		);
+		const rotatedPosition = alignedPosition.rotate( rotation );
 
 		mvPosition = vec4( mvPosition.xy.add( rotatedPosition ), mvPosition.zw );
 
@@ -88,13 +75,6 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 	copy( source ) {
 
-		this.colorNode = source.colorNode;
-		this.opacityNode = source.opacityNode;
-
-		this.alphaTestNode = source.alphaTestNode;
-
-		this.lightNode = source.lightNode;
-
 		this.positionNode = source.positionNode;
 		this.rotationNode = source.rotationNode;
 		this.scaleNode = source.scaleNode;
@@ -107,4 +87,4 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 export default SpriteNodeMaterial;
 
-addNodeMaterial( SpriteNodeMaterial );
+addNodeMaterial( 'SpriteNodeMaterial', SpriteNodeMaterial );

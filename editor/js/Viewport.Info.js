@@ -9,27 +9,25 @@ function ViewportInfo( editor ) {
 	container.setId( 'info' );
 	container.setPosition( 'absolute' );
 	container.setLeft( '10px' );
-	container.setBottom( '10px' );
+	container.setBottom( '20px' );
 	container.setFontSize( '12px' );
 	container.setColor( '#fff' );
+	container.setTextTransform( 'lowercase' );
 
-	const objectsText = new UIText( '0' ).setMarginLeft( '6px' );
-	const verticesText = new UIText( '0' ).setMarginLeft( '6px' );
-	const trianglesText = new UIText( '0' ).setMarginLeft( '6px' );
-	const frametimeText = new UIText( '0' ).setMarginLeft( '6px' );
+	const objectsText  = new UIText( '0' ).setTextAlign( 'right' ).setWidth( '60px' ).setMarginRight( '6px' );
+	const verticesText = new UIText( '0' ).setTextAlign( 'right' ).setWidth( '60px' ).setMarginRight( '6px' );
+	const trianglesText = new UIText( '0' ).setTextAlign( 'right' ).setWidth( '60px' ).setMarginRight( '6px' );
+	const frametimeText = new UIText( '0' ).setTextAlign( 'right' ).setWidth( '60px' ).setMarginRight( '6px' );
 
-	container.add( new UIText( strings.getKey( 'viewport/info/objects' ) ).setTextTransform( 'lowercase' ) );
-	container.add( objectsText, new UIBreak() );
-	container.add( new UIText( strings.getKey( 'viewport/info/vertices' ) ).setTextTransform( 'lowercase' ) );
-	container.add( verticesText, new UIBreak() );
-	container.add( new UIText( strings.getKey( 'viewport/info/triangles' ) ).setTextTransform( 'lowercase' ) );
-	container.add( trianglesText, new UIBreak() );
-	container.add( new UIText( strings.getKey( 'viewport/info/frametime' ) ).setTextTransform( 'lowercase' ) );
-	container.add( frametimeText, new UIBreak() );
+	container.add( objectsText, new UIText( strings.getKey( 'viewport/info/objects' ) ), new UIBreak() );
+	container.add( verticesText, new UIText( strings.getKey( 'viewport/info/vertices' ) ), new UIBreak() );
+	container.add( trianglesText, new UIText( strings.getKey( 'viewport/info/triangles' ) ), new UIBreak() );
+	container.add( frametimeText, new UIText( strings.getKey( 'viewport/info/rendertime' ) ), new UIBreak() );
 
 	signals.objectAdded.add( update );
 	signals.objectRemoved.add( update );
 	signals.geometryChanged.add( update );
+	signals.sceneRendered.add( updateFrametime );
 
 	//
 
@@ -79,11 +77,9 @@ function ViewportInfo( editor ) {
 
 	}
 
-	signals.sceneRendered.add( updateFrametime );
-
 	function updateFrametime( frametime ) {
 
-		frametimeText.setValue( Number( frametime ).toFixed( 2 ) + ' ms' );
+		frametimeText.setValue( Number( frametime ).toFixed( 2 ) );
 
 	}
 

@@ -1,4 +1,4 @@
-import { LinearSRGBColorSpace } from '../../constants.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
 
 /**
  * Uniform Utilities
@@ -86,14 +86,23 @@ export function cloneUniformsGroups( src ) {
 
 export function getUnlitUniformColorSpace( renderer ) {
 
-	if ( renderer.getRenderTarget() === null ) {
+	const currentRenderTarget = renderer.getRenderTarget();
+
+	if ( currentRenderTarget === null ) {
 
 		// https://github.com/mrdoob/three.js/pull/23937#issuecomment-1111067398
 		return renderer.outputColorSpace;
 
 	}
 
-	return LinearSRGBColorSpace;
+	// https://github.com/mrdoob/three.js/issues/27868
+	if ( currentRenderTarget.isXRRenderTarget === true ) {
+
+		return currentRenderTarget.texture.colorSpace;
+
+	}
+
+	return ColorManagement.workingColorSpace;
 
 }
 

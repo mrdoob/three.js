@@ -45,12 +45,12 @@ const mesh = new THREE.Mesh( geometry, material ); scene.add( mesh );
 			[param:Integer thetaSegments], [param:Integer phiSegments], [param:Float thetaStart], [param:Float thetaLength])
 		</h3>
 		<p>
-			innerRadius — Default is 0.5. <br />
-			outerRadius — Default is 1. <br />
+			innerRadius — Default is `0.5`. <br />
+			outerRadius — Default is `1`. <br />
 			thetaSegments — Number of segments. A higher number means the ring will be
-			more round. Minimum is 3. Default is 32. <br />
-			phiSegments — Minimum is 1. Default is 1.<br />
-			thetaStart — Starting angle. Default is 0. <br />
+			more round. Minimum is `3`. Default is `32`. <br />
+			phiSegments — Number of segments per ring segment. Minimum is `1`. Default is `1`.<br />
+			thetaStart — Starting angle. Default is `0`. <br />
 			thetaLength — Central angle. Default is Math.PI * 2.
 		</p>
 

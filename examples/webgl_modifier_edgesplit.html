@@ -7,11 +7,6 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -31,8 +26,6 @@
 			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
 
 			let renderer, scene, camera;
 			let modifier, mesh, baseGeometry;
@@ -59,7 +52,6 @@
 				document.body.appendChild( info );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -76,7 +68,7 @@
 				controls.minZoom = 1;
 				camera.position.set( 0, 0, 4 );
 
-				scene.add( new THREE.HemisphereLight( 0xffffff, 0x444444 ) );
+				scene.add( new THREE.HemisphereLight( 0xffffff, 0x444444, 3 ) );
 
 				new OBJLoader().load(
 					'./models/obj/cerberus/Cerberus.obj',
@@ -112,6 +104,7 @@
 				new THREE.TextureLoader().load( './models/obj/cerberus/Cerberus_A.jpg', function ( texture ) {
 
 					map = texture;
+					map.colorSpace = THREE.SRGBColorSpace;
 
 					if ( mesh !== undefined && params.showMap ) {
 
@@ -123,7 +116,7 @@
 				} );
 
 
-				const gui = new GUI( { name: 'Edge split modifier parameters' } );
+				const gui = new GUI( { title: 'Edge split modifier parameters' } );
 
 				gui.add( params, 'showMap' ).onFinishChange( updateMesh );
 				gui.add( params, 'smoothShading' ).onFinishChange( updateMesh );

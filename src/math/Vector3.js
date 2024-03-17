@@ -251,21 +251,20 @@ class Vector3 {
 
 	applyQuaternion( q ) {
 
-		const x = this.x, y = this.y, z = this.z;
+		// quaternion q is assumed to have unit length
+
+		const vx = this.x, vy = this.y, vz = this.z;
 		const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
 
-		// calculate quat * vector
+		// t = 2 * cross( q.xyz, v );
+		const tx = 2 * ( qy * vz - qz * vy );
+		const ty = 2 * ( qz * vx - qx * vz );
+		const tz = 2 * ( qx * vy - qy * vx );
 
-		const ix = qw * x + qy * z - qz * y;
-		const iy = qw * y + qz * x - qx * z;
-		const iz = qw * z + qx * y - qy * x;
-		const iw = - qx * x - qy * y - qz * z;
-
-		// calculate result * inverse quat
-
-		this.x = ix * qw + iw * - qx + iy * - qz - iz * - qy;
-		this.y = iy * qw + iw * - qy + iz * - qx - ix * - qz;
-		this.z = iz * qw + iw * - qz + ix * - qy - iy * - qx;
+		// v + q.w * t + cross( q.xyz, t );
+		this.x = vx + qw * tx + qy * tz - qz * ty;
+		this.y = vy + qw * ty + qz * tx - qx * tz;
+		this.z = vz + qw * tz + qx * ty - qy * tx;
 
 		return this;
 
@@ -397,9 +396,9 @@ class Vector3 {
 
 	roundToZero() {
 
-		this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
-		this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
-		this.z = ( this.z < 0 ) ? Math.ceil( this.z ) : Math.floor( this.z );
+		this.x = Math.trunc( this.x );
+		this.y = Math.trunc( this.y );
+		this.z = Math.trunc( this.z );
 
 		return this;
 
@@ -695,15 +694,15 @@ class Vector3 {
 
 	randomDirection() {
 
-		// Derived from https://mathworld.wolfram.com/SpherePointPicking.html
+		// https://mathworld.wolfram.com/SpherePointPicking.html
 
-		const u = ( Math.random() - 0.5 ) * 2;
-		const t = Math.random() * Math.PI * 2;
-		const f = Math.sqrt( 1 - u ** 2 );
+		const theta = Math.random() * Math.PI * 2;
+		const u = Math.random() * 2 - 1;
+		const c = Math.sqrt( 1 - u * u );
 
-		this.x = f * Math.cos( t );
-		this.y = f * Math.sin( t );
-		this.z = u;
+		this.x = c * Math.cos( theta );
+		this.y = u;
+		this.z = c * Math.sin( theta );
 
 		return this;
 

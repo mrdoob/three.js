@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js - WebGPU - GLTFloader + compressed</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - GLTFLoader + compression extensions
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+
+			let camera, scene, renderer;
+
+			init();
+
+			async function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 20 );
+				camera.position.set( 2, 2, 2 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xEEEEEE );
+
+				//lights
+
+				const light = new THREE.PointLight( 0xffffff );
+				light.power = 1300;
+				camera.add( light );
+				scene.add( camera );
+
+				//renderer
+
+				renderer = new WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ReinhardToneMapping;
+				renderer.toneMappingExposure = 1;
+				document.body.appendChild( renderer.domElement );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 3;
+				controls.maxDistance = 6;
+				controls.update();
+
+				const ktx2Loader = await new KTX2Loader()
+					.setTranscoderPath( 'jsm/libs/basis/' )
+					.detectSupportAsync( renderer );
+
+				const loader = new GLTFLoader();
+				loader.setKTX2Loader( ktx2Loader );
+				loader.setMeshoptDecoder( MeshoptDecoder );
+				loader.load( 'models/gltf/coffeemat.glb', function ( gltf ) {
+
+					const gltfScene = gltf.scene;
+					gltfScene.position.y = - .8;
+					gltfScene.scale.setScalar( .01 );
+
+					scene.add( gltfScene );
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

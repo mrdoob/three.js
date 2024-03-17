@@ -7,10 +7,6 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -35,8 +31,6 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import Stats from 'three/addons/libs/stats.module.js';
-
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
 
 			let camera, scene, renderer;
 			let reflector;
@@ -108,15 +102,14 @@
 				//
 
 				reflector = new Reflector( new THREE.PlaneGeometry( 2, 2 ), {
-					textureWidth: window.innerWidth * window.devicePixelRatio,
-					textureHeight: window.innerHeight * window.devicePixelRatio
+					textureWidth: window.innerWidth,
+					textureHeight: window.innerHeight
 				} );
 				reflector.position.x = 1;
 				reflector.position.y = 1.5;
 				reflector.position.z = - 3;
 				reflector.rotation.y = - Math.PI / 4;
-				// TOFIX: Reflector breaks transmission
-				// scene.add( reflector );
+				scene.add( reflector );
 
 				const frameGeometry = new THREE.BoxGeometry( 2.1, 2.1, 0.1 );
 				const frameMaterial = new THREE.MeshPhongMaterial();
@@ -127,11 +120,12 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.xr.enabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
 				document.body.appendChild( renderer.domElement );
 
 				document.body.appendChild( VRButton.createButton( renderer ) );
@@ -188,7 +182,10 @@
 				gui.add( parameters, 'thickness', 0, 1 ).onChange( onThicknessChange );
 				gui.domElement.style.visibility = 'hidden';
 
-				const group = new InteractiveGroup( renderer, camera );
+				const group = new InteractiveGroup();
+				group.listenToPointerEvents( renderer, camera );
+				group.listenToXRControllerEvents( controller1 );
+				group.listenToXRControllerEvents( controller2 );
 				scene.add( group );
 
 				const mesh = new HTMLMesh( gui.domElement );

@@ -1,5 +1,7 @@
 import {
 	Clock,
+	HalfFloatType,
+	NoBlending,
 	Vector2,
 	WebGLRenderTarget
 } from 'three';
@@ -14,19 +16,19 @@ class EffectComposer {
 
 		this.renderer = renderer;
 
+		this._pixelRatio = renderer.getPixelRatio();
+
 		if ( renderTarget === undefined ) {
 
 			const size = renderer.getSize( new Vector2() );
-			this._pixelRatio = renderer.getPixelRatio();
 			this._width = size.width;
 			this._height = size.height;
 
-			renderTarget = new WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio );
+			renderTarget = new WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType } );
 			renderTarget.texture.name = 'EffectComposer.rt1';
 
 		} else {
 
-			this._pixelRatio = 1;
 			this._width = renderTarget.width;
 			this._height = renderTarget.height;
 
@@ -44,6 +46,7 @@ class EffectComposer {
 		this.passes = [];
 
 		this.copyPass = new ShaderPass( CopyShader );
+		this.copyPass.material.blending = NoBlending;
 
 		this.clock = new Clock();
 

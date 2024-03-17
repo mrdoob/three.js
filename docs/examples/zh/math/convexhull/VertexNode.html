@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>顶点节点([name])</h1>
+
+	<p class="desc">
+		一个顶点作为双链表节点。
+	</p>
+
+	<h2>Import</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
+			import { VertexNode } from 'three/addons/math/ConvexHull.js';
+		</code>
+
+
+	<h2>构造函数</h2>
+
+
+	<h3>[name]( [param:Vector3 point] )</h3>
+	<p>
+		[page:Vector3 point] - [page:Vector3] 3D 空间中的点 (x, y, z)。<br /><br />
+
+		创建一个 [name] 实例。
+	</p>
+
+	<h2>属性</h2>
+
+	<h3>[property:Vector3 point]</h3>
+	<p>
+		3D 空间中的点 (x, y, z)。默认值 undefined。
+	</p>
+
+	<h3>[property:VertexNode prev]</h3>
+	<p>
+		引用双链表中的前一个顶点。默认为 null。
+	</p>
+
+	<h3>[property:VertexNode next]</h3>
+	<p>
+		引用双链表中的下一个顶点。默认为 null。
+	</p>
+
+	<h3>[property:Face face]</h3>
+	<p>
+		对能够看到该顶点的面的引用。默认值为 undefined。
+	</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/ConvexHull.js examples/jsm/math/ConvexHull.js]
+	<p>
+</body>
+
+</html>

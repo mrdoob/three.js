@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	[page:Mesh] &rarr;
+
+	<h1>批处理网格([name])</h1>
+
+	<p class="desc">
+		[page:Mesh] 的特殊版本，支持多绘制批量渲染。如果您必须渲染大量具有相同材质但具有不同世界变换和几何形状的对象，请使用 [name]。使用 [name] 将帮助您减少绘制调用的数量，从而提高应用程序的整体渲染性能。
+		<br />
+		<br />
+
+		如果不支持 [link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_multi_draw WEBGL_multi_draw extension]
+		，则使用性能较低的回调。
+	</p>
+
+	<h2>代码示例</h2>
+
+	<code>
+		const box = new THREE.BoxGeometry( 1, 1, 1 );
+		const sphere = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+
+		// initialize and add geometries into the batched mesh
+		const batchedMesh = new BatchedMesh( 10, 5000, 10000, material );
+		const boxId = batchedMesh.addGeometry( box );
+		const sphereId = batchedMesh.addGeometry( sphere );
+
+		// position the geometries
+		batchedMesh.setMatrixAt( boxId, boxMatrix );
+		batchedMesh.setMatrixAt( sphereId, sphereMatrix );
+
+		scene.add( batchedMesh );
+		</code>
+
+	<h2>例子</h2>
+	<p>
+		[example:webgl_mesh_batch WebGL / mesh / batch]<br />
+	</p>
+
+	<h2>构造函数</h2>
+	<h3>
+		[name](
+		[param:Integer maxGeometryCount], [param:Integer maxVertexCount],
+		[param:Integer maxIndexCount], [param:Material material],
+		)
+	</h3>
+	<p>
+		[page:Integer maxGeometryCount] - 计划添加的单个几何体的最大数量。<br />
+		[page:Integer maxVertexCount] - 所有几何体使用的最大顶点数。<br />
+		[page:Integer maxIndexCount] - 所有几何图形使用的最大索引数。<br />
+		[page:Material material] - [page:Material] 的一个实例。默认是新的 [page:MeshBasicMaterial]。<br />
+	</p>
+
+	<h2>属性</h2>
+	<p>有关常见属性，请参阅 [page:Mesh] 基类</p>
+
+	<h3>[property:Box3 boundingBox]</h3>
+	<p>
+		该边界框包围了 [name] 的所有实例。可以用 [page:.computeBoundingBox]() 进行计算。默认为 `null`。
+	</p>
+
+	<h3>[property:Sphere boundingSphere]</h3>
+	<p>
+		该边界球包围了 [name] 的所有实例。可以用 [page:.computeBoundingSphere]() 进行计算。默认为 `null`。
+	</p>
+
+	<h3>[property:Boolean perObjectFrustumCulled]</h3>
+	<p>
+		如果为 true，则 [name] 内的各个对象将被视锥体剔除。默认为 `true`。
+	</p>
+
+	<h3>[property:Boolean sortObjects]</h3>
+	<p>
+		如果为 true，则对 [name] 中的各个对象进行排序以改善与过度绘制相关的工件。如果材质被标记为“透明”，则对象将从后到前渲染，如果没有，则它们从前到后渲染。默认为 `true`。
+	</p>
+
+	<h3>[property:Integer maxGeometryCount]</h3>
+	<p>
+		只读，[name] 中可以存储的单个几何体的最大数量。
+	</p>
+
+	<h3>[property:Boolean isBatchedMesh]</h3>
+	<p>用于检查给定对象是否属于 [name] 类型的只读标志。</p>
+
+	<h2>Methods</h2>
+	<p>有关常用方法，请参阅 [page:Mesh] 基类。</p>
+
+	<h3>[method:undefined computeBoundingBox]()</h3>
+	<p>
+		计算边界框，更新 [page:.boundingBox] 属性。<br />
+		默认情况下不计算边界框。它们需要显式计算，否则就是 `null`。
+	</p>
+
+	<h3>[method:undefined computeBoundingSphere]()</h3>
+	<p>
+		计算边界球，更新 [page:.boundingSphere] 属性。<br />
+		默认情况下不计算边界球。它们需要显式计算，否则就是 `null`。
+	</p>
+
+	<h3>[method:undefined dispose]()</h3>
+	<p>
+		释放该实例分配的GPU相关资源。每当您的应用程序中不再使用此实例时，请调用此方法。
+	</p>
+
+	<h3>[method:this setCustomSort]( [param:Function sortFunction] )</h3>
+	<p>
+		对渲染之前运行的函数进行排序。该函数需要一个要排序的项目列表和一个相机。列表中的对象包含一个“z”字段，用于执行深度排序。
+	</p>
+
+	<h3>
+		[method:Matrix4 getMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )
+	</h3>
+	<p>
+		[page:Integer index]: 实例的索引。值必须在 [0, count] 范围内。
+	</p>
+	<p>
+		[page:Matrix4 matrix]: 这个 4x4 矩阵将被设置为定义实例的局部变换矩阵。
+	</p>
+	<p>获取定义实例的局部变换矩阵。</p>
+
+	<h3>
+		[method:Boolean getVisibleAt]( [param:Integer index] )
+	</h3>
+	<p>
+		[page:Integer index]: 实例的索引。值必须在 [0, count] 范围内。
+	</p>
+	<p>获取给定实例是否标记为“可见”。</p>
+
+	<h3>
+		[method:this setMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )
+	</h3>
+	<p>
+		[page:Integer index]: 实例的索引。值必须在 [0, count] 范围内。
+	</p>
+	<p>
+		[page:Matrix4 matrix]: 表示单个实例的局部变换的 4x4 矩阵。
+	</p>
+	<p>
+		将给定的局部变换矩阵设置为定义的实例。
+	</p>
+
+	<h3>
+		[method:this setVisibleAt]( [param:Integer index], [param:Boolean visible] )
+	</h3>
+	<p>
+		[page:Integer index]: 实例的索引。值必须在 [0, count] 范围内。
+	</p>
+	<p>
+		[page:Boolean visible]: 指示可见性状态的布尔值。
+	</p>
+	<p>
+		设置给定索引处对象的可见性。
+	</p>
+
+	<h3>
+		[method:Integer addGeometry]( [param:BufferGeometry geometry], [param:Integer reservedVertexRange], [param:Integer
+		reservedIndexRange] )
+	</h3>
+	<p>
+		[page:BufferGeometry geometry]: 要添加到 [name] 中的几何体。
+	</p>
+	<p>
+		[page:Integer reservedVertexRange]: 可选参数，指定为添加的几何体保留的顶点缓冲区空间量。如果计划稍后在此索引处设置大于原始几何图形的新几何图形，则这是必要的。默认为给定几何顶点缓冲区的长度。
+	</p>
+	<p>
+		[page:Integer reservedIndexRange]: 可选参数，指定为添加的几何体保留的索引缓冲区空间量。如果计划稍后在此索引处设置大于原始几何图形的新几何图形，则这是必要的。默认为给定几何索引缓冲区的长度。
+	</p>
+	<p>
+		将给定几何体添加到 [name] 并返回引用它的关联索引。
+	</p>
+
+	<h3>
+		[method:Integer setGeometryAt]( [param:Integer index], [param:BufferGeometry geometry] )
+	</h3>
+	<p>
+		[page:Integer index]: 用该几何图形替换哪个几何图形索引。
+	</p>
+	<p>
+		[page:BufferGeometry geometry]: 在给定几何索引处替换的几何。
+	</p>
+	<p>
+		用提供的几何图形替换 `index` 的几何图形。如果索引处没有为几何体保留足够的空间，则会引发错误。
+	</p>
+
+	<h3>
+		[method:this deleteGeometry]( [param:Integer index] )
+	</h3>
+	<p>
+		将给定索引处的几何体标记为已删除并且不再渲染。
+	</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</p>
+</body>
+
+</html>

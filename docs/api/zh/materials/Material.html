@@ -24,14 +24,28 @@
 
 <h2>属性(Properties)</h2>
 
+<h3>[property:Boolean alphaHash]</h3>
+<p>
+启用alphaHash透明度，这是[page:.transparent]或[page:.alphaTest]的替代方案。如果不透明度低于随机阈值，则不会渲染材质。随机化会引入一些颗粒或噪点，但相较于传统的Alpha blend方式，避免了透明度引起的深度排序问题。使用TAARenderPass可以有效减少噪点。
+</p>
+
 <h3>[property:Float alphaTest]</h3>
 <p>设置运行alphaTest时要使用的alpha值。如果不透明度低于此值，则不会渲染材质。默认值为*0*。
 </p>
 
 <h3>[property:Boolean alphaToCoverage]</h3>
-<p>
-启用alpha to coverage. 只能在开启了MSAA的渲染环境中使用 (当渲染器创建的时候*antialias* 属性要*true*才能使用).
-默认为 *false*.
+<p>启用 alpha 覆盖。 只能与启用 MSAA 的上下文一起使用（意味着在创建渲染器时将抗锯齿参数 *antialias* 设置为 `true`）。
+	启用此选项将平滑剪裁平面边缘和 alphaTest 剪辑边缘上的锯齿。 默认值为 `false`。
+</p>
+
+<h3>[property:Float blendAlpha]</h3>
+<p>表示恒定混合颜色的 alpha 值。 默认值为 `0`。<br />
+	此属性仅在使用 [page:CustomBlendingEquation ConstantAlpha] 或 [page:CustomBlendingEquation OneMinusConstantAlpha] 自定义混合时有效。
+</p>
+
+<h3>[property:Color blendColor]</h3>
+<p>表示恒定混合颜色的 RGB 值。 默认值为 `0x000000`。<br />
+	此属性仅在使用 [page:CustomBlendingEquation ConstantColor] 或 [page:CustomBlendingEquation OneMinusConstantColor] 自定义混合时有效。
 </p>
 
 <h3>[property:Integer blendDst]</h3>

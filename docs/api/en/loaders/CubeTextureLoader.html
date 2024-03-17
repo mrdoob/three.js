@@ -12,8 +12,13 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Class for loading a [page:CubeTexture CubeTexture]. This uses the
-			[page:ImageLoader] internally for loading files.
+			[name] can be used to load cube maps. The loader returns an instance of [page:CubeTexture] and expects the cube map to
+			be defined as six separate images representing the sides of a cube. Other cube map definitions like vertical and horizontal cross, 
+			column and row layouts are not supported.
+		</p>
+		<p>
+			The loaded [page:CubeTexture] is in sRGB color space. Meaning the [page:Texture.colorSpace colorSpace] 
+			property is set to `THREE.SRGBColorSpace` by default.
 		</p>
 
 		<h2>Code Example</h2>
@@ -57,8 +62,7 @@ scene.background = new THREE.CubeTextureLoader()
 		<p>See the base [page:Loader] class for common methods.</p>
 
 		<h3>
-			[method:CubeTexture load]( [param:String urls], [param:Function onLoad],
-			[param:Function onProgress], [param:Function onError] )
+			[method:CubeTexture load]( [param:String urls], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )
 		</h3>
 		<p>
 			[page:String urls] — array of 6 urls to images, one for each side of the

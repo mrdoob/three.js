@@ -25,6 +25,9 @@ const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 const _addedEvent = { type: 'added' };
 const _removedEvent = { type: 'removed' };
 
+const _childaddedEvent = { type: 'childadded', child: null };
+const _childremovedEvent = { type: 'childremoved', child: null };
+
 class Object3D extends EventDispatcher {
 
 	constructor() {
@@ -98,9 +101,9 @@ class Object3D extends EventDispatcher {
 		this.matrixWorld = new Matrix4();
 
 		this.matrixAutoUpdate = Object3D.DEFAULT_MATRIX_AUTO_UPDATE;
-		this.matrixWorldNeedsUpdate = false;
 
 		this.matrixWorldAutoUpdate = Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE; // checked by the renderer
+		this.matrixWorldNeedsUpdate = false;
 
 		this.layers = new Layers();
 		this.visible = true;
@@ -116,6 +119,10 @@ class Object3D extends EventDispatcher {
 		this.userData = {};
 
 	}
+
+	onBeforeShadow( /* renderer, object, camera, shadowCamera, geometry, depthMaterial, group */ ) {}
+
+	onAfterShadow( /* renderer, object, camera, shadowCamera, geometry, depthMaterial, group */ ) {}
 
 	onBeforeRender( /* renderer, scene, camera, geometry, material, group */ ) {}
 
@@ -326,16 +333,15 @@ class Object3D extends EventDispatcher {
 
 		if ( object && object.isObject3D ) {
 
-			if ( object.parent !== null ) {
-
-				object.parent.remove( object );
-
-			}
-
+			object.removeFromParent();
 			object.parent = this;
 			this.children.push( object );
 
 			object.dispatchEvent( _addedEvent );
+
+			_childaddedEvent.child = object;
+			this.dispatchEvent( _childaddedEvent );
+			_childaddedEvent.child = null;
 
 		} else {
 
@@ -370,6 +376,10 @@ class Object3D extends EventDispatcher {
 
 			object.dispatchEvent( _removedEvent );
 
+			_childremovedEvent.child = object;
+			this.dispatchEvent( _childremovedEvent );
+			_childremovedEvent.child = null;
+
 		}
 
 		return this;
@@ -392,20 +402,7 @@ class Object3D extends EventDispatcher {
 
 	clear() {
 
-		for ( let i = 0; i < this.children.length; i ++ ) {
-
-			const object = this.children[ i ];
-
-			object.parent = null;
-
-			object.dispatchEvent( _removedEvent );
-
-		}
-
-		this.children.length = 0;
-
-		return this;
-
+		return this.remove( ... this.children );
 
 	}
 
@@ -429,9 +426,17 @@ class Object3D extends EventDispatcher {
 
 		object.applyMatrix4( _m1 );
 
-		this.add( object );
+		object.removeFromParent();
+		object.parent = this;
+		this.children.push( object );
 
 		object.updateWorldMatrix( false, true );
+
+		object.dispatchEvent( _addedEvent );
+
+		_childaddedEvent.child = object;
+		this.dispatchEvent( _childaddedEvent );
+		_childaddedEvent.child = null;
 
 		return this;
 
@@ -470,21 +475,15 @@ class Object3D extends EventDispatcher {
 
 	}
 
-	getObjectsByProperty( name, value ) {
-
-		let result = [];
+	getObjectsByProperty( name, value, result = [] ) {
 
 		if ( this[ name ] === value ) result.push( this );
 
-		for ( let i = 0, l = this.children.length; i < l; i ++ ) {
+		const children = this.children;
 
-			const childResult = this.children[ i ].getObjectsByProperty( name, value );
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			if ( childResult.length > 0 ) {
-
-				result = result.concat( childResult );
-
-			}
+			children[ i ].getObjectsByProperty( name, value, result );
 
 		}
 
@@ -693,7 +692,7 @@ class Object3D extends EventDispatcher {
 			};
 
 			output.metadata = {
-				version: 4.5,
+				version: 4.6,
 				type: 'Object',
 				generator: 'Object3D.toJSON'
 			};
@@ -729,6 +728,56 @@ class Object3D extends EventDispatcher {
 			object.count = this.count;
 			object.instanceMatrix = this.instanceMatrix.toJSON();
 			if ( this.instanceColor !== null ) object.instanceColor = this.instanceColor.toJSON();
+
+		}
+
+		if ( this.isBatchedMesh ) {
+
+			object.type = 'BatchedMesh';
+			object.perObjectFrustumCulled = this.perObjectFrustumCulled;
+			object.sortObjects = this.sortObjects;
+
+			object.drawRanges = this._drawRanges;
+			object.reservedRanges = this._reservedRanges;
+
+			object.visibility = this._visibility;
+			object.active = this._active;
+			object.bounds = this._bounds.map( bound => ( {
+				boxInitialized: bound.boxInitialized,
+				boxMin: bound.box.min.toArray(),
+				boxMax: bound.box.max.toArray(),
+
+				sphereInitialized: bound.sphereInitialized,
+				sphereRadius: bound.sphere.radius,
+				sphereCenter: bound.sphere.center.toArray()
+			} ) );
+
+			object.maxGeometryCount = this._maxGeometryCount;
+			object.maxVertexCount = this._maxVertexCount;
+			object.maxIndexCount = this._maxIndexCount;
+
+			object.geometryInitialized = this._geometryInitialized;
+			object.geometryCount = this._geometryCount;
+
+			object.matricesTexture = this._matricesTexture.toJSON( meta );
+
+			if ( this.boundingSphere !== null ) {
+
+				object.boundingSphere = {
+					center: object.boundingSphere.center.toArray(),
+					radius: object.boundingSphere.radius
+				};
+
+			}
+
+			if ( this.boundingBox !== null ) {
+
+				object.boundingBox = {
+					min: object.boundingBox.min.toArray(),
+					max: object.boundingBox.max.toArray()
+				};
+
+			}
 
 		}
 
@@ -932,9 +981,9 @@ class Object3D extends EventDispatcher {
 		this.matrixWorld.copy( source.matrixWorld );
 
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
-		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
 		this.matrixWorldAutoUpdate = source.matrixWorldAutoUpdate;
+		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
 		this.layers.mask = source.layers.mask;
 		this.visible = source.visible;
@@ -944,6 +993,8 @@ class Object3D extends EventDispatcher {
 
 		this.frustumCulled = source.frustumCulled;
 		this.renderOrder = source.renderOrder;
+
+		this.animations = source.animations.slice();
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 

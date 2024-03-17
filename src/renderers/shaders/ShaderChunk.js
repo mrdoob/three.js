@@ -1,9 +1,13 @@
+import alphahash_fragment from './ShaderChunk/alphahash_fragment.glsl.js';
+import alphahash_pars_fragment from './ShaderChunk/alphahash_pars_fragment.glsl.js';
 import alphamap_fragment from './ShaderChunk/alphamap_fragment.glsl.js';
 import alphamap_pars_fragment from './ShaderChunk/alphamap_pars_fragment.glsl.js';
 import alphatest_fragment from './ShaderChunk/alphatest_fragment.glsl.js';
 import alphatest_pars_fragment from './ShaderChunk/alphatest_pars_fragment.glsl.js';
 import aomap_fragment from './ShaderChunk/aomap_fragment.glsl.js';
 import aomap_pars_fragment from './ShaderChunk/aomap_pars_fragment.glsl.js';
+import batching_pars_vertex from './ShaderChunk/batching_pars_vertex.glsl.js';
+import batching_vertex from './ShaderChunk/batching_vertex.glsl.js';
 import begin_vertex from './ShaderChunk/begin_vertex.glsl.js';
 import beginnormal_vertex from './ShaderChunk/beginnormal_vertex.glsl.js';
 import bsdfs from './ShaderChunk/bsdfs.glsl.js';
@@ -24,8 +28,8 @@ import displacementmap_pars_vertex from './ShaderChunk/displacementmap_pars_vert
 import displacementmap_vertex from './ShaderChunk/displacementmap_vertex.glsl.js';
 import emissivemap_fragment from './ShaderChunk/emissivemap_fragment.glsl.js';
 import emissivemap_pars_fragment from './ShaderChunk/emissivemap_pars_fragment.glsl.js';
-import encodings_fragment from './ShaderChunk/encodings_fragment.glsl.js';
-import encodings_pars_fragment from './ShaderChunk/encodings_pars_fragment.glsl.js';
+import colorspace_fragment from './ShaderChunk/colorspace_fragment.glsl.js';
+import colorspace_pars_fragment from './ShaderChunk/colorspace_pars_fragment.glsl.js';
 import envmap_fragment from './ShaderChunk/envmap_fragment.glsl.js';
 import envmap_common_pars_fragment from './ShaderChunk/envmap_common_pars_fragment.glsl.js';
 import envmap_pars_fragment from './ShaderChunk/envmap_pars_fragment.glsl.js';
@@ -61,6 +65,7 @@ import map_particle_fragment from './ShaderChunk/map_particle_fragment.glsl.js';
 import map_particle_pars_fragment from './ShaderChunk/map_particle_pars_fragment.glsl.js';
 import metalnessmap_fragment from './ShaderChunk/metalnessmap_fragment.glsl.js';
 import metalnessmap_pars_fragment from './ShaderChunk/metalnessmap_pars_fragment.glsl.js';
+import morphinstance_vertex from './ShaderChunk/morphinstance_vertex.glsl.js';
 import morphcolor_vertex from './ShaderChunk/morphcolor_vertex.glsl.js';
 import morphnormal_vertex from './ShaderChunk/morphnormal_vertex.glsl.js';
 import morphtarget_pars_vertex from './ShaderChunk/morphtarget_pars_vertex.glsl.js';
@@ -75,7 +80,7 @@ import clearcoat_normal_fragment_begin from './ShaderChunk/clearcoat_normal_frag
 import clearcoat_normal_fragment_maps from './ShaderChunk/clearcoat_normal_fragment_maps.glsl.js';
 import clearcoat_pars_fragment from './ShaderChunk/clearcoat_pars_fragment.glsl.js';
 import iridescence_pars_fragment from './ShaderChunk/iridescence_pars_fragment.glsl.js';
-import output_fragment from './ShaderChunk/output_fragment.glsl.js';
+import opaque_fragment from './ShaderChunk/opaque_fragment.glsl.js';
 import packing from './ShaderChunk/packing.glsl.js';
 import premultiplied_alpha_fragment from './ShaderChunk/premultiplied_alpha_fragment.glsl.js';
 import project_vertex from './ShaderChunk/project_vertex.glsl.js';
@@ -121,12 +126,16 @@ import * as shadow from './ShaderLib/shadow.glsl.js';
 import * as sprite from './ShaderLib/sprite.glsl.js';
 
 export const ShaderChunk = {
+	alphahash_fragment: alphahash_fragment,
+	alphahash_pars_fragment: alphahash_pars_fragment,
 	alphamap_fragment: alphamap_fragment,
 	alphamap_pars_fragment: alphamap_pars_fragment,
 	alphatest_fragment: alphatest_fragment,
 	alphatest_pars_fragment: alphatest_pars_fragment,
 	aomap_fragment: aomap_fragment,
 	aomap_pars_fragment: aomap_pars_fragment,
+	batching_pars_vertex: batching_pars_vertex,
+	batching_vertex: batching_vertex,
 	begin_vertex: begin_vertex,
 	beginnormal_vertex: beginnormal_vertex,
 	bsdfs: bsdfs,
@@ -147,8 +156,8 @@ export const ShaderChunk = {
 	displacementmap_vertex: displacementmap_vertex,
 	emissivemap_fragment: emissivemap_fragment,
 	emissivemap_pars_fragment: emissivemap_pars_fragment,
-	encodings_fragment: encodings_fragment,
-	encodings_pars_fragment: encodings_pars_fragment,
+	colorspace_fragment: colorspace_fragment,
+	colorspace_pars_fragment: colorspace_pars_fragment,
 	envmap_fragment: envmap_fragment,
 	envmap_common_pars_fragment: envmap_common_pars_fragment,
 	envmap_pars_fragment: envmap_pars_fragment,
@@ -184,6 +193,7 @@ export const ShaderChunk = {
 	map_particle_pars_fragment: map_particle_pars_fragment,
 	metalnessmap_fragment: metalnessmap_fragment,
 	metalnessmap_pars_fragment: metalnessmap_pars_fragment,
+	morphinstance_vertex: morphinstance_vertex,
 	morphcolor_vertex: morphcolor_vertex,
 	morphnormal_vertex: morphnormal_vertex,
 	morphtarget_pars_vertex: morphtarget_pars_vertex,
@@ -198,7 +208,7 @@ export const ShaderChunk = {
 	clearcoat_normal_fragment_maps: clearcoat_normal_fragment_maps,
 	clearcoat_pars_fragment: clearcoat_pars_fragment,
 	iridescence_pars_fragment: iridescence_pars_fragment,
-	output_fragment: output_fragment,
+	opaque_fragment: opaque_fragment,
 	packing: packing,
 	premultiplied_alpha_fragment: premultiplied_alpha_fragment,
 	project_vertex: project_vertex,

@@ -9,6 +9,8 @@ import {
 
 const ConvolutionShader = {
 
+	name: 'ConvolutionShader',
+
 	defines: {
 
 		'KERNEL_SIZE_FLOAT': '25.0',

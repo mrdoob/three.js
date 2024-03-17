@@ -16,7 +16,7 @@
 		<p>
 			[page:Vector3 center] - center of the sphere. Default is a [page:Vector3]
 			at `(0, 0, 0)`. <br />
-			[page:Float radius] - radius of the sphere. Default is -1.<br /><br />
+			[page:Float radius] - radius of the sphere. Default is `-1`.<br /><br />
 
 			Creates a new [name].
 		</p>
@@ -28,6 +28,9 @@
 			A [page:Vector3] defining the center of the sphere. Default is `(0, 0,
 			0)`.
 		</p>
+
+		<h3>[property:Boolean isSphere]</h3>
+		<p>Read-only flag to check if a given object is of type [name].</p>
 
 		<h3>[property:Float radius]</h3>
 		<p>The radius of the sphere. Default is -1.</p>
@@ -91,7 +94,7 @@
 		<p>
 			Checks to see if the sphere is empty (the radius set to a negative
 			number). <br />
-			Spheres with a radius of 0 contain only their center point and are not
+			Spheres with a radius of `0` contain only their center point and are not
 			considered to be empty.
 		</p>
 

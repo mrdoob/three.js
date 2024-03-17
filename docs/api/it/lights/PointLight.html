@@ -68,16 +68,10 @@ scene.add( light );
 
 		<h3>[property:Float distance]</h3>
 		<p>
-			`Modalità predefinita` — Quando la distanza è zero, la luce non si attenua. Quando la distanza è diversa da zero,
-      la luce si attenuerà linearmente dalla massima intensità nella posizione della luce fino a zero a questa distanza 
-      dalla luce.
-		</p>
-		<p>
-			`Modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta]` — Quando la distanza è
-      zero, la luce si attenuerà secondo la legge dell'inverso del quadrato alla distanza infinita.
-      Quando la distanza è diversa da zero, la luce si attenuerà secondo la legge dell'inverso del quadrato 
-      fino in prossimità del limite di distanza, dove si attenuerà quindi rapidamente e senza intoppi fino a 0.
-      Intrinsecamente, i limiti non sono fisicamente corretti.
+			Quando la distanza è zero, la luce si attenuerà secondo la legge dell'inverso del quadrato alla distanza infinita.
+			Quando la distanza è diversa da zero, la luce si attenuerà secondo la legge dell'inverso del quadrato 
+			fino in prossimità del limite di distanza, dove si attenuerà quindi rapidamente e senza intoppi fino a 0.
+			Intrinsecamente, i limiti non sono fisicamente corretti.
 		</p>
 		<p>
 			Il valore predefinito è `0.0`.
@@ -86,8 +80,7 @@ scene.add( light );
 		<h3>[property:Float intensity]</h3>
 		<p>
       L'intensità della luce. Il valore predefinito è `1`.<br />
-      Nella modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta], l'intensità 
-      è l'intensità luminosa della luce misurata in candela (cd).<br /><br />
+      L'intensità è l'intensità luminosa della luce misurata in candela (cd).<br /><br />
 
       Modificando l'intensità si modificherà anche la potenza della luce.
 		</p>
@@ -95,8 +88,7 @@ scene.add( light );
 		<h3>[property:Float power]</h3>
 		<p>
       La potenza della luce.<br />
-      Nella modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta], la potenza è la potenza 
-      della luminosità della luce misurata in lumen (lm).<br /><br />
+      La potenza è la potenza della luminosità della luce misurata in lumen (lm).<br /><br />
 
       Modificando la potenza si modificherà anche l'intensità della luce.
 		</p>

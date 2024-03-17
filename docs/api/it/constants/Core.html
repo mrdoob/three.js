@@ -21,22 +21,22 @@ THREE.REVISION
 
 		<h2>Spazi Colore</h2>
 		<code>
-THREE.NoColorSpace			
-THREE.SRGBColorSpace
-THREE.LinearSRGBColorSpace
+THREE.NoColorSpace = ""
+THREE.SRGBColorSpace = "srgb"
+THREE.LinearSRGBColorSpace = "srgb-linear"
 		</code>
 		<p>
 			[page:NoColorSpace] non definisce uno spazio colore specifico. 
 		</p>
 		<p>
-			[page:SRGBColorSpace] (“sRGB”) si riferisce allo spazio colore definito dal Rec. 709
+			[page:SRGBColorSpace] (“srgb”) si riferisce allo spazio colore definito dal Rec. 709
       primari, punto di bianco D65 e funzioni di trasferimento sRGB non lineare. sRGB è lo spazio
       colore predefinito nei CSS, e si trova spesso nelle palette dei colori e nei selettori di colore.
       I colori espressi in esadecimale o in notazione CSS sono tipicamente nello spazio colore sRGB.
 		</p>
 
 		<p>
-			[page:LinearSRGBColorSpace] (“Linear-sRGB”) si riferisce allo spazio colore sRGB (sopra) con
+			[page:LinearSRGBColorSpace] (“srgb-linear”) si riferisce allo spazio colore sRGB (sopra) con
       funzioni di trasferimento lineare. Linear-sRGB è lo spazio colore di lavoro in three.js, utilizzato
       durante la maggior parte del processo di rendering. I componenti RGB presenti nei materiali, negli 
       shader in three.js si trovano nello spazio colore Linear-sRGB.

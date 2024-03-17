@@ -30,6 +30,7 @@ export const fragment = /* glsl */`
 uniform float flipEnvMap;
 uniform float backgroundBlurriness;
 uniform float backgroundIntensity;
+uniform mat3 backgroundRotation;
 
 varying vec3 vWorldDirection;
 
@@ -39,11 +40,11 @@ void main() {
 
 	#ifdef ENVMAP_TYPE_CUBE
 
-		vec4 texColor = textureCube( envMap, vec3( flipEnvMap * vWorldDirection.x, vWorldDirection.yz ) );
+		vec4 texColor = textureCube( envMap, backgroundRotation * vec3( flipEnvMap * vWorldDirection.x, vWorldDirection.yz ) );
 
 	#elif defined( ENVMAP_TYPE_CUBE_UV )
 
-		vec4 texColor = textureCubeUV( envMap, vWorldDirection, backgroundBlurriness );
+		vec4 texColor = textureCubeUV( envMap, backgroundRotation * vWorldDirection, backgroundBlurriness );
 
 	#else
 
@@ -56,7 +57,7 @@ void main() {
 	gl_FragColor = texColor;
 
 	#include <tonemapping_fragment>
-	#include <encodings_fragment>
+	#include <colorspace_fragment>
 
 }
 `;

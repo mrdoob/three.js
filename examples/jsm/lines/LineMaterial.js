@@ -169,51 +169,34 @@ ShaderLib[ 'line' ] = {
 
 			#ifdef WORLD_UNITS
 
-				// get the offset direction as perpendicular to the view vector
 				vec3 worldDir = normalize( end.xyz - start.xyz );
-				vec3 offset;
-				if ( position.y < 0.5 ) {
+				vec3 tmpFwd = normalize( mix( start.xyz, end.xyz, 0.5 ) );
+				vec3 worldUp = normalize( cross( worldDir, tmpFwd ) );
+				vec3 worldFwd = cross( worldDir, worldUp );
+				worldPos = position.y < 0.5 ? start: end;
 
-					offset = normalize( cross( start.xyz, worldDir ) );
-
-				} else {
-
-					offset = normalize( cross( end.xyz, worldDir ) );
-
-				}
-
-				// sign flip
-				if ( position.x < 0.0 ) offset *= - 1.0;
-
-				float forwardOffset = dot( worldDir, vec3( 0.0, 0.0, 1.0 ) );
+				// height offset
+				float hw = linewidth * 0.5;
+				worldPos.xyz += position.x < 0.0 ? hw * worldUp : - hw * worldUp;
 
 				// don't extend the line if we're rendering dashes because we
 				// won't be rendering the endcaps
 				#ifndef USE_DASH
 
-					// extend the line bounds to encompass  endcaps
-					start.xyz += - worldDir * linewidth * 0.5;
-					end.xyz += worldDir * linewidth * 0.5;
+					// cap extension
+					worldPos.xyz += position.y < 0.5 ? - hw * worldDir : hw * worldDir;
 
-					// shift the position of the quad so it hugs the forward edge of the line
-					offset.xy -= dir * forwardOffset;
-					offset.z += 0.5;
+					// add width to the box
+					worldPos.xyz += worldFwd * hw;
+
+					// endcaps
+					if ( position.y > 1.0 || position.y < 0.0 ) {
+
+						worldPos.xyz -= worldFwd * 2.0 * hw;
+
+					}
 
 				#endif
-
-				// endcaps
-				if ( position.y > 1.0 || position.y < 0.0 ) {
-
-					offset.xy += dir * 2.0 * forwardOffset;
-
-				}
-
-				// adjust for linewidth
-				offset *= linewidth * 0.5;
-
-				// set the world position
-				worldPos = ( position.y < 0.5 ) ? start : end;
-				worldPos.xyz += offset;
 
 				// project the worldpos
 				vec4 clip = projectionMatrix * worldPos;
@@ -426,7 +409,7 @@ ShaderLib[ 'line' ] = {
 			gl_FragColor = vec4( diffuseColor.rgb, alpha );
 
 			#include <tonemapping_fragment>
-			#include <encodings_fragment>
+			#include <colorspace_fragment>
 			#include <fog_fragment>
 			#include <premultiplied_alpha_fragment>
 
@@ -453,247 +436,181 @@ class LineMaterial extends ShaderMaterial {
 
 		this.isLineMaterial = true;
 
-		Object.defineProperties( this, {
-
-			color: {
-
-				enumerable: true,
-
-				get: function () {
-
-					return this.uniforms.diffuse.value;
-
-				},
-
-				set: function ( value ) {
-
-					this.uniforms.diffuse.value = value;
-
-				}
-
-			},
-
-			worldUnits: {
-
-				enumerable: true,
-
-				get: function () {
-
-					return 'WORLD_UNITS' in this.defines;
-
-				},
-
-				set: function ( value ) {
-
-					if ( value === true ) {
-
-						this.defines.WORLD_UNITS = '';
-
-					} else {
-
-						delete this.defines.WORLD_UNITS;
-
-					}
-
-				}
-
-			},
-
-			linewidth: {
-
-				enumerable: true,
-
-				get: function () {
-
-					return this.uniforms.linewidth.value;
-
-				},
-
-				set: function ( value ) {
-
-					this.uniforms.linewidth.value = value;
-
-				}
-
-			},
-
-			dashed: {
-
-				enumerable: true,
-
-				get: function () {
-
-					return Boolean( 'USE_DASH' in this.defines );
-
-				},
-
-				set( value ) {
-
-					if ( Boolean( value ) !== Boolean( 'USE_DASH' in this.defines ) ) {
-
-						this.needsUpdate = true;
-
-					}
-
-					if ( value === true ) {
-
-						this.defines.USE_DASH = '';
-
-					} else {
-
-						delete this.defines.USE_DASH;
-
-					}
-
-				}
-
-			},
-
-			dashScale: {
-
-				enumerable: true,
-
-				get: function () {
-
-					return this.uniforms.dashScale.value;
-
-				},
-
-				set: function ( value ) {
-
-					this.uniforms.dashScale.value = value;
-
-				}
-
-			},
-
-			dashSize: {
-
-				enumerable: true,
-
-				get: function () {
-
-					return this.uniforms.dashSize.value;
-
-				},
-
-				set: function ( value ) {
-
-					this.uniforms.dashSize.value = value;
-
-				}
-
-			},
-
-			dashOffset: {
-
-				enumerable: true,
-
-				get: function () {
-
-					return this.uniforms.dashOffset.value;
-
-				},
-
-				set: function ( value ) {
-
-					this.uniforms.dashOffset.value = value;
-
-				}
-
-			},
-
-			gapSize: {
-
-				enumerable: true,
-
-				get: function () {
-
-					return this.uniforms.gapSize.value;
-
-				},
-
-				set: function ( value ) {
-
-					this.uniforms.gapSize.value = value;
-
-				}
-
-			},
-
-			opacity: {
-
-				enumerable: true,
-
-				get: function () {
-
-					return this.uniforms.opacity.value;
-
-				},
-
-				set: function ( value ) {
-
-					this.uniforms.opacity.value = value;
-
-				}
-
-			},
-
-			resolution: {
-
-				enumerable: true,
-
-				get: function () {
-
-					return this.uniforms.resolution.value;
-
-				},
-
-				set: function ( value ) {
-
-					this.uniforms.resolution.value.copy( value );
-
-				}
-
-			},
-
-			alphaToCoverage: {
-
-				enumerable: true,
-
-				get: function () {
-
-					return Boolean( 'USE_ALPHA_TO_COVERAGE' in this.defines );
-
-				},
-
-				set: function ( value ) {
-
-					if ( Boolean( value ) !== Boolean( 'USE_ALPHA_TO_COVERAGE' in this.defines ) ) {
-
-						this.needsUpdate = true;
-
-					}
-
-					if ( value === true ) {
-
-						this.defines.USE_ALPHA_TO_COVERAGE = '';
-						this.extensions.derivatives = true;
-
-					} else {
-
-						delete this.defines.USE_ALPHA_TO_COVERAGE;
-						this.extensions.derivatives = false;
-
-					}
-
-				}
-
-			}
-
-		} );
-
 		this.setValues( parameters );
+
+	}
+
+	get color() {
+
+		return this.uniforms.diffuse.value;
+
+	}
+
+	set color( value ) {
+
+		this.uniforms.diffuse.value = value;
+
+	}
+
+	get worldUnits() {
+
+		return 'WORLD_UNITS' in this.defines;
+
+	}
+
+	set worldUnits( value ) {
+
+		if ( value === true ) {
+
+			this.defines.WORLD_UNITS = '';
+
+		} else {
+
+			delete this.defines.WORLD_UNITS;
+
+		}
+
+	}
+
+	get linewidth() {
+
+		return this.uniforms.linewidth.value;
+
+	}
+
+	set linewidth( value ) {
+
+		if ( ! this.uniforms.linewidth ) return;
+		this.uniforms.linewidth.value = value;
+
+	}
+
+	get dashed() {
+
+		return 'USE_DASH' in this.defines;
+
+	}
+
+	set dashed( value ) {
+
+		if ( ( value === true ) !== this.dashed ) {
+
+			this.needsUpdate = true;
+
+		}
+
+		if ( value === true ) {
+
+			this.defines.USE_DASH = '';
+
+		} else {
+
+			delete this.defines.USE_DASH;
+
+		}
+
+	}
+
+	get dashScale() {
+
+		return this.uniforms.dashScale.value;
+
+	}
+
+	set dashScale( value ) {
+
+		this.uniforms.dashScale.value = value;
+
+	}
+
+	get dashSize() {
+
+		return this.uniforms.dashSize.value;
+
+	}
+
+	set dashSize( value ) {
+
+		this.uniforms.dashSize.value = value;
+
+	}
+
+	get dashOffset() {
+
+		return this.uniforms.dashOffset.value;
+
+	}
+
+	set dashOffset( value ) {
+
+		this.uniforms.dashOffset.value = value;
+
+	}
+
+	get gapSize() {
+
+		return this.uniforms.gapSize.value;
+
+	}
+
+	set gapSize( value ) {
+
+		this.uniforms.gapSize.value = value;
+
+	}
+
+	get opacity() {
+
+		return this.uniforms.opacity.value;
+
+	}
+
+	set opacity( value ) {
+
+		if ( ! this.uniforms ) return;
+		this.uniforms.opacity.value = value;
+
+	}
+
+	get resolution() {
+
+		return this.uniforms.resolution.value;
+
+	}
+
+	set resolution( value ) {
+
+		this.uniforms.resolution.value.copy( value );
+
+	}
+
+	get alphaToCoverage() {
+
+		return 'USE_ALPHA_TO_COVERAGE' in this.defines;
+
+	}
+
+	set alphaToCoverage( value ) {
+
+		if ( ! this.defines ) return;
+
+		if ( ( value === true ) !== this.alphaToCoverage ) {
+
+			this.needsUpdate = true;
+
+		}
+
+		if ( value === true ) {
+
+			this.defines.USE_ALPHA_TO_COVERAGE = '';
+			this.extensions.derivatives = true;
+
+		} else {
+
+			delete this.defines.USE_ALPHA_TO_COVERAGE;
+			this.extensions.derivatives = false;
+
+		}
 
 	}
 

@@ -12,10 +12,6 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl node particles example
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -29,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { attribute, timerLocal, positionLocal, spritesheetUV, pointUV, vec2, texture, uniform, mix, PointsNodeMaterial } from 'three/nodes';
+			import { attribute, timerLocal, positionLocal, spritesheetUV, pointUV, vec2, vec3, texture, uniform, mix, PointsNodeMaterial } from 'three/nodes';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -39,9 +35,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { nodeFrame } from 'three/addons/renderers/webgl/nodes/WebGLNodes.js';
-
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+			import { nodeFrame } from 'three/addons/renderers/webgl-legacy/nodes/WebGLNodes.js';
 
 			let camera, scene, renderer, stats;
 
@@ -78,7 +72,7 @@
 
 					speed.push( 20 + Math.random() * 50 );
 
-					intensity.push( Math.random() * .15 );
+					intensity.push( Math.random() * .04 );
 
 					size.push( 30 + Math.random() * 230 );
 
@@ -95,6 +89,7 @@
 				// Forked from: https://answers.unrealengine.com/questions/143267/emergency-need-help-with-fire-fx-weird-loop.html
 
 				const fireMap = new THREE.TextureLoader().load( 'textures/sprites/firetorch_1.jpg' );
+				fireMap.colorSpace = THREE.SRGBColorSpace;
 
 				// nodes
 
@@ -127,7 +122,7 @@
 					blending: THREE.AdditiveBlending
 				} );
 
-				material.colorNode = fire;
+				material.colorNode = vec3( fire );
 				material.sizeNode = particleSize;
 				material.positionNode = positionNode;
 
@@ -139,7 +134,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				// stats

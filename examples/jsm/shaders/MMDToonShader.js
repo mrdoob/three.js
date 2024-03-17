@@ -27,17 +27,17 @@ struct BlinnPhongMaterial {
 
 };
 
-void RE_Direct_BlinnPhong( const in IncidentLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
+void RE_Direct_BlinnPhong( const in IncidentLight directLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
 
-	vec3 irradiance = getGradientIrradiance( geometry.normal, directLight.direction ) * directLight.color;
+	vec3 irradiance = getGradientIrradiance( geometryNormal, directLight.direction ) * directLight.color;
 
 	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
 
-	reflectedLight.directSpecular += irradiance * BRDF_BlinnPhong( directLight.direction, geometry.viewDir, geometry.normal, material.specularColor, material.specularShininess ) * material.specularStrength;
+	reflectedLight.directSpecular += irradiance * BRDF_BlinnPhong( directLight.direction, geometryViewDir, geometryNormal, material.specularColor, material.specularShininess ) * material.specularStrength;
 
 }
 
-void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
+void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
 
 	reflectedLight.indirectDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
 
@@ -70,6 +70,8 @@ const mmd_toon_matcap_fragment = /* glsl */`
 `;
 
 const MMDToonShader = {
+
+	name: 'MMDToonShader',
 
 	defines: {
 		TOON: true,

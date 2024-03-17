@@ -1,22 +1,18 @@
 import { Color, Matrix3, Matrix4, Vector2, Vector3, Vector4 } from 'three';
 
-export function getCacheKey( object ) {
+export function getCacheKey( object, force = false ) {
 
 	let cacheKey = '{';
 
 	if ( object.isNode === true ) {
 
-		cacheKey += `uuid:"${ object.uuid }"`;
+		cacheKey += object.id;
 
 	}
 
-	for ( const { property, index, childNode } of getNodeChildren( object ) ) {
+	for ( const { property, childNode } of getNodeChildren( object ) ) {
 
-		// @TODO: Think about implement NodeArray and NodeObject.
-
-		let childCacheKey = getCacheKey( childNode );
-		if ( ! childCacheKey.includes( ',' ) ) childCacheKey = childCacheKey.slice( childCacheKey.indexOf( '"' ), childCacheKey.indexOf( '}' ) );
-		cacheKey += `,${ property }${ index !== undefined ? '/' + index : '' }:${ childCacheKey }`;
+		cacheKey += ',' + property.slice( 0, - 4 ) + ':' + childNode.getCacheKey( force );
 
 	}
 
@@ -95,6 +91,10 @@ export function getValueType( value ) {
 
 		return 'string';
 
+	} else if ( typeOf === 'function' ) {
+
+		return 'shader';
+
 	} else if ( value.isVector2 === true ) {
 
 		return 'vec2';
@@ -132,6 +132,14 @@ export function getValueType( value ) {
 export function getValueFromType( type, ...params ) {
 
 	const last4 = type ? type.slice( - 4 ) : undefined;
+
+	if ( params.length === 1 ) { // ensure same behaviour as in NodeBuilder.format()
+
+		if ( last4 === 'vec2' ) params = [ params[ 0 ], params[ 0 ] ];
+		else if ( last4 === 'vec3' ) params = [ params[ 0 ], params[ 0 ], params[ 0 ] ];
+		else if ( last4 === 'vec4' ) params = [ params[ 0 ], params[ 0 ], params[ 0 ], params[ 0 ] ];
+
+	}
 
 	if ( type === 'color' ) {
 

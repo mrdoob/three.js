@@ -70,7 +70,7 @@
 
 			import * as THREE from 'three';
 
-			import { nodeFrame } from 'three/addons/renderers/webgl/nodes/WebGLNodes.js';
+			import { nodeFrame } from 'three/addons/renderers/webgl-legacy/nodes/WebGLNodes.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -91,7 +91,7 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.5, 60 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.5, 200 );
 				camera.position.set( 0.0, 3, 4 * 3 );
 
 				scene = new THREE.Scene();
@@ -117,7 +117,6 @@
 				} else {
 
 					renderer = new THREE.WebGLRenderer( { antialias: true } );
-					renderer.useLegacyLights = false;
 
 					composer = new EffectComposer( renderer );
 					composer.addPass( new RenderPass( scene, camera ) );
@@ -127,7 +126,6 @@
 				//
 
 				renderer.setAnimationLoop( render );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.LinearToneMapping;
 				renderer.toneMappingExposure = 1;
 				document.body.appendChild( renderer.domElement );

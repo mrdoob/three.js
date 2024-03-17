@@ -11,8 +11,7 @@ import {
 	Int32BufferAttribute,
 	Uint32BufferAttribute,
 	Float16BufferAttribute,
-	Float32BufferAttribute,
-	Float64BufferAttribute
+	Float32BufferAttribute
 } from '../../../../src/core/BufferAttribute.js';
 
 import { DynamicDrawUsage } from '../../../../src/constants.js';
@@ -74,7 +73,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( 'updateRange', ( assert ) => {
+		QUnit.todo( 'updateRanges', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
@@ -296,8 +295,7 @@ export default QUnit.module( 'Core', () => {
 			const attr2 = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3, true );
 			attr2.name = 'attributeName';
 			attr2.setUsage( DynamicDrawUsage );
-			attr2.updateRange.offset = 1;
-			attr2.updateRange.count = 2;
+			attr2.addUpdateRange( 1, 2 );
 			assert.deepEqual( attr2.toJSON(), {
 				itemSize: 3,
 				type: 'Float32Array',
@@ -305,7 +303,6 @@ export default QUnit.module( 'Core', () => {
 				normalized: true,
 				name: 'attributeName',
 				usage: DynamicDrawUsage,
-				updateRange: { offset: 1, count: 2 }
 			}, 'Serialized to JSON as expected with non-default values' );
 
 		} );
@@ -507,7 +504,7 @@ export default QUnit.module( 'Core', () => {
 		const toHalfFloatArray = ( f32Array ) => {
 
 			const f16Array = new Uint16Array( f32Array.length );
-			for ( let i = 0, n = f32Array.length; i < n; ++i ) {
+			for ( let i = 0, n = f32Array.length; i < n; ++ i ) {
 
 				f16Array[ i ] = toHalfFloat( f32Array[ i ] );
 
@@ -520,7 +517,7 @@ export default QUnit.module( 'Core', () => {
 		const fromHalfFloatArray = ( f16Array ) => {
 
 			const f32Array = new Float32Array( f16Array.length );
-			for ( let i = 0, n = f16Array.length; i < n; ++i ) {
+			for ( let i = 0, n = f16Array.length; i < n; ++ i ) {
 
 				f32Array[ i ] = fromHalfFloat( f16Array[ i ] );
 
@@ -601,29 +598,6 @@ export default QUnit.module( 'Core', () => {
 
 			const object = new Float32BufferAttribute();
 			assert.ok( object, 'Can instantiate a Float32BufferAttribute.' );
-
-		} );
-
-	} );
-
-	QUnit.module( 'Float64BufferAttribute', () => {
-
-		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
-
-			const object = new Float64BufferAttribute();
-			assert.strictEqual(
-				object instanceof BufferAttribute, true,
-				'Float64BufferAttribute extends from BufferAttribute'
-			);
-
-		} );
-
-		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
-
-			const object = new Float64BufferAttribute();
-			assert.ok( object, 'Can instantiate a Float64BufferAttribute.' );
 
 		} );
 

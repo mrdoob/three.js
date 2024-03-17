@@ -7,11 +7,6 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -45,9 +40,9 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x505050 ) );
+				scene.add( new THREE.AmbientLight( 0xcccccc ) );
 
-				const spotLight = new THREE.SpotLight( 0xffffff );
+				const spotLight = new THREE.SpotLight( 0xffffff, 60 );
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.2;
 				spotLight.position.set( 2, 3, 3 );
@@ -58,7 +53,7 @@
 				spotLight.shadow.mapSize.height = 1024;
 				scene.add( spotLight );
 
-				const dirLight = new THREE.DirectionalLight( 0x55505a, 1 );
+				const dirLight = new THREE.DirectionalLight( 0x55505a, 3 );
 				dirLight.position.set( 0, 3, 0 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 1;
@@ -87,7 +82,9 @@
 
 					// ***** Clipping setup (material): *****
 					clippingPlanes: [ localPlane ],
-					clipShadows: true
+					clipShadows: true,
+
+					alphaToCoverage: true,
 
 				} );
 
@@ -113,7 +110,7 @@
 
 				// Renderer
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -135,6 +132,9 @@
 				// GUI
 
 				const gui = new GUI(),
+					props = {
+						alphaToCoverage: true,
+					},
 					folderLocal = gui.addFolder( 'Local Clipping' ),
 					propsLocal = {
 
@@ -172,7 +172,6 @@
 						}
 
 					},
-
 					folderGlobal = gui.addFolder( 'Global Clipping' ),
 					propsGlobal = {
 
@@ -200,6 +199,15 @@
 
 					};
 
+				gui.add( props, 'alphaToCoverage' ).onChange( function ( value ) {
+
+					ground.material.alphaToCoverage = value;
+					ground.material.needsUpdate = true;
+
+					material.alphaToCoverage = value;
+					material.needsUpdate = true;
+
+				} );
 				folderLocal.add( propsLocal, 'Enabled' );
 				folderLocal.add( propsLocal, 'Shadows' );
 				folderLocal.add( propsLocal, 'Plane', 0.3, 1.25 );

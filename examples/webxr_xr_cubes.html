@@ -12,10 +12,6 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> xr - interactive cubes
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -33,8 +29,6 @@
 			import { XRButton } from 'three/addons/webxr/XRButton.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 			const clock = new THREE.Clock();
 
 			let container;
@@ -44,7 +38,6 @@
 
 			let controller, controllerGrip;
 			let INTERSECTED;
-			const tempMatrix = new THREE.Matrix4();
 
 			init();
 			animate();
@@ -63,13 +56,13 @@
 
 				room = new THREE.LineSegments(
 					new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ).translate( 0, 3, 0 ),
-					new THREE.LineBasicMaterial( { color: 0x808080 } )
+					new THREE.LineBasicMaterial( { color: 0xbcbcbc } )
 				);
 				scene.add( room );
 
-				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
+				scene.add( new THREE.HemisphereLight( 0xa5a5a5, 0x898989, 3 ) );
 
-				const light = new THREE.DirectionalLight( 0xffffff );
+				const light = new THREE.DirectionalLight( 0xffffff, 3 );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
@@ -147,7 +140,7 @@
 
 				//
 
-				document.body.appendChild( XRButton.createButton( renderer ) );
+				document.body.appendChild( XRButton.createButton( renderer, { 'optionalFeatures': [ 'depth-sensing'] } ) );
 
 			}
 
@@ -214,10 +207,7 @@
 
 				// find intersections
 
-				tempMatrix.identity().extractRotation( controller.matrixWorld );
-
-				raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
-				raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
+				raycaster.setFromXRController( controller );
 
 				const intersects = raycaster.intersectObjects( room.children, false );
 

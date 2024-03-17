@@ -1,13 +1,13 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { add } from '../math/OperatorNode.js';
-import { normalWorld } from '../accessors/NormalNode.js';
-import { positionWorld } from '../accessors/PositionNode.js';
+import { normalLocal } from '../accessors/NormalNode.js';
+import { positionLocal } from '../accessors/PositionNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { addNodeElement, nodeProxy, float, vec3 } from '../shadernode/ShaderNode.js';
 
 class TriplanarTexturesNode extends Node {
 
-	constructor( textureXNode, textureYNode = null, textureZNode = null, scaleNode = float( 1 ), positionNode = positionWorld, normalNode = normalWorld ) {
+	constructor( textureXNode, textureYNode = null, textureZNode = null, scaleNode = float( 1 ), positionNode = positionLocal, normalNode = normalLocal ) {
 
 		super( 'vec4' );
 
@@ -22,7 +22,7 @@ class TriplanarTexturesNode extends Node {
 
 	}
 
-	construct() {
+	setup() {
 
 		const { textureXNode, textureYNode, textureZNode, scaleNode, positionNode, normalNode } = this;
 
@@ -55,8 +55,8 @@ class TriplanarTexturesNode extends Node {
 export default TriplanarTexturesNode;
 
 export const triplanarTextures = nodeProxy( TriplanarTexturesNode );
-export const triplanarTexture = ( texture, ...params ) => triplanarTextures( texture, texture, texture, ...params );
+export const triplanarTexture = ( ...params ) => triplanarTextures( ...params );
 
 addNodeElement( 'triplanarTexture', triplanarTexture );
 
-addNodeClass( TriplanarTexturesNode );
+addNodeClass( 'TriplanarTexturesNode', TriplanarTexturesNode );

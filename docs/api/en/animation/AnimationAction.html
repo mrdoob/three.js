@@ -59,7 +59,7 @@
 			automatically be switched to false when the last loop of the action has
 			finished, so that this action has no further impact.<br /><br />
 
-			Default is false.<br /><br />
+			Default is `false`.<br /><br />
 
 			Note: `clampWhenFinished` has no impact if the action is interrupted (it
 			has only an effect if its last loop has really finished).
@@ -140,7 +140,7 @@
 		<h3>[property:Number weight]</h3>
 		<p>
 			The degree of influence of this action (in the interval `[0, 1]`). Values
-			between `0` (no impact) and 1 (full impact) can be used to blend between
+			between `0` (no impact) and `1` (full impact) can be used to blend between
 			several actions. Default is `1`. <br /><br />
 			Properties/methods concerning `weight` are: 
 			[page:.crossFadeFrom crossFadeFrom], 
@@ -168,8 +168,7 @@
 		<h2>Methods</h2>
 
 		<h3>
-			[method:this crossFadeFrom]( [param:AnimationAction fadeOutAction],
-			[param:Number durationInSeconds], [param:Boolean warpBoolean] )
+			[method:this crossFadeFrom]( [param:AnimationAction fadeOutAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )
 		</h3>
 		<p>
 			Causes this action to [page:.fadeIn fade in], fading out another action
@@ -180,12 +179,11 @@
 			of the time scales) will be applied.<br /><br />
 
 			Note: Like with `fadeIn`/`fadeOut`, the fading starts/ends with a weight
-			of 1.
+			of `1`.
 		</p>
 
 		<h3>
-			[method:this crossFadeTo]( [param:AnimationAction fadeInAction],
-			[param:Number durationInSeconds], [param:Boolean warpBoolean] )
+			[method:this crossFadeTo]( [param:AnimationAction fadeInAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )
 		</h3>
 		<p>
 			Causes this action to [page:.fadeOut fade out], fading in another action
@@ -195,7 +193,7 @@
 			of the time scales) will be applied.<br /><br />
 
 			Note: Like with `fadeIn`/`fadeOut`, the fading starts/ends with a weight
-			of 1.
+			of `1`.
 		</p>
 
 		<h3>[method:this fadeIn]( [param:Number durationInSeconds] )</h3>

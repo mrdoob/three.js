@@ -17,23 +17,23 @@
 		</p>
 
 		<code>
-			const pixelRatio = window.devicePixelRatio;
-			const textureSize = 128 * pixelRatio;
+const pixelRatio = window.devicePixelRatio;
+const textureSize = 128 * pixelRatio;
 
-			// instantiate a framebuffer texture
-			const frameTexture = new FramebufferTexture( textureSize, textureSize, RGBAFormat );
-	
-			// calculate start position for copying part of the frame data
-			const vector = new Vector2();
-			vector.x = ( window.innerWidth * pixelRatio / 2 ) - ( textureSize / 2 );
-			vector.y = ( window.innerHeight * pixelRatio / 2 ) - ( textureSize / 2 );
+// instantiate a framebuffer texture
+const frameTexture = new FramebufferTexture( textureSize, textureSize );
 
-			// render the scene
-			renderer.clear();
-			renderer.render( scene, camera );
+// calculate start position for copying part of the frame data
+const vector = new Vector2();
+vector.x = ( window.innerWidth * pixelRatio / 2 ) - ( textureSize / 2 );
+vector.y = ( window.innerHeight * pixelRatio / 2 ) - ( textureSize / 2 );
 
-			// copy part of the rendered frame into the framebuffer texture
-			renderer.copyFramebufferToTexture( vector, frameTexture );
+// render the scene
+renderer.clear();
+renderer.render( scene, camera );
+
+// copy part of the rendered frame into the framebuffer texture
+renderer.copyFramebufferToTexture( vector, frameTexture );
 		</code>
 
 		<h2>Examples</h2>
@@ -43,15 +43,12 @@
 		<h2>Constructor</h2>
 
 		<h3>
-			[name]( [param:Number width], [param:Number height], [param:Constant format] )
+			[name]( [param:Number width], [param:Number height] )
 		</h3>
 		<p>
 			[page:Number width] -- The width of the texture.<br />
 
-			[page:Number height] -- The height of the texture.<br />
-
-			[page:Constant format] -- The format used in the texture. See
-			[page:Textures format constants] for other choices.<br />
+			[page:Number height] -- The height of the texture.
 		</p>
 
 		<h2>Properties</h2>

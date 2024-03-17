@@ -19,7 +19,7 @@
 
 		<h2>代码示例</h2>
 		<code>
-		// white spotlight shining from the side, modulated by a texture, casting a shadow
+		// 白色聚光灯从侧面照射，经过纹理调节，形成阴影
 
 		const spotLight = new THREE.SpotLight( 0xffffff );
 		spotLight.position.set( 100, 1000, 100 );
@@ -47,115 +47,117 @@
 		<h2>构造器（Constructor）</h2>
 
 
-		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Float distance], [param:Radians angle], [param:Float penumbra], [param:Float decay] )</h3>
+		<h3>[name]( [param:Color color], [param:Float intensity], [param:Float distance], [param:Radians angle], [param:Float penumbra], [param:Float decay] )</h3>
 		<p>
-			[page:Integer color] - (可选参数) 十六进制光照颜色。 缺省值 0xffffff (白色)。<br />
-			[page:Float intensity] - (可选参数) 光照强度。 缺省值 1。<br />
-			[page:Float distance] - 从光源发出光的最大距离，其强度根据光源的距离线性衰减。 <br />
-			[page:Radians angle] - 光线散射角度，最大为Math.PI/2。<br />
-			[page:Float penumbra] - 聚光锥的半影衰减百分比。在0和1之间的值。默认为0。<br />
-			[page:Float decay] - 沿着光照距离的衰减量。<br /><br />
+			[page:Color color] -（可选）一个表示颜色的 Color 的实例、字符串或数字，默认为一个白色（0xffffff）的 [page:Color Color] 对象。<br />
+			[page:Float intensity] -（可选）光照强度。默认值为 1。<br />
+			[page:Float distance] - 光源照射的最大距离。默认值为 0（无限远）。<br />
+			[page:Radians angle] - 光线照射范围的角度。默认值为 Math.PI/3。<br />
+			[page:Float penumbra] - 聚光锥的半影衰减百分比。默认值为 0。<br />
+			[page:Float decay] - 沿着光照距离的衰减量。默认值为 2。<br /><br />
 
 			创建一个新的聚光灯。
 		</p>
 
 		<h2>属性（Properties）</h2>
 
-		<p>公共属性请查看基类[page:Light Light]。</p>
+		<p>公共属性请查看基类 [page:Light Light]。</p>
 
 		<h3>[property:Float angle]</h3>
 		<p>
-			从聚光灯的位置以弧度表示聚光灯的最大范围。应该不超过 *Math.PI/2*。默认值为 *Math.PI/3*。
+			光线照射范围的角度，用弧度表示。不应超过 `Math.PI/2`。默认值为 `Math.PI/3`。
 		</p>
 
 
 		<h3>[property:Boolean castShadow]</h3>
 		<p>
-			此属性设置为 *true* 聚光灯将投射阴影。警告: 这样做的代价比较高而且需要一直调整到阴影看起来正确。
+			此属性设置为 `true` 灯光将投射阴影。*注意*：这样做的代价比较高，需要通过调整让阴影看起来正确。
 			查看 [page:SpotLightShadow] 了解详细信息。
-			默认值为 *false*
+			默认值为 `false`。
 		</p>
 
 		<h3>[property:Float decay]</h3>
 		<p>
-			The amount the light dims along the distance of the light. Default is `2`.<br />
-			In context of physically-correct rendering the default value should not be changed.
+			光线随着距离增加变暗的衰减量。默认值为 `2`。<br />
+			在物理正确渲染的上下文中，不应更改默认值。
 		</p>
 
 		<h3>[property:Float distance]</h3>
 		<p>
-			如果非零，那么光强度将会从最大值当前灯光位置处按照距离线性衰减到0。
-			缺省值为 *0.0*。
+			当值为零时，光线将根据平方反比定律衰减到无限远。
+			当值不为零时，光线会先按照平方反比定律衰减，直到距离截止点附近，然后线性衰减到 0。
+		</p>
+		<p>默认值为 `0.0`。</p>
+
+		<h3>[property:Float intensity]</h3>
+		<p>
+			光源的强度。默认值为 `1`。<br />
+			单位是坎德拉（cd）。<br /><br />
+			改变该值会影响到 `power` 的值。
 		</p>
 
 		<h3>[property:Boolean isSpotLight]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			只读，用于检查对象的类型是否为 [name]。
 		</p>
 
 		<h3>[property:Float penumbra]</h3>
 		<p>
-				聚光锥的半影衰减百分比。在0和1之间的值。
-				默认值 — 0.0。
+			该属性设置照明区域在边缘附近的平滑衰减速度，取值范围在 0 到 1 之间。默认值为 `0.0`。
 		</p>
 
 		<h3>[property:Vector3 position]</h3>
 		<p>
-			假如这个值设置等于 [page:Object3D.DEFAULT_UP] (0, 1, 0)，那么光线将会从上往下照射。
+			假如这个值设置为 [page:Object3D.DEFAULT_UP] (0, 1, 0)，光线将会从上往下照射。
 		</p>
 
 		<h3>[property:Float power]</h3>
 		<p>
-			光功率<br />
-			在 [page:WebGLRenderer.physicallyCorrectLights physically correct] 模式中，
-			表示以"流明（光通量单位）"为单位的光功率。 缺省值 - *4Math.PI*。 <br /><br />
-
-			该值与 [page:.intensity intensity] 直接关联
-				<code>
-				power = intensity * 4&pi;
-			</code>
-			修改该值也会导致光强度的改变。
+			光源的功率。<br />
+			单位为流明（lm）。<br /><br />
+			改变该值会影响到 `intensity` 的值。
 		</p>
 
 		<h3>[property:SpotLightShadow shadow]</h3>
 		<p>
-			[page:SpotLightShadow]用与计算此光照的阴影。
+			[page:SpotLightShadow] 对象，用与计算此光照的阴影。
 		</p>
 
 
 		<h3>[property:Object3D target]</h3>
 		<p>
-				聚光灯的方向是从它的位置到目标位置.默认的目标位置为原点 *(0,0,0)*。<br />
-				注意: 对于目标的位置，要将其更改为除缺省值之外的任何位置，它必须被添加到 [page:Scene scene]
-				场景中去。
+			灯光从它的位置（[page:.position position]）指向目标位置。默认的目标位置为`(0, 0, 0)`。<br />
+			*注意*：对于目标的位置，如果要改为除默认值之外的其他位置，该位置必须被添加到场景（[page:Scene scene]）中去。
 			<code>
 				scene.add( light.target );
 			</code>
-
-			这使得属性target中的 [page:Object3D.matrixWorld matrixWorld] 会每帧自动更新。<br /><br />
-
-			它也可以设置target为场景中的其他对象(任意拥有 [page:Object3D.position position] 属性的对象), 示例如下:
+			这是为了让目标的 [page:Object3D.matrixWorld matrixWorld] 在每一帧自动更新。<br /><br />
+			也可以将目标设置为场景中的其他对象（任意拥有 [page:Object3D.position position] 属性的对象），如:
 			<code>
 const targetObject = new THREE.Object3D();
 scene.add(targetObject);
 
 light.target = targetObject;
 			</code>
-			完成上述操作后，聚光灯现在就可以追踪到目标对像了。
+			通过上述操作，光源就可以追踪目标对象了。
 		</p>
 
 		<h3>[property:Texture map]</h3>
 		<p>
-			A [page:Texture] used to modulate the color of the light. The spot light color is mixed
-			with the RGB value of this texture, with a ratio corresponding to its
-			alpha value. The cookie-like masking effect is reproduced using pixel values (0, 0, 0, 1-cookie_value).
-			*Warning*: [param:SpotLight map] is disabled if [param:SpotLight castShadow] is *false*.
+			用于调节光线颜色的纹理（[page:Texture]），聚光灯颜色会与该纹理的RGB值混合，其比例与其alpha值相对应。<br />
+			The cookie-like masking effect is reproduced using pixel values (0, 0, 0, 1-cookie_value).<br />
+			*注意*: 如果 [page:.castShadow] 值为 `false` 时，[page:.map] 不可用。
 		</p>
 
 
 		<h2>方法（Methods）</h2>
 
 		<p>公共方法请查看基类 [page:Light Light]。</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			释放由该实例分配的 GPU 相关资源。 当这个实例不再在你的应用中使用时，调用这个方法。
+		</p>
 
 		<h3>[method:this copy]( [param:SpotLight source] )</h3>
 		<p>
@@ -167,3 +169,4 @@ light.target = targetObject;
 		</p>
 	</body>
 </html>
+

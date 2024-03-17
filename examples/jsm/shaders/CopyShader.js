@@ -4,6 +4,8 @@
 
 const CopyShader = {
 
+	name: 'CopyShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null },
@@ -32,8 +34,8 @@ const CopyShader = {
 
 		void main() {
 
-			gl_FragColor = texture2D( tDiffuse, vUv );
-			gl_FragColor.a *= opacity;
+			vec4 texel = texture2D( tDiffuse, vUv );
+			gl_FragColor = opacity * texel;
 
 
 		}`

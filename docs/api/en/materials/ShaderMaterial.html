@@ -313,7 +313,7 @@ uniforms: {
 this.defaultAttributeValues = { 
 	'color': [ 1, 1, 1 ], 
 	'uv': [ 0, 0 ],
-	'uv2': [ 0, 0 ] 
+	'uv1': [ 0, 0 ] 
 };
 			</code>
 		</p>
@@ -342,11 +342,8 @@ this.defaultAttributeValues = {
 			An object with the following properties:
 			<code>
 this.extensions = { 
-	derivatives: false, // set to use derivatives
-	fragDepth: false, // set to use fragment depth values 
-	drawBuffers: false, // set to use draw buffers 
-	shaderTextureLOD: false // set to use
-	shader texture LOD 
+	clipCullDistance: false, // set to use vertex shader clipping
+	multiDraw: false // set to use vertex shader multi_draw / enable gl_DrawID
 };
 			</code>
 		</p>
@@ -367,8 +364,7 @@ this.extensions = {
 
 		<h3>[property:String glslVersion]</h3>
 		<p>
-			Defines the GLSL version of custom shader code. Only relevant for WebGL 2
-			in order to define whether to specify GLSL 3.0 or not. Valid values are
+			Defines the GLSL version of custom shader code. Valid values are
 			`THREE.GLSL1` or `THREE.GLSL3`. Default is `null`.
 		</p>
 
@@ -390,12 +386,12 @@ this.extensions = {
 
 		<h3>[property:Float linewidth]</h3>
 		<p>
-			Controls wireframe thickness. Default is 1.<br /><br />
+			Controls wireframe thickness. Default is `1`.<br /><br />
 
 			Due to limitations of the
 			[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile] 
 			with the [page:WebGLRenderer WebGL] renderer on most
-			platforms linewidth will always be 1 regardless of the set value.
+			platforms linewidth will always be `1` regardless of the set value.
 		</p>
 
 		<h3>[property:Boolean flatShading]</h3>
@@ -451,18 +447,18 @@ this.extensions = {
 
 		<h3>[property:Float wireframeLinewidth]</h3>
 		<p>
-			Controls wireframe thickness. Default is 1.<br /><br />
+			Controls wireframe thickness. Default is `1`.<br /><br />
 
 			Due to limitations of the
 			[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile] 
 			with the [page:WebGLRenderer WebGL] renderer on most
-			platforms linewidth will always be 1 regardless of the set value.
+			platforms linewidth will always be `1` regardless of the set value.
 		</p>
 
 		<h2>Methods</h2>
 		<p>See the base [page:Material] class for common methods.</p>
 
-		<h3>[method:ShaderMaterial clone]() [param:ShaderMaterial this]</h3>
+		<h3>[method:ShaderMaterial clone]()</h3>
 		<p>
 			Generates a shallow copy of this material. Note that the vertexShader and
 			fragmentShader are copied `by reference`, as are the definitions of the

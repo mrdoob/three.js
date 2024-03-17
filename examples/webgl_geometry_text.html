@@ -13,10 +13,6 @@
 			type to enter new text, drag to spin the text
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -36,7 +32,6 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			THREE.Cache.enabled = true;
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
 
 			let container;
 
@@ -122,11 +117,11 @@
 
 				// LIGHTS
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.4 );
 				dirLight.position.set( 0, 0, 1 ).normalize();
 				scene.add( dirLight );
 
-				const pointLight = new THREE.PointLight( 0xffffff, 1.5 );
+				const pointLight = new THREE.PointLight( 0xffffff, 4.5, 0, 0 );
 				pointLight.color.setHSL( Math.random(), 1, 0.5 );
 				pointLight.position.set( 0, 100, 90 );
 				scene.add( pointLight );
@@ -156,7 +151,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				container.appendChild( renderer.domElement );
 
 				// EVENTS

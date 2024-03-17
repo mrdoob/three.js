@@ -7,7 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Object3D] &rarr; [page:Line] &rarr;
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
 
 		<h1>[name]</h1>
 
@@ -39,13 +39,13 @@
 		</h3>
 		<p>
 			radius -- The radius of the polar grid. This can be any positive number.
-			Default is 10.<br />
+			Default is `10`.<br />
 			sectors -- The number of sectors the grid will be divided into. This can
-			be any positive integer. Default is 16.<br />
+			be any positive integer. Default is `16`.<br />
 			rings -- The number of rings. This can be any positive integer. Default is
 			8.<br />
 			divisions -- The number of line segments used for each circle. This can be
-			any positive integer that is 3 or greater. Default is 64.<br />
+			any positive integer that is 3 or greater. Default is `64`.<br />
 			color1 -- The first color used for grid elements. This can be a
 			[page:Color], a hexadecimal value and an CSS-Color name. Default is
 			0x444444 <br />

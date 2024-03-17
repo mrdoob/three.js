@@ -20,10 +20,6 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -35,175 +31,196 @@
 
 <script type="module">
 import * as THREE from 'three';
-import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 function main() {
-  const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
-  const fov = 75;
-  const aspect = 2;  // the canvas default
-  const near = 0.1;
-  const far = 50;
-  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.set(0, 2, 5);
+	const canvas = document.querySelector( '#c' );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
 
-  const controls = new OrbitControls(camera, canvas);
-  controls.target.set(0, 2, 0);
-  controls.update();
+	const fov = 75;
+	const aspect = 2; // the canvas default
+	const near = 0.1;
+	const far = 50;
+	const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	camera.position.set( 0, 2, 5 );
 
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color('white');
+	const controls = new OrbitControls( camera, canvas );
+	controls.target.set( 0, 2, 0 );
+	controls.update();
 
-  function addLight(position) {
-    const color = 0xFFFFFF;
-    const intensity = 1;
-    const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(...position);
-    scene.add(light);
-    scene.add(light.target);
-  }
-  addLight([-3, 1, 1]);
-  addLight([ 2, 1, .5]);
+	const scene = new THREE.Scene();
+	scene.background = new THREE.Color( 'white' );
 
-  const bodyRadiusTop = .4;
-  const bodyRadiusBottom = .2;
-  const bodyHeight = 2;
-  const bodyRadialSegments = 6;
-  const bodyGeometry = new THREE.CylinderGeometry(
-      bodyRadiusTop, bodyRadiusBottom, bodyHeight, bodyRadialSegments);
+	function addLight( position ) {
 
-  const headRadius = bodyRadiusTop * 0.8;
-  const headLonSegments = 12;
-  const headLatSegments = 5;
-  const headGeometry = new THREE.SphereGeometry(
-      headRadius, headLonSegments, headLatSegments);
+		const color = 0xFFFFFF;
+		const intensity = 3;
+		const light = new THREE.DirectionalLight( color, intensity );
+		light.position.set( ...position );
+		scene.add( light );
+		scene.add( light.target );
 
-  const labelGeometry = new THREE.PlaneGeometry(1, 1);
+	}
 
-  const ctx = document.createElement('canvas').getContext('2d');
+	addLight( [ - 3, 1, 1 ] );
+	addLight( [ 2, 1, .5 ] );
 
-  function makeLabelCanvas(baseWidth, size, name) {
-    const borderSize = 2;
-    const font =  `${size}px bold sans-serif`;
-    ctx.font = font;
-    // measure how long the name will be
-    const textWidth = ctx.measureText(name).width;
+	const bodyRadiusTop = .4;
+	const bodyRadiusBottom = .2;
+	const bodyHeight = 2;
+	const bodyRadialSegments = 6;
+	const bodyGeometry = new THREE.CylinderGeometry(
+		bodyRadiusTop, bodyRadiusBottom, bodyHeight, bodyRadialSegments );
 
-    const doubleBorderSize = borderSize * 2;
-    const width = baseWidth + doubleBorderSize;
-    const height = size + doubleBorderSize;
-    ctx.canvas.width = width;
-    ctx.canvas.height = height;
+	const headRadius = bodyRadiusTop * 0.8;
+	const headLonSegments = 12;
+	const headLatSegments = 5;
+	const headGeometry = new THREE.SphereGeometry(
+		headRadius, headLonSegments, headLatSegments );
 
-    // need to set font again after resizing canvas
-    ctx.font = font;
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'center';
+	const labelGeometry = new THREE.PlaneGeometry( 1, 1 );
 
-    ctx.fillStyle = 'blue';
-    ctx.fillRect(0, 0, width, height);
+	const ctx = document.createElement( 'canvas' ).getContext( '2d' );
 
-    // scale to fit but don't stretch
-    const scaleFactor = Math.min(1, baseWidth / textWidth);
-    ctx.translate(width / 2, height / 2);
-    ctx.scale(scaleFactor, 1);
-    ctx.fillStyle = 'white';
-    ctx.fillText(name, 0, 0);
+	function makeLabelCanvas( baseWidth, size, name ) {
 
-    return ctx.canvas;
-  }
+		const borderSize = 2;
+		const font = `${size}px bold sans-serif`;
+		ctx.font = font;
+		// measure how long the name will be
+		const textWidth = ctx.measureText( name ).width;
 
-  const forceTextureInitialization = function() {
-    const material = new THREE.MeshBasicMaterial();
-    const geometry = new THREE.PlaneGeometry();
-    const scene = new THREE.Scene();
-    scene.add(new THREE.Mesh(geometry, material));
-    const camera = new THREE.Camera();
+		const doubleBorderSize = borderSize * 2;
+		const width = baseWidth + doubleBorderSize;
+		const height = size + doubleBorderSize;
+		ctx.canvas.width = width;
+		ctx.canvas.height = height;
 
-    return function forceTextureInitialization(texture) {
-      material.map = texture;
-      renderer.render(scene, camera);
-    };
-  }();
+		// need to set font again after resizing canvas
+		ctx.font = font;
+		ctx.textBaseline = 'middle';
+		ctx.textAlign = 'center';
 
-  function makePerson(x, labelWidth, size, name, color) {
-    const canvas = makeLabelCanvas(labelWidth, size, name);
-    const texture = new THREE.CanvasTexture(canvas);
-    // because our canvas is likely not a power of 2
-    // in both dimensions set the filtering appropriately.
-    texture.minFilter = THREE.LinearFilter;
-    texture.wrapS = THREE.ClampToEdgeWrapping;
-    texture.wrapT = THREE.ClampToEdgeWrapping;
-    forceTextureInitialization(texture);
+		ctx.fillStyle = 'blue';
+		ctx.fillRect( 0, 0, width, height );
 
-    const labelMaterial = new THREE.MeshBasicMaterial({
-      map: texture,
-      side: THREE.DoubleSide,
-      transparent: true,
-    });
-    const bodyMaterial = new THREE.MeshPhongMaterial({
-      color,
-      flatShading: true,
-    });
+		// scale to fit but don't stretch
+		const scaleFactor = Math.min( 1, baseWidth / textWidth );
+		ctx.translate( width / 2, height / 2 );
+		ctx.scale( scaleFactor, 1 );
+		ctx.fillStyle = 'white';
+		ctx.fillText( name, 0, 0 );
 
-    const root = new THREE.Object3D();
-    root.position.x = x;
+		return ctx.canvas;
 
-    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-    root.add(body);
-    body.position.y = bodyHeight / 2;
+	}
 
-    const head = new THREE.Mesh(headGeometry, bodyMaterial);
-    root.add(head);
-    head.position.y = bodyHeight + headRadius * 1.1;
+	const forceTextureInitialization = function () {
 
-    const label = new THREE.Mesh(labelGeometry, labelMaterial);
-    root.add(label);
-    label.position.y = bodyHeight * 4 / 5;
-    label.position.z = bodyRadiusTop * 1.01;
+		const material = new THREE.MeshBasicMaterial();
+		const geometry = new THREE.PlaneGeometry();
+		const scene = new THREE.Scene();
+		scene.add( new THREE.Mesh( geometry, material ) );
+		const camera = new THREE.Camera();
 
-    // if units are meters then 0.01 here makes size
-    // of the label into centimeters.
-    const labelBaseScale = 0.01;
-    label.scale.x = canvas.width  * labelBaseScale;
-    label.scale.y = canvas.height * labelBaseScale;
+		return function forceTextureInitialization( texture ) {
 
-    scene.add(root);
-    return root;
-  }
+			material.map = texture;
+			renderer.render( scene, camera );
 
-  makePerson(-3, 150, 32, 'Purple People Eater', 'purple');
-  makePerson(-0, 150, 32, 'Green Machine', 'green');
-  makePerson(+3, 150, 32, 'Red Menace', 'red');
+		};
 
-  function resizeRendererToDisplaySize(renderer) {
-    const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
-    }
-    return needResize;
-  }
+	}();
 
-  function render() {
-    if (resizeRendererToDisplaySize(renderer)) {
-      const canvas = renderer.domElement;
-      camera.aspect = canvas.clientWidth / canvas.clientHeight;
-      camera.updateProjectionMatrix();
-    }
+	function makePerson( x, labelWidth, size, name, color ) {
 
-    renderer.render(scene, camera);
+		const canvas = makeLabelCanvas( labelWidth, size, name );
+		const texture = new THREE.CanvasTexture( canvas );
+		// because our canvas is likely not a power of 2
+		// in both dimensions set the filtering appropriately.
+		texture.minFilter = THREE.LinearFilter;
+		texture.wrapS = THREE.ClampToEdgeWrapping;
+		texture.wrapT = THREE.ClampToEdgeWrapping;
+		forceTextureInitialization( texture );
 
-    requestAnimationFrame(render);
-  }
+		const labelMaterial = new THREE.MeshBasicMaterial( {
+			map: texture,
+			side: THREE.DoubleSide,
+			transparent: true,
+		} );
+		const bodyMaterial = new THREE.MeshPhongMaterial( {
+			color,
+			flatShading: true,
+		} );
 
-  requestAnimationFrame(render);
+		const root = new THREE.Object3D();
+		root.position.x = x;
+
+		const body = new THREE.Mesh( bodyGeometry, bodyMaterial );
+		root.add( body );
+		body.position.y = bodyHeight / 2;
+
+		const head = new THREE.Mesh( headGeometry, bodyMaterial );
+		root.add( head );
+		head.position.y = bodyHeight + headRadius * 1.1;
+
+		const label = new THREE.Mesh( labelGeometry, labelMaterial );
+		root.add( label );
+		label.position.y = bodyHeight * 4 / 5;
+		label.position.z = bodyRadiusTop * 1.01;
+
+		// if units are meters then 0.01 here makes size
+		// of the label into centimeters.
+		const labelBaseScale = 0.01;
+		label.scale.x = canvas.width * labelBaseScale;
+		label.scale.y = canvas.height * labelBaseScale;
+
+		scene.add( root );
+		return root;
+
+	}
+
+	makePerson( - 3, 150, 32, 'Purple People Eater', 'purple' );
+	makePerson( - 0, 150, 32, 'Green Machine', 'green' );
+	makePerson( + 3, 150, 32, 'Red Menace', 'red' );
+
+	function resizeRendererToDisplaySize( renderer ) {
+
+		const canvas = renderer.domElement;
+		const width = canvas.clientWidth;
+		const height = canvas.clientHeight;
+		const needResize = canvas.width !== width || canvas.height !== height;
+		if ( needResize ) {
+
+			renderer.setSize( width, height, false );
+
+		}
+
+		return needResize;
+
+	}
+
+	function render() {
+
+		if ( resizeRendererToDisplaySize( renderer ) ) {
+
+			const canvas = renderer.domElement;
+			camera.aspect = canvas.clientWidth / canvas.clientHeight;
+			camera.updateProjectionMatrix();
+
+		}
+
+		renderer.render( scene, camera );
+
+		requestAnimationFrame( render );
+
+	}
+
+	requestAnimationFrame( render );
+
 }
 
 main();
 </script>
 </html>
-

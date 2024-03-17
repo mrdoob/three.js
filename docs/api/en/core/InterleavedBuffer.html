@@ -40,11 +40,16 @@
 		<h3>[property:Integer count]</h3>
 		<p>Gives the total number of elements in the array.</p>
 
-		<h3>[property:Object updateRange]</h3>
+		<h3>[property:Object updateRanges]</h3>
 		<p>
-			Object containing offset and count.<br />
-			- [page:Number offset]: Default is `0`.<br />
-			- [page:Number count]: Default is `-1`.<br />
+			Array of objects containing:<br />
+			[page:Integer start]: Position at which to start
+			update.<br />
+			[page:Integer count]: The number of components to update. <br /><br />
+
+			This can be used to only update some components of stored data. Use
+			the [page:InterleavedBuffer.addUpdateRange addUpdateRange] function
+			to add ranges to this array.
 		</p>
 
 		<h3>[property:String uuid]</h3>
@@ -74,6 +79,18 @@
 		</p>
 
 		<h2>Methods</h2>
+
+		<h3>[method:this addUpdateRange]( [param:Integer start], [param:Integer count] )</h3>
+		<p>
+			Adds a range of data in the data array to be updated on the GPU. Adds an
+			object describing the range to the [page:InterleavedBuffer.updateRanges updateRanges]
+			array.
+		</p>
+
+		<h3>[method:this clearUpdateRanges]()</h3>
+		<p>
+			Clears the [page:InterleavedBuffer.updateRanges updateRanges] array.
+		</p>
 
 		<h3>[method:this copy]( [param:InterleavedBuffer source] )</h3>
 		<p>Copies another [name] to this [name].</p>

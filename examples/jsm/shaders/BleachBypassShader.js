@@ -6,6 +6,8 @@
 
 const BleachBypassShader = {
 
+	name: 'BleachBypassShader',
+
 	uniforms: {
 
 		'tDiffuse': { value: null },

@@ -7,7 +7,7 @@ import { FilmShader } from '../shaders/FilmShader.js';
 
 class FilmPass extends Pass {
 
-	constructor( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
+	constructor( intensity = 0.5, grayscale = false ) {
 
 		super();
 
@@ -17,16 +17,15 @@ class FilmPass extends Pass {
 
 		this.material = new ShaderMaterial( {
 
+			name: shader.name,
 			uniforms: this.uniforms,
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader
 
 		} );
 
-		if ( grayscale !== undefined )	this.uniforms.grayscale.value = grayscale;
-		if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
-		if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
-		if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
+		this.uniforms.intensity.value = intensity; // (0 = no effect, 1 = full effect)
+		this.uniforms.grayscale.value = grayscale;
 
 		this.fsQuad = new FullScreenQuad( this.material );
 

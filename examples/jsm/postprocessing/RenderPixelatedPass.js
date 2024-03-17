@@ -5,7 +5,8 @@ import {
 	Vector2,
 	Vector4,
 	DepthTexture,
-	NearestFilter
+	NearestFilter,
+	HalfFloatType
 } from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 
@@ -32,13 +33,13 @@ class RenderPixelatedPass extends Pass {
 		this.beautyRenderTarget = new WebGLRenderTarget();
 		this.beautyRenderTarget.texture.minFilter = NearestFilter;
 		this.beautyRenderTarget.texture.magFilter = NearestFilter;
+		this.beautyRenderTarget.texture.type = HalfFloatType;
 		this.beautyRenderTarget.depthTexture = new DepthTexture();
 
 		this.normalRenderTarget = new WebGLRenderTarget();
 		this.normalRenderTarget.texture.minFilter = NearestFilter;
 		this.normalRenderTarget.texture.magFilter = NearestFilter;
-
-
+		this.normalRenderTarget.texture.type = HalfFloatType;
 
 	}
 

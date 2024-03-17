@@ -1,8 +1,9 @@
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 import { denormalize, normalize } from '../math/MathUtils.js';
-import { StaticDrawUsage } from '../constants.js';
+import { StaticDrawUsage, FloatType } from '../constants.js';
 import { fromHalfFloat, toHalfFloat } from '../extras/DataUtils.js';
+import { warnOnce } from '../utils.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
 const _vector2 = /*@__PURE__*/ new Vector2();
@@ -27,7 +28,9 @@ class BufferAttribute {
 		this.normalized = normalized;
 
 		this.usage = StaticDrawUsage;
-		this.updateRange = { offset: 0, count: - 1 };
+		this._updateRange = { offset: 0, count: - 1 };
+		this.updateRanges = [];
+		this.gpuType = FloatType;
 
 		this.version = 0;
 
@@ -41,11 +44,30 @@ class BufferAttribute {
 
 	}
 
+	get updateRange() {
+
+		warnOnce( 'THREE.BufferAttribute: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
+		return this._updateRange;
+
+	}
+
 	setUsage( value ) {
 
 		this.usage = value;
 
 		return this;
+
+	}
+
+	addUpdateRange( start, count ) {
+
+		this.updateRanges.push( { start, count } );
+
+	}
+
+	clearUpdateRanges() {
+
+		this.updateRanges.length = 0;
 
 	}
 
@@ -58,6 +80,7 @@ class BufferAttribute {
 		this.normalized = source.normalized;
 
 		this.usage = source.usage;
+		this.gpuType = source.gpuType;
 
 		return this;
 
@@ -168,6 +191,26 @@ class BufferAttribute {
 
 		// Matching BufferAttribute constructor, do not normalize the array.
 		this.array.set( value, offset );
+
+		return this;
+
+	}
+
+	getComponent( index, component ) {
+
+		let value = this.array[ index * this.itemSize + component ];
+
+		if ( this.normalized ) value = denormalize( value, this.array );
+
+		return value;
+
+	}
+
+	setComponent( index, component, value ) {
+
+		if ( this.normalized ) value = normalize( value, this.array );
+
+		this.array[ index * this.itemSize + component ] = value;
 
 		return this;
 
@@ -338,33 +381,8 @@ class BufferAttribute {
 
 		if ( this.name !== '' ) data.name = this.name;
 		if ( this.usage !== StaticDrawUsage ) data.usage = this.usage;
-		if ( this.updateRange.offset !== 0 || this.updateRange.count !== - 1 ) data.updateRange = this.updateRange;
 
 		return data;
-
-	}
-
-	copyColorsArray() { // @deprecated, r144
-
-		console.error( 'THREE.BufferAttribute: copyColorsArray() was removed in r144.' );
-
-	}
-
-	copyVector2sArray() { // @deprecated, r144
-
-		console.error( 'THREE.BufferAttribute: copyVector2sArray() was removed in r144.' );
-
-	}
-
-	copyVector3sArray() { // @deprecated, r144
-
-		console.error( 'THREE.BufferAttribute: copyVector3sArray() was removed in r144.' );
-
-	}
-
-	copyVector4sArray() { // @deprecated, r144
-
-		console.error( 'THREE.BufferAttribute: copyVector4sArray() was removed in r144.' );
 
 	}
 
@@ -605,20 +623,9 @@ class Float32BufferAttribute extends BufferAttribute {
 
 }
 
-class Float64BufferAttribute extends BufferAttribute {
-
-	constructor( array, itemSize, normalized ) {
-
-		super( new Float64Array( array ), itemSize, normalized );
-
-	}
-
-}
-
 //
 
 export {
-	Float64BufferAttribute,
 	Float32BufferAttribute,
 	Float16BufferAttribute,
 	Uint32BufferAttribute,

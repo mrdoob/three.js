@@ -67,6 +67,8 @@ class Water extends Mesh {
 
 		const mirrorShader = {
 
+			name: 'MirrorShader',
+
 			uniforms: UniformsUtils.merge( [
 				UniformsLib[ 'fog' ],
 				UniformsLib[ 'lights' ],
@@ -181,15 +183,17 @@ class Water extends Mesh {
 					gl_FragColor = vec4( outgoingLight, alpha );
 
 					#include <tonemapping_fragment>
-					#include <fog_fragment>
+					#include <colorspace_fragment>
+					#include <fog_fragment>	
 				}`
 
 		};
 
 		const material = new ShaderMaterial( {
-			fragmentShader: mirrorShader.fragmentShader,
-			vertexShader: mirrorShader.vertexShader,
+			name: mirrorShader.name,
 			uniforms: UniformsUtils.clone( mirrorShader.uniforms ),
+			vertexShader: mirrorShader.vertexShader,
+			fragmentShader: mirrorShader.fragmentShader,
 			lights: true,
 			side: side,
 			fog: fog

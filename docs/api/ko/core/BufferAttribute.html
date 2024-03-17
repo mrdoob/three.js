@@ -53,10 +53,17 @@
 
 		<h3>[property:Integer count]</h3>
 		<p>
-		[page:BufferAttribute.itemSize itemSize]로 나눈 [page:BufferAttribute.array array]의 길이를 저장.<br /><br />
+		[page:BufferAttribute.itemSize itemSize]로 나눈 [page:BufferAttribute.array array]의 길이를 저장. Read-only property.<br /><br />
 
 		버퍼가 3개의 컴포넌트를 저장한 벡터(위치, 법선, 색 등)
 		저장된 벡터들의 수를 계산합니다.
+		</p>
+
+		<h3>[property:Number gpuType]</h3>
+		<p>
+			Configures the bound GPU type for use in shaders. Either [page:BufferAttribute THREE.FloatType] or [page:BufferAttribute THREE.IntType], default is [page:BufferAttribute THREE.FloatType].
+
+			Note: this only has an effect for integer arrays and is not configurable for float arrays. For lower precision float types, see [page:BufferAttributeTypes THREE.Float16BufferAttribute].
 		</p>
 
 		<h3>[property:Boolean isBufferAttribute]</h3>
@@ -139,6 +146,9 @@
 		<h3>[method:this copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
 		<p>bufferAttribute[index2]의 벡터를 [page:BufferAttribute.array array][index1]에 복사합니다.</p>
 
+		<h3>[method:Number getComponent]( [param:Integer index], [param:Integer component] ) </h3>
+		<p>Returns the given component of the vector at the given index.</p>
+
 		<h3>[method:Number getX]( [param:Integer index] ) </h3>
 		<p>해당 index의 벡터의 x 컴포넌트 값을 리턴합니다.</p>
 
@@ -171,6 +181,9 @@
 
 		<h3>[method:this setUsage] ( [param:Usage value] ) </h3>
 		<p>[page:BufferAttribute.usage usage]를 value로 설정합니다.</p>
+
+		<h3>[method:Number setComponent]( [param:Integer index], [param:Integer component], [param:Float value] ) </h3>
+		<p>Sets the given component of the vector at the given index.</p>
 
 		<h3>[method:this setX]( [param:Integer index], [param:Float x] ) </h3>
 		<p> x 컴포넌트 값을 설정합니다.</p>

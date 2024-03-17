@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -68,20 +64,17 @@ composer.addPass(bloomPass);
 </pre>
 <p>마지막으로 원본 장면에 노이즈와 스캔라인(scanline)을 추가하는 <code class="notranslate" translate="no">FilmPass</code>를 추가합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const filmPass = new FilmPass(
-    0.35,   // 노이즈 강도
-    0.025,  // 스캔라인 강도
-    648,    // 스캔라인 개수
+    0.5,   // 강도
     false,  // 흑백
 );
-filmPass.renderToScreen = true;
 composer.addPass(filmPass);
 </pre>
-<p><code class="notranslate" translate="no">filmPass</code>가 마지막 pass이기에 캔버스에 결과를 바로 렌더링하도록 <code class="notranslate" translate="no">renderToScreen</code> 옵션을 true로 설정했습니다. 이 옵션을 설정하지 않으면 캔버스가 아닌 다음 렌더 타겟에 장면을 렌더링할 거예요.</p>
 <p>또 이 클래스들을 사용하기 위해 여러 스크립트를 불러와야 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
 import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 </pre>
 <p>대부분의 후처리에는 <code class="notranslate" translate="no">EffectComposer.js</code>와 <code class="notranslate" translate="no">RenderPass.js</code>가 필수입니다.</p>
 <p>이제 <a href="/docs/#api/ko/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> 대신 <code class="notranslate" translate="no">EffectComposer.render</code>를 사용<em>하고</em> <code class="notranslate" translate="no">EffectComposer</code>가 결과물을 캔버스의 크기에 맞추도록 해야 합니다.</p>
@@ -131,10 +124,8 @@ import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
 </pre>
 <p>마찬가지로 <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>에서
 아래 코드를 찾았습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">if ( grayscale !== undefined )    this.uniforms.grayscale.value = grayscale;
-if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
-if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
-if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.uniforms.intensity.value = intensity;
+this.uniforms.grayscale.value = grayscale;
 </pre>
 <p>이제 어떻게 값을 지정해야 하는지 알았으니 이 값을 조작하는 GUI를 만들어봅시다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -149,9 +140,7 @@ if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 {
   const folder = gui.addFolder('FilmPass');
   folder.add(filmPass.uniforms.grayscale, 'value').name('grayscale');
-  folder.add(filmPass.uniforms.nIntensity, 'value', 0, 1).name('noise intensity');
-  folder.add(filmPass.uniforms.sIntensity, 'value', 0, 1).name('scanline intensity');
-  folder.add(filmPass.uniforms.sCount, 'value', 0, 1000).name('scanline count');
+  folder.add(filmPass.uniforms.intensity, 'value', 0, 1).name('intensity');
   folder.open();
 }
 </pre>
@@ -221,7 +210,7 @@ gui.add(colorPass.uniforms.color.value, 'b', 0, 4).name('blue');
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

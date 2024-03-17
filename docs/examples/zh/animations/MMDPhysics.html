@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>MMD物理([name])</h1>
+
+	<p class="desc"> 资源的物理处理程序 <a href="https://sites.google.com/view/evpvp/">`MMD`</a>。 <br /><br />
+		[name] 使用 [link:https://github.com/kripken/ammo.js/ ammo.js] （基于 Bullet 的 JavaScript 物理引擎）为 [page:MMDLoader]
+		计算加载模型的物理量。
+	</p>
+
+	<h2>引入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
+			import { MMDPhysics } from 'three/addons/animation/MMDPhysics.js';
+		</code>
+
+	<h2>代码示例</h2>
+
+	<code>
+		let physics;
+
+		// Load MMD resources and instantiate MMDPhysics
+		new MMDLoader().load(
+			'models/mmd/miku.pmd',
+			function ( mesh ) {
+
+				physics = new MMDPhysics( mesh )
+				scene.add( mesh );
+
+			}
+		);
+
+		function render() {
+
+			const delta = clock.getDelta();
+			animate( delta );  // update bones
+			if ( physics !== undefined ) physics.update( delta );
+			renderer.render( scene, camera );
+
+		}
+		</code>
+
+	<h2>例子</h2>
+
+	<p>
+		[example:webgl_loader_mmd]<br />
+		[example:webgl_loader_mmd_audio]
+	</p>
+
+	<h2>构造函数</h2>
+
+	<h3>[name]( [param:SkinnedMesh mesh], [param:Array rigidBodyParams], [param:Array constraintParams], [param:Object
+		params] )</h3>
+	<p>
+		[page:SkinnedMesh mesh] — [page:SkinnedMesh]， [name] 为其计算物理。<br />
+		[page:Array rigidBodyParams] — 指定刚体参数的 [page:Object] 数组。<br />
+		[page:Array constraintParams] — 可选）指定约束参数的 [page:Object] 数组。<br />
+		[page:Object params] — （可选）<br />
+	</p>
+	<ul>
+		<li>[page:Number unitStep] - 默认为 1 / 65</li>
+		<li>[page:Integer maxStepNum] - 默认为 3</li>
+		<li>[page:Vector3 gravity] - 默认为 ( 0, - 9.8 * 10, 0 )</li>
+	</ul>
+	<p>
+		创建一个新的 [name]。
+	</p>
+
+	<h2>属性</h2>
+
+	<h3>[property:Array mesh]</h3>
+	<p>[page:SkinnedMesh] 传递给构造函数。</p>
+
+	<h2>方法</h2>
+
+	<h3>[method:MMDPhysicsHelper createHelper]()</h3>
+	<p>
+		返回 [page:MMDPhysicsHelper]。您可以通过将辅助对象添加到场景来可视化刚体。
+	</p>
+
+	<h3>[method:this reset]()</h3>
+	<p>
+		重置刚体变换为当前骨骼的刚体。
+	</p>
+
+	<h3>[method:this setGravity]( [param:Vector3 gravity] )</h3>
+	<p>
+		[page:Vector3 gravity] — 重力的方向和体积。
+	</p>
+	<p>
+		设置重力。
+	</p>
+
+	<h3>[method:this update]( [param:Number delta] )</h3>
+	<p>
+		[page:Number delta] — 时间（以秒为单位）
+	</p>
+	<p>
+		高级物理计算和更新骨骼。
+	</p>
+
+	<h3>[method:this warmup]( [param:Integer cycles] )</h3>
+	<p>
+		[page:Number delta] — 时间（以秒为单位）
+	</p>
+	<p>
+		热身刚体。计算循环步数。
+	</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/animation/MMDPhysics.js examples/jsm/animation/MMDPhysics.js]
+	</p>
+</body>
+
+</html>

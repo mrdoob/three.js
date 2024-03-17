@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+			هذه هي الفئة الأساسية لمعظم الكائنات في three.js وتوفر مجموعة من
+			الخصائص والطُرق للتلاعب بالكائنات في المساحة ثلاثية الأبعاد.<br /><br />
+		 
+			لاحظ أن هذا يمكن استخدامه لتجميع الكائنات عبر طريقة [page:.add]( object ) التي تضيف الكائن كطفل، ومع ذلك فمن الأفضل
+			استخدام [page:Group] لهذا.
+		</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>[name]()</h3>
+		<p>المُنشئ لا يأخذ أي وسائط.</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		 
+		<h3>[property:AnimationClip animations]</h3>
+		<p>مصفوفة بمقاطع الرسوم المتحركة للكائن.</p>
+		 
+		<h3>[property:Boolean castShadow]</h3>
+		<p>ما إذا كان يتم عرض الكائن في خريطة الظل. الافتراضي هو `false`.</p>
+		 
+		<h3>[property:Array children]</h3>
+		<p>
+			مصفوفة بأطفال الكائن. انظر [page:Group] للحصول على معلومات حول
+			تجميع الكائنات يدويًا.
+		</p>
+		 
+		<h3>[property:Material customDepthMaterial]</h3>
+		<p>
+			مادة عمق مخصصة للاستخدام عند التقديم إلى خريطة العمق. يمكن استخدامه فقط
+			في سياق المشابك. عند رمي الظل مع
+			[page:DirectionalLight] أو [page:SpotLight]، إذا كنت تعدل
+			مواضع رأس في شادر رأس يجب تحديد customDepthMaterial مخصص
+			لظلال صحيحة. الافتراضي هو `undefined`.
+		</p>
+		 
+		<h3>[property:Material customDistanceMaterial]</h3>
+		<p>
+			نفس [page:.customDepthMaterial customDepthMaterial]، ولكن يستخدم مع
+			[page:PointLight]. الافتراضي هو `undefined`.
+		</p>
+		 
+		<h3>[property:Boolean frustumCulled]</h3>
+		<p>
+			عند تعيين هذا، يتحقق في كل إطار ما إذا كان الكائن في مخروط
+			الكاميرا قبل تقديم الكائن. إذا تم تعيينه على `false` يتم تقديم الكائن
+			في كل إطار حتى لو لم يكن في مخروط الكاميرا.
+			الافتراضي هو `true`.
+		</p>
+		 
+		<h3>[property:Integer id]</h3>
+		<p>readonly – رقم فريد لهذه الحالة من الكائن.</p>
+		 
+		<h3>[property:Boolean isObject3D]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان الكائن المعطى هو من نوع [name].</p>
+		 
+		<h3>[property:Layers layers]</h3>
+		<p>
+			عضوية طبقة الكائن. الكائن مرئي فقط إذا كان لديه
+			على الأقل طبقة واحدة مشتركة مع [page:Camera] قيد الاستخدام. يمكن استخدام هذه الخاصية أيضًا لتصفية
+			كائنات غير مرغوب فيها في اختبارات التقاطع بالأشعة
+			عند استخدام [page:Raycaster].
+		</p>
+		 
+		<h3>[property:Matrix4 matrix]</h3>
+		<p>مصفوفة التحول المحلية.</p>
+		 
+		<h3>[property:Boolean matrixAutoUpdate]</h3>
+		<p>
+			عند تعيين هذا، يحسب مصفوفة الموضع، (الدوران أو
+			quaternion) والحجم في كل إطار وأيضًا يعيد حساب خصائص matrixWorld
+			. الافتراضي هو [page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE] (true).
+		</p>
+		 
+		<h3>[property:Matrix4 matrixWorld]</h3>
+		<p>
+			التحول العالمي للكائن. إذا لم يكن لدى Object3D أي والد، فإنه
+			مطابق للتحول المحلي [page:.matrix].
+		</p>
+			 
+		<h3>[property:Boolean matrixWorldAutoUpdate]</h3>
+		<p>
+			إذا تم تعيينه، فإن المقدم يتحقق في كل إطار ما إذا كان الكائن و
+			أطفاله يحتاجون إلى تحديثات المصفوفة. عندما لا يكون كذلك، فعليك الحفاظ على جميع
+			المصفوفات في الكائن وأطفاله بنفسك. الافتراضي هو
+			[page:Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE] (true).
+		</p>
+			 
+		<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
+		<p>
+			عند تعيين هذا، يحسب matrixWorld في ذلك الإطار ويعيد
+			هذه الخاصية إلى false. الافتراضي هو `false`.
+		</p>
+			 
+		<h3>[property:Matrix4 modelViewMatrix]</h3>
+		<p>
+			يتم تمرير هذا إلى الشادر ويستخدم لحساب موضع
+			الكائن.
+		</p>
+			 
+		<h3>[property:String name]</h3>
+		<p>
+			اسم اختياري للكائن (لا يحتاج إلى أن يكون فريدًا). الافتراضي هو
+			سلسلة فارغة.
+		</p>
+			 
+		<h3>[property:Matrix3 normalMatrix]</h3>
+		<p>
+			يتم تمرير هذا إلى الشادر ويستخدم لحساب الإضاءة لـ
+			الكائن. هو نقل معكوس من المصفوفة 3x3 العلوية اليسرى
+			من مصفوفة modelViewMatrix لهذا الكائن.<br /><br />
+			 
+			سبب هذه المصفوفة الخاصة هو أن استخدام ببساطة
+			modelViewMatrix قد يؤدي إلى طول غير وحدة من normals (على التحجيم)
+			أو في اتجاه غير عمودي (على التحجيم غير الموحد).<br /><br />
+			 
+			من ناحية أخرى، جزء الترجمة من modelViewMatrix غير
+			ذات صلة بحساب normals. وبالتالي فإن Matrix3 كافية.
+		</p>
+
+		<h3>[property:Function onAfterRender]</h3>
+		<p>
+			رد اتصال اختياري يتم تنفيذه مباشرة بعد تقديم كائن ثلاثي الأبعاد
+			. يتم استدعاء هذه الوظيفة بالمعلمات التالية: renderer,
+			scene, camera, geometry, material, group.
+		</p>
+		<p>
+			يرجى ملاحظة أن هذا الرد الاتصال يتم تنفيذه فقط لـ `renderable` 3D
+			كائنات. معنى كائنات ثلاثية الأبعاد التي تحدد مظهرها المرئي مع
+			الهندسة والمواد مثل نسخ [page:Mesh]، [page:Line]،
+			[page:Points] أو [page:Sprite]. نسخ من [page:Object3D]، [page:Group]
+			أو [page:Bone] ليست قابلة للتقديم وبالتالي لا يتم تنفيذ هذا الرد الاتصال
+			لمثل هذه الكائنات.
+		</p>
+
+		<h3>[property:Function onAfterShadow]</h3>
+		<p>
+			An optional callback that is executed immediately after a 3D object is
+			rendered to a shadow map. This function is called with the following parameters: renderer,
+			scene, camera, shadowCamera, geometry, depthMaterial, group.
+		</p>
+		<p>
+			يرجى ملاحظة أن هذا الرد الاتصال يتم تنفيذه فقط لـ `renderable` 3D
+			كائنات. معنى كائنات ثلاثية الأبعاد التي تحدد مظهرها المرئي مع
+			الهندسة والمواد مثل نسخ [page:Mesh]، [page:Line]،
+			[page:Points] أو [page:Sprite]. نسخ من [page:Object3D]، [page:Group]
+			أو [page:Bone] ليست قابلة للتقديم وبالتالي لا يتم تنفيذ هذا الرد الاتصال
+			لمثل هذه الكائنات.
+		</p>
+			 
+		<h3>[property:Function onBeforeRender]</h3>
+		<p>
+			رد اتصال اختياري يتم تنفيذه مباشرة قبل تقديم كائن ثلاثي الأبعاد
+			. يتم استدعاء هذه الوظيفة بالمعلمات التالية: renderer,
+			scene, camera, geometry, material, group.
+		</p>
+		<p>
+			يرجى ملاحظة أن هذا الرد الاتصال يتم تنفيذه فقط لـ `renderable` 3D
+			كائنات. معنى كائنات ثلاثية الأبعاد التي تحدد مظهرها المرئي مع
+			الهندسة والمواد مثل نسخ [page:Mesh]، [page:Line]،
+			[page:Points] أو [page:Sprite]. نسخ من [page:Object3D]، [page:Group]
+			أو [page:Bone] ليست قابلة للتقديم وبالتالي لا يتم تنفيذ هذا الرد الاتصال
+			لمثل هذه الكائنات.
+		</p>
+
+		<h3>[property:Function onBeforeShadow]</h3>
+		<p>
+			An optional callback that is executed immediately before a 3D object is
+			rendered to a shadow map. This function is called with the following parameters: renderer,
+			scene, camera, shadowCamera, geometry, depthMaterial, group.
+		</p>
+		<p>
+			يرجى ملاحظة أن هذا الرد الاتصال يتم تنفيذه فقط لـ `renderable` 3D
+			كائنات. معنى كائنات ثلاثية الأبعاد التي تحدد مظهرها المرئي مع
+			الهندسة والمواد مثل نسخ [page:Mesh]، [page:Line]،
+			[page:Points] أو [page:Sprite]. نسخ من [page:Object3D]، [page:Group]
+			أو [page:Bone] ليست قابلة للتقديم وبالتالي لا يتم تنفيذ هذا الرد الاتصال
+			لمثل هذه الكائنات.
+		</p>
+			 
+		<h3>[property:Object3D parent]</h3>
+		<p>
+			والد كائن في [link:https://en.wikipedia.org/wiki/Scene_graph scene graph]. يمكن أن يكون لكائن واحد على الأكثر واحد.
+		</p>
+			 
+		<h3>[property:Vector3 position]</h3>
+		<p>
+			A [page:Vector3] يمثل الموضع المحلي للكائن. الافتراضي هو `(0,
+			0, 0)`.
+		</p>
+			 
+		<h3>[property:Quaternion quaternion]</h3>
+		<p>دوران المحلية للكائن كـ [page:Quaternion Quaternion].</p>
+			 
+		<h3>[property:Boolean receiveShadow]</h3>
+		<p>ما إذا كان المادة تتلقى الظلال. الافتراضي هو `false`.</p>
+
+		<h3>[property:Number renderOrder]</h3>
+		<p>
+			يسمح هذا القيمة بتجاوز ترتيب التصيير الافتراضي لـ
+			[link:https://en.wikipedia.org/wiki/Scene_graph scene graph] objects على الرغم من أن الأشياء المعتمة والشفافة لا تزال مرتبة
+			بشكل مستقل. عند تعيين هذه الخاصية لمثيل [page:Group Group]، سيتم فرز جميع الكائنات النسل وتقديمها معًا.
+			الترتيب من أدنى إلى أعلى renderOrder. القيمة الافتراضية هي `0`.
+		</p>
+			 
+		<h3>[property:Euler rotation]</h3>
+		<p>
+			دوران المحلي للكائن (انظر
+			[link:https://en.wikipedia.org/wiki/Euler_angles Euler angles])، في
+			شعاع.
+		</p>
+			 
+		<h3>[property:Vector3 scale]</h3>
+		<p>مقياس المحلي للكائن. الافتراضي هو [page:Vector3]( 1, 1, 1 ).</p>
+			 
+		<h3>[property:Vector3 up]</h3>
+		<p>
+			يستخدم هذا بواسطة [page:.lookAt lookAt] method، على سبيل المثال، إلى
+			تحديد توجه النتيجة.<br />
+			الافتراضي هو [page:Object3D.DEFAULT_UP] - أي `( 0, 1, 0 )`.
+		</p>
+			 
+		<h3>[property:Object userData]</h3>
+		<p>
+			كائن يمكن استخدامه لتخزين بيانات مخصصة حول Object3D. يجب ألا يحتوي على مراجع إلى وظائف كونها لن تكون مستنسخة.
+		</p>
+			 
+		<h3>[property:String uuid]</h3>
+		<p>
+			[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] من
+			هذه المثيلة كائن. يتم تعيين هذا تلقائيًا، لذلك يجب عدم تحريره.
+		</p>
+			 
+		<h3>[property:Boolean visible]</h3>
+		<p>الكائن يحصل على التصيير إذا كان `true`. الافتراضي هو `true`.</p>
+
+		<h2>الخصائص الثابتة (Static Properties)</h2>
+		<p>
+			يتم تعريف الخصائص والطرق الثابتة لكل فئة بدلاً من كل
+			مثيل لتلك الفئة. هذا يعني أن تغيير
+			[page:Object3D.DEFAULT_UP] أو [page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE]
+			سيغير قيم [page:.up up] و [page:.matrixAutoUpdate matrixAutoUpdate] لـ `كل` مثيل من Object3D (أو الفئات المشتقة)
+			تم إنشاؤه بعد إجراء التغيير (لن يتأثر Object3Ds المنشأ بالفعل).
+		</p>
+			 
+		<h3>[property:Vector3 DEFAULT_UP]</h3>
+		<p>
+			اتجاه [page:.up up] الافتراضي للكائنات، يستخدم أيضًا كموقع افتراضي
+			لـ [page:DirectionalLight]، [page:HemisphereLight] و
+			[page:Spotlight] (الذي يخلق أضواء تشرق من الأعلى إلى الأسفل).<br />
+			مضبوط على ( 0, 1, 0 ) بشكل افتراضي.
+		</p>
+			 
+		<h3>[property:Boolean DEFAULT_MATRIX_AUTO_UPDATE]</h3>
+		<p>
+			العدد الافتراضي لـ [page:.matrixAutoUpdate matrixAutoUpdate] لـ
+			Object3Ds المنشأة حديثًا.<br />
+		</p>
+			 
+		<h3>[property:Boolean DEFAULT_MATRIX_WORLD_AUTO_UPDATE]</h3>
+		<p>
+			العدد الافتراضي لـ [page:.matrixWorldAutoUpdate
+			matrixWorldAutoUpdate] لـ Object3Ds المنشأة حديثًا.<br />
+		</p>
+			 
+		<h2>الوظائف (Methods)</h2>
+			 
+		<p>
+			طرق [page:EventDispatcher EventDispatcher] متاحة على هذه
+			فئة.
+		</p>
+			 
+		<h3>[method:this add]( [param:Object3D object], ... )</h3>
+		<p>
+			يضيف `object` كطفل لهذا الكائن. يمكن إضافة عدد غير محدود من الكائنات. سيتم إزالة أي والد حالي على كائن ممرر هنا، نظرًا لأنه يمكن أن يكون للكائن والد واحد على الأكثر.<br /><br />
+			 
+			راجع [page:Group] للحصول على معلومات حول تجميع الكائنات يدويًا.
+		</p>
+			 
+		<h3>[method:undefined applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<p>
+			يطبق تحويل المصفوفة على الكائن ويحدث موقع الكائن ودورانه ومقياسه.
+		</p>
+			 
+		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
+		<p>يطبق الدوران الممثل بالرباعي على الكائن.</p>
+			 
+		<h3>[method:this attach]( [param:Object3D object] )</h3>
+		<p>
+			يضيف `object` كطفل لهذا، مع الحفاظ على تحويل العالم للكائن.
+			<br /><br />
+			ملاحظة: هذه الطريقة لا تدعم رسومات المشهد التي تحتوي على
+			نقاط غير متساوية في الحجم (s).
+		</p>
+			 
+		<h3>[method:Object3D clone]( [param:Boolean recursive] )</h3>
+		<p>
+			recursive -- إذا كان صحيحًا، فإن نسل الكائن يتم استنساخه أيضًا. الافتراضي
+			صحيح.<br /><br />
+			 
+			يعود بنسخة من هذا الكائن واختياريًا جميع النسل.
+		</p>
+			 
+		<h3>[method:this copy]( [param:Object3D object], [param:Boolean recursive] )</h3>
+		<p>
+			recursive -- إذا كان صحيحًا، فإن نسل الكائن يتم نسخه أيضًا. الافتراضي
+			صحيح.<br /><br />
+			 
+			نسخ الكائن المعطى في هذا الكائن. ملاحظة: لا يتم نسخ مستمعو الأحداث و
+			التعليمات البرمجية المعرفة من قبل المستخدم ([page:.onAfterRender] و [page:.onBeforeRender]).
+		</p>
+			 
+		<h3>[method:Object3D getObjectById]( [param:Integer id] )</h3>
+		<p>
+			id -- رقم فريد لمثيل الكائن<br /><br />
+			 
+			يبحث في كائن وأطفاله، بدءًا من الكائن
+			نفسه، ويرجع أول مطابقة مع id.<br />
+			لاحظ أنه يتم تعيين المعرفات بالترتيب التاريخي: 1، 2، 3، ...،
+			زيادة بواحد لكل كائن جديد.
+		</p>
+			 
+		<h3>[method:Object3D getObjectByName]( [param:String name] )</h3>
+		<p>
+			name -- سلسلة للمطابقة مع خصائص Object3D.name للأطفال.
+			<br /><br />
+			 
+			يبحث في كائن وأطفاله، بدءًا من الكائن
+			نفسه، ويرجع أول مطابقة مع اسم.<br />
+			لاحظ أنه بالنسبة لمعظم الكائنات، يكون الاسم سلسلة فارغة بشكل افتراضي. سوف
+			ستضطر إلى تعيينه يدويًا للاستفادة من هذه الطريقة.
+		</p>
+
+		<h3>[method:Object3D getObjectByProperty]( [param:String name], [param:Any value] )</h3>
+		<p>
+			name -- اسم الخاصية التي يتم البحث عنها. <br />
+			value -- قيمة الخاصية المعطاة. <br /><br />
+			 
+			يبحث في كائن وأطفاله، بدءًا من الكائن
+			نفسه، ويرجع أول مع خاصية تطابق القيمة
+			معطى.
+		</p>
+			 
+		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value], [param:Array optionalTarget] )</h3>
+		<p>
+			name -- اسم الخاصية التي يتم البحث عنها. <br />
+			value -- قيمة الخاصية المعطاة. <br />
+			optionalTarget -- (optional) target to set the result.
+			Otherwise a new Array is instantiated. If set, you must clear this
+			array prior to each call (i.e., array.length = 0;). <br /><br />
+
+			يبحث في كائن وأطفاله، بدءًا من الكائن
+			نفسه، ويرجع جميع الكائنات مع خاصية تطابق القيمة
+			معطى.
+		</p>
+			 
+		<h3>[method:Vector3 getWorldPosition]( [param:Vector3 target] )</h3>
+		<p>
+			[page:Vector3 target] — سيتم نسخ النتيجة في هذا Vector3.
+			<br /><br />
+			 
+			يعود بمتجه يمثل موقع الكائن في الفضاء العالمي.
+		</p>
+			 
+		<h3>[method:Quaternion getWorldQuaternion]( [param:Quaternion target] )</h3>
+		<p>
+			[page:Quaternion target] — سيتم نسخ النتيجة في هذا Quaternion.
+			<br /><br />
+			 
+			يعود برباعي يمثل دوران الكائن في الفضاء العالمي.
+		</p>
+			 
+		<h3>[method:Vector3 getWorldScale]( [param:Vector3 target] )</h3>
+		<p>
+			[page:Vector3 target] — سيتم نسخ النتيجة في هذا Vector3.
+			<br /><br />
+			 
+			يعود بمتجه من عوامل التحجيم المطبقة على الكائن لكل
+			محور في الفضاء العالمي.
+		</p>
+			 
+		<h3>[method:Vector3 getWorldDirection]( [param:Vector3 target] )</h3>
+		<p>
+			[page:Vector3 target] — سيتم نسخ النتيجة في هذا Vector3.
+			<br /><br />
+		 
+			يعود بمتجه يمثل اتجاه محور z الموجب للكائن في
+			الفضاء العالمي.
+		</p>
+		 
+		<h3>[method:Vector3 localToWorld]( [param:Vector3 vector] )</h3>
+		<p>
+			vector - متجه يمثل موقعًا في هذا المساحة المحلية للكائن.<br /><br />
+		 
+			يحول المتجه من مساحة هذا الكائن المحلية إلى الفضاء العالمي.
+		</p>
+		 
+		<h3>[method:undefined lookAt]( [param:Vector3 vector] )<br />
+		[method:undefined lookAt]( [param:Float x], [param:Float y], [param:Float z] )
+		</h3>
+		<p>
+			vector - متجه يمثل موقعًا في الفضاء العالمي.<br /><br />
+			اختياريًا، [page:.x x]، [page:.y y] و [page:.z z] مكونات من
+			موقع الفضاء العالمي.<br /><br />
+		 
+			يدور الكائن لمواجهة نقطة في الفضاء العالمي.<br /><br />
+		 
+			هذه الطريقة لا تدعم كائنات تحتوي على
+			والد (والدين) غير متساوي (ين) في الحجم.
+		</p>
+		 
+		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<p>
+			طريقة فارغة (فارغة) للحصول على تقاطعات بين شعاع صب وهذا
+			كائن. تطبق فئات فرعية مثل [page:Mesh]، [page:Line]، و [page:Points]
+			هذه الطريقة من أجل استخدام التصوير بالأشعة.
+		</p>
+		 
+		<h3>[method:this remove]( [param:Object3D object], ... )</h3>
+		<p>
+			يزيل `object` كطفل لهذا الكائن. يمكن إزالة عدد غير محدود من الكائنات
+			قد تم إزالته.
+		</p>
+		 
+		<h3>[method:this removeFromParent]()</h3>
+		<p>يزيل هذا الكائن من والده الحالي.</p>
+		 
+		<h3>[method:this clear]()</h3>
+		<p>يزيل جميع كائنات الأطفال.</p>
+		 
+		<h3>[method:this rotateOnAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
+		<p>
+			axis -- متجه معتدل في المساحة المحلية. <br />
+			angle -- الزاوية بالراديان.<br /><br />
+		 
+			قم بتدوير كائن على طول محور في المساحة المحلية. يفترض أن يكون المحور
+			معتدل.
+		</p>
+		 
+		<h3>[method:this rotateOnWorldAxis]( [param:Vector3 axis], [param:Float angle])</h3>
+		<p>
+			axis -- متجه معتدل في المساحة العالمية. <br />
+			angle -- الزاوية بالراديان.<br /><br />
+		 
+			قم بتدوير كائن على طول محور في المساحة العالمية. يفترض أن يكون المحور
+			معتدل. تفترض طريقة عدم وجود والد دوران.
+		</p>
+
+		<h3>[method:this rotateX]( [param:Float rad] )</h3>
+		<p>
+			rad - الزاوية للتدوير بالراديان.<br /><br />
+		 
+			يدور الكائن حول محور x في المساحة المحلية.
+		</p>
+		 
+		<h3>[method:this rotateY]( [param:Float rad] )</h3>
+		<p>
+			rad - الزاوية للتدوير بالراديان.<br /><br />
+		 
+			يدور الكائن حول محور y في المساحة المحلية.
+		</p>
+		 
+		<h3>[method:this rotateZ]( [param:Float rad] )</h3>
+		<p>
+			rad - الزاوية للتدوير بالراديان.<br /><br />
+		 
+			يدور الكائن حول محور z في المساحة المحلية.
+		</p>
+		 
+		<h3>[method:undefined setRotationFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
+		<p>
+			axis -- متجه معتدل في المساحة المحلية. <br />
+			angle -- زاوية بالراديان<br /><br />
+		 
+			يستدعي [page:Quaternion.setFromAxisAngle setFromAxisAngle]( [page:Float axis], [page:Float angle] ) على [page:.quaternion].
+		</p>
+		 
+		<h3>[method:undefined setRotationFromEuler]( [param:Euler euler] )</h3>
+		<p>
+			euler -- زاوية أويلر تحدد كمية الدوران.<br />
+		 
+			يستدعي [page:Quaternion.setRotationFromEuler setRotationFromEuler](
+			[page:Euler euler]) على [page:.quaternion].
+		</p>
+		 
+		<h3>[method:undefined setRotationFromMatrix]( [param:Matrix4 m] )</h3>
+		<p>
+			m -- قم بتدوير الرباعي بمكون الدوران من المصفوفة.<br />
+		 
+			يستدعي [page:Quaternion.setFromRotationMatrix setFromRotationMatrix](
+			[page:Matrix4 m]) على [page:.quaternion].<br /><br />
+		 
+			لاحظ أن هذا يفترض أن الـ 3x3 العلوي من m هو مصفوفة دوران نقية
+			(أي غير مقاس).
+		</p>
+
+		<h3>[method:undefined setRotationFromQuaternion]( [param:Quaternion q] )</h3>
+		<p>
+			q -- رباعي معتدل.<br /><br />
+		 
+			نسخ الرباعي المعطى في [page:.quaternion].
+		</p>
+		 
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
+		<p>
+			meta -- كائن يحتوي على بيانات تعريفية مثل المواد أو القوام أو الصور
+			للكائن.<br />
+			قم بتحويل الكائن إلى three.js
+			[link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
+		</p>
+		 
+		<h3>[method:this translateOnAxis]( [param:Vector3 axis], [param:Float distance] )</h3>
+		<p>
+			axis -- متجه معتدل في المساحة المحلية.<br />
+			distance -- المسافة التي يتم ترجمتها.<br /><br />
+		 
+			قم بترجمة كائن بمسافة على طول محور في المساحة المحلية. يفترض أن يكون المحور
+			معتدل.
+		</p>
+		 
+		<h3>[method:this translateX]( [param:Float distance] )</h3>
+		<p>يترجم الكائن على طول محور x في المساحة المحلية بوحدات `distance`.</p>
+		 
+		<h3>[method:this translateY]( [param:Float distance] )</h3>
+		<p>يترجم الكائن على طول محور y في المساحة المحلية بوحدات `distance`.</p>
+		 
+		<h3>[method:this translateZ]( [param:Float distance] )</h3>
+		<p>يترجم الكائن على طول محور z في المساحة المحلية بوحدات `distance`.</p>
+		 
+		<h3>[method:undefined traverse]( [param:Function callback] )</h3>
+		<p>
+			callback - وظيفة مع كأول وسيطة كائن object3D.<br /><br />
+		 
+			ينفذ رد الاتصال على هذا الكائن وجميع النسل.<br />
+			ملاحظة: يُفضل عدم تعديل رسم المشهد داخل رد الاتصال.
+		</p>
+		 
+		<h3>[method:undefined traverseVisible]( [param:Function callback] )</h3>
+		<p>
+			callback - وظيفة مع كأول وسيطة كائن object3D.<br /><br />
+		 
+			مثل traverse، ولكن سيتم تنفيذ رد الاتصال فقط للكائنات المرئية.
+			لا يتم اجتياز نسل الكائنات غير المرئية.<br />
+			ملاحظة: يُفضل عدم تعديل رسم المشهد داخل رد الاتصال.
+		</p>
+		 
+		<h3>[method:undefined traverseAncestors]( [param:Function callback] )</h3>
+		<p>
+			callback - وظيفة مع كأول وسيطة كائن object3D.<br /><br />
+		 
+			ينفذ رد الاتصال على جميع الأجداد.<br />
+			ملاحظة: يُفضل عدم تعديل رسم المشهد داخل رد الاتصال.
+		</p>
+		 
+		<h3>[method:undefined updateMatrix]()</h3>
+		<p>يحدث التحويل المحلي.</p>
+		 
+		<h3>[method:undefined updateMatrixWorld]( [param:Boolean force] )</h3>
+		<p>
+			force - منطقي يمكن استخدامه لتجاوز
+			[page:.matrixWorldAutoUpdate]، لإعادة حساب مصفوفة العالم لـ
+			الكائن والنسل في الإطار الحالي. مفيد إذا لم تتمكن من الانتظار
+			المصور لتحديثه في الإطار التالي (باستخدام
+			[page:.matrixWorldAutoUpdate] مضبوط على `true`).<br /><br />
+		 
+			يحدث التحويل العالمي للكائن ونسله إذا كان
+			تحتاج مصفوفة العالم إلى تحديث ([page:.matrixWorldNeedsUpdate] مضبوط على true) أو
+			إذا تم تعيين معلمة `force` على `true`.
+		</p>
+		 
+		<h3>[method:undefined updateWorldMatrix]( [param:Boolean updateParents], [param:Boolean updateChildren] )</h3>
+		<p>
+			updateParents - يحدث تحويل العالم للأجداد بشكل متكرر.<br />
+			updateChildren - يحدث تحويل العالم للنسل بشكل متكرر.<br /><br />
+		 
+			يحدث التحويل العالمي للكائن.
+		</p>
+		 
+		<h3>[method:Vector3 worldToLocal]( [param:Vector3 vector] )</h3>
+		<p>
+			vector - متجه يمثل موقعًا في الفضاء العالمي.<br /><br />
+		 
+			يحول المتجه من المساحة العالمية إلى المساحة المحلية لهذا الكائن.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

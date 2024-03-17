@@ -49,7 +49,7 @@
 
 			[page:Boolean stencil] - whether the drawing buffer has a
 			[link:https://en.wikipedia.org/wiki/Stencil_buffer stencil buffer] of at
-			least 8 bits. Default is `true`.<br />
+			least 8 bits. Default is `false`.<br />
 
 			[page:Boolean preserveDrawingBuffer] - whether to preserve the buffers
 			until manually cleared or overwritten. Default is `false`.<br />
@@ -82,7 +82,7 @@
 		<h3>[property:Boolean autoClear]</h3>
 		<p>
 			Defines whether the renderer should automatically clear its output before
-			rendering a frame.
+			rendering a frame. Default is `true`.
 		</p>
 
 		<h3>[property:Boolean autoClearColor]</h3>
@@ -101,22 +101,6 @@
 		<p>
 			If [page:.autoClear autoClear] is true, defines whether the renderer
 			should clear the stencil buffer. Default is `true`.
-		</p>
-
-		<h3>[property:Object debug]</h3>
-		<p>
-			- [page:Boolean checkShaderErrors]: If it is true, defines whether
-			material shader programs are checked for errors during compilation and
-			linkage process. It may be useful to disable this check in production for
-			performance gain. It is strongly recommended to keep these checks enabled
-			during development. If the shader does not compile and link - it will not
-			work and associated material will not render. Default is `true`.<br />
-			- [page:Function onShaderError]( gl, program, glVertexShader,
-			glFragmentShader ): A callback function that can be used for custom error
-			reporting. The callback receives the WebGL context, an instance of
-			WebGLProgram as well two instances of WebGLShader representing the vertex
-			and fragment shader. Assigning a custom function disables the default
-			error reporting. Default is `null`.
 		</p>
 
 		<h3>[property:Object capabilities]</h3>
@@ -172,6 +156,22 @@
 			the plane is negative are cut away. Default is [].
 		</p>
 
+		<h3>[property:Object debug]</h3>
+		<p>
+			- [page:Boolean checkShaderErrors]: If it is true, defines whether
+			material shader programs are checked for errors during compilation and
+			linkage process. It may be useful to disable this check in production for
+			performance gain. It is strongly recommended to keep these checks enabled
+			during development. If the shader does not compile and link - it will not
+			work and associated material will not render. Default is `true`.<br />
+			- [page:Function onShaderError]( gl, program, glVertexShader,
+			glFragmentShader ): A callback function that can be used for custom error
+			reporting. The callback receives the WebGL context, an instance of
+			WebGLProgram as well two instances of WebGLShader representing the vertex
+			and fragment shader. Assigning a custom function disables the default
+			error reporting. Default is `null`.
+		</p>
+		
 		<h3>[property:DOMElement domElement]</h3>
 		<p>
 			A [link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas] 
@@ -199,7 +199,7 @@ document.body.appendChild( renderer.domElement );
 			<li>`WEBGL_compressed_texture_etc1`</li>
 		</ul>
 
-		<h3>[property:number outputColorSpace]</h3>
+		<h3>[property:string outputColorSpace]</h3>
 		<p>
 			Defines the output color space of the renderer. Default is [page:Textures THREE.SRGBColorSpace].
 		</p>
@@ -253,9 +253,6 @@ document.body.appendChild( renderer.domElement );
 			Defines whether the renderer respects object-level clipping planes.
 			Default is `false`.
 		</p>
-
-		<h3>[property:Boolean useLegacyLights]</h3>
-		<p>Whether to use the legacy lighting mode or not. Default is `true`.</p>
 
 		<h3>[property:Object properties]</h3>
 		<p>
@@ -326,8 +323,7 @@ document.body.appendChild( renderer.domElement );
 		<h2>Methods</h2>
 
 		<h3>
-			[method:undefined clear]( [param:Boolean color], [param:Boolean depth],
-			[param:Boolean stencil] )
+			[method:undefined clear]( [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )
 		</h3>
 		<p>
 			Tells the renderer to clear its color, depth or stencil drawing buffer(s).
@@ -352,16 +348,26 @@ document.body.appendChild( renderer.domElement );
 		</p>
 
 		<h3>
-			[method:undefined compile]( [param:Object3D scene], [param:Camera camera] )
+			[method:Set compile]( [param:Object3D scene], [param:Camera camera], [param:Scene targetScene] )
 		</h3>
 		<p>
-			Compiles all materials in the scene with the camera. This is useful to
-			precompile shaders before the first rendering.
+			Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.
+			If you want to add a 3D object to an existing scene, use the third optional parameter for applying the target scene.<br />
+			Note that the (target) scene's lighting and environment should be configured before calling this method.
+		</p>	
+
+		<h3>
+			[method:Promise compileAsync]( [param:Object3D scene], [param:Camera camera], [param:Scene targetScene] )
+		</h3>
+		<p>
+			Asynchronous version of [page:WebGLRenderer.compile .compile](). The method returns a Promise that resolves when the 
+			given scene can be rendered without unnecessary stalling due to shader compilation.<br /><br />
+			
+			This method makes use of the *KHR_parallel_shader_compile* WebGL extension.
 		</p>
 
 		<h3>
-			[method:undefined copyFramebufferToTexture]( [param:Vector2 position],
-			[param:FramebufferTexture texture], [param:Number level] )
+			[method:undefined copyFramebufferToTexture]( [param:Vector2 position], [param:FramebufferTexture texture], [param:Number level] )
 		</h3>
 		<p>
 			Copies pixels from the current WebGLFramebuffer into a 2D texture. Enables
@@ -370,8 +376,7 @@ document.body.appendChild( renderer.domElement );
 		</p>
 
 		<h3>
-			[method:undefined copyTextureToTexture]( [param:Vector2 position],
-			[param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )
+			[method:undefined copyTextureToTexture]( [param:Vector2 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )
 		</h3>
 		<p>
 			Copies all pixels of a texture to an existing texture starting from the
@@ -380,9 +385,7 @@ document.body.appendChild( renderer.domElement );
 		</p>
 
 		<h3>
-			[method:undefined copyTextureToTexture3D]( [param:Box3 sourceBox],
-			[param:Vector3 position], [param:Texture srcTexture], 
-			[param:Texture dstTexture], [param:Number level] )
+			[method:undefined copyTextureToTexture3D]( [param:Box3 sourceBox], [param:Vector3 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )
 		</h3>
 		<p>
 			Copies the pixels of a texture in the bounds '[page:Box3 sourceBox]' in
@@ -411,8 +414,8 @@ document.body.appendChild( renderer.domElement );
 
 		<h3>[method:Float getClearAlpha]()</h3>
 		<p>
-			Returns a [page:Float float] with the current clear alpha. Ranges from 0
-			to 1.
+			Returns a [page:Float float] with the current clear alpha. Ranges from `0`
+			to `1`.
 		</p>
 
 		<h3>[method:Color getClearColor]( [param:Color target] )</h3>
@@ -496,9 +499,7 @@ document.body.appendChild( renderer.domElement );
 		</p>
 
 		<h3>
-			[method:undefined readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], 
-			[param:Float x], [param:Float y], [param:Float width],
-			[param:Float height], [param:TypedArray buffer], [param:IntegeractiveCubeFaceIndex] )
+			[method:undefined readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], [param:TypedArray buffer], [param:Integer activeCubeFaceIndex] )
 		</h3>
 		<p>
 			buffer - Uint8Array is the only destination type supported in all cases,
@@ -588,8 +589,7 @@ document.body.appendChild( renderer.domElement );
 		</p>
 
 		<h3>
-			[method:undefined setScissor]( [param:Integer x], [param:Integer y],
-			[param:Integer width], [param:Integer height] )<br />
+			[method:undefined setScissor]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )<br />
 			[method:undefined setScissor]( [param:Vector4 vector] )
 		</h3>
 
@@ -622,8 +622,7 @@ document.body.appendChild( renderer.domElement );
 		</p>
 
 		<h3>
-			[method:undefined setSize]( [param:Integer width], [param:Integer height],
-			[param:Boolean updateStyle] )
+			[method:undefined setSize]( [param:Integer width], [param:Integer height], [param:Boolean updateStyle] )
 		</h3>
 		<p>
 			Resizes the output canvas to (width, height) with device pixel ratio taken
@@ -633,8 +632,7 @@ document.body.appendChild( renderer.domElement );
 		</p>
 
 		<h3>
-			[method:undefined setViewport]( [param:Integer x], [param:Integer y],
-			[param:Integer width], [param:Integer height] )<br />
+			[method:undefined setViewport]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )<br />
 			[method:undefined setViewport]( [param:Vector4 vector] )
 		</h3>
 

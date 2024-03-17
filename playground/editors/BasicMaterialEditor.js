@@ -1,6 +1,7 @@
 import { ColorInput, SliderInput, LabelElement } from 'flow';
 import { MaterialEditor } from './MaterialEditor.js';
 import { MeshBasicNodeMaterial } from 'three/nodes';
+import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
 export class BasicMaterialEditor extends MaterialEditor {
 
@@ -10,9 +11,9 @@ export class BasicMaterialEditor extends MaterialEditor {
 
 		super( 'Basic Material', material );
 
-		const color = new LabelElement( 'color' ).setInput( 3 );
-		const opacity = new LabelElement( 'opacity' ).setInput( 1 );
-		const position = new LabelElement( 'position' ).setInput( 3 );
+		const color = setInputAestheticsFromType( new LabelElement( 'color' ), 'Color' );
+		const opacity = setInputAestheticsFromType( new LabelElement( 'opacity' ), 'Number' );
+		const position = setInputAestheticsFromType( new LabelElement( 'position' ), 'Vector3' );
 
 		color.add( new ColorInput( material.color.getHex() ).onChange( ( input ) => {
 

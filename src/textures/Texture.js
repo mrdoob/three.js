@@ -8,18 +8,14 @@ import {
 	LinearMipmapLinearFilter,
 	LinearFilter,
 	UVMapping,
-	sRGBEncoding,
-	SRGBColorSpace,
 	NoColorSpace,
-	LinearEncoding
 } from '../constants.js';
 import * as MathUtils from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { Source } from './Source.js';
-import { warnOnce } from '../utils.js';
 
-let textureId = 0;
+let _textureId = 0;
 
 class Texture extends EventDispatcher {
 
@@ -29,7 +25,7 @@ class Texture extends EventDispatcher {
 
 		this.isTexture = true;
 
-		Object.defineProperty( this, 'id', { value: textureId ++ } );
+		Object.defineProperty( this, 'id', { value: _textureId ++ } );
 
 		this.uuid = MathUtils.generateUUID();
 
@@ -66,17 +62,7 @@ class Texture extends EventDispatcher {
 		this.flipY = true;
 		this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-		if ( typeof colorSpace === 'string' ) {
-
-			this.colorSpace = colorSpace;
-
-		} else { // @deprecated, r152
-
-			warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
-			this.colorSpace = colorSpace === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
-
-		}
-
+		this.colorSpace = colorSpace;
 
 		this.userData = {};
 
@@ -169,7 +155,7 @@ class Texture extends EventDispatcher {
 		const output = {
 
 			metadata: {
-				version: 4.5,
+				version: 4.6,
 				type: 'Texture',
 				generator: 'Texture.toJSON'
 			},
@@ -312,20 +298,6 @@ class Texture extends EventDispatcher {
 			this.source.needsUpdate = true;
 
 		}
-
-	}
-
-	get encoding() { // @deprecated, r152
-
-		warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
-		return this.colorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding;
-
-	}
-
-	set encoding( encoding ) { // @deprecated, r152
-
-		warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
-		this.colorSpace = encoding === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
 
 	}
 

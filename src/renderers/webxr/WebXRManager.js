@@ -1,6 +1,7 @@
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
+import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RAD2DEG } from '../../math/MathUtils.js';
@@ -9,6 +10,7 @@ import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebXRController } from './WebXRController.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedIntType, UnsignedInt248Type } from '../../constants.js';
+import { WebXRDepthSensing } from './WebXRDepthSensing.js';
 
 class WebXRManager extends EventDispatcher {
 
@@ -33,15 +35,18 @@ class WebXRManager extends EventDispatcher {
 		let glProjLayer = null;
 		let glBaseLayer = null;
 		let xrFrame = null;
+
+		const depthSensing = new WebXRDepthSensing();
 		const attributes = gl.getContextAttributes();
+
 		let initialRenderTarget = null;
 		let newRenderTarget = null;
 
 		const controllers = [];
 		const controllerInputSources = [];
 
-		const planes = new Set();
-		const planesLastChangedTimes = new Map();
+		const currentSize = new Vector2();
+		let currentPixelRatio = null;
 
 		//
 
@@ -55,9 +60,9 @@ class WebXRManager extends EventDispatcher {
 
 		const cameras = [ cameraL, cameraR ];
 
-		const cameraVR = new ArrayCamera();
-		cameraVR.layers.enable( 1 );
-		cameraVR.layers.enable( 2 );
+		const cameraXR = new ArrayCamera();
+		cameraXR.layers.enable( 1 );
+		cameraXR.layers.enable( 2 );
 
 		let _currentDepthNear = null;
 		let _currentDepthFar = null;
@@ -130,6 +135,7 @@ class WebXRManager extends EventDispatcher {
 
 			if ( controller !== undefined ) {
 
+				controller.update( event.inputSource, event.frame, customReferenceSpace || referenceSpace );
 				controller.dispatchEvent( { type: event.type, data: event.inputSource } );
 
 			}
@@ -162,6 +168,8 @@ class WebXRManager extends EventDispatcher {
 			_currentDepthNear = null;
 			_currentDepthFar = null;
 
+			depthSensing.reset();
+
 			// restore framebuffer/rendering state
 
 			renderer.setRenderTarget( initialRenderTarget );
@@ -177,6 +185,9 @@ class WebXRManager extends EventDispatcher {
 			animation.stop();
 
 			scope.isPresenting = false;
+
+			renderer.setPixelRatio( currentPixelRatio );
+			renderer.setSize( currentSize.width, currentSize.height, false );
 
 			scope.dispatchEvent( { type: 'sessionend' } );
 
@@ -265,10 +276,13 @@ class WebXRManager extends EventDispatcher {
 
 				}
 
-				if ( ( session.renderState.layers === undefined ) || ( renderer.capabilities.isWebGL2 === false ) ) {
+				currentPixelRatio = renderer.getPixelRatio();
+				renderer.getSize( currentSize );
+
+				if ( session.renderState.layers === undefined ) {
 
 					const layerInit = {
-						antialias: ( session.renderState.layers === undefined ) ? attributes.antialias : true,
+						antialias: attributes.antialias,
 						alpha: true,
 						depth: attributes.depth,
 						stencil: attributes.stencil,
@@ -278,6 +292,9 @@ class WebXRManager extends EventDispatcher {
 					glBaseLayer = new XRWebGLLayer( session, gl, layerInit );
 
 					session.updateRenderState( { baseLayer: glBaseLayer } );
+
+					renderer.setPixelRatio( 1 );
+					renderer.setSize( glBaseLayer.framebufferWidth, glBaseLayer.framebufferHeight, false );
 
 					newRenderTarget = new WebGLRenderTarget(
 						glBaseLayer.framebufferWidth,
@@ -315,6 +332,9 @@ class WebXRManager extends EventDispatcher {
 					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
 
 					session.updateRenderState( { layers: [ glProjLayer ] } );
+
+					renderer.setPixelRatio( 1 );
+					renderer.setSize( glProjLayer.textureWidth, glProjLayer.textureHeight, false );
 
 					newRenderTarget = new WebGLRenderTarget(
 						glProjLayer.textureWidth,
@@ -508,27 +528,43 @@ class WebXRManager extends EventDispatcher {
 
 			if ( session === null ) return;
 
-			cameraVR.near = cameraR.near = cameraL.near = camera.near;
-			cameraVR.far = cameraR.far = cameraL.far = camera.far;
+			if ( depthSensing.texture !== null ) {
 
-			if ( _currentDepthNear !== cameraVR.near || _currentDepthFar !== cameraVR.far ) {
+				camera.near = depthSensing.depthNear;
+				camera.far = depthSensing.depthFar;
+
+			}
+
+			cameraXR.near = cameraR.near = cameraL.near = camera.near;
+			cameraXR.far = cameraR.far = cameraL.far = camera.far;
+
+			if ( _currentDepthNear !== cameraXR.near || _currentDepthFar !== cameraXR.far ) {
 
 				// Note that the new renderState won't apply until the next frame. See #18320
 
 				session.updateRenderState( {
-					depthNear: cameraVR.near,
-					depthFar: cameraVR.far
+					depthNear: cameraXR.near,
+					depthFar: cameraXR.far
 				} );
 
-				_currentDepthNear = cameraVR.near;
-				_currentDepthFar = cameraVR.far;
+				_currentDepthNear = cameraXR.near;
+				_currentDepthFar = cameraXR.far;
+
+				cameraL.near = _currentDepthNear;
+				cameraL.far = _currentDepthFar;
+				cameraR.near = _currentDepthNear;
+				cameraR.far = _currentDepthFar;
+
+				cameraL.updateProjectionMatrix();
+				cameraR.updateProjectionMatrix();
+				camera.updateProjectionMatrix();
 
 			}
 
 			const parent = camera.parent;
-			const cameras = cameraVR.cameras;
+			const cameras = cameraXR.cameras;
 
-			updateCamera( cameraVR, parent );
+			updateCamera( cameraXR, parent );
 
 			for ( let i = 0; i < cameras.length; i ++ ) {
 
@@ -540,49 +576,41 @@ class WebXRManager extends EventDispatcher {
 
 			if ( cameras.length === 2 ) {
 
-				setProjectionFromUnion( cameraVR, cameraL, cameraR );
+				setProjectionFromUnion( cameraXR, cameraL, cameraR );
 
 			} else {
 
 				// assume single camera setup (AR)
 
-				cameraVR.projectionMatrix.copy( cameraL.projectionMatrix );
+				cameraXR.projectionMatrix.copy( cameraL.projectionMatrix );
 
 			}
 
 			// update user camera and its children
 
-			updateUserCamera( camera, cameraVR, parent );
+			updateUserCamera( camera, cameraXR, parent );
 
 		};
 
-		function updateUserCamera( camera, cameraVR, parent ) {
+		function updateUserCamera( camera, cameraXR, parent ) {
 
 			if ( parent === null ) {
 
-				camera.matrix.copy( cameraVR.matrixWorld );
+				camera.matrix.copy( cameraXR.matrixWorld );
 
 			} else {
 
 				camera.matrix.copy( parent.matrixWorld );
 				camera.matrix.invert();
-				camera.matrix.multiply( cameraVR.matrixWorld );
+				camera.matrix.multiply( cameraXR.matrixWorld );
 
 			}
 
 			camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
 			camera.updateMatrixWorld( true );
 
-			const children = camera.children;
-
-			for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-				children[ i ].updateMatrixWorld( true );
-
-			}
-
-			camera.projectionMatrix.copy( cameraVR.projectionMatrix );
-			camera.projectionMatrixInverse.copy( cameraVR.projectionMatrixInverse );
+			camera.projectionMatrix.copy( cameraXR.projectionMatrix );
+			camera.projectionMatrixInverse.copy( cameraXR.projectionMatrixInverse );
 
 			if ( camera.isPerspectiveCamera ) {
 
@@ -595,7 +623,7 @@ class WebXRManager extends EventDispatcher {
 
 		this.getCamera = function () {
 
-			return cameraVR;
+			return cameraXR;
 
 		};
 
@@ -632,9 +660,9 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
-		this.getPlanes = function () {
+		this.hasDepthSensing = function () {
 
-			return planes;
+			return depthSensing.texture !== null;
 
 		};
 
@@ -658,14 +686,14 @@ class WebXRManager extends EventDispatcher {
 
 				}
 
-				let cameraVRNeedsUpdate = false;
+				let cameraXRNeedsUpdate = false;
 
-				// check if it's necessary to rebuild cameraVR's camera list
+				// check if it's necessary to rebuild cameraXR's camera list
 
-				if ( views.length !== cameraVR.cameras.length ) {
+				if ( views.length !== cameraXR.cameras.length ) {
 
-					cameraVR.cameras.length = 0;
-					cameraVRNeedsUpdate = true;
+					cameraXR.cameras.length = 0;
+					cameraXRNeedsUpdate = true;
 
 				}
 
@@ -717,14 +745,30 @@ class WebXRManager extends EventDispatcher {
 
 					if ( i === 0 ) {
 
-						cameraVR.matrix.copy( camera.matrix );
-						cameraVR.matrix.decompose( cameraVR.position, cameraVR.quaternion, cameraVR.scale );
+						cameraXR.matrix.copy( camera.matrix );
+						cameraXR.matrix.decompose( cameraXR.position, cameraXR.quaternion, cameraXR.scale );
 
 					}
 
-					if ( cameraVRNeedsUpdate === true ) {
+					if ( cameraXRNeedsUpdate === true ) {
 
-						cameraVR.cameras.push( camera );
+						cameraXR.cameras.push( camera );
+
+					}
+
+				}
+
+				//
+
+				const enabledFeatures = session.enabledFeatures;
+
+				if ( enabledFeatures && enabledFeatures.includes( 'depth-sensing' ) ) {
+
+					const depthData = glBinding.getDepthInformation( views[ 0 ] );
+
+					if ( depthData && depthData.isValid && depthData.texture ) {
+
+						depthSensing.init( renderer, depthData, session.renderState );
 
 					}
 
@@ -747,64 +791,13 @@ class WebXRManager extends EventDispatcher {
 
 			}
 
+			depthSensing.render( renderer, cameraXR );
+
 			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, frame );
 
 			if ( frame.detectedPlanes ) {
 
-				scope.dispatchEvent( { type: 'planesdetected', data: frame.detectedPlanes } );
-
-				let planesToRemove = null;
-
-				for ( const plane of planes ) {
-
-					if ( ! frame.detectedPlanes.has( plane ) ) {
-
-						if ( planesToRemove === null ) {
-
-							planesToRemove = [];
-
-						}
-
-						planesToRemove.push( plane );
-
-					}
-
-				}
-
-				if ( planesToRemove !== null ) {
-
-					for ( const plane of planesToRemove ) {
-
-						planes.delete( plane );
-						planesLastChangedTimes.delete( plane );
-						scope.dispatchEvent( { type: 'planeremoved', data: plane } );
-
-					}
-
-				}
-
-				for ( const plane of frame.detectedPlanes ) {
-
-					if ( ! planes.has( plane ) ) {
-
-						planes.add( plane );
-						planesLastChangedTimes.set( plane, frame.lastChangedTime );
-						scope.dispatchEvent( { type: 'planeadded', data: plane } );
-
-					} else {
-
-						const lastKnownTime = planesLastChangedTimes.get( plane );
-
-						if ( plane.lastChangedTime > lastKnownTime ) {
-
-							planesLastChangedTimes.set( plane, plane.lastChangedTime );
-							scope.dispatchEvent( { type: 'planechanged', data: plane } );
-
-						}
-
-					}
-
-				}
+				scope.dispatchEvent( { type: 'planesdetected', data: frame } );
 
 			}
 

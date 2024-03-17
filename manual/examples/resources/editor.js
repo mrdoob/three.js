@@ -1711,7 +1711,9 @@ async function openInStackBlitz() {
 
 		g.setPosition = false;
 		const url = getSourceBlobFromEditor();
-		g.iframe.src = url;
+		// g.iframe.src = url;
+		// work around firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1828286
+		g.iframe.contentWindow.location.replace(url);
 
 	}
 

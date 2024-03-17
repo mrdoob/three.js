@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -145,7 +141,7 @@ function setPickPosition(event) {
   pickPosition.y = (pos.y / canvas.height) * -2 + 1;  // note we flip Y
 }
 
-function clearPickPosition() { 
+function clearPickPosition() {
   // 对于触屏，不像鼠标总是能有一个位置坐标，
   // 如果用户不在触摸屏幕，我们希望停止拾取操作。
   // 因此，我们选取一个特别的值，表明什么都没选中
@@ -266,7 +262,7 @@ for (let i = 0; i &lt; numObjects; ++i) {
   cube.scale.set(rand(3, 6), rand(3, 6), rand(3, 6));
 
 +  const pickingMaterial = new THREE.MeshPhongMaterial({
-+    emissive: new THREE.Color(id),
++    emissive: new THREE.Color().setHex(id, THREE.NoColorSpace),
 +    color: new THREE.Color(0, 0, 0),
 +    specular: new THREE.Color(0, 0, 0),
 +    map: texture,
@@ -384,7 +380,7 @@ for (let i = 0; i &lt; numObjects; ++i) {
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

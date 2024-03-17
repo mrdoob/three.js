@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -30,24 +26,24 @@
       </div>
       <div class="lesson">
         <div class="lesson-main">
-          <p>Эта статья является частью серии статей о three.js. Первая статья - <a href="fundamentals.html">основы Three.js</a>. 
+          <p>Эта статья является частью серии статей о three.js. Первая статья - <a href="fundamentals.html">основы Three.js</a>.
 Если вы еще не читали их, и вы новичок в three.js, возможно, вы захотите начать с них.
 <a href="cameras.html">Предыдущая статья была о камерах</a> ,которые важно прочитать, прежде чем читать эту статью, а также
 <a href="lights.html">статью, посвященную свету</a>.</p>
 <p>Тени на компьютерах могут быть сложной темой. Существуют различные решения, и у всех есть свои компромиссы, включая решения, доступные в three.js.</p>
-<p>Three.js по умолчанию использует <em>shadow maps</em>. Shadow map работает так: <em>для каждого источника света, отбрасывающего тени, все объекты, 
+<p>Three.js по умолчанию использует <em>shadow maps</em>. Shadow map работает так: <em>для каждого источника света, отбрасывающего тени, все объекты,
 помеченные для отбрасывания теней, визуализируются с точки зрения источника света</em>. <strong>ПРОЧИТАЙТЕ ЭТО СНОВА!</strong> и это запомнится. </p>
-<p>Другими словами, если у вас есть 20 объектов и 5 источников света, и все 20 объектов отбрасывают тени, 
+<p>Другими словами, если у вас есть 20 объектов и 5 источников света, и все 20 объектов отбрасывают тени,
 а все 5 источников отбрасывают тени, то вся ваша сцена будет нарисована 6 раз.
-Все 20 объектов будут нарисованы для источника света № 1, затем все 20 объектов будут нарисованы для источника света № 2, 
+Все 20 объектов будут нарисованы для источника света № 1, затем все 20 объектов будут нарисованы для источника света № 2,
 затем № 3 и т. д., И, наконец, фактическая сцена будет нарисована с использованием данных из первых 5 визуализаций. </p>
 <p>Становится хуже, если у вас есть точечный источник света, отбрасывающий тени, сцена должна быть нарисована 6 раз только для этого света!</p>
-<p> По этим причинам часто приходится искать другие решения, кроме множества источников света, генерирующих тени. Одно общее решение состоит в том, 
+<p> По этим причинам часто приходится искать другие решения, кроме множества источников света, генерирующих тени. Одно общее решение состоит в том,
  чтобы иметь несколько источников света, но только один направленный источник света, генерирующий тени. </p>
-<p>Еще одно решение заключается в использовании карт освещения и / или карт окклюзии(преграждений) окружающей среды 
-для предварительного расчета эффектов освещения в автономном режиме. 
+<p>Еще одно решение заключается в использовании карт освещения и / или карт окклюзии(преграждений) окружающей среды
+для предварительного расчета эффектов освещения в автономном режиме.
 Это приводит к статическому освещению или подсказкам статического освещения, но, по крайней мере, это быстро. Мы рассмотрим оба из них в другой статье. </p>
-<p>Другое решение заключается в использовании поддельных теней. Создайте плоскость, поместите текстуру в градациях серого в плоскость, 
+<p>Другое решение заключается в использовании поддельных теней. Создайте плоскость, поместите текстуру в градациях серого в плоскость,
 которая приближается к тени, нарисуйте ее над землей под вашим объектом.</p>
 <p>Например, давайте использовать эту текстуру в качестве поддельной тени</p>
 <div class="threejs_center"><img src="../examples/resources/images/roundshadow.png"></div>
@@ -82,8 +78,8 @@
   scene.add(mesh);
 }
 </pre>
-<p>Обратите внимание, что мы устанавливаем цвет на <code class="notranslate" translate="no">1,5, 1,5, 1,5</code>. Это умножит цвета текстуры шахматной доски на 1,5, 1,5, 1,5. 
-Так как цвета текстуры 0x808080 и 0xC0C0C0, которые являются средне-серыми и светло-серыми, 
+<p>Обратите внимание, что мы устанавливаем цвет на <code class="notranslate" translate="no">1,5, 1,5, 1,5</code>. Это умножит цвета текстуры шахматной доски на 1,5, 1,5, 1,5.
+Так как цвета текстуры 0x808080 и 0xC0C0C0, которые являются средне-серыми и светло-серыми,
 умножение их на 1,5 даст нам белую и светло-серую шахматную доску.</p>
 <p> Давайте загрузим текстуру тени</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const shadowTexture = loader.load('resources/images/roundshadow.png');
@@ -161,9 +157,9 @@ for (let i = 0; i &lt; numSpheres; ++i) {
   scene.add(light.target);
 }
 </pre>
-<p>Он будет отображаться как есть, но давайте оживим сферы. 
+<p>Он будет отображаться как есть, но давайте оживим сферы.
 Для каждой сферы, тени, базового набора мы перемещаем базу в плоскости xz, мы перемещаем сферу вверх и вниз,
-используя <a href="/docs/#api/en/math/Math.abs (Math.sin (time))"><code class="notranslate" translate="no">Math.abs (Math.sin (time))</code></a>, который дает нам оживленную анимацию. 
+используя <a href="/docs/#api/en/math/Math.abs (Math.sin (time))"><code class="notranslate" translate="no">Math.abs (Math.sin (time))</code></a>, который дает нам оживленную анимацию.
 И мы также устанавливаем непрозрачность теневого материала таким образом, чтобы, когда каждая сфера поднималась выше, ее тень исчезала.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;  // convert to seconds
@@ -200,10 +196,10 @@ for (let i = 0; i &lt; numSpheres; ++i) {
 </div>
 
 <p></p>
-<p>В некоторых приложениях обычно используют круглую или овальную тень для всего, но, конечно, 
+<p>В некоторых приложениях обычно используют круглую или овальную тень для всего, но, конечно,
 вы также можете использовать теневые текстуры различной формы. Вы также можете придать тени более жесткий край.
 Хорошим примером использования этого типа тени является <a href="https://www.google.com/search?tbm=isch&amp;q=animal+crossing+pocket+camp+screenshots">Animal Crossing Pocket Camp</a>
-де вы можете видеть, что у каждого персонажа есть простая круглая тень. Это эффективно и дешево. 
+де вы можете видеть, что у каждого персонажа есть простая круглая тень. Это эффективно и дешево.
 <a href="https://www.google.com/search?q=monument+valley+screenshots&amp;tbm=isch">Monument Valley</a>
  кажется, также использует этот вид тени для главного героя. </p>
 <p>Итак, переходя к теневым картам, есть 3 источника света, которые могут отбрасывать тени. <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>, <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> и <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>.</p>
@@ -240,7 +236,7 @@ mesh.receiveShadow = true;
 
 <p></p>
 <p>Что произошло? Почему части теней отсутствуют? </p>
-<p>Причина в том, что карты теней создаются путем рендеринга сцены с точки зрения света. 
+<p>Причина в том, что карты теней создаются путем рендеринга сцены с точки зрения света.
 В этом случае в <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> есть камера, которая смотрит на свою цель.  Точно так же, как <a href="cameras.html">камера, которую мы ранее покрывали</a>,
 камера тени определяет область, внутри которой рендерится тени. В приведенном выше примере эта область слишком мала.</p>
 <p>Чтобы визуализировать эту область, мы можем получить теневую камеру и добавить <a href="/docs/#api/en/helpers/CameraHelper"><code class="notranslate" translate="no">CameraHelper</code></a> к сцене.</p>
@@ -256,13 +252,13 @@ scene.add(cameraHelper);
 <p></p>
 <p>Отрегулируйте целевое значение x назад и вперед, и должно быть довольно ясно, что только то, что находится внутри блока камеры тени, находится там, где рисуются тени. </p>
 <p>Мы можем отрегулировать размер этой коробки, отрегулировав камеру освещения.</p>
-<p>Давайте добавим некоторые настройки графического интерфейса, чтобы отрегулировать тень камеры освещения. 
+<p>Давайте добавим некоторые настройки графического интерфейса, чтобы отрегулировать тень камеры освещения.
 Поскольку <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> представляет свет, движущийся в параллельном направлении,
-<a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> использует <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> для своей теневой камеры. Мы рассмотрели, как работает 
+<a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> использует <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> для своей теневой камеры. Мы рассмотрели, как работает
 <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> в <a href="cameras.html">предыдущей статье о камерах</a>.</p>
 <p>Напомним, <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> определяет свою рамку или вид усечения по своим свойствам <code class="notranslate" translate="no">left</code>, <code class="notranslate" translate="no">right</code>, <code class="notranslate" translate="no">top</code>, <code class="notranslate" translate="no">bottom</code>, <code class="notranslate" translate="no">near</code>, <code class="notranslate" translate="no">far</code> и <code class="notranslate" translate="no">zoom</code>. </p>
-<p>Снова давайте создадим вспомогательный класс для lil-gui. Мы сделаем <code class="notranslate" translate="no">DimensionGUIHelper</code>, 
-который мы передадим объект и 2 свойства. Он представит одно свойство, которое lil-gui 
+<p>Снова давайте создадим вспомогательный класс для lil-gui. Мы сделаем <code class="notranslate" translate="no">DimensionGUIHelper</code>,
+который мы передадим объект и 2 свойства. Он представит одно свойство, которое lil-gui
 может настроить, и в ответ установит два значения: положительное и отрицательное.
 Мы можем использовать это, чтобы установить влево и вправо как ширину, а вверх и вниз как высоту.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class DimensionGUIHelper {
@@ -299,8 +295,8 @@ gui.add(light, 'intensity', 0, 2, 0.01);
 +  folder.add(light.shadow.camera, 'zoom', 0.01, 1.5, 0.01).onChange(updateCamera);
 +}
 </pre>
-<p>Мы говорим GUI, чтобы мы вызывали нашу функцию <code class="notranslate" translate="no">updateCamera</code> каждый раз, когда что-то меняется. 
-Давайте напишем эту функцию для обновления источника света, помощника источника света, 
+<p>Мы говорим GUI, чтобы мы вызывали нашу функцию <code class="notranslate" translate="no">updateCamera</code> каждый раз, когда что-то меняется.
+Давайте напишем эту функцию для обновления источника света, помощника источника света,
 камеры тени источника света и помощника, отображающего камеру тени источника света.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateCamera() {
   // update the light target's matrixWorld because it's needed by the helper
@@ -321,26 +317,26 @@ updateCamera();
 
 <p></p>
 <p>Установите <code class="notranslate" translate="no">ширину</code> и <code class="notranslate" translate="no">высоту</code> около 30, и вы увидите, что тени правильные и области, которые должны находиться в тени для этой сцены, полностью покрыты. </p>
-<p>Но это поднимает вопрос, почему бы просто не установить <code class="notranslate" translate="no">ширину</code> и <code class="notranslate" translate="no">высоту</code> для некоторых гигантских чисел, 
+<p>Но это поднимает вопрос, почему бы просто не установить <code class="notranslate" translate="no">ширину</code> и <code class="notranslate" translate="no">высоту</code> для некоторых гигантских чисел,
 чтобы просто покрыть все? Установите <code class="notranslate" translate="no">ширину</code> и <code class="notranslate" translate="no">высоту</code> 100, и вы можете увидеть что-то вроде этого</p>
 <div class="threejs_center"><img src="../resources/images/low-res-shadow-map.png" style="width: 369px"></div>
 
 <p>Что происходит с этими тенями в низком разрешении ?!</p>
 <p>Эта проблема - еще один параметр, связанный с тенями, о котором нужно знать. Карты теней - это текстуры, в которые затягиваются тени.
-Эти текстуры имеют размер. Область теневой камеры, которую мы установили выше, 
+Эти текстуры имеют размер. Область теневой камеры, которую мы установили выше,
 растянута на этот размер. Это означает, что чем больше область, которую вы устанавливаете, тем более блочными будут ваши тени.</p>
 <p> Вы можете установить разрешение текстуры карты теней, установив <code class="notranslate" translate="no">light.shadow.mapSize.width</code> и <code class="notranslate" translate="no">light.shadow.mapSize.height</code>.
- Они по умолчанию 512x512. Чем больше вы делаете их, тем больше памяти они отнимают 
- и тем медленнее они вычисляются, поэтому вы захотите установить их как можно меньше и при этом заставить вашу сцену работать. 
- То же самое относится и к области камеры теневого света. Меньшие тени означают - лучше выглядящие, 
+ Они по умолчанию 512x512. Чем больше вы делаете их, тем больше памяти они отнимают
+ и тем медленнее они вычисляются, поэтому вы захотите установить их как можно меньше и при этом заставить вашу сцену работать.
+ То же самое относится и к области камеры теневого света. Меньшие тени означают - лучше выглядящие,
  поэтому сделайте область как можно меньше и при этом охватывайте всю сцену. Имейте в виду, что на компьютере каждого пользователя установлен максимально допустимый
  размер текстуры, который доступен в рендере как <a href="/docs/#api/en/renderers/WebGLRenderer#capabilities"><code class="notranslate" translate="no">renderer.capabilities.maxTextureSize</code></a>.</p>
 <!--
 Ok but what about `near` and `far` I hear you thinking. Can we set `near` to 0.00001 and far to `100000000`
 -->
-<p>При переключении на <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> теневая камера источника света становится <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>. 
-В отличие от теневой камеры <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>, где мы могли вручную установить большинство ее настроек, 
-теневая камера SpotLight управляется самим <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>. Поле зрения для теневой камеры напрямую связано с настройкой угла <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>. 
+<p>При переключении на <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a> теневая камера источника света становится <a href="/docs/#api/en/cameras/PerspectiveCamera"><code class="notranslate" translate="no">PerspectiveCamera</code></a>.
+В отличие от теневой камеры <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>, где мы могли вручную установить большинство ее настроек,
+теневая камера SpotLight управляется самим <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>. Поле зрения для теневой камеры напрямую связано с настройкой угла <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>.
 <code class="notranslate" translate="no">aspect</code> устанавливается автоматически в зависимости от размера карты теней.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const light = new THREE.DirectionalLight(color, intensity);
 +const light = new THREE.SpotLight(color, intensity);
@@ -370,10 +366,10 @@ also blur the result
 
 -->
 <p>И, наконец, есть тени с <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>. Так как <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> светит во всех направлениях, единственные релевантные настройки - ближние и дальние.
-В противном случае тень <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> фактически представляет собой 6 теней <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>, каждая из которых указывает на грань куба вокруг источника света. 
+В противном случае тень <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> фактически представляет собой 6 теней <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>, каждая из которых указывает на грань куба вокруг источника света.
 Это означает, что тени <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> намного медленнее, поскольку вся сцена должна быть нарисована 6 раз, по одному для каждого направления. </p>
 <p>Давайте поместим рамку вокруг нашей сцены, чтобы мы могли видеть тени на стенах и потолке.
-Мы установим свойство стороны материала в <code class="notranslate" translate="no">THREE.BackSide</code>, чтобы отображать внутреннюю часть поля вместо внешней. Как и пол, мы установим его только для получения теней. 
+Мы установим свойство стороны материала в <code class="notranslate" translate="no">THREE.BackSide</code>, чтобы отображать внутреннюю часть поля вместо внешней. Как и пол, мы установим его только для получения теней.
 Также мы установим положение ящика так, чтобы его дно было немного ниже пола, чтобы пол и дно ящика не мешали друг другу.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const cubeSize = 30;
@@ -404,8 +400,8 @@ also blur the result
 </div>
 
 <p></p>
-<p>Используйте настройки GUI для перемещения света, и вы увидите, как тени падают на все стены. 
-Вы также можете настроить ближние и дальние настройки и видеть, как и другие тени, 
+<p>Используйте настройки GUI для перемещения света, и вы увидите, как тени падают на все стены.
+Вы также можете настроить ближние и дальние настройки и видеть, как и другие тени,
 когда объекты ближе -  они больше не получают тень, когда объекты дальше - они всегда находятся в тени.</p>
 <!--
 self shadow, shadow acne
@@ -414,7 +410,7 @@ self shadow, shadow acne
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

@@ -18,7 +18,7 @@ function GeometryParametersPanel( editor, object ) {
 	const radiusRow = new UIRow();
 	const radius = new UINumber( parameters.radius ).onChange( update );
 
-	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/radius' ) ).setWidth( '90px' ) );
+	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/radius' ) ).setClass( 'Label' ) );
 	radiusRow.add( radius );
 
 	container.add( radiusRow );
@@ -28,7 +28,7 @@ function GeometryParametersPanel( editor, object ) {
 	const tubeRow = new UIRow();
 	const tube = new UINumber( parameters.tube ).onChange( update );
 
-	tubeRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/tube' ) ).setWidth( '90px' ) );
+	tubeRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/tube' ) ).setClass( 'Label' ) );
 	tubeRow.add( tube );
 
 	container.add( tubeRow );
@@ -38,7 +38,7 @@ function GeometryParametersPanel( editor, object ) {
 	const radialSegmentsRow = new UIRow();
 	const radialSegments = new UIInteger( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
-	radialSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/radialsegments' ) ).setWidth( '90px' ) );
+	radialSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/radialsegments' ) ).setClass( 'Label' ) );
 	radialSegmentsRow.add( radialSegments );
 
 	container.add( radialSegmentsRow );
@@ -48,7 +48,7 @@ function GeometryParametersPanel( editor, object ) {
 	const tubularSegmentsRow = new UIRow();
 	const tubularSegments = new UIInteger( parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
 
-	tubularSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/tubularsegments' ) ).setWidth( '90px' ) );
+	tubularSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/tubularsegments' ) ).setClass( 'Label' ) );
 	tubularSegmentsRow.add( tubularSegments );
 
 	container.add( tubularSegmentsRow );
@@ -58,7 +58,7 @@ function GeometryParametersPanel( editor, object ) {
 	const arcRow = new UIRow();
 	const arc = new UINumber( parameters.arc * THREE.MathUtils.RAD2DEG ).setStep( 10 ).onChange( update );
 
-	arcRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/arc' ) ).setWidth( '90px' ) );
+	arcRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/arc' ) ).setClass( 'Label' ) );
 	arcRow.add( arc );
 
 	container.add( arcRow );

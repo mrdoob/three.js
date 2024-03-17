@@ -14,10 +14,6 @@
 			by <a href="https://discoverthreejs.com/" target="_blank" rel="noopener">Discover three.js</a>
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -69,7 +65,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.useLegacyLights = false;
 				renderer.setAnimationLoop( function () {
 
 					renderer.render( scene, camera );

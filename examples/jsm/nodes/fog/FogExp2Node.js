@@ -1,5 +1,4 @@
 import FogNode from './FogNode.js';
-import { positionView } from '../accessors/PositionNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
@@ -15,12 +14,12 @@ class FogExp2Node extends FogNode {
 
 	}
 
-	construct() {
+	setup( builder ) {
 
-		const depthNode = positionView.z.negate();
-		const densityNode = this.densityNode;
+		const viewZ = this.getViewZNode( builder );
+		const density = this.densityNode;
 
-		return densityNode.mul( densityNode, depthNode, depthNode ).negate().exp().oneMinus();
+		return density.mul( density, viewZ, viewZ ).negate().exp().oneMinus();
 
 	}
 
@@ -32,4 +31,4 @@ export const densityFog = nodeProxy( FogExp2Node );
 
 addNodeElement( 'densityFog', densityFog );
 
-addNodeClass( FogExp2Node );
+addNodeClass( 'FogExp2Node', FogExp2Node );

@@ -159,36 +159,52 @@ class Box3 {
 
 		object.updateWorldMatrix( false, false );
 
-		if ( object.boundingBox !== undefined ) {
+		const geometry = object.geometry;
 
-			if ( object.boundingBox === null ) {
+		if ( geometry !== undefined ) {
 
-				object.computeBoundingBox();
+			const positionAttribute = geometry.getAttribute( 'position' );
 
-			}
+			// precise AABB computation based on vertex data requires at least a position attribute.
+			// instancing isn't supported so far and uses the normal (conservative) code path.
 
-			_box.copy( object.boundingBox );
-			_box.applyMatrix4( object.matrixWorld );
+			if ( precise === true && positionAttribute !== undefined && object.isInstancedMesh !== true ) {
 
-			this.union( _box );
+				for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
 
-		} else {
+					if ( object.isMesh === true ) {
 
-			const geometry = object.geometry;
+						object.getVertexPosition( i, _vector );
 
-			if ( geometry !== undefined ) {
+					} else {
 
-				if ( precise && geometry.attributes !== undefined && geometry.attributes.position !== undefined ) {
-
-					const position = geometry.attributes.position;
-					for ( let i = 0, l = position.count; i < l; i ++ ) {
-
-						_vector.fromBufferAttribute( position, i ).applyMatrix4( object.matrixWorld );
-						this.expandByPoint( _vector );
+						_vector.fromBufferAttribute( positionAttribute, i );
 
 					}
 
+					_vector.applyMatrix4( object.matrixWorld );
+					this.expandByPoint( _vector );
+
+				}
+
+			} else {
+
+				if ( object.boundingBox !== undefined ) {
+
+					// object-level bounding box
+
+					if ( object.boundingBox === null ) {
+
+						object.computeBoundingBox();
+
+					}
+
+					_box.copy( object.boundingBox );
+
+
 				} else {
+
+					// geometry-level bounding box
 
 					if ( geometry.boundingBox === null ) {
 
@@ -197,11 +213,12 @@ class Box3 {
 					}
 
 					_box.copy( geometry.boundingBox );
-					_box.applyMatrix4( object.matrixWorld );
-
-					this.union( _box );
 
 				}
+
+				_box.applyMatrix4( object.matrixWorld );
+
+				this.union( _box );
 
 			}
 

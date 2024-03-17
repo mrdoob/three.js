@@ -97,7 +97,7 @@
 
 		<h3>[property:Camera camera]</h3>
 		<p>
-      La telecamera da utilizzare durante il raycast contro oggetti dipendenti dalla vista, come oggetti su cartelloni pubblicitari 
+      La telecamera da utilizzare durante il raycast contro oggetti dipendenti dalla vista, come oggetti su cartelloni pubblicitari
       come [page:Sprites]. Questo campo può essere settato manualmente o viene impostato quando si chiama il metodo "setFromCamera".
 
       L'impostazione predefinita è null.
@@ -156,12 +156,18 @@
 		  Aggiorna il raggio con una nuova origine e direzione.
 		</p>
 
+		<h3>[method:this setFromXRController]( [param:WebXRController controller] )</h3>
+		<p>
+			[page:WebXRController controller] — The controller to copy the position and direction from.
+		</p>
+		<p>Updates the ray with a new origin and direction.</p>
+
 		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
 		[page:Object3D object] — L'oggetto da verificare per l'intersezione con il raggio.<br />
-		[page:Boolean recursive] — Se true, controlla anche tutti i discendenti. Altrimenti controlla soltanto 
+		[page:Boolean recursive] — Se true, controlla anche tutti i discendenti. Altrimenti controlla soltanto
     l'intersezione con l'oggetto. Il valore predefinito è true.<br />
-		[page:Array optionalTarget] — (opzionale) obiettivo per impostare il risultato. 
+		[page:Array optionalTarget] — (opzionale) obiettivo per impostare il risultato.
     Altrimenti viene istanziato un nuovo [page:Array]. Se impostato, è necessario cancellare questo array prima di ogni chiamata (ad esempio, array.length = 0;).
 		</p>
 		<p>
@@ -178,13 +184,13 @@
 			[page:Integer faceIndex] – indice della faccia intersecata<br />
 			[page:Object3D object] – l'oggetto intersecato<br />
 			[page:Vector2 uv] - le coordinate U,V nel punto di intersezione<br />
-			[page:Vector2 uv2] - Secondo insieme delle coordinate U,V nel punto di intersezione<br />
+			[page:Vector2 uv1] - Secondo insieme delle coordinate U,V nel punto di intersezione<br />
 			[page:Vector3 normal] - vettore normale interpolato nel punto di intersezione<br />
 			[page:Integer instanceId] – Il numero di indice dell'istanza in cui il raggio interseca la InstancedMesh.
 		</p>
 		<p>
-      `Raycaster` delega al metodo [page:Object3D.raycast raycast] dell'oggetto passato, 
-      quando valuta se il raggio interseca l'oggetto o no. Ciò permette alle mesh di rispondere 
+      `Raycaster` delega al metodo [page:Object3D.raycast raycast] dell'oggetto passato,
+      quando valuta se il raggio interseca l'oggetto o no. Ciò permette alle mesh di rispondere
       in modo diverso al raycasting rispetto alle linee e alle nuvole di punti.
 		</p>
 		<p>
@@ -197,14 +203,14 @@
 		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
       [page:Array objects] — Gli oggetti da controllare per l'intersezione con il raggio.<br />
-      [page:Boolean recursive] — Se true, controlla anche i discendenti degli oggetti. Altrimenti controlla soltanto 
+      [page:Boolean recursive] — Se true, controlla anche i discendenti degli oggetti. Altrimenti controlla soltanto
       l'intersezione con gli oggetti. Il valore predefinito è true.<br />
       [page:Array optionalTarget] — (opzionale) obiettivo per impostare il risultato.
       Altrimenti viene istanziato un nuovo [page:Array]. Se impostato, è necessario cancellare questo array prima di ogni chiamata (ad esempio, array.length = 0;).
 		</p>
 		<p>
       Controlla tutte le intersezioni tra il raggio e gli oggetti con o senza i discendenti.
-      Le intersezioni sono restituite ordinate per distanza, prima le più vicine. Le intersezioni 
+      Le intersezioni sono restituite ordinate per distanza, prima le più vicine. Le intersezioni
       hanno la stessa forma di quelle restituite da [page:.intersectObject].
 		</p>
 

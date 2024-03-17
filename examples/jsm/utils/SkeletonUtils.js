@@ -200,7 +200,8 @@ function retarget( target, source, options = {} ) {
 function retargetClip( target, source, clip, options = {} ) {
 
 	options.useFirstFramePosition = options.useFirstFramePosition !== undefined ? options.useFirstFramePosition : false;
-	options.fps = options.fps !== undefined ? options.fps : 30;
+	// Calculate the fps from the source clip based on the track with the most frames, unless fps is already provided.
+	options.fps = options.fps !== undefined ? options.fps : ( Math.max( ...clip.tracks.map( track => track.times.length ) ) / clip.duration );
 	options.names = options.names || [];
 
 	if ( ! source.isObject3D ) {
@@ -210,7 +211,7 @@ function retargetClip( target, source, clip, options = {} ) {
 	}
 
 	const numFrames = Math.round( clip.duration * ( options.fps / 1000 ) * 1000 ),
-		delta = 1 / options.fps,
+		delta = clip.duration / ( numFrames - 1 ),
 		convertedTracks = [],
 		mixer = new AnimationMixer( source ),
 		bones = getBones( target.skeleton ),
@@ -287,7 +288,17 @@ function retargetClip( target, source, clip, options = {} ) {
 
 		}
 
-		mixer.update( delta );
+		if ( i === numFrames - 2 ) {
+
+			// last mixer update before final loop iteration
+			// make sure we do not go over or equal to clip duration
+			mixer.update( delta - 0.0000001 );
+
+		} else {
+
+			mixer.update( delta );
+
+		}
 
 		source.updateMatrixWorld();
 

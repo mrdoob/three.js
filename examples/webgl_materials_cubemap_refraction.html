@@ -14,10 +14,6 @@
 			Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
 		</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -35,13 +31,9 @@
 
 			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let container, stats;
 
 			let camera, scene, renderer;
-
-			let pointLight;
 
 			let mouseX = 0, mouseY = 0;
 
@@ -77,19 +69,8 @@
 
 				// LIGHTS
 
-				const ambient = new THREE.AmbientLight( 0xffffff );
+				const ambient = new THREE.AmbientLight( 0xffffff, 3.5 );
 				scene.add( ambient );
-
-				pointLight = new THREE.PointLight( 0xffffff, 2 );
-				scene.add( pointLight );
-
-				// light representation
-
-				const sphere = new THREE.SphereGeometry( 100, 16, 8 );
-
-				const mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
-				mesh.scale.set( 0.05, 0.05, 0.05 );
-				pointLight.add( mesh );
 
 				// material samples
 
@@ -99,8 +80,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -177,15 +157,10 @@
 
 			function render() {
 
-				const timer = - 0.0002 * Date.now();
-
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
 				camera.lookAt( scene.position );
-
-				pointLight.position.x = 1500 * Math.cos( timer );
-				pointLight.position.z = 1500 * Math.sin( timer );
 
 				renderer.render( scene, camera );
 

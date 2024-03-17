@@ -11,10 +11,6 @@
 
     <link rel="stylesheet" href="../resources/lesson.css">
     <link rel="stylesheet" href="../resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-
 <script type="importmap">
 {
   "imports": {
@@ -43,7 +39,7 @@
 <p>같은 컴퓨터에서 30-60 프레임이 나옵니다. 이 게임이 텍스처를 입힌 삼각형을 렌더링하는 등 좀 더 일반적인 기법을 사용했기 때문이죠.</p>
 <p>뭐 그렇다고 해도 쉐이더토이의 쉐이더를 Three.js에 한 번 불러와보는 건 나쁘지 않을 겁니다.</p>
 <p>아래는 쉐이더토이에서 <a href="https://www.shadertoy.com/new">"New"를 클릭했을 때</a> 나오는 기본 쉐이더입니다(2019년 1월 기준).</p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By iq: https://www.shadertoy.com/user/iq  
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By iq: https://www.shadertoy.com/user/iq
 // license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
@@ -129,7 +125,7 @@ main();
 uniform vec3 iResolution;
 uniform float iTime;
 
-// By iq: https://www.shadertoy.com/user/iq  
+// By iq: https://www.shadertoy.com/user/iq
 // license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
@@ -214,7 +210,7 @@ void main() {
 <p>쉐이더토이 쉐이더 중에는 <a href="https://www.shadertoy.com/view/MsXSzM">텍스처를 받아서 사용하는 경우</a>도 있습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By Daedelus: https://www.shadertoy.com/user/Daedelus
 // license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
-#define TIMESCALE 0.25 
+#define TIMESCALE 0.25
 #define TILES 8
 #define COLOR 0.7, 1.6, 2.8
 
@@ -317,7 +313,7 @@ uniforms.iTime.value = time;
         </div>
       </div>
     </div>
-  
+
   <script src="../resources/prettify.js"></script>
   <script src="../resources/lesson.js"></script>
 

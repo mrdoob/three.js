@@ -1,25 +1,5 @@
 import terser from '@rollup/plugin-terser';
-
-function addons() {
-
-	return {
-
-		transform( code, id ) {
-
-			if ( /\/examples\/jsm\//.test( id ) === false ) return;
-
-			code = code.replace( 'build/three.module.js', 'src/Three.js' );
-
-			return {
-				code: code,
-				map: null
-			};
-
-		}
-
-	};
-
-}
+import MagicString from 'magic-string';
 
 export function glsl() {
 
@@ -29,7 +9,9 @@ export function glsl() {
 
 			if ( /\.glsl.js$/.test( id ) === false ) return;
 
-			code = code.replace( /\/\* glsl \*\/\`(.*?)\`/sg, function ( match, p1 ) {
+			code = new MagicString( code );
+
+			code.replace( /\/\* glsl \*\/\`(.*?)\`/sg, function ( match, p1 ) {
 
 				return JSON.stringify(
 					p1
@@ -43,8 +25,8 @@ export function glsl() {
 			} );
 
 			return {
-				code: code,
-				map: null
+				code: code.toString(),
+				map: code.generateMap()
 			};
 
 		}
@@ -59,27 +41,18 @@ function header() {
 
 		renderChunk( code ) {
 
-			return `/**
+			code = new MagicString( code );
+
+			code.prepend( `/**
  * @license
  * Copyright 2010-2023 Three.js Authors
  * SPDX-License-Identifier: MIT
- */
-${ code }`;
+ */\n` );
 
-		}
-
-	};
-
-}
-
-function deprecationWarning() {
-
-	return {
-
-		renderChunk( code ) {
-
-			return `console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation' );
-${ code }`;
+			return {
+				code: code.toString(),
+				map: code.generateMap()
+			};
 
 		}
 
@@ -91,7 +64,6 @@ const builds = [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			addons(),
 			glsl(),
 			header()
 		],
@@ -105,10 +77,9 @@ const builds = [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			addons(),
 			glsl(),
-			terser(),
-			header()
+			header(),
+			terser()
 		],
 		output: [
 			{
@@ -120,7 +91,6 @@ const builds = [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			addons(),
 			glsl(),
 			header()
 		],
@@ -130,41 +100,6 @@ const builds = [
 				name: 'THREE',
 				file: 'build/three.cjs',
 				indent: '\t'
-			}
-		]
-	},
-
-	{ // @deprecated, r150
-		input: 'src/Three.js',
-		plugins: [
-			addons(),
-			glsl(),
-			header(),
-			deprecationWarning()
-		],
-		output: [
-			{
-				format: 'umd',
-				name: 'THREE',
-				file: 'build/three.js',
-				indent: '\t'
-			}
-		]
-	},
-	{ // @deprecated, r150
-		input: 'src/Three.js',
-		plugins: [
-			addons(),
-			glsl(),
-			terser(),
-			header(),
-			deprecationWarning()
-		],
-		output: [
-			{
-				format: 'umd',
-				name: 'THREE',
-				file: 'build/three.min.js'
 			}
 		]
 	}

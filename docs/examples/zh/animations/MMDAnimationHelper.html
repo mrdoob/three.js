@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>MMD动画辅助对象([name])</h1>
+
+	<p class="desc"> <a href="https://sites.google.com/view/evpvp/">`MMD`</a> 资源的动画辅助对象。<br /><br />
+		[name] 处理由 [page:MMDLoader] 加载的 MMD 资源的动画，具有 IK、Grant 和Physics 等 MMD 特殊功能。它内部使用 [page:CCDIKSolver] 和
+		[page:MMDPhysics]。
+	</p>
+
+	<h2>引入</h2>
+
+	<p>
+		[name] 是一个附加组件，必须显式导入。请参阅 [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
+			import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
+		</code>
+
+	<h2>代码示例</h2>
+
+	<code>
+		// Instantiate a helper
+		const helper = new MMDAnimationHelper();
+
+		// Load MMD resources and add to helper
+		new MMDLoader().loadWithAnimation(
+			'models/mmd/miku.pmd',
+			'models/mmd/dance.vmd',
+			function ( mmd ) {
+
+				helper.add( mmd.mesh, {
+					animation: mmd.animation,
+					physics: true
+				} );
+
+				scene.add( mmd.mesh );
+
+				new THREE.AudioLoader().load(
+					'audios/mmd/song.mp3',
+					function ( buffer ) {
+
+						const listener = new THREE.AudioListener();
+						const audio = new THREE.Audio( listener ).setBuffer( buffer );
+
+						listener.position.z = 1;
+
+						scene.add( audio );
+						scene.add( listener );
+
+					}
+
+				);
+
+			}
+		);
+
+		function render() {
+
+			helper.update( clock.getDelta() );
+			renderer.render( scene, camera );
+
+		}
+		</code>
+
+	<h2>例子</h2>
+
+	<p>
+		[example:webgl_loader_mmd]<br />
+		[example:webgl_loader_mmd_pose]<br />
+		[example:webgl_loader_mmd_audio]
+	</p>
+
+	<h2>构造函数</h2>
+
+	<h3>[name]( [param:Object params] )</h3>
+	<p>
+		[page:Object params] — （可选）<br />
+	</p>
+	<ul>
+		<li> [page:Boolean sync] - 添加对象的动画持续时间是否同步。默认为 true</li>
+		<li> [page:Number afterglow] - 默认值为 0.0。</li>
+		<li> [page:Boolean resetPhysicsOnLoop] - 默认值为 true</li>
+		<li> [page:Boolean pmxAnimation] - 如果设置为 true，则帮助程序遵循复杂且昂贵的 PMX 动画系统。仅当您的 PMX 模型动画效果不佳时才尝试此选项。默认为 false。</li>
+	</ul>
+	<p>
+		创建一个新的 [name]。
+	</p>
+
+	<h2>属性</h2>
+
+	<h3>[property:Audio audio]</h3>
+	<p>添加的 [page:Audio] 音频</p>
+
+	<h3>[property:Camera camera]</h3>
+	<p>添加的 [page:Camera] 相机</p>
+
+	<h3>[property:Array meshes]</h3>
+	<p>添加的 [page:SkinnedMesh] 数组</p>
+
+	<h3>[property:WeakMap objects]</h3>
+	<p>一个 [page:WeakMap] ，它保存添加到 helper 的对象的 helper 中使用的动画内容。例如，您可以使用“helper.objects.get(mesh).mixer”访问添加的
+		[page:AnimationMixer] 的 [page:SkinnedMesh]。</p>
+
+	<h3>[property:Function onBeforePhysics]</h3>
+	<p> 在 [page:SkinnedMesh] 的物理计算之前立即执行的可选回调。该函数通过 [page:SkinnedMesh] 调用。</p>
+
+	<h2>方法</h2>
+
+	<h3>[method:MMDAnimationHelper add]( [param:Object3D object], [param:Object params] )</h3>
+	<p>
+		[page:Object3D object] — [page:SkinnedMesh], [page:Camera] 或 [page:Audio]<br />
+		[page:Object params] — （可选）<br />
+	</p>
+	<ul>
+		<li>[page:AnimationClip animation] - 一个 [page:AnimationClip] 或设置为对象的 [page:AnimationClip] 数组。仅适用于 [page:SkinnedMesh]
+			和 [page:Camera]。默认值 undefined。</li>
+		<li>[page:Boolean physics] - 仅适用于 [page:SkinnedMesh]。是否开启物理标志。默认为 true。</li>
+		<li>[page:Integer warmup] - 仅适用于 [page:SkinnedMesh] 并且 physics 为 true。物理参数。默认值为 60。</li>
+		<li>[page:Number unitStep] - 仅适用于 [page:SkinnedMesh] 并且 physics 为 true。物理参数。默认值为 1 / 65。</li>
+		<li>[page:Integer maxStepNum] - 仅适用于 [page:SkinnedMesh] 并且 physics 为 true。物理参数。默认值为 3。</li>
+		<li>[page:Vector3 gravity] - 仅适用于 [page:SkinnedMesh] 并且 physics 为 true。物理参数。默认值为 ( 0, - 9.8 * 10, 0 )。</li>
+		<li>[page:Number delayTime] - 仅适用于 [page:Audio]。默认值为 0.0。</li>
+	</ul>
+	<p>
+		添加 [page:SkinnedMesh]、[page:Camera] 或 [page:Audio] 到辅助对象并设置动画。 添加的对象的动画持续时间是同步的。如果已经添加了摄像头/音频，它将被替换为新的。
+	</p>
+
+	<h3>[method:MMDAnimationHelper enable]( [param:String key], [param:Boolean enabled] )</h3>
+	<p>
+		[page:String key] — 允许的字符串为 'animation'、'ik'、'grant'、'physicals' 和 'cameraAnimation'。<br />
+		[page:Boolean enabled] — true 表示启用，false 表示禁用。<br />
+	</p>
+	<p>
+		启用/禁用动画功能
+	</p>
+
+	<h3>[method:MMDAnimationHelper pose]( [param:SkinnedMesh mesh], [param:Object vpd], [param:Object params] )</h3>
+	<p>
+		[page:SkinnedMesh mesh] — [page:SkinnedMesh] 改变姿势。不需要将其添加到 helper 中。<br />
+		[page:Object vpd] — 获取由 [page:MMDLoader].loadVPD 加载的 VPD 内容<br />
+		[page:Object params] — （可选）<br />
+	</p>
+	<ul>
+		<li>[page:Boolean resetPose] - 默认为 true</li>
+		<li>[page:Boolean ik] - 默认为 true</li>
+		<li>[page:Boolean grant] - 默认为 true</li>
+	</ul>
+	<p>
+		根据 VPD 内容指定 更改 [page:SkinnedMesh] 的姿势。
+	</p>
+
+	<h3>[method:MMDAnimationHelper remove]( [param:Object3D object] )</h3>
+	<p>
+		[page:Object3D object] — [page:SkinnedMesh]、[page:Camera] 或 [page:Audio]<br />
+	</p>
+	<p>
+		从助手中删除 [page:SkinnedMesh]、[page:Camera] 或 [page:Audio]。
+	</p>
+
+	<h3>[method:MMDAnimationHelper update]( [param:Number delta] )</h3>
+	<p>
+		[page:Number delta] — 秒数<br />
+	</p>
+	<p>
+		提前混合器时间并更新添加到助手的对象的动画。
+	</p>
+
+	<h2>源代码</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/animation/MMDAnimationHelper.js examples/jsm/animation/MMDAnimationHelper.js]
+	</p>
+</body>
+
+</html>

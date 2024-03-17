@@ -43,11 +43,13 @@ m.elements = [ 11, 21, 31,
 		<h2>Constructor</h2>
 
 
-		<h3>[name]()</h3>
+		<h3>[name]( [param:Number n11], [param:Number n12], [param:Number n13],
+			[param:Number n21], [param:Number n22], [param:Number n23],
+			[param:Number n31], [param:Number n32], [param:Number n33] )</h3>
 		<p>
-		创建并初始化一个3X3的单位矩阵[link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
+			Creates a 3x3 matrix with the given arguments in row-major order. If no arguments are provided, the constructor initializes
+			the [name] to the 3x3 [link:https://en.wikipedia.org/wiki/Identity_matrix identity matrix].
 		</p>
-
 
 
 		<h2>属性（Properties）</h2>
@@ -78,18 +80,79 @@ m.elements = [ 11, 21, 31,
 		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
 		<p>
 		将该矩阵的基向量 [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] 提取到提供的三个轴向中。如果该矩阵如下：
-		<code>
-a, b, c,
-d, e, f,
-g, h, i
-		</code>
-		那么 [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] 将会被设置为：
-		<code>
-xAxis = (a, d, g)
-yAxis = (b, e, h)
-zAxis = (c, f, i)
-		</code>
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>a</mi></mtd>
+						<mtd><mi>b</mi></mtd>
+						<mtd><mi>c</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>d</mi></mtd>
+						<mtd><mi>e</mi></mtd>
+						<mtd><mi>f</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>g</mi></mtd>
+						<mtd><mi>h</mi></mtd>
+						<mtd><mi>i</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+
+		<p>
+		那么 [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] 将会被设置为：
+		</p>
+
+		<div style="text-align: center">
+		<math>
+			<mrow>
+				<mi>xAxis</mi>
+				<mo>=</mo>
+				<mo>[</mo>
+				<mtable>
+					<mtr><mtd style="height: 1rem"><mi>a</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>d</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>g</mi></mtd></mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>,
+
+		<math>
+			<mrow>
+				<mi>yAxis</mi>
+				<mo>=</mo>
+				<mo>[</mo>
+				<mtable>
+					<mtr><mtd style="height: 1rem"><mi>b</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>e</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>h</mi></mtd></mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>, and
+
+		<math>
+			<mrow>
+				<mi>zAxis</mi>
+				<mo>=</mo>
+				<mo>[</mo>
+				<mtable>
+					<mtr><mtd style="height: 1rem"><mi>c</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>f</mi></mtd></mtr>
+					<mtr><mtd style="height: 1rem"><mi>i</mi></mtd></mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
+		</div>
 
 		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
@@ -115,13 +178,31 @@ zAxis = (c, f, i)
 		<h3>[method:this identity]()</h3>
 		<p>
 			将此矩阵重置为3x3单位矩阵:
-				<code>
-1, 0, 0
-0, 1, 0
-0, 0, 1
-		</code>
-
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this makeRotation]( [param:Float theta] )</h3>
 		<p>
@@ -129,38 +210,114 @@ zAxis = (c, f, i)
 
 		Sets this matrix as a 2D rotational transformation by [page:Float theta] radians.
 		The resulting matrix will be:
-		<code>
-cos(&theta;) -sin(&theta;) 0
-sin(&theta;) cos(&theta;)  0
-0      0       1
-		</code>
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>-sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd>
+							<mi>sin</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mi>cos</mi>
+							<mi>&theta;</mi>
+						</mtd>
+						<mtd>
+							<mn>0</mn>
+						</mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this makeScale]( [param:Float x], [param:Float y] )</h3>
 		<p>
 		[page:Float x] - the amount to scale in the X axis.<br />
 		[page:Float y] - the amount to scale in the Y axis.<br />
 
-		Sets this matrix as a 2D scale transform:
-		<code>
-x, 0, 0,
-0, y, 0,
-0, 0, 1
-		</code>
+		Sets this matrix as a 2D scale transform:<br /><br />
+
+		<math>
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>x</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+						<mtd><mn>0</mn></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 		</p>
 
+		<h3>[method:this makeTranslation]( [param:Vector2 v] )</h3>
 		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y] )</h3>
 		<p>
+		[page:Vector2 v] a translation transform from vector.<br />
+		or<br />
 		[page:Float x] - the amount to translate in the X axis.<br />
 		[page:Float y] - the amount to translate in the Y axis.<br />
 
 		Sets this matrix as a 2D translation transform:
-		<code>
-1, 0, x,
-0, 1, y,
-0, 0, 1
-		</code>
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mi>x</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+						<mtd><mi>y</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>0</mn></mtd>
+						<mtd><mn>1</mn></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this multiply]( [param:Matrix3 m] )</h3>
 		<p>将当前矩阵乘以矩阵[page:Matrix3 m]。</p>
@@ -173,15 +330,32 @@ x, 0, 0,
 
 		<h3>[method:this set]( [param:Float n11], [param:Float n12], [param:Float n13], [param:Float n21], [param:Float n22], [param:Float n23], [param:Float n31], [param:Float n32], [param:Float n33] )</h3>
 		<p>
-		[page:Float n11] - 设置第一行第一列的值。<br />
-		[page:Float n12] - 设置第一行第二列的值。<br />
-		...<br />
-		...<br />
-		[page:Float n32] - 设置第三行第二列的值。<br />
-		[page:Float n33] - 设置第三行第三列的值。<br /><br />
-
-		使用行优先 [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major] 的格式来设置该矩阵。
+		使用行优先 [link:https://en.wikipedia.org/wiki/Row-_and_column-major_order row-major] 的格式来设置该矩阵:
 		</p>
+
+		<math display="block">
+			<mrow>
+				<mo>[</mo>
+				<mtable>
+					<mtr>
+						<mtd><mi>n11</mi></mtd>
+						<mtd><mi>n12</mi></mtd>
+						<mtd><mi>n13</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n21</mi></mtd>
+						<mtd><mi>n22</mi></mtd>
+						<mtd><mi>n23</mi></mtd>
+					</mtr>
+					<mtr>
+						<mtd><mi>n31</mi></mtd>
+						<mtd><mi>n32</mi></mtd>
+						<mtd><mi>n33</mi></mtd>
+					</mtr>
+				</mtable>
+				<mo>]</mo>
+			</mrow>
+		</math>
 
 		<h3>[method:this premultiply]( [param:Matrix3 m] )</h3>
 		<p>将矩阵[page:Matrix3 m]乘以当前矩阵。</p>

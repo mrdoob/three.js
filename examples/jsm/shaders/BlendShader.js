@@ -4,6 +4,8 @@
 
 const BlendShader = {
 
+	name: 'BlendShader',
+
 	uniforms: {
 
 		'tDiffuse1': { value: null },
@@ -38,8 +40,7 @@ const BlendShader = {
 
 			vec4 texel1 = texture2D( tDiffuse1, vUv );
 			vec4 texel2 = texture2D( tDiffuse2, vUv );
-			gl_FragColor = mix( texel1, texel2, mixRatio );
-			gl_FragColor.a *= opacity;
+			gl_FragColor = opacity * mix( texel1, texel2, mixRatio );
 
 		}`
 

@@ -1,5 +1,6 @@
 export const vertex = /* glsl */`
 #include <common>
+#include <batching_pars_vertex>
 #include <fog_pars_vertex>
 #include <morphtarget_pars_vertex>
 #include <skinning_pars_vertex>
@@ -8,7 +9,10 @@ export const vertex = /* glsl */`
 
 void main() {
 
+	#include <batching_vertex>
+
 	#include <beginnormal_vertex>
+	#include <morphinstance_vertex>
 	#include <morphnormal_vertex>
 	#include <skinbase_vertex>
 	#include <skinnormal_vertex>
@@ -47,7 +51,7 @@ void main() {
 	gl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );
 
 	#include <tonemapping_fragment>
-	#include <encodings_fragment>
+	#include <colorspace_fragment>
 	#include <fog_fragment>
 
 }

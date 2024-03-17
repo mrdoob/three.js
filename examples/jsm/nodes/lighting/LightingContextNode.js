@@ -1,75 +1,57 @@
 import ContextNode from '../core/ContextNode.js';
-import { temp } from '../core/VarNode.js';
-import { add } from '../math/OperatorNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeProxy, float, vec3 } from '../shadernode/ShaderNode.js';
 
 class LightingContextNode extends ContextNode {
 
-	constructor( node, lightingModelNode = null ) {
+	constructor( node, lightingModel = null, backdropNode = null, backdropAlphaNode = null ) {
 
 		super( node );
 
-		this.lightingModelNode = lightingModelNode;
+		this.lightingModel = lightingModel;
+		this.backdropNode = backdropNode;
+		this.backdropAlphaNode = backdropAlphaNode;
+
+		this._context = null;
 
 	}
 
-	getNodeType( /*builder*/ ) {
+	getContext() {
 
-		return 'vec3';
+		const { backdropNode, backdropAlphaNode } = this;
 
-	}
-
-	construct( builder ) {
-
-		const { lightingModelNode } = this;
-
-		const context = this.context = {}; // reset context
-		const properties = builder.getNodeProperties( this );
-
-		const directDiffuse = temp( vec3() ),
-			directSpecular = temp( vec3() ),
-			indirectDiffuse = temp( vec3() ),
-			indirectSpecular = temp( vec3() ),
-			total = add( directDiffuse, directSpecular, indirectDiffuse, indirectSpecular );
+		const directDiffuse = vec3().temp( 'directDiffuse' ),
+			directSpecular = vec3().temp( 'directSpecular' ),
+			indirectDiffuse = vec3().temp( 'indirectDiffuse' ),
+			indirectSpecular = vec3().temp( 'indirectSpecular' );
 
 		const reflectedLight = {
 			directDiffuse,
 			directSpecular,
 			indirectDiffuse,
-			indirectSpecular,
-			total
+			indirectSpecular
 		};
 
-		const lighting = {
-			radiance: temp( vec3() ),
-			irradiance: temp( vec3() ),
-			iblIrradiance: temp( vec3() ),
-			ambientOcclusion: temp( float( 1 ) )
+		const context = {
+			radiance: vec3().temp( 'radiance' ),
+			irradiance: vec3().temp( 'irradiance' ),
+			iblIrradiance: vec3().temp( 'iblIrradiance' ),
+			ambientOcclusion: float( 1 ).temp( 'ambientOcclusion' ),
+			reflectedLight,
+			backdrop: backdropNode,
+			backdropAlpha: backdropAlphaNode
 		};
 
-		Object.assign( properties, reflectedLight, lighting );
-		Object.assign( context, lighting );
-
-		context.reflectedLight = reflectedLight;
-		context.lightingModelNode = lightingModelNode || context.lightingModelNode;
-
-		if ( lightingModelNode && lightingModelNode.indirectDiffuse ) lightingModelNode.indirectDiffuse.call( context );
-		if ( lightingModelNode && lightingModelNode.indirectSpecular ) lightingModelNode.indirectSpecular.call( context );
-		if ( lightingModelNode && lightingModelNode.ambientOcclusion ) lightingModelNode.ambientOcclusion.call( context );
-
-		return super.construct( builder );
+		return context;
 
 	}
 
-	generate( builder ) {
+	setup( builder ) {
 
-		const { context } = this;
-		const type = this.getNodeType( builder );
+		this.context = this._context || ( this._context = this.getContext() );
+		this.context.lightingModel = this.lightingModel || builder.context.lightingModel;
 
-		super.generate( builder, type );
-
-		return context.reflectedLight.total.build( builder, type );
+		return super.setup( builder );
 
 	}
 
@@ -81,4 +63,4 @@ export const lightingContext = nodeProxy( LightingContextNode );
 
 addNodeElement( 'lightingContext', lightingContext );
 
-addNodeClass( LightingContextNode );
+addNodeClass( 'LightingContextNode', LightingContextNode );
