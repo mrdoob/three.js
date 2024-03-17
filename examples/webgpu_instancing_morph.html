@@ -102,6 +102,7 @@
 					dummy = glb.scene.children[ 0 ];
 
 					mesh = new THREE.InstancedMesh( dummy.geometry, new MeshStandardNodeMaterial( {
+						flatShading: true,
 					} ), 1024 );
 
 					mesh.castShadow = true;

@@ -5,7 +5,7 @@ import { property } from '../core/PropertyNode.js';
 import { normalize } from '../math/MathNode.js';
 import { cameraViewMatrix } from './CameraNode.js';
 import { modelNormalMatrix } from './ModelNode.js';
-import { nodeImmutable } from '../shadernode/ShaderNode.js';
+import { nodeImmutable, vec3 } from '../shadernode/ShaderNode.js';
 
 class NormalNode extends Node {
 
@@ -41,7 +41,7 @@ class NormalNode extends Node {
 
 			if ( geometryAttribute === false ) {
 
-				outputNode = attribute( 'position', 'vec3' );
+				outputNode = vec3( 0, 1, 0 );
 
 			} else {
 
