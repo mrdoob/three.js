@@ -129,7 +129,7 @@ class Skeleton {
 	}
 
 	update() {
-		
+
 		const bones = this.bones;
 		const boneInverses = this.boneInverses;
 		const boneMatrices = this.boneMatrices;
@@ -144,10 +144,12 @@ class Skeleton {
 			const matrix = bones[ i ] ? bones[ i ].matrixWorld : _identityMatrix;
 			_offsetMatrix.multiplyMatrices( matrix, boneInverses[ i ] );
 
-			if (this.useDualQuaternion) {
+			if ( this.useDualQuaternion ) {
+
 				const dq = _offsetDualQuaternion.fromMatrix4( _offsetMatrix );
 				dq.toArray( boneMatrices, i * 16 );
 				continue;
+
 			}
 
 			_offsetMatrix.toArray( boneMatrices, i * 16 );
