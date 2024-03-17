@@ -79,7 +79,7 @@ export default /* glsl */`
 		vec4 qd = dq[1];
 		vec3 pos = v.xyz + 2.0 * cross( qr.xyz, cross( qr.xyz, v.xyz ) + qr.w * v.xyz ); // Quaternion Rotation of a Vector            
 		vec3 tran = 2.0 * ( qr.w * qd.xyz - qd.w * qr.xyz + cross( qr.xyz, qd.xyz ));	 // Pull out Translation from DQ
-		return vec4(pos + tran, 0.0);
+		return vec4(pos + tran, 1.0);
 	}
 
 	#endif
