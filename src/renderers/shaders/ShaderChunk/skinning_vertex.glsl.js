@@ -5,10 +5,11 @@ export default /* glsl */`
 
 	#ifdef DUAL_QUATERNION_SKINNING
 
-	mat2x4 boneDualQuatX = getDualQuaternionFromMatrix( boneMatX );
-	mat2x4 boneDualQuatY = getDualQuaternionFromMatrix( boneMatY );
-	mat2x4 boneDualQuatZ = getDualQuaternionFromMatrix( boneMatZ );
-	mat2x4 boneDualQuatW = getDualQuaternionFromMatrix( boneMatW );
+	mat2x4 boneDualQuatX = getBoneDualQuaternion( skinIndex.x );
+	mat2x4 boneDualQuatY = getBoneDualQuaternion( skinIndex.y );
+	mat2x4 boneDualQuatZ = getBoneDualQuaternion( skinIndex.z );
+	mat2x4 boneDualQuatW = getBoneDualQuaternion( skinIndex.w );
+
 	vec4 normalizedSkinWeight = normalize( skinWeight );
 
     if ( dot(boneDualQuatX[0], boneDualQuatY[0]) < 0.0 ) {
