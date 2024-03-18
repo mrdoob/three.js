@@ -62,7 +62,7 @@
 
 		//
 
-		const MAX_GEOMETRY_COUNT = 40000;
+		const MAX_GEOMETRY_COUNT = 20000;
 
 		const Method = {
 			BATCHED: 'BATCHED',
@@ -72,7 +72,7 @@
 		const api = {
 			webgpu: true,
 			method: Method.BATCHED,
-			count: MAX_GEOMETRY_COUNT,
+			count: 512,
 			dynamic: 16,
 
 			sortObjects: true,
