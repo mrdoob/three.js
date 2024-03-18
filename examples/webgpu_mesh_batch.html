@@ -64,14 +64,8 @@
 
 		const MAX_GEOMETRY_COUNT = 20000;
 
-		const Method = {
-			BATCHED: 'BATCHED',
-			NAIVE: 'NAIVE'
-		};
-
 		const api = {
 			webgpu: true,
-			method: Method.BATCHED,
 			count: 512,
 			dynamic: 16,
 
@@ -154,34 +148,7 @@
 		function initMesh() {
 
 			cleanup();
-
-			if ( api.method === Method.BATCHED ) {
-
-				initBatchedMesh();
-
-			} else {
-
-				initRegularMesh();
-
-			}
-
-		}
-
-		function initRegularMesh() {
-
-			mesh = new THREE.Group();
-			const material = createMaterial();
-
-			for ( let i = 0; i < api.count; i ++ ) {
-
-				const child = new THREE.Mesh( geometries[ i % geometries.length ], material );
-				randomizeMatrix( child.matrix );
-				child.matrix.decompose( child.position, child.quaternion, child.scale );
-				child.userData.rotationSpeed = randomizeRotationSpeed( new THREE.Euler() );
-				mesh.add( child );
-
-			}
-
+			initBatchedMesh();
 
 		}
 
@@ -214,6 +181,7 @@
 
 			}
 
+			scene.add( mesh );
 
 		}
 
@@ -224,6 +192,7 @@
 			if ( renderer ) {
 
 				renderer.dispose();
+				controls.dispose();
 				document.body.removeChild( stats.dom );
 				document.body.removeChild( renderer.domElement );
 
@@ -264,6 +233,10 @@
 			document.body.appendChild( renderer.domElement );
 
 
+
+			initGeometries();
+			initMesh();
+
 			// controls
 
 			controls = new OrbitControls( camera, renderer.domElement );
@@ -290,7 +263,6 @@
 			} );
 			gui.add( api, 'count', 1, MAX_GEOMETRY_COUNT ).step( 1 ).onChange( initMesh );
 			gui.add( api, 'dynamic', 0, MAX_GEOMETRY_COUNT ).step( 1 );
-			gui.add( api, 'method', Method ).onChange( initMesh );
 
 			gui.add( api, 'opacity', 0, 1 ).onChange( v => {
 
@@ -320,9 +292,6 @@
 			window.addEventListener( 'resize', onWindowResize );
 
 
-			initGeometries();
-			initMesh();
-			scene.add( mesh );
 
 
 			function onWindowResize() {
@@ -368,33 +337,15 @@
 
 				const loopNum = Math.min( api.count, api.dynamic );
 
-				if ( api.method === Method.BATCHED ) {
 
-					for ( let i = 0; i < loopNum; i ++ ) {
+				for ( let i = 0; i < loopNum; i ++ ) {
 
-						const rotationMatrix = mesh.userData.rotationSpeeds[ i ];
-						const id = ids[ i ];
+					const rotationMatrix = mesh.userData.rotationSpeeds[ i ];
+					const id = ids[ i ];
 
-						mesh.getMatrixAt( id, matrix );
-						matrix.multiply( rotationMatrix );
-						mesh.setMatrixAt( id, matrix );
-
-					}
-
-				} else {
-
-					for ( let i = 0; i < loopNum; i ++ ) {
-
-						const child = mesh.children[ i ];
-						const rotationSpeed = child.userData.rotationSpeed;
-
-						child.rotation.set(
-							child.rotation.x + rotationSpeed.x,
-							child.rotation.y + rotationSpeed.y,
-							child.rotation.z + rotationSpeed.z
-						);
-
-					}
+					mesh.getMatrixAt( id, matrix );
+					matrix.multiply( rotationMatrix );
+					mesh.setMatrixAt( id, matrix );
 
 				}
 
