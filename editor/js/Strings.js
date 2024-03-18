@@ -212,7 +212,7 @@ function Strings( config ) {
 			'sidebar/geometry/text_geometry/text': 'Text',
 			'sidebar/geometry/text_geometry/size': 'Font size',
 			'sidebar/geometry/text_geometry/depth': 'Extrude depth',
-			'sidebar/geometry/text_geometry/depth': 'Scale',
+			'sidebar/geometry/text_geometry/scale': 'Scale',
 			'sidebar/geometry/text_geometry/curveseg': 'Curve segments',
 			'sidebar/geometry/text_geometry/bevelenabled': 'Bevel enabled',
 			'sidebar/geometry/text_geometry/bevelthickness': 'Bevel thickness',
