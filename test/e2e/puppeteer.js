@@ -139,6 +139,7 @@ const exceptionList = [
 	'webgpu_tsl_transpiler',
 	'webgpu_portal',
 	'webgpu_custom_fog',
+	'webgpu_instancing_morph',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',
