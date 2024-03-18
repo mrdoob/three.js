@@ -73,7 +73,7 @@
 		<p>Returns this mixer's root object.</p>
 
 		<h3>[method:this stopAllAction]()</h3>
-		<p>Deactivates all previously scheduled actions on this mixer, calling [page:AnimationAction.stop]() on all actions.</p>
+		<p>Deactivates all previously scheduled actions on this mixer.</p>
 
 		<h3>[method:this update]([param:Number deltaTimeInSeconds])</h3>
 		<p>
@@ -102,8 +102,8 @@
 		<p>
 			Deallocates all memory resources for a root object. Before using this
 			method make sure to call [page:AnimationAction.stop]() for all related
-			actions. Note that [page:.stopAllAction]() will call .stop() on all
-			actions which is convenient when the mixer operates on a single root.
+			actions or alternatively [page:.stopAllAction]() when the mixer operates 
+			on a single root.
 		</p>
 
 		<h3>[method:undefined uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])
