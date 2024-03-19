@@ -6,6 +6,8 @@ import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, ma
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
+import { batch } from '../accessors/BatchNode.js';
+
 import { positionLocal, positionView } from '../accessors/PositionNode.js';
 import { skinningReference } from '../accessors/SkinningNode.js';
 import { morphReference } from '../accessors/MorphNode.js';
@@ -206,6 +208,12 @@ class NodeMaterial extends ShaderMaterial {
 		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
 
 			instance( object ).append();
+
+		}
+
+		if ( object.isBatchedMesh ) {
+
+			batch( object ).append();
 
 		}
 
