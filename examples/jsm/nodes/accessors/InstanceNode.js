@@ -1,9 +1,10 @@
 import Node, { addNodeClass } from '../core/Node.js';
+import { varyingProperty } from '../core/PropertyNode.js';
 import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './BufferAttributeNode.js';
 import { normalLocal } from './NormalNode.js';
 import { positionLocal } from './PositionNode.js';
 import { nodeProxy, vec3, mat3, mat4 } from '../shadernode/ShaderNode.js';
-import { DynamicDrawUsage, InstancedInterleavedBuffer } from 'three';
+import { DynamicDrawUsage, InstancedInterleavedBuffer, InstancedBufferAttribute } from 'three';
 
 class InstanceNode extends Node {
 
@@ -15,15 +16,18 @@ class InstanceNode extends Node {
 
 		this.instanceMatrixNode = null;
 
+		this.instanceColorNode = null;
+
 	}
 
 	setup( /*builder*/ ) {
 
 		let instanceMatrixNode = this.instanceMatrixNode;
 
+		const instanceMesh = this.instanceMesh;
+
 		if ( instanceMatrixNode === null ) {
 
-			const instanceMesh = this.instanceMesh;
 			const instanceAttribute = instanceMesh.instanceMatrix;
 			const buffer = new InstancedInterleavedBuffer( instanceAttribute.array, 16, 1 );
 
@@ -43,6 +47,17 @@ class InstanceNode extends Node {
 
 		}
 
+		const instanceColorAttribute = instanceMesh.instanceColor;
+
+		if ( instanceColorAttribute && this.instanceColorNode === null ) {
+
+			const buffer = new InstancedBufferAttribute( instanceColorAttribute.array, 3 );
+			const bufferFn = instanceColorAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
+
+			this.instanceColorNode = vec3( bufferFn( buffer, 'vec3', 3, 0 ) );
+
+		}
+
 		// POSITION
 
 		const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
@@ -59,6 +74,14 @@ class InstanceNode extends Node {
 
 		positionLocal.assign( instancePosition );
 		normalLocal.assign( instanceNormal );
+
+		// COLOR
+
+		if ( this.instanceColorNode !== null ) {
+
+			varyingProperty( 'vec3', 'vInstanceColor' ).assign( this.instanceColorNode );
+
+		}
 
 	}
 
