@@ -29,8 +29,6 @@ const LUTShader = {
 	fragmentShader: /* glsl */`
 
 		uniform float lutSize;
-
-		precision highp sampler3D;
 		uniform sampler3D lut;
 
 		varying vec2 vUv;
