@@ -19,4 +19,3 @@ export * from './TorusGeometry.js';
 export * from './TorusKnotGeometry.js';
 export * from './TubeGeometry.js';
 export * from './WireframeGeometry.js';
-export * from '../../examples/jsm/geometries/TextGeometry.js';
