@@ -6,9 +6,11 @@ import { Bone } from './Bone.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import * as MathUtils from '../math/MathUtils.js';
+import { DualQuaternion } from '../math/DualQuaternion.js';
 
 const _offsetMatrix = /*@__PURE__*/ new Matrix4();
 const _identityMatrix = /*@__PURE__*/ new Matrix4();
+const _offsetDualQuaternion = /*@__PURE__*/ new DualQuaternion();
 
 class Skeleton {
 
@@ -21,6 +23,8 @@ class Skeleton {
 		this.boneMatrices = null;
 
 		this.boneTexture = null;
+
+		this.useDualQuaternion = false;
 
 		this.init();
 
@@ -138,8 +142,16 @@ class Skeleton {
 			// compute the offset between the current and the original transform
 
 			const matrix = bones[ i ] ? bones[ i ].matrixWorld : _identityMatrix;
-
 			_offsetMatrix.multiplyMatrices( matrix, boneInverses[ i ] );
+
+			if ( this.useDualQuaternion ) {
+
+				const dq = _offsetDualQuaternion.fromMatrix4( _offsetMatrix );
+				dq.toArray( boneMatrices, i * 16 );
+				continue;
+
+			}
+
 			_offsetMatrix.toArray( boneMatrices, i * 16 );
 
 		}
@@ -160,8 +172,13 @@ class Skeleton {
 
 	computeBoneTexture() {
 
+		// Depending on the skinning type, the bone texture is either a 4x4 (Matrix4) or 4x4 (Mat2x4 + vec4 + vec4)
+		// Linear Blend Skinning:
 		// layout (1 matrix = 4 pixels)
 		//      RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
+		// Dual Quaternion Skinning:
+		// layout (1 dual quaternion and 1 scale vector with padding = 4 pixels)
+		//      RGBA RGBA RGBA RGBA (=> dual_quaternion_real, dual_quaternion_dual, scale, padding)
 		//  with  8x8  pixel texture max   16 bones * 4 pixels =  (8 * 8)
 		//       16x16 pixel texture max   64 bones * 4 pixels = (16 * 16)
 		//       32x32 pixel texture max  256 bones * 4 pixels = (32 * 32)

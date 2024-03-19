@@ -37,6 +37,8 @@ class SkinnedMesh extends Mesh {
 		this.boundingBox = null;
 		this.boundingSphere = null;
 
+		this.useDualQuaternionSkinning = false;
+
 	}
 
 	computeBoundingBox() {
