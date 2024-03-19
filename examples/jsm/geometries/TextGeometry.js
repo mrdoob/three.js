@@ -38,7 +38,7 @@ class TextGeometry extends ExtrudeGeometry {
 
 			if ( parameters.depth === undefined && parameters.height !== undefined ) {
 
-				console.warn( '.height in TextGeometry is now depreciated. Please use .depth instead' );
+				console.warn( 'THREE.TextGeometry: .height is now depreciated. Please use .depth instead' ); // @deprecated, r163
 
 			}
 
