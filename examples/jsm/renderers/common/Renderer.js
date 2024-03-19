@@ -332,7 +332,7 @@ class Renderer {
 
 	}
 
-	_renderScene( scene, camera ) {
+	async _renderScene( scene, camera ) {
 
 		// preserve render tree
 
