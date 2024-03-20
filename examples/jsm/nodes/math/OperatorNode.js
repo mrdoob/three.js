@@ -51,11 +51,11 @@ class OperatorNode extends TempNode {
 
 			return builder.getIntegerType( typeA );
 
-		} else if ( op === '!' || op === '==' || op === '&&' || op === '||' || op === '^^' ) {
+		} else if ( op === '!' || op === '&&' || op === '||' || op === '^^' ) {
 
 			return 'bool';
 
-		} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' ) {
+		} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' || op === '!=' ) {
 
 			const typeLength = output ? builder.getTypeLength( output ) : Math.max( builder.getTypeLength( typeA ), builder.getTypeLength( typeB ) );
 
@@ -110,7 +110,7 @@ class OperatorNode extends TempNode {
 			typeA = aNode.getNodeType( builder );
 			typeB = typeof bNode !== 'undefined' ? bNode.getNodeType( builder ) : null;
 
-			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' ) {
+			if ( op === '<' || op === '>' || op === '<=' || op === '>=' || op === '==' || op === '!=' ) {
 
 				if ( builder.isVector( typeA ) ) {
 

@@ -57,13 +57,9 @@ class MathNode extends TempNode {
 
 			return 'vec3';
 
-		} else if ( method === MathNode.ALL ) {
+		} else if ( method === MathNode.ALL || method === MathNode.ANY ) {
 
 			return 'bool';
-
-		} else if ( method === MathNode.EQUALS ) {
-
-			return builder.changeComponentType( this.aNode.getNodeType( builder ), 'bool' );
 
 		} else if ( method === MathNode.MOD ) {
 
