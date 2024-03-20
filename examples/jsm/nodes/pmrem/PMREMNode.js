@@ -30,9 +30,21 @@ function _getPMREMFromTexture( texture ) {
 
 		if ( texture.isCubeTexture ) {
 
+			if ( texture.source.data.some( ( texture ) => texture === undefined ) ) {
+
+				throw new Error( 'PMREMNode: Undefined texture in CubeTexture. Use onLoad callback or async loader' );
+
+			}
+
 			cacheTexture = _generator.fromCubemap( texture );
 
 		} else {
+
+			if ( texture.image === undefined ) {
+
+				throw new Error( 'PMREMNode: Undefined image in Texture. Use onLoad callback or async loader' );
+
+			}
 
 			cacheTexture = _generator.fromEquirectangular( texture );
 
