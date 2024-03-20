@@ -409,19 +409,20 @@ function buildPrimvars( attributes ) {
 
 	}
 
-	  // Handle vertex colors
-	  const colorAttribute = attributes.color;
-	
-	  if (colorAttribute !== undefined) {
-	
-	    const count = colorAttribute.count;
-	
-	    string += `
-	      color3f[] primvars:displayColor = [${buildVector3Array(colorAttribute, count)}] (
+	// vertex colors
+
+	const colorAttribute = attributes.color;
+
+	if ( colorAttribute !== undefined ) {
+
+		const count = colorAttribute.count;
+
+		string += `
+	color3f[] primvars:displayColor = [${buildVector3Array( colorAttribute, count )}] (
 		interpolation = "vertex"
-	      )`;
-	
-	  }
+		)`;
+
+	}
 
 	return string;
 
