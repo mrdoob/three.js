@@ -48,8 +48,7 @@ class JoinNode extends TempNode {
 
 		}
 
-		const snippet = `${ builder.getType( type ) }( ${ snippetValues.join( ', ' ) } )`;
-
+		const snippet = builder.formatOperation( '()', builder.getType( type ), snippetValues );
 		return builder.format( snippet, type, output );
 
 	}

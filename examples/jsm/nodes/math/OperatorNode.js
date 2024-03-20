@@ -156,54 +156,8 @@ class OperatorNode extends TempNode {
 		const a = aNode.build( builder, typeA );
 		const b = typeof bNode !== 'undefined' ? bNode.build( builder, typeB ) : null;
 
-		const outputLength = builder.getTypeLength( output );
-		const fnOpSnippet = builder.getFunctionOperator( op );
-
-		if ( output !== 'void' ) {
-
-			if ( op === '<' && outputLength > 1 ) {
-
-				return builder.format( `${ builder.getMethod( 'lessThan' ) }( ${ a }, ${ b } )`, type, output );
-
-			} else if ( op === '<=' && outputLength > 1 ) {
-
-				return builder.format( `${ builder.getMethod( 'lessThanEqual' ) }( ${ a }, ${ b } )`, type, output );
-
-			} else if ( op === '>' && outputLength > 1 ) {
-
-				return builder.format( `${ builder.getMethod( 'greaterThan' ) }( ${ a }, ${ b } )`, type, output );
-
-			} else if ( op === '>=' && outputLength > 1 ) {
-
-				return builder.format( `${ builder.getMethod( 'greaterThanEqual' ) }( ${ a }, ${ b } )`, type, output );
-
-			} else if ( op === '!' || op === '~' ) {
-
-				return builder.format( `(${op}${a})`, typeA, output );
-
-			} else if ( fnOpSnippet ) {
-
-				return builder.format( `${ fnOpSnippet }( ${ a }, ${ b } )`, type, output );
-
-			} else {
-
-				return builder.format( `( ${ a } ${ op } ${ b } )`, type, output );
-
-			}
-
-		} else if ( typeA !== 'void' ) {
-
-			if ( fnOpSnippet ) {
-
-				return builder.format( `${ fnOpSnippet }( ${ a }, ${ b } )`, type, output );
-
-			} else {
-
-				return builder.format( `${ a } ${ op } ${ b }`, type, output );
-
-			}
-
-		}
+		const snippet = builder.formatOperation( op, a, b, type );
+		return builder.format( snippet, type, output );
 
 	}
 

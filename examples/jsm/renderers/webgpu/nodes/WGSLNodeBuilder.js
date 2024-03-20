@@ -28,10 +28,6 @@ const supports = {
 	storageBuffer: true
 };
 
-const wgslFnOpLib = {
-	'^^': 'threejs_xor'
-};
-
 const wgslTypeLib = {
 	float: 'f32',
 	int: 'i32',
@@ -70,62 +66,10 @@ const wgslTypeLib = {
 	bmat4: 'mat4x4<bool>'
 };
 
-const wgslMethods = {
-	dFdx: 'dpdx',
-	dFdy: '- dpdy',
-	mod_float: 'threejs_mod_float',
-	mod_vec2: 'threejs_mod_vec2',
-	mod_vec3: 'threejs_mod_vec3',
-	mod_vec4: 'threejs_mod_vec4',
-	equals_bool: 'threejs_equals_bool',
-	equals_bvec2: 'threejs_equals_bvec2',
-	equals_bvec3: 'threejs_equals_bvec3',
-	equals_bvec4: 'threejs_equals_bvec4',
-	lessThanEqual: 'threejs_lessThanEqual',
-	greaterThan: 'threejs_greaterThan',
-	inversesqrt: 'inverseSqrt',
-	bitcast: 'bitcast<f32>'
-};
-
 const wgslPolyfill = {
-	threejs_xor: new CodeNode( `
-fn threejs_xor( a : bool, b : bool ) -> bool {
-
-	return ( a || b ) && !( a && b );
-
-}
-` ),
-	lessThanEqual: new CodeNode( `
-fn threejs_lessThanEqual( a : vec3<f32>, b : vec3<f32> ) -> vec3<bool> {
-
-	return vec3<bool>( a.x <= b.x, a.y <= b.y, a.z <= b.z );
-
-}
-` ),
-	greaterThan: new CodeNode( `
-fn threejs_greaterThan( a : vec3<f32>, b : vec3<f32> ) -> vec3<bool> {
-
-	return vec3<bool>( a.x > b.x, a.y > b.y, a.z > b.z );
-
-}
-` ),
-	mod_float: new CodeNode( 'fn threejs_mod_float( x : f32, y : f32 ) -> f32 { return x - y * floor( x / y ); }' ),
-	mod_vec2: new CodeNode( 'fn threejs_mod_vec2( x : vec2f, y : vec2f ) -> vec2f { return x - y * floor( x / y ); }' ),
-	mod_vec3: new CodeNode( 'fn threejs_mod_vec3( x : vec3f, y : vec3f ) -> vec3f { return x - y * floor( x / y ); }' ),
-	mod_vec4: new CodeNode( 'fn threejs_mod_vec4( x : vec4f, y : vec4f ) -> vec4f { return x - y * floor( x / y ); }' ),
-	equals_bool: new CodeNode( 'fn threejs_equals_bool( a : bool, b : bool ) -> bool { return a == b; }' ),
-	equals_bvec2: new CodeNode( 'fn threejs_equals_bvec2( a : vec2f, b : vec2f ) -> vec2<bool> { return vec2<bool>( a.x == b.x, a.y == b.y ); }' ),
-	equals_bvec3: new CodeNode( 'fn threejs_equals_bvec3( a : vec3f, b : vec3f ) -> vec3<bool> { return vec3<bool>( a.x == b.x, a.y == b.y, a.z == b.z ); }' ),
-	equals_bvec4: new CodeNode( 'fn threejs_equals_bvec4( a : vec4f, b : vec4f ) -> vec4<bool> { return vec4<bool>( a.x == b.x, a.y == b.y, a.z == b.z, a.w == b.w ); }' ),
-	repeatWrapping: new CodeNode( `
-fn threejs_repeatWrapping( uv : vec2<f32>, dimension : vec2<u32> ) -> vec2<u32> {
-
-	let uvScaled = vec2<u32>( uv * vec2<f32>( dimension ) );
-
-	return ( ( uvScaled % dimension ) + dimension ) % dimension;
-
-}
-` )
+	xor: ( name, wgslType ) => `fn ${ name }( a : ${ wgslType }, b : ${ wgslType } ) -> ${ wgslType } { return ( a || b ) && !( a && b ); }`,
+	mod: ( name, wgslType ) => `fn ${ name }( x : ${ wgslType }, y : ${ wgslType } ) -> ${ wgslType } { return x - y * floor( x / y ); }`,
+	repeatWrapping: new CodeNode( 'fn threejs_repeatWrapping( uv : vec2f, dimension : vec2u ) -> vec2u { return vec2u( uv * vec2f( dimension ) ) % dimension; }' )
 };
 
 class WGSLNodeBuilder extends NodeBuilder {
@@ -324,22 +268,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 	_getUniformGroupCount( shaderStage ) {
 
 		return Object.keys( this.uniforms[ shaderStage ] ).length;
-
-	}
-
-	getFunctionOperator( op ) {
-
-		const fnOp = wgslFnOpLib[ op ];
-
-		if ( fnOp !== undefined ) {
-
-			this._include( fnOp );
-
-			return fnOp;
-
-		}
-
-		return null;
 
 	}
 
@@ -910,26 +838,6 @@ ${ flowData.code }
 
 	}
 
-	getMethod( method, output = null ) {
-
-		let wgslMethod;
-
-		if ( output !== null ) {
-
-			wgslMethod = this._getWGSLMethod( method + '_' + output );
-
-		}
-
-		if ( wgslMethod === undefined ) {
-
-			wgslMethod = this._getWGSLMethod( method );
-
-		}
-
-		return wgslMethod || method;
-
-	}
-
 	getType( type ) {
 
 		return wgslTypeLib[ type ] || type;
@@ -942,30 +850,9 @@ ${ flowData.code }
 
 	}
 
-	_getWGSLMethod( method ) {
+	_getPolyfills() {
 
-		if ( wgslPolyfill[ method ] !== undefined ) {
-
-			this._include( method );
-
-		}
-
-		return wgslMethods[ method ];
-
-	}
-
-	_include( name ) {
-
-		const codeNode = wgslPolyfill[ name ];
-		codeNode.build( this );
-
-		if ( this.currentFunctionNode !== null ) {
-
-			this.currentFunctionNode.includes.push( codeNode );
-
-		}
-
-		return codeNode;
+		return wgslPolyfill;
 
 	}
 
@@ -1072,6 +959,46 @@ ${vars}
 		return `${structSnippet}
 @binding( ${binding} ) @group( ${group} )
 var<${access}> ${name} : ${structName};`;
+
+	}
+
+	_getOperators() {
+
+		return { // https://www.w3.org/TR/WGSL/#operator-precedence-associativity
+			ops: [
+				{ ops: [ '[]', '()', '.' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ 'un-', 'un!', 'un~', 'un*', 'un&' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ 'post++', 'post--' ], maxPrec: Infinity, allowSelf: true }, // https://www.w3.org/TR/WGSL/#increment-decrement
+				{ ops: [ '*', '/', '%' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '+', '-' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '<<', '>>' ], maxPrec: 1, allowSelf: false },
+				{ ops: [ '<', '>', '<=', '>=', '==', '!=' ], maxPrec: Infinity, allowSelf: false },
+				{ ops: [ '&' ], maxPrec: 1, allowSelf: true },
+				{ ops: [ '^' ], maxPrec: 1, allowSelf: true },
+				{ ops: [ '|' ], maxPrec: 1, allowSelf: true },
+				{ ops: [ '&&' ], maxPrec: 6, allowSelf: true },
+				{ ops: [ '||' ], maxPrec: 6, allowSelf: true },
+				{ ops: [ '=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '>>=', '<<=' ], maxPrec: Infinity, allowSelf: true }, // https://www.w3.org/TR/WGSL/#compound-assignment-sec
+				{ ops: [ ',' ], maxPrec: Infinity, allowSelf: true }
+			],
+			replace: {
+				// missing functions in WGSL
+				'^^': 'threejs_xor()',
+				'mod()': 'threejs_mod()',
+
+				// functions with different names in WGSL
+				'dFdx()': 'dpdx()',
+				'dFdy()': '- dpdy()',
+				'inversesqrt()': 'inverseSqrt()',
+				'bitcast()': 'bitcast<f32>()',
+
+				// there are no prefix increments/decrements in WGSL
+				'++': 'post++',
+				'pre++': 'post++',
+				'--': 'post--',
+				'pre--': 'post--'
+			}
+		};
 
 	}
 

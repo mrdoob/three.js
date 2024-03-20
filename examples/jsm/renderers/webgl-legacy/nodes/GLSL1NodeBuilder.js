@@ -1,9 +1,5 @@
 import { MathNode, GLSLNodeParser, NodeBuilder } from '../../../nodes/Nodes.js';
 
-const glslMethods = {
-	[ MathNode.ATAN2 ]: 'atan'
-};
-
 const precisionLib = {
 	low: 'lowp',
 	medium: 'mediump',
@@ -15,12 +11,6 @@ class GLSL1NodeBuilder extends NodeBuilder {
 	constructor( object, renderer, scene = null ) {
 
 		super( object, renderer, new GLSLNodeParser(), scene );
-
-	}
-
-	getMethod( method ) {
-
-		return glslMethods[ method ] || method;
 
 	}
 
@@ -310,6 +300,37 @@ void main() {
 			//this.computeShader = this._getGLSLComputeCode( shadersData.compute );
 
 		}
+
+	}
+
+	_getOperators() {
+
+		return { // https://www.khronos.org/files/opengles_shading_language.pdf, section 5.1
+			ops: [
+				{ ops: [ '[]', '()', '.', 'post++', 'post--' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ 'pre++', 'pre--', 'un+', 'un-', 'un!' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '*', '/' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '+', '-' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '<', '>', '<=', '>=' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '==', '!=' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '&&' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '^^' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '||' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '=', '+=', '-=', '*=', '/=' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ ',' ], maxPrec: Infinity, allowSelf: true }
+			],
+			replace: {
+				// section 5.9
+				'<': 'lessThan()',
+				'<=': 'lessThanEqual()',
+				'>': 'greaterThan()',
+				'>=': 'greaterThanEqual()',
+				'==': 'equal()',
+				'!=': 'notEqual()',
+
+				'atan2()': 'atan()'
+			}
+		};
 
 	}
 
