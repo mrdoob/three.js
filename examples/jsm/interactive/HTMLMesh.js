@@ -241,9 +241,11 @@ function html2canvas( element ) {
 
 	function drawElement( element, style ) {
 
-	        // Do not render invisible elements, comments and scripts.
-		if (element.nodeType === Node.COMMENT_NODE || element.nodeName === 'SCRIPT' || (element.style && element.style.display === 'none')) {
+		// Do not render invisible elements, comments and scripts.
+		if ( element.nodeType === Node.COMMENT_NODE || element.nodeName === 'SCRIPT' || ( element.style && element.style.display === 'none' ) ) {
+
 			return;
+
 		}
 
 		let x = 0, y = 0, width = 0, height = 0;
