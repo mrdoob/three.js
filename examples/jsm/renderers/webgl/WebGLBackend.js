@@ -699,7 +699,24 @@ class WebGLBackend extends Backend {
 
 		if ( object.isBatchedMesh ) {
 
-			renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+			if ( instanceCount > 1 ) {
+
+				// TODO: Better support with InstancedBatchedMesh
+				if ( object._multiDrawInstances === undefined ) {
+
+					object._multiDrawInstances = new Int32Array( object._maxGeometryCount );
+
+				}
+
+				object._multiDrawInstances.fill( instanceCount );
+
+				renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
+
+			} else {
+
+				renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+
+			}
 
 		} else if ( instanceCount > 1 ) {
 

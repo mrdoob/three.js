@@ -205,15 +205,15 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
-
-			instance( object ).append();
-
-		}
-
 		if ( object.isBatchedMesh ) {
 
 			batch( object ).append();
+
+		}
+
+		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
+
+			instance( object ).append();
 
 		}
 
