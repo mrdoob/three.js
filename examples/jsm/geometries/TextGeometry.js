@@ -5,7 +5,7 @@
  *  font: <THREE.Font>, // font
  *
  *  size: <float>, // size of the text
- *  height: <float>, // thickness to extrude text
+ *  depth: <float>, // thickness to extrude text
  *  curveSegments: <int>, // number of points on the curves
  *
  *  bevelEnabled: <bool>, // turn on bevel

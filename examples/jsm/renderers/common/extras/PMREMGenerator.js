@@ -420,7 +420,7 @@ class PMREMGenerator {
 
 			if ( this._cubemapMaterial === null ) {
 
-				this._cubemapMaterial = _getCubemapMaterial();
+				this._cubemapMaterial = _getCubemapMaterial( texture );
 
 			}
 
@@ -428,7 +428,7 @@ class PMREMGenerator {
 
 			if ( this._equirectMaterial === null ) {
 
-				this._equirectMaterial = _getEquirectMaterial();
+				this._equirectMaterial = _getEquirectMaterial( texture );
 
 			}
 
@@ -736,19 +736,19 @@ function _getBlurShader( lodMax, width, height ) {
 
 }
 
-function _getCubemapMaterial() {
+function _getCubemapMaterial( envTexture ) {
 
 	const material = _getMaterial();
-	material.fragmentNode = cubeTexture( texture, outputDirection );
+	material.fragmentNode = cubeTexture( envTexture, outputDirection );
 
 	return material;
 
 }
 
-function _getEquirectMaterial() {
+function _getEquirectMaterial( envTexture ) {
 
 	const material = _getMaterial();
-	material.fragmentNode = texture( texture, equirectUV( outputDirection ), 0 );
+	material.fragmentNode = texture( envTexture, equirectUV( outputDirection ), 0 );
 
 	return material;
 

@@ -87,9 +87,9 @@ function MenubarEdit( editor ) {
 		const center = aabb.getCenter( new Vector3() );
 		const newPosition = new Vector3();
 
-		newPosition.x = object.position.x + ( object.position.x - center.x );
-		newPosition.y = object.position.y + ( object.position.y - center.y );
-		newPosition.z = object.position.z + ( object.position.z - center.z );
+		newPosition.x = object.position.x - center.x;
+		newPosition.y = object.position.y - center.y;
+		newPosition.z = object.position.z - center.z;
 
 		editor.execute( new SetPositionCommand( editor, object, newPosition ) );
 

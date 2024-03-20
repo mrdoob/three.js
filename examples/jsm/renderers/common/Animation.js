@@ -35,6 +35,7 @@ class Animation {
 	dispose() {
 
 		self.cancelAnimationFrame( this.requestId );
+		this.requestId = null;
 
 	}
 

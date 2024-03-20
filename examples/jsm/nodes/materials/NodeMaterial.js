@@ -1,11 +1,13 @@
 import { Material, ShaderMaterial, NoColorSpace, LinearSRGBColorSpace } from 'three';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
-import { output, diffuseColor } from '../core/PropertyNode.js';
+import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
+import { batch } from '../accessors/BatchNode.js';
+
 import { positionLocal, positionView } from '../accessors/PositionNode.js';
 import { skinningReference } from '../accessors/SkinningNode.js';
 import { morphReference } from '../accessors/MorphNode.js';
@@ -203,6 +205,12 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
+		if ( object.isBatchedMesh ) {
+
+			batch( object ).append();
+
+		}
+
 		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
 
 			instance( object ).append();
@@ -224,7 +232,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	setupDiffuseColor( { geometry } ) {
+	setupDiffuseColor( { object, geometry } ) {
 
 		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
 
@@ -233,6 +241,16 @@ class NodeMaterial extends ShaderMaterial {
 		if ( this.vertexColors === true && geometry.hasAttribute( 'color' ) ) {
 
 			colorNode = vec4( colorNode.xyz.mul( attribute( 'color', 'vec3' ) ), colorNode.a );
+
+		}
+
+		// Instanced colors
+
+		if ( object.instanceColor ) {
+
+			const instanceColor = varyingProperty( 'vec3', 'vInstanceColor' );
+
+			colorNode = instanceColor.mul( colorNode );
 
 		}
 
