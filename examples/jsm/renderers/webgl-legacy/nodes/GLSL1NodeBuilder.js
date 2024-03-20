@@ -1,4 +1,4 @@
-import { MathNode, GLSLNodeParser, NodeBuilder } from '../../../nodes/Nodes.js';
+import { GLSLNodeParser, NodeBuilder } from '../../../nodes/Nodes.js';
 
 const precisionLib = {
 	low: 'lowp',

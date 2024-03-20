@@ -957,12 +957,6 @@ class NodeBuilder {
 
 	}
 
-	getFunctionOperator() {
-
-		return null;
-
-	}
-
 	flowChildNode( node, output = null ) {
 
 		const previousFlow = this.flow;
