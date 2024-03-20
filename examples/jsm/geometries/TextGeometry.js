@@ -35,7 +35,15 @@ class TextGeometry extends ExtrudeGeometry {
 
 			// translate parameters to ExtrudeGeometry API
 
-			parameters.depth = parameters.height !== undefined ? parameters.height : 50;
+			if ( parameters.depth === undefined && parameters.height !== undefined ) {
+
+				console.warn( 'THREE.TextGeometry: .height is now depreciated. Please use .depth instead' ); // @deprecated, r163
+
+			}
+
+			parameters.depth = parameters.depth !== undefined ?
+				parameters.depth : parameters.height !== undefined ?
+					parameters.height : 50;
 
 			// defaults
 
