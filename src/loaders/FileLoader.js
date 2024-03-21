@@ -119,11 +119,9 @@ class FileLoader extends Loader {
 
 					// periodically read data into the new stream tracking while download progress
 					const stream = new ReadableStream( {
-						start( controller ) {
+						start: ( controller ) => {
 
-							readData();
-
-							function readData() {
+							const readData = () => {
 
 								reader.read().then( ( { done, value } ) => {
 
@@ -148,9 +146,12 @@ class FileLoader extends Loader {
 
 									}
 
-								} );
+								} ).catch( err => this._handleError( err, url ) );
 
-							}
+							};
+
+							readData();
+
 
 						}
 
@@ -228,32 +229,7 @@ class FileLoader extends Loader {
 				}
 
 			} )
-			.catch( err => {
-
-				// Abort errors and other errors are handled the same
-
-				const callbacks = loading[ url ];
-
-				if ( callbacks === undefined ) {
-
-					// When onLoad was called and url was deleted in `loading`
-					this.manager.itemError( url );
-					throw err;
-
-				}
-
-				delete loading[ url ];
-
-				for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
-
-					const callback = callbacks[ i ];
-					if ( callback.onError ) callback.onError( err );
-
-				}
-
-				this.manager.itemError( url );
-
-			} )
+			.catch( err => this._handleError( err, url ) )
 			.finally( () => {
 
 				this.manager.itemEnd( url );
@@ -275,6 +251,33 @@ class FileLoader extends Loader {
 
 		this.mimeType = value;
 		return this;
+
+	}
+
+	_handleError( err, url ) {
+
+		// Abort errors and other errors are handled the same
+
+		const callbacks = loading[ url ];
+
+		if ( callbacks === undefined ) {
+
+			// When onLoad was called and url was deleted in `loading`
+			this.manager.itemError( url );
+			throw err;
+
+		}
+
+		delete loading[ url ];
+
+		for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+
+			const callback = callbacks[ i ];
+			if ( callback.onError ) callback.onError( err );
+
+		}
+
+		this.manager.itemError( url );
 
 	}
 
