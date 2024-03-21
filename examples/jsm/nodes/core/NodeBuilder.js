@@ -1444,24 +1444,16 @@ class NodeBuilder {
 			if ( rhsOp.op !== '<' && rhsOp.op !== '>' && operators.includes( rhsOp.op + '=' ) ) { // use assignment statement
 
 				op = rhsOp.op + '=';
-				arg2 = arg2.slice( rhsOp.end ).trimLeft();
+				let newArg2 = arg2.slice( rhsOp.end ).trimLeft();
 
-				if ( arg2.startsWith( '(' ) && arg2.endsWith( ')' ) ) { // RHS' second argument could be wrapped in brackets
+				if ( newArg2.startsWith( '(' ) && newArg2.endsWith( ')' ) // RHS' second argument could be wrapped in brackets
+					 && arg2Parsed.find( arg => arg.start >= rhsOp.end ).end === arg2.length ) { // the brackets are indeed outmost, remove them
 
-					let i, diff = 0;
-
-					for ( i = 0; i < arg2.length; i ++ ) {
-
-						if ( arg2[ i ] === '(' ) diff ++;
-						if ( arg2[ i ] === ')' ) diff --;
-
-						if ( diff === 0 ) break;
-
-					}
-
-					if ( i === arg2.length - 1 ) arg2 = arg2.slice( 1, - 1 ).trim(); // the brackets are indeed outmost, remove them
+					newArg2 = newArg2.slice( 1, - 1 ).trim(); 
 
 				}
+
+				arg2 = newArg2;
 
 			}
 
