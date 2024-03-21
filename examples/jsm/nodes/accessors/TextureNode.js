@@ -55,7 +55,7 @@ class TextureNode extends UniformNode {
 
 	}
 
-	updateReference( /*frame*/ ) {
+	setReference( /*state*/ ) {
 
 		return this.value;
 
@@ -123,12 +123,6 @@ class TextureNode extends UniformNode {
 		if ( levelNode === null && builder.context.getTextureLevel ) {
 
 			levelNode = builder.context.getTextureLevel( this );
-
-		}
-
-		if ( levelNode !== null && builder.context.getTextureLevelAlgorithm !== undefined ) {
-
-			levelNode = builder.context.getTextureLevelAlgorithm( this, levelNode );
 
 		}
 

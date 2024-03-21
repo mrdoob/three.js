@@ -29,7 +29,7 @@
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import StorageBufferAttribute from 'three/addons/renderers/common/StorageBufferAttribute.js';
+			import StorageInstancedBufferAttribute from 'three/addons/renderers/common/StorageInstancedBufferAttribute.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -103,7 +103,7 @@
 
 				//
 
-				const createBuffer = ( type = 'vec3' ) => storage( new StorageBufferAttribute( maxParticleCount, 3 ), type, maxParticleCount );
+				const createBuffer = ( type = 'vec3' ) => storage( new StorageInstancedBufferAttribute( maxParticleCount, 3 ), type, maxParticleCount );
 
 				const positionBuffer = createBuffer();
 				const velocityBuffer = createBuffer();
@@ -167,9 +167,8 @@
 
 						position.y = 25;
 
-						ripplePosition.x = position.x;
+						ripplePosition.xz = position.xz;
 						ripplePosition.y = floorPosition;
-						ripplePosition.z = position.z;
 
 						// reset hit time: x = time
 

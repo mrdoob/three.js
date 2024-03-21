@@ -18,6 +18,8 @@ class Animation {
 
 			this.requestId = self.requestAnimationFrame( update );
 
+			if ( this.info.autoReset === true ) this.info.reset();
+
 			this.nodes.nodeFrame.update();
 
 			this.info.frame = this.nodes.nodeFrame.frameId;
@@ -33,6 +35,7 @@ class Animation {
 	dispose() {
 
 		self.cancelAnimationFrame( this.requestId );
+		this.requestId = null;
 
 	}
 

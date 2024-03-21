@@ -15,7 +15,6 @@ class SpotLightHelper extends Object3D {
 
 		this.light = light;
 
-		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
 
 		this.color = color;
@@ -66,6 +65,24 @@ class SpotLightHelper extends Object3D {
 
 		this.light.updateWorldMatrix( true, false );
 		this.light.target.updateWorldMatrix( true, false );
+
+		// update the local matrix based on the parent and light target transforms
+		if ( this.parent ) {
+
+			this.parent.updateWorldMatrix( true );
+
+			this.matrix
+				.copy( this.parent.matrixWorld )
+				.invert()
+				.multiply( this.light.matrixWorld );
+
+		} else {
+
+			this.matrix.copy( this.light.matrixWorld );
+
+		}
+
+		this.matrixWorld.copy( this.light.matrixWorld );
 
 		const coneLength = this.light.distance ? this.light.distance : 1000;
 		const coneWidth = coneLength * Math.tan( this.light.angle );

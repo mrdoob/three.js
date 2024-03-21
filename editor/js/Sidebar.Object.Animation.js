@@ -1,6 +1,6 @@
-import { UIPanel, UIBreak, UIButton, UIDiv, UIText, UINumber, UIRow } from './libs/ui.js';
+import { UIBreak, UIButton, UIDiv, UIText, UINumber, UIRow } from './libs/ui.js';
 
-function SidebarAnimation( editor ) {
+function SidebarObjectAnimation( editor ) {
 
 	const strings = editor.strings;
 	const signals = editor.signals;
@@ -71,7 +71,8 @@ function SidebarAnimation( editor ) {
 
 	} );
 
-	const container = new UIPanel();
+	const container = new UIDiv();
+	container.setMarginTop( '20px' );
 	container.setDisplay( 'none' );
 
 	container.add( new UIText( strings.getKey( 'sidebar/animations' ) ).setTextTransform( 'uppercase' ) );
@@ -89,7 +90,7 @@ function SidebarAnimation( editor ) {
 
 	} );
 
-	mixerTimeScaleRow.add( new UIText( strings.getKey( 'sidebar/animations/timescale' ) ).setWidth( '90px' ) );
+	mixerTimeScaleRow.add( new UIText( strings.getKey( 'sidebar/animations/timescale' ) ).setClass( 'Label' ) );
 	mixerTimeScaleRow.add( mixerTimeScaleNumber );
 
 	container.add( mixerTimeScaleRow );
@@ -98,4 +99,4 @@ function SidebarAnimation( editor ) {
 
 }
 
-export { SidebarAnimation };
+export { SidebarObjectAnimation };

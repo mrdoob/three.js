@@ -555,7 +555,7 @@ addNodeElement( 'append', append );
 export const color = new ConvertType( 'color' );
 
 export const float = new ConvertType( 'float', cacheMaps.float );
-export const int = new ConvertType( 'int', cacheMaps.int );
+export const int = new ConvertType( 'int', cacheMaps.ints );
 export const uint = new ConvertType( 'uint', cacheMaps.uint );
 export const bool = new ConvertType( 'bool', cacheMaps.bool );
 

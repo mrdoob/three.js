@@ -36,23 +36,45 @@ class CondNode extends Node {
 
 	}
 
-	generate( builder ) {
+	generate( builder, output ) {
 
 		const type = this.getNodeType( builder );
 		const context = { tempWrite: false };
 
+		const nodeData = builder.getDataFromNode( this );
+
+		if ( nodeData.nodeProperty !== undefined ) {
+
+			return nodeData.nodeProperty;
+
+		}
+
 		const { ifNode, elseNode } = this;
 
-		const needsProperty = ifNode.getNodeType( builder ) !== 'void' || ( elseNode && elseNode.getNodeType( builder ) !== 'void' );
-		const nodeProperty = needsProperty ? property( type ).build( builder ) : '';
+		const needsOutput = output !== 'void';
+		const nodeProperty = needsOutput ? property( type ).build( builder ) : '';
+
+		nodeData.nodeProperty = nodeProperty;
 
 		const nodeSnippet = contextNode( this.condNode/*, context*/ ).build( builder, 'bool' );
 
 		builder.addFlowCode( `\n${ builder.tab }if ( ${ nodeSnippet } ) {\n\n` ).addFlowTab();
 
-		let ifSnippet = contextNode( this.ifNode, context ).build( builder, type );
+		let ifSnippet = contextNode( ifNode, context ).build( builder, type );
 
-		ifSnippet = needsProperty ? nodeProperty + ' = ' + ifSnippet + ';' : ifSnippet;
+		if ( ifSnippet ) {
+
+			if ( needsOutput ) {
+
+				ifSnippet = nodeProperty + ' = ' + ifSnippet + ';';
+
+			} else {
+
+				ifSnippet = 'return ' + ifSnippet + ';';
+
+			}
+
+		}
 
 		builder.removeFlowTab().addFlowCode( builder.tab + '\t' + ifSnippet + '\n\n' + builder.tab + '}' );
 
@@ -61,7 +83,20 @@ class CondNode extends Node {
 			builder.addFlowCode( ' else {\n\n' ).addFlowTab();
 
 			let elseSnippet = contextNode( elseNode, context ).build( builder, type );
-			elseSnippet = nodeProperty ? nodeProperty + ' = ' + elseSnippet + ';' : elseSnippet;
+
+			if ( elseSnippet ) {
+
+				if ( needsOutput ) {
+
+					elseSnippet = nodeProperty + ' = ' + elseSnippet + ';';
+
+				} else {
+
+					elseSnippet = 'return ' + elseSnippet + ';';
+
+				}
+
+			}
 
 			builder.removeFlowTab().addFlowCode( builder.tab + '\t' + elseSnippet + '\n\n' + builder.tab + '}\n\n' );
 
@@ -71,7 +106,7 @@ class CondNode extends Node {
 
 		}
 
-		return nodeProperty;
+		return builder.format( nodeProperty, type, output );
 
 	}
 

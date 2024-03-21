@@ -62,6 +62,7 @@ class Textures extends DataMap {
 		renderTargetData.depthTexture = depthTexture;
 		renderTargetData.depth = renderTarget.depthBuffer;
 		renderTargetData.stencil = renderTarget.stencilBuffer;
+		renderTargetData.renderTarget = renderTarget;
 
 		if ( renderTargetData.sampleCount !== sampleCount ) {
 

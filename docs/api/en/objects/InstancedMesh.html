@@ -94,17 +94,16 @@
 
 		<h3>[method:undefined computeBoundingBox]()</h3>
 		<p>
-			Computes the bounding box, updating [page:.boundingBox] attribute.<br />
-			Bounding boxes aren't computed by default. They need to be explicitly
-			computed, otherwise they are `null`.
+			Computes the bounding box of the instanced mesh, and updates the [page:.boundingBox] attribute.
+			The bounding box is not computed by the engine; it must be computed by your app.
+			You may need to recompute the bounding box if an instance is transformed via [page:.setMatrixAt]().
 		</p>
 
 		<h3>[method:undefined computeBoundingSphere]()</h3>
 		<p>
-			Computes the bounding sphere, updating [page:.boundingSphere]
-			attribute.<br />
-			Bounding spheres aren't computed by default. They need to be explicitly
-			computed, otherwise they are `null`.
+			Computes the bounding sphere of the instanced mesh, and updates the [page:.boundingSphere] attribute.
+			The engine automatically computes the bounding sphere when it is needed, e.g., for ray casting or view frustum culling.
+			You may need to recompute the bounding sphere if an instance is transformed via [page:.setMatrixAt]().
 		</p>
 
 		<h3>[method:undefined dispose]()</h3>
@@ -190,7 +189,7 @@
 			range [0, count].
 		</p>
 		<p>
-			[page:Matrix4 matrix]: A mesh with [page:Mesh.morphTargetInfluences .morphTargetInfluences] property containing the morph target weights
+			[page:Mesh mesh]: A mesh with [page:Mesh.morphTargetInfluences .morphTargetInfluences] property containing the morph target weights
 			of a single instance.
 		</p>
 		<p>

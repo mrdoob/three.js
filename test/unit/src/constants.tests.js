@@ -72,6 +72,7 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.ACESFilmicToneMapping, 4, 'ACESFilmicToneMapping is equal to 4' );
 		assert.equal( Constants.CustomToneMapping, 5, 'CustomToneMapping is equal to 5' );
 		assert.equal( Constants.AgXToneMapping, 6, 'AgXToneMapping is equal to 6' );
+		assert.equal( Constants.NeutralToneMapping, 7, 'NeutralToneMapping is equal to 7' );
 
 		assert.equal( Constants.AttachedBindMode, 'attached', 'AttachedBindMode is equal to attached' );
 		assert.equal( Constants.DetachedBindMode, 'detached', 'DetachedBindMode is equal to detached' );
@@ -210,8 +211,6 @@ export default QUnit.module( 'Constants', () => {
 
 		assert.equal( Constants.GLSL1, '100', 'GLSL1 is equal to 100' );
 		assert.equal( Constants.GLSL3, '300 es', 'GLSL3 is equal to 300 es' );
-
-		assert.equal( Constants._SRGBAFormat, 1035, '_SRGBAFormat is equal to 1035' );
 
 	} );
 

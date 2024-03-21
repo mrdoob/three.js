@@ -178,8 +178,8 @@ class TransformControls extends Object3D {
 
 	}
 
-	// updateMatrixWorld  updates key transformation variables
-	updateMatrixWorld() {
+	// updateMatrixWorld updates key transformation variables
+	updateMatrixWorld( force ) {
 
 		if ( this.object !== undefined ) {
 
@@ -221,7 +221,7 @@ class TransformControls extends Object3D {
 		this.matrixWorldNeedsUpdate = false;
 		this.matrixWorld.copy( this.matrix );
 
-		super.updateMatrixWorld();
+		super.updateMatrixWorld( false );
 
 	}
 
@@ -229,7 +229,7 @@ class TransformControls extends Object3D {
 
 		if ( this.object === undefined || this.dragging === true ) return;
 
-		_raycaster.setFromCamera( pointer, this.camera );
+		if ( pointer !== null ) _raycaster.setFromCamera( pointer, this.camera );
 
 		const intersect = intersectObjectWithRay( this._gizmo.picker[ this.mode ], _raycaster );
 
@@ -247,11 +247,11 @@ class TransformControls extends Object3D {
 
 	pointerDown( pointer ) {
 
-		if ( this.object === undefined || this.dragging === true || pointer.button !== 0 ) return;
+		if ( this.object === undefined || this.dragging === true || ( pointer != null && pointer.button !== 0 ) ) return;
 
 		if ( this.axis !== null ) {
 
-			_raycaster.setFromCamera( pointer, this.camera );
+			if ( pointer !== null ) _raycaster.setFromCamera( pointer, this.camera );
 
 			const planeIntersect = intersectObjectWithRay( this._plane, _raycaster, true );
 
@@ -295,9 +295,9 @@ class TransformControls extends Object3D {
 
 		}
 
-		if ( object === undefined || axis === null || this.dragging === false || pointer.button !== - 1 ) return;
+		if ( object === undefined || axis === null || this.dragging === false || ( pointer !== null && pointer.button !== - 1 ) ) return;
 
-		_raycaster.setFromCamera( pointer, this.camera );
+		if ( pointer !== null ) _raycaster.setFromCamera( pointer, this.camera );
 
 		const planeIntersect = intersectObjectWithRay( this._plane, _raycaster, true );
 
@@ -537,7 +537,7 @@ class TransformControls extends Object3D {
 
 	pointerUp( pointer ) {
 
-		if ( pointer.button !== 0 ) return;
+		if ( pointer !== null && pointer.button !== 0 ) return;
 
 		if ( this.dragging && ( this.axis !== null ) ) {
 

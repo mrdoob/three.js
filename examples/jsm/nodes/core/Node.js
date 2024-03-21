@@ -20,9 +20,24 @@ class Node extends EventDispatcher {
 
 		this.uuid = MathUtils.generateUUID();
 
+		this.version = 0;
+
+		this._cacheKey = null;
+		this._cacheKeyVersion = 0;
+
 		this.isNode = true;
 
 		Object.defineProperty( this, 'id', { value: _nodeId ++ } );
+
+	}
+
+	set needsUpdate( value ) {
+
+		if ( value === true ) {
+
+			this.version ++;
+
+		}
 
 	}
 
@@ -40,7 +55,7 @@ class Node extends EventDispatcher {
 
 	}
 
-	updateReference() {
+	setReference( /*state*/ ) {
 
 		return this;
 
@@ -80,9 +95,18 @@ class Node extends EventDispatcher {
 
 	}
 
-	getCacheKey() {
+	getCacheKey( force = false ) {
 
-		return getCacheKey( this );
+		force = force || this.version !== this._cacheKeyVersion;
+
+		if ( force === true || this._cacheKey === null ) {
+
+			this._cacheKey = getCacheKey( this, force );
+			this._cacheKeyVersion = this.version;
+
+		}
+
+		return this._cacheKey;
 
 	}
 
@@ -230,6 +254,8 @@ class Node extends EventDispatcher {
 		const buildStage = builder.getBuildStage();
 
 		if ( buildStage === 'setup' ) {
+
+			this.setReference( builder );
 
 			const properties = builder.getNodeProperties( this );
 

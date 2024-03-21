@@ -1,16 +1,16 @@
 import { MathNode, GLSLNodeParser, NodeBuilder, UniformNode, vectorComponents } from '../../../nodes/Nodes.js';
 
-import UniformBuffer from '../../common/UniformBuffer.js';
+import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
-
 
 import { RedFormat, RGFormat, IntType, DataTexture, RGBAFormat, FloatType } from 'three';
 
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan',
-	textureDimensions: 'textureSize'
+	textureDimensions: 'textureSize',
+	equals: 'equal'
 };
 
 const precisionLib = {
@@ -20,7 +20,8 @@ const precisionLib = {
 };
 
 const supports = {
-	instance: true
+	instance: true,
+	swizzleAssign: true
 };
 
 const defaultPrecisions = `
@@ -541,7 +542,6 @@ ${ flowData.code }
 
 	}
 
-
 	isFlipY() {
 
 		return true;
@@ -755,11 +755,11 @@ void main() {
 
 			} else if ( type === 'buffer' ) {
 
-				node.name = `NodeBuffer_${node.id}`;
+				node.name = `NodeBuffer_${ node.id }`;
+				uniformNode.name = `buffer${ node.id }`;
 
-				const buffer = new UniformBuffer( node.name, node.value );
-
-				uniformNode.name = `buffer${node.id}`;
+				const buffer = new NodeUniformBuffer( node );
+				buffer.name = node.name;
 
 				this.bindings[ shaderStage ].push( buffer );
 

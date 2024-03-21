@@ -19,7 +19,7 @@ function GeometryParametersPanel( editor, object ) {
 	const segmentsRow = new UIRow();
 	const segments = new UIInteger( parameters.segments ).onChange( update );
 
-	segmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/segments' ) ).setWidth( '90px' ) );
+	segmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/segments' ) ).setClass( 'Label' ) );
 	segmentsRow.add( segments );
 
 	container.add( segmentsRow );
@@ -29,7 +29,7 @@ function GeometryParametersPanel( editor, object ) {
 	const phiStartRow = new UIRow();
 	const phiStart = new UINumber( parameters.phiStart * 180 / Math.PI ).onChange( update );
 
-	phiStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/phistart' ) ).setWidth( '90px' ) );
+	phiStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/phistart' ) ).setClass( 'Label' ) );
 	phiStartRow.add( phiStart );
 
 	container.add( phiStartRow );
@@ -39,7 +39,7 @@ function GeometryParametersPanel( editor, object ) {
 	const phiLengthRow = new UIRow();
 	const phiLength = new UINumber( parameters.phiLength * 180 / Math.PI ).onChange( update );
 
-	phiLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/philength' ) ).setWidth( '90px' ) );
+	phiLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/philength' ) ).setClass( 'Label' ) );
 	phiLengthRow.add( phiLength );
 
 	container.add( phiLengthRow );
@@ -47,7 +47,7 @@ function GeometryParametersPanel( editor, object ) {
 	// points
 
 	const pointsRow = new UIRow();
-	pointsRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/points' ) ).setWidth( '90px' ) );
+	pointsRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/points' ) ).setClass( 'Label' ) );
 
 	const points = new UIPoints2().setValue( parameters.points ).onChange( update );
 	pointsRow.add( points );

@@ -52,8 +52,8 @@
 					"three/addons/": "../examples/jsm/",
 
 					"three/examples/": "../examples/",
-					"three-gpu-pathtracer": "https://unpkg.com/three-gpu-pathtracer@0.0.17/build/index.module.js",
-					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.7.0/build/index.module.js"
+					"three-gpu-pathtracer": "https://unpkg.com/three-gpu-pathtracer@0.0.19/build/index.module.js",
+					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.7.3/build/index.module.js"
 				}
 			}
 		</script>
@@ -70,7 +70,6 @@
 			import { Sidebar } from './js/Sidebar.js';
 			import { Menubar } from './js/Menubar.js';
 			import { Resizer } from './js/Resizer.js';
-			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
@@ -87,7 +86,6 @@
 
 			window.editor = editor; // Expose editor to Console
 			window.THREE = THREE; // Expose THREE to APP Scripts and Console
-			window.VRButton = VRButton; // Expose VRButton to APP Scripts
 
 			const viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );

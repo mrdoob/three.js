@@ -20,6 +20,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - drag controls<br />
 			Use "Shift+Click" to add/remove objects to/from a group.<br />
+			Use "M" to toggle between rotate and translate mode.<br />
 			Grouped objects can be transformed as a union.
 		</div>
 
@@ -113,6 +114,7 @@
 				container.appendChild( renderer.domElement );
 
 				controls = new DragControls( [ ... objects ], camera, renderer.domElement );
+				controls.rotateSpeed = 2;
 				controls.addEventListener( 'drag', render );
 
 				//
@@ -141,6 +143,12 @@
 			function onKeyDown( event ) {
 
 				enableSelection = ( event.keyCode === 16 ) ? true : false;
+				
+				if ( event.keyCode === 77 ) {
+
+					controls.mode = ( controls.mode === 'translate' ) ? 'rotate' : 'translate';
+			
+				}
 
 			}
 

@@ -602,9 +602,6 @@ class WebGPUBackend extends Backend {
 			supportsDepth = renderer.depth;
 			supportsStencil = renderer.stencil;
 
-			depth = depth && supportsDepth;
-			stencil = stencil && supportsStencil;
-
 			const descriptor = this._getDefaultRenderPassDescriptor();
 
 			if ( color ) {
@@ -619,7 +616,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			if ( depth || stencil ) {
+			if ( supportsDepth || supportsStencil ) {
 
 				depthStencilAttachment = descriptor.depthStencilAttachment;
 
@@ -629,9 +626,6 @@ class WebGPUBackend extends Backend {
 
 			supportsDepth = renderTargetData.depth;
 			supportsStencil = renderTargetData.stencil;
-
-			depth = depth && supportsDepth;
-			stencil = stencil && supportsStencil;
 
 			if ( color ) {
 
@@ -666,7 +660,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			if ( depth || stencil ) {
+			if ( supportsDepth || supportsStencil ) {
 
 				const depthTextureData = this.get( renderTargetData.depthTexture );
 
@@ -680,7 +674,7 @@ class WebGPUBackend extends Backend {
 
 		//
 
-		if ( depthStencilAttachment !== undefined ) {
+		if ( supportsDepth ) {
 
 			if ( depth ) {
 
@@ -695,7 +689,11 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			//
+		}
+
+		//
+
+		if ( supportsStencil ) {
 
 			if ( stencil ) {
 
@@ -1051,9 +1049,11 @@ class WebGPUBackend extends Backend {
 				beginningOfPassWriteIndex: 0, // Write timestamp in index 0 when pass begins.
 				endOfPassWriteIndex: 1, // Write timestamp in index 1 when pass ends.
 			};
+
 			Object.assign( descriptor, {
 				timestampWrites,
 			} );
+
 			renderContextData.timeStampQuerySet = timeStampQuerySet;
 
 		}
@@ -1086,33 +1086,29 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	async resolveTimestampAsync( renderContext, type = 'render' ) {
-
-		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
-
-		const renderContextData = this.get( renderContext );
-
-		// handle timestamp query results
-
+	async resolveTimestampAsync(renderContext, type = 'render') {
+		if (!this.hasFeature(GPUFeatureName.TimestampQuery) || !this.trackTimestamp) return;
+	
+		const renderContextData = this.get(renderContext);
 		const { currentTimestampQueryBuffer } = renderContextData;
+	
+		if (currentTimestampQueryBuffer === undefined) return;
 
-		if ( currentTimestampQueryBuffer ) {
+		const buffer = currentTimestampQueryBuffer;
 
-			renderContextData.currentTimestampQueryBuffer = null;
-
-			await currentTimestampQueryBuffer.mapAsync( GPUMapMode.READ );
-
-			const times = new BigUint64Array( currentTimestampQueryBuffer.getMappedRange() );
-
-			const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
-			// console.log( `Compute ${type} duration: ${Number( times[ 1 ] - times[ 0 ] ) / 1000000}ms` );
-			this.renderer.info.updateTimestamp( type, duration );
-
-			currentTimestampQueryBuffer.unmap();
-
+		try {
+			await buffer.mapAsync(GPUMapMode.READ);
+			const times = new BigUint64Array(buffer.getMappedRange());
+			const duration = Number(times[1] - times[0]) / 1000000;
+			this.renderer.info.updateTimestamp(type, duration);
+		} catch (error) {
+			console.error(`Error mapping buffer: ${error}`);
+			// Optionally handle the error, e.g., re-queue the buffer or skip it
+		} finally {
+			buffer.unmap(); 
 		}
-
 	}
+	
 
 	// node builder
 
@@ -1238,7 +1234,7 @@ class WebGPUBackend extends Backend {
 
 		if ( ! this.adapter ) {
 
-			console.warn( 'WebGPUBackend: WebGPU adapter has not been initialized yet. Please use detectSupportAsync instead' );
+			console.warn( 'WebGPUBackend: WebGPU adapter has not been initialized yet. Please use hasFeatureAsync instead' );
 
 			return false;
 
@@ -1247,6 +1243,37 @@ class WebGPUBackend extends Backend {
 		return this.adapter.features.has( name );
 
 	}
+
+	copyTextureToTexture( position, srcTexture, dstTexture, level = 0 ) {
+
+		const encoder = this.device.createCommandEncoder( { label: 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id } );
+
+		const sourceGPU = this.get( srcTexture ).texture;
+		const destinationGPU = this.get( dstTexture ).texture;
+
+		encoder.copyTextureToTexture(
+			{
+				texture: sourceGPU,
+				mipLevel: level,
+				origin: { x: 0, y: 0, z: 0 }
+			},
+			{
+				texture: destinationGPU,
+				mipLevel: level,
+				origin: { x: position.x, y: position.y, z: position.z }
+			},
+			[
+				srcTexture.image.width,
+				srcTexture.image.height
+			]
+		);
+
+		this.device.queue.submit( [ encoder.finish() ] );
+
+	}
+
+
+
 
 	copyFramebufferToTexture( texture, renderContext ) {
 

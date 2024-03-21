@@ -12,8 +12,6 @@ export class FloatEditor extends BaseNodeEditor {
 
 		super( 'Float', inputNode, 150 );
 
-		this.setOutputLength( 1 );
-
 		element.addEventListener( 'changeInput', () => this.invalidate() );
 
 		this.add( element );
