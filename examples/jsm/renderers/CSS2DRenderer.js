@@ -90,8 +90,8 @@ class CSS2DRenderer {
 
 		this.render = function ( scene, camera ) {
 
-			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
-			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+			if ( scene.matrixWorldAutoUpdate === true && CSS2DRenderer.DEFAULT_MATRIX_WORLD_AUTO_UPDATE ) scene.updateMatrixWorld();
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true && CSS2DRenderer.DEFAULT_MATRIX_WORLD_AUTO_UPDATE ) camera.updateMatrixWorld();
 
 			_viewMatrix.copy( camera.matrixWorldInverse );
 			_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
@@ -211,5 +211,7 @@ class CSS2DRenderer {
 	}
 
 }
+
+CSS2DRenderer.DEFAULT_MATRIX_WORLD_AUTO_UPDATE = true;
 
 export { CSS2DObject, CSS2DRenderer };

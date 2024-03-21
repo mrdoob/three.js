@@ -143,8 +143,8 @@ class CSS3DRenderer {
 
 			}
 
-			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
-			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+			if ( scene.matrixWorldAutoUpdate === true && CSS3DRenderer.DEFAULT_MATRIX_WORLD_AUTO_UPDATE ) scene.updateMatrixWorld();
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true && CSS3DRenderer.DEFAULT_MATRIX_WORLD_AUTO_UPDATE ) camera.updateMatrixWorld();
 
 			let tx, ty;
 
@@ -325,5 +325,7 @@ class CSS3DRenderer {
 	}
 
 }
+
+CSS3DRenderer.DEFAULT_MATRIX_WORLD_AUTO_UPDATE = true;
 
 export { CSS3DObject, CSS3DSprite, CSS3DRenderer };
