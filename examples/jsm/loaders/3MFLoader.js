@@ -144,6 +144,8 @@ class ThreeMFLoader extends Loader {
 
 			}
 
+			if ( relsName === undefined ) throw new Error( 'THREE.ThreeMFLoader: Cannot find relationship file `rels` in 3MF archive.' );
+
 			//
 
 			const relsView = zip[ relsName ];
@@ -1435,9 +1437,6 @@ class ThreeMFLoader extends Loader {
 			const group = new Group();
 
 			const relationship = fetch3DModelPart( data3mf[ 'rels' ] );
-
-			if ( relationship === undefined ) throw new Error( 'THREE.ThreeMFLoader: Cannot find relationship file `rels` in 3MF archive.' );
-
 			const buildData = data3mf.model[ relationship[ 'target' ].substring( 1 ) ][ 'build' ];
 
 			for ( let i = 0; i < buildData.length; i ++ ) {
