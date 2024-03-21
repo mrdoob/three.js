@@ -110,6 +110,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.xr.enabled = true;
 				renderer.xr.setReferenceSpaceType( 'local' );
+				renderer.xr.setEyeLayers( [ 1, 2 ] ); // set layers on left and right camera;
 				container.appendChild( renderer.domElement );
 
 				document.body.appendChild( VRButton.createButton( renderer ) );

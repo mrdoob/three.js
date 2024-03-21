@@ -51,21 +51,20 @@ class WebXRManager extends EventDispatcher {
 		//
 
 		const cameraL = new PerspectiveCamera();
-		cameraL.layers.enable( 1 );
 		cameraL.viewport = new Vector4();
 
 		const cameraR = new PerspectiveCamera();
-		cameraR.layers.enable( 2 );
 		cameraR.viewport = new Vector4();
 
 		const cameras = [ cameraL, cameraR ];
 
 		const cameraXR = new ArrayCamera();
-		cameraXR.layers.enable( 1 );
-		cameraXR.layers.enable( 2 );
 
 		let _currentDepthNear = null;
 		let _currentDepthFar = null;
+		let _currentCameraLayers = null;
+		let _leftEyeLayer = null;
+		let _rightEyeLayer = null;
 
 		//
 
@@ -167,6 +166,7 @@ class WebXRManager extends EventDispatcher {
 
 			_currentDepthNear = null;
 			_currentDepthFar = null;
+			_currentCameraLayers = null;
 
 			depthSensing.reset();
 
@@ -524,6 +524,14 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
+		this.setEyeLayers = function ( layers ) {
+
+			_leftEyeLayer = layers[ 0 ];
+			_rightEyeLayer = layers[ 1 ];
+			_currentCameraLayers = null; // force layer setting on next update
+
+		};
+
 		this.updateCamera = function ( camera ) {
 
 			if ( session === null ) return;
@@ -560,6 +568,27 @@ class WebXRManager extends EventDispatcher {
 				camera.updateProjectionMatrix();
 
 			}
+
+			if ( _currentCameraLayers !== camera.layers.mask ) {
+
+				const mask = camera.layers.mask;
+
+				if ( _leftEyeLayer && _rightEyeLayer ) {
+
+					cameraL.layers.mask = mask | 1 << _leftEyeLayer;
+					cameraR.layers.mask = mask | 1 << _rightEyeLayer;
+					cameraXR.layers.mask = mask | 1 << _rightEyeLayer | 1 << _leftEyeLayer;
+
+				} else {
+
+					cameraXR.layers.mask = cameraL.layers.mask = cameraR.layers.mask = mask;
+
+				}
+
+				_currentCameraLayers = mask;
+
+			}
+
 
 			const parent = camera.parent;
 			const cameras = cameraXR.cameras;
