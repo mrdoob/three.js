@@ -18,7 +18,7 @@ class TrackballControls extends EventDispatcher {
 		super();
 
 		const scope = this;
-		const STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
+		const STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM: 4, TOUCH_PAN: 5, };
 
 		this.object = object;
 		this.domElement = domElement;
@@ -198,7 +198,7 @@ class TrackballControls extends EventDispatcher {
 
 			let factor;
 
-			if ( _state === STATE.TOUCH_ZOOM_PAN ) {
+			if ( _state === STATE.TOUCH_ZOOM ) {
 
 				factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
 				_touchZoomDistanceStart = _touchZoomDistanceEnd;
@@ -643,21 +643,27 @@ class TrackballControls extends EventDispatcher {
 		function onTouchStart( event ) {
 
 			trackPointer( event );
-
 			switch ( _pointers.length ) {
 
 				case 1:
 					_state = STATE.TOUCH_ROTATE;
-					_moveCurr.copy( getMouseOnCircle( _pointers[ 0 ].pageX, _pointers[ 0 ].pageY ) );
+					_moveCurr.copy(
+						getMouseOnCircle( _pointers[ 0 ].pageX, _pointers[ 0 ].pageY )
+					);
 					_movePrev.copy( _moveCurr );
 					break;
 
-				default: // 2 or more
-					_state = STATE.TOUCH_ZOOM_PAN;
+				case 2:
+					_state = STATE.TOUCH_ZOOM;
 					const dx = _pointers[ 0 ].pageX - _pointers[ 1 ].pageX;
 					const dy = _pointers[ 0 ].pageY - _pointers[ 1 ].pageY;
-					_touchZoomDistanceEnd = _touchZoomDistanceStart = Math.sqrt( dx * dx + dy * dy );
+					_touchZoomDistanceEnd = _touchZoomDistanceStart = Math.sqrt(
+						dx * dx + dy * dy
+					);
+					break;
 
+				default: // 3 or more
+					_state = STATE.TOUCH_PAN;
 					const x = ( _pointers[ 0 ].pageX + _pointers[ 1 ].pageX ) / 2;
 					const y = ( _pointers[ 0 ].pageY + _pointers[ 1 ].pageY ) / 2;
 					_panStart.copy( getMouseOnScreen( x, y ) );
@@ -673,7 +679,6 @@ class TrackballControls extends EventDispatcher {
 		function onTouchMove( event ) {
 
 			trackPointer( event );
-
 			switch ( _pointers.length ) {
 
 				case 1:
@@ -681,16 +686,17 @@ class TrackballControls extends EventDispatcher {
 					_moveCurr.copy( getMouseOnCircle( event.pageX, event.pageY ) );
 					break;
 
-				default: // 2 or more
-
-					const position = getSecondPointerPosition( event );
-
-					const dx = event.pageX - position.x;
-					const dy = event.pageY - position.y;
+				case 2:
+					const second_pos = getSecondPointerPosition( event );
+					const dx = event.pageX - second_pos.x;
+					const dy = event.pageY - second_pos.y;
 					_touchZoomDistanceEnd = Math.sqrt( dx * dx + dy * dy );
+					break;
 
-					const x = ( event.pageX + position.x ) / 2;
-					const y = ( event.pageY + position.y ) / 2;
+				default: // 3 or more
+					const third_pos = getThirdPointerPosition( event );
+					const x = ( event.pageX + third_pos.x ) / 2;
+					const y = ( event.pageY + third_pos.y ) / 2;
 					_panEnd.copy( getMouseOnScreen( x, y ) );
 					break;
 
@@ -712,9 +718,8 @@ class TrackballControls extends EventDispatcher {
 					_movePrev.copy( _moveCurr );
 					break;
 
-				case 2:
-					_state = STATE.TOUCH_ZOOM_PAN;
-
+				default:
+					_state = STATE.TOUCH_PAN;
 					for ( let i = 0; i < _pointers.length; i ++ ) {
 
 						if ( _pointers[ i ].pointerId !== event.pointerId ) {
@@ -785,6 +790,14 @@ class TrackballControls extends EventDispatcher {
 		function getSecondPointerPosition( event ) {
 
 			const pointer = ( event.pointerId === _pointers[ 0 ].pointerId ) ? _pointers[ 1 ] : _pointers[ 0 ];
+
+			return _pointerPositions[ pointer.pointerId ];
+
+		}
+
+		function getThirdPointerPosition( event ) {
+
+			const pointer = ( event.pointerId === _pointers[ 1 ].pointerId ) ? _pointers[ 2 ] : _pointers[ 1 ];
 
 			return _pointerPositions[ pointer.pointerId ];
 
