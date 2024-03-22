@@ -90,7 +90,7 @@ function Loader( editor ) {
 					const { Rhino3dmLoader } = await import( 'three/addons/loaders/3DMLoader.js' );
 
 					const loader = new Rhino3dmLoader();
-					loader.setLibraryPath( 'three/addons/libs/rhino3dm/' );
+					loader.setLibraryPath( '../examples/jsm/libs/rhino3dm/' );
 					loader.parse( contents, function ( object ) {
 
 						object.name = filename;
@@ -205,7 +205,7 @@ function Loader( editor ) {
 					const { DRACOLoader } = await import( 'three/addons/loaders/DRACOLoader.js' );
 
 					const loader = new DRACOLoader();
-					loader.setDecoderPath( 'three/addons/libs/draco/' );
+					loader.setDecoderPath( '../examples/jsm/libs/draco/' );
 					loader.parse( contents, function ( geometry ) {
 
 						let object;
@@ -431,7 +431,7 @@ function Loader( editor ) {
 					const { LDrawLoader } = await import( 'three/addons/loaders/LDrawLoader.js' );
 
 					const loader = new LDrawLoader();
-					loader.setPath( 'three/examples/models/ldraw/officialLibrary/' );
+					loader.setPath( '../../examples/models/ldraw/officialLibrary/' );
 					loader.parse( event.target.result, function ( group ) {
 
 						group.name = filename;
@@ -995,10 +995,10 @@ function Loader( editor ) {
 		const { MeshoptDecoder } = await import( 'three/addons/libs/meshopt_decoder.module.js' );
 
 		const dracoLoader = new DRACOLoader();
-		dracoLoader.setDecoderPath( 'three/addons/libs/draco/gltf/' );
+		dracoLoader.setDecoderPath( '../examples/jsm/libs/draco/gltf/' );
 
 		const ktx2Loader = new KTX2Loader();
-		ktx2Loader.setTranscoderPath( 'three/addons/libs/basis/' );
+		ktx2Loader.setTranscoderPath( '../examples/jsm/libs/basis/' );
 
 		editor.signals.rendererDetectKTX2Support.dispatch( ktx2Loader );
 
