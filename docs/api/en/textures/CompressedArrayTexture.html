@@ -61,6 +61,20 @@
 		<h3>[property:Object image]</h3>
 		<p>Overridden with a object containing width, height, and depth.</p>
 
+		<h3>[property:Boolean layerNeedsUpdate]</h3>
+		<p>
+			Specifies that a specific layer of the texture needs to be updated. Unlike
+			[page:Texture.needsUpdate needsUpdate] which sends the entire compressed
+			texture array to the GPU, marking specific layers will only transmit
+			subsets of all mipmaps associated with a specific depth in the array.
+		</p>
+
+		<h3>[property:Array dirtyLayers]</h3>
+		<p>
+			A list of all dirty layers in the texture. See
+			[Page:CompressedTextureArray.layerNeedsUpdate layerNeedsUpdate].
+		</p>
+
 		<h3>[property:Boolean isCompressedArrayTexture]</h3>
 		<p>Read-only flag to check if a given object is of type [name].</p>
 
