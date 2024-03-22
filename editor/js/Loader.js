@@ -90,7 +90,7 @@ function Loader( editor ) {
 					const { Rhino3dmLoader } = await import( 'three/addons/loaders/3DMLoader.js' );
 
 					const loader = new Rhino3dmLoader();
-					loader.setLibraryPath( '../examples/jsm/libs/rhino3dm/' );
+					loader.setLibraryPath( 'three/addons/libs/rhino3dm/' );
 					loader.parse( contents, function ( object ) {
 
 						object.name = filename;
@@ -205,7 +205,7 @@ function Loader( editor ) {
 					const { DRACOLoader } = await import( 'three/addons/loaders/DRACOLoader.js' );
 
 					const loader = new DRACOLoader();
-					loader.setDecoderPath( '../examples/jsm/libs/draco/' );
+					loader.setDecoderPath( 'three/addons/libs/draco/' );
 					loader.parse( contents, function ( geometry ) {
 
 						let object;
@@ -431,7 +431,7 @@ function Loader( editor ) {
 					const { LDrawLoader } = await import( 'three/addons/loaders/LDrawLoader.js' );
 
 					const loader = new LDrawLoader();
-					loader.setPath( '../../examples/models/ldraw/officialLibrary/' );
+					loader.setPath( 'three/examples/models/ldraw/officialLibrary/' );
 					loader.parse( event.target.result, function ( group ) {
 
 						group.name = filename;
@@ -506,7 +506,7 @@ function Loader( editor ) {
 
 					const contents = event.target.result;
 
-					const { PCDLoader } = await import( '../../examples/jsm/loaders/PCDLoader.js' );
+					const { PCDLoader } = await import( 'three/addons/loaders/PCDLoader.js' );
 
 					const points = new PCDLoader().parse( contents );
 					points.name = filename;
@@ -653,7 +653,7 @@ function Loader( editor ) {
 
 					const contents = event.target.result;
 
-					const { USDZLoader } = await import( '../../examples/jsm/loaders/USDZLoader.js' );
+					const { USDZLoader } = await import( 'three/addons/loaders/USDZLoader.js' );
 
 					const group = new USDZLoader().parse( contents );
 					group.name = filename;
@@ -995,10 +995,10 @@ function Loader( editor ) {
 		const { MeshoptDecoder } = await import( 'three/addons/libs/meshopt_decoder.module.js' );
 
 		const dracoLoader = new DRACOLoader();
-		dracoLoader.setDecoderPath( '../examples/jsm/libs/draco/gltf/' );
+		dracoLoader.setDecoderPath( 'three/addons/libs/draco/gltf/' );
 
 		const ktx2Loader = new KTX2Loader();
-		ktx2Loader.setTranscoderPath( '../examples/jsm/libs/basis/' );
+		ktx2Loader.setTranscoderPath( 'three/addons/libs/basis/' );
 
 		editor.signals.rendererDetectKTX2Support.dispatch( ktx2Loader );
 
