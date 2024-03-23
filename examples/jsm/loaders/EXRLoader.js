@@ -2309,7 +2309,7 @@ class EXRLoader extends DataTextureLoader {
 
 				const scan_y = scanlineBlockIdx * EXRDecoder.scanlineBlockSize;
 				const true_y = line_y + EXRDecoder.scanOrder( scan_y );
-				if ( true_y >= EXRDecoder.height ) break;
+				if ( true_y >= EXRDecoder.height ) continue;
 
 				const lineOffset = line_y * EXRDecoder.bytesPerLine;
 				const outLineOffset = ( EXRDecoder.height - 1 - true_y ) * EXRDecoder.outLineWidth;
