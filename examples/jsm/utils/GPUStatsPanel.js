@@ -3,7 +3,7 @@ import Stats from '../libs/stats.module.js';
 // https://www.khronos.org/registry/webgl/extensions/EXT_disjoint_timer_query_webgl2/
 export class GPUStatsPanel extends Stats.Panel {
 
-	constructor( context, name = 'GPU MS' ) {
+	constructor( context, name = 'GPU' ) {
 
 		super( name, '#f90', '#210' );
 
@@ -19,6 +19,8 @@ export class GPUStatsPanel extends Stats.Panel {
 		this.extension = extension;
 		this.maxTime = 30;
 		this.activeQueries = 0;
+
+		this.getDisplayValue = value => value.toFixed( 2 );
 
 		this.startQuery = function () {
 
@@ -56,8 +58,18 @@ export class GPUStatsPanel extends Stats.Panel {
 
 					}
 
-					this.activeQueries --;
+					// release the query
+					if ( isWebGL2 ) {
 
+						gl.deleteQuery( query );
+
+					} else {
+
+						ext.deleteQueryEXT( query );
+
+					}
+
+					this.activeQueries --;
 
 				} else if ( gl.isContextLost() === false ) {
 
