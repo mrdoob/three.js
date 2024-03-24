@@ -571,6 +571,8 @@ class BatchedMesh extends Mesh {
 		drawRange.count = hasIndex ? srcIndex.count : posAttr.count;
 		this._visibilityChanged = true;
 
+		this._active[ id ] = true;
+
 		return id;
 
 	}
