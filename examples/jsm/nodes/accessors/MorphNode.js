@@ -1,6 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { float, nodeProxy, tslFn } from '../shadernode/ShaderNode.js';
+import { If, float, nodeProxy, tslFn, vec4 } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { reference } from './ReferenceNode.js';
 import { positionLocal } from './PositionNode.js';
@@ -8,20 +8,37 @@ import { normalLocal } from './NormalNode.js';
 import { textureLoad } from './TextureNode.js';
 import { instanceIndex, vertexIndex } from '../core/IndexNode.js';
 import { ivec2, int } from '../shadernode/ShaderNode.js';
-import { DataArrayTexture, Vector2, Vector4, FloatType } from 'three';
+import { DataArrayTexture, Vector2, Vector4, FloatType, RedFormat } from 'three';
 import { loop } from '../utils/LoopNode.js';
+import { all } from '../Nodes.js';
 
 const morphTextures = new WeakMap();
 const morphVec4 = new Vector4();
 
 const getMorph = tslFn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
 
-	const texelIndex = int( vertexIndex ).mul( stride ).add( offset );
+	const texelIndex = int( vertexIndex ).mul( stride ).add( offset.mul( 3 ) );
 
 	const y = texelIndex.div( width );
 	const x = texelIndex.sub( y.mul( width ) );
 
-	const bufferAttrib = textureLoad( bufferMap, ivec2( x, y ) ).depth( depth );
+	const morphUV = ivec2( x, y );
+
+	// const bufferAttrib = textureLoad( bufferMap, ivec2( x, y ) ).depth( depth );
+
+	const bufferAttrib = vec4( 0. ).toVar();
+	bufferAttrib.x = textureLoad( bufferMap, morphUV ).depth( depth ).r;
+	morphUV.x.addAssign( 1 );
+	bufferAttrib.y = textureLoad( bufferMap, morphUV ).depth( depth ).r;
+	morphUV.x.addAssign( 1 );
+	bufferAttrib.z = textureLoad( bufferMap, morphUV ).depth( depth ).r;
+
+	If( all( stride.equal( 10 ) ), () => {
+
+		morphUV.x.addAssign( 1 );
+		bufferAttrib.a = offset.equal( 2 ).all().cond( textureLoad( bufferMap, morphUV ).depth( depth ).r, 0. );
+
+	} );
 
 	return bufferAttrib.mul( influence );
 
@@ -51,9 +68,9 @@ function getEntry( geometry ) {
 
 		let vertexDataCount = 0;
 
-		if ( hasMorphPosition === true ) vertexDataCount = 1;
-		if ( hasMorphNormals === true ) vertexDataCount = 2;
-		if ( hasMorphColors === true ) vertexDataCount = 3;
+		if ( hasMorphPosition === true ) vertexDataCount = 3;
+		if ( hasMorphNormals === true ) vertexDataCount = 6;
+		if ( hasMorphColors === true ) vertexDataCount = 10;
 
 		let width = geometry.attributes.position.count * vertexDataCount;
 		let height = 1;
@@ -62,20 +79,21 @@ function getEntry( geometry ) {
 
 		if ( width > maxTextureSize ) {
 
-			height = Math.ceil( width / maxTextureSize );
-			width = maxTextureSize;
+			// Align width on stride to simplify the texel fetching in the shader
+			const strideWidth = Math.floor( maxTextureSize / vertexDataCount ) * vertexDataCount;
+			height = Math.ceil( width / strideWidth );
+			width = strideWidth;
 
 		}
 
-		const buffer = new Float32Array( width * height * 4 * morphTargetsCount );
+		const buffer = new Float32Array( width * height * morphTargetsCount );
 
 		const bufferTexture = new DataArrayTexture( buffer, width, height, morphTargetsCount );
 		bufferTexture.type = FloatType;
+		bufferTexture.format = RedFormat;
 		bufferTexture.needsUpdate = true;
 
 		// fill buffer
-
-		const vertexDataStride = vertexDataCount * 4;
 
 		for ( let i = 0; i < morphTargetsCount; i ++ ) {
 
@@ -83,11 +101,11 @@ function getEntry( geometry ) {
 			const morphNormal = morphNormals[ i ];
 			const morphColor = morphColors[ i ];
 
-			const offset = width * height * 4 * i;
+			const offset = width * height * i;
 
 			for ( let j = 0; j < morphTarget.count; j ++ ) {
 
-				const stride = j * vertexDataStride;
+				const stride = j * vertexDataCount;
 
 				if ( hasMorphPosition === true ) {
 
@@ -96,7 +114,6 @@ function getEntry( geometry ) {
 					buffer[ offset + stride + 0 ] = morphVec4.x;
 					buffer[ offset + stride + 1 ] = morphVec4.y;
 					buffer[ offset + stride + 2 ] = morphVec4.z;
-					buffer[ offset + stride + 3 ] = 0;
 
 				}
 
@@ -104,10 +121,9 @@ function getEntry( geometry ) {
 
 					morphVec4.fromBufferAttribute( morphNormal, j );
 
-					buffer[ offset + stride + 4 ] = morphVec4.x;
-					buffer[ offset + stride + 5 ] = morphVec4.y;
-					buffer[ offset + stride + 6 ] = morphVec4.z;
-					buffer[ offset + stride + 7 ] = 0;
+					buffer[ offset + stride + 3 ] = morphVec4.x;
+					buffer[ offset + stride + 4 ] = morphVec4.y;
+					buffer[ offset + stride + 5 ] = morphVec4.z;
 
 				}
 
@@ -115,10 +131,10 @@ function getEntry( geometry ) {
 
 					morphVec4.fromBufferAttribute( morphColor, j );
 
-					buffer[ offset + stride + 8 ] = morphVec4.x;
-					buffer[ offset + stride + 9 ] = morphVec4.y;
-					buffer[ offset + stride + 10 ] = morphVec4.z;
-					buffer[ offset + stride + 11 ] = ( morphColor.itemSize === 4 ) ? morphVec4.w : 1;
+					buffer[ offset + stride + 6 ] = morphVec4.x;
+					buffer[ offset + stride + 7 ] = morphVec4.y;
+					buffer[ offset + stride + 8 ] = morphVec4.z;
+					buffer[ offset + stride + 9 ] = ( morphColor.itemSize === 4 ) ? morphVec4.w : 1;
 
 				}
 
