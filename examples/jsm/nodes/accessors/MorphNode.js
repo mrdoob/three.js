@@ -33,10 +33,10 @@ const getMorph = tslFn( ( { bufferMap, influence, stride, width, depth, offset }
 	morphUV.x.addAssign( 1 );
 	bufferAttrib.z = textureLoad( bufferMap, morphUV ).depth( depth ).r;
 
-	If( all( stride.equal( 10 ) ), () => {
+	If( stride.equal( 10 ), () => {
 
 		morphUV.x.addAssign( 1 );
-		bufferAttrib.a = offset.equal( 2 ).all().cond( textureLoad( bufferMap, morphUV ).depth( depth ).r, 0. );
+		bufferAttrib.a = offset.equal( 2 ).cond( textureLoad( bufferMap, morphUV ).depth( depth ).r, 0. );
 
 	} );
 
