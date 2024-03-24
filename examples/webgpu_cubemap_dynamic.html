@@ -60,15 +60,6 @@
 
 				}
 
-				renderer = new WebGPURenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animation );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				document.body.appendChild( renderer.domElement );
-
-				window.addEventListener( 'resize', onWindowResized );
-
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
@@ -134,6 +125,15 @@
 
 				//
 
+				renderer = new WebGPURenderer( { antialias: true, forceWebGL: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animation );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResized );
+
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.autoRotate = true;
 
@@ -159,7 +159,6 @@
 
 				const time = msTime / 1000;
 
-				if ( ! cube ) return;
 				cube.position.x = Math.cos( time ) * 30;
 				cube.position.y = Math.sin( time ) * 30;
 				cube.position.z = Math.sin( time ) * 30;
