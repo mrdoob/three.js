@@ -242,33 +242,33 @@ class KTX2Loader extends Loader {
 	load( url, onLoad, onProgress, onError ) {
 
 		if ( this.workerConfig === null ) {
-
-			throw new Error( 'THREE.KTX2Loader: Missing initialization with `.detectSupport( renderer )`.' );
-
+		  throw new Error( 'THREE.KTX2Loader: Missing initialization with `.detectSupport( renderer )`.' );
 		}
-
+	  
 		const loader = new FileLoader( this.manager );
-
+	  
 		loader.setResponseType( 'arraybuffer' );
 		loader.setWithCredentials( this.withCredentials );
-
+	  
 		loader.load( url, ( buffer ) => {
-
-			// Check for an existing task using this buffer. A transferred buffer cannot be transferred
-			// again from this thread.
-			if ( _taskCache.has( buffer ) ) {
-
-				const cachedTask = _taskCache.get( buffer );
-
-				return cachedTask.promise.then( onLoad ).catch( onError );
-
-			}
-
-			this._createTexture( buffer )
-				.then( ( texture ) => onLoad ? onLoad( texture ) : null )
-				.catch( onError );
-
+		  this.parse( buffer, onLoad, onError );
 		}, onProgress, onError );
+
+	}
+
+	parse( arrayBuffer, onLoad, onError ) {
+		
+		if ( this.workerConfig === null ) {
+		  throw new Error( 'THREE.KTX2Loader: Missing initialization with `.detectSupport( renderer )`.' );
+		}
+	  
+		this._createTexture( arrayBuffer )
+			.then( texture => {
+				if ( onLoad ) onLoad( texture );
+			} )
+			.catch( err => {
+				if ( onError ) onError( err );
+			} );
 
 	}
 
