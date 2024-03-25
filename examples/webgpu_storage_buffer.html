@@ -68,7 +68,7 @@
 			// WebGL Backend
 			init( true );
 
-			function init( forceWebGL = false ) {
+			async function init( forceWebGL = false ) {
 
 				const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
 				const camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
@@ -207,18 +207,21 @@
 
 				}
 
-				// Init Positions
-				renderer.compute( computeInit );
+				renderer.info.autoReset = false;
+
+				await renderer.computeAsync( computeInit );
 
 				 const stepAnimation = async function () {
+
+					renderer.info.reset();
 
 					await renderer.computeAsync( compute );
 					await renderer.renderAsync( scene, camera );
 
 					timestamps[ forceWebGL ? 'webgl' : 'webgpu' ].innerHTML = `
 
-							Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.timestamp.compute.toFixed( 6 )}ms<br>
-							Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.timestamp.render.toFixed( 6 )}ms`;
+							Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
+							Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.render.timestamp.toFixed( 6 )}ms`;
 
 					setTimeout( stepAnimation, 1000 );
 			
@@ -233,6 +236,8 @@
 					renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
 					const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
+
+					camera.aspect = aspect;
 
 					const frustumHeight = camera.top - camera.bottom;
 
