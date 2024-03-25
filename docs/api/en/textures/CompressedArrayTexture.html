@@ -61,18 +61,10 @@
 		<h3>[property:Object image]</h3>
 		<p>Overridden with a object containing width, height, and depth.</p>
 
-		<h3>[property:Boolean layerNeedsUpdate]</h3>
+		<h3>[property:Set dirtyLayers]</h3>
 		<p>
-			Specifies that a specific layer of the texture needs to be updated. Unlike
-			[page:Texture.needsUpdate needsUpdate] which sends the entire compressed
-			texture array to the GPU, marking specific layers will only transmit
-			subsets of all mipmaps associated with a specific depth in the array.
-		</p>
-
-		<h3>[property:Array dirtyLayers]</h3>
-		<p>
-			A list of all dirty layers in the texture. See
-			[Page:CompressedTextureArray.layerNeedsUpdate layerNeedsUpdate].
+			A set of all dirty layers in the texture. See
+			[Page:CompressedTextureArray.addDirtyLayer addDirtyLayer].
 		</p>
 
 		<h3>[property:Boolean isCompressedArrayTexture]</h3>
@@ -80,9 +72,19 @@
 
 		<h2>Methods</h2>
 
+		<h3>[method:addDirtyLayer addDirtyLayer]( layerIndex )</h3>
 		<p>
-			See the base [page:CompressedTexture CompressedTexture] class for common
-			methods.
+			Describes that a specific layer of the texture needs to be updated.
+			Normally when [page:Texture.needsUpdate needsUpdate] is set to true, the
+			entire compressed texture array is sent to the GPU. Marking specific
+			layers will only transmit subsets of all mipmaps associated with a
+			specific depth in the array which is often much more performant. 
+		</p>
+
+		<h3>[method:clearDirtyLayers clearDirtyLayers]()</h3>
+		<p>
+			Resets the dirty layers registry. See
+			[Page:CompressedTextureArray.addDirtyLayer addDirtyLayer].
 		</p>
 
 		<h2>Source</h2>
