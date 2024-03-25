@@ -159,8 +159,7 @@ function hsl(h, s, l) {
 }
 </pre>
 <p>看过来, 当材质加载完成后才调用<code class="notranslate" translate="no">render</code>方法. 我们这么做是因为使用了<a href="rendering-on-demand.html">按需渲染</a>中的方法, 而不是连续渲染. 这样我们仅仅需要在材质加载后渲染一遍就好. </p>
-<p>然后我们需要对代码做一些改动, 每个数据都画一个点, 而不是每个</p>
-<p>然后我们需要修改上面每个数据点画一个点的代码, 改为每个数据点画一个框</p>
+<p>然后我们需要修改上面每个数据点画一个点的代码, 改为每个数据点画一个框.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function addBoxes(file) {
   const {min, max, data} = file;
   const range = max - min;
@@ -421,7 +420,7 @@ scene.add(mesh);
 </div>
 
 <p></p>
-<p>合并几何体是一个常见的优化手段. 比如, 可以将一百多棵树合并成一个几何体, 一堆石头合并成一块石头, 零零碎碎的栅栏合并成一个栅栏的mesh. 另一个例子是Minecraft并不是一个一个方块去绘制, 而是创建一组合并了的方块, 当然之前选择性地移除那些看不见的. </p>
+<p>合并几何体是一个常见的优化手段. 比如, 可以将一百多棵树合并成一个几何体, 一堆石头合并成一块石头, 零零碎碎的栅栏合并成一个栅栏的mesh. 另一个在 Minecraft 中的例子是, 它不太可能单独绘制每个立方体, 而是创建一组合并的立方体, 并且选择性地删除那些永远不可见的面. </p>
 <p>这么做带来的问题是, 合并起来简单, 分离难. 接下来我们再引入一种优化方案
 <a href="optimize-lots-of-objects-animated.html">优化大量动画对象</a>.</p>
 <p><canvas id="c"></canvas></p>
