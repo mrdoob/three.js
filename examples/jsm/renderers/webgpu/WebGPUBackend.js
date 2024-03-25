@@ -1049,9 +1049,11 @@ class WebGPUBackend extends Backend {
 				beginningOfPassWriteIndex: 0, // Write timestamp in index 0 when pass begins.
 				endOfPassWriteIndex: 1, // Write timestamp in index 1 when pass ends.
 			};
+
 			Object.assign( descriptor, {
 				timestampWrites,
 			} );
+
 			renderContextData.timeStampQuerySet = timeStampQuerySet;
 
 		}
@@ -1084,33 +1086,29 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	async resolveTimestampAsync( renderContext, type = 'render' ) {
-
-		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
-
-		const renderContextData = this.get( renderContext );
-
-		// handle timestamp query results
-
+	async resolveTimestampAsync(renderContext, type = 'render') {
+		if (!this.hasFeature(GPUFeatureName.TimestampQuery) || !this.trackTimestamp) return;
+	
+		const renderContextData = this.get(renderContext);
 		const { currentTimestampQueryBuffer } = renderContextData;
+	
+		if (currentTimestampQueryBuffer === undefined) return;
 
-		if ( currentTimestampQueryBuffer ) {
+		const buffer = currentTimestampQueryBuffer;
 
-			renderContextData.currentTimestampQueryBuffer = null;
-
-			await currentTimestampQueryBuffer.mapAsync( GPUMapMode.READ );
-
-			const times = new BigUint64Array( currentTimestampQueryBuffer.getMappedRange() );
-
-			const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
-			// console.log( `Compute ${type} duration: ${Number( times[ 1 ] - times[ 0 ] ) / 1000000}ms` );
-			this.renderer.info.updateTimestamp( type, duration );
-
-			currentTimestampQueryBuffer.unmap();
-
+		try {
+			await buffer.mapAsync(GPUMapMode.READ);
+			const times = new BigUint64Array(buffer.getMappedRange());
+			const duration = Number(times[1] - times[0]) / 1000000;
+			this.renderer.info.updateTimestamp(type, duration);
+		} catch (error) {
+			console.error(`Error mapping buffer: ${error}`);
+			// Optionally handle the error, e.g., re-queue the buffer or skip it
+		} finally {
+			buffer.unmap(); 
 		}
-
 	}
+	
 
 	// node builder
 

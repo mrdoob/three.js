@@ -275,7 +275,7 @@ class Nodes extends DataMap {
 
 			if ( rendererData.toneMapping !== rendererToneMapping ) {
 
-				const rendererToneMappingNode = rendererData.rendererToneMappingNode || toneMapping( rendererToneMapping, reference( 'toneMappingExposure', 'float', renderer ) );
+				const rendererToneMappingNode = rendererData.rendererToneMappingNode || toneMapping( rendererToneMapping );
 				rendererToneMappingNode.toneMapping = rendererToneMapping;
 
 				rendererData.rendererToneMappingNode = rendererToneMappingNode;

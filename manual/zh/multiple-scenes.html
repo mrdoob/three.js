@@ -195,7 +195,7 @@ Renderer.### <a href="">setViewport</a> ( x : Integer, y : Integer, width : Inte
 </pre>
 <p>最终效果如下：</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/threejs-multiple-scenes-v1.html"></iframe></div>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-v1.html"></iframe></div>
   <a class="threejs_center" href="/manual/examples/multiple-scenes-v1.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
@@ -480,7 +480,7 @@ function render(time) {
 </div>
 
 
-上面提到的方法在本网站上可以找到很多实例，比如<a href="https://threejsfundamentals.org/threejs/lessons/threejs-primitives.html">Three.js 图元</a>和<a href="https://threejsfundamentals.org/threejs/lessons/threejs-materials.html">Three.js 材质</a> 这两篇文章。<p></p>
+上面提到的方法在本网站上可以找到很多实例，比如<a href="primitives.html">Three.js 图元</a>和<a href="materials.html">Three.js 材质</a> 这两篇文章。<p></p>
 <h2 id="-">另一个方法</h2>
 <p>还有一个方法也可以实现这种效果，原理是渲染到屏幕外的画布上，并将结果复制到对应的2D画布上。这个方法的优点是对如何组合每个独立区域没有限制，因此只需正常编写HTML即可。而第一种方法则需要在背景设置一个<code class="notranslate" translate="no">Canvas</code>。</p>
 <p>但这个方法的缺点就是速度较慢，因为每个区域都必须进行复制，因此速度快慢取决于浏览器本身和GPU的性能。</p>

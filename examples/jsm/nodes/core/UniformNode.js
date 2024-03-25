@@ -35,6 +35,26 @@ class UniformNode extends InputNode {
 
 	}
 
+	onUpdate( callback, updateType ) {
+
+		const self = this.getSelf();
+
+		callback = callback.bind( self );
+
+		return super.onUpdate( ( frame ) => {
+
+			const value = callback( frame, self );
+
+			if ( value !== undefined ) {
+
+				this.value = value;
+
+			}
+
+	 	}, updateType );
+
+	}
+
 	generate( builder, output ) {
 
 		const type = this.getNodeType( builder );

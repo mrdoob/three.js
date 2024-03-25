@@ -228,7 +228,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	isUnfilterable( texture ) {
 
-		return texture.isDataTexture === true && texture.type === FloatType;
+		return this.getComponentTypeFromTexture( texture ) !== 'float' || ( texture.isDataTexture === true && texture.type === FloatType );
 
 	}
 
@@ -759,11 +759,13 @@ ${ flowData.code }
 
 					const format = getFormat( texture );
 
-					textureType = 'texture_storage_2d<' + format + ', write>';
+					textureType = `texture_storage_2d<${ format }, write>`;
 
 				} else {
 
-					textureType = 'texture_2d<f32>';
+					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
+
+					textureType = `texture_2d<${ componentPrefix }32>`;
 
 				}
 
