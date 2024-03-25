@@ -44,6 +44,7 @@ const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
 const MAX_SAMPLES = 20;
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+const _cubeCamera = /*@__PURE__*/ new PerspectiveCamera( 90, 1 );
 const _clearColor = /*@__PURE__*/ new Color();
 let _oldTarget = null;
 let _oldActiveCubeFace = 0;
@@ -326,9 +327,9 @@ class PMREMGenerator {
 
 	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
 
-		const fov = 90;
-		const aspect = 1;
-		const cubeCamera = new PerspectiveCamera( fov, aspect, near, far );
+		const cubeCamera = _cubeCamera;
+		cubeCamera.near = near;
+		cubeCamera.far = far;
 
 		// px, py, pz, nx, ny, nz
 		const upSign = [ - 1, 1, - 1, - 1, - 1, - 1 ];
