@@ -162,7 +162,7 @@ class PMREMNode extends TempNode {
 
 		const texture = this.value;
 
-		if ( builder.renderer.coordinateSystem === WebGLCoordinateSystem && texture.isRenderTargetTexture ) {
+		if ( builder.renderer.coordinateSystem === WebGLCoordinateSystem && texture.isPMREMTexture !== true && texture.isRenderTargetTexture === true ) {
 
 			uvNode = vec3( uvNode.x.negate(), uvNode.yz );
 
