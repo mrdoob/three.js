@@ -820,7 +820,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 									if ( dataReady ) {
 
-										if ( texture.dirtyLayers.length > 0 ) {
+										if ( texture.dirtyLayers.size > 0 ) {
 
 											for ( const layerIndex of texture.dirtyLayers ) {
 
