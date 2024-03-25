@@ -40,6 +40,8 @@ export class JoinEditor extends BaseNodeEditor {
 
 			this.invalidate();
 
+			this.title.setOutput( length );
+
 		};
 
 		const xElement = setInputAestheticsFromType( new LabelElement( 'x | r' ), 'Number' ).onConnect( update );
