@@ -177,8 +177,6 @@
 
 				} )();
 			
-				// TODO: Add toAttribute() test
-
 				//
 
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
@@ -207,9 +205,12 @@
 
 				}
 
-				renderer.info.autoReset = false;
 
 				await renderer.computeAsync( computeInit );
+
+				//
+
+				renderer.info.autoReset = false;
 
 				 const stepAnimation = async function () {
 
@@ -236,8 +237,6 @@
 					renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
 					const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
-
-					camera.aspect = aspect;
 
 					const frustumHeight = camera.top - camera.bottom;
 
