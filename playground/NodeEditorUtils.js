@@ -1,5 +1,6 @@
 import { StringInput, NumberInput, ColorInput, Element, LabelElement } from 'flow';
 import { string, float, vec2, vec3, vec4, color } from 'three/nodes';
+import { setInputAestheticsFromType, setOutputAestheticsFromType } from './DataTypeLib.js';
 
 export function exportJSON( object, name ) {
 
@@ -55,48 +56,6 @@ export function disposeMaterial( material )	{
 		}
 
 	}
-
-}
-
-export const colorLib = {
-	// gpu
-	string: '#ff0000',
-	// cpu
-	Material: '#228b22',
-	Object3D: '#00a1ff',
-	CodeNode: '#ff00ff',
-	Texture: '#ffa500',
-	URL: '#ff0080',
-	String: '#ff0000'
-};
-
-export function getColorFromType( type ) {
-
-	return colorLib[ type ];
-
-}
-
-export function getTypeFromValue( value ) {
-
-	if ( value && value.isScriptableValueNode ) value = value.value;
-	if ( ! value ) return;
-
-	if ( value.isNode && value.nodeType === 'string' ) return 'string';
-	if ( value.isNode && value.nodeType === 'ArrayBuffer' ) return 'URL';
-
-	for ( const type of Object.keys( colorLib ).reverse() ) {
-
-		if ( value[ 'is' + type ] === true ) return type;
-
-	}
-
-}
-
-export function getColorFromValue( value ) {
-
-	const type = getTypeFromValue( value );
-
-	return getColorFromType( type );
 
 }
 
@@ -306,9 +265,8 @@ export function createElementFromJSON( json ) {
 
 	if ( inputType && json.inputConnection !== false ) {
 
-		element.setInputColor( getColorFromType( inputType ) );
+		setInputAestheticsFromType( element, inputType );
 		//element.setInputStyle( 'dotted' ); // 'border-style: dotted;'
-		element.setInput( 1 );
 
 		element.onValid( onValidType( inputType ) );
 
@@ -316,9 +274,8 @@ export function createElementFromJSON( json ) {
 
 	if ( outputType ) {
 
-		element.setInputColor( getColorFromType( outputType ) );
+		setOutputAestheticsFromType( element, outputType );
 		//element.setInputStyle( 'dotted' ); // 'border-style: dotted;'
-		element.setOutput( 1 );
 
 	}
 

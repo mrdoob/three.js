@@ -1,12 +1,12 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { nodeProxy, tslFn } from '../shadernode/ShaderNode.js';
+import { float, nodeProxy, tslFn } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { reference } from './ReferenceNode.js';
 import { positionLocal } from './PositionNode.js';
 import { normalLocal } from './NormalNode.js';
 import { textureLoad } from './TextureNode.js';
-import { vertexIndex } from '../core/IndexNode.js';
+import { instanceIndex, vertexIndex } from '../core/IndexNode.js';
 import { ivec2, int } from '../shadernode/ShaderNode.js';
 import { DataArrayTexture, Vector2, Vector4, FloatType } from 'three';
 import { loop } from '../utils/LoopNode.js';
@@ -188,7 +188,17 @@ class MorphNode extends Node {
 
 		loop( morphTargetsCount, ( { i } ) => {
 
-			const influence = reference( 'morphTargetInfluences', 'float' ).element( i );
+			const influence = float( 0 ).toVar();
+
+			if ( this.mesh.isInstancedMesh === true && ( this.mesh.morphTexture !== null && this.mesh.morphTexture !== undefined ) ) {
+
+				influence.assign( textureLoad( this.mesh.morphTexture, ivec2( int( i ).add( 1 ), int( instanceIndex ) ) ).r );
+
+			} else {
+
+				influence.assign( reference( 'morphTargetInfluences', 'float' ).element( i ).toVar() );
+
+			}
 
 			if ( hasMorphPosition === true ) {
 

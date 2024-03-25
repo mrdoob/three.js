@@ -57,7 +57,7 @@ class Renderer {
 		this.sortObjects = true;
 
 		this.depth = true;
-		this.stencil = true;
+		this.stencil = false;
 
 		this.clippingPlanes = [];
 
@@ -379,7 +379,6 @@ class Renderer {
 
 		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-		if ( this.info.autoReset === true ) this.info.reset();
 
 		//
 
@@ -898,7 +897,6 @@ class Renderer {
 		const previousRenderId = nodeFrame.renderId;
 
 		//
-		if ( this.info.autoReset === true ) this.info.resetCompute();
 
 		this.info.calls ++;
 		this.info.compute.calls ++;

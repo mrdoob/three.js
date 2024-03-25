@@ -68,7 +68,7 @@ class WebGLRenderer {
 			canvas = createCanvasElement(),
 			context = null,
 			depth = true,
-			stencil = true,
+			stencil = false,
 			alpha = false,
 			antialias = false,
 			premultipliedAlpha = true,
@@ -1407,8 +1407,12 @@ class WebGLRenderer {
 					generateMipmaps: true,
 					type: ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) ) ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
-					samples: 4
+					samples: 4,
+					stencilBuffer: stencil
 				} );
+
+				const renderTargetProperties = properties.get( currentRenderState.state.transmissionRenderTarget );
+				renderTargetProperties.__isTransmissionRenderTarget = true;
 
 				// debug
 
@@ -1983,6 +1987,12 @@ class WebGLRenderer {
 				m_uniforms.envMap.value = envMap;
 
 				m_uniforms.flipEnvMap.value = ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) ? - 1 : 1;
+
+			}
+
+			if ( material.isMeshStandardMaterial && material.envMap === null && scene.environment !== null ) {
+
+				m_uniforms.envMapIntensity.value = scene.environmentIntensity;
 
 			}
 

@@ -1,11 +1,13 @@
 import { Material, ShaderMaterial, NoColorSpace, LinearSRGBColorSpace } from 'three';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
-import { output, diffuseColor } from '../core/PropertyNode.js';
+import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
+import { batch } from '../accessors/BatchNode.js';
+
 import { positionLocal, positionView } from '../accessors/PositionNode.js';
 import { skinningReference } from '../accessors/SkinningNode.js';
 import { morphReference } from '../accessors/MorphNode.js';
@@ -107,7 +109,11 @@ class NodeMaterial extends ShaderMaterial {
 
 			if ( clippingNode !== null ) builder.stack.add( clippingNode );
 
-			resultNode = this.setupOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
+			// force unsigned floats - useful for RenderTargets
+
+			const basicOutput = vec4( outgoingLightNode, diffuseColor.a ).max( 0 );
+
+			resultNode = this.setupOutput( builder, basicOutput );
 
 			// OUTPUT NODE
 
@@ -199,6 +205,12 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
+		if ( object.isBatchedMesh ) {
+
+			batch( object ).append();
+
+		}
+
 		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
 
 			instance( object ).append();
@@ -220,7 +232,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	setupDiffuseColor( { geometry } ) {
+	setupDiffuseColor( { object, geometry } ) {
 
 		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
 
@@ -229,6 +241,16 @@ class NodeMaterial extends ShaderMaterial {
 		if ( this.vertexColors === true && geometry.hasAttribute( 'color' ) ) {
 
 			colorNode = vec4( colorNode.xyz.mul( attribute( 'color', 'vec3' ) ), colorNode.a );
+
+		}
+
+		// Instanced colors
+
+		if ( object.instanceColor ) {
+
+			const instanceColor = varyingProperty( 'vec3', 'vInstanceColor' );
+
+			colorNode = instanceColor.mul( colorNode );
 
 		}
 
@@ -380,6 +402,16 @@ class NodeMaterial extends ShaderMaterial {
 
 		const renderer = builder.renderer;
 
+		// FOG
+
+		if ( this.fog === true ) {
+
+			const fogNode = builder.fogNode;
+
+			if ( fogNode ) outputNode = vec4( fogNode.mix( outputNode.rgb, fogNode.colorNode ), outputNode.a );
+
+		}
+
 		// TONE MAPPING
 
 		const toneMappingNode = builder.toneMappingNode;
@@ -387,16 +419,6 @@ class NodeMaterial extends ShaderMaterial {
 		if ( this.toneMapped === true && toneMappingNode ) {
 
 			outputNode = vec4( toneMappingNode.context( { color: outputNode.rgb } ), outputNode.a );
-
-		}
-
-		// FOG
-
-		if ( this.fog === true ) {
-
-			const fogNode = builder.fogNode;
-
-			if ( fogNode ) outputNode = vec4( fogNode.mixAssign( outputNode.rgb ), outputNode.a );
 
 		}
 

@@ -84,8 +84,10 @@ export { default as CameraNode, cameraProjectionMatrix, cameraProjectionMatrixIn
 export { default as VertexColorNode, vertexColor } from './accessors/VertexColorNode.js';
 export { default as CubeTextureNode, cubeTexture } from './accessors/CubeTextureNode.js';
 export { default as InstanceNode, instance } from './accessors/InstanceNode.js';
+export { default as BatchNode, batch } from './accessors/BatchNode.js';
 export { default as MaterialNode, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecularColor, materialSpecularStrength, materialReflectivity, materialRoughness, materialMetalness, materialNormal, materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialRotation, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineWidth, materialLineDashOffset, materialPointWidth } from './accessors/MaterialNode.js';
 export { default as MaterialReferenceNode, materialReference } from './accessors/MaterialReferenceNode.js';
+export { default as RendererReferenceNode, rendererReference } from './accessors/RendererReferenceNode.js';
 export { default as MorphNode, morphReference } from './accessors/MorphNode.js';
 export { default as TextureBicubicNode, textureBicubic } from './accessors/TextureBicubicNode.js';
 export { default as ModelNode, modelDirection, modelViewMatrix, modelNormalMatrix, modelWorldMatrix, modelPosition, modelViewPosition, modelScale } from './accessors/ModelNode.js';

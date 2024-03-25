@@ -2845,7 +2845,7 @@ class AnimationParser {
 
 		const quaternionValues = [];
 
-		if ( ! values || ! times ) return new QuaternionKeyframeTrack( modelName + '.quaternion', [], [] );
+		if ( ! values || ! times ) return new QuaternionKeyframeTrack( modelName + '.quaternion', [ 0 ], [ 0 ] );
 
 		for ( let i = 0; i < values.length; i += 3 ) {
 
