@@ -166,6 +166,8 @@ class TransformControls extends Object3D {
 		this._quaternionStart = new Quaternion();
 		this._scaleStart = new Vector3();
 
+		this._transformMatrixWorldInv = new Matrix4();
+
 		this._getPointer = getPointer.bind( this );
 		this._onPointerDown = onPointerDown.bind( this );
 		this._onPointerHover = onPointerHover.bind( this );
@@ -215,13 +217,15 @@ class TransformControls extends Object3D {
 
 		}
 
-		// TransformControls should ignore any parent matrix
-		this.matrixAutoUpdate = false;
-		this.updateMatrix();
-		this.matrixWorldNeedsUpdate = false;
-		this.matrixWorld.copy( this.matrix );
+		// keep the matrixWorld to identity
+		if ( this.parent ) {
 
-		super.updateMatrixWorld( false );
+			this._transformMatrixWorldInv.copy( this.parent.matrixWorld ).invert();
+			this._transformMatrixWorldInv.decompose( this.position, this.rotation, this.scale );
+
+		}
+
+		super.updateMatrixWorld( force );
 
 	}
 
