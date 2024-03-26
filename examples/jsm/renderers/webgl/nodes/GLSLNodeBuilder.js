@@ -390,7 +390,7 @@ ${ flowData.code }
 
 			const array = dataAttribute.array;
 
-			if ( ( array instanceof Uint32Array || array instanceof Int32Array || array instanceof Uint16Array || array instanceof Int16Array ) === false ) {
+			if ( ( array instanceof Uint32Array || array instanceof Int32Array ) ) {
 
 				nodeType = nodeType.slice( 1 );
 
