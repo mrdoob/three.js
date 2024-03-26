@@ -5,7 +5,7 @@ import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
-import { RedFormat, RGFormat, IntType, DataTexture, RGBAFormat, FloatType } from 'three';
+import { RedFormat, RGFormat, IntType, DataTexture, RGBFormat, RGBAFormat, FloatType } from 'three';
 
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan',
@@ -104,7 +104,7 @@ ${ flowData.code }
 
 			} else if ( itemSize === 3 ) {
 
-				format = 6407; // patch since legacy doesn't use RGBFormat for rendering but here it's needed for packing optimization
+				format = RGBFormat;
 
 			} else if ( itemSize === 4 ) {
 
