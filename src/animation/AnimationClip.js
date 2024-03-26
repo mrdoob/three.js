@@ -11,7 +11,7 @@ import { NormalAnimationBlendMode } from '../constants.js';
 
 class AnimationClip {
 
-	constructor( name, duration = - 1, tracks, blendMode = NormalAnimationBlendMode ) {
+	constructor( name = '', duration = - 1, tracks = [], blendMode = NormalAnimationBlendMode ) {
 
 		this.name = name;
 		this.tracks = tracks;

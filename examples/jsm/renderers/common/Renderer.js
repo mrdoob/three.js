@@ -320,7 +320,9 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
-		this._renderScene( scene, camera );
+		const renderContext = this._renderScene( scene, camera );
+
+		await this.backend.resolveTimestampAsync( renderContext, 'render' );
 
 	}
 
@@ -580,7 +582,6 @@ class Renderer {
 		sceneRef.onAfterRender( this, scene, camera, renderTarget );
 
 		//
-		this.backend.resolveTimestampAsync( renderContext, 'render' );
 
 		return renderContext;
 

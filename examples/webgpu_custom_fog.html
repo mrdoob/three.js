@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, fog, float, positionWorld, triNoise3D, positionView, normalWorld, timerLocal, MeshPhongNodeMaterial } from 'three/nodes';
+			import { color, fog, float, positionWorld, triNoise3D, positionView, normalWorld, uniform, MeshPhongNodeMaterial } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
@@ -64,7 +64,8 @@
 				const alpha = .98;
 				const groundFogArea = float( distance ).sub( positionWorld.y ).div( distance ).pow( 3 ).saturate().mul( alpha );
 
-				const timer = timerLocal( 1 );
+				// a alternative way to create a TimerNode
+				const timer = uniform( 0 ).onFrameUpdate( ( frame ) => frame.time );
 
 				const fogNoiseA = triNoise3D( positionWorld.mul( .005 ), 0.2, timer );
 				const fogNoiseB = triNoise3D( positionWorld.mul( .01 ), 0.2, timer.mul( 1.2 ) );

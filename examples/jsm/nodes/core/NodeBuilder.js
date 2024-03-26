@@ -15,7 +15,7 @@ import {
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from '../../renderers/common/nodes/NodeUniform.js';
 
-import { REVISION, RenderTarget, NoColorSpace, Color, Vector2, Vector3, Vector4, Float16BufferAttribute } from 'three';
+import { REVISION, RenderTarget, Color, Vector2, Vector3, Vector4, IntType, UnsignedIntType, Float16BufferAttribute } from 'three';
 
 import { stack } from './StackNode.js';
 import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
@@ -483,25 +483,18 @@ class NodeBuilder {
 
 	}
 
-	getTextureColorSpaceFromMap( map ) {
+	getComponentTypeFromTexture( texture ) {
 
-		let colorSpace;
+		const type = texture.type;
 
-		if ( map && map.isTexture ) {
+		if ( texture.isDataTexture ) {
 
-			colorSpace = map.colorSpace;
-
-		} else if ( map && map.isWebGLRenderTarget ) {
-
-			colorSpace = map.texture.colorSpace;
-
-		} else {
-
-			colorSpace = NoColorSpace;
+			if ( type === IntType ) return 'int';
+			if ( type === UnsignedIntType ) return 'uint';
 
 		}
 
-		return colorSpace;
+		return 'float';
 
 	}
 

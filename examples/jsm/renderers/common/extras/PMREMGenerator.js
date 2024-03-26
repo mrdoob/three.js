@@ -44,6 +44,7 @@ const EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
 const MAX_SAMPLES = 20;
 
 const _flatCamera = /*@__PURE__*/ new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+const _cubeCamera = /*@__PURE__*/ new PerspectiveCamera( 90, 1 );
 const _clearColor = /*@__PURE__*/ new Color();
 let _oldTarget = null;
 let _oldActiveCubeFace = 0;
@@ -107,10 +108,12 @@ class PMREMGenerator {
 		this._lodPlanes = [];
 		this._sizeLods = [];
 		this._sigmas = [];
+		this._lodMeshes = [];
 
 		this._blurMaterial = null;
 		this._cubemapMaterial = null;
 		this._equirectMaterial = null;
+		this._backgroundBox = null;
 
 	}
 
@@ -211,6 +214,12 @@ class PMREMGenerator {
 
 		if ( this._cubemapMaterial !== null ) this._cubemapMaterial.dispose();
 		if ( this._equirectMaterial !== null ) this._equirectMaterial.dispose();
+		if ( this._backgroundBox !== null ) {
+
+			this._backgroundBox.geometry.dispose();
+			this._backgroundBox.material.dispose();
+
+		}
 
 	}
 
@@ -308,7 +317,7 @@ class PMREMGenerator {
 			this._pingPongRenderTarget = _createRenderTarget( width, height, params );
 
 			const { _lodMax } = this;
-			( { sizeLods: this._sizeLods, lodPlanes: this._lodPlanes, sigmas: this._sigmas } = _createPlanes( _lodMax ) );
+			( { sizeLods: this._sizeLods, lodPlanes: this._lodPlanes, sigmas: this._sigmas, lodMeshes: this._lodMeshes } = _createPlanes( _lodMax ) );
 
 			this._blurMaterial = _getBlurShader( _lodMax, width, height );
 
@@ -320,16 +329,18 @@ class PMREMGenerator {
 
 	_compileMaterial( material ) {
 
-		const tmpMesh = new Mesh( this._lodPlanes[ 0 ], material );
+		const tmpMesh = this._lodMeshes[ 0 ];
+		tmpMesh.material = material;
+
 		this._renderer.compile( tmpMesh, _flatCamera );
 
 	}
 
 	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
 
-		const fov = 90;
-		const aspect = 1;
-		const cubeCamera = new PerspectiveCamera( fov, aspect, near, far );
+		const cubeCamera = _cubeCamera;
+		cubeCamera.near = near;
+		cubeCamera.far = far;
 
 		// px, py, pz, nx, ny, nz
 		const upSign = [ - 1, 1, - 1, - 1, - 1, - 1 ];
@@ -344,14 +355,20 @@ class PMREMGenerator {
 		renderer.toneMapping = NoToneMapping;
 		renderer.autoClear = false;
 
-		const backgroundMaterial = new MeshBasicMaterial( {
-			name: 'PMREM.Background',
-			side: BackSide,
-			depthWrite: false,
-			depthTest: false
-		} );
+		let backgroundBox = this._backgroundBox;
 
-		const backgroundBox = new Mesh( new BoxGeometry(), backgroundMaterial );
+		if ( backgroundBox === null ) {
+
+			const backgroundMaterial = new MeshBasicMaterial( {
+				name: 'PMREM.Background',
+				side: BackSide,
+				depthWrite: false,
+				depthTest: false
+			} );
+
+			backgroundBox = new Mesh( new BoxGeometry(), backgroundMaterial );
+
+		}
 
 		let useSolidColor = false;
 		const background = scene.background;
@@ -360,7 +377,7 @@ class PMREMGenerator {
 
 			if ( background.isColor ) {
 
-				backgroundMaterial.color.copy( background );
+				backgroundBox.material.color.copy( background );
 				scene.background = null;
 				useSolidColor = true;
 
@@ -368,7 +385,7 @@ class PMREMGenerator {
 
 		} else {
 
-			backgroundMaterial.color.copy( _clearColor );
+			backgroundBox.material.color.copy( _clearColor );
 			useSolidColor = true;
 
 		}
@@ -412,9 +429,6 @@ class PMREMGenerator {
 
 		}
 
-		backgroundBox.geometry.dispose();
-		backgroundBox.material.dispose();
-
 		renderer.toneMapping = toneMapping;
 		renderer.autoClear = originalAutoClear;
 		scene.background = background;
@@ -431,7 +445,7 @@ class PMREMGenerator {
 
 			if ( this._cubemapMaterial === null ) {
 
-				this._cubemapMaterial = _getCubemapMaterial();
+				this._cubemapMaterial = _getCubemapMaterial( texture );
 
 			}
 
@@ -439,16 +453,17 @@ class PMREMGenerator {
 
 			if ( this._equirectMaterial === null ) {
 
-				this._equirectMaterial = _getEquirectMaterial();
+				this._equirectMaterial = _getEquirectMaterial( texture );
 
 			}
 
 		}
 
 		const material = isCubeTexture ? this._cubemapMaterial : this._equirectMaterial;
-		const mesh = new Mesh( this._lodPlanes[ 0 ], material );
-
 		material.fragmentNode.value = texture;
+
+		const mesh = this._lodMeshes[ 0 ];
+		mesh.material = material;
 
 		const size = this._cubeSize;
 
@@ -517,15 +532,16 @@ class PMREMGenerator {
 
 		if ( direction !== 'latitudinal' && direction !== 'longitudinal' ) {
 
-			console.error(
-				'blur direction must be either latitudinal or longitudinal!' );
+			console.error( 'blur direction must be either latitudinal or longitudinal!' );
 
 		}
 
 		// Number of standard deviations at which to cut off the discrete approximation.
 		const STANDARD_DEVIATIONS = 3;
 
-		const blurMesh = new Mesh( this._lodPlanes[ lodOut ], blurMaterial );
+		const blurMesh = this._lodMeshes[ lodOut ];
+		blurMesh.material = blurMaterial;
+
 		const blurUniforms = blurMaterial.uniforms;
 
 		const pixels = this._sizeLods[ lodIn ] - 1;
@@ -568,6 +584,8 @@ class PMREMGenerator {
 
 		}
 
+		targetIn.texture.frame = ( targetIn.texture.frame || 0 ) + 1;
+
 		blurUniforms.envMap.value = targetIn.texture;
 		blurUniforms.samples.value = samples;
 		blurUniforms.weights.array = weights;
@@ -600,6 +618,7 @@ function _createPlanes( lodMax ) {
 	const lodPlanes = [];
 	const sizeLods = [];
 	const sigmas = [];
+	const lodMeshes = [];
 
 	let lod = lodMax;
 
@@ -664,6 +683,7 @@ function _createPlanes( lodMax ) {
 		planes.setAttribute( 'uv', new BufferAttribute( uv, uvSize ) );
 		planes.setAttribute( 'faceIndex', new BufferAttribute( faceIndex, faceIndexSize ) );
 		lodPlanes.push( planes );
+		lodMeshes.push( new Mesh( planes, null ) );
 
 		if ( lod > LOD_MIN ) {
 
@@ -673,7 +693,7 @@ function _createPlanes( lodMax ) {
 
 	}
 
-	return { lodPlanes, sizeLods, sigmas };
+	return { lodPlanes, sizeLods, sigmas, lodMeshes };
 
 }
 
@@ -745,19 +765,19 @@ function _getBlurShader( lodMax, width, height ) {
 
 }
 
-function _getCubemapMaterial() {
+function _getCubemapMaterial( envTexture ) {
 
 	const material = _getMaterial();
-	material.fragmentNode = cubeTexture( texture, outputDirection );
+	material.fragmentNode = cubeTexture( envTexture, outputDirection );
 
 	return material;
 
 }
 
-function _getEquirectMaterial() {
+function _getEquirectMaterial( envTexture ) {
 
 	const material = _getMaterial();
-	material.fragmentNode = texture( texture, equirectUV( outputDirection ), 0 );
+	material.fragmentNode = texture( envTexture, equirectUV( outputDirection ), 0 );
 
 	return material;
 
