@@ -155,7 +155,7 @@ export default class RenderObject {
 
 		for ( const property in material ) {
 
-			if ( /^(is[A-Z])|^(visible|version|uuid|name|opacity|userData)$/.test( property ) ) continue;
+			if ( /^(is[A-Z]|_)|^(visible|version|uuid|name|opacity|userData)$/.test( property ) ) continue;
 
 			let value = material[ property ];
 

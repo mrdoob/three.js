@@ -506,7 +506,7 @@ function Loader( editor ) {
 
 					const contents = event.target.result;
 
-					const { PCDLoader } = await import( '../../examples/jsm/loaders/PCDLoader.js' );
+					const { PCDLoader } = await import( 'three/addons/loaders/PCDLoader.js' );
 
 					const points = new PCDLoader().parse( contents );
 					points.name = filename;
@@ -653,7 +653,7 @@ function Loader( editor ) {
 
 					const contents = event.target.result;
 
-					const { USDZLoader } = await import( '../../examples/jsm/loaders/USDZLoader.js' );
+					const { USDZLoader } = await import( 'three/addons/loaders/USDZLoader.js' );
 
 					const group = new USDZLoader().parse( contents );
 					group.name = filename;
