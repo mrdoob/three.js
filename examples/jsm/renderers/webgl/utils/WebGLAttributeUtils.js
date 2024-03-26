@@ -1,5 +1,3 @@
-import { IntType } from 'three';
-
 let _id = 0;
 
 class DualAttributeData {
@@ -80,16 +78,19 @@ class WebGLAttributeUtils {
 		//attribute.onUploadCallback();
 
 		let type;
+		let isInteger = true;
 
 		if ( array instanceof Float32Array ) {
 
 			type = gl.FLOAT;
+			isInteger = false;
 
 		} else if ( array instanceof Uint16Array ) {
 
 			if ( attribute.isFloat16BufferAttribute ) {
 
 				type = gl.HALF_FLOAT;
+				isInteger = false;
 
 			} else {
 
@@ -135,7 +136,7 @@ class WebGLAttributeUtils {
 			bytesPerElement: array.BYTES_PER_ELEMENT,
 			version: attribute.version,
 			pbo: attribute.pbo,
-			isInteger: type === gl.INT || type === gl.UNSIGNED_INT || attribute.gpuType === IntType,
+			isInteger,
 			id: _id ++
 		};
 
