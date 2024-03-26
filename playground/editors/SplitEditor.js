@@ -1,7 +1,7 @@
 import { LabelElement } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { nodeObject, float } from 'three/nodes';
-import { setInputAestheticsFromType } from '../DataTypeLib.js';
+import { setInputAestheticsFromType, setOutputAestheticsFromType } from '../DataTypeLib.js';
 
 export class SplitEditor extends BaseNodeEditor {
 
@@ -33,12 +33,10 @@ export class SplitEditor extends BaseNodeEditor {
 
 		} );
 
-		this.add( inputElement );
-
-		const xElement = setInputAestheticsFromType( new LabelElement( 'x | r' ), 'Number' ).setObject( float() );
-		const yElement = setInputAestheticsFromType( new LabelElement( 'y | g' ), 'Number' ).setObject( float() );
-		const zElement = setInputAestheticsFromType( new LabelElement( 'z | b' ), 'Number' ).setObject( float() );
-		const wElement = setInputAestheticsFromType( new LabelElement( 'w | a' ), 'Number' ).setObject( float() );
+		const xElement = setOutputAestheticsFromType( new LabelElement( 'x | r' ), 'Number' ).setObject( float() );
+		const yElement = setOutputAestheticsFromType( new LabelElement( 'y | g' ), 'Number' ).setObject( float() );
+		const zElement = setOutputAestheticsFromType( new LabelElement( 'z | b' ), 'Number' ).setObject( float() );
+		const wElement = setOutputAestheticsFromType( new LabelElement( 'w | a' ), 'Number' ).setObject( float() );
 
 		this.add( inputElement )
 			.add( xElement )
