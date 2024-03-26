@@ -4,7 +4,8 @@ import { texture } from '../accessors/TextureNode.js';
 import { textureCubeUV } from './PMREMUtils.js';
 import { uniform } from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
+import { WebGLCoordinateSystem } from 'three';
 
 let _generator = null;
 
@@ -26,7 +27,9 @@ function _getPMREMFromTexture( texture ) {
 
 	let cacheTexture = _cache.get( texture );
 
-	if ( cacheTexture === undefined ) {
+	const pmremVersion = cacheTexture !== undefined ? cacheTexture.pmremVersion : - 1;
+
+	if ( pmremVersion !== texture.pmremVersion ) {
 
 		if ( texture.isCubeTexture ) {
 
@@ -36,7 +39,7 @@ function _getPMREMFromTexture( texture ) {
 
 			}
 
-			cacheTexture = _generator.fromCubemap( texture );
+			cacheTexture = _generator.fromCubemap( texture, cacheTexture );
 
 		} else {
 
@@ -46,9 +49,11 @@ function _getPMREMFromTexture( texture ) {
 
 			}
 
-			cacheTexture = _generator.fromEquirectangular( texture );
+			cacheTexture = _generator.fromEquirectangular( texture, cacheTexture );
 
 		}
+
+		cacheTexture.pmremVersion = texture.pmremVersion;
 
 		_cache.set( texture, cacheTexture );
 
@@ -104,13 +109,14 @@ class PMREMNode extends TempNode {
 
 	}
 
-	updateBefore( frame ) {
+	updateBefore() {
 
 		let pmrem = this._pmrem;
 
-		if ( pmrem === null ) {
+		const pmremVersion = pmrem ? pmrem.pmremVersion : - 1;
+		const texture = this._value;
 
-			const texture = this._value;
+		if ( pmremVersion !== texture.pmremVersion ) {
 
 			if ( texture.isPMREMTexture === true ) {
 
@@ -149,6 +155,16 @@ class PMREMNode extends TempNode {
 		if ( uvNode === null && builder.context.getUV ) {
 
 			uvNode = builder.context.getUV( this );
+
+		}
+
+		//
+
+		const texture = this.value;
+
+		if ( builder.renderer.coordinateSystem === WebGLCoordinateSystem && texture.isPMREMTexture !== true && texture.isRenderTargetTexture === true ) {
+
+			uvNode = vec3( uvNode.x.negate(), uvNode.yz );
 
 		}
 
