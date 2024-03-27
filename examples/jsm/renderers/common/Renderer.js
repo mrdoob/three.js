@@ -12,7 +12,7 @@ import Background from './Background.js';
 import Nodes from './nodes/Nodes.js';
 import Color4 from './Color4.js';
 import ClippingContext from './ClippingContext.js';
-import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, RenderTarget, HalfFloatType, RGBAFormat } from 'three';
+import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, RenderTarget, HalfFloatType, RGBAFormat, FloatType } from 'three';
 import { NodeMaterial } from '../../nodes/Nodes.js';
 import QuadMesh from '../../objects/QuadMesh.js';
 
@@ -352,7 +352,7 @@ class Renderer {
 			postProcessingTarget = new RenderTarget( width, height, {
 				depthBuffer: depth,
 				stencilBuffer: stencil,
-				type: HalfFloatType,
+				type: HalfFloatType, // FloatType
 				format: RGBAFormat,
 				colorSpace: LinearSRGBColorSpace,
 				generateMipmaps: false,
@@ -1298,7 +1298,7 @@ class Renderer {
 
 		//
 
-		if ( material.side === DoubleSide && material.forceSinglePass === false ) {
+		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 			material.side = BackSide;
 			this._handleObjectFunction( object, material, scene, camera, lightsNode, 'backSide' ); // create backSide pass id

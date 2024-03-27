@@ -1,6 +1,8 @@
 import Node from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { nodeObject, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
+import { diffuseColor, mix } from '../Nodes.js';
+import { materialTransmission } from '../accessors/MaterialNode.js';
 
 const LightNodes = new WeakMap();
 
@@ -96,6 +98,10 @@ class LightsNode extends Node {
 			if ( backdrop !== null ) {
 
 				totalDiffuse = vec3( backdropAlpha !== null ? backdropAlpha.mix( totalDiffuse, backdrop ) : backdrop );
+
+				diffuseColor.a.mulAssign( backdropAlpha );
+
+				context.material.transparent = true;
 
 			}
 

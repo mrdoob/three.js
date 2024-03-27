@@ -13,7 +13,7 @@ import { tslFn, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
 import { cond } from '../math/CondNode.js';
 import { mix, smoothstep } from '../math/MathNode.js';
 
-import { mat4, normalize, div, color, refract, int, length, clamp, vec2, log2, textureBicubic, log, exp, If, vec4, sub, viewportMipTexture, cameraPosition, modelViewMatrix, cameraProjectionMatrix, modelWorldMatrix, materialReference, faceDirection, viewportResolution, viewportTopLeft, cameraViewMatrix } from '../Nodes.js';
+import { mat4, normalize, div, color, refract, int, length, clamp, vec2, log2, textureBicubic, log, exp, If, vec4, sub, viewportMipTexture, cameraPosition, modelViewMatrix, cameraProjectionMatrix, modelWorldMatrix, materialReference, faceDirection, viewportResolution, viewportTopLeft, cameraViewMatrix, viewportTexture } from '../Nodes.js';
 import { attenuationColor, attenuationDistance, materialThickness, materialTransmission } from '../accessors/MaterialNode.js';
 
 const materialIOR = materialReference( 'ior', 'float' );
@@ -57,9 +57,13 @@ const applyIorToRoughness = tslFn( ( [ roughness, ior ] ) => {
 	]
 } );
 
+const singleViewportMipTexture = viewportMipTexture();
+
 const getTransmissionSample = tslFn( ( [ fragCoord, roughness, ior ] ) => {
 
-	const transmissionSample = viewportMipTexture( fragCoord || viewportTopLeft );
+	//const transmissionSample = singleViewportMipTexture.uv( fragCoord || viewportTopLeft );
+	const transmissionSample = singleViewportMipTexture.uv( fragCoord || viewportTopLeft );
+	//const transmissionSample = viewportTexture( fragCoord || viewportTopLeft );
 	//const sizeX = float( transmissionSample.size( 0 ).x ).toVar();
 	const sizeX = viewportResolution.x;
 
@@ -117,7 +121,7 @@ const getIBLVolumeRefraction = tslFn( ( [ n_immutable, v_immutable, roughness_im
 	refractionCoords.assign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
 	const uv = refractionCoords;
 	const transmittedLight = vec4( getTransmissionSample( uv, roughness, ior ) ).toVar();
-	const transmittance = vec3( diffuseColor.mul( volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance ) ) ).toVar();
+	const transmittance = vec3( diffuseColor.mul( volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance ) ) );
 	const attenuatedColor = vec3( transmittance.mul( transmittedLight.rgb ) ).toVar();
 	const dotNV = n.dot( v ).clamp();
 	const F = vec3( EnvironmentBRDF( { // n, v, specularColor, specularF90, roughness
@@ -126,9 +130,9 @@ const getIBLVolumeRefraction = tslFn( ( [ n_immutable, v_immutable, roughness_im
 		specularF90,
 		roughness
 	} ) ).toVar();
-	const transmittanceFactor = float( transmittance.r.add( transmittance.g.add( transmittance.b ) ).div( 3.0 ) ).toVar();
+	const transmittanceFactor = float( transmittance.r.add( transmittance.g, transmittance.b ) ).div( 3.0 );
 
-	return vec4( sub( 1.0, F ).mul( attenuatedColor ), sub( 1.0, sub( 1.0, transmittedLight.a ).mul( transmittanceFactor ) ) );
+	return vec4( F.oneMinus().mul( attenuatedColor ), transmittedLight.a.oneMinus().mul( transmittanceFactor ).oneMinus() );
 
 } );
 
@@ -448,7 +452,7 @@ class PhysicalLightingModel extends LightingModel {
 				materialReference( 'attenuationDistance', 'float' ) // attenuationDistance
 			);
 
-			context.backdropAlpha = materialTransmission;
+			context.backdropAlpha = mix( 1, context.backdrop.a, materialTransmission );
 
 		}
 
