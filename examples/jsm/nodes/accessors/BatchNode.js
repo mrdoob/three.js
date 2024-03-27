@@ -4,8 +4,7 @@ import { positionLocal } from './PositionNode.js';
 import { nodeProxy, vec3, mat3, mat4, int, ivec2, float } from '../shadernode/ShaderNode.js';
 import { textureLoad } from './TextureNode.js';
 import { textureSize } from './TextureSizeNode.js';
-import { Float32BufferAttribute } from 'three';
-import { bufferAttribute } from './BufferAttributeNode.js';
+import { attribute } from '../core/AttributeNode.js';
 import { tangentLocal } from './TangentNode.js';
 
 class BatchNode extends Node {
@@ -29,12 +28,7 @@ class BatchNode extends Node {
 
 		if ( this.batchingIdNode === null ) {
 
-			const batchingAttribute = this.batchMesh.geometry.getAttribute( 'batchId' );
-			const array = new Float32Array( batchingAttribute.array );
-
-			const buffer = new Float32BufferAttribute( array, 1 );
-
-			this.batchingIdNode = bufferAttribute( buffer, 'float' ).toVar();
+			this.batchingIdNode = attribute( 'batchId' );
 
 		}
 

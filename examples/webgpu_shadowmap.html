@@ -31,7 +31,7 @@
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { vec4, tslFn, vertexIndex, MeshPhongNodeMaterial } from 'three/nodes';
+			import { vec4, tslFn, color, vertexIndex, MeshPhongNodeMaterial } from 'three/nodes';
 			let camera, scene, renderer, clock;
 			let dirLight, spotLight;
 			let torusKnot, dirGroup;
@@ -52,7 +52,7 @@
 				camera.position.set( 0, 10, 20 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x222244 );
+				scene.backgroundNode = color( 0x222244 );
 				scene.fog = new THREE.Fog( 0x222244, 50, 100 );
 
 				// lights

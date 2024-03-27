@@ -135,7 +135,7 @@ class WebGLAttributeUtils {
 			bytesPerElement: array.BYTES_PER_ELEMENT,
 			version: attribute.version,
 			pbo: attribute.pbo,
-			isInteger: type === gl.INT || type === gl.UNSIGNED_INT || attribute.gpuType === IntType,
+			isInteger: type === gl.INT || type === gl.UNSIGNED_INT || type === gl.UNSIGNED_SHORT || attribute.gpuType === IntType,
 			id: _id ++
 		};
 
