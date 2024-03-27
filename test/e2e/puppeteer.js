@@ -235,15 +235,11 @@ async function main() {
 
 	/* Launch browser */
 
-	const flags = [ '--hide-scrollbars', '--enable-gpu' ];
-	// flags.push( '--enable-unsafe-webgpu', '--enable-features=Vulkan', '--use-gl=swiftshader', '--use-angle=swiftshader', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader' );
-	// if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
-
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
 	browser = await puppeteer.launch( {
 		headless: process.env.VISIBLE ? false : 'new',
-		args: flags,
+		args: [ '--hide-scrollbars' ],
 		defaultViewport: viewport,
 		handleSIGINT: false,
 		protocolTimeout: 0
@@ -258,6 +254,10 @@ async function main() {
 	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 	const build = ( await fs.readFile( 'build/three.module.js', 'utf8' ) ).replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
+
+	// const page = await browser.newPage();
+	// await page.goto( 'chrome://gpu' );
+	// await page.screenshot( { path: `test/e2e/output-screenshots/gpu.jpg`, fullPage: true } );
 
 	/* Prepare pages */
 
