@@ -1,8 +1,7 @@
 import Node from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { nodeObject, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
-import { diffuseColor, mix } from '../Nodes.js';
-import { materialTransmission } from '../accessors/MaterialNode.js';
+import { diffuseColor } from '../Nodes.js';
 
 const LightNodes = new WeakMap();
 

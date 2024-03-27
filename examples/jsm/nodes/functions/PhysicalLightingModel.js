@@ -13,8 +13,8 @@ import { tslFn, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
 import { cond } from '../math/CondNode.js';
 import { mix, smoothstep } from '../math/MathNode.js';
 
-import { mat4, normalize, div, color, refract, int, length, clamp, vec2, log2, textureBicubic, log, exp, If, vec4, sub, viewportMipTexture, cameraPosition, modelViewMatrix, cameraProjectionMatrix, modelWorldMatrix, materialReference, faceDirection, viewportResolution, viewportTopLeft, cameraViewMatrix, viewportTexture } from '../Nodes.js';
-import { attenuationColor, attenuationDistance, materialThickness, materialTransmission } from '../accessors/MaterialNode.js';
+import { mat4, normalize, div, refract, length, clamp, vec2, log2, log, exp, If, vec4, viewportMipTexture, cameraPosition, cameraProjectionMatrix, modelWorldMatrix, materialReference, viewportResolution, cameraViewMatrix } from '../Nodes.js';
+import { materialThickness, materialTransmission } from '../accessors/MaterialNode.js';
 
 const materialIOR = materialReference( 'ior', 'float' );
 
@@ -61,10 +61,9 @@ const singleViewportMipTexture = viewportMipTexture();
 
 const getTransmissionSample = tslFn( ( [ fragCoord, roughness, ior ] ) => {
 
-	//const transmissionSample = singleViewportMipTexture.uv( fragCoord || viewportTopLeft );
-	const transmissionSample = singleViewportMipTexture.uv( fragCoord || viewportTopLeft );
-	//const transmissionSample = viewportTexture( fragCoord || viewportTopLeft );
-	//const sizeX = float( transmissionSample.size( 0 ).x ).toVar();
+	const transmissionSample = singleViewportMipTexture.uv( fragCoord );
+	//const transmissionSample = viewportMipTexture( fragCoord );
+
 	const sizeX = viewportResolution.x;
 
 	const lod = float( log2( float( sizeX ) ).mul( applyIorToRoughness( roughness, ior ) ) ).toVar();
