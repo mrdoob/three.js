@@ -39,8 +39,17 @@
 			const params = {
 				exposure: 1.0,
 				toneMapping: 'AgX',
+			};
+
+			const bgParams = {
 				blurriness: 0.3,
 				intensity: 1.0,
+				rotation: 0,
+			};
+
+			const envParams = {
+				intensity: 1.0,
+				rotation: 0,
 			};
 
 			const toneMappingOptions = {
@@ -144,7 +153,7 @@
 
 				const backgroundFolder = gui.addFolder( 'background' );
 
-				backgroundFolder.add( params, 'blurriness', 0, 1 )
+				backgroundFolder.add( bgParams, 'blurriness', 0, 1 )
 
 					.onChange( function ( value ) {
 
@@ -153,11 +162,40 @@
 
 					} );
 
-				backgroundFolder.add( params, 'intensity', 0, 1 )
+				backgroundFolder.add( bgParams, 'intensity', 0, 2, 0.1 )
 
 					.onChange( function ( value ) {
 
 						scene.backgroundIntensity = value;
+						render();
+
+					} );
+
+				backgroundFolder.add( bgParams, 'rotation', - Math.PI, Math.PI, 0.1 )
+
+					.onChange( function ( value ) {
+
+						scene.backgroundRotation.y = value;
+						render();
+
+					} );
+
+				const environmentFolder = gui.addFolder( 'environment' );
+
+				environmentFolder.add( envParams, 'rotation', - Math.PI, Math.PI, 0.1 )
+
+					.onChange( function ( value ) {
+			
+						scene.environmentRotation.y = value;
+						render();
+			
+					} );
+
+				environmentFolder.add( envParams, 'intensity', 0, 2, 0.1 )
+
+					.onChange( function ( value ) {
+
+						scene.environmentIntensity = value;
 						render();
 
 					} );
@@ -179,7 +217,7 @@
 
 				if ( params.toneMapping !== 'None' ) {
 
-					guiExposure = folder.add( params, 'exposure', 0, 2 )
+					guiExposure = folder.add( params, 'exposure', 0, 2, 0.1 )
 
 						.onChange( function () {
 
