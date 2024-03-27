@@ -9,11 +9,15 @@ import LightingModel from '../core/LightingModel.js';
 import { diffuseColor, specularColor, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness } from '../core/PropertyNode.js';
 import { transformedNormalView, transformedClearcoatNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
 import { positionViewDirection, positionWorld } from '../accessors/PositionNode.js';
-import { tslFn, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
+import { tslFn, float, vec2, vec3, vec4, mat3, mat4, If } from '../shadernode/ShaderNode.js';
 import { cond } from '../math/CondNode.js';
-import { mix, smoothstep } from '../math/MathNode.js';
-
-import { mat4, normalize, div, refract, length, clamp, vec2, log2, log, exp, If, vec4, viewportMipTexture, cameraPosition, cameraProjectionMatrix, modelWorldMatrix, materialReference, viewportResolution, cameraViewMatrix } from '../Nodes.js';
+import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } from '../math/MathNode.js';
+import { div } from '../math/OperatorNode.js';
+import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../accessors/CameraNode.js';
+import { modelWorldMatrix } from '../accessors/ModelNode.js';
+import { materialReference } from '../accessors/MaterialReferenceNode.js';
+import { viewportResolution } from '../display/ViewportNode.js';
+import { viewportMipTexture } from '../display/ViewportTextureNode.js';
 import { materialThickness, materialTransmission } from '../accessors/MaterialNode.js';
 
 const materialIOR = materialReference( 'ior', 'float' );

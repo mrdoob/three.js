@@ -5,9 +5,9 @@ import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal,
 import { float, vec3 } from '../shadernode/ShaderNode.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
-
+import { mix, pow2, min } from '../math/MathNode.js';
+import { materialReference } from '../accessors/MaterialReferenceNode.js';
 import { MeshPhysicalMaterial } from 'three';
-import { materialReference, mix, pow2, min } from '../Nodes.js';
 
 const defaultValues = new MeshPhysicalMaterial();
 
