@@ -47,7 +47,7 @@ class WebGPUAttributeUtils {
 			let array = bufferAttribute.array;
 
 			// patch for INT16 and UINT16
-			if ( array.constructor === Int16Array || array.constructor === Uint16Array ) {
+			if ( attribute.normalized === false && ( array.constructor === Int16Array || array.constructor === Uint16Array ) ) {
 
 				const tempArray = new Uint32Array( array.length );
 				for ( let i = 0; i < array.length; i ++ ) {
@@ -168,8 +168,9 @@ class WebGPUAttributeUtils {
 				}
 
 				// patch for INT16 and UINT16
-				if ( geometryAttribute.array.constructor === Int16Array || geometryAttribute.array.constructor === Uint16Array ) {
+				if ( geometryAttribute.normalized === false && ( geometryAttribute.array.constructor === Int16Array || geometryAttribute.array.constructor === Uint16Array ) ) {
 
+					console.log( geometryAttribute );
 					arrayStride = 4;
 
 				}
