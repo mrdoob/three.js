@@ -323,6 +323,69 @@ ShaderLib[ 'line' ] = {
 
 		}
 
+		// https://iquilezles.org/articles/intersectors
+		// https://www.shadertoy.com/view/Xt3SzX
+		float capIntersect( in vec3 ro, in vec3 rd, in vec3 pa, in vec3 pb, in float ra ) {
+
+			vec3  ba = pb - pa;
+			vec3  oa = ro - pa;
+			float baba = dot( ba, ba );
+			float bard = dot( ba, rd );
+			float baoa = dot( ba, oa );
+			float rdoa = dot( rd, oa );
+			float oaoa = dot( oa, oa );
+			float a = baba        - bard * bard;
+			float b = baba * rdoa - baoa * bard;
+			float c = baba * oaoa - baoa * baoa - ra * ra * baba;
+			float h = b * b - a * c;
+
+			if( h >= 0.0 ) {
+
+				float t = ( - b - sqrt( h ) ) / a;
+				float y = baoa + t * bard;
+
+				// body
+				if( y > 0.0 && y < baba ) return t;
+
+				// caps
+				vec3 oc = y <= 0.0 ? oa : ro - pb;
+				b = dot( rd, oc );
+				c = dot( oc, oc ) - ra * ra;
+				h = b * b - c;
+				if( h > 0.0 ) return - b - sqrt(h);
+
+			}
+
+			return - 1.0;
+
+		}
+
+		// compute normal
+		vec3 capNormal( in vec3 pos, in vec3 a, in vec3 b, in float r ) {
+
+			vec3  ba = b - a;
+			vec3  pa = pos - a;
+			float h = clamp( dot( pa, ba ) / dot( ba, ba ), 0.0, 1.0 );
+			return ( pa - h * ba ) / r;
+
+		}
+
+		// https://stackoverflow.com/questions/10264949/glsl-gl-fragcoord-z-calculation-and-setting-gl-fragdepth
+		uniform mat4 projectionMatrix;
+		float zToFragDepth( vec3 eye_space_pos ) {
+
+			float far = gl_DepthRange.far;
+			float near = gl_DepthRange.near;
+			vec4 clip_space_pos = projectionMatrix * vec4( eye_space_pos, 1.0 );
+
+			float ndc_depth = clip_space_pos.z / clip_space_pos.w;
+
+			float depth = ( ( ( far - near ) * ndc_depth ) + near + far ) / 2.0;
+			return depth;
+
+		}
+
+
 		void main() {
 
 			#include <clipping_planes_fragment>
@@ -339,31 +402,50 @@ ShaderLib[ 'line' ] = {
 
 			#ifdef WORLD_UNITS
 
-				// Find the closest points on the view ray and the line segment
-				vec3 rayEnd = normalize( worldPos.xyz ) * 1e5;
-				vec3 lineDir = worldEnd - worldStart;
-				vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
+				#if defined( WRITE_WORLD_UNIT_DEPTH ) && ! defined( USE_DASH )
 
-				vec3 p1 = worldStart + lineDir * params.x;
-				vec3 p2 = rayEnd * params.y;
-				vec3 delta = p1 - p2;
-				float len = length( delta );
-				float norm = len / linewidth;
+					// Find the closest points on the view ray and the line segment
+					vec3 rayEnd = normalize( worldPos.xyz );
+					float dist = capIntersect( vec3( 0, 0, 0 ), rayEnd, worldStart, worldEnd, linewidth * 0.5 );
+					vec3 pos = rayEnd * dist;
 
-				#ifndef USE_DASH
+					if ( dist < 0.0 ) {
 
-					#ifdef USE_ALPHA_TO_COVERAGE
+						discard;
 
-						float dnorm = fwidth( norm );
-						alpha = 1.0 - smoothstep( 0.5 - dnorm, 0.5 + dnorm, norm );
+					}
 
-					#else
+					gl_FragDepth = zToFragDepth( pos );
 
-						if ( norm > 0.5 ) {
+				#else
 
-							discard;
+					// Find the closest points on the view ray and the line segment
+					vec3 rayEnd = normalize( worldPos.xyz ) * 1e5;
+					vec3 lineDir = worldEnd - worldStart;
+					vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
 
-						}
+					vec3 p1 = worldStart + lineDir * params.x;
+					vec3 p2 = rayEnd * params.y;
+					vec3 delta = p1 - p2;
+					float len = length( delta );
+					float norm = len / linewidth;
+
+					#ifndef USE_DASH
+
+						#ifdef USE_ALPHA_TO_COVERAGE
+
+							float dnorm = fwidth( norm );
+							alpha = 1.0 - smoothstep( 0.5 - dnorm, 0.5 + dnorm, norm );
+
+						#else
+
+							if ( norm > 0.5 ) {
+
+								discard;
+
+							}
+
+						#endif
 
 					#endif
 
@@ -467,6 +549,26 @@ class LineMaterial extends ShaderMaterial {
 		} else {
 
 			delete this.defines.WORLD_UNITS;
+
+		}
+
+	}
+
+	get adjustDepth() {
+
+		return 'WRITE_WORLD_UNIT_DEPTH' in this.defines;
+
+	}
+
+	set adjustDepth( value ) {
+
+		if ( value === true ) {
+
+			this.defines.WRITE_WORLD_UNIT_DEPTH = '';
+
+		} else {
+
+			delete this.defines.WRITE_WORLD_UNIT_DEPTH;
 
 		}
 

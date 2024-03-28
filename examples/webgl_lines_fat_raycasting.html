@@ -81,6 +81,7 @@
 
 			const params = {
 
+				'capsule depth': false,
 				'line type': 0,
 				'world units': matLine.worldUnits,
 				'visualize threshold': matThresholdLine.visible,
@@ -203,6 +204,10 @@
 				stats.addPanel( gpuPanel );
 				stats.showPanel( 0 );
 				initGui();
+
+				const cube = new THREE.Mesh( new THREE.BoxGeometry() );
+				cube.scale.setScalar( 2 );
+				scene.add( cube );
 
 			}
 
@@ -328,6 +333,16 @@
 					matLine.needsUpdate = true;
 
 					matThresholdLine.worldUnits = val;
+					matThresholdLine.needsUpdate = true;
+
+				} );
+
+				gui.add( params, 'capsule depth' ).onChange( function ( val ) {
+
+					matLine.adjustDepth = val;
+					matLine.needsUpdate = true;
+
+					matThresholdLine.adjustDepth = val;
 					matThresholdLine.needsUpdate = true;
 
 				} );
