@@ -74,8 +74,7 @@ class FunctionCallNode extends TempNode {
 		}
 
 		const functionName = functionNode.build( builder, 'property' );
-
-		return `${functionName}( ${params.join( ', ' )} )`;
+		return builder.formatOperation( '()', functionName, params );
 
 	}
 

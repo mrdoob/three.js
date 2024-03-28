@@ -258,7 +258,7 @@ export const blur = tslFn( ( { n, latitudinal, poleAxis, outputDirection, weight
 
 	const axis = vec3( cond( latitudinal, poleAxis, cross( poleAxis, outputDirection ) ) ).toVar();
 
-	If( all( axis.equals( vec3( 0.0 ) ) ), () => {
+	If( all( axis.equal( vec3( 0.0 ) ) ), () => {
 
 		axis.assign( vec3( outputDirection.z, 0.0, outputDirection.x.negate() ) );
 

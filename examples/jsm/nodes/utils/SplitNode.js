@@ -73,7 +73,7 @@ class SplitNode extends Node {
 
 			} else {
 
-				snippet = builder.format( `${nodeSnippet}.${this.components}`, this.getNodeType( builder ), output );
+				snippet = builder.format( builder.formatOperation( '.', nodeSnippet, this.components ), this.getNodeType( builder ), output );
 
 			}
 

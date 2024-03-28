@@ -1,4 +1,4 @@
-import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder, normalView } from '../../../nodes/Nodes.js';
+import { defaultShaderStages, NodeFrame, GLSLNodeParser, NodeBuilder, normalView } from '../../../nodes/Nodes.js';
 import SlotNode from './SlotNode.js';
 import { PerspectiveCamera, ShaderChunk, ShaderLib, UniformsUtils, UniformsLib } from 'three';
 
@@ -12,10 +12,6 @@ const nodeShaderLib = {
 	MeshStandardNodeMaterial: ShaderLib.standard,
 	MeshPhysicalNodeMaterial: ShaderLib.physical,
 	MeshPhongNodeMaterial: ShaderLib.phong
-};
-
-const glslMethods = {
-	[ MathNode.ATAN2 ]: 'atan'
 };
 
 const precisionLib = {
@@ -50,12 +46,6 @@ class WebGLNodeBuilder extends NodeBuilder {
 		this._parseObject();
 
 		this._sortSlotsToFlow();
-
-	}
-
-	getMethod( method ) {
-
-		return glslMethods[ method ] || method;
 
 	}
 
@@ -784,6 +774,43 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 			nodeFrame.updateNode( node );
 
 		}
+
+	}
+
+	_getOperators() {
+
+		return { // https://registry.khronos.org/OpenGL/specs/es/3.0/GLSL_ES_Specification_3.00.pdf, section 5.1
+			ops: [
+				{ ops: [ '[]', '()', '.', 'post++', 'post--' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ 'pre++', 'pre--', 'un+', 'un-', 'un~', 'un!' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '*', '/', '%' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '+', '-' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '<<', '>>' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '<', '>', '<=', '>=' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '==', '!=' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '&' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '^' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '|' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '&&' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '^^' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '||' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ '=', '+=', '-=', '*=', '/=', '%=', '<<=', '>>=', '&=', '^=', '|=' ], maxPrec: Infinity, allowSelf: true },
+				{ ops: [ ',' ], maxPrec: Infinity, allowSelf: true }
+			],
+			replace: {
+				// section 5.9
+				'<': 'lessThan()',
+				'<=': 'lessThanEqual()',
+				'>': 'greaterThan()',
+				'>=': 'greaterThanEqual()',
+				'==': 'equal()',
+				'!=': 'notEqual()',
+
+				// functions under different names
+				'atan2()': 'atan()',
+				'textureDimensions()': 'textureSize()'
+			}
+		};
 
 	}
 
