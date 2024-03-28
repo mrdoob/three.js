@@ -960,24 +960,32 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 										case _gl.ALPHA:
 											texelSize = 1;
+											break;
 										case _gl.LUMINANCE:
 											texelSize = 1;
+											break;
 										case _gl.LUMINANCE_ALPHA:
 											texelSize = 2;
+											break;
 										case _gl.RGB:
 											texelSize = 3;
+											break;
 										case _gl.RGBA:
 											texelSize = 4;
+											break;
 
 										default:
 											throw new Error( `Unknown texel size for format ${glFormat}.` );
 
 									}
 
+									break;
+
 								case _gl.UNSIGNED_SHORT_4_4_4_4:
 								case _gl.UNSIGNED_SHORT_5_5_5_1:
 								case _gl.UNSIGNED_SHORT_5_6_5:
 									texelSize = 1;
+									break;
 
 								default:
 									throw new Error( `Unknown texel size for type ${glType}.` );
