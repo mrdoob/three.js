@@ -826,7 +826,22 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 									if ( dataReady ) {
 
-										state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
+										if ( texture.dirtyLayers.size > 0 ) {
+
+											for ( const layerIndex of texture.dirtyLayers ) {
+
+												const layerSize = mipmap.width * mipmap.height;
+												state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, layerIndex, mipmap.width, mipmap.height, 1, glFormat, mipmap.data.slice( layerSize * layerIndex, layerSize * ( layerIndex + 1 ) ), 0, 0 );
+
+											}
+
+											texture.clearDirtyLayers();
+
+										} else {
+
+											state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
+
+										}
 
 									}
 
