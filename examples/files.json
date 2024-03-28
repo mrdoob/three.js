@@ -348,6 +348,7 @@
 		"webgpu_loader_gltf_compressed",
 		"webgpu_loader_gltf_iridescence",
 		"webgpu_loader_gltf_sheen",
+		"webgpu_loader_gltf_transmission",
 		"webgpu_loader_materialx",
 		"webgpu_materials",
 		"webgpu_materials_sss",

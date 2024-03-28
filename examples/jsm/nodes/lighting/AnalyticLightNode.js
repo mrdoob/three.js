@@ -10,7 +10,7 @@ import { normalWorld } from '../accessors/NormalNode.js';
 import { WebGPUCoordinateSystem } from 'three';
 //import { add } from '../math/OperatorNode.js';
 
-import { Color, DepthTexture, NearestFilter, LessCompare } from 'three';
+import { Color, DepthTexture, NearestFilter, LessCompare, NoToneMapping } from 'three';
 
 let overrideMaterial = null;
 
@@ -183,6 +183,7 @@ class AnalyticLightNode extends LightingNode {
 
 		light.shadow.updateMatrices( light );
 
+		const currentToneMapping = renderer.toneMapping;
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
 
@@ -197,11 +198,14 @@ class AnalyticLightNode extends LightingNode {
 		} );
 
 		renderer.setRenderTarget( rtt );
+		renderer.toneMapping = NoToneMapping;
 
 		renderer.render( scene, light.shadow.camera );
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setRenderObjectFunction( currentRenderObjectFunction );
+
+		renderer.toneMapping = currentToneMapping;
 
 		scene.overrideMaterial = currentOverrideMaterial;
 

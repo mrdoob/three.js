@@ -123,7 +123,7 @@ class RenderList {
 
 		if ( object.occlusionTest === true ) this.occlusionQueryCount ++;
 
-		( material.transparent === true ? this.transparent : this.opaque ).push( renderItem );
+		( material.transparent === true || material.transmission > 0 ? this.transparent : this.opaque ).push( renderItem );
 
 	}
 

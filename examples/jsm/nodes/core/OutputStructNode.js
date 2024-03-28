@@ -8,8 +8,9 @@ class OutputStructNode extends Node {
 
 		super();
 
-		this.isOutputStructNode = true;
 		this.members = members;
+
+		this.isOutputStructNode = true;
 
 	}
 

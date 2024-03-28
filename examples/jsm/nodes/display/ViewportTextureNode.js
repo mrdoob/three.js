@@ -58,7 +58,10 @@ class ViewportTextureNode extends TextureNode {
 
 	clone() {
 
-		return new this.constructor( this.uvNode, this.levelNode, this.value );
+		const viewportTextureNode = new this.constructor( this.uvNode, this.levelNode, this.value );
+		viewportTextureNode.generateMipmaps = this.generateMipmaps;
+
+		return viewportTextureNode;
 
 	}
 

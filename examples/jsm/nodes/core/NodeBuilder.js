@@ -72,7 +72,6 @@ class NodeBuilder {
 		this.lightsNode = null;
 		this.environmentNode = null;
 		this.fogNode = null;
-		this.toneMappingNode = null;
 
 		this.clippingContext = null;
 
