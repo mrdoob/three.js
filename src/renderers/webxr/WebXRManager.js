@@ -666,6 +666,12 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		this.getDepthSensingMesh = function () {
+
+			return depthSensing.getMesh( cameraXR );
+
+		};
+
 		// Animation Loop
 
 		let onAnimationFrameCallback = null;
@@ -790,8 +796,6 @@ class WebXRManager extends EventDispatcher {
 				}
 
 			}
-
-			depthSensing.render( renderer, cameraXR );
 
 			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, frame );
 
