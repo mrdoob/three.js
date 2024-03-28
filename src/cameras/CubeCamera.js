@@ -1,4 +1,4 @@
-import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../constants.js';
+import { WebGLCoordinateSystem, WebGPUCoordinateSystem, NoToneMapping } from '../constants.js';
 import { Object3D } from '../core/Object3D.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
@@ -130,8 +130,10 @@ class CubeCamera extends Object3D {
 		const currentActiveMipmapLevel = renderer.getActiveMipmapLevel();
 
 		const currentXrEnabled = renderer.xr.enabled;
+		const currentToneMapping = renderer.toneMapping;
 
 		renderer.xr.enabled = false;
+		renderer.toneMapping = NoToneMapping;
 
 		const generateMipmaps = renderTarget.texture.generateMipmaps;
 
@@ -163,6 +165,7 @@ class CubeCamera extends Object3D {
 		renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
 
 		renderer.xr.enabled = currentXrEnabled;
+		renderer.toneMapping = currentToneMapping;
 
 		renderTarget.texture.needsPMREMUpdate = true;
 
