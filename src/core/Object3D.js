@@ -587,7 +587,7 @@ class Object3D extends EventDispatcher {
 
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
-		if ( this.matrixWorldNeedsUpdate || force ) {
+		if ( this.matrixWorldNeedsUpdate || this.matrixWorldAutoUpdate === true || force ) {
 
 			if ( this.parent === null ) {
 
@@ -600,8 +600,6 @@ class Object3D extends EventDispatcher {
 			}
 
 			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
 
 		}
 
