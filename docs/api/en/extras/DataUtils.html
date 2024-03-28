@@ -29,6 +29,25 @@
 			precision floating point value.
 		</p>
 
+
+		<h3>[method:Uint32Array toRGB9E5]( [param:Number r], [param:Number g], [param:Number b], [param:Uint32Array target] )</h3>
+		<p>
+			r -- A float representing the R channel.<br />
+			g -- A float representing the G channel.<br />
+			b -- A float representing the B channel.<br />
+			target -- An instance of `Uint32Array` with length `1`.<br /><br />
+
+			This method packs three floats into a single Uint32 value which is required for the `RGB9E5` texture format.
+		</p>
+
+		<h3>[method:Array fromRGB9E5]( [param:Uint32Array val], [param:Array target] )</h3>
+		<p>
+			val -- An instance of `Uint32Array` with length `1`.<br />
+			target -- An array holding the three unpacked floats.<br /><br />
+
+			This method unpacks three floats from a single Uint32 value holding a `RGB9E5` texel.
+		</p>
+
 		<h2>Source</h2>
 
 		<p>
