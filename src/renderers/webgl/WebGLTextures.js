@@ -941,7 +941,63 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					if ( dataReady ) {
 
-						state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+						if ( texture.dirtyLayers.size > 0 ) {
+
+							for ( const layerIndex of texture.dirtyLayers ) {
+
+								// When type is GL_UNSIGNED_BYTE, each of these bytes is
+								// interpreted as one color component, depending on format. When
+								// type is one of GL_UNSIGNED_SHORT_5_6_5,
+								// GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_5_5_5_1, each
+								// unsigned value is interpreted as containing all the
+								// components for a single pixel, with the color components
+								// arranged according to format.
+								//
+								// See https://registry.khronos.org/OpenGL-Refpages/es1.1/xhtml/glTexImage2D.xml
+								let texelSize;
+								switch ( glType ) {
+
+									case _gl.UNSIGNED_BYTE:
+										switch ( glFormat ) {
+
+											case _gl.ALPHA:
+												texelSize = 1;
+											case _gl.LUMINANCE:
+												texelSize = 1;
+											case _gl.LUMINANCE_ALPHA:
+												texelSize = 2;
+											case _gl.RGB:
+												texelSize = 3;
+											case _gl.RGBA:
+												texelSize = 4;
+
+											default:
+												throw new Error( `Unknown texel size for format ${glFormat}.` );
+
+										}
+
+									case _gl.UNSIGNED_SHORT_4_4_4_4:
+									case _gl.UNSIGNED_SHORT_5_5_5_1:
+									case _gl.UNSIGNED_SHORT_5_6_5:
+										texelSize = 1;
+
+									default:
+										throw new Error( `Unknown texel size for type ${glType}.` );
+
+								}
+
+								const layerSize = image.width * image.height * texelSize;
+								state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, 0, 0, 0, layerIndex, image.width, image.height, 1, glFormat, glType, image.data.slice( layerSize * layerIndex, layerSize * ( layerIndex + 1 ) ) );
+
+							}
+
+							texture.clearDirtyLayers();
+
+						} else {
+
+							state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+
+						}
 
 					}
 

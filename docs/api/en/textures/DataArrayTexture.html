@@ -143,7 +143,29 @@
 			page for details.
 		</p>
 
+		<h3>[property:Set dirtyLayers]</h3>
+		<p>
+			A set of all dirty layers in the texture. See
+			[Page:DataArrayTexture.addDirtyLayer addDirtyLayer].
+		</p>
+
 		<h2>Methods</h2>
+
+		<h3>[method:addDirtyLayer addDirtyLayer]( layerIndex )</h3>
+		<p>
+			Describes that a specific layer of the texture needs to be updated.
+			Normally when [page:Texture.needsUpdate needsUpdate] is set to true, the
+			entire compressed texture array is sent to the GPU. Marking specific
+			layers will only transmit subsets of all mipmaps associated with a
+			specific depth in the array which is often much more performant.
+		</p>
+
+		<h3>[method:clearDirtyLayers clearDirtyLayers]()</h3>
+		<p>
+			Resets the dirty layers registry. See
+			[Page:DataArrayTexture.addDirtyLayer addDirtyLayer].
+		</p>
+
 
 		<p>See the base [page:Texture Texture] class for common methods.</p>
 
