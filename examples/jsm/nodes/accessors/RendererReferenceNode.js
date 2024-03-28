@@ -12,7 +12,7 @@ class RendererReferenceNode extends ReferenceNode {
 
 	}
 
-	setReference( state ) {
+	updateReference( state ) {
 
 		this.reference = this.renderer !== null ? this.renderer : state.renderer;
 

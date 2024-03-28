@@ -40,7 +40,6 @@
 			const seed = uniform( new THREE.Vector2() );
 
 			init();
-			render();
 
 			function init() {
 
@@ -163,7 +162,7 @@
 
 				// compute init
 
-				renderer.compute( computeInitNode );
+				renderer.computeAsync( computeInitNode );
 
 			}
 
@@ -179,8 +178,6 @@
 				camera.right = frustumHeight * aspect / 2;
 
 				camera.updateProjectionMatrix();
-
-				render();
 
 			}
 

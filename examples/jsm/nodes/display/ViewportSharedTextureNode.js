@@ -20,6 +20,12 @@ class ViewportSharedTextureNode extends ViewportTextureNode {
 
 	}
 
+	updateReference() {
+
+		return this;
+
+	}
+
 }
 
 export default ViewportSharedTextureNode;

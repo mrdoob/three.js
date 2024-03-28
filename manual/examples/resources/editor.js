@@ -1961,7 +1961,7 @@ async function openInStackBlitz() {
 		} else {
 
 			applySubstitutions();
-			require.config( { paths: { 'vs': 'https://unpkg.com/monaco-editor@0.34.1/min/vs' } } );
+			require.config( { paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.34.1/min/vs' } } );
 			require( [ 'vs/editor/editor.main' ], main );
 
 		}
