@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
 import { Config } from './Config.js';
 import { Loader } from './Loader.js';
 import { History as _History } from './History.js';
@@ -657,6 +659,8 @@ Editor.prototype = {
 	fromJSON: async function ( json ) {
 
 		var loader = new THREE.ObjectLoader();
+		loader.registerGeometry( 'TextGeometry', TextGeometry );
+
 		var camera = await loader.parseAsync( json.camera );
 
 		this.camera.copy( camera );

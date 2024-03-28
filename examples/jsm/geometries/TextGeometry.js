@@ -15,6 +15,7 @@
  * }
  */
 
+import { Font } from '../loaders/FontLoader.js';
 import {
 	ExtrudeGeometry
 } from 'three';
@@ -53,9 +54,36 @@ class TextGeometry extends ExtrudeGeometry {
 
 			super( shapes, parameters );
 
+			// for conversion of font to object units (ie. px -> m)
+
+			const scale = parameters.scale;
+
+			if ( scale !== undefined ) {
+
+				this.computeBoundingBox();
+				this.scale( scale, scale, scale );
+
+			}
+
 		}
 
 		this.type = 'TextGeometry';
+
+	}
+
+	toJSON() {
+
+		const data = super.toJSON();
+		return data;
+
+	}
+
+	static fromJSON( data ) {
+
+		const options = data.options;
+
+		options.font = new Font( options.font.data );
+		return new TextGeometry( options.text, options );
 
 	}
 
