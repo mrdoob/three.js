@@ -164,13 +164,108 @@ function fromHalfFloat( val ) {
 
 }
 
+// RGB9E5 packing/unpacking
+
+const RGB9E5_MANTISSA_BITS = 9;
+const RGB9E5_EXP_BIAS = 15;
+const RGB9E5_MAX_VALID_BIASED_EXP = 31;
+
+const MAX_RGB9E5_EXP = ( RGB9E5_MAX_VALID_BIASED_EXP - RGB9E5_EXP_BIAS );
+const RGB9E5_MANTISSA_VALUES = ( 1 << RGB9E5_MANTISSA_BITS );
+const MAX_RGB9E5_MANTISSA = ( RGB9E5_MANTISSA_VALUES - 1 );
+const MAX_RGB9E5 = ( ( MAX_RGB9E5_MANTISSA ) / RGB9E5_MANTISSA_VALUES * ( 1 << MAX_RGB9E5_EXP ) );
+
+function ClampRange_for_rgb9e5( x ) {
+
+	if ( x > 0.0 ) {
+
+		if ( x >= MAX_RGB9E5 ) {
+
+			return MAX_RGB9E5;
+
+		} else {
+
+			return x;
+
+		}
+
+	} else {
+
+		/* NaN gets here too since comparisons with NaN always fail! */
+		return 0.0;
+
+	}
+
+}
+
+function FloorLog2( x ) {
+
+	return Math.floor( Math.log2( x ) );
+
+}
+
+// reference https://registry.khronos.org/OpenGL/extensions/EXT/EXT_texture_shared_exponent.txt
+
+function toRGB9E5( r, g, b, target ) {
+
+	const rc = ClampRange_for_rgb9e5( r );
+	const gc = ClampRange_for_rgb9e5( g );
+	const bc = ClampRange_for_rgb9e5( b );
+
+	const maxrgb = Math.max( rc, gc, bc );
+	let exp_shared = Math.max( - RGB9E5_EXP_BIAS - 1, FloorLog2( maxrgb ) ) + 1 + RGB9E5_EXP_BIAS;
+
+	let denom = Math.pow( 2, exp_shared - RGB9E5_EXP_BIAS - RGB9E5_MANTISSA_BITS );
+	const maxm = Math.floor( maxrgb / denom + 0.5 );
+
+	if ( maxm == MAX_RGB9E5_MANTISSA + 1 ) {
+
+		denom *= 2;
+		exp_shared += 1;
+
+	}
+
+	const rm = Math.floor( rc / denom + 0.5 );
+	const gm = Math.floor( gc / denom + 0.5 );
+	const bm = Math.floor( bc / denom + 0.5 );
+
+	//
+
+	target[ 0 ] = ( rm << 0 ) | ( gm << 9 ) | ( bm << 18 ) | ( exp_shared << 27 );
+
+	return target;
+
+}
+
+function fromRGB9E5( val, target ) {
+
+	const r = ( val[ 0 ] >> 0 ) & 0x1FF;
+	const g = ( val[ 0 ] >> 9 ) & 0x1FF;
+	const b = ( val[ 0 ] >> 18 ) & 0x1FF;
+	const e = ( val[ 0 ] >> 27 ) & 0x01F;
+
+	const exponent = e - RGB9E5_EXP_BIAS - RGB9E5_MANTISSA_BITS;
+	const scale = Math.pow( 2, exponent );
+
+	target[ 0 ] = r * scale;
+	target[ 1 ] = g * scale;
+	target[ 2 ] = b * scale;
+
+	return target;
+
+}
+
 const DataUtils = {
 	toHalfFloat: toHalfFloat,
 	fromHalfFloat: fromHalfFloat,
+	toRGB9E5: toRGB9E5,
+	fromRGB9E5: fromRGB9E5
 };
 
 export {
 	toHalfFloat,
 	fromHalfFloat,
+	toRGB9E5,
+	fromRGB9E5,
 	DataUtils
 };
