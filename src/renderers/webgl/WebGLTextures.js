@@ -948,8 +948,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 							// type is one of GL_UNSIGNED_SHORT_5_6_5,
 							// GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_5_5_5_1, each
 							// unsigned value is interpreted as containing all the components
-              // for a single pixel, with the color components arranged
-              // according to format.
+							// for a single pixel, with the color components arranged
+							// according to format.
 							//
 							// See https://registry.khronos.org/OpenGL-Refpages/es1.1/xhtml/glTexImage2D.xml
 							let texelSize;
