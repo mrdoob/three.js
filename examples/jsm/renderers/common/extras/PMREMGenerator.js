@@ -20,7 +20,6 @@ import {
 	CubeRefractionMapping,
 	CubeUVReflectionMapping,
 	LinearFilter,
-	NoToneMapping,
 	NoBlending,
 	RGBAFormat,
 	HalfFloatType,
@@ -49,7 +48,6 @@ const _clearColor = /*@__PURE__*/ new Color();
 let _oldTarget = null;
 let _oldActiveCubeFace = 0;
 let _oldActiveMipmapLevel = 0;
-let _oldToneMapping = null;
 
 // Golden Ratio
 const PHI = ( 1 + Math.sqrt( 5 ) ) / 2;
@@ -246,16 +244,8 @@ class PMREMGenerator {
 
 	}
 
-	_ready() {
-
-		_oldToneMapping = this._renderer.toneMapping;
-		this._renderer.toneMapping = NoToneMapping;
-
-	}
-
 	_cleanup( outputTarget ) {
 
-		this._renderer.toneMapping = _oldToneMapping;
 		this._renderer.setRenderTarget( _oldTarget, _oldActiveCubeFace, _oldActiveMipmapLevel );
 		outputTarget.scissorTest = false;
 		_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
@@ -279,8 +269,6 @@ class PMREMGenerator {
 		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
 
 		const cubeUVRenderTarget = renderTarget || this._allocateTargets();
-
-		this._ready();
 		this._textureToCubeUV( texture, cubeUVRenderTarget );
 		this._applyPMREM( cubeUVRenderTarget );
 		this._cleanup( cubeUVRenderTarget );
@@ -349,10 +337,9 @@ class PMREMGenerator {
 		const renderer = this._renderer;
 
 		const originalAutoClear = renderer.autoClear;
-		const toneMapping = renderer.toneMapping;
+
 		renderer.getClearColor( _clearColor );
 
-		renderer.toneMapping = NoToneMapping;
 		renderer.autoClear = false;
 
 		let backgroundBox = this._backgroundBox;
@@ -429,7 +416,6 @@ class PMREMGenerator {
 
 		}
 
-		renderer.toneMapping = toneMapping;
 		renderer.autoClear = originalAutoClear;
 		scene.background = background;
 

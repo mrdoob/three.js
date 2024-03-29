@@ -246,10 +246,7 @@ class Nodes extends DataMap {
 
 	get isToneMappingState() {
 
-		const renderer = this.renderer;
-		const renderTarget = renderer.getRenderTarget();
-
-		return renderTarget && renderTarget.isCubeRenderTarget ? false : true;
+		return this.renderer.getRenderTarget() ? false : true;
 
 	}
 
@@ -393,13 +390,17 @@ class Nodes extends DataMap {
 
 		let output = texture( outputTexture );
 
-		if ( this.renderer.toneMappingNode ) {
+		if ( this.isToneMappingState ) {
 
-			output = vec4( this.renderer.toneMappingNode.context( { color: output.rgb } ), output.a );
+			if ( this.renderer.toneMappingNode ) {
 
-		} else if ( this.renderer.toneMapping !== NoToneMapping ) {
+				output = vec4( this.renderer.toneMappingNode.context( { color: output.rgb } ), output.a );
 
-			output = output.toneMapping( this.renderer.toneMapping );
+			} else if ( this.renderer.toneMapping !== NoToneMapping ) {
+
+				output = output.toneMapping( this.renderer.toneMapping );
+
+			}
 
 		}
 

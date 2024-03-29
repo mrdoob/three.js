@@ -96,9 +96,17 @@ class LightsNode extends Node {
 
 			if ( backdrop !== null ) {
 
-				totalDiffuse = vec3( backdropAlpha !== null ? backdropAlpha.mix( totalDiffuse, backdrop ) : backdrop );
+				if ( backdropAlpha !== null ) {
 
-				diffuseColor.a.mulAssign( backdropAlpha );
+					totalDiffuse = vec3( backdropAlpha.mix( totalDiffuse, backdrop ) );
+
+					diffuseColor.a.mulAssign( backdropAlpha );
+
+				} else {
+
+					totalDiffuse = vec3( backdrop );
+
+				}
 
 				context.material.transparent = true;
 

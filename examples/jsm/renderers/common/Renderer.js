@@ -357,8 +357,11 @@ class Renderer {
 				colorSpace: LinearSRGBColorSpace,
 				generateMipmaps: false,
 				minFilter: LinearFilter,
-				magFilter: LinearFilter
+				magFilter: LinearFilter,
+				samples: this.backend.parameters.antialias ? 4 : 0
 			} );
+
+			postProcessingTarget.isPostProcessingRenderTarget = true;
 
 			this._postProcessingTarget = postProcessingTarget;
 
@@ -374,7 +377,8 @@ class Renderer {
 
 	_renderScene( scene, camera, usePostProcessing = true ) {
 
-		const needsPostProcessing = usePostProcessing && ( this.currentColorSpace === SRGBColorSpace || this.toneMapping !== NoToneMapping || this.toneMappingNode !== null );
+		const useToneMapping = this._renderTarget === null && ( this.toneMapping !== NoToneMapping || this.toneMappingNode !== null );
+		const needsPostProcessing = usePostProcessing && ( this.currentColorSpace === SRGBColorSpace || useToneMapping );
 
 		// preserve render tree
 
