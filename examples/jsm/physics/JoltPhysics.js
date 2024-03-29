@@ -110,12 +110,9 @@ async function JoltPhysics() {
 
 		if ( shape === null ) return;
 
-		// shape.setMass( mass );
-		// shape.setRestitution( restitution );
-
 		const body = mesh.isInstancedMesh
-							? createInstancedBody( mesh, mass, shape )
-							: createBody( mesh.position, mesh.quaternion, mass, shape );
+							? createInstancedBody( mesh, mass, restitution, shape )
+							: createBody( mesh.position, mesh.quaternion, mass, restitution, shape );
 
 		if ( mass > 0 ) {
 
@@ -126,7 +123,7 @@ async function JoltPhysics() {
 
 	}
 
-	function createInstancedBody( mesh, mass, shape ) {
+	function createInstancedBody( mesh, mass, restitution, shape ) {
 
 		const array = mesh.instanceMatrix.array;
 
@@ -136,7 +133,7 @@ async function JoltPhysics() {
 
 			const position = _position.fromArray( array, i * 16 + 12 );
 			const quaternion = _quaternion.setFromRotationMatrix( _matrix.fromArray( array, i * 16 ) ); // TODO Copilot did this
-			bodies.push( createBody( position, quaternion, mass, shape ) );
+			bodies.push( createBody( position, quaternion, mass, restitution, shape ) );
 
 		}
 
@@ -144,16 +141,18 @@ async function JoltPhysics() {
 
 	}
 
-	function createBody( position, quaternion, mass, shape ) {
+	function createBody( position, rotation, mass, restitution, shape ) {
 
 		const pos = new Jolt.Vec3( position.x, position.y, position.z );
-		const rot = new Jolt.Quat( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+		const rot = new Jolt.Quat( rotation.x, rotation.y, rotation.z, rotation.w );
 
 		const motion = mass > 0 ? Jolt.EMotionType_Dynamic : Jolt.EMotionType_Static;
 		const layer = mass > 0 ? LAYER_MOVING : LAYER_NON_MOVING;
 
-		let creationSettings = new Jolt.BodyCreationSettings( shape, pos, rot, motion, layer );
-		let body = bodyInterface.CreateBody( creationSettings );
+		const creationSettings = new Jolt.BodyCreationSettings( shape, pos, rot, motion, layer );
+		creationSettings.mRestitution = restitution;
+
+		const body = bodyInterface.CreateBody( creationSettings );
 
 		bodyInterface.AddBody( body.GetID(), Jolt.EActivation_Activate );
 
@@ -165,19 +164,21 @@ async function JoltPhysics() {
 
 	function setMeshPosition( mesh, position, index = 0 ) {
 
-		const body = meshMap.get( mesh );
-
 		if ( mesh.isInstancedMesh ) {
 
-			const body2 = body[ index ];
+			const bodies = meshMap.get( mesh );
 
-			bodyInterface.RemoveBody( body2.GetID() );
-			bodyInterface.DestroyBody( body2.GetID() );
+			const body = bodies[ index ];
 
-			let shape = body2.GetShape();
-			let newBody = createBody( position, { x: 0, y: 0, z: 0, w: 1 }, 1, shape );
+			bodyInterface.RemoveBody( body.GetID() );
+			bodyInterface.DestroyBody( body.GetID() );
 
-			body[ index ] = newBody;
+			const physics = mesh.userData.physics;
+
+			let shape = body.GetShape();
+			let body2 = createBody( position, { x: 0, y: 0, z: 0, w: 1 }, physics.mass, physics.restitution, shape );
+
+			bodies[ index ] = body2;
 
 		} else {
 
@@ -253,10 +254,10 @@ async function JoltPhysics() {
 				const body = meshMap.get( mesh );
 
 				const position = body.GetPosition();
-				const quaternion = body.GetRotation();
+				const rotation = body.GetRotation();
 
 				mesh.position.set( position.GetX(), position.GetY(), position.GetZ() );
-				mesh.quaternion.set( quaternion.GetX(), quaternion.GetY(), quaternion.GetZ(), quaternion.GetW() );
+				mesh.quaternion.set( rotation.GetX(), rotation.GetY(), rotation.GetZ(), rotation.GetW() );
 
 			}
 
