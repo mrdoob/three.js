@@ -10,6 +10,7 @@ import WebGLTextureUtils from './utils/WebGLTextureUtils.js';
 import WebGLExtensions from './utils/WebGLExtensions.js';
 import WebGLCapabilities from './utils/WebGLCapabilities.js';
 import { GLFeatureName } from './utils/WebGLConstants.js';
+import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
 
 //
 
@@ -39,14 +40,18 @@ class WebGLBackend extends Backend {
 		this.capabilities = new WebGLCapabilities( this );
 		this.attributeUtils = new WebGLAttributeUtils( this );
 		this.textureUtils = new WebGLTextureUtils( this );
+		this.bufferRenderer = new WebGLBufferRenderer( this );
+
 		this.state = new WebGLState( this );
 		this.utils = new WebGLUtils( this );
 
 		this.vaoCache = {};
 		this.transformFeedbackCache = {};
 		this.discard = false;
+		this.trackTimestamp = ( parameters.trackTimestamp === true );
 
 		this.extensions.get( 'EXT_color_buffer_float' );
+		this.disjoint = this.extensions.get( 'EXT_disjoint_timer_query_webgl2' );
 		this.parallel = this.extensions.get( 'KHR_parallel_shader_compile' );
 		this._currentContext = null;
 
@@ -64,6 +69,96 @@ class WebGLBackend extends Backend {
 
 	}
 
+
+	initTimestampQuery( renderContext ) {
+
+		if ( ! this.disjoint || ! this.trackTimestamp ) return;
+
+		const renderContextData = this.get( renderContext );
+
+		if ( this.queryRunning ) {
+
+		  if ( ! renderContextData.queryQueue ) renderContextData.queryQueue = [];
+		  renderContextData.queryQueue.push( renderContext );
+		  return;
+
+		}
+
+		if ( renderContextData.activeQuery ) {
+
+		  this.gl.endQuery( this.disjoint.TIME_ELAPSED_EXT );
+		  renderContextData.activeQuery = null;
+
+		}
+
+		renderContextData.activeQuery = this.gl.createQuery();
+
+		if ( renderContextData.activeQuery !== null ) {
+
+		  this.gl.beginQuery( this.disjoint.TIME_ELAPSED_EXT, renderContextData.activeQuery );
+		  this.queryRunning = true;
+
+		}
+
+	}
+
+	// timestamp utils
+
+	  prepareTimestampBuffer( renderContext ) {
+
+		if ( ! this.disjoint || ! this.trackTimestamp ) return;
+
+		const renderContextData = this.get( renderContext );
+
+		if ( renderContextData.activeQuery ) {
+
+		  this.gl.endQuery( this.disjoint.TIME_ELAPSED_EXT );
+
+		  if ( ! renderContextData.gpuQueries ) renderContextData.gpuQueries = [];
+		  renderContextData.gpuQueries.push( { query: renderContextData.activeQuery } );
+		  renderContextData.activeQuery = null;
+		  this.queryRunning = false;
+
+		  if ( renderContextData.queryQueue && renderContextData.queryQueue.length > 0 ) {
+
+				const nextRenderContext = renderContextData.queryQueue.shift();
+				this.initTimestampQuery( nextRenderContext );
+
+			}
+
+		}
+
+	}
+
+	  async resolveTimestampAsync( renderContext, type = 'render' ) {
+
+		if ( ! this.disjoint || ! this.trackTimestamp ) return;
+
+		const renderContextData = this.get( renderContext );
+
+		if ( ! renderContextData.gpuQueries ) renderContextData.gpuQueries = [];
+
+		for ( let i = 0; i < renderContextData.gpuQueries.length; i ++ ) {
+
+		  const queryInfo = renderContextData.gpuQueries[ i ];
+		  const available = this.gl.getQueryParameter( queryInfo.query, this.gl.QUERY_RESULT_AVAILABLE );
+		  const disjoint = this.gl.getParameter( this.disjoint.GPU_DISJOINT_EXT );
+
+		  if ( available && ! disjoint ) {
+
+				const elapsed = this.gl.getQueryParameter( queryInfo.query, this.gl.QUERY_RESULT );
+				const duration = Number( elapsed ) / 1000000; // Convert nanoseconds to milliseconds
+				this.gl.deleteQuery( queryInfo.query );
+				renderContextData.gpuQueries.splice( i, 1 ); // Remove the processed query
+				i --;
+				this.renderer.info.updateTimestamp( type, duration );
+
+			}
+
+		}
+
+	}
+
 	getContext() {
 
 		return this.gl;
@@ -78,6 +173,7 @@ class WebGLBackend extends Backend {
 		//
 
 		//
+		this.initTimestampQuery( renderContext );
 
 		renderContextData.previousContext = this._currentContext;
 		this._currentContext = renderContext;
@@ -219,6 +315,7 @@ class WebGLBackend extends Backend {
 
 		}
 
+		this.prepareTimestampBuffer( renderContext );
 
 	}
 
@@ -379,11 +476,12 @@ class WebGLBackend extends Backend {
 
 	}
 
-	beginCompute( /*computeGroup*/ ) {
+	beginCompute( computeGroup ) {
 
 		const gl = this.gl;
 
 		gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+		this.initTimestampQuery( computeGroup );
 
 	}
 
@@ -456,13 +554,15 @@ class WebGLBackend extends Backend {
 
 	}
 
-	finishCompute( /*computeGroup*/ ) {
+	finishCompute( computeGroup ) {
 
 		const gl = this.gl;
 
 		this.discard = false;
 
 		gl.disable( gl.RASTERIZER_DISCARD );
+
+		this.prepareTimestampBuffer( computeGroup );
 
 	}
 
@@ -547,21 +647,22 @@ class WebGLBackend extends Backend {
 
 		//
 
-		let mode;
-		if ( object.isPoints ) mode = gl.POINTS;
-		else if ( object.isLineSegments ) mode = gl.LINES;
-		else if ( object.isLine ) mode = gl.LINE_STRIP;
-		else if ( object.isLineLoop ) mode = gl.LINE_LOOP;
+		const renderer = this.bufferRenderer;
+
+		if ( object.isPoints ) renderer.mode = gl.POINTS;
+		else if ( object.isLineSegments ) renderer.mode = gl.LINES;
+		else if ( object.isLine ) renderer.mode = gl.LINE_STRIP;
+		else if ( object.isLineLoop ) renderer.mode = gl.LINE_LOOP;
 		else {
 
 			if ( material.wireframe === true ) {
 
 				state.setLineWidth( material.wireframeLinewidth * this.renderer.getPixelRatio() );
-				mode = gl.LINES;
+				renderer.mode = gl.LINES;
 
 			} else {
 
-				mode = gl.TRIANGLES;
+				renderer.mode = gl.TRIANGLES;
 
 			}
 
@@ -569,46 +670,63 @@ class WebGLBackend extends Backend {
 
 		//
 
-		const instanceCount = this.getInstanceCount( renderObject );
+
+		let count;
+
+		renderer.object = object;
 
 		if ( index !== null ) {
 
 			const indexData = this.get( index );
 			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
 
-			if ( instanceCount > 1 ) {
+			renderer.index = index.count;
+			renderer.type = indexData.type;
 
-				gl.drawElementsInstanced( mode, index.count, indexData.type, firstVertex, instanceCount );
-
-			} else {
-
-				gl.drawElements( mode, index.count, indexData.type, firstVertex );
-
-			}
-
-			info.update( object, indexCount, 1 );
+			count = indexCount;
 
 		} else {
 
-			const positionAttribute = geometry.attributes.position;
-			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : positionAttribute.count;
+			renderer.index = 0;
 
-			if ( instanceCount > 1 ) {
+			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : geometry.attributes.position.count;
 
-				gl.drawArraysInstanced( mode, 0, vertexCount, instanceCount );
-
-			} else {
-
-				gl.drawArrays( mode, 0, vertexCount );
-
-			}
-
-			//gl.drawArrays( mode, vertexCount, gl.UNSIGNED_SHORT, firstVertex );
-
-			info.update( object, vertexCount, 1 );
+			count = vertexCount;
 
 		}
 
+		const instanceCount = this.getInstanceCount( renderObject );
+
+		if ( object.isBatchedMesh ) {
+
+			if ( instanceCount > 1 ) {
+
+				// TODO: Better support with InstancedBatchedMesh
+				if ( object._multiDrawInstances === undefined ) {
+
+					object._multiDrawInstances = new Int32Array( object._maxGeometryCount );
+
+				}
+
+				object._multiDrawInstances.fill( instanceCount );
+
+				renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
+
+			} else {
+
+				renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+
+			}
+
+		} else if ( instanceCount > 1 ) {
+
+			renderer.renderInstances( firstVertex, count, instanceCount );
+
+		} else {
+
+			renderer.render( firstVertex, count );
+
+		}
 		//
 
 		gl.bindVertexArray( null );
@@ -1024,6 +1142,12 @@ class WebGLBackend extends Backend {
 	getMaxAnisotropy() {
 
 		return this.capabilities.getMaxAnisotropy();
+
+	}
+
+	copyTextureToTexture( position, srcTexture, dstTexture, level ) {
+
+		this.textureUtils.copyTextureToTexture( position, srcTexture, dstTexture, level );
 
 	}
 

@@ -66,6 +66,7 @@ class PassNode extends TempNode {
 		this._depthTextureNode = nodeObject( new PassTextureNode( this, depthTexture ) );
 
 		this._depthNode = null;
+		this._viewZNode = null;
 		this._cameraNear = uniform( 0 );
 		this._cameraFar = uniform( 0 );
 
@@ -91,6 +92,21 @@ class PassNode extends TempNode {
 
 	}
 
+	getViewZNode() {
+
+		if ( this._viewZNode === null ) {
+
+			const cameraNear = this._cameraNear;
+			const cameraFar = this._cameraFar;
+
+			this._viewZNode = perspectiveDepthToViewZ( this._depthTextureNode, cameraNear, cameraFar );
+
+		}
+
+		return this._viewZNode;
+
+	}
+
 	getDepthNode() {
 
 		if ( this._depthNode === null ) {
@@ -98,7 +114,7 @@ class PassNode extends TempNode {
 			const cameraNear = this._cameraNear;
 			const cameraFar = this._cameraFar;
 
-			this._depthNode = viewZToOrthographicDepth( perspectiveDepthToViewZ( this._depthTextureNode, cameraNear, cameraFar ), cameraNear, cameraFar );
+			this._depthNode = viewZToOrthographicDepth( this.getViewZNode(), cameraNear, cameraFar );
 
 		}
 

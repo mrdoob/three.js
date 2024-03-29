@@ -121,11 +121,9 @@
 
 				//
 
-				const format = ( renderer.capabilities.isWebGL2 ) ? THREE.RedFormat : THREE.LuminanceFormat;
-
 				uniforms = {
 
-					tAudioData: { value: new THREE.DataTexture( analyser.data, fftSize / 2, 1, format ) }
+					tAudioData: { value: new THREE.DataTexture( analyser.data, fftSize / 2, 1, THREE.RedFormat ) }
 
 				};
 

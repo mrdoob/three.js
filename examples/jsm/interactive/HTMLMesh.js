@@ -241,6 +241,13 @@ function html2canvas( element ) {
 
 	function drawElement( element, style ) {
 
+		// Do not render invisible elements, comments and scripts.
+		if ( element.nodeType === Node.COMMENT_NODE || element.nodeName === 'SCRIPT' || ( element.style && element.style.display === 'none' ) ) {
+
+			return;
+
+		}
+
 		let x = 0, y = 0, width = 0, height = 0;
 
 		if ( element.nodeType === Node.TEXT_NODE ) {
@@ -258,14 +265,9 @@ function html2canvas( element ) {
 
 			drawText( style, x, y, element.nodeValue.trim() );
 
-		} else if ( element.nodeType === Node.COMMENT_NODE ) {
-
-			return;
-
 		} else if ( element instanceof HTMLCanvasElement ) {
 
 			// Canvas element
-			if ( element.style.display === 'none' ) return;
 
 			const rect = element.getBoundingClientRect();
 
@@ -280,8 +282,6 @@ function html2canvas( element ) {
 
 		} else if ( element instanceof HTMLImageElement ) {
 
-			if ( element.style.display === 'none' ) return;
-
 			const rect = element.getBoundingClientRect();
 
 			x = rect.left - offset.left - 0.5;
@@ -292,8 +292,6 @@ function html2canvas( element ) {
 			context.drawImage( element, x, y, width, height );
 
 		} else {
-
-			if ( element.style.display === 'none' ) return;
 
 			const rect = element.getBoundingClientRect();
 

@@ -11,6 +11,32 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
 			<br />This example demonstrate the fetch of external element from a StorageBuffer.
 			<br /> Left canvas is using WebGPU Backend, right canvas is WebGL Backend.
+			<div id="timestamps" style="
+				position: absolute;
+				top: 60px;
+				left: 0;
+				padding: 10px;
+				background: rgba( 0, 0, 0, 0.5 );
+				color: #fff;
+				font-family: monospace;
+				font-size: 12px;
+				line-height: 1.5;
+				pointer-events: none;
+				text-align: left;
+			"></div>
+			<div id="timestamps_webgl" style="
+			position: absolute;
+			top: 60px;
+			right: 0;
+			padding: 10px;
+			background: rgba( 0, 0, 0, 0.5 );
+			color: #fff;
+			font-family: monospace;
+			font-size: 12px;
+			line-height: 1.5;
+			pointer-events: none;
+			text-align: left;
+		"></div>
 		</div>
 
 		<script type="importmap">
@@ -31,13 +57,18 @@
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 			import StorageInstancedBufferAttribute from 'three/addons/renderers/common/StorageInstancedBufferAttribute.js';
 
+			const timestamps = {
+				webgpu: document.getElementById( 'timestamps' ),
+				webgl: document.getElementById( 'timestamps_webgl' )
+			};
+
 			// WebGPU Backend
 			init();
 
 			// WebGL Backend
 			init( true );
 
-			function init( forceWebGL = false ) {
+			async function init( forceWebGL = false ) {
 
 				const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
 				const camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
@@ -146,14 +177,12 @@
 
 				} )();
 			
-				// TODO: Add toAttribute() test
-
 				//
 
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( plane );
 
-				const renderer = new WebGPURenderer( { antialias: false, forceWebGL: forceWebGL } );
+				const renderer = new WebGPURenderer( { antialias: false, forceWebGL: forceWebGL, trackTimestamp: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
@@ -176,13 +205,24 @@
 
 				}
 
-				// Init Positions
-				renderer.compute( computeInit );
+
+				await renderer.computeAsync( computeInit );
+
+				//
+
+				renderer.info.autoReset = false;
 
 				 const stepAnimation = async function () {
 
+					renderer.info.reset();
+
 					await renderer.computeAsync( compute );
 					await renderer.renderAsync( scene, camera );
+
+					timestamps[ forceWebGL ? 'webgl' : 'webgpu' ].innerHTML = `
+
+							Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
+							Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.render.timestamp.toFixed( 6 )}ms`;
 
 					setTimeout( stepAnimation, 1000 );
 			

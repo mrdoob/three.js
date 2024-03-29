@@ -63,9 +63,7 @@ composer.addPass(bloomPass);
 </pre>
 <p>最后,我们用<code class="notranslate" translate="no">FilmPass</code>来添加噪点和扫描线。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const filmPass = new FilmPass(
-    0.35,   // noise intensity
-    0.025,  // scanline intensity
-    648,    // scanline count
+    0.5,   // intensity
     false,  // grayscale
 );
 composer.addPass(filmPass);
@@ -123,10 +121,8 @@ import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">bloomPass.copyUniforms.opacity.value = someValue;
 </pre>
 <p>类似地，在<code class="notranslate" translate="no">FilmPass.js</code>中我发现这些代码</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">if ( grayscale !== undefined )    this.uniforms.grayscale.value = grayscale;
-if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
-if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
-if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.uniforms.intensity.value = intensity;
+this.uniforms.grayscale.value = grayscale;
 </pre>
 <p>这样就很清楚如何设置它们。</p>
 <p>让我们快速创建一个GUI来设置这些值</p>
@@ -142,9 +138,7 @@ if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 {
   const folder = gui.addFolder('FilmPass');
   folder.add(filmPass.uniforms.grayscale, 'value').name('grayscale');
-  folder.add(filmPass.uniforms.nIntensity, 'value', 0, 1).name('noise intensity');
-  folder.add(filmPass.uniforms.sIntensity, 'value', 0, 1).name('scanline intensity');
-  folder.add(filmPass.uniforms.sCount, 'value', 0, 1000).name('scanline count');
+  folder.add(filmPass.uniforms.intensity, 'value', 0, 1).name('intensity');
   folder.open();
 }
 </pre>

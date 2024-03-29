@@ -16,7 +16,8 @@
 				"imports": {
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three/nodes": "./jsm/nodes/Nodes.js",
+					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.6/dist/main.js"
 				}
 			}
 		</script>
@@ -37,7 +38,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from 'stats-gl';
 
 			const maxParticleCount = 100000;
 
@@ -50,7 +51,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
 
@@ -285,8 +286,24 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
-				stats = new Stats();
+				stats = new Stats( {
+					precision: 3,
+					horizontal: false
+				} );
+				stats.init( renderer );
 				document.body.appendChild( stats.dom );
+
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 10, 0 );
+				controls.minDistance = 25;
+				controls.maxDistance = 35;
+				controls.maxPolarAngle = Math.PI / 1.7;
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = - 0.7;
+				controls.update();
 
 				// post processing
 
@@ -314,18 +331,7 @@
 
 				//
 
-				renderer.compute( computeInit );
-
-				//
-
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 10, 0 );
-				controls.minDistance = 25;
-				controls.maxDistance = 35;
-				controls.maxPolarAngle = Math.PI / 1.7;
-				controls.autoRotate = true;
-				controls.autoRotateSpeed = - 0.7;
-				controls.update();
+				await renderer.computeAsync( computeInit );
 
 				//
 
@@ -344,9 +350,7 @@
 
 			}
 
-			function animate() {
-
-				stats.update();
+			async function animate() {
 
 				controls.update();
 
@@ -354,18 +358,20 @@
 
 				scene.overrideMaterial = collisionPosMaterial;
 				renderer.setRenderTarget( collisionPosRT );
-				renderer.render( scene, collisionCamera );
+				await renderer.renderAsync( scene, collisionCamera );
 
 				// compute
 
-				renderer.compute( computeParticles );
+				await renderer.computeAsync( computeParticles );
 
 				// result
 
 				scene.overrideMaterial = null;
 				renderer.setRenderTarget( null );
 
-				postProcessing.render();
+				await postProcessing.renderAsync();
+			
+				stats.update();
 
 			}
 

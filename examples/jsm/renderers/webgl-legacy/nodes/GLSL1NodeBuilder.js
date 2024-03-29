@@ -40,8 +40,6 @@ class GLSL1NodeBuilder extends NodeBuilder {
 
 	getTextureBias( texture, textureProperty, uvSnippet, biasSnippet ) {
 
-		if ( this.material.extensions !== undefined ) this.material.extensions.shaderTextureLOD = true;
-
 		return `textureLod( ${textureProperty}, ${uvSnippet}, ${biasSnippet} )`;
 
 	}

@@ -15,13 +15,15 @@ import {
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from '../../renderers/common/nodes/NodeUniform.js';
 
-import { REVISION, RenderTarget, NoColorSpace, Color, Vector2, Vector3, Vector4, Float16BufferAttribute } from 'three';
+import { REVISION, RenderTarget, Color, Vector2, Vector3, Vector4, IntType, UnsignedIntType, Float16BufferAttribute } from 'three';
 
 import { stack } from './StackNode.js';
 import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
 
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
+
+import PMREMGenerator from '../../renderers/common/extras/PMREMGenerator.js';
 
 const uniformsGroupCache = new ChainMap();
 
@@ -113,15 +115,23 @@ class NodeBuilder {
 
 	}
 
-	getRenderTarget( width, height, options ) {
+	createRenderTarget( width, height, options ) {
 
 		return new RenderTarget( width, height, options );
 
 	}
 
-	getCubeRenderTarget( size, options ) {
+	createCubeRenderTarget( size, options ) {
 
 		return new CubeRenderTarget( size, options );
+
+	}
+
+	createPMREMGenerator() {
+
+		// TODO: Move Materials.js to outside of the Nodes.js in order to remove this function and improve tree-shaking support
+
+		return new PMREMGenerator( this.renderer );
 
 	}
 
@@ -474,25 +484,18 @@ class NodeBuilder {
 
 	}
 
-	getTextureColorSpaceFromMap( map ) {
+	getComponentTypeFromTexture( texture ) {
 
-		let colorSpace;
+		const type = texture.type;
 
-		if ( map && map.isTexture ) {
+		if ( texture.isDataTexture ) {
 
-			colorSpace = map.colorSpace;
-
-		} else if ( map && map.isWebGLRenderTarget ) {
-
-			colorSpace = map.texture.colorSpace;
-
-		} else {
-
-			colorSpace = NoColorSpace;
+			if ( type === IntType ) return 'int';
+			if ( type === UnsignedIntType ) return 'uint';
 
 		}
 
-		return colorSpace;
+		return 'float';
 
 	}
 
@@ -1167,6 +1170,8 @@ class NodeBuilder {
 	}
 
 	createNodeMaterial( type = 'NodeMaterial' ) {
+
+		// TODO: Move Materials.js to outside of the Nodes.js in order to remove this function and improve tree-shaking support
 
 		return createNodeMaterialFromType( type );
 

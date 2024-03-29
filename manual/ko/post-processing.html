@@ -64,9 +64,7 @@ composer.addPass(bloomPass);
 </pre>
 <p>마지막으로 원본 장면에 노이즈와 스캔라인(scanline)을 추가하는 <code class="notranslate" translate="no">FilmPass</code>를 추가합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const filmPass = new FilmPass(
-    0.35,   // 노이즈 강도
-    0.025,  // 스캔라인 강도
-    648,    // 스캔라인 개수
+    0.5,   // 강도
     false,  // 흑백
 );
 composer.addPass(filmPass);
@@ -126,10 +124,8 @@ import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 </pre>
 <p>마찬가지로 <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>에서
 아래 코드를 찾았습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">if ( grayscale !== undefined )    this.uniforms.grayscale.value = grayscale;
-if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
-if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
-if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.uniforms.intensity.value = intensity;
+this.uniforms.grayscale.value = grayscale;
 </pre>
 <p>이제 어떻게 값을 지정해야 하는지 알았으니 이 값을 조작하는 GUI를 만들어봅시다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -144,9 +140,7 @@ if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 {
   const folder = gui.addFolder('FilmPass');
   folder.add(filmPass.uniforms.grayscale, 'value').name('grayscale');
-  folder.add(filmPass.uniforms.nIntensity, 'value', 0, 1).name('noise intensity');
-  folder.add(filmPass.uniforms.sIntensity, 'value', 0, 1).name('scanline intensity');
-  folder.add(filmPass.uniforms.sCount, 'value', 0, 1000).name('scanline count');
+  folder.add(filmPass.uniforms.intensity, 'value', 0, 1).name('intensity');
   folder.open();
 }
 </pre>

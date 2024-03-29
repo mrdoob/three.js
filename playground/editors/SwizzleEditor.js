@@ -2,6 +2,7 @@ import { LabelElement } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { createElementFromJSON } from '../NodeEditorUtils.js';
 import { split, float } from 'three/nodes';
+import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
 export class SwizzleEditor extends BaseNodeEditor {
 
@@ -11,7 +12,7 @@ export class SwizzleEditor extends BaseNodeEditor {
 
 		super( 'Swizzle', node, 175 );
 
-		const inputElement = new LabelElement( 'Input' ).setInput( 1 ).onConnect( () => {
+		const inputElement = setInputAestheticsFromType( new LabelElement( 'Input' ), 'node' ).onConnect( () => {
 
 			node.node = inputElement.getLinkedObject() || float();
 
