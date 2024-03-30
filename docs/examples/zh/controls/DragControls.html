@@ -107,6 +107,11 @@
 			当[page:DragControls.objects]数组包含一个单个可拖拽的组对象时该选项生效。如果设置为`true`，[name]会转换整个组对象，而不对单个对象做转换。默认值为`false`。
 		</p>
 
+		<h3>[property:String mode]</h3>
+		<p>
+			The current transformation mode. Possible values are `translate`, and `rotate`. Default is `translate`.
+		</p>
+
 		<h2>方法</h2>
 
 		<p>共有方法请参见其基类[page:EventDispatcher]。</p>
@@ -134,6 +139,11 @@
 		<h3>[method:Raycaster getRaycaster] ()</h3>
 		<p>
 			返回用于相交测试的内部[page:Raycaster]实例。
+		</p>
+
+		<h3>[method:undefined setObjects] ( [param:Array objects] )</h3>
+		<p>
+			Sets an array of draggable objects by overwriting the existing one.
 		</p>
 
 		<h2>Source</h2>

@@ -47,8 +47,10 @@
 
 				const aspect = window.innerWidth / window.innerHeight;
 
-				cameraPersp = new THREE.PerspectiveCamera( 50, aspect, 0.01, 30000 );
-				cameraOrtho = new THREE.OrthographicCamera( - 600 * aspect, 600 * aspect, 600, - 600, 0.01, 30000 );
+				const frustumSize = 5;
+
+				cameraPersp = new THREE.PerspectiveCamera( 50, aspect, 0.1, 100 );
+				cameraOrtho = new THREE.OrthographicCamera( - frustumSize * aspect, frustumSize * aspect, frustumSize, - frustumSize, 0.1, 100 );
 				currentCamera = cameraPersp;
 
 				currentCamera.position.set( 5, 2.5, 5 );
@@ -100,7 +102,7 @@
 							break;
 
 						case 16: // Shift
-							control.setTranslationSnap( 100 );
+							control.setTranslationSnap( 1 );
 							control.setRotationSnap( THREE.MathUtils.degToRad( 15 ) );
 							control.setScaleSnap( 0.25 );
 							break;

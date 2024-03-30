@@ -10,6 +10,8 @@ import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 import { SetColorCommand } from './commands/SetColorCommand.js';
 
+import { SidebarObjectAnimation } from './Sidebar.Object.Animation.js';
+
 function SidebarObject( editor ) {
 
 	const strings = editor.strings;
@@ -410,11 +412,15 @@ function SidebarObject( editor ) {
 		const left = ( screen.width - 500 ) / 2;
 		const top = ( screen.height - 500 ) / 2;
 
-		const url = URL.createObjectURL( new Blob( [ output ], { type: 'text/plain' } ) );
+		const url = URL.createObjectURL( new Blob( [ output ], { type: 'text/plain;charset=utf-8' } ) );
 		window.open( url, '_blank', `location=no,left=${left},top=${top},width=500,height=500` );
 
 	} );
 	container.add( exportJson );
+
+	// Animations
+
+	container.add( new SidebarObjectAnimation( editor ) );
 
 	//
 

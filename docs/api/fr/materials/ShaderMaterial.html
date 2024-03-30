@@ -313,10 +313,6 @@ et la page [page:BufferAttribute] pour un aperçu détaillé de l'API `BufferAtt
 		Un objet avec les propriétés suivantes :
 		<code>
 			this.extensions = {
-				derivatives: false, // set to use derivatives
-				fragDepth: false, // set to use fragment depth values
-				drawBuffers: false, // set to use draw buffers
-				shaderTextureLOD: false, // set to use shader texture LOD
 				clipCullDistance: false, // set to use vertex shader clipping
 				multiDraw: false // set to use vertex shader multi_draw / enable gl_DrawID
 			};
@@ -340,8 +336,8 @@ et la page [page:BufferAttribute] pour un aperçu détaillé de l'API `BufferAtt
 
 		<h3>[property:String glslVersion]</h3>
 		<p>
-			Définit la version GLSL du code de shader personnalisé. Pertinent uniquement pour WebGL 2 afin de définir s'il faut spécifier
-			GLSL 3.0 ou pas. Les valeurs valides sont `THREE.GLSL1` ou `THREE.GLSL3`. La valeur par défaut est `null`.
+			Définit la version GLSL du code de shader personnalisé. Les valeurs valides sont `THREE.GLSL1` ou `THREE.GLSL3`.
+			La valeur par défaut est `null`.
 		</p>
 
 		<h3>[property:String index0AttributeName]</h3>

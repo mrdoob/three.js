@@ -41,10 +41,20 @@ class CondNode extends Node {
 		const type = this.getNodeType( builder );
 		const context = { tempWrite: false };
 
+		const nodeData = builder.getDataFromNode( this );
+
+		if ( nodeData.nodeProperty !== undefined ) {
+
+			return nodeData.nodeProperty;
+
+		}
+
 		const { ifNode, elseNode } = this;
 
 		const needsOutput = output !== 'void';
 		const nodeProperty = needsOutput ? property( type ).build( builder ) : '';
+
+		nodeData.nodeProperty = nodeProperty;
 
 		const nodeSnippet = contextNode( this.condNode/*, context*/ ).build( builder, 'bool' );
 

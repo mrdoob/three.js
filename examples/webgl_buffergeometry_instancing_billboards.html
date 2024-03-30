@@ -91,15 +91,6 @@
 
 		function init() {
 
-			renderer = new THREE.WebGLRenderer();
-
-			if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'ANGLE_instanced_arrays' ) === false ) {
-
-				document.getElementById( 'notSupported' ).style.display = '';
-				return false;
-
-			}
-
 			container = document.createElement( 'div' );
 			document.body.appendChild( container );
 
@@ -143,6 +134,7 @@
 			mesh.scale.set( 500, 500, 500 );
 			scene.add( mesh );
 
+			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );

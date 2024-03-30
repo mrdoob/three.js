@@ -5,11 +5,12 @@ import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
 
-import { RedFormat, RGFormat, IntType, DataTexture, RGBAFormat, FloatType } from 'three';
+import { RedFormat, RGFormat, IntType, DataTexture, RGBFormat, RGBAFormat, FloatType } from 'three';
 
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan',
-	textureDimensions: 'textureSize'
+	textureDimensions: 'textureSize',
+	equals: 'equal'
 };
 
 const precisionLib = {
@@ -103,7 +104,7 @@ ${ flowData.code }
 
 			} else if ( itemSize === 3 ) {
 
-				format = 6407; // patch since legacy doesn't use RGBFormat for rendering but here it's needed for packing optimization
+				format = RGBFormat;
 
 			} else if ( itemSize === 4 ) {
 
@@ -389,7 +390,7 @@ ${ flowData.code }
 
 			const array = dataAttribute.array;
 
-			if ( ( array instanceof Uint32Array || array instanceof Int32Array ) === false ) {
+			if ( ( array instanceof Uint32Array || array instanceof Int32Array || array instanceof Uint16Array || array instanceof Int16Array ) === false ) {
 
 				nodeType = nodeType.slice( 1 );
 

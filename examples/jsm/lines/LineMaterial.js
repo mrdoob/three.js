@@ -603,12 +603,10 @@ class LineMaterial extends ShaderMaterial {
 		if ( value === true ) {
 
 			this.defines.USE_ALPHA_TO_COVERAGE = '';
-			this.extensions.derivatives = true;
 
 		} else {
 
 			delete this.defines.USE_ALPHA_TO_COVERAGE;
-			this.extensions.derivatives = false;
 
 		}
 

@@ -102,15 +102,14 @@
 				//
 
 				reflector = new Reflector( new THREE.PlaneGeometry( 2, 2 ), {
-					textureWidth: window.innerWidth * window.devicePixelRatio,
-					textureHeight: window.innerHeight * window.devicePixelRatio
+					textureWidth: window.innerWidth,
+					textureHeight: window.innerHeight
 				} );
 				reflector.position.x = 1;
 				reflector.position.y = 1.5;
 				reflector.position.z = - 3;
 				reflector.rotation.y = - Math.PI / 4;
-				// TOFIX: Reflector breaks transmission
-				// scene.add( reflector );
+				scene.add( reflector );
 
 				const frameGeometry = new THREE.BoxGeometry( 2.1, 2.1, 0.1 );
 				const frameMaterial = new THREE.MeshPhongMaterial();

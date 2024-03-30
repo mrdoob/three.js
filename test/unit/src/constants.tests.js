@@ -212,8 +212,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.GLSL1, '100', 'GLSL1 is equal to 100' );
 		assert.equal( Constants.GLSL3, '300 es', 'GLSL3 is equal to 300 es' );
 
-		assert.equal( Constants._SRGBAFormat, 1035, '_SRGBAFormat is equal to 1035' );
-
 	} );
 
 } );

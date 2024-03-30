@@ -40,7 +40,8 @@
     "XRMediaBinding": "readonly",
     "CodeMirror": "readonly",
     "esprima": "readonly",
-    "jsonlint": "readonly"
+    "jsonlint": "readonly",
+    "VideoFrame": "readonly"
   },
   "rules": {
     "no-throw-literal": [

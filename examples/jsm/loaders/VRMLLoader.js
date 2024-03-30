@@ -1012,7 +1012,9 @@ class VRMLLoader extends Loader {
 
 					const pointsMaterial = new PointsMaterial( {
 						name: Loader.DEFAULT_MATERIAL_NAME,
-						color: 0xffffff
+						color: 0xffffff,
+						opacity: material.opacity,
+						transparent: material.transparent
 					} );
 
 					if ( geometry.attributes.color !== undefined ) {
@@ -1037,7 +1039,9 @@ class VRMLLoader extends Loader {
 
 					const lineMaterial = new LineBasicMaterial( {
 						name: Loader.DEFAULT_MATERIAL_NAME,
-						color: 0xffffff
+						color: 0xffffff,
+						opacity: material.opacity,
+						transparent: material.transparent
 					} );
 
 					if ( geometry.attributes.color !== undefined ) {

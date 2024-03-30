@@ -2,7 +2,6 @@
 
 import {
 	ClampToEdgeWrapping,
-	DataTexture,
 	Data3DTexture,
 	FileLoader,
 	FloatType,
@@ -127,18 +126,6 @@ export class LUTCubeLoader extends Loader {
 
 		}
 
-		const texture = new DataTexture();
-		texture.image.data = data;
-		texture.image.width = size;
-		texture.image.height = size * size;
-		texture.type = this.type;
-		texture.magFilter = LinearFilter;
-		texture.minFilter = LinearFilter;
-		texture.wrapS = ClampToEdgeWrapping;
-		texture.wrapT = ClampToEdgeWrapping;
-		texture.generateMipmaps = false;
-		texture.needsUpdate = true;
-
 		const texture3D = new Data3DTexture();
 		texture3D.image.data = data;
 		texture3D.image.width = size;
@@ -158,7 +145,6 @@ export class LUTCubeLoader extends Loader {
 			size,
 			domainMin,
 			domainMax,
-			texture,
 			texture3D,
 		};
 

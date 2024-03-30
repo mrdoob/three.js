@@ -16,7 +16,7 @@ class RenderContext {
 		this.clearDepth = true;
 		this.clearDepthValue = 1;
 
-		this.stencil = true;
+		this.stencil = false;
 		this.clearStencil = true;
 		this.clearStencilValue = 1;
 
@@ -33,6 +33,8 @@ class RenderContext {
 
 		this.width = 0;
 		this.height = 0;
+
+		this.isRenderContext = true;
 
 	}
 

@@ -442,12 +442,6 @@
 
 				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
-				if ( renderer.capabilities.isWebGL2 === false ) {
-
-					gpuCompute.setDataType( THREE.HalfFloatType );
-
-				}
-
 				const heightmap0 = gpuCompute.createTexture();
 
 				fillTexture( heightmap0 );

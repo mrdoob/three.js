@@ -126,6 +126,7 @@
 		THREE.UnsignedShort4444Type
 		THREE.UnsignedShort5551Type
 		THREE.UnsignedInt248Type
+		THREE.UnsignedInt5999Type
 		</code>
 		<p>
 		텍스쳐의 [page:Texture.type type] 프로퍼티와 함께 사용되며, 정확한 포맷이어야 합니다. 아래 세부 사항을 확인하세요.<br /><br />
@@ -140,6 +141,7 @@
 		THREE.RedIntegerFormat
 		THREE.RGFormat
 		THREE.RGIntegerFormat
+		THREE.RGBFormat
 		THREE.RGBAFormat
 		THREE.RGBAIntegerFormat
 		THREE.LuminanceFormat
@@ -157,23 +159,19 @@
 
 		[page:constant RedIntegerFormat] green 및 blue 요소를 버리고 red 요소만 읽어들입니다.
 		texel은 부동 소수점 대신 정수로 읽어들입니다.
-		(WebGL 2 렌더링 시에만 사용 가능).
 		<br /><br />
 
 		[page:constant RGFormat] alpha, blue 요소를 버리고 red, green 요소만 읽어들입니다.
-		(WebGL 2 렌더링 시에만 사용 가능).
 		<br /><br />
 
 		[page:constant RGIntegerFormat] alpha, blue 요소를 버리고 red, green 요소만 읽어들입니다.
 		texel은 부동 소수점 대신 정수로 읽어들입니다.
-		(WebGL 2 렌더링 시에만 사용 가능).
 		<br /><br />
 
 		[page:constant RGBAFormat]는 기본값이며 red, green, blue 및 alpha 요소를 읽어들입니다.<br /><br />
 
 		[page:constant RGBAIntegerFormat]는 기본값이며 red, green, blue 및 alpha 요소를 읽어들입니다.
 		texel은 부동 소수점 대신 정수로 읽어들입니다.
-		(WebGL 2 렌더링 시에만 사용 가능).
 		<br /><br />
 
 		[page:constant LuminanceFormat]은 각 요소(element)를 단일 휘도 요소(component)로 읽어들입니다.
@@ -335,9 +333,6 @@
 		</code>
 
 		<p>
-
-		주의: WebGL 2 렌더링의 경우에만 텍스쳐 내부 포맷 변경이 텍스쳐에 영향을 줄 것입니다.<br /><br />
-
 		텍스쳐의 [page:Texture.internalFormat internalFormat] 프로퍼티와 함께 사용되며,
 		텍스쳐 혹은 *texels*의 요소들이 GPU에 어떻게 저장될지 정의합니다.<br /><br />
 
