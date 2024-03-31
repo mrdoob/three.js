@@ -22,10 +22,6 @@ const UnsignedByteType = 1009;
 const FloatType = 1015;
 const HalfFloatType = 1016;
 const RGBAFormat = 1023;
-/** @deprecated Use LinearSRGBColorSpace or NoColorSpace in three.js r152+. */
-const LinearEncoding = 3000;
-/** @deprecated Use SRGBColorSpace in three.js r152+. */
-const sRGBEncoding = 3001;
 
 // Color space string identifiers, matching CSS Color Module Level 4 and WebGPU names where available.
 const NoColorSpace = '';
@@ -762,23 +758,24 @@ class Quaternion {
 
 	random() {
 
-		// Derived from http://planning.cs.uiuc.edu/node198.html
-		// Note, this source uses w, x, y, z ordering,
-		// so we swap the order below.
+		// sets this quaternion to a uniform random unit quaternnion
 
-		const u1 = Math.random();
-		const sqrt1u1 = Math.sqrt( 1 - u1 );
-		const sqrtu1 = Math.sqrt( u1 );
+		// Ken Shoemake
+		// Uniform random rotations
+		// D. Kirk, editor, Graphics Gems III, pages 124-132. Academic Press, New York, 1992.
 
-		const u2 = 2 * Math.PI * Math.random();
+		const theta1 = 2 * Math.PI * Math.random();
+		const theta2 = 2 * Math.PI * Math.random();
 
-		const u3 = 2 * Math.PI * Math.random();
+		const x0 = Math.random();
+		const r1 = Math.sqrt( 1 - x0 );
+		const r2 = Math.sqrt( x0 );
 
 		return this.set(
-			sqrt1u1 * Math.cos( u2 ),
-			sqrtu1 * Math.sin( u3 ),
-			sqrtu1 * Math.cos( u3 ),
-			sqrt1u1 * Math.sin( u2 ),
+			r1 * Math.sin( theta1 ),
+			r1 * Math.cos( theta1 ),
+			r2 * Math.sin( theta2 ),
+			r2 * Math.cos( theta2 ),
 		);
 
 	}
@@ -1546,15 +1543,15 @@ class Vector3 {
 
 	randomDirection() {
 
-		// Derived from https://mathworld.wolfram.com/SpherePointPicking.html
+		// https://mathworld.wolfram.com/SpherePointPicking.html
 
-		const u = ( Math.random() - 0.5 ) * 2;
-		const t = Math.random() * Math.PI * 2;
-		const f = Math.sqrt( 1 - u ** 2 );
+		const theta = Math.random() * Math.PI * 2;
+		const u = Math.random() * 2 - 1;
+		const c = Math.sqrt( 1 - u * u );
 
-		this.x = f * Math.cos( t );
-		this.y = f * Math.sin( t );
-		this.z = u;
+		this.x = c * Math.cos( theta );
+		this.y = u;
+		this.z = c * Math.sin( theta );
 
 		return this;
 
@@ -5037,6 +5034,9 @@ const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 const _addedEvent = { type: 'added' };
 const _removedEvent = { type: 'removed' };
 
+const _childaddedEvent = { type: 'childadded', child: null };
+const _childremovedEvent = { type: 'childremoved', child: null };
+
 class Object3D extends EventDispatcher {
 
 	constructor() {
@@ -5353,6 +5353,10 @@ class Object3D extends EventDispatcher {
 
 			object.dispatchEvent( _addedEvent );
 
+			_childaddedEvent.child = object;
+			this.dispatchEvent( _childaddedEvent );
+			_childaddedEvent.child = null;
+
 		} else {
 
 			console.error( 'THREE.Object3D.add: object not an instance of THREE.Object3D.', object );
@@ -5385,6 +5389,10 @@ class Object3D extends EventDispatcher {
 			this.children.splice( index, 1 );
 
 			object.dispatchEvent( _removedEvent );
+
+			_childremovedEvent.child = object;
+			this.dispatchEvent( _childremovedEvent );
+			_childremovedEvent.child = null;
 
 		}
 
@@ -6307,7 +6315,7 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( position && position.isGLBufferAttribute ) {
 
-			console.error( 'THREE.BufferGeometry.computeBoundingBox(): GLBufferAttribute requires a manual bounding box. Alternatively set "mesh.frustumCulled" to "false".', this );
+			console.error( 'THREE.BufferGeometry.computeBoundingBox(): GLBufferAttribute requires a manual bounding box.', this );
 
 			this.boundingBox.set(
 				new Vector3( - Infinity, - Infinity, - Infinity ),
@@ -6377,7 +6385,7 @@ class BufferGeometry extends EventDispatcher {
 
 		if ( position && position.isGLBufferAttribute ) {
 
-			console.error( 'THREE.BufferGeometry.computeBoundingSphere(): GLBufferAttribute requires a manual bounding sphere. Alternatively set "mesh.frustumCulled" to "false".', this );
+			console.error( 'THREE.BufferGeometry.computeBoundingSphere(): GLBufferAttribute requires a manual bounding sphere.', this );
 
 			this.boundingSphere.set( new Vector3(), Infinity );
 
@@ -6494,24 +6502,21 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
-		const indices = index.array;
-		const positions = attributes.position.array;
-		const normals = attributes.normal.array;
-		const uvs = attributes.uv.array;
-
-		const nVertices = positions.length / 3;
+		const positionAttribute = attributes.position;
+		const normalAttribute = attributes.normal;
+		const uvAttribute = attributes.uv;
 
 		if ( this.hasAttribute( 'tangent' ) === false ) {
 
-			this.setAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
+			this.setAttribute( 'tangent', new BufferAttribute( new Float32Array( 4 * positionAttribute.count ), 4 ) );
 
 		}
 
-		const tangents = this.getAttribute( 'tangent' ).array;
+		const tangentAttribute = this.getAttribute( 'tangent' );
 
 		const tan1 = [], tan2 = [];
 
-		for ( let i = 0; i < nVertices; i ++ ) {
+		for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
 			tan1[ i ] = new Vector3();
 			tan2[ i ] = new Vector3();
@@ -6531,13 +6536,13 @@ class BufferGeometry extends EventDispatcher {
 
 		function handleTriangle( a, b, c ) {
 
-			vA.fromArray( positions, a * 3 );
-			vB.fromArray( positions, b * 3 );
-			vC.fromArray( positions, c * 3 );
+			vA.fromBufferAttribute( positionAttribute, a );
+			vB.fromBufferAttribute( positionAttribute, b );
+			vC.fromBufferAttribute( positionAttribute, c );
 
-			uvA.fromArray( uvs, a * 2 );
-			uvB.fromArray( uvs, b * 2 );
-			uvC.fromArray( uvs, c * 2 );
+			uvA.fromBufferAttribute( uvAttribute, a );
+			uvB.fromBufferAttribute( uvAttribute, b );
+			uvC.fromBufferAttribute( uvAttribute, c );
 
 			vB.sub( vA );
 			vC.sub( vA );
@@ -6570,7 +6575,7 @@ class BufferGeometry extends EventDispatcher {
 
 			groups = [ {
 				start: 0,
-				count: indices.length
+				count: index.count
 			} ];
 
 		}
@@ -6585,9 +6590,9 @@ class BufferGeometry extends EventDispatcher {
 			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
 
 				handleTriangle(
-					indices[ j + 0 ],
-					indices[ j + 1 ],
-					indices[ j + 2 ]
+					index.getX( j + 0 ),
+					index.getX( j + 1 ),
+					index.getX( j + 2 )
 				);
 
 			}
@@ -6599,7 +6604,7 @@ class BufferGeometry extends EventDispatcher {
 
 		function handleVertex( v ) {
 
-			n.fromArray( normals, v * 3 );
+			n.fromBufferAttribute( normalAttribute, v );
 			n2.copy( n );
 
 			const t = tan1[ v ];
@@ -6615,10 +6620,7 @@ class BufferGeometry extends EventDispatcher {
 			const test = tmp2.dot( tan2[ v ] );
 			const w = ( test < 0.0 ) ? - 1.0 : 1.0;
 
-			tangents[ v * 4 ] = tmp.x;
-			tangents[ v * 4 + 1 ] = tmp.y;
-			tangents[ v * 4 + 2 ] = tmp.z;
-			tangents[ v * 4 + 3 ] = w;
+			tangentAttribute.setXYZW( v, tmp.x, tmp.y, tmp.z, w );
 
 		}
 
@@ -6631,9 +6633,9 @@ class BufferGeometry extends EventDispatcher {
 
 			for ( let j = start, jl = start + count; j < jl; j += 3 ) {
 
-				handleVertex( indices[ j + 0 ] );
-				handleVertex( indices[ j + 1 ] );
-				handleVertex( indices[ j + 2 ] );
+				handleVertex( index.getX( j + 0 ) );
+				handleVertex( index.getX( j + 1 ) );
+				handleVertex( index.getX( j + 2 ) );
 
 			}
 
@@ -8823,7 +8825,7 @@ class Material extends EventDispatcher {
 		if ( this.sheenColor && this.sheenColor.isColor ) data.sheenColor = this.sheenColor.getHex();
 		if ( this.sheenRoughness !== undefined ) data.sheenRoughness = this.sheenRoughness;
 		if ( this.emissive && this.emissive.isColor ) data.emissive = this.emissive.getHex();
-		if ( this.emissiveIntensity && this.emissiveIntensity !== 1 ) data.emissiveIntensity = this.emissiveIntensity;
+		if ( this.emissiveIntensity !== undefined && this.emissiveIntensity !== 1 ) data.emissiveIntensity = this.emissiveIntensity;
 
 		if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
 		if ( this.specularIntensity !== undefined ) data.specularIntensity = this.specularIntensity;
@@ -8933,6 +8935,7 @@ class Material extends EventDispatcher {
 
 		}
 
+		if ( this.envMapRotation !== undefined ) data.envMapRotation = this.envMapRotation.toArray();
 		if ( this.envMapIntensity !== undefined ) data.envMapIntensity = this.envMapIntensity;
 		if ( this.reflectivity !== undefined ) data.reflectivity = this.reflectivity;
 		if ( this.refractionRatio !== undefined ) data.refractionRatio = this.refractionRatio;
@@ -9177,6 +9180,7 @@ class MeshBasicMaterial extends Material {
 		this.alphaMap = null;
 
 		this.envMap = null;
+		this.envMapRotation = new Euler();
 		this.combine = MultiplyOperation;
 		this.reflectivity = 1;
 		this.refractionRatio = 0.98;
@@ -9211,6 +9215,7 @@ class MeshBasicMaterial extends Material {
 		this.alphaMap = source.alphaMap;
 
 		this.envMap = source.envMap;
+		this.envMapRotation.copy( source.envMapRotation );
 		this.combine = source.combine;
 		this.reflectivity = source.reflectivity;
 		this.refractionRatio = source.refractionRatio;
@@ -9607,7 +9612,6 @@ function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, n
 			_uvC.fromBufferAttribute( uv1, c );
 
 			intersection.uv1 = Triangle.getInterpolation( _intersectionPoint, _vA, _vB, _vC, _uvA, _uvB, _uvC, new Vector2() );
-			intersection.uv2 = intersection.uv1; // @deprecated, r152
 
 		}
 
@@ -10658,17 +10662,7 @@ class Texture extends EventDispatcher {
 		this.flipY = true;
 		this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-		if ( typeof colorSpace === 'string' ) {
-
-			this.colorSpace = colorSpace;
-
-		} else { // @deprecated, r152
-
-			warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
-			this.colorSpace = colorSpace === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
-
-		}
-
+		this.colorSpace = colorSpace;
 
 		this.userData = {};
 
@@ -10904,20 +10898,6 @@ class Texture extends EventDispatcher {
 			this.source.needsUpdate = true;
 
 		}
-
-	}
-
-	get encoding() { // @deprecated, r152
-
-		warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
-		return this.colorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding;
-
-	}
-
-	set encoding( encoding ) { // @deprecated, r152
-
-		warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
-		this.colorSpace = encoding === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
 
 	}
 
@@ -11594,14 +11574,6 @@ class RenderTarget extends EventDispatcher {
 
 		const image = { width: width, height: height, depth: 1 };
 
-		if ( options.encoding !== undefined ) {
-
-			// @deprecated, r152
-			warnOnce( 'THREE.WebGLRenderTarget: option.encoding has been replaced by option.colorSpace.' );
-			options.colorSpace = options.encoding === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
-
-		}
-
 		options = Object.assign( {
 			generateMipmaps: false,
 			internalFormat: null,
@@ -11609,15 +11581,25 @@ class RenderTarget extends EventDispatcher {
 			depthBuffer: true,
 			stencilBuffer: false,
 			depthTexture: null,
-			samples: 0
+			samples: 0,
+			count: 1
 		}, options );
 
-		this.texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
-		this.texture.isRenderTargetTexture = true;
+		const texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
 
-		this.texture.flipY = false;
-		this.texture.generateMipmaps = options.generateMipmaps;
-		this.texture.internalFormat = options.internalFormat;
+		texture.flipY = false;
+		texture.generateMipmaps = options.generateMipmaps;
+		texture.internalFormat = options.internalFormat;
+
+		this.textures = [];
+
+		const count = options.count;
+		for ( let i = 0; i < count; i ++ ) {
+
+			this.textures[ i ] = texture.clone();
+			this.textures[ i ].isRenderTargetTexture = true;
+
+		}
 
 		this.depthBuffer = options.depthBuffer;
 		this.stencilBuffer = options.stencilBuffer;
@@ -11625,6 +11607,18 @@ class RenderTarget extends EventDispatcher {
 		this.depthTexture = options.depthTexture;
 
 		this.samples = options.samples;
+
+	}
+
+	get texture() {
+
+		return this.textures[ 0 ];
+
+	}
+
+	set texture( value ) {
+
+		this.textures[ 0 ] = value;
 
 	}
 
@@ -11636,9 +11630,13 @@ class RenderTarget extends EventDispatcher {
 			this.height = height;
 			this.depth = depth;
 
-			this.texture.image.width = width;
-			this.texture.image.height = height;
-			this.texture.image.depth = depth;
+			for ( let i = 0, il = this.textures.length; i < il; i ++ ) {
+
+				this.textures[ i ].image.width = width;
+				this.textures[ i ].image.height = height;
+				this.textures[ i ].image.depth = depth;
+
+			}
 
 			this.dispose();
 
@@ -11666,8 +11664,14 @@ class RenderTarget extends EventDispatcher {
 
 		this.viewport.copy( source.viewport );
 
-		this.texture = source.texture.clone();
-		this.texture.isRenderTargetTexture = true;
+		this.textures.length = 0;
+
+		for ( let i = 0, il = source.textures.length; i < il; i ++ ) {
+
+			this.textures[ i ] = source.textures[ i ].clone();
+			this.textures[ i ].isRenderTargetTexture = true;
+
+		}
 
 		// ensure image object is not shared, see #20328
 
@@ -11989,6 +11993,7 @@ class PMREMGenerator {
 	 * Generates a PMREM from an equirectangular texture, which can be either LDR
 	 * or HDR. The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
+	 * The smallest supported equirectangular image size is 64 x 32.
 	 */
 	fromEquirectangular( equirectangular, renderTarget = null ) {
 
@@ -12000,6 +12005,7 @@ class PMREMGenerator {
 	 * Generates a PMREM from an cubemap texture, which can be either LDR
 	 * or HDR. The ideal input cube size is 256 x 256,
 	 * as this matches best with the 256 x 256 cubemap output.
+	 * The smallest supported cube size is 16 x 16.
 	 */
 	fromCubemap( cubemap, renderTarget = null ) {
 
