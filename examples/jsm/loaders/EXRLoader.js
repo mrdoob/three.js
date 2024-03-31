@@ -2041,41 +2041,10 @@ class EXRLoader extends DataTextureLoader {
 
 		}
 
-		function floorLog2( x ) {
-
-			let y = 0;
-
-			while ( x > 1 ) {
-
-				y += 1;
-				x >>= 1;
-
-			}
-
-			return y;
-
-		}
-
-		function ceilLog2( x ) {
-
-			let y = 0, r = 0;
-
-			while ( x > 1 ) {
-
-				if ( x & 1 ) r = 1;
-
-				y += 1;
-				x >>= 1;
-
-			}
-
-			return y + r;
-
-		}
-
 		function roundLog2( x, mode ) {
 
-			return mode == 'ROUND_DOWN' ? floorLog2( x ) : ceilLog2( x );
+			const log2 = Math.log2( x );
+			return mode == 'ROUND_DOWN' ? Math.floor( log2 ) : Math.ceil( log2 );
 
 		}
 
