@@ -39,7 +39,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				// scene
 
@@ -52,9 +52,9 @@
 
 				// environment
 
-				const environmentTexture = new THREE.CubeTextureLoader()
+				const environmentTexture = await new THREE.CubeTextureLoader()
 					.setPath( './textures/cube/Park2/' )
-					.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
+					.loadAsync( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
 
 
 				scene.environment = environmentTexture;
@@ -64,21 +64,21 @@
 
 				const loader = new THREE.TextureLoader();
 
-				const topTexture = loader.load( 'textures/ambientcg/Ice002_1K-JPG_Color.jpg' );
+				const topTexture = await loader.loadAsync( 'textures/ambientcg/Ice002_1K-JPG_Color.jpg' );
 				topTexture.colorSpace = THREE.SRGBColorSpace;
 
-				const roughnessTexture = loader.load( 'textures/ambientcg/Ice002_1K-JPG_Roughness.jpg' );
-				roughnessTexture.colorSpace = THREE.SRGBColorSpace;
+				const roughnessTexture = await loader.loadAsync( 'textures/ambientcg/Ice002_1K-JPG_Roughness.jpg' );
+				roughnessTexture.colorSpace = THREE.NoColorSpace;
 
-				const normalTexture = loader.load( 'textures/ambientcg/Ice002_1K-JPG_NormalGL.jpg' );
+				const normalTexture = await loader.loadAsync( 'textures/ambientcg/Ice002_1K-JPG_NormalGL.jpg' );
 				normalTexture.colorSpace = THREE.NoColorSpace;
 
-				const displaceTexture = loader.load( 'textures/ambientcg/Ice002_1K-JPG_Displacement.jpg' );
-				displaceTexture.colorSpace = THREE.SRGBColorSpace;
+				const displaceTexture = await loader.loadAsync( 'textures/ambientcg/Ice002_1K-JPG_Displacement.jpg' );
+				displaceTexture.colorSpace = THREE.NoColorSpace;
 
 				//
 
-				const bottomTexture = loader.load( 'textures/ambientcg/Ice003_1K-JPG_Color.jpg' );
+				const bottomTexture = await loader.loadAsync( 'textures/ambientcg/Ice003_1K-JPG_Color.jpg' );
 				bottomTexture.colorSpace = THREE.SRGBColorSpace;
 				bottomTexture.wrapS = THREE.RepeatWrapping;
 				bottomTexture.wrapT = THREE.RepeatWrapping;

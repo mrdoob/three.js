@@ -49,7 +49,6 @@
 			const gui = new GUI();
 			gui.add( parameters, 'samples', 0, 4 ).step( 1 );
 			gui.add( parameters, 'wireframe' );
-			gui.onChange( render );
 
 			*/
 
@@ -142,7 +141,7 @@
 
 				const loader = new THREE.TextureLoader();
 
-				const diffuse = loader.load( 'textures/hardwood2_diffuse.jpg', render );
+				const diffuse = loader.load( 'textures/hardwood2_diffuse.jpg' );
 				diffuse.colorSpace = THREE.SRGBColorSpace;
 				diffuse.wrapS = THREE.RepeatWrapping;
 				diffuse.wrapT = THREE.RepeatWrapping;

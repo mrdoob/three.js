@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mix, oscSine, timerLocal, cubeTexture, maxMipLevel, toneMapping } from 'three/nodes';
+			import { mix, oscSine, timerLocal, pmremTexture, float, toneMapping } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
@@ -43,7 +43,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
 
@@ -71,25 +71,23 @@
 				cube1Texture.minFilter = THREE.LinearMipmapLinearFilter;
 
 				const cube2Urls = [ 'dark-s_px.jpg', 'dark-s_nx.jpg', 'dark-s_py.jpg', 'dark-s_ny.jpg', 'dark-s_pz.jpg', 'dark-s_nz.jpg' ];
-				const cube2Texture = new THREE.CubeTextureLoader()
+				const cube2Texture = await new THREE.CubeTextureLoader()
 					.setPath( './textures/cube/MilkyWay/' )
-					.load( cube2Urls );
+					.loadAsync( cube2Urls );
 
 				cube2Texture.generateMipmaps = true;
 				cube2Texture.minFilter = THREE.LinearMipmapLinearFilter;
 
-				scene.environmentNode = mix( cubeTexture( cube2Texture ), cubeTexture( cube1Texture ), oscSine( timerLocal( .1 ) ) );
+				scene.environmentNode = mix( pmremTexture( cube2Texture ), pmremTexture( cube1Texture ), oscSine( timerLocal( .1 ) ) );
 
 				scene.backgroundNode = scene.environmentNode.context( {
-					getTextureLevel: ( textureNode ) => maxMipLevel( textureNode )
+					getTextureLevel: () => float( .5 )
 				} );
 
 				const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
-				loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+				const gltf = await loader.loadAsync( 'DamagedHelmet.gltf' );
 
-					scene.add( gltf.scene );
-
-				} );
+				scene.add( gltf.scene );
 
 				renderer = new WebGPURenderer( { antialias: true } );
 

@@ -49,29 +49,14 @@ function WebGLExtensions( gl ) {
 
 		},
 
-		init: function ( capabilities ) {
+		init: function () {
 
-			if ( capabilities.isWebGL2 ) {
-
-				getExtension( 'EXT_color_buffer_float' );
-				getExtension( 'WEBGL_clip_cull_distance' );
-
-			} else {
-
-				getExtension( 'WEBGL_depth_texture' );
-				getExtension( 'OES_texture_float' );
-				getExtension( 'OES_texture_half_float' );
-				getExtension( 'OES_texture_half_float_linear' );
-				getExtension( 'OES_standard_derivatives' );
-				getExtension( 'OES_element_index_uint' );
-				getExtension( 'OES_vertex_array_object' );
-				getExtension( 'ANGLE_instanced_arrays' );
-
-			}
-
+			getExtension( 'EXT_color_buffer_float' );
+			getExtension( 'WEBGL_clip_cull_distance' );
 			getExtension( 'OES_texture_float_linear' );
 			getExtension( 'EXT_color_buffer_half_float' );
 			getExtension( 'WEBGL_multisampled_render_to_texture' );
+			getExtension( 'WEBGL_render_shared_exponent' );
 
 		},
 

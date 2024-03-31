@@ -20,15 +20,57 @@ class Node extends EventDispatcher {
 
 		this.uuid = MathUtils.generateUUID();
 
+		this.version = 0;
+
+		this._cacheKey = null;
+		this._cacheKeyVersion = 0;
+
 		this.isNode = true;
 
 		Object.defineProperty( this, 'id', { value: _nodeId ++ } );
 
 	}
 
+	set needsUpdate( value ) {
+
+		if ( value === true ) {
+
+			this.version ++;
+
+		}
+
+	}
+
 	get type() {
 
 		return this.constructor.type;
+
+	}
+
+	onUpdate( callback, updateType ) {
+
+		this.updateType = updateType;
+		this.update = callback.bind( this.getSelf() );
+
+		return this;
+
+	}
+
+	onFrameUpdate( callback ) {
+
+		return this.onUpdate( callback, NodeUpdateType.FRAME );
+
+	}
+
+	onRenderUpdate( callback ) {
+
+		return this.onUpdate( callback, NodeUpdateType.RENDER );
+
+	}
+
+	onObjectUpdate( callback ) {
+
+		return this.onUpdate( callback, NodeUpdateType.OBJECT );
 
 	}
 
@@ -40,7 +82,7 @@ class Node extends EventDispatcher {
 
 	}
 
-	setReference( /*state*/ ) {
+	updateReference( /*state*/ ) {
 
 		return this;
 
@@ -80,9 +122,18 @@ class Node extends EventDispatcher {
 
 	}
 
-	getCacheKey() {
+	getCacheKey( force = false ) {
 
-		return getCacheKey( this );
+		force = force || this.version !== this._cacheKeyVersion;
+
+		if ( force === true || this._cacheKey === null ) {
+
+			this._cacheKey = getCacheKey( this, force );
+			this._cacheKeyVersion = this.version;
+
+		}
+
+		return this._cacheKey;
 
 	}
 
@@ -231,7 +282,7 @@ class Node extends EventDispatcher {
 
 		if ( buildStage === 'setup' ) {
 
-			this.setReference( builder );
+			this.updateReference( builder );
 
 			const properties = builder.getNodeProperties( this );
 

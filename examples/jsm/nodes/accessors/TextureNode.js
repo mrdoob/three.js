@@ -25,7 +25,31 @@ class TextureNode extends UniformNode {
 		this.updateMatrix = false;
 		this.updateType = NodeUpdateType.NONE;
 
+		this.referenceNode = null;
+
+		this._value = value;
+
 		this.setUpdateMatrix( uvNode === null );
+
+	}
+
+	set value( value ) {
+
+		if ( this.referenceNode ) {
+
+			this.referenceNode.value = value;
+
+		} else {
+
+			this._value = value;
+
+		}
+
+	}
+
+	get value() {
+
+		return this.referenceNode ? this.referenceNode.value : this._value;
 
 	}
 
@@ -55,7 +79,7 @@ class TextureNode extends UniformNode {
 
 	}
 
-	setReference( /*state*/ ) {
+	updateReference( /*state*/ ) {
 
 		return this.value;
 
@@ -123,12 +147,6 @@ class TextureNode extends UniformNode {
 		if ( levelNode === null && builder.context.getTextureLevel ) {
 
 			levelNode = builder.context.getTextureLevel( this );
-
-		}
-
-		if ( levelNode !== null && builder.context.getTextureLevelAlgorithm !== undefined ) {
-
-			levelNode = builder.context.getTextureLevelAlgorithm( this, levelNode );
 
 		}
 
@@ -264,6 +282,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.uvNode = uvNode;
+		textureNode.referenceNode = this;
 
 		return nodeObject( textureNode );
 
@@ -273,6 +292,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.levelNode = levelNode.mul( maxMipLevel( textureNode ) );
+		textureNode.referenceNode = this;
 
 		return nodeObject( textureNode );
 
@@ -282,6 +302,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.levelNode = levelNode;
+		textureNode.referenceNode = this;
 
 		return textureNode;
 
@@ -297,6 +318,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.compareNode = nodeObject( compareNode );
+		textureNode.referenceNode = this;
 
 		return nodeObject( textureNode );
 
@@ -306,6 +328,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.depthNode = nodeObject( depthNode );
+		textureNode.referenceNode = this;
 
 		return nodeObject( textureNode );
 

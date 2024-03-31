@@ -280,10 +280,6 @@ this.defaultAttributeValues = {
 		<p> 一个有如下属性的对象：
 		<code>
 this.extensions = {
-	derivatives: false, // set to use derivatives
-	fragDepth: false, // set to use fragment depth values
-	drawBuffers: false, // set to use draw buffers
-	shaderTextureLOD: false, // set to use shader texture LOD
 	clipCullDistance: false, // set to use vertex shader clipping
 	multiDraw: false // set to use vertex shader multi_draw / enable gl_DrawID
 };
@@ -305,8 +301,7 @@ this.extensions = {
 
 		<h3>[property:String glslVersion]</h3>
 		<p>
-		Defines the GLSL version of custom shader code. Only relevant for WebGL 2 in order to define whether to specify
-		GLSL 3.0 or not. Valid values are *THREE.GLSL1* or *THREE.GLSL3*. Default is *null*.
+		Defines the GLSL version of custom shader code. Valid values are *THREE.GLSL1* or *THREE.GLSL3*. Default is *null*.
 		</p>
 
 		<h3>[property:String index0AttributeName]</h3>

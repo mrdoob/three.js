@@ -1,7 +1,7 @@
 import DataMap from './DataMap.js';
 import Color4 from './Color4.js';
 import { Mesh, SphereGeometry, BackSide } from 'three';
-import { vec4, context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection, maxMipLevel } from '../../nodes/Nodes.js';
+import { vec4, context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection } from '../../nodes/Nodes.js';
 
 const _clearColor = new Color4();
 
@@ -50,11 +50,11 @@ class Background extends DataMap {
 
 			if ( backgroundMesh === undefined ) {
 
-				const backgroundMeshNode = context( vec4( backgroundNode ), {
+				const backgroundMeshNode = context( vec4( backgroundNode ).mul( backgroundIntensity ), {
 					// @TODO: Add Texture2D support using node context
 					getUV: () => normalWorld,
-					getTextureLevel: ( textureNode ) => backgroundBlurriness.mul( maxMipLevel( textureNode ) )
-				} ).mul( backgroundIntensity );
+					getTextureLevel: () => backgroundBlurriness
+				} );
 
 				let viewProj = modelViewProjection();
 				viewProj = viewProj.setZ( viewProj.w );
@@ -83,7 +83,7 @@ class Background extends DataMap {
 
 			if ( sceneData.backgroundCacheKey !== backgroundCacheKey ) {
 
-				sceneData.backgroundMeshNode.node = vec4( backgroundNode );
+				sceneData.backgroundMeshNode.node = vec4( backgroundNode ).mul( backgroundIntensity );
 
 				backgroundMesh.material.needsUpdate = true;
 

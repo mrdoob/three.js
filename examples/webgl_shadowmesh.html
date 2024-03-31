@@ -35,7 +35,7 @@
 			const scene = new THREE.Scene();
 			const camera = new THREE.PerspectiveCamera( 55, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 3000 );
 			const clock = new THREE.Clock();
-			const renderer = new THREE.WebGLRenderer();
+			const renderer = new THREE.WebGLRenderer( { stencil: true } );
 
 			const sunLight = new THREE.DirectionalLight( 'rgb(255,255,255)', 3 );
 			let useDirectionalLight = true;

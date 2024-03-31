@@ -318,10 +318,6 @@ this.defaultAttributeValues = {
 			Un oggetto con le seguenti proprietà:
 		<code>
 this.extensions = {
-	derivatives: false, // impostato per utilizzare le direttive
-	fragDepth: false, // impostato per utilizzare i valori di profondità del frammento
-	drawBuffers: false, // impostato per utilizzare i buffer di disegno
-	shaderTextureLOD: false, // impostato per utilizzare la texture dello shader LOD
 	clipCullDistance: false, // set to use vertex shader clipping
 	multiDraw: false // set to use vertex shader multi_draw / enable gl_DrawID
 };
@@ -345,8 +341,8 @@ this.extensions = {
 
 		<h3>[property:String glslVersion]</h3>
 		<p>
-			Definisce la versione GLSL del codice dello shader personalizzato. Rilevante solo per WebGL 2 per definire se 
-			specificare o meno GLSL 3.0. I valori validi sono `THREE.GLSL1` o `THREE.GLSL3`. Il valore predefinito è `null`.
+			Definisce la versione GLSL del codice dello shader personalizzato. I valori validi sono `THREE.GLSL1` o `THREE.GLSL3`. 
+			Il valore predefinito è `null`.
 		</p>
 
 		<h3>[property:String index0AttributeName]</h3>
