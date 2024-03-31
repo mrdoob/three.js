@@ -14,6 +14,7 @@ export * from './PolyhedronGeometry.js';
 export * from './RingGeometry.js';
 export * from './ShapeGeometry.js';
 export * from './SphereGeometry.js';
+export * from './SuperquadricGeometry.js';
 export * from './TetrahedronGeometry.js';
 export * from './TorusGeometry.js';
 export * from './TorusKnotGeometry.js';
