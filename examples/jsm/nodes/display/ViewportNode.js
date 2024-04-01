@@ -21,7 +21,9 @@ class ViewportNode extends Node {
 
 	getNodeType() {
 
-		return this.scope === ViewportNode.VIEWPORT ? 'vec4' : 'vec2';
+		if ( this.scope === ViewportNode.VIEWPORT ) return 'vec4';
+		else if ( this.scope === ViewportNode.COORDINATE ) return 'vec3';
+		else return 'vec2';
 
 	}
 
@@ -99,7 +101,7 @@ class ViewportNode extends Node {
 
 				const resolution = builder.getNodeProperties( viewportResolution ).outputNode.build( builder );
 
-				coord = `${ builder.getType( 'vec2' ) }( ${ coord }.x, ${ resolution }.y - ${ coord }.y )`;
+				coord = `${ builder.getType( 'vec3' ) }( ${ coord }.x, ${ resolution }.y - ${ coord }.y, ${ coord }.z )`;
 
 			}
 

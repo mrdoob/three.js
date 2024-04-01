@@ -522,7 +522,7 @@ ${ flowData.code }
 
 	getFragCoord() {
 
-		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>' ) + '.xy';
+		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>' ) + '.xyz';
 
 	}
 
