@@ -96,9 +96,9 @@ class NodeMaterial extends ShaderMaterial {
 
 		const clippingNode = this.setupClipping( builder );
 
-		if ( this.fragmentNode === null ) {
+		if ( this.depthWrite === true ) this.setupDepth( builder );
 
-			if ( this.depthWrite === true ) this.setupDepth( builder );
+		if ( this.fragmentNode === null ) {
 
 			if ( this.normals === true ) this.setupNormal( builder );
 
