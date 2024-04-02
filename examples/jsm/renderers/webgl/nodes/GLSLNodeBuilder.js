@@ -246,9 +246,7 @@ ${ flowData.code }
 
 	}
 
-	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet ) {
-
-		if ( depthSnippet ) uvSnippet = `vec3( ${ uvSnippet }, ${ depthSnippet } )`;
+	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet ) {
 
 		return `textureGrad( ${ textureProperty }, ${ uvSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] } )`;
 
