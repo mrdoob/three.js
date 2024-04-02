@@ -384,7 +384,8 @@
 		"webgpu_materials_texture_anisotropy",
 		"webgpu_storage_buffer",
 		"webgpu_mesh_batch",
-		"webgpu_instancing_morph"
+		"webgpu_instancing_morph",
+		"webgpu_texturegrad"
 	],
 	"webaudio": [
 		"webaudio_orientation",
