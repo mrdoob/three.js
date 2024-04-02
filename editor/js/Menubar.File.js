@@ -278,7 +278,7 @@ function MenubarFile( editor ) {
 
 		const exporter = new USDZExporter();
 
-		saveArrayBuffer( await exporter.parse( editor.scene ), 'model.usdz' );
+		saveArrayBuffer( await exporter.parseAsync( editor.scene ), 'model.usdz' );
 
 	} );
 	options.add( option );
