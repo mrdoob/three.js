@@ -173,6 +173,7 @@ class WebGLBackend extends Backend {
 		//
 
 		//
+
 		this.initTimestampQuery( renderContext );
 
 		renderContextData.previousContext = this._currentContext;

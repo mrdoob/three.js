@@ -134,7 +134,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, .15 );
+				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, .3 );
 				document.body.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );

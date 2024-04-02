@@ -370,6 +370,9 @@ class Renderer {
 		postProcessingTarget.depthBuffer = depth;
 		postProcessingTarget.stencilBuffer = stencil;
 		postProcessingTarget.setSize( width, height );
+		postProcessingTarget.viewport.copy( this._viewport );
+		postProcessingTarget.scissor.copy( this._scissor );
+		postProcessingTarget.scissorTest = this._scissorTest;
 
 		return postProcessingTarget;
 
@@ -848,7 +851,7 @@ class Renderer {
 		}
 
 		let renderTargetData = null;
-		const renderTarget = this._renderTarget;
+		const renderTarget = this._renderTarget || this._getPostProcessingTarget();
 
 		if ( renderTarget !== null ) {
 
