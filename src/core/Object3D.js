@@ -575,6 +575,50 @@ class Object3D extends EventDispatcher {
 
 	}
 
+	*traverseGenerator() {
+
+		yield this;
+
+		const children = this.children;
+
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+			yield* children[ i ].traverseGenerator();
+
+		}
+
+	}
+
+	*traverseVisibleGenerator() {
+
+		if ( this.visible === false ) return;
+
+		yield this;
+
+		const children = this.children;
+
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+			yield* children[ i ].traverseVisibleGenerator();
+
+		}
+
+	}
+
+	*traverseAncestorsGenerator() {
+
+		const parent = this.parent;
+
+		if ( parent !== null ) {
+
+			yield parent;
+
+			yield* parent.traverseAncestorsGenerator();
+
+		}
+
+	}
+
 	updateMatrix() {
 
 		this.matrix.compose( this.position, this.quaternion, this.scale );
