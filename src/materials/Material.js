@@ -218,6 +218,8 @@ class Material extends EventDispatcher {
 
 		}
 
+		if ( this.dispersion !== undefined ) data.dispersion = this.dispersion;
+
 		if ( this.iridescence !== undefined ) data.iridescence = this.iridescence;
 		if ( this.iridescenceIOR !== undefined ) data.iridescenceIOR = this.iridescenceIOR;
 		if ( this.iridescenceThicknessRange !== undefined ) data.iridescenceThicknessRange = this.iridescenceThicknessRange;
