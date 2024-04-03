@@ -1950,10 +1950,10 @@ class WebGLRenderer {
 
 				if ( skeleton ) {
 
-          if ( skeleton.boneTexture === null ) skeleton.computeBoneTexture();
+					if ( skeleton.boneTexture === null ) skeleton.computeBoneTexture();
 
-          p_uniforms.setValue( _gl, 'boneTexture', skeleton.boneTexture, textures );
-          p_uniforms.setValue( _gl, 'boneIndexWeightsTexture', object.boneIndexWeightsTexture, textures );
+					p_uniforms.setValue( _gl, 'boneTexture', skeleton.boneTexture, textures );
+					p_uniforms.setValue( _gl, 'boneIndexWeightsTexture', object.boneIndexWeightsTexture, textures );
 
 				}
 
