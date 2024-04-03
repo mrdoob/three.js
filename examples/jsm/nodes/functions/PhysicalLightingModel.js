@@ -455,7 +455,9 @@ class PhysicalLightingModel extends LightingModel {
 				materialReference( 'attenuationDistance', 'float' ) // attenuationDistance
 			);
 
-			context.backdropAlpha = mix( 1, context.backdrop.a, materialTransmission );
+			context.backdropAlpha = materialTransmission;
+
+			diffuseColor.a.mulAssign( mix( 1, context.backdrop.a, materialTransmission ) );
 
 		}
 

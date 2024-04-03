@@ -100,8 +100,6 @@ class LightsNode extends Node {
 
 					totalDiffuse = vec3( backdropAlpha.mix( totalDiffuse, backdrop ) );
 
-					diffuseColor.a.mulAssign( backdropAlpha );
-
 				} else {
 
 					totalDiffuse = vec3( backdrop );
