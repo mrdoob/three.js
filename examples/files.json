@@ -88,6 +88,7 @@
 		"webgl_loader_gltf",
 		"webgl_loader_gltf_avif",
 		"webgl_loader_gltf_compressed",
+		"webgl_loader_gltf_dispersion",
 		"webgl_loader_gltf_instancing",
 		"webgl_loader_gltf_iridescence",
 		"webgl_loader_gltf_lights",
