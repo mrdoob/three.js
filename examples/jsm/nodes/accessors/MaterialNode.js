@@ -111,20 +111,6 @@ class MaterialNode extends Node {
 
 			}
 
-		} else if ( scope === MaterialNode.SPECULAR_INTENSITY ) {
-
-			const specularIntensity = this.getFloat( scope );
-
-			if ( material.specularMap ) {
-
-				node = specularIntensity.mul( this.getTexture( scope ).a );
-
-			} else {
-
-				node = specularIntensity;
-
-			}
-
 		} else if ( scope === MaterialNode.ROUGHNESS ) { // TODO: cleanup similar branches
 
 			const roughnessNode = this.getFloat( scope );
