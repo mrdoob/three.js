@@ -372,6 +372,8 @@ class Renderer {
 		postProcessingTarget.setSize( width, height );
 		postProcessingTarget.viewport.copy( this._viewport );
 		postProcessingTarget.scissor.copy( this._scissor );
+		postProcessingTarget.viewport.multiplyScalar( this._pixelRatio );
+		postProcessingTarget.scissor.multiplyScalar( this._pixelRatio );
 		postProcessingTarget.scissorTest = this._scissorTest;
 
 		return postProcessingTarget;

@@ -1272,9 +1272,6 @@ class WebGPUBackend extends Backend {
 
 	}
 
-
-
-
 	copyFramebufferToTexture( texture, renderContext ) {
 
 		const renderContextData = this.get( renderContext );
