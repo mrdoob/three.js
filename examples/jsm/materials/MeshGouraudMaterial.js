@@ -270,8 +270,6 @@ const GouraudShader = {
 
 			#endif
 
-			#include <lightmap_fragment>
-
 			reflectedLight.indirectDiffuse *= BRDF_Lambert( diffuseColor.rgb );
 
 			#ifdef DOUBLE_SIDED
