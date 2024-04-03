@@ -23,41 +23,25 @@ class QuadGeometry extends BufferGeometry {
 
 const _geometry = new QuadGeometry();
 
-class QuadMesh {
+class QuadMesh extends Mesh {
 
 	constructor( material = null ) {
 
-		this._mesh = new Mesh( _geometry, material );
+		super( _geometry, material );
+
+		this.camera = _camera;
 
 	}
 
-	dispose() {
+	renderAsync( renderer ) {
 
-		this._mesh.geometry.dispose();
-
-	}
-
-	async renderAsync( renderer ) {
-
-		await renderer.renderAsync( this._mesh, _camera );
+		return renderer.renderAsync( this, _camera );
 
 	}
 
-	get material() {
+	render( renderer ) {
 
-		return this._mesh.material;
-
-	}
-
-	set material( value ) {
-
-		this._mesh.material = value;
-
-	}
-
-	get render() {
-
-		return this.renderAsync;
+		renderer.render( this, _camera );
 
 	}
 

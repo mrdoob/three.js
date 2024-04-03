@@ -54,6 +54,9 @@ object.matrixAutoUpdate = false;
 		<p>
 		When either the parent or the child object's transformation changes, you can request that the child object's [page:Object3D.matrixWorld matrixWorld] be updated by calling [page:Object3D.updateMatrixWorld updateMatrixWorld]().
 		</p>
+		<p>
+		An object can be transformed via [page:Object3D.applyMatrix4]. Note: Under-the-hood, this method relies on [page:Matrix4.decompose], and not all matrices are decomposable in this way. For example, if an object has a non-uniformly scaled parent, then the object's world matrix may not be decomposable, and this method may not be appropriate.
+		</p>
 
 		<h2>Rotation and Quaternion</h2>
 		<p>

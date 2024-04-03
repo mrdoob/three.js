@@ -1,15 +1,12 @@
 
-import { UIPanel, UIBreak, UIText } from './libs/ui.js';
+import { UIButton, UIPanel, UIBreak, UIText } from './libs/ui.js';
 import { UIBoolean, UIOutliner } from './libs/ui.three.js';
 
 function SidebarSettingsHistory( editor ) {
 
 	const strings = editor.strings;
-
 	const signals = editor.signals;
-
 	const config = editor.config;
-
 	const history = editor.history;
 
 	const container = new UIPanel();
@@ -58,6 +55,22 @@ function SidebarSettingsHistory( editor ) {
 
 	} );
 	container.add( outliner );
+
+	container.add( new UIBreak() );
+
+	// Clear History
+
+	const option = new UIButton( strings.getKey( 'sidebar/history/clear' ) );
+	option.onClick( function () {
+
+		if ( confirm( 'The Undo/Redo History will be cleared. Are you sure?' ) ) {
+
+			editor.history.clear();
+
+		}
+
+	} );
+	container.add( option );
 
 	//
 

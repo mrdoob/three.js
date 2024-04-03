@@ -20,7 +20,8 @@ function SidebarSettings( editor ) {
 	const options = {
 		en: 'English',
 		fr: 'Français',
-		zh: '中文'
+		zh: '中文',
+		ja: '日本語',
 	};
 
 	const languageRow = new UIRow();
@@ -41,7 +42,7 @@ function SidebarSettings( editor ) {
 
 	} );
 
-	languageRow.add( new UIText( strings.getKey( 'sidebar/settings/language' ) ).setWidth( '90px' ) );
+	languageRow.add( new UIText( strings.getKey( 'sidebar/settings/language' ) ).setClass( 'Label' ) );
 	languageRow.add( language );
 
 	settings.add( languageRow );

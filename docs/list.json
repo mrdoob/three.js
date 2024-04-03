@@ -279,9 +279,7 @@
 			},
 
 			"Renderers": {
-				"WebGLMultipleRenderTargets": "api/en/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
-				"WebGL1Renderer": "api/en/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
 				"WebGL3DRenderTarget": "api/en/renderers/WebGL3DRenderTarget",
 				"WebGLArrayRenderTarget": "api/en/renderers/WebGLArrayRenderTarget",
@@ -721,9 +719,7 @@
 			},
 
 			"Renderers": {
-				"WebGLMultipleRenderTargets": "api/ar/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/ar/renderers/WebGLRenderer",
-				"WebGL1Renderer": "api/ar/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/ar/renderers/WebGLRenderTarget",
 				"WebGL3DRenderTarget": "api/ar/renderers/WebGL3DRenderTarget",
 				"WebGLArrayRenderTarget": "api/ar/renderers/WebGLArrayRenderTarget",
@@ -1029,9 +1025,7 @@
 			},
 
 			"渲染器": {
-				"WebGLMultipleRenderTargets": "api/zh/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
-				"WebGL1Renderer": "api/zh/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/zh/renderers/WebGLRenderTarget",
 				"WebGL3DRenderTarget": "api/zh/renderers/WebGL3DRenderTarget",
 				"WebGLArrayRenderTarget": "api/zh/renderers/WebGLArrayRenderTarget",
@@ -1666,9 +1660,7 @@
 			},
 
 			"Renderers": {
-				"WebGLMultipleRenderTargets": "api/it/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/it/renderers/WebGLRenderer",
-				"WebGL1Renderer": "api/it/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/it/renderers/WebGLRenderTarget",
 				"WebGL3DRenderTarget": "api/it/renderers/WebGL3DRenderTarget",
 				"WebGLArrayRenderTarget": "api/it/renderers/WebGLArrayRenderTarget",
@@ -2194,9 +2186,7 @@
 			},
 
 			"Renderers": {
-				"WebGLMultipleRenderTargets": "api/en/renderers/WebGLMultipleRenderTargets",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
-				"WebGL1Renderer": "api/en/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
 				"WebGL3DRenderTarget": "api/en/renderers/WebGL3DRenderTarget",
 				"WebGLArrayRenderTarget": "api/en/renderers/WebGLArrayRenderTarget",

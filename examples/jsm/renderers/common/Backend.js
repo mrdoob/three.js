@@ -90,7 +90,7 @@ class Backend {
 
 	// utils
 
-	resolveTimeStampAsync( renderContext, type ) { }
+	resolveTimestampAsync( renderContext, type ) { }
 
 	hasFeatureAsync( name ) { } // return Boolean
 
@@ -119,6 +119,8 @@ class Backend {
 		return this.renderer.getScissor( vector4 );
 
 	}
+
+	setScissorTest( boolean ) { }
 
 	getClearColor() {
 

@@ -10,6 +10,7 @@ import WebGLTextureUtils from './utils/WebGLTextureUtils.js';
 import WebGLExtensions from './utils/WebGLExtensions.js';
 import WebGLCapabilities from './utils/WebGLCapabilities.js';
 import { GLFeatureName } from './utils/WebGLConstants.js';
+import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
 
 //
 
@@ -39,14 +40,19 @@ class WebGLBackend extends Backend {
 		this.capabilities = new WebGLCapabilities( this );
 		this.attributeUtils = new WebGLAttributeUtils( this );
 		this.textureUtils = new WebGLTextureUtils( this );
+		this.bufferRenderer = new WebGLBufferRenderer( this );
+
 		this.state = new WebGLState( this );
 		this.utils = new WebGLUtils( this );
 
 		this.vaoCache = {};
 		this.transformFeedbackCache = {};
 		this.discard = false;
+		this.trackTimestamp = ( parameters.trackTimestamp === true );
 
 		this.extensions.get( 'EXT_color_buffer_float' );
+		this.disjoint = this.extensions.get( 'EXT_disjoint_timer_query_webgl2' );
+		this.parallel = this.extensions.get( 'KHR_parallel_shader_compile' );
 		this._currentContext = null;
 
 	}
@@ -60,6 +66,96 @@ class WebGLBackend extends Backend {
 	async getArrayBufferAsync( attribute ) {
 
 		return await this.attributeUtils.getArrayBufferAsync( attribute );
+
+	}
+
+
+	initTimestampQuery( renderContext ) {
+
+		if ( ! this.disjoint || ! this.trackTimestamp ) return;
+
+		const renderContextData = this.get( renderContext );
+
+		if ( this.queryRunning ) {
+
+		  if ( ! renderContextData.queryQueue ) renderContextData.queryQueue = [];
+		  renderContextData.queryQueue.push( renderContext );
+		  return;
+
+		}
+
+		if ( renderContextData.activeQuery ) {
+
+		  this.gl.endQuery( this.disjoint.TIME_ELAPSED_EXT );
+		  renderContextData.activeQuery = null;
+
+		}
+
+		renderContextData.activeQuery = this.gl.createQuery();
+
+		if ( renderContextData.activeQuery !== null ) {
+
+		  this.gl.beginQuery( this.disjoint.TIME_ELAPSED_EXT, renderContextData.activeQuery );
+		  this.queryRunning = true;
+
+		}
+
+	}
+
+	// timestamp utils
+
+	  prepareTimestampBuffer( renderContext ) {
+
+		if ( ! this.disjoint || ! this.trackTimestamp ) return;
+
+		const renderContextData = this.get( renderContext );
+
+		if ( renderContextData.activeQuery ) {
+
+		  this.gl.endQuery( this.disjoint.TIME_ELAPSED_EXT );
+
+		  if ( ! renderContextData.gpuQueries ) renderContextData.gpuQueries = [];
+		  renderContextData.gpuQueries.push( { query: renderContextData.activeQuery } );
+		  renderContextData.activeQuery = null;
+		  this.queryRunning = false;
+
+		  if ( renderContextData.queryQueue && renderContextData.queryQueue.length > 0 ) {
+
+				const nextRenderContext = renderContextData.queryQueue.shift();
+				this.initTimestampQuery( nextRenderContext );
+
+			}
+
+		}
+
+	}
+
+	  async resolveTimestampAsync( renderContext, type = 'render' ) {
+
+		if ( ! this.disjoint || ! this.trackTimestamp ) return;
+
+		const renderContextData = this.get( renderContext );
+
+		if ( ! renderContextData.gpuQueries ) renderContextData.gpuQueries = [];
+
+		for ( let i = 0; i < renderContextData.gpuQueries.length; i ++ ) {
+
+		  const queryInfo = renderContextData.gpuQueries[ i ];
+		  const available = this.gl.getQueryParameter( queryInfo.query, this.gl.QUERY_RESULT_AVAILABLE );
+		  const disjoint = this.gl.getParameter( this.disjoint.GPU_DISJOINT_EXT );
+
+		  if ( available && ! disjoint ) {
+
+				const elapsed = this.gl.getQueryParameter( queryInfo.query, this.gl.QUERY_RESULT );
+				const duration = Number( elapsed ) / 1000000; // Convert nanoseconds to milliseconds
+				this.gl.deleteQuery( queryInfo.query );
+				renderContextData.gpuQueries.splice( i, 1 ); // Remove the processed query
+				i --;
+				this.renderer.info.updateTimestamp( type, duration );
+
+			}
+
+		}
 
 	}
 
@@ -77,13 +173,14 @@ class WebGLBackend extends Backend {
 		//
 
 		//
+		this.initTimestampQuery( renderContext );
 
 		renderContextData.previousContext = this._currentContext;
 		this._currentContext = renderContext;
 
 		this._setFramebuffer( renderContext );
 
-		this.clear( renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil, renderContext );
+		this.clear( renderContext.clearColor, renderContext.clearDepth, renderContext.clearStencil, renderContext, false );
 
 		//
 		if ( renderContext.viewport ) {
@@ -93,6 +190,14 @@ class WebGLBackend extends Backend {
 		} else {
 
 			gl.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
+
+		}
+
+		if ( renderContext.scissor ) {
+
+			const { x, y, width, height } = renderContext.scissorValue;
+
+			gl.scissor( x, y, width, height );
 
 		}
 
@@ -210,6 +315,7 @@ class WebGLBackend extends Backend {
 
 		}
 
+		this.prepareTimestampBuffer( renderContext );
 
 	}
 
@@ -288,7 +394,23 @@ class WebGLBackend extends Backend {
 
 	}
 
-	clear( color, depth, stencil, descriptor = null ) {
+	setScissorTest( boolean ) {
+
+		const gl = this.gl;
+
+		if ( boolean ) {
+
+			gl.enable( gl.SCISSOR_TEST );
+
+		} else {
+
+			gl.disable( gl.SCISSOR_TEST );
+
+		}
+
+	}
+
+	clear( color, depth, stencil, descriptor = null, setFrameBuffer = true ) {
 
 		const { gl } = this;
 
@@ -311,7 +433,7 @@ class WebGLBackend extends Backend {
 
 		if ( clear !== 0 ) {
 
-			const clearColor = descriptor.clearColorValue;
+			const clearColor = descriptor.clearColorValue || this.getClearColor();
 
 			if ( depth ) this.state.setDepthMask( true );
 
@@ -321,6 +443,8 @@ class WebGLBackend extends Backend {
 				gl.clear( clear );
 
 			} else {
+
+				if ( setFrameBuffer ) this._setFramebuffer( descriptor );
 
 				if ( color ) {
 
@@ -352,11 +476,12 @@ class WebGLBackend extends Backend {
 
 	}
 
-	beginCompute( /*computeGroup*/ ) {
+	beginCompute( computeGroup ) {
 
 		const gl = this.gl;
 
 		gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+		this.initTimestampQuery( computeGroup );
 
 	}
 
@@ -364,18 +489,19 @@ class WebGLBackend extends Backend {
 
 		const gl = this.gl;
 
-		if ( ! this.discard )  {
+		if ( ! this.discard ) {
 
 			// required here to handle async behaviour of render.compute()
 			gl.enable( gl.RASTERIZER_DISCARD );
 			this.discard = true;
+
 		}
 
 		const { programGPU, transformBuffers, attributes } = this.get( pipeline );
 
 		const vaoKey = this._getVaoKey( null, attributes );
 
-		let vaoGPU = this.vaoCache[ vaoKey ];
+		const vaoGPU = this.vaoCache[ vaoKey ];
 
 		if ( vaoGPU === undefined ) {
 
@@ -396,27 +522,47 @@ class WebGLBackend extends Backend {
 		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, transformFeedbackGPU );
 		gl.beginTransformFeedback( gl.POINTS );
 
-		gl.drawArraysInstanced( gl.POINTS, 0, 1, computeNode.count );
+		if ( attributes[ 0 ].isStorageInstancedBufferAttribute ) {
+
+			gl.drawArraysInstanced( gl.POINTS, 0, 1, computeNode.count );
+
+		} else {
+
+			gl.drawArrays( gl.POINTS, 0, computeNode.count );
+
+		}
 
 		gl.endTransformFeedback();
 		gl.bindTransformFeedback( gl.TRANSFORM_FEEDBACK, null );
 
 		// switch active buffers
+
 		for ( let i = 0; i < transformBuffers.length; i ++ ) {
 
-			transformBuffers[ i ].switchBuffers();
+			const dualAttributeData = transformBuffers[ i ];
+
+			if ( dualAttributeData.pbo ) {
+
+				this.textureUtils.copyBufferToTexture( dualAttributeData.transformBuffer, dualAttributeData.pbo );
+
+			}
+
+			dualAttributeData.switchBuffers();
+
 
 		}
 
 	}
 
-	finishCompute( /*computeGroup*/ ) {
+	finishCompute( computeGroup ) {
 
 		const gl = this.gl;
 
 		this.discard = false;
 
 		gl.disable( gl.RASTERIZER_DISCARD );
+
+		this.prepareTimestampBuffer( computeGroup );
 
 	}
 
@@ -501,21 +647,22 @@ class WebGLBackend extends Backend {
 
 		//
 
-		let mode;
-		if ( object.isPoints ) mode = gl.POINTS;
-		else if ( object.isLineSegments ) mode = gl.LINES;
-		else if ( object.isLine ) mode = gl.LINE_STRIP;
-		else if ( object.isLineLoop ) mode = gl.LINE_LOOP;
+		const renderer = this.bufferRenderer;
+
+		if ( object.isPoints ) renderer.mode = gl.POINTS;
+		else if ( object.isLineSegments ) renderer.mode = gl.LINES;
+		else if ( object.isLine ) renderer.mode = gl.LINE_STRIP;
+		else if ( object.isLineLoop ) renderer.mode = gl.LINE_LOOP;
 		else {
 
 			if ( material.wireframe === true ) {
 
 				state.setLineWidth( material.wireframeLinewidth * this.renderer.getPixelRatio() );
-				mode = gl.LINES;
+				renderer.mode = gl.LINES;
 
 			} else {
 
-				mode = gl.TRIANGLES;
+				renderer.mode = gl.TRIANGLES;
 
 			}
 
@@ -523,46 +670,63 @@ class WebGLBackend extends Backend {
 
 		//
 
-		const instanceCount = this.getInstanceCount( renderObject );
+
+		let count;
+
+		renderer.object = object;
 
 		if ( index !== null ) {
 
 			const indexData = this.get( index );
 			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
 
-			if ( instanceCount > 1 ) {
+			renderer.index = index.count;
+			renderer.type = indexData.type;
 
-				gl.drawElementsInstanced( mode, index.count, indexData.type, firstVertex, instanceCount );
-
-			} else {
-
-				gl.drawElements( mode, index.count, indexData.type, firstVertex );
-
-			}
-
-			info.update( object, indexCount, 1 );
+			count = indexCount;
 
 		} else {
 
-			const positionAttribute = geometry.attributes.position;
-			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : positionAttribute.count;
+			renderer.index = 0;
 
-			if ( instanceCount > 1 ) {
+			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : geometry.attributes.position.count;
 
-				gl.drawArraysInstanced( mode, 0, vertexCount, instanceCount );
-
-			} else {
-
-				gl.drawArrays( mode, 0, vertexCount );
-
-			}
-
-			//gl.drawArrays( mode, vertexCount, gl.UNSIGNED_SHORT, firstVertex );
-
-			info.update( object, vertexCount, 1 );
+			count = vertexCount;
 
 		}
 
+		const instanceCount = this.getInstanceCount( renderObject );
+
+		if ( object.isBatchedMesh ) {
+
+			if ( instanceCount > 1 ) {
+
+				// TODO: Better support with InstancedBatchedMesh
+				if ( object._multiDrawInstances === undefined ) {
+
+					object._multiDrawInstances = new Int32Array( object._maxGeometryCount );
+
+				}
+
+				object._multiDrawInstances.fill( instanceCount );
+
+				renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
+
+			} else {
+
+				renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+
+			}
+
+		} else if ( instanceCount > 1 ) {
+
+			renderer.renderInstances( firstVertex, count, instanceCount );
+
+		} else {
+
+			renderer.render( firstVertex, count );
+
+		}
 		//
 
 		gl.bindVertexArray( null );
@@ -660,7 +824,7 @@ class WebGLBackend extends Backend {
 
 	}
 
-	createRenderPipeline( renderObject ) {
+	createRenderPipeline( renderObject, promises ) {
 
 		const gl = this.gl;
 		const pipeline = renderObject.pipeline;
@@ -677,6 +841,52 @@ class WebGLBackend extends Backend {
 		gl.attachShader( programGPU, fragmentShader );
 		gl.attachShader( programGPU, vertexShader );
 		gl.linkProgram( programGPU );
+
+		this.set( pipeline, {
+			programGPU,
+			fragmentShader,
+			vertexShader
+		} );
+
+		if ( promises !== null && this.parallel ) {
+
+			const p = new Promise( ( resolve /*, reject*/ ) => {
+
+				const parallel = this.parallel;
+				const checkStatus = () => {
+
+					if ( gl.getProgramParameter( programGPU, parallel.COMPLETION_STATUS_KHR ) ) {
+
+						this._completeCompile( renderObject, pipeline );
+						resolve();
+
+					} else {
+
+						requestAnimationFrame( checkStatus );
+
+					}
+
+				};
+
+				checkStatus();
+
+			} );
+
+			promises.push( p );
+
+			return;
+
+		}
+
+		this._completeCompile( renderObject, pipeline );
+
+	}
+
+	_completeCompile( renderObject, pipeline ) {
+
+		const gl = this.gl;
+		const pipelineData = this.get( pipeline );
+		const { programGPU, fragmentShader, vertexShader } = pipelineData;
 
 		if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
 
@@ -709,7 +919,7 @@ class WebGLBackend extends Backend {
 
 		const fragmentProgram = {
 			stage: 'fragment',
-			code: "#version 300 es\nprecision highp float;\nvoid main() {}"
+			code: '#version 300 es\nprecision highp float;\nvoid main() {}'
 		};
 
 		this.createProgram( fragmentProgram );
@@ -935,6 +1145,12 @@ class WebGLBackend extends Backend {
 
 	}
 
+	copyTextureToTexture( position, srcTexture, dstTexture, level ) {
+
+		this.textureUtils.copyTextureToTexture( position, srcTexture, dstTexture, level );
+
+	}
+
 	copyFramebufferToTexture( texture, renderContext ) {
 
 		this.textureUtils.copyFramebufferToTexture( texture, renderContext );
@@ -1150,7 +1366,7 @@ class WebGLBackend extends Backend {
 			gl.bindBuffer( gl.ARRAY_BUFFER, attributeData.bufferGPU );
 			gl.enableVertexAttribArray( i );
 
-			if ( attribute.isStorageBufferAttribute ) staticVao = false;
+			if ( attribute.isStorageBufferAttribute || attribute.isStorageInstancedBufferAttribute ) staticVao = false;
 
 			let stride, offset;
 

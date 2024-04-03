@@ -57,12 +57,13 @@ class AnalyticLightNode extends LightingNode {
 			if ( overrideMaterial === null ) {
 
 				overrideMaterial = builder.createNodeMaterial();
-				overrideMaterial.fragmentNode = vec4( 1 );
+				overrideMaterial.fragmentNode = vec4( 0, 0, 0, 1 );
+				overrideMaterial.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.fragmentNode unintentionally when using material.shadowNode
 
 			}
 
 			const shadow = this.light.shadow;
-			const rtt = builder.getRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
+			const rtt = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
 
 			const depthTexture = new DepthTexture();
 			depthTexture.minFilter = NearestFilter;
@@ -147,8 +148,10 @@ class AnalyticLightNode extends LightingNode {
 			*/
 			//
 
+			const shadowColor = texture( rtt.texture, shadowCoord );
+
 			this.rtt = rtt;
-			this.colorNode = this.colorNode.mul( frustumTest.mix( 1, shadowNode ) );
+			this.colorNode = this.colorNode.mul( frustumTest.mix( 1, shadowNode.mix( shadowColor.a.mix( 1, shadowColor ), 1 ) ) );
 
 			this.shadowNode = shadowNode;
 

@@ -26,6 +26,7 @@ void main() {
 
 	#include <uv_vertex>
 	#include <color_vertex>
+	#include <morphinstance_vertex>
 	#include <morphcolor_vertex>
 	#include <batching_vertex>
 
@@ -92,6 +93,10 @@ uniform float opacity;
 #ifdef USE_CLEARCOAT
 	uniform float clearcoat;
 	uniform float clearcoatRoughness;
+#endif
+
+#ifdef USE_DISPERSION
+	uniform float dispersion;
 #endif
 
 #ifdef USE_IRIDESCENCE

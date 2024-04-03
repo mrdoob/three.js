@@ -159,6 +159,12 @@
 			使用一个新的原点和方向来更新射线。
 		</p>
 
+		<h3>[method:this setFromXRController]( [param:WebXRController controller] )</h3>
+		<p>
+			[page:WebXRController controller] — The controller to copy the position and direction from.
+		</p>
+		<p>Updates the ray with a new origin and direction.</p>
+
 		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
 		<p>
 		[page:Object3D object] —— 检查与射线相交的物体。<br />
@@ -179,9 +185,9 @@
 			[page:Integer faceIndex] —— 相交的面的索引<br />
 			[page:Object3D object] —— 相交的物体<br />
 			[page:Vector2 uv] —— 相交部分的点的UV坐标。<br />
-			[page:Vector2 uv1] —— Second set of U,V coordinates at point of intersection<br />
+			[page:Vector2 uv1] —— 相交部分的点的第二组UV坐标<br />
 			[page:Vector3 normal] - 交点处的内插法向量<br />
-			[page:Integer instanceId] – The index number of the instance where the ray intersects the InstancedMesh
+			[page:Integer instanceId] – 与InstancedMesh物体相交时的instance索引
 		</p>
 		<p>
 			当计算这条射线是否和物体相交的时候，*Raycaster*将传入的对象委托给[page:Object3D.raycast raycast]方法。

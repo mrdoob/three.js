@@ -7,10 +7,10 @@ import {
 	NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter,
 	RepeatWrapping, MirroredRepeatWrapping,
 	RGB_ETC2_Format, RGBA_ETC2_EAC_Format,
-	RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, SRGBColorSpace, DepthFormat, DepthStencilFormat,
+	RGBAFormat, RGBFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, SRGBColorSpace, DepthFormat, DepthStencilFormat,
 	RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format,
-	RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, UnsignedIntType, UnsignedShortType, UnsignedInt248Type,
-	NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare
+	RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, UnsignedIntType, UnsignedShortType, UnsignedInt248Type, UnsignedInt5999Type,
+	NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, IntType, RedIntegerFormat, RGIntegerFormat, RGBAIntegerFormat
 } from 'three';
 
 import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping, DepthTexture } from 'three';
@@ -38,8 +38,8 @@ class WebGPUTextureUtils {
 
 		this._passUtils = null;
 
-		this.defaultTexture = null;
-		this.defaultCubeTexture = null;
+		this.defaultTexture = {};
+		this.defaultCubeTexture = {};
 
 		this.colorBuffer = null;
 
@@ -79,13 +79,15 @@ class WebGPUTextureUtils {
 
 		let textureGPU;
 
+		const format = getFormat( texture );
+
 		if ( texture.isCubeTexture ) {
 
-			textureGPU = this._getDefaultCubeTextureGPU();
+			textureGPU = this._getDefaultCubeTextureGPU( format );
 
 		} else {
 
-			textureGPU = this._getDefaultTextureGPU();
+			textureGPU = this._getDefaultTextureGPU( format );
 
 		}
 
@@ -111,7 +113,7 @@ class WebGPUTextureUtils {
 		const { width, height, depth, levels } = options;
 
 		const dimension = this._getDimension( texture );
-		const format = texture.internalFormat || getFormat( texture, backend.device );
+		const format = texture.internalFormat || options.format || getFormat( texture, backend.device );
 
 		let sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
 
@@ -268,7 +270,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	getDepthBuffer( depth = true, stencil = true ) {
+	getDepthBuffer( depth = true, stencil = false ) {
 
 		const backend = this.backend;
 		const { width, height } = backend.getDrawingBufferSize();
@@ -327,13 +329,13 @@ class WebGPUTextureUtils {
 
 		if ( texture.isDataTexture || texture.isData3DTexture ) {
 
-			this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, false );
+			this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
 
 		} else if ( texture.isDataArrayTexture ) {
 
 			for ( let i = 0; i < options.image.depth; i ++ ) {
 
-				this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, i, false, i );
+				this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, i, texture.flipY, i );
 
 			}
 
@@ -422,19 +424,19 @@ class WebGPUTextureUtils {
 
 	}
 
-	_getDefaultTextureGPU() {
+	_getDefaultTextureGPU( format ) {
 
-		let defaultTexture = this.defaultTexture;
+		let defaultTexture = this.defaultTexture[ format ];
 
-		if ( defaultTexture === null ) {
+		if ( defaultTexture === undefined ) {
 
 			const texture = new Texture();
 			texture.minFilter = NearestFilter;
 			texture.magFilter = NearestFilter;
 
-			this.createTexture( texture, { width: 1, height: 1 } );
+			this.createTexture( texture, { width: 1, height: 1, format } );
 
-			this.defaultTexture = defaultTexture = texture;
+			this.defaultTexture[ format ] = defaultTexture = texture;
 
 		}
 
@@ -442,11 +444,11 @@ class WebGPUTextureUtils {
 
 	}
 
-	_getDefaultCubeTextureGPU() {
+	_getDefaultCubeTextureGPU( format ) {
 
-		let defaultCubeTexture = this.defaultTexture;
+		let defaultCubeTexture = this.defaultTexture[ format ];
 
-		if ( defaultCubeTexture === null ) {
+		if ( defaultCubeTexture === undefined ) {
 
 			const texture = new CubeTexture();
 			texture.minFilter = NearestFilter;
@@ -454,7 +456,7 @@ class WebGPUTextureUtils {
 
 			this.createTexture( texture, { width: 1, height: 1, depth: 6 } );
 
-			this.defaultCubeTexture = defaultCubeTexture = texture;
+			this.defaultCubeTexture[ format ] = defaultCubeTexture = texture;
 
 		}
 
@@ -930,6 +932,21 @@ export function getFormat( texture, device = null ) {
 
 				break;
 
+			case RGBFormat:
+
+				switch ( type ) {
+
+					case UnsignedInt5999Type:
+						formatGPU = GPUTextureFormat.RGB9E5UFloat;
+						break;
+
+					default:
+						console.error( 'WebGPURenderer: Unsupported texture type with RGBFormat.', type );
+
+				}
+
+				break;
+
 			case RedFormat:
 
 				switch ( type ) {
@@ -1021,6 +1038,63 @@ export function getFormat( texture, device = null ) {
 
 					default:
 						console.error( 'WebGPURenderer: Unsupported texture type with DepthStencilFormat.', type );
+
+				}
+
+				break;
+
+			case RedIntegerFormat:
+
+				switch ( type ) {
+
+					case IntType:
+						formatGPU = GPUTextureFormat.R32Sint;
+						break;
+
+					case UnsignedIntType:
+						formatGPU = GPUTextureFormat.R32Uint;
+						break;
+
+					default:
+						console.error( 'WebGPURenderer: Unsupported texture type with RedIntegerFormat.', type );
+
+				}
+
+				break;
+
+			case RGIntegerFormat:
+
+				switch ( type ) {
+
+					case IntType:
+						formatGPU = GPUTextureFormat.RG32Sint;
+						break;
+
+					case UnsignedIntType:
+						formatGPU = GPUTextureFormat.RG32Uint;
+						break;
+
+					default:
+						console.error( 'WebGPURenderer: Unsupported texture type with RGIntegerFormat.', type );
+
+				}
+
+				break;
+
+			case RGBAIntegerFormat:
+
+				switch ( type ) {
+
+					case IntType:
+						formatGPU = GPUTextureFormat.RGBA32Sint;
+						break;
+
+					case UnsignedIntType:
+						formatGPU = GPUTextureFormat.RGBA32Uint;
+						break;
+
+					default:
+						console.error( 'WebGPURenderer: Unsupported texture type with RGBAIntegerFormat.', type );
 
 				}
 

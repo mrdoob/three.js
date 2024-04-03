@@ -1,17 +1,19 @@
 import { Material, ShaderMaterial, NoColorSpace, LinearSRGBColorSpace } from 'three';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
-import { output, diffuseColor } from '../core/PropertyNode.js';
+import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
+import { batch } from '../accessors/BatchNode.js';
+
 import { positionLocal, positionView } from '../accessors/PositionNode.js';
-import { skinning } from '../accessors/SkinningNode.js';
-import { morph } from '../accessors/MorphNode.js';
+import { skinningReference } from '../accessors/SkinningNode.js';
+import { morphReference } from '../accessors/MorphNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
-import { lightNodes } from '../lighting/LightsNode.js';
+import { lightsNode } from '../lighting/LightsNode.js';
 import { mix } from '../math/MathNode.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import AONode from '../lighting/AONode.js';
@@ -19,6 +21,8 @@ import { lightingContext } from '../lighting/LightingContextNode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
 import { depthPixel } from '../display/ViewportDepthNode.js';
 import { cameraLogDepth } from '../accessors/CameraNode.js';
+import { clipping, clippingAlpha } from '../accessors/ClippingNode.js';
+import { faceDirection } from '../display/FrontFacingNode.js';
 
 const NodeMaterials = new Map();
 
@@ -42,6 +46,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.lightsNode = null;
 		this.envNode = null;
+		this.aoNode = null;
 
 		this.colorNode = null;
 		this.normalNode = null;
@@ -53,6 +58,7 @@ class NodeMaterial extends ShaderMaterial {
 		this.positionNode = null;
 
 		this.depthNode = null;
+		this.shadowNode = null;
 
 		this.outputNode = null;
 
@@ -89,9 +95,11 @@ class NodeMaterial extends ShaderMaterial {
 
 		let resultNode;
 
-		if ( this.fragmentNode === null ) {
+		const clippingNode = this.setupClipping( builder );
 
-			if ( this.depthWrite === true ) this.setupDepth( builder );
+		if ( this.depthWrite === true ) this.setupDepth( builder );
+
+		if ( this.fragmentNode === null ) {
 
 			if ( this.normals === true ) this.setupNormal( builder );
 
@@ -100,7 +108,13 @@ class NodeMaterial extends ShaderMaterial {
 
 			const outgoingLightNode = this.setupLighting( builder );
 
-			resultNode = this.setupOutput( builder, vec4( outgoingLightNode, diffuseColor.a ) );
+			if ( clippingNode !== null ) builder.stack.add( clippingNode );
+
+			// force unsigned floats - useful for RenderTargets
+
+			const basicOutput = vec4( outgoingLightNode, diffuseColor.a ).max( 0 );
+
+			resultNode = this.setupOutput( builder, basicOutput );
 
 			// OUTPUT NODE
 
@@ -119,6 +133,31 @@ class NodeMaterial extends ShaderMaterial {
 		builder.stack.outputNode = resultNode;
 
 		builder.addFlow( 'fragment', builder.removeStack() );
+
+	}
+
+	setupClipping( builder ) {
+
+		const { globalClippingCount, localClippingCount } = builder.clippingContext;
+
+		let result = null;
+
+		if ( globalClippingCount || localClippingCount ) {
+
+			if ( this.alphaToCoverage ) {
+
+				// to be added to flow when the color/alpha value has been determined
+				result = clippingAlpha();
+
+			} else {
+
+				builder.stack.add( clipping() );
+
+			}
+
+		}
+
+		return result;
 
 	}
 
@@ -157,13 +196,19 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color ) {
 
-			morph( object ).append();
+			morphReference( object ).append();
 
 		}
 
 		if ( object.isSkinnedMesh === true ) {
 
-			skinning( object ).append();
+			skinningReference( object ).append();
+
+		}
+
+		if ( object.isBatchedMesh ) {
+
+			batch( object ).append();
 
 		}
 
@@ -188,7 +233,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	setupDiffuseColor( { geometry } ) {
+	setupDiffuseColor( { object, geometry } ) {
 
 		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
 
@@ -197,6 +242,16 @@ class NodeMaterial extends ShaderMaterial {
 		if ( this.vertexColors === true && geometry.hasAttribute( 'color' ) ) {
 
 			colorNode = vec4( colorNode.xyz.mul( attribute( 'color', 'vec3' ) ), colorNode.a );
+
+		}
+
+		// Instanced colors
+
+		if ( object.instanceColor ) {
+
+			const instanceColor = varyingProperty( 'vec3', 'vInstanceColor' );
+
+			colorNode = instanceColor.mul( colorNode );
 
 		}
 
@@ -235,13 +290,13 @@ class NodeMaterial extends ShaderMaterial {
 
 			const normalNode = positionView.dFdx().cross( positionView.dFdy() ).normalize();
 
-			transformedNormalView.assign( normalNode );
+			transformedNormalView.assign( normalNode.mul( faceDirection ) );
 
 		} else {
 
 			const normalNode = this.normalNode ? vec3( this.normalNode ) : materialNormal;
 
-			transformedNormalView.assign( normalNode );
+			transformedNormalView.assign( normalNode.mul( faceDirection ) );
 
 		}
 
@@ -283,21 +338,23 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		if ( builder.material.aoMap ) {
+		if ( this.aoNode !== null || builder.material.aoMap ) {
 
-			materialLightsNode.push( new AONode( texture( builder.material.aoMap ) ) );
+			const aoNode = this.aoNode !== null ? this.aoNode : texture( builder.material.aoMap );
+
+			materialLightsNode.push( new AONode( aoNode ) );
 
 		}
 
-		let lightsNode = this.lightsNode || builder.lightsNode;
+		let lightsN = this.lightsNode || builder.lightsNode;
 
 		if ( materialLightsNode.length > 0 ) {
 
-			lightsNode = lightNodes( [ ...lightsNode.lightNodes, ...materialLightsNode ] );
+			lightsN = lightsNode( [ ...lightsN.lightNodes, ...materialLightsNode ] );
 
 		}
 
-		return lightsNode;
+		return lightsN;
 
 	}
 
@@ -348,6 +405,16 @@ class NodeMaterial extends ShaderMaterial {
 
 		const renderer = builder.renderer;
 
+		// FOG
+
+		if ( this.fog === true ) {
+
+			const fogNode = builder.fogNode;
+
+			if ( fogNode ) outputNode = vec4( fogNode.mix( outputNode.rgb, fogNode.colorNode ), outputNode.a );
+
+		}
+
 		// TONE MAPPING
 
 		const toneMappingNode = builder.toneMappingNode;
@@ -355,16 +422,6 @@ class NodeMaterial extends ShaderMaterial {
 		if ( this.toneMapped === true && toneMappingNode ) {
 
 			outputNode = vec4( toneMappingNode.context( { color: outputNode.rgb } ), outputNode.a );
-
-		}
-
-		// FOG
-
-		if ( this.fog === true ) {
-
-			const fogNode = builder.fogNode;
-
-			if ( fogNode ) outputNode = vec4( fogNode.mixAssign( outputNode.rgb ), outputNode.a );
 
 		}
 
@@ -496,6 +553,7 @@ class NodeMaterial extends ShaderMaterial {
 		this.positionNode = source.positionNode;
 
 		this.depthNode = source.depthNode;
+		this.shadowNode = source.shadowNode;
 
 		this.outputNode = source.outputNode;
 

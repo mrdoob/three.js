@@ -47,23 +47,6 @@ function MenubarEdit( editor ) {
 	} );
 	options.add( redo );
 
-	// Clear History
-
-	let option = new UIRow();
-	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/edit/clear_history' ) );
-	option.onClick( function () {
-
-		if ( confirm( 'The Undo/Redo History will be cleared. Are you sure?' ) ) {
-
-			editor.history.clear();
-
-		}
-
-	} );
-	options.add( option );
-
-
 	editor.signals.historyChanged.add( function () {
 
 		const history = editor.history;
@@ -91,7 +74,7 @@ function MenubarEdit( editor ) {
 
 	// Center
 
-	option = new UIRow();
+	let option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/center' ) );
 	option.onClick( function () {
@@ -104,9 +87,9 @@ function MenubarEdit( editor ) {
 		const center = aabb.getCenter( new Vector3() );
 		const newPosition = new Vector3();
 
-		newPosition.x = object.position.x + ( object.position.x - center.x );
-		newPosition.y = object.position.y + ( object.position.y - center.y );
-		newPosition.z = object.position.z + ( object.position.z - center.z );
+		newPosition.x = object.position.x - center.x;
+		newPosition.y = object.position.y - center.y;
+		newPosition.z = object.position.z - center.z;
 
 		editor.execute( new SetPositionCommand( editor, object, newPosition ) );
 

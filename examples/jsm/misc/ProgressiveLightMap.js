@@ -45,6 +45,7 @@ class ProgressiveLightMap {
 
 			// Vertex Shader: Set Vertex Positions to the Unwrapped UV Positions
 			shader.vertexShader =
+				'attribute vec2 uv1;\n' +
 				'#define USE_LIGHTMAP\n' +
 				'#define LIGHTMAP_UV uv1\n' +
 				shader.vertexShader.slice( 0, - 1 ) +

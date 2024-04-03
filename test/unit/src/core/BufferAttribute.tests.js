@@ -11,8 +11,7 @@ import {
 	Int32BufferAttribute,
 	Uint32BufferAttribute,
 	Float16BufferAttribute,
-	Float32BufferAttribute,
-	Float64BufferAttribute
+	Float32BufferAttribute
 } from '../../../../src/core/BufferAttribute.js';
 
 import { DynamicDrawUsage } from '../../../../src/constants.js';
@@ -626,29 +625,6 @@ export default QUnit.module( 'Core', () => {
 
 			const object = new Float32BufferAttribute();
 			assert.ok( object, 'Can instantiate a Float32BufferAttribute.' );
-
-		} );
-
-	} );
-
-	QUnit.module( 'Float64BufferAttribute', () => {
-
-		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
-
-			const object = new Float64BufferAttribute();
-			assert.strictEqual(
-				object instanceof BufferAttribute, true,
-				'Float64BufferAttribute extends from BufferAttribute'
-			);
-
-		} );
-
-		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
-
-			const object = new Float64BufferAttribute();
-			assert.ok( object, 'Can instantiate a Float64BufferAttribute.' );
 
 		} );
 

@@ -70,7 +70,6 @@
 				const numberOfSphersPerSide = 5;
 				const sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
 				const stepSize = 1.0 / numberOfSphersPerSide;
-				const format = ( renderer.capabilities.isWebGL2 ) ? THREE.RedFormat : THREE.LuminanceFormat;
 
 				const geometry = new THREE.SphereGeometry( sphereRadius, 32, 16 );
 
@@ -84,7 +83,7 @@
 
 					}
 
-					const gradientMap = new THREE.DataTexture( colors, colors.length, 1, format );
+					const gradientMap = new THREE.DataTexture( colors, colors.length, 1, THREE.RedFormat );
 					gradientMap.needsUpdate = true;
 
 					for ( let beta = 0; beta <= 1.0; beta += stepSize ) {
@@ -120,7 +119,7 @@
 						font: font,
 
 						size: 20,
-						height: 1,
+						depth: 1,
 						curveSegments: 1
 
 					} );

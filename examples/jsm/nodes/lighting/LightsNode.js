@@ -169,7 +169,7 @@ class LightsNode extends Node {
 export default LightsNode;
 
 export const lights = ( lights ) => nodeObject( new LightsNode().fromLights( lights ) );
-export const lightNodes = nodeProxy( LightsNode );
+export const lightsNode = nodeProxy( LightsNode );
 
 export function addLightNode( lightClass, lightNodeClass ) {
 

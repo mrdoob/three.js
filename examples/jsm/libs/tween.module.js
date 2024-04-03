@@ -413,18 +413,21 @@ var Tween = /** @class */ (function () {
     Tween.prototype.isPaused = function () {
         return this._isPaused;
     };
+    Tween.prototype.getDuration = function () {
+        return this._duration;
+    };
     Tween.prototype.to = function (target, duration) {
         if (duration === void 0) { duration = 1000; }
         if (this._isPlaying)
             throw new Error('Can not call Tween.to() while Tween is already started or paused. Stop the Tween first.');
         this._valuesEnd = target;
         this._propertiesAreSetUp = false;
-        this._duration = duration;
+        this._duration = duration < 0 ? 0 : duration;
         return this;
     };
     Tween.prototype.duration = function (duration) {
         if (duration === void 0) { duration = 1000; }
-        this._duration = duration;
+        this._duration = duration < 0 ? 0 : duration;
         return this;
     };
     Tween.prototype.dynamic = function (dynamic) {
@@ -673,12 +676,13 @@ var Tween = /** @class */ (function () {
      * it is still playing, just paused).
      */
     Tween.prototype.update = function (time, autoStart) {
+        var _this = this;
+        var _a;
         if (time === void 0) { time = now(); }
         if (autoStart === void 0) { autoStart = true; }
         if (this._isPaused)
             return true;
         var property;
-        var elapsed;
         var endTime = this._startTime + this._duration;
         if (!this._goToEnd && !this._isPlaying) {
             if (time > endTime)
@@ -702,18 +706,37 @@ var Tween = /** @class */ (function () {
             }
             this._onEveryStartCallbackFired = true;
         }
-        elapsed = (time - this._startTime) / this._duration;
-        elapsed = this._duration === 0 || elapsed > 1 ? 1 : elapsed;
+        var elapsedTime = time - this._startTime;
+        var durationAndDelay = this._duration + ((_a = this._repeatDelayTime) !== null && _a !== void 0 ? _a : this._delayTime);
+        var totalTime = this._duration + this._repeat * durationAndDelay;
+        var calculateElapsedPortion = function () {
+            if (_this._duration === 0)
+                return 1;
+            if (elapsedTime > totalTime) {
+                return 1;
+            }
+            var timesRepeated = Math.trunc(elapsedTime / durationAndDelay);
+            var timeIntoCurrentRepeat = elapsedTime - timesRepeated * durationAndDelay;
+            // TODO use %?
+            // const timeIntoCurrentRepeat = elapsedTime % durationAndDelay
+            var portion = Math.min(timeIntoCurrentRepeat / _this._duration, 1);
+            if (portion === 0 && elapsedTime === _this._duration) {
+                return 1;
+            }
+            return portion;
+        };
+        var elapsed = calculateElapsedPortion();
         var value = this._easingFunction(elapsed);
         // properties transformations
         this._updateProperties(this._object, this._valuesStart, this._valuesEnd, value);
         if (this._onUpdateCallback) {
             this._onUpdateCallback(this._object, elapsed);
         }
-        if (elapsed === 1) {
+        if (this._duration === 0 || elapsedTime >= this._duration) {
             if (this._repeat > 0) {
+                var completeCount = Math.min(Math.trunc((elapsedTime - this._duration) / durationAndDelay) + 1, this._repeat);
                 if (isFinite(this._repeat)) {
-                    this._repeat--;
+                    this._repeat -= completeCount;
                 }
                 // Reassign starting values, restart by making startTime = now
                 for (property in this._valuesStartRepeat) {
@@ -731,12 +754,7 @@ var Tween = /** @class */ (function () {
                 if (this._yoyo) {
                     this._reversed = !this._reversed;
                 }
-                if (this._repeatDelayTime !== undefined) {
-                    this._startTime = time + this._repeatDelayTime;
-                }
-                else {
-                    this._startTime = time + this._delayTime;
-                }
+                this._startTime += durationAndDelay * completeCount;
                 if (this._onRepeatCallback) {
                     this._onRepeatCallback(this._object);
                 }
@@ -812,7 +830,7 @@ var Tween = /** @class */ (function () {
     return Tween;
 }());
 
-var VERSION = '21.0.0';
+var VERSION = '23.1.1';
 
 /**
  * Tween.js - Licensed under the MIT license

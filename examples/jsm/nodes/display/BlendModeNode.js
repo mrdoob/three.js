@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { EPSILON } from '../math/MathNode.js';
+import { /*mix, step,*/ EPSILON } from '../math/MathNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, tslFn, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
 
@@ -9,6 +9,13 @@ export const BurnNode = tslFn( ( { base, blend } ) => {
 
 	return vec3( fn( 'x' ), fn( 'y' ), fn( 'z' ) );
 
+} ).setLayout( {
+	name: 'burnColor',
+	type: 'vec3',
+	inputs: [
+		{ name: 'base', type: 'vec3' },
+		{ name: 'blend', type: 'vec3' }
+	]
 } );
 
 export const DodgeNode = tslFn( ( { base, blend } ) => {
@@ -17,6 +24,13 @@ export const DodgeNode = tslFn( ( { base, blend } ) => {
 
 	return vec3( fn( 'x' ), fn( 'y' ), fn( 'z' ) );
 
+} ).setLayout( {
+	name: 'dodgeColor',
+	type: 'vec3',
+	inputs: [
+		{ name: 'base', type: 'vec3' },
+		{ name: 'blend', type: 'vec3' }
+	]
 } );
 
 export const ScreenNode = tslFn( ( { base, blend } ) => {
@@ -25,14 +39,29 @@ export const ScreenNode = tslFn( ( { base, blend } ) => {
 
 	return vec3( fn( 'x' ), fn( 'y' ), fn( 'z' ) );
 
+} ).setLayout( {
+	name: 'screenColor',
+	type: 'vec3',
+	inputs: [
+		{ name: 'base', type: 'vec3' },
+		{ name: 'blend', type: 'vec3' }
+	]
 } );
 
 export const OverlayNode = tslFn( ( { base, blend } ) => {
 
 	const fn = ( c ) => base[ c ].lessThan( 0.5 ).cond( base[ c ].mul( blend[ c ], 2.0 ), base[ c ].oneMinus().mul( blend[ c ].oneMinus() ).oneMinus() );
+	//const fn = ( c ) => mix( base[ c ].oneMinus().mul( blend[ c ].oneMinus() ).oneMinus(), base[ c ].mul( blend[ c ], 2.0 ), step( base[ c ], 0.5 ) );
 
 	return vec3( fn( 'x' ), fn( 'y' ), fn( 'z' ) );
 
+} ).setLayout( {
+	name: 'overlayColor',
+	type: 'vec3',
+	inputs: [
+		{ name: 'base', type: 'vec3' },
+		{ name: 'blend', type: 'vec3' }
+	]
 } );
 
 class BlendModeNode extends TempNode {

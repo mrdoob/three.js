@@ -1,3 +1,5 @@
+import ClippingContext from './ClippingContext.js';
+
 let id = 0;
 
 export default class RenderObject {
@@ -24,6 +26,10 @@ export default class RenderObject {
 		this.pipeline = null;
 		this.vertexBuffers = null;
 
+		this.updateClipping( renderContext.clippingContext );
+
+		this.clippingContextVersion = this.clippingContext.version;
+
 		this.initialNodesCacheKey = this.getNodesCacheKey();
 		this.initialCacheKey = this.getCacheKey();
 
@@ -41,6 +47,41 @@ export default class RenderObject {
 		};
 
 		this.material.addEventListener( 'dispose', this.onMaterialDispose );
+
+	}
+
+	updateClipping( parent ) {
+
+		const material = this.material;
+
+		let clippingContext = this.clippingContext;
+
+		if ( Array.isArray( material.clippingPlanes ) ) {
+
+			if ( clippingContext === parent || ! clippingContext ) {
+
+				clippingContext = new ClippingContext();
+				this.clippingContext = clippingContext;
+
+			}
+
+			clippingContext.update( parent, material );
+
+		} else if ( this.clippingContext !== parent ) {
+
+			this.clippingContext = parent;
+
+		}
+
+	}
+
+	get clippingNeedsUpdate() {
+
+		if ( this.clippingContext.version === this.clippingContextVersion ) return false;
+
+		this.clippingContextVersion = this.clippingContext.version;
+
+		return true;
 
 	}
 
@@ -114,7 +155,7 @@ export default class RenderObject {
 
 		for ( const property in material ) {
 
-			if ( /^(is[A-Z])|^(visible|version|uuid|name|opacity|userData)$/.test( property ) ) continue;
+			if ( /^(is[A-Z]|_)|^(visible|version|uuid|name|opacity|userData)$/.test( property ) ) continue;
 
 			let value = material[ property ];
 
@@ -131,9 +172,11 @@ export default class RenderObject {
 
 		}
 
+		cacheKey += this.clippingContextVersion + ',';
+
 		if ( object.skeleton ) {
 
-			cacheKey += object.skeleton.uuid + ',';
+			cacheKey += object.skeleton.bones.length + ',';
 
 		}
 
@@ -143,13 +186,19 @@ export default class RenderObject {
 
 		}
 
+		if ( object.isBatchedMesh ) {
+
+			cacheKey += object._matricesTexture.uuid + ',';
+
+		}
+
 		return cacheKey;
 
 	}
 
 	get needsUpdate() {
 
-		return this.initialNodesCacheKey !== this.getNodesCacheKey();
+		return this.initialNodesCacheKey !== this.getNodesCacheKey() || this.clippingNeedsUpdate;
 
 	}
 

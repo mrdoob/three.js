@@ -89,8 +89,11 @@ export const hue = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.HUE );
 export const lumaCoeffs = vec3( 0.2125, 0.7154, 0.0721 );
 export const luminance = ( color, luma = lumaCoeffs ) => dot( color, luma );
 
+export const threshold = ( color, threshold ) => mix( vec3( 0.0 ), color, luminance( color ).sub( threshold ).max( 0 ) );
+
 addNodeElement( 'saturation', saturation );
 addNodeElement( 'vibrance', vibrance );
 addNodeElement( 'hue', hue );
+addNodeElement( 'threshold', threshold );
 
 addNodeClass( 'ColorAdjustmentNode', ColorAdjustmentNode );

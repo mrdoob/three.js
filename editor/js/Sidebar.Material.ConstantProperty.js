@@ -6,7 +6,7 @@ function SidebarMaterialConstantProperty( editor, property, name, options ) {
 	const signals = editor.signals;
 
 	const container = new UIRow();
-	container.add( new UIText( name ).setWidth( '90px' ) );
+	container.add( new UIText( name ).setClass( 'Label' ) );
 
 	const constant = new UISelect().setOptions( options ).onChange( onChange );
 	container.add( constant );

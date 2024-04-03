@@ -7,7 +7,7 @@ function SidebarMaterialColorProperty( editor, property, name ) {
 	const signals = editor.signals;
 
 	const container = new UIRow();
-	container.add( new UIText( name ).setWidth( '90px' ) );
+	container.add( new UIText( name ).setClass( 'Label' ) );
 
 	const color = new UIColor().onInput( onChange );
 	container.add( color );

@@ -27,9 +27,15 @@
 			I dati effettivi di una texture. Il tipo di questa proprietà dipende dalla texture che utilizza questa istanza.
 		</p>
 
-		<h3>[property:Boolean isSource]</h3>
+		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
-			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+			When the property is set to `true`, the engine allocates the memory for the texture (if necessary) and triggers the actual texture upload to the GPU next time the source is used.
+		</p>
+
+		<h3>[property:Boolean dataReady]</h3>
+		<p>
+			This property is only relevant when [page:.needUpdate] is set to `true` and provides more control on how texture data should be processed.
+			When `dataReady` is set to `false`, the engine performs the memory allocation (if necessary) but does not transfer the data into the GPU memory. Default is `true`.
 		</p>
 
 		<h3>[property:Boolean needsUpdate]</h3>
