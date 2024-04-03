@@ -56,14 +56,12 @@ class FullscreenTriangleGeometry extends BufferGeometry {
 
 }
 
-const _geometry = new FullscreenTriangleGeometry();
 
 class FullScreenQuad {
 
 	constructor( material ) {
-
+		const _geometry = new FullscreenTriangleGeometry();
 		this._mesh = new Mesh( _geometry, material );
-
 	}
 
 	dispose() {
