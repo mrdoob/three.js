@@ -1,13 +1,9 @@
 import { Sphere } from '../math/Sphere.js';
-import { Ray } from '../math/Ray.js';
-import { Matrix4 } from '../math/Matrix4.js';
 import { Object3D } from '../core/Object3D.js';
 import { Vector3 } from '../math/Vector3.js';
 import { PointsMaterial } from '../materials/PointsMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-const _inverseMatrix = /*@__PURE__*/ new Matrix4();
-const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
 const _position = /*@__PURE__*/ new Vector3();
 
@@ -56,13 +52,7 @@ class Points extends Object3D {
 
 		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
 
-		//
-
-		_inverseMatrix.copy( matrixWorld ).invert();
-		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
-
-		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
-		const localThresholdSq = localThreshold * localThreshold;
+		const thresholdSq = threshold * threshold;
 
 		const index = geometry.index;
 		const attributes = geometry.attributes;
@@ -77,9 +67,9 @@ class Points extends Object3D {
 
 				const a = index.getX( i );
 
-				_position.fromBufferAttribute( positionAttribute, a );
+				_position.fromBufferAttribute( positionAttribute, a ).applyMatrix4( matrixWorld );
 
-				testPoint( _position, a, localThresholdSq, matrixWorld, raycaster, intersects, this );
+				testPoint( _position, a, thresholdSq, raycaster, intersects, this );
 
 			}
 
@@ -90,9 +80,9 @@ class Points extends Object3D {
 
 			for ( let i = start, l = end; i < l; i ++ ) {
 
-				_position.fromBufferAttribute( positionAttribute, i );
+				_position.fromBufferAttribute( positionAttribute, i ).applyMatrix4( matrixWorld );
 
-				testPoint( _position, i, localThresholdSq, matrixWorld, raycaster, intersects, this );
+				testPoint( _position, i, thresholdSq, raycaster, intersects, this );
 
 			}
 
@@ -133,16 +123,15 @@ class Points extends Object3D {
 
 }
 
-function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, intersects, object ) {
+function testPoint( point, index, thresholdSq, raycaster, intersects, object ) {
 
-	const rayPointDistanceSq = _ray.distanceSqToPoint( point );
+	const rayPointDistanceSq = raycaster.ray.distanceSqToPoint( point );
 
-	if ( rayPointDistanceSq < localThresholdSq ) {
+	if ( rayPointDistanceSq < thresholdSq ) {
 
 		const intersectPoint = new Vector3();
 
-		_ray.closestPointToPoint( point, intersectPoint );
-		intersectPoint.applyMatrix4( matrixWorld );
+		raycaster.ray.closestPointToPoint( point, intersectPoint );
 
 		const distance = raycaster.ray.origin.distanceTo( intersectPoint );
 
