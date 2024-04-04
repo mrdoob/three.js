@@ -3,7 +3,7 @@ import { nodeImmutable, nodeProxy } from '../shadernode/ShaderNode.js';
 import { cameraNear, cameraFar } from '../accessors/CameraNode.js';
 import { positionView } from '../accessors/PositionNode.js';
 import { viewportDepthTexture } from './ViewportDepthTextureNode.js';
-
+import { WebGLCoordinateSystem } from 'three';
 class ViewportDepthNode extends Node {
 
 	constructor( scope, valueNode = null ) {
@@ -31,7 +31,7 @@ class ViewportDepthNode extends Node {
 
 	}
 
-	setup( /*builder*/ ) {
+	setup( builder ) {
 
 		const { scope } = this;
 
@@ -52,7 +52,16 @@ class ViewportDepthNode extends Node {
 
 			if ( this.valueNode !== null ) {
 
- 				node = depthPixelBase().assign( this.valueNode );
+				let depth = this.valueNode;
+
+				// WebGL: Conversion [ -1, 0 ] to [ 0, 1 ], without EXT_depth_clamp extension WebGL internally clamps these values to the range [0, 1] during the rasterization process
+				if ( builder.renderer.coordinateSystem === WebGLCoordinateSystem ) {
+
+					depth = depth.add( 1 ).div( 2 );
+
+				}
+
+ 				node = depthPixelBase().assign( depth );
 
 			}
 
