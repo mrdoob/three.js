@@ -12,7 +12,7 @@ import Background from './Background.js';
 import Nodes from './nodes/Nodes.js';
 import Color4 from './Color4.js';
 import ClippingContext from './ClippingContext.js';
-import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, RenderTarget, HalfFloatType, RGBAFormat } from 'three';
+import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, RenderTarget, HalfFloatType, RGBAFormat } from 'three';
 import { NodeMaterial } from '../../nodes/Nodes.js';
 import QuadMesh from '../../objects/QuadMesh.js';
 
@@ -97,7 +97,7 @@ class Renderer {
 		this._opaqueSort = null;
 		this._transparentSort = null;
 
-		this._postProcessingTarget = null;
+		this._frameBufferTarget = null;
 
 		const alphaClear = this.alpha === true ? 0 : 1;
 
@@ -340,16 +340,23 @@ class Renderer {
 
 	}
 
-	_getPostProcessingTarget() {
+	_getFrameBufferTarget() {
+
+		const { currentColorSpace } = this;
+
+		const useToneMapping = this._renderTarget === null && ( this.toneMapping !== NoToneMapping || this.toneMappingNode !== null );
+		const useColorSpace = currentColorSpace !== LinearSRGBColorSpace && currentColorSpace !== NoColorSpace;
+
+		if ( useToneMapping === false && useColorSpace === false ) return null;
 
 		const { width, height } = this.getDrawingBufferSize( _drawingBufferSize );
 		const { depth, stencil } = this;
 
-		let postProcessingTarget = this._postProcessingTarget;
+		let frameBufferTarget = this._frameBufferTarget;
 
-		if ( postProcessingTarget === null ) {
+		if ( frameBufferTarget === null ) {
 
-			postProcessingTarget = new RenderTarget( width, height, {
+			frameBufferTarget = new RenderTarget( width, height, {
 				depthBuffer: depth,
 				stencilBuffer: stencil,
 				type: HalfFloatType, // FloatType
@@ -361,29 +368,28 @@ class Renderer {
 				samples: this.backend.parameters.antialias ? 4 : 0
 			} );
 
-			postProcessingTarget.isPostProcessingRenderTarget = true;
+			frameBufferTarget.isPostProcessingRenderTarget = true;
 
-			this._postProcessingTarget = postProcessingTarget;
+			this._frameBufferTarget = frameBufferTarget;
 
 		}
 
-		postProcessingTarget.depthBuffer = depth;
-		postProcessingTarget.stencilBuffer = stencil;
-		postProcessingTarget.setSize( width, height );
-		postProcessingTarget.viewport.copy( this._viewport );
-		postProcessingTarget.scissor.copy( this._scissor );
-		postProcessingTarget.viewport.multiplyScalar( this._pixelRatio );
-		postProcessingTarget.scissor.multiplyScalar( this._pixelRatio );
-		postProcessingTarget.scissorTest = this._scissorTest;
+		frameBufferTarget.depthBuffer = depth;
+		frameBufferTarget.stencilBuffer = stencil;
+		frameBufferTarget.setSize( width, height );
+		frameBufferTarget.viewport.copy( this._viewport );
+		frameBufferTarget.scissor.copy( this._scissor );
+		frameBufferTarget.viewport.multiplyScalar( this._pixelRatio );
+		frameBufferTarget.scissor.multiplyScalar( this._pixelRatio );
+		frameBufferTarget.scissorTest = this._scissorTest;
 
-		return postProcessingTarget;
+		return frameBufferTarget;
 
 	}
 
-	_renderScene( scene, camera, usePostProcessing = true ) {
+	_renderScene( scene, camera, useFrameBufferTarget = true ) {
 
-		const useToneMapping = this._renderTarget === null && ( this.toneMapping !== NoToneMapping || this.toneMappingNode !== null );
-		const needsPostProcessing = usePostProcessing && ( this.currentColorSpace === SRGBColorSpace || useToneMapping );
+		const frameBufferTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : null;
 
 		// preserve render tree
 
@@ -406,9 +412,9 @@ class Renderer {
 
 		let renderTarget;
 
-		if ( needsPostProcessing ) {
+		if ( frameBufferTarget !== null ) {
 
-			renderTarget = this._getPostProcessingTarget();
+			renderTarget = frameBufferTarget;
 
 			this.setRenderTarget( renderTarget );
 
@@ -576,7 +582,7 @@ class Renderer {
 
 		//
 
-		if ( needsPostProcessing ) {
+		if ( frameBufferTarget !== null ) {
 
 			this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
 
@@ -852,8 +858,9 @@ class Renderer {
 
 		}
 
+		const renderTarget = this._renderTarget || this._getFrameBufferTarget();
+
 		let renderTargetData = null;
-		const renderTarget = this._renderTarget || this._getPostProcessingTarget();
 
 		if ( renderTarget !== null ) {
 
