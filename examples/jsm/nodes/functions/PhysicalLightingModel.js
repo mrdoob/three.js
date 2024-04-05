@@ -55,6 +55,8 @@ const getVolumeTransmissionRay = tslFn( ( [ n, v, thickness, ior, modelMatrix ] 
 
 const applyIorToRoughness = tslFn( ( [ roughness, ior ] ) => {
 
+	// Scale roughness with IOR so that an IOR of 1.0 results in no microfacet refraction and
+	// an IOR of 1.5 results in the default amount of microfacet refraction.
 	return roughness.mul( clamp( ior.mul( 2.0 ).sub( 2.0 ), 0.0, 1.0 ) );
 
 } ).setLayout( {
@@ -85,6 +87,7 @@ const volumeAttenuation = tslFn( ( [ transmissionDistance, attenuationColor, att
 
 	If( attenuationDistance.notEqual( 0 ), () => {
 
+		// Compute light attenuation using Beer's law.
 		const attenuationCoefficient = vec3( log( attenuationColor ).negate().div( attenuationDistance ) );
 		const transmittance = vec3( exp( attenuationCoefficient.negate().mul( transmissionDistance ) ) );
 
@@ -92,6 +95,7 @@ const volumeAttenuation = tslFn( ( [ transmissionDistance, attenuationColor, att
 
 	} );
 
+	// Attenuation distance is +∞, i.e. the transmitted color is not attenuated at all.
 	return vec3( 1.0 );
 
 } ).setLayout( {
@@ -104,110 +108,39 @@ const volumeAttenuation = tslFn( ( [ transmissionDistance, attenuationColor, att
 	]
 } );
 
-const getIBLVolumeRefraction = tslFn( ( [ n_immutable, v_immutable, roughness_immutable, diffuseColor_immutable, specularColor_immutable, specularF90_immutable, position_immutable, modelMatrix_immutable, viewMatrix_immutable, projMatrix_immutable, ior_immutable, thickness_immutable, attenuationColor_immutable, attenuationDistance_immutable ] ) => {
+const getIBLVolumeRefraction = tslFn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance ] ) => {
 
-	const attenuationDistance = float( attenuationDistance_immutable ).toVar();
-	const attenuationColor = vec3( attenuationColor_immutable ).toVar();
-	const thickness = float( thickness_immutable ).toVar();
-	const ior = float( ior_immutable ).toVar();
-	const projMatrix = mat4( projMatrix_immutable ).toVar();
-	const viewMatrix = mat4( viewMatrix_immutable ).toVar();
-	const modelMatrix = mat4( modelMatrix_immutable ).toVar();
-	const position = vec3( position_immutable ).toVar();
-	const specularF90 = float( specularF90_immutable ).toVar();
-	const specularColor = vec3( specularColor_immutable ).toVar();
-	const diffuseColor = vec3( diffuseColor_immutable ).toVar();
-	const roughness = float( roughness_immutable ).toVar();
-	const v = vec3( v_immutable ).toVar();
-	const n = vec3( n_immutable ).toVar();
 	const transmissionRay = vec3( getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix ) ).toVar();
-	const refractedRayExit = vec3( position.add( transmissionRay ) ).toVar();
+	const refractedRayExit = vec3( position.add( transmissionRay ) );
+
+	// Project refracted vector on the framebuffer, while mapping to normalized device coordinates.
 	const ndcPos = projMatrix.mul( viewMatrix.mul( vec4( refractedRayExit, 1.0 ) ) );
 	const refractionCoords = vec2( ndcPos.xy.div( ndcPos.w ) ).toVar();
 	refractionCoords.addAssign( 1.0 );
 	refractionCoords.divAssign( 2.0 );
 	refractionCoords.assign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
-	const uv = refractionCoords;
-	const transmittedLight = vec4( getTransmissionSample( uv, roughness, ior ) ).toVar();
+
+	// Sample framebuffer to get pixel the refracted ray hits.
+	const transmittedLight = vec4( getTransmissionSample( refractionCoords, roughness, ior ) );
 	const transmittance = vec3( diffuseColor.mul( volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance ) ) );
-	const attenuatedColor = vec3( transmittance.mul( transmittedLight.rgb ) ).toVar();
+	const attenuatedColor = vec3( transmittance.mul( transmittedLight.rgb ) );
 	const dotNV = n.dot( v ).clamp();
+
+	// Get the specular component.
 	const F = vec3( EnvironmentBRDF( { // n, v, specularColor, specularF90, roughness
 		dotNV,
 		specularColor,
 		specularF90,
 		roughness
-	} ) ).toVar();
+	} ) );
+
+	// As less light is transmitted, the opacity should be increased. This simple approximation does a decent job
+	// of modulating a CSS background, and has no effect when the buffer is opaque, due to a solid object or clear color.
 	const transmittanceFactor = float( transmittance.r.add( transmittance.g, transmittance.b ) ).div( 3.0 );
 
 	return vec4( F.oneMinus().mul( attenuatedColor ), transmittedLight.a.oneMinus().mul( transmittanceFactor ).oneMinus() );
 
 } );
-
-// layouts
-/*
-getVolumeTransmissionRay.setLayout( {
-	name: 'getVolumeTransmissionRay',
-	type: 'vec3',
-	inputs: [
-		{ name: 'n', type: 'vec3' },
-		{ name: 'v', type: 'vec3' },
-		{ name: 'thickness', type: 'float' },
-		{ name: 'ior', type: 'float' },
-		{ name: 'modelMatrix', type: 'mat4' }
-	]
-} );
-
-applyIorToRoughness.setLayout( {
-	name: 'applyIorToRoughness',
-	type: 'float',
-	inputs: [
-		{ name: 'roughness', type: 'float' },
-		{ name: 'ior', type: 'float' }
-	]
-} );
-
-getTransmissionSample.setLayout( {
-	name: 'getTransmissionSample',
-	type: 'vec4',
-	inputs: [
-		{ name: 'fragCoord', type: 'vec2' },
-		{ name: 'roughness', type: 'float' },
-		{ name: 'ior', type: 'float' }
-	]
-} );
-
-volumeAttenuation.setLayout( {
-	name: 'volumeAttenuation',
-	type: 'vec3',
-	inputs: [
-		{ name: 'transmissionDistance', type: 'float' },
-		{ name: 'attenuationColor', type: 'vec3' },
-		{ name: 'attenuationDistance', type: 'float' }
-	]
-} );
-
-getIBLVolumeRefraction.setLayout( {
-	name: 'getIBLVolumeRefraction',
-	type: 'vec4',
-	inputs: [
-		{ name: 'n', type: 'vec3' },
-		{ name: 'v', type: 'vec3' },
-		{ name: 'roughness', type: 'float' },
-		{ name: 'diffuseColor', type: 'vec3' },
-		{ name: 'specularColor', type: 'vec3' },
-		{ name: 'specularF90', type: 'float' },
-		{ name: 'position', type: 'vec3' },
-		{ name: 'modelMatrix', type: 'mat4' },
-		{ name: 'viewMatrix', type: 'mat4' },
-		{ name: 'projMatrix', type: 'mat4' },
-		{ name: 'ior', type: 'float' },
-		{ name: 'thickness', type: 'float' },
-		{ name: 'attenuationColor', type: 'vec3' },
-		{ name: 'attenuationDistance', type: 'float' }
-	]
-} );*/
-
 
 //
 // Iridescence
@@ -422,25 +355,8 @@ class PhysicalLightingModel extends LightingModel {
 
 		if ( this.transmission === true ) {
 
-			/*{ name: 'n', type: 'vec3' },
-			{ name: 'v', type: 'vec3' },
-			{ name: 'roughness', type: 'float' },
-			{ name: 'diffuseColor', type: 'vec3' },
-			{ name: 'specularColor', type: 'vec3' },
-			{ name: 'specularF90', type: 'float' },
-			{ name: 'position', type: 'vec3' },
-			{ name: 'modelMatrix', type: 'mat4' },
-			{ name: 'viewMatrix', type: 'mat4' },
-			{ name: 'projMatrix', type: 'mat4' },
-			{ name: 'ior', type: 'float' },
-			{ name: 'thickness', type: 'float' },
-			{ name: 'attenuationColor', type: 'vec3' },
-			{ name: 'attenuationDistance', type: 'float' }*/
-
 			const position = positionWorld;
-			const v = cameraPosition.sub( positionWorld ).normalize();
-			//const v = positionViewDirection;
-			//const n = transformedNormalView.transformDirection( modelViewMatrix );
+			const v = cameraPosition.sub( positionWorld ).normalize(); // TODO: Create Node for this, same issue in MaterialX
 			const n = transformedNormalWorld;
 
 			context.backdrop = getIBLVolumeRefraction(
