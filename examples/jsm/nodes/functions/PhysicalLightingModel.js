@@ -28,12 +28,17 @@ const materialIOR = materialReference( 'ior', 'float' );
 
 const getVolumeTransmissionRay = tslFn( ( [ n, v, thickness, ior, modelMatrix ] ) => {
 
+	// Direction of refracted light.
 	const refractionVector = vec3( refract( v.negate(), normalize( n ), div( 1.0, ior ) ) );
-	const modelScale = vec3().toVar();
-	modelScale.x.assign( length( modelMatrix[ 0 ].xyz ) );
-	modelScale.y.assign( length( modelMatrix[ 1 ].xyz ) );
-	modelScale.z.assign( length( modelMatrix[ 2 ].xyz ) );
 
+	// Compute rotation-independant scaling of the model matrix.
+	const modelScale = vec3(
+		length( modelMatrix[ 0 ].xyz ),
+		length( modelMatrix[ 1 ].xyz ),
+		length( modelMatrix[ 2 ].xyz )
+	);
+
+	// The thickness is specified in local space.
 	return normalize( refractionVector ).mul( thickness.mul( modelScale ) );
 
 } ).setLayout( {
