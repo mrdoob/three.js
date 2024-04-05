@@ -171,7 +171,7 @@
 			// Specify path to a folder containing WASM/JS libraries or a CDN.
 			// For example, /jsm/libs/rhino3dm/ is the location of the library inside the three.js repository
 			// loader.setLibraryPath( '/path_to_library/rhino3dm/' );
-			loader.setLibraryPath( 'https://unpkg.com/rhino3dm@8.0.1/' );
+			loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.0.1/' );
 	
 			// Load a 3DM file
 			loader.load(
@@ -212,13 +212,13 @@
 	</p>
 
 	<code>
-		import rhino3dm from 'https://unpkg.com/rhino3dm@8.0.1'
+		import rhino3dm from 'https://cdn.jsdelivr.net/npm/rhino3dm@8.0.1'
 
 		// Instantiate a loader
 		const loader = new Rhino3dmLoader();
 
 		// Specify path to a folder containing WASM/JS libraries or a CDN.
-		loader.setLibraryPath( 'https://unpkg.com/rhino3dm@8.0.1' );
+		loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.0.1' );
 
 		const rhino = await rhino3dm();
 		console.log('Loaded rhino3dm.');
@@ -251,7 +251,7 @@
 		// Specify path to a folder containing the WASM/JS library:
 		loader.setLibraryPath( '/path_to_library/rhino3dm/' );
 		// or from a CDN:
-		loader.setLibraryPath( 'https://unpkg.com/rhino3dm@8.0.1' );
+		loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@8.0.1' );
 		</code>
 
 	<h3>[method:this setWorkerLimit]( [param:Number workerLimit] )</h3>

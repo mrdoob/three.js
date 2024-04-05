@@ -1,4 +1,4 @@
-import ClippingContext from "./ClippingContext.js";
+import ClippingContext from './ClippingContext.js';
 
 let id = 0;
 
@@ -75,7 +75,7 @@ export default class RenderObject {
 
 	}
 
-	clippingNeedsUpdate () {
+	get clippingNeedsUpdate() {
 
 		if ( this.clippingContext.version === this.clippingContextVersion ) return false;
 
@@ -155,7 +155,7 @@ export default class RenderObject {
 
 		for ( const property in material ) {
 
-			if ( /^(is[A-Z])|^(visible|version|uuid|name|opacity|userData)$/.test( property ) ) continue;
+			if ( /^(is[A-Z]|_)|^(visible|version|uuid|name|opacity|userData)$/.test( property ) ) continue;
 
 			let value = material[ property ];
 
@@ -186,13 +186,19 @@ export default class RenderObject {
 
 		}
 
+		if ( object.isBatchedMesh ) {
+
+			cacheKey += object._matricesTexture.uuid + ',';
+
+		}
+
 		return cacheKey;
 
 	}
 
 	get needsUpdate() {
 
-		return this.initialNodesCacheKey !== this.getNodesCacheKey();
+		return this.initialNodesCacheKey !== this.getNodesCacheKey() || this.clippingNeedsUpdate;
 
 	}
 

@@ -1,5 +1,5 @@
 import Node, { addNodeClass } from '../core/Node.js';
-import { mix } from '../math/MathNode.js';
+import { positionView } from '../accessors/PositionNode.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class FogNode extends Node {
@@ -15,9 +15,19 @@ class FogNode extends Node {
 
 	}
 
-	mixAssign( outputNode ) {
+	getViewZNode( builder ) {
 
-		return mix( outputNode, this.colorNode, this );
+		let viewZ;
+
+		const getViewZ = builder.context.getViewZ;
+
+		if ( getViewZ !== undefined ) {
+
+			viewZ = getViewZ( this );
+
+		}
+
+		return ( viewZ || positionView.z ).negate();
 
 	}
 

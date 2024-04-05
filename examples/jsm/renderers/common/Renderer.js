@@ -57,7 +57,7 @@ class Renderer {
 		this.sortObjects = true;
 
 		this.depth = true;
-		this.stencil = true;
+		this.stencil = false;
 
 		this.clippingPlanes = [];
 
@@ -379,7 +379,6 @@ class Renderer {
 
 		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-		if ( this.info.autoReset === true ) this.info.reset();
 
 		//
 
@@ -898,7 +897,6 @@ class Renderer {
 		const previousRenderId = nodeFrame.renderId;
 
 		//
-		if ( this.info.autoReset === true ) this.info.resetCompute();
 
 		this.info.calls ++;
 		this.info.compute.calls ++;
@@ -1160,6 +1158,7 @@ class Renderer {
 
 		let overridePositionNode;
 		let overrideFragmentNode;
+		let overrideDepthNode;
 
 		//
 
@@ -1176,7 +1175,6 @@ class Renderer {
 			if ( material.positionNode && material.positionNode.isNode ) {
 
 				overridePositionNode = overrideMaterial.positionNode;
-
 				overrideMaterial.positionNode = material.positionNode;
 
 			}
@@ -1184,6 +1182,14 @@ class Renderer {
 			if ( overrideMaterial.isShadowNodeMaterial ) {
 
 				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
+
+				if ( material.depthNode && material.depthNode.isNode ) {
+
+					overrideDepthNode = overrideMaterial.depthNode;
+					overrideMaterial.depthNode = material.depthNode;
+
+				}
+
 
 				if ( material.shadowNode && material.shadowNode.isNode ) {
 
@@ -1247,6 +1253,12 @@ class Renderer {
 		if ( overridePositionNode !== undefined ) {
 
 			scene.overrideMaterial.positionNode = overridePositionNode;
+
+		}
+
+		if ( overrideDepthNode !== undefined ) {
+
+			scene.overrideMaterial.depthNode = overrideDepthNode;
 
 		}
 

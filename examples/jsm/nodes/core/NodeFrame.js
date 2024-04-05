@@ -45,17 +45,17 @@ class NodeFrame {
 	updateBeforeNode( node ) {
 
 		const updateType = node.getUpdateBeforeType();
-		const reference = node.setReference( this );
+		const reference = node.updateReference( this );
 
 		if ( updateType === NodeUpdateType.FRAME ) {
 
 			const { frameMap } = this._getMaps( this.updateBeforeMap, reference );
 
-			if ( frameMap.get( node ) !== this.frameId ) {
+			if ( frameMap.get( reference ) !== this.frameId ) {
 
 				if ( node.updateBefore( this ) !== false ) {
 
-					frameMap.set( node, this.frameId );
+					frameMap.set( reference, this.frameId );
 
 				}
 
@@ -65,11 +65,11 @@ class NodeFrame {
 
 			const { renderMap } = this._getMaps( this.updateBeforeMap, reference );
 
-			if ( renderMap.get( node ) !== this.renderId ) {
+			if ( renderMap.get( reference ) !== this.renderId ) {
 
 				if ( node.updateBefore( this ) !== false ) {
 
-					renderMap.set( node, this.renderId );
+					renderMap.set( reference, this.renderId );
 
 				}
 
@@ -86,17 +86,17 @@ class NodeFrame {
 	updateNode( node ) {
 
 		const updateType = node.getUpdateType();
-		const reference = node.setReference( this );
+		const reference = node.updateReference( this );
 
 		if ( updateType === NodeUpdateType.FRAME ) {
 
 			const { frameMap } = this._getMaps( this.updateMap, reference );
 
-			if ( frameMap.get( node ) !== this.frameId ) {
+			if ( frameMap.get( reference ) !== this.frameId ) {
 
 				if ( node.update( this ) !== false ) {
 
-					frameMap.set( node, this.frameId );
+					frameMap.set( reference, this.frameId );
 
 				}
 
@@ -106,11 +106,11 @@ class NodeFrame {
 
 			const { renderMap } = this._getMaps( this.updateMap, reference );
 
-			if ( renderMap.get( node ) !== this.renderId ) {
+			if ( renderMap.get( reference ) !== this.renderId ) {
 
 				if ( node.update( this ) !== false ) {
 
-					renderMap.set( node, this.renderId );
+					renderMap.set( reference, this.renderId );
 
 				}
 

@@ -16,7 +16,7 @@ class RenderContext {
 		this.clearDepth = true;
 		this.clearDepthValue = 1;
 
-		this.stencil = true;
+		this.stencil = false;
 		this.clearStencil = true;
 		this.clearStencilValue = 1;
 

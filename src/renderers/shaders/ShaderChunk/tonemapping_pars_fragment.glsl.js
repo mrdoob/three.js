@@ -185,7 +185,7 @@ vec3 NeutralToneMapping( vec3 color ) {
 	color *= newPeak / peak;
 
 	float g = 1. - 1. / (desaturation * (peak - newPeak) + 1.);
-	return mix(color, vec3(1, 1, 1), g);
+	return mix(color, newPeak * vec3(1, 1, 1), g);
 }
 
 vec3 CustomToneMapping( vec3 color ) { return color; }

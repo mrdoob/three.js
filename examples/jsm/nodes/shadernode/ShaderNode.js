@@ -474,14 +474,6 @@ export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, al
 export const nodeProxy = ( ...params ) => new ShaderNodeProxy( ...params );
 export const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params );
 
-export const shader = ( jsFunc ) => { // @deprecated, r154
-
-	console.warn( 'TSL: shader() is deprecated. Use tslFn() instead.' );
-
-	return new ShaderNode( jsFunc );
-
-};
-
 export const tslFn = ( jsFunc ) => {
 
 	const shaderNode = new ShaderNode( jsFunc );
@@ -555,7 +547,7 @@ addNodeElement( 'append', append );
 export const color = new ConvertType( 'color' );
 
 export const float = new ConvertType( 'float', cacheMaps.float );
-export const int = new ConvertType( 'int', cacheMaps.int );
+export const int = new ConvertType( 'int', cacheMaps.ints );
 export const uint = new ConvertType( 'uint', cacheMaps.uint );
 export const bool = new ConvertType( 'bool', cacheMaps.bool );
 

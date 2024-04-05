@@ -6,6 +6,7 @@ struct PhysicalMaterial {
 	float roughness;
 	vec3 specularColor;
 	float specularF90;
+	float dispersion;
 
 	#ifdef USE_CLEARCOAT
 		float clearcoat;

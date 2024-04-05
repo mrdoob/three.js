@@ -228,7 +228,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	isUnfilterable( texture ) {
 
-		return texture.isDataTexture === true && texture.type === FloatType;
+		return this.getComponentTypeFromTexture( texture ) !== 'float' || ( texture.isDataTexture === true && texture.type === FloatType );
 
 	}
 
@@ -251,6 +251,21 @@ class WGSLNodeBuilder extends NodeBuilder {
 		}
 
 		return snippet;
+
+	}
+
+	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+
+		if ( shaderStage === 'fragment' ) {
+
+			// TODO handle i32 or u32 --> uvSnippet, array_index: A, ddx, ddy
+			return `textureSampleGrad( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet },  ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] } )`;
+
+		} else {
+
+			console.error( `WebGPURenderer: THREE.TextureNode.gradient() does not support ${ shaderStage } shader.` );
+
+		}
 
 	}
 
@@ -522,7 +537,7 @@ ${ flowData.code }
 
 	getFragCoord() {
 
-		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>' ) + '.xy';
+		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>' ) + '.xyz';
 
 	}
 
@@ -759,11 +774,13 @@ ${ flowData.code }
 
 					const format = getFormat( texture );
 
-					textureType = 'texture_storage_2d<' + format + ', write>';
+					textureType = `texture_storage_2d<${ format }, write>`;
 
 				} else {
 
-					textureType = 'texture_2d<f32>';
+					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
+
+					textureType = `texture_2d<${ componentPrefix }32>`;
 
 				}
 
