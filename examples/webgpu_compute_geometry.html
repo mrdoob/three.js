@@ -62,11 +62,11 @@
 
 					// replace geometry attributes for storage buffer attributes
 
-					const positionStorageBaseAttribute = new StorageBufferAttribute( positionBaseAttribute.count, 4 );
-					const normalStorageBaseAttribute = new StorageBufferAttribute( normalBaseAttribute.count, 4 );
+					const positionStorageBufferAttribute = new StorageBufferAttribute( positionBaseAttribute.count, 4 );
+					const normalStorageBufferAttribute = new StorageBufferAttribute( normalBaseAttribute.count, 4 );
 
-					mesh.geometry.setAttribute( 'position', positionStorageBaseAttribute );
-					mesh.geometry.setAttribute( 'normal', normalStorageBaseAttribute );
+					mesh.geometry.setAttribute( 'position', positionStorageBufferAttribute );
+					mesh.geometry.setAttribute( 'normal', normalStorageBufferAttribute );
 
 					// compute shader
 
@@ -75,8 +75,8 @@
 						const positionAttribute = storage( positionBaseAttribute, 'vec3', positionBaseAttribute.count );
 						const normalAttribute = storage( normalBaseAttribute, 'vec3', normalBaseAttribute.count );
 
-						const positionStorageAttribute = storage( positionStorageBaseAttribute, 'vec4', positionStorageBaseAttribute.count );
-						const normalStorageAttribute = storage( normalStorageBaseAttribute, 'vec4', normalStorageBaseAttribute.count );
+						const positionStorageAttribute = storage( positionStorageBufferAttribute, 'vec4', positionStorageBufferAttribute.count );
+						const normalStorageAttribute = storage( normalStorageBufferAttribute, 'vec4', normalStorageBufferAttribute.count );
 
 						const time = timerLocal( .7 );
 						const scale = 0.3;
