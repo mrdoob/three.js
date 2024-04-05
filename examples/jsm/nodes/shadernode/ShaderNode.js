@@ -474,14 +474,6 @@ export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, al
 export const nodeProxy = ( ...params ) => new ShaderNodeProxy( ...params );
 export const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params );
 
-export const shader = ( jsFunc ) => { // @deprecated, r154
-
-	console.warn( 'TSL: shader() is deprecated. Use tslFn() instead.' );
-
-	return new ShaderNode( jsFunc );
-
-};
-
 export const tslFn = ( jsFunc ) => {
 
 	const shaderNode = new ShaderNode( jsFunc );

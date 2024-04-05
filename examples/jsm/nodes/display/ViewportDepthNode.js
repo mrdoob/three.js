@@ -75,7 +75,7 @@ export const orthographicDepthToViewZ = ( depth, near, far ) => near.sub( far ).
 // NOTE: https://twitter.com/gonnavis/status/1377183786949959682
 
 // -near maps to 0; -far maps to 1
-export const viewZToPerspectiveDepth = ( viewZ, near, far ) => near.add( viewZ ).mul( far ).div( near.sub( far ).mul( viewZ ) );
+export const viewZToPerspectiveDepth = ( viewZ, near, far ) => near.add( viewZ ).mul( far ).div( far.sub( near ).mul( viewZ ) );
 
 // maps perspective depth in [ 0, 1 ] to viewZ
 export const perspectiveDepthToViewZ = ( depth, near, far ) => near.mul( far ).div( far.sub( near ).mul( depth ).sub( far ) );

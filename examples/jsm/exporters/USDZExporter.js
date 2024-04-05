@@ -12,7 +12,13 @@ import { decompress } from './../utils/TextureUtils.js';
 
 class USDZExporter {
 
-	async parse( scene, options = {} ) {
+	parse( scene, onDone, onError, options ) {
+
+		this.parseAsync( scene, options ).then( onDone ).catch( onError );
+
+	}
+
+	async parseAsync( scene, options = {} ) {
 
 		options = Object.assign( {
 			ar: {

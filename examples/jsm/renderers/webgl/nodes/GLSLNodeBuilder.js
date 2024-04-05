@@ -246,6 +246,12 @@ ${ flowData.code }
 
 	}
 
+	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet ) {
+
+		return `textureGrad( ${ textureProperty }, ${ uvSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] } )`;
+
+	}
+
 	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
