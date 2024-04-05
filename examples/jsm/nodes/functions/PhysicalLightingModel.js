@@ -6,7 +6,7 @@ import F_Schlick from './BSDF/F_Schlick.js';
 import Schlick_to_F0 from './BSDF/Schlick_to_F0.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
 import LightingModel from '../core/LightingModel.js';
-import { diffuseColor, specularColor, specularF0, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness } from '../core/PropertyNode.js';
+import { diffuseColor, specularColor, specularF90, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness } from '../core/PropertyNode.js';
 import { transformedNormalView, transformedClearcoatNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
 import { positionViewDirection, positionWorld } from '../accessors/PositionNode.js';
 import { tslFn, float, vec2, vec3, vec4, mat3, If } from '../shadernode/ShaderNode.js';
@@ -365,7 +365,7 @@ class PhysicalLightingModel extends LightingModel {
 				roughness,
 				diffuseColor,
 				specularColor,
-				specularF0, // specularF90
+				specularF90, // specularF90
 				position, // positionWorld
 				modelWorldMatrix, // modelMatrix
 				cameraViewMatrix, // viewMatrix
@@ -431,7 +431,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
 
-		reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX( { lightDirection, f0: specularColor, f90: 1, roughness, iridescence: this.iridescence, iridescenceFresnel: this.iridescenceFresnel } ) ) );
+		reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX( { lightDirection, f0: specularColor, f90: specularF90, roughness, iridescence: this.iridescence, iridescenceFresnel: this.iridescenceFresnel } ) ) );
 
 	}
 
@@ -477,7 +477,7 @@ class PhysicalLightingModel extends LightingModel {
 		const multiScattering = vec3().temp( 'multiScattering' );
 		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
 
-		this.computeMultiscattering( singleScattering, multiScattering );
+		this.computeMultiscattering( singleScattering, multiScattering, specularF90 );
 
 		const totalScattering = singleScattering.add( multiScattering );
 
