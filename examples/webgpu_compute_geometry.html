@@ -79,13 +79,14 @@
 						const normalStorageAttribute = storage( normalStorageBaseAttribute, 'vec4', normalStorageBaseAttribute.count );
 
 						const time = timerLocal( .7 );
+						const scale = 0.3;
 
 						//
 
 						const position = vec3( positionAttribute.element( instanceIndex ) );
 						const normal = vec3( normalAttribute.element( instanceIndex ) );
 
-						const theta = sin( time.add( position.y ) );
+						const theta = sin( time.add( position.y ) ).mul( scale );
 
 						const c = cos( theta );
 						const s = sin( theta );
