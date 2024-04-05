@@ -58,7 +58,7 @@
 
 			const params = {
 				envMap: 'HDR JPG',
-				roughness: 0.0,
+				roughness: 1.0,
 				metalness: 1.0,
 				exposure: 1.0,
 				debug: false
@@ -274,7 +274,6 @@
 
 				}
 
-				// torusMesh.rotation.y += 0.005;
 				planeMesh.visible = params.debug;
 
 				scene.environment = equirectangularMap;
