@@ -75,9 +75,7 @@ const getTransmissionSample = tslFn( ( [ fragCoord, roughness, ior ] ) => {
 	const transmissionSample = singleViewportMipTexture.uv( fragCoord );
 	//const transmissionSample = viewportMipTexture( fragCoord );
 
-	const sizeX = viewportResolution.x;
-
-	const lod = float( log2( float( sizeX ) ).mul( applyIorToRoughness( roughness, ior ) ) ).toVar();
+	const lod = log2( float( viewportResolution.x ) ).mul( applyIorToRoughness( roughness, ior ) );
 
 	return transmissionSample.bicubic( lod );
 
@@ -88,8 +86,8 @@ const volumeAttenuation = tslFn( ( [ transmissionDistance, attenuationColor, att
 	If( attenuationDistance.notEqual( 0 ), () => {
 
 		// Compute light attenuation using Beer's law.
-		const attenuationCoefficient = vec3( log( attenuationColor ).negate().div( attenuationDistance ) );
-		const transmittance = vec3( exp( attenuationCoefficient.negate().mul( transmissionDistance ) ) );
+		const attenuationCoefficient = log( attenuationColor ).negate().div( attenuationDistance );
+		const transmittance = exp( attenuationCoefficient.negate().mul( transmissionDistance ) );
 
 		return transmittance;
 
@@ -110,8 +108,8 @@ const volumeAttenuation = tslFn( ( [ transmissionDistance, attenuationColor, att
 
 const getIBLVolumeRefraction = tslFn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance ] ) => {
 
-	const transmissionRay = vec3( getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix ) ).toVar();
-	const refractedRayExit = vec3( position.add( transmissionRay ) );
+	const transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );
+	const refractedRayExit = position.add( transmissionRay );
 
 	// Project refracted vector on the framebuffer, while mapping to normalized device coordinates.
 	const ndcPos = projMatrix.mul( viewMatrix.mul( vec4( refractedRayExit, 1.0 ) ) );
@@ -121,9 +119,9 @@ const getIBLVolumeRefraction = tslFn( ( [ n, v, roughness, diffuseColor, specula
 	refractionCoords.assign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
 
 	// Sample framebuffer to get pixel the refracted ray hits.
-	const transmittedLight = vec4( getTransmissionSample( refractionCoords, roughness, ior ) );
-	const transmittance = vec3( diffuseColor.mul( volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance ) ) );
-	const attenuatedColor = vec3( transmittance.mul( transmittedLight.rgb ) );
+	const transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );
+	const transmittance = diffuseColor.mul( volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance ) );
+	const attenuatedColor = transmittance.rgb.mul( transmittedLight.rgb );
 	const dotNV = n.dot( v ).clamp();
 
 	// Get the specular component.
@@ -136,7 +134,7 @@ const getIBLVolumeRefraction = tslFn( ( [ n, v, roughness, diffuseColor, specula
 
 	// As less light is transmitted, the opacity should be increased. This simple approximation does a decent job
 	// of modulating a CSS background, and has no effect when the buffer is opaque, due to a solid object or clear color.
-	const transmittanceFactor = float( transmittance.r.add( transmittance.g, transmittance.b ) ).div( 3.0 );
+	const transmittanceFactor = transmittance.r.add( transmittance.g, transmittance.b ).div( 3.0 );
 
 	return vec4( F.oneMinus().mul( attenuatedColor ), transmittedLight.a.oneMinus().mul( transmittanceFactor ).oneMinus() );
 
