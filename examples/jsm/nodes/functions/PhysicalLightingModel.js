@@ -6,10 +6,10 @@ import F_Schlick from './BSDF/F_Schlick.js';
 import Schlick_to_F0 from './BSDF/Schlick_to_F0.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
 import LightingModel from '../core/LightingModel.js';
-import { diffuseColor, specularColor, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness } from '../core/PropertyNode.js';
+import { diffuseColor, specularColor, specularF0, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness } from '../core/PropertyNode.js';
 import { transformedNormalView, transformedClearcoatNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
 import { positionViewDirection, positionWorld } from '../accessors/PositionNode.js';
-import { tslFn, float, vec2, vec3, vec4, mat3, mat4, If } from '../shadernode/ShaderNode.js';
+import { tslFn, float, vec2, vec3, vec4, mat3, If } from '../shadernode/ShaderNode.js';
 import { cond } from '../math/CondNode.js';
 import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } from '../math/MathNode.js';
 import { div } from '../math/OperatorNode.js';
@@ -365,7 +365,7 @@ class PhysicalLightingModel extends LightingModel {
 				roughness,
 				diffuseColor,
 				specularColor,
-				float( 1 ), // specularF90
+				specularF0, // specularF90
 				position, // positionWorld
 				modelWorldMatrix, // modelMatrix
 				cameraViewMatrix, // viewMatrix

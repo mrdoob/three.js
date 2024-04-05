@@ -1,6 +1,6 @@
 import { addNodeMaterial } from './NodeMaterial.js';
 import { transformedClearcoatNormalView } from '../accessors/NormalNode.js';
-import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, diffuseColor, metalness } from '../core/PropertyNode.js';
+import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularF0, diffuseColor, metalness } from '../core/PropertyNode.js';
 import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor2 } from '../accessors/MaterialNode.js';
 import { float, vec3 } from '../shadernode/ShaderNode.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
@@ -73,6 +73,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		const materialIOR = materialReference( 'ior', 'float' );
 
 		specularColor.assign( mix( min( pow2( materialIOR.sub( 1.0 ).div( materialIOR.add( 1.0 ) ) ).mul( materialSpecularColor2 ), vec3( 1.0 ) ).mul( materialSpecularIntensity ), diffuseColor.rgb, metalness ) );
+		specularF0.assign( mix( materialSpecularIntensity, 1.0, metalness ) );
 
 	}
 

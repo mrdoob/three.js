@@ -63,6 +63,7 @@ export const iridescence = nodeImmutable( PropertyNode, 'float', 'Iridescence' )
 export const iridescenceIOR = nodeImmutable( PropertyNode, 'float', 'IridescenceIOR' );
 export const iridescenceThickness = nodeImmutable( PropertyNode, 'float', 'IridescenceThickness' );
 export const specularColor = nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
+export const specularF0 = nodeImmutable( PropertyNode, 'float', 'SpecularF0' );
 export const shininess = nodeImmutable( PropertyNode, 'float', 'Shininess' );
 export const output = nodeImmutable( PropertyNode, 'vec4', 'Output' );
 export const dashSize = nodeImmutable( PropertyNode, 'float', 'dashSize' );
