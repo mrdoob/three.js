@@ -18,6 +18,13 @@ class StorageBufferNode extends BufferNode {
 		this._attribute = null;
 		this._varying = null;
 
+		if ( value.isStorageBufferAttribute !== true && value.isStorageInstancedBufferAttribute !== true ) {
+
+			if ( value.isInstancedBufferAttribute ) value.isStorageInstancedBufferAttribute = true;
+			else value.isStorageBufferAttribute = true;
+
+		}
+
 	}
 
 	getInputType( /*builder*/ ) {
