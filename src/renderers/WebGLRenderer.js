@@ -1427,7 +1427,7 @@ class WebGLRenderer {
 				} );
 
 				const renderTargetProperties = properties.get( currentRenderState.state.transmissionRenderTarget[ camera.id ] );
-				renderTargetProperties.__isTransmissionRenderTarget = true;
+				renderTargetProperties.__ignoreDepthValues = true;
 
 				// debug
 
