@@ -44,7 +44,7 @@ function WebGLRenderState( extensions ) {
 
 		lights: lights,
 
-		transmissionRenderTarget: null
+		transmissionRenderTarget: {}
 	};
 
 	return {
