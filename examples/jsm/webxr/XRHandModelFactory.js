@@ -40,7 +40,7 @@ class XRHandModel extends Object3D {
 
 class XRHandModelFactory {
 
-	constructor(gltfLoader = null, onLoad = null) {
+	constructor( gltfLoader = null, onLoad = null ) {
 
 		this.gltfLoader = gltfLoader;
 		this.path = null;
