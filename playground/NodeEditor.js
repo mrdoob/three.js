@@ -116,6 +116,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 		if ( value ) {
 
 			this._wasSplitscreen = this.splitscreen;
+
 			this.splitscreen = false;
 
 			this.menu.dom.remove();
@@ -134,7 +135,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 			this.previewMenu.dom.remove();
 
-			if (this._wasSplitscreen == true) {
+			if ( this._wasSplitscreen == true ) {
 
 				this.splitscreen = true;
 
@@ -278,8 +279,8 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		splitscreenButton.onClick( () => {
 
-			this.splitscreen = !this.splitscreen;
-			splitscreenButton.setIcon(this.splitscreen ? 'ti ti-layout-sidebar-right-collapse' : 'ti ti-layout-sidebar-right-expand');
+			this.splitscreen = ! this.splitscreen;
+			splitscreenButton.setIcon( this.splitscreen ? 'ti ti-layout-sidebar-right-collapse' : 'ti ti-layout-sidebar-right-expand' );
 
 		});
 
@@ -339,7 +340,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		previewMenu.add( editorButton );
 
-		this.domElement.appendChild(menu.dom);
+		this.domElement.appendChild( menu.dom );
 
 		this.menu = menu;
 		this.previewMenu = previewMenu;
@@ -456,12 +457,13 @@ export class NodeEditor extends THREE.EventDispatcher {
 				} else if ( key === 'Delete' ) {
 
 					if ( this.canvas.selected ) this.canvas.selected.dispose();
-					
+
 				} else if ( key === 'Escape' ) {
 
 					this.canvas.select( null );
 
 				}
+
 			}
 
 		} );
