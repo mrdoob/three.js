@@ -125,7 +125,7 @@
 
 				//
 
-				renderer.setAnimationLoop( render );
+				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.LinearToneMapping;
 				renderer.toneMappingExposure = 1;
 				document.body.appendChild( renderer.domElement );
@@ -178,8 +178,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				if ( renderer.isWebGLRenderer ) nodeFrame.update();
 
