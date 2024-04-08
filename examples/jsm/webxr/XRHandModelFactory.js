@@ -40,9 +40,11 @@ class XRHandModel extends Object3D {
 
 class XRHandModelFactory {
 
-	constructor() {
+	constructor( gltfLoader = null, onLoad = null ) {
 
+		this.gltfLoader = gltfLoader;
 		this.path = null;
+		this.onLoad = onLoad;
 
 	}
 
@@ -77,7 +79,7 @@ class XRHandModelFactory {
 
 				} else if ( profile === 'mesh' ) {
 
-					handModel.motionController = new XRHandMeshModel( handModel, controller, this.path, xrInputSource.handedness );
+					handModel.motionController = new XRHandMeshModel( handModel, controller, this.path, xrInputSource.handedness, this.gltfLoader, this.onLoad );
 
 				}
 
