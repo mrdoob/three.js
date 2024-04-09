@@ -38,6 +38,7 @@
 		[page:Constant colorSpace] - 默认是[page:Textures NoColorSpace]. <br />
 		[page:Boolean depthBuffer] - 默认是`true`.<br />
 		[page:Boolean stencilBuffer] - 默认是`false`.<br />
+		[page:Boolean resolveStencilBuffer] - 默认是`true`.<br />
 		[page:Number samples] - 默认是`0`.<br />
 		[page:Number count] - default is `1`.<br /><br />
 
@@ -94,7 +95,13 @@
 
 		<h3>[property:Boolean stencilBuffer]</h3>
 		<p>
-		渲染到模板缓冲区。默认为false
+		渲染到模板缓冲区。默认为false.
+		</p>
+
+		<h3>[property:Boolean resolveStencilBuffer]</h3>
+		<p>
+			Defines whether the stencil buffer should be resolved when rendering into a multisampled render target or not. 
+			默认为`true`.
 		</p>
 
 		<h3>[property:DepthTexture depthTexture]</h3>

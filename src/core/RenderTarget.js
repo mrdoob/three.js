@@ -34,6 +34,7 @@ class RenderTarget extends EventDispatcher {
 			minFilter: LinearFilter,
 			depthBuffer: true,
 			stencilBuffer: false,
+			resolveStencilBuffer: true,
 			depthTexture: null,
 			samples: 0,
 			count: 1
@@ -57,6 +58,8 @@ class RenderTarget extends EventDispatcher {
 
 		this.depthBuffer = options.depthBuffer;
 		this.stencilBuffer = options.stencilBuffer;
+
+		this.resolveStencilBuffer = options.resolveStencilBuffer;
 
 		this.depthTexture = options.depthTexture;
 
@@ -134,6 +137,8 @@ class RenderTarget extends EventDispatcher {
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
+
+		this.resolveStencilBuffer = source.resolveStencilBuffer;
 
 		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
 
