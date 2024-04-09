@@ -856,7 +856,16 @@ class WebGLRenderer {
 
 			if ( object.isBatchedMesh ) {
 
-				renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+				// TODO: implement this field in BatchedMesh or InstancedBatchedMesh
+				if ( object._multiDrawInstances !== undefined ) {
+
+					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
+
+				} else {
+
+					renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+
+				}
 
 			} else if ( object.isInstancedMesh ) {
 
