@@ -456,6 +456,8 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 // exports
 
+export const defined = ( value ) => value && value.value;
+
 // utils
 
 export const getConstNodeType = ( value ) => ( value !== undefined && value !== null ) ? ( value.nodeType || value.convertTo || ( typeof value === 'string' ? value : null ) ) : null;
