@@ -245,6 +245,71 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 }
 
+/**
+ * @param {Object3D} object Object to traverse.
+ * @param {function(Object3D):boolean} [condition]
+ *     Filter condition, objects will not be yielded when false.
+ * @yields {Object3D} Objects that passed the filter condition.
+ */
+function* traverseGenerator( object, condition ) {
+
+	if ( condition === undefined || condition( object ) )
+		yield object;
+
+	const children = object.children;
+
+	for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+		yield* traverseGenerator( children[ i ], condition );
+
+	}
+
+}
+
+/**
+ * @param {Object3D} object Object to traverse.
+ * @param {function(Object3D):boolean} [condition]
+ * 	   Filter condition, objects will not be yielded when false.
+ * @yields {Object3D} Objects that passed the filter condition.
+ */
+function* traverseVisibleGenerator( object, condition ) {
+
+	if ( object.visible === false ) return;
+
+	if ( condition === undefined || condition( object ) )
+		yield object;
+
+	const children = object.children;
+
+	for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+		yield* traverseVisibleGenerator( children[ i ], condition );
+
+	}
+
+}
+
+/**
+ * @param {Object3D} object Object to traverse.
+ * @param {function(Object3D):boolean} [condition]
+ *     Filter condition, objects will not be yielded when false.
+ * @yields {Object3D} Objects that passed the filter condition.
+ */
+function* traverseAncestorsGenerator( object, condition ) {
+
+	const parent = object.parent;
+
+	if ( parent !== null ) {
+
+		if ( condition === undefined || condition( parent ) )
+			yield parent;
+
+		yield* traverseAncestorsGenerator( parent, condition );
+
+	}
+
+}
+
 export {
 	createMeshesFromInstancedMesh,
 	createMeshesFromMultiMaterialMesh,
