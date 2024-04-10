@@ -1880,7 +1880,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					// resolving stencil is slow with a D3D backend. disable it for all transmission render targets (see #27799)
 
-					if ( renderTarget.stencilBuffer && renderTargetProperties.__isTransmissionRenderTarget !== true ) mask |= _gl.STENCIL_BUFFER_BIT;
+					if ( renderTarget.stencilBuffer && renderTarget.resolveStencilBuffer ) mask |= _gl.STENCIL_BUFFER_BIT;
 
 				}
 
