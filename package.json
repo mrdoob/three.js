@@ -92,7 +92,7 @@
     "chalk": "^5.2.0",
     "concurrently": "^8.0.1",
     "dpdm": "^3.14.0",
-    "eslint": "^8.37.0",
+    "eslint": "^9.0.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-compat": "^4.1.2",
     "eslint-plugin-html": "^8.0.0",
