@@ -74,6 +74,14 @@ class Node extends EventDispatcher {
 
 	}
 
+	onReference( callback ) {
+
+		this.updateReference = callback.bind( this.getSelf() );
+
+		return this;
+
+	}
+
 	getSelf() {
 
 		// Returns non-node object.
