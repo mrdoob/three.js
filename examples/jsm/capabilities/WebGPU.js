@@ -9,11 +9,17 @@ if ( self.GPUShaderStage === undefined ) {
 let isAvailable = navigator.gpu !== undefined;
 
 
-if ( typeof window !== 'undefined' && isAvailable ) {
+async function checkGPUAvailability() {
 
-	isAvailable = await navigator.gpu.requestAdapter();
+  if ( typeof window !== 'undefined' && isAvailable ) {
+
+    isAvailable = await navigator.gpu.requestAdapter();
+
+  }
 
 }
+
+checkGPUAvailability();
 
 class WebGPU {
 
