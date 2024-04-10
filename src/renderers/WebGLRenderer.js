@@ -1419,11 +1419,9 @@ class WebGLRenderer {
 					type: ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) ) ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
 					samples: 4,
-					stencilBuffer: stencil
+					stencilBuffer: stencil,
+					resolveStencilBuffer: false
 				} );
-
-				const renderTargetProperties = properties.get( currentRenderState.state.transmissionRenderTarget[ camera.id ] );
-				renderTargetProperties.__isTransmissionRenderTarget = true;
 
 				// debug
 

@@ -2921,6 +2921,7 @@ class RenderTarget extends EventDispatcher {
 			minFilter: LinearFilter,
 			depthBuffer: true,
 			stencilBuffer: false,
+			resolveStencilBuffer: true,
 			depthTexture: null,
 			samples: 0,
 			count: 1
@@ -2944,6 +2945,8 @@ class RenderTarget extends EventDispatcher {
 
 		this.depthBuffer = options.depthBuffer;
 		this.stencilBuffer = options.stencilBuffer;
+
+		this.resolveStencilBuffer = options.resolveStencilBuffer;
 
 		this.depthTexture = options.depthTexture;
 
@@ -3021,6 +3024,8 @@ class RenderTarget extends EventDispatcher {
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
+
+		this.resolveStencilBuffer = source.resolveStencilBuffer;
 
 		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
 
@@ -25538,7 +25543,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					// resolving stencil is slow with a D3D backend. disable it for all transmission render targets (see #27799)
 
-					if ( renderTarget.stencilBuffer && renderTargetProperties.__isTransmissionRenderTarget !== true ) mask |= _gl.STENCIL_BUFFER_BIT;
+					if ( renderTarget.stencilBuffer && renderTarget.resolveStencilBuffer ) mask |= _gl.STENCIL_BUFFER_BIT;
 
 				}
 
@@ -29514,11 +29519,9 @@ class WebGLRenderer {
 					type: ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) ) ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
 					samples: 4,
-					stencilBuffer: stencil
+					stencilBuffer: stencil,
+					resolveStencilBuffer: false
 				} );
-
-				const renderTargetProperties = properties.get( currentRenderState.state.transmissionRenderTarget );
-				renderTargetProperties.__isTransmissionRenderTarget = true;
 
 				// debug
 
