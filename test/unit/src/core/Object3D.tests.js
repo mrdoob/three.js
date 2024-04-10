@@ -823,14 +823,13 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'traverse/traverseVisible/traverseAncestors + generators', ( assert ) => {
+		QUnit.test( 'traverse/traverseVisible/traverseAncestors', ( assert ) => {
 
 			const a = new Object3D();
 			const b = new Object3D();
 			const c = new Object3D();
 			const d = new Object3D();
 			let names = [];
-			let generatedNames = [];
 			const expectedNormal = [ 'parent', 'child', 'childchild 1', 'childchild 2' ];
 			const expectedVisible = [ 'parent', 'child', 'childchild 2' ];
 			const expectedAncestors = [ 'child', 'parent' ];
@@ -850,9 +849,7 @@ export default QUnit.module( 'Core', () => {
 				names.push( obj.name );
 
 			} );
-			generatedNames = Array.from(a.traverseGenerator()).map(obj => obj.name);
 			assert.deepEqual( names, expectedNormal, 'Traversed objects in expected order' );
-			assert.deepEqual( generatedNames, expectedNormal, 'Traversed objects in expected order' );
 
 			names = [];
 			a.traverseVisible( function ( obj ) {
@@ -860,9 +857,7 @@ export default QUnit.module( 'Core', () => {
 				names.push( obj.name );
 
 			} );
-			generatedNames = Array.from(a.traverseVisibleGenerator()).map(obj => obj.name);
 			assert.deepEqual( names, expectedVisible, 'Traversed visible objects in expected order' );
-			assert.deepEqual( generatedNames, expectedVisible, 'Traversed visible objects in expected order' );
 
 			names = [];
 			c.traverseAncestors( function ( obj ) {
@@ -870,9 +865,7 @@ export default QUnit.module( 'Core', () => {
 				names.push( obj.name );
 
 			} );
-			generatedNames = Array.from(c.traverseAncestorsGenerator()).map(obj => obj.name);
 			assert.deepEqual( names, expectedAncestors, 'Traversed ancestors in expected order' );
-			assert.deepEqual( generatedNames, expectedAncestors, 'Traversed ancestors in expected order' );
 
 		} );
 
