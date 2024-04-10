@@ -86,7 +86,7 @@
 		} );
 
 		// Carica come di solito, quindi revoca gli URL dei Blob 
-		const loader = new THREE.GLTFLoader( manager );
+		const loader = new GLTFLoader( manager );
 		loader.load( 'fish.gltf', (gltf) => {
 
 			scene.add( gltf.scene );

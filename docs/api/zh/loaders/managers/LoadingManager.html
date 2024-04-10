@@ -83,7 +83,7 @@
 		} );
 
 		// 像通常一样加载，然后撤消blob URL
-		const loader = new THREE.GLTFLoader( manager );
+		const loader = new GLTFLoader( manager );
 		loader.load( 'fish.gltf', (gltf) => {
 
 			scene.add( gltf.scene );
