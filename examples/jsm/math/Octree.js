@@ -470,13 +470,19 @@ class Octree {
 
 	}
 
-	fromGraphNode( group ) {
+	fromGraphNode( group, skip ) {
 
 		group.updateWorldMatrix( true, true );
 
 		group.traverse( ( obj ) => {
 
 			if ( obj.isMesh === true ) {
+
+			    if ( skip && skip.includes(obj.material.name) ) {
+
+				// ignore these meshes
+
+			    } else {
 
 				let geometry, isTemp = false;
 
@@ -512,6 +518,8 @@ class Octree {
 					geometry.dispose();
 
 				}
+
+			    }
 
 			}
 
