@@ -42,6 +42,7 @@
 				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1.35;
 				document.body.appendChild( renderer.domElement );
@@ -78,8 +79,6 @@
 
 				scene.add( gltf.scene );
 
-				render();
-
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
@@ -91,8 +90,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				render();
 
 			}
 
