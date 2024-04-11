@@ -4,7 +4,8 @@ import {
 	Plane,
 	Sphere,
 	Triangle,
-	Vector3
+	Vector3,
+	Layers
 } from 'three';
 import { Capsule } from '../math/Capsule.js';
 
@@ -89,6 +90,7 @@ class Octree {
 
 		this.subTrees = [];
 		this.triangles = [];
+		this.layers = new Layers();
 
 	}
 
@@ -470,7 +472,7 @@ class Octree {
 
 	}
 
-	fromGraphNode( group, skip ) {
+	fromGraphNode( group ) {
 
 		group.updateWorldMatrix( true, true );
 
@@ -478,11 +480,7 @@ class Octree {
 
 			if ( obj.isMesh === true ) {
 
-			    if ( skip && skip.includes(obj.material.name) ) {
-
-				// ignore these meshes
-
-			    } else {
+			    if ( this.layers.test( obj.layers ) ) {
 
 				let geometry, isTemp = false;
 
