@@ -307,7 +307,7 @@ class PhysicalLightingModel extends LightingModel {
 		this.sheen = sheen;
 		this.iridescence = iridescence;
 		this.anisotropy = anisotropy;
-		this.transmission = transmission
+		this.transmission = transmission;
 
 		this.clearcoatRadiance = null;
 		this.clearcoatSpecularDirect = null;
