@@ -1247,13 +1247,17 @@ class WebGLRenderer {
 
 				const renderStateCamera = currentRenderState.state.camera;
 
-				if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, renderStateCamera );
+				if ( renderStateCamera !== null ) {
 
-				const viewport = renderStateCamera.viewport;
+					if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, renderStateCamera );
 
-				if ( viewport !== undefined ) {
+					const viewport = renderStateCamera.viewport;
 
-					state.viewport( viewport );
+					if ( viewport !== undefined ) {
+
+						state.viewport( viewport );
+
+					}
 
 				}
 
