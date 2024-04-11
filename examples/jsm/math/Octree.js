@@ -4,7 +4,8 @@ import {
 	Plane,
 	Sphere,
 	Triangle,
-	Vector3
+	Vector3,
+	Layers
 } from 'three';
 import { Capsule } from '../math/Capsule.js';
 
@@ -89,6 +90,7 @@ class Octree {
 
 		this.subTrees = [];
 		this.triangles = [];
+		this.layers = new Layers();
 
 	}
 
@@ -478,6 +480,8 @@ class Octree {
 
 			if ( obj.isMesh === true ) {
 
+			    if ( this.layers.test( obj.layers ) ) {
+
 				let geometry, isTemp = false;
 
 				if ( obj.geometry.index !== null ) {
@@ -512,6 +516,8 @@ class Octree {
 					geometry.dispose();
 
 				}
+
+			    }
 
 			}
 
