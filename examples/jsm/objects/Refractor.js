@@ -186,7 +186,7 @@ class Refractor extends Mesh {
 
 		//
 
-		function render( renderer, scene, camera ) {
+		function render( renderer, scene ) {
 
 			scope.visible = false;
 
@@ -204,16 +204,6 @@ class Refractor extends Mesh {
 			renderer.xr.enabled = currentXrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 			renderer.setRenderTarget( currentRenderTarget );
-
-			// restore viewport
-
-			const viewport = camera.viewport;
-
-			if ( viewport !== undefined ) {
-
-				renderer.state.viewport( viewport );
-
-			}
 
 			scope.visible = true;
 
@@ -239,7 +229,7 @@ class Refractor extends Mesh {
 
 			updateVirtualCamera( camera );
 
-			render( renderer, scene, camera );
+			render( renderer, scene );
 
 		};
 
