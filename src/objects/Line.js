@@ -12,6 +12,8 @@ const _end = /*@__PURE__*/ new Vector3();
 const _inverseMatrix = /*@__PURE__*/ new Matrix4();
 const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
+const _interRay = /*@__PURE__*/ new Vector3();
+const _interSegment = /*@__PURE__*/ new Vector3();
 
 class Line extends Object3D {
 
@@ -74,6 +76,38 @@ class Line extends Object3D {
 
 	}
 
+	_raycastSegment( iStart, iEnd, raycaster, ray, localThresholdSq ) {
+
+		const positionAttribute = this.geometry.attributes.position;
+
+		_start.fromBufferAttribute( positionAttribute, iStart );
+		_end.fromBufferAttribute( positionAttribute, iEnd );
+
+		const distSq = ray.distanceSqToSegment( _start, _end, _interRay, _interSegment );
+
+		if ( distSq > localThresholdSq ) return;
+
+		_interRay.applyMatrix4( this.matrixWorld ); // Move back to world space for distance calculation
+
+		const distance = raycaster.ray.origin.distanceTo( _interRay );
+
+		if ( distance < raycaster.near || distance > raycaster.far ) return;
+
+		return {
+
+			distance: distance,
+			// What do we want? intersection point on the ray or on the segment??
+			// point: raycaster.ray.at( distance ),
+			point: _interSegment.clone().applyMatrix4( this.matrixWorld ),
+			index: iStart,
+			face: null,
+			faceIndex: null,
+			object: this
+
+		};
+
+	}
+
 	raycast( raycaster, intersects ) {
 
 		const geometry = this.geometry;
@@ -99,10 +133,6 @@ class Line extends Object3D {
 		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 		const localThresholdSq = localThreshold * localThreshold;
 
-		const vStart = new Vector3();
-		const vEnd = new Vector3();
-		const interSegment = new Vector3();
-		const interRay = new Vector3();
 		const step = this.isLineSegments ? 2 : 1;
 
 		const index = geometry.index;
@@ -119,31 +149,28 @@ class Line extends Object3D {
 				const a = index.getX( i );
 				const b = index.getX( i + 1 );
 
-				vStart.fromBufferAttribute( positionAttribute, a );
-				vEnd.fromBufferAttribute( positionAttribute, b );
+				const intersect = this._raycastSegment( a, b, raycaster, _ray, localThresholdSq );
 
-				const distSq = _ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
+				if ( intersect ) {
 
-				if ( distSq > localThresholdSq ) continue;
+					intersects.push( intersect );
 
-				interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
+				}
 
-				const distance = raycaster.ray.origin.distanceTo( interRay );
+			}
 
-				if ( distance < raycaster.near || distance > raycaster.far ) continue;
+			if ( this.isLineLoop ) {
 
-				intersects.push( {
+				const a = index.getX( end - 1 );
+				const b = index.getX( start );
 
-					distance: distance,
-					// What do we want? intersection point on the ray or on the segment??
-					// point: raycaster.ray.at( distance ),
-					point: interSegment.clone().applyMatrix4( this.matrixWorld ),
-					index: i,
-					face: null,
-					faceIndex: null,
-					object: this
+				const intersect = this._raycastSegment( a, b, raycaster, _ray, localThresholdSq );
 
-				} );
+				if ( intersect ) {
+
+					intersects.push( intersect );
+
+				}
 
 			}
 
@@ -154,31 +181,25 @@ class Line extends Object3D {
 
 			for ( let i = start, l = end - 1; i < l; i += step ) {
 
-				vStart.fromBufferAttribute( positionAttribute, i );
-				vEnd.fromBufferAttribute( positionAttribute, i + 1 );
+				const intersect = this._raycastSegment( i, i + 1, raycaster, _ray, localThresholdSq );
 
-				const distSq = _ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
+				if ( intersect ) {
 
-				if ( distSq > localThresholdSq ) continue;
+					intersects.push( intersect );
 
-				interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
+				}
 
-				const distance = raycaster.ray.origin.distanceTo( interRay );
+			}
 
-				if ( distance < raycaster.near || distance > raycaster.far ) continue;
+			if ( this.isLineLoop ) {
 
-				intersects.push( {
+				const intersect = this._raycastSegment( end - 1, start, raycaster, _ray, localThresholdSq );
 
-					distance: distance,
-					// What do we want? intersection point on the ray or on the segment??
-					// point: raycaster.ray.at( distance ),
-					point: interSegment.clone().applyMatrix4( this.matrixWorld ),
-					index: i,
-					face: null,
-					faceIndex: null,
-					object: this
+				if ( intersect ) {
 
-				} );
+					intersects.push( intersect );
+
+				}
 
 			}
 
