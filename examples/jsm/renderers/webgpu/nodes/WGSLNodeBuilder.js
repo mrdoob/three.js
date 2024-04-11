@@ -254,6 +254,21 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+
+		if ( shaderStage === 'fragment' ) {
+
+			// TODO handle i32 or u32 --> uvSnippet, array_index: A, ddx, ddy
+			return `textureSampleGrad( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet },  ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] } )`;
+
+		} else {
+
+			console.error( `WebGPURenderer: THREE.TextureNode.gradient() does not support ${ shaderStage } shader.` );
+
+		}
+
+	}
+
 	generateTextureCompare( texture, textureProperty, uvSnippet, compareSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
@@ -522,7 +537,7 @@ ${ flowData.code }
 
 	getFragCoord() {
 
-		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>' ) + '.xy';
+		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>' ) + '.xyz';
 
 	}
 

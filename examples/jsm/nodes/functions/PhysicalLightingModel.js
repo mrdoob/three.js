@@ -299,14 +299,15 @@ const clearcoatF90 = vec3( 1 );
 
 class PhysicalLightingModel extends LightingModel {
 
-	constructor( clearcoat = false, sheen = false, iridescence = false, transmission = false ) {
+	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false ) {
 
 		super();
 
 		this.clearcoat = clearcoat;
 		this.sheen = sheen;
 		this.iridescence = iridescence;
-		this.transmission = transmission;
+		this.anisotropy = anisotropy;
+		this.transmission = transmission
 
 		this.clearcoatRadiance = null;
 		this.clearcoatSpecularDirect = null;
@@ -429,7 +430,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
 
-		reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX( { lightDirection, f0: specularColor, f90: specularF90, roughness, iridescence: this.iridescence, iridescenceFresnel: this.iridescenceFresnel } ) ) );
+		reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX( { lightDirection, f0: specularColor, f90: 1, roughness, iridescence: this.iridescence, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } ) ) );
 
 	}
 

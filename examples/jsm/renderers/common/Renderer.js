@@ -1248,6 +1248,7 @@ class Renderer {
 
 		let overridePositionNode;
 		let overrideFragmentNode;
+		let overrideDepthNode;
 
 		//
 
@@ -1264,7 +1265,6 @@ class Renderer {
 			if ( material.positionNode && material.positionNode.isNode ) {
 
 				overridePositionNode = overrideMaterial.positionNode;
-
 				overrideMaterial.positionNode = material.positionNode;
 
 			}
@@ -1272,6 +1272,14 @@ class Renderer {
 			if ( overrideMaterial.isShadowNodeMaterial ) {
 
 				overrideMaterial.side = material.shadowSide === null ? material.side : material.shadowSide;
+
+				if ( material.depthNode && material.depthNode.isNode ) {
+
+					overrideDepthNode = overrideMaterial.depthNode;
+					overrideMaterial.depthNode = material.depthNode;
+
+				}
+
 
 				if ( material.shadowNode && material.shadowNode.isNode ) {
 
@@ -1335,6 +1343,12 @@ class Renderer {
 		if ( overridePositionNode !== undefined ) {
 
 			scene.overrideMaterial.positionNode = overridePositionNode;
+
+		}
+
+		if ( overrideDepthNode !== undefined ) {
+
+			scene.overrideMaterial.depthNode = overrideDepthNode;
 
 		}
 

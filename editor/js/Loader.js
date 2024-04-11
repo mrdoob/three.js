@@ -376,29 +376,6 @@ function Loader( editor ) {
 
 			}
 
-			case 'ifc':
-
-			{
-
-				reader.addEventListener( 'load', async function ( event ) {
-
-					const { IFCLoader } = await import( 'three/addons/loaders/IFCLoader.js' );
-
-					var loader = new IFCLoader();
-					loader.ifcManager.setWasmPath( 'three/addons/loaders/ifc/' );
-
-					const model = await loader.parse( event.target.result );
-					model.mesh.name = filename;
-
-					editor.execute( new AddObjectCommand( editor, model.mesh ) );
-
-				}, false );
-				reader.readAsArrayBuffer( file );
-
-				break;
-
-			}
-
 			case 'kmz':
 
 			{

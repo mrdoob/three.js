@@ -3,9 +3,7 @@ import {
 	BackSide,
 	FrontSide,
 	DoubleSide,
-	RGBAFormat,
 	HalfFloatType,
-	FloatType,
 	UnsignedByteType,
 	NoToneMapping,
 	LinearMipmapLinearFilter,
@@ -26,7 +24,6 @@ import {
 import { Color } from '../math/Color.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
-import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
@@ -205,7 +202,6 @@ class WebGLRenderer {
 
 		const _projScreenMatrix = new Matrix4();
 
-		const _vector2 = new Vector2();
 		const _vector3 = new Vector3();
 
 		const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, isScene: true };
@@ -292,9 +288,9 @@ class WebGLRenderer {
 			extensions = new WebGLExtensions( _gl );
 			extensions.init();
 
-			capabilities = new WebGLCapabilities( _gl, extensions, parameters );
-
 			utils = new WebGLUtils( _gl, extensions );
+
+			capabilities = new WebGLCapabilities( _gl, extensions, parameters, utils );
 
 			state = new WebGLState( _gl );
 
@@ -1408,11 +1404,9 @@ class WebGLRenderer {
 					type: ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) ) ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
 					samples: 4,
-					stencilBuffer: stencil
+					stencilBuffer: stencil,
+					resolveStencilBuffer: false
 				} );
-
-				const renderTargetProperties = properties.get( currentRenderState.state.transmissionRenderTarget );
-				renderTargetProperties.__isTransmissionRenderTarget = true;
 
 				// debug
 
@@ -1428,8 +1422,8 @@ class WebGLRenderer {
 
 			const transmissionRenderTarget = currentRenderState.state.transmissionRenderTarget;
 
-			_this.getDrawingBufferSize( _vector2 );
-			transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
+			const activeViewport = camera.viewport || _currentViewport;
+			transmissionRenderTarget.setSize( activeViewport.z, activeViewport.w );
 
 			//
 
@@ -1446,6 +1440,11 @@ class WebGLRenderer {
 			// Otherwise they are applied twice in opaque objects pass and transmission objects pass.
 			const currentToneMapping = _this.toneMapping;
 			_this.toneMapping = NoToneMapping;
+
+			// Remove viewport from camera to avoid nested render calls resetting viewport to it (e.g Reflector).
+			// Transmission render pass requires viewport to match the transmissionRenderTarget.
+			const currentCameraViewport = camera.viewport;
+			if ( camera.viewport !== undefined ) camera.viewport = undefined;
 
 			renderObjects( opaqueObjects, scene, camera );
 
@@ -1491,6 +1490,8 @@ class WebGLRenderer {
 			_this.setRenderTarget( currentRenderTarget );
 
 			_this.setClearColor( _currentClearColor, _currentClearAlpha );
+
+			if ( currentCameraViewport !== undefined ) camera.viewport = currentCameraViewport;
 
 			_this.toneMapping = currentToneMapping;
 
@@ -2288,17 +2289,14 @@ class WebGLRenderer {
 					const textureFormat = texture.format;
 					const textureType = texture.type;
 
-					if ( textureFormat !== RGBAFormat && utils.convert( textureFormat ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
+					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
 
 						console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
 						return;
 
 					}
 
-					const halfFloatSupportedByExt = ( textureType === HalfFloatType ) && ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) );
-
-					if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // Edge and Chrome Mac < 52 (#9513)
-						textureType !== FloatType && ! halfFloatSupportedByExt ) {
+					if ( ! capabilities.textureTypeReadable( textureType ) ) {
 
 						console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
 						return;

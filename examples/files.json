@@ -88,6 +88,7 @@
 		"webgl_loader_gltf",
 		"webgl_loader_gltf_avif",
 		"webgl_loader_gltf_compressed",
+		"webgl_loader_gltf_dispersion",
 		"webgl_loader_gltf_instancing",
 		"webgl_loader_gltf_iridescence",
 		"webgl_loader_gltf_lights",
@@ -323,6 +324,7 @@
 		"webgpu_clearcoat",
 		"webgpu_clipping",
 		"webgpu_compute_audio",
+		"webgpu_compute_geometry",
 		"webgpu_compute_particles",
 		"webgpu_compute_particles_rain",
 		"webgpu_compute_particles_snow",
@@ -345,6 +347,7 @@
 		"webgpu_lights_selective",
 		"webgpu_lines_fat",
 		"webgpu_loader_gltf",
+		"webgpu_loader_gltf_anisotropy",
 		"webgpu_loader_gltf_compressed",
 		"webgpu_loader_gltf_iridescence",
 		"webgpu_loader_gltf_sheen",
@@ -386,7 +389,8 @@
 		"webgpu_materials_texture_anisotropy",
 		"webgpu_storage_buffer",
 		"webgpu_mesh_batch",
-		"webgpu_instancing_morph"
+		"webgpu_instancing_morph",
+		"webgpu_texturegrad"
 	],
 	"webaudio": [
 		"webaudio_orientation",

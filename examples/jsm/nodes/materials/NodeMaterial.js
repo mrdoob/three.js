@@ -44,6 +44,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.lightsNode = null;
 		this.envNode = null;
+		this.aoNode = null;
 
 		this.colorNode = null;
 		this.normalNode = null;
@@ -94,9 +95,9 @@ class NodeMaterial extends ShaderMaterial {
 
 		const clippingNode = this.setupClipping( builder );
 
-		if ( this.fragmentNode === null ) {
+		if ( this.depthWrite === true ) this.setupDepth( builder );
 
-			if ( this.depthWrite === true ) this.setupDepth( builder );
+		if ( this.fragmentNode === null ) {
 
 			if ( this.normals === true ) this.setupNormal( builder );
 
@@ -343,9 +344,11 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		if ( builder.material.aoMap ) {
+		if ( this.aoNode !== null || builder.material.aoMap ) {
 
-			materialLightsNode.push( new AONode( texture( builder.material.aoMap ) ) );
+			const aoNode = this.aoNode !== null ? this.aoNode : texture( builder.material.aoMap );
+
+			materialLightsNode.push( new AONode( aoNode ) );
 
 		}
 

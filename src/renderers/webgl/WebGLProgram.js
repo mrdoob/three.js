@@ -244,11 +244,7 @@ function resolveIncludes( string ) {
 
 }
 
-const shaderChunkMap = new Map( [
-	[ 'encodings_fragment', 'colorspace_fragment' ], // @deprecated, r154
-	[ 'encodings_pars_fragment', 'colorspace_pars_fragment' ], // @deprecated, r154
-	[ 'output_fragment', 'opaque_fragment' ], // @deprecated, r154
-] );
+const shaderChunkMap = new Map();
 
 function includeReplacer( match, include ) {
 
@@ -776,6 +772,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.clearcoatMap ? '#define USE_CLEARCOATMAP' : '',
 			parameters.clearcoatRoughnessMap ? '#define USE_CLEARCOAT_ROUGHNESSMAP' : '',
 			parameters.clearcoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '',
+
+			parameters.dispersion ? '#define USE_DISPERSION' : '',
 
 			parameters.iridescence ? '#define USE_IRIDESCENCE' : '',
 			parameters.iridescenceMap ? '#define USE_IRIDESCENCEMAP' : '',

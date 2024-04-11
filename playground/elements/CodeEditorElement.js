@@ -30,7 +30,8 @@ export class CodeEditorElement extends Element {
 				value: this.source,
 				language: 'javascript',
 				theme: 'vs-dark',
-				automaticLayout: true
+				automaticLayout: true,
+				minimap: { enabled: false }
 			} );
 
 			let timeout = null;
