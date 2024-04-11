@@ -34,6 +34,8 @@ function WebGLRenderState( extensions ) {
 
 	function setupLightsView( camera ) {
 
+		state.camera = camera;
+
 		lights.setupView( lightsArray, camera );
 
 	}
@@ -43,6 +45,7 @@ function WebGLRenderState( extensions ) {
 		shadowsArray: shadowsArray,
 
 		lights: lights,
+		camera: null,
 
 		transmissionRenderTarget: {}
 	};
