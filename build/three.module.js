@@ -21824,8 +21824,6 @@ function WebGLRenderState( extensions ) {
 
 	function setupLightsView( camera ) {
 
-		state.camera = camera;
-
 		lights.setupView( lightsArray, camera );
 
 	}
@@ -21835,7 +21833,6 @@ function WebGLRenderState( extensions ) {
 		shadowsArray: shadowsArray,
 
 		lights: lights,
-		camera: null,
 
 		transmissionRenderTarget: {}
 	};
@@ -29067,7 +29064,6 @@ class WebGLRenderer {
 			}
 
 			currentRenderState.setupLights( _this._useLegacyLights );
-			currentRenderState.setupLightsView( camera );
 
 			// Only initialize materials in the new scene, not the targetScene.
 
@@ -29360,24 +29356,6 @@ class WebGLRenderer {
 			if ( renderStateStack.length > 0 ) {
 
 				currentRenderState = renderStateStack[ renderStateStack.length - 1 ];
-
-				// restore clipping uniforms and viewport
-
-				const renderStateCamera = currentRenderState.state.camera;
-
-				if ( renderStateCamera !== null ) {
-
-					if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, renderStateCamera );
-
-					const viewport = renderStateCamera.viewport;
-
-					if ( viewport !== undefined ) {
-
-						state.viewport( viewport );
-
-					}
-
-				}
 
 			} else {
 
