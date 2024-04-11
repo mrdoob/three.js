@@ -4,9 +4,7 @@ import { tslFn } from '../../shadernode/ShaderNode.js';
 
 // Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
 // https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-const V_GGX_SmithCorrelated = tslFn( ( inputs ) => {
-
-	const { alpha, dotNL, dotNV } = inputs;
+const V_GGX_SmithCorrelated = tslFn( ( { alpha, dotNL, dotNV } ) => {
 
 	const a2 = alpha.pow2();
 
