@@ -1463,6 +1463,8 @@ class WebGLRenderer {
 
 			currentRenderState.setupLightsView( camera );
 
+			if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, camera );
+
 			renderObjects( opaqueObjects, scene, camera );
 
 			textures.updateMultisampleRenderTarget( transmissionRenderTarget );
