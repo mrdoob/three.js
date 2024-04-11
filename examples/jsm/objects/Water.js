@@ -314,6 +314,16 @@ class Water extends Mesh {
 
 			renderer.setRenderTarget( currentRenderTarget );
 
+			// Restore viewport
+
+			const viewport = camera.viewport;
+
+			if ( viewport !== undefined ) {
+
+				renderer.state.viewport( viewport );
+
+			}
+
 		};
 
 	}
