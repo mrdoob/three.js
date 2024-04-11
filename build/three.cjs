@@ -21799,7 +21799,9 @@ function WebGLRenderState( extensions ) {
 	const lightsArray = [];
 	const shadowsArray = [];
 
-	function init() {
+	function init( camera ) {
+
+		state.camera = camera;
 
 		lightsArray.length = 0;
 		shadowsArray.length = 0;
@@ -21833,6 +21835,8 @@ function WebGLRenderState( extensions ) {
 	const state = {
 		lightsArray: lightsArray,
 		shadowsArray: shadowsArray,
+
+		camera: null,
 
 		lights: lights,
 
@@ -29023,7 +29027,7 @@ class WebGLRenderer {
 			if ( targetScene === null ) targetScene = scene;
 
 			currentRenderState = renderStates.get( targetScene );
-			currentRenderState.init();
+			currentRenderState.init( camera );
 
 			renderStateStack.push( currentRenderState );
 
@@ -29240,7 +29244,7 @@ class WebGLRenderer {
 			if ( scene.isScene === true ) scene.onBeforeRender( _this, scene, camera, _currentRenderTarget );
 
 			currentRenderState = renderStates.get( scene, renderStateStack.length );
-			currentRenderState.init();
+			currentRenderState.init( camera );
 
 			renderStateStack.push( currentRenderState );
 
@@ -29358,6 +29362,8 @@ class WebGLRenderer {
 			if ( renderStateStack.length > 0 ) {
 
 				currentRenderState = renderStateStack[ renderStateStack.length - 1 ];
+
+				if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, currentRenderState.state.camera );
 
 			} else {
 
