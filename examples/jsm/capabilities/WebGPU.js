@@ -4,28 +4,31 @@ if ( self.GPUShaderStage === undefined ) {
 
 }
 
-// statics
-
 let isAvailable = navigator.gpu !== undefined;
-
-
-if ( typeof window !== 'undefined' && isAvailable ) {
-
-	isAvailable = await navigator.gpu.requestAdapter();
-
-}
 
 class WebGPU {
 
 	static isAvailable() {
 
-		return Boolean( isAvailable );
+		return isAvailable;
 
 	}
 
-	static getStaticAdapter() {
+	static async getStaticAdapter () {
 
-		return isAvailable;
+		if ( navigator.gpu ) {
+
+			const adapter = await navigator.gpu.requestAdapter();
+
+			if ( !adapter ) {
+
+				isAvailable = false;
+
+			}
+
+			return adapter;
+
+		}
 
 	}
 
