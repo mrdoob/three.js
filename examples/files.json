@@ -317,6 +317,7 @@
 		"webgl2_volume_perlin"
 	],
 	"webgpu (wip)": [
+		"webgpu_materials_physical_transmission",
 		"webgpu_backdrop",
 		"webgpu_backdrop_area",
 		"webgpu_backdrop_water",

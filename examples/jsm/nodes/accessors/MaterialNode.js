@@ -258,6 +258,10 @@ class MaterialNode extends Node {
 
 			}
 
+		} else if ( scope === MaterialNode.IOR ) {
+
+			node = this.getFloat( scope );
+
 		} else {
 
 			const outputType = this.getNodeType( builder );
@@ -276,7 +280,9 @@ MaterialNode.ALPHA_TEST = 'alphaTest';
 MaterialNode.COLOR = 'color';
 MaterialNode.OPACITY = 'opacity';
 MaterialNode.SHININESS = 'shininess';
-MaterialNode.SPECULAR_COLOR = 'specular';
+MaterialNode.SPECULAR = 'specular';
+MaterialNode.SPECULAR_COLOR = 'specularColor';
+MaterialNode.SPECULAR_INTENSITY = 'specularIntensity';
 MaterialNode.SPECULAR_STRENGTH = 'specularStrength';
 MaterialNode.REFLECTIVITY = 'reflectivity';
 MaterialNode.ROUGHNESS = 'roughness';
@@ -299,6 +305,7 @@ MaterialNode.LINE_GAP_SIZE = 'gapSize';
 MaterialNode.LINE_WIDTH = 'linewidth';
 MaterialNode.LINE_DASH_OFFSET = 'dashOffset';
 MaterialNode.POINT_WIDTH = 'pointWidth';
+MaterialNode.IOR = 'ior';
 
 export default MaterialNode;
 
@@ -307,7 +314,9 @@ export const materialColor = nodeImmutable( MaterialNode, MaterialNode.COLOR );
 export const materialShininess = nodeImmutable( MaterialNode, MaterialNode.SHININESS );
 export const materialEmissive = nodeImmutable( MaterialNode, MaterialNode.EMISSIVE );
 export const materialOpacity = nodeImmutable( MaterialNode, MaterialNode.OPACITY );
-export const materialSpecularColor = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_COLOR );
+export const materialSpecularColor = nodeImmutable( MaterialNode, MaterialNode.SPECULAR );
+export const materialSpecularPhysicColor = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_COLOR );
+export const materialSpecularIntensity = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_INTENSITY );
 export const materialSpecularStrength = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_STRENGTH );
 export const materialReflectivity = nodeImmutable( MaterialNode, MaterialNode.REFLECTIVITY );
 export const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
@@ -329,6 +338,7 @@ export const materialLineGapSize = nodeImmutable( MaterialNode, MaterialNode.LIN
 export const materialLineWidth = nodeImmutable( MaterialNode, MaterialNode.LINE_WIDTH );
 export const materialLineDashOffset = nodeImmutable( MaterialNode, MaterialNode.LINE_DASH_OFFSET );
 export const materialPointWidth = nodeImmutable( MaterialNode, MaterialNode.POINT_WIDTH );
+export const materialIOR = nodeImmutable( MaterialNode, MaterialNode.IOR );
 export const materialAnisotropyVector = uniform( new Vector2() ).onReference( function ( frame ) {
 
 	return frame.material;

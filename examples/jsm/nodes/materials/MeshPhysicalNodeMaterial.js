@@ -1,9 +1,10 @@
 import { addNodeMaterial } from './NodeMaterial.js';
 import { transformedClearcoatNormalView } from '../accessors/NormalNode.js';
-import { roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, anisotropy, alphaT, anisotropyT, anisotropyB } from '../core/PropertyNode.js';
-import { materialAnisotropy, materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness } from '../accessors/MaterialNode.js';
-import { float, vec2, vec3, If } from '../shadernode/ShaderNode.js';
+import { roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, anisotropy, alphaT, anisotropyT, anisotropyB, specularColor, metalness, diffuseColor, ior } from '../core/PropertyNode.js';
+import { materialAnisotropy, materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialIOR, materialSpecularIntensity, materialSpecularPhysicColor } from '../accessors/MaterialNode.js';
+import { float, vec2, vec3, If, color } from '../shadernode/ShaderNode.js';
 import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
+import { min, mix, pow2 } from '../math/MathNode.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
 
@@ -40,6 +41,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		this.anisotropyNode = null;
 
+		this.iorNode = null;
+
 		this.setDefaultValues( defaultValues );
 
 		this.setValues( parameters );
@@ -67,6 +70,12 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	get useAnisotropy() {
 
 		return this.anisotropy > 0 || this.anisotropyNode !== null;
+
+	}
+
+	get useIOR() {
+
+		return this.ior > 1 || this.iorNode !== null;
 
 	}
 
@@ -145,6 +154,18 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		}
 
+		if ( this.useIOR ) {
+
+			const specularColorPhysicColorNode = this.materialSpecularPhysicColorNode ? color( this.materialSpecularPhysicColorNode ) : materialSpecularPhysicColor;
+			const iorNode = this.iorNode ? float( this.iorNode ) : materialIOR;
+			ior.assign( iorNode );
+
+			const specularColorNode = mix( min( pow2( iorNode.sub( 1.0 ).div( iorNode.add( 1.0 ) ) ).mul( specularColorPhysicColorNode ), vec3( 1 ) ).mul( materialSpecularIntensity ), diffuseColor.rgb, metalness );
+
+			specularColor.assign( specularColorNode );
+
+		}
+
 	}
 
 	setupNormal( builder ) {
@@ -181,6 +202,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.attenuationColorNode = source.attenuationColorNode;
 
 		this.anisotropyNode = source.anisotropyNode;
+
+		this.iorNode = source.iorNode;
 
 		return super.copy( source );
 
