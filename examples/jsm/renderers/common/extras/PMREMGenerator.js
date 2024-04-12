@@ -20,7 +20,6 @@ import {
 	CubeRefractionMapping,
 	CubeUVReflectionMapping,
 	LinearFilter,
-	NoToneMapping,
 	NoBlending,
 	RGBAFormat,
 	HalfFloatType,
@@ -338,10 +337,9 @@ class PMREMGenerator {
 		const renderer = this._renderer;
 
 		const originalAutoClear = renderer.autoClear;
-		const toneMapping = renderer.toneMapping;
+
 		renderer.getClearColor( _clearColor );
 
-		renderer.toneMapping = NoToneMapping;
 		renderer.autoClear = false;
 
 		let backgroundBox = this._backgroundBox;
@@ -418,7 +416,6 @@ class PMREMGenerator {
 
 		}
 
-		renderer.toneMapping = toneMapping;
 		renderer.autoClear = originalAutoClear;
 		scene.background = background;
 
@@ -709,8 +706,6 @@ function _setViewport( target, x, y, width, height ) {
 function _getMaterial() {
 
 	const material = new NodeMaterial();
-	material.colorSpaced = false;
-	material.toneMapped = false;
 	material.depthTest = false;
 	material.depthWrite = false;
 	material.blending = NoBlending;

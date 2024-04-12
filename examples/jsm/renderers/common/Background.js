@@ -1,6 +1,6 @@
 import DataMap from './DataMap.js';
 import Color4 from './Color4.js';
-import { Mesh, SphereGeometry, BackSide } from 'three';
+import { Mesh, SphereGeometry, BackSide, LinearSRGBColorSpace } from 'three';
 import { vec4, context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection } from '../../nodes/Nodes.js';
 
 const _clearColor = new Color4();
@@ -27,14 +27,14 @@ class Background extends DataMap {
 
 			// no background settings, use clear color configuration from the renderer
 
-			renderer._clearColor.getRGB( _clearColor, this.renderer.currentColorSpace );
+			renderer._clearColor.getRGB( _clearColor, LinearSRGBColorSpace );
 			_clearColor.a = renderer._clearColor.a;
 
 		} else if ( background.isColor === true ) {
 
 			// background is an opaque color
 
-			background.getRGB( _clearColor, this.renderer.currentColorSpace );
+			background.getRGB( _clearColor, LinearSRGBColorSpace );
 			_clearColor.a = 1;
 
 			forceClear = true;
