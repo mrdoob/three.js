@@ -480,44 +480,44 @@ class Octree {
 
 			if ( obj.isMesh === true ) {
 
-			    if ( this.layers.test( obj.layers ) ) {
+				if ( this.layers.test( obj.layers ) ) {
 
-				let geometry, isTemp = false;
+					let geometry, isTemp = false;
 
-				if ( obj.geometry.index !== null ) {
+					if ( obj.geometry.index !== null ) {
 
-					isTemp = true;
-					geometry = obj.geometry.toNonIndexed();
+						isTemp = true;
+						geometry = obj.geometry.toNonIndexed();
 
-				} else {
+					} else {
 
-					geometry = obj.geometry;
+						geometry = obj.geometry;
+
+					}
+
+					const positionAttribute = geometry.getAttribute( 'position' );
+
+					for ( let i = 0; i < positionAttribute.count; i += 3 ) {
+
+						const v1 = new Vector3().fromBufferAttribute( positionAttribute, i );
+						const v2 = new Vector3().fromBufferAttribute( positionAttribute, i + 1 );
+						const v3 = new Vector3().fromBufferAttribute( positionAttribute, i + 2 );
+
+						v1.applyMatrix4( obj.matrixWorld );
+						v2.applyMatrix4( obj.matrixWorld );
+						v3.applyMatrix4( obj.matrixWorld );
+
+						this.addTriangle( new Triangle( v1, v2, v3 ) );
+
+					}
+
+					if ( isTemp ) {
+
+						geometry.dispose();
+
+					}
 
 				}
-
-				const positionAttribute = geometry.getAttribute( 'position' );
-
-				for ( let i = 0; i < positionAttribute.count; i += 3 ) {
-
-					const v1 = new Vector3().fromBufferAttribute( positionAttribute, i );
-					const v2 = new Vector3().fromBufferAttribute( positionAttribute, i + 1 );
-					const v3 = new Vector3().fromBufferAttribute( positionAttribute, i + 2 );
-
-					v1.applyMatrix4( obj.matrixWorld );
-					v2.applyMatrix4( obj.matrixWorld );
-					v3.applyMatrix4( obj.matrixWorld );
-
-					this.addTriangle( new Triangle( v1, v2, v3 ) );
-
-				}
-
-				if ( isTemp ) {
-
-					geometry.dispose();
-
-				}
-
-			    }
 
 			}
 
