@@ -24,7 +24,7 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 		const nodeSnippet = this.node.build( builder );
 		const indexSnippet = this.indexNode.build( builder, 'uint' );
 
-		return `${nodeSnippet}[ ${indexSnippet} ]`;
+		return builder.formatOperation( '[]', nodeSnippet, indexSnippet );
 
 	}
 

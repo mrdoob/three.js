@@ -7,6 +7,7 @@ import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
 import ParameterNode from './ParameterNode.js';
 import FunctionNode from '../code/FunctionNode.js';
+import CodeNode from '../code/CodeNode.js';
 import { createNodeMaterialFromType, default as NodeMaterial } from '../materials/NodeMaterial.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
@@ -265,12 +266,6 @@ class NodeBuilder {
 
 	}
 
-	getMethod( method ) {
-
-		return method;
-
-	}
-
 	getNodeFromHash( hash ) {
 
 		return this.hashNodes[ hash ];
@@ -374,7 +369,6 @@ class NodeBuilder {
 		if ( type === 'int' ) return `${ Math.round( value ) }`;
 		if ( type === 'uint' ) return value >= 0 ? `${ Math.round( value ) }u` : '0u';
 		if ( type === 'bool' ) return value ? 'true' : 'false';
-		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${ toFloat( value.r ) }, ${ toFloat( value.g ) }, ${ toFloat( value.b ) } )`;
 
 		const typeLength = this.getTypeLength( type );
 
@@ -382,25 +376,17 @@ class NodeBuilder {
 
 		const generateConst = value => this.generateConst( componentType, value );
 
-		if ( typeLength === 2 ) {
+		if ( typeLength >= 2 && typeLength <= 4 ) {
 
-			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) } )`;
-
-		} else if ( typeLength === 3 ) {
-
-			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) }, ${ generateConst( value.z ) } )`;
-
-		} else if ( typeLength === 4 ) {
-
-			return `${ this.getType( type ) }( ${ generateConst( value.x ) }, ${ generateConst( value.y ) }, ${ generateConst( value.z ) }, ${ generateConst( value.w ) } )`;
+			return this.formatOperation( '()', this.getType( type ), [ ...value ].map( generateConst ) );
 
 		} else if ( typeLength > 4 && value && ( value.isMatrix3 || value.isMatrix4 ) ) {
 
-			return `${ this.getType( type ) }( ${ value.elements.map( generateConst ).join( ', ' ) } )`;
+			return this.formatOperation( '()', this.getType( type ), value.elements.map( generateConst ) );
 
 		} else if ( typeLength > 4 ) {
 
-			return `${ this.getType( type ) }()`;
+			return this.formatOperation( '()', this.getType( type ) );
 
 		}
 
@@ -599,6 +585,42 @@ class NodeBuilder {
 		if ( componentType === 'int' || componentType === 'uint' ) return type;
 
 		return this.changeComponentType( type, 'int' );
+
+	}
+
+	_getPolyfills() {
+
+		return {};
+
+	}
+
+	_resolvePolyfill( name, type = null ) {
+
+		return this._getPolyfills()[ name + '_' + type ] ? `threejs_${ name }_${ type }` : `threejs_${ name }`;
+
+	}
+
+	_include( name, type = null ) {
+
+		const polyfills = this._getPolyfills();
+
+		if ( typeof polyfills[ name ] === 'function' && type !== null && ! polyfills[ name + '_' + type ] ) { // auto-generate polyfill for the required type
+
+			polyfills[ name + '_' + type ] = new CodeNode( polyfills[ name ]( `threejs_${ name }_${ type }`, this.getType( type ) ) );
+
+		}
+
+		const codeNode = polyfills[ name + '_' + type ] || polyfills[ name ];
+
+		codeNode.build( this );
+
+		if ( this.currentFunctionNode !== null ) {
+
+			this.currentFunctionNode.includes.push( codeNode );
+
+		}
+
+		return codeNode;
 
 	}
 
@@ -935,12 +957,6 @@ class NodeBuilder {
 
 	}
 
-	getFunctionOperator() {
-
-		return null;
-
-	}
-
 	flowChildNode( node, output = null ) {
 
 		const previousFlow = this.flow;
@@ -1209,25 +1225,25 @@ class NodeBuilder {
 
 		if ( fromTypeLength === toTypeLength ) {
 
-			return `${ this.getType( toType ) }( ${ snippet } )`;
+			return this.formatOperation( '()', this.getType( toType ), snippet );
 
 		}
 
 		if ( fromTypeLength > toTypeLength ) {
 
-			return this.format( `${ snippet }.${ 'xyz'.slice( 0, toTypeLength ) }`, this.getTypeFromLength( toTypeLength, this.getComponentType( fromType ) ), toType );
+			return this.format( this.formatOperation( '.', snippet, 'xyz'.slice( 0, toTypeLength ) ), this.getTypeFromLength( toTypeLength, this.getComponentType( fromType ) ), toType );
 
 		}
 
 		if ( toTypeLength === 4 && fromTypeLength > 1 ) { // toType is vec4-like
 
-			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, 'vec3' ) }, 1.0 )`;
+			return this.formatOperation( '()', this.getType( toType ), [ this.format( snippet, fromType, 'vec3' ), '1.0' ] );
 
 		}
 
 		if ( fromTypeLength === 2 ) { // fromType is vec2-like and toType is vec3-like
 
-			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, 'vec2' ) }, 0.0 )`;
+			return this.formatOperation( '()', this.getType( toType ), [ this.format( snippet, fromType, 'vec2' ), '0.0' ] );
 
 		}
 
@@ -1236,11 +1252,251 @@ class NodeBuilder {
 			// convert a number value to vector type, e.g:
 			// vec3( 1u ) -> vec3( float( 1u ) )
 
-			snippet = `${ this.getType( this.getComponentType( toType ) ) }( ${ snippet } )`;
+			snippet = this.formatOperation( '()', this.getType( this.getComponentType( toType ) ), snippet );
 
 		}
 
-		return `${ this.getType( toType ) }( ${ snippet } )`; // fromType is float-like
+		return this.formatOperation( '()', this.getType( toType ), snippet ); // fromType is float-like
+
+	}
+
+	_parseTopLevel( str ) {
+
+		const operators = [ ',', '.', '~', '!', '++', '--', '+', '-', '*', '/', '%', '<<', '>>', '<', '>', '<=', '>=', '==', '!=', '&', '^', '|', '&&', '^^', '||' ];
+
+		const list = [];
+		let level = 0;
+
+		for ( let i = 0; i < str.length; i ++ ) {
+
+			let opData = null;
+
+			if ( str[ i ] === '(' || str[ i ] === '[' ) {
+
+				level ++;
+
+			} else if ( str[ i ] === ')' || str[ i ] === ']' ) {
+
+				level --;
+
+			} else if ( level === 0 && operators.includes( str[ i ] + str[ i + 1 ] ) ) {
+
+				opData = { start: i, end: i + 2, op: str[ i ] + str[ i + 1 ] };
+				i ++;
+
+			} else if ( level === 0 && operators.includes( str[ i ] ) ) {
+
+				opData = { start: i, end: i + 1, op: str[ i ] };
+
+			}
+
+			if ( opData === null ) continue;
+
+			// not an operator, a part of type
+			// @TODO: move this to WGSLNodeBuilder?
+			if ( opData.op === '<' && [ 'f32', 'i32', 'u32', 'bool' ].includes( str.slice( opData.start + 1, str.indexOf( '>', opData.start ) ) ) ) continue;
+			if ( opData.op === '>' && [ 'f32', 'i32', 'u32', 'bool' ].includes( str.slice( str.lastIndexOf( '<', opData.start ) + 1, opData.start ) ) ) continue;
+
+			const lastEnd = list.length > 0 ? list[ list.length - 1 ].end : 0;
+			const arg = str.slice( lastEnd, opData.start );
+			const argNonEmpty = [ ...arg ].some( x => x !== ' ' );
+
+			if ( argNonEmpty === true ) {
+
+				list.push( { start: lastEnd, end: opData.start, arg } );
+
+			} else {
+
+				// if we have two operators in row (or one directly in the start) and the previous one is not unary, mark this one as unary
+				if ( list.length === 0 || ! list[ list.length - 1 ].unary ) opData.unary = true;
+
+			}
+
+			if ( opData.op === '++' || opData.op === '--' ) {
+
+				opData.unary = true;
+
+				if ( argNonEmpty ) opData.postfix = true;
+				else opData.prefix = true;
+
+			}
+
+			list.push( opData );
+
+		}
+
+		const lastEnd = list.length > 0 ? list[ list.length - 1 ].end : 0;
+		const arg = str.slice( lastEnd );
+		if ( [ ...arg ].some( x => x !== ' ' ) ) list.push( { start: lastEnd, end: str.length, arg } );
+
+		return list;
+
+	}
+
+	_getOperators() {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	formatOperation( op, arg1, arg2, output = null ) {
+
+		const languageOperators = this._getOperators(); // @TODO: make this just a static property
+
+		if ( op === '()' && languageOperators.replace[ arg1 + '()' ] !== undefined ) { // change function
+
+			if ( ! languageOperators.replace[ arg1 + '()' ].endsWith( '()' ) ) { // function -> op
+
+				op = languageOperators.replace[ arg1 + '()' ];
+				arg1 = arg2;
+
+				const argParsed = this._parseTopLevel( arg1 );
+				const comma = argParsed.find( arg => arg.op === ',' );
+
+				if ( comma !== undefined ) {
+
+					arg2 = arg1.slice( comma.end ).trimLeft();
+					arg1 = arg1.slice( 0, comma.start ).trimRight();
+
+				}
+
+			} else { // function -> function
+
+				arg1 = languageOperators.replace[ arg1 + '()' ].slice( 0, - 2 );
+
+			}
+
+		}
+
+		if ( languageOperators.replace[ op ] !== undefined ) { // change operator
+
+			if ( languageOperators.replace[ op ].endsWith( '()' ) ) { // op -> function
+
+				if ( output !== null && this.getTypeLength( output ) > 1 ) {
+
+					arg2 = [ arg1, arg2 ];
+					arg1 = languageOperators.replace[ op ].slice( 0, - 2 );
+					op = '()';
+
+				}
+
+			} else { // op -> op
+
+				op = languageOperators.replace[ op ];
+
+			}
+
+		}
+
+		if ( op === '()' && arg1.startsWith( 'threejs_' ) ) { // include function polyfill
+
+			this._include( arg1.slice( 'threejs_'.length ), output );
+			arg1 = this._resolvePolyfill( arg1.slice( 'threejs_'.length ), output );
+
+		}
+
+		if ( arg2 === undefined && ! op.startsWith( 'pre' ) && ! op.startsWith( 'post' ) ) op = 'un' + op;
+
+		const inversePrecedence = languageOperators.ops;
+
+		const precedence = {};
+		for ( let i = 0; i < inversePrecedence.length; i ++ ) {
+
+			for ( const op of inversePrecedence[ i ].ops ) {
+
+				precedence[ op ] = { prec: i, maxAllowed: inversePrecedence[ i ].maxPrec, allowEqual: inversePrecedence[ i ].allowSelf };
+
+			}
+
+		}
+
+		const operators = inversePrecedence.map( x => x.ops ).flat();
+
+		if ( ! operators.includes( op ) || op === ',' ) {
+
+			console.warn( `${ this.constructor.name }: Operator ${ op } is not supported.` );
+
+		}
+
+		if ( Array.isArray( arg2 ) ) arg2 = arg2.join( ', ' );
+
+		if ( op === '()' || op === '[]' ) {
+
+			if ( arg2 === undefined ) arg2 = '';
+			if ( arg2 !== '' ) arg2 = ` ${ arg2 } `;
+			return `${ arg1 }${ op[ 0 ] }${ arg2 }${ op[ 1 ] }`;
+
+		}
+
+		const arg1Parsed = this._parseTopLevel( arg1 );
+		const arg2Parsed = arg2 !== undefined ? this._parseTopLevel( arg2 ) : [];
+
+		if ( op === '=' && arg2.startsWith( arg1 ) ) {
+
+			const rhsOp = arg2Parsed.find( arg => !! arg.op && arg.start >= arg1.length );
+
+			if ( rhsOp === undefined ) { // dummy assignment
+
+				return '';
+
+			}
+
+			if ( rhsOp.op !== '<' && rhsOp.op !== '>' && operators.includes( rhsOp.op + '=' ) ) { // use assignment statement
+
+				op = rhsOp.op + '=';
+				let newArg2 = arg2.slice( rhsOp.end ).trimLeft();
+
+				if ( newArg2.startsWith( '(' ) && newArg2.endsWith( ')' ) // RHS' second argument could be wrapped in brackets
+					 && arg2Parsed.find( arg => arg.start >= rhsOp.end ).end === arg2.length ) { // the brackets are indeed outmost, remove them
+
+					newArg2 = newArg2.slice( 1, - 1 ).trim(); 
+
+				}
+
+				arg2 = newArg2;
+
+			}
+
+		}
+
+		const cannotAssociate = left => data => {
+
+			if ( ! data.op ) return false;
+
+			return precedence[ data.op ].prec > precedence[ op ].prec ||
+			       ( precedence[ data.op ].prec > precedence[ op ].maxAllowed && precedence[ data.op ].prec !== precedence[ op ].prec ) ||
+				   ( precedence[ data.op ].prec === precedence[ op ].prec && precedence[ op ].allowEqual === false ) ||
+				   ( precedence[ data.op ].prec === precedence[ op ].prec && left === false && // assuming left-to-right associativity for all binary operators
+				       ! ( ( ( data.op === op ) && [ '&&', '||', '^^', '&', '|', '^' ].includes( op ) ) || [ '+', '[]', '()' ].includes( op ) ) // operators that do allow RTL associativity with same-precedence operators
+										// TODO: if we could somehow determine whether * is used in context of mat * mat/vec or component-wise multiplication, we could use it in the second list (only in the second context)
+				   );
+
+		};
+
+		if ( arg1Parsed.some( cannotAssociate( true ) ) ) arg1 = `( ${ arg1 } )`;
+		if ( arg2Parsed.some( cannotAssociate( false ) ) ) arg2 = `( ${ arg2 } )`;
+
+		if ( op === '.' ) {
+
+			return `${ arg1 }.${ arg2 }`;
+
+		} else if ( op.startsWith( 'un' ) ) {
+
+			return `${ op.slice( 2 ) } ${ arg1 }`;
+
+		} else if ( op.startsWith( 'pre' ) ) {
+
+			return `${ op.slice( 3 ) } ${ arg1 }`;
+
+		} else if ( op.startsWith( 'post' ) ) {
+
+			return `${ arg1 } ${ op.slice( 4 ) }`;
+
+		} else {
+
+			return `${ arg1 } ${ op } ${ arg2 }`;
+
+		}
 
 	}
 

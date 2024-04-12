@@ -57,13 +57,9 @@ class MathNode extends TempNode {
 
 			return 'vec3';
 
-		} else if ( method === MathNode.ALL ) {
+		} else if ( method === MathNode.ALL || method === MathNode.ANY ) {
 
 			return 'bool';
-
-		} else if ( method === MathNode.EQUALS ) {
-
-			return builder.changeComponentType( this.aNode.getNodeType( builder ), 'bool' );
 
 		} else if ( method === MathNode.MOD ) {
 
@@ -114,7 +110,7 @@ class MathNode extends TempNode {
 
 		} else if ( method === MathNode.NEGATE ) {
 
-			return builder.format( '( - ' + a.build( builder, inputType ) + ' )', type, output );
+			return builder.format( builder.formatOperation( '-', a.build( builder, inputType ) ), type, output );
 
 		} else if ( method === MathNode.ONE_MINUS ) {
 
@@ -177,7 +173,7 @@ class MathNode extends TempNode {
 
 			}
 
-			return builder.format( `${ builder.getMethod( method, type ) }( ${params.join( ', ' )} )`, type, output );
+			return builder.format( builder.formatOperation( '()', method, params, type ), type, output );
 
 		}
 
@@ -205,7 +201,6 @@ class MathNode extends TempNode {
 
 MathNode.ALL = 'all';
 MathNode.ANY = 'any';
-MathNode.EQUALS = 'equals';
 
 MathNode.RADIANS = 'radians';
 MathNode.DEGREES = 'degrees';
@@ -270,7 +265,6 @@ export const PI2 = float( Math.PI * 2 );
 
 export const all = nodeProxy( MathNode, MathNode.ALL );
 export const any = nodeProxy( MathNode, MathNode.ANY );
-export const equals = nodeProxy( MathNode, MathNode.EQUALS );
 
 export const radians = nodeProxy( MathNode, MathNode.RADIANS );
 export const degrees = nodeProxy( MathNode, MathNode.DEGREES );
@@ -333,7 +327,6 @@ export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
 
 addNodeElement( 'all', all );
 addNodeElement( 'any', any );
-addNodeElement( 'equals', equals );
 
 addNodeElement( 'radians', radians );
 addNodeElement( 'degrees', degrees );

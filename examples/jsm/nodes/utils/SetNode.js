@@ -45,13 +45,13 @@ class SetNode extends TempNode {
 
 			} else {
 
-				snippetValues.push( sourceSnippet + '.' + component );
+				snippetValues.push( builder.formatOperation( '.', sourceSnippet, component ) );
 
 			}
 
 		}
 
-		return `${ builder.getType( sourceType ) }( ${ snippetValues.join( ', ' ) } )`;
+		return builder.formatOperation( '()', builder.getType( sourceType ), snippetValues.join( ', ' ) );
 
 	}
 
