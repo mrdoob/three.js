@@ -76,7 +76,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	get useIOR() {
 
-		return this.defines.PHYSICAL === '';
+		return this.defines.PHYSICAL !== false;
 
 	}
 
