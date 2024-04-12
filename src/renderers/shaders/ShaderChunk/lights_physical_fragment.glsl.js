@@ -13,32 +13,22 @@ material.roughness = min( material.roughness, 1.0 );
 
 	material.ior = ior;
 
-	#ifdef USE_SPECULAR
+	float specularIntensityFactor = specularIntensity;
+	vec3 specularColorFactor = specularColor;
 
-		float specularIntensityFactor = specularIntensity;
-		vec3 specularColorFactor = specularColor;
+	#ifdef USE_SPECULAR_COLORMAP
 
-		#ifdef USE_SPECULAR_COLORMAP
-
-			specularColorFactor *= texture2D( specularColorMap, vSpecularColorMapUv ).rgb;
-
-		#endif
-
-		#ifdef USE_SPECULAR_INTENSITYMAP
-
-			specularIntensityFactor *= texture2D( specularIntensityMap, vSpecularIntensityMapUv ).a;
-
-		#endif
-
-		material.specularF90 = mix( specularIntensityFactor, 1.0, metalnessFactor );
-
-	#else
-
-		float specularIntensityFactor = 1.0;
-		vec3 specularColorFactor = vec3( 1.0 );
-		material.specularF90 = 1.0;
+		specularColorFactor *= texture2D( specularColorMap, vSpecularColorMapUv ).rgb;
 
 	#endif
+
+	#ifdef USE_SPECULAR_INTENSITYMAP
+
+		specularIntensityFactor *= texture2D( specularIntensityMap, vSpecularIntensityMapUv ).a;
+
+	#endif
+
+	material.specularF90 = mix( specularIntensityFactor, 1.0, metalnessFactor );
 
 	material.specularColor = mix( min( pow2( ( material.ior - 1.0 ) / ( material.ior + 1.0 ) ) * specularColorFactor, vec3( 1.0 ) ) * specularIntensityFactor, diffuseColor.rgb, metalnessFactor );
 
