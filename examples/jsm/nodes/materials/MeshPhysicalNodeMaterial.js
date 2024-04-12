@@ -32,6 +32,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.iridescenceThicknessNode = null;
 
 		this.specularIntensityNode = null;
+		this.specularPhysicColorNode = null;
 		this.specularColorNode = null;
 
 		this.transmissionNode = null;
@@ -156,7 +157,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		if ( this.useIOR ) {
 
-			const specularColorPhysicColorNode = this.materialSpecularPhysicColorNode ? color( this.materialSpecularPhysicColorNode ) : materialSpecularPhysicColor;
+			const specularColorPhysicColorNode = this.specularPhysicColorNode ? color( this.specularPhysicColorNode ) : materialSpecularPhysicColor;
 			const iorNode = this.iorNode ? float( this.iorNode ) : materialIOR;
 			ior.assign( iorNode );
 
@@ -194,6 +195,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.iridescenceThicknessNode = source.iridescenceThicknessNode;
 
 		this.specularIntensityNode = source.specularIntensityNode;
+		this.specularPhysicColorNode = source.specularPhysicColorNode;
 		this.specularColorNode = source.specularColorNode;
 
 		this.transmissionNode = source.transmissionNode;
