@@ -2,7 +2,7 @@ import { addNodeMaterial } from './NodeMaterial.js';
 import { transformedClearcoatNormalView } from '../accessors/NormalNode.js';
 import { roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, anisotropy, alphaT, anisotropyT, anisotropyB, specularColor, metalness, diffuseColor, ior } from '../core/PropertyNode.js';
 import { materialAnisotropy, materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialIOR, materialSpecularIntensity, materialSpecularPhysicColor } from '../accessors/MaterialNode.js';
-import { float, vec2, vec3, If, color } from '../shadernode/ShaderNode.js';
+import { float, vec2, vec3, If } from '../shadernode/ShaderNode.js';
 import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
 import { min, mix, pow2 } from '../math/MathNode.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
@@ -157,7 +157,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		if ( this.useIOR ) {
 
-			const specularColorPhysicColorNode = this.specularPhysicColorNode ? color( this.specularPhysicColorNode ) : materialSpecularPhysicColor;
+			const specularColorPhysicColorNode = this.specularPhysicColorNode ? vec3( this.specularPhysicColorNode ) : materialSpecularPhysicColor;
 			const iorNode = this.iorNode ? float( this.iorNode ) : materialIOR;
 			ior.assign( iorNode );
 
