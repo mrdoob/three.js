@@ -300,6 +300,10 @@ class MaterialNode extends Node {
 
 			}
 
+		} else if ( scope === MaterialNode.IOR ) {
+
+			node = this.getFloat( scope );
+
 		} else {
 
 			const outputType = this.getNodeType( builder );
@@ -337,6 +341,7 @@ MaterialNode.ANISOTROPY = 'anisotropy';
 MaterialNode.IRIDESCENCE = 'iridescence';
 MaterialNode.IRIDESCENCE_IOR = 'iridescenceIOR';
 MaterialNode.IRIDESCENCE_THICKNESS = 'iridescenceThickness';
+MaterialNode.IOR = 'ior';
 MaterialNode.TRANSMISSION = 'transmission';
 MaterialNode.THICKNESS = 'thickness';
 MaterialNode.ATTENUATION_DISTANCE = 'attenuationDistance';
@@ -377,8 +382,9 @@ export const materialIridescenceIOR = nodeImmutable( MaterialNode, MaterialNode.
 export const materialIridescenceThickness = nodeImmutable( MaterialNode, MaterialNode.IRIDESCENCE_THICKNESS );
 export const materialTransmission = nodeImmutable( MaterialNode, MaterialNode.TRANSMISSION );
 export const materialThickness = nodeImmutable( MaterialNode, MaterialNode.THICKNESS );
-export const attenuationDistance = nodeImmutable( MaterialNode, MaterialNode.ATTENUATION_DISTANCE );
-export const attenuationColor = nodeImmutable( MaterialNode, MaterialNode.ATTENUATION_COLOR );
+export const materialIOR = nodeImmutable( MaterialNode, MaterialNode.IOR );
+export const materialAttenuationDistance = nodeImmutable( MaterialNode, MaterialNode.ATTENUATION_DISTANCE );
+export const materialAttenuationColor = nodeImmutable( MaterialNode, MaterialNode.ATTENUATION_COLOR );
 export const materialLineScale = nodeImmutable( MaterialNode, MaterialNode.LINE_SCALE );
 export const materialLineDashSize = nodeImmutable( MaterialNode, MaterialNode.LINE_DASH_SIZE );
 export const materialLineGapSize = nodeImmutable( MaterialNode, MaterialNode.LINE_GAP_SIZE );

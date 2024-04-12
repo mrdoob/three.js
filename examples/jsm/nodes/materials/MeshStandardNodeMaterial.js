@@ -35,7 +35,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	}
 
-	setupSpecularColor() {
+	setupSpecular() {
 
 		const specularColorNode = mix( vec3( 0.04 ), diffuseColor.rgb, metalness );
 
@@ -60,7 +60,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 		// SPECULAR COLOR
 
-		this.setupSpecularColor();
+		this.setupSpecular();
 
 		// DIFFUSE COLOR
 

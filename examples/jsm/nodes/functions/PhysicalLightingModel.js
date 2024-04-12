@@ -6,7 +6,7 @@ import F_Schlick from './BSDF/F_Schlick.js';
 import Schlick_to_F0 from './BSDF/Schlick_to_F0.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
 import LightingModel from '../core/LightingModel.js';
-import { diffuseColor, specularColor, specularF90, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness } from '../core/PropertyNode.js';
+import { diffuseColor, specularColor, specularF90, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor } from '../core/PropertyNode.js';
 import { transformedNormalView, transformedClearcoatNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
 import { positionViewDirection, positionWorld } from '../accessors/PositionNode.js';
 import { tslFn, float, vec2, vec3, vec4, mat3, If } from '../shadernode/ShaderNode.js';
@@ -15,12 +15,8 @@ import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } fr
 import { div } from '../math/OperatorNode.js';
 import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../accessors/CameraNode.js';
 import { modelWorldMatrix } from '../accessors/ModelNode.js';
-import { materialReference } from '../accessors/MaterialReferenceNode.js';
 import { viewportResolution } from '../display/ViewportNode.js';
 import { viewportMipTexture } from '../display/ViewportTextureNode.js';
-import { materialThickness, materialTransmission } from '../accessors/MaterialNode.js';
-
-const materialIOR = materialReference( 'ior', 'float' );
 
 //
 // Transmission
@@ -369,15 +365,15 @@ class PhysicalLightingModel extends LightingModel {
 				modelWorldMatrix, // modelMatrix
 				cameraViewMatrix, // viewMatrix
 				cameraProjectionMatrix, // projMatrix
-				materialIOR, // ior
-				materialThickness, // thickness
-				materialReference( 'attenuationColor', 'color' ), // attenuationColor
-				materialReference( 'attenuationDistance', 'float' ) // attenuationDistance
+				ior,
+				thickness,
+				attenuationColor,
+				attenuationDistance
 			);
 
-			context.backdropAlpha = materialTransmission;
+			context.backdropAlpha = transmission;
 
-			diffuseColor.a.mulAssign( mix( 1, context.backdrop.a, materialTransmission ) );
+			diffuseColor.a.mulAssign( mix( 1, context.backdrop.a, transmission ) );
 
 		}
 
