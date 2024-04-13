@@ -37,6 +37,7 @@
 			import * as GeometryUtils from 'three/addons/utils/GeometryUtils.js';
 
 			let line, renderer, scene, camera, camera2, controls;
+			let map;
 			let line1;
 			let matLine, matLineBasic, matLineDashed;
 			let stats, gpuPanel;
@@ -69,6 +70,18 @@
 				controls.enableDamping = true;
 				controls.minDistance = 10;
 				controls.maxDistance = 500;
+
+				const textureLoader = new THREE.TextureLoader();
+
+				const onLoad = ( texture ) => {
+
+					texture.colorSpace = 'srgb';
+					texture.magFilter = THREE.NearestFilter;
+					texture.minFilter = THREE.NearestFilter;
+
+				};
+
+				map = textureLoader.load( 'textures/lines/blue_white_blue.jpg', onLoad );
 
 
 				// Position and THREE.Color Data
@@ -223,7 +236,8 @@
 					'alphaToCoverage': true,
 					'dashed': false,
 					'dash scale': 1,
-					'dash / gap': 1
+					'dash / gap': 1,
+					'map': false,
 				};
 
 				gui.add( param, 'line type', { 'LineGeometry': 0, 'gl.LINE': 1 } ).onChange( function ( val ) {
@@ -245,6 +259,13 @@
 							break;
 
 					}
+
+				} );
+
+				gui.add( param, 'map' ).onChange( function ( val ) {
+
+					matLine.map = val ? map : null;
+					matLine.needsUpdate = true;
 
 				} );
 
