@@ -14762,9 +14762,8 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 	let currentBackgroundVersion = 0;
 	let currentTonemapping = null;
 
-	function render( renderList, scene ) {
+	function getBackground( scene ) {
 
-		let forceClear = false;
 		let background = scene.isScene === true ? scene.background : null;
 
 		if ( background && background.isTexture ) {
@@ -14773,6 +14772,15 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 			background = ( usePMREM ? cubeuvmaps : cubemaps ).get( background );
 
 		}
+
+		return background;
+
+	}
+
+	function render( scene ) {
+
+		let forceClear = false;
+		const background = getBackground( scene );
 
 		if ( background === null ) {
 
@@ -14802,6 +14810,12 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 			renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
 
 		}
+
+	}
+
+	function addToRenderList( renderList, scene ) {
+
+		const background = getBackground( scene );
 
 		if ( background && ( background.isCubeTexture || background.mapping === CubeUVReflectionMapping ) ) {
 
@@ -14983,7 +14997,8 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 			setClear( clearColor, clearAlpha );
 
 		},
-		render: render
+		render: render,
+		addToRenderList: addToRenderList
 
 	};
 
@@ -29267,6 +29282,13 @@ class WebGLRenderer {
 
 			}
 
+			const renderBackground = xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false;
+			if ( renderBackground ) {
+
+				background.addToRenderList( currentRenderList, scene );
+
+			}
+
 			//
 
 			this.info.render.frame ++;
@@ -29282,15 +29304,6 @@ class WebGLRenderer {
 			//
 
 			if ( this.info.autoReset === true ) this.info.reset();
-
-
-			//
-
-			if ( xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false ) {
-
-				background.render( currentRenderList, scene );
-
-			}
 
 			// render scene
 
@@ -29315,6 +29328,8 @@ class WebGLRenderer {
 
 				}
 
+				if ( renderBackground ) background.render( scene );
+
 				for ( let i = 0, l = cameras.length; i < l; i ++ ) {
 
 					const camera2 = cameras[ i ];
@@ -29326,6 +29341,8 @@ class WebGLRenderer {
 			} else {
 
 				if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
+
+				if ( renderBackground ) background.render( scene );
 
 				renderScene( currentRenderList, scene, camera );
 
