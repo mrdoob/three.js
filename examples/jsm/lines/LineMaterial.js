@@ -23,6 +23,7 @@ import {
 UniformsLib.line = {
 
 	worldUnits: { value: 1 },
+	map: { value: null },
 	linewidth: { value: 1 },
 	resolution: { value: new Vector2( 1, 1 ) },
 	dashOffset: { value: 0 },
@@ -64,6 +65,10 @@ ShaderLib[ 'line' ] = {
 			varying vec3 worldEnd;
 
 			#ifdef USE_DASH
+
+				varying vec2 vUv;
+
+			#elif defined( USE_MAP )
 
 				varying vec2 vUv;
 
@@ -126,6 +131,12 @@ ShaderLib[ 'line' ] = {
 				worldEnd = end.xyz;
 
 			#else
+
+				vUv = uv;
+
+			#endif
+
+			#ifdef USE_MAP
 
 				vUv = uv;
 
@@ -260,6 +271,12 @@ ShaderLib[ 'line' ] = {
 		uniform float opacity;
 		uniform float linewidth;
 
+		#ifdef USE_MAP
+
+			uniform sampler2D map;
+
+		#endif
+
 		#ifdef USE_DASH
 
 			uniform float dashOffset;
@@ -277,6 +294,10 @@ ShaderLib[ 'line' ] = {
 			varying vec3 worldEnd;
 
 			#ifdef USE_DASH
+
+				varying vec2 vUv;
+
+			#elif defined( USE_MAP )
 
 				varying vec2 vUv;
 
@@ -408,6 +429,14 @@ ShaderLib[ 'line' ] = {
 
 			gl_FragColor = vec4( diffuseColor.rgb, alpha );
 
+			#ifdef USE_MAP
+
+				// The UV coord are not in the [0, 1] range and need transformation
+				vec4 mapColor = texture2D( map, vec2( ( vUv.x + 1.0 ) * 0.5, 0.0 )  );
+				gl_FragColor = vec4( gl_FragColor.rgb * mapColor.rgb, gl_FragColor.a * mapColor.a );
+
+			#endif
+
 			#include <tonemapping_fragment>
 			#include <colorspace_fragment>
 			#include <fog_fragment>
@@ -437,6 +466,28 @@ class LineMaterial extends ShaderMaterial {
 		this.isLineMaterial = true;
 
 		this.setValues( parameters );
+
+	}
+
+	get map() {
+
+		return this.uniforms.map.value;
+
+	}
+
+	set map( value ) {
+
+		this.uniforms.map.value = value;
+
+		if ( value ) {
+
+			this.defines.USE_MAP = '';
+
+		} else {
+
+			delete this.defines.USE_MAP;
+
+		}
 
 	}
 
