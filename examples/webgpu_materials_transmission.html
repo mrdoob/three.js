@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>threejs webgl - materials - transmission</title>
+		<title>threejs webgpu - materials - transmission</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Transmission</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> webgpu - transmission</div>
 
 		<script type="importmap">
 			{
@@ -27,6 +27,8 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			const params = {
 				color: 0xffffff,
@@ -60,10 +62,10 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
+				renderer.setAnimationLoop( render );
 				document.body.appendChild( renderer.domElement );
 
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -111,7 +113,6 @@
 				//
 
 				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 10;
 				controls.maxDistance = 150;
 
@@ -125,7 +126,6 @@
 					.onChange( function () {
 
 						material.color.set( params.color );
-						render();
 
 					} );
 
@@ -133,7 +133,6 @@
 					.onChange( function () {
 
 						material.transmission = params.transmission;
-						render();
 
 					} );
 
@@ -141,7 +140,6 @@
 					.onChange( function () {
 
 						material.opacity = params.opacity;
-						render();
 
 					} );
 
@@ -149,7 +147,6 @@
 					.onChange( function () {
 
 						material.metalness = params.metalness;
-						render();
 
 					} );
 
@@ -157,7 +154,6 @@
 					.onChange( function () {
 
 						material.roughness = params.roughness;
-						render();
 
 					} );
 
@@ -165,7 +161,6 @@
 					.onChange( function () {
 
 						material.ior = params.ior;
-						render();
 
 					} );
 
@@ -173,7 +168,6 @@
 					.onChange( function () {
 
 						material.thickness = params.thickness;
-						render();
 
 					} );
 
@@ -181,7 +175,6 @@
 					.onChange( function () {
 
 						material.specularIntensity = params.specularIntensity;
-						render();
 
 					} );
 
@@ -189,7 +182,6 @@
 					.onChange( function () {
 
 						material.specularColor.set( params.specularColor );
-						render();
 
 					} );
 
@@ -198,7 +190,6 @@
 					.onChange( function () {
 
 						material.envMapIntensity = params.envMapIntensity;
-						render();
 
 					} );
 
@@ -206,7 +197,6 @@
 					.onChange( function () {
 
 						renderer.toneMappingExposure = params.exposure;
-						render();
 
 					} );
 
@@ -223,8 +213,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-
-				render();
 
 			}
 
@@ -246,7 +234,7 @@
 
 			function render() {
 
-				renderer.render( scene, camera );
+				renderer.renderAsync( scene, camera );
 
 			}
 

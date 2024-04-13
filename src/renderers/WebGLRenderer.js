@@ -915,7 +915,7 @@ class WebGLRenderer {
 			if ( targetScene === null ) targetScene = scene;
 
 			currentRenderState = renderStates.get( targetScene );
-			currentRenderState.init();
+			currentRenderState.init( camera );
 
 			renderStateStack.push( currentRenderState );
 
@@ -1132,7 +1132,7 @@ class WebGLRenderer {
 			if ( scene.isScene === true ) scene.onBeforeRender( _this, scene, camera, _currentRenderTarget );
 
 			currentRenderState = renderStates.get( scene, renderStateStack.length );
-			currentRenderState.init();
+			currentRenderState.init( camera );
 
 			renderStateStack.push( currentRenderState );
 
@@ -1157,6 +1157,13 @@ class WebGLRenderer {
 
 			}
 
+			const renderBackground = xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false;
+			if ( renderBackground ) {
+
+				background.addToRenderList( currentRenderList, scene );
+
+			}
+
 			//
 
 			this.info.render.frame ++;
@@ -1172,15 +1179,6 @@ class WebGLRenderer {
 			//
 
 			if ( this.info.autoReset === true ) this.info.reset();
-
-
-			//
-
-			if ( xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false ) {
-
-				background.render( currentRenderList, scene );
-
-			}
 
 			// render scene
 
@@ -1205,6 +1203,8 @@ class WebGLRenderer {
 
 				}
 
+				if ( renderBackground ) background.render( scene );
+
 				for ( let i = 0, l = cameras.length; i < l; i ++ ) {
 
 					const camera2 = cameras[ i ];
@@ -1216,6 +1216,8 @@ class WebGLRenderer {
 			} else {
 
 				if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
+
+				if ( renderBackground ) background.render( scene );
 
 				renderScene( currentRenderList, scene, camera );
 
@@ -1250,6 +1252,8 @@ class WebGLRenderer {
 			if ( renderStateStack.length > 0 ) {
 
 				currentRenderState = renderStateStack[ renderStateStack.length - 1 ];
+
+				if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, currentRenderState.state.camera );
 
 			} else {
 
