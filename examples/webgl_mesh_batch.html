@@ -61,6 +61,7 @@
 
 		const api = {
 			method: Method.BATCHED,
+			instances: 0,
 			count: 256,
 			dynamic: 16,
 
@@ -179,6 +180,7 @@
 
 		function initBatchedMesh() {
 
+			const instanceCount = api.instances;
 			const geometryCount = api.count;
 			const vertexCount = api.count * 512;
 			const indexCount = api.count * 1024;
@@ -201,6 +203,12 @@
 				const rotationMatrix = new THREE.Matrix4();
 				rotationMatrix.makeRotationFromEuler( randomizeRotationSpeed( euler ) );
 				mesh.userData.rotationSpeeds.push( rotationMatrix );
+
+				if ( instanceCount > 0 ) {
+
+					mesh.setInstanceCountAt( id, instanceCount );
+
+				}
 
 				ids.push( id );
 
@@ -246,6 +254,7 @@
 			// gui
 
 			gui = new GUI();
+			gui.add( api, 'instances', 0, 1000 ).step( 1 ).onChange( initMesh );
 			gui.add( api, 'count', 1, MAX_GEOMETRY_COUNT ).step( 1 ).onChange( initMesh );
 			gui.add( api, 'dynamic', 0, MAX_GEOMETRY_COUNT ).step( 1 );
 			gui.add( api, 'method', Method ).onChange( initMesh );

@@ -191,6 +191,30 @@
 		用提供的几何图形替换 `index` 的几何图形。如果索引处没有为几何体保留足够的空间，则会引发错误。
 	</p>
 
+	<h3>
+		[method:Integer getInstanceCountAt]( [param:Integer index] )
+	</h3>
+	<p>
+		[page:Integer index]: The index of an instance. Values have to be in the
+		range [0, count].
+	</p>
+	<p>
+		Gets the instance count of the geometry at `index`. Returns `null` if instance counts are not configured.
+	</p>
+
+	<h3>
+		[method:Integer setInstanceCountAt]( [param:Integer index], [param:Integer instanceCount ] )
+	</h3>
+	<p>
+		[page:Integer index]: Which geometry index to configure an instance count for.
+	</p>
+	<p>
+		[page:Integer instanceCount]: The number of instances to render of the given geometry index.
+	</p>
+	<p>
+		Sets an instance count of the geometry at `index`.
+	</p>
+
 	<h2>源代码</h2>
 
 	<p>

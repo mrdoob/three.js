@@ -856,8 +856,7 @@ class WebGLRenderer {
 
 			if ( object.isBatchedMesh ) {
 
-				// TODO: implement this field in BatchedMesh or InstancedBatchedMesh
-				if ( object._multiDrawInstances !== undefined ) {
+				if ( object._multiDrawInstances !== null ) {
 
 					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
 
