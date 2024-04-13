@@ -1427,6 +1427,9 @@ class WebGLRenderer {
 					resolveStencilBuffer: false
 				} );
 
+				const renderTargetProperties = properties.get( currentRenderState.state.transmissionRenderTarget[ camera.id ] );
+				renderTargetProperties.__ignoreDepthValues = true;
+
 				// debug
 
 				/*
