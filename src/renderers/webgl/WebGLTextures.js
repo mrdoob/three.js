@@ -1833,109 +1833,126 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function updateMultisampleRenderTarget( renderTarget ) {
 
-		if ( ( renderTarget.samples > 0 ) && useMultisampledRTT( renderTarget ) === false ) {
+		if ( renderTarget.samples > 0 ) {
 
-			const textures = renderTarget.textures;
-			const width = renderTarget.width;
-			const height = renderTarget.height;
-			let mask = _gl.COLOR_BUFFER_BIT;
-			const invalidationArray = [];
-			const depthStyle = renderTarget.stencilBuffer ? _gl.DEPTH_STENCIL_ATTACHMENT : _gl.DEPTH_ATTACHMENT;
-			const renderTargetProperties = properties.get( renderTarget );
-			const isMultipleRenderTargets = ( textures.length > 1 );
+			if ( useMultisampledRTT( renderTarget ) === false ) {
 
-			// If MRT we need to remove FBO attachments
-			if ( isMultipleRenderTargets ) {
+				const textures = renderTarget.textures;
+				const width = renderTarget.width;
+				const height = renderTarget.height;
+				let mask = _gl.COLOR_BUFFER_BIT;
+				const invalidationArray = [];
+				const depthStyle = renderTarget.stencilBuffer ? _gl.DEPTH_STENCIL_ATTACHMENT : _gl.DEPTH_ATTACHMENT;
+				const renderTargetProperties = properties.get( renderTarget );
+				const isMultipleRenderTargets = ( textures.length > 1 );
+
+				// If MRT we need to remove FBO attachments
+				if ( isMultipleRenderTargets ) {
+
+					for ( let i = 0; i < textures.length; i ++ ) {
+
+						state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
+						_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.RENDERBUFFER, null );
+
+						state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+						_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.TEXTURE_2D, null, 0 );
+
+					}
+
+				}
+
+				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
+				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
 
 				for ( let i = 0; i < textures.length; i ++ ) {
 
-					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
-					_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.RENDERBUFFER, null );
+					invalidationArray.push( _gl.COLOR_ATTACHMENT0 + i );
 
-					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
-					_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.TEXTURE_2D, null, 0 );
+					if ( renderTarget.depthBuffer ) {
+
+						invalidationArray.push( depthStyle );
+
+					}
+
+					const ignoreDepthValues = ( renderTargetProperties.__ignoreDepthValues !== undefined ) ? renderTargetProperties.__ignoreDepthValues : false;
+
+					if ( ignoreDepthValues === false ) {
+
+						if ( renderTarget.depthBuffer ) mask |= _gl.DEPTH_BUFFER_BIT;
+
+						// resolving stencil is slow with a D3D backend. disable it for all transmission render targets (see #27799)
+
+						if ( renderTarget.stencilBuffer && renderTarget.resolveStencilBuffer ) mask |= _gl.STENCIL_BUFFER_BIT;
+
+					}
+
+					if ( isMultipleRenderTargets ) {
+
+						_gl.framebufferRenderbuffer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer[ i ] );
+
+					}
+
+					if ( ignoreDepthValues === true ) {
+
+						_gl.invalidateFramebuffer( _gl.READ_FRAMEBUFFER, [ depthStyle ] );
+						_gl.invalidateFramebuffer( _gl.DRAW_FRAMEBUFFER, [ depthStyle ] );
+
+					}
+
+					if ( isMultipleRenderTargets ) {
+
+						const webglTexture = properties.get( textures[ i ] ).__webglTexture;
+						_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, webglTexture, 0 );
+
+					}
+
+					_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST );
+
+					if ( supportsInvalidateFramebuffer ) {
+
+						_gl.invalidateFramebuffer( _gl.READ_FRAMEBUFFER, invalidationArray );
+
+					}
+
 
 				}
 
-			}
+				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
+				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
 
-			state.bindFramebuffer( _gl.READ_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
-			state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
-
-			for ( let i = 0; i < textures.length; i ++ ) {
-
-				invalidationArray.push( _gl.COLOR_ATTACHMENT0 + i );
-
-				if ( renderTarget.depthBuffer ) {
-
-					invalidationArray.push( depthStyle );
-
-				}
-
-				const ignoreDepthValues = ( renderTargetProperties.__ignoreDepthValues !== undefined ) ? renderTargetProperties.__ignoreDepthValues : false;
-
-				if ( ignoreDepthValues === false ) {
-
-					if ( renderTarget.depthBuffer ) mask |= _gl.DEPTH_BUFFER_BIT;
-
-					// resolving stencil is slow with a D3D backend. disable it for all transmission render targets (see #27799)
-
-					if ( renderTarget.stencilBuffer && renderTarget.resolveStencilBuffer ) mask |= _gl.STENCIL_BUFFER_BIT;
-
-				}
-
+				// If MRT since pre-blit we removed the FBO we need to reconstruct the attachments
 				if ( isMultipleRenderTargets ) {
 
-					_gl.framebufferRenderbuffer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer[ i ] );
+					for ( let i = 0; i < textures.length; i ++ ) {
+
+						state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
+						_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer[ i ] );
+
+						const webglTexture = properties.get( textures[ i ] ).__webglTexture;
+
+						state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+						_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.TEXTURE_2D, webglTexture, 0 );
+
+					}
 
 				}
 
-				if ( ignoreDepthValues === true ) {
+				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
 
-					_gl.invalidateFramebuffer( _gl.READ_FRAMEBUFFER, [ depthStyle ] );
+			} else {
+
+				const renderTargetProperties = properties.get( renderTarget );
+				const ignoreDepthValues = ( renderTargetProperties.__ignoreDepthValues !== undefined ) ? renderTargetProperties.__ignoreDepthValues : false;
+
+				if ( renderTarget.depthBuffer && ignoreDepthValues && supportsInvalidateFramebuffer ) {
+
+					const depthStyle = renderTarget.stencilBuffer ? _gl.DEPTH_STENCIL_ATTACHMENT : _gl.DEPTH_ATTACHMENT;
+
 					_gl.invalidateFramebuffer( _gl.DRAW_FRAMEBUFFER, [ depthStyle ] );
 
 				}
 
-				if ( isMultipleRenderTargets ) {
-
-					const webglTexture = properties.get( textures[ i ] ).__webglTexture;
-					_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, webglTexture, 0 );
-
-				}
-
-				_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST );
-
-				if ( supportsInvalidateFramebuffer ) {
-
-					_gl.invalidateFramebuffer( _gl.READ_FRAMEBUFFER, invalidationArray );
-
-				}
-
-
 			}
-
-			state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
-			state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
-
-			// If MRT since pre-blit we removed the FBO we need to reconstruct the attachments
-			if ( isMultipleRenderTargets ) {
-
-				for ( let i = 0; i < textures.length; i ++ ) {
-
-					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
-					_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer[ i ] );
-
-					const webglTexture = properties.get( textures[ i ] ).__webglTexture;
-
-					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
-					_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.TEXTURE_2D, webglTexture, 0 );
-
-				}
-
-			}
-
-			state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer );
 
 		}
 
