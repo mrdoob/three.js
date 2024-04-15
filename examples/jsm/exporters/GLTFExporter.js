@@ -26,6 +26,7 @@ import {
 	Quaternion,
 } from 'three';
 import { decompress } from './../utils/TextureUtils.js';
+import { REVISION } from '../../../src/constants.js';
 
 
 /**
@@ -502,7 +503,7 @@ class GLTFWriter {
 		this.json = {
 			asset: {
 				version: '2.0',
-				generator: 'THREE.GLTFExporter'
+				generator: 'THREE.GLTFExporter r' + REVISION
 			}
 		};
 
