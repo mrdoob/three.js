@@ -383,7 +383,7 @@ class PhysicalLightingModel extends LightingModel {
 	// Approximates multiscattering in order to preserve energy.
 	// http://www.jcgt.org/published/0008/01/03/
 
-	computeMultiscattering( singleScatter, multiScatter, specularF90 = float( 1 ) ) {
+	computeMultiscattering( singleScatter, multiScatter, specularF90 ) {
 
 		const dotNV = transformedNormalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
 
