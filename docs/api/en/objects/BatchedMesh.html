@@ -213,6 +213,30 @@
 			Replaces the geometry at `index` with the provided geometry. Throws an error if there is not enough space reserved for geometry at the index.
 		</p>
 
+		<h3>
+			[method:Integer getInstanceCountAt]( [param:Integer index] )
+		</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the
+			range [0, count].
+		</p>
+		<p>
+			Gets the instance count of the geometry at `index`. Returns `null` if instance counts are not configured.
+		</p>
+
+		<h3>
+			[method:Integer setInstanceCountAt]( [param:Integer index], [param:Integer instanceCount ] )
+		</h3>
+		<p>
+			[page:Integer index]: Which geometry index to configure an instance count for.
+		</p>
+		<p>
+			[page:Integer instanceCount]: The number of instances to render of the given geometry index.
+		</p>
+		<p>
+			Sets an instance count of the geometry at `index`.
+		</p>
+
 		<h2>Source</h2>
 
 		<p>
