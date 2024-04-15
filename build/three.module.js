@@ -15653,12 +15653,48 @@ function WebGLBufferRenderer( gl, extensions, info ) {
 
 	}
 
+	function renderMultiDrawInstances( starts, counts, drawCount, primcount ) {
+
+		if ( drawCount === 0 ) return;
+
+		const extension = extensions.get( 'WEBGL_multi_draw' );
+
+		if ( extension === null ) {
+
+			for ( let i = 0; i < starts.length; i ++ ) {
+
+				renderInstances( starts[ i ], counts[ i ], primcount[ i ] );
+
+			}
+
+		} else {
+
+			extension.multiDrawArraysInstancedWEBGL( mode, starts, 0, counts, 0, primcount, 0, drawCount );
+
+			let elementCount = 0;
+			for ( let i = 0; i < drawCount; i ++ ) {
+
+				elementCount += counts[ i ];
+
+			}
+
+			for ( let i = 0; i < primcount.length; i ++ ) {
+
+				info.update( elementCount, mode, primcount[ i ] );
+
+			}
+
+		}
+
+	}
+
 	//
 
 	this.setMode = setMode;
 	this.render = render;
 	this.renderInstances = renderInstances;
 	this.renderMultiDraw = renderMultiDraw;
+	this.renderMultiDrawInstances = renderMultiDrawInstances;
 
 }
 
@@ -17569,6 +17605,41 @@ function WebGLIndexedBufferRenderer( gl, extensions, info ) {
 
 	}
 
+	function renderMultiDrawInstances( starts, counts, drawCount, primcount ) {
+
+		if ( drawCount === 0 ) return;
+
+		const extension = extensions.get( 'WEBGL_multi_draw' );
+
+		if ( extension === null ) {
+
+			for ( let i = 0; i < starts.length; i ++ ) {
+
+				renderInstances( starts[ i ] / bytesPerElement, counts[ i ], primcount[ i ] );
+
+			}
+
+		} else {
+
+			extension.multiDrawElementsInstancedWEBGL( mode, counts, 0, type, starts, 0, primcount, 0, drawCount );
+
+			let elementCount = 0;
+			for ( let i = 0; i < drawCount; i ++ ) {
+
+				elementCount += counts[ i ];
+
+			}
+
+			for ( let i = 0; i < primcount.length; i ++ ) {
+
+				info.update( elementCount, mode, primcount[ i ] );
+
+			}
+
+		}
+
+	}
+
 	//
 
 	this.setMode = setMode;
@@ -17576,6 +17647,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, info ) {
 	this.render = render;
 	this.renderInstances = renderInstances;
 	this.renderMultiDraw = renderMultiDraw;
+	this.renderMultiDrawInstances = renderMultiDrawInstances;
 
 }
 
@@ -25574,7 +25646,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					if ( ignoreDepthValues === true ) {
+					if ( ignoreDepthValues === true && supportsInvalidateFramebuffer ) {
 
 						_gl.invalidateFramebuffer( _gl.READ_FRAMEBUFFER, [ depthStyle ] );
 						_gl.invalidateFramebuffer( _gl.DRAW_FRAMEBUFFER, [ depthStyle ] );
@@ -29007,7 +29079,15 @@ class WebGLRenderer {
 
 			if ( object.isBatchedMesh ) {
 
-				renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+				if ( object._multiDrawInstances !== null ) {
+
+					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
+
+				} else {
+
+					renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+
+				}
 
 			} else if ( object.isInstancedMesh ) {
 
@@ -32778,6 +32858,7 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCounts = new Int32Array( maxGeometryCount );
 		this._multiDrawStarts = new Int32Array( maxGeometryCount );
 		this._multiDrawCount = 0;
+		this._multiDrawInstances = null;
 		this._visibilityChanged = true;
 
 		// Local matrix per geometry by using data texture
@@ -33216,6 +33297,28 @@ class BatchedMesh extends Mesh {
 		this._visibilityChanged = true;
 
 		return this;
+
+	}
+
+	getInstanceCountAt( id ) {
+
+		if ( this._multiDrawInstances === null ) return null;
+
+		return this._multiDrawInstances[ id ];
+
+	}
+
+	setInstanceCountAt( id, instanceCount ) {
+
+		if ( this._multiDrawInstances === null ) {
+
+			this._multiDrawInstances = new Int32Array( this._maxGeometryCount ).fill( 1 );
+
+		}
+
+		this._multiDrawInstances[ id ] = instanceCount;
+
+		return id;
 
 	}
 
