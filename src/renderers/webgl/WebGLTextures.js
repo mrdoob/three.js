@@ -1892,7 +1892,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					if ( ignoreDepthValues === true ) {
+					if ( ignoreDepthValues === true && supportsInvalidateFramebuffer ) {
 
 						_gl.invalidateFramebuffer( _gl.READ_FRAMEBUFFER, [ depthStyle ] );
 						_gl.invalidateFramebuffer( _gl.DRAW_FRAMEBUFFER, [ depthStyle ] );
