@@ -54,6 +54,9 @@ class AnalyticLightNode extends LightingNode {
 
 		if ( shadowNode === null ) {
 
+			const { object } = builder;
+
+
 			if ( overrideMaterial === null ) {
 
 				overrideMaterial = builder.createNodeMaterial();
@@ -81,7 +84,9 @@ class AnalyticLightNode extends LightingNode {
 			const bias = reference( 'bias', 'float', shadow );
 			const normalBias = reference( 'normalBias', 'float', shadow );
 
-			let shadowCoord = uniform( shadow.matrix ).mul( positionWorld.add( normalWorld.mul( normalBias ) ) );
+			const position = object.material.shadowPositionNode || positionWorld;
+
+			let shadowCoord = uniform( shadow.matrix ).mul( position.add( normalWorld.mul( normalBias ) ) );
 			shadowCoord = shadowCoord.xyz.div( shadowCoord.w );
 
 			const frustumTest = shadowCoord.x.greaterThanEqual( 0 )
@@ -145,7 +150,7 @@ class AnalyticLightNode extends LightingNode {
 				textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy1 ) ), shadowCoord.z ),
 				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx1, dy1 ) ), shadowCoord.z )
 			).mul( 1 / 17 );
-			*/
+			 */
 			//
 
 			const shadowColor = texture( rtt.texture, shadowCoord );
@@ -165,7 +170,7 @@ class AnalyticLightNode extends LightingNode {
 
 	setup( builder ) {
 
-		if ( this.light.castShadow ) this.setupShadow( builder );
+		if ( this.light.castShadow && builder.object.receiveShadow ) this.setupShadow( builder );
 		else if ( this.shadowNode !== null ) this.disposeShadow();
 
 	}
