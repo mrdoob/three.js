@@ -50,11 +50,14 @@ class AnalyticLightNode extends LightingNode {
 
 	setupShadow( builder ) {
 
+		const { object } = builder;
+
+		if ( object.receiveShadow === false ) return;
+
 		let shadowNode = this.shadowNode;
 
 		if ( shadowNode === null ) {
 
-			const { object } = builder;
 
 
 			if ( overrideMaterial === null ) {
@@ -170,7 +173,7 @@ class AnalyticLightNode extends LightingNode {
 
 	setup( builder ) {
 
-		if ( this.light.castShadow || builder.object.receiveShadow ) this.setupShadow( builder );
+		if ( this.light.castShadow ) this.setupShadow( builder );
 		else if ( this.shadowNode !== null ) this.disposeShadow();
 
 	}
