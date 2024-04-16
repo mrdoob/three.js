@@ -212,7 +212,7 @@ class CCDIKSolver {
 
 	/**
 	 * Creates Helper
-	 *  
+	 *
 	 * @param {number} sphereSize
 	 * @return {CCDIKHelper}
 	 */
