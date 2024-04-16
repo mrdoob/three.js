@@ -25587,6 +25587,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
+	const invalidationArrayRead = [];
+	const invalidationArrayDraw = [];
+
 	function updateMultisampleRenderTarget( renderTarget ) {
 
 		if ( renderTarget.samples > 0 ) {
@@ -25597,7 +25600,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				const width = renderTarget.width;
 				const height = renderTarget.height;
 				let mask = _gl.COLOR_BUFFER_BIT;
-				const invalidationArray = [];
 				const depthStyle = renderTarget.stencilBuffer ? _gl.DEPTH_STENCIL_ATTACHMENT : _gl.DEPTH_ATTACHMENT;
 				const renderTargetProperties = properties.get( renderTarget );
 				const isMultipleRenderTargets = ( textures.length > 1 );
@@ -25622,14 +25624,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				for ( let i = 0; i < textures.length; i ++ ) {
 
-					invalidationArray.push( _gl.COLOR_ATTACHMENT0 + i );
-
-					if ( renderTarget.depthBuffer ) {
-
-						invalidationArray.push( depthStyle );
-
-					}
-
 					const ignoreDepthValues = ( renderTargetProperties.__ignoreDepthValues !== undefined ) ? renderTargetProperties.__ignoreDepthValues : false;
 
 					if ( ignoreDepthValues === false ) {
@@ -25646,17 +25640,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						_gl.framebufferRenderbuffer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer[ i ] );
 
-					}
-
-					if ( ignoreDepthValues === true && supportsInvalidateFramebuffer ) {
-
-						_gl.invalidateFramebuffer( _gl.READ_FRAMEBUFFER, [ depthStyle ] );
-						_gl.invalidateFramebuffer( _gl.DRAW_FRAMEBUFFER, [ depthStyle ] );
-
-					}
-
-					if ( isMultipleRenderTargets ) {
-
 						const webglTexture = properties.get( textures[ i ] ).__webglTexture;
 						_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, webglTexture, 0 );
 
@@ -25664,12 +25647,25 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST );
 
-					if ( supportsInvalidateFramebuffer ) {
+					if ( supportsInvalidateFramebuffer === true ) {
 
-						_gl.invalidateFramebuffer( _gl.READ_FRAMEBUFFER, invalidationArray );
+						invalidationArrayRead.length = 0;
+						invalidationArrayDraw.length = 0;
+
+						invalidationArrayRead.push( _gl.COLOR_ATTACHMENT0 + i );
+
+						if ( renderTarget.depthBuffer && ignoreDepthValues === true ) {
+
+							invalidationArrayRead.push( depthStyle );
+							invalidationArrayDraw.push( depthStyle );
+
+							_gl.invalidateFramebuffer( _gl.DRAW_FRAMEBUFFER, invalidationArrayDraw );
+
+						}
+
+						_gl.invalidateFramebuffer( _gl.READ_FRAMEBUFFER, invalidationArrayRead );
 
 					}
-
 
 				}
 
