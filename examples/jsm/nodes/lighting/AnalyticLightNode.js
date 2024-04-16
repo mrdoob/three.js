@@ -170,7 +170,7 @@ class AnalyticLightNode extends LightingNode {
 
 	setup( builder ) {
 
-		if ( this.light.castShadow && builder.object.receiveShadow ) this.setupShadow( builder );
+		if ( this.light.castShadow || builder.object.receiveShadow ) this.setupShadow( builder );
 		else if ( this.shadowNode !== null ) this.disposeShadow();
 
 	}
