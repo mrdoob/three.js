@@ -216,7 +216,7 @@ class CCDIKSolver {
 	 * @param {number} sphereSize
 	 * @return {CCDIKHelper}
 	 */
-	createHelper(sphereSize) {
+	createHelper( sphereSize ) {
 
 		return new CCDIKHelper( this.mesh, this.iks, sphereSize );
 
