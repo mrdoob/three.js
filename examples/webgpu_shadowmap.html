@@ -164,6 +164,15 @@
 
 				} )();
 
+
+				planeMaterial.colorNode = tslFn( () => {
+
+					const pos = positionWorld.toVar();
+					pos.xz.addAssign( mx_fractal_noise_vec3( positionWorld.mul( 2 ) ).saturate().xz );
+					return mx_fractal_noise_vec3( positionWorld.mul( 2 ) ).saturate().zzz.mul( 0.2 ).add( .5 );
+
+				} )();
+
 				const ground = new THREE.Mesh( planeGeometry, planeMaterial );
 				ground.rotation.x = - Math.PI / 2;
 				ground.scale.multiplyScalar( 3 );
