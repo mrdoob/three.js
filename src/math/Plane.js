@@ -18,7 +18,7 @@ class Plane {
 
 	}
 
-	set( normal, constant ) {
+	set( normal, constant = 0 ) {
 
 		this.normal.copy( normal );
 		this.constant = constant;
