@@ -8,4 +8,10 @@ export default /* glsl */`
 	diffuseColor.rgb *= vColor;
 
 #endif
+
+#if defined( USE_BATCHING )
+
+	diffuseColor.a *= vBatchingOpacity;
+
+#endif
 `;

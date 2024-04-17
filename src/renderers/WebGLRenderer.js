@@ -1997,6 +1997,7 @@ class WebGLRenderer {
 
 				p_uniforms.setOptional( _gl, object, 'batchingTexture' );
 				p_uniforms.setValue( _gl, 'batchingTexture', object._matricesTexture, textures );
+				p_uniforms.setValue( _gl, 'batchingOpacityTexture', object._opacitiesTexture, textures );
 
 			}
 

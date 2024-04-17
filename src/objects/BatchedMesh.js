@@ -4,7 +4,7 @@ import { DataTexture } from '../textures/DataTexture.js';
 import { FloatType } from '../constants.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Mesh } from './Mesh.js';
-import { RGBAFormat } from '../constants.js';
+import { RGBAFormat, RedFormat } from '../constants.js';
 import { Box3 } from '../math/Box3.js';
 import { Sphere } from '../math/Sphere.js';
 import { Frustum } from '../math/Frustum.js';
@@ -160,6 +160,11 @@ class BatchedMesh extends Mesh {
 
 		this._initMatricesTexture();
 
+		// Local opacity per geometry by using data texture
+		this._opacitiesTexture = null;
+
+		this._initOpacitiesTexture();
+
 	}
 
 	_initMatricesTexture() {
@@ -179,6 +184,14 @@ class BatchedMesh extends Mesh {
 		const matricesTexture = new DataTexture( matricesArray, size, size, RGBAFormat, FloatType );
 
 		this._matricesTexture = matricesTexture;
+
+	}
+
+	_initOpacitiesTexture() {
+
+		const opacitiesTexture = new DataTexture( new Float32Array( this._maxGeometryCount ).fill( 1.0 ), 1, this._maxGeometryCount, RedFormat, FloatType );
+
+		this._opacitiesTexture = opacitiesTexture;
 
 	}
 
@@ -746,6 +759,43 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	setOpacityAt( geometryId, opacity ) {
+
+		// @TODO: Map geometryId to index of the arrays because
+		//        optimize() can make geometryId mismatch the index
+
+		const active = this._active;
+		const opacitiesTexture = this._opacitiesTexture;
+		const opacitiesArray = this._opacitiesTexture.image.data;
+		const geometryCount = this._geometryCount;
+		if ( geometryId >= geometryCount || active[ geometryId ] === false ) {
+
+			return this;
+
+		}
+
+		opacitiesArray[ geometryId ] = opacity;
+		opacitiesTexture.needsUpdate = true;
+
+		return this;
+
+	}
+
+	getOpacityAt( geometryId ) {
+
+		const active = this._active;
+		const opacitiesArray = this._opacitiesTexture.image.data;
+		const geometryCount = this._geometryCount;
+		if ( geometryId >= geometryCount || active[ geometryId ] === false ) {
+
+			return null;
+
+		}
+
+		return opacitiesArray[ geometryId ];
+
+	}
+
 	setVisibleAt( geometryId, value ) {
 
 		const visibility = this._visibility;
@@ -886,6 +936,9 @@ class BatchedMesh extends Mesh {
 		this._matricesTexture = source._matricesTexture.clone();
 		this._matricesTexture.image.data = this._matricesTexture.image.slice();
 
+		this._opacitiesTexture = source._opacitiesTexture.clone();
+		this._opacitiesTexture.image.data = this._opacitiesTexture.image.slice();
+
 		return this;
 
 	}
@@ -897,6 +950,10 @@ class BatchedMesh extends Mesh {
 
 		this._matricesTexture.dispose();
 		this._matricesTexture = null;
+
+		this._opacitiesTexture.dispose();
+		this._opacitiesTexture = null;
+
 		return this;
 
 	}

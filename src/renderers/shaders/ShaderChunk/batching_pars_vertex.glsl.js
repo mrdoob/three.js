@@ -2,6 +2,10 @@ export default /* glsl */`
 #ifdef USE_BATCHING
 	attribute float batchId;
 	uniform highp sampler2D batchingTexture;
+
+	uniform highp sampler2D batchingOpacityTexture;
+	varying float vBatchingOpacity;
+
 	mat4 getBatchingMatrix( const in float i ) {
 
 		int size = textureSize( batchingTexture, 0 ).x;

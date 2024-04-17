@@ -760,6 +760,7 @@ class Object3D extends EventDispatcher {
 			object.geometryCount = this._geometryCount;
 
 			object.matricesTexture = this._matricesTexture.toJSON( meta );
+			object.opacitiesTexture = this._opacitiesTexture.toJSON( meta );
 
 			if ( this.boundingSphere !== null ) {
 

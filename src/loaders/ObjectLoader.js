@@ -946,6 +946,7 @@ class ObjectLoader extends Loader {
 				object._geometryCount = data.geometryCount;
 
 				object._matricesTexture = getTexture( data.matricesTexture.uuid );
+				object._opacitiesTexture = getTexture( data.opacitiesTexture.uuid );
 
 				break;
 

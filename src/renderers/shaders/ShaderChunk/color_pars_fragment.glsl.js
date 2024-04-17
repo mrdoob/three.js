@@ -8,4 +8,10 @@ export default /* glsl */`
 	varying vec3 vColor;
 
 #endif
+
+#if defined( USE_BATCHING )
+
+	varying float vBatchingOpacity;
+
+#endif
 `;

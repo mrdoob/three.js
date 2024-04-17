@@ -189,6 +189,7 @@ export default class RenderObject {
 		if ( object.isBatchedMesh ) {
 
 			cacheKey += object._matricesTexture.uuid + ',';
+			cacheKey += object._opacitiesTexture.uuid + ',';
 
 		}
 
