@@ -57,6 +57,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.depthNode = null;
 		this.shadowNode = null;
+		this.shadowPositionNode = null;
 
 		this.outputNode = null;
 
@@ -530,6 +531,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.depthNode = source.depthNode;
 		this.shadowNode = source.shadowNode;
+		this.shadowPositionNode = source.shadowPositionNode;
 
 		this.outputNode = source.outputNode;
 
