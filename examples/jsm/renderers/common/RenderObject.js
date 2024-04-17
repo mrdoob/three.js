@@ -2,6 +2,40 @@ import ClippingContext from './ClippingContext.js';
 
 let id = 0;
 
+function getKeys( obj ) {
+
+	const keys = Object.keys( obj );
+
+	let proto = Object.getPrototypeOf( obj );
+
+	while ( proto ) {
+
+		const descriptors = Object.getOwnPropertyDescriptors( proto );
+
+		for ( const key in descriptors ) {
+
+			if ( descriptors[ key ] !== undefined ) {
+
+				const descriptor = descriptors[ key ];
+
+				if ( descriptor && typeof descriptor.get === 'function' ) {
+
+					keys.push( key );
+
+				}
+
+			}
+
+		}
+
+		proto = Object.getPrototypeOf( proto );
+
+	}
+
+	return keys;
+
+}
+
 export default class RenderObject {
 
 	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext ) {
@@ -153,9 +187,9 @@ export default class RenderObject {
 
 		let cacheKey = material.customProgramCacheKey();
 
-		for ( const property in material ) {
+		for ( const property of getKeys( material ) ) {
 
-			if ( /^(is[A-Z]|_(?!(transmission|clearcoat)))|^(visible|version|uuid|name|opacity|userData)$/.test( property ) ) continue;
+			if ( /^(is[A-Z]|_)|^(visible|version|uuid|name|opacity|userData)$/.test( property ) ) continue;
 
 			let value = material[ property ];
 
