@@ -58,8 +58,6 @@ class AnalyticLightNode extends LightingNode {
 
 		if ( shadowNode === null ) {
 
-
-
 			if ( overrideMaterial === null ) {
 
 				overrideMaterial = builder.createNodeMaterial();
