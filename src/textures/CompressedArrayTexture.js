@@ -11,19 +11,19 @@ class CompressedArrayTexture extends CompressedTexture {
 		this.image.depth = depth;
 		this.wrapR = ClampToEdgeWrapping;
 
-		this.dirtyLayers = new Set();
+		this.layerUpdates = new Set();
 
 	}
 
-	addDirtyLayer( layerIndex ) {
+	addLayerUpdates( layerIndex ) {
 
-		this.dirtyLayers.add( layerIndex );
+		this.layerUpdates.add( layerIndex );
 
 	}
 
-	clearDirtyLayers() {
+	clearLayerUpdates() {
 
-		this.dirtyLayers.clear();
+		this.layerUpdates.clear();
 
 	}
 

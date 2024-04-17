@@ -20,19 +20,19 @@ class DataArrayTexture extends Texture {
 		this.flipY = false;
 		this.unpackAlignment = 1;
 
-		this.dirtyLayers = new Set();
+		this.layerUpdates = new Set();
 
 	}
 
-	addDirtyLayer( layerIndex ) {
+	addLayerUpdate( layerIndex ) {
 
-		this.dirtyLayers.add( layerIndex );
+		this.layerUpdates.add( layerIndex );
 
 	}
 
-	clearDirtyLayers() {
+	clearLayerUpdates() {
 
-		this.dirtyLayers.clear();
+		this.layerUpdates.clear();
 
 	}
 

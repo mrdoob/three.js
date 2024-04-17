@@ -820,16 +820,16 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 									if ( dataReady ) {
 
-										if ( texture.dirtyLayers.size > 0 ) {
+										if ( texture.layerUpdates.size > 0 ) {
 
-											for ( const layerIndex of texture.dirtyLayers ) {
+											for ( const layerIndex of texture.layerUpdates ) {
 
 												const layerSize = mipmap.width * mipmap.height;
 												state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, layerIndex, mipmap.width, mipmap.height, 1, glFormat, mipmap.data.slice( layerSize * layerIndex, layerSize * ( layerIndex + 1 ) ), 0, 0 );
 
 											}
 
-											texture.clearDirtyLayers();
+											texture.clearLayerUpdates();
 
 										} else {
 
@@ -941,7 +941,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					if ( dataReady ) {
 
-						if ( texture.dirtyLayers.size > 0 ) {
+						if ( texture.layerUpdates.size > 0 ) {
 
 							// When type is GL_UNSIGNED_BYTE, each of these bytes is
 							// interpreted as one color component, depending on format. When
@@ -994,13 +994,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 							const layerSize = image.width * image.height * texelSize;
 
-							for ( const layerIndex of texture.dirtyLayers ) {
+							for ( const layerIndex of texture.layerUpdates ) {
 
 								state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, 0, 0, 0, layerIndex, image.width, image.height, 1, glFormat, glType, image.data.slice( layerSize * layerIndex, layerSize * ( layerIndex + 1 ) ) );
 
 							}
 
-							texture.clearDirtyLayers();
+							texture.clearLayerUpdates();
 
 						} else {
 
