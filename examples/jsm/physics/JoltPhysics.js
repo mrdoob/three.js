@@ -18,7 +18,7 @@ function getShape( geometry ) {
 		const sy = parameters.height !== undefined ? parameters.height / 2 : 0.5;
 		const sz = parameters.depth !== undefined ? parameters.depth / 2 : 0.5;
 
-		return new Jolt.BoxShape( new Jolt.Vec3( sx, sy, sz ), 0.05, null );
+		return new Jolt.BoxShape( new Jolt.Vec3( sx, sy, sz ), 0.05 * Math.min( sx, sy, sz ), null );
 
 	} else if ( geometry.type === 'SphereGeometry' || geometry.type === 'IcosahedronGeometry' ) {
 
