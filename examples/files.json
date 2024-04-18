@@ -434,6 +434,7 @@
 		"physics_ammo_rope",
 		"physics_ammo_terrain",
 		"physics_ammo_volume",
+		"physics_jolt_instancing",
 		"physics_rapier_instancing"
 	],
 	"misc": [

@@ -108,6 +108,7 @@ const exceptionList = [
 	// TODO: implement determinism for setTimeout and setInterval
 	// could it fix some examples from above?
 	'physics_rapier_instancing',
+	'physics_jolt_instancing',
 
 	// Awaiting for WebGL backend support
 	'webgpu_clearcoat',
