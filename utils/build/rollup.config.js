@@ -45,7 +45,7 @@ function header() {
 
 			code.prepend( `/**
  * @license
- * Copyright 2010-2023 Three.js Authors
+ * Copyright 2010-2024 Three.js Authors
  * SPDX-License-Identifier: MIT
  */\n` );
 
