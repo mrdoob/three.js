@@ -43,9 +43,15 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.dashSizeNode = null;
 		this.gapSizeNode = null;
 
+		this.setValues( params );
+
+	}
+
+	setup( builder ) {
+
 		this.setupShaders();
 
-		this.setValues( params );
+		super.setup( builder );
 
 	}
 
