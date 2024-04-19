@@ -377,8 +377,6 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		} )();
 
-		this.needsUpdate = true;
-
 	}
 
 
@@ -393,7 +391,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		if ( this.useWorldUnits !== value ) {
 
 			this.useWorldUnits = value;
-			this.setupShaders();
+			this.needsUpdate = true;
 
 		}
 
@@ -411,7 +409,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		if ( this.useDash !== value ) {
 
 			this.useDash = value;
-			this.setupShaders();
+			this.needsUpdate = true;
 
 		}
 
@@ -429,7 +427,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		if ( this.useAlphaToCoverage !== value ) {
 
 			this.useAlphaToCoverage = value;
-			this.setupShaders();
+			this.needsUpdate = true;
 
 		}
 
