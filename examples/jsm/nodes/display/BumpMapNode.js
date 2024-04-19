@@ -13,33 +13,14 @@ import { addNodeElement, tslFn, nodeProxy, float, vec2 } from '../shadernode/Sha
 
 const dHdxy_fwd = tslFn( ( { textureNode, bumpScale } ) => {
 
-	let texNode = textureNode;
-
-	if ( texNode.isTextureNode !== true ) {
-
-		texNode.traverse( ( node ) => {
-
-			if ( node.isTextureNode === true ) texNode = node;
-
-		} );
-
-	}
-
-	if ( texNode.isTextureNode !== true ) {
-
-		throw new Error( 'THREE.TSL: dHdxy_fwd() requires a TextureNode.' );
-
-	}
-
 	const Hll = float( textureNode );
-	const uvNode = texNode.uvNode || uv();
 
 	// It's used to preserve the same TextureNode instance
-	const sampleTexture = ( uv ) => textureNode.cache().context( { getUV: () => uv, forceUVContext: true } );
+	const sampleTexture = ( callback ) => textureNode.cache().context( { getUV: ( texNode ) => callback( texNode.uvNode || uv() ), forceUVContext: true } );
 
 	return vec2(
-		float( sampleTexture( uvNode.add( uvNode.dFdx() ) ) ).sub( Hll ),
-		float( sampleTexture( uvNode.add( uvNode.dFdy() ) ) ).sub( Hll )
+		float( sampleTexture( ( uvNode ) => uvNode.add( uvNode.dFdx() ) ) ).sub( Hll ),
+		float( sampleTexture( ( uvNode ) => uvNode.add( uvNode.dFdy() ) ) ).sub( Hll )
 	).mul( bumpScale );
 
 } );
