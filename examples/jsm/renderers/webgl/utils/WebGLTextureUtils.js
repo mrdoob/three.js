@@ -706,7 +706,7 @@ class WebGLTextureUtils {
 
 		await backend.utils._clientWaitAsync();
 
-		const dstBuffer = new typedArrayType( elementCount );
+		const dstBuffer = new typedArrayType( byteLength / typedArrayType.BYTES_PER_ELEMENT );
 
 		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, buffer );
 		gl.getBufferSubData( gl.PIXEL_PACK_BUFFER, 0, dstBuffer );
