@@ -91,7 +91,7 @@ class MaterialNode extends Node {
 
 			if ( material.specularMap && material.specularMap.isTexture === true ) {
 
-				node = this.getTexture( scope ).r;
+				node = this.getTexture( 'specular' ).r;
 
 			} else {
 

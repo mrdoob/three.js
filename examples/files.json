@@ -153,7 +153,6 @@
 		"webgl_materials_envmaps_exr",
 		"webgl_materials_envmaps_groundprojected",
 		"webgl_materials_envmaps_hdr",
-		"webgl_materials_lightmap",
 		"webgl_materials_matcap",
 		"webgl_materials_normalmap",
 		"webgl_materials_normalmap_object_space",
@@ -224,17 +223,6 @@
 		"webgl_video_panorama_equirectangular",
 		"webgl_water",
 		"webgl_water_flowmap"
-	],
-	"webgl / nodes": [
-		"webgl_nodes_loader_gltf_iridescence",
-		"webgl_nodes_loader_gltf_transmission",
-		"webgl_nodes_loader_gltf_sheen",
-		"webgl_nodes_loader_materialx",
-		"webgl_nodes_materials_instance_uniform",
-		"webgl_nodes_materials_physical_clearcoat",
-		"webgl_nodes_materials_standard",
-		"webgl_nodes_materialx_noise",
-		"webgl_nodes_points"
 	],
 	"webgl / postprocessing": [
 		"webgl_postprocessing",
@@ -354,6 +342,7 @@
 		"webgpu_loader_gltf_transmission",
 		"webgpu_loader_materialx",
 		"webgpu_materials",
+		"webgpu_materials_lightmap",
 		"webgpu_materials_sss",
 		"webgpu_materials_transmission",
 		"webgpu_materials_video",

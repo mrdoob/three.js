@@ -109,12 +109,9 @@
 
 			import * as THREE from 'three';
 
-			import { nodeFrame } from 'three/addons/renderers/webgl-legacy/nodes/WebGLNodes.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 
 			import { NodeEditor } from './NodeEditor.js';
 
@@ -129,9 +126,6 @@
 
 				document.body.appendChild( container );
 
-				const urlParams = new URLSearchParams( window.location.search );
-				const backend = urlParams.get( 'backend' );
-
 				//
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.5, 200 );
@@ -142,32 +136,7 @@
 
 				//
 
-				if ( backend === 'webgpu' ) {
-
-					const { default: WebGPU } = await import( 'three/addons/capabilities/WebGPU.js' );
-					const { default: WebGPURenderer } = await import( 'three/addons/renderers/webgpu/WebGPURenderer.js' );
-
-					renderer = new WebGPURenderer();
-
-					if ( WebGPU.isAvailable() === false ) {
-
-						document.body.appendChild( WebGPU.getErrorMessage() );
-
-						throw new Error( 'No WebGPU support' );
-
-					}
-
-				} else {
-
-					renderer = new THREE.WebGLRenderer( { antialias: true } );
-
-					composer = new EffectComposer( renderer );
-					composer.addPass( new RenderPass( scene, camera ) );
-
-				}
-
-				//
-
+				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.LinearToneMapping;
 				renderer.toneMappingExposure = 1;
@@ -187,13 +156,13 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				initEditor(container);
+				initEditor( container );
 
 				onWindowResize();
 
 			}
 
-			function initEditor(container) {
+			function initEditor( container ) {
 
 				nodeEditor = new NodeEditor( scene, renderer, composer );
 
@@ -219,8 +188,6 @@
 
 			function animate() {
 
-				if ( renderer.isWebGLRenderer ) nodeFrame.update();
-
 				render();
 
 			}
@@ -229,8 +196,7 @@
 
 				checkResize();
 
-				if ( composer && composer.passes.length > 1 ) composer.render();
-				else renderer.render( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 
@@ -247,10 +213,10 @@
 					camera.aspect = width / height;
 					camera.updateProjectionMatrix();
 
-					renderer.setSize( width , height );
-					if ( composer ) composer.setSize( width, height );
+					renderer.setSize( width, height );
 
 				}
+
 			}
 
 		</script>
