@@ -9,14 +9,12 @@ import { addNodeElement, tslFn, nodeProxy, float, vec2 } from '../shadernode/Sha
 // Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 // https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
 
-// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
-
 const dHdxy_fwd = tslFn( ( { textureNode, bumpScale } ) => {
-
-	const Hll = float( textureNode );
 
 	// It's used to preserve the same TextureNode instance
 	const sampleTexture = ( callback ) => textureNode.cache().context( { getUV: ( texNode ) => callback( texNode.uvNode || uv() ), forceUVContext: true } );
+
+	const Hll = float( sampleTexture( ( uvNode ) => uvNode ) );
 
 	return vec2(
 		float( sampleTexture( ( uvNode ) => uvNode.add( uvNode.dFdx() ) ) ).sub( Hll ),
@@ -24,6 +22,8 @@ const dHdxy_fwd = tslFn( ( { textureNode, bumpScale } ) => {
 	).mul( bumpScale );
 
 } );
+
+// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
 
 const perturbNormalArb = tslFn( ( inputs ) => {
 
