@@ -615,7 +615,7 @@ class WebGLBackend extends Backend {
 		const index = renderObject.getIndex();
 
 		const geometry = renderObject.geometry;
-		const drawRange = geometry.drawRange;
+		const drawRange = renderObject.drawRange;
 		const firstVertex = drawRange.start;
 
 		//

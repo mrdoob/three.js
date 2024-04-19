@@ -56,6 +56,8 @@ export default class RenderObject {
 		this.geometry = object.geometry;
 		this.version = material.version;
 
+		this.drawRange = null;
+
 		this.attributes = null;
 		this.pipeline = null;
 		this.vertexBuffers = null;
