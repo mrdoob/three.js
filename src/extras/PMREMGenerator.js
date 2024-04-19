@@ -58,7 +58,7 @@ const _axisDirections = [
 	/*@__PURE__*/ new Vector3( - 1, 1, - 1 ),
 	/*@__PURE__*/ new Vector3( 1, 1, - 1 ),
 	/*@__PURE__*/ new Vector3( - 1, 1, 1 ),
-	/*@__PURE__*/ new Vector3( 1, 1, 1 )];
+	/*@__PURE__*/ new Vector3( 1, 1, 1 ) ];
 
 /**
  * This class generates a Prefiltered, Mipmapped Radiance Environment Map
