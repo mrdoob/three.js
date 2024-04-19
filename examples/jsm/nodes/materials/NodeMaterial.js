@@ -7,7 +7,7 @@ import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
 import { batch } from '../accessors/BatchNode.js';
-
+import { materialReference } from '../accessors/MaterialReferenceNode.js';
 import { positionLocal, positionView } from '../accessors/PositionNode.js';
 import { skinningReference } from '../accessors/SkinningNode.js';
 import { morphReference } from '../accessors/MorphNode.js';
@@ -19,6 +19,7 @@ import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import AONode from '../lighting/AONode.js';
 import { lightingContext } from '../lighting/LightingContextNode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
+import IrradianceNode from '../lighting/IrradianceNode.js';
 import { depthPixel } from '../display/ViewportDepthNode.js';
 import { cameraLogDepth } from '../accessors/CameraNode.js';
 import { clipping, clippingAlpha } from '../accessors/ClippingNode.js';
@@ -342,6 +343,12 @@ class NodeMaterial extends ShaderMaterial {
 		if ( envNode ) {
 
 			materialLightsNode.push( new EnvironmentNode( envNode ) );
+
+		}
+
+		if ( builder.material.lightMap ) {
+
+			materialLightsNode.push( new IrradianceNode( materialReference( 'lightMap', 'texture' ) ) );
 
 		}
 

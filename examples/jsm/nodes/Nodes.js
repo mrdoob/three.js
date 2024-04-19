@@ -158,6 +158,7 @@ export { default as LightingNode /* @TODO: lighting (abstract), light */ } from 
 export { default as LightingContextNode, lightingContext } from './lighting/LightingContextNode.js';
 export { default as HemisphereLightNode } from './lighting/HemisphereLightNode.js';
 export { default as EnvironmentNode } from './lighting/EnvironmentNode.js';
+export { default as IrradianceNode } from './lighting/IrradianceNode.js';
 export { default as AONode } from './lighting/AONode.js';
 export { default as AnalyticLightNode } from './lighting/AnalyticLightNode.js';
 
