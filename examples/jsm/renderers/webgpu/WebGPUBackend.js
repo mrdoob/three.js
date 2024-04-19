@@ -871,7 +871,7 @@ class WebGPUBackend extends Backend {
 
 		// draw
 
-		const drawRange = geometry.drawRange;
+		const drawRange = renderObject.drawRange;
 		const firstVertex = drawRange.start;
 
 		const instanceCount = this.getInstanceCount( renderObject );
