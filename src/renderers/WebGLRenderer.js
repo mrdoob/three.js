@@ -1432,7 +1432,7 @@ class WebGLRenderer {
 					minFilter: LinearMipmapLinearFilter,
 					samples: 4,
 					stencilBuffer: stencil,
-					ignoreDepthValues: true,
+					resolveDepthBuffer: false,
 					resolveStencilBuffer: false
 				} );
 

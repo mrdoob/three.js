@@ -1868,7 +1868,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				for ( let i = 0; i < textures.length; i ++ ) {
 
-					if ( renderTarget.ignoreDepthValues === false ) {
+					if ( renderTarget.resolveDepthBuffer ) {
 
 						if ( renderTarget.depthBuffer ) mask |= _gl.DEPTH_BUFFER_BIT;
 
@@ -1896,7 +1896,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						invalidationArrayRead.push( _gl.COLOR_ATTACHMENT0 + i );
 
-						if ( renderTarget.depthBuffer && renderTarget.ignoreDepthValues === true ) {
+						if ( renderTarget.depthBuffer && renderTarget.resolveDepthBuffer === false ) {
 
 							invalidationArrayRead.push( depthStyle );
 							invalidationArrayDraw.push( depthStyle );
@@ -1935,7 +1935,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else {
 
-				if ( renderTarget.depthBuffer && renderTarget.ignoreDepthValues && supportsInvalidateFramebuffer ) {
+				if ( renderTarget.depthBuffer && renderTarget.resolveDepthBuffer === false && supportsInvalidateFramebuffer ) {
 
 					const depthStyle = renderTarget.stencilBuffer ? _gl.DEPTH_STENCIL_ATTACHMENT : _gl.DEPTH_ATTACHMENT;
 
