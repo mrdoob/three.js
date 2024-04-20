@@ -1432,11 +1432,9 @@ class WebGLRenderer {
 					minFilter: LinearMipmapLinearFilter,
 					samples: 4,
 					stencilBuffer: stencil,
+					resolveDepthBuffer: false,
 					resolveStencilBuffer: false
 				} );
-
-				const renderTargetProperties = properties.get( currentRenderState.state.transmissionRenderTarget[ camera.id ] );
-				renderTargetProperties.__ignoreDepthValues = true;
 
 				// debug
 

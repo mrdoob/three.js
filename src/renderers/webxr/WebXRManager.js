@@ -345,11 +345,9 @@ class WebXRManager extends EventDispatcher {
 							depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
 							stencilBuffer: attributes.stencil,
 							colorSpace: renderer.outputColorSpace,
-							samples: attributes.antialias ? 4 : 0
+							samples: attributes.antialias ? 4 : 0,
+							resolveDepthBuffer: ( glProjLayer.ignoreDepthValues === false )
 						} );
-
-					const renderTargetProperties = renderer.properties.get( newRenderTarget );
-					renderTargetProperties.__ignoreDepthValues = glProjLayer.ignoreDepthValues;
 
 				}
 
