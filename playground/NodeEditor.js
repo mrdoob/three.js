@@ -391,45 +391,12 @@ export class NodeEditor extends THREE.EventDispatcher {
 		// EXAMPLES
 		//**************//
 
-		addExamples( 'Universal', [
+		addExamples( 'Basic', [
 			'Teapot',
 			'Matcap',
-			'Fresnel'
+			'Fresnel',
+			'Particles'
 		] );
-
-		if ( this.renderer.isWebGLRenderer ) {
-
-			addExamples( 'WebGL', [
-				'Car'
-			] );
-
-			context.add( new ButtonInput( 'WebGPU Version' ).onClick( () => {
-
-				if ( confirm( 'Are you sure?' ) === true ) {
-
-					window.location.search = '?backend=webgpu';
-
-				}
-
-			} ) );
-
-		} else if ( this.renderer.isWebGPURenderer ) {
-
-			addExamples( 'WebGPU', [
-				'Particle'
-			] );
-
-			context.add( new ButtonInput( 'WebGL Version' ).onClick( () => {
-
-				if ( confirm( 'Are you sure?' ) === true ) {
-
-					window.location.search = '';
-
-				}
-
-			} ) );
-
-		}
 
 		this.examplesContext = context;
 
@@ -474,7 +441,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		const urlParams = new URLSearchParams( window.location.search );
 
-		const example = urlParams.get( 'example' ) || 'universal/teapot';
+		const example = urlParams.get( 'example' ) || 'basic/teapot';
 
 		this.loadURL( `./examples/${example}.json` );
 
