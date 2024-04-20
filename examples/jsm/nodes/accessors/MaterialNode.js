@@ -115,11 +115,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.SPECULAR_COLOR2 ) {
 
-			const specularColorNode = this.getColor( 'specularColor' );
+			const specularColorNode = this.getColor( scope );
 
 			if ( material.specularColorMap && material.specularColorMap.isTexture === true ) {
 
-				node = specularColorNode.mul( this.getTexture( 'specularColor' ).rgb );
+				node = specularColorNode.mul( this.getTexture( scope ).rgb );
 
 			} else {
 
