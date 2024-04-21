@@ -31,6 +31,7 @@
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import TWEEN from 'three/addons/libs/tween.module.js';
+			import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 
 			let container, stats;
 			let renderer;
@@ -211,13 +212,6 @@
 
 			function Transition( sceneA, sceneB ) {
 
-				const scene = new THREE.Scene();
-
-				const width = window.innerWidth;
-				const height = window.innerHeight;
-
-				const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, - 10, 10 );
-
 				const textures = [];
 
 				const loader = new THREE.TextureLoader();
@@ -304,9 +298,7 @@
 
 				} );
 
-				const geometry = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
-				const mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+				const fsQuad = new FullScreenQuad( material );
 
 				material.uniforms.tDiffuse1.value = sceneA.fbo.texture;
 				material.uniforms.tDiffuse2.value = sceneB.fbo.texture;
@@ -392,7 +384,7 @@
 
 						renderer.setRenderTarget( null );
 						renderer.clear();
-						renderer.render( scene, camera );
+						fsQuad.render( renderer );
 
 					}
 
