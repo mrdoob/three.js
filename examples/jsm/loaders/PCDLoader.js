@@ -120,7 +120,7 @@ class PCDLoader extends Loader {
 			PCDheader.data = result2[ 1 ];
 			PCDheader.headerLen = result2[ 0 ].length + result1;
 			PCDheader.str = data.slice( 0, PCDheader.headerLen );
-
+			console.log(PCDheader.str);
 			// remove comments
 
 			PCDheader.str = PCDheader.str.replace( /#.*/gi, '' );
@@ -283,6 +283,20 @@ class PCDLoader extends Loader {
 
 					color.push( c.r, c.g, c.b );
 
+				} else if ( (offset.red !== undefined) && (offset.green !== undefined) && (offset.blue !== undefined) ) {
+
+					const red = parseFloat( line[ offset.red ] );
+					const green = parseFloat( line[ offset.green ] );
+					const blue = parseFloat( line[ offset.blue ] );
+
+					const r = ( red >> 8 ) / 255;
+					const g = ( green >> 8 ) / 255;
+					const b = ( blue >> 8 ) / 255;
+
+					c.set( r, g, b ).convertSRGBToLinear();
+
+					color.push( c.r, c.g, c.b );
+
 				}
 
 				if ( offset.normal_x !== undefined ) {
@@ -387,6 +401,7 @@ class PCDLoader extends Loader {
 
 			const dataview = new DataView( data, PCDheader.headerLen );
 			const offset = PCDheader.offset;
+			console.log(offset);
 
 			for ( let i = 0, row = 0; i < PCDheader.points; i ++, row += PCDheader.rowSize ) {
 
@@ -403,6 +418,22 @@ class PCDLoader extends Loader {
 					const r = dataview.getUint8( row + offset.rgb + 2 ) / 255.0;
 					const g = dataview.getUint8( row + offset.rgb + 1 ) / 255.0;
 					const b = dataview.getUint8( row + offset.rgb + 0 ) / 255.0;
+
+					c.set( r, g, b ).convertSRGBToLinear();
+
+					color.push( c.r, c.g, c.b );
+
+				}
+
+				if ( offset.red !== undefined ) {
+
+					const red = dataview.getFloat64( row + offset.red , true);
+					const green = dataview.getFloat64( row + offset.green , true);
+					const blue = dataview.getFloat64( row + offset.blue , true);
+
+					const r = ( red >> 8 ) / 255;
+					const g = ( green >> 8 ) / 255;
+					const b = ( blue >> 8  ) / 255;
 
 					c.set( r, g, b ).convertSRGBToLinear();
 
