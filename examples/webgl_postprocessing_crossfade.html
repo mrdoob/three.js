@@ -71,6 +71,16 @@
 
 				transition = new Transition( sceneA, sceneB );
 
+				window.addEventListener( 'resize', onWindowResize );
+
+				function onWindowResize() {
+
+					sceneA.resize();
+					sceneB.resize();
+					renderer.setSize( window.innerWidth, window.innerHeight );
+
+				}
+
 			}
 
 			function animate() {
@@ -204,6 +214,14 @@
 						renderer.render( scene, camera );
 
 					}
+
+				};
+
+				this.resize = function () {
+
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+					this.fbo.setSize( window.innerWidth, window.innerHeight );
 
 				};
 
