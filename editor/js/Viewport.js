@@ -43,8 +43,8 @@ function Viewport( editor ) {
 
 	// helpers
 
-	const GRID_COLORS_LIGHT = [ 0x999999, 0x777777 ] 
-	const GRID_COLORS_DARK =  [ 0x555555, 0x888888 ];
+	const GRID_COLORS_LIGHT = [ 0x999999, 0x777777 ];
+	const GRID_COLORS_DARK = [ 0x555555, 0x888888 ];
 
 	const grid = new THREE.Group();
 
