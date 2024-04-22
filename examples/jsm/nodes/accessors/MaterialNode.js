@@ -336,10 +336,10 @@ MaterialNode.ALPHA_TEST = 'alphaTest';
 MaterialNode.COLOR = 'color';
 MaterialNode.OPACITY = 'opacity';
 MaterialNode.SHININESS = 'shininess';
-MaterialNode.SPECULAR_COLOR = 'specular';
+MaterialNode.SPECULAR = 'specular';
 MaterialNode.SPECULAR_STRENGTH = 'specularStrength';
 MaterialNode.SPECULAR_INTENSITY = 'specularIntensity';
-MaterialNode.SPECULAR_COLOR2 = 'specularColor';
+MaterialNode.SPECULAR_COLOR = 'specularColor';
 MaterialNode.REFLECTIVITY = 'reflectivity';
 MaterialNode.ROUGHNESS = 'roughness';
 MaterialNode.METALNESS = 'metalness';
@@ -374,10 +374,10 @@ export const materialColor = nodeImmutable( MaterialNode, MaterialNode.COLOR );
 export const materialShininess = nodeImmutable( MaterialNode, MaterialNode.SHININESS );
 export const materialEmissive = nodeImmutable( MaterialNode, MaterialNode.EMISSIVE );
 export const materialOpacity = nodeImmutable( MaterialNode, MaterialNode.OPACITY );
-export const materialSpecularColor = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_COLOR );
+export const materialSpecular = nodeImmutable( MaterialNode, MaterialNode.SPECULAR );
 
 export const materialSpecularIntensity = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_INTENSITY );
-export const materialSpecularColor2 = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_COLOR2 );
+export const materialSpecularColor = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_COLOR );
 
 export const materialSpecularStrength = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_STRENGTH );
 export const materialReflectivity = nodeImmutable( MaterialNode, MaterialNode.REFLECTIVITY );
