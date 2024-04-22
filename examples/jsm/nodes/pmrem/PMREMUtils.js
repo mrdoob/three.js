@@ -237,7 +237,7 @@ const bilinearCubeUV = tslFn( ( [ envMap, direction_immutable, mipInt_immutable,
 	uv.x.mulAssign( CUBEUV_TEXEL_WIDTH );
 	uv.y.mulAssign( CUBEUV_TEXEL_HEIGHT );
 
-	return envMap.uv( uv );
+	return envMap.uv( uv ).grad( vec2(), vec2() ); // disable anisotropic filtering
 
 } );
 
