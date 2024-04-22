@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
 
 import { Config } from './Config.js';
 import { Loader } from './Loader.js';
@@ -430,6 +431,10 @@ Editor.prototype = {
 				} else if ( object.isHemisphereLight ) {
 
 					helper = new THREE.HemisphereLightHelper( object, 1 );
+
+				} else if ( object.isRectAreaLight ) {
+
+					helper = new RectAreaLightHelper( object );
 
 				} else if ( object.isSkinnedMesh ) {
 

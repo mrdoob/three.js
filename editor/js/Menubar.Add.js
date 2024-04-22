@@ -385,6 +385,26 @@ function MenubarAdd( editor ) {
 	} );
 	options.add( option );
 
+	// RectAreaLight
+
+	option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/add/rectarealight' ) );
+	option.onClick( function () {
+
+		const color = 0xffffff;
+		const intensity = 1;
+		const width = 10;
+		const height = 10;
+
+		const light = new THREE.RectAreaLight( color, intensity, width, height );
+		light.name = 'RectAreaLight';
+
+		editor.execute( new AddObjectCommand( editor, light ) );
+
+	} );
+	options.add( option );
+
 	// SpotLight
 
 	option = new UIRow();

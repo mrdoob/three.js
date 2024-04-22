@@ -437,7 +437,7 @@ function Viewport( editor ) {
 
 		const helper = editor.helpers[ object.id ];
 
-		if ( helper !== undefined && helper.isSkeletonHelper !== true ) {
+		if ( helper !== undefined && helper.isSkeletonHelper !== true && helper.type !== 'RectAreaLightHelper' ) {
 
 			helper.update();
 

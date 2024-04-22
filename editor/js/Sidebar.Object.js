@@ -214,6 +214,26 @@ function SidebarObject( editor ) {
 
 	container.add( objectFarRow );
 
+	// width
+
+	const objectWidthRow = new UIRow();
+	const objectWidth = new UINumber().onChange( update );
+
+	objectWidthRow.add( new UIText( strings.getKey( 'sidebar/object/width' ) ).setClass( 'Label' ) );
+	objectWidthRow.add( objectWidth );
+
+	container.add( objectWidthRow );
+
+	// height
+
+	const objectHeightRow = new UIRow();
+	const objectHeight = new UINumber().onChange( update );
+
+	objectHeightRow.add( new UIText( strings.getKey( 'sidebar/object/height' ) ).setClass( 'Label' ) );
+	objectHeightRow.add( objectHeight );
+
+	container.add( objectHeightRow );
+
 	// intensity
 
 	const objectIntensityRow = new UIRow();
@@ -508,6 +528,18 @@ function SidebarObject( editor ) {
 
 			}
 
+			if ( object.width !== undefined && Math.abs( object.width - objectWidth.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( editor, object, 'width', objectWidth.getValue() ) );
+
+			}
+
+			if ( object.height !== undefined && Math.abs( object.height - objectHeight.getValue() ) >= 0.01 ) {
+
+				editor.execute( new SetValueCommand( editor, object, 'height', objectHeight.getValue() ) );
+
+			}
+
 			if ( object.intensity !== undefined && Math.abs( object.intensity - objectIntensity.getValue() ) >= 0.01 ) {
 
 				editor.execute( new SetValueCommand( editor, object, 'intensity', objectIntensity.getValue() ) );
@@ -625,6 +657,8 @@ function SidebarObject( editor ) {
 	function updateRows( object ) {
 
 		const properties = {
+			'width': objectWidthRow,
+			'height': objectHeightRow,
 			'fov': objectFovRow,
 			'left': objectLeftRow,
 			'right': objectRightRow,
@@ -750,6 +784,18 @@ function SidebarObject( editor ) {
 		objectScaleX.setValue( object.scale.x );
 		objectScaleY.setValue( object.scale.y );
 		objectScaleZ.setValue( object.scale.z );
+
+		if ( object.width !== undefined ) {
+
+			objectWidth.setValue( object.width );
+
+		}
+
+		if ( object.height !== undefined ) {
+
+			objectHeight.setValue( object.height );
+
+		}
 
 		if ( object.fov !== undefined ) {
 

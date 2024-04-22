@@ -61,6 +61,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 
 			import { Editor } from './js/Editor.js';
 			import { Viewport } from './js/Viewport.js';
@@ -81,6 +82,8 @@
 			};
 
 			//
+
+			RectAreaLightUniformsLib.init();
 
 			const editor = new Editor();
 
