@@ -218,10 +218,7 @@ class WebGLRenderer {
 
 		function getContext( contextName, contextAttributes ) {
 
-			const context = canvas.getContext( contextName, contextAttributes );
-			if ( context !== null ) return context;
-
-			return null;
+			return canvas.getContext( contextName, contextAttributes );
 
 		}
 
