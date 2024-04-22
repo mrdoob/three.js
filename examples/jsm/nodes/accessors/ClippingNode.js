@@ -5,7 +5,7 @@ import { positionView } from './PositionNode.js';
 import { diffuseColor, property } from '../core/PropertyNode.js';
 import { tslFn } from '../shadernode/ShaderNode.js';
 import { loop } from '../utils/LoopNode.js';
-import { smoothstep  } from '../math/MathNode.js';
+import { smoothstep } from '../math/MathNode.js';
 import { uniforms } from './UniformsNode.js';
 
 class ClippingNode extends Node {
@@ -78,7 +78,7 @@ class ClippingNode extends Node {
 
 					plane = clippingPlanes.element( i );
 
-					distanceToPlane.assign( positionView.dot(  plane.xyz ).negate().add( plane.w ) );
+					distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
 					distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
 
 					unionClipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ).oneMinus() );
@@ -126,6 +126,7 @@ class ClippingNode extends Node {
 				} );
 
 				clipped.discard();
+
 			}
 
 		} )();
