@@ -1,7 +1,7 @@
 import { addNodeMaterial } from './NodeMaterial.js';
 import { transformedClearcoatNormalView } from '../accessors/NormalNode.js';
 import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor } from '../core/PropertyNode.js';
-import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor2, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor } from '../accessors/MaterialNode.js';
+import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor } from '../accessors/MaterialNode.js';
 import { float, vec2, vec3, If } from '../shadernode/ShaderNode.js';
 import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
@@ -82,7 +82,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		const iorNode = this.iorNode ? float( this.iorNode ) : materialIOR;
 
 		ior.assign( iorNode );
-		specularColor.assign( mix( min( pow2( ior.sub( 1.0 ).div( ior.add( 1.0 ) ) ).mul( materialSpecularColor2 ), vec3( 1.0 ) ).mul( materialSpecularIntensity ), diffuseColor.rgb, metalness ) );
+		specularColor.assign( mix( min( pow2( ior.sub( 1.0 ).div( ior.add( 1.0 ) ) ).mul( materialSpecularColor ), vec3( 1.0 ) ).mul( materialSpecularIntensity ), diffuseColor.rgb, metalness ) );
 		specularF90.assign( mix( materialSpecularIntensity, 1.0, metalness ) );
 
 	}
