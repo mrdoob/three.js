@@ -113,7 +113,7 @@ class MaterialNode extends Node {
 
 			}
 
-		} else if ( scope === MaterialNode.SPECULAR_COLOR2 ) {
+		} else if ( scope === MaterialNode.SPECULAR_COLOR ) {
 
 			const specularColorNode = this.getColor( scope );
 
