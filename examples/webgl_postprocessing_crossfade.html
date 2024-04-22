@@ -53,7 +53,6 @@
 			const fxSceneB = new FXScene( new THREE.IcosahedronGeometry( 1, 1 ), new THREE.Vector3( 0, 0.2, 0.1 ), 0x000000 );
 
 			init();
-			animate();
 
 			function init() {
 
@@ -63,7 +62,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				composer = new EffectComposer( renderer );
@@ -77,6 +75,8 @@
 
 				const outputPass = new OutputPass();
 				composer.addPass( outputPass );
+
+				renderer.setAnimationLoop( animate );
 
 			}
 
