@@ -60,13 +60,9 @@
 				initGUI();
 				initTextures();
 
-				const width = window.innerWidth;
-				const height = window.innerHeight;
-				const dpr = window.devicePixelRatio;
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( dpr );
-				renderer.setSize( width, height );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
@@ -76,8 +72,6 @@
 				document.body.appendChild( stats.dom );
 
 				renderTransitionPass = new RenderTransitionPass( fxSceneA.scene, fxSceneA.camera, fxSceneB.scene, fxSceneB.camera );
-				renderTransitionPass.setPixelRatio( dpr );
-				renderTransitionPass.setSize( width, height );
 				renderTransitionPass.setTexture( textures[ 0 ] );
 				composer.addPass( renderTransitionPass );
 
@@ -92,11 +86,7 @@
 
 				fxSceneA.resize();
 				fxSceneB.resize();
-				const width = window.innerWidth;
-				const height = window.innerHeight;
-				renderTransitionPass.setSize( width, height );
-				renderer.setSize( width, height );
-				composer.setSize( width, height );
+				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

@@ -24,8 +24,6 @@ class RenderTransitionPass extends Pass {
 		this.renderTargetB = new WebGLRenderTarget();
 		this.renderTargetB.texture.type = HalfFloatType;
 
-		this.pixelRatio = 1;
-
 	}
 
 	setTransition( value ) {
@@ -52,17 +50,8 @@ class RenderTransitionPass extends Pass {
 
 	}
 
-	setPixelRatio( value ) {
-
-		this.pixelRatio = value;
-
-	}
-
 	setSize( width, height ) {
 
-		const pixelRatio = this.pixelRatio;
-		width = pixelRatio * width;
-		height = pixelRatio * height;
 		this.renderTargetA.setSize( width, height );
 		this.renderTargetB.setSize( width, height );
 
