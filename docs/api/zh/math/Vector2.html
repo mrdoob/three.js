@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -34,16 +33,19 @@
 			其他的一些事物也可以使用二维向量进行表示，比如说动量矢量、复数等等；但以上这些是它在three.js中的常用用途。
 		</p>
 
-		<h2>示例</h2>
+		<p>
+			对 [name] 实例进行遍历将按相应的顺序生成它的分量 (x, y)。
+		</p>
 
+		<h2>代码示例</h2>
 
 		<code>
-		var a = new THREE.Vector2( 0, 1 );
+		const a = new THREE.Vector2( 0, 1 );
 
 		//no arguments; will be initialised to (0, 0)
-		var b = new THREE.Vector2( );
+		const b = new THREE.Vector2( );
 
-		var d = a.distanceTo( b );
+		const d = a.distanceTo( b );
 		</code>
 
 
@@ -62,6 +64,11 @@
 
 		<h3>[property:Float height]</h3>
 		<p>[page:.y y]的别名。</p>
+
+		<h3>[property:Boolean isVector2]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:Float width]</h3>
 		<p>[page:.x x]的别名。</p>
@@ -88,6 +95,11 @@
 		<h3>[method:Float angle]()</h3>
 		<p>
 			计算该向量相对于x轴正方向的弧度角度。
+		</p>
+
+		<h3>[method:Float angleTo]( [param:Vector2 v] )</h3>
+		<p>
+		以弧度返回该向量与向量[page:Vector2 v]之间的角度。
 		</p>
 
 		<h3>[method:this applyMatrix3]( [param:Matrix3 m] )</h3>
@@ -160,8 +172,7 @@
 
 		<h3>[method:this divideScalar]( [param:Float s] )</h3>
 		<p>
-			将该向量除以标量[page:Float s]。<br />
-			如果传入的[page:Float s] = 0，则向量将被设置为*( 0, 0 )*。
+			将该向量除以标量[page:Float s]。
 		</p>
 
 		<h3>[method:Float dot]( [param:Vector2 v] )</h3>
@@ -171,7 +182,7 @@
 
 		<h3>[method:Float cross]( [param:Vector2 v] )</h3>
 		<p>
-			计算该vector和所传入[page:Vector2 v]的叉积（[link:https://en.wikipedia.org/wiki/Cross_product cross product]）。 
+			计算该vector和所传入[page:Vector2 v]的叉积（[link:https://en.wikipedia.org/wiki/Cross_product cross product]）。
 			请注意，“叉积”在2D中并没有被明确定义。该函数计算的是2D图形中经常使用的几何叉积。
 		</p>
 
@@ -196,7 +207,7 @@
 		[page:BufferAttribute attribute] - 来源的attribute。<br />
 		[page:Integer index] - 在attribute中的索引。<br /><br />
 
-		从[page:BufferAttribute attribute]中设置向量的[page:.x x]值和[page:.y y]值。 
+		从[page:BufferAttribute attribute]中设置向量的[page:.x x]值和[page:.y y]值。
 、		</p>
 
 		<h3>[method:Float getComponent]( [param:Integer index] )</h3>
@@ -271,16 +282,16 @@
 		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
 		<p>将该向量与所传入的标量[page:Float s]进行相乘。</p>
 
-		<h3>[method:this rotateAround]( [param:Vector2 center], [param:float angle] )</h3>
+		<h3>[method:this rotateAround]( [param:Vector2 center], [param:Float angle] )</h3>
 		<p>
 		[page:Vector2 center] - 将被围绕旋转的点。<br />
-		[page:float angle] - 将要旋转的角度，以弧度来表示。<br /><br />
+		[page:Float angle] - 将要旋转的角度，以弧度来表示。<br /><br />
 
-		将向量围绕着[page:Vector2 center]旋转[page:float angle]弧度。
+		将向量围绕着[page:Vector2 center]旋转[page:Float angle]弧度。
 		</p>
 
 		<h3>[method:this round]()</h3>
-		<p>			
+		<p>
 			向量中的[page:.x x]分量和[page:.y y]分量四舍五入取整为最接近的整数值。
 		</p>
 
@@ -292,7 +303,7 @@
 		<h3>[method:this set]( [param:Float x], [param:Float y] )</h3>
 		<p>设置该向量的[page:.x x]和[page:.y y]分量。</p>
 
-		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
+		<h3>[method:this setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<p>
 		[page:Integer index] - 0 或 1<br />
 		[page:Float value] - [page:Float]<br /><br />
@@ -332,6 +343,11 @@
 		[page:Integer offset] - （可选） 数组中元素的偏移量。<br /><br />
 
 		返回一个数组[x, y]，或者将x和y复制到所传入的[page:Array array]中。
+		</p>
+
+		<h3>[method:this random]()</h3>
+		<p>
+			将该向量的每个分量(x、y)设置为介于 0 和 1 之间的伪随机数，不包括 1。
 		</p>
 
 		<h2>源代码</h2>

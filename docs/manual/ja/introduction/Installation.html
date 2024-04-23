@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <base href="../../../" />
+    <script src="page.js"></script>
+    <link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+    <h1>[name]</h1>
+
+    <p>
+        [link:https://www.npmjs.com/ npm]を使ってthree.jsとモダンなビルドツールをインストール出来ます。もしくは、静的ホスティングやCDNを使って素早く使い始めることも可能です。ほとんどの人にとっては、npmを使ってインストールするのが良いでしょう。
+    </p>
+
+    <p>
+        どちらの方法を選ぶにしても、一貫して同じバージョンのライブラリからファイルをimportしてください。異なるソースのファイルを混ぜるとコードが重複するかもしれませんし、予想外の方法でアプリケーションが壊れるかもしれません。
+    </p>
+
+    <p>
+        three.jsをインストール方法は、ES modules依存です([link:https://eloquentjavascript.net/10_modules.html#h_hF2FmOVxw7 Eloquent JavaScript: ECMAScript Modules]を参照)。そのおかげで、最新版のプロジェクトのライブラリの必要な部分だけを取り込むことができます。
+    </p>
+
+    <h2>npmでインストールする</h2>
+
+    <p>
+        [link:https://www.npmjs.com/package/three there] npm moduleをインストールするために, プロジェクトのフォルダでターミナルを開いて以下のコードを実行してください。
+    </p>
+
+    <code>
+		npm install three
+		</code>
+
+    <p>
+        パッケージがダウンロードされて、インストールされます。これで、three.jsをコードの中で使う準備が完了しました。
+    </p>
+
+    <code>
+		// Option 1: Import the entire three.js core library.
+		import * as THREE from 'three';
+
+		const scene = new THREE.Scene();
+
+
+		// Option 2: Import just the parts you need.
+		import { Scene } from 'three';
+
+		const scene = new Scene();
+		</code>
+
+    <p>
+        npmからインストールする際に、プロジェクトで必要なパッケージを一つのJavaScriptのファイルにまとめるために、ビルドツールを使うことがあるでしょう。ほとんどのモダンなJavaScriptのビルダーでthree.jsは使えますが、最も人気なのは[link:https://webpack.js.org/ webpack]です。
+    </p>
+
+    <p>
+        すべての機能が <em>three</em> モジュールから直接アクセスできるわけではありません(直接アクセスすることを「ベアインポート」とも呼びます)。コントロール、ローダー、エフェクトの前処理など、ライブラリの他の一般的な部分はサプフォルダ[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm]からインポートしなければなりません。詳細については、以下の<em>Examples</em>を参照してください。
+    </p>
+
+    <p>
+        [link:https://eloquentjavascript.net/20_node.html#h_J6hW/SmL/a Eloquent JavaScript: Installing with npm]でnpm moduleについて詳しく学習する。
+    </p>
+
+    <h2>CDNや静的ホスティングからインストールをする</h2>
+
+    <p>
+        three.jsは、自分の Web サーバーにファイルをアップロードするか、既存の CDN を利用することで、ビルドシステムなしで利用することができます。ライブラリはES moduleに依存しているため、ライブラリを参照するスクリプトは以下のように<em>type="module"</em>を使用する必要があります。
+    </p>
+
+    <code>
+&lt;script type="importmap">
+    {
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@&lt;version&gt;/build/three.module.js"
+    }
+    }
+&lt;/script>
+
+&lt;script type="module">
+
+    import * as THREE from 'three';
+
+    const scene = new THREE.Scene();
+
+&lt;/script>
+</code>
+
+    <h2>Addons</h2>
+
+    <p>
+        three.jsのコアは、3Dエンジンの最も重要なコンポーネントに焦点を当てています。コントロール、ローダー、エフェクトの前処理といった、他の多くの便利なコンポーネントは [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] ディレクトリの一部です。これらは「examples」と呼ばれています。その理由としては、ユーザーが既製品を使用でき、リミックスやカスタマイズも可能だからです。これらのコンポーネントは常にコアライブラリと同期していますが、npm上の同様のサードパーティ製パッケージは別の人によってメンテナンスされており、最新ではないかもしれません。
+    </p>
+
+    <p>
+        Addonsはそれだけ別でインストールする必要はありませんが、importは分けて行う必要があります。 three.jsをnpmでインストールしている場合、以下のようにして[page:OrbitControls]コンポーネントを読み込むことができます。
+    </p>
+
+
+    <code>
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+		const controls = new OrbitControls( camera, renderer.domElement );
+		</code>
+
+    <p>
+        three.jsをCDNを使用してインストールしている場合は、同じCDNを使用して他のコンポートをインストールしてください。
+    </p>
+
+    <code>
+&lt;script type="importmap">
+    {
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@&lt;version&gt;/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@&lt;version&gt;/examples/jsm/"
+    }
+    }
+&lt;/script>
+
+&lt;script type="module">
+
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const controls = new OrbitControls( camera, renderer.domElement );
+
+&lt;/script>
+</code>
+
+    <p>
+        重要なのは、すべてのファイルで同じバージョンを使用することです。異なるバージョンの異なるAddonsをインポートしたり、three.jsライブラリ自体とは異なるバージョンのAddonsを使用したりしないでください。
+    </p>
+
+    <h2>互換性について</h2>
+
+    <h3>CommonJSでのimport</h3>
+
+    <p>
+        最近のJavaScriptバンドラーはデフォルトでESモジュールをサポートしていますが、古いビルドツールの中にはサポートしていないものもあります。そのような場合は,バンドラーがESモジュールのことがわかるように設定することができます。例えば [link:http://browserify.org/ Browserify]では[link:https://github.com/babel/babelify babelify] プラグインが必要です。
+    </p>
+
+    <h3>Import maps</h3>
+
+    <p>
+        npmからインストールする時と、静的ホスティングやCDN からインストールする時とでは、インポートに使用するパスが異なります。これは、両方のグループのユーザーが、どういったものを使いやすいと感じるかが異なるために起こります。ビルドツールやバンドルを使用している開発者は、相対パスよりも裸のパッケージ指定子(例えば、'three')を好み、<em>examples/</em> フォルダ内のファイルは、この形式に従わない <em>three.module.js</em> への相対参照を使用しています。ビルドツールを使用しない人（高速プロトタイピング、学習、個人的な好みなど）は、同様に、特定のフォルダ構造を必要とし、グローバルな<em>three.*</em>名前空間よりも厳密な相対インポートを嫌うかもしれません。
+    </p>
+
+    <p>
+        [link:https://github.com/WICG/import-maps import maps] が広く利用できるようになったら、これらの相対パスを削除して、npm パッケージ名の 'three' への裸のパッケージ指定子に置き換えたいと考えています。これにより、ビルドツールが期待するnpmパッケージとより密接にマッチし、ファイルをインポートする際に両グループのユーザが全く同じコードを書くことができるようになります。ビルドツールを避けたいユーザーのために、シンプルなJSONマッピングですべてのインポートをCDNや静的ファイルフォルダに向けることができます。試しに、私たちの
+        [link:https://glitch.com/edit/#!/three-import-map?path=index.html import map example] で示されているように、import mapsのPolyfillを使って、今日はよりシンプルなインポートを使ってみることができます。
+    </p>
+
+    <h3>Node.js</h3>
+
+    <p>
+        Because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be resolved by using shims like [link:https://github.com/stackgl/headless-gl headless-gl], or by replacing components like [page:TextureLoader] with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
+    </p>
+
+    <p>
+        Make sure to add `{ "type": "module" }` to your `package.json` to enable ES6 modules in your node project.
+    </p>
+
+</body>
+
+</html>

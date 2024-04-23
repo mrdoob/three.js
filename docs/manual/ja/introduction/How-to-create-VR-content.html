@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>[name]</h1>
+
+	<p>
+		このガイドでは、three.jsを使って作成したWebベースのVRアプリケーションの基本的なコンポーネントの概要を説明しています。
+	</p>
+
+	<h2>Workflow</h2>
+
+	<p>
+		はじめに、プロジェクトに[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/VRButton.js VRButton.js]を追加する必要があります。
+	</p>
+
+	<code>
+import { VRButton } from 'three/addons/webxr/VRButton.js';
+	</code>
+
+	<p>
+		*VRButton.createButton()* は2つの重要なことを行います。VR互換性であることを表すボタンを作成し、ユーザーがボタンをアクティブにするとVRセッションを開始します。この機能を追加するためには、次のコードをアプリに追加するだけで良いです。
+	</p>
+
+	<code>
+document.body.appendChild( VRButton.createButton( renderer ) );
+	</code>
+
+	<p>
+		次に *WebGLRenderer* インスタンスのXRレンダリングを有効にしてください。
+	</p>
+
+	<code>
+renderer.xr.enabled = true;
+	</code>
+
+	<p>
+		最後にアニメーションループを調整する必要があります。というのも、よく知られた *window.requestAnimationFrame()* 関数を使えないからです。VRプロジェクトのためには、[page:WebGLRenderer.setAnimationLoop setAnimationLoop]を使います。最低限必要なコードは以下のようになります。
+	</p>
+
+	<code>
+renderer.setAnimationLoop( function () {
+
+	renderer.render( scene, camera );
+
+} );
+	</code>
+
+	<h2>Next Steps</h2>
+
+	<p>
+		このワークフローを実際に見るために、公式のWebVRの例を見てみましょう。<br /><br />
+
+		[example:webxr_vr_ballshooter WebXR / VR / ballshooter]<br />
+		[example:webxr_vr_cubes WebXR / VR / cubes]<br />
+		[example:webxr_vr_dragging WebXR / VR / dragging]<br />
+		[example:webxr_vr_paint WebXR / VR / paint]<br />
+		[example:webxr_vr_panorama_depth WebXR / VR / panorama_depth]<br />
+		[example:webxr_vr_panorama WebXR / VR / panorama]<br />
+		[example:webxr_vr_rollercoaster WebXR / VR / rollercoaster]<br />
+		[example:webxr_vr_sandbox WebXR / VR / sandbox]<br />
+		[example:webxr_vr_sculpt WebXR / VR / sculpt]<br />
+		[example:webxr_vr_video WebXR / VR / video]
+	</p>
+
+</body>
+
+</html>

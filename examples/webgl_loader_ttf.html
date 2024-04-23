@@ -7,41 +7,51 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<script src="js/libs/opentype.min.js"></script>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - TTFLoader using opentype by gero3
 			<br/>type to enter new text, drag to spin the text
 		</div>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { TTFLoader } from './jsm/loaders/TTFLoader.js';
+			import { TTFLoader } from 'three/addons/loaders/TTFLoader.js';
+			import { Font } from 'three/addons/loaders/FontLoader.js';
+			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
-			var container;
-			var camera, cameraTarget, scene, renderer;
-			var group, textMesh1, textMesh2, textGeo, material;
-			var firstLetter = true;
+			let container;
+			let camera, cameraTarget, scene, renderer;
+			let group, textMesh1, textMesh2, textGeo, material;
+			let firstLetter = true;
 
-			var text = 'three.js',
-				height = 20,
+			let text = 'three.js';
+			const depth = 20,
 				size = 70,
 				hover = 30,
 				curveSegments = 4,
 				bevelThickness = 2,
 				bevelSize = 1.5;
 
-			var font = null;
-			var mirror = true;
+			let font = null;
+			const mirror = true;
 
-			var targetRotation = 0;
-			var targetRotationOnMouseDown = 0;
+			let targetRotation = 0;
+			let targetRotationOnPointerDown = 0;
 
-			var mouseX = 0;
-			var mouseXOnMouseDown = 0;
+			let pointerX = 0;
+			let pointerXOnPointerDown = 0;
 
-			var windowHalfX = window.innerWidth / 2;
+			let windowHalfX = window.innerWidth / 2;
 
 			init();
 			animate();
@@ -66,14 +76,14 @@
 
 				// LIGHTS
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
-				dirLight.position.set( 0, 0, 1 ).normalize();
-				scene.add( dirLight );
+				const dirLight1 = new THREE.DirectionalLight( 0xffffff, 0.4 );
+				dirLight1.position.set( 0, 0, 1 ).normalize();
+				scene.add( dirLight1 );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 1.5 );
-				pointLight.position.set( 0, 100, 90 );
-				pointLight.color.setHSL( Math.random(), 1, 0.5 );
-				scene.add( pointLight );
+				const dirLight2 = new THREE.DirectionalLight( 0xffffff, 2 );
+				dirLight2.position.set( 0, hover, 10 ).normalize();
+				dirLight2.color.setHSL( Math.random(), 1, 0.5, THREE.SRGBColorSpace );
+				scene.add( dirLight2 );
 
 				material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
@@ -82,17 +92,17 @@
 
 				scene.add( group );
 
-				var loader = new TTFLoader();
+				const loader = new TTFLoader();
 
 				loader.load( 'fonts/ttf/kenpixel.ttf', function ( json ) {
 
-					font = new THREE.Font( json );
+					font = new Font( json );
 					createText();
 
 				} );
 
-				var plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 10000, 10000 ),
+				const plane = new THREE.Mesh(
+					new THREE.PlaneGeometry( 10000, 10000 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } )
 				);
 				plane.position.y = 100;
@@ -108,13 +118,13 @@
 
 				// EVENTS
 
-				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-				document.addEventListener( 'keypress', onDocumentKeyPress, false );
-				document.addEventListener( 'keydown', onDocumentKeyDown, false );
+				container.style.touchAction = 'none';
+				container.addEventListener( 'pointerdown', onPointerDown );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'keypress', onDocumentKeyPress );
+				document.addEventListener( 'keydown', onDocumentKeyDown );
+
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -138,7 +148,7 @@
 
 				}
 
-				var keyCode = event.keyCode;
+				const keyCode = event.keyCode;
 
 				// backspace
 
@@ -157,7 +167,7 @@
 
 			function onDocumentKeyPress( event ) {
 
-				var keyCode = event.which;
+				const keyCode = event.which;
 
 				// backspace
 
@@ -167,7 +177,7 @@
 
 				} else {
 
-					var ch = String.fromCharCode( keyCode );
+					const ch = String.fromCharCode( keyCode );
 					text += ch;
 
 					refreshText();
@@ -178,12 +188,12 @@
 
 			function createText() {
 
-				textGeo = new THREE.TextBufferGeometry( text, {
+				textGeo = new TextGeometry( text, {
 
 					font: font,
 
 					size: size,
-					height: height,
+					depth: depth,
 					curveSegments: curveSegments,
 
 					bevelThickness: bevelThickness,
@@ -195,7 +205,7 @@
 				textGeo.computeBoundingBox();
 				textGeo.computeVertexNormals();
 
-				var centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
+				const centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
 				textMesh1 = new THREE.Mesh( textGeo, material );
 
@@ -214,7 +224,7 @@
 
 					textMesh2.position.x = centerOffset;
 					textMesh2.position.y = - hover;
-					textMesh2.position.z = height;
+					textMesh2.position.z = depth;
 
 					textMesh2.rotation.x = Math.PI;
 					textMesh2.rotation.y = Math.PI * 2;
@@ -236,68 +246,38 @@
 
 			}
 
-			function onDocumentMouseDown( event ) {
+			function onPointerDown( event ) {
 
-				event.preventDefault();
+				if ( event.isPrimary === false ) return;
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.addEventListener( 'mouseout', onDocumentMouseOut, false );
+				pointerXOnPointerDown = event.clientX - windowHalfX;
+				targetRotationOnPointerDown = targetRotation;
 
-				mouseXOnMouseDown = event.clientX - windowHalfX;
-				targetRotationOnMouseDown = targetRotation;
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = event.clientX - windowHalfX;
-
-				targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
+				document.addEventListener( 'pointermove', onPointerMove );
+				document.addEventListener( 'pointerup', onPointerUp );
 
 			}
 
-			function onDocumentMouseUp() {
+			function onPointerMove( event ) {
 
-				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+				if ( event.isPrimary === false ) return;
 
-			}
+				pointerX = event.clientX - windowHalfX;
 
-			function onDocumentMouseOut() {
-
-				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+				targetRotation = targetRotationOnPointerDown + ( pointerX - pointerXOnPointerDown ) * 0.02;
 
 			}
 
-			function onDocumentTouchStart( event ) {
+			function onPointerUp() {
 
-				if ( event.touches.length === 1 ) {
+				if ( event.isPrimary === false ) return;
 
-					event.preventDefault();
-
-					mouseXOnMouseDown = event.touches[ 0 ].pageX - windowHalfX;
-					targetRotationOnMouseDown = targetRotation;
-
-				}
+				document.removeEventListener( 'pointermove', onPointerMove );
+				document.removeEventListener( 'pointerup', onPointerUp );
 
 			}
 
-			function onDocumentTouchMove( event ) {
-
-				if ( event.touches.length === 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
-
-				}
-
-			}
+			//
 
 			function animate() {
 

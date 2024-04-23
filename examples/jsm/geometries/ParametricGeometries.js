@@ -1,20 +1,15 @@
+import {
+	Curve,
+	Vector3
+} from 'three';
+
+import { ParametricGeometry } from './ParametricGeometry.js';
+
 /**
- * @author zz85
- *
  * Experimenting of primitive geometry creation using Surface Parametric equations
- *
  */
 
-import {
-	ArrowHelper,
-	Curve,
-	Geometry,
-	Object3D,
-	ParametricGeometry,
-	Vector3
-} from "../../../build/three.module.js";
-
-var ParametricGeometries = {
+const ParametricGeometries = {
 
 	klein: function ( v, u, target ) {
 
@@ -22,7 +17,7 @@ var ParametricGeometries = {
 		v *= 2 * Math.PI;
 
 		u = u * 2;
-		var x, y, z;
+		let x, z;
 		if ( u < Math.PI ) {
 
 			x = 3 * Math.cos( u ) * ( 1 + Math.sin( u ) ) + ( 2 * ( 1 - Math.cos( u ) / 2 ) ) * Math.cos( u ) * Math.cos( v );
@@ -35,7 +30,7 @@ var ParametricGeometries = {
 
 		}
 
-		y = - 2 * ( 1 - Math.cos( u ) / 2 ) * Math.sin( v );
+		const y = - 2 * ( 1 - Math.cos( u ) / 2 ) * Math.sin( v );
 
 		target.set( x, y, z );
 
@@ -45,9 +40,9 @@ var ParametricGeometries = {
 
 		return function ( u, v, target ) {
 
-			var x = u * width;
-			var y = 0;
-			var z = v * height;
+			const x = u * width;
+			const y = 0;
+			const z = v * height;
 
 			target.set( x, y, z );
 
@@ -60,15 +55,13 @@ var ParametricGeometries = {
 		// flat mobius strip
 		// http://www.wolframalpha.com/input/?i=M%C3%B6bius+strip+parametric+equations&lk=1&a=ClashPrefs_*Surface.MoebiusStrip.SurfaceProperty.ParametricEquations-
 		u = u - 0.5;
-		var v = 2 * Math.PI * t;
+		const v = 2 * Math.PI * t;
 
-		var x, y, z;
+		const a = 2;
 
-		var a = 2;
-
-		x = Math.cos( v ) * ( a + u * Math.cos( v / 2 ) );
-		y = Math.sin( v ) * ( a + u * Math.cos( v / 2 ) );
-		z = u * Math.sin( v / 2 );
+		const x = Math.cos( v ) * ( a + u * Math.cos( v / 2 ) );
+		const y = Math.sin( v ) * ( a + u * Math.cos( v / 2 ) );
+		const z = u * Math.sin( v / 2 );
 
 		target.set( x, y, z );
 
@@ -82,14 +75,12 @@ var ParametricGeometries = {
 		t *= 2 * Math.PI;
 
 		u = u * 2;
-		var phi = u / 2;
-		var major = 2.25, a = 0.125, b = 0.65;
+		const phi = u / 2;
+		const major = 2.25, a = 0.125, b = 0.65;
 
-		var x, y, z;
-
-		x = a * Math.cos( t ) * Math.cos( phi ) - b * Math.sin( t ) * Math.sin( phi );
-		z = a * Math.cos( t ) * Math.sin( phi ) + b * Math.sin( t ) * Math.cos( phi );
-		y = ( major + x ) * Math.sin( u );
+		let x = a * Math.cos( t ) * Math.cos( phi ) - b * Math.sin( t ) * Math.sin( phi );
+		const z = a * Math.cos( t ) * Math.sin( phi ) + b * Math.sin( t ) * Math.cos( phi );
+		const y = ( major + x ) * Math.sin( u );
 		x = ( major + x ) * Math.cos( u );
 
 		target.set( x, y, z );
@@ -105,66 +96,58 @@ var ParametricGeometries = {
  *
  *********************************************/
 
-ParametricGeometries.TubeGeometry = function ( path, segments, radius, segmentsRadius, closed, debug ) {
+ParametricGeometries.TubeGeometry = class TubeGeometry extends ParametricGeometry {
 
-	this.path = path;
-	this.segments = segments || 64;
-	this.radius = radius || 1;
-	this.segmentsRadius = segmentsRadius || 8;
-	this.closed = closed || false;
-	if ( debug ) this.debug = new Object3D();
+	constructor( path, segments = 64, radius = 1, segmentsRadius = 8, closed = false ) {
 
-	var scope = this, numpoints = this.segments + 1;
+		const numpoints = segments + 1;
 
-	var frames = path.computeFrenetFrames( segments, closed ),
-		tangents = frames.tangents,
-		normals = frames.normals,
-		binormals = frames.binormals;
+		const frames = path.computeFrenetFrames( segments, closed ),
+			tangents = frames.tangents,
+			normals = frames.normals,
+			binormals = frames.binormals;
 
-	// proxy internals
+		const position = new Vector3();
 
-	this.tangents = tangents;
-	this.normals = normals;
-	this.binormals = binormals;
+		function ParametricTube( u, v, target ) {
 
-	var ParametricTube = function ( u, v, target ) {
+			v *= 2 * Math.PI;
 
-		v *= 2 * Math.PI;
+			const i = Math.floor( u * ( numpoints - 1 ) );
 
-		var i = u * ( numpoints - 1 );
-		i = Math.floor( i );
+			path.getPointAt( u, position );
 
-		var pos = path.getPointAt( u );
+			const normal = normals[ i ];
+			const binormal = binormals[ i ];
 
-		var tangent = tangents[ i ];
-		var normal = normals[ i ];
-		var binormal = binormals[ i ];
+			const cx = - radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
+			const cy = radius * Math.sin( v );
 
-		if ( scope.debug ) {
+			position.x += cx * normal.x + cy * binormal.x;
+			position.y += cx * normal.y + cy * binormal.y;
+			position.z += cx * normal.z + cy * binormal.z;
 
-			scope.debug.add( new ArrowHelper( tangent, pos, radius, 0x0000ff ) );
-			scope.debug.add( new ArrowHelper( normal, pos, radius, 0xff0000 ) );
-			scope.debug.add( new ArrowHelper( binormal, pos, radius, 0x00ff00 ) );
+			target.copy( position );
 
 		}
 
-		var cx = - scope.radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
-		var cy = scope.radius * Math.sin( v );
+		super( ParametricTube, segments, segmentsRadius );
 
-		pos.x += cx * normal.x + cy * binormal.x;
-		pos.y += cx * normal.y + cy * binormal.y;
-		pos.z += cx * normal.z + cy * binormal.z;
+		// proxy internals
 
-		target.copy( pos );
+		this.tangents = tangents;
+		this.normals = normals;
+		this.binormals = binormals;
 
-	};
+		this.path = path;
+		this.segments = segments;
+		this.radius = radius;
+		this.segmentsRadius = segmentsRadius;
+		this.closed = closed;
 
-	ParametricGeometry.call( this, ParametricTube, segments, segmentsRadius );
+	}
 
 };
-
-ParametricGeometries.TubeGeometry.prototype = Object.create( Geometry.prototype );
-ParametricGeometries.TubeGeometry.prototype.constructor = ParametricGeometries.TubeGeometry;
 
 
 /*********************************************
@@ -172,78 +155,74 @@ ParametricGeometries.TubeGeometry.prototype.constructor = ParametricGeometries.T
   * Parametric Replacement for TorusKnotGeometry
   *
   *********************************************/
-ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segmentsT, segmentsR, p, q ) {
+ParametricGeometries.TorusKnotGeometry = class TorusKnotGeometry extends ParametricGeometries.TubeGeometry {
 
-	this.radius = radius || 200;
-	this.tube = tube || 40;
-	this.segmentsT = segmentsT || 64;
-	this.segmentsR = segmentsR || 8;
-	this.p = p || 2;
-	this.q = q || 3;
+	constructor( radius = 200, tube = 40, segmentsT = 64, segmentsR = 8, p = 2, q = 3 ) {
 
-	function TorusKnotCurve() {
+		class TorusKnotCurve extends Curve {
 
-		Curve.call( this );
+			getPoint( t, optionalTarget = new Vector3() ) {
+
+				const point = optionalTarget;
+
+				t *= Math.PI * 2;
+
+				const r = 0.5;
+
+				const x = ( 1 + r * Math.cos( q * t ) ) * Math.cos( p * t );
+				const y = ( 1 + r * Math.cos( q * t ) ) * Math.sin( p * t );
+				const z = r * Math.sin( q * t );
+
+				return point.set( x, y, z ).multiplyScalar( radius );
+
+			}
+
+		}
+
+		const segments = segmentsT;
+		const radiusSegments = segmentsR;
+		const extrudePath = new TorusKnotCurve();
+
+		super( extrudePath, segments, tube, radiusSegments, true, false );
+
+		this.radius = radius;
+		this.tube = tube;
+		this.segmentsT = segmentsT;
+		this.segmentsR = segmentsR;
+		this.p = p;
+		this.q = q;
 
 	}
 
-	TorusKnotCurve.prototype = Object.create( Curve.prototype );
-	TorusKnotCurve.prototype.constructor = TorusKnotCurve;
-
-	TorusKnotCurve.prototype.getPoint = function ( t, optionalTarget ) {
-
-		var point = optionalTarget || new Vector3();
-
-		t *= Math.PI * 2;
-
-		var r = 0.5;
-
-		var x = ( 1 + r * Math.cos( q * t ) ) * Math.cos( p * t );
-		var y = ( 1 + r * Math.cos( q * t ) ) * Math.sin( p * t );
-		var z = r * Math.sin( q * t );
-
-		return point.set( x, y, z ).multiplyScalar( radius );
-
-	};
-
-	var segments = segmentsT;
-	var radiusSegments = segmentsR;
-	var extrudePath = new TorusKnotCurve();
-
-	ParametricGeometries.TubeGeometry.call( this, extrudePath, segments, tube, radiusSegments, true, false );
-
 };
-
-ParametricGeometries.TorusKnotGeometry.prototype = Object.create( Geometry.prototype );
-ParametricGeometries.TorusKnotGeometry.prototype.constructor = ParametricGeometries.TorusKnotGeometry;
-
 
 /*********************************************
   *
   * Parametric Replacement for SphereGeometry
   *
   *********************************************/
-ParametricGeometries.SphereGeometry = function ( size, u, v ) {
+ParametricGeometries.SphereGeometry = class SphereGeometry extends ParametricGeometry {
 
-	function sphere( u, v, target ) {
+	constructor( size, u, v ) {
 
-		u *= Math.PI;
-		v *= 2 * Math.PI;
+		function sphere( u, v, target ) {
 
-		var x = size * Math.sin( u ) * Math.cos( v );
-		var y = size * Math.sin( u ) * Math.sin( v );
-		var z = size * Math.cos( u );
+			u *= Math.PI;
+			v *= 2 * Math.PI;
 
-		target.set( x, y, z );
+			const x = size * Math.sin( u ) * Math.cos( v );
+			const y = size * Math.sin( u ) * Math.sin( v );
+			const z = size * Math.cos( u );
+
+			target.set( x, y, z );
+
+		}
+
+		super( sphere, u, v );
 
 	}
 
-	ParametricGeometry.call( this, sphere, u, v );
-
 };
-
-ParametricGeometries.SphereGeometry.prototype = Object.create( Geometry.prototype );
-ParametricGeometries.SphereGeometry.prototype.constructor = ParametricGeometries.SphereGeometry;
 
 
 /*********************************************
@@ -252,23 +231,24 @@ ParametricGeometries.SphereGeometry.prototype.constructor = ParametricGeometries
   *
   *********************************************/
 
-ParametricGeometries.PlaneGeometry = function ( width, depth, segmentsWidth, segmentsDepth ) {
+ParametricGeometries.PlaneGeometry = class PlaneGeometry extends ParametricGeometry {
 
-	function plane( u, v, target ) {
+	constructor( width, depth, segmentsWidth, segmentsDepth ) {
 
-		var x = u * width;
-		var y = 0;
-		var z = v * depth;
+		function plane( u, v, target ) {
 
-		target.set( x, y, z );
+			const x = u * width;
+			const y = 0;
+			const z = v * depth;
+
+			target.set( x, y, z );
+
+		}
+
+		super( plane, segmentsWidth, segmentsDepth );
 
 	}
 
-	ParametricGeometry.call( this, plane, segmentsWidth, segmentsDepth );
-
 };
-
-ParametricGeometries.PlaneGeometry.prototype = Object.create( Geometry.prototype );
-ParametricGeometries.PlaneGeometry.prototype.constructor = ParametricGeometries.PlaneGeometry;
 
 export { ParametricGeometries };

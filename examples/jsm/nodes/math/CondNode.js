@@ -1,44 +1,34 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
+import Node, { addNodeClass } from '../core/Node.js';
+import { property } from '../core/PropertyNode.js';
+import { context as contextNode } from '../core/ContextNode.js';
+import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
-import { TempNode } from '../core/TempNode.js';
+class CondNode extends Node {
 
-function CondNode( a, b, op, ifNode, elseNode ) {
+	constructor( condNode, ifNode, elseNode = null ) {
 
-	TempNode.call( this );
+		super();
 
-	this.a = a;
-	this.b = b;
+		this.condNode = condNode;
 
-	this.op = op;
+		this.ifNode = ifNode;
+		this.elseNode = elseNode;
 
-	this.ifNode = ifNode;
-	this.elseNode = elseNode;
+	}
 
-}
+	getNodeType( builder ) {
 
-CondNode.EQUAL = '==';
-CondNode.NOT_EQUAL = '!=';
-CondNode.GREATER = '>';
-CondNode.GREATER_EQUAL = '>=';
-CondNode.LESS = '<';
-CondNode.LESS_EQUAL = '<=';
+		const ifType = this.ifNode.getNodeType( builder );
 
-CondNode.prototype = Object.create( TempNode.prototype );
-CondNode.prototype.constructor = CondNode;
-CondNode.prototype.nodeType = "Cond";
+		if ( this.elseNode !== null ) {
 
-CondNode.prototype.getType = function ( builder ) {
+			const elseType = this.elseNode.getNodeType( builder );
 
-	if ( this.ifNode ) {
+			if ( builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ) {
 
-		var ifType = this.ifNode.getType( builder );
-		var elseType = this.elseNode.getType( builder );
+				return elseType;
 
-		if ( builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ) {
-
-			return elseType;
+			}
 
 		}
 
@@ -46,83 +36,86 @@ CondNode.prototype.getType = function ( builder ) {
 
 	}
 
-	return 'b';
+	generate( builder, output ) {
 
-};
+		const type = this.getNodeType( builder );
+		const context = { tempWrite: false };
 
-CondNode.prototype.getCondType = function ( builder ) {
+		const nodeData = builder.getDataFromNode( this );
 
-	if ( builder.getTypeLength( this.b.getType( builder ) ) > builder.getTypeLength( this.a.getType( builder ) ) ) {
+		if ( nodeData.nodeProperty !== undefined ) {
 
-		return this.b.getType( builder );
+			return nodeData.nodeProperty;
+
+		}
+
+		const { ifNode, elseNode } = this;
+
+		const needsOutput = output !== 'void';
+		const nodeProperty = needsOutput ? property( type ).build( builder ) : '';
+
+		nodeData.nodeProperty = nodeProperty;
+
+		const nodeSnippet = contextNode( this.condNode/*, context*/ ).build( builder, 'bool' );
+
+		builder.addFlowCode( `\n${ builder.tab }if ( ${ nodeSnippet } ) {\n\n` ).addFlowTab();
+
+		let ifSnippet = contextNode( ifNode, context ).build( builder, type );
+
+		if ( ifSnippet ) {
+
+			if ( needsOutput ) {
+
+				ifSnippet = nodeProperty + ' = ' + ifSnippet + ';';
+
+			} else {
+
+				ifSnippet = 'return ' + ifSnippet + ';';
+
+			}
+
+		}
+
+		builder.removeFlowTab().addFlowCode( builder.tab + '\t' + ifSnippet + '\n\n' + builder.tab + '}' );
+
+		if ( elseNode !== null ) {
+
+			builder.addFlowCode( ' else {\n\n' ).addFlowTab();
+
+			let elseSnippet = contextNode( elseNode, context ).build( builder, type );
+
+			if ( elseSnippet ) {
+
+				if ( needsOutput ) {
+
+					elseSnippet = nodeProperty + ' = ' + elseSnippet + ';';
+
+				} else {
+
+					elseSnippet = 'return ' + elseSnippet + ';';
+
+				}
+
+			}
+
+			builder.removeFlowTab().addFlowCode( builder.tab + '\t' + elseSnippet + '\n\n' + builder.tab + '}\n\n' );
+
+		} else {
+
+			builder.addFlowCode( '\n\n' );
+
+		}
+
+		return builder.format( nodeProperty, type, output );
 
 	}
 
-	return this.a.getType( builder );
+}
 
-};
+export default CondNode;
 
-CondNode.prototype.generate = function ( builder, output ) {
+export const cond = nodeProxy( CondNode );
 
-	var type = this.getType( builder ),
-		condType = this.getCondType( builder ),
-		a = this.a.build( builder, condType ),
-		b = this.b.build( builder, condType ),
-		code;
+addNodeElement( 'cond', cond );
 
-	if ( this.ifNode ) {
-
-		var ifCode = this.ifNode.build( builder, type ),
-			elseCode = this.elseNode.build( builder, type );
-
-		code = '( ' + [ a, this.op, b, '?', ifCode, ':', elseCode ].join( ' ' ) + ' )';
-
-	} else {
-
-		code = '( ' + a + ' ' + this.op + ' ' + b + ' )';
-
-	}
-
-	return builder.format( code, this.getType( builder ), output );
-
-};
-
-CondNode.prototype.copy = function ( source ) {
-
-	TempNode.prototype.copy.call( this, source );
-
-	this.a = source.a;
-	this.b = source.b;
-
-	this.op = source.op;
-
-	this.ifNode = source.ifNode;
-	this.elseNode = source.elseNode;
-
-	return this;
-
-};
-
-CondNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.a = this.a.toJSON( meta ).uuid;
-		data.b = this.b.toJSON( meta ).uuid;
-
-		data.op = this.op;
-
-		if ( data.ifNode ) data.ifNode = this.ifNode.toJSON( meta ).uuid;
-		if ( data.elseNode ) data.elseNode = this.elseNode.toJSON( meta ).uuid;
-
-	}
-
-	return data;
-
-};
-
-export { CondNode };
+addNodeClass( 'CondNode', CondNode );

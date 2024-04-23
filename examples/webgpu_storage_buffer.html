@@ -1,0 +1,256 @@
+<html lang="en">
+	<head>
+		<title>three.js - WebGPU - Storage PBO External Element</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			<br />This example demonstrate the fetch of external element from a StorageBuffer.
+			<br /> Left canvas is using WebGPU Backend, right canvas is WebGL Backend.
+			<div id="timestamps" style="
+				position: absolute;
+				top: 60px;
+				left: 0;
+				padding: 10px;
+				background: rgba( 0, 0, 0, 0.5 );
+				color: #fff;
+				font-family: monospace;
+				font-size: 12px;
+				line-height: 1.5;
+				pointer-events: none;
+				text-align: left;
+			"></div>
+			<div id="timestamps_webgl" style="
+			position: absolute;
+			top: 60px;
+			right: 0;
+			padding: 10px;
+			background: rgba( 0, 0, 0, 0.5 );
+			color: #fff;
+			font-family: monospace;
+			font-size: 12px;
+			line-height: 1.5;
+			pointer-events: none;
+			text-align: left;
+		"></div>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { storageObject, If, vec3, uv, uint, float, tslFn, instanceIndex, MeshBasicNodeMaterial } from 'three/nodes';
+
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import StorageInstancedBufferAttribute from 'three/addons/renderers/common/StorageInstancedBufferAttribute.js';
+
+			const timestamps = {
+				webgpu: document.getElementById( 'timestamps' ),
+				webgl: document.getElementById( 'timestamps_webgl' )
+			};
+
+			// WebGPU Backend
+			init();
+
+			// WebGL Backend
+			init( true );
+
+			async function init( forceWebGL = false ) {
+
+				const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
+				const camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
+				camera.position.z = 1;
+
+				const scene = new THREE.Scene();
+
+				// texture
+
+				const size = 1024; // non power of two buffer size is not well supported in WebGPU
+
+				const type = [ 'float', 'vec2', 'vec3', 'vec4' ];
+
+
+				const arrayBufferNodes = [];
+
+				for ( let i = 0; i < type.length; i ++ ) {
+
+					const typeSize = i + 1;
+					const array = new Array( size * typeSize ).fill( 0 );
+
+					const arrayBuffer = new StorageInstancedBufferAttribute( new Float32Array( array ), typeSize );
+
+					arrayBufferNodes.push( storageObject( arrayBuffer, type[ i ], size ) );
+
+				}
+
+				const computeInitOrder = tslFn( () => {
+
+					for ( let i = 0; i < type.length; i ++ ) {
+
+						arrayBufferNodes[ i ].element( instanceIndex ).assign( instanceIndex );
+
+					}
+
+				} );
+
+				const computeInvertOrder = tslFn( () => {
+
+					for ( let i = 0; i < type.length; i ++ ) {
+
+						const invertIndex = arrayBufferNodes[ i ].element( uint( size ).sub( instanceIndex ) );
+						arrayBufferNodes[ i ].element( instanceIndex ).assign( invertIndex );
+
+					}
+
+				} );
+
+				// compute
+
+				const computeInit = computeInitOrder().compute( size );
+
+				const compute = computeInvertOrder().compute( size );
+
+				const material = new MeshBasicNodeMaterial( { color: 0x00ff00 } );
+
+				material.colorNode = tslFn( () => {
+
+					const index = uint( uv().x.mul( size ).floor() ).toVar();
+
+					If( index.greaterThanEqual( size ), () => {
+
+						index.assign( uint( size ).sub( 1 ) );
+
+					} );
+
+					const color = vec3( 0, 0, 0 ).toVar();
+
+					If( uv().y.greaterThan( 0.0 ), () => {
+
+						const indexValue = arrayBufferNodes[ 0 ].element( index ).toVar();
+						const value = float( indexValue ).div( float( size ) ).mul( 20 ).floor().div( 20 );
+			
+						color.assign( vec3( value, 0, 0 ) );
+
+					} );
+
+					If( uv().y.greaterThan( 0.25 ), () => {
+
+						const indexValue = arrayBufferNodes[ 1 ].element( index ).toVar();
+						const value = float( indexValue ).div( float( size ) ).mul( 20 ).floor().div( 20 );
+			
+						color.assign( vec3( 0, value, 0 ) );
+
+					} );
+
+					If( uv().y.greaterThan( 0.5 ), () => {
+
+						const indexValue = arrayBufferNodes[ 2 ].element( index ).toVar();
+						const value = float( indexValue ).div( float( size ) ).mul( 20 ).floor().div( 20 );
+			
+						color.assign( vec3( 0, 0, value ) );
+
+					} );
+
+					If( uv().y.greaterThan( 0.75 ), () => {
+
+						const indexValue = arrayBufferNodes[ 3 ].element( index ).toVar();
+						const value = float( indexValue ).div( float( size ) ).mul( 20 ).floor().div( 20 );
+			
+						color.assign( vec3( value, value, value ) );
+
+					} );
+
+					return color;
+
+				} )();
+			
+				//
+
+				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
+				scene.add( plane );
+
+				const renderer = new WebGPURenderer( { antialias: false, forceWebGL: forceWebGL, trackTimestamp: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth / 2, window.innerHeight );
+
+				document.body.appendChild( renderer.domElement );
+				renderer.domElement.style.position = 'absolute';
+				renderer.domElement.style.top = '0';
+				renderer.domElement.style.left = '0';
+				renderer.domElement.style.width = '50%';
+				renderer.domElement.style.height = '100%';
+
+				if ( forceWebGL ) {
+
+					renderer.domElement.style.left = '50%';
+
+					scene.background = new THREE.Color( 0x212121 );
+			
+				} else {
+
+					scene.background = new THREE.Color( 0x313131 );
+
+				}
+
+
+				await renderer.computeAsync( computeInit );
+
+				//
+
+				renderer.info.autoReset = false;
+
+				 const stepAnimation = async function () {
+
+					renderer.info.reset();
+
+					await renderer.computeAsync( compute );
+					await renderer.renderAsync( scene, camera );
+
+					timestamps[ forceWebGL ? 'webgl' : 'webgpu' ].innerHTML = `
+
+							Compute ${renderer.info.compute.computeCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
+							Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.render.timestamp.toFixed( 6 )}ms`;
+
+					setTimeout( stepAnimation, 1000 );
+			
+				};
+
+				stepAnimation();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				function onWindowResize() {
+
+					renderer.setSize( window.innerWidth / 2, window.innerHeight );
+
+					const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
+
+					const frustumHeight = camera.top - camera.bottom;
+
+					camera.left = - frustumHeight * aspect / 2;
+					camera.right = frustumHeight * aspect / 2;
+
+					camera.updateProjectionMatrix();
+
+					renderer.render( scene, camera );
+
+				}
+
+			}
+
+		</script>
+	</body>
+</html>

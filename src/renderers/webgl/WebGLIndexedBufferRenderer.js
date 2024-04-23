@@ -1,12 +1,6 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+function WebGLIndexedBufferRenderer( gl, extensions, info ) {
 
-function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
-
-	var isWebGL2 = capabilities.isWebGL2;
-
-	var mode;
+	let mode;
 
 	function setMode( value ) {
 
@@ -14,7 +8,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
 	}
 
-	var type, bytesPerElement;
+	let type, bytesPerElement;
 
 	function setIndex( value ) {
 
@@ -27,38 +21,83 @@ function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
 		gl.drawElements( mode, count, type, start * bytesPerElement );
 
-		info.update( count, mode );
+		info.update( count, mode, 1 );
 
 	}
 
-	function renderInstances( geometry, start, count, primcount ) {
+	function renderInstances( start, count, primcount ) {
 
 		if ( primcount === 0 ) return;
 
-		var extension, methodName;
+		gl.drawElementsInstanced( mode, count, type, start * bytesPerElement, primcount );
 
-		if ( isWebGL2 ) {
+		info.update( count, mode, primcount );
 
-			extension = gl;
-			methodName = 'drawElementsInstanced';
+	}
+
+	function renderMultiDraw( starts, counts, drawCount ) {
+
+		if ( drawCount === 0 ) return;
+
+		const extension = extensions.get( 'WEBGL_multi_draw' );
+
+		if ( extension === null ) {
+
+			for ( let i = 0; i < drawCount; i ++ ) {
+
+				this.render( starts[ i ] / bytesPerElement, counts[ i ] );
+
+			}
 
 		} else {
 
-			extension = extensions.get( 'ANGLE_instanced_arrays' );
-			methodName = 'drawElementsInstancedANGLE';
+			extension.multiDrawElementsWEBGL( mode, counts, 0, type, starts, 0, drawCount );
 
-			if ( extension === null ) {
+			let elementCount = 0;
+			for ( let i = 0; i < drawCount; i ++ ) {
 
-				console.error( 'THREE.WebGLIndexedBufferRenderer: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-				return;
+				elementCount += counts[ i ];
+
+			}
+
+			info.update( elementCount, mode, 1 );
+
+		}
+
+	}
+
+	function renderMultiDrawInstances( starts, counts, drawCount, primcount ) {
+
+		if ( drawCount === 0 ) return;
+
+		const extension = extensions.get( 'WEBGL_multi_draw' );
+
+		if ( extension === null ) {
+
+			for ( let i = 0; i < starts.length; i ++ ) {
+
+				renderInstances( starts[ i ] / bytesPerElement, counts[ i ], primcount[ i ] );
+
+			}
+
+		} else {
+
+			extension.multiDrawElementsInstancedWEBGL( mode, counts, 0, type, starts, 0, primcount, 0, drawCount );
+
+			let elementCount = 0;
+			for ( let i = 0; i < drawCount; i ++ ) {
+
+				elementCount += counts[ i ];
+
+			}
+
+			for ( let i = 0; i < primcount.length; i ++ ) {
+
+				info.update( elementCount, mode, primcount[ i ] );
 
 			}
 
 		}
-
-		extension[ methodName ]( mode, count, type, start * bytesPerElement, primcount );
-
-		info.update( count, mode, primcount );
 
 	}
 
@@ -68,6 +107,8 @@ function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 	this.setIndex = setIndex;
 	this.render = render;
 	this.renderInstances = renderInstances;
+	this.renderMultiDraw = renderMultiDraw;
+	this.renderMultiDrawInstances = renderMultiDrawInstances;
 
 }
 

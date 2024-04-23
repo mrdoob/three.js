@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Una classe astratta per le luci - tutti gli altri tipi di luce ereditano le proprietà e
+      i metodi descritti qui.
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Integer color], [param:Float intensity] )</h3>
+		<p>
+		[page:Integer color] - (opzionale) Colore esadecimale della luce. Il valore predefinito è 0xffffff (white).<br />
+		[page:Float intensity] - (opzionale) Il valore numerico della forza/intensità della luce. Il valore predefinito è 1.<br /><br />
+
+    Crea una nuova [name]. Si noti che questa classe non è intesa per essere chiamata direttamente (utilizzare invece una delle classi derivate).
+		</p>
+
+    <h2>Proprietà</h2>
+		<p>
+      Vedi la classe base [page:Object3D Object3D] per le proprietà comuni.
+		</p>
+
+		<h3>[property:Color color]</h3>
+		<p>
+			Colore della luce. Il valore predefinito è un nuovo [page:Color] impostato su bianco,
+      se non viene passato nel costruttore.<br />
+		</p>
+
+		<h3>[property:Float intensity]</h3>
+		<p>
+      L'intensità o la forza della luce.<br />
+      Le unità di intensità dipendono dal tipo di luce.<br />
+			Il valore predefinito è `1.0`.
+		</p>
+
+		<h3>[property:Boolean isLight]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è del tipo [name].
+		</p>
+
+
+		<h2>Metodi</h2>
+		<p>
+      Vedi la classe base [page:Object3D Object3D] per i metodi comuni.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+      Metodo dispose astratto per le luci; implementato dalle sottoclassi che hanno risorse disponibili.
+		</p>
+
+		<h3>[method:this copy]( [param:Light source] )</h3>
+		<p>
+      Copia il valore di [page:.color color] e [page:.intensity intensity] dalla luce [page:Light sorgente] (source) in questa luce.
+		</p>
+
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
+		<p>
+		meta -- oggetto contenente matedati come i metariali e le texture per gli oggetti.<br />
+    Converte la luce nel [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 formato Oggetto/Scena JSON] di three.js.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

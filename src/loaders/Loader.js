@@ -1,46 +1,72 @@
 import { DefaultLoadingManager } from './LoadingManager.js';
 
-/**
- * @author alteredq / http://alteredqualia.com/
- */
+class Loader {
 
-function Loader( manager ) {
+	constructor( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
-	this.crossOrigin = 'anonymous';
-	this.path = '';
-	this.resourcePath = '';
+		this.crossOrigin = 'anonymous';
+		this.withCredentials = false;
+		this.path = '';
+		this.resourcePath = '';
+		this.requestHeader = {};
 
-}
+	}
 
-Object.assign( Loader.prototype, {
+	load( /* url, onLoad, onProgress, onError */ ) {}
 
-	load: function ( /* url, onLoad, onProgress, onError */ ) {},
+	loadAsync( url, onProgress ) {
 
-	parse: function ( /* data */ ) {},
+		const scope = this;
 
-	setCrossOrigin: function ( crossOrigin ) {
+		return new Promise( function ( resolve, reject ) {
+
+			scope.load( url, resolve, onProgress, reject );
+
+		} );
+
+	}
+
+	parse( /* data */ ) {}
+
+	setCrossOrigin( crossOrigin ) {
 
 		this.crossOrigin = crossOrigin;
 		return this;
 
-	},
+	}
 
-	setPath: function ( path ) {
+	setWithCredentials( value ) {
+
+		this.withCredentials = value;
+		return this;
+
+	}
+
+	setPath( path ) {
 
 		this.path = path;
 		return this;
 
-	},
+	}
 
-	setResourcePath: function ( resourcePath ) {
+	setResourcePath( resourcePath ) {
 
 		this.resourcePath = resourcePath;
 		return this;
 
 	}
 
-} );
+	setRequestHeader( requestHeader ) {
+
+		this.requestHeader = requestHeader;
+		return this;
+
+	}
+
+}
+
+Loader.DEFAULT_MATERIAL_NAME = '__DEFAULT';
 
 export { Loader };

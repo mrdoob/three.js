@@ -1,19 +1,29 @@
 {
   "name": "three",
-  "version": "0.114.0",
+  "version": "0.163.0",
   "description": "JavaScript 3D library",
-  "main": "build/three.js",
-  "module": "build/three.module.js",
-  "types": "src/Three.d.ts",
+  "type": "module",
+  "main": "./build/three.cjs",
+  "module": "./build/three.module.js",
+  "exports": {
+    ".": {
+      "import": "./build/three.module.js",
+      "require": "./build/three.cjs"
+    },
+    "./examples/fonts/*": "./examples/fonts/*",
+    "./examples/jsm/*": "./examples/jsm/*",
+    "./addons": "./examples/jsm/Addons.js",
+    "./addons/*": "./examples/jsm/*",
+    "./src/*": "./src/*",
+    "./nodes": "./examples/jsm/nodes/Nodes.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/mrdoob/three.js"
   },
+  "sideEffects": ["./examples/jsm/nodes/**/*"],
   "files": [
-    "build/three.js",
-    "build/three.min.js",
-    "build/three.module.js",
-    "examples/js",
+    "build",
     "examples/jsm",
     "examples/fonts",
     "LICENSE",
@@ -26,46 +36,49 @@
     "example": "examples",
     "test": "test"
   },
-  "eslintConfig": {
-    "parser": "@typescript-eslint/parser",
-    "extends": "mdcs",
-    "plugins": [
-      "html",
-      "@typescript-eslint"
-    ],
-    "rules": {
-      "@typescript-eslint/no-unused-vars": 1,
-      "@typescript-eslint/indent": [
-        "error",
-        "tab",
-        {
-          "SwitchCase": 1
-        }
-      ]
-    }
-  },
+  "browserslist": [
+    "> 1%, not dead, not ie 11, not op_mini all"
+  ],
   "scripts": {
     "start": "npm run dev",
+    "test": "npm run lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
-    "build-test": "rollup -c test/rollup.unit.config.js",
-    "build-closure": "rollup -c utils/build/rollup.config.js && google-closure-compiler --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
-    "build-examples": "rollup -c utils/build/rollup-examples.config.js",
-    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"http-server -c-1 -p 8080\"",
-    "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
-    "test": "npm run test-lint && npm run test-unit",
-    "test-lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
-    "test-lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
-    "test-unit": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
-    "test-e2e": "node --expose-gc test/e2e/puppeteer.js",
-    "make-screenshot": "cross-env MAKE=true npm run test-e2e"
+    "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
+    "dev-ssl": "concurrently --names \"ROLLUP,HTTPS\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080 --ssl\"",
+    "lint-core": "eslint src",
+    "lint-addons": "eslint examples/jsm --ext .js --ignore-pattern libs --ignore-pattern ifc",
+    "lint-examples": "eslint examples --ext .html",
+    "lint-docs": "eslint docs --ignore-pattern prettify.js",
+    "lint-editor": "eslint editor --ignore-pattern libs",
+    "lint-playground": "eslint playground --ignore-pattern libs",
+    "lint-manual": "eslint manual --ignore-pattern 3rdparty --ignore-pattern prettify.js --ignore-pattern shapefile.js",
+    "lint-test": "eslint test --ignore-pattern vendor",
+    "lint-utils": "eslint utils",
+    "lint": "npm run lint-core",
+    "lint-fix": "npm run lint-core -- --fix && npm run lint-addons -- --fix && npm run lint-examples -- --fix && npm run lint-docs -- --fix && npm run lint-editor -- --fix && npm run lint-playground -- --fix && npm run lint-manual -- --fix && npm run lint-test -- --fix && npm run lint-utils -- --fix",
+    "test-unit": "qunit -r failonlyreporter -f !-webonly test/unit/three.source.unit.js",
+    "test-e2e": "node test/e2e/puppeteer.js",
+    "test-e2e-cov": "node test/e2e/check-coverage.js",
+    "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
+    "test-circular-deps": "dpdm --no-warning --no-tree --exit-code circular:1 examples/jsm/nodes/Nodes.js",
+    "make-screenshot": "node test/e2e/puppeteer.js --make"
   },
   "keywords": [
     "three",
     "three.js",
+    "javascript",
     "3d",
+    "virtual-reality",
+    "augmented-reality",
+    "webgl",
+    "webgl2",
+    "webaudio",
+    "webgpu",
+    "webxr",
     "canvas",
     "svg",
-    "webgl"
+    "html5"
   ],
   "author": "mrdoob",
   "license": "MIT",
@@ -74,26 +87,29 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@types/webgl2": "^0.0.5",
-    "@typescript-eslint/eslint-plugin": "^2.15.0",
-    "@typescript-eslint/parser": "^2.15.0",
-    "concurrently": "^5.0.2",
-    "cross-env": "^7.0.0",
-    "eslint": "^6.8.0",
-    "eslint-config-mdcs": "^4.2.3",
-    "eslint-plugin-html": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-terser": "^0.4.0",
+    "chalk": "^5.2.0",
+    "concurrently": "^8.0.1",
+    "dpdm": "^3.14.0",
+    "eslint": "^8.37.0",
+    "eslint-config-mdcs": "^5.0.0",
+    "eslint-plugin-compat": "^4.1.2",
+    "eslint-plugin-html": "^8.0.0",
+    "eslint-plugin-import": "^2.27.5",
     "failonlyreporter": "^1.0.0",
-    "google-closure-compiler": "20200101.0.0",
-    "http-server": "^0.12.1",
-    "image-output": "2.4.1",
-    "pixelmatch": "5.1.0",
-    "pngjs": "3.4.0",
-    "puppeteer": "^2.1.1",
-    "qunit": "^2.9.3",
-    "rollup": "^1.28.0",
-    "rollup-plugin-buble": "^0.19.8",
-    "serve-handler": "^6.1.2",
-    "typescript": "^3.7.4"
+    "jimp": "^0.22.7",
+    "magic-string": "^0.30.0",
+    "pixelmatch": "^5.3.0",
+    "puppeteer": "^22.0.0",
+    "qunit": "^2.19.4",
+    "rollup": "^4.6.0",
+    "rollup-plugin-filesize": "^10.0.0",
+    "rollup-plugin-visualizer": "^5.9.0",
+    "servez": "^2.0.0"
+  },
+  "overrides": {
+    "jpeg-js": "^0.4.4"
   },
   "jspm": {
     "files": [

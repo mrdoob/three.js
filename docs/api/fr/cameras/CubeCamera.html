@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Crée 6 caméras qui effectuent le rendu d'un [page:WebGLCubeRenderTarget].</p>
+
+		<h2>Exemple de Code</h2>
+
+		<code>
+		// Create cube render target
+		const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+
+		// Create cube camera
+		const cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
+		scene.add( cubeCamera );
+
+		// Create car
+		const chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeRenderTarget.texture } );
+		const car = new THREE.Mesh( carGeometry, chromeMaterial );
+		scene.add( car );
+
+		// Update the render target cube
+		car.visible = false;
+		cubeCamera.position.copy( car.position );
+		cubeCamera.update( renderer, scene );
+
+		// Render the scene
+		car.visible = true;
+		renderer.render( scene, camera );
+		</code>
+
+		<h2>Exemples</h2>
+
+		<p>
+			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]
+		</p>
+
+		<h2>Constructeur</h2>
+
+
+		<h3>[name]( [param:Number near], [param:Number far], [param:WebGLCubeRenderTarget renderTarget] )</h3>
+		<p>
+		near -- La distance near de clipping. <br />
+		far -- La distance far de clipping. <br />
+		renderTarget -- Le CubeRenderTarget de destination.
+		</p>
+
+		<p>
+		Construis une CubeCamera contenant 6 [page:PerspectiveCamera PerspectiveCameras] qui
+		effectuent le rendu d'un [page:WebGLCubeRenderTarget].
+		</p>
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe [page:Object3D] pour connaître les propriétés communes.</p>
+
+		<h3>[property:WebGLCubeRenderTarget renderTarget]</h3>
+		<p>
+		Le CubeRenderTarget de destination.
+		</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe [page:Object3D] pour connaître les propriétés communes.</p>
+
+		<h3>[method:undefined update]( [param:WebGLRenderer renderer], [param:Scene scene] )</h3>
+		<p>
+		renderer -- Le moteur de rendu WebGL actuel <br />
+		scene -- La scène actuelle
+		</p>
+		<p>
+		Appellez cette méthode pour mettre à jour le [page:CubeCamera.renderTarget renderTarget].
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

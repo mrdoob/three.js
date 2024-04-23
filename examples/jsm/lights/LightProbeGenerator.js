@@ -1,73 +1,72 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- */
-
 import {
 	Color,
 	LightProbe,
-	LinearEncoding,
+	LinearSRGBColorSpace,
 	SphericalHarmonics3,
 	Vector3,
-	sRGBEncoding
-} from "../../../build/three.module.js";
+	SRGBColorSpace,
+	NoColorSpace,
+	HalfFloatType,
+	DataUtils
+} from 'three';
 
-var LightProbeGenerator = {
+class LightProbeGenerator {
 
 	// https://www.ppsloan.org/publications/StupidSH36.pdf
-	fromCubeTexture: function ( cubeTexture ) {
+	static fromCubeTexture( cubeTexture ) {
 
-		var norm, lengthSq, weight, totalWeight = 0;
+		let totalWeight = 0;
 
-		var coord = new Vector3();
+		const coord = new Vector3();
 
-		var dir = new Vector3();
+		const dir = new Vector3();
 
-		var color = new Color();
+		const color = new Color();
 
-		var shBasis = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+		const shBasis = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
 
-		var sh = new SphericalHarmonics3();
-		var shCoefficients = sh.coefficients;
+		const sh = new SphericalHarmonics3();
+		const shCoefficients = sh.coefficients;
 
-		for ( var faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
+		for ( let faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
 
-			var image = cubeTexture.image[ faceIndex ];
+			const image = cubeTexture.image[ faceIndex ];
 
-			var width = image.width;
-			var height = image.height;
+			const width = image.width;
+			const height = image.height;
 
-			var canvas = document.createElement( 'canvas' );
+			const canvas = document.createElement( 'canvas' );
 
 			canvas.width = width;
 			canvas.height = height;
 
-			var context = canvas.getContext( '2d' );
+			const context = canvas.getContext( '2d' );
 
 			context.drawImage( image, 0, 0, width, height );
 
-			var imageData = context.getImageData( 0, 0, width, height );
+			const imageData = context.getImageData( 0, 0, width, height );
 
-			var data = imageData.data;
+			const data = imageData.data;
 
-			var imageWidth = imageData.width; // assumed to be square
+			const imageWidth = imageData.width; // assumed to be square
 
-			var pixelSize = 2 / imageWidth;
+			const pixelSize = 2 / imageWidth;
 
-			for ( var i = 0, il = data.length; i < il; i += 4 ) { // RGBA assumed
+			for ( let i = 0, il = data.length; i < il; i += 4 ) { // RGBA assumed
 
 				// pixel color
 				color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
 
 				// convert to linear color space
-				convertColorToLinear( color, cubeTexture.encoding );
+				convertColorToLinear( color, cubeTexture.colorSpace );
 
 				// pixel coordinate on unit cube
 
-				var pixelIndex = i / 4;
+				const pixelIndex = i / 4;
 
-				var col = - 1 + ( pixelIndex % imageWidth + 0.5 ) * pixelSize;
+				const col = - 1 + ( pixelIndex % imageWidth + 0.5 ) * pixelSize;
 
-				var row = 1 - ( Math.floor( pixelIndex / imageWidth ) + 0.5 ) * pixelSize;
+				const row = 1 - ( Math.floor( pixelIndex / imageWidth ) + 0.5 ) * pixelSize;
 
 				switch ( faceIndex ) {
 
@@ -87,9 +86,9 @@ var LightProbeGenerator = {
 
 				// weight assigned to this pixel
 
-				lengthSq = coord.lengthSq();
+				const lengthSq = coord.lengthSq();
 
-				weight = 4 / ( Math.sqrt( lengthSq ) * lengthSq );
+				const weight = 4 / ( Math.sqrt( lengthSq ) * lengthSq );
 
 				totalWeight += weight;
 
@@ -100,7 +99,7 @@ var LightProbeGenerator = {
 				SphericalHarmonics3.getBasisAt( dir, shBasis );
 
 				// accummuulate
-				for ( var j = 0; j < 9; j ++ ) {
+				for ( let j = 0; j < 9; j ++ ) {
 
 					shCoefficients[ j ].x += shBasis[ j ] * color.r * weight;
 					shCoefficients[ j ].y += shBasis[ j ] * color.g * weight;
@@ -113,9 +112,9 @@ var LightProbeGenerator = {
 		}
 
 		// normalize
-		norm = ( 4 * Math.PI ) / totalWeight;
+		const norm = ( 4 * Math.PI ) / totalWeight;
 
-		for ( var j = 0; j < 9; j ++ ) {
+		for ( let j = 0; j < 9; j ++ ) {
 
 			shCoefficients[ j ].x *= norm;
 			shCoefficients[ j ].y *= norm;
@@ -125,47 +124,79 @@ var LightProbeGenerator = {
 
 		return new LightProbe( sh );
 
-	},
+	}
 
-	fromCubeRenderTarget: function ( renderer, cubeRenderTarget ) {
+	static fromCubeRenderTarget( renderer, cubeRenderTarget ) {
 
 		// The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
-		var norm, lengthSq, weight, totalWeight = 0;
+		let totalWeight = 0;
 
-		var coord = new Vector3();
+		const coord = new Vector3();
 
-		var dir = new Vector3();
+		const dir = new Vector3();
 
-		var color = new Color();
+		const color = new Color();
 
-		var shBasis = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+		const shBasis = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
 
-		var sh = new SphericalHarmonics3();
-		var shCoefficients = sh.coefficients;
+		const sh = new SphericalHarmonics3();
+		const shCoefficients = sh.coefficients;
 
-		for ( var faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
+		const dataType = cubeRenderTarget.texture.type;
 
-			var imageWidth = cubeRenderTarget.width; // assumed to be square
-			var data = new Uint8Array( imageWidth * imageWidth * 4 );
+		for ( let faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
+
+			const imageWidth = cubeRenderTarget.width; // assumed to be square
+
+			let data;
+
+			if ( dataType === HalfFloatType ) {
+
+				data = new Uint16Array( imageWidth * imageWidth * 4 );
+
+			} else {
+
+				// assuming UnsignedByteType
+
+				data = new Uint8Array( imageWidth * imageWidth * 4 );
+
+			}
+
 			renderer.readRenderTargetPixels( cubeRenderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex );
 
-			var pixelSize = 2 / imageWidth;
+			const pixelSize = 2 / imageWidth;
 
-			for ( var i = 0, il = data.length; i < il; i += 4 ) { // RGBA assumed
+			for ( let i = 0, il = data.length; i < il; i += 4 ) { // RGBA assumed
+
+				let r, g, b;
+
+				if ( dataType === HalfFloatType ) {
+
+					r = DataUtils.fromHalfFloat( data[ i ] );
+					g = DataUtils.fromHalfFloat( data[ i + 1 ] );
+					b = DataUtils.fromHalfFloat( data[ i + 2 ] );
+
+				} else {
+
+					r = data[ i ] / 255;
+					g = data[ i + 1 ] / 255;
+					b = data[ i + 2 ] / 255;
+
+				}
 
 				// pixel color
-				color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
+				color.setRGB( r, g, b );
 
 				// convert to linear color space
-				convertColorToLinear( color, cubeRenderTarget.texture.encoding );
+				convertColorToLinear( color, cubeRenderTarget.texture.colorSpace );
 
 				// pixel coordinate on unit cube
 
-				var pixelIndex = i / 4;
+				const pixelIndex = i / 4;
 
-				var col = - 1 + ( pixelIndex % imageWidth + 0.5 ) * pixelSize;
+				const col = - 1 + ( pixelIndex % imageWidth + 0.5 ) * pixelSize;
 
-				var row = 1 - ( Math.floor( pixelIndex / imageWidth ) + 0.5 ) * pixelSize;
+				const row = 1 - ( Math.floor( pixelIndex / imageWidth ) + 0.5 ) * pixelSize;
 
 				switch ( faceIndex ) {
 
@@ -185,9 +216,9 @@ var LightProbeGenerator = {
 
 				// weight assigned to this pixel
 
-				lengthSq = coord.lengthSq();
+				const lengthSq = coord.lengthSq();
 
-				weight = 4 / ( Math.sqrt( lengthSq ) * lengthSq );
+				const weight = 4 / ( Math.sqrt( lengthSq ) * lengthSq );
 
 				totalWeight += weight;
 
@@ -198,7 +229,7 @@ var LightProbeGenerator = {
 				SphericalHarmonics3.getBasisAt( dir, shBasis );
 
 				// accummuulate
-				for ( var j = 0; j < 9; j ++ ) {
+				for ( let j = 0; j < 9; j ++ ) {
 
 					shCoefficients[ j ].x += shBasis[ j ] * color.r * weight;
 					shCoefficients[ j ].y += shBasis[ j ] * color.g * weight;
@@ -211,9 +242,9 @@ var LightProbeGenerator = {
 		}
 
 		// normalize
-		norm = ( 4 * Math.PI ) / totalWeight;
+		const norm = ( 4 * Math.PI ) / totalWeight;
 
-		for ( var j = 0; j < 9; j ++ ) {
+		for ( let j = 0; j < 9; j ++ ) {
 
 			shCoefficients[ j ].x *= norm;
 			shCoefficients[ j ].y *= norm;
@@ -225,30 +256,31 @@ var LightProbeGenerator = {
 
 	}
 
-};
+}
 
-var convertColorToLinear = function ( color, encoding ) {
+function convertColorToLinear( color, colorSpace ) {
 
-	switch ( encoding ) {
+	switch ( colorSpace ) {
 
-		case sRGBEncoding:
+		case SRGBColorSpace:
 
 			color.convertSRGBToLinear();
 			break;
 
-		case LinearEncoding:
+		case LinearSRGBColorSpace:
+		case NoColorSpace:
 
 			break;
 
 		default:
 
-			console.warn( 'WARNING: LightProbeGenerator convertColorToLinear() encountered an unsupported encoding.' );
+			console.warn( 'WARNING: LightProbeGenerator convertColorToLinear() encountered an unsupported color space.' );
 			break;
 
 	}
 
 	return color;
 
-};
+}
 
 export { LightProbeGenerator };

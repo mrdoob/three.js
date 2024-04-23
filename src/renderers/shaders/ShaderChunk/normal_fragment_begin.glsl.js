@@ -1,10 +1,10 @@
 export default /* glsl */`
+float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
+
 #ifdef FLAT_SHADED
 
-	// Workaround for Adreno/Nexus5 not able able to do dFdx( vViewPosition ) ...
-
-	vec3 fdx = vec3( dFdx( vViewPosition.x ), dFdx( vViewPosition.y ), dFdx( vViewPosition.z ) );
-	vec3 fdy = vec3( dFdy( vViewPosition.x ), dFdy( vViewPosition.y ), dFdy( vViewPosition.z ) );
+	vec3 fdx = dFdx( vViewPosition );
+	vec3 fdy = dFdy( vViewPosition );
 	vec3 normal = normalize( cross( fdx, fdy ) );
 
 #else
@@ -13,27 +13,57 @@ export default /* glsl */`
 
 	#ifdef DOUBLE_SIDED
 
-		normal = normal * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+		normal *= faceDirection;
 
 	#endif
 
+#endif
+
+#if defined( USE_NORMALMAP_TANGENTSPACE ) || defined( USE_CLEARCOAT_NORMALMAP ) || defined( USE_ANISOTROPY )
+
 	#ifdef USE_TANGENT
 
-		vec3 tangent = normalize( vTangent );
-		vec3 bitangent = normalize( vBitangent );
+		mat3 tbn = mat3( normalize( vTangent ), normalize( vBitangent ), normal );
 
-		#ifdef DOUBLE_SIDED
+	#else
 
-			tangent = tangent * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-			bitangent = bitangent * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-
+		mat3 tbn = getTangentFrame( - vViewPosition, normal,
+		#if defined( USE_NORMALMAP )
+			vNormalMapUv
+		#elif defined( USE_CLEARCOAT_NORMALMAP )
+			vClearcoatNormalMapUv
+		#else
+			vUv
 		#endif
+		);
 
-		#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP )
+	#endif
 
-			mat3 vTBN = mat3( tangent, bitangent, normal );
+	#if defined( DOUBLE_SIDED ) && ! defined( FLAT_SHADED )
 
-		#endif
+		tbn[0] *= faceDirection;
+		tbn[1] *= faceDirection;
+
+	#endif
+
+#endif
+
+#ifdef USE_CLEARCOAT_NORMALMAP
+
+	#ifdef USE_TANGENT
+
+		mat3 tbn2 = mat3( normalize( vTangent ), normalize( vBitangent ), normal );
+
+	#else
+
+		mat3 tbn2 = getTangentFrame( - vViewPosition, normal, vClearcoatNormalMapUv );
+
+	#endif
+
+	#if defined( DOUBLE_SIDED ) && ! defined( FLAT_SHADED )
+
+		tbn2[0] *= faceDirection;
+		tbn2[1] *= faceDirection;
 
 	#endif
 
@@ -41,6 +71,6 @@ export default /* glsl */`
 
 // non perturbed normal for clearcoat among others
 
-vec3 geometryNormal = normal;
+vec3 nonPerturbedNormal = normal;
 
 `;

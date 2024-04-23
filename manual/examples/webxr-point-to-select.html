@@ -1,0 +1,274 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - WebXR - Point to Select</title>
+    <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+  </body>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { VRButton } from 'three/addons/webxr/VRButton.js';
+
+function main() {
+
+	const canvas = document.querySelector( '#c' );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
+	renderer.xr.enabled = true;
+	document.body.appendChild( VRButton.createButton( renderer ) );
+
+	const fov = 75;
+	const aspect = 2; // the canvas default
+	const near = 0.1;
+	const far = 50;
+	const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	camera.position.set( 0, 1.6, 0 );
+
+	const scene = new THREE.Scene();
+	// object to put pickable objects on so we can easily
+	// separate them from non-pickable objects
+	const pickRoot = new THREE.Object3D();
+	scene.add( pickRoot );
+
+	{
+
+		const loader = new THREE.CubeTextureLoader();
+		const texture = loader.load( [
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+			'resources/images/grid-1024.png',
+		] );
+		scene.background = texture;
+
+	}
+
+	{
+
+		const color = 0xFFFFFF;
+		const intensity = 3;
+		const light = new THREE.DirectionalLight( color, intensity );
+		light.position.set( - 1, 2, 4 );
+		scene.add( light );
+
+	}
+
+	const boxWidth = 1;
+	const boxHeight = 1;
+	const boxDepth = 1;
+	const boxGeometry = new THREE.BoxGeometry( boxWidth, boxHeight, boxDepth );
+
+	const sphereRadius = 0.5;
+	const sphereGeometry = new THREE.SphereGeometry( sphereRadius );
+
+	function makeInstance( geometry, color, x ) {
+
+		const material = new THREE.MeshPhongMaterial( { color } );
+
+		const cube = new THREE.Mesh( geometry, material );
+		pickRoot.add( cube );
+
+		cube.position.x = x;
+		cube.position.y = 1.6;
+		cube.position.z = - 2;
+
+		return cube;
+
+	}
+
+	const meshToMeshMap = new Map();
+	[
+		{ x: 0, boxColor: 0x44aa88, sphereColor: 0xFF4444, },
+		{ x: 2, boxColor: 0x8844aa, sphereColor: 0x44FF44, },
+		{ x: - 2, boxColor: 0xaa8844, sphereColor: 0x4444FF, },
+	].forEach( ( info ) => {
+
+		const { x, boxColor, sphereColor } = info;
+		const sphere = makeInstance( sphereGeometry, sphereColor, x );
+		const box = makeInstance( boxGeometry, boxColor, x );
+		// hide the sphere
+		sphere.visible = false;
+		// map the sphere to the box
+		meshToMeshMap.set( box, sphere );
+		// map the box to the sphere
+		meshToMeshMap.set( sphere, box );
+
+	} );
+
+	class ControllerPickHelper extends THREE.EventDispatcher {
+
+		constructor( scene ) {
+
+			super();
+			this.raycaster = new THREE.Raycaster();
+			this.objectToColorMap = new Map();
+			this.controllerToObjectMap = new Map();
+
+			const pointerGeometry = new THREE.BufferGeometry().setFromPoints( [
+				new THREE.Vector3( 0, 0, 0 ),
+				new THREE.Vector3( 0, 0, - 1 ),
+			] );
+
+			this.controllers = [];
+			for ( let i = 0; i < 2; ++ i ) {
+
+				const controller = renderer.xr.getController( i );
+				controller.addEventListener( 'select', ( event ) => {
+
+					const controller = event.target;
+					const selectedObject = this.controllerToObjectMap.get( controller );
+					if ( selectedObject ) {
+
+						this.dispatchEvent( { type: 'select', controller, selectedObject } );
+
+					}
+
+				} );
+				scene.add( controller );
+
+				const line = new THREE.Line( pointerGeometry );
+				line.scale.z = 5;
+				controller.add( line );
+				this.controllers.push( { controller, line } );
+
+			}
+
+		}
+		reset() {
+
+			// restore the colors
+			this.objectToColorMap.forEach( ( color, object ) => {
+
+				object.material.emissive.setHex( color );
+
+			} );
+			this.objectToColorMap.clear();
+			this.controllerToObjectMap.clear();
+
+		}
+		update( pickablesParent, time ) {
+
+			this.reset();
+			for ( const { controller, line } of this.controllers ) {
+
+				// cast a ray through the from the controller
+				this.raycaster.setFromXRController( controller );
+				// get the list of objects the ray intersected
+				const intersections = this.raycaster.intersectObjects( pickablesParent.children );
+				if ( intersections.length ) {
+
+					const intersection = intersections[ 0 ];
+					// make the line touch the object
+					line.scale.z = intersection.distance;
+					// pick the first object. It's the closest one
+					const pickedObject = intersection.object;
+					// save which object this controller picked
+					this.controllerToObjectMap.set( controller, pickedObject );
+					// highlight the object if we haven't already
+					if ( this.objectToColorMap.get( pickedObject ) === undefined ) {
+
+						// save its color
+						this.objectToColorMap.set( pickedObject, pickedObject.material.emissive.getHex() );
+						// set its emissive color to flashing red/yellow
+						pickedObject.material.emissive.setHex( ( time * 8 ) % 2 > 1 ? 0xFF2000 : 0xFF0000 );
+
+					}
+
+				} else {
+
+					line.scale.z = 5;
+
+				}
+
+			}
+
+		}
+
+	}
+
+	const pickHelper = new ControllerPickHelper( scene );
+	pickHelper.addEventListener( 'select', ( event ) => {
+
+		event.selectedObject.visible = false;
+		const partnerObject = meshToMeshMap.get( event.selectedObject );
+		partnerObject.visible = true;
+
+	} );
+
+	function resizeRendererToDisplaySize( renderer ) {
+
+		const canvas = renderer.domElement;
+		const width = canvas.clientWidth;
+		const height = canvas.clientHeight;
+		const needResize = canvas.width !== width || canvas.height !== height;
+		if ( needResize ) {
+
+			renderer.setSize( width, height, false );
+
+		}
+
+		return needResize;
+
+	}
+
+	function render( time ) {
+
+		time *= 0.001;
+
+		if ( resizeRendererToDisplaySize( renderer ) ) {
+
+			const canvas = renderer.domElement;
+			camera.aspect = canvas.clientWidth / canvas.clientHeight;
+			camera.updateProjectionMatrix();
+
+		}
+
+		let ndx = 0;
+		for ( const mesh of meshToMeshMap.keys() ) {
+
+			const speed = 1 + ndx * .1;
+			const rot = time * speed;
+			mesh.rotation.x = rot;
+			mesh.rotation.y = rot;
+			++ ndx;
+
+		}
+
+		pickHelper.update( pickRoot, time );
+
+		renderer.render( scene, camera );
+
+	}
+
+	renderer.setAnimationLoop( render );
+
+}
+
+main();
+</script>
+</html>

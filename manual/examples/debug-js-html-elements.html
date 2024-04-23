@@ -1,0 +1,122 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Debug - HTML Elements</title>
+    <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    #debug {
+      position: absolute;
+      left: 1em;
+      top: 1em;
+      padding: 1em;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      font-family: monospace;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <div id="debug">
+      <div>x:<span id="x"></span></div>
+      <div>y:<span id="y"></span></div>
+      <div>z:<span id="z"></span></div>
+    </div>
+  </body>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+function main() {
+
+	const canvas = document.querySelector( '#c' );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
+
+	const fov = 75;
+	const aspect = 2; // the canvas default
+	const near = 0.1;
+	const far = 50;
+	const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	camera.position.z = 20;
+
+	const scene = new THREE.Scene();
+	scene.background = new THREE.Color( 'red' );
+
+	const geometry = new THREE.SphereGeometry();
+	const material = new THREE.MeshBasicMaterial( { color: 'yellow' } );
+
+	const mesh = new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+
+	function resizeRendererToDisplaySize( renderer ) {
+
+		const canvas = renderer.domElement;
+		const width = canvas.clientWidth;
+		const height = canvas.clientHeight;
+		const needResize = canvas.width !== width || canvas.height !== height;
+		if ( needResize ) {
+
+			renderer.setSize( width, height, false );
+
+		}
+
+		return needResize;
+
+	}
+
+	const xElem = document.querySelector( '#x' );
+	const yElem = document.querySelector( '#y' );
+	const zElem = document.querySelector( '#z' );
+
+	function render( time ) {
+
+		time *= 0.001; // convert to seconds
+
+		if ( resizeRendererToDisplaySize( renderer ) ) {
+
+			const canvas = renderer.domElement;
+			camera.aspect = canvas.clientWidth / canvas.clientHeight;
+			camera.updateProjectionMatrix();
+
+		}
+
+		mesh.position.set(
+			Math.sin( time * 1.2 ) * 5,
+			Math.sin( time * 1.1 ) * 5,
+			Math.sin( time * 1.3 ) * 10,
+		);
+		xElem.textContent = mesh.position.x.toFixed( 3 );
+		yElem.textContent = mesh.position.y.toFixed( 3 );
+		zElem.textContent = mesh.position.z.toFixed( 3 );
+
+		renderer.render( scene, camera );
+
+		requestAnimationFrame( render );
+
+	}
+
+	requestAnimationFrame( render );
+
+}
+
+main();
+</script>
+</html>

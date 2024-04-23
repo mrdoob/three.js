@@ -1,16 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
-		<h1>球几何体（[name]）</h1>
+		<h1>球缓冲几何体（[name]）</h1>
 
 		<p class="desc">一个用于生成球体的类。</p>
 
@@ -22,7 +21,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -32,11 +31,11 @@
 
 		</script>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
-		<code>var geometry = new THREE.SphereGeometry( 5, 32, 32 );
-		var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-		var sphere = new THREE.Mesh( geometry, material );
+		<code>const geometry = new THREE.SphereGeometry( 15, 32, 16 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		const sphere = new THREE.Mesh( geometry, material );
 		scene.add( sphere );
 		</code>
 
@@ -45,13 +44,13 @@
 		<h3>[name]([param:Float radius], [param:Integer widthSegments], [param:Integer heightSegments], [param:Float phiStart], [param:Float phiLength], [param:Float thetaStart], [param:Float thetaLength])</h3>
 
 		<p>
-		radius — 球体半径，默认为1。<br />
-		widthSegments — 水平分段数（沿着经线分段），最小值为3，默认值为8。<br />
-		heightSegments — 垂直分段数（沿着纬线分段），最小值为2，默认值为6。<br />
-		phiStart — 指定水平（经线）起始角度，默认值为0。。<br />
-		phiLength — 指定水平（经线）扫描角度的大小，默认值为 Math.PI * 2。<br />
-		thetaStart — 指定垂直（纬线）起始角度，默认值为0。<br />
-		thetaLength — 指定垂直（纬线）扫描角度大小，默认值为 Math.PI。<br />
+			radius — 球体半径，默认为1。<br />
+			widthSegments — 水平分段数（沿着经线分段），最小值为3，默认值为32。<br />
+			heightSegments — 垂直分段数（沿着纬线分段），最小值为2，默认值为16。<br />
+			phiStart — 指定水平（经线）起始角度，默认值为0。。<br />
+			phiLength — 指定水平（经线）扫描角度的大小，默认值为 Math.PI * 2。<br />
+			thetaStart — 指定垂直（纬线）起始角度，默认值为0。<br />
+			thetaLength — 指定垂直（纬线）扫描角度大小，默认值为 Math.PI。<br />
 		</p>
 
 		<p>
@@ -61,7 +60,7 @@
 		</p>
 
 		<h2>属性</h2>
-		<p>共有属性请参见其基类[page:Geometry]。</p>
+		<p>共有属性请参见其基类[page:BufferGeometry]。</p>
 
 		<h3>.parameters</h3>
 		<p>
@@ -69,7 +68,7 @@
 		</p>
 
 		<h2>方法(Methods)</h2>
-		<p>共有方法请参见其基类[page:Geometry]。</p>
+		<p>共有方法请参见其基类[page:BufferGeometry]。</p>
 
 		<h2>源代码</h2>
 

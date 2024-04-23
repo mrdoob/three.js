@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr; [page:LineBasicMaterial] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Un matériau pour dessiner des géométries de style filaire, avec des pointillés.<br />
+			Note: You must call [page:Line.computeLineDistances]() when using [name].
+		</p>
+
+		<h2>Exemple de Code</h2>
+
+		<code>
+		const material = new THREE.LineDashedMaterial( {
+			color: 0xffffff,
+			linewidth: 1,
+			scale: 1,
+			dashSize: 3,
+			gapSize: 1,
+		} );
+		</code>
+
+		<h2>Exemples</h2>
+
+		<p>
+			[example:webgl_lines_dashed WebGL / lines / dashed]<br />
+		</p>
+
+		<h2>Constructeur</h2>
+
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+		[page:Object parameters] - (optionnel) un objet avec une ou plusieurs propriétés définissant l'apparence du matériau.
+		Toute propriété du matériau (y compris toute proprioété héritée de [page:LineBasicMaterial]) peut être passée dans l'objet.
+		</p>
+
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe [page:LineBasicMaterial] pour les propriétés communes.</p>
+
+		<h3>[property:number dashSize]</h3>
+		<p>La taille des tirets, c'est à dire de l'espace additionnée à celle du trait. La valeur par défaut est `3`.</p>
+
+		<h3>[property:number gapSize]</h3>
+		<p>La taille de l'espace. La valeur par défaut est `1`.</p>
+
+		<h3>[property:Boolean isLineDashedMaterial]</h3>
+		<p>
+			Attribut pour vérifier si un objet donné est de type [name], en lecture seule.
+		</p>
+
+
+		<h3>[property:number scale]</h3>
+		<p>L'échelle de la partie pointillée d'une ligne. La valeur par défaut est `1`.</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe [page:LineBasicMaterial] pour les méthodes communes.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

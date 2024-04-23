@@ -5,18 +5,6 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link type="text/css" rel="stylesheet" href="main.css">
-	<style>
-		a {
-			color: #08f;
-		}
-		#notSupported {
-			width: 50%;
-			margin: auto;
-			background-color: #f00;
-			margin-top: 20px;
-			padding: 10px;
-		}
-	</style>
 </head>
 <body>
 
@@ -82,26 +70,26 @@
 		}
 	</script>
 
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
+			}
+		}
+	</script>
+
 	<script type="module">
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 
-		import Stats from './jsm/libs/stats.module.js';
+		import Stats from 'three/addons/libs/stats.module.js';
 
-		var container, stats;
+		let container, stats;
 
-		var camera, scene, renderer;
-		var geometry, material, mesh;
+		let camera, scene, renderer;
+		let geometry, material, mesh;
 
 		function init() {
-
-			renderer = new THREE.WebGLRenderer();
-
-			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
-
-				document.getElementById( 'notSupported' ).style.display = '';
-				return false;
-
-			}
 
 			container = document.createElement( 'div' );
 			document.body.appendChild( container );
@@ -111,17 +99,17 @@
 
 			scene = new THREE.Scene();
 
-			var circleGeometry = new THREE.CircleBufferGeometry( 1, 6 );
+			const circleGeometry = new THREE.CircleGeometry( 1, 6 );
 
 			geometry = new THREE.InstancedBufferGeometry();
 			geometry.index = circleGeometry.index;
 			geometry.attributes = circleGeometry.attributes;
 
-			var particleCount = 75000;
+			const particleCount = 75000;
 
-			var translateArray = new Float32Array( particleCount * 3 );
+			const translateArray = new Float32Array( particleCount * 3 );
 
-			for ( var i = 0, i3 = 0, l = particleCount; i < l; i ++, i3 += 3 ) {
+			for ( let i = 0, i3 = 0, l = particleCount; i < l; i ++, i3 += 3 ) {
 
 				translateArray[ i3 + 0 ] = Math.random() * 2 - 1;
 				translateArray[ i3 + 1 ] = Math.random() * 2 - 1;
@@ -133,8 +121,8 @@
 
 			material = new THREE.RawShaderMaterial( {
 				uniforms: {
-					"map": { value: new THREE.TextureLoader().load( 'textures/sprites/circle.png' ) },
-					"time": { value: 0.0 }
+					'map': { value: new THREE.TextureLoader().load( 'textures/sprites/circle.png' ) },
+					'time': { value: 0.0 }
 				},
 				vertexShader: document.getElementById( 'vshader' ).textContent,
 				fragmentShader: document.getElementById( 'fshader' ).textContent,
@@ -146,6 +134,7 @@
 			mesh.scale.set( 500, 500, 500 );
 			scene.add( mesh );
 
+			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
@@ -153,7 +142,7 @@
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 			return true;
 
@@ -179,9 +168,9 @@
 
 		function render() {
 
-			var time = performance.now() * 0.0005;
+			const time = performance.now() * 0.0005;
 
-			material.uniforms[ "time" ].value = time;
+			material.uniforms[ 'time' ].value = time;
 
 			mesh.rotation.x = time * 0.2;
 			mesh.rotation.y = time * 0.4;

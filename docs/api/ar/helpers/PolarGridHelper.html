@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			PolarGridHelper هو كائن لتحديد الشبكات القطبية. الشبكات هي مصفوفات ثنائية الأبعاد
+			من الخطوط.
+		</p>
+			
+		<h2>مثال الكود</h2>
+			
+		<code>
+		const radius = 10;
+		const sectors = 16;
+		const rings = 8;
+		const divisions = 64;
+
+		const helper = new THREE.PolarGridHelper( radius, sectors, rings, divisions );
+		scene.add( helper );
+		</code>
+
+		<h2>أمثلة (Examples)</h2>
+
+		<p>[example:webgl_helpers WebGL / helpers]</p>
+		
+		<h2>المنشئ (Constructor)</h2>
+		
+		<h3>
+		[name]( [param:Number radius], [param:Number sectors], [param:Number rings], [param:Number divisions], [param:Color color1], [param:Color color2] )
+		</h3>
+		<p>
+		radius -- نصف قطر الشبكة القطبية. يمكن أن يكون هذا أي رقم موجب.
+		الافتراضي هو 10.<br />
+		sectors -- عدد القطاعات التي ستُقسَّم إليها الشبكة. يمكن أن يكون هذا
+		أي عدد صحيح موجب. الافتراضي هو 16.<br />
+		rings -- عدد الحلقات. يمكن أن يكون هذا أي عدد صحيح موجب. الافتراضي هو
+		8.<br />
+		divisions -- عدد شرائح الخط المستخدمة لكل دائرة. يمكن أن يكون هذا
+		أي عدد صحيح موجب لا يقل عن 3. الافتراضي هو 64.<br />
+		color1 -- اللون الأول المستخدم لعناصر الشبكة. يمكن أن يكون هذا
+		[page:Color]، قيمة ست عشرية واسم لون CSS. الافتراضي هو
+		0x444444 <br />
+		color2 -- اللون الثاني المستخدم لعناصر الشبكة. يمكن أن يكون هذا
+		[page:Color]، قيمة ست عشرية واسم لون CSS. الافتراضي هو
+		0x888888
+		</p>
+		<p>
+		ينشئ [name] جديدًا بقطر 'radius' مع 'sectors' عدد من القطاعات
+		و 'rings' عدد من الحلقات، حيث تُسَهَّل كل دائرة إلى
+		'divisions' عدد من شرائح الخط. الألوان اختيارية.
+		</p>
+		
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى الفئة الأساسية [page:LineSegments] للحصول على الطرق المشتركة.</p>
+		
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		يُطلِق الموارد المتعلقة بوحدة معالجة الرسومات التي تم تخصيصها من قبل هذه العيّنة. اتصل بهذه
+		الطريقة كلما لم يعد هذه العيّنة مستخدمة في تطبيقك.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -15,13 +14,13 @@
 
 		<h2>构造函数</h2>
 
-		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding )</h3>
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace )</h3>
 
-		<h2>源代码</h2>
+		<h2>代码示例</h2>
 
 		<code>
 		// load a texture, set wrap mode to repeat
-		var texture = new THREE.TextureLoader().load( "textures/water.jpg" );
+		const texture = new THREE.TextureLoader().load( "textures/water.jpg" );
 		texture.wrapS = THREE.RepeatWrapping;
 		texture.wrapT = THREE.RepeatWrapping;
 		texture.repeat.set( 4, 4 );
@@ -32,6 +31,11 @@
 		<h3>[property:Integer id]</h3>
 		<p>
 		只读 - 表示该纹理实例的唯一数字。
+		</p>
+
+		<h3>[property:Boolean isTexture]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:String uuid]</h3>
@@ -54,7 +58,7 @@
 		并在视频播放时不断地更新这个纹理贴图。——[page:VideoTexture VideoTexture] 类会对此自动进行处理。
 		</p>
 
-		<h3>[property:array mipmaps]</h3>
+		<h3>[property:Array mipmaps]</h3>
 		<p>
 		用户所给定的mipmap数组（可选）。
 		</p>
@@ -65,6 +69,11 @@
 		即UV坐标将被用于纹理映射。<br />
 
 		请参阅[page:Textures texture constants]（映射模式常量）来了解其他映射类型。
+		</p>
+
+		<h3>[property:Integer channel]</h3>
+		<p>
+		Lets you select the uv attribute to map the texture to. `0` for `uv`, `1` for `uv1`, `2` for `uv2` and `3` for `uv3`.
 		</p>
 
 		<h3>[property:number wrapS]</h3>
@@ -106,15 +115,22 @@
 		<p>
 		沿着轴，通过具有最高纹素密度的像素的样本数。
 		默认情况下，这个值为1。设置一个较高的值将会产生比基本的mipmap更清晰的效果，代价是需要使用更多纹理样本。
-		使用[page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() 来查询GPU中各向异性的最大有效值；这个值通常是2的幂。
+		使用[page:WebGLRenderer.capabilities renderer.capabilities.getMaxAnisotropy]() 来查询GPU中各向异性的最大有效值；这个值通常是2的幂。
 		</p>
 
 		<h3>[property:number format]</h3>
 		<p>
-		默认值为[page:Textures THREE.RGBAFormat]，
-		但[page:TextureLoader TextureLoader]将会在载入JPG图片时自动将这个值设置为[page:Textures THREE.RGBFormat]。<br /><br />
+		默认值为[page:Textures THREE.RGBAFormat]。<br /><br />
 
 		请参阅[page:Textures texture constants]页面来了解其它格式。
+		</p>
+
+		<h3>[property:String internalFormat]</h3>
+		<p>
+		此项的默认值由[page:Texture.format .format]和[page:Texture.type .type]混合并决定。<br />
+
+		这项GPU格式设置允许开发者决定在GPU中的数据存储方式。<br /><br />
+		查看[page:Textures texture constants]页面来了解所有可用的Internal Formats以及其细节。
 		</p>
 
 		<h3>[property:number type]</h3>
@@ -127,21 +143,15 @@
 
 		<h3>[property:Vector2 offset]</h3>
 		<p>
-		纹理在单次重复时，从一开始将分别在U、V方向上偏移多少。
-		这个值的范围通常在*0.0*之间*1.0*。
-		请注意：这一属性是一个非常方便的修改器，仅仅影响纹理对模型上第一组UV的应用。
-		如果该纹理被用于需要额外的UV集的贴图（例如一些成品材质中的aoMap或lightMap），
-		这些UV必须被手动调整来实现所期望的偏移。
+		贴图单次重复中的起始偏移量，分别表示U和V。
+		一般范围是由`0.0`到`1.0`。
 		</p>
 
 		<h3>[property:Vector2 repeat]</h3>
 		<p>
-		纹理将在表面上，分别在U、V方向重复多少次。如果这个值在任意方向上设置为大于1，
-		则对应的Wrap参数应当也被设为[page:Textures THREE.RepeatWrapping]或[page:Textures THREE.MirroredRepeatWrapping]，
-		以实现所期望的平铺效果。
-		请注意：这一属性是一个非常方便的修改器，仅仅影响纹理对模型上第一组UV的应用。
-		如果该纹理被用于需要额外的UV集的贴图（例如一些成品材质中的aoMap或lightMap），
-		这些UV必须被手动调整来实现所期望的重复。
+		决定纹理在表面的重复次数，两个方向分别表示U和V，如果重复次数在任何方向上设置了超过1的数值，
+		对应的Wrap需要设置为[page:Textures THREE.RepeatWrapping]或者[page:Textures THREE.MirroredRepeatWrapping]来
+		达到想要的平铺效果。
 		</p>
 
 		<h3>[property:number rotation]</h3>
@@ -154,7 +164,7 @@
 		旋转中心点。(0.5, 0.5)对应纹理的正中心。默认值为(0,0)，即左下角。
 		</p>
 
-		<h3>[property:boolean matrixAutoUpdate]</h3>
+		<h3>[property:Boolean matrixAutoUpdate]</h3>
 		<p>
 		是否从纹理的[page:Texture.offset .offset]、[page:Texture.repeat .repeat]、[page:Texture.rotation .rotation]和[page:Texture.center .center]属性更新纹理的UV变换矩阵（uv-transform [page:Texture.matrix .matrix]）。
 		默认值为true。
@@ -170,26 +180,26 @@
 			默认值为单位矩阵。
 		</p>
 
-		<h3>[property:boolean generateMipmaps]</h3>
+		<h3>[property:Boolean generateMipmaps]</h3>
 		<p>
 			是否为纹理生成mipmap（如果可用）。默认为true。
 			如果你手动生成mipmap，请将其设为false。
 		</p>
 
-		<h3>[property:boolean premultiplyAlpha]</h3>
+		<h3>[property:Boolean premultiplyAlpha]</h3>
 		<p>
-		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Defaut is *false*.<br /><br />
+		如果设置为*true*并且alpha通道存在的话，上传到GPU时alpha的数值将会与颜色通道的数值相乘。默认为*false*。<br /><br />
 
-		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
-		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
+		注意此项属性不会影响到[link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap]。
+		如果你想要则需要在bitmap创建的时候进行配置，如何配置请查看[page:ImageBitmapLoader]。
 		</p>
 
-		<h3>[property:boolean flipY]</h3>
+		<h3>[property:Boolean flipY]</h3>
 		<p>
-		If set to *true*, the texture is flipped along the vertical axis when uploaded to the GPU. Default is *true*.<br /><br />
+		如果设置为*true*，纹理在上传到GPU的时候会进行纵向的翻转。默认值为*true*。<br /><br />
 
-		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
-		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
+		注意此项属性不会影响到[link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap]。
+		如果你想要则需要在bitmap创建的时候进行配置，如何配置请查看[page:ImageBitmapLoader]。
 		</p>
 
 		<h3>[property:number unpackAlignment]</h3>
@@ -199,13 +209,10 @@
 			请参阅[link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei]来了解详细信息。
 		</p>
 
-		<h3>[property:number encoding]</h3>
+		<h3>[property:string colorSpace]</h3>
 		<p>
-		默认值为[page:Textures THREE.LinearEncoding]。
-		请参阅[page:Textures texture constants]来了解其他格式的详细信息。<br /><br />
-
-		请注意，如果在材质被使用之后，纹理贴图中这个值发生了改变，
-		需要触发Material.needsUpdate，来使得这个值在着色器中实现。
+		默认值为[page:Textures THREE.NoColorSpace]。
+		请参阅[page:Textures texture constants]来了解其他格式的详细信息。
 		</p>
 
 		<h3>[property:Integer version]</h3>
@@ -225,12 +232,21 @@
 			这对于设置包裹模式尤其重要。
 		</p>
 
+		<h3>[property:Object userData]</h3>
+		<p>
+		保存关于纹理的自定义信息的对象。不应该放函数引用，因为函数不会拷贝。
+		</p>
+
+		<h3>[property:Source source]</h3>
+		<p>
+		纹理的数据源信息。可以在不同的纹理之间引用相同的数据源，这在使用精灵表的情况下很好用，因为在这种情况下不同的纹理只是使用了不同的偏移，但是其数据源是相同的。
+		</p>
 
 		<h2>方法</h2>
 
-		<h3>[page:EventDispatcher EventDispatcher]方法在这个类上可以使用。</h3>
+		<p>[page:EventDispatcher EventDispatcher]方法在这个类上可以使用。</p>
 
-		<h3>[method:null updateMatrix]()</h3>
+		<h3>[method:undefined updateMatrix]()</h3>
 		<p>
 			从纹理的[page:Texture.offset .offset]、[page:Texture.repeat .repeat]、
 			[page:Texture.rotation .rotation]和[page:Texture.center .center]属性来更新纹理的UV变换矩阵（uv-transform [page:Texture.matrix .matrix]）。
@@ -239,6 +255,7 @@
 		<h3>[method:Texture clone]()</h3>
 		<p>
 			拷贝纹理。请注意。这不是“深拷贝”，图像是共用的。
+			除此之外，拷贝一个纹理并不会将此纹理自动标记并上传。你需要在图片的属性变更或者源数据完全加载完的时候并准备好的时候将[page:Texture.needsUpdate]设置为true。
 		</p>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
@@ -247,7 +264,7 @@
 		将Texture对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
 		</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>
 			使用“废置”事件类型调用[page:EventDispatcher EventDispatcher].dispatchEvent。
 		</p>

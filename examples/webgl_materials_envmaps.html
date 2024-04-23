@@ -10,22 +10,28 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl environment mapping example<br/>
-			Equirectangular Map by <a href="http://gl.ict.usc.edu/Data/HighResProbes/">University of Southern California</a><br/>
-			Spherical Map by <a href="http://www.pauldebevec.com/Probes/">Paul Debevec</a>
+			Equirectangular Map by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.
 		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			var controls, camera, scene, renderer;
-			var cameraCube, sceneCube;
-			var textureEquirec, textureCube, textureSphere;
-			var cubeMesh, sphereMesh;
-			var sphereMaterial;
+			let controls, camera, scene, renderer;
+			let textureEquirec, textureCube;
+			let sphereMesh, sphereMaterial, params;
 
 			init();
 			animate();
@@ -34,137 +40,77 @@
 
 				// CAMERAS
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.position.set( 0, 0, 1000 );
-				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 0, 2.5 );
 
 				// SCENE
 
 				scene = new THREE.Scene();
-				sceneCube = new THREE.Scene();
-
-				// Lights
-
-				var ambient = new THREE.AmbientLight( 0xffffff );
-				scene.add( ambient );
 
 				// Textures
 
-				var r = "textures/cube/Bridge2/";
-				var urls = [ r + "posx.jpg", r + "negx.jpg",
-							 r + "posy.jpg", r + "negy.jpg",
-							 r + "posz.jpg", r + "negz.jpg" ];
+				const loader = new THREE.CubeTextureLoader();
+				loader.setPath( 'textures/cube/Bridge2/' );
 
-				textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.encoding = THREE.sRGBEncoding;
+				textureCube = loader.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
 
-				var textureLoader = new THREE.TextureLoader();
+				const textureLoader = new THREE.TextureLoader();
 
-				textureEquirec = textureLoader.load( "textures/2294472375_24a3b8ef46_o.jpg" );
+				textureEquirec = textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg' );
 				textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
-				textureEquirec.encoding = THREE.sRGBEncoding;
+				textureEquirec.colorSpace = THREE.SRGBColorSpace;
 
-				textureSphere = textureLoader.load( "textures/metal.jpg" );
-				textureSphere.mapping = THREE.SphericalReflectionMapping;
-				textureSphere.encoding = THREE.sRGBEncoding;
-
-				// Materials
-
-				var equirectShader = THREE.ShaderLib[ "equirect" ];
-
-				var equirectMaterial = new THREE.ShaderMaterial( {
-					fragmentShader: equirectShader.fragmentShader,
-					vertexShader: equirectShader.vertexShader,
-					uniforms: equirectShader.uniforms,
-					depthWrite: false,
-					side: THREE.BackSide
-				} );
-
-				equirectMaterial.uniforms[ "tEquirect" ].value = textureEquirec;
-				// enable code injection for non-built-in material
-				Object.defineProperty( equirectMaterial, 'map', {
-
-					get: function () {
-
-						return this.uniforms.tEquirect.value;
-
-					}
-
-				} );
-
-				var cubeShader = THREE.ShaderLib[ "cube" ];
-				var cubeMaterial = new THREE.ShaderMaterial( {
-					fragmentShader: cubeShader.fragmentShader,
-					vertexShader: cubeShader.vertexShader,
-					uniforms: cubeShader.uniforms,
-					depthWrite: false,
-					side: THREE.BackSide
-				} );
-
-				cubeMaterial.envMap = textureCube;
-
-				// Skybox
-
-				cubeMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), cubeMaterial );
-				sceneCube.add( cubeMesh );
+				scene.background = textureCube;
 
 				//
 
-				var geometry = new THREE.SphereBufferGeometry( 400.0, 48, 24 );
-				sphereMaterial = new THREE.MeshLambertMaterial( { envMap: textureCube } );
+				const geometry = new THREE.IcosahedronGeometry( 1, 15 );
+				sphereMaterial = new THREE.MeshBasicMaterial( { envMap: textureCube } );
 				sphereMesh = new THREE.Mesh( geometry, sphereMaterial );
-
 				scene.add( sphereMesh );
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
-
 				//
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 500;
-				controls.maxDistance = 2500;
+				controls.minDistance = 1.5;
+				controls.maxDistance = 6;
 
 				//
 
-				var params = {
+				params = {
 					Cube: function () {
 
-						cubeMesh.material = cubeMaterial;
-						cubeMesh.visible = true;
+						scene.background = textureCube;
+
 						sphereMaterial.envMap = textureCube;
 						sphereMaterial.needsUpdate = true;
 
 					},
 					Equirectangular: function () {
 
-						cubeMesh.material = equirectMaterial;
-						cubeMesh.visible = true;
+						scene.background = textureEquirec;
+
 						sphereMaterial.envMap = textureEquirec;
 						sphereMaterial.needsUpdate = true;
 
 					},
-					Spherical: function () {
-
-						cubeMesh.visible = false;
-						sphereMaterial.envMap = textureSphere;
-						sphereMaterial.needsUpdate = true;
-
-					},
-					Refraction: false
+					Refraction: false,
+					backgroundRotationX: false,
+					backgroundRotationY: false,
+					backgroundRotationZ: false,
+					syncMaterial: false
 				};
 
-				var gui = new GUI();
+				const gui = new GUI( { width: 300 } );
 				gui.add( params, 'Cube' );
 				gui.add( params, 'Equirectangular' );
-				gui.add( params, 'Spherical' );
 				gui.add( params, 'Refraction' ).onChange( function ( value ) {
 
 					if ( value ) {
@@ -182,9 +128,13 @@
 					sphereMaterial.needsUpdate = true;
 
 				} );
+				gui.add( params, 'backgroundRotationX' );
+				gui.add( params, 'backgroundRotationY' );
+				gui.add( params, 'backgroundRotationZ' );
+				gui.add( params, 'syncMaterial' );
 				gui.open();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -192,9 +142,6 @@
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-
-				cameraCube.aspect = window.innerWidth / window.innerHeight;
-				cameraCube.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -212,10 +159,31 @@
 
 			function render() {
 
-				camera.lookAt( scene.position );
-				cameraCube.rotation.copy( camera.rotation );
+				if ( params.backgroundRotationX ) {
 
-				renderer.render( sceneCube, cameraCube );
+					scene.backgroundRotation.x += 0.001;
+
+				}
+
+				if ( params.backgroundRotationY ) {
+
+					scene.backgroundRotation.y += 0.001;
+
+				}
+
+				if ( params.backgroundRotationZ ) {
+
+					scene.backgroundRotation.z += 0.001;
+
+				}
+
+				if ( params.syncMaterial ) {
+
+					sphereMesh.material.envMapRotation.copy( scene.backgroundRotation );
+
+				}
+
+				camera.lookAt( scene.position );
 				renderer.render( scene, camera );
 
 			}

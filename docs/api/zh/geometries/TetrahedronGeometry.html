@@ -1,16 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr; [page:PolyhedronGeometry] &rarr;
 
-		<h1>四面几何体（[name]）</h1>
+		<h1>四面缓冲几何体（[name]）</h1>
 
 		<p class="desc">一个用于生成四面几何体的类。</p>
 
@@ -22,7 +21,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -36,12 +35,12 @@
 
 		<h3>[name]([param:Float radius], [param:Integer detail])</h3>
 		<p>
-		radius — 四面体的半径，默认值为1。<br />
-		detail — 默认值为0。将这个值设为一个大于0的数将会为它增加一些顶点，使其不再是一个四面体。
+				radius — 四面体的半径，默认值为1。<br />
+				detail — 默认值为0。将这个值设为一个大于0的数将会为它增加一些顶点，使其不再是一个四面体。
 		</p>
 
 		<h2>属性</h2>
-		<p>共有属性请参见其基类[page:Geometry]。</p>
+		<p>共有属性请参见其基类[page:PolyhedronGeometry]。</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
@@ -49,7 +48,7 @@
 		</p>
 
 		<h2>方法(Methods)</h2>
-		<p>共有方法请参见其基类[page:Geometry]。</p>
+		<p>共有方法请参见其基类[page:PolyhedronGeometry]。</p>
 
 		<h2>源代码</h2>
 

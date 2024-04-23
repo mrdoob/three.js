@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		This class is used to convert 이 클래스는 연속된 shape들을 [page:Path] 배열로 바꾸는데에 사용되며, 일례로 SVG shape를 path로 바꾸는 것이 있습니다.(아래 예제를 확인하세요).
+		</p>
+
+		<h2>생성자</h2>
+
+
+		<h3>[name](  )</h3>
+		<p>
+		새 ShapePath를 만듭니다. [page:Path]와 달리, 점들이 ShapePath로 전달되지 않으며 생성 이후에 작동되게 설계되었습니다.
+		</p>
+
+
+		<h2>프로퍼티</h2>
+
+		<h3>[property:Array subPaths]</h3>
+		<p>
+		[page:Path]들의 배열입니다.
+		</p>
+
+		<h3>[property:Array currentPath]</h3>
+		<p>
+		현재 생성된 [page:Path]입니다.
+		</p>
+
+		<h3>[property:Color color]</h3>
+		<p>shape의 [page:Color]이며, 기본값은 흰 색입니다(0xffffff).</p>
+
+		<h2>메서드</h2>
+
+		<h3>[method:this moveTo]( [param:Float x], [param:Float y] )</h3>
+		<p>
+		새 [page:Path]를 시작하고 해당 [page:Path]에 [page:Path.moveTo]( x, y )를 호출합니다.
+		[page:ShapePath.currentPath currentPath] 점도 해당 [page:Path]에 호출합니다.
+		</p>
+
+		<h3>[method:this lineTo]( [param:Float x], [param:Float y] )</h3>
+		<p>[page:ShapePath.currentPath currentPath]의 오프셋에서 X 및 Y로 선을 생성하고 오프셋을 X와 Y로 업데이트합니다.</p>
+
+		<h3>[method:this quadraticCurveTo]( [param:Float cpX], [param:Float cpY], [param:Float x], [param:Float y] )</h3>
+		<p>[page:ShapePath.currentPath currentPath]의 오프셋에서 조절점 cpX 와 cpY 및 x 와 y로 이차곡선을 만들고 [page:ShapePath.currentPath currentPath]의 오프셋을 x 와 y로 업데이트합니다.</p>
+
+		<h3>[method:this bezierCurveTo]( [param:Float cp1X], [param:Float cp1Y], [param:Float cp2X], [param:Float cp2Y], [param:Float x], [param:Float y] )</h3>
+		<p>[page:ShapePath.currentPath currentPath]의 오프셋에서 조절점 cpX 와 cpY 및 x 와 y로 베지어곡선을 만들고 [page:ShapePath.currentPath currentPath]의 오프셋을 x 와 y로 업데이트합니다.</p>
+
+		<h3>[method:this splineThru] ( [param:Array points] ) </h3>
+		<p>points - [page:Vector2]들의 배열</p>
+		<p>[page:ShapePath.currentPath currentPath] 위에 새 [page:SplineCurve]를 연결합니다.</p>
+
+
+		<h3>[method:Array toShapes]( [param:Boolean isCCW] )</h3>
+		<p>
+		isCCW -- solids와 holes가 생성되는 방식을 변경합니다
+		</p>
+		<p>
+		[page:ShapePath.subPaths subPaths] 배열을 Shapes 배열로 변환합니다. 기본값으로 solid shapes는 시계방향(CW)이고 holes는 반시계방향(CCW)입니다.
+		isCCW가 true면, 이 값들이 반대가 됩니다.
+		<br/>
+
+		</p>
+
+
+		<h2>소스코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/extras/core/ShapePath.js src/extras/core/ShapePath.js]
+		</p>
+	</body>
+</html>

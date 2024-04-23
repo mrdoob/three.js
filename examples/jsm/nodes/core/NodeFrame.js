@@ -1,58 +1,143 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
+import { NodeUpdateType } from './constants.js';
 
-function NodeFrame( time ) {
+class NodeFrame {
 
-	this.time = time !== undefined ? time : 0;
+	constructor() {
 
-	this.id = 0;
+		this.time = 0;
+		this.deltaTime = 0;
 
-}
+		this.frameId = 0;
+		this.renderId = 0;
 
-NodeFrame.prototype = {
+		this.startTime = null;
 
-	constructor: NodeFrame,
+		this.updateMap = new WeakMap();
+		this.updateBeforeMap = new WeakMap();
 
-	update: function ( delta ) {
-
-		++ this.id;
-
-		this.time += delta;
-		this.delta = delta;
-
-		return this;
-
-	},
-
-	setRenderer: function ( renderer ) {
-
-		this.renderer = renderer;
-
-		return this;
-
-	},
-
-	setRenderTexture: function ( renderTexture ) {
-
-		this.renderTexture = renderTexture;
-
-		return this;
-
-	},
-
-	updateNode: function ( node ) {
-
-		if ( node.frameId === this.id ) return this;
-
-		node.updateFrame( this );
-
-		node.frameId = this.id;
-
-		return this;
+		this.renderer = null;
+		this.material = null;
+		this.camera = null;
+		this.object = null;
+		this.scene = null;
 
 	}
 
-};
+	_getMaps( referenceMap, nodeRef ) {
 
-export { NodeFrame };
+		let maps = referenceMap.get( nodeRef );
+
+		if ( maps === undefined ) {
+
+			maps = {
+				renderMap: new WeakMap(),
+				frameMap: new WeakMap()
+			};
+
+			referenceMap.set( nodeRef, maps );
+
+		}
+
+		return maps;
+
+	}
+
+	updateBeforeNode( node ) {
+
+		const updateType = node.getUpdateBeforeType();
+		const reference = node.updateReference( this );
+
+		if ( updateType === NodeUpdateType.FRAME ) {
+
+			const { frameMap } = this._getMaps( this.updateBeforeMap, reference );
+
+			if ( frameMap.get( reference ) !== this.frameId ) {
+
+				if ( node.updateBefore( this ) !== false ) {
+
+					frameMap.set( reference, this.frameId );
+
+				}
+
+			}
+
+		} else if ( updateType === NodeUpdateType.RENDER ) {
+
+			const { renderMap } = this._getMaps( this.updateBeforeMap, reference );
+
+			if ( renderMap.get( reference ) !== this.renderId ) {
+
+				if ( node.updateBefore( this ) !== false ) {
+
+					renderMap.set( reference, this.renderId );
+
+				}
+
+			}
+
+		} else if ( updateType === NodeUpdateType.OBJECT ) {
+
+			node.updateBefore( this );
+
+		}
+
+	}
+
+	updateNode( node ) {
+
+		const updateType = node.getUpdateType();
+		const reference = node.updateReference( this );
+
+		if ( updateType === NodeUpdateType.FRAME ) {
+
+			const { frameMap } = this._getMaps( this.updateMap, reference );
+
+			if ( frameMap.get( reference ) !== this.frameId ) {
+
+				if ( node.update( this ) !== false ) {
+
+					frameMap.set( reference, this.frameId );
+
+				}
+
+			}
+
+		} else if ( updateType === NodeUpdateType.RENDER ) {
+
+			const { renderMap } = this._getMaps( this.updateMap, reference );
+
+			if ( renderMap.get( reference ) !== this.renderId ) {
+
+				if ( node.update( this ) !== false ) {
+
+					renderMap.set( reference, this.renderId );
+
+				}
+
+			}
+
+		} else if ( updateType === NodeUpdateType.OBJECT ) {
+
+			node.update( this );
+
+		}
+
+	}
+
+	update() {
+
+		this.frameId ++;
+
+		if ( this.lastTime === undefined ) this.lastTime = performance.now();
+
+		this.deltaTime = ( performance.now() - this.lastTime ) / 1000;
+
+		this.lastTime = performance.now();
+
+		this.time += this.deltaTime;
+
+	}
+
+}
+
+export default NodeFrame;

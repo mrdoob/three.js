@@ -1,29 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
-		<h1>多面几何体（[name]）</h1>
+		<h1>多面缓冲几何体（[name]）</h1>
 
 		<p class="desc">
-			多面体是在三维空间中具有一些平面的立体图形。这个类将一个顶点数组投射到一个球面上，之后将它们细分为所需的细节级别。
+				多面体在三维空间中具有一些平面的立体图形。这个类将一个顶点数组投射到一个球面上，之后将它们细分为所需的细节级别。
+				这个类由[page:DodecahedronGeometry]、[page:IcosahedronGeometry]、[page:OctahedronGeometry]和[page:TetrahedronGeometry]
+				所使用，以生成它们各自的几何结构。
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 <code>
-var verticesOfCube = [
+const verticesOfCube = [
     -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
     -1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
 ];
 
-var indicesOfFaces = [
+const indicesOfFaces = [
     2,1,0,    0,3,2,
     0,4,7,    7,3,0,
     0,1,5,    5,4,0,
@@ -32,7 +33,7 @@ var indicesOfFaces = [
     4,5,6,    6,7,4
 ];
 
-var geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
+const geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
 </code>
 
 		<h2>构造器</h2>
@@ -47,7 +48,7 @@ var geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 
 		</p>
 
 		<h2>属性</h2>
-		<p>共有属性请参见其基类[page:Geometry]。</p>
+		<p>共有属性请参见其基类[page:BufferGeometry]。</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
@@ -55,7 +56,7 @@ var geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 
 		</p>
 
 		<h2>方法(Methods)</h2>
-		<p>共有方法请参见其基类[page:Geometry]。</p>
+		<p>共有方法请参见其基类[page:BufferGeometry]。</p>
 
 		<h2>源代码</h2>
 

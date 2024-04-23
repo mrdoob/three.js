@@ -1,19 +1,15 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
-import {
-	BoxBufferGeometry
-} from '../../../../src/geometries/BoxGeometry';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
+
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'BoxBufferGeometry', ( hooks ) => {
+	QUnit.module( 'BoxGeometry', ( hooks ) => {
 
-		var geometries = undefined;
+		let geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -26,24 +22,53 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				new BoxBufferGeometry(),
-				new BoxBufferGeometry( parameters.width, parameters.height, parameters.depth ),
-				new BoxBufferGeometry( parameters.width, parameters.height, parameters.depth, parameters.widthSegments, parameters.heightSegments, parameters.depthSegments )
+				new BoxGeometry(),
+				new BoxGeometry( parameters.width, parameters.height, parameters.depth ),
+				new BoxGeometry( parameters.width, parameters.height, parameters.depth, parameters.widthSegments, parameters.heightSegments, parameters.depthSegments ),
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const object = new BoxGeometry();
+			assert.strictEqual(
+				object instanceof BufferGeometry, true,
+				'BoxGeometry extends from BufferGeometry'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const object = new BoxGeometry();
+			assert.ok( object, 'Can instantiate a BoxGeometry.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new BoxGeometry();
+			assert.ok(
+				object.type === 'BoxGeometry',
+				'BoxGeometry.type should be BoxGeometry'
+			);
+
+		} );
+
+		QUnit.todo( 'parameters', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// STATIC
+		QUnit.todo( 'fromJSON', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

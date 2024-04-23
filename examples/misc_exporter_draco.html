@@ -5,115 +5,85 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			body {
-				background-color: #a0a0a0;
-				color: #fff;
-			}
-
-			a {
-				color: #0f0;
-			}
-		</style>
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - draco<br/><br/>
-			<button id="createGeometry">Geometry</button>
-			<button id="createBufferGeometry">BufferGeometry</button> |
-			<button id="exportFile">Export DRC</button>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - draco
 		</div>
 
-		<script src="js/libs/draco/draco_encoder.js"></script>
+		<script src="jsm/libs/draco/draco_encoder.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { DRACOExporter } from './jsm/exporters/DRACOExporter.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { DRACOExporter } from 'three/addons/exporters/DRACOExporter.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			var scene, camera, renderer, exporter, mesh;
+			let scene, camera, renderer, exporter, mesh;
+
+			const params = {
+				export: exportFile
+			};
 
 			init();
 			animate();
 
-			function createBufferGeometry() {
-
-				scene.remove( mesh );
-
-				var geometry = new THREE.TorusKnotBufferGeometry( 50, 15, 200, 30 );
-				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.castShadow = true;
-				mesh.position.y = 25;
-				scene.add( mesh );
-
-			}
-
-			function createGeometry() {
-
-				scene.remove( mesh );
-
-				var geometry = new THREE.TorusKnotGeometry( 50, 15, 200, 30 );
-				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.castShadow = true;
-				mesh.position.y = 25;
-				scene.add( mesh );
-
-			}
-
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.set( 200, 100, 200 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 4, 2, 4 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
-				scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
+				scene.fog = new THREE.Fog( 0xa0a0a0, 4, 20 );
 
 				exporter = new DRACOExporter();
 
 				//
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				hemiLight.position.set( 0, 200, 0 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444, 3 );
+				hemiLight.position.set( 0, 20, 0 );
 				scene.add( hemiLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-				directionalLight.position.set( 0, 200, 100 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				directionalLight.position.set( 0, 20, 10 );
 				directionalLight.castShadow = true;
-				directionalLight.shadow.camera.top = 180;
-				directionalLight.shadow.camera.bottom = - 100;
-				directionalLight.shadow.camera.left = - 120;
-				directionalLight.shadow.camera.right = 120;
+				directionalLight.shadow.camera.top = 2;
+				directionalLight.shadow.camera.bottom = - 2;
+				directionalLight.shadow.camera.left = - 2;
+				directionalLight.shadow.camera.right = 2;
 				scene.add( directionalLight );
 
 				// ground
 
-				var ground = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 2000, 2000 ),
-					new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } )
-				);
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 40, 40 ), new THREE.MeshPhongMaterial( { color: 0xbbbbbb, depthWrite: false } ) );
 				ground.rotation.x = - Math.PI / 2;
-				ground.position.y = - 75;
 				ground.receiveShadow = true;
 				scene.add( ground );
 
-				var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
+				const grid = new THREE.GridHelper( 40, 20, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
-				grid.position.y = - 75;
 				scene.add( grid );
 
 				// export mesh
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 50, 15, 200, 30 );
-				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+				const geometry = new THREE.TorusKnotGeometry( 0.75, 0.2, 200, 30 );
+				const material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
-				mesh.position.y = 25;
+				mesh.position.y = 1.5;
 				scene.add( mesh );
 
 				//
@@ -126,22 +96,19 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 25, 0 );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1.5, 0 );
 				controls.update();
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				var createGeometryButton = document.getElementById( 'createGeometry' );
-				createGeometryButton.addEventListener( 'click', createGeometry );
+				const gui = new GUI();
 
-				var createBufferGeometryButton = document.getElementById( 'createBufferGeometry' );
-				createBufferGeometryButton.addEventListener( 'click', createBufferGeometry );
+				gui.add( params, 'export' ).name( 'Export DRC' );
+				gui.open();
 
-				var exportButton = document.getElementById( 'exportFile' );
-				exportButton.addEventListener( 'click', exportFile );
 
 			}
 
@@ -163,12 +130,12 @@
 
 			function exportFile() {
 
-				var result = exporter.parse( mesh.geometry );
+				const result = exporter.parse( mesh );
 				saveArrayBuffer( result, 'file.drc' );
 
 			}
 
-			var link = document.createElement( 'a' );
+			const link = document.createElement( 'a' );
 			link.style.display = 'none';
 			document.body.appendChild( link );
 

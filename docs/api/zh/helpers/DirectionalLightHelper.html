@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -18,16 +17,15 @@
 			其中包含了表示光位置的平面和表示光方向的线段.
 		</p>
 
-		<h2>例子</h2>
+		<h2>代码示例</h2>
 
 		<code>
-		var light = new THREE.DirectionalLight( 0xFFFFFF );
+		const light = new THREE.DirectionalLight( 0xFFFFFF );
+		scene.add( light );
 
-		var helper = new THREE.DirectionalLightHelper( light, 5 );
-
+		const helper = new THREE.DirectionalLightHelper( light, 5 );
 		scene.add( helper );
 		</code>
-
 
 		<h2>构造函数</h2>
 
@@ -52,10 +50,10 @@
 		<h3>[property:DirectionalLight light]</h3>
 		<p>被模拟的光源. 请参考 [page:DirectionalLight directionalLight] .</p>
 
-		<h3>[property:object matrix]</h3>
+		<h3>[property:Object matrix]</h3>
 		<p>请参考光源的世界矩阵 [page:Object3D.matrixWorld matrixWorld].</p>
 
-		<h3>[property:object matrixAutoUpdate]</h3>
+		<h3>[property:Object matrixAutoUpdate]</h3>
 		<p>
 			请查看 [page:Object3D.matrixAutoUpdate] 页面. 这里设置为 *false* 表示辅助对象
 			使用光源的 [page:Object3D.matrixWorld matrixWorld].
@@ -69,13 +67,13 @@
 
 
 		<h2>方法</h2>
-		<p>请到基类  [page:Object3D] 页面查看公共方法.</p>
+		<p>请到基类 [page:Object3D] 页面查看公共方法.</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>销毁该平行光辅助对象.</p>
 
 
-		<h3>[method:null update]()</h3>
+		<h3>[method:undefined update]()</h3>
 		<p>更新辅助对象，与模拟的 [page:.light directionalLight] 光源的位置和方向保持一致.</p>
 
 		<h2>源码</h2>

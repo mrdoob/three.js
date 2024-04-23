@@ -1,58 +1,60 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+class Layers {
 
-function Layers() {
+	constructor() {
 
-	this.mask = 1 | 0;
+		this.mask = 1 | 0;
 
-}
+	}
 
-Object.assign( Layers.prototype, {
+	set( channel ) {
 
-	set: function ( channel ) {
+		this.mask = ( 1 << channel | 0 ) >>> 0;
 
-		this.mask = 1 << channel | 0;
+	}
 
-	},
-
-	enable: function ( channel ) {
+	enable( channel ) {
 
 		this.mask |= 1 << channel | 0;
 
-	},
+	}
 
-	enableAll: function () {
+	enableAll() {
 
 		this.mask = 0xffffffff | 0;
 
-	},
+	}
 
-	toggle: function ( channel ) {
+	toggle( channel ) {
 
 		this.mask ^= 1 << channel | 0;
 
-	},
+	}
 
-	disable: function ( channel ) {
+	disable( channel ) {
 
 		this.mask &= ~ ( 1 << channel | 0 );
 
-	},
+	}
 
-	disableAll: function () {
+	disableAll() {
 
 		this.mask = 0;
 
-	},
+	}
 
-	test: function ( layers ) {
+	test( layers ) {
 
 		return ( this.mask & layers.mask ) !== 0;
 
 	}
 
-} );
+	isEnabled( channel ) {
+
+		return ( this.mask & ( 1 << channel | 0 ) ) !== 0;
+
+	}
+
+}
 
 
 export { Layers };

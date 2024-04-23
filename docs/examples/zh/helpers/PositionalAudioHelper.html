@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,19 +13,28 @@
 
 		<p class="desc">这一辅助对象显示[page:PositionalAudio]的方向锥。</p>
 
-		<h2>示例</h2>
+		<h2>进口</h2>
 
-		<div>[example:webaudio_orientation webaudio / orientation ]</div>
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
 
-		<h2>示例代码</h2>
 		<code>
-var positionalAudio = new THREE.PositionalAudio( listener );
-positionalAudio.setDirectionalCone( 180, 230, 0.1 );
-
-var helper = new PositionalAudioHelper( positionalAudio );
-positionalAudio.add( helper );
+			import { PositionalAudioHelper } from 'three/addons/helpers/PositionalAudioHelper.js';
 		</code>
 
+		<h2>代码示例</h2>
+		<code>
+		const positionalAudio = new THREE.PositionalAudio( listener );
+		positionalAudio.setDirectionalCone( 180, 230, 0.1 );
+
+		const helper = new PositionalAudioHelper( positionalAudio );
+		positionalAudio.add( helper );
+		</code>
+
+		<h2>例子</h2>
+		<div>[example:webaudio_orientation webaudio / orientation ]</div>
 
 		<h2>构造函数</h2>
 
@@ -60,10 +68,10 @@ positionalAudio.add( helper );
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Object3D]。</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>废置这一辅助对象。</p>
 
-		<h3>[method:null update]()</h3>
+		<h3>[method:undefined update]()</h3>
 		<p>更新这一辅助对象。</p>
 
 		<h2>源代码</h2>

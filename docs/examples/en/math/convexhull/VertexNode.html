@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,6 +13,17 @@
 			A vertex as a double linked list node.
 		</p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { VertexNode } from 'three/addons/math/ConvexHull.js';
+		</code>
+
 
 		<h2>Constructor</h2>
 
@@ -21,6 +31,8 @@
 		<h3>[name]( [param:Vector3 point] )</h3>
 		<p>
 		[page:Vector3 point] - [page:Vector3] A point (x, y, z) in 3D space.<br /><br />
+
+		Creates a new instance of [name].
 		</p>
 
 		<h2>Properties</h2>

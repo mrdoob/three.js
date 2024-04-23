@@ -1,12 +1,11 @@
 /**
- * @author WestLangley / http://github.com/WestLangley
- *
  * parameters = {
  *  color: <hex>,
  *  linewidth: <float>,
  *  dashed: <boolean>,
  *  dashScale: <float>,
  *  dashSize: <float>,
+ *  dashOffset: <float>,
  *  gapSize: <float>,
  *  resolution: <Vector2>, // to be set by renderer
  * }
@@ -18,12 +17,15 @@ import {
 	UniformsLib,
 	UniformsUtils,
 	Vector2
-} from "../../../build/three.module.js";
+} from 'three';
+
 
 UniformsLib.line = {
 
+	worldUnits: { value: 1 },
 	linewidth: { value: 1 },
 	resolution: { value: new Vector2( 1, 1 ) },
+	dashOffset: { value: 0 },
 	dashScale: { value: 1 },
 	dashSize: { value: 1 },
 	gapSize: { value: 1 } // todo FIX - maybe change to totalSize
@@ -39,7 +41,7 @@ ShaderLib[ 'line' ] = {
 	] ),
 
 	vertexShader:
-		`
+	/* glsl */`
 		#include <common>
 		#include <color_pars_vertex>
 		#include <fog_pars_vertex>
@@ -55,7 +57,23 @@ ShaderLib[ 'line' ] = {
 		attribute vec3 instanceColorStart;
 		attribute vec3 instanceColorEnd;
 
-		varying vec2 vUv;
+		#ifdef WORLD_UNITS
+
+			varying vec4 worldPos;
+			varying vec3 worldStart;
+			varying vec3 worldEnd;
+
+			#ifdef USE_DASH
+
+				varying vec2 vUv;
+
+			#endif
+
+		#else
+
+			varying vec2 vUv;
+
+		#endif
 
 		#ifdef USE_DASH
 
@@ -92,16 +110,26 @@ ShaderLib[ 'line' ] = {
 			#ifdef USE_DASH
 
 				vLineDistance = ( position.y < 0.5 ) ? dashScale * instanceDistanceStart : dashScale * instanceDistanceEnd;
+				vUv = uv;
 
 			#endif
 
 			float aspect = resolution.x / resolution.y;
 
-			vUv = uv;
-
 			// camera space
 			vec4 start = modelViewMatrix * vec4( instanceStart, 1.0 );
 			vec4 end = modelViewMatrix * vec4( instanceEnd, 1.0 );
+
+			#ifdef WORLD_UNITS
+
+				worldStart = start.xyz;
+				worldEnd = end.xyz;
+
+			#else
+
+				vUv = uv;
+
+			#endif
 
 			// special case for perspective projection, and segments that terminate either in, or behind, the camera plane
 			// clearly the gpu firmware has a way of addressing this issue when projecting into ndc space
@@ -129,50 +157,91 @@ ShaderLib[ 'line' ] = {
 			vec4 clipEnd = projectionMatrix * end;
 
 			// ndc space
-			vec2 ndcStart = clipStart.xy / clipStart.w;
-			vec2 ndcEnd = clipEnd.xy / clipEnd.w;
+			vec3 ndcStart = clipStart.xyz / clipStart.w;
+			vec3 ndcEnd = clipEnd.xyz / clipEnd.w;
 
 			// direction
-			vec2 dir = ndcEnd - ndcStart;
+			vec2 dir = ndcEnd.xy - ndcStart.xy;
 
 			// account for clip-space aspect ratio
 			dir.x *= aspect;
 			dir = normalize( dir );
 
-			// perpendicular to dir
-			vec2 offset = vec2( dir.y, - dir.x );
+			#ifdef WORLD_UNITS
 
-			// undo aspect ratio adjustment
-			dir.x /= aspect;
-			offset.x /= aspect;
+				vec3 worldDir = normalize( end.xyz - start.xyz );
+				vec3 tmpFwd = normalize( mix( start.xyz, end.xyz, 0.5 ) );
+				vec3 worldUp = normalize( cross( worldDir, tmpFwd ) );
+				vec3 worldFwd = cross( worldDir, worldUp );
+				worldPos = position.y < 0.5 ? start: end;
 
-			// sign flip
-			if ( position.x < 0.0 ) offset *= - 1.0;
+				// height offset
+				float hw = linewidth * 0.5;
+				worldPos.xyz += position.x < 0.0 ? hw * worldUp : - hw * worldUp;
 
-			// endcaps
-			if ( position.y < 0.0 ) {
+				// don't extend the line if we're rendering dashes because we
+				// won't be rendering the endcaps
+				#ifndef USE_DASH
 
-				offset += - dir;
+					// cap extension
+					worldPos.xyz += position.y < 0.5 ? - hw * worldDir : hw * worldDir;
 
-			} else if ( position.y > 1.0 ) {
+					// add width to the box
+					worldPos.xyz += worldFwd * hw;
 
-				offset += dir;
+					// endcaps
+					if ( position.y > 1.0 || position.y < 0.0 ) {
 
-			}
+						worldPos.xyz -= worldFwd * 2.0 * hw;
 
-			// adjust for linewidth
-			offset *= linewidth;
+					}
 
-			// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
-			offset /= resolution.y;
+				#endif
 
-			// select end
-			vec4 clip = ( position.y < 0.5 ) ? clipStart : clipEnd;
+				// project the worldpos
+				vec4 clip = projectionMatrix * worldPos;
 
-			// back to clip space
-			offset *= clip.w;
+				// shift the depth of the projected points so the line
+				// segments overlap neatly
+				vec3 clipPose = ( position.y < 0.5 ) ? ndcStart : ndcEnd;
+				clip.z = clipPose.z * clip.w;
 
-			clip.xy += offset;
+			#else
+
+				vec2 offset = vec2( dir.y, - dir.x );
+				// undo aspect ratio adjustment
+				dir.x /= aspect;
+				offset.x /= aspect;
+
+				// sign flip
+				if ( position.x < 0.0 ) offset *= - 1.0;
+
+				// endcaps
+				if ( position.y < 0.0 ) {
+
+					offset += - dir;
+
+				} else if ( position.y > 1.0 ) {
+
+					offset += dir;
+
+				}
+
+				// adjust for linewidth
+				offset *= linewidth;
+
+				// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
+				offset /= resolution.y;
+
+				// select end
+				vec4 clip = ( position.y < 0.5 ) ? clipStart : clipEnd;
+
+				// back to clip space
+				offset *= clip.w;
+
+				clip.xy += offset;
+
+			#endif
 
 			gl_Position = clip;
 
@@ -186,12 +255,14 @@ ShaderLib[ 'line' ] = {
 		`,
 
 	fragmentShader:
-		`
+	/* glsl */`
 		uniform vec3 diffuse;
 		uniform float opacity;
+		uniform float linewidth;
 
 		#ifdef USE_DASH
 
+			uniform float dashOffset;
 			uniform float dashSize;
 			uniform float gapSize;
 
@@ -199,13 +270,58 @@ ShaderLib[ 'line' ] = {
 
 		varying float vLineDistance;
 
+		#ifdef WORLD_UNITS
+
+			varying vec4 worldPos;
+			varying vec3 worldStart;
+			varying vec3 worldEnd;
+
+			#ifdef USE_DASH
+
+				varying vec2 vUv;
+
+			#endif
+
+		#else
+
+			varying vec2 vUv;
+
+		#endif
+
 		#include <common>
 		#include <color_pars_fragment>
 		#include <fog_pars_fragment>
 		#include <logdepthbuf_pars_fragment>
 		#include <clipping_planes_pars_fragment>
 
-		varying vec2 vUv;
+		vec2 closestLineToLine(vec3 p1, vec3 p2, vec3 p3, vec3 p4) {
+
+			float mua;
+			float mub;
+
+			vec3 p13 = p1 - p3;
+			vec3 p43 = p4 - p3;
+
+			vec3 p21 = p2 - p1;
+
+			float d1343 = dot( p13, p43 );
+			float d4321 = dot( p43, p21 );
+			float d1321 = dot( p13, p21 );
+			float d4343 = dot( p43, p43 );
+			float d2121 = dot( p21, p21 );
+
+			float denom = d2121 * d4343 - d4321 * d4321;
+
+			float numer = d1343 * d4321 - d1321 * d4343;
+
+			mua = numer / denom;
+			mua = clamp( mua, 0.0, 1.0 );
+			mub = ( d1343 + d4321 * ( mua ) ) / d4343;
+			mub = clamp( mub, 0.0, 1.0 );
+
+			return vec2( mua, mub );
+
+		}
 
 		void main() {
 
@@ -215,29 +331,85 @@ ShaderLib[ 'line' ] = {
 
 				if ( vUv.y < - 1.0 || vUv.y > 1.0 ) discard; // discard endcaps
 
-				if ( mod( vLineDistance, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
+				if ( mod( vLineDistance + dashOffset, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
 
 			#endif
 
-			if ( abs( vUv.y ) > 1.0 ) {
+			float alpha = opacity;
 
-				float a = vUv.x;
-				float b = ( vUv.y > 0.0 ) ? vUv.y - 1.0 : vUv.y + 1.0;
-				float len2 = a * a + b * b;
+			#ifdef WORLD_UNITS
 
-				if ( len2 > 1.0 ) discard;
+				// Find the closest points on the view ray and the line segment
+				vec3 rayEnd = normalize( worldPos.xyz ) * 1e5;
+				vec3 lineDir = worldEnd - worldStart;
+				vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
 
-			}
+				vec3 p1 = worldStart + lineDir * params.x;
+				vec3 p2 = rayEnd * params.y;
+				vec3 delta = p1 - p2;
+				float len = length( delta );
+				float norm = len / linewidth;
 
-			vec4 diffuseColor = vec4( diffuse, opacity );
+				#ifndef USE_DASH
+
+					#ifdef USE_ALPHA_TO_COVERAGE
+
+						float dnorm = fwidth( norm );
+						alpha = 1.0 - smoothstep( 0.5 - dnorm, 0.5 + dnorm, norm );
+
+					#else
+
+						if ( norm > 0.5 ) {
+
+							discard;
+
+						}
+
+					#endif
+
+				#endif
+
+			#else
+
+				#ifdef USE_ALPHA_TO_COVERAGE
+
+					// artifacts appear on some hardware if a derivative is taken within a conditional
+					float a = vUv.x;
+					float b = ( vUv.y > 0.0 ) ? vUv.y - 1.0 : vUv.y + 1.0;
+					float len2 = a * a + b * b;
+					float dlen = fwidth( len2 );
+
+					if ( abs( vUv.y ) > 1.0 ) {
+
+						alpha = 1.0 - smoothstep( 1.0 - dlen, 1.0 + dlen, len2 );
+
+					}
+
+				#else
+
+					if ( abs( vUv.y ) > 1.0 ) {
+
+						float a = vUv.x;
+						float b = ( vUv.y > 0.0 ) ? vUv.y - 1.0 : vUv.y + 1.0;
+						float len2 = a * a + b * b;
+
+						if ( len2 > 1.0 ) discard;
+
+					}
+
+				#endif
+
+			#endif
+
+			vec4 diffuseColor = vec4( diffuse, alpha );
 
 			#include <logdepthbuf_fragment>
 			#include <color_fragment>
 
-			gl_FragColor = vec4( diffuseColor.rgb, diffuseColor.a );
+			gl_FragColor = vec4( diffuseColor.rgb, alpha );
 
 			#include <tonemapping_fragment>
-			#include <encodings_fragment>
+			#include <colorspace_fragment>
 			#include <fog_fragment>
 			#include <premultiplied_alpha_fragment>
 
@@ -245,143 +417,201 @@ ShaderLib[ 'line' ] = {
 		`
 };
 
-var LineMaterial = function ( parameters ) {
+class LineMaterial extends ShaderMaterial {
 
-	ShaderMaterial.call( this, {
+	constructor( parameters ) {
 
-		type: 'LineMaterial',
+		super( {
 
-		uniforms: UniformsUtils.clone( ShaderLib[ 'line' ].uniforms ),
+			type: 'LineMaterial',
 
-		vertexShader: ShaderLib[ 'line' ].vertexShader,
-		fragmentShader: ShaderLib[ 'line' ].fragmentShader,
+			uniforms: UniformsUtils.clone( ShaderLib[ 'line' ].uniforms ),
 
-		clipping: true // required for clipping support
+			vertexShader: ShaderLib[ 'line' ].vertexShader,
+			fragmentShader: ShaderLib[ 'line' ].fragmentShader,
 
-	} );
+			clipping: true // required for clipping support
 
-	this.dashed = false;
+		} );
 
-	Object.defineProperties( this, {
+		this.isLineMaterial = true;
 
-		color: {
+		this.setValues( parameters );
 
-			enumerable: true,
+	}
 
-			get: function () {
+	get color() {
 
-				return this.uniforms.diffuse.value;
+		return this.uniforms.diffuse.value;
 
-			},
+	}
 
-			set: function ( value ) {
+	set color( value ) {
 
-				this.uniforms.diffuse.value = value;
+		this.uniforms.diffuse.value = value;
 
-			}
+	}
 
-		},
+	get worldUnits() {
 
-		linewidth: {
+		return 'WORLD_UNITS' in this.defines;
 
-			enumerable: true,
+	}
 
-			get: function () {
+	set worldUnits( value ) {
 
-				return this.uniforms.linewidth.value;
+		if ( value === true ) {
 
-			},
+			this.defines.WORLD_UNITS = '';
 
-			set: function ( value ) {
+		} else {
 
-				this.uniforms.linewidth.value = value;
-
-			}
-
-		},
-
-		dashScale: {
-
-			enumerable: true,
-
-			get: function () {
-
-				return this.uniforms.dashScale.value;
-
-			},
-
-			set: function ( value ) {
-
-				this.uniforms.dashScale.value = value;
-
-			}
-
-		},
-
-		dashSize: {
-
-			enumerable: true,
-
-			get: function () {
-
-				return this.uniforms.dashSize.value;
-
-			},
-
-			set: function ( value ) {
-
-				this.uniforms.dashSize.value = value;
-
-			}
-
-		},
-
-		gapSize: {
-
-			enumerable: true,
-
-			get: function () {
-
-				return this.uniforms.gapSize.value;
-
-			},
-
-			set: function ( value ) {
-
-				this.uniforms.gapSize.value = value;
-
-			}
-
-		},
-
-		resolution: {
-
-			enumerable: true,
-
-			get: function () {
-
-				return this.uniforms.resolution.value;
-
-			},
-
-			set: function ( value ) {
-
-				this.uniforms.resolution.value.copy( value );
-
-			}
+			delete this.defines.WORLD_UNITS;
 
 		}
 
-	} );
+	}
 
-	this.setValues( parameters );
+	get linewidth() {
 
-};
+		return this.uniforms.linewidth.value;
 
-LineMaterial.prototype = Object.create( ShaderMaterial.prototype );
-LineMaterial.prototype.constructor = LineMaterial;
+	}
 
-LineMaterial.prototype.isLineMaterial = true;
+	set linewidth( value ) {
 
+		if ( ! this.uniforms.linewidth ) return;
+		this.uniforms.linewidth.value = value;
+
+	}
+
+	get dashed() {
+
+		return 'USE_DASH' in this.defines;
+
+	}
+
+	set dashed( value ) {
+
+		if ( ( value === true ) !== this.dashed ) {
+
+			this.needsUpdate = true;
+
+		}
+
+		if ( value === true ) {
+
+			this.defines.USE_DASH = '';
+
+		} else {
+
+			delete this.defines.USE_DASH;
+
+		}
+
+	}
+
+	get dashScale() {
+
+		return this.uniforms.dashScale.value;
+
+	}
+
+	set dashScale( value ) {
+
+		this.uniforms.dashScale.value = value;
+
+	}
+
+	get dashSize() {
+
+		return this.uniforms.dashSize.value;
+
+	}
+
+	set dashSize( value ) {
+
+		this.uniforms.dashSize.value = value;
+
+	}
+
+	get dashOffset() {
+
+		return this.uniforms.dashOffset.value;
+
+	}
+
+	set dashOffset( value ) {
+
+		this.uniforms.dashOffset.value = value;
+
+	}
+
+	get gapSize() {
+
+		return this.uniforms.gapSize.value;
+
+	}
+
+	set gapSize( value ) {
+
+		this.uniforms.gapSize.value = value;
+
+	}
+
+	get opacity() {
+
+		return this.uniforms.opacity.value;
+
+	}
+
+	set opacity( value ) {
+
+		if ( ! this.uniforms ) return;
+		this.uniforms.opacity.value = value;
+
+	}
+
+	get resolution() {
+
+		return this.uniforms.resolution.value;
+
+	}
+
+	set resolution( value ) {
+
+		this.uniforms.resolution.value.copy( value );
+
+	}
+
+	get alphaToCoverage() {
+
+		return 'USE_ALPHA_TO_COVERAGE' in this.defines;
+
+	}
+
+	set alphaToCoverage( value ) {
+
+		if ( ! this.defines ) return;
+
+		if ( ( value === true ) !== this.alphaToCoverage ) {
+
+			this.needsUpdate = true;
+
+		}
+
+		if ( value === true ) {
+
+			this.defines.USE_ALPHA_TO_COVERAGE = '';
+
+		} else {
+
+			delete this.defines.USE_ALPHA_TO_COVERAGE;
+
+		}
+
+	}
+
+}
 
 export { LineMaterial };

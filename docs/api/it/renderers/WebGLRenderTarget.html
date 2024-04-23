@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Un [link:https://webglfundamentals.org/webgl/lessons/webgl-render-to-texture.html render target] è un buffer
+			dove la scheda video disegna i pixel per una scena che viene renderizzata in background.
+			Viene utilizzata in diversi effetti, come applicare la post-elaborazione a un'immagine 
+			renderizzata prima di visualizzarla sullo schermo.
+		</p>
+
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]([param:Number width], [param:Number height], [param:Object options])</h3>
+
+		<p>
+		[page:Float width] - La lunghezza del renderTarget. Il valore predefinito è `1`.<br />
+		[page:Float height] - L'altezza del renderTarget. Il valore predefinito è `1`.<br />
+		options - oggetto opzionale che contiene i parametri della texture per una texture target auto generata
+		e i booleani depthBuffer/stencilBuffer.
+
+		Per una spiegazione dei parametri della texture vedi [page:Texture Texture]. Le seguenti
+		sono opzioni valide:<br /><br />
+
+		[page:Constant wrapS] - il valore predefinito è [page:Textures ClampToEdgeWrapping]. <br />
+		[page:Constant wrapT] - il valore predefinito è [page:Textures ClampToEdgeWrapping]. <br />
+		[page:Constant magFilter] - il valore predefinito è [page:Textures LinearFilter]. <br />
+		[page:Constant minFilter] - il valore predefinito è [page:Textures LinearFilter]. <br />
+		[page:Boolean generateMipmaps] - il valore predefinito è `false`.<br />
+		[page:Constant format] - il valore predefinito è [page:Textures RGBAFormat]. <br />
+		[page:Constant type] - il valore predefinito è [page:Textures UnsignedByteType]. <br />
+		[page:Number anisotropy] - il valore predefinito è `1`. Vedi [page:Texture.anisotropy]<br />
+		[page:Constant colorSpace] - il valore predefinito è [page:Textures NoColorSpace]. <br />
+		[page:String internalFormat] - il valore predefinito è `null`.<br />
+		[page:Boolean depthBuffer] - il valore predefinito è `true`. <br />
+		[page:Boolean stencilBuffer] - il valore predefinito è `false`.<br />
+		[page:Boolean resolveDepthBuffer] - il valore predefinito è `true`.<br />
+		[page:Boolean resolveStencilBuffer] - il valore predefinito è `true`.<br />
+		[page:Number samples] - il valore predefinito è 0.<br />
+		[page:Number count] - default is `1`.<br /><br />
+
+		Crea un nuovo [name]
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Boolean isWebGLRenderTarget]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:number width]</h3>
+		<p>
+			La lunghezza del render target.
+		</p>
+
+		<h3>[property:number height]</h3>
+		<p>
+			L'altezza del render target.
+		</p>
+
+		<h3>[property:Vector4 scissor]</h3>
+		<p>
+			Un area rettangolare all'interno della viewport del render target. I frammenti che sono fuori dall'area verranno scartati.
+		</p>
+
+		<h3>[property:Boolean scissorTest]</h3>
+		<p>
+			Indica se il test scissor è attivo o no.
+		</p>
+
+		<h3>[property:Vector4 viewport]</h3>
+		<p>
+			Il viewport di questo render target.
+		</p>
+
+		<h3>[property:Texture texture]</h3>
+		<p>
+			Questa istanza della texture contiene i pixel renderizzati. Utilizzalo come input per ulteriori informazioni.
+		</p>
+
+		<h3>[property:Texture textures]</h3>
+		<p>
+			An array holding the [page:WebGLRenderTarget.texture texture] references
+			of multiple render targets configured with the [page:Number count] option.
+		</p>
+
+		<h3>[property:Boolean depthBuffer]</h3>
+		<p>
+			Effettua il rendering al buffer di profondità. L'impostazione predefinita è `true`.
+		</p>
+
+		<h3>[property:Boolean stencilBuffer]</h3>
+		<p>
+			Effettua il rendering al buffer stencil. Il valore predefinito è `false`.
+		</p>
+
+		<h3>[property:Boolean resolveDepthBuffer]</h3>
+		<p>
+			Defines whether the depth buffer should be resolved when rendering into a multisampled render target. 
+			Il valore predefinito è `true`.
+		</p>
+
+		<h3>[property:Boolean resolveStencilBuffer]</h3>
+		<p>
+			Defines whether the stencil buffer should be resolved when rendering into a multisampled render target. 
+			This property has no effect when [page:.resolveDepthBuffer] is set to `false`. 
+			Il valore predefinito è `true`.
+		</p>
+
+		<h3>[property:DepthTexture depthTexture]</h3>
+		<p>
+			Se impostato, la profondità della scena verrà renderizzata su questa texture. Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Number samples]</h3>
+		<p>
+			Definisce il conteggio di campioni MSAA. Può essere utilizzato solo con WebGL 2. Il valore predefinito è `0`.
+		</p>
+
+		<h2>Metodi</h2>
+
+		<h3>[method:undefined setSize]( [param:Number width], [param:Number height] )</h3>
+		<p>
+			Imposta la dimensione del render target.
+		</p>
+
+		<h3>[method:WebGLRenderTarget clone]()</h3>
+		<p>
+			Crea una copia di questo render target.
+		</p>
+
+		<h3>[method:this copy]( [param:WebGLRenderTarget source] )</h3>
+		<p>
+			Adotta le impostazioni del render target dato.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Libera le risorse relative alla GPU allocate a questa istanza. Chiama questo metodo ogni volta che questa istanza non viene più utilizzata nella tua app.
+		</p>
+
+		<p>I metodi [page:EventDispatcher EventDispatcher] sono disponibili in questa classe.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

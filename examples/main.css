@@ -22,10 +22,6 @@ button {
 	text-transform: uppercase;
 }
 
-canvas {
-	display: block;
-}
-
 #info {
 	position: absolute;
 	top: 0px;
@@ -45,43 +41,51 @@ a, button, input, select {
 	pointer-events: auto;
 }
 
-.dg.ac {
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
+.lil-gui {
 	z-index: 2 !important; /* TODO Solve this in HTML */
+}
+
+@media all and ( max-width: 640px ) {
+	.lil-gui.root { 
+		right: auto;
+		top: auto;
+		max-height: 50%;
+		max-width: 80%;
+		bottom: 0;
+		left: 0;
+	}
 }
 
 #overlay {
 	position: absolute;
+	font-size: 16px;
 	z-index: 2;
 	top: 0;
 	left: 0;
 	width: 100%;
-	height:100%;
+	height: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	opacity: 1;
-	background-color: #000000;
-	color: #ffffff;
+	flex-direction: column;
+	background: rgba(0,0,0,0.7);
 }
 
-#overlay > div {
-	text-align: center;
-}
+	#overlay button {
+		background: transparent;
+		border: 0;
+		border: 1px solid rgb(255, 255, 255);
+		border-radius: 4px;
+		color: #ffffff;
+		padding: 12px 18px;
+		text-transform: uppercase;
+		cursor: pointer;
+	}
 
-#overlay > div > button {
-	height: 20px;
-	background: transparent;
-	color: #ffffff;
-	outline: 1px solid #ffffff;
-	border: 0px;
-	cursor: pointer;
-}
-
-#overlay > div > p {
-	color: #777777;
-	font-size: 12px;
+#notSupported {
+	width: 50%;
+	margin: auto;
+	background-color: #f00;
+	margin-top: 20px;
+	padding: 10px;
 }

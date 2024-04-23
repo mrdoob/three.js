@@ -5,27 +5,36 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			a {
-				color: #08f;
-			}
-		</style>
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - lines</div>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			var container, stats;
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			var camera, scene, renderer;
+			let container, stats, clock;
 
-			var line;
+			let camera, scene, renderer;
+
+			let line;
+
+			const segments = 10000;
+			const r = 800;
+			let t = 0;
 
 			init();
 			animate();
@@ -41,21 +50,19 @@
 
 				scene = new THREE.Scene();
 
-				var segments = 10000;
+				clock = new THREE.Clock();
 
-				var geometry = new THREE.BufferGeometry();
-				var material = new THREE.LineBasicMaterial( { vertexColors: true } );
+				const geometry = new THREE.BufferGeometry();
+				const material = new THREE.LineBasicMaterial( { vertexColors: true } );
 
-				var positions = [];
-				var colors = [];
+				const positions = [];
+				const colors = [];
 
-				var r = 800;
+				for ( let i = 0; i < segments; i ++ ) {
 
-				for ( var i = 0; i < segments; i ++ ) {
-
-					var x = Math.random() * r - r / 2;
-					var y = Math.random() * r - r / 2;
-					var z = Math.random() * r - r / 2;
+					const x = Math.random() * r - r / 2;
+					const y = Math.random() * r - r / 2;
+					const z = Math.random() * r - r / 2;
 
 					// positions
 
@@ -71,6 +78,7 @@
 
 				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				generateMorphTargets( geometry );
 
 				geometry.computeBoundingSphere();
 
@@ -82,7 +90,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				container.appendChild( renderer.domElement );
 
@@ -93,7 +100,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -119,12 +126,37 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				const delta = clock.getDelta();
+				const time = clock.getElapsedTime();
 
 				line.rotation.x = time * 0.25;
 				line.rotation.y = time * 0.5;
 
+				t += delta * 0.5;
+				line.morphTargetInfluences[ 0 ] = Math.abs( Math.sin( t ) );
+
 				renderer.render( scene, camera );
+
+			}
+
+			function generateMorphTargets( geometry ) {
+
+				const data = [];
+
+				for ( let i = 0; i < segments; i ++ ) {
+
+					const x = Math.random() * r - r / 2;
+					const y = Math.random() * r - r / 2;
+					const z = Math.random() * r - r / 2;
+
+					data.push( x, y, z );
+
+				}
+
+				const morphTarget = new THREE.Float32BufferAttribute( data, 3 );
+				morphTarget.name = 'target1';
+
+				geometry.morphAttributes.position = [ morphTarget ];
 
 			}
 

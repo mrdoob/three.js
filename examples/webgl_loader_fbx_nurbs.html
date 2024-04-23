@@ -12,24 +12,32 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - FBXLoader - Nurbs
 		</div>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
-			var container, stats, controls;
-			var camera, scene, renderer, light;
+			let camera, scene, renderer, stats;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -37,16 +45,8 @@
 
 				scene = new THREE.Scene();
 
-				light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				light.position.set( 0, 1, 0 );
-				scene.add( light );
-
-				light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 1, 0 );
-				scene.add( light );
-
 				// grid
-				var gridHelper = new THREE.GridHelper( 28, 28, 0x303030, 0x303030 );
+				const gridHelper = new THREE.GridHelper( 28, 28, 0x303030, 0x303030 );
 				scene.add( gridHelper );
 
 				// stats
@@ -54,7 +54,7 @@
 				container.appendChild( stats.dom );
 
 				// model
-				var loader = new FBXLoader();
+				const loader = new FBXLoader();
 				loader.load( 'models/fbx/nurbs.fbx', function ( object ) {
 
 					scene.add( object );
@@ -66,11 +66,11 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 12, 0 );
 				controls.update();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -1,0 +1,286 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>Post Processing</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Post Processing">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Post Processing</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p><em>Post processing</em> generally refers to applying some kind of effect or filter to
+a 2D image. In the case of THREE.js we have a scene with a bunch of meshes in
+it. We render that scene into a 2D image. Normally that image is rendered
+directly into the canvas and displayed in the browser but instead we can <a href="rendertargets.html">render
+it to a render target</a> and then apply some <em>post
+processing</em> effects to the result before drawing it to the canvas. It's called
+post processing because it happens after (post) the main scene processing.</p>
+<p>Examples of post processing are Instagram like filters,
+Photoshop filters, etc...</p>
+<p>THREE.js has some example classes to help setup a post processing pipeline. The
+way it works is you create an <code class="notranslate" translate="no">EffectComposer</code> and to it you add multiple <code class="notranslate" translate="no">Pass</code>
+objects. You then call <code class="notranslate" translate="no">EffectComposer.render</code> and it renders your scene to a
+<a href="rendertargets.html">render target</a> and then applies each <code class="notranslate" translate="no">Pass</code>.</p>
+<p>Each <code class="notranslate" translate="no">Pass</code> can be some post processing effect like adding a vignette, blurring,
+applying a bloom, applying film grain, adjusting the hue, saturation, contrast,
+etc... and finally rendering the result to the canvas.</p>
+<p>It's a little bit important to understand how <code class="notranslate" translate="no">EffectComposer</code> functions. It
+creates two <a href="rendertargets.html">render targets</a>. Let's call them
+<strong>rtA</strong> and <strong>rtB</strong>.</p>
+<p>Then, you call <code class="notranslate" translate="no">EffectComposer.addPass</code> to add each pass in the order you want
+to apply them. The passes are then applied <em>something like</em> this.</p>
+<div class="threejs_center"><img src="../resources/images/threejs-postprocessing.svg" style="width: 600px"></div>
+
+<p>First the scene you passed into <code class="notranslate" translate="no">RenderPass</code> is rendered to <strong>rtA</strong>, then
+<strong>rtA</strong> is passed to the next pass, whatever it is. That pass uses <strong>rtA</strong> as
+input to do whatever it does and writes the results to <strong>rtB</strong>. <strong>rtB</strong> is then
+passed to the next pass which uses <strong>rtB</strong> as input and writes back to <strong>rtA</strong>.
+This continues through all the passes. </p>
+<p>Each <code class="notranslate" translate="no">Pass</code> has 4 basic options</p>
+<h2 id="-enabled-"><code class="notranslate" translate="no">enabled</code></h2>
+<p>Whether or not to use this pass</p>
+<h2 id="-needsswap-"><code class="notranslate" translate="no">needsSwap</code></h2>
+<p>Whether or not to swap <code class="notranslate" translate="no">rtA</code> and <code class="notranslate" translate="no">rtB</code> after finishing this pass</p>
+<h2 id="-clear-"><code class="notranslate" translate="no">clear</code></h2>
+<p>Whether or not to clear before rendering this pass</p>
+<h2 id="-rendertoscreen-"><code class="notranslate" translate="no">renderToScreen</code></h2>
+<p>Whether or not to render to the canvas instead the current destination render
+target. In most use cases you do not set this flag explicitly since the last pass in the pass chain is automatically rendered to screen.</p>
+<p>Let's put together a basic example. We'll start with the example from <a href="responsive.html">the
+article on responsiveness</a>.</p>
+<p>To that first we create an <code class="notranslate" translate="no">EffectComposer</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const composer = new EffectComposer(renderer);
+</pre>
+<p>Then as the first pass we add a <code class="notranslate" translate="no">RenderPass</code> that will render our scene with our
+camera into the first render target.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">composer.addPass(new RenderPass(scene, camera));
+</pre>
+<p>Next we add a <code class="notranslate" translate="no">BloomPass</code>. A <code class="notranslate" translate="no">BloomPass</code> renders its input to a generally
+smaller render target and blurs the result. It then adds that blurred result on
+top of the original input. This makes the scene <em>bloom</em></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const bloomPass = new BloomPass(
+    1,    // strength
+    25,   // kernel size
+    4,    // sigma ?
+    256,  // blur render target resolution
+);
+composer.addPass(bloomPass);
+</pre>
+<p>Next we had a <code class="notranslate" translate="no">FilmPass</code> that draws noise and scanlines on top of its input.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const filmPass = new FilmPass(
+    0.5,   // intensity
+    false,  // grayscale
+);
+composer.addPass(filmPass);
+</pre>
+<p>Finally we had a <code class="notranslate" translate="no">OutputPass</code> which performs color space conversion to sRGB and optional tone mapping.
+This pass is usually the last pass of the pass chain.
+</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const outputPass = new OutputPass();
+composer.addPass(outputPass);
+</pre>
+<p>To use these classes we need to import a bunch of scripts.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {BloomPass} from 'three/addons/postprocessing/BloomPass.js';
+import {FilmPass} from 'three/addons/postprocessing/FilmPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+</pre>
+<p>For pretty much any post processing <code class="notranslate" translate="no">EffectComposer.js</code>, <code class="notranslate" translate="no">RenderPass.js</code> and <code class="notranslate" translate="no">OutputPass.js</code>
+are required.</p>
+<p>The last things we need to do are to use <code class="notranslate" translate="no">EffectComposer.render</code> instead of
+<a href="/docs/#api/en/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> <em>and</em> to tell the <code class="notranslate" translate="no">EffectComposer</code> to match the size of
+the canvas.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function render(now) {
+-  time *= 0.001;
++let then = 0;
++function render(now) {
++  now *= 0.001;  // convert to seconds
++  const deltaTime = now - then;
++  then = now;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
++    composer.setSize(canvas.width, canvas.height);
+  }
+
+  cubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+-    const rot = time * speed;
++    const rot = now * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+-  renderer.render(scene, camera);
++  composer.render(deltaTime);
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p><code class="notranslate" translate="no">EffectComposer.render</code> takes a <code class="notranslate" translate="no">deltaTime</code> which is the time in seconds since
+the last frame was rendered. It passes this to the various effects in case any
+of them are animated. In this case the <code class="notranslate" translate="no">FilmPass</code> is animated.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/postprocessing.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>To change effect parameters at runtime usually requires setting uniform values.
+Let's add a gui to adjust some of the parameters. Figuring out which values you
+can easily adjust and how to adjust them requires digging through the code for
+that effect.</p>
+<p>Looking inside
+<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/BloomPass.js"><code class="notranslate" translate="no">BloomPass.js</code></a>
+I found this line:</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.copyUniforms[ "opacity" ].value = strength;
+</pre>
+<p>So we can set the strength by setting</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">bloomPass.copyUniforms.opacity.value = someValue;
+</pre>
+<p>Similarly looking in
+<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>
+I found these lines:</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.uniforms.intensity.value = intensity;
+this.uniforms.grayscale.value = grayscale;
+</pre>
+<p>So which makes it pretty clear how to set them.</p>
+<p>Let's make a quick GUI to set those values</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
+</pre>
+<p>and</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+{
+  const folder = gui.addFolder('BloomPass');
+  folder.add(bloomPass.copyUniforms.opacity, 'value', 0, 2).name('strength');
+  folder.open();
+}
+{
+  const folder = gui.addFolder('FilmPass');
+  folder.add(filmPass.uniforms.grayscale, 'value').name('grayscale');
+  folder.add(filmPass.uniforms.intensity, 'value', 0, 1).name('intensity');
+  folder.open();
+}
+</pre>
+<p>and now we can adjust those settings</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing-gui.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/postprocessing-gui.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>That was a small step to making our own effect.</p>
+<p>Post processing effects use shaders. Shaders are written in a language called
+<a href="https://www.khronos.org/files/opengles_shading_language.pdf">GLSL (Graphics Library Shading Language)</a>. Going
+over the entire language is way too large a topic for these articles. A few
+resources to get start from would be maybe <a href="https://webglfundamentals.org/webgl/lessons/webgl-shaders-and-glsl.html">this article</a>
+and maybe <a href="https://thebookofshaders.com/">the Book of Shaders</a>.</p>
+<p>I think an example to get you started would be helpful though so let's make a
+simple GLSL post processing shader. We'll make one that lets us multiply the
+image by a color.</p>
+<p>For post processing THREE.js provides a useful helper called the <code class="notranslate" translate="no">ShaderPass</code>.
+It takes an object with info defining a vertex shader, a fragment shader, and
+the default inputs. It will handling setting up which texture to read from to
+get the previous pass's results and where to render to, either one of the
+<code class="notranslate" translate="no">EffectComposer</code>s render target or the canvas.</p>
+<p>Here's a simple post processing shader that multiplies the previous pass's
+result by a color. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const colorShader = {
+  uniforms: {
+    tDiffuse: { value: null },
+    color:    { value: new THREE.Color(0x88CCFF) },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1);
+    }
+  `,
+  fragmentShader: `
+    varying vec2 vUv;
+    uniform sampler2D tDiffuse;
+    uniform vec3 color;
+    void main() {
+      vec4 previousPassColor = texture2D(tDiffuse, vUv);
+      gl_FragColor = vec4(
+          previousPassColor.rgb * color,
+          previousPassColor.a);
+    }
+  `,
+};
+</pre>
+<p>Above <code class="notranslate" translate="no">tDiffuse</code> is the name that <code class="notranslate" translate="no">ShaderPass</code> uses to pass in the previous
+pass's result texture so we pretty much always need that. We then declare
+<code class="notranslate" translate="no">color</code> as a THREE.js <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">Color</code></a>.</p>
+<p>Next we need a vertex shader. For post processing the vertex shader shown here
+is pretty much standard and rarely needs to be changed. Without going into too
+many details (see articles linked above) the variables <code class="notranslate" translate="no">uv</code>, <code class="notranslate" translate="no">projectionMatrix</code>,
+<code class="notranslate" translate="no">modelViewMatrix</code> and <code class="notranslate" translate="no">position</code> are all magically added by THREE.js.</p>
+<p>Finally we create a fragment shader. In it we get a pixel color from the
+previous pass with this line</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">vec4 previousPassColor = texture2D(tDiffuse, vUv);
+</pre>
+<p>we multiply it by our color and set <code class="notranslate" translate="no">gl_FragColor</code> to the result</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">gl_FragColor = vec4(
+    previousPassColor.rgb * color,
+    previousPassColor.a);
+</pre>
+<p>Adding some simple GUI to set the 3 values of the color</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+gui.add(colorPass.uniforms.color.value, 'r', 0, 4).name('red');
+gui.add(colorPass.uniforms.color.value, 'g', 0, 4).name('green');
+gui.add(colorPass.uniforms.color.value, 'b', 0, 4).name('blue');
+</pre>
+<p>Gives us a simple postprocessing effect that multiplies by a color.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing-custom.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/postprocessing-custom.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>As mentioned about all the details of how to write GLSL and custom shaders is
+too much for these articles. If you really want to know how WebGL itself works
+then check out <a href="https://webglfundamentals.org">these articles</a>. Another great
+resources is just to
+<a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/shaders">read through the existing post processing shaders in the THREE.js repo</a>. Some
+are more complicated than others but if you start with the smaller ones you can
+hopefully get an idea of how they work.</p>
+<p>Most of the post processing effects in the THREE.js repo are unfortunately
+undocumented so to use them you'll have to <a href="https://github.com/mrdoob/three.js/tree/master/examples">read through the examples</a> or
+<a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/postprocessing">the code for the effects themselves</a>.
+Hopefully these simple example and the article on
+<a href="rendertargets.html">render targets</a> provide enough context to get started.</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

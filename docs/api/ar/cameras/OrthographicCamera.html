@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Camera] &rarr;
+
+		<h1>[name]</h1>
+		<p class="desc">
+			كاميرا تستخدم
+			[link:https://en.wikipedia.org/wiki/Orthographic_projection الإسقاط المجسمي].<br /><br />
+
+			في هذا النمط من الإسقاط، يبقى حجم الجسم 
+			ثابتاً في الصورة المُرسَمَة بغض النظر عن مسافته من الكاميرا.<br /><br />
+
+			يمكن أن يكون هذا مفيداً لتصوير المشاهد ثنائية الأبعاد وعناصر واجهة المستخدم، وغيرها من 
+			الأشياء.
+		</p>
+
+		<h2>مثال للكود</h2>
+		<code>	
+		const camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+		scene.add( camera );
+		</code>
+
+		<h2>أمثلة (Examples)</h2>
+		<p>
+			[example:webgl_camera camera ]<br />
+			[example:webgl_interactive_cubes_ortho interactive / cubes / ortho ]<br />
+			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic]<br />
+			[example:webgl_postprocessing_advanced postprocessing / advanced ]<br />
+			[example:webgl_postprocessing_dof2 postprocessing / dof2 ]<br />
+			[example:webgl_postprocessing_godrays postprocessing / godrays ]<br />
+			[example:webgl_rtt rtt ]<br />
+			[example:webgl_shadowmap shadowmap ]
+		</p>
+
+		<h2>المنشئ (Constructor)</h2>
+		<h3>[name]( [param:Number left], [param:Number right], [param:Number top], [param:Number bottom], [param:Number near], [param:Number far] )</h3>
+		<p>
+			left — سطح الهرم الأيسر.<br />
+			right — سطح الهرم الأيمن.<br />
+			top — سطح الهرم العلوي.<br />
+			bottom — سطح الهرم السفلي.<br />
+			near — سطح الهرم الأمامي.<br />
+			far — سطح الهرم الخلفي.<br /><br />
+
+			معًا، تحدد هذه العناصر هرم العرض للكاميرا.
+			[link:https://en.wikipedia.org/wiki/Viewing_frustum هرم الرؤية].
+		</p>
+
+		<h2>الخصائص (Properties)</h2>
+		<p>
+			انظر إلى صفحة [page:Camera] الأساسية للحصول على الخصائص الشائعة.<br />
+			يرجى ملاحظة أنه بعد إجراء تغييرات على معظم هذه الخصائص، يجب عليك استدعاء 
+			[page:OrthographicCamera.updateProjectionMatrix .updateProjectionMatrix] 
+			لجعل التغييرات سارية المفعول.
+		</p>
+
+		<h3>[property:Float bottom]</h3>
+		<p>سطح الهرم السفلي للكاميرا.</p>
+
+		<h3>[property:Float far]</h3>
+		<p>
+			سطح الهرم الخلفي للكاميرا. العدد الافتراضي هو `2000`.<br /><br />
+يجب أن يكون أكبر من القيمة الحالية لسطح الهرم الأمامي [page:.near near].
+		</p>
+
+		<h3>[property:Boolean isOrthographicCamera]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان الكائن المعطى من النوع [name].</p>
+
+		<h3>[property:Float left]</h3>
+		<p>سطح الهرم الأيسر للكاميرا.</p>
+
+		<h3>[property:Float near]</h3>
+		<p>
+			سطح الهرم الأمامي للكاميرا. العدد الافتراضي هو `0.1`.<br /><br />
+			النطاق الصحيح هو بين `0` وقيمة الهرم الخلفي [page:.far far]. يرجى ملاحظة أنه، على عكس الـ [page:PerspectiveCamera]،
+			يمثل الصفر قيمة صالحة لسطح الهرم الأمامي في OrthographicCamera.
+		</p>
+
+		<h3>[property:Float right]</h3>
+		<p>سطح الهرم الأيمن للكاميرا.</p>
+
+		<h3>[property:Float top]</h3>
+		<p>سطح الهرم العلوي للكاميرا.</p>
+
+		<h3>[property:Object view]</h3>
+		<p>
+			`يتم تعيينها بواسطة [page:OrthographicCamera.setViewOffset setViewOffset]. العدد الافتراضي هو 
+			`null`.
+		</p>
+
+		<h3>[property:number zoom]</h3>
+		<p>تُستخدم للحصول على قيمة عامل التكبير أو تعيينها للكاميرا. العدد الافتراضي هو `1`</p>
+
+		<h2>الوظائف (Methods)</h2>
+		<p>راجع صفحة [page:Camera] الأساسية للحصول على الأساليب الشائعة.</p>
+
+		<h3>[method:undefined setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
+		<p>
+			fullWidth — العرض الكامل لإعداد العرض المتعدد.<br />
+			fullHeight — الارتفاع الكامل لإعداد العرض المتعدد.<br />
+			x — الإزاحة الأفقية للكاميرا الفرعية.<br />
+			y — الإزاحة العمودية للكاميرا الفرعية.<br />
+			width — عرض الكاميرا الفرعية.<br />
+			height — ارتفاع الكاميرا الفرعية.<br /><br />
+
+			يُعيّن إزاحة في 
+			[link:https://en.wikipedia.org/wiki/Viewing_frustum هرم الرؤية]
+			أكبر. هذا مفيد لإعدادات النوافذ المتعددة أو إعدادات الشاشات / الأجهزة المتعددة. 
+			لمثال حول كيفية استخدامها، انظر [page:PerspectiveCamera.setViewOffset PerspectiveCamera].
+		</p>
+
+		<h3>[method:undefined clearViewOffset]()</h3>
+		<p>تزيل أي إزاحة تم تعيينها بواسطة طريقة .setViewOffset.</p>
+
+		<h3>[method:undefined updateProjectionMatrix]()</h3>
+		<p>
+			تحديث مصفوفة إسقاط الكاميرا. يجب استدعاؤها بعد أي تغيير في 
+			المعلمات.
+		</p>
+
+		<h3>[method:Object toJSON]([param:Object meta])</h3>
+		<p>
+			meta -- كائن يحتوي على بيانات وصفية مثل الخامات أو الصور في الأجزاء 
+			الفرعية للكائنات.<br />
+			تحويل الكاميرا إلى تنسيق three.js
+			[link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene]
+		</p>
+
+		<h2>المصدر (Source)</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

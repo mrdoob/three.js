@@ -221,18 +221,6 @@
   }
 
   ;(function() {
-    // C#-style strings where "" escapes a quote.
-    function tokenAtString(stream, state) {
-      var next;
-      while ((next = stream.next()) != null) {
-        if (next == '"' && !stream.eat('"')) {
-          state.tokenize = null;
-          break;
-        }
-      }
-      return "string";
-    }
-
     CodeMirror.defineMIME("text/x-glsl", {
       name: "glsl",
       keywords: words(glslKeywords),

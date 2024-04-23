@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>参数化缓冲几何体（[name]）</h1>
+
+		<p class="desc">生成由参数表示其表面的几何体。</p>
+
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';
+		</code>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const geometry = new THREE.ParametricGeometry( THREE.ParametricGeometries.klein, 25, 25 );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const klein = new THREE.Mesh( geometry, material );
+		scene.add( klein );
+		</code>
+
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]([param:Function func], [param:Integer slices], [param:Integer stacks])</h3>
+		<p>
+		func — A function that takes in a [page:Float u] and [page:Float v] value each between 0 and 1 and modifies a third [page:Vector3] argument. Default is a function that generates a curved plane surface.<br />
+		slices — The count of slices to use for the parametric function. Default is *8*.<br />
+		stacks — The count of stacks to use for the parametric function. Default is *8*.
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:BufferGeometry]。</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
+		</p>
+
+		<h2>方法(Methods)</h2>
+		<p>共有方法请参见其基类[page:BufferGeometry]。</p>
+
+		<h2>方法</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/geometries/ParametricGeometry.js examples/jsm/geometries/ParametricGeometry.js]
+		</p>
+	</body>
+</html>

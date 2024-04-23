@@ -3,18 +3,20 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
 		<h1>[name]</h1>
 
-		<p class="desc">A class for generating plane geometries</p>
+		<p class="desc">A class for generating plane geometries.</p>
 
-		<iframe id="scene" src="scenes/geometry-browser.html#PlaneGeometry"></iframe>
+		<iframe
+			id="scene"
+			src="scenes/geometry-browser.html#PlaneGeometry"
+		></iframe>
 
 		<script>
 
@@ -22,7 +24,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -31,35 +33,38 @@
 		}
 
 		</script>
+		<h2>Code Example</h2>
 
-		<h2>Example</h2>
-
-		<code>var geometry = new THREE.PlaneGeometry( 5, 20, 32 );
-		var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
-		var plane = new THREE.Mesh( geometry, material );
-		scene.add( plane );
+		<code>
+const geometry = new THREE.PlaneGeometry( 1, 1 );
+const material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+const plane = new THREE.Mesh( geometry, material );
+scene.add( plane );
 		</code>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]([param:Float width], [param:Float height], [param:Integer widthSegments], [param:Integer heightSegments])</h3>
+		<h3>
+			[name]([param:Float width], [param:Float height], [param:Integer widthSegments], [param:Integer heightSegments])
+		</h3>
 		<p>
-		width — Width along the X axis. Default is 1.<br />
-		height — Height along the Y axis. Default is 1.<br />
-		widthSegments — Optional. Default is 1. <br />
-		heightSegments — Optional. Default is 1.
+			width — Width along the X axis. Default is `1`.<br />
+			height — Height along the Y axis. Default is `1`.<br />
+			widthSegments — Optional. Default is `1`. <br />
+			heightSegments — Optional. Default is `1`.
 		</p>
 
 		<h2>Properties</h2>
-		<p>See the base [page:Geometry] class for common properties.</p>
+		<p>See the base [page:BufferGeometry] class for common properties.</p>
 
-		<h3>.parameters</h3>
+		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+			An object with a property for each of the constructor parameters. Any
+			modification after instantiation does not change the geometry.
 		</p>
 
 		<h2>Methods</h2>
-		<p>See the base [page:Geometry] class for common methods.</p>
+		<p>See the base [page:BufferGeometry] class for common methods.</p>
 
 		<h2>Source</h2>
 

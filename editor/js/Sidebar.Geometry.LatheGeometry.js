@@ -1,66 +1,62 @@
-/**
- * @author rfm1201
- */
+import * as THREE from 'three';
 
-import * as THREE from '../../build/three.module.js';
-
-import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
+import { UIDiv, UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 import { UIPoints2 } from './libs/ui.three.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryLatheGeometry = function ( editor, object ) {
+function GeometryParametersPanel( editor, object ) {
 
-	var strings = editor.strings;
+	const strings = editor.strings;
 
-	var container = new UIRow();
+	const container = new UIDiv();
 
-	var geometry = object.geometry;
-	var parameters = geometry.parameters;
+	const geometry = object.geometry;
+	const parameters = geometry.parameters;
 
 	// segments
 
-	var segmentsRow = new UIRow();
-	var segments = new UIInteger( parameters.segments ).onChange( update );
+	const segmentsRow = new UIRow();
+	const segments = new UIInteger( parameters.segments ).onChange( update );
 
-	segmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/segments' ) ).setWidth( '90px' ) );
+	segmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/segments' ) ).setClass( 'Label' ) );
 	segmentsRow.add( segments );
 
 	container.add( segmentsRow );
 
 	// phiStart
 
-	var phiStartRow = new UIRow();
-	var phiStart = new UINumber( parameters.phiStart * 180 / Math.PI ).onChange( update );
+	const phiStartRow = new UIRow();
+	const phiStart = new UINumber( parameters.phiStart * 180 / Math.PI ).onChange( update );
 
-	phiStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/phistart' ) ).setWidth( '90px' ) );
+	phiStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/phistart' ) ).setClass( 'Label' ) );
 	phiStartRow.add( phiStart );
 
 	container.add( phiStartRow );
 
 	// phiLength
 
-	var phiLengthRow = new UIRow();
-	var phiLength = new UINumber( parameters.phiLength * 180 / Math.PI ).onChange( update );
+	const phiLengthRow = new UIRow();
+	const phiLength = new UINumber( parameters.phiLength * 180 / Math.PI ).onChange( update );
 
-	phiLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/philength' ) ).setWidth( '90px' ) );
+	phiLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/philength' ) ).setClass( 'Label' ) );
 	phiLengthRow.add( phiLength );
 
 	container.add( phiLengthRow );
 
 	// points
 
-	var pointsRow = new UIRow();
-	pointsRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/points' ) ).setWidth( '90px' ) );
+	const pointsRow = new UIRow();
+	pointsRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/points' ) ).setClass( 'Label' ) );
 
-	var points = new UIPoints2().setValue( parameters.points ).onChange( update );
+	const points = new UIPoints2().setValue( parameters.points ).onChange( update );
 	pointsRow.add( points );
 
 	container.add( pointsRow );
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.LatheBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.LatheGeometry(
 			points.getValue(),
 			segments.getValue(),
 			phiStart.getValue() / 180 * Math.PI,
@@ -71,6 +67,6 @@ var SidebarGeometryLatheGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
-export { SidebarGeometryLatheGeometry };
+export { GeometryParametersPanel };

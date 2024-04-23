@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Desenhando linhas</h1>
+		<div>
+			<p>
+				Digamos que você queira desenhar uma linha ou um círculo, não um wireframe [page:Mesh].
+				Primeiro precisamos configurar o [page:WebGLRenderer renderizador] (renderer), a [page:Scene cena] (scene) e 
+				a câmera (camera) (veja a página Criando uma cena).
+			</p>
+
+			<p>
+				Aqui está o código que vamos usar:
+			</p>
+			<code>
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+
+const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
+camera.position.set( 0, 0, 100 );
+camera.lookAt( 0, 0, 0 );
+
+const scene = new THREE.Scene();
+			</code>
+
+			<p>
+				A próxima coisa que vamos fazer é definir um material. 
+				Para linhas nós temos que usar [page:LineBasicMaterial] ou [page:LineDashedMaterial].
+			</p>
+			
+			<code>
+//create a blue LineBasicMaterial
+const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+			</code>
+
+			<p>
+				Depois do material, nós vamos precisar de uma geometria com alguns vértices:
+			</p>
+
+			<code>
+const points = [];
+points.push( new THREE.Vector3( - 10, 0, 0 ) );
+points.push( new THREE.Vector3( 0, 10, 0 ) );
+points.push( new THREE.Vector3( 10, 0, 0 ) );
+
+const geometry = new THREE.BufferGeometry().setFromPoints( points );
+			</code>
+
+			<p>
+				Note que linhas são desenhadas entre cada par consecutivo de vértices, 
+				mas não entre o primeiro e o último (a linha não é fechada).
+			</p>
+
+			<p>
+				Agora que nós temos os pontos para duas linhas e um material,
+				podemos juntar tudo e formar uma linha
+			</p>
+			<code>
+const line = new THREE.Line( geometry, material );
+			</code>
+
+			<p>
+				Tudo o que falta é adicioná-la na cena e chamar o [page:WebGLRenderer.render renderizador].
+			</p>
+
+			<code>
+scene.add( line );
+renderer.render( scene, camera );
+			</code>
+
+			<p>
+			Agora você deve estar vendo uma seta apontando para cima, feita de duas linhas azuis.
+			</p>
+		</div>
+	</body>
+</html>

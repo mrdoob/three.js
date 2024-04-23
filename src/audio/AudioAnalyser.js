@@ -1,33 +1,31 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+class AudioAnalyser {
 
-function AudioAnalyser( audio, fftSize ) {
+	constructor( audio, fftSize = 2048 ) {
 
-	this.analyser = audio.context.createAnalyser();
-	this.analyser.fftSize = fftSize !== undefined ? fftSize : 2048;
+		this.analyser = audio.context.createAnalyser();
+		this.analyser.fftSize = fftSize;
 
-	this.data = new Uint8Array( this.analyser.frequencyBinCount );
+		this.data = new Uint8Array( this.analyser.frequencyBinCount );
 
-	audio.getOutput().connect( this.analyser );
+		audio.getOutput().connect( this.analyser );
 
-}
+	}
 
-Object.assign( AudioAnalyser.prototype, {
 
-	getFrequencyData: function () {
+	getFrequencyData() {
 
 		this.analyser.getByteFrequencyData( this.data );
 
 		return this.data;
 
-	},
+	}
 
-	getAverageFrequency: function () {
+	getAverageFrequency() {
 
-		var value = 0, data = this.getFrequencyData();
+		let value = 0;
+		const data = this.getFrequencyData();
 
-		for ( var i = 0; i < data.length; i ++ ) {
+		for ( let i = 0; i < data.length; i ++ ) {
 
 			value += data[ i ];
 
@@ -37,6 +35,6 @@ Object.assign( AudioAnalyser.prototype, {
 
 	}
 
-} );
+}
 
 export { AudioAnalyser };

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+	 
+		<p class="desc">
+			تولد هذه الفئة خريطة بيئة إشعاعية محددة مسبقًا ومتدرجة (PMREM) من نسيج بيئة cubeMap. يسمح هذا بالوصول السريع إلى مستويات مختلفة من التشويش بناءً على خشونة المادة. على عكس سلسلة mipmap التقليدية ، فإنها تنخفض فقط إلى مستوى LOD_MIN (أعلاه) ، ثم تنشئ "mips" إضافية مُصفاة حتى أكثر في نفس دقة LOD_MIN ، المرتبطة بمستويات خشونة أعلى. بهذه الطريقة نحافظ على الدقة لتداخل الإضاءة المنتشرة بسلاسة مع تحديد حسابات العينات.<br /><br />
+	 
+			ملاحظة: يعتمد خشونة [page:MeshStandardMaterial] الأدنى على حجم النسيج المقدم. إذا كانت عملية التصيير لديك أبعادًا صغيرة أو كانت الأجزاء اللامعة لديها الكثير من التقوس ، فقد لا تزال قادرًا على التخلص من حجم نسيج أصغر.
+		</p>
+
+		<table>
+			<tr>
+				<th>حجم النسيج (texture size)</th>
+				<td>الخشونة الدنيا (minimum roughness)</td>
+			</tr>
+			<tr>
+				<td>16</td>
+				<td>0.21</td>
+			</tr>
+			<tr>
+				<td>32</td>
+				<td>0.15</td>
+			</tr>
+			<tr>
+				<td>64</td>
+				<td>0.11</td>
+			</tr>
+			<tr>
+				<td>128</td>
+				<td>0.076</td>
+			</tr>
+			<tr>
+				<td>256</td>
+				<td>0.054</td>
+			</tr>
+			<tr>
+				<td>512</td>
+				<td>0.038</td>
+			</tr>
+			<tr>
+				<td>1024</td>
+				<td>0.027</td>
+			</tr>
+		</table>
+
+		<h2>المنشئ (Constructor)</h2>
+
+		<h3>[name]( [param:WebGLRenderer renderer] )</h3>
+		<p>ينشئ هذا المنشئ [name] جديدًا.</p>
+	 
+		<h2>الوظائف (Methods)</h2>
+	 
+		<h3>
+			[method:WebGLRenderTarget fromScene]( [param:Scene scene], [param:Number sigma], [param:Number near], [param:Number far] )
+		</h3>
+		<p>
+			[page:Scene scene] - المشهد المعطى.<br />
+			[page:Number sigma] - (اختياري) يحدد نصف قطر التشويش بالراديان ليتم تطبيقه على المشهد قبل إنشاء PMREM. الافتراضي هو `0`.<br />
+			[page:Number near] - (اختياري) قيمة السطح القريب. الافتراضي هو `0.1`.<br />
+			[page:Number far] - (اختياري) قيمة السطح البعيد. الافتراضي هو `100`.<br /><br />
+	 
+			يولد PMREM من مشهد معطى ، والذي يمكن أن يكون أسرع من استخدام صورة إذا كانت عرض النطاق الترددي للشبكة منخفضة. تضمن الأسطح القريبة والبعيدة الاختيارية عرض المشهد بأكمله (يتم وضع cubeCamera في المنشأ).
+		</p>
+	 
+		<h3>
+			[method:WebGLRenderTarget fromEquirectangular]( [param:Texture equirectangular] )
+		</h3>
+		<p>
+			[page:Texture equirectangular] - نسيج equirectangular.<br /><br />
+	 
+			يولد PMREM من نسيج equirectangular.
+		</p>
+	 
+		<h3>
+			[method:WebGLRenderTarget fromCubemap]( [param:CubeTexture cubemap] )
+		</h3>
+		<p>
+			[page:CubeTexture cubemap] - نسيج cubemap.<br /><br />
+	 
+			يولد PMREM من نسيج cubemap.
+		</p>
+	 
+		<h3>[method:undefined compileCubemapShader]()</h3>
+		<p>
+			يجمع مسبقًا شادر cubemap. يمكنك الحصول على بدء تشغيل أسرع عن طريق استدعاء هذه الطريقة أثناء جلب شبكة نسيجك لزيادة التزامن.
+		</p>
+	 
+		<h3>[method:undefined compileEquirectangularShader]()</h3>
+		<p>
+			يجمع مسبقًا شادر equirectangular. يمكنك الحصول على بدء تشغيل أسرع عن طريق استدعاء هذه الطريقة أثناء جلب شبكة نسيجك لزيادة التزامن.
+		</p>
+	 
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			يحرر الموارد المتعلقة بوحدة معالجة الرسومات التي تم تخصيصها من قبل هذه الحالة. استدعِ هذه الطريقة كلما لم يعُد هذا المثيل مستخدمًا في تطبيقك.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

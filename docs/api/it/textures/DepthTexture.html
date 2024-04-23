@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Texture] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Questa classe può essere utilizzata per salvare automaticamente le informazioni di profondità di un rendering in una texture.
+		</p>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_depth_texture depth / texture]
+		</p>
+
+		<h2>Costruttore</h2>
+		<h3>[name]( [param:Number width], [param:Number height], [param:Constant type], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Number anisotropy], [param:Constant format] )</h3>
+
+		<p>
+		[page:Number width] -- larghezza della texture.<br />
+
+		[page:Number height] -- altezza della texture.<br />
+
+		[page:Constant type] -- Il valore predefinito è [page:Textures THREE.UnsignedIntType] quando utilizzi [page:Textures DepthFormat] e 
+		[page:Textures THREE.UnsignedInt248Type] quando utilizzi [page:Textures DepthStencilFormat].
+		Vedi [page:Textures type constants] per altre scelte.<br />
+
+		[page:Constant mapping] --
+		Vedi [page:Textures mapping mode constants] per i dettagli.<br />
+
+		[page:Constant wrapS] -- Il valore predefinito è [page:Textures THREE.ClampToEdgeWrapping].
+		Vedi [page:Textures wrap mode constants] per altre scelte.<br />
+
+		[page:Constant wrapT] -- Il valore predefinito è [page:Textures THREE.ClampToEdgeWrapping].
+		Vedi [page:Textures wrap mode constants] per altre scelte.<br />
+
+		[page:Constant magFilter] -- Come viene campionata la texture quando un texel copre più di un pixel.
+		Il valore predefinito è [page:Textures THREE.NearestFilter]. Vedi [page:Textures magnification filter constants] per altre scelte.<br />
+
+		[page:Constant minFilter] -- Come viene campionata la texture quando un texel copre meno di un pixel.
+		Il valore predefinito è [page:Textures THREE.NearestFilter]. Vedi [page:Textures minification filter constants] per altre scelte.<br />
+
+		[page:Number anisotropy] -- Il numero di campioni prelevati lungo l'asse attravero il pixel che ha la densità di texel più alta.
+		Per impostazione predefinita, questo valore è 1. Un valore più alto fornisce un risultato meno sfuocato rispetto ad una mipmap di base, 
+		a costo di utilizzare più campioni di texture. Usa [page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() 
+		per trovare il valore di anisotropia massimo valido per la GPU; questo valore è solitamente una potenza di 2.<br />
+
+		[page:Constant format] -- deve essere [page:Textures DepthFormat] (predefinito) o [page:Textures DepthStencilFormat].
+		Vedi [page:Textures format constants] per i dettagli.<br />
+		</p>
+
+
+		<h2>Proprietà</h2>
+
+		<p>
+			Vedi la classe base [page:Texture Texture] per le proprietà comuni.
+		- anche le seguenti proprietà fanno parte della classe texture, ma qui hanno impostazioni predefinite diverse.
+		</p>
+
+		<h3>[page:Texture.format format]</h3>
+		<p>
+		[page:Textures DepthFormat] (predefinito) o [page:Textures DepthStencilFormat].
+		Vedi [page:Textures format constants] per i dettagli.<br />
+		</p>
+
+		<h3>[page:Texture.type type]</h3>
+		<p>
+			Il valore predefinito è [page:Textures THREE.UnsignedIntType] quando utilizzi [page:Textures DepthFormat] e
+			[page:Textures THREE.UnsignedInt248Type] quando utilizzi [page:Textures DepthStencilFormat].
+			Vedi [page:Textures format constants] per i dettagli.<br />
+		</p>
+
+		<h3>[page:Texture.magFilter magFilter]</h3>
+		<p>
+			Come viene campionata la texture quando un texel copre più di un pixel.
+			Il valore predefinito è [page:Textures THREE.NearestFilter].
+		  Vedi le [page:Textures costanti del filtro di ingrandimento] per altre scelte.
+		</p>
+
+		<h3>[page:Texture.minFilter minFilter]</h3>
+		<p>
+			Come viene campionata la texture quando un texel copre meno di un pixel.
+			Il valore predefinito è [page:Textures THREE.NearestFilter].
+		  Vedi le [page:Textures costanti del filtro di ingrandimento] per altre scelte.
+		</p>
+
+		<h3>[page:Texture.flipY flipY]</h3>
+		<p>
+			Le texture di profondità non hanno bisogno di essere capovolte, quindi questo è `false` per impostazione predefinita.
+		</p>
+
+		<h3>[page:Texture.generateMipmaps .generateMipmaps]</h3>
+		<p>
+			Le texture di profondità non usano i mipmap.
+		</p>
+
+		<h3>[property:Boolean isDepthTexture]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h2>Metodi</h2>
+
+    <p>
+			Vedi la classe base [page:Texture Texture] per i metodi comuni.
+    </p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

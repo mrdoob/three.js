@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js / editor</title>
+		<title>three.js editor</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="apple-touch-icon" href="images/icon.png">
 		<link rel="manifest" href="manifest.json">
-		<link rel="shortcut icon" href="../files/favicon.ico" />
+		<link rel="shortcut icon" href="../files/favicon_white.ico" media="(prefers-color-scheme: dark)"/>
+		<link rel="shortcut icon" href="../files/favicon.ico" media="(prefers-color-scheme: light)" />
 	</head>
-	<body ontouchstart="">
+	<body>
 		<link rel="stylesheet" href="css/main.css">
 
-		<script src="../examples/js/libs/jszip.min.js"></script>
+		<script src="../examples/jsm/libs/draco/draco_encoder.js"></script>
 
 		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
 		<link rel="stylesheet" href="js/libs/codemirror/theme/monokai.css">
@@ -21,7 +22,8 @@
 
 		<script src="js/libs/esprima.js"></script>
 		<script src="js/libs/jsonlint.js"></script>
-		<script src="js/libs/glslprep.min.js"></script>
+
+		<script src="js/libs/ffmpeg.min.js" defer></script>
 
 		<link rel="stylesheet" href="js/libs/codemirror/addon/dialog.css">
 		<link rel="stylesheet" href="js/libs/codemirror/addon/show-hint.css">
@@ -42,11 +44,23 @@
 		<script src="js/libs/ternjs/doc_comment.js"></script>
 		<script src="js/libs/tern-threejs/threejs.js"></script>
 		<script src="js/libs/signals.min.js"></script>
-		<script src="../examples/js/vr/HelioWebXRPolyfill.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "../examples/jsm/",
+
+					"three/examples/": "../examples/",
+					"three-gpu-pathtracer": "https://cdn.jsdelivr.net/npm/three-gpu-pathtracer@0.0.19/build/index.module.js",
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.3/build/index.module.js"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { Editor } from './js/Editor.js';
 			import { Viewport } from './js/Viewport.js';
@@ -55,42 +69,44 @@
 			import { Player } from './js/Player.js';
 			import { Sidebar } from './js/Sidebar.js';
 			import { Menubar } from './js/Menubar.js';
-			import { VRButton } from '../examples/jsm/webxr/VRButton.js';
+			import { Resizer } from './js/Resizer.js';
 
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
 
 			Number.prototype.format = function () {
 
-				return this.toString().replace( /(\d)(?=(\d{3})+(?!\d))/g, "$1," );
+				return this.toString().replace( /(\d)(?=(\d{3})+(?!\d))/g, '$1,' );
 
 			};
 
 			//
 
-			var editor = new Editor();
+			const editor = new Editor();
 
 			window.editor = editor; // Expose editor to Console
 			window.THREE = THREE; // Expose THREE to APP Scripts and Console
-			window.VRButton = VRButton; // Expose VRButton to APP Scripts
 
-			var viewport = new Viewport( editor );
+			const viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
 
-			var toolbar = new Toolbar( editor );
+			const toolbar = new Toolbar( editor );
 			document.body.appendChild( toolbar.dom );
 
-			var script = new Script( editor );
+			const script = new Script( editor );
 			document.body.appendChild( script.dom );
 
-			var player = new Player( editor );
+			const player = new Player( editor );
 			document.body.appendChild( player.dom );
 
-			var sidebar = new Sidebar( editor );
+			const sidebar = new Sidebar( editor );
 			document.body.appendChild( sidebar.dom );
 
-			var menubar = new Menubar( editor );
+			const menubar = new Menubar( editor );
 			document.body.appendChild( menubar.dom );
+
+			const resizer = new Resizer( editor );
+			document.body.appendChild( resizer.dom );
 
 			//
 
@@ -106,7 +122,7 @@
 
 					}
 
-					var selected = editor.config.getKey( 'selected' );
+					const selected = editor.config.getKey( 'selected' );
 
 					if ( selected !== undefined ) {
 
@@ -118,7 +134,7 @@
 
 				//
 
-				var timeout;
+				let timeout;
 
 				function saveState() {
 
@@ -146,7 +162,7 @@
 
 				}
 
-				var signals = editor.signals;
+				const signals = editor.signals;
 
 				signals.geometryChanged.add( saveState );
 				signals.objectAdded.add( saveState );
@@ -154,6 +170,7 @@
 				signals.objectRemoved.add( saveState );
 				signals.materialChanged.add( saveState );
 				signals.sceneBackgroundChanged.add( saveState );
+				signals.sceneEnvironmentChanged.add( saveState );
 				signals.sceneFogChanged.add( saveState );
 				signals.sceneGraphChanged.add( saveState );
 				signals.scriptChanged.add( saveState );
@@ -168,15 +185,27 @@
 				event.preventDefault();
 				event.dataTransfer.dropEffect = 'copy';
 
-			}, false );
+			} );
 
 			document.addEventListener( 'drop', function ( event ) {
 
 				event.preventDefault();
 
-				editor.loader.loadFiles( event.dataTransfer.files );
+				if ( event.dataTransfer.types[ 0 ] === 'text/plain' ) return; // Outliner drop
 
-			}, false );
+				if ( event.dataTransfer.items ) {
+
+					// DataTransferItemList supports folders
+
+					editor.loader.loadItemList( event.dataTransfer.items );
+
+				} else {
+
+					editor.loader.loadFiles( event.dataTransfer.files );
+
+				}
+
+			} );
 
 			function onWindowResize() {
 
@@ -184,22 +213,22 @@
 
 			}
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 			onWindowResize();
 
 			//
 
-			var isLoadingFromHash = false;
-			var hash = window.location.hash;
+			let isLoadingFromHash = false;
+			const hash = window.location.hash;
 
-			if ( hash.substr( 1, 5 ) === 'file=' ) {
+			if ( hash.slice( 1, 6 ) === 'file=' ) {
 
-				var file = hash.substr( 6 );
+				const file = hash.slice( 6 );
 
 				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
-					var loader = new THREE.FileLoader();
+					const loader = new THREE.FileLoader();
 					loader.crossOrigin = '';
 					loader.load( file, function ( text ) {
 
@@ -227,15 +256,6 @@
 				}
 
 			}
-
-			/*
-			window.addEventListener( 'message', function ( event ) {
-
-				editor.clear();
-				editor.fromJSON( event.data );
-
-			}, false );
-			*/
 
 		</script>
 	</body>

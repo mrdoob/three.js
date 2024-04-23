@@ -13,27 +13,36 @@
 
 		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - fat lines</div>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { LineMaterial } from './jsm/lines/LineMaterial.js';
-			import { Wireframe } from './jsm/lines/Wireframe.js';
-			import { WireframeGeometry2 } from './jsm/lines/WireframeGeometry2.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+			import { Wireframe } from 'three/addons/lines/Wireframe.js';
+			import { WireframeGeometry2 } from 'three/addons/lines/WireframeGeometry2.js';
 
-			var wireframe, renderer, scene, camera, camera2, controls;
-			var wireframe1;
-			var matLine, matLineBasic, matLineDashed;
-			var stats;
-			var gui;
+			let wireframe, renderer, scene, camera, camera2, controls;
+			let wireframe1;
+			let matLine, matLineBasic, matLineDashed;
+			let stats;
+			let gui;
 
 			// viewport
-			var insetWidth;
-			var insetHeight;
+			let insetWidth;
+			let insetHeight;
 
 			init();
 			animate();
@@ -61,9 +70,9 @@
 
 				// Wireframe ( WireframeGeometry2, LineMaterial )
 
-				var geo = new THREE.IcosahedronBufferGeometry( 20, 1 );
+				let geo = new THREE.IcosahedronGeometry( 20, 1 );
 
-				var geometry = new WireframeGeometry2( geo );
+				const geometry = new WireframeGeometry2( geo );
 
 				matLine = new LineMaterial( {
 
@@ -94,7 +103,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
 
 				stats = new Stats();
@@ -166,7 +175,7 @@
 
 				gui = new GUI();
 
-				var param = {
+				const param = {
 					'line type': 0,
 					'width (px)': 5,
 					'dashed': false,
@@ -179,14 +188,14 @@
 
 					switch ( val ) {
 
-						case '0':
+						case 0:
 							wireframe.visible = true;
 
 							wireframe1.visible = false;
 
 							break;
 
-						case '1':
+						case 1:
 							wireframe.visible = false;
 
 							wireframe1.visible = true;
@@ -210,7 +219,7 @@
 					// dashed is implemented as a defines -- not as a uniform. this could be changed.
 					// ... or THREE.LineDashedMaterial could be implemented as a separate material
 					// temporary hack - renderer should do this eventually
-					if ( val ) matLine.defines.USE_DASH = ""; else delete matLine.defines.USE_DASH;
+					if ( val ) matLine.defines.USE_DASH = ''; else delete matLine.defines.USE_DASH;
 					matLine.needsUpdate = true;
 
 					wireframe1.material = val ? matLineDashed : matLineBasic;
@@ -228,7 +237,7 @@
 
 					switch ( val ) {
 
-						case '0':
+						case 0:
 							matLine.dashSize = 2;
 							matLine.gapSize = 1;
 
@@ -237,7 +246,7 @@
 
 							break;
 
-						case '1':
+						case 1:
 							matLine.dashSize = 1;
 							matLine.gapSize = 1;
 
@@ -246,7 +255,7 @@
 
 							break;
 
-						case '2':
+						case 2:
 							matLine.dashSize = 1;
 							matLine.gapSize = 2;
 

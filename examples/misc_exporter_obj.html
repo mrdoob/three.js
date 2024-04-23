@@ -5,118 +5,43 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			.floating {
-				background : #000000;
-				opacity : 0.8;
-				width : 80%;
-				height : 80%;
-				position : absolute;
-				left : 10%;
-				top : 10%;
-				border : 1px solid #555555;
-				padding : 10px;
-				display : none;
-				overflow : auto;
-				z-index: 100;
-			}
-		</style>
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - obj<br /><br />
-			<button id="triangle">triangle</button>
-			<button id="cube">cube</button>
-			<button id="cylinder">cylinder</button>
-			<button id="multiple">multiple</button>
-			<button id="transformed">transformed</button><br /><br />
-			<button id="export">export to obj</button>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - obj
 		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OBJExporter } from './jsm/exporters/OBJExporter.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			var camera, scene, light, renderer;
-			var exportButton, floatingDiv;
-			var mouseX = 0, mouseY = 0;
+			let camera, scene, renderer;
 
-			function exportToObj() {
+			const params = {
+				addTriangle: addTriangle,
+				addCube: addCube,
+				addCylinder: addCylinder,
+				addMultiple: addMultiple,
+				addTransformed: addTransformed,
+				addPoints: addPoints,
+				exportToObj: exportToObj
+			};
 
-				var exporter = new OBJExporter();
-				var result = exporter.parse( scene );
-				floatingDiv.style.display = 'block';
-				floatingDiv.innerHTML = result.split( '\n' ).join( '<br />' );
-
-			}
-
-			function addGeometry( type ) {
-
-				for ( var i = 0; i < scene.children.length; i ++ ) {
-
-					var child = scene.children[ i ];
-
-					if ( child.isMesh ) {
-
-						child.geometry.dispose();
-						scene.remove( child );
-						i --;
-
-					}
-
-				}
-
-				if ( type === 1 ) {
-
-					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-					var geometry = generateTriangleGeometry();
-
-					scene.add( new THREE.Mesh( geometry, material ) );
-
-
-				} else if ( type === 2 ) {
-
-					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-					var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
-					scene.add( new THREE.Mesh( geometry, material ) );
-
-				} else if ( type === 3 ) {
-
-					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-					var geometry = new THREE.CylinderBufferGeometry( 50, 50, 100, 30, 1 );
-					scene.add( new THREE.Mesh( geometry, material ) );
-
-				} else if ( type === 4 || type === 5 ) {
-
-					var material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
-					var geometry = generateTriangleGeometry();
-
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = - 200;
-					scene.add( mesh );
-
-					var geometry2 = new THREE.BoxBufferGeometry( 100, 100, 100 );
-					var mesh2 = new THREE.Mesh( geometry2, material );
-					scene.add( mesh2 );
-
-					var geometry3 = new THREE.CylinderBufferGeometry( 50, 50, 100, 30, 1 );
-					var mesh3 = new THREE.Mesh( geometry3, material );
-					mesh3.position.x = 200;
-					scene.add( mesh3 );
-
-					if ( type === 5 ) {
-
-						mesh.rotation.y = Math.PI / 4.0;
-						mesh2.rotation.y = Math.PI / 4.0;
-						mesh3.rotation.y = Math.PI / 4.0;
-
-					}
-
-				}
-
-			}
+			init();
+			animate();
 
 			function init() {
 
@@ -130,78 +55,177 @@
 
 				scene = new THREE.Scene();
 
-				light = new THREE.DirectionalLight( 0xffffff );
-				scene.add( light );
+				const ambientLight = new THREE.AmbientLight( 0xffffff );
+				scene.add( ambientLight );
+
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 2.5 );
+				directionalLight.position.set( 0, 1, 1 );
+				scene.add( directionalLight );
+
+				const gui = new GUI();
+
+				let h = gui.addFolder( 'Geometry Selection' );
+				h.add( params, 'addTriangle' ).name( 'Triangle' );
+				h.add( params, 'addCube' ).name( 'Cube' );
+				h.add( params, 'addCylinder' ).name( 'Cylinder' );
+				h.add( params, 'addMultiple' ).name( 'Multiple objects' );
+				h.add( params, 'addTransformed' ).name( 'Transformed objects' );
+				h.add( params, 'addPoints' ).name( 'Point Cloud' );
+
+				h = gui.addFolder( 'Export' );
+				h.add( params, 'exportToObj' ).name( 'Export OBJ' );
+
+				gui.open();
 
 				addGeometry( 1 );
 
-				window.addEventListener( 'click', onWindowClick, false );
-				window.addEventListener( 'resize', onWindowResize, false );
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mouseover', onDocumentMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				document.getElementById( 'triangle' ).addEventListener( 'click', function () {
-
-					addGeometry( 1 );
-
-				} );
-				document.getElementById( 'cube' ).addEventListener( 'click', function () {
-
-					addGeometry( 2 );
-
-				} );
-				document.getElementById( 'cylinder' ).addEventListener( 'click', function () {
-
-					addGeometry( 3 );
-
-				} );
-				document.getElementById( 'multiple' ).addEventListener( 'click', function () {
-
-					addGeometry( 4 );
-
-				} );
-				document.getElementById( 'transformed' ).addEventListener( 'click', function () {
-
-					addGeometry( 5 );
-
-				} );
-
-				exportButton = document.getElementById( 'export' );
-				exportButton.addEventListener( 'click', function () {
-
-					exportToObj();
-
-				} );
-
-				floatingDiv = document.createElement( 'div' );
-				floatingDiv.className = 'floating';
-				document.body.appendChild( floatingDiv );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.enablePan = false;
 
 			}
 
-			function onWindowClick( event ) {
+			function exportToObj() {
 
-				var needToClose = true;
-				var target = event.target;
+				const exporter = new OBJExporter();
+				const result = exporter.parse( scene );
+				saveString( result, 'object.obj' );
 
-				while ( target !== null ) {
+			}
 
-					if ( target === floatingDiv || target === exportButton ) {
+			function addGeometry( type ) {
 
-						needToClose = false;
-						break;
+				for ( let i = 0; i < scene.children.length; i ++ ) {
+
+					const child = scene.children[ i ];
+
+					if ( child.isMesh || child.isPoints ) {
+
+						child.geometry.dispose();
+						scene.remove( child );
+						i --;
 
 					}
 
-					target = target.parentElement;
+				}
+
+				if ( type === 1 ) {
+
+					const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
+					const geometry = generateTriangleGeometry();
+
+					scene.add( new THREE.Mesh( geometry, material ) );
+
+
+				} else if ( type === 2 ) {
+
+					const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
+					const geometry = new THREE.BoxGeometry( 100, 100, 100 );
+					scene.add( new THREE.Mesh( geometry, material ) );
+
+				} else if ( type === 3 ) {
+
+					const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
+					const geometry = new THREE.CylinderGeometry( 50, 50, 100, 30, 1 );
+					scene.add( new THREE.Mesh( geometry, material ) );
+
+				} else if ( type === 4 || type === 5 ) {
+
+					const material = new THREE.MeshLambertMaterial( { color: 0x00cc00 } );
+					const geometry = generateTriangleGeometry();
+
+					const mesh = new THREE.Mesh( geometry, material );
+					mesh.position.x = - 200;
+					scene.add( mesh );
+
+					const geometry2 = new THREE.BoxGeometry( 100, 100, 100 );
+					const mesh2 = new THREE.Mesh( geometry2, material );
+					scene.add( mesh2 );
+
+					const geometry3 = new THREE.CylinderGeometry( 50, 50, 100, 30, 1 );
+					const mesh3 = new THREE.Mesh( geometry3, material );
+					mesh3.position.x = 200;
+					scene.add( mesh3 );
+
+					if ( type === 5 ) {
+
+						mesh.rotation.y = Math.PI / 4.0;
+						mesh2.rotation.y = Math.PI / 4.0;
+						mesh3.rotation.y = Math.PI / 4.0;
+
+					}
+
+				} else if ( type === 6 ) {
+
+					const points = [ 0, 0, 0, 100, 0, 0, 100, 100, 0, 0, 100, 0 ];
+					const colors = [ 0.5, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0.5, 0 ];
+
+					const geometry = new THREE.BufferGeometry();
+					geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( points, 3 ) );
+					geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+					const material = new THREE.PointsMaterial( { size: 10, vertexColors: true } );
+
+					const pointCloud = new THREE.Points( geometry, material );
+					pointCloud.name = 'point cloud';
+					scene.add( pointCloud );
 
 				}
 
-				if ( needToClose ) {
+			}
 
-					floatingDiv.style.display = 'none';
+			function addTriangle() {
 
-				}
+				addGeometry( 1 );
+
+			}
+
+			function addCube() {
+
+				addGeometry( 2 );
+
+			}
+
+			function addCylinder() {
+
+				addGeometry( 3 );
+
+			}
+
+			function addMultiple() {
+
+				addGeometry( 4 );
+
+			}
+
+			function addTransformed() {
+
+				addGeometry( 5 );
+
+			}
+
+			function addPoints() {
+
+				addGeometry( 6 );
+
+			}
+
+			const link = document.createElement( 'a' );
+			link.style.display = 'none';
+			document.body.appendChild( link );
+
+			function save( blob, filename ) {
+
+				link.href = URL.createObjectURL( blob );
+				link.download = filename;
+				link.click();
+
+			}
+
+			function saveString( text, filename ) {
+
+				save( new Blob( [ text ], { type: 'text/plain' } ), filename );
 
 			}
 
@@ -214,32 +238,18 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
-
-				var windowHalfX = window.innerWidth / 2;
-				var windowHalfY = window.innerHeight / 2;
-				mouseX = ( event.clientX - windowHalfX ) / 2;
-				mouseY = ( event.clientY - windowHalfY ) / 2;
-
-			}
-
 			function animate() {
 
 				requestAnimationFrame( animate );
 
-				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
-				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
-				camera.lookAt( scene.position );
-
-				light.position.set( camera.position.x, camera.position.y, camera.position.z ).normalize();
 				renderer.render( scene, camera );
 
 			}
 
 			function generateTriangleGeometry() {
 
-				var geometry = new THREE.BufferGeometry();
-				var vertices = [];
+				const geometry = new THREE.BufferGeometry();
+				const vertices = [];
 
 				vertices.push( - 50, - 50, 0 );
 				vertices.push( 50, - 50, 0 );
@@ -251,10 +261,6 @@
 				return geometry;
 
 			}
-
-			init();
-			animate();
-
 
 		</script>
 

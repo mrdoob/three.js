@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+
+	<body class="rtl">
+		<h1>إنشاء مشهد（[name])</h1>
+
+		<p>الهدف من هذا القسم هو تقديم مقدمة مختصرة عن three.js. سنبدأ بإعداد مشهد باستخدام مكعب دوار. متوفر مثال عملي جاهز في أسفل الصفحة في حالة واجهتك مشكلة و علقت واحتجت إلى المساعدة.</p>
+
+		<h2>قبل أن تبدأ</h2>
+
+		<p>إذا لم تقم بذلك بعد، فانتقل إلى دليل [link:#manual/ar/introduction/Installation تثبيت]. سنفترض أنك قمت بالفعل بإعداد نفس هيكل المشروع (يشمل ذلك Index.html وmain.js)، وقمت بتثبيت three.js، وأنك تقوم بستخدم أداة بناء ، أو تستخدم خادم محلي مع CDN و import maps.</p>
+
+		<h2>إنشاء المشهد</h2>
+
+		<p>لكي نتمكن فعلًا من عرض أي شيء باستخدام three.js، نحتاج إلى ثلاثة عناصر: المشهد (scene) والكاميرا (camera) والعارض (renderer)، بحيث يمكننا عرض المشهد بواسطة الكاميرا.</p>
+
+		<p class="RtlTitle"><i >main.js —</i></p>
+
+		<code>
+		import * as THREE from 'three';
+
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+		</code>
+
+		<p>لنتمهل لحظة من أجل توضيح ما يحصل هنا. لقد قمنا بتحضير كل من المسرح، الكاميرا، و العارض.</p>
+
+		<p>هناك العديد من الخيارات بخصوص نوع الكاميرا. للوقت الراهن، سنستعمل `PerspectiveCamera`.</p>
+
+		<p>أول قيمه هي `مجال الرؤية - field of view `.FOV تمثل مجال المشاهدة المتاح في أي وقت من العرض. وحده قيسها هي الدرجة (degrees)</p>
+		
+		<p>ثاني قيمة هي `نسبة العرض إلى الارتفاع - aspect ratio`. من المستحسن إستعمال نتيجة قسمة عرض وطول العنصر الحاوي، و إلا ستحصل على تجربة مماثلة لمشاهدة فيلم قديم على تلفاز عريض حيث ستكون الصورة مضغوطة.</p>
+
+		<p>القيمتين المتبقيتين هما `أقرب - near` و `أبعد - far` سطح فاصل. القصد هو اي شيء بعيد عن الكاميرا من قيمه `far` او اقرب من قيمه `near` لن يتم عرضهم.أنت لست مطالب بالقلق حيال هذا، و لكن من الممكن أن تريد إستعمال قيم أخرى من أجل الحصول على أداء أفضل.</p>
+	
+		<p>الخطوة التالية الأن هوالعارض. بالإضافة إلى إنشاء مثيل العارض,يتعين علينا أيضًا تعيين الحجم الذي نرغب في عرض تطبيقنا به.هنا من الفكرة الجيدة استخدام عرض وارتفاع المنطقة التي نرغب في ملئها بتطبيقنا - في هذه الحالة، عرض وارتفاع نافذة المتصفح. بالنسبة لتطبيقات تتطلب أداءً مكثفًا، يمكنك أيضًا تقديم قيم أصغر لـ `setSize`، مثل `window.innerWidth/2` و `window.innerHeight/2`، مما سيجعل التطبيق يعرض بحجم ربع الشاشة.</p>
+				
+		<p>إذا كنت ترغب في الاحتفاظ بحجم تطبيقك ولكن تقديمه بدقة أقل، يمكنك القيام بذلك عن طريق استخدام `setSize` و استخدام قيمه false ل`updateStyle` المعامل الثالث . على سبيل المثال، setSize(window.innerWidth/2, window.innerHeight/2, false) سيقوم بتقديم تطبيقك بدقة نصف الحجم، شريطةً أن لديك &lt;canvas&gt; بعرض وارتفاع 100% </p>
+
+		<p>أخيرا و ليس أخرا، سنقوم بإضافة `العارض - renderer` إلى ملف الHTML. <br> &lt; canvas &gt; هو وسم يستعمله العارض لإظهار المشهد من خلاله.</p>
+
+		<p><em>"كل شيء جيد، و لكن أي المكعب الذي وعدتنا به؟"</em> لنقم بإضافته الأن.</p>
+
+
+		<code>
+		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
+
+		camera.position.z = 5;
+		</code>
+		
+		<p>لكي نقوم بإنشاء مكعب، نحتاج مكون `BoxGeometry`. هذا الأخير مسؤول عن حفض أماكن كل النقاط (`vertices`) و تعبئة كل الأوجه (`faces`) المكونة للمكعب. سنقوم بالتعمق في هذا الموضوع مستقبلا.</p>
+
+		<p>بالإضافة إلى الهندسة الخاصة بالمكعب، نحتاج الي مادة له لتعطيه لون. Three.js تأتي مع العديد من المواد،ولكن سنكتفي بإستعمال `MeshBasicMaterial` الان. كل المواد تأخذ مجموعة من القيم ستطبق عليها من أجل الوصول إلى النتيجة المرادة. لإبقاء الأشياء بسيطة، قمنا بإرفاق قيمة اللون التي `0x00ff00`، و الذي يمثل اللون الأخضر. كيفية إحتساب القيمة هي نفسها كإستعمال CSS أو Photoshop(`hex colors`).</p>
+		
+		<p>الخطوة التالية هي إنشاء `جسم - Mesh`. نقصد به الشيء الذي سيتكفل بالتعامل مع هندسة الشكل و تطبيقهاعلى المادة المرفوقة، و من ثم يمكننا إدخال الشكل الجسم النهائي إلى المشهد، و التحرك بحرية حوله.</p>
+
+		<p>بشكل افتراضي عند إستعمال أمر `scene.add()`، الشيء المراد إضافته للمشهد سيضاف في الإحداثيات التالية (`0,0,0`) . هذا يمكن له أن يشكل بعض المشاكل كون الكاميرا في هذه الحالة داخل المكعب. لتجنب هذا نقوم ببساطة بإبعاد الكاميرا قليلا.</p>
+
+		<h2>عرض المشهد</h2>
+
+		<p>إن قمت بنسخ الأوامر البرمجية الموجودة أعله وسط ملف HTML الذي قمنا بإنشائه مسبقا، لم تتمكن من رؤية أي شيء حتى الأن. هذا بسبب أننا لم نقم بعرض أي شيء حتى اللحظة. لذلك، ما نحتاجه يدعى  (`العرض - render`) أو (`حلقةالحركات - animation loop`).</p>
+
+		<code>
+		function animate() {
+			requestAnimationFrame( animate );
+			renderer.render( scene, camera );
+		}
+		animate();
+		</code>
+		
+		<p>هذه الشفره ستقوم بإنشاء حلقة تكراريه تجعل العارض يعيد تحديث المشهد كل مرة يحدث فيها تغيير في الصفحة (أو نظرياهذا يعني 60 مرةخلال كل ثانية). إن كنت لا تملك تجربة مسبقة في صناعة ألعاب المتصفح، ستتسائل <em>"لماذا لا نستعمل setInterval؟"</em> الحقيقة أننا بإمكاننا ذلك و لكن `requestAnimationFrame` تقدم لنا العديد من المزايا. من أهما أنها تقوم بإيقاف العمل عندما يقوم المستعمل بتغيير الصفحة، بالإضافة لعدم إستهلاك قدرة الحاسب الخاص بالجهاز و عمر البطارية.</p>
+
+		<h2>تحريك المكعب</h2>
+
+		<p>إن قمت بإضافة الشفرات السابقه للملف الخاص بك، من الأرجح أنك ترى الأن مكعبا أخضر اللون. لنقم بجعله أكثر جذابية من خلال تدويره.</p>
+
+		<p>قم بإضافة الشفرة التالية فوق السطر الذي يحتوي أمر `renderer.render` في الوظيفة `animate`:</p>
+
+		<code>
+		cube.rotation.x += 0.01;
+		cube.rotation.y += 0.01;
+		</code>
+
+		<p>هذه الأوامر سيتم تشغيلها في كل  (اطار - frame,ما يعني 60 مرة في الثانية تقريبا).و بذلك ستمكن المكعب من الدوران. في الأساس، أي شيء تريد تحريكه أو تغيره خلال فترة عمل التطبيق يستوجب أن تكون الأوامر الخاصة بذلك قد تم تشغيلها داخل حلقة الحركات. يمكنك بالتأكيد مناداة وظائف أخرى، لكي لا ينتهي بك المطاف بوظيفة واحدة تحتوي على مئات السطور.</p>
+
+		<h2>النتيجة</h2>
+		
+		<p>تهانينا! لقد قمت بإكمال أول تطبيق three.js لك. الأمر ليس معقدا، يجب عليك فقد البدأ من مكان ما.</p>
+
+		<p>الشفرة البرمجية الكاملة في الأسفل إلى جانب محرر مباشر [link:https://jsfiddle.net/0c1oqf38/ live example]. العب بالأوامر البرمجية لتكون صورة افضل عن كيفية عملها.</p>
+
+		<p class="RtlTitle"><i>index.html —</i></p>
+
+		<code>
+		&lt;!DOCTYPE html&gt;
+		&lt;html lang="en"&gt;
+			&lt;head&gt;
+				&lt;meta charset="utf-8"&gt;
+				&lt;title&gt;My first three.js app&lt;/title&gt;
+				&lt;style&gt;
+					body { margin: 0; }
+				&lt;/style&gt;
+			&lt;/head&gt;
+			&lt;body&gt;
+				&lt;script type="module" src="/main.js"&gt;&lt;/script&gt;
+			&lt;/body&gt;
+		&lt;/html&gt;
+		</code>
+
+		<p class="RtlTitle"><i>main.js —</i></p>
+
+		<code>
+		import * as THREE from 'three';
+
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
+
+		camera.position.z = 5;
+
+		function animate() {
+			requestAnimationFrame( animate );
+
+			cube.rotation.x += 0.01;
+			cube.rotation.y += 0.01;
+
+			renderer.render( scene, camera );
+		}
+
+		animate();
+		</code>
+	</body>
+</html>

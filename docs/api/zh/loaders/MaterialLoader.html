@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,12 +16,11 @@
 			默认使用[page:FileLoader]进行加载文件。
 		</p>
 
-		<h2>例子</h2>
-
+		<h2>代码示例</h2>
 
 		<code>
 		// 初始化一个加载器
-		var loader = new THREE.MaterialLoader();
+		const loader = new THREE.MaterialLoader();
 
 		// 加载资源
 		loader.load(
@@ -65,7 +63,7 @@
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Loader]。</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — 文件的URL或者路径，也可以为
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
@@ -83,7 +81,7 @@
 		解析<em>JSON</em>结构，以json对象的参数中的[page:String json.type]类型，创建一个新的[page:Material]。
 		</p>
 
-		<h3>[method:null setTextures]( [param:Object textures] )</h3>
+		<h3>[method:this setTextures]( [param:Object textures] )</h3>
 		<p>
 		[page:Object textures] — 对象包含任何被材质所使用的纹理。
 		</p>

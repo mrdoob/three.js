@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -34,23 +33,18 @@
 			</ul>
 		</div>
 
-		<script>
+		<h2>进口</h2>
 
-		// iOS iframe auto-resize workaround
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
 
-		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+		<code>
+			import { SVGRenderer } from 'three/addons/renderers/SVGRenderer.js';
+		</code>
 
-			var scene = document.getElementById( 'scene' );
-
-			scene.style.width = getComputedStyle( scene ).width;
-			scene.style.height = getComputedStyle( scene ).height;
-			scene.setAttribute( 'scrolling', 'no' );
-
-		}
-
-		</script>
-
-		<h2>示例</h2>
+		<h2>例子</h2>
 
 		<p>
 			[example:svg_lines lines]<br />
@@ -63,32 +57,37 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:null clear]()</h3>
+		<h3>[method:undefined clear]()</h3>
 		<p>
 			告诉渲染器来清除其绘图表面。
 		</p>
 
-		<h3>[method:null render]( [param:Scene scene], [param:Camera camera] )</h3>
+		<h3>[method:Object getSize]()</h3>
+		<p>
+			返回一个包含有渲染器宽和高的对象。
+		</p>
+
+		<h3>[method:undefined render]( [param:Scene scene], [param:Camera camera] )</h3>
 		<p>
 			使用[page:Camera camera]来渲染一个[page:Scene scene]。
 		</p>
 
-		<h3>[method:null setClearColor]( [param:Color color], [param:number alpha] )</h3>
+		<h3>[method:undefined setClearColor]( [param:Color color], [param:number alpha] )</h3>
 		<p>
 			设置clearColor（空白颜色）以及clearAlpha（空白Alpha）。
 		</p>
 
-		<h3>[method:null setPrecision]( [param:Number precision] )</h3>
+		<h3>[method:undefined setPrecision]( [param:Number precision] )</h3>
 		<p>
 			设置用于创建路径的数据的精度。
 		</p>
 
-		<h3>[method:null setQuality]()</h3>
+		<h3>[method:undefined setQuality]()</h3>
 		<p>
 			设置渲染质量。可能的值有*low*和*high*（默认值）。
 		</p>
 
-		<h3>[method:null setSize]( [param:Number width], [param:Number height] )</h3>
+		<h3>[method:undefined setSize]( [param:Number width], [param:Number height] )</h3>
 		<p>
 			改变渲染器尺寸为(width, height)。
 		</p>

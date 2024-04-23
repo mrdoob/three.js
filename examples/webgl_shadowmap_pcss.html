@@ -29,7 +29,6 @@
 				#define NUM_SAMPLES 17
 				#define NUM_RINGS 11
 				#define BLOCKER_SEARCH_NUM_SAMPLES NUM_SAMPLES
-				#define PCF_NUM_SAMPLES NUM_SAMPLES
 
 				vec2 poissonDisk[NUM_SAMPLES];
 
@@ -75,15 +74,20 @@
 
 				float PCF_Filter(sampler2D shadowMap, vec2 uv, float zReceiver, float filterRadius ) {
 					float sum = 0.0;
-					for( int i = 0; i < PCF_NUM_SAMPLES; i ++ ) {
-						float depth = unpackRGBAToDepth( texture2D( shadowMap, uv + poissonDisk[ i ] * filterRadius ) );
+					float depth;
+					#pragma unroll_loop_start
+					for( int i = 0; i < 17; i ++ ) {
+						depth = unpackRGBAToDepth( texture2D( shadowMap, uv + poissonDisk[ i ] * filterRadius ) );
 						if( zReceiver <= depth ) sum += 1.0;
 					}
-					for( int i = 0; i < PCF_NUM_SAMPLES; i ++ ) {
-						float depth = unpackRGBAToDepth( texture2D( shadowMap, uv + -poissonDisk[ i ].yx * filterRadius ) );
+					#pragma unroll_loop_end
+					#pragma unroll_loop_start
+					for( int i = 0; i < 17; i ++ ) {
+						depth = unpackRGBAToDepth( texture2D( shadowMap, uv + -poissonDisk[ i ].yx * filterRadius ) );
 						if( zReceiver <= depth ) sum += 1.0;
 					}
-					return sum / ( 2.0 * float( PCF_NUM_SAMPLES ) );
+					#pragma unroll_loop_end
+					return sum / ( 2.0 * float( 17 ) );
 				}
 
 				float PCSS ( sampler2D shadowMap, vec4 coords ) {
@@ -114,25 +118,34 @@
 
 		</script>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			var container, stats;
-			var camera, scene, renderer;
+			let stats;
+			let camera, scene, renderer;
 
-			var group;
+			let group;
 
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				// scene
@@ -156,9 +169,9 @@
 
 				// lights
 
-				scene.add( new THREE.AmbientLight( 0x666666 ) );
+				scene.add( new THREE.AmbientLight( 0xaaaaaa, 3 ) );
 
-				var light = new THREE.DirectionalLight( 0xdfebff, 1.75 );
+				const light = new THREE.DirectionalLight( 0xf0f6ff, 4.5 );
 				light.position.set( 2, 8, 4 );
 
 				light.castShadow = true;
@@ -176,13 +189,13 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				var geometry = new THREE.SphereBufferGeometry( 0.3, 20, 20 );
+				const geometry = new THREE.SphereGeometry( 0.3, 20, 20 );
 
-				for ( var i = 0; i < 20; i ++ ) {
+				for ( let i = 0; i < 20; i ++ ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );
+					const material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );
 
-					var sphere = new THREE.Mesh( geometry, material );
+					const sphere = new THREE.Mesh( geometry, material );
 					sphere.position.x = Math.random() - 0.5;
 					sphere.position.z = Math.random() - 0.5;
 					sphere.position.normalize();
@@ -196,24 +209,24 @@
 
 				// ground
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0x404040, specular: 0x111111 } );
+				const groundMaterial = new THREE.MeshPhongMaterial( { color: 0x898989 } );
 
-				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000, 8, 8 ), groundMaterial );
-				mesh.rotation.x = - Math.PI / 2;
-				mesh.receiveShadow = true;
-				scene.add( mesh );
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 20000, 20000, 8, 8 ), groundMaterial );
+				ground.rotation.x = - Math.PI / 2;
+				ground.receiveShadow = true;
+				scene.add( ground );
 
 				// column
 
-				var mesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 4, 1 ), groundMaterial );
-				mesh.position.y = 2;
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
-				scene.add( mesh );
+				const column = new THREE.Mesh( new THREE.BoxGeometry( 1, 4, 1 ), groundMaterial );
+				column.position.y = 2;
+				column.castShadow = true;
+				column.receiveShadow = true;
+				scene.add( column );
 
 				// overwrite shadowmap code
 
-				var shader = THREE.ShaderChunk.shadowmap_pars_fragment;
+				let shader = THREE.ShaderChunk.shadowmap_pars_fragment;
 
 				shader = shader.replace(
 					'#ifdef USE_SHADOWMAP',
@@ -238,11 +251,10 @@
 
 				container.appendChild( renderer.domElement );
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 
 				// controls
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.maxPolarAngle = Math.PI * 0.5;
 				controls.minDistance = 10;
 				controls.maxDistance = 75;
@@ -256,7 +268,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -275,7 +287,7 @@
 
 			function animate() {
 
-				var time = performance.now() / 1000;
+				const time = performance.now() / 1000;
 
 				group.traverse( function ( child ) {
 

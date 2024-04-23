@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc"> Visualizza un oggetto helper a forma di cono per una [page:SpotLight].</p>
+
+		<h2>Codice di Esempio</h2>
+		<code>
+		const spotLight = new THREE.SpotLight( 0xffffff );
+		spotLight.position.set( 10, 10, 10 );
+		scene.add( spotLight );
+
+		const spotLightHelper = new THREE.SpotLightHelper( spotLight );
+		scene.add( spotLightHelper );
+		</code>
+
+		<h2>Esempi</h2>
+		<p>
+			[example:webgl_lights_spotlights WebGL/ lights / spotlights ]
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:SpotLight light], [param:Hex color] )</h3>
+		<p>
+			[page:SpotLight light] -- La [page:SpotLight] da visualizzare. <br /><br/>
+
+			[page:Hex color] -- (opzionale) Se non è impostato l'helper prenderà il colore della luce.
+		</p>
+
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Object3D] per le proprietà in comune.</p>
+
+		<h3>[property:LineSegments cone]</h3>
+		<p>[page:LineSegments] usati per visualizzare la luce.</p>
+
+		<h3>[property:SpotLight light]</h3>
+		<p>Riferimento alla [page:SpotLight] visualizzata.</p>
+
+		<h3>[property:Object matrix]</h3>
+		<p>Riferimento alla [page:Object3D.matrixWorld matrixWorld] della spotLight.</p>
+
+		<h3>[property:Object matrixAutoUpdate]</h3>
+		<p>
+			Vedi [page:Object3D.matrixAutoUpdate]. In questo caso è impostato su `false`, poiché l'helper sta usando
+			[page:Object3D.matrixWorld matrixWorld] della telecamera.
+		</p>
+
+		<h3>[property:hex color]</h3>
+		<p>
+			Il parametro colore passato nel costruttore. Il valore predefinito è `undefined`. Se viene modificato,
+      il colore dell'helper sarà aggiornato la prossima volta che il metodo [page:.update update] venga chiamato.
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Object3D] per i metodi comuni.</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>Elimina l'helper della luce.</p>
+
+		<h3>[method:undefined update]()</h3>
+		<p>Aggiorna l'helper della luce.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>のポストプロセス</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – のポストプロセス">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>のポストプロセス</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p><em>ポストプロセス</em>とは、一般的には2D画像に何らかのエフェクトやフィルターを適用する事です。
+Three.jsの場合、たくさんのメッシュが入ったシーンがあり、そのシーンを2D画像にレンダリングします。
+通常はその2D画像はキャンバスに直接レンダリングしブラウザに表示されますが、
+代わりに<a href="rendertargets.html">レンダーターゲットにレンダリング</a>し、キャンバス描画前に<em>ポストプロセス</em>エフェクトを適用できます。
+メインシーンのレンダリング後に行われるため、ポストプロセスと呼ばれています。</p>
+<p>ポストプロセスの例としては、InstagramやPhotoshopのフィルターなどがあります。</p>
+<p>Three.jsには、ポストプロセスのパイプラインを設定するサンプルクラスがいくつかあります。
+今回は最初に <code class="notranslate" translate="no">EffectComposer</code> を作成し、複数の <code class="notranslate" translate="no">Pass</code> オブジェクトを追加します。
+次に <code class="notranslate" translate="no">EffectComposer.render</code> を呼び出し、シーンを <a href="rendertargets.html">レンダーターゲット</a>にレンダリングしてそれぞれの <code class="notranslate" translate="no">Pass</code> を適用します。</p>
+<p>それぞれの <code class="notranslate" translate="no">Pass</code> には、ビネットの追加、ブラーやブルームの適用、フィルムグレインの適用、色相、彩度、コントラストの調整などのポストプロセスを適用できます。
+最後のレンダリングでポストプロセス結果をキャンバスにレンダリングします。</p>
+<p><code class="notranslate" translate="no">EffectComposer</code> 関数がどのようなものか理解するのは少し重要です。
+ここでは2つの<a href="rendertargets.html">レンダーターゲット</a>を作成します。
+これを<strong>rtA</strong>と<strong>rtB</strong>と呼ぶ事にしましょう。</p>
+<p>次に <code class="notranslate" translate="no">EffectComposer.addPass</code> を呼び出し、それぞれのPassに適用したい順番で追加します。
+Passは<em>次の図のように</em>適用されます。</p>
+<div class="threejs_center"><img src="../resources/images/threejs-postprocessing.svg" style="width: 600px"></div>
+
+<p><code class="notranslate" translate="no">RenderPass</code>に渡されたシーンは、まず<strong>rtA</strong>にレンダリングされ<strong>rtA</strong>は次のPassに渡されます。
+このPassは<strong>rtA</strong>を入力として使用し、<strong>rtB</strong>に結果を書き込みます。
+その後に<strong>rtB</strong>は次のPassに渡され、<strong>rtB</strong>を入力として使用し<strong>rtA</strong>に書き戻します。
+これは全てのPassを通ります。</p>
+<p>それぞれの <code class="notranslate" translate="no">Pass</code> には4つの基本的なオプションがあります。</p>
+<h2 id="-enabled-"><code class="notranslate" translate="no">enabled</code></h2>
+<p>このPassを使用するかどうか</p>
+<h2 id="-needsswap-"><code class="notranslate" translate="no">needsSwap</code></h2>
+<p>このPass終了後に <code class="notranslate" translate="no">rtA</code> と <code class="notranslate" translate="no">rtB</code> を入れ替えるかどうか</p>
+<h2 id="-clear-"><code class="notranslate" translate="no">clear</code></h2>
+<p>このPassをレンダリングする前にクリアするかどうか</p>
+<h2 id="-rendertoscreen-"><code class="notranslate" translate="no">renderToScreen</code></h2>
+<p>現在の出力先のレンダーターゲットではなく、キャンバスにレンダリングするかどうか。
+通常は <code class="notranslate" translate="no">EffectComposer</code> に追加する最後のPassでtrueに設定する必要があります。</p>
+<p>基本的な例をまとめてみましょう。
+まずは<a href="responsive.html">レスポンシブデザインの記事</a>から例を挙げてみます。</p>
+<p>そのためにまず <code class="notranslate" translate="no">EffectComposer</code> を作成します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const composer = new EffectComposer(renderer);
+</pre>
+<p>次に最初のPassとして <code class="notranslate" translate="no">RenderPass</code> を追加し、最初のレンダーターゲットにカメラを使ってシーンをレンダリングします。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">composer.addPass(new RenderPass(scene, camera));
+</pre>
+<p>次に <code class="notranslate" translate="no">BloomPass</code> を追加します。
+<code class="notranslate" translate="no">BloomPass</code> は一般的には入力を小さなレンダーターゲットにレンダリングし、結果にブラーをかけます。
+そして、元の入力の上にブラーされた結果を追加します。
+これでシーンに <em>ブルーム</em> をかけます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const bloomPass = new BloomPass(
+    1,    // strength
+    25,   // kernel size
+    4,    // sigma ?
+    256,  // blur render target resolution
+);
+composer.addPass(bloomPass);
+</pre>
+<p>最終的には、元の入力の上にノイズとスキャンラインを描画する <code class="notranslate" translate="no">FilmPass</code> ができました。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const filmPass = new FilmPass(
+    0.5,   // intensity
+    false,  // grayscale
+);
+composer.addPass(filmPass);
+</pre>
+<p>これらのクラスを使用するには、以下をインポートする必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {BloomPass} from 'three/addons/postprocessing/BloomPass.js';
+import {FilmPass} from 'three/addons/postprocessing/FilmPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+</pre>
+<p>ほとんどのポストプロセスには <code class="notranslate" translate="no">EffectComposer.js</code> と <code class="notranslate" translate="no">RenderPass.js</code> が必須です。</p>
+<p>最後に <a href="/docs/#api/ja/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> の代わりに <code class="notranslate" translate="no">EffectComposer.render</code> を使用し、<code class="notranslate" translate="no">EffectComposer</code> にキャンバスのサイズを合わせます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function render(now) {
+-  time *= 0.001;
++let then = 0;
++function render(now) {
++  now *= 0.001;  // convert to seconds
++  const deltaTime = now - then;
++  then = now;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
++    composer.setSize(canvas.width, canvas.height);
+  }
+
+  cubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+-    const rot = time * speed;
++    const rot = now * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+-  renderer.render(scene, camera);
++  composer.render(deltaTime);
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p><code class="notranslate" translate="no">EffectComposer.render</code> は <code class="notranslate" translate="no">deltaTime</code> で最後のフレームのレンダリング後からの時間を秒単位で受け取ります。
+deltaTimeをアニメーションしてる様々なエフェクトに渡します。
+今回は <code class="notranslate" translate="no">FilmPass</code> がアニメーションしています。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/postprocessing.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>実行時にエフェクトパラメーターを変更するには、uniformの値を設定する必要があります。
+パラメータを調整するためのGUIを追加してみましょう。
+どの値を調整できるか把握するには、以下のコードを調べる必要があります。</p>
+<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/BloomPass.js"><code class="notranslate" translate="no">BloomPass.js</code></a>の中でこの行を見つけました。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.copyUniforms[ "opacity" ].value = strength;
+</pre>
+<p>strengthを設定できます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">bloomPass.copyUniforms.opacity.value = someValue;
+</pre>
+<p>同様に<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>でこの行を見つけました。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.uniforms.intensity.value = intensity;
+this.uniforms.grayscale.value = grayscale;
+</pre>
+<p>これでどのように設定するか、かなり明確になりました。</p>
+<p>これらの値を設定する簡単なGUIを作ってみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
+</pre>
+<p>そして</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+{
+  const folder = gui.addFolder('BloomPass');
+  folder.add(bloomPass.copyUniforms.opacity, 'value', 0, 2).name('strength');
+  folder.open();
+}
+{
+  const folder = gui.addFolder('FilmPass');
+  folder.add(filmPass.uniforms.grayscale, 'value').name('grayscale');
+  folder.add(filmPass.uniforms.intensity, 'value', 0, 1).name('intensity');
+  folder.open();
+}
+</pre>
+<p>これで設定を調整できるようになりました。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing-gui.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/postprocessing-gui.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>これはあなた自身のエフェクトを作る小さな1歩です。</p>
+<p>ポストプロセスエフェクトではシェーダーを使用します。
+シェーダーは<a href="https://www.khronos.org/files/opengles_shading_language.pdf">GLSL (Graphics Library Shading Language)</a>と呼ばれる言語で書かれています。
+この記事では、GLSL言語全体を解説するのはあまりにも大きなトピックです。
+<a href="https://webglfundamentals.org/webgl/lessons/webgl-shaders-and-glsl.html">この記事</a>と<a href="https://thebookofshaders.com/">このシェーダーの本</a>を参考にしてみて下さい。</p>
+<p>サンプルがあると便利だと思うので、簡単なGLSLのポストプロセスのシェーダーを作ってみましょう。
+画像に色を乗算したものを作ります。</p>
+<p>Three.jsではポストプロセス用に <code class="notranslate" translate="no">ShaderPass</code> という便利なヘルパーを提供しています。
+頂点シェーダー、フラグメントシェーダー、デフォルト入力を定義した情報を持つオブジェクトを取得します。
+前のPassの結果を得るためにどのテクスチャから読み込むか、<code class="notranslate" translate="no">EffectComposer</code> のどこにレンダリングするかを設定します。</p>
+<p>前のPassの結果に色を乗算するシンプルなポストプロセスシェーダーです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const colorShader = {
+  uniforms: {
+    tDiffuse: { value: null },
+    color:    { value: new THREE.Color(0x88CCFF) },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1);
+    }
+  `,
+  fragmentShader: `
+    varying vec2 vUv;
+    uniform sampler2D tDiffuse;
+    uniform vec3 color;
+    void main() {
+      vec4 previousPassColor = texture2D(tDiffuse, vUv);
+      gl_FragColor = vec4(
+          previousPassColor.rgb * color,
+          previousPassColor.a);
+    }
+  `,
+};
+</pre>
+<p>上記の <code class="notranslate" translate="no">tDiffuse</code> は <code class="notranslate" translate="no">ShaderPass</code> が前のPassの結果テクスチャを渡す名前です。
+<code class="notranslate" translate="no">color</code> を Three.jsの <a href="/docs/#api/ja/math/Color"><code class="notranslate" translate="no">Color</code></a> として宣言します。</p>
+<p>次に頂点シェーダーが必要です。
+ポストプロセスでは上記コードの頂点シェーダーは標準的なものであり、ほとんど変更する必要はありません。
+あまり詳しく説明しませんが（上記のリンク先の記事を参照してください）、
+変数 <code class="notranslate" translate="no">uv</code>, <code class="notranslate" translate="no">projectionMatrix</code>, <code class="notranslate" translate="no">modelViewMatrix</code>, <code class="notranslate" translate="no">position</code> は全てThree.jsによって魔法のように追加されています。</p>
+<p>最後にフラグメントシェーダーを作成します。この中で前のPassのピクセルカラーを次の行で取得します。</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">vec4 previousPassColor = texture2D(tDiffuse, vUv);
+</pre>
+<p>これに色を掛けて <code class="notranslate" translate="no">gl_FragColor</code> を設定します。</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">gl_FragColor = vec4(
+    previousPassColor.rgb * color,
+    previousPassColor.a);
+</pre>
+<p>3つ色の設定用に簡単なGUIを追加します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+gui.add(colorPass.uniforms.color.value, 'r', 0, 4).name('red');
+gui.add(colorPass.uniforms.color.value, 'g', 0, 4).name('green');
+gui.add(colorPass.uniforms.color.value, 'b', 0, 4).name('blue');
+</pre>
+<p>色で乗算するシンプルなポストプロセスエフェクトができました。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing-custom.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/postprocessing-custom.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>GLSLやカスタムシェーダーの詳細は、ネット上にたくさんの記事があります。
+WebGL自体がどのように動作するかを知りたいならば、<a href="https://webglfundamentals.org">これらの記事</a>をチェックしてみて下さい。
+もう1つの素晴らしいリソースは、<a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/shaders">THREE.jsレポートの既存ポストプロセスシェーダーを読み解く</a>事です。
+複雑なものもいくつかありますが、小さいものから始めるとどのように動作するかのアイデアを得る事ができます。</p>
+<p>残念ながらThree.jsレポートにあるほとんどのポストプロセスエフェクトは文書化されていないので、使用するには<a href="https://github.com/mrdoob/three.js/tree/master/examples">この例</a>か
+<a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/postprocessing">エフェクト自体のコード</a>を読んで下さい。
+これらのシンプルな例と<a href="rendertargets.html">レンダーターゲット</a>の記事がポストプロセスを始めるのに十分な知識を提供してくれると思います。</p>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

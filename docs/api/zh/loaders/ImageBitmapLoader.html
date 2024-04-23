@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -13,27 +12,20 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			一个把[page:Image]加载为[link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap]的加载器。
+			一个把[page:Image]加载为[link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap]的加载器。
 			ImageBitmap提供了一种异步且有效的资源的途径，用于在WebGL中渲染的纹理。<br/>
 			不像[page:FileLoader], [name]无需避免对同一的URL进行多次请求。
 		</p>
 
 		<p>
-			Note that [page:Texture.flipY] and [page:Texture.premultiplyAlpha] with [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap] are ignored.
-			[link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap] needs these configuration on bitmap creation
-			unlike regular images need them on uploading to GPU. You need to set the equivalent options via [page:ImageBitmapLoader.setOptions]
-			instead. Refer to [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#6.10 WebGL specification] for the detail.
+			值得注意的是 [page:Texture.flipY] 和 [page:Texture.premultiplyAlpha] 在 [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap] 中会被忽略。不像常规图像上传到 GPU 时需要这些配置，[link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap] 是创建位图时需要它们。比如你需要通过 [page:ImageBitmapLoader.setOptions] 来设置等效的选项。详情请参阅 [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#6.10 WebGL specification] 规范。
 		</p>
 
-		<h2>例子</h2>
-
-		<p>
-			[example:webgl_loader_imagebitmap WebGL / loader / ImageBitmap]
-		</p>
+		<h2>代码示例</h2>
 
 		<code>
 		// 初始化一个加载器
-		var loader = new THREE.ImageBitmapLoader();
+		const loader = new THREE.ImageBitmapLoader();
 
 		// set options if needed
 		loader.setOptions( { imageOrientation: 'flipY' } );
@@ -45,8 +37,8 @@
 
 			// onLoad回调
 			function ( imageBitmap ) {
-				var texture = new THREE.CanvasTexture( imageBitmap );
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				const texture = new THREE.CanvasTexture( imageBitmap );
+				const material = new THREE.MeshBasicMaterial( { map: texture } );
 			},
 
 			// 目前暂不支持onProgress的回调
@@ -59,6 +51,11 @@
 		);
 		</code>
 
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_loader_imagebitmap WebGL / loader / ImageBitmap]
+		</p>
 
 		<h2>构造函数</h2>
 
@@ -72,6 +69,11 @@
 		<h2>属性</h2>
 		<p>共有属性请参见其基类[page:Loader]。</p>
 
+		<h3>[property:Boolean isImageBitmapLoader]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 
 		<h3>[property:String options]</h3>
 		<p>一个可选对象，用来设置内部使用的[link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap]工厂方法，
@@ -80,7 +82,7 @@
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Loader]。</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 		[page:String url] — 文件的URL或者路径，也可以为
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
@@ -92,7 +94,7 @@
 			从URL中进行加载，并返回将包含数据的[page:ImageBitmap image]对象。
 		</p>
 
-		<h3>[method:ImageBitmapLoader setOptions]( [param:Object options] )</h3>
+		<h3>[method:this setOptions]( [param:Object options] )</h3>
 		<p>
 			设置[link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap]的选项对象。
 		</p>

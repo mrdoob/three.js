@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -35,18 +34,20 @@
 		其他的一些事物也可以使用四维向量进行表示，但以上这些是它在three.js中的常用用途。
 		</p>
 
-
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
-var a = new THREE.Vector4( 0, 1, 0, 0 );
+		const a = new THREE.Vector4( 0, 1, 0, 0 );
 
-//no arguments; will be initialised to (0, 0, 0, 1)
-var b = new THREE.Vector4( );
+		//no arguments; will be initialised to (0, 0, 0, 1)
+		const b = new THREE.Vector4( );
 
-var d = a.dot( b );
+		const d = a.dot( b );
 		</code>
 
+		<p>
+			对 [name] 实例进行遍历将按相应的顺序生成它的分量 (x, y, z, w)。
+		</p>
 
 		<h2>构造函数</h2>
 
@@ -62,6 +63,11 @@ var d = a.dot( b );
 
 
 		<h2>属性</h2>
+
+		<h3>[property:Boolean isVector4]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:Float x]</h3>
 
@@ -141,8 +147,7 @@ var d = a.dot( b );
 
 		<h3>[method:this divideScalar]( [param:Float s] )</h3>
 		<p>
-		将该向量除以标量[page:Float s]。<br />
-		如果传入的[page:Float s] = 0，则向量将被设置为*( 0, 0, 0, 0 )*。
+		将该向量除以标量[page:Float s]。
 		</p>
 
 		<h3>[method:Float dot]( [param:Vector4 v] )</h3>
@@ -242,6 +247,9 @@ var d = a.dot( b );
 		则将该值替换为对应的最小值。
 		</p>
 
+		<h3>[method:this multiply]( [param:Vector4 v] )</h3>
+		<p>将该向量与所传入的向量[page:Vector4 v]进行相乘。</p>
+
 		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
 		<p>将该向量与所传入的标量[page:Float s]进行相乘。</p>
 
@@ -256,9 +264,9 @@ var d = a.dot( b );
 		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
 		<p>设置该向量的[page:.x x]、[page:.y y]、[page:.z z]和[page:.w w]分量。</p>
 
-		<h3>[method:this setAxisAngleFromQuaternion]( [param:Quaterion q] )</h3>
+		<h3>[method:this setAxisAngleFromQuaternion]( [param:Quaternion q] )</h3>
 		<p>
-			[page:Quaterion q] - 归一化的[page:Quaterion]（四元数）<br /><br />
+			[page:Quaternion q] - 归一化的[page:Quaternion]（四元数）<br /><br />
 
 			将该向量的[page:.x x]、[page:.y y]和[page:.z z]分量设置为四元数的轴，
 			[page:.w w]分量设置为四元数的角度。
@@ -272,9 +280,9 @@ var d = a.dot( b );
 			将该向量的[page:.x x]、[page:.y y]和[page:.z z]设置为旋转轴，[page:.w w]为角度。
 		</p>
 
-		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
+		<h3>[method:this setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<p>
-		[page:Integer index] - 0、1或2。<br />
+		[page:Integer index] - 0、1、2 或 3。<br />
 		[page:Float value] - [page:Float]<br /><br />
 
 		若index为 0 则设置 [page:.x x] 值为 [page:Float value]。<br />
@@ -321,6 +329,11 @@ var d = a.dot( b );
 		[page:Integer offset] - （可选） 数组中元素的偏移量。<br /><br />
 
 		返回一个数组[x, y, z, w]，或者将x、y、z和w复制到所传入的[page:Array array]中。
+		</p>
+
+		<h3>[method:this random]()</h3>
+		<p>
+		将该向量的每个分量(x、y、z、w)设置为介于 0 和 1 之间的伪随机数，不包括 1。
 		</p>
 
 		<h2>源代码</h2>

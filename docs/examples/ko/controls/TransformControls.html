@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			해당 클래스는 DCC 툴인 블렌더의 상호 작용 모델과 비슷한 기능을 3D 공간에서 객체를 변환하는데 사용할 수 있습니다.
+			다른 컨트롤과 달리, 해당 기능은 카메라의 장면 변환을 의미하지 않습니다.<br /><br />
+
+			[name] 는 연결된 3D 객체가 씬(scene) 그래프의 일부 입니다.
+
+		</p>
+
+		<h2>수입</h2>
+
+		<p>
+			[name] 는 애드온이며 명시적으로 가져와야 합니다.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { TransformControls } from 'three/addons/controls/TransformControls.js';
+		</code>
+
+		<h2>예시</h2>
+
+		<p>[example:misc_controls_transform misc / controls / transform ]</p>
+
+		<h2>생성자</h2>
+
+		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+				[page:Camera camera]: 렌더링 된 장면의 카메라입니다.
+			</p>
+			<p>
+				[page:HTMLDOMElement domElement]: 이벤트 리스너에 사용되는 HTML 엘리먼트입니다.
+			<p>
+				새로운 [name] 객체를 생성합니다.
+			</p>
+		</p>
+
+		<h2>이벤트</h2>
+
+		<h3>change</h3>
+		<p>
+			어떤 유형 (객체 또는 속성 변경) 의 변경이 수행할 경우 호출됩니다. 속성 변경은 이벤트 리스너를 추가 할 수 있는 별도의 이벤트입니다.
+			이벤트의 타입은 "propertyname-changed" 입니다.
+		</p>
+
+		<h3>mouseDown</h3>
+		<p>
+			포인터 (마우스 / 터치)가 활성화되면 호출됩니다.
+		</p>
+
+		<h3>mouseUp</h3>
+		<p>
+			포인터 (마우스 / 터치)가 활성화되지 않으면 호출됩니다.
+		</p>
+
+		<h3>objectChange</h3>
+		<p>
+			제어 된 3D 객체가 변경되면 호출됩니다.
+		</p>
+
+		<h2>속성</h2>
+
+		<p>공통 속성은 [page:Object3D] 클래스를 참조하세요.</p>
+
+		<h3>[property:String axis]</h3>
+		<p>
+			현재 변환 축을 지정합니다.
+		</p>
+
+		<h3>[property:Camera camera]</h3>
+		<p>
+			렌더링 된 장면의 카메라를 지정합니다.
+		</p>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			HTMLDOMElement는 마우스 / 터치 이벤트를 사용하는데 이용됩니다. 이것은 생성자에 의해 설정되어야 합니다;
+			생성자를 통해 설정되지 않을 경우 새 이벤트 리스너에 설정되지 않습니다.
+		</p>
+
+		<h3>[property:Boolean dragging]</h3>
+		<p>
+			현재 드래그를 수행할건지 여부를 지정합니다. 해당 속성은 읽기전용 입니다.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			컨트롤의 활성화 여부를 지정합니다.
+		</p>
+
+		<h3>[property:String mode]</h3>
+		<p>
+			현재 변환 모드를 지정합니다. 해당 속성은 "translate", "roate" 및 "scale" 의 값을 지정할 수 있습니다. 기본값은 *translate* 입니다.
+		</p>
+
+		<h3>[property:Object3D object]</h3>
+		<p>
+			제어 될 3D 객체를 지정합니다.
+		</p>
+
+		<h3>[property:Number rotationSnap]</h3>
+		<p>
+			기본적으로, 3D 객체는 연속적으로 회전합니다. 해당 프로퍼티에 값을 설정하면 (라디안), 3D 객체를 각 단계별로 회전 할 때마다 정의할 수 있습니다. 기본값은 *null* 입니다.
+		</p>
+
+		<h3>[property:Boolean showX]</h3>
+		<p>
+			x축 헬퍼의 표시 여부를 결정합니다. 기본값은 *true* 입니다.
+		</p>
+
+		<h3>[property:Boolean showY]</h3>
+		<p>
+			y축 헬퍼의 표시 여부를 결정합니다. 기본값은 *true* 입니다.
+		</p>
+
+		<h3>[property:Boolean showZ]</h3>
+		<p>
+			z축 헬퍼의 표시 여부를 결정합니다. 기본값은 *true* 입니다.
+		</p>
+
+		<h3>[property:Number size]</h3>
+		<p>
+			helper UI의 크기를 조절합니다 (축/면). 기본값은 *1* 입니다.
+		</p>
+
+		<h3>[property:String space]</h3>
+		<p>
+			좌표 변환을 수행 되어질 공간을 지정합니다. 해당 속성은 "world" 및 "local" 의 값을 지정할 수 있습니다. 기본값은 *world* 입니다.
+		</p>
+
+		<h3>[property:Number translationSnap]</h3>
+		<p>
+			일반적으로, 3D 객체는 연속적으로 변환됩니다. 해당 프로퍼티에 값을 설정하면 (월드 단위), 3D 객체를 각 단계별로 변환 할 때마다 정의할 수 있습니다. 기본값은 *null* 입니다.
+		</p>
+
+		<h2>메소드</h2>
+
+		<p>일반적인 메소드는 [page:Object3D] 클래스를 참조하세요.</p>
+
+		<h3>[method:TransformControls attach] ( [param:Object3D object] )</h3>
+		<p>
+			<p>
+				[page:Object3D object]: 변환 되어지는 3D 객체 입니다.
+			</p>
+			<p>
+				변환해야하는 3D 객체를 설정하고 컨트롤 UI가 표시되도록합니다.
+			</p>
+		</p>
+
+		<h3>[method:TransformControls detach] ()</h3>
+		<p>
+			컨트롤에서 현재 3D 객체를 제거하고 helper UI를 보이지 않게합니다.
+		</p>
+
+		<h3>[method:undefined dispose] ()</h3>
+		<p>
+			컨트롤을 더이상 필요하지 않을 경우 호출해야 합니다.
+		</p>
+
+		<h3>[method:Raycaster getRaycaster] ()</h3>
+		<p>
+			사용자 상호 작용에 사용되는 [page:Raycaster] 객체를 반환합니다. 이 개체는의 모든 인스턴스간에 공유됩니다. TransformControls. [name] 의
+			[page:Object3D.layers .layers] 속성을 설정하면 [page:Raycaster] 의 [page:Raycaster.layers .layers] 속성을 일치하는
+			값으로 설정하거나 그렇지 않으면 [name] 예상대로 작동하지 않습니다.
+		</p>
+
+		<h3>[method:String getMode] ()</h3>
+		<p>
+			변환 모드를 반환합니다.
+		</p>
+
+		<h3>[method:undefined setMode] ( [param:String mode] )</h3>
+		<p>
+			<p>
+				[page:String mode]: 변환 모드를 가리킵니다.
+			</p>
+			<p>
+				변환 모드를 설정합니다.
+			</p>
+		</p>
+
+		<h3>[method:undefined setRotationSnap] ( [param:Number rotationSnap] )</h3>
+		<p>
+			<p>
+				[page:Number rotationSnap]: 회전 스냅를 가리킵니다.
+			</p>
+			<p>
+				회전 스냅를 설정합니다.
+			</p>
+		</p>
+
+		<h3>[method:undefined setSize] ( [param:Number size] )</h3>
+		<p>
+			<p>
+				[page:Number size]: helper UI의 크기를 가리킵니다.
+			</p>
+			<p>
+				helper UI의 크기를 설정합니다.
+			</p>
+		</p>
+
+		<h3>[method:undefined setSpace] ( [param:String space] )</h3>
+		<p>
+			<p>
+				[page:String space]: 어떤 좌표 공간으로 변환을 적용합니다.
+			</p>
+			<p>
+				변환될 좌표 공간을 설정합니다.
+			</p>
+		</p>
+
+		<h3>[method:undefined setTranslationSnap] ( [param:Number translationSnap] )</h3>
+		<p>
+			<p>
+				[page:Number translationSnap]: 변환 스냅을 가리킵니다.
+			</p>
+			<p>
+				변환 스냅을 설정합니다.
+			</p>
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/TransformControls.js examples/jsm/controls/TransformControls.js]
+		</p>
+	</body>
+</html>

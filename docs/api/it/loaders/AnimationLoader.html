@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Classe per il caricamento di [page:AnimationClip AnimationClip] in formato JSON.
+      Utilizza internamente il [page:FileLoader] per caricare i file.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		// istanzia un loader
+		const loader = new THREE.AnimationLoader();
+
+		// carica una risorsa
+		loader.load(
+			// URL della risorsa
+			'animations/animation.js',
+
+			// onLoad callback
+			function ( animations ) {
+				// animations è un array di AnimationClips
+			},
+
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+
+			// onError callback
+			function ( err ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — Il [page:LoadingManager loadingManager] del loader da utilizzare. Il valore predefinito è [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+
+		Crea un nuovo [name].
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Loader] per le proprietà comuni.</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Loader] per i metodi comuni.</p>
+
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — Il path o URL del file. Questo può anche essere un
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] — Verrà chiamato quando il caricamento sarà completato. L'argomento saranno le [page:AnimationClip animation clip] caricate.<br />
+		[page:Function onProgress] (opzionale) — Verrà chiamato durante il caricamento. L'argomento sarà l'istanza ProgressEvent, la quale contiene .[page:Boolean lengthComputable], 
+    .[page:Integer total] e .[page:Integer loaded]. Se il server non imposta l'header Content-Length; .[page:Integer total] sarà 0.<br />
+		[page:Function onError] (opzionale) — Verrà chiamato in caso di errori di caricamento.<br /><br />
+
+    Inizia il caricamento dall'url e passa l'animazione caricata a onLoad.
+		</p>
+
+		<h3>[method:Array parse]( [param:JSON json] )</h3>
+		<p>
+		[page:JSON json] — obbligatorio<br /><br />
+
+    Parsa l'oggetto JSON e restituisce un array di animation clip. Le singole clip nell'oggetto verranno
+    parsate con [page:AnimationClip.parse].
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -9,19 +9,6 @@
 			a {
 				color: #f00;
 			}
-			.ac {  /* prevent dat-gui from being selected */
-				-webkit-user-select: none;
-				-moz-user-select: none;
-				-ms-user-select: none;
-				user-select: none;
-			}
-			.no-pointer-events {
-				pointer-events: none;
-			}
-			.control-disabled {
-				color: #888;
-				text-decoration: line-through;
-			}
 		</style>
 	</head>
 	<body>
@@ -32,34 +19,43 @@
 			Note: crossfades are possible with blend weights being set to (1,0,0), (0,1,0) or (0,0,1)
 		</div>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			var scene, renderer, camera, stats;
-			var model, skeleton, mixer, clock;
+			let scene, renderer, camera, stats;
+			let model, skeleton, mixer, clock;
 
-			var crossFadeControls = [];
+			const crossFadeControls = [];
 
-			var idleAction, walkAction, runAction;
-			var idleWeight, walkWeight, runWeight;
-			var actions, settings;
+			let idleAction, walkAction, runAction;
+			let idleWeight, walkWeight, runWeight;
+			let actions, settings;
 
-			var singleStepMode = false;
-			var sizeOfNextStep = 0;
+			let singleStepMode = false;
+			let sizeOfNextStep = 0;
 
 			init();
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 100 );
 				camera.position.set( 1, 2, - 3 );
 				camera.lookAt( 0, 1, 0 );
 
@@ -69,11 +65,11 @@
 				scene.background = new THREE.Color( 0xa0a0a0 );
 				scene.fog = new THREE.Fog( 0xa0a0a0, 10, 50 );
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d, 3 );
 				hemiLight.position.set( 0, 20, 0 );
 				scene.add( hemiLight );
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
 				dirLight.position.set( - 3, 10, - 10 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.top = 2;
@@ -84,16 +80,16 @@
 				dirLight.shadow.camera.far = 40;
 				scene.add( dirLight );
 
-				// scene.add( new CameraHelper( light.shadow.camera ) );
+				// scene.add( new THREE.CameraHelper( dirLight.shadow.camera ) );
 
 				// ground
 
-				var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshPhongMaterial( { color: 0xcbcbcb, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				var loader = new GLTFLoader();
+				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/Soldier.glb', function ( gltf ) {
 
 					model = gltf.scene;
@@ -118,7 +114,7 @@
 
 					//
 
-					var animations = gltf.animations;
+					const animations = gltf.animations;
 
 					mixer = new THREE.AnimationMixer( model );
 
@@ -137,27 +133,26 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function createPanel() {
 
-				var panel = new GUI( { width: 310 } );
+				const panel = new GUI( { width: 310 } );
 
-				var folder1 = panel.addFolder( 'Visibility' );
-				var folder2 = panel.addFolder( 'Activation/Deactivation' );
-				var folder3 = panel.addFolder( 'Pausing/Stepping' );
-				var folder4 = panel.addFolder( 'Crossfading' );
-				var folder5 = panel.addFolder( 'Blend Weights' );
-				var folder6 = panel.addFolder( 'General Speed' );
+				const folder1 = panel.addFolder( 'Visibility' );
+				const folder2 = panel.addFolder( 'Activation/Deactivation' );
+				const folder3 = panel.addFolder( 'Pausing/Stepping' );
+				const folder4 = panel.addFolder( 'Crossfading' );
+				const folder5 = panel.addFolder( 'Blend Weights' );
+				const folder6 = panel.addFolder( 'General Speed' );
 
 				settings = {
 					'show model': true,
@@ -231,27 +226,6 @@
 				folder4.open();
 				folder5.open();
 				folder6.open();
-
-				crossFadeControls.forEach( function ( control ) {
-
-					control.classList1 = control.domElement.parentElement.parentElement.classList;
-					control.classList2 = control.domElement.previousElementSibling.classList;
-
-					control.setDisabled = function () {
-
-						control.classList1.add( 'no-pointer-events' );
-						control.classList2.add( 'control-disabled' );
-
-					};
-
-					control.setEnabled = function () {
-
-						control.classList1.remove( 'no-pointer-events' );
-						control.classList2.remove( 'control-disabled' );
-
-					};
-
-				} );
 
 			}
 
@@ -357,7 +331,7 @@
 
 				// Switch default / custom crossfade duration (according to the user's choice)
 
-				var duration = setCrossFadeDuration( defaultDuration );
+				const duration = setCrossFadeDuration( defaultDuration );
 
 				// Make sure that we don't go on in singleStepMode, and that all actions are unpaused
 
@@ -452,28 +426,30 @@
 
 			function updateCrossFadeControls() {
 
-				crossFadeControls.forEach( function ( control ) {
-
-					control.setDisabled();
-
-				} );
-
 				if ( idleWeight === 1 && walkWeight === 0 && runWeight === 0 ) {
 
-					crossFadeControls[ 1 ].setEnabled();
+					crossFadeControls[ 0 ].disable();
+					crossFadeControls[ 1 ].enable();
+					crossFadeControls[ 2 ].disable();
+					crossFadeControls[ 3 ].disable();
 
 				}
 
 				if ( idleWeight === 0 && walkWeight === 1 && runWeight === 0 ) {
 
-					crossFadeControls[ 0 ].setEnabled();
-					crossFadeControls[ 2 ].setEnabled();
+					crossFadeControls[ 0 ].enable();
+					crossFadeControls[ 1 ].disable();
+					crossFadeControls[ 2 ].enable();
+					crossFadeControls[ 3 ].disable();
 
 				}
 
 				if ( idleWeight === 0 && walkWeight === 0 && runWeight === 1 ) {
 
-					crossFadeControls[ 3 ].setEnabled();
+					crossFadeControls[ 0 ].disable();
+					crossFadeControls[ 1 ].disable();
+					crossFadeControls[ 2 ].disable();
+					crossFadeControls[ 3 ].enable();
 
 				}
 
@@ -508,7 +484,7 @@
 
 				// Get the time elapsed since the last frame, used for mixer update (if not in single step mode)
 
-				var mixerUpdateDelta = clock.getDelta();
+				let mixerUpdateDelta = clock.getDelta();
 
 				// If in single step mode, make one step and then do nothing (until the user clicks again)
 

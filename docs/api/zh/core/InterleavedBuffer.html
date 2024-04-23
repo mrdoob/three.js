@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,7 +15,7 @@
 			如下链接有对交叉存储更详细的介绍: [link:https://blog.tojicode.com/2011/05/interleaved-array-basics.html Interleaved array basics]
 		</p>
 
-		<h2>示例</h2>
+		<h2>例子</h2>
 
 		<p>[example:webgl_buffergeometry_points_interleaved webgl / buffergeometry / points / interleaved]</p>
 
@@ -46,27 +45,19 @@
 
 		<h3>[property:Object updateRange]</h3>
 		<p>
-			对象存储着需要更新的数据的偏移量和数量。
+			对象存储着需要更新的数据的偏移量和数量。<br />
+			- [page:Number offset]: 默认值为 *0*。<br />
+			- [page:Number count]: 默认值为 *-1*。<br />
 		</p>
 
-		<h3>[property:Number updateRange.offset]</h3>
+		<h3>[property:String uuid]</h3>
 		<p>
-			默认值为 *0*。
-		</p>
-
-		<h3>[property:Number updateRange.count]</h3>
-		<p>
-			默认值为 *-1*。
+		该类所创建的实例的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]。它是自动被指定的，因此它不应当被编辑、更改。
 		</p>
 
 		<h3>[property:Integer version]</h3>
 		<p>
 			版本号，每次 needsUpdate 属性设置为 true 时，版本号增加。
-		</p>
-
-		<h3>[property:Integer isInterleavedBuffer]</h3>
-		<p>
-			默认值为 *true*。
 		</p>
 
 		<h3>[property:Integer needsUpdate]</h3>
@@ -82,15 +73,15 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:InterleavedBuffer copy]( [param:InterleavedBuffer source] ) </h3>
+		<h3>[method:this copy]( [param:InterleavedBuffer source] ) </h3>
 		<p>
 			将参数指定的 [name] 拷贝到当前 [name]。
 		</p>
 
-		<h3>[method:InterleavedBuffer copyAt]( [param:Integer index1], [param:InterleavedBuffer attribute], [param:Integer index2] ) </h3>
+		<h3>[method:this copyAt]( [param:Integer index1], [param:InterleavedBuffer attribute], [param:Integer index2] ) </h3>
 		<p> 将数据从 attribute[index2] 拷贝到 [page:InterleavedBuffer.array array][index1]。</p>
 
-		<h3>[method:InterleavedBuffer set]( [param:TypedArray value], [param:Integer offset] ) </h3>
+		<h3>[method:this set]( [param:TypedArray value], [param:Integer offset] ) </h3>
 		<p>
 			value - 被拷贝的源（类型化）队列。<br/>
 			offset - 源队列中，数据开始拷贝的偏移量。默认值是 *0*.<br/><br />
@@ -98,13 +89,22 @@
 			将源队列数据拷贝到目标队列缓存中。
 		</p>
 
-		<h3>[method:InterleavedBuffer clone]() </h3>
+		<h3>[method:InterleavedBuffer clone]( [param:Object data] ) </h3>
 		<p>
-			克隆当前 [name]。
+			data - This object holds shared array buffers required for properly cloning geometries with interleaved attributes.<br/><br />
+
+			Creates a clone of this [name].
 		</p>
 
-		<h3>[method:BufferAttribute setUsage] ( [param:Usage value] ) </h3>
-		<p>Set [page:BufferAttribute.usage usage] to value.</p>
+		<h3>[method:this setUsage] ( [param:Usage value] ) </h3>
+		<p>Set [page:InterleavedBuffer.usage usage] to value.</p>
+
+		<h3>[method:Object toJSON]( [param:Object data] ) </h3>
+		<p>
+			data - This object holds shared array buffers required for properly serializing geometries with interleaved attributes.<br/><br />
+
+			Serializes this [name].
+		</p>
 
 		<h2>源代码</h2>
 

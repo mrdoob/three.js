@@ -1,107 +1,58 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- *
- * Film grain & scanlines shader
- *
- * - ported from HLSL to WebGL / GLSL
- * http://www.truevision3d.com/forums/showcase/staticnoise_colorblackwhite_scanline_shaders-t18698.0.html
- *
- * Screen Space Static Postprocessor
- *
- * Produces an analogue noise overlay similar to a film grain / TV static
- *
- * Original implementation and noise algorithm
- * Pat 'Hawthorne' Shearon
- *
- * Optimized scanlines + noise version with intensity scaling
- * Georg 'Leviathan' Steinrohder
- *
- * This version is provided under a Creative Commons Attribution 3.0 License
- * http://creativecommons.org/licenses/by/3.0/
- */
+const FilmShader = {
 
-
-
-var FilmShader = {
+	name: 'FilmShader',
 
 	uniforms: {
 
-		"tDiffuse": { value: null },
-		"time": { value: 0.0 },
-		"nIntensity": { value: 0.5 },
-		"sIntensity": { value: 0.05 },
-		"sCount": { value: 4096 },
-		"grayscale": { value: 1 }
+		'tDiffuse': { value: null },
+		'time': { value: 0.0 },
+		'intensity': { value: 0.5 },
+		'grayscale': { value: false }
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
 
-		"varying vec2 vUv;",
+		varying vec2 vUv;
 
-		"void main() {",
+		void main() {
 
-		"	vUv = uv;",
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		"}"
+		}`,
 
-	].join( "\n" ),
+	fragmentShader: /* glsl */`
 
-	fragmentShader: [
+		#include <common>
 
-		"#include <common>",
+		uniform float intensity;
+		uniform bool grayscale;
+		uniform float time;
 
-		// control parameter
-		"uniform float time;",
+		uniform sampler2D tDiffuse;
 
-		"uniform bool grayscale;",
+		varying vec2 vUv;
 
-		// noise effect intensity value (0 = no effect, 1 = full effect)
-		"uniform float nIntensity;",
+		void main() {
 
-		// scanlines effect intensity value (0 = no effect, 1 = full effect)
-		"uniform float sIntensity;",
+			vec4 base = texture2D( tDiffuse, vUv );
 
-		// scanlines effect count value (0 = no effect, 4096 = full effect)
-		"uniform float sCount;",
+			float noise = rand( fract( vUv + time ) );
 
-		"uniform sampler2D tDiffuse;",
+			vec3 color = base.rgb + base.rgb * clamp( 0.1 + noise, 0.0, 1.0 );
 
-		"varying vec2 vUv;",
+			color = mix( base.rgb, color, intensity );
 
-		"void main() {",
+			if ( grayscale ) {
 
-		// sample the source
-		"	vec4 cTextureScreen = texture2D( tDiffuse, vUv );",
+				color = vec3( luminance( color ) ); // assuming linear-srgb
 
-		// make some noise
-		"	float dx = rand( vUv + time );",
+			}
 
-		// add noise
-		"	vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx, 0.0, 1.0 );",
+			gl_FragColor = vec4( color, base.a );
 
-		// get us a sine and cosine
-		"	vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );",
-
-		// add scanlines
-		"	cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * sIntensity;",
-
-		// interpolate between source and result by intensity
-		"	cResult = cTextureScreen.rgb + clamp( nIntensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );",
-
-		// convert to grayscale if desired
-		"	if( grayscale ) {",
-
-		"		cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );",
-
-		"	}",
-
-		"	gl_FragColor =  vec4( cResult, cTextureScreen.a );",
-
-		"}"
-
-	].join( "\n" )
+		}`,
 
 };
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created by User:Pietn for Wikipedia -->
+<svg width="105" height="85" version="1.1" 
+ xmlns="http://www.w3.org/2000/svg" 
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <title>...</title>
+ <defs>
+   <circle r="30" id="schijf" />
+ </defs>
+ <use x="35" y="35" xlink:href="#schijf" fill="darkorchid" />
+ <use x="70" y="50" xlink:href="#schijf" fill="orangered" />
+</svg>

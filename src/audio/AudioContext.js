@@ -1,12 +1,8 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+let _context;
 
-var _context;
+class AudioContext {
 
-var AudioContext = {
-
-	getContext: function () {
+	static getContext() {
 
 		if ( _context === undefined ) {
 
@@ -16,14 +12,14 @@ var AudioContext = {
 
 		return _context;
 
-	},
+	}
 
-	setContext: function ( value ) {
+	static setContext( value ) {
 
 		_context = value;
 
 	}
 
-};
+}
 
 export { AudioContext };

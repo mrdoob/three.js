@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,17 +15,15 @@
 			模拟3维包围盒 [page:Box3] 的辅助对象.
 		</p>
 
-
-		<h2>例子</h2>
+		<h2>代码示例</h2>
 
 		<code>
-		var box = new THREE.Box3();
+		const box = new THREE.Box3();
 		box.setFromCenterAndSize( new THREE.Vector3( 1, 1, 1 ), new THREE.Vector3( 2, 1, 3 ) );
 
-		var helper = new THREE.Box3Helper( box, 0xffff00 );
+		const helper = new THREE.Box3Helper( box, 0xffff00 );
 		scene.add( helper );
 		</code>
-
 
 		<h2>构造函数</h2>
 
@@ -50,7 +47,7 @@
 		<p>请到基类 [page:LineSegments] 页面查看公共方法.</p>
 
 
-		<h3>[method:void updateMatrixWorld]( [param:Boolean force] )</h3>
+		<h3>[method:undefined updateMatrixWorld]( [param:Boolean force] )</h3>
 		<p>
 			重写基类 [page:Object3D] 的该方法以便于
 			同时更新线框辅助对象与 [page:Box3Helper.box .box]

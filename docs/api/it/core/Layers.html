@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Un oggetto [page:Layers] assegna un [page:Object3D] a 1 o più di 32 layer numerati da `0` a `31`
+      - internamente i layer sono memorizzati come una [link:https://en.wikipedia.org/wiki/Mask_(computing) maschera di bit],
+      e, per impostazione predefinita, tutti gli Object3D sono membri del leyer 0.<br /><br />
+
+      Può essere utilizzato per controllare la visibilità - un oggetto deve condividere un layer con una [page:Camera telecamera] per
+      essere visibile quando la vista della telecamera viene renderizzata.<br /><br />
+
+      Tutte le classi che ereditano da [page:Object3D] hanno una proprietà [page:Object3D.layers] che è un'istanza della classe.
+		</p>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_layers WebGL / layers]
+		</p>
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+      Crea un nuovo oggetto Layers, con l'appartenenza inizialmente impostata al layer 0.
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Integer mask]</h3>
+		<p>
+      Una maschera di bit che memorizza a quale dei 32 layer questo oggetto layer è attualmente membro.
+		</p>
+
+
+		<h2>Metodi</h2>
+
+		<h3>[method:undefined disable]( [param:Integer layer] )</h3>
+		<p>
+			layer - un intero da 0 a 31.<br /><br />
+
+      Elimina l'appartenenza a questo `layer`.
+		</p>
+
+		<h3>[method:undefined enable]( [param:Integer layer] )</h3>
+		<p>
+			layer - un intero da 0 a 31.<br /><br />
+
+      Aggiunge l'appartenenza a questo `layer`.
+		</p>
+
+		<h3>[method:undefined set]( [param:Integer layer] )</h3>
+		<p>
+			layer - un intero da 0 a 31.<br /><br />
+
+      Imposta l'appartenza a `layer`, e rimuove l'appartenza a tutti gli altri layer.
+		</p>
+
+		<h3>[method:Boolean test]( [param:Layers layers] )</h3>
+		<p>
+			layers - un oggetto Layers<br /><br />
+
+      Restituisce true se questo e l'oggetto `layers` passato hanno al più un layer in comune.
+		</p>
+
+		<h3>[method:Boolean isEnabled]( [param:Integer layer] )</h3>
+		<p>
+			layer - un intero da 0 a 31.<br /><br />
+
+      Restituisce true se il dato layer è abilitato.
+		</p>
+
+		<h3>[method:undefined toggle]( [param:Integer layer] )</h3>
+		<p>
+			layer - un intero da 0 a 31.<br /><br />
+
+      Attiva/disattiva l'appartenenza al `layer`.
+		</p>
+
+		<h3>[method:undefined enableAll]()</h3>
+		<p>
+      Aggiunge l'appartenza a tutti i layer.
+		</p>
+
+		<h3>[method:undefined disableAll]()</h3>
+		<p>
+      Rimuove l'appartenenza da tutti i layer.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

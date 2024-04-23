@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr; [page:LatheGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name] est une classe de géométrie pour une capsule avec des rayons et une hauteur donnés.
+			Elle est construite à l'aide de demi-shpères.
+		</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#CapsuleGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Exemple de code : </h2>
+
+		<code>const geometry = new THREE.CapsuleGeometry( 1, 1, 4, 8 );
+		const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+		const capsule = new THREE.Mesh( geometry, material );
+		scene.add( capsule );
+		</code>
+
+		<h2>Constructeur</h2>
+
+		<h3>[name]([param:Float radius], [param:Float length], [param:Integer capSegments], [param:Integer radialSegments])</h3>
+		<p>
+
+		radius — Rayon de la capsule. Optionnel; par défaut à 1.<br />
+		length — Longueur de la section médiane. Optionnel; par défaut à 1.<br />
+		capSegments — Nombre de segments de courbe utilisés pour construire les demi-sphères. Optionnel; par défaut à 4.<br />
+		radialSegments — Nombre de faces segmentées autour de la circonférence de la capsule. Optionnel; par défaut à 8.<br />
+		</p>
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les propriétés communes.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		Un objet avec une propriété pour chacun des paramètres du constructeur. Toute modification après instanciation ne change pas la géométrie.
+		</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les méthodes communes.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

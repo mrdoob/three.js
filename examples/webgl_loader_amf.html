@@ -13,22 +13,26 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<a href="http://amf.wikispaces.com" target="_blank" rel="noopener">AMF File format</a>
-			<div>AMF loader test by <a href="https://github.com/tamarintech" target="_blank" rel="noopener">tamarintech</a></div>
-			<div>Rook manufacturing file from <a href="http://amf.wikispaces.com/AMF+test+files" target="_blank" rel="noopener">AMF test files</a></div>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - AMF loader
 		</div>
 
-		<script src="js/libs/jszip.min.js"></script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { AMFLoader } from './jsm/loaders/AMFLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { AMFLoader } from 'three/addons/loaders/AMFLoader.js';
 
-			var camera, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
 
@@ -46,11 +50,11 @@
 				camera.up.set( 0, 0, 1 );
 				camera.position.set( 0, - 9, 6 );
 
-				camera.add( new THREE.PointLight( 0xffffff, 0.8 ) );
+				camera.add( new THREE.PointLight( 0xffffff, 250 ) );
 
 				scene.add( camera );
 
-				var grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
+				const grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
 				grid.rotateOnAxis( new THREE.Vector3( 1, 0, 0 ), 90 * ( Math.PI / 180 ) );
 				scene.add( grid );
 
@@ -59,7 +63,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				var loader = new AMFLoader();
+				const loader = new AMFLoader();
 				loader.load( './models/amf/rook.amf', function ( amfobject ) {
 
 					scene.add( amfobject );
@@ -67,12 +71,13 @@
 
 				} );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
-				controls.target.set( 0, 1.2, 2 );
+				controls.target.set( 0, 0, 2 );
+				controls.enableZoom = false;
 				controls.update();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

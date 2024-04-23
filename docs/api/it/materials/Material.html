@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Classe base astratta per i materiali.<br /><br />
+
+			I materiali descrivono l'aspetto degli [page:Object oggetti].
+			Sono definiti in modo (spesso) indipendente dal renderer, quindi non devi 
+			riscrivere i materiali se decidi di usare un renderer diverso.<br /><br />
+
+			Le proprietà e i metodi seguenti vengono ereditati da tutti gli altri tipi di materiale
+			(sebbene possano avere impostazioni predefinite diverse).
+		</p>
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]()</h3>
+		<p>Questo crea un materiale generico.</p>
+
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Boolean alphaHash]</h3>
+		<p>
+			Enables alpha hashed transparency, an alternative to [page:.transparent] or [page:.alphaTest].
+			The material will not be rendered if opacity is lower than a random threshold.
+			Randomization introduces some grain or noise, but approximates alpha blending without
+			the associated problems of sorting. Using TAARenderPass can reduce the resulting noise.
+		</p>
+
+		<h3>[property:Float alphaTest]</h3>
+		<p>
+			Imposta il valore alfa per essere usato quando vengono eseguiti i test alfa.
+			Il materiale non sarà renderizzato se l'opacità è inferiore a questo valore.
+			Il valore predefinito è `0`.
+		</p>
+
+		<h3>[property:Boolean alphaToCoverage]</h3>
+		<p>
+			Abilita l'alfa alla copertura. Può essere utilizzato solo con contesti abilitati per MSAA (ovvero quando il renderer è stato creato con 
+			il parametro `antialias` impostato a `true`).
+			Il valore predefinito è `false`.
+		</p>
+
+		<h3>[property:Integer blendDst]</h3>
+		<p>
+			Destinazione di fusione. Il valore predefinito è [page:CustomBlendingEquation OneMinusSrcAlphaFactor].
+			Vedi le [page:CustomBlendingEquation costanti] dei fattori di destinazione per tutti i valori possibili.<br />
+			La [page:Constant fusione] del materiale deve essere impostata a [page:Materials CustomBlending] affinché 
+			ciò abbia effetto.
+		</p>
+
+		<h3>[property:Integer blendDstAlpha]</h3>
+		<p>La trasparenza del [page:.blendDst]. Usa [page:.blendDst] se il valore è null. Il valore predefinito è `null`.</p>
+
+		<h3>[property:Integer blendEquation]</h3>
+		<p>
+			Equazione di fusione da utilizzare quando si applica la fusione. Il valore predefinito è [page:CustomBlendingEquation AddEquation].
+			Vedi le [page:CustomBlendingEquation costanti] dell'equazione di fusione per tutti i valori possibili.<br />
+			La [page:Constant fusione] del materiale deve essere impostata a [page:Materials CustomBlending] affinché 
+			ciò abbia effetto.
+		</p>
+
+		<h3>[property:Integer blendEquationAlpha]</h3>
+		<p>La trasparenza del [page:.blendEquation]. Usa [page:.blendEquation] se il valore è null. Il valore predefinito è `null`.</p>
+
+		<h3>[property:Blending blending]</h3>
+		<p>
+			Indica quale fusione utilizzare quando gli oggetti vengono mostrati con questo materiale.<br />
+			Questa proprietà deve essere impostata a [page:Materials CustomBlending] per usare 
+			[page:Constant blendSrc], [page:Constant blendDst] o [page:Constant blendEquation] personalizzati.<br />
+			Vedi le [page:Materials costanti] del metodo di fusione per tutti i valori possibili. Il valore predefinito è [page:Materials NormalBlending].
+		</p>
+
+		<h3>[property:Integer blendSrc]</h3>
+		<p>
+			Sorgente di fusione. Il valore predefinito è [page:CustomBlendingEquation SrcAlphaFactor].
+			Vedi le [page:CustomBlendingEquation costanti] dei fattori della sorgente per tutti i valori possibili.<br />
+			La [page:Constant fusione] del materiale deve essere impostata a [page:Materials CustomBlending] affinché ciò abbia effetto.
+		</p>
+
+		<h3>[property:Integer blendSrcAlpha]</h3>
+		<p>La trasparenza del [page:.blendSrc]. Usa [page:.blendSrc] se il valore è null. Il valore predefinito è `null`.</p>
+
+		<h3>[property:Boolean clipIntersection]</h3>
+		<p>
+			Modifica il comportamento dei piani di taglio così che solo la loro intersezione sia ritagliata, piuttosto che la loro unione.
+			Il valore predefinito è `false`.
+		</p>
+
+		<h3>[property:Array clippingPlanes]</h3>
+		<p>
+			Piani di taglio definiti dall'utente e specificati come ogetti THREE.Plane nello spazio world.
+			Questi piani si applicano agli oggetti ai quali è attaccato questo materiale.
+			I punti nello spazio la cui distanza con segno dal piano è negativa vengono ritagliati (non renderizzati).
+			Questo richiede che [page:WebGLRenderer.localClippingEnabled] sia impostato a `true`.
+			Vedi l'esempio [example:webgl_clipping_intersection WebGL / clipping /intersection].
+			Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Boolean clipShadows]</h3>
+		<p>
+			Definisce se ritagliare le ombre in base ai piani di ritaglio specificati su questo materiale. L'impostazione predefinita è `false`.
+		</p>
+
+		<h3>[property:Boolean colorWrite]</h3>
+		<p>
+			Indica se visualizzare il colore del materiale.
+			Può essere utilizzato insieme alla proprietà [page:Integer renderOrder] di una mesh per creare oggetti invisibili che occludono altri oggetti.
+			Il valore predefinito è `true`.
+		</p>
+
+		<h3>[property:Object defines]</h3>
+		<p>
+			Definizioni personalizzate da iniettare nello shader. Questi vengono passati nella forma di un oggetto letterale,
+			con la coppia chiave/valore. `{ MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }`.
+			Le coppie sono definite in entrambi gli shader, vertex e fragment. Il valore predefinito è `undefined`.
+		</p>
+
+		<h3>[property:Integer depthFunc]</h3>
+		<p>
+			Indica quale funzione di profondità utilizzare. Il valore predefinito è [page:Materials LessEqualDepth]. Vedi 
+			le [page:Materials costanti] del metodo di profondità per tutti i valori possibili.
+		</p>
+
+		<h3>[property:Boolean depthTest]</h3>
+		<p>
+			Indica se abilitare il test di profondità durante la visualizzazione di questo materiale. Il valore predefinito è `true`.
+		</p>
+
+		<h3>[property:Boolean depthWrite]</h3>
+		<p>
+			Indica se il rendering di questo materiale ha qualche effetto sul buffer di profondità. Il valore predefinito è `true`.<br /><br />
+
+			Quando si disegnano sovrapposizioni 2D può essere utile disabilitare la scrittura di profondità per sovrapporre più
+			cose insieme senza creare artefatti z.index.
+		</p>
+
+		<h3>[property:Boolean forceSinglePass]</h3>
+		<p>
+		Whether double-sided, transparent objects should be rendered with a single pass or not. Default is `false`.<br /><br />
+
+		The engine renders double-sided, transparent objects with two draw calls (back faces first, then front faces) to mitigate transparency artifacts.
+		There are scenarios however where this approach produces no quality gains but still doubles draw calls e.g. when rendering flat vegetation like grass sprites. 
+		In these cases, set the `forceSinglePass` flag to `true` to disable the two pass rendering to avoid performance issues.
+		</p>
+
+		<h3>[property:Boolean isMaterial]</h3>
+		<p>
+			Flag di sola lettura per  verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:Boolean stencilWrite]</h3>
+		<p>
+			Indica se le operazioni di stencil vengono eseguite sul buffer di stencil. Per seguire scritture o confronti con il buffer dello stencil,
+			questo valore deve essere `true`. Il valore predefinito è `false`.
+		</p>
+
+		<h3>[property:Integer stencilWriteMask]</h3>
+		<p>
+			La maschera bit da utilizzare durante la scrittura nel buffer dello stencil. Il valore predefinito è `0xFF`.
+		</p>
+
+		<h3>[property:Integer stencilFunc]</h3>
+		<p>
+			La funzione di confronto dello stencil da utilizzare.
+			Il valore predefinito è [page:Materials AlwaysStencilFunc].
+			Vedi le [page:Materials costanti] della funzione stencil per tutti i possibili valori.
+		</p>
+
+		<h3>[property:Integer stencilRef]</h3>
+		<p>
+			Il valore da utilizzare quando si eseguono confronti di stencil o operazioni di stencil. Il valore predefinito è `0`.
+		</p>
+
+		<h3>[property:Integer stencilFuncMask]</h3>
+		<p>
+			La maschera bit da utilizzare durante il confronto con il buffer dello stencil. Il valore predefinito è `0xFF`.
+		</p>
+
+		<h3>[property:Integer stencilFail]</h3>
+		<p>
+			Quale operazione stencil eseguire quando la funzione di confronto ritorna false.
+			Il valore predefinito è [page:Materials KeepStencilOp]. Vedi le [page:Materials costanti] delle operazioni stencil per tutti i possbili valori.
+		</p>
+
+		<h3>[property:Integer stencilZFail]</h3>
+		<p>
+			Quale operazione stencil eseguire quando la funzione di confronto ritorna true ma il test di profondità fallisce.
+			Il valore predefinito è [page:Materials KeepStencilOp]. Vedi le [page:Materials costanti] delle operazioni stencil per tutti i possbili valori.
+		</p>
+
+		<h3>[property:Integer stencilZPass]</h3>
+		<p>
+			Quale operazione stencil eseguire quando la funzione di confronto ritorna true ma il test di profondità termina con successo.
+			Il valore predefinito è [page:Materials KeepStencilOp]. Vedi le [page:Materials costanti] delle operazioni stencil per tutti i possbili valori.
+		</p>
+
+		<h3>[property:Integer id]</h3>
+		<p>Numero univoco per questa istanza di materiale.</p>
+
+		<h3>[property:String name]</h3>
+		<p>Nome opzionale dell'oggetto (non è necessario che sia univoco). Il valore predefinito è una stringa vuota.</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+			Specifica che il materiale ha bisogno di essere ricompilato.
+		</p>
+
+		<h3>[property:Float opacity]</h3>
+		<p>
+			Float nell'intervallo `0.0` - `1.0` indicando quanto è trasparente il materiale.
+			Un valore di `0.0` indica che il materiale è completamente trasparente, `1.0` è completamente opaco.<br />
+			Se la proprietà [page:Boolean transparent] del materiale non è impostato a `true`, il materiale rimarrà 
+			completamente opaco e questo valore influirà solo sul suo colore.<br />
+			Il valore predefinito è `1.0`.
+		</p>
+
+		<h3>[property:Boolean polygonOffset]</h3>
+		<p>
+			Indica se utilizzare l'offset dei poligoni. Il valore predefinito è `false`. Corrisponde alla funzione WebGL `GL_POLYGON_OFFSET_FILL`.
+		</p>
+
+		<h3>[property:Integer polygonOffsetFactor]</h3>
+		<p>Imposta il fattore di offset del poligono. Il valore predefinito è `0`.</p>
+
+		<h3>[property:Integer polygonOffsetUnits]</h3>
+		<p>Imposta le unità di offset del poligono. Il valore predefinito è `0`.</p>
+
+		<h3>[property:String precision]</h3>
+		<p>
+			Sovrascrive la precisione predefinita del renderer per questo materiale. Può essere `"highp"`, `"mediump"` or `"lowp"`.
+			Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Boolean premultipliedAlpha]</h3>
+		<p>
+			Indica se moltiplicare il valore alfa (trasparenza).
+			Vedi [Example:webgl_materials_physical_transmission WebGL / Materials / Physical / Transmission] per un esempio della differenza.
+			Il valore predefinito è `false`.
+		</p>
+
+		<h3>[property:Boolean dithering]</h3>
+		<p>
+			Indica se applicare il dithering al colore per rimuovere l'aspetto delle bande. 
+			Il valore predefinito è `false`.
+		</p>
+
+		<h3>[property:Integer shadowSide]</h3>
+		<p>
+			Definisce quale lato delle facce proietta le ombre.
+			Quando impostato, può essere [page:Materials THREE.FrontSide], [page:Materials THREE.BackSide], o [page:Materials THREE.DoubleSide].
+			Il valore predefinito è `null`. <br />
+			Se `null`, le ombre di proiezione lateriali sono determinate come segue:<br />
+
+		<table>
+			<thead>
+				<tr>
+					<th>[page:Material.side]</th>
+					<th>Ombre proiettate lateralmente</th>
+				</tr>
+			</thead>
+			<tbody>
+
+				<tr>
+					<td>THREE.FrontSide</td>
+					<td>lato posteriore</td>
+				</tr>
+				<tr>
+					<td>THREE.BackSide</td>
+					<td>lato frontale</td>
+				</tr>
+				<tr>
+					<td>THREE.DoubleSide</td>
+					<td>entrambi i lati</td>
+				</tr>
+			</tbody>
+		</table>
+
+
+		</p>
+
+		<h3>[property:Integer side]</h3>
+		<p>
+			Definisce quale lato delle facce sarà visualizzato - frontale, posteriore o entrambi.
+			Il valore predefinito è [page:Materials THREE.FrontSide].
+			Altre opzioni sono [page:Materials THREE.BackSide] e [page:Materials THREE.DoubleSide].
+		</p>
+
+		<h3>[property:Boolean toneMapped]</h3>
+		<p>
+			Definisce se questo materiale è mappato sui toni secondo l'impostazione [page:WebGLRenderer.toneMapping toneMapping] del renderer.
+			L'impostazione predefinita è `true`.
+		</p>
+
+		<h3>[property:Boolean transparent]</h3>
+		<p>
+			Definisce se questo materiale è trasparente. Ciò a effetto sul rendering
+			poiché gli oggetti trasparenti richiedono un trattamento speciale e vengono 
+			visualizzati dopo gli oggetti non trasparenti.<br />
+			Quando impostato a true, la misura in cui il materiale è trasparente è controllata impostando
+			la sua proprietà di [page:Float opacity].<br />
+			Il valore predefinito è `false`.
+		</p>
+
+		<h3>[property:String type]</h3>
+		<p>
+			Il valore è la stringa 'Material'. Non può essere cambiato, e può essere utilizzato 
+			per trovare tutti gli oggetti di questo tipo nella scena.
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] di questa istanza di materiale.
+		Questo viene assegnato automaticamente, quindi non dovrebbe essere modificato.
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>
+			Parte da `0` e conta quante volte [page:Material.needsUpdate .needsUpdate] è impostato a `true`.
+		</p>
+
+		<h3>[property:Boolean vertexColors]</h3>
+		<p>
+			Definisce se viene utilizzata la colorazione dei vertici. Il valore predefinito è `false`.
+			The engine supports RGB and RGBA vertex colors depending on whether a three (RGB) or four (RGBA) component color buffer attribute is used.
+		</p>
+
+		<h3>[property:Boolean visible]</h3>
+		<p>
+			Definisce se questo materiale è visibile. Il valore predefinito è `true`.
+		</p>
+
+		<h3>[property:Object userData]</h3>
+		<p>
+			Un oggetto che può essere utilizzato per memorizzare dati personalizzati sul materiale. Non dovrebbe 
+			contenere riferimenti a funzioni poiché queste non verranno clonate.
+		</p>
+
+		<h2>Metodi</h2>
+
+		<p>I metodi [page:EventDispatcher EventDispatcher] sono disponibili in questa classe.</p>
+
+		<h3>[method:Material clone]( )</h3>
+		<p>Restituisce un nuovo materiale con gli stessi parametri di questo materiale.</p>
+
+		<h3>[method:this copy]( [param:material material] )</h3>
+		<p>Copia i parametri dal materiale passato in questo materiale.</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Libera le risorse relative alla GPU allocate da questa istanza.
+			Chiama questo metodo ogni volta che questa istanza non è più utilizzata nella tua app. <br /><br />
+
+			Le texture del materiale devono essere liberate dal metodo dispose() della [page:Texture Texture].
+		</p>
+
+		<h3>[method:undefined onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
+		<p>
+			Una callback opzionale che viene eseguita immediatamente prima che il programma shader sia compilato.
+			Questa funzione viene chiamata con il codice sorgente dello shader come parametro.
+			Utile per la modifica di materiali build-in.
+		</p>
+		<p>
+			A differenza delle proprietà, la callback non è supportata da [page:Material.clone .clone](), [page:Material.copy .copy]() e [page:Material.toJSON .toJSON]().
+		</p>
+
+		<h3>[method:String customProgramCacheKey]()</h3>
+		<p>
+			Nel caso in cui onBeforeCompile sia utilizzato, questa callback può essere utilizzata per identificare i valori delle impostazioni utilizzati
+			nel onBeforeCompile, quindi three.js può riutilizzare uno shader memorizzato nella cache o ricompilare lo shader per questo materiale secondo 
+			necessità.
+		</p>
+
+		<p>
+			Per esempio, se onBeforeCompile contiene un'istruzione condizionale come:<br />
+
+		<code>if ( black ) {
+
+			shader.fragmentShader = shader.fragmentShader.replace('gl_FragColor = vec4(1)', 'gl_FragColor = vec4(0)')
+
+		}
+		</code>
+
+		allora customProgramCacheKey deve essere impostato come questo:<br />
+
+		<code>material.customProgramCacheKey = function() {
+
+			return black ? '1' : '0';
+
+		}
+		</code>
+
+		</p>
+
+		<p>
+			A differenza delle proprietà, la callback non è supportata da [page:Material.clone .clone](), [page:Material.copy .copy]() e [page:Material.toJSON .toJSON]().
+		</p>
+
+		<h3>[method:undefined setValues]( [param:Object values] )</h3>
+		<p>
+		values -- un contenitore con i parametri.<br />
+		Imposta le proprietà in base ai `values`.
+		</p>
+
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
+		<p>
+		meta -- oggetto contenente metadati come texture o immagini per il materiale.<br />
+		Converte il materiale nel [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 formato JSON Object/Scene] di three.js.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

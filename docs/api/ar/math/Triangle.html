@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+		مثلث هندسي كما هو محدد بثلاثة [page:Vector3 Vector3s] تمثل زواياه الثلاثة.
+		</p>
+			
+		<h2>المنشئ (Constructor)</h2>
+			
+		<h3>[name]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] )</h3>
+		<p>
+		[page:Vector3 a] - الزاوية الأولى للمثلث. الافتراضي هو [page:Vector3] في `(0، 0، 0)`.<br />
+		[page:Vector3 b] - الزاوية الثانية للمثلث. الافتراضي هو [page:Vector3] في `(0، 0، 0)`.<br />
+		[page:Vector3 c] - الزاوية النهائية للمثلث. الافتراضي هو [page:Vector3] في `(0، 0، 0)`.<br /><br />
+			
+		ينشئ نسخة جديدة من [name].
+		</p>
+			
+		<h2>الخصائص (Properties)</h2>
+			
+		<h3>[property:Vector3 a]</h3>
+		<p>
+		الزاوية الأولى للمثلث. الافتراضي هو [page:Vector3] في `(0، 0، 0)`.
+		</p>
+			
+		<h3>[property:Vector3 b]</h3>
+		<p>
+		الزاوية الثانية للمثلث. الافتراضي هو [page:Vector3] في `(0، 0، 0)`.
+		</p>
+			
+		<h3>[property:Vector3 c]</h3>
+		<p>
+		الزاوية النهائية للمثلث. الافتراضي هو [page:Vector3] في `(0، 0، 0)`.
+		</p>
+			
+		<h2>الطرق (Methods)</h2>
+
+		<h3>[method:Triangle clone]()</h3>
+		<p>
+		يعود بمثلث جديد بنفس خصائص [page:.a a]، [page:.b b] و [page:.c c] كهذا.
+		</p>
+		
+		<h3>
+		[method:Vector3 closestPointToPoint]( [param:Vector3 point], [param:Vector3 target] )
+		</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] <br />
+		[page:Vector3 target] - سيتم نسخ النتيجة في هذا Vector3.<br /><br />
+		
+		يعود بأقرب نقطة على المثلث إلى [page:Vector3 point].
+		</p>
+		
+		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] للتحقق.<br /><br />
+		
+		يعود بـ true إذا كانت النقطة الممررة، عندما يتم إسقاطها على مستوى المثلث، تقع داخل المثلث.
+		</p>
+		
+		<h3>[method:this copy]( [param:Triangle triangle] )</h3>
+		<p>
+		ينسخ قيم خصائص [page:.a a]، [page:.b b] و [page:.c c] للمثلث الممرر إلى هذا المثلث.
+		</p>
+		
+		<h3>[method:Boolean equals]( [param:Triangle triangle] )</h3>
+		<p>
+		يعود بـ true إذا كانت المثلثين لديهما خصائص متطابقة من [page:.a a]، [page:.b b]
+		و [page:.c c].
+		</p>
+		
+		<h3>[method:Float getArea]()</h3>
+		<p>يرجع مساحة المثلث.</p>
+		
+		<h3>
+		[method:Vector3 getBarycoord]( [param:Vector3 point], [param:Vector3 target] )
+		</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] <br />
+		[page:Vector3 target] - سيتم نسخ النتيجة في هذا Vector3.<br /><br />
+		
+		يرجع إحداثية ثلاثية من المتجه المعطى. <br /><br />
+		
+		[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png صورة لإحداثيات ثلاثية]
+		</p>
+
+		<h3>[method:Vector3 getMidpoint]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] - سيتم نسخ النتيجة في هذا Vector3.<br /><br />
+		
+		حساب نقطة منتصف المثلث.
+		</p>
+		
+		<h3>[method:Vector3 getNormal]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] - سيتم نسخ النتيجة في هذا Vector3.<br /><br />
+		
+		حساب [link:https://en.wikipedia.org/wiki/Normal_(geometry) متجه العادي] للمثلث.
+		</p>
+		
+		<h3>[method:Plane getPlane]( [param:Plane target] )</h3>
+		<p>
+		[page:Plane target] - سيتم نسخ النتيجة في هذا Plane.<br /><br />
+		
+		حساب [page:Plane plane] بناءً على المثلث. .
+		</p>
+		
+		<h3>
+		[method:Vector getInterpolation]( [param:Vector3 point], [param:Vector3 p1], [param:Vector3 p2], [param:Vector3 p3], [param:Vector v1], [param:Vector v2], [param:Vector v3], [param:Vector target] )
+		</h3>
+		<p>
+		[page:Vector3 point] - موقع النقطة المُركبة.<br />
+		[page:Vector3 p1] - موقع الرأس الأول.<br />
+		[page:Vector3 p2] - موقع الرأس الثاني.<br />
+		[page:Vector3 p3] - موقع الرأس الثالث.<br />
+		[page:Vector v1] - قيمة الرأس الأولى.<br />
+		[page:Vector v2] - قيمة الرأس الثانية.<br />
+		[page:Vector v3] - قيمة الرأس الثالثة.<br />
+		[page:Vector target] — سيتم نسخ النتيجة في هذا Vector.<br /><br />
+		
+		تعود بالقيمة المُركبة بشكل ثلاثي للنقطة المعطاة على المثلث.
+		</p>
+		
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - مربع للتحقق من التقاطع ضده.<br /><br />
+		
+		يحدد ما إذا كان هذا المثلث يتقاطع مع [page:Box3 box] أم لا.
+		</p>
+		
+		<h3>[method:Boolean isFrontFacing]( [param:Vector3 direction] )</h3>
+		<p>
+		[page:Vector3 direction] - الاتجاه الذي يتم اختباره.<br /><br />
+		
+		ما إذا كان المثلث موجهًا نحو الاتجاه المعطى أم لا.
+		</p>
+		
+		<h3>
+		[method:this set]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] )
+		</h3>
+		<p>
+		يضبط خصائص المثلث [page:.a a]، [page:.b b] و [page:.c c] على [page:Vector3 vector3s] الممررة.<br />
+		يرجى ملاحظة أن هذه الطريقة تنسخ فقط القيم من الكائنات المعطاة.
+		</p>
+		
+		<h3>
+		[method:this setFromAttributeAndIndices]( [param:BufferAttribute attribute],
+		[param:Integer i0], [param:Integer i1], [param:Integer i2] )
+		</h3>
+		<p>
+		attribute - [page:BufferAttribute] من بيانات الرأس <br />
+		i0 - فهرس [page:Integer] <br />
+		i1 - فهرس [page:Integer] <br />
+		i2 - فهرس [page:Integer]<br /><br />
+		
+		يضبط رؤوس المثلث من بيانات رأس سمة الحافظة.
+		</p>
+		
+		<h3>
+		[method:this setFromPointsAndIndices]( [param:Array points], [param:Integer i0], [param:Integer i1], [param:Integer i2] )
+		</h3>
+		<p>
+		points - مصفوفة من [page:Vector3]s <br />
+		i0 - فهرس [page:Integer] <br />
+		i1 - فهرس [page:Integer] <br />
+		i2 - فهرس [page:Integer]<br /><br />
+		
+		يضبط متجهات المثلث على المتجهات في المصفوفة.
+		</p>
+		
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

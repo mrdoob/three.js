@@ -20,26 +20,35 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="http://www.minecraft.net/" target="_blank" rel="noopener">minecraft</a> demo. featuring <a href="http://painterlypack.net/" target="_blank" rel="noopener">painterly pack</a><br />(left click: forward, right click: backward)</div>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
-			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
-			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, controls, scene, renderer;
+			let camera, controls, scene, renderer;
 
-			var worldWidth = 128, worldDepth = 128;
-			var worldHalfWidth = worldWidth / 2;
-			var worldHalfDepth = worldDepth / 2;
-			var data = generateHeight( worldWidth, worldDepth );
+			const worldWidth = 128, worldDepth = 128;
+			const worldHalfWidth = worldWidth / 2;
+			const worldHalfDepth = worldDepth / 2;
+			const data = generateHeight( worldWidth, worldDepth );
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -56,32 +65,32 @@
 
 				// sides
 
-				var matrix = new THREE.Matrix4();
+				const matrix = new THREE.Matrix4();
 
-				var pxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const pxGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pxGeometry.attributes.uv.array[ 1 ] = 0.5;
 				pxGeometry.attributes.uv.array[ 3 ] = 0.5;
 				pxGeometry.rotateY( Math.PI / 2 );
 				pxGeometry.translate( 50, 0, 0 );
 
-				var nxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const nxGeometry = new THREE.PlaneGeometry( 100, 100 );
 				nxGeometry.attributes.uv.array[ 1 ] = 0.5;
 				nxGeometry.attributes.uv.array[ 3 ] = 0.5;
 				nxGeometry.rotateY( - Math.PI / 2 );
 				nxGeometry.translate( - 50, 0, 0 );
 
-				var pyGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const pyGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pyGeometry.attributes.uv.array[ 5 ] = 0.5;
 				pyGeometry.attributes.uv.array[ 7 ] = 0.5;
 				pyGeometry.rotateX( - Math.PI / 2 );
 				pyGeometry.translate( 0, 50, 0 );
 
-				var pzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const pzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pzGeometry.attributes.uv.array[ 1 ] = 0.5;
 				pzGeometry.attributes.uv.array[ 3 ] = 0.5;
 				pzGeometry.translate( 0, 0, 50 );
 
-				var nzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const nzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				nzGeometry.attributes.uv.array[ 1 ] = 0.5;
 				nzGeometry.attributes.uv.array[ 3 ] = 0.5;
 				nzGeometry.rotateY( Math.PI );
@@ -89,13 +98,13 @@
 
 				//
 
-				var geometries = [];
+				const geometries = [];
 
-				for ( var z = 0; z < worldDepth; z ++ ) {
+				for ( let z = 0; z < worldDepth; z ++ ) {
 
-					for ( var x = 0; x < worldWidth; x ++ ) {
+					for ( let x = 0; x < worldWidth; x ++ ) {
 
-						var h = getY( x, z );
+						const h = getY( x, z );
 
 						matrix.makeTranslation(
 							x * 100 - worldHalfWidth * 100,
@@ -103,10 +112,10 @@
 							z * 100 - worldHalfDepth * 100
 						);
 
-						var px = getY( x + 1, z );
-						var nx = getY( x - 1, z );
-						var pz = getY( x, z + 1 );
-						var nz = getY( x, z - 1 );
+						const px = getY( x + 1, z );
+						const nx = getY( x - 1, z );
+						const pz = getY( x, z + 1 );
+						const nz = getY( x, z - 1 );
 
 						geometries.push( pyGeometry.clone().applyMatrix4( matrix ) );
 
@@ -138,19 +147,20 @@
 
 				}
 
-				var geometry = BufferGeometryUtils.mergeBufferGeometries( geometries );
+				const geometry = BufferGeometryUtils.mergeGeometries( geometries );
 				geometry.computeBoundingSphere();
 
-				var texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
+				const texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
+				texture.colorSpace = THREE.SRGBColorSpace;
 				texture.magFilter = THREE.NearestFilter;
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, side: THREE.DoubleSide } ) );
+				const mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, side: THREE.DoubleSide } ) );
 				scene.add( mesh );
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc );
+				const ambientLight = new THREE.AmbientLight( 0xeeeeee, 3 );
 				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 12 );
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
@@ -170,7 +180,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -187,16 +197,18 @@
 
 			function generateHeight( width, height ) {
 
-				var data = [], perlin = new ImprovedNoise(),
-					size = width * height, quality = 2, z = Math.random() * 100;
+				const data = [], perlin = new ImprovedNoise(),
+					size = width * height, z = Math.random() * 100;
 
-				for ( var j = 0; j < 4; j ++ ) {
+				let quality = 2;
 
-					if ( j === 0 ) for ( var i = 0; i < size; i ++ ) data[ i ] = 0;
+				for ( let j = 0; j < 4; j ++ ) {
 
-					for ( var i = 0; i < size; i ++ ) {
+					if ( j === 0 ) for ( let i = 0; i < size; i ++ ) data[ i ] = 0;
 
-						var x = i % width, y = ( i / width ) | 0;
+					for ( let i = 0; i < size; i ++ ) {
+
+						const x = i % width, y = ( i / width ) | 0;
 						data[ i ] += perlin.noise( x / quality, y / quality, z ) * quality;
 
 
@@ -212,7 +224,7 @@
 
 			function getY( x, z ) {
 
-				return ( data[ x + z * worldWidth ] * 0.2 ) | 0;
+				return ( data[ x + z * worldWidth ] * 0.15 ) | 0;
 
 			}
 

@@ -12,17 +12,28 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl RGBM texture loader example
 		</div>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			var params = {
+			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
+
+			const params = {
 				exposure: 2.0
 			};
 
-			var renderer, scene, camera;
+			let renderer, scene, camera;
 
 			init();
 
@@ -36,27 +47,20 @@
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = params.exposure;
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 
 				camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 1 );
 
-				new THREE.TextureLoader().load( 'textures/memorial.png', function ( texture ) {
+				new RGBMLoader().setMaxRange( 16 ).load( 'textures/memorial.png', function ( texture ) {
 
-					texture.encoding = THREE.RGBM16Encoding;
+					const material = new THREE.MeshBasicMaterial( { map: texture } );
 
-					texture.minFilter = THREE.LinearFilter;
-					texture.magFilter = THREE.LinearFilter;
-					texture.flipY = true;
+					const quad = new THREE.PlaneGeometry( 1, 1.5 );
 
-					var material = new THREE.MeshBasicMaterial( { map: texture } );
-
-					var quad = new THREE.PlaneBufferGeometry( 1.5 * texture.width / texture.height, 1.5 );
-
-					var mesh = new THREE.Mesh( quad, material );
+					const mesh = new THREE.Mesh( quad, material );
 
 					scene.add( mesh );
 
@@ -66,22 +70,22 @@
 
 				//
 
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.add( params, 'exposure', 0, 4, 0.01 ).onChange( render );
 				gui.open();
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function onWindowResize() {
 
-				var aspect = window.innerWidth / window.innerHeight;
+				const aspect = window.innerWidth / window.innerHeight;
 
-				var frustumHeight = camera.top - camera.bottom;
+				const frustumHeight = camera.top - camera.bottom;
 
 				camera.left = - frustumHeight * aspect / 2;
 				camera.right = frustumHeight * aspect / 2;

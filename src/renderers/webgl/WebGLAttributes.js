@@ -1,38 +1,37 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+function WebGLAttributes( gl ) {
 
-function WebGLAttributes( gl, capabilities ) {
-
-	var isWebGL2 = capabilities.isWebGL2;
-
-	var buffers = new WeakMap();
+	const buffers = new WeakMap();
 
 	function createBuffer( attribute, bufferType ) {
 
-		var array = attribute.array;
-		var usage = attribute.usage;
+		const array = attribute.array;
+		const usage = attribute.usage;
+		const size = array.byteLength;
 
-		var buffer = gl.createBuffer();
+		const buffer = gl.createBuffer();
 
 		gl.bindBuffer( bufferType, buffer );
 		gl.bufferData( bufferType, array, usage );
 
 		attribute.onUploadCallback();
 
-		var type = gl.FLOAT;
+		let type;
 
 		if ( array instanceof Float32Array ) {
 
 			type = gl.FLOAT;
 
-		} else if ( array instanceof Float64Array ) {
-
-			console.warn( 'THREE.WebGLAttributes: Unsupported data buffer format: Float64Array.' );
-
 		} else if ( array instanceof Uint16Array ) {
 
-			type = gl.UNSIGNED_SHORT;
+			if ( attribute.isFloat16BufferAttribute ) {
+
+				type = gl.HALF_FLOAT;
+
+			} else {
+
+				type = gl.UNSIGNED_SHORT;
+
+			}
 
 		} else if ( array instanceof Int16Array ) {
 
@@ -54,47 +53,67 @@ function WebGLAttributes( gl, capabilities ) {
 
 			type = gl.UNSIGNED_BYTE;
 
+		} else if ( array instanceof Uint8ClampedArray ) {
+
+			type = gl.UNSIGNED_BYTE;
+
+		} else {
+
+			throw new Error( 'THREE.WebGLAttributes: Unsupported buffer data format: ' + array );
+
 		}
 
 		return {
 			buffer: buffer,
 			type: type,
 			bytesPerElement: array.BYTES_PER_ELEMENT,
-			version: attribute.version
+			version: attribute.version,
+			size: size
 		};
 
 	}
 
 	function updateBuffer( buffer, attribute, bufferType ) {
 
-		var array = attribute.array;
-		var updateRange = attribute.updateRange;
+		const array = attribute.array;
+		const updateRange = attribute._updateRange; // @deprecated, r159
+		const updateRanges = attribute.updateRanges;
 
 		gl.bindBuffer( bufferType, buffer );
 
-		if ( updateRange.count === - 1 ) {
+		if ( updateRange.count === - 1 && updateRanges.length === 0 ) {
 
 			// Not using update ranges
-
 			gl.bufferSubData( bufferType, 0, array );
 
-		} else {
+		}
 
-			if ( isWebGL2 ) {
+		if ( updateRanges.length !== 0 ) {
 
-				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
-					array, updateRange.offset, updateRange.count );
+			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
-			} else {
+				const range = updateRanges[ i ];
 
-				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
-					array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
+				gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
+					array, range.start, range.count );
 
 			}
+
+			attribute.clearUpdateRanges();
+
+		}
+
+		// @deprecated, r159
+		if ( updateRange.count !== - 1 ) {
+
+			gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
+				array, updateRange.offset, updateRange.count );
 
 			updateRange.count = - 1; // reset range
 
 		}
+
+		attribute.onUploadCallback();
 
 	}
 
@@ -112,7 +131,7 @@ function WebGLAttributes( gl, capabilities ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		var data = buffers.get( attribute );
+		const data = buffers.get( attribute );
 
 		if ( data ) {
 
@@ -126,15 +145,40 @@ function WebGLAttributes( gl, capabilities ) {
 
 	function update( attribute, bufferType ) {
 
+		if ( attribute.isGLBufferAttribute ) {
+
+			const cached = buffers.get( attribute );
+
+			if ( ! cached || cached.version < attribute.version ) {
+
+				buffers.set( attribute, {
+					buffer: attribute.buffer,
+					type: attribute.type,
+					bytesPerElement: attribute.elementSize,
+					version: attribute.version
+				} );
+
+			}
+
+			return;
+
+		}
+
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		var data = buffers.get( attribute );
+		const data = buffers.get( attribute );
 
 		if ( data === undefined ) {
 
 			buffers.set( attribute, createBuffer( attribute, bufferType ) );
 
 		} else if ( data.version < attribute.version ) {
+
+			if ( data.size !== attribute.array.byteLength ) {
+
+				throw new Error( 'THREE.WebGLAttributes: The size of the buffer attribute\'s array buffer does not match the original size. Resizing buffer attributes is not supported.' );
+
+			}
 
 			updateBuffer( data.buffer, attribute, bufferType );
 

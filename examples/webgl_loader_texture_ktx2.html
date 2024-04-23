@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - KTX2 texture loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - KTX2 texture loader<br />
+			<a href="http://github.khronos.org/KTX-Specification/" target="_blank" rel="noopener">KTX2</a> with
+			<a href="https://github.com/binomialLLC/basis_universal" target="_blank">Basis Universal GPU Texture Codec</a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			let camera, scene, renderer, controls, loader, material;
+
+			const SAMPLES = {
+				'BasisU ETC1S': '2d_etc1s.ktx2',
+				'BasisU UASTC': '2d_uastc.ktx2',
+				'RGBA8 sRGB': '2d_rgba8.ktx2',
+				'RGBA8 Linear': '2d_rgba8_linear.ktx2',
+				// 'RGBA8 Display P3': '2d_rgba8_displayp3.ktx2',
+				'RGBA16 Linear': '2d_rgba16_linear.ktx2',
+				'RGBA32 Linear': '2d_rgba32_linear.ktx2',
+				'ASTC 6x6 (mobile)': '2d_astc_6x6.ktx2',
+			};
+
+			const FORMAT_LABELS = {
+				[ THREE.RGBAFormat ]: 'RGBA',
+				[ THREE.RGBA_BPTC_Format ]: 'RGBA_BPTC',
+				[ THREE.RGBA_ASTC_4x4_Format ]: 'RGBA_ASTC_4x4',
+				[ THREE.RGB_S3TC_DXT1_Format ]: 'RGB_S3TC_DXT1',
+				[ THREE.RGBA_S3TC_DXT5_Format ]: 'RGBA_S3TC_DXT5',
+				[ THREE.RGB_PVRTC_4BPPV1_Format ]: 'RGB_PVRTC_4BPPV1',
+				[ THREE.RGBA_PVRTC_4BPPV1_Format ]: 'RGBA_PVRTC_4BPPV1',
+				[ THREE.RGB_ETC1_Format ]: 'RGB_ETC1',
+				[ THREE.RGB_ETC2_Format ]: 'RGB_ETC2',
+				[ THREE.RGBA_ETC2_EAC_Format ]: 'RGB_ETC2_EAC',
+			};
+
+			const TYPE_LABELS = {
+				[ THREE.UnsignedByteType ]: 'UnsignedByteType',
+				[ THREE.ByteType ]: 'ByteType',
+				[ THREE.ShortType ]: 'ShortType',
+				[ THREE.UnsignedShortType ]: 'UnsignedShortType',
+				[ THREE.IntType ]: 'IntType',
+				[ THREE.UnsignedIntType ]: 'UnsignedIntType',
+				[ THREE.FloatType ]: 'FloatType',
+				[ THREE.HalfFloatType ]: 'HalfFloatType',
+			};
+
+			const params = {
+				sample: Object.values( SAMPLES )[ 0 ],
+			};
+
+			init().then( animate );
+
+			async function init() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( width, height );
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x202020 );
+
+				camera = new THREE.PerspectiveCamera( 60, width / height, 0.1, 100 );
+				camera.position.set( 0, 0, 2.5 );
+				camera.lookAt( scene.position );
+				scene.add( camera );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+
+				// PlaneGeometry UVs assume flipY=true, which compressed textures don't support.
+				const geometry = flipY( new THREE.PlaneGeometry() );
+				material = new THREE.MeshBasicMaterial( {
+					color: 0xFFFFFF,
+					side: THREE.DoubleSide,
+					transparent: true,
+				} );
+				const mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				loader = new KTX2Loader()
+					.setTranscoderPath( 'jsm/libs/basis/' )
+					.detectSupport( renderer );
+
+				const gui = new GUI();
+
+				gui.add( params, 'sample', SAMPLES ).onChange( loadTexture );
+
+				await loadTexture( params.sample );
+
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+				renderer.setSize( width, height );
+
+			}
+
+			async function loadTexture( path ) {
+
+				try {
+
+					const texture = await loader.loadAsync( `./textures/compressed/${path}` );
+					texture.minFilter = THREE.NearestMipmapNearestFilter;
+
+					material.map = texture;
+					material.needsUpdate = true;
+
+					console.info( `format: ${ FORMAT_LABELS[ texture.format ] }` );
+					console.info( `type: ${ TYPE_LABELS[ texture.type ] }` );
+					console.info( `colorSpace: ${ texture.colorSpace }` );
+
+				} catch ( e ) {
+
+					console.error( e );
+
+				}
+
+				// NOTE: Call `loader.dispose()` when finished loading textures.
+
+
+			}
+
+			/** Correct UVs to be compatible with `flipY=false` textures. */
+			function flipY( geometry ) {
+
+				const uv = geometry.attributes.uv;
+
+				for ( let i = 0; i < uv.count; i ++ ) {
+
+					uv.setY( i, 1 - uv.getY( i ) );
+
+				}
+
+				return geometry;
+
+			}
+
+		</script>
+
+	</body>
+</html>

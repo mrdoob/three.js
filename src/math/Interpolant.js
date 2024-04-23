@@ -17,28 +17,29 @@
  *
  * 		http://www.oodesign.com/template-method-pattern.html
  *
- * @author tschw
  */
 
-function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+class Interpolant {
 
-	this.parameterPositions = parameterPositions;
-	this._cachedIndex = 0;
+	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
-	this.resultBuffer = resultBuffer !== undefined ?
-		resultBuffer : new sampleValues.constructor( sampleSize );
-	this.sampleValues = sampleValues;
-	this.valueSize = sampleSize;
+		this.parameterPositions = parameterPositions;
+		this._cachedIndex = 0;
 
-}
+		this.resultBuffer = resultBuffer !== undefined ?
+			resultBuffer : new sampleValues.constructor( sampleSize );
+		this.sampleValues = sampleValues;
+		this.valueSize = sampleSize;
 
-Object.assign( Interpolant.prototype, {
+		this.settings = null;
+		this.DefaultSettings_ = {};
 
-	evaluate: function ( t ) {
+	}
 
-		var pp = this.parameterPositions,
-			i1 = this._cachedIndex,
+	evaluate( t ) {
 
+		const pp = this.parameterPositions;
+		let i1 = this._cachedIndex,
 			t1 = pp[ i1 ],
 			t0 = pp[ i1 - 1 ];
 
@@ -46,7 +47,7 @@ Object.assign( Interpolant.prototype, {
 
 			seek: {
 
-				var right;
+				let right;
 
 				linear_scan: {
 
@@ -56,7 +57,7 @@ Object.assign( Interpolant.prototype, {
 					//- 				if ( t >= t1 || t1 === undefined ) {
 					forward_scan: if ( ! ( t < t1 ) ) {
 
-						for ( var giveUpAt = i1 + 2; ; ) {
+						for ( let giveUpAt = i1 + 2; ; ) {
 
 							if ( t1 === undefined ) {
 
@@ -66,7 +67,7 @@ Object.assign( Interpolant.prototype, {
 
 								i1 = pp.length;
 								this._cachedIndex = i1;
-								return this.afterEnd_( i1 - 1, t, t0 );
+								return this.copySampleValue_( i1 - 1 );
 
 							}
 
@@ -96,7 +97,7 @@ Object.assign( Interpolant.prototype, {
 
 						// looping?
 
-						var t1global = pp[ 1 ];
+						const t1global = pp[ 1 ];
 
 						if ( t < t1global ) {
 
@@ -107,14 +108,14 @@ Object.assign( Interpolant.prototype, {
 
 						// linear reverse scan
 
-						for ( var giveUpAt = i1 - 2; ; ) {
+						for ( let giveUpAt = i1 - 2; ; ) {
 
 							if ( t0 === undefined ) {
 
 								// before start
 
 								this._cachedIndex = 0;
-								return this.beforeStart_( 0, t, t1 );
+								return this.copySampleValue_( 0 );
 
 							}
 
@@ -149,7 +150,7 @@ Object.assign( Interpolant.prototype, {
 
 				while ( i1 < right ) {
 
-					var mid = ( i1 + right ) >>> 1;
+					const mid = ( i1 + right ) >>> 1;
 
 					if ( t < pp[ mid ] ) {
 
@@ -171,7 +172,7 @@ Object.assign( Interpolant.prototype, {
 				if ( t0 === undefined ) {
 
 					this._cachedIndex = 0;
-					return this.beforeStart_( 0, t, t1 );
+					return this.copySampleValue_( 0 );
 
 				}
 
@@ -179,7 +180,7 @@ Object.assign( Interpolant.prototype, {
 
 					i1 = pp.length;
 					this._cachedIndex = i1;
-					return this.afterEnd_( i1 - 1, t0, t );
+					return this.copySampleValue_( i1 - 1 );
 
 				}
 
@@ -193,31 +194,24 @@ Object.assign( Interpolant.prototype, {
 
 		return this.interpolate_( i1, t0, t, t1 );
 
-	},
+	}
 
-	settings: null, // optional, subclass-specific settings structure
-	// Note: The indirection allows central control of many interpolants.
-
-	// --- Protected interface
-
-	DefaultSettings_: {},
-
-	getSettings_: function () {
+	getSettings_() {
 
 		return this.settings || this.DefaultSettings_;
 
-	},
+	}
 
-	copySampleValue_: function ( index ) {
+	copySampleValue_( index ) {
 
 		// copies a sample value to the result buffer
 
-		var result = this.resultBuffer,
+		const result = this.resultBuffer,
 			values = this.sampleValues,
 			stride = this.valueSize,
 			offset = index * stride;
 
-		for ( var i = 0; i !== stride; ++ i ) {
+		for ( let i = 0; i !== stride; ++ i ) {
 
 			result[ i ] = values[ offset + i ];
 
@@ -225,35 +219,23 @@ Object.assign( Interpolant.prototype, {
 
 		return result;
 
-	},
+	}
 
 	// Template methods for derived classes:
 
-	interpolate_: function ( /* i1, t0, t, t1 */ ) {
+	interpolate_( /* i1, t0, t, t1 */ ) {
 
 		throw new Error( 'call to abstract method' );
 		// implementations shall return this.resultBuffer
 
-	},
+	}
 
-	intervalChanged_: function ( /* i1, t0, t1 */ ) {
+	intervalChanged_( /* i1, t0, t1 */ ) {
 
 		// empty
 
 	}
 
-} );
-
-//!\ DECLARE ALIAS AFTER assign prototype !
-Object.assign( Interpolant.prototype, {
-
-	//( 0, t, t0 ), returns this.resultBuffer
-	beforeStart_: Interpolant.prototype.copySampleValue_,
-
-	//( N-1, tN-1, t ), returns this.resultBuffer
-	afterEnd_: Interpolant.prototype.copySampleValue_,
-
-} );
-
+}
 
 export { Interpolant };

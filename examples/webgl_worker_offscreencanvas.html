@@ -53,7 +53,7 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - offscreen canvas (<a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas" target="_blank" rel="noopener noreferrer">about</a>)<br/>
-			<p id="message">Your browser does not support OffscreenCanvas. Check the browser support <a href="https://caniuse.com/#feat=offscreencanvas" target="_blank" rel="noopener noreferrer">here</a></p>
+			<p id="message">Your browser does not support OffscreenCanvas with a WebGL Context. Check the browser support <a href="https://caniuse.com/#feat=offscreencanvas" target="_blank" rel="noopener noreferrer">here</a></p>
 		</div>
 
 		<div id="container">
@@ -64,29 +64,51 @@
 			<span id="result"></span>
 		</div>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import initJank from './jsm/offscreen/jank.js';
-			import init from './jsm/offscreen/scene.js';
-
+			import initJank from 'three/addons/offscreen/jank.js';
+			import init from 'three/addons/offscreen/scene.js';
+			
 			// onscreen
 
-			var canvas1 = document.getElementById( 'canvas1' );
-			var canvas2 = document.getElementById( 'canvas2' );
+			const canvas1 = document.getElementById( 'canvas1' );
+			const canvas2 = document.getElementById( 'canvas2' );
 
-			var width = canvas1.clientWidth;
-			var height = canvas1.clientHeight;
-			var pixelRatio = window.devicePixelRatio;
+			const width = canvas1.clientWidth;
+			const height = canvas1.clientHeight;
+			const pixelRatio = window.devicePixelRatio;
 
 			init( canvas1, width, height, pixelRatio, './' );
 			initJank();
 
 			// offscreen
 
-			if ( 'transferControlToOffscreen' in canvas2 ) {
+			const isSafari = /^((?!chrome|android).)*safari/i.test( navigator.userAgent );
+			let supportOffScreenWebGL = 'transferControlToOffscreen' in canvas2;
 
-				var offscreen = canvas2.transferControlToOffscreen();
-				var worker = new Worker( 'jsm/offscreen/offscreen.js', { type: 'module' } );
+			// If it's Safari, then check the version because Safari < 17 doesn't support OffscreenCanvas with a WebGL context.
+			if ( isSafari ) {
+
+				var versionMatch = navigator.userAgent.match( /version\/(\d+)/i );
+				var safariVersion = versionMatch ? parseInt( versionMatch[ 1 ] ) : 0;
+
+				supportOffScreenWebGL = safariVersion >= 17;
+
+			}
+
+			if ( supportOffScreenWebGL ) {
+
+				const offscreen = canvas2.transferControlToOffscreen();
+				const worker = new Worker( 'jsm/offscreen/offscreen.js', { type: 'module' } );
 				worker.postMessage( {
 					drawingSurface: offscreen,
 					width: canvas2.clientWidth,

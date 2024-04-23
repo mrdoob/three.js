@@ -4,73 +4,69 @@ import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Frustum } from '../math/Frustum.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
+const _lightPositionWorld = /*@__PURE__*/ new Vector3();
+const _lookTarget = /*@__PURE__*/ new Vector3();
 
-function LightShadow( camera ) {
+class LightShadow {
 
-	this.camera = camera;
+	constructor( camera ) {
 
-	this.bias = 0;
-	this.radius = 1;
+		this.camera = camera;
 
-	this.mapSize = new Vector2( 512, 512 );
+		this.bias = 0;
+		this.normalBias = 0;
+		this.radius = 1;
+		this.blurSamples = 8;
 
-	this.map = null;
-	this.mapPass = null;
-	this.matrix = new Matrix4();
+		this.mapSize = new Vector2( 512, 512 );
 
-	this._frustum = new Frustum();
-	this._frameExtents = new Vector2( 1, 1 );
+		this.map = null;
+		this.mapPass = null;
+		this.matrix = new Matrix4();
 
-	this._viewportCount = 1;
+		this.autoUpdate = true;
+		this.needsUpdate = false;
 
-	this._viewports = [
+		this._frustum = new Frustum();
+		this._frameExtents = new Vector2( 1, 1 );
 
-		new Vector4( 0, 0, 1, 1 )
+		this._viewportCount = 1;
 
-	];
+		this._viewports = [
 
-}
+			new Vector4( 0, 0, 1, 1 )
 
-Object.assign( LightShadow.prototype, {
+		];
 
-	_projScreenMatrix: new Matrix4(),
+	}
 
-	_lightPositionWorld: new Vector3(),
-
-	_lookTarget: new Vector3(),
-
-	getViewportCount: function () {
+	getViewportCount() {
 
 		return this._viewportCount;
 
-	},
+	}
 
-	getFrustum: function () {
+	getFrustum() {
 
 		return this._frustum;
 
-	},
+	}
 
-	updateMatrices: function ( light ) {
+	updateMatrices( light ) {
 
-		var shadowCamera = this.camera,
-			shadowMatrix = this.matrix,
-			projScreenMatrix = this._projScreenMatrix,
-			lookTarget = this._lookTarget,
-			lightPositionWorld = this._lightPositionWorld;
+		const shadowCamera = this.camera;
+		const shadowMatrix = this.matrix;
 
-		lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-		shadowCamera.position.copy( lightPositionWorld );
+		_lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
+		shadowCamera.position.copy( _lightPositionWorld );
 
-		lookTarget.setFromMatrixPosition( light.target.matrixWorld );
-		shadowCamera.lookAt( lookTarget );
+		_lookTarget.setFromMatrixPosition( light.target.matrixWorld );
+		shadowCamera.lookAt( _lookTarget );
 		shadowCamera.updateMatrixWorld();
 
-		projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-		this._frustum.setFromProjectionMatrix( projScreenMatrix );
+		_projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
+		this._frustum.setFromProjectionMatrix( _projScreenMatrix );
 
 		shadowMatrix.set(
 			0.5, 0.0, 0.0, 0.5,
@@ -79,24 +75,39 @@ Object.assign( LightShadow.prototype, {
 			0.0, 0.0, 0.0, 1.0
 		);
 
-		shadowMatrix.multiply( shadowCamera.projectionMatrix );
-		shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
+		shadowMatrix.multiply( _projScreenMatrix );
 
-	},
+	}
 
-	getViewport: function ( viewportIndex ) {
+	getViewport( viewportIndex ) {
 
 		return this._viewports[ viewportIndex ];
 
-	},
+	}
 
-	getFrameExtents: function () {
+	getFrameExtents() {
 
 		return this._frameExtents;
 
-	},
+	}
 
-	copy: function ( source ) {
+	dispose() {
+
+		if ( this.map ) {
+
+			this.map.dispose();
+
+		}
+
+		if ( this.mapPass ) {
+
+			this.mapPass.dispose();
+
+		}
+
+	}
+
+	copy( source ) {
 
 		this.camera = source.camera.clone();
 
@@ -107,19 +118,20 @@ Object.assign( LightShadow.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var object = {};
+		const object = {};
 
 		if ( this.bias !== 0 ) object.bias = this.bias;
+		if ( this.normalBias !== 0 ) object.normalBias = this.normalBias;
 		if ( this.radius !== 1 ) object.radius = this.radius;
 		if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = this.mapSize.toArray();
 
@@ -130,7 +142,6 @@ Object.assign( LightShadow.prototype, {
 
 	}
 
-} );
-
+}
 
 export { LightShadow };

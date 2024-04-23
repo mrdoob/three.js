@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="utf-8">
+  <title>Three.js and Shadertoy</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@threejs">
+  <meta name="twitter:title" content="Three.js – and Shadertoy">
+  <meta property="og:image" content="https://threejs.org/files/share.png">
+  <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+  <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+  <link rel="stylesheet" href="../resources/lesson.css">
+  <link rel="stylesheet" href="../resources/lang.css">
+  <script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  <link rel="stylesheet" href="/manual/zh/lang.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="lesson-title">
+      <h1>Three.js 与 Shadertoy</h1>
+    </div>
+    <div class="lesson">
+      <div class="lesson-main">
+        <p><a href="https://shadertoy.com">Shadertoy</a> 是一个有着众多惊艳的shader实践的著名网站。 经常有人问如何在 Three.js 里面使用那些shader。</p>
+        <p>重要的是要知道，被称作Shader<strong>TOY</strong> 事出有因。 通常与其把 ShaderToy 里的shader当做最佳实践，不如称它们是有趣的挑战，比如：<a
+            href="https://dwitter.net">dwitter</a> (代码少于140 个字符) 或<a href="https://js13kgames.com">js13kGames</a>
+          (用不多于13k代码制作游戏)。</p>
+        <p>使用Shadertoy 的难题是, <em>给特定位置的像素着色写函数从而绘制有趣的图像</em>。这是一种有趣的挑战，很多的结果非常惊艳。但请注意，这并非最佳实践。</p>
+        <p>点击 <a href="https://www.shadertoy.com/view/XtsSWs">这个惊艳的shader绘制了整个城市</a></p>
+        <div class="threejs_center"><img src="../resources/images/shadertoy-skyline.png"></div>
+        <p>在我的GPU 上全屏运行，它的运行速度为每秒大约5帧。与<a
+            href="https://store.steampowered.com/app/255710/Cities_Skylines/">《城市：天际线》</a>这样的游戏形成鲜明对比。</p>
+        <div class="threejs_center"><img src="../resources/images/cities-skylines.jpg" style="width: 600px;"></div>
+        <p>这个游戏在同一台机器上每秒运行 30-60 帧，因为它使用更多 传统技术，建筑物由三角形绘制而成，并带有纹理，等等...</p>
+        <p>言归正传，让我们回到如何在three.js使用 Shadertoy的shader 。</p>
+        <p>当你在 <a href="https://www.shadertoy.com/new">shadertoy.com</a>上点击“新建”,这是个初始的shader，至少 2019 年 1 月是这样的。</p>
+        <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By iq: https://www.shadertoy.com/user/iq
+// license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
+
+    // Time varying pixel color
+    vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
+
+    // Output to screen
+    fragColor = vec4(col,1.0);
+}
+</pre>
+        <p>关于shader你首要知道的重点是，他们是用一种叫做GLSL (Graphics Library Shading Language)的语言写成的，这是一种专为3D 数学设计的强类型语言。在上面我们看到<code
+            class="notranslate" translate="no">vec4</code>, <code class="notranslate" translate="no">vec2</code>,<code
+            class="notranslate" translate="no">vec3</code> 这三种特定类型。 一个 <code class="notranslate"
+            translate="no">vec2</code> 有2个value, 一个 <code class="notranslate" translate="no">vec3</code>
+          有3个value,一个<code class="notranslate" translate="no">vec4</code> 有4个 values。他们的使用方法非常灵活。最常见的一种是通过 <code
+            class="notranslate" translate="no">x</code>, <code class="notranslate" translate="no">y</code>, <code
+            class="notranslate" translate="no">z</code>, 以及<code class="notranslate" translate="no">w</code> 表示向里。</p>
+        <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">vec4 v1 = vec4(1.0, 2.0, 3.0, 4.0);
+float v2 = v1.x + v1.y;  // adds 1.0 + 2.0
+</pre>
+        <p>与JavaScript不同，GLSL更像是C / C++，其中变量必须定义类型，所以不能写成这样<code class="notranslate" translate="no">var v = 1.2;</code>
+          而是通过 <code class="notranslate" translate="no">float v = 1.2;</code> 将 <code class="notranslate"
+            translate="no">v</code> 声明为浮点数。 </p>
+        <p>详解 GLSL超出本文范畴。 概览GLSL可以点击<a
+            href="https://webglfundamentals.org/webgl/lessons/webgl-shaders-and-glsl.html">本文</a>
+          ，进阶可以查看 <a href="https://thebookofshaders.com/">本系列</a>。</p>
+        <p>注意，在2019 年 1 月,
+          <a href="https://shadertoy.com">shadertoy.com</a> 仅关注 <em>fragment
+            shaders</em>. Fragment shader的职责在于，给定一个像素的位置，输出该像素颜色。
+        </p>
+        <p>上面的代码我们看到 shader 有一个<code class="notranslate" translate="no">out</code> 修饰的叫<code class="notranslate"
+            translate="no">fragColor</code>的参数。<code class="notranslate" translate="no">out</code> 代表 <code
+            class="notranslate" translate="no">output</code>。这个参数向函数传递参数。我们需要将其设置为某种颜色。</p>
+        <p>它也有一个 叫 <code class="notranslate" translate="no">fragCoord</code>的<code class="notranslate"
+            translate="no">in</code> (代表 input)参数。 这代表了将要绘制的像素坐标。基于坐标我们可以生成特定颜色。 如果canvas有 400x300 像素，那么函数将会被调用 400x300
+          次或者说是 120,000 次。 每次 <code class="notranslate" translate="no">fragCoord</code> 都是一个不同的像素坐标。</p>
+        <p>还有 2 个正在使用但未在代码中定义的变量， 一是
+          <code class="notranslate" translate="no">iResolution</code>。 该参数设置 canvas分辨率 。若该参数设置为
+          400x300 则 <code class="notranslate" translate="no">iResolution</code> 是 400,300 。随着像素值
+          在400,300变化 <code class="notranslate" translate="no">uv</code> 将在texture的纵横两个方向从 0.0 to 1.0 变化。 使用
+          <em>规范化</em> 值能简化工作，而且 shadertoy上大部分的
+          shaders也以类似方式开始。
+        </p>
+        <p>shader中另一个未定义的参数是 <code class="notranslate" translate="no">iTime</code>。 该参数代表页面加载后的秒数。</p>
+        <p>上面这俩全局变量在shader术语中被称为 <em>uniform</em> 变量。 之所以被称为 <em>uniform</em>
+          在于这些变量在shader的一次调用中保持uniform（统一），直到下一次shader调用。需要注意的是，这些参数都是在shadertoy定义的特定变量， 而非GLSL<em>官方</em>
+          变量。这俩变量是发明shadertoy的人定义的。</p>
+        <p>这篇 <a href="https://www.shadertoy.com/howto">Shadertoy 文档</a>中有更多定义。 现在让我们一起来写点代码来操作上面俩shader参数。</p>
+        <p>首先我们定义一个填充canvas的plane。
+          参考这篇<a href="backgrounds.html">关于背景的文章</a>。
+          我们以这篇文章开始，不过要先删掉cube。代码很简单，如下：</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+  renderer.autoClearColor = false;
+
+  const camera = new THREE.OrthographicCamera(
+    -1, // left
+     1, // right
+     1, // top
+    -1, // bottom
+    -1, // near,
+     1, // far
+  );
+  const scene = new THREE.Scene();
+  const plane = new THREE.PlaneGeometry(2, 2);
+  const material = new THREE.MeshBasicMaterial({
+      color: 'red',
+  });
+  scene.add(new THREE.Mesh(plane, material));
+
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
+
+  function render() {
+    resizeRendererToDisplaySize(renderer);
+
+    renderer.render(scene, camera);
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+}
+
+main();
+</pre>
+        <p>正如<a href="backgrounds.html">关于背景的文章</a>所解释，这些参数将定义
+          <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate"
+              translate="no">OrthographicCamera</code></a> 以及一个大小是2个单位且被canvas填充的plane。
+          当前我们得到一个红色的canvas，因为我们使用的是红色
+          <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate"
+              translate="no">MeshBasicMaterial</code></a>材质。
+        </p>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-prep.html"></iframe></div>
+          <a class="threejs_center" href="/manual/examples/shadertoy-prep.html" target="_blank">点击此处在新标签页中打开</a>
+        </div>
+
+        <p></p>
+        <p>现在我们添加shadertoy shader。 </p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fragmentShader = `
+#include &lt;common&gt;
+
+uniform vec3 iResolution;
+uniform float iTime;
+
+// By iq: https://www.shadertoy.com/user/iq
+// license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
+
+    // Time varying pixel color
+    vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
+
+    // Output to screen
+    fragColor = vec4(col,1.0);
+}
+
+void main() {
+  mainImage(gl_FragColor, gl_FragCoord.xy);
+}
+`;
+</pre>
+        <p>上面我们定义了刚刚提到的2个uniform变量，接下来我们关注从shadertoy里的shader GLSL代码。我们调用
+          <code class="notranslate" translate="no">mainImage</code> ，同时传递
+          <code class="notranslate" translate="no">gl_FragColor</code> 和 <code class="notranslate"
+            translate="no">gl_FragCoord.xy</code>。 <code class="notranslate" translate="no">gl_FragColor</code>
+          是一个WebGL官方
+          全局变量，代表当前像素的颜色。<code class="notranslate" translate="no">gl_FragCoord</code> 是另一个WebGL官方
+          全局变量，代表当前着色像素的坐标。
+        </p>
+        <p>然后设置three.js uniforms，以便控制shader参数。 </p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const uniforms = {
+  iTime: { value: 0 },
+  iResolution:  { value: new THREE.Vector3() },
+};
+</pre>
+        <p>在THREE.js的每个uniform都有 <code class="notranslate" translate="no">value</code> 参数。该参数必须与shader中的uniform类型匹配。</p>
+        <p>然后我们把fragmentshader和uniforms都传递给
+          <a href="/docs/#api/en/materials/ShaderMaterial"><code class="notranslate"
+              translate="no">ShaderMaterial</code></a>。
+        </p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const material = new THREE.MeshBasicMaterial({
+-    color: 'red',
+-});
++const material = new THREE.ShaderMaterial({
++  fragmentShader,
++  uniforms,
++});
+</pre>
+        <p>在渲染前，需要先设置uniforms的值。
+        </p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function render() {
++function render(time) {
++  time *= 0.001;  // convert to seconds
+
+  resizeRendererToDisplaySize(renderer);
+
++  const canvas = renderer.domElement;
++  uniforms.iResolution.value.set(canvas.width, canvas.height, 1);
++  uniforms.iTime.value = time;
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}
+</pre>
+        <blockquote>
+          <p>注意：
+            不清楚为何<code class="notranslate" translate="no">iResolution</code>是个<code class="notranslate"
+              translate="no">vec3</code>,而且
+            <a href="https://www.shadertoy.com/howto">shadertoy.com</a>上的文档也没有说明第三个参数是啥，在上面没有用到第三个参数所以暂时设置为1。¯\_(ツ)_/¯
+          </p>
+        </blockquote>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-basic.html"></iframe></div>
+          <a class="threejs_center" href="/manual/examples/shadertoy-basic.html" target="_blank">点击此处在新标签页中打开</a>
+        </div>
+
+        <p></p>
+        <p>上面定义的新shader效果与我们在 <a href="https://www.shadertoy.com/new">Shadertoy</a>上看到的匹配，
+          至少 2019 年 1 月是这样的 😉。这个shader做了些啥？ </p>
+        <ul>
+          <li><code class="notranslate" translate="no">uv</code> 从0变到1。</li>
+          <li><code class="notranslate" translate="no">cos(uv.xyx)</code>得到3个cos值，以<code class="notranslate"
+              translate="no">vec3</code>形式输出，一个是<code class="notranslate" translate="no">uv.x</code>的cos值, 一个是<code
+              class="notranslate" translate="no">uv.y</code>的cos值，最后是<code class="notranslate"
+              translate="no">uv.x</code>的cos值。</li>
+          <li>参数中加上时间 <code class="notranslate" translate="no">cos(iTime+uv.xyx)</code>形成动画。</li>
+          <li>另外<code class="notranslate" translate="no">vec3(0,2,4)</code>参数与<code class="notranslate"
+              translate="no">cos(iTime+uv.xyx+vec3(0,2,4))</code> 求和使cos波偏移。</li>
+          <li><code class="notranslate" translate="no">cos</code> 输出值范围从-1到1，所以经过<code class="notranslate"
+              translate="no">0.5 * 0.5 + cos(...)</code>从-1 &lt;-&gt; 1 变为 0.0 &lt;-&gt; 1.0</li>
+          <li>计算结果作为RGB颜色赋予当前像素。</li>
+        </ul>
+        <p>为了更容易看出cos波形我们稍微调整一下代码。当前<code class="notranslate" translate="no">uv</code>
+          仅能从0到1，因cos波形在2π处重复，我们通过将uv乘上40，实现cos波形从0到40的变化，这将会使cos波形重复大约6.3次。</p>
+        <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">-vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
++vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx*40.0+vec3(0,2,4));
+</pre>
+        <p>如下我数了下大约是重复了6.3次，通过 <code class="notranslate"
+            translate="no">+vec3(0,2,4)</code>偏移了4因此我们能看到红蓝相间，否则我们将看到红蓝颜色混合为紫色。</p>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-basic-x40.html"></iframe></div>
+          <a class="threejs_center" href="/manual/examples/shadertoy-basic-x40.html" target="_blank">点击此处在新标签页中打开</a>
+        </div>
+
+        <p></p>
+        <p>了解到输入如此简单，当看到如
+          <a href="https://www.shadertoy.com/view/MdXGW2">a city canal</a>,
+          <a href="https://www.shadertoy.com/view/4ttSWf">a forest</a>,
+          <a href="https://www.shadertoy.com/view/ld3Gz2">a snail</a>,
+          <a href="https://www.shadertoy.com/view/4tBXR1">a
+            mushroom</a>这些结果，让人更觉得充满挑战。幸运的是这也清晰的说明为何相对于传统的三角形构成的场景，这通常这不是正确的方式。因为每个像素颜色都需要经过许多数学计算，通常会导致运行缓慢。
+        </p>
+        <p>有些shadertoy的shaders使用纹理贴图作为输入，比如<a href="https://www.shadertoy.com/view/MsXSzM">这个</a>。</p>
+        <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By Daedelus: https://www.shadertoy.com/user/Daedelus
+// license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+#define TIMESCALE 0.25
+#define TILES 8
+#define COLOR 0.7, 1.6, 2.8
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = fragCoord.xy / iResolution.xy;
+    uv.x *= iResolution.x / iResolution.y;
+
+    vec4 noise = texture2D(iChannel0, floor(uv * float(TILES)) / float(TILES));
+    float p = 1.0 - mod(noise.r + noise.g + noise.b + iTime * float(TIMESCALE), 1.0);
+    p = min(max(p * 3.0 - 1.8, 0.1), 2.0);
+
+    vec2 r = mod(uv * float(TILES), 1.0);
+    r = vec2(pow(r.x - 0.5, 2.0), pow(r.y - 0.5, 2.0));
+    p *= 1.0 - pow(min(1.0, 12.0 * dot(r, r)), 2.0);
+
+    fragColor = vec4(COLOR, 1.0) * p;
+}
+</pre>
+        <p>给shader传递纹理与<a href="textures.html">给常规材质传递纹理</a>一样，只不过需要通过uniforms来设置纹理。</p>
+        <p>首先需要给shader添加一个纹理的uniform。在GLSL中对应为
+          <code class="notranslate" translate="no">sampler2D</code> 。
+        </p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fragmentShader = `
+#include &lt;common&gt;
+
+uniform vec3 iResolution;
+uniform float iTime;
++uniform sampler2D iChannel0;
+
+...
+</pre>
+        <p>然后我们可以像<a href="textures.html">这里</a>一样载入纹理，并且设置uniform的值。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
++const texture = loader.load('resources/images/bayer.png');
++texture.minFilter = THREE.NearestFilter;
++texture.magFilter = THREE.NearestFilter;
++texture.wrapS = THREE.RepeatWrapping;
++texture.wrapT = THREE.RepeatWrapping;
+const uniforms = {
+  iTime: { value: 0 },
+  iResolution:  { value: new THREE.Vector3() },
++  iChannel0: { value: texture },
+};
+</pre>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-bleepy-blocks.html"></iframe>
+          </div>
+          <a class="threejs_center" href="/manual/examples/shadertoy-bleepy-blocks.html"
+            target="_blank">点击此处在新标签页中打开</a>
+        </div>
+
+        <p></p>
+        <p>到目前为止，我们一直用<a href="https://shadertoy.com">Shadertoy.com</a>上的方式使用 Shadertoy
+          shaders,即在canvas上绘制shader。但我们无需受限于此。请留意，通常人们在Shadertoy上写的函数仅输入一个<code class="notranslate"
+            translate="no">fragCoord</code> 和一个<code class="notranslate" translate="no">iResolution</code>参数。<code
+            class="notranslate" translate="no">fragCoord</code> 不一定来自像素坐标，像纹理坐标也可以，然后就可以像常规的纹理一样使用。通常把这种通过函数生成纹理的技术叫做<a
+            href="https://www.google.com/search?q=procedural+texture"><em>procedural texture</em></a>。</p>
+        <p>让我们改一改上面的shader，最简单的莫过于使用three.js提供的纹理坐标，乘上<code class="notranslate"
+            translate="no">iResolution</code>再传到<code class="notranslate" translate="no">fragCoords</code>。</p>
+        <p>我们需要加一个<em>varying</em>变量。varing变量通过对顶点进行插值（也叫varied）实现从vertex shader传值到fragment shader。在fragment
+          shader中使用之前需要先声明该变量。这个变量名中的 <code class="notranslate" translate="no">uv</code>代表纹理坐标，前面的<code
+            class="notranslate" translate="no">v</code>代表<em>varying</em>。</p>
+        <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">...
+
++varying vec2 vUv;
+
+void main() {
+-  mainImage(gl_FragColor, gl_FragCoord.xy);
++  mainImage(gl_FragColor, vUv * iResolution.xy);
+}
+</pre>
+        <p>然后我们需要实现vertex shader，下面是最简化的three.js的vertex shader。three.js中定义了<code class="notranslate"
+            translate="no">uv</code>，<code class="notranslate" translate="no">projectionMatrix</code>，<code
+            class="notranslate" translate="no">modelViewMatrix</code>，和 <code class="notranslate"
+            translate="no">position</code>这几个参数，且可以传值给shader。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const vertexShader = `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+  }
+`;
+</pre>
+        <p>把vertexshader传给<a href="/docs/#api/en/materials/ShaderMaterial"><code class="notranslate"
+              translate="no">ShaderMaterial</code></a>。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.ShaderMaterial({
+  vertexShader,
+  fragmentShader,
+  uniforms,
+});
+</pre>
+        <p>因为<code class="notranslate" translate="no">iResolution</code>保持不变，因此可以在初始化时设定它的值。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const uniforms = {
+  iTime: { value: 0 },
+-  iResolution:  { value: new THREE.Vector3() },
++  iResolution:  { value: new THREE.Vector3(1, 1, 1) },
+  iChannel0: { value: texture },
+};
+</pre>
+        <p>在渲染时无需设置它的值。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const canvas = renderer.domElement;
+-uniforms.iResolution.value.set(canvas.width, canvas.height, 1);
+uniforms.iTime.value = time;
+</pre>
+        <p>另外我从<a href="responsive.html">关于响应能力的文章</a>复制了一段3个旋转cube代码。效果如下：</p>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-as-texture.html"></iframe>
+          </div>
+          <a class="threejs_center" href="/manual/examples/shadertoy-as-texture.html" target="_blank">点击此处在新标签页中打开</a>
+        </div>
+
+        <p></p>
+        <p>希望这篇文字能说清在three.js使用shadertoy shader的入门方法。再次重申，大部分的shadertoy
+          shaders与其说是性能方面的最佳实践，不如称它们是有趣的挑战（通过函数实现所有绘制）。尽管如此，他们还是有着令人印象深刻的惊艳和美，了解shader工作原理可以学到很多东西。</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body>
+
+</html>

@@ -1,63 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - loaders - vrml loader</title>
+		<title>three.js webgl - loaders - VRML loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			body {
-				color: #444;
-			}
-			a {
-				color: #08f;
-			}
-		</style>
 	</head>
 
 	<body>
 		<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
-		vrml format loader test
-		<!--model from <a href="http://cs.iupui.edu/~aharris/webDesign/vrml/" target="_blank" rel="noopener">VRML 2.0 Tutorial</a>,-->
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - VRML loader
 		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { VRMLLoader } from './jsm/loaders/VRMLLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { VRMLLoader } from 'three/addons/loaders/VRMLLoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			var camera, scene, renderer, stats;
+			let camera, scene, renderer, stats, controls, loader;
+
+			const params = {
+				asset: 'house'
+			};
+
+			const assets = [
+				'creaseAngle',
+				'crystal',
+				'house',
+				'elevationGrid1',
+				'elevationGrid2',
+				'extrusion1',
+				'extrusion2',
+				'extrusion3',
+				'lines',
+				'linesTransparent',
+				'meshWithLines',
+				'meshWithTexture',
+				'pixelTexture',
+				'points',
+			];
+
+			let vrmlScene;
 
 			init();
 			animate();
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
-				camera.position.z = 6;
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1e10 );
+				camera.position.set( - 10, 5, 10 );
 
 				scene = new THREE.Scene();
 				scene.add( camera );
 
 				// light
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( 200, 200, 1000 ).normalize();
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 1.2 );
+				scene.add( ambientLight );
 
-				camera.add( dirLight );
-				camera.add( dirLight.target );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 2.0 );
+				dirLight.position.set( 200, 200, 200 );
+				scene.add( dirLight );
 
-				var loader = new VRMLLoader();
-				loader.load( 'models/vrml/house.wrl', function ( object ) {
-
-					scene.add( object );
-
-				} );
+				loader = new VRMLLoader();
+				loadAsset( params.asset );
 
 				// renderer
 
@@ -68,7 +88,10 @@
 
 				// controls
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 200;
+				controls.enableDamping = true;
 
 				//
 
@@ -77,7 +100,42 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
+
+				//
+
+				const gui = new GUI();
+				gui.add( params, 'asset', assets ).onChange( function ( value ) {
+
+					if ( vrmlScene ) {
+
+						vrmlScene.traverse( function ( object ) {
+
+							if ( object.material ) object.material.dispose();
+							if ( object.material && object.material.map ) object.material.map.dispose();
+							if ( object.geometry ) object.geometry.dispose();
+
+						} );
+
+						scene.remove( vrmlScene );
+
+					}
+
+					loadAsset( value );
+
+				} );
+
+			}
+
+			function loadAsset( asset ) {
+
+				loader.load( 'models/vrml/' + asset + '.wrl', function ( object ) {
+
+					vrmlScene = object;
+					scene.add( object );
+					controls.reset();
+
+				} );
 
 			}
 
@@ -93,6 +151,8 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+
+				controls.update(); // to support damping
 
 				renderer.render( scene, camera );
 

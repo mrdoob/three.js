@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>فحص توافق WebGL</h1>
+		<p>
+			على الرغم من أن هذه المشكلة أصبحت أقل وأقل ، إلا أن بعض الأجهزة أو المتصفحات قد لا تدعم WebGL.
+			تتيح لك الطريقة التالية التحقق مما إذا كانت مدعومة وعرض رسالة للمستخدم إذا لم تكن مدعومة.
+			قم باستيراد وحدة الكشف عن دعم WebGL ، وقم بتشغيل ما يلي قبل محاولة عرض أي شيء.
+		</p>
+
+		<code>
+		import WebGL from 'three/addons/capabilities/WebGL.js';
+
+		if ( WebGL.isWebGLAvailable() ) {
+
+			// Initiate function or other initializations here
+			animate();
+
+		} else {
+
+			const warning = WebGL.getWebGLErrorMessage();
+			document.getElementById( 'container' ).appendChild( warning );
+
+		}
+		</code>
+	</body>
+</html>

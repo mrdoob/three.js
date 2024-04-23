@@ -1,0 +1,226 @@
+<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8">
+    <title>Le brouillard</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Brouillard">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Le brouillard</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Cet article fait partie d'une série consacrée à Three.js dont le premier article s'intitule <a href="fundamentals.html">Principes de base</a>.
+Si vous ne l'avez pas encore lu, vous devriez commencer par lui. Si, également, vous n'avez pas lu l'article concernant <a href="cameras.html">les caméras</a>, lisez-le avant de poursuivre.</p>
+<p>Le brouillard dans un moteur 3D est généralement un moyen d'atténuer les couleurs de la scène vers une couleur désirée en fonction de la distance par rapport à la caméra. Dans Three.js, vous pouvez ajouter du brouillard en crééant dans la propriété <a href="/docs/#api/en/scenes/Scene#fog"><code class="notranslate" translate="no">fog</code></a> de votre scène, soit un objet <a href="https://threejs.org/docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> soit un objet <a href="https://threejs.org/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a>.</p>
+<p><a href="/docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> permet de définir les paramètres <code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code> en tant que distance par rapport à la caméra. Ce qui se trouve entre la caméra et <code class="notranslate" translate="no">near</code> n'est pas affecté par le brouillard.
+Ce qui est au-delà de <code class="notranslate" translate="no">far</code> est complètement dans le brouillard. Ce qui se trouve entre les deux, est altéré par le brouillard.</p>
+<p>Il y a aussi <a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> qui croît de façon exponentielle en fonction de la distance de la caméra.</p>
+<p>Pour utiliser <a href="/docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a>, suivez cet exemple :</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+{
+  const color = 0xFFFFFF;  // white
+  const near = 10;
+  const far = 100;
+  scene.fog = new THREE.Fog(color, near, far);
+}
+</pre>
+<p>Pour utiliser <a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a>, suivez cet exemple :</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+{
+  const color = 0xFFFFFF;
+  const density = 0.1;
+  scene.fog = new THREE.FogExp2(color, density);
+}
+</pre>
+<p><a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> est le plus proche de la réalité, mais <a href="/docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> est le plus souvent utilisé car il permet de choisir un endroit où appliquer le brouillard, afin de vous permettre d'afficher une scène claire jusqu'à une certaine distance, puis de passer à une autre couleur au-delà de cette distance.</p>
+<div class="spread">
+  <div>
+    <div data-diagram="fog" style="height: 300px;"></div>
+    <div class="code">THREE.Fog</div>
+  </div>
+  <div>
+    <div data-diagram="fogExp2" style="height: 300px;"></div>
+    <div class="code">THREE.FogExp2</div>
+  </div>
+</div>
+
+<p>Il est important de noter que le brouillard s'applique aux objets rendus lors du calcul sur chaque pixel de la couleur des objets. Cela signifie que si vous voulez que votre scène s'estompe avec une certaine couleur, vous devez définir le brouillard ainsi que la couleur d'arrière-plan avec la même couleur. La couleur d'arrière-plan est définie à l'aide de la propriété <a href="/docs/#api/en/scenes/Scene#background"><code class="notranslate" translate="no">scene.background</code></a>. Pour choisir une couleur d'arrière-plan, vous lui attachez une <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a>. Comme ceci :</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">scene.background = new THREE.Color('#F00');  // red
+</pre>
+<div class="spread">
+  <div>
+    <div data-diagram="fogBlueBackgroundRed" style="height: 300px;" class="border"></div>
+    <div class="code">Brouillard bleu, arrière-plan rouge</div>
+  </div>
+  <div>
+    <div data-diagram="fogBlueBackgroundBlue" style="height: 300px;" class="border"></div>
+    <div class="code">Brouillard bleu, arrière-plan bleu</div>
+  </div>
+</div>
+
+<p>Voici l'un de nos exemples précédents mais avec du brouillard activé. L'unique ajout se fait juste après avoir configuré la scène : nous ajoutons le brouillard et définissons la couleur d'arrière-plan de la scène.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+
++{
++  const near = 1;
++  const far = 2;
++  const color = 'lightblue';
++  scene.fog = new THREE.Fog(color, near, far);
++  scene.background = new THREE.Color(color);
++}
+</pre>
+<p>Dans l'exemple ci-dessous, le <code class="notranslate" translate="no">near</code> de la caméra est à 0,1 et le <code class="notranslate" translate="no">far</code> à 5. La position z de la caméra est à 2. Les cubes mesurent 1 unité de large et à Z = 0. Les réglages du brouillard, <code class="notranslate" translate="no">near</code> = 1 et <code class="notranslate" translate="no">far</code> = 2. Ainsi, les cubes s'estompent juste autour de leur centre.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fog.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/fog.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée.</a>
+</div>
+
+<p></p>
+<p>Mettons à jour notre <a href="https://github.com/georgealways/lil-gui">lil-gui</a> pour jouer avec le brouillard. Lil-gui prend un objet et une propriété et crée automatiquement une interface de contrôle pour cette propriété. Nous pourrions simplement le laisser modifier les propriétés <code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code> du brouillard, mais il est impossible que <code class="notranslate" translate="no">near</code> soit supérieur à <code class="notranslate" translate="no">far</code>. Assurons-nous de cela.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// On utilise cette classe pour passer à lil-gui.
+// Quand lil-gui modifie near ou far :
+//  - near n'est jamais strictement supérieur à far
+//  - far n'est jamais strictement inférieur à near
+class FogGUIHelper {
+  constructor(fog) {
+    this.fog = fog;
+  }
+  get near() {
+    return this.fog.near;
+  }
+  set near(v) {
+    this.fog.near = v;
+    this.fog.far = Math.max(this.fog.far, v);
+  }
+  get far() {
+    return this.fog.far;
+  }
+  set far(v) {
+    this.fog.far = v;
+    this.fog.near = Math.min(this.fog.near, v);
+  }
+}
+</pre>
+<p>On peut l'ajouter comme ceci :</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const near = 1;
+  const far = 2;
+  const color = 'lightblue';
+  scene.fog = new THREE.Fog(color, near, far);
+  scene.background = new THREE.Color(color);
++
++  const fogGUIHelper = new FogGUIHelper(scene.fog);
++  gui.add(fogGUIHelper, 'near', near, far).listen();
++  gui.add(fogGUIHelper, 'far', near, far).listen();
+}
+</pre>
+<p>Les paramètres <code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code> définissent les valeurs minimales et maximales pour ajuster le brouillard. Ils sont définis lors de la configuration de la caméra.</p>
+<p>Le <code class="notranslate" translate="no">.listen()</code> à la fin des 2 lignes, dit à lil-gui <em>d'écouter</em>
+les changements. Ainsi, que nous changions <code class="notranslate" translate="no">near</code> ou <code class="notranslate" translate="no">far</code>, lil-gui mettra automatiquement à jour les deux propriétés pour nous.</p>
+<p>Il peut également être agréable de pouvoir changer la couleur du brouillard, mais comme mentionné ci-dessus, nous devons synchroniser la couleur du brouillard et la couleur de l'arrière-plan. Ajoutons donc une autre propriété <em>virtuelle</em> à notre helper qui définira les deux couleurs lorsque lil-gui la manipule.</p>
+<p>lil-gui peut manipuler les couleurs de 4 façons différentes : - Sous la forme d'une chaîne hexadécimale à 6 chiffres (ex : <code class="notranslate" translate="no">#112233</code>); - Sous la forme HSL (ex : <code class="notranslate" translate="no">{h: 60, s: 1, v: }</code>); -
+En tant que tableau RGB (ex : <code class="notranslate" translate="no">[255, 128, 64]</code>); - Ou finalement, comme un tableau RGBA (ex : <code class="notranslate" translate="no">[127, 200, 75, 0.3]</code>).</p>
+<p>Il est plus simple d'utiliser la première solution, la version chaîne hexadécimale, ainsi
+lil-gui ne manipule qu'une seule valeur. Heureusement, <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a>
+a une méthode pour cela : <a href="/docs/#api/en/math/Color#getHexString"><code class="notranslate" translate="no">getHexString</code></a> qui permet d'obtenir une telle chaîne, il suffit juste d'ajouter un '#' au début.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">/// On utilise cette classe pour passer à lil-gui
+// Quand il manipule near ou far
+// near n'est jamais &gt; far et far n'est jamais &lt; near
++// Aussi, lorsque lil-gui manipule la couleur, nous allons
++// mettre à jour les couleurs du brouillard et de l'arrière-plan.
+class FogGUIHelper {
+*  constructor(fog, backgroundColor) {
+    this.fog = fog;
++    this.backgroundColor = backgroundColor;
+  }
+  get near() {
+    return this.fog.near;
+  }
+  set near(v) {
+    this.fog.near = v;
+    this.fog.far = Math.max(this.fog.far, v);
+  }
+  get far() {
+    return this.fog.far;
+  }
+  set far(v) {
+    this.fog.far = v;
+    this.fog.near = Math.min(this.fog.near, v);
+  }
++  get color() {
++    return `#${this.fog.color.getHexString()}`;
++  }
++  set color(hexString) {
++    this.fog.color.set(hexString);
++    this.backgroundColor.set(hexString);
++  }
+}
+</pre>
+<p>Ensuite, nous appelons <code class="notranslate" translate="no">gui.addColor</code> pour ajouter une couleur à notre propriété virtuelle :</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const near = 1;
+  const far = 2;
+  const color = 'lightblue';
+  scene.fog = new THREE.Fog(color, near, far);
+  scene.background = new THREE.Color(color);
+
+*  const fogGUIHelper = new FogGUIHelper(scene.fog, scene.background);
+  gui.add(fogGUIHelper, 'near', near, far).listen();
+  gui.add(fogGUIHelper, 'far', near, far).listen();
++  gui.addColor(fogGUIHelper, 'color');
+}
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fog-gui.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/fog-gui.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée.</a>
+</div>
+
+<p></p>
+<p>Vous pouvez voir qu'un réglage <code class="notranslate" translate="no">near</code> à 1.9 et <code class="notranslate" translate="no">far</code> à 2.0 donne une transition très nette entre non embué et complètement dans le brouillard. <code class="notranslate" translate="no">near</code> = 1.1 et <code class="notranslate" translate="no">far</code> = 2.9 devrait être la meilleure configuration étant donné que nos cubes tournent à 2 unités de la caméra.</p>
+<p>Une dernière chose ! Il existe une propriété <a href="/docs/#api/en/materials/Material#fog">fog</a> pour savoir si les objets rendus avec ce matériau sont affectés ou non par le brouillard. La valeur par défaut est <code class="notranslate" translate="no">true</code> pour la plupart des matériaux. Voici deux exemples illustrant cette volonté de désactiver le brouillard : imaginez que vous créez un simulateur de véhicule 3D avec une vue depuis le siège du conducteur (cockpit). Vous ne voulez pas qu'il n'y ait de brouillard à l'intérieur du véhicule. Prenons un second exemple : une maison avec un épais brouillard à l'extérieur. Disons que pour commencer, le brouillard est réglé pour commencer à 2 mètres (near = 2) et être total à 4 mètres (far = 4). Les pièces et la maison faisant plus de 4 mètres, il vous faudra donc définir les matériaux utilisés à l'intérieur de la maison pour qu'il n'y ait pas de brouillard, sinon, cela donnerait l'aspect non désiré suivant :</p>
+<div class="spread">
+  <div>
+    <div data-diagram="fogHouseAll" style="height: 300px;" class="border"></div>
+    <div class="code">fog à true sur tous les objets.</div>
+  </div>
+</div>
+
+<p>Remarquez que les murs et le plafond au fond de la pièce sont dans le brouillard. En désactivant le brouillard sur les matériaux de la maison, on résout ce problème.</p>
+<div class="spread">
+  <div>
+    <div data-diagram="fogHouseInsideNoFog" style="height: 300px;" class="border"></div>
+    <div class="code">fog à true sur uniquement les matériaux extérieurs de la maison.</div>
+  </div>
+</div>
+
+<p><canvas id="c"></canvas></p>
+<script type="module" src="../resources/threejs-fog.js"></script>
+
+        </div>
+      </div>
+    </div>
+
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

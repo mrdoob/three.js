@@ -1,35 +1,31 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- */
-
 import { Color } from '../math/Color.js';
 
-function Fog( color, near, far ) {
+class Fog {
 
-	this.name = '';
+	constructor( color, near = 1, far = 1000 ) {
 
-	this.color = new Color( color );
+		this.isFog = true;
 
-	this.near = ( near !== undefined ) ? near : 1;
-	this.far = ( far !== undefined ) ? far : 1000;
+		this.name = '';
 
-}
+		this.color = new Color( color );
 
-Object.assign( Fog.prototype, {
+		this.near = near;
+		this.far = far;
 
-	isFog: true,
+	}
 
-	clone: function () {
+	clone() {
 
 		return new Fog( this.color, this.near, this.far );
 
-	},
+	}
 
-	toJSON: function ( /* meta */ ) {
+	toJSON( /* meta */ ) {
 
 		return {
 			type: 'Fog',
+			name: this.name,
 			color: this.color.getHex(),
 			near: this.near,
 			far: this.far
@@ -37,6 +33,6 @@ Object.assign( Fog.prototype, {
 
 	}
 
-} );
+}
 
 export { Fog };

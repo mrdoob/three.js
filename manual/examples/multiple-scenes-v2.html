@@ -1,0 +1,203 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Multiple Scenes - v2</title>
+    <style>
+    #c {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: -1;
+    }
+    .diagram {
+      display: inline-block;
+      width: 5em;
+      height: 3em;
+      border: 1px solid black;
+    }
+    .left {
+      float: left;
+      margin-right: .25em;
+    }
+    .right {
+      float: right;
+      margin-left: .25em;
+    }
+    p {
+      margin: 1em auto;
+      max-width: 500px;
+      font-size: xx-large;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <p>
+      <span id="box" class="diagram left"></span>
+      I love boxes. Presents come in boxes.
+      When I find a new box I'm always excited to find out what's inside.
+    </p>
+    <p>
+      <span id="pyramid" class="diagram right"></span>
+      When I was a kid I dreamed of going on an expedition inside a pyramid
+      and finding a undiscovered tomb full of mummies and treasure.
+    </p>
+  </body>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+function main() {
+
+	const canvas = document.querySelector( '#c' );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas, alpha: true } );
+
+	function makeScene( elem ) {
+
+		const scene = new THREE.Scene();
+		scene.background = new THREE.Color( '#0F0' );
+
+		const fov = 45;
+		const aspect = 2; // the canvas default
+		const near = 0.1;
+		const far = 5;
+		const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+		camera.position.set( 0, 1, 2 );
+		camera.lookAt( 0, 0, 0 );
+
+		{
+
+			const color = 0xFFFFFF;
+			const intensity = 3;
+			const light = new THREE.DirectionalLight( color, intensity );
+			light.position.set( - 1, 2, 4 );
+			scene.add( light );
+
+		}
+
+		return { scene, camera, elem };
+
+	}
+
+	function setupScene1() {
+
+		const sceneInfo = makeScene( document.querySelector( '#box' ) );
+		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshPhongMaterial( { color: 'red' } );
+		const mesh = new THREE.Mesh( geometry, material );
+		sceneInfo.scene.add( mesh );
+		sceneInfo.mesh = mesh;
+		return sceneInfo;
+
+	}
+
+	function setupScene2() {
+
+		const sceneInfo = makeScene( document.querySelector( '#pyramid' ) );
+		const radius = .8;
+		const widthSegments = 4;
+		const heightSegments = 2;
+		const geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments );
+		const material = new THREE.MeshPhongMaterial( {
+			color: 'blue',
+			flatShading: true,
+		} );
+		const mesh = new THREE.Mesh( geometry, material );
+		sceneInfo.scene.add( mesh );
+		sceneInfo.mesh = mesh;
+		return sceneInfo;
+
+	}
+
+	const sceneInfo1 = setupScene1();
+	const sceneInfo2 = setupScene2();
+
+	function resizeRendererToDisplaySize( renderer ) {
+
+		const canvas = renderer.domElement;
+		const width = canvas.clientWidth;
+		const height = canvas.clientHeight;
+		const needResize = canvas.width !== width || canvas.height !== height;
+		if ( needResize ) {
+
+			renderer.setSize( width, height, false );
+
+		}
+
+		return needResize;
+
+	}
+
+	function renderSceneInfo( sceneInfo ) {
+
+		const { scene, camera, elem } = sceneInfo;
+
+		// get the viewport relative position of this element
+		const { left, right, top, bottom, width, height } =
+        elem.getBoundingClientRect();
+
+		const isOffscreen =
+        bottom < 0 ||
+        top > renderer.domElement.clientHeight ||
+        right < 0 ||
+        left > renderer.domElement.clientWidth;
+
+		if ( isOffscreen ) {
+
+			return;
+
+		}
+
+		camera.aspect = width / height;
+		camera.updateProjectionMatrix();
+
+		const positiveYUpBottom = renderer.domElement.clientHeight - bottom;
+		renderer.setScissor( left, positiveYUpBottom, width, height );
+		renderer.setViewport( left, positiveYUpBottom, width, height );
+
+		renderer.render( scene, camera );
+
+	}
+
+	const clearColor = new THREE.Color( '#000' );
+	function render( time ) {
+
+		time *= 0.001;
+
+		resizeRendererToDisplaySize( renderer );
+
+		renderer.setScissorTest( false );
+		renderer.setClearColor( clearColor, 0 );
+		renderer.clear( true, true );
+		renderer.setScissorTest( true );
+
+		sceneInfo1.mesh.rotation.y = time * .1;
+		sceneInfo2.mesh.rotation.y = time * .1;
+
+		renderSceneInfo( sceneInfo1 );
+		renderSceneInfo( sceneInfo2 );
+
+		requestAnimationFrame( render );
+
+	}
+
+	requestAnimationFrame( render );
+
+}
+
+main();
+</script>
+</html>

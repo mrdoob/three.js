@@ -1,41 +1,33 @@
 import { Camera } from './Camera.js';
-import { Object3D } from '../core/Object3D.js';
 
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author arose / http://github.com/arose
- */
+class OrthographicCamera extends Camera {
 
-function OrthographicCamera( left, right, top, bottom, near, far ) {
+	constructor( left = - 1, right = 1, top = 1, bottom = - 1, near = 0.1, far = 2000 ) {
 
-	Camera.call( this );
+		super();
 
-	this.type = 'OrthographicCamera';
+		this.isOrthographicCamera = true;
 
-	this.zoom = 1;
-	this.view = null;
+		this.type = 'OrthographicCamera';
 
-	this.left = ( left !== undefined ) ? left : - 1;
-	this.right = ( right !== undefined ) ? right : 1;
-	this.top = ( top !== undefined ) ? top : 1;
-	this.bottom = ( bottom !== undefined ) ? bottom : - 1;
+		this.zoom = 1;
+		this.view = null;
 
-	this.near = ( near !== undefined ) ? near : 0.1;
-	this.far = ( far !== undefined ) ? far : 2000;
+		this.left = left;
+		this.right = right;
+		this.top = top;
+		this.bottom = bottom;
 
-	this.updateProjectionMatrix();
+		this.near = near;
+		this.far = far;
 
-}
+		this.updateProjectionMatrix();
 
-OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ), {
+	}
 
-	constructor: OrthographicCamera,
+	copy( source, recursive ) {
 
-	isOrthographicCamera: true,
-
-	copy: function ( source, recursive ) {
-
-		Camera.prototype.copy.call( this, source, recursive );
+		super.copy( source, recursive );
 
 		this.left = source.left;
 		this.right = source.right;
@@ -49,9 +41,9 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 		return this;
 
-	},
+	}
 
-	setViewOffset: function ( fullWidth, fullHeight, x, y, width, height ) {
+	setViewOffset( fullWidth, fullHeight, x, y, width, height ) {
 
 		if ( this.view === null ) {
 
@@ -77,9 +69,9 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 		this.updateProjectionMatrix();
 
-	},
+	}
 
-	clearViewOffset: function () {
+	clearViewOffset() {
 
 		if ( this.view !== null ) {
 
@@ -89,24 +81,24 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 		this.updateProjectionMatrix();
 
-	},
+	}
 
-	updateProjectionMatrix: function () {
+	updateProjectionMatrix() {
 
-		var dx = ( this.right - this.left ) / ( 2 * this.zoom );
-		var dy = ( this.top - this.bottom ) / ( 2 * this.zoom );
-		var cx = ( this.right + this.left ) / 2;
-		var cy = ( this.top + this.bottom ) / 2;
+		const dx = ( this.right - this.left ) / ( 2 * this.zoom );
+		const dy = ( this.top - this.bottom ) / ( 2 * this.zoom );
+		const cx = ( this.right + this.left ) / 2;
+		const cy = ( this.top + this.bottom ) / 2;
 
-		var left = cx - dx;
-		var right = cx + dx;
-		var top = cy + dy;
-		var bottom = cy - dy;
+		let left = cx - dx;
+		let right = cx + dx;
+		let top = cy + dy;
+		let bottom = cy - dy;
 
 		if ( this.view !== null && this.view.enabled ) {
 
-			var scaleW = ( this.right - this.left ) / this.view.fullWidth / this.zoom;
-			var scaleH = ( this.top - this.bottom ) / this.view.fullHeight / this.zoom;
+			const scaleW = ( this.right - this.left ) / this.view.fullWidth / this.zoom;
+			const scaleH = ( this.top - this.bottom ) / this.view.fullHeight / this.zoom;
 
 			left += scaleW * this.view.offsetX;
 			right = left + scaleW * this.view.width;
@@ -115,15 +107,15 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 		}
 
-		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far );
+		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, this.coordinateSystem );
 
-		this.projectionMatrixInverse.getInverse( this.projectionMatrix );
+		this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
-		var data = Object3D.prototype.toJSON.call( this, meta );
+		const data = super.toJSON( meta );
 
 		data.object.zoom = this.zoom;
 		data.object.left = this.left;
@@ -139,7 +131,6 @@ OrthographicCamera.prototype = Object.assign( Object.create( Camera.prototype ),
 
 	}
 
-} );
-
+}
 
 export { OrthographicCamera };

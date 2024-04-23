@@ -5,11 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			#warning {
-				color: #ff0000;
-			}
-		</style>
 	</head>
 	<body>
 
@@ -221,6 +216,8 @@
 
 			void main() {
 
+				if ( vColor.y == 0.0 ) discard;
+
 				float f = length( gl_PointCoord - vec2( 0.5, 0.5 ) );
 				if ( f > 0.5 ) {
 					discard;
@@ -231,33 +228,39 @@
 
 		</script>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
-
-			var isIE = /Trident/i.test( navigator.userAgent );
-			var isEdge = /Edge/i.test( navigator.userAgent );
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';
 
 			// Texture width for simulation (each texel is a debris particle)
-			var WIDTH = ( isIE || isEdge ) ? 4 : 64;
+			const WIDTH = 64;
 
-			var container, stats;
-			var camera, scene, renderer, geometry;
+			let container, stats;
+			let camera, scene, renderer, geometry;
 
-			var PARTICLES = WIDTH * WIDTH;
+			const PARTICLES = WIDTH * WIDTH;
 
-			var gpuCompute;
-			var velocityVariable;
-			var positionVariable;
-			var velocityUniforms;
-			var particleUniforms;
-			var effectController;
+			let gpuCompute;
+			let velocityVariable;
+			let positionVariable;
+			let velocityUniforms;
+			let particleUniforms;
+			let effectController;
 
 			init();
 			animate();
@@ -278,7 +281,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 100;
+				controls.maxDistance = 1000;
 
 				effectController = {
 					// Can be changed dynamically
@@ -300,7 +305,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				initGUI();
 
@@ -314,23 +319,23 @@
 
 				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
-				var dtPosition = gpuCompute.createTexture();
-				var dtVelocity = gpuCompute.createTexture();
+				const dtPosition = gpuCompute.createTexture();
+				const dtVelocity = gpuCompute.createTexture();
 
 				fillTextures( dtPosition, dtVelocity );
 
-				velocityVariable = gpuCompute.addVariable( "textureVelocity", document.getElementById( 'computeShaderVelocity' ).textContent, dtVelocity );
-				positionVariable = gpuCompute.addVariable( "texturePosition", document.getElementById( 'computeShaderPosition' ).textContent, dtPosition );
+				velocityVariable = gpuCompute.addVariable( 'textureVelocity', document.getElementById( 'computeShaderVelocity' ).textContent, dtVelocity );
+				positionVariable = gpuCompute.addVariable( 'texturePosition', document.getElementById( 'computeShaderPosition' ).textContent, dtPosition );
 
 				gpuCompute.setVariableDependencies( velocityVariable, [ positionVariable, velocityVariable ] );
 				gpuCompute.setVariableDependencies( positionVariable, [ positionVariable, velocityVariable ] );
 
 				velocityUniforms = velocityVariable.material.uniforms;
 
-				velocityUniforms[ "gravityConstant" ] = { value: 0.0 };
-				velocityUniforms[ "density" ] = { value: 0.0 };
+				velocityUniforms[ 'gravityConstant' ] = { value: 0.0 };
+				velocityUniforms[ 'density' ] = { value: 0.0 };
 
-				var error = gpuCompute.init();
+				const error = gpuCompute.init();
 
 				if ( error !== null ) {
 
@@ -342,8 +347,8 @@
 
 			function restartSimulation() {
 
-				var dtPosition = gpuCompute.createTexture();
-				var dtVelocity = gpuCompute.createTexture();
+				const dtPosition = gpuCompute.createTexture();
+				const dtVelocity = gpuCompute.createTexture();
 
 				fillTextures( dtPosition, dtVelocity );
 
@@ -358,10 +363,10 @@
 
 				geometry = new THREE.BufferGeometry();
 
-				var positions = new Float32Array( PARTICLES * 3 );
-				var p = 0;
+				const positions = new Float32Array( PARTICLES * 3 );
+				let p = 0;
 
-				for ( var i = 0; i < PARTICLES; i ++ ) {
+				for ( let i = 0; i < PARTICLES; i ++ ) {
 
 					positions[ p ++ ] = ( Math.random() * 2 - 1 ) * effectController.radius;
 					positions[ p ++ ] = 0; //( Math.random() * 2 - 1 ) * effectController.radius;
@@ -369,12 +374,12 @@
 
 				}
 
-				var uvs = new Float32Array( PARTICLES * 2 );
+				const uvs = new Float32Array( PARTICLES * 2 );
 				p = 0;
 
-				for ( var j = 0; j < WIDTH; j ++ ) {
+				for ( let j = 0; j < WIDTH; j ++ ) {
 
-					for ( var i = 0; i < WIDTH; i ++ ) {
+					for ( let i = 0; i < WIDTH; i ++ ) {
 
 						uvs[ p ++ ] = i / ( WIDTH - 1 );
 						uvs[ p ++ ] = j / ( WIDTH - 1 );
@@ -387,22 +392,20 @@
 				geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 				particleUniforms = {
-					"texturePosition": { value: null },
-					"textureVelocity": { value: null },
-					"cameraConstant": { value: getCameraConstant( camera ) },
-					"density": { value: 0.0 }
+					'texturePosition': { value: null },
+					'textureVelocity': { value: null },
+					'cameraConstant': { value: getCameraConstant( camera ) },
+					'density': { value: 0.0 }
 				};
 
 				// THREE.ShaderMaterial
-				var material = new THREE.ShaderMaterial( {
+				const material = new THREE.ShaderMaterial( {
 					uniforms: particleUniforms,
 					vertexShader: document.getElementById( 'particleVertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'particleFragmentShader' ).textContent
 				} );
 
-				material.extensions.drawBuffers = true;
-
-				var particles = new THREE.Points( geometry, material );
+				const particles = new THREE.Points( geometry, material );
 				particles.matrixAutoUpdate = false;
 				particles.updateMatrix();
 
@@ -412,21 +415,21 @@
 
 			function fillTextures( texturePosition, textureVelocity ) {
 
-				var posArray = texturePosition.image.data;
-				var velArray = textureVelocity.image.data;
+				const posArray = texturePosition.image.data;
+				const velArray = textureVelocity.image.data;
 
-				var radius = effectController.radius;
-				var height = effectController.height;
-				var exponent = effectController.exponent;
-				var maxMass = effectController.maxMass * 1024 / PARTICLES;
-				var maxVel = effectController.velocity;
-				var velExponent = effectController.velocityExponent;
-				var randVel = effectController.randVelocity;
+				const radius = effectController.radius;
+				const height = effectController.height;
+				const exponent = effectController.exponent;
+				const maxMass = effectController.maxMass * 1024 / PARTICLES;
+				const maxVel = effectController.velocity;
+				const velExponent = effectController.velocityExponent;
+				const randVel = effectController.randVelocity;
 
-				for ( var k = 0, kl = posArray.length; k < kl; k += 4 ) {
+				for ( let k = 0, kl = posArray.length; k < kl; k += 4 ) {
 
 					// Position
-					var x, y, z, rr;
+					let x, z, rr;
 
 					do {
 
@@ -438,20 +441,20 @@
 
 					rr = Math.sqrt( rr );
 
-					var rExp = radius * Math.pow( rr, exponent );
+					const rExp = radius * Math.pow( rr, exponent );
 
 					// Velocity
-					var vel = maxVel * Math.pow( rr, velExponent );
+					const vel = maxVel * Math.pow( rr, velExponent );
 
-					var vx = vel * z + ( Math.random() * 2 - 1 ) * randVel;
-					var vy = ( Math.random() * 2 - 1 ) * randVel * 0.05;
-					var vz = - vel * x + ( Math.random() * 2 - 1 ) * randVel;
+					const vx = vel * z + ( Math.random() * 2 - 1 ) * randVel;
+					const vy = ( Math.random() * 2 - 1 ) * randVel * 0.05;
+					const vz = - vel * x + ( Math.random() * 2 - 1 ) * randVel;
 
 					x *= rExp;
 					z *= rExp;
-					y = ( Math.random() * 2 - 1 ) * height;
+					const y = ( Math.random() * 2 - 1 ) * height;
 
-					var mass = Math.random() * maxMass + 1;
+					const mass = Math.random() * maxMass + 1;
 
 					// Fill in texture values
 					posArray[ k + 0 ] = x;
@@ -475,38 +478,38 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				particleUniforms[ "cameraConstant" ].value = getCameraConstant( camera );
+				particleUniforms[ 'cameraConstant' ].value = getCameraConstant( camera );
 
 			}
 
 			function dynamicValuesChanger() {
 
-				velocityUniforms[ "gravityConstant" ].value = effectController.gravityConstant;
-				velocityUniforms[ "density" ].value = effectController.density;
-				particleUniforms[ "density" ].value = effectController.density;
+				velocityUniforms[ 'gravityConstant' ].value = effectController.gravityConstant;
+				velocityUniforms[ 'density' ].value = effectController.density;
+				particleUniforms[ 'density' ].value = effectController.density;
 
 			}
 
 			function initGUI() {
 
-				var gui = new GUI( { width: 300 } );
+				const gui = new GUI( { width: 280 } );
 
-				var folder1 = gui.addFolder( 'Dynamic parameters' );
+				const folder1 = gui.addFolder( 'Dynamic parameters' );
 
-				folder1.add( effectController, "gravityConstant", 0.0, 1000.0, 0.05 ).onChange( dynamicValuesChanger );
-				folder1.add( effectController, "density", 0.0, 10.0, 0.001 ).onChange( dynamicValuesChanger );
+				folder1.add( effectController, 'gravityConstant', 0.0, 1000.0, 0.05 ).onChange( dynamicValuesChanger );
+				folder1.add( effectController, 'density', 0.0, 10.0, 0.001 ).onChange( dynamicValuesChanger );
 
-				var folder2 = gui.addFolder( 'Static parameters' );
+				const folder2 = gui.addFolder( 'Static parameters' );
 
-				folder2.add( effectController, "radius", 10.0, 1000.0, 1.0 );
-				folder2.add( effectController, "height", 0.0, 50.0, 0.01 );
-				folder2.add( effectController, "exponent", 0.0, 2.0, 0.001 );
-				folder2.add( effectController, "maxMass", 1.0, 50.0, 0.1 );
-				folder2.add( effectController, "velocity", 0.0, 150.0, 0.1 );
-				folder2.add( effectController, "velocityExponent", 0.0, 1.0, 0.01 );
-				folder2.add( effectController, "randVelocity", 0.0, 50.0, 0.1 );
+				folder2.add( effectController, 'radius', 10.0, 1000.0, 1.0 );
+				folder2.add( effectController, 'height', 0.0, 50.0, 0.01 );
+				folder2.add( effectController, 'exponent', 0.0, 2.0, 0.001 );
+				folder2.add( effectController, 'maxMass', 1.0, 50.0, 0.1 );
+				folder2.add( effectController, 'velocity', 0.0, 150.0, 0.1 );
+				folder2.add( effectController, 'velocityExponent', 0.0, 1.0, 0.01 );
+				folder2.add( effectController, 'randVelocity', 0.0, 50.0, 0.1 );
 
-				var buttonRestart = {
+				const buttonRestart = {
 					restartSimulation: function () {
 
 						restartSimulation();
@@ -541,8 +544,8 @@
 
 				gpuCompute.compute();
 
-				particleUniforms[ "texturePosition" ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
-				particleUniforms[ "textureVelocity" ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
+				particleUniforms[ 'texturePosition' ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
+				particleUniforms[ 'textureVelocity' ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
 
 				renderer.render( scene, camera );
 

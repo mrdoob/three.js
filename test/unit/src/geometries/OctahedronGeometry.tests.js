@@ -1,19 +1,15 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
-import {
-	OctahedronBufferGeometry
-} from '../../../../src/geometries/OctahedronGeometry';
+import { OctahedronGeometry } from '../../../../src/geometries/OctahedronGeometry.js';
+
+import { PolyhedronGeometry } from '../../../../src/geometries/PolyhedronGeometry.js';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'OctahedronBufferGeometry', ( hooks ) => {
+	QUnit.module( 'OctahedronGeometry', ( hooks ) => {
 
-		var geometries = undefined;
+		let geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -22,24 +18,53 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				new OctahedronBufferGeometry(),
-				new OctahedronBufferGeometry( parameters.radius ),
-				new OctahedronBufferGeometry( parameters.radius, parameters.detail ),
+				new OctahedronGeometry(),
+				new OctahedronGeometry( parameters.radius ),
+				new OctahedronGeometry( parameters.radius, parameters.detail ),
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const object = new OctahedronGeometry();
+			assert.strictEqual(
+				object instanceof PolyhedronGeometry, true,
+				'OctahedronGeometry extends from PolyhedronGeometry'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const object = new OctahedronGeometry();
+			assert.ok( object, 'Can instantiate an OctahedronGeometry.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new OctahedronGeometry();
+			assert.ok(
+				object.type === 'OctahedronGeometry',
+				'OctahedronGeometry.type should be OctahedronGeometry'
+			);
+
+		} );
+
+		QUnit.todo( 'parameters', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// STATIC
+		QUnit.todo( 'fromJSON', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

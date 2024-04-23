@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -48,12 +47,12 @@
 
 		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
 		<p>
-		[page:Vector3 point] - [page:Vector3] to test.<br /><br />
+		[page:Vector3 point] - [page:Vector3] 被检测的点。<br /><br />
 
 		检测该点 [page:Vector3 point] 是否在视锥体内。
 		</p>
 
-		<h3>[method:Frustum copy]( [param:Frustum frustum] )</h3>
+		<h3>[method:this copy]( [param:Frustum frustum] )</h3>
 		<p>
 		[page:Frustum frustum] - 用于拷贝的视锥体。<br /><br />
 
@@ -63,15 +62,15 @@
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
 		<p>
 		[page:Box3 box] - [page:Box3] 用于检测是否要交的包围盒。<br /><br />
-		
+
 		返回 true 如果该 [page:Box3 box] 与视锥体相交。
 		</p>
 
 		<h3>[method:Boolean intersectsObject]( [param:Object3D object] )</h3>
 		<p>
-			检测 [page:Object3D object] 的包围球 [page:Geometry.boundingSphere bounding sphere] 是否与视锥体相交。<br /><br />
+			检测 [page:Object3D object] 的包围球 [page:BufferGeometry.boundingSphere bounding sphere] 是否与视锥体相交。<br /><br />
 
-			注意：该对象必须有一个 [page:Geometry] 或 [page:BufferGeometry] ，因为这样才能计算出包围球。
+			注意：该对象必须有一个 [page:BufferGeometry] ，因为这样才能计算出包围球。
 		</p>
 
 		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
@@ -88,14 +87,14 @@
 
 		<h3>[method:this set]( [param:Plane p0], [param:Plane p1], [param:Plane p2], [param:Plane p3], [param:Plane p4], [param:Plane p5] )</h3>
 		<p>
-		Sets the frustum from the passed planes. No plane order is implied.<br>
-		Note that this method only copies the values from the given objects.
+		从传入的平面设置当前视锥体。没有隐式的顺序。<br>
+		请注意，此方法仅复制给定对象的值。
 		</p>
 
 		<h3>[method:this setFromProjectionMatrix]( [param:Matrix4 matrix] )</h3>
 		<p>
-		[page:Matrix4 matrix] - Projection [page:Matrix4] used to set the [page:.planes planes]<br /><br />
-		Sets the frustum planes from the projection matrix.
+		[page:Matrix4 matrix] - 投影矩阵 [page:Matrix4] 会被用来设置该视椎体的 [page:.planes planes]<br /><br />
+		根据投影矩阵 matrix 来设置当前视椎体的六个面。
 		</p>
 
 

@@ -13,17 +13,26 @@
 			PR2 head from <a href="http://www.ros.org/wiki/pr2_description">www.ros.org</a>
 		</div>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { STLLoader } from './jsm/loaders/STLLoader.js';
+			import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, cameraTarget, scene, renderer;
+			let camera, cameraTarget, scene, renderer;
 
 			init();
 			animate();
@@ -42,12 +51,11 @@
 				scene.background = new THREE.Color( 0x72645b );
 				scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
 
-
 				// Ground
 
-				var plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 40, 40 ),
-					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
+				const plane = new THREE.Mesh(
+					new THREE.PlaneGeometry( 40, 40 ),
+					new THREE.MeshPhongMaterial( { color: 0xcbcbcb, specular: 0x474747 } )
 				);
 				plane.rotation.x = - Math.PI / 2;
 				plane.position.y = - 0.5;
@@ -58,11 +66,11 @@
 
 				// ASCII file
 
-				var loader = new STLLoader();
+				const loader = new STLLoader();
 				loader.load( './models/stl/ascii/slotted_disk.stl', function ( geometry ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
-					var mesh = new THREE.Mesh( geometry, material );
+					const material = new THREE.MeshPhongMaterial( { color: 0xff9c7c, specular: 0x494949, shininess: 200 } );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.set( 0, - 0.25, 0.6 );
 					mesh.rotation.set( 0, - Math.PI / 2, 0 );
@@ -78,11 +86,11 @@
 
 				// Binary files
 
-				var material = new THREE.MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
+				const material = new THREE.MeshPhongMaterial( { color: 0xd5d5d5, specular: 0x494949, shininess: 200 } );
 
 				loader.load( './models/stl/binary/pr2_head_pan.stl', function ( geometry ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.set( 0, - 0.37, - 0.6 );
 					mesh.rotation.set( - Math.PI / 2, 0, 0 );
@@ -97,7 +105,7 @@
 
 				loader.load( './models/stl/binary/pr2_head_tilt.stl', function ( geometry ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.set( 0.136, - 0.37, - 0.6 );
 					mesh.rotation.set( - Math.PI / 2, 0.3, 0 );
@@ -113,14 +121,15 @@
 				// Colored binary STL
 				loader.load( './models/stl/binary/colored.stl', function ( geometry ) {
 
-					var meshMaterial = material;
+					let meshMaterial = material;
+
 					if ( geometry.hasColors ) {
 
 						meshMaterial = new THREE.MeshPhongMaterial( { opacity: geometry.alpha, vertexColors: true } );
 
 					}
 
-					var mesh = new THREE.Mesh( geometry, meshMaterial );
+					const mesh = new THREE.Mesh( geometry, meshMaterial );
 
 					mesh.position.set( 0.5, 0.2, 0 );
 					mesh.rotation.set( - Math.PI / 2, Math.PI / 2, 0 );
@@ -136,16 +145,15 @@
 
 				// Lights
 
-				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+				scene.add( new THREE.HemisphereLight( 0x8d7c7c, 0x494966, 3 ) );
 
-				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
-				addShadowedLight( 0.5, 1, - 1, 0xffaa00, 1 );
+				addShadowedLight( 1, 1, 1, 0xffffff, 3.5 );
+				addShadowedLight( 0.5, 1, - 1, 0xffd500, 3 );
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				renderer.shadowMap.enabled = true;
 
@@ -158,19 +166,19 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function addShadowedLight( x, y, z, color, intensity ) {
 
-				var directionalLight = new THREE.DirectionalLight( color, intensity );
+				const directionalLight = new THREE.DirectionalLight( color, intensity );
 				directionalLight.position.set( x, y, z );
 				scene.add( directionalLight );
 
 				directionalLight.castShadow = true;
 
-				var d = 1;
+				const d = 1;
 				directionalLight.shadow.camera.left = - d;
 				directionalLight.shadow.camera.right = d;
 				directionalLight.shadow.camera.top = d;
@@ -203,7 +211,7 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.0005;
+				const timer = Date.now() * 0.0005;
 
 				camera.position.x = Math.cos( timer ) * 3;
 				camera.position.z = Math.sin( timer ) * 3;

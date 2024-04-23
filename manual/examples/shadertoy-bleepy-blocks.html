@@ -1,0 +1,139 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Shadertoy Bleepy Blocks</title>
+    <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+  </body>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+function main() {
+
+	const canvas = document.querySelector( '#c' );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
+	renderer.autoClearColor = false;
+
+	const camera = new THREE.OrthographicCamera(
+		- 1, // left
+		1, // right
+		1, // top
+		- 1, // bottom
+		- 1, // near,
+		1, // far
+	);
+	const scene = new THREE.Scene();
+	const plane = new THREE.PlaneGeometry( 2, 2 );
+
+	const fragmentShader = `
+  #include <common>
+
+  uniform vec3 iResolution;
+  uniform float iTime;
+  uniform sampler2D iChannel0;
+
+  // By Daedelus: https://www.shadertoy.com/user/Daedelus
+  // license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+  #define TIMESCALE 0.25
+  #define TILES 8
+  #define COLOR 0.7, 1.6, 2.8
+
+  void mainImage( out vec4 fragColor, in vec2 fragCoord )
+  {
+    vec2 uv = fragCoord.xy / iResolution.xy;
+    uv.x *= iResolution.x / iResolution.y;
+
+    vec4 noise = texture2D(iChannel0, floor(uv * float(TILES)) / float(TILES));
+    float p = 1.0 - mod(noise.r + noise.g + noise.b + iTime * float(TIMESCALE), 1.0);
+    p = min(max(p * 3.0 - 1.8, 0.1), 2.0);
+
+    vec2 r = mod(uv * float(TILES), 1.0);
+    r = vec2(pow(r.x - 0.5, 2.0), pow(r.y - 0.5, 2.0));
+    p *= 1.0 - pow(min(1.0, 12.0 * dot(r, r)), 2.0);
+
+    fragColor = vec4(COLOR, 1.0) * p;
+  }
+
+  void main() {
+    mainImage(gl_FragColor, gl_FragCoord.xy);
+  }
+  `;
+	const loader = new THREE.TextureLoader();
+	const texture = loader.load( 'resources/images/bayer.png' );
+	texture.minFilter = THREE.NearestFilter;
+	texture.magFilter = THREE.NearestFilter;
+	texture.wrapS = THREE.RepeatWrapping;
+	texture.wrapT = THREE.RepeatWrapping;
+	const uniforms = {
+		iTime: { value: 0 },
+		iResolution: { value: new THREE.Vector3() },
+		iChannel0: { value: texture },
+	};
+	const material = new THREE.ShaderMaterial( {
+		fragmentShader,
+		uniforms,
+	} );
+	scene.add( new THREE.Mesh( plane, material ) );
+
+	function resizeRendererToDisplaySize( renderer ) {
+
+		const canvas = renderer.domElement;
+		const width = canvas.clientWidth;
+		const height = canvas.clientHeight;
+		const needResize = canvas.width !== width || canvas.height !== height;
+		if ( needResize ) {
+
+			renderer.setSize( width, height, false );
+
+		}
+
+		return needResize;
+
+	}
+
+	function render( time ) {
+
+		time *= 0.001; // convert to seconds
+
+		resizeRendererToDisplaySize( renderer );
+
+		const canvas = renderer.domElement;
+		uniforms.iResolution.value.set( canvas.width, canvas.height, 1 );
+		uniforms.iTime.value = time;
+
+		renderer.render( scene, camera );
+
+		requestAnimationFrame( render );
+
+	}
+
+	requestAnimationFrame( render );
+
+}
+
+main();
+</script>
+</html>

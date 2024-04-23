@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -13,25 +12,30 @@
 		<h1>视频纹理（[name]）</h1>
 
 		<p class="desc">
-		创建一个使用视频来作为贴图的纹理对象。<br /><br />
-
-		它和其基类[page:Texture Texture]几乎是相同的，除了它总是将[page:Texture.needsUpdate needsUpdate]设置为*true*，以便使得贴图能够在视频播放时进行更新。自动创建[page:Texture.mipmaps mipmaps]也会被禁用。
+		创建一个使用视频来作为贴图的纹理对象。
 		</p>
 
-	<h2>示例</h2>
+		<p>
+			Note: After the initial use of a texture, the video cannot be changed. Instead, call [page:.dispose]() on the texture and instantiate a new one.
+		</p>
 
-		<p>[example:webgl_materials_video materials / video ]</p>
+		<h2>代码示例</h2>
 
 		<code>
-//assuming you have created a HTML video element with id="video"
-var video = document.getElementById( 'video' );
-
-var texture = new THREE.VideoTexture( video );
-texture.minFilter = THREE.LinearFilter;
-texture.magFilter = THREE.LinearFilter;
-texture.format = THREE.RGBFormat;
+// assuming you have created a HTML video element with id="video"
+const video = document.getElementById( 'video' );
+const texture = new THREE.VideoTexture( video );
 		</code>
 
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_materials_video materials / video]<br />
+			[example:webgl_materials_video_webcam materials / video / webcam]<br />
+			[example:webgl_video_kinect video / kinect]<br />
+			[example:webgl_video_panorama_equirectangular video / panorama / equirectangular]<br />
+			[example:webxr_vr_video vr / video]
+		</p>
 
 		<h2>构造函数</h2>
 		<h3>[name]( [param:Video video], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Constant format], [param:Constant type], [param:Number anisotropy] )</h3>
@@ -51,9 +55,9 @@ texture.format = THREE.RGBFormat;
 		其默认值为[page:Textures THREE.LinearFilter]。请参阅[page:Textures magnification filter constants]（放大滤镜常量）来了解其它选项。<br />
 
 		[page:Constant minFilter] -- 当一个纹素覆盖小于一个像素时，贴图将如何采样。
-		其默认值为[page:Textures THREE.LinearMipmapLinearFilter]。请参阅[page:Textures minification filter constants]（缩小滤镜常量）来了解其它选项。<br />
+		其默认值为[page:Textures THREE.LinearFilter]。请参阅[page:Textures minification filter constants]（缩小滤镜常量）来了解其它选项。<br />
 
-		[page:Constant format] -- 在纹理贴图中使用的格式。
+		[page:Constant format] -- The default is [page:Textures THREE.RGBAFormat].
 	 	请参阅[page:Textures format constants]（格式常量）来了解各个选项。<br />
 
 		[page:Constant type] -- 默认值是[page:Textures THREE.UnsignedByteType].
@@ -71,9 +75,19 @@ texture.format = THREE.RGBFormat;
 		共有属性请参见其基类[page:Texture Texture]。
 	</p>
 
-		<h3>[property:boolean needsUpdate]</h3>
+		<h3>[property:Boolean generateMipmaps]</h3>
 		<p>
-		在这里，你不必手动设置这个值，因为它是由[page:VideoTexture.update update]方法来进行控制的。
+		Whether to generate mipmaps. `false` by default.
+		</p>
+
+		<h3>[property:Boolean isVideoTexture]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+		在这里，你不必手动设置这个值，因为它是由[page:VideoTexture.update update]()方法来进行控制的。
 		</p>
 
 		<h2>方法</h2>
@@ -82,10 +96,10 @@ texture.format = THREE.RGBFormat;
 		共有方法请参见其基类[page:Texture Texture]。
 	</p>
 
-	<h3>[method:null update]()</h3>
+	<h3>[method:undefined update]()</h3>
 		<p>
 		在每一次新的一帧可用时，这个方法将被自动调用，
-		并将[property:boolean needsUpdate]设置为*true*。
+		并将[property:Boolean needsUpdate]设置为*true*。
 		</p>
 
 

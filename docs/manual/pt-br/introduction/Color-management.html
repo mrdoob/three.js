@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+	<style>
+		blockquote {
+			font-size: 0.8em;
+			line-height: 1.5em;
+			margin-left: 0;
+			border-left: 4px solid #cccccc;
+			padding: 1em 2em 1em 2em;
+		}
+
+		blockquote p:first-child {
+			margin-top: 0;
+		}
+
+		blockquote p:last-child {
+			margin-bottom: 0;
+		}
+
+		figure {
+			width: 100%;
+			margin: 1em 0;
+			font-style: italic;
+		}
+
+		figure img {
+			width: 100%;
+		}
+
+		figure.float {
+			float: right;
+			max-width: 30%;
+			margin: 1em;
+		}
+
+		@media all and ( max-width: 640px ) {
+
+			figure.float {
+				float: none;
+				max-width: 100%;
+			}
+
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Gerenciamento de cor</h1>
+
+	<h2>O que é um espaço de cor?</h2>
+
+	<p>
+		Cada espaço de cor é uma coleção de várias decisões de design, escolhidas em conjunto para dar suporte a uma
+		grande variedade de cores, satisfazendo as restrições técnicas relacionadas à precisão e a tecnologia das telas. Ao criar um recurso 3D ou ao montar recursos 3D em uma cena, é
+		importante saber quais são essas propriedades e como as propriedades de um espaço de cores se relacionam
+		com outros espaços de cor na cena.
+	</p>
+
+	<figure class="float">
+		<img src="resources/srgb_gamut.png" alt="">
+		<figcaption>
+			Cores sRGB e ponto branco (D65) exibidos no diagrama de referência cromaticidade CIE 1931.
+			A região colorida representa uma projeção 2D da gama sRGB, que é um volume 3D.
+			Fonte: <a href="https://en.wikipedia.org/wiki/SRGB" target="_blank" rel="noopener">Wikipedia</a>
+		</figcaption>
+	</figure>
+
+	<ul>
+		<li>
+			<b>
+				Cores primárias:</b> As cores primárias (por exemplo, vermelho, verde, azul) não são absolutas; elas são
+				selecionadas a partir do espectro visível com base em restrições de precisão limitada e
+				capacidades dos dispositivos de exibição disponíveis. As cores são expressas como uma proporção das cores primárias.
+		</li>
+		<li>
+			<b>Ponto branco:</b> a maioria dos espaços de cores é projetada de forma que uma soma igualmente ponderada das
+			primárias <i>R = G = B</i> parecerão sem cor, ou "acromáticas". A aparência
+			de valores acromáticos (como branco ou cinza) dependem da percepção humana, que por sua vez depende
+			fortemente no contexto do observador. Um espaço de cor especifica seu "ponto branco" para equilibrar
+			essas necessidades. O ponto branco definido pelo espaço de cores sRGB é
+			[link:https://en.wikipedia.org/wiki/Illuminant_D65 D65].
+		</li>
+		<li>
+			<b>Transfer functions:</b> depois de escolher a gama de cores e um modelo de cores, ainda precisamos
+			definir mapeamentos ("transfer functions") de valores numéricos para o espaço de cores. <i>r = 0,5</i>
+			representa 50% menos iluminação física do que <i>r = 1.0</i>? Ou 50% menos brilhante, conforme percebido
+			por um olho humano médio? São coisas diferentes, e essa diferença pode ser representada como
+			uma função matemática. As transfer functions podem ser <i>lineares</i> ou <i>não lineares</i>, dependendo
+			dos objetivos do espaço de cores. sRGB define transfer functions não lineares. Aquelas
+			funções são às vezes aproximadas como <i>funções gamma</i>, mas o termo "gamma" é
+			ambíguo e deve ser evitado neste contexto.
+		</li>
+	</ul>
+
+	Esses três parâmetros — cores primárias, ponto branco e transfer functions — definem um espaço de cores,
+	cada um escolhido para objetivos particulares. Tendo definido os parâmetros, alguns termos adicionais
+	são úteis:
+
+	<ul>
+		<li>
+			<b>Modelo de cores:</b> Sintaxe para identificar numericamente as cores dentro da gama de cores escolhida —
+			um sistema de coordenadas para cores. No three.js estamos preocupados principalmente com o modelo de cor RGB,
+			tendo três coordenadas <i>r, g, b ∈ [0,1]</i> ("domínio fechado") ou
+			<i>r, g, b ∈ [0,∞]</i> ("domínio aberto"), cada um representando uma fração de uma cor primária.
+			Outros modelos de cores (HSL, Lab, LCH) são comumente usados ​​para controle artístico.
+		</li>
+		<li>
+			<b>Gama de cores:</b> uma vez que as cores primárias e um ponto branco tenham sido escolhidos, eles representam
+			um volume dentro do espectro visível (uma "gama"). Cores fora deste volume ("fora da gama")
+			não podem ser expressas por valores RGB de domínio fechado [0,1]. No domínio aberto [0,∞], a gama é
+			tecnicamente infinita.
+		</li>
+	</ul>
+
+	<p>
+		Considere dois espaços de cores muito comuns: [page:SRGBColorSpace] ("sRGB") e
+		[page:LinearSRGBColorSpace] ("Linear-sRGB"). Ambos usam as mesmas cores primárias e ponto branco,
+		e, portanto, têm a mesma gama de cores. Ambos usam o modelo de cores RGB. Eles diferem apenas
+		nas transfer functions — Linear-sRGB é linear em relação à intensidade da luz física.
+		sRGB usa as transfer functions sRGB não lineares e se assemelha mais à maneira que
+		o olho humano percebe a luz e a capacidade de resposta de dispositivos de exibição comuns.
+	</p>
+
+	<p>
+		Essa diferença é importante. Cálculos de iluminação e outras operações de renderização devem
+		geralmente ocorrem em um espaço de cores linear. No entanto, cores lineares são menos eficientes para
+		armazenar em uma imagem ou framebuffer e não parecem corretas quando vistas por um observador humano.
+		Como resultado, as texturas de entrada e a imagem final renderizada geralmente usarão o método não linear
+		do espaço de cores sRGB.
+	</p>
+
+	<blockquote>
+		<p>
+			ℹ️ <i><b>AVISO:</b> Embora alguns monitores modernos sejam compatíveis com gamas mais amplas, como Display-P3,
+				as APIs gráficas da plataforma web dependem em grande parte do sRGB. Aplicativos que usam three.js
+				hoje normalmente usarão apenas os espaços de cores sRGB e Linear-sRGB.</i>
+		</p>
+	</blockquote>
+
+	<h2>Atribuições dos espaços de cores</h2>
+
+	<p>
+		Fluxos de trabalho lineares - necessários para métodos modernos de renderização - geralmente envolvem mais de
+		um espaço de cores, cada um atribuído a uma função específica. Espaços de cores lineares e não lineares são
+		apropriados para diferentes funções, como explicado abaixo.
+	</p>
+
+	<h3>Input do espaço de cores</h3>
+
+	<p>
+		Cores fornecidas ao three.js — de seletores de cores, texturas, modelos 3D e outras fontes —
+		cada um tem um espaço de cor associado. Aqueles que ainda não estão na cor de trabalho Linear-sRGB,
+        devem ser convertidos e as texturas devem receber a atribuição <i>texture.colorSpace</i> correta.
+		Certas conversões (para cores hexadecimais e CSS em sRGB) podem ser feitas automaticamente se
+		o modo de gerenciamento de cores herdado é desabilitado antes de inicializar as cores:
+	</p>
+
+	<code>
+THREE.ColorManagement.enabled = true;
+	</code>
+
+	<ul>
+		<li>
+			<b>Materiais, luzes e shaders:</b> cores nos materiais, luzes e shaders armazenam
+			componentes RGB no espaço de cores de trabalho Linear-sRGB.
+		</li>
+		<li>
+			<b>Cores de vértices:</b> [page:BufferAttribute BufferAttributes] armazena componentes RGB no
+			Espaço de cores de trabalho linear-sRGB.
+		</li>
+		<li>
+			<b>Texturas de cores:</b> PNG ou JPEG [page:Texture Textures] contendo informações de cores
+			(como .map ou .emissiveMap) usam o espaço de cores sRGB de domínio fechado e devem ser anotados com
+			<i>texture.colorSpace = SRGBColorSpace</i>. Formatos como OpenEXR (às vezes usado para .envMap ou
+			.lightMap) usam o espaço de cores Linear-sRGB indicado com <i>texture.colorSpace = LinearSRGBColorSpace</i>,
+			e podem conter valores no domínio aberto [0,∞].
+		</li>
+		<li>
+			<b>Texturas não coloridas:</b> Texturas que não armazenam informações de cores (como .normalMap
+			ou .roughnessMap) não têm um espaço de cores associado e geralmente usam a textura (padrão)
+			como <i>texture.colorSpace = NoColorSpace</i>. Em casos raros, dados sem cor
+			podem ser representados com outras codificações não lineares por motivos técnicos.
+		</li>
+	</ul>
+
+	<blockquote>
+		<p>
+			⚠️ <i><b>AVISO:</b> Muitos formatos para modelos 3D não funcionam de forma correta ou consistente
+			na definição das informações do espaço de cores. Enquanto o three.js tenta lidar com a maioria dos casos, problemas
+			são comuns com formatos de arquivo mais antigos. Para melhores resultados, use glTF 2.0 ([page:GLTFLoader])
+			e teste modelos 3D em visualizadores on-line antecipadamente para confirmar que o recurso em si está correto.</i>
+		</p>
+	</blockquote>
+
+	<h3>Espaço de cores de trabalho</h3>
+
+	<p>
+		Renderização, interpolação e muitas outras operações devem ser executadas em um domínio aberto
+		do espaço de cores de trabalho linear, no qual os componentes RGB são proporcionais a iluminação
+		física. No three.js, o espaço de cores de trabalho é Linear-sRGB.
+	</p>
+
+	<h3>Output do espaço de cores</h3>
+
+	<p>
+		A saída para um dispositivo de exibição, imagem ou vídeo pode envolver a conversão do domínio aberto
+		do espaço de cores de trabalho linear-sRGB para outro espaço de cores. Essa conversão pode ser feita em
+		uma passagem de renderização principal ([page:WebGLRenderer.outputColorSpace]), ou durante o pós-processamento.
+	</p>
+
+	<code>
+renderer.outputColorSpace = THREE.SRGBColorSpace; // optional with post-processing
+	</code>
+
+	<ul>
+		<li>
+			<b>Tela:</b> as cores gravadas em um canvas WebGL para exibição devem estar no espaço sRGB
+			colorido.
+		</li>
+		<li>
+			<b>Imagem:</b> as cores gravadas em uma imagem devem usar o espaço de cores apropriado para
+			o formato e o uso. Imagens totalmente renderizadas gravadas em texturas PNG ou JPEG geralmente
+			usam o espaço de cores sRGB. Imagens contendo emissão, mapas de luz ou outros dados não
+			confinados ao intervalo [0,1] geralmente usarão o espaço de cores Linear-sRGB de domínio aberto,
+			e um formato de imagem compatível como OpenEXR.
+		</li>
+	</ul>
+
+	<blockquote>
+		<p>
+			⚠️ <i><b>AVISO:</b>
+			Os render targets podem usar sRGB ou Linear-sRGB. sRGB faz
+			melhor uso de precisão limitada. No domínio fechado, 8 bits geralmente são suficientes para sRGB
+			enquanto que ≥12 bits (meio flutuante) podem ser necessários para Linear-sRGB. Se mais tarde
+			os estágios pipeline precisarem de entrada Linear-sRGB, as conversões adicionais podem ter um pequeno
+			custo de desempenho.</i>
+		</p>
+	</blockquote>
+
+	<p>
+		Custom materials based on [page:ShaderMaterial] and [page:RawShaderMaterial] have to implement their own output color space conversion.
+		For instances of `ShaderMaterial`, adding the `colorspace_fragment` shader chunk to the fragment shader's `main()` function should be sufficient.
+	</p>
+
+	<h2>Trabalhando com instâncias THREE.Color</h2>
+
+	<p>
+		Métodos de leitura ou modificação de instâncias [page:Color] assumem que os dados já estão no
+		espaço de cores de trabalho three.js, Linear-sRGB. Os componentes RGB e HSL são
+		representações diretas de dados armazenados pela instância Color e nunca são convertidos
+		implicitamente. Os dados de cores podem ser convertidos explicitamente com <i>.convertLinearToSRGB()</i>
+		ou <i>.convertSRGBToLinear()</i>.
+	</p>
+
+	<code>
+		// RGB components (no change).
+		color.r = color.g = color.b = 0.5;
+		console.log( color.r ); // → 0.5
+
+		// Manual conversion.
+		color.r = 0.5;
+		color.convertSRGBToLinear();
+		console.log( color.r ); // → 0.214041140
+	</code>
+
+	<p>
+		Com <i>ColorManagement.enabled = true</i> definido (recomendado), determinadas conversões
+		são feitas automaticamente. Como as cores hexadecimais e CSS geralmente são sRGB, métodos [page:Color]
+		irão converter automaticamente essas entradas de sRGB para Linear-sRGB em setters, ou
+		converter de Linear-sRGB para sRGB ao retornar hexadecimal ou CSS de getters.
+	</p>
+
+	<code>
+		// Hexadecimal conversion.
+		color.setHex( 0x808080 );
+		console.log( color.r ); // → 0.214041140
+		console.log( color.getHex() ); // → 0x808080
+
+		// CSS conversion.
+		color.setStyle( 'rgb( 0.5, 0.5, 0.5 )' );
+		console.log( color.r ); // → 0.214041140
+
+		// Override conversion with 'colorSpace' argument.
+		color.setHex( 0x808080, LinearSRGBColorSpace );
+		console.log( color.r ); // → 0.5
+		console.log( color.getHex( LinearSRGBColorSpace ) ); // → 0x808080
+		console.log( color.getHex( SRGBColorSpace ) ); // → 0xBCBCBC
+	</code>
+
+	<h2>Erros comuns</h2>
+
+	<p>
+		Quando uma cor ou textura individual é configurada incorretamente, ela aparecerá mais escura ou mais clara do que
+		esperado. Quando o espaço de cores de saída do renderizador está mal configurado, a cena inteira pode aparecer
+		mais escura (por exemplo, conversão ausente para sRGB) ou mais clara (por exemplo, uma conversão dupla para sRGB com
+		pós-processamento). Em cada caso, o problema pode não ser uniforme e simplesmente aumentar/diminuir
+		a iluminação não resolve.
+	</p>
+
+	<p>
+		Um problema mais sutil aparece quando <i>ambos</i> os espaços de cores de entrada e saída
+		estão incorretos — os níveis gerais de brilho podem ser bons, mas as cores podem mudar
+		inesperadamente sob iluminação diferente, ou o sombreamento pode parecer mais estourado e menos suave
+		do que o pretendido. Esses dois erros não fazem um acerto, e é importante que o trabalho
+		espaço de cores funcional seja linear ("cena referida") e o espaço de cores de saída seja não linear
+		("exibição referida").
+	</p>
+
+	<h2>Leitura adicional</h2>
+
+	<ul>
+		<li>
+			<a href="https://developer.nvidia.com/gpugems/gpugems3/part-iv-image-effects/chapter-24-importance-being-linear" target="_blank" rel="noopener">GPU Gems 3: The Importance of Being Linear</a>, de Larry Gritz and Eugene d'Eon
+		</li>
+		<li>
+			<a href="https://blog.johnnovak.net/2016/09/21/what-every-coder-should-know-about-gamma/" target="_blank" rel="noopener">What every coder should know about gamma</a>, de John Novak
+		</li>
+		<li>
+			<a href="https://hg2dc.com/" target="_blank" rel="noopener">The Hitchhiker's Guide to Digital Color</a>, de Troy Sobotka
+		</li>
+		<li>
+			<a href="https://docs.blender.org/manual/en/latest/render/color_management.html" target="_blank" rel="noopener">Color Management</a>, Blender
+		</li>
+	</ul>
+
+</body>
+
+</html>

@@ -1,0 +1,153 @@
+<html>
+<head>
+<meta charset="utf8">
+<title>moon orbit</title>
+<link href="../examples/resources/threejs-tutorials.css" rel="stylesheet" />
+<style>
+body {
+  margin: 0px;
+  background: white;
+}
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+p {
+    position: relative;
+}
+#c {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  z-index: 2;
+  background-color: transparent;
+}
+@media (prefers-color-scheme: dark) {
+  canvas {
+    background: #444;
+  }
+}
+</style>
+</head>
+<body>
+<p><canvas id="orbit"></canvas>
+<canvas id="c"></canvas></p>
+</body>
+<script src="../examples/resources/lessons-helper.js"></script>
+<script src="../examples/resources/threejs-utils.js"></script>
+<script src="canvas-wrapper.js"></script>
+<script>
+'use strict';  // eslint-disable-line
+
+/* global wrapCanvasRenderingContext2D, threejsUtils */
+
+function main() {
+
+  const root = {
+    name: 'sun',
+    translation: [0, 0],
+    color: 'yellow',
+    radius: 30,
+    speed: 1,
+    children: [
+      {
+        name: 'earth',
+        translation: [-5, 1],
+        color: 'blue',
+        radius: 10,
+        speed: 2,
+        children: [
+          {
+            name: 'moon',
+            translation: [-1, 1],
+            color: 'gray',
+            drawOrbit: true,
+            radius: 5,
+            speed: 36.13,
+            children: [
+            ],
+          },
+        ],
+      },
+    ],
+  };
+
+  const canvas = document.getElementById('c');
+  const ctx = wrapCanvasRenderingContext2D(canvas.getContext('2d'));
+  const orbitCtx = document.getElementById('orbit').getContext('2d');
+
+  const spread = 16;
+  function updateTranslation(node) {
+    node.translation[0] *= spread;
+    node.translation[1] *= spread;
+    node.rotation = 0;
+    node.children.forEach(updateTranslation);
+  }
+  updateTranslation(root);
+
+  let clock = 0;
+  const maxHistory = 400;
+  let curHistory = 0;
+  const history = [];
+
+  function drawTrail(ctx, pos, radius) {
+    ctx.beginPath();
+    ctx.arc(pos[0], pos[1], radius, 0, Math.PI * 2, false);
+    ctx.fill();
+  }
+
+  function drawNode(node) {
+    ctx.save();
+    ctx.rotate(node.speed * clock);
+    ctx.translate(node.translation[0], node.translation[1]);
+    ctx.fillStyle = node.color;
+    ctx.strokeStyle = 'black';
+    ctx.beginPath();
+    ctx.arc(0, 0, node.radius, 0, Math.PI * 2, false);
+    ctx.fill();
+    ctx.stroke();
+    if (node.drawOrbit) {
+      const mat = ctx.currentTransform;
+      const point = [mat.e, mat.f];
+      const old = history[curHistory];
+      if (old) {
+        orbitCtx.save();
+        orbitCtx.globalCompositeOperation = 'destination-out';
+        orbitCtx.fillStyle = 'rgba(255,255,255,1)';
+        drawTrail(orbitCtx, old, 2);
+        orbitCtx.restore();
+      }
+      history[curHistory] = point;
+      curHistory = (curHistory + 1) % maxHistory;
+      orbitCtx.fillStyle = 'rgba(255, 0, 0, 1)';
+      drawTrail(orbitCtx, point, 1);
+    }
+    node.children.forEach(drawNode);
+    ctx.restore();
+  }
+
+  function drawScene() {
+    threejsUtils.resizeCanvasToDisplaySize(ctx.canvas);
+    threejsUtils.resizeCanvasToDisplaySize(orbitCtx.canvas);
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.save();
+    ctx.translate(ctx.canvas.width / 2, ctx.canvas.height / 2);
+    drawNode(root);
+    ctx.restore();
+  }
+
+  function render() {
+    clock += 1 / 60 * 0.25;
+
+    drawScene();
+
+    requestAnimationFrame(render, canvas);
+  }
+  requestAnimationFrame(render, canvas);
+}
+
+main();
+</script>
+</html>
+

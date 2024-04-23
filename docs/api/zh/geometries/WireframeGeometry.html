@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -12,46 +11,31 @@
 
 		<h1>网格几何体（[name]）</h1>
 
-		<p class="desc">这个类可以被用作一个辅助物体，来对一个[page:Geometry Geometry]以线框的形式进行查看。</p>
+		<p class="desc">这个类可以被用作一个辅助物体，来对一个[page:BufferGeometry geometry]以线框的形式进行查看。</p>
 
-		<!-- <iframe id="scene" src="scenes/geometry-browser.html#EdgeGeometry"></iframe>
-
-		<script>
-
-		// iOS iframe auto-resize workaround
-
-		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
-
-			var scene = document.getElementById( 'scene' );
-
-			scene.style.width = getComputedStyle( scene ).width;
-			scene.style.height = getComputedStyle( scene ).height;
-			scene.setAttribute( 'scrolling', 'no' );
-
-		}
-
-		</script> -->
-
-		<h2>示例</h2>
-
-		[example:webgl_helpers helpers]
+		<h2>代码示例</h2>
 
 		<code>
-var geometry = new THREE.SphereBufferGeometry( 100, 100, 100 );
+		const geometry = new THREE.SphereGeometry( 100, 100, 100 );
 
-var wireframe = new THREE.WireframeGeometry( geometry );
+		const wireframe = new THREE.WireframeGeometry( geometry );
 
-var line = new THREE.LineSegments( wireframe );
-line.material.depthTest = false;
-line.material.opacity = 0.25;
-line.material.transparent = true;
+		const line = new THREE.LineSegments( wireframe );
+		line.material.depthTest = false;
+		line.material.opacity = 0.25;
+		line.material.transparent = true;
 
-scene.add( line );
+		scene.add( line );
 		</code>
+
+		<h2>例子</h2>
+		<p>
+			[example:webgl_helpers helpers]
+		</p>
 
 		<h2>构造器</h2>
 
-		<h3>[name]( [param:Geometry geometry] )</h3>
+		<h3>[name]( [param:BufferGeometry geometry] )</h3>
 		<p>
 		geometry — 任意几何体对象。
 		</p>

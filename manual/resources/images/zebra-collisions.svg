@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 500 500" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g transform="matrix(1,0,0,1,-63.8587,-9.6138)">
+        <g transform="matrix(0.984731,0,0,0.984731,4.92423,3.96993)">
+            <circle cx="322.5" cy="260" r="118.602" style="fill:rgb(255,211,211);stroke:black;stroke-width:0.42px;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,70,0)">
+            <rect x="215" y="150" width="75" height="220" style="fill:rgb(87,109,219);"/>
+        </g>
+        <g transform="matrix(3.87943e-17,0.633559,-0.633559,3.87943e-17,440.415,150.222)">
+            <text x="108.391px" y="203.717px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:50px;">zebra</text>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,24.568,0.386204)">
+        <rect x="100" y="50" width="34.565" height="399.228" style="fill:rgb(123,123,123);"/>
+        <g transform="matrix(3.87943e-17,0.633559,-0.633559,3.87943e-17,235.004,140.012)">
+            <text x="108.391px" y="203.717px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:50px;">fence</text>
+        </g>
+    </g>
+</svg>

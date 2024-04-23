@@ -1,170 +1,141 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import {
-	BufferGeometry,
-	Geometry,
-	Line,
+	Color,
 	Matrix3,
-	Mesh,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
+} from 'three';
 
-var OBJExporter = function () {};
+class OBJExporter {
 
-OBJExporter.prototype = {
+	parse( object ) {
 
-	constructor: OBJExporter,
+		let output = '';
 
-	parse: function ( object ) {
+		let indexVertex = 0;
+		let indexVertexUvs = 0;
+		let indexNormals = 0;
 
-		var output = '';
+		const vertex = new Vector3();
+		const color = new Color();
+		const normal = new Vector3();
+		const uv = new Vector2();
 
-		var indexVertex = 0;
-		var indexVertexUvs = 0;
-		var indexNormals = 0;
+		const face = [];
 
-		var vertex = new Vector3();
-		var normal = new Vector3();
-		var uv = new Vector2();
+		function parseMesh( mesh ) {
 
-		var i, j, k, l, m, face = [];
+			let nbVertex = 0;
+			let nbNormals = 0;
+			let nbVertexUvs = 0;
 
-		var parseMesh = function ( mesh ) {
+			const geometry = mesh.geometry;
 
-			var nbVertex = 0;
-			var nbNormals = 0;
-			var nbVertexUvs = 0;
+			const normalMatrixWorld = new Matrix3();
 
-			var geometry = mesh.geometry;
+			// shortcuts
+			const vertices = geometry.getAttribute( 'position' );
+			const normals = geometry.getAttribute( 'normal' );
+			const uvs = geometry.getAttribute( 'uv' );
+			const indices = geometry.getIndex();
 
-			var normalMatrixWorld = new Matrix3();
+			// name of the mesh object
+			output += 'o ' + mesh.name + '\n';
 
-			if ( geometry instanceof Geometry ) {
+			// name of the mesh material
+			if ( mesh.material && mesh.material.name ) {
 
-				geometry = new BufferGeometry().setFromObject( mesh );
+				output += 'usemtl ' + mesh.material.name + '\n';
 
 			}
 
-			if ( geometry instanceof BufferGeometry ) {
+			// vertices
 
-				// shortcuts
-				var vertices = geometry.getAttribute( 'position' );
-				var normals = geometry.getAttribute( 'normal' );
-				var uvs = geometry.getAttribute( 'uv' );
-				var indices = geometry.getIndex();
+			if ( vertices !== undefined ) {
 
-				// name of the mesh object
-				output += 'o ' + mesh.name + '\n';
+				for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
 
-				// name of the mesh material
-				if ( mesh.material && mesh.material.name ) {
+					vertex.fromBufferAttribute( vertices, i );
 
-					output += 'usemtl ' + mesh.material.name + '\n';
+					// transform the vertex to world space
+					vertex.applyMatrix4( mesh.matrixWorld );
+
+					// transform the vertex to export format
+					output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
 
 				}
 
-				// vertices
+			}
 
-				if ( vertices !== undefined ) {
+			// uvs
 
-					for ( i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
+			if ( uvs !== undefined ) {
 
-						vertex.x = vertices.getX( i );
-						vertex.y = vertices.getY( i );
-						vertex.z = vertices.getZ( i );
+				for ( let i = 0, l = uvs.count; i < l; i ++, nbVertexUvs ++ ) {
 
-						// transfrom the vertex to world space
-						vertex.applyMatrix4( mesh.matrixWorld );
+					uv.fromBufferAttribute( uvs, i );
 
-						// transform the vertex to export format
-						output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
-
-					}
+					// transform the uv to export format
+					output += 'vt ' + uv.x + ' ' + uv.y + '\n';
 
 				}
 
-				// uvs
+			}
 
-				if ( uvs !== undefined ) {
+			// normals
 
-					for ( i = 0, l = uvs.count; i < l; i ++, nbVertexUvs ++ ) {
+			if ( normals !== undefined ) {
 
-						uv.x = uvs.getX( i );
-						uv.y = uvs.getY( i );
+				normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
 
-						// transform the uv to export format
-						output += 'vt ' + uv.x + ' ' + uv.y + '\n';
+				for ( let i = 0, l = normals.count; i < l; i ++, nbNormals ++ ) {
 
-					}
+					normal.fromBufferAttribute( normals, i );
 
-				}
+					// transform the normal to world space
+					normal.applyMatrix3( normalMatrixWorld ).normalize();
 
-				// normals
-
-				if ( normals !== undefined ) {
-
-					normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
-
-					for ( i = 0, l = normals.count; i < l; i ++, nbNormals ++ ) {
-
-						normal.x = normals.getX( i );
-						normal.y = normals.getY( i );
-						normal.z = normals.getZ( i );
-
-						// transfrom the normal to world space
-						normal.applyMatrix3( normalMatrixWorld ).normalize();
-
-						// transform the normal to export format
-						output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
-
-					}
+					// transform the normal to export format
+					output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
 
 				}
 
-				// faces
+			}
 
-				if ( indices !== null ) {
+			// faces
 
-					for ( i = 0, l = indices.count; i < l; i += 3 ) {
+			if ( indices !== null ) {
 
-						for ( m = 0; m < 3; m ++ ) {
+				for ( let i = 0, l = indices.count; i < l; i += 3 ) {
 
-							j = indices.getX( i + m ) + 1;
+					for ( let m = 0; m < 3; m ++ ) {
 
-							face[ m ] = ( indexVertex + j ) + ( normals || uvs ? '/' + ( uvs ? ( indexVertexUvs + j ) : '' ) + ( normals ? '/' + ( indexNormals + j ) : '' ) : '' );
+						const j = indices.getX( i + m ) + 1;
 
-						}
-
-						// transform the face to export format
-						output += 'f ' + face.join( ' ' ) + "\n";
+						face[ m ] = ( indexVertex + j ) + ( normals || uvs ? '/' + ( uvs ? ( indexVertexUvs + j ) : '' ) + ( normals ? '/' + ( indexNormals + j ) : '' ) : '' );
 
 					}
 
-				} else {
-
-					for ( i = 0, l = vertices.count; i < l; i += 3 ) {
-
-						for ( m = 0; m < 3; m ++ ) {
-
-							j = i + m + 1;
-
-							face[ m ] = ( indexVertex + j ) + ( normals || uvs ? '/' + ( uvs ? ( indexVertexUvs + j ) : '' ) + ( normals ? '/' + ( indexNormals + j ) : '' ) : '' );
-
-						}
-
-						// transform the face to export format
-						output += 'f ' + face.join( ' ' ) + "\n";
-
-					}
+					// transform the face to export format
+					output += 'f ' + face.join( ' ' ) + '\n';
 
 				}
 
 			} else {
 
-				console.warn( 'THREE.OBJExporter.parseMesh(): geometry type unsupported', geometry );
+				for ( let i = 0, l = vertices.count; i < l; i += 3 ) {
+
+					for ( let m = 0; m < 3; m ++ ) {
+
+						const j = i + m + 1;
+
+						face[ m ] = ( indexVertex + j ) + ( normals || uvs ? '/' + ( uvs ? ( indexVertexUvs + j ) : '' ) + ( normals ? '/' + ( indexNormals + j ) : '' ) : '' );
+
+					}
+
+					// transform the face to export format
+					output += 'f ' + face.join( ' ' ) + '\n';
+
+				}
 
 			}
 
@@ -173,54 +144,91 @@ OBJExporter.prototype = {
 			indexVertexUvs += nbVertexUvs;
 			indexNormals += nbNormals;
 
-		};
+		}
 
-		var parseLine = function ( line ) {
+		function parseLine( line ) {
 
-			var nbVertex = 0;
+			let nbVertex = 0;
 
-			var geometry = line.geometry;
-			var type = line.type;
+			const geometry = line.geometry;
+			const type = line.type;
 
-			if ( geometry instanceof Geometry ) {
+			// shortcuts
+			const vertices = geometry.getAttribute( 'position' );
 
-				geometry = new BufferGeometry().setFromObject( line );
+			// name of the line object
+			output += 'o ' + line.name + '\n';
 
-			}
+			if ( vertices !== undefined ) {
 
-			if ( geometry instanceof BufferGeometry ) {
+				for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
 
-				// shortcuts
-				var vertices = geometry.getAttribute( 'position' );
+					vertex.fromBufferAttribute( vertices, i );
 
-				// name of the line object
-				output += 'o ' + line.name + '\n';
+					// transform the vertex to world space
+					vertex.applyMatrix4( line.matrixWorld );
 
-				if ( vertices !== undefined ) {
-
-					for ( i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
-
-						vertex.x = vertices.getX( i );
-						vertex.y = vertices.getY( i );
-						vertex.z = vertices.getZ( i );
-
-						// transfrom the vertex to world space
-						vertex.applyMatrix4( line.matrixWorld );
-
-						// transform the vertex to export format
-						output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
-
-					}
+					// transform the vertex to export format
+					output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
 
 				}
 
-				if ( type === 'Line' ) {
+			}
 
-					output += 'l ';
+			if ( type === 'Line' ) {
 
-					for ( j = 1, l = vertices.count; j <= l; j ++ ) {
+				output += 'l ';
 
-						output += ( indexVertex + j ) + ' ';
+				for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
+
+					output += ( indexVertex + j ) + ' ';
+
+				}
+
+				output += '\n';
+
+			}
+
+			if ( type === 'LineSegments' ) {
+
+				for ( let j = 1, k = j + 1, l = vertices.count; j < l; j += 2, k = j + 1 ) {
+
+					output += 'l ' + ( indexVertex + j ) + ' ' + ( indexVertex + k ) + '\n';
+
+				}
+
+			}
+
+			// update index
+			indexVertex += nbVertex;
+
+		}
+
+		function parsePoints( points ) {
+
+			let nbVertex = 0;
+
+			const geometry = points.geometry;
+
+			const vertices = geometry.getAttribute( 'position' );
+			const colors = geometry.getAttribute( 'color' );
+
+			output += 'o ' + points.name + '\n';
+
+			if ( vertices !== undefined ) {
+
+				for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
+
+					vertex.fromBufferAttribute( vertices, i );
+					vertex.applyMatrix4( points.matrixWorld );
+
+					output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z;
+
+					if ( colors !== undefined ) {
+
+						color.fromBufferAttribute( colors, i ).convertLinearToSRGB();
+
+						output += ' ' + color.r + ' ' + color.g + ' ' + color.b;
 
 					}
 
@@ -228,38 +236,40 @@ OBJExporter.prototype = {
 
 				}
 
-				if ( type === 'LineSegments' ) {
+				output += 'p ';
 
-					for ( j = 1, k = j + 1, l = vertices.count; j < l; j += 2, k = j + 1 ) {
+				for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
 
-						output += 'l ' + ( indexVertex + j ) + ' ' + ( indexVertex + k ) + '\n';
-
-					}
+					output += ( indexVertex + j ) + ' ';
 
 				}
 
-			} else {
-
-				console.warn( 'THREE.OBJExporter.parseLine(): geometry type unsupported', geometry );
+				output += '\n';
 
 			}
 
 			// update index
 			indexVertex += nbVertex;
 
-		};
+		}
 
 		object.traverse( function ( child ) {
 
-			if ( child instanceof Mesh ) {
+			if ( child.isMesh === true ) {
 
 				parseMesh( child );
 
 			}
 
-			if ( child instanceof Line ) {
+			if ( child.isLine === true ) {
 
 				parseLine( child );
+
+			}
+
+			if ( child.isPoints === true ) {
+
+				parsePoints( child );
 
 			}
 
@@ -269,6 +279,6 @@ OBJExporter.prototype = {
 
 	}
 
-};
+}
 
 export { OBJExporter };

@@ -1,166 +1,137 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author benaadams / https://twitter.com/ben_a_adams
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector3 } from '../math/Vector3.js';
 
-// SphereGeometry
+class SphereGeometry extends BufferGeometry {
 
-function SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+	constructor( radius = 1, widthSegments = 32, heightSegments = 16, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI ) {
 
-	Geometry.call( this );
+		super();
 
-	this.type = 'SphereGeometry';
+		this.type = 'SphereGeometry';
 
-	this.parameters = {
-		radius: radius,
-		widthSegments: widthSegments,
-		heightSegments: heightSegments,
-		phiStart: phiStart,
-		phiLength: phiLength,
-		thetaStart: thetaStart,
-		thetaLength: thetaLength
-	};
+		this.parameters = {
+			radius: radius,
+			widthSegments: widthSegments,
+			heightSegments: heightSegments,
+			phiStart: phiStart,
+			phiLength: phiLength,
+			thetaStart: thetaStart,
+			thetaLength: thetaLength
+		};
 
-	this.fromBufferGeometry( new SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) );
-	this.mergeVertices();
+		widthSegments = Math.max( 3, Math.floor( widthSegments ) );
+		heightSegments = Math.max( 2, Math.floor( heightSegments ) );
 
-}
+		const thetaEnd = Math.min( thetaStart + thetaLength, Math.PI );
 
-SphereGeometry.prototype = Object.create( Geometry.prototype );
-SphereGeometry.prototype.constructor = SphereGeometry;
+		let index = 0;
+		const grid = [];
 
-// SphereBufferGeometry
+		const vertex = new Vector3();
+		const normal = new Vector3();
 
-function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
+		// buffers
 
-	BufferGeometry.call( this );
+		const indices = [];
+		const vertices = [];
+		const normals = [];
+		const uvs = [];
 
-	this.type = 'SphereBufferGeometry';
+		// generate vertices, normals and uvs
 
-	this.parameters = {
-		radius: radius,
-		widthSegments: widthSegments,
-		heightSegments: heightSegments,
-		phiStart: phiStart,
-		phiLength: phiLength,
-		thetaStart: thetaStart,
-		thetaLength: thetaLength
-	};
+		for ( let iy = 0; iy <= heightSegments; iy ++ ) {
 
-	radius = radius || 1;
+			const verticesRow = [];
 
-	widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
-	heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
+			const v = iy / heightSegments;
 
-	phiStart = phiStart !== undefined ? phiStart : 0;
-	phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
+			// special case for the poles
 
-	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
+			let uOffset = 0;
 
-	var thetaEnd = Math.min( thetaStart + thetaLength, Math.PI );
+			if ( iy === 0 && thetaStart === 0 ) {
 
-	var ix, iy;
+				uOffset = 0.5 / widthSegments;
 
-	var index = 0;
-	var grid = [];
+			} else if ( iy === heightSegments && thetaEnd === Math.PI ) {
 
-	var vertex = new Vector3();
-	var normal = new Vector3();
+				uOffset = - 0.5 / widthSegments;
 
-	// buffers
+			}
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+			for ( let ix = 0; ix <= widthSegments; ix ++ ) {
 
-	// generate vertices, normals and uvs
+				const u = ix / widthSegments;
 
-	for ( iy = 0; iy <= heightSegments; iy ++ ) {
+				// vertex
 
-		var verticesRow = [];
+				vertex.x = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+				vertex.y = radius * Math.cos( thetaStart + v * thetaLength );
+				vertex.z = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
 
-		var v = iy / heightSegments;
+				vertices.push( vertex.x, vertex.y, vertex.z );
 
-		// special case for the poles
+				// normal
 
-		var uOffset = 0;
+				normal.copy( vertex ).normalize();
+				normals.push( normal.x, normal.y, normal.z );
 
-		if ( iy == 0 && thetaStart == 0 ) {
+				// uv
 
-			uOffset = 0.5 / widthSegments;
+				uvs.push( u + uOffset, 1 - v );
 
-		} else if ( iy == heightSegments && thetaEnd == Math.PI ) {
+				verticesRow.push( index ++ );
 
-			uOffset = - 0.5 / widthSegments;
+			}
+
+			grid.push( verticesRow );
 
 		}
 
-		for ( ix = 0; ix <= widthSegments; ix ++ ) {
+		// indices
 
-			var u = ix / widthSegments;
+		for ( let iy = 0; iy < heightSegments; iy ++ ) {
 
-			// vertex
+			for ( let ix = 0; ix < widthSegments; ix ++ ) {
 
-			vertex.x = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
-			vertex.y = radius * Math.cos( thetaStart + v * thetaLength );
-			vertex.z = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+				const a = grid[ iy ][ ix + 1 ];
+				const b = grid[ iy ][ ix ];
+				const c = grid[ iy + 1 ][ ix ];
+				const d = grid[ iy + 1 ][ ix + 1 ];
 
-			vertices.push( vertex.x, vertex.y, vertex.z );
+				if ( iy !== 0 || thetaStart > 0 ) indices.push( a, b, d );
+				if ( iy !== heightSegments - 1 || thetaEnd < Math.PI ) indices.push( b, c, d );
 
-			// normal
-
-			normal.copy( vertex ).normalize();
-			normals.push( normal.x, normal.y, normal.z );
-
-			// uv
-
-			uvs.push( u + uOffset, 1 - v );
-
-			verticesRow.push( index ++ );
+			}
 
 		}
 
-		grid.push( verticesRow );
+		// build geometry
+
+		this.setIndex( indices );
+		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+		this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	}
 
-	// indices
+	copy( source ) {
 
-	for ( iy = 0; iy < heightSegments; iy ++ ) {
+		super.copy( source );
 
-		for ( ix = 0; ix < widthSegments; ix ++ ) {
+		this.parameters = Object.assign( {}, source.parameters );
 
-			var a = grid[ iy ][ ix + 1 ];
-			var b = grid[ iy ][ ix ];
-			var c = grid[ iy + 1 ][ ix ];
-			var d = grid[ iy + 1 ][ ix + 1 ];
-
-			if ( iy !== 0 || thetaStart > 0 ) indices.push( a, b, d );
-			if ( iy !== heightSegments - 1 || thetaEnd < Math.PI ) indices.push( b, c, d );
-
-		}
+		return this;
 
 	}
 
-	// build geometry
+	static fromJSON( data ) {
 
-	this.setIndex( indices );
-	this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-	this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+		return new SphereGeometry( data.radius, data.widthSegments, data.heightSegments, data.phiStart, data.phiLength, data.thetaStart, data.thetaLength );
+
+	}
 
 }
 
-SphereBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
-SphereBufferGeometry.prototype.constructor = SphereBufferGeometry;
-
-
-export { SphereGeometry, SphereBufferGeometry };
+export { SphereGeometry };

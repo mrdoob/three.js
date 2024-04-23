@@ -8,68 +8,82 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - stl<br/><br/>
-			<button id="exportASCII">export ASCII</button> <button id="exportBinary">export binary</button>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - stl
 		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { STLExporter } from './jsm/exporters/STLExporter.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { STLExporter } from 'three/addons/exporters/STLExporter.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			var scene, camera, renderer, exporter, mesh;
+			let scene, camera, renderer, exporter, mesh;
+
+			const params = {
+				exportASCII: exportASCII,
+				exportBinary: exportBinary
+			};
 
 			init();
 			animate();
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.set( 200, 100, 200 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 4, 2, 4 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
-				scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
+				scene.fog = new THREE.Fog( 0xa0a0a0, 4, 20 );
 
 				exporter = new STLExporter();
 
 				//
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				hemiLight.position.set( 0, 200, 0 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444, 3 );
+				hemiLight.position.set( 0, 20, 0 );
 				scene.add( hemiLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 0, 200, 100 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				directionalLight.position.set( 0, 20, 10 );
 				directionalLight.castShadow = true;
-				directionalLight.shadow.camera.top = 180;
-				directionalLight.shadow.camera.bottom = - 100;
-				directionalLight.shadow.camera.left = - 120;
-				directionalLight.shadow.camera.right = 120;
+				directionalLight.shadow.camera.top = 2;
+				directionalLight.shadow.camera.bottom = - 2;
+				directionalLight.shadow.camera.left = - 2;
+				directionalLight.shadow.camera.right = 2;
 				scene.add( directionalLight );
 
 				// ground
 
-				var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 40, 40 ), new THREE.MeshPhongMaterial( { color: 0xbbbbbb, depthWrite: false } ) );
 				ground.rotation.x = - Math.PI / 2;
 				ground.receiveShadow = true;
 				scene.add( ground );
 
-				var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
+				const grid = new THREE.GridHelper( 40, 20, 0x000000, 0x000000 );
 				grid.material.opacity = 0.2;
 				grid.material.transparent = true;
 				scene.add( grid );
 
 				// export mesh
 
-				var geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
-				var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+				const geometry = new THREE.BoxGeometry();
+				const material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
 
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
-				mesh.position.y = 25;
+				mesh.position.y = 0.5;
 				scene.add( mesh );
 
 				//
@@ -82,19 +96,19 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, 25, 0 );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 0.5, 0 );
 				controls.update();
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				var buttonExportASCII = document.getElementById( 'exportASCII' );
-				buttonExportASCII.addEventListener( 'click', exportASCII );
+				const gui = new GUI();
 
-				var buttonExportBinary = document.getElementById( 'exportBinary' );
-				buttonExportBinary.addEventListener( 'click', exportBinary );
+				gui.add( params, 'exportASCII' ).name( 'Export STL (ASCII)' );
+				gui.add( params, 'exportBinary' ).name( 'Export STL (Binary)' );
+				gui.open();
 
 			}
 
@@ -116,19 +130,19 @@
 
 			function exportASCII() {
 
-				var result = exporter.parse( mesh );
+				const result = exporter.parse( mesh );
 				saveString( result, 'box.stl' );
 
 			}
 
 			function exportBinary() {
 
-				var result = exporter.parse( mesh, { binary: true } );
+				const result = exporter.parse( mesh, { binary: true } );
 				saveArrayBuffer( result, 'box.stl' );
 
 			}
 
-			var link = document.createElement( 'a' );
+			const link = document.createElement( 'a' );
 			link.style.display = 'none';
 			document.body.appendChild( link );
 

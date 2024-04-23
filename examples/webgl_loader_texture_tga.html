@@ -11,61 +11,72 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - TGA texture example by <a href="https://github.com/DaoshengMu/" target="_blank" rel="noopener">Daosheng Mu</a>
 		</div>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { TGALoader } from './jsm/loaders/TGALoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TGALoader } from 'three/addons/loaders/TGALoader.js';
 
-			var camera, scene, renderer, stats;
+			let camera, scene, renderer, stats;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
-				camera.position.set( 0, 50, 250 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 1, 5 );
 
 				scene = new THREE.Scene();
 
 				//
 
-				var loader = new TGALoader();
-				var geometry = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				const loader = new TGALoader();
+				const geometry = new THREE.BoxGeometry();
 
 				// add box 1 - grey8 texture
 
-				var texture1 = loader.load( 'textures/crate_grey8.tga' );
-				var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
+				const texture1 = loader.load( 'textures/crate_grey8.tga' );
+				texture1.colorSpace = THREE.SRGBColorSpace;
+				const material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
 
-				var mesh1 = new THREE.Mesh( geometry, material1 );
-				mesh1.position.x = - 50;
+				const mesh1 = new THREE.Mesh( geometry, material1 );
+				mesh1.position.x = - 1;
 
 				scene.add( mesh1 );
 
 				// add box 2 - tga texture
 
-				var texture2 = loader.load( 'textures/crate_color8.tga' );
-				var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
+				const texture2 = loader.load( 'textures/crate_color8.tga' );
+				texture2.colorSpace = THREE.SRGBColorSpace;
+				const material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
 
-				var mesh2 = new THREE.Mesh( geometry, material2 );
-				mesh2.position.x = 50;
+				const mesh2 = new THREE.Mesh( geometry, material2 );
+				mesh2.position.x = 1;
 
 				scene.add( mesh2 );
 
 				//
 
-				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.4 );
+				const ambientLight = new THREE.AmbientLight( 0xffffff, 1.5 );
 				scene.add( ambientLight );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				const light = new THREE.DirectionalLight( 0xffffff, 2.5 );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
@@ -78,7 +89,8 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
 
 				//
 
@@ -87,7 +99,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

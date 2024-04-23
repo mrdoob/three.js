@@ -1,39 +1,35 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- */
-
 import { Color } from '../math/Color.js';
 
-function FogExp2( color, density ) {
+class FogExp2 {
 
-	this.name = '';
+	constructor( color, density = 0.00025 ) {
 
-	this.color = new Color( color );
-	this.density = ( density !== undefined ) ? density : 0.00025;
+		this.isFogExp2 = true;
 
-}
+		this.name = '';
 
-Object.assign( FogExp2.prototype, {
+		this.color = new Color( color );
+		this.density = density;
 
-	isFogExp2: true,
+	}
 
-	clone: function () {
+	clone() {
 
 		return new FogExp2( this.color, this.density );
 
-	},
+	}
 
-	toJSON: function ( /* meta */ ) {
+	toJSON( /* meta */ ) {
 
 		return {
 			type: 'FogExp2',
+			name: this.name,
 			color: this.color.getHex(),
 			density: this.density
 		};
 
 	}
 
-} );
+}
 
 export { FogExp2 };

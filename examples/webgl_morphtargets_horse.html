@@ -19,20 +19,33 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - morph targets - horse<br/>
-			model by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a>
+			model by <a href="https://mirada.com/" target="_blank" rel="noopener">mirada</a> from <a href="http://www.ro.me" target="_blank" rel="noopener">rome</a>
 		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			var container, stats;
-			var camera, scene, renderer;
-			var mesh, mixer;
+			let container, stats;
+			let camera, scene, renderer;
+			let mesh, mixer;
+
+			const radius = 600;
+			let theta = 0;
+			let prevTime = Date.now();
 
 			init();
 			animate();
@@ -46,23 +59,22 @@
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 300;
-				camera.target = new THREE.Vector3( 0, 150, 0 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
 
 				//
 
-				var light = new THREE.DirectionalLight( 0xefefff, 1.5 );
-				light.position.set( 1, 1, 1 ).normalize();
-				scene.add( light );
+				const light1 = new THREE.DirectionalLight( 0xefefff, 5 );
+				light1.position.set( 1, 1, 1 ).normalize();
+				scene.add( light1 );
 
-				var light = new THREE.DirectionalLight( 0xffefef, 1.5 );
-				light.position.set( - 1, - 1, - 1 ).normalize();
-				scene.add( light );
+				const light2 = new THREE.DirectionalLight( 0xffefef, 5 );
+				light2.position.set( - 1, - 1, - 1 ).normalize();
+				scene.add( light2 );
 
-				var loader = new GLTFLoader();
-				loader.load( "models/gltf/Horse.glb", function ( gltf ) {
+				const loader = new GLTFLoader();
+				loader.load( 'models/gltf/Horse.glb', function ( gltf ) {
 
 					mesh = gltf.scene.children[ 0 ];
 					mesh.scale.set( 1.5, 1.5, 1.5 );
@@ -80,7 +92,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				container.appendChild( renderer.domElement );
 
@@ -91,7 +102,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -115,11 +126,6 @@
 
 			}
 
-			var radius = 600;
-			var theta = 0;
-
-			var prevTime = Date.now();
-
 			function render() {
 
 				theta += 0.1;
@@ -127,11 +133,11 @@
 				camera.position.x = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
 				camera.position.z = radius * Math.cos( THREE.MathUtils.degToRad( theta ) );
 
-				camera.lookAt( camera.target );
+				camera.lookAt( 0, 150, 0 );
 
 				if ( mixer ) {
 
-					var time = Date.now();
+					const time = Date.now();
 
 					mixer.update( ( time - prevTime ) * 0.001 );
 

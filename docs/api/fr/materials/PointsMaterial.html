@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Le matériau par défaut utilisé par [page:Points].</p>
+
+		<h2>Code Example</h2>
+		<code>
+		const vertices = [];
+
+		for ( let i = 0; i < 10000; i ++ ) {
+
+			const x = THREE.MathUtils.randFloatSpread( 2000 );
+			const y = THREE.MathUtils.randFloatSpread( 2000 );
+			const z = THREE.MathUtils.randFloatSpread( 2000 );
+
+			vertices.push( x, y, z );
+
+		}
+
+		const geometry = new THREE.BufferGeometry();
+		geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+		const material = new THREE.PointsMaterial( { color: 0x888888 } );
+
+		const points = new THREE.Points( geometry, material );
+
+		scene.add( points );
+		</code>
+
+		<h2>Exemples</h2>
+		<p>
+			[example:misc_controls_fly misc / controls / fly]<br />
+			[example:webgl_buffergeometry_drawrange WebGL / BufferGeometry / drawrange]<br />
+			[example:webgl_buffergeometry_points WebGL / BufferGeometry / points]<br />
+			[example:webgl_buffergeometry_points_interleaved WebGL / BufferGeometry / points / interleaved]<br />
+			[example:webgl_camera WebGL / camera ]<br />
+			[example:webgl_geometry_convex WebGL / geometry / convex]<br />
+			[example:webgl_geometry_shapes WebGL / geometry / shapes]<br />
+			[example:webgl_interactive_raycasting_points WebGL / interactive / raycasting / points]<br />
+			[example:webgl_multiple_elements_text WebGL / multiple / elements / text]<br />
+			[example:webgl_points_billboards WebGL / points / billboards]<br />
+			[example:webgl_points_dynamic WebGL / points / dynamic]<br />
+			[example:webgl_points_sprites WebGL / points / sprites]
+		</p>
+
+		<h2>Constructeur</h2>
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (optionnel) un objet avec une ou plusieurs propriétés définissant l'apparence du matériau.
+		Toute propriété du matériau (y compris toute proprioété héritée de [page:Material]) peut être passée dans l'objet.<br /><br />
+
+			L'exception est la propriété [page:Hexadecimal color], qui peut être passée comme une chaine de caractères hexadécimale,
+		 ayant la valeur `0xffffff` (blanc) par défaut. [page:Color.set]( color ) est appelée en interne.
+		</p>
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe [page:Material] pour les propriétés communes.</p>
+
+		<h3>[property:Texture alphaMap]</h3>
+		<p>La carte alpha est une texture en niveaux de gris qui contrôle l'opacité sur la surface
+			(noir : entièrement transparent ; blanc : entièrement opaque). La valeur par défaut est nulle.<br /><br />
+			
+			Seule la couleur de la texture est utilisée, en ignorant le canal alpha s'il en existe un.
+			Pour les textures RGB et RGBA, le moteur de rendu [page:WebGLRenderer WebGL] utilisera le
+			canal vert lors de l'échantillonnage de cette texture en raison du peu de précision supplémentaire fourni
+			pour le vert dans les formats RVB 565 compressés DXT et non compressés. 
+			Les textures avec uniquement de la luminance ou les textures luminance/alpha fonctionneront également comme prévu.
+		</p>
+
+		<h3>[property:Color color]</h3>
+		<p>[page:Color], couleur du matériau, par défaut en blanc (0xffffff).</p>
+
+		<h3>[property:Boolean fog]</h3>
+		<p>Si le matériau est affecté par le brouillard (fog) La valeur par défaut est `true`.</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>
+			Définit la couleur des points à l'aide des données d'une [page:Texture].
+			Peut éventuellement inclure un canal alpha, généralement combiné avec
+			[page:Material.transparent .transparent] ou [page:Material.alphaTest .alphaTest].
+		</p>
+
+		<h3>[property:Number size]</h3>
+		<p>Définit la taille des points en pixels. La valeur par défaut est 1.0.<br/>
+			Sera plafonné s'il dépasse le paramètre dépendant du matériel [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter gl.ALIASED_POINT_SIZE_RANGE].</p>
+
+		<h3>[property:Boolean sizeAttenuation]</h3>
+		<p>Spécifiez si la taille des points est atténuée par la profondeur de la caméra. (Caméra perspective uniquement). La valeur par défaut est true.</p>
+
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe [page:Material] pour les méthodes communes.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

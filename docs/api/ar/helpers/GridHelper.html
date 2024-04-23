@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			GridHelper هو كائن لتحديد الشبكات. الشبكات هي مصفوفات ثنائية الأبعاد
+			من الخطوط.
+		</p>
+			
+		<h2>مثال الكود</h2>
+
+		<code>
+		const size = 10;
+		const divisions = 10;
+
+		const gridHelper = new THREE.GridHelper( size, divisions );
+		scene.add( gridHelper );
+		</code>
+
+		<h2>أمثلة (Examples)</h2>
+
+		<p>[example:webgl_helpers WebGL / helpers]</p>
+		
+		<h2>المنشئ (Constructor)</h2>
+		
+		<h3>
+		[name]( [param:number size], [param:Number divisions], [param:Color colorCenterLine], [param:Color colorGrid] )
+		</h3>
+		<p>
+		size -- حجم الشبكة. الافتراضي هو 10. <br />
+		divisions -- عدد التقسيمات عبر الشبكة. الافتراضي هو 10.
+		<br />
+		colorCenterLine -- لون الخط الأوسط. يمكن أن يكون هذا
+		[page:Color]، قيمة ست عشرية واسم لون CSS. الافتراضي هو
+		0x444444 <br />
+		colorGrid -- لون خطوط الشبكة. يمكن أن يكون هذا
+		[page:Color]، قيمة ست عشرية واسم لون CSS. الافتراضي هو
+		0x888888
+		</p>
+		<p>
+		ينشئ [name] جديدًا بحجم 'size' ومقسَّمًا إلى 'divisions' شرائح
+		لكل جانب. الألوان اختيارية.
+		</p>
+		
+		<h2>الطرق (Methods)</h2>
+		<p>انظر إلى الفئة الأساسية [page:LineSegments] للحصول على الطرق المشتركة.</p>
+		
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		يُطلِق الموارد المتعلقة بوحدة معالجة الرسومات التي تم تخصيصها من قبل هذه العيّنة. اتصل بهذه
+		الطريقة كلما لم يعد هذه العيّنة مستخدمة في تطبيقك.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

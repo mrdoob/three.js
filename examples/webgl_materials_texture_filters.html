@@ -43,21 +43,30 @@
 		min: <span class="c">Nearest</span>
 		</div>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
+			const SCREEN_WIDTH = window.innerWidth;
+			const SCREEN_HEIGHT = window.innerHeight;
 
-			var container;
+			let container;
 
-			var camera, scene, scene2, renderer;
+			let camera, scene, scene2, renderer;
 
-			var mouseX = 0, mouseY = 0;
+			let mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			const windowHalfX = window.innerWidth / 2;
+			const windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -81,46 +90,47 @@
 
 				// GROUND
 
-				var imageCanvas = document.createElement( "canvas" ),
-					context = imageCanvas.getContext( "2d" );
+				const imageCanvas = document.createElement( 'canvas' );
+				const context = imageCanvas.getContext( '2d' );
 
 				imageCanvas.width = imageCanvas.height = 128;
 
-				context.fillStyle = "#444";
+				context.fillStyle = '#444';
 				context.fillRect( 0, 0, 128, 128 );
 
-				context.fillStyle = "#fff";
+				context.fillStyle = '#fff';
 				context.fillRect( 0, 0, 64, 64 );
 				context.fillRect( 64, 64, 64, 64 );
 
-				var textureCanvas = new THREE.CanvasTexture( imageCanvas );
+				const textureCanvas = new THREE.CanvasTexture( imageCanvas );
+				textureCanvas.colorSpace = THREE.SRGBColorSpace;
 				textureCanvas.repeat.set( 1000, 1000 );
 				textureCanvas.wrapS = THREE.RepeatWrapping;
 				textureCanvas.wrapT = THREE.RepeatWrapping;
 
-				var textureCanvas2 = textureCanvas.clone();
+				const textureCanvas2 = textureCanvas.clone();
 				textureCanvas2.magFilter = THREE.NearestFilter;
 				textureCanvas2.minFilter = THREE.NearestFilter;
 
-				var	materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
-				var materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
+				const materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
+				const materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
-				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const geometry = new THREE.PlaneGeometry( 100, 100 );
 
-				var meshCanvas = new THREE.Mesh( geometry, materialCanvas );
+				const meshCanvas = new THREE.Mesh( geometry, materialCanvas );
 				meshCanvas.rotation.x = - Math.PI / 2;
 				meshCanvas.scale.set( 1000, 1000, 1000 );
 
-				var meshCanvas2 = new THREE.Mesh( geometry, materialCanvas2 );
+				const meshCanvas2 = new THREE.Mesh( geometry, materialCanvas2 );
 				meshCanvas2.rotation.x = - Math.PI / 2;
 				meshCanvas2.scale.set( 1000, 1000, 1000 );
 
 
 				// PAINTING
 
-				var callbackPainting = function () {
+				const callbackPainting = function () {
 
-					var image = texturePainting.image;
+					const image = texturePainting.image;
 
 					texturePainting2.image = image;
 					texturePainting2.needsUpdate = true;
@@ -128,9 +138,9 @@
 					scene.add( meshCanvas );
 					scene2.add( meshCanvas2 );
 
-					var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-					var mesh = new THREE.Mesh( geometry, materialPainting );
-					var mesh2 = new THREE.Mesh( geometry, materialPainting2 );
+					const geometry = new THREE.PlaneGeometry( 100, 100 );
+					const mesh = new THREE.Mesh( geometry, materialPainting );
+					const mesh2 = new THREE.Mesh( geometry, materialPainting2 );
 
 					addPainting( scene, mesh );
 					addPainting( scene2, mesh2 );
@@ -142,13 +152,13 @@
 
 						zscene.add( zmesh );
 
-						var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
+						const meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
 						meshFrame.position.z = - 10.0;
 						meshFrame.scale.x = 1.1 * image.width / 100;
 						meshFrame.scale.y = 1.1 * image.height / 100;
 						zscene.add( meshFrame );
 
-						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.75, transparent: true } ) );
+						const meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.75, transparent: true } ) );
 						meshShadow.position.y = - 1.1 * image.height / 2;
 						meshShadow.position.z = - 1.1 * image.height / 2;
 						meshShadow.rotation.x = - Math.PI / 2;
@@ -156,7 +166,7 @@
 						meshShadow.scale.y = 1.1 * image.height / 100;
 						zscene.add( meshShadow );
 
-						var floorHeight = - 1.117 * image.height / 2;
+						const floorHeight = - 1.117 * image.height / 2;
 						meshCanvas.position.y = meshCanvas2.position.y = floorHeight;
 
 					}
@@ -164,11 +174,14 @@
 
 				};
 
-				var texturePainting = new THREE.TextureLoader().load( "textures/758px-Canestra_di_frutta_(Caravaggio).jpg", callbackPainting );
-				var texturePainting2 = new THREE.Texture();
-				var materialPainting = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting } );
-				var materialPainting2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: texturePainting2 } );
+				const texturePainting = new THREE.TextureLoader().load( 'textures/758px-Canestra_di_frutta_(Caravaggio).jpg', callbackPainting );
+				const texturePainting2 = new THREE.Texture();
 
+				const materialPainting = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting } );
+				const materialPainting2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: texturePainting2 } );
+
+				texturePainting.colorSpace = THREE.SRGBColorSpace;
+				texturePainting2.colorSpace = THREE.SRGBColorSpace;
 				texturePainting2.minFilter = texturePainting2.magFilter = THREE.NearestFilter;
 				texturePainting.minFilter = texturePainting.magFilter = THREE.LinearFilter;
 				texturePainting.mapping = THREE.UVMapping;
@@ -179,10 +192,10 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;
 
-				renderer.domElement.style.position = "relative";
+				renderer.domElement.style.position = 'relative';
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			}
 

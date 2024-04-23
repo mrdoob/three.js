@@ -1,8 +1,3 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
-
 import { Command } from '../Command.js';
 
 /**
@@ -12,51 +7,53 @@ import { Command } from '../Command.js';
  * @param newValue integer representing a hex color value
  * @constructor
  */
-var SetMaterialColorCommand = function ( editor, object, attributeName, newValue, materialSlot ) {
+class SetMaterialColorCommand extends Command {
 
-	Command.call( this, editor );
+	constructor( editor, object, attributeName, newValue, materialSlot ) {
 
-	this.type = 'SetMaterialColorCommand';
-	this.name = 'Set Material.' + attributeName;
-	this.updatable = true;
+		super( editor );
 
-	this.object = object;
-	this.material = this.editor.getObjectMaterial( object, materialSlot );
+		this.type = 'SetMaterialColorCommand';
+		this.name = `Set Material.${attributeName}`;
+		this.updatable = true;
 
-	this.oldValue = ( this.material !== undefined ) ? this.material[ attributeName ].getHex() : undefined;
-	this.newValue = newValue;
+		this.object = object;
+		this.materialSlot = materialSlot;
 
-	this.attributeName = attributeName;
+		this.material = ( this.object !== undefined ) ? this.editor.getObjectMaterial( object, materialSlot ) : undefined;
 
-};
+		this.oldValue = ( this.material !== undefined ) ? this.material[ attributeName ].getHex() : undefined;
+		this.newValue = newValue;
 
-SetMaterialColorCommand.prototype = {
+		this.attributeName = attributeName;
 
-	execute: function () {
+	}
+
+	execute() {
 
 		this.material[ this.attributeName ].setHex( this.newValue );
 
-		this.editor.signals.materialChanged.dispatch( this.material );
+		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
 
-	},
+	}
 
-	undo: function () {
+	undo() {
 
 		this.material[ this.attributeName ].setHex( this.oldValue );
 
-		this.editor.signals.materialChanged.dispatch( this.material );
+		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
 
-	},
+	}
 
-	update: function ( cmd ) {
+	update( cmd ) {
 
 		this.newValue = cmd.newValue;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var output = Command.prototype.toJSON.call( this );
+		const output = super.toJSON( this );
 
 		output.objectUuid = this.object.uuid;
 		output.attributeName = this.attributeName;
@@ -65,11 +62,11 @@ SetMaterialColorCommand.prototype = {
 
 		return output;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Command.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.attributeName = json.attributeName;
@@ -78,6 +75,6 @@ SetMaterialColorCommand.prototype = {
 
 	}
 
-};
+}
 
 export { SetMaterialColorCommand };

@@ -1,116 +1,173 @@
+import { WebGLCoordinateSystem, WebGPUCoordinateSystem } from '../constants.js';
 import { Object3D } from '../core/Object3D.js';
-import { WebGLCubeRenderTarget } from '../renderers/WebGLCubeRenderTarget.js';
-import { LinearFilter, RGBFormat } from '../constants.js';
-import { Vector3 } from '../math/Vector3.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
-/**
- * Camera for rendering cube maps
- *	- renders scene into axis-aligned cube
- *
- * @author alteredq / http://alteredqualia.com/
- */
+const fov = - 90; // negative fov is not an error
+const aspect = 1;
 
-var fov = 90, aspect = 1;
+class CubeCamera extends Object3D {
 
-function CubeCamera( near, far, cubeResolution, options ) {
+	constructor( near, far, renderTarget ) {
 
-	Object3D.call( this );
+		super();
 
-	this.type = 'CubeCamera';
+		this.type = 'CubeCamera';
 
-	var cameraPX = new PerspectiveCamera( fov, aspect, near, far );
-	cameraPX.up.set( 0, - 1, 0 );
-	cameraPX.lookAt( new Vector3( 1, 0, 0 ) );
-	this.add( cameraPX );
+		this.renderTarget = renderTarget;
+		this.coordinateSystem = null;
+		this.activeMipmapLevel = 0;
 
-	var cameraNX = new PerspectiveCamera( fov, aspect, near, far );
-	cameraNX.up.set( 0, - 1, 0 );
-	cameraNX.lookAt( new Vector3( - 1, 0, 0 ) );
-	this.add( cameraNX );
+		const cameraPX = new PerspectiveCamera( fov, aspect, near, far );
+		cameraPX.layers = this.layers;
+		this.add( cameraPX );
 
-	var cameraPY = new PerspectiveCamera( fov, aspect, near, far );
-	cameraPY.up.set( 0, 0, 1 );
-	cameraPY.lookAt( new Vector3( 0, 1, 0 ) );
-	this.add( cameraPY );
+		const cameraNX = new PerspectiveCamera( fov, aspect, near, far );
+		cameraNX.layers = this.layers;
+		this.add( cameraNX );
 
-	var cameraNY = new PerspectiveCamera( fov, aspect, near, far );
-	cameraNY.up.set( 0, 0, - 1 );
-	cameraNY.lookAt( new Vector3( 0, - 1, 0 ) );
-	this.add( cameraNY );
+		const cameraPY = new PerspectiveCamera( fov, aspect, near, far );
+		cameraPY.layers = this.layers;
+		this.add( cameraPY );
 
-	var cameraPZ = new PerspectiveCamera( fov, aspect, near, far );
-	cameraPZ.up.set( 0, - 1, 0 );
-	cameraPZ.lookAt( new Vector3( 0, 0, 1 ) );
-	this.add( cameraPZ );
+		const cameraNY = new PerspectiveCamera( fov, aspect, near, far );
+		cameraNY.layers = this.layers;
+		this.add( cameraNY );
 
-	var cameraNZ = new PerspectiveCamera( fov, aspect, near, far );
-	cameraNZ.up.set( 0, - 1, 0 );
-	cameraNZ.lookAt( new Vector3( 0, 0, - 1 ) );
-	this.add( cameraNZ );
+		const cameraPZ = new PerspectiveCamera( fov, aspect, near, far );
+		cameraPZ.layers = this.layers;
+		this.add( cameraPZ );
 
-	options = options || { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
+		const cameraNZ = new PerspectiveCamera( fov, aspect, near, far );
+		cameraNZ.layers = this.layers;
+		this.add( cameraNZ );
 
-	this.renderTarget = new WebGLCubeRenderTarget( cubeResolution, options );
-	this.renderTarget.texture.name = "CubeCamera";
+	}
 
-	this.update = function ( renderer, scene ) {
+	updateCoordinateSystem() {
 
-		if ( this.parent === null ) this.updateMatrixWorld();
+		const coordinateSystem = this.coordinateSystem;
 
-		var currentRenderTarget = renderer.getRenderTarget();
+		const cameras = this.children.concat();
 
-		var renderTarget = this.renderTarget;
-		var generateMipmaps = renderTarget.texture.generateMipmaps;
+		const [ cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ ] = cameras;
 
-		renderTarget.texture.generateMipmaps = false;
+		for ( const camera of cameras ) this.remove( camera );
 
-		renderer.setRenderTarget( renderTarget, 0 );
-		renderer.render( scene, cameraPX );
+		if ( coordinateSystem === WebGLCoordinateSystem ) {
 
-		renderer.setRenderTarget( renderTarget, 1 );
-		renderer.render( scene, cameraNX );
+			cameraPX.up.set( 0, 1, 0 );
+			cameraPX.lookAt( 1, 0, 0 );
 
-		renderer.setRenderTarget( renderTarget, 2 );
-		renderer.render( scene, cameraPY );
+			cameraNX.up.set( 0, 1, 0 );
+			cameraNX.lookAt( - 1, 0, 0 );
 
-		renderer.setRenderTarget( renderTarget, 3 );
-		renderer.render( scene, cameraNY );
+			cameraPY.up.set( 0, 0, - 1 );
+			cameraPY.lookAt( 0, 1, 0 );
 
-		renderer.setRenderTarget( renderTarget, 4 );
-		renderer.render( scene, cameraPZ );
+			cameraNY.up.set( 0, 0, 1 );
+			cameraNY.lookAt( 0, - 1, 0 );
 
-		renderTarget.texture.generateMipmaps = generateMipmaps;
+			cameraPZ.up.set( 0, 1, 0 );
+			cameraPZ.lookAt( 0, 0, 1 );
 
-		renderer.setRenderTarget( renderTarget, 5 );
-		renderer.render( scene, cameraNZ );
+			cameraNZ.up.set( 0, 1, 0 );
+			cameraNZ.lookAt( 0, 0, - 1 );
 
-		renderer.setRenderTarget( currentRenderTarget );
+		} else if ( coordinateSystem === WebGPUCoordinateSystem ) {
 
-	};
+			cameraPX.up.set( 0, - 1, 0 );
+			cameraPX.lookAt( - 1, 0, 0 );
 
-	this.clear = function ( renderer, color, depth, stencil ) {
+			cameraNX.up.set( 0, - 1, 0 );
+			cameraNX.lookAt( 1, 0, 0 );
 
-		var currentRenderTarget = renderer.getRenderTarget();
+			cameraPY.up.set( 0, 0, 1 );
+			cameraPY.lookAt( 0, 1, 0 );
 
-		var renderTarget = this.renderTarget;
+			cameraNY.up.set( 0, 0, - 1 );
+			cameraNY.lookAt( 0, - 1, 0 );
 
-		for ( var i = 0; i < 6; i ++ ) {
+			cameraPZ.up.set( 0, - 1, 0 );
+			cameraPZ.lookAt( 0, 0, 1 );
 
-			renderer.setRenderTarget( renderTarget, i );
+			cameraNZ.up.set( 0, - 1, 0 );
+			cameraNZ.lookAt( 0, 0, - 1 );
 
-			renderer.clear( color, depth, stencil );
+		} else {
+
+			throw new Error( 'THREE.CubeCamera.updateCoordinateSystem(): Invalid coordinate system: ' + coordinateSystem );
 
 		}
 
-		renderer.setRenderTarget( currentRenderTarget );
+		for ( const camera of cameras ) {
 
-	};
+			this.add( camera );
+
+			camera.updateMatrixWorld();
+
+		}
+
+	}
+
+	update( renderer, scene ) {
+
+		if ( this.parent === null ) this.updateMatrixWorld();
+
+		const { renderTarget, activeMipmapLevel } = this;
+
+		if ( this.coordinateSystem !== renderer.coordinateSystem ) {
+
+			this.coordinateSystem = renderer.coordinateSystem;
+
+			this.updateCoordinateSystem();
+
+		}
+
+		const [ cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ ] = this.children;
+
+		const currentRenderTarget = renderer.getRenderTarget();
+		const currentActiveCubeFace = renderer.getActiveCubeFace();
+		const currentActiveMipmapLevel = renderer.getActiveMipmapLevel();
+
+		const currentXrEnabled = renderer.xr.enabled;
+
+		renderer.xr.enabled = false;
+
+		const generateMipmaps = renderTarget.texture.generateMipmaps;
+
+		renderTarget.texture.generateMipmaps = false;
+
+		renderer.setRenderTarget( renderTarget, 0, activeMipmapLevel );
+		renderer.render( scene, cameraPX );
+
+		renderer.setRenderTarget( renderTarget, 1, activeMipmapLevel );
+		renderer.render( scene, cameraNX );
+
+		renderer.setRenderTarget( renderTarget, 2, activeMipmapLevel );
+		renderer.render( scene, cameraPY );
+
+		renderer.setRenderTarget( renderTarget, 3, activeMipmapLevel );
+		renderer.render( scene, cameraNY );
+
+		renderer.setRenderTarget( renderTarget, 4, activeMipmapLevel );
+		renderer.render( scene, cameraPZ );
+
+		// mipmaps are generated during the last call of render()
+		// at this point, all sides of the cube render target are defined
+
+		renderTarget.texture.generateMipmaps = generateMipmaps;
+
+		renderer.setRenderTarget( renderTarget, 5, activeMipmapLevel );
+		renderer.render( scene, cameraNZ );
+
+		renderer.setRenderTarget( currentRenderTarget, currentActiveCubeFace, currentActiveMipmapLevel );
+
+		renderer.xr.enabled = currentXrEnabled;
+
+		renderTarget.texture.needsPMREMUpdate = true;
+
+	}
 
 }
-
-CubeCamera.prototype = Object.create( Object3D.prototype );
-CubeCamera.prototype.constructor = CubeCamera;
-
 
 export { CubeCamera };

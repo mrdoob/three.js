@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Gestisce e tiene traccia dei dati caricati e pendenti. Un'istanza globale predefinita di questa classe
+      viene creata e utilizzata dai loader, se non viene fornita manualmente - vedi [page:DefaultLoadingManager].<br /><br />
+
+      In generale questo dovrebbe essere sufficiente, tuttavia ci sono volte in cui è utile che i loader siano separti -
+      per esempio se si vuole mostrare barre di caricamento separate per gli oggetti e le texture.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<p>
+      Questo esempio mostra come utilizzare il LoadingManager per tracciare i progressi
+      dell'[page:OBJLoader].
+		</p>
+
+		<code>
+		const manager = new THREE.LoadingManager();
+		manager.onStart = function ( url, itemsLoaded, itemsTotal ) {
+
+			console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+
+		};
+
+		manager.onLoad = function ( ) {
+
+			console.log( 'Loading complete!');
+
+		};
+
+
+		manager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
+
+			console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+
+		};
+
+		manager.onError = function ( url ) {
+
+			console.log( 'There was an error loading ' + url );
+
+		};
+
+		const loader = new OBJLoader( manager );
+		loader.load( 'file.obj', function ( object ) {
+
+			//
+
+		} );
+		</code>
+
+		<p>
+      Oltre ad osservare i progressi, un LoadingManager può essere utilizzato 
+      per sovrascrivere le URL della risorsa durante il caricamento. Questo può
+      essere utile per le risorse che derivano dagli eventi di drag-and-drop,
+      WebSockets, WebRTC, o altre API. L'esempio qui sotto mostra come caricare un modello 
+      in memoria utilizzando le URL del Blob.
+		</p>
+
+		<code>
+		// Oggetti Blob o File creati quando i file vengono trascinati nella pagina web
+		const blobs = {'fish.gltf': blob1, 'diffuse.png': blob2, 'normal.png': blob3};
+
+		const manager = new THREE.LoadingManager();
+
+		// Inizializza il manager di caricamento con la callback della URL
+		const objectURLs = [];
+		manager.setURLModifier( ( url ) => {
+
+			url = URL.createObjectURL( blobs[ url ] );
+
+			objectURLs.push( url );
+
+			return url;
+
+		} );
+
+		// Carica come di solito, quindi revoca gli URL dei Blob 
+		const loader = new GLTFLoader( manager );
+		loader.load( 'fish.gltf', (gltf) => {
+
+			scene.add( gltf.scene );
+
+			objectURLs.forEach( ( url ) => URL.revokeObjectURL( url ) );
+
+		});
+		</code>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_loader_obj WebGL / loader / obj]<br />
+			[example:webgl_postprocessing_outline WebGL / postprocesing / outline]
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:Function onLoad] — (opzionale) Questa funzione sarà chiamata quando tutti i caricamenti saranno terminati.<br />
+		[page:Function onProgress] — (opzionale) Questa funzione sarà chiamata quando un elemento è completato.<br />
+		[page:Function onError] — (opzionale) Questa funzione sarà chiamata quando un loader incontra degli errori.<br /><br />
+
+		Crea un nuovo [name].
+		</p>
+
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Function onStart]</h3>
+		<p>
+      Questa funzione verrà chiamata all'avvio del caricamento.
+			Gli argomenti sono:<br />
+			[page:String url] — La url dell'elemento appena caricato.<br />
+			[page:Integer itemsLoaded] — Il numero di elementi già caricati finora.<br />
+			[page:Integer itemsTotal] — La quantità totale di elementi da caricare.<br /><br />
+
+      Il valore predefinito è `undefined`.
+		</p>
+
+		<h3>[property:Function onLoad]</h3>
+		<p>
+      Questa funzione sarà chiamata quando tutti i caricamenti saranno terminati. Il valore predefinito è `undefined`
+      a meno che non venga passata nel costruttore.
+		</p>
+
+		<h3>[property:Function onProgress]</h3>
+		<p>
+      Questa funzione sarà chiamata quando un elemento è completato.
+      Gli argomenti sono:<br />
+      [page:String url] — La url dell'elemento appena caricato.<br />
+      [page:Integer itemsLoaded] — Il numero di elementi già caricati finora.<br />
+      [page:Integer itemsTotal] — La quantità totale di elementi da caricare.<br /><br />
+
+      Il valore predefinito è `undefined` a meno che non venga passata nel costruttore.
+		</p>
+
+		<h3>[property:Function onError]</h3>
+		<p>
+      Questa funzione sarà chiamata quando un loader incontra degli errori, con l'argomento:<br />
+			[page:String url] — La url dell'elemento andato in errore.<br /><br />
+
+      Il valore predefinito è `undefined` a meno che non venga passata nel costruttore.
+		</p>
+
+
+		<h2>Metodi</h2>
+
+		<h3>[method:this addHandler]( [param:Object regex], [param:Loader loader] )</h3>
+		<p>
+		[page:Object regex] — Un'espressione regolare.<br />
+		[page:Loader loader] — Il loader.
+		<p>
+      Registra un loader con l'espressione regolare passata. Può essere utilizzato per definire quale loader 
+      deve essere utilizzato per caricare file specifici. Un caso d'uso tipico è sovrascrivere il loader
+      predefinito per le texture. 
+		</p>
+		<code>
+// aggiunge un handler per le texture TGA
+manager.addHandler( /\.tga$/i, new TGALoader() );
+		</code>
+
+		<h3>[method:Loader getHandler]( [param:String file] )</h3>
+		<p>
+		[page:String file] — Il percorso del file.
+		<p>
+      Può essere utilizzato per recuperare il loader registrato per il dato percorso del file.
+		</p>
+
+		<h3>[method:this removeHandler]( [param:Object regex] )</h3>
+		<p>
+		[page:Object regex] — Un'espressione regolare.
+		<p>
+      Rimuove il loader per l'espressione regolare passata.
+		</p>
+
+		<h3>[method:String resolveURL]( [param:String url] )</h3>
+		<p>
+		[page:String url] — La url da caricare.<br /><br />
+
+    Data una URL, utilizza la callback del modificatore di URL (se presente) e restituisce 
+    un URL risolto. Se non è impostato alcun modificatore di URL, restituisce l'URL originale.
+		</p>
+
+		<h3>[method:this setURLModifier]( [param:Function callback] )</h3>
+		<p>
+		[page:Function callback] — La callback del modificatore di URL. Chiamata con l'argomento [page:String url], e
+    deve restituisce una [page:String resolvedURL].<br /><br />
+
+    Se fornito, la callback verrà passata ad ogni risorsa URL prima che la richiesta venga inviata.
+    La callback deve restituire la URL originale, o una nuova URL per sovrascrivere il comportamento del caricamento.
+    Questo comportamento può essere utilizzato per caricare le risorse dai file .ZIP, dalle API di drag-and-drop e dai Data URI.
+		</p>
+
+		<br />
+
+		<p>
+			<em>Nota: I metodi seguenti sono progettati per essere chiamati internamente dai loader. Non possono essere
+        chiamati direttamente.</em>
+		</p>
+
+		<h3>[method:undefined itemStart]( [param:String url] )</h3>
+		<p>
+		[page:String url] — La url da caricare.<br /><br />
+
+    Questo metodo dovrebbe essere chiamato da qualsiasi loader che utilizza il manager quando il loader inizia a caricare una url.
+		</p>
+
+		<h3>[method:undefined itemEnd]( [param:String url] )</h3>
+		<p>
+		[page:String url] — La url caricata.<br /><br />
+
+    Questo metodo dovrebbe essere chiamato da qualsiasi loader che utilizza il manager quando il loader finisce di caricare una url.
+		</p>
+
+		<h3>[method:undefined itemError]( [param:String url] )</h3>
+		<p>
+		[page:String url] — La url caricata.<br /><br />
+
+    Questo metodo dovrebbe essere chiamato da qualsiasi loader che utilizza il manager quando il loader va in errore caricando una url.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/loaders/LoadingManager.js src/loaders/LoadingManager.js]
+		</p>
+	</body>
+</html>

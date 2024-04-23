@@ -12,22 +12,31 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - cube panorama demo
 		</div>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			var camera, controls;
-			var renderer;
-			var scene;
+			let camera, controls;
+			let renderer;
+			let scene;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -45,56 +54,54 @@
 				controls.enableDamping = true;
 				controls.rotateSpeed = - 0.25;
 
-				var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
+				const textures = getTexturesFromAtlasFile( 'textures/cube/sun_temple_stripe.jpg', 6 );
 
-				var materials = [];
+				const materials = [];
 
-				for ( var i = 0; i < 6; i ++ ) {
+				for ( let i = 0; i < 6; i ++ ) {
 
 					materials.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
 
 				}
 
-				var skyBox = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ), materials );
+				const skyBox = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ), materials );
 				skyBox.geometry.scale( 1, 1, - 1 );
 				scene.add( skyBox );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
 
-				var textures = [];
+				const textures = [];
 
-				for ( var i = 0; i < tilesNum; i ++ ) {
+				for ( let i = 0; i < tilesNum; i ++ ) {
 
 					textures[ i ] = new THREE.Texture();
 
 				}
 
-				var imageObj = new Image();
+				new THREE.ImageLoader()
+					.load( atlasImgUrl, ( image ) => {
 
-				imageObj.onload = function () {
+						let canvas, context;
+						const tileWidth = image.height;
 
-					var canvas, context;
-					var tileWidth = imageObj.height;
+						for ( let i = 0; i < textures.length; i ++ ) {
 
-					for ( var i = 0; i < textures.length; i ++ ) {
+							canvas = document.createElement( 'canvas' );
+							context = canvas.getContext( '2d' );
+							canvas.height = tileWidth;
+							canvas.width = tileWidth;
+							context.drawImage( image, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
+							textures[ i ].colorSpace = THREE.SRGBColorSpace;
+							textures[ i ].image = canvas;
+							textures[ i ].needsUpdate = true;
 
-						canvas = document.createElement( 'canvas' );
-						context = canvas.getContext( '2d' );
-						canvas.height = tileWidth;
-						canvas.width = tileWidth;
-						context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
-						textures[ i ].image = canvas;
-						textures[ i ].needsUpdate = true;
+						}
 
-					}
-
-				};
-
-				imageObj.src = atlasImgUrl;
+					} );
 
 				return textures;
 

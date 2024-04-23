@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -12,33 +11,34 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">[name] can be used to create a decal mesh that serves different kinds of purposes e.g. adding unique details to models, performing dynamic visual environmental changes or covering seams.</p>
+		<p class="desc">
+			[name] can be used to create a decal mesh that serves different kinds of purposes e.g. adding unique details
+			to models, performing dynamic visual environmental changes or covering seams.
+		</p>
 
-		<script>
+		<h2>Import</h2>
 
-		// iOS iframe auto-resize workaround
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
 
-		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+		<code>
+			import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';
+		</code>
 
-			var scene = document.getElementById( 'scene' );
+		<h2>Code Example</h2>
 
-			scene.style.width = getComputedStyle( scene ).width;
-			scene.style.height = getComputedStyle( scene ).height;
-			scene.setAttribute( 'scrolling', 'no' );
-
-		}
-
-		</script>
-
-		<h2>Example</h2>
-
-		<p>[example:webgl_decals WebGL / decals]</p>
-
-		<code>var geometry =  new DecalGeometry( mesh, position, orientation, size );
-		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-		var mesh = new THREE.Mesh( geometry, material );
+		<code>
+		const geometry =  new DecalGeometry( mesh, position, orientation, size );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 		</code>
+
+		<h2>Examples</h2>
+
+		<p>[example:webgl_decals WebGL / decals]</p>
 
 		<h2>Constructor</h2>
 

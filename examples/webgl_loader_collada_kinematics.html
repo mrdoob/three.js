@@ -12,27 +12,34 @@
 			robot from <a href="https://github.com/rdiankov/collada_robots" target="_blank" rel="noopener">collada robots</a>
 		</div>
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { TWEEN } from './jsm/libs/tween.module.min.js';
-			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
+			import TWEEN from 'three/addons/libs/tween.module.js';
+			import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer;
-			var particleLight;
-			var dae;
+			let camera, scene, renderer;
+			let dae;
 
-			var kinematics;
-			var kinematicsTween;
-			var tweenParameters = {};
+			let kinematics;
+			let kinematicsTween;
+			const tweenParameters = {};
 
-			var loader = new ColladaLoader();
-			// loader.load( './models/collada/kawada-hironx.dae', function ( collada ) {
+			const loader = new ColladaLoader();
 			loader.load( './models/collada/abb_irb52_7_120.dae', function ( collada ) {
 
 				dae = collada.scene;
@@ -70,25 +77,19 @@
 
 				// Grid
 
-				var grid = new THREE.GridHelper( 20, 20 );
+				const grid = new THREE.GridHelper( 20, 20, 0xc1c1c1, 0x8d8d8d );
 				scene.add( grid );
 
 				// Add the COLLADA
 
 				scene.add( dae );
 
-				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
-				scene.add( particleLight );
-
 				// Lights
 
-				var light = new THREE.HemisphereLight( 0xffeeee, 0x111122 );
+				const light = new THREE.HemisphereLight( 0xfff7f7, 0x494966, 3 );
 				scene.add( light );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.3 );
-				particleLight.add( pointLight );
-
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -100,27 +101,27 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function setupTween() {
 
-				var duration = THREE.MathUtils.randInt( 1000, 5000 );
+				const duration = THREE.MathUtils.randInt( 1000, 5000 );
 
-				var target = {};
+				const target = {};
 
-				for ( var prop in kinematics.joints ) {
+				for ( const prop in kinematics.joints ) {
 
 					if ( kinematics.joints.hasOwnProperty( prop ) ) {
 
 						if ( ! kinematics.joints[ prop ].static ) {
 
-							var joint = kinematics.joints[ prop ];
+							const joint = kinematics.joints[ prop ];
 
-							var old = tweenParameters[ prop ];
+							const old = tweenParameters[ prop ];
 
-							var position = old ? old : joint.zeroPosition;
+							const position = old ? old : joint.zeroPosition;
 
 							tweenParameters[ prop ] = position;
 
@@ -136,7 +137,7 @@
 
 				kinematicsTween.onUpdate( function ( object ) {
 
-					for ( var prop in kinematics.joints ) {
+					for ( const prop in kinematics.joints ) {
 
 						if ( kinematics.joints.hasOwnProperty( prop ) ) {
 
@@ -181,17 +182,13 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.0001;
+				const timer = Date.now() * 0.0001;
 
 				camera.position.x = Math.cos( timer ) * 20;
 				camera.position.y = 10;
 				camera.position.z = Math.sin( timer ) * 20;
 
 				camera.lookAt( 0, 5, 0 );
-
-				particleLight.position.x = Math.sin( timer * 4 ) * 3009;
-				particleLight.position.y = Math.cos( timer * 5 ) * 4000;
-				particleLight.position.z = Math.cos( timer * 4 ) * 3009;
 
 				renderer.render( scene, camera );
 

@@ -1,68 +1,57 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIBreak, UIText } from './libs/ui.js';
 
-var ViewportInfo = function ( editor ) {
+function ViewportInfo( editor ) {
 
-	var signals = editor.signals;
-	var strings = editor.strings;
+	const signals = editor.signals;
+	const strings = editor.strings;
 
-	var container = new UIPanel();
+	const container = new UIPanel();
 	container.setId( 'info' );
 	container.setPosition( 'absolute' );
 	container.setLeft( '10px' );
-	container.setBottom( '10px' );
+	container.setBottom( '20px' );
 	container.setFontSize( '12px' );
 	container.setColor( '#fff' );
+	container.setTextTransform( 'lowercase' );
 
-	var objectsText = new UIText( '0' ).setMarginLeft( '6px' );
-	var verticesText = new UIText( '0' ).setMarginLeft( '6px' );
-	var trianglesText = new UIText( '0' ).setMarginLeft( '6px' );
-	var frametimeText = new UIText( '0' ).setMarginLeft( '6px' );
+	const objectsText  = new UIText( '0' ).setTextAlign( 'right' ).setWidth( '60px' ).setMarginRight( '6px' );
+	const verticesText = new UIText( '0' ).setTextAlign( 'right' ).setWidth( '60px' ).setMarginRight( '6px' );
+	const trianglesText = new UIText( '0' ).setTextAlign( 'right' ).setWidth( '60px' ).setMarginRight( '6px' );
+	const frametimeText = new UIText( '0' ).setTextAlign( 'right' ).setWidth( '60px' ).setMarginRight( '6px' );
 
-	container.add( new UIText( strings.getKey( 'viewport/info/objects' ) ).setTextTransform( 'lowercase' ) );
-	container.add( objectsText, new UIBreak() );
-	container.add( new UIText( strings.getKey( 'viewport/info/vertices' ) ).setTextTransform( 'lowercase' ) );
-	container.add( verticesText, new UIBreak() );
-	container.add( new UIText( strings.getKey( 'viewport/info/triangles' ) ).setTextTransform( 'lowercase' ) );
-	container.add( trianglesText, new UIBreak() );
-	container.add( new UIText( strings.getKey( 'viewport/info/frametime' ) ).setTextTransform( 'lowercase' ) );
-	container.add( frametimeText, new UIBreak() );
+	container.add( objectsText, new UIText( strings.getKey( 'viewport/info/objects' ) ), new UIBreak() );
+	container.add( verticesText, new UIText( strings.getKey( 'viewport/info/vertices' ) ), new UIBreak() );
+	container.add( trianglesText, new UIText( strings.getKey( 'viewport/info/triangles' ) ), new UIBreak() );
+	container.add( frametimeText, new UIText( strings.getKey( 'viewport/info/rendertime' ) ), new UIBreak() );
 
 	signals.objectAdded.add( update );
 	signals.objectRemoved.add( update );
 	signals.geometryChanged.add( update );
+	signals.sceneRendered.add( updateFrametime );
 
 	//
 
 	function update() {
 
-		var scene = editor.scene;
+		const scene = editor.scene;
 
-		var objects = 0, vertices = 0, triangles = 0;
+		let objects = 0, vertices = 0, triangles = 0;
 
-		for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+		for ( let i = 0, l = scene.children.length; i < l; i ++ ) {
 
-			var object = scene.children[ i ];
+			const object = scene.children[ i ];
 
 			object.traverseVisible( function ( object ) {
 
 				objects ++;
 
-				if ( object.isMesh ) {
+				if ( object.isMesh || object.isPoints ) {
 
-					var geometry = object.geometry;
+					const geometry = object.geometry;
 
-					if ( geometry.isGeometry ) {
+					vertices += geometry.attributes.position.count;
 
-						vertices += geometry.vertices.length;
-						triangles += geometry.faces.length;
-
-					} else if ( geometry.isBufferGeometry ) {
-
-						vertices += geometry.attributes.position.count;
+					if ( object.isMesh ) {
 
 						if ( geometry.index !== null ) {
 
@@ -88,16 +77,14 @@ var ViewportInfo = function ( editor ) {
 
 	}
 
-	signals.sceneRendered.add( updateFrametime );
-
 	function updateFrametime( frametime ) {
 
-		frametimeText.setValue( Number( frametime ).toFixed( 2 ) + " ms" );
+		frametimeText.setValue( Number( frametime ).toFixed( 2 ) );
 
 	}
 
 	return container;
 
-};
+}
 
 export { ViewportInfo };

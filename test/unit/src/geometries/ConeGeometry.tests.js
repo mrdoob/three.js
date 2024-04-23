@@ -1,37 +1,63 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
-import {
-	ConeBufferGeometry
-} from '../../../../src/geometries/ConeGeometry';
+import { ConeGeometry } from '../../../../src/geometries/ConeGeometry.js';
+
+import { CylinderGeometry } from '../../../../src/geometries/CylinderGeometry.js';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'ConeBufferGeometry', ( hooks ) => {
+	QUnit.module( 'ConeGeometry', ( hooks ) => {
 
-		var geometries = undefined;
+		let geometries = undefined;
 		hooks.beforeEach( function () {
 
 			geometries = [
-				new ConeBufferGeometry()
+				new ConeGeometry(),
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const object = new ConeGeometry();
+			assert.strictEqual(
+				object instanceof CylinderGeometry, true,
+				'ConeGeometry extends from CylinderGeometry'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const object = new ConeGeometry();
+			assert.ok( object, 'Can instantiate a ConeGeometry.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new ConeGeometry();
+			assert.ok(
+				object.type === 'ConeGeometry',
+				'ConeGeometry.type should be ConeGeometry'
+			);
+
+		} );
+
+		QUnit.todo( 'parameters', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// STATIC
+		QUnit.todo( 'fromJSON', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,6 +16,12 @@
 		该辅助对象使用 [page:LineBasicMaterial LineBasicMaterial] 材质.
 		</p>
 
+		<h2>代码示例</h2>
+
+		<code>
+		const helper = new THREE.SkeletonHelper( skinnedMesh );
+		scene.add( helper );
+		</code>
 
 		<h2>例子</h2>
 
@@ -26,20 +31,12 @@
 			[example:webgl_loader_bvh WebGL / loader / bvh ]
 		</p>
 
-		<code>
-var helper = new THREE.SkeletonHelper( skinnedMesh );
-scene.add( helper );
-		</code>
-
-
-
 		<h2>构造函数</h2>
 
 
 		<h3>[name]( [param:Object3D object] )</h3>
 		<p>
-		object -- Usually an instance of [page:SkinnedMesh]. However, any instance of [page:Object3D] can be used if it represents
-		a hierarchy of [page:Bone Bone]s (via [page:Object3D.children]).
+		object -- 通常是 [page:SkinnedMesh]的实例. 实际上, 只要子级存在[page:Bone Bone]s的任何 [page:Object3D] 的实例都可以，(参考 [page:Object3D.children]).
 		</p>
 
 
@@ -48,6 +45,11 @@ scene.add( helper );
 		<h3>[property:Array bones]</h3>
 		<p>
 		辅助对象使用 [page:Line Lines] 渲染的骨数组.
+		</p>
+
+		<h3>[property:Boolean isSkeletonHelper]</h3>
+		<p>
+			只读属性，用以检查该给定对象是否是 [name].
 		</p>
 
 		<h3>[property:Object3D root]</h3>

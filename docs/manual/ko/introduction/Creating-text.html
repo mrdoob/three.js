@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>텍스트 만들기([name])</h1>
+		<div>
+			<p>
+				three.js에서 텍스트를 활용하고 싶을 경우가 많을 것입니다. - 그 방법의 몇가지를 소개합니다.
+			</p>
+		</div>
+
+		<h2>1. DOM + CSS</h2>
+		<div>
+			<p>
+				HTML을 사용하는 것은 텍스트를 추가하는 가장 쉽고 빠른 방법입니다. 대부분의 three.js 예제에서 오버레이 설명에 사용되는 방식입니다.
+			</p>
+			<p>내용을 추가하려면 다음과 같이 입력합니다.</p>
+			<code>&lt;div id="info"&gt;Description&lt;/div&gt;</code>
+
+			<p>
+				절대 위치를 설정하려면 CSS 마크업을 사용하고, 특히 three.js를 전체화면으로 사용한다면 z-index를 활용합니다.
+			</p>
+
+			<code>
+#info {
+	position: absolute;
+	top: 10px;
+	width: 100%;
+	text-align: center;
+	z-index: 100;
+	display:block;
+}
+			</code>
+
+		</div>
+
+
+
+		<h2>2. 캔버스에 텍스트를 그리고 [page:Texture]로 사용</h2>
+		<div>
+			<p>three.js scene에 손쉽게 텍스트를 그리고싶은 경우에 이 메서드를 사용하세요.</p>
+		</div>
+
+
+		<h2>3. 본인이 가장 선호하는 3D 앱으로 만들고 three.js로 export 하세요.</h2>
+		<div>
+			<p>본인의 3d 작업 앱을 선호하는 경우 이 메서드를 사용해 three.js로 모델을 import하세요.</p>
+		</div>
+
+
+
+		<h2>4. 절차적 텍스트 geometry</h2>
+		<div>
+			<p>
+				THREE.js만을 사용해 절차적 및 동적 3D 텍스트 geometry를 사용하고 싶으면, geometry이 THREE.TextGeometry의 인스턴스인 mesh를 사용하면 됩니다.
+			</p>
+			<p>
+				<code>new THREE.TextGeometry( text, parameters );</code>
+			</p>
+			<p>
+				하지만 이 작업을 수행하려면, TextGeometry의 "font" 파라미터가 THREE.Font 인스턴스로 설정되어 있어야 합니다.
+
+				이 과정이 어떻게 작동하는지, 각각의 파라미터에 대한 설명, THREE.js가 가지고 있는 JSON 폰트 리스트를 확인하려면 [page:TextGeometry] 페이지를 참고해 주세요.
+			</p>
+
+			<h3>예시</h3>
+
+			<p>
+				[example:webgl_geometry_text WebGL / geometry / text]<br />
+				[example:webgl_shadowmap WebGL / shadowmap]
+			</p>
+
+			<p>
+				글꼴이 없거나, 다른 글꼴을 사용하고 싶으면 python 스크립트를 통해 Three.js의 JSON 포맷으로 파일을 export 하세요:
+				[link:http://www.jaanga.com/2012/03/blender-to-threejs-create-3d-text-with.html]
+			</p>
+
+		</div>
+
+
+
+		<h2>5. 비트맵 글꼴</h2>
+		<div>
+			<p>
+				BMFonts (비트맵 폰트) 는 단일 BufferGeometry에 글자들을 일괄적으로 활용할 수 있습니다. BMFont 렌더링은
+				word-wrapping, letter spacing, kerning, signed distance fields with standard
+				derivatives, multi-channel signed distance fields, multi-texture fonts 등을 지원합니다.
+				[link:https://github.com/Jam3/three-bmfont-text three-bmfont-text]를 확인해 보세요.
+			</p>
+			<p>
+				Stock 폰트는
+                [link:https://github.com/etiennepinchon/aframe-fonts A-Frame Fonts]처럼 사용 가능하고, 
+                자신만의 .TTF 폰트를 만들어서, 프로젝트에 필요한 문자들만 불러와 최적화할 수 도 있습니다.
+			</p>
+			<p>
+				참고 자료:
+			</p>
+			<ul>
+				<li>[link:http://msdf-bmfont.donmccurdy.com/ msdf-bmfont-web] <i>(웹 기반)</i></li>
+				<li>[link:https://github.com/soimy/msdf-bmfont-xml msdf-bmfont-xml] <i>(커맨드라인)</i></li>
+				<li>[link:https://github.com/libgdx/libgdx/wiki/Hiero hiero] <i>(데스크탑 앱)</i></li>
+			</ul>
+		</div>
+
+
+
+	</body>
+</html>

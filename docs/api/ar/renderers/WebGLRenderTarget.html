@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+		A
+		[link:https://webglfundamentals.org/webgl/lessons/webgl-render-to-texture.html render target]
+		هو مخزن حيث ترسم بطاقة الفيديو بكسل لمشهد
+		يتم تجسيده في الخلفية. يستخدم في تأثيرات مختلفة ،
+		مثل تطبيق المعالجة اللاحقة على صورة معروضة قبل عرضها
+		على الشاشة.
+		</p>
+		 
+		<h2>المنشئ (Constructor)</h2>
+		 
+		<h3>
+		[name]([param:Number width], [param:Number height], [param:Object options])
+		</h3>
+
+		<p>
+		[page:Float width] - عرض renderTarget. الافتراضي هو `1`. <br />
+		[page:Float height] - ارتفاع renderTarget. الافتراضي هو `1`. <br />
+		الخيارات - كائن اختياري يحمل معلمات القوام لـ
+		قوام الهدف التلقائي المتولد وعمق المخزن / مخطط قالب booleans. لـ
+		شرح معلمات القوام انظر [page:Texture Texture]. التالية هي خيارات صالحة: <br /><br />
+		 
+		[page:Constant wrapS] - الافتراضي هو [page:Textures ClampToEdgeWrapping].
+		<br />
+		[page:Constant wrapT] - الافتراضي هو [page:Textures ClampToEdgeWrapping].
+		<br />
+		[page:Constant magFilter] - الافتراضي هو [page:Textures LinearFilter].
+		<br />
+		[page:Constant minFilter] - الافتراضي هو [page:Textures LinearFilter].
+		<br />
+		[page:Boolean generateMipmaps] - الافتراضي هو `false`. <br />
+		[page:Constant format] - الافتراضي هو [page:Textures RGBAFormat]. <br />
+		[page:Constant type] - الافتراضي هو [page:Textures UnsignedByteType]. <br />
+		[page:Number anisotropy] - الافتراضي هو `1`. انظر
+		[page:Texture.anisotropy]<br />
+		[page:Constant colorSpace] - الافتراضي هو [page:Textures NoColorSpace].
+		<br />
+		[page:String internalFormat] - الافتراضي هو `null`.<br />
+		[page:Boolean depthBuffer] - الافتراضي هو `true`. <br />
+		[page:Boolean stencilBuffer] - الافتراضي هو `false`. <br />
+		[page:Boolean resolveDepthBuffer] - الافتراضي هو `true`. <br />
+		[page:Boolean resolveStencilBuffer] - الافتراضي هو `true`. <br />
+		[page:Number samples] - الافتراضي هو 0. <br /><br />
+		 
+		ينشئ جديدًا [name]
+		</p>
+		 
+		<h2>الخصائص (Properties)</h2>
+		 
+		<h3>[property:Boolean isWebGLRenderTarget]</h3>
+		<p>علامة للقراءة فقط للتحقق مما إذا كان كائنًا معطىً من نوع [name].</p>
+		 
+		<h3>[property:number width]</h3>
+		<p>عرض هدف التجسيم.</p>
+		 
+		<h3>[property:number height]</h3>
+		<p>ارتفاع هدف التجسيم.</p>
+		 
+		<h3>[property:Vector4 scissor]</h3>
+		<p>
+		منطقة مستطيلة داخل منفذ عرض render target. سيتم تجاهل الشظايا التي
+		خارج المنطقة.
+		</p>
+		 
+		<h3>[property:Boolean scissorTest]</h3>
+		 
+		<h3>[property:Vector4 viewport]</h3>
+		<p>منفذ العرض الخاص بهذا الهدف التجسيم.</p>
+	 
+		<h3>[property:Texture texture]</h3>
+		<p>
+		تحتوي هذه النسخة من القوام على البكسلات المعروضة. استخدمه كإدخال لـ
+		معالجة إضافية.
+		</p>
+	 
+		<h3>[property:Boolean depthBuffer]</h3>
+		<p>يعرض على مخزن العمق. الافتراضي هو true.</p>
+	 
+		<h3>[property:Boolean stencilBuffer]</h3>
+		<p>يعرض على مخزن القالب. الافتراضي هو false.</p>
+
+		<h3>[property:Boolean resolveDepthBuffer]</h3>
+		<p>
+			Defines whether the depth buffer should be resolved when rendering into a multisampled render target. 
+			Default is `true`.
+		</p>
+
+		<h3>[property:Boolean resolveStencilBuffer]</h3>
+		<p>
+			Defines whether the stencil buffer should be resolved when rendering into a multisampled render target. 
+			This property has no effect when [page:.resolveDepthBuffer] is set to `false`. 
+			Default is `true`.
+		</p>
+	 
+		<h3>[property:DepthTexture depthTexture]</h3>
+		<p>
+		إذا تم تعيينه ، سيتم عرض عمق المشهد على هذه القوام. الافتراضي هو null.
+		</p>
+	 
+		<h3>[property:Number samples]</h3>
+		<p>
+		يحدد عدد عينات MSAA. يمكن استخدامه فقط مع WebGL 2. الافتراضي
+		هو `0`.
+		</p>
+	 
+		<h2>الطرق (Methods)</h2>
+	 
+		<h3>
+		[method:undefined setSize]( [param:Number width], [param:Number height] )
+		</h3>
+		<p>يحدد حجم هدف التجسيم.</p>
+	 
+		<h3>[method:WebGLRenderTarget clone]()</h3>
+		<p>ينشئ نسخة من هذا الهدف التجسيم.</p>
+	 
+		<h3>[method:this copy]( [param:WebGLRenderTarget source] )</h3>
+		<p>يتبنى إعدادات الهدف التجسيم المعطى.</p>
+	 
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		يحرر الموارد المتعلقة بوحدة معالجة الرسومات المخصصة من قبل هذه الحالة. اتصل بهذا
+		طريقة كلما لم يعد يستخدم هذا المثيل في تطبيقك.
+		</p>
+	 
+		<p>
+		[page:EventDispatcher EventDispatcher] الطرق متاحة على هذا
+		فئة.
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

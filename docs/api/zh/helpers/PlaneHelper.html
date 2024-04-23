@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,12 +15,11 @@
 			用于模拟平面 [page:Plane] 的辅助对象.
 		</p>
 
-
-		<h2>例子</h2>
+		<h2>代码示例</h2>
 
 		<code>
-		var plane = new THREE.Plane( new THREE.Vector3( 1, 1, 0.2 ), 3 );
-		var helper = new THREE.PlaneHelper( plane, 1, 0xffff00 );
+		const plane = new THREE.Plane( new THREE.Vector3( 1, 1, 0.2 ), 3 );
+		const helper = new THREE.PlaneHelper( plane, 1, 0xffff00 );
 		scene.add( helper );
 		</code>
 
@@ -51,7 +49,7 @@
 		<h2>方法</h2>
 		<p>请到基类 [page:LineSegments] 页面查看公共方法.</p>
 
-		<h3>[method:void updateMatrixWorld]( [param:Boolean force] )</h3>
+		<h3>[method:undefined updateMatrixWorld]( [param:Boolean force] )</h3>
 		<p>
 			重写基类 [page:Object3D] 的该方法以便于
 			同时更新线框辅助对象与 [page:PlaneHelper.plane .plane] 和
