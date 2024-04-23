@@ -1086,9 +1086,9 @@ class Renderer {
 	}
 
 
-	readRenderTargetPixelsAsync( renderTarget, x, y, width, height ) {
+	readRenderTargetPixelsAsync( renderTarget, x, y, width, height, index = 0 ) {
 
-		return this.backend.copyTextureToBuffer( renderTarget.texture, x, y, width, height );
+		return this.backend.copyTextureToBuffer( renderTarget.textures[ index ], x, y, width, height );
 
 	}
 
