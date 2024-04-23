@@ -251,16 +251,15 @@ function sortInstancedMesh( mesh, compareFn ) {
  *     Filter condition, objects will not be yielded when false.
  * @yields {Object3D} Objects that passed the filter condition.
  */
-function* traverseGenerator( object, condition ) {
+function* traverseGenerator( object ) {
 
-	if ( condition === undefined || condition( object ) )
-		yield object;
+	yield object;
 
 	const children = object.children;
 
 	for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-		yield* traverseGenerator( children[ i ], condition );
+		yield* traverseGenerator( children[ i ] );
 
 	}
 
@@ -272,18 +271,17 @@ function* traverseGenerator( object, condition ) {
  * 	   Filter condition, objects will not be yielded when false.
  * @yields {Object3D} Objects that passed the filter condition.
  */
-function* traverseVisibleGenerator( object, condition ) {
+function* traverseVisibleGenerator( object ) {
 
 	if ( object.visible === false ) return;
 
-	if ( condition === undefined || condition( object ) )
-		yield object;
+	yield object;
 
 	const children = object.children;
 
 	for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-		yield* traverseVisibleGenerator( children[ i ], condition );
+		yield* traverseVisibleGenerator( children[ i ] );
 
 	}
 
@@ -295,16 +293,15 @@ function* traverseVisibleGenerator( object, condition ) {
  *     Filter condition, objects will not be yielded when false.
  * @yields {Object3D} Objects that passed the filter condition.
  */
-function* traverseAncestorsGenerator( object, condition ) {
+function* traverseAncestorsGenerator( object ) {
 
 	const parent = object.parent;
 
 	if ( parent !== null ) {
 
-		if ( condition === undefined || condition( parent ) )
-			yield parent;
+		yield parent;
 
-		yield* traverseAncestorsGenerator( parent, condition );
+		yield* traverseAncestorsGenerator( parent );
 
 	}
 
@@ -315,5 +312,8 @@ export {
 	createMeshesFromMultiMaterialMesh,
 	createMultiMaterialObject,
 	reduceVertices,
-	sortInstancedMesh
+	sortInstancedMesh,
+	traverseGenerator,
+	traverseVisibleGenerator,
+	traverseAncestorsGenerator
 };
