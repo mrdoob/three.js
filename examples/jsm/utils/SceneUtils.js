@@ -245,10 +245,69 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 }
 
+/**
+ * @param {Object3D} object Object to traverse.
+ * @yields {Object3D} Objects that passed the filter condition.
+ */
+function* traverseGenerator( object ) {
+
+	yield object;
+
+	const children = object.children;
+
+	for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+		yield* traverseGenerator( children[ i ] );
+
+	}
+
+}
+
+/**
+ * @param {Object3D} object Object to traverse.
+ * @yields {Object3D} Objects that passed the filter condition.
+ */
+function* traverseVisibleGenerator( object ) {
+
+	if ( object.visible === false ) return;
+
+	yield object;
+
+	const children = object.children;
+
+	for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+		yield* traverseVisibleGenerator( children[ i ] );
+
+	}
+
+}
+
+/**
+ * @param {Object3D} object Object to traverse.
+ * @yields {Object3D} Objects that passed the filter condition.
+ */
+function* traverseAncestorsGenerator( object ) {
+
+	const parent = object.parent;
+
+	if ( parent !== null ) {
+
+		yield parent;
+
+		yield* traverseAncestorsGenerator( parent );
+
+	}
+
+}
+
 export {
 	createMeshesFromInstancedMesh,
 	createMeshesFromMultiMaterialMesh,
 	createMultiMaterialObject,
 	reduceVertices,
-	sortInstancedMesh
+	sortInstancedMesh,
+	traverseGenerator,
+	traverseVisibleGenerator,
+	traverseAncestorsGenerator
 };
