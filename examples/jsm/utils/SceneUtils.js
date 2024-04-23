@@ -247,8 +247,6 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 /**
  * @param {Object3D} object Object to traverse.
- * @param {function(Object3D):boolean} [condition]
- *     Filter condition, objects will not be yielded when false.
  * @yields {Object3D} Objects that passed the filter condition.
  */
 function* traverseGenerator( object ) {
@@ -267,8 +265,6 @@ function* traverseGenerator( object ) {
 
 /**
  * @param {Object3D} object Object to traverse.
- * @param {function(Object3D):boolean} [condition]
- * 	   Filter condition, objects will not be yielded when false.
  * @yields {Object3D} Objects that passed the filter condition.
  */
 function* traverseVisibleGenerator( object ) {
@@ -289,8 +285,6 @@ function* traverseVisibleGenerator( object ) {
 
 /**
  * @param {Object3D} object Object to traverse.
- * @param {function(Object3D):boolean} [condition]
- *     Filter condition, objects will not be yielded when false.
  * @yields {Object3D} Objects that passed the filter condition.
  */
 function* traverseAncestorsGenerator( object ) {
