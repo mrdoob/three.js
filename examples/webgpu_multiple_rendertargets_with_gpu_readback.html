@@ -1,0 +1,249 @@
+<html lang="en">
+	<head>
+		<title>three.js - WebGPU - Multiple Render Targets with GPU ReadBack</title>
+		<meta charset="utf-8">
+        <link rel="shortcut icon" href="#">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
+				}
+			}
+		</script>
+
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { MeshBasicNodeMaterial, NodeMaterial, mix, modelNormalMatrix, normalGeometry, normalize, outputStruct, step, texture, uniform, uv, varying, vec2, vec4, attribute } from 'three/nodes';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
+
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+
+			import QuadMesh from 'three/addons/objects/QuadMesh.js';
+
+			let camera, scene, renderer, torus;
+			let quadMesh, renderTarget;
+			let selector = 1;
+			let gui = new GUI();
+
+			let options = {
+				selection: "multipleRenderTarget",
+			}
+
+			var controller = gui.add(options, "selection", ["multipleRenderTarget", "readback_Wood", "readback_Normal"]);
+
+			controller.onChange(function(e) {
+				if(e === "multipleRenderTarget"){
+					selector = 1;
+				}
+				if(e === "readback_Wood"){
+					selector = 2;
+				}				
+				if(e === "readback_Normal"){
+					selector = 3;
+				}				
+			});
+
+
+			class WriteGBufferMaterial extends NodeMaterial {
+
+				constructor( diffuseTexture ) {
+
+					super();
+
+					this.lights = false;
+					this.fog = false;
+					this.colorSpaced = false;
+
+					this.diffuseTexture = diffuseTexture;
+
+					const vUv = varying( uv() );
+
+					const transformedNormal = modelNormalMatrix.mul( normalGeometry );
+					const vNormal = varying( normalize( transformedNormal ) );
+
+					const repeat = uniform( vec2( 5, 0.5 ) );
+
+					const gColor = texture( this.diffuseTexture, vUv.mul( repeat ) );
+					const gNormal = vec4( normalize( vNormal ), 1.0 );
+
+					this.fragmentNode = outputStruct( gColor, gNormal );
+
+				}
+
+			}
+
+			class ReadGBufferMaterial extends NodeMaterial {
+
+				constructor( tDiffuse, tNormal ) {
+
+					super();
+
+					this.lights = false;
+					this.fog = false;
+
+					const vUv = varying( uv() );
+
+					const diffuse = texture( tDiffuse, vUv );
+					const normal = texture( tNormal, vUv );
+
+					this.fragmentNode = mix( diffuse, normal, step( 0.5, vUv.x ) );
+
+				}
+
+			}
+
+			init();
+
+			function init() {
+
+				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU or WebGL2 support' );
+
+				}
+
+				renderer = new WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
+				document.body.appendChild( renderer.domElement );
+
+				// Create a multi render target with Float buffers
+
+				renderTarget = new THREE.RenderTarget(
+					window.innerWidth * window.devicePixelRatio,
+					window.innerHeight * window.devicePixelRatio,
+					{ count: 2, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter }
+				);
+
+				// Name our G-Buffer attachments for debugging
+
+				renderTarget.textures[ 0 ].name = 'diffuse';
+				renderTarget.textures[ 1 ].name = 'normal';
+
+				// Scene setup
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 50 );
+				camera.position.z = 4;
+
+
+				const loader = new THREE.TextureLoader();
+
+				const diffuse = loader.load( 'textures/hardwood2_diffuse.jpg' );
+				diffuse.colorSpace = THREE.SRGBColorSpace;
+				diffuse.wrapS = THREE.RepeatWrapping;
+				diffuse.wrapT = THREE.RepeatWrapping;
+
+				torus = new THREE.Mesh(
+					new THREE.TorusKnotGeometry( 1, 0.3, 128, 32 ),
+					new WriteGBufferMaterial( diffuse )
+				);
+
+				scene.add( torus );
+
+				
+				// Controls
+
+				new OrbitControls( camera, renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				const dpr = renderer.getPixelRatio();
+				renderTarget.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
+
+			}
+
+			async function render( time ) {
+
+				torus.rotation.y = ( time / 1000 ) * .4;
+
+				// render scene into target
+				renderer.setRenderTarget( renderTarget );
+				renderer.render( scene, camera );
+
+				// render post FX
+				renderer.setRenderTarget( null );
+
+				if(selector == 1){
+					quadMesh = new QuadMesh( new ReadGBufferMaterial( renderTarget.textures[ 0 ], renderTarget.textures[ 1 ] ) );
+					quadMesh.render( renderer );
+				}
+
+				await readback();
+			}
+
+
+			async function readback(){
+
+				//Be careful with this value! 512 is already big. Reading data back from the GPU is computationally intensive
+				const size = 512;	
+				const renderTarget = new THREE.RenderTarget(size, size, { count: 2 });
+				renderer.setRenderTarget( renderTarget );
+				renderer.render( scene, camera );
+				renderer.setRenderTarget( null );
+
+				const width = renderTarget.width;
+          const height = renderTarget.height;
+				
+				const pixelBuffer0 = await renderer.readRenderTargetPixelsAsync(renderTarget, 0, 0, width, height, 0);	//zero is optional
+				const pixelBuffer1 = await renderer.readRenderTargetPixelsAsync(renderTarget, 0, 0, width, height, 1);
+
+				const pixelBufferTexture0 = new THREE.DataTexture(pixelBuffer0, width, height);
+				pixelBufferTexture0.type = THREE.UnsignedByteType,      
+				pixelBufferTexture0.format = THREE.RGBAFormat,
+				pixelBufferTexture0.needsUpdate = true;
+
+				const pixelBufferTexture1 = new THREE.DataTexture(pixelBuffer1, width, height); 
+				pixelBufferTexture1.type = THREE.UnsignedByteType,     
+				pixelBufferTexture1.format = THREE.RGBAFormat,
+				pixelBufferTexture1.needsUpdate = true;
+
+				const lookUpMaterial0 = new MeshBasicNodeMaterial();
+				lookUpMaterial0.colorNode = texture( pixelBufferTexture0, attribute("uv") );
+
+				const lookUpMaterial1 = new MeshBasicNodeMaterial();
+				lookUpMaterial1.colorNode = texture( pixelBufferTexture1, attribute("uv") );
+
+				if(selector == 2){
+					quadMesh = new QuadMesh(lookUpMaterial0);
+					quadMesh.render( renderer );
+				}
+				if(selector == 3){
+					quadMesh = new QuadMesh(lookUpMaterial1);
+					quadMesh.render( renderer );
+				}
+			}
+
+		</script>
+
+	</body>
+</html>
