@@ -101,7 +101,7 @@ class WebGPUBackend extends Backend {
 			requiredLimits: parameters.requiredLimits
 		};
 
-		const device = await adapter.requestDevice( deviceDescriptor );
+		const device = ( parameters.device !== undefined ) ? parameters.device : await adapter.requestDevice( deviceDescriptor );
 
 		const context = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgpu' );
 
