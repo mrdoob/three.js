@@ -187,7 +187,7 @@ class OrbitControls extends EventDispatcher {
 
 				// so camera.up is the orbit axis
 				quat.setFromUnitVectors( object.up, originalUp );
-				quatInverse.copy( quat ).inverse();
+				quatInverse.copy( quat ).invert();
 
 				const position = scope.object.position;
 
