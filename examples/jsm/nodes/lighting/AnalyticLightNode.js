@@ -26,6 +26,7 @@ class AnalyticLightNode extends LightingNode {
 
 		this.rtt = null;
 		this.shadowNode = null;
+		this.shadowMaskNode = null;
 
 		this.color = new Color();
 		this._defaultColorNode = uniform( this.color );
@@ -155,11 +156,13 @@ class AnalyticLightNode extends LightingNode {
 			//
 
 			const shadowColor = texture( rtt.texture, shadowCoord );
+			const shadowMaskNode = frustumTest.mix( 1, shadowNode.mix( shadowColor.a.mix( 1, shadowColor ), 1 ) );
 
 			this.rtt = rtt;
-			this.colorNode = this.colorNode.mul( frustumTest.mix( 1, shadowNode.mix( shadowColor.a.mix( 1, shadowColor ), 1 ) ) );
+			this.colorNode = this.colorNode.mul( shadowMaskNode );
 
 			this.shadowNode = shadowNode;
+			this.shadowMaskNode = shadowMaskNode;
 
 			//
 
@@ -222,6 +225,7 @@ class AnalyticLightNode extends LightingNode {
 		this.rtt.dispose();
 
 		this.shadowNode = null;
+		this.shadowMaskNode = null;
 		this.rtt = null;
 
 		this.colorNode = this._defaultColorNode;
