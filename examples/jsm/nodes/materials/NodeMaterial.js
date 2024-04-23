@@ -146,6 +146,8 @@ class NodeMaterial extends ShaderMaterial {
 
 	setupClipping( builder ) {
 
+		if ( builder.clippingContext === null ) return null;
+
 		const { globalClippingCount, localClippingCount } = builder.clippingContext;
 
 		let result = null;
