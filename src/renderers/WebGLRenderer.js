@@ -1480,7 +1480,7 @@ class WebGLRenderer {
 			textures.updateMultisampleRenderTarget( transmissionRenderTarget );
 			textures.updateRenderTargetMipmap( transmissionRenderTarget );
 
-			if ( extensions.has( 'WEBGL_multisampled_render_to_texture' ) === false ) {
+			if ( extensions.has( 'WEBGL_multisampled_render_to_texture' ) === false ) { // see #28131
 
 				let renderTargetNeedsUpdate = false;
 
