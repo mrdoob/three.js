@@ -355,12 +355,12 @@ export class Physic {
 		this.world.step(delta);
 
 		for (let i = 0, l = this.dynamicObjects.length; i < l; i++) {
-			const mesh = this.dynamicObjects[i];
+			const object = this.dynamicObjects[i];
 
-			if (mesh instanceof InstancedMesh) {
-				const array = mesh.instanceMatrix.array;
+			if (object instanceof InstancedMesh) {
+				const array = object.instanceMatrix.array;
 				/** @type {PhysicProperties[]} */
-				const bodies = this.dynamicObjectMap.get(mesh);
+				const bodies = this.dynamicObjectMap.get(object);
 
 				for (let j = 0; j < bodies.length; j++) {
 					const physicProperties = bodies[j];
@@ -375,16 +375,40 @@ export class Physic {
 						.toArray(array, j * 16);
 				}
 
-				mesh.instanceMatrix.needsUpdate = true;
-				mesh.computeBoundingSphere();
+				object.instanceMatrix.needsUpdate = true;
+				object.computeBoundingSphere();
 			} else {
 				/** @type {PhysicProperties} */
-				const physicProperties = this.dynamicObjectMap.get(mesh);
+				const physicProperties = this.dynamicObjectMap.get(object);
 
-				mesh.position.copy(physicProperties.rigidBody.translation());
-				mesh.quaternion.copy(physicProperties.rigidBody.rotation());
+				object.position.copy(physicProperties.rigidBody.translation());
+				object.quaternion.copy(physicProperties.rigidBody.rotation());
 			}
 		}
+	}
+
+	/**
+	 * @description Remove the specified object to the physic `world`.
+	 *
+	 * @param {Object3D} object Object3D based.
+	 */
+	removeFromWorld(object) {
+		for (let i = 0; i < this.dynamicObjects.length; i++) {
+			const dynamicObject = this.dynamicObjects[i];
+			if (dynamicObject.id === object.id) {
+				this.dynamicObjectMap.delete(dynamicObject);
+				this.dynamicObjects.splice(i, 1);
+				return;
+			}
+		}
+	}
+
+	/**
+	 * @description remove all the stored physical objects.
+	 */
+	dispose() {
+		this.dynamicObjects = [];
+		this.dynamicObjectMap = new WeakMap();
 	}
 }
 
