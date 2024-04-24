@@ -9,7 +9,8 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - <a href="https://github.com/dimforge/rapier.js" target="_blank">rapier</a> instancing
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - <a href="https://github.com/dimforge/rapier.js" target="_blank">rapier</a> instancing<br />
+			Press any <strong>key</strong> to shake.
 		</div>
 
 		<script type="importmap">
@@ -28,10 +29,11 @@
 			import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			let camera, scene, renderer, stats;
+			let camera, controls, scene, renderer, stats;
 			let physics, position;
 
 			let boxes, spheres;
+			let physicBoxes = [], physicSpheres = [];
 
 			init();
 
@@ -110,7 +112,9 @@
 
 				}
 
-				physics.addSceneToWorld( scene );
+				physics.addToWorld( floor, 0 );
+				physicBoxes = physics.addToWorld( boxes, 1 );
+				physicSpheres = physics.addToWorld( spheres, 1 );
 
 				//
 
@@ -125,8 +129,28 @@
 
 				//
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				window.onkeydown = () =>{
+
+					[ ...physicBoxes, ...physicSpheres ].map( ( item ) => {
+
+						item.rigidBody.applyImpulse(
+							{
+								x: ( Math.random() - 0.5 ) * 5,
+								y: Math.random() * 5,
+								z: ( Math.random() - 0.5 ) * 5
+							},
+							true
+						);
+
+					} );
+
+				};
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.y = 0.5;
+				controls.autoRotate = true;
 				controls.update();
 
 				animate();
@@ -152,6 +176,8 @@
 			function animate() {
 
 				physics.step();
+
+				controls.update();
 
 				requestAnimationFrame( animate );
 
