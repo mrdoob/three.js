@@ -51,18 +51,18 @@ class NormalNode extends Node {
 
 		} else if ( scope === NormalNode.LOCAL ) {
 
-			outputNode = varying( normalGeometry );
+			outputNode = varying( normalGeometry, 'v_normalLocal' );
 
 		} else if ( scope === NormalNode.VIEW ) {
 
-			const vertexNode = modelNormalMatrix.mul( normalLocal );
-			outputNode = normalize( varying( vertexNode ) );
+			const vertexNode = modelNormalMatrix.mul( normalGeometry );
+			outputNode = normalize( varying( vertexNode, 'v_normalView' ) );
 
 		} else if ( scope === NormalNode.WORLD ) {
 
 			// To use inverseTransformDirection only inverse the param order like this: cameraViewMatrix.transformDirection( normalView )
 			const vertexNode = normalView.transformDirection( cameraViewMatrix );
-			outputNode = normalize( varying( vertexNode ) );
+			outputNode = normalize( varying( vertexNode, 'v_normalWorld' ) );
 
 		}
 
@@ -96,7 +96,7 @@ NormalNode.WORLD = 'world';
 export default NormalNode;
 
 export const normalGeometry = nodeImmutable( NormalNode, NormalNode.GEOMETRY );
-export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL ).temp( 'Normal' );
+export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL );
 export const normalView = nodeImmutable( NormalNode, NormalNode.VIEW );
 export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );
 export const transformedNormalView = property( 'vec3', 'TransformedNormalView' );

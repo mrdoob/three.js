@@ -27,28 +27,33 @@ class BitangentNode extends Node {
 		const scope = this.scope;
 
 		let crossNormalTangent;
+		let name = 'v_bitangent';
 
 		if ( scope === BitangentNode.GEOMETRY ) {
 
 			crossNormalTangent = normalGeometry.cross( tangentGeometry );
+			name = 'v_bitangentGeometry';
 
 		} else if ( scope === BitangentNode.LOCAL ) {
 
 			crossNormalTangent = normalLocal.cross( tangentLocal );
+			name = 'v_bitangentLocal';
 
 		} else if ( scope === BitangentNode.VIEW ) {
 
 			crossNormalTangent = normalView.cross( tangentView );
+			name = 'v_bitangentView';
 
 		} else if ( scope === BitangentNode.WORLD ) {
 
 			crossNormalTangent = normalWorld.cross( tangentWorld );
+			name = 'v_bitangentWorld';
 
 		}
 
 		const vertexNode = crossNormalTangent.mul( tangentGeometry.w ).xyz;
 
-		const outputNode = normalize( varying( vertexNode ) );
+		const outputNode = normalize( varying( vertexNode, name ) );
 
 		return outputNode.build( builder, this.getNodeType( builder ) );
 

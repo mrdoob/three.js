@@ -43,7 +43,7 @@ class IndexNode extends Node {
 
 		} else {
 
-			const nodeVarying = varying( this );
+			const nodeVarying = varying( this, `v_${propertyName}` );
 
 			output = nodeVarying.build( builder, nodeType );
 

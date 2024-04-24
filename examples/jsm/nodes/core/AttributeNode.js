@@ -83,7 +83,7 @@ class AttributeNode extends Node {
 
 			} else {
 
-				const nodeVarying = varying( this );
+				const nodeVarying = varying( this, `v_${attributeName}` );
 
 				return nodeVarying.build( builder, nodeType );
 
