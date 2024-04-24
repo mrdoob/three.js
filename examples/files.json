@@ -348,6 +348,7 @@
 		"webgpu_materials_video",
 		"webgpu_materialx_noise",
 		"webgpu_multiple_rendertargets",
+		"webgpu_mrt_readback.html",
 		"webgpu_morphtargets",
 		"webgpu_morphtargets_face",
 		"webgpu_occlusion",
