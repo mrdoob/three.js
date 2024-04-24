@@ -85,6 +85,14 @@ function SidebarProjectApp( editor ) {
 
 		const toZip = {};
 
+		const scene = editor.scene;
+		let hasRectAreaLight = false;
+		scene.traverse( function ( child ) {
+
+			if ( child.isRectAreaLight === true ) hasRectAreaLight = true;
+
+		} );
+
 		//
 
 		let output = editor.toJSON();
@@ -136,6 +144,30 @@ function SidebarProjectApp( editor ) {
 
 			content = content.replace( '\t\t\t/* edit button */', editButton );
 
+			const importAddonsScripts = [];
+			if ( hasRectAreaLight ) importAddonsScripts.push( '\t\t\timport { RectAreaLightUniformsLib } from \'three/addons/lights/RectAreaLightUniformsLib.js\';' );
+			if ( importAddonsScripts.length > 0 ) {
+
+				content = content.replace( '\t\t\t/* import addons js */', importAddonsScripts.join( '\n\t\t\t' ) );
+
+			} else {
+
+				content = content.replace( '\t\t\t/* import addons js */\r\n', '' );
+
+			}
+
+			const initAddonsScripts = [];
+			if ( hasRectAreaLight ) initAddonsScripts.push( '\t\t\tRectAreaLightUniformsLib.init();' );
+			if ( initAddonsScripts.length > 0 ) {
+
+				content = content.replace( '\t\t\t/* init addons js */', initAddonsScripts.join( '\n\t\t\t' ) );
+
+			} else {
+
+				content = content.replace( '\t\t\t/* init addons js */\r\n', '' );
+
+			}
+
 			toZip[ 'index.html' ] = strToU8( content );
 
 		} );
@@ -149,6 +181,16 @@ function SidebarProjectApp( editor ) {
 			toZip[ 'js/three.module.js' ] = strToU8( content );
 
 		} );
+
+		if ( hasRectAreaLight ) {
+
+			loader.load( '../examples/jsm/lights/RectAreaLightUniformsLib.js', function ( content ) {
+
+				toZip[ 'js/lights/RectAreaLightUniformsLib.js' ] = strToU8( content );
+
+			} );
+
+		}
 
 	} );
 	container.add( publishButton );
