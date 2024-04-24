@@ -212,7 +212,7 @@
 				renderer.setRenderTarget( null );
 
 				const width = renderTarget.width;
-          const height = renderTarget.height;
+          			const height = renderTarget.height;
 				
 				const pixelBuffer0 = await renderer.readRenderTargetPixelsAsync(renderTarget, 0, 0, width, height, 0);	//zero is optional
 				const pixelBuffer1 = await renderer.readRenderTargetPixelsAsync(renderTarget, 0, 0, width, height, 1);
