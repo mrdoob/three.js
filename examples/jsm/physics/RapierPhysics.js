@@ -349,10 +349,11 @@ export class Physic {
 	/**
 	 * @description Update the physic world.
 	 *
-	 * @param {number | undefined} delta
+	 * @param {number | undefined} timestep The timestep length, in seconds.
 	 */
-	step(delta = undefined) {
-		this.world.step(delta);
+	step(timestep = undefined) {
+		if (typeof timestep === "number") this.world.timestep = timestep;
+		this.world.step();
 
 		for (let i = 0, l = this.dynamicObjects.length; i < l; i++) {
 			const object = this.dynamicObjects[i];

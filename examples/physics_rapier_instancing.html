@@ -173,9 +173,11 @@
 
 			}
 
-			function animate() {
+			const clock = new THREE.Clock();
 
-				physics.step();
+ 			function animate() {
+
+				physics.step( clock.getDelta() );
 
 				controls.update();
 
