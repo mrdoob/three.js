@@ -89,7 +89,7 @@ const exceptionList = [
 	'webgl_materials_blending',
 	'webgl_mirror',
 	'webgl_morphtargets_face',
-	'webgl_postprocessing_crossfade',
+	'webgl_postprocessing_transition',
 	'webgl_postprocessing_dof2',
 	'webgl_raymarching_reflect',
 	'webgl_renderer_pathtracer',
