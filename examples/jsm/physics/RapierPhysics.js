@@ -140,8 +140,6 @@ export class Physic {
 
 			const physics = child.userData.physics;
 
-			if (!physics) return;
-
 			this._addObject(child, physics.mass, physics.restitution);
 		});
 	}
