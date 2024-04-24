@@ -95,7 +95,7 @@ function intersectObject( object, raycaster, intersects, recursive ) {
 
 	}
 
-	if ( recursive === true && ! stopTraversal ) {
+	if ( recursive === true && stopTraversal === false ) {
 
 		const children = object.children;
 
