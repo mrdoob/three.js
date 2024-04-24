@@ -51,11 +51,11 @@ class NormalNode extends Node {
 
 		} else if ( scope === NormalNode.LOCAL ) {
 
-			outputNode = varying( normalGeometry, 'v_normalLocal' );
+			outputNode = varying( normalGeometry );
 
 		} else if ( scope === NormalNode.VIEW ) {
 
-			const vertexNode = modelNormalMatrix.mul( normalGeometry );
+			const vertexNode = modelNormalMatrix.mul( normalLocal );
 			outputNode = normalize( varying( vertexNode, 'v_normalView' ) );
 
 		} else if ( scope === NormalNode.WORLD ) {
