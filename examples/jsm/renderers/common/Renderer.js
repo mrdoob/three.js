@@ -1054,13 +1054,23 @@ class Renderer {
 
 	}
 
-	hasFeatureAsync( name ) {
+	async hasFeatureAsync( name ) {
 
-		return this.backend.hasFeatureAsync( name );
+		if ( this._initialized === false ) await this.init();
+
+		return this.backend.hasFeature( name );
 
 	}
 
 	hasFeature( name ) {
+
+		if ( this._initialized === false ) {
+
+			console.warn( 'THREE.Renderer: .hasFeature() called before the backend is initialized. Try using .hasFeatureAsync() instead.' );
+
+			return false;
+
+		}
 
 		return this.backend.hasFeature( name );
 

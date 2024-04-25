@@ -14,7 +14,6 @@ import WebGPUAttributeUtils from './utils/WebGPUAttributeUtils.js';
 import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
-import WebGPU from '../../capabilities/WebGPU.js';
 
 //
 
@@ -1230,29 +1229,9 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	async hasFeatureAsync( name ) {
-
-		const device = this.device || await WebGPU.getStaticAdapter();
-
-		//
-
-		return device.features.has( name );
-
-	}
-
 	hasFeature( name ) {
 
-		const device = this.device;
-
-		if ( ! device ) {
-
-			console.warn( 'WebGPUBackend: WebGPU device has not been initialized yet. Please use hasFeatureAsync() instead.' );
-
-			return false;
-
-		}
-
-		return device.features.has( name );
+		return this.device.features.has( name );
 
 	}
 
