@@ -210,7 +210,7 @@
 				// render post FX
 				renderer.setRenderTarget( null );
 
-				if ( selector === 1 ){
+				if ( selector === 1 ) {
 					quadMesh.material = material;
 					quadMesh.render( renderer );
 				}
@@ -219,7 +219,7 @@
 			}
 
 
-			async function readback(){
+			async function readback() {
 
 				renderer.setRenderTarget( readbackTarget );
 				renderer.render( scene, camera );
@@ -228,7 +228,7 @@
 				const width = readbackTarget.width;
 				const height = readbackTarget.height;
 
-				if ( selector === 2 ){
+				if ( selector === 2 ) {
 					pixelBuffer = await renderer.readRenderTargetPixelsAsync( readbackTarget, 0, 0, width, height, 0 );	//zero is optional
 					
 					pixelBufferTexture.image.data = pixelBuffer;
@@ -240,7 +240,7 @@
 					quadMesh.render( renderer );
 				}
 
-				if ( selector === 3 ){
+				if ( selector === 3 ) {
 					pixelBuffer = await renderer.readRenderTargetPixelsAsync( readbackTarget, 0, 0, width, height, 1 );
 
 					pixelBufferTexture.image.data = pixelBuffer;
