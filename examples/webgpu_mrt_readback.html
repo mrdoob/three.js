@@ -150,6 +150,7 @@
 				pixelBufferTexture.format = THREE.RGBAFormat,
 
 				readbackMaterial = new MeshBasicNodeMaterial();
+				readbackMaterial.colorNode = texture();
 
 
 				// Scene setup
@@ -234,8 +235,7 @@
 					pixelBufferTexture.image.data = pixelBuffer;
 					pixelBufferTexture.needsUpdate = true;
 
-					readbackMaterial.colorNode = texture( pixelBufferTexture, attribute("uv") );
-
+					readbackMaterial.colorNode.value = pixelBufferTexture;
 					quadMesh.material = readbackMaterial;
 					quadMesh.render( renderer );
 				}
@@ -246,7 +246,7 @@
 					pixelBufferTexture.image.data = pixelBuffer;
 					pixelBufferTexture.needsUpdate = true;
 					
-					readbackMaterial.colorNode = texture( pixelBufferTexture, attribute("uv") );
+					readbackMaterial.colorNode.value = pixelBufferTexture;
 
 					quadMesh.material = readbackMaterial;
 					quadMesh.render( renderer );
