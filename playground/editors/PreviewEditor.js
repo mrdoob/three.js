@@ -92,7 +92,8 @@ export class PreviewEditor extends BaseNodeEditor {
 
 		const renderer = new WebGPURenderer( {
 			canvas,
-			alpha: true
+			alpha: true,
+			antialias: true
 		} );
 
 		renderer.autoClear = false;
