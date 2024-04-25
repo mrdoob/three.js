@@ -1108,12 +1108,6 @@ class WebGLBackend extends Backend {
 
 	}
 
-	async hasFeatureAsync( name ) {
-
-		return this.hasFeature( name );
-
-	}
-
 	hasFeature( name ) {
 
 		const keysMatching = Object.keys( GLFeatureName ).filter( key => GLFeatureName[ key ] === name );
@@ -1121,7 +1115,6 @@ class WebGLBackend extends Backend {
 		const extensions = this.extensions;
 
 		for ( let i = 0; i < keysMatching.length; i ++ ) {
-
 
 			if ( extensions.has( keysMatching[ i ] ) ) return true;
 
