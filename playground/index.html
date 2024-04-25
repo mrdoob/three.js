@@ -138,6 +138,7 @@
 
 				renderer = new WebGPURenderer( { antialias: true } );
 				renderer.setAnimationLoop( animate );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.toneMapping = THREE.LinearToneMapping;
 				renderer.toneMappingExposure = 1;
 
