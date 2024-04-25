@@ -24,9 +24,9 @@ import {
 	CompressedTexture,
 	Vector3,
 	Quaternion,
+	REVISION
 } from 'three';
 import { decompress } from './../utils/TextureUtils.js';
-import { REVISION } from '../../../src/constants.js';
 
 
 /**
