@@ -138,7 +138,7 @@
 				pixelBufferTexture.format = THREE.RGBAFormat;
 
 				readbackMaterial = new MeshBasicNodeMaterial();
-				readbackMaterial.colorNode = texture();
+				readbackMaterial.colorNode = texture( pixelBufferTexture );
 
 
 				// Scene setup
@@ -219,6 +219,8 @@
 				renderer.render( scene, camera );
 				renderer.setRenderTarget( null );
 
+				quadMesh.material = readbackMaterial;
+
 				const width = readbackTarget.width;
 				const height = readbackTarget.height;
 
@@ -231,20 +233,12 @@
 					pixelBufferTexture.image.data = pixelBuffer;
 					pixelBufferTexture.needsUpdate = true;
 
-					readbackMaterial.colorNode.value = pixelBufferTexture;
-
-					quadMesh.material = readbackMaterial;
-
 				} else if ( selection === 'normal' ) {
 
 					pixelBuffer = await renderer.readRenderTargetPixelsAsync( readbackTarget, 0, 0, width, height, 1 );
 
 					pixelBufferTexture.image.data = pixelBuffer;
 					pixelBufferTexture.needsUpdate = true;
-
-					readbackMaterial.colorNode.value = pixelBufferTexture;
-
-					quadMesh.material = readbackMaterial;
 
 				}
 
