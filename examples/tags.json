@@ -109,5 +109,7 @@
 	"webgl2_multiple_rendertargets": [ "mrt" ],
 	"webgl2_multisampled_renderbuffers": [ "msaa" ],
 	"webxr_xr_ballshooter": [ "physics" ],
-	"webgpu_materials_lightmap": [ "shadow" ]
+	"webgpu_materials_lightmap": [ "shadow" ],
+	"webgpu_multiple_rendertargets": [ "mrt" ],
+	"webgpu_multiple_rendertargets_readback": [ "mrt" ]
 }
