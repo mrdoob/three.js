@@ -66,7 +66,7 @@ class TangentNode extends Node {
 
 		} else if ( scope === TangentNode.VIEW ) {
 
-			const vertexNode = modelViewMatrix.mul( vec4( tangentGeometry.xyz, 0 ) ).xyz;
+			const vertexNode = modelViewMatrix.mul( vec4( tangentLocal, 0 ) ).xyz;
 			outputNode = normalize( varying( vertexNode ) );
 
 		} else if ( scope === TangentNode.WORLD ) {
