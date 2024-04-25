@@ -14,6 +14,7 @@ import WebGPUAttributeUtils from './utils/WebGPUAttributeUtils.js';
 import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
+import WebGPU from '../../capabilities/WebGPU.js';
 
 //
 
@@ -44,6 +45,7 @@ class WebGPUBackend extends Backend {
 
 		this.trackTimestamp = ( parameters.trackTimestamp === true );
 
+		this.adapter = null;
 		this.device = null;
 		this.context = null;
 		this.colorBuffer = null;
@@ -66,55 +68,44 @@ class WebGPUBackend extends Backend {
 
 		const parameters = this.parameters;
 
-		// create the device if it is not passed with parameters
+		const adapterOptions = {
+			powerPreference: parameters.powerPreference
+		};
 
-		let device;
+		const adapter = await navigator.gpu.requestAdapter( adapterOptions );
 
-		if ( parameters.device === undefined ) {
+		if ( adapter === null ) {
 
-			const adapterOptions = {
-				powerPreference: parameters.powerPreference
-			};
-
-			const adapter = await navigator.gpu.requestAdapter( adapterOptions );
-
-			if ( adapter === null ) {
-
-				throw new Error( 'WebGPUBackend: Unable to create WebGPU adapter.' );
-
-			}
-
-			// feature support
-
-			const features = Object.values( GPUFeatureName );
-
-			const supportedFeatures = [];
-
-			for ( const name of features ) {
-
-				if ( adapter.features.has( name ) ) {
-
-					supportedFeatures.push( name );
-
-				}
-
-			}
-
-			const deviceDescriptor = {
-				requiredFeatures: supportedFeatures,
-				requiredLimits: parameters.requiredLimits
-			};
-
-			device = await adapter.requestDevice( deviceDescriptor );
-
-		} else {
-
-			device = parameters.device;
+			throw new Error( 'WebGPUBackend: Unable to create WebGPU adapter.' );
 
 		}
 
+		// feature support
+
+		const features = Object.values( GPUFeatureName );
+
+		const supportedFeatures = [];
+
+		for ( const name of features ) {
+
+			if ( adapter.features.has( name ) ) {
+
+				supportedFeatures.push( name );
+
+			}
+
+		}
+
+		const deviceDescriptor = {
+			requiredFeatures: supportedFeatures,
+			requiredLimits: parameters.requiredLimits
+		};
+
+		const device = ( parameters.device !== undefined ) ? parameters.device : await adapter.requestDevice( deviceDescriptor );
+
 		const context = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgpu' );
 
+		this.adapter = adapter;
 		this.device = device;
 		this.context = context;
 
@@ -1231,21 +1222,25 @@ class WebGPUBackend extends Backend {
 
 	async hasFeatureAsync( name ) {
 
-		return this.hasFeature( name );
+		const adapter = this.adapter || await WebGPU.getStaticAdapter();
+
+		//
+
+		return adapter.features.has( name );
 
 	}
 
 	hasFeature( name ) {
 
-		if ( ! this.device ) {
+		if ( ! this.adapter ) {
 
-			console.warn( 'WebGPUBackend: WebGPU device has not been initialized yet.' );
+			console.warn( 'WebGPUBackend: WebGPU adapter has not been initialized yet. Please use hasFeatureAsync instead' );
 
 			return false;
 
 		}
 
-		return this.device.features.has( name );
+		return this.adapter.features.has( name );
 
 	}
 
