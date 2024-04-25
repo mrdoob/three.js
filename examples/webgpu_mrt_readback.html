@@ -46,13 +46,13 @@
 			var controller = gui.add( options, "selection", [ "multipleRenderTarget", "readback_Wood", "readback_Normal" ] );
 
 			controller.onChange( function( e ) {
-				if( e === "multipleRenderTarget" ) {
+				if ( e === "multipleRenderTarget" ) {
 					selector = 1;
 				}
-				if( e === "readback_Wood" ) {
+				if ( e === "readback_Wood" ) {
 					selector = 2;
 				}				
-				if( e === "readback_Normal" ) {
+				if ( e === "readback_Normal" ) {
 					selector = 3;
 				}				
 			} );
@@ -210,7 +210,7 @@
 				// render post FX
 				renderer.setRenderTarget( null );
 
-				if( selector === 1 ){
+				if ( selector === 1 ){
 					quadMesh.material = material;
 					quadMesh.render( renderer );
 				}
@@ -228,7 +228,7 @@
 				const width = readbackTarget.width;
 				const height = readbackTarget.height;
 
-				if( selector === 2 ){
+				if ( selector === 2 ){
 					pixelBuffer = await renderer.readRenderTargetPixelsAsync( readbackTarget, 0, 0, width, height, 0 );	//zero is optional
 					
 					pixelBufferTexture.image.data = pixelBuffer;
@@ -240,7 +240,7 @@
 					quadMesh.render( renderer );
 				}
 
-				if( selector === 3 ){
+				if ( selector === 3 ){
 					pixelBuffer = await renderer.readRenderTargetPixelsAsync( readbackTarget, 0, 0, width, height, 1 );
 
 					pixelBufferTexture.image.data = pixelBuffer;
