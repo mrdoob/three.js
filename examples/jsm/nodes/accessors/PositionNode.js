@@ -39,27 +39,27 @@ class PositionNode extends Node {
 
 		} else if ( scope === PositionNode.LOCAL ) {
 
-			outputNode = varying( positionGeometry, 'v_positionLocal' );
+			outputNode = varying( positionGeometry );
 
 		} else if ( scope === PositionNode.WORLD ) {
 
 			const vertexPositionNode = modelWorldMatrix.mul( positionLocal );
-			outputNode = varying( vertexPositionNode, 'v_positionWorld' );
+			outputNode = varying( vertexPositionNode );
 
 		} else if ( scope === PositionNode.VIEW ) {
 
 			const vertexPositionNode = modelViewMatrix.mul( positionLocal );
-			outputNode = varying( vertexPositionNode, 'v_positionView' );
+			outputNode = varying( vertexPositionNode );
 
 		} else if ( scope === PositionNode.VIEW_DIRECTION ) {
 
-			const vertexPositionNode = modelViewMatrix.mul( positionLocal ).negate();
-			outputNode = normalize( varying( vertexPositionNode, 'v_positionViewDirection' ) );
+			const vertexPositionNode = positionView.negate();
+			outputNode = normalize( varying( vertexPositionNode ) );
 
 		} else if ( scope === PositionNode.WORLD_DIRECTION ) {
 
-			const vertexPositionNode = positionGeometry.transformDirection( modelWorldMatrix );
-			outputNode = normalize( varying( vertexPositionNode, 'v_positionWorldDirection' ) );
+			const vertexPositionNode = positionLocal.transformDirection( modelWorldMatrix );
+			outputNode = normalize( varying( vertexPositionNode ) );
 
 		}
 

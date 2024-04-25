@@ -17,6 +17,12 @@ class TangentNode extends Node {
 
 	}
 
+	isGlobal() {
+
+		return true;
+
+	}
+
 	getHash( /*builder*/ ) {
 
 		return `tangent-${this.scope}`;
@@ -56,17 +62,17 @@ class TangentNode extends Node {
 
 		} else if ( scope === TangentNode.LOCAL ) {
 
-			outputNode = varying( tangentGeometry.xyz, 'v_tangentLocal' );
+			outputNode = varying( tangentGeometry.xyz );
 
 		} else if ( scope === TangentNode.VIEW ) {
 
 			const vertexNode = modelViewMatrix.mul( vec4( tangentGeometry.xyz, 0 ) ).xyz;
-			outputNode = normalize( varying( vertexNode, 'v_tangentView' ) );
+			outputNode = normalize( varying( vertexNode ) );
 
 		} else if ( scope === TangentNode.WORLD ) {
 
 			const vertexNode = tangentView.transformDirection( cameraViewMatrix );
-			outputNode = normalize( varying( vertexNode, 'v_tangentWorld' ) );
+			outputNode = normalize( varying( vertexNode ) );
 
 		}
 
