@@ -142,10 +142,10 @@
 				// Be careful with the size! 512 is already big. Reading data back from the GPU is computationally intensive
 
 				size = 512;	
-				readbackTarget = new THREE.RenderTarget(size, size, { count: 2 });
+				readbackTarget = new THREE.RenderTarget( size, size, { count: 2 } );
 
-				pixelBuffer = new Uint8Array(size ** 2 * 4).fill(0);
-				pixelBufferTexture = new THREE.DataTexture(pixelBuffer, size, size); 
+				pixelBuffer = new Uint8Array( size ** 2 * 4 ).fill( 0 );
+				pixelBufferTexture = new THREE.DataTexture( pixelBuffer, size, size ); 
 				pixelBufferTexture.type = THREE.UnsignedByteType,      
 				pixelBufferTexture.format = THREE.RGBAFormat,
 
@@ -210,7 +210,7 @@
 				// render post FX
 				renderer.setRenderTarget( null );
 
-				if(selector == 1){
+				if( selector === 1 ){
 					quadMesh.material = material;
 					quadMesh.render( renderer );
 				}
@@ -228,8 +228,8 @@
 				const width = readbackTarget.width;
 				const height = readbackTarget.height;
 
-				if(selector == 2){
-					pixelBuffer = await renderer.readRenderTargetPixelsAsync(readbackTarget, 0, 0, width, height, 0);	//zero is optional
+				if( selector === 2 ){
+					pixelBuffer = await renderer.readRenderTargetPixelsAsync( readbackTarget, 0, 0, width, height, 0 );	//zero is optional
 					
 					pixelBufferTexture.image.data = pixelBuffer;
 					pixelBufferTexture.needsUpdate = true;
@@ -240,8 +240,8 @@
 					quadMesh.render( renderer );
 				}
 
-				if(selector == 3){
-					pixelBuffer = await renderer.readRenderTargetPixelsAsync(readbackTarget, 0, 0, width, height, 1);
+				if( selector === 3 ){
+					pixelBuffer = await renderer.readRenderTargetPixelsAsync( readbackTarget, 0, 0, width, height, 1 );
 
 					pixelBufferTexture.image.data = pixelBuffer;
 					pixelBufferTexture.needsUpdate = true;
