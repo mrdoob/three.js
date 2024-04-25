@@ -58,7 +58,9 @@ class StorageBufferNode extends BufferNode {
 		if ( this._attribute === null ) {
 
 			this._attribute = bufferAttribute( this.value );
-			this._varying = varying( this._attribute, `v_${this._attribute.name}` );
+
+			const name = this._attribute.name && this._attribute.name !== '' ? `v_${this._attribute.name}` : null;
+			this._varying = varying( this._attribute, name );
 
 		}
 

@@ -43,7 +43,9 @@ class IndexNode extends Node {
 
 		} else {
 
-			const nodeVarying = varying( this, `v_${propertyName}` );
+			const name = propertyName && scope !== IndexNode.VERTEX && scope !== IndexNode.INSTANCE ? output : null;
+
+			const nodeVarying = varying( this, name );
 
 			output = nodeVarying.build( builder, nodeType );
 
