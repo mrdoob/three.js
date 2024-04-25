@@ -974,7 +974,7 @@ function Loader( editor ) {
 		const dracoLoader = new DRACOLoader();
 		dracoLoader.setDecoderPath( '../examples/jsm/libs/draco/gltf/' );
 
-		const ktx2Loader = new KTX2Loader();
+		const ktx2Loader = new KTX2Loader( manager );
 		ktx2Loader.setTranscoderPath( '../examples/jsm/libs/basis/' );
 
 		editor.signals.rendererDetectKTX2Support.dispatch( ktx2Loader );
