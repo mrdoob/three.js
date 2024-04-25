@@ -19,7 +19,6 @@
 			}
 		</script>
 
-
 		<script type="module">
 
 			import * as THREE from 'three';
@@ -36,7 +35,7 @@
 			import QuadMesh from 'three/addons/objects/QuadMesh.js';
 
 			let camera, scene, renderer, torus;
-			let quadMesh, renderTarget;
+			let quadMesh, renderTarget, size, readbackTarget, material, readbackMaterial;
 			let selector = 1;
 			let gui = new GUI();
 
@@ -138,6 +137,12 @@
 				renderTarget.textures[ 0 ].name = 'diffuse';
 				renderTarget.textures[ 1 ].name = 'normal';
 
+
+				// Init readback render target
+				//Be careful with the size! 512 is already big. Reading data back from the GPU is computationally intensive
+				size = 512;	
+				readbackTarget = new THREE.RenderTarget(size, size, { count: 2 });
+
 				// Scene setup
 
 				scene = new THREE.Scene();
@@ -161,7 +166,10 @@
 
 				scene.add( torus );
 
-				
+
+				material = new ReadGBufferMaterial( renderTarget.textures[ 0 ], renderTarget.textures[ 1 ] )
+				quadMesh = new QuadMesh( material );
+
 				// Controls
 
 				new OrbitControls( camera, renderer.domElement );
@@ -194,7 +202,7 @@
 				renderer.setRenderTarget( null );
 
 				if(selector == 1){
-					quadMesh = new QuadMesh( new ReadGBufferMaterial( renderTarget.textures[ 0 ], renderTarget.textures[ 1 ] ) );
+					quadMesh.material = material;
 					quadMesh.render( renderer );
 				}
 
@@ -204,41 +212,40 @@
 
 			async function readback(){
 
-				//Be careful with this value! 512 is already big. Reading data back from the GPU is computationally intensive
-				const size = 512;	
-				const renderTarget = new THREE.RenderTarget(size, size, { count: 2 });
-				renderer.setRenderTarget( renderTarget );
+				renderer.setRenderTarget( readbackTarget );
 				renderer.render( scene, camera );
 				renderer.setRenderTarget( null );
 
-				const width = renderTarget.width;
-          			const height = renderTarget.height;
-				
-				const pixelBuffer0 = await renderer.readRenderTargetPixelsAsync(renderTarget, 0, 0, width, height, 0);	//zero is optional
-				const pixelBuffer1 = await renderer.readRenderTargetPixelsAsync(renderTarget, 0, 0, width, height, 1);
-
-				const pixelBufferTexture0 = new THREE.DataTexture(pixelBuffer0, width, height);
-				pixelBufferTexture0.type = THREE.UnsignedByteType,      
-				pixelBufferTexture0.format = THREE.RGBAFormat,
-				pixelBufferTexture0.needsUpdate = true;
-
-				const pixelBufferTexture1 = new THREE.DataTexture(pixelBuffer1, width, height); 
-				pixelBufferTexture1.type = THREE.UnsignedByteType,     
-				pixelBufferTexture1.format = THREE.RGBAFormat,
-				pixelBufferTexture1.needsUpdate = true;
-
-				const lookUpMaterial0 = new MeshBasicNodeMaterial();
-				lookUpMaterial0.colorNode = texture( pixelBufferTexture0, attribute("uv") );
-
-				const lookUpMaterial1 = new MeshBasicNodeMaterial();
-				lookUpMaterial1.colorNode = texture( pixelBufferTexture1, attribute("uv") );
+				const width = readbackTarget.width;
+				const height = readbackTarget.height;
 
 				if(selector == 2){
-					quadMesh = new QuadMesh(lookUpMaterial0);
+					const pixelBuffer0 = await renderer.readRenderTargetPixelsAsync(readbackTarget, 0, 0, width, height, 0);	//zero is optional
+					
+					const pixelBufferTexture0 = new THREE.DataTexture(pixelBuffer0, width, height);
+					pixelBufferTexture0.type = THREE.UnsignedByteType,      
+					pixelBufferTexture0.format = THREE.RGBAFormat,
+					pixelBufferTexture0.needsUpdate = true;
+
+					readbackMaterial = new MeshBasicNodeMaterial();
+					readbackMaterial.colorNode = texture( pixelBufferTexture0, attribute("uv") );
+
+					quadMesh.material = readbackMaterial;
 					quadMesh.render( renderer );
 				}
+
 				if(selector == 3){
-					quadMesh = new QuadMesh(lookUpMaterial1);
+					const pixelBuffer1 = await renderer.readRenderTargetPixelsAsync(readbackTarget, 0, 0, width, height, 1);
+
+					const pixelBufferTexture1 = new THREE.DataTexture(pixelBuffer1, width, height); 
+					pixelBufferTexture1.type = THREE.UnsignedByteType,     
+					pixelBufferTexture1.format = THREE.RGBAFormat,
+					pixelBufferTexture1.needsUpdate = true;
+					
+					readbackMaterial = new MeshBasicNodeMaterial();
+					readbackMaterial.colorNode = texture( pixelBufferTexture1, attribute("uv") );
+
+					quadMesh.material = readbackMaterial;
 					quadMesh.render( renderer );
 				}
 			}
