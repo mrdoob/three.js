@@ -205,6 +205,8 @@
 
 				} else {
 
+					quadMesh.material = readbackMaterial;
+
 					await readback();
 
 				}
@@ -218,8 +220,6 @@
 				renderer.setRenderTarget( readbackTarget );
 				renderer.render( scene, camera );
 				renderer.setRenderTarget( null );
-
-				quadMesh.material = readbackMaterial;
 
 				const width = readbackTarget.width;
 				const height = readbackTarget.height;
