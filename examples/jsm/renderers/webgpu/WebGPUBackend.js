@@ -1242,7 +1242,9 @@ class WebGPUBackend extends Backend {
 
 	hasFeature( name ) {
 
-		if ( ! this.device ) {
+		const device = this.device;
+
+		if ( ! device ) {
 
 			console.warn( 'WebGPUBackend: WebGPU device has not been initialized yet. Please use hasFeatureAsync() instead.' );
 
@@ -1250,7 +1252,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		return this.device.features.has( name );
+		return device.features.has( name );
 
 	}
 
