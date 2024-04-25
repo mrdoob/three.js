@@ -43,19 +43,19 @@
 				selection: "multipleRenderTarget",
 			}
 
-			var controller = gui.add(options, "selection", ["multipleRenderTarget", "readback_Wood", "readback_Normal"]);
+			var controller = gui.add( options, "selection", [ "multipleRenderTarget", "readback_Wood", "readback_Normal" ] );
 
-			controller.onChange(function(e) {
-				if(e === "multipleRenderTarget"){
+			controller.onChange( function( e ) {
+				if( e === "multipleRenderTarget" ) {
 					selector = 1;
 				}
-				if(e === "readback_Wood"){
+				if( e === "readback_Wood" ) {
 					selector = 2;
 				}				
-				if(e === "readback_Normal"){
+				if( e === "readback_Normal" ) {
 					selector = 3;
 				}				
-			});
+			} );
 
 
 			class WriteGBufferMaterial extends NodeMaterial {
