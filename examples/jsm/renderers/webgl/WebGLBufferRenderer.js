@@ -127,7 +127,11 @@ class WebGLBufferRenderer {
 
 			}
 
-			info.update( object, elementCount, mode, primcount );
+			for ( let i = 0; i < primcount.length; i ++ ) {
+
+				info.update( object, elementCount, mode, primcount[ i ] );
+
+			}
 
 		}
 

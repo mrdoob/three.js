@@ -62,11 +62,21 @@ export const sheenRoughness = nodeImmutable( PropertyNode, 'float', 'SheenRoughn
 export const iridescence = nodeImmutable( PropertyNode, 'float', 'Iridescence' );
 export const iridescenceIOR = nodeImmutable( PropertyNode, 'float', 'IridescenceIOR' );
 export const iridescenceThickness = nodeImmutable( PropertyNode, 'float', 'IridescenceThickness' );
+export const alphaT = nodeImmutable( PropertyNode, 'float', 'AlphaT' );
+export const anisotropy = nodeImmutable( PropertyNode, 'float', 'Anisotropy' );
+export const anisotropyT = nodeImmutable( PropertyNode, 'vec3', 'AnisotropyT' );
+export const anisotropyB = nodeImmutable( PropertyNode, 'vec3', 'AnisotropyB' );
 export const specularColor = nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
+export const specularF90 = nodeImmutable( PropertyNode, 'float', 'SpecularF90' );
 export const shininess = nodeImmutable( PropertyNode, 'float', 'Shininess' );
 export const output = nodeImmutable( PropertyNode, 'vec4', 'Output' );
 export const dashSize = nodeImmutable( PropertyNode, 'float', 'dashSize' );
 export const gapSize = nodeImmutable( PropertyNode, 'float', 'gapSize' );
 export const pointWidth = nodeImmutable( PropertyNode, 'float', 'pointWidth' );
+export const ior = nodeImmutable( PropertyNode, 'float', 'IOR' );
+export const transmission = nodeImmutable( PropertyNode, 'float', 'Transmission' );
+export const thickness = nodeImmutable( PropertyNode, 'float', 'Thickness' );
+export const attenuationDistance = nodeImmutable( PropertyNode, 'float', 'AttenuationDistance' );
+export const attenuationColor = nodeImmutable( PropertyNode, 'color', 'AttenuationColor' );
 
 addNodeClass( 'PropertyNode', PropertyNode );

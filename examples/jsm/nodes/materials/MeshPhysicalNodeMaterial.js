@@ -1,11 +1,12 @@
 import { addNodeMaterial } from './NodeMaterial.js';
 import { transformedClearcoatNormalView } from '../accessors/NormalNode.js';
-import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness } from '../core/PropertyNode.js';
-import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness } from '../accessors/MaterialNode.js';
-import { float, vec3 } from '../shadernode/ShaderNode.js';
+import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor } from '../core/PropertyNode.js';
+import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor } from '../accessors/MaterialNode.js';
+import { float, vec2, vec3, If } from '../shadernode/ShaderNode.js';
+import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
-
+import { mix, pow2, min } from '../math/MathNode.js';
 import { MeshPhysicalMaterial } from 'three';
 
 const defaultValues = new MeshPhysicalMaterial();
@@ -32,10 +33,13 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.specularIntensityNode = null;
 		this.specularColorNode = null;
 
+		this.iorNode = null;
 		this.transmissionNode = null;
 		this.thicknessNode = null;
 		this.attenuationDistanceNode = null;
 		this.attenuationColorNode = null;
+
+		this.anisotropyNode = null;
 
 		this.setDefaultValues( defaultValues );
 
@@ -61,9 +65,31 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
+	get useAnisotropy() {
+
+		return this.anisotropy > 0 || this.anisotropyNode !== null;
+
+	}
+
+	get useTransmission() {
+
+		return this.transmission > 0 || this.transmissionNode !== null;
+
+	}
+
+	setupSpecular() {
+
+		const iorNode = this.iorNode ? float( this.iorNode ) : materialIOR;
+
+		ior.assign( iorNode );
+		specularColor.assign( mix( min( pow2( ior.sub( 1.0 ).div( ior.add( 1.0 ) ) ).mul( materialSpecularColor ), vec3( 1.0 ) ).mul( materialSpecularIntensity ), diffuseColor.rgb, metalness ) );
+		specularF90.assign( mix( materialSpecularIntensity, 1.0, metalness ) );
+
+	}
+
 	setupLightingModel( /*builder*/ ) {
 
-		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence );
+		return new PhysicalLightingModel( this.useClearcoat, this.useSheen, this.useIridescence, this.useAnisotropy, this.useTransmission );
 
 	}
 
@@ -109,6 +135,49 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		}
 
+		// ANISOTROPY
+
+		if ( this.useAnisotropy ) {
+
+			const anisotropyV = ( this.anisotropyNode ? vec2( this.anisotropyNode ) : materialAnisotropy ).toVar();
+
+			anisotropy.assign( anisotropyV.length() );
+
+			If( anisotropy.equal( 0.0 ), () => {
+
+				anisotropyV.assign( vec2( 1.0, 0.0 ) );
+
+			} ).else( () => {
+
+				anisotropyV.divAssign( anisotropy );
+				anisotropy.assign( anisotropy.saturate() );
+
+			} );
+
+			// Roughness along the anisotropy bitangent is the material roughness, while the tangent roughness increases with anisotropy.
+			alphaT.assign( anisotropy.pow2().mix( roughness.pow2(), 1.0 ) );
+
+			anisotropyT.assign( TBNViewMatrix[ 0 ].mul( anisotropyV.x ).add( TBNViewMatrix[ 1 ].mul( anisotropyV.y ) ) );
+			anisotropyB.assign( TBNViewMatrix[ 1 ].mul( anisotropyV.x ).sub( TBNViewMatrix[ 0 ].mul( anisotropyV.y ) ) );
+
+		}
+
+		// TRANSMISSION
+
+		if ( this.useTransmission ) {
+
+			const transmissionNode = this.transmissionNode ? float( this.transmissionNode ) : materialTransmission;
+			const thicknessNode = this.thicknessNode ? float( this.thicknessNode ) : materialThickness;
+			const attenuationDistanceNode = this.attenuationDistanceNode ? float( this.attenuationDistanceNode ) : materialAttenuationDistance;
+			const attenuationColorNode = this.attenuationColorNode ? vec3( this.attenuationColorNode ) : materialAttenuationColor;
+
+			transmission.assign( transmissionNode );
+			thickness.assign( thicknessNode );
+			attenuationDistance.assign( attenuationDistanceNode );
+			attenuationColor.assign( attenuationColorNode );
+
+		}
+
 	}
 
 	setupNormal( builder ) {
@@ -143,6 +212,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.thicknessNode = source.thicknessNode;
 		this.attenuationDistanceNode = source.attenuationDistanceNode;
 		this.attenuationColorNode = source.attenuationColorNode;
+
+		this.anisotropyNode = source.anisotropyNode;
 
 		return super.copy( source );
 

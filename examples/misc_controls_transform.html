@@ -95,31 +95,31 @@
 
 				window.addEventListener( 'keydown', function ( event ) {
 
-					switch ( event.keyCode ) {
+					switch ( event.key ) {
 
-						case 81: // Q
+						case 'q':
 							control.setSpace( control.space === 'local' ? 'world' : 'local' );
 							break;
 
-						case 16: // Shift
+						case 'Shift':
 							control.setTranslationSnap( 1 );
 							control.setRotationSnap( THREE.MathUtils.degToRad( 15 ) );
 							control.setScaleSnap( 0.25 );
 							break;
 
-						case 87: // W
+						case 'w':
 							control.setMode( 'translate' );
 							break;
 
-						case 69: // E
+						case 'e':
 							control.setMode( 'rotate' );
 							break;
 
-						case 82: // R
+						case 'r':
 							control.setMode( 'scale' );
 							break;
 
-						case 67: // C
+						case 'c':
 							const position = currentCamera.position.clone();
 
 							currentCamera = currentCamera.isPerspectiveCamera ? cameraOrtho : cameraPersp;
@@ -132,7 +132,7 @@
 							onWindowResize();
 							break;
 
-						case 86: // V
+						case 'v':
 							const randomFoV = Math.random() + 0.1;
 							const randomZoom = Math.random() + 0.1;
 
@@ -145,33 +145,33 @@
 							onWindowResize();
 							break;
 
-						case 187:
-						case 107: // +, =, num+
+						case '+':
+						case '=':
 							control.setSize( control.size + 0.1 );
 							break;
 
-						case 189:
-						case 109: // -, _, num-
+						case '-':
+						case '_':
 							control.setSize( Math.max( control.size - 0.1, 0.1 ) );
 							break;
 
-						case 88: // X
+						case 'x':
 							control.showX = ! control.showX;
 							break;
 
-						case 89: // Y
+						case 'y':
 							control.showY = ! control.showY;
 							break;
 
-						case 90: // Z
+						case 'z':
 							control.showZ = ! control.showZ;
 							break;
 
-						case 32: // Spacebar
+						case ' ':
 							control.enabled = ! control.enabled;
 							break;
 
-						case 27: // Esc
+						case 'Escape':
 							control.reset();
 							break;
 
@@ -181,9 +181,9 @@
 
 				window.addEventListener( 'keyup', function ( event ) {
 
-					switch ( event.keyCode ) {
+					switch ( event.key ) {
 
-						case 16: // Shift
+						case 'Shift':
 							control.setTranslationSnap( null );
 							control.setRotationSnap( null );
 							control.setScaleSnap( null );

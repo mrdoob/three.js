@@ -18,6 +18,15 @@ class StorageBufferNode extends BufferNode {
 		this._attribute = null;
 		this._varying = null;
 
+		if ( value.isStorageBufferAttribute !== true && value.isStorageInstancedBufferAttribute !== true ) {
+
+			// TOOD: Improve it, possibly adding a new property to the BufferAttribute to identify it as a storage buffer read-only attribute in Renderer
+
+			if ( value.isInstancedBufferAttribute ) value.isStorageInstancedBufferAttribute = true;
+			else value.isStorageBufferAttribute = true;
+
+		}
+
 	}
 
 	getInputType( /*builder*/ ) {

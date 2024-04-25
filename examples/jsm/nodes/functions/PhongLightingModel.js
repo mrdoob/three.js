@@ -12,7 +12,7 @@ const G_BlinnPhong_Implicit = () => float( 0.25 );
 
 const D_BlinnPhong = tslFn( ( { dotNH } ) => {
 
-	return shininess.mul( 0.5 / Math.PI ).add( 1.0 ).mul( dotNH.pow( shininess ) );
+	return shininess.mul( float( 0.5 ) ).add( 1.0 ).mul( float( 1 / Math.PI ) ).mul( dotNH.pow( shininess ) );
 
 } );
 

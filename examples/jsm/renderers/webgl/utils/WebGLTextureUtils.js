@@ -576,20 +576,35 @@ class WebGLTextureUtils {
 		const width = texture.image.width;
 		const height = texture.image.height;
 
-		if ( texture.isDepthTexture ) {
+		const requireDrawFrameBuffer = texture.isDepthTexture === true || ( renderContext.renderTarget && renderContext.renderTarget.samples > 0 );
 
-			let mask = gl.DEPTH_BUFFER_BIT;
+		if ( requireDrawFrameBuffer ) {
 
-			if ( renderContext.stencil ) {
+			let mask;
+			let attachment;
 
-				mask |= gl.STENCIL_BUFFER_BIT;
+			if ( texture.isDepthTexture === true ) {
+
+				mask = gl.DEPTH_BUFFER_BIT;
+				attachment = gl.DEPTH_ATTACHMENT;
+
+				if ( renderContext.stencil ) {
+
+					mask |= gl.STENCIL_BUFFER_BIT;
+
+				}
+
+			} else {
+
+				mask = gl.COLOR_BUFFER_BIT;
+				attachment = gl.COLOR_ATTACHMENT0;
 
 			}
 
 			const fb = gl.createFramebuffer();
 			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
 
-			gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, textureGPU, 0 );
+			gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureGPU, 0 );
 
 			gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, gl.NEAREST );
 
@@ -625,7 +640,6 @@ class WebGLTextureUtils {
 			let glInternalFormat = gl.DEPTH_COMPONENT24;
 
 			if ( samples > 0 ) {
-
 
 				if ( depthTexture && depthTexture.isDepthTexture ) {
 
@@ -692,7 +706,7 @@ class WebGLTextureUtils {
 
 		await backend.utils._clientWaitAsync();
 
-		const dstBuffer = new typedArrayType( elementCount );
+		const dstBuffer = new typedArrayType( byteLength / typedArrayType.BYTES_PER_ELEMENT );
 
 		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, buffer );
 		gl.getBufferSubData( gl.PIXEL_PACK_BUFFER, 0, dstBuffer );

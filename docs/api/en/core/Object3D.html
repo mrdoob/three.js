@@ -325,10 +325,10 @@
 
 		<h3>[method:this copy]( [param:Object3D object], [param:Boolean recursive] )</h3>
 		<p>
-			recursive -- if true, descendants of the object are also copied. Default
-			is true.<br /><br />
+			recursive -- If set to `true`, descendants of the object are copied next to the existing ones. 
+			If set to `false`, descendants are left unchanged. Default is `true`.<br /><br />
 
-			Copy the given object into this object. Note: event listeners and
+			Copies the given object into this object. Note: Event listeners and
 			user-defined callbacks ([page:.onAfterRender] and [page:.onBeforeRender])
 			are not copied.
 		</p>

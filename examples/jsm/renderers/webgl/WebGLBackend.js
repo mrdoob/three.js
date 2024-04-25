@@ -173,6 +173,7 @@ class WebGLBackend extends Backend {
 		//
 
 		//
+
 		this.initTimestampQuery( renderContext );
 
 		renderContextData.previousContext = this._currentContext;
@@ -568,7 +569,7 @@ class WebGLBackend extends Backend {
 
 	draw( renderObject, info ) {
 
-		const { pipeline, material, context } = renderObject;
+		const { object, pipeline, material, context } = renderObject;
 		const { programGPU } = this.get( pipeline );
 
 		const { gl, state } = this;
@@ -579,7 +580,9 @@ class WebGLBackend extends Backend {
 
 		this._bindUniforms( renderObject.getBindings() );
 
-		state.setMaterial( material );
+		const frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
+
+		state.setMaterial( material, frontFaceCW );
 
 		gl.useProgram( programGPU );
 
@@ -611,9 +614,8 @@ class WebGLBackend extends Backend {
 
 		const index = renderObject.getIndex();
 
-		const object = renderObject.object;
 		const geometry = renderObject.geometry;
-		const drawRange = geometry.drawRange;
+		const drawRange = renderObject.drawRange;
 		const firstVertex = drawRange.start;
 
 		//
@@ -699,16 +701,7 @@ class WebGLBackend extends Backend {
 
 		if ( object.isBatchedMesh ) {
 
-			if ( instanceCount > 1 ) {
-
-				// TODO: Better support with InstancedBatchedMesh
-				if ( object._multiDrawInstances === undefined ) {
-
-					object._multiDrawInstances = new Int32Array( object._maxGeometryCount );
-
-				}
-
-				object._multiDrawInstances.fill( instanceCount );
+			if ( object._multiDrawInstances !== null ) {
 
 				renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
 
@@ -1115,12 +1108,6 @@ class WebGLBackend extends Backend {
 
 	}
 
-	async hasFeatureAsync( name ) {
-
-		return this.hasFeature( name );
-
-	}
-
 	hasFeature( name ) {
 
 		const keysMatching = Object.keys( GLFeatureName ).filter( key => GLFeatureName[ key ] === name );
@@ -1128,7 +1115,6 @@ class WebGLBackend extends Backend {
 		const extensions = this.extensions;
 
 		for ( let i = 0; i < keysMatching.length; i ++ ) {
-
 
 			if ( extensions.has( keysMatching[ i ] ) ) return true;
 

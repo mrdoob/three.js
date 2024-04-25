@@ -6,12 +6,135 @@ import F_Schlick from './BSDF/F_Schlick.js';
 import Schlick_to_F0 from './BSDF/Schlick_to_F0.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
 import LightingModel from '../core/LightingModel.js';
-import { diffuseColor, specularColor, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness } from '../core/PropertyNode.js';
-import { transformedNormalView, transformedClearcoatNormalView } from '../accessors/NormalNode.js';
-import { positionViewDirection } from '../accessors/PositionNode.js';
-import { tslFn, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
+import { diffuseColor, specularColor, specularF90, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor } from '../core/PropertyNode.js';
+import { transformedNormalView, transformedClearcoatNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
+import { positionViewDirection, positionWorld } from '../accessors/PositionNode.js';
+import { tslFn, float, vec2, vec3, vec4, mat3, If } from '../shadernode/ShaderNode.js';
 import { cond } from '../math/CondNode.js';
-import { mix, smoothstep } from '../math/MathNode.js';
+import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } from '../math/MathNode.js';
+import { div } from '../math/OperatorNode.js';
+import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../accessors/CameraNode.js';
+import { modelWorldMatrix } from '../accessors/ModelNode.js';
+import { viewportResolution } from '../display/ViewportNode.js';
+import { viewportMipTexture } from '../display/ViewportTextureNode.js';
+
+//
+// Transmission
+//
+
+const getVolumeTransmissionRay = tslFn( ( [ n, v, thickness, ior, modelMatrix ] ) => {
+
+	// Direction of refracted light.
+	const refractionVector = vec3( refract( v.negate(), normalize( n ), div( 1.0, ior ) ) );
+
+	// Compute rotation-independant scaling of the model matrix.
+	const modelScale = vec3(
+		length( modelMatrix[ 0 ].xyz ),
+		length( modelMatrix[ 1 ].xyz ),
+		length( modelMatrix[ 2 ].xyz )
+	);
+
+	// The thickness is specified in local space.
+	return normalize( refractionVector ).mul( thickness.mul( modelScale ) );
+
+} ).setLayout( {
+	name: 'getVolumeTransmissionRay',
+	type: 'vec3',
+	inputs: [
+		{ name: 'n', type: 'vec3' },
+		{ name: 'v', type: 'vec3' },
+		{ name: 'thickness', type: 'float' },
+		{ name: 'ior', type: 'float' },
+		{ name: 'modelMatrix', type: 'mat4' }
+	]
+} );
+
+const applyIorToRoughness = tslFn( ( [ roughness, ior ] ) => {
+
+	// Scale roughness with IOR so that an IOR of 1.0 results in no microfacet refraction and
+	// an IOR of 1.5 results in the default amount of microfacet refraction.
+	return roughness.mul( clamp( ior.mul( 2.0 ).sub( 2.0 ), 0.0, 1.0 ) );
+
+} ).setLayout( {
+	name: 'applyIorToRoughness',
+	type: 'float',
+	inputs: [
+		{ name: 'roughness', type: 'float' },
+		{ name: 'ior', type: 'float' }
+	]
+} );
+
+const singleViewportMipTexture = viewportMipTexture();
+
+const getTransmissionSample = tslFn( ( [ fragCoord, roughness, ior ] ) => {
+
+	const transmissionSample = singleViewportMipTexture.uv( fragCoord );
+	//const transmissionSample = viewportMipTexture( fragCoord );
+
+	const lod = log2( float( viewportResolution.x ) ).mul( applyIorToRoughness( roughness, ior ) );
+
+	return transmissionSample.bicubic( lod );
+
+} );
+
+const volumeAttenuation = tslFn( ( [ transmissionDistance, attenuationColor, attenuationDistance ] ) => {
+
+	If( attenuationDistance.notEqual( 0 ), () => {
+
+		// Compute light attenuation using Beer's law.
+		const attenuationCoefficient = log( attenuationColor ).negate().div( attenuationDistance );
+		const transmittance = exp( attenuationCoefficient.negate().mul( transmissionDistance ) );
+
+		return transmittance;
+
+	} );
+
+	// Attenuation distance is +∞, i.e. the transmitted color is not attenuated at all.
+	return vec3( 1.0 );
+
+} ).setLayout( {
+	name: 'volumeAttenuation',
+	type: 'vec3',
+	inputs: [
+		{ name: 'transmissionDistance', type: 'float' },
+		{ name: 'attenuationColor', type: 'vec3' },
+		{ name: 'attenuationDistance', type: 'float' }
+	]
+} );
+
+const getIBLVolumeRefraction = tslFn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance ] ) => {
+
+	const transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );
+	const refractedRayExit = position.add( transmissionRay );
+
+	// Project refracted vector on the framebuffer, while mapping to normalized device coordinates.
+	const ndcPos = projMatrix.mul( viewMatrix.mul( vec4( refractedRayExit, 1.0 ) ) );
+	const refractionCoords = vec2( ndcPos.xy.div( ndcPos.w ) ).toVar();
+	refractionCoords.addAssign( 1.0 );
+	refractionCoords.divAssign( 2.0 );
+	refractionCoords.assign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
+
+	// Sample framebuffer to get pixel the refracted ray hits.
+	const transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );
+	const transmittance = diffuseColor.mul( volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance ) );
+	const attenuatedColor = transmittance.rgb.mul( transmittedLight.rgb );
+	const dotNV = n.dot( v ).clamp();
+
+	// Get the specular component.
+	const F = vec3( EnvironmentBRDF( { // n, v, specularColor, specularF90, roughness
+		dotNV,
+		specularColor,
+		specularF90,
+		roughness
+	} ) );
+
+	// As less light is transmitted, the opacity should be increased. This simple approximation does a decent job
+	// of modulating a CSS background, and has no effect when the buffer is opaque, due to a solid object or clear color.
+	const transmittanceFactor = transmittance.r.add( transmittance.g, transmittance.b ).div( 3.0 );
+
+	return vec4( F.oneMinus().mul( attenuatedColor ), transmittedLight.a.oneMinus().mul( transmittanceFactor ).oneMinus() );
+
+} );
 
 //
 // Iridescence
@@ -172,13 +295,15 @@ const clearcoatF90 = vec3( 1 );
 
 class PhysicalLightingModel extends LightingModel {
 
-	constructor( clearcoat = false, sheen = false, iridescence = false ) {
+	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false ) {
 
 		super();
 
 		this.clearcoat = clearcoat;
 		this.sheen = sheen;
 		this.iridescence = iridescence;
+		this.anisotropy = anisotropy;
+		this.transmission = transmission;
 
 		this.clearcoatRadiance = null;
 		this.clearcoatSpecularDirect = null;
@@ -190,7 +315,7 @@ class PhysicalLightingModel extends LightingModel {
 
 	}
 
-	start( /*context*/ ) {
+	start( context ) {
 
 		if ( this.clearcoat === true ) {
 
@@ -223,13 +348,42 @@ class PhysicalLightingModel extends LightingModel {
 
 		}
 
+		if ( this.transmission === true ) {
+
+			const position = positionWorld;
+			const v = cameraPosition.sub( positionWorld ).normalize(); // TODO: Create Node for this, same issue in MaterialX
+			const n = transformedNormalWorld;
+
+			context.backdrop = getIBLVolumeRefraction(
+				n,
+				v,
+				roughness,
+				diffuseColor,
+				specularColor,
+				specularF90, // specularF90
+				position, // positionWorld
+				modelWorldMatrix, // modelMatrix
+				cameraViewMatrix, // viewMatrix
+				cameraProjectionMatrix, // projMatrix
+				ior,
+				thickness,
+				attenuationColor,
+				attenuationDistance
+			);
+
+			context.backdropAlpha = transmission;
+
+			diffuseColor.a.mulAssign( mix( 1, context.backdrop.a, transmission ) );
+
+		}
+
 	}
 
 	// Fdez-Agüera's "Multiple-Scattering Microfacet Model for Real-Time Image Based Lighting"
 	// Approximates multiscattering in order to preserve energy.
 	// http://www.jcgt.org/published/0008/01/03/
 
-	computeMultiscattering( singleScatter, multiScatter, specularF90 = float( 1 ) ) {
+	computeMultiscattering( singleScatter, multiScatter, specularF90 ) {
 
 		const dotNV = transformedNormalView.dot( positionViewDirection ).clamp(); // @ TODO: Move to core dotNV
 
@@ -272,7 +426,7 @@ class PhysicalLightingModel extends LightingModel {
 
 		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
 
-		reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX( { lightDirection, f0: specularColor, f90: 1, roughness, iridescence: this.iridescence, iridescenceFresnel: this.iridescenceFresnel } ) ) );
+		reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX( { lightDirection, f0: specularColor, f90: 1, roughness, iridescence: this.iridescence, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } ) ) );
 
 	}
 
@@ -318,7 +472,7 @@ class PhysicalLightingModel extends LightingModel {
 		const multiScattering = vec3().temp( 'multiScattering' );
 		const cosineWeightedIrradiance = iblIrradiance.mul( 1 / Math.PI );
 
-		this.computeMultiscattering( singleScattering, multiScattering );
+		this.computeMultiscattering( singleScattering, multiScattering, specularF90 );
 
 		const totalScattering = singleScattering.add( multiScattering );
 

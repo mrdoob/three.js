@@ -1,15 +1,17 @@
 import F_Schlick from './F_Schlick.js';
 import V_GGX_SmithCorrelated from './V_GGX_SmithCorrelated.js';
+import V_GGX_SmithCorrelated_Anisotropic from './V_GGX_SmithCorrelated_Anisotropic.js';
 import D_GGX from './D_GGX.js';
+import D_GGX_Anisotropic from './D_GGX_Anisotropic.js';
 import { transformedNormalView } from '../../accessors/NormalNode.js';
 import { positionViewDirection } from '../../accessors/PositionNode.js';
-import { iridescence } from '../../core/PropertyNode.js';
-import { tslFn } from '../../shadernode/ShaderNode.js';
+import { iridescence, alphaT, anisotropyT, anisotropyB } from '../../core/PropertyNode.js';
+import { tslFn, defined } from '../../shadernode/ShaderNode.js';
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
 const BRDF_GGX = tslFn( ( inputs ) => {
 
-	const { lightDirection, f0, f90, roughness, iridescenceFresnel } = inputs;
+	const { lightDirection, f0, f90, roughness, f, USE_IRIDESCENCE, USE_ANISOTROPY } = inputs;
 
 	const normalView = inputs.normalView || transformedNormalView;
 
@@ -23,15 +25,32 @@ const BRDF_GGX = tslFn( ( inputs ) => {
 	const dotVH = positionViewDirection.dot( halfDir ).clamp();
 
 	let F = F_Schlick( { f0, f90, dotVH } );
+	let V, D;
 
-	if ( iridescenceFresnel ) {
+	if ( defined( USE_IRIDESCENCE ) ) {
 
-		F = iridescence.mix( F, iridescenceFresnel );
+		F = iridescence.mix( F, f );
 
 	}
 
-	const V = V_GGX_SmithCorrelated( { alpha, dotNL, dotNV } );
-	const D = D_GGX( { alpha, dotNH } );
+	if ( defined( USE_ANISOTROPY ) ) {
+
+		const dotTL = anisotropyT.dot( lightDirection );
+		const dotTV = anisotropyT.dot( positionViewDirection );
+		const dotTH = anisotropyT.dot( halfDir );
+		const dotBL = anisotropyB.dot( lightDirection );
+		const dotBV = anisotropyB.dot( positionViewDirection );
+		const dotBH = anisotropyB.dot( halfDir );
+
+		V = V_GGX_SmithCorrelated_Anisotropic( { alphaT, alphaB: alpha, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL } );
+		D = D_GGX_Anisotropic( { alphaT, alphaB: alpha, dotNH, dotTH, dotBH } );
+
+	} else {
+
+		V = V_GGX_SmithCorrelated( { alpha, dotNL, dotNV } );
+		D = D_GGX( { alpha, dotNH } );
+
+	}
 
 	return F.mul( V ).mul( D );
 

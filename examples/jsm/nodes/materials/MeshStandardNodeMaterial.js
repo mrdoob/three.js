@@ -1,5 +1,5 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { diffuseColor, metalness, roughness, specularColor } from '../core/PropertyNode.js';
+import { diffuseColor, metalness, roughness, specularColor, specularF90 } from '../core/PropertyNode.js';
 import { mix } from '../math/MathNode.js';
 import { materialRoughness, materialMetalness } from '../accessors/MaterialNode.js';
 import getRoughness from '../functions/material/getRoughness.js';
@@ -35,6 +35,15 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	}
 
+	setupSpecular() {
+
+		const specularColorNode = mix( vec3( 0.04 ), diffuseColor.rgb, metalness );
+
+		specularColor.assign( specularColorNode );
+		specularF90.assign( 1.0 );
+
+	}
+
 	setupVariants() {
 
 		// METALNESS
@@ -52,9 +61,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 		// SPECULAR COLOR
 
-		const specularColorNode = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessNode );
-
-		specularColor.assign( specularColorNode );
+		this.setupSpecular();
 
 		// DIFFUSE COLOR
 

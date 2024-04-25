@@ -39,6 +39,7 @@
 	"webgl_lights_pointlights": [ "multiple" ],
 	"webgl_lines_fat": [ "gpu", "stats", "panel" ],
 	"webgl_lines_fat_raycasting": [ "gpu", "stats", "panel", "raycast" ],
+	"webgl_loader_gltf_dispersion": [ "transmission" ],
 	"webgl_loader_ifc": [ "external" ],
 	"webgl_loader_ldraw": [ "lego" ],
 	"webgl_loader_pdb": [ "molecules", "css2d" ],
@@ -51,7 +52,6 @@
 	"webgl_materials_cubemap_mipmaps": [ "envmap" ],
 	"webgl_materials_cubemap_render_to_mipmaps": [ "envmap", "renderTarget", "mipmap" ],
 	"webgl_materials_envmaps_hdr": [ "rgbm" ],
-	"webgl_materials_lightmap": [ "shadow" ],
 	"webgl_materials_physical_clearcoat": [ "anisotropy" ],
 	"webgl_materials_physical_transmission": [ "alpha" ],
 	"webgl_materials_texture_canvas": [ "paint" ],
@@ -108,5 +108,8 @@
 	"webgl_simple_gi": [ "global illumination" ],
 	"webgl2_multiple_rendertargets": [ "mrt" ],
 	"webgl2_multisampled_renderbuffers": [ "msaa" ],
-	"webxr_xr_ballshooter": [ "physics" ]
+	"webxr_xr_ballshooter": [ "physics" ],
+	"webgpu_materials_lightmap": [ "shadow" ],
+	"webgpu_multiple_rendertargets": [ "mrt" ],
+	"webgpu_multiple_rendertargets_readback": [ "mrt" ]
 }
