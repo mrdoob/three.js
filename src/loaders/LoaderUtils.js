@@ -8,29 +8,74 @@ class LoaderUtils {
 
 		}
 
-		// Avoid the String.fromCharCode.apply(null, array) shortcut, which
-		// throws a "maximum call stack size exceeded" error for large arrays.
-
 		let s = '';
 
-		for ( let i = 0, il = array.length; i < il; i ++ ) {
+		for ( let i = 0, l = array.length; i < l; ) {
 
-			// Implicitly assumes little-endian.
-			s += String.fromCharCode( array[ i ] );
+			if ( array[ i ] >> 7 === 0 ) {
+
+				s += String.fromCodePoint( array[ i ] );
+				i += 1;
+				continue;
+
+			} else if ( array[ i ] >> 5 === 0b110 ) {
+
+				if ( array[ i + 1 ] >> 6 === 0b10 ) {
+
+					s += String.fromCodePoint( ( ( array[ i ] & 0b11111 ) << 6 ) + ( array[ i + 1 ] & 0b111111 ) );
+					i += 2;
+					continue;
+
+				}
+
+			} else if ( array[ i ] >> 4 === 0b1110 ) {
+
+				if ( array[ i + 1 ] >> 6 === 0b10 && array[ i + 2 ] >> 6 === 0b10 ) {
+
+					s += String.fromCodePoint( ( ( array[ i ] & 0b1111 ) << 12 ) + ( ( array[ i + 1 ] & 0b111111 ) << 6 ) + ( array[ i + 2 ] & 0b111111 ) );
+					i += 3;
+					continue;
+
+				}
+
+			} else if ( array[ i ] >> 3 === 0b11110 ) {
+
+				if ( array[ i + 1 ] >> 6 === 0b10 && array[ i + 2 ] >> 6 === 0b10 && array[ i + 3 ] >> 6 === 0b10 ) {
+
+					s += String.fromCodePoint( ( ( array[ i ] & 0b111 ) << 18 ) + ( ( array[ i + 1 ] & 0b111111 ) << 12 ) + ( ( array[ i + 2 ] & 0b111111 ) << 6 ) + ( array[ i + 3 ] & 0b111111 ) );
+					i += 4;
+					continue;
+
+				}
+
+			} else if ( array[ i ] >> 2 === 0b111110 ) {
+
+				if ( array[ i + 1 ] >> 6 === 0b10 && array[ i + 2 ] >> 6 === 0b10 && array[ i + 3 ] >> 6 === 0b10 && array[ i + 4 ] >> 6 === 0b10 ) {
+
+					s += String.fromCodePoint( ( ( array[ i ] & 0b11 ) << 24 ) + ( ( array[ i + 1 ] & 0b111111 ) << 18 ) + ( ( array[ i + 2 ] & 0b111111 ) << 12 ) + ( ( array[ i + 3 ] & 0b111111 ) << 6 ) + ( array[ i + 4 ] & 0b111111 ) );
+					i += 5;
+					continue;
+
+				}
+
+			} else if ( array[ i ] >> 1 === 0b1111110 ) {
+
+				if ( array[ i + 1 ] >> 6 === 0b10 && array[ i + 2 ] >> 6 === 0b10 && array[ i + 3 ] >> 6 === 0b10 && array[ i + 4 ] >> 6 === 0b10 && array[ i + 5 ] >> 6 === 0b10 ) {
+
+					s += String.fromCodePoint( ( ( array[ i ] & 0b1 ) << 30 ) + ( ( array[ i + 1 ] & 0b111111 ) << 24 ) + ( ( array[ i + 2 ] & 0b111111 ) << 18 ) + ( ( array[ i + 3 ] & 0b111111 ) << 12 ) + ( ( array[ i + 4 ] & 0b111111 ) << 6 ) + ( array[ i + 5 ] & 0b111111 ) );
+					i += 6;
+					continue;
+
+				}
+
+			}
+
+			s += 0xfffd;
+			i += 1;
 
 		}
 
-		try {
-
-			// merges multi-byte utf-8 characters.
-
-			return decodeURIComponent( escape( s ) );
-
-		} catch ( e ) { // see #16358
-
-			return s;
-
-		}
+		return s;
 
 	}
 
