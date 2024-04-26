@@ -70,7 +70,7 @@ class LoaderUtils {
 
 			}
 
-			s += 0xfffd;
+			s += String.fromCodePoint( 0xfffd );
 			i += 1;
 
 		}
