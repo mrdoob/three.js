@@ -148,6 +148,10 @@ class FileLoader extends Loader {
 
 									}
 
+								}, ( e ) => {
+
+									controller.error( e );
+
 								} );
 
 							}
