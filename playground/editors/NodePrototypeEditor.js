@@ -87,6 +87,12 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 
 	setEditor( editor ) {
 
+		if ( editor === null && this.editor ) {
+
+			this.editor.removeClass( this._prototype );
+
+		}
+
 		super.setEditor( editor );
 
 		if ( editor === null ) {

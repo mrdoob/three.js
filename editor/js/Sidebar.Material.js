@@ -111,6 +111,11 @@ function SidebarMaterial( editor ) {
 	const materialReflectivity = new SidebarMaterialNumberProperty( editor, 'reflectivity', strings.getKey( 'sidebar/material/reflectivity' ) );
 	container.add( materialReflectivity );
 
+	// ior
+
+	const materialIOR = new SidebarMaterialNumberProperty( editor, 'ior', strings.getKey( 'sidebar/material/ior' ), [ 1, 2.333 ], 3 );
+	container.add( materialIOR );
+
 	// roughness
 
 	const materialRoughness = new SidebarMaterialNumberProperty( editor, 'roughness', strings.getKey( 'sidebar/material/roughness' ), [ 0, 1 ] );
@@ -130,6 +135,11 @@ function SidebarMaterial( editor ) {
 
 	const materialClearcoatRoughness = new SidebarMaterialNumberProperty( editor, 'clearcoatRoughness', strings.getKey( 'sidebar/material/clearcoatroughness' ), [ 0, 1 ] );
 	container.add( materialClearcoatRoughness );
+
+	// dispersion
+
+	const materialDispersion = new SidebarMaterialNumberProperty( editor, 'dispersion', strings.getKey( 'sidebar/material/dispersion' ), [ 0, 10 ] );
+	container.add( materialDispersion );
 
 	// iridescence
 

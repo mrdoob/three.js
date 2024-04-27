@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - GLTFloader + Anisotropy</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - GLTFLoader + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_anisotropy" target="_blank" rel="noopener">KHR_materials_anisotropy</a><br />
+			Anisotropy Barn Lamp from <a href="https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/AnisotropyBarnLamp" target="_blank" rel="noopener">glTF-Sample-Models</a><br />
+			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+
+			let renderer, scene, camera, controls;
+
+			init();
+
+			async function init() {
+
+				renderer = new WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1.35;
+				document.body.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.01, 10 );
+				camera.position.set( - 0.35, - 0.2, 0.35 );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, - 0.08, 0.11 );
+				controls.minDistance = 0.1;
+				controls.maxDistance = 2;
+				controls.addEventListener( 'change', render );
+				controls.update();
+
+				const rgbeLoader = new RGBELoader().setPath( 'textures/equirectangular/' );
+				const gltfLoader = new GLTFLoader().setPath( 'models/gltf/' );
+
+				const [ texture, gltf ] = await Promise.all( [
+					rgbeLoader.loadAsync( 'royal_esplanade_1k.hdr' ),
+					gltfLoader.loadAsync( 'AnisotropyBarnLamp.glb' ),
+				] );
+
+				// environment
+
+				texture.mapping = THREE.EquirectangularReflectionMapping;
+
+				scene.background = texture;
+				scene.backgroundBlurriness = 0.5;
+				scene.environment = texture;
+
+				// model
+
+				scene.add( gltf.scene );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function render() {
+
+				renderer.renderAsync( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

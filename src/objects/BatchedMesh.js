@@ -152,6 +152,7 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCounts = new Int32Array( maxGeometryCount );
 		this._multiDrawStarts = new Int32Array( maxGeometryCount );
 		this._multiDrawCount = 0;
+		this._multiDrawInstances = null;
 		this._visibilityChanged = true;
 
 		// Local matrix per geometry by using data texture
@@ -590,6 +591,28 @@ class BatchedMesh extends Mesh {
 		this._visibilityChanged = true;
 
 		return this;
+
+	}
+
+	getInstanceCountAt( id ) {
+
+		if ( this._multiDrawInstances === null ) return null;
+
+		return this._multiDrawInstances[ id ];
+
+	}
+
+	setInstanceCountAt( id, instanceCount ) {
+
+		if ( this._multiDrawInstances === null ) {
+
+			this._multiDrawInstances = new Int32Array( this._maxGeometryCount ).fill( 1 );
+
+		}
+
+		this._multiDrawInstances[ id ] = instanceCount;
+
+		return id;
 
 	}
 

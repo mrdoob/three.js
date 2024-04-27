@@ -10,7 +10,7 @@ import { normalWorld } from '../accessors/NormalNode.js';
 import { WebGPUCoordinateSystem } from 'three';
 //import { add } from '../math/OperatorNode.js';
 
-import { Color, DepthTexture, NearestFilter, LessCompare } from 'three';
+import { Color, DepthTexture, NearestFilter, LessCompare, NoToneMapping } from 'three';
 
 let overrideMaterial = null;
 
@@ -26,6 +26,7 @@ class AnalyticLightNode extends LightingNode {
 
 		this.rtt = null;
 		this.shadowNode = null;
+		this.shadowMaskNode = null;
 
 		this.color = new Color();
 		this._defaultColorNode = uniform( this.color );
@@ -49,6 +50,10 @@ class AnalyticLightNode extends LightingNode {
 	}
 
 	setupShadow( builder ) {
+
+		const { object } = builder;
+
+		if ( object.receiveShadow === false ) return;
 
 		let shadowNode = this.shadowNode;
 
@@ -81,7 +86,9 @@ class AnalyticLightNode extends LightingNode {
 			const bias = reference( 'bias', 'float', shadow );
 			const normalBias = reference( 'normalBias', 'float', shadow );
 
-			let shadowCoord = uniform( shadow.matrix ).mul( positionWorld.add( normalWorld.mul( normalBias ) ) );
+			const position = object.material.shadowPositionNode || positionWorld;
+
+			let shadowCoord = uniform( shadow.matrix ).mul( position.add( normalWorld.mul( normalBias ) ) );
 			shadowCoord = shadowCoord.xyz.div( shadowCoord.w );
 
 			const frustumTest = shadowCoord.x.greaterThanEqual( 0 )
@@ -145,15 +152,17 @@ class AnalyticLightNode extends LightingNode {
 				textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy1 ) ), shadowCoord.z ),
 				textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx1, dy1 ) ), shadowCoord.z )
 			).mul( 1 / 17 );
-			*/
+			 */
 			//
 
 			const shadowColor = texture( rtt.texture, shadowCoord );
+			const shadowMaskNode = frustumTest.mix( 1, shadowNode.mix( shadowColor.a.mix( 1, shadowColor ), 1 ) );
 
 			this.rtt = rtt;
-			this.colorNode = this.colorNode.mul( frustumTest.mix( 1, shadowNode.mix( shadowColor.a.mix( 1, shadowColor ), 1 ) ) );
+			this.colorNode = this.colorNode.mul( shadowMaskNode );
 
 			this.shadowNode = shadowNode;
+			this.shadowMaskNode = shadowMaskNode;
 
 			//
 
@@ -183,6 +192,7 @@ class AnalyticLightNode extends LightingNode {
 
 		light.shadow.updateMatrices( light );
 
+		const currentToneMapping = renderer.toneMapping;
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
 
@@ -197,11 +207,14 @@ class AnalyticLightNode extends LightingNode {
 		} );
 
 		renderer.setRenderTarget( rtt );
+		renderer.toneMapping = NoToneMapping;
 
 		renderer.render( scene, light.shadow.camera );
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setRenderObjectFunction( currentRenderObjectFunction );
+
+		renderer.toneMapping = currentToneMapping;
 
 		scene.overrideMaterial = currentOverrideMaterial;
 
@@ -212,6 +225,7 @@ class AnalyticLightNode extends LightingNode {
 		this.rtt.dispose();
 
 		this.shadowNode = null;
+		this.shadowMaskNode = null;
 		this.rtt = null;
 
 		this.colorNode = this._defaultColorNode;

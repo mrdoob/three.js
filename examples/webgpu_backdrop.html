@@ -56,7 +56,7 @@
 				camera.position.set( 1, 2, 3 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 'lightblue' );
+				scene.backgroundNode = viewportTopLeft.y.mix( color( 0x66bbff ), color( 0x4466ff ) );
 				camera.lookAt( 0, 1, 0 );
 
 				clock = new THREE.Clock();
@@ -134,7 +134,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, .15 );
+				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, .3 );
 				document.body.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );

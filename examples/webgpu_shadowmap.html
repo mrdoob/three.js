@@ -31,7 +31,7 @@
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { vec4, tslFn, color, vertexIndex, MeshPhongNodeMaterial } from 'three/nodes';
+			import { mx_fractal_noise_vec3, positionWorld, vec4, tslFn, color, vertexIndex, MeshPhongNodeMaterial } from 'three/nodes';
 			let camera, scene, renderer, clock;
 			let dirLight, spotLight;
 			let torusKnot, dirGroup;
@@ -115,6 +115,7 @@
 
 				} )();
 
+
 				materialCustomShadow.shadowNode = tslFn( () => {
 
 					discardNode.discard();
@@ -135,7 +136,6 @@
 				const pillar1 = new THREE.Mesh( cylinderGeometry, material );
 				pillar1.position.set( 8, 3.5, 8 );
 				pillar1.castShadow = true;
-				pillar1.receiveShadow = true;
 
 				const pillar2 = pillar1.clone();
 				pillar2.position.set( 8, 3.5, - 8 );
@@ -155,6 +155,23 @@
 					shininess: 0,
 					specular: 0x111111
 				} );
+
+				planeMaterial.shadowPositionNode = tslFn( () => {
+
+					const pos = positionWorld.toVar();
+					pos.xz.addAssign( mx_fractal_noise_vec3( positionWorld.mul( 2 ) ).saturate().xz );
+					return pos;
+
+				} )();
+
+
+				planeMaterial.colorNode = tslFn( () => {
+
+					const pos = positionWorld.toVar();
+					pos.xz.addAssign( mx_fractal_noise_vec3( positionWorld.mul( 2 ) ).saturate().xz );
+					return mx_fractal_noise_vec3( positionWorld.mul( 2 ) ).saturate().zzz.mul( 0.2 ).add( .5 );
+
+				} )();
 
 				const ground = new THREE.Mesh( planeGeometry, planeMaterial );
 				ground.rotation.x = - Math.PI / 2;

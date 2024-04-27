@@ -4,6 +4,7 @@ import { Canvas, CircleMenu, ButtonInput, StringInput, ContextMenu, Tips, Search
 import { FileEditor } from './editors/FileEditor.js';
 import { exportJSON } from './NodeEditorUtils.js';
 import { init, ClassLib, getNodeEditorClass, getNodeList } from './NodeEditorLib.js';
+import { SplitscreenManager } from './SplitscreenManager.js';
 
 init();
 
@@ -38,6 +39,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 		this.domElement = domElement;
 
 		this._preview = false;
+		this._splitscreen = false;
 
 		this.search = null;
 
@@ -47,6 +49,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 		this.nodesContext = null;
 		this.examplesContext = null;
 
+		this._initSplitview();
 		this._initUpload();
 		this._initTips();
 		this._initMenu();
@@ -55,7 +58,6 @@ export class NodeEditor extends THREE.EventDispatcher {
 		this._initExamplesContext();
 		this._initShortcuts();
 		this._initParams();
-
 	}
 
 	setSize( width, height ) {
@@ -113,6 +115,10 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		if ( value ) {
 
+			this._wasSplitscreen = this.splitscreen;
+
+			this.splitscreen = false;
+
 			this.menu.dom.remove();
 			this.canvas.dom.remove();
 			this.search.dom.remove();
@@ -129,6 +135,12 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 			this.previewMenu.dom.remove();
 
+			if ( this._wasSplitscreen == true ) {
+
+				this.splitscreen = true;
+
+			}
+
 		}
 
 		this._preview = value;
@@ -138,6 +150,22 @@ export class NodeEditor extends THREE.EventDispatcher {
 	get preview() {
 
 		return this._preview;
+
+	}
+
+	set splitscreen( value ) {
+
+		if ( this._splitscreen === value ) return;
+
+		this.splitview.setSplitview( value );
+
+		this._splitscreen = value;
+
+	}
+
+	get splitscreen() {
+
+		return this._splitscreen;
 
 	}
 
@@ -177,6 +205,12 @@ export class NodeEditor extends THREE.EventDispatcher {
 		}
 
 		this.dispatchEvent( { type: 'load' } );
+
+	}
+
+	_initSplitview() {
+
+		this.splitview = new SplitscreenManager( this );
 
 	}
 
@@ -231,6 +265,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 		previewMenu.setAlign( 'top left' );
 
 		const previewButton = new ButtonInput().setIcon( 'ti ti-brand-threejs' ).setToolTip( 'Preview' );
+		const splitscreenButton = new ButtonInput().setIcon( 'ti ti-layout-sidebar-right-expand' ).setToolTip( 'Splitscreen' );
 		const menuButton = new ButtonInput().setIcon( 'ti ti-apps' ).setToolTip( 'Add' );
 		const examplesButton = new ButtonInput().setIcon( 'ti ti-file-symlink' ).setToolTip( 'Examples' );
 		const newButton = new ButtonInput().setIcon( 'ti ti-file' ).setToolTip( 'New' );
@@ -241,6 +276,13 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		previewButton.onClick( () => this.preview = true );
 		editorButton.onClick( () => this.preview = false );
+
+		splitscreenButton.onClick( () => {
+
+			this.splitscreen = ! this.splitscreen;
+			splitscreenButton.setIcon( this.splitscreen ? 'ti ti-layout-sidebar-right-collapse' : 'ti ti-layout-sidebar-right-expand' );
+
+		});
 
 		menuButton.onClick( () => this.nodesContext.open() );
 		examplesButton.onClick( () => this.examplesContext.open() );
@@ -289,6 +331,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 		} );
 
 		menu.add( previewButton )
+			.add( splitscreenButton )
 			.add( newButton )
 			.add( examplesButton )
 			.add( openButton )
@@ -297,7 +340,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		previewMenu.add( editorButton );
 
-		this.domElement.append( menu.dom );
+		this.domElement.appendChild( menu.dom );
 
 		this.menu = menu;
 		this.previewMenu = previewMenu;
@@ -348,45 +391,12 @@ export class NodeEditor extends THREE.EventDispatcher {
 		// EXAMPLES
 		//**************//
 
-		addExamples( 'Universal', [
+		addExamples( 'Basic', [
 			'Teapot',
 			'Matcap',
-			'Fresnel'
+			'Fresnel',
+			'Particles'
 		] );
-
-		if ( this.renderer.isWebGLRenderer ) {
-
-			addExamples( 'WebGL', [
-				'Car'
-			] );
-
-			context.add( new ButtonInput( 'WebGPU Version' ).onClick( () => {
-
-				if ( confirm( 'Are you sure?' ) === true ) {
-
-					window.location.search = '?backend=webgpu';
-
-				}
-
-			} ) );
-
-		} else if ( this.renderer.isWebGPURenderer ) {
-
-			addExamples( 'WebGPU', [
-				'Particle'
-			] );
-
-			context.add( new ButtonInput( 'WebGL Version' ).onClick( () => {
-
-				if ( confirm( 'Are you sure?' ) === true ) {
-
-					window.location.search = '';
-
-				}
-
-			} ) );
-
-		}
 
 		this.examplesContext = context;
 
@@ -414,12 +424,13 @@ export class NodeEditor extends THREE.EventDispatcher {
 				} else if ( key === 'Delete' ) {
 
 					if ( this.canvas.selected ) this.canvas.selected.dispose();
-					
+
 				} else if ( key === 'Escape' ) {
 
 					this.canvas.select( null );
 
 				}
+
 			}
 
 		} );
@@ -430,7 +441,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		const urlParams = new URLSearchParams( window.location.search );
 
-		const example = urlParams.get( 'example' ) || 'universal/teapot';
+		const example = urlParams.get( 'example' ) || 'basic/teapot';
 
 		this.loadURL( `./examples/${example}.json` );
 

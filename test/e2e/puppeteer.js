@@ -89,10 +89,7 @@ const exceptionList = [
 	'webgl_materials_blending',
 	'webgl_mirror',
 	'webgl_morphtargets_face',
-	'webgl_nodes_loader_materialx',
-	'webgl_nodes_materials_standard',
-	'webgl_nodes_materialx_noise',
-	'webgl_postprocessing_crossfade',
+	'webgl_postprocessing_transition',
 	'webgl_postprocessing_dof2',
 	'webgl_raymarching_reflect',
 	'webgl_renderer_pathtracer',
@@ -108,6 +105,7 @@ const exceptionList = [
 	// TODO: implement determinism for setTimeout and setInterval
 	// could it fix some examples from above?
 	'physics_rapier_instancing',
+	'physics_jolt_instancing',
 
 	// Awaiting for WebGL backend support
 	'webgpu_clearcoat',

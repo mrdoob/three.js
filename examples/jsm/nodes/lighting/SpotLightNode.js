@@ -75,7 +75,8 @@ class SpotLightNode extends AnalyticLightNode {
 		lightingModel.direct( {
 			lightDirection,
 			lightColor,
-			reflectedLight
+			reflectedLight,
+			shadowMask: this.shadowMaskNode
 		}, builder.stack, builder );
 
 	}

@@ -101,7 +101,7 @@ class ClippingContext {
 
 		if ( this !== parent && parent.version !== this.parentVersion ) {
 
-			this.globalClippingCount =  material.isShadowNodeMaterial ? 0 : parent.globalClippingCount;
+			this.globalClippingCount = material.isShadowNodeMaterial ? 0 : parent.globalClippingCount;
 			this.localClippingEnabled = parent.localClippingEnabled;
 			this.planes = Array.from( parent.planes );
 			this.parentVersion = parent.version;

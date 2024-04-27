@@ -24,6 +24,7 @@ import {
 	CompressedTexture,
 	Vector3,
 	Quaternion,
+	REVISION
 } from 'three';
 import { decompress } from './../utils/TextureUtils.js';
 
@@ -108,6 +109,12 @@ class GLTFExporter {
 		this.register( function ( writer ) {
 
 			return new GLTFMaterialsClearcoatExtension( writer );
+
+		} );
+
+		this.register( function ( writer ) {
+
+			return new GLTFMaterialsDispersionExtension( writer );
 
 		} );
 
@@ -496,7 +503,7 @@ class GLTFWriter {
 		this.json = {
 			asset: {
 				version: '2.0',
-				generator: 'THREE.GLTFExporter'
+				generator: 'THREE.GLTFExporter r' + REVISION
 			}
 		};
 
@@ -2633,6 +2640,9 @@ class GLTFMaterialsClearcoatExtension {
 				index: writer.processTexture( material.clearcoatNormalMap ),
 				texCoord: material.clearcoatNormalMap.channel
 			};
+
+			if ( material.clearcoatNormalScale.x !== 1 ) clearcoatNormalMapDef.scale = material.clearcoatNormalScale.x;
+
 			writer.applyTextureTransform( clearcoatNormalMapDef, material.clearcoatNormalMap );
 			extensionDef.clearcoatNormalTexture = clearcoatNormalMapDef;
 
@@ -2643,6 +2653,40 @@ class GLTFMaterialsClearcoatExtension {
 
 		extensionsUsed[ this.name ] = true;
 
+
+	}
+
+}
+
+/**
+ * Materials dispersion Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_dispersion
+ */
+class GLTFMaterialsDispersionExtension {
+
+	constructor( writer ) {
+
+		this.writer = writer;
+		this.name = 'KHR_materials_dispersion';
+
+	}
+
+	writeMaterial( material, materialDef ) {
+
+		if ( ! material.isMeshPhysicalMaterial || material.dispersion === 0 ) return;
+
+		const writer = this.writer;
+		const extensionsUsed = writer.extensionsUsed;
+
+		const extensionDef = {};
+
+		extensionDef.dispersion = material.dispersion;
+
+		materialDef.extensions = materialDef.extensions || {};
+		materialDef.extensions[ this.name ] = extensionDef;
+
+		extensionsUsed[ this.name ] = true;
 
 	}
 

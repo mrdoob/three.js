@@ -2,6 +2,40 @@ import ClippingContext from './ClippingContext.js';
 
 let id = 0;
 
+function getKeys( obj ) {
+
+	const keys = Object.keys( obj );
+
+	let proto = Object.getPrototypeOf( obj );
+
+	while ( proto ) {
+
+		const descriptors = Object.getOwnPropertyDescriptors( proto );
+
+		for ( const key in descriptors ) {
+
+			if ( descriptors[ key ] !== undefined ) {
+
+				const descriptor = descriptors[ key ];
+
+				if ( descriptor && typeof descriptor.get === 'function' ) {
+
+					keys.push( key );
+
+				}
+
+			}
+
+		}
+
+		proto = Object.getPrototypeOf( proto );
+
+	}
+
+	return keys;
+
+}
+
 export default class RenderObject {
 
 	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext ) {
@@ -21,6 +55,8 @@ export default class RenderObject {
 
 		this.geometry = object.geometry;
 		this.version = material.version;
+
+		this.drawRange = null;
 
 		this.attributes = null;
 		this.pipeline = null;
@@ -153,7 +189,7 @@ export default class RenderObject {
 
 		let cacheKey = material.customProgramCacheKey();
 
-		for ( const property in material ) {
+		for ( const property of getKeys( material ) ) {
 
 			if ( /^(is[A-Z]|_)|^(visible|version|uuid|name|opacity|userData)$/.test( property ) ) continue;
 
@@ -183,6 +219,12 @@ export default class RenderObject {
 		if ( object.morphTargetInfluences ) {
 
 			cacheKey += object.morphTargetInfluences.length + ',';
+
+		}
+
+		if ( object.isBatchedMesh ) {
+
+			cacheKey += object._matricesTexture.uuid + ',';
 
 		}
 

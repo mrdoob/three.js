@@ -3,9 +3,7 @@ import {
 	BackSide,
 	FrontSide,
 	DoubleSide,
-	RGBAFormat,
 	HalfFloatType,
-	FloatType,
 	UnsignedByteType,
 	NoToneMapping,
 	LinearMipmapLinearFilter,
@@ -26,7 +24,6 @@ import {
 import { Color } from '../math/Color.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
-import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
@@ -205,7 +202,6 @@ class WebGLRenderer {
 
 		const _projScreenMatrix = new Matrix4();
 
-		const _vector2 = new Vector2();
 		const _vector3 = new Vector3();
 
 		const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, isScene: true };
@@ -222,10 +218,7 @@ class WebGLRenderer {
 
 		function getContext( contextName, contextAttributes ) {
 
-			const context = canvas.getContext( contextName, contextAttributes );
-			if ( context !== null ) return context;
-
-			return null;
+			return canvas.getContext( contextName, contextAttributes );
 
 		}
 
@@ -292,9 +285,9 @@ class WebGLRenderer {
 			extensions = new WebGLExtensions( _gl );
 			extensions.init();
 
-			capabilities = new WebGLCapabilities( _gl, extensions, parameters );
-
 			utils = new WebGLUtils( _gl, extensions );
+
+			capabilities = new WebGLCapabilities( _gl, extensions, parameters, utils );
 
 			state = new WebGLState( _gl );
 
@@ -860,7 +853,15 @@ class WebGLRenderer {
 
 			if ( object.isBatchedMesh ) {
 
-				renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+				if ( object._multiDrawInstances !== null ) {
+
+					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
+
+				} else {
+
+					renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+
+				}
 
 			} else if ( object.isInstancedMesh ) {
 
@@ -910,7 +911,7 @@ class WebGLRenderer {
 			if ( targetScene === null ) targetScene = scene;
 
 			currentRenderState = renderStates.get( targetScene );
-			currentRenderState.init();
+			currentRenderState.init( camera );
 
 			renderStateStack.push( currentRenderState );
 
@@ -1127,7 +1128,7 @@ class WebGLRenderer {
 			if ( scene.isScene === true ) scene.onBeforeRender( _this, scene, camera, _currentRenderTarget );
 
 			currentRenderState = renderStates.get( scene, renderStateStack.length );
-			currentRenderState.init();
+			currentRenderState.init( camera );
 
 			renderStateStack.push( currentRenderState );
 
@@ -1152,6 +1153,13 @@ class WebGLRenderer {
 
 			}
 
+			const renderBackground = xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false;
+			if ( renderBackground ) {
+
+				background.addToRenderList( currentRenderList, scene );
+
+			}
+
 			//
 
 			this.info.render.frame ++;
@@ -1168,22 +1176,30 @@ class WebGLRenderer {
 
 			if ( this.info.autoReset === true ) this.info.reset();
 
-
-			//
-
-			if ( xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false ) {
-
-				background.render( currentRenderList, scene );
-
-			}
-
 			// render scene
+
+			const opaqueObjects = currentRenderList.opaque;
+			const transmissiveObjects = currentRenderList.transmissive;
 
 			currentRenderState.setupLights( _this._useLegacyLights );
 
 			if ( camera.isArrayCamera ) {
 
 				const cameras = camera.cameras;
+
+				if ( transmissiveObjects.length > 0 ) {
+
+					for ( let i = 0, l = cameras.length; i < l; i ++ ) {
+
+						const camera2 = cameras[ i ];
+
+						renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera2 );
+
+					}
+
+				}
+
+				if ( renderBackground ) background.render( scene );
 
 				for ( let i = 0, l = cameras.length; i < l; i ++ ) {
 
@@ -1194,6 +1210,10 @@ class WebGLRenderer {
 				}
 
 			} else {
+
+				if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
+
+				if ( renderBackground ) background.render( scene );
 
 				renderScene( currentRenderList, scene, camera );
 
@@ -1228,6 +1248,8 @@ class WebGLRenderer {
 			if ( renderStateStack.length > 0 ) {
 
 				currentRenderState = renderStateStack[ renderStateStack.length - 1 ];
+
+				if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, currentRenderState.state.camera );
 
 			} else {
 
@@ -1373,8 +1395,6 @@ class WebGLRenderer {
 
 			if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, camera );
 
-			if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
-
 			if ( viewport ) state.viewport( _currentViewport.copy( viewport ) );
 
 			if ( opaqueObjects.length > 0 ) renderObjects( opaqueObjects, scene, camera );
@@ -1401,18 +1421,17 @@ class WebGLRenderer {
 
 			}
 
-			if ( currentRenderState.state.transmissionRenderTarget === null ) {
+			if ( currentRenderState.state.transmissionRenderTarget[ camera.id ] === undefined ) {
 
-				currentRenderState.state.transmissionRenderTarget = new WebGLRenderTarget( 1, 1, {
+				currentRenderState.state.transmissionRenderTarget[ camera.id ] = new WebGLRenderTarget( 1, 1, {
 					generateMipmaps: true,
 					type: ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) ) ? HalfFloatType : UnsignedByteType,
 					minFilter: LinearMipmapLinearFilter,
 					samples: 4,
-					stencilBuffer: stencil
+					stencilBuffer: stencil,
+					resolveDepthBuffer: false,
+					resolveStencilBuffer: false
 				} );
-
-				const renderTargetProperties = properties.get( currentRenderState.state.transmissionRenderTarget );
-				renderTargetProperties.__isTransmissionRenderTarget = true;
 
 				// debug
 
@@ -1426,10 +1445,10 @@ class WebGLRenderer {
 
 			}
 
-			const transmissionRenderTarget = currentRenderState.state.transmissionRenderTarget;
+			const transmissionRenderTarget = currentRenderState.state.transmissionRenderTarget[ camera.id ];
 
-			_this.getDrawingBufferSize( _vector2 );
-			transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
+			const activeViewport = camera.viewport || _currentViewport;
+			transmissionRenderTarget.setSize( activeViewport.z, activeViewport.w );
 
 			//
 
@@ -1447,50 +1466,65 @@ class WebGLRenderer {
 			const currentToneMapping = _this.toneMapping;
 			_this.toneMapping = NoToneMapping;
 
+			// Remove viewport from camera to avoid nested render calls resetting viewport to it (e.g Reflector).
+			// Transmission render pass requires viewport to match the transmissionRenderTarget.
+			const currentCameraViewport = camera.viewport;
+			if ( camera.viewport !== undefined ) camera.viewport = undefined;
+
+			currentRenderState.setupLightsView( camera );
+
+			if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, camera );
+
 			renderObjects( opaqueObjects, scene, camera );
 
 			textures.updateMultisampleRenderTarget( transmissionRenderTarget );
 			textures.updateRenderTargetMipmap( transmissionRenderTarget );
 
-			let renderTargetNeedsUpdate = false;
+			if ( extensions.has( 'WEBGL_multisampled_render_to_texture' ) === false ) { // see #28131
 
-			for ( let i = 0, l = transmissiveObjects.length; i < l; i ++ ) {
+				let renderTargetNeedsUpdate = false;
 
-				const renderItem = transmissiveObjects[ i ];
+				for ( let i = 0, l = transmissiveObjects.length; i < l; i ++ ) {
 
-				const object = renderItem.object;
-				const geometry = renderItem.geometry;
-				const material = renderItem.material;
-				const group = renderItem.group;
+					const renderItem = transmissiveObjects[ i ];
 
-				if ( material.side === DoubleSide && object.layers.test( camera.layers ) ) {
+					const object = renderItem.object;
+					const geometry = renderItem.geometry;
+					const material = renderItem.material;
+					const group = renderItem.group;
 
-					const currentSide = material.side;
+					if ( material.side === DoubleSide && object.layers.test( camera.layers ) ) {
 
-					material.side = BackSide;
-					material.needsUpdate = true;
+						const currentSide = material.side;
 
-					renderObject( object, scene, camera, geometry, material, group );
+						material.side = BackSide;
+						material.needsUpdate = true;
 
-					material.side = currentSide;
-					material.needsUpdate = true;
+						renderObject( object, scene, camera, geometry, material, group );
 
-					renderTargetNeedsUpdate = true;
+						material.side = currentSide;
+						material.needsUpdate = true;
+
+						renderTargetNeedsUpdate = true;
+
+					}
 
 				}
 
-			}
+				if ( renderTargetNeedsUpdate === true ) {
 
-			if ( renderTargetNeedsUpdate === true ) {
+					textures.updateMultisampleRenderTarget( transmissionRenderTarget );
+					textures.updateRenderTargetMipmap( transmissionRenderTarget );
 
-				textures.updateMultisampleRenderTarget( transmissionRenderTarget );
-				textures.updateRenderTargetMipmap( transmissionRenderTarget );
+				}
 
 			}
 
 			_this.setRenderTarget( currentRenderTarget );
 
 			_this.setClearColor( _currentClearColor, _currentClearAlpha );
+
+			if ( currentCameraViewport !== undefined ) camera.viewport = currentCameraViewport;
 
 			_this.toneMapping = currentToneMapping;
 
@@ -2023,7 +2057,7 @@ class WebGLRenderer {
 
 				}
 
-				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, currentRenderState.state.transmissionRenderTarget );
+				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, currentRenderState.state.transmissionRenderTarget[ camera.id ] );
 
 				WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 
@@ -2288,17 +2322,14 @@ class WebGLRenderer {
 					const textureFormat = texture.format;
 					const textureType = texture.type;
 
-					if ( textureFormat !== RGBAFormat && utils.convert( textureFormat ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
+					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
 
 						console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
 						return;
 
 					}
 
-					const halfFloatSupportedByExt = ( textureType === HalfFloatType ) && ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) );
-
-					if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // Edge and Chrome Mac < 52 (#9513)
-						textureType !== FloatType && ! halfFloatSupportedByExt ) {
+					if ( ! capabilities.textureTypeReadable( textureType ) ) {
 
 						console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
 						return;
@@ -2382,9 +2413,9 @@ class WebGLRenderer {
 
 		this.copyTextureToTexture3D = function ( sourceBox, position, srcTexture, dstTexture, level = 0 ) {
 
-			const width = Math.round( sourceBox.max.x - sourceBox.min.x );
-			const height = Math.round( sourceBox.max.y - sourceBox.min.y );
-			const depth = sourceBox.max.z - sourceBox.min.z + 1;
+			const width = sourceBox.max.x - sourceBox.min.x;
+			const height = sourceBox.max.y - sourceBox.min.y;
+			const depth = sourceBox.max.z - sourceBox.min.z;
 			const glFormat = utils.convert( dstTexture.format );
 			const glType = utils.convert( dstTexture.type );
 			let glTarget;

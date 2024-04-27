@@ -14,3 +14,4 @@ export { default as MeshPhysicalNodeMaterial } from './MeshPhysicalNodeMaterial.
 export { default as MeshSSSNodeMaterial } from './MeshSSSNodeMaterial.js';
 export { default as PointsNodeMaterial } from './PointsNodeMaterial.js';
 export { default as SpriteNodeMaterial } from './SpriteNodeMaterial.js';
+export { default as ShadowNodeMaterial } from './ShadowNodeMaterial.js';

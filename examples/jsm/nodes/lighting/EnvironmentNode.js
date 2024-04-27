@@ -8,6 +8,7 @@ import { positionViewDirection } from '../accessors/PositionNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { float } from '../shadernode/ShaderNode.js';
 import { reference } from '../accessors/ReferenceNode.js';
+import { transformedBentNormalView } from '../accessors/AccessorsUtils.js';
 import { pmremTexture } from '../pmrem/PMREMNode.js';
 
 const envNodeCache = new WeakMap();
@@ -44,10 +45,15 @@ class EnvironmentNode extends LightingNode {
 
 		//
 
-		const envMap = builder.material.envMap;
+		const { material } = builder;
+
+		const envMap = material.envMap;
 		const intensity = envMap ? reference( 'envMapIntensity', 'float', builder.material ) : reference( 'environmentIntensity', 'float', builder.scene ); // @TODO: Add materialEnvIntensity in MaterialNode
 
-		const radiance = context( envNode, createRadianceContext( roughness, transformedNormalView ) ).mul( intensity );
+		const useAnisotropy = material.useAnisotropy === true || material.anisotropy > 0;
+		const radianceNormalView = useAnisotropy ? transformedBentNormalView : transformedNormalView;
+
+		const radiance = context( envNode, createRadianceContext( roughness, radianceNormalView ) ).mul( intensity );
 		const irradiance = context( envNode, createIrradianceContext( transformedNormalWorld ) ).mul( Math.PI ).mul( intensity );
 
 		const isolateRadiance = cache( radiance );
@@ -85,7 +91,10 @@ const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 			if ( reflectVec === null ) {
 
 				reflectVec = positionViewDirection.negate().reflect( normalViewNode );
+
+				// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
 				reflectVec = roughnessNode.mul( roughnessNode ).mix( reflectVec, normalViewNode ).normalize();
+
 				reflectVec = reflectVec.transformDirection( cameraViewMatrix );
 
 			}

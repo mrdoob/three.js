@@ -17,6 +17,7 @@
 				margin: 0;
 				position: fixed;
 				overscroll-behavior: none;
+				background: #191919ed;
 			}
 
 			.renderer {
@@ -35,6 +36,7 @@
 				width: 100%;
 				box-shadow: inset 0 0 20px 0px #000000;
 				pointer-events: none;
+				overflow: hidden;
 			}
 
 			flow > * {
@@ -49,11 +51,48 @@
 				background: #191919ed;
 			}
 
+			flow f-menu {
+				white-space: nowrap;
+			}
+
+			node-editor {
+				position: relative;
+				width: 100%;
+				height: 100%;
+			}
+
+			f-preview {
+				display: block;
+				position: relative;
+				width: 100%;
+				height: 100%;
+			}
+
+			f-gutter {
+				position: absolute;
+				cursor: ew-resize;
+				height: 100%;
+				top: 0px;
+				width: 2px;
+				background-color: #191919ed;
+				border-style: none solid none solid;
+				border-width: 1px;
+				border-color: #aaaaaa;
+				box-shadow: 0 0 5px 0px #000000;
+				z-index: 30;
+			}
+
+			.panel {
+				position: absolute;
+				overflow: visible;
+				float: left;
+			}
+
 		</style>
 	</head>
 	<body>
 
-		<script src="https://cdn.jsdelivr.net/npm/monaco-editor@latest/min/vs/loader.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.48.0/min/vs/loader.min.js"></script>
 
 		<script type="importmap">
 			{
@@ -70,12 +109,9 @@
 
 			import * as THREE from 'three';
 
-			import { nodeFrame } from 'three/addons/renderers/webgl-legacy/nodes/WebGLNodes.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 
 			import { NodeEditor } from './NodeEditor.js';
 
@@ -86,8 +122,9 @@
 
 			async function init() {
 
-				const urlParams = new URLSearchParams( window.location.search );
-				const backend = urlParams.get( 'backend' );
+				const container = document.createElement( 'node-editor' );
+
+				document.body.appendChild( container );
 
 				//
 
@@ -99,38 +136,18 @@
 
 				//
 
-				if ( backend === 'webgpu' ) {
-
-					const { default: WebGPU } = await import( 'three/addons/capabilities/WebGPU.js' );
-					const { default: WebGPURenderer } = await import( 'three/addons/renderers/webgpu/WebGPURenderer.js' );
-
-					renderer = new WebGPURenderer();
-
-					if ( WebGPU.isAvailable() === false ) {
-
-						document.body.appendChild( WebGPU.getErrorMessage() );
-
-						throw new Error( 'No WebGPU support' );
-
-					}
-
-				} else {
-
-					renderer = new THREE.WebGLRenderer( { antialias: true } );
-
-					composer = new EffectComposer( renderer );
-					composer.addPass( new RenderPass( scene, camera ) );
-
-				}
-
-				//
-
-				renderer.setAnimationLoop( render );
+				renderer = new WebGPURenderer( { antialias: true } );
+				renderer.setAnimationLoop( animate );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.toneMapping = THREE.LinearToneMapping;
 				renderer.toneMappingExposure = 1;
-				document.body.appendChild( renderer.domElement );
 
-				renderer.domElement.className = 'renderer';
+				// Additional container required for determining accurate pixel dimensions of the canvas when resizing
+				const rendererContainer = document.createElement( 'f-preview' );
+				container.appendChild( rendererContainer );
+
+				rendererContainer.appendChild( renderer.domElement );
+				renderer.domElement.className = 'renderer panel';
 
 				//
 
@@ -140,13 +157,13 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				initEditor();
+				initEditor( container );
 
 				onWindowResize();
 
 			}
 
-			function initEditor() {
+			function initEditor( container ) {
 
 				nodeEditor = new NodeEditor( scene, renderer, composer );
 
@@ -156,22 +173,15 @@
 
 				} );
 
-				document.body.appendChild( nodeEditor.domElement );
+				container.appendChild( nodeEditor.domElement );
+				nodeEditor.domElement.className = 'panel';
 
 			}
 
 			function onWindowResize() {
 
-				const width = window.innerWidth;
-				const height = window.innerHeight;
-
-				camera.aspect = width / height;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( width, height );
-				if ( composer ) composer.setSize( width, height );
-
-				nodeEditor.setSize( width, height );
+				checkResize();
+				nodeEditor.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -179,18 +189,34 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
-				if ( renderer.isWebGLRenderer ) nodeFrame.update();
-
 				render();
 
 			}
 
 			function render() {
 
-				if ( composer && composer.passes.length > 1 ) composer.render();
-				else renderer.render( scene, camera );
+				checkResize();
+
+				renderer.render( scene, camera );
+
+			}
+
+			function checkResize() {
+
+				const canvas = renderer.domElement;
+
+				const rendererContainer = canvas.parentNode;
+				const width = rendererContainer.clientWidth;
+				const height = rendererContainer.clientHeight;
+
+				if ( canvas.width !== width || canvas.height !== height ) {
+
+					camera.aspect = width / height;
+					camera.updateProjectionMatrix();
+
+					renderer.setSize( width, height );
+
+				}
 
 			}
 

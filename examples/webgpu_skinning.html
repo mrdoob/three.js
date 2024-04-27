@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { toneMapping } from 'three/nodes';
+			import { toneMapping, color, viewportTopLeft } from 'three/nodes';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -54,7 +54,7 @@
 				camera.position.set( 1, 2, 3 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 'lightblue' );
+				scene.backgroundNode = viewportTopLeft.y.mix( color( 0x66bbff ), color( 0x4466ff ) );
 				camera.lookAt( 0, 1, 0 );
 
 				clock = new THREE.Clock();
@@ -65,6 +65,9 @@
 				light.power = 2500;
 				camera.add( light );
 				scene.add( camera );
+
+				const ambient = new THREE.AmbientLight( 0x4466ff, 1 );
+				scene.add( ambient );
 
 				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
@@ -85,7 +88,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, .15 );
+				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, .4 );
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );

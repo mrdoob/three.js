@@ -47,8 +47,11 @@
 			[page:Texture.anisotropy]<br />
 			[page:Constant colorSpace] - default is [page:Textures NoColorSpace].
 			<br />
+			[page:String internalFormat] - default is `null`.<br />
 			[page:Boolean depthBuffer] - default is `true`. <br />
 			[page:Boolean stencilBuffer] - default is `false`.<br />
+			[page:Boolean resolveDepthBuffer] - default is `true`.<br />
+			[page:Boolean resolveStencilBuffer] - default is `true`.<br />
 			[page:Number samples] - default is `0`.<br />
 			[page:Number count] - default is `1`.<br /><br />
 
@@ -95,6 +98,19 @@
 
 		<h3>[property:Boolean stencilBuffer]</h3>
 		<p>Renders to the stencil buffer. Default is false.</p>
+
+		<h3>[property:Boolean resolveDepthBuffer]</h3>
+		<p>
+			Defines whether the depth buffer should be resolved when rendering into a multisampled render target. 
+			Default is `true`.
+		</p>
+
+		<h3>[property:Boolean resolveStencilBuffer]</h3>
+		<p>
+			Defines whether the stencil buffer should be resolved when rendering into a multisampled render target. 
+			This property has no effect when [page:.resolveDepthBuffer] is set to `false`. 
+			Default is `true`.
+		</p>
 
 		<h3>[property:DepthTexture depthTexture]</h3>
 		<p>

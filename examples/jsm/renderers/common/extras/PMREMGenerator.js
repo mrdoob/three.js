@@ -20,7 +20,6 @@ import {
 	CubeRefractionMapping,
 	CubeUVReflectionMapping,
 	LinearFilter,
-	NoToneMapping,
 	NoBlending,
 	RGBAFormat,
 	HalfFloatType,
@@ -57,16 +56,16 @@ const INV_PHI = 1 / PHI;
 // Vertices of a dodecahedron (except the opposites, which represent the
 // same axis), used as axis directions evenly spread on a sphere.
 const _axisDirections = [
-	/*@__PURE__*/ new Vector3( 1, 1, 1 ),
-	/*@__PURE__*/ new Vector3( - 1, 1, 1 ),
-	/*@__PURE__*/ new Vector3( 1, 1, - 1 ),
-	/*@__PURE__*/ new Vector3( - 1, 1, - 1 ),
-	/*@__PURE__*/ new Vector3( 0, PHI, INV_PHI ),
-	/*@__PURE__*/ new Vector3( 0, PHI, - INV_PHI ),
-	/*@__PURE__*/ new Vector3( INV_PHI, 0, PHI ),
-	/*@__PURE__*/ new Vector3( - INV_PHI, 0, PHI ),
+	/*@__PURE__*/ new Vector3( - PHI, INV_PHI, 0 ),
 	/*@__PURE__*/ new Vector3( PHI, INV_PHI, 0 ),
-	/*@__PURE__*/ new Vector3( - PHI, INV_PHI, 0 )
+	/*@__PURE__*/ new Vector3( - INV_PHI, 0, PHI ),
+	/*@__PURE__*/ new Vector3( INV_PHI, 0, PHI ),
+	/*@__PURE__*/ new Vector3( 0, PHI, - INV_PHI ),
+	/*@__PURE__*/ new Vector3( 0, PHI, INV_PHI ),
+	/*@__PURE__*/ new Vector3( - 1, 1, - 1 ),
+	/*@__PURE__*/ new Vector3( 1, 1, - 1 ),
+	/*@__PURE__*/ new Vector3( - 1, 1, 1 ),
+	/*@__PURE__*/ new Vector3( 1, 1, 1 )
 ];
 
 //
@@ -338,10 +337,9 @@ class PMREMGenerator {
 		const renderer = this._renderer;
 
 		const originalAutoClear = renderer.autoClear;
-		const toneMapping = renderer.toneMapping;
+
 		renderer.getClearColor( _clearColor );
 
-		renderer.toneMapping = NoToneMapping;
 		renderer.autoClear = false;
 
 		let backgroundBox = this._backgroundBox;
@@ -418,7 +416,6 @@ class PMREMGenerator {
 
 		}
 
-		renderer.toneMapping = toneMapping;
 		renderer.autoClear = originalAutoClear;
 		scene.background = background;
 
@@ -468,12 +465,13 @@ class PMREMGenerator {
 		const renderer = this._renderer;
 		const autoClear = renderer.autoClear;
 		renderer.autoClear = false;
+		const n = this._lodPlanes.length;
 
-		for ( let i = 1; i < this._lodPlanes.length; i ++ ) {
+		for ( let i = 1; i < n; i ++ ) {
 
 			const sigma = Math.sqrt( this._sigmas[ i ] * this._sigmas[ i ] - this._sigmas[ i - 1 ] * this._sigmas[ i - 1 ] );
 
-			const poleAxis = _axisDirections[ ( i - 1 ) % _axisDirections.length ];
+			const poleAxis = _axisDirections[ ( n - i - 1 ) % _axisDirections.length ];
 
 			this._blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
 
@@ -709,8 +707,6 @@ function _setViewport( target, x, y, width, height ) {
 function _getMaterial() {
 
 	const material = new NodeMaterial();
-	material.colorSpaced = false;
-	material.toneMapped = false;
 	material.depthTest = false;
 	material.depthWrite = false;
 	material.blending = NoBlending;
