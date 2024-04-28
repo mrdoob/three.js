@@ -8856,6 +8856,8 @@ class Material extends EventDispatcher {
 
 		}
 
+		if ( this.dispersion !== undefined ) data.dispersion = this.dispersion;
+
 		if ( this.iridescence !== undefined ) data.iridescence = this.iridescence;
 		if ( this.iridescenceIOR !== undefined ) data.iridescenceIOR = this.iridescenceIOR;
 		if ( this.iridescenceThicknessRange !== undefined ) data.iridescenceThicknessRange = this.iridescenceThicknessRange;
@@ -11589,6 +11591,8 @@ class RenderTarget extends EventDispatcher {
 			minFilter: LinearFilter,
 			depthBuffer: true,
 			stencilBuffer: false,
+			resolveDepthBuffer: true,
+			resolveStencilBuffer: true,
 			depthTexture: null,
 			samples: 0,
 			count: 1
@@ -11612,6 +11616,9 @@ class RenderTarget extends EventDispatcher {
 
 		this.depthBuffer = options.depthBuffer;
 		this.stencilBuffer = options.stencilBuffer;
+
+		this.resolveDepthBuffer = options.resolveDepthBuffer;
+		this.resolveStencilBuffer = options.resolveStencilBuffer;
 
 		this.depthTexture = options.depthTexture;
 
@@ -11689,6 +11696,9 @@ class RenderTarget extends EventDispatcher {
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
+
+		this.resolveDepthBuffer = source.resolveDepthBuffer;
+		this.resolveStencilBuffer = source.resolveStencilBuffer;
 
 		if ( source.depthTexture !== null ) this.depthTexture = source.depthTexture.clone();
 
@@ -11919,16 +11929,16 @@ const INV_PHI = 1 / PHI;
 // Vertices of a dodecahedron (except the opposites, which represent the
 // same axis), used as axis directions evenly spread on a sphere.
 const _axisDirections = [
-	/*@__PURE__*/ new Vector3( 1, 1, 1 ),
-	/*@__PURE__*/ new Vector3( - 1, 1, 1 ),
-	/*@__PURE__*/ new Vector3( 1, 1, - 1 ),
-	/*@__PURE__*/ new Vector3( - 1, 1, - 1 ),
-	/*@__PURE__*/ new Vector3( 0, PHI, INV_PHI ),
-	/*@__PURE__*/ new Vector3( 0, PHI, - INV_PHI ),
-	/*@__PURE__*/ new Vector3( INV_PHI, 0, PHI ),
-	/*@__PURE__*/ new Vector3( - INV_PHI, 0, PHI ),
+	/*@__PURE__*/ new Vector3( - PHI, INV_PHI, 0 ),
 	/*@__PURE__*/ new Vector3( PHI, INV_PHI, 0 ),
-	/*@__PURE__*/ new Vector3( - PHI, INV_PHI, 0 ) ];
+	/*@__PURE__*/ new Vector3( - INV_PHI, 0, PHI ),
+	/*@__PURE__*/ new Vector3( INV_PHI, 0, PHI ),
+	/*@__PURE__*/ new Vector3( 0, PHI, - INV_PHI ),
+	/*@__PURE__*/ new Vector3( 0, PHI, INV_PHI ),
+	/*@__PURE__*/ new Vector3( - 1, 1, - 1 ),
+	/*@__PURE__*/ new Vector3( 1, 1, - 1 ),
+	/*@__PURE__*/ new Vector3( - 1, 1, 1 ),
+	/*@__PURE__*/ new Vector3( 1, 1, 1 ) ];
 
 /**
  * This class generates a Prefiltered, Mipmapped Radiance Environment Map
@@ -12314,12 +12324,13 @@ class PMREMGenerator {
 		const renderer = this._renderer;
 		const autoClear = renderer.autoClear;
 		renderer.autoClear = false;
+		const n = this._lodPlanes.length;
 
-		for ( let i = 1; i < this._lodPlanes.length; i ++ ) {
+		for ( let i = 1; i < n; i ++ ) {
 
 			const sigma = Math.sqrt( this._sigmas[ i ] * this._sigmas[ i ] - this._sigmas[ i - 1 ] * this._sigmas[ i - 1 ] );
 
-			const poleAxis = _axisDirections[ ( i - 1 ) % _axisDirections.length ];
+			const poleAxis = _axisDirections[ ( n - i - 1 ) % _axisDirections.length ];
 
 			this._blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
 
