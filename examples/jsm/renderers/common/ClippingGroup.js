@@ -2,7 +2,6 @@ import { Group } from 'three';
 
 class ClippingGroup extends Group {
 
-
     constructor() {
 
         super();
