@@ -107,7 +107,7 @@
 
 				// initialize the pathtracer
 				pathTracer = new WebGLPathTracer( renderer );
-				pathTracer.filterGlossyFactor = 0.5;
+				pathTracer.filterGlossyFactor = 1;
 				pathTracer.minSamples = 3;
 				pathTracer.renderScale = params.resolutionScale;
 				pathTracer.tiles.set( params.tiles, params.tiles );
@@ -187,6 +187,7 @@
 
 										newMaterial.opacity = 1.0;
 										newMaterial.transmission = 1.0;
+										newMaterial.thickness = 1.0;
 										newMaterial.ior = 1.4;
 										newMaterial.roughness = oldMaterial.roughness;
 										newMaterial.metalness = 0.0;
