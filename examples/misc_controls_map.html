@@ -42,8 +42,7 @@
 			let camera, controls, scene, renderer;
 
 			init();
-			//render(); // remove when using next line for animation loop (requestAnimationFrame)
-			animate();
+			//render(); // remove when using animation loop
 
 			function init() {
 
@@ -54,6 +53,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -130,8 +130,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
 
