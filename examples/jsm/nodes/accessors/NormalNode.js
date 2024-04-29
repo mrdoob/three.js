@@ -23,9 +23,15 @@ class NormalNode extends Node {
 
 	}
 
+	getVaryingProperty() {
+
+		return 'v_' + this.getHash();
+
+	}
+
 	getHash( /*builder*/ ) {
 
-		return `normal-${this.scope}`;
+		return `normal_${ this.scope }`;
 
 	}
 
@@ -51,18 +57,18 @@ class NormalNode extends Node {
 
 		} else if ( scope === NormalNode.LOCAL ) {
 
-			outputNode = varying( normalGeometry );
+			outputNode = varying( normalGeometry, this.getVaryingProperty() );
 
 		} else if ( scope === NormalNode.VIEW ) {
 
 			const vertexNode = modelNormalMatrix.mul( normalLocal );
-			outputNode = normalize( varying( vertexNode ) );
+			outputNode = normalize( varying( vertexNode, this.getVaryingProperty() ) );
 
 		} else if ( scope === NormalNode.WORLD ) {
 
 			// To use inverseTransformDirection only inverse the param order like this: cameraViewMatrix.transformDirection( normalView )
 			const vertexNode = normalView.transformDirection( cameraViewMatrix );
-			outputNode = normalize( varying( vertexNode ) );
+			outputNode = normalize( varying( vertexNode, this.getVaryingProperty() ) );
 
 		}
 
