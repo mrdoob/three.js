@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Toon Material with OutlineEffect</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Toon Material</div>
 
 		<script type="importmap">
 			{
@@ -26,7 +26,7 @@
 			import * as THREE from 'three';
 			import * as Nodes from 'three/nodes';
 
-			import { tslFn, wgslFn, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportBottomLeft, js, string, global, loop, MeshBasicNodeMaterial, MeshToonNodeMaterial, NodeObjectLoader } from 'three/nodes';
+			import { MeshBasicNodeMaterial, MeshToonNodeMaterial } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
@@ -36,7 +36,6 @@
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
 			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
@@ -169,10 +168,6 @@
 
 				//
 
-//				effect = new OutlineEffect( renderer );
-
-				//
-
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
@@ -205,7 +200,6 @@
 
 				stats.begin();
 
-//				effect.render( scene, camera );
 				renderer.render( scene, camera );
 
 				stats.end();
