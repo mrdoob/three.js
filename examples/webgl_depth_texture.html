@@ -83,7 +83,6 @@
 			let camera, scene, renderer, controls, stats;
 			let target;
 			let postScene, postCamera, postMaterial;
-			const supportsExtension = true;
 
 			const params = {
 				format: THREE.DepthFormat,
@@ -94,13 +93,13 @@
 			const types = { UnsignedShortType: THREE.UnsignedShortType, UnsignedIntType: THREE.UnsignedIntType, UnsignedInt248Type: THREE.UnsignedInt248Type };
 
 			init();
-			animate();
 
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -215,10 +214,6 @@
 			}
 
 			function animate() {
-
-				if ( ! supportsExtension ) return;
-
-				requestAnimationFrame( animate );
 
 				// render scene into target
 				renderer.setRenderTarget( target );

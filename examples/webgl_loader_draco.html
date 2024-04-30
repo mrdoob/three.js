@@ -38,7 +38,6 @@
 		dracoLoader.setDecoderConfig( { type: 'js' } );
 
 		init();
-		animate();
 
 		function init() {
 
@@ -90,6 +89,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
 			renderer.shadowMap.enabled = true;
 			container.appendChild( renderer.domElement );
 
@@ -107,13 +107,6 @@
 		}
 
 		function animate() {
-
-			render();
-			requestAnimationFrame( animate );
-
-		}
-
-		function render() {
 
 			const timer = Date.now() * 0.0003;
 

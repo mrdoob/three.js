@@ -34,7 +34,6 @@
 			const clock = new THREE.Clock();
 
 			init();
-			animate();
 
 			function init() {
 
@@ -94,6 +93,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -118,13 +118,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-				render();
-
-			}
-
-			function render() {
 
 				controls.update( clock.getDelta() );
 

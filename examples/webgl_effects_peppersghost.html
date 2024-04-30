@@ -34,7 +34,6 @@
 			let group;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -93,6 +92,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				effect = new PeppersGhostEffect( renderer );
@@ -113,8 +113,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				group.rotation.y += 0.01;
 
