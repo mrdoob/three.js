@@ -35,6 +35,14 @@ function ViewportPathtracer( renderer ) {
 
 	}
 
+	function updateMaterials() {
+
+		if ( pathTracer === null ) return;
+
+		pathTracer.updateMaterials();
+
+	}
+
 	function setEnvironment( environment ) {
 
 		if ( pathTracer === null ) return;
@@ -64,6 +72,7 @@ function ViewportPathtracer( renderer ) {
 		setSize: setSize,
 		setBackground: setBackground,
 		setEnvironment: setEnvironment,
+		updateMaterials: updateMaterials,
 		update: update,
 		reset: reset
 	};
