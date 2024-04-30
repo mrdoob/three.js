@@ -350,6 +350,9 @@ function Strings( config ) {
 			'viewport/controls/grid': 'Grid',
 			'viewport/controls/helpers': 'Helpers',
 
+			'viewport/info/oneObject': 'Object',
+			'viewport/info/oneVertex': 'Vertex',
+			'viewport/info/oneTriangle': 'Triangle',
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
 			'viewport/info/triangles': 'Triangles',
@@ -703,6 +706,9 @@ function Strings( config ) {
 			'viewport/controls/grid': 'Grille',
 			'viewport/controls/helpers': 'Helpers',
 
+			'viewport/info/oneObject': 'Objet',
+			'viewport/info/oneVertex': 'Sommet',
+			'viewport/info/oneTriangle': 'Triangle',
 			'viewport/info/objects': 'Objets',
 			'viewport/info/vertices': 'Sommets',
 			'viewport/info/triangles': 'Triangles',
@@ -1056,6 +1062,9 @@ function Strings( config ) {
 			'viewport/controls/grid': '网格',
 			'viewport/controls/helpers': '辅助',
 
+			'viewport/info/oneObject': '物体',
+			'viewport/info/oneVertex': '顶点',
+			'viewport/info/oneTriangle': '三角形',
 			'viewport/info/objects': '物体',
 			'viewport/info/vertices': '顶点',
 			'viewport/info/triangles': '三角形',
@@ -1409,6 +1418,9 @@ function Strings( config ) {
 			'viewport/controls/grid': 'グリッド',
 			'viewport/controls/helpers': 'オーバーレイ表示',
 
+			'viewport/info/oneObject': 'オブジェクト',
+			'viewport/info/oneVertex': '頂点',
+			'viewport/info/oneTriangle': '三角形',
 			'viewport/info/objects': 'オブジェクト',
 			'viewport/info/vertices': '頂点',
 			'viewport/info/triangles': '三角形',
