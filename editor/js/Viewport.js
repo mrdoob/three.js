@@ -462,7 +462,7 @@ function Viewport( editor ) {
 
 	signals.materialChanged.add( function () {
 
-		initPT();
+		updatePTMaterials();
 		render();
 
 	} );
@@ -772,6 +772,16 @@ function Viewport( editor ) {
 		if ( editor.viewportShading === 'realistic' ) {
 
 			pathtracer.setEnvironment( scene.environment );
+
+		}
+
+	}
+
+	function updatePTMaterials() {
+
+		if ( editor.viewportShading === 'realistic' ) {
+
+			pathtracer.updateMaterials();
 
 		}
 
