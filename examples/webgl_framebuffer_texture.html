@@ -65,7 +65,6 @@
 			const color = new THREE.Color();
 
 			init();
-			animate();
 
 			function init() {
 
@@ -120,6 +119,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.autoClear = false;
 				document.body.appendChild( renderer.domElement );
 
@@ -168,8 +168,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				const colorAttribute = line.geometry.getAttribute( 'color' );
 				updateColors( colorAttribute );
