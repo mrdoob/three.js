@@ -1,3 +1,5 @@
+import { warnOnce } from '../../utils.js';
+
 function WebGLExtensions( gl ) {
 
 	const extensions = {};
@@ -66,7 +68,7 @@ function WebGLExtensions( gl ) {
 
 			if ( extension === null ) {
 
-				console.warn( 'THREE.WebGLRenderer: ' + name + ' extension not supported.' );
+				warnOnce( 'THREE.WebGLRenderer: ' + name + ' extension not supported.' );
 
 			}
 
