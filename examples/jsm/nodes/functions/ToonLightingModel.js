@@ -14,11 +14,9 @@ const getGradientIrradiance = tslFn( ( { normal, lightDirection, builder } ) => 
 
 	if ( builder.material.gradientMap ) {
 
-		const mr = materialReference( 'gradientMap', 'texture' );
+		const mr = materialReference( 'gradientMap', 'texture' ).context( { getUV: () => coord } );
 
-		mr.build( builder );
-
-		return vec3( mr.node.uv( coord ).r );
+		return vec3( mr.r );
 
 	} else {
 
