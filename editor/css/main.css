@@ -308,7 +308,7 @@ select {
 	bottom: 0;
 }
 
-	#viewport #info {
+	#viewport .Text {
 		text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
 		pointer-events: none;
 	}
