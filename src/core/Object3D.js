@@ -761,6 +761,8 @@ class Object3D extends EventDispatcher {
 
 			object.matricesTexture = this._matricesTexture.toJSON( meta );
 
+			if ( this.colorsTexture !== null ) object.colorsTexture = this.colorsTexture.toJSON( meta );
+
 			if ( this.boundingSphere !== null ) {
 
 				object.boundingSphere = {

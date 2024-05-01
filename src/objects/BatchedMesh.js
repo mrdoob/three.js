@@ -160,6 +160,9 @@ class BatchedMesh extends Mesh {
 
 		this._initMatricesTexture();
 
+		// Local color per geometry by using data texture
+		this.colorsTexture = null;
+
 	}
 
 	_initMatricesTexture() {
@@ -179,6 +182,25 @@ class BatchedMesh extends Mesh {
 		const matricesTexture = new DataTexture( matricesArray, size, size, RGBAFormat, FloatType );
 
 		this._matricesTexture = matricesTexture;
+
+	}
+
+	_initColorsTexture() {
+
+		// layout (1 color = 1 pixel)
+		//      RGBA (=> column1)
+		//  with  8x8  pixel texture max   64 matrices * 1 pixel = (8 * 8)
+		//       16x16 pixel texture max  256 matrices * 1 pixel = (16 * 16)
+		//       32x32 pixel texture max 1024 matrices * 1 pixel = (32 * 32)
+		//       64x64 pixel texture max 4096 matrices * 1 pixel = (64 * 64)
+
+		let size = Math.sqrt( this._maxGeometryCount ); // 1 pixel needed for 1 color
+		size = Math.ceil( size );
+
+		const colorsArray = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
+		const colorsTexture = new DataTexture( colorsArray, size, size, RGBAFormat, FloatType );
+
+		this.colorsTexture = colorsTexture;
 
 	}
 
@@ -746,6 +768,49 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	setColorAt( geometryId, color ) {
+
+		if ( this.colorsTexture === null ) {
+
+			this._initColorsTexture();
+
+		}
+
+		// @TODO: Map geometryId to index of the arrays because
+		//        optimize() can make geometryId mismatch the index
+
+		const active = this._active;
+		const colorsTexture = this.colorsTexture;
+		const colorsArray = this.colorsTexture.image.data;
+		const geometryCount = this._geometryCount;
+		if ( geometryId >= geometryCount || active[ geometryId ] === false ) {
+
+			return this;
+
+		}
+
+		color.toArray( colorsArray, geometryId * 4 );
+		colorsTexture.needsUpdate = true;
+
+		return this;
+
+	}
+
+	getColorAt( geometryId, color ) {
+
+		const active = this._active;
+		const colorsArray = this.colorsTexture.image.data;
+		const geometryCount = this._geometryCount;
+		if ( geometryId >= geometryCount || active[ geometryId ] === false ) {
+
+			return null;
+
+		}
+
+		return color.fromArray( colorsArray, geometryId * 4 );
+
+	}
+
 	setVisibleAt( geometryId, value ) {
 
 		const visibility = this._visibility;
@@ -886,6 +951,13 @@ class BatchedMesh extends Mesh {
 		this._matricesTexture = source._matricesTexture.clone();
 		this._matricesTexture.image.data = this._matricesTexture.image.slice();
 
+		if ( this.colorsTexture !== null ) {
+
+			this.colorsTexture = source.colorsTexture.clone();
+			this.colorsTexture.image.data = this.colorsTexture.image.slice();
+
+		}
+
 		return this;
 
 	}
@@ -897,6 +969,14 @@ class BatchedMesh extends Mesh {
 
 		this._matricesTexture.dispose();
 		this._matricesTexture = null;
+
+		if ( this.colorsTexture !== null ) {
+
+			this.colorsTexture.dispose();
+			this.colorsTexture = null;
+
+		}
+
 		return this;
 
 	}
