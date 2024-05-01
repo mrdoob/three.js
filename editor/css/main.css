@@ -661,9 +661,12 @@ select {
 		}
 
 	.Outliner {
-		color: #888;
 		background: #222;
 	}
+
+        .Outliner .option {
+            color: #999;
+        }
 
 		.Outliner .option:hover {
 			background-color: rgba(21,60,94,0.5);
