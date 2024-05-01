@@ -45,7 +45,6 @@
 			let groundMirror, verticalMirror;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -55,6 +54,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				// scene
@@ -192,8 +192,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				const timer = Date.now() * 0.01;
 

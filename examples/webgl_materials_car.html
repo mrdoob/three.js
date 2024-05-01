@@ -68,7 +68,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( render );
+				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.85;
 				container.appendChild( renderer.domElement );
@@ -193,7 +193,7 @@
 
 			}
 
-			function render() {
+			function animate() {
 
 				controls.update();
 
