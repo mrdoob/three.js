@@ -75,9 +75,9 @@ function ViewportInfo( editor ) {
 
 		}
 
-		objectsText.setValue( objects.format() );
-		verticesText.setValue( vertices.format() );
-		trianglesText.setValue( triangles.format() );
+		objectsText.setValue( editor.utils.formatNumber( objects ) );
+		verticesText.setValue( editor.utils.formatNumber( vertices ) );
+		trianglesText.setValue( editor.utils.formatNumber( triangles ) );
 
 		const pluralRules = new Intl.PluralRules( editor.config.getKey( 'language' ) );
 
