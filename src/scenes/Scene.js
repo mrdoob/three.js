@@ -10,6 +10,7 @@ class Scene extends Object3D {
 		this.isScene = true;
 
 		this.type = 'Scene';
+		this.bundleType = null; // || 'snapshot' || 'static'
 
 		this.background = null;
 		this.environment = null;

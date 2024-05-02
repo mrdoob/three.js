@@ -56,6 +56,8 @@ class WebGPUBackend extends Backend {
 		this.textureUtils = new WebGPUTextureUtils( this );
 		this.occludedResolveCache = new Map();
 
+		this.bundles = [];
+
 	}
 
 	async init( renderer ) {
@@ -72,40 +74,40 @@ class WebGPUBackend extends Backend {
 
 		if ( parameters.device === undefined ) {
 
-			const adapterOptions = {
-				powerPreference: parameters.powerPreference
-			};
+		const adapterOptions = {
+			powerPreference: parameters.powerPreference
+		};
 
-			const adapter = await navigator.gpu.requestAdapter( adapterOptions );
+		const adapter = await navigator.gpu.requestAdapter( adapterOptions );
 
-			if ( adapter === null ) {
+		if ( adapter === null ) {
 
-				throw new Error( 'WebGPUBackend: Unable to create WebGPU adapter.' );
+			throw new Error( 'WebGPUBackend: Unable to create WebGPU adapter.' );
 
-			}
+		}
 
-			// feature support
+		// feature support
 
-			const features = Object.values( GPUFeatureName );
+		const features = Object.values( GPUFeatureName );
 
-			const supportedFeatures = [];
+		const supportedFeatures = [];
 
-			for ( const name of features ) {
+		for ( const name of features ) {
 
-				if ( adapter.features.has( name ) ) {
+			if ( adapter.features.has( name ) ) {
 
-					supportedFeatures.push( name );
-
-				}
+				supportedFeatures.push( name );
 
 			}
 
-			const deviceDescriptor = {
-				requiredFeatures: supportedFeatures,
-				requiredLimits: parameters.requiredLimits
-			};
+		}
 
-			device = await adapter.requestDevice( deviceDescriptor );
+		const deviceDescriptor = {
+			requiredFeatures: supportedFeatures,
+			requiredLimits: parameters.requiredLimits
+		};
+
+		device = await adapter.requestDevice( deviceDescriptor );
 
 		} else {
 
@@ -297,6 +299,8 @@ class WebGPUBackend extends Backend {
 		const device = this.device;
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
+		this.bundles = [];
+
 		let occlusionQuerySet;
 
 		if ( occlusionQueryCount > 0 ) {
@@ -452,6 +456,13 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
+
+
+		if ( this.bundles.length > 0 ) {
+
+			renderContextData.currentPass.executeBundles( this.bundles );
+
+		}
 
 		if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
 
@@ -791,9 +802,38 @@ class WebGPUBackend extends Backend {
 		const pipelineGPU = this.get( pipeline ).pipeline;
 		const currentSets = contextData.currentSets;
 
+		const renderObjectData = this.get( renderObject );
+
+		const useRenderBundle = renderObject.scene.bundleType === 'snapshot' || 'static'
+
+		const { renderBundle, lastPipeline } = renderObjectData;
+
+
+		if ( renderBundle !== undefined && lastPipeline === pipelineGPU ) {
+
+			const renderContextData = this.get( context );
+
+			const renderBundleNeedsUpdate = context.width + '_' + context.height !== renderContextData._renderBundleViewport
+
+			if ( ! renderBundleNeedsUpdate ) {
+
+				this.bundles.push( renderBundle );
+				return;
+
+			}
+
+		}
+
+		if ( this.bundles.length > 0 ) {
+
+			contextData.currentPass.executeBundles( this.bundles );
+			this.bundles = [];
+
+		}
+
+		const passEncoderGPU = useRenderBundle ? this._createRenderBundleEncoder( context ) : contextData.currentPass;
 		// pipeline
 
-		const passEncoderGPU = contextData.currentPass;
 
 		if ( currentSets.pipeline !== pipelineGPU ) {
 
@@ -902,6 +942,17 @@ class WebGPUBackend extends Backend {
 			passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
 
 			info.update( object, vertexCount, instanceCount );
+
+		}
+
+		
+		// finish renderBundle and execute
+		if ( useRenderBundle ) {
+
+			const newRenderBundle = passEncoderGPU.finish();
+
+			renderObjectData.lastPipeline = pipelineGPU;
+			renderObjectData.renderBundle = newRenderBundle;
 
 		}
 
@@ -1147,6 +1198,31 @@ class WebGPUBackend extends Backend {
 	}
 
 	// pipelines
+
+	_createRenderBundleEncoder( renderContext ) {
+
+		const renderContextData = this.get( renderContext );
+
+		const depthStencilFormat = this.utils.getCurrentDepthStencilFormat( renderContext );
+		const colorFormat = this.utils.getCurrentColorFormat( renderContext );
+
+		const descriptor = {
+			label: 'renderBundleEncoder',
+			colorFormats: [ colorFormat ],
+			depthStencilFormat,
+			sampleCount: this.parameters.sampleCount,
+			// depthReadOnly: false,
+			// stencilReadOnly: false
+		};
+
+		const renderBundleEncoder = this.device.createRenderBundleEncoder( descriptor );
+
+		renderContextData.currentSets = { attributes: {} };
+		renderContextData._renderBundleViewport = renderContext.width + '_' + renderContext.height;
+
+		return renderBundleEncoder;
+
+	}
 
 	createRenderPipeline( renderObject, promises ) {
 

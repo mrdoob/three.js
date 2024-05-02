@@ -4,8 +4,10 @@ import { varying } from '../core/VaryingNode.js';
 import { property } from '../core/PropertyNode.js';
 import { normalize } from '../math/MathNode.js';
 import { cameraViewMatrix } from './CameraNode.js';
-import { modelNormalMatrix } from './ModelNode.js';
+// import { modelNormalMatrix } from './ModelNode.js';
 import { nodeImmutable, vec3 } from '../shadernode/ShaderNode.js';
+import { positionView } from './PositionNode.js';
+import { modelNormalMatrix, modelWorldMatrix } from './ModelNode.js';
 
 class NormalNode extends Node {
 
@@ -55,6 +57,12 @@ class NormalNode extends Node {
 
 		} else if ( scope === NormalNode.VIEW ) {
 
+
+			// TODO: For static mode prevent the necessary usage of modelViewMatrix and keep camera dynamic
+			// TODO: Add inverse() support to WGSL
+			// Use positionView for static mode to prevent usage for camera
+			// cameraViewMatrix.mul( modelWorldMatrix ).inverse().transpose() And TODO update modelNormalMatrix
+			// const vertexNode = cameraViewMatrix.mul( modelWorldMatrix ).transpose().mul( normalLocal );
 			const vertexNode = modelNormalMatrix.mul( normalLocal );
 			outputNode = normalize( varying( vertexNode ) );
 

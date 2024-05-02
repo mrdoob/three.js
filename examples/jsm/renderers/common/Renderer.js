@@ -243,6 +243,7 @@ class Renderer {
 
 		//
 
+		// TODO Render once and reuse renderList in static mode
 		const renderList = this._renderLists.get( scene, camera );
 		renderList.begin();
 
@@ -509,6 +510,7 @@ class Renderer {
 
 		renderList.finish();
 
+		// TODO: Sort on the GPU in static mode via indirect draw call and compute shader
 		if ( this.sortObjects === true ) {
 
 			renderList.sort( this._opaqueSort, this._transparentSort );
@@ -566,6 +568,10 @@ class Renderer {
 		const transparentObjects = renderList.transparent;
 		const lightsNode = renderList.lightsNode;
 
+
+
+		// const needsUpdate = this.backend.bundles !== undefined && this.backend.bundles.length > 0 ? false : true;
+		// TODO: Potentially do not reset bundles and prevent update of render objects
 		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
 
@@ -1390,9 +1396,14 @@ class Renderer {
 
 		//
 
+		const needsUpdate = scene.bundleType === 'static' && this.backend.bundles !== undefined && this.backend.bundles.length > 0 ? false : true;
+
+		// TODO: Apply same logic in case of static scene
 		this._nodes.updateForRender( renderObject );
-		this._geometries.updateForRender( renderObject );
+		if ( needsUpdate ) this._geometries.updateForRender( renderObject );
+		// TODO: Apply same logic in case of static scene
 		this._bindings.updateForRender( renderObject );
+		// TODO: Apply same logic in case of static scene
 		this._pipelines.updateForRender( renderObject );
 
 		//
