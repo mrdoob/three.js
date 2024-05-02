@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgpu - renderbundle</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+	<style>
+		#info {
+			background-color: rgba(0,0,0,0.75);
+		}
+	</style>
+</head>
+<body>
+
+	<div id="info">
+
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - renderbundle
+
+	</div>
+
+	<div id="backend" style="position: absolute; top: 200px; left: 0; color: #fff; background-color: rgba(0,0,0,0.75); padding: 5px;">
+		Active Backend: WebGPU
+	</div>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/",
+				"three/nodes": "./jsm/nodes/Nodes.js",
+				"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.7/dist/main.js"
+			}
+		}
+	</script>
+
+	<script type="module">
+		import * as THREE from 'three';
+
+		import Stats from 'stats-gl';
+		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+		import { MeshNormalNodeMaterial } from 'three/nodes';
+
+		let camera, scene, renderer;
+		let controls, stats;
+		let gui;
+		let geometries, group, material;
+
+		//
+
+		const position = new THREE.Vector3();
+		const rotation = new THREE.Euler();
+		const quaternion = new THREE.Quaternion();
+		const scale = new THREE.Vector3();
+
+		//
+
+		const MAX_GEOMETRY_COUNT = 20000;
+
+		const api = {
+			webgpu: true,
+			bundleType: 'static',
+			count: 8000,
+			dynamic: 0,
+			opacity: 1,
+		};
+
+
+		init( ! api.webgpu, api.bundleType );
+
+		//
+
+		function randomizeMatrix( matrix ) {
+
+			position.x = Math.random() * 80 - 40;
+			position.y = Math.random() * 80 - 40;
+			position.z = Math.random() * 80 - 40;
+
+			rotation.x = Math.random() * 2 * Math.PI;
+			rotation.y = Math.random() * 2 * Math.PI;
+			rotation.z = Math.random() * 2 * Math.PI;
+
+			quaternion.setFromEuler( rotation );
+
+			scale.x = scale.y = scale.z = 0.35 + ( Math.random() * 0.5 );
+
+			return matrix.compose( position, quaternion, scale );
+
+		}
+
+		function randomizeRotationSpeed( rotation ) {
+
+			rotation.x = Math.random() * 0.01;
+			rotation.y = Math.random() * 0.01;
+			rotation.z = Math.random() * 0.01;
+			return rotation;
+
+		}
+
+		function initGeometries() {
+
+			geometries = [
+				new THREE.ConeGeometry( 1.0, 2.0 ),
+				new THREE.BoxGeometry( 2.0, 2.0, 2.0 ),
+				new THREE.SphereGeometry( 1.0, 16, 8 ),
+			];
+
+		}
+
+		function createMaterial() {
+
+			if ( ! material ) {
+
+				material = new MeshNormalNodeMaterial();
+
+			}
+
+			return material;
+
+		}
+
+		function cleanup() {
+
+			if ( group ) {
+
+				group.parent.remove( group );
+
+				if ( group.dispose ) {
+
+					group.dispose();
+
+				}
+
+			}
+
+		}
+
+		function initMesh() {
+
+			cleanup();
+			initRegularMesh();
+
+		}
+
+
+		function initRegularMesh() {
+
+			group = new THREE.Group();
+			const material = createMaterial();
+
+			for ( let i = 0; i < api.count; i ++ ) {
+
+				const child = new THREE.Mesh( geometries[ i % geometries.length ], material );
+				randomizeMatrix( child.matrix );
+				child.matrix.decompose( child.position, child.quaternion, child.scale );
+				child.userData.rotationSpeed = randomizeRotationSpeed( new THREE.Euler() );
+				child.frustrumCulled = false;
+				// child.matrixAutoUpdate = false;
+				group.add( child );
+
+			}
+
+			scene.add( group );
+
+		}
+
+		function init( forceWebGL = false, bundleType = 'static' ) {
+
+			if ( renderer ) {
+
+				renderer.dispose();
+				controls.dispose();
+				document.body.removeChild( stats.dom );
+				document.body.removeChild( renderer.domElement );
+
+			}
+
+			document.getElementById( 'backend' ).innerText = 'Active Backend: ' + ( forceWebGL ? 'WebGL' : 'WebGPU' );
+			// camera
+
+			const aspect = window.innerWidth / window.innerHeight;
+
+			camera = new THREE.PerspectiveCamera( 70, aspect, 1, 100 );
+			camera.position.z = 50;
+
+			// renderer
+
+			renderer = new WebGPURenderer( { antialias: true, forceWebGL } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+			renderer.setAnimationLoop( animate );
+
+			// scene
+
+			scene = new THREE.Scene();
+
+			scene.bundleType = bundleType;
+
+			if ( forceWebGL ) {
+
+				scene.background = new THREE.Color( 0xf10000 );
+
+			} else {
+
+				scene.background = new THREE.Color( 0x333333 );
+
+			}
+
+			document.body.appendChild( renderer.domElement );
+
+
+
+			initGeometries();
+			initMesh();
+
+			// controls
+
+			controls = new OrbitControls( camera, renderer.domElement );
+			controls.autoRotate = true;
+			controls.autoRotateSpeed = 1.0;
+
+			// stats
+
+			stats = new Stats( {
+				precision: 3,
+				horizontal: false
+			} );
+			// stats.init( renderer );
+			document.body.appendChild( stats.dom );
+			stats.dom.style.position = 'absolute';
+
+			// gui
+
+			gui = new GUI();
+			gui.add( api, 'bundleType', [
+				null,
+				'snapshot',
+				'static'
+			] ).onChange( () => {
+
+				init( ! api.webgpu, api.bundleType );
+
+			} );
+
+			gui.add( api, 'webgpu' ).onChange( () => {
+
+				init( ! api.webgpu );
+
+			} );
+
+			gui.add( api, 'count', 1, MAX_GEOMETRY_COUNT ).step( 1 ).onChange( initMesh );
+			gui.add( api, 'dynamic', 0, MAX_GEOMETRY_COUNT ).step( 1 );
+
+			gui.add( api, 'opacity', 0, 1 ).onChange( v => {
+
+				if ( v < 1 ) {
+
+					material.transparent = true;
+					material.depthWrite = false;
+
+				} else {
+
+					material.transparent = false;
+					material.depthWrite = true;
+
+				}
+
+				material.opacity = v;
+				material.needsUpdate = true;
+
+			} );
+
+
+			// listeners
+
+			window.addEventListener( 'resize', onWindowResize );
+
+
+
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+
+			async function animate() {
+
+				animateMeshes();
+
+				controls.update();
+
+				await renderer.renderAsync( scene, camera );
+
+				stats.update();
+
+			}
+
+			function animateMeshes() {
+
+				const loopNum = Math.min( api.count, api.dynamic );
+
+
+				for ( let i = 0; i < loopNum; i ++ ) {
+
+					const child = group.children[ i ];
+					const rotationSpeed = child.userData.rotationSpeed;
+
+					child.rotation.set(
+						child.rotation.x + rotationSpeed.x,
+						child.rotation.y + rotationSpeed.y,
+						child.rotation.z + rotationSpeed.z
+					);
+
+				}
+
+			}
+
+}
+	</script>
+
+</body>
+</html>

@@ -381,7 +381,8 @@
 		"webgpu_storage_buffer",
 		"webgpu_mesh_batch",
 		"webgpu_instancing_morph",
-		"webgpu_texturegrad"
+		"webgpu_texturegrad",
+		"webgpu_renderbundle"
 	],
 	"webaudio": [
 		"webaudio_orientation",
