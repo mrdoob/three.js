@@ -419,6 +419,8 @@ function SidebarScene( editor ) {
 		} else {
 
 			backgroundType.setValue( 'None' );
+			backgroundTexture.setValue( null );
+			backgroundEquirectangularTexture.setValue( null );
 
 		}
 
@@ -438,6 +440,7 @@ function SidebarScene( editor ) {
 		} else {
 
 			environmentType.setValue( 'None' );
+			environmentEquirectangularTexture.setValue( null );
 
 		}
 
