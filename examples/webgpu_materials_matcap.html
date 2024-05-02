@@ -88,7 +88,7 @@
 					mesh = gltf.scene.children[ 0 ];
 					mesh.position.y = - 0.25;
 
-					mesh.material = new THREE.MeshMatcapMaterial( {
+					mesh.material = new MeshMatcapNodeMaterial( {
 
 						color: new THREE.Color().setHex( API.color ).convertSRGBToLinear(),
 						matcap: matcap,
