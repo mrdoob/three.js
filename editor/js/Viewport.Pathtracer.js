@@ -17,7 +17,7 @@ function ViewportPathtracer( renderer ) {
 
 	}
 
-	function setSize( width, height ) {
+	function setSize( /* width, height */ ) {
 
 		if ( pathTracer === null ) return;
 
@@ -26,7 +26,7 @@ function ViewportPathtracer( renderer ) {
 
 	}
 
-	function setBackground( background, blurriness ) {
+	function setBackground( /* background, blurriness */ ) {
 
 		if ( pathTracer === null ) return;
 
@@ -43,7 +43,7 @@ function ViewportPathtracer( renderer ) {
 
 	}
 
-	function setEnvironment( environment ) {
+	function setEnvironment( /* environment */ ) {
 
 		if ( pathTracer === null ) return;
 

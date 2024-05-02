@@ -97,7 +97,7 @@ function MenubarView( editor ) {
 
 					}
 
-			} );
+				} );
 
 		}
 

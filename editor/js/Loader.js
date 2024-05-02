@@ -99,7 +99,7 @@ function Loader( editor ) {
 
 					}, function ( error ) {
 
-						console.error( error )
+						console.error( error );
 
 					} );
 
@@ -941,7 +941,7 @@ function Loader( editor ) {
 				{
 
 					const loader = await createGLTFLoader( manager );
-					
+
 					loader.parse( strFromU8( file ), '', function ( result ) {
 
 						const scene = result.scene;
