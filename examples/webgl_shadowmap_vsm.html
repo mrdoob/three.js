@@ -34,7 +34,6 @@
 			let torusKnot, dirGroup;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -185,6 +184,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.VSMShadowMap;
 
@@ -210,8 +210,6 @@
 			}
 
 			function animate( time ) {
-
-				requestAnimationFrame( animate );
 
 				const delta = clock.getDelta();
 

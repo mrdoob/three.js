@@ -46,7 +46,6 @@
 			let camera, scene, renderer, composer, controls, clock, stats, mixer;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -66,6 +65,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
@@ -185,8 +185,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				const delta = clock.getDelta();
 

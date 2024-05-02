@@ -49,7 +49,6 @@
 			const distance = .5;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -76,6 +75,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				document.addEventListener( 'pointerdown', onPointerDown );
@@ -127,13 +127,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-				update();
-
-			}
-
-			function update() {
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
 				phi = THREE.MathUtils.degToRad( 90 - lat );

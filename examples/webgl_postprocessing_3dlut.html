@@ -63,7 +63,6 @@
 			let composer, lutPass;
 
 			init();
-			render();
 
 			function init() {
 
@@ -131,6 +130,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
@@ -154,7 +154,6 @@
 				gui.add( params, 'enabled' );
 				gui.add( params, 'lut', Object.keys( lutMap ) );
 				gui.add( params, 'intensity' ).min( 0 ).max( 1 );
-				gui.add( params, 'use2DLut' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -168,15 +167,11 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				composer.setSize( window.innerWidth, window.innerHeight );
 
-				render();
-
 			}
 
 			//
 
-			function render() {
-
-				requestAnimationFrame( render );
+			function animate() {
 
 				lutPass.enabled = params.enabled && Boolean( lutMap[ params.lut ] );
 				lutPass.intensity = params.intensity;
