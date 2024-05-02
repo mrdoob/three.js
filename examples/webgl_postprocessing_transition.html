@@ -62,6 +62,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				composer = new EffectComposer( renderer );
@@ -75,8 +76,6 @@
 
 				const outputPass = new OutputPass();
 				composer.addPass( outputPass );
-
-				renderer.setAnimationLoop( animate );
 
 			}
 
@@ -117,15 +116,15 @@
 
 			function animate() {
 
+				// Transition animation
+				if ( params.transitionAnimate ) TWEEN.update();
+
 				const delta = clock.getDelta();
 				fxSceneA.render( delta );
 				fxSceneB.render( delta );
 
 				render();
 				stats.update();
-
-				// Transition animation
-				if ( params.transitionAnimate ) TWEEN.update();
 
 			}
 
