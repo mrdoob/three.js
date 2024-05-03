@@ -50,7 +50,6 @@
 				overlay.remove();
 
 				init();
-				animate();
 
 			} );
 
@@ -66,6 +65,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -135,8 +135,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;

@@ -71,17 +71,16 @@
 
 		<h2>Rendering the scene</h2>
 
-		<p>If you copied the code from above into the HTML file we created earlier, you wouldn't be able to see anything. This is because we're not actually rendering anything yet. For that, we need what's called a `render or animate loop`.</p>
+		<p>If you copied the code from above into the HTML file we created earlier, you wouldn't be able to see anything. This is because we're not actually rendering anything yet. For that, we need what's called a render or animation loop.</p>
 
 		<code>
 		function animate() {
-			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 		}
-		animate();
+		renderer.setAnimationLoop( animate );
 		</code>
 
-		<p>This will create a loop that causes the renderer to draw the scene every time the screen is refreshed (on a typical screen this means 60 times per second). If you're new to writing games in the browser, you might say <em>"why don't we just create a setInterval ?"</em> The thing is - we could, but `requestAnimationFrame` has a number of advantages. Perhaps the most important one is that it pauses when the user navigates to another browser tab, hence not wasting their precious processing power and battery life.</p>
+		<p>This will create a loop that causes the renderer to draw the scene every time the screen is refreshed (on a typical screen this means 60 times per second). If you're new to writing games in the browser, you might say <em>"why don't we just create a setInterval ?"</em> The thing is - we could, but `requestAnimationFrame` which is internally used in `WebGLRenderer` has a number of advantages. Perhaps the most important one is that it pauses when the user navigates to another browser tab, hence not wasting their precious processing power and battery life.</p>
 
 		<h2>Animating the cube</h2>
 
@@ -94,12 +93,12 @@
 		cube.rotation.y += 0.01;
 		</code>
 
-		<p>This will be run every frame (normally 60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the app is running has to go through the animate loop. You can of course call other functions from there, so that you don't end up with an `animate` function that's hundreds of lines.</p>
+		<p>This will be run every frame (normally 60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the app is running has to go through the animation loop. You can of course call other functions from there, so that you don't end up with an `animate` function that's hundreds of lines.</p>
 
 		<h2>The result</h2>
 		<p>Congratulations! You have now completed your first three.js application. It's simple, but you have to start somewhere.</p>
 
-		<p>The full code is available below and as an editable [link:https://jsfiddle.net/0c1oqf38/ live example]. Play around with it to get a better understanding of how it works.</p>
+		<p>The full code is available below and as an editable [link:https://jsfiddle.net/tswh48fL/ live example]. Play around with it to get a better understanding of how it works.</p>
 
 		<p><i>index.html —</i></p>
 
@@ -129,6 +128,7 @@
 
 		const renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer.setAnimationLoop( animate );
 		document.body.appendChild( renderer.domElement );
 
 		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
@@ -139,15 +139,13 @@
 		camera.position.z = 5;
 
 		function animate() {
-			requestAnimationFrame( animate );
 
 			cube.rotation.x += 0.01;
 			cube.rotation.y += 0.01;
 
 			renderer.render( scene, camera );
-		}
 
-		animate();
+		}
 		</code>
 	</body>
 </html>

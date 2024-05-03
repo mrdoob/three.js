@@ -263,7 +263,8 @@
 				updateProgressBar( 0 );
 
 				pathTracer.setScene( scene, camera );
-				render();
+			
+				renderer.setAnimationLoop( animate );
 
 			}
 
@@ -340,9 +341,7 @@
 
 			//
 
-			function render() {
-
-				requestAnimationFrame( render );
+			function animate() {
 
 				renderer.toneMapping = params.toneMapping ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping;
 

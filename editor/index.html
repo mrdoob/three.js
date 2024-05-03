@@ -74,12 +74,6 @@
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
 
-			Number.prototype.format = function () {
-
-				return this.toString().replace( /(\d)(?=(\d{3})+(?!\d))/g, '$1,' );
-
-			};
-
 			//
 
 			const editor = new Editor();
@@ -226,7 +220,7 @@
 
 				const file = hash.slice( 6 );
 
-				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
+				if ( confirm( editor.strings.getKey( 'prompt/file/open' ) ) ) {
 
 					const loader = new THREE.FileLoader();
 					loader.crossOrigin = '';

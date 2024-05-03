@@ -6,6 +6,14 @@ function Strings( config ) {
 
 		en: {
 
+			'prompt/file/open': 'Any unsaved data will be lost. Are you sure?',
+			'prompt/file/export/noMeshSelected': 'No Mesh selected!',
+			'prompt/file/export/noObjectSelected': 'No Object selected!',
+			'prompt/script/remove': 'Are you sure?',
+			'prompt/history/clear': 'The Undo/Redo History will be cleared. Are you sure?',
+			'prompt/history/preserve': 'The history will be preserved across sessions.\nThis can have an impact on performance when working with textures.',
+			'prompt/history/forbid': 'Undo/Redo disabled while scene is playing.',
+
 			'menubar/file': 'File',
 			'menubar/file/new': 'New',
 			'menubar/file/import': 'Import',
@@ -350,6 +358,9 @@ function Strings( config ) {
 			'viewport/controls/grid': 'Grid',
 			'viewport/controls/helpers': 'Helpers',
 
+			'viewport/info/oneObject': 'Object',
+			'viewport/info/oneVertex': 'Vertex',
+			'viewport/info/oneTriangle': 'Triangle',
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
 			'viewport/info/triangles': 'Triangles',
@@ -358,6 +369,14 @@ function Strings( config ) {
 		},
 
 		fr: {
+
+			'prompt/file/open': 'Toutes les données non enregistrées seront perdues Êtes-vous sûr ?',
+			'prompt/file/export/noMeshSelected': 'Aucun maillage sélectionné !',
+			'prompt/file/export/noObjectSelected': 'Aucun objet sélectionné !',
+			'prompt/script/remove': 'Es-tu sûr?',
+			'prompt/history/clear': 'L\'historique d\'annulation/rétablissement sera effacé Êtes-vous sûr ?',
+			'prompt/history/preserve': 'L\'histoire sera conservée entre les sessions.\nCela peut avoir un impact sur les performances lors de la manipulation des textures.',
+			'prompt/history/forbid': 'Les fonctions Annuler/Rétablir sont désactivées pendant la lecture de la scène.',
 
 			'menubar/file': 'Fichier',
 			'menubar/file/new': 'Nouveau',
@@ -703,6 +722,9 @@ function Strings( config ) {
 			'viewport/controls/grid': 'Grille',
 			'viewport/controls/helpers': 'Helpers',
 
+			'viewport/info/oneObject': 'Objet',
+			'viewport/info/oneVertex': 'Sommet',
+			'viewport/info/oneTriangle': 'Triangle',
 			'viewport/info/objects': 'Objets',
 			'viewport/info/vertices': 'Sommets',
 			'viewport/info/triangles': 'Triangles',
@@ -711,6 +733,14 @@ function Strings( config ) {
 		},
 
 		zh: {
+
+			'prompt/file/open': '您确定吗？未保存的数据将会丢失。',
+			'prompt/file/export/noMeshSelected': '未选择网格！',
+			'prompt/file/export/noObjectSelected': '未选择对象！',
+			'prompt/script/remove': '你确定吗？',
+			'prompt/history/clear': '撤销/重做历史记录将被清除。您确定吗？',
+			'prompt/history/preserve': '历史将在会话之间保留。\n这可能会影响在处理纹理时的性能。',
+			'prompt/history/forbid': '在播放场景时，撤消/重做被禁用。',
 
 			'menubar/file': '文件',
 			'menubar/file/new': '新建',
@@ -1056,6 +1086,9 @@ function Strings( config ) {
 			'viewport/controls/grid': '网格',
 			'viewport/controls/helpers': '辅助',
 
+			'viewport/info/oneObject': '物体',
+			'viewport/info/oneVertex': '顶点',
+			'viewport/info/oneTriangle': '三角形',
 			'viewport/info/objects': '物体',
 			'viewport/info/vertices': '顶点',
 			'viewport/info/triangles': '三角形',
@@ -1064,6 +1097,14 @@ function Strings( config ) {
 		},
 
 		ja: {
+
+			'prompt/file/open': '保存されていないデータは失われます。 本気ですか？',
+			'prompt/file/export/noMeshSelected': 'メッシュが選択されていません!',
+			'prompt/file/export/noObjectSelected': 'オブジェクトが選択されていません!',
+			'prompt/script/remove': '本気ですか？',
+			'prompt/history/clear': '元に戻す/やり直しの履歴が消去されます。 本気ですか？',
+			'prompt/history/preserve': '履歴はセッションをまたいで保存されます。\nこれは、テクスチャを操作する際のパフォーマンスに影響を与える可能性があります。',
+			'prompt/history/forbid': 'シーンの再生中は元に戻す/やり直しは無効になります。',
 
 			'menubar/file': 'ファイル',
 			'menubar/file/new': '新規',
@@ -1409,6 +1450,9 @@ function Strings( config ) {
 			'viewport/controls/grid': 'グリッド',
 			'viewport/controls/helpers': 'オーバーレイ表示',
 
+			'viewport/info/oneObject': 'オブジェクト',
+			'viewport/info/oneVertex': '頂点',
+			'viewport/info/oneTriangle': '三角形',
 			'viewport/info/objects': 'オブジェクト',
 			'viewport/info/vertices': '頂点',
 			'viewport/info/triangles': '三角形',
