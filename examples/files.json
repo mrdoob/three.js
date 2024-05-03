@@ -347,6 +347,7 @@
 		"webgpu_materials_matcap",
 		"webgpu_materials_sss",
 		"webgpu_materials_transmission",
+		"webgpu_materials_toon",
 		"webgpu_materials_video",
 		"webgpu_materialx_noise",
 		"webgpu_multiple_rendertargets",
