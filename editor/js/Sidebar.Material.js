@@ -500,7 +500,7 @@ function SidebarMaterial( editor ) {
 
 				}
 
-				editor.execute( new SetMaterialCommand( editor, currentObject, material, currentMaterialSlot ), 'New Material: ' + materialClass.getValue() );
+				editor.execute( new SetMaterialCommand( editor, currentObject, material, currentMaterialSlot ), strings.getKey( 'command/SetMaterial' ) + ':' + materialClass.getValue() );
 				editor.addMaterial( material );
 				// TODO Copy other references in the scene graph
 				// keeping name and UUID then.

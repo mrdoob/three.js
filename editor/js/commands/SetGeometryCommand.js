@@ -15,7 +15,7 @@ class SetGeometryCommand extends Command {
 		super( editor );
 
 		this.type = 'SetGeometryCommand';
-		this.name = 'Set Geometry';
+		this.name = editor.strings.getKey( 'command/SetGeometry' );
 		this.updatable = true;
 
 		this.object = object;

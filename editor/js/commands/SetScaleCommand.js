@@ -15,7 +15,7 @@ class SetScaleCommand extends Command {
 		super( editor );
 
 		this.type = 'SetScaleCommand';
-		this.name = 'Set Scale';
+		this.name = editor.strings.getKey( 'command/SetScale' );
 		this.updatable = true;
 
 		this.object = object;
