@@ -17,7 +17,7 @@ class MatcapUVNode extends TempNode {
 		const x = vec3( positionViewDirection.z, 0, positionViewDirection.x.negate() ).normalize();
 		const y = positionViewDirection.cross( x );
 
-		return vec2( x.dot( transformedNormalView ), y.dot( transformedNormalView ) ).mul( 0.495 ).add( 0.5 );
+		return vec2( x.dot( transformedNormalView ), y.dot( transformedNormalView ) ).mul( 0.495 ).add( 0.5 ); // 0.495 to remove artifacts caused by undersized matcap disks
 
 	}
 
