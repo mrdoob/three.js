@@ -226,7 +226,7 @@
 
 				const file = hash.slice( 6 );
 
-				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
+				if ( confirm( editor.strings.getKey( 'prompt/file/open' ) ) ) {
 
 					const loader = new THREE.FileLoader();
 					loader.crossOrigin = '';
