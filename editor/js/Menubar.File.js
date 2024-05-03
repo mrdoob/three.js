@@ -26,7 +26,7 @@ function MenubarFile( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/file/new' ) );
 	option.onClick( function () {
 
-		if ( confirm( strings.getKey( '[prompt]/file/open' ) ) ) {
+		if ( confirm( strings.getKey( 'prompt/file/open' ) ) ) {
 
 			editor.clear();
 
@@ -81,7 +81,7 @@ function MenubarFile( editor ) {
 
 		if ( object === null || object.isMesh === undefined ) {
 
-			alert( strings.getKey( '[prompt]/file/export/noMeshSelected' ) );
+			alert( strings.getKey( 'prompt/file/export/noMeshSelected' ) );
 			return;
 
 		}
@@ -181,7 +181,7 @@ function MenubarFile( editor ) {
 
 		if ( object === null ) {
 
-			alert( strings.getKey( '[prompt]/file/export/noObjectSelected' ) );
+			alert( strings.getKey( 'prompt/file/export/noObjectSelected' ) );
 			return;
 
 		}

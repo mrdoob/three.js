@@ -25,7 +25,7 @@ function SidebarSettingsHistory( editor ) {
 
 		if ( value ) {
 
-			alert( strings.getKey( '[prompt]/history/preserve' ) );
+			alert( strings.getKey( 'prompt/history/preserve' ) );
 
 			const lastUndoCmd = history.undos[ history.undos.length - 1 ];
 			const lastUndoId = ( lastUndoCmd !== undefined ) ? lastUndoCmd.id : 0;
@@ -63,7 +63,7 @@ function SidebarSettingsHistory( editor ) {
 	const option = new UIButton( strings.getKey( 'sidebar/history/clear' ) );
 	option.onClick( function () {
 
-		if ( confirm( strings.getKey( '[prompt]/history/clear' ) ) ) {
+		if ( confirm( strings.getKey( 'prompt/history/clear' ) ) ) {
 
 			editor.history.clear();
 
