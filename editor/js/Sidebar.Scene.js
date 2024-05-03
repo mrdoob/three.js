@@ -99,7 +99,7 @@ function SidebarScene( editor ) {
 
 	function buildHTML( object ) {
 
-		let html = `<span class="type ${ getObjectType( object ) }"></span> ${ escapeHTML( object.name ) }`;
+		let html = `<span class="type ${ getObjectType( object ) }"></span> <span class="label">${ escapeHTML( object.name ) }</span> `;
 
 		if ( object.isMesh ) {
 
@@ -494,14 +494,13 @@ function SidebarScene( editor ) {
 
 	signals.refreshSidebarEnvironment.add( refreshUI );
 
-	/*
 	signals.objectChanged.add( function ( object ) {
 
-		let options = outliner.options;
+		const options = outliner.options;
 
 		for ( let i = 0; i < options.length; i ++ ) {
 
-			let option = options[ i ];
+			const option = options[ i ];
 
 			if ( option.value === object.id ) {
 
@@ -513,7 +512,6 @@ function SidebarScene( editor ) {
 		}
 
 	} );
-	*/
 
 	signals.objectSelected.add( function ( object ) {
 
