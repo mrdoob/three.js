@@ -56,6 +56,7 @@ import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
 import { createCanvasElement } from '../utils.js';
 import { ColorManagement } from '../math/ColorManagement.js';
+import { Box2 } from '../math/Box2.js';
 
 class WebGLRenderer {
 
