@@ -61,6 +61,8 @@ function ViewportControls( editor ) {
 
 	signals.editorCleared.add( function () {
 
+		editor.setViewportCamera( Object.keys( editor.cameras )[ 0 ] );
+
 		shadingSelect.setValue( 'solid' );
 		editor.setViewportShading( shadingSelect.getValue() );
 
@@ -84,7 +86,13 @@ function ViewportControls( editor ) {
 		}
 
 		cameraSelect.setOptions( options );
-		cameraSelect.setValue( editor.viewportCamera.uuid );
+
+		const selectedCamera = ( editor.viewportCamera.uuid in options )
+			? editor.viewportCamera
+			: Object.values( editor.cameras )[ 0 ];
+
+		cameraSelect.setValue( selectedCamera.uuid );
+		editor.setViewportCamera( selectedCamera.uuid );
 
 	}
 
