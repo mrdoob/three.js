@@ -2371,10 +2371,20 @@ class WebGLRenderer {
 
 		};
 
-		this.copyTextureToTexture = function ( position, srcTexture, dstTexture, level = 0 ) {
+		this.copyTextureToTexture = function ( sourceBox, position, srcTexture, dstTexture, level = 0 ) {
 
-			const width = srcTexture.image.width;
-			const height = srcTexture.image.height;
+			if ( sourceBox.isBox2 !== true ) {
+
+				console.warn( 'WebGLRenderer: copyTextureToTexture function signature has changed.' );
+				position = arguments[ 0 ];
+				srcTexture = arguments[ 1 ];
+				dstTexture = arguments[ 2 ];
+				level = arguments[ 3 ];
+
+			}
+
+			const width = sourceBox.max.x - sourceBox.min.x;
+			const height = sourceBox.max.y - sourceBox.min.y;
 			const glFormat = utils.convert( dstTexture.format );
 			const glType = utils.convert( dstTexture.type );
 
@@ -2386,23 +2396,42 @@ class WebGLRenderer {
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, dstTexture.premultiplyAlpha );
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
 
+			const unpackRowLen = _gl.getParameter( _gl.UNPACK_ROW_LENGTH );
+			const unpackImageHeight = _gl.getParameter( _gl.UNPACK_IMAGE_HEIGHT );
+			const unpackSkipPixels = _gl.getParameter( _gl.UNPACK_SKIP_PIXELS );
+			const unpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
+			const unpackSkipImages = _gl.getParameter( _gl.UNPACK_SKIP_IMAGES );
+
+			const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ level ] : srcTexture.image;
+
+			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
+			_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, image.height );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, sourceBox.min.x );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, sourceBox.min.y );
+
 			if ( srcTexture.isDataTexture ) {
 
-				_gl.texSubImage2D( _gl.TEXTURE_2D, level, position.x, position.y, width, height, glFormat, glType, srcTexture.image.data );
+				_gl.texSubImage2D( _gl.TEXTURE_2D, level, position.x, position.y, width, height, glFormat, glType, image.data );
 
 			} else {
 
 				if ( srcTexture.isCompressedTexture ) {
 
-					_gl.compressedTexSubImage2D( _gl.TEXTURE_2D, level, position.x, position.y, srcTexture.mipmaps[ 0 ].width, srcTexture.mipmaps[ 0 ].height, glFormat, srcTexture.mipmaps[ 0 ].data );
+					_gl.compressedTexSubImage2D( _gl.TEXTURE_2D, level, position.x, position.y, image.width, image.height, glFormat, image.data );
 
 				} else {
 
-					_gl.texSubImage2D( _gl.TEXTURE_2D, level, position.x, position.y, glFormat, glType, srcTexture.image );
+					_gl.texSubImage2D( _gl.TEXTURE_2D, level, position.x, position.y, glFormat, glType, image );
 
 				}
 
 			}
+
+			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, unpackRowLen );
+			_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, unpackImageHeight );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, unpackSkipPixels );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, unpackSkipRows );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, unpackSkipImages );
 
 			// Generate mipmaps only when copying level 0
 			if ( level === 0 && dstTexture.generateMipmaps ) _gl.generateMipmap( _gl.TEXTURE_2D );
