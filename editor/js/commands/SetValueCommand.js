@@ -14,7 +14,7 @@ class SetValueCommand extends Command {
 		super( editor );
 
 		this.type = 'SetValueCommand';
-		this.name = editor.strings.getKey( 'command/SetValue' ) + ':' + attributeName;
+		this.name = editor.strings.getKey( 'command/SetValue' ) + ': ' + attributeName;
 		this.updatable = true;
 
 		this.object = object;

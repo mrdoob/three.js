@@ -14,7 +14,7 @@ class SetGeometryValueCommand extends Command {
 		super( editor );
 
 		this.type = 'SetGeometryValueCommand';
-		this.name = editor.strings.getKey( 'command/SetGeometryValue' ) + ':' + attributeName;
+		this.name = editor.strings.getKey( 'command/SetGeometryValue' ) + ': ' + attributeName;
 
 		this.object = object;
 		this.attributeName = attributeName;
