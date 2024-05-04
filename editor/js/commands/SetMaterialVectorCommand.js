@@ -6,7 +6,7 @@ class SetMaterialVectorCommand extends Command {
 
 		super( editor );
 
-		this.type = 'SetMaterialColorCommand';
+		this.type = 'SetMaterialVectorCommand';
 		this.name = editor.strings.getKey( 'command/SetMaterialVector' ) + ': ' + attributeName;
 		this.updatable = true;
 

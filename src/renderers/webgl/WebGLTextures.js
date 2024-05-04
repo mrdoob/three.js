@@ -826,7 +826,22 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 									if ( dataReady ) {
 
-										state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
+										if ( texture.layerUpdates.size > 0 ) {
+
+											for ( const layerIndex of texture.layerUpdates ) {
+
+												const layerSize = mipmap.width * mipmap.height;
+												state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, layerIndex, mipmap.width, mipmap.height, 1, glFormat, mipmap.data.slice( layerSize * layerIndex, layerSize * ( layerIndex + 1 ) ), 0, 0 );
+
+											}
+
+											texture.clearLayerUpdates();
+
+										} else {
+
+											state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
+
+										}
 
 									}
 
@@ -932,7 +947,72 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					if ( dataReady ) {
 
-						state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+						if ( texture.layerUpdates.size > 0 ) {
+
+							// When type is GL_UNSIGNED_BYTE, each of these bytes is
+							// interpreted as one color component, depending on format. When
+							// type is one of GL_UNSIGNED_SHORT_5_6_5,
+							// GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_5_5_5_1, each
+							// unsigned value is interpreted as containing all the components
+							// for a single pixel, with the color components arranged
+							// according to format.
+							//
+							// See https://registry.khronos.org/OpenGL-Refpages/es1.1/xhtml/glTexImage2D.xml
+							let texelSize;
+							switch ( glType ) {
+
+								case _gl.UNSIGNED_BYTE:
+									switch ( glFormat ) {
+
+										case _gl.ALPHA:
+											texelSize = 1;
+											break;
+										case _gl.LUMINANCE:
+											texelSize = 1;
+											break;
+										case _gl.LUMINANCE_ALPHA:
+											texelSize = 2;
+											break;
+										case _gl.RGB:
+											texelSize = 3;
+											break;
+										case _gl.RGBA:
+											texelSize = 4;
+											break;
+
+										default:
+											throw new Error( `Unknown texel size for format ${glFormat}.` );
+
+									}
+
+									break;
+
+								case _gl.UNSIGNED_SHORT_4_4_4_4:
+								case _gl.UNSIGNED_SHORT_5_5_5_1:
+								case _gl.UNSIGNED_SHORT_5_6_5:
+									texelSize = 1;
+									break;
+
+								default:
+									throw new Error( `Unknown texel size for type ${glType}.` );
+
+							}
+
+							const layerSize = image.width * image.height * texelSize;
+
+							for ( const layerIndex of texture.layerUpdates ) {
+
+								state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, 0, 0, 0, layerIndex, image.width, image.height, 1, glFormat, glType, image.data.slice( layerSize * layerIndex, layerSize * ( layerIndex + 1 ) ) );
+
+							}
+
+							texture.clearLayerUpdates();
+
+						} else {
+
+							state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+
+						}
 
 					}
 
