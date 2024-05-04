@@ -2376,10 +2376,16 @@ class WebGLRenderer {
 			if ( sourceBox.isBox2 !== true ) {
 
 				console.warn( 'WebGLRenderer: copyTextureToTexture function signature has changed.' );
+
 				position = arguments[ 0 ];
 				srcTexture = arguments[ 1 ];
 				dstTexture = arguments[ 2 ];
 				level = arguments[ 3 ];
+
+				const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ level ] : srcTexture.image;
+				sourceBox = new Box2();
+				sourceBox.min.set( 0, 0 );
+				sourceBox.max.set( image.width, image.height );
 
 			}
 
