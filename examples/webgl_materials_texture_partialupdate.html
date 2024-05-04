@@ -31,6 +31,7 @@
 			let last = 0;
 			const position = new THREE.Vector2();
 			const color = new THREE.Color();
+			const box = new THREE.Box2();
 
 			init();
 
@@ -103,7 +104,10 @@
 
 					// perform copy from src to dest texture to a random position
 
-					renderer.copyTextureToTexture( position, dataTexture, diffuseMap );
+					box.min.set( 0, 0 );
+					box.max.set( dataTexture.image.width, dataTexture.image.height );
+
+					renderer.copyTextureToTexture( box, position, dataTexture, diffuseMap );
 
 				}
 
