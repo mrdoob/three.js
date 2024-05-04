@@ -14,7 +14,7 @@ class SetMaterialCommand extends Command {
 		super( editor );
 
 		this.type = 'SetMaterialCommand';
-		this.name = 'New Material';
+		this.name = editor.strings.getKey( 'command/SetMaterial' );
 
 		this.object = object;
 		this.materialSlot = materialSlot;
