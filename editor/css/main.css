@@ -345,6 +345,7 @@ select {
 		float: left;
 		cursor: pointer;
 		padding-right: 8px;
+		background: inherit;
 	}
 
 	#menubar .menu.right {
@@ -356,20 +357,32 @@ select {
 
 		#menubar .menu .title {
 			display: inline-block;
+			background: inherit;
 			color: #888;
 			margin: 0;
 			padding: 8px;
 			line-height: 16px;
+			position: relative;
+		}
+
+		#menubar .menu:hover .title {
+			z-index: 2; /* over menu option */
+			padding: calc(8px - 1px); /* minus border width */
+			border: 1px outset #ddd;
+			border-bottom: 0 none;
 		}
 
 		#menubar .menu .options {
 			position: fixed;
+			z-index: 1; /* under menu title */
 			display: none;
-			padding: 5px 0;
-			background: #eee;
-			width: 150px;
-			max-height: calc(100% - 80px);
+			padding: calc(5px - 1px) 0; /* minus border width */
+			min-width: 150px;
+			max-height: calc(100vh - 80px);
 			overflow: auto;
+			background: inherit;
+			border: 1px outset #ddd;
+			transform: translateY(-1px); /* offset border width */
 		}
 
 		#menubar .menu:hover .options {
@@ -382,7 +395,6 @@ select {
 
 			#menubar .menu .options .option {
 				color: #666;
-				background-color: transparent;
 				padding: 5px 10px;
 				margin: 0 !important;
 			}
@@ -394,12 +406,10 @@ select {
 
 				#menubar .menu .options .option:active {
 					color: #666;
-					background: transparent;
 				}
 
 		#menubar .menu .options .inactive {
 			color: #bbb;
-			background-color: transparent;
 			padding: 5px 10px;
 			margin: 0 !important;
 		}
@@ -531,10 +541,6 @@ select {
 		display: none;
 	}
 
-	#menubar .menu .options {
-		max-height: calc(100% - 372px);
-	}
-
 	#menubar .menu.right {
 		display: none;
 	}
@@ -610,8 +616,13 @@ select {
 		background: #111;
 	}
 
+		#menubar .menu:hover .title {
+			border: 1px outset #ddd;
+			border-bottom: 0 none;
+		}
+
 			#menubar .menu .options {
-				background: #111;
+				border: 1px outset #ddd;
 			}
 
 				#menubar .menu .options hr {
