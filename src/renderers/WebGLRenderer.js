@@ -2390,7 +2390,7 @@ class WebGLRenderer {
 
 		};
 
-		this.readRenderTargetPixelsAsync = async function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex, options ) {
+		this.readRenderTargetPixelsAsync = async function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex ) {
 
 			return new Promise( ( resolve, reject ) => {
 
@@ -2441,47 +2441,30 @@ class WebGLRenderer {
 
 						if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
-							const asyncOptions = options || {};
-
-							const glBuffer = ( asyncOptions.glBuffer != undefined ) ? asyncOptions.glBuffer : _gl.createBuffer();
-							const byteOffset = ( asyncOptions.byteOffset != undefined ) ? asyncOptions.byteOffset : 0;
-							const interval = ( asyncOptions.interval != undefined ) ? asyncOptions.interval : 8;
-							const shouldSync = ( asyncOptions.sync != undefined ) ? asyncOptions.sync : true;
-							const shouldReadback = ( asyncOptions.readback != undefined ) ? asyncOptions.readback : true;
-
+							const interval = 8;
+							const glBuffer = _gl.createBuffer();
 							_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
+							_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
 
-							if ( ! asyncOptions.glBuffer )
-								_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
+							_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
+							// _gl.flush();
 
-							_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), byteOffset );
-							_gl.flush();
+							const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
+							probeAsync( _gl, sync, interval ).then( () => {
 
-							if ( shouldSync ) {
+								this.readbackPixels( glBuffer, buffer );
+								resolve( buffer );
 
-								const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
+							} ).finally( () => {
 
-								probeAsync( _gl, sync, interval ).then( () => {
+								_gl.deleteBuffer( glBuffer );
+								_gl.deleteSync( sync );
 
-									if ( shouldReadback )
-										this.readbackPixels( glBuffer, buffer );
+							} ).catch( () => {
 
-									resolve( buffer || true );
+								reject();
 
-								} ).finally( () => {
-
-									if ( ! asyncOptions.glBuffer )
-										_gl.deleteBuffer( glBuffer );
-
-									_gl.deleteSync( sync );
-
-								} ).catch( () => reject() );
-
-							} else {
-
-								resolve( false );
-
-							}
+							} );
 
 						}
 
