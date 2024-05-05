@@ -88,28 +88,30 @@ function warnOnce( message ) {
 
 }
 
-async function probeAsync( gl, sync, interval ) {
+function probeAsync( gl, sync, interval ) {
 
-	return new Promise( function ( resolveProbe, rejectProbe ) {
+	return new Promise( function ( resolve, reject ) {
 
 		function probe() {
 
 			switch ( gl.clientWaitSync( sync, gl.SYNC_FLUSH_COMMANDS_BIT, 0 ) ) {
 
 				case gl.WAIT_FAILED:
-					rejectProbe(); break;
+					reject();
+					break;
 
 				case gl.TIMEOUT_EXPIRED:
-					setTimeout( probe, interval ); break;
+					setTimeout( probe, interval );
+					break;
 
 				default:
-					resolveProbe();
+					resolve();
 
 			}
 
 		}
 
-		setTimeout( probe );
+		setTimeout( probe, interval );
 
 	} );
 
