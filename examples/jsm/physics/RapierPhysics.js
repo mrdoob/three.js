@@ -396,7 +396,20 @@ export class Physic {
 	removeFromWorld(object) {
 		for (let i = 0; i < this.dynamicObjects.length; i++) {
 			const dynamicObject = this.dynamicObjects[i];
-			if (dynamicObject.id === object.id) {
+			/** @type PhysicProperties */
+			const dynamicObjectProps = this.dynamicObjectMap.get(dynamicObject);
+
+			if (dynamicObject.id === object.id && dynamicObjectProps) {
+				if (object instanceof InstancedMesh)
+					dynamicObjectProps.map((props) => {
+						this.world.removeRigidBody(props.rigidBody);
+						this.world.removeCollider(props.collider, true);
+					});
+				else {
+					this.world.removeRigidBody(dynamicObjectProps.rigidBody);
+					this.world.removeCollider(dynamicObjectProps.collider, true);
+				}
+
 				this.dynamicObjectMap.delete(dynamicObject);
 				this.dynamicObjects.splice(i, 1);
 				return;
