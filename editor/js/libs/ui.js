@@ -110,6 +110,18 @@ class UIElement {
 
 	}
 
+	setHidden( isHidden ) {
+
+		this.dom.hidden = isHidden;
+
+	}
+
+	isHidden() {
+
+		return this.dom.hidden;
+
+	}
+
 	setDisabled( value ) {
 
 		this.dom.disabled = value;

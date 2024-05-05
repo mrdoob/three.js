@@ -9,7 +9,7 @@ import { SidebarGeometryModifiers } from './Sidebar.Geometry.Modifiers.js';
 
 import { VertexNormalsHelper } from 'three/addons/helpers/VertexNormalsHelper.js';
 
-function SidebarGeometry( editor ) {
+function SidebarGeometry( editor, toggleParentTab ) {
 
 	const strings = editor.strings;
 
@@ -17,7 +17,6 @@ function SidebarGeometry( editor ) {
 
 	const container = new UIPanel();
 	container.setBorderTop( '0' );
-	container.setDisplay( 'none' );
 	container.setPaddingTop( '20px' );
 
 	let currentGeometryType = null;
@@ -211,7 +210,7 @@ function SidebarGeometry( editor ) {
 
 			const geometry = object.geometry;
 
-			container.setDisplay( 'block' );
+			toggleParentTab( true );
 
 			geometryType.setValue( geometry.type );
 
@@ -253,7 +252,7 @@ function SidebarGeometry( editor ) {
 
 		} else {
 
-			container.setDisplay( 'none' );
+			toggleParentTab( false );
 
 		}
 

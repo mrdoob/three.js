@@ -4,7 +4,7 @@ import { AddScriptCommand } from './commands/AddScriptCommand.js';
 import { SetScriptValueCommand } from './commands/SetScriptValueCommand.js';
 import { RemoveScriptCommand } from './commands/RemoveScriptCommand.js';
 
-function SidebarScript( editor ) {
+function SidebarScript( editor, toggleParentTab ) {
 
 	const strings = editor.strings;
 
@@ -13,7 +13,6 @@ function SidebarScript( editor ) {
 	const container = new UIPanel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
-	container.setDisplay( 'none' );
 
 	//
 
@@ -106,13 +105,13 @@ function SidebarScript( editor ) {
 
 		if ( object !== null && editor.camera !== object ) {
 
-			container.setDisplay( 'block' );
+			toggleParentTab( true );
 
 			update();
 
 		} else {
 
-			container.setDisplay( 'none' );
+			toggleParentTab( false );
 
 		}
 

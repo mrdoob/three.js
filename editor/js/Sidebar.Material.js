@@ -13,7 +13,7 @@ import { SidebarMaterialNumberProperty } from './Sidebar.Material.NumberProperty
 import { SidebarMaterialRangeValueProperty } from './Sidebar.Material.RangeValueProperty.js';
 import { SidebarMaterialProgram } from './Sidebar.Material.Program.js';
 
-function SidebarMaterial( editor ) {
+function SidebarMaterial( editor, toggleParentTab ) {
 
 	const signals = editor.signals;
 	const strings = editor.strings;
@@ -24,7 +24,6 @@ function SidebarMaterial( editor ) {
 
 	const container = new UIPanel();
 	container.setBorderTop( '0' );
-	container.setDisplay( 'none' );
 	container.setPaddingTop( '20px' );
 
 	// Current material slot
@@ -644,12 +643,12 @@ function SidebarMaterial( editor ) {
 
 			currentObject = object;
 			refreshUI();
-			container.setDisplay( '' );
+			toggleParentTab( true );
 
 		} else {
 
 			currentObject = null;
-			container.setDisplay( 'none' );
+			toggleParentTab( false );
 
 		}
 
