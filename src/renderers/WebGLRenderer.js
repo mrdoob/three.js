@@ -2392,94 +2392,91 @@ class WebGLRenderer {
 
 		this.readRenderTargetPixelsAsync = async function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex ) {
 
-			return new Promise( ( resolve, reject ) => {
+			if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
 
-				if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
+				console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
+				// reject();
+				throw new Error();
 
-					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
-					reject();
+			}
 
-				}
+			let framebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
-				let framebuffer = properties.get( renderTarget ).__webglFramebuffer;
+			if ( renderTarget.isWebGLCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
 
-				if ( renderTarget.isWebGLCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
+				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
-					framebuffer = framebuffer[ activeCubeFaceIndex ];
+			}
 
-				}
+			if ( framebuffer ) {
 
-				if ( framebuffer ) {
+				state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
-					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+				try {
 
-					try {
+					const texture = renderTarget.texture;
+					const textureFormat = texture.format;
+					const textureType = texture.type;
 
-						const texture = renderTarget.texture;
-						const textureFormat = texture.format;
-						const textureType = texture.type;
+					if ( textureFormat !== RGBAFormat && utils.convert( textureFormat ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
 
-						if ( textureFormat !== RGBAFormat && utils.convert( textureFormat ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
-
-							console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
-							reject();
-
-						}
-
-						const halfFloatSupportedByExt = ( textureType === HalfFloatType ) && ( extensions.has( 'EXT_color_buffer_half_float' ) || ( capabilities.isWebGL2 && extensions.has( 'EXT_color_buffer_float' ) ) );
-
-						if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // Edge and Chrome Mac < 52 (#9513)
-							! ( textureType === FloatType && ( capabilities.isWebGL2 || extensions.has( 'OES_texture_float' ) || extensions.has( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
-							! halfFloatSupportedByExt ) {
-
-							console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
-							reject();
-
-						}
-
-						// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
-
-						if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
-
-							const interval = 8;
-							const glBuffer = _gl.createBuffer();
-							_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
-							_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
-
-							_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
-							// _gl.flush();
-
-							const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
-							probeAsync( _gl, sync, interval ).then( () => {
-
-								this.readbackPixels( glBuffer, buffer );
-								resolve( buffer );
-
-							} ).finally( () => {
-
-								_gl.deleteBuffer( glBuffer );
-								_gl.deleteSync( sync );
-
-							} ).catch( () => {
-
-								reject();
-
-							} );
-
-						}
-
-					} finally {
-
-						// restore framebuffer of current render target if necessary
-
-						const framebuffer = ( _currentRenderTarget !== null ) ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
-						state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+						console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
+						// reject();
+						throw new Error();
 
 					}
 
+					const halfFloatSupportedByExt = ( textureType === HalfFloatType ) && ( extensions.has( 'EXT_color_buffer_half_float' ) || ( capabilities.isWebGL2 && extensions.has( 'EXT_color_buffer_float' ) ) );
+
+					if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // Edge and Chrome Mac < 52 (#9513)
+						! ( textureType === FloatType && ( capabilities.isWebGL2 || extensions.has( 'OES_texture_float' ) || extensions.has( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
+						! halfFloatSupportedByExt ) {
+
+						console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
+						// reject();
+						throw new Error();
+
+					}
+
+					// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
+					if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
+
+						const interval = 8;
+						const glBuffer = _gl.createBuffer();
+						_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
+						_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
+
+						_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
+						// _gl.flush();
+
+						const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
+						await probeAsync( _gl, sync, interval )
+
+						try {
+
+							this.readbackPixels( glBuffer, buffer );
+
+						} finally {
+
+							_gl.deleteBuffer( glBuffer );
+							_gl.deleteSync( sync );
+
+						}
+
+						return buffer;
+
+					}
+
+				} finally {
+
+					// restore framebuffer of current render target if necessary
+
+					const framebuffer = ( _currentRenderTarget !== null ) ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+
 				}
 
-			} );
+			}
 
 		};
 
