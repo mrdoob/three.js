@@ -88,4 +88,31 @@ function warnOnce( message ) {
 
 }
 
-export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, createCanvasElement, warnOnce };
+async function probeAsync( gl, sync, interval ) {
+
+	return new Promise( function ( resolveProbe, rejectProbe ) {
+
+		function probe() {
+
+			switch ( gl.clientWaitSync( sync, gl.SYNC_FLUSH_COMMANDS_BIT, 0 ) ) {
+
+				case gl.WAIT_FAILED:
+					rejectProbe(); break;
+
+				case gl.TIMEOUT_EXPIRED:
+					setTimeout( probe, interval ); break;
+
+				default:
+					resolveProbe();
+
+			}
+
+		}
+
+		setTimeout( probe );
+
+	} );
+
+}
+
+export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, createCanvasElement, warnOnce, probeAsync };

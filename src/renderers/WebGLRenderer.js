@@ -19,7 +19,9 @@ import {
 	UnsignedShort5551Type,
 	WebGLCoordinateSystem,
 	DisplayP3ColorSpace,
-	LinearDisplayP3ColorSpace
+	LinearDisplayP3ColorSpace,
+	RGBAFormat,
+	FloatType
 } from '../constants.js';
 import { Color } from '../math/Color.js';
 import { Frustum } from '../math/Frustum.js';
@@ -54,7 +56,7 @@ import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
-import { createCanvasElement } from '../utils.js';
+import { createCanvasElement, probeAsync } from '../utils.js';
 import { ColorManagement } from '../math/ColorManagement.js';
 
 class WebGLRenderer {
@@ -2354,6 +2356,147 @@ class WebGLRenderer {
 				}
 
 			}
+
+		};
+
+		this.createReadbackBuffer = function ( byteLength ) {
+
+			const glBuffer = _gl.createBuffer();
+
+			_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
+			_gl.bufferData( _gl.PIXEL_PACK_BUFFER, byteLength, _gl.STREAM_READ );
+
+			return glBuffer;
+
+		};
+
+		this.readbackPixels = function ( glBuffer, typedarray ) {
+
+			_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
+			_gl.getBufferSubData( _gl.PIXEL_PACK_BUFFER, 0, typedarray );
+
+		};
+
+		this.disposeReadbackBuffer = function ( glBuffer ) {
+
+			if ( ! glBuffer || ! Number.isInteger( glBuffer ) ) {
+
+				console.error( 'THREE.WebGLRenderer.disposePixelBuffer: invalid glBuffer.' );
+				return;
+
+			}
+
+			_gl.deleteBuffer( glBuffer );
+
+		};
+
+		this.readRenderTargetPixelsAsync = async function ( renderTarget, x, y, width, height, buffer, activeCubeFaceIndex, options ) {
+
+			return new Promise( ( resolve, reject ) => {
+
+				if ( ! ( renderTarget && renderTarget.isWebGLRenderTarget ) ) {
+
+					console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not THREE.WebGLRenderTarget.' );
+					reject();
+
+				}
+
+				let framebuffer = properties.get( renderTarget ).__webglFramebuffer;
+
+				if ( renderTarget.isWebGLCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
+
+					framebuffer = framebuffer[ activeCubeFaceIndex ];
+
+				}
+
+				if ( framebuffer ) {
+
+					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+
+					try {
+
+						const texture = renderTarget.texture;
+						const textureFormat = texture.format;
+						const textureType = texture.type;
+
+						if ( textureFormat !== RGBAFormat && utils.convert( textureFormat ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
+
+							console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in RGBA or implementation defined format.' );
+							reject();
+
+						}
+
+						const halfFloatSupportedByExt = ( textureType === HalfFloatType ) && ( extensions.has( 'EXT_color_buffer_half_float' ) || ( capabilities.isWebGL2 && extensions.has( 'EXT_color_buffer_float' ) ) );
+
+						if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== _gl.getParameter( _gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // Edge and Chrome Mac < 52 (#9513)
+							! ( textureType === FloatType && ( capabilities.isWebGL2 || extensions.has( 'OES_texture_float' ) || extensions.has( 'WEBGL_color_buffer_float' ) ) ) && // Chrome Mac >= 52 and Firefox
+							! halfFloatSupportedByExt ) {
+
+							console.error( 'THREE.WebGLRenderer.readRenderTargetPixels: renderTarget is not in UnsignedByteType or implementation defined type.' );
+							reject();
+
+						}
+
+						// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
+
+						if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
+
+							const asyncOptions = options || {};
+
+							const glBuffer = ( asyncOptions.glBuffer != undefined ) ? asyncOptions.glBuffer : _gl.createBuffer();
+							const byteOffset = ( asyncOptions.byteOffset != undefined ) ? asyncOptions.byteOffset : 0;
+							const interval = ( asyncOptions.interval != undefined ) ? asyncOptions.interval : 8;
+							const shouldSync = ( asyncOptions.sync != undefined ) ? asyncOptions.sync : true;
+							const shouldReadback = ( asyncOptions.readback != undefined ) ? asyncOptions.readback : true;
+
+							_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
+
+							if ( ! asyncOptions.glBuffer )
+								_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
+
+							_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), byteOffset );
+							_gl.flush();
+
+							if ( shouldSync ) {
+
+								const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
+
+								probeAsync( _gl, sync, interval ).then( () => {
+
+									if ( shouldReadback )
+										this.readbackPixels( glBuffer, buffer );
+
+									resolve( buffer || true );
+
+								} ).finally( () => {
+
+									if ( ! asyncOptions.glBuffer )
+										_gl.deleteBuffer( glBuffer );
+
+									_gl.deleteSync( sync );
+
+								} ).catch( () => reject() );
+
+							} else {
+
+								resolve( false );
+
+							}
+
+						}
+
+					} finally {
+
+						// restore framebuffer of current render target if necessary
+
+						const framebuffer = ( _currentRenderTarget !== null ) ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+						state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+
+					}
+
+				}
+
+			} );
 
 		};
 
