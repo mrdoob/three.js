@@ -1,7 +1,6 @@
 import { Matrix3, Plane, Vector4 } from 'three';
 
 const _plane = new Plane();
-const _viewNormalMatrix = new Matrix3();
 
 let _clippingContextVersion = 0;
 
@@ -20,6 +19,7 @@ class ClippingContext {
 		this.planes = [];
 
 		this.parentVersion = 0;
+		this.viewNormalMatrix = new Matrix3();
 
 	}
 
@@ -30,7 +30,7 @@ class ClippingContext {
 
 		for ( let i = 0; i < l; i ++ ) {
 
-			_plane.copy( source[ i ] ).applyMatrix4( this.viewMatrix, _viewNormalMatrix );
+			_plane.copy( source[ i ] ).applyMatrix4( this.viewMatrix, this.viewNormalMatrix );
 
 			const v = planes[ offset + i ];
 			const normal = _plane.normal;
@@ -49,7 +49,7 @@ class ClippingContext {
 		const rendererClippingPlanes = renderer.clippingPlanes;
 		this.viewMatrix = camera.matrixWorldInverse;
 
-		_viewNormalMatrix.getNormalMatrix( this.viewMatrix );
+		this.viewNormalMatrix.getNormalMatrix( this.viewMatrix );
 
 		let update = false;
 
@@ -106,7 +106,7 @@ class ClippingContext {
 			this.planes = Array.from( parent.planes );
 			this.parentVersion = parent.version;
 			this.viewMatrix = parent.viewMatrix;
-
+			this.viewNormalMatrix = parent.viewNormalMatrix;
 
 			update = true;
 
