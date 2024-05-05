@@ -2395,6 +2395,13 @@ class WebGLRenderer {
 			const glFormat = utils.convert( dstTexture.format );
 			const glType = utils.convert( dstTexture.type );
 
+			if ( dstTexture.isRenderTarget ) {
+
+				this.initTexture( dstTexture );
+				dstTexture = dstTexture.texture;
+
+			}
+
 			textures.setTexture2D( dstTexture, 0 );
 
 			// As another texture upload may have changed pixelStorei
@@ -2455,6 +2462,13 @@ class WebGLRenderer {
 			const glFormat = utils.convert( dstTexture.format );
 			const glType = utils.convert( dstTexture.type );
 			let glTarget;
+
+			if ( dstTexture.isRenderTarget ) {
+
+				this.initTexture( dstTexture );
+				dstTexture = dstTexture.texture;
+
+			}
 
 			if ( dstTexture.isData3DTexture ) {
 
@@ -2524,7 +2538,15 @@ class WebGLRenderer {
 
 		this.initTexture = function ( texture ) {
 
-			if ( texture.isCubeTexture ) {
+			if ( texture.isRenderTarget ) {
+
+				if ( properties.get( texture ).__webglFramebuffer === undefined ) {
+
+					textures.setupRenderTarget( texture );
+
+				}
+
+			} else if ( texture.isCubeTexture ) {
 
 				textures.setTextureCube( texture, 0 );
 
