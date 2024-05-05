@@ -2402,15 +2402,16 @@ class WebGLRenderer {
 					// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
 					if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
-						const interval = 8;
 						const glBuffer = _gl.createBuffer();
 						_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
 						_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
 						_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
+						// TODO: is this needed?
 						// _gl.flush();
 
+						// check if the commands have finished every 8 ms
 						const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
-						await probeAsync( _gl, sync, interval );
+						await probeAsync( _gl, sync, 8 );
 
 						try {
 
