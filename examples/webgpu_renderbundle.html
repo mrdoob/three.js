@@ -42,7 +42,6 @@
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-		import { MeshNormalNodeMaterial } from 'three/nodes';
 
 		let camera, scene, renderer;
 		let controls, stats;
@@ -110,17 +109,8 @@
 
 		}
 
-		function createMaterial() {
 
-			if ( ! material ) {
 
-				material = new MeshNormalNodeMaterial();
-
-			}
-
-			return material;
-
-		}
 
 		function cleanup() {
 
@@ -149,16 +139,24 @@
 		function initRegularMesh() {
 
 			group = new THREE.Group();
-			const material = createMaterial();
 
 			for ( let i = 0; i < api.count; i ++ ) {
+
+				const material = new THREE.MeshPhysicalMaterial( {
+					color: new THREE.Color( Math.random() * 0xffffff ),
+					roughness: Math.random(),
+					metalness: Math.random(),
+					clearcoatRoughness: Math.random(),
+					reflectivity: Math.random(),
+					specularIntensity: Math.random(),
+				} );
 
 				const child = new THREE.Mesh( geometries[ i % geometries.length ], material );
 				randomizeMatrix( child.matrix );
 				child.matrix.decompose( child.position, child.quaternion, child.scale );
 				child.userData.rotationSpeed = randomizeRotationSpeed( new THREE.Euler() );
 				child.frustumCulled = false;
-				// child.matrixAutoUpdate = false;
+				child.matrixAutoUpdate = false;
 				group.add( child );
 
 			}
@@ -208,6 +206,9 @@
 				scene.background = new THREE.Color( 0x333333 );
 
 			}
+
+	const light = new THREE.DirectionalLight( 0xffffff, 2.4 );
+	scene.add( light );
 
 			document.body.appendChild( renderer.domElement );
 

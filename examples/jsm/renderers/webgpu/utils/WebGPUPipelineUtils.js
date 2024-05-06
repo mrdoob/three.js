@@ -199,6 +199,7 @@ class WebGPUPipelineUtils {
 
 		const bundleEncoder = device.createRenderBundleEncoder( descriptor );
 
+		renderObjectData.bundleEncoder = bundleEncoder;
 		renderContextData.currentSets = { attributes: {} };
 		renderContextData._renderBundleViewport = renderContext.width + '_' + renderContext.height;
 
