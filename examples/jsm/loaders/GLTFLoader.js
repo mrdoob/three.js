@@ -1,6 +1,7 @@
 import {
 	AnimationClip,
 	Bone,
+	BoneIndexWeightsTextureAllow,
 	Box3,
 	BufferAttribute,
 	BufferGeometry,
@@ -69,9 +70,12 @@ import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
 
 class GLTFLoader extends Loader {
 
-	constructor( manager ) {
+	constructor( manager, options = {} ) {
 
 		super( manager );
+
+		this.useBoneIndexWeightsTexture =
+			options.useBoneIndexWeightsTexture ?? BoneIndexWeightsTextureAllow;
 
 		this.dracoLoader = null;
 		this.ktx2Loader = null;
@@ -371,7 +375,8 @@ class GLTFLoader extends Loader {
 			requestHeader: this.requestHeader,
 			manager: this.manager,
 			ktx2Loader: this.ktx2Loader,
-			meshoptDecoder: this.meshoptDecoder
+			meshoptDecoder: this.meshoptDecoder,
+			useBoneIndexWeightsTexture: this.useBoneIndexWeightsTexture
 
 		} );
 
@@ -1952,7 +1957,7 @@ class GLTFDracoMeshCompressionExtension {
 
 		for ( const attributeName in gltfAttributeMap ) {
 
-			const threeAttributeName = ATTRIBUTES[ attributeName ] || attributeName.toLowerCase();
+			const threeAttributeName = getThreeAttributeName( attributeName );
 
 			threeAttributeMap[ threeAttributeName ] = gltfAttributeMap[ attributeName ];
 
@@ -1960,7 +1965,7 @@ class GLTFDracoMeshCompressionExtension {
 
 		for ( const attributeName in primitive.attributes ) {
 
-			const threeAttributeName = ATTRIBUTES[ attributeName ] || attributeName.toLowerCase();
+			const threeAttributeName = getThreeAttributeName( attributeName );
 
 			if ( gltfAttributeMap[ attributeName ] !== undefined ) {
 
@@ -2239,8 +2244,6 @@ const ATTRIBUTES = {
 	TEXCOORD_2: 'uv2',
 	TEXCOORD_3: 'uv3',
 	COLOR_0: 'color',
-	WEIGHTS_0: 'skinWeight',
-	JOINTS_0: 'skinIndex',
 };
 
 const PATH_PROPERTIES = {
@@ -2262,6 +2265,28 @@ const ALPHA_MODES = {
 	MASK: 'MASK',
 	BLEND: 'BLEND'
 };
+
+function getThreeAttributeName( gltfAttributeName ) {
+
+	if ( ATTRIBUTES[ gltfAttributeName ] !== undefined) {
+
+		return ATTRIBUTES[ gltfAttributeName ];
+
+	} else if ( gltfAttributeName.startsWith( 'JOINTS_' ) ) {
+
+		const index = gltfAttributeName.substring(7);
+		return 'skinIndex' + ( index === '0' ? '' : index );
+
+	} else if ( gltfAttributeName.startsWith( 'WEIGHTS_' ) ) {
+
+		const index = gltfAttributeName.substring(8);
+		return 'skinWeight' + ( index === '0' ? '' : index );
+
+	}
+
+	return gltfAttributeName.toLowerCase();
+
+}
 
 /**
  * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#default-material
@@ -3790,15 +3815,10 @@ class GLTFParser {
 
 					// .isSkinnedMesh isn't in glTF spec. See ._markDefs()
 					mesh = meshDef.isSkinnedMesh === true
-						? new SkinnedMesh( geometry, material )
+						? new SkinnedMesh( geometry, material, {
+								useBoneIndexWeightsTexture: parser.options.useBoneIndexWeightsTexture
+						} )
 						: new Mesh( geometry, material );
-
-					if ( mesh.isSkinnedMesh === true ) {
-
-						// normalize skin weights to fix malformed assets (see #15319)
-						mesh.normalizeSkinWeights();
-
-					}
 
 					if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
 
@@ -4680,7 +4700,7 @@ function addPrimitiveAttributes( geometry, primitiveDef, parser ) {
 
 	for ( const gltfAttributeName in attributes ) {
 
-		const threeAttributeName = ATTRIBUTES[ gltfAttributeName ] || gltfAttributeName.toLowerCase();
+		const threeAttributeName = getThreeAttributeName( gltfAttributeName );
 
 		// Skip attributes already provided by e.g. Draco extension.
 		if ( threeAttributeName in geometry.attributes ) continue;

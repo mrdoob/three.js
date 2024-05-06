@@ -83,12 +83,13 @@
 
 		<h2>Constructor</h2>
 		<h3>
-			[name]( [param:BufferGeometry geometry], [param:Material material] )
+			[name]( [param:BufferGeometry geometry], [param:Material material], [param:Constant useBoneIndexWeightsTexture] )
 		</h3>
 		<p>
 			[page:BufferGeometry geometry] - an instance of [page:BufferGeometry].<br />
 			[page:Material material] - (optional) an instance of [page:Material].
 			Default is a new [page:MeshBasicMaterial].
+			[page:Constant useBoneIndexWeightsTexture] — (optional) Controls whether or not a bone weights texture will be created and used instead of a vertex buffer for skinning. Defaults to [page:Loaders THREE.BoneIndexWeightsTextureAllow].
 		</p>
 
 		<h2>Properties</h2>

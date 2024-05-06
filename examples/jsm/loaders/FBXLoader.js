@@ -68,9 +68,10 @@ let sceneGraph;
 
 class FBXLoader extends Loader {
 
-	constructor( manager ) {
+	constructor( manager, options = {} ) {
 
 		super( manager );
+		this.options = options;
 
 	}
 
@@ -142,7 +143,7 @@ class FBXLoader extends Loader {
 
 		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-		return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
+		return new FBXTreeParser( textureLoader, this.manager, this.options ).parse( fbxTree );
 
 	}
 
@@ -151,10 +152,11 @@ class FBXLoader extends Loader {
 // Parse the FBXTree object returned by the BinaryParser or TextParser and return a Group
 class FBXTreeParser {
 
-	constructor( textureLoader, manager ) {
+	constructor( textureLoader, manager, options = {} ) {
 
 		this.textureLoader = textureLoader;
 		this.manager = manager;
+		this.options = options;
 
 	}
 
@@ -1310,8 +1312,9 @@ class FBXTreeParser {
 
 		if ( geometry.FBX_Deformer ) {
 
-			model = new SkinnedMesh( geometry, material );
-			model.normalizeSkinWeights();
+			model = new SkinnedMesh( geometry, material, {
+				useBoneIndexWeightsTexture: this.options.useBoneIndexWeightsTexture
+			} );
 
 		} else {
 

@@ -68,9 +68,13 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<h3>[name]( [param:LoadingManager manager], [param:Object options] )</h3>
 		<p>
 		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		[page:Object options] — (optional) Change loading behavior. Properties:<br/>
+		<ul>
+			<li>useBoneIndexWeightsTexture — (optional) Controls whether or not a [page:SkinnedMesh SkinnedMesh] will create and use a bone weights texture instead of a vertex buffer. Defaults to [page:Loaders THREE.BoneIndexWeightsTextureAllow].</li>
+		</ul>
 		</p>
 		<p>
 		Creates a new [name].

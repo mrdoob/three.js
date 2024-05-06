@@ -156,6 +156,10 @@ export const RGBADepthPacking = 3201;
 export const TangentSpaceNormalMap = 0;
 export const ObjectSpaceNormalMap = 1;
 
+export const BoneIndexWeightsTextureNever = 0;
+export const BoneIndexWeightsTextureAlways = 1;
+export const BoneIndexWeightsTextureAllow = 2;
+
 // Color space string identifiers, matching CSS Color Module Level 4 and WebGPU names where available.
 export const NoColorSpace = '';
 export const SRGBColorSpace = 'srgb';

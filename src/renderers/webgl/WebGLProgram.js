@@ -614,6 +614,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
 			parameters.skinning ? '#define USE_SKINNING' : '',
+			parameters.skinWeightsTexture ? '#define USE_BONE_WEIGHTS_TEX' : '',
 
 			parameters.morphTargets ? '#define USE_MORPHTARGETS' : '',
 			parameters.morphNormals && parameters.flatShading === false ? '#define USE_MORPHNORMALS' : '',
@@ -726,8 +727,16 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			'#ifdef USE_SKINNING',
 
-			'	attribute vec4 skinIndex;',
-			'	attribute vec4 skinWeight;',
+			'	#ifdef USE_BONE_WEIGHTS_TEX',
+
+			'		attribute int bonePairTexStartIndex;',
+
+			'	#else',
+
+			'		attribute vec4 skinIndex;',
+			'		attribute vec4 skinWeight;',
+
+			'	#endif',
 
 			'#endif',
 

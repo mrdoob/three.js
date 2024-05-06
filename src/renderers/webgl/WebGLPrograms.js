@@ -1,4 +1,4 @@
-import { BackSide, DoubleSide, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, NormalBlending, LinearSRGBColorSpace, SRGBTransfer } from '../../constants.js';
+import { BackSide, BoneIndexWeightsTextureAllow, BoneIndexWeightsTextureAlways, DoubleSide, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, NormalBlending, LinearSRGBColorSpace, SRGBTransfer } from '../../constants.js';
 import { Layers } from '../../core/Layers.js';
 import { WebGLProgram } from './WebGLProgram.js';
 import { WebGLShaderCache } from './WebGLShaderCache.js';
@@ -306,6 +306,14 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
 
 			skinning: object.isSkinnedMesh === true,
+			skinWeightsTexture: object.isSkinnedMesh === true
+				&& (
+					object.useBoneIndexWeightsTexture === BoneIndexWeightsTextureAlways
+					|| (
+						object.useBoneIndexWeightsTexture === BoneIndexWeightsTextureAllow
+						&& object.boneIndexWeightsTexture !== null
+					)
+				),
 
 			morphTargets: geometry.morphAttributes.position !== undefined,
 			morphNormals: geometry.morphAttributes.normal !== undefined,
@@ -461,6 +469,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.numClippingPlanes );
 		array.push( parameters.numClipIntersection );
 		array.push( parameters.depthPacking );
+		array.push( parameters.skinWeightsTexture );
 
 	}
 
