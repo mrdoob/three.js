@@ -128,7 +128,7 @@ class Bindings extends DataMap {
 
 				if ( updated ) {
 
-					this.textures.updateTexture( binding.texture );
+					backend.updateBinding( binding );
 
 				}
 
@@ -136,13 +136,13 @@ class Bindings extends DataMap {
 
 				const texture = binding.texture;
 
-				if ( binding.needsBindingsUpdate ) needsBindingsUpdate = true;
-
 				const updated = binding.update();
 
 				if ( updated ) {
 
 					this.textures.updateTexture( binding.texture );
+
+					needsBindingsUpdate = true;
 
 				}
 
