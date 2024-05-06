@@ -104,10 +104,7 @@
 
 					// perform copy from src to dest texture to a random position
 
-					box.min.set( 0, 0 );
-					box.max.set( dataTexture.image.width, dataTexture.image.height );
-
-					renderer.copyTextureToTexture( box, position, dataTexture, diffuseMap );
+					renderer.copyTextureToTexture( position, dataTexture, diffuseMap );
 
 				}
 
