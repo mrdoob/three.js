@@ -365,6 +365,8 @@ class MaterialCreator {
 
 			}
 
+			map.sourceFile = value; // for UITexture
+
 			params[ mapType ] = map;
 
 		}

@@ -858,6 +858,24 @@ function Loader( editor ) {
 
 		const zip = unzipSync( new Uint8Array( contents ) );
 
+		const manager = new THREE.LoadingManager();
+		manager.setURLModifier( function ( url ) {
+
+			const u8a = zip[ url ];
+
+			if ( u8a ) {
+
+				console.log( 'Loading', url );
+
+				const blob = new Blob( [ u8a ], { type: 'application/octet-stream' } );
+				return URL.createObjectURL( blob );
+
+			}
+
+			return url;
+
+		} );
+
 		// Poly
 
 		if ( zip[ 'model.obj' ] && zip[ 'materials.mtl' ] ) {
@@ -865,9 +883,11 @@ function Loader( editor ) {
 			const { MTLLoader } = await import( 'three/addons/loaders/MTLLoader.js' );
 			const { OBJLoader } = await import( 'three/addons/loaders/OBJLoader.js' );
 
-			const materials = new MTLLoader().parse( strFromU8( zip[ 'materials.mtl' ] ) );
-			const object = new OBJLoader().setMaterials( materials ).parse( strFromU8( zip[ 'model.obj' ] ) );
+			const materials = new MTLLoader( manager ).parse( strFromU8( zip[ 'materials.mtl' ] ) );
+			const object = new OBJLoader( manager ).setMaterials( materials ).parse( strFromU8( zip[ 'model.obj' ] ) );
+
 			editor.execute( new AddObjectCommand( editor, object ) );
+			return;
 
 		}
 
@@ -876,24 +896,6 @@ function Loader( editor ) {
 		for ( const path in zip ) {
 
 			const file = zip[ path ];
-
-			const manager = new THREE.LoadingManager();
-			manager.setURLModifier( function ( url ) {
-
-				const file = zip[ url ];
-
-				if ( file ) {
-
-					console.log( 'Loading', url );
-
-					const blob = new Blob( [ file.buffer ], { type: 'application/octet-stream' } );
-					return URL.createObjectURL( blob );
-
-				}
-
-				return url;
-
-			} );
 
 			const extension = path.split( '.' ).pop().toLowerCase();
 
