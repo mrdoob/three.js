@@ -570,7 +570,6 @@ class Renderer {
 
 
 
-		// const needsUpdate = this.backend.bundles !== undefined && this.backend.bundles.length > 0 ? false : true;
 		// TODO: Potentially do not reset bundles and prevent update of render objects
 		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
@@ -1385,6 +1384,8 @@ class Renderer {
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
 		renderObject.drawRange = group || object.geometry.drawRange;
 
+		const needsUpdate = scene.bundleType === 'static' && this.backend._renderBundles !== undefined && this.backend._renderBundles.length > 0 ? false : true;
+
 		//
 
 		this._nodes.updateBefore( renderObject );
@@ -1396,7 +1397,6 @@ class Renderer {
 
 		//
 
-		const needsUpdate = scene.bundleType === 'static' && this.backend.bundles !== undefined && this.backend.bundles.length > 0 ? false : true;
 
 		// TODO: Apply same logic in case of static scene
 		this._nodes.updateForRender( renderObject );

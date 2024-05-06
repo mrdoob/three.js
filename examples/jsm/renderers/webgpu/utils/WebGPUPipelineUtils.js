@@ -118,6 +118,7 @@ class WebGPUPipelineUtils {
 		}
 
 		const pipelineDescriptor = {
+			label: 'renderPipeline',
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
 			fragment: Object.assign( {}, fragmentModule, { targets } ),
 			primitive: primitiveState,
@@ -159,6 +160,32 @@ class WebGPUPipelineUtils {
 			promises.push( p );
 
 		}
+
+	}
+
+	createRenderBundleEncoder( renderContext ) {
+
+		const backend = this.backend;
+		const { utils, parameters, device } = backend;
+
+		const renderContextData = backend.get( renderContext );
+
+		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderContext );
+		const colorFormat = utils.getCurrentColorFormat( renderContext );
+
+		const descriptor = {
+			label: 'renderBundleEncoder',
+			colorFormats: [ colorFormat ],
+			depthStencilFormat,
+			sampleCount: parameters.sampleCount
+		};
+
+		const renderBundleEncoder = device.createRenderBundleEncoder( descriptor );
+
+		renderContextData.currentSets = { attributes: {} };
+		renderContextData._renderBundleViewport = renderContext.width + '_' + renderContext.height;
+
+		return renderBundleEncoder;
 
 	}
 

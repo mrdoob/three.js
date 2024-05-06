@@ -56,8 +56,6 @@ class WebGPUBackend extends Backend {
 		this.textureUtils = new WebGPUTextureUtils( this );
 		this.occludedResolveCache = new Map();
 
-		this.bundles = [];
-
 	}
 
 	async init( renderer ) {
@@ -299,7 +297,7 @@ class WebGPUBackend extends Backend {
 		const device = this.device;
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
-		this.bundles = [];
+		this._renderBundles = [];
 
 		let occlusionQuerySet;
 
@@ -458,9 +456,9 @@ class WebGPUBackend extends Backend {
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
 
-		if ( this.bundles.length > 0 ) {
+		if ( this._renderBundles.length > 0 ) {
 
-			renderContextData.currentPass.executeBundles( this.bundles );
+			renderContextData.currentPass.executeBundles( this._renderBundles );
 
 		}
 
@@ -817,23 +815,23 @@ class WebGPUBackend extends Backend {
 
 			if ( ! renderBundleNeedsUpdate ) {
 
-				this.bundles.push( renderBundle );
+				this._renderBundles.push( renderBundle );
 				return;
 
 			}
 
 		}
 
-		if ( this.bundles.length > 0 ) {
+		if ( this._renderBundles.length > 0 ) {
 
-			contextData.currentPass.executeBundles( this.bundles );
-			this.bundles = [];
+			contextData.currentPass.executeBundles( this._renderBundles );
+			this._renderBundles = [];
 
 		}
 
-		const passEncoderGPU = useRenderBundle ? this._createRenderBundleEncoder( context ) : contextData.currentPass;
-		// pipeline
+		const passEncoderGPU = useRenderBundle ? this.createRenderBundleEncoder( context ) : contextData.currentPass;
 
+		// pipeline
 
 		if ( currentSets.pipeline !== pipelineGPU ) {
 
@@ -1199,31 +1197,6 @@ class WebGPUBackend extends Backend {
 
 	// pipelines
 
-	_createRenderBundleEncoder( renderContext ) {
-
-		const renderContextData = this.get( renderContext );
-
-		const depthStencilFormat = this.utils.getCurrentDepthStencilFormat( renderContext );
-		const colorFormat = this.utils.getCurrentColorFormat( renderContext );
-
-		const descriptor = {
-			label: 'renderBundleEncoder',
-			colorFormats: [ colorFormat ],
-			depthStencilFormat,
-			sampleCount: this.parameters.sampleCount,
-			// depthReadOnly: false,
-			// stencilReadOnly: false
-		};
-
-		const renderBundleEncoder = this.device.createRenderBundleEncoder( descriptor );
-
-		renderContextData.currentSets = { attributes: {} };
-		renderContextData._renderBundleViewport = renderContext.width + '_' + renderContext.height;
-
-		return renderBundleEncoder;
-
-	}
-
 	createRenderPipeline( renderObject, promises ) {
 
 		this.pipelineUtils.createRenderPipeline( renderObject, promises );
@@ -1233,6 +1206,12 @@ class WebGPUBackend extends Backend {
 	createComputePipeline( computePipeline, bindings ) {
 
 		this.pipelineUtils.createComputePipeline( computePipeline, bindings );
+
+	}
+
+	createRenderBundleEncoder( renderContext ) {
+
+		return this.pipelineUtils.createRenderBundleEncoder( renderContext );
 
 	}
 
