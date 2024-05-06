@@ -88,7 +88,7 @@ class History {
 
 		if ( this.historyDisabled ) {
 
-			alert( 'Undo/Redo disabled while scene is playing.' );
+			alert( this.editor.strings.getKey( 'prompt/history/forbid' ) );
 			return;
 
 		}
@@ -123,7 +123,7 @@ class History {
 
 		if ( this.historyDisabled ) {
 
-			alert( 'Undo/Redo disabled while scene is playing.' );
+			alert( this.editor.strings.getKey( 'prompt/history/forbid' ) );
 			return;
 
 		}
@@ -241,7 +241,7 @@ class History {
 
 		if ( this.historyDisabled ) {
 
-			alert( 'Undo/Redo disabled while scene is playing.' );
+			alert( this.editor.strings.getKey( 'prompt/history/forbid' ) );
 			return;
 
 		}

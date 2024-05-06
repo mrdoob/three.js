@@ -15,7 +15,7 @@ class SetMaterialRangeCommand extends Command {
 		super( editor );
 
 		this.type = 'SetMaterialRangeCommand';
-		this.name = `Set Material.${attributeName}`;
+		this.name = editor.strings.getKey( 'command/SetMaterialRange' ) + ': ' + attributeName;
 		this.updatable = true;
 
 		this.object = object;

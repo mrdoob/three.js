@@ -17,7 +17,7 @@ class AddObjectCommand extends Command {
 		this.object = object;
 		if ( object !== undefined ) {
 
-			this.name = `Add Object: ${object.name}`;
+			this.name = editor.strings.getKey( 'command/AddObject' ) + ': ' + object.name;
 
 		}
 

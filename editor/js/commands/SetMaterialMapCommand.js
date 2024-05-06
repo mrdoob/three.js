@@ -15,7 +15,7 @@ class SetMaterialMapCommand extends Command {
 		super( editor );
 
 		this.type = 'SetMaterialMapCommand';
-		this.name = `Set Material.${mapName}`;
+		this.name = editor.strings.getKey( 'command/SetMaterialMap' ) + ': ' + mapName;
 
 		this.object = object;
 		this.materialSlot = materialSlot;

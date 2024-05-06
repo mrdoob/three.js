@@ -3,7 +3,7 @@
  * Copyright 2010-2024 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '164';
+const REVISION = '165dev';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -3076,6 +3076,20 @@ class DataArrayTexture extends Texture {
 		this.generateMipmaps = false;
 		this.flipY = false;
 		this.unpackAlignment = 1;
+
+		this.layerUpdates = new Set();
+
+	}
+
+	addLayerUpdate( layerIndex ) {
+
+		this.layerUpdates.add( layerIndex );
+
+	}
+
+	clearLayerUpdates() {
+
+		this.layerUpdates.clear();
 
 	}
 
@@ -17320,7 +17334,7 @@ function WebGLExtensions( gl ) {
 
 			if ( extension === null ) {
 
-				console.warn( 'THREE.WebGLRenderer: ' + name + ' extension not supported.' );
+				warnOnce( 'THREE.WebGLRenderer: ' + name + ' extension not supported.' );
 
 			}
 
@@ -24581,7 +24595,22 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 									if ( dataReady ) {
 
-										state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
+										if ( texture.layerUpdates.size > 0 ) {
+
+											for ( const layerIndex of texture.layerUpdates ) {
+
+												const layerSize = mipmap.width * mipmap.height;
+												state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, layerIndex, mipmap.width, mipmap.height, 1, glFormat, mipmap.data.slice( layerSize * layerIndex, layerSize * ( layerIndex + 1 ) ), 0, 0 );
+
+											}
+
+											texture.clearLayerUpdates();
+
+										} else {
+
+											state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
+
+										}
 
 									}
 
@@ -24687,7 +24716,72 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					if ( dataReady ) {
 
-						state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+						if ( texture.layerUpdates.size > 0 ) {
+
+							// When type is GL_UNSIGNED_BYTE, each of these bytes is
+							// interpreted as one color component, depending on format. When
+							// type is one of GL_UNSIGNED_SHORT_5_6_5,
+							// GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_5_5_5_1, each
+							// unsigned value is interpreted as containing all the components
+							// for a single pixel, with the color components arranged
+							// according to format.
+							//
+							// See https://registry.khronos.org/OpenGL-Refpages/es1.1/xhtml/glTexImage2D.xml
+							let texelSize;
+							switch ( glType ) {
+
+								case _gl.UNSIGNED_BYTE:
+									switch ( glFormat ) {
+
+										case _gl.ALPHA:
+											texelSize = 1;
+											break;
+										case _gl.LUMINANCE:
+											texelSize = 1;
+											break;
+										case _gl.LUMINANCE_ALPHA:
+											texelSize = 2;
+											break;
+										case _gl.RGB:
+											texelSize = 3;
+											break;
+										case _gl.RGBA:
+											texelSize = 4;
+											break;
+
+										default:
+											throw new Error( `Unknown texel size for format ${glFormat}.` );
+
+									}
+
+									break;
+
+								case _gl.UNSIGNED_SHORT_4_4_4_4:
+								case _gl.UNSIGNED_SHORT_5_5_5_1:
+								case _gl.UNSIGNED_SHORT_5_6_5:
+									texelSize = 1;
+									break;
+
+								default:
+									throw new Error( `Unknown texel size for type ${glType}.` );
+
+							}
+
+							const layerSize = image.width * image.height * texelSize;
+
+							for ( const layerIndex of texture.layerUpdates ) {
+
+								state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, 0, 0, 0, layerIndex, image.width, image.height, 1, glFormat, glType, image.data.slice( layerSize * layerIndex, layerSize * ( layerIndex + 1 ) ) );
+
+							}
+
+							texture.clearLayerUpdates();
+
+						} else {
+
+							state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+
+						}
 
 					}
 
@@ -34387,6 +34481,20 @@ class CompressedArrayTexture extends CompressedTexture {
 		this.image.depth = depth;
 		this.wrapR = ClampToEdgeWrapping;
 
+		this.layerUpdates = new Set();
+
+	}
+
+	addLayerUpdates( layerIndex ) {
+
+		this.layerUpdates.add( layerIndex );
+
+	}
+
+	clearLayerUpdates() {
+
+		this.layerUpdates.clear();
+
 	}
 
 }
@@ -43501,6 +43609,10 @@ class FileLoader extends Loader {
 
 									}
 
+								}, ( e ) => {
+
+									controller.error( e );
+
 								} );
 
 							}
@@ -50994,13 +51106,15 @@ function ascSort( a, b ) {
 
 function intersect( object, raycaster, intersects, recursive ) {
 
+	let stopTraversal = false;
+
 	if ( object.layers.test( raycaster.layers ) ) {
 
-		object.raycast( raycaster, intersects );
+		stopTraversal = object.raycast( raycaster, intersects );
 
 	}
 
-	if ( recursive === true ) {
+	if ( recursive === true && stopTraversal !== true ) {
 
 		const children = object.children;
 

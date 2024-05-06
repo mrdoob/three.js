@@ -14,7 +14,7 @@ class RemoveObjectCommand extends Command {
 		super( editor );
 
 		this.type = 'RemoveObjectCommand';
-		this.name = 'Remove Object';
+		this.name = editor.strings.getKey( 'command/RemoveObject' ) + ': ' + object.name;
 
 		this.object = object;
 		this.parent = ( object !== undefined ) ? object.parent : undefined;

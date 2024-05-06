@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { TGALoader } from 'three/addons/loaders/TGALoader.js';
+import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 
 import { UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
 import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
@@ -831,7 +832,7 @@ class UIBoolean extends UISpan {
 
 }
 
-let renderer;
+let renderer, fsQuad;
 
 function renderToCanvas( texture ) {
 
@@ -841,19 +842,18 @@ function renderToCanvas( texture ) {
 
 	}
 
+	if ( fsQuad === undefined ) {
+
+		fsQuad = new FullScreenQuad( new THREE.MeshBasicMaterial() );
+
+	}
+
 	const image = texture.image;
 
 	renderer.setSize( image.width, image.height, false );
 
-	const scene = new THREE.Scene();
-	const camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-
-	const material = new THREE.MeshBasicMaterial( { map: texture } );
-	const quad = new THREE.PlaneGeometry( 2, 2 );
-	const mesh = new THREE.Mesh( quad, material );
-	scene.add( mesh );
-
-	renderer.render( scene, camera );
+	fsQuad.material.map = texture;
+	fsQuad.render( renderer );
 
 	return renderer.domElement;
 

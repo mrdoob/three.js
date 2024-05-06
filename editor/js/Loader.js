@@ -70,7 +70,7 @@ function Loader( editor ) {
 		const reader = new FileReader();
 		reader.addEventListener( 'progress', function ( event ) {
 
-			const size = '(' + Math.floor( event.total / 1000 ).format() + ' KB)';
+			const size = '(' + editor.utils.formatNumber( Math.floor( event.total / 1000 ) ) + ' KB)';
 			const progress = Math.floor( ( event.loaded / event.total ) * 100 ) + '%';
 
 			console.log( 'Loading', filename, size, progress );
@@ -99,7 +99,7 @@ function Loader( editor ) {
 
 					}, function ( error ) {
 
-						console.error( error )
+						console.error( error );
 
 					} );
 
@@ -941,7 +941,7 @@ function Loader( editor ) {
 				{
 
 					const loader = await createGLTFLoader( manager );
-					
+
 					loader.parse( strFromU8( file ), '', function ( result ) {
 
 						const scene = result.scene;

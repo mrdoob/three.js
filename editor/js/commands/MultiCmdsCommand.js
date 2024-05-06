@@ -12,7 +12,7 @@ class MultiCmdsCommand extends Command {
 		super( editor );
 
 		this.type = 'MultiCmdsCommand';
-		this.name = 'Multiple Changes';
+		this.name = editor.strings.getKey( 'command/MultiCmds' );
 
 		this.cmdArray = ( cmdArray !== undefined ) ? cmdArray : [];
 

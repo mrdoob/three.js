@@ -15,7 +15,7 @@ class SetScriptValueCommand extends Command {
 		super( editor );
 
 		this.type = 'SetScriptValueCommand';
-		this.name = `Set Script.${attributeName}`;
+		this.name = editor.strings.getKey( 'command/SetScriptValue' ) + ': ' + attributeName;
 		this.updatable = true;
 
 		this.object = object;

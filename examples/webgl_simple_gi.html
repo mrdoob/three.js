@@ -154,7 +154,6 @@
 			let camera, scene, renderer;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -191,6 +190,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				new SimpleGI( renderer, scene );
@@ -213,8 +213,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				renderer.setRenderTarget( null );
 				renderer.render( scene, camera );

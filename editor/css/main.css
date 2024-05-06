@@ -308,7 +308,7 @@ select {
 	bottom: 0;
 }
 
-	#viewport #info {
+	#viewport .Text {
 		text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
 		pointer-events: none;
 	}
@@ -661,9 +661,12 @@ select {
 		}
 
 	.Outliner {
-		color: #888;
 		background: #222;
 	}
+
+		.Outliner .option {
+			color: #999;
+		}
 
 		.Outliner .option:hover {
 			background-color: rgba(21,60,94,0.5);

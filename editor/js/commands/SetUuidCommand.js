@@ -13,7 +13,7 @@ class SetUuidCommand extends Command {
 		super( editor );
 
 		this.type = 'SetUuidCommand';
-		this.name = 'Update UUID';
+		this.name = editor.strings.getKey( 'command/SetUuid' );
 
 		this.object = object;
 
