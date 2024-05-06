@@ -89,7 +89,7 @@ function ViewportControls( editor ) {
 
 		const selectedCamera = ( editor.viewportCamera.uuid in options )
 			? editor.viewportCamera
-			: Object.values( editor.cameras )[ 0 ];
+			: editor.camera;
 
 		cameraSelect.setValue( selectedCamera.uuid );
 		editor.setViewportCamera( selectedCamera.uuid );
