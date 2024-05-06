@@ -816,7 +816,6 @@ class WebGPUBackend extends Backend {
 		if ( this._renderBundles.length > 0 ) {
 
 			contextData.currentPass.executeBundles( this._renderBundles );
-			this._renderBundles = [];
 
 		}
 

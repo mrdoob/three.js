@@ -182,7 +182,7 @@ class WebGPUPipelineUtils {
 
 		if ( renderObjectData.bundleEncoder && renderContextData._renderBundleViewport === renderContext.width + '_' + renderContext.height ) {
 
-			return renderContextData.bundleEncoder;
+			return renderObjectData.bundleEncoder;
 
 		}
 
