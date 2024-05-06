@@ -2447,6 +2447,7 @@ class WebGLRenderer {
 
 		this.copyTextureToTexture3D = function ( position, srcTexture, dstTexture, level = 0, sourceBox = null ) {
 
+			// support previous signature with source box first
 			if ( position.isBox3 === true ) {
 
 				// @deprecated, r165
