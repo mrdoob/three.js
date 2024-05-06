@@ -200,7 +200,7 @@ class UITexture extends UISpan {
 
 			if ( image !== undefined && image !== null && image.width > 0 ) {
 
-				canvas.title = texture.sourceFile;
+				canvas.title = texture.sourceFile || texture.name;
 				const scale = canvas.width / image.width;
 
 				if ( texture.isDataTexture || texture.isCompressedTexture ) {
