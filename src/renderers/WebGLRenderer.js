@@ -2372,27 +2372,25 @@ class WebGLRenderer {
 
 		};
 
-		this.copyTextureToTexture = function ( sourceBox, position, srcTexture, dstTexture, level = 0 ) {
+		this.copyTextureToTexture = function ( position, srcTexture, dstTexture, level = 0, sourceBox = null ) {
 
-			if ( sourceBox.isBox2 !== true ) {
+			let width, height, minX, minY;
+			if ( sourceBox ) {
 
-				// @deprecated, r165
-				console.warn( 'WebGLRenderer: copyTextureToTexture function signature has changed.' );
+				width = sourceBox.max.x - sourceBox.min.x;
+				height = sourceBox.max.y - sourceBox.min.y;
+				minX = sourceBox.min.x;
+				minY = sourceBox.min.y;
 
-				position = arguments[ 0 ];
-				srcTexture = arguments[ 1 ];
-				dstTexture = arguments[ 2 ];
-				level = arguments[ 3 ];
+			} else {
 
-				const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ level ] : srcTexture.image;
-				sourceBox = new Box2();
-				sourceBox.min.set( 0, 0 );
-				sourceBox.max.set( image.width, image.height );
+				width = srcTexture.image.width;
+				height = srcTexture.image.height;
+				minX = 0;
+				minY = 0;
 
 			}
 
-			const width = sourceBox.max.x - sourceBox.min.x;
-			const height = sourceBox.max.y - sourceBox.min.y;
 			const glFormat = utils.convert( dstTexture.format );
 			const glType = utils.convert( dstTexture.type );
 
@@ -2414,8 +2412,8 @@ class WebGLRenderer {
 
 			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
 			_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, image.height );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, sourceBox.min.x );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, sourceBox.min.y );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, minX );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, minY );
 
 			if ( srcTexture.isDataTexture ) {
 
@@ -2448,11 +2446,43 @@ class WebGLRenderer {
 
 		};
 
-		this.copyTextureToTexture3D = function ( sourceBox, position, srcTexture, dstTexture, level = 0 ) {
+		this.copyTextureToTexture3D = function ( position, srcTexture, dstTexture, level = 0, sourceBox = null ) {
 
-			const width = sourceBox.max.x - sourceBox.min.x;
-			const height = sourceBox.max.y - sourceBox.min.y;
-			const depth = sourceBox.max.z - sourceBox.min.z;
+			if ( position.isBox3 === true ) {
+
+				// @deprecated, r165
+				console.warn( 'WebGLRenderer: copyTextureToTexture3D function signature has changed.' );
+
+				sourceBox = arguments[ 0 ];
+				position = arguments[ 1 ];
+				srcTexture = arguments[ 2 ];
+				dstTexture = arguments[ 3 ];
+				level = arguments[ 4 ] || 0;
+
+			}
+
+			let width, height, depth, minX, minY, minZ;
+			if ( sourceBox ) {
+
+				width = sourceBox.max.x - sourceBox.min.x;
+				height = sourceBox.max.y - sourceBox.min.y;
+				depth = sourceBox.max.z - sourceBox.min.z;
+				minX = sourceBox.min.x;
+				minY = sourceBox.min.y;
+				minZ = sourceBox.min.z;
+
+			} else {
+
+				const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ level ] : srcTexture.image;
+				width = image.width;
+				height = image.height;
+				depth = image.depth;
+				minX = 0;
+				minY = 0;
+				minZ = 0;
+
+			}
+
 			const glFormat = utils.convert( dstTexture.format );
 			const glType = utils.convert( dstTexture.type );
 			let glTarget;
@@ -2488,9 +2518,9 @@ class WebGLRenderer {
 
 			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
 			_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, image.height );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, sourceBox.min.x );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, sourceBox.min.y );
-			_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, sourceBox.min.z );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, minX );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, minY );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, minZ );
 
 			if ( srcTexture.isDataTexture || srcTexture.isData3DTexture ) {
 
