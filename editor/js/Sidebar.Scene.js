@@ -119,13 +119,11 @@ function SidebarScene( editor ) {
 
 	function getScript( uuid ) {
 
-		if ( editor.scripts[ uuid ] !== undefined ) {
+		if ( editor.scripts[ uuid ] === undefined ) return '';
 
-			return ' <span class="type Script"></span>';
+		if ( editor.scripts[ uuid ].length === 0 ) return '';
 
-		}
-
-		return '';
+		return ' <span class="type Script"></span>';
 
 	}
 
@@ -494,18 +492,22 @@ function SidebarScene( editor ) {
 
 	signals.refreshSidebarEnvironment.add( refreshUI );
 
-	/*
 	signals.objectChanged.add( function ( object ) {
 
-		let options = outliner.options;
+		const options = outliner.options;
 
 		for ( let i = 0; i < options.length; i ++ ) {
 
-			let option = options[ i ];
+			const option = options[ i ];
 
 			if ( option.value === object.id ) {
 
-				option.innerHTML = buildHTML( object );
+				const openerElement = option.querySelector( ':scope > .opener' );
+
+				const openerHTML = openerElement ? openerElement.outerHTML : '';
+
+				option.innerHTML = openerHTML + buildHTML( object );
+
 				return;
 
 			}
@@ -513,7 +515,19 @@ function SidebarScene( editor ) {
 		}
 
 	} );
-	*/
+
+	signals.scriptAdded.add( function () {
+
+		signals.objectChanged.dispatch( editor.selected );
+
+	} );
+
+	signals.scriptRemoved.add( function () {
+
+		signals.objectChanged.dispatch( editor.selected );
+
+	} );
+
 
 	signals.objectSelected.add( function ( object ) {
 
