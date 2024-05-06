@@ -2375,7 +2375,7 @@ class WebGLRenderer {
 		this.copyTextureToTexture = function ( position, srcTexture, dstTexture, level = 0, sourceBox = null ) {
 
 			let width, height, minX, minY;
-			if ( sourceBox ) {
+			if ( sourceBox !== null ) {
 
 				width = sourceBox.max.x - sourceBox.min.x;
 				height = sourceBox.max.y - sourceBox.min.y;
@@ -2462,7 +2462,8 @@ class WebGLRenderer {
 			}
 
 			let width, height, depth, minX, minY, minZ;
-			if ( sourceBox ) {
+			const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ level ] : srcTexture.image;
+			if ( sourceBox !== null ) {
 
 				width = sourceBox.max.x - sourceBox.min.x;
 				height = sourceBox.max.y - sourceBox.min.y;
@@ -2473,7 +2474,6 @@ class WebGLRenderer {
 
 			} else {
 
-				const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ level ] : srcTexture.image;
 				width = image.width;
 				height = image.height;
 				depth = image.depth;
@@ -2513,8 +2513,6 @@ class WebGLRenderer {
 			const currentUnpackSkipPixels = _gl.getParameter( _gl.UNPACK_SKIP_PIXELS );
 			const currentUnpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
 			const currentUnpackSkipImages = _gl.getParameter( _gl.UNPACK_SKIP_IMAGES );
-
-			const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ level ] : srcTexture.image;
 
 			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
 			_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, image.height );
