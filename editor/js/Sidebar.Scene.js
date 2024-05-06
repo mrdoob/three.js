@@ -424,7 +424,11 @@ function SidebarScene( editor ) {
 
 		if ( scene.environment ) {
 
-			if ( scene.environment.mapping === THREE.EquirectangularReflectionMapping ) {
+			if ( scene.background && scene.background.isTexture && scene.background.uuid === scene.environment.uuid ) {
+
+				environmentType.setValue( 'Background' );
+
+			} else if ( scene.environment.mapping === THREE.EquirectangularReflectionMapping ) {
 
 				environmentType.setValue( 'Equirectangular' );
 				environmentEquirectangularTexture.setValue( scene.environment );
@@ -558,6 +562,17 @@ function SidebarScene( editor ) {
 		} else {
 
 			outliner.setValue( null );
+
+		}
+
+	} );
+
+	signals.sceneBackgroundChanged.add( function () {
+
+		if ( environmentType.getValue() === 'Background' ) {
+
+			onEnvironmentChanged();
+			refreshEnvironmentUI();
 
 		}
 

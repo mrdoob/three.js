@@ -538,9 +538,13 @@ function Viewport( editor ) {
 
 				useBackgroundAsEnvironment = true;
 
-				scene.environment = scene.background;
-				scene.environment.mapping = THREE.EquirectangularReflectionMapping;
-				scene.environmentRotation.y = scene.backgroundRotation.y;
+				if ( scene.background !== null && scene.background.isTexture ) {
+
+					scene.environment = scene.background;
+					scene.environment.mapping = THREE.EquirectangularReflectionMapping;
+					scene.environmentRotation.y = scene.backgroundRotation.y;
+
+				}
 
 				break;
 
