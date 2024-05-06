@@ -2376,6 +2376,7 @@ class WebGLRenderer {
 
 			if ( sourceBox.isBox2 !== true ) {
 
+				// @deprecated, r165
 				console.warn( 'WebGLRenderer: copyTextureToTexture function signature has changed.' );
 
 				position = arguments[ 0 ];
