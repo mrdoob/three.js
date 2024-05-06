@@ -368,7 +368,7 @@ select {
 		#menubar .menu:hover .title {
 			z-index: 2; /* over menu option */
 			padding: calc(8px - 1px); /* minus border width */
-			border: 1px outset #ddd;
+			border: 1px solid #bbb;
 			border-bottom: 0 none;
 		}
 
@@ -381,7 +381,7 @@ select {
 			max-height: calc(100vh - 80px);
 			overflow: auto;
 			background: inherit;
-			border: 1px outset #ddd;
+			border: 1px solid #bbb;
 			transform: translateY(-1px); /* offset border width */
 		}
 
@@ -617,12 +617,12 @@ select {
 	}
 
 		#menubar .menu:hover .title {
-			border: 1px outset #ddd;
+			border: 1px solid #555;
 			border-bottom: 0 none;
 		}
 
 			#menubar .menu .options {
-				border: 1px outset #ddd;
+				border: 1px solid #555;
 			}
 
 				#menubar .menu .options hr {
