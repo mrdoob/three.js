@@ -804,11 +804,11 @@ class WebGPUBackend extends Backend {
 
 		const renderObjectData = this.get( renderObject );
 
-		const useRenderBundle = renderObject.scene.bundleType === 'snapshot' || 'static'
+		const useRenderBundle = renderObject.scene.bundleType !== null ? true : false;
 
 		const { renderBundle, lastPipeline } = renderObjectData;
 
-
+		// console.log(renderObject.scene.bundleType, useRenderBundle)
 		if ( renderBundle !== undefined && lastPipeline === pipelineGPU ) {
 
 			const renderContextData = this.get( context );
