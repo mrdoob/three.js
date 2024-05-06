@@ -7,6 +7,9 @@ function Strings( config ) {
 		en: {
 
 			'prompt/file/open': 'Any unsaved data will be lost. Are you sure?',
+			'prompt/file/import/fail': 'Failed to import file',
+			'prompt/file/import/supportedFileFormat': 'Supported file formats',
+			'prompt/file/import/unsupportedFileFormat': 'Unsupported file format',
 			'prompt/file/export/noMeshSelected': 'No Mesh selected!',
 			'prompt/file/export/noObjectSelected': 'No Object selected!',
 			'prompt/script/remove': 'Are you sure?',
@@ -394,6 +397,9 @@ function Strings( config ) {
 		fr: {
 
 			'prompt/file/open': 'Toutes les données non enregistrées seront perdues Êtes-vous sûr ?',
+			'prompt/file/import/fail': 'Echec de l’importation du fichier',
+			'prompt/file/import/supportedFileFormat': 'Formats de fichiers pris en charge',
+			'prompt/file/import/unsupportedFileFormat': 'Format de fichier non pris en charge',
 			'prompt/file/export/noMeshSelected': 'Aucun maillage sélectionné !',
 			'prompt/file/export/noObjectSelected': 'Aucun objet sélectionné !',
 			'prompt/script/remove': 'Es-tu sûr?',
@@ -781,6 +787,9 @@ function Strings( config ) {
 		zh: {
 
 			'prompt/file/open': '您确定吗？未保存的数据将会丢失。',
+			'prompt/file/import/fail': '导入文件失败',
+			'prompt/file/import/supportedFileFormat': '支持的文件格式',
+			'prompt/file/import/unsupportedFileFormat': '不支持的文件格式',
 			'prompt/file/export/noMeshSelected': '未选择网格！',
 			'prompt/file/export/noObjectSelected': '未选择对象！',
 			'prompt/script/remove': '你确定吗？',
@@ -1168,6 +1177,9 @@ function Strings( config ) {
 		ja: {
 
 			'prompt/file/open': '保存されていないデータは失われます。 本気ですか？',
+			'prompt/file/import/fail': 'ファイルのインポートに失敗しました',
+			'prompt/file/import/supportedFileFormat': 'サポートされているファイル形式',
+			'prompt/file/import/unsupportedFileFormat': 'サポートされていないファイル形式です',
 			'prompt/file/export/noMeshSelected': 'メッシュが選択されていません!',
 			'prompt/file/export/noObjectSelected': 'オブジェクトが選択されていません!',
 			'prompt/script/remove': '本気ですか？',

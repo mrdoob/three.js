@@ -768,7 +768,15 @@ function Loader( editor ) {
 
 			default:
 
-				console.error( 'Unsupported file format (' + extension + ').' );
+				alert( [
+
+					editor.strings.getKey( 'prompt/file/import/fail' ) + ': ' +
+					editor.strings.getKey( 'prompt/file/import/unsupportedFileFormat' ) + ' (' + extension + ')',
+					'',
+					editor.strings.getKey( 'prompt/file/import/supportedFileFormat' ) + ': ',
+					'3dm, 3ds, 3mf, amf, dae, drc, fbx, glb, gltf, js, json, kmz, ldr, mpd, md2, obj, pcd, ply, stl, svg, usdz, vtk, vtp, wrl, xyz, zip(fbx), zip(glb), zip(gltf), zip(obj)'
+
+				].join( '\n' ) );
 
 				break;
 
