@@ -251,11 +251,25 @@ class CSS3DRenderer {
 
 		}
 
+		function ancestorIsVisible(parent) {
+
+			if (parent) {
+
+				if (parent.visible)  return ancestorIsVisible(parent.parent);
+
+				return false;
+					
+			} 
+
+			return true;
+								
+		}
+
 		function renderObject( object, scene, camera, cameraCSSMatrix ) {
 
 			if ( object.isCSS3DObject ) {
 
-				const visible = ( object.visible === true ) && ( object.layers.test( camera.layers ) === true );
+				const visible = ( object.visible === true && ancestorIsVisible( object.parent ) ) && ( object.layers.test( camera.layers ) === true );
 				object.element.style.display = ( visible === true ) ? '' : 'none';
 
 				if ( visible === true ) {
