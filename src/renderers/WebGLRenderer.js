@@ -19,7 +19,7 @@ import {
 	UnsignedShort5551Type,
 	WebGLCoordinateSystem,
 	DisplayP3ColorSpace,
-	LinearDisplayP3ColorSpace,
+	LinearDisplayP3ColorSpace
 } from '../constants.js';
 import { Color } from '../math/Color.js';
 import { Frustum } from '../math/Frustum.js';
