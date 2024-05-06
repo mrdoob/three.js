@@ -46,6 +46,15 @@ function ViewportControls( editor ) {
 
 	signals.cameraAdded.add( update );
 	signals.cameraRemoved.add( update );
+	signals.objectChanged.add( function ( object ) {
+
+		if ( object.isCamera ) {
+
+			update();
+
+		}
+
+	} );
 
 	// shading
 
