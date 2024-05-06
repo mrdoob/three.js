@@ -23,6 +23,27 @@ class WebGPUPipelineUtils {
 
 	}
 
+	_getSampleCount( renderObjectContext ) {
+
+		let sampleCount = this.backend.utils.getSampleCount( renderObjectContext );
+
+		if ( sampleCount > 1 ) {
+
+			// WebGPU only supports power-of-two sample counts and 2 is not a valid value
+			sampleCount = Math.pow( 2, Math.floor( Math.log2( sampleCount ) ) );
+
+			if ( sampleCount === 2 ) {
+
+				sampleCount = 4;
+
+			}
+
+		}
+
+		return sampleCount;
+
+	}
+
 	createRenderPipeline( renderObject, promises ) {
 
 		const { object, material, geometry, pipeline } = renderObject;
@@ -102,20 +123,8 @@ class WebGPUPipelineUtils {
 		const primitiveState = this._getPrimitiveState( object, geometry, material );
 		const depthCompare = this._getDepthCompare( material );
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderObject.context );
-		let sampleCount = utils.getSampleCount( renderObject.context );
 
-		if ( sampleCount > 1 ) {
-
-			// WebGPU only supports power-of-two sample counts and 2 is not a valid value
-			sampleCount = Math.pow( 2, Math.floor( Math.log2( sampleCount ) ) );
-
-			if ( sampleCount === 2 ) {
-
-				sampleCount = 4;
-
-			}
-
-		}
+		const sampleCount = this._getSampleCount( renderObject.context );
 
 		const pipelineDescriptor = {
 			label: 'renderPipeline',
@@ -166,7 +175,7 @@ class WebGPUPipelineUtils {
 	createBundleEncoder( renderContext, renderObject ) {
 
 		const backend = this.backend;
-		const { utils, parameters, device } = backend;
+		const { utils, device } = backend;
 
 		const renderContextData = backend.get( renderContext );
 		const renderObjectData = backend.get( renderObject );
@@ -179,12 +188,13 @@ class WebGPUPipelineUtils {
 
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderContext );
 		const colorFormat = utils.getCurrentColorFormat( renderContext );
+		const sampleCount = this._getSampleCount( renderObject.context );
 
 		const descriptor = {
 			label: 'renderBundleEncoder',
 			colorFormats: [ colorFormat ],
 			depthStencilFormat,
-			sampleCount: parameters.sampleCount
+			sampleCount
 		};
 
 		const bundleEncoder = device.createRenderBundleEncoder( descriptor );
