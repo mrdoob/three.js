@@ -20,7 +20,7 @@
 	</div>
 
 	<div id="backend" style="position: absolute; top: 200px; left: 0; color: #fff; background-color: rgba(0,0,0,0.75); padding: 5px;">
-		Active Backend: WebGPU
+		Draw Calls: 0
 	</div>
 
 	<script type="importmap">
@@ -157,7 +157,7 @@
 				randomizeMatrix( child.matrix );
 				child.matrix.decompose( child.position, child.quaternion, child.scale );
 				child.userData.rotationSpeed = randomizeRotationSpeed( new THREE.Euler() );
-				child.frustrumCulled = false;
+				child.frustumCulled = false;
 				// child.matrixAutoUpdate = false;
 				group.add( child );
 
@@ -178,7 +178,6 @@
 
 			}
 
-			document.getElementById( 'backend' ).innerText = 'Active Backend: ' + ( forceWebGL ? 'WebGL' : 'WebGPU' );
 			// camera
 
 			const aspect = window.innerWidth / window.innerHeight;
@@ -305,12 +304,16 @@
 
 				stats.update();
 
+				document.getElementById( 'backend' ).innerText = 'Draw Calls: ' + renderer.info.render.drawCalls;
+
 			}
 
 			function animateMeshes() {
 
 				const loopNum = Math.min( api.count, api.dynamic );
 
+
+				if ( scene.bundleType === 'static' ) return;
 
 				for ( let i = 0; i < loopNum; i ++ ) {
 

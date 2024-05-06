@@ -163,12 +163,19 @@ class WebGPUPipelineUtils {
 
 	}
 
-	createRenderBundleEncoder( renderContext ) {
+	createBundleEncoder( renderContext, renderObject ) {
 
 		const backend = this.backend;
 		const { utils, parameters, device } = backend;
 
 		const renderContextData = backend.get( renderContext );
+		const renderObjectData = backend.get( renderObject );
+
+		if ( renderObjectData.bundleEncoder && renderContextData._renderBundleViewport === renderContext.width + '_' + renderContext.height ) {
+
+			return renderContextData.bundleEncoder;
+
+		}
 
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderContext );
 		const colorFormat = utils.getCurrentColorFormat( renderContext );
@@ -180,12 +187,12 @@ class WebGPUPipelineUtils {
 			sampleCount: parameters.sampleCount
 		};
 
-		const renderBundleEncoder = device.createRenderBundleEncoder( descriptor );
+		const bundleEncoder = device.createRenderBundleEncoder( descriptor );
 
 		renderContextData.currentSets = { attributes: {} };
 		renderContextData._renderBundleViewport = renderContext.width + '_' + renderContext.height;
 
-		return renderBundleEncoder;
+		return bundleEncoder;
 
 	}
 
