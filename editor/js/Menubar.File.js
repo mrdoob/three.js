@@ -66,12 +66,7 @@ function MenubarFile( editor ) {
 	} );
 	options.add( option );
 
-	//
-
-	options.add( new UIHorizontalRule() );
-
-
-	// Export (submenu)
+	// Export
 
 	const fileExportSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/file/export' ) ).addClass( 'option' ).addClass( 'submenu-title' );
 	fileExportSubmenuTitle.onMouseOver( function () {
@@ -97,7 +92,7 @@ function MenubarFile( editor ) {
 
 	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/file/export/drc' ) );
+	option.setTextContent( 'DRC' );
 	option.onClick( async function () {
 
 		const object = editor.selected;
@@ -134,7 +129,7 @@ function MenubarFile( editor ) {
 
 	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/file/export/glb' ) );
+	option.setTextContent( 'GLB' );
 	option.onClick( async function () {
 
 		const scene = editor.scene;
@@ -165,7 +160,7 @@ function MenubarFile( editor ) {
 
 	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/file/export/gltf' ) );
+	option.setTextContent( 'GLTF' );
 	option.onClick( async function () {
 
 		const scene = editor.scene;
@@ -197,7 +192,7 @@ function MenubarFile( editor ) {
 
 	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/file/export/obj' ) );
+	option.setTextContent( 'OBJ' );
 	option.onClick( async function () {
 
 		const object = editor.selected;
@@ -222,7 +217,7 @@ function MenubarFile( editor ) {
 
 	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/file/export/ply' ) );
+	option.setTextContent( 'PLY' );
 	option.onClick( async function () {
 
 		const { PLYExporter } = await import( 'three/addons/exporters/PLYExporter.js' );
@@ -238,11 +233,11 @@ function MenubarFile( editor ) {
 	} );
 	fileExportSubmenu.add( option );
 
-	// Export PLY (Binary)
+	// Export PLY (BINARY)
 
 	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/file/export/ply_binary' ) );
+	option.setTextContent( 'PLY (BINARY)' );
 	option.onClick( async function () {
 
 		const { PLYExporter } = await import( 'three/addons/exporters/PLYExporter.js' );
@@ -262,7 +257,7 @@ function MenubarFile( editor ) {
 
 	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/file/export/stl' ) );
+	option.setTextContent( 'STL' );
 	option.onClick( async function () {
 
 		const { STLExporter } = await import( 'three/addons/exporters/STLExporter.js' );
@@ -274,11 +269,11 @@ function MenubarFile( editor ) {
 	} );
 	fileExportSubmenu.add( option );
 
-	// Export STL (Binary)
+	// Export STL (BINARY)
 
 	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/file/export/stl_binary' ) );
+	option.setTextContent( 'STL (BINARY)' );
 	option.onClick( async function () {
 
 		const { STLExporter } = await import( 'three/addons/exporters/STLExporter.js' );
@@ -294,7 +289,7 @@ function MenubarFile( editor ) {
 
 	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/file/export/usdz' ) );
+	option.setTextContent( 'USDZ' );
 	option.onClick( async function () {
 
 		const { USDZExporter } = await import( 'three/addons/exporters/USDZExporter.js' );
