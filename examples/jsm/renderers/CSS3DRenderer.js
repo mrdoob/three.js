@@ -251,11 +251,11 @@ class CSS3DRenderer {
 
 		}
 
-		function ancestorIsVisible(parent) {
+		function ancestorIsVisible( parent ) {
 
-			if (parent) {
+			if ( parent ) {
 
-				if (parent.visible)  return ancestorIsVisible(parent.parent);
+				if ( parent.visible )  return ancestorIsVisible(parent.parent);
 
 				return false;
 					
