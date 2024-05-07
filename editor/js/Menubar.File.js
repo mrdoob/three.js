@@ -71,27 +71,27 @@ function MenubarFile( editor ) {
 	options.add( new UIHorizontalRule() );
 
 
-	//
+	// Export (submenu)
 
-	const fileExportSubmenuTitleRow = new UIRow().setTextContent( strings.getKey( 'menubar/file/export' ) ).addClass( 'option' ).addClass( 'submenu-title' );
-	fileExportSubmenuTitleRow.onMouseOver( function () {
+	const fileExportSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/file/export' ) ).addClass( 'option' ).addClass( 'submenu-title' );
+	fileExportSubmenuTitle.onMouseOver( function () {
 
 		const { top, right } = this.dom.getBoundingClientRect();
 		const { paddingTop } = getComputedStyle( this.dom );
-		fileExportSubmenuPanel.setLeft( right + 'px' );
-		fileExportSubmenuPanel.setTop( top - parseFloat( paddingTop ) + 'px' );
-		fileExportSubmenuPanel.setDisplay( 'block' );
+		fileExportSubmenu.setLeft( right + 'px' );
+		fileExportSubmenu.setTop( top - parseFloat( paddingTop ) + 'px' );
+		fileExportSubmenu.setDisplay( 'block' );
 
 	} );
-	fileExportSubmenuTitleRow.onMouseOut( function () {
+	fileExportSubmenuTitle.onMouseOut( function () {
 
-		fileExportSubmenuPanel.setDisplay( 'none' );
+		fileExportSubmenu.setDisplay( 'none' );
 
 	} );
-	options.add( fileExportSubmenuTitleRow );
+	options.add( fileExportSubmenuTitle );
 
-	const fileExportSubmenuPanel = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
-	fileExportSubmenuTitleRow.add( fileExportSubmenuPanel );
+	const fileExportSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
+	fileExportSubmenuTitle.add( fileExportSubmenu );
 
 	// Export DRC
 
@@ -128,7 +128,7 @@ function MenubarFile( editor ) {
 		saveArrayBuffer( result, 'model.drc' );
 
 	} );
-	fileExportSubmenuPanel.add( option );
+	fileExportSubmenu.add( option );
 
 	// Export GLB
 
@@ -159,7 +159,7 @@ function MenubarFile( editor ) {
 		}, undefined, { binary: true, animations: optimizedAnimations } );
 
 	} );
-	fileExportSubmenuPanel.add( option );
+	fileExportSubmenu.add( option );
 
 	// Export GLTF
 
@@ -191,7 +191,7 @@ function MenubarFile( editor ) {
 
 
 	} );
-	fileExportSubmenuPanel.add( option );
+	fileExportSubmenu.add( option );
 
 	// Export OBJ
 
@@ -216,7 +216,7 @@ function MenubarFile( editor ) {
 		saveString( exporter.parse( object ), 'model.obj' );
 
 	} );
-	fileExportSubmenuPanel.add( option );
+	fileExportSubmenu.add( option );
 
 	// Export PLY (ASCII)
 
@@ -236,7 +236,7 @@ function MenubarFile( editor ) {
 		} );
 
 	} );
-	fileExportSubmenuPanel.add( option );
+	fileExportSubmenu.add( option );
 
 	// Export PLY (Binary)
 
@@ -256,7 +256,7 @@ function MenubarFile( editor ) {
 		}, { binary: true } );
 
 	} );
-	fileExportSubmenuPanel.add( option );
+	fileExportSubmenu.add( option );
 
 	// Export STL (ASCII)
 
@@ -272,7 +272,7 @@ function MenubarFile( editor ) {
 		saveString( exporter.parse( editor.scene ), 'model.stl' );
 
 	} );
-	fileExportSubmenuPanel.add( option );
+	fileExportSubmenu.add( option );
 
 	// Export STL (Binary)
 
@@ -288,7 +288,7 @@ function MenubarFile( editor ) {
 		saveArrayBuffer( exporter.parse( editor.scene, { binary: true } ), 'model-binary.stl' );
 
 	} );
-	fileExportSubmenuPanel.add( option );
+	fileExportSubmenu.add( option );
 
 	// Export USDZ
 
@@ -304,7 +304,7 @@ function MenubarFile( editor ) {
 		saveArrayBuffer( await exporter.parseAsync( editor.scene ), 'model.usdz' );
 
 	} );
-	fileExportSubmenuPanel.add( option );
+	fileExportSubmenu.add( option );
 
 	//
 
