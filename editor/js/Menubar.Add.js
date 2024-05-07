@@ -42,26 +42,26 @@ function MenubarAdd( editor ) {
 
 	//
 
-	const addGeometryRow = new UIRow().setTextContent( strings.getKey( 'menubar/add/mesh' ) ).addClass( 'option' ).addClass( 'submenu-title' );
-	addGeometryRow.onMouseOver( function () {
+	const meshSubmenuTitleRow = new UIRow().setTextContent( strings.getKey( 'menubar/add/mesh' ) ).addClass( 'option' ).addClass( 'submenu-title' );
+	meshSubmenuTitleRow.onMouseOver( function () {
 
-		const { top, right } = addGeometryRow.dom.getBoundingClientRect();
+		const { top, right } = meshSubmenuTitleRow.dom.getBoundingClientRect();
 		const { paddingTop } = getComputedStyle( this.dom );
-		addGeometryPanel.setLeft( right + 'px' );
-		addGeometryPanel.setTop( top - parseFloat( paddingTop ) + 'px' );
-		addGeometryPanel.setStyle( 'max-height', [ `calc( 100vh - ${top}px )` ] );
-		addGeometryPanel.setDisplay( 'block' );
+		meshSubmenuPanel.setLeft( right + 'px' );
+		meshSubmenuPanel.setTop( top - parseFloat( paddingTop ) + 'px' );
+		meshSubmenuPanel.setStyle( 'max-height', [ `calc( 100vh - ${top}px )` ] );
+		meshSubmenuPanel.setDisplay( 'block' );
 
 	} );
-	addGeometryRow.onMouseOut( function () {
+	meshSubmenuTitleRow.onMouseOut( function () {
 
-		addGeometryPanel.setDisplay( 'none' );
+		meshSubmenuPanel.setDisplay( 'none' );
 
 	} );
-	options.add( addGeometryRow );
+	options.add( meshSubmenuTitleRow );
 
-	const addGeometryPanel = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
-	addGeometryRow.add( addGeometryPanel );
+	const meshSubmenuPanel = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
+	meshSubmenuTitleRow.add( meshSubmenuPanel );
 
 	// Box
 
@@ -77,7 +77,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// Capsule
 
@@ -94,7 +94,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// Circle
 
@@ -110,7 +110,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// Cylinder
 
@@ -126,7 +126,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// Dodecahedron
 
@@ -142,7 +142,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// Icosahedron
 
@@ -158,7 +158,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// Lathe
 
@@ -174,7 +174,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// Octahedron
 
@@ -190,7 +190,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// Plane
 
@@ -207,7 +207,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// Ring
 
@@ -223,7 +223,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// Sphere
 
@@ -239,7 +239,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// Sprite
 
@@ -254,7 +254,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, sprite ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// Tetrahedron
 
@@ -270,7 +270,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// Torus
 
@@ -286,7 +286,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// TorusKnot
 
@@ -302,7 +302,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	// Tube
 
@@ -325,7 +325,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	addGeometryPanel.add( option );
+	meshSubmenuPanel.add( option );
 
 	//
 
