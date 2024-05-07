@@ -327,15 +327,35 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	//
+	// Light
 
-	options.add( new UIHorizontalRule() );
+	const lightSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/add/light' ) ).addClass( 'option' ).addClass( 'submenu-title' );
+	lightSubmenuTitle.onMouseOver( function () {
+
+		const { top, right } = lightSubmenuTitle.dom.getBoundingClientRect();
+		const { paddingTop } = getComputedStyle( this.dom );
+
+		lightSubmenu.setLeft( right + 'px' );
+		lightSubmenu.setTop( top - parseFloat( paddingTop ) + 'px' );
+		lightSubmenu.setStyle( 'max-height', [ `calc( 100vh - ${top}px )` ] );
+		lightSubmenu.setDisplay( 'block' );
+
+	} );
+	lightSubmenuTitle.onMouseOut( function () {
+
+		lightSubmenu.setDisplay( 'none' );
+
+	} );
+	options.add( lightSubmenuTitle );
+
+	const lightSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
+	lightSubmenuTitle.add( lightSubmenu );
 
 	// AmbientLight
 
 	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/add/ambientlight' ) );
+	option.setTextContent( strings.getKey( 'menubar/add/light/ambient' ) );
 	option.onClick( function () {
 
 		const color = 0x222222;
@@ -346,13 +366,13 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, light ) );
 
 	} );
-	options.add( option );
+	lightSubmenu.add( option );
 
 	// DirectionalLight
 
 	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/add/directionallight' ) );
+	option.setTextContent( strings.getKey( 'menubar/add/light/directional' ) );
 	option.onClick( function () {
 
 		const color = 0xffffff;
@@ -367,13 +387,13 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, light ) );
 
 	} );
-	options.add( option );
+	lightSubmenu.add( option );
 
 	// HemisphereLight
 
 	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/add/hemispherelight' ) );
+	option.setTextContent( strings.getKey( 'menubar/add/light/hemisphere' ) );
 	option.onClick( function () {
 
 		const skyColor = 0x00aaff;
@@ -388,13 +408,13 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, light ) );
 
 	} );
-	options.add( option );
+	lightSubmenu.add( option );
 
 	// PointLight
 
 	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/add/pointlight' ) );
+	option.setTextContent( strings.getKey( 'menubar/add/light/point' ) );
 	option.onClick( function () {
 
 		const color = 0xffffff;
@@ -407,13 +427,13 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, light ) );
 
 	} );
-	options.add( option );
+	lightSubmenu.add( option );
 
 	// SpotLight
 
 	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/add/spotlight' ) );
+	option.setTextContent( strings.getKey( 'menubar/add/light/spot' ) );
 	option.onClick( function () {
 
 		const color = 0xffffff;
@@ -431,7 +451,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, light ) );
 
 	} );
-	options.add( option );
+	lightSubmenu.add( option );
 
 	//
 
