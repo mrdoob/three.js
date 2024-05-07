@@ -314,7 +314,7 @@ class UITextArea extends UIElement {
 
 			event.stopPropagation();
 
-			if ( event.keyCode === 9 ) {
+			if ( event.code === 'Tab' ) {
 
 				event.preventDefault();
 
@@ -686,19 +686,19 @@ class UINumber extends UIElement {
 
 			event.stopPropagation();
 
-			switch ( event.keyCode ) {
+			switch ( event.code ) {
 
-				case 13: // enter
+				case 'Enter':
 					scope.dom.blur();
 					break;
 
-				case 38: // up
+				case 'ArrowUp':
 					event.preventDefault();
 					scope.setValue( scope.getValue() + scope.nudge );
 					scope.dom.dispatchEvent( changeEvent );
 					break;
 
-				case 40: // down
+				case 'ArrowDown':
 					event.preventDefault();
 					scope.setValue( scope.getValue() - scope.nudge );
 					scope.dom.dispatchEvent( changeEvent );
@@ -901,19 +901,19 @@ class UIInteger extends UIElement {
 
 			event.stopPropagation();
 
-			switch ( event.keyCode ) {
+			switch ( event.code ) {
 
-				case 13: // enter
+				case 'Enter':
 					scope.dom.blur();
 					break;
 
-				case 38: // up
+				case 'ArrowUp':
 					event.preventDefault();
 					scope.setValue( scope.getValue() + scope.nudge );
 					scope.dom.dispatchEvent( changeEvent );
 					break;
 
-				case 40: // down
+				case 'ArrowDown':
 					event.preventDefault();
 					scope.setValue( scope.getValue() - scope.nudge );
 					scope.dom.dispatchEvent( changeEvent );

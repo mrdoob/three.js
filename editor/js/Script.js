@@ -342,8 +342,7 @@ function Script( editor ) {
 	codemirror.on( 'keypress', function ( cm, kb ) {
 
 		if ( currentMode !== 'javascript' ) return;
-		const typed = String.fromCharCode( kb.which || kb.keyCode );
-		if ( /[\w\.]/.exec( typed ) ) {
+		if ( /[\w\.]/.exec( kb.key ) ) {
 
 			server.complete( cm );
 
