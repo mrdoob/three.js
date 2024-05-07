@@ -69,6 +69,8 @@ class ObjectLoader extends Loader {
 
 		super( manager );
 
+		this.geometryTypes = Object.assign( {}, Geometries );
+
 	}
 
 	load( url, onLoad, onProgress, onError ) {
@@ -261,6 +263,12 @@ class ObjectLoader extends Loader {
 
 	}
 
+	registerGeometry( type, klass ) {
+
+		this.geometryTypes[ type ] = klass;
+
+	}
+
 	parseGeometries( json, shapes ) {
 
 		const geometries = {};
@@ -284,9 +292,9 @@ class ObjectLoader extends Loader {
 
 					default:
 
-						if ( data.type in Geometries ) {
+						if ( data.type in this.geometryTypes ) {
 
-							geometry = Geometries[ data.type ].fromJSON( data, shapes );
+							geometry = this.geometryTypes[ data.type ].fromJSON( data, shapes );
 
 						} else {
 

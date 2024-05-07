@@ -70,6 +70,7 @@ function Strings( config ) {
 			'menubar/add/icosahedron': 'Icosahedron',
 			'menubar/add/octahedron': 'Octahedron',
 			'menubar/add/tetrahedron': 'Tetrahedron',
+			'menubar/add/text': 'Text',
 			'menubar/add/torus': 'Torus',
 			'menubar/add/tube': 'Tube',
 			'menubar/add/torusknot': 'TorusKnot',
@@ -238,6 +239,17 @@ function Strings( config ) {
 			'sidebar/geometry/sphere_geometry/philength': 'Phi length',
 			'sidebar/geometry/sphere_geometry/thetastart': 'Theta start',
 			'sidebar/geometry/sphere_geometry/thetalength': 'Theta length',
+
+			'sidebar/geometry/text_geometry/text': 'Text',
+			'sidebar/geometry/text_geometry/size': 'Font size',
+			'sidebar/geometry/text_geometry/depth': 'Extrude depth',
+			'sidebar/geometry/text_geometry/scale': 'Scale',
+			'sidebar/geometry/text_geometry/curveseg': 'Curve segments',
+			'sidebar/geometry/text_geometry/bevelenabled': 'Bevel enabled',
+			'sidebar/geometry/text_geometry/bevelthickness': 'Bevel thickness',
+			'sidebar/geometry/text_geometry/bevelsize': 'Bevel size',
+			'sidebar/geometry/text_geometry/bevelOffset': 'Bevel offset',
+			'sidebar/geometry/text_geometry/bevelseg': 'Bevel segments',
 
 			'sidebar/geometry/torus_geometry/radius': 'Radius',
 			'sidebar/geometry/torus_geometry/tube': 'Tube',
@@ -1558,7 +1570,7 @@ function Strings( config ) {
 
 		getKey: function ( key ) {
 
-			return values[ language ][ key ] || '???';
+			return values[ language ][ key ] || `???${key.split('/').pop().substring(0, 8)}`;
 
 		}
 
