@@ -28,7 +28,7 @@
 	window._renderStarted = false;
 	window._renderFinished = false;
 
-	const maxFrameId = 2;
+	const maxFrameId = 3;
 	window.requestAnimationFrame = function ( cb ) {
 
 		if ( ! window._renderStarted ) {
