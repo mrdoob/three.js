@@ -124,13 +124,7 @@ class Bindings extends DataMap {
 
 			} else if ( binding.isSampler ) {
 
-				const updated = binding.update();
-
-				if ( updated ) {
-
-					backend.updateBinding( binding );
-
-				}
+				binding.update();
 
 			} else if ( binding.isSampledTexture ) {
 
