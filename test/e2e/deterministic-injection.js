@@ -29,7 +29,7 @@
 	window._renderFinished = false;
 
 	const maxFrameId = 3;
-	window.requestAnimationFrame = function ( cb ) {
+	self.requestAnimationFrame = window.requestAnimationFrame = function ( cb ) {
 
 		if ( ! window._renderStarted ) {
 
@@ -37,7 +37,7 @@
 
 				requestAnimationFrame( cb );
 
-			}, 500 );
+			}, 50 );
 
 		} else {
 
