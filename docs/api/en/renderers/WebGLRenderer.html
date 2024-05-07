@@ -493,6 +493,13 @@ document.body.appendChild( renderer.domElement );
 			and GPU upload overhead).
 		</p>
 
+		<h3>[method:undefined initRenderTarget]( [param:WebGLRenderTarget target] )</h3>
+		<p>
+			Initializes the given WebGLRenderTarget memory. Useful for initializing a render
+			target so data can be copied into it using [page:WebGLRenderer.copyTextureToTexture .copyTextureToTexture]
+			before it has been rendered to.
+		</p>
+
 		<h3>[method:undefined resetGLState]( )</h3>
 		<p>
 			Reset the GL state to default. Called internally if the WebGL context is
