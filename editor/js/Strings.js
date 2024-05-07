@@ -40,6 +40,7 @@ function Strings( config ) {
 			'menubar/file': 'File',
 			'menubar/file/new': 'New',
 			'menubar/file/import': 'Import',
+			'menubar/file/export': 'Export',
 			'menubar/file/export/drc': 'Export DRC',
 			'menubar/file/export/glb': 'Export GLB',
 			'menubar/file/export/gltf': 'Export GLTF',
@@ -59,6 +60,7 @@ function Strings( config ) {
 
 			'menubar/add': 'Add',
 			'menubar/add/group': 'Group',
+			'menubar/add/mesh': 'Mesh',
 			'menubar/add/plane': 'Plane',
 			'menubar/add/box': 'Box',
 			'menubar/add/capsule': 'Capsule',
@@ -427,6 +429,7 @@ function Strings( config ) {
 			'menubar/file': 'Fichier',
 			'menubar/file/new': 'Nouveau',
 			'menubar/file/import': 'Importer',
+			'menubar/file/export': 'Exporter',
 			'menubar/file/export/drc': 'Exporter DRC',
 			'menubar/file/export/glb': 'Exporter GLB',
 			'menubar/file/export/gltf': 'Exporter GLTF',
@@ -446,6 +449,7 @@ function Strings( config ) {
 
 			'menubar/add': 'Ajouter',
 			'menubar/add/group': 'Groupe',
+			'menubar/add/mesh': 'Maille',
 			'menubar/add/plane': 'Plan',
 			'menubar/add/box': 'Cube',
 			'menubar/add/capsule': 'Capsule',
@@ -814,6 +818,7 @@ function Strings( config ) {
 			'menubar/file': '文件',
 			'menubar/file/new': '新建',
 			'menubar/file/import': '导入',
+			'menubar/file/export': '导出',
 			'menubar/file/export/drc': '导出DRC',
 			'menubar/file/export/glb': '导出GLB',
 			'menubar/file/export/gltf': '导出GLTF',
@@ -833,6 +838,7 @@ function Strings( config ) {
 
 			'menubar/add': '添加',
 			'menubar/add/group': '组',
+			'menubar/add/mesh': '网格',
 			'menubar/add/plane': '平面',
 			'menubar/add/box': '正方体',
 			'menubar/add/capsule': '胶囊',
@@ -1201,6 +1207,7 @@ function Strings( config ) {
 			'menubar/file': 'ファイル',
 			'menubar/file/new': '新規',
 			'menubar/file/import': 'インポート',
+			'menubar/file/export': 'エクスポート',
 			'menubar/file/export/drc': 'エクスポート DRC',
 			'menubar/file/export/glb': 'エクスポート GLB',
 			'menubar/file/export/gltf': 'エクスポート GLTF',
@@ -1220,6 +1227,7 @@ function Strings( config ) {
 
 			'menubar/add': '追加',
 			'menubar/add/group': 'グループ',
+			'menubar/add/mesh': 'メッシュ',
 			'menubar/add/plane': '平面',
 			'menubar/add/box': '直方体',
 			'menubar/add/capsule': 'カプセル',
