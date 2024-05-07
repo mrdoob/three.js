@@ -63,7 +63,7 @@ function MenubarAdd( editor ) {
 	const meshSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
 	meshSubmenuTitle.add( meshSubmenu );
 
-	// Box
+	// Mesh / Box
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -79,7 +79,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// Capsule
+	// Mesh / Capsule
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -96,7 +96,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// Circle
+	// Mesh / Circle
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -112,7 +112,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// Cylinder
+	// Mesh / Cylinder
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -128,7 +128,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// Dodecahedron
+	// Mesh / Dodecahedron
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -144,7 +144,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// Icosahedron
+	// Mesh / Icosahedron
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -160,7 +160,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// Lathe
+	// Mesh / Lathe
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -176,7 +176,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// Octahedron
+	// Mesh / Octahedron
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -192,7 +192,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// Plane
+	// Mesh / Plane
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -209,7 +209,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// Ring
+	// Mesh / Ring
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -225,7 +225,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// Sphere
+	// Mesh / Sphere
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -241,7 +241,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// Sprite
+	// Mesh / Sprite
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -256,7 +256,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// Tetrahedron
+	// Mesh / Tetrahedron
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -272,7 +272,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// Torus
+	// Mesh / Torus
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -288,7 +288,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// TorusKnot
+	// Mesh / TorusKnot
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -304,7 +304,7 @@ function MenubarAdd( editor ) {
 	} );
 	meshSubmenu.add( option );
 
-	// Tube
+	// Mesh / Tube
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -351,7 +351,7 @@ function MenubarAdd( editor ) {
 	const lightSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
 	lightSubmenuTitle.add( lightSubmenu );
 
-	// AmbientLight
+	// Light / Ambient
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -368,7 +368,7 @@ function MenubarAdd( editor ) {
 	} );
 	lightSubmenu.add( option );
 
-	// DirectionalLight
+	// Light / Directional
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -389,7 +389,7 @@ function MenubarAdd( editor ) {
 	} );
 	lightSubmenu.add( option );
 
-	// HemisphereLight
+	// Light / Hemisphere
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -410,7 +410,7 @@ function MenubarAdd( editor ) {
 	} );
 	lightSubmenu.add( option );
 
-	// PointLight
+	// Light / Point
 
 	option = new UIRow();
 	option.setClass( 'option' );
@@ -429,7 +429,7 @@ function MenubarAdd( editor ) {
 	} );
 	lightSubmenu.add( option );
 
-	// SpotLight
+	// Light / Spot
 
 	option = new UIRow();
 	option.setClass( 'option' );
