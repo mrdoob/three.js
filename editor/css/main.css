@@ -399,7 +399,7 @@ select {
 				}
 
 				#menubar .submenu-title::after {
-					content: '>';
+					content: '⏵';
 					float: right;
 				}
 
