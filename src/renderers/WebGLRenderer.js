@@ -2374,7 +2374,7 @@ class WebGLRenderer {
 		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
 
 			// support previous signature with source box first
-			if ( srcTexture.isVector3 === true ) {
+			if ( srcTexture.isTexture !== true ) {
 
 				// @deprecated, r165
 				console.warn( 'WebGLRenderer: copyTextureToTexture function signature has changed.' );
@@ -2383,6 +2383,7 @@ class WebGLRenderer {
 				srcTexture = arguments[ 1 ];
 				dstTexture = arguments[ 2 ];
 				level = arguments[ 3 ] || 0;
+				srcRegion = null;
 
 			}
 
@@ -2474,7 +2475,7 @@ class WebGLRenderer {
 		this.copyTextureToTexture3D = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
 
 			// support previous signature with source box first
-			if ( srcTexture.isBox3 === true ) {
+			if ( srcTexture.isTexture !== true ) {
 
 				// @deprecated, r165
 				console.warn( 'WebGLRenderer: copyTextureToTexture3D function signature has changed.' );

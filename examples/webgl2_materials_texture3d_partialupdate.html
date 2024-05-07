@@ -343,7 +343,7 @@
 					const scaleFactor = ( Math.random() + 0.5 ) * 0.5;
 					const source = generateCloudTexture( perElementPaddedSize, scaleFactor );
 
-					renderer.copyTextureToTexture3D( position, source, cloudTexture, 0, box );
+					renderer.copyTextureToTexture3D( source, cloudTexture, box, position );
 
 					prevTime = time;
 
