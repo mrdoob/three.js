@@ -2452,7 +2452,7 @@ class WebGLRenderer {
 
 		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
 
-			// support previous signature with source box first
+			// support previous signature with dstPosition first
 			if ( srcTexture.isTexture !== true ) {
 
 				// @deprecated, r165
