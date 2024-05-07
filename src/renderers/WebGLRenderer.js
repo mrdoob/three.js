@@ -2405,7 +2405,7 @@ class WebGLRenderer {
 
 						// check if the commands have finished every 8 ms
 						const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
-						await probeAsync( _gl, sync, 8 );
+						await probeAsync( _gl, sync, 4 );
 
 						try {
 
