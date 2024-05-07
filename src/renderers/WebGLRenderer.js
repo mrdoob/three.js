@@ -2672,6 +2672,16 @@ class WebGLRenderer {
 
 		};
 
+		this.initRenderTarget = function ( target ) {
+
+			if ( properties.get( target ).__webglFramebuffer === undefined ) {
+
+				textures.setupRenderTarget( target );
+
+			}
+
+		};
+
 		this.initTexture = function ( texture ) {
 
 			if ( texture.isCubeTexture ) {
