@@ -376,20 +376,20 @@ document.body.appendChild( renderer.domElement );
 		</p>
 
 		<h3>
-			[method:undefined copyTextureToTexture]( [param:Vector2 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level], [param:Box2 sourceBox] )
+			[method:undefined copyTextureToTexture]( [param:Texture srcTexture], [param:Texture dstTexture], [param:Box2 srcRegion], [param:Vector2 dstPosition], [param:Number level] )
 		</h3>
 		<p>
-			Copies the pixels of a texture in the bounds '[page:Box2 sourceBox]' in
+			Copies the pixels of a texture in the bounds '[page:Box2 srcRegion]' in
 			the destination texture starting from the given position. Enables access
 			to
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texSubImage2D WebGLRenderingContext.texSubImage2D].
 		</p>
 
 		<h3>
-			[method:undefined copyTextureToTexture3D]( [param:Vector3 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level], [param:Box3 sourceBox] )
+			[method:undefined copyTextureToTexture3D]( [param:Texture srcTexture], [param:Texture dstTexture], [param:Vector3 dstPosition], [param:Box3 srcRegion], [param:Number level] )
 		</h3>
 		<p>
-			Copies the pixels of a texture in the bounds '[page:Box3 sourceBox]' in
+			Copies the pixels of a texture in the bounds '[page:Box3 srcRegion]' in
 			the destination texture starting from the given position. Enables access
 			to
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texSubImage3D WebGL2RenderingContext.texSubImage3D].
