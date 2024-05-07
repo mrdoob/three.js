@@ -39,6 +39,30 @@ function MenubarAdd( editor ) {
 
 	options.add( new UIHorizontalRule() );
 
+
+	//
+
+	const addGeometryRow = new UIRow().setTextContent( strings.getKey( 'menubar/add/mesh' ) ).addClass( 'option' ).addClass( 'submenu-title' );
+	addGeometryRow.onMouseOver( function () {
+
+		const { top, right } = addGeometryRow.dom.getBoundingClientRect();
+		const { paddingTop } = getComputedStyle( this.dom );
+		addGeometryPanel.setLeft( right + 'px' );
+		addGeometryPanel.setTop( top - parseFloat( paddingTop ) + 'px' );
+		addGeometryPanel.setStyle( 'max-height', [ `calc( 100vh - ${top}px )` ] );
+		addGeometryPanel.setDisplay( 'block' );
+
+	} );
+	addGeometryRow.onMouseOut( function () {
+
+		addGeometryPanel.setDisplay( 'none' );
+
+	} );
+	options.add( addGeometryRow );
+
+	const addGeometryPanel = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
+	addGeometryRow.add( addGeometryPanel );
+
 	// Box
 
 	option = new UIRow();
@@ -53,7 +77,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// Capsule
 
@@ -70,7 +94,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// Circle
 
@@ -86,7 +110,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// Cylinder
 
@@ -102,7 +126,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// Dodecahedron
 
@@ -118,7 +142,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// Icosahedron
 
@@ -134,7 +158,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// Lathe
 
@@ -150,7 +174,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// Octahedron
 
@@ -166,7 +190,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// Plane
 
@@ -183,7 +207,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// Ring
 
@@ -199,7 +223,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// Sphere
 
@@ -215,7 +239,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// Sprite
 
@@ -230,7 +254,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, sprite ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// Tetrahedron
 
@@ -246,7 +270,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// Torus
 
@@ -262,7 +286,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// TorusKnot
 
@@ -278,7 +302,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	// Tube
 
@@ -301,7 +325,7 @@ function MenubarAdd( editor ) {
 		editor.execute( new AddObjectCommand( editor, mesh ) );
 
 	} );
-	options.add( option );
+	addGeometryPanel.add( option );
 
 	//
 
