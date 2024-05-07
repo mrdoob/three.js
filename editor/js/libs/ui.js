@@ -151,7 +151,7 @@ const properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'hei
 
 properties.forEach( function ( property ) {
 
-	const method = 'set' + property.substr( 0, 1 ).toUpperCase() + property.substr( 1, property.length );
+	const method = 'set' + property.substring( 0, 1 ).toUpperCase() + property.substring( 1 );
 
 	UIElement.prototype[ method ] = function () {
 
@@ -494,7 +494,7 @@ class UIColor extends UIElement {
 
 	getHexValue() {
 
-		return parseInt( this.dom.value.substr( 1 ), 16 );
+		return parseInt( this.dom.value.substring( 1 ), 16 );
 
 	}
 
