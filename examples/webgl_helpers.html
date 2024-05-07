@@ -41,7 +41,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -111,6 +110,8 @@
 
 					scene.add( new THREE.BoxHelper( group ) );
 					scene.add( new THREE.BoxHelper( scene ) );
+
+					renderer.setAnimationLoop( animate );
 
 
 				} );
