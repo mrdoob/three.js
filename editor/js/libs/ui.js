@@ -542,8 +542,7 @@ class UINumber extends UIElement {
 
 		const scope = this;
 
-		const changeEvent = document.createEvent( 'HTMLEvents' );
-		changeEvent.initEvent( 'change', true, true );
+		const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 
 		let distance = 0;
 		let onMouseDownValue = 0;
@@ -812,8 +811,7 @@ class UIInteger extends UIElement {
 
 		const scope = this;
 
-		const changeEvent = document.createEvent( 'HTMLEvents' );
-		changeEvent.initEvent( 'change', true, true );
+		const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 
 		let distance = 0;
 		let onMouseDownValue = 0;
@@ -1266,8 +1264,7 @@ class UIListbox extends UIDiv {
 
 		this.selectedValue = value;
 
-		const changeEvent = document.createEvent( 'HTMLEvents' );
-		changeEvent.initEvent( 'change', true, true );
+		const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 		this.dom.dispatchEvent( changeEvent );
 
 	}
