@@ -2371,15 +2371,29 @@ class WebGLRenderer {
 
 		};
 
-		this.copyTextureToTexture = function ( position, srcTexture, dstTexture, level = 0, sourceBox = null ) {
+		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
+
+			// support previous signature with source box first
+			if ( srcTexture.isVector3 === true ) {
+
+				// @deprecated, r165
+				console.warn( 'WebGLRenderer: copyTextureToTexture function signature has changed.' );
+
+				dstPosition = arguments[ 0 ] || null;
+				srcTexture = arguments[ 1 ];
+				dstTexture = arguments[ 2 ];
+				level = arguments[ 3 ] || 0;
+
+			}
 
 			let width, height, minX, minY;
-			if ( sourceBox !== null ) {
+			let dstX, dstY;
+			if ( srcRegion !== null ) {
 
-				width = sourceBox.max.x - sourceBox.min.x;
-				height = sourceBox.max.y - sourceBox.min.y;
-				minX = sourceBox.min.x;
-				minY = sourceBox.min.y;
+				width = srcRegion.max.x - srcRegion.min.x;
+				height = srcRegion.max.y - srcRegion.min.y;
+				minX = srcRegion.min.x;
+				minY = srcRegion.min.y;
 
 			} else {
 
@@ -2387,6 +2401,18 @@ class WebGLRenderer {
 				height = srcTexture.image.height;
 				minX = 0;
 				minY = 0;
+
+			}
+
+			if ( dstPosition !== null ) {
+
+				dstX = dstPosition.x;
+				dstY = dstPosition.y;
+
+			} else {
+
+				dstX = 0;
+				dstY = 0;
 
 			}
 
@@ -2416,17 +2442,17 @@ class WebGLRenderer {
 
 			if ( srcTexture.isDataTexture ) {
 
-				_gl.texSubImage2D( _gl.TEXTURE_2D, level, position.x, position.y, width, height, glFormat, glType, image.data );
+				_gl.texSubImage2D( _gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image.data );
 
 			} else {
 
 				if ( srcTexture.isCompressedTexture ) {
 
-					_gl.compressedTexSubImage2D( _gl.TEXTURE_2D, level, position.x, position.y, image.width, image.height, glFormat, image.data );
+					_gl.compressedTexSubImage2D( _gl.TEXTURE_2D, level, dstX, dstY, image.width, image.height, glFormat, image.data );
 
 				} else {
 
-					_gl.texSubImage2D( _gl.TEXTURE_2D, level, position.x, position.y, glFormat, glType, image );
+					_gl.texSubImage2D( _gl.TEXTURE_2D, level, dstX, dstY, glFormat, glType, image );
 
 				}
 
@@ -2445,16 +2471,16 @@ class WebGLRenderer {
 
 		};
 
-		this.copyTextureToTexture3D = function ( position, srcTexture, dstTexture, level = 0, sourceBox = null ) {
+		this.copyTextureToTexture3D = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
 
 			// support previous signature with source box first
-			if ( position.isBox3 === true ) {
+			if ( srcTexture.isBox3 === true ) {
 
 				// @deprecated, r165
 				console.warn( 'WebGLRenderer: copyTextureToTexture3D function signature has changed.' );
 
-				sourceBox = arguments[ 0 ];
-				position = arguments[ 1 ];
+				srcRegion = arguments[ 0 ] || null;
+				dstPosition = arguments[ 1 ] || null;
 				srcTexture = arguments[ 2 ];
 				dstTexture = arguments[ 3 ];
 				level = arguments[ 4 ] || 0;
@@ -2462,15 +2488,16 @@ class WebGLRenderer {
 			}
 
 			let width, height, depth, minX, minY, minZ;
+			let dstX, dstY, dstZ;
 			const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ level ] : srcTexture.image;
-			if ( sourceBox !== null ) {
+			if ( srcRegion !== null ) {
 
-				width = sourceBox.max.x - sourceBox.min.x;
-				height = sourceBox.max.y - sourceBox.min.y;
-				depth = sourceBox.max.z - sourceBox.min.z;
-				minX = sourceBox.min.x;
-				minY = sourceBox.min.y;
-				minZ = sourceBox.min.z;
+				width = srcRegion.max.x - srcRegion.min.x;
+				height = srcRegion.max.y - srcRegion.min.y;
+				depth = srcRegion.max.z - srcRegion.min.z;
+				minX = srcRegion.min.x;
+				minY = srcRegion.min.y;
+				minZ = srcRegion.min.z;
 
 			} else {
 
@@ -2480,6 +2507,20 @@ class WebGLRenderer {
 				minX = 0;
 				minY = 0;
 				minZ = 0;
+
+			}
+
+			if ( dstPosition !== null ) {
+
+				dstX = dstPosition.x;
+				dstY = dstPosition.y;
+				dstZ = dstPosition.z;
+
+			} else {
+
+				dstX = 0;
+				dstY = 0;
+				dstZ = 0;
 
 			}
 
@@ -2522,17 +2563,17 @@ class WebGLRenderer {
 
 			if ( srcTexture.isDataTexture || srcTexture.isData3DTexture ) {
 
-				_gl.texSubImage3D( glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, glType, image.data );
+				_gl.texSubImage3D( glTarget, level, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image.data );
 
 			} else {
 
 				if ( dstTexture.isCompressedArrayTexture ) {
 
-					_gl.compressedTexSubImage3D( glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, image.data );
+					_gl.compressedTexSubImage3D( glTarget, level, dstX, dstY, dstZ, width, height, depth, glFormat, image.data );
 
 				} else {
 
-					_gl.texSubImage3D( glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, glType, image );
+					_gl.texSubImage3D( glTarget, level, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image );
 
 				}
 
