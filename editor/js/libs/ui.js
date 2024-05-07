@@ -782,6 +782,8 @@ class UINumber extends UIElement {
 
 		this.unit = unit;
 
+		this.setValue( this.value );
+
 		return this;
 
 	}
