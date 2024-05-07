@@ -37,7 +37,7 @@
 
 				requestAnimationFrame( cb );
 
-			}, 50 );
+			}, 500 );
 
 		} else {
 
