@@ -77,11 +77,7 @@ function ViewportControls( editor ) {
 
 	} );
 
-	signals.cameraResetted.add( function () {
-
-		update();
-
-	} );
+	signals.cameraResetted.add( update );
 
 	update();
 
