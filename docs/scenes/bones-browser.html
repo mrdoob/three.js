@@ -184,7 +184,7 @@
 
 				mesh.bind( skeleton );
 
-				skeletonHelper = new SkeletonHelper( mesh );
+				skeletonHelper = new SkeletonHelper( mesh, { axesHelperSize: 1.5 } );
 				skeletonHelper.material.linewidth = 2;
 				scene.add( skeletonHelper );
 

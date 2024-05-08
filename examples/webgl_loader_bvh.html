@@ -47,7 +47,7 @@
 			const loader = new BVHLoader();
 			loader.load( 'models/bvh/pirouette.bvh', function ( result ) {
 
-				const skeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ] );
+				const skeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ], { axesHelperSize: 5 } );
 
 				scene.add( result.skeleton.bones[ 0 ] );
 				scene.add( skeletonHelper );
@@ -76,8 +76,10 @@
 				document.body.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 300;
+				controls.target = new THREE.Vector3( 0, 50, 0 );
+				controls.minDistance = 100;
 				controls.maxDistance = 700;
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize );
 

@@ -25,8 +25,12 @@ export default QUnit.module( 'Helpers', () => {
 		QUnit.test( 'Instancing', ( assert ) => {
 
 			const bone = new Bone();
-			const object = new SkeletonHelper( bone );
+			bone.add( new Bone() );
+			let object = new SkeletonHelper( bone );
 			assert.ok( object, 'Can instantiate a SkeletonHelper.' );
+			assert.ok( object.axesHelpers.length === 0, 'No axes helpers unless a non-zero size is specified.' );
+			object = new SkeletonHelper( bone, { axesHelperSize: 1 } );
+			assert.ok( object.axesHelpers.length === 2, 'Axes helpers are created per bone when a non-zero size is specified.' );
 
 		} );
 
