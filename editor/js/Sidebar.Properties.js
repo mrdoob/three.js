@@ -18,6 +18,54 @@ function SidebarProperties( editor ) {
 	container.addTab( 'scriptTab', strings.getKey( 'sidebar/properties/script' ), new SidebarScript( editor ) );
 	container.select( 'objectTab' );
 
+	function getTabByTabId( tabs, tabId ) {
+
+		return tabs.find( function ( tab ) {
+
+			return tab.dom.id === tabId;
+
+		} );
+
+	}
+
+	const geometryTab = getTabByTabId( container.tabs, 'geometryTab' );
+	const materialTab = getTabByTabId( container.tabs, 'materialTab' );
+	const scriptTab = getTabByTabId( container.tabs, 'scriptTab' );
+
+	function toggleTabs( object ) {
+
+		container.setHidden( object === null );
+
+		if ( object === null ) return;
+
+		geometryTab.setHidden( ! object.geometry );
+
+		materialTab.setHidden( ! object.material );
+
+		scriptTab.setHidden( object === editor.camera );
+
+		// set active tab
+
+		if ( container.selected === 'geometryTab' ) {
+
+			container.select( geometryTab.isHidden() ? 'objectTab' : 'geometryTab' );
+
+		} else if ( container.selected === 'materialTab' ) {
+
+			container.select( materialTab.isHidden() ? 'objectTab' : 'materialTab' );
+
+		} else if ( container.selected === 'scriptTab' ) {
+
+			container.select( scriptTab.isHidden() ? 'objectTab' : 'scriptTab' );
+
+		}
+
+	}
+
+	editor.signals.objectSelected.add( toggleTabs );
+
+	toggleTabs( editor.selected );
+
 	return container;
 
 }
