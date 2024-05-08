@@ -2,6 +2,7 @@ import { Vector3 } from './Vector3.js';
 import { Quaternion } from './Quaternion.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
+const _vector2 = /*@__PURE__*/ new Vector3();
 const _quaternion = /*@__PURE__*/ new Quaternion();
 
 class DualQuaternion {
@@ -43,10 +44,9 @@ class DualQuaternion {
 
 	fromMatrix4( matrix ) {
 
-		const position = _vector.setFromMatrixPosition( matrix );
-		const rotation = _quaternion.setFromRotationMatrix( matrix );
+		matrix.decompose( _vector, _quaternion, _vector2 );
 
-		return this.fromTranslationAndRotation( position, rotation );
+		return this.fromTranslationAndRotation( _vector, _quaternion );
 
 	}
 
