@@ -1235,8 +1235,18 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	copyTextureToTexture( position, srcTexture, dstTexture, level = 0 ) {
+	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
 
+		let dstX = 0;
+		let dstY = 0;
+
+		if ( dstPosition !== null ) {
+
+			dstX = dstPosition.x;
+			dstY = dstPosition.y;
+
+		}
+		
 		const encoder = this.device.createCommandEncoder( { label: 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id } );
 
 		const sourceGPU = this.get( srcTexture ).texture;
@@ -1251,7 +1261,7 @@ class WebGPUBackend extends Backend {
 			{
 				texture: destinationGPU,
 				mipLevel: level,
-				origin: { x: position.x, y: position.y, z: position.z }
+				origin: { x: dstX, y: dstY, z: 0 }
 			},
 			[
 				srcTexture.image.width,
