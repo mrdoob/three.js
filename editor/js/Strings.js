@@ -77,8 +77,9 @@ function Strings( config ) {
 			'menubar/add/light/point': 'Point',
 			'menubar/add/light/spot': 'Spot',
 
-			'menubar/add/perspectivecamera': 'PerspectiveCamera',
-			'menubar/add/orthographiccamera': 'OrthographicCamera',
+			'menubar/add/camera': 'Camera',
+			'menubar/add/camera/perspective': 'Perspective',
+			'menubar/add/camera/orthographic': 'Orthographic',
 
 			'menubar/status/autosave': 'autosave',
 
@@ -461,8 +462,9 @@ function Strings( config ) {
 			'menubar/add/light/point': 'Ponctuelle',
 			'menubar/add/light/spot': 'Projecteur',
 
-			'menubar/add/perspectivecamera': 'Caméra perspective',
-			'menubar/add/orthographiccamera': 'Caméra orthographique',
+			'menubar/add/camera': 'Caméra',
+			'menubar/add/camera/perspective': 'Perspective',
+			'menubar/add/camera/orthographic': 'Orthographique',
 
 			'menubar/status/autosave': 'enregistrement automatique',
 
@@ -845,8 +847,9 @@ function Strings( config ) {
 			'menubar/add/light/point': '点光源',
 			'menubar/add/light/spot': '聚光灯',
 
-			'menubar/add/perspectivecamera': '透视相机',
-			'menubar/add/orthographiccamera': '正交相机',
+			'menubar/add/camera': 'Camera',
+			'menubar/add/camera/perspective': '透视相机',
+			'menubar/add/camera/orthographic': '正交相机',
 
 			'menubar/status/autosave': '自动保存',
 
@@ -1229,8 +1232,9 @@ function Strings( config ) {
 			'menubar/add/light/point': 'ポイント',
 			'menubar/add/light/spot': 'スポット',
 
-			'menubar/add/perspectivecamera': '透視投影カメラ',
-			'menubar/add/orthographiccamera': '平行投影カメラ',
+			'menubar/add/camera': 'カメラ',
+			'menubar/add/camera/perspective': '透視投影',
+			'menubar/add/camera/orthographic': '平行投影',
 
 			'menubar/status/autosave': '自動保存',
 
