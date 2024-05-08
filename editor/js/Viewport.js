@@ -292,6 +292,8 @@ function Viewport( editor ) {
 
 		transformControls.setSpace( space );
 
+		render();
+
 	} );
 
 	signals.rendererUpdated.add( function () {
