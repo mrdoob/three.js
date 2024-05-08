@@ -28,8 +28,8 @@
 	window._renderStarted = false;
 	window._renderFinished = false;
 
-	const maxFrameId = 3;
-	self.requestAnimationFrame = window.requestAnimationFrame = function ( cb ) {
+	const maxFrameId = 2;
+	window.requestAnimationFrame = function ( cb ) {
 
 		if ( ! window._renderStarted ) {
 
