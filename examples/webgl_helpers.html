@@ -35,6 +35,7 @@
 			let vth;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -111,8 +112,6 @@
 					scene.add( new THREE.BoxHelper( group ) );
 					scene.add( new THREE.BoxHelper( scene ) );
 
-					renderer.setAnimationLoop( animate );
-
 
 				} );
 
@@ -132,6 +131,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				const time = - performance.now() * 0.0003;
 
