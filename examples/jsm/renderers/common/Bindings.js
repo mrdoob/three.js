@@ -128,8 +128,6 @@ class Bindings extends DataMap {
 
 			} else if ( binding.isSampledTexture ) {
 
-				const texture = binding.texture;
-
 				const updated = binding.update();
 
 				if ( updated ) {
@@ -139,6 +137,8 @@ class Bindings extends DataMap {
 					needsBindingsUpdate = true;
 
 				}
+
+				const texture = binding.texture;
 
 				if ( texture.isStorageTexture === true ) {
 
