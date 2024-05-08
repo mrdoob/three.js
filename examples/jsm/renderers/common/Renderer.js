@@ -1086,12 +1086,12 @@ class Renderer {
 
 	}
 
-	copyTextureToTexture( position, srcTexture, dstTexture, level = 0 ) {
+	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
 
 		this._textures.updateTexture( srcTexture );
 		this._textures.updateTexture( dstTexture );
 
-		this.backend.copyTextureToTexture( position, srcTexture, dstTexture, level );
+		this.backend.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, level );
 
 	}
 
