@@ -7,10 +7,15 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import * as MathUtils from '../math/MathUtils.js';
 import { DualQuaternion } from '../math/DualQuaternion.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Quaternion } from '../math/Quaternion.js';
 
 const _offsetMatrix = /*@__PURE__*/ new Matrix4();
 const _identityMatrix = /*@__PURE__*/ new Matrix4();
 const _offsetDualQuaternion = /*@__PURE__*/ new DualQuaternion();
+const _offsetTranslation = /*@__PURE__*/ new Vector3();
+const _offsetRotation = /*@__PURE__*/ new Quaternion();
+const _offsetScale = /*@__PURE__*/ new Vector3();
 
 class Skeleton {
 
@@ -142,17 +147,22 @@ class Skeleton {
 			// compute the offset between the current and the original transform
 
 			const matrix = bones[ i ] ? bones[ i ].matrixWorld : _identityMatrix;
+			// console.log(matrix);
 			_offsetMatrix.multiplyMatrices( matrix, boneInverses[ i ] );
 
 			if ( this.useDualQuaternion ) {
 
-				const dq = _offsetDualQuaternion.fromMatrix4( _offsetMatrix );
+				_offsetMatrix.decompose( _offsetTranslation, _offsetRotation, _offsetScale );
+				const dq = _offsetDualQuaternion.fromTranslationAndRotation( _offsetTranslation, _offsetRotation );
+
 				dq.toArray( boneMatrices, i * 16 );
-				continue;
+				_offsetScale.toArray( boneMatrices, i * 16 + 8 );
+
+			} else {
+
+				_offsetMatrix.toArray( boneMatrices, i * 16 );
 
 			}
-
-			_offsetMatrix.toArray( boneMatrices, i * 16 );
 
 		}
 
