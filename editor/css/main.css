@@ -374,7 +374,7 @@ select {
 
 		#menubar .menu:hover .options {
 			display: block;
-			box-shadow: 0 5px 10px -5px #000;
+			box-shadow: 0 10px 10px -5px #00000033;
 		}
 
 			#menubar .menu .options hr {
