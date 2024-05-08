@@ -365,8 +365,6 @@ class MaterialCreator {
 
 			}
 
-			map.name = value;
-
 			params[ mapType ] = map;
 
 		}

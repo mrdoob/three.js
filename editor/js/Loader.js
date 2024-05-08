@@ -861,13 +861,13 @@ function Loader( editor ) {
 		const manager = new THREE.LoadingManager();
 		manager.setURLModifier( function ( url ) {
 
-			const u8a = zip[ url ];
+			const file = zip[ url ];
 
-			if ( u8a ) {
+			if ( file ) {
 
 				console.log( 'Loading', url );
 
-				const blob = new Blob( [ u8a ], { type: 'application/octet-stream' } );
+				const blob = new Blob( [ file.buffer ], { type: 'application/octet-stream' } );
 				return URL.createObjectURL( blob );
 
 			}
@@ -884,7 +884,7 @@ function Loader( editor ) {
 			const { OBJLoader } = await import( 'three/addons/loaders/OBJLoader.js' );
 
 			const materials = new MTLLoader( manager ).parse( strFromU8( zip[ 'materials.mtl' ] ) );
-			const object = new OBJLoader( manager ).setMaterials( materials ).parse( strFromU8( zip[ 'model.obj' ] ) );
+			const object = new OBJLoader().setMaterials( materials ).parse( strFromU8( zip[ 'model.obj' ] ) );
 
 			editor.execute( new AddObjectCommand( editor, object ) );
 			return;
